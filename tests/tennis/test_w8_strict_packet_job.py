@@ -182,3 +182,22 @@ def test_fresh_host_receipt_requires_bytes_path_and_original_inode(tmp_path, mon
     job.Path(protected['source'][0]).write_bytes(b'changed')
     with pytest.raises(ValueError, match='identity mismatch'):
         job.policy.protected_identity(original, tmp_path / 'bad.json')
+
+
+def test_grants_accept_json_key_order_but_reject_added_or_missing_paths(monkeypatch):
+    monkeypatch.setattr(job.cost, 'strict_roots',
+                        lambda root, output, runtime, files: [str(root), str(output), *(x['path'] for x in files.values())])
+    config = {'output': '/output', 'allow_paths': ['/code', '/output', '/bundle', '/profile', '/guider'],
+              'files': {'bundle': {'path': '/bundle'}, 'guider': {'path': '/guider'}, 'profile': {'path': '/profile'}}}
+    job.check_grants(config, {})
+    config['allow_paths'].append('/extra')
+    with pytest.raises(ValueError, match='grants'):
+        job.check_grants(config, {})
+    config['allow_paths'].pop()
+    removed = config['allow_paths'].pop()
+    with pytest.raises(ValueError, match='grants'):
+        job.check_grants(config, {})
+    config['allow_paths'].append(removed)
+    config['allow_paths'][-1] = '/bundle'
+    with pytest.raises(ValueError, match='grants'):
+        job.check_grants(config, {})

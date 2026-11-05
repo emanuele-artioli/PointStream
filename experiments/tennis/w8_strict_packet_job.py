@@ -109,6 +109,13 @@ def reconcile_protected_identity(historical: dict[str, Any], fresh: dict[str, An
             raise ValueError('protected host identity changed: ' + group)
 
 
+def check_grants(config: dict[str, Any], runtime: dict[str, Any]) -> None:
+    actual = config['allow_paths']
+    expected = cost.strict_roots(Path(actual[0]), Path(config['output']), runtime, config['files'])
+    if len(actual) != len(expected) or len(set(actual)) != len(actual) or set(actual) != set(expected):
+        raise ValueError('packet read grants differ')
+
+
 def worker(python: Path, root: Path, work: Path, config: dict[str, Any], loader: Path) -> dict[str, Any]:
     cfg = work / 'worker-config.json'
     cfg.write_text(json.dumps(config, sort_keys=True))
@@ -337,8 +344,8 @@ def validate(stage: Path, output: Path) -> int:
                     or 'experiments.tennis.w8_strict_packet_worker' not in usage['argv']):
                 raise ValueError('packet worker source-origin argv differs')
             main = preflight['runtimes']['main']
-            if (config['allow_paths'] != cost.strict_roots(Path(config['allow_paths'][0]), Path(config['output']), main, config['files'])
-                    or {name: item['sha256'] for name, item in config['files'].items()}
+            check_grants(config, main)
+            if ({name: item['sha256'] for name, item in config['files'].items()}
                     != {'bundle': NAMES['packet'], 'profile': NAMES['profile'], 'guider': NAMES['guider']}
                     or config['protected_receipt']['sha256'] != fixed.file_sha(unpacked / 'protected-identity.json')
                     or config['cpu_seconds'] != 100):
