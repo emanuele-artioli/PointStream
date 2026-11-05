@@ -35,7 +35,7 @@
     "experiments.tennis.w8_profiler_clock_oracle",
     "validate"
   ],
-  "deadline": "2026-11-05T12:55:00Z",
+  "deadline": "2026-11-05T12:59:00Z",
   "verify_staged_inputs": true,
   "stall_seconds": 80.0,
   "device": "cpu",
@@ -68,5 +68,5 @@
     "resume_attempts": 0
   },
   "cpu_affinity_index": 1,
-  "deadline_epoch": 1793883300.0
+  "deadline_epoch": 1793883540.0
 }
