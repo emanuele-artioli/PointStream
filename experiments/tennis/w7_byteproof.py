@@ -1,8 +1,8 @@
 """Fail-closed W7 Matroska byte proofs; no GPU, scoring, or job submission.
 
-A successful proof requires the complete reconstructed IVF to equal the
-historical IVF byte for byte. A mismatch is retained as unproven; a separate
-reviewed and budgeted native-YUV comparison is required before reuse.
+The default policy requires complete reconstructed-IVF byte equality. An
+explicit, separately budgeted native-YUV pilot may accept header differences
+only after ordered-payload, PTS and pinned-decoder YUV identity checks.
 """
 from __future__ import annotations
 
@@ -91,7 +91,8 @@ def commands(ffmpeg: Path, ffprobe: Path, src: Path, work: Path) -> dict[str, li
     return profile.commands(str(ffmpeg), str(ffprobe), 'unused-dav1d', src, work)
 
 
-def prove(row: dict[str, Any], src: Path, work: Path, ffmpeg: Path, ffprobe: Path) -> dict[str, Any]:
+def prove(row: dict[str, Any], src: Path, work: Path, ffmpeg: Path, ffprobe: Path,
+          *, dav1d: Path | None = None, native_yuv: bool = False) -> dict[str, Any]:
     if digest(src) != row['original_ivf_sha256'] or digest(ffmpeg) != old.FFMPEG_SHA or digest(ffprobe) != old.FFPROBE_SHA:
         raise ValueError('native or tool identity mismatch')
     ivf(src)
@@ -114,7 +115,26 @@ def prove(row: dict[str, Any], src: Path, work: Path, ffmpeg: Path, ffprobe: Pat
            'native_decoder_input_unchanged': comparison['exact_ivf_bytes'],
            'scope': 'byte proof only; source/RGB/mask/scorer equality must be separately established'}
     (work / 'proof.json').write_text(json.dumps(out, indent=2) + '\n')
-    if not comparison['exact_ivf_bytes']:
+    if not comparison['timestamps_equal'] or not comparison['ordered_payloads_equal']:
+        raise ValueError('ordered AV1 payloads or timestamps differ')
+    if native_yuv:
+        if dav1d is None or digest(dav1d) != profile.DAV1D_SHA:
+            raise ValueError('native decoder identity differs')
+        expected = row['historical_native_yuv_sha256']
+        if len(expected) != 64 or any(c not in '0123456789abcdef' for c in expected):
+            raise ValueError('historical native YUV hash is required')
+        decoded = work.parent.parent / (work.name + '-native.yuv')
+        command = [str(dav1d), '-i', str(work / 'decoder-scratch.ivf'), '-o', str(decoded), '--threads', '1', '--quiet']
+        subprocess.run(command, capture_output=True, check=True, timeout=90)
+        native_sha = digest(decoded)
+        if decoded.stat().st_size != row['width'] * row['height'] * 3 // 2 * 240 or native_sha != expected:
+            raise ValueError('delivered native YUV differs from historical decoder output')
+        decoded.unlink()
+        out.update(native_yuv_sha256=native_sha, native_decoder_sha256=profile.DAV1D_SHA,
+                   native_decode_command=command, native_yuv_proven=True,
+                   native_yuv_scope='decoded native YUV, distinct from source-video YUV')
+        (work / 'proof.json').write_text(json.dumps(out, indent=2) + '\n')
+    elif not comparison['exact_ivf_bytes']:
         raise ValueError('IVF bytes differ; separate budgeted native-YUV decode required')
     return out
 
@@ -137,7 +157,7 @@ def representative_three(inventory: dict[str, Any]) -> list[dict[str, Any]]:
         result.append(rows[0])
     return result
 
-def validate_proof(row: dict[str, Any], original: Path, work: Path) -> dict[str, Any]:
+def validate_proof(row: dict[str, Any], original: Path, work: Path, *, native_yuv: bool = False) -> dict[str, Any]:
     record = json.loads((work / 'proof.json').read_text())
     for key, value in row.items():
         if record.get(key) != value:
@@ -146,7 +166,11 @@ def validate_proof(row: dict[str, Any], original: Path, work: Path) -> dict[str,
     comparison = compare_ivf(original, work / 'decoder-scratch.ivf')
     if (digest(original) != row['original_ivf_sha256']
             or any(record.get(key) != value for key, value in comparison.items())
-            or not comparison['exact_ivf_bytes'] or not comparison['ordered_payloads_equal']
+            or (not native_yuv and not comparison['exact_ivf_bytes']) or not comparison['ordered_payloads_equal']
+            or not comparison['timestamps_equal']
+            or (native_yuv and (record.get('native_yuv_proven') is not True
+                                or record.get('native_yuv_sha256') != row['historical_native_yuv_sha256']
+                                or record.get('native_decoder_sha256') != profile.DAV1D_SHA))
             or record.get('profile') != profile.PROFILE
             or record.get('delivered_mkv_sha256') != digest(mkv)
             or record.get('delivered_mkv_bytes') != mkv.stat().st_size):

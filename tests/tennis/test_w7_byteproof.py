@@ -231,7 +231,7 @@ def test_mismatched_reconstruction_is_preserved_and_requires_decode_gate(tmp_pat
             path.write_bytes(b'mkv')
         else:
             data = bytearray(original.read_bytes())
-            data[-1] ^= 1
+            data[28] ^= 1
             path.write_bytes(data)
         return SimpleNamespace(stdout=b'')
     monkeypatch.setattr(proof.subprocess, 'run', fake_run)
