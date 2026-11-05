@@ -27,7 +27,10 @@ def worker_command(arguments: list[str]) -> list[str]:
         return [sys.executable, '-m', TARGET, '--accounted-child', *arguments]
     if arguments[0] == 'native-proof' and os.environ.get('CUDA_VISIBLE_DEVICES') == '':
         return [sys.executable, '-m', 'experiments.tennis.k5d_native_cpu_workload', *arguments[1:]]
-    raise ValueError('only fixed prepare/score or CPU native-proof workers are allowed')
+    if arguments[0] in ('parity16', 'parity-noop') and os.environ.get('CUDA_VISIBLE_DEVICES') not in (None, ''):
+        action = 'run' if arguments[0] == 'parity16' else 'noop'
+        return [sys.executable, '-m', 'experiments.tennis.k5d_real_parity', action, *arguments[1:]]
+    raise ValueError('only fixed prepare/score or approved proof workers are allowed')
 
 
 def supervise(arguments: list[str], timeout: float, outside_namespace: str) -> dict[str, Any]:

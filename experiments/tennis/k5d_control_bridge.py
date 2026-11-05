@@ -34,7 +34,9 @@ CONTROL_ADDITIONS = frozenset({'experiments/tennis/k5d_control_bridge.py',
                                'experiments/tennis/k5d_pid_escalation_oracle.py',
                                'experiments/tennis/k5d_pid_namespace_wrapper.py',
                                'tests/tennis/test_k5d_scoped_namespace.py',
-                               'tests/tennis/test_k5d_native_pid_oracle.py'})
+                               'tests/tennis/test_k5d_native_pid_oracle.py',
+                               'experiments/tennis/k5d_real_parity.py',
+                               'tests/tennis/test_k5d_real_parity.py'})
 
 
 def manifest(archive: Path, expected_sha: str) -> tuple[str, dict[str, list[str]]]:

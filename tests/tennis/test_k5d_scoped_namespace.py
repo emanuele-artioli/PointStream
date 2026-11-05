@@ -47,3 +47,12 @@ def test_native_proof_is_fixed_cpu_only(monkeypatch: pytest.MonkeyPatch) -> None
     monkeypatch.setenv('CUDA_VISIBLE_DEVICES', '0')
     with pytest.raises(ValueError, match='fixed prepare'):
         namespace.worker_command(['native-proof', '--archive', '/staged/source'])
+
+
+def test_gpu_parity_target_is_fixed_and_requires_device(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv('CUDA_VISIBLE_DEVICES', '0')
+    cmd = namespace.worker_command(['parity16', '--frames', '16'])
+    assert cmd[1:4] == ['-m', 'experiments.tennis.k5d_real_parity', 'run']
+    monkeypatch.setenv('CUDA_VISIBLE_DEVICES', '')
+    with pytest.raises(ValueError):
+        namespace.worker_command(['parity16', '--frames', '16'])
