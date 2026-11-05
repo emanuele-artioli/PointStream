@@ -39,6 +39,24 @@ def source_bridge() -> dict[str, Any]:
     return bridge
 
 
+def check_hybrid_state(window: roi.Window, actual_sha: str, spec_path: Path, ready_path: Path) -> None:
+    if window.hybrid_archive_sha is not None:
+        if window.hybrid_archive_sha != actual_sha:
+            raise ValueError('hybrid control archive differs from frozen window')
+        return
+    from experiments.jobs.inbox import digest as spec_digest
+    if (window.name != 'med000'
+            or old.digest(spec_path) != '9b3d405e22326c26a88ce6f6a15c3aa8b63fb59f8eccdb6714221de7c82339fc'
+            or old.digest(ready_path) != '8a7575bf77e28c573a8c9a35e5d294d258d1413c98f4244a12056302d4b94b98'):
+        raise ValueError('null hybrid state requires authenticated historical spec and ready')
+    spec, ready = json.loads(spec_path.read_text()), json.loads(ready_path.read_text())
+    records = [x for x in spec['staged_inputs'] if x['name'] == 'hybrid']
+    if (spec_digest(spec) != ready.get('spec_sha256') or len(records) != 1
+            or records[0]['sha256'] != actual_sha
+            or actual_sha != '2f01e4df611c1b6c3c08890ec88cc1c6881517c288cbec722eb20699e741cf03'):
+        raise ValueError('historical spec hybrid identity differs')
+
+
 def check_point(row: dict[str, Any], proof: dict[str, Any], validation: dict[str, Any], mkv: Path, window: roi.Window,
                 source_sha: str, masks_sha: str, hybrid_sha: str, scorer_sha: str, bridge: dict[str, Any]) -> None:
     """Bind the actual native-YUV receipt and reviewed historical scoring inputs."""
@@ -231,8 +249,7 @@ def score(args: Any, rows: list[dict[str, Any]], inputs: dict[str, Path], pilot:
     for row in selected:
         w = row['window']
         proof = json.loads(inputs[row['proof_asset']].read_text())
-        if roi.WINDOWS[w].hybrid_archive_sha != old.digest(inputs[w + '_hybrid']):
-            raise ValueError('hybrid control archive differs from frozen window')
+        check_hybrid_state(roi.WINDOWS[w], old.digest(inputs[w + '_hybrid']), inputs['historical_spec'], inputs['historical_ready'])
         validation = json.loads(inputs[row['validation_asset']].read_text())
         check_point(row, proof, validation, inputs[row['mkv_asset']], roi.WINDOWS[w], old.digest(inputs[w + '_source']),
                     old.digest(inputs[w + '_masks']), old.digest(inputs[w + '_hybrid']), scorer_sha, bridge)

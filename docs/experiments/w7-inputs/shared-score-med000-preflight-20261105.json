@@ -1,0 +1,87 @@
+{
+  "scope": "CPU input and historical control preflight only; no new GPU scoring or 53-point quality reuse",
+  "historical_job": "20261031T112710Z-7930b798",
+  "historical_spec_file_sha256": "9b3d405e22326c26a88ce6f6a15c3aa8b63fb59f8eccdb6714221de7c82339fc",
+  "historical_ready_file_sha256": "8a7575bf77e28c573a8c9a35e5d294d258d1413c98f4244a12056302d4b94b98",
+  "historical_spec_canonical_sha256": "9dd825eb0df4e5b18531f7170923a9d4be796d502f7a5dfc48d5e7ebcedbce12",
+  "historical_source_sha256": "79a3ea215c06610deccc73c610989252ca4d983f4a6fc41ba84fe8795f8ace94",
+  "historical_snapshot_sha256": "bf86ce21637732e65754d8f4de8f4ecd2d3b32981e93452fa2f7b6a079d1b2f2",
+  "historical_score_archive_sha256": "936e866c31a527d837c0bc0d22d05d6f672612cfa556aa1b8a64d1cb2ec52344",
+  "historical_state_hybrid_is_null": true,
+  "hybrid_sha256": "2f01e4df611c1b6c3c08890ec88cc1c6881517c288cbec722eb20699e741cf03",
+  "mask_archive_sha256": "d0c038098fcd159d4713400456ed84ebcc0998251d0b5a14ef826ec167824efd",
+  "mask_npz_sha256": "3d5ccbc845223234a0270e51ed6e130c0d274e0ae01751c913806cf459f5219f",
+  "fixed_ticks": 80,
+  "historical_control_errors": {
+    "full_lpips": 3.9183063271663876e-05,
+    "foreground_lpips": 9.966627943447381e-05,
+    "full_dists": 1.430511474609375e-05,
+    "foreground_dists": 3.11732292175293e-05
+  },
+  "control_tolerance": 0.001,
+  "cache_hashes": {
+    "files": [
+      {
+        "name": "windows",
+        "actual": "18d184cd39f6a4029a98e6fd9852d1e38f5cfde5c2ee19e5bc67bd69299c5e15",
+        "expected": "18d184cd39f6a4029a98e6fd9852d1e38f5cfde5c2ee19e5bc67bd69299c5e15",
+        "passed": true
+      },
+      {
+        "name": "state",
+        "actual": "96f8eee7bec42558fc1711a6f0ae03a85bffd0c1fd89235e291325455c5b9afb",
+        "expected": "96f8eee7bec42558fc1711a6f0ae03a85bffd0c1fd89235e291325455c5b9afb",
+        "passed": true
+      },
+      {
+        "name": "med000",
+        "actual": "3bf7ddaae0db5c48b1072fccb15f9f162e41fa5999886b9a5bde58dc0495c630",
+        "expected": "3bf7ddaae0db5c48b1072fccb15f9f162e41fa5999886b9a5bde58dc0495c630",
+        "passed": true
+      },
+      {
+        "name": "lpips",
+        "actual": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+        "expected": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+        "passed": true
+      },
+      {
+        "name": "dists",
+        "actual": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+        "expected": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+        "passed": true
+      }
+    ],
+    "cpu_seconds": 0.8221449999999999
+  },
+  "source_conversion": {
+    "exit_code": 0,
+    "stderr": "",
+    "bytes": 746496000,
+    "yuv_sha256": "da27e6d44ae9760a19a0dd1d2ac5eea2e3f826806b19c38a6000c63145f7ed11",
+    "wall_seconds": 1.4389814659953117,
+    "cpu_seconds": 1.462617,
+    "ffmpeg_sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+    "command": [
+      "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "-v",
+      "error",
+      "-nostdin",
+      "-i",
+      "/local/users/emanuele/pointstream/cache/3bf7ddaae0db5c48b1072fccb15f9f162e41fa5999886b9a5bde58dc0495c630/medvedev_struff__000.mp4",
+      "-frames:v",
+      "240",
+      "-vf",
+      "select=between(n\\,0\\,239),scale=1920:1080:flags=area:out_range=tv,format=yuv420p",
+      "-fps_mode",
+      "passthrough",
+      "-f",
+      "rawvideo",
+      "-pix_fmt",
+      "yuv420p",
+      "-y",
+      "pipe:1"
+    ]
+  },
+  "rgb_note": "YUV conversion verified; historical 80-tick RGB had no recorded hash. Identical reviewed scorer and helper conversion code is required; no independently saved RGB equality is claimed."
+}

@@ -120,7 +120,7 @@ def test_pilot_spec_uses_actual_whole_argument_stage_placeholder(tmp_path, monke
     import json
     from experiments.tennis import w7_shared_fleet as fleet
     names = ('inventory', 'bindings', 'windows', 'state', 'lpips', 'dists', 'med000_source',
-             'med000_masks', 'med000_hybrid', 'byte_publication', 'p1', 'v1', 'm1', 'p2', 'v2', 'm2')
+             'med000_masks', 'med000_hybrid', 'byte_publication', 'historical_spec', 'historical_ready', 'p1', 'v1', 'm1', 'p2', 'v2', 'm2')
     assets = {}
     for name in names:
         path = tmp_path / name
@@ -140,6 +140,7 @@ def test_pilot_spec_uses_actual_whole_argument_stage_placeholder(tmp_path, monke
     monkeypatch.setattr(worker, 'materialize_proofs', lambda archive, sha, chosen, destination: {name: tmp_path / name for name in ('p1', 'v1', 'm1', 'p2', 'v2', 'm2')})
     monkeypatch.setattr(worker, 'check_proof_publication', lambda *args, **kwargs: None)
     monkeypatch.setattr(worker, 'source_bridge', lambda: {})
+    monkeypatch.setattr(worker, 'check_hybrid_state', lambda *args: None)
     monkeypatch.setattr(worker.old, 'digest', lambda path: roi.WEIGHTS[path.name] if path.name in roi.WEIGHTS else 'f' * 64)
     result = fleet.pilot_spec(assets=assets, deadline='2099-01-01T00:00:00Z', smoke_seconds=100,
                               campaign_seconds=150, gpu_budget_seconds=200, cpu_budget_seconds=250)
@@ -172,3 +173,23 @@ def test_materialize_checks_full_coverage_and_selected_bytes(tmp_path: Path) -> 
     assert files['m'].read_bytes() == mkv
     with pytest.raises(ValueError, match='hash differs'):
         worker.materialize_proofs(archive, '0' * 64, [row], tmp_path / 'bad')
+
+
+def test_null_hybrid_requires_actual_7930_spec_and_ready(tmp_path: Path, monkeypatch) -> None:
+    import json
+    from types import SimpleNamespace
+    from experiments.jobs.inbox import digest
+    value = '2f01e4df611c1b6c3c08890ec88cc1c6881517c288cbec722eb20699e741cf03'
+    spec = {'staged_inputs': [{'name': 'hybrid', 'sha256': value}]}
+    sp, ready = tmp_path / 'spec', tmp_path / 'ready'
+    sp.write_text(json.dumps(spec))
+    ready.write_text(json.dumps({'spec_sha256': digest(spec)}))
+    monkeypatch.setattr(worker.old, 'digest', lambda p: {'spec': '9b3d405e22326c26a88ce6f6a15c3aa8b63fb59f8eccdb6714221de7c82339fc',
+                       'ready': '8a7575bf77e28c573a8c9a35e5d294d258d1413c98f4244a12056302d4b94b98'}[p.name])
+    w = SimpleNamespace(name='med000', hybrid_archive_sha=None)
+    worker.check_hybrid_state(w, value, sp, ready)
+    with pytest.raises(ValueError, match='identity'):
+        worker.check_hybrid_state(w, 'other', sp, ready)
+    w.hybrid_archive_sha = 'non-null-different'
+    with pytest.raises(ValueError, match='hybrid control'):
+        worker.check_hybrid_state(w, value, sp, ready)

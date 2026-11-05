@@ -28,7 +28,7 @@ def pilot_spec(*, assets: dict[str, dict[str, str]], deadline: str, smoke_second
     for name, entry in assets.items():
         cf.asset(name, entry['remote'], entry['sha256'], Path(entry['local']), extract=False)
     for name in ('inventory', 'bindings', 'windows', 'state', 'lpips', 'dists', 'med000_source',
-                 'med000_masks', 'med000_hybrid', 'byte_publication'):
+                 'med000_masks', 'med000_hybrid', 'byte_publication', 'historical_spec', 'historical_ready'):
         if name not in assets:
             raise ValueError('missing pilot asset: ' + name)
     rows = worker.inventory(Path(assets['inventory']['local']), assets['inventory']['sha256'])
@@ -41,6 +41,7 @@ def pilot_spec(*, assets: dict[str, dict[str, str]], deadline: str, smoke_second
         raise ValueError('pilot control and new point are required')
     if assets['byte_publication']['sha256'] != '55739efe3cbf6937b6251e26c2ed1322663f8d1d2d1ee5f36bfb1ace593cdb59':
         raise ValueError('pilot requires the independently reviewed 14f7 full byte-proof publication')
+    worker.check_hybrid_state(roi.WINDOWS['med000'], assets['med000_hybrid']['sha256'], Path(assets['historical_spec']['local']), Path(assets['historical_ready']['local']))
     if any(worker.old.digest(Path(assets[n]['local'])) != roi.WEIGHTS[n] for n in ('lpips', 'dists')):
         raise ValueError('model weights differ')
     import tempfile
