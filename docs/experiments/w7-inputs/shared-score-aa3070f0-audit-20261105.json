@@ -108,5 +108,8 @@
   },
   "six_context_bounds_available": false,
   "full22_admitted": false,
-  "scope": "actual two-point pilot; neither historical 53 quality reuse nor full22 admitted"
+  "scope": "actual two-point pilot; neither historical 53 quality reuse nor full22 admitted",
+  "source_conversion_preflight_receipt_sha256": "952173832da4d42f35e51f50182137872824dcbe418ed1243ee2b905dc362db7",
+  "source_rgb_scope": "Historical CPU source YUV hash verified; pilot used reviewed W1 RGB conversion; no historical saved RGB digest exists.",
+  "historical_53_join_sha256": "d9894203a5b0858b3c870a9156f6e9a0054cff6393b8617fd01afed29f948c3f"
 }
