@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import resource
@@ -35,6 +36,44 @@ RESERVE_SECONDS = 25.0
 SMOKE_SECONDS = 150.0
 
 
+def configure_allocator(torch: Any, limit_mib: int, total_bytes: int) -> float:
+    """Install the shared-job allocator cap before any tensor allocation."""
+    if (
+        type(limit_mib) is not int
+        or limit_mib != 4096
+        or type(total_bytes) is not int
+        or total_bytes <= 0
+    ):
+        raise ValueError("invalid shared GPU memory limit")
+    fraction = limit_mib * 2**20 / total_bytes
+    if not 0.0 < fraction <= 1.0:
+        raise ValueError("shared GPU memory limit exceeds physical memory")
+    torch.cuda.set_per_process_memory_fraction(fraction, 0)
+    verify_allocator(torch, fraction)
+    return fraction
+
+
+def verify_allocator(torch: Any, expected: float) -> float:
+    value = float(torch.cuda.get_per_process_memory_fraction(0))
+    if not math.isfinite(value) or abs(value - expected) > 1e-6:
+        raise ValueError("shared CUDA allocator cap differs")
+    return value
+
+
+def prepare_cuda_probe(
+    torch: Any, limit_mib: int, total_bytes: int
+) -> tuple[Any, Any, float, float, float]:
+    fraction = configure_allocator(torch, limit_mib, total_bytes)
+    before_allocation = verify_allocator(torch, fraction)
+    x = torch.ones((64, 64), dtype=torch.float32, device="cuda:0")
+    y = x @ x
+    torch.cuda.synchronize()
+    value = float(y.sum().item())
+    if not (x.is_cuda and y.is_cuda and value == 262144.0):
+        raise ValueError("synthetic CUDA matmul failed correctness or fell back")
+    return x, y, value, fraction, before_allocation
+
+
 def source_origins() -> dict[str, str]:
     root = Path(__file__).resolve(strict=True).parents[2]
     if Path.cwd().resolve(strict=True) != root:
@@ -55,6 +94,9 @@ def worker(config: Path, expected_sha: str, arm: str) -> None:
         raise ValueError("invalid config or arm")
     cfg = json.loads(config.read_text())
     visible = os.environ.get("CUDA_VISIBLE_DEVICES", "")
+    limit_raw = os.environ.get("PS_GPU_MEMORY_LIMIT_MIB", "")
+    if limit_raw != "4096" or cfg.get("gpu_memory_limit_mib") != 4096:
+        raise ValueError("missing or invalid shared GPU allocator limit")
     if not visible or policy.canonical_gpu_uuid(visible) != policy.canonical_gpu_uuid(
         cfg["gpu_uuid"]
     ):
@@ -147,12 +189,9 @@ def worker(config: Path, expected_sha: str, arm: str) -> None:
             raise ValueError("physical CUDA UUID differs from claim")
         if props.major != 8 or props.minor != 9 or "RTX 6000 Ada" not in props.name:
             raise ValueError("actual GPU is not the admitted Ada class")
-        x = torch.ones((64, 64), dtype=torch.float32, device="cuda:0")
-        y = x @ x
-        torch.cuda.synchronize()
-        value = float(y.sum().item())
-        if not (x.is_cuda and y.is_cuda and value == 262144.0):
-            raise ValueError("synthetic CUDA matmul failed correctness or fell back")
+        x, y, value, fraction, cap_before_allocation = prepare_cuda_probe(
+            torch, int(limit_raw), int(props.total_memory)
+        )
         receipt["cuda"] = {
             "success": True,
             "device_count": count,
@@ -163,7 +202,12 @@ def worker(config: Path, expected_sha: str, arm: str) -> None:
             "inputs_cuda": bool(x.is_cuda),
             "output_cuda": bool(y.is_cuda),
             "cuda_initialized": bool(torch.cuda.is_initialized()),
+            "gpu_memory_limit_mib": int(limit_raw),
+            "total_memory_bytes": int(props.total_memory),
+            "allocator_fraction": fraction,
+            "allocator_fraction_before_allocation": cap_before_allocation,
         }
+        receipt["cuda"]["allocator_fraction_before_profile"] = verify_allocator(torch, fraction)
         os.write(2, b"W8_CUDA_PROFILE_BEGIN\n")
         try:
             with torch.profiler.profile(
@@ -201,6 +245,8 @@ def worker(config: Path, expected_sha: str, arm: str) -> None:
             }
         finally:
             os.write(2, b"W8_CUDA_PROFILE_END\n")
+            receipt["cuda"]["allocator_fraction_after_profile"] = verify_allocator(torch, fraction)
+            receipt["cuda"]["peak_torch_reserved_bytes"] = int(torch.cuda.max_memory_reserved())
     except Exception as exc:
         receipt["cuda"] = {
             "success": False,
@@ -215,8 +261,11 @@ def worker(config: Path, expected_sha: str, arm: str) -> None:
 def run() -> None:
     visible = os.environ.get("CUDA_VISIBLE_DEVICES", "")
     claimed = os.environ.get("PS_CLAIMED_GPU_UUID", "")
+    limit_raw = os.environ.get("PS_GPU_MEMORY_LIMIT_MIB", "")
+    if os.environ.get("PS_GPU_SHARING") != "shared" or limit_raw != "4096":
+        raise ValueError("shared GPU claim or allocator limit missing")
     if not visible or policy.canonical_gpu_uuid(visible) != policy.canonical_gpu_uuid(claimed):
-        raise ValueError("missing exclusive GPU claim")
+        raise ValueError("missing shared GPU claim")
     if len(os.sched_getaffinity(0)) != 1:
         raise ValueError("one CPU affinity required")
     stage = Path(os.environ["PS_STAGE_DIR"])
@@ -245,6 +294,7 @@ def run() -> None:
         denied.extend((str(p), str(alias)))
     env = {
         "CUDA_VISIBLE_DEVICES": visible,
+        "PS_GPU_MEMORY_LIMIT_MIB": limit_raw,
         "PYTHONDONTWRITEBYTECODE": "1",
         "PYTHONNOUSERSITE": "1",
         "OMP_NUM_THREADS": "1",
@@ -278,6 +328,7 @@ def run() -> None:
         output.mkdir()
         config = root / f"{arm}.json"
         cfg = {
+            "gpu_memory_limit_mib": int(limit_raw),
             "output": str(output),
             "canary": str(canary),
             "denied": denied,
@@ -425,6 +476,14 @@ def validate() -> None:
         ):
             raise ValueError("validator device claim differs")
         if (
+            spec["gpu_memory_mib"] != 4096
+            or spec["gpu_sharing"]["mode"] != "shared"
+            or dispatch["gpu_sharing"]["mode"] != "shared"
+            or os.environ.get("PS_GPU_MEMORY_LIMIT_MIB") != "4096"
+            or os.environ.get("PS_GPU_SHARING") != "shared"
+        ):
+            raise ValueError("shared allocator reservation differs")
+        if (
             spec["environment"]["sha256"]
             != "bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e"
         ):
@@ -534,6 +593,8 @@ def validate() -> None:
                 raise ValueError("receipt differs")
             if set(receipt["source_origins"].values()) != set(SOURCE):
                 raise ValueError("source origins differ")
+            if config.get("gpu_memory_limit_mib") != 4096:
+                raise ValueError("worker allocator reservation differs")
             if policy.canonical_gpu_uuid(config["gpu_uuid"]) != policy.canonical_gpu_uuid(
                 visible
             ) or policy.canonical_gpu_uuid(receipt["visible_uuid"]) != policy.canonical_gpu_uuid(
@@ -605,6 +666,22 @@ def validate() -> None:
             cuda = receipt["cuda"]
             profile = receipt["profiler"]
             if cuda["success"]:
+                expected_fraction = 4096 * 2**20 / cuda["total_memory_bytes"]
+                if (
+                    cuda["gpu_memory_limit_mib"] != 4096
+                    or not 0 < expected_fraction <= 1
+                    or any(
+                        abs(cuda[key] - expected_fraction) > 1e-6
+                        for key in (
+                            "allocator_fraction",
+                            "allocator_fraction_before_allocation",
+                            "allocator_fraction_before_profile",
+                            "allocator_fraction_after_profile",
+                        )
+                    )
+                    or cuda["peak_torch_reserved_bytes"] > 4096 * 2**20
+                ):
+                    raise ValueError("shared allocator cap differs")
                 if (
                     cuda["device_count"] != 1
                     or policy.canonical_gpu_uuid(cuda["uuid"]) != policy.canonical_gpu_uuid(visible)

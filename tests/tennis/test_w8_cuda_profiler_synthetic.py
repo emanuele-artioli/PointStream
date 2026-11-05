@@ -45,15 +45,18 @@ def test_gpu_diagnostic_validator_rejects_tampered_trace_and_cpu_fallback(tmp_pa
         "code": {"snapshot_sha256": actual_sha(source)},
         "campaign_clock": clock,
         "environment": {"gpu": gpu},
+        "gpu_sharing": {"mode": "shared"},
     }
     (stage / "dispatch.json").write_text(json.dumps(dispatch))
     (tmp_path / "ready.json").write_text(json.dumps({"snapshot_sha256": actual_sha(source)}))
     (tmp_path / "spec.json").write_text(
         json.dumps(
             {
+                "gpu_memory_mib": 4096,
+                "gpu_sharing": {"mode": "shared"},
                 "environment": {
                     "sha256": "bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e"
-                }
+                },
             }
         )
     )
@@ -74,6 +77,7 @@ def test_gpu_diagnostic_validator_rejects_tampered_trace_and_cpu_fallback(tmp_pa
     for index, arm in enumerate(oracle.ARMS):
         config = {
             "gpu_uuid": uuid,
+            "gpu_memory_limit_mib": 4096,
             "denied": denied,
             "loader": {},
             "parent_ns": {"user": "u0", "net": "n0"},
@@ -89,6 +93,13 @@ def test_gpu_diagnostic_validator_rejects_tampered_trace_and_cpu_fallback(tmp_pa
             "inputs_cuda": True,
             "output_cuda": True,
             "cuda_initialized": True,
+            "gpu_memory_limit_mib": 4096,
+            "total_memory_bytes": 48 * 2**30,
+            "allocator_fraction": 1 / 12,
+            "allocator_fraction_before_allocation": 1 / 12,
+            "allocator_fraction_before_profile": 1 / 12,
+            "allocator_fraction_after_profile": 1 / 12,
+            "peak_torch_reserved_bytes": 1024,
         }
         profile = {
             "attempted": True,
@@ -203,9 +214,25 @@ def test_gpu_diagnostic_validator_rejects_tampered_trace_and_cpu_fallback(tmp_pa
     monkeypatch.setenv("PS_VALIDATION_PATH", str(out))
     monkeypatch.setenv("CUDA_VISIBLE_DEVICES", uuid)
     monkeypatch.setenv("PS_CLAIMED_GPU_UUID", uuid)
+    monkeypatch.setenv("PS_GPU_MEMORY_LIMIT_MIB", "4096")
+    monkeypatch.setenv("PS_GPU_SHARING", "shared")
     publish()
     oracle.validate()
     assert json.loads(out.read_text())["checks"]["cuda_outcomes_and_kernels"]
+    monkeypatch.delenv("PS_GPU_MEMORY_LIMIT_MIB")
+    with pytest.raises(ValueError, match="shared allocator reservation"):
+        oracle.validate()
+    monkeypatch.setenv("PS_GPU_MEMORY_LIMIT_MIB", "4096")
+    row = result["arms"][1]
+    row["receipt"]["cuda"]["allocator_fraction_after_profile"] = 0.5
+    content["publish/unrestricted.receipt"] = json.dumps(row["receipt"]).encode()
+    row["artifacts"]["receipt"] = sha(content["publish/unrestricted.receipt"])
+    publish()
+    with pytest.raises(ValueError, match="shared allocator cap differs"):
+        oracle.validate()
+    row["receipt"]["cuda"]["allocator_fraction_after_profile"] = 1 / 12
+    content["publish/unrestricted.receipt"] = json.dumps(row["receipt"]).encode()
+    row["artifacts"]["receipt"] = sha(content["publish/unrestricted.receipt"])
     content["publish/strict.trace"] += b"tamper"
     publish()
     with pytest.raises(ValueError, match="raw artifact hash"):
@@ -249,3 +276,53 @@ def test_gpu_diagnostic_validator_rejects_tampered_trace_and_cpu_fallback(tmp_pa
     publish()
     oracle.validate()
     assert json.loads(out.read_text())["arms"] == ["strict"]
+
+
+def test_shared_allocator_is_required_before_any_tensor_allocation():
+    events = []
+
+    class CUDA:
+        fraction = 0.0
+
+        def set_per_process_memory_fraction(self, value, device):
+            events.append("cap")
+            self.fraction = value
+
+        def get_per_process_memory_fraction(self, device):
+            return self.fraction
+
+        def synchronize(self):
+            events.append("synchronize")
+
+    class Tensor:
+        is_cuda = True
+
+        def __matmul__(self, other):
+            return self
+
+        def sum(self):
+            return self
+
+        def item(self):
+            return 262144.0
+
+    class Torch:
+        cuda = CUDA()
+        float32 = "float32"
+
+        @staticmethod
+        def ones(*args, **kwargs):
+            assert events == ["cap"]
+            events.append("allocation")
+            return Tensor()
+
+    for invalid_limit, total in ((0, 48 * 2**30), (8192, 48 * 2**30), (4096, 1)):
+        with pytest.raises(ValueError):
+            oracle.prepare_cuda_probe(Torch, invalid_limit, total)
+        assert events == []
+    _, _, value, fraction, observed = oracle.prepare_cuda_probe(Torch, 4096, 48 * 2**30)
+    assert value == 262144.0 and fraction == observed == 1 / 12
+    assert events == ["cap", "allocation", "synchronize"]
+    Torch.cuda.fraction = 0.5
+    with pytest.raises(ValueError, match="cap differs"):
+        oracle.verify_allocator(Torch, fraction)

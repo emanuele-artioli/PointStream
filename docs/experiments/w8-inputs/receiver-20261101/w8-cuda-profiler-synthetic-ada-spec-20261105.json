@@ -35,13 +35,12 @@
     "experiments.tennis.w8_cuda_profiler_synthetic",
     "validate"
   ],
-  "deadline": "2026-11-05T13:15:00Z",
+  "deadline": "2026-11-05T13:17:00Z",
   "verify_staged_inputs": true,
   "stall_seconds": 120.0,
   "device": "gpu",
   "hosts": [
-    "gpu5",
-    "gpu6"
+    "gpu5"
   ],
   "gpu_models": [
     "RTX 6000 Ada"
@@ -66,13 +65,16 @@
   },
   "validator_seconds": 15,
   "budget_seconds": 180,
-  "contention": {
-    "policy": "stop",
-    "resume_attempts": 0
-  },
   "cpu_affinity_index": 1,
   "gpu_sharing": {
-    "mode": "exclusive"
+    "mode": "shared",
+    "basis": "Synthetic device, isolation and profiler correctness do not depend on performance measurements; timing is used only as a conservative budget gate.",
+    "margin_mib": 8192
   },
-  "deadline_epoch": 1793884500.0
+  "contention": {
+    "policy": "continue",
+    "basis": "Synthetic device, isolation and profiler correctness do not depend on performance measurements; timing is used only as a conservative budget gate.",
+    "resume_attempts": 0
+  },
+  "deadline_epoch": 1793884620.0
 }
