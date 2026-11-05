@@ -99,6 +99,32 @@ def projection(costs: dict[str, dict[str, float]], allowances: dict[str, Any],
             'limitation': '16/48 single-clip fixed-marginal fit, not established cross-clip or 586-frame cost; confirmations precede the other 28 clips'}
 
 
+
+def qualified_remaining_draft(receipt: dict[str, Any], *, identity: dict[str, str],
+                              inventory_path: Path, inventory_sha: str,
+                              noncommand_path: Path, noncommand_sha: str,
+                              ledger_path: Path, ledger_sha: str,
+                              attestation_path: Path, attestation_sha: str) -> dict[str, Any]:
+    """Recompute only verified pending work; draft never grants admission."""
+    from experiments.tennis import k5d_control_study as control, k5d_study_wave as wave
+
+    if receipt.get('consumer_execution_identity') != identity:
+        raise ValueError('consumer execution identity differs')
+    inventory = wave.inventory(study.checked_json(inventory_path, inventory_sha), identity)
+    if any(inventory[clip][phase]['state'] != 'complete'
+           for clip in wave.CONFIRMATIONS for phase in ('prepare', 'score')):
+        raise ValueError('four verified confirmation stages required')
+    noncommand = wave.verified_noncommand(study.checked_json(noncommand_path, noncommand_sha), identity, inventory)
+    ledger = study.checked_json(ledger_path, ledger_sha)
+    attestation = study.checked_json(attestation_path, attestation_sha)
+    control.check_budget(ledger, attestation, ledger_sha, attestation_sha, receipt)
+    forecast = control.programme_projection(receipt, inventory=inventory, noncommand=noncommand)
+    return {'schema': 1, 'approved': False, 'status': 'draft pending independent review',
+            'execution_identity': identity, 'inventory_sha256': inventory_sha,
+            'noncommand_evidence_sha256': noncommand_sha, 'budget_ledger_sha256': ledger_sha,
+            'budget_attestation_sha256': attestation_sha, 'forecast': forecast,
+            'scope': 'verified pending-stage estimate; not a resource release'}
+
 def metadata(stage_entry: dict[str, Any]) -> tuple[dict[str, Any], str]:
     job, root, stage = stage_entry['job'], Path(stage_entry['directory']), stage_entry['stage']
     if root.name != job or stage not in ('smoke', 'full'):

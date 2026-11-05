@@ -37,7 +37,8 @@ CALIBRATION_ARCHIVES = {
 }
 
 
-def programme_projection(receipt: dict[str, Any]) -> dict[str, Any]:
+def programme_projection(receipt: dict[str, Any], *, inventory: dict[str, dict[str, Any]] | None = None,
+                         noncommand: dict[str, dict[str, Any]] | None = None) -> dict[str, Any]:
     """Recompute all 60 GPU full stages and CPU-readiness campaigns, once each."""
     rows = study.selection()
     if len(rows) != 30 or sum(row['label_rows'] for row in rows.values()) != 5675:
@@ -60,19 +61,39 @@ def programme_projection(receipt: dict[str, Any]) -> dict[str, Any]:
                 or costs[phase]['margin'] < 1.5 or costs[phase]['reserve_seconds'] <= 0
                 or costs[phase]['seconds16'] <= 0 or costs[phase]['seconds48'] < costs[phase]['seconds16']):
             raise ValueError('invalid calibration bounds')
+    if inventory is not None and (set(inventory) != set(rows) or any(
+            inventory[clip][phase]['state'] not in ('pending', 'complete')
+            for clip in rows for phase in ('prepare', 'score'))):
+        raise ValueError('inventory contains unknown or unfinished work')
+    pending = [(clip, phase) for clip in rows for phase in ('prepare', 'score')
+               if inventory is None or inventory[clip][phase]['state'] == 'pending']
     full_compute = 0.0
     max_full = 0.0
-    for row in rows.values():
-        for phase in ('prepare', 'score'):
-            estimate = study.forecast(receipt, phase, row['label_rows'], costs[phase]['seconds16'])
-            full_compute += estimate
-            max_full = max(max_full, estimate)
+    for clip, phase in pending:
+        row = rows[clip]
+        estimate = study.forecast(receipt, phase, row['label_rows'], costs[phase]['seconds16'])
+        full_compute += estimate
+        max_full = max(max_full, estimate)
     if max_full > 2670:
         raise ValueError('full stage exceeds recovery bound')
     cpu_costs = None
     if 'cpu_calibration' in receipt:
         from experiments.tennis import k5d_study_wave as wave
-        cpu_costs = wave.verified_cpu_calibration(receipt['cpu_calibration'], receipt['consumer_execution_identity'])
+        cpu_costs = wave.verified_cpu_calibration(receipt['cpu_calibration'], receipt['consumer_execution_identity'], inventory)
+        if set(cpu_costs) != {'prepare', 'score'}:
+            raise ValueError('both CPU calibration phases required')
+        for model in cpu_costs.values():
+            values = [model.get(k) for k in ('margin', 'fixed_seconds', 'marginal_seconds_per_frame')]
+            if (any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) or v < 0
+                    for v in values) or model['margin'] < 1.5):
+                raise ValueError('CPU calibration requires a finite 1.5 margin')
+        if inventory is not None:
+            for phase in ('prepare', 'score'):
+                for sample in receipt['cpu_calibration'][phase]:
+                    entry, saved = sample['entry'], inventory[sample['clip']][phase]
+                    if any(entry.get(key) != saved.get(key) or key not in entry or key not in saved
+                           for key in ('job_id', 'receipt_sha256', 'publications', 'independent_audit_sha256')):
+                        raise ValueError('CPU calibration differs from verified inventory')
     results = {}
     for resource in ('gpu', 'cpu'):
         d = receipt['programme'][resource]
@@ -83,23 +104,46 @@ def programme_projection(receipt: dict[str, Any]) -> dict[str, Any]:
         if not (20 <= d['readiness_seconds'] <= 60 and d['stage_staging_seconds'] > 0
                 and d['validator_seconds'] > 0 and d['audit_seconds'] > 0 and d['failed_start_reserve_seconds'] > 0):
             raise ValueError('missing readiness, staging, validator or audit reserves')
-        if max_full + d['readiness_seconds'] + 2 * d['stage_staging_seconds'] + d['validator_seconds'] > 3000:
-            raise ValueError('longest campaign exceeds 3000-second recovery bound')
         command_cost = full_compute
+        max_command = max_full
         if resource == 'cpu' and cpu_costs is not None:
-            command_cost = sum(cpu_costs[phase]['margin'] * (cpu_costs[phase]['fixed_seconds']
-                               + cpu_costs[phase]['marginal_seconds_per_frame'] * row['label_rows'])
-                               for row in rows.values() for phase in ('prepare', 'score'))
-        incremental = (command_cost + 60 * d['readiness_seconds'] + 120 * d['stage_staging_seconds']
-                       + 60 * d['validator_seconds'] + 60 * d['audit_seconds'] + d['failed_start_reserve_seconds'])
-        qualified = resource == 'gpu'
+            estimates = [cpu_costs[phase]['margin'] * (cpu_costs[phase]['fixed_seconds']
+                         + cpu_costs[phase]['marginal_seconds_per_frame'] * rows[clip]['label_rows'])
+                         for clip, phase in pending]
+            command_cost = sum(estimates)
+            max_command = max(estimates, default=0.0)
+        count = len(pending)
+        if noncommand is not None:
+            groups = noncommand['groups']
+            declared = d.get('noncommand_groups')
+            if not isinstance(declared, dict) or set(declared) != set(groups):
+                raise ValueError('all audited noncommand groups require allowances')
+            for name, sample in groups.items():
+                value = declared[name]
+                if (isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value)
+                        or value < sample[resource]):
+                    raise ValueError('noncommand allowance understates audited measurement: ' + name)
+            group_total = sum(declared.values())
+            if count and d['failed_start_reserve_seconds'] < max_command + group_total:
+                raise ValueError('failure reserve below one bounded campaign')
+            if resource == 'gpu' and max_full + group_total > 2700:
+                raise ValueError('longest campaign exceeds 45-minute recovery bound')
+            incremental = command_cost + count * group_total + (d['failed_start_reserve_seconds'] if count else 0)
+        else:
+            campaign = max_full + d['readiness_seconds'] + 2 * d['stage_staging_seconds'] + d['validator_seconds']
+            if campaign > 2700:
+                raise ValueError('longest campaign exceeds 45-minute recovery bound')
+            incremental = (command_cost + count * d['readiness_seconds'] + 2 * count * d['stage_staging_seconds']
+                           + count * d['validator_seconds'] + count * d['audit_seconds'] + d['failed_start_reserve_seconds'])
+        qualified = resource == 'gpu' or (inventory is not None and noncommand is not None and cpu_costs is not None)
         results[resource] = {'incremental_seconds': incremental if resource == 'gpu' or cpu_costs is not None else None,
                              'fits': qualified and incremental <= min(d['ball_remaining_seconds'], d['global_remaining_seconds'])}
-    return {'campaigns': 60, 'full_stages': 60, 'gpu_smoke_inferences': 0,
+    return {'campaigns': len(pending), 'full_stages': len(pending), 'gpu_smoke_inferences': 0,
             'full_frames_per_phase': 5675, 'max_full_seconds': max_full,
             'gpu': results['gpu'], 'cpu': results['cpu'],
-            'cpu_method': ('unreleased estimate: verified command CPU with 1.5 margin; staging and isolation remain unproved'
-                           if cpu_costs is not None else 'process-tree CPU upper bound not established')}
+            'cpu_method': ('verified command CPU and independently audited noncommand bounds'
+                           if inventory is not None and noncommand is not None and cpu_costs is not None
+                           else 'unreleased estimate; complete CPU bound not established')}
 
 
 def check_budget(ledger: dict[str, Any], attestation: dict[str, Any], ledger_sha: str,
@@ -109,6 +153,28 @@ def check_budget(ledger: dict[str, Any], attestation: dict[str, Any], ledger_sha
             or receipt.get('budget_ledger_sha256') != ledger_sha
             or receipt.get('budget_attestation_sha256') != attestation_sha):
         raise ValueError('budget snapshot and active reservations not bound')
+    active = {}
+    if 'reservations' in ledger:
+        for reservation in ledger['reservations']:
+            status = reservation.get('status')
+            if not isinstance(status, str) or not status:
+                raise ValueError('reservation status missing')
+            if status.lower().startswith(('closed', 'released', 'superseded', 'cancelled')):
+                continue
+            phase = reservation['phase']
+            if phase in active:
+                raise ValueError('duplicate active reservation phase')
+            remaining = {}
+            for resource in ('gpu', 'cpu'):
+                cap = reservation[resource + '_seconds']
+                if isinstance(cap, bool) or not isinstance(cap, (int, float)) or not math.isfinite(cap) or cap < 0:
+                    raise ValueError('invalid active reservation accounting')
+                remaining[resource] = cap
+            active[phase] = {'workstream': reservation['workstream'], **remaining}
+        if active and ledger.get('reservation_amount_basis') != 'remaining_unspent':
+            raise ValueError('active reservation amounts must explicitly be remaining unspent')
+        if (active or 'active_reservations' in attestation) and attestation.get('active_reservations') != active:
+            raise ValueError('active reservation attestation differs from ledger')
     for resource in ('gpu', 'cpu'):
         charged = sum(row.get(resource + '_seconds', 0) for row in ledger['charges'] if row['workstream'] == 'ball')
         global_charged = sum(row.get(resource + '_seconds', 0) for row in ledger['charges'])
@@ -116,8 +182,8 @@ def check_budget(ledger: dict[str, Any], attestation: dict[str, Any], ledger_sha
         programme = receipt['programme'][resource]
         if (row['ball_charged_seconds'] != charged or row['global_charged_seconds'] != global_charged
                 or row['ball_limit_seconds'] != ledger['workstreams']['ball'][resource + '_limit_seconds']
-                or row['spent_and_reserved_seconds'] < charged
-                or row['global_remaining_seconds'] > ledger[resource + '_total_seconds'] - global_charged
+                or row['spent_and_reserved_seconds'] < charged + sum(x[resource] for x in active.values() if x['workstream'] == 'ball')
+                or row['global_remaining_seconds'] > ledger[resource + '_total_seconds'] - global_charged - sum(x[resource] for x in active.values())
                 or programme['ball_remaining_seconds'] > row['ball_limit_seconds'] - row['spent_and_reserved_seconds']
                 or programme['global_remaining_seconds'] > row['global_remaining_seconds']):
             raise ValueError('programme budget exceeds reconciled ledger')
@@ -162,7 +228,8 @@ def confirmation_budget(gate: dict[str, Any], receipt: dict[str, Any]) -> None:
 def approved(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha: str, bridge_path: Path, bridge_sha: str,
              old_source: Path, new_source: Path, ledger_path: Path, ledger_sha: str,
              budget_path: Path, budget_sha: str, identity: dict[str, str], clip: str, phase: str,
-             qualification_paths: dict[str, Path] | None = None) -> tuple[dict[str, Any], int]:
+             qualification_paths: dict[str, Path] | None = None,
+             full_evidence_paths: dict[str, Path] | None = None) -> tuple[dict[str, Any], int]:
     gate = study.checked_json(gate_path, gate_sha)
     receipt = study.checked_json(cost_path, cost_sha)
     signed_bridge = study.checked_json(bridge_path, bridge_sha)
@@ -201,8 +268,9 @@ def approved(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha: str, bri
     ledger = study.checked_json(ledger_path, ledger_sha)
     attestation = study.checked_json(budget_path, budget_sha)
     check_budget(ledger, attestation, ledger_sha, budget_sha, receipt)
-    projection = programme_projection(receipt)
     if gate['release'] == 'cost-confirmation':
+        programme_projection(receipt)
+    if gate['release'] in ('cost-confirmation', 'full-study'):
         qualification = gate.get('confirmation_qualification')
         if not isinstance(qualification, dict):
             raise ValueError('real-path confirmation qualification required')
@@ -232,10 +300,34 @@ def approved(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha: str, bri
                 or not isinstance(parity.get('job_id'), str) or not parity['job_id'].startswith('2026')
                 or parity.get('consumer_execution_identity') != identity or parity.get('gpu_model') != 'RTX A6000'
                 or parity.get('gpu_capability') != [8, 6] or parity.get('all_six_exact') is not True
-                or parity.get('namespace_wrapper_sha256') != qualification['namespace_wrapper_sha256']):
+                or parity.get('namespace_wrapper_sha256') != qualification['namespace_wrapper_sha256']
+                or parity.get('unshare_sha256') != qualification['unshare_sha256']):
             raise ValueError('actual native or GPU qualification receipt differs')
-        confirmation_budget(gate, receipt)
-    else:
+        if gate['release'] == 'cost-confirmation':
+            confirmation_budget(gate, receipt)
+    if gate['release'] == 'full-study':
+        qualification = gate.get('confirmation_qualification')
+        if not isinstance(qualification, dict):
+            raise ValueError('full-study qualification missing')
+        if full_evidence_paths is None or set(full_evidence_paths) != {'inventory', 'noncommand'}:
+            raise ValueError('full-study inventory and noncommand evidence required')
+        from experiments.tennis import k5d_study_wave as wave
+        inventory_doc = study.checked_json(full_evidence_paths['inventory'], gate['full_study_inventory_sha256'])
+        noncommand_doc = study.checked_json(full_evidence_paths['noncommand'], gate['noncommand_evidence_sha256'])
+        inventory = wave.inventory(inventory_doc, identity)
+        if any(inventory[clip][stage]['state'] != 'complete'
+               for clip in wave.CONFIRMATIONS for stage in ('prepare', 'score')):
+            raise ValueError('all four verified confirmation stages required')
+        for confirmed_clip in wave.CONFIRMATIONS:
+            for confirmed_phase in ('prepare', 'score'):
+                entry = inventory[confirmed_clip][confirmed_phase]
+                job_receipt = study.checked_json(Path(entry['receipt_path']), entry['receipt_sha256'])
+                job_spec = study.checked_json(Path(job_receipt['job_directory']) / 'spec.json',
+                                              job_receipt['records']['spec_sha256'])
+                if cf.option(job_spec['arguments'], '--unshare-sha') != qualification['unshare_sha256']:
+                    raise ValueError('confirmation namespace executable identity differs')
+        noncommand = wave.verified_noncommand(noncommand_doc, identity, inventory)
+        projection = programme_projection(receipt, inventory=inventory, noncommand=noncommand)
         if receipt.get('budget_fits') != {'gpu': True, 'cpu': True}:
             raise ValueError('full programme budget evidence differs')
         if not projection['gpu']['fits'] or not projection['cpu']['fits']:
@@ -247,9 +339,14 @@ def approved(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha: str, bri
 
 def spec(base: dict[str, Any], *, phase: str, clip: str, identity: dict[str, str], assets: dict[str, dict[str, str]],
          deadline: str, readiness_seconds: int, full_seconds: int, campaign_seconds: int) -> dict[str, Any]:
+    if (base.get('device') != 'gpu' or base.get('cpu_threads') != 1
+            or base.get('single_cpu_campaign') is not True
+            or base.get('gpu_sharing') != {'mode': 'exclusive'}
+            or base.get('contention') != {'policy': 'stop', 'resume_attempts': 0}):
+        raise ValueError('exclusive single-core GPU campaign required')
     if (type(readiness_seconds) is not int or not 20 <= readiness_seconds <= 60
             or type(full_seconds) is not int or not 0 < full_seconds <= 2670
-            or type(campaign_seconds) is not int or campaign_seconds > 3000
+            or type(campaign_seconds) is not int or campaign_seconds > 2700
             or campaign_seconds < readiness_seconds + full_seconds + 30):
         raise ValueError('invalid readiness/full campaign bounds')
     for name, item in assets.items():
@@ -262,17 +359,23 @@ def spec(base: dict[str, Any], *, phase: str, clip: str, identity: dict[str, str
             raise ValueError('missing approved evidence asset: ' + name)
     gate_data = study.checked_json(Path(assets['full_gate']['local']), assets['full_gate']['sha256'])
     qualification_paths = None
-    if gate_data.get('release') == 'cost-confirmation':
+    if gate_data.get('release') in ('cost-confirmation', 'full-study'):
         if not {'native_cpu_receipt', 'gpu_parity_receipt'}.issubset(assets):
             raise ValueError('actual CPU and GPU qualification assets required')
         qualification_paths = {name: Path(assets[name + '_receipt']['local']) for name in ('native_cpu', 'gpu_parity')}
+    full_evidence_paths = None
+    if gate_data.get('release') == 'full-study':
+        if not {'study_inventory', 'noncommand_evidence'}.issubset(assets):
+            raise ValueError('full-study inventory and noncommand assets required')
+        full_evidence_paths = {'inventory': Path(assets['study_inventory']['local']),
+                               'noncommand': Path(assets['noncommand_evidence']['local'])}
     receipt, frames = approved(Path(assets['full_gate']['local']), assets['full_gate']['sha256'],
                                Path(assets['cost_receipt']['local']), assets['cost_receipt']['sha256'],
                                Path(assets['bridge']['local']), assets['bridge']['sha256'],
                                Path(assets['calibration_source']['local']), Path(assets['consumer_source']['local']),
                                Path(assets['budget_ledger']['local']), assets['budget_ledger']['sha256'],
                                Path(assets['budget_attestation']['local']), assets['budget_attestation']['sha256'],
-                               identity, clip, phase, qualification_paths)
+                               identity, clip, phase, qualification_paths, full_evidence_paths)
     predicted = study.forecast(receipt, phase, frames, receipt['cost'][phase]['seconds16'])
     if predicted > full_seconds:
         raise ValueError('fixed/marginal full-stage forecast exceeds declared cap')
@@ -289,6 +392,9 @@ def spec(base: dict[str, Any], *, phase: str, clip: str, identity: dict[str, str
     if qualification_paths is not None:
         args += ['--native-cpu-receipt', '{staged:native_cpu_receipt}',
                  '--gpu-parity-receipt', '{staged:gpu_parity_receipt}']
+    if full_evidence_paths is not None:
+        args += ['--study-inventory', '{staged:study_inventory}',
+                 '--noncommand-evidence', '{staged:noncommand_evidence}']
     if phase == 'score':
         if 'checkpoint' not in assets:
             raise ValueError('actual full-context checkpoint required')
@@ -302,11 +408,17 @@ def spec(base: dict[str, Any], *, phase: str, clip: str, identity: dict[str, str
     result['scale']['mode'] = {'smoke': 'readiness', 'full': 'full'}
     result['smoke'] = {'seconds': readiness_seconds, 'representative_basis': 'CPU validation of the complete source timeline, model identities, source bridge and prepared checkpoint.'}
     result['full'] = {'seconds': full_seconds}
-    if gate_data['release'] == 'cost-confirmation':
-        for resource in ('gpu', 'cpu'):
-            cap = gate_data['confirmation_caps'][resource]['jobs'][f'{clip}:{phase}']
-            if campaign_seconds > cap:
-                raise ValueError('campaign exceeds reserved confirmation job cap')
+    if gate_data['release'] in ('cost-confirmation', 'full-study'):
+        if gate_data['release'] == 'cost-confirmation':
+            for resource in ('gpu', 'cpu'):
+                cap = gate_data['confirmation_caps'][resource]['jobs'][f'{clip}:{phase}']
+                if campaign_seconds > cap:
+                    raise ValueError('campaign exceeds reserved confirmation job cap')
+        else:
+            for resource in ('gpu', 'cpu'):
+                d = receipt['programme'][resource]
+                if campaign_seconds + sum(d['noncommand_groups'].values()) > d['failed_start_reserve_seconds']:
+                    raise ValueError('actual campaign cap exceeds prospective failure reserve')
         result['entrypoint'] = ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']
         result['arguments'] = ['--unshare-sha', gate_data['confirmation_qualification']['unshare_sha256'],
                                '--timeout', '{namespace_timeout}', '--', *args]
@@ -324,7 +436,9 @@ def verify_gate(args: argparse.Namespace, identity: dict[str, str]) -> int:
                          Path(args.budget_ledger), args.budget_ledger_sha256, Path(args.budget_attestation),
                          args.budget_attestation_sha256, identity, args.clip, args.action,
                          {'native_cpu': Path(args.native_cpu_receipt), 'gpu_parity': Path(args.gpu_parity_receipt)}
-                         if args.native_cpu_receipt and args.gpu_parity_receipt else None)
+                         if args.native_cpu_receipt and args.gpu_parity_receipt else None,
+                         {'inventory': Path(args.study_inventory), 'noncommand': Path(args.noncommand_evidence)}
+                         if args.study_inventory and args.noncommand_evidence else None)
     if args.frames != frames:
         raise ValueError('full native timeline differs')
     return frames
@@ -407,6 +521,8 @@ def main() -> None:
         parser.add_argument('--' + name, required=True)
     parser.add_argument('--native-cpu-receipt')
     parser.add_argument('--gpu-parity-receipt')
+    parser.add_argument('--study-inventory')
+    parser.add_argument('--noncommand-evidence')
     parser.add_argument('--checkpoint')
     parser.add_argument('--checkpoint-sha256')
     parser.add_argument('--frames', type=int, required=True)

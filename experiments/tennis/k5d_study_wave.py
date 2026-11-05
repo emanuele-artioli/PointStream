@@ -82,6 +82,7 @@ def verify_completed(clip: str, phase: str, entry: dict[str, Any], frames: int,
         raise ValueError('completed job directory differs')
     spec = read(job_dir / 'spec.json', receipt['records']['spec_sha256'])
     if spec.get('entrypoint') not in (['-m', 'experiments.tennis.k5d_control_study'],
+                                       ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer'],
                                        ['-m', 'experiments.tennis.k5d_full_study']):
         raise ValueError('unsupported study entrypoint')
     for stage in names:
@@ -90,7 +91,8 @@ def verify_completed(clip: str, phase: str, entry: dict[str, Any], frames: int,
         staging = read(job_dir / stage / 'staging.json', records['staging_sha256'])
         execution = read(job_dir / stage / 'execution.json', records['execution_sha256'])
         artifact = publications[stage]
-        control = spec.get('entrypoint') == ['-m', 'experiments.tennis.k5d_control_study']
+        control = spec.get('entrypoint') in (['-m', 'experiments.tennis.k5d_control_study'],
+                                                ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer'])
         expected_frames = frames if control or stage == 'full' else 16
         code = dispatch['code']
         gpu = dispatch['environment']['gpu']['name']
@@ -115,10 +117,17 @@ def verify_completed(clip: str, phase: str, entry: dict[str, Any], frames: int,
         if phase == 'prepare' and stage == 'full' and not cf.digest_string(artifact.get('checkpoint_sha256', '')):
             raise ValueError('prepared checkpoint digest missing')
         if control:
+            if spec.get('entrypoint') != ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']:
+                raise ValueError('completed control stage requires qualified namespace')
             log_path = job_dir / stage / 'command.log'
             if oracle.sha(log_path) != records['command_log_sha256']:
                 raise ValueError('CPU command log SHA mismatch')
-            accounting.read_receipt(log_path.read_text(), phase=phase, stage=stage, clip=clip,
+            log_text = log_path.read_text()
+            records_cpu = [json.loads(line.removeprefix('K5D_CPU_ACCOUNTING ')) for line in log_text.splitlines()
+                           if line.startswith('K5D_CPU_ACCOUNTING ')]
+            if len(records_cpu) != 1 or records_cpu[0].get('method') != 'linux-pidns-init-waited-rusage-v1':
+                raise ValueError('qualified namespace accounting method required')
+            accounting.read_receipt(log_text, phase=phase, stage=stage, clip=clip,
                                     frames=frames, identity=identity)
         if control and stage == 'smoke':
             with unpack_publication(Path(artifact['local_path']), artifact['sha256']) as output:
@@ -146,7 +155,7 @@ def validate_full(clip: str, phase: str, frames: int, identity: dict[str, str],
             raise ValueError('score requires exact prepared publication')
         prepared = preparation['publications']['full']
         checkpoint_sha = prepared['checkpoint_sha256']
-        option = '--checkpoint-sha256' if 'experiments.tennis.k5d_control_study' in dispatch['command'] else '--checkpoint-full-sha256'
+        option = '--checkpoint-sha256' if '--checkpoint-sha256' in dispatch['command'] else '--checkpoint-full-sha256'
         if (cf.option(dispatch['command'], option) != checkpoint_sha
                 or not any(x.get('sha256') == prepared['sha256'] for x in dispatch.get('staged_inputs', []))):
             raise ValueError('score dispatch is not bound to prepared publication')
@@ -173,7 +182,27 @@ def validate_full(clip: str, phase: str, frames: int, identity: dict[str, str],
 
 
 
-def verified_cpu_calibration(samples: dict[str, Any], identity: dict[str, str]) -> dict[str, dict[str, float]]:
+
+def verify_independent_confirmation(clip: str, phase: str, entry: dict[str, Any],
+                                    identity: dict[str, str]) -> None:
+    """Require a separately recorded, hash-bound audit of each real confirmation."""
+    audit = read(Path(entry['independent_audit_path']), entry['independent_audit_sha256'])
+    receipt = read(Path(entry['receipt_path']), entry['receipt_sha256'])
+    checks = audit.get('checks', {})
+    required = {'fleet_provenance', 'source_frame_identity', 'published_content',
+                'namespace_cpu_accounting', 'teardown', 'native_fresh_decode'}
+    if phase == 'score':
+        required |= {'all_six_metrics_judges', 'producer_checkpoint_join'}
+    if (audit.get('schema') != 1 or audit.get('scope') != 'independent full confirmation audit'
+            or audit.get('audited') is not True or audit.get('passed') is not True
+            or audit.get('job_id') != entry['job_id'] or audit.get('clip') != clip or audit.get('phase') != phase
+            or audit.get('execution_identity') != identity or audit.get('receipt_sha256') != entry['receipt_sha256']
+            or audit.get('command_log_sha256') != receipt['records']['full']['command_log_sha256']
+            or not isinstance(checks, dict) or any(checks.get(k) is not True for k in required)):
+        raise ValueError('independent confirmation audit differs')
+
+def verified_cpu_calibration(samples: dict[str, Any], identity: dict[str, str],
+                             verified_inventory: dict[str, dict[str, Any]] | None = None) -> dict[str, dict[str, float]]:
     """Fit CPU only from the two independently validated full confirmation jobs per phase."""
     if set(samples) != {'prepare', 'score'}:
         raise ValueError('both CPU calibration phases required')
@@ -190,14 +219,35 @@ def verified_cpu_calibration(samples: dict[str, Any], identity: dict[str, str]) 
             frames = selection[clip]['label_rows']
             entry = sample['entry']
             jobs.add(entry['job_id'])
+            if verified_inventory is not None:
+                saved = verified_inventory[clip][phase]
+                if saved.get('state') != 'complete' or any(entry.get(key) != saved.get(key) or key not in entry or key not in saved
+                        for key in ('job_id', 'receipt_sha256', 'publications', 'independent_audit_sha256')):
+                    raise ValueError('CPU calibration differs from verified inventory')
             if phase == 'score':
                 if not sample.get('preparation'):
                     raise ValueError('score calibration needs its actual producer job')
-                verify_completed(clip, 'prepare', sample['preparation'], frames, identity)
-            verify_completed(clip, phase, entry, frames, identity, sample.get('preparation'))
+                if verified_inventory is None:
+                    verify_completed(clip, 'prepare', sample['preparation'], frames, identity)
+                elif sample['preparation']['job_id'] != verified_inventory[clip]['prepare']['job_id']:
+                    raise ValueError('CPU score producer differs from verified inventory')
+            if verified_inventory is None:
+                verify_completed(clip, phase, entry, frames, identity, sample.get('preparation'))
+            verify_independent_confirmation(clip, phase, entry, identity)
             receipt = read(Path(entry['receipt_path']), entry['receipt_sha256'])
-            log = Path(receipt['job_directory']) / 'full' / 'command.log'
-            seconds = accounting.read_receipt(log.read_text(), phase=phase, stage='full', clip=clip,
+            directory = Path(receipt['job_directory'])
+            spec = read(directory / 'spec.json', receipt['records']['spec_sha256'])
+            if spec.get('entrypoint') != ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']:
+                raise ValueError('CPU calibration requires qualified namespace execution')
+            log = directory / 'full' / 'command.log'
+            if oracle.sha(log) != receipt['records']['full']['command_log_sha256']:
+                raise ValueError('CPU calibration command log changed')
+            log_text = log.read_text()
+            records_cpu = [json.loads(line.removeprefix('K5D_CPU_ACCOUNTING ')) for line in log_text.splitlines()
+                           if line.startswith('K5D_CPU_ACCOUNTING ')]
+            if len(records_cpu) != 1 or records_cpu[0].get('method') != 'linux-pidns-init-waited-rusage-v1':
+                raise ValueError('CPU calibration lacks namespace accounting')
+            seconds = accounting.read_receipt(log_text, phase=phase, stage='full', clip=clip,
                                               frames=frames, identity=identity)
             values.append((frames, seconds))
         if len(jobs) != 2:
@@ -208,6 +258,139 @@ def verified_cpu_calibration(samples: dict[str, Any], identity: dict[str, str]) 
         fixed = max(0.0, t1 - slope * n1, t2 - slope * n2)
         fitted[phase] = {'fixed_seconds': fixed, 'marginal_seconds_per_frame': slope, 'margin': 1.5}
     return fitted
+
+
+OVERHEAD_KINDS = ('readiness', 'staging', 'validation', 'publication', 'audit', 'isolation')
+
+
+def verified_noncommand(bundle: dict[str, Any], identity: dict[str, str],
+                        rows: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    """Verify disjoint measured groups and command-covered isolation."""
+    if (bundle.get('schema') != 1 or bundle.get('failure_reserve') != 'one-bounded-campaign'
+            or bundle.get('command_covered') not in ([], ['isolation'])
+            or not isinstance(bundle.get('groups'), dict) or not bundle['groups']):
+        raise ValueError('audited noncommand groups and prospective failure reserve required')
+    covered = set(bundle['command_covered'])
+    for item in bundle['groups'].values():
+        scopes = item.get('covers')
+        if (not isinstance(scopes, list) or not scopes or len(scopes) != len(set(scopes))
+                or not set(scopes).issubset(set(OVERHEAD_KINDS)) or covered.intersection(scopes)):
+            raise ValueError('invalid or overlapping noncommand coverage')
+        covered.update(scopes)
+    if covered != set(OVERHEAD_KINDS):
+        raise ValueError('all noncommand categories must be covered')
+    jobs = {rows[clip][phase]['job_id']: rows[clip][phase] for clip in CONFIRMATIONS for phase in ('prepare', 'score')}
+    if bundle['command_covered']:
+        for clip in CONFIRMATIONS:
+            for phase in ('prepare', 'score'):
+                entry = rows[clip][phase]
+                receipt = read(Path(entry['receipt_path']), entry['receipt_sha256'])
+                path = Path(receipt['job_directory']) / 'full/command.log'
+                if oracle.sha(path) != receipt['records']['full']['command_log_sha256']:
+                    raise ValueError('command-covered isolation log differs')
+                log = path.read_text()
+                accounting.read_receipt(log, phase=phase, stage='full', clip=clip,
+                                        frames=study.selection()[clip]['label_rows'], identity=identity)
+                namespace = [json.loads(line.removeprefix('K5D_NAMESPACE_CANDIDATE '))
+                             for line in log.splitlines() if line.startswith('K5D_NAMESPACE_CANDIDATE ')]
+                if len(namespace) != 1 or namespace[0].get('init_cpu_seconds') is None:
+                    raise ValueError('command-covered isolation CPU absent')
+    result = {}
+    now = datetime.now(timezone.utc)
+    for kind, item in bundle['groups'].items():
+        if not isinstance(kind, str) or not kind or item.get('frequency') != 'per_campaign':
+            raise ValueError('noncommand group identity or frequency differs')
+        raw = read(Path(item['raw_path']), item['raw_sha256'])
+        audit = read(Path(item['audit_path']), item['audit_sha256'])
+        job = raw.get('job_id')
+        if (not re.fullmatch(r'\d{8}T\d{6}Z-[0-9a-f]{8}', str(job))
+                or job not in jobs
+                or raw.get('schema') != 1 or raw.get('kind') != kind or raw.get('covers') != item['covers']
+                or raw.get('execution_identity') != identity
+                or raw.get('cpu_method') not in ('waited-rusage-delta-v1', 'single-cpu-interval-upper-bound-v1')
+                or raw.get('complete_descendant_wait') is not True
+                or raw.get('observed_at') is None or timestamp(raw['observed_at']) > now
+                or audit.get('schema') != 1 or audit.get('scope') != 'independent noncommand measurement audit'
+                or audit.get('audited') is not True or audit.get('passed') is not True
+                or audit.get('job_id') != job or audit.get('kind') != kind or audit.get('covers') != item['covers']
+                or audit.get('raw_sha256') != item['raw_sha256'] or audit.get('execution_identity') != identity
+                or audit.get('checks', {}).get('raw_job_and_scope_join') is not True
+                or audit.get('checks', {}).get('complete_process_tree') is not True
+                or audit.get('checks', {}).get('gpu_claim_coverage') is not True):
+            raise ValueError('noncommand evidence identity or independent audit differs')
+        # The checked fleet records bind every group to one actual confirmation.
+        directory = Path(raw['job_directory'])
+        if directory.name != job:
+            raise ValueError('noncommand job directory differs')
+        job_receipt = read(Path(jobs[job]['receipt_path']), jobs[job]['receipt_sha256'])
+        if Path(job_receipt['job_directory']) != directory:
+            raise ValueError('noncommand measurement uses another job directory')
+        status = read(directory / 'run/status.json', raw['status_sha256'])
+        spec = read(directory / 'spec.json', raw['spec_sha256'])
+        if status.get('status') != 'complete' or not isinstance(spec.get('entrypoint'), list):
+            raise ValueError('noncommand source job status differs')
+        stage = raw['stage']
+        if stage not in ('smoke', 'full'):
+            raise ValueError('invalid noncommand stage')
+        dispatch = read(directory / stage / 'dispatch.json', raw['dispatch_sha256'])
+        code = dispatch['code']
+        if (code.get('source_sha256') != identity['source_sha256']
+                or code.get('snapshot_sha256') != identity['snapshot_sha256']
+                or dispatch['staged_environment']['sha256'] != identity['environment_sha256']
+                or code.get('spec_sha256') != inbox.digest(spec)
+                or not raw.get('gpu_uuid') or raw['gpu_uuid'] != dispatch['environment']['gpu']['uuid']):
+            raise ValueError('noncommand fleet dispatch identity differs')
+        before, after = raw['cpu_before'], raw['cpu_after']
+        counter_records = []
+        for label in ('before', 'after'):
+            counter_path = Path(raw[f'counter_{label}_path']).resolve(strict=True)
+            if not counter_path.is_relative_to(directory.resolve(strict=True)):
+                raise ValueError('CPU counter source is outside its recorded job')
+            counter_records.append(read(counter_path, raw[f'counter_{label}_sha256']))
+        for declared, measured_record in zip((before, after), counter_records):
+            child = measured_record.get('children_resource_usage')
+            if (not isinstance(child, list) or len(child) < 2
+                    or declared.get('children_user') != child[0] or declared.get('children_system') != child[1]):
+                raise ValueError('CPU child counters differ from hashed raw execution')
+            if raw['cpu_method'] == 'waited-rusage-delta-v1':
+                own = measured_record.get('self_resource_usage')
+                if (not isinstance(own, list) or len(own) < 2
+                        or declared.get('self_user') != own[0] or declared.get('self_system') != own[1]):
+                    raise ValueError('measured supervisor counters unavailable or mismatched')
+            elif (raw.get('self_cpu_observed') is not False or declared.get('self_user') != 0
+                  or declared.get('self_system') != 0):
+                raise ValueError('upper bound must disclose unmeasured supervisor CPU')
+        cpu_values = [before.get(k) for k in ('self_user', 'self_system', 'children_user', 'children_system')]
+        end_values = [after.get(k) for k in ('self_user', 'self_system', 'children_user', 'children_system')]
+        values = [*cpu_values, *end_values, raw.get('gpu_claim_start'), raw.get('gpu_claim_end'),
+                  raw.get('interval_start'), raw.get('interval_end')]
+        if (any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) or v < 0 for v in values)
+                or any(b < a for a, b in zip(cpu_values, end_values))
+                or raw['gpu_claim_end'] < raw['gpu_claim_start'] or raw['interval_end'] <= raw['interval_start']):
+            raise ValueError('invalid noncommand measurement counters')
+        measured = sum(b - a for a, b in zip(cpu_values, end_values))
+        if measured <= 0:
+            raise ValueError('noncommand raw CPU counters missing')
+        if raw['cpu_method'] == 'single-cpu-interval-upper-bound-v1':
+            affinity = dispatch.get('cpu_affinity')
+            if (spec.get('single_cpu_campaign') is not True or spec.get('cpu_threads') != 1
+                    or not isinstance(affinity, list) or len(affinity) != 1
+                    or audit['checks'].get('one_cpu_affinity_and_tree') is not True
+                    or audit['checks'].get('external_costs_covered') is not True):
+                raise ValueError('single-CPU interval lacks audited affinity, tree or external scope')
+            cpu = raw['interval_end'] - raw['interval_start']
+            if measured > cpu + 0.05:
+                raise ValueError('CPU counters exceed single-CPU interval')
+        else:
+            cpu = measured
+        gpu = raw['gpu_claim_end'] - raw['gpu_claim_start']
+        # Zero is valid for no GPU claim, but CPU must be measured, not omitted.
+        if cpu <= 0:
+            raise ValueError('noncommand CPU measurement missing')
+        result[kind] = {'cpu': 1.5 * cpu, 'gpu': 1.5 * gpu, 'cpu_method': raw['cpu_method'],
+                        'covers': item['covers'], 'frequency': 'per_campaign'}
+    return {'groups': result, 'command_covered': bundle['command_covered'],
+            'failure_reserve': 'one-bounded-campaign'}
 
 def inventory(ledger: dict[str, Any], identity: dict[str, str]) -> dict[str, dict[str, Any]]:
     selected = study.selection()
@@ -251,7 +434,7 @@ def inspect_hosts(snapshot: dict[str, Any], now: datetime) -> None:
 def propose(*, ledger_path: Path, ledger_sha: str, gate_path: Path, gate_sha: str,
             evidence_path: Path, evidence_sha: str, inspection_path: Path, inspection_sha: str,
             identity: dict[str, str], gpu_budget_seconds: float, cpu_budget_seconds: float,
-            now: datetime) -> dict[str, Any]:
+            now: datetime, control_assets: dict[str, str] | None = None) -> dict[str, Any]:
     """Return at most one bounded prepare/score job, never submit it."""
     if now.tzinfo is None:
         raise ValueError('timezone required')
@@ -274,11 +457,36 @@ def propose(*, ledger_path: Path, ledger_sha: str, gate_path: Path, gate_sha: st
             phase = 'score'
         else:
             continue
-        _, evidence, frames = study.admission(gate_path, gate_sha, evidence_path, evidence_sha, clip, identity)
-        cost = evidence['cost'][phase]
-        if isinstance(cost.get('margin'), bool) or not isinstance(cost.get('margin'), (int, float)) or not math.isfinite(cost['margin']) or cost['margin'] < 1.5:
-            raise ValueError('cost margin must be at least 1.5')
-        raise ValueError('process-tree CPU bound is not established; no wave proposal')
+        if control_assets is None:
+            _, evidence, _ = study.admission(gate_path, gate_sha, evidence_path, evidence_sha, clip, identity)
+            cost = evidence['cost'][phase]
+            if isinstance(cost.get('margin'), bool) or not isinstance(cost.get('margin'), (int, float)) or not math.isfinite(cost['margin']) or cost['margin'] < 1.5:
+                raise ValueError('cost margin must be at least 1.5')
+            raise ValueError('process-tree CPU bound is not established; no wave proposal')
+        from experiments.tennis import k5d_control_study as control
+        required = {'bridge_path', 'bridge_sha', 'calibration_source', 'consumer_source', 'budget_ledger',
+                    'budget_ledger_sha', 'budget_attestation', 'budget_attestation_sha', 'native_cpu_receipt',
+                    'gpu_parity_receipt', 'noncommand_evidence'}
+        if set(control_assets) != required:
+            raise ValueError('complete full-study control evidence required')
+        a = control_assets
+        evidence, frames = control.approved(gate_path, gate_sha, evidence_path, evidence_sha,
+            Path(a['bridge_path']), a['bridge_sha'], Path(a['calibration_source']), Path(a['consumer_source']),
+            Path(a['budget_ledger']), a['budget_ledger_sha'], Path(a['budget_attestation']), a['budget_attestation_sha'],
+            identity, clip, phase, {'native_cpu': Path(a['native_cpu_receipt']), 'gpu_parity': Path(a['gpu_parity_receipt'])},
+            {'inventory': ledger_path, 'noncommand': Path(a['noncommand_evidence'])})
+        cpu_model = verified_cpu_calibration(evidence['cpu_calibration'], identity, rows)[phase]
+        gpu_full = study.forecast(evidence, phase, frames, evidence['cost'][phase]['seconds16'])
+        cpu_full = cpu_model['margin'] * (cpu_model['fixed_seconds'] + cpu_model['marginal_seconds_per_frame'] * frames)
+        caps = {}
+        for resource, command in (('gpu', gpu_full), ('cpu', cpu_full)):
+            d = evidence['programme'][resource]
+            caps[resource] = command + sum(d['noncommand_groups'].values()) + d['failed_start_reserve_seconds']
+        if gpu_full > 2670 or caps['gpu'] > gpu_budget_seconds or caps['cpu'] > cpu_budget_seconds:
+            raise ValueError('next stage exceeds recovery or remaining budgets')
+        return {'schema': 1, 'action': phase, 'clip': clip, 'frames': frames, 'execution_identity': identity,
+                'ledger_sha256': ledger_sha, 'gpu_seconds_upper': caps['gpu'], 'cpu_seconds_upper': caps['cpu'],
+                'scope': 'review-only qualified remaining-stage proposal; no dispatch or authority'}
     return {'schema': 1, 'action': 'complete', 'selection_sha256': study.fleet.SOURCE_SHA,
             'ledger_sha256': ledger_sha, 'scope': 'all registered clips have completed prepare and score receipts'}
 

@@ -146,14 +146,15 @@ def test_confirmation_requires_both_audited_receipts_without_full30_fit(
            'independent_cpu_match': True}
     parity = {'schema': 1, 'audited': True, 'passed': True, 'scope': 'actual 16-frame GPU native and score parity',
               'consumer_execution_identity': {'new': 'new'}, 'job_id': '20261105T000000Z-abcdef12',
-              'gpu_model': 'RTX A6000', 'gpu_capability': [8, 6], 'all_six_exact': True, 'namespace_wrapper_sha256': 'w' * 64}
+              'gpu_model': 'RTX A6000', 'gpu_capability': [8, 6], 'all_six_exact': True, 'namespace_wrapper_sha256': 'w' * 64,
+              'unshare_sha256': 'd' * 64}
     objects = {'gate': gate, 'cost': data, 'bridge': bridge, 'ledger': {}, 'budget': {}, 'cpu': cpu, 'parity': parity}
     monkeypatch.setattr(study, 'checked_json', lambda path, _: objects[path.name])
     monkeypatch.setattr(study, 'selection', lambda: {clips[0]: {'label_rows': 292}, clips[1]: {'label_rows': 586}})
     monkeypatch.setattr(control.bridge, 'bridge', lambda *_: bridge)
     monkeypatch.setattr(control.evidence, 'historical', lambda *_: None)
     monkeypatch.setattr(control, 'check_budget', lambda *_: None)
-    monkeypatch.setattr(control, 'programme_projection', lambda *_: {'gpu': {'fits': False}, 'cpu': {'fits': False}})
+    monkeypatch.setattr(control, 'programme_projection', lambda *_, **_kwargs: {'gpu': {'fits': False}, 'cpu': {'fits': False}})
     monkeypatch.setattr(control.oracle, 'sha', lambda *_: 'w' * 64)
     args = (tmp_path / 'gate', 'g' * 64, tmp_path / 'cost', 'e' * 64, tmp_path / 'bridge', 'b' * 64,
             tmp_path / 'old', tmp_path / 'new', tmp_path / 'ledger', 'l' * 64, tmp_path / 'budget', 't' * 64,
@@ -169,8 +170,25 @@ def test_confirmation_requires_both_audited_receipts_without_full30_fit(
     parity['all_six_exact'] = True
     gate['release'] = 'full-study'
     data['budget_fits'] = {'gpu': True, 'cpu': True}
-    with pytest.raises(ValueError, match='full programme exceeds'):
+    with pytest.raises(ValueError, match='inventory and noncommand'):
         control.approved(*args, paths)
+    from experiments.tennis import k5d_study_wave as wave
+    gate.update(full_study_inventory_sha256='i' * 64, noncommand_evidence_sha256='n' * 64)
+    inventory = {clip: {phase: {'state': 'complete', 'receipt_path': str(tmp_path / 'job_receipt'),
+                                 'receipt_sha256': 'r' * 64} for phase in ('prepare', 'score')} for clip in clips}
+    objects['inventory'] = {'inventory': True}
+    objects['noncommand'] = {'samples': True}
+    objects['job_receipt'] = {'job_directory': str(tmp_path / 'job'), 'records': {'spec_sha256': 's' * 64}}
+    objects['spec.json'] = {'arguments': ['--unshare-sha', 'd' * 64]}
+    monkeypatch.setattr(wave, 'inventory', lambda *_: inventory)
+    monkeypatch.setattr(wave, 'verified_noncommand', lambda *_: {'audited': True})
+    monkeypatch.setattr(control, 'programme_projection', lambda *_, **_kwargs: {'gpu': {'fits': True}, 'cpu': {'fits': True}})
+    full_paths = {'inventory': tmp_path / 'inventory', 'noncommand': tmp_path / 'noncommand'}
+    _, frames = control.approved(*args, paths, full_paths)
+    assert frames == 292
+    inventory[clips[0]]['prepare']['state'] = 'pending'
+    with pytest.raises(ValueError, match='all four verified confirmation'):
+        control.approved(*args, paths, full_paths)
 
 
 def test_confirmation_spec_uses_namespace_and_enforces_job_caps(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -189,7 +207,8 @@ def test_confirmation_spec_uses_namespace_and_enforces_job_caps(tmp_path, monkey
     monkeypatch.setattr(control.cf, 'asset', lambda name, *_args, **_kwargs: {'name': name})
     monkeypatch.setattr(control.cf, 'common_spec', lambda *_: {'scale': {}})
     monkeypatch.setattr(inbox, 'validate_spec', lambda *_: None)
-    base: dict = {'arguments': []}
+    base: dict = {'arguments': [], 'device': 'gpu', 'cpu_threads': 1, 'single_cpu_campaign': True,
+                  'gpu_sharing': {'mode': 'exclusive'}, 'contention': {'policy': 'stop', 'resume_attempts': 0}}
     result = control.spec(base, phase='prepare', clip=clip, identity={}, assets=assets,
                           deadline='later', readiness_seconds=20, full_seconds=100, campaign_seconds=150)
     assert result['entrypoint'] == ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']
@@ -198,3 +217,93 @@ def test_confirmation_spec_uses_namespace_and_enforces_job_caps(tmp_path, monkey
     with pytest.raises(ValueError, match='job cap'):
         control.spec(base, phase='prepare', clip=clip, identity={}, assets=assets,
                      deadline='later', readiness_seconds=20, full_seconds=490, campaign_seconds=550)
+
+
+def test_qualified_projection_excludes_verified_complete_stages_and_rejects_understatement(monkeypatch):
+    from experiments.tennis import k5d_study_wave as wave
+
+    data = receipt()
+    data['consumer_execution_identity'] = {'source': 'a'}
+    rows = control.study.selection()
+    inventory = {clip: {phase: {'state': 'pending'} for phase in ('prepare', 'score')} for clip in rows}
+    samples = {'prepare': [], 'score': []}
+    for index, clip in enumerate(wave.CONFIRMATIONS):
+        for phase in ('prepare', 'score'):
+            entry = {'state': 'complete', 'job_id': f'20261105T00000{index}Z-{phase[0] * 8}',
+                     'receipt_sha256': 'a' * 64, 'publications': {}, 'independent_audit_sha256': 'b' * 64}
+            inventory[clip][phase] = entry
+            samples[phase].append({'clip': clip, 'entry': entry.copy()})
+    data['cpu_calibration'] = samples
+    monkeypatch.setattr(wave, 'verified_cpu_calibration', lambda *_: {
+        phase: {'margin': 1.5, 'fixed_seconds': 1, 'marginal_seconds_per_frame': 0.1}
+        for phase in ('prepare', 'score')})
+    noncommand = {'groups': {'whole': {'gpu': 0.5, 'cpu': 0.5}},
+                  'command_covered': ['isolation'], 'failure_reserve': 'one-bounded-campaign'}
+    for value in data['programme'].values():
+        value.update(noncommand_groups={'whole': 1}, failed_start_reserve_seconds=3000)
+    result = control.programme_projection(data, inventory=inventory, noncommand=noncommand)
+    assert result['campaigns'] == 56 and result['cpu']['fits'] is True
+    data['programme']['cpu']['failed_start_reserve_seconds'] = 1
+    with pytest.raises(ValueError, match='failure reserve'):
+        control.programme_projection(data, inventory=inventory, noncommand=noncommand)
+    data['programme']['cpu']['failed_start_reserve_seconds'] = 3000
+    data['programme']['cpu']['noncommand_groups']['whole'] = 0.1
+    with pytest.raises(ValueError, match='understates'):
+        control.programme_projection(data, inventory=inventory, noncommand=noncommand)
+    data['programme']['cpu']['noncommand_groups']['whole'] = 1
+    inventory[wave.CONFIRMATIONS[0]]['prepare']['state'] = 'unknown'
+    with pytest.raises(ValueError, match='unknown or unfinished'):
+        control.programme_projection(data, inventory=inventory, noncommand=noncommand)
+
+
+def test_full_study_spec_routes_through_qualified_namespace(tmp_path, monkeypatch):
+    from experiments.jobs import inbox
+
+    clip = 'tracknet/game9/Clip5'
+    gate = {'release': 'full-study', 'confirmation_qualification': {'unshare_sha256': 'a' * 64}}
+    names = ('full_gate', 'cost_receipt', 'bridge', 'calibration_source', 'consumer_source', 'fidelity_gate',
+             'budget_ledger', 'budget_attestation', 'native_cpu_receipt', 'gpu_parity_receipt',
+             'study_inventory', 'noncommand_evidence')
+    assets = {name: {'local': str(tmp_path / name), 'remote': '/remote/' + name, 'sha256': 'a' * 64} for name in names}
+    monkeypatch.setattr(control.study, 'checked_json', lambda *_: gate)
+    monkeypatch.setattr(control, 'approved', lambda *_: ({'cost': {'prepare': {'seconds16': 1}},
+        'programme': {r: {'failed_start_reserve_seconds': 500, 'noncommand_groups': {'whole': 5}}
+                      for r in ('gpu', 'cpu')}}, 292))
+    monkeypatch.setattr(control.study, 'forecast', lambda *_: 1)
+    monkeypatch.setattr(control.cf, 'asset', lambda name, *_args, **_kwargs: {'name': name})
+    monkeypatch.setattr(control.cf, 'common_spec', lambda *_: {'scale': {}})
+    monkeypatch.setattr(inbox, 'validate_spec', lambda *_: None)
+    base = {'arguments': [], 'device': 'gpu', 'cpu_threads': 1, 'single_cpu_campaign': True,
+            'gpu_sharing': {'mode': 'exclusive'}, 'contention': {'policy': 'stop', 'resume_attempts': 0}}
+    result = control.spec(base, phase='prepare', clip=clip, identity={}, assets=assets,
+                          deadline='later', readiness_seconds=20, full_seconds=100, campaign_seconds=150)
+    assert result['entrypoint'] == ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']
+    for option in ('--native-cpu-receipt', '--gpu-parity-receipt', '--study-inventory', '--noncommand-evidence'):
+        assert option in result['arguments']
+    with pytest.raises(ValueError, match='invalid readiness/full campaign bounds'):
+        control.spec(base, phase='prepare', clip=clip, identity={}, assets=assets,
+                     deadline='later', readiness_seconds=20, full_seconds=100, campaign_seconds=2701)
+
+
+def test_budget_reconciles_active_reservations_and_parent_charges_once():
+    ledger = {'gpu_total_seconds': 1000, 'cpu_total_seconds': 1200,
+              'workstreams': {'ball': {'gpu_limit_seconds': 800, 'cpu_limit_seconds': 900}},
+              'charges': [{'phase': 'partial', 'parent_phase': 'active', 'workstream': 'ball',
+                           'gpu_seconds': 100, 'cpu_seconds': 200}],
+              'reservation_amount_basis': 'remaining_unspent',
+              'reservations': [{'phase': 'active', 'workstream': 'ball', 'status': 'running',
+                                'gpu_seconds': 200, 'cpu_seconds': 200}]}
+    attestation = {'reviewed': True, 'ledger_sha256': 'a' * 64, 'active_reservations_reconciled': True,
+                   'active_reservations': {'active': {'workstream': 'ball', 'gpu': 200, 'cpu': 200}},
+                   'gpu': {'ball_charged_seconds': 100, 'global_charged_seconds': 100, 'ball_limit_seconds': 800,
+                           'spent_and_reserved_seconds': 300, 'global_remaining_seconds': 700},
+                   'cpu': {'ball_charged_seconds': 200, 'global_charged_seconds': 200, 'ball_limit_seconds': 900,
+                           'spent_and_reserved_seconds': 400, 'global_remaining_seconds': 800}}
+    data = receipt()
+    data.update(budget_ledger_sha256='a' * 64, budget_attestation_sha256='b' * 64)
+    data['programme']['gpu'].update(ball_remaining_seconds=500, global_remaining_seconds=700)
+    data['programme']['cpu'].update(ball_remaining_seconds=500, global_remaining_seconds=800)
+    control.check_budget(ledger, attestation, 'a' * 64, 'b' * 64, data)
+    attestation['active_reservations']['active']['gpu'] = 0
+    with pytest.raises(ValueError, match='active reservation attestation'):
+        control.check_budget(ledger, attestation, 'a' * 64, 'b' * 64, data)
