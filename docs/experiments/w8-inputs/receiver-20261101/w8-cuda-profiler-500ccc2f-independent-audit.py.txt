@@ -1,0 +1,82 @@
+"""Read-only saved-artifact audit of a shared synthetic CUDA profiler request."""
+import ast, hashlib, io, json, math, os, re, resource, stat, tarfile
+from pathlib import Path
+resource.setrlimit(resource.RLIMIT_CPU, (40, 40))
+J='20261105T125523Z-500ccc2f'
+B=Path('/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox')/J
+D=lambda b:hashlib.sha256(b).hexdigest()
+def read(p):return p.read_bytes()
+def obj(p):return json.loads(read(p))
+def digest(x):return D(json.dumps(x,sort_keys=True,allow_nan=False).encode())
+def gpu(x):return x.removeprefix('GPU-').lower()
+state=obj(B/'state.json');ready=obj(B/'ready.json');spec=obj(B/'spec.json');status=obj(B/'run/status.json');claim=obj(B/'run/claim.json');staging=obj(B/'smoke/staging.json');dispatch=obj(B/'smoke/dispatch.json');execution=obj(B/'smoke/execution.json');gate=obj(B/'gate.json')
+assert state['status']==status['status']=='complete' and status['exit_code']==0 and state['host_alias']=='gpu5'
+assert ready['git_head']=='971ca13a9bf458f6503404a70768f9fb4aee83fa'
+assert ready['snapshot_sha256']==D(read(B/'source.tar'))=='8ee43cef6a501a5d1af3188fc422c067985a70537789ea706c3c2c83a74ef21f'
+assert ready['spec_sha256']==digest(spec)=='8e6276d21bdb800f699dfed9ebfd52e9d2ee96a9aafccca41c1beda18ab35868'
+assert ready['source_sha256']==gate['source_sha256']=='abdfcfaee706e068e9566f318acd92f809670572a72c76bf099e12f40b799fe9'
+assert spec['gpu_sharing']['mode']=='shared' and spec['gpu_sharing']['margin_mib']==8192 and spec['gpu_memory_mib']==4096 and spec['cpu_affinity_index']==1 and spec['hosts']==['gpu5']
+assert execution['timing_contaminated'] and execution['gpu_sharing']['mode']=='shared'
+assert spec['environment']['sha256']=='bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e'
+assert len(staging['inputs'])==1 and D(read(Path(staging['inputs'][0]['path'])))=='5452a5d6bb865152556a0e26dc99798a0ee88dff1c1c86b9a4fd1f5c904413dd'
+assert gate['passed'] and gate['validation']['passed'] and all(gate['validation']['checks'].values())
+uuid='GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162';assert gpu(uuid)==gpu(claim['device_claim']['device_uuid'])==gpu(dispatch['environment']['gpu']['uuid'])
+pub=read(B/'smoke/published.tar');pubsha=D(pub);assert pubsha==staging['published']['sha256']
+with tarfile.open(fileobj=io.BytesIO(pub)) as t:
+ members=t.getmembers();files=[m for m in members if m.isfile()];arms=['strict','unrestricted','clock'];kinds=['trace','config','receipt','stdout','stderr']
+ expected={'publish/cuda-profiler-oracle.json'}|{f'publish/{a}.{k}' for a in arms for k in kinds}
+ assert len(files)==16 and {m.name for m in files}==expected
+ assert all(m.isfile() or (m.isdir() and m.name.rstrip('/')=='publish') for m in members)
+ assert all(m.size<=(20_000_000 if m.name.endswith('.trace') else 1_000_000) for m in files)
+ raw={m.name:t.extractfile(m).read() for m in files}
+r=json.loads(raw['publish/cuda-profiler-oracle.json']);assert r['scope']=='synthetic CUDA profiler diagnostic; no model, receiver or quality qualification'
+assert gpu(r['gpu_uuid'])==gpu(uuid) and r['dispatch_gpu']==dispatch['environment']['gpu'] and r['campaign_clock']==dispatch['campaign_clock']
+with tarfile.open(B/'source.tar') as t:
+ assert len(r['code_sha256'])==9
+ for name,sha in r['code_sha256'].items():assert D(t.extractfile(name).read())==sha
+ source=t.extractfile('experiments/tennis/w8_cuda_profiler_synthetic.py').read();assert D(source)=='304bfb6ae505fa57631f2840a7717b793567a03ccb2f561cc0ff4b2c3da55545'
+ tree=ast.parse(t.extractfile('experiments/tennis/w8_cuda_system_leaves.py').read());approved=next(ast.literal_eval(n.value) for n in tree.body if isinstance(n,ast.Assign) and any(isinstance(x,ast.Name) and x.id=='APPROVED_LEAVES' for x in n.targets))
+ syn=ast.parse(source);assert not any(isinstance(n,ast.Attribute) and n.attr in ('Renderer','load_state_dict') for n in ast.walk(syn))
+assert [x['arm'] for x in r['arms']]==arms
+proj=r['projection'];clock=r['campaign_clock'];measured=proj['evaluated_at']-clock['started'];remaining=min(clock['budget_end'],clock['phase_started']+150)-proj['evaluated_at'];required=measured*3+25
+assert abs(measured-proj['measured_first_stage_seconds'])<1e-5 and abs(remaining-proj['remaining_seconds'])<1e-5 and abs(required-proj['required_seconds'])<1e-5 and proj['controls_admitted'] and required<=remaining
+second=proj['clock_gate'];remaining2=min(clock['budget_end'],clock['phase_started']+150)-second['evaluated_at'];unrestricted=r['arms'][1];required2=max(measured,unrestricted['ended']-unrestricted['started'])*1.5+25
+assert abs(remaining2-second['remaining_seconds'])<1e-5 and abs(required2-second['required_seconds'])<1e-5 and second['admitted'] and required2<=remaining2
+results=[]
+for row in r['arms']:
+ arm=row['arm'];data={k:raw[f'publish/{arm}.{k}'] for k in kinds};assert {k:D(v) for k,v in data.items()}==row['artifacts']
+ a=json.loads(data['receipt']);cfg=json.loads(data['config']);assert a==row['receipt'] and a['scope']==r['scope'] and a['arm']==arm
+ assert set(a['source_origins'].values())==set(r['code_sha256']) and gpu(a['visible_uuid'])==gpu(cfg['gpu_uuid'])==gpu(uuid)
+ assert a['provider']=='torch CUDA' and a['torch_version']=='2.7.0+cu128' and a['torch_cuda_version']=='12.8' and not a['cuda_initialized_before'] and a['cuda_initialized_after'] and a['cpu_bootstrap_equal']
+ assert all(a['namespaces'][n]!=a['parent_ns'][n]==cfg['parent_ns'][n] for n in ('user','net'))
+ if arm!='unrestricted':
+  assert len(a['denials'])==10 and set(a['denials'])==set(cfg['denied']) and set(a['denials'].values())<={1,13}
+  assert set(a['mutations'])=={'write','truncate','create','remove','mkdir','rename','link'} and set(a['mutations'].values())<={1,13,18}
+  assert a['landlock_abi']>=3 and len(a['approved_leaves'])==12 and {x['name'] for x in a['approved_leaves']}==set(approved)
+ if arm=='clock':
+  g=a['experimental_clock_grants'];p=cfg['clock_identity'];assert len(g)==len(p)==3
+  assert [x['path'] for x in g]==['/sys/devices/system/clocksource','/sys/devices/system/clocksource/clocksource0/current_clocksource','/sys/devices/system/clocksource/clocksource0/available_clocksource']
+  for i,(x,y) in enumerate(zip(g,p)):
+   assert {k:v for k,v in x.items() if k not in ('child_uid','rights')}==y and y['uid']==0 and x['child_uid']==65534 and not y['mode']&stat.S_IWOTH
+   assert x['rights']==('READ_DIR recursive' if i==0 else 'READ_FILE') and (stat.S_ISDIR(y['mode']) if i==0 else stat.S_ISREG(y['mode']))
+   if i:assert y['sha256']==D(read(Path(y['path'])))
+ c=a['cuda'];assert c['success'] and c['device_count']==1 and gpu(c['uuid'])==gpu(uuid) and c['capability']==[8,9] and 'RTX 6000 Ada' in c['name'] and c['sum']==262144.0 and c['inputs_cuda'] and c['output_cuda'] and c['cuda_initialized']
+ frac=4096*2**20/c['total_memory_bytes'];assert cfg['gpu_memory_limit_mib']==c['gpu_memory_limit_mib']==4096 and 0<frac<=1
+ assert all(math.isfinite(c[k]) and abs(c[k]-frac)<1e-6 for k in ('allocator_fraction','allocator_fraction_before_allocation','allocator_fraction_before_profile','allocator_fraction_after_profile')) and c['peak_torch_reserved_bytes']<=4096*2**20
+ p=a['profiler'];assert p['attempted']
+ if p['success']:
+  assert p['cuda_kernels'] and p['cuda_kernels']==[name for name in p['cuda_events'] if 'memcpy' not in name.lower() and 'memset' not in name.lower()]
+ else:assert p['error'] and not p['cuda_kernels']
+ lines=data['trace'].decode(errors='replace').splitlines();start=[i for i,l in enumerate(lines) if 'W8_CUDA_PROFILE_BEGIN' in l];end=[i for i,l in enumerate(lines) if 'W8_CUDA_PROFILE_END' in l];assert len(start)==len(end)==1 and start[0]<end[0]
+ segment=lines[start[0]+1:end[0]];clock_calls=[l for l in segment if '/sys/devices/system/clocksource' in l];denials=[l for l in segment if 'EACCES' in l or 'EPERM' in l]
+ results.append({'arm':arm,'cuda':c,'profiler':p,'clock_calls_between_markers':clock_calls,'denials_between_markers':denials,'trace_bytes':len(data['trace']),'artifact_sha256':row['artifacts'],'private_denial_count':len(a.get('denials',{})),'mutations':a.get('mutations'),'clock_grants':a.get('experimental_clock_grants'),'namespace_distinct':True})
+assert not results[0]['profiler']['success'] and 'clocksource' in results[0]['profiler']['error'] and all(x['profiler']['success'] for x in results[1:])
+assert any('EACCES' in x and '/sys/devices/system/clocksource' in x for x in results[0]['clock_calls_between_markers'])
+base=Path(claim['claims_dir']);cpu=base/'cpu'/f"{claim['cpu_claim']['host']}.json";alloc=obj(cpu).get('allocations',{}) if cpu.exists() else {}
+ct=claim['cpu_claim']['token'];dt=claim['device_claim']['token'];host=claim['device_claim']['host'];duid=re.sub(r'[^A-Za-z0-9_.-]','_',uuid);device=base/'devices'/f'{host}_{duid}.shared'/f'{dt}.json'
+released=ct not in alloc and not device.exists();pids=[state['supervisor_pid'],status['pid']];present=[pid for pid in pids if Path(f'/proc/{pid}').exists()]
+try:os.killpg(status['process_group_id'],0);group_present=True
+except ProcessLookupError:group_present=False
+assert released and not present and not group_present
+out={'job_id':J,'status':'complete; synthetic CUDA profiler diagnostic, not receiver qualification','revision':ready['git_head'],'snapshot_sha256':ready['snapshot_sha256'],'normalized_spec_sha256':ready['spec_sha256'],'publication_sha256':pubsha,'environment_sha256':spec['environment']['sha256'],'synthetic_input_sha256':staging['inputs'][0]['sha256'],'code_sha256':r['code_sha256'],'results':results,'projection':proj,'timing_contaminated':True,'lifecycle':{'created':state['created'],'started':status['started'],'ended':status['ended'],'updated':state['updated'],'creation_to_ended_seconds':status['ended']-state['created'],'creation_to_updated_seconds':state['updated']-state['created'],'proposed_gpu_seconds':110,'proposed_cpu_seconds_including_170_external':280},'release':{'supervisor_and_campaign_pids':pids,'pids_present':present,'campaign_pgid':status['process_group_id'],'process_group_present':group_present,'cpu_and_own_shared_gpu_claims_released':released},'audit_cpu_seconds':sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),'scope_limit':'Only synthetic matmul and profiler were run. Shared timings are contaminated and used only to gate budget, not performance evidence. This does not change receiver policy, qualify model inference, or authorize a GPU retry.'}
+print(json.dumps(out,sort_keys=True,indent=2))

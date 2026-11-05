@@ -1,0 +1,273 @@
+{
+  "audit_cpu_seconds": 0.08648,
+  "code_sha256": {
+    "experiments/__init__.py": "06f003a15341e1a630da290bb9f66f11bd79de593e85aff33fdd1b548db2cba9",
+    "experiments/tennis/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "experiments/tennis/k6b_generate.py": "00248aa4fdd47e634f82b37a7a33c99f1794440d65cbfe9395255a4225735542",
+    "experiments/tennis/w8_cuda_profiler_synthetic.py": "304bfb6ae505fa57631f2840a7717b793567a03ccb2f561cc0ff4b2c3da55545",
+    "experiments/tennis/w8_cuda_system_leaves.py": "4cbca949843da0254644e666b6c6d86400fe37e22b316f921da3fc8715e0f970",
+    "experiments/tennis/w8_folder_oracle.py": "1db0c096065f4e5c710de02a99679cf81ad15738312b6d37572a7b0b91f378ee",
+    "experiments/tennis/w8_profiler_clock_oracle.py": "f8166c5d9db64ea41c28f18311dc6fecdc0af4f1ae77c10e2da147318dae2c39",
+    "experiments/tennis/w8_public_folder_materialize.py": "e127da6bffbf055b40a163b0026b50f9bb56e083c75ad017007d4145453b1fcc",
+    "experiments/tennis/w8_receiver_bootstrap.py": "3fb7f0b2ab33fdfa185f38c3bfe8f977540dc13cc10b8f0ccce0625c1de03e49"
+  },
+  "environment_sha256": "bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e",
+  "job_id": "20261105T125523Z-500ccc2f",
+  "lifecycle": {
+    "created": 1793883352.720317,
+    "creation_to_ended_seconds": 70.08711504936218,
+    "creation_to_updated_seconds": 109.22786140441895,
+    "ended": 1793883422.807432,
+    "proposed_cpu_seconds_including_170_external": 280,
+    "proposed_gpu_seconds": 110,
+    "started": 1793883401.922008,
+    "updated": 1793883461.9481783
+  },
+  "normalized_spec_sha256": "8e6276d21bdb800f699dfed9ebfd52e9d2ee96a9aafccca41c1beda18ab35868",
+  "projection": {
+    "clock_gate": {
+      "admitted": true,
+      "evaluated_at": 6563026.012218083,
+      "remaining_seconds": 141.68582090642303,
+      "required_seconds": 36.769441241398454
+    },
+    "controls_admitted": true,
+    "evaluated_at": 6563022.054390804,
+    "measured_first_stage_seconds": 7.8462941609323025,
+    "multiplier": 1.5,
+    "remaining_seconds": 145.64364818576723,
+    "required_seconds": 48.53888248279691,
+    "reserve_seconds": 25.0
+  },
+  "publication_sha256": "1550b7453cfd07502bdc2807e4299f6c70713e209a316253bf436f4c1180fcaa",
+  "release": {
+    "campaign_pgid": 2219160,
+    "cpu_and_own_shared_gpu_claims_released": true,
+    "pids_present": [],
+    "process_group_present": false,
+    "supervisor_and_campaign_pids": [
+      2219124,
+      2219160
+    ]
+  },
+  "results": [
+    {
+      "arm": "strict",
+      "artifact_sha256": {
+        "config": "67825387b1d60f5ec311e6a8ed29f7de53d00048030068a32248b44737338f2e",
+        "receipt": "5e6d5999c5750cdb847fb5f51cb23c9d53348e12fa98f729c15bf2334aa54d8c",
+        "stderr": "98fa1492f2dac850c77abe977b34cbe2c6f47164d56cc237b31cf34b0d06773c",
+        "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "trace": "cf4c0c586afd8bcfe347e6fa817ff42e6ec300d02e2ed4e9ea13e71ad8ceecf8"
+      },
+      "clock_calls_between_markers": [
+        "2219271 openat(AT_FDCWD</local/users/emanuele/pointstream/sources/20261105T125523Z-500ccc2f>, \"/sys/devices/system/clocksource\", O_RDONLY|O_NONBLOCK|O_CLOEXEC|O_DIRECTORY) = -1 EACCES (Permission denied)"
+      ],
+      "clock_grants": null,
+      "cuda": {
+        "allocator_fraction": 0.0841981925961709,
+        "allocator_fraction_after_profile": 0.0841981925961709,
+        "allocator_fraction_before_allocation": 0.0841981925961709,
+        "allocator_fraction_before_profile": 0.0841981925961709,
+        "capability": [
+          8,
+          9
+        ],
+        "cuda_initialized": true,
+        "device_count": 1,
+        "gpu_memory_limit_mib": 4096,
+        "inputs_cuda": true,
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "output_cuda": true,
+        "peak_torch_reserved_bytes": 23068672,
+        "success": true,
+        "sum": 262144.0,
+        "total_memory_bytes": 51010207744,
+        "uuid": "07aa7586-7116-8c7b-1e9c-e5dbdc74b162"
+      },
+      "denials_between_markers": [
+        "2219271 openat(AT_FDCWD</local/users/emanuele/pointstream/sources/20261105T125523Z-500ccc2f>, \"/sys/devices/system/clocksource\", O_RDONLY|O_NONBLOCK|O_CLOEXEC|O_DIRECTORY) = -1 EACCES (Permission denied)"
+      ],
+      "mutations": {
+        "create": 13,
+        "link": 18,
+        "mkdir": 13,
+        "remove": 13,
+        "rename": 13,
+        "truncate": 13,
+        "write": 13
+      },
+      "namespace_distinct": true,
+      "private_denial_count": 10,
+      "profiler": {
+        "attempted": true,
+        "cuda_kernels": [],
+        "error": "RuntimeError: boost::filesystem::directory_iterator::construct: Permission denied [system:13]: \"/sys/devices/system/clocksource\"",
+        "success": false
+      },
+      "trace_bytes": 1306162
+    },
+    {
+      "arm": "unrestricted",
+      "artifact_sha256": {
+        "config": "7b142d5822b8dbec0305478e6cc58e33ae729bb3fb05991faba104b8ab60eb92",
+        "receipt": "ba643489fc50f7e165f2e086008eb29c8dbe1b635fea52f4249bcae4993bbf77",
+        "stderr": "98fa1492f2dac850c77abe977b34cbe2c6f47164d56cc237b31cf34b0d06773c",
+        "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "trace": "dace7c2110fa930a937c8d0aea8cf4f2fb5be8f9c6a5ac4aefb2ed415bfb04d8"
+      },
+      "clock_calls_between_markers": [
+        "2219468 openat(AT_FDCWD</local/users/emanuele/pointstream/sources/20261105T125523Z-500ccc2f>, \"/sys/devices/system/clocksource\", O_RDONLY|O_NONBLOCK|O_CLOEXEC|O_DIRECTORY) = 37</sys/devices/system/clocksource>",
+        "2219468 newfstatat(37</sys/devices/system/clocksource>, \"\", {st_mode=S_IFDIR|0755, st_size=0, ...}, AT_EMPTY_PATH) = 0",
+        "2219468 getdents64(37</sys/devices/system/clocksource>, 0x5e144c3dfab0 /* 5 entries */, 32768) = 144",
+        "2219468 openat(AT_FDCWD</local/users/emanuele/pointstream/sources/20261105T125523Z-500ccc2f>, \"/sys/devices/system/clocksource/clocksource0/current_clocksource\", O_RDONLY) = 38</sys/devices/system/clocksource/clocksource0/current_clocksource>",
+        "2219468 getdents64(37</sys/devices/system/clocksource>, 0x5e144c3dfab0 /* 0 entries */, 32768) = 0"
+      ],
+      "clock_grants": null,
+      "cuda": {
+        "allocator_fraction": 0.0841981925961709,
+        "allocator_fraction_after_profile": 0.0841981925961709,
+        "allocator_fraction_before_allocation": 0.0841981925961709,
+        "allocator_fraction_before_profile": 0.0841981925961709,
+        "capability": [
+          8,
+          9
+        ],
+        "cuda_initialized": true,
+        "device_count": 1,
+        "gpu_memory_limit_mib": 4096,
+        "inputs_cuda": true,
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "output_cuda": true,
+        "peak_torch_reserved_bytes": 23068672,
+        "success": true,
+        "sum": 262144.0,
+        "total_memory_bytes": 51010207744,
+        "uuid": "07aa7586-7116-8c7b-1e9c-e5dbdc74b162"
+      },
+      "denials_between_markers": [
+        "2219468 openat(AT_FDCWD</local/users/emanuele/pointstream/sources/20261105T125523Z-500ccc2f>, \"/root/nvlog.config\", O_RDONLY) = -1 EACCES (Permission denied)"
+      ],
+      "mutations": null,
+      "namespace_distinct": true,
+      "private_denial_count": 0,
+      "profiler": {
+        "attempted": true,
+        "cuda_events": [
+          "ampere_sgemm_32x32_sliced1x4_nn",
+          "void cublasLt::splitKreduce_kernel<32, 16, int, float, float, float, float, false, float, float, float, true, false, false>(cublasLt::cublasSplitKParams<float>, float const*, float const*, float*, float*, float const*, float const*, float const*, float const*, float*, void*, long, float*, int*, float*, float*, float const*, float const*, float const*, float const*, float const*)"
+        ],
+        "cuda_kernels": [
+          "ampere_sgemm_32x32_sliced1x4_nn",
+          "void cublasLt::splitKreduce_kernel<32, 16, int, float, float, float, float, false, float, float, float, true, false, false>(cublasLt::cublasSplitKParams<float>, float const*, float const*, float*, float*, float const*, float const*, float const*, float const*, float*, void*, long, float*, int*, float*, float*, float const*, float const*, float const*, float const*, float const*)"
+        ],
+        "success": true
+      },
+      "trace_bytes": 1312731
+    },
+    {
+      "arm": "clock",
+      "artifact_sha256": {
+        "config": "c47f35aa5cf541f4455dec5f751d32be58a565cdf6741bd98368213f6eef8df7",
+        "receipt": "8f80c2c5c16245839e7c82223c201567f273bd9baa66b2c362390a03c56306e7",
+        "stderr": "8a88e4ebef144d6cada845081c798ca0c5efd39b6cd23f8a8f07eab0e7ecb21b",
+        "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "trace": "f85796fedc4b3b86f4cba449ad714f18c71b7bc89e68fc1a3cea90706e7b801c"
+      },
+      "clock_calls_between_markers": [
+        "2219619 openat(AT_FDCWD</local/users/emanuele/pointstream/sources/20261105T125523Z-500ccc2f>, \"/sys/devices/system/clocksource\", O_RDONLY|O_NONBLOCK|O_CLOEXEC|O_DIRECTORY) = 37</sys/devices/system/clocksource>",
+        "2219619 newfstatat(37</sys/devices/system/clocksource>, \"\", {st_mode=S_IFDIR|0755, st_size=0, ...}, AT_EMPTY_PATH) = 0",
+        "2219619 getdents64(37</sys/devices/system/clocksource>, 0x5e2b06638070 /* 5 entries */, 32768) = 144",
+        "2219619 openat(AT_FDCWD</local/users/emanuele/pointstream/sources/20261105T125523Z-500ccc2f>, \"/sys/devices/system/clocksource/clocksource0/current_clocksource\", O_RDONLY) = 38</sys/devices/system/clocksource/clocksource0/current_clocksource>",
+        "2219619 getdents64(37</sys/devices/system/clocksource>, 0x5e2b06638070 /* 0 entries */, 32768) = 0"
+      ],
+      "clock_grants": [
+        {
+          "child_uid": 65534,
+          "device": 23,
+          "inode": 304355,
+          "mode": 16877,
+          "path": "/sys/devices/system/clocksource",
+          "rights": "READ_DIR recursive",
+          "sha256": null,
+          "uid": 0
+        },
+        {
+          "child_uid": 65534,
+          "device": 23,
+          "inode": 304369,
+          "mode": 33188,
+          "path": "/sys/devices/system/clocksource/clocksource0/current_clocksource",
+          "rights": "READ_FILE",
+          "sha256": "53038def32a9c25e6d962a247d9b3dfe213ce648d291ced6939d60ed92f1d6d8",
+          "uid": 0
+        },
+        {
+          "child_uid": 65534,
+          "device": 23,
+          "inode": 304371,
+          "mode": 33060,
+          "path": "/sys/devices/system/clocksource/clocksource0/available_clocksource",
+          "rights": "READ_FILE",
+          "sha256": "309c9b2702da091c26ae707a11349c2eed75acf2928c466f7447e2b1a72b3cf0",
+          "uid": 0
+        }
+      ],
+      "cuda": {
+        "allocator_fraction": 0.0841981925961709,
+        "allocator_fraction_after_profile": 0.0841981925961709,
+        "allocator_fraction_before_allocation": 0.0841981925961709,
+        "allocator_fraction_before_profile": 0.0841981925961709,
+        "capability": [
+          8,
+          9
+        ],
+        "cuda_initialized": true,
+        "device_count": 1,
+        "gpu_memory_limit_mib": 4096,
+        "inputs_cuda": true,
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "output_cuda": true,
+        "peak_torch_reserved_bytes": 23068672,
+        "success": true,
+        "sum": 262144.0,
+        "total_memory_bytes": 51010207744,
+        "uuid": "07aa7586-7116-8c7b-1e9c-e5dbdc74b162"
+      },
+      "denials_between_markers": [
+        "2219619 openat(AT_FDCWD</local/users/emanuele/pointstream/sources/20261105T125523Z-500ccc2f>, \"/root/nvlog.config\", O_RDONLY) = -1 EACCES (Permission denied)",
+        "2219619 openat(AT_FDCWD</local/users/emanuele/pointstream/sources/20261105T125523Z-500ccc2f>, \"/proc/2219619/cmdline\", O_RDONLY) = -1 EACCES (Permission denied)"
+      ],
+      "mutations": {
+        "create": 13,
+        "link": 18,
+        "mkdir": 13,
+        "remove": 13,
+        "rename": 13,
+        "truncate": 13,
+        "write": 13
+      },
+      "namespace_distinct": true,
+      "private_denial_count": 10,
+      "profiler": {
+        "attempted": true,
+        "cuda_events": [
+          "ampere_sgemm_32x32_sliced1x4_nn",
+          "void cublasLt::splitKreduce_kernel<32, 16, int, float, float, float, float, false, float, float, float, true, false, false>(cublasLt::cublasSplitKParams<float>, float const*, float const*, float*, float*, float const*, float const*, float const*, float const*, float*, void*, long, float*, int*, float*, float*, float const*, float const*, float const*, float const*, float const*)"
+        ],
+        "cuda_kernels": [
+          "ampere_sgemm_32x32_sliced1x4_nn",
+          "void cublasLt::splitKreduce_kernel<32, 16, int, float, float, float, float, false, float, float, float, true, false, false>(cublasLt::cublasSplitKParams<float>, float const*, float const*, float*, float*, float const*, float const*, float const*, float const*, float*, void*, long, float*, int*, float*, float*, float const*, float const*, float const*, float const*, float const*)"
+        ],
+        "success": true
+      },
+      "trace_bytes": 1316582
+    }
+  ],
+  "revision": "971ca13a9bf458f6503404a70768f9fb4aee83fa",
+  "scope_limit": "Only synthetic matmul and profiler were run. Shared timings are contaminated and used only to gate budget, not performance evidence. This does not change receiver policy, qualify model inference, or authorize a GPU retry.",
+  "snapshot_sha256": "8ee43cef6a501a5d1af3188fc422c067985a70537789ea706c3c2c83a74ef21f",
+  "status": "complete; synthetic CUDA profiler diagnostic, not receiver qualification",
+  "synthetic_input_sha256": "5452a5d6bb865152556a0e26dc99798a0ee88dff1c1c86b9a4fd1f5c904413dd",
+  "timing_contaminated": true
+}
