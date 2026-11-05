@@ -18,6 +18,7 @@ import subprocess
 import sys
 
 from experiments.visor.gvcrt_entropy_pilot import kill_owned_tree
+from experiments.generative import gvcrt_device_guard as device_guard
 import tarfile
 import time
 import zipfile
@@ -594,7 +595,14 @@ def run(args: argparse.Namespace) -> int:
         if sha(inputs[name]) != expected:
             raise ValueError(f'{name} bytes differ from staged identity')
     runtime = Path(packed['prefix']).resolve(strict=True)
-    gpu_identity = inspect_gpu(os.environ['CUDA_VISIBLE_DEVICES'])
+    claimed = os.environ.get('PS_CLAIMED_GPU_UUID', '')
+    if os.environ.get('CUDA_VISIBLE_DEVICES') != claimed:
+        raise ValueError('CUDA visibility differs from fleet claim')
+    expected_uuid = device_guard.canonical_uuid(claimed)
+    dispatched = (dispatch.get('environment', {}).get('gpu') or {}).get('uuid')
+    if device_guard.canonical_uuid(dispatched) != expected_uuid:
+        raise ValueError('fleet dispatch and claimed GPU differ')
+    gpu_identity = inspect_gpu(claimed)
     ffmpeg = runtime / 'bin/ffmpeg'
     if sha(ffmpeg) != '7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2':
         raise ValueError('calibration ffmpeg identity mismatch')
@@ -617,7 +625,8 @@ def run(args: argparse.Namespace) -> int:
             item.chmod(0o555 if item.is_dir() else 0o444)
     author.chmod(0o555)
     minimal.mkdir()
-    for name in ('gvcrt_native_bridge.py', 'gvcrt_receiver_worker_w8leaves.py', 'gvcrt_peer_scorer.py'):
+    for name in ('gvcrt_native_bridge.py', 'gvcrt_receiver_worker_w8leaves.py', 'gvcrt_peer_scorer.py',
+                 'gvcrt_device_guard.py', 'gvcrt_guarded_scorer.py'):
         shutil.copyfile(HERE / name, minimal / name)
         (minimal / name).chmod(0o444)
     bridge, worker, scorer = (minimal / name for name in
@@ -671,10 +680,9 @@ def run(args: argparse.Namespace) -> int:
         if isolation['pid'] != probe['pid']:
             raise ValueError('isolated probe PID differs from worker receipt')
         probe_cuda = read_json(probeout / 'probe.json')
-        if (probe_cuda.get('count') != 1 or probe_cuda.get('sum') != 1048576.0
-                or probe_cuda.get('name') != gpu_identity['name'] or isolation.get('cuda_preinitialized') is not False
-                or (probe_cuda.get('uuid') and probe_cuda['uuid'].lower().removeprefix('gpu-')
-                    != gpu_identity['uuid'].lower().removeprefix('gpu-'))):
+        device_guard.check_device(probe_cuda, gpu_identity['uuid'])
+        if (probe_cuda.get('sum') != 1048576.0 or probe_cuda.get('name') != gpu_identity['name']
+                or isolation.get('cuda_preinitialized') is not False):
             raise ValueError('invalid probe receipt')
     except (OSError, ValueError, KeyError, TypeError, RuntimeError) as exc:
         probe_error = {'type': type(exc).__name__, 'message': str(exc)}
@@ -758,14 +766,14 @@ def run(args: argparse.Namespace) -> int:
     config = work / 'scorer-config.json'
     save(config, {name: str(inputs[name]) for name in METRIC_INPUTS if name != 'wasb_config'})
     score_path = work / 'score.json'
-    score_cmd = [str(python), str(scorer), 'score', '--source', str(prep / 'source_rgb.npy'),
+    score_cmd = [str(python), str(minimal / 'gvcrt_guarded_scorer.py'), '--expected-uuid', claimed, '--source', str(prep / 'source_rgb.npy'),
                  '--decoded', str(received), '--labels', str(prep / 'labels.json'), '--config', str(config),
                  '--count', str(args.frames), '--output', str(score_path)]
     score = child(score_cmd, 'score', stage, historical_env, 150 if args.frames == 4 else 350)
     need_success(score)
     scores = read_json(score_path)
-    if (scores.get('device', {}).get('count') != 1 or scores['device']['name'] != gpu_identity['name']
-            or scores['device']['visible'] != gpu_identity['uuid']):
+    device_guard.check_device(scores.get('device', {}), gpu_identity['uuid'], scorer=True)
+    if scores['device']['name'] != gpu_identity['name']:
         raise ValueError('scorer GPU identity mismatch')
     metrics_record = scores.get('metric_models', {})
     if (metrics_record.get('lpips', {}).get('heads_sha256') != 'df73285e35b22355a2df87cdb6b70b343713b667eddbda73e1977e0c860835c0'
@@ -820,6 +828,8 @@ def run(args: argparse.Namespace) -> int:
               'wire_kbps': ((stage / 'stream.bin').stat().st_size + (stage / 'manifest.json').stat().st_size)
                            * 8 * 30 / args.frames / 1000,
               'snapshot': dispatch['code'], 'worker_sha256': sha(worker), 'scorer_sha256': sha(scorer),
+              'device_guard_sha256': sha(minimal / 'gvcrt_device_guard.py'),
+              'guarded_scorer_sha256': sha(minimal / 'gvcrt_guarded_scorer.py'),
               'files': artifact_hashes,
               'times': times, 'projection': cost, 'training_overlap': 'unknown',
               'limitations': 'one exploratory peer point; no BD-rate or full-clip quality claim'}
@@ -872,6 +882,8 @@ def validate_phase(stage: Path, validation: Path) -> int:
         checks['native_schedule_and_isolation'] = False
     checks['current_code'] = (result.get('worker_sha256') == sha(HERE / 'gvcrt_receiver_worker_w8leaves.py')
                               and result.get('scorer_sha256') == sha(HERE / 'gvcrt_peer_scorer.py')
+                              and result.get('device_guard_sha256') == sha(HERE / 'gvcrt_device_guard.py')
+                              and result.get('guarded_scorer_sha256') == sha(HERE / 'gvcrt_guarded_scorer.py')
                               and sha(HERE / 'gvcrt_native_bridge.py') == BRIDGE_SHA)
     try:
         names = ('prepare', 'isolated-probe', 'sender', 'receiver', 'score')
@@ -921,9 +933,13 @@ def validate_phase(stage: Path, validation: Path) -> int:
         and metric_record.get('dists', {}).get('weights_sha256') ==
         'f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218'
         and metric_record.get('dists', {}).get('backbone_sha256') == METRIC_INPUTS['dists_backbone'])
-    checks['scorer_device'] = (score.get('device', {}).get('count') == 1
-                               and score['device']['name'] == result['gpu_identity']['name']
-                               and score['device']['visible'] == result['gpu_uuid'])
+    try:
+        device_guard.check_device(result['probe_cuda'], result['gpu_uuid'])
+        device_guard.check_device(score['device'], result['gpu_uuid'], scorer=True)
+        checks['scorer_device'] = (score['device']['name'] == result['gpu_identity']['name']
+                                   and result['probe_cuda']['name'] == result['gpu_identity']['name'])
+    except (ValueError, TypeError, KeyError):
+        checks['scorer_device'] = False
     if frames == 4:
         try:
             recomputed = projection(sender, receiver, result['times'], result['projection']['remaining_seconds'])

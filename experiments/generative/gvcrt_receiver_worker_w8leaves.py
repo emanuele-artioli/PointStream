@@ -335,7 +335,7 @@ def cuda_probe() -> dict[str, Any]:
     if not bool(torch.isfinite(y).all().item()) or float(y.sum().item()) != 1048576.0:
         raise RuntimeError('invalid synthetic CUDA result')
     return {'name': p.name, 'uuid': str(getattr(p, 'uuid', '')), 'count': 1,
-            'capability': [p.major, p.minor], 'sum': 1048576.0, 'torch': str(torch.__version__)}
+            'visible': os.environ.get('CUDA_VISIBLE_DEVICES', ''), 'capability': [p.major, p.minor], 'sum': 1048576.0, 'torch': str(torch.__version__)}
 
 
 def load_entropy(path: str) -> None:
