@@ -1,0 +1,478 @@
+{
+  "schema": 1,
+  "job_id": "20261105T130124Z-684bc795",
+  "status": "complete",
+  "scope": "synthetic CPU-only PID namespace escalation wrapper; no native, GPU or production qualification",
+  "revision": "aec74889709fe08f2c58abf97fe5873a787ad61e",
+  "source_tree_sha256": "b3c215dc440a42c17ccecda3f29e1d435241705e4ac39efc295c95e22a902c84",
+  "source_archive_sha256": "af2ef759bf892c3d958048352200dd5fc5b21f35bc55fbeab33141b30580e050",
+  "normalized_spec_sha256": "7df2cb24594be4d8544d12e0bd911f1c6f0ad3758c9215e5d22dcfdc974fd2a1",
+  "oracle_source_sha256": "57e6ef1d842fd16812832aa1ac2ec40ddbf1ef47f349bd4ecb1ebc6f15aa0433",
+  "wrapper_source_sha256": "9e74f7de2773710c26c235bb9cd5834241690c572e6ac9b084f2558192b3cff6",
+  "unshare_path": "/usr/bin/unshare",
+  "unshare_version": "unshare from util-linux 2.37.2",
+  "unshare_sha256": "9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6",
+  "host": "gpu2",
+  "cpu_affinity": [
+    0
+  ],
+  "gpu": null,
+  "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "stage_records": {
+    "smoke": {
+      "publication_sha256": "9a64f6eaa5a4d15c3c6ff2cf8cddbd3799d9865b50462c27dc1f49710a447552",
+      "dispatch_sha256": "1f2708cfc27a26f67e3661bdeeafa721af7b7e9c7b98ac5234074a600ac273c2",
+      "staging_sha256": "63efa98595e47f09dda1ea0114c4c38b44c6ca364e37166ddd480d9317dd03ba",
+      "execution_sha256": "e4644bf6b0aff9e167ca7f017b7c4a6ab113a6a8c46868c584ad98e8ccbfb8db",
+      "command_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "command_elapsed_seconds": 0.9255430698394775,
+      "cases": [
+        {
+          "case": "normal",
+          "elapsed_since_escape_seconds": 0.04321543872356415,
+          "escalated_to_sigkill": false,
+          "escaped": {
+            "host_pid": 2014879,
+            "namespace_pgid": 2,
+            "namespace_pid": 3,
+            "namespace_pids": [
+              2014879,
+              3
+            ],
+            "namespace_sid": 2,
+            "observed_monotonic": 2350842.931971759,
+            "pid_namespace": "pid:[4026537683]",
+            "start_ticks": 235084293
+          },
+          "init": {
+            "host_pid": 2014866,
+            "namespace_pgid": 0,
+            "namespace_pid": 1,
+            "namespace_pids": [
+              2014866,
+              1
+            ],
+            "namespace_sid": 0,
+            "observed_monotonic": 2350842.927577128,
+            "pid_namespace": "pid:[4026537683]",
+            "start_ticks": 235084286
+          },
+          "intermediate": {
+            "host_pid": 2014878,
+            "namespace_pgid": 0,
+            "namespace_pid": 2,
+            "namespace_pids": [
+              2014878,
+              2
+            ],
+            "namespace_sid": 0,
+            "observed_monotonic": 2350842.929716618,
+            "pid_namespace": "pid:[4026537683]",
+            "start_ticks": 235084292
+          },
+          "launcher_executable": "/usr/bin/unshare",
+          "launcher_executable_sha256": "9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6",
+          "launcher_exit_code": 0,
+          "launcher_host_pid": 2014847,
+          "launcher_start_ticks": 235084283,
+          "members_absent": true,
+          "outside_pid_namespace": "pid:[4026531836]",
+          "signals_sent_only_to_launcher": true
+        },
+        {
+          "case": "timeout",
+          "elapsed_since_escape_seconds": 0.23578631598502398,
+          "escalated_to_sigkill": true,
+          "escaped": {
+            "host_pid": 2014883,
+            "namespace_pgid": 2,
+            "namespace_pid": 3,
+            "namespace_pids": [
+              2014883,
+              3
+            ],
+            "namespace_sid": 2,
+            "observed_monotonic": 2350843.068681311,
+            "pid_namespace": "pid:[4026537683]",
+            "start_ticks": 235084306
+          },
+          "init": {
+            "host_pid": 2014881,
+            "namespace_pgid": 0,
+            "namespace_pid": 1,
+            "namespace_pids": [
+              2014881,
+              1
+            ],
+            "namespace_sid": 0,
+            "observed_monotonic": 2350843.064373183,
+            "pid_namespace": "pid:[4026537683]",
+            "start_ticks": 235084300
+          },
+          "intermediate": {
+            "host_pid": 2014882,
+            "namespace_pgid": 0,
+            "namespace_pid": 2,
+            "namespace_pids": [
+              2014882,
+              2
+            ],
+            "namespace_sid": 0,
+            "observed_monotonic": 2350843.066518417,
+            "pid_namespace": "pid:[4026537683]",
+            "start_ticks": 235084306
+          },
+          "launcher_executable": "/usr/bin/unshare",
+          "launcher_executable_sha256": "9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6",
+          "launcher_exit_code": -9,
+          "launcher_host_pid": 2014880,
+          "launcher_start_ticks": 235084297,
+          "members_absent": true,
+          "outside_pid_namespace": "pid:[4026531836]",
+          "signals_sent_only_to_launcher": true
+        },
+        {
+          "case": "sigterm",
+          "elapsed_since_escape_seconds": 0.13120451709255576,
+          "escalated_to_sigkill": true,
+          "escaped": {
+            "host_pid": 2014887,
+            "namespace_pgid": 2,
+            "namespace_pid": 3,
+            "namespace_pids": [
+              2014887,
+              3
+            ],
+            "namespace_sid": 2,
+            "observed_monotonic": 2350843.401736519,
+            "pid_namespace": "pid:[4026537683]",
+            "start_ticks": 235084340
+          },
+          "init": {
+            "host_pid": 2014885,
+            "namespace_pgid": 0,
+            "namespace_pid": 1,
+            "namespace_pids": [
+              2014885,
+              1
+            ],
+            "namespace_sid": 0,
+            "observed_monotonic": 2350843.397446217,
+            "pid_namespace": "pid:[4026537683]",
+            "start_ticks": 235084333
+          },
+          "intermediate": {
+            "host_pid": 2014886,
+            "namespace_pgid": 0,
+            "namespace_pid": 2,
+            "namespace_pids": [
+              2014886,
+              2
+            ],
+            "namespace_sid": 0,
+            "observed_monotonic": 2350843.399487337,
+            "pid_namespace": "pid:[4026537683]",
+            "start_ticks": 235084339
+          },
+          "launcher_executable": "/usr/bin/unshare",
+          "launcher_executable_sha256": "9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6",
+          "launcher_exit_code": -9,
+          "launcher_host_pid": 2014884,
+          "launcher_start_ticks": 235084330,
+          "members_absent": true,
+          "outside_pid_namespace": "pid:[4026531836]",
+          "signals_sent_only_to_launcher": true
+        },
+        {
+          "case": "sigkill",
+          "elapsed_since_escape_seconds": 0.03344375407323241,
+          "escalated_to_sigkill": false,
+          "escaped": {
+            "host_pid": 2014894,
+            "namespace_pgid": 2,
+            "namespace_pid": 3,
+            "namespace_pids": [
+              2014894,
+              3
+            ],
+            "namespace_sid": 2,
+            "observed_monotonic": 2350843.628196357,
+            "pid_namespace": "pid:[4026537683]",
+            "start_ticks": 235084362
+          },
+          "init": {
+            "host_pid": 2014892,
+            "namespace_pgid": 0,
+            "namespace_pid": 1,
+            "namespace_pids": [
+              2014892,
+              1
+            ],
+            "namespace_sid": 0,
+            "observed_monotonic": 2350843.62372866,
+            "pid_namespace": "pid:[4026537683]",
+            "start_ticks": 235084356
+          },
+          "intermediate": {
+            "host_pid": 2014893,
+            "namespace_pgid": 0,
+            "namespace_pid": 2,
+            "namespace_pids": [
+              2014893,
+              2
+            ],
+            "namespace_sid": 0,
+            "observed_monotonic": 2350843.625950043,
+            "pid_namespace": "pid:[4026537683]",
+            "start_ticks": 235084362
+          },
+          "launcher_executable": "/usr/bin/unshare",
+          "launcher_executable_sha256": "9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6",
+          "launcher_exit_code": -9,
+          "launcher_host_pid": 2014888,
+          "launcher_start_ticks": 235084353,
+          "members_absent": true,
+          "outside_pid_namespace": "pid:[4026531836]",
+          "signals_sent_only_to_launcher": true
+        }
+      ]
+    },
+    "full": {
+      "publication_sha256": "e716832b9f0e6e7f7d5f1d3f5552667c46c6782d530c91a1b723d74dd9e01d9b",
+      "dispatch_sha256": "5d3cec180474fca58a76e5dd6d95dda9374fa9dcecff8b3b53a9d2e1f006b0ef",
+      "staging_sha256": "eb4d827661191cfd2888619fe3c76d42fc4eed42497c9a34178af029376ef25d",
+      "execution_sha256": "d11204fa7b6af58b81fb2e1c461cad47df9d9627aea2a501fa5c3e13d1a3d963",
+      "command_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "command_elapsed_seconds": 0.9878597259521484,
+      "cases": [
+        {
+          "case": "normal",
+          "elapsed_since_escape_seconds": 0.03852814482524991,
+          "escalated_to_sigkill": false,
+          "escaped": {
+            "host_pid": 2015236,
+            "namespace_pgid": 2,
+            "namespace_pid": 3,
+            "namespace_pids": [
+              2015236,
+              3
+            ],
+            "namespace_sid": 2,
+            "observed_monotonic": 2350857.413666453,
+            "pid_namespace": "pid:[4026537683]",
+            "start_ticks": 235085741
+          },
+          "init": {
+            "host_pid": 2015217,
+            "namespace_pgid": 0,
+            "namespace_pid": 1,
+            "namespace_pids": [
+              2015217,
+              1
+            ],
+            "namespace_sid": 0,
+            "observed_monotonic": 2350857.408827409,
+            "pid_namespace": "pid:[4026537683]",
+            "start_ticks": 235085733
+          },
+          "intermediate": {
+            "host_pid": 2015235,
+            "namespace_pgid": 0,
+            "namespace_pid": 2,
+            "namespace_pids": [
+              2015235,
+              2
+            ],
+            "namespace_sid": 0,
+            "observed_monotonic": 2350857.411330334,
+            "pid_namespace": "pid:[4026537683]",
+            "start_ticks": 235085741
+          },
+          "launcher_executable": "/usr/bin/unshare",
+          "launcher_executable_sha256": "9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6",
+          "launcher_exit_code": 0,
+          "launcher_host_pid": 2015216,
+          "launcher_start_ticks": 235085728,
+          "members_absent": true,
+          "outside_pid_namespace": "pid:[4026531836]",
+          "signals_sent_only_to_launcher": true
+        },
+        {
+          "case": "timeout",
+          "elapsed_since_escape_seconds": 0.23065659077838063,
+          "escalated_to_sigkill": true,
+          "escaped": {
+            "host_pid": 2015240,
+            "namespace_pgid": 2,
+            "namespace_pid": 3,
+            "namespace_pids": [
+              2015240,
+              3
+            ],
+            "namespace_sid": 2,
+            "observed_monotonic": 2350857.549674575,
+            "pid_namespace": "pid:[4026537684]",
+            "start_ticks": 235085754
+          },
+          "init": {
+            "host_pid": 2015238,
+            "namespace_pgid": 0,
+            "namespace_pid": 1,
+            "namespace_pids": [
+              2015238,
+              1
+            ],
+            "namespace_sid": 0,
+            "observed_monotonic": 2350857.545169904,
+            "pid_namespace": "pid:[4026537684]",
+            "start_ticks": 235085748
+          },
+          "intermediate": {
+            "host_pid": 2015239,
+            "namespace_pgid": 0,
+            "namespace_pid": 2,
+            "namespace_pids": [
+              2015239,
+              2
+            ],
+            "namespace_sid": 0,
+            "observed_monotonic": 2350857.547289131,
+            "pid_namespace": "pid:[4026537684]",
+            "start_ticks": 235085754
+          },
+          "launcher_executable": "/usr/bin/unshare",
+          "launcher_executable_sha256": "9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6",
+          "launcher_exit_code": -9,
+          "launcher_host_pid": 2015237,
+          "launcher_start_ticks": 235085745,
+          "members_absent": true,
+          "outside_pid_namespace": "pid:[4026531836]",
+          "signals_sent_only_to_launcher": true
+        },
+        {
+          "case": "sigterm",
+          "elapsed_since_escape_seconds": 0.12909698020666838,
+          "escalated_to_sigkill": true,
+          "escaped": {
+            "host_pid": 2015266,
+            "namespace_pgid": 2,
+            "namespace_pid": 3,
+            "namespace_pids": [
+              2015266,
+              3
+            ],
+            "namespace_sid": 2,
+            "observed_monotonic": 2350857.879518307,
+            "pid_namespace": "pid:[4026537683]",
+            "start_ticks": 235085787
+          },
+          "init": {
+            "host_pid": 2015242,
+            "namespace_pgid": 0,
+            "namespace_pid": 1,
+            "namespace_pids": [
+              2015242,
+              1
+            ],
+            "namespace_sid": 0,
+            "observed_monotonic": 2350857.875623323,
+            "pid_namespace": "pid:[4026537683]",
+            "start_ticks": 235085781
+          },
+          "intermediate": {
+            "host_pid": 2015265,
+            "namespace_pgid": 0,
+            "namespace_pid": 2,
+            "namespace_pids": [
+              2015265,
+              2
+            ],
+            "namespace_sid": 0,
+            "observed_monotonic": 2350857.877512238,
+            "pid_namespace": "pid:[4026537683]",
+            "start_ticks": 235085787
+          },
+          "launcher_executable": "/usr/bin/unshare",
+          "launcher_executable_sha256": "9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6",
+          "launcher_exit_code": -9,
+          "launcher_host_pid": 2015241,
+          "launcher_start_ticks": 235085778,
+          "members_absent": true,
+          "outside_pid_namespace": "pid:[4026531836]",
+          "signals_sent_only_to_launcher": true
+        },
+        {
+          "case": "sigkill",
+          "elapsed_since_escape_seconds": 0.03318924503400922,
+          "escalated_to_sigkill": false,
+          "escaped": {
+            "host_pid": 2015278,
+            "namespace_pgid": 2,
+            "namespace_pid": 3,
+            "namespace_pids": [
+              2015278,
+              3
+            ],
+            "namespace_sid": 2,
+            "observed_monotonic": 2350858.103066102,
+            "pid_namespace": "pid:[4026537683]",
+            "start_ticks": 235085810
+          },
+          "init": {
+            "host_pid": 2015273,
+            "namespace_pgid": 0,
+            "namespace_pid": 1,
+            "namespace_pids": [
+              2015273,
+              1
+            ],
+            "namespace_sid": 0,
+            "observed_monotonic": 2350858.098946236,
+            "pid_namespace": "pid:[4026537683]",
+            "start_ticks": 235085803
+          },
+          "intermediate": {
+            "host_pid": 2015277,
+            "namespace_pgid": 0,
+            "namespace_pid": 2,
+            "namespace_pids": [
+              2015277,
+              2
+            ],
+            "namespace_sid": 0,
+            "observed_monotonic": 2350858.100806855,
+            "pid_namespace": "pid:[4026537683]",
+            "start_ticks": 235085809
+          },
+          "launcher_executable": "/usr/bin/unshare",
+          "launcher_executable_sha256": "9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6",
+          "launcher_exit_code": -9,
+          "launcher_host_pid": 2015272,
+          "launcher_start_ticks": 235085801,
+          "members_absent": true,
+          "outside_pid_namespace": "pid:[4026531836]",
+          "signals_sent_only_to_launcher": true
+        }
+      ]
+    }
+  },
+  "gate_sha256": "f23683cb5b0154ba94ce4d69a2cb79524475a5bc1ad4f6dcf8969a7fe03d9d04",
+  "supervisor_pid": 2014541,
+  "supervisor_process_group": 2014542,
+  "case_process_ids_absent_afterward": 32,
+  "supervisor_pids_absent": true,
+  "supervisor_process_group_absent": true,
+  "cpu_claim_allocations_empty": true,
+  "process_claims_receipt_sha256": "656ef3ad0afb802913c7286989f4eae7be428ef5800c4c40bd6fa597b4e86930",
+  "raw_remote_job_root": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T130124Z-684bc795",
+  "local_audit_copy": "/private/tmp/k5d-escalation-684bc795-audit/records.tar",
+  "whole_lifecycle_actual_cpu_seconds": null,
+  "conservative_charge_cpu_seconds": 180,
+  "limitations": [
+    "Synthetic workload only; no native encoder, Torch, CUDA, GPU, production wrapper or nested user/network namespaces were exercised.",
+    "Launcher exec identity and namespace membership are workload-recorded runtime observations checked against pinned source and archive; no external live tracing was performed.",
+    "PID absence is a later point-in-time observation and PID reuse is possible.",
+    "Whole lifecycle and external audit CPU are unmeasured; entire reservation is the conservative charge.",
+    "Previous immediate-SIGTERM failure remains valid and its underlying cause remains untraced."
+  ]
+}

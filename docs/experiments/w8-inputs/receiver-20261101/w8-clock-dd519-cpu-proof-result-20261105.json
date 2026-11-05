@@ -1,0 +1,218 @@
+{
+  "aa_guard_original_comparison_body_unchanged": true,
+  "aa_guard_passed_with_retained_config": true,
+  "aa_pin_passed": true,
+  "child": {
+    "abi": 4,
+    "approved_leaves": [
+      {
+        "device": 64512,
+        "inode": 3934945,
+        "mode": 33188,
+        "name": "/etc/ld.so.cache",
+        "resolved": "/etc/ld.so.cache",
+        "uid": 65534
+      },
+      {
+        "device": 24,
+        "inode": 4026532021,
+        "mode": 33060,
+        "name": "/proc/cpuinfo",
+        "resolved": "/proc/cpuinfo",
+        "uid": 65534
+      },
+      {
+        "device": 24,
+        "inode": 4026532022,
+        "mode": 33060,
+        "name": "/proc/devices",
+        "resolved": "/proc/devices",
+        "uid": 65534
+      },
+      {
+        "device": 24,
+        "inode": 4026534152,
+        "mode": 33060,
+        "name": "/proc/driver/nvidia/capabilities/mig/config",
+        "resolved": "/proc/driver/nvidia/capabilities/mig/config",
+        "uid": 65534
+      },
+      {
+        "device": 24,
+        "inode": 4026534153,
+        "mode": 33060,
+        "name": "/proc/driver/nvidia/capabilities/mig/monitor",
+        "resolved": "/proc/driver/nvidia/capabilities/mig/monitor",
+        "uid": 65534
+      },
+      {
+        "device": 24,
+        "inode": 4026534129,
+        "mode": 33060,
+        "name": "/proc/driver/nvidia/params",
+        "resolved": "/proc/driver/nvidia/params",
+        "uid": 65534
+      },
+      {
+        "device": 24,
+        "inode": 1192626855,
+        "mode": 33060,
+        "name": "/proc/self/maps",
+        "resolved": "/proc/2300324/maps",
+        "uid": 0
+      },
+      {
+        "device": 24,
+        "inode": 1192715695,
+        "mode": 33060,
+        "name": "/proc/self/status",
+        "resolved": "/proc/2300324/status",
+        "uid": 0
+      },
+      {
+        "device": 24,
+        "inode": 4026532026,
+        "mode": 33060,
+        "name": "/proc/stat",
+        "resolved": "/proc/stat",
+        "uid": 65534
+      },
+      {
+        "device": 24,
+        "inode": 898880684,
+        "mode": 33188,
+        "name": "/proc/sys/vm/mmap_min_addr",
+        "resolved": "/proc/sys/vm/mmap_min_addr",
+        "uid": 65534
+      },
+      {
+        "device": 23,
+        "inode": 11615,
+        "mode": 33060,
+        "name": "/sys/devices/system/cpu/online",
+        "resolved": "/sys/devices/system/cpu/online",
+        "uid": 65534
+      },
+      {
+        "device": 23,
+        "inode": 48,
+        "mode": 33060,
+        "name": "/sys/devices/system/memory/block_size_bytes",
+        "resolved": "/sys/devices/system/memory/block_size_bytes",
+        "uid": 65534
+      }
+    ],
+    "cuda_visible_devices": "",
+    "denials": {
+      "/local/users/emanuele/pointstream/audits/w8-clock-dd519-cpu-20261105/protected/0": 13,
+      "/local/users/emanuele/pointstream/audits/w8-clock-dd519-cpu-20261105/protected/1": 13,
+      "/local/users/emanuele/pointstream/audits/w8-clock-dd519-cpu-20261105/protected/2": 13,
+      "/local/users/emanuele/pointstream/audits/w8-clock-dd519-cpu-20261105/protected/3": 13,
+      "/local/users/emanuele/pointstream/audits/w8-clock-dd519-cpu-20261105/protected/4": 13,
+      "/local/users/emanuele/pointstream/audits/w8-clock-dd519-cpu-20261105/protected/alias-0": 13,
+      "/local/users/emanuele/pointstream/audits/w8-clock-dd519-cpu-20261105/protected/alias-1": 13,
+      "/local/users/emanuele/pointstream/audits/w8-clock-dd519-cpu-20261105/protected/alias-2": 13,
+      "/local/users/emanuele/pointstream/audits/w8-clock-dd519-cpu-20261105/protected/alias-3": 13,
+      "/local/users/emanuele/pointstream/audits/w8-clock-dd519-cpu-20261105/protected/alias-4": 13
+    },
+    "mask": 32767,
+    "mutations": {
+      "create": 13,
+      "link": 18,
+      "mkdir": 13,
+      "remove": 13,
+      "rename": 13,
+      "truncate": 13,
+      "write": 13
+    },
+    "namespaces": {
+      "net": "net:[4026537872]",
+      "user": "user:[4026537871]"
+    },
+    "profile": {
+      "objects": [
+        {
+          "child": {
+            "device": 23,
+            "inode": 304355,
+            "mode": 16877,
+            "path": "/sys/devices/system/clocksource",
+            "sha256": null,
+            "uid": 65534
+          },
+          "parent": {
+            "device": 23,
+            "inode": 304355,
+            "mode": 16877,
+            "path": "/sys/devices/system/clocksource",
+            "sha256": null,
+            "uid": 0
+          },
+          "rights": "READ_DIR recursive"
+        },
+        {
+          "child": {
+            "device": 23,
+            "inode": 304369,
+            "mode": 33188,
+            "path": "/sys/devices/system/clocksource/clocksource0/current_clocksource",
+            "sha256": "53038def32a9c25e6d962a247d9b3dfe213ce648d291ced6939d60ed92f1d6d8",
+            "uid": 65534
+          },
+          "parent": {
+            "device": 23,
+            "inode": 304369,
+            "mode": 33188,
+            "path": "/sys/devices/system/clocksource/clocksource0/current_clocksource",
+            "sha256": "53038def32a9c25e6d962a247d9b3dfe213ce648d291ced6939d60ed92f1d6d8",
+            "uid": 0
+          },
+          "rights": "READ_FILE"
+        },
+        {
+          "child": {
+            "device": 23,
+            "inode": 304371,
+            "mode": 33060,
+            "path": "/sys/devices/system/clocksource/clocksource0/available_clocksource",
+            "sha256": "309c9b2702da091c26ae707a11349c2eed75acf2928c466f7447e2b1a72b3cf0",
+            "uid": 65534
+          },
+          "parent": {
+            "device": 23,
+            "inode": 304371,
+            "mode": 33060,
+            "path": "/sys/devices/system/clocksource/clocksource0/available_clocksource",
+            "sha256": "309c9b2702da091c26ae707a11349c2eed75acf2928c466f7447e2b1a72b3cf0",
+            "uid": 0
+          },
+          "rights": "READ_FILE"
+        }
+      ],
+      "parent_receipt_sha256": "df0888da950a7fe4f0ed8c55b046b58ee546f80c63151ee4f7b6c6c38bb90080",
+      "profile": "w8-public-clocksource-two-leaf-v1"
+    },
+    "torch_imported": false
+  },
+  "child_cpu_seconds": 0.291168,
+  "helper": {
+    "path": "/local/users/emanuele/pointstream/audits/w8-clock-dd519-cpu-20261105/receiver-source/experiments/tennis/w8_clock_profile.py",
+    "sha256": "ebc7df390b7bce170624906caf4ceb03a113779001484c814eead26eee7433a9"
+  },
+  "helper_origin": "experiments/tennis/w8_clock_profile.py",
+  "historical_preflight_source_closure_passed": true,
+  "parent_cpu_seconds": 9.583893,
+  "parent_cuda_initialized": false,
+  "parent_ns": {
+    "net": "net:[4026531840]",
+    "user": "user:[4026531837]"
+  },
+  "prior_source_archive_sha256": "ef9b1324fe2eff914ac54931eb1416c2e8a984f7f5c5118350b3766267738393",
+  "retained_config_sha256": "4dc8a3bd11ba5a191790a00cb65d1780eb3d1a4fdc9496127c06c5e5cac1c8f5",
+  "scope": "CPU-only source/config/guard and synthetic clock policy qualification; no model instance, weights, protected body or GPU",
+  "source_archive_sha256": "a519ad56ee2df01d4b7951b882bdfb20cc458874538a66defc122070dd28cfc4",
+  "source_file_count": 353,
+  "source_manifest_sha256": "a53eeb2b1086b95af9b0db633f2325c9e551855b2e00f75e688f520a971e901d",
+  "wrong_helper_hash_rejected": true,
+  "wrong_helper_path_rejected": true
+}

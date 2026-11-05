@@ -66,10 +66,17 @@ def clean_process() -> None:
 
 
 def launch(config_path: Path, config_sha: str, loader_path: Path, loader_sha: str,
-           canary: Path, source_root: Path, *, materialize_profile: bool = False) -> None:
+           canary: Path, source_root: Path, *, materialize_profile: bool = False,
+           clock_receipt: Path | None = None, clock_receipt_sha: str | None = None) -> None:
     if sys.platform != 'linux' or len(os.sched_getaffinity(0)) != 1:
         raise RuntimeError('Linux and one CPU required')
     policy, fixed, bootstrap, receiver = preload()
+    if (clock_receipt is None) != (clock_receipt_sha is None) or (clock_receipt is not None and not materialize_profile):
+        raise ValueError('clocksource profile requires a bound receipt and materialized model worker')
+    clock_profile: Any = None
+    if clock_receipt is not None:
+        from experiments.tennis import w8_clock_profile as clock_profile_module
+        clock_profile = clock_profile_module
     source_origins = validate_source_origins(source_root)
     config = bootstrap.load_config(config_path, config_sha)
     if Path(config['allow_paths'][0]).resolve(strict=True) != source_root.resolve(strict=True):
@@ -105,6 +112,11 @@ def launch(config_path: Path, config_sha: str, loader_path: Path, loader_sha: st
         raise ValueError('canary must be outside allowed roots')
     extra, leaves = policy.approved_leaves(denied, loader)
     allowed.extend(extra)
+    clock_identity = None
+    if clock_profile is not None:
+        assert clock_receipt is not None and clock_receipt_sha is not None
+        clock_paths, clock_identity = clock_profile.prepare_child(clock_receipt, clock_receipt_sha, denied)
+        allowed.extend(clock_paths)
     cpu_seconds = config['cpu_seconds']
     if type(cpu_seconds) is not int or not 1 <= cpu_seconds <= 3600:
         raise ValueError('invalid worker CPU limit')
@@ -122,7 +134,8 @@ def launch(config_path: Path, config_sha: str, loader_path: Path, loader_sha: st
     before = fixed.synthetic_torch_bootstrap(torch)
     clean_process()
     sys.addaudithook(bootstrap._deny_processes)
-    abi, mask = policy.restrict(allowed, output)
+    abi, mask = (clock_profile.restrict(policy, allowed, output) if clock_profile is not None
+                 else policy.restrict(allowed, output))
     mutation = policy.mutation_probes(canary, output)
     probes = bootstrap._check_denials(denied)
     after = fixed.synthetic_torch_bootstrap(torch)
@@ -135,6 +148,8 @@ def launch(config_path: Path, config_sha: str, loader_path: Path, loader_sha: st
                  'approved_leaves': leaves, 'mutation_denials': mutation, 'output_write_ok': True,
                  'loader_identity_sha256': loader_sha, 'source_origins': source_origins,
                  'policy': 'w8-approved-system-leaves-mutation-v1'}
+    if clock_identity is not None:
+        isolation['clock_profile'] = clock_identity
     if config['worker_kind'] == 'packet':
         if materialize_profile:
             raise ValueError('materialization profile is not valid for packet workers')

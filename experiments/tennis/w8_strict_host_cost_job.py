@@ -26,8 +26,11 @@ from experiments.tennis import w8_strict_source as strict_source
 from experiments.tennis import w8_strict_packet_job as packet_audit
 from experiments.tennis import w8_public_folder_materialize as folder_profile
 from experiments.tennis import w8_cuda_system_leaves as strict_policy
+from experiments.tennis import w8_clock_profile
 from experiments.tennis.w8_receiver_preflight import ENV_SHAS, PROTECTED
 
+CLOCK_AUDIT_SHA = '9cf6eff76f0c0e40228d658bb439d92a261f1e87bb3ce9c546567f829759ae07'
+CLOCK_AUDIT_PATH = 'docs/experiments/w8-inputs/receiver-20261101/w8-cuda-profiler-500ccc2f-independent-audit-20261105.json'
 FOLDER_AUDIT_SHA = '75174fe559f3ecb4d73dbd1950eb74bc0eec2b47a470885c3b914f9f09ee600c'
 FOLDER_AUDIT_PATH = 'docs/experiments/w8-inputs/receiver-20261101/w8-folder-real-io-b5eb8a21-independent-audit-20261105.json'
 FOLDER_IO_WALL_FLOOR = 5.554623505100608
@@ -165,7 +168,7 @@ def _item(path: Path, digest_file: Callable[[Path], str] | None = None) -> dict[
     return {'path': str(path), 'sha256': (digest_file or fixed.file_sha)(path)}
 
 
-def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, wall_seconds: int, code_root: Path, loader: Path, *, materialize_profile: bool = False) -> dict[str, Any]:
+def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, wall_seconds: int, code_root: Path, loader: Path, *, materialize_profile: bool = False, clock_profile: bool = False) -> dict[str, Any]:
     config_path = work / 'worker-config.json'
     config_path.write_text(json.dumps(config, sort_keys=True))
     source = code_root
@@ -187,6 +190,12 @@ def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, 
         if config['worker_kind'] != 'cost_probe':
             raise ValueError('materialization applies only to model cost probes')
         command.append('--materialize-profile')
+    if clock_profile:
+        if not materialize_profile or config['worker_kind'] != 'cost_probe':
+            raise ValueError('clock profile applies only to materialized model cost probes')
+        clock_path = work / 'clock-identity.json'
+        clock_sha = w8_clock_profile.write_parent_receipt(clock_path)
+        command.extend(('--clock-receipt', str(clock_path), '--clock-receipt-sha256', clock_sha))
     before = resource.getrusage(resource.RUSAGE_CHILDREN)
     started = time.monotonic()
     def limit() -> None:
@@ -491,8 +500,30 @@ def check_gpu_binding(receipt: dict[str, Any], sealed: dict[str, Any], claimed: 
     receiver.check_execution_receipt(sealed)
 
 
+def add_clock_source(generated: dict[str, dict[str, str]], root: Path, manifest: dict[str, Any]) -> None:
+    """Bind the opt-in executing helper to the staged source manifest."""
+    name = 'experiments.tennis.w8_clock_profile'
+    relative = name.replace('.', '/') + '.py'
+    expected = manifest['files'].get(relative)
+    source = root / relative
+    if not isinstance(expected, str) or fixed.file_sha(source) != expected:
+        raise ValueError('staged clock helper source identity differs')
+    generated[f'code:{name}'] = {'path': str(source), 'sha256': expected}
+
+
+def check_clock_source_binding(config: dict[str, Any], origins: dict[str, str], files: dict[str, str]) -> None:
+    """Join retained generator identity to the authenticated source manifest."""
+    name = 'experiments.tennis.w8_clock_profile'
+    relative = name.replace('.', '/') + '.py'
+    entry = config['files'].get(f'code:{name}', {})
+    if (origins.get(name) != relative or entry.get('path') != str(Path(config['allow_paths'][0]) / relative)
+            or entry.get('sha256') != files.get(relative) or not isinstance(files.get(relative), str)):
+        raise ValueError('clock helper generator config and source manifest differ')
+
+
 def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generator_cpu: int,
-             worker_wall: int, preflight_path: Path, preflight_sha: str, *, materialize_profile: bool = False) -> None:
+             worker_wall: int, preflight_path: Path, preflight_sha: str, *, materialize_profile: bool = False,
+             clock_profile: bool = False) -> None:
     if sys.platform != 'linux' or len(os.sched_getaffinity(0)) != 1:
         raise RuntimeError('Linux one-core fleet admission required')
     if steps not in (1, 3) or type(steps) is not int:
@@ -508,6 +539,11 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
     uuid_api = require_gpu_uuid_api(torch)
     digests = StableDigests()
     paths, spec = stage_inputs(stage, digests.digest)
+    if spec.get('clock_policy_profile') != (w8_clock_profile.PROFILE if clock_profile else None) or (clock_profile and not materialize_profile):
+        raise ValueError('declared clock policy and command differ')
+    if clock_profile and (spec.get('clock_reference_audit_sha256') != CLOCK_AUDIT_SHA
+            or fixed.file_sha(Path(__file__).resolve().parents[2] / CLOCK_AUDIT_PATH) != CLOCK_AUDIT_SHA):
+        raise ValueError('synthetic CUDA clock audit identity differs')
     profile = spec.get('materialization_profile')
     if profile not in (None, folder_profile.PROFILE) or (profile == folder_profile.PROFILE) != materialize_profile:
         raise ValueError('declared materialization profile and command differ')
@@ -633,6 +669,8 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
         if fixed.file_sha(current) != digest:
             raise ValueError(f'current generator source differs from frozen identity: {name}')
         generated[f'code:{name}'] = {'path': str(current), 'sha256': digest}
+    if clock_profile:
+        add_clock_source(generated, root, code_manifest)
     visible = os.environ.get('CUDA_VISIBLE_DEVICES')
     dispatch = json.loads((stage / 'dispatch.json').read_text())
     if not visible or visible != os.environ.get('PS_CLAIMED_GPU_UUID'):
@@ -641,7 +679,7 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
         raise ValueError('dispatch and claimed GPU differ')
     gpu_cfg = config('cost_probe', generated, model_out, policies['jcv'], generator_cpu, visible)
     gpu_cfg['probe_steps'] = steps
-    gpu_usage = _worker(Path(policies['jcv']['python']), gpu_cfg, model_work, generator_cpu, worker_wall, root, loader_receipt, materialize_profile=materialize_profile)
+    gpu_usage = _worker(Path(policies['jcv']['python']), gpu_cfg, model_work, generator_cpu, worker_wall, root, loader_receipt, materialize_profile=materialize_profile, clock_profile=clock_profile)
     expected = {'unit': fixed.UNITS[0], 'packet_sha256': fixed.WINDOW_SHA, 'profile_sha256': fixed.PROFILE_SHA,
                 'tensor_fingerprints': fingerprints, 'files': {k: v['sha256'] for k, v in generated.items()}}
     validation = receiver.validate_cost_probe(model_out, expected, steps)
@@ -708,6 +746,9 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
                'actual_parent_cpu_seconds': sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),
                'parent_cpu_limit': parent_cpu, 'packet_cpu_limit': packet_cpu, 'generator_cpu_limit': generator_cpu,
                'retained_output': str(retained), 'quality_claim': False}
+    if clock_profile:
+        summary['clock_policy_profile'] = w8_clock_profile.PROFILE
+        summary['clock_reference_audit_sha256'] = CLOCK_AUDIT_SHA
     (publication / 'cost-summary.json').write_text(json.dumps(summary, sort_keys=True))
 
 
@@ -837,6 +878,21 @@ def audit_strict_policy(stage: Path, retained: Path, summary: dict[str, Any]) ->
             raise ValueError('retained materialization binding differs')
     elif gpu_receipt.get('materialization_profile') is not None:
         raise ValueError('unexpected retained materialization profile')
+    spec = json.loads((stage.parent / 'spec.json').read_text())
+    clock_enabled = spec.get('clock_policy_profile') == w8_clock_profile.PROFILE
+    if spec.get('clock_policy_profile') not in (None, w8_clock_profile.PROFILE):
+        raise ValueError('unknown clock profile')
+    if summary.get('clock_policy_profile') != (w8_clock_profile.PROFILE if clock_enabled else None):
+        raise ValueError('clock profile summary differs')
+    if clock_enabled:
+        if (not materialized or spec.get('clock_reference_audit_sha256') != CLOCK_AUDIT_SHA
+                or summary.get('clock_reference_audit_sha256') != CLOCK_AUDIT_SHA):
+            raise ValueError('clock audit reference differs')
+        with tarfile.open(archive) as bundle:
+            entry = bundle.getmember(CLOCK_AUDIT_PATH)
+            stream = bundle.extractfile(entry) if entry.isfile() else None
+            if stream is None or hashlib.sha256(stream.read()).hexdigest() != CLOCK_AUDIT_SHA:
+                raise ValueError('frozen synthetic CUDA clock audit differs')
     records = (('packet-config.json', json.loads((retained / 'decoded-manifest.json').read_text())['isolation']),
                ('generator-config.json', json.loads((retained / 'sealed.json').read_text())['isolation']))
     for filename, isolation in records:
@@ -867,6 +923,11 @@ def audit_strict_policy(stage: Path, retained: Path, summary: dict[str, Any]) ->
                        for key, value in origins.items())):
             raise ValueError('pre-isolation project source origins differ from pinned source manifest')
         strict_policy.validate_leaf_receipt(isolation['approved_leaves'], loader)
+        if filename == 'generator-config.json' and clock_enabled:
+            check_clock_source_binding(config, origins, files)
+            w8_clock_profile.validate_receipt(isolation.get('clock_profile'))
+        elif isolation.get('clock_profile') is not None:
+            raise ValueError('unexpected clock policy in worker')
         mutation = isolation['mutation_denials']
         if (set(mutation) != {'write', 'truncate', 'create', 'remove', 'mkdir', 'rename', 'link'}
                 or any(v not in ((1, 13, 18) if k in ('rename', 'link') else (1, 13)) for k, v in mutation.items())):
@@ -1108,6 +1169,7 @@ def main() -> int:
     run.add_argument('--preflight', type=Path, required=True)
     run.add_argument('--preflight-sha256', required=True)
     run.add_argument('--materialize-profile', action='store_true')
+    run.add_argument('--clock-profile', action='store_true')
     sub.add_parser('cost-validate')
     audit = sub.add_parser('cost-audit')
     audit.add_argument('--one', type=Path, required=True)
@@ -1144,7 +1206,8 @@ def main() -> int:
     if args.command == 'cost-validate':
         return cost_validate(stage, Path(os.environ['PS_VALIDATION_PATH']))
     cost_run(stage, args.steps, args.parent_cpu, args.packet_cpu, args.generator_cpu, args.worker_wall,
-             args.preflight, args.preflight_sha256, materialize_profile=args.materialize_profile)
+             args.preflight, args.preflight_sha256, materialize_profile=args.materialize_profile,
+             clock_profile=args.clock_profile)
     return 0
 
 
