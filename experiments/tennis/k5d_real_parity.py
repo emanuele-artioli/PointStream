@@ -47,9 +47,9 @@ def spec(base: dict, *, assets: dict[str, dict[str, str]], deadline: str, unshar
                            '--unshare-sha256', unshare_sha256]
     result['scale']['frames'] = {'smoke': 16, 'full': 16}
     result['scale']['proof_mode'] = {'smoke': 'parity16', 'full': 'parity-noop'}
-    result['scale']['namespace_timeout'] = {'smoke': 600, 'full': 4}
+    result['scale']['namespace_timeout'] = {'smoke': 580, 'full': 4}
     result.update(gpu_models=['RTX A6000'], gpu_sharing={'mode': 'exclusive'}, budget_seconds=800,
-                  validator_seconds=30, smoke={'seconds': 650, 'representative_basis':
+                  validator_seconds=30, smoke={'seconds': 600, 'representative_basis':
                   'Actual 16-frame preparation and all six native replay, metric and judge paths with exact saved parity.'},
                   full={'seconds': 5}, validator=['{python}', '-m', 'experiments.tennis.k5d_real_parity', 'validate'])
     from experiments.jobs.inbox import validate_spec
@@ -122,6 +122,43 @@ def run(args: argparse.Namespace) -> None:
                  'scope': 'exact 16-frame calibration parity; not an independent sample'})
 
 
+def verify_scored(root: Path, identity: dict[str, str]) -> None:
+    """Rebuild the output from all six saved points and require all arms ran."""
+    import tempfile
+
+    prepared, proof = root / 'prepared', root / 'scored'
+    checkpoint_sha = oracle.sha(prepared / 'checkpoint.json')
+    cp.verify(prepared, checkpoint_sha, identity)
+    record = json.loads((proof / 'coalesced-validation.json').read_text())
+    points = record['points']
+    expected = [f'point-{codec}-{point}.json' for codec, point in enc.POINTS]
+    if (record['checkpoint_sha256'] != checkpoint_sha or record['execution_identity'] != identity
+            or [item['name'] for item in points] != expected):
+        raise ValueError('six scored checkpoint proofs differ')
+    files = []
+    for item in points:
+        path = proof / item['name']
+        if oracle.sha(path) != item['sha256']:
+            raise ValueError('point proof hash differs')
+        files.append({'path': str(path), 'sha256': item['sha256']})
+    with tempfile.TemporaryDirectory(prefix='k5d-parity-assemble-', dir=os.environ.get('TMPDIR')) as folder:
+        assembled = Path(folder) / 'assembled'
+        result = cp.assemble(prepared, checkpoint_sha, files, assembled, identity)
+        if result != record['result'] or oracle.sha(assembled / 'pilot.json') != oracle.sha(proof / 'assembled' / 'pilot.json'):
+            raise ValueError('saved assembly differs from scored points')
+    report = json.loads((proof / 'assembled' / 'pilot.json').read_text())
+    source = json.loads((proof / 'assembled' / 'source-qualification.json').read_text())
+    if (len(source['rows']) != 16 or any(row['label_kind'] != 1 for row in source['rows'])
+            or any(point['streak']['guard_off'] is not False for point in report['points'])):
+        raise ValueError('calibration source or guard differs')
+    events = json.loads((proof / 'timing.json').read_text())['events']
+    required = {f'{kind}.{codec}.{point}.{arm}' for codec, point in enc.POINTS
+                for kind in ('metrics', 'judges') for arm in ('baseline', 'streak')}
+    if any(len(found := [e for e in events if e['name'] == name]) != 1 or found[0]['completed'] is not True
+           for name in required):
+        raise ValueError('metric or judge timing event missing or duplicated')
+
+
 def validate() -> None:
     target = Path(os.environ['PS_VALIDATION_PATH'])
     try:
@@ -132,6 +169,7 @@ def validate() -> None:
               cost.unpack(stage / 'published.tar', published_sha) as output):
             identity = cp.execution_identity()
             saved = json.loads((output / 'parity.json').read_text())
+            verify_scored(output, identity)
             cf.prepare_parity(output / 'prepared', prior, identity)
             comparison = cp.compare_equivalence(prior, output / 'scored' / 'assembled', oracle.sha(prior / 'pilot.json'))
             if (saved['comparison'] != comparison or saved['execution_identity'] != identity
