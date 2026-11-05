@@ -66,3 +66,29 @@ def test_assembly_requires_six_distinct_bound_score_receipts(tmp_path, monkeypat
     Path(receipts[0]['path']).write_text('{}')
     with pytest.raises(ValueError, match='SHA256'):
         cp.assemble(root, digest, receipts, tmp_path / 'changed', identity)
+
+
+def test_assemble_readonly_staged_checkpoint_without_mutating_it(tmp_path, monkeypatch):
+    root = tmp_path / 'prepare'
+    identity, points, digest = make_preparation(root, monkeypatch)
+    receipts = []
+    for i, original in enumerate(points):
+        point = json.loads(json.dumps(original))
+        point['baseline'].update(metrics=[{'frame': 0}, {'frame': 1}], judges={'wasb': 'ok'})
+        point['streak'].update(metrics=[{'frame': 0}, {'frame': 1}], judges={'wasb': 'ok'})
+        path = tmp_path / f'proof-{i}.json'
+        path.write_text(json.dumps({'checkpoint_sha256': digest, 'execution_identity': identity, 'point': point,
+                                    'receiver_replay': {'decoded_yuv_sha256': 'decode', 'rendered_rgb_sha256': 'render'}}))
+        receipts.append({'path': str(path), 'sha256': cp.oracle.sha(path)})
+    monkeypatch.setattr(cp.enc, 'validate', lambda out: {'points': len(json.loads((out / 'pilot.json').read_text())['points'])})
+    staged = [root, *root.rglob('*')]
+    for path in staged:
+        path.chmod(0o555 if path.is_dir() else 0o444)
+    try:
+        assert cp.assemble(root, digest, receipts, tmp_path / 'assembled', identity) == {'points': 6}
+        assert cp.oracle.sha(root / 'checkpoint.json') == digest
+        assert all(path.stat().st_mode & 0o222 == 0 for path in staged)
+        assert not (tmp_path / 'assembled' / 'checkpoint.json').exists()
+    finally:
+        for path in staged:
+            path.chmod(path.stat().st_mode | 0o200)

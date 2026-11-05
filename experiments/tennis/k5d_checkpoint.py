@@ -212,6 +212,10 @@ def assemble(checkpoint: Path, checkpoint_sha: str, point_files: list[dict[str, 
     if output.exists():
         raise ValueError('assemble output already exists')
     shutil.copytree(checkpoint, output)
+    # Fleet stages verified archives read-only; copytree preserves those modes.
+    # Make only the new assembly copy writable, leaving the checkpoint untouched.
+    for path in (output, *output.rglob('*')):
+        path.chmod(path.stat().st_mode | 0o200)
     (output / 'checkpoint.json').unlink()
     report.pop('checkpoint_prepare')
     report['full_metrics'] = True
