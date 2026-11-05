@@ -84,7 +84,29 @@ def test_decision_preserves_missing_brackets_and_18_scenarios():
                       'dcvc_points': [], 'hybrid': {m: {'whole': .5, 'foreground': .5}
                                                    for m in ('lpips', 'dists')}}
                for name in subject.w7_analysis.WINDOWS}
-    report = subject.decision_report(views, billing)
+    sizes = {(r['role'], r['window'], r['name']): 100 for r in views['all_roles']}
+    report = subject.framing_reports(views, billing, sizes)['primary_ivf']
     assert len(report['scenarios']) == 18
     assert all(case['holds'] is None for case in report['scenarios'].values())
     assert len(report['roles']) == 75
+
+
+def test_final_gate_rejects_missing_or_wrong_source_before_loading(tmp_path):
+    with pytest.raises(ValueError, match='before artifact loading'):
+        subject.check_final_gate(None, None, tmp_path)
+    path = tmp_path / 'gate.json'
+    path.write_text('{"approved":true,"max_cpu_seconds":500}')
+    with pytest.raises(ValueError, match='exact 60-second cap'):
+        subject.check_final_gate(path, subject._file_sha(path), tmp_path)
+
+
+def test_gate_rejects_changed_scientific_dependency_identity(tmp_path, monkeypatch):
+    import json
+    gate = tmp_path / 'gate.json'
+    gate.write_text(json.dumps({'approved': True, 'max_cpu_seconds': 60,
+                                'analysis_source_sha256': subject._file_sha(subject.Path(subject.__file__)),
+                                'new_score_audit_sha256': subject.NEW_REVIEW_SHA,
+                                'scientific_source_identity': {'tracked_python_manifest_sha256': 'old'}}))
+    monkeypatch.setattr(subject, 'source_identity', lambda root: {'tracked_python_manifest_sha256': 'changed'})
+    with pytest.raises(ValueError, match='source identity'):
+        subject.check_final_gate(gate, subject._file_sha(gate), tmp_path)

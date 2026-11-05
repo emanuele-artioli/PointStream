@@ -1,20 +1,24 @@
-# MKV envelope analysis readiness
+# Source-bound IVF and MKV envelope analysis readiness
 
-The CPU-only `experiments.tennis.w7_mkv_envelope` loader authenticates both approved historical receipts and all nine old score archives; the accepted SHA-pinned 40ee/aa307 audit, two 40ee stage publications and prior aa307 publication; the fixed 75-role inventory and delivered map; and each full-timeline score member. It joins all 75 roles, verifies the four equal-IVF/YUV/score/byte-count duplicate pairs and preserves the two independent MKV hashes. The resulting 71-stream primary and 57-role planned-family sensitivity views retain source identity, per-row GPU class and exact native and billed byte provenance.
+The primary baseline uses complete original IVF byte lengths with the fixed preinstalled DAV1D, limited-BT.709 and cubic-upscale receiver profile. Complete delivered MKV is a separately identified transport sensitivity. This does not imply generic metadata interoperability, newly measured IVF RGB, or an archived historical RGB hash; the strict metadata failure remains failed. The four new scores are attached to original IVF bytes by independently verified native-YUV equality and the fixed scorer conversion, an inference rather than a fresh IVF neural replay.
 
-The report implements the existing G5 achievable hull, W1 bracket-only log-rate family comparisons, W1 family dominance, W7 pooled and per-match t intervals and missing-DCVC sensitivity. It uses the SHA-pinned corrected W9 billing artifact and its original all-assets formula for 7,200/3,600/1,800 seconds. The 3,600/1,800 rates agree with the existing W9 results within 7.2e-15 kbps. Whole and foreground LPIPS/DISTS gaps and all roles are retained. Three fixed stress cases add −0.001, 0 or +0.001 uniformly to anchor errors; this is deterministic sensitivity, not a statistical or per-row bound. The separate curve helper uses K5 PCHIP over real quality overlap and returns no BD number without overlap. The hybrid currently has only one measured point per window, so a hybrid BD-rate is not invented.
+The `w7_mkv_envelope` loader authenticates the approved historical and new-score reviews, nine old score archives, all three new/pilot publications, fixed role inventory and delivery map. It independently reads and hashes all 75 original IVF members from 18 SHA-verified encode archives, checks complete framing byte lengths, native-YUV identity and the fixed 75-role oracle, and validates all four deduplicated pairs. Both framings use the same 71-stream primary and 57-role historical-family sensitivity. It retains per-role native, score, GPU-class, IVF and MKV provenance.
 
-No actual quality outcome has been computed. The [CPU-only pilot](mkv-analysis-synthetic-cost-pilot-20261105.json) authenticated the actual inputs, then ran ten complete reports on synthetic scores only: 1.260 s total wall and 1.080 CPU; first report 0.936 s. W7's original decision uses analytical t intervals, so there is no 1,000-replicate bootstrap to forecast. The pilot is local warm-cache evidence, not a production performance guarantee. Proposed next allocation is **60 CPU-seconds for the final command plus 60 CPU-seconds external/audit = 120 inclusive**, with a 1.5× measured margin and the remaining amount as explicit reserve; root must review source and allocate it before producing outcomes.
+The report uses the existing G5 achievable hull, W1 bracket-only family comparisons and dominance, W7 t intervals and missing-DCVC sensitivity, and SHA-pinned corrected W9 7,200/3,600/1,800-second bank rates. ±0.001 uniformly perturbs anchor errors as a deterministic stress, not a statistical bound. The hybrid has a single measured point per window, so no hybrid BD-rate is invented.
 
-The `--mode final` entrypoint requires an actual SHA-pinned root gate with `approved: true`, `analysis_source_sha256` matching this module, `new_score_audit_sha256` equal to the accepted audit and positive `max_cpu_seconds` at most 500. It writes only an exclusive new output path. Pilot invocation and corresponding final command (add `--gate PATH --gate-sha256 SHA` to the latter):
+No actual outcome has been computed. The [CPU-only pilot](mkv-analysis-synthetic-cost-pilot-20261105.json) verified actual archive and IVF inputs, then ran ten complete paired IVF/MKV reports on synthetic scores: 1.620 seconds wall, 1.478 CPU, first paired report 0.942 seconds. W7's decision uses analytical t intervals; no bootstrap is required. The proposed and root-approved envelope is 60 CPU-seconds for the command and 60 seconds for external/audit, inclusive 120 CPU-seconds. An independent source review and outcome gate remain pending.
+
+Final execution sets the exact 60-second process CPU cap and validates a SHA-pinned root gate **before reading score or transport artifacts**. The gate must bind the module SHA, accepted four-score audit SHA, `max_cpu_seconds: 60`, and the entire tracked Python source manifest plus numerical runtime identity printed in the pilot receipt. The manifest and runtime are rechecked before output. A source change invalidates the gate. The final report writes a fresh exclusive path and must not be run without a gate approved by root.
 
 ```sh
-python -m experiments.tennis.w7_mkv_envelope --mode pilot \
+python -m experiments.tennis.w7_mkv_envelope --mode final \
   --historical-inbox /private/tmp/w7-original-53-audit \
   --pilot-publication /private/tmp/w7-shared-aa3070-audit/smoke.tar \
   --new-smoke-publication /private/tmp/w7-narrow-40ee-audit/smoke/published.tar \
   --new-full-publication /private/tmp/w7-narrow-40ee-audit/full/published.tar \
-  --output /private/tmp/w7-mkv-analysis-cost-pilot-NEW.json
+  --ivf-archive-dir /private/tmp/w7-fps-oracle-archives \
+  --gate ROOT_APPROVED_GATE --gate-sha256 ROOT_APPROVED_GATE_SHA \
+  --output /private/tmp/w7-ivf-mkv-final-NEW.json
 ```
 
-For final use replace `pilot` with `final`, add the gate arguments, and use a new final output path. The new source and its local input paths are subject to root review; no authorization or gate is created by this document. No paper, ledger or GPU action follows.
+This document does not create a gate or authorize a new GPU, paper or ledger action.

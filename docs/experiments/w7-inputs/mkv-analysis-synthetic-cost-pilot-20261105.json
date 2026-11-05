@@ -3,22 +3,32 @@
   "historical_roles": 71,
   "new_roles": 4,
   "primary_streams": 71,
-  "authenticated_load_wall_seconds": 0.02525912504643202,
+  "authenticated_load_wall_seconds": 0.06577187543734908,
   "synthetic_runs": 10,
   "synthetic_run_wall_seconds": [
-    0.9358817921020091,
-    0.03317783307284117,
-    0.03362208278849721,
-    0.03318945784121752,
-    0.03309662500396371,
-    0.032943458296358585,
-    0.033003666903823614,
-    0.033014667220413685,
-    0.03297337517142296,
-    0.03296145796775818
+    0.9415987501852214,
+    0.06904066679999232,
+    0.06809674995020032,
+    0.06719654193148017,
+    0.06969091668725014,
+    0.06853254232555628,
+    0.0677840830758214,
+    0.06737225037068129,
+    0.0670186672359705,
+    0.0674834162928164
   ],
-  "total_wall_seconds": 1.2597031658515334,
-  "process_cpu_seconds": 1.080475,
+  "total_wall_seconds": 1.620195375289768,
+  "process_cpu_seconds": 1.477885,
   "full_analysis_basis": "one complete W7 t-interval report, no bootstrap; external work and reserves require root",
-  "source_sha256": "59ffbcfbceec1073372420d19f1595669b2b63c667efa700afec2c8b805fa33f"
+  "source_sha256": "e0d4716bf40ceb16a4ad43181becb618df6cf5f00b728d0f0b525cd65e780dea",
+  "scientific_source_identity": {
+    "tracked_python_files": 545,
+    "tracked_python_manifest_sha256": "0bd91672433804cfa3b22ca840ce9d5e9196ae5947819aaab669ece168dc0e74",
+    "python_version": "3.12.7 | packaged by conda-forge | (main, Oct  4 2024, 15:57:01) [Clang 17.0.6 ]",
+    "numpy_version": "2.0.0",
+    "scipy_version": "1.18.1",
+    "numpy_binary_sha256": "c402348e6a6b07bdb3addc344f34df76abb32ab43a50ef481ccf6ad84ed1a731",
+    "scipy_special_binary_sha256": "a0889d5c82454d79d4cd4cc8a589a62a382d667da8e2b030e637f58708bd340c",
+    "scipy_interpolate_binary_sha256": "c8139dcb012c867067a514fa2ca0f264459aad6f43e0a5e77f72201bf483b50d"
+  }
 }

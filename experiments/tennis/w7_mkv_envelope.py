@@ -10,6 +10,8 @@ import hashlib
 import io
 import json
 import math
+import subprocess
+import sys
 import tarfile
 from pathlib import Path
 from typing import Any
@@ -27,6 +29,7 @@ CONTROL_REVIEW_SHA = '7a6ff1d5ce5d540b5d31825147cc5c198c66149cdf11741fb56786cfd1
 NEW_REVIEW_SHA = 'a01fb9ff905918e8574e48ce6d74d4b0f44f9ce9099a46dd74f85a0d2c8726f1'
 INVENTORY_SHA = '867d9fff8974f4ec5320c9b830138d4aac2ee22c285d7de45aebb04dff3bab11'
 DELIVERY_MAP_SHA = 'fd53ad6f70b589e1849cd94ede731c1259867b48d0e2b80cf64fcd52dbc5377e'
+IVF_ORACLE_SHA = '95788528fdef505ead5a341dd5e9e11a7b0b5fa6d690a80d2489fa9efa29fe2f'
 
 
 def _file_sha(path: Path) -> str:
@@ -35,6 +38,38 @@ def _file_sha(path: Path) -> str:
         for block in iter(lambda: stream.read(1024 * 1024), b''):
             h.update(block)
     return h.hexdigest()
+
+
+
+def source_identity(root: Path) -> dict[str, Any]:
+    """Bind every tracked project Python source, plus the numerical runtime."""
+    import importlib
+    import scipy
+    from scipy.interpolate import _ppoly
+    from scipy.special import _ufuncs
+
+    raw = subprocess.check_output(['git', '-C', str(root), 'ls-files', '-z', '--', '*.py'])
+    names = sorted(x.decode() for x in raw.split(b'\0') if x)
+    if not names or 'experiments/tennis/w7_mkv_envelope.py' not in names:
+        raise ValueError('complete tracked Python source checkout required')
+    manifest = {name: _file_sha(root / name) for name in names}
+    encoded = json.dumps(manifest, sort_keys=True, separators=(',', ':')).encode()
+    return {'tracked_python_files': len(names), 'tracked_python_manifest_sha256': hashlib.sha256(encoded).hexdigest(),
+            'python_version': sys.version, 'numpy_version': np.__version__, 'scipy_version': scipy.__version__,
+            'numpy_binary_sha256': _file_sha(Path(str(importlib.import_module('numpy._core._multiarray_umath').__file__))),
+            'scipy_special_binary_sha256': _file_sha(Path(_ufuncs.__file__)),
+            'scipy_interpolate_binary_sha256': _file_sha(Path(_ppoly.__file__))}
+
+
+def check_final_gate(path: Path | None, sha: str | None, root: Path) -> dict[str, Any]:
+    if path is None or sha is None or _file_sha(path) != sha:
+        raise ValueError('SHA-pinned root cost gate required before artifact loading')
+    gate = json.loads(path.read_text())
+    if (gate.get('approved') is not True or gate.get('analysis_source_sha256') != _file_sha(Path(__file__))
+            or gate.get('new_score_audit_sha256') != NEW_REVIEW_SHA or gate.get('max_cpu_seconds') != 60
+            or gate.get('scientific_source_identity') != source_identity(root)):
+        raise ValueError('root gate source identity, audit or exact 60-second cap differs')
+    return gate
 
 
 def load_historical(old_path: Path, control_path: Path, archives: dict[str, Path]) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, Any]]:
@@ -147,6 +182,46 @@ def load_new(review_path: Path, inventory_path: Path, delivery_path: Path,
         reviewed.append({k: v for k, v in row.items() if k not in ('role', 'values') } | {'score_array_sha256': score_digest(values)})
         output.append(row)
     return output, {'approved_new_scores': True, 'rows': reviewed, 'audit_sha256': NEW_REVIEW_SHA}, inventory
+
+
+
+def load_ivf_sizes(inventory: dict[str, Any], oracle_path: Path, archive_dir: Path) -> dict[tuple[str, str, str], int]:
+    """Authenticate original full IVF files, including the header and every frame header."""
+    if _file_sha(oracle_path) != IVF_ORACLE_SHA:
+        raise ValueError('original IVF oracle SHA differs')
+    oracle = json.loads(oracle_path.read_text())
+    lookup = {(r['window'], r['name']): r for r in oracle['rows']}
+    if len(lookup) != 75 or oracle['logical_roles'] != 75:
+        raise ValueError('IVF oracle role coverage differs')
+    groups = [('rerate', inventory['points']), ('control', inventory['controls']), ('new', inventory['new_points'])]
+    cached = {}
+    sizes = {}
+    for role, entries in groups:
+        for row in entries:
+            archive_sha = row['encode_archive_sha256']
+            path = archive_dir / archive_sha
+            if archive_sha not in cached:
+                if _file_sha(path) != archive_sha:
+                    raise ValueError('original encode archive SHA differs')
+                cached[archive_sha] = path
+            with tarfile.open(path) as tar:
+                matches = [m for m in tar if m.name == row['ivf_member'] and m.isfile()]
+                if len(matches) != 1 or matches[0].size <= 32:
+                    raise ValueError('original IVF member missing or ambiguous')
+                stream = tar.extractfile(matches[0])
+                if stream is None:
+                    raise ValueError('original IVF unreadable')
+                blob = stream.read()
+            record = lookup[row['window'], row['name']]
+            if (hashlib.sha256(blob).hexdigest() != row['original_ivf_sha256']
+                    or record['sha256'] != row['original_ivf_sha256']
+                    or record['native_yuv_sha256'] != row['historical_native_yuv_sha256']
+                    or record['bytes'] != len(blob) or record['fps'] not in (25, 50)):
+                raise ValueError('original IVF byte, native YUV or oracle identity differs')
+            sizes[role, row['window'], row['name']] = len(blob)
+    if len(sizes) != 75 or len(cached) != 18:
+        raise ValueError('original IVF inventory coverage differs')
+    return sizes
 
 
 def score_digest(values: Any) -> str:
@@ -309,11 +384,11 @@ def decision_report(views: dict[str, Any], billing: dict[str, dict[str, Any]]) -
     A missing bracket leaves the corresponding window unresolved. The selected
     families are preserved as a historical sensitivity, with DCVC as before.
     """
-    output: dict[str, Any] = {'scope': 'W7 MKV sensitivity, not fresh historical neural scoring',
+    output: dict[str, Any] = {'scope': 'W7 anchor comparison, not fresh historical neural scoring',
                               'deduplicated': views['deduplicated'], 'scenarios': {},
                               'roles': [{k: r[k] for k in ('role', 'window', 'name', 'policy', 'crf',
                                                            'original_ivf_sha256', 'native_yuv_sha256',
-                                                           'mkv_sha256', 'mkv_bytes', 'fps', 'wire_kbps',
+                                                           'mkv_sha256', 'mkv_bytes', 'ivf_bytes', 'fps', 'wire_kbps',
                                                            'gpu_class', 'score_job')} |
                                         {'score_array_sha256': score_digest(r['values']),
                                          'means': [float(x) for x in np.mean(r['values'], axis=1)]}
@@ -427,6 +502,33 @@ def decision_report(views: dict[str, Any], billing: dict[str, dict[str, Any]]) -
     return output
 
 
+
+def framing_reports(views: dict[str, Any], billing: dict[str, dict[str, Any]],
+                    sizes: dict[tuple[str, str, str], int]) -> dict[str, Any]:
+    """Compute IVF primary and MKV sensitivity from the same verified score arrays."""
+    import copy
+
+    if len(sizes) != 75:
+        raise ValueError('all original IVF byte lengths required')
+    enriched = copy.deepcopy(views)
+    for row in enriched['all_roles']:
+        key = row['role'], row['window'], row['name']
+        row['ivf_bytes'] = sizes[key]
+    for pair in enriched['deduplicated']:
+        control = next(r for r in enriched['all_roles'] if r['role'] == 'control' and r['window'] == pair['window'] and r['name'] == pair['control'])
+        roi = next(r for r in enriched['all_roles'] if r['role'] == 'rerate' and r['window'] == pair['window'] and r['name'] == pair['roi'])
+        if control['ivf_bytes'] != roi['ivf_bytes']:
+            raise ValueError('deduplicated original IVF byte lengths differ')
+    mkv = decision_report(enriched, billing)
+    for row in enriched['all_roles']:
+        row['wire_kbps'] = 8 * row['ivf_bytes'] * row['fps'] / (240 * 1000)
+    ivf = decision_report(enriched, billing)
+    return {'primary_ivf': ivf, 'mkv_transport_sensitivity': mkv,
+            'framing_scope': 'complete IVF headers and payloads; MKV bills complete delivered files',
+            'receiver_scope': 'fixed preinstalled DAV1D, limited BT.709, cubic resize; not generic metadata interoperability',
+            'native_yuv_reuse': 'quality attachment is inferred from equal native YUV and fixed conversion; historical RGB hash unavailable'}
+
+
 def main() -> None:
     import argparse
     import copy
@@ -439,11 +541,15 @@ def main() -> None:
     parser.add_argument('--pilot-publication', type=Path, required=True)
     parser.add_argument('--new-smoke-publication', type=Path, required=True)
     parser.add_argument('--new-full-publication', type=Path, required=True)
+    parser.add_argument('--ivf-archive-dir', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--gate', type=Path)
     parser.add_argument('--gate-sha256')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[2]
+    if args.mode == 'final':
+        resource.setrlimit(resource.RLIMIT_CPU, (60, 60))
+        check_final_gate(args.gate, args.gate_sha256, root)
     evidence = root / 'docs/experiments/w7-inputs'
     started = time.monotonic()
     cpu = resource.getrusage(resource.RUSAGE_SELF)
@@ -458,6 +564,7 @@ def main() -> None:
                                            evidence / 'mkv-53-inventory-20261105.json',
                                            evidence / 'fps-native-yuv-14f7a33e-delivery-map-20261105.json', pubs)
     views = verified_views(inventory, old + new, old_review, control_review, new_review)
+    sizes = load_ivf_sizes(inventory, evidence / 'fps-original-75-oracle-20261105.json', args.ivf_archive_dir)
     billing = load_billing(root / 'docs/experiments/w9-inputs/w7-tier1-billing-corrected.json')
     loaded_wall = time.monotonic() - started
     if args.mode == 'pilot':
@@ -471,7 +578,7 @@ def main() -> None:
         durations = []
         for _ in range(10):
             before = time.monotonic()
-            decision_report(fake, fake_billing)
+            framing_reports(fake, fake_billing, sizes)
             durations.append(time.monotonic() - before)
         after = resource.getrusage(resource.RUSAGE_SELF)
         output = {'scope': 'CPU cost only; synthetic scores, no outcome or admission',
@@ -480,21 +587,15 @@ def main() -> None:
                   'synthetic_run_wall_seconds': durations, 'total_wall_seconds': time.monotonic() - started,
                   'process_cpu_seconds': after.ru_utime + after.ru_stime - cpu.ru_utime - cpu.ru_stime,
                   'full_analysis_basis': 'one complete W7 t-interval report, no bootstrap; external work and reserves require root',
-                  'source_sha256': _file_sha(Path(__file__))}
+                  'source_sha256': _file_sha(Path(__file__)), 'scientific_source_identity': source_identity(root)}
     else:
-        if args.gate is None or args.gate_sha256 is None or _file_sha(args.gate) != args.gate_sha256:
-            raise ValueError('SHA-pinned root cost gate required for final report')
-        gate = json.loads(args.gate.read_text())
-        if (gate.get('approved') is not True or gate.get('analysis_source_sha256') != _file_sha(Path(__file__))
-                or gate.get('new_score_audit_sha256') != NEW_REVIEW_SHA
-                or gate.get('max_cpu_seconds', 0) <= 0 or gate.get('max_cpu_seconds', 0) > 500):
-            raise ValueError('root cost gate does not approve this source and evidence')
-        resource.setrlimit(resource.RLIMIT_CPU, (int(gate['max_cpu_seconds']), int(gate['max_cpu_seconds'])))
-        output = decision_report(views, billing)
+        output = framing_reports(views, billing, sizes)
+        check_final_gate(args.gate, args.gate_sha256, root)
         output['evidence'] = {'historical_review_sha256': OLD_REVIEW_SHA,
                               'control_review_sha256': CONTROL_REVIEW_SHA,
                               'new_score_audit_sha256': NEW_REVIEW_SHA, 'billing_sha256': BILLING_SHA,
-                              'analysis_source_sha256': _file_sha(Path(__file__))}
+                              'analysis_source_sha256': _file_sha(Path(__file__)), 'ivf_oracle_sha256': IVF_ORACLE_SHA,
+                              'scientific_source_identity': source_identity(root)}
         output['limitations'] = ['Historical RGB is inferred, not independently matched.',
                                  'Ada and A6000 scoring differ; ±0.001 is a stress, not an uncertainty bound.',
                                  'Reference-bank reuse and missing operational framing remain assumptions.']
