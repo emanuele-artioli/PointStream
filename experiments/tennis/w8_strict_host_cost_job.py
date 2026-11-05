@@ -417,6 +417,17 @@ def strict_roots(root: Path, output: Path, runtime: dict[str, Any], files: dict[
     return list(dict.fromkeys(roots))
 
 
+def require_gpu_uuid_api(torch: Any) -> dict[str, Any]:
+    """Inspect the JCV CUDA-properties class without initializing CUDA."""
+    properties = getattr(torch._C, '_CudaDeviceProperties', None)
+    attribute = getattr(properties, 'uuid', None) if properties is not None else None
+    if (not isinstance(attribute, property) or str(torch.__version__) != '2.7.0+cu128'
+            or str(torch.version.cuda) != '12.8' or torch.cuda.is_initialized()):
+        raise ValueError('JCV GPU UUID property unavailable or CUDA already initialized')
+    return {'torch_version': str(torch.__version__), 'cuda_version': str(torch.version.cuda),
+            'uuid_attribute_type': 'property', 'cuda_initialized': False}
+
+
 def check_gpu_binding(receipt: dict[str, Any], sealed: dict[str, Any], claimed: str, dispatch: dict[str, Any],
                       source_files: dict[str, str]) -> None:
     """Bind this stage's model/kernels to the fleet-selected physical Ada device."""
@@ -449,6 +460,8 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
     if parent_cpu > 60 or packet_cpu > 100 or generator_cpu > 300 or worker_wall > 450:
         raise ValueError('worker limit exceeds reviewed ceiling')
     resource.setrlimit(resource.RLIMIT_CPU, (parent_cpu, 3600))
+    import torch
+    uuid_api = require_gpu_uuid_api(torch)
     digests = StableDigests()
     paths, spec = stage_inputs(stage, digests.digest)
     if preflight_path.resolve(strict=True) != paths['preflight'] or fixed.file_sha(preflight_path) != preflight_sha:
@@ -627,7 +640,7 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
                'packet_config_sha256': fixed.file_sha(retained / 'packet-config.json'),
                'generator_config_sha256': fixed.file_sha(retained / 'generator-config.json'),
                'generation_usage': gpu_usage, 'inputs': {k: digests.digest(v) for k, v in paths.items()},
-               'hash_accounting': digests.receipt(),
+               'hash_accounting': digests.receipt(), 'uuid_api_pre_model': uuid_api,
                'preflight_sha256': fixed.file_sha(paths['preflight']),
                'actual_parent_cpu_seconds': sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),
                'parent_cpu_limit': parent_cpu, 'packet_cpu_limit': packet_cpu, 'generator_cpu_limit': generator_cpu,
@@ -636,6 +649,9 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
 
 
 def check_summary_resources(summary: dict[str, Any]) -> None:
+    if summary.get('uuid_api_pre_model') != {'torch_version': '2.7.0+cu128', 'cuda_version': '12.8',
+                                              'uuid_attribute_type': 'property', 'cuda_initialized': False}:
+        raise ValueError('pre-model GPU UUID property check missing')
     if summary.get('quality_claim') is not False or summary.get('scope') != 'qualification_only':
         raise ValueError('summary must be qualification only')
     parent = summary.get('actual_parent_cpu_seconds')

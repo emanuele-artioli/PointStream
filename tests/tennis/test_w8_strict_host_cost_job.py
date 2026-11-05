@@ -22,6 +22,7 @@ def test_new_spec_limits_and_frozen_inputs():
 
 def test_receipt_resource_check_requires_preserved_canaries():
     summary = {'scope': 'qualification_only', 'quality_claim': False, 'actual_parent_cpu_seconds': 1,
+               'uuid_api_pre_model': {'torch_version': '2.7.0+cu128', 'cuda_version': '12.8', 'uuid_attribute_type': 'property', 'cuda_initialized': False},
                'parent_cpu_limit': 30, 'packet_cpu_limit': 30, 'generator_cpu_limit': 210,
                'packet_usage': {'cpu_seconds': 1, 'wall_seconds': 1, 'status': 0, 'timed_out': False, 'canaries_preserved': True},
                'generation_usage': {'cpu_seconds': 1, 'wall_seconds': 1, 'status': 0, 'timed_out': False, 'canaries_preserved': True}}
@@ -193,3 +194,18 @@ def test_gpu_binding_rejects_mutated_wrapper_hash(monkeypatch):
     sealed = {'device': {'name': 'RTX 6000 Ada', 'major': 8, 'minor': 9}}
     with pytest.raises(ValueError, match='wrapper origin'):
         job.check_gpu_binding(receipt, sealed, uuid, {'environment': {'gpu': {'uuid': uuid}}}, {path: 'a' * 64})
+
+
+def test_uuid_api_preflight_rejects_missing_property_and_initialized_cuda():
+    from types import SimpleNamespace
+    cls = type('Properties', (), {'uuid': property(lambda self: 'uuid')})
+    torch = SimpleNamespace(_C=SimpleNamespace(_CudaDeviceProperties=cls), __version__='2.7.0+cu128',
+                            version=SimpleNamespace(cuda='12.8'), cuda=SimpleNamespace(is_initialized=lambda: False))
+    assert job.require_gpu_uuid_api(torch)['cuda_initialized'] is False
+    torch._C._CudaDeviceProperties = type('Missing', (), {})
+    with pytest.raises(ValueError, match='UUID property'):
+        job.require_gpu_uuid_api(torch)
+    torch._C._CudaDeviceProperties = cls
+    torch.cuda.is_initialized = lambda: True
+    with pytest.raises(ValueError, match='already initialized'):
+        job.require_gpu_uuid_api(torch)
