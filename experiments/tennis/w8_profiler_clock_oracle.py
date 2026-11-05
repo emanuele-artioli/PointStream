@@ -265,6 +265,15 @@ def validate() -> None:
         if os.environ.get("CUDA_VISIBLE_DEVICES") != "":
             raise ValueError("GPU visible")
         staging = json.loads((stage / "staging.json").read_text())
+        inputs = staging["inputs"]
+        if (
+            len(inputs) != 1
+            or inputs[0]["name"] != "synthetic_reference"
+            or inputs[0]["sha256"]
+            != "5452a5d6bb865152556a0e26dc99798a0ee88dff1c1c86b9a4fd1f5c904413dd"
+            or sha(Path(inputs[0]["path"])) != inputs[0]["sha256"]
+        ):
+            raise ValueError("synthetic input identity")
         if sha(stage / "published.tar") != staging["published"]["sha256"]:
             raise ValueError("publication digest")
         with tarfile.open(stage / "published.tar") as t:
@@ -278,7 +287,10 @@ def validate() -> None:
             x["arm"] for x in r["arms"]
         ] != ["unrestricted", "strict", "clock"]:
             raise ValueError("scope/arms mismatch")
-        if not r["strace_sha256"] or not 0 <= r["child_cpu_seconds"] <= 60:
+        if (
+            r["strace_sha256"] != sha(Path("/usr/bin/strace"))
+            or not 0 <= r["child_cpu_seconds"] <= 60
+        ):
             raise ValueError("tracer identity or CPU budget")
         for x in r["arms"]:
             if (

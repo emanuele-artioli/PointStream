@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.w8_profiler_clock_oracle"
+  ],
+  "arguments": [
+    "{phase}"
+  ],
+  "staged_inputs": [
+    {
+      "name": "synthetic_reference",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T064712Z-66226a15/smoke/published.tar",
+      "sha256": "5452a5d6bb865152556a0e26dc99798a0ee88dff1c1c86b9a4fd1f5c904413dd",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T064712Z-66226a15/smoke/published.tar",
+      "sha256": "5452a5d6bb865152556a0e26dc99798a0ee88dff1c1c86b9a4fd1f5c904413dd"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-jcv-20261022T124459Z.tar.gz",
+    "sha256": "bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e"
+  },
+  "required_commands": [
+    "unshare",
+    "strace"
+  ],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.w8_profiler_clock_oracle",
+    "validate"
+  ],
+  "deadline": "2026-11-05T12:55:00Z",
+  "verify_staged_inputs": true,
+  "stall_seconds": 80.0,
+  "device": "cpu",
+  "hosts": [
+    "gpu6"
+  ],
+  "gpu_models": [],
+  "gpu_memory_mib": 0,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "defer_failed_publication": true,
+  "local_storage_gib": 2,
+  "scale": {
+    "phase": {
+      "smoke": "run",
+      "full": "marker"
+    }
+  },
+  "smoke": {
+    "seconds": 80,
+    "representative_basis": "Three synthetic fresh-process strict and experimental CPU-only profiler arms, traced with GPU hidden, plus protected-read and mutation checks."
+  },
+  "full": {
+    "seconds": 5
+  },
+  "validator_seconds": 10,
+  "budget_seconds": 100,
+  "contention": {
+    "policy": "stop",
+    "resume_attempts": 0
+  },
+  "cpu_affinity_index": 1,
+  "deadline_epoch": 1793883300.0
+}
