@@ -58,7 +58,7 @@ def pilot_spec(*, assets: dict[str, dict[str, str]], deadline: str, smoke_second
     args = ['pilot', '--items', '{items}', '--byte-publication-sha256', assets['byte_publication']['sha256'], '--inventory', '{staged:inventory}', '--inventory-sha256', assets['inventory']['sha256'],
             '--bindings', '{staged:bindings}', '--bindings-sha256', assets['bindings']['sha256']]
     spec = w7_specs.common('experiments.tennis.w7_shared_fleet', args, files)
-    spec.update({'device': 'gpu', 'hosts': w7_specs.HOSTS_GPU, 'gpu_models': ['RTX A6000'],
+    spec.update({'device': 'gpu', 'hosts': ['gpu2', 'gpu3'], 'gpu_models': ['RTX A6000'],
                  'gpu_memory_mib': 8000, 'cpu_threads': 1, 'single_cpu_campaign': True,
                  'local_storage_gib': 30, 'deadline': deadline, 'scale': {'items': {'smoke': 2, 'full': 0}},
                  'smoke': {'seconds': smoke_seconds, 'representative_basis': 'Complete 80-tick med000 control and new CRF70, one shared model load.'},
