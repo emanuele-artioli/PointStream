@@ -913,6 +913,24 @@
       "cpu_seconds": 470,
       "release_stage": "research-first24/28",
       "basis": "Root conservative GPU hold upper 60.277469s from kernel supervisor birth to canonical terminal.updated, rounded to 100; excludes pending queue. inbox.reconcile waits for supervisor exit, monitor finally releases owned claims. CPU 470 is 1000 ceiling minus unexecuted500 full and30 validator; retains200 smoke+70 administration+200 external. Contended during smoke, no native point. No timing/performance claim. Own process/claims teardown and terminal events audited; raw artifacts retained."
+    },
+    {
+      "phase": "w8-paired-cost-bounded-queue-20261105-readiness",
+      "parent_phase": "w8-paired-cost-bounded-queue-20261105",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "release_stage": "research-first24/28",
+      "basis": "Entire50CPU freshmetadata allowance conservatively charged: all-host doctor/canonical jobs/shared source SHA/nativeclass/cachemetadata+prior admission inspection. Distributed aggregate CPU unmetered; source/input stage rehash still required. Reused common inspection acrosstwo preparations, eachcharged50CPU. NoGPUyet."
+    },
+    {
+      "phase": "gvcrt-qp9-bounded-queue-20261105-readiness",
+      "parent_phase": "gvcrt-qp9-bounded-queue-20261105",
+      "workstream": "ego_peer_oracles",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "release_stage": "research-first24/28",
+      "basis": "Entire50CPU freshmetadata allowance conservatively charged: all-host doctor/canonical jobs/shared source SHA/nativeclass/cachemetadata+prior admission inspection. Distributed aggregate CPU unmetered; source/input stage rehash still required. Reused common inspection acrosstwo preparations, eachcharged50CPU. NoGPUyet."
     }
   ],
   "reservations": [
@@ -1471,16 +1489,16 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 900,
-      "cpu_seconds": 1100,
-      "status": "Prospective inclusive one-fresh-attempt reservation after user chose bounded fleet queues. Metadata/source/spec preparation<=50CPU now; NO GPUsubmission before root exact fresh source/cache/spec/host/deadline/cost review. Reuse immutable earlier selected source and numeric/quality/guard settings; exclusive contention-stop/noautomaticresume. Pending queue not GPU occupancy. No old request replay, no new decoder full witness release."
+      "cpu_seconds": 1050,
+      "status": "Root RELEASES one fresh immutable-source bounded exclusive queue attempt after actual spec validation and only deadline/epoch diff vs prior actual request; fresh host/worker/claims/cache/deadline check at submit. No automatic resume/replay, no full30decoder quality witness. Remaining values include stage/admin/external audit caps; oldfailedattempts alreadycharged."
     },
     {
       "phase": "gvcrt-qp9-bounded-queue-20261105",
       "workstream": "ego_peer_oracles",
       "release_stage": "research-first24/28",
       "gpu_seconds": 900,
-      "cpu_seconds": 1000,
-      "status": "Prospective inclusive one-fresh-attempt reservation after user chose bounded fleet queues. Metadata/source/spec preparation<=50CPU now; NO GPUsubmission before root exact fresh source/cache/spec/host/deadline/cost review. Reuse immutable earlier selected source and numeric/quality/guard settings; exclusive contention-stop/noautomaticresume. Pending queue not GPU occupancy. No old request replay, no new decoder full witness release."
+      "cpu_seconds": 950,
+      "status": "Root RELEASES one fresh immutable-source bounded exclusive queue attempt after actual spec validation and only deadline/epoch diff vs prior actual request; fresh host/worker/claims/cache/deadline check at submit. No automatic resume/replay, no full30decoder quality witness. Remaining values include stage/admin/external audit caps; oldfailedattempts alreadycharged."
     }
   ],
   "jobs": [
@@ -2295,7 +2313,7 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "No active fleet jobs/waits. Fresh W8paired and GVCQP9 source/spec/host preparation only after user chose bounded queues; no GPUrelease yet. Ball final control review before native repair sourcefreeze.",
+    "state": "RootreleasedONEfreshW8paired+ONEfreshGVCQP9 boundedexclusivequeue attempts; IDsnotyetreceived. Source/spec/capsreviewed,freshsubmissionchecksrequired. Ballcandidate927apendingroot/exactH2review.",
     "jobs": [],
     "batches": [],
     "native_completion_resume_verified": false,
