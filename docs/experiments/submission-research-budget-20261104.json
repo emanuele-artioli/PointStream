@@ -1003,6 +1003,15 @@
       "cpu_seconds": 20,
       "release_stage": "research-first24/28",
       "basis": "Conservative20CPUforallpastsourcecopy/metadata andtwo failedpreexecutionlaunchers: hostPythonlacksfile_digest, thenabandonedreceiver-sourcepathmissing. Nooutputdir/oraclePID/models/GPUeverstarted. RootmechanicalportablehashandSHA-identicalsourcecopyrepairsamendedleaf90insideexistingW8cap;70futureonly. AggregateCPUunmetered."
+    },
+    {
+      "phase": "k5d-parity16-a2f7-readiness-20261106",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "release_stage": "research-first24/28",
+      "basis": "Full50CPUmetadataallowancecharged foractualfrozenbuilder/realvalidate_spec andCLIparse-only smoke/noop, newc09receiptsharedSHAupload, reference/source/cache/tool/hostchecks. IncludedinprospectiveGPUparity1000GPU1200CPU; remaining1150CPU, notextra. NoGPUyetatledgerwrite."
     }
   ],
   "reservations": [
@@ -1521,8 +1530,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 9000,
-      "cpu_seconds": 10030,
-      "status": "Canonicalentrypointcorrecteda2f7/newd056/92fb/source5f2c/env32e/wrapperdc909 CPUproofc09cROOTACCEPTED. Newleaf210CPUcharged(50prep130lifecycle30audit),90unusedvs300releasedwithinparent. NextactualGPU16parityspec/source/wholecostreviewrequired beforeanyGPU; full30NOTadmitted."
+      "cpu_seconds": 9980,
+      "status": "RootRELEASES ONE GPU16parityexactd056/92fb/source5f2c/env32e afternewc09proofacceptance +realAPI/CLI/static/source/input checks. Nestedinclusive1000GPU1200CPU,50CPUprepcharged,1150futureCPU.800campaign/600smoke580NS/30val/5noop,200postGPU/400externalCPU. Freshchecks/deadlineonlyrefreshbeforeonejob; all6parity/counters/teardownauditbefore292/586. Full30NOTreleased."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -2467,7 +2476,7 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "No activefleetjobs/waits; newc09cCPUproofrootaccepted, GPU16paritypreparationnext, noGPUreleaseyet. W8CPUrunstructureoraclerepairedpreexecutionstage, noactualoracleyet. Allprior77c/0202/fdb/c09waitscollected.",
+    "state": "GPU16parity rootreleased/IDnotyetreceived; allpriorfleetjobscomplete. W8CPUstructureoraclecompletedawaitingrootartifactacceptance/closure; no30stepfreshwitness/benchmark30.",
     "jobs": [],
     "batches": [],
     "native_completion_resume_verified": false,
