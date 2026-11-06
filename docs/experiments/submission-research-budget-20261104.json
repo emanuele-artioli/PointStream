@@ -1039,6 +1039,15 @@
       "cpu_seconds": 50,
       "release_stage": "research-first24/28",
       "basis": "Whole50CPUmetadata/sourcepreparationallowancecharged: one22fbimmutableupload428.680wall,regular16384000B/newsourcecacheSHAverified;freshallhost/jobs/input/runtime/native/unshare/storage/CPUchecks. WallnotCPUmeasurement. Includedin300CPUnewPGIDproof cap,250futureonly."
+    },
+    {
+      "phase": "k5d-pgid-native-2793-root-closure-20261106",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 160,
+      "release_stage": "research-first24/28",
+      "basis": "Rootaccepted exactae6030/22fb/71d/env32e/wrapper62f. Fouractualnative/group/teardowncases withlivePID/starttick/PGIDjoins; 15observed+supervisor/campaign/groupabsent,claimsfree/eventsACK. Wholeinheritedonecore120.687260 rounded130CPU +30audit=160future,prior50prep=>210inclusivevs300cap. Conservativebound,notaggregateadminCPUmeasurement. NoGPU."
     }
   ],
   "reservations": [
@@ -1557,8 +1566,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8900,
-      "cpu_seconds": 9480,
-      "status": "Remaining_unspent8900GPU9480CPU. ONEPGIDproof2793db1bsubmitted,300CPUinclusive50prepcharged+250future nested;delegateONEwait83207max150s. NoGPUrelease/replay. Rootreviewactualsource/group/native/teardown beforeparity."
+      "cpu_seconds": 9320,
+      "status": "Remaining_unspent8900GPU9320CPU after2793CPUproof210inclusive; rootacceptedexactsourceCPUcontainment/group only. NoactiveGPU/retry/parityreleaseyet. GPU16proposal then292/586/full30separategates."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -2506,7 +2515,7 @@
       "job_id": "20261106T023738Z-2793db1b",
       "phase": "k5d-scale-first-tranche-20261105",
       "subphase": "namespace-pgid-proof",
-      "state": "submittedinitialpending;delegateonecanonicalwait;inspectexistingbeforeaction",
+      "state": "complete;rootacceptedexactsource4caseCPUgroup/native/teardown;ownPIDs/claimsabsent,eventACK",
       "revision": "ae6030e58a98156d3b5cb5d1cfab78967b173c9b",
       "snapshot_sha256": "22fb921e5cc26d04f22d6e8be6f1098f504b3319283794e341ab5952dc51815d",
       "source_sha256": "71d788cf9c520c4c095f011dbf5efce157493f003a3db970e57731f06d1cb7af",
@@ -2517,7 +2526,9 @@
       "gpu_ceiling": 0,
       "wait_handle": 83207,
       "wait_max_seconds": 150,
-      "local_batch_record": "/private/tmp/k5d-pgid-native-batch-20261106.json"
+      "local_batch_record": "/private/tmp/k5d-pgid-native-batch-20261106.json",
+      "actual_phase_conservative_cpu_charge": 210,
+      "root_accepted_receipt_sha256": "c64a5890d6c2388bb54453332964e1c365aa0caa28a20836de74b0493c3abf8a"
     }
   ],
   "old_budgets": "closed, not borrowed",
