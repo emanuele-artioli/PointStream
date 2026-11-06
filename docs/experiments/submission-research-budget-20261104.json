@@ -1012,6 +1012,24 @@
       "cpu_seconds": 50,
       "release_stage": "research-first24/28",
       "basis": "Full50CPUmetadataallowancecharged foractualfrozenbuilder/realvalidate_spec andCLIparse-only smoke/noop, newc09receiptsharedSHAupload, reference/source/cache/tool/hostchecks. IncludedinprospectiveGPUparity1000GPU1200CPU; remaining1150CPU, notextra. NoGPUyetatledgerwrite."
+    },
+    {
+      "phase": "w8-run-structure-root-closure-20261106",
+      "parent_phase": "w8-unit-run-structure-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 70,
+      "release_stage": "research-first24/28",
+      "basis": "Root raw/source/candidate joins PASS. Remaining70CPU leaf cap charged conservatively +20past=90inclusive; true oracle7.067 included in launcher7.504, externalCPUunmetered. Structural equality only, no fullwitness authority."
+    },
+    {
+      "phase": "k5d-parity16-7d2-root-closure-20261106",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 100,
+      "cpu_seconds": 450,
+      "release_stage": "research-first24/28",
+      "basis": "Contended7d2 no parity. Whole60.489s GPU/onecore lifecycle rounded100 each +350remaining externalCPU allowance=450futureCPU; prior50prep=>500inclusive. Conservative bound not aggregate measurement; namespaceCPU included not added. Raw claim/affinity/teardown/events reviewed. Launcher PGID incompatibility needs correction/newqualification; no replay."
     }
   ],
   "reservations": [
@@ -1529,9 +1547,9 @@
       "phase": "k5d-scale-first-tranche-20261105",
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
-      "gpu_seconds": 9000,
-      "cpu_seconds": 9980,
-      "status": "RootRELEASES ONE GPU16parityexactd056/92fb/source5f2c/env32e afternewc09proofacceptance +realAPI/CLI/static/source/input checks. Nestedinclusive1000GPU1200CPU,50CPUprepcharged,1150futureCPU.800campaign/600smoke580NS/30val/5noop,200postGPU/400externalCPU. Freshchecks/deadlineonlyrefreshbeforeonejob; all6parity/counters/teardownauditbefore292/586. Full30NOTreleased."
+      "gpu_seconds": 8900,
+      "cpu_seconds": 9530,
+      "status": "Remaining_unspent8900GPU9530CPU afterstopped7d2 parity100GPU500CPUinclusive. NoactiveGPUorautomaticretry. PGIDsourcecorrection/newCPUproof/parity/rootreviewbefore292/586;full30notadmitted."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -1586,8 +1604,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 0,
-      "cpu_seconds": 70,
-      "status": "Rootamended60\u219290CPUinsideunchangedW8/global forportablehash+input-locationpreparationrepair.20pastmetadata/sourcecopy/2preexecfailedlauncherscharged;70remainingincludesONEreplacement<=60(10prep45RLIMITCPU5post)+10reserve. PubliccodecopiesHASHidenticalfrome66/currentrepo and093fAAarchive stagednewtaskdir, existingNPZhashesfixed; noabandonedreceiver-sourcepathdependency. CUDAhidden/offline/onecore90wall,noGPUs/models/rendering/arrays. Componentoraclenotyetexecuted; failurespreserved, noautomaticreplay.",
+      "cpu_seconds": 0,
+      "status": "closed;rootacceptedstructureonly,90CPUinclusiveconservativelycharged,0GPU;noquality/fullwitnessrelease",
       "authorized_cumulative_cpu_seconds": 90
     }
   ],
@@ -2455,6 +2473,17 @@
       "gpu_ceiling": 0,
       "wait_handle": "43184collected",
       "root_accepted_receipt_sha256": "2aeade38dbb818218f34995c810d35e7ac3a39900fd914db56621ad7b4c12efa"
+    },
+    {
+      "job_id": "20261106T021034Z-7d2d1b33",
+      "phase": "k5d-scale-first-tranche-20261105",
+      "subphase": "canonical-entrypoint-parity16-a2f7",
+      "state": "terminalcontended,noquality/parity;PGIDlauncher/monitorincompatibility;flaggedownershipunproven;ownPIDs/claimsabsent/eventsACK",
+      "revision": "d056399736d54f44127a4514bd40549f92bb57bc",
+      "source_sha256": "5f2cb62e80b2dc87b29eaf730429daee153762131724207b4e13a1e1307c089b",
+      "spec_sha256": "829b9508f62584d7f3162e92cc2ad334a46f034ed85e2916f79800d43dbb1d7f",
+      "terminal_charged_gpu_seconds": 100,
+      "phase_total_cpu_seconds": 500
     }
   ],
   "old_budgets": "closed, not borrowed",

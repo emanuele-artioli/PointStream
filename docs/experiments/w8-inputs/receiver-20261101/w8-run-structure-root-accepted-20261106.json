@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "status": "root_accepted",
+  "candidate": "docs/experiments/w8-inputs/receiver-20261101/w8-run-structure-16cc-candidate-20261106.json",
+  "candidate_sha256": "8b8da8b327db413c7d4da8390b889cacb9ed81ed40cde8cdb678f47f5d98119b",
+  "raw_tar": "/private/tmp/w8-structure-raw-16cc-20261106.tar",
+  "raw_tar_sha256": "20fae3632107117fead3d567a649c403d79eba8f58e6b78dcddf0507544aaf1d",
+  "checks": [
+    "all11rawmembers inspected; stdout/launcher/intent/inputmanifest SHA joins pass",
+    "actual result and launcher equal candidate; oracle script equals current exact source",
+    "four actual component/source SHA bindings pass",
+    "both distinct240frame80tick unit inputs, one contiguous run each,12effective windows per step",
+    "CUDA hidden,onecore,45CPU limit,exit0,no timeout,PID/PGID absent"
+  ],
+  "decision": "Structural workloads match; no latency, quality or full witness admission. Both-unit correctness smoke and complete cost forecast remain mandatory.",
+  "cpu_charge_seconds": 90,
+  "cpu_charge_basis": "20previous preparation/failures +70remaining leaf ceiling conservatively charged; oracle7.067357 included in launcher waitedchildren7.503963, not added. External administrative CPU unmetered.",
+  "gpu_charge_seconds": 0
+}

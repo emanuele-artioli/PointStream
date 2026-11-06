@@ -1,0 +1,51 @@
+{
+  "revision": "a2f7ff31ea52621607e2b18be4b14bda2da23b1e",
+  "worktree": "/private/tmp/pointstream-checks-a2f7-20261106",
+  "interpreter": "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+  "checks": [
+    {
+      "check": "ruff",
+      "command": [
+        "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+        "-m",
+        "ruff",
+        "check"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.08647870799904922,
+      "log": "/private/tmp/pointstream-checks-a2f7-result-20261106/ruff.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "check": "mypy",
+      "command": [
+        "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+        "-m",
+        "mypy",
+        "--config-file",
+        "pyproject.toml"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 57.224894790997496,
+      "log": "/private/tmp/pointstream-checks-a2f7-result-20261106/mypy.log",
+      "sha256": "ca4d62e50d8c35f432816818f7fa4e8cdf3f328e0a03c0cff497e8c953fdbee1"
+    },
+    {
+      "check": "pytest",
+      "command": [
+        "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+        "-m",
+        "pytest"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 109.73472658399987,
+      "log": "/private/tmp/pointstream-checks-a2f7-result-20261106/pytest.log",
+      "sha256": "a1187311facd773d1f875650fb2d224979fcfde3205dba577d1114f4781faf26"
+    }
+  ],
+  "wall_seconds": 167.0484815000018,
+  "waited_children_cpu_seconds": 236.686002,
+  "passed": true,
+  "scope": "ordinary local configured software checks; no experiment/model qualification",
+  "pytest_summary": "1923passed37skipped109.18s"
+}

@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "job_id": "20261106T021034Z-7d2d1b33",
+  "status": "terminal_contended_no_parity",
+  "canonical_terminal_sha256": "d18d09b30d647b059d02803fbcf89a0de8d280359561a7c513c563afbd3ef849",
+  "raw_namespace_claim_affinity_audit_sha256": "c43e6ab95906c348e5b1d06c6c4add9826746e848af4fb956715f2cddc720fa0",
+  "supervisor_birth_epoch": 1793931075.14,
+  "canonical_terminal_epoch": 1793931135.6293674,
+  "whole_hold_upper_seconds": 60.48936724662781,
+  "campaign_selected_cpu_affinity": [
+    0
+  ],
+  "namespace_waited_and_init_cpu_seconds": 19.923784,
+  "gpu_charge_seconds": 100,
+  "phase_total_cpu_charge_seconds": 500,
+  "cpu_already_charged_preparation_seconds": 50,
+  "cpu_future_closure_charge_seconds": 450,
+  "basis": "Whole inherited onecore lifecycle60.489367 rounded100CPU, plus350remaining of original400externalCPU allowance (50prep already charged). GPUhold rounded100. Conservative declared allocation bounds, not aggregate measurements. Namespace child counter included, not added.",
+  "containment": "Recorded owned supervisor/campaign/namespace PIDs absent, GPU process list empty, CPU claim empty, terminal/contention events ACK; retained raw audit.",
+  "decision": "No parity/quality evidence. Launcher starts a new session incompatible with fleet PGID ownership. Exact flagged PID ownership unproven; no retry. Correction requires new source qualification."
+}
