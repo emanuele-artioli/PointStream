@@ -1030,6 +1030,15 @@
       "cpu_seconds": 450,
       "release_stage": "research-first24/28",
       "basis": "Contended7d2 no parity. Whole60.489s GPU/onecore lifecycle rounded100 each +350remaining externalCPU allowance=450futureCPU; prior50prep=>500inclusive. Conservative bound not aggregate measurement; namespaceCPU included not added. Raw claim/affinity/teardown/events reviewed. Launcher PGID incompatibility needs correction/newqualification; no replay."
+    },
+    {
+      "phase": "k5d-pgid-source-readiness-20261106",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "release_stage": "research-first24/28",
+      "basis": "Whole50CPUmetadata/sourcepreparationallowancecharged: one22fbimmutableupload428.680wall,regular16384000B/newsourcecacheSHAverified;freshallhost/jobs/input/runtime/native/unshare/storage/CPUchecks. WallnotCPUmeasurement. Includedin300CPUnewPGIDproof cap,250futureonly."
     }
   ],
   "reservations": [
@@ -1548,8 +1557,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8900,
-      "cpu_seconds": 9530,
-      "status": "Remaining_unspent8900GPU9530CPU. Root releases ONE newsourcePGID CPUproof only; nested300CPUinclusive(50prep220wholelifecycle30audit),0GPU. Exactae6030/22fb/source71d/wrapper62f/env32e,unchanged1348+25controls,reviewed6acc+c3cf. Freshallhost/job/source/tool/storage/deadline<=45min checks before one canonicalrequest. GPUparity/292/586/full30NOTreleased. No replay/replacement."
+      "cpu_seconds": 9480,
+      "status": "Remaining_unspent8900GPU9480CPU. ONEPGIDproof2793db1bsubmitted,300CPUinclusive50prepcharged+250future nested;delegateONEwait83207max150s. NoGPUrelease/replay. Rootreviewactualsource/group/native/teardown beforeparity."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -2492,6 +2501,23 @@
       "spec_sha256": "829b9508f62584d7f3162e92cc2ad334a46f034ed85e2916f79800d43dbb1d7f",
       "terminal_charged_gpu_seconds": 100,
       "phase_total_cpu_seconds": 500
+    },
+    {
+      "job_id": "20261106T023738Z-2793db1b",
+      "phase": "k5d-scale-first-tranche-20261105",
+      "subphase": "namespace-pgid-proof",
+      "state": "submittedinitialpending;delegateonecanonicalwait;inspectexistingbeforeaction",
+      "revision": "ae6030e58a98156d3b5cb5d1cfab78967b173c9b",
+      "snapshot_sha256": "22fb921e5cc26d04f22d6e8be6f1098f504b3319283794e341ab5952dc51815d",
+      "source_sha256": "71d788cf9c520c4c095f011dbf5efce157493f003a3db970e57731f06d1cb7af",
+      "spec_sha256": "394f7c801603bf8f3e6dfc8b2ab1e84d2b4d200b8ff13e0b7d45eab7447eabdf",
+      "deadline": "2026-11-06T03:18:24Z",
+      "inclusive_cpu_ceiling": 300,
+      "preparation_charged_cpu_seconds": 50,
+      "gpu_ceiling": 0,
+      "wait_handle": 83207,
+      "wait_max_seconds": 150,
+      "local_batch_record": "/private/tmp/k5d-pgid-native-batch-20261106.json"
     }
   ],
   "old_budgets": "closed, not borrowed",
