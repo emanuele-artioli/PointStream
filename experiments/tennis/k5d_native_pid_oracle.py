@@ -58,6 +58,7 @@ def descendants(pid: int) -> list[dict[str, Any]]:
                 pids = [int(n) for n in fields[0]]
                 record = {'host_pid': child, 'namespace_pid': pids[-1], 'namespace_pids': pids,
                           'start_ticks': int(text[text.rfind(')') + 2:].split()[19]),
+                          'host_pgid': int(text[text.rfind(')') + 2:].split()[2]),
                           'pid_namespace': os.readlink(base / 'ns/pid'),
                           'executable': os.readlink(base / 'exe')}
             except (FileNotFoundError, IndexError, ProcessLookupError):
@@ -65,6 +66,12 @@ def descendants(pid: int) -> list[dict[str, Any]]:
             result.append(record)
             pending.append(child)
     return result
+
+
+def observed_worker_group(group: dict[str, Any], members: list[dict[str, Any]], namespace: str) -> bool:
+    return any(m['host_pid'] == group['host_pid'] and m['start_ticks'] == group['start_ticks']
+               and m['namespace_pid'] == 2 and m['host_pgid'] == group['exec_host_pgid']
+               and m['pid_namespace'] == namespace for m in members)
 
 
 def one_case(root: Path, case: str, unshare: Path, native_args: list[str],
@@ -110,7 +117,8 @@ def one_case(root: Path, case: str, unshare: Path, native_args: list[str],
             if (group['host_pgid'] != group['campaign_pgid']
                     or group['exec_host_pgid'] != (group['campaign_pgid'] if case == 'normal' else group['host_pid'])
                     or group['start_ticks'] <= 0
-                    or (group['host_pid'], group['start_ticks']) not in observed):
+                    or (group['host_pid'], group['start_ticks']) not in observed
+                    or observed[(group['host_pid'], group['start_ticks'])]['host_pgid'] != group['exec_host_pgid']):
                 raise ValueError('CPU worker group proof differs')
             launcher_exe = Path(os.readlink(f'/proc/{proc.pid}/exe')).resolve(strict=True)
             launcher_stat = Path(f'/proc/{proc.pid}/stat').read_text()
@@ -342,9 +350,7 @@ def validate() -> None:
             if (group != pre['worker_group'] or group['host_pgid'] != campaign_group
                     or group['campaign_pgid'] != campaign_group
                     or group['exec_host_pgid'] != (campaign_group if case == 'normal' else group['host_pid'])
-                    or not any(m['host_pid'] == group['host_pid'] and m['start_ticks'] == group['start_ticks']
-                               and m['namespace_pid'] == 2
-                               and m['pid_namespace'] == result['init']['pid_namespace'] for m in observed_members)):
+                    or not observed_worker_group(group, observed_members, result['init']['pid_namespace'])):
                 raise ValueError('worker group identity or live procfs join differs')
             if (pre['case'] != case or pre['native'] != result['native'] or pre['init'] != result['init']
                     or result['members_absent'] is not True or not valid_identity(result['native'])
