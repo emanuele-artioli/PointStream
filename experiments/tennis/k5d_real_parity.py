@@ -40,8 +40,8 @@ def spec(base: dict, *, assets: dict[str, dict[str, str]], deadline: str, unshar
             or cpu.get('namespace_wrapper_sha256') != oracle.sha(Path(namespace.__file__))):
         raise ValueError('audited actual CPU proof does not match namespace')
     result = cf.common_spec(base, extra, deadline)
-    result['entrypoint'] = ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']
-    result['arguments'] = ['--unshare-sha', unshare_sha256, '--timeout', '{namespace_timeout}', '--', '{proof_mode}',
+    result['entrypoint'] = ['-m', 'experiments.tennis.k5d_scoped_namespace']
+    result['arguments'] = ['outer', '--unshare-sha', unshare_sha256, '--timeout', '{namespace_timeout}', '--', '{proof_mode}',
                            *base['arguments'], '--fidelity-gate', '{staged:fidelity_gate}',
                            '--fidelity-gate-sha256', assets['fidelity_gate']['sha256'], '--accepted16', '{staged:accepted16}',
                            '--native-cpu-receipt', '{staged:native_cpu_receipt}',

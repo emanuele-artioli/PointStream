@@ -510,8 +510,8 @@ def spec(base: dict[str, Any], *, phase: str, clip: str, identity: dict[str, str
                 d = receipt['programme'][resource]
                 if campaign_seconds + sum(d['noncommand_groups'].values()) > d['failed_start_reserve_seconds']:
                     raise ValueError('actual campaign cap exceeds prospective failure reserve')
-        result['entrypoint'] = ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']
-        result['arguments'] = ['--unshare-sha', gate_data['confirmation_qualification']['unshare_sha256'],
+        result['entrypoint'] = ['-m', 'experiments.tennis.k5d_scoped_namespace']
+        result['arguments'] = ['outer', '--unshare-sha', gate_data['confirmation_qualification']['unshare_sha256'],
                                '--timeout', '{namespace_timeout}', '--', *args]
         result['scale']['namespace_timeout'] = {'smoke': str(readiness_seconds - min(10, readiness_seconds / 4)),
                                                  'full': str(full_seconds - min(10, full_seconds / 4))}
@@ -568,7 +568,8 @@ def require_namespace_worker() -> None:
     spec = json.loads((stage.parent / 'spec.json').read_text())
     staging = json.loads((stage / 'staging.json').read_text())
     dispatch = json.loads((stage / 'dispatch.json').read_text())
-    if spec.get('entrypoint') != ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']:
+    if (spec.get('entrypoint') != ['-m', 'experiments.tennis.k5d_scoped_namespace']
+            or spec.get('arguments', [])[:1] != ['outer']):
         raise ValueError('direct control-study fleet entrypoint prohibited')
     expected = phase_command(spec, stage_name, staging['inputs'], sys.executable)
     if expected != dispatch.get('command') or expected.count('--') != 1:
@@ -652,7 +653,8 @@ def validate() -> None:
         from experiments.tennis import k5d_cpu_accounting as accounting
         spec_data = json.loads((stage.parent / 'spec.json').read_text())
         args = spec_data['arguments']
-        if spec_data['entrypoint'] != ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']:
+        if (spec_data['entrypoint'] != ['-m', 'experiments.tennis.k5d_scoped_namespace']
+                or spec_data.get('arguments', [])[:1] != ['outer']):
             raise ValueError('readiness validator requires namespace entrypoint')
         from experiments.jobs.inbox import phase_command
         dispatch = json.loads((stage / 'dispatch.json').read_text())

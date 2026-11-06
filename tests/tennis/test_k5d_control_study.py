@@ -194,8 +194,8 @@ def test_confirmation_spec_uses_namespace_and_enforces_job_caps(tmp_path, monkey
                   'gpu_sharing': {'mode': 'exclusive'}, 'contention': {'policy': 'stop', 'resume_attempts': 0}}
     result = control.spec(base, phase='prepare', clip=clip, identity={}, assets=assets,
                           deadline='later', readiness_seconds=20, full_seconds=100, campaign_seconds=150)
-    assert result['entrypoint'] == ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']
-    assert result['arguments'][:4] == ['--unshare-sha', 'a' * 64, '--timeout', '{namespace_timeout}']
+    assert result['entrypoint'] == ['-m', 'experiments.tennis.k5d_scoped_namespace']
+    assert result['arguments'][:5] == ['outer', '--unshare-sha', 'a' * 64, '--timeout', '{namespace_timeout}']
     assert '--native-cpu-receipt' in result['arguments'] and '--gpu-parity-receipt' in result['arguments']
     with pytest.raises(ValueError, match='job cap'):
         control.spec(base, phase='prepare', clip=clip, identity={}, assets=assets,
@@ -267,7 +267,7 @@ def test_full_study_spec_routes_through_qualified_namespace(tmp_path, monkeypatc
             'gpu_sharing': {'mode': 'exclusive'}, 'contention': {'policy': 'stop', 'resume_attempts': 0}}
     result = control.spec(base, phase='prepare', clip=clip, identity={}, assets=assets,
                           deadline=deadline, readiness_seconds=20, full_seconds=100, campaign_seconds=150)
-    assert result['entrypoint'] == ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']
+    assert result['entrypoint'] == ['-m', 'experiments.tennis.k5d_scoped_namespace']
     for option in ('--native-cpu-receipt', '--gpu-parity-receipt', '--certificate', '--certificate-microbench', '--certificate-microbench-audit'):
         assert option in result['arguments']
     monkeypatch.setattr(control.study, 'forecast', lambda *_: 88)
@@ -491,3 +491,43 @@ def test_forecast_owned_reservation_is_counted_once_across_advance():
     data['forecast_covered_reservation_phases'] = ['full', 'other']
     with pytest.raises(ValueError, match='active ball allocation'):
         control.check_budget(ledger, att, 'a' * 64, 'b' * 64, data)
+
+
+@pytest.mark.parametrize('release', ['cost-confirmation', 'full-study'])
+def test_control_builders_pass_real_fleet_validator(release: str, tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
+    import json
+    from datetime import datetime, timedelta, timezone
+    from experiments.jobs import inbox
+    from experiments.tennis import k5d_full_admission as admission
+
+    clip = 'tracknet/game9/Clip5'
+    now = datetime.now(timezone.utc)
+    gate: dict = {'release': release, 'confirmation_qualification': {'unshare_sha256': 'a' * 64},
+                  'confirmation_caps': {r: {'jobs': {f'{clip}:prepare': 500}} for r in ('gpu', 'cpu')},
+                  'certificate_validation_reserve_seconds': 2, 'namespace_bootstrap_reserve_seconds': 5,
+                  'certificate_sha256': 'b' * 64}
+    names = {'full_gate', 'cost_receipt', 'fidelity_gate', 'budget_ledger', 'budget_attestation',
+             'native_cpu_receipt', 'gpu_parity_receipt'}
+    names |= ({'certificate', 'certificate_microbench', 'certificate_microbench_audit'} if release == 'full-study'
+              else {'bridge', 'calibration_source', 'consumer_source'})
+    remote = '/home/itec/emanuele/Datasets/pointstream-data/test/'
+    assets = {name: {'local': str(tmp_path / name), 'remote': remote + name + '.json', 'sha256': 'a' * 64}
+              for name in names}
+    monkeypatch.setattr(control.study, 'checked_json', lambda *_: gate)
+    monkeypatch.setattr(control, 'approved', lambda *_: ({'cost': {'prepare': {'seconds16': 1}},
+        'programme': {r: {'failed_start_reserve_seconds': 500, 'noncommand_groups': {'whole': 5}}
+                      for r in ('gpu', 'cpu')}}, 292))
+    monkeypatch.setattr(control.study, 'forecast', lambda *_: 1)
+    monkeypatch.setattr(control.cf, 'asset', lambda name, path, digest, _local, *, extract:
+                        {'name': name, 'path': path, 'sha256': digest, 'extract': extract})
+    monkeypatch.setattr(admission, 'read_certificate', lambda *_: {'valid_until': (now + timedelta(minutes=30)).isoformat()})
+    base = json.loads(control.cf.BASE.read_text())
+    result = control.spec(base, phase='prepare', clip=clip, identity={}, assets=assets,
+                          deadline=(now + timedelta(minutes=20)).isoformat(),
+                          readiness_seconds=20, full_seconds=100, campaign_seconds=150)
+    normalized = inbox.validate_spec(result)
+    assert normalized['entrypoint'] == ['-m', 'experiments.tennis.k5d_scoped_namespace']
+    assert result['arguments'][0] == 'outer'
+    staged = [{'name': item['name'], 'path': '/staged/' + item['name']} for item in result['staged_inputs']]
+    command = inbox.phase_command(result, 'smoke', staged, '/runtime/python')
+    assert command[:4] == ['/runtime/python', '-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']

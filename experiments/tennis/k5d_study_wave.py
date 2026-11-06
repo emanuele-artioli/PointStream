@@ -86,7 +86,8 @@ def verify_completed(clip: str, phase: str, entry: dict[str, Any], frames: int,
     state = read(job_dir / 'state.json', records_top['state_sha256'])
     terminal = read(job_dir / 'run/status.json', records_top['terminal_sha256'])
     gate = read(job_dir / 'gate.json', records_top['gate_sha256'])
-    if (spec.get('entrypoint') != ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']
+    if (spec.get('entrypoint') != ['-m', 'experiments.tennis.k5d_scoped_namespace']
+            or spec.get('arguments', [])[:1] != ['outer']
             or spec.get('gpu_sharing') != {'mode': 'exclusive'}
             or ready.get('source_sha256') != identity['source_sha256']
             or ready.get('snapshot_sha256') != identity['snapshot_sha256']
@@ -104,7 +105,7 @@ def verify_completed(clip: str, phase: str, entry: dict[str, Any], frames: int,
         execution = read(job_dir / stage / 'execution.json', records['execution_sha256'])
         artifact = publications[stage]
         control = spec.get('entrypoint') in (['-m', 'experiments.tennis.k5d_control_study'],
-                                                ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer'])
+                                                ['-m', 'experiments.tennis.k5d_scoped_namespace'])
         expected_frames = frames if control or stage == 'full' else 16
         code = dispatch['code']
         gpu = dispatch['environment']['gpu']['name']
@@ -131,7 +132,8 @@ def verify_completed(clip: str, phase: str, entry: dict[str, Any], frames: int,
         if phase == 'prepare' and stage == 'full' and not cf.digest_string(artifact.get('checkpoint_sha256', '')):
             raise ValueError('prepared checkpoint digest missing')
         if control:
-            if spec.get('entrypoint') != ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']:
+            if (spec.get('entrypoint') != ['-m', 'experiments.tennis.k5d_scoped_namespace']
+                    or spec.get('arguments', [])[:1] != ['outer']):
                 raise ValueError('completed control stage requires qualified namespace')
             log_path = job_dir / stage / 'command.log'
             if oracle.sha(log_path) != records['command_log_sha256']:
@@ -287,7 +289,8 @@ def verified_cpu_calibration(samples: dict[str, Any], identity: dict[str, str],
             receipt = read(Path(entry['receipt_path']), entry['receipt_sha256'])
             directory = Path(receipt['job_directory'])
             spec = read(directory / 'spec.json', receipt['records']['spec_sha256'])
-            if spec.get('entrypoint') != ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']:
+            if (spec.get('entrypoint') != ['-m', 'experiments.tennis.k5d_scoped_namespace']
+                    or spec.get('arguments', [])[:1] != ['outer']):
                 raise ValueError('CPU calibration requires qualified namespace execution')
             log = directory / 'full' / 'command.log'
             if oracle.sha(log) != receipt['records']['full']['command_log_sha256']:

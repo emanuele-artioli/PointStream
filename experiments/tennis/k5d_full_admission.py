@@ -311,8 +311,8 @@ def author(config: dict[str, Any]) -> dict[str, Any]:
             arguments = live_spec.get('arguments', [])
             if live_spec.get('entrypoint') == ['-m', 'experiments.tennis.k5d_native_pid_oracle']:
                 continue
-            if (live_spec.get('entrypoint') != ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']
-                    or arguments.count('--') != 1):
+            if (live_spec.get('entrypoint') != ['-m', 'experiments.tennis.k5d_scoped_namespace']
+                    or arguments[:1] != ['outer'] or arguments.count('--') != 1):
                 raise ValueError('same-consumer job target is unknown')
             worker = arguments[arguments.index('--') + 1:]
             if worker and worker[0] in ('parity16', 'parity-noop'):

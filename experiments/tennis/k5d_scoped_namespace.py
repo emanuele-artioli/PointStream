@@ -115,7 +115,8 @@ def outer(unshare_sha: str, timeout: float, arguments: list[str]) -> None:
     stage = Path(os.environ['PS_STAGE_DIR'])
     spec = json.loads((stage.parent / 'spec.json').read_text())
     staging = json.loads((stage / 'staging.json').read_text())
-    if (spec.get('entrypoint') != ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']
+    if (spec.get('entrypoint') != ['-m', 'experiments.tennis.k5d_scoped_namespace']
+            or spec.get('arguments', [])[:1] != ['outer']
             or phase_command(spec, stage_name, staging['inputs'], sys.executable) != [sys.executable, '-m',
                 'experiments.tennis.k5d_scoped_namespace', *sys.argv[1:]]):
         raise ValueError('launcher arguments differ from actual fleet stage')
