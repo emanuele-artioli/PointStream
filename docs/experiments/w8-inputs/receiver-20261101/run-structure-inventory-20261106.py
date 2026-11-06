@@ -1,4 +1,4 @@
-"""Read-only first-stage structure inventory; never claims scheduler call counts."""
+"""Read-only packet structure and frozen CPU scheduler counts; no GPU or quality claim."""
 import ast
 import hashlib
 import json
@@ -18,8 +18,11 @@ SOURCE_SHA = ('bb30f9e4292a8f1d687f70f1af8b25325ea4df504789c7154eb84f923d68d996'
 
 
 def sha(path):
+    digest = hashlib.sha256()
     with open(path, 'rb') as stream:
-        return hashlib.file_digest(stream, 'sha256').hexdigest()
+        for chunk in iter(lambda: stream.read(1024 * 1024), b''):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def main():
