@@ -931,6 +931,15 @@
       "cpu_seconds": 50,
       "release_stage": "research-first24/28",
       "basis": "Entire50CPU freshmetadata allowance conservatively charged: all-host doctor/canonical jobs/shared source SHA/nativeclass/cachemetadata+prior admission inspection. Distributed aggregate CPU unmetered; source/input stage rehash still required. Reused common inspection acrosstwo preparations, eachcharged50CPU. NoGPUyet."
+    },
+    {
+      "phase": "k5d-927a-source-preparation-20261106",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "release_stage": "research-first24/28",
+      "basis": "Entire50CPU source-preparation allowance charged; unique4bf9 fullsourceupload24.331wall, newregularnonsymlink16373760B/SHAverified/inode5854917/noownuploader. Freshpostuploadhost/tool/source/deadline checks included. Wall notCPUmeasurement; noGPU/nativejobyet. Repair1future100campaign+30audit remainnested."
     }
   ],
   "reservations": [
@@ -1449,8 +1458,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 9000,
-      "cpu_seconds": 10500,
-      "status": "RootFREEZES15c6/H2+25newcontrols: all1373archivemembersindependentlymatchassembledcommit,1348oldbyteidentical,source46c2/archive4bf9/env32e. Configured927aRuff/mypy544PASS/pytest1919pass37skip; actualH2focused56pass4skip/mypy494PASS. RELEASEoneunique900wallsourcecacheuploadunder50CPUprep, thenONEfresh100CPUcampaign70smoke/10val/5noop+30CPUaudit ifactualcacheSHA/size/no-uploader/freshhost/native/tool/source/deadline<=45m checks match. Onlydeadlinefields mayrefresh; recordnormalizedSHA/newIDbeforeoneboundedwait. Repair1future180CPU remainsnested;40alreadycharged. Missing/failurestops/noGPU/full30release."
+      "cpu_seconds": 10450,
+      "status": "Rootfreeze15c6/4bf9/source46c2/env32e accepted, uniqueGPU5sourcecacheuploadPASSED24.331wall/SHA/16373760B/regular/noownuploader;50CPUprepcharged. Repair1cumulative90CPU(40capability+50prep),future100CPUcampaign+30audit remainnested inballremaining. ConditionalONEfresh100CPUproof70/10/5afterfreshchecks/deadlineonlyrefresh;noGPU/full30release."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -2293,6 +2302,34 @@
       "gpu_ceiling": 0,
       "inclusive_cpu_ceiling": 180,
       "cpu_already_charged_seconds": 50
+    },
+    {
+      "job_id": "20261106T005057Z-77c276fa",
+      "phase": "w8-paired-cost-bounded-queue-20261105",
+      "state": "pending at submit receipt; one combined canonical wait delegated",
+      "revision": "04c6e22b85554d660b6a33d735d875f1df7530ca",
+      "snapshot_sha256": "e66ed9c7f02835a719cf8f5defbdbf67785cd08f55011dd26239c724212bef90",
+      "spec_sha256": "f6acfa4cd52e212698842cb3c728060519c1488731671704204b93e48f3a6b5d",
+      "deadline": "2026-11-06T01:22:28Z",
+      "inclusive_cpu_ceiling": 1100,
+      "gpu_ceiling": 900,
+      "local_batch_record": "/private/tmp/w8-gvc-queue-batch-20261106.json",
+      "wait_handle": 22463,
+      "wait_max_seconds": 2000
+    },
+    {
+      "job_id": "20261106T005107Z-0202f092",
+      "phase": "gvcrt-qp9-bounded-queue-20261105",
+      "state": "pending at submit receipt; one combined canonical wait delegated",
+      "revision": "e6e0b530aebc84b1a73ef6200b7fc24db7f28c21",
+      "snapshot_sha256": "cde9046414f4412a92652b11c0c75ac7a4965e7843badb65a1f449b3368ae7ff",
+      "spec_sha256": "ad5422963054df3d61d177fb6b02df2803070fb397516692e23701216afff052",
+      "deadline": "2026-11-06T01:22:28Z",
+      "inclusive_cpu_ceiling": 1000,
+      "gpu_ceiling": 900,
+      "local_batch_record": "/private/tmp/w8-gvc-queue-batch-20261106.json",
+      "wait_handle": 22463,
+      "wait_max_seconds": 2000
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -2313,9 +2350,20 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "RootreleasedONEfreshW8paired+ONEfreshGVCQP9 boundedexclusivequeue attempts; IDsnotyetreceived. Source/spec/capsreviewed,freshsubmissionchecksrequired. Ballcandidate927apendingroot/exactH2review.",
-    "jobs": [],
-    "batches": [],
+    "state": "W8andGVCfreshqueues submitted/onecombined2000sps-fleetwait22463. BallsourceuploadPASSED; freshCPUproofprechecks underway,IDnotyetreceived. PR341OPENautoMERGEenabledatf9bb; configuredchecksallpass927a.",
+    "jobs": [
+      "20261106T005057Z-77c276fa",
+      "20261106T005107Z-0202f092"
+    ],
+    "batches": [
+      {
+        "scope": "freshW8paired+GVCQP9",
+        "record": "/private/tmp/w8-gvc-queue-batch-20261106.json",
+        "wait_handle": 22463,
+        "max_seconds": 2000,
+        "deadline": "2026-11-06T01:22:28Z"
+      }
+    ],
     "native_completion_resume_verified": false,
     "recurring_llm_polling": false,
     "completed": false
