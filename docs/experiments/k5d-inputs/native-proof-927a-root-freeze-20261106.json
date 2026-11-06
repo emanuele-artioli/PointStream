@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "scope": "root freeze review for one CPU native proof; not qualification/GPU/full30 authority",
+  "candidate_revision": "927aee050dfa48509eec9ee7cfded54f7b64fc65",
+  "assembled_revision": "15c6c48e484b8681323fae5ab864910e5d8c122a",
+  "source_identity": {
+    "source_sha256": "46c23588ba8cdafe305604645099691622c43b8e8438fe3e3a721b8aeb30c688",
+    "snapshot_sha256": "4bf9f93c6c3eb038efc3617697db2c3383ca5ec42521dd306ddef3be443c3e46",
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "unchanged_old_files": 1348,
+  "exact_control_additions": 25,
+  "all1373_archive_members_match_assembled_commit": true,
+  "bridge_independently_recomputed": true,
+  "draft_spec_independently_validated": true,
+  "draft_spec_sha256": "89b75001a5174e8e0a6e9d88e0cddf3171c8a123d3b8cfce5e9dc74d20f5756e",
+  "upload_ceiling_wall_seconds": 900,
+  "remaining_repair_cpu_caps": {
+    "preparation": 50,
+    "campaign": 100,
+    "audit": 30
+  },
+  "decision": "Freeze accepted for bounded native CPU proof only. One unique cached source upload; post-upload SHA/size/no-own-uploader and freshhost/tool/cache/spec/deadline checks before one new100sCPUcampaign. Missing/failedproofstops, source/root/data unchanged. No GPUdispatch here."
+}
