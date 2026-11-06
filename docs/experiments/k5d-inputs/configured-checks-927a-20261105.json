@@ -1,0 +1,65 @@
+{
+  "revision": "927aee050dfa48509eec9ee7cfded54f7b64fc65",
+  "worktree": "/private/tmp/pointstream-checks-927a-20261105",
+  "interpreter": "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+  "checks": [
+    {
+      "check": "mypy",
+      "exit_code": 0,
+      "command": [
+        "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+        "-m",
+        "mypy",
+        "--config-file",
+        "pyproject.toml"
+      ],
+      "cwd": "/Users/manu/.codex/worktrees/3cb5/PointStream",
+      "revision": "927aee050dfa48509eec9ee7cfded54f7b64fc65",
+      "source_worktree_diff_empty": true,
+      "origin": "delegate pinned run after commit; root verified log and unchanged tracked code before freeze",
+      "log": "/private/tmp/pointstream-checks-927a-result-20261105/mypy.log",
+      "sha256": "ca4d62e50d8c35f432816818f7fa4e8cdf3f328e0a03c0cff497e8c953fdbee1"
+    },
+    {
+      "check": "ruff",
+      "command": [
+        "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+        "-m",
+        "ruff",
+        "check"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.1463533330024802,
+      "log": "/private/tmp/pointstream-checks-927a-result-20261105/ruff.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "check": "pytest",
+      "command": [
+        "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+        "-m",
+        "pytest"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 113.19039774999692,
+      "log": "/private/tmp/pointstream-checks-927a-result-20261105/pytest.log",
+      "sha256": "3ce6de70d216209e5d8cfcc7e9662e1bd45f3c4103b84d965398b84fb81e6781"
+    }
+  ],
+  "wall_seconds": 113.33857849999913,
+  "waited_children_cpu_seconds": 188.531966,
+  "passed": true,
+  "scope": "ordinary local configured software checks; no experiment/model qualification",
+  "pytest_summary": "1919 passed,37 skipped in112.54s",
+  "mypy_summary": "544 source files clean in pinned environment; default Miniconda NumPy errors do not reproduce",
+  "experiment_source_validation": {
+    "assembled_revision": "15c6c48e484b8681323fae5ab864910e5d8c122a",
+    "snapshot_sha256": "4bf9f93c6c3eb038efc3617697db2c3383ca5ec42521dd306ddef3be443c3e46",
+    "source_sha256": "46c23588ba8cdafe305604645099691622c43b8e8438fe3e3a721b8aeb30c688",
+    "unchanged_h2_files": 1348,
+    "exact_control_additions": 25,
+    "focused_tests": "56passed4skipped",
+    "mypy": "494sourcefilesclean",
+    "scope": "CPU/local compatibility checks only; native namespace/certificate actualdata/CPUfit/GPUparity not established"
+  }
+}
