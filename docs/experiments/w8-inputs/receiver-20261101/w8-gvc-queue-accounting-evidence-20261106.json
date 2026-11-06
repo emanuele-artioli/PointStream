@@ -1,0 +1,106 @@
+{
+  "affinity_evidence": {
+    "gvc": {
+      "full_dispatch": [
+        3
+      ],
+      "run_cpu_affinity_index": 3,
+      "smoke_dispatch": [
+        3
+      ],
+      "supervisor_selected": [
+        3
+      ]
+    },
+    "inbox_sha256": "5dbdc52879729157d2073ad717d731fb7af4563f3ca1330930be96edea97266e",
+    "limitation": "not every descendant affinity observed continuously; native affinity changes are not excluded by receipt",
+    "method": "supervisor pinned before campaign; children inherit affinity; workload checks one CPU",
+    "monitor_sha256": "73671c2892127bf2510b98aee75356f50736d8613f769d5b8e5426b4a821268e",
+    "w8": {
+      "full_dispatch": [
+        1
+      ],
+      "run_cpu_affinity_index": 1,
+      "smoke_dispatch": [
+        1
+      ],
+      "supervisor_selected": [
+        1
+      ]
+    }
+  },
+  "audits": {
+    "gvc_audit_sha256": "bb6cd32bfa3cc1dc6e928c8989fc214966998f950c898ac37373e7966a1e2fad",
+    "w8_cost_sha256": "06cecf48c5462cfc8bac90b53989ab95d3fdce32dda88ea7cc54d57af8b64c94",
+    "w8_guard_sha256": "291e578ae29a915a2fd76216861edc33b83a70edc55aa5b542e71c41be143823"
+  },
+  "cpu_envelope_caveat": "lifecycle envelopes assume descendants retained one-CPU affinity; separate external allowance is conservative, but aggregate external/supervisor CPU was not directly measured. Larger originally authorized ceilings remain the unconditional reservation limits.",
+  "gvc": {
+    "admission_attempts": [
+      {
+        "cpu_wall_upper_seconds": 0.36141300201416016,
+        "gpu_wall_upper_seconds": 0.36141300201416016,
+        "id": "28826bb4faa34aedb05265847d250abb",
+        "reason": "CPU claim failed: Requested 1 threads exceeds cap 1 on gpu5.itec.aau.at (currently allocated: 1/1)",
+        "status_mtime": 1793927232.341413,
+        "supervisor_birth": 1793927231.98
+      },
+      {
+        "cpu_wall_upper_seconds": 0.3937811851501465,
+        "gpu_wall_upper_seconds": 0.3937811851501465,
+        "id": "61d45d1a2475449ca11b0a89a6c886b2",
+        "reason": "CPU claim failed: Requested 1 threads exceeds cap 1 on gpu5.itec.aau.at (currently allocated: 1/1)",
+        "status_mtime": 1793927111.013781,
+        "supervisor_birth": 1793927110.62
+      },
+      {
+        "cpu_wall_upper_seconds": 0.31613850593566895,
+        "gpu_wall_upper_seconds": 0,
+        "id": "6ea7d2eb76804846ae2ea00f54317aaf",
+        "reason": "GPU claim failed: Device GPU-7754164a-33cd-265c-3696-c20966d228fe on gpu5.itec.aau.at is already claimed",
+        "status_mtime": 1793926988.9061384,
+        "supervisor_birth": 1793926988.59
+      }
+    ],
+    "cpu_envelope": {
+      "final_single_cpu_lifecycle": 200,
+      "preparation": 50,
+      "prior_attempts": 10,
+      "remaining_external_and_audit": 150,
+      "rounding_slack": 40
+    },
+    "full_waited_children_rusage_cumulative": [
+      83.269254,
+      18.532268
+    ],
+    "job_id": "20261106T005107Z-0202f092",
+    "proposed_cpu_charge_seconds": 450,
+    "proposed_gpu_charge_seconds": 200,
+    "status": "complete",
+    "supervisor_birth": 1793927353.7,
+    "supervisor_to_terminal_wall_upper": 180.5410521030426,
+    "terminal_updated": 1793927534.2410522
+  },
+  "schema": 1,
+  "scope": "conservative closure inputs; root owns phase ledger; no measured aggregate CPU claim",
+  "w8": {
+    "admission_attempts": [],
+    "cpu_envelope": {
+      "final_single_cpu_lifecycle": 400,
+      "post_audit": 100,
+      "preparation": 50,
+      "remaining_external": 50
+    },
+    "full_waited_children_rusage_cumulative": [
+      218.285226,
+      83.317627
+    ],
+    "job_id": "20261106T005057Z-77c276fa",
+    "proposed_cpu_charge_seconds": 600,
+    "proposed_gpu_charge_seconds": 400,
+    "status": "complete",
+    "supervisor_birth": 1793926987.45,
+    "supervisor_to_terminal_wall_upper": 365.66623973846436,
+    "terminal_updated": 1793927353.1162398
+  }
+}
