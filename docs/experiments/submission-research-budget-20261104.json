@@ -1465,6 +1465,22 @@
       "gpu_seconds": 0,
       "cpu_seconds": 60,
       "status": "closed;60CPUcharged;actualSHAcachecopierqualifiedforcde904copies,newsource/destnohardlink/nooverwrite."
+    },
+    {
+      "phase": "w8-paired-cost-bounded-queue-20261105",
+      "workstream": "w8",
+      "release_stage": "research-first24/28",
+      "gpu_seconds": 900,
+      "cpu_seconds": 1100,
+      "status": "Prospective inclusive one-fresh-attempt reservation after user chose bounded fleet queues. Metadata/source/spec preparation<=50CPU now; NO GPUsubmission before root exact fresh source/cache/spec/host/deadline/cost review. Reuse immutable earlier selected source and numeric/quality/guard settings; exclusive contention-stop/noautomaticresume. Pending queue not GPU occupancy. No old request replay, no new decoder full witness release."
+    },
+    {
+      "phase": "gvcrt-qp9-bounded-queue-20261105",
+      "workstream": "ego_peer_oracles",
+      "release_stage": "research-first24/28",
+      "gpu_seconds": 900,
+      "cpu_seconds": 1000,
+      "status": "Prospective inclusive one-fresh-attempt reservation after user chose bounded fleet queues. Metadata/source/spec preparation<=50CPU now; NO GPUsubmission before root exact fresh source/cache/spec/host/deadline/cost review. Reuse immutable earlier selected source and numeric/quality/guard settings; exclusive contention-stop/noautomaticresume. Pending queue not GPU occupancy. No old request replay, no new decoder full witness release."
     }
   ],
   "jobs": [
@@ -2274,16 +2290,17 @@
     "Root20261105prospectivelyraisesW8clockcostphaseCPU1000\u21921100insideexistingW8/programmeCPUcap, specifically100postrunauditafterfreshreadinessconsumed100external. Existingnumericcaps/source/scientificgatesunchanged; configured930includesalreadycharged100readiness, futureconfigured830. Futurephase940CPU700GPU, cumulative160chargedCPU+940=1100.",
     "RootCPUproofsubcap100\u2192150withinGVC2200, noaggregate/workstreamincrease; 20readinesscharged, futureproof130inclusive. Remaining2180CPUopenGVCaggregateincludesit\u2014nodooublecount.",
     "Userresourcequestionpending20261105: canuserarrange~1hexclusiveAdaongpu5orpreferboundedqueues? Raisedafter64efforeigncontention; independentball/GVCcontinue. NoW8retryauthorizedwhileawaitingcapacitydecision. Localconfiguredsoftwarechecks07f8Ruff/mypy542PASS/pytest1898pass37skip1docformatfailure; docfixed/focused3PASS, CIpublicationnext. Ordinarysoftwarechecksnotnewinferencechargespercard.",
-    "AUTHORITATIVERESERVATIONSEMANTICS: everyopenreservationamountisREMAINING_UNSPENT; rootreducesitwhenchargesareadded. Sumcurrentopenamountsdirectly; NEVERsubtractphase/parentchargesagain. Closedhistoricalrowsignored. Auditedattestationmustmatchexactactivephase\u2192remainingmapping."
+    "AUTHORITATIVERESERVATIONSEMANTICS: everyopenreservationamountisREMAINING_UNSPENT; rootreducesitwhenchargesareadded. Sumcurrentopenamountsdirectly; NEVERsubtractphase/parentchargesagain. Closedhistoricalrowsignored. Auditedattestationmustmatchexactactivephase\u2192remainingmapping.",
+    "User20261105resourceanswer: Keep using bounded fleet queues. Root opens ONEfresh W8paired900GPU1100CPU and ONEfreshGVCQP9 900GPU1000CPU inclusive; metadata<=50CPUeach first, rootreleasepending, no changedsource/math/gates orfullwitness. Prior64ef/2f65contendedattemptsclosedandpreserved. Allremaining_unspent semantics unchanged."
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "No live fleet jobs; all recorded waits collected. QP0 complete/root accepted; QP9 and W8 contended/closed; ball native proof failed API/closed. Raw pidfd self capability pass only; new native proof held for reviewed full-control source.",
+    "state": "No active fleet jobs/waits. Fresh W8paired and GVCQP9 source/spec/host preparation only after user chose bounded queues; no GPUrelease yet. Ball final control review before native repair sourcefreeze.",
     "jobs": [],
     "batches": [],
     "native_completion_resume_verified": false,
     "recurring_llm_polling": false,
-    "completed": true
+    "completed": false
   },
   "approval_history": [
     {
