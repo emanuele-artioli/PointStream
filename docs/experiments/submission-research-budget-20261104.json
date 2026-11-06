@@ -1549,7 +1549,7 @@
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8900,
       "cpu_seconds": 9530,
-      "status": "Remaining_unspent8900GPU9530CPU afterstopped7d2 parity100GPU500CPUinclusive. NoactiveGPUorautomaticretry. PGIDsourcecorrection/newCPUproof/parity/rootreviewbefore292/586;full30notadmitted."
+      "status": "Remaining_unspent8900GPU9530CPU. Root releases ONE newsourcePGID CPUproof only; nested300CPUinclusive(50prep220wholelifecycle30audit),0GPU. Exactae6030/22fb/source71d/wrapper62f/env32e,unchanged1348+25controls,reviewed6acc+c3cf. Freshallhost/job/source/tool/storage/deadline<=45min checks before one canonicalrequest. GPUparity/292/586/full30NOTreleased. No replay/replacement."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
