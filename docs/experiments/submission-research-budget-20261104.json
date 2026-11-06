@@ -17,8 +17,8 @@
       "cpu_limit_seconds": 3620
     },
     "w8": {
-      "gpu_limit_seconds": 7200,
-      "cpu_limit_seconds": 10800
+      "gpu_limit_seconds": 8200,
+      "cpu_limit_seconds": 11300
     },
     "w6": {
       "gpu_limit_seconds": 1800,
@@ -29,8 +29,8 @@
       "cpu_limit_seconds": 5400
     },
     "shared": {
-      "gpu_limit_seconds": 7200,
-      "cpu_limit_seconds": 4480
+      "gpu_limit_seconds": 6200,
+      "cpu_limit_seconds": 3980
     }
   },
   "charges": [
@@ -1607,6 +1607,14 @@
       "cpu_seconds": 0,
       "status": "closed;rootacceptedstructureonly,90CPUinclusiveconservativelycharged,0GPU;noquality/fullwitnessrelease",
       "authorized_cumulative_cpu_seconds": 90
+    },
+    {
+      "phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "release_stage": "research-first24/28",
+      "gpu_seconds": 4550,
+      "cpu_seconds": 4550,
+      "status": "Prospectiveremaining_unspent staged ceiling only. NOexecution/fullcandidate released. IncludesnewsourceCPUproof,qualificationbothunits30step24contextplusactualnativeSAMcompose <=500combinedscientificsmoke, allstaging/lifecycles/offline80tickgolden andfailureheadroom. Requireexactsource/securityreview+completeactualcostforecast beforeeachrelease. Existingcost-onlyprofilefixed; qualificationcannotpasscandidatevalidators. Original3600closed; ballpriority; stopifcompleteforecastfails. No automaticreplay."
     }
   ],
   "jobs": [
@@ -2527,6 +2535,11 @@
       "initial_new_tranche_gpu_seconds": 9000,
       "initial_new_tranche_cpu_seconds": 10800,
       "gate": "Prospective per-job releases only: actual native/CPU/PID/nestednamespace and source-bridge qualification,292/586scale confirmations and complete remaining forecast with1.5margin/reserves. Full30notyetreleased."
+    },
+    {
+      "date": "2026-11-06",
+      "authority": "Root uses explicit main-card prospective shared-reserve transfer authority; aggregate user ceiling unchanged",
+      "change": "Move1000GPU/500CPU shared toW8: W8limits8200/11300; shared6200/3980. PairedsameAda cost2082.691GPUtwo30steps model plusstructurallyequal240frameunits supports scoping onegated freshwitness; not a fit or quality guarantee. Ballalreadyopen tranche unchanged; no training or qualityrulechange."
     }
   ],
   "reservation_amount_basis": "remaining_unspent"
