@@ -1,3 +1,7 @@
+# User resource decision — bounded fleet queues
+
+The pending Ada-window question is RESOLVED: user says **Keep using bounded fleet queues**. Root prospective reservations5459749d: ONE fresh W8paired900GPU/1100CPU and ONE freshGVCQP9900GPU/1000CPU inclusive, eachincludes<=50CPU freshmetadata preparation. Delegate decoder_cost_finish prepares exact old immutable source/cache/spec/compatiblepool/freshdeadline for rootreview; **no newGPUrelease/IDyet**. Previous64ef/2f65 IDs remain terminal and are not replayed. Charged17682GPU34960CPU unchanged; open aggregate ball9000/10500 +W8900/1100 +GVC900/1000, allREMAINING_UNSPENT. No full freshdecoder quality witness or fullball30 released. Ballcontrolsourcefreeze stillheld for final compactcertificate lifecycle/accounting tests. Older statements awaiting resource preference are superseded.
+
 # Latest research checkpoint — after QP endpoint audit
 
 User-approved ceiling is **24 GPU-hours /28 workload CPU-hours**, research first, manuscript edits paused. Charged **17,682 GPU /34,960 CPU seconds**; only open aggregate reservation is ball first tranche **9,000 GPU /10,500 CPU seconds remaining_unspent**. Sum open values directly, never subtract charges again. No active fleet jobs or waits. No automatic W8/GVC retry while awaiting user's preference for an exclusive Ada window versus bounded queues.
