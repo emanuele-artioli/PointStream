@@ -38,7 +38,8 @@ CALIBRATION_ARCHIVES = {
 
 
 def programme_projection(receipt: dict[str, Any], *, inventory: dict[str, dict[str, Any]] | None = None,
-                         noncommand: dict[str, dict[str, Any]] | None = None) -> dict[str, Any]:
+                         noncommand: dict[str, dict[str, Any]] | None = None,
+                         certified_cpu: dict[str, dict[str, float]] | None = None) -> dict[str, Any]:
     """Recompute all 60 GPU full stages and CPU-readiness campaigns, once each."""
     rows = study.selection()
     if len(rows) != 30 or sum(row['label_rows'] for row in rows.values()) != 5675:
@@ -77,9 +78,12 @@ def programme_projection(receipt: dict[str, Any], *, inventory: dict[str, dict[s
     if max_full > 2670:
         raise ValueError('full stage exceeds recovery bound')
     cpu_costs = None
-    if 'cpu_calibration' in receipt:
-        from experiments.tennis import k5d_study_wave as wave
-        cpu_costs = wave.verified_cpu_calibration(receipt['cpu_calibration'], receipt['consumer_execution_identity'], inventory)
+    if certified_cpu is not None or 'cpu_calibration' in receipt:
+        if certified_cpu is None:
+            from experiments.tennis import k5d_study_wave as wave
+            cpu_costs = wave.verified_cpu_calibration(receipt['cpu_calibration'], receipt['consumer_execution_identity'], inventory)
+        else:
+            cpu_costs = certified_cpu
         if set(cpu_costs) != {'prepare', 'score'}:
             raise ValueError('both CPU calibration phases required')
         for model in cpu_costs.values():
@@ -87,7 +91,7 @@ def programme_projection(receipt: dict[str, Any], *, inventory: dict[str, dict[s
             if (any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) or v < 0
                     for v in values) or model['margin'] < 1.5):
                 raise ValueError('CPU calibration requires a finite 1.5 margin')
-        if inventory is not None:
+        if inventory is not None and certified_cpu is None:
             for phase in ('prepare', 'score'):
                 for sample in receipt['cpu_calibration'][phase]:
                     entry, saved = sample['entry'], inventory[sample['clip']][phase]
@@ -175,6 +179,11 @@ def check_budget(ledger: dict[str, Any], attestation: dict[str, Any], ledger_sha
             raise ValueError('active reservation amounts must explicitly be remaining unspent')
         if (active or 'active_reservations' in attestation) and attestation.get('active_reservations') != active:
             raise ValueError('active reservation attestation differs from ledger')
+    covered = attestation.get('forecast_covered_reservation_phases', [])
+    if (not isinstance(covered, list) or len(covered) != len(set(covered))
+            or receipt.get('forecast_covered_reservation_phases', []) != covered
+            or any(phase not in active or active[phase]['workstream'] != 'ball' for phase in covered)):
+        raise ValueError('forecast-covered reservations do not match active ball allocation')
     for resource in ('gpu', 'cpu'):
         charged = sum(row.get(resource + '_seconds', 0) for row in ledger['charges'] if row['workstream'] == 'ball')
         global_charged = sum(row.get(resource + '_seconds', 0) for row in ledger['charges'])
@@ -183,11 +192,21 @@ def check_budget(ledger: dict[str, Any], attestation: dict[str, Any], ledger_sha
         if (row['ball_charged_seconds'] != charged or row['global_charged_seconds'] != global_charged
                 or row['ball_limit_seconds'] != ledger['workstreams']['ball'][resource + '_limit_seconds']
                 or row['spent_and_reserved_seconds'] < charged + sum(x[resource] for x in active.values() if x['workstream'] == 'ball')
-                or row['global_remaining_seconds'] > ledger[resource + '_total_seconds'] - global_charged - sum(x[resource] for x in active.values())
-                or programme['ball_remaining_seconds'] > row['ball_limit_seconds'] - row['spent_and_reserved_seconds']
+                or row['global_remaining_seconds'] > ledger[resource + '_total_seconds'] - global_charged - sum(x[resource] for phase, x in active.items() if phase not in covered)
+                or programme['ball_remaining_seconds'] > row['ball_limit_seconds'] - row['spent_and_reserved_seconds'] + sum(active[phase][resource] for phase in covered)
                 or programme['global_remaining_seconds'] > row['global_remaining_seconds']):
             raise ValueError('programme budget exceeds reconciled ledger')
 
+
+
+def check_forecast_allocation(attestation: dict[str, Any], forecast: dict[str, Any]) -> None:
+    covered = attestation.get('forecast_covered_reservation_phases', [])
+    if covered:
+        active = attestation['active_reservations']
+        for resource in ('gpu', 'cpu'):
+            amount = forecast[resource]['incremental_seconds']
+            if amount is None or amount > sum(active[phase][resource] for phase in covered):
+                raise ValueError('pending forecast exceeds its reserved allocation')
 
 def confirmation_budget(gate: dict[str, Any], receipt: dict[str, Any]) -> None:
     """Check only an independently reserved four-job scale confirmation.
@@ -225,15 +244,16 @@ def confirmation_budget(gate: dict[str, Any], receipt: dict[str, Any]) -> None:
                         raise ValueError('confirmation GPU cap below numerical forecast')
 
 
-def approved(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha: str, bridge_path: Path, bridge_sha: str,
+def audit_raw_approval(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha: str, bridge_path: Path, bridge_sha: str,
              old_source: Path, new_source: Path, ledger_path: Path, ledger_sha: str,
              budget_path: Path, budget_sha: str, identity: dict[str, str], clip: str, phase: str,
              qualification_paths: dict[str, Path] | None = None,
-             full_evidence_paths: dict[str, Path] | None = None) -> tuple[dict[str, Any], int]:
+             full_evidence_paths: dict[str, Path] | None = None, *, authoring: bool = False,
+             verified_inventory: dict[str, dict[str, Any]] | None = None) -> tuple[dict[str, Any], int]:
     gate = study.checked_json(gate_path, gate_sha)
     receipt = study.checked_json(cost_path, cost_sha)
     signed_bridge = study.checked_json(bridge_path, bridge_sha)
-    if (gate.get('schema') != 1 or gate.get('approved') is not True
+    if (gate.get('schema') != 1 or (gate.get('approved') is not True and not (authoring and gate.get('approved') is False))
             or gate.get('purpose') != 'full-retrospective-benchmark-cpu-readiness'
             or gate.get('selection_sha256') != fleet.SOURCE_SHA or gate.get('consumer_execution_identity') != identity
             or gate.get('cost_receipt_sha256') != cost_sha or gate.get('bridge_sha256') != bridge_sha
@@ -314,7 +334,9 @@ def approved(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha: str, bri
         from experiments.tennis import k5d_study_wave as wave
         inventory_doc = study.checked_json(full_evidence_paths['inventory'], gate['full_study_inventory_sha256'])
         noncommand_doc = study.checked_json(full_evidence_paths['noncommand'], gate['noncommand_evidence_sha256'])
-        inventory = wave.inventory(inventory_doc, identity)
+        if verified_inventory is not None and not authoring:
+            raise ValueError('preverified inventory is author-only')
+        inventory = verified_inventory if verified_inventory is not None else wave.inventory(inventory_doc, identity)
         if any(inventory[clip][stage]['state'] != 'complete'
                for clip in wave.CONFIRMATIONS for stage in ('prepare', 'score')):
             raise ValueError('all four verified confirmation stages required')
@@ -326,8 +348,13 @@ def approved(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha: str, bri
                                               job_receipt['records']['spec_sha256'])
                 if cf.option(job_spec['arguments'], '--unshare-sha') != qualification['unshare_sha256']:
                     raise ValueError('confirmation namespace executable identity differs')
+        if inventory[clip][phase]['state'] != 'pending':
+            raise ValueError('requested target is not pending')
+        if phase == 'score' and inventory[clip]['prepare']['state'] != 'complete':
+            raise ValueError('score target has no verified producer')
         noncommand = wave.verified_noncommand(noncommand_doc, identity, inventory)
         projection = programme_projection(receipt, inventory=inventory, noncommand=noncommand)
+        check_forecast_allocation(attestation, projection)
         if receipt.get('budget_fits') != {'gpu': True, 'cpu': True}:
             raise ValueError('full programme budget evidence differs')
         if not projection['gpu']['fits'] or not projection['cpu']['fits']:
@@ -336,6 +363,34 @@ def approved(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha: str, bri
         raise ValueError('invalid stage')
     return receipt, clips[clip]['label_rows']
 
+
+
+def approved(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha: str, bridge_path: Path, bridge_sha: str,
+             old_source: Path, new_source: Path, ledger_path: Path, ledger_sha: str,
+             budget_path: Path, budget_sha: str, identity: dict[str, str], clip: str, phase: str,
+             qualification_paths: dict[str, Path] | None = None,
+             full_evidence_paths: dict[str, Path] | None = None) -> tuple[dict[str, Any], int]:
+    """Worker checks small signed inputs only; raw full-study audit is author-only."""
+    gate = study.checked_json(gate_path, gate_sha)
+    if gate.get('release') != 'full-study':
+        return audit_raw_approval(gate_path, gate_sha, cost_path, cost_sha, bridge_path, bridge_sha,
+                                  old_source, new_source, ledger_path, ledger_sha, budget_path, budget_sha,
+                                  identity, clip, phase, qualification_paths, full_evidence_paths)
+    if full_evidence_paths is None or set(full_evidence_paths) != {'certificate', 'microbenchmark', 'microbenchmark_audit'}:
+        raise ValueError('full-study compact certificate required')
+    from experiments.tennis import k5d_full_admission as admission
+    cert = admission.read_certificate(full_evidence_paths['certificate'], gate.get('certificate_sha256'))
+    admission.check_small_paths([gate_path, cost_path, ledger_path, budget_path, *([] if qualification_paths is None else qualification_paths.values())])
+    admission.check_microbenchmark(full_evidence_paths['microbenchmark'], full_evidence_paths['microbenchmark_audit'],
+                                   gate, identity, gate['certificate_sha256'])
+    receipt = study.checked_json(cost_path, cost_sha)
+    ledger = study.checked_json(ledger_path, ledger_sha)
+    attestation = study.checked_json(budget_path, budget_sha)
+    check_budget(ledger, attestation, ledger_sha, budget_sha, receipt)
+    admission.check_certificate(cert, gate, identity, clip, phase, cost_sha, ledger_sha, budget_sha,
+                                qualification_paths, receipt)
+    check_forecast_allocation(attestation, cert['forecast'])
+    return receipt, cert['targets'][clip][phase]['frames']
 
 def spec(base: dict[str, Any], *, phase: str, clip: str, identity: dict[str, str], assets: dict[str, dict[str, str]],
          deadline: str, readiness_seconds: int, full_seconds: int, campaign_seconds: int) -> dict[str, Any]:
@@ -349,57 +404,93 @@ def spec(base: dict[str, Any], *, phase: str, clip: str, identity: dict[str, str
             or type(campaign_seconds) is not int or campaign_seconds > 2700
             or campaign_seconds < readiness_seconds + full_seconds + 30):
         raise ValueError('invalid readiness/full campaign bounds')
+    if 'full_gate' not in assets:
+        raise ValueError('missing approved evidence asset: full_gate')
+    gate_data = study.checked_json(Path(assets['full_gate']['local']), assets['full_gate']['sha256'])
+    full_release = gate_data.get('release') == 'full-study'
     for name, item in assets.items():
         if name == 'checkpoint' and item.get('archive_sha256') != item.get('sha256'):
             raise ValueError('checkpoint archive SHA aliases differ')
-        cf.asset(name, item['remote'], item['sha256'], Path(item['local']), extract=False)
-    for name in ('full_gate', 'cost_receipt', 'bridge', 'calibration_source', 'consumer_source', 'fidelity_gate',
-                 'budget_ledger', 'budget_attestation'):
-        if name not in assets:
-            raise ValueError('missing approved evidence asset: ' + name)
-    gate_data = study.checked_json(Path(assets['full_gate']['local']), assets['full_gate']['sha256'])
-    qualification_paths = None
-    if gate_data.get('release') in ('cost-confirmation', 'full-study'):
-        if not {'native_cpu_receipt', 'gpu_parity_receipt'}.issubset(assets):
-            raise ValueError('actual CPU and GPU qualification assets required')
-        qualification_paths = {name: Path(assets[name + '_receipt']['local']) for name in ('native_cpu', 'gpu_parity')}
-    full_evidence_paths = None
-    if gate_data.get('release') == 'full-study':
-        if not {'study_inventory', 'noncommand_evidence'}.issubset(assets):
-            raise ValueError('full-study inventory and noncommand assets required')
-        full_evidence_paths = {'inventory': Path(assets['study_inventory']['local']),
-                               'noncommand': Path(assets['noncommand_evidence']['local'])}
+        if not (full_release and name == 'checkpoint'):
+            cf.asset(name, item['remote'], item['sha256'], Path(item['local']), extract=False)
+    required = {'full_gate', 'cost_receipt', 'fidelity_gate', 'budget_ledger', 'budget_attestation',
+                'native_cpu_receipt', 'gpu_parity_receipt'}
+    required |= {'certificate', 'certificate_microbench', 'certificate_microbench_audit'} if full_release else {'bridge', 'calibration_source', 'consumer_source'}
+    if not required.issubset(assets):
+        raise ValueError('missing approved evidence asset')
+    if full_release and set(assets) != required | ({'checkpoint'} if phase == 'score' else set()):
+        raise ValueError('full-study assets must be the exact compact set')
+    qualification_paths = {name: Path(assets[name + '_receipt']['local']) for name in ('native_cpu', 'gpu_parity')}
+    full_evidence_paths = {'certificate': Path(assets['certificate']['local']),
+                           'microbenchmark': Path(assets['certificate_microbench']['local']),
+                           'microbenchmark_audit': Path(assets['certificate_microbench_audit']['local'])} if full_release else None
     receipt, frames = approved(Path(assets['full_gate']['local']), assets['full_gate']['sha256'],
                                Path(assets['cost_receipt']['local']), assets['cost_receipt']['sha256'],
-                               Path(assets['bridge']['local']), assets['bridge']['sha256'],
-                               Path(assets['calibration_source']['local']), Path(assets['consumer_source']['local']),
+                               Path(assets['bridge']['local']) if not full_release else Path('.'),
+                               assets['bridge']['sha256'] if not full_release else '',
+                               Path(assets['calibration_source']['local']) if not full_release else Path('.'),
+                               Path(assets['consumer_source']['local']) if not full_release else Path('.'),
                                Path(assets['budget_ledger']['local']), assets['budget_ledger']['sha256'],
                                Path(assets['budget_attestation']['local']), assets['budget_attestation']['sha256'],
                                identity, clip, phase, qualification_paths, full_evidence_paths)
+    if full_release:
+        if full_evidence_paths is None:
+            raise ValueError('compact certificate paths required')
+        from experiments.tennis import k5d_full_admission as admission
+        cert = admission.read_certificate(full_evidence_paths['certificate'], gate_data['certificate_sha256'])
+        readiness_namespace = readiness_seconds - min(10, readiness_seconds / 4)
+        if (gate_data['certificate_validation_reserve_seconds']
+                + gate_data['namespace_bootstrap_reserve_seconds'] >= readiness_namespace):
+            raise ValueError('compact verification leaves no readiness namespace time')
+        from datetime import datetime, timezone
+        now = datetime.now(timezone.utc)
+        if not 0 < (admission._deadline(deadline) - now).total_seconds() <= 2700:
+            raise ValueError('job deadline must be within 45 minutes')
+        if admission._deadline(deadline) > admission._deadline(cert['valid_until']):
+            raise ValueError('job deadline exceeds certificate validity')
     predicted = study.forecast(receipt, phase, frames, receipt['cost'][phase]['seconds16'])
-    if predicted > full_seconds:
-        raise ValueError('fixed/marginal full-stage forecast exceeds declared cap')
+    namespace_full = full_seconds - min(10, full_seconds / 4)
+    verification_reserve = 0.0
+    if full_release:
+        verification_reserve = (gate_data['certificate_validation_reserve_seconds']
+                                + gate_data['namespace_bootstrap_reserve_seconds'])
+        if (isinstance(verification_reserve, bool) or not isinstance(verification_reserve, (int, float))
+                or not math.isfinite(verification_reserve) or verification_reserve < 0):
+            raise ValueError('invalid compact verification or namespace reserve')
+    if predicted + verification_reserve > namespace_full:
+        raise ValueError('forecast and verification exceed actual namespace timeout')
     extra = [cf.asset(name, item['remote'], item['sha256'], Path(item['local']), extract=False)
              for name, item in assets.items() if name != 'checkpoint']
     args = [phase, *base['arguments'], '--clip', clip, '--mode', '{mode}',
             '--full-gate', '{staged:full_gate}', '--full-gate-sha256', assets['full_gate']['sha256'],
             '--cost-receipt', '{staged:cost_receipt}', '--cost-receipt-sha256', assets['cost_receipt']['sha256'],
-            '--bridge', '{staged:bridge}', '--bridge-sha256', assets['bridge']['sha256'],
-            '--calibration-source', '{staged:calibration_source}', '--consumer-source', '{staged:consumer_source}',
             '--budget-ledger', '{staged:budget_ledger}', '--budget-ledger-sha256', assets['budget_ledger']['sha256'],
             '--budget-attestation', '{staged:budget_attestation}', '--budget-attestation-sha256', assets['budget_attestation']['sha256'],
             '--fidelity-gate', '{staged:fidelity_gate}', '--fidelity-gate-sha256', assets['fidelity_gate']['sha256']]
+    if not full_release:
+        args += ['--bridge', '{staged:bridge}', '--bridge-sha256', assets['bridge']['sha256'],
+                 '--calibration-source', '{staged:calibration_source}', '--consumer-source', '{staged:consumer_source}']
     if qualification_paths is not None:
         args += ['--native-cpu-receipt', '{staged:native_cpu_receipt}',
                  '--gpu-parity-receipt', '{staged:gpu_parity_receipt}']
-    if full_evidence_paths is not None:
-        args += ['--study-inventory', '{staged:study_inventory}',
-                 '--noncommand-evidence', '{staged:noncommand_evidence}']
+    if full_release:
+        args += ['--certificate', '{staged:certificate}', '--certificate-microbench', '{staged:certificate_microbench}',
+                 '--certificate-microbench-audit', '{staged:certificate_microbench_audit}']
     if phase == 'score':
         if 'checkpoint' not in assets:
             raise ValueError('actual full-context checkpoint required')
         item = assets['checkpoint']
-        extra.append(study.checkpoint(item, 'checkpoint', clip, frames, identity))
+        if full_release:
+            producer = cert['targets'][clip]['score']['producer']
+            if (item.get('remote') != producer['remote'] or item.get('sha256') != producer['archive_sha256']
+                    or item.get('checkpoint_sha256') != producer['checkpoint_sha256']):
+                raise ValueError('score checkpoint differs from certified producer')
+            remote = Path(item['remote'])
+            if not remote.is_absolute() or not remote.is_relative_to(cf.DATA_ROOT):
+                raise ValueError('certified checkpoint outside shared data root')
+            extra.append({'name': 'checkpoint', 'path': str(remote), 'sha256': item['sha256'], 'extract': True})
+        else:
+            extra.append(study.checkpoint(item, 'checkpoint', clip, frames, identity))
         args += ['--checkpoint', '{staged:checkpoint}', '--checkpoint-sha256', item['checkpoint_sha256']]
     result = cf.common_spec(base, extra, deadline)
     result.update(entrypoint=['-m', 'experiments.tennis.k5d_control_study'], arguments=args,
@@ -432,19 +523,94 @@ def spec(base: dict[str, Any], *, phase: str, clip: str, identity: dict[str, str
 
 def verify_gate(args: argparse.Namespace, identity: dict[str, str]) -> int:
     _, frames = approved(Path(args.full_gate), args.full_gate_sha256, Path(args.cost_receipt), args.cost_receipt_sha256,
-                         Path(args.bridge), args.bridge_sha256, Path(args.calibration_source), Path(args.consumer_source),
+                         Path(args.bridge or '.'), args.bridge_sha256 or '', Path(args.calibration_source or '.'), Path(args.consumer_source or '.'),
                          Path(args.budget_ledger), args.budget_ledger_sha256, Path(args.budget_attestation),
                          args.budget_attestation_sha256, identity, args.clip, args.action,
                          {'native_cpu': Path(args.native_cpu_receipt), 'gpu_parity': Path(args.gpu_parity_receipt)}
                          if args.native_cpu_receipt and args.gpu_parity_receipt else None,
-                         {'inventory': Path(args.study_inventory), 'noncommand': Path(args.noncommand_evidence)}
-                         if args.study_inventory and args.noncommand_evidence else None)
+                         {'certificate': Path(args.certificate), 'microbenchmark': Path(args.certificate_microbench),
+                          'microbenchmark_audit': Path(args.certificate_microbench_audit)}
+                         if args.certificate and args.certificate_microbench and args.certificate_microbench_audit else None)
     if args.frames != frames:
         raise ValueError('full native timeline differs')
+    if args.certificate:
+        from experiments.tennis import k5d_full_admission as admission
+        gate = study.checked_json(Path(args.full_gate), args.full_gate_sha256)
+        cert = admission.read_certificate(Path(args.certificate), gate['certificate_sha256'])
+        stage = Path(os.environ['PS_STAGE_DIR'])
+        spec_doc = json.loads((stage.parent / 'spec.json').read_text())
+        if admission._deadline(spec_doc['deadline']) > admission._deadline(cert['valid_until']):
+            raise ValueError('fleet deadline exceeds certificate validity')
+        if args.action == 'score':
+            producer = cert['targets'][args.clip]['score']['producer']
+            entries = [x for x in json.loads((stage / 'staging.json').read_text())['inputs'] if x['name'] == 'checkpoint']
+            if (len(entries) != 1 or entries[0]['sha256'] != producer['archive_sha256']
+                    or entries[0]['source'] != producer['remote']
+                    or args.checkpoint_sha256 != producer['checkpoint_sha256']):
+                raise ValueError('staged score producer differs from certificate')
+        admission.target_claim(cert, gate['certificate_sha256'], args.clip, args.action, stage.parent.name)
     return frames
 
 
+
+def require_namespace_worker() -> None:
+    """Bind the current PID-namespace child to its actual fleet dispatch."""
+    from experiments.jobs.inbox import phase_command
+
+    stage_name = os.environ.get('PS_STAGE', '')
+    if stage_name not in ('smoke', 'full') or os.getppid() != 1:
+        raise ValueError('actual PID-namespace init parent required')
+    status = Path('/proc/self/status').read_text()
+    fields = [line.split()[1:] for line in status.splitlines() if line.startswith('NSpid:')]
+    if len(fields) != 1 or len(fields[0]) < 2 or int(fields[0][-1]) != os.getpid():
+        raise ValueError('nested PID namespace identity required')
+    stage = Path(os.environ['PS_STAGE_DIR'])
+    spec = json.loads((stage.parent / 'spec.json').read_text())
+    staging = json.loads((stage / 'staging.json').read_text())
+    dispatch = json.loads((stage / 'dispatch.json').read_text())
+    if spec.get('entrypoint') != ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']:
+        raise ValueError('direct control-study fleet entrypoint prohibited')
+    expected = phase_command(spec, stage_name, staging['inputs'], sys.executable)
+    if expected != dispatch.get('command') or expected.count('--') != 1:
+        raise ValueError('actual namespace dispatch differs from fleet specification')
+    tail = expected[expected.index('--') + 1:]
+    validate_namespace_child_argv(sys.argv[1:], tail)
+    parent_fields = [line.split()[1:] for line in status.splitlines() if line.startswith('PPid:')]
+    if len(parent_fields) != 1 or len(parent_fields[0]) != 1:
+        raise ValueError('host parent PID missing')
+    host_parent = int(parent_fields[0][0])
+    parent_root = Path('/proc') / str(host_parent)
+    parent_args = [x.decode() for x in (parent_root / 'cmdline').read_bytes().split(b'\0') if x]
+    parent_status = (parent_root / 'status').read_text()
+    nested = [line.split()[1:] for line in parent_status.splitlines() if line.startswith('NSpid:')]
+    own_ns = os.readlink('/proc/self/ns/pid')
+    parent_ns = os.readlink(parent_root / 'ns/pid')
+    validate_namespace_parent(parent_args, nested, own_ns, parent_ns, expected, tail)
+
+
+
+def validate_namespace_child_argv(actual: list[str], expected: list[str]) -> None:
+    """The CLI removes --accounted-child before parsing the worker arguments."""
+    if actual != expected:
+        raise ValueError('namespace child arguments differ from fleet dispatch')
+
+def validate_namespace_parent(parent_args: list[str], nested: list[list[str]], own_ns: str, parent_ns: str,
+                              expected: list[str], tail: list[str]) -> None:
+    """Join the host-visible parent to the frozen fleet namespace command."""
+    from experiments.tennis import k5d_scoped_namespace as namespace
+
+    if (len(nested) != 1 or len(nested[0]) < 2 or nested[0][-1] != '1' or own_ns != parent_ns
+            or len(parent_args) < 10 or Path(parent_args[0]).resolve() != Path(sys.executable).resolve()
+            or parent_args[1:4] != ['-m', 'experiments.tennis.k5d_scoped_namespace', 'inner']
+            or parent_args[4] != '--outside' or parent_args[5] == own_ns
+            or not parent_args[5].startswith('pid:[') or parent_args[6] != '--timeout'
+            or parent_args[8] != '--' or parent_args[9:] != tail
+            or float(parent_args[7]) != float(cf.option(expected, '--timeout'))
+            or Path(namespace.__file__).resolve() != Path(__file__).resolve().with_name('k5d_scoped_namespace.py')):
+        raise ValueError('actual namespace init identity or command differs')
+
 def run(args: argparse.Namespace) -> None:
+    require_namespace_worker()
     identity = cp.execution_identity()
     verify_gate(args, identity)
     stage = Path(os.environ['PS_STAGE_DIR'])
@@ -465,6 +631,13 @@ def run(args: argparse.Namespace) -> None:
             co.score_all(data, args.checkpoint_sha256, identity)
 
 
+
+def check_full_timeout(predicted: float, observed: float, timeout: float) -> None:
+    values = (predicted, observed, timeout)
+    if (any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) or v <= 0 for v in values)
+            or predicted + 1.5 * observed > timeout):
+        raise ValueError('actual readiness and numerical forecast exceed full namespace timeout')
+
 def validate() -> None:
     target = Path(os.environ['PS_VALIDATION_PATH'])
     try:
@@ -479,15 +652,37 @@ def validate() -> None:
         from experiments.tennis import k5d_cpu_accounting as accounting
         spec_data = json.loads((stage.parent / 'spec.json').read_text())
         args = spec_data['arguments']
-        if spec_data['entrypoint'] == ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']:
-            if args.count('--') != 1:
-                raise ValueError('namespace worker separator differs')
-            args = args[args.index('--') + 1:]
+        if spec_data['entrypoint'] != ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']:
+            raise ValueError('readiness validator requires namespace entrypoint')
+        from experiments.jobs.inbox import phase_command
+        dispatch = json.loads((stage / 'dispatch.json').read_text())
+        if dispatch.get('command') != phase_command(spec_data, 'smoke', staged['inputs'], sys.executable):
+            raise ValueError('readiness namespace dispatch differs from specification')
+        if args.count('--') != 1:
+            raise ValueError('namespace worker separator differs')
+        args = args[args.index('--') + 1:]
         if '--accounted-child' in args:
             raise ValueError('fleet command may not bypass CPU wrapper')
-        accounting.read_receipt((stage / 'command.log').read_text(), phase=args[0], stage='smoke',
+        log_text = (stage / 'command.log').read_text()
+        cpu_records = [json.loads(line.removeprefix('K5D_CPU_ACCOUNTING ')) for line in log_text.splitlines()
+                       if line.startswith('K5D_CPU_ACCOUNTING ')]
+        if len(cpu_records) != 1 or cpu_records[0].get('method') != 'linux-pidns-init-waited-rusage-v1':
+            raise ValueError('namespace accounting method required')
+        accounting.read_receipt(log_text, phase=args[0], stage='smoke',
                                 clip=cf.option(args, '--clip'), frames=report['source']['frames'],
                                 identity=cp.execution_identity())
+        # The bounded CPU-only readiness smoke is the actual target-specific
+        # payload measurement. Require its observed complete stage time, with
+        # margin, plus the numerical forecast to fit the effective namespace
+        # deadline before the GPU full stage can start.
+        execution = json.loads((stage / 'execution.json').read_text())
+        observed = execution.get('seconds')
+        receipt_path = next(item['path'] for item in staged['inputs'] if item['name'] == 'cost_receipt')
+        cost_receipt = study.checked_json(Path(receipt_path), cf.option(args, '--cost-receipt-sha256'))
+        predicted = study.forecast(cost_receipt, args[0], report['source']['frames'],
+                                   cost_receipt['cost'][args[0]]['seconds16'])
+        full_timeout = float(spec_data['scale']['namespace_timeout']['full'])
+        check_full_timeout(predicted, observed, full_timeout)
         target.write_text(json.dumps({'passed': True, 'checks': {'full_timeline_and_assets': True,
                                       'strict_frozen_identity': True}}) + '\n')
     except Exception as exc:
@@ -515,10 +710,17 @@ def main() -> None:
     parser.add_argument('action', choices=('prepare', 'score'))
     for name in ('archive', 'balltrack-code', 'balltrack-weight', 'wasb-code', 'wasb-weights', 'wasb-config',
                  'image-ckpt', 'video-ckpt', 'lpips-backbone', 'dists-backbone', 'clip', 'full-gate', 'full-gate-sha256',
-                 'cost-receipt', 'cost-receipt-sha256', 'bridge', 'bridge-sha256', 'calibration-source', 'consumer-source',
+                 'cost-receipt', 'cost-receipt-sha256',
                  'fidelity-gate', 'fidelity-gate-sha256', 'budget-ledger', 'budget-ledger-sha256',
                  'budget-attestation', 'budget-attestation-sha256', 'mode'):
         parser.add_argument('--' + name, required=True)
+    parser.add_argument('--bridge')
+    parser.add_argument('--bridge-sha256')
+    parser.add_argument('--calibration-source')
+    parser.add_argument('--consumer-source')
+    parser.add_argument('--certificate')
+    parser.add_argument('--certificate-microbench')
+    parser.add_argument('--certificate-microbench-audit')
     parser.add_argument('--native-cpu-receipt')
     parser.add_argument('--gpu-parity-receipt')
     parser.add_argument('--study-inventory')

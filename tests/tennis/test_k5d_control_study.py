@@ -170,25 +170,8 @@ def test_confirmation_requires_both_audited_receipts_without_full30_fit(
     parity['all_six_exact'] = True
     gate['release'] = 'full-study'
     data['budget_fits'] = {'gpu': True, 'cpu': True}
-    with pytest.raises(ValueError, match='inventory and noncommand'):
+    with pytest.raises(ValueError, match='compact certificate'):
         control.approved(*args, paths)
-    from experiments.tennis import k5d_study_wave as wave
-    gate.update(full_study_inventory_sha256='i' * 64, noncommand_evidence_sha256='n' * 64)
-    inventory = {clip: {phase: {'state': 'complete', 'receipt_path': str(tmp_path / 'job_receipt'),
-                                 'receipt_sha256': 'r' * 64} for phase in ('prepare', 'score')} for clip in clips}
-    objects['inventory'] = {'inventory': True}
-    objects['noncommand'] = {'samples': True}
-    objects['job_receipt'] = {'job_directory': str(tmp_path / 'job'), 'records': {'spec_sha256': 's' * 64}}
-    objects['spec.json'] = {'arguments': ['--unshare-sha', 'd' * 64]}
-    monkeypatch.setattr(wave, 'inventory', lambda *_: inventory)
-    monkeypatch.setattr(wave, 'verified_noncommand', lambda *_: {'audited': True})
-    monkeypatch.setattr(control, 'programme_projection', lambda *_, **_kwargs: {'gpu': {'fits': True}, 'cpu': {'fits': True}})
-    full_paths = {'inventory': tmp_path / 'inventory', 'noncommand': tmp_path / 'noncommand'}
-    _, frames = control.approved(*args, paths, full_paths)
-    assert frames == 292
-    inventory[clips[0]]['prepare']['state'] = 'pending'
-    with pytest.raises(ValueError, match='all four verified confirmation'):
-        control.approved(*args, paths, full_paths)
 
 
 def test_confirmation_spec_uses_namespace_and_enforces_job_caps(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -257,13 +240,17 @@ def test_qualified_projection_excludes_verified_complete_stages_and_rejects_unde
 
 
 def test_full_study_spec_routes_through_qualified_namespace(tmp_path, monkeypatch):
+    from datetime import datetime, timedelta, timezone
+
     from experiments.jobs import inbox
+    from experiments.tennis import k5d_full_admission as admission
 
     clip = 'tracknet/game9/Clip5'
-    gate = {'release': 'full-study', 'confirmation_qualification': {'unshare_sha256': 'a' * 64}}
-    names = ('full_gate', 'cost_receipt', 'bridge', 'calibration_source', 'consumer_source', 'fidelity_gate',
-             'budget_ledger', 'budget_attestation', 'native_cpu_receipt', 'gpu_parity_receipt',
-             'study_inventory', 'noncommand_evidence')
+    gate = {'release': 'full-study', 'confirmation_qualification': {'unshare_sha256': 'a' * 64},
+            'certificate_validation_reserve_seconds': 2, 'namespace_bootstrap_reserve_seconds': 5,
+            'certificate_sha256': 'b' * 64}
+    names = ('full_gate', 'cost_receipt', 'fidelity_gate', 'budget_ledger', 'budget_attestation',
+             'native_cpu_receipt', 'gpu_parity_receipt', 'certificate', 'certificate_microbench', 'certificate_microbench_audit')
     assets = {name: {'local': str(tmp_path / name), 'remote': '/remote/' + name, 'sha256': 'a' * 64} for name in names}
     monkeypatch.setattr(control.study, 'checked_json', lambda *_: gate)
     monkeypatch.setattr(control, 'approved', lambda *_: ({'cost': {'prepare': {'seconds16': 1}},
@@ -273,16 +260,23 @@ def test_full_study_spec_routes_through_qualified_namespace(tmp_path, monkeypatc
     monkeypatch.setattr(control.cf, 'asset', lambda name, *_args, **_kwargs: {'name': name})
     monkeypatch.setattr(control.cf, 'common_spec', lambda *_: {'scale': {}})
     monkeypatch.setattr(inbox, 'validate_spec', lambda *_: None)
+    future = datetime.now(timezone.utc)
+    deadline = (future + timedelta(minutes=20)).isoformat()
+    monkeypatch.setattr(admission, 'read_certificate', lambda *_: {'valid_until': (future + timedelta(minutes=30)).isoformat()})
     base = {'arguments': [], 'device': 'gpu', 'cpu_threads': 1, 'single_cpu_campaign': True,
             'gpu_sharing': {'mode': 'exclusive'}, 'contention': {'policy': 'stop', 'resume_attempts': 0}}
     result = control.spec(base, phase='prepare', clip=clip, identity={}, assets=assets,
-                          deadline='later', readiness_seconds=20, full_seconds=100, campaign_seconds=150)
+                          deadline=deadline, readiness_seconds=20, full_seconds=100, campaign_seconds=150)
     assert result['entrypoint'] == ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']
-    for option in ('--native-cpu-receipt', '--gpu-parity-receipt', '--study-inventory', '--noncommand-evidence'):
+    for option in ('--native-cpu-receipt', '--gpu-parity-receipt', '--certificate', '--certificate-microbench', '--certificate-microbench-audit'):
         assert option in result['arguments']
+    monkeypatch.setattr(control.study, 'forecast', lambda *_: 88)
+    with pytest.raises(ValueError, match='actual namespace timeout'):
+        control.spec(base, phase='prepare', clip=clip, identity={}, assets=assets,
+                     deadline=deadline, readiness_seconds=20, full_seconds=100, campaign_seconds=150)
     with pytest.raises(ValueError, match='invalid readiness/full campaign bounds'):
         control.spec(base, phase='prepare', clip=clip, identity={}, assets=assets,
-                     deadline='later', readiness_seconds=20, full_seconds=100, campaign_seconds=2701)
+                     deadline=deadline, readiness_seconds=20, full_seconds=100, campaign_seconds=2701)
 
 
 def test_budget_reconciles_active_reservations_and_parent_charges_once():
@@ -307,3 +301,193 @@ def test_budget_reconciles_active_reservations_and_parent_charges_once():
     attestation['active_reservations']['active']['gpu'] = 0
     with pytest.raises(ValueError, match='active reservation attestation'):
         control.check_budget(ledger, attestation, 'a' * 64, 'b' * 64, data)
+
+
+def test_main_accounted_child_passes_normalized_arguments_to_worker(monkeypatch):
+    import sys
+
+    args = ['prepare', '--frames', '292']
+    monkeypatch.setattr(sys, 'argv', ['k5d_control_study', '--accounted-child', *args])
+    monkeypatch.setattr('argparse.ArgumentParser.parse_args', lambda _self: type('Args', (), {
+        'action': 'prepare', 'frames': 292, 'checkpoint': None, 'checkpoint_sha256': None})())
+    called = []
+    def actual_worker(_args):
+        control.validate_namespace_child_argv(sys.argv[1:], args)
+        called.append(True)
+    monkeypatch.setattr(control, 'run', actual_worker)
+    control.main()
+    assert called == [True]
+    with pytest.raises(ValueError, match='arguments differ'):
+        control.validate_namespace_child_argv(['prepare', '--frames', '586'], args)
+
+
+def test_namespace_parent_must_be_exact_init_module_and_arguments():
+    import sys
+
+    expected = [sys.executable, '-m', 'experiments.tennis.k5d_scoped_namespace', 'outer',
+                '--timeout', '60', '--', 'prepare', '--frames', '292']
+    tail = ['prepare', '--frames', '292']
+    parent = [sys.executable, '-m', 'experiments.tennis.k5d_scoped_namespace', 'inner',
+              '--outside', 'pid:[111]', '--timeout', '60.0', '--', *tail]
+    control.validate_namespace_parent(parent, [['4321', '1']], 'pid:[222]', 'pid:[222]', expected, tail)
+    fake = parent.copy()
+    fake[2] = 'experiments.tennis.k5d_other_init'
+    with pytest.raises(ValueError, match='namespace init'):
+        control.validate_namespace_parent(fake, [['4321', '1']], 'pid:[222]', 'pid:[222]', expected, tail)
+    with pytest.raises(ValueError, match='namespace init'):
+        control.validate_namespace_parent(parent, [['4321', '1']], 'pid:[222]', 'pid:[333]', expected, tail)
+
+
+def test_effective_namespace_timeout_includes_observed_readiness():
+    control.check_full_timeout(80, 6, 90)
+    with pytest.raises(ValueError, match='namespace timeout'):
+        control.check_full_timeout(82, 6, 90)
+    with pytest.raises(ValueError, match='namespace timeout'):
+        control.check_full_timeout(80, float('nan'), 90)
+
+
+def test_compact_certificate_pins_target_qualification_and_recomputes_budget(tmp_path, monkeypatch):
+    import hashlib
+    import json
+    from datetime import datetime, timedelta, timezone
+    from experiments.tennis import k5d_full_admission as admission
+
+    identity = {'source_sha256': 'a' * 64, 'snapshot_sha256': 'b' * 64, 'environment_sha256': 'c' * 64}
+    selected = {'tracknet/game9/Clip5': {'label_rows': 292}, 'tracknet/game10/Clip12': {'label_rows': 586},
+                'tracknet/game8/Clip1': {'label_rows': 100}}
+    monkeypatch.setattr(admission.study, 'selection', lambda: selected)
+    forecast = {'gpu': {'fits': True, 'incremental_seconds': 10}, 'cpu': {'fits': True, 'incremental_seconds': 10}}
+    monkeypatch.setattr(control, 'programme_projection', lambda *_args, **_kwargs: forecast)
+    native, parity = tmp_path / 'native.json', tmp_path / 'parity.json'
+    native.write_text('{}')
+    parity.write_text(json.dumps({'namespace_bootstrap_seconds': 1, 'namespace_bootstrap_audited': True}))
+    def sha(path):
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+    q = {'native_cpu_receipt_sha256': sha(native), 'gpu_parity_receipt_sha256': sha(parity)}
+    def entry(job):
+        return {'job_id': job, 'receipt_sha256': 'e' * 64, 'independent_audit_sha256': 'f' * 64,
+                'publications': {'smoke': {'sha256': '1' * 64}, 'full': {'sha256': '2' * 64}}}
+    completed = {c: {'prepare': entry('20261105T000000Z-11111111'),
+                     'score': entry('20261105T000001Z-22222222')} for c in list(selected)[:2]}
+    now = datetime.now(timezone.utc)
+    receipt = dict.fromkeys(admission.COST_CORE_KEYS, 'immutable')
+    cert = {'schema': 1, 'scope': 'server-side full raw admission audit; root must review exact SHA',
+            'selection_sha256': admission.fleet.SOURCE_SHA, 'execution_identity': identity,
+            'cost_sha256': '3' * 64, 'cost_core_sha256': admission.cost_core_sha256(receipt),
+            'ledger_sha256': '4' * 64, 'attestation_sha256': '5' * 64, 'qualification': q,
+            'targets': {'tracknet/game8/Clip1': {'prepare': {'state': 'pending', 'frames': 100}}},
+            'pending': [['tracknet/game8/Clip1', 'prepare'], ['tracknet/game8/Clip1', 'score']],
+            'blocked_targets': [], 'completed': completed, 'cpu_models': {}, 'noncommand': {}, 'forecast': forecast,
+            'authored_at': now.isoformat(), 'valid_until': (now + timedelta(hours=2)).isoformat()}
+    gate = {'schema': 1, 'approved': True, 'release': 'full-study', 'purpose': 'full-retrospective-benchmark-cpu-readiness',
+            'selection_sha256': admission.fleet.SOURCE_SHA, 'consumer_execution_identity': identity,
+            'gpu_models': ['RTX A6000'], 'gpu_capability': [8, 6], 'fidelity_only_for_unqualified': True,
+            'cost_receipt_sha256': '3' * 64, 'confirmation_qualification': q,
+            'allowed_clips': ['tracknet/game8/Clip1'], 'namespace_bootstrap_reserve_seconds': 5}
+    paths = {'native_cpu': native, 'gpu_parity': parity}
+    admission.check_certificate(cert, gate, identity, 'tracknet/game8/Clip1', 'prepare', '3' * 64, '4' * 64, '5' * 64, paths, receipt)
+    with pytest.raises(ValueError, match='target is not certified pending'):
+        admission.check_certificate(cert, gate, identity, 'tracknet/game8/Clip1', 'score', '3' * 64, '4' * 64, '5' * 64, paths, receipt)
+    cert['forecast']['cpu']['fits'] = False
+    with pytest.raises(ValueError, match='budget differs'):
+        admission.check_certificate(cert, gate, identity, 'tracknet/game8/Clip1', 'prepare', '3' * 64, '4' * 64, '5' * 64, paths, receipt)
+
+
+def test_certificate_cost_core_allows_budget_changes_but_not_science_changes():
+    from experiments.tennis import k5d_full_admission as admission
+
+    a = dict.fromkeys(admission.COST_CORE_KEYS, 'same')
+    a.update(budget_ledger_sha256='a' * 64, programme={'cpu': 1})
+    b = {**a, 'budget_ledger_sha256': 'b' * 64, 'programme': {'cpu': 2}}
+    assert admission.cost_core_sha256(a) == admission.cost_core_sha256(b)
+    b['cost'] = 'changed'
+    assert admission.cost_core_sha256(a) != admission.cost_core_sha256(b)
+
+
+def test_persistent_target_claim_prevents_duplicate(tmp_path, monkeypatch):
+    from experiments.tennis import k5d_full_admission as admission
+
+    monkeypatch.setattr(admission, 'DATA_ROOT', tmp_path)
+    cert = {'execution_identity': {'source_sha256': 'a' * 64}}
+    admission.target_claim(cert, 'b' * 64, 'clip', 'prepare', 'job1')
+    admission.target_claim(cert, 'b' * 64, 'clip', 'prepare', 'job1')
+    with pytest.raises(ValueError, match='already claimed'):
+        admission.target_claim(cert, 'b' * 64, 'clip', 'prepare', 'job2')
+
+
+def test_full_score_spec_uses_exact_remote_certificate_producer_without_local_archive(tmp_path, monkeypatch):
+    from datetime import datetime, timedelta, timezone
+    from experiments.jobs import inbox
+    from experiments.tennis import k5d_full_admission as admission
+
+    clip = 'tracknet/game8/Clip1'
+    remote = '/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T000000Z-11111111/full/published.tar'
+    producer = {'remote': remote, 'archive_sha256': 'a' * 64, 'checkpoint_sha256': 'b' * 64}
+    future = datetime.now(timezone.utc)
+    gate = {'release': 'full-study', 'confirmation_qualification': {'unshare_sha256': 'a' * 64},
+            'certificate_validation_reserve_seconds': 2, 'namespace_bootstrap_reserve_seconds': 5,
+            'certificate_sha256': 'c' * 64}
+    names = ('full_gate', 'cost_receipt', 'fidelity_gate', 'budget_ledger', 'budget_attestation',
+             'native_cpu_receipt', 'gpu_parity_receipt', 'certificate', 'certificate_microbench', 'certificate_microbench_audit')
+    assets = {name: {'local': str(tmp_path / name), 'remote': '/remote/' + name, 'sha256': 'a' * 64} for name in names}
+    assets['checkpoint'] = {'remote': remote, 'sha256': 'a' * 64, 'archive_sha256': 'a' * 64,
+                            'checkpoint_sha256': 'b' * 64}
+    monkeypatch.setattr(control.study, 'checked_json', lambda *_: gate)
+    monkeypatch.setattr(control, 'approved', lambda *_: ({'cost': {'score': {'seconds16': 1}},
+        'programme': {r: {'failed_start_reserve_seconds': 500, 'noncommand_groups': {'whole': 5}}
+                      for r in ('gpu', 'cpu')}}, 100))
+    monkeypatch.setattr(control.study, 'forecast', lambda *_: 1)
+    monkeypatch.setattr(control.cf, 'asset', lambda name, *_args, **_kwargs: {'name': name})
+    monkeypatch.setattr(control.cf, 'common_spec', lambda _base, extra, _deadline: {'scale': {}, 'extra': extra})
+    monkeypatch.setattr(inbox, 'validate_spec', lambda *_: None)
+    monkeypatch.setattr(admission, 'read_certificate', lambda *_: {'valid_until': (future + timedelta(minutes=30)).isoformat(),
+        'targets': {clip: {'score': {'producer': producer}}}})
+    base = {'arguments': [], 'device': 'gpu', 'cpu_threads': 1, 'single_cpu_campaign': True,
+            'gpu_sharing': {'mode': 'exclusive'}, 'contention': {'policy': 'stop', 'resume_attempts': 0}}
+    result = control.spec(base, phase='score', clip=clip, identity={}, assets=assets,
+                          deadline=(future + timedelta(minutes=20)).isoformat(), readiness_seconds=20,
+                          full_seconds=100, campaign_seconds=150)
+    checkpoint = next(item for item in result['extra'] if item['name'] == 'checkpoint')
+    assert checkpoint == {'name': 'checkpoint', 'path': remote, 'sha256': 'a' * 64, 'extract': True}
+    assets['checkpoint']['checkpoint_sha256'] = 'd' * 64
+    with pytest.raises(ValueError, match='certified producer'):
+        control.spec(base, phase='score', clip=clip, identity={}, assets=assets,
+                     deadline=(future + timedelta(minutes=20)).isoformat(), readiness_seconds=20,
+                     full_seconds=100, campaign_seconds=150)
+
+
+def test_forecast_owned_reservation_is_counted_once_across_advance():
+    ledger = {'reservation_amount_basis': 'remaining_unspent', 'gpu_total_seconds': 1000, 'cpu_total_seconds': 1000,
+              'workstreams': {'ball': {'gpu_limit_seconds': 800, 'cpu_limit_seconds': 800}},
+              'charges': [{'phase': 'prior', 'workstream': 'ball', 'gpu_seconds': 100, 'cpu_seconds': 100}],
+              'reservations': [{'phase': 'full', 'workstream': 'ball', 'status': 'running', 'gpu_seconds': 600, 'cpu_seconds': 600},
+                               {'phase': 'other', 'workstream': 'w8', 'status': 'running', 'gpu_seconds': 100, 'cpu_seconds': 100}]}
+    active = {'full': {'workstream': 'ball', 'gpu': 600, 'cpu': 600},
+              'other': {'workstream': 'w8', 'gpu': 100, 'cpu': 100}}
+    att = {'reviewed': True, 'ledger_sha256': 'a' * 64, 'active_reservations_reconciled': True,
+           'active_reservations': active, 'forecast_covered_reservation_phases': ['full']}
+    for r in ('gpu', 'cpu'):
+        att[r] = {'ball_charged_seconds': 100, 'global_charged_seconds': 100, 'ball_limit_seconds': 800,
+                  'spent_and_reserved_seconds': 700, 'global_remaining_seconds': 800}
+    data = receipt()
+    data.update(budget_ledger_sha256='a' * 64, budget_attestation_sha256='b' * 64,
+                forecast_covered_reservation_phases=['full'])
+    for r in ('gpu', 'cpu'):
+        data['programme'][r].update(ball_remaining_seconds=700, global_remaining_seconds=800)
+    control.check_budget(ledger, att, 'a' * 64, 'b' * 64, data)
+    control.check_forecast_allocation(att, {r: {'incremental_seconds': 600} for r in ('gpu', 'cpu')})
+    ledger['charges'].append({'phase': 'part', 'parent_phase': 'full', 'workstream': 'ball', 'gpu_seconds': 100, 'cpu_seconds': 100})
+    for r in ('gpu', 'cpu'):
+        ledger['reservations'][0][r + '_seconds'] = 500
+        active['full'][r] = 500
+        att[r].update(ball_charged_seconds=200, global_charged_seconds=200,
+                      spent_and_reserved_seconds=700, global_remaining_seconds=700)
+        data['programme'][r].update(ball_remaining_seconds=600, global_remaining_seconds=700)
+    control.check_budget(ledger, att, 'a' * 64, 'b' * 64, data)
+    control.check_forecast_allocation(att, {r: {'incremental_seconds': 500} for r in ('gpu', 'cpu')})
+    with pytest.raises(ValueError, match='reserved allocation'):
+        control.check_forecast_allocation(att, {r: {'incremental_seconds': 501} for r in ('gpu', 'cpu')})
+    att['forecast_covered_reservation_phases'] = ['full', 'other']
+    data['forecast_covered_reservation_phases'] = ['full', 'other']
+    with pytest.raises(ValueError, match='active ball allocation'):
+        control.check_budget(ledger, att, 'a' * 64, 'b' * 64, data)
