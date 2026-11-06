@@ -2330,6 +2330,25 @@
       "local_batch_record": "/private/tmp/w8-gvc-queue-batch-20261106.json",
       "wait_handle": 22463,
       "wait_max_seconds": 2000
+    },
+    {
+      "job_id": "20261106T005828Z-fdb5ed8f",
+      "phase": "k5d-scale-first-tranche-20261105",
+      "subphase": "native-pidfd-repair1-927a-20261106",
+      "state": "published pending; actual snapshot and HEAD match; expected source tree awaits ready/dispatch audit",
+      "revision": "15c6c48e484b8681323fae5ab864910e5d8c122a",
+      "snapshot_sha256": "4bf9f93c6c3eb038efc3617697db2c3383ca5ec42521dd306ddef3be443c3e46",
+      "expected_source_sha256": "46c23588ba8cdafe305604645099691622c43b8e8438fe3e3a721b8aeb30c688",
+      "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "spec_sha256": "628e2c145dfa9ff47511d47a652e5d7a994638fb3803baa7ff5b9d0558d0d6e7",
+      "deadline": "2026-11-06T01:36:00Z",
+      "campaign_cpu_ceiling": 100,
+      "post_audit_cpu_ceiling": 30,
+      "repair_inclusive_cpu_ceiling": 220,
+      "gpu_ceiling": 0,
+      "wait_handle": 35830,
+      "wait_max_seconds": 150,
+      "wait_output": "/private/tmp/pointstream-k5d-native-proof-927a-wait-20261106.json"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -2350,10 +2369,11 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "W8andGVCfreshqueues submitted/onecombined2000sps-fleetwait22463. BallsourceuploadPASSED; freshCPUproofprechecks underway,IDnotyetreceived. PR341OPENautoMERGEenabledatf9bb; configuredchecksallpass927a.",
+    "state": "NativeCPUproof fdb5ed8f submitted/ONE150swait35830; W8/GVCfreshqueues ONEcombined2000swait22463; allowneddelegates,noextra polling/replays. PR341MERGED200d1fea,CI42140212893SUCCESS; origin/main integrated. NoGPUparity/full30qualityrelease.",
     "jobs": [
       "20261106T005057Z-77c276fa",
-      "20261106T005107Z-0202f092"
+      "20261106T005107Z-0202f092",
+      "20261106T005828Z-fdb5ed8f"
     ],
     "batches": [
       {
@@ -2362,6 +2382,13 @@
         "wait_handle": 22463,
         "max_seconds": 2000,
         "deadline": "2026-11-06T01:22:28Z"
+      },
+      {
+        "scope": "nativeCPUproof927a",
+        "wait_handle": 35830,
+        "max_seconds": 150,
+        "job_id": "20261106T005828Z-fdb5ed8f",
+        "result": "/private/tmp/pointstream-k5d-native-proof-927a-wait-20261106.json"
       }
     ],
     "native_completion_resume_verified": false,

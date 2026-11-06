@@ -1,3 +1,11 @@
+# Active native proof and merged code checkpoint
+
+PR341 **MERGED** at00:58:36UTC as **200d1fea92893a30373fb5acd27d3e1f45fbf4d1**, CI42140212893SUCCESS. origin/main fetched and integrated on scoped branch; laterjob/accountingrecords remainfollowupmetadata. Actualsource/mathunchangedsince927a. Do notredo configuredchecks withoutcodechange/newconcern.
+
+Native CPU repair **20261106T005828Z-fdb5ed8f** submitted on gpu2CPU0, actualHEAD15c6c48e/archive4bf9 matchreview; expectedtree46c2 awaitsready/dispatchaudit. Final normalizedspec **628e2c145dfa9ff47511d47a652e5d7a994638fb3803baa7ff5b9d0558d0d6e7**, deadline**01:36UTC**. Delegateball_scale_finish owns ONEcanonical150s wait **35830**, output `/private/tmp/pointstream-k5d-native-proof-927a-wait-20261106.json`; submissionclient86581, receipt `/private/tmp/pointstream-k5d-native-proof-927a-submit-20261106.json`. Repair1CPU220includes90alreadycharged +future100campaign/30audit nestedinballremaining10,450;0GPU. All4actualnativecases/normalCPUcounterjoin/source/spec/env/ownedPIDclaimteardown/events mustpassbeforeGPU16parityrootrelease. Noautomaticretry.
+
+FreshW8 **77c276fa** andGVCQP9 **0202f092** stillownedbydecoder_cost_finish's ONEcombinedwait22463 todeadline01:22:28UTC; no duplicatepolling. Ledgercharged17,682GPU/35,110CPU; openball9000GPU10450CPU, W8900GPU1050CPU, GVC900GPU950CPU, allREMAINING_UNSPENT. NoGPUparity/full30/fresh30stepwitnessrelease. Manuscript/PRESLEYunchanged. Olderjobstatesbelowaresnapshots.
+
 # Live research checkpoint — November6 UTC, November5 local
 
 Charged **17,682 GPU /35,110 CPU seconds** of approved24GPUh/28CPUh. Open REMAINING_UNSPENT aggregate rows: ball9,000GPU/10,450CPU; W8900GPU/1,050CPU; GVC900GPU/950CPU. Do not subtract charged phase costs again. Paper/PRESLEY untouched.
