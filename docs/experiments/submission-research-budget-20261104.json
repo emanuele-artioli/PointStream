@@ -949,6 +949,33 @@
       "cpu_seconds": 160,
       "release_stage": "research-first24/28",
       "basis": "Rootconservative130CPU wholeone-core supervisorbirth1793926741.19\u2192canonicalterminal1793926861.887658=120.697658wall upper +30CPUindependentaudit. Prior40capability+50prep=90chargedseparately; nativeleaf250CPUtotal. Earlier220forecast preserved, accountingallowance increased30CPU insideunchangedfirsttranche, no additionalGPU/userceiling. Actual normalouter2.363826/PID1+children2.240979CPU; completeadministrativeCPUnotmetered, cap100campaignwasnotwholelifecyclebound. Rootverified18rawblobSHA/ready/spec/source/fourcauses/19PIDabsence/claims/ACK; scope nativeCPUmechanics only."
+    },
+    {
+      "phase": "w8-paired-cost-bounded-queue-20261105-closure",
+      "parent_phase": "w8-paired-cost-bounded-queue-20261105",
+      "workstream": "w8",
+      "gpu_seconds": 400,
+      "cpu_seconds": 550,
+      "release_stage": "research-first24/28",
+      "basis": "W8wholeexclusiveGPUhold365.666\u2192400GPU, noarchivedattempts. Wholeinheritedonecore400CPU +50remainingexternal+100postaudit=550future,prior50prep =>600inclusive. Rootexactreceipt/scientific/terminalreviewaccepted; allownedPIDs/claimsabsent/eventsACK. Inheritedaffinityandexternalcapsconservative\u2014notmeasuredaggregate; cumulativechildCPUnotadded."
+    },
+    {
+      "phase": "gvcrt-qp9-bounded-queue-20261105-closure",
+      "parent_phase": "gvcrt-qp9-bounded-queue-20261105",
+      "workstream": "ego_peer_oracles",
+      "gpu_seconds": 200,
+      "cpu_seconds": 400,
+      "release_stage": "research-first24/28",
+      "basis": "GVCfinalGPUhold180.541+twoCPUadmissionfailureholds0.755=181.296\u2192200GPU;thirdGPUreject0GPU. Wholeonecore200CPU+priorattempts10+remainingexternal/audit150+rounding40=400future,prior50prep=>450inclusive. Rootexactreceipt/scientific/terminalreviewaccepted; allownedPIDs/claimsabsent/eventsACK. Inheritedaffinityandexternalcapsconservative\u2014notmeasuredaggregate; cumulativechildCPUnotadded."
+    },
+    {
+      "phase": "k5d-parity16-preflight-blocked-20261106",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "release_stage": "research-first24/28",
+      "basis": "Full50CPUprospectivemetadataallowancecharged: accepted16archiveactualSHAretrieval, nativeCPUreceiptsharednewupload/hash, fidelity/host/cachechecks. RealfrozenbuilderfailedcanonicalfleetentrypointAPIbeforeGPU; nojob/source/profilevariation. Preserverefassets/oldproof; correctiona2f7requiresnewCPUproof/sourceidentity."
     }
   ],
   "reservations": [
@@ -1467,8 +1494,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 9000,
-      "cpu_seconds": 10290,
-      "status": "NativeCPUfdb5rootACCEPTED exact4bf9/46c2/15c6/env32e andallfouractualcauses/CPUcounter/19PIDclaimcleanup; leaf250CPUcharged(40capability50prep130lifecycle30audit), revisedfrom220historicalforecastinsideunchangedtranche. NextGPU16parity1000GPU1200CPU prospectiveonly; noGPUreleaseuntilactualspec/inputs/wholecostreview. Full30NOTadmitted."
+      "cpu_seconds": 10240,
+      "status": "Old15c6nativeproofaccepted; GPUparitypreflightblockedinvalid3elemententrypoint(noGPU),50CPUcharged. Minimalcanonical2element+outerargfixa2f7reviewed, realvalidate_spec regressions/H2+25focused60PASS4skip/mypy494PASS. Newsource d056/92fb/5f2c wrapperdc909 needsfreshCPUproof. Prospective300CPU(50prep220wholelifecycle30audit), noGPU, withinunchangedtranche; rootfinalsource/specpreflightreleasepending."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -1506,17 +1533,17 @@
       "phase": "w8-paired-cost-bounded-queue-20261105",
       "workstream": "w8",
       "release_stage": "research-first24/28",
-      "gpu_seconds": 900,
-      "cpu_seconds": 1050,
-      "status": "Root RELEASES one fresh immutable-source bounded exclusive queue attempt after actual spec validation and only deadline/epoch diff vs prior actual request; fresh host/worker/claims/cache/deadline check at submit. No automatic resume/replay, no full30decoder quality witness. Remaining values include stage/admin/external audit caps; oldfailedattempts alreadycharged."
+      "gpu_seconds": 500,
+      "cpu_seconds": 500,
+      "status": "closed; rootaccepted20261106T005057Z-77c276fa; charged400GPU/600CPUinclusiveinclprior50prep, unusedvaluesreleased. No30stepfullwitnessauthority; GVCfixedpointstudyclosedscope16frames."
     },
     {
       "phase": "gvcrt-qp9-bounded-queue-20261105",
       "workstream": "ego_peer_oracles",
       "release_stage": "research-first24/28",
-      "gpu_seconds": 900,
-      "cpu_seconds": 950,
-      "status": "Root RELEASES one fresh immutable-source bounded exclusive queue attempt after actual spec validation and only deadline/epoch diff vs prior actual request; fresh host/worker/claims/cache/deadline check at submit. No automatic resume/replay, no full30decoder quality witness. Remaining values include stage/admin/external audit caps; oldfailedattempts alreadycharged."
+      "gpu_seconds": 700,
+      "cpu_seconds": 550,
+      "status": "closed; rootaccepted20261106T005107Z-0202f092; charged200GPU/450CPUinclusiveinclprior50prep, unusedvaluesreleased. No30stepfullwitnessauthority; GVCfixedpointstudyclosedscope16frames."
     }
   ],
   "jobs": [
@@ -2315,7 +2342,7 @@
     {
       "job_id": "20261106T005057Z-77c276fa",
       "phase": "w8-paired-cost-bounded-queue-20261105",
-      "state": "pending at submit receipt; one combined canonical wait delegated",
+      "state": "complete; root accepted scoped result; allownPIDs/claims absent/eventsACK",
       "revision": "04c6e22b85554d660b6a33d735d875f1df7530ca",
       "snapshot_sha256": "e66ed9c7f02835a719cf8f5defbdbf67785cd08f55011dd26239c724212bef90",
       "spec_sha256": "f6acfa4cd52e212698842cb3c728060519c1488731671704204b93e48f3a6b5d",
@@ -2324,12 +2351,15 @@
       "gpu_ceiling": 900,
       "local_batch_record": "/private/tmp/w8-gvc-queue-batch-20261106.json",
       "wait_handle": 22463,
-      "wait_max_seconds": 2000
+      "wait_max_seconds": 2000,
+      "source_sha256": "727aaedd8b6783302bd83f1a24d1ea44bade54a8166846a396bd6ea1e622d077",
+      "terminal_charged_gpu_seconds": 400,
+      "phase_total_cpu_seconds": 600
     },
     {
       "job_id": "20261106T005107Z-0202f092",
       "phase": "gvcrt-qp9-bounded-queue-20261105",
-      "state": "pending at submit receipt; one combined canonical wait delegated",
+      "state": "complete; root accepted scoped result; allownPIDs/claims absent/eventsACK",
       "revision": "e6e0b530aebc84b1a73ef6200b7fc24db7f28c21",
       "snapshot_sha256": "cde9046414f4412a92652b11c0c75ac7a4965e7843badb65a1f449b3368ae7ff",
       "spec_sha256": "ad5422963054df3d61d177fb6b02df2803070fb397516692e23701216afff052",
@@ -2338,7 +2368,10 @@
       "gpu_ceiling": 900,
       "local_batch_record": "/private/tmp/w8-gvc-queue-batch-20261106.json",
       "wait_handle": 22463,
-      "wait_max_seconds": 2000
+      "wait_max_seconds": 2000,
+      "source_sha256": "a4f3b2d25a7d9c9d38b30761d1cb187fc9b63d60ccf33ba7972b106b95ba1558",
+      "terminal_charged_gpu_seconds": 200,
+      "phase_total_cpu_seconds": 450
     },
     {
       "job_id": "20261106T005828Z-fdb5ed8f",
@@ -2382,23 +2415,12 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "NativeCPUproofcomplete/rootaccepted/charged/noGPU. W8paired77c276faCOMPLETEauditing, GVCQP90202f092RUNNINGatmeaningfulcheckpoint; delegatecollects/audits thenONEremainingjobwait asneeded. GPU16paritypreparationonly.",
-    "jobs": [
-      "20261106T005057Z-77c276fa",
-      "20261106T005107Z-0202f092"
-    ],
-    "batches": [
-      {
-        "scope": "freshW8paired+GVCQP9",
-        "record": "/private/tmp/w8-gvc-queue-batch-20261106.json",
-        "wait_handle": 22463,
-        "max_seconds": 2000,
-        "deadline": "2026-11-06T01:22:28Z"
-      }
-    ],
+    "state": "No active fleet jobs/waits: W8paired77c andGVCQP90202complete/rootaccepted/charged, nativefdbcompleteacceptedoldsource. Newcanonicalentrypointa2f7sourceproofpending; configuredchecksnewcode runninglocal65331. FullW8proposal CPUstructureoracle notyetreleased; noGPUparity/full30/freshwitness.",
+    "jobs": [],
+    "batches": [],
     "native_completion_resume_verified": false,
     "recurring_llm_polling": false,
-    "completed": false
+    "completed": true
   },
   "approval_history": [
     {
