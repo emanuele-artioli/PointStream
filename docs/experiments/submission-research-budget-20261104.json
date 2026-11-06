@@ -940,6 +940,15 @@
       "cpu_seconds": 50,
       "release_stage": "research-first24/28",
       "basis": "Entire50CPU source-preparation allowance charged; unique4bf9 fullsourceupload24.331wall, newregularnonsymlink16373760B/SHAverified/inode5854917/noownuploader. Freshpostuploadhost/tool/source/deadline checks included. Wall notCPUmeasurement; noGPU/nativejobyet. Repair1future100campaign+30audit remainnested."
+    },
+    {
+      "phase": "k5d-native-pid-fdb5-closure-20261106",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 160,
+      "release_stage": "research-first24/28",
+      "basis": "Rootconservative130CPU wholeone-core supervisorbirth1793926741.19\u2192canonicalterminal1793926861.887658=120.697658wall upper +30CPUindependentaudit. Prior40capability+50prep=90chargedseparately; nativeleaf250CPUtotal. Earlier220forecast preserved, accountingallowance increased30CPU insideunchangedfirsttranche, no additionalGPU/userceiling. Actual normalouter2.363826/PID1+children2.240979CPU; completeadministrativeCPUnotmetered, cap100campaignwasnotwholelifecyclebound. Rootverified18rawblobSHA/ready/spec/source/fourcauses/19PIDabsence/claims/ACK; scope nativeCPUmechanics only."
     }
   ],
   "reservations": [
@@ -1458,8 +1467,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 9000,
-      "cpu_seconds": 10450,
-      "status": "Rootfreeze15c6/4bf9/source46c2/env32e accepted, uniqueGPU5sourcecacheuploadPASSED24.331wall/SHA/16373760B/regular/noownuploader;50CPUprepcharged. Repair1cumulative90CPU(40capability+50prep),future100CPUcampaign+30audit remainnested inballremaining. ConditionalONEfresh100CPUproof70/10/5afterfreshchecks/deadlineonlyrefresh;noGPU/full30release."
+      "cpu_seconds": 10290,
+      "status": "NativeCPUfdb5rootACCEPTED exact4bf9/46c2/15c6/env32e andallfouractualcauses/CPUcounter/19PIDclaimcleanup; leaf250CPUcharged(40capability50prep130lifecycle30audit), revisedfrom220historicalforecastinsideunchangedtranche. NextGPU16parity1000GPU1200CPU prospectiveonly; noGPUreleaseuntilactualspec/inputs/wholecostreview. Full30NOTadmitted."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -2335,7 +2344,7 @@
       "job_id": "20261106T005828Z-fdb5ed8f",
       "phase": "k5d-scale-first-tranche-20261105",
       "subphase": "native-pidfd-repair1-927a-20261106",
-      "state": "published pending; actual snapshot and HEAD match; expected source tree awaits ready/dispatch audit",
+      "state": "complete; root accepted actual four-case nativeCPU proof; allownPID/claim absent, terminal event ACK; noGPU",
       "revision": "15c6c48e484b8681323fae5ab864910e5d8c122a",
       "snapshot_sha256": "4bf9f93c6c3eb038efc3617697db2c3383ca5ec42521dd306ddef3be443c3e46",
       "expected_source_sha256": "46c23588ba8cdafe305604645099691622c43b8e8438fe3e3a721b8aeb30c688",
@@ -2348,7 +2357,10 @@
       "gpu_ceiling": 0,
       "wait_handle": 35830,
       "wait_max_seconds": 150,
-      "wait_output": "/private/tmp/pointstream-k5d-native-proof-927a-wait-20261106.json"
+      "wait_output": "/private/tmp/pointstream-k5d-native-proof-927a-wait-20261106.json",
+      "source_sha256": "46c23588ba8cdafe305604645099691622c43b8e8438fe3e3a721b8aeb30c688",
+      "closure_cpu_seconds": 160,
+      "root_accepted_receipt_sha256": "d588681ccc93d7c89ced7e3c7e6edcb324ae9bf3aecc9e74e3375a94250bf44c"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -2365,15 +2377,15 @@
     "RootCPUproofsubcap100\u2192150withinGVC2200, noaggregate/workstreamincrease; 20readinesscharged, futureproof130inclusive. Remaining2180CPUopenGVCaggregateincludesit\u2014nodooublecount.",
     "Userresourcequestionpending20261105: canuserarrange~1hexclusiveAdaongpu5orpreferboundedqueues? Raisedafter64efforeigncontention; independentball/GVCcontinue. NoW8retryauthorizedwhileawaitingcapacitydecision. Localconfiguredsoftwarechecks07f8Ruff/mypy542PASS/pytest1898pass37skip1docformatfailure; docfixed/focused3PASS, CIpublicationnext. Ordinarysoftwarechecksnotnewinferencechargespercard.",
     "AUTHORITATIVERESERVATIONSEMANTICS: everyopenreservationamountisREMAINING_UNSPENT; rootreducesitwhenchargesareadded. Sumcurrentopenamountsdirectly; NEVERsubtractphase/parentchargesagain. Closedhistoricalrowsignored. Auditedattestationmustmatchexactactivephase\u2192remainingmapping.",
-    "User20261105resourceanswer: Keep using bounded fleet queues. Root opens ONEfresh W8paired900GPU1100CPU and ONEfreshGVCQP9 900GPU1000CPU inclusive; metadata<=50CPUeach first, rootreleasepending, no changedsource/math/gates orfullwitness. Prior64ef/2f65contendedattemptsclosedandpreserved. Allremaining_unspent semantics unchanged."
+    "User20261105resourceanswer: Keep using bounded fleet queues. Root opens ONEfresh W8paired900GPU1100CPU and ONEfreshGVCQP9 900GPU1000CPU inclusive; metadata<=50CPUeach first, rootreleasepending, no changedsource/math/gates orfullwitness. Prior64ef/2f65contendedattemptsclosedandpreserved. Allremaining_unspent semantics unchanged.",
+    "Rootnativeproofaccountingamendment20261106: original220CPUleafprospectiveforecastwasnotprovencompletebecausemanager/publicationpostcampaignnotmetered. Wholeone-core120.698wallupper\u2192130CPU+30audit revisesleaf250CPU including90prior, allinsideunchangedballtranche/programme/workstream. No newGPU/computation oruserceilingincrease."
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "NativeCPUproof fdb5ed8f submitted/ONE150swait35830; W8/GVCfreshqueues ONEcombined2000swait22463; allowneddelegates,noextra polling/replays. PR341MERGED200d1fea,CI42140212893SUCCESS; origin/main integrated. NoGPUparity/full30qualityrelease.",
+    "state": "NativeCPUproofcomplete/rootaccepted/charged/noGPU. W8paired77c276faCOMPLETEauditing, GVCQP90202f092RUNNINGatmeaningfulcheckpoint; delegatecollects/audits thenONEremainingjobwait asneeded. GPU16paritypreparationonly.",
     "jobs": [
       "20261106T005057Z-77c276fa",
-      "20261106T005107Z-0202f092",
-      "20261106T005828Z-fdb5ed8f"
+      "20261106T005107Z-0202f092"
     ],
     "batches": [
       {
@@ -2382,13 +2394,6 @@
         "wait_handle": 22463,
         "max_seconds": 2000,
         "deadline": "2026-11-06T01:22:28Z"
-      },
-      {
-        "scope": "nativeCPUproof927a",
-        "wait_handle": 35830,
-        "max_seconds": 150,
-        "job_id": "20261106T005828Z-fdb5ed8f",
-        "result": "/private/tmp/pointstream-k5d-native-proof-927a-wait-20261106.json"
       }
     ],
     "native_completion_resume_verified": false,
