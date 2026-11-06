@@ -30,6 +30,13 @@ def test_bridge_checks_complete_manifest_and_rejects_scientific_change(tmp_path:
     b = {'source_sha256': new_id, 'snapshot_sha256': new_sha, 'environment_sha256': 'e' * 64}
     result = bridge.bridge(old, a, new, b)
     assert result['approved'] is False and result['changed_paths'] == sorted(bridge.CONTROL_ADDITIONS)
+    admission = 'experiments/tennis/k5d_full_admission.py'
+    assert admission in bridge.CONTROL_ADDITIONS
+    missing = {name: data for name, data in added.items() if name != admission}
+    missing_sha = archive(new, {'model.py': b'unchanged', 'codec.py': b'unchanged', **missing})
+    missing_id, _ = bridge.manifest(new, missing_sha)
+    with pytest.raises(ValueError, match='beyond approved'):
+        bridge.bridge(old, a, new, {**b, 'source_sha256': missing_id, 'snapshot_sha256': missing_sha})
     changed_sha = archive(new, {'model.py': b'changed', 'codec.py': b'unchanged', **added})
     changed_id, _ = bridge.manifest(new, changed_sha)
     with pytest.raises(ValueError, match='beyond approved'):

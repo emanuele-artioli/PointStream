@@ -291,10 +291,12 @@ def receiver_command(python: Path, worker: Path, mode: str, config: Path, *, iso
     return ['/usr/bin/unshare', '--user', '--map-root-user', '--net', *cmd] if isolated else cmd
 
 
-def check_manifest(manifest: dict[str, Any], frames: int, stream: Path) -> None:
+def check_manifest(manifest: dict[str, Any], frames: int, stream: Path, qp: int = 3) -> None:
+    if type(qp) is not int or qp not in (0, 3, 9):
+        raise ValueError("unregistered base QP")
     expected = {'schema': 'gvcrt-native-v1', 'source_revision': 'd0e32bfa3e8e282f9a77437c223c605858eea637',
                 'frames': frames, 'fps': 30, 'original_width': 1280, 'original_height': 720,
-                'canvas_width': 1920, 'canvas_height': 1088, 'base_qp': 3, 'reset_interval': 8,
+                'canvas_width': 1920, 'canvas_height': 1088, 'base_qp': qp, 'reset_interval': 8,
                 'padding_policy': 'released', 'ec_part': 1,
                 'model_sha256': {'I': I_SHA, 'P': P_SHA}}
     if any(manifest.get(k) != v for k, v in expected.items()):
@@ -309,7 +311,7 @@ def check_manifest(manifest: dict[str, Any], frames: int, stream: Path) -> None:
     for index, item in enumerate(placements):
         if (item.get('index') != index or item.get('I') != (index == 0)
                 or item.get('reset') != (index > 0 and index % 8 == 1)
-                or item.get('qp') != 3 + (shifts[index % 8] if index else 0)
+                or item.get('qp') != qp + (shifts[index % 8] if index else 0)
                 or item.get('offset') != offset or type(item.get('bytes')) is not int or item['bytes'] <= 0):
             raise ValueError('native frame schedule mismatch')
         offset += item['bytes']
@@ -724,13 +726,13 @@ def run(args: argparse.Namespace) -> int:
     sender_cmd = [str(python), str(bridge), 'encode', '--disable-fused', '--official-repo', str(author),
                   '--i-checkpoint', str(inputs['i_model']), '--i-sha256', I_SHA, '--p-checkpoint', str(inputs['p_model']),
                   '--p-sha256', P_SHA, '--frames-json', str(selected), '--frames', str(args.frames),
-                  '--width', '1280', '--height', '720', '--fps', '30', '--qp', '3', '--reset-interval', '8',
+                  '--width', '1280', '--height', '720', '--fps', '30', '--qp', str(args.qp), '--reset-interval', '8',
                   '--padding-policy', 'released', '--output-dir', str(sender_dir)]
     sender = child(sender_cmd, 'sender', stage, env, 150 if args.frames == 4 else 350)
     need_success(sender)
     sender_receipt = read_json(sender_dir / 'sender_receipt.json')
     manifest = read_json(sender_dir / 'manifest.json')
-    check_manifest(manifest, args.frames, sender_dir / 'stream.bin')
+    check_manifest(manifest, args.frames, sender_dir / 'stream.bin', args.qp)
     env_record = sender_receipt['qualification']['environment']
     if (env_record.get('disable_fused') is not True or env_record.get('customized_cuda_inference') is not False
             or env_record.get('cuda_visible_devices') != os.environ['CUDA_VISIBLE_DEVICES']
@@ -828,7 +830,7 @@ def run(args: argparse.Namespace) -> int:
     times['staging'] += unmeasured
     remaining = min(500.0, clock['budget_end'] - time.monotonic() - 60.0)
     cost = projection(sender_receipt, receiver_receipt, times, remaining) if args.frames == 4 else None
-    result = {'frames': args.frames, 'clip': 'tracknet/game10/Clip3', 'qp': 3, 'comparison': comparison,
+    result = {'frames': args.frames, 'clip': 'tracknet/game10/Clip3', 'qp': args.qp, 'comparison': comparison,
               'source_yuv_sha256': 'c82d2e12e18e19f0453cb4d1b497581841c423149b153a1fc4ba2de6ff4353f4',
               'gpu_uuid': os.environ['CUDA_VISIBLE_DEVICES'], 'gpu_identity': gpu_identity, 'probe_cuda': probe_cuda,
               'ffmpeg': {'sha256': sha(ffmpeg), 'version': ffmpeg_version},
@@ -856,13 +858,13 @@ def run(args: argparse.Namespace) -> int:
     return 0
 
 
-def validate_phase(stage: Path, validation: Path) -> int:
+def validate_phase(stage: Path, validation: Path, qp: int = 3) -> int:
     root = stage / 'gvcrt-peer'
     result = read_json(root / 'result.json')
     frames = result.get('frames')
     if type(frames) is not int or frames not in (4, 16):
         raise ValueError('invalid saved frame count')
-    checks = {'frames_and_qp': frames in (4, 16) and result.get('qp') == 3,
+    checks = {'frames_and_qp': frames in (4, 16) and type(result.get('qp')) is int and result.get('qp') == qp and type(qp) is int and qp in (0, 3, 9),
               'fixed_sources': result.get('source_sha256') == SOURCE_SHA and result.get('runtime_sha256') == RUNTIME_SHA
                   and result.get('entropy_sha256') == ENTROPY_SHA and result.get('baseline_archive_sha256') == BASELINE_SHA,
               'input_checkpoint_identity': result.get('i_model_sha256') == I_SHA and result.get('p_model_sha256') == P_SHA,
@@ -883,7 +885,7 @@ def validate_phase(stage: Path, validation: Path) -> int:
                   and set(result.get('metric_source_tree_sha256', {})) == {'balltrack_code', 'wasb_code'},
               'gate': frames != 4 or bool(result.get('projection', {}).get('passes'))}
     try:
-        check_manifest(read_json(root / 'manifest.json'), frames, root / 'stream.bin')
+        check_manifest(read_json(root / 'manifest.json'), frames, root / 'stream.bin', qp)
         check_isolation(result['probe_isolation'], read_json(root / 'probe-config.json'))
         receiver_config_doc = read_json(root / 'receiver-config.json')
         probe_config_doc = read_json(root / 'probe-config.json')
@@ -912,6 +914,9 @@ def validate_phase(stage: Path, validation: Path) -> int:
                     or sha(root / f'{name}.stdout') != rec.get('stdout_sha256')
                     or sha(root / f'{name}.stderr') != rec.get('stderr_sha256')):
                 raise ValueError('child exit or log receipt mismatch')
+        sender_argv = receipts[2]['argv']
+        if sender_argv.count('--qp') != 1 or sender_argv[sender_argv.index('--qp') + 1] != str(qp):
+            raise ValueError('sender QP differs from registered validator QP')
         if any(a['ended_monotonic'] > b['started_monotonic'] for a, b in zip(receipts, receipts[1:])):
             raise ValueError('probe/sender/receiver/scorer ordering mismatch')
         if (result['probe_isolation']['pid'] != receipts[1]['pid']
@@ -988,7 +993,7 @@ def validate_phase(stage: Path, validation: Path) -> int:
             expected = projection(smoke_sender, smoke_receiver, smoke['times'], smoke['projection']['remaining_seconds'])
             a = np.load(smoke_root / 'reconstruction.npy', allow_pickle=False, mmap_mode='r')
             b = np.load(root / 'reconstruction.npy', allow_pickle=False, mmap_mode='r')
-            checks['smoke_promotion_and_prefix'] = (expected == smoke['projection'] and bool(expected['passes'])
+            checks['smoke_promotion_and_prefix'] = (smoke.get('qp') == qp and expected == smoke['projection'] and bool(expected['passes'])
                 and sha(smoke_root / 'reconstruction.npy') == smoke['files']['reconstruction.npy']
                 and np.array_equal(a, b[:4]))
         except (OSError, ValueError, KeyError, TypeError):
@@ -1034,11 +1039,16 @@ def validate_phase(stage: Path, validation: Path) -> int:
     return 0 if passed else 1
 
 
-def make_spec(deadline: str) -> dict[str, Any]:
+def make_spec(deadline: str, qp: int = 3) -> dict[str, Any]:
+    if type(qp) is not int or qp not in (0, 3, 9):
+        raise ValueError("unregistered base QP")
     base = HERE.parents[1] / 'docs/experiments/ego-peer-inputs/20261104/gvcrt-native16-fleet-draft.json'
     spec = read_json(base)
     spec['entrypoint'] = ['-m', 'experiments.generative.gvcrt_peer_job_w8leaves']
     spec['validator'] = ['{python}', '-m', 'experiments.generative.gvcrt_peer_job_w8leaves', 'validate']
+    if qp != 3:
+        spec['arguments'].extend(['--qp', str(qp)])
+        spec['validator'].extend(['--qp', str(qp)])
     spec['hosts'] = ['gpu5', 'gpu6']
     spec['gpu_models'] = ['RTX 6000 Ada']
     spec['deadline'] = deadline
@@ -1052,11 +1062,12 @@ def main() -> int:
     p.add_argument('--output', type=Path)
     p.add_argument('--frames', type=int, choices=(4, 16))
     p.add_argument('--deadline')
+    p.add_argument('--qp', type=int, choices=(0, 3, 9), default=3)
     args = p.parse_args()
     if args.mode == 'make-spec':
         if args.output is None or args.deadline is None:
             p.error('make-spec needs --deadline and --output')
-        spec = make_spec(args.deadline)
+        spec = make_spec(args.deadline, args.qp)
         from experiments.jobs.inbox import validate_spec
         validate_spec(spec)
         with args.output.open('x') as stream:
@@ -1064,11 +1075,11 @@ def main() -> int:
             stream.write('\n')
         return 0
     if args.mode == 'validate':
-        return validate_phase(Path(os.environ['PS_STAGE_DIR']), Path(os.environ['PS_VALIDATION_PATH']))
+        return validate_phase(Path(os.environ['PS_STAGE_DIR']), Path(os.environ['PS_VALIDATION_PATH']), args.qp)
     if args.mode == 'audit':
         if args.stage is None or args.output is None:
             p.error('audit needs --stage and --output')
-        return validate_phase(args.stage, args.output)
+        return validate_phase(args.stage, args.output, args.qp)
     return run(args)
 
 

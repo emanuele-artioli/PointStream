@@ -1,0 +1,38 @@
+{
+  "deadline": "2026-11-05T23:55:00Z",
+  "authority": "root approved 24 GPU-hour/28 CPU-hour overall program, GVC 1800 GPU/2000 CPU remaining for the two endpoints; ledger docs/experiments/submission-research-budget-20261104.json",
+  "cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/gvcrt-cache-3ce18520af3c46e0be3d9345a9f04009/source.tar",
+  "source_archive_sha256": "cde9046414f4412a92652b11c0c75ac7a4965e7843badb65a1f449b3368ae7ff",
+  "source_identity": "a4f3b2d25a7d9c9d38b30761d1cb187fc9b63d60ccf33ba7972b106b95ba1558",
+  "revision": "e6e0b530aebc84b1a73ef6200b7fc24db7f28c21",
+  "gpu_budget_seconds": 1800,
+  "cpu_budget_seconds": 2000,
+  "jobs": [
+    {
+      "qp": 0,
+      "cpu_affinity_index": 2,
+      "spec": "/private/tmp/pointstream-gvcrt-cache-qp0-spec-20261105.json",
+      "raw_sha256": "04c7d20462f201bb247b6c400a25f2706799ae38f9597af9826bfbf75429a814",
+      "normalized_sha256": "bdb7173235a77c7ca8166b3acf3c9a481589de228faef6d86255d0d2bdfaee76",
+      "status": "pending",
+      "handle": 7142,
+      "output": "/private/tmp/pointstream-gvcrt-cache-qp0-submit-20261105.log",
+      "job_id": "20261105T231555Z-78e54aff",
+      "actual_snapshot": "cde9046414f4412a92652b11c0c75ac7a4965e7843badb65a1f449b3368ae7ff",
+      "actual_spec": "bdb7173235a77c7ca8166b3acf3c9a481589de228faef6d86255d0d2bdfaee76"
+    },
+    {
+      "qp": 9,
+      "cpu_affinity_index": 3,
+      "spec": "/private/tmp/pointstream-gvcrt-cache-qp9-spec-20261105.json",
+      "raw_sha256": "34d869c7eebc8d8e5f1da0194b81e98763ce89df0e9a254e3ec4f91789b70b15",
+      "normalized_sha256": "6a1f70d5ff0d36eed5bede73881c38b0cb71f119ef2dbc35d7e2cbcc504c219a",
+      "status": "pending",
+      "handle": 60739,
+      "output": "/private/tmp/pointstream-gvcrt-cache-qp9-submit-20261105.log",
+      "job_id": "20261105T231706Z-2f65a26e",
+      "actual_snapshot": "cde9046414f4412a92652b11c0c75ac7a4965e7843badb65a1f449b3368ae7ff",
+      "actual_spec": "6a1f70d5ff0d36eed5bede73881c38b0cb71f119ef2dbc35d7e2cbcc504c219a"
+    }
+  ]
+}

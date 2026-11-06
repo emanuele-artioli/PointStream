@@ -100,13 +100,29 @@ def stage_inputs(stage: Path, digest_file: Callable[[Path], str] | None = None) 
     spec = json.loads((stage.parent / 'spec.json').read_text())
     staging = json.loads((stage / 'staging.json').read_text())
     dispatch = json.loads((stage / 'dispatch.json').read_text())
+    profile = spec.get('w8_paired_cost_profile')
+    if profile is not None and (profile != 'w8-paired-cost-800-v1'
+            or spec.get('budget_seconds') != 800 or spec.get('smoke', {}).get('seconds') != 260
+            or spec.get('full', {}).get('seconds') != 500 or spec.get('validator_seconds') != 60
+            or spec.get('receiver_validator_cpu_seconds') != 60
+            or spec.get('receiver_cpu_budget_seconds') != 1000
+            or spec.get('receiver_external_cpu_reserve_seconds') != 100
+            or spec.get('scale') != {'steps': {'smoke': 1, 'full': 3}}
+            or spec.get('entrypoint') != ['-m', 'experiments.tennis.w8_strict_host_cost_job']
+            or spec.get('validator') != ['{python}', '-m', 'experiments.tennis.w8_strict_host_cost_job', 'cost-validate']
+            or spec.get('arguments') != ['cost-run', '--steps', '{steps}', '--parent-cpu', '30',
+                 '--packet-cpu', '100', '--generator-cpu', '290', '--worker-wall', '300',
+                 '--preflight', '{staged:preflight}', '--preflight-sha256',
+                 'ab5f1b932918ae9956f6ef648e36e59c6a1fd9ef6c36a1722a1916b0da63a4c5',
+                 '--materialize-profile', '--clock-profile']):
+        raise ValueError('invalid paired cost profile')
     if (spec.get('device', 'gpu') != 'gpu' or spec.get('single_cpu_campaign') is not True
             or spec.get('cpu_threads') != 1 or len(dispatch.get('cpu_affinity', [])) != 1
             or spec.get('environment', {}).get('sha256') != JCV_ENV
             or spec.get('gpu_sharing', {'mode': 'exclusive'}) != {'mode': 'exclusive'}
             or spec.get('contention', {}).get('policy') != 'stop'
-            or not 0 < spec.get('budget_seconds', 0) <= 600):
-        raise ValueError('one-core JCV GPU campaign with at most 600 seconds required')
+            or not 0 < spec.get('budget_seconds', 0) <= (800 if profile is not None else 600)):
+        raise ValueError('one-core JCV GPU campaign with a valid bounded budget required')
     wanted = {'packet': fixed.WINDOW_SHA, 'profile': fixed.PROFILE_SHA, 'oracle': ORACLE_SHA,
               'base': BASE_ARCHIVE_SHA, 'aa': receiver.AA_ARCHIVE_SHA,
               **{key: receiver.PINNED_WEIGHTS[name] for key, name in WEIGHT_NAMES.items()}}

@@ -1,0 +1,336 @@
+{
+  "job": "20261105T223810Z-0d856f3b",
+  "status": "complete",
+  "host": "gpu5",
+  "revision": "e6e0b530aebc84b1a73ef6200b7fc24db7f28c21",
+  "source_scope_note": "Fleet automatically appended experiments/jobs and src/__init__.py to nine reviewed paths; all 20 actual regular-file bytes match the recorded git revision. Pre-dispatch nine-file hash was not the actual submitted archive.",
+  "actual_source_archive_sha256": "29d57355d4742fc096f8b2eb0e8a28dc2cd33440f191407a23e49e647f4e078e",
+  "actual_source_identity": "bbbc865680ebe31f21f7742bbd7262557a5566eab309e36ee6e4e7d731f81019",
+  "normalized_spec_sha256": "8e25fcf2865713c6a1aa05ad4901c58da9ec556cbaac2f5fc957b6f232d486c8",
+  "source_member_blobs": [
+    {
+      "path": "experiments/__init__.py",
+      "sha256": "06f003a15341e1a630da290bb9f66f11bd79de593e85aff33fdd1b548db2cba9"
+    },
+    {
+      "path": "experiments/generative/gvcrt_device_guard.py",
+      "sha256": "8dd759958409ae6b514b662b1b39946f5e738c9f8a25dacf7871c7c409c289da"
+    },
+    {
+      "path": "experiments/generative/gvcrt_native_bridge.py",
+      "sha256": "cf42d1a115d905ed5faf3fdb01a8c7aa66c728091a18880c8cbf818cbcfbfd61"
+    },
+    {
+      "path": "experiments/generative/gvcrt_peer_job_w8leaves.py",
+      "sha256": "90460292abb053a92208367d294995a3c7b7593363e6a2f5bbeadcc47b6dc229"
+    },
+    {
+      "path": "experiments/generative/gvcrt_qp_coverage.py",
+      "sha256": "5f065658f8c1f63132cc21d288b8d571928199c2f14461b2f2205b49d9482de3"
+    },
+    {
+      "path": "experiments/generative/gvcrt_qp_cpu_job.py",
+      "sha256": "d60eb93ee81dda277090b41fab92fb3ea505ee0a3a00a760f8d5b41ecb626327"
+    },
+    {
+      "path": "experiments/generative/gvcrt_source_marker.json",
+      "sha256": "b211cbcc4280acad546a41283ec95c63c7ca95c8d0fd6fdb07af7120932cbe97"
+    },
+    {
+      "path": "experiments/jobs/__init__.py",
+      "sha256": "999dfe9ae372c896e01e55010d27a97b0c6bc2fe6ff22183a1dc121ee3d56633"
+    },
+    {
+      "path": "experiments/jobs/artifacts.py",
+      "sha256": "e43caff476b148de076d161ecae1e8bd728d0085b71b131ab019ce118f9f95c3"
+    },
+    {
+      "path": "experiments/jobs/claims.py",
+      "sha256": "4ce261cc723de1ff2e4497c5f760d997bf6681f0e7ca75019a53280acbc6b1ef"
+    },
+    {
+      "path": "experiments/jobs/environment.py",
+      "sha256": "11a7eb114e04dedd3721bb57db3e5b1fe9e44c515adcfc6baafc9b7169964992"
+    },
+    {
+      "path": "experiments/jobs/fleet.py",
+      "sha256": "e2a3da5f591be682f8fc0643f1ab72845d46cd1c75fcc4ca3ebb333595f65b3b"
+    },
+    {
+      "path": "experiments/jobs/fleet_smoke.py",
+      "sha256": "c386740f9d7c8fe1f66506767c9482eb01c6b99d714a96f9674fc87b78796d0a"
+    },
+    {
+      "path": "experiments/jobs/inbox.py",
+      "sha256": "5dbdc52879729157d2073ad717d731fb7af4563f3ca1330930be96edea97266e"
+    },
+    {
+      "path": "experiments/jobs/indexed_control_probe.py",
+      "sha256": "99809638ad7b28daab34cfa78b02ebfcd5cc1ba9bd9302337d1169f53e5ebcbb"
+    },
+    {
+      "path": "experiments/jobs/monitor.py",
+      "sha256": "73671c2892127bf2510b98aee75356f50736d8613f769d5b8e5426b4a821268e"
+    },
+    {
+      "path": "experiments/jobs/staging.py",
+      "sha256": "f94156c1d5b9a6bf2ac1ec8c3437a82cd6f36a9085a7f68a6122381b7cfd0422"
+    },
+    {
+      "path": "experiments/visor/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "experiments/visor/gvcrt_entropy_pilot.py",
+      "sha256": "af7e02639547cf35edf43c792615d5d9c8f784de2079efb890310c4137b0fb3a"
+    },
+    {
+      "path": "src/__init__.py",
+      "sha256": "ae44788819d1253995e05ac454621d9c9b5ee2139f8a411cd8b786349e932078"
+    }
+  ],
+  "raw_receipt_sha256": "ffe1be3f95b4b7bc49f875c6aaa580aa00b73872837871f6bdf25fc80bfccf58",
+  "raw_receipt": {
+    "coverage": [
+      {
+        "parameter_elements": 83508678,
+        "role": "I",
+        "selected_dictionary": "raw",
+        "state_tensors": 596,
+        "strict_complete_coverage": true
+      },
+      {
+        "parameter_elements": 51677028,
+        "role": "P",
+        "selected_dictionary": "state_dict",
+        "state_tensors": 537,
+        "strict_complete_coverage": true
+      }
+    ],
+    "cpu_proof": {
+      "affinity": [
+        2
+      ],
+      "cuda_initialized_after": false,
+      "cuda_initialized_before": false,
+      "cuda_visible_devices": "",
+      "elapsed_seconds": 6.186386730521917,
+      "helper_sha256": "5f065658f8c1f63132cc21d288b8d571928199c2f14461b2f2205b49d9482de3",
+      "interpreter": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python3.12",
+      "interpreter_sha256": "de81e48f1f4e78c5f116a381ab847460e06d864301829cd879df382657e21a9e",
+      "pgid": 3648943,
+      "pid": 3649218,
+      "source_manifest_sha256": "b211cbcc4280acad546a41283ec95c63c7ca95c8d0fd6fdb07af7120932cbe97",
+      "usage_after": {
+        "children": {
+          "max_rss": 0,
+          "system_seconds": 0.0,
+          "user_seconds": 0.0
+        },
+        "self": {
+          "max_rss": 1704928,
+          "system_seconds": 0.998354,
+          "user_seconds": 5.195439
+        }
+      },
+      "usage_before": {
+        "children": {
+          "max_rss": 0,
+          "system_seconds": 0.0,
+          "user_seconds": 0.0
+        },
+        "self": {
+          "max_rss": 22528,
+          "system_seconds": 0.008052,
+          "user_seconds": 0.05033
+        }
+      }
+    },
+    "devices": {
+      "I.buffers": {
+        "count": 0,
+        "devices": []
+      },
+      "I.parameters": {
+        "count": 596,
+        "devices": [
+          "cpu"
+        ]
+      },
+      "P.buffers": {
+        "count": 0,
+        "devices": []
+      },
+      "P.parameters": {
+        "count": 537,
+        "devices": [
+          "cpu"
+        ]
+      }
+    },
+    "environment": {
+      "Pillow": "12.3.0",
+      "bridge_sha256": "cf42d1a115d905ed5faf3fdb01a8c7aa66c728091a18880c8cbf818cbcfbfd61",
+      "command_argv": [
+        "/local/users/emanuele/pointstream/sources/20261105T223810Z-0d856f3b/experiments/generative/gvcrt_qp_coverage.py",
+        "--official-repo",
+        "/local/users/emanuele/pointstream/scratch/20261105T223810Z-0d856f3b-smoke/gvcrt-qp-cpu/author",
+        "--i-checkpoint",
+        "/local/users/emanuele/pointstream/cache/c8a840415cc028307131c66f68076b7e9f6fcc4db7fed423c62e8b202f83a22d/GVC-RT_I.pt",
+        "--i-sha256",
+        "c8a840415cc028307131c66f68076b7e9f6fcc4db7fed423c62e8b202f83a22d",
+        "--p-checkpoint",
+        "/local/users/emanuele/pointstream/cache/7a89bd342a1484b3da7dfc3f03834ff81e0e4180e02f8a286dec0d1025c99f4e/GVC-RT_P.pt",
+        "--p-sha256",
+        "7a89bd342a1484b3da7dfc3f03834ff81e0e4180e02f8a286dec0d1025c99f4e",
+        "--output",
+        "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T223810Z-0d856f3b/smoke/qp-coverage.json"
+      ],
+      "cublas_workspace_config": ":4096:8",
+      "cuda_runtime": "12.8",
+      "customized_cuda_inference": false,
+      "deterministic_algorithms": true,
+      "disable_fused": true,
+      "einops": "0.8.2",
+      "entropy_extension": "/local/users/emanuele/pointstream/cache/f0951974be2a1168f87a67f8d3683844874aa1902b2d135cde46c2e5b915262e/MLCodec_extensions_cpp.so",
+      "entropy_sha256": "f0951974be2a1168f87a67f8d3683844874aa1902b2d135cde46c2e5b915262e",
+      "force_zero_thres": null,
+      "i_sha256": "c8a840415cc028307131c66f68076b7e9f6fcc4db7fed423c62e8b202f83a22d",
+      "numpy": "1.26.4",
+      "p_sha256": "7a89bd342a1484b3da7dfc3f03834ff81e0e4180e02f8a286dec0d1025c99f4e",
+      "python": "3.12.14 (main, Sep  2 2026, 23:27:36) [GCC 15.3.0]",
+      "source_revision": "d0e32bfa3e8e282f9a77437c223c605858eea637",
+      "torch": "2.10.0+cu128",
+      "torch_threads": 1
+    },
+    "tables": {
+      "p_shift_indices": {
+        "0": [
+          0,
+          2,
+          1
+        ],
+        "3": [
+          3,
+          5,
+          4
+        ],
+        "9": [
+          9,
+          11,
+          10
+        ]
+      },
+      "shapes": {
+        "I.q_scale_dec": [
+          10,
+          512,
+          1,
+          1
+        ],
+        "I.q_scale_enc": [
+          10,
+          368,
+          1,
+          1
+        ],
+        "I.q_scale_recon": [
+          10,
+          320,
+          1,
+          1
+        ],
+        "P.q_scale_dec": [
+          12,
+          256,
+          1,
+          1
+        ],
+        "P.q_scale_enc": [
+          12,
+          256,
+          1,
+          1
+        ],
+        "P.q_scale_feature": [
+          12,
+          256,
+          1,
+          1
+        ],
+        "P.q_scale_recon": [
+          12,
+          320,
+          1,
+          1
+        ]
+      }
+    }
+  },
+  "validation": {
+    "passed": true,
+    "checks": {
+      "cpu_only": true,
+      "devices": true,
+      "coverage": true,
+      "table_shapes": true,
+      "shifts": true,
+      "identities": true,
+      "process_and_usage": true
+    }
+  },
+  "smoke_execution": {
+    "exit_code": 0,
+    "seconds": 7.169686555862427,
+    "children_resource_usage": [
+      5.871838,
+      1.1969319999999999,
+      1704928,
+      0,
+      0,
+      0,
+      380360,
+      3,
+      0,
+      57288,
+      944,
+      0,
+      0,
+      0,
+      391,
+      415
+    ],
+    "timing_contaminated": false,
+    "contention": [],
+    "paused_seconds": 0.0,
+    "gpu_sharing": null
+  },
+  "run_status": {
+    "status": "complete",
+    "started": 1793918310.615275,
+    "last_progress": 1793918340.834773,
+    "emitted": [
+      "terminal:complete"
+    ],
+    "pid": 3648943,
+    "proc_start_time": 1793918310.48,
+    "process_group_id": 3648943,
+    "progress": {
+      "stage": "full",
+      "completed": 1,
+      "updated": 1793918332.5481133,
+      "decision": null
+    },
+    "exit_code": 0,
+    "ended": 1793918340.834773
+  },
+  "supervisor": {
+    "pid": 3648942,
+    "proc_start_time": 1793918310.38
+  },
+  "teardown_observation": "After terminal, gpu5 ps -eLo found no recorded supervisor 3648942, campaign/PGID 3648943, helper 3649218, their listed children or any thread in that process group; CPU claims allocations empty. This is a post-exit observation, not a trace of child behavior.",
+  "event": "65650fac8fb056169888659b0e6930b4",
+  "event_acknowledged": true,
+  "raw_bundle_sha256": "467e6177f9c9ccef9a535b01341716e140fa40046f55f0685d51bc165985cd01",
+  "limitations": "CPU checkpoint and table proof only; no native encode, GPU, endpoint rate or quality proof. Root acceptance and accounting remain pending."
+}
