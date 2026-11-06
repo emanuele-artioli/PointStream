@@ -137,3 +137,13 @@ def test_interruption_proof_rejects_wrong_cause() -> None:
         bad[index] = replacement
         with pytest.raises(ValueError, match='interruption cause'):
             oracle.check_interruptions(bad)
+
+
+def test_worker_group_joins_observed_host_pgid() -> None:
+    from experiments.tennis.k5d_native_pid_oracle import observed_worker_group
+
+    group = {'host_pid': 30, 'start_ticks': 42, 'exec_host_pgid': 10}
+    member = {'host_pid': 30, 'start_ticks': 42, 'namespace_pid': 2,
+              'host_pgid': 10, 'pid_namespace': 'pid:[123]'}
+    assert observed_worker_group(group, [member], 'pid:[123]')
+    assert not observed_worker_group(group, [{**member, 'host_pgid': 30}], 'pid:[123]')

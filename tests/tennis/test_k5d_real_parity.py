@@ -54,4 +54,43 @@ def test_parity_spec_stays_within_smoke_limit_and_uses_actual_cpu_receipt(tmp_pa
     assert result['scale']['namespace_timeout']['smoke'] == 580
     assert result['gpu_sharing'] == {'mode': 'exclusive'}
     assert result['scale']['proof_mode'] == {'smoke': 'parity16', 'full': 'parity-noop'}
-    assert result['entrypoint'] == ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']
+    assert result['entrypoint'] == ['-m', 'experiments.tennis.k5d_scoped_namespace']
+
+
+def test_parity_builder_passes_real_fleet_validator_and_outer_cli(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
+    import hashlib
+    import sys
+    from pathlib import Path
+    from datetime import datetime, timedelta, timezone
+    from experiments.jobs import inbox
+    from experiments.tennis import k5d_scoped_namespace as namespace
+
+    wrapper_sha = hashlib.sha256(Path(namespace.__file__).read_bytes()).hexdigest()
+    cpu = tmp_path / 'cpu.json'
+    cpu.write_text(json.dumps({'audited': True, 'passed': True, 'scope': 'native CPU PID containment and accounting',
+                               'gpu_used': False, 'unshare_sha256': 'a' * 64,
+                               'namespace_wrapper_sha256': wrapper_sha, 'consumer_execution_identity': {}}))
+    remote = '/home/itec/emanuele/Datasets/pointstream-data/test/'
+    assets = {'fidelity_gate': {'local': str(cpu), 'remote': remote + 'fidelity.json', 'sha256': 'c' * 64},
+              'accepted16': {'local': str(cpu), 'remote': remote + 'accepted.tar', 'sha256': parity.cf.D8_SMOKE_SHA},
+              'native_cpu_receipt': {'local': str(cpu), 'remote': remote + 'cpu.json', 'sha256': 'd' * 64}}
+    monkeypatch.setattr(parity.cf, 'asset', lambda name, path, digest, _local, *, extract:
+                        {'name': name, 'path': path, 'sha256': digest, 'extract': extract})
+    base = json.loads(parity.cf.BASE.read_text())
+    deadline = (datetime.now(timezone.utc) + timedelta(minutes=30)).isoformat()
+    result = parity.spec(base, assets=assets, deadline=deadline, unshare_sha256='a' * 64, identity={})
+    normalized = inbox.validate_spec(result)
+    legacy = {**result, 'entrypoint': [*result['entrypoint'], 'outer'], 'arguments': result['arguments'][1:]}
+    with pytest.raises(inbox.fleet.FleetError, match='entrypoint must be'):
+        inbox.validate_spec(legacy)
+    assert normalized['entrypoint'] == ['-m', 'experiments.tennis.k5d_scoped_namespace']
+    assert result['arguments'][0] == 'outer'
+    staged = [{'name': item['name'], 'path': '/staged/' + item['name']} for item in result['staged_inputs']]
+    command = inbox.phase_command(result, 'smoke', staged, '/runtime/python')
+    assert command[:4] == ['/runtime/python', '-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']
+    captured = []
+    monkeypatch.setattr(namespace, 'outer', lambda sha, timeout, args: captured.append((sha, timeout, args)))
+    monkeypatch.setattr(sys, 'argv', ['module', *command[3:]])
+    namespace.main()
+    assert captured[0][0] == 'a' * 64 and captured[0][1] == 580
+    assert captured[0][2][0] == 'parity16'

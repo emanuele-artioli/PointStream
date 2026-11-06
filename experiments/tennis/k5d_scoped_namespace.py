@@ -33,6 +33,22 @@ def worker_command(arguments: list[str]) -> list[str]:
     raise ValueError('only fixed prepare/score or approved proof workers are allowed')
 
 
+def host_group_identity(status_path: Path) -> dict[str, int]:
+    """Join this process's host PID, birth and group to the campaign status."""
+    import json
+
+    status = json.loads(status_path.read_text())
+    group = status.get('process_group_id')
+    stat = Path('/proc/self/stat').read_text()
+    fields = stat[stat.rfind(')') + 2:].split()
+    host_pid = int(stat[:stat.find(' ')])
+    actual_group, start_ticks = int(fields[2]), int(fields[19])
+    if type(group) is not int or group <= 0 or actual_group != group or start_ticks <= 0:
+        raise ValueError('worker host process group differs from campaign')
+    return {'host_pid': host_pid, 'host_pgid': actual_group, 'start_ticks': start_ticks,
+            'campaign_pgid': group}
+
+
 def supervise(arguments: list[str], timeout: float, outside_namespace: str) -> dict[str, Any]:
     """Run as PID namespace init, reap all children and measure waited CPU.
 
@@ -69,7 +85,31 @@ def supervise(arguments: list[str], timeout: float, outside_namespace: str) -> d
             raise ValueError('proof root must be within scratch')
         write(root / 'init.json', {'identity': process_identity(), 'argv': command,
                                  'outside_namespace': outside_namespace})
-    child = subprocess.Popen(command, start_new_session=True)
+    import json
+
+    status_path = Path(os.environ['PS_STAGE_DIR']).parent / 'run' / 'status.json'
+    read_fd, write_fd = os.pipe()
+    def verify_before_exec() -> None:
+        os.close(read_fd)
+        identity = host_group_identity(status_path)
+        # CPU-only oracle deliberately detaches to exercise namespace teardown.
+        if arguments[0] == 'native-proof' and os.environ.get('PS_K5D_DETACH_NATIVE') == '1':
+            os.setsid()
+        identity['exec_host_pgid'] = int(
+            Path('/proc/self/stat').read_text().rsplit(')', 1)[1].split()[2])
+        if proof_root:
+            write(Path(proof_root) / 'worker-group.json', identity)
+        os.write(write_fd, json.dumps(identity, sort_keys=True).encode())
+        os.close(write_fd)
+
+    try:
+        child = subprocess.Popen(command, preexec_fn=verify_before_exec, pass_fds=(write_fd,))
+    finally:
+        os.close(write_fd)
+    try:
+        worker_identity = json.loads(os.read(read_fd, 4096))
+    finally:
+        os.close(read_fd)
     status: int | None = None
     reaped = 0
     reason = ''
@@ -96,7 +136,8 @@ def supervise(arguments: list[str], timeout: float, outside_namespace: str) -> d
     own = resource.getrusage(resource.RUSAGE_SELF)
     cpu = (after.ru_utime + after.ru_stime) - (before.ru_utime + before.ru_stime)
     return {'status': status, 'reason': reason or 'complete', 'reaped': reaped,
-            'namespace_init': process_identity(), 'worker_namespace_pid': child.pid, 'argv': command,
+            'namespace_init': process_identity(), 'worker_namespace_pid': child.pid,
+            'worker_host_identity': worker_identity, 'argv': command,
             'children_cpu_seconds': cpu, 'init_cpu_seconds': own.ru_utime + own.ru_stime,
             'elapsed_seconds': time.monotonic() - start, 'complete_descendant_wait': True}
 
@@ -115,7 +156,8 @@ def outer(unshare_sha: str, timeout: float, arguments: list[str]) -> None:
     stage = Path(os.environ['PS_STAGE_DIR'])
     spec = json.loads((stage.parent / 'spec.json').read_text())
     staging = json.loads((stage / 'staging.json').read_text())
-    if (spec.get('entrypoint') != ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']
+    if (spec.get('entrypoint') != ['-m', 'experiments.tennis.k5d_scoped_namespace']
+            or spec.get('arguments', [])[:1] != ['outer']
             or phase_command(spec, stage_name, staging['inputs'], sys.executable) != [sys.executable, '-m',
                 'experiments.tennis.k5d_scoped_namespace', *sys.argv[1:]]):
         raise ValueError('launcher arguments differ from actual fleet stage')

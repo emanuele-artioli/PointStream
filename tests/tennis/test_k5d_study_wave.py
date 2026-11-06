@@ -67,7 +67,7 @@ def test_completed_receipt_binds_publications_and_fleet_records(tmp_path: Path, 
     root.mkdir()
     identity = {key: 'a' * 64 for key in ('source_sha256', 'snapshot_sha256', 'environment_sha256')}
     spec = {'gpu_models': ['RTX A6000'], 'gpu_sharing': {'mode': 'exclusive'},
-            'entrypoint': ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer'], 'inputs': []}
+            'entrypoint': ['-m', 'experiments.tennis.k5d_scoped_namespace'], 'arguments': ['outer'], 'inputs': []}
 
     def write(path: Path, value: Any) -> str:
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -266,7 +266,7 @@ def test_cpu_calibration_requires_four_namespace_logs_and_independent_audits(tmp
     log = tmp_path / 'full/command.log'
     log.parent.mkdir()
     log.write_text('K5D_CPU_ACCOUNTING ' + json.dumps({'method': 'linux-pidns-init-waited-rusage-v1'}) + '\n')
-    spec = {'entrypoint': ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']}
+    spec = {'entrypoint': ['-m', 'experiments.tennis.k5d_scoped_namespace'], 'arguments': ['outer']}
     receipt = {'job_directory': str(tmp_path), 'records': {'spec_sha256': 's',
                'full': {'command_log_sha256': wave.oracle.sha(log)}}}
     monkeypatch.setattr(wave, 'read', lambda path, _sha: spec if path.name == 'spec.json' else receipt)

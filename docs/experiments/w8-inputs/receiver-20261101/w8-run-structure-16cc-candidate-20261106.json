@@ -1,0 +1,251 @@
+{
+  "cpu_accounting_note": "7.067357 oracle CPU is included in 7.503963 launcher waited-children CPU; do not add them; external SSH CPU is not measured",
+  "evidence_bundle": {
+    "bytes": 27669,
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-run-structure-20261106-16ccf9d28ee6479cad1756a14468bb9b/metadata.tar.gz",
+    "scope": "metadata/source only; no NPZ arrays or model weights",
+    "sha256": "7465c50211f128ade397f9163d831d319d237de3372319a3a154a59c50680508"
+  },
+  "input_manifest_sha256": "84818f1255154859e8bfb3fbe1800142159beffc8f0b5f7458dc0c29403dae40",
+  "intent_sha256": "ae69f6f3a5a520d8d72f08116a1f3448e54109e37fd708f9b480eb5b6e795626",
+  "job_reference": "20261106T005057Z-77c276fa",
+  "launcher_receipt": {
+    "child_cpu_seconds": 7.503963000000001,
+    "exit_code": 0,
+    "output_dir": "/local/users/emanuele/pointstream/audits/w8-run-structure-16ccf9d28ee6479cad1756a14468bb9b",
+    "pgid": 3992958,
+    "pgid_absent": true,
+    "pid": 3992958,
+    "pid_absent": true,
+    "runtime": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/bin/python",
+    "self_cpu_seconds": 0.053813,
+    "stdout_sha256": "e73c4dea47f7e749307d59fc6a61c9034b56fbfd0ce8c8fa517a06d995be9b6b",
+    "timeout": false,
+    "wall_seconds": 8.308847039937973
+  },
+  "launcher_receipt_sha256": "813627026e084e8dd4a94063ce5a21f2ce8d5d8757c7b35c9b42977b4748cb5d",
+  "pre_execution_failures": [
+    "hashlib.file_digest unavailable in gpu5 system Python; failed before output or child",
+    "old scratch receiver-source absent; failed before output or child; both NPZ SHA checks passed"
+  ],
+  "result": {
+    "affinity": [
+      0
+    ],
+    "cpu_seconds": 7.0673569999999994,
+    "cuda_visible_devices": "",
+    "pgid": 3992958,
+    "pid": 3992958,
+    "python": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/bin/python",
+    "scheduler": {
+      "closed_loop": true,
+      "context_batch_size": 1,
+      "context_frames": 24,
+      "discarded_overlap": 0,
+      "guidance": 2,
+      "guidance_batch_multiplier": 2,
+      "latent_frames": "run length; no temporal padding",
+      "name": "uniform",
+      "overlap": 4,
+      "render_size": [
+        512,
+        784
+      ],
+      "step_argument": 0,
+      "stride": 1
+    },
+    "scheduler_syntax": [
+      {
+        "functions": [
+          "ordered_halving",
+          "uniform",
+          "get_context_scheduler",
+          "get_total_steps"
+        ],
+        "sha256": "aa019bb1dac4e7e736231c85d48131e21ea51012347b1810cb03c8b37cade71a"
+      },
+      {
+        "functions": [
+          "__init__",
+          "enable_vae_slicing",
+          "disable_vae_slicing",
+          "enable_sequential_cpu_offload",
+          "_execution_device",
+          "decode_latents",
+          "prepare_extra_step_kwargs",
+          "prepare_latents",
+          "_encode_prompt",
+          "interpolate_latents",
+          "__call__"
+        ],
+        "sha256": "480971c58c845c8636a9b0e616708f07bd7d7a5c19ae3c20b9439c0c9ac90a7f"
+      }
+    ],
+    "scope": "CPU structure and scheduler counts only; no GPU or quality claim",
+    "source_sha256": [
+      "bb30f9e4292a8f1d687f70f1af8b25325ea4df504789c7154eb84f923d68d996",
+      "00248aa4fdd47e634f82b37a7a33c99f1794440d65cbfe9395255a4225735542",
+      "aa019bb1dac4e7e736231c85d48131e21ea51012347b1810cb03c8b37cade71a",
+      "480971c58c845c8636a9b0e616708f07bd7d7a5c19ae3c20b9439c0c9ac90a7f"
+    ],
+    "status": "complete",
+    "units": [
+      {
+        "frames": 240,
+        "pose_dtype": "uint8",
+        "pose_shape": [
+          240,
+          784,
+          512,
+          3
+        ],
+        "reference_dtype": "uint8",
+        "reference_shape": [
+          784,
+          512,
+          3
+        ],
+        "runs": [
+          {
+            "1": {
+              "denoiser_calls": 12,
+              "discarded_windows_per_step": 10,
+              "image_encoder_calls": 1,
+              "pose_guider_calls": 1,
+              "reference_unet_calls": 1,
+              "scheduler_invocations": 2,
+              "used_windows_per_step": 12,
+              "vae_decode_calls": 240,
+              "vae_encode_calls": 1,
+              "window_lengths": [
+                24
+              ],
+              "wrapped_windows_per_step": 1
+            },
+            "3": {
+              "denoiser_calls": 36,
+              "discarded_windows_per_step": 10,
+              "image_encoder_calls": 1,
+              "pose_guider_calls": 1,
+              "reference_unet_calls": 1,
+              "scheduler_invocations": 6,
+              "used_windows_per_step": 12,
+              "vae_decode_calls": 240,
+              "vae_encode_calls": 1,
+              "window_lengths": [
+                24
+              ],
+              "wrapped_windows_per_step": 1
+            },
+            "30": {
+              "denoiser_calls": 360,
+              "discarded_windows_per_step": 10,
+              "image_encoder_calls": 1,
+              "pose_guider_calls": 1,
+              "reference_unet_calls": 1,
+              "scheduler_invocations": 60,
+              "used_windows_per_step": 12,
+              "vae_decode_calls": 240,
+              "vae_encode_calls": 1,
+              "window_lengths": [
+                24
+              ],
+              "wrapped_windows_per_step": 1
+            },
+            "contiguous": true,
+            "id": 0,
+            "length": 240
+          }
+        ],
+        "sha256": "387544a3fc344685f7c07632879affbdafcfd54fd6e1c00e0d9d6c06ca98995d",
+        "ticks": 80
+      },
+      {
+        "frames": 240,
+        "pose_dtype": "uint8",
+        "pose_shape": [
+          240,
+          784,
+          512,
+          3
+        ],
+        "reference_dtype": "uint8",
+        "reference_shape": [
+          784,
+          512,
+          3
+        ],
+        "runs": [
+          {
+            "1": {
+              "denoiser_calls": 12,
+              "discarded_windows_per_step": 10,
+              "image_encoder_calls": 1,
+              "pose_guider_calls": 1,
+              "reference_unet_calls": 1,
+              "scheduler_invocations": 2,
+              "used_windows_per_step": 12,
+              "vae_decode_calls": 240,
+              "vae_encode_calls": 1,
+              "window_lengths": [
+                24
+              ],
+              "wrapped_windows_per_step": 1
+            },
+            "3": {
+              "denoiser_calls": 36,
+              "discarded_windows_per_step": 10,
+              "image_encoder_calls": 1,
+              "pose_guider_calls": 1,
+              "reference_unet_calls": 1,
+              "scheduler_invocations": 6,
+              "used_windows_per_step": 12,
+              "vae_decode_calls": 240,
+              "vae_encode_calls": 1,
+              "window_lengths": [
+                24
+              ],
+              "wrapped_windows_per_step": 1
+            },
+            "30": {
+              "denoiser_calls": 360,
+              "discarded_windows_per_step": 10,
+              "image_encoder_calls": 1,
+              "pose_guider_calls": 1,
+              "reference_unet_calls": 1,
+              "scheduler_invocations": 60,
+              "used_windows_per_step": 12,
+              "vae_decode_calls": 240,
+              "vae_encode_calls": 1,
+              "window_lengths": [
+                24
+              ],
+              "wrapped_windows_per_step": 1
+            },
+            "contiguous": true,
+            "id": 0,
+            "length": 240
+          }
+        ],
+        "sha256": "74be8c9e2f8eb65ca67e6339ef9a2a2f8238df36c60a4b5a07a45fc68d3712a7",
+        "ticks": 80
+      }
+    ],
+    "wall_seconds": 6.996573017910123
+  },
+  "root_review_and_cost_closeout": "pending",
+  "schema": 1,
+  "scope": "CPU-only run structure and static scheduler count; no latency, GPU or quality qualification",
+  "source_manifest": {
+    "aa_inventory_archive": "093f33d582754309b3ac8d908f4fc11f7af78bc3cbd636d6c32750d0eddfbbe2",
+    "consumer_archive": "e66ed9c7f02835a719cf8f5defbdbf67785cd08f55011dd26239c724212bef90",
+    "consumer_revision": "04c6e22b85554d660b6a33d735d875f1df7530ca",
+    "source_origins": {
+      "context.py": "gpu5 JCV source inventory SHA 093f",
+      "k6b_generate.py": "git 04c6e22b + local SHA 00248",
+      "pipeline_pose2vid_long.py": "gpu5 JCV source inventory SHA 093f",
+      "w8_receiver_generate.py": "git 04c6e22b + local SHA bb30"
+    }
+  },
+  "stdout_sha256": "e73c4dea47f7e749307d59fc6a61c9034b56fbfd0ce8c8fa517a06d995be9b6b"
+}
