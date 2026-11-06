@@ -1,0 +1,208 @@
+{
+  "schema": 1,
+  "status": "candidate for root review only; not approved, uploaded or submitted",
+  "candidate_source_revision": "927aee050dfa48509eec9ee7cfded54f7b64fc65",
+  "assembled_revision": "15c6c48e484b8681323fae5ab864910e5d8c122a",
+  "worktree": "/private/tmp/pointstream-k5d-consumer-927a-20261105",
+  "old_archive": {
+    "local": "/private/tmp/pointstream-k5d-native-baseline-20261105.tar",
+    "sha256": "c3ff5419167504afcd84d25931791eddfe8bae16b5e492ed124df31e43f66f67",
+    "source_sha256": "8a3b51c487cf9b456e304fdf24300f230ece3f3c7b2c8569ab6681fbd8166f13",
+    "files": 1348
+  },
+  "new_archive": {
+    "local": "/var/folders/dm/2nks9rj5417726rl0kgrsg4h0000gn/T/pointstream-fleet-rfft0x4b.tar",
+    "sha256": "4bf9f93c6c3eb038efc3617697db2c3383ca5ec42521dd306ddef3be443c3e46",
+    "source_sha256": "46c23588ba8cdafe305604645099691622c43b8e8438fe3e3a721b8aeb30c688",
+    "bytes": 16373760,
+    "files": 1373
+  },
+  "unchanged_original_files": 1348,
+  "modified_original_files": [],
+  "additions": [
+    {
+      "path": "experiments/tennis/k5d_control_bridge.py",
+      "sha256": "2d73c26646effd0e3d1779f78b90d51ffa6a7035ec5d9ca7248469462873d756"
+    },
+    {
+      "path": "experiments/tennis/k5d_control_readiness.py",
+      "sha256": "55f331fa2f00174a914d1c756f59bc8cd7b6a194bf8e66b572eec3b678d43926"
+    },
+    {
+      "path": "experiments/tennis/k5d_control_study.py",
+      "sha256": "86971dfca550d88876c7d6ef33565d8ed645528151c298067595fe1fdba3bbbf"
+    },
+    {
+      "path": "experiments/tennis/k5d_cpu_accounting.py",
+      "sha256": "6183878e138e4b1f7866e7c27e55d3f3d7f38024a3f774f33d9d99f744f2d44b"
+    },
+    {
+      "path": "experiments/tennis/k5d_full_admission.py",
+      "sha256": "e4444ed4cc02fa7b549d8159dca4b061771dfead7c4df8d6979c2c899f5a5d24"
+    },
+    {
+      "path": "experiments/tennis/k5d_full_cost_builder.py",
+      "sha256": "d2a81c59074202d7bb522796aee60482b149469a326f856750605978824b19c7"
+    },
+    {
+      "path": "experiments/tennis/k5d_native_cpu_workload.py",
+      "sha256": "f4ca34f7c66529339105fbee190475478ed34a284809b0da0bf02b3df4bb309f"
+    },
+    {
+      "path": "experiments/tennis/k5d_native_pid_oracle.py",
+      "sha256": "2b09effba176100977682849715392edaef6766e4bbc26c80f94310b059118ea"
+    },
+    {
+      "path": "experiments/tennis/k5d_pid_escalation_oracle.py",
+      "sha256": "57e6ef1d842fd16812832aa1ac2ec40ddbf1ef47f349bd4ecb1ebc6f15aa0433"
+    },
+    {
+      "path": "experiments/tennis/k5d_pid_namespace_wrapper.py",
+      "sha256": "9e74f7de2773710c26c235bb9cd5834241690c572e6ac9b084f2558192b3cff6"
+    },
+    {
+      "path": "experiments/tennis/k5d_pidfd.py",
+      "sha256": "21ed2775eaafd2f55c19cc65c91c2a4f73c042b4bfc7a616bbcde36b99e6bd8e"
+    },
+    {
+      "path": "experiments/tennis/k5d_readiness_cost_probe.py",
+      "sha256": "fa423f07c1a4ed9aa1ae2f2b03ebfbab939660df2cda65b9b9a08d1bd8b96b24"
+    },
+    {
+      "path": "experiments/tennis/k5d_real_parity.py",
+      "sha256": "d516ccc7252e0bb649d3ee7d2ff13d5b23ee42fa06911d60cceca5886bf2d98e"
+    },
+    {
+      "path": "experiments/tennis/k5d_scoped_namespace.py",
+      "sha256": "9e68ec7e229f8cccf77c53eed5f561912b6caaf73149c00181205a8242412477"
+    },
+    {
+      "path": "experiments/tennis/k5d_study_wave.py",
+      "sha256": "8a749dc6ccc47d884f074160ee04102a4caad78143bc1ad1a63100b79560f3ec"
+    },
+    {
+      "path": "tests/tennis/test_k5d_control_bridge.py",
+      "sha256": "dd8d0bd5c2380c0fbcca21274de54790b322009aa827a04a294da9cb9650db33"
+    },
+    {
+      "path": "tests/tennis/test_k5d_control_readiness.py",
+      "sha256": "b5f221d83d9d82e427e2b57e419db2b364328be3cb2c076739387c2a0f6676a8"
+    },
+    {
+      "path": "tests/tennis/test_k5d_control_study.py",
+      "sha256": "492fa31b25b833034cf97cc19b9b4978364c8b8ae52e53d66fbefd65ce9ceabd"
+    },
+    {
+      "path": "tests/tennis/test_k5d_cpu_accounting.py",
+      "sha256": "e284dcb650fa1e98bbc6a64b30b19ceafac3b307d4efc00fb3f2b6cae2c8ddb6"
+    },
+    {
+      "path": "tests/tennis/test_k5d_full_cost_builder.py",
+      "sha256": "b660d9364995a75920fd2ae1a2c65ab53ee7510b7ad807eb4059868d42728f4a"
+    },
+    {
+      "path": "tests/tennis/test_k5d_native_pid_oracle.py",
+      "sha256": "07dcfeb1735ceb4f9b28797d1516636937ebf390b40d8a9242d5ba0de5288c48"
+    },
+    {
+      "path": "tests/tennis/test_k5d_readiness_cost_probe.py",
+      "sha256": "f925283ef72ff2240bc311e694cef68d60baaf2984ddc3c6ab7a35fe6d02f8f1"
+    },
+    {
+      "path": "tests/tennis/test_k5d_real_parity.py",
+      "sha256": "3f9d9a83a1495709e31ac0c9ac7e0a4546f5e2dba05268939744fa0778e7a28c"
+    },
+    {
+      "path": "tests/tennis/test_k5d_scoped_namespace.py",
+      "sha256": "4c54e394f3b648597c819572444499eaf46381ed84f090f89c1b51c6dfe79502"
+    },
+    {
+      "path": "tests/tennis/test_k5d_study_wave.py",
+      "sha256": "354ce58d0ca8e725145903c931acbdd9d2a80a26ab60460034d42af59294af60"
+    }
+  ],
+  "bridge": {
+    "schema": 1,
+    "status": "draft; independent scientific review required",
+    "approved": false,
+    "calibration_execution_identity": {
+      "source_sha256": "8a3b51c487cf9b456e304fdf24300f230ece3f3c7b2c8569ab6681fbd8166f13",
+      "snapshot_sha256": "c3ff5419167504afcd84d25931791eddfe8bae16b5e492ed124df31e43f66f67",
+      "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+    },
+    "consumer_execution_identity": {
+      "source_sha256": "46c23588ba8cdafe305604645099691622c43b8e8438fe3e3a721b8aeb30c688",
+      "snapshot_sha256": "4bf9f93c6c3eb038efc3617697db2c3383ca5ec42521dd306ddef3be443c3e46",
+      "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+    },
+    "calibration_snapshot_sha256": "c3ff5419167504afcd84d25931791eddfe8bae16b5e492ed124df31e43f66f67",
+    "consumer_snapshot_sha256": "4bf9f93c6c3eb038efc3617697db2c3383ca5ec42521dd306ddef3be443c3e46",
+    "changed_paths": [
+      "experiments/tennis/k5d_control_bridge.py",
+      "experiments/tennis/k5d_control_readiness.py",
+      "experiments/tennis/k5d_control_study.py",
+      "experiments/tennis/k5d_cpu_accounting.py",
+      "experiments/tennis/k5d_full_admission.py",
+      "experiments/tennis/k5d_full_cost_builder.py",
+      "experiments/tennis/k5d_native_cpu_workload.py",
+      "experiments/tennis/k5d_native_pid_oracle.py",
+      "experiments/tennis/k5d_pid_escalation_oracle.py",
+      "experiments/tennis/k5d_pid_namespace_wrapper.py",
+      "experiments/tennis/k5d_pidfd.py",
+      "experiments/tennis/k5d_readiness_cost_probe.py",
+      "experiments/tennis/k5d_real_parity.py",
+      "experiments/tennis/k5d_scoped_namespace.py",
+      "experiments/tennis/k5d_study_wave.py",
+      "tests/tennis/test_k5d_control_bridge.py",
+      "tests/tennis/test_k5d_control_readiness.py",
+      "tests/tennis/test_k5d_control_study.py",
+      "tests/tennis/test_k5d_cpu_accounting.py",
+      "tests/tennis/test_k5d_full_cost_builder.py",
+      "tests/tennis/test_k5d_native_pid_oracle.py",
+      "tests/tennis/test_k5d_readiness_cost_probe.py",
+      "tests/tennis/test_k5d_real_parity.py",
+      "tests/tennis/test_k5d_scoped_namespace.py",
+      "tests/tennis/test_k5d_study_wave.py"
+    ],
+    "unchanged_files": 1348,
+    "scope": "complete archived source manifests; no checkpoint identity substitution"
+  },
+  "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "tool_sha256": {
+    "unshare": "9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6",
+    "ffmpeg": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+    "encoder": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+    "decoder": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6"
+  },
+  "proof_spec": {
+    "local": "/private/tmp/pointstream-k5d-native-proof-927a-draft-spec-20261106.json",
+    "file_sha256": "ccca60c1ba83939f1b4ec07f9e4bb6ed6a5ae7b3290ceb8f3f3e120522a13944",
+    "normalized_sha256": "89b75001a5174e8e0a6e9d88e0cddf3171c8a123d3b8cfce5e9dc74d20f5756e",
+    "draft_deadline": "2026-11-06T01:30:00Z",
+    "deadline_must_be_refreshed_after_upload": true,
+    "only_difference_from_prior_reviewed_spec": "deadline",
+    "scope": "CPU-only; 70s smoke, 10s validator, 5s no-op, 100s campaign"
+  },
+  "prospective_budget": {
+    "already_charged_cpu_seconds": 40,
+    "preparation_cpu_seconds": 50,
+    "campaign_cpu_seconds": 100,
+    "audit_cpu_seconds": 30,
+    "repair1_total_cpu_seconds": 220,
+    "gpu_seconds": 0,
+    "interpretation": "50+100+30 is remaining 180, nested inside first tranche; not a new aggregate reservation"
+  },
+  "forecast": {
+    "previous_full_source_upload_wall_seconds": 431.655,
+    "one_point_1_5x_plus_30_seconds": 677.4825,
+    "candidate_metadata_upload_wall_cap_seconds": 900,
+    "limitation": "prior upload time is one observation on different source archive; actual CPU accounting and source-copy costs remain bounded by approved allocations, not inferred from wall"
+  },
+  "tests": {
+    "focused_passed": 56,
+    "focused_skipped": 4,
+    "focused_log": "/private/tmp/pointstream-k5d-consumer-927a-tests-20261105.log",
+    "mypy": "success: 494 source files",
+    "mypy_log": "/private/tmp/pointstream-k5d-consumer-927a-mypy-20261105.log"
+  }
+}
