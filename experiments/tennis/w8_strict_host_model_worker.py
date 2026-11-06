@@ -70,19 +70,23 @@ def main() -> int:
     parser.add_argument('--materialize-profile', action='store_true')
     parser.add_argument('--clock-receipt', type=Path)
     parser.add_argument('--clock-receipt-sha256')
+    parser.add_argument('--witness-mode', choices=('generate', 'context_qualification'))
     args = parser.parse_args()
     if (args.clock_receipt is None) != (args.clock_receipt_sha256 is None) or (args.clock_receipt is not None and not args.materialize_profile):
         raise ValueError('clock profile requires both receipt arguments and materialization')
     if receiver.digest(args.config) != args.config_sha256:
         raise ValueError('model worker config identity mismatch')
     config = json.loads(args.config.read_text())
-    if config.get('worker_kind') != 'cost_probe':
+    if config.get('worker_kind') != (args.witness_mode or 'cost_probe'):
         raise ValueError('host model wrapper only admits bounded cost probes')
+    if args.witness_mode and (not args.materialize_profile or args.clock_receipt is None):
+        raise ValueError('witness mode requires materialization and clock profile')
     wrapper = wrapper_identity(args.source_root, Path(__file__))
     if args.materialize_profile:
         pin_declared_aa_imports(config)
         receiver.launch(args.config, args.config_sha256, args.loader, args.loader_sha256, args.canary, args.source_root,
-                        materialize_profile=True, clock_receipt=args.clock_receipt, clock_receipt_sha=args.clock_receipt_sha256)
+                        materialize_profile=True, clock_receipt=args.clock_receipt, clock_receipt_sha=args.clock_receipt_sha256,
+                        witness_mode=args.witness_mode)
     else:
         receiver.launch(args.config, args.config_sha256, args.loader, args.loader_sha256, args.canary, args.source_root)
     if args.materialize_profile:

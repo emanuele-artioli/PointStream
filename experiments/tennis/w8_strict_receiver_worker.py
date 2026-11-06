@@ -67,7 +67,8 @@ def clean_process() -> None:
 
 def launch(config_path: Path, config_sha: str, loader_path: Path, loader_sha: str,
            canary: Path, source_root: Path, *, materialize_profile: bool = False,
-           clock_receipt: Path | None = None, clock_receipt_sha: str | None = None) -> None:
+           clock_receipt: Path | None = None, clock_receipt_sha: str | None = None,
+           witness_mode: str | None = None) -> None:
     if sys.platform != 'linux' or len(os.sched_getaffinity(0)) != 1:
         raise RuntimeError('Linux and one CPU required')
     policy, fixed, bootstrap, receiver = preload()
@@ -81,8 +82,11 @@ def launch(config_path: Path, config_sha: str, loader_path: Path, loader_sha: st
     config = bootstrap.load_config(config_path, config_sha)
     if Path(config['allow_paths'][0]).resolve(strict=True) != source_root.resolve(strict=True):
         raise ValueError('config source grant differs from authenticated source root')
-    if config['worker_kind'] not in ('packet', 'cost_probe'):
+    allowed_kinds = ('packet', 'cost_probe') if witness_mode is None else (witness_mode,)
+    if witness_mode not in (None, 'generate', 'context_qualification') or config['worker_kind'] not in allowed_kinds:
         raise ValueError('only packet decode and bounded cost probe are admitted')
+    if witness_mode is not None and (not materialize_profile or clock_receipt is None):
+        raise ValueError('witness modes require materialized source and clock profile')
     if config['worker_kind'] == 'cost_probe' and config.get('probe_steps') not in (1, 3):
         raise ValueError('only 1/3 step qualification runs are admitted')
     if digest(loader_path) != loader_sha:

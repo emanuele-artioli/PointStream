@@ -156,7 +156,7 @@ def load_config(path: Path, expected_sha: str) -> dict[str, Any]:
         raise ValueError('unexpected configuration fields')
     if ('native_receipt' in config) != (config.get('worker_kind') == 'rgb'):
         raise ValueError('native receipt required only for RGB conversion')
-    if config['worker_kind'] not in ('packet', 'generate', 'cost_probe', 'preflight', 'sam', 'rgb', 'compose'):
+    if config['worker_kind'] not in ('packet', 'generate', 'context_qualification', 'cost_probe', 'preflight', 'sam', 'rgb', 'compose'):
         raise ValueError('unknown worker kind')
     if config['worker_kind'] == 'cost_probe':
         if type(config.get('probe_steps')) is not int or config['probe_steps'] not in (1, 3, 6):
@@ -266,7 +266,7 @@ def main() -> int:
                    'numpy': str(numpy.__version__), 'cuda_initialized': torch.cuda.is_initialized(),
                    'visible_devices': os.environ.get('CUDA_VISIBLE_DEVICES'), 'source_modules': closure}
         (Path(config['output']) / 'preflight.json').write_text(json.dumps(receipt, sort_keys=True))
-    elif config['worker_kind'] in ('packet', 'generate', 'cost_probe'):
+    elif config['worker_kind'] in ('packet', 'generate', 'context_qualification', 'cost_probe'):
         from experiments.tennis.w8_receiver_generate import run_isolated, run_packet_isolated
         if config['worker_kind'] == 'packet':
             run_packet_isolated(config, isolation)

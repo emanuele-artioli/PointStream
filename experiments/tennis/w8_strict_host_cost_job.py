@@ -184,7 +184,11 @@ def _item(path: Path, digest_file: Callable[[Path], str] | None = None) -> dict[
     return {'path': str(path), 'sha256': (digest_file or fixed.file_sha)(path)}
 
 
-def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, wall_seconds: int, code_root: Path, loader: Path, *, materialize_profile: bool = False, clock_profile: bool = False) -> dict[str, Any]:
+def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, wall_seconds: int, code_root: Path, loader: Path, *, materialize_profile: bool = False, clock_profile: bool = False, witness_mode: str | None = None) -> dict[str, Any]:
+    if (witness_mode not in (None, 'generate', 'context_qualification')
+            or (witness_mode is not None and (config.get('worker_kind') != witness_mode
+                or not materialize_profile or not clock_profile))):
+        raise ValueError('witness worker mode or required safeguards differ')
     config_path = work / 'worker-config.json'
     config_path.write_text(json.dumps(config, sort_keys=True))
     source = code_root
@@ -203,15 +207,17 @@ def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, 
                '--loader-sha256', fixed.file_sha(loader), '--canary', str(canary),
                '--source-root', str(code_root)]
     if materialize_profile:
-        if config['worker_kind'] != 'cost_probe':
+        if config['worker_kind'] != 'cost_probe' and witness_mode is None:
             raise ValueError('materialization applies only to model cost probes')
         command.append('--materialize-profile')
     if clock_profile:
-        if not materialize_profile or config['worker_kind'] != 'cost_probe':
+        if not materialize_profile or (config['worker_kind'] != 'cost_probe' and witness_mode is None):
             raise ValueError('clock profile applies only to materialized model cost probes')
         clock_path = work / 'clock-identity.json'
         clock_sha = w8_clock_profile.write_parent_receipt(clock_path)
         command.extend(('--clock-receipt', str(clock_path), '--clock-receipt-sha256', clock_sha))
+    if witness_mode is not None:
+        command.extend(('--witness-mode', witness_mode))
     before = resource.getrusage(resource.RUSAGE_CHILDREN)
     started = time.monotonic()
     def limit() -> None:
