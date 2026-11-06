@@ -90,3 +90,36 @@ def test_outer_accepts_real_canonical_fleet_argv(tmp_path, monkeypatch: pytest.M
     (tmp_path / 'spec.json').write_text(json.dumps(spec))
     with pytest.raises(ValueError, match='launcher arguments'):
         namespace.outer(sha, 10, ['prepare', '--frames', '16'])
+
+
+@pytest.mark.skipif(__import__('sys').platform != 'linux', reason='host procfs required')
+def test_real_child_group_identity_and_rejection(tmp_path) -> None:
+    import json
+    import os
+    import subprocess
+    import sys
+
+    status = tmp_path / 'status.json'
+    status.write_text(json.dumps({'process_group_id': os.getpgrp()}))
+    program = ('import json,sys; from pathlib import Path; '
+               'from experiments.tennis.k5d_scoped_namespace import host_group_identity; '
+               'print(json.dumps(host_group_identity(Path(sys.argv[1]))))')
+    child = subprocess.run([sys.executable, '-c', program, str(status)], capture_output=True, text=True, check=True)
+    identity = json.loads(child.stdout)
+    assert identity['host_pgid'] == os.getpgrp() == identity['campaign_pgid']
+    assert identity['host_pid'] > 0 and identity['start_ticks'] > 0
+    rejected = subprocess.run([sys.executable, '-c', program, str(status)], capture_output=True, text=True,
+                              start_new_session=True)
+    assert rejected.returncode != 0 and 'worker host process group differs' in rejected.stderr
+
+
+def test_real_process_inherits_group_unless_detached() -> None:
+    import os
+    import subprocess
+    import sys
+
+    command = [sys.executable, '-c', 'import os; print(os.getpid(), os.getpgrp())']
+    inherited = subprocess.check_output(command, text=True).split()
+    detached = subprocess.check_output(command, text=True, start_new_session=True).split()
+    assert int(inherited[1]) == os.getpgrp()
+    assert detached[0] == detached[1] and int(detached[1]) != os.getpgrp()

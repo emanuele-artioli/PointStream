@@ -58,6 +58,7 @@ def descendants(pid: int) -> list[dict[str, Any]]:
                 pids = [int(n) for n in fields[0]]
                 record = {'host_pid': child, 'namespace_pid': pids[-1], 'namespace_pids': pids,
                           'start_ticks': int(text[text.rfind(')') + 2:].split()[19]),
+                          'host_pgid': int(text[text.rfind(')') + 2:].split()[2]),
                           'pid_namespace': os.readlink(base / 'ns/pid'),
                           'executable': os.readlink(base / 'exe')}
             except (FileNotFoundError, IndexError, ProcessLookupError):
@@ -65,6 +66,12 @@ def descendants(pid: int) -> list[dict[str, Any]]:
             result.append(record)
             pending.append(child)
     return result
+
+
+def observed_worker_group(group: dict[str, Any], members: list[dict[str, Any]], namespace: str) -> bool:
+    return any(m['host_pid'] == group['host_pid'] and m['start_ticks'] == group['start_ticks']
+               and m['namespace_pid'] == 2 and m['host_pgid'] == group['exec_host_pgid']
+               and m['pid_namespace'] == namespace for m in members)
 
 
 def one_case(root: Path, case: str, unshare: Path, native_args: list[str],
@@ -80,7 +87,8 @@ def one_case(root: Path, case: str, unshare: Path, native_args: list[str],
     log = proof / 'command.log'
     with log.open('xb') as stream:
         proc = subprocess.Popen(command, stdout=stream, stderr=subprocess.STDOUT,
-                                env={**os.environ, 'PS_K5D_PROOF_ROOT': str(proof)}, start_new_session=True)
+                                env={**os.environ, 'PS_K5D_PROOF_ROOT': str(proof),
+                                     'PS_K5D_DETACH_NATIVE': '0' if case == 'normal' else '1'})
         try:
             owner = {'host_pid': proc.pid, 'start_ticks': int((Path('/proc') / str(proc.pid) / 'stat').read_text().split(') ')[1].split()[19])}
             write(proof / 'launcher.json', owner)
@@ -105,6 +113,13 @@ def one_case(root: Path, case: str, unshare: Path, native_args: list[str],
                 proc.wait()
                 raise TimeoutError('native subprocess observation deadline')
             init = json.loads((proof / 'init.json').read_text())['identity']
+            group = json.loads((proof / 'worker-group.json').read_text())
+            if (group['host_pgid'] != group['campaign_pgid']
+                    or group['exec_host_pgid'] != (group['campaign_pgid'] if case == 'normal' else group['host_pid'])
+                    or group['start_ticks'] <= 0
+                    or (group['host_pid'], group['start_ticks']) not in observed
+                    or observed[(group['host_pid'], group['start_ticks'])]['host_pgid'] != group['exec_host_pgid']):
+                raise ValueError('CPU worker group proof differs')
             launcher_exe = Path(os.readlink(f'/proc/{proc.pid}/exe')).resolve(strict=True)
             launcher_stat = Path(f'/proc/{proc.pid}/stat').read_text()
             launcher_start = int(launcher_stat[launcher_stat.rfind(')') + 2:].split()[19])
@@ -116,7 +131,7 @@ def one_case(root: Path, case: str, unshare: Path, native_args: list[str],
                 proc.wait()
                 raise ValueError('namespace or native process identity differs')
             write(proof / 'before-interruption.json', {'case': case, 'launcher': owner, 'init': init,
-                  'native': active_native, 'observed_members': list(observed.values()), 'outside_namespace': outside,
+                  'native': active_native, 'worker_group': group, 'observed_members': list(observed.values()), 'outside_namespace': outside,
                   'launcher_executable': str(launcher_exe), 'launcher_executable_sha256': sha(launcher_exe)})
             if case != 'normal':
                 if gone(active_native):
@@ -187,7 +202,7 @@ def one_case(root: Path, case: str, unshare: Path, native_args: list[str],
     elif case == 'sigkill' and proc.returncode != -signal.SIGKILL:
         raise ValueError('SIGKILL did not determine launcher exit')
     result = {'case': case, 'launcher': owner, 'init': init, 'native': active_native,
-              'observed_members': list(observed.values()), 'members_absent': True,
+              'observed_members': list(observed.values()), 'worker_group': group, 'members_absent': True,
               'returncode': proc.returncode, 'escalated_to_sigkill': escalated, 'outer_waited_cpu_seconds': waited_cpu,
               'inner_records': records, 'native_output': outputs[0] if case == 'normal' else None,
               'native_commands_sha256': hashlib.sha256(json.dumps(
@@ -328,7 +343,15 @@ def validate() -> None:
                 or record['environment_sha256'] != dispatch['staged_environment']['sha256']
                 or dispatch['environment']['gpu'] is not None or [x['case'] for x in cases] != list(CASES)):
             raise ValueError('oracle execution identity differs')
+        campaign_group = json.loads((stage.parent / 'run' / 'status.json').read_text())['process_group_id']
         for case, pre, result in zip(CASES, before, cases, strict=True):
+            group = result['worker_group']
+            observed_members = result['observed_members']
+            if (group != pre['worker_group'] or group['host_pgid'] != campaign_group
+                    or group['campaign_pgid'] != campaign_group
+                    or group['exec_host_pgid'] != (campaign_group if case == 'normal' else group['host_pid'])
+                    or not observed_worker_group(group, observed_members, result['init']['pid_namespace'])):
+                raise ValueError('worker group identity or live procfs join differs')
             if (pre['case'] != case or pre['native'] != result['native'] or pre['init'] != result['init']
                     or result['members_absent'] is not True or not valid_identity(result['native'])
                     or not valid_identity(result['init']) or result['init']['namespace_pid'] != 1
