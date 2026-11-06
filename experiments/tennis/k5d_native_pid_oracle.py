@@ -128,11 +128,13 @@ def one_case(root: Path, case: str, unshare: Path, native_args: list[str],
                     pidfd.send(fd, int(signal.SIGSTOP))
                 finally:
                     os.close(fd)
+            escalated = False
             if case == 'sigterm':
                 proc.terminate()
                 try:
                     proc.wait(timeout=0.1)
                 except subprocess.TimeoutExpired:
+                    escalated = True
                     proc.kill()
             elif case == 'sigkill':
                 proc.kill()
@@ -174,11 +176,19 @@ def one_case(root: Path, case: str, unshare: Path, native_args: list[str],
         # The external total also includes unshare; allow a small positive overhead.
         if not 0 <= waited_cpu - inner_cpu <= max(0.2, inner_cpu * 0.05):
             raise ValueError('outer and namespace CPU counters disagree')
-    elif proc.returncode == 0:
-        raise ValueError('interrupted workload exited successfully')
+    elif case == 'timeout':
+        if (proc.returncode != 1 or len(records) != 1 or records[0].get('reason') != 'timeout'
+                or records[0].get('complete_descendant_wait') is not True):
+            raise ValueError('namespace watchdog timeout was not observed')
+    elif case == 'sigterm':
+        expected = -signal.SIGKILL if escalated else -signal.SIGTERM
+        if proc.returncode != expected:
+            raise ValueError('SIGTERM or its escalation did not determine launcher exit')
+    elif case == 'sigkill' and proc.returncode != -signal.SIGKILL:
+        raise ValueError('SIGKILL did not determine launcher exit')
     result = {'case': case, 'launcher': owner, 'init': init, 'native': active_native,
               'observed_members': list(observed.values()), 'members_absent': True,
-              'returncode': proc.returncode, 'outer_waited_cpu_seconds': waited_cpu,
+              'returncode': proc.returncode, 'escalated_to_sigkill': escalated, 'outer_waited_cpu_seconds': waited_cpu,
               'inner_records': records, 'native_output': outputs[0] if case == 'normal' else None,
               'native_commands_sha256': hashlib.sha256(json.dumps(
                   [outputs[0]['conversion_command'], outputs[0]['native']['encode_command'],
@@ -251,6 +261,18 @@ def execute(args: argparse.Namespace) -> None:
           'scope': 'CPU native process containment and accounting; no GPU, quality or file-denial claim'})
 
 
+def check_interruptions(cases: list[dict[str, Any]]) -> None:
+    timeout, term, killed = cases[1:]
+    timeout_records = timeout['inner_records']
+    if (timeout['returncode'] != 1 or len(timeout_records) != 1
+            or timeout_records[0].get('reason') != 'timeout'
+            or timeout_records[0].get('complete_descendant_wait') is not True
+            or type(term.get('escalated_to_sigkill')) is not bool
+            or term['returncode'] != (-signal.SIGKILL if term['escalated_to_sigkill'] else -signal.SIGTERM)
+            or killed['returncode'] != -signal.SIGKILL):
+        raise ValueError('interruption cause differs from declared case')
+
+
 def validate() -> None:
     import tarfile
 
@@ -319,6 +341,7 @@ def validate() -> None:
                     or pre['launcher_executable_sha256'] != option('--unshare-sha')
                     or (case != 'normal' and Path(result['native']['executable']).name != 'SvtAv1EncApp')):
                 raise ValueError('native or teardown evidence differs')
+        check_interruptions(cases)
         normal = cases[0]
         native = normal['native_output']
         cpu = normal['inner_records']

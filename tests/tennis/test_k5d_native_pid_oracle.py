@@ -1,4 +1,5 @@
 import json
+from typing import Any
 
 import pytest
 
@@ -123,3 +124,16 @@ def test_x86_64_pidfd_syscall_rejects_wrong_word_size(monkeypatch: pytest.Monkey
     monkeypatch.setattr(k5d_pidfd.signal, 'pidfd_send_signal', None, raising=False)
     with pytest.raises(RuntimeError, match='unsupported Linux pidfd syscall ABI'):
         k5d_pidfd.Pidfd()
+
+
+def test_interruption_proof_rejects_wrong_cause() -> None:
+    cases: list[dict[str, Any]] = [{}, {'returncode': 1, 'inner_records': [{'reason': 'timeout', 'complete_descendant_wait': True}]},
+             {'returncode': -15, 'escalated_to_sigkill': False}, {'returncode': -9}]
+    oracle.check_interruptions(cases)
+    for index, replacement in ((1, {'returncode': 1, 'inner_records': [{'reason': 'worker_failed'}]}),
+                               (2, {'returncode': -9, 'escalated_to_sigkill': False}),
+                               (3, {'returncode': 1})):
+        bad = list(cases)
+        bad[index] = replacement
+        with pytest.raises(ValueError, match='interruption cause'):
+            oracle.check_interruptions(bad)
