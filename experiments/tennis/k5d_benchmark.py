@@ -29,7 +29,8 @@ def build(args: argparse.Namespace) -> argparse.Namespace:
     if not ((stage == "smoke" and args.frames == 16) or
             (stage == "full" and args.frames == selected["label_rows"])):
         raise ValueError("shard requires first 16 frames in smoke and all frames in full")
-    encoder.fidelity_gate(Path(args.fidelity_gate), args.fidelity_gate_sha256, fleet.EXPECTED["archive"])
+    encoder.fidelity_gate(Path(args.fidelity_gate, purpose=getattr(args, 'fidelity_purpose', 'full-retrospective-benchmark'),
+                      clip=args.clip, frames=args.frames), args.fidelity_gate_sha256, fleet.EXPECTED["archive"])
     data: dict[str, Any] = vars(args).copy()
     stage_dir = Path(os.environ["PS_STAGE_DIR"])
     dispatch_code = json.loads((stage_dir / "dispatch.json").read_text())["code"]

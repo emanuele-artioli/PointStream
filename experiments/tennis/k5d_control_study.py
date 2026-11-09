@@ -37,13 +37,7 @@ CALIBRATION_ARCHIVES = {
 }
 
 
-def programme_projection(receipt: dict[str, Any], *, inventory: dict[str, dict[str, Any]] | None = None,
-                         noncommand: dict[str, dict[str, Any]] | None = None,
-                         certified_cpu: dict[str, dict[str, float]] | None = None) -> dict[str, Any]:
-    """Recompute all 60 GPU full stages and CPU-readiness campaigns, once each."""
-    rows = study.selection()
-    if len(rows) != 30 or sum(row['label_rows'] for row in rows.values()) != 5675:
-        raise ValueError('frozen population differs')
+def validate_calibration(receipt: dict[str, Any]) -> None:
     if receipt.get('budget_reconciled') is not True:
         raise ValueError('budget and active reservations require reconciliation')
     costs = receipt['cost']
@@ -62,6 +56,17 @@ def programme_projection(receipt: dict[str, Any], *, inventory: dict[str, dict[s
                 or costs[phase]['margin'] < 1.5 or costs[phase]['reserve_seconds'] <= 0
                 or costs[phase]['seconds16'] <= 0 or costs[phase]['seconds48'] < costs[phase]['seconds16']):
             raise ValueError('invalid calibration bounds')
+
+
+def programme_projection(receipt: dict[str, Any], *, inventory: dict[str, dict[str, Any]] | None = None,
+                         noncommand: dict[str, dict[str, Any]] | None = None,
+                         certified_cpu: dict[str, dict[str, float]] | None = None) -> dict[str, Any]:
+    """Recompute all 60 GPU full stages and CPU-readiness campaigns, once each."""
+    rows = study.selection()
+    if len(rows) != 30 or sum(row['label_rows'] for row in rows.values()) != 5675:
+        raise ValueError('frozen population differs')
+    validate_calibration(receipt)
+    costs = receipt['cost']
     if inventory is not None and (set(inventory) != set(rows) or any(
             inventory[clip][phase]['state'] not in ('pending', 'complete')
             for clip in rows for phase in ('prepare', 'score'))):
@@ -244,6 +249,87 @@ def confirmation_budget(gate: dict[str, Any], receipt: dict[str, Any]) -> None:
                         raise ValueError('confirmation GPU cap below numerical forecast')
 
 
+PAIR_RELEASE = 'first-292-pair-v1'
+PAIR_CLIP = 'tracknet/game9/Clip5'
+
+
+def parent8_bridge_record(old_source: Path, calibration: dict[str, str], new_source: Path,
+                          identity: dict[str, str]) -> dict[str, Any]:
+    """Normalize the independently pinned resource-only archive comparison."""
+    from experiments.tennis import k5d_first292_source_bridge as scoped_bridge
+    return scoped_bridge.bridge(old_source, calibration, new_source, identity)
+
+
+def pair_producer(gate: dict[str, Any]) -> dict[str, Any]:
+    producer = gate.get('pair_producer')
+    if (not isinstance(producer, dict) or producer.get('audited') is not True
+            or producer.get('clip') != PAIR_CLIP or producer.get('frames') != 292
+            or not isinstance(producer.get('job_id'), str) or not producer['job_id'].startswith('2026')
+            or any(not isinstance(producer.get(key), str) or not cf.digest_string(producer[key])
+                   for key in ('archive_sha256', 'checkpoint_sha256', 'audit_sha256'))
+            or not isinstance(producer.get('remote'), str)
+            or not Path(producer['remote']).is_absolute() or not Path(producer['remote']).is_relative_to(cf.DATA_ROOT)):
+        raise ValueError('independently audited pair producer required')
+    return producer
+
+
+def verify_pair_producer_audit(gate: dict[str, Any], path: Path, identity: dict[str, str]) -> None:
+    producer = pair_producer(gate)
+    audit = study.checked_json(path, producer['audit_sha256'])
+    if (audit.get('schema') != 1 or audit.get('audited') is not True or audit.get('terminal_status') != 'COMPLETE'
+            or audit.get('exclusive') is not True or audit.get('timing_contaminated') is not False
+            or audit.get('consumer_execution_identity') != identity
+            or any(audit.get(key) != producer.get(key) for key in
+                   ('job_id', 'clip', 'frames', 'remote', 'archive_sha256', 'checkpoint_sha256',
+                    'gpu_charge_seconds', 'cpu_charge_seconds'))):
+        raise ValueError('independent pair producer audit differs')
+
+
+def first_pair_budget(gate: dict[str, Any], receipt: dict[str, Any], attestation: dict[str, Any],
+                      phase: str = 'prepare') -> None:
+    """Reserve the complete requested pair; later study fit remains unproven."""
+    if gate.get('allowed_clips') != [PAIR_CLIP] or gate.get('future_study_fit_proven') is not False:
+        raise ValueError('pair release requires the registered clip and no full-study fit claim')
+    caps = gate.get('confirmation_caps')
+    if not isinstance(caps, dict) or set(caps) != {'gpu', 'cpu'}:
+        raise ValueError('pair GPU and CPU caps required')
+    forecast = {}
+    for resource in ('gpu', 'cpu'):
+        budget = caps[resource]
+        if not isinstance(budget, dict) or set(budget) != {'jobs', 'external', 'total'}:
+            raise ValueError('pair jobs and external reserve required')
+        jobs = budget['jobs']
+        if not isinstance(jobs, dict) or set(jobs) != {f'{PAIR_CLIP}:prepare', f'{PAIR_CLIP}:score'}:
+            raise ValueError('exact pair jobs required')
+        values = [*jobs.values(), budget['external'], budget['total']]
+        if any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) or v <= 0 for v in values):
+            raise ValueError('invalid pair cap')
+        if sum(jobs.values()) + budget['external'] > budget['total'] or budget['total'] > 3350:
+            raise ValueError('pair cap exceeds inclusive allocation')
+        remaining = budget['total']
+        if phase == 'score':
+            producer = pair_producer(gate)
+            charged = producer.get(resource + '_charge_seconds')
+            if (isinstance(charged, bool) or not isinstance(charged, (int, float))
+                    or not math.isfinite(charged) or charged <= 0 or charged > jobs[f'{PAIR_CLIP}:prepare']):
+                raise ValueError('invalid audited producer charge')
+            remaining = jobs[f'{PAIR_CLIP}:score'] + budget['external']
+            if charged + remaining > budget['total']:
+                raise ValueError('pair including producer charge exceeds inclusive allocation')
+        elif phase != 'prepare':
+            raise ValueError('invalid pair phase')
+        if remaining > min(receipt['programme'][resource]['ball_remaining_seconds'],
+                           receipt['programme'][resource]['global_remaining_seconds']):
+            raise ValueError('pair cap exceeds reconciled budget')
+        if resource == 'gpu':
+            for kind in ('prepare', 'score'):
+                predicted = study.forecast(receipt, kind, 292, receipt['cost'][kind]['seconds16'])
+                if jobs[f'{PAIR_CLIP}:{kind}'] < predicted:
+                    raise ValueError('pair GPU cap below numerical forecast')
+        forecast[resource] = {'incremental_seconds': remaining}
+    check_forecast_allocation(attestation, forecast)
+
+
 def audit_raw_approval(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha: str, bridge_path: Path, bridge_sha: str,
              old_source: Path, new_source: Path, ledger_path: Path, ledger_sha: str,
              budget_path: Path, budget_sha: str, identity: dict[str, str], clip: str, phase: str,
@@ -264,15 +350,22 @@ def audit_raw_approval(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha
     clips = study.selection()
     allowed = gate.get('allowed_clips')
     if (not isinstance(allowed, list) or clip not in allowed or len(set(allowed)) != len(allowed)
-            or not set(allowed).issubset(set(clips)) or gate.get('release') not in ('cost-confirmation', 'full-study')
+            or not set(allowed).issubset(set(clips)) or gate.get('release') not in ('cost-confirmation', 'full-study', PAIR_RELEASE)
             or (gate['release'] == 'cost-confirmation' and not set(allowed).issubset(study.CONFIRMATION))):
         raise ValueError('clip is not admitted by this release')
+    if gate['release'] == PAIR_RELEASE and clips[PAIR_CLIP]['label_rows'] != 292:
+        raise ValueError('registered pair timeline differs')
     calibration = signed_bridge['calibration_execution_identity']
     if signed_bridge.get('approved') is not True or signed_bridge.get('consumer_execution_identity') != identity:
         raise ValueError('unapproved or wrong source bridge')
-    actual_bridge = bridge.bridge(old_source, calibration, new_source, identity)
-    for name in ('calibration_execution_identity', 'consumer_execution_identity', 'calibration_snapshot_sha256',
-                 'consumer_snapshot_sha256', 'changed_paths', 'unchanged_files'):
+    if gate['release'] == PAIR_RELEASE:
+        actual_bridge = parent8_bridge_record(old_source, calibration, new_source, identity)
+        bridge_fields = tuple(actual_bridge)
+    else:
+        actual_bridge = bridge.bridge(old_source, calibration, new_source, identity)
+        bridge_fields = ('calibration_execution_identity', 'consumer_execution_identity', 'calibration_snapshot_sha256',
+                         'consumer_snapshot_sha256', 'changed_paths', 'unchanged_files')
+    for name in bridge_fields:
         if signed_bridge.get(name) != actual_bridge[name]:
             raise ValueError('source bridge archived manifest differs: ' + name)
     if (receipt.get('schema') != 1 or receipt.get('passed') is not True
@@ -290,7 +383,7 @@ def audit_raw_approval(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha
     check_budget(ledger, attestation, ledger_sha, budget_sha, receipt)
     if gate['release'] == 'cost-confirmation':
         programme_projection(receipt)
-    if gate['release'] in ('cost-confirmation', 'full-study'):
+    if gate['release'] in ('cost-confirmation', 'full-study', PAIR_RELEASE):
         qualification = gate.get('confirmation_qualification')
         if not isinstance(qualification, dict):
             raise ValueError('real-path confirmation qualification required')
@@ -323,8 +416,14 @@ def audit_raw_approval(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha
                 or parity.get('namespace_wrapper_sha256') != qualification['namespace_wrapper_sha256']
                 or parity.get('unshare_sha256') != qualification['unshare_sha256']):
             raise ValueError('actual native or GPU qualification receipt differs')
+        if gate['release'] == PAIR_RELEASE and (parity.get('exclusive') is not True
+                                                   or parity.get('timing_contaminated') is not False):
+            raise ValueError('pair requires clean exclusive GPU qualification')
         if gate['release'] == 'cost-confirmation':
             confirmation_budget(gate, receipt)
+        elif gate['release'] == PAIR_RELEASE:
+            validate_calibration(receipt)
+            first_pair_budget(gate, receipt, attestation, phase)
     if gate['release'] == 'full-study':
         qualification = gate.get('confirmation_qualification')
         if not isinstance(qualification, dict):
@@ -361,6 +460,8 @@ def audit_raw_approval(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha
             raise ValueError('recomputed full programme exceeds available budgets')
     if phase not in ('prepare', 'score'):
         raise ValueError('invalid stage')
+    if gate['release'] == PAIR_RELEASE and phase == 'score':
+        pair_producer(gate)
     return receipt, clips[clip]['label_rows']
 
 
@@ -420,6 +521,19 @@ def spec(base: dict[str, Any], *, phase: str, clip: str, identity: dict[str, str
         raise ValueError('missing approved evidence asset')
     if full_release and set(assets) != required | ({'checkpoint'} if phase == 'score' else set()):
         raise ValueError('full-study assets must be the exact compact set')
+    if gate_data.get('release') == PAIR_RELEASE and phase == 'score':
+        if 'pair_producer_audit' not in assets:
+            raise ValueError('pair producer audit asset required')
+        audit_asset = assets['pair_producer_audit']
+        if audit_asset['sha256'] != pair_producer(gate_data)['audit_sha256']:
+            raise ValueError('pair producer audit asset digest differs')
+        verify_pair_producer_audit(gate_data, Path(audit_asset['local']), identity)
+    if gate_data.get('release') == PAIR_RELEASE:
+        fidelity = study.checked_json(Path(assets['fidelity_gate']['local']), assets['fidelity_gate']['sha256'])
+        if fidelity.get('pair_cost_bound_sha256') != assets['cost_receipt']['sha256']:
+            raise ValueError('pair fidelity cost evidence differs')
+        benchmark.encoder.fidelity_gate(Path(assets['fidelity_gate']['local']), assets['fidelity_gate']['sha256'],
+                                        fleet.EXPECTED['archive'], purpose=PAIR_RELEASE, clip=clip, frames=292)
     qualification_paths = {name: Path(assets[name + '_receipt']['local']) for name in ('native_cpu', 'gpu_parity')}
     full_evidence_paths = {'certificate': Path(assets['certificate']['local']),
                            'microbenchmark': Path(assets['certificate_microbench']['local']),
@@ -476,10 +590,16 @@ def spec(base: dict[str, Any], *, phase: str, clip: str, identity: dict[str, str
     if full_release:
         args += ['--certificate', '{staged:certificate}', '--certificate-microbench', '{staged:certificate_microbench}',
                  '--certificate-microbench-audit', '{staged:certificate_microbench_audit}']
+    if gate_data.get('release') == PAIR_RELEASE and phase == 'score':
+        args += ['--pair-producer-audit', '{staged:pair_producer_audit}']
     if phase == 'score':
         if 'checkpoint' not in assets:
             raise ValueError('actual full-context checkpoint required')
         item = assets['checkpoint']
+        if gate_data['release'] == PAIR_RELEASE:
+            producer = pair_producer(gate_data)
+            if any(item.get(key) != producer[key] for key in ('remote', 'archive_sha256', 'checkpoint_sha256')):
+                raise ValueError('pair score checkpoint differs from audited producer')
         if full_release:
             producer = cert['targets'][clip]['score']['producer']
             if (item.get('remote') != producer['remote'] or item.get('sha256') != producer['archive_sha256']
@@ -499,8 +619,8 @@ def spec(base: dict[str, Any], *, phase: str, clip: str, identity: dict[str, str
     result['scale']['mode'] = {'smoke': 'readiness', 'full': 'full'}
     result['smoke'] = {'seconds': readiness_seconds, 'representative_basis': 'CPU validation of the complete source timeline, model identities, source bridge and prepared checkpoint.'}
     result['full'] = {'seconds': full_seconds}
-    if gate_data['release'] in ('cost-confirmation', 'full-study'):
-        if gate_data['release'] == 'cost-confirmation':
+    if gate_data['release'] in ('cost-confirmation', 'full-study', PAIR_RELEASE):
+        if gate_data['release'] in ('cost-confirmation', PAIR_RELEASE):
             for resource in ('gpu', 'cpu'):
                 cap = gate_data['confirmation_caps'][resource]['jobs'][f'{clip}:{phase}']
                 if campaign_seconds > cap:
@@ -533,6 +653,18 @@ def verify_gate(args: argparse.Namespace, identity: dict[str, str]) -> int:
                          if args.certificate and args.certificate_microbench and args.certificate_microbench_audit else None)
     if args.frames != frames:
         raise ValueError('full native timeline differs')
+    gate = study.checked_json(Path(args.full_gate), args.full_gate_sha256)
+    if gate.get('release') == PAIR_RELEASE and args.action == 'score':
+        producer = pair_producer(gate)
+        if not args.pair_producer_audit:
+            raise ValueError('pair producer audit asset required')
+        verify_pair_producer_audit(gate, Path(args.pair_producer_audit), identity)
+        stage = Path(os.environ['PS_STAGE_DIR'])
+        entries = [x for x in json.loads((stage / 'staging.json').read_text())['inputs'] if x['name'] == 'checkpoint']
+        if (len(entries) != 1 or entries[0]['sha256'] != producer['archive_sha256']
+                or entries[0]['source'] != producer['remote']
+                or args.checkpoint_sha256 != producer['checkpoint_sha256']):
+            raise ValueError('staged pair producer differs from audited producer')
     if args.certificate:
         from experiments.tennis import k5d_full_admission as admission
         gate = study.checked_json(Path(args.full_gate), args.full_gate_sha256)
@@ -614,6 +746,12 @@ def run(args: argparse.Namespace) -> None:
     require_namespace_worker()
     identity = cp.execution_identity()
     verify_gate(args, identity)
+    gate = study.checked_json(Path(args.full_gate), args.full_gate_sha256)
+    if gate.get('release') == PAIR_RELEASE:
+        fidelity = study.checked_json(Path(args.fidelity_gate), args.fidelity_gate_sha256)
+        if fidelity.get('pair_cost_bound_sha256') != args.cost_receipt_sha256:
+            raise ValueError('pair fidelity cost evidence differs')
+        args.fidelity_purpose = PAIR_RELEASE
     stage = Path(os.environ['PS_STAGE_DIR'])
     scratch = Path(os.environ['PS_SCRATCH_DIR'])
     if {'smoke': 'readiness', 'full': 'full'}.get(os.environ.get('PS_STAGE', '')) != args.mode:
@@ -729,6 +867,7 @@ def main() -> None:
     parser.add_argument('--noncommand-evidence')
     parser.add_argument('--checkpoint')
     parser.add_argument('--checkpoint-sha256')
+    parser.add_argument('--pair-producer-audit')
     parser.add_argument('--frames', type=int, required=True)
     args = parser.parse_args()
     if args.action == 'score' and (not args.checkpoint or not args.checkpoint_sha256):

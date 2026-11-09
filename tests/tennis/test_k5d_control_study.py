@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 
 from experiments.tennis import k5d_control_study as control
@@ -168,6 +170,20 @@ def test_confirmation_requires_both_audited_receipts_without_full30_fit(
     with pytest.raises(ValueError, match='qualification receipt'):
         control.approved(*args, paths)
     parity['all_six_exact'] = True
+    gate['release'] = control.PAIR_RELEASE
+    gate['allowed_clips'] = [clips[0]]
+    gate['future_study_fit_proven'] = False
+    gate['confirmation_caps'] = {resource: {'jobs': {f'{clips[0]}:prepare': 1450, f'{clips[0]}:score': 1700},
+                                            'external': 200, 'total': 3350}
+                                 for resource in ('gpu', 'cpu')}
+    bridge['bridge_type'] = 'parent8-resource-v1'
+    monkeypatch.setattr(control, 'parent8_bridge_record', lambda *_: {k: v for k, v in bridge.items() if k != 'approved'})
+    parity.update(exclusive=True, timing_contaminated=False)
+    _, frames = control.approved(*args, paths)
+    assert frames == 292
+    parity['timing_contaminated'] = True
+    with pytest.raises(ValueError, match='clean exclusive'):
+        control.approved(*args, paths)
     gate['release'] = 'full-study'
     data['budget_fits'] = {'gpu': True, 'cpu': True}
     with pytest.raises(ValueError, match='compact certificate'):
@@ -531,3 +547,109 @@ def test_control_builders_pass_real_fleet_validator(release: str, tmp_path, monk
     staged = [{'name': item['name'], 'path': '/staged/' + item['name']} for item in result['staged_inputs']]
     command = inbox.phase_command(result, 'smoke', staged, '/runtime/python')
     assert command[:4] == ['/runtime/python', '-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']
+
+
+def test_first_pair_budget_is_exact_bounded_and_not_full_study() -> None:
+    data = receipt()
+    clip = control.PAIR_CLIP
+    gate: dict[str, Any] = {'allowed_clips': [clip], 'future_study_fit_proven': False,
+            'confirmation_caps': {resource: {'jobs': {f'{clip}:prepare': 1450, f'{clip}:score': 1700},
+                                              'external': 200, 'total': 3350}
+                                  for resource in ('gpu', 'cpu')}}
+    control.validate_calibration(data)
+    control.first_pair_budget(gate, data, {})
+    gate['confirmation_caps']['gpu']['jobs'][f'{clip}:score'] = 100
+    with pytest.raises(ValueError, match='forecast'):
+        control.first_pair_budget(gate, data, {})
+    gate['confirmation_caps']['gpu']['jobs'][f'{clip}:score'] = 1700
+    gate['allowed_clips'].append('tracknet/game10/Clip12')
+    with pytest.raises(ValueError, match='registered clip'):
+        control.first_pair_budget(gate, data, {})
+    gate['allowed_clips'].pop()
+    gate['confirmation_caps']['cpu']['total'] = 3351
+    with pytest.raises(ValueError, match='allocation'):
+        control.first_pair_budget(gate, data, {})
+    data['cost']['prepare']['seconds48'] -= 1
+    with pytest.raises(ValueError, match='understates'):
+        control.validate_calibration(data)
+
+
+def test_pair_producer_requires_root_audited_real_checkpoint() -> None:
+    gate = {'pair_producer': {'audited': True, 'clip': control.PAIR_CLIP, 'frames': 292,
+                              'job_id': '20261109T000000Z-12345678', 'archive_sha256': 'a' * 64,
+                              'checkpoint_sha256': 'b' * 64, 'audit_sha256': 'c' * 64,
+                              'remote': str(control.cf.DATA_ROOT / 'jobs/example.tar')}}
+    assert control.pair_producer(gate)['frames'] == 292
+    gate['pair_producer']['frames'] = 16
+    with pytest.raises(ValueError, match='producer'):
+        control.pair_producer(gate)
+
+
+def test_pair_producer_audit_checks_actual_sealed_record(tmp_path) -> None:
+    import hashlib
+    import json
+
+    identity = {'source_sha256': '1' * 64, 'snapshot_sha256': '2' * 64, 'environment_sha256': '3' * 64}
+    producer = {'audited': True, 'clip': control.PAIR_CLIP, 'frames': 292,
+                'job_id': '20261109T000000Z-12345678', 'archive_sha256': 'a' * 64,
+                'checkpoint_sha256': 'b' * 64, 'gpu_charge_seconds': 1200, 'cpu_charge_seconds': 1200,
+                'remote': str(control.cf.DATA_ROOT / 'jobs/example.tar')}
+    audit = dict(producer, schema=1, terminal_status='COMPLETE', exclusive=True, timing_contaminated=False,
+                 consumer_execution_identity=identity)
+    path = tmp_path / 'audit.json'
+    path.write_text(json.dumps(audit))
+    gate = {'pair_producer': dict(producer, audit_sha256=hashlib.sha256(path.read_bytes()).hexdigest())}
+    control.verify_pair_producer_audit(gate, path, identity)
+    audit['timing_contaminated'] = True
+    path.write_text(json.dumps(audit))
+    gate['pair_producer']['audit_sha256'] = hashlib.sha256(path.read_bytes()).hexdigest()
+    with pytest.raises(ValueError, match='producer audit differs'):
+        control.verify_pair_producer_audit(gate, path, identity)
+    with pytest.raises(ValueError):
+        control.pair_producer({'pair_producer': {}})
+
+
+def test_pair_score_accounts_only_unspent_pair_after_audited_prepare() -> None:
+    data = receipt()
+    clip = control.PAIR_CLIP
+    jobs = {f'{clip}:prepare': 1450, f'{clip}:score': 1700}
+    gate = {'allowed_clips': [clip], 'future_study_fit_proven': False,
+            'confirmation_caps': {kind: {'jobs': dict(jobs), 'external': 200, 'total': 3350}
+                                  for kind in ('gpu', 'cpu')},
+            'pair_producer': {'audited': True, 'clip': clip, 'frames': 292, 'job_id': '20261109T000000Z-12345678',
+                              'archive_sha256': 'a' * 64, 'checkpoint_sha256': 'b' * 64, 'audit_sha256': 'c' * 64,
+                              'remote': str(control.cf.DATA_ROOT / 'jobs/producer.tar'),
+                              'gpu_charge_seconds': 1400, 'cpu_charge_seconds': 1400}}
+    for kind in ('gpu', 'cpu'):
+        data['programme'][kind]['ball_remaining_seconds'] = 1950
+        data['programme'][kind]['global_remaining_seconds'] = 1950
+    control.first_pair_budget(gate, data, {}, 'score')
+    gate['pair_producer']['gpu_charge_seconds'] = 1451
+    with pytest.raises(ValueError, match='producer charge'):
+        control.first_pair_budget(gate, data, {}, 'score')
+    gate['pair_producer']['gpu_charge_seconds'] = 1400
+    data['programme']['cpu']['ball_remaining_seconds'] = 1899
+    with pytest.raises(ValueError, match='reconciled'):
+        control.first_pair_budget(gate, data, {}, 'score')
+
+
+def test_pair_fidelity_gate_is_distinct_and_binds_cost(tmp_path) -> None:
+    import json
+
+    from experiments.tennis import k5d_encoder
+
+    gate = {'schema_version': 1, 'passed': True, 'scope': 'fidelity-only', 'purpose': control.PAIR_RELEASE,
+            'archive_sha256': 'archive', 'calibration_job_id': '20261105T000000Z-example',
+            'evidence_sha256': 'a' * 64, 'pair_cost_bound_sha256': 'b' * 64,
+            'clip': control.PAIR_CLIP, 'max_frames': 292,
+            'checks': ['source_transform', 'native_and_wire', 'receiver_parity', 'perceptual_metrics', 'pair_cost']}
+    path = tmp_path / 'fidelity.json'
+    path.write_text(json.dumps(gate))
+    sha = control.oracle.sha(path)
+    assert k5d_encoder.fidelity_gate(path, sha, 'archive', purpose=control.PAIR_RELEASE,
+                                     clip=control.PAIR_CLIP, frames=292)['passed']
+    with pytest.raises(ValueError):
+        k5d_encoder.fidelity_gate(path, sha, 'archive', purpose=control.PAIR_RELEASE,
+                                  clip=control.PAIR_CLIP, frames=188)
+    with pytest.raises(ValueError):
+        k5d_encoder.fidelity_gate(path, sha, 'archive')
