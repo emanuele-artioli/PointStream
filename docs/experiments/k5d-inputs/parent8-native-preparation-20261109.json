@@ -1,0 +1,52 @@
+{
+  "accounting_caveat": "Remote host process CPU measured; SSH/fleet/admin aggregate CPU not separately measured and included in conservative 20. Root owns ledger charging.",
+  "active_jobs": 0,
+  "cpu_preparation_conservative_charge": 20,
+  "deadline": "2026-11-09T22:46:27.561819Z",
+  "doctor_passed": true,
+  "fresh_source_cache_sha256": "9f486d70424b9d293d8774c92b36350d284edcb2513c415390b88a2b4c344aed",
+  "gpu2_cpu0_available": true,
+  "gpu2_cpu_claim_empty": true,
+  "gpu2_local_free_bytes": 1914242727936,
+  "gpu_seconds": 0,
+  "host_probe_cpu_seconds": 11.770185,
+  "known_jobs": 1650,
+  "logical_spec_sha256": "278f6ebf5218b37b1f6b66ebff8c55bd4cad5bde4bf4f53e449aad8ec06162a4",
+  "normalized_diff_from_prior": [
+    "deadline",
+    "deadline_epoch"
+  ],
+  "normalized_file_sha256": "6b5e5088f991d58c38b8d72802ba36955ed99be28686e6008172cda657239bd2",
+  "qualification": "Prior expected-failure forensic observation is not a passed native gate. Full native 4-case proof requires separate root release; no GPU submission.",
+  "raw_paths": {
+    "doctor": "/private/tmp/k5d-parent8-nativeprep-doctor.json",
+    "host": "/private/tmp/k5d-parent8-nativeprep-host.out",
+    "host_script": "/private/tmp/k5d-df6-readiness-host.py",
+    "jobs": "/private/tmp/k5d-parent8-nativeprep-jobs.json",
+    "normalized": "/private/tmp/k5d-parent8-native-final-20261109/normalized.json",
+    "sourcehash": "/private/tmp/k5d-parent8-nativeprep-sourcehash.json",
+    "sourcehash_script": "/private/tmp/k5d-parent8-nativeprep-sourcehash.py",
+    "workers": "/private/tmp/k5d-parent8-nativeprep-workers.json"
+  },
+  "raw_sha256": {
+    "doctor": "592185c9a6f650c63fd5eaef696ab83001e7a0c824b63a48faf54f749a0b7336",
+    "host": "9237351b07302d0b76809a3658499835975d49fd28848062ca089a6fd3a3a306",
+    "host_script": "99ffbc0f757e1abcefc770e364dfc8201377f91bc1ab546997787ca805942b6f",
+    "jobs": "43cbc6e73395c8e9c2c2e0c263df16c84652a79b50a15d79b92559c5fbb66516",
+    "normalized": "6b5e5088f991d58c38b8d72802ba36955ed99be28686e6008172cda657239bd2",
+    "sourcehash": "8aeda2820520cd4dfd47ca0b4bc608f87ad0254ff7aed11146b5fa8324ffdc5f",
+    "sourcehash_script": "5aff607f4f0267d220a9ca6c2e02a52c18e2a39e193a003b21ba84086865b63b",
+    "workers": "7991a9d5dfc4836c687a29f75a435ed04ca6c49c33ba2878f2515dcf955f797b"
+  },
+  "raw_spec_sha256": "9bfc25c51eab5afc28b38bc95afaee2d3fd35b83e1fbf9a6cbc1a725ab13bb45",
+  "revision": "965d801ada4b8ccb6e54685f4560de8287931d00",
+  "schema": 1,
+  "snapshot_sha256": "9f486d70424b9d293d8774c92b36350d284edcb2513c415390b88a2b4c344aed",
+  "source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/k5d-parent8-child2-965d-20261109/source.tar",
+  "source_reuploaded": false,
+  "source_sha256": "58787f8664f961c2287228762c1ddd3295adab4042bd7f41d9bfee87d2666104",
+  "sourcehash_cpu_seconds": 0.129938,
+  "spec_path": "docs/experiments/k5d-inputs/parent8-native-final-spec-20261109.json",
+  "status": "native preparation complete; separate root review and release required",
+  "zip_fresh_sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18"
+}
