@@ -1168,6 +1168,16 @@
       "cpu_seconds": 30,
       "release_stage": "research-first24/28",
       "basis": "Authorizedconservative30CPUreadinessandtinynewaccepted6a4receiptupload/SHA. Allhostdoctor/jobs/claims; gpu2onlywarmeligibleA6000,one26388MiBfree>=16384+8192; gpu3cold/belowheadroomexcluded. Source447freshSHA; largecacheidentityfromstablemetadata+priorreceipts,notclaimedfreshbytechecks; canonicalstagingmustverifyallbytes. Inside1200CPUparityleaf,1170future remains,noGPUsubmittedyet."
+    },
+    {
+      "phase": "w8-f6-source-precheck-20261109",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 6,
+      "witness_qualification": false,
+      "release_stage": "research-first24/28",
+      "basis": "Knownf6sourceprep prechecks stopped beforeupload atgpu5cachepresencechanged; target/source notcreated. Actualcompression0.412+wrapper0.067+localSSH0.054+gpu2remote0.077CPUplusunreportedgpu5process bounded4CPU=><=4.61; conservative6incladmin. Insidefutureprep30:24remain(14source/reconcile+10publicationreserve). No newjob/GPU/privatecontentopen."
     }
   ],
   "reservations": [
@@ -1751,8 +1761,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 4430,
-      "status": "Remaining unspent 4550 GPU / 4430 CPU after CPU proof edd3 failed before any proof leaf: 20 CPU preparation plus conservative 100 CPU terminal/queue wall upper and postchecks, total 120 CPU / 0 GPU. No automatic retry; root review required before any repair or new request. Qualification <=900 GPU / 1000 CPU remains unreleased; full 240/80 gates unchanged."
+      "cpu_seconds": 4424,
+      "status": "Remaining_unspent4550GPU4424CPU afterfailedproof120inclusive andf6sourceprecheck6. F6cachednativepresence reconciliationbeforeupload; no replacementrequest. Prospective900CPUcumulative=120oldfailed+6newprep+774future(24prep600campaign100post50audit),0GPU; qualifiersunchanged."
     }
   ],
   "jobs": [
