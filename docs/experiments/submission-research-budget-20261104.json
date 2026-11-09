@@ -1401,6 +1401,15 @@
       "gpu_seconds": 0,
       "basis": "70 conservative one-core command lifetime upper for 68.012 s SSH elapsed, plus 20 fresh readiness/dispatch and 30 independent post audit; prior preflight 20 already charged. Admin not completely measured.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "parent8-parity16-70eb-closure-20261109",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 450,
+      "cpu_seconds": 520,
+      "basis": "Conservative allocation:430 rounded supervisor-birth to canonical421.562s same-path bound plus90external audit/admin +30already charged prep.450GPU supported by inferred normal successful claim-release ordering<=420.877s; exact release and aggregate CPU not measured. Late manual absence is NOT a runtime timestamp.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -1918,9 +1927,9 @@
       "phase": "k5d-scale-first-tranche-20261105",
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
-      "gpu_seconds": 8370,
-      "cpu_seconds": 7160,
-      "status": "Remaining_unspent8370GPU7160CPU; GPU3warming120charged/140familyclosed; GPUparity70ebcompleteawaitingrootaudit; no scale release."
+      "gpu_seconds": 7920,
+      "cpu_seconds": 6640,
+      "status": "Remaining_unspent7920GPU6640CPU;70ebnumericalgateacceptedandclosed450GPU550CPUinclusive30prep; no cost/scale/full30 release."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -3231,7 +3240,7 @@
       "job_id": "20261109T223822Z-70eb4770",
       "phase": "k5d-scale-first-tranche-20261105",
       "subphase": "parent8child2-shared-numerical-parity16",
-      "state": "complete with substantive parity gate passed; independent resource/source/teardown/cost audit and root acceptance pending",
+      "state": "complete; root accepted shared numerical/resource feasibility only",
       "revision": "965d801ada4b8ccb6e54685f4560de8287931d00",
       "source_sha256": "58787f8664f961c2287228762c1ddd3295adab4042bd7f41d9bfee87d2666104",
       "snapshot_sha256": "9f486d70424b9d293d8774c92b36350d284edcb2513c415390b88a2b4c344aed",
@@ -3254,7 +3263,12 @@
       "gpu_index": 1,
       "gpu_uuid": "GPU-40e9a544-b3d6-e5f3-a736-7020a6401bfc",
       "timing_contaminated": true,
-      "wait_state": "ended after expected contention event ACK and one remaining-deadline rearm"
+      "wait_state": "ended; expected contention and terminal events ACKed",
+      "terminal_gpu_charge": 450,
+      "terminal_additional_cpu_charge": 520,
+      "actual_inclusive_conservative_cpu_charge": 550,
+      "root_accepted_receipt_sha256": "90097dacc5ae38d430d383e61ed4a1cf225339ee9cf44576fd0cb9508fa1416d",
+      "timing_cost_scale_qualified": false
     }
   ],
   "old_budgets": "closed, not borrowed",
