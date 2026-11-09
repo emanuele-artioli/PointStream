@@ -1766,7 +1766,7 @@
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8770,
       "cpu_seconds": 8060,
-      "status": "Remaining_unspent8770GPU8060CPU; newda98sourceprepared50CPU, proof300inclusiveleafhas250future; rootoneCPUproofreleasepending, noGPUrelease."
+      "status": "Remaining_unspent8770GPU8060CPU; da98CPUproof5331running,250futureCPUinsideparent; noGPUrelease."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -2868,6 +2868,28 @@
       "actual_inclusive_conservative_cpu_charge": 108,
       "terminal_charged_gpu_seconds": 0,
       "wait_state": "ended; no live wait/retry"
+    },
+    {
+      "job_id": "20261109T203757Z-5331bf94",
+      "phase": "k5d-scale-first-tranche-20261105",
+      "subphase": "low-memory-da98-new-source-native-CPUproof",
+      "state": "running; root freshly verified canonical status; no replay",
+      "revision": "da98de4a37e58af56d850eddabebb81be0642e42",
+      "snapshot_sha256": "0fc1220f7aa82e7f0edfe637869cbfb5bbb1517e3cc5a51ad6e273702b03cfb1",
+      "source_sha256": "62b6c4904c627d770a3d0854dc850a8871097f0053e551563e8cb4c647cc3036",
+      "spec_sha256": "1207854549d029717de6053304569501d2d4536c2ff604915ac05840f7b1ae86",
+      "deadline": "2026-11-09T21:13:13Z",
+      "host": "gpu2",
+      "cpu_affinity_index": 0,
+      "source_archive": true,
+      "inclusive_cpu_ceiling": 300,
+      "preparation_charged_cpu_seconds": 50,
+      "future_cpu_ceiling": 250,
+      "campaign_wall_ceiling": 100,
+      "gpu_ceiling": 0,
+      "local_batch": "/private/tmp/k5d-da98-proof-20261109",
+      "wait_max_seconds": 2100,
+      "scope": "RealnativeCPUcontainment/accounting only; noGPU/parity/memory/timing/scale/quality qualification"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -2889,7 +2911,7 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "Noactivefleetjobs/waits. BallDF6sharedqueueexpired/rootclosed; W8f6CPUprooffailed/rootclosed. Localfinalnamespace-repairoracle<=10CPUandlower-memoryBallprofilepreparationonly;nonewGPUrelease.",
+    "state": "Ballda98CPUproofrunning; ONEcanonicalboundedwaitauthorizedafterpersistedID. W8f8CPUproofreleasednotyetIDknown. NoGPUjob,autoretry,recurringtimer.",
     "jobs": [],
     "batches": [],
     "native_completion_resume_verified": false,
