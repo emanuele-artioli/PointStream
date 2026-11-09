@@ -317,6 +317,24 @@ def _unit1_promotion(paths: dict[str, Path], spec: dict[str, Any], dispatch: dic
         check_qualification_subcap(ledger, gate, gpu_cap=spec['witness_gpu_ceiling_seconds'],
                                    cpu_cap=spec['witness_cpu_ceiling_seconds'])
     completed = gate.get('completed_artifact_sha256', {})
+    if profile == 'w8-context-unit1-v1' and (gate.get('qualification_next_gpu_ceiling_seconds') != spec['witness_gpu_ceiling_seconds']
+            or gate.get('qualification_next_cpu_ceiling_seconds') != spec['witness_cpu_ceiling_seconds']):
+        raise ValueError('unit-1 stage ceilings differ from reviewed forecast')
+    if profile in ('w8-full-unit0-v1', 'w8-full-unit1-v1'):
+        expected_limits = {'full_seconds': spec['full']['seconds'], 'campaign_seconds': spec['budget_seconds'],
+            'gpu_ceiling_seconds': spec['witness_gpu_ceiling_seconds'], 'cpu_ceiling_seconds': spec['witness_cpu_ceiling_seconds'],
+            'generator_cpu': spec['witness_caps']['generator_cpu'], 'generator_wall': spec['witness_caps']['generator_wall']}
+        if gate.get('candidate_next_limits') != expected_limits:
+            raise ValueError('producer stage limits differ from reviewed forecast')
+    if profile == 'w8-full-finish-v1':
+        expected_limits = {'full_seconds': spec['full']['seconds'], 'campaign_seconds': spec['budget_seconds'],
+            'gpu_ceiling_seconds': spec['witness_gpu_ceiling_seconds'], 'cpu_ceiling_seconds': spec['witness_cpu_ceiling_seconds'],
+            'worker_cpu': spec['witness_caps']['worker_cpu'], 'worker_wall': spec['witness_caps']['worker_wall']}
+        if gate.get('finish_next_limits') != expected_limits:
+            raise ValueError('finish stage limits differ from reviewed forecast')
+    if profile == 'w8-context-qualification-v1' and (gate.get('qualification_next_gpu_ceiling_seconds') != spec['witness_gpu_ceiling_seconds']
+            or gate.get('qualification_next_cpu_ceiling_seconds') != spec['witness_cpu_ceiling_seconds']):
+        raise ValueError('qualification finish ceilings differ from reviewed forecast')
     if profile == 'w8-context-unit1-v1' and 'unit1_context' in completed:
         raise ValueError('unit-1 context already completed; no replay')
     if profile in ('w8-full-unit0-v1', 'w8-full-unit1-v1'):
