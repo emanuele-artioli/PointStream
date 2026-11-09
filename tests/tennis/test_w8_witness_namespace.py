@@ -38,7 +38,8 @@ def test_receipt_rejects_wrong_group_and_failed_cleanup(tmp_path):
     receipt = {'schema': 1, 'reason': 'complete', 'status': 0, 'target': target,
                'outside_namespace': 'pid:[10]', 'worker_namespace_pid': 2,
                'worker_host_identity': {'host_pid': 101, 'host_pgid': 99, 'campaign_pgid': 99, 'start_ticks': 5},
-               'namespace_init': {'host_pid': 100, 'namespace_pid': 1, 'pid_namespace': 'pid:[11]'},
+               'namespace_init': {'host_pid': 100, 'start_ticks': 4, 'host_pgid': 99,
+                                  'namespace_pid': 1, 'pid_namespace': 'pid:[11]'},
                'reaped': 1, 'complete_descendant_wait': True, 'elapsed_seconds': 1.0, 'children_cpu_seconds': .1}
     path = tmp_path / 'receipt.json'
     path.write_text(json.dumps(receipt))

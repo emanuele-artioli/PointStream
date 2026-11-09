@@ -105,6 +105,18 @@ def supervise(outside: str, timeout: float, receipt: Path, target: str, args: li
         worker = json.loads(os.read(read_fd, 4096))
     finally:
         os.close(read_fd)
+    init_raw = Path('/proc/self/stat').read_text()
+    init_fields = init_raw[init_raw.rfind(')') + 2:].split()
+    init_identity = {'host_pid': int(nspid[0][0]), 'start_ticks': int(init_fields[19]),
+                     'host_pgid': int(init_fields[2]), 'namespace_pid': 1, 'pid_namespace': current}
+    if init_identity['host_pgid'] != worker['campaign_pgid'] or init_identity['start_ticks'] <= 0:
+        raise ValueError('namespace init group or birth differs')
+    started_path = receipt.with_name(receipt.name + '.started')
+    with started_path.open('x') as stream:
+        json.dump({'schema': 1, 'target': target, 'outside_namespace': outside,
+                   'namespace_init': init_identity, 'worker_host_identity': worker}, stream, sort_keys=True)
+        stream.flush()
+        os.fsync(stream.fileno())
     child_status = None
     reason = ''
     reaped = 0
@@ -130,7 +142,7 @@ def supervise(outside: str, timeout: float, receipt: Path, target: str, args: li
     result = {'schema': 1, 'reason': reason or 'complete', 'status': child_status,
               'target': target, 'outside_namespace': outside,
               'worker_host_identity': worker, 'worker_namespace_pid': child.pid,
-              'namespace_init': {'host_pid': int(nspid[0][0]), 'namespace_pid': 1, 'pid_namespace': current},
+              'namespace_init': init_identity,
               'reaped': reaped, 'complete_descendant_wait': True,
               'elapsed_seconds': time.monotonic() - start,
               'init_cpu_seconds': own.ru_utime + own.ru_stime,
@@ -154,6 +166,9 @@ def validate_receipt(path: Path, *, expected_pgid: int, expected_outside: str,
             or init.get('namespace_pid') != 1 or init.get('pid_namespace') == expected_outside
             or not str(init.get('pid_namespace', '')).startswith('pid:[')
             or type(expected_pgid) is not int or expected_pgid <= 0
+            or init.get('host_pgid') != expected_pgid
+            or type(init.get('host_pid')) is not int or init['host_pid'] <= 0
+            or type(init.get('start_ticks')) is not int or init['start_ticks'] <= 0
             or worker.get('host_pgid') != expected_pgid or worker.get('campaign_pgid') != expected_pgid
             or type(worker.get('host_pid')) is not int or worker['host_pid'] <= 0
             or type(worker.get('start_ticks')) is not int or worker['start_ticks'] <= 0
