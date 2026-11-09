@@ -245,9 +245,10 @@ def validate(stage: Path, destination: Path) -> None:
                     *(f'strict-{runtime}-{name}.json' for runtime in ('main', 'jcv')
                       for name in ('config_path', 'receipt_path', 'namespace_path', 'namespace_started_path')),
                     *(f'native-{case}-{name}' for case in ('normal', 'timeout', 'kill')
-                      for name in ('namespace_started', 'teardown', 'launcher_execution')),
+                      for name in ('namespace_started', 'teardown', 'launcher_execution',
+                                   'native_handle', 'native_handle_ready')),
                     'native-normal-namespace_final', 'native-normal-native_seal',
-                    'native-normal-native_handle', 'native-normal-native_execution',
+                    'native-normal-native_execution',
                     'native-normal-control_execution', 'native-timeout-interruption',
                     'native-timeout-namespace_final', 'native-kill-interruption'}
         if not required <= receipts.keys():
@@ -265,6 +266,9 @@ def validate(stage: Path, destination: Path) -> None:
         for case in ('normal', 'timeout', 'kill'):
             if raw_json(f'native-{case}-teardown').get('owned_init_and_worker_absent') is not True:
                 raise ValueError('native lifecycle teardown missing')
+            if (raw_json(f'native-{case}-native_handle_ready').get('sha256')
+                    != receipts[f'native-{case}-native_handle']['sha256']):
+                raise ValueError('native observed handle identity differs')
         native = raw_json('native-normal-native_seal')
         if (native.get('yuv_sha256') != '7490edf9b678db805c23baae49a2a3b5e9d7b037b18dd216320aad47a061beff'
                 or native.get('inventory_sha256') != NATIVE_INVENTORY_SHA or native.get('exit_code') != 0):
