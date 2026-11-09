@@ -44,13 +44,13 @@ def _check_deadline(spec: dict[str, Any], *, reference_epoch: float | None = Non
         raise ValueError('45-minute recovery deadline required')
 
 
-def check_bootstrap_archive(stage: Path, dispatch: dict[str, Any], expected: str, input_sha: str) -> None:
+def check_bootstrap_archive(stage: Path, dispatch: dict[str, Any], expected: str, input_sha: str, policy_sha: str) -> None:
     """Join the declared new bootstrap to the authenticated physical snapshot."""
     import hashlib
     import tarfile
 
     archive = stage.parent / 'source.tar'
-    if (not _sha(expected) or not _sha(input_sha) or fixed.file_sha(archive) != dispatch.get('code', {}).get('snapshot_sha256')
+    if (not _sha(expected) or not _sha(input_sha) or not _sha(policy_sha) or fixed.file_sha(archive) != dispatch.get('code', {}).get('snapshot_sha256')
             or fixed.file_sha(Path(__file__).resolve().parent / 'w8_receiver_bootstrap.py') != expected):
         raise ValueError('witness source snapshot or bootstrap differs')
     with tarfile.open(archive) as tar:
@@ -62,6 +62,11 @@ def check_bootstrap_archive(stage: Path, dispatch: dict[str, Any], expected: str
         stream = tar.extractfile(entry) if entry.isfile() else None
         if stream is None or hashlib.sha256(stream.read()).hexdigest() != input_sha or fixed.file_sha(Path(fixed.__file__).resolve()) != input_sha:
             raise ValueError('input module differs from authenticated snapshot')
+        entry = tar.getmember('experiments/tennis/w8_cuda_system_leaves.py')
+        stream = tar.extractfile(entry) if entry.isfile() else None
+        if (stream is None or hashlib.sha256(stream.read()).hexdigest() != policy_sha
+                or fixed.file_sha(Path(__file__).resolve().parent / 'w8_cuda_system_leaves.py') != policy_sha):
+            raise ValueError('system leaves policy differs from authenticated snapshot')
 
 
 def check_cpu_gate(gate: dict[str, Any], *, gate_sha: str, expected_sha: str,
@@ -73,6 +78,7 @@ def check_cpu_gate(gate: dict[str, Any], *, gate_sha: str, expected_sha: str,
             or not re.fullmatch(r'[0-9a-f]{40}', str(source.get('git_head')))
             or not _sha(environment_sha) or host_name not in ('gpu5', 'gpu6')
             or not _sha(gate.get('bootstrap_sha256')) or not _sha(gate.get('input_job_sha256'))
+            or not _sha(gate.get('system_leaves_sha256'))
             or gate.get('source_sha256') != source.get('source_sha256')
             or gate.get('snapshot_sha256') != source.get('snapshot_sha256')
             or gate.get('revision') != source.get('git_head')
@@ -99,11 +105,12 @@ def load_inputs(stage: Path) -> tuple[dict[str, Path], dict[str, Any], dict[str,
     check_cpu_gate(proof, gate_sha=fixed.file_sha(paths['cpu_proof']),
                    expected_sha=spec['witness_cpu_proof_sha256'], source=code,
                    environment_sha=environment.get('sha256'), host_name=host_name)
-    if (spec.get('witness_input_job_sha256') != proof.get('input_job_sha256')
+    if (spec.get('witness_system_leaves_sha256') != proof.get('system_leaves_sha256')
+            or spec.get('witness_input_job_sha256') != proof.get('input_job_sha256')
             or spec.get('witness_bootstrap_sha256') != proof.get('bootstrap_sha256')
             or fixed.file_sha(Path(__file__).resolve().parent / 'w8_receiver_bootstrap.py') != proof['bootstrap_sha256']):
         raise ValueError('actual witness bootstrap differs from CPU proof')
-    check_bootstrap_archive(stage, dispatch, proof['bootstrap_sha256'], proof['input_job_sha256'])
+    check_bootstrap_archive(stage, dispatch, proof['bootstrap_sha256'], proof['input_job_sha256'], proof['system_leaves_sha256'])
     return paths, spec, dispatch
 
 
@@ -159,9 +166,10 @@ def load_released_inputs(stage: Path) -> tuple[dict[str, Path], dict[str, Any], 
                    environment_sha=dispatch.get('staged_environment', {}).get('sha256'),
                    host_name=(dispatch.get('environment') or {}).get('alias'))
     if (spec.get('witness_bootstrap_sha256') != proof.get('bootstrap_sha256')
-            or spec.get('witness_input_job_sha256') != proof.get('input_job_sha256')):
+            or spec.get('witness_input_job_sha256') != proof.get('input_job_sha256')
+            or spec.get('witness_system_leaves_sha256') != proof.get('system_leaves_sha256')):
         raise ValueError('released witness bootstrap differs from CPU proof')
-    check_bootstrap_archive(stage, dispatch, proof['bootstrap_sha256'], proof['input_job_sha256'])
+    check_bootstrap_archive(stage, dispatch, proof['bootstrap_sha256'], proof['input_job_sha256'], proof['system_leaves_sha256'])
     return paths, spec, dispatch
 
 
@@ -386,6 +394,7 @@ def _pilot_spec(spec: dict[str, Any], *, unit1: bool = False, reference_epoch: f
             or spec.get('witness_cpu_proof_host') not in ('gpu5', 'gpu6')
             or not _sha(spec.get('witness_bootstrap_sha256'))
             or not _sha(spec.get('witness_input_job_sha256'))
+            or not _sha(spec.get('witness_system_leaves_sha256'))
             or spec.get('hosts') != [spec.get('witness_cpu_proof_host')]
             or spec.get('single_cpu_campaign') is not True or spec.get('cpu_threads') != 1
             or spec.get('contention', {}).get('policy') != 'stop'
@@ -753,6 +762,9 @@ def validate_pilot(stage: Path, target: Path) -> None:
                                        ('generator-namespace.json', 'experiments.tennis.w8_strict_host_model_worker', 'generation_usage')):
             ns = witness.namespace_completion(retained / name, expected_pgid=group,
                                                expected_outside=outside, expected_target=module)
+            leaf_owner = decoded if usage_key == 'packet_usage' else seal
+            host.strict_policy.validate_self_leaf_identity(leaf_owner['isolation']['approved_leaves'],
+                                                           ns['worker_host_identity'])
             if (summary[usage_key].get('namespace_receipt_sha256') != fixed.file_sha(retained / name)
                     or summary[usage_key]['cpu_seconds'] + 0.05 < ns['children_cpu_seconds']):
                 raise ValueError('pilot namespace CPU or receipt join differs')
@@ -804,6 +816,7 @@ def make_pilot_spec(*, deadline: str, proof_local: Path, proof_remote: str,
     spec['witness_cpu_proof_sha256'] = digest
     spec['witness_bootstrap_sha256'] = gate['bootstrap_sha256']
     spec['witness_input_job_sha256'] = gate['input_job_sha256']
+    spec['witness_system_leaves_sha256'] = gate['system_leaves_sha256']
     spec['clock_policy_profile'] = host.w8_clock_profile.PROFILE
     spec['clock_reference_audit_sha256'] = host.CLOCK_AUDIT_SHA
     spec['validator'] = ['{python}', '-m', 'experiments.tennis.w8_witness_job', 'validate']
@@ -1436,11 +1449,15 @@ def validate_finish(stage: Path, target: Path) -> None:
                                        source_manifest=manifest, loader=loader, loader_sha=fixed.file_sha(loader_path))
         ns = witness.namespace_completion(retained / name / 'namespace-receipt.json', expected_pgid=group,
             expected_outside=outside, expected_target='experiments.tennis.w8_strict_receiver_worker')
+        host.strict_policy.validate_self_leaf_identity(receipt['isolation']['approved_leaves'],
+                                                       ns['worker_host_identity'])
         if (summary['usage'][name]['cpu_seconds'] + 0.05 < ns['children_cpu_seconds']
                 or summary['usage'][name].get('namespace_receipt_sha256') != fixed.file_sha(retained / name / 'namespace-receipt.json')):
             raise ValueError('finish worker CPU or namespace receipt differs')
     packet_ns = witness.namespace_completion(retained / 'packet-namespace.json', expected_pgid=group,
         expected_outside=outside, expected_target='experiments.tennis.w8_strict_receiver_worker')
+    host.strict_policy.validate_self_leaf_identity(decoded['isolation']['approved_leaves'],
+                                                   packet_ns['worker_host_identity'])
     packet_usage = summary.get('packet_usage', {})
     if (packet_usage.get('status') != 0 or packet_usage.get('timed_out') is not False
             or packet_usage.get('canaries_preserved') is not True

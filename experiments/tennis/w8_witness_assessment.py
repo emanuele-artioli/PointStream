@@ -573,10 +573,12 @@ def run_assessment_policy_proof(prepared: dict[str, Any]) -> dict[str, Any]:
             raise RuntimeError('assessment policy proof timed out; preserve artifacts')
     if status:
         raise RuntimeError('assessment policy proof failed; preserve artifacts')
-    witness.namespace_completion(receipt, expected_pgid=os.getpgrp(), expected_outside=outside,
+    namespace_result = witness.namespace_completion(receipt, expected_pgid=os.getpgrp(), expected_outside=outside,
                                  expected_target=namespace.ASSESSMENT_TARGET)
     proof_path = output / 'assessment-policy.json'
     proof = json.loads(proof_path.read_text())
+    from experiments.tennis import w8_cuda_system_leaves as policy
+    policy.validate_self_leaf_identity(proof['isolation']['approved_leaves'], namespace_result['worker_host_identity'])
     if (proof.get('scope') != 'assessment policy component only; no candidate or quality claim'
             or proof.get('gpu_claim') is not False or proof.get('quality_claim') is not False):
         raise ValueError('assessment policy proof scope differs')
@@ -782,8 +784,11 @@ def fleet_run(stage: Path, template_path: Path, template_sha: str) -> None:
         if not absent:
             raise RuntimeError('assessment teardown unresolved; preserve task-owned outputs')
         raise RuntimeError('assessment failed or timed out; preserved task-owned outputs')
-    witness.namespace_completion(namespace_path, expected_pgid=os.getpgrp(), expected_outside=outside,
+    namespace_result = witness.namespace_completion(namespace_path, expected_pgid=os.getpgrp(), expected_outside=outside,
                                  expected_target=namespace.ASSESSMENT_TARGET)
+    from experiments.tennis import w8_cuda_system_leaves as policy
+    assessment = json.loads((output / 'assessment.json').read_text())
+    policy.validate_self_leaf_identity(assessment['role_isolation']['approved_leaves'], namespace_result['worker_host_identity'])
     retained = stage / 'w8-assessment-retained'
     retained.mkdir()
     names = {'source': ('source-rgb.npy', 'source.yuv', 'sealed.json', 'assessment.json',
@@ -876,12 +881,14 @@ def fleet_validate(stage: Path, destination: Path) -> None:
     if summary['outside_namespace'] != outside or summary['campaign_pgid'] != group:
         raise ValueError('assessment campaign namespace or group differs')
     # The helper requires sibling `.started`; retained name is intentionally exact.
-    witness.namespace_completion(retained / 'namespace.json', expected_pgid=group,
+    namespace_result = witness.namespace_completion(retained / 'namespace.json', expected_pgid=group,
                                  expected_outside=outside, expected_target=namespace.ASSESSMENT_TARGET)
     config = json.loads((retained / 'config.json').read_text())
     candidate, _ = authenticate(config)
     assets = role_files(config, phase)
     record = json.loads((retained / 'assessment.json').read_text())
+    from experiments.tennis import w8_cuda_system_leaves as policy
+    policy.validate_self_leaf_identity(record['role_isolation']['approved_leaves'], namespace_result['worker_host_identity'])
     check_clean_execution(json.loads((stage / 'execution.json').read_text()), dispatch, phase, record)
     if (record.get('producer_manifest_sha256') != config['producer_manifest']['sha256']
             or record.get('asset_manifest_sha256') != config['asset_manifest']['sha256']

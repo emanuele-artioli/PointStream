@@ -337,6 +337,9 @@ def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, 
         assert outside_pidns is not None
         namespace_receipt = w8_witness_profile.namespace_completion(work / 'namespace-receipt.json',
             expected_pgid=owned_pgid, expected_outside=outside_pidns, expected_target=module)
+        leaf_rows = json.loads((Path(config['output']).parent / 'self-leaves.json').read_text())
+        strict_policy.validate_self_leaf_identity(leaf_rows, namespace_receipt['worker_host_identity'])
+        receipt['self_leaves_sha256'] = fixed.file_sha(Path(config['output']).parent / 'self-leaves.json')
         receipt['namespace_receipt_sha256'] = fixed.file_sha(work / 'namespace-receipt.json')
         receipt['namespace_children_cpu_seconds'] = namespace_receipt['children_cpu_seconds']
         with (work / 'namespace-validation.json').open('x') as output:
@@ -507,7 +510,8 @@ def check_preflight_bundle(preflight: dict[str, Any], identity_path: Path, *, wi
 
 def check_preflight_sources(preflight: dict[str, Any], root: Path, *,
                             witness_bootstrap_sha: str | None = None,
-                            witness_input_sha: str | None = None) -> None:
+                            witness_input_sha: str | None = None,
+                            witness_policy_sha: str | None = None) -> None:
     """Recheck the exact preflight entrypoints and imported project closure.
 
     Unexecuted files in the same source archive may change in the separately
@@ -534,6 +538,10 @@ def check_preflight_sources(preflight: dict[str, Any], root: Path, *,
             if len(witness_input_sha) != 64 or any(c not in '0123456789abcdef' for c in witness_input_sha):
                 raise ValueError('invalid reviewed witness input module identity')
             expected = witness_input_sha
+        if witness_policy_sha is not None and name == 'experiments/tennis/w8_cuda_system_leaves.py':
+            if len(witness_policy_sha) != 64 or any(c not in '0123456789abcdef' for c in witness_policy_sha):
+                raise ValueError('invalid reviewed witness system leaves identity')
+            expected = witness_policy_sha
         if not isinstance(expected, str):
             raise ValueError(f'preflight source identity missing: {name}')
         actual = (root / name).resolve(strict=True)
@@ -692,7 +700,8 @@ def prepare_receiver_inputs(paths: dict[str, Path], spec: dict[str, Any], *, pac
         raise ValueError('real folder I/O audit reference differs')
     check_preflight_sources(preflight, snapshot_root,
                             witness_bootstrap_sha=spec.get('witness_bootstrap_sha256') if witness else None,
-                            witness_input_sha=spec.get('witness_input_job_sha256') if witness else None)
+                            witness_input_sha=spec.get('witness_input_job_sha256') if witness else None,
+                            witness_policy_sha=spec.get('witness_system_leaves_sha256') if witness else None)
     scratch = fixed.checked_scratch()
     protected_path = scratch / 'protected-identity.json'
     if witness:

@@ -633,7 +633,8 @@ def run_isolation_proof(prepared: dict[str, Any], *, worker_cpu: int = 40, worke
         records.append({'runtime': runtime_name, 'scope': 'cpu_isolation_proof_only', 'usage': usage,
                         'config_path': str(work / 'worker-config.json'), 'receipt_path': str(receipt_path),
                         'namespace_path': str(work / 'namespace-receipt.json'),
-                        'namespace_started_path': str(work / 'namespace-receipt.json.started')})
+                        'namespace_started_path': str(work / 'namespace-receipt.json.started'),
+                        'self_leaves_path': str(work / 'self-leaves.json')})
     return {'scope': 'cpu_isolation_proof_only', 'runs': records}
 
 

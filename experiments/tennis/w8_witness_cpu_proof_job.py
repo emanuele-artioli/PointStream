@@ -117,6 +117,7 @@ def make_spec(deadline: str, inventory: str) -> dict[str, Any]:
     bootstrap = Path(__file__).resolve().parent / 'w8_receiver_bootstrap.py'
     spec['witness_bootstrap_sha256'] = fixed.file_sha(bootstrap)
     spec['witness_input_job_sha256'] = fixed.file_sha(Path(fixed.__file__).resolve())
+    spec['witness_system_leaves_sha256'] = fixed.file_sha(bootstrap.parent / 'w8_cuda_system_leaves.py')
     validate_spec(spec)
     return spec
 
@@ -186,7 +187,7 @@ def run(stage: Path) -> None:
             or [row['runtime'] for row in isolation.get('runs', [])] != ['main', 'jcv']):
         raise ValueError('both real strict runtime proofs required')
     for row in isolation['runs']:
-        for key in ('config_path', 'receipt_path', 'namespace_path', 'namespace_started_path'):
+        for key in ('config_path', 'receipt_path', 'namespace_path', 'namespace_started_path', 'self_leaves_path'):
             keep(f"strict-{row['runtime']}-{key}.json", row[key])
     remaining(dispatch, 210)  # assessor 45 + native 135 + publication 30
     from experiments.tennis import w8_witness_assessment as assessment
@@ -276,12 +277,13 @@ def validate(stage: Path, destination: Path) -> None:
         lifecycle = json.load(lifecycle_stream)
         check_lifecycle(lifecycle, lifecycle['campaign_pgid'])
         required = {'packet-packet-config.json', 'packet-packet-decoded-manifest.json',
+                    'packet-packet-self-leaves.json', 'packet-packet-namespace.json',
                     'packet-packet-cpu-only.json', 'packet-decoded.pt',
                     'packet-protected-identity.json',
                     *(f'namespace-{case}-receipt.json.started' for case in ('normal', 'timeout', 'term', 'kill')),
                     *(f'packet-unit-{unit}.npz' for unit in fixed.UNITS),
                     *(f'strict-{runtime}-{name}.json' for runtime in ('main', 'jcv')
-                      for name in ('config_path', 'receipt_path', 'namespace_path', 'namespace_started_path')),
+                      for name in ('config_path', 'receipt_path', 'namespace_path', 'namespace_started_path', 'self_leaves_path')),
                     'assessor-policy.json', 'assessor-config.json', 'assessor-namespace.json',
                     'assessor-namespace.started',
                     *(f'native-{case}-{name}' for case in ('normal', 'timeout', 'kill')
@@ -306,12 +308,23 @@ def validate(stage: Path, destination: Path) -> None:
         from experiments.tennis import w8_protected_metadata
         historical = w8_protected_metadata.read_historical(identity_path, packet.IDENTITY_SHA)
         check_protected_metadata(raw_json('packet-protected-identity.json'), historical)
+        from experiments.tennis import w8_cuda_system_leaves as policy
+        packet_leaves = raw_json('packet-packet-self-leaves.json')
+        policy.validate_self_leaf_identity(packet_leaves, raw_json('packet-packet-namespace.json')['worker_host_identity'])
+        if packet_leaves != raw_json('packet-packet-decoded-manifest.json')['isolation']['approved_leaves']:
+            raise ValueError('packet self leaves differ from decoded isolation')
         for runtime in ('main', 'jcv'):
             observed = raw_json(f'strict-{runtime}-receipt_path.json')
+            leaves = raw_json(f'strict-{runtime}-self_leaves_path.json')
+            policy.validate_self_leaf_identity(leaves, raw_json(f'strict-{runtime}-namespace_path.json')['worker_host_identity'])
+            if leaves != observed['isolation']['approved_leaves']:
+                raise ValueError('strict self leaves differ from isolation')
             if (observed.get('scope') != 'cpu_isolation_proof_only'
                     or observed.get('cuda_initialized') is not False or observed.get('visible_devices') != ''):
                 raise ValueError('strict CPU proof receipt differs')
         assessor = raw_json('assessor-policy.json')
+        policy.validate_self_leaf_identity(assessor['isolation']['approved_leaves'],
+            raw_json('assessor-namespace.json')['worker_host_identity'])
         if (assessor.get('scope') != 'assessment policy component only; no candidate or quality claim'
                 or assessor.get('gpu_claim') is not False or assessor.get('quality_claim') is not False
                 or assessor.get('output_write') is not True
