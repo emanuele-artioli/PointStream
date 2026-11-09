@@ -181,6 +181,8 @@ def run(stage: Path) -> None:
             raise ValueError('actual native proof case and raw receipts required')
         for name, path in result['receipt_paths'].items():
             keep(f'native-{case}-{name}', path)
+        if case == 'normal':
+            keep('native-normal-decoded.yuv', Path(result['output']) / 'native.yuv')
     remaining(dispatch, 10)
     summary = {'schema': 1, 'scope': 'raw CPU proof receipts only; independent root audit required',
                'quality_claim': False, 'gpu_claim': False, 'source': dispatch['code'],
@@ -248,7 +250,7 @@ def validate(stage: Path, destination: Path) -> None:
                     *(f'native-{case}-{name}' for case in ('normal', 'timeout', 'kill')
                       for name in ('namespace_started', 'teardown', 'launcher_execution',
                                    'native_handle', 'native_handle_ready', 'native_handle_committed')),
-                    'native-normal-namespace_final', 'native-normal-native_seal',
+                    'native-normal-namespace_final', 'native-normal-native_seal', 'native-normal-decoded.yuv',
                     'native-normal-native_execution',
                     'native-normal-control_execution', 'native-timeout-interruption',
                     'native-timeout-namespace_final', 'native-kill-interruption'}
@@ -272,6 +274,7 @@ def validate(stage: Path, destination: Path) -> None:
                 raise ValueError('native observed handle identity differs')
         native = raw_json('native-normal-native_seal')
         if (native.get('yuv_sha256') != '7490edf9b678db805c23baae49a2a3b5e9d7b037b18dd216320aad47a061beff'
+                or native.get('yuv_sha256') != receipts['native-normal-decoded.yuv']['sha256']
                 or native.get('inventory_sha256') != NATIVE_INVENTORY_SHA or native.get('exit_code') != 0):
             raise ValueError('actual native YUV proof differs')
     with destination.open('x') as stream:
