@@ -485,6 +485,7 @@ def _validate_receipt(output: Path, expected: dict[str, Any], scope: str, steps:
                     or archive['crops'].shape != (8, 784, 512, 3) or archive['crops'].dtype != np.uint8):
                 raise ValueError('qualification crop context differs')
         if (sidecar.get('scope') != scope or sidecar.get('unit') != unit or sidecar.get('steps') != 30
+                or sidecar.get('profile') != 'match5'
                 or sidecar.get('frames_generated') != 24 or sidecar.get('kept') != 8
                 or sidecar.get('npz_sha256') != fixed.file_sha(path) or receipt.get('sidecar') != sidecar
                 or sidecar.get('context') != {'run': 0, 'first_frame': 0, 'frames': 24,

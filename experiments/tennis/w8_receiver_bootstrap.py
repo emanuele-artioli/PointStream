@@ -154,9 +154,9 @@ def load_config(path: Path, expected_sha: str) -> dict[str, Any]:
     if not isinstance(config, dict) or set(config) not in (required, required | {'native_receipt'},
                                                          required | {'probe_steps'}):
         raise ValueError('unexpected configuration fields')
-    if ('native_receipt' in config) != (config.get('worker_kind') == 'rgb'):
+    if ('native_receipt' in config) != (config.get('worker_kind') in ('rgb', 'context_rgb')):
         raise ValueError('native receipt required only for RGB conversion')
-    if config['worker_kind'] not in ('packet', 'generate', 'context_qualification', 'cost_probe', 'preflight', 'sam', 'rgb', 'compose'):
+    if config['worker_kind'] not in ('packet', 'generate', 'context_qualification', 'cost_probe', 'preflight', 'sam', 'rgb', 'compose', 'context_sam', 'context_rgb', 'context_compose'):
         raise ValueError('unknown worker kind')
     if config['worker_kind'] == 'cost_probe':
         if type(config.get('probe_steps')) is not int or config['probe_steps'] not in (1, 3, 6):
@@ -275,8 +275,14 @@ def main() -> int:
     else:
         from experiments.tennis.w8_receiver_finish import (run_compose_isolated, run_conversion_isolated,
                                                             run_sam_isolated)
-        {'sam': run_sam_isolated, 'rgb': run_conversion_isolated, 'compose': run_compose_isolated}[
-            config['worker_kind']](config, isolation)
+        kind = config['worker_kind']
+        funcs = {'sam': run_sam_isolated, 'rgb': run_conversion_isolated, 'compose': run_compose_isolated,
+                 'context_sam': run_sam_isolated, 'context_rgb': run_conversion_isolated,
+                 'context_compose': run_compose_isolated}
+        if kind.startswith('context_'):
+            funcs[kind](config, isolation, qualification=True)
+        else:
+            funcs[kind](config, isolation)
     return 0
 
 
