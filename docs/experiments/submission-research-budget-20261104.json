@@ -1336,6 +1336,15 @@
       "cpu_seconds": 90,
       "release_stage": "research-first24/28",
       "basis": "Prior50unique source preparation +70rounded onecore lifecycle through canonicalpublication60.571wall +20audit/admin =140of150firstleaf; aggregateCPUunmeasured. Tenunused releasedinsideparent. Separate270CPU nativeleaf remains unexecuted. FAILEDfleetstage retained; rootqualifiedfailuremechanismonly,no passednative/GPUgate."
+    },
+    {
+      "phase": "k5d-parent8-native-readiness-20261109",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 20,
+      "release_stage": "research-first24/28",
+      "basis": "Full authorized20CPU fresh native readiness, ZIP11.770CPU+source9fSHA.130partial probes, fleet/SSH/adminunmetered. No duplicate sourceupload. Inside270nativeleaf,250future; failedleaf140closed -> combinedqualification410if270fullyspent<=420. Rootexactrawreadiness/SHA/spec reviewed, nojobyet."
     }
   ],
   "reservations": [
@@ -1854,8 +1863,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8370,
-      "cpu_seconds": 7600,
-      "status": "Remaining_unspent8370GPU7600CPU; expectedfailurea2f4rootacceptedmechanismonly140CPUinclusive; no native/GPUjob released."
+      "cpu_seconds": 7580,
+      "status": "Remaining_unspent8370GPU7580CPU; native20readinesscharged, ONE270inclusiveCPUproof released250future, noGPUrelease."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",

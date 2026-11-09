@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "decision": "release ONE real native four-case CPU proof for965d source",
+  "revision": "965d801ada4b8ccb6e54685f4560de8287931d00",
+  "snapshot_sha256": "9f486d70424b9d293d8774c92b36350d284edcb2513c415390b88a2b4c344aed",
+  "source_sha256": "58787f8664f961c2287228762c1ddd3295adab4042bd7f41d9bfee87d2666104",
+  "source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/k5d-parent8-child2-965d-20261109/source.tar",
+  "spec_path": "/private/tmp/k5d-parent8-native-final-20261109/spec.json",
+  "raw_spec_sha256": "9bfc25c51eab5afc28b38bc95afaee2d3fd35b83e1fbf9a6cbc1a725ab13bb45",
+  "logical_spec_sha256": "278f6ebf5218b37b1f6b66ebff8c55bd4cad5bde4bf4f53e449aad8ec06162a4",
+  "normalized_file_sha256": "6b5e5088f991d58c38b8d72802ba36955ed99be28686e6008172cda657239bd2",
+  "deadline": "2026-11-09T22:46:27.561819Z",
+  "host": "gpu2",
+  "cpu_affinity_index": 0,
+  "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "inclusive_CPU_leaf_cap": 270,
+  "already_charged_preparation_CPU": 20,
+  "future_CPU_cap": 250,
+  "future_components": {
+    "single_core_campaign": 100,
+    "postcampaign": 100,
+    "independent_audit": 30,
+    "contingency": 20
+  },
+  "GPU_cap": 0,
+  "total_qualification_CPU_cap": 420,
+  "prior_failed_leaf_closed_CPU": 140,
+  "total_if_native_leaf_fully_charged": 410,
+  "parent_remaining_CPU": 7580,
+  "parent_remaining_GPU": 8370,
+  "source_review": "Root/reviewer actual1381Gitblobs/H2bridge69dd/full1776+37skip,mypy501,Ruff and8-filediff verified. Expectedfailedleafa2f4rootacceptedonlyforfailure/reapermechanism; notnativegate. New actualspeconlydeadline/epochdifffrompriornativeprovisional; raw/readiness/9fsource/ZIP/tool/unshare/currentclaim reviewed.",
+  "forecast": "Same nativeCPU four-case code as prior source, namespace adds ESRCH-only no-descendant handling already exercised in a2f4. Prior fullproof5331birth-to-run61.161s x1.5=91.742fits100campaign;70smoke+10validator+5noop leaves15staging/slack. Publication andunmeteredmanagement coveredseparately, no doublecountchildCPU. A boundedsmoke, not GPU/cost/quality evidence.",
+  "conditions": [
+    "ONEcanonicalsubmitclean965d/cache9f/source_archive:true/exactfixedspec;freshminimaljobs/worker/CPUclaimcheck;require>=900secondsbeforefixeddeadlineorSTOPforrootreview,no silentrefresh",
+    "saveactualID/source/spec/deadline/budgets/output inBallentry FIRST;sendrootIDforcentralledger BEFOREONEps-fleetwait boundedbydeadline<=2700;neverreplayunknownsubmissions",
+    "actualnormal/timeout/TERM/KILL ffmpeg/SVT/dav1d control paths and input/native byte/source/PIDnamespace/accounting/observedbirth/claim/teardown checks; full substantive validator must PASS here",
+    "rootindependentlyauditsfullrawcases/accounting/identities/claims/publication beforeacceptedgate; retain a2f4expectedFAILED markerseparately; no inferred GPUallocator/8GiBmemoryfit/parity/timing/scale/quality",
+    "stoponanysource/native/identity/accounting/cost/deadline/receiptfailure;no autoretry/GPUrelease"
+  ]
+}
