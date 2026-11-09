@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "decision": "release_only_two_bounded_stat_observations_before_any_transfer_or_CPUproof",
+  "date": "2026-11-09",
+  "parent_phase": "w8-full-witness-staged-20261106",
+  "source_revision": "ff6ae97cbb84dc870283e697e2763c1f62cf78f8",
+  "source_archive_sha256": "9e96b6764c2801c751cb583e6006002b6fb842815d8aeb1ddc61a2e4560fa70d",
+  "source_identity": "e61c4bac77b3e6f48517e6b2241841414ec2a722a867cc8eabcc08f46406d3e4",
+  "observer_sha256": "3ecf53c1ba43db08101dc48b060baecdd13cf3f87500a0a0ba97fe5f5b7354e8",
+  "hosts": [
+    "gpu2",
+    "gpu5"
+  ],
+  "roles": [
+    "management-gpu2",
+    "execution-gpu5"
+  ],
+  "observer_cpu_seconds_per_host": 15,
+  "observer_wall_seconds_per_host": 60,
+  "combined_metadata_cpu_ceiling": 40,
+  "combined_remote_cpu_ceiling": 30,
+  "local_control_cpu_ceiling": 10,
+  "phase_preparation_cumulative_cpu_ceiling": 50,
+  "cpu_proof_total_prospective_ceiling": 800,
+  "gpu_seconds": 0,
+  "witness_qualification": false,
+  "checks": [
+    "ff6 configured Ruff/mypy/pytest passed2004/39skips",
+    "root1648Gitblob/sourcearchive exact identity",
+    "final prospective CPU spec index0 validates;deadline unassigned",
+    "fixed declared path/hash references do not match five protected assets; actual metadata stillunobserved"
+  ],
+  "conditions": [
+    "only metadata stat/lstat/resolve on protected/public/cache/controller paths; no protected content open/read/hash",
+    "read active jobs/claims before operations; no unknown replay",
+    "attended commands, oneCPU each, self+localwaited SSH CPU separate records; no parent/childdoublecount",
+    "no transfer, workload execution, inference or request submission",
+    "actual measured/roundedCPU with administrative margin charged once against parent and cumulative prep50; stop if forecast for remainingprep cannotfit",
+    "future transfer/hash may read only reviewed public assets after root stat audit; requires separate release",
+    "trusted controller/cooperative immutable public-file scope; not a race-proof adversarial filesystem guarantee",
+    "40is a cap, not prepaid measured cost or proof; CPUproof and GPU gates remain closed"
+  ]
+}
