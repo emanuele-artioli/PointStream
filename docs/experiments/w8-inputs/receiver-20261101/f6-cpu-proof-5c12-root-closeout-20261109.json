@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "job_id": "20261109T200115Z-5c125c3b",
+  "decision": "root accepts terminal closure only; no research gate passed",
+  "audit_file": "docs/experiments/w8-inputs/receiver-20261101/f6-cpu-proof-5c12-terminal-audit-20261109.json",
+  "audit_sha256": "040b1bcd7270e1d02485a4d59202723d8723de7cb3294afe34136b65a8ab4381",
+  "raw_files_independently_rehashed": 4,
+  "canonical_terminal_status_freshly_verified": true,
+  "gpu_charge": 0,
+  "additional_cpu_charge": 100,
+  "inclusive_cpu_charge": 108,
+  "basis": "Conservative80created-to-terminalwallupper(includesqueue)+10audit/admin+10publication/readiness=100newCPU;prior8prep=>108replacementinclusive,priorfailed120=>228proof-familyCPU. AggregateadminCPUunmeasured. All4rawhashesrootchecked,namespace/campaignPIDsandCPUclaimabsent,eventsACK. FailedprocselfbindingandESRCHreaper,no passinggate/GPU/quality.",
+  "retry_authorized": false
+}

@@ -1188,6 +1188,27 @@
       "witness_qualification": false,
       "release_stage": "research-first24/28",
       "basis": "Rootindependentlyreviewedf6metadata/upload/postpublichashreceiptsE652,bothhostprivatecontent_readfalse; solelyexpectedcd6nativecachepopulationfrompriorff6staging reconciledwithcurrentSHA. Remote0.55189+localwaitedSSH0.139089+localwrapper0.085867=~0.776846CPU, conservative2admin; priorprecheck6=>newprep8/30,22futureprep(inc10pubreserve). No CPUproofrequest/GPUyet."
+    },
+    {
+      "phase": "k5d-shared-df6-parity16-expiry-closeout-20261109",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "job_id": "20261109T193337Z-e4e56d4b",
+      "gpu_seconds": 0,
+      "cpu_seconds": 370,
+      "release_stage": "research-first24/28",
+      "basis": "Fullremaining370externalCPUallowancechargedconservativelyforqueue/manager/audit/admin;prior30prep=>400inclusiveof1200leaf. Noassignedhost/stage/GPU, pending1735.275wallNOTCPU. All12rawhashesrootchecked,emptyclaimbook,eventACK. Unused800campaignCPUreleasedinsideparent,notnewreservation."
+    },
+    {
+      "phase": "w8-f6-cpu-proof-failure-closeout-20261109",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "job_id": "20261109T200115Z-5c125c3b",
+      "gpu_seconds": 0,
+      "cpu_seconds": 100,
+      "release_stage": "research-first24/28",
+      "basis": "Conservative80created-to-terminalwallupper(includesqueue)+10audit/admin+10publication/readiness=100newCPU;prior8prep=>108replacementinclusive,priorfailed120=>228proof-familyCPU. AggregateadminCPUunmeasured. All4rawhashesrootchecked,namespace/campaignPIDsandCPUclaimabsent,eventsACK. FailedprocselfbindingandESRCHreaper,no passinggate/GPU/quality.",
+      "witness_qualification": false
     }
   ],
   "reservations": [
@@ -1706,8 +1727,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8770,
-      "cpu_seconds": 8510,
-      "status": "Remaining_unspent8770GPU8510CPU aftersharedGPU16readiness30charged. ONEsharednumericparity e4e56d4b pendingwithinparent; inclusive1000GPU1200CPUincl30prep and1170future. No timing/scale/cost/full30 promotion."
+      "cpu_seconds": 8140,
+      "status": "Remaining_unspent8770GPU8140CPU; terminalfailuresclosed,localresourcepolicyrepairsunderreview,noGPUorfullstudyrelease."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -1771,8 +1792,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 4422,
-      "status": "Remaining_unspent4550GPU4422CPU; f6sourceE652uploaded/verified,bothfixedSHAs+allGitblobsreviewed/newprep8charged, oldfailedproof120. OneReplacement900cumulative includes772futureCPU(22prep600campaign100post50audit); rootexecutionreleasepending. NoGPUqualification/fullwitness."
+      "cpu_seconds": 4322,
+      "status": "Remaining_unspent4550GPU4322CPU; terminalfailuresclosed,localresourcepolicyrepairsunderreview,noGPUorfullstudyrelease."
     }
   ],
   "jobs": [
@@ -2759,7 +2780,7 @@
       "job_id": "20261109T193337Z-e4e56d4b",
       "phase": "k5d-scale-first-tranche-20261105",
       "subphase": "shared-df6-16frame-numerical-parity",
-      "state": "pending; one bounded queue; no automatic retry",
+      "state": "expired/nohost/nostage/noGPU/emptyclaims/eventACK/rootclosed",
       "revision": "df6eee829e56a1880397547f6d654eb47169c4f4",
       "source_sha256": "ac77730dc24ce123fa7dac7f9e2d65003e25a11fdbded29b05f77be9bef1b15b",
       "snapshot_sha256": "4477693bd025e633a8d14a4f8f303576e41df4cd23420c083cedd967113ce463",
@@ -2773,12 +2794,16 @@
       "wait_max_seconds": 1631,
       "local_batch": "/private/tmp/k5d-shared16-queue-20261109/batch.json",
       "source_archive": true,
-      "evidence_scope": "shared numerical parity only; no timing, scale or cost promotion"
+      "evidence_scope": "shared numerical parity only; no timing, scale or cost promotion",
+      "conservative_terminal_additional_cpu_charge": 370,
+      "actual_inclusive_conservative_cpu_charge": 400,
+      "terminal_charged_gpu_seconds": 0,
+      "wait_state": "ended; no live wait/retry"
     },
     {
       "job_id": "20261109T200115Z-5c125c3b",
       "phase": "w8-full-witness-staged-20261106",
-      "state": "failed; CPU claim and recorded namespace/group processes absent; no retry",
+      "state": "failed/namespacebindingandreaper/recordedPIDsandclaimabsent/eventsACK/rootclosed",
       "revision": "f6d2d8437aaf16c7e866e8ea846cc769e09dd922",
       "source_sha256": "269820305152e06bd7e2421e821acf9a63895f3487fbc53327e0870c2d73d7e2",
       "snapshot_sha256": "e6527d02582402b637bf34f31ce5b661bef9b7e900d062ee77b78fc08e97f84c",
@@ -2800,7 +2825,11 @@
       "scope": "CPU-only packet, namespace, native and policy proof; no GPU or quality evidence",
       "result": "Packet strict worker rejected /proc/self/maps; PID namespace reaper then raised ProcessLookupError during kill(-1); no final namespace receipt or packet proof.",
       "terminal_receipt": "docs/experiments/w8-inputs/receiver-20261101/f6-cpu-proof-5c12-terminal-audit-20261109.json",
-      "cpu_charge_status": "pending root independent audit"
+      "cpu_charge_status": "root accepted closure; no passing proof",
+      "conservative_terminal_additional_cpu_charge": 100,
+      "actual_inclusive_conservative_cpu_charge": 108,
+      "terminal_charged_gpu_seconds": 0,
+      "wait_state": "ended; no live wait/retry"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -2822,7 +2851,7 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "Noactivejobs/waits: BallbbdeCPUproofrootaccepted, W8edd3failedclosed. Noautomaticretry/GPUrelease; localW8resource-onlyrepairreviewandsharedBallGPU16proposalnext.",
+    "state": "Noactivefleetjobs/waits. BallDF6sharedqueueexpired/rootclosed; W8f6CPUprooffailed/rootclosed. Localfinalnamespace-repairoracle<=10CPUandlower-memoryBallprofilepreparationonly;nonewGPUrelease.",
     "jobs": [],
     "batches": [],
     "native_completion_resume_verified": false,

@@ -7,6 +7,14 @@ worthwhile, authorized research, retain negatives, then revise the paper within
 No actual submission is authorized; coauthor review and footage rights remain
 human prerequisites. No training/legacy200GPU-hour full-pipeline study.
 
+## Latest checkpoint — November9 after20:15UTC
+
+- No live fleet job/wait. Fresh canonical statuses: Ball`20261109T193337Z-e4e56d4b` expired without host/stage/GPU; W8`20261109T200115Z-5c125c3b` failed at packet system-leaf binding then ESRCH reaper. Root rehashed12+4raw files and accepted terminal closure only. Both event/claim/process closures are recorded in respective root-closeout receipts.
+- Charges now18,512GPU /38,688CPU seconds. Open REMAINING_UNSPENT parents: Ball8,770GPU /8,140CPU; W8 4,550GPU /4,322CPU. Shared CPUfree61. Ballqueue400CPUinclusive(30prep+370external); W8newattempt108inclusive(8prep+100closure), proof-family228before neworacle. Queue wall is notCPU; administration unmetered and conservatively charged.
+- W8owner`plan_research_audit` is implementing second/final local repair: exact self maps/status hostPID/startticks/PGID binding plus ESRCH-only reaper. First proc-view oracle0.235CPU; one further real12+2publicmetadata oracle allowed within10CPUaggregate from unspent50audit allowance. No full combined proof/GPU release. `ball_scale_finish` independently reviews.
+- `decoder_cost_finish` is implementing a distinct lower-memory Ballprofile locally:4GiBparent+2GiBserialchild, unchanged8GiBmargin, exact original16/batch/dtype/models/QPs/allarrays/12receipts. PreserveDF6/v1. Cardd2e1ae6a is prospective; no source upload/CPUproof/GPU authority yet. Need new exact minimal consumer source bridge/freeze, configured checks and fresh actual-source CPUproof before GPU16release.
+- PR344 MERGED as3513cec7a87a8c9dfcab3eb925c84fc4e9af6591, CIgreen. Fetch/integrate main only after active source edits are committed; never lose WIP. Later docs need push/review. Preserve untracked calibration-controls spec. All older checkpoints below are historical, superseded where stated.
+
 ## Latest checkpoint — November9 about19:55UTC
 
 Read live ledger/job entries before acting; older details below preserve history.
