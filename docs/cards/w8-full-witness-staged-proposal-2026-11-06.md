@@ -78,3 +78,9 @@ Root permits a prospective proposal of at most **800 workload CPU seconds / zero
 ### Clarification of the full-run bound
 
 The600-second limit applies to smoke and qualification commands. The earlier blanket wording was too broad and is corrected before any execution. Original full candidate generation keeps its unbroken240-frame run,30 steps and registered seed; do not chunk it or change RNG/context merely to fit that wording. A prospective1,300-second full stage with an1,100-second worker is inside the45-minute operational bound, but remains unadmitted until source proof, both-unit qualification, independent producer/candidate checks and a complete remaining-cost forecast pass. This clarification adds no budget, quality tolerance or automatic release.
+
+### Qualification charge attribution
+
+The same-source CPU proof and its own readiness/audit costs are outside the900-GPU/1,000-CPU qualification sub-cap, but remain inside the4,550/4,550 parent reservation. Tag those ledger charges `witness_qualification: false`. Readiness, execution, publication and audit for the context qualification stages count inside the sub-cap and are tagged true. All charges under this parent must be explicitly attributed.
+
+The initial unit0 pilot must reject earlier qualification execution or replay. It may include explicitly identified prep-only charges for its current attempt; those are already spent. The cumulative gate sums every qualification-tagged charge and only the proposed **future** allowance, without subtracting or reserving its own charged preparation twice. For example,50CPU of current pilot preparation plus950futureCPU uses the1,000CPU cap; a separate CPU-proof charge does not consume that sub-cap. Unattributed costs, an earlier execution or mismatched attempt/phase bindings fail the gate.
