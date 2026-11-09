@@ -15,6 +15,15 @@
     0
   ],
   "error": "CPU proof attempted to raise inherited hard RLIMIT_CPU to 3600 and failed at line 138 before packet, native or namespace proof leaves",
+  "event_ack": {
+    "acknowledged": [
+      "50079b21f77b5fb7bc0fbb1946f124cd",
+      "2da28a051ee854269ef59d6cbd7bab68"
+    ],
+    "path": "/private/tmp/pointstream-w8-ff6-cpu-proof-submission-20261109-a1/ack.json",
+    "raw_utf8": "{\n  \"acknowledged\": [\n    \"50079b21f77b5fb7bc0fbb1946f124cd\",\n    \"2da28a051ee854269ef59d6cbd7bab68\"\n  ]\n}\n",
+    "sha256": "853f5ac044185ff012c67746b378f86c2381623f81297bef23fc4bcbd0a2494e"
+  },
   "gpu_seconds": 0,
   "inherited_hard_limit": "unknown; not measured",
   "job_id": "20261109T184450Z-edd3f290",
