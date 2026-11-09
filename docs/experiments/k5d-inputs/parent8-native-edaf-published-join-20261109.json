@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "job_id": "20261109T221304Z-edafe094",
+  "verified_archive_sha256": "9446b186e6c588b0f98aa950eb764f2c84bd29a4bddf901118560944cfd4cfe1",
+  "all26_extracted_regular_files_match_archive_members": true,
+  "root_audit_scope": "Supplementary direct archive-member comparison after independent audit and before GPU parity release; all extracted oracle/case/identity/native proof files joined to the canonical published bytes. No new compute run or qualification."
+}
