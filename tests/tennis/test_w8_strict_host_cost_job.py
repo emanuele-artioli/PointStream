@@ -361,7 +361,7 @@ def test_aa_pin_rejects_foreign_and_mixed_preloaded_origins(tmp_path, monkeypatc
 
 def test_witness_uses_pid_namespace_without_new_host_process_group(tmp_path, monkeypatch):
     from types import SimpleNamespace
-    from experiments.tennis import w8_witness_namespace as namespace
+    from experiments.tennis import w8_witness_profile as witness
 
     calls = []
     def launch(command, **kwargs):
@@ -372,7 +372,7 @@ def test_witness_uses_pid_namespace_without_new_host_process_group(tmp_path, mon
     monkeypatch.setattr(job.subprocess, 'Popen', launch)
     monkeypatch.setattr(job.receiver, 'wait_owned_worker', lambda proc, seconds: (0, False))
     monkeypatch.setattr(job.w8_clock_profile, 'write_parent_receipt', lambda path: 'clock-sha')
-    monkeypatch.setattr(namespace, 'validate_receipt', lambda *_args, **_kwargs: {'children_cpu_seconds': 1.0})
+    monkeypatch.setattr(witness, 'namespace_completion', lambda *_args, **_kwargs: {'children_cpu_seconds': 1.0})
     monkeypatch.setenv('PS_STAGE_DIR', str(tmp_path / 'smoke'))
     readlink = job.os.readlink
     monkeypatch.setattr(job.os, 'readlink', lambda path: 'pid:[parent]' if str(path) == '/proc/self/ns/pid' else readlink(path))
