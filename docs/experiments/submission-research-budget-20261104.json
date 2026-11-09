@@ -1796,7 +1796,7 @@
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8770,
       "cpu_seconds": 7870,
-      "status": "Remaining_unspent8770GPU7870CPU; lower-profile GPU16 readiness30CPU charged; ONE pilot1000GPU1200CPUinclusive released,1170futureCPU insideparent; no scale/full30."
+      "status": "Remaining_unspent8770GPU7870CPU; sharedGPU16f114running1000GPU1200CPUinclusive/1170futureCPU insideparent; no scale/full30."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -2952,6 +2952,34 @@
       "terminal_additional_cpu_charge": 110,
       "proof_family_closed_cpu": 378,
       "wait_state": "ended"
+    },
+    {
+      "job_id": "20261109T205759Z-f1141a7c",
+      "phase": "k5d-scale-first-tranche-20261105",
+      "subphase": "low-memory-shared-GPU16-exact-parity",
+      "state": "running; expected foreignGPU contention/continue, timing contaminated by design; root freshly verified canonical status",
+      "revision": "da98de4a37e58af56d850eddabebb81be0642e42",
+      "snapshot_sha256": "0fc1220f7aa82e7f0edfe637869cbfb5bbb1517e3cc5a51ad6e273702b03cfb1",
+      "source_sha256": "62b6c4904c627d770a3d0854dc850a8871097f0053e551563e8cb4c647cc3036",
+      "spec_sha256": "7045e18d4751f2100eac3a06e5ff0379db19e1118889555008e3f37f8db664bb",
+      "deadline": "2026-11-09T21:33:17.493552Z",
+      "host": "gpu2",
+      "gpu_uuid": "GPU-fc7e8fff-75be-4984-a185-fe8ce63edcd9",
+      "cpu_affinity_index": 0,
+      "source_archive": true,
+      "inclusive_gpu_ceiling": 1000,
+      "inclusive_cpu_ceiling": 1200,
+      "preparation_charged_cpu_seconds": 30,
+      "future_CPU_ceiling": 1170,
+      "campaign_wall_ceiling": 800,
+      "declared_gpu_mib": 6144,
+      "admission_margin_mib": 8192,
+      "root_native_CPU_gate_sha256": "511c3c777f4866bb8a7b50180918a2f14be9dd9609c5e288cb58bbf9824c70f7",
+      "local_batch": "/private/tmp/k5d-low16-pilot-20261109/batch.json",
+      "supervisor_pid": 1751883,
+      "campaign_pgid": 1751899,
+      "wait_max_seconds": 2035,
+      "evidence_scope": "Exact16frame/sixpoint numerical+resource feasibility only; no timing/scale/cost promotion"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -2973,7 +3001,7 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "Noactivefleetjobs/waits. Ball5331CPUproofrootaccepted/closed; GPU16readinessonlyunderway. W8final538froutingfailureclosed; newlocalrepaironly. Noautomaticretry/recurringtimer.",
+    "state": "ONE Ball GPU16 jobf114running shared/continue; owner records/ACKs expectedsharedcontention event then ONEcanonicalwait2035s. W8routingrepairlocalonly, no otherfleetjob/retry/timer.",
     "jobs": [],
     "batches": [],
     "native_completion_resume_verified": false,
