@@ -7,6 +7,50 @@ worthwhile, authorized research, retain negatives, then revise the paper within
 No actual submission is authorized; coauthor review and footage rights remain
 human prerequisites. No training/legacy200GPU-hour full-pipeline study.
 
+## Latest checkpoint — November9 about19:55UTC
+
+Read live ledger/job entries before acting; older details below preserve history.
+- BallCPUbbde248b is ROOT ACCEPTED, receipt
+  `shared-df6-native-bbde-root-accepted-20261109.json` SHA6a4c7d3b… .
+  Charge150CPUinclusive50prep+70lifetimeupper+30audit,0GPU; all19observedPIDs,
+  group/supervisor and CPUclaim absent, eventACK. No GPUquality/timing claim.
+- ONE sharedGPU16 queue is active: `20261109T193337Z-e4e56d4b`, sourceDF6/447/ac777,
+  logicalspecfbc752f3…, deadline20:02:36UTC. Rootrelease98d18016 andqueue
+  clarification6ad52e64; scheduler waitsfree>=16,384+8,192MiB, no smaller margin.
+  GPU2only; GPU3coldcacheexcluded. Solecanonicalwait96885/max1631s endsbefore
+  deadline; batch `/private/tmp/k5d-shared16-queue-20261109/`. No replay/poll/requeue.
+  Inclusive1,000GPU/1,200CPU,30prepcharged,1,170futureCPU, insideparent.
+  Shared timing cannot qualify scaling/cost/performance. Exact all16 arrays
+  and all12DCVCresource receipts still required.
+- W8 import-limit fix is frozenf6d2d8437aaf16c7e866e8ea846cc769e09dd922, source
+  269820305152e06bd7e2421e821acf9a63895f3487fbc53327e0870c2d73d7e2, archive
+  e6527d02582402b637bf34f31ce5b661bef9b7e900d062ee77b78fc08e97f84c,
+  bootstrap01f3fed3…, inputhelper7a0685ba… . Rootverifiedall1,667Gitblobs;
+  allconfiguredchecks2011passed/39skipped,mypy561,Ruff. Test-onlycherrypick1cfe70b7
+  made sharedrootcode/tests equivalent; codefreezeexcludeslaterdocs.
+  Newsourcecachedandbothhostpublichashchecked at
+  jobs/fleet/snapshot-cache/w8-witness-f6d2-20261109/source.tar.
+  The oldnative-inventorymissing->presenttransitionwas validatedasCD6file
+  createdbycanonicalff6staging; no other baselinechangeallowed.
+- Sourceprechecks/reconcile/upload cost6+2CPU. W8parent4,422CPU/4,550GPU;
+  ROOTexecutionrelease98a50fee permitsONEreplacement:900CPUcumulative=
+  failed120+newprep8+future772(22prep600campaign100post50audit),0GPU.
+  Actualspec logicald45ea01e2f60d05eeedebe2f9d6320b81d8c862bcadd675e5205d680ab30e776,
+  rawda96031e…,normalizedFILE59809d05…,deadline20:24:24UTC, gpu5CPU0/Main32e/CD6.
+  Submitonly>=900secondsleft; otherwiseSTOPfornewrootreview, no silentrefresh.
+  Ownerplan_research_audit is performing actualsubmission/recording; no newID
+  knownatthischeckpoint. Read W8entry/ledger/status; NEVERreplay.
+- Programme charges18,512GPU/38,218CPU beforelateractualcosts; Ballparent
+  8,770GPU/8,510CPU. Large-cache readiness metadata is not fresh bytehashing;
+  canonicalstage verification remains mandatory.
+- PR344 opened withauto-merge mergecommit, CI42686777797SUCCESS; lateststate
+  mustberead. Rootfeaturebranch pushedthrough69920917; laterdoc/sourceprep
+  receipts/release stillneedpush. Activejobssnapshotsindependentofmain.
+- ball_scale_finish is doingLOCALreadonlymemory audit for a hypothetical
+  separate4GiBparent+2GiBchild profile withUNCHANGED8GiBmargin,14GiBtotal.
+  It is neither a change toDF6/v1 nor execution authority. No newshared
+  outcomehasbeenobserved; rootdecides onlyafterconcretestaticreview/queueevent.
+
 ## Authority and current accounting
 
 Programme remains24GPU-hours /28workloadCPU-hours inclusive. The live
