@@ -15,18 +15,32 @@ from experiments.tennis import w8_receiver_finish as finish
 from experiments.tennis import w8_receiver_generate as generation
 
 
-def namespace_started_absence(path: Path, *, expected_pgid: int, expected_outside: str,
-                              expected_target: str) -> dict[str, Any]:
-    """Require pre-wait owned identities and confirm both exact processes exited."""
-    started = json.loads(path.with_name(path.name + '.started').read_text())
+def validate_started_identity(started: dict[str, Any], *, expected_pgid: int,
+                              expected_outside: str, expected_target: str) -> None:
+    """Validate the trusted init's pre-wait process and namespace binding."""
     if (started.get('schema') != 1 or started.get('target') != expected_target
             or started.get('outside_namespace') != expected_outside):
         raise ValueError('namespace pre-wait identity differs')
-    for item in (started['namespace_init'], started['worker_host_identity']):
+    init = started['namespace_init']
+    worker = started['worker_host_identity']
+    if (init.get('namespace_pid') != 1 or not str(init.get('pid_namespace', '')).startswith('pid:[')
+            or init.get('pid_namespace') == expected_outside or worker.get('campaign_pgid') != expected_pgid
+            or init.get('host_pid') == worker.get('host_pid')):
+        raise ValueError('namespace pre-wait process binding differs')
+    for item in (init, worker):
         if (type(item.get('host_pid')) is not int or item['host_pid'] <= 0
                 or type(item.get('start_ticks')) is not int or item['start_ticks'] <= 0
                 or item.get('host_pgid') != expected_pgid):
             raise ValueError('invalid namespace owned process identity')
+
+
+def namespace_started_absence(path: Path, *, expected_pgid: int, expected_outside: str,
+                              expected_target: str) -> dict[str, Any]:
+    """Require pre-wait owned identities and confirm both exact processes exited."""
+    started = json.loads(path.with_name(path.name + '.started').read_text())
+    validate_started_identity(started, expected_pgid=expected_pgid, expected_outside=expected_outside,
+                              expected_target=expected_target)
+    for item in (started['namespace_init'], started['worker_host_identity']):
         try:
             raw = (Path('/proc') / str(item['host_pid']) / 'stat').read_text()
         except FileNotFoundError:
@@ -451,6 +465,8 @@ def execute_native_base(prepared: dict[str, Any], *, inventory_path: Path,
                     except (FileNotFoundError, json.JSONDecodeError):
                         pass
                     time.sleep(.01)
+                validate_started_identity(started_record, expected_pgid=os.getpgrp(),
+                                          expected_outside=outside, expected_target=namespace.NATIVE_TARGET)
                 owner = started_record['worker_host_identity']
                 if (marker.get('sha256') != fixed.file_sha(native_handle)
                         or set(handle) != {'pid', 'pgid', 'started_monotonic'}

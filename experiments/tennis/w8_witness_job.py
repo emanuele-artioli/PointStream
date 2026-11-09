@@ -18,7 +18,7 @@ CPU_SCOPE = 'root-reviewed W8 same-source CPU isolation and native lifecycle pro
 REQUIRED_PROOFS = ('namespace_lifecycle', 'native_normal', 'native_timeout_kill', 'strict_modes', 'independent_audit')
 REQUIRED_CHECKS = ('same_source_snapshot_environment', 'cpu_hidden_one_core', 'namespace_normal_timeout_term_kill',
                    'native_real_yuv_and_timeout_kill', 'owned_pid_starttick_teardown',
-                   'strict_isolation_proof_denies_paths', 'strict_mode_dispatch_static_reviewed',
+                   'strict_runtime_policy_deny_paths', 'strict_mode_dispatch_static_reviewed',
                    'strict_source_closure_and_clock_leaves', 'counter_and_external_cost_coverage')
 
 

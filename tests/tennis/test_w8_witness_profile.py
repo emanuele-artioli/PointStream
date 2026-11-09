@@ -261,17 +261,24 @@ def test_namespace_completion_requires_started_join_and_absent_owned_pids(tmp_pa
 
     receipt = tmp_path / 'receipt.json'
     started_path = tmp_path / 'receipt.json.started'
-    final = {'namespace_init': {'host_pid': 99999991, 'start_ticks': 1, 'host_pgid': 1},
-             'worker_host_identity': {'host_pid': 99999992, 'start_ticks': 2, 'host_pgid': 1}}
+    final = {'namespace_init': {'host_pid': 99999991, 'start_ticks': 1, 'host_pgid': 1,
+                                'namespace_pid': 1, 'pid_namespace': 'pid:[inner]'},
+             'worker_host_identity': {'host_pid': 99999992, 'start_ticks': 2, 'host_pgid': 1,
+                                      'campaign_pgid': 1}}
     monkeypatch.setattr(namespace, 'validate_receipt', lambda *_args, **_kwargs: final)
     started = {'schema': 1, 'target': 'target', 'outside_namespace': 'pid:[outer]', **final}
     started_path.write_text(json.dumps(started))
     assert witness.namespace_completion(receipt, expected_pgid=1, expected_outside='pid:[outer]',
                                         expected_target='target') == final
-    started['worker_host_identity'] = {'host_pid': 99999992, 'start_ticks': 3, 'host_pgid': 1}
+    started['worker_host_identity'] = {'host_pid': 99999992, 'start_ticks': 3, 'host_pgid': 1, 'campaign_pgid': 1}
     started_path.write_text(json.dumps(started))
     with pytest.raises(ValueError, match='pre-wait identity'):
         witness.namespace_completion(receipt, expected_pgid=1, expected_outside='pid:[outer]', expected_target='target')
+    started['namespace_init'] = dict(final['namespace_init'], pid_namespace='pid:[outer]')
+    started_path.write_text(json.dumps(started))
+    with pytest.raises(ValueError, match='process binding'):
+        witness.namespace_started_absence(receipt, expected_pgid=1, expected_outside='pid:[outer]',
+                                          expected_target='target')
     started_path.unlink()
     with pytest.raises(FileNotFoundError):
         witness.namespace_completion(receipt, expected_pgid=1, expected_outside='pid:[outer]', expected_target='target')
