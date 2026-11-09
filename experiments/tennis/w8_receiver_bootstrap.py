@@ -156,7 +156,7 @@ def load_config(path: Path, expected_sha: str) -> dict[str, Any]:
         raise ValueError('unexpected configuration fields')
     if ('native_receipt' in config) != (config.get('worker_kind') in ('rgb', 'context_rgb')):
         raise ValueError('native receipt required only for RGB conversion')
-    if config['worker_kind'] not in ('packet', 'generate', 'context_qualification', 'cost_probe', 'preflight', 'sam', 'rgb', 'compose', 'context_sam', 'context_rgb', 'context_compose'):
+    if config['worker_kind'] not in ('packet', 'generate', 'context_qualification', 'cost_probe', 'preflight', 'sam', 'rgb', 'compose', 'context_sam', 'context_rgb', 'context_compose', 'isolation_proof'):
         raise ValueError('unknown worker kind')
     if config['worker_kind'] == 'cost_probe':
         if type(config.get('probe_steps')) is not int or config['probe_steps'] not in (1, 3, 6):
@@ -165,8 +165,11 @@ def load_config(path: Path, expected_sha: str) -> dict[str, Any]:
         raise ValueError('probe steps allowed only for cost probe')
     if not isinstance(config['files'], dict) or not isinstance(config['tensor_fingerprints'], dict):
         raise ValueError('invalid asset or fingerprint manifest')
-    if config['worker_kind'] != 'preflight' and len(config['tensor_fingerprints']) != 480:
+    if config['worker_kind'] not in ('preflight', 'isolation_proof') and len(config['tensor_fingerprints']) != 480:
         raise ValueError('480 tensor fingerprints required')
+    if config['worker_kind'] == 'isolation_proof' and (set(config['files']) != {'code:experiments.tennis.w8_clock_profile'}
+            or config['tensor_fingerprints'] or config['environment'].get('CUDA_VISIBLE_DEVICES') != ''):
+        raise ValueError('isolation proof must be CPU-only and scientific-input-free')
     if not isinstance(config['allow_paths'], list) or not config['allow_paths'] or not all(
             isinstance(p, str) for p in config['allow_paths']):
         raise ValueError('explicit allow paths required')

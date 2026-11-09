@@ -63,6 +63,23 @@ def _audit_policy(expected: list[str]) -> Any:
     return audit
 
 
+def write_native_handle(output: Path, handle: dict[str, Any]) -> None:
+    """Publish a fsynced handle before the exclusive readiness marker."""
+    handle_path = output / 'native-handle.json'
+    with handle_path.open('x') as stream:
+        json.dump(handle, stream, sort_keys=True)
+        stream.flush()
+        os.fsync(stream.fileno())
+    with (output / 'native-handle.ready').open('x') as stream:
+        json.dump({'sha256': file_sha(handle_path)}, stream, sort_keys=True)
+        stream.flush()
+        os.fsync(stream.fileno())
+    # Observing this marker implies both preceding records were already fsynced.
+    with (output / 'native-handle.committed').open('x') as stream:
+        stream.flush()
+        os.fsync(stream.fileno())
+
+
 def _landlock(files: list[Path], dirs: list[Path], execute: list[Path], output: Path) -> int:
     """Grant exact file reads/executions and reads/writes only in fresh output."""
     execute_bit, write_file, read_file, read_dir = 1, 2, 4, 8
@@ -207,7 +224,7 @@ def run(config: dict[str, Any]) -> None:
         if proc.stdin is not None:
             proc.stdin.close()
         handle = {'pid': proc.pid, 'pgid': os.getpgrp(), 'started_monotonic': started}
-        (output / 'native-handle.json').write_text(json.dumps(handle, sort_keys=True))
+        write_native_handle(output, handle)
         status = 'completed'
         try:
             returncode = proc.wait(timeout=wall)

@@ -387,4 +387,9 @@ def test_witness_uses_pid_namespace_without_new_host_process_group(tmp_path, mon
     assert 'experiments.tennis.w8_witness_namespace' in command
     assert command[command.index('--timeout') + 1] == '120'
     assert 'start_new_session' not in kwargs
+    for key in ('TMPDIR', 'TMP', 'TEMP', 'HOME'):
+        assert kwargs['env'][key] == str(work)
+    for key in ('XDG_CACHE_HOME', 'TORCH_HOME', 'HF_HOME'):
+        assert Path(kwargs['env'][key]).is_relative_to(work)
+    assert kwargs['env']['HF_HUB_OFFLINE'] == '1' and kwargs['env']['TRANSFORMERS_OFFLINE'] == '1'
     assert (work / 'namespace-validation.json').is_file()

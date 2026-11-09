@@ -103,8 +103,14 @@ def stage_inputs(stage: Path, digest_file: Callable[[Path], str] | None = None, 
     dispatch = json.loads((stage / 'dispatch.json').read_text())
     profile = spec.get('w8_paired_cost_profile')
     witness_profile = spec.get('w8_witness_profile')
-    if witness and (profile is not None or witness_profile not in ('w8-context-pilot-v1', 'w8-context-qualification-v1')):
+    if witness and (profile is not None or witness_profile not in ('w8-context-pilot-v1', 'w8-context-unit1-v1',
+            'w8-context-qualification-v1', 'w8-full-unit0-v1', 'w8-full-unit1-v1')):
         raise ValueError('explicit separate context witness profile required')
+    if witness and (spec.get('witness_cpu_proof_host') not in ('gpu5', 'gpu6')
+                    or spec.get('hosts') != [spec['witness_cpu_proof_host']]
+                    or (dispatch.get('environment') or {}).get('alias') != spec['witness_cpu_proof_host']
+                    or 'RTX 6000 Ada' not in ((dispatch.get('environment') or {}).get('gpu') or {}).get('name', '')):
+        raise ValueError('witness dispatch differs from CPU proof host or Ada model')
     if profile is not None and (profile != 'w8-paired-cost-800-v1'
             or spec.get('budget_seconds') != 800 or spec.get('smoke', {}).get('seconds') != 260
             or spec.get('full', {}).get('seconds') != 500 or spec.get('validator_seconds') != 60
@@ -125,7 +131,8 @@ def stage_inputs(stage: Path, digest_file: Callable[[Path], str] | None = None, 
             or spec.get('environment', {}).get('sha256') != JCV_ENV
             or spec.get('gpu_sharing', {'mode': 'exclusive'}) != {'mode': 'exclusive'}
             or spec.get('contention', {}).get('policy') != 'stop'
-            or not 0 < spec.get('budget_seconds', 0) <= (900 if witness else 800 if profile is not None else 600)):
+            or not 0 < spec.get('budget_seconds', 0) <= (1500 if witness and witness_profile in ('w8-full-unit0-v1', 'w8-full-unit1-v1')
+                                                        else 900 if witness else 800 if profile is not None else 600)):
         raise ValueError('one-core JCV GPU campaign with a valid bounded budget required')
     wanted = {'packet': fixed.WINDOW_SHA, 'profile': fixed.PROFILE_SHA, 'oracle': ORACLE_SHA,
               'base': BASE_ARCHIVE_SHA, 'aa': receiver.AA_ARCHIVE_SHA,
@@ -137,6 +144,12 @@ def stage_inputs(stage: Path, digest_file: Callable[[Path], str] | None = None, 
                 or any(c not in '0123456789abcdef' for c in proof_sha)):
             raise ValueError('root-pinned CPU proof SHA required')
         wanted['cpu_proof'] = proof_sha
+        if witness_profile in ('w8-context-unit1-v1', 'w8-full-unit0-v1', 'w8-full-unit1-v1'):
+            for name, key in (('promotion', 'witness_promotion_sha256'), ('ledger', 'witness_ledger_sha256')):
+                value = spec.get(key)
+                if not isinstance(value, str) or len(value) != 64 or any(c not in '0123456789abcdef' for c in value):
+                    raise ValueError('root-pinned promotion and ledger SHA required')
+                wanted[name] = value
         if witness_profile == 'w8-context-qualification-v1':
             wanted.update(sam_weights=SAM_SHA,
                           native_inventory='cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b')
@@ -200,7 +213,7 @@ def _item(path: Path, digest_file: Callable[[Path], str] | None = None) -> dict[
 
 def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, wall_seconds: int, code_root: Path, loader: Path, *, materialize_profile: bool = False, clock_profile: bool = False, witness_mode: str | None = None) -> dict[str, Any]:
     model_modes = ('generate', 'context_qualification')
-    finish_modes = ('context_rgb', 'context_sam', 'context_compose', 'rgb', 'sam', 'compose')
+    finish_modes = ('context_rgb', 'context_sam', 'context_compose', 'rgb', 'sam', 'compose', 'isolation_proof')
     if (witness_mode not in (None, 'packet', *model_modes, *finish_modes)
             or (witness_mode is not None and config.get('worker_kind') != witness_mode)
             or (witness_mode not in (None, 'packet') and not clock_profile)
@@ -218,6 +231,10 @@ def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, 
     env = {'PYTHONPATH': str(source), 'PYTHONNOUSERSITE': '1', 'PYTHONDONTWRITEBYTECODE': '1',
            'OMP_NUM_THREADS': '1', 'OPENBLAS_NUM_THREADS': '1', 'MKL_NUM_THREADS': '1', 'NUMEXPR_NUM_THREADS': '1'}
     if witness_mode is not None:
+        env.update({'TMPDIR': str(work), 'TMP': str(work), 'TEMP': str(work), 'HOME': str(work),
+                    'XDG_CACHE_HOME': str(work / '.cache'), 'TORCH_HOME': str(work / '.cache' / 'torch'),
+                    'HF_HOME': str(work / '.cache' / 'huggingface'),
+                    'HF_HUB_OFFLINE': '1', 'TRANSFORMERS_OFFLINE': '1'})
         stage_dir = os.environ.get('PS_STAGE_DIR', '')
         if not Path(stage_dir).is_absolute() or Path(stage_dir).name not in ('smoke', 'full'):
             raise ValueError('witness requires the actual fleet stage directory')
@@ -226,7 +243,7 @@ def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, 
               else 'experiments.tennis.w8_strict_packet_worker' if config['worker_kind'] == 'packet'
               else 'experiments.tennis.w8_strict_receiver_worker' if witness_mode in finish_modes
               else 'experiments.tennis.w8_strict_host_model_worker')
-    if config['worker_kind'] == 'packet':
+    if config['worker_kind'] in ('packet', 'isolation_proof'):
         env['CUDA_VISIBLE_DEVICES'] = ''
     prefix = ['/usr/bin/unshare', '--user', '--map-root-user', '--net']
     outside_pidns = None
@@ -258,7 +275,14 @@ def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, 
         command.extend(('--witness-mode', witness_mode))
     before = resource.getrusage(resource.RUSAGE_CHILDREN)
     started = time.monotonic()
+    parent_pid = os.getpid()
+    owner_guard = None
+    if witness_mode is not None:
+        from experiments.tennis.w8_receiver_native_bootstrap import parent_death_signal
+        owner_guard = parent_death_signal
     def limit() -> None:
+        if owner_guard is not None:
+            owner_guard(parent_pid)
         resource.setrlimit(resource.RLIMIT_CPU, (cpu_seconds, 3600))
     with (work / 'stdout').open('xb') as stdout, (work / 'stderr').open('xb') as stderr:
         proc = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr,
@@ -452,7 +476,8 @@ def check_preflight_bundle(preflight: dict[str, Any], identity_path: Path) -> No
                 raise ValueError('preflight source closure mismatch')
 
 
-def check_preflight_sources(preflight: dict[str, Any], root: Path) -> None:
+def check_preflight_sources(preflight: dict[str, Any], root: Path, *,
+                            witness_bootstrap_sha: str | None = None) -> None:
     """Recheck the exact preflight entrypoints and imported project closure.
 
     Unexecuted files in the same source archive may change in the separately
@@ -471,6 +496,10 @@ def check_preflight_sources(preflight: dict[str, Any], root: Path) -> None:
                 raise ValueError('preflight source module outside frozen tree') from exc
     for name in required:
         expected = preflight['frozen_source_files'].get(name)
+        if witness_bootstrap_sha is not None and name == 'experiments/tennis/w8_receiver_bootstrap.py':
+            if (len(witness_bootstrap_sha) != 64 or any(c not in '0123456789abcdef' for c in witness_bootstrap_sha)):
+                raise ValueError('invalid reviewed witness bootstrap identity')
+            expected = witness_bootstrap_sha
         if not isinstance(expected, str):
             raise ValueError(f'preflight source identity missing: {name}')
         actual = (root / name).resolve(strict=True)
@@ -619,7 +648,8 @@ def prepare_receiver_inputs(paths: dict[str, Path], spec: dict[str, Any], *, pac
     if materialize_profile and (spec.get('folder_reference_audit_sha256') != FOLDER_AUDIT_SHA
             or fixed.file_sha(snapshot_root / FOLDER_AUDIT_PATH) != FOLDER_AUDIT_SHA):
         raise ValueError('real folder I/O audit reference differs')
-    check_preflight_sources(preflight, snapshot_root)
+    check_preflight_sources(preflight, snapshot_root,
+                            witness_bootstrap_sha=spec.get('witness_bootstrap_sha256') if witness else None)
     scratch = fixed.checked_scratch()
     protected_path = scratch / 'protected-identity.json'
     fresh_receipt = strict_policy.protected_identity({'denied_paths': {group: [path] for group, (path, _) in PROTECTED.items()}}, protected_path)

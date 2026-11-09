@@ -344,13 +344,15 @@ def execute_qualification_finish(prepared: dict[str, Any], generations: dict[str
 
 
 def execute_native_base(prepared: dict[str, Any], *, inventory_path: Path,
-                        parent_cpu: int, worker_cpu: int, child_cpu: int, wall: int) -> dict[str, Any]:
+                        parent_cpu: int, worker_cpu: int, child_cpu: int, wall: int,
+                        proof_case: str | None = None) -> dict[str, Any]:
     """Run the fixed CPU-only native decoder under its independently audited launcher.
 
     The caller owns campaign admission, total CPU accounting and teardown audit.
     """
     import os
     import resource
+    import signal
     import subprocess
     import sys
     import time
@@ -358,6 +360,11 @@ def execute_native_base(prepared: dict[str, Any], *, inventory_path: Path,
     from experiments.tennis import w8_witness_namespace as namespace
     from experiments.tennis.w8_receiver_preflight import PROTECTED
 
+    if proof_case not in (None, 'normal', 'timeout', 'kill'):
+        raise ValueError('unknown native lifecycle case')
+    if proof_case is not None and (os.environ.get('CUDA_VISIBLE_DEVICES') != ''
+            or os.environ.get('PS_CLAIMED_GPU_UUID') or len(os.sched_getaffinity(0)) != 1):
+        raise ValueError('native lifecycle proof requires hidden CUDA and one CPU')
     inventory_sha = 'cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b'
     if (fixed.file_sha(inventory_path) != inventory_sha
             or any(type(x) is not int or not 1 <= x <= 500 for x in (parent_cpu, worker_cpu, child_cpu, wall))):
@@ -374,7 +381,7 @@ def execute_native_base(prepared: dict[str, Any], *, inventory_path: Path,
     libraries = {Path(name): item['sha256'] for name, item in mapped.items() if name not in (str(binary), str(loader))}
     native.validate_inventory(inventory_path, inventory_sha, binary, loader, loader_sha, libraries)
     scratch = prepared['scratch'].resolve(strict=True)
-    work = scratch / 'witness-native'
+    work = scratch / ('witness-native' if proof_case is None else f'witness-native-proof-{proof_case}')
     work.mkdir()
     output = work / 'output'
     output.mkdir()
@@ -397,9 +404,10 @@ def execute_native_base(prepared: dict[str, Any], *, inventory_path: Path,
     control = work / 'control'
     outside = os.readlink('/proc/self/ns/pid')
     namespace_path = work / 'namespace-receipt.json'
+    inner_timeout = 8 if proof_case == 'timeout' else wall + 15
     command = ['/usr/bin/unshare', '--user', '--map-root-user', '--pid', '--fork', '--kill-child=SIGKILL',
                sys.executable, '-m', 'experiments.tennis.w8_witness_namespace', '--outside', outside,
-               '--timeout', str(wall + 15), '--receipt', str(namespace_path), '--', namespace.NATIVE_TARGET,
+               '--timeout', str(inner_timeout), '--receipt', str(namespace_path), '--', namespace.NATIVE_TARGET,
                '--phase', 'launch',
                '--config', str(config_path), '--config-sha256', config_sha, '--parent-cpu', str(parent_cpu),
                '--worker-cpu', str(worker_cpu), '--child-cpu', str(child_cpu), '--wall-seconds', str(wall),
@@ -410,37 +418,112 @@ def execute_native_base(prepared: dict[str, Any], *, inventory_path: Path,
            'PS_STAGE_DIR': os.environ['PS_STAGE_DIR'], 'PS_SCRATCH_DIR': str(scratch)}
     before = resource.getrusage(resource.RUSAGE_CHILDREN)
     started = time.monotonic()
+    parent_pid = os.getpid()
+    def child_owner() -> None:
+        native.parent_death_signal(parent_pid)
     with (work / 'launcher.stdout').open('xb') as stdout, (work / 'launcher.stderr').open('xb') as stderr:
         proc = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr,
-                                env=env, cwd=prepared['root'], close_fds=True)
+                                env=env, cwd=prepared['root'], close_fds=True, preexec_fn=child_owner)
         with (work / 'launcher-handle.json').open('x') as stream:
             json.dump({'pid': proc.pid, 'command': command, 'wall_limit': wall + 25}, stream, sort_keys=True)
             stream.flush()
             os.fsync(stream.fileno())
+        interruption_error = None
         try:
+            if proof_case in ('timeout', 'kill'):
+                deadline = time.monotonic() + min(6, wall)
+                started_path = namespace_path.with_name(namespace_path.name + '.started')
+                native_handle = output / 'native-handle.json'
+                native_ready = output / 'native-handle.ready'
+                native_committed = output / 'native-handle.committed'
+                while True:
+                    if proc.poll() is not None or time.monotonic() >= deadline:
+                        raise RuntimeError('native proof did not reach an observable invocation')
+                    if not native_committed.is_file():
+                        time.sleep(.01)
+                        continue
+                    try:
+                        started_record = json.loads(started_path.read_text())
+                        handle = json.loads(native_handle.read_text())
+                        marker = json.loads(native_ready.read_text())
+                        if 'worker_host_identity' in started_record and set(marker) == {'sha256'}:
+                            break
+                    except (FileNotFoundError, json.JSONDecodeError):
+                        pass
+                    time.sleep(.01)
+                owner = started_record['worker_host_identity']
+                if (marker.get('sha256') != fixed.file_sha(native_handle)
+                        or set(handle) != {'pid', 'pgid', 'started_monotonic'}
+                        or type(handle['pid']) is not int or handle['pid'] <= 0
+                        or type(handle['pgid']) is not int or handle['pgid'] <= 0
+                        or not isinstance(handle['started_monotonic'], (int, float))
+                        or handle['started_monotonic'] <= 0):
+                    raise ValueError('native process handle is incomplete or mismatched')
+                raw = (Path('/proc') / str(owner['host_pid']) / 'stat').read_text()
+                if proc.poll() is not None or int(raw[raw.rfind(')') + 2:].split()[19]) != owner['start_ticks']:
+                    raise ValueError('native proof owner PID was reused')
+                with (work / 'interruption.json').open('x') as stream:
+                    json.dump({'case': proof_case, 'worker_host_identity': owner,
+                               'native_handle_sha256': fixed.file_sha(native_handle), 'native_handle': handle}, stream, sort_keys=True)
+                    stream.flush()
+                    os.fsync(stream.fileno())
+                if proof_case == 'timeout':
+                    os.kill(owner['host_pid'], signal.SIGSTOP)
+                else:
+                    proc.kill()
             status = proc.wait(timeout=wall + 25)
             timed_out = False
         except subprocess.TimeoutExpired:
             proc.kill()
             status = proc.wait(timeout=10)
             timed_out = True
+        except (OSError, ValueError, KeyError, IndexError, RuntimeError) as exc:
+            interruption_error = str(exc)
+            if proc.poll() is None:
+                proc.kill()
+            status = proc.wait(timeout=10)
+            timed_out = False
     after = resource.getrusage(resource.RUSAGE_CHILDREN)
     usage = {'pid': proc.pid, 'status': status, 'timed_out': timed_out,
              'wall_seconds': time.monotonic() - started,
              'waited_cpu_seconds': after.ru_utime + after.ru_stime - before.ru_utime - before.ru_stime,
-             'config_sha256': config_sha}
+             'config_sha256': config_sha, 'interruption_error': interruption_error}
     with (work / 'launcher-execution.json').open('x') as stream:
         json.dump(usage, stream, sort_keys=True)
-    try:
-        namespace_started_absence(namespace_path, expected_pgid=os.getpgrp(), expected_outside=outside,
-                                  expected_target=namespace.NATIVE_TARGET)
-        teardown = {'owned_init_and_worker_absent': True, 'basis': 'PID namespace teardown; descendants not individually observed'}
-    except (OSError, ValueError, KeyError, IndexError) as exc:
-        teardown = {'owned_init_and_worker_absent': False, 'error': str(exc)}
+    deadline = time.monotonic() + 3
+    while True:
+        try:
+            namespace_started_absence(namespace_path, expected_pgid=os.getpgrp(), expected_outside=outside,
+                                      expected_target=namespace.NATIVE_TARGET)
+            teardown = {'owned_init_and_worker_absent': True,
+                        'basis': 'PID namespace teardown; descendants not individually observed'}
+            break
+        except (OSError, ValueError, KeyError, IndexError) as exc:
+            if time.monotonic() >= deadline:
+                teardown = {'owned_init_and_worker_absent': False, 'error': str(exc)}
+                break
+            time.sleep(.02)
     with (work / 'teardown.json').open('x') as stream:
         json.dump(teardown, stream, sort_keys=True)
     if teardown['owned_init_and_worker_absent'] is not True:
         raise RuntimeError('native teardown identity unresolved; preserve and inspect')
+    if interruption_error is not None:
+        raise RuntimeError('native interruption failed; preserve task-owned evidence: ' + interruption_error)
+    if proof_case in ('timeout', 'kill'):
+        if (timed_out or (proof_case == 'timeout' and (status == 0 or not namespace_path.is_file()))
+                or (proof_case == 'kill' and status != -signal.SIGKILL)):
+            raise ValueError('native lifecycle interruption outcome differs')
+        if proof_case == 'timeout' and json.loads(namespace_path.read_text()).get('reason') != 'timeout':
+            raise ValueError('native reaper timeout receipt differs')
+        return {'scope': 'native_cpu_lifecycle_proof_only', 'case': proof_case, 'usage': usage,
+                'receipt_paths': {'namespace_started': str(namespace_path.with_name(namespace_path.name + '.started')),
+                                  'interruption': str(work / 'interruption.json'),
+                                  'native_handle': str(output / 'native-handle.json'),
+                                  'native_handle_ready': str(output / 'native-handle.ready'),
+                                  'native_handle_committed': str(output / 'native-handle.committed'),
+                                  'teardown': str(work / 'teardown.json'),
+                                  'launcher_execution': str(work / 'launcher-execution.json'),
+                                  **({'namespace_final': str(namespace_path)} if namespace_path.is_file() else {})}}
     if status != 0 or timed_out:
         raise RuntimeError('native launcher failed; preserve task-owned evidence')
     namespace_receipt = namespace_completion(namespace_path, expected_pgid=os.getpgrp(),
@@ -453,5 +536,57 @@ def execute_native_base(prepared: dict[str, Any], *, inventory_path: Path,
             or receipt.get('yuv_sha256') != fixed.file_sha(output / 'native.yuv')
             or set(receipt.get('denials', {})) != {item[0] for item in PROTECTED.values()}):
         raise ValueError('native decoder receipt or source access probes differ')
-    return {'output': output, 'receipt': receipt, 'usage': usage, 'control': control,
-            'namespace_receipt': namespace_receipt, 'namespace_receipt_sha256': fixed.file_sha(namespace_path)}
+    return {'scope': 'native_cpu_lifecycle_proof_only' if proof_case == 'normal' else 'native_decode',
+            'case': proof_case, 'output': output, 'receipt': receipt, 'usage': usage, 'control': control,
+            'namespace_receipt': namespace_receipt, 'namespace_receipt_sha256': fixed.file_sha(namespace_path),
+            'receipt_paths': {'namespace_started': str(namespace_path.with_name(namespace_path.name + '.started')),
+                              'namespace_final': str(namespace_path), 'native_seal': str(output / 'sealed.json'),
+                              'native_handle': str(output / 'native-handle.json'),
+                              'native_handle_ready': str(output / 'native-handle.ready'),
+                              'native_handle_committed': str(output / 'native-handle.committed'),
+                              'native_execution': str(output / 'native-execution.json'),
+                              'launcher_execution': str(work / 'launcher-execution.json'),
+                              'control_execution': str(control / 'execution.json'),
+                              'teardown': str(work / 'teardown.json')}}
+
+
+def run_native_proof(prepared: dict[str, Any], *, inventory_path: Path, case: str) -> dict[str, Any]:
+    """Exercise the actual fixed native path in one bounded CPU-only proof case."""
+    return execute_native_base(prepared, inventory_path=inventory_path, parent_cpu=20, worker_cpu=20,
+                               child_cpu=20, wall=20, proof_case=case)
+
+
+def run_isolation_proof(prepared: dict[str, Any], *, worker_cpu: int = 40, worker_wall: int = 60) -> dict[str, Any]:
+    """Run the strict CPU-only source/clock/denial seam in both packed runtimes."""
+    from experiments.tennis import w8_strict_host_cost_job as host
+
+    if type(worker_cpu) is not int or not 1 <= worker_cpu <= 60 or type(worker_wall) is not int or not 11 <= worker_wall <= 90:
+        raise ValueError('bounded isolation proof limits required')
+    records = []
+    for runtime_name in ('main', 'jcv'):
+        work = prepared['scratch'] / f'witness-isolation-proof-{runtime_name}'
+        work.mkdir()
+        output = work / 'output'
+        output.mkdir()
+        files: dict[str, dict[str, str]] = {}
+        host.add_clock_source(files, prepared['root'], prepared['code_manifest'])
+        config = prepared['config']('isolation_proof', files, output, prepared['policies'][runtime_name],
+                                    worker_cpu, '', unit=fixed.UNITS[0])
+        config['tensor_fingerprints'] = {}
+        usage = host._worker(Path(prepared['policies'][runtime_name]['python']), config, work, worker_cpu,
+                             worker_wall, prepared['root'], prepared['loader_receipt'],
+                             clock_profile=True, witness_mode='isolation_proof')
+        receipt_path = output / 'isolation-proof.json'
+        receipt = json.loads(receipt_path.read_text())
+        if (receipt.get('scope') != 'cpu_isolation_proof_only' or receipt.get('cuda_initialized') is not False
+                or receipt.get('visible_devices') != ''):
+            raise ValueError('CPU isolation proof scope differs')
+        check_worker_isolation(config, receipt['isolation'], runtime=prepared['policies'][runtime_name],
+                               source_manifest=prepared['code_manifest'],
+                               loader=json.loads(prepared['loader_receipt'].read_text()),
+                               loader_sha=fixed.file_sha(prepared['loader_receipt']))
+        records.append({'runtime': runtime_name, 'scope': 'cpu_isolation_proof_only', 'usage': usage,
+                        'config_path': str(work / 'worker-config.json'), 'receipt_path': str(receipt_path),
+                        'namespace_path': str(work / 'namespace-receipt.json'),
+                        'namespace_started_path': str(work / 'namespace-receipt.json.started')})
+    return {'scope': 'cpu_isolation_proof_only', 'runs': records}
