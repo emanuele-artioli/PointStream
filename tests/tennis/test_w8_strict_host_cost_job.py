@@ -357,3 +357,39 @@ def test_aa_pin_rejects_foreign_and_mixed_preloaded_origins(tmp_path, monkeypatc
     init.write_text('mutation')
     with pytest.raises(ValueError, match='origin or hash'):
         worker.pin_declared_aa_imports(config)
+
+
+def test_witness_uses_pid_namespace_without_new_host_process_group(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    from experiments.tennis import w8_witness_profile as witness
+
+    calls = []
+    def launch(command, **kwargs):
+        calls.append((command, kwargs))
+        receipt = Path(command[command.index('--receipt') + 1])
+        receipt.write_text('{}')
+        return SimpleNamespace(pid=123)
+    monkeypatch.setattr(job.subprocess, 'Popen', launch)
+    monkeypatch.setattr(job.receiver, 'wait_owned_worker', lambda proc, seconds: (0, False))
+    monkeypatch.setattr(job.w8_clock_profile, 'write_parent_receipt', lambda path: 'clock-sha')
+    monkeypatch.setattr(witness, 'namespace_completion', lambda *_args, **_kwargs: {'children_cpu_seconds': 1.0})
+    monkeypatch.setenv('PS_STAGE_DIR', str(tmp_path / 'smoke'))
+    readlink = job.os.readlink
+    monkeypatch.setattr(job.os, 'readlink', lambda path: 'pid:[parent]' if str(path) == '/proc/self/ns/pid' else readlink(path))
+    loader = tmp_path / 'loader.json'
+    loader.write_text('{}')
+    work = tmp_path / 'model'
+    work.mkdir()
+    job._worker(tmp_path / 'python', {'worker_kind': 'context_qualification'}, work, 100, 130,
+                tmp_path, loader, materialize_profile=True, clock_profile=True, witness_mode='context_qualification')
+    command, kwargs = calls[0]
+    assert command[:7] == ['/usr/bin/unshare', '--user', '--map-root-user', '--net', '--pid', '--fork', '--kill-child=SIGKILL']
+    assert 'experiments.tennis.w8_witness_namespace' in command
+    assert command[command.index('--timeout') + 1] == '120'
+    assert 'start_new_session' not in kwargs
+    for key in ('TMPDIR', 'TMP', 'TEMP', 'HOME'):
+        assert kwargs['env'][key] == str(work)
+    for key in ('XDG_CACHE_HOME', 'TORCH_HOME', 'HF_HOME'):
+        assert Path(kwargs['env'][key]).is_relative_to(work)
+    assert kwargs['env']['HF_HUB_OFFLINE'] == '1' and kwargs['env']['TRANSFORMERS_OFFLINE'] == '1'
+    assert (work / 'namespace-validation.json').is_file()

@@ -51,3 +51,29 @@ Root re-inspected the accepted `ivf-mkv-corrected-tier1-report-20261105.json` at
 The parallel read-only audit found no newly usable independent, W6-frame-linked racket pixel or occlusion truth in the bounded repository inventory and documented prior manifest search. Root re-read W11's exact SHA/window and annotation audit: the RacketVision filename/hash search does not rule out re-encoded overlap, its native labels are boxes/keypoints, and W6's body-hull proxy can omit detached racket pixels. **Defer the paste oracle for a missing prerequisite**; this is neither a failed oracle nor evidence that no labels exist anywhere. Do not create labels or substitute proxy coverage for recall. Reopen with an independently annotated pixel mask and exact source/frame alignment. See [W11](w11-racket.md), [W6](w6-motion-pose.md), and the recorded dataset inventory; no fresh corpus-wide visual search or experiment was run.
 
 Root also re-read B2b/H5/H5p: actual four-window pilot timing and the preset-1/low-resolution ladder exist, including H5p's **+74% billed pooled weighted-LPIPS failure**. Preserve those scoped results and the four-item preset-4 ROI pilot. They do not certify the original 34-item endpoint, complete paid receiver or production equal-time claim; F/model training was not timed. The saved manuscript's pilot-only comparison and explicit end-to-end-speed disclaimer do not depend on that missing completion. **Defer the 34-item ROI/ladder/full-pipeline completion outside this finite no-training programme**, rather than run it merely to close a checkbox or imply no ladder was encoded. Reopen only for a concrete retained claim requiring that endpoint, with new complete timing and a scoped costed card. See [B2b](b2b.md), [H5](h5.md), and [H5p](h5p.md). No manuscript was changed.
+
+## Root continuation — November9 bounded queues and admission scope
+
+The user prefers bounded fleet queues rather than an exclusive reservation.
+The first Ball GPU parity queue expired without host/GPU assignment; a fresh
+all-host observation on November9 at about17:52UTC found an idle gpu2 A6000,
+so root conditionally released one new exact-source parity request after
+remaining readiness, identity and cost checks. This is no automatic replay or
+292/586/full30 release. The first-tranche remaining reservation is8,900GPU /
+8,870CPU seconds after a conservative50CPU shared readiness charge; the
+programme total is18,382GPU /37,730CPU seconds before any later leaf charges.
+
+The new W8 witness paths now use stat-only denial-target identities. Historical
+protected SHA values are references, not current byte verification. Root's
+fixed-input admission scope is a trusted fleet/controller and cooperative
+immutable public inputs: every concrete declared input/environment/source path
+is compared by metadata against the five protected targets before publication.
+The independent review found no actual path/reference-digest overlap; its
+pre-staging concern was a hypothetical alias or replacement, which the workload
+guards alone do not cover. The admission check does not establish protection
+against hostile replacement after review. No shared fleet security deployment
+is required for this fixed scientific workflow; actual Landlock denial and
+namespace/native proof remain mandatory. No new W8 job or remote upload has
+been released yet. Software checks on b5661eaa passed2,001tests/39skips, Ruff
+and mypy, but are superseded for final-source admission by subsequent patches.
+The paper and PRESLEY remain untouched.

@@ -55,12 +55,16 @@ def _restrict(paths: list[Path]) -> int:
     return abi
 
 
-def _check_denials(paths: list[Path]) -> dict[str, int]:
+def _check_denials(paths: list[Path], *, open_only: bool = False) -> dict[str, int]:
     result = {}
     for path in paths:
         try:
-            with path.open('rb') as stream:
-                stream.read(1)
+            if open_only:
+                fd = os.open(path, os.O_RDONLY | os.O_CLOEXEC)
+                os.close(fd)
+            else:
+                with path.open('rb') as stream:
+                    stream.read(1)
         except OSError as exc:
             if exc.errno not in (errno.EACCES, errno.EPERM):
                 raise RuntimeError(f'probe did not establish denial: {path}') from exc
@@ -154,9 +158,9 @@ def load_config(path: Path, expected_sha: str) -> dict[str, Any]:
     if not isinstance(config, dict) or set(config) not in (required, required | {'native_receipt'},
                                                          required | {'probe_steps'}):
         raise ValueError('unexpected configuration fields')
-    if ('native_receipt' in config) != (config.get('worker_kind') == 'rgb'):
+    if ('native_receipt' in config) != (config.get('worker_kind') in ('rgb', 'context_rgb')):
         raise ValueError('native receipt required only for RGB conversion')
-    if config['worker_kind'] not in ('packet', 'generate', 'cost_probe', 'preflight', 'sam', 'rgb', 'compose'):
+    if config['worker_kind'] not in ('packet', 'generate', 'context_qualification', 'cost_probe', 'preflight', 'sam', 'rgb', 'compose', 'context_sam', 'context_rgb', 'context_compose', 'isolation_proof'):
         raise ValueError('unknown worker kind')
     if config['worker_kind'] == 'cost_probe':
         if type(config.get('probe_steps')) is not int or config['probe_steps'] not in (1, 3, 6):
@@ -165,8 +169,11 @@ def load_config(path: Path, expected_sha: str) -> dict[str, Any]:
         raise ValueError('probe steps allowed only for cost probe')
     if not isinstance(config['files'], dict) or not isinstance(config['tensor_fingerprints'], dict):
         raise ValueError('invalid asset or fingerprint manifest')
-    if config['worker_kind'] != 'preflight' and len(config['tensor_fingerprints']) != 480:
+    if config['worker_kind'] not in ('preflight', 'isolation_proof') and len(config['tensor_fingerprints']) != 480:
         raise ValueError('480 tensor fingerprints required')
+    if config['worker_kind'] == 'isolation_proof' and (set(config['files']) != {'code:experiments.tennis.w8_clock_profile'}
+            or config['tensor_fingerprints'] or config['environment'].get('CUDA_VISIBLE_DEVICES') != ''):
+        raise ValueError('isolation proof must be CPU-only and scientific-input-free')
     if not isinstance(config['allow_paths'], list) or not config['allow_paths'] or not all(
             isinstance(p, str) for p in config['allow_paths']):
         raise ValueError('explicit allow paths required')
@@ -183,19 +190,35 @@ def load_config(path: Path, expected_sha: str) -> dict[str, Any]:
     from experiments.tennis.w8_receiver_preflight import PROTECTED
 
     protected_receipt = config['protected_receipt']
-    if not isinstance(protected_receipt, dict) or set(protected_receipt) != {'path', 'sha256'}:
+    if (not isinstance(protected_receipt, dict)
+            or set(protected_receipt) not in ({'path', 'sha256'}, {'path', 'sha256', 'historical_sha256'})):
         raise ValueError('protected receipt identity required')
-    protected_raw = Path(protected_receipt['path']).read_bytes()
-    if hashlib.sha256(protected_raw).hexdigest() != protected_receipt['sha256']:
-        raise ValueError('protected receipt identity mismatch')
-    verified = json.loads(protected_raw)['protected_inputs']
+    metadata_only = 'historical_sha256' in protected_receipt
+    if metadata_only:
+        from experiments.tennis import w8_protected_metadata
+        protected_data = w8_protected_metadata.read_historical(
+            Path(protected_receipt['path']), protected_receipt['sha256'])
+        w8_protected_metadata.validate(protected_data, check_current=True)
+        if protected_data['historical_receipt_sha256'] != protected_receipt['historical_sha256']:
+            raise ValueError('historical protected receipt reference differs')
+    else:
+        protected_raw = Path(protected_receipt['path']).read_bytes()
+        if hashlib.sha256(protected_raw).hexdigest() != protected_receipt['sha256']:
+            raise ValueError('protected receipt identity mismatch')
+        protected_data = json.loads(protected_raw)
+    verified = protected_data['protected_inputs']
     identities = {}
     for group in ('source', 'prepared', 'fit', 'golden', 'masks'):
         expected_path, expected_sha = PROTECTED[group]
         if denials[group] != [expected_path]:
             raise ValueError('protected probe is not the fixed original input')
         st = Path(expected_path).stat()
-        if verified.get(group) != {'path': expected_path, 'sha256': expected_sha, 'device': st.st_dev, 'inode': st.st_ino}:
+        if metadata_only:
+            row = verified.get(group, {})
+            if (row.get('path') != expected_path or row.get('reference_sha256') != expected_sha
+                    or (row.get('device'), row.get('inode')) != (st.st_dev, st.st_ino)):
+                raise ValueError('protected probe differs from metadata-only receipt')
+        elif verified.get(group) != {'path': expected_path, 'sha256': expected_sha, 'device': st.st_dev, 'inode': st.st_ino}:
             raise ValueError('protected probe differs from verified identity receipt')
 
         identities[group] = {(Path(path).stat().st_dev, Path(path).stat().st_ino) for path in denials[group]}
@@ -266,7 +289,7 @@ def main() -> int:
                    'numpy': str(numpy.__version__), 'cuda_initialized': torch.cuda.is_initialized(),
                    'visible_devices': os.environ.get('CUDA_VISIBLE_DEVICES'), 'source_modules': closure}
         (Path(config['output']) / 'preflight.json').write_text(json.dumps(receipt, sort_keys=True))
-    elif config['worker_kind'] in ('packet', 'generate', 'cost_probe'):
+    elif config['worker_kind'] in ('packet', 'generate', 'context_qualification', 'cost_probe'):
         from experiments.tennis.w8_receiver_generate import run_isolated, run_packet_isolated
         if config['worker_kind'] == 'packet':
             run_packet_isolated(config, isolation)
@@ -275,8 +298,14 @@ def main() -> int:
     else:
         from experiments.tennis.w8_receiver_finish import (run_compose_isolated, run_conversion_isolated,
                                                             run_sam_isolated)
-        {'sam': run_sam_isolated, 'rgb': run_conversion_isolated, 'compose': run_compose_isolated}[
-            config['worker_kind']](config, isolation)
+        kind = config['worker_kind']
+        funcs: dict[str, Any] = {'sam': run_sam_isolated, 'rgb': run_conversion_isolated, 'compose': run_compose_isolated,
+                 'context_sam': run_sam_isolated, 'context_rgb': run_conversion_isolated,
+                 'context_compose': run_compose_isolated}
+        if kind.startswith('context_'):
+            funcs[kind](config, isolation, qualification=True)
+        else:
+            funcs[kind](config, isolation)
     return 0
 
 

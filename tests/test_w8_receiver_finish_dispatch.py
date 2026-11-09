@@ -127,3 +127,16 @@ def test_score_bootstrap_sets_bound_before_exec(tmp_path, monkeypatch):
     bootstrap.main()
     assert captured[0] == ('limit', (7, 11))
     assert captured[1][0] == 'exec'
+
+
+def test_native_handle_readiness_binds_fsynced_complete_handle(tmp_path):
+    import json
+    from experiments.tennis import w8_input_job as fixed
+
+    handle = {'pid': 17, 'pgid': 12, 'started_monotonic': 1.5}
+    native.write_native_handle(tmp_path, handle)
+    path = tmp_path / 'native-handle.json'
+    assert json.loads(path.read_text()) == handle
+    assert json.loads((tmp_path / 'native-handle.ready').read_text()) == {'sha256': fixed.file_sha(path)}
+    with pytest.raises(FileExistsError):
+        native.write_native_handle(tmp_path, handle)

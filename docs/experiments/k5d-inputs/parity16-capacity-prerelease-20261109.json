@@ -1,0 +1,282 @@
+{
+  "scope": "root conditional release; one parity attempt, no scale",
+  "batch": {
+    "scope": "conditional release; one new parity request only",
+    "spec_file": "/private/tmp/k5d-parity1752-live-spec.json",
+    "file_sha256": "df4a5e73af6e6790e8d05ef5ed8ba083c542c27b18efac85dc2c9d4e556cf2b5",
+    "normalized_sha256": "13c30c660c375af9bdfd53dddf783df49dd6496349eddf05ec3bf37d1364ecc0",
+    "deadline": "2026-11-09T18:39:45Z",
+    "source_revision": "ae6030e58a98156d3b5cb5d1cfab78967b173c9b",
+    "source_sha256": "71d788cf9c520c4c095f011dbf5efce157493f003a3db970e57731f06d1cb7af",
+    "snapshot_sha256": "22fb921e5cc26d04f22d6e8be6f1098f504b3319283794e341ab5952dc51815d",
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "prior_preparation_cpu_charged": 50,
+    "future_cpu_cap": 1150,
+    "inclusive_cpu_cap": 1200,
+    "gpu_cap": 1000,
+    "campaign_wall": 800,
+    "status": "prepared; one submission only; never replay uncertain result"
+  },
+  "doctor_passed": true,
+  "workers_fresh": {
+    "gpu1": true,
+    "gpu2": true,
+    "gpu3": true,
+    "gpu4": true,
+    "gpu5": true,
+    "gpu6": true
+  },
+  "gpu2": [
+    {
+      "index": 0,
+      "uuid": "GPU-fc7e8fff-75be-4984-a185-fe8ce63edcd9",
+      "name": "NVIDIA RTX A6000",
+      "memory_used_mib": 29870,
+      "memory_total_mib": 49140,
+      "memory_free_mib": 18805,
+      "utilization_pct": 100,
+      "compute_processes": [
+        {
+          "pid": 932007,
+          "memory_mib": 29864
+        }
+      ],
+      "pointstream_claimed": false,
+      "pointstream_shared_claims": []
+    },
+    {
+      "index": 1,
+      "uuid": "GPU-40e9a544-b3d6-e5f3-a736-7020a6401bfc",
+      "name": "NVIDIA RTX A6000",
+      "memory_used_mib": 1,
+      "memory_total_mib": 49140,
+      "memory_free_mib": 48675,
+      "utilization_pct": 0,
+      "compute_processes": [],
+      "pointstream_claimed": false,
+      "pointstream_shared_claims": []
+    }
+  ],
+  "host_checks": {
+    "inputs": {
+      "archive": {
+        "source": true,
+        "cache": true
+      },
+      "balltrack_code": {
+        "source": true,
+        "cache": true
+      },
+      "balltrack_weight": {
+        "source": true,
+        "cache": true
+      },
+      "wasb_code": {
+        "source": true,
+        "cache": true
+      },
+      "wasb_weights": {
+        "source": true,
+        "cache": true
+      },
+      "wasb_config": {
+        "source": true,
+        "cache": true
+      },
+      "image_ckpt": {
+        "source": true,
+        "cache": true
+      },
+      "video_ckpt": {
+        "source": true,
+        "cache": true
+      },
+      "lpips_backbone": {
+        "source": true,
+        "cache": true
+      },
+      "dists_backbone": {
+        "source": true,
+        "cache": true
+      },
+      "fidelity_gate": {
+        "source": true,
+        "cache": true
+      },
+      "accepted16": {
+        "source": true,
+        "cache": true
+      },
+      "native_cpu_receipt": {
+        "source": true,
+        "cache": false
+      }
+    },
+    "receipt_sha": "c64a5890d6c2388bb54453332964e1c365aa0caa28a20836de74b0493c3abf8a",
+    "tools": {
+      "ffmpeg": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+      "SvtAv1EncApp": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+      "dav1d": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6"
+    },
+    "unshare": "9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6",
+    "source_sha": "22fb921e5cc26d04f22d6e8be6f1098f504b3319283794e341ab5952dc51815d",
+    "source_size": 16384000,
+    "source_regular": true,
+    "affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119,
+      120,
+      121,
+      122,
+      123,
+      124,
+      125,
+      126,
+      127
+    ],
+    "cpu_allocations": {},
+    "separate": true,
+    "free": 1916023959552
+  },
+  "live_jobs": [],
+  "prior_queue": "expired",
+  "cost_basis": {
+    "science_16_wall_1_5_seconds": 417.370745,
+    "historical_two_staging_1_5_seconds": 61.071447,
+    "smoke_cap": 600,
+    "namespace_cap": 580,
+    "validator_cap": 30,
+    "noop_cap": 5,
+    "campaign_cap": 800,
+    "prior_preparation_charged_cpu": 50,
+    "future_external_cpu": 350,
+    "prospective_future_cpu": 1150,
+    "inclusive_gpu": 1000,
+    "inclusive_cpu": 1200,
+    "caveat": "historical staging and post-campaign intervals are references, not guarantees; no automatic retry"
+  },
+  "local_evidence": [
+    "/private/tmp/k5d-parity1752-host.json",
+    "/private/tmp/k5d-parity1752-inspect.json",
+    "/private/tmp/k5d-parity1752-status.json",
+    "/private/tmp/ps-readiness-20261109T1752-doctor.json"
+  ]
+}

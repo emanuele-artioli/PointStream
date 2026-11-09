@@ -1,0 +1,53 @@
+{
+  "revision": "bc845ed78b65f26a193eef0603c8fa43ea59c515",
+  "worktree": "/private/tmp/pointstream-checks-bc845-20261109",
+  "interpreter": "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+  "checks": [
+    {
+      "check": "ruff",
+      "command": [
+        "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+        "-m",
+        "ruff",
+        "check"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.12435041699791327,
+      "log": "/private/tmp/pointstream-checks-bc845-result-20261109/ruff.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "check": "mypy",
+      "command": [
+        "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+        "-m",
+        "mypy",
+        "--config-file",
+        "pyproject.toml"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 63.57651749999786,
+      "log": "/private/tmp/pointstream-checks-bc845-result-20261109/mypy.log",
+      "sha256": "89962b3a22bd711d61a7f72d5f111d1e9b108ac95241629298ab3f246acdeab9"
+    },
+    {
+      "check": "pytest",
+      "command": [
+        "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+        "-m",
+        "pytest"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 116.55191904200183,
+      "log": "/private/tmp/pointstream-checks-bc845-result-20261109/pytest.log",
+      "sha256": "2427bcefb381daa32457ecb8f8ac9914eebd218a30c931b9989c7ff4585646a7"
+    }
+  ],
+  "wall_seconds": 180.25359650001337,
+  "waited_children_cpu_seconds": 240.890347,
+  "passed": true,
+  "scope": "ordinary local configured software checks; no experiment or Linux namespace qualification",
+  "pytest_summary": "1986 passed,39 skipped in115.93s",
+  "mypy_summary": "554 configured source files passed",
+  "experiment_admission": "HELD: independent review found private source/golden/prepared/fit/mask content hashing in pre-seal parent helper; no upload or compute authorized. These passing software checks do not establish source-access compliance. Stat-only witness replacement and fresh checks required."
+}

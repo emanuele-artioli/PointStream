@@ -67,22 +67,37 @@ def clean_process() -> None:
 
 def launch(config_path: Path, config_sha: str, loader_path: Path, loader_sha: str,
            canary: Path, source_root: Path, *, materialize_profile: bool = False,
-           clock_receipt: Path | None = None, clock_receipt_sha: str | None = None) -> None:
+           clock_receipt: Path | None = None, clock_receipt_sha: str | None = None,
+           witness_mode: str | None = None) -> None:
     if sys.platform != 'linux' or len(os.sched_getaffinity(0)) != 1:
         raise RuntimeError('Linux and one CPU required')
     policy, fixed, bootstrap, receiver = preload()
-    if (clock_receipt is None) != (clock_receipt_sha is None) or (clock_receipt is not None and not materialize_profile):
+    finish_modes = ('context_rgb', 'context_sam', 'context_compose', 'rgb', 'sam', 'compose', 'isolation_proof')
+    if ((clock_receipt is None) != (clock_receipt_sha is None)
+            or (clock_receipt is not None and not materialize_profile
+                and witness_mode not in finish_modes)):
         raise ValueError('clocksource profile requires a bound receipt and materialized model worker')
     clock_profile: Any = None
     if clock_receipt is not None:
         from experiments.tennis import w8_clock_profile as clock_profile_module
         clock_profile = clock_profile_module
+    if witness_mode in finish_modes and witness_mode != 'isolation_proof':
+        from experiments.tennis import w8_receiver_finish as finish
     source_origins = validate_source_origins(source_root)
     config = bootstrap.load_config(config_path, config_sha)
     if Path(config['allow_paths'][0]).resolve(strict=True) != source_root.resolve(strict=True):
         raise ValueError('config source grant differs from authenticated source root')
-    if config['worker_kind'] not in ('packet', 'cost_probe'):
+    allowed_kinds = ('packet', 'cost_probe') if witness_mode is None else (witness_mode,)
+    if witness_mode not in (None, 'packet', 'generate', 'context_qualification', *finish_modes) or config['worker_kind'] not in allowed_kinds:
         raise ValueError('only packet decode and bounded cost probe are admitted')
+    if witness_mode in ('generate', 'context_qualification') and (not materialize_profile or clock_receipt is None):
+        raise ValueError('witness modes require materialized source and clock profile')
+    if witness_mode in finish_modes and (materialize_profile or clock_receipt is None):
+        raise ValueError('qualification finish requires clock profile and no model materialization')
+    if witness_mode == 'packet' and (materialize_profile or clock_receipt is not None):
+        raise ValueError('witness packet must remain CPU-only and unmaterialized')
+    if witness_mode == 'isolation_proof' and config['environment'].get('CUDA_VISIBLE_DEVICES') != '':
+        raise ValueError('isolation proof requires hidden CUDA')
     if config['worker_kind'] == 'cost_probe' and config.get('probe_steps') not in (1, 3):
         raise ValueError('only 1/3 step qualification runs are admitted')
     if digest(loader_path) != loader_sha:
@@ -126,6 +141,9 @@ def launch(config_path: Path, config_sha: str, loader_path: Path, loader_sha: st
     os.environ.update({'OMP_NUM_THREADS': '1', 'OPENBLAS_NUM_THREADS': '1', 'MKL_NUM_THREADS': '1',
                        'NUMEXPR_NUM_THREADS': '1', 'PYTHONNOUSERSITE': '1', 'PYTHONDONTWRITEBYTECODE': '1',
                        'HF_HUB_OFFLINE': '1', 'TRANSFORMERS_OFFLINE': '1'})
+    if witness_mode is not None:
+        import tempfile
+        tempfile.tempdir = None
     import torch
     torch.set_num_threads(1)
     torch.set_num_interop_threads(1)
@@ -137,7 +155,7 @@ def launch(config_path: Path, config_sha: str, loader_path: Path, loader_sha: st
     abi, mask = (clock_profile.restrict(policy, allowed, output) if clock_profile is not None
                  else policy.restrict(allowed, output))
     mutation = policy.mutation_probes(canary, output)
-    probes = bootstrap._check_denials(denied)
+    probes = bootstrap._check_denials(denied, open_only=witness_mode is not None)
     after = fixed.synthetic_torch_bootstrap(torch)
     if before != after or torch.cuda.is_initialized():
         raise RuntimeError('post-isolation CPU warmup failed')
@@ -154,6 +172,20 @@ def launch(config_path: Path, config_sha: str, loader_path: Path, loader_sha: st
         if materialize_profile:
             raise ValueError('materialization profile is not valid for packet workers')
         receiver.run_packet_isolated(config, isolation)
+    elif witness_mode == 'isolation_proof':
+        if torch.cuda.is_initialized():
+            raise ValueError('isolation proof initialized CUDA')
+        with (output / 'isolation-proof.json').open('x') as stream:
+            json.dump({'scope': 'cpu_isolation_proof_only', 'isolation': isolation,
+                       'cuda_initialized': False, 'visible_devices': ''}, stream, sort_keys=True)
+    elif witness_mode in finish_modes:
+        finish_funcs: dict[str, Any] = {'context_rgb': finish.run_conversion_isolated, 'context_sam': finish.run_sam_isolated,
+                        'context_compose': finish.run_compose_isolated, 'rgb': finish.run_conversion_isolated,
+                        'sam': finish.run_sam_isolated, 'compose': finish.run_compose_isolated}
+        if witness_mode.startswith('context_'):
+            finish_funcs[witness_mode](config, isolation, qualification=True)
+        else:
+            finish_funcs[witness_mode](config, isolation, authenticated_full=True)
     elif materialize_profile:
         receiver.run_isolated(config, isolation, materialize_profile=True)
     else:
@@ -168,8 +200,12 @@ def main() -> int:
     p.add_argument('--loader-sha256', required=True)
     p.add_argument('--canary', type=Path, required=True)
     p.add_argument('--source-root', type=Path, required=True)
+    p.add_argument('--witness-mode', choices=('packet', 'context_rgb', 'context_sam', 'context_compose', 'rgb', 'sam', 'compose', 'isolation_proof'))
+    p.add_argument('--clock-receipt', type=Path)
+    p.add_argument('--clock-receipt-sha256')
     args = p.parse_args()
-    launch(args.config, args.config_sha256, args.loader, args.loader_sha256, args.canary, args.source_root)
+    launch(args.config, args.config_sha256, args.loader, args.loader_sha256, args.canary, args.source_root,
+           witness_mode=args.witness_mode, clock_receipt=args.clock_receipt, clock_receipt_sha=args.clock_receipt_sha256)
     return 0
 
 

@@ -96,11 +96,21 @@ class StableDigests:
                 'hash_cpu_seconds': self.cpu_seconds, 'scope': 'this process only'}
 
 
-def stage_inputs(stage: Path, digest_file: Callable[[Path], str] | None = None) -> tuple[dict[str, Path], dict[str, Any]]:
+def stage_inputs(stage: Path, digest_file: Callable[[Path], str] | None = None, *,
+                 witness: bool = False) -> tuple[dict[str, Path], dict[str, Any]]:
     spec = json.loads((stage.parent / 'spec.json').read_text())
     staging = json.loads((stage / 'staging.json').read_text())
     dispatch = json.loads((stage / 'dispatch.json').read_text())
     profile = spec.get('w8_paired_cost_profile')
+    witness_profile = spec.get('w8_witness_profile')
+    if witness and (profile is not None or witness_profile not in ('w8-context-pilot-v1', 'w8-context-unit1-v1',
+            'w8-context-qualification-v1', 'w8-full-finish-v1', 'w8-full-unit0-v1', 'w8-full-unit1-v1')):
+        raise ValueError('explicit separate context witness profile required')
+    if witness and (spec.get('witness_cpu_proof_host') not in ('gpu5', 'gpu6')
+                    or spec.get('hosts') != [spec['witness_cpu_proof_host']]
+                    or (dispatch.get('environment') or {}).get('alias') != spec['witness_cpu_proof_host']
+                    or 'RTX 6000 Ada' not in ((dispatch.get('environment') or {}).get('gpu') or {}).get('name', '')):
+        raise ValueError('witness dispatch differs from CPU proof host or Ada model')
     if profile is not None and (profile != 'w8-paired-cost-800-v1'
             or spec.get('budget_seconds') != 800 or spec.get('smoke', {}).get('seconds') != 260
             or spec.get('full', {}).get('seconds') != 500 or spec.get('validator_seconds') != 60
@@ -121,11 +131,43 @@ def stage_inputs(stage: Path, digest_file: Callable[[Path], str] | None = None) 
             or spec.get('environment', {}).get('sha256') != JCV_ENV
             or spec.get('gpu_sharing', {'mode': 'exclusive'}) != {'mode': 'exclusive'}
             or spec.get('contention', {}).get('policy') != 'stop'
-            or not 0 < spec.get('budget_seconds', 0) <= (800 if profile is not None else 600)):
+            or not 0 < spec.get('budget_seconds', 0) <= (2000 if witness and witness_profile == 'w8-full-finish-v1' else 1500 if witness and witness_profile in ('w8-full-unit0-v1', 'w8-full-unit1-v1')
+                                                        else 900 if witness else 800 if profile is not None else 600)):
         raise ValueError('one-core JCV GPU campaign with a valid bounded budget required')
     wanted = {'packet': fixed.WINDOW_SHA, 'profile': fixed.PROFILE_SHA, 'oracle': ORACLE_SHA,
               'base': BASE_ARCHIVE_SHA, 'aa': receiver.AA_ARCHIVE_SHA,
               **{key: receiver.PINNED_WEIGHTS[name] for key, name in WEIGHT_NAMES.items()}}
+    if witness:
+        from experiments.tennis.w8_receiver_finish import SAM_SHA
+        proof_sha = spec.get('witness_cpu_proof_sha256')
+        if (not isinstance(proof_sha, str) or len(proof_sha) != 64
+                or any(c not in '0123456789abcdef' for c in proof_sha)):
+            raise ValueError('root-pinned CPU proof SHA required')
+        wanted['cpu_proof'] = proof_sha
+        if witness_profile == 'w8-context-pilot-v1':
+            ledger_sha = spec.get('witness_ledger_sha256')
+            if not isinstance(ledger_sha, str) or len(ledger_sha) != 64 or any(c not in '0123456789abcdef' for c in ledger_sha):
+                raise ValueError('first-pilot pinned ledger SHA required')
+            wanted['ledger'] = ledger_sha
+            admission_sha = spec.get('witness_admission_sha256')
+            if not isinstance(admission_sha, str) or len(admission_sha) != 64 or any(c not in '0123456789abcdef' for c in admission_sha):
+                raise ValueError('first-pilot reviewed attempt SHA required')
+            wanted['admission'] = admission_sha
+        if witness_profile in ('w8-context-unit1-v1', 'w8-full-unit0-v1', 'w8-full-unit1-v1',
+                               'w8-context-qualification-v1', 'w8-full-finish-v1'):
+            for name, key in (('promotion', 'witness_promotion_sha256'), ('ledger', 'witness_ledger_sha256')):
+                value = spec.get(key)
+                if not isinstance(value, str) or len(value) != 64 or any(c not in '0123456789abcdef' for c in value):
+                    raise ValueError('root-pinned promotion and ledger SHA required')
+                wanted[name] = value
+        if witness_profile in ('w8-context-qualification-v1', 'w8-full-finish-v1'):
+            for name in ('producer_audit', 'producer0', 'producer1'):
+                value = spec.get('witness_' + name + '_sha256')
+                if not isinstance(value, str) or len(value) != 64 or any(c not in '0123456789abcdef' for c in value):
+                    raise ValueError('root-pinned producer audit and archives required')
+                wanted[name] = value
+            wanted.update(sam_weights=SAM_SHA,
+                          native_inventory='cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b')
     declared = {x['name']: x for x in spec['staged_inputs']}
     actual = {x['name']: x for x in staging['inputs']}
     if len(declared) != len(spec['staged_inputs']) or len(actual) != len(staging['inputs']):
@@ -141,6 +183,9 @@ def stage_inputs(stage: Path, digest_file: Callable[[Path], str] | None = None) 
                 or declared[name].get('extract', False) or actual[name].get('extract', False)):
             raise ValueError(f'staged identity mismatch: {name}')
         path = Path(actual[name]['path']).resolve(strict=True)
+        if witness:
+            from experiments.tennis.w8_protected_metadata import reject_protected_alias
+            reject_protected_alias(path)
         if digest_file(path) != expected:
             raise ValueError(f'staged bytes mismatch: {name}')
         paths[name] = path
@@ -184,7 +229,16 @@ def _item(path: Path, digest_file: Callable[[Path], str] | None = None) -> dict[
     return {'path': str(path), 'sha256': (digest_file or fixed.file_sha)(path)}
 
 
-def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, wall_seconds: int, code_root: Path, loader: Path, *, materialize_profile: bool = False, clock_profile: bool = False) -> dict[str, Any]:
+def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, wall_seconds: int, code_root: Path, loader: Path, *, materialize_profile: bool = False, clock_profile: bool = False, witness_mode: str | None = None) -> dict[str, Any]:
+    model_modes = ('generate', 'context_qualification')
+    finish_modes = ('context_rgb', 'context_sam', 'context_compose', 'rgb', 'sam', 'compose', 'isolation_proof')
+    if (witness_mode not in (None, 'packet', *model_modes, *finish_modes)
+            or (witness_mode is not None and config.get('worker_kind') != witness_mode)
+            or (witness_mode not in (None, 'packet') and not clock_profile)
+            or (witness_mode == 'packet' and (materialize_profile or clock_profile))
+            or (witness_mode in model_modes and not materialize_profile)
+            or (witness_mode in finish_modes and materialize_profile)):
+        raise ValueError('witness worker mode or required safeguards differ')
     config_path = work / 'worker-config.json'
     config_path.write_text(json.dumps(config, sort_keys=True))
     source = code_root
@@ -194,40 +248,95 @@ def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, 
         (canary / name).write_bytes(b'canary')
     env = {'PYTHONPATH': str(source), 'PYTHONNOUSERSITE': '1', 'PYTHONDONTWRITEBYTECODE': '1',
            'OMP_NUM_THREADS': '1', 'OPENBLAS_NUM_THREADS': '1', 'MKL_NUM_THREADS': '1', 'NUMEXPR_NUM_THREADS': '1'}
-    module = 'experiments.tennis.w8_strict_packet_worker' if config['worker_kind'] == 'packet' else 'experiments.tennis.w8_strict_host_model_worker'
-    if config['worker_kind'] == 'packet':
+    if witness_mode is not None:
+        env.update({'TMPDIR': str(work), 'TMP': str(work), 'TEMP': str(work), 'HOME': str(work),
+                    'XDG_CACHE_HOME': str(work / '.cache'), 'TORCH_HOME': str(work / '.cache' / 'torch'),
+                    'HF_HOME': str(work / '.cache' / 'huggingface'),
+                    'HF_HUB_OFFLINE': '1', 'TRANSFORMERS_OFFLINE': '1'})
+        stage_dir = os.environ.get('PS_STAGE_DIR', '')
+        if not Path(stage_dir).is_absolute() or Path(stage_dir).name not in ('smoke', 'full'):
+            raise ValueError('witness requires the actual fleet stage directory')
+        env['PS_STAGE_DIR'] = stage_dir
+    module = ('experiments.tennis.w8_strict_receiver_worker' if witness_mode == 'packet'
+              else 'experiments.tennis.w8_strict_packet_worker' if config['worker_kind'] == 'packet'
+              else 'experiments.tennis.w8_strict_receiver_worker' if witness_mode in finish_modes
+              else 'experiments.tennis.w8_strict_host_model_worker')
+    if config['worker_kind'] in ('packet', 'isolation_proof'):
         env['CUDA_VISIBLE_DEVICES'] = ''
-    command = ['/usr/bin/unshare', '--user', '--map-root-user', '--net', str(python), '-m',
-               module, '--config', str(config_path),
+    prefix = ['/usr/bin/unshare', '--user', '--map-root-user', '--net']
+    outside_pidns = None
+    if witness_mode is not None:
+        if wall_seconds <= 10:
+            raise ValueError('witness timeout must leave namespace cleanup reserve')
+        outside_pidns = os.readlink('/proc/self/ns/pid')
+        prefix.extend(('--pid', '--fork', '--kill-child=SIGKILL', str(python), '-m',
+                       'experiments.tennis.w8_witness_namespace', '--outside', outside_pidns,
+                       '--timeout', str(wall_seconds - 10), '--receipt', str(work / 'namespace-receipt.json'),
+                       '--', module))
+    else:
+        prefix.extend((str(python), '-m', module))
+    command = [*prefix, '--config', str(config_path),
                '--config-sha256', fixed.file_sha(config_path), '--loader', str(loader),
                '--loader-sha256', fixed.file_sha(loader), '--canary', str(canary),
                '--source-root', str(code_root)]
     if materialize_profile:
-        if config['worker_kind'] != 'cost_probe':
+        if config['worker_kind'] != 'cost_probe' and witness_mode is None:
             raise ValueError('materialization applies only to model cost probes')
         command.append('--materialize-profile')
     if clock_profile:
-        if not materialize_profile or config['worker_kind'] != 'cost_probe':
+        if (not materialize_profile and witness_mode not in finish_modes) or (config['worker_kind'] != 'cost_probe' and witness_mode is None):
             raise ValueError('clock profile applies only to materialized model cost probes')
         clock_path = work / 'clock-identity.json'
         clock_sha = w8_clock_profile.write_parent_receipt(clock_path)
         command.extend(('--clock-receipt', str(clock_path), '--clock-receipt-sha256', clock_sha))
+    if witness_mode is not None:
+        command.extend(('--witness-mode', witness_mode))
     before = resource.getrusage(resource.RUSAGE_CHILDREN)
     started = time.monotonic()
+    parent_pid = os.getpid()
+    owner_guard = None
+    if witness_mode is not None:
+        from experiments.tennis.w8_receiver_native_bootstrap import parent_death_signal
+        owner_guard = parent_death_signal
     def limit() -> None:
+        if owner_guard is not None:
+            owner_guard(parent_pid)
         resource.setrlimit(resource.RLIMIT_CPU, (cpu_seconds, 3600))
     with (work / 'stdout').open('xb') as stdout, (work / 'stderr').open('xb') as stderr:
         proc = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr,
                                 close_fds=True, env=env, cwd=code_root, preexec_fn=limit)
-        (work / 'start.json').write_text(json.dumps({'pid': proc.pid, 'pgid': os.getpgrp(),
+        owned_pgid = os.getpgrp()
+        (work / 'start.json').write_text(json.dumps({'pid': proc.pid, 'pgid': owned_pgid,
                                                      'started_monotonic': started}, sort_keys=True))
         status, timed_out = receiver.wait_owned_worker(proc, wall_seconds)
     after = resource.getrusage(resource.RUSAGE_CHILDREN)
-    receipt = {'pid': proc.pid, 'pgid': os.getpgrp(), 'status': status, 'timed_out': timed_out,
+    receipt = {'pid': proc.pid, 'pgid': owned_pgid, 'status': status, 'timed_out': timed_out,
                'wall_seconds': time.monotonic() - started,
                'cpu_seconds': after.ru_utime + after.ru_stime - before.ru_utime - before.ru_stime,
                'config_sha256': fixed.file_sha(config_path)}
     (work / 'exit.json').write_text(json.dumps(receipt, sort_keys=True))
+    if witness_mode is not None and (status != 0 or timed_out):
+        from experiments.tennis import w8_witness_profile
+        try:
+            assert outside_pidns is not None
+            w8_witness_profile.namespace_started_absence(work / 'namespace-receipt.json',
+                expected_pgid=owned_pgid, expected_outside=outside_pidns, expected_target=module)
+            teardown = {'owned_init_and_worker_absent': True,
+                        'basis': 'PID namespace teardown; descendants not individually observed'}
+        except (OSError, ValueError, KeyError, IndexError) as exc:
+            teardown = {'owned_init_and_worker_absent': False, 'error': str(exc)}
+        with (work / 'namespace-teardown.json').open('x') as output:
+            json.dump(teardown, output, sort_keys=True)
+    if witness_mode is not None and status == 0 and not timed_out:
+        from experiments.tennis import w8_witness_profile
+        assert outside_pidns is not None
+        namespace_receipt = w8_witness_profile.namespace_completion(work / 'namespace-receipt.json',
+            expected_pgid=owned_pgid, expected_outside=outside_pidns, expected_target=module)
+        receipt['namespace_receipt_sha256'] = fixed.file_sha(work / 'namespace-receipt.json')
+        receipt['namespace_children_cpu_seconds'] = namespace_receipt['children_cpu_seconds']
+        with (work / 'namespace-validation.json').open('x') as output:
+            json.dump({'receipt_sha256': receipt['namespace_receipt_sha256'],
+                       'target': module, 'host_pgid': owned_pgid, 'outside': outside_pidns}, output, sort_keys=True)
     names = {'write', 'truncate', 'remove', 'rename', 'link'}
     if {x.name for x in canary.iterdir()} != names or any((canary / name).read_bytes() != b'canary' for name in names):
         raise RuntimeError('mutation canary changed')
@@ -332,15 +441,21 @@ def verify_durable_archive(retained: Path, receipt: dict[str, Any], *, materiali
                 raise ValueError('durable archive member bytes differ')
 
 
-def check_preflight_bundle(preflight: dict[str, Any], identity_path: Path) -> None:
+def check_preflight_bundle(preflight: dict[str, Any], identity_path: Path, *, witness_metadata: bool = False) -> None:
     """Bind embedded MAIN/JCV receipts to the accepted preflight result."""
     from experiments.tennis.w8_receiver_preflight import EXPECTED_TORCH
 
-    if (preflight.get('passed') is not True or preflight.get('identity_sha256') != fixed.file_sha(identity_path)
+    if witness_metadata:
+        from experiments.tennis import w8_protected_metadata
+        identity = w8_protected_metadata.read_historical(identity_path, preflight['identity_sha256'])
+        actual_sha = preflight['identity_sha256']
+    else:
+        actual_sha = fixed.file_sha(identity_path)
+        identity = json.loads(identity_path.read_text())
+    if (preflight.get('passed') is not True or preflight.get('identity_sha256') != actual_sha
             or set(preflight.get('runtimes', {})) != {'main', 'jcv'}
             or set(preflight.get('receipts', {})) != {'main', 'jcv'}):
         raise ValueError('accepted preflight bundle and identity receipt required')
-    identity = json.loads(identity_path.read_text())
     assets = identity['files']
     expected_assets = {'main_archive': MAIN_ENV, 'jcv_archive': JCV_ENV, 'aa_archive': receiver.AA_ARCHIVE_SHA,
                        **{f'weight_{name}': receiver.PINNED_WEIGHTS[weight] for name, weight in (
@@ -385,7 +500,8 @@ def check_preflight_bundle(preflight: dict[str, Any], identity_path: Path) -> No
                 raise ValueError('preflight source closure mismatch')
 
 
-def check_preflight_sources(preflight: dict[str, Any], root: Path) -> None:
+def check_preflight_sources(preflight: dict[str, Any], root: Path, *,
+                            witness_bootstrap_sha: str | None = None) -> None:
     """Recheck the exact preflight entrypoints and imported project closure.
 
     Unexecuted files in the same source archive may change in the separately
@@ -404,6 +520,10 @@ def check_preflight_sources(preflight: dict[str, Any], root: Path) -> None:
                 raise ValueError('preflight source module outside frozen tree') from exc
     for name in required:
         expected = preflight['frozen_source_files'].get(name)
+        if witness_bootstrap_sha is not None and name == 'experiments/tennis/w8_receiver_bootstrap.py':
+            if (len(witness_bootstrap_sha) != 64 or any(c not in '0123456789abcdef' for c in witness_bootstrap_sha)):
+                raise ValueError('invalid reviewed witness bootstrap identity')
+            expected = witness_bootstrap_sha
         if not isinstance(expected, str):
             raise ValueError(f'preflight source identity missing: {name}')
         actual = (root / name).resolve(strict=True)
@@ -537,56 +657,35 @@ def check_clock_source_binding(config: dict[str, Any], origins: dict[str, str], 
         raise ValueError('clock helper generator config and source manifest differ')
 
 
-def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generator_cpu: int,
-             worker_wall: int, preflight_path: Path, preflight_sha: str, *, materialize_profile: bool = False,
-             clock_profile: bool = False) -> None:
-    if sys.platform != 'linux' or len(os.sched_getaffinity(0)) != 1:
-        raise RuntimeError('Linux one-core fleet admission required')
-    if steps not in (1, 3) or type(steps) is not int:
-        raise ValueError('campaign runs only 1-step smoke and 3-step full')
-    if stage.name != {1: 'smoke', 3: 'full'}[steps]:
-        raise ValueError('step count does not match fleet stage')
-    if any(type(n) is not int or n <= 0 for n in (parent_cpu, packet_cpu, generator_cpu, worker_wall)):
-        raise ValueError('positive CPU and wall limits required')
-    if parent_cpu > 60 or packet_cpu > 100 or generator_cpu > 300 or worker_wall > 450:
-        raise ValueError('worker limit exceeds reviewed ceiling')
-    resource.setrlimit(resource.RLIMIT_CPU, (parent_cpu, 3600))
-    import torch
-    uuid_api = require_gpu_uuid_api(torch)
-    digests = StableDigests()
-    paths, spec = stage_inputs(stage, digests.digest)
-    if spec.get('clock_policy_profile') != (w8_clock_profile.PROFILE if clock_profile else None) or (clock_profile and not materialize_profile):
-        raise ValueError('declared clock policy and command differ')
-    if clock_profile and (spec.get('clock_reference_audit_sha256') != CLOCK_AUDIT_SHA
-            or fixed.file_sha(Path(__file__).resolve().parents[2] / CLOCK_AUDIT_PATH) != CLOCK_AUDIT_SHA):
-        raise ValueError('synthetic CUDA clock audit identity differs')
-    profile = spec.get('materialization_profile')
-    if profile not in (None, folder_profile.PROFILE) or (profile == folder_profile.PROFILE) != materialize_profile:
-        raise ValueError('declared materialization profile and command differ')
-    if preflight_path.resolve(strict=True) != paths['preflight'] or fixed.file_sha(preflight_path) != preflight_sha:
-        raise ValueError('CLI preflight path or SHA differs from staged input')
-    external = spec['receiver_external_cpu_reserve_seconds']
-    validator_cap = validator_cpu_limit(spec)
-    total_cpu = 2 * (parent_cpu + packet_cpu + generator_cpu) + validator_cap + external
-    if (type(external) not in (int, float) or not 0 < external <= 100
-            or not total_cpu <= spec['receiver_cpu_budget_seconds'] <= 1000):
-        raise ValueError('campaign CPU reservations exceed remaining budget')
+def prepare_receiver_inputs(paths: dict[str, Path], spec: dict[str, Any], *, packet_cpu: int,
+                            materialize_profile: bool, clock_profile: bool,
+                            digests: StableDigests, witness: bool = False) -> dict[str, Any]:
+    """Authenticate and decode the fixed packet under the existing strict policy."""
     rate = audit_public_rate(paths['packet'], paths['profile'])
     fingerprints = read_oracle(paths['oracle'])
     preflight = json.loads(paths['preflight'].read_text())
-    check_preflight_bundle(preflight, paths['identity'])
-    identity = json.loads(paths['identity'].read_text())
+    check_preflight_bundle(preflight, paths['identity'], witness_metadata=witness)
+    if witness:
+        from experiments.tennis import w8_protected_metadata
+        identity = w8_protected_metadata.read_historical(paths['identity'], preflight['identity_sha256'])
+    else:
+        identity = json.loads(paths['identity'].read_text())
     snapshot_root = Path(__file__).resolve().parents[2]
     if spec.get('packet_reference_audit_sha256') != PACKET_AUDIT_SHA or fixed.file_sha(snapshot_root / PACKET_AUDIT_PATH) != PACKET_AUDIT_SHA:
         raise ValueError('accepted CPU packet reference evidence differs')
     if materialize_profile and (spec.get('folder_reference_audit_sha256') != FOLDER_AUDIT_SHA
             or fixed.file_sha(snapshot_root / FOLDER_AUDIT_PATH) != FOLDER_AUDIT_SHA):
         raise ValueError('real folder I/O audit reference differs')
-    check_preflight_sources(preflight, snapshot_root)
+    check_preflight_sources(preflight, snapshot_root,
+                            witness_bootstrap_sha=spec.get('witness_bootstrap_sha256') if witness else None)
     scratch = fixed.checked_scratch()
     protected_path = scratch / 'protected-identity.json'
-    fresh_receipt = strict_policy.protected_identity({'denied_paths': {group: [path] for group, (path, _) in PROTECTED.items()}}, protected_path)
-    packet_audit.reconcile_protected_identity(identity, json.loads(protected_path.read_text()))
+    if witness:
+        from experiments.tennis import w8_protected_metadata
+        fresh_receipt = w8_protected_metadata.capture(paths['identity'], protected_path, expected_historical_sha256=preflight['identity_sha256'])
+    else:
+        fresh_receipt = strict_policy.protected_identity({'denied_paths': {group: [path] for group, (path, _) in PROTECTED.items()}}, protected_path)
+        packet_audit.reconcile_protected_identity(identity, json.loads(protected_path.read_text()))
     root = scratch / 'receiver-source'
     code_manifest = strict_source.stage_source(snapshot_root, root)
     strict_source.verify_source(root, code_manifest)
@@ -627,9 +726,9 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
         raise ValueError('fleet worker must use preflight-qualified JCV runtime')
     receipt = fresh_receipt
     def config(kind: str, files: dict[str, dict[str, str]], out: Path, policy: dict[str, Any],
-               cpu: int, visible: str) -> dict[str, Any]:
+               cpu: int, visible: str, unit: str = fixed.UNITS[0]) -> dict[str, Any]:
         roots = strict_roots(root, out, policy, files)
-        return {'worker_kind': kind, 'unit': fixed.UNITS[0], 'cpu_seconds': cpu, 'files': files,
+        return {'worker_kind': kind, 'unit': unit, 'cpu_seconds': cpu, 'files': files,
                 'output': str(out), 'allow_paths': roots, 'denied_paths': denials,
                 'parent_user_namespace': parent_user, 'parent_network_namespace': parent_net,
                 'protected_receipt': receipt, 'tensor_fingerprints': fingerprints,
@@ -640,7 +739,8 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
     packet_files = {'bundle': _item(paths['packet'], digests.digest),
                     'profile': _item(paths['profile'], digests.digest), 'guider': _item(paths['w6'], digests.digest)}
     packet_cfg = config('packet', packet_files, decoder_out, policies['main'], packet_cpu, '')
-    packet_usage = _worker(Path(policies['main']['python']), packet_cfg, decoder_work, packet_cpu, 130, root, loader_receipt)
+    packet_usage = _worker(Path(policies['main']['python']), packet_cfg, decoder_work, packet_cpu, 130, root,
+                           loader_receipt, witness_mode='packet' if witness else None)
     decoder_manifest = decoder_out / 'decoded-manifest.json'
     decoded = json.loads(decoder_manifest.read_text())
     cpu_receipt = json.loads((decoder_out / 'cpu-only.json').read_text())
@@ -687,6 +787,61 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
         generated[f'code:{name}'] = {'path': str(current), 'sha256': digest}
     if clock_profile:
         add_clock_source(generated, root, code_manifest)
+    return {'paths': paths, 'rate': rate, 'fingerprints': fingerprints, 'preflight': preflight, 'identity': identity, 'snapshot_root': snapshot_root, 'scratch': scratch, 'protected_path': protected_path, 'fresh_receipt': fresh_receipt, 'root': root, 'code_manifest': code_manifest, 'loader_receipt': loader_receipt, 'decoder_work': decoder_work, 'decoder_out': decoder_out, 'model_work': model_work, 'model_out': model_out, 'cached_jcv': cached_jcv, 'policies': policies, 'config': config, 'packet_usage': packet_usage, 'decoder_manifest': decoder_manifest, 'generated': generated}
+
+
+def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generator_cpu: int,
+             worker_wall: int, preflight_path: Path, preflight_sha: str, *, materialize_profile: bool = False,
+             clock_profile: bool = False) -> None:
+    if sys.platform != 'linux' or len(os.sched_getaffinity(0)) != 1:
+        raise RuntimeError('Linux one-core fleet admission required')
+    if steps not in (1, 3) or type(steps) is not int:
+        raise ValueError('campaign runs only 1-step smoke and 3-step full')
+    if stage.name != {1: 'smoke', 3: 'full'}[steps]:
+        raise ValueError('step count does not match fleet stage')
+    if any(type(n) is not int or n <= 0 for n in (parent_cpu, packet_cpu, generator_cpu, worker_wall)):
+        raise ValueError('positive CPU and wall limits required')
+    if parent_cpu > 60 or packet_cpu > 100 or generator_cpu > 300 or worker_wall > 450:
+        raise ValueError('worker limit exceeds reviewed ceiling')
+    resource.setrlimit(resource.RLIMIT_CPU, (parent_cpu, 3600))
+    import torch
+    uuid_api = require_gpu_uuid_api(torch)
+    digests = StableDigests()
+    paths, spec = stage_inputs(stage, digests.digest)
+    if spec.get('clock_policy_profile') != (w8_clock_profile.PROFILE if clock_profile else None) or (clock_profile and not materialize_profile):
+        raise ValueError('declared clock policy and command differ')
+    if clock_profile and (spec.get('clock_reference_audit_sha256') != CLOCK_AUDIT_SHA
+            or fixed.file_sha(Path(__file__).resolve().parents[2] / CLOCK_AUDIT_PATH) != CLOCK_AUDIT_SHA):
+        raise ValueError('synthetic CUDA clock audit identity differs')
+    profile = spec.get('materialization_profile')
+    if profile not in (None, folder_profile.PROFILE) or (profile == folder_profile.PROFILE) != materialize_profile:
+        raise ValueError('declared materialization profile and command differ')
+    if preflight_path.resolve(strict=True) != paths['preflight'] or fixed.file_sha(preflight_path) != preflight_sha:
+        raise ValueError('CLI preflight path or SHA differs from staged input')
+    external = spec['receiver_external_cpu_reserve_seconds']
+    validator_cap = validator_cpu_limit(spec)
+    total_cpu = 2 * (parent_cpu + packet_cpu + generator_cpu) + validator_cap + external
+    if (type(external) not in (int, float) or not 0 < external <= 100
+            or not total_cpu <= spec['receiver_cpu_budget_seconds'] <= 1000):
+        raise ValueError('campaign CPU reservations exceed remaining budget')
+    prepared = prepare_receiver_inputs(paths, spec, packet_cpu=packet_cpu,
+        materialize_profile=materialize_profile, clock_profile=clock_profile, digests=digests)
+    rate = prepared['rate']
+    fingerprints = prepared['fingerprints']
+    scratch = prepared['scratch']
+    protected_path = prepared['protected_path']
+    root = prepared['root']
+    code_manifest = prepared['code_manifest']
+    loader_receipt = prepared['loader_receipt']
+    decoder_work = prepared['decoder_work']
+    decoder_out = prepared['decoder_out']
+    model_work = prepared['model_work']
+    model_out = prepared['model_out']
+    policies = prepared['policies']
+    config = prepared['config']
+    packet_usage = prepared['packet_usage']
+    decoder_manifest = prepared['decoder_manifest']
+    generated = prepared['generated']
     visible = os.environ.get('CUDA_VISIBLE_DEVICES')
     dispatch = json.loads((stage / 'dispatch.json').read_text())
     if not visible or visible != os.environ.get('PS_CLAIMED_GPU_UUID'):

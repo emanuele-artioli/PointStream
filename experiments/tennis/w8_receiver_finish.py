@@ -30,6 +30,19 @@ def _array_sha(array: np.ndarray) -> str:
     return hashlib.sha256(np.ascontiguousarray(array).tobytes()).hexdigest()
 
 
+def _qualification_gpu(torch: Any) -> dict[str, Any]:
+    from experiments.tennis.w8_cuda_system_leaves import canonical_gpu_uuid
+
+    if torch.cuda.device_count() != 1:
+        raise ValueError('qualification requires exactly one CUDA device')
+    props = torch.cuda.get_device_properties(0)
+    actual = canonical_gpu_uuid(str(getattr(props, 'uuid', '')))
+    visible = canonical_gpu_uuid(os.environ.get('CUDA_VISIBLE_DEVICES', ''))
+    if actual != visible or (props.major, props.minor) not in ((8, 6), (8, 9)):
+        raise ValueError('qualification physical GPU identity differs')
+    return {'uuid': str(actual), 'visible_uuid': str(visible), 'major': props.major, 'minor': props.minor}
+
+
 def _isolation(isolation: dict[str, Any]) -> None:
     namespaces = isolation.get('namespaces', {})
     if (isolation.get('landlock_abi', 0) < 1 or isolation.get('pre_sandbox_threads') != 1
@@ -82,11 +95,20 @@ def _packet(paths: dict[str, Path]) -> tuple[dict[str, Any], dict[str, bytes]]:
     return profile, sections
 
 
-def _generation_seals(paths: dict[str, Path]) -> None:
+def _generation_seals(paths: dict[str, Path], *, qualification: bool = False) -> None:
     from experiments.tennis import w8_receiver_generate as generation
 
     for unit in fixed.UNITS:
         receipt = json.loads(paths[f'generation_seal:{unit}'].read_text())
+        if qualification:
+            crop = paths[f'crop:{unit}'].resolve(strict=True)
+            seal = paths[f'generation_seal:{unit}'].resolve(strict=True)
+            if crop.name != f'{unit}@match5.npz' or seal != crop.parent / 'sealed.json':
+                raise ValueError('qualification crop and seal canonical paths differ')
+            expected = {'unit': unit, 'packet_sha256': fixed.WINDOW_SHA, 'profile_sha256': fixed.PROFILE_SHA,
+                        'tensor_fingerprints': receipt.get('tensor_fingerprints'), 'files': receipt.get('files')}
+            generation.validate_context_qualification(crop.parent, expected)
+            continue
         if (receipt.get('version') != 1 or receipt.get('unit') != unit
                 or receipt.get('packet_sha256') != fixed.WINDOW_SHA
                 or receipt.get('profile_sha256') != fixed.PROFILE_SHA
@@ -121,10 +143,14 @@ def native_argv(binary: Path, ivf: Path, output: Path) -> list[str]:
             '-i', str(ivf), '-pix_fmt', 'yuv420p', '-f', 'rawvideo', '-n', str(output)]
 
 
-def run_conversion_isolated(config: dict[str, Any], isolation: dict[str, Any]) -> None:
+def run_conversion_isolated(config: dict[str, Any], isolation: dict[str, Any], *, qualification: bool = False,
+                            authenticated_full: bool = False) -> None:
     """Convert native YUV into 80 RGB bases without invoking a tool."""
     _isolation(isolation)
-    paths = _inputs(config, {'packet', 'profile', 'yuv'})
+    names = {'packet', 'profile', 'yuv'}
+    if qualification or authenticated_full:
+        names.add('code:experiments.tennis.w8_clock_profile')
+    paths = _inputs(config, names)
     output = _new_output(config)
     profile, _ = _packet(paths)
     native = config['native_receipt']
@@ -148,30 +174,35 @@ def run_conversion_isolated(config: dict[str, Any], isolation: dict[str, Any]) -
     cv2.setNumThreads(1)
     if not torch.cuda.is_available():
         raise RuntimeError('original CUDA color conversion required')
+    gpu_identity = _qualification_gpu(torch) if qualification or authenticated_full else None
+    selected_ticks = TICKS[:8] if qualification else TICKS
+    end_frame = 24 if qualification else 240
     target = np.lib.format.open_memmap(output / 'base.npy', mode='w+', dtype=np.uint8,
-                                       shape=(80, 1080, 1920, 3))
+                                       shape=(len(selected_ticks), 1080, 1920, 3))
     hashes = []
     saved = 0
-    for first in range(0, 240, 8):
-        planes = torch.from_numpy(read_frames(paths['yuv'], 480, 272, first, min(8, 240-first))).to('cuda')
+    for first in range(0, end_frame, 8):
+        planes = torch.from_numpy(read_frames(paths['yuv'], 480, 272, first, min(8, end_frame-first))).to('cuda')
         rgb = yuv420_to_rgb(planes, 480, 272, full_range=False)
-        for tick in range(first, min(240, first + 8)):
+        for tick in range(first, min(end_frame, first + 8)):
             if tick % 3:
                 continue
             frame = rgb[tick-first].permute(1, 2, 0).to(torch.uint8).cpu().numpy()
             target[saved] = cv2.resize(frame, (1920, 1080), interpolation=cv2.INTER_CUBIC)
             hashes.append(_array_sha(target[saved]))
             saved += 1
-    if saved != 80:
+    if saved != len(selected_ticks):
         raise ValueError('RGB conversion tick coverage')
     target.flush()
     del target
     receipt = {'version': 1, 'packet_sha256': fixed.WINDOW_SHA, 'profile_sha256': fixed.PROFILE_SHA,
                'input_sha256': {key: value['sha256'] for key, value in config['files'].items()},
                'native': native, 'base_sha256': fixed.file_sha(output / 'base.npy'),
-               'base_frame_sha256': hashes, 'ticks': TICKS.tolist(), 'isolation': isolation,
+               'base_frame_sha256': hashes, 'ticks': selected_ticks.tolist(), 'isolation': isolation,
                'color_path': profile['recipe']['color_path'], 'torch': torch.__version__,
-               'opencv': cv2.__version__, 'device': torch.cuda.get_device_name(0)}
+               'opencv': cv2.__version__, 'device': torch.cuda.get_device_name(0),
+               **({'scope': 'context_qualification_only', 'gpu_identity': gpu_identity} if qualification
+                  else {'gpu_identity': gpu_identity} if authenticated_full else {})}
     (output / 'sealed.json').write_text(json.dumps(receipt, sort_keys=True))
 
 
@@ -199,16 +230,38 @@ def _sam_module_closure(verified: dict[str, str]) -> dict[str, str]:
     return modules
 
 
-def run_sam_isolated(config: dict[str, Any], isolation: dict[str, Any]) -> None:
+def _qual_sam_identity(historical: dict[str, Any], fresh: dict[str, Any], *, historical_sha256: str) -> None:
+    """Join historical content reference to current stat-only metadata."""
+    from experiments.tennis import w8_protected_metadata
+
+    w8_protected_metadata.validate(fresh, {'protected_inputs': historical})
+    if fresh['historical_receipt_sha256'] != historical_sha256:
+        raise ValueError('SAM historical receipt reference differs')
+
+
+def run_sam_isolated(config: dict[str, Any], isolation: dict[str, Any], *, qualification: bool = False,
+                     authenticated_full: bool = False) -> None:
     """Predict one fresh crop's mask per tick using independent SAM resets."""
     _isolation(isolation)
     names = {'packet', 'profile', 'weights', 'text', 'sam_record', *(f'crop:{u}' for u in fixed.UNITS),
              *(f'generation_seal:{u}' for u in fixed.UNITS)}
+    split_identity = qualification or authenticated_full
+    if split_identity:
+        names.add('protected_record')
+        names.add('code:experiments.tennis.w8_clock_profile')
     paths = _inputs(config, names)
-    _generation_seals(paths)
-    if fixed.file_sha(paths['sam_record']) != config['protected_receipt']['sha256']:
+    _generation_seals(paths, qualification=qualification)
+    selected_ticks = TICKS[:8] if qualification else TICKS
+    sam_record = json.loads(paths['sam_record'].read_text())
+    if split_identity:
+        if fixed.file_sha(paths['protected_record']) != config['protected_receipt']['sha256']:
+            raise ValueError('fresh protected identity receipt differs')
+        historical = sam_record['protected_inputs']
+        fresh = json.loads(paths['protected_record'].read_text())
+        _qual_sam_identity(historical, fresh, historical_sha256=fixed.file_sha(paths['sam_record']))
+    elif fixed.file_sha(paths['sam_record']) != config['protected_receipt']['sha256']:
         raise ValueError('SAM distribution preflight identity mismatch')
-    distribution = json.loads(paths['sam_record'].read_text())['sam_distribution']
+    distribution = sam_record['sam_distribution']
     verified = distribution['verified_files']
     if not isinstance(verified, dict) or not verified:
         raise ValueError('SAM verified source mapping missing')
@@ -229,6 +282,7 @@ def run_sam_isolated(config: dict[str, Any], isolation: dict[str, Any]) -> None:
     torch.set_num_threads(1)
     if not torch.cuda.is_available():
         raise RuntimeError('CUDA required')
+    gpu_identity = _qualification_gpu(torch) if split_identity else None
     torch.cuda.set_per_process_memory_fraction(min(1.0, 12000 * 2**20 / torch.cuda.get_device_properties(0).total_memory))
     torch.manual_seed(0)
     torch.use_deterministic_algorithms(True)
@@ -255,10 +309,10 @@ def run_sam_isolated(config: dict[str, Any], isolation: dict[str, Any]) -> None:
         keypoints = dict(zip(unit['t'].tolist(), unit['kp']))
         with np.load(paths[f'crop:{name}'], allow_pickle=False) as data:
             ticks, crops = data['t'], data['crops']
-            if not np.array_equal(ticks, TICKS) or crops.shape != (80, 784, 512, 3) or crops.dtype != np.uint8:
+            if not np.array_equal(ticks, selected_ticks) or crops.shape != (len(selected_ticks), 784, 512, 3) or crops.dtype != np.uint8:
                 raise ValueError('fresh crop coverage')
             masks, prompts = [], []
-            for j, tick in enumerate(TICKS):
+            for j, tick in enumerate(selected_ticks):
                 t = int(tick)
                 image = torch.from_numpy(np.array(Image.fromarray(crops[j]).resize(
                     (int(model.image_size), int(model.image_size)))).transpose(2, 0, 1).copy())
@@ -287,7 +341,7 @@ def run_sam_isolated(config: dict[str, Any], isolation: dict[str, Any]) -> None:
                 del state, image
         target = output / f'{name}-masks.npz'
         a = np.stack(masks)
-        np.savez_compressed(target, t=TICKS, masks=a)
+        np.savez_compressed(target, t=selected_ticks, masks=a)
         rows.append({'unit': name, 'file_sha256': fixed.file_sha(target), 'array_sha256': _array_sha(a),
                      'frames': [_array_sha(m) for m in a], 'prompts': prompts})
     sam_modules = _sam_module_closure(verified)
@@ -297,17 +351,23 @@ def run_sam_isolated(config: dict[str, Any], isolation: dict[str, Any]) -> None:
                'independent_frames': True, 'isolation': isolation, 'load': tracker.load_report,
                'runtime': runtime(), 'device': torch.cuda.get_device_name(0), 'torch': torch.__version__,
                'flash_events': kernels,
-               'cpu_seconds': sum(resource.getrusage(resource.RUSAGE_SELF)[:2])}
+               'cpu_seconds': sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),
+               **({'scope': 'context_qualification_only', 'gpu_identity': gpu_identity} if qualification
+                  else {'gpu_identity': gpu_identity} if authenticated_full else {})}
     (output / 'sealed.json').write_text(json.dumps(receipt, sort_keys=True, default=str))
 
 
-def run_compose_isolated(config: dict[str, Any], isolation: dict[str, Any]) -> None:
+def run_compose_isolated(config: dict[str, Any], isolation: dict[str, Any], *, qualification: bool = False,
+                         authenticated_full: bool = False) -> None:
     """Compose only newly generated crops and predicted masks over the paid base."""
     _isolation(isolation)
     names = {'packet', 'profile', 'base', *(f'crop:{u}' for u in fixed.UNITS),
              *(f'mask:{u}' for u in fixed.UNITS), *(f'generation_seal:{u}' for u in fixed.UNITS)}
+    if qualification or authenticated_full:
+        names.add('code:experiments.tennis.w8_clock_profile')
     paths = _inputs(config, names)
-    _generation_seals(paths)
+    _generation_seals(paths, qualification=qualification)
+    selected_ticks = TICKS[:8] if qualification else TICKS
     output = _new_output(config)
     profile, sections = _packet(paths)
     from experiments.tennis.k6b import unit_name
@@ -324,26 +384,26 @@ def run_compose_isolated(config: dict[str, Any], isolation: dict[str, Any]) -> N
         raise ValueError('composition unit binding')
     boxes = {unit['name']: box for unit, box in zip(units, box_maps(units))}
     base = np.load(paths['base'], mmap_mode='r', allow_pickle=False)
-    if base.shape != (80, 1080, 1920, 3) or base.dtype != np.uint8:
+    if base.shape != (len(selected_ticks), 1080, 1920, 3) or base.dtype != np.uint8:
         raise ValueError('base coverage')
     crops, masks = {}, {}
     for name in fixed.UNITS:
         with np.load(paths[f'crop:{name}'], allow_pickle=False) as archive:
-            if not np.array_equal(archive['t'], TICKS):
+            if not np.array_equal(archive['t'], selected_ticks):
                 raise ValueError('crop ticks')
             crops[name] = archive['crops']
-            if crops[name].shape != (80, 784, 512, 3) or crops[name].dtype != np.uint8:
+            if crops[name].shape != (len(selected_ticks), 784, 512, 3) or crops[name].dtype != np.uint8:
                 raise ValueError('crop dimensions')
         with np.load(paths[f'mask:{name}'], allow_pickle=False) as archive:
-            if not np.array_equal(archive['t'], TICKS):
+            if not np.array_equal(archive['t'], selected_ticks):
                 raise ValueError('mask ticks')
             masks[name] = archive['masks']
-            if masks[name].shape != (80, 784, 512) or masks[name].dtype != bool:
+            if masks[name].shape != (len(selected_ticks), 784, 512) or masks[name].dtype != bool:
                 raise ValueError('mask dimensions')
     target = np.lib.format.open_memmap(output / 'composite.npy', mode='w+', dtype=np.uint8,
-                                       shape=(80, 1080, 1920, 3))
+                                       shape=(len(selected_ticks), 1080, 1920, 3))
     hashes = []
-    for i, tick in enumerate(TICKS):
+    for i, tick in enumerate(selected_ticks):
         cs, bs, ms = {}, {}, {}
         for player in order:
             unit = unit_name(fixed.WINDOW, player)
@@ -355,9 +415,10 @@ def run_compose_isolated(config: dict[str, Any], isolation: dict[str, Any]) -> N
     target.flush()
     del target
     receipt = {'version': 1, 'packet_sha256': fixed.WINDOW_SHA, 'profile_sha256': fixed.PROFILE_SHA,
-               'files': {k: v['sha256'] for k, v in config['files'].items()}, 'ticks': TICKS.tolist(),
+               'files': {k: v['sha256'] for k, v in config['files'].items()}, 'ticks': selected_ticks.tolist(),
                'composite_sha256': fixed.file_sha(output / 'composite.npy'),
-               'frame_sha256': hashes, 'order': order, 'isolation': isolation}
+               'frame_sha256': hashes, 'order': order, 'isolation': isolation,
+               **({'scope': 'context_qualification_only'} if qualification else {})}
     (output / 'sealed.json').write_text(json.dumps(receipt, sort_keys=True))
 
 

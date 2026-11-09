@@ -187,6 +187,22 @@ def render_full_unit(renderer: Any, unit: dict[str, np.ndarray], seed: int,
     return ticks, crops
 
 
+def render_qualification_context(renderer: Any, unit: dict[str, np.ndarray], seed: int,
+                                 run: int) -> tuple[list[int], list[np.ndarray]]:
+    """Render the first whole 24-frame context; never a full-run prefix claim."""
+    rows = np.flatnonzero(unit['run'] == run)[:24]
+    if not np.array_equal(rows, np.arange(24)):
+        raise ValueError('qualification must use the first 24 native frames')
+    video = renderer.render(unit['reference'], unit['pose'][rows], 30, seed * 1009 + run)
+    if len(video) != 24:
+        raise ValueError('qualification context incomplete')
+    ticks = [int(unit['t'][row]) for row in rows if unit['judged'][row]]
+    crops = [video[index] for index, row in enumerate(rows) if unit['judged'][row]]
+    if ticks != list(range(0, 24, 3)):
+        raise ValueError('qualification ticks differ')
+    return ticks, crops
+
+
 def run_isolated(config: dict[str, Any], isolation: dict[str, Any], *, materialize_profile: bool = False) -> None:
     """Render one complete packet-derived unit after the stdlib isolation bootstrap."""
     import resource
@@ -258,6 +274,8 @@ def run_isolated(config: dict[str, Any], isolation: dict[str, Any], *, materiali
     kind = config['worker_kind']
     if kind == 'generate':
         steps, scope = 30, 'candidate'
+    elif kind == 'context_qualification':
+        steps, scope = 30, 'context_qualification_only'
     elif kind == 'cost_probe' and type(config.get('probe_steps')) is int and config['probe_steps'] in (1, 3, 6):
         steps, scope = config['probe_steps'], 'qualification_only'
     else:
@@ -328,9 +346,12 @@ def run_isolated(config: dict[str, Any], isolation: dict[str, Any], *, materiali
     check_model_record(renderer.record, checkpoint_sha)
     check_execution_receipt(qualification)
     sampling_started = start_phase()
-    ticks, crops = render_full_unit(renderer, unit, seed, steps)
+    if kind == 'context_qualification':
+        ticks, crops = render_qualification_context(renderer, unit, seed, first_run)
+    else:
+        ticks, crops = render_full_unit(renderer, unit, seed, steps)
     sampling_cost = finish_phase(sampling_started)
-    frames = 240
+    frames = 24 if kind == 'context_qualification' else 240
     for name, module in sys.modules.items():
         if ((name.startswith('animate_anyone') or name in ('experiments.tennis.k6b_generate',
                 'experiments.tennis.k6b_fit') or (isolation.get('clock_profile') is not None and name == clock_module))
@@ -356,6 +377,9 @@ def run_isolated(config: dict[str, Any], isolation: dict[str, Any], *, materiali
     np.savez_compressed(path, t=np.asarray(ticks, dtype=np.int64), crops=np.stack(crops))
     sidecar = {'unit': unit_name, 'profile': 'match5', 'frames_generated': frames, 'kept': len(ticks),
                'steps': steps, 'seed': seed, 'npz_sha256': fixed.file_sha(path), 'scope': scope}
+    if kind == 'context_qualification':
+        sidecar['context'] = {'run': first_run, 'first_frame': 0, 'frames': 24,
+                              'sampler_seed': seed * 1009 + first_run}
     path.with_suffix('.json').write_text(json.dumps(sidecar, sort_keys=True))
     publication_cost = finish_phase(publication_started)
     device = torch.cuda.get_device_properties(0)
@@ -453,7 +477,23 @@ def _validate_receipt(output: Path, expected: dict[str, Any], scope: str, steps:
             or isolation.get('extra_fds') is not False or not isolation.get('denials')
             or any(value not in (1, 13) for value in isolation['denials'].values())):
         raise ValueError('isolation receipt incomplete')
-    hashes = validate_crops(output, (unit,), steps, scope)
+    if scope == 'context_qualification_only':
+        path = output / f'{unit}@match5.npz'
+        sidecar = json.loads(path.with_suffix('.json').read_text())
+        with np.load(path, allow_pickle=False) as archive:
+            if (set(archive.files) != {'t', 'crops'} or not np.array_equal(archive['t'], np.arange(0, 24, 3))
+                    or archive['crops'].shape != (8, 784, 512, 3) or archive['crops'].dtype != np.uint8):
+                raise ValueError('qualification crop context differs')
+        if (sidecar.get('scope') != scope or sidecar.get('unit') != unit or sidecar.get('steps') != 30
+                or sidecar.get('profile') != 'match5'
+                or sidecar.get('frames_generated') != 24 or sidecar.get('kept') != 8
+                or sidecar.get('npz_sha256') != fixed.file_sha(path) or receipt.get('sidecar') != sidecar
+                or sidecar.get('context') != {'run': 0, 'first_frame': 0, 'frames': 24,
+                     'sampler_seed': int(hashlib.sha256(unit.encode()).hexdigest()[:7], 16) * 1009}):
+            raise ValueError('qualification context seal differs')
+        hashes = {unit: fixed.file_sha(path)}
+    else:
+        hashes = validate_crops(output, (unit,), steps, scope)
     if receipt.get('sidecar', {}).get('npz_sha256') != hashes[unit]:
         raise ValueError('sealed output mismatch')
     if not receipt.get('device', {}).get('name') or not receipt.get('kernels') or not receipt.get('model_record'):
@@ -473,6 +513,11 @@ def _validate_receipt(output: Path, expected: dict[str, Any], scope: str, steps:
 def validate_sealed(output: Path, expected: dict[str, Any]) -> dict[str, Any]:
     """Validate only original 30-step candidate output."""
     return _validate_receipt(output, expected, 'candidate', 30)
+
+
+def validate_context_qualification(output: Path, expected: dict[str, Any]) -> dict[str, Any]:
+    """Validate one original-recipe context, never a full candidate."""
+    return _validate_receipt(output, expected, 'context_qualification_only', 30)
 
 
 def validate_cost_probe(output: Path, expected: dict[str, Any], steps: int) -> dict[str, Any]:

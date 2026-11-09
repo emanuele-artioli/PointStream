@@ -32,27 +32,37 @@ def bound_inputs(stage: Path) -> tuple[dict[str, Path], dict[str, Any], dict[str
     spec = json.loads((stage.parent / 'spec.json').read_text())
     staging = json.loads((stage / 'staging.json').read_text())
     dispatch = json.loads((stage / 'dispatch.json').read_text())
+    combined = spec.get('w8_combined_cpu_proof_profile') == 'w8-exact-source-cpu-proof-v1'
+    expected_names = dict(NAMES)
+    if combined:
+        expected_names['native_inventory'] = 'cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b'
     if (spec.get('device') != 'cpu' or spec.get('gpu_models') != [] or spec.get('gpu_memory_mib') != 0
             or spec.get('single_cpu_campaign') is not True or spec.get('cpu_threads') != 1
-            or spec.get('hosts') != ['gpu5'] or spec.get('budget_seconds', 0) != 240
+            or spec.get('hosts') != ['gpu5'] or spec.get('budget_seconds', 0) != (600 if combined else 240)
             or spec.get('environment', {}).get('sha256') != cost.MAIN_ENV
             or staging['environment']['sha256'] != cost.MAIN_ENV or len(dispatch.get('cpu_affinity', [])) != 1):
         raise ValueError('CPU-only single-core MAIN environment contract differs')
+    if combined and (spec.get('smoke', {}).get('seconds') != 530 or spec.get('full', {}).get('seconds') != 5
+                     or spec.get('validator_seconds') != 50):
+        raise ValueError('combined CPU proof stage limits differ')
     declared = {item['name']: item for item in spec['staged_inputs']}
     actual = {item['name']: item for item in staging['inputs']}
-    if len(declared) != len(spec['staged_inputs']) or len(actual) != len(staging['inputs']) or set(declared) != set(NAMES) or set(actual) != set(NAMES):
+    if len(declared) != len(spec['staged_inputs']) or len(actual) != len(staging['inputs']) or set(declared) != set(expected_names) or set(actual) != set(expected_names):
         raise ValueError('exact public packet input set required')
     declared_paths = {(item['path'], item['sha256']) for item in spec['inputs']}
     if declared_paths != {(item['path'], item['sha256']) for item in declared.values()}:
         raise ValueError('declared input identities differ')
     root = Path(staging['local_root']).resolve(strict=True)
     paths = {}
-    for name, expected in NAMES.items():
+    for name, expected in expected_names.items():
         item = actual[name]
         if (declared[name]['sha256'] != expected or item['sha256'] != expected
                 or declared[name].get('extract', False) or item.get('extract', False)):
             raise ValueError('input binding differs: ' + name)
         path = Path(item['path']).resolve(strict=True)
+        if combined:
+            from experiments.tennis.w8_protected_metadata import reject_protected_alias
+            reject_protected_alias(path)
         if not path.is_relative_to(root) or fixed.file_sha(path) != expected:
             raise ValueError('staged public input differs: ' + name)
         paths[name] = path
@@ -449,3 +459,102 @@ def main() -> int:
 
 if __name__ == '__main__':
     raise SystemExit(main())
+
+
+def run_proof(stage: Path) -> dict[str, Any]:
+    """Run the fixed real packet path for the combined CPU proof, without publication."""
+    from experiments.tennis import w8_strict_host_cost_job as host
+
+    if (stage.name != 'smoke' or sys.platform != 'linux' or len(os.sched_getaffinity(0)) != 1
+            or os.environ.get('CUDA_VISIBLE_DEVICES') != '' or os.environ.get('PS_CLAIMED_GPU_UUID')):
+        raise ValueError('combined packet proof requires hidden CUDA and one-core Linux')
+    paths, spec, dispatch = bound_inputs(stage)
+    if spec.get('w8_combined_cpu_proof_profile') != 'w8-exact-source-cpu-proof-v1':
+        raise ValueError('explicit combined proof profile required')
+    bootstrap_sha = spec.get('witness_bootstrap_sha256')
+    if (not isinstance(bootstrap_sha, str) or len(bootstrap_sha) != 64
+            or any(c not in '0123456789abcdef' for c in bootstrap_sha)):
+        raise ValueError('frozen witness bootstrap SHA required')
+    from experiments.tennis.w8_witness_job import check_bootstrap_archive
+    check_bootstrap_archive(stage, dispatch, bootstrap_sha)
+    snapshot = Path(__file__).resolve().parents[2]
+    preflight = json.loads(paths['preflight'].read_text())
+    host.check_preflight_bundle(preflight, paths['identity'], witness_metadata=True)
+    host.check_preflight_sources(preflight, snapshot, witness_bootstrap_sha=bootstrap_sha)
+    fingerprints = host.read_oracle(paths['oracle'])
+    rate = host.audit_public_rate(paths['packet'], paths['profile'])
+    scratch = fixed.checked_scratch()
+    protected_path = scratch / 'protected-identity.json'
+    from experiments.tennis import w8_protected_metadata
+    protected = w8_protected_metadata.capture(paths['identity'], protected_path, expected_historical_sha256=IDENTITY_SHA)
+    root = scratch / 'receiver-source'
+    manifest = source.stage_source(snapshot, root)
+    source.verify_source(root, manifest)
+    manifest_path = scratch / 'source-manifest.json'
+    manifest_path.write_text(json.dumps(manifest, sort_keys=True))
+    loader = Path('/etc/ld.so.cache').resolve(strict=True)
+    info = loader.stat()
+    if str(loader) != '/etc/ld.so.cache' or not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or info.st_mode & stat.S_IWOTH:
+        raise ValueError('unsafe host loader cache')
+    loader_path = scratch / 'loader-identity.json'
+    loader_path.write_text(json.dumps({'device': info.st_dev, 'inode': info.st_ino, 'mode': info.st_mode, 'uid': info.st_uid}, sort_keys=True))
+    aliases = scratch / 'protected-aliases'
+    aliases.mkdir()
+    denied = {group: [name] for group, (name, _) in PROTECTED.items()}
+    denied['aliases'] = []
+    for group, (name, _) in PROTECTED.items():
+        alias = aliases / group
+        alias.symlink_to(Path(name).resolve(strict=True))
+        denied['aliases'].append(str(alias))
+    policies = preflight['runtimes']
+    for name, expected in (('main', host.MAIN_ENV), ('jcv', host.JCV_ENV)):
+        root_path = Path('/local/users/emanuele/pointstream/cache') / expected / 'tree'
+        if not Path(policies[name]['python']).resolve(strict=True).is_relative_to(root_path.resolve(strict=True)):
+            raise ValueError('proof runtime differs from pinned cache')
+    work = scratch / 'packet-worker'
+    work.mkdir()
+    output = work / 'output'
+    output.mkdir()
+    def config(kind: str, files: dict[str, dict[str, str]], out: Path, runtime: dict[str, Any],
+               cpu: int, visible: str, unit: str = fixed.UNITS[0]) -> dict[str, Any]:
+        return {'worker_kind': kind, 'unit': unit, 'cpu_seconds': cpu, 'files': files, 'output': str(out),
+                'allow_paths': host.strict_roots(root, out, runtime, files), 'denied_paths': denied,
+                'parent_user_namespace': os.readlink('/proc/self/ns/user'),
+                'parent_network_namespace': os.readlink('/proc/self/ns/net'), 'protected_receipt': protected,
+                'tensor_fingerprints': fingerprints,
+                'environment': {'CUDA_VISIBLE_DEVICES': visible, 'TMPDIR': str(out), 'TMP': str(out),
+                                'TEMP': str(out), 'XDG_CACHE_HOME': str(out / '.cache'),
+                                'TORCH_HOME': str(out / '.cache' / 'torch'), 'PS_GPU_MEMORY_LIMIT_MIB': '0'}}
+    files = {'bundle': host._item(paths['packet']), 'profile': host._item(paths['profile']),
+             'guider': host._item(paths['guider'])}
+    packet_config = config('packet', files, output, policies['main'], 100, '')
+    usage = host._worker(Path(policies['main']['python']), packet_config, work, 100, 80, root, loader_path,
+                         witness_mode='packet')
+    decoded_path = output / 'decoded-manifest.json'
+    decoded = json.loads(decoded_path.read_text())
+    check_grants(packet_config, policies['main'])
+    check_isolation(packet_config, decoded['isolation'], json.loads(loader_path.read_text()), manifest,
+                    fixed.file_sha(loader_path))
+    cpu_path = output / 'cpu-only.json'
+    cpu = json.loads(cpu_path.read_text())
+    if (decoded.get('match_tensors') != fingerprints or decoded.get('unit_sha256') != receiver.ORACLE_UNIT_SHA
+            or decoded.get('packet_sha256') != fixed.WINDOW_SHA or decoded.get('profile_sha256') != fixed.PROFILE_SHA
+            or decoded.get('guider_sha256') != fixed.GUIDER_SHA or decoded.get('checkpoint_sha256') != CHECKPOINT_SHA
+            or receiver.verify_serialized_match(output / 'decoded.pt', fingerprints) != CHECKPOINT_SHA
+            or any(fixed.file_sha(output / 'publish' / 'units' / f'{u}.npz') != receiver.ORACLE_UNIT_SHA[u] for u in fixed.UNITS)
+            or cpu.get('cuda_visible_devices') != '' or cpu.get('cuda_initialized_after_decode') is not False
+            or cpu.get('torch_version') != preflight['receipts']['main']['torch']
+            or cpu.get('pre_serialization', {}).get('state_tensors') != 480
+            or cpu.get('pre_serialization', {}).get('restored_tensors') != 480):
+        raise ValueError('combined proof packet/oracle identity differs')
+    receipt_paths = {'packet-config.json': work / 'worker-config.json', 'packet-exit.json': work / 'exit.json',
+                     'packet-namespace.json': work / 'namespace-receipt.json',
+                     'packet-namespace.json.started': work / 'namespace-receipt.json.started',
+                     'packet-decoded-manifest.json': decoded_path, 'packet-cpu-only.json': cpu_path,
+                     'source-manifest.json': manifest_path, 'loader-identity.json': loader_path,
+                     'protected-identity.json': protected_path}
+    return {'scope': 'strict_packet_cpu_proof_only', 'paths': paths, 'scratch': scratch, 'root': root,
+            'protected_path': protected_path, 'code_manifest': manifest, 'loader_receipt': loader_path,
+            'preflight': preflight, 'policies': policies, 'config': config, 'fingerprints': fingerprints,
+            'decoder_out': output, 'packet_usage': usage, 'public_rate': rate,
+            'native_inventory': paths['native_inventory'], 'proof_receipts': receipt_paths}

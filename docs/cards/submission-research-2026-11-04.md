@@ -42,10 +42,10 @@ No training, paid API fallback or remote agent session is included.
 |---|---:|---:|
 | Ball source oracles, controls, matched native ladders, 30-clip benchmark and qualified cross-sport subset |18h|20h|
 | Two original SVT half-out gaps, original scoring controls and updated intervals |0.5h|3,620 s|
-| New W8 CUDA diagnosis, then cost pilot and one complete fresh witness only on gates |2h|3h|
+| New W8 CUDA diagnosis, then cost pilot and one complete fresh witness only on gates |8,200 s|11,300 s|
 | W6 literal control reproduction and bounded smoothing study |0.5h|1.25h|
 | Paid-mask / generative-peer feasibility oracles, no full 34-window sweep |1h|1.5h|
-| Shared admission, audit and uncertainty reserve |2h|4,480 s|
+| Shared admission, audit and uncertainty reserve |6,200 s|3,980 s|
 | **Total** |**24h**|**28h**|
 
 The original initial release was at most **2 GPU-hours /3 workload CPU-hours** across
@@ -146,3 +146,7 @@ The real public-folder I/O oracle `20261105T071725Z-b5eb8a21` independently pass
 ## Research-first ceiling revision —2026-11-05
 
 User approved the pending24GPUh/28CPUh proposal in `submission-research-budget-revision-2026-11-05.md`, with the first additional9,000GPU/10,800CPU-second tranche conditional on per-job correctness, source-compatibility, real native/namespace/CPU-accounting qualification and292/586 scale confirmations. The aggregate increase is assigned to ball; the full30 study remains gated by a complete forecast and reserves. Pause manuscript edits until worthwhile research endpoints are resolved. Preserve completed negatives, historical ceilings and failed attempts. No training, legacy200GPUh study, or submission.
+
+### Root prospective reserve transfer — November6 UTC
+
+The explicit shared-reserve authority above is used prospectively to move1,000GPU/500CPU seconds toW8; aggregate24GPUh/28CPUh and ball ceilings stay unchanged. W8limit is8,200GPU/11,300CPU; shared6,200GPU/3,980CPU. After paired-cost and CPU-structure acceptance, W8has5,159GPU/4,616CPU remaining. Reserve at most4,550GPU/4,550CPU for the staged fresh-witness attempt described in `w8-full-witness-staged-proposal-2026-11-06.md`, including newsourceproof and alloperational costs, leaving66CPU insideW8. This is a ceiling reservation, never proof of fit or execution authority. Actualsource/securityreview and complete forecast precede each released stage; no full candidate/quality run is released. A failed or unfundable stage stops and retains evidence. The old witness allocation stays closed.

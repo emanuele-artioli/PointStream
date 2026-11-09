@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "job_id": "20261109T151733Z-42249d1d",
+  "status": "expired_without_host_or_gpu_assignment",
+  "canonical_terminal_sha256": "9ceeedebfbf55d68f0e434f48ed66ce81e10501c178dd7ab0503867b87856bfe",
+  "retained_inbox_listing_sha256": "f7caf74226212b44c54d9a2ce8d27bcbdb3689ee676b14b8a92d6c86b298765a",
+  "terminal_events_sha256": "0fce405cf6dc189d8cc749e9d4eb807fb9592711eedef844146d44569ce379c3",
+  "gpu_charge_seconds": 0,
+  "phase_total_conservative_cpu_charge_seconds": 400,
+  "preparation_already_charged_cpu_seconds": 100,
+  "closure_cpu_charge_seconds": 300,
+  "cpu_basis": "Conservatively charge the entire remaining 300-second external administration/monitoring/audit allowance. No campaign was created. Exact local watch CPU and complete manager CPU are unavailable; this is a declared-cap charge, not measured aggregate usage. Pending wall time is not GPU occupancy.",
+  "observations": [
+    "canonical expiry: insufficient time before deadline",
+    "no assigned host, supervisor, run directory, stage output or gate",
+    "only ready/spec/source/state/owner/event artifacts retained",
+    "terminal event acknowledged; post-expiry A6000 inspection still occupied",
+    "one canonical wait ended; no retry"
+  ],
+  "decision": "No parity, quality, timing-model or codec-failure evidence. Ball GPU qualification remains open pending compatible capacity. Preserve the accepted exact-source CPU proof and all queue artifacts."
+}
