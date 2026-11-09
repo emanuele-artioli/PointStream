@@ -640,7 +640,7 @@ def test_finish_fixed_dispatch_and_cli(qualification: bool, monkeypatch, tmp_pat
     from experiments.jobs import inbox
     from experiments.tennis import w8_witness_job as job
 
-    spec = {'deadline': (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat(),
+    spec: dict[str, Any] = {'deadline': (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat(),
             'w8_witness_profile': 'w8-context-qualification-v1' if qualification else 'w8-full-finish-v1',
             'entrypoint': ['-m', 'experiments.tennis.w8_witness_job'], 'arguments': ['{phase}'],
             'scale': {'phase': {'smoke': 'finish-readiness',
@@ -706,7 +706,7 @@ def test_finish_builder_binds_audit_archives_and_qualification_caps(tmp_path: Pa
         'witness_cpu_proof_host': 'gpu5', 'contention': {'policy': 'stop', 'resume_attempts': 0},
         'staged_inputs': [], 'inputs': []})
     monkeypatch.setattr(inbox, 'validate_spec', lambda _: None)
-    gate = {'qualification_charge_phases': ['pilot'], 'qualification_gpu_spent_seconds': 200,
+    gate: dict[str, Any] = {'qualification_charge_phases': ['pilot'], 'qualification_gpu_spent_seconds': 200,
             'qualification_cpu_spent_seconds': 300, 'qualification_next_gpu_ceiling_seconds': 600,
             'qualification_next_cpu_ceiling_seconds': 670,
             'completed_artifact_sha256': {'unit1_context': '3' * 64},
