@@ -1603,7 +1603,7 @@
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8900,
       "cpu_seconds": 8870,
-      "status": "Remaining_unspent8900GPU8870CPU after50CPUboundedsharedreadiness. NoactiveBalljob/wait; GPUparity,292/586/full30notreleased; old4224expiredclosed."
+      "status": "Remaining_unspent8900GPU8870CPU after50CPUboundedsharedreadiness. Active one parity leaf 20261109T175655Z-9b4701ce nested <=1000GPU/1150futureCPU; no second request or scale release."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -2585,6 +2585,25 @@
       "terminal_charged_gpu_seconds": 0,
       "phase_total_cpu_seconds": 400,
       "wait_state": "completed;onecanonicalwait2344seconds"
+    },
+    {
+      "job_id": "20261109T175655Z-9b4701ce",
+      "phase": "k5d-scale-first-tranche-20261105",
+      "subphase": "parity16-new-capacity-20261109",
+      "state": "pending; one bounded exclusive GPU request; no automatic retry",
+      "revision": "ae6030e58a98156d3b5cb5d1cfab78967b173c9b",
+      "snapshot_sha256": "22fb921e5cc26d04f22d6e8be6f1098f504b3319283794e341ab5952dc51815d",
+      "source_sha256": "71d788cf9c520c4c095f011dbf5efce157493f003a3db970e57731f06d1cb7af",
+      "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "spec_sha256": "13c30c660c375af9bdfd53dddf783df49dd6496349eddf05ec3bf37d1364ecc0",
+      "deadline": "2026-11-09T18:39:45Z",
+      "gpu_ceiling": 1000,
+      "inclusive_cpu_ceiling": 1200,
+      "preparation_charged_cpu_seconds": 50,
+      "future_cpu_ceiling": 1150,
+      "campaign_wall_ceiling": 800,
+      "wait_max_seconds": 2700,
+      "batch_path": "/private/tmp/k5d-parity1752-batch.json"
     }
   ],
   "old_budgets": "closed, not borrowed",
