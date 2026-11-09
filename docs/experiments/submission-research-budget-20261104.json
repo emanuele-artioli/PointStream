@@ -1057,6 +1057,15 @@
       "cpu_seconds": 50,
       "release_stage": "research-first24/28",
       "basis": "Conservative50CPUforNov9 allhost/oldjob/source/input/env/tool/CPU/storage checks anduniqueacceptedCPUreceipt c64upload/fsync/hash. AllcompatibleA6000occupied; no GPUrequest yet. Userboundedqueuepreference permitsONEpendingrequest. This50countsinside unchanged1000GPU1200CPUleaf; nextfreshprep<=50fromexisting400externalCPU, totalprep100and300remainingexternalaudit/lifecycle."
+    },
+    {
+      "phase": "k5d-parity-pgid-queue-readiness-20261109",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "release_stage": "research-first24/28",
+      "basis": "Additional50CPUfreshqueuepreparation conservativelycharged insideunchanged1000GPU1200CPUattempt. Allhost/jobs/source/receipt/runtime/tools/input/CPU/space verified,actualrequest42249d1d pending,foreignGPUoccupancyhandledbyqueue. Previousblockedprep50+this50=100prepwithin400externalCPU;remaining300externalplus800campaign=1100futureCPU."
     }
   ],
   "reservations": [
@@ -1575,8 +1584,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8900,
-      "cpu_seconds": 9270,
-      "status": "Remaining_unspent8900GPU9270CPU. ONEGPU16parityrequestreleased; earlierblockedpreflight50CPUcharged, noGPUjobyet. Userboundedqueues: busyA6000doesnotblockpendingrequest. OperationalamendONEwait<=2700s/deadline<=45min, original1000GPU1200CPUinclusive unchanged(100CPUtotalprepallowedwithin400external,300others). NewrequestmustrecordIDandwait; expire/contendstop,noretry/full30."
+      "cpu_seconds": 9220,
+      "status": "Remaining_unspent8900GPU9220CPU. GPU16parity42249d1dsubmittedpending inboundedqueue,deadline16:00:43UTCNov9,onewait61883max2700delegateowned. Leaf1000GPU1200CPUinclusive100prepcharged+1100futureCPU nested. Exactae/22fb/71d/env32e/c64receipt. Noautomaticretry/full30release."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -2538,6 +2547,23 @@
       "local_batch_record": "/private/tmp/k5d-pgid-native-batch-20261106.json",
       "actual_phase_conservative_cpu_charge": 210,
       "root_accepted_receipt_sha256": "c64a5890d6c2388bb54453332964e1c365aa0caa28a20836de74b0493c3abf8a"
+    },
+    {
+      "job_id": "20261109T151733Z-42249d1d",
+      "phase": "k5d-scale-first-tranche-20261105",
+      "subphase": "gpu16-pgid-parity-bounded-queue",
+      "state": "submittedinitialpending;onecanonicalwaitdelegateowned,noautomaticretry",
+      "revision": "ae6030e58a98156d3b5cb5d1cfab78967b173c9b",
+      "source_sha256": "71d788cf9c520c4c095f011dbf5efce157493f003a3db970e57731f06d1cb7af",
+      "snapshot_sha256": "22fb921e5cc26d04f22d6e8be6f1098f504b3319283794e341ab5952dc51815d",
+      "spec_sha256": "131e9660b6de898a5081e7c55c22d03936a5d241183e9bad4d8d36db9641c94e",
+      "deadline": "2026-11-09T16:00:43Z",
+      "gpu_ceiling": 1000,
+      "inclusive_cpu_ceiling": 1200,
+      "preparation_charged_cpu_seconds": 100,
+      "wait_handle": 61883,
+      "wait_max_seconds": 2700,
+      "local_batch": "/private/tmp/k5d-parity1109-batch.json"
     }
   ],
   "old_budgets": "closed, not borrowed",
