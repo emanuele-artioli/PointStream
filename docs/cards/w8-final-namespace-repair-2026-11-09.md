@@ -63,3 +63,5 @@ quality, timing or fresh witness result follows. Both-unit24-frame qualification
 and the full original unbroken240-frame witness require separate admissions and
 complete remaining CPU/GPU forecasts. Scientific recipe, comparison endpoints,
 bit-exact masks and registered RGB/LPIPS/DISTS tolerances remain unchanged.
+
+The eventual independently reviewed CPU gate must bind `system_leaves_sha256` to the exact policy member in the validated physical source snapshot and to the proof spec's `witness_system_leaves_sha256`. It remains an audit decision after real proof completion; the raw proof does not emit or approve that gate. The self-leaf PID, start tick and process-group values must join the corresponding namespace worker receipt for packet, both strict runtime leaves and assessment.
