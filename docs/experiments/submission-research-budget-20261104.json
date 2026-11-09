@@ -1297,6 +1297,35 @@
       "witness_qualification": false,
       "release_stage": "research-first24/28",
       "basis": "Full released30CPU AADA source preparation: stat-first protected metadata/public source690+CD6 verification, no-overwrite gzip upload, freshallhostdoctor/workers/jobs/gpu5CPU0claim checks and spec. Partial measuredCPU~2.1; managerCPUunmetered. Root38rawhashes checked. Family378prior+30=>408closed,832futureof1250card;0GPU."
+    },
+    {
+      "phase": "w8-aada-9784-term-harness-failure-closeout-20261109",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 80,
+      "release_stage": "research-first24/28",
+      "basis": "70 rounded created-to-canonical-terminal62.62wallupper includingqueue+10inspection/archive/ack/admin. Not measured aggregateCPU; preparation30alreadycharged.",
+      "job_id": "20261109T212248Z-97844483",
+      "witness_qualification": false
+    },
+    {
+      "phase": "k5d-parent8-965d-source-preparation-20261109",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "release_stage": "research-first24/28",
+      "basis": "Full released50CPU unique-source preparation: freshallhostdoctor/jobs/workers,gpu2CPU0/claim/runtime/tool/unshare/localdisk/inputZIPactualSHA, source9f no-overwrite upload/publicSHA. HostZIPhash6.847CPU/post.055 measured; upload/fleet/adminunmetered. Inside revised150firstleaf of420CPUqualification, nojob yet."
+    },
+    {
+      "phase": "k5d-gpu3-cache-prefix-probe-20261109",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 20,
+      "release_stage": "research-first24/28",
+      "basis": "Full authorized20CPU inventory and64MiBprefix copy/hash/fsync probe,0GPU. Remote1.052+SSH.023 partialCPU measured, nvidia/worker/adminunmetered. Prefix equalSHA is not fullZIP/cache-byte proof. Separate from420CPU sourcequalification; no warming/pool change."
     }
   ],
   "reservations": [
@@ -1815,8 +1844,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8370,
-      "cpu_seconds": 7760,
-      "status": "Remaining_unspent8370GPU7760CPU; f1144GiBparentOOMclosed400GPU140CPUinclusive; local8+2source/reaperrepair only, no new experiment released."
+      "cpu_seconds": 7690,
+      "status": "Remaining_unspent8370GPU7690CPU; no activefleetjob, sourcequalification/localrepair only; noGPUrelease."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -1880,8 +1909,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 4142,
-      "status": "Remaining_unspent4550GPU4142CPU; aada source690 prepared30CPU, amended family1250 has408closed+832future=1240. ONEcombinedCPUproof release, no GPU/context/fullwitness."
+      "cpu_seconds": 4062,
+      "status": "Remaining_unspent4550GPU4062CPU; no activefleetjob, sourcequalification/localrepair only; noGPUrelease."
     }
   ],
   "jobs": [
@@ -3009,7 +3038,7 @@
     {
       "job_id": "20261109T212248Z-97844483",
       "phase": "w8-full-witness-staged-20261106",
-      "state": "failed; root fresh canonical terminal status before wait; cause and teardown/cost audit pending",
+      "state": "failedTERMharness/packetCPUcomponentverified/normal+timeoutpartial/noKILLorlaterproof/11PIDsandgroupsabsent/eventsACK/rootclosed",
       "revision": "aada886b3e0bb644c4dd180373ead4b40651c90d",
       "snapshot_sha256": "690b8eb0ef8d39a89789688165520c183acc92abc69856bc087867b66ebb2ce6",
       "source_sha256": "cffdb7d9ccfbfd8f53a15f3cb643c760254a93a6778c2e6620f2d550c94edc99",
@@ -3028,7 +3057,10 @@
       "local_batch": "/private/tmp/pointstream-w8-aada-proof-20261109-a1",
       "supervisor_pid": 125732,
       "campaign_pgid": 125757,
-      "scope": "Packet-first CPU integration only; no passing full proof/GPU/quality evidence"
+      "scope": "Packet-first CPU integration only; no passing full proof/GPU/quality evidence",
+      "terminal_additional_cpu_charge": 80,
+      "proof_family_closed_cpu": 488,
+      "wait_state": "ended"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -3050,7 +3082,7 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "AADA9784CPUproofalreadyfailed; root recordedID, ONEcanonicalwaitmayreturnterminal then rawcause/teardown/cost audit. NoGPUjob/retry/timer. Parent8+2Ballsource local only.",
+    "state": "Noactivefleetjobs/waits. AADA9784TERMfailureclosed; localTERM/originrepair7b519only. Parent8sourceprepared50CPU, actualforensic/native specsawaitrootreview. GPU3prefixprobe20CPUclosed, nowarming/poolchange.",
     "jobs": [],
     "batches": [],
     "native_completion_resume_verified": false,
