@@ -1,0 +1,130 @@
+{
+  "job_id": "20261105T021434Z-3ec159d8",
+  "scope": "retained-record, parser, provenance and arithmetic audit; no independent re-decode or neural inference",
+  "stages": {
+    "smoke": {
+      "frames": 16,
+      "archive_sha256": "e05684c829f65804c5317040fa5c6c04bc62299fb18f960b8fcd5219548b56be",
+      "command_seconds": 32.835890769958496,
+      "timing_contaminated": false,
+      "disk_guard_off": false,
+      "records_sha256": {
+        "dispatch": "755ba90b8a203088423a0eea96b7b818f2fe34853d8902d8f089b568c1ca0d1b",
+        "staging": "ba2a89f14cc8e38cd9e71dc1ebff8af3366b96a6ccd564efb8c45616d4a9afb5",
+        "execution": "0c200ddff0c32b052a857fb752b87143d1d1bddf738041a2fd353e756502d576"
+      },
+      "results": {
+        "native": {
+          "changed_frames": 0,
+          "billed_bytes": 21683,
+          "judge_hits10": {
+            "wasb": 4,
+            "balltrack": 3
+          },
+          "frame_sse": 1685065636
+        },
+        "streak": {
+          "changed_frames": 15,
+          "billed_bytes": 21826,
+          "judge_hits10": {
+            "wasb": 15,
+            "balltrack": 15
+          },
+          "frame_sse": 1678597051
+        },
+        "disk": {
+          "changed_frames": 15,
+          "billed_bytes": 21823,
+          "judge_hits10": {
+            "wasb": 15,
+            "balltrack": 15
+          },
+          "frame_sse": 1681739507
+        },
+        "wrong_position": {
+          "changed_frames": 15,
+          "billed_bytes": null,
+          "judge_hits10": {
+            "wasb": 3,
+            "balltrack": 2
+          },
+          "frame_sse": 1688371862
+        },
+        "brightness": {
+          "changed_frames": 15,
+          "billed_bytes": null,
+          "judge_hits10": {
+            "wasb": 15,
+            "balltrack": 15
+          },
+          "frame_sse": 1680252555
+        }
+      }
+    },
+    "full": {
+      "frames": 48,
+      "archive_sha256": "8a877a2f8d424dd886b44ed002be606ee29c11607c95ae82fb1ee029f0504e8e",
+      "command_seconds": 68.29033493995667,
+      "timing_contaminated": false,
+      "disk_guard_off": false,
+      "records_sha256": {
+        "dispatch": "3cb5eaa6adc65295dbe206ab028214d880badbbdf0b0faa43041b452a02f64bb",
+        "staging": "0c5f609bbb2a5c69b720ed77c93a3d594001d29ef1c6cd9e548dff292f69d0f9",
+        "execution": "1f0bb450607dbaae06fdde78281d9f46d694b93f33e77b9be88f4a1e9e191bdd"
+      },
+      "results": {
+        "native": {
+          "changed_frames": 0,
+          "billed_bytes": 34146,
+          "judge_hits10": {
+            "wasb": 5,
+            "balltrack": 4
+          },
+          "frame_sse": 3694318234
+        },
+        "streak": {
+          "changed_frames": 47,
+          "billed_bytes": 34421,
+          "judge_hits10": {
+            "wasb": 45,
+            "balltrack": 47
+          },
+          "frame_sse": 3674844529
+        },
+        "disk": {
+          "changed_frames": 47,
+          "billed_bytes": 34413,
+          "judge_hits10": {
+            "wasb": 45,
+            "balltrack": 47
+          },
+          "frame_sse": 3680724190
+        },
+        "wrong_position": {
+          "changed_frames": 47,
+          "billed_bytes": null,
+          "judge_hits10": {
+            "wasb": 4,
+            "balltrack": 1
+          },
+          "frame_sse": 3700538749
+        },
+        "brightness": {
+          "changed_frames": 47,
+          "billed_bytes": null,
+          "judge_hits10": {
+            "wasb": 45,
+            "balltrack": 47
+          },
+          "frame_sse": 3677629710
+        }
+      }
+    }
+  },
+  "cost_fit": {
+    "fixed_seconds": 15.108668684959412,
+    "marginal_seconds_per_frame": 1.1079513803124428,
+    "full188_with_1_5_margin_and_40reserve": 375.105292275548
+  },
+  "passed": true
+}

@@ -16,12 +16,15 @@ MEMBER = 'src/codecs/dcvc_uf_worker.py'
 OLD_SHA = 'd189b733c4fe18fa383ff4f193d7c2dc9ddc7a844275a8d59bc48684eee108e4'
 NEW_SHA = 'a2d04032b7bf4691939e754fb50399bb07d5107da0aaf07413568f665c80be61'
 PATCH_SHA = '66c20e8c48776839cabddeac4aeec540e3f460002e25faefbf3a4e8b3ab16ddc'
+FIXTURE = 'docs/experiments/k5d-inputs/controls-3ec159d8-independent-audit-20261105.json'
+FIXTURE_SHA = 'f438382b94d44dcd81bc3a3bc17405d4ad2d78fd6866691ab20655ef11f5c0ad'
 ADDITIONS = base.CONTROL_ADDITIONS | frozenset({
     'experiments/tennis/k5d_shared_source_bridge.py',
     'tests/tennis/test_k5d_shared_source_bridge.py',
     'tests/tennis/test_k5d_shared_parity.py',
     'experiments/tennis/k5d_low_memory_source_bridge.py',
     'tests/tennis/test_k5d_low_memory_source_bridge.py',
+    FIXTURE,
 })
 
 
@@ -50,6 +53,8 @@ def bridge(old_archive: Path, old_identity: dict[str, str], new_archive: Path,
     changed = {name for name in set(old) | set(new) if old.get(name) != new.get(name)}
     if changed != ADDITIONS | {MEMBER} or any(name in old for name in ADDITIONS):
         raise ValueError('source changes extend beyond the pinned resource patch and control additions')
+    if new.get(FIXTURE) != [FIXTURE, FIXTURE_SHA]:
+        raise ValueError('pinned audit fixture digest differs')
     before, after = member_bytes(old_archive), member_bytes(new_archive)
     patch = b''.join(difflib.diff_bytes(difflib.unified_diff, before.splitlines(keepends=True),
                                       after.splitlines(keepends=True),

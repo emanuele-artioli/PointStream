@@ -27,6 +27,7 @@ def test_exact_resource_patch_rejects_any_other_original_change(tmp_path, monkey
                                       tofile=b'new/src/codecs/dcvc_uf_worker.py'))
     for name, value in [('OLD_SHA', before), ('NEW_SHA', after), ('PATCH_SHA', patch)]:
         monkeypatch.setattr(bridge, name, hashlib.sha256(value).hexdigest())
+    monkeypatch.setattr(bridge, 'FIXTURE_SHA', hashlib.sha256(b'control').hexdigest())
     additions = {name: b'control' for name in bridge.ADDITIONS}
     old_sha = archive(old, {bridge.MEMBER: before, 'model.py': b'unchanged'})
     new_sha = archive(new, {bridge.MEMBER: after, 'model.py': b'unchanged', **additions})
@@ -43,4 +44,8 @@ def test_exact_resource_patch_rejects_any_other_original_change(tmp_path, monkey
     modified = archive(new, {bridge.MEMBER: b'other patch', 'model.py': b'unchanged', **additions})
     changed, _ = base.manifest(new, modified)
     with pytest.raises(ValueError, match='digest'):
+        bridge.bridge(old, a, new, {**b, 'source_sha256': changed, 'snapshot_sha256': modified})
+    modified = archive(new, {bridge.MEMBER: after, 'model.py': b'unchanged', **{**additions, bridge.FIXTURE: b'wrong'}})
+    changed, _ = base.manifest(new, modified)
+    with pytest.raises(ValueError, match='fixture'):
         bridge.bridge(old, a, new, {**b, 'source_sha256': changed, 'snapshot_sha256': modified})
