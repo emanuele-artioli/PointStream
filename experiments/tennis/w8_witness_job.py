@@ -1123,6 +1123,7 @@ def run_finish(stage: Path, *, qualification: bool) -> None:
                'members': {name: fixed.file_sha(retained / name) for name in named},
                'expected': generations['expected'], 'trusted': result['trusted'], 'validation': result['validation'],
                'usage': result['usage'], 'packet_usage': prepared['packet_usage'], 'native_usage': native['usage'],
+               'native_namespace_sha256': native['namespace_receipt_sha256'],
                'source_sha256': dispatch['code']['source_sha256'], 'snapshot_sha256': dispatch['code']['snapshot_sha256'],
                'elapsed_seconds': time.monotonic() - started, 'automatic_promotion': False}
     output = prepared['scratch'] / 'publish'
@@ -1274,12 +1275,24 @@ def validate_finish(stage: Path, target: Path) -> None:
                                        source_manifest=manifest, loader=loader, loader_sha=fixed.file_sha(loader_path))
         ns = witness.namespace_completion(retained / name / 'namespace-receipt.json', expected_pgid=group,
             expected_outside=outside, expected_target='experiments.tennis.w8_strict_receiver_worker')
-        if summary['usage'][name]['cpu_seconds'] + 0.05 < ns['children_cpu_seconds']:
-            raise ValueError('finish worker CPU receipt differs')
-    witness.namespace_completion(retained / 'packet-namespace.json', expected_pgid=group,
+        if (summary['usage'][name]['cpu_seconds'] + 0.05 < ns['children_cpu_seconds']
+                or summary['usage'][name].get('namespace_receipt_sha256') != fixed.file_sha(retained / name / 'namespace-receipt.json')):
+            raise ValueError('finish worker CPU or namespace receipt differs')
+    packet_ns = witness.namespace_completion(retained / 'packet-namespace.json', expected_pgid=group,
         expected_outside=outside, expected_target='experiments.tennis.w8_strict_receiver_worker')
-    witness.namespace_completion(retained / 'native/namespace.json', expected_pgid=group,
+    packet_usage = summary.get('packet_usage', {})
+    if (packet_usage.get('status') != 0 or packet_usage.get('timed_out') is not False
+            or packet_usage.get('canaries_preserved') is not True
+            or packet_usage.get('cpu_seconds', float('inf')) > caps['packet_cpu']
+            or packet_usage.get('wall_seconds', float('inf')) > 130
+            or packet_usage.get('cpu_seconds', -1) + 0.05 < packet_ns['children_cpu_seconds']
+            or packet_usage.get('namespace_receipt_sha256') != fixed.file_sha(retained / 'packet-namespace.json')):
+        raise ValueError('finish packet cost or namespace receipt differs')
+    native_ns = witness.namespace_completion(retained / 'native/namespace.json', expected_pgid=group,
         expected_outside=outside, expected_target=namespace.NATIVE_TARGET)
+    if (summary.get('native_namespace_sha256') != fixed.file_sha(retained / 'native/namespace.json')
+            or native_usage.get('waited_cpu_seconds', -1) + 0.05 < native_ns['children_cpu_seconds']):
+        raise ValueError('native finish namespace or waited CPU differs')
     checked = witness.check_finish(generation_dirs={u: retained / u for u in fixed.UNITS}, expected=expected,
         base_dir=retained / 'rgb', sam_dir=retained / 'sam', compose_dir=retained / 'compose',
         trusted=trusted, qualification=qualification)
