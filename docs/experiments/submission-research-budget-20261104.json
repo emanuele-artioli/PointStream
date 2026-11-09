@@ -2778,7 +2778,7 @@
     {
       "job_id": "20261109T200115Z-5c125c3b",
       "phase": "w8-full-witness-staged-20261106",
-      "state": "pending; one authorized replacement, no automatic retry",
+      "state": "failed; CPU claim and recorded namespace/group processes absent; no retry",
       "revision": "f6d2d8437aaf16c7e866e8ea846cc769e09dd922",
       "source_sha256": "269820305152e06bd7e2421e821acf9a63895f3487fbc53327e0870c2d73d7e2",
       "snapshot_sha256": "e6527d02582402b637bf34f31ce5b661bef9b7e900d062ee77b78fc08e97f84c",
@@ -2797,7 +2797,10 @@
       "audit_cpu_ceiling_seconds": 50,
       "result_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261109T200115Z-5c125c3b",
       "local_intent": "/private/tmp/pointstream-w8-f6d2-prepub-20261109-a1/submit-intent.json",
-      "scope": "CPU-only packet, namespace, native and policy proof; no GPU or quality evidence"
+      "scope": "CPU-only packet, namespace, native and policy proof; no GPU or quality evidence",
+      "result": "Packet strict worker rejected /proc/self/maps; PID namespace reaper then raised ProcessLookupError during kill(-1); no final namespace receipt or packet proof.",
+      "terminal_receipt": "docs/experiments/w8-inputs/receiver-20261101/f6-cpu-proof-5c12-terminal-audit-20261109.json",
+      "cpu_charge_status": "pending root independent audit"
     }
   ],
   "old_budgets": "closed, not borrowed",

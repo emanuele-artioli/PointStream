@@ -1,0 +1,766 @@
+{
+  "cause": "packet worker approved_leaves rejected /proc/self/maps; namespace reaper then raised ProcessLookupError on kill(-1, SIGKILL), leaving no final namespace receipt",
+  "cost": "not yet finalized; root audit required; created-to-terminal wall includes queue",
+  "job_id": "20261109T200115Z-5c125c3b",
+  "ownership": "CPU claim absent; campaign group empty; recorded namespace launcher/init/worker PIDs absent",
+  "raw": {
+    "group-inspection.json": {
+      "json": {
+        "affinity_record": {
+          "available": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79,
+            80,
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90,
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            99,
+            100,
+            101,
+            102,
+            103,
+            104,
+            105,
+            106,
+            107,
+            108,
+            109,
+            110,
+            111,
+            112,
+            113,
+            114,
+            115,
+            116,
+            117,
+            118,
+            119,
+            120,
+            121,
+            122,
+            123,
+            124,
+            125,
+            126,
+            127,
+            128,
+            129,
+            130,
+            131,
+            132,
+            133,
+            134,
+            135,
+            136,
+            137,
+            138,
+            139,
+            140,
+            141,
+            142,
+            143,
+            144,
+            145,
+            146,
+            147,
+            148,
+            149,
+            150,
+            151,
+            152,
+            153,
+            154,
+            155,
+            156,
+            157,
+            158,
+            159,
+            160,
+            161,
+            162,
+            163,
+            164,
+            165,
+            166,
+            167,
+            168,
+            169,
+            170,
+            171,
+            172,
+            173,
+            174,
+            175,
+            176,
+            177,
+            178,
+            179,
+            180,
+            181,
+            182,
+            183,
+            184,
+            185,
+            186,
+            187,
+            188,
+            189,
+            190,
+            191,
+            192,
+            193,
+            194,
+            195,
+            196,
+            197,
+            198,
+            199,
+            200,
+            201,
+            202,
+            203,
+            204,
+            205,
+            206,
+            207,
+            208,
+            209,
+            210,
+            211,
+            212,
+            213,
+            214,
+            215,
+            216,
+            217,
+            218,
+            219,
+            220,
+            221,
+            222,
+            223,
+            224,
+            225,
+            226,
+            227,
+            228,
+            229,
+            230,
+            231,
+            232,
+            233,
+            234,
+            235,
+            236,
+            237,
+            238,
+            239,
+            240,
+            241,
+            242,
+            243,
+            244,
+            245,
+            246,
+            247,
+            248,
+            249,
+            250,
+            251,
+            252,
+            253,
+            254,
+            255
+          ],
+          "index": 0,
+          "selected": [
+            0
+          ]
+        },
+        "dispatch": {
+          "attempt": 1,
+          "campaign_clock": {
+            "budget_end": 6934716.916653778,
+            "phase_started": 6934121.654390848,
+            "started": 6934117.157543577
+          },
+          "citable": false,
+          "code": {
+            "deleted_paths": [],
+            "git_head": "f6d2d8437aaf16c7e866e8ea846cc769e09dd922",
+            "included_untracked_sha256": {},
+            "input_check": {
+              "deferred": [
+                "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz"
+              ],
+              "deferred_bytes": 4936811281,
+              "deferred_to": "campaign",
+              "hashed": [
+                "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-linux-input-20261101-eff1aca8/profile-bec98d67.json",
+                "/home/itec/emanuele/Datasets/pointstream-data/w8-witness-20261109/native-v4-receipt-cd6bb8cf.json",
+                "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/bundle.json",
+                "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/identity.json",
+                "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/oracle.json",
+                "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-linux-input-20261101-eff1aca8/packet-eff1aca8.psw8",
+                "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/pose_guider.pth"
+              ]
+            },
+            "published": 1794254486.638223,
+            "snapshot_sha256": "e6527d02582402b637bf34f31ce5b661bef9b7e900d062ee77b78fc08e97f84c",
+            "source_archive": "source.tar",
+            "source_sha256": "269820305152e06bd7e2421e821acf9a63895f3487fbc53327e0870c2d73d7e2",
+            "spec_sha256": "d45ea01e2f60d05eeedebe2f9d6320b81d8c862bcadd675e5205d680ab30e776",
+            "tracked_changes_excluded": [],
+            "tracked_changes_included": [],
+            "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "untracked_excluded_count": 0,
+            "untracked_excluded_paths_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "untracked_excluded_sample": []
+          },
+          "command": [
+            "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+            "-m",
+            "experiments.tennis.w8_witness_cpu_proof_job",
+            "run"
+          ],
+          "contention_policy": {
+            "policy": "stop",
+            "resume_attempts": 0
+          },
+          "cpu_affinity": [
+            0
+          ],
+          "environment": {
+            "alias": "gpu5",
+            "gpu": null,
+            "host": "gpu5.itec.aau.at",
+            "python": "Python 3.10.20",
+            "started": 1794254504.2201383,
+            "tools": {
+              "ffmpeg": {
+                "path": "/opt/local/bin/ffmpeg",
+                "returncode": 0,
+                "version": [
+                  "ffmpeg version n7.1.1-56-gc2184b65d2 Copyright (c) 2000-2025 the FFmpeg developers",
+                  "built with gcc 11 (Ubuntu 11.4.0-1ubuntu1~22.04)",
+                  "configuration: --prefix=/opt/local --enable-pthreads --enable-pic --enable-shared --enable-rpath --enable-gpl --enable-openssl --enable-libaom --enable-libass --enable-libfdk-aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libsvtav1 --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libx265 --enable-libvmaf --enable-nonfree --enable-ffnvcodec --enable-demuxer=dash --enable-libxml2 --enable-libvvenc"
+                ]
+              },
+              "vvencapp": {
+                "path": "/opt/local/bin/vvencapp",
+                "returncode": 0,
+                "version": [
+                  "vvencapp version 1.11.0"
+                ]
+              }
+            }
+          },
+          "fleet_control": {
+            "files": {
+              "experiments/__init__.py": "06f003a15341e1a630da290bb9f66f11bd79de593e85aff33fdd1b548db2cba9",
+              "experiments/jobs/__init__.py": "999dfe9ae372c896e01e55010d27a97b0c6bc2fe6ff22183a1dc121ee3d56633",
+              "experiments/jobs/claims.py": "4ce261cc723de1ff2e4497c5f760d997bf6681f0e7ca75019a53280acbc6b1ef",
+              "experiments/jobs/fleet.py": "ecb7b7bbe4b2f8c3c79e39e77da1de1ae00a3d8a67308b33ff0aad29ff729145",
+              "experiments/jobs/inbox.py": "5dbdc52879729157d2073ad717d731fb7af4563f3ca1330930be96edea97266e",
+              "experiments/jobs/monitor.py": "73671c2892127bf2510b98aee75356f50736d8613f769d5b8e5426b4a821268e",
+              "experiments/jobs/staging.py": "f94156c1d5b9a6bf2ac1ec8c3437a82cd6f36a9085a7f68a6122381b7cfd0422"
+            },
+            "root": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261105T031637Z-2503bb20"
+          },
+          "gpu_sharing": null,
+          "input_identity": [
+            {
+              "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-linux-input-20261101-eff1aca8/packet-eff1aca8.psw8",
+              "sha256": "eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4"
+            },
+            {
+              "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-linux-input-20261101-eff1aca8/profile-bec98d67.json",
+              "sha256": "bec98d67280e9f777a0d3cc110baa51ae2bf2c876aefe6b247d9691432f61107"
+            },
+            {
+              "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/oracle.json",
+              "sha256": "8047b67694dd64171d2c0d13a9eaff53b18cd833b8fdc45ba054185c382848cc"
+            },
+            {
+              "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/bundle.json",
+              "sha256": "ab5f1b932918ae9956f6ef648e36e59c6a1fd9ef6c36a1722a1916b0da63a4c5"
+            },
+            {
+              "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/identity.json",
+              "sha256": "0953c5284ee8dc462d4eb95b7ce49cb9bad68e4d612fce5d167706f954668ebe"
+            },
+            {
+              "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/pose_guider.pth",
+              "sha256": "1a8b7c1b4db92980fd977b4fd003c1396bbae9a9cdea00c35d452136d5e4f488"
+            },
+            {
+              "path": "/home/itec/emanuele/Datasets/pointstream-data/w8-witness-20261109/native-v4-receipt-cd6bb8cf.json",
+              "sha256": "cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b"
+            }
+          ],
+          "resumed_from": null,
+          "staged_environment": {
+            "bin": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin",
+            "extract": true,
+            "mode": "local-hit",
+            "name": "environment",
+            "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree",
+            "prefix": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree",
+            "python": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+            "seconds": 4.332244873046875,
+            "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+            "source": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz"
+          },
+          "staged_inputs": [
+            {
+              "extract": false,
+              "mode": "local-hit",
+              "name": "packet",
+              "path": "/local/users/emanuele/pointstream/cache/eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4/packet-eff1aca8.psw8",
+              "seconds": 0.002782106399536133,
+              "sha256": "eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4",
+              "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-linux-input-20261101-eff1aca8/packet-eff1aca8.psw8"
+            },
+            {
+              "extract": false,
+              "mode": "local-hit",
+              "name": "profile",
+              "path": "/local/users/emanuele/pointstream/cache/bec98d67280e9f777a0d3cc110baa51ae2bf2c876aefe6b247d9691432f61107/profile-bec98d67.json",
+              "seconds": 6.198883056640625e-05,
+              "sha256": "bec98d67280e9f777a0d3cc110baa51ae2bf2c876aefe6b247d9691432f61107",
+              "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-linux-input-20261101-eff1aca8/profile-bec98d67.json"
+            },
+            {
+              "extract": false,
+              "mode": "local-hit",
+              "name": "oracle",
+              "path": "/local/users/emanuele/pointstream/cache/8047b67694dd64171d2c0d13a9eaff53b18cd833b8fdc45ba054185c382848cc/oracle.json",
+              "seconds": 0.00015616416931152344,
+              "sha256": "8047b67694dd64171d2c0d13a9eaff53b18cd833b8fdc45ba054185c382848cc",
+              "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/oracle.json"
+            },
+            {
+              "extract": false,
+              "mode": "local-hit",
+              "name": "preflight",
+              "path": "/local/users/emanuele/pointstream/cache/ab5f1b932918ae9956f6ef648e36e59c6a1fd9ef6c36a1722a1916b0da63a4c5/bundle.json",
+              "seconds": 6.532669067382812e-05,
+              "sha256": "ab5f1b932918ae9956f6ef648e36e59c6a1fd9ef6c36a1722a1916b0da63a4c5",
+              "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/bundle.json"
+            },
+            {
+              "extract": false,
+              "mode": "local-hit",
+              "name": "identity",
+              "path": "/local/users/emanuele/pointstream/cache/0953c5284ee8dc462d4eb95b7ce49cb9bad68e4d612fce5d167706f954668ebe/identity.json",
+              "seconds": 8.416175842285156e-05,
+              "sha256": "0953c5284ee8dc462d4eb95b7ce49cb9bad68e4d612fce5d167706f954668ebe",
+              "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/identity.json"
+            },
+            {
+              "extract": false,
+              "mode": "local-hit",
+              "name": "guider",
+              "path": "/local/users/emanuele/pointstream/cache/1a8b7c1b4db92980fd977b4fd003c1396bbae9a9cdea00c35d452136d5e4f488/pose_guider.pth",
+              "seconds": 0.010538578033447266,
+              "sha256": "1a8b7c1b4db92980fd977b4fd003c1396bbae9a9cdea00c35d452136d5e4f488",
+              "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/pose_guider.pth"
+            },
+            {
+              "extract": false,
+              "mode": "local-hit",
+              "name": "native_inventory",
+              "path": "/local/users/emanuele/pointstream/cache/cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b/native-v4-receipt-cd6bb8cf.json",
+              "seconds": 7.581710815429688e-05,
+              "sha256": "cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b",
+              "source": "/home/itec/emanuele/Datasets/pointstream-data/w8-witness-20261109/native-v4-receipt-cd6bb8cf.json"
+            }
+          ],
+          "started": 1794254509.8121178
+        },
+        "execution": {
+          "children_resource_usage": [
+            0.743969,
+            0.230867,
+            55296,
+            0,
+            0,
+            0,
+            31234,
+            2,
+            0,
+            10992,
+            17488,
+            0,
+            0,
+            0,
+            268,
+            63
+          ],
+          "contention": [],
+          "exit_code": 1,
+          "gpu_sharing": null,
+          "paused_seconds": 0.0,
+          "seconds": 1.1310524940490723,
+          "timing_contaminated": false
+        },
+        "group": 4010897,
+        "group_members": [],
+        "observed_epoch": 1794254723.2502728,
+        "owned_cpu_claim_count": 0,
+        "pgid": 4021527,
+        "pid": 4021527,
+        "recorded_namespace_pid_existence": {
+          "4011130": false,
+          "4011131": false,
+          "4011133": false
+        },
+        "scope": "owned process-group and claim teardown audit",
+        "self_cpu_seconds": 0.155397,
+        "unreadable_process_stats": 0
+      },
+      "sha256": "add4fed3932eaaaa0ccbaf7e9bd4b1364f43339967c92d4f2f4852fbaeb64dc2"
+    },
+    "packet-inspection.json": {
+      "json": {
+        "exists": true,
+        "namespace-receipt.json.started": "{\"namespace_init\": {\"host_pgid\": 4010897, \"host_pid\": 4011131, \"namespace_pid\": 1, \"pid_namespace\": \"pid:[4026537876]\", \"start_ticks\": 693412224}, \"outside_namespace\": \"pid:[4026531836]\", \"schema\": 1, \"target\": \"experiments.tennis.w8_strict_receiver_worker\", \"worker_host_identity\": {\"campaign_pgid\": 4010897, \"host_pgid\": 4010897, \"host_pid\": 4011133, \"start_ticks\": 693412230}}",
+        "self_cpu": 0.029595999999999997,
+        "start.json": "{\"pgid\": 4010897, \"pid\": 4011130, \"started_monotonic\": 6934122.237371761}",
+        "stderr": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"/local/users/emanuele/pointstream/scratch/20261109T200115Z-5c125c3b-smoke/receiver-source/experiments/tennis/w8_strict_receiver_worker.py\", line 213, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"/local/users/emanuele/pointstream/scratch/20261109T200115Z-5c125c3b-smoke/receiver-source/experiments/tennis/w8_strict_receiver_worker.py\", line 207, in main\n    launch(args.config, args.config_sha256, args.loader, args.loader_sha256, args.canary, args.source_root,\n  File \"/local/users/emanuele/pointstream/scratch/20261109T200115Z-5c125c3b-smoke/receiver-source/experiments/tennis/w8_strict_receiver_worker.py\", line 128, in launch\n    extra, leaves = policy.approved_leaves(denied, loader)\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/local/users/emanuele/pointstream/scratch/20261109T200115Z-5c125c3b-smoke/receiver-source/experiments/tennis/w8_cuda_system_leaves.py\", line 288, in approved_leaves\n    raise ValueError('approved leaf is not the expected regular kernel or loader file: ' + name)\nValueError: approved leaf is not the expected regular kernel or loader file: /proc/self/maps\nTraceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"/local/users/emanuele/pointstream/scratch/20261109T200115Z-5c125c3b-smoke/receiver-source/experiments/tennis/w8_witness_namespace.py\", line 228, in <module>\n    main()\n  File \"/local/users/emanuele/pointstream/scratch/20261109T200115Z-5c125c3b-smoke/receiver-source/experiments/tennis/w8_witness_namespace.py\", line 222, in main\n    result = supervise(args.outside, args.timeout, args.receipt, rest[0], rest[1:])\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/local/users/emanuele/pointstream/scratch/20261109T200115Z-5c125c3b-smoke/receiver-source/experiments/tennis/w8_witness_namespace.py\", line 165, in supervise\n    os.kill(-1, signal.SIGKILL)\nProcessLookupError: [Errno 3] No such process\n",
+        "stdout": ""
+      },
+      "sha256": "4568861174d0c7b179a8e49992198c4f54ce85c571af7c496a9dbaf99eef66d7"
+    },
+    "terminal-inspection.json": {
+      "json": {
+        "campaign_error": {
+          "error": "smoke failed with exit code 1",
+          "updated": 1794254510.986992
+        },
+        "command_log_tail": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"/local/users/emanuele/pointstream/sources/20261109T200115Z-5c125c3b/experiments/tennis/w8_witness_cpu_proof_job.py\", line 365, in <module>\n    main()\n  File \"/local/users/emanuele/pointstream/sources/20261109T200115Z-5c125c3b/experiments/tennis/w8_witness_cpu_proof_job.py\", line 352, in main\n    run(Path(os.environ['PS_STAGE_DIR']))\n  File \"/local/users/emanuele/pointstream/sources/20261109T200115Z-5c125c3b/experiments/tennis/w8_witness_cpu_proof_job.py\", line 151, in run\n    prepared = packet.run_proof(stage)\n               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/local/users/emanuele/pointstream/sources/20261109T200115Z-5c125c3b/experiments/tennis/w8_strict_packet_job.py\", line 535, in run_proof\n    usage = host._worker(Path(policies['main']['python']), packet_config, work, 100, 80, root, loader_path,\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/local/users/emanuele/pointstream/sources/20261109T200115Z-5c125c3b/experiments/tennis/w8_strict_host_cost_job.py\", line 350, in _worker\n    raise RuntimeError(f'isolated worker failed; retained {work}')\nRuntimeError: isolated worker failed; retained /local/users/emanuele/pointstream/scratch/20261109T200115Z-5c125c3b-smoke/packet-worker\n",
+        "host": "gpu5.itec.aau.at",
+        "observed_epoch": 1794254639.7434552,
+        "pgid": 4017330,
+        "pid": 4017330,
+        "processes": {
+          "4010893": null,
+          "4010897": null
+        },
+        "request": {
+          "attempt": 1,
+          "budget_seconds": 600.0,
+          "cancel_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261109T200115Z-5c125c3b/cancel.json",
+          "claims": {
+            "claims_dir": "/home/itec/emanuele/Datasets/pointstream-data/jobs/claims",
+            "cpu_threads": 1,
+            "gpu": null,
+            "min_free_memory_mb": 4096
+          },
+          "codex": "codex",
+          "command": [
+            "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+            "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261105T031637Z-2503bb20/experiments/jobs/inbox.py",
+            "campaign",
+            "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261109T200115Z-5c125c3b"
+          ],
+          "contention": {
+            "policy": "stop",
+            "resume_attempts": 0
+          },
+          "cpu_affinity_index": 0,
+          "cwd": "/local/users/emanuele/pointstream/sources/20261109T200115Z-5c125c3b",
+          "deadline_epoch": 1794255864.188435,
+          "fleet_control": {
+            "files": {
+              "experiments/__init__.py": "06f003a15341e1a630da290bb9f66f11bd79de593e85aff33fdd1b548db2cba9",
+              "experiments/jobs/__init__.py": "999dfe9ae372c896e01e55010d27a97b0c6bc2fe6ff22183a1dc121ee3d56633",
+              "experiments/jobs/claims.py": "4ce261cc723de1ff2e4497c5f760d997bf6681f0e7ca75019a53280acbc6b1ef",
+              "experiments/jobs/fleet.py": "ecb7b7bbe4b2f8c3c79e39e77da1de1ae00a3d8a67308b33ff0aad29ff729145",
+              "experiments/jobs/inbox.py": "5dbdc52879729157d2073ad717d731fb7af4563f3ca1330930be96edea97266e",
+              "experiments/jobs/monitor.py": "73671c2892127bf2510b98aee75356f50736d8613f769d5b8e5426b4a821268e",
+              "experiments/jobs/staging.py": "f94156c1d5b9a6bf2ac1ec8c3437a82cd6f36a9085a7f68a6122381b7cfd0422"
+            },
+            "root": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261105T031637Z-2503bb20"
+          },
+          "gpu_sharing": null,
+          "thread": null
+        },
+        "scope": "single existing task terminal inspection; no replay",
+        "self_cpu_seconds": 0.044990999999999996,
+        "staging": {
+          "attempt": 1,
+          "environment": {
+            "bin": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin",
+            "extract": true,
+            "mode": "local-hit",
+            "name": "environment",
+            "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree",
+            "prefix": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree",
+            "python": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+            "seconds": 4.332244873046875,
+            "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+            "source": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz"
+          },
+          "inputs": [
+            {
+              "extract": false,
+              "mode": "local-hit",
+              "name": "packet",
+              "path": "/local/users/emanuele/pointstream/cache/eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4/packet-eff1aca8.psw8",
+              "seconds": 0.002782106399536133,
+              "sha256": "eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4",
+              "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-linux-input-20261101-eff1aca8/packet-eff1aca8.psw8"
+            },
+            {
+              "extract": false,
+              "mode": "local-hit",
+              "name": "profile",
+              "path": "/local/users/emanuele/pointstream/cache/bec98d67280e9f777a0d3cc110baa51ae2bf2c876aefe6b247d9691432f61107/profile-bec98d67.json",
+              "seconds": 6.198883056640625e-05,
+              "sha256": "bec98d67280e9f777a0d3cc110baa51ae2bf2c876aefe6b247d9691432f61107",
+              "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-linux-input-20261101-eff1aca8/profile-bec98d67.json"
+            },
+            {
+              "extract": false,
+              "mode": "local-hit",
+              "name": "oracle",
+              "path": "/local/users/emanuele/pointstream/cache/8047b67694dd64171d2c0d13a9eaff53b18cd833b8fdc45ba054185c382848cc/oracle.json",
+              "seconds": 0.00015616416931152344,
+              "sha256": "8047b67694dd64171d2c0d13a9eaff53b18cd833b8fdc45ba054185c382848cc",
+              "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/oracle.json"
+            },
+            {
+              "extract": false,
+              "mode": "local-hit",
+              "name": "preflight",
+              "path": "/local/users/emanuele/pointstream/cache/ab5f1b932918ae9956f6ef648e36e59c6a1fd9ef6c36a1722a1916b0da63a4c5/bundle.json",
+              "seconds": 6.532669067382812e-05,
+              "sha256": "ab5f1b932918ae9956f6ef648e36e59c6a1fd9ef6c36a1722a1916b0da63a4c5",
+              "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/bundle.json"
+            },
+            {
+              "extract": false,
+              "mode": "local-hit",
+              "name": "identity",
+              "path": "/local/users/emanuele/pointstream/cache/0953c5284ee8dc462d4eb95b7ce49cb9bad68e4d612fce5d167706f954668ebe/identity.json",
+              "seconds": 8.416175842285156e-05,
+              "sha256": "0953c5284ee8dc462d4eb95b7ce49cb9bad68e4d612fce5d167706f954668ebe",
+              "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/identity.json"
+            },
+            {
+              "extract": false,
+              "mode": "local-hit",
+              "name": "guider",
+              "path": "/local/users/emanuele/pointstream/cache/1a8b7c1b4db92980fd977b4fd003c1396bbae9a9cdea00c35d452136d5e4f488/pose_guider.pth",
+              "seconds": 0.010538578033447266,
+              "sha256": "1a8b7c1b4db92980fd977b4fd003c1396bbae9a9cdea00c35d452136d5e4f488",
+              "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/pose_guider.pth"
+            },
+            {
+              "extract": false,
+              "mode": "local-hit",
+              "name": "native_inventory",
+              "path": "/local/users/emanuele/pointstream/cache/cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b/native-v4-receipt-cd6bb8cf.json",
+              "seconds": 7.581710815429688e-05,
+              "sha256": "cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b",
+              "source": "/home/itec/emanuele/Datasets/pointstream-data/w8-witness-20261109/native-v4-receipt-cd6bb8cf.json"
+            }
+          ],
+          "local_root": "/local/users/emanuele/pointstream",
+          "restored_checkpoint": null,
+          "scratch": "/local/users/emanuele/pointstream/scratch/20261109T200115Z-5c125c3b-smoke",
+          "temporary_environment": {
+            "PYTHONPYCACHEPREFIX": "/local/users/emanuele/pointstream/python-cache",
+            "TEMP": "/local/users/emanuele/pointstream/temporary/20261109T200115Z-5c125c3b/smoke/tmp-91613e4d55ac4f06999fb34777832142",
+            "TMP": "/local/users/emanuele/pointstream/temporary/20261109T200115Z-5c125c3b/smoke/tmp-91613e4d55ac4f06999fb34777832142",
+            "TMPDIR": "/local/users/emanuele/pointstream/temporary/20261109T200115Z-5c125c3b/smoke/tmp-91613e4d55ac4f06999fb34777832142"
+          }
+        },
+        "state": {
+          "created": 1794254486.621808,
+          "gpu": null,
+          "gpu_sharing": null,
+          "host_alias": "gpu5",
+          "job_id": "20261109T200115Z-5c125c3b",
+          "remote_status": {
+            "emitted": [
+              "terminal:failed",
+              "decision:63688ea731b159c1be9aa89b8e1154cc"
+            ],
+            "ended": 1794254515.3869781,
+            "exit_code": 1,
+            "last_progress": 1794254515.3869781,
+            "pid": 4010897,
+            "proc_start_time": 1794254505.06,
+            "process_group_id": 4010897,
+            "progress": {
+              "completed": 0,
+              "decision": "smoke failed with exit code 1",
+              "stage": "attention",
+              "updated": 1794254511.0033355
+            },
+            "started": 1794254505.0743861,
+            "status": "failed"
+          },
+          "status": "failed",
+          "supervisor_pid": 4010893,
+          "updated": 1794254565.1592267
+        },
+        "status": {
+          "emitted": [
+            "terminal:failed",
+            "decision:63688ea731b159c1be9aa89b8e1154cc"
+          ],
+          "ended": 1794254515.3869781,
+          "exit_code": 1,
+          "last_progress": 1794254515.3869781,
+          "pid": 4010897,
+          "proc_start_time": 1794254505.06,
+          "process_group_id": 4010897,
+          "progress": {
+            "completed": 0,
+            "decision": "smoke failed with exit code 1",
+            "stage": "attention",
+            "updated": 1794254511.0033355
+          },
+          "started": 1794254505.0743861,
+          "status": "failed"
+        },
+        "task_cpu_claims": []
+      },
+      "sha256": "32dc51c20886a4f3082dd388bb5ea092a266c7b9aeafeb71d49a2dfa147498e6"
+    },
+    "wait.stdout": {
+      "json": {
+        "attention": true,
+        "jobs": [
+          {
+            "attention": true,
+            "events": [
+              {
+                "id": "59fefaa5ec1e5ce7a2cb637e7332c815",
+                "kind": "terminal:failed"
+              },
+              {
+                "id": "2fe62e91d8545c68adb0454230ac2d13",
+                "kind": "decision:63688ea731b159c1be9aa89b8e1154cc"
+              }
+            ],
+            "host": "gpu5",
+            "job_id": "20261109T200115Z-5c125c3b",
+            "minutes_since_progress": 1.1,
+            "minutes_since_start": 1.3,
+            "stage": "attention",
+            "status": "failed",
+            "unacknowledged_event_ids": [
+              "59fefaa5ec1e5ce7a2cb637e7332c815",
+              "2fe62e91d8545c68adb0454230ac2d13"
+            ]
+          }
+        ],
+        "max_seconds": 1320.0,
+        "reason": "attention",
+        "waited_seconds": 6
+      },
+      "sha256": "6d98f3748afa942ea7248ae90094337109220e70132f763ff92970c1bc94a5e7"
+    }
+  },
+  "raw_directory": "/private/tmp/pointstream-w8-f6d2-prepub-20261109-a1",
+  "schema": 1,
+  "scope": "raw CPU infrastructure failure; no GPU, packet proof, quality or promotion",
+  "status": "failed"
+}
