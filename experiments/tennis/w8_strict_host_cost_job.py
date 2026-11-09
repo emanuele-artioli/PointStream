@@ -104,7 +104,7 @@ def stage_inputs(stage: Path, digest_file: Callable[[Path], str] | None = None, 
     profile = spec.get('w8_paired_cost_profile')
     witness_profile = spec.get('w8_witness_profile')
     if witness and (profile is not None or witness_profile not in ('w8-context-pilot-v1', 'w8-context-unit1-v1',
-            'w8-context-qualification-v1', 'w8-full-unit0-v1', 'w8-full-unit1-v1')):
+            'w8-context-qualification-v1', 'w8-full-finish-v1', 'w8-full-unit0-v1', 'w8-full-unit1-v1')):
         raise ValueError('explicit separate context witness profile required')
     if witness and (spec.get('witness_cpu_proof_host') not in ('gpu5', 'gpu6')
                     or spec.get('hosts') != [spec['witness_cpu_proof_host']]
@@ -131,7 +131,7 @@ def stage_inputs(stage: Path, digest_file: Callable[[Path], str] | None = None, 
             or spec.get('environment', {}).get('sha256') != JCV_ENV
             or spec.get('gpu_sharing', {'mode': 'exclusive'}) != {'mode': 'exclusive'}
             or spec.get('contention', {}).get('policy') != 'stop'
-            or not 0 < spec.get('budget_seconds', 0) <= (1500 if witness and witness_profile in ('w8-full-unit0-v1', 'w8-full-unit1-v1')
+            or not 0 < spec.get('budget_seconds', 0) <= (2000 if witness and witness_profile == 'w8-full-finish-v1' else 1500 if witness and witness_profile in ('w8-full-unit0-v1', 'w8-full-unit1-v1')
                                                         else 900 if witness else 800 if profile is not None else 600)):
         raise ValueError('one-core JCV GPU campaign with a valid bounded budget required')
     wanted = {'packet': fixed.WINDOW_SHA, 'profile': fixed.PROFILE_SHA, 'oracle': ORACLE_SHA,
@@ -144,13 +144,19 @@ def stage_inputs(stage: Path, digest_file: Callable[[Path], str] | None = None, 
                 or any(c not in '0123456789abcdef' for c in proof_sha)):
             raise ValueError('root-pinned CPU proof SHA required')
         wanted['cpu_proof'] = proof_sha
-        if witness_profile in ('w8-context-unit1-v1', 'w8-full-unit0-v1', 'w8-full-unit1-v1'):
+        if witness_profile in ('w8-context-unit1-v1', 'w8-full-unit0-v1', 'w8-full-unit1-v1',
+                               'w8-context-qualification-v1', 'w8-full-finish-v1'):
             for name, key in (('promotion', 'witness_promotion_sha256'), ('ledger', 'witness_ledger_sha256')):
                 value = spec.get(key)
                 if not isinstance(value, str) or len(value) != 64 or any(c not in '0123456789abcdef' for c in value):
                     raise ValueError('root-pinned promotion and ledger SHA required')
                 wanted[name] = value
-        if witness_profile == 'w8-context-qualification-v1':
+        if witness_profile in ('w8-context-qualification-v1', 'w8-full-finish-v1'):
+            for name in ('producer_audit', 'producer0', 'producer1'):
+                value = spec.get('witness_' + name + '_sha256')
+                if not isinstance(value, str) or len(value) != 64 or any(c not in '0123456789abcdef' for c in value):
+                    raise ValueError('root-pinned producer audit and archives required')
+                wanted[name] = value
             wanted.update(sam_weights=SAM_SHA,
                           native_inventory='cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b')
     declared = {x['name']: x for x in spec['staged_inputs']}

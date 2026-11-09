@@ -118,18 +118,26 @@ def check_generation(outputs: dict[str, Path], expected: dict[str, dict[str, Any
 
 def check_finish(*, generation_dirs: dict[str, Path], expected: dict[str, dict[str, Any]],
                  base_dir: Path, sam_dir: Path, compose_dir: Path,
-                 trusted: dict[str, Any]) -> dict[str, Any]:
-    """Verify the short smoke separately; it cannot be a full-candidate seal."""
-    generations = check_generation(generation_dirs, expected)
-    ticks = finish.TICKS[:8]
+                 trusted: dict[str, Any], qualification: bool = True) -> dict[str, Any]:
+    """Verify independently bound short-context or complete candidate output."""
+    if qualification:
+        generations = check_generation(generation_dirs, expected)
+    else:
+        if set(generation_dirs) != set(fixed.UNITS) or set(expected) != set(fixed.UNITS):
+            raise ValueError('both complete producer identities required')
+        generations = {unit: generation.validate_sealed(generation_dirs[unit], expected[unit])
+                       for unit in fixed.UNITS}
+    ticks = finish.TICKS[:8] if qualification else finish.TICKS
+    count = len(ticks)
     base = np.load(base_dir / 'base.npy', mmap_mode='r', allow_pickle=False)
     composite = np.load(compose_dir / 'composite.npy', mmap_mode='r', allow_pickle=False)
-    if any(x.shape != (8, 1080, 1920, 3) or x.dtype != np.uint8 for x in (base, composite)):
+    if any(x.shape != (count, 1080, 1920, 3) or x.dtype != np.uint8 for x in (base, composite)):
         raise ValueError('qualification base or composite coverage differs')
     receipts = [json.loads((directory / 'sealed.json').read_text()) for directory in (base_dir, sam_dir, compose_dir)]
     for receipt in receipts:
-        if receipt.get('scope') != 'context_qualification_only':
-            raise ValueError('qualification finish scope differs')
+        if (receipt.get('scope') != 'context_qualification_only' if qualification
+                else receipt.get('scope') is not None):
+            raise ValueError('finish scope differs')
         finish._isolation(receipt['isolation'])
         if (receipt.get('packet_sha256') != fixed.WINDOW_SHA
                 or receipt.get('profile_sha256') != fixed.PROFILE_SHA):
@@ -139,6 +147,7 @@ def check_finish(*, generation_dirs: dict[str, Path], expected: dict[str, dict[s
     if (not isinstance(native, dict) or native != base_seal.get('native')
             or native.get('binary_sha256') != finish.FFMPEG_SHA or native.get('ivf_sha256') != finish.IVF_SHA
             or native.get('yuv_sha256') != '7490edf9b678db805c23baae49a2a3b5e9d7b037b18dd216320aad47a061beff'
+            or base_seal.get('input_sha256', {}).get('yuv') != native.get('yuv_sha256')
             or native.get('exit_code') != 0 or native.get('decoder') != 'libdav1d'
             or native.get('yuv_bytes') != 240 * 480 * 272 * 3 // 2
             or native.get('landlock_abi', 0) < 1 or not native.get('denials')
@@ -185,7 +194,7 @@ def check_finish(*, generation_dirs: dict[str, Path], expected: dict[str, dict[s
         mask = sam_dir / f'{unit}-masks.npz'
         with np.load(mask, allow_pickle=False) as archive:
             if (set(archive.files) != {'t', 'masks'} or not np.array_equal(archive['t'], ticks)
-                    or archive['masks'].shape != (8, 784, 512) or archive['masks'].dtype != bool):
+                    or archive['masks'].shape != (count, 784, 512) or archive['masks'].dtype != bool):
                 raise ValueError('qualification mask coverage differs')
         for receipt in (sam_seal, compose_seal):
             if (receipt.get('files', {}).get(f'crop:{unit}') != fixed.file_sha(crop)
@@ -194,7 +203,17 @@ def check_finish(*, generation_dirs: dict[str, Path], expected: dict[str, dict[s
         if (sam_rows[unit].get('file_sha256') != fixed.file_sha(mask)
                 or compose_seal.get('files', {}).get(f'mask:{unit}') != fixed.file_sha(mask)):
             raise ValueError('qualification SAM mask join differs')
-    return {'scope': 'context_qualification_only', 'ticks': ticks.tolist(), 'units': generations,
+    if not qualification:
+        candidate_paths = {'base': base_dir / 'base.npy', 'base_receipt': base_dir / 'sealed.json',
+                           'composite': compose_dir / 'composite.npy', 'compose_receipt': compose_dir / 'sealed.json',
+                           'sam_receipt': sam_dir / 'sealed.json'}
+        for unit in fixed.UNITS:
+            candidate_paths.update({f'crop:{unit}': generation_dirs[unit] / f'{unit}@match5.npz',
+                                    f'generation_seal:{unit}': generation_dirs[unit] / 'sealed.json',
+                                    f'mask:{unit}': sam_dir / f'{unit}-masks.npz'})
+        finish.validate_candidate_seals(candidate_paths)
+    return {'scope': 'context_qualification_only' if qualification else 'candidate',
+            'ticks': ticks.tolist(), 'units': generations,
             'base_sha256': base_seal['base_sha256'], 'composite_sha256': compose_seal['composite_sha256']}
 
 
@@ -274,7 +293,8 @@ def execute_generation_units(prepared: dict[str, Any], dispatch: dict[str, Any],
 def execute_qualification_finish(prepared: dict[str, Any], generations: dict[str, Any], *,
                                  identity_path: Path, sam_weights: Path, native_output: Path,
                                  dispatch: dict[str, Any], visible: str,
-                                 worker_cpu: int, worker_wall: int) -> dict[str, Any]:
+                                 worker_cpu: int, worker_wall: int,
+                                 qualification: bool = True) -> dict[str, Any]:
     """Join two validated contexts to native RGB, independent SAM and composition.
 
     The native output must already have been produced by the separate fixed
@@ -296,7 +316,13 @@ def execute_qualification_finish(prepared: dict[str, Any], generations: dict[str
     if fixed.file_sha(sam_weights) != finish.SAM_SHA:
         raise ValueError('qualification SAM checkpoint differs')
     outputs, expected = generations['outputs'], generations['expected']
-    check_generation(outputs, expected)
+    if qualification:
+        check_generation(outputs, expected)
+    else:
+        if set(outputs) != set(fixed.UNITS) or set(expected) != set(fixed.UNITS):
+            raise ValueError('both complete producer identities required')
+        for unit in fixed.UNITS:
+            generation.validate_sealed(outputs[unit], expected[unit])
     native_output = native_output.resolve(strict=True)
     if not native_output.is_relative_to(prepared['scratch'].resolve(strict=True)):
         raise ValueError('native output outside this task scratch')
@@ -333,7 +359,7 @@ def execute_qualification_finish(prepared: dict[str, Any], generations: dict[str
             for unit in fixed.UNITS:
                 files[f'mask:{unit}'] = host._item(stage_outputs['sam'] / f'{unit}-masks.npz')
         host.add_clock_source(files, prepared['root'], prepared['code_manifest'])
-        mode = 'context_' + name
+        mode = ('context_' if qualification else '') + name
         config = prepared['config'](mode, files, output, prepared['policies']['main'], worker_cpu,
                                     '' if name == 'compose' else visible)
         if name == 'rgb':
@@ -352,7 +378,8 @@ def execute_qualification_finish(prepared: dict[str, Any], generations: dict[str
                'gpu_name': gpu['name'], 'claimed_gpu_uuid': visible,
                'sam_verified_files': identity['sam_distribution']['verified_files']}
     checked = check_finish(generation_dirs=outputs, expected=expected, base_dir=stage_outputs['rgb'],
-                           sam_dir=stage_outputs['sam'], compose_dir=stage_outputs['compose'], trusted=trusted)
+                           sam_dir=stage_outputs['sam'], compose_dir=stage_outputs['compose'], trusted=trusted,
+                           qualification=qualification)
     return {'outputs': stage_outputs, 'configs': configs, 'usage': usages, 'validation': checked,
             'trusted': trusted}
 
@@ -606,3 +633,62 @@ def run_isolation_proof(prepared: dict[str, Any], *, worker_cpu: int = 40, worke
                         'namespace_path': str(work / 'namespace-receipt.json'),
                         'namespace_started_path': str(work / 'namespace-receipt.json.started')})
     return {'scope': 'cpu_isolation_proof_only', 'runs': records}
+
+
+def recover_audited_producers(prepared: dict[str, Any], audit: dict[str, Any], archives: dict[str, Path], *,
+                              qualification: bool, source: dict[str, Any]) -> dict[str, Any]:
+    """Recover only two pinned producer outputs after the primary audited each job.
+
+    The audit is a root-pinned trust boundary; archive bytes and packet/model
+    identities are rechecked here, while terminal/exclusive job provenance is
+    checked by the primary auditor before pinning it.
+    """
+    import re
+    import shutil
+    import tarfile
+
+    scope = 'context_qualification_only' if qualification else 'candidate'
+    if (audit.get('schema') != 1 or audit.get('scope') != 'root-reviewed W8 producer pair'
+            or audit.get('producer_scope') != scope or audit.get('source_sha256') != source.get('source_sha256')
+            or audit.get('snapshot_sha256') != source.get('snapshot_sha256')
+            or set(archives) != set(fixed.UNITS) or set(audit.get('producers', {})) != set(fixed.UNITS)):
+        raise ValueError('root-pinned producer pair differs')
+    outputs, expected = {}, {}
+    for unit in fixed.UNITS:
+        row = audit['producers'][unit]
+        archive = archives[unit]
+        if (not re.fullmatch(r'\d{8}T\d{6}Z-[0-9a-f]{8}', str(row.get('job_id')))
+                or not re.fullmatch(r'[0-9a-f]{64}', str(row.get('terminal_audit_sha256')))
+                or fixed.file_sha(archive) != row.get('archive_sha256')):
+            raise ValueError('producer job, audit or immutable archive differs')
+        needed = {'sealed.json', f'{unit}@match5.npz', f'{unit}@match5.json', 'decoded-manifest.json'}
+        output = prepared['scratch'] / ('producer-' + unit)
+        output.mkdir()
+        with tarfile.open(archive) as tar:
+            members = tar.getmembers()
+            if (len(members) != len({m.name for m in members}) or any(not m.isfile() for m in members)
+                    or not needed.issubset({m.name for m in members})
+                    or sum(m.size for m in members) > 512 * 1024 * 1024):
+                raise ValueError('producer archive membership or size differs')
+            for name in sorted(needed):
+                member = tar.extractfile(name)
+                if member is None:
+                    raise ValueError('producer archive member missing')
+                with (output / name).open('xb') as target:
+                    shutil.copyfileobj(member, target, 1024 * 1024)
+        generated = dict(prepared['generated'])
+        generated['unit'] = {'sha256': fixed.file_sha(prepared['decoder_out'] / 'publish' / 'units' / f'{unit}.npz')}
+        # The prior decoder manifest includes job-specific isolation paths. Its
+        # identity is separately fixed by the audited producer archive.
+        generated['decoder_manifest'] = {'sha256': fixed.file_sha(output / 'decoded-manifest.json')}
+        expected[unit] = {'unit': unit, 'packet_sha256': fixed.WINDOW_SHA, 'profile_sha256': fixed.PROFILE_SHA,
+                          'tensor_fingerprints': prepared['fingerprints'],
+                          'files': {key: item['sha256'] for key, item in generated.items()}}
+        decoded = json.loads((output / 'decoded-manifest.json').read_text())
+        if (decoded.get('match_tensors') != prepared['fingerprints']
+                or decoded.get('checkpoint_sha256') != generated['checkpoint']['sha256']
+                or decoded.get('unit_sha256') != generation.ORACLE_UNIT_SHA):
+            raise ValueError('prior producer packet and fresh checkpoint differ')
+        (generation.validate_context_qualification if qualification else generation.validate_sealed)(output, expected[unit])
+        outputs[unit] = output
+    return {'outputs': outputs, 'expected': expected, 'producer_audit': audit}

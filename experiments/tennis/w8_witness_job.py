@@ -110,9 +110,16 @@ def load_released_inputs(stage: Path) -> tuple[dict[str, Path], dict[str, Any], 
                 'base': host.BASE_ARCHIVE_SHA, 'aa': host.receiver.AA_ARCHIVE_SHA,
                 **{key: host.receiver.PINNED_WEIGHTS[name] for key, name in host.WEIGHT_NAMES.items()},
                 'cpu_proof': spec['witness_cpu_proof_sha256']}
-    promoted_profiles = ('w8-context-unit1-v1', 'w8-full-unit0-v1', 'w8-full-unit1-v1')
+    promoted_profiles = ('w8-context-unit1-v1', 'w8-full-unit0-v1', 'w8-full-unit1-v1',
+                         'w8-context-qualification-v1', 'w8-full-finish-v1')
     if spec.get('w8_witness_profile') in promoted_profiles:
         expected.update(promotion=spec['witness_promotion_sha256'], ledger=spec['witness_ledger_sha256'])
+    if spec.get('w8_witness_profile') in ('w8-context-qualification-v1', 'w8-full-finish-v1'):
+        from experiments.tennis.w8_receiver_finish import SAM_SHA
+        expected.update(sam_weights=SAM_SHA,
+                        native_inventory='cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b',
+                        **{name: spec['witness_' + name + '_sha256']
+                           for name in ('producer_audit', 'producer0', 'producer1')})
     if (len(declared) != len(spec['staged_inputs']) or len(staged) != len(staging['inputs'])
             or set(declared) != set(expected) | {'preflight', 'identity'} or set(staged) != set(declared)):
         raise ValueError('released staged asset membership differs')
@@ -126,6 +133,8 @@ def load_released_inputs(stage: Path) -> tuple[dict[str, Path], dict[str, Any], 
     small_names = ['preflight', 'identity', 'oracle', 'cpu_proof']
     if spec.get('w8_witness_profile') in promoted_profiles:
         small_names.extend(('promotion', 'ledger'))
+    if spec.get('w8_witness_profile') in ('w8-context-qualification-v1', 'w8-full-finish-v1'):
+        small_names.append('producer_audit')
     paths = {name: Path(staged[name]['source']) for name in small_names}
     if any(fixed.file_sha(path) != expected[name] for name, path in paths.items()):
         raise ValueError('released proof or preflight source differs')
@@ -230,11 +239,29 @@ def promotion_ledger_remaining(ledger: dict[str, Any]) -> tuple[float, float]:
     return result[0], result[1]
 
 
+
+def check_qualification_subcap(ledger: dict[str, Any], gate: dict[str, Any], *,
+                               gpu_cap: float, cpu_cap: float) -> None:
+    """Charge tagged qualification entries once against its cumulative ceiling."""
+    rows = [row for row in ledger['charges'] if row.get('parent_phase') == 'w8-full-witness-staged-20261106']
+    if any(type(row.get('witness_qualification')) is not bool for row in rows):
+        raise ValueError('every parent charge needs explicit qualification attribution')
+    qualified = [row for row in rows if row['witness_qualification']]
+    phases = [row.get('phase') for row in qualified]
+    if (any(not isinstance(phase, str) or not phase for phase in phases)
+            or len(phases) != len(set(phases)) or sorted(phases) != gate.get('qualification_charge_phases')):
+        raise ValueError('qualification charge attribution differs from reviewed gate')
+    for resource, cap, ceiling in (('gpu', gpu_cap, 900), ('cpu', cpu_cap, 1000)):
+        spent = sum(row[resource + '_seconds'] for row in qualified)
+        if gate.get('qualification_' + resource + '_spent_seconds') != spent or spent + cap > ceiling:
+            raise ValueError('qualification cumulative ceiling exceeded')
+
 def _unit1_promotion(paths: dict[str, Path], spec: dict[str, Any], dispatch: dict[str, Any], *,
                      historical: bool = False) -> None:
     gate = json.loads(paths['promotion'].read_text())
     ledger_sha = fixed.file_sha(paths['ledger'])
-    gpu_remaining, cpu_remaining = promotion_ledger_remaining(json.loads(paths['ledger'].read_text()))
+    ledger = json.loads(paths['ledger'].read_text())
+    gpu_remaining, cpu_remaining = promotion_ledger_remaining(ledger)
     if (spec.get('witness_gpu_remaining_seconds') != gpu_remaining
             or spec.get('witness_cpu_remaining_seconds') != cpu_remaining):
         raise ValueError('spec budget differs from active ledger reservation')
@@ -244,6 +271,9 @@ def _unit1_promotion(paths: dict[str, Path], spec: dict[str, Any], dispatch: dic
         ledger_sha=ledger_sha, gpu_remaining=gpu_remaining, cpu_remaining=cpu_remaining,
         reference_epoch=dispatch['started'] if historical else None)
     profile = spec.get('w8_witness_profile')
+    if profile in ('w8-context-unit1-v1', 'w8-context-qualification-v1'):
+        check_qualification_subcap(ledger, gate, gpu_cap=spec['witness_gpu_ceiling_seconds'],
+                                   cpu_cap=spec['witness_cpu_ceiling_seconds'])
     completed = gate.get('completed_artifact_sha256', {})
     if profile == 'w8-context-unit1-v1' and 'unit1_context' in completed:
         raise ValueError('unit-1 context already completed; no replay')
@@ -252,7 +282,12 @@ def _unit1_promotion(paths: dict[str, Path], spec: dict[str, Any], dispatch: dic
         if (target in completed or 'unit1_context' not in completed
                 or not _sha(gate.get('qualification_receipt_sha256'))):
             raise ValueError('qualification incomplete or producer already completed')
-    component = ('unit1_context' if profile == 'w8-context-unit1-v1' else
+    if profile in ('w8-context-qualification-v1', 'w8-full-finish-v1'):
+        needed = {'unit1_context'} if profile == 'w8-context-qualification-v1' else {'unit0_full', 'unit1_full'}
+        if not needed.issubset(completed) or 'native_sam_compose' in completed:
+            raise ValueError('finish producers incomplete or finish already completed')
+    component = ('native_sam_compose' if profile in ('w8-context-qualification-v1', 'w8-full-finish-v1') else
+                 'unit1_context' if profile == 'w8-context-unit1-v1' else
                  'unit1_full' if profile == 'w8-full-unit1-v1' else 'unit0_full')
     if (gate['remaining_components'][component]['gpu_seconds'] < spec['witness_gpu_ceiling_seconds']
             or gate['remaining_components'][component]['cpu_seconds'] < spec['witness_cpu_ceiling_seconds']):
@@ -434,6 +469,31 @@ def run_pilot(stage: Path, *, unit1: bool = False, candidate: bool = False) -> N
         os.fsync(stream.fileno())
 
 
+
+
+def check_stage_evidence(stage: Path, dispatch: dict[str, Any], *, terminal: bool) -> None:
+    """Reject contaminated timing and require canonical terminal state for post-stage reuse."""
+    execution = json.loads((stage / 'execution.json').read_text())
+    if (execution.get('exit_code') != 0 or execution.get('timing_contaminated') is not False
+            or execution.get('contention') != [] or execution.get('gpu_sharing') != {'mode': 'exclusive'}):
+        raise ValueError('stage execution is incomplete or GPU timing contaminated')
+    if terminal:
+        state = json.loads((stage.parent / 'state.json').read_text())
+        gate = json.loads((stage.parent / 'gate.json').read_text())
+        spec = json.loads((stage.parent / 'spec.json').read_text())
+        if (state.get('status') != 'complete' or state.get('job_id') != stage.parent.name
+                or gate.get('passed') is not True or gate.get('inputs') != spec.get('inputs')
+                or gate.get('source_sha256') != dispatch.get('code', {}).get('source_sha256')):
+            raise ValueError('canonical terminal completion or smoke gate differs')
+
+def require_original_host(dispatch: dict[str, Any]) -> None:
+    """PID/start-tick absence is meaningful only on the producer's host."""
+    import socket
+
+    recorded = (dispatch.get('environment') or {}).get('host')
+    if not isinstance(recorded, str) or not recorded or socket.getfqdn().lower() != recorded.lower():
+        raise ValueError('offline audit must run on the original fleet host')
+
 def validate_pilot(stage: Path, target: Path) -> None:
     """Independently reopen the sealed context or full producer artifact."""
     import os
@@ -444,6 +504,7 @@ def validate_pilot(stage: Path, target: Path) -> None:
 
     try:
         paths, spec, dispatch = load_released_inputs(stage)
+        check_stage_evidence(stage, dispatch, terminal=stage.name == 'full')
         profile = spec.get('w8_witness_profile')
         candidate = profile in ('w8-full-unit0-v1', 'w8-full-unit1-v1')
         unit1 = profile in ('w8-context-unit1-v1', 'w8-full-unit1-v1')
@@ -588,6 +649,7 @@ def validate_pilot(stage: Path, target: Path) -> None:
             raise ValueError('pilot physical GPU identity receipt differs')
         claimed = dispatch['environment']['gpu']['uuid']
         host.check_gpu_binding(gpu, seal, claimed, dispatch, manifest['files'])
+        require_original_host(dispatch)
         group = json.loads((stage.parent / 'run/status.json').read_text())['process_group_id']
         outside = os.readlink('/proc/self/ns/pid')
         for name, module, usage_key in (('packet-namespace.json', 'experiments.tennis.w8_strict_receiver_worker', 'packet_usage'),
@@ -663,7 +725,8 @@ def make_unit1_spec(*, deadline: str, proof_local: Path, proof_remote: str,
     for remote in (promotion_remote, ledger_remote):
         if not Path(remote).is_absolute() or not Path(remote).is_relative_to(Path('/home/itec/emanuele/Datasets/pointstream-data')):
             raise ValueError('promotion and ledger must have shared-data paths')
-    gpu_remaining, cpu_remaining = promotion_ledger_remaining(json.loads(ledger_local.read_text()))
+    ledger = json.loads(ledger_local.read_text())
+    gpu_remaining, cpu_remaining = promotion_ledger_remaining(ledger)
     check_promotion(gate, gate_sha=promotion_sha, expected_sha=promotion_sha,
                     source={'source_sha256': gate.get('source_sha256'), 'snapshot_sha256': gate.get('snapshot_sha256')},
                     cpu_gate_sha=spec['witness_cpu_proof_sha256'], prior_artifact_sha=prior_artifact_sha,
@@ -675,6 +738,22 @@ def make_unit1_spec(*, deadline: str, proof_local: Path, proof_remote: str,
     spec['witness_prior_artifact_sha256'] = prior_artifact_sha
     spec['witness_gpu_remaining_seconds'] = gate['gpu_remaining_seconds']
     spec['witness_cpu_remaining_seconds'] = gate['cpu_remaining_seconds']
+    if not _for_candidate:
+        gpu_cap = gate.get('qualification_next_gpu_ceiling_seconds')
+        cpu_cap = gate.get('qualification_next_cpu_ceiling_seconds')
+        if (type(gpu_cap) is not int or type(cpu_cap) is not int or not 250 <= gpu_cap <= 900
+                or not 341 <= cpu_cap <= 1000):
+            raise ValueError('explicit bounded qualification stage ceilings required')
+        spec['witness_gpu_ceiling_seconds'], spec['witness_cpu_ceiling_seconds'] = gpu_cap, cpu_cap
+        spec['witness_external_gpu_seconds'] = 50
+        spec['budget_seconds'] = gpu_cap - 50
+        spec['smoke']['seconds'] = min(580, spec['budget_seconds'] - 65)
+        spec['witness_caps']['generator_wall'] = min(310, spec['smoke']['seconds'] - 145)
+        spec['witness_caps']['generator_cpu'] = min(300, cpu_cap - 340)
+        if spec['witness_caps']['generator_wall'] < 11:
+            raise ValueError('qualification stage wall ceiling too small')
+        check_qualification_subcap(ledger, gate, gpu_cap=spec['witness_gpu_ceiling_seconds'],
+                                   cpu_cap=spec['witness_cpu_ceiling_seconds'])
     if not _for_candidate and (gate['remaining_components']['unit1_context']['gpu_seconds'] < spec['witness_gpu_ceiling_seconds']
             or gate['remaining_components']['unit1_context']['cpu_seconds'] < spec['witness_cpu_ceiling_seconds']):
         raise ValueError('forecast does not reserve unit-1 inclusive caps')
@@ -778,6 +857,452 @@ def validate_readiness(stage: Path, target: Path) -> None:
         raise
 
 
+def _finish_spec(spec: dict[str, Any], *, qualification: bool, reference_epoch: float | None = None) -> None:
+    """Reject altered finish profiles, budgets and dispatch before running any work."""
+    _check_deadline(spec, reference_epoch=reference_epoch)
+    profile = 'w8-context-qualification-v1' if qualification else 'w8-full-finish-v1'
+    if qualification:
+        gpu = spec.get('witness_gpu_ceiling_seconds')
+        cpu = spec.get('witness_cpu_ceiling_seconds')
+        caps = spec.get('witness_caps', {})
+        if (type(gpu) is not int or type(cpu) is not int or not 350 <= gpu <= 900
+                or not 350 <= cpu <= 1000 or not isinstance(caps, dict)
+                or set(caps) != {'parent_cpu', 'packet_cpu', 'native_cpu', 'native_wall', 'worker_cpu', 'worker_wall', 'external_cpu'}
+                or caps.get('parent_cpu') != 30 or caps.get('packet_cpu') != 100
+                or caps.get('native_cpu') != 30 or caps.get('native_wall') != 40 or caps.get('external_cpu') != 100
+                or type(caps.get('worker_cpu')) is not int or not 1 <= caps['worker_cpu'] <= 100
+                or type(caps.get('worker_wall')) is not int or not 11 <= caps['worker_wall'] <= 110
+                or spec.get('budget_seconds') != gpu - 30 or gpu - 30 + 100 > cpu
+                or spec.get('full', {}).get('seconds') != spec['budget_seconds'] - 110
+                or 195 + 3 * caps['worker_wall'] > spec['full']['seconds']):
+            raise ValueError('qualification finish limits do not fit inclusive ceilings')
+        full_seconds, campaign, ceiling = spec['full']['seconds'], spec['budget_seconds'], gpu
+    else:
+        full_seconds, campaign, ceiling = 1700, 1770, 1800
+        caps = {'parent_cpu': 30, 'packet_cpu': 100, 'native_cpu': 30, 'native_wall': 40,
+                'worker_cpu': 450, 'worker_wall': 460, 'external_cpu': 100}
+    if (spec.get('w8_witness_profile') != profile or spec.get('entrypoint') != ['-m', 'experiments.tennis.w8_witness_job']
+            or spec.get('arguments') != ['{phase}']
+            or spec.get('scale') != {'phase': {'smoke': 'finish-readiness', 'full': 'finish-context' if qualification else 'finish-candidate'}}
+            or spec.get('smoke', {}).get('seconds') != 60 or spec.get('full', {}).get('seconds') != full_seconds
+            or spec.get('budget_seconds') != campaign or spec.get('validator_seconds') != 50
+            or spec.get('witness_gpu_ceiling_seconds') != ceiling
+            or (not qualification and spec.get('witness_cpu_ceiling_seconds') != ceiling)
+            or spec.get('witness_caps') != caps or spec.get('witness_cpu_proof_host') not in ('gpu5', 'gpu6')
+            or spec.get('hosts') != [spec['witness_cpu_proof_host']] or spec.get('gpu_models') != ['RTX 6000 Ada']
+            or spec.get('contention') != {'policy': 'stop', 'resume_attempts': 0}
+            or spec.get('validator') != ['{python}', '-m', 'experiments.tennis.w8_witness_job', 'finish-readiness-validate']):
+        raise ValueError('finish fixed dispatch or inclusive bounds differ')
+    if any(not _sha(spec.get('witness_' + name + '_sha256')) for name in ('producer_audit', 'producer0', 'producer1')):
+        raise ValueError('exact audited producer artifacts required')
+
+
+def make_finish_spec(*, deadline: str, proof_local: Path, proof_remote: str, promotion_local: Path,
+                     promotion_remote: str, ledger_local: Path, ledger_remote: str,
+                     producer_audit_local: Path, producer_audit_remote: str, producer0_local: Path,
+                     producer0_remote: str, producer1_local: Path, producer1_remote: str,
+                     sam_remote: str, native_inventory_remote: str, qualification: bool) -> dict[str, Any]:
+    """Prepare a review-only stage, requiring a separately pinned producer audit."""
+    from experiments.tennis.w8_receiver_finish import SAM_SHA
+    audit_sha = fixed.file_sha(producer_audit_local)
+    spec = make_unit1_spec(deadline=deadline, proof_local=proof_local, proof_remote=proof_remote,
+        promotion_local=promotion_local, promotion_remote=promotion_remote, ledger_local=ledger_local,
+        ledger_remote=ledger_remote, prior_artifact_sha=audit_sha, _for_candidate=True)
+    spec['w8_witness_profile'] = 'w8-context-qualification-v1' if qualification else 'w8-full-finish-v1'
+    spec['scale'] = {'phase': {'smoke': 'finish-readiness', 'full': 'finish-context' if qualification else 'finish-candidate'}}
+    spec['smoke'] = {'seconds': 60, 'representative_basis': 'Exact reviewed source, producer and remaining-budget readiness.'}
+    spec['full'] = {'seconds': 500 if qualification else 1700}
+    spec['budget_seconds'] = 570 if qualification else 1770
+    spec['validator_seconds'] = 50
+    spec['witness_gpu_ceiling_seconds'] = spec['witness_cpu_ceiling_seconds'] = 600 if qualification else 1800
+    spec['witness_external_gpu_seconds'] = 30
+    spec['witness_caps'] = {'parent_cpu': 30, 'packet_cpu': 100, 'native_cpu': 30, 'native_wall': 40,
+                            'worker_cpu': 100 if qualification else 450,
+                            'worker_wall': 110 if qualification else 460, 'external_cpu': 100}
+    spec['validator'] = ['{python}', '-m', 'experiments.tennis.w8_witness_job', 'finish-readiness-validate']
+    if qualification:
+        gate = json.loads(promotion_local.read_text())
+        gpu = gate.get('qualification_next_gpu_ceiling_seconds')
+        cpu = gate.get('qualification_next_cpu_ceiling_seconds')
+        if type(gpu) is not int or type(cpu) is not int or not 350 <= gpu <= 900 or not 350 <= cpu <= 1000:
+            raise ValueError('explicit qualification finish ceilings required')
+        spec['witness_gpu_ceiling_seconds'], spec['witness_cpu_ceiling_seconds'] = gpu, cpu
+        spec['budget_seconds'] = gpu - 30
+        spec['full']['seconds'] = spec['budget_seconds'] - 110
+        spec['witness_caps']['worker_wall'] = min(110, (spec['full']['seconds'] - 195) // 3)
+        spec['witness_caps']['worker_cpu'] = min(100, spec['witness_caps']['worker_wall'])
+    additions = [('producer_audit', producer_audit_remote, audit_sha),
+                 ('producer0', producer0_remote, fixed.file_sha(producer0_local)),
+                 ('producer1', producer1_remote, fixed.file_sha(producer1_local)),
+                 ('sam_weights', sam_remote, SAM_SHA),
+                 ('native_inventory', native_inventory_remote, 'cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b')]
+    for name, path, digest in additions:
+        permitted = (Path('/home/itec/emanuele/Models') if name == 'sam_weights'
+                     else Path('/home/itec/emanuele/Datasets/pointstream-data'))
+        if not Path(path).is_absolute() or not Path(path).is_relative_to(permitted):
+            raise ValueError('finish input requires its registered storage root')
+        if name.startswith('producer'):
+            spec['witness_' + name + '_sha256'] = digest
+        spec['staged_inputs'].append({'name': name, 'path': path, 'sha256': digest, 'extract': False})
+        spec['inputs'].append({'path': path, 'sha256': digest})
+    _finish_spec(spec, qualification=qualification)
+    gate = json.loads(promotion_local.read_text())
+    if qualification:
+        check_qualification_subcap(json.loads(ledger_local.read_text()), gate,
+                                   gpu_cap=spec['witness_gpu_ceiling_seconds'],
+                                   cpu_cap=spec['witness_cpu_ceiling_seconds'])
+    completed = gate.get('completed_artifact_sha256', {})
+    needed = {'unit1_context'} if qualification else {'unit0_full', 'unit1_full'}
+    component = gate['remaining_components']['native_sam_compose']
+    if (not needed.issubset(completed) or 'native_sam_compose' in completed
+            or any(component[k] < spec['witness_' + k.replace('_seconds', '_ceiling_seconds')]
+                   for k in ('gpu_seconds', 'cpu_seconds'))):
+        raise ValueError('finish forecast or required producers incomplete')
+    from experiments.jobs.inbox import validate_spec
+    validate_spec(spec)
+    return spec
+
+def finish_readiness(stage: Path, *, loaded: tuple[dict[str, Path], dict[str, Any], dict[str, Any]] | None = None) -> dict[str, Any]:
+    paths, spec, dispatch = load_inputs(stage) if loaded is None else loaded
+    qualification = spec.get('w8_witness_profile') == 'w8-context-qualification-v1'
+    _finish_spec(spec, qualification=qualification)
+    _unit1_promotion(paths, spec, dispatch)
+    audit = json.loads(paths['producer_audit'].read_text())
+    expected_scope = 'context_qualification_only' if qualification else 'candidate'
+    if (audit.get('scope') != 'root-reviewed W8 producer pair' or audit.get('producer_scope') != expected_scope
+            or audit.get('source_sha256') != dispatch['code']['source_sha256']
+            or audit.get('snapshot_sha256') != dispatch['code']['snapshot_sha256']
+            or fixed.file_sha(paths['producer_audit']) != spec['witness_prior_artifact_sha256']
+            or set(audit.get('producers', {})) != set(fixed.UNITS)):
+        raise ValueError('producer audit and source binding differ')
+    for index, unit in enumerate(fixed.UNITS):
+        if audit['producers'][unit].get('archive_sha256') != spec[f'witness_producer{index}_sha256']:
+            raise ValueError('producer archive differs from pinned audit')
+    return {'scope': expected_scope, 'source_sha256': dispatch['code']['source_sha256'],
+            'producer_audit_sha256': fixed.file_sha(paths['producer_audit']),
+            'producer_archives': [spec['witness_producer0_sha256'], spec['witness_producer1_sha256']]}
+
+
+def run_finish_readiness(stage: Path) -> None:
+    import os
+    if stage.name != 'smoke' or os.environ.get('PS_STAGE') != 'smoke':
+        raise ValueError('finish readiness belongs to the smoke stage')
+    result = finish_readiness(stage)
+    output = Path(os.environ['PS_SCRATCH_DIR']) / 'publish'
+    output.mkdir()
+    with (output / 'summary.json').open('x') as stream:
+        json.dump(result, stream, sort_keys=True)
+
+
+
+def read_finish_publication(path: Path, *, maximum: int) -> dict[str, Any]:
+    """Read the exact archive produced by the fleet publication helper."""
+    import tarfile
+
+    with tarfile.open(path) as tar:
+        members = tar.getmembers()
+        if (len(members) != 2 or {entry.name for entry in members} != {'publish', 'publish/summary.json'}
+                or not next(entry for entry in members if entry.name == 'publish').isdir()):
+            raise ValueError('finish publication membership differs')
+        entry = next(entry for entry in members if entry.name == 'publish/summary.json')
+        if not entry.isfile() or entry.size > maximum:
+            raise ValueError('finish publication summary differs')
+        content = tar.extractfile(entry)
+        if content is None:
+            raise ValueError('finish publication summary missing')
+        result = json.load(content)
+        if not isinstance(result, dict):
+            raise ValueError('finish publication summary is not an object')
+        return result
+
+def validate_finish_readiness(stage: Path, target: Path) -> None:
+    import os
+    paths, spec, dispatch = load_released_inputs(stage)
+    qualification = spec.get('w8_witness_profile') == 'w8-context-qualification-v1'
+    _finish_spec(spec, qualification=qualification, reference_epoch=dispatch['started'])
+    _unit1_promotion(paths, spec, dispatch, historical=True)
+    check_stage_evidence(stage, dispatch, terminal=False)
+    staging = json.loads((stage / 'staging.json').read_text())
+    publication = stage / 'published.tar'
+    if fixed.file_sha(publication) != staging['published']['sha256']:
+        raise ValueError('finish readiness publication differs')
+    result = read_finish_publication(publication, maximum=10000)
+    if (result.get('producer_audit_sha256') != spec['witness_producer_audit_sha256']
+            or result.get('producer_archives') != [spec['witness_producer0_sha256'], spec['witness_producer1_sha256']]
+            or result.get('source_sha256') != dispatch['code']['source_sha256']
+            or result.get('scope') != ('context_qualification_only' if qualification else 'candidate')):
+        raise ValueError('finish readiness summary differs')
+    with target.open('x') as output_stream:
+        json.dump({'passed': True, 'scope': 'readiness only',
+                   'checks': {'source_producers_and_budget': True}}, output_stream)
+        output_stream.flush()
+        os.fsync(output_stream.fileno())
+
+
+def run_finish(stage: Path, *, qualification: bool) -> None:
+    import os
+    import resource
+    import sys
+    import time
+    from experiments.tennis import w8_witness_profile as witness
+
+    if stage.name != 'full' or os.environ.get('PS_STAGE') != 'full' or sys.platform != 'linux' or len(os.sched_getaffinity(0)) != 1:
+        raise ValueError('one-core Linux finish full stage required')
+    started = time.monotonic()
+    paths, spec, dispatch = load_inputs(stage)
+    _finish_spec(spec, qualification=qualification)
+    _unit1_promotion(paths, spec, dispatch)
+    finish_readiness(stage, loaded=(paths, spec, dispatch))
+    caps = spec['witness_caps']
+    resource.setrlimit(resource.RLIMIT_CPU, (caps['parent_cpu'], 3600))
+    host.require_gpu_uuid_api(__import__('torch'))
+    prepared = host.prepare_receiver_inputs(paths, spec, packet_cpu=caps['packet_cpu'],
+        materialize_profile=True, clock_profile=True, digests=host.StableDigests(), witness=True)
+    archives = {unit: paths[f'producer{index}'] for index, unit in enumerate(fixed.UNITS)}
+    generations = witness.recover_audited_producers(prepared, json.loads(paths['producer_audit'].read_text()),
+                                                   archives, qualification=qualification, source=dispatch['code'])
+    native = witness.execute_native_base(prepared, inventory_path=paths['native_inventory'],
+        parent_cpu=caps['native_cpu'], worker_cpu=caps['native_cpu'], child_cpu=caps['native_cpu'], wall=caps['native_wall'])
+    result = witness.execute_qualification_finish(prepared, generations, identity_path=paths['identity'],
+        sam_weights=paths['sam_weights'], native_output=native['output'], dispatch=dispatch,
+        visible=os.environ.get('CUDA_VISIBLE_DEVICES', ''), worker_cpu=caps['worker_cpu'],
+        worker_wall=caps['worker_wall'], qualification=qualification)
+    retained = stage / 'w8-finish-retained'
+    retained.mkdir()
+    named = {'producer-audit.json': paths['producer_audit'], 'protected-identity.json': prepared['protected_path'],
+             'loader-identity.json': prepared['loader_receipt'], 'native-sealed.json': native['output'] / 'sealed.json',
+             'packet-config.json': prepared['decoder_work'] / 'worker-config.json',
+             'packet-decoded.json': prepared['decoder_manifest'],
+             'packet-cpu-only.json': prepared['decoder_out'] / 'cpu-only.json',
+             'packet-checkpoint.pt': prepared['decoder_out'] / 'decoded.pt',
+             **{f'packet/{unit}.npz': prepared['decoder_out'] / 'publish' / 'units' / f'{unit}.npz'
+                for unit in fixed.UNITS},
+             'packet-namespace.json': prepared['decoder_work'] / 'namespace-receipt.json',
+             'packet-namespace.json.started': prepared['decoder_work'] / 'namespace-receipt.json.started'}
+    for name, path in native['receipt_paths'].items():
+        basename = {'namespace_started': 'namespace.json.started', 'namespace_final': 'namespace.json'}.get(name, name + '.json')
+        named['native/' + basename] = Path(path)
+    for unit in fixed.UNITS:
+        for name in ('sealed.json', f'{unit}@match5.npz', f'{unit}@match5.json', 'decoded-manifest.json'):
+            named[f'{unit}/{name}'] = generations['outputs'][unit] / name
+    for name, output in result['outputs'].items():
+        output_files = {'rgb': ('sealed.json', 'base.npy'),
+                        'sam': ('sealed.json', *(f'{unit}-masks.npz' for unit in fixed.UNITS)),
+                        'compose': ('sealed.json', 'composite.npy')}[name]
+        for child in output_files:
+            named[f'{name}/{child}'] = output / child
+        work = prepared['scratch'] / f'witness-finish-{name}'
+        for record in ('worker-config.json', 'namespace-receipt.json', 'namespace-receipt.json.started'):
+            named[f'{name}/{record}'] = work / record
+    for name, source in named.items():
+        target = retained / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        host.copy_new(source, target)
+    with (retained / 'source-manifest.json').open('x') as stream:
+        json.dump(prepared['code_manifest'], stream, sort_keys=True)
+    named['source-manifest.json'] = retained / 'source-manifest.json'
+    summary = {'scope': 'context_qualification_only' if qualification else 'candidate',
+               'producer_audit_sha256': fixed.file_sha(paths['producer_audit']),
+               'members': {name: fixed.file_sha(retained / name) for name in named},
+               'expected': generations['expected'], 'trusted': result['trusted'], 'validation': result['validation'],
+               'usage': result['usage'], 'packet_usage': prepared['packet_usage'], 'native_usage': native['usage'],
+               'source_sha256': dispatch['code']['source_sha256'], 'snapshot_sha256': dispatch['code']['snapshot_sha256'],
+               'elapsed_seconds': time.monotonic() - started, 'automatic_promotion': False}
+    output = prepared['scratch'] / 'publish'
+    output.mkdir()
+    with (output / 'summary.json').open('x') as stream:
+        json.dump(summary, stream, sort_keys=True, allow_nan=False)
+        stream.flush()
+        os.fsync(stream.fileno())
+
+def validate_finish(stage: Path, target: Path) -> None:
+    """Reopen retained bytes and independently bind producers, workers and finish."""
+    import hashlib
+    import os
+    import tarfile
+    from experiments.tennis import w8_receiver_generate as generation
+    from experiments.tennis import w8_witness_namespace as namespace
+    from experiments.tennis import w8_witness_profile as witness
+
+    paths, spec, dispatch = load_released_inputs(stage)
+    qualification = spec.get('w8_witness_profile') == 'w8-context-qualification-v1'
+    _finish_spec(spec, qualification=qualification, reference_epoch=dispatch['started'])
+    _unit1_promotion(paths, spec, dispatch, historical=True)
+    check_stage_evidence(stage, dispatch, terminal=True)
+    staging = json.loads((stage / 'staging.json').read_text())
+    publication = stage / 'published.tar'
+    if fixed.file_sha(publication) != staging['published']['sha256']:
+        raise ValueError('finish publication SHA differs')
+    summary = read_finish_publication(publication, maximum=5_000_000)
+    retained = stage / 'w8-finish-retained'
+    members = summary.get('members')
+    if (retained.is_symlink() or not retained.is_dir() or not isinstance(members, dict) or not members
+            or any(not isinstance(name, str) or Path(name).is_absolute() or '..' in Path(name).parts
+                   or not _sha(digest) or (retained / name).is_symlink()
+                   or fixed.file_sha(retained / name) != digest for name, digest in members.items())
+            or summary.get('scope') != ('context_qualification_only' if qualification else 'candidate')
+            or summary.get('automatic_promotion') is not False
+            or summary.get('source_sha256') != dispatch['code']['source_sha256']
+            or summary.get('snapshot_sha256') != dispatch['code']['snapshot_sha256']
+            or summary.get('producer_audit_sha256') != spec['witness_producer_audit_sha256']
+            or fixed.file_sha(retained / 'producer-audit.json') != spec['witness_producer_audit_sha256']):
+        raise ValueError('finish retained member or source binding differs')
+    import math
+    elapsed = summary.get('elapsed_seconds')
+    if (isinstance(elapsed, bool) or not isinstance(elapsed, (int, float))
+            or not math.isfinite(elapsed) or not 0 < elapsed <= spec['full']['seconds']):
+        raise ValueError('finish elapsed wall exceeds its fixed stage')
+    caps = spec['witness_caps']
+    for name in ('rgb', 'sam', 'compose'):
+        usage = summary.get('usage', {}).get(name, {})
+        if (usage.get('status') != 0 or usage.get('timed_out') is not False
+                or usage.get('canaries_preserved') is not True
+                or any(isinstance(usage.get(key), bool) or not isinstance(usage.get(key), (int, float))
+                       or not math.isfinite(usage[key]) or usage[key] < 0 for key in ('cpu_seconds', 'wall_seconds'))
+                or usage['cpu_seconds'] > caps['worker_cpu'] or usage['wall_seconds'] > caps['worker_wall']):
+            raise ValueError('finish worker bounds or canary differ')
+    native_usage = summary.get('native_usage', {})
+    if (native_usage.get('status') != 0 or native_usage.get('timed_out') is not False
+            or not isinstance(native_usage.get('wall_seconds'), (int, float))
+            or not 0 <= native_usage['wall_seconds'] <= caps['native_wall'] + 25):
+        raise ValueError('native finish bounds differ')
+    manifest = json.loads((retained / 'source-manifest.json').read_text())
+    files = manifest['files']
+    if hashlib.sha256(json.dumps(files, sort_keys=True, separators=(',', ':')).encode()).hexdigest() != manifest['manifest_sha256']:
+        raise ValueError('finish source manifest differs')
+    with tarfile.open(stage.parent / 'source.tar') as source_tar:
+        if fixed.file_sha(stage.parent / 'source.tar') != dispatch['code']['snapshot_sha256']:
+            raise ValueError('finish source archive differs')
+        for name, digest in files.items():
+            entry = source_tar.getmember(name)
+            stream = source_tar.extractfile(entry) if entry.isfile() else None
+            if stream is None or hashlib.sha256(stream.read()).hexdigest() != digest:
+                raise ValueError('finish source member differs')
+    identity = json.loads(paths['identity'].read_text())
+    preflight = json.loads(paths['preflight'].read_text())
+    host.check_preflight_bundle(preflight, paths['identity'])
+    host.packet_audit.reconcile_protected_identity(identity, json.loads((retained / 'protected-identity.json').read_text()))
+    fingerprints = host.read_oracle(paths['oracle'])
+    decoded = json.loads((retained / 'packet-decoded.json').read_text())
+    packet_config = json.loads((retained / 'packet-config.json').read_text())
+    loader_path = retained / 'loader-identity.json'
+    loader = json.loads(loader_path.read_text())
+    host.packet_audit.check_grants(packet_config, preflight['runtimes']['main'])
+    host.packet_audit.check_isolation(packet_config, decoded['isolation'], loader, manifest, fixed.file_sha(loader_path))
+    cpu_only = json.loads((retained / 'packet-cpu-only.json').read_text())
+    if (cpu_only.get('cuda_visible_devices') != '' or cpu_only.get('cuda_initialized_after_decode') is not False
+            or cpu_only.get('pre_serialization', {}).get('state_tensors') != 480
+            or cpu_only.get('pre_serialization', {}).get('restored_tensors') != 480
+            or decoded.get('match_tensors') != fingerprints or decoded.get('unit_sha256') != generation.ORACLE_UNIT_SHA
+            or generation.verify_serialized_match(retained / 'packet-checkpoint.pt', fingerprints) != decoded['checkpoint_sha256']):
+        raise ValueError('finish packet CPU and decoded checkpoint differ')
+    audit = json.loads((retained / 'producer-audit.json').read_text())
+    expected_scope = 'context_qualification_only' if qualification else 'candidate'
+    if (audit.get('scope') != 'root-reviewed W8 producer pair' or audit.get('producer_scope') != expected_scope
+            or audit.get('source_sha256') != dispatch['code']['source_sha256']
+            or audit.get('snapshot_sha256') != dispatch['code']['snapshot_sha256']
+            or set(audit.get('producers', {})) != set(fixed.UNITS)):
+        raise ValueError('finish producer audit differs')
+    expected = summary['expected']
+    staged = {item['name']: item for item in staging['inputs']}
+    for index, unit in enumerate(fixed.UNITS):
+        producer = Path(staged[f'producer{index}']['source'])
+        if fixed.file_sha(producer) != spec[f'witness_producer{index}_sha256']:
+            raise ValueError('audited producer archive bytes differ')
+        with tarfile.open(producer) as tar:
+            for name in ('sealed.json', f'{unit}@match5.npz', f'{unit}@match5.json', 'decoded-manifest.json'):
+                entry = tar.getmember(name)
+                source = tar.extractfile(entry) if entry.isfile() else None
+                if source is None:
+                    raise ValueError('audited producer member unavailable')
+                digest = hashlib.sha256()
+                while chunk := source.read(1024 * 1024):
+                    digest.update(chunk)
+                if digest.hexdigest() != fixed.file_sha(retained / unit / name):
+                    raise ValueError('retained producer differs from audited archive')
+            entry = tar.getmember('generator-config.json')
+            source = tar.extractfile(entry) if entry.isfile() else None
+            if source is None:
+                raise ValueError('audited producer config missing')
+            producer_config = json.load(source)
+            if {key: value['sha256'] for key, value in producer_config['files'].items()} != expected[unit]['files']:
+                raise ValueError('producer input identities differ')
+        if (audit['producers'][unit].get('archive_sha256') != spec[f'witness_producer{index}_sha256']
+                or expected[unit]['tensor_fingerprints'] != fingerprints
+                or expected[unit]['files']['checkpoint'] != decoded['checkpoint_sha256']
+                or expected[unit]['files']['unit'] != generation.ORACLE_UNIT_SHA[unit]
+                or fixed.file_sha(retained / 'packet' / f'{unit}.npz') != generation.ORACLE_UNIT_SHA[unit]
+                or expected[unit]['files']['decoder_manifest'] != fixed.file_sha(retained / unit / 'decoded-manifest.json')):
+            raise ValueError('finish producer and fresh packet identities differ')
+    from experiments.tennis.w8_cuda_system_leaves import canonical_gpu_uuid
+
+    trusted = summary['trusted']
+    if (trusted.get('sam_record_sha256') != fixed.file_sha(paths['identity'])
+            or trusted.get('protected_record_sha256') != fixed.file_sha(retained / 'protected-identity.json')
+            or trusted.get('sam_verified_files') != identity['sam_distribution']['verified_files']
+            or trusted.get('native_receipt') != json.loads((retained / 'native-sealed.json').read_text())
+            or trusted.get('gpu_name') != dispatch['environment']['gpu']['name']
+            or canonical_gpu_uuid(trusted.get('claimed_gpu_uuid', ''))
+               != canonical_gpu_uuid(dispatch['environment']['gpu']['uuid'])):
+        raise ValueError('finish independent native, SAM or GPU identity differs')
+    require_original_host(dispatch)
+    outside = os.readlink('/proc/self/ns/pid')
+    group = json.loads((stage.parent / 'run/status.json').read_text())['process_group_id']
+    for name in ('rgb', 'sam', 'compose'):
+        config = json.loads((retained / name / 'worker-config.json').read_text())
+        receipt = json.loads((retained / name / 'sealed.json').read_text())
+        witness.check_worker_isolation(config, receipt['isolation'], runtime=preflight['runtimes']['main'],
+                                       source_manifest=manifest, loader=loader, loader_sha=fixed.file_sha(loader_path))
+        ns = witness.namespace_completion(retained / name / 'namespace-receipt.json', expected_pgid=group,
+            expected_outside=outside, expected_target='experiments.tennis.w8_strict_receiver_worker')
+        if summary['usage'][name]['cpu_seconds'] + 0.05 < ns['children_cpu_seconds']:
+            raise ValueError('finish worker CPU receipt differs')
+    witness.namespace_completion(retained / 'packet-namespace.json', expected_pgid=group,
+        expected_outside=outside, expected_target='experiments.tennis.w8_strict_receiver_worker')
+    witness.namespace_completion(retained / 'native/namespace.json', expected_pgid=group,
+        expected_outside=outside, expected_target=namespace.NATIVE_TARGET)
+    checked = witness.check_finish(generation_dirs={u: retained / u for u in fixed.UNITS}, expected=expected,
+        base_dir=retained / 'rgb', sam_dir=retained / 'sam', compose_dir=retained / 'compose',
+        trusted=trusted, qualification=qualification)
+    if checked != summary['validation']:
+        raise ValueError('independent finish validation differs')
+    with target.open('x') as output_stream:
+        json.dump({'passed': True, 'scope': expected_scope, 'source_sha256': dispatch['code']['source_sha256'],
+                   'producer_audit_sha256': summary['producer_audit_sha256'], 'members': members,
+                   'automatic_promotion': False}, output_stream, sort_keys=True)
+        output_stream.flush()
+        os.fsync(output_stream.fileno())
+
+
+def run_finish_audit(stage: Path, target: Path) -> None:
+    """One-core, hard-capped post-stage audit; retain actual process CPU usage."""
+    import os
+    import resource
+    import time
+
+    affinity = sorted(os.sched_getaffinity(0))
+    if len(affinity) != 1:
+        raise ValueError('finish audit requires verified one-core affinity')
+    resource.setrlimit(resource.RLIMIT_CPU, (100, 100))
+    started = time.monotonic()
+    try:
+        validate_finish(stage, target)
+        status = 'complete'
+    except Exception:
+        status = 'failed'
+        raise
+    finally:
+        self_cpu = resource.getrusage(resource.RUSAGE_SELF)
+        child_cpu = resource.getrusage(resource.RUSAGE_CHILDREN)
+        with target.with_name(target.name + '.usage.json').open('x') as stream:
+            json.dump({'scope': 'one-core bounded finish audit', 'status': status, 'cpu_cap_seconds': 100,
+                       'self_cpu_seconds': self_cpu.ru_utime + self_cpu.ru_stime,
+                       'waited_children_cpu_seconds': child_cpu.ru_utime + child_cpu.ru_stime,
+                       'affinity': affinity, 'pid': os.getpid(), 'pgid': os.getpgrp(),
+                       'wall_seconds': time.monotonic() - started}, stream, sort_keys=True)
+            stream.flush()
+            os.fsync(stream.fileno())
+
 def main() -> None:
     import argparse
     import os
@@ -800,10 +1325,23 @@ def main() -> None:
     for arg in ('cpu-proof-local', 'promotion-local', 'ledger-local', 'output'):
         candidate.add_argument('--' + arg, type=Path, required=True)
     candidate.add_argument('--unit1', action='store_true')
+    finish_make = sub.add_parser('make-finish-spec')
+    for arg in ('deadline', 'cpu-proof-remote', 'promotion-remote', 'ledger-remote',
+                'producer-audit-remote', 'producer0-remote', 'producer1-remote', 'sam-remote',
+                'native-inventory-remote'):
+        finish_make.add_argument('--' + arg, required=True)
+    for arg in ('cpu-proof-local', 'promotion-local', 'ledger-local', 'producer-audit-local',
+                'producer0-local', 'producer1-local', 'output'):
+        finish_make.add_argument('--' + arg, type=Path, required=True)
+    finish_make.add_argument('--qualification', action='store_true')
+    finish_audit = sub.add_parser('audit-finish')
+    finish_audit.add_argument('--stage', type=Path, required=True)
+    finish_audit.add_argument('--output', type=Path, required=True)
     audit = sub.add_parser('audit-candidate')
     audit.add_argument('--stage', type=Path, required=True)
     audit.add_argument('--output', type=Path, required=True)
-    for action in ('pilot', 'unit1', 'readiness', 'readiness-validate', 'candidate0', 'candidate1', 'noop', 'validate'):
+    for action in ('pilot', 'unit1', 'readiness', 'readiness-validate', 'candidate0', 'candidate1', 'noop', 'validate', 'finish-readiness', 'finish-readiness-validate',
+                   'finish-context', 'finish-candidate'):
         sub.add_parser(action)
     args = parser.parse_args()
     if args.action == 'make-spec':
@@ -832,11 +1370,30 @@ def main() -> None:
             json.dump(spec, stream, indent=2, allow_nan=False)
             stream.write('\n')
         return
+    if args.action == 'make-finish-spec':
+        keys = ('deadline', 'cpu_proof_local', 'cpu_proof_remote', 'promotion_local', 'promotion_remote',
+                'ledger_local', 'ledger_remote', 'producer_audit_local', 'producer_audit_remote',
+                'producer0_local', 'producer0_remote', 'producer1_local', 'producer1_remote',
+                'sam_remote', 'native_inventory_remote', 'qualification')
+        spec = make_finish_spec(**{key: getattr(args, key) for key in keys})
+        with args.output.open('x') as stream:
+            json.dump(spec, stream, indent=2, allow_nan=False)
+            stream.write('\n')
+        return
+    if args.action == 'audit-finish':
+        run_finish_audit(args.stage, args.output)
+        return
     if args.action == 'audit-candidate':
         validate_pilot(args.stage, args.output)
         return
     stage = Path(os.environ['PS_STAGE_DIR'])
-    if args.action == 'pilot':
+    if args.action == 'finish-readiness':
+        run_finish_readiness(stage)
+    elif args.action == 'finish-readiness-validate':
+        validate_finish_readiness(stage, Path(os.environ['PS_VALIDATION_PATH']))
+    elif args.action in ('finish-context', 'finish-candidate'):
+        run_finish(stage, qualification=args.action == 'finish-context')
+    elif args.action == 'pilot':
         run_pilot(stage)
     elif args.action == 'unit1':
         run_pilot(stage, unit1=True)

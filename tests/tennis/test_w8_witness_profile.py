@@ -62,7 +62,8 @@ def test_qualification_finish_rejects_wrong_gpu_and_sam_source(tmp_path: Path, m
               'landlock_abi': 1, 'denials': {'source': 13}, 'loader_sha256': 'x', 'libraries': {'libdav1d': 'x'}}
     base_sha = fixed.file_sha(base / 'base.npy')
     (base / 'sealed.json').write_text(json.dumps({**shared, 'native': native, 'ticks': finish.TICKS[:8].tolist(),
-                                                 'base_sha256': base_sha, 'gpu_identity': gpu_identity}))
+                                                 'base_sha256': base_sha, 'gpu_identity': gpu_identity,
+                                                 'input_sha256': {'yuv': native['yuv_sha256']}}))
     source = tmp_path / 'sam.py'
     source.write_text('sam source')
     gen_files = {}
@@ -261,7 +262,7 @@ def test_namespace_completion_requires_started_join_and_absent_owned_pids(tmp_pa
 
     receipt = tmp_path / 'receipt.json'
     started_path = tmp_path / 'receipt.json.started'
-    final = {'namespace_init': {'host_pid': 99999991, 'start_ticks': 1, 'host_pgid': 1,
+    final: dict[str, dict[str, Any]] = {'namespace_init': {'host_pid': 99999991, 'start_ticks': 1, 'host_pgid': 1,
                                 'namespace_pid': 1, 'pid_namespace': 'pid:[inner]'},
              'worker_host_identity': {'host_pid': 99999992, 'start_ticks': 2, 'host_pgid': 1,
                                       'campaign_pgid': 1}}
@@ -473,6 +474,9 @@ def test_unit1_spec_requires_actual_ledger_and_forecast(tmp_path: Path):
         'prior_artifact_sha256': '1' * 64, 'ledger_sha256': fixed.file_sha(ledger),
         'raw_measurement_audit_sha256': '2' * 64, 'safety_factor': 1.5, 'remaining_components': components,
         'gpu_remaining_seconds': 2000, 'cpu_remaining_seconds': 2200,
+        'qualification_charge_phases': [], 'qualification_gpu_spent_seconds': 0,
+        'qualification_cpu_spent_seconds': 0, 'qualification_next_gpu_ceiling_seconds': 900,
+        'qualification_next_cpu_ceiling_seconds': 1000,
         'issued_epoch': time.time() - 1, 'expires_epoch': time.time() + 100}))
     base = '/home/itec/emanuele/Datasets/pointstream-data/tests/'
     spec = job.make_unit1_spec(deadline=(datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat(), proof_local=proof,
@@ -579,3 +583,227 @@ def test_candidate_spec_requires_qualified_producers_and_separate_readiness(tmp_
             proof_local=proof, proof_remote=base + 'proof.json', promotion_local=promotion,
             promotion_remote=base + 'promotion.json', ledger_local=ledger, ledger_remote=base + 'ledger.json',
             qualification_artifact_sha='1' * 64, unit1=False)
+
+
+def test_finish_reuses_exact_audited_producer_pair(tmp_path: Path, monkeypatch) -> None:
+    import io
+    import tarfile
+
+    scratch = tmp_path / 'scratch'
+    scratch.mkdir()
+    decoded = tmp_path / 'decoded'
+    (decoded / 'publish' / 'units').mkdir(parents=True)
+    unit_hashes = {}
+    for unit in fixed.UNITS:
+        path = decoded / 'publish' / 'units' / f'{unit}.npz'
+        path.write_bytes(unit.encode())
+        unit_hashes[unit] = fixed.file_sha(path)
+    monkeypatch.setattr(witness.generation, 'ORACLE_UNIT_SHA', unit_hashes)
+    observed = []
+    monkeypatch.setattr(witness.generation, 'validate_context_qualification',
+                        lambda path, expected: observed.append((path.name, expected['unit'])))
+    archives, rows = {}, {}
+    for index, unit in enumerate(fixed.UNITS):
+        archive = tmp_path / f'{index}.tar'
+        payloads = {'sealed.json': b'{}', f'{unit}@match5.npz': b'crop', f'{unit}@match5.json': b'{}',
+                    'decoded-manifest.json': json.dumps({'match_tensors': {'x': 1}, 'checkpoint_sha256': 'c' * 64,
+                                                         'unit_sha256': unit_hashes}).encode()}
+        with tarfile.open(archive, 'w') as tar:
+            for name, payload in payloads.items():
+                entry = tarfile.TarInfo(name)
+                entry.size = len(payload)
+                tar.addfile(entry, io.BytesIO(payload))
+        archives[unit] = archive
+        rows[unit] = {'job_id': f'20261106T00000{index}Z-12345678', 'terminal_audit_sha256': 'd' * 64,
+                      'archive_sha256': fixed.file_sha(archive)}
+    audit = {'schema': 1, 'scope': 'root-reviewed W8 producer pair', 'producer_scope': 'context_qualification_only',
+             'source_sha256': 'a' * 64, 'snapshot_sha256': 'b' * 64, 'producers': rows}
+    prepared = {'scratch': scratch, 'decoder_out': decoded, 'fingerprints': {'x': 1},
+                'generated': {'checkpoint': {'sha256': 'c' * 64}, 'decoder_manifest': {'sha256': 'e' * 64}}}
+    source = {'source_sha256': 'a' * 64, 'snapshot_sha256': 'b' * 64}
+    result = witness.recover_audited_producers(prepared, audit, archives, qualification=True, source=source)
+    assert set(result['outputs']) == set(fixed.UNITS)
+    assert [x[1] for x in observed] == list(fixed.UNITS)
+    other_scratch = tmp_path / 'other'
+    other_scratch.mkdir()
+    prepared['scratch'] = other_scratch
+    swapped = {fixed.UNITS[0]: archives[fixed.UNITS[1]], fixed.UNITS[1]: archives[fixed.UNITS[0]]}
+    with pytest.raises(ValueError, match='archive differs'):
+        witness.recover_audited_producers(prepared, audit, swapped, qualification=True, source=source)
+    with pytest.raises(ValueError, match='pair differs'):
+        witness.recover_audited_producers(prepared, audit, archives, qualification=False, source=source)
+
+
+@pytest.mark.parametrize('qualification', [True, False])
+def test_finish_fixed_dispatch_and_cli(qualification: bool, monkeypatch, tmp_path: Path) -> None:
+    import sys
+    from experiments.jobs import inbox
+    from experiments.tennis import w8_witness_job as job
+
+    spec = {'deadline': (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat(),
+            'w8_witness_profile': 'w8-context-qualification-v1' if qualification else 'w8-full-finish-v1',
+            'entrypoint': ['-m', 'experiments.tennis.w8_witness_job'], 'arguments': ['{phase}'],
+            'scale': {'phase': {'smoke': 'finish-readiness',
+                                'full': 'finish-context' if qualification else 'finish-candidate'}},
+            'smoke': {'seconds': 60}, 'full': {'seconds': 460 if qualification else 1700},
+            'budget_seconds': 570 if qualification else 1770, 'validator_seconds': 50,
+            'witness_gpu_ceiling_seconds': 600 if qualification else 1800,
+            'witness_cpu_ceiling_seconds': 670 if qualification else 1800,
+            'witness_caps': {'parent_cpu': 30, 'packet_cpu': 100, 'native_cpu': 30, 'native_wall': 40,
+                             'worker_cpu': 100 if qualification else 450,
+                             'worker_wall': 88 if qualification else 460, 'external_cpu': 100},
+            'witness_cpu_proof_host': 'gpu5', 'hosts': ['gpu5'], 'gpu_models': ['RTX 6000 Ada'],
+            'contention': {'policy': 'stop', 'resume_attempts': 0}, 'validator': ['{python}', '-m', 'experiments.tennis.w8_witness_job', 'finish-readiness-validate'],
+            **{'witness_' + name + '_sha256': 'a' * 64 for name in ('producer_audit', 'producer0', 'producer1')}}
+    job._finish_spec(spec, qualification=qualification)
+    stage = tmp_path / 'full'
+    stage.mkdir()
+    called = []
+    monkeypatch.setenv('PS_STAGE_DIR', str(stage))
+    monkeypatch.setattr(job, 'run_finish', lambda path, **kwargs: called.append((path, kwargs)))
+    command = inbox.phase_command(spec, 'full', python='/python')
+    monkeypatch.setattr(sys, 'argv', ['w8_witness_job', *command[3:]])
+    job.main()
+    assert called == [(stage, {'qualification': qualification})]
+    spec['hosts'] = ['gpu6']
+    with pytest.raises(ValueError, match='fixed dispatch'):
+        job._finish_spec(spec, qualification=qualification)
+
+
+def test_qualification_subcap_uses_only_explicit_parent_charges_once() -> None:
+    from experiments.tennis import w8_witness_job as job
+
+    ledger = {'charges': [
+        {'parent_phase': 'w8-full-witness-staged-20261106', 'phase': 'proof', 'witness_qualification': False,
+         'gpu_seconds': 0, 'cpu_seconds': 100},
+        {'parent_phase': 'w8-full-witness-staged-20261106', 'phase': 'pilot', 'witness_qualification': True,
+         'gpu_seconds': 200, 'cpu_seconds': 300}]}
+    gate = {'qualification_charge_phases': ['pilot'], 'qualification_gpu_spent_seconds': 200,
+            'qualification_cpu_spent_seconds': 300}
+    job.check_qualification_subcap(ledger, gate, gpu_cap=700, cpu_cap=700)
+    with pytest.raises(ValueError, match='ceiling exceeded'):
+        job.check_qualification_subcap(ledger, gate, gpu_cap=701, cpu_cap=700)
+    gate['qualification_cpu_spent_seconds'] = 0
+    with pytest.raises(ValueError, match='ceiling exceeded'):
+        job.check_qualification_subcap(ledger, gate, gpu_cap=700, cpu_cap=700)
+    del ledger['charges'][0]['witness_qualification']
+    with pytest.raises(ValueError, match='attribution'):
+        job.check_qualification_subcap(ledger, gate, gpu_cap=700, cpu_cap=700)
+
+
+def test_finish_builder_binds_audit_archives_and_qualification_caps(tmp_path: Path, monkeypatch) -> None:
+    from experiments.jobs import inbox
+    from experiments.tennis import w8_witness_job as job
+
+    deadline = (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat()
+    monkeypatch.setattr(job, 'make_unit1_spec', lambda **_: {
+        'deadline': deadline, 'entrypoint': ['-m', 'experiments.tennis.w8_witness_job'],
+        'arguments': ['{phase}'], 'hosts': ['gpu5'], 'gpu_models': ['RTX 6000 Ada'],
+        'witness_cpu_proof_host': 'gpu5', 'contention': {'policy': 'stop', 'resume_attempts': 0},
+        'staged_inputs': [], 'inputs': []})
+    monkeypatch.setattr(inbox, 'validate_spec', lambda _: None)
+    gate = {'qualification_charge_phases': ['pilot'], 'qualification_gpu_spent_seconds': 200,
+            'qualification_cpu_spent_seconds': 300, 'qualification_next_gpu_ceiling_seconds': 600,
+            'qualification_next_cpu_ceiling_seconds': 670,
+            'completed_artifact_sha256': {'unit1_context': '3' * 64},
+            'remaining_components': {'native_sam_compose': {'gpu_seconds': 600, 'cpu_seconds': 670}}}
+    promotion = tmp_path / 'promotion.json'
+    promotion.write_text(json.dumps(gate))
+    ledger = tmp_path / 'ledger.json'
+    ledger.write_text(json.dumps({'charges': [{'parent_phase': 'w8-full-witness-staged-20261106',
+        'phase': 'pilot', 'witness_qualification': True, 'gpu_seconds': 200, 'cpu_seconds': 300}]}))
+    audit, producer0, producer1 = (tmp_path / n for n in ('audit', 'p0', 'p1'))
+    for item in (audit, producer0, producer1):
+        item.write_bytes(item.name.encode())
+    base = '/home/itec/emanuele/Datasets/pointstream-data/tests/'
+    spec = job.make_finish_spec(deadline=deadline, proof_local=audit, proof_remote=base + 'proof',
+        promotion_local=promotion, promotion_remote=base + 'promotion', ledger_local=ledger,
+        ledger_remote=base + 'ledger', producer_audit_local=audit, producer_audit_remote=base + 'audit',
+        producer0_local=producer0, producer0_remote=base + 'p0', producer1_local=producer1,
+        producer1_remote=base + 'p1', sam_remote='/home/itec/emanuele/Models/SAM/weights',
+        native_inventory_remote=base + 'native', qualification=True)
+    assert spec['witness_producer0_sha256'] == fixed.file_sha(producer0)
+    assert spec['full']['seconds'] == 460 and spec['witness_caps']['worker_wall'] == 88
+    gate['qualification_next_gpu_ceiling_seconds'] = 701
+    gate['qualification_next_cpu_ceiling_seconds'] = 800
+    promotion.write_text(json.dumps(gate))
+    with pytest.raises(ValueError, match='ceiling exceeded'):
+        job.make_finish_spec(deadline=deadline, proof_local=audit, proof_remote=base + 'proof',
+            promotion_local=promotion, promotion_remote=base + 'promotion', ledger_local=ledger,
+            ledger_remote=base + 'ledger', producer_audit_local=audit, producer_audit_remote=base + 'audit',
+            producer0_local=producer0, producer0_remote=base + 'p0', producer1_local=producer1,
+            producer1_remote=base + 'p1', sam_remote='/home/itec/emanuele/Models/SAM/weights',
+            native_inventory_remote=base + 'native', qualification=True)
+
+
+def test_finish_publication_uses_real_fleet_archive(tmp_path: Path) -> None:
+    from experiments.jobs import staging
+    from experiments.tennis import w8_witness_job as job
+
+    scratch, stage = tmp_path / 'scratch', tmp_path / 'stage'
+    (scratch / 'publish').mkdir(parents=True)
+    stage.mkdir()
+    (scratch / 'publish' / 'summary.json').write_text(json.dumps({'scope': 'candidate'}))
+    record = staging.publish_scratch(scratch, stage)
+    assert record is not None
+    assert job.read_finish_publication(stage / 'published.tar', maximum=1000) == {'scope': 'candidate'}
+    (scratch / 'publish' / 'extra').write_text('unexpected')
+    other = tmp_path / 'other'
+    other.mkdir()
+    staging.publish_scratch(scratch, other)
+    with pytest.raises(ValueError, match='membership'):
+        job.read_finish_publication(other / 'published.tar', maximum=1000)
+
+
+def test_finish_rejects_contaminated_execution_and_nonterminal(tmp_path: Path) -> None:
+    from experiments.tennis import w8_witness_job as job
+
+    root = tmp_path / '20261106T000000Z-12345678'
+    stage = root / 'full'
+    stage.mkdir(parents=True)
+    execution = {'exit_code': 0, 'timing_contaminated': False, 'contention': [],
+                 'gpu_sharing': {'mode': 'exclusive'}}
+    (stage / 'execution.json').write_text(json.dumps(execution))
+    (root / 'state.json').write_text(json.dumps({'status': 'complete', 'job_id': root.name}))
+    (root / 'spec.json').write_text(json.dumps({'inputs': []}))
+    (root / 'gate.json').write_text(json.dumps({'passed': True, 'inputs': [], 'source_sha256': 'a' * 64}))
+    dispatch = {'code': {'source_sha256': 'a' * 64}}
+    job.check_stage_evidence(stage, dispatch, terminal=True)
+    execution['timing_contaminated'] = True
+    (stage / 'execution.json').write_text(json.dumps(execution))
+    with pytest.raises(ValueError, match='contaminated'):
+        job.check_stage_evidence(stage, dispatch, terminal=True)
+    execution['timing_contaminated'] = False
+    (stage / 'execution.json').write_text(json.dumps(execution))
+    (root / 'state.json').write_text(json.dumps({'status': 'contended', 'job_id': root.name}))
+    with pytest.raises(ValueError, match='terminal'):
+        job.check_stage_evidence(stage, dispatch, terminal=True)
+
+
+def test_finish_readiness_validator_accepts_real_fleet_publication(tmp_path: Path, monkeypatch) -> None:
+    from experiments.jobs import staging
+    from experiments.tennis import w8_witness_job as job
+
+    scratch, stage = tmp_path / 'scratch', tmp_path / 'smoke'
+    (scratch / 'publish').mkdir(parents=True)
+    stage.mkdir()
+    source = 'a' * 64
+    spec = {'w8_witness_profile': 'w8-context-qualification-v1',
+            'witness_producer_audit_sha256': 'b' * 64,
+            'witness_producer0_sha256': 'c' * 64, 'witness_producer1_sha256': 'd' * 64}
+    dispatch = {'started': 1, 'code': {'source_sha256': source}}
+    (scratch / 'publish' / 'summary.json').write_text(json.dumps({'scope': 'context_qualification_only',
+        'source_sha256': source, 'producer_audit_sha256': 'b' * 64,
+        'producer_archives': ['c' * 64, 'd' * 64]}))
+    publication = staging.publish_scratch(scratch, stage)
+    assert publication is not None
+    (stage / 'staging.json').write_text(json.dumps({'published': publication}))
+    (stage / 'execution.json').write_text(json.dumps({'exit_code': 0, 'timing_contaminated': False,
+        'contention': [], 'gpu_sharing': {'mode': 'exclusive'}}))
+    monkeypatch.setattr(job, 'load_released_inputs', lambda _: ({}, spec, dispatch))
+    monkeypatch.setattr(job, '_finish_spec', lambda *_a, **_k: None)
+    monkeypatch.setattr(job, '_unit1_promotion', lambda *_a, **_k: None)
+    target = tmp_path / 'validation.json'
+    job.validate_finish_readiness(stage, target)
+    result = json.loads(target.read_text())
+    assert result['passed'] is True and result['checks']['source_producers_and_budget'] is True
