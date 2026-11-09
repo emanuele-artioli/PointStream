@@ -1219,6 +1219,15 @@
       "witness_qualification": false,
       "release_stage": "research-first24/28",
       "basis": "Full authorized10CPU aggregate allowance; first proc-view probe~0.235 and second self0.059525+waited0.18049+localSSH0.023 measured CPU; remaining conservatively charged for administration. Not full administrative telemetry. Root public-metadata/reaper mechanism accepted, not combined packet/GPU/quality proof. Drawnfromunspent50auditallowance."
+    },
+    {
+      "phase": "k5d-profile-choice-readiness-survey-20261109",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 30,
+      "release_stage": "research-first24/28",
+      "basis": "Fullauthorized30CPUreadinessceilingforONEallhostdoctor/inspect/knownjobs/workers+gpu2/3CPU0/claim/cache/space survey; partiallocal+remoteCPU~1.08butadministrationunmetered. V1noheadroom, lowerprofilethresholdmettransiently; no sourceupload/job/GPU. Separateprofile-choicecost,notdoublecountedinsidefutureproofpreparation50."
     }
   ],
   "reservations": [
@@ -1737,8 +1746,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8770,
-      "cpu_seconds": 8140,
-      "status": "Remaining_unspent8770GPU8140CPU; terminalfailuresclosed,localresourcepolicyrepairsunderreview,noGPUorfullstudyrelease."
+      "cpu_seconds": 8110,
+      "status": "Remaining_unspent8770GPU8110CPU; lowerprofilelocalfreeze/rootsourcebridgeaccepted,readinesssurvey30CPUcharged; noCPU/GPUreleaseyet."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
