@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "job_id": "20261109T215520Z-a2f41fee",
+  "decision": "root accepts observed expected failure/reaper mechanism only",
+  "fleet_status": "failed",
+  "fleet_gate_passed": false,
+  "full_native_or_GPU_gate_qualified": false,
+  "source_sha256": "58787f8664f961c2287228762c1ddd3295adab4042bd7f41d9bfee87d2666104",
+  "snapshot_sha256": "9f486d70424b9d293d8774c92b36350d284edcb2513c415390b88a2b4c344aed",
+  "spec_sha256": "528876fc0946ed3d20466ce95f80e04362fcc3b52931a50a6c0b95e4481f914a",
+  "audit_sha256": "97df78830661fee8229c4d7195e9bb9eac40d8a5db8beb4de0e9fb31759869dc",
+  "raw_file_hashes_rechecked": 19,
+  "actual_namespace_receipt": {
+    "argv": [
+      "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+      "-m",
+      "experiments.tennis.k5d_native_cpu_workload"
+    ],
+    "children_cpu_seconds": 0.043616,
+    "complete_descendant_wait": true,
+    "elapsed_seconds": 0.07850430021062493,
+    "init_cpu_seconds": 0.04876,
+    "namespace_init": {
+      "host_pid": 1865491,
+      "namespace_pgid": 0,
+      "namespace_pid": 1,
+      "namespace_pids": [
+        1865491,
+        1
+      ],
+      "namespace_sid": 0,
+      "observed_monotonic": 2728522.290364878,
+      "pid_namespace": "pid:[4026537776]",
+      "start_ticks": 272852217
+    },
+    "reaped": 1,
+    "reason": "worker_failed",
+    "status": 2,
+    "worker_host_identity": {
+      "campaign_pgid": 1865081,
+      "exec_host_pgid": 1865081,
+      "host_pgid": 1865081,
+      "host_pid": 1865492,
+      "start_ticks": 272852222
+    },
+    "worker_namespace_pid": 2
+  },
+  "scope": "Fixed native module missing required args exited2; actualPID1 worker_failed/status2/onechildreaped/completewait, outer1, noESRCH traceback. Observed owned identities/groups/claim absent; twoeventsACK. Not a native encoder/decoder, model, GPUmemory, parity, timing or quality result.",
+  "inclusive_CPU_charge": 140,
+  "additional_CPU_charge": 90,
+  "GPU_charge": 0,
+  "CPU_basis": "Prior50unique source preparation +70rounded onecore lifecycle through canonicalpublication60.571wall +20audit/admin =140of150firstleaf; aggregateCPUunmeasured. Tenunused releasedinsideparent. Separate270CPU nativeleaf remains unexecuted."
+}
