@@ -111,3 +111,13 @@ def test_witness_modes_require_opt_in_materialization_and_clock(monkeypatch, tmp
     with pytest.raises(ValueError, match='materialized source and clock'):
         worker.launch(Path('/config'), 'sha', tmp_path / 'loader', 'sha', tmp_path, tmp_path,
                       witness_mode=kind)
+
+
+def test_cpu_runtime_identity_reports_actual_python(monkeypatch):
+    import sys
+    from pathlib import Path
+    from types import SimpleNamespace
+
+    result = worker.cpu_runtime_identity(SimpleNamespace(__version__='test-torch'))
+    assert result == {'executable': str(Path(sys.executable).resolve(strict=True)),
+                      'prefix': str(Path(sys.prefix).resolve(strict=True)), 'torch': 'test-torch'}

@@ -72,7 +72,7 @@ def check_bootstrap_archive(stage: Path, dispatch: dict[str, Any], expected: str
 def check_cpu_gate(gate: dict[str, Any], *, gate_sha: str, expected_sha: str,
                    source: dict[str, Any], environment_sha: str, host_name: str | None) -> None:
     """Check the exact root-pinned envelope after primary review of raw proofs."""
-    if (not _sha(gate_sha) or gate_sha != expected_sha or gate.get('schema') != 1
+    if (not _sha(gate_sha) or gate_sha != expected_sha or gate.get('schema') != 2
             or gate.get('scope') != CPU_SCOPE or gate.get('passed') is not True
             or not _sha(source.get('source_sha256')) or not _sha(source.get('snapshot_sha256'))
             or not re.fullmatch(r'[0-9a-f]{40}', str(source.get('git_head')))
@@ -82,7 +82,11 @@ def check_cpu_gate(gate: dict[str, Any], *, gate_sha: str, expected_sha: str,
             or gate.get('source_sha256') != source.get('source_sha256')
             or gate.get('snapshot_sha256') != source.get('snapshot_sha256')
             or gate.get('revision') != source.get('git_head')
-            or gate.get('environment_sha256') != environment_sha or gate.get('host') != host_name
+            or gate.get('proof_campaign_environment_sha256') != host.MAIN_ENV
+            or gate.get('generation_environment_sha256') != host.JCV_ENV
+            or environment_sha != host.JCV_ENV or gate.get('host') != host_name
+            or gate.get('generation_controller_executed') is not False
+            or gate.get('cuda_qualified') is not False
             or not re.fullmatch(r'\d{8}T\d{6}Z-[0-9a-f]{8}', str(gate.get('job_id')))
             or not _sha(gate.get('spec_sha256'))):
         raise ValueError('same-source CPU proof envelope identity differs')
@@ -786,14 +790,14 @@ def make_pilot_spec(*, deadline: str, proof_local: Path, proof_remote: str,
     """Prepare a review-only spec after a real, independently reviewed CPU gate exists."""
     digest = fixed.file_sha(proof_local)
     gate = json.loads(proof_local.read_text())
-    if (gate.get('schema') != 1 or gate.get('scope') != CPU_SCOPE or gate.get('passed') is not True
+    if (gate.get('schema') != 2 or gate.get('scope') != CPU_SCOPE or gate.get('passed') is not True
             or not _sha(digest) or not Path(proof_remote).is_absolute()
             or not Path(proof_remote).is_relative_to(Path('/home/itec/emanuele/Datasets/pointstream-data'))):
         raise ValueError('actual root-reviewed proof gate and shared path required')
     check_cpu_gate(gate, gate_sha=digest, expected_sha=digest,
                    source={'source_sha256': gate.get('source_sha256'), 'snapshot_sha256': gate.get('snapshot_sha256'),
                            'git_head': gate.get('revision')},
-                   environment_sha=gate.get('environment_sha256'), host_name=gate.get('host'))
+                   environment_sha=gate.get('generation_environment_sha256'), host_name=gate.get('host'))
     spec = host.make_materialized_spec(deadline)
     spec.pop('w8_paired_cost_profile', None)
     spec['entrypoint'] = ['-m', 'experiments.tennis.w8_witness_job']

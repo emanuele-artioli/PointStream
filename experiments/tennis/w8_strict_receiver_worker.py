@@ -65,6 +65,12 @@ def clean_process() -> None:
         raise RuntimeError('unexpected open descriptor')
 
 
+def cpu_runtime_identity(torch: Any) -> dict[str, str]:
+    """Report the actual executing CPU leaf runtime without initializing CUDA."""
+    return {'executable': str(Path(sys.executable).resolve(strict=True)),
+            'prefix': str(Path(sys.prefix).resolve(strict=True)), 'torch': str(torch.__version__)}
+
+
 def launch(config_path: Path, config_sha: str, loader_path: Path, loader_sha: str,
            canary: Path, source_root: Path, *, materialize_profile: bool = False,
            clock_receipt: Path | None = None, clock_receipt_sha: str | None = None,
@@ -182,7 +188,8 @@ def launch(config_path: Path, config_sha: str, loader_path: Path, loader_sha: st
             raise ValueError('isolation proof initialized CUDA')
         with (output / 'isolation-proof.json').open('x') as stream:
             json.dump({'scope': 'cpu_isolation_proof_only', 'isolation': isolation,
-                       'cuda_initialized': False, 'visible_devices': ''}, stream, sort_keys=True)
+                       'cuda_initialized': False, 'visible_devices': '',
+                       'runtime_identity': cpu_runtime_identity(torch)}, stream, sort_keys=True)
     elif witness_mode in finish_modes:
         finish_funcs: dict[str, Any] = {'context_rgb': finish.run_conversion_isolated, 'context_sam': finish.run_sam_isolated,
                         'context_compose': finish.run_compose_isolated, 'rgb': finish.run_conversion_isolated,

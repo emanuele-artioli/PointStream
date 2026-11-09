@@ -601,6 +601,31 @@ def run_native_proof(prepared: dict[str, Any], *, inventory_path: Path, case: st
                                child_cpu=20, wall=20, proof_case=case)
 
 
+def validate_cpu_runtime_attestation(receipt: dict[str, Any], config: dict[str, Any],
+                                     preflight: dict[str, Any], runtime_name: str) -> None:
+    """Bind actual leaf process runtime to the matching pinned preflight role."""
+    from experiments.tennis import w8_strict_host_cost_job as host
+
+    if runtime_name not in ('main', 'jcv'):
+        raise ValueError('unknown CPU runtime role')
+    digest = host.MAIN_ENV if runtime_name == 'main' else host.JCV_ENV
+    root = Path('/local/users/emanuele/pointstream/cache') / digest / 'tree'
+    expected = preflight['receipts'][runtime_name]
+    policy = preflight['runtimes'][runtime_name]
+    actual = receipt.get('runtime_identity')
+    if (not isinstance(actual, dict) or set(actual) != {'executable', 'prefix', 'torch'}
+            or actual.get('executable') != expected.get('executable')
+            or actual.get('executable') != policy.get('python')
+            or Path(str(actual.get('executable'))).parent != root / 'bin'
+            or actual.get('prefix') != str(root) or actual.get('prefix') != expected.get('prefix')
+            or actual.get('torch') != expected.get('torch') or not isinstance(actual.get('torch'), str)
+            or config.get('environment', {}).get('CUDA_VISIBLE_DEVICES') != ''
+            or str(root) not in config.get('allow_paths', [])
+            or receipt.get('scope') != 'cpu_isolation_proof_only'
+            or receipt.get('cuda_initialized') is not False or receipt.get('visible_devices') != ''):
+        raise ValueError('actual CPU runtime attestation differs from pinned preflight role')
+
+
 def run_isolation_proof(prepared: dict[str, Any], *, worker_cpu: int = 40, worker_wall: int = 60) -> dict[str, Any]:
     """Run the strict CPU-only source/clock/denial seam in both packed runtimes."""
     from experiments.tennis import w8_strict_host_cost_job as host
@@ -626,6 +651,7 @@ def run_isolation_proof(prepared: dict[str, Any], *, worker_cpu: int = 40, worke
         if (receipt.get('scope') != 'cpu_isolation_proof_only' or receipt.get('cuda_initialized') is not False
                 or receipt.get('visible_devices') != ''):
             raise ValueError('CPU isolation proof scope differs')
+        validate_cpu_runtime_attestation(receipt, config, prepared['preflight'], runtime_name)
         check_worker_isolation(config, receipt['isolation'], runtime=prepared['policies'][runtime_name],
                                source_manifest=prepared['code_manifest'],
                                loader=json.loads(prepared['loader_receipt'].read_text()),
