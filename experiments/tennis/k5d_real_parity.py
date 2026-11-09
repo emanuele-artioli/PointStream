@@ -84,7 +84,10 @@ def check_resource_profile(specification: dict, dispatch: dict, *, requested: bo
             or dispatch.get('gpu_sharing') != specification['gpu_sharing']
             or dispatch.get('contention_policy') != specification['contention']
             or environ.get('PS_GPU_SHARING') != 'shared'
-            or environ.get('PS_GPU_MEMORY_LIMIT_MIB') != str(SHARED_LIMIT_MIB)):
+            or environ.get('PS_GPU_MEMORY_LIMIT_MIB') != str(SHARED_LIMIT_MIB)
+            or not environ.get('CUDA_VISIBLE_DEVICES', '').startswith('GPU-')
+            or environ.get('PS_CLAIMED_GPU_UUID') != environ.get('CUDA_VISIBLE_DEVICES')
+            or dispatch.get('environment', {}).get('gpu', {}).get('uuid') != environ.get('CUDA_VISIBLE_DEVICES')):
         raise ValueError('shared numerical parity claim or policy differs')
 
 
@@ -100,16 +103,20 @@ def apply_parent_limit(torch: Any) -> dict:
     from experiments.tennis.k5d_scoped_namespace import host_group_identity
     host = host_group_identity(Path(os.environ['PS_STAGE_DIR']).parent / 'run' / 'status.json')
     return {'role': 'parent', 'pid': os.getpid(), 'pgid': os.getpgrp(), 'budget_mib': PER_PROCESS_MIB,
-            'total_bytes': total, 'fraction': PER_PROCESS_MIB * 2**20 / total, 'allocated_before': 0, **host}
+            'total_bytes': total, 'fraction': PER_PROCESS_MIB * 2**20 / total, 'allocated_before': 0,
+            'gpu_uuid': os.environ['CUDA_VISIBLE_DEVICES'], **host}
 
 
 def configure_child_environment(saved: dict, current: dict) -> None:
     """Propagate the already-authenticated opt-in into K5's frozen child env."""
     if (current.get('PS_K5D_SHARED_NUMERICAL') != SHARED_PROFILE
             or current.get('PS_GPU_SHARING') != 'shared'
-            or current.get('PS_GPU_MEMORY_LIMIT_MIB') != str(SHARED_LIMIT_MIB)):
+            or current.get('PS_GPU_MEMORY_LIMIT_MIB') != str(SHARED_LIMIT_MIB)
+            or not current.get('CUDA_VISIBLE_DEVICES', '').startswith('GPU-')
+            or current.get('PS_CLAIMED_GPU_UUID') != current.get('CUDA_VISIBLE_DEVICES')):
         raise ValueError('shared child environment differs')
-    for key in ('PS_K5D_SHARED_NUMERICAL', 'PS_GPU_SHARING', 'PS_GPU_MEMORY_LIMIT_MIB', 'PS_K5D_RESOURCE_RECEIPTS'):
+    for key in ('PS_K5D_SHARED_NUMERICAL', 'PS_GPU_SHARING', 'PS_GPU_MEMORY_LIMIT_MIB', 'PS_K5D_RESOURCE_RECEIPTS',
+                'CUDA_VISIBLE_DEVICES', 'PS_CLAIMED_GPU_UUID'):
         saved[key] = current[key]
 
 
@@ -127,6 +134,7 @@ def validate_resource_receipts(directory: Path) -> list[dict]:
                 or value.get('fraction') != PER_PROCESS_MIB * 2**20 / total
                 or not isinstance(value.get('pid'), int) or value['pid'] <= 0
                 or not isinstance(value.get('pgid'), int) or value['pgid'] < 0
+                or not isinstance(value.get('gpu_uuid'), str) or not value['gpu_uuid'].startswith('GPU-')
                 or any(type(value.get(key)) is not int or value[key] <= 0 for key in
                        ('host_pid', 'host_pgid', 'start_ticks', 'campaign_pgid'))
                 or value['host_pgid'] != value['campaign_pgid']
@@ -296,9 +304,11 @@ def validate() -> None:
         if resource_records:
             worker = lines[0]['worker_host_identity']
             group = json.loads((stage.parent / 'run' / 'status.json').read_text())['process_group_id']
+            dispatch = json.loads((stage / 'dispatch.json').read_text())
+            gpu_uuid = dispatch['environment']['gpu']['uuid']
             parent = next(item for item in resource_records if item['role'] == 'parent')
             if (any(parent[key] != worker[key] for key in ('host_pid', 'start_ticks', 'host_pgid', 'campaign_pgid'))
-                    or any(item['host_pgid'] != group for item in resource_records)):
+                    or any(item['host_pgid'] != group or item['gpu_uuid'] != gpu_uuid for item in resource_records)):
                 raise ValueError('shared allocator host ownership differs')
         if any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) or v < 0 for v in values) or sum(values) <= 0:
             raise ValueError('actual namespace CPU accounting invalid')

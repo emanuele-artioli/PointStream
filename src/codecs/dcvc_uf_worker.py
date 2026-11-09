@@ -138,6 +138,8 @@ def _apply_optional_shared_parity_limit(torch: Any, environ: Any) -> None:
         return
     if (profile != 'k5d-parity16-shared-numerical-v1' or environ.get('PS_GPU_SHARING') != 'shared'
             or environ.get('PS_GPU_MEMORY_LIMIT_MIB') != '16384'
+            or not environ.get('CUDA_VISIBLE_DEVICES', '').startswith('GPU-')
+            or environ.get('PS_CLAIMED_GPU_UUID') != environ.get('CUDA_VISIBLE_DEVICES')
             or torch.cuda.get_device_name(0) != 'NVIDIA RTX A6000'
             or tuple(torch.cuda.get_device_capability(0)) != (8, 6)
             or torch.cuda.memory_allocated(0) != 0):
@@ -167,7 +169,8 @@ def _apply_optional_shared_parity_limit(torch: Any, environ: Any) -> None:
         json.dump({'role': 'dcvc', 'pid': os.getpid(), 'pgid': os.getpgrp(), 'budget_mib': 8192,
                    'total_bytes': total, 'fraction': fraction, 'allocated_before': 0, 'host_pid': host_pid,
                    'host_pgid': host_pgid, 'start_ticks': start_ticks, 'campaign_pgid': group,
-                   'action': sys.argv[1], 'plan': str(plan.relative_to(scratch))}, stream)
+                   'action': sys.argv[1], 'plan': str(plan.relative_to(scratch)),
+                   'gpu_uuid': environ['CUDA_VISIBLE_DEVICES']}, stream)
 
 
 def _load_state(path: str, expected_sha256: str) -> tuple[dict[str, Any], dict[str, Any]]:

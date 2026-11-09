@@ -11,8 +11,9 @@ def claim():
     spec = {'k5d_shared_parity_profile': parity.SHARED_PROFILE, 'gpu_memory_mib': 16384,
             'gpu_models': ['RTX A6000'], 'gpu_sharing': policy,
             'contention': {'policy': 'continue', 'basis': parity.SHARED_BASIS, 'resume_attempts': 0}}
-    env = {'PS_GPU_SHARING': 'shared', 'PS_GPU_MEMORY_LIMIT_MIB': '16384'}
-    return spec, {'gpu_sharing': policy.copy(), 'contention_policy': spec['contention'].copy()}, env
+    env = {'PS_GPU_SHARING': 'shared', 'PS_GPU_MEMORY_LIMIT_MIB': '16384',
+           'CUDA_VISIBLE_DEVICES': 'GPU-test', 'PS_CLAIMED_GPU_UUID': 'GPU-test'}
+    return spec, {'gpu_sharing': policy.copy(), 'contention_policy': spec['contention'].copy(), 'environment': {'gpu': {'uuid': 'GPU-test'}}}, env
 
 
 def fake_torch(*, allocated=0, total=48 * 1024**3, name='NVIDIA RTX A6000', capability=(8, 6)):
@@ -49,6 +50,7 @@ def test_two_allocators_capped_before_allocation_and_child_env_propagates(tmp_pa
     env['PS_SCRATCH_DIR'] = str(tmp_path)
     env['PS_STAGE_DIR'] = str(tmp_path / 'smoke')
     monkeypatch.setenv('PS_STAGE_DIR', env['PS_STAGE_DIR'])
+    monkeypatch.setenv('CUDA_VISIBLE_DEVICES', 'GPU-test')
     host = {'host_pid': 101, 'host_pgid': 77, 'start_ticks': 1001, 'campaign_pgid': 77}
     monkeypatch.setattr(k5d_scoped_namespace, 'host_group_identity', lambda _path: host)
     original_read = Path.read_text
