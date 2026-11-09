@@ -48,6 +48,14 @@ def main() -> int:
     config = json.loads(args.config.read_text())
     if config.get('worker_kind') != 'packet' or config.get('environment', {}).get('CUDA_VISIBLE_DEVICES') != '':
         raise ValueError('packet-only worker must explicitly hide CUDA')
+    source_origin = None
+    if args.witness_mode == 'packet':
+        actual = Path(__file__).resolve(strict=True)
+        expected = args.source_root.resolve(strict=True) / 'experiments/tennis/w8_strict_packet_worker.py'
+        if actual != expected or __spec__ is None or Path(str(__spec__.origin)).resolve(strict=True) != actual:
+            raise ValueError('executing packet wrapper source origin differs')
+        source_origin = {'path': str(actual), 'relative_path': 'experiments/tennis/w8_strict_packet_worker.py',
+                         'sha256': receiver.digest(actual)}
     _, fixed, _, _ = receiver.preload()
     from experiments.tennis import w8_payload
     import numpy as np
@@ -91,6 +99,8 @@ def main() -> int:
         raise RuntimeError('packet decoder initialized or exposed CUDA')
     receipt = {'cuda_visible_devices': '', 'cuda_initialized_after_decode': False,
                'torch_version': str(torch.__version__), 'pre_serialization': observed, 'scope': 'CPU packet decoder only'}
+    if source_origin is not None:
+        receipt['source_origin'] = source_origin
     with (Path(config['output']) / 'cpu-only.json').open('x') as stream:
         json.dump(receipt, stream, sort_keys=True)
         stream.write('\n')

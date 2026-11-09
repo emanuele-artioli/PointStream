@@ -38,7 +38,8 @@ def test_lifecycle_rejects_missing_case_and_wrong_group():
     for name in ('normal', 'timeout', 'term', 'kill'):
         cases.append({'case': name, 'launcher_rc': 0 if name == 'normal' else -15 if name == 'term' else -9,
             'outer_waited_cpu_seconds': .4, 'init': init, 'worker': worker, 'detached': detached,
-            'all_absent': True, 'receipt': normal_receipt if name == 'normal' else
+            'all_absent': True, 'detached_group_absent': True, 'term_requested': name == 'term',
+            'term_escalated': False, 'receipt': normal_receipt if name == 'normal' else
                 {'reason': 'timeout'} if name == 'timeout' else None})
     record = {'scope': 'synthetic CPU namespace lifecycle only', 'campaign_pgid': group, 'cases': cases}
     proof.check_lifecycle(record, group)
@@ -46,6 +47,17 @@ def test_lifecycle_rejects_missing_case_and_wrong_group():
         proof.check_lifecycle({**record, 'cases': cases[:-1]}, group)
     with pytest.raises(ValueError):
         proof.check_lifecycle(record, group + 1)
+    term = cases[2]
+    term['term_escalated'] = True
+    term['launcher_rc'] = -9
+    proof.check_lifecycle(record, group)
+    term['launcher_rc'] = -15
+    with pytest.raises(ValueError, match='escalation'):
+        proof.check_lifecycle(record, group)
+    term['launcher_rc'] = -9
+    term['detached_group_absent'] = False
+    with pytest.raises(ValueError, match='host identity'):
+        proof.check_lifecycle(record, group)
 
 
 def test_actual_fleet_gate_accepts_cpu_proof_validation_shape(tmp_path, monkeypatch):

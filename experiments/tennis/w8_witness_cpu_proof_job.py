@@ -51,7 +51,8 @@ def check_lifecycle(record: dict[str, Any], campaign_pgid: int) -> None:
         raise ValueError('namespace lifecycle proof scope or cases differ')
     for case in cases:
         worker, init, detached = case['worker'], case['init'], case['detached']
-        if (case.get('all_absent') is not True or worker['pgid'] != campaign_pgid
+        if (case.get('all_absent') is not True or case.get('detached_group_absent') is not True
+                or worker['pgid'] != campaign_pgid
                 or init['pgid'] != campaign_pgid or detached['pgid'] != detached['pid']
                 or worker['ppid'] != init['pid'] or detached['ppid'] != worker['pid']
                 or any(type(row.get('pid')) is not int or row['pid'] <= 0
@@ -73,7 +74,12 @@ def check_lifecycle(record: dict[str, Any], campaign_pgid: int) -> None:
         elif case['case'] == 'timeout':
             if case.get('launcher_rc') == 0 or not isinstance(receipt, dict) or receipt.get('reason') != 'timeout':
                 raise ValueError('timeout namespace lifecycle differs')
-        elif case.get('launcher_rc') != -({'term': signal.SIGTERM, 'kill': signal.SIGKILL}[case['case']]):
+        elif case['case'] == 'term':
+            escalated = case.get('term_escalated')
+            if (case.get('term_requested') is not True or type(escalated) is not bool
+                    or case.get('launcher_rc') != -(signal.SIGKILL if escalated else signal.SIGTERM)):
+                raise ValueError('TERM request or escalation differs')
+        elif case.get('launcher_rc') != -signal.SIGKILL:
             raise ValueError('interrupted namespace lifecycle signal differs')
 
 
@@ -320,6 +326,13 @@ def validate(stage: Path, destination: Path) -> None:
         historical = w8_protected_metadata.read_historical(identity_path, packet.IDENTITY_SHA)
         check_protected_metadata(raw_json('packet-protected-identity.json'), historical)
         check_retained_packet_cpu(spec, raw_json('packet-packet-cpu-only.json'))
+        packet_cpu = raw_json('packet-packet-cpu-only.json')
+        packet_config = raw_json('packet-packet-config.json')
+        source_manifest = raw_json('packet-source-manifest.json')
+        source_root = Path(packet_config['output']).parent.parent / 'receiver-source'
+        packet.validate_witness_packet_source(packet_cpu, source_root, source_manifest)
+        packet.validate_packet_source_archive(stage.parent / 'source.tar',
+                                              dispatch['code']['snapshot_sha256'], packet_cpu)
         from experiments.tennis import w8_cuda_system_leaves as policy
         packet_leaves = raw_json('packet-packet-self-leaves.json')
         packet_namespace = raw_json('packet-packet-namespace.json')

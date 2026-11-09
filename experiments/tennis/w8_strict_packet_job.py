@@ -472,6 +472,28 @@ def validate_witness_packet_cpu_receipt(cpu: dict[str, Any], expected_torch: str
     return cpu
 
 
+def validate_witness_packet_source(cpu: dict[str, Any], source_root: Path, manifest: dict[str, Any]) -> None:
+    """Bind the executing __main__ file to the authenticated source manifest."""
+    name = 'experiments/tennis/w8_strict_packet_worker.py'
+    expected = manifest.get('files', {}).get(name)
+    origin = cpu.get('source_origin')
+    if (not isinstance(expected, str) or len(expected) != 64 or not isinstance(origin, dict)
+            or origin != {'path': str(source_root / name), 'relative_path': name, 'sha256': expected}):
+        raise ValueError('packet wrapper executing source identity differs')
+
+
+def validate_packet_source_archive(archive: Path, snapshot_sha: str, cpu: dict[str, Any]) -> None:
+    """Recheck the exact executed wrapper member in the authenticated archive."""
+    if fixed.file_sha(archive) != snapshot_sha:
+        raise ValueError('packet source snapshot differs')
+    name = 'experiments/tennis/w8_strict_packet_worker.py'
+    with tarfile.open(archive) as source_tar:
+        entry = source_tar.getmember(name)
+        source_bytes = source_tar.extractfile(entry) if entry.isfile() else None
+        if source_bytes is None or hashlib.sha256(source_bytes.read()).hexdigest() != cpu['source_origin']['sha256']:
+            raise ValueError('packet wrapper archive source differs')
+
+
 def read_witness_packet_cpu_receipt(path: Path, expected_torch: str) -> dict[str, Any]:
     return validate_witness_packet_cpu_receipt(json.loads(path.read_text()), expected_torch)
 
@@ -558,7 +580,8 @@ def run_proof(stage: Path) -> dict[str, Any]:
     check_isolation(packet_config, decoded['isolation'], json.loads(loader_path.read_text()), manifest,
                     fixed.file_sha(loader_path))
     cpu_path = output / 'cpu-only.json'
-    read_witness_packet_cpu_receipt(cpu_path, preflight['receipts']['main']['torch'])
+    cpu = read_witness_packet_cpu_receipt(cpu_path, preflight['receipts']['main']['torch'])
+    validate_witness_packet_source(cpu, root, manifest)
     if (decoded.get('match_tensors') != fingerprints or decoded.get('unit_sha256') != receiver.ORACLE_UNIT_SHA
             or decoded.get('packet_sha256') != fixed.WINDOW_SHA or decoded.get('profile_sha256') != fixed.PROFILE_SHA
             or decoded.get('guider_sha256') != fixed.GUIDER_SHA or decoded.get('checkpoint_sha256') != CHECKPOINT_SHA

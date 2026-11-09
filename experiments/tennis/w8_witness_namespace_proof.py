@@ -77,6 +77,28 @@ def check_waited_cpu(outer: float, init: float, children: float) -> None:
         raise ValueError('independent synthetic waited CPU accounting differs')
 
 
+def group_absent(pgid: int) -> bool:
+    """Conservatively reject any remaining or inaccessible detached group."""
+    if type(pgid) is not int or pgid <= 0:
+        raise ValueError('invalid detached process group')
+    try:
+        os.killpg(pgid, 0)
+    except ProcessLookupError:
+        return True
+    except PermissionError:
+        return False
+    return False
+
+
+def wait_after_term(launcher: subprocess.Popen) -> tuple[int, bool]:
+    """Give TERM a bounded grace period, then explicitly escalate if needed."""
+    try:
+        return int(launcher.wait(timeout=3)), False
+    except subprocess.TimeoutExpired:
+        launcher.kill()
+        return int(launcher.wait(timeout=5)), True
+
+
 def run(output: Path, unshare: Path, unshare_sha: str) -> None:
     scratch = Path(os.environ['PS_SCRATCH_DIR']).resolve(strict=True)
     output = output.resolve(strict=True)
@@ -125,8 +147,12 @@ def run(output: Path, unshare: Path, unshare_sha: str) -> None:
                 raise ValueError('live host PID/start/group join differs')
             if case in ('term', 'kill'):
                 launcher.send_signal(signal.SIGTERM if case == 'term' else signal.SIGKILL)
+            escalated = False
             try:
-                rc = launcher.wait(timeout=12)
+                if case == 'term':
+                    rc, escalated = wait_after_term(launcher)
+                else:
+                    rc = launcher.wait(timeout=12)
             except subprocess.TimeoutExpired:
                 launcher.kill()
                 launcher.wait(timeout=5)
@@ -135,9 +161,9 @@ def run(output: Path, unshare: Path, unshare_sha: str) -> None:
             waited_cpu = (usage_after.ru_utime + usage_after.ru_stime
                           - usage_before.ru_utime - usage_before.ru_stime)
             end = time.monotonic() + 3
-            while not (absent(a) and absent(b) and absent(init)) and time.monotonic() < end:
+            while not (absent(a) and absent(b) and absent(init) and group_absent(b['pgid'])) and time.monotonic() < end:
                 time.sleep(.02)
-            if not (absent(a) and absent(b) and absent(init)):
+            if not (absent(a) and absent(b) and absent(init) and group_absent(b['pgid'])):
                 raise RuntimeError('owned proof descendants survived')
             inner = json.loads(receipt.read_text()) if receipt.exists() else None
             if case == 'normal' and (rc != 0 or inner is None or inner['reason'] != 'complete'
@@ -151,11 +177,13 @@ def run(output: Path, unshare: Path, unshare_sha: str) -> None:
                 check_waited_cpu(waited_cpu, inner['init_cpu_seconds'], inner['children_cpu_seconds'])
             if case == 'timeout' and (rc == 0 or inner is None or inner['reason'] != 'timeout'):
                 raise ValueError('timeout proof differs')
-            if (case == 'term' and rc != -signal.SIGTERM) or (case == 'kill' and rc != -signal.SIGKILL):
+            if ((case == 'term' and rc != -(signal.SIGKILL if escalated else signal.SIGTERM))
+                    or (case == 'kill' and rc != -signal.SIGKILL)):
                 raise ValueError('signal proof differs')
             results.append({'case': case, 'launcher_rc': rc, 'outer_waited_cpu_seconds': waited_cpu,
                             'init': init, 'worker': a, 'detached': b,
-                            'all_absent': True, 'receipt': inner})
+                            'all_absent': True, 'detached_group_absent': True,
+                            'term_requested': case == 'term', 'term_escalated': escalated, 'receipt': inner})
         finally:
             if launcher.poll() is None:
                 launcher.kill()

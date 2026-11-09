@@ -144,3 +144,42 @@ def test_packet_target_is_fixed_and_cuda_hidden(monkeypatch):
     monkeypatch.setenv('CUDA_VISIBLE_DEVICES', 'GPU-not-hidden')
     with pytest.raises(ValueError, match='fixed CPU witness packet'):
         namespace.command(target, args)
+
+
+def test_term_wait_escalates_only_when_needed_and_fails_on_unkillable():
+    import subprocess
+    from experiments.tennis import w8_witness_namespace_proof as proof
+
+    class Launcher:
+        def __init__(self, timeouts):
+            self.timeouts = iter(timeouts)
+            self.killed = 0
+        def wait(self, timeout):
+            outcome = next(self.timeouts)
+            if outcome == 'timeout':
+                raise subprocess.TimeoutExpired('launcher', timeout)
+            return outcome
+        def kill(self):
+            self.killed += 1
+    clean = Launcher([-15])
+    assert proof.wait_after_term(clean) == (-15, False) and clean.killed == 0
+    escalation = Launcher(['timeout', -9])
+    assert proof.wait_after_term(escalation) == (-9, True) and escalation.killed == 1
+    stuck = Launcher(['timeout', 'timeout'])
+    with pytest.raises(subprocess.TimeoutExpired):
+        proof.wait_after_term(stuck)
+    assert stuck.killed == 1
+
+
+def test_detached_group_absence_rejects_live_or_inaccessible(monkeypatch):
+    from experiments.tennis import w8_witness_namespace_proof as proof
+    monkeypatch.setattr(proof.os, 'killpg', lambda *_: None)
+    assert proof.group_absent(123) is False
+    def inaccessible(*_):
+        raise PermissionError()
+    monkeypatch.setattr(proof.os, 'killpg', inaccessible)
+    assert proof.group_absent(123) is False
+    def missing(*_):
+        raise ProcessLookupError()
+    monkeypatch.setattr(proof.os, 'killpg', missing)
+    assert proof.group_absent(123) is True
