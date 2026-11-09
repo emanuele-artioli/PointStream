@@ -83,7 +83,7 @@ def retain_file(source: Path, scratch: Path, output: Path) -> dict[str, Any]:
             writer.write(chunk)
         writer.flush()
         os.fsync(writer.fileno())
-    if hashlib.sha256(source.read_bytes()).hexdigest() != digest.hexdigest():
+    if fixed.file_sha(source) != digest.hexdigest():
         raise ValueError('proof receipt changed during retention')
     return {'sha256': digest.hexdigest(), 'bytes': output.stat().st_size}
 
@@ -246,7 +246,7 @@ def validate(stage: Path, destination: Path) -> None:
                       for name in ('config_path', 'receipt_path', 'namespace_path', 'namespace_started_path')),
                     *(f'native-{case}-{name}' for case in ('normal', 'timeout', 'kill')
                       for name in ('namespace_started', 'teardown', 'launcher_execution',
-                                   'native_handle', 'native_handle_ready')),
+                                   'native_handle', 'native_handle_ready', 'native_handle_committed')),
                     'native-normal-namespace_final', 'native-normal-native_seal',
                     'native-normal-native_execution',
                     'native-normal-control_execution', 'native-timeout-interruption',
