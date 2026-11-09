@@ -1,0 +1,49 @@
+{
+  "revision": "e02d7db5900b5c302fb338038448fb610997c292",
+  "checks": [
+    {
+      "name": "ruff",
+      "command": [
+        "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+        "-m",
+        "ruff",
+        "check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.119,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "log": "/private/tmp/k5d-shared-root-checks-e02-20261109/ruff.log"
+    },
+    {
+      "name": "mypy",
+      "command": [
+        "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+        "-m",
+        "mypy",
+        "--config-file",
+        "pyproject.toml"
+      ],
+      "exit_code": 0,
+      "seconds": 60.254,
+      "sha256": "1ff373c3cad226405390b47a6b3bfd37d55b59d1f5735ace1b6268fdafc86150",
+      "log": "/private/tmp/k5d-shared-root-checks-e02-20261109/mypy.log"
+    },
+    {
+      "name": "pytest",
+      "command": [
+        "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+        "-m",
+        "pytest"
+      ],
+      "exit_code": 0,
+      "seconds": 110.039,
+      "sha256": "488bc6abd37d227f5fa6702f677a459b65fcbb5f00719869fc1a2a10727d236b",
+      "log": "/private/tmp/k5d-shared-root-checks-e02-20261109/pytest.log"
+    }
+  ],
+  "scope": "Configured local software checks on exactrootrevision e02d7db5, not Linux CPUproof, GPUparity, cost orscale evidence.",
+  "test_summary": "2008 passed,39 skipped",
+  "isolated_consumer_revision": "df6eee829e56a1880397547f6d654eb47169c4f4",
+  "isolated_consumer_archive_sha256": "4477693bd025e633a8d14a4f8f303576e41df4cd23420c083cedd967113ce463",
+  "root_independent_git_blob_count": 1376
+}
