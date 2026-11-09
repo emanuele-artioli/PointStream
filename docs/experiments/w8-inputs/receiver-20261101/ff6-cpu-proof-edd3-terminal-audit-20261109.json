@@ -7,7 +7,9 @@
   "canonical_created_to_terminal_updated_seconds": 87.94822812080383,
   "canonical_status": "failed",
   "canonical_terminal_updated_epoch": 1794249988.5819182,
-  "conservative_cpu_charge": "pending root review; 90 s broad created-to-terminal wall upper plus 10 s external audit proposed; prior 20 s preparation separately charged",
+  "charge_cpu_seconds_including_preparation": 120,
+  "charge_cpu_seconds_new": 100,
+  "conservative_cpu_charge": "Root accepted 90 s broad created-to-terminal wall upper plus 10 s external audit; prior 20 s preparation separately charged; total 120 CPU seconds. Queue included; not measured aggregate CPU.",
   "cpu_affinity_index": 0,
   "cpu_selected": [
     0

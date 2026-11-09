@@ -1123,6 +1123,16 @@
       "basis": "Conservative 10 CPU seconds for fresh canonical workers and all-job status, both per-host claim/stat/public-SHA rechecks, fleet doctor, source-cache copy and publication. Includes unmetered manager/admin work; not a measured manager CPU total. Within unchanged 50 CPU preparation and 800 CPU proof ceiling."
     },
     {
+      "phase": "w8-ff6-cpu-proof-edd3-closeout-20261109",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 100,
+      "witness_qualification": false,
+      "release_stage": "research-first24/28",
+      "basis": "Root accepted conservative 90 CPU seconds for 87.948 s created-to-terminal wall upper including queue plus 10 CPU postchecks/admin. This is not measured aggregate CPU. Prior 20 CPU preparation separately charged; 120 CPU total, 0 GPU for failed pre-leaf proof. Task process group and CPU claim absent; no scientific evidence or retry."
+    },
+    {
       "phase": "k5d-shared-vendor-source-audit-20261109",
       "parent_phase": "k5d-scale-first-tranche-20261105",
       "workstream": "ball",
@@ -1713,15 +1723,15 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 4530,
-      "status": "Remaining unspent 4550 GPU / 4530 CPU after 20 CPU preparation charged. CPU-only proof job 20261109T184450Z-edd3f290 pending; source archive mode true, no GPU. Its unchanged 800 CPU ceiling includes 20 preparation charged + at most 30 remaining preparation + 600 campaign + 100 post-campaign + 50 independent audit. Qualification <=900 GPU / 1000 CPU remains unreleased; full 240/80 gates unchanged."
+      "cpu_seconds": 4430,
+      "status": "Remaining unspent 4550 GPU / 4430 CPU after CPU proof edd3 failed before any proof leaf: 20 CPU preparation plus conservative 100 CPU terminal/queue wall upper and postchecks, total 120 CPU / 0 GPU. No automatic retry; root review required before any repair or new request. Qualification <=900 GPU / 1000 CPU remains unreleased; full 240/80 gates unchanged."
     }
   ],
   "jobs": [
     {
       "job_id": "20261109T184450Z-edd3f290",
       "phase": "w8-full-witness-staged-20261106",
-      "state": "pending; one CPU-only proof; no automatic retry",
+      "state": "failed before proof leaves; process group and task CPU claim absent; no automatic retry",
       "revision": "ff6ae97cbb84dc870283e697e2763c1f62cf78f8",
       "source_sha256": "e61c4bac77b3e6f48517e6b2241841414ec2a722a867cc8eabcc08f46406d3e4",
       "snapshot_sha256": "9e96b6764c2801c751cb583e6006002b6fb842815d8aeb1ddc61a2e4560fa70d",
@@ -1736,7 +1746,10 @@
       "remaining_preparation_cpu_ceiling_seconds": 30,
       "result_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261109T184450Z-edd3f290",
       "local_intent": "/private/tmp/pointstream-w8-ff6-cpu-proof-submission-20261109-a1/intent.json",
-      "scope": "CPU-only source/packet/namespace/native/policy proof; not GPU, generation or quality evidence"
+      "scope": "CPU-only source/packet/namespace/native/policy proof; not GPU, generation or quality evidence",
+      "result": "Failed at first setrlimit(RLIMIT_CPU, (100, 3600)): inherited hard limit lower than 3600. Actual inherited hard value unknown. No packet, native, namespace, policy, GPU or quality evidence.",
+      "charge_cpu_seconds_including_prior_preparation": 120,
+      "terminal_receipt": "docs/experiments/w8-inputs/receiver-20261101/ff6-cpu-proof-edd3-terminal-audit-20261109.json"
     },
     {
       "job_id": "20261104T221616Z-49f19251",
@@ -2696,9 +2709,9 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "W8 ff6 CPU-only proof published pending; one canonical bounded completion wait is authorized. No automatic replay or GPU release.",
-    "jobs": ["20261109T184450Z-edd3f290"],
-    "batches": [{"jobs": ["20261109T184450Z-edd3f290"], "deadline": "2026-11-09T19:15:35.387884+00:00", "max_wait_seconds": 2700}],
+    "state": "W8 CPU proof edd3 terminated failed before proof leaves; canonical wait stopped. Task group and CPU claim absent; no retry or GPU release.",
+    "jobs": [],
+    "batches": [],
     "native_completion_resume_verified": false,
     "recurring_llm_polling": false,
     "completed": false
