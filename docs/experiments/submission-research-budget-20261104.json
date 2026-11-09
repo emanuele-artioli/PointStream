@@ -1140,6 +1140,15 @@
       "cpu_seconds": 20,
       "release_stage": "research-first24/28",
       "basis": "Two separatelyrootauthorized <=10CPUreadonlysourceaudits onregisteredgpu5 CPU1, no model/weights/GPU. First6files47633B remote0.071327CPU; followup9modules71632B remote0.065021CPU; localSSH~0.01CPUeach. Fullconservative20CPUchargedonceincludingcontrol/admin. RootverifiedcapturedsourceSHA+AST: solePythonspawn common.start_train uncalledbyfixedadapter/collectedPythonmodules. Doesnotprove nativeextension/arbitrarydynamicbehaviour; sourcebridge andactualnewsourceCPUproofstillrequired."
+    },
+    {
+      "phase": "k5d-shared-df6-native-preparation-20261109",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "release_stage": "research-first24/28",
+      "basis": "Conservativeauthorized50CPUpreparation forONEnewdf6sourceCPUproof: allhostdoctor/knownjobs/CPUclaims/gpu2CPU0/runtime/tools/unshare/storage/inputZIP SHA(14.41CPUreported), exactnewsourcegzipupload4.94wall+sourcepublichashverification/admin. Countsinside300CPUleaf; future250CPU(100campaign100post30audit20contingency),noGPUparity/full30release. ActualjobIDpending; no replay."
     }
   ],
   "reservations": [
@@ -1658,8 +1667,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8770,
-      "cpu_seconds": 8690,
-      "status": "Remaining_unspent8770GPU8690CPU after20CPUvendorreadiness; no activeBallrequest/wait. Newexplicitsharednumericalprofilewithallocatorlimits/sourcebridgepreparedlocally; freshactualsourceCPUproof+unchanged16arraygatesbeforeparitypromotion. No292/586/full30release."
+      "cpu_seconds": 8640,
+      "status": "Remaining_unspent8770GPU8640CPU; df6nativeCPUproof300CPU0GPUrootreleased,50prepcharged/250future, sourceuploadonceverification/admissioninprogress. No sharedGPU16/292/586/full30 release."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
