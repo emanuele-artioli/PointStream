@@ -7,12 +7,12 @@ from src.codecs import dcvc_uf_worker as dcvc
 
 
 def claim():
-    policy = {'mode': 'shared', 'basis': parity.SHARED_BASIS, 'margin_mib': 4096}
+    policy = {'mode': 'shared', 'basis': parity.SHARED_BASIS, 'margin_mib': 8192}
     spec = {'k5d_shared_parity_profile': parity.SHARED_PROFILE, 'gpu_memory_mib': 16384,
             'gpu_models': ['RTX A6000'], 'gpu_sharing': policy,
             'contention': {'policy': 'continue', 'basis': parity.SHARED_BASIS, 'resume_attempts': 0}}
     env = {'PS_GPU_SHARING': 'shared', 'PS_GPU_MEMORY_LIMIT_MIB': '16384'}
-    return spec, {'gpu_sharing': policy.copy()}, env
+    return spec, {'gpu_sharing': policy.copy(), 'contention_policy': spec['contention'].copy()}, env
 
 
 def fake_torch(*, allocated=0, total=48 * 1024**3, name='NVIDIA RTX A6000', capability=(8, 6)):
@@ -40,17 +40,29 @@ def test_shared_claim_requires_exact_opt_in_and_unchanged_default():
         parity.check_resource_profile(spec, {'gpu_sharing': {'mode': 'exclusive'}}, requested=True, environ=env)
 
 
-def test_two_allocators_capped_before_allocation_and_child_env_propagates():
+def test_two_allocators_capped_before_allocation_and_child_env_propagates(tmp_path):
     spec, _, env = claim()
     del spec
     env['PS_K5D_SHARED_NUMERICAL'] = parity.SHARED_PROFILE
+    env['PS_SCRATCH_DIR'] = str(tmp_path)
+    receipt_dir = tmp_path / 'shared-resource-receipts'
+    receipt_dir.mkdir()
+    env['PS_K5D_RESOURCE_RECEIPTS'] = str(receipt_dir)
     saved = {'OTHER': 'preserved'}
     parity.configure_child_environment(saved, env)
-    assert saved == {**env, 'OTHER': 'preserved'}
+    assert saved == {key: value for key, value in env.items() if key != 'PS_SCRATCH_DIR'} | {'OTHER': 'preserved'}
+    saved['PS_SCRATCH_DIR'] = str(tmp_path)
     parent, parent_calls = fake_torch()
     child, child_calls = fake_torch()
-    parity.apply_parent_limit(parent)
+    parent_receipt = parity.apply_parent_limit(parent)
+    import json
+    (receipt_dir / 'parent.json').write_text(json.dumps(parent_receipt))
     dcvc._apply_optional_shared_parity_limit(child, saved)
+    parity.validate_resource_receipts(receipt_dir)
+    parent_receipt['budget_mib'] = 16384
+    (receipt_dir / 'parent.json').write_text(json.dumps(parent_receipt))
+    with pytest.raises(ValueError):
+        parity.validate_resource_receipts(receipt_dir)
     assert parent_calls == child_calls == [(8192 / (48 * 1024), 0)]
     with pytest.raises(ValueError):
         parity.configure_child_environment({}, {**env, 'PS_GPU_SHARING': 'exclusive'})

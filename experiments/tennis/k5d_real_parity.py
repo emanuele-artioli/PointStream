@@ -63,7 +63,7 @@ def spec(base: dict, *, assets: dict[str, dict[str, str]], deadline: str, unshar
     if shared_numerical:
         result['arguments'].append('--shared-numerical-only')
         result.update(k5d_shared_parity_profile=SHARED_PROFILE, gpu_memory_mib=SHARED_LIMIT_MIB,
-                      gpu_sharing={'mode': 'shared', 'basis': SHARED_BASIS, 'margin_mib': 4096},
+                      gpu_sharing={'mode': 'shared', 'basis': SHARED_BASIS, 'margin_mib': 8192},
                       contention={'policy': 'continue', 'basis': SHARED_BASIS, 'resume_attempts': 0})
     from experiments.jobs.inbox import validate_spec
     validate_spec(result)
@@ -79,15 +79,16 @@ def check_resource_profile(specification: dict, dispatch: dict, *, requested: bo
     if (specification.get('k5d_shared_parity_profile') != SHARED_PROFILE
             or specification.get('gpu_memory_mib') != SHARED_LIMIT_MIB
             or specification.get('gpu_models') != ['RTX A6000']
-            or specification.get('gpu_sharing') != {'mode': 'shared', 'basis': SHARED_BASIS, 'margin_mib': 4096}
+            or specification.get('gpu_sharing') != {'mode': 'shared', 'basis': SHARED_BASIS, 'margin_mib': 8192}
             or specification.get('contention') != {'policy': 'continue', 'basis': SHARED_BASIS, 'resume_attempts': 0}
             or dispatch.get('gpu_sharing') != specification['gpu_sharing']
+            or dispatch.get('contention_policy') != specification['contention']
             or environ.get('PS_GPU_SHARING') != 'shared'
             or environ.get('PS_GPU_MEMORY_LIMIT_MIB') != str(SHARED_LIMIT_MIB)):
         raise ValueError('shared numerical parity claim or policy differs')
 
 
-def apply_parent_limit(torch: Any) -> None:
+def apply_parent_limit(torch: Any) -> dict:
     """Cap this allocator before loading models; DCVC children use a separate cap."""
     cuda = torch.cuda
     if cuda.memory_allocated(0) != 0:
@@ -96,6 +97,8 @@ def apply_parent_limit(torch: Any) -> None:
     if total < SHARED_LIMIT_MIB * 2**20:
         raise ValueError('shared A6000 capacity is insufficient')
     cuda.set_per_process_memory_fraction(PER_PROCESS_MIB * 2**20 / total, 0)
+    return {'role': 'parent', 'pid': os.getpid(), 'pgid': os.getpgrp(), 'budget_mib': PER_PROCESS_MIB,
+            'total_bytes': total, 'fraction': PER_PROCESS_MIB * 2**20 / total, 'allocated_before': 0}
 
 
 def configure_child_environment(saved: dict, current: dict) -> None:
@@ -104,8 +107,25 @@ def configure_child_environment(saved: dict, current: dict) -> None:
             or current.get('PS_GPU_SHARING') != 'shared'
             or current.get('PS_GPU_MEMORY_LIMIT_MIB') != str(SHARED_LIMIT_MIB)):
         raise ValueError('shared child environment differs')
-    for key in ('PS_K5D_SHARED_NUMERICAL', 'PS_GPU_SHARING', 'PS_GPU_MEMORY_LIMIT_MIB'):
+    for key in ('PS_K5D_SHARED_NUMERICAL', 'PS_GPU_SHARING', 'PS_GPU_MEMORY_LIMIT_MIB', 'PS_K5D_RESOURCE_RECEIPTS'):
         saved[key] = current[key]
+
+
+def validate_resource_receipts(directory: Path) -> None:
+    paths = sorted(directory.glob('*.json'))
+    if not (directory / 'parent.json').is_file() or len(paths) < 2:
+        raise ValueError('shared parent and DCVC allocator receipts required')
+    for path in paths:
+        value = json.loads(path.read_text())
+        role = 'parent' if path.name == 'parent.json' else 'dcvc'
+        total = value.get('total_bytes')
+        if (value.get('role') != role or not isinstance(total, int) or total < SHARED_LIMIT_MIB * 2**20
+                or value.get('budget_mib') != PER_PROCESS_MIB or value.get('allocated_before') != 0
+                or value.get('fraction') != PER_PROCESS_MIB * 2**20 / total
+                or not isinstance(value.get('pid'), int) or value['pid'] <= 0
+                or not isinstance(value.get('pgid'), int) or value['pgid'] < 0
+                or (role == 'dcvc' and path.name != f"child-{value['pid']}.json")):
+            raise ValueError('invalid shared allocator receipt')
 
 
 def run(args: argparse.Namespace) -> None:
@@ -135,8 +155,11 @@ def run(args: argparse.Namespace) -> None:
             or tuple(torch.cuda.get_device_capability(0)) != (8, 6)):
         raise ValueError('A6000 CUDA device required')
     if args.shared_numerical_only:
-        apply_parent_limit(torch)
+        receipt_dir = scratch / 'shared-resource-receipts'
+        receipt_dir.mkdir()
+        cp.write_new(receipt_dir / 'parent.json', apply_parent_limit(torch))
         os.environ['PS_K5D_SHARED_NUMERICAL'] = SHARED_PROFILE
+        os.environ['PS_K5D_RESOURCE_RECEIPTS'] = str(receipt_dir)
         # K5 snapshots its child environment at import time; update only this
         # reviewed opt-in so native DCVC encode/decode workers receive the cap.
         from experiments.tennis import k5
@@ -179,6 +202,8 @@ def run(args: argparse.Namespace) -> None:
     publish.mkdir()
     shutil.move(str(prepared), publish / 'prepared')
     shutil.move(str(scored), publish / 'scored')
+    if args.shared_numerical_only:
+        shutil.move(str(receipt_dir), publish / 'shared-resource-receipts')
     cp.write_new(publish / 'parity.json', {'comparison': comparison, 'checkpoint_sha256': checkpoint_sha,
                  'execution_identity': identity, 'native_cpu_receipt_sha256': args.native_cpu_receipt_sha256,
                  'scope': 'exact 16-frame calibration parity; not an independent sample',
@@ -232,6 +257,8 @@ def validate() -> None:
               cost.unpack(stage / 'published.tar', published_sha) as output):
             identity = cp.execution_identity()
             saved = json.loads((output / 'parity.json').read_text())
+            if saved.get('shared_numerical_only') is True:
+                validate_resource_receipts(output / 'shared-resource-receipts')
             verify_scored(output, identity)
             cf.prepare_parity(output / 'prepared', prior, identity)
             comparison = cp.compare_equivalence(prior, output / 'scored' / 'assembled', oracle.sha(prior / 'pilot.json'))
