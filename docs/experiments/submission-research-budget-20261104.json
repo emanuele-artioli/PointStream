@@ -1113,6 +1113,16 @@
       "basis": "One approved exclusive ff6 source/native transfer and two host postchecks; actual distinct observed CPU 1.316218 seconds including local source compression and fresh claim check; conservative 5 includes unmetered small administration. Root audit pending. Prep cumulative 10/50 inside unchanged CPU proof 800; 40 preparation CPU remain. No job or GPU."
     },
     {
+      "phase": "w8-ff6-cpu-proof-publication-prep-20261109",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 10,
+      "witness_qualification": false,
+      "release_stage": "research-first24/28",
+      "basis": "Conservative 10 CPU seconds for fresh canonical workers and all-job status, both per-host claim/stat/public-SHA rechecks, fleet doctor, source-cache copy and publication. Includes unmetered manager/admin work; not a measured manager CPU total. Within unchanged 50 CPU preparation and 800 CPU proof ceiling."
+    },
+    {
       "phase": "k5d-shared-vendor-source-audit-20261109",
       "parent_phase": "k5d-scale-first-tranche-20261105",
       "workstream": "ball",
@@ -1703,11 +1713,31 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 4540,
-      "status": "Remaining_unspent4550GPU4540CPU; rootreleasedONEexactff6CPUproof800total/790futureCPU0GPU includingprep10charged,40futureprep600campaign100post50audit; actualrequestnotyetsubmitted. Parentincludesallproof/ops/failure; no duplicateleafreservation. No GPUqualification/fullcandidate release."
+      "cpu_seconds": 4530,
+      "status": "Remaining unspent 4550 GPU / 4530 CPU after 20 CPU preparation charged. CPU-only proof job 20261109T184450Z-edd3f290 pending; source archive mode true, no GPU. Its unchanged 800 CPU ceiling includes 20 preparation charged + at most 30 remaining preparation + 600 campaign + 100 post-campaign + 50 independent audit. Qualification <=900 GPU / 1000 CPU remains unreleased; full 240/80 gates unchanged."
     }
   ],
   "jobs": [
+    {
+      "job_id": "20261109T184450Z-edd3f290",
+      "phase": "w8-full-witness-staged-20261106",
+      "state": "pending; one CPU-only proof; no automatic retry",
+      "revision": "ff6ae97cbb84dc870283e697e2763c1f62cf78f8",
+      "source_sha256": "e61c4bac77b3e6f48517e6b2241841414ec2a722a867cc8eabcc08f46406d3e4",
+      "snapshot_sha256": "9e96b6764c2801c751cb583e6006002b6fb842815d8aeb1ddc61a2e4560fa70d",
+      "spec_sha256": "d93a2d4b71c35ec407ee800da0337fdb5c57e883d4eb14ed3ea3b684f0382ee9",
+      "deadline": "2026-11-09T19:15:35.387884+00:00",
+      "host": "gpu5",
+      "cpu_affinity_index": 0,
+      "source_archive": true,
+      "gpu_ceiling_seconds": 0,
+      "cpu_ceiling_including_preparation_seconds": 800,
+      "prepared_cpu_charged_seconds": 20,
+      "remaining_preparation_cpu_ceiling_seconds": 30,
+      "result_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261109T184450Z-edd3f290",
+      "local_intent": "/private/tmp/pointstream-w8-ff6-cpu-proof-submission-20261109-a1/intent.json",
+      "scope": "CPU-only source/packet/namespace/native/policy proof; not GPU, generation or quality evidence"
+    },
     {
       "job_id": "20261104T221616Z-49f19251",
       "phase": "w7-remux-transport-20261104",
@@ -2666,9 +2696,9 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "No active jobs/waits. Ball4224expired and acknowledged. W8 source proof unsubmitted; bounded shared readiness only, no automatic replay.",
-    "jobs": [],
-    "batches": [],
+    "state": "W8 ff6 CPU-only proof published pending; one canonical bounded completion wait is authorized. No automatic replay or GPU release.",
+    "jobs": ["20261109T184450Z-edd3f290"],
+    "batches": [{"jobs": ["20261109T184450Z-edd3f290"], "deadline": "2026-11-09T19:15:35.387884+00:00", "max_wait_seconds": 2700}],
     "native_completion_resume_verified": false,
     "recurring_llm_polling": false,
     "completed": false
