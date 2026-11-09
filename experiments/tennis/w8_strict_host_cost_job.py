@@ -96,11 +96,15 @@ class StableDigests:
                 'hash_cpu_seconds': self.cpu_seconds, 'scope': 'this process only'}
 
 
-def stage_inputs(stage: Path, digest_file: Callable[[Path], str] | None = None) -> tuple[dict[str, Path], dict[str, Any]]:
+def stage_inputs(stage: Path, digest_file: Callable[[Path], str] | None = None, *,
+                 witness: bool = False) -> tuple[dict[str, Path], dict[str, Any]]:
     spec = json.loads((stage.parent / 'spec.json').read_text())
     staging = json.loads((stage / 'staging.json').read_text())
     dispatch = json.loads((stage / 'dispatch.json').read_text())
     profile = spec.get('w8_paired_cost_profile')
+    witness_profile = spec.get('w8_witness_profile')
+    if witness and (profile is not None or witness_profile not in ('w8-context-pilot-v1', 'w8-context-qualification-v1')):
+        raise ValueError('explicit separate context witness profile required')
     if profile is not None and (profile != 'w8-paired-cost-800-v1'
             or spec.get('budget_seconds') != 800 or spec.get('smoke', {}).get('seconds') != 260
             or spec.get('full', {}).get('seconds') != 500 or spec.get('validator_seconds') != 60
@@ -121,11 +125,21 @@ def stage_inputs(stage: Path, digest_file: Callable[[Path], str] | None = None) 
             or spec.get('environment', {}).get('sha256') != JCV_ENV
             or spec.get('gpu_sharing', {'mode': 'exclusive'}) != {'mode': 'exclusive'}
             or spec.get('contention', {}).get('policy') != 'stop'
-            or not 0 < spec.get('budget_seconds', 0) <= (800 if profile is not None else 600)):
+            or not 0 < spec.get('budget_seconds', 0) <= (900 if witness else 800 if profile is not None else 600)):
         raise ValueError('one-core JCV GPU campaign with a valid bounded budget required')
     wanted = {'packet': fixed.WINDOW_SHA, 'profile': fixed.PROFILE_SHA, 'oracle': ORACLE_SHA,
               'base': BASE_ARCHIVE_SHA, 'aa': receiver.AA_ARCHIVE_SHA,
               **{key: receiver.PINNED_WEIGHTS[name] for key, name in WEIGHT_NAMES.items()}}
+    if witness:
+        from experiments.tennis.w8_receiver_finish import SAM_SHA
+        proof_sha = spec.get('witness_cpu_proof_sha256')
+        if (not isinstance(proof_sha, str) or len(proof_sha) != 64
+                or any(c not in '0123456789abcdef' for c in proof_sha)):
+            raise ValueError('root-pinned CPU proof SHA required')
+        wanted['cpu_proof'] = proof_sha
+        if witness_profile == 'w8-context-qualification-v1':
+            wanted.update(sam_weights=SAM_SHA,
+                          native_inventory='cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b')
     declared = {x['name']: x for x in spec['staged_inputs']}
     actual = {x['name']: x for x in staging['inputs']}
     if len(declared) != len(spec['staged_inputs']) or len(actual) != len(staging['inputs']):
@@ -186,9 +200,11 @@ def _item(path: Path, digest_file: Callable[[Path], str] | None = None) -> dict[
 
 def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, wall_seconds: int, code_root: Path, loader: Path, *, materialize_profile: bool = False, clock_profile: bool = False, witness_mode: str | None = None) -> dict[str, Any]:
     model_modes = ('generate', 'context_qualification')
-    finish_modes = ('context_rgb', 'context_sam', 'context_compose')
-    if (witness_mode not in (None, *model_modes, *finish_modes)
-            or (witness_mode is not None and (config.get('worker_kind') != witness_mode or not clock_profile))
+    finish_modes = ('context_rgb', 'context_sam', 'context_compose', 'rgb', 'sam', 'compose')
+    if (witness_mode not in (None, 'packet', *model_modes, *finish_modes)
+            or (witness_mode is not None and config.get('worker_kind') != witness_mode)
+            or (witness_mode not in (None, 'packet') and not clock_profile)
+            or (witness_mode == 'packet' and (materialize_profile or clock_profile))
             or (witness_mode in model_modes and not materialize_profile)
             or (witness_mode in finish_modes and materialize_profile)):
         raise ValueError('witness worker mode or required safeguards differ')
@@ -206,7 +222,8 @@ def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, 
         if not Path(stage_dir).is_absolute() or Path(stage_dir).name not in ('smoke', 'full'):
             raise ValueError('witness requires the actual fleet stage directory')
         env['PS_STAGE_DIR'] = stage_dir
-    module = ('experiments.tennis.w8_strict_packet_worker' if config['worker_kind'] == 'packet'
+    module = ('experiments.tennis.w8_strict_receiver_worker' if witness_mode == 'packet'
+              else 'experiments.tennis.w8_strict_packet_worker' if config['worker_kind'] == 'packet'
               else 'experiments.tennis.w8_strict_receiver_worker' if witness_mode in finish_modes
               else 'experiments.tennis.w8_strict_host_model_worker')
     if config['worker_kind'] == 'packet':
@@ -256,10 +273,22 @@ def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, 
                'cpu_seconds': after.ru_utime + after.ru_stime - before.ru_utime - before.ru_stime,
                'config_sha256': fixed.file_sha(config_path)}
     (work / 'exit.json').write_text(json.dumps(receipt, sort_keys=True))
+    if witness_mode is not None and (status != 0 or timed_out):
+        from experiments.tennis import w8_witness_profile
+        try:
+            assert outside_pidns is not None
+            w8_witness_profile.namespace_started_absence(work / 'namespace-receipt.json',
+                expected_pgid=owned_pgid, expected_outside=outside_pidns, expected_target=module)
+            teardown = {'owned_init_and_worker_absent': True,
+                        'basis': 'PID namespace teardown; descendants not individually observed'}
+        except (OSError, ValueError, KeyError, IndexError) as exc:
+            teardown = {'owned_init_and_worker_absent': False, 'error': str(exc)}
+        with (work / 'namespace-teardown.json').open('x') as output:
+            json.dump(teardown, output, sort_keys=True)
     if witness_mode is not None and status == 0 and not timed_out:
-        from experiments.tennis import w8_witness_namespace
+        from experiments.tennis import w8_witness_profile
         assert outside_pidns is not None
-        namespace_receipt = w8_witness_namespace.validate_receipt(work / 'namespace-receipt.json',
+        namespace_receipt = w8_witness_profile.namespace_completion(work / 'namespace-receipt.json',
             expected_pgid=owned_pgid, expected_outside=outside_pidns, expected_target=module)
         receipt['namespace_receipt_sha256'] = fixed.file_sha(work / 'namespace-receipt.json')
         receipt['namespace_children_cpu_seconds'] = namespace_receipt['children_cpu_seconds']
@@ -577,7 +606,7 @@ def check_clock_source_binding(config: dict[str, Any], origins: dict[str, str], 
 
 def prepare_receiver_inputs(paths: dict[str, Path], spec: dict[str, Any], *, packet_cpu: int,
                             materialize_profile: bool, clock_profile: bool,
-                            digests: StableDigests) -> dict[str, Any]:
+                            digests: StableDigests, witness: bool = False) -> dict[str, Any]:
     """Authenticate and decode the fixed packet under the existing strict policy."""
     rate = audit_public_rate(paths['packet'], paths['profile'])
     fingerprints = read_oracle(paths['oracle'])
@@ -648,7 +677,8 @@ def prepare_receiver_inputs(paths: dict[str, Path], spec: dict[str, Any], *, pac
     packet_files = {'bundle': _item(paths['packet'], digests.digest),
                     'profile': _item(paths['profile'], digests.digest), 'guider': _item(paths['w6'], digests.digest)}
     packet_cfg = config('packet', packet_files, decoder_out, policies['main'], packet_cpu, '')
-    packet_usage = _worker(Path(policies['main']['python']), packet_cfg, decoder_work, packet_cpu, 130, root, loader_receipt)
+    packet_usage = _worker(Path(policies['main']['python']), packet_cfg, decoder_work, packet_cpu, 130, root,
+                           loader_receipt, witness_mode='packet' if witness else None)
     decoder_manifest = decoder_out / 'decoded-manifest.json'
     decoded = json.loads(decoder_manifest.read_text())
     cpu_receipt = json.loads((decoder_out / 'cpu-only.json').read_text())
@@ -695,7 +725,7 @@ def prepare_receiver_inputs(paths: dict[str, Path], spec: dict[str, Any], *, pac
         generated[f'code:{name}'] = {'path': str(current), 'sha256': digest}
     if clock_profile:
         add_clock_source(generated, root, code_manifest)
-    return {'rate': rate, 'fingerprints': fingerprints, 'preflight': preflight, 'identity': identity, 'snapshot_root': snapshot_root, 'scratch': scratch, 'protected_path': protected_path, 'fresh_receipt': fresh_receipt, 'root': root, 'code_manifest': code_manifest, 'loader_receipt': loader_receipt, 'decoder_work': decoder_work, 'decoder_out': decoder_out, 'model_work': model_work, 'model_out': model_out, 'cached_jcv': cached_jcv, 'policies': policies, 'config': config, 'packet_usage': packet_usage, 'decoder_manifest': decoder_manifest, 'generated': generated}
+    return {'paths': paths, 'rate': rate, 'fingerprints': fingerprints, 'preflight': preflight, 'identity': identity, 'snapshot_root': snapshot_root, 'scratch': scratch, 'protected_path': protected_path, 'fresh_receipt': fresh_receipt, 'root': root, 'code_manifest': code_manifest, 'loader_receipt': loader_receipt, 'decoder_work': decoder_work, 'decoder_out': decoder_out, 'model_work': model_work, 'model_out': model_out, 'cached_jcv': cached_jcv, 'policies': policies, 'config': config, 'packet_usage': packet_usage, 'decoder_manifest': decoder_manifest, 'generated': generated}
 
 
 def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generator_cpu: int,

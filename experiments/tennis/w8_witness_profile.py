@@ -15,6 +15,43 @@ from experiments.tennis import w8_receiver_finish as finish
 from experiments.tennis import w8_receiver_generate as generation
 
 
+def namespace_started_absence(path: Path, *, expected_pgid: int, expected_outside: str,
+                              expected_target: str) -> dict[str, Any]:
+    """Require pre-wait owned identities and confirm both exact processes exited."""
+    started = json.loads(path.with_name(path.name + '.started').read_text())
+    if (started.get('schema') != 1 or started.get('target') != expected_target
+            or started.get('outside_namespace') != expected_outside):
+        raise ValueError('namespace pre-wait identity differs')
+    for item in (started['namespace_init'], started['worker_host_identity']):
+        if (type(item.get('host_pid')) is not int or item['host_pid'] <= 0
+                or type(item.get('start_ticks')) is not int or item['start_ticks'] <= 0
+                or item.get('host_pgid') != expected_pgid):
+            raise ValueError('invalid namespace owned process identity')
+        try:
+            raw = (Path('/proc') / str(item['host_pid']) / 'stat').read_text()
+        except FileNotFoundError:
+            continue
+        fields = raw[raw.rfind(')') + 2:].split()
+        if int(fields[19]) == item['start_ticks']:
+            raise ValueError('owned namespace init or worker still alive')
+    return started
+
+
+def namespace_completion(path: Path, *, expected_pgid: int, expected_outside: str,
+                         expected_target: str) -> dict[str, Any]:
+    """Join pre-wait and final identities; kernel teardown covers other children."""
+    from experiments.tennis import w8_witness_namespace as namespace
+
+    final = namespace.validate_receipt(path, expected_pgid=expected_pgid,
+                                       expected_outside=expected_outside, expected_target=expected_target)
+    started = namespace_started_absence(path, expected_pgid=expected_pgid,
+                                        expected_outside=expected_outside, expected_target=expected_target)
+    if (started.get('namespace_init') != final.get('namespace_init')
+            or started.get('worker_host_identity') != final.get('worker_host_identity')):
+        raise ValueError('namespace pre-wait identity differs from final receipt')
+    return final
+
+
 def check_worker_isolation(config: dict[str, Any], isolation: dict[str, Any], *, runtime: dict[str, Any],
                            source_manifest: dict[str, Any], loader: dict[str, Any], loader_sha: str) -> None:
     """Recheck protected grants and clock/source bindings from independent inputs."""
@@ -96,6 +133,8 @@ def check_finish(*, generation_dirs: dict[str, Path], expected: dict[str, dict[s
         raise ValueError('independent native receipt differs')
     if (sam_seal.get('sam_record_sha256') != trusted.get('sam_record_sha256')
             or not trusted.get('sam_record_sha256')
+            or sam_seal.get('files', {}).get('protected_record') != trusted.get('protected_record_sha256')
+            or not trusted.get('protected_record_sha256')
             or sam_seal.get('files', {}).get('weights') != finish.SAM_SHA
             or sam_seal['files'].get('text') != finish.SAM_SHA
             or sam_seal.get('device') != trusted.get('gpu_name') or not trusted.get('gpu_name')
@@ -157,13 +196,13 @@ def execute_generation_units(prepared: dict[str, Any], dispatch: dict[str, Any],
     from experiments.tennis import w8_strict_host_cost_job as host
     from experiments.tennis import w8_cuda_system_leaves as policy
 
-    if ((mode == 'context_qualification' and units != fixed.UNITS)
+    if ((mode == 'context_qualification' and units not in (fixed.UNITS, (fixed.UNITS[0],), (fixed.UNITS[1],)))
             or (mode == 'generate' and (len(units) != 1 or units[0] not in fixed.UNITS))
             or mode not in ('context_qualification', 'generate')
             or type(worker_cpu) is not int or not 1 <= worker_cpu <= 1800
             or type(worker_wall) is not int or not 11 <= worker_wall <= 1800
             or (mode == 'context_qualification' and (worker_cpu > 500 or worker_wall > 500))):
-        raise ValueError('exact qualification pair or one bounded full candidate required')
+        raise ValueError('registered qualification unit(s) or one bounded full candidate required')
     if (not visible or visible != os.environ.get('PS_CLAIMED_GPU_UUID')
             or policy.canonical_gpu_uuid(visible) != policy.canonical_gpu_uuid(
                 (dispatch.get('environment', {}).get('gpu') or {}).get('uuid', ''))):
@@ -212,6 +251,207 @@ def execute_generation_units(prepared: dict[str, Any], dispatch: dict[str, Any],
                 or materialized['wall_seconds'] + materialized['cleanup_wall_seconds'] > usage[unit]['wall_seconds']):
             raise ValueError('qualification materialization receipt differs')
         outputs[unit] = output
-    checked = (check_generation(outputs, expected) if mode == 'context_qualification'
+    checked = ({unit: generation.validate_context_qualification(outputs[unit], expected[unit]) for unit in units}
+               if mode == 'context_qualification'
                else {units[0]: generation.validate_sealed(outputs[units[0]], expected[units[0]])})
     return {'outputs': outputs, 'expected': expected, 'usage': usage, 'validation': checked}
+
+
+def execute_qualification_finish(prepared: dict[str, Any], generations: dict[str, Any], *,
+                                 identity_path: Path, sam_weights: Path, native_output: Path,
+                                 dispatch: dict[str, Any], visible: str,
+                                 worker_cpu: int, worker_wall: int) -> dict[str, Any]:
+    """Join two validated contexts to native RGB, independent SAM and composition.
+
+    The native output must already have been produced by the separate fixed
+    launcher. This helper does not submit jobs or authorize promotion.
+    """
+    import os
+    from experiments.tennis import w8_strict_host_cost_job as host
+    from experiments.tennis import w8_cuda_system_leaves as policy
+    from experiments.tennis.w8_receiver_preflight import PROTECTED
+
+    if (type(worker_cpu) is not int or not 1 <= worker_cpu <= 500
+            or type(worker_wall) is not int or not 11 <= worker_wall <= 500):
+        raise ValueError('bounded qualification finish worker limits required')
+    gpu = (dispatch.get('environment', {}).get('gpu') or {})
+    if (not visible or visible != os.environ.get('PS_CLAIMED_GPU_UUID')
+            or policy.canonical_gpu_uuid(visible) != policy.canonical_gpu_uuid(gpu.get('uuid', ''))):
+        raise ValueError('qualification finish dispatch GPU differs')
+    host.check_preflight_bundle(prepared['preflight'], identity_path)
+    if fixed.file_sha(sam_weights) != finish.SAM_SHA:
+        raise ValueError('qualification SAM checkpoint differs')
+    outputs, expected = generations['outputs'], generations['expected']
+    check_generation(outputs, expected)
+    native_output = native_output.resolve(strict=True)
+    if not native_output.is_relative_to(prepared['scratch'].resolve(strict=True)):
+        raise ValueError('native output outside this task scratch')
+    native = json.loads((native_output / 'sealed.json').read_text())
+    if (set(native.get('denials', {})) != {item[0] for item in PROTECTED.values()}
+            or any(code not in (1, 13) for code in native['denials'].values())
+            or native.get('yuv_sha256') != fixed.file_sha(native_output / 'native.yuv')):
+        raise ValueError('native receipt denial or YUV identity differs')
+    packet = host._item(prepared['paths']['packet'])
+    profile = host._item(prepared['paths']['profile'])
+    gen_files = {}
+    for unit in fixed.UNITS:
+        gen_files[f'crop:{unit}'] = host._item(outputs[unit] / f'{unit}@match5.npz')
+        gen_files[f'generation_seal:{unit}'] = host._item(outputs[unit] / 'sealed.json')
+    scratch = prepared['scratch']
+    stage_outputs: dict[str, Path] = {}
+    configs: dict[str, Any] = {}
+    usages: dict[str, Any] = {}
+    for name in ('rgb', 'sam', 'compose'):
+        work = scratch / f'witness-finish-{name}'
+        work.mkdir()
+        output = work / 'output'
+        output.mkdir()
+        files = {'packet': packet, 'profile': profile}
+        if name == 'rgb':
+            files['yuv'] = host._item(native_output / 'native.yuv')
+        elif name == 'sam':
+            files.update(gen_files)
+            files.update(weights=host._item(sam_weights), text=host._item(sam_weights),
+                         sam_record=host._item(identity_path), protected_record=host._item(prepared['protected_path']))
+        else:
+            files.update(gen_files)
+            files['base'] = host._item(stage_outputs['rgb'] / 'base.npy')
+            for unit in fixed.UNITS:
+                files[f'mask:{unit}'] = host._item(stage_outputs['sam'] / f'{unit}-masks.npz')
+        host.add_clock_source(files, prepared['root'], prepared['code_manifest'])
+        mode = 'context_' + name
+        config = prepared['config'](mode, files, output, prepared['policies']['main'], worker_cpu,
+                                    '' if name == 'compose' else visible)
+        if name == 'rgb':
+            config['native_receipt'] = native
+        usage = host._worker(Path(prepared['policies']['main']['python']), config, work, worker_cpu, worker_wall,
+                             prepared['root'], prepared['loader_receipt'], clock_profile=True, witness_mode=mode)
+        receipt = json.loads((output / 'sealed.json').read_text())
+        check_worker_isolation(config, receipt['isolation'], runtime=prepared['policies']['main'],
+                               source_manifest=prepared['code_manifest'],
+                               loader=json.loads(prepared['loader_receipt'].read_text()),
+                               loader_sha=fixed.file_sha(prepared['loader_receipt']))
+        stage_outputs[name], configs[name], usages[name] = output, config, usage
+    identity = json.loads(identity_path.read_text())
+    trusted = {'native_receipt': native, 'sam_record_sha256': fixed.file_sha(identity_path),
+               'protected_record_sha256': fixed.file_sha(prepared['protected_path']),
+               'gpu_name': gpu['name'], 'claimed_gpu_uuid': visible,
+               'sam_verified_files': identity['sam_distribution']['verified_files']}
+    checked = check_finish(generation_dirs=outputs, expected=expected, base_dir=stage_outputs['rgb'],
+                           sam_dir=stage_outputs['sam'], compose_dir=stage_outputs['compose'], trusted=trusted)
+    return {'outputs': stage_outputs, 'configs': configs, 'usage': usages, 'validation': checked,
+            'trusted': trusted}
+
+
+def execute_native_base(prepared: dict[str, Any], *, inventory_path: Path,
+                        parent_cpu: int, worker_cpu: int, child_cpu: int, wall: int) -> dict[str, Any]:
+    """Run the fixed CPU-only native decoder under its independently audited launcher.
+
+    The caller owns campaign admission, total CPU accounting and teardown audit.
+    """
+    import os
+    import resource
+    import subprocess
+    import sys
+    import time
+    from experiments.tennis import w8_receiver_native_bootstrap as native
+    from experiments.tennis import w8_witness_namespace as namespace
+    from experiments.tennis.w8_receiver_preflight import PROTECTED
+
+    inventory_sha = 'cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b'
+    if (fixed.file_sha(inventory_path) != inventory_sha
+            or any(type(x) is not int or not 1 <= x <= 500 for x in (parent_cpu, worker_cpu, child_cpu, wall))):
+        raise ValueError('native inventory or bounded worker limits differ')
+    profile, sections = finish._packet({'packet': prepared['paths']['packet'], 'profile': prepared['paths']['profile']})
+    ivf = sections[profile['ivf']]
+    if fixed.digest(ivf) != finish.IVF_SHA:
+        raise ValueError('packet IVF differs')
+    inventory = json.loads(inventory_path.read_text())
+    binary = Path(inventory['ffmpeg_path']).resolve(strict=True)
+    loader = Path(inventory['elf_interpreter']).resolve(strict=True)
+    mapped = inventory['mapped_files']
+    loader_sha = mapped[str(loader)]['sha256']
+    libraries = {Path(name): item['sha256'] for name, item in mapped.items() if name not in (str(binary), str(loader))}
+    native.validate_inventory(inventory_path, inventory_sha, binary, loader, loader_sha, libraries)
+    scratch = prepared['scratch'].resolve(strict=True)
+    work = scratch / 'witness-native'
+    work.mkdir()
+    output = work / 'output'
+    output.mkdir()
+    ivf_path = work / 'packet.ivf'
+    with ivf_path.open('xb') as stream:
+        stream.write(ivf)
+    config = {'output': str(output), 'binary': str(binary), 'ivf': str(ivf_path),
+              'loader': {'path': str(loader), 'sha256': loader_sha},
+              'libraries': [{'path': str(path), 'sha256': digest} for path, digest in sorted(libraries.items())],
+              'inventory': {'path': str(inventory_path), 'sha256': inventory_sha},
+              'denied_paths': [value[0] for value in PROTECTED.values()],
+              'parent_user_namespace': os.readlink('/proc/self/ns/user'),
+              'parent_network_namespace': os.readlink('/proc/self/ns/net'),
+              'parent_cpu_seconds': worker_cpu, 'child_cpu_seconds': child_cpu, 'wall_seconds': wall,
+              'library_path': ':'.join(sorted({str(path.parent) for path in libraries}))}
+    config_path = work / 'native-config.json'
+    with config_path.open('x') as stream:
+        json.dump(config, stream, sort_keys=True)
+    config_sha = fixed.file_sha(config_path)
+    control = work / 'control'
+    outside = os.readlink('/proc/self/ns/pid')
+    namespace_path = work / 'namespace-receipt.json'
+    command = ['/usr/bin/unshare', '--user', '--map-root-user', '--pid', '--fork', '--kill-child=SIGKILL',
+               sys.executable, '-m', 'experiments.tennis.w8_witness_namespace', '--outside', outside,
+               '--timeout', str(wall + 15), '--receipt', str(namespace_path), '--', namespace.NATIVE_TARGET,
+               '--phase', 'launch',
+               '--config', str(config_path), '--config-sha256', config_sha, '--parent-cpu', str(parent_cpu),
+               '--worker-cpu', str(worker_cpu), '--child-cpu', str(child_cpu), '--wall-seconds', str(wall),
+               '--control', str(control)]
+    env = {'PATH': '/usr/bin:/bin', 'PYTHONPATH': str(prepared['root']), 'CUDA_VISIBLE_DEVICES': '',
+           'PYTHONNOUSERSITE': '1', 'PYTHONDONTWRITEBYTECODE': '1', 'TMPDIR': str(work),
+           'TMP': str(work), 'TEMP': str(work), 'XDG_CACHE_HOME': str(work),
+           'PS_STAGE_DIR': os.environ['PS_STAGE_DIR'], 'PS_SCRATCH_DIR': str(scratch)}
+    before = resource.getrusage(resource.RUSAGE_CHILDREN)
+    started = time.monotonic()
+    with (work / 'launcher.stdout').open('xb') as stdout, (work / 'launcher.stderr').open('xb') as stderr:
+        proc = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr,
+                                env=env, cwd=prepared['root'], close_fds=True)
+        with (work / 'launcher-handle.json').open('x') as stream:
+            json.dump({'pid': proc.pid, 'command': command, 'wall_limit': wall + 25}, stream, sort_keys=True)
+            stream.flush()
+            os.fsync(stream.fileno())
+        try:
+            status = proc.wait(timeout=wall + 25)
+            timed_out = False
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            status = proc.wait(timeout=10)
+            timed_out = True
+    after = resource.getrusage(resource.RUSAGE_CHILDREN)
+    usage = {'pid': proc.pid, 'status': status, 'timed_out': timed_out,
+             'wall_seconds': time.monotonic() - started,
+             'waited_cpu_seconds': after.ru_utime + after.ru_stime - before.ru_utime - before.ru_stime,
+             'config_sha256': config_sha}
+    with (work / 'launcher-execution.json').open('x') as stream:
+        json.dump(usage, stream, sort_keys=True)
+    try:
+        namespace_started_absence(namespace_path, expected_pgid=os.getpgrp(), expected_outside=outside,
+                                  expected_target=namespace.NATIVE_TARGET)
+        teardown = {'owned_init_and_worker_absent': True, 'basis': 'PID namespace teardown; descendants not individually observed'}
+    except (OSError, ValueError, KeyError, IndexError) as exc:
+        teardown = {'owned_init_and_worker_absent': False, 'error': str(exc)}
+    with (work / 'teardown.json').open('x') as stream:
+        json.dump(teardown, stream, sort_keys=True)
+    if teardown['owned_init_and_worker_absent'] is not True:
+        raise RuntimeError('native teardown identity unresolved; preserve and inspect')
+    if status != 0 or timed_out:
+        raise RuntimeError('native launcher failed; preserve task-owned evidence')
+    namespace_receipt = namespace_completion(namespace_path, expected_pgid=os.getpgrp(),
+                                             expected_outside=outside, expected_target=namespace.NATIVE_TARGET)
+    receipt = json.loads((output / 'sealed.json').read_text())
+    execution = json.loads((control / 'execution.json').read_text())
+    if (execution.get('status') != 'completed' or execution.get('returncode') != 0
+            or receipt.get('inventory_sha256') != inventory_sha or receipt.get('binary_sha256') != finish.FFMPEG_SHA
+            or receipt.get('ivf_sha256') != finish.IVF_SHA or receipt.get('exit_code') != 0
+            or receipt.get('yuv_sha256') != fixed.file_sha(output / 'native.yuv')
+            or set(receipt.get('denials', {})) != {item[0] for item in PROTECTED.values()}):
+        raise ValueError('native decoder receipt or source access probes differ')
+    return {'output': output, 'receipt': receipt, 'usage': usage, 'control': control,
+            'namespace_receipt': namespace_receipt, 'namespace_receipt_sha256': fixed.file_sha(namespace_path)}

@@ -143,10 +143,14 @@ def native_argv(binary: Path, ivf: Path, output: Path) -> list[str]:
             '-i', str(ivf), '-pix_fmt', 'yuv420p', '-f', 'rawvideo', '-n', str(output)]
 
 
-def run_conversion_isolated(config: dict[str, Any], isolation: dict[str, Any], *, qualification: bool = False) -> None:
+def run_conversion_isolated(config: dict[str, Any], isolation: dict[str, Any], *, qualification: bool = False,
+                            authenticated_full: bool = False) -> None:
     """Convert native YUV into 80 RGB bases without invoking a tool."""
     _isolation(isolation)
-    paths = _inputs(config, {'packet', 'profile', 'yuv'})
+    names = {'packet', 'profile', 'yuv'}
+    if qualification or authenticated_full:
+        names.add('code:experiments.tennis.w8_clock_profile')
+    paths = _inputs(config, names)
     output = _new_output(config)
     profile, _ = _packet(paths)
     native = config['native_receipt']
@@ -170,7 +174,7 @@ def run_conversion_isolated(config: dict[str, Any], isolation: dict[str, Any], *
     cv2.setNumThreads(1)
     if not torch.cuda.is_available():
         raise RuntimeError('original CUDA color conversion required')
-    gpu_identity = _qualification_gpu(torch) if qualification else None
+    gpu_identity = _qualification_gpu(torch) if qualification or authenticated_full else None
     selected_ticks = TICKS[:8] if qualification else TICKS
     end_frame = 24 if qualification else 240
     target = np.lib.format.open_memmap(output / 'base.npy', mode='w+', dtype=np.uint8,
@@ -197,7 +201,8 @@ def run_conversion_isolated(config: dict[str, Any], isolation: dict[str, Any], *
                'base_frame_sha256': hashes, 'ticks': selected_ticks.tolist(), 'isolation': isolation,
                'color_path': profile['recipe']['color_path'], 'torch': torch.__version__,
                'opencv': cv2.__version__, 'device': torch.cuda.get_device_name(0),
-               **({'scope': 'context_qualification_only', 'gpu_identity': gpu_identity} if qualification else {})}
+               **({'scope': 'context_qualification_only', 'gpu_identity': gpu_identity} if qualification
+                  else {'gpu_identity': gpu_identity} if authenticated_full else {})}
     (output / 'sealed.json').write_text(json.dumps(receipt, sort_keys=True))
 
 
@@ -225,17 +230,42 @@ def _sam_module_closure(verified: dict[str, str]) -> dict[str, str]:
     return modules
 
 
-def run_sam_isolated(config: dict[str, Any], isolation: dict[str, Any], *, qualification: bool = False) -> None:
+def _qual_sam_identity(historical: dict[str, Any], fresh: dict[str, Any]) -> None:
+    from experiments.tennis.w8_receiver_preflight import PROTECTED
+
+    if (set(historical) != set(PROTECTED) or set(fresh) != set(PROTECTED) or any(
+            not isinstance(record, dict) or set(record) != {'path', 'sha256', 'inode', 'device'}
+            or (record['path'], record['sha256']) != PROTECTED[key]
+            or type(record['inode']) is not int or record['inode'] <= 0
+            or type(record['device']) is not int or record['device'] < 0
+            for key in PROTECTED for record in (historical[key], fresh[key])) or any(
+            historical[key]['inode'] != fresh[key]['inode'] for key in PROTECTED)):
+        raise ValueError('SAM preflight and fresh protected identities differ')
+
+
+def run_sam_isolated(config: dict[str, Any], isolation: dict[str, Any], *, qualification: bool = False,
+                     authenticated_full: bool = False) -> None:
     """Predict one fresh crop's mask per tick using independent SAM resets."""
     _isolation(isolation)
     names = {'packet', 'profile', 'weights', 'text', 'sam_record', *(f'crop:{u}' for u in fixed.UNITS),
              *(f'generation_seal:{u}' for u in fixed.UNITS)}
+    split_identity = qualification or authenticated_full
+    if split_identity:
+        names.add('protected_record')
+        names.add('code:experiments.tennis.w8_clock_profile')
     paths = _inputs(config, names)
     _generation_seals(paths, qualification=qualification)
     selected_ticks = TICKS[:8] if qualification else TICKS
-    if fixed.file_sha(paths['sam_record']) != config['protected_receipt']['sha256']:
+    sam_record = json.loads(paths['sam_record'].read_text())
+    if split_identity:
+        if fixed.file_sha(paths['protected_record']) != config['protected_receipt']['sha256']:
+            raise ValueError('fresh protected identity receipt differs')
+        historical = sam_record['protected_inputs']
+        fresh = json.loads(paths['protected_record'].read_text())['protected_inputs']
+        _qual_sam_identity(historical, fresh)
+    elif fixed.file_sha(paths['sam_record']) != config['protected_receipt']['sha256']:
         raise ValueError('SAM distribution preflight identity mismatch')
-    distribution = json.loads(paths['sam_record'].read_text())['sam_distribution']
+    distribution = sam_record['sam_distribution']
     verified = distribution['verified_files']
     if not isinstance(verified, dict) or not verified:
         raise ValueError('SAM verified source mapping missing')
@@ -256,7 +286,7 @@ def run_sam_isolated(config: dict[str, Any], isolation: dict[str, Any], *, quali
     torch.set_num_threads(1)
     if not torch.cuda.is_available():
         raise RuntimeError('CUDA required')
-    gpu_identity = _qualification_gpu(torch) if qualification else None
+    gpu_identity = _qualification_gpu(torch) if split_identity else None
     torch.cuda.set_per_process_memory_fraction(min(1.0, 12000 * 2**20 / torch.cuda.get_device_properties(0).total_memory))
     torch.manual_seed(0)
     torch.use_deterministic_algorithms(True)
@@ -326,15 +356,19 @@ def run_sam_isolated(config: dict[str, Any], isolation: dict[str, Any], *, quali
                'runtime': runtime(), 'device': torch.cuda.get_device_name(0), 'torch': torch.__version__,
                'flash_events': kernels,
                'cpu_seconds': sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),
-               **({'scope': 'context_qualification_only', 'gpu_identity': gpu_identity} if qualification else {})}
+               **({'scope': 'context_qualification_only', 'gpu_identity': gpu_identity} if qualification
+                  else {'gpu_identity': gpu_identity} if authenticated_full else {})}
     (output / 'sealed.json').write_text(json.dumps(receipt, sort_keys=True, default=str))
 
 
-def run_compose_isolated(config: dict[str, Any], isolation: dict[str, Any], *, qualification: bool = False) -> None:
+def run_compose_isolated(config: dict[str, Any], isolation: dict[str, Any], *, qualification: bool = False,
+                         authenticated_full: bool = False) -> None:
     """Compose only newly generated crops and predicted masks over the paid base."""
     _isolation(isolation)
     names = {'packet', 'profile', 'base', *(f'crop:{u}' for u in fixed.UNITS),
              *(f'mask:{u}' for u in fixed.UNITS), *(f'generation_seal:{u}' for u in fixed.UNITS)}
+    if qualification or authenticated_full:
+        names.add('code:experiments.tennis.w8_clock_profile')
     paths = _inputs(config, names)
     _generation_seals(paths, qualification=qualification)
     selected_ticks = TICKS[:8] if qualification else TICKS

@@ -276,7 +276,7 @@ def main() -> int:
         from experiments.tennis.w8_receiver_finish import (run_compose_isolated, run_conversion_isolated,
                                                             run_sam_isolated)
         kind = config['worker_kind']
-        funcs = {'sam': run_sam_isolated, 'rgb': run_conversion_isolated, 'compose': run_compose_isolated,
+        funcs: dict[str, Any] = {'sam': run_sam_isolated, 'rgb': run_conversion_isolated, 'compose': run_compose_isolated,
                  'context_sam': run_sam_isolated, 'context_rgb': run_conversion_isolated,
                  'context_compose': run_compose_isolated}
         if kind.startswith('context_'):

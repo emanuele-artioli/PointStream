@@ -72,27 +72,30 @@ def launch(config_path: Path, config_sha: str, loader_path: Path, loader_sha: st
     if sys.platform != 'linux' or len(os.sched_getaffinity(0)) != 1:
         raise RuntimeError('Linux and one CPU required')
     policy, fixed, bootstrap, receiver = preload()
+    finish_modes = ('context_rgb', 'context_sam', 'context_compose', 'rgb', 'sam', 'compose')
     if ((clock_receipt is None) != (clock_receipt_sha is None)
             or (clock_receipt is not None and not materialize_profile
-                and witness_mode not in ('context_rgb', 'context_sam', 'context_compose'))):
+                and witness_mode not in finish_modes)):
         raise ValueError('clocksource profile requires a bound receipt and materialized model worker')
     clock_profile: Any = None
     if clock_receipt is not None:
         from experiments.tennis import w8_clock_profile as clock_profile_module
         clock_profile = clock_profile_module
-    if witness_mode in ('context_rgb', 'context_sam', 'context_compose'):
+    if witness_mode in finish_modes:
         from experiments.tennis import w8_receiver_finish as finish
     source_origins = validate_source_origins(source_root)
     config = bootstrap.load_config(config_path, config_sha)
     if Path(config['allow_paths'][0]).resolve(strict=True) != source_root.resolve(strict=True):
         raise ValueError('config source grant differs from authenticated source root')
     allowed_kinds = ('packet', 'cost_probe') if witness_mode is None else (witness_mode,)
-    if witness_mode not in (None, 'generate', 'context_qualification', 'context_rgb', 'context_sam', 'context_compose') or config['worker_kind'] not in allowed_kinds:
+    if witness_mode not in (None, 'packet', 'generate', 'context_qualification', *finish_modes) or config['worker_kind'] not in allowed_kinds:
         raise ValueError('only packet decode and bounded cost probe are admitted')
     if witness_mode in ('generate', 'context_qualification') and (not materialize_profile or clock_receipt is None):
         raise ValueError('witness modes require materialized source and clock profile')
-    if witness_mode in ('context_rgb', 'context_sam', 'context_compose') and (materialize_profile or clock_receipt is None):
+    if witness_mode in finish_modes and (materialize_profile or clock_receipt is None):
         raise ValueError('qualification finish requires clock profile and no model materialization')
+    if witness_mode == 'packet' and (materialize_profile or clock_receipt is not None):
+        raise ValueError('witness packet must remain CPU-only and unmaterialized')
     if config['worker_kind'] == 'cost_probe' and config.get('probe_steps') not in (1, 3):
         raise ValueError('only 1/3 step qualification runs are admitted')
     if digest(loader_path) != loader_sha:
@@ -164,9 +167,14 @@ def launch(config_path: Path, config_sha: str, loader_path: Path, loader_sha: st
         if materialize_profile:
             raise ValueError('materialization profile is not valid for packet workers')
         receiver.run_packet_isolated(config, isolation)
-    elif witness_mode in ('context_rgb', 'context_sam', 'context_compose'):
-        {'context_rgb': finish.run_conversion_isolated, 'context_sam': finish.run_sam_isolated,
-         'context_compose': finish.run_compose_isolated}[witness_mode](config, isolation, qualification=True)
+    elif witness_mode in finish_modes:
+        finish_funcs: dict[str, Any] = {'context_rgb': finish.run_conversion_isolated, 'context_sam': finish.run_sam_isolated,
+                        'context_compose': finish.run_compose_isolated, 'rgb': finish.run_conversion_isolated,
+                        'sam': finish.run_sam_isolated, 'compose': finish.run_compose_isolated}
+        if witness_mode.startswith('context_'):
+            finish_funcs[witness_mode](config, isolation, qualification=True)
+        else:
+            finish_funcs[witness_mode](config, isolation, authenticated_full=True)
     elif materialize_profile:
         receiver.run_isolated(config, isolation, materialize_profile=True)
     else:
@@ -181,7 +189,7 @@ def main() -> int:
     p.add_argument('--loader-sha256', required=True)
     p.add_argument('--canary', type=Path, required=True)
     p.add_argument('--source-root', type=Path, required=True)
-    p.add_argument('--witness-mode', choices=('context_rgb', 'context_sam', 'context_compose'))
+    p.add_argument('--witness-mode', choices=('packet', 'context_rgb', 'context_sam', 'context_compose', 'rgb', 'sam', 'compose'))
     p.add_argument('--clock-receipt', type=Path)
     p.add_argument('--clock-receipt-sha256')
     args = p.parse_args()
