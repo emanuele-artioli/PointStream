@@ -165,3 +165,33 @@ def test_cross_device_publication_error_preserves_private_entry(tmp_path: Path, 
         safe.publish(asset, sha, task, cache)
     assert exc.value.errno == errno.EXDEV and not (cache / sha).exists()
     assert (task / sha / asset.name).read_bytes() == b'source'
+
+
+def test_archive_root_and_executable_mode_are_preserved(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    task, cache = roots(tmp_path)
+    archive = (tmp_path / 'exec.tar').resolve()
+    with tarfile.open(archive, 'w') as bundle:
+        root = tarfile.TarInfo('.')
+        root.type = tarfile.DIRTYPE
+        bundle.addfile(root)
+        executable = tarfile.TarInfo('./bin/tool')
+        executable.size = 3
+        executable.mode = 0o755
+        bundle.addfile(executable, io.BytesIO(b'run'))
+    sha = hashlib.sha256(archive.read_bytes()).hexdigest()
+    monkeypatch.setattr(safe, '_publish_noreplace', lambda src, dst: os.rename(src, dst))
+    safe.publish(archive, sha, task, cache, extract=True, max_extract_bytes=3)
+    assert (cache / sha / 'tree/bin/tool').stat().st_mode & 0o777 == 0o555
+
+
+def test_existing_cache_symlink_is_never_followed(tmp_path: Path) -> None:
+    task, cache = roots(tmp_path)
+    asset, sha = source(tmp_path)
+    external = tmp_path / 'external'
+    external.mkdir()
+    (external / 'keep').write_bytes(b'preserve')
+    (cache / sha).symlink_to(external, target_is_directory=True)
+    with pytest.raises(FileExistsError):
+        safe.publish(asset, sha, task, cache)
+    assert (cache / sha).is_symlink() and (external / 'keep').read_bytes() == b'preserve'
+    assert not (task / sha).exists()

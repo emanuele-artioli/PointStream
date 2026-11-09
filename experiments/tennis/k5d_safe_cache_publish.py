@@ -62,13 +62,19 @@ def _extract_verified(archive: Path, entry: Path, max_bytes: int) -> dict[str, s
     tree = entry / 'tree'
     tree.mkdir(mode=0o700)
     expected: dict[str, str] = {}
+    modes: dict[str, int] = {}
     seen: set[str] = set()
     with tarfile.open(archive) as bundle:
         for member in bundle:
-            name = member.name.rstrip('/')
-            parts = PurePosixPath(name).parts
-            if (not name or name.startswith('/') or any(p in ('..', '.') for p in parts)
-                    or name in seen or not (member.isdir() or member.isfile())):
+            raw_name = member.name.rstrip('/')
+            parts = PurePosixPath(raw_name).parts
+            if raw_name in ('.', '') and member.isdir():
+                continue
+            if (not raw_name or raw_name.startswith('/') or not parts or '..' in parts
+                    or not (member.isdir() or member.isfile())):
+                raise ValueError('unsafe, duplicate or non-regular archive member')
+            name = '/'.join(parts)
+            if name in seen:
                 raise ValueError('unsafe, duplicate or non-regular archive member')
             seen.add(name)
             path = tree.joinpath(*parts)
@@ -86,10 +92,12 @@ def _extract_verified(archive: Path, entry: Path, max_bytes: int) -> dict[str, s
                     dst.write(block)
                 dst.flush()
                 os.fsync(dst.fileno())
-            path.chmod(0o444)
+            modes[name] = 0o444 | (member.mode & 0o111)
+            path.chmod(modes[name])
             expected[name] = h.hexdigest()
     actual = {str(path.relative_to(tree)): _sha(path) for path in tree.rglob('*') if path.is_file()}
-    if actual != expected or any(path.is_symlink() for path in tree.rglob('*')):
+    if (actual != expected or any(path.is_symlink() for path in tree.rglob('*'))
+            or any(stat.S_IMODE((tree / name).stat().st_mode) != mode for name, mode in modes.items())):
         raise ValueError('extracted tree identity differs')
     for path in sorted((p for p in tree.rglob('*') if p.is_dir()), key=lambda p: len(p.parts), reverse=True):
         _sync_dir(path)
