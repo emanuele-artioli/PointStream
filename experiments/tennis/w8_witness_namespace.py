@@ -107,7 +107,7 @@ def supervise(outside: str, timeout: float, receipt: Path, target: str, args: li
         os.close(read_fd)
     init_raw = Path('/proc/self/stat').read_text()
     init_fields = init_raw[init_raw.rfind(')') + 2:].split()
-    init_identity = {'host_pid': int(nspid[0][0]), 'start_ticks': int(init_fields[19]),
+    init_identity: dict[str, Any] = {'host_pid': int(nspid[0][0]), 'start_ticks': int(init_fields[19]),
                      'host_pgid': int(init_fields[2]), 'namespace_pid': 1, 'pid_namespace': current}
     if init_identity['host_pgid'] != worker['campaign_pgid'] or init_identity['start_ticks'] <= 0:
         raise ValueError('namespace init group or birth differs')
