@@ -12,6 +12,7 @@ import math
 import os
 import shutil
 import sys
+from collections.abc import Mapping, MutableMapping
 from pathlib import Path
 from typing import Any
 
@@ -70,7 +71,7 @@ def spec(base: dict, *, assets: dict[str, dict[str, str]], deadline: str, unshar
     return result
 
 
-def check_resource_profile(specification: dict, dispatch: dict, *, requested: bool, environ: dict) -> None:
+def check_resource_profile(specification: dict, dispatch: dict, *, requested: bool, environ: Mapping[str, str]) -> None:
     """Bind the opt-in to the authenticated fleet declaration and claim."""
     if not requested:
         if specification.get('k5d_shared_parity_profile') is not None or environ.get('PS_GPU_SHARING') == 'shared':
@@ -107,7 +108,7 @@ def apply_parent_limit(torch: Any) -> dict:
             'gpu_uuid': os.environ['CUDA_VISIBLE_DEVICES'], **host}
 
 
-def configure_child_environment(saved: dict, current: dict) -> None:
+def configure_child_environment(saved: MutableMapping[str, str], current: Mapping[str, str]) -> None:
     """Propagate the already-authenticated opt-in into K5's frozen child env."""
     if (current.get('PS_K5D_SHARED_NUMERICAL') != SHARED_PROFILE
             or current.get('PS_GPU_SHARING') != 'shared'
