@@ -1,0 +1,54 @@
+{
+  "revision": "ff6ae97cbb84dc870283e697e2763c1f62cf78f8",
+  "base": "/private/tmp/pointstream-final-checks-ff6ae97c-20261109",
+  "root": "/private/tmp/pointstream-final-checks-ff6ae97c-20261109/source",
+  "python": "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+  "checks": [
+    {
+      "check": "ruff",
+      "command": [
+        "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+        "-m",
+        "ruff",
+        "check"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.13616220900439657,
+      "log": "/private/tmp/pointstream-final-checks-ff6ae97c-20261109/ruff.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "check": "mypy",
+      "command": [
+        "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+        "-m",
+        "mypy",
+        "--config-file",
+        "pyproject.toml"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 61.213570167004946,
+      "log": "/private/tmp/pointstream-final-checks-ff6ae97c-20261109/mypy.log",
+      "sha256": "f39fe753b593b74a42d6324dd2fee1fd2228accc2bdf0d52f83c4cdcda94c4cf"
+    },
+    {
+      "check": "pytest",
+      "command": [
+        "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+        "-m",
+        "pytest"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 114.80457337498956,
+      "log": "/private/tmp/pointstream-final-checks-ff6ae97c-20261109/pytest.log",
+      "sha256": "b2b18f461398d2889459102a55f70d2bdc30e3bc1231a0c8b2abab467261aed9"
+    }
+  ],
+  "passed": true,
+  "wall_seconds": 176.1550167499954,
+  "children_cpu_seconds": 245.57586700000002,
+  "scope": "Ordinary local configured software checks, no Linux proof or experiment inference",
+  "test_summary": "2004 passed, 39 skipped",
+  "source_archive_sha256": "9e96b6764c2801c751cb583e6006002b6fb842815d8aeb1ddc61a2e4560fa70d",
+  "admission": "Software checks passed for exact frozen ff6 source. Remote input admission and actual Linux CPU proof remain separate mandatory gates; no GPU release."
+}
