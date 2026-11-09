@@ -80,6 +80,22 @@ def test_parity_builder_passes_real_fleet_validator_and_outer_cli(tmp_path, monk
     deadline = (datetime.now(timezone.utc) + timedelta(minutes=30)).isoformat()
     result = parity.spec(base, assets=assets, deadline=deadline, unshare_sha256='a' * 64, identity={})
     normalized = inbox.validate_spec(result)
+    shared = parity.spec(base, assets=assets, deadline=deadline, unshare_sha256='a' * 64,
+                         identity={}, shared_numerical=True)
+    shared_normalized = inbox.validate_spec(shared)
+    assert shared_normalized['gpu_sharing']['mode'] == 'shared'
+    assert shared_normalized['gpu_memory_mib'] == 16384
+    assert shared_normalized['contention']['resume_attempts'] == 0
+    assert '--shared-numerical-only' in shared['arguments']
+    assert '--shared-numerical-only' not in result['arguments']
+    low = parity.spec(base, assets=assets, deadline=deadline, unshare_sha256='a' * 64,
+                      identity={}, shared_low_memory=True)
+    assert inbox.validate_spec(low)['gpu_memory_mib'] == 6144
+    assert low['gpu_sharing']['margin_mib'] == 8192
+    assert '--shared-low-memory' in low['arguments'] and '--shared-numerical-only' not in low['arguments']
+    with pytest.raises(ValueError, match='mutually exclusive'):
+        parity.spec(base, assets=assets, deadline=deadline, unshare_sha256='a' * 64,
+                    identity={}, shared_numerical=True, shared_low_memory=True)
     legacy = {**result, 'entrypoint': [*result['entrypoint'], 'outer'], 'arguments': result['arguments'][1:]}
     with pytest.raises(inbox.fleet.FleetError, match='entrypoint must be'):
         inbox.validate_spec(legacy)
@@ -94,3 +110,7 @@ def test_parity_builder_passes_real_fleet_validator_and_outer_cli(tmp_path, monk
     namespace.main()
     assert captured[0][0] == 'a' * 64 and captured[0][1] == 580
     assert captured[0][2][0] == 'parity16'
+    low_command = inbox.phase_command(low, 'smoke', staged, '/runtime/python')
+    monkeypatch.setattr(sys, 'argv', ['module', *low_command[3:]])
+    namespace.main()
+    assert captured[1][2][0] == 'parity16' and '--shared-low-memory' in captured[1][2]
