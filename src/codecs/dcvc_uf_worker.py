@@ -128,6 +128,24 @@ def _require_claimed_device() -> None:
         raise RuntimeError(f"refusing to run without one claimed GPU UUID; CUDA_VISIBLE_DEVICES={visible!r}")
     if not torch.cuda.is_available() or torch.cuda.device_count() != 1:
         raise RuntimeError("exactly one visible CUDA device is required")
+    _apply_optional_shared_parity_limit(torch, os.environ)
+
+
+def _apply_optional_shared_parity_limit(torch: Any, environ: Any) -> None:
+    """Opt-in K5d 16-frame resource guard; legacy execution is unchanged."""
+    profile = environ.get('PS_K5D_SHARED_NUMERICAL')
+    if profile is None:
+        return
+    if (profile != 'k5d-parity16-shared-numerical-v1' or environ.get('PS_GPU_SHARING') != 'shared'
+            or environ.get('PS_GPU_MEMORY_LIMIT_MIB') != '16384'
+            or torch.cuda.get_device_name(0) != 'NVIDIA RTX A6000'
+            or tuple(torch.cuda.get_device_capability(0)) != (8, 6)
+            or torch.cuda.memory_allocated(0) != 0):
+        raise RuntimeError('shared DCVC parity allocator claim or device differs')
+    total = torch.cuda.get_device_properties(0).total_memory
+    if total < 16384 * 2**20:
+        raise RuntimeError('shared DCVC parity GPU capacity is insufficient')
+    torch.cuda.set_per_process_memory_fraction(8192 * 2**20 / total, 0)
 
 
 def _load_state(path: str, expected_sha256: str) -> tuple[dict[str, Any], dict[str, Any]]:
