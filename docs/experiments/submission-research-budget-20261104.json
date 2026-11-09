@@ -1257,6 +1257,17 @@
       "cpu_seconds": 160,
       "release_stage": "research-first24/28",
       "basis": "50 prior preparation +130 rounded one-core lifecycle through canonical publication(120.737wall) +30 independent audit/admin. Aggregate administrative CPU not measured. Remaining90of300leaf released inside parent. Root accepted CPU mechanism only; gate SHA 511c3c777f4866bb8a7b50180918a2f14be9dd9609c5e288cb58bbf9824c70f7"
+    },
+    {
+      "phase": "w8-f8-cpu-proof-routing-failure-closeout-20261109",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "job_id": "20261109T203908Z-538fd91b",
+      "gpu_seconds": 0,
+      "cpu_seconds": 110,
+      "witness_qualification": false,
+      "release_stage": "research-first24/28",
+      "basis": "Conservative100created-to-canonical-terminalwallupper(95.11includesqueue)+10inspection/archive/ack/admin. Not measured aggregateCPU. Existingboundedpublicbundlemetadata retrieval may fit inside chargedauditallowance; no inference. Root failedgate; PID2selfleaf/teardownpartialonly. Family378CPUclosed."
     }
   ],
   "reservations": [
@@ -1840,8 +1851,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 4282,
-      "status": "Remaining_unspent4550GPU4282CPU; f8source476prepared/rootreviewed, family268closed; ONEfinalCPUproof1100cumulativehas832future,0GPU; no qualification/fullwitness."
+      "cpu_seconds": 4172,
+      "status": "Remaining_unspent4550GPU4172CPU; f8routingfailure538fclosed110CPU, proof-family378CPU; local routingrepaironly, noCPU/GPUrunrelease."
     }
   ],
   "jobs": [
@@ -2909,7 +2920,7 @@
     {
       "job_id": "20261109T203908Z-538fd91b",
       "phase": "w8-full-witness-staged-20261106",
-      "state": "failed; root freshly verified canonical terminal status; no replay; cost and teardown audit pending",
+      "state": "failed/rootclosed/missingpre-serializationCPUreceipt/PID2isolationpartialonly/claimandPIDsabsent/eventsACK/waitended",
       "revision": "f8b93b638a8ef9cdd1eb28d612967b4f5e4527b7",
       "snapshot_sha256": "476ea5c810e650888660ab6d9fb2c2f317b7d848041b43cfa01e41c65aaeb671",
       "source_sha256": "7d9fae842f2154f2dea33f94a7efc014b7422dcb97bbd68ca6d98248f4535f82",
@@ -2928,7 +2939,10 @@
       "local_batch": "/private/tmp/pointstream-w8-f8-final-proof-20261109-a1",
       "supervisor_pid": 4118583,
       "campaign_pgid": 4118595,
-      "scope": "CPU-only packet/native/namespace/policy integration; no passing proof/GPU/quality result"
+      "scope": "CPU-only packet/native/namespace/policy integration; no passing proof/GPU/quality result",
+      "terminal_additional_cpu_charge": 110,
+      "proof_family_closed_cpu": 378,
+      "wait_state": "ended"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -2950,7 +2964,7 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "Ball5331CPUproofrootaccepted/closed; W8final538ffailed, ownerfailure/teardownauditpending. No liveGPUjob/retry/timer.",
+    "state": "Noactivefleetjobs/waits. Ball5331CPUproofrootaccepted/closed; GPU16readinessonlyunderway. W8final538froutingfailureclosed; newlocalrepaironly. Noautomaticretry/recurringtimer.",
     "jobs": [],
     "batches": [],
     "native_completion_resume_verified": false,

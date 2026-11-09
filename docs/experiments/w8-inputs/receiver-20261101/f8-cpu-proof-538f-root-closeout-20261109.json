@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "job_id": "20261109T203908Z-538fd91b",
+  "decision": "root accepts failure/teardown and narrowly scoped PID2 isolation evidence only; no CPU proof gate",
+  "audit_sha256": "2d4eb2342d0774ab9f5456968194adc74386c71e9a93d1f24aece8f491007c8c",
+  "raw_files_independently_rehashed": 7,
+  "ack_sha256": "9ad6671143b94bb5c49435662371558106070a4a67ad0369d7850f9efd125c83",
+  "actual_worker_status": 0,
+  "actual_worker_namespace_pid": 2,
+  "self_leaf_identity_join_verified": true,
+  "EACCES_denials_reported": 10,
+  "manifest_tensor_fingerprints_recorded": 480,
+  "missing_requirement": "No cpu-only.json and no observed pre-serialization CPU state/restoration instrumentation; manifest fingerprints are not that evidence. Required combined proof failed.",
+  "cause": "Witness packet routing selected the uninstrumented receiver entrypoint instead of the existing strict packet CPU wrapper.",
+  "owned_group_and_recorded_namespace_PIDs_absent": true,
+  "CPU_claim_absent": true,
+  "events_acknowledged": [
+    "5779ef94f8e959b4970432769475b0e2",
+    "52575d3e652f56a881c14fd730eaccce"
+  ],
+  "preserved_small_packet_archive": "/home/itec/emanuele/Datasets/pointstream-data/w8-witness-20261109/f8-538fd91b-packet-evidence-20261109.tar",
+  "preserved_small_packet_archive_sha256": "7b04982be81db6e554deed73a6d3ab63f54172fb1be0bf25da224993f9a31da9",
+  "large_decoded_checkpoint_and_protected_bodies_archived": false,
+  "additional_CPU_charge": 110,
+  "GPU_charge": 0,
+  "basis": "Conservative100created-to-canonical-terminalwallupper(95.11includesqueue)+10inspection/archive/ack/admin. Not measured aggregateCPU. Existingboundedpublicbundlemetadata retrieval may fit inside chargedauditallowance; no inference.",
+  "proof_family_closed_CPU": 378,
+  "no_combined_proof_retry_or_GPU_release": true,
+  "next": "Authorized local routing repair only; root will explicitly review/amend any stoppedcard and completecost before any new immutable-source experiment."
+}
