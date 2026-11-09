@@ -1290,6 +1290,40 @@ def validate_finish(stage: Path, target: Path) -> None:
         os.fsync(output_stream.fileno())
 
 
+
+def run_producer_audit(stage: Path, target: Path) -> None:
+    """Account the standalone producer audit under the stage validator CPU cap."""
+    import os
+    import resource
+    import time
+
+    affinity = sorted(os.sched_getaffinity(0))
+    if len(affinity) != 1:
+        raise ValueError('producer audit requires verified one-core affinity')
+    spec = json.loads((stage.parent / 'spec.json').read_text())
+    limit = spec.get('witness_validator_cpu_seconds')
+    if type(limit) is not int or not 1 <= limit <= 120:
+        raise ValueError('producer audit CPU limit differs')
+    resource.setrlimit(resource.RLIMIT_CPU, (limit, limit))
+    started = time.monotonic()
+    try:
+        validate_pilot(stage, target)
+        status = 'complete'
+    except Exception:
+        status = 'failed'
+        raise
+    finally:
+        own = resource.getrusage(resource.RUSAGE_SELF)
+        children = resource.getrusage(resource.RUSAGE_CHILDREN)
+        with target.with_name(target.name + '.usage.json').open('x') as stream:
+            json.dump({'scope': 'one-core bounded producer audit', 'status': status, 'cpu_cap_seconds': limit,
+                       'self_cpu_seconds': own.ru_utime + own.ru_stime,
+                       'waited_children_cpu_seconds': children.ru_utime + children.ru_stime,
+                       'affinity': affinity, 'pid': os.getpid(), 'pgid': os.getpgrp(),
+                       'wall_seconds': time.monotonic() - started}, stream, sort_keys=True)
+            stream.flush()
+            os.fsync(stream.fileno())
+
 def run_finish_audit(stage: Path, target: Path) -> None:
     """One-core, hard-capped post-stage audit; retain actual process CPU usage."""
     import os
@@ -1400,7 +1434,7 @@ def main() -> None:
         run_finish_audit(args.stage, args.output)
         return
     if args.action == 'audit-candidate':
-        validate_pilot(args.stage, args.output)
+        run_producer_audit(args.stage, args.output)
         return
     stage = Path(os.environ['PS_STAGE_DIR'])
     if args.action == 'finish-readiness':
