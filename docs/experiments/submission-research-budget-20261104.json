@@ -1084,6 +1084,13 @@
       "cpu_seconds": 50,
       "release_stage": "research-first24/28",
       "basis": "Prospective conservative50CPU cap for one fresh allhost/jobs/workers capacity and metadata-only admission readiness observation shared with W8. No source upload, protected-content reads, inference or request release. No recurring polling. Entire50charged; later request requires distinct root admission."
+    },
+    {
+      "phase": "k5d-parity16-9b47-contended-closeout-20261109",
+      "workstream": "ball",
+      "gpu_seconds": 130,
+      "cpu_seconds": 160,
+      "basis": "130s rounded one-core supervisor birth-to-canonical-terminal upper; CPU adds30 external audit; prior50 prep separately charged"
     }
   ],
   "reservations": [
@@ -1601,9 +1608,9 @@
       "phase": "k5d-scale-first-tranche-20261105",
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
-      "gpu_seconds": 8900,
-      "cpu_seconds": 8870,
-      "status": "Remaining_unspent8900GPU8870CPU after50CPUboundedsharedreadiness. Active one parity leaf 20261109T175655Z-9b4701ce nested <=1000GPU/1150futureCPU; no second request or scale release."
+      "gpu_seconds": 8770,
+      "cpu_seconds": 8710,
+      "status": "Remaining_unspent8770GPU8710CPU after 9b47 contended leaf closure; no active Ball job or wait; no parity or scale release."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -2590,7 +2597,7 @@
       "job_id": "20261109T175655Z-9b4701ce",
       "phase": "k5d-scale-first-tranche-20261105",
       "subphase": "parity16-new-capacity-20261109",
-      "state": "pending; one bounded exclusive GPU request; no automatic retry",
+      "state": "contended; foreign GPU process; no gate or parity; observed owned PIDs and claim absent; terminal events ACK",
       "revision": "ae6030e58a98156d3b5cb5d1cfab78967b173c9b",
       "snapshot_sha256": "22fb921e5cc26d04f22d6e8be6f1098f504b3319283794e341ab5952dc51815d",
       "source_sha256": "71d788cf9c520c4c095f011dbf5efce157493f003a3db970e57731f06d1cb7af",
@@ -2603,7 +2610,12 @@
       "future_cpu_ceiling": 1150,
       "campaign_wall_ceiling": 800,
       "wait_max_seconds": 2700,
-      "batch_path": "/private/tmp/k5d-parity1752-batch.json"
+      "batch_path": "/private/tmp/k5d-parity1752-batch.json",
+      "conservative_gpu_charge": 130,
+      "conservative_future_cpu_charge": 160,
+      "inclusive_cpu_charge": 210,
+      "audit_receipt_sha256": "81e78f1818602d495c814ca3e1c0493991d41c7f4421ef30731480f76d5e3199",
+      "wait_handle": 36823
     }
   ],
   "old_budgets": "closed, not borrowed",
