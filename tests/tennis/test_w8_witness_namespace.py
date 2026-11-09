@@ -91,3 +91,28 @@ def test_proof_worker_rejects_unisolated_execution(tmp_path, monkeypatch):
     output.mkdir()
     with pytest.raises((ValueError, FileNotFoundError)):
         proof.worker('normal', output)
+
+
+def test_native_target_requires_fixed_cpu_config_and_scratch(tmp_path, monkeypatch):
+    import hashlib
+    import os
+
+    monkeypatch.setattr(sys, 'platform', 'linux')
+    monkeypatch.setattr(os, 'sched_getaffinity', lambda _pid: {0}, raising=False)
+    monkeypatch.setenv('PS_SCRATCH_DIR', str(tmp_path))
+    monkeypatch.setenv('CUDA_VISIBLE_DEVICES', '')
+    monkeypatch.setenv('PYTHONPATH', str(namespace.Path(namespace.__file__).resolve().parents[2]))
+    config = tmp_path / 'native.json'
+    config.write_text('{}')
+    args = ['--phase', 'launch', '--config', str(config), '--config-sha256',
+            hashlib.sha256(config.read_bytes()).hexdigest(), '--parent-cpu', '2', '--worker-cpu', '3',
+            '--child-cpu', '4', '--wall-seconds', '5', '--control', str(tmp_path / 'control')]
+    assert namespace.command(namespace.NATIVE_TARGET, args)[3:] == args
+    with pytest.raises(ValueError):
+        namespace.command(namespace.NATIVE_TARGET, [*args[:-1], str(tmp_path.parent / 'escape')])
+    with pytest.raises(ValueError):
+        namespace.command(namespace.NATIVE_TARGET, [*args[:5], '0' * 64, *args[6:]])
+    monkeypatch.setenv('CUDA_VISIBLE_DEVICES', 'GPU-not-hidden')
+    with pytest.raises(ValueError):
+        namespace.command(namespace.NATIVE_TARGET, args)
+    assert namespace.NATIVE_TARGET not in namespace.TARGETS

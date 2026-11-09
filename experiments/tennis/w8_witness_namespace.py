@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import os
@@ -16,6 +17,32 @@ from typing import Any
 TARGETS = frozenset({'experiments.tennis.w8_strict_host_model_worker',
                      'experiments.tennis.w8_strict_receiver_worker'})
 PROOF_TARGET = 'experiments.tennis.w8_witness_namespace_proof'
+NATIVE_TARGET = 'experiments.tennis.w8_receiver_native_bootstrap'
+
+
+def native_command_args(args: list[str]) -> None:
+    """Admit only the fixed, CPU-hidden native launcher under task scratch."""
+    flags = ('--phase', '--config', '--config-sha256', '--parent-cpu', '--worker-cpu',
+             '--child-cpu', '--wall-seconds', '--control')
+    if (sys.platform != 'linux' or os.environ.get('CUDA_VISIBLE_DEVICES') != ''
+            or len(os.sched_getaffinity(0)) != 1 or len(args) != 2 * len(flags)
+            or tuple(args[::2]) != flags or args[1] != 'launch'):
+        raise ValueError('fixed CPU native launch required')
+    scratch = Path(os.environ['PS_SCRATCH_DIR']).resolve(strict=True)
+    config = Path(args[3]).resolve(strict=True)
+    control = Path(args[15])
+    if (not config.is_file() or not config.is_relative_to(scratch) or not control.is_absolute()
+            or control.exists() or not control.parent.resolve(strict=True).is_relative_to(scratch)
+            or hashlib.sha256(config.read_bytes()).hexdigest() != args[5]
+            or any(not value.isascii() or not value.isdecimal() or not 1 <= int(value) <= 500
+                   for value in (args[7], args[9], args[11], args[13]))):
+        raise ValueError('native config, bounds or scratch control differs')
+    source = Path(__file__).resolve(strict=True).parent
+    target = source / 'w8_receiver_native_bootstrap.py'
+    root = source.parent.parent
+    if (target.is_symlink() or not target.is_file() or os.environ.get('PYTHONPATH') != str(root)
+            or Path.cwd().resolve(strict=True) != root):
+        raise ValueError('native worker must be in the same staged source')
 
 
 def command(target: str, args: list[str]) -> list[str]:
@@ -26,6 +53,8 @@ def command(target: str, args: list[str]) -> list[str]:
                 or args[2] != '--output' or not Path(args[3]).resolve(strict=True).is_relative_to(scratch)
                 or Path(args[3]).resolve(strict=True) == scratch):
             raise ValueError('CPU proof target requires fixed scratch-bound invocation')
+    elif target == NATIVE_TARGET:
+        native_command_args(args)
     elif target not in TARGETS:
         raise ValueError('unapproved witness worker')
     return [sys.executable, '-m', target, *args]
@@ -118,7 +147,7 @@ def validate_receipt(path: Path, *, expected_pgid: int, expected_outside: str,
     result = json.loads(path.read_text())
     worker = result.get('worker_host_identity', {})
     init = result.get('namespace_init', {})
-    if (expected_target not in TARGETS or result.get('schema') != 1
+    if (expected_target not in TARGETS | {NATIVE_TARGET} or result.get('schema') != 1
             or result.get('target') != expected_target or result.get('outside_namespace') != expected_outside
             or result.get('reason') != 'complete' or result.get('status') != 0
             or result.get('complete_descendant_wait') is not True or result.get('worker_namespace_pid') != 2
