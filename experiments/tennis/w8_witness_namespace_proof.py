@@ -138,6 +138,7 @@ def run(output: Path, unshare: Path, unshare_sha: str) -> None:
                                      or inner['children_cpu_seconds'] < 0 or inner['init_cpu_seconds'] < 0):
                 raise ValueError('normal waited proof differs')
             if case == 'normal':
+                assert inner is not None
                 check_waited_cpu(waited_cpu, inner['init_cpu_seconds'], inner['children_cpu_seconds'])
             if case == 'timeout' and (rc == 0 or inner is None or inner['reason'] != 'timeout'):
                 raise ValueError('timeout proof differs')
