@@ -70,3 +70,24 @@ def test_cpu_proof_target_is_fixed_and_not_a_candidate(tmp_path, monkeypatch):
         namespace.command(namespace.PROOF_TARGET, args)
     with pytest.raises(ValueError):
         namespace.command(namespace.PROOF_TARGET, ['worker', 'normal', '--output', str(tmp_path)])
+
+
+def test_independent_waited_cpu_counter():
+    from experiments.tennis.w8_witness_namespace_proof import check_waited_cpu
+
+    check_waited_cpu(1.1, .1, .9)
+    with pytest.raises(ValueError):
+        check_waited_cpu(1.4, .1, .9)
+    with pytest.raises(ValueError):
+        check_waited_cpu(float('nan'), .1, .9)
+
+
+def test_proof_worker_rejects_unisolated_execution(tmp_path, monkeypatch):
+    from experiments.tennis import w8_witness_namespace_proof as proof
+
+    monkeypatch.setenv('PS_SCRATCH_DIR', str(tmp_path))
+    monkeypatch.setenv('CUDA_VISIBLE_DEVICES', 'GPU-not-hidden')
+    output = tmp_path / 'case'
+    output.mkdir()
+    with pytest.raises((ValueError, FileNotFoundError)):
+        proof.worker('normal', output)

@@ -9,6 +9,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import resource
 import signal
 import subprocess
 import sys
@@ -44,6 +45,16 @@ def absent(item: dict[str, int]) -> bool:
 
 def worker(case: str, output: Path) -> None:
     # The fixed detached synthetic child tests PID-namespace teardown, not codecs.
+    scratch = Path(os.environ['PS_SCRATCH_DIR']).resolve(strict=True)
+    output = output.resolve(strict=True)
+    fields = [line.split()[1:] for line in Path('/proc/self/status').read_text().splitlines()
+              if line.startswith('NSpid:')]
+    if (sys.platform != 'linux' or os.environ.get('CUDA_VISIBLE_DEVICES') != ''
+            or len(os.sched_getaffinity(0)) != 1 or os.getpid() != 2
+            or len(fields) != 1 or len(fields[0]) < 2 or fields[0][-1] != '2'
+            or case not in ('normal', 'timeout', 'term', 'kill') or output == scratch
+            or not output.is_relative_to(scratch) or not output.is_dir()):
+        raise ValueError('CPU proof worker requires nested PID namespace and owned scratch')
     child = os.fork()
     if child == 0:
         os.setsid()
@@ -55,6 +66,15 @@ def worker(case: str, output: Path) -> None:
         os.waitpid(child, 0)
         return
     time.sleep(60)
+
+
+def check_waited_cpu(outer: float, init: float, children: float) -> None:
+    """Check independent waited accounting for this small synthetic workload."""
+    import math
+
+    if (any(not math.isfinite(x) or x < 0 for x in (outer, init, children))
+            or abs(outer - init - children) > 0.25):
+        raise ValueError('independent synthetic waited CPU accounting differs')
 
 
 def run(output: Path, unshare: Path, unshare_sha: str) -> None:
@@ -79,6 +99,7 @@ def run(output: Path, unshare: Path, unshare_sha: str) -> None:
                 sys.executable, '-m', 'experiments.tennis.w8_witness_namespace', '--outside', outside,
                 '--timeout', str(timeout), '--receipt', str(receipt), '--', namespace.PROOF_TARGET,
                 'worker', case, '--output', str(case_dir)]
+        usage_before = resource.getrusage(resource.RUSAGE_CHILDREN)
         launcher = subprocess.Popen(argv)
         try:
             deadline = time.monotonic() + 4
@@ -101,6 +122,9 @@ def run(output: Path, unshare: Path, unshare_sha: str) -> None:
                 launcher.kill()
                 launcher.wait(timeout=5)
                 raise RuntimeError('proof launcher exceeded bound')
+            usage_after = resource.getrusage(resource.RUSAGE_CHILDREN)
+            waited_cpu = (usage_after.ru_utime + usage_after.ru_stime
+                          - usage_before.ru_utime - usage_before.ru_stime)
             end = time.monotonic() + 3
             while not (absent(a) and absent(b) and absent(init)) and time.monotonic() < end:
                 time.sleep(.02)
@@ -113,11 +137,14 @@ def run(output: Path, unshare: Path, unshare_sha: str) -> None:
                                      or inner['namespace_init']['host_pid'] != init['pid']
                                      or inner['children_cpu_seconds'] < 0 or inner['init_cpu_seconds'] < 0):
                 raise ValueError('normal waited proof differs')
+            if case == 'normal':
+                check_waited_cpu(waited_cpu, inner['init_cpu_seconds'], inner['children_cpu_seconds'])
             if case == 'timeout' and (rc == 0 or inner is None or inner['reason'] != 'timeout'):
                 raise ValueError('timeout proof differs')
             if case == 'term' and rc == 0 or case == 'kill' and rc != -signal.SIGKILL:
                 raise ValueError('signal proof differs')
-            results.append({'case': case, 'launcher_rc': rc, 'init': init, 'worker': a, 'detached': b,
+            results.append({'case': case, 'launcher_rc': rc, 'outer_waited_cpu_seconds': waited_cpu,
+                            'init': init, 'worker': a, 'detached': b,
                             'all_absent': True, 'receipt': inner})
         finally:
             if launcher.poll() is None:
