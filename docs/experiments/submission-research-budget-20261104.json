@@ -1364,6 +1364,15 @@
       "witness_qualification": false,
       "basis": "Full conservative approved preparation ceiling; measured telemetry partial and manager aggregate unmeasured. Raw source/readiness/spec hashes root checked; no protected contents read.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "gpu3-safe-cache-preflight-20261109",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "cpu_seconds": 20,
+      "gpu_seconds": 0,
+      "basis": "Entire authorized20CPU inclusive ceiling; remote self.278CPU and partial local telemetry measured, aggregate admin unmeasured. No real cache/model bulk copy, extraction or content SHA.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -1882,8 +1891,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8370,
-      "cpu_seconds": 7330,
-      "status": "Remaining_unspent8370GPU7330CPU; parent8 CPU gate accepted; noGPUrelease."
+      "cpu_seconds": 7310,
+      "status": "Remaining_unspent8370GPU7310CPU; GPU3safe-preflight20charged; no warming/GPU jobrelease."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -3164,7 +3173,7 @@
       "job_id": "20261109T223214Z-c2d5c561",
       "phase": "w8-full-witness-staged-20261106",
       "subphase": "7b519-real-combined-CPUproof",
-      "state": "submitted pending; canonical status check and sole wait owned by plan_research_audit",
+      "state": "last observed running; sole canonical wait owned by plan_research_audit",
       "revision": "7b519d3e448135842fbd33e7007fffd1ea167a0f",
       "source_sha256": "e0278d99b99c97179d808907476dd9b21bd69d47b800241542c6c1a6e0e27835",
       "snapshot_sha256": "d747b15f47dbddb72a94f4cf225338bd5cac0810a002d642e45227a80d69e8ba",
@@ -3182,7 +3191,9 @@
       "family_CPU_forecast_inclusive": 1350,
       "gpu_ceiling": 0,
       "local_batch": "/private/tmp/pointstream-w8-7b519-proof-20261109-a1",
-      "scope": "CPU packet with executing source, lifecycle with honest TERM escalation, denial/native proof only; no GPU/generation/quality"
+      "scope": "CPU packet with executing source, lifecycle with honest TERM escalation, denial/native proof only; no GPU/generation/quality",
+      "supervisor_pid": 682299,
+      "campaign_pgid": 682318
     }
   ],
   "old_budgets": "closed, not borrowed",
