@@ -1268,6 +1268,15 @@
       "witness_qualification": false,
       "release_stage": "research-first24/28",
       "basis": "Conservative100created-to-canonical-terminalwallupper(95.11includesqueue)+10inspection/archive/ack/admin. Not measured aggregateCPU. Existingboundedpublicbundlemetadata retrieval may fit inside chargedauditallowance; no inference. Root failedgate; PID2selfleaf/teardownpartialonly. Family378CPUclosed."
+    },
+    {
+      "phase": "k5d-low-memory-parity16-readiness-20261109",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 30,
+      "release_stage": "research-first24/28",
+      "basis": "Full authorized30CPU readiness/tiny accepted511 receipt publication charged. Host0.161CPU measured; fleet/admin unmetered. Source0fc and gate511 freshSHA, allhostdoctor/jobs/workers and gpu2CPU0/claim/headroom/localdisk/tools passed; largecache metadata is not freshhash. Included in1200CPU GPU16leaf,1170future remains."
     }
   ],
   "reservations": [
@@ -1786,8 +1795,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8770,
-      "cpu_seconds": 7900,
-      "status": "Remaining_unspent8770GPU7900CPU; da98nativeCPUproof5331rootaccepted210inclusive, noGPU16/scale release yet."
+      "cpu_seconds": 7870,
+      "status": "Remaining_unspent8770GPU7870CPU; lower-profile GPU16 readiness30CPU charged; ONE pilot1000GPU1200CPUinclusive released,1170futureCPU insideparent; no scale/full30."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
