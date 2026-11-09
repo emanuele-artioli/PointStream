@@ -126,7 +126,7 @@ def run(stage: Path) -> None:
     # the one-core fleet campaign wall remains the aggregate 600-second bound.
     resource.setrlimit(resource.RLIMIT_CPU, (100, 3600))
     started = time.monotonic()
-    remaining(dispatch, 475)  # packet 80 + lifecycle 90 + strict 120 + native 135 + setup 20 + publish 30
+    remaining(dispatch, 520)  # packet 80 + lifecycle 90 + strict 120 + assessor 45 + native 135 + setup/publish 50
     scratch = Path(os.environ['PS_SCRATCH_DIR']).resolve(strict=True)
     publish = scratch / 'publish'
     publish.mkdir(exist_ok=False)
@@ -148,7 +148,7 @@ def run(stage: Path) -> None:
     for unit in fixed.UNITS:
         keep('packet-unit-' + unit + '.npz', prepared['decoder_out'] / 'publish' / 'units' / f'{unit}.npz')
     keep('packet-decoded.pt', prepared['decoder_out'] / 'decoded.pt')
-    remaining(dispatch, 375)  # lifecycle 90 + two policy leaves 120 + native 135 + publication 30
+    remaining(dispatch, 420)  # lifecycle 90 + strict 120 + assessor 45 + native 135 + publication 30
     life_dir = scratch / 'namespace-lifecycle'
     life_dir.mkdir()
     unshare = Path('/usr/bin/unshare').resolve(strict=True)
@@ -164,7 +164,7 @@ def run(stage: Path) -> None:
             path = case_dir / basename
             if path.is_file():
                 keep(f'namespace-{name}-{basename}', path)
-    remaining(dispatch, 285)  # strict leaves 120 + native 135 + publication 30
+    remaining(dispatch, 330)  # strict 120 + assessor 45 + native 135 + publication 30
     isolation = witness.run_isolation_proof(prepared, worker_cpu=40, worker_wall=60)
     if (isolation.get('scope') != 'cpu_isolation_proof_only'
             or [row['runtime'] for row in isolation.get('runs', [])] != ['main', 'jcv']):
@@ -172,6 +172,13 @@ def run(stage: Path) -> None:
     for row in isolation['runs']:
         for key in ('config_path', 'receipt_path', 'namespace_path', 'namespace_started_path'):
             keep(f"strict-{row['runtime']}-{key}.json", row[key])
+    remaining(dispatch, 210)  # assessor 45 + native 135 + publication 30
+    from experiments.tennis import w8_witness_assessment as assessment
+    assessed = assessment.run_assessment_policy_proof(prepared)
+    if assessed.get('scope') != 'assessment policy component only; no candidate or quality claim':
+        raise ValueError('actual assessment policy proof required')
+    for name, path in assessed['receipt_paths'].items():
+        keep('assessor-' + name, path)
     for index, case in enumerate(('normal', 'timeout', 'kill')):
         remaining(dispatch, (3 - index) * 45 + 30)
         result = witness.run_native_proof(prepared, inventory_path=prepared['native_inventory'],
@@ -247,6 +254,8 @@ def validate(stage: Path, destination: Path) -> None:
                     *(f'packet-unit-{unit}.npz' for unit in fixed.UNITS),
                     *(f'strict-{runtime}-{name}.json' for runtime in ('main', 'jcv')
                       for name in ('config_path', 'receipt_path', 'namespace_path', 'namespace_started_path')),
+                    'assessor-policy.json', 'assessor-config.json', 'assessor-namespace.json',
+                    'assessor-namespace.started',
                     *(f'native-{case}-{name}' for case in ('normal', 'timeout', 'kill')
                       for name in ('namespace_started', 'teardown', 'launcher_execution',
                                    'native_handle', 'native_handle_ready', 'native_handle_committed')),
@@ -266,6 +275,13 @@ def validate(stage: Path, destination: Path) -> None:
             if (observed.get('scope') != 'cpu_isolation_proof_only'
                     or observed.get('cuda_initialized') is not False or observed.get('visible_devices') != ''):
                 raise ValueError('strict CPU proof receipt differs')
+        assessor = raw_json('assessor-policy.json')
+        if (assessor.get('scope') != 'assessment policy component only; no candidate or quality claim'
+                or assessor.get('gpu_claim') is not False or assessor.get('quality_claim') is not False
+                or assessor.get('output_write') is not True
+                or assessor.get('undeclared_read_denial') not in (1, 13)
+                or assessor.get('undeclared_execute_denial') not in (1, 13)):
+            raise ValueError('assessment role policy proof differs')
         for case in ('normal', 'timeout', 'kill'):
             if raw_json(f'native-{case}-teardown').get('owned_init_and_worker_absent') is not True:
                 raise ValueError('native lifecycle teardown missing')

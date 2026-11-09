@@ -18,6 +18,29 @@ TARGETS = frozenset({'experiments.tennis.w8_strict_host_model_worker',
                      'experiments.tennis.w8_strict_receiver_worker'})
 PROOF_TARGET = 'experiments.tennis.w8_witness_namespace_proof'
 NATIVE_TARGET = 'experiments.tennis.w8_receiver_native_bootstrap'
+ASSESSMENT_TARGET = 'experiments.tennis.w8_witness_assessment'
+
+
+def assessment_command_args(args: list[str]) -> None:
+    """Admit only the exact post-seal assessment CLI and scratch configuration."""
+    if (sys.platform != 'linux' or len(os.sched_getaffinity(0)) != 1 or len(args) != 6
+            or args[::2] != ['--phase', '--config', '--config-sha256']
+            or args[1] not in ('source', 'score', 'offline', 'policy-probe')):
+        raise ValueError('fixed assessment CLI required')
+    scratch = Path(os.environ['PS_SCRATCH_DIR']).resolve(strict=True)
+    config = Path(args[3]).resolve(strict=True)
+    if (not config.is_file() or not config.is_relative_to(scratch)
+            or hashlib.sha256(config.read_bytes()).hexdigest() != args[5]
+            or json.loads(config.read_text()).get('phase') != args[1]):
+        raise ValueError('assessment configuration identity differs')
+    if args[1] == 'policy-probe' and (os.environ.get('CUDA_VISIBLE_DEVICES') != ''
+                                      or os.environ.get('PS_CLAIMED_GPU_UUID')):
+        raise ValueError('assessment policy proof must hide CUDA')
+    root = Path(__file__).resolve(strict=True).parent.parent.parent
+    target = root / 'experiments/tennis/w8_witness_assessment.py'
+    if (target.is_symlink() or not target.is_file() or os.environ.get('PYTHONPATH') != str(root)
+            or Path.cwd().resolve(strict=True) != root):
+        raise ValueError('assessment must use the same staged source')
 
 
 def native_command_args(args: list[str]) -> None:
@@ -55,6 +78,8 @@ def command(target: str, args: list[str]) -> list[str]:
             raise ValueError('CPU proof target requires fixed scratch-bound invocation')
     elif target == NATIVE_TARGET:
         native_command_args(args)
+    elif target == ASSESSMENT_TARGET:
+        assessment_command_args(args)
     elif target not in TARGETS:
         raise ValueError('unapproved witness worker')
     return [sys.executable, '-m', target, *args]
@@ -162,7 +187,7 @@ def validate_receipt(path: Path, *, expected_pgid: int, expected_outside: str,
     result = json.loads(path.read_text())
     worker = result.get('worker_host_identity', {})
     init = result.get('namespace_init', {})
-    if (expected_target not in TARGETS | {NATIVE_TARGET} or result.get('schema') != 1
+    if (expected_target not in TARGETS | {NATIVE_TARGET, ASSESSMENT_TARGET} or result.get('schema') != 1
             or result.get('target') != expected_target or result.get('outside_namespace') != expected_outside
             or result.get('reason') != 'complete' or result.get('status') != 0
             or result.get('complete_descendant_wait') is not True or result.get('worker_namespace_pid') != 2
