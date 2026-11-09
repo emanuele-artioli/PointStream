@@ -1209,6 +1209,16 @@
       "release_stage": "research-first24/28",
       "basis": "Conservative80created-to-terminalwallupper(includesqueue)+10audit/admin+10publication/readiness=100newCPU;prior8prep=>108replacementinclusive,priorfailed120=>228proof-familyCPU. AggregateadminCPUunmeasured. All4rawhashesrootchecked,namespace/campaignPIDsandCPUclaimabsent,eventsACK. FailedprocselfbindingandESRCHreaper,no passinggate/GPU/quality.",
       "witness_qualification": false
+    },
+    {
+      "phase": "w8-final-self-leaf-public-oracles-20261109",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 10,
+      "witness_qualification": false,
+      "release_stage": "research-first24/28",
+      "basis": "Full authorized10CPU aggregate allowance; first proc-view probe~0.235 and second self0.059525+waited0.18049+localSSH0.023 measured CPU; remaining conservatively charged for administration. Not full administrative telemetry. Root public-metadata/reaper mechanism accepted, not combined packet/GPU/quality proof. Drawnfromunspent50auditallowance."
     }
   ],
   "reservations": [
@@ -1792,8 +1802,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 4322,
-      "status": "Remaining_unspent4550GPU4322CPU; terminalfailuresclosed,localresourcepolicyrepairsunderreview,noGPUorfullstudyrelease."
+      "cpu_seconds": 4312,
+      "status": "Remaining_unspent4550GPU4312CPU; finalselfleafmetadata/reaperoracleaccepted10CPU,no combinedproof/GPUrelease. Proof-family238CPUclosed."
     }
   ],
   "jobs": [
