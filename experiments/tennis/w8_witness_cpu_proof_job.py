@@ -28,6 +28,17 @@ NATIVE_INVENTORY_SHA = 'cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e
 DATA_ROOT = Path('/home/itec/emanuele/Datasets/pointstream-data')
 
 
+def check_retained_packet_cpu(spec: dict[str, Any], cpu: dict[str, Any]) -> None:
+    """Join the retained instrumented receipt to pinned historical MAIN metadata."""
+    from experiments.tennis import w8_protected_metadata
+
+    rows = [item for item in spec['staged_inputs'] if item.get('name') == 'preflight']
+    if len(rows) != 1 or rows[0].get('sha256') != packet.PREFLIGHT_SHA:
+        raise ValueError('historical preflight metadata input differs')
+    preflight = w8_protected_metadata.read_historical(Path(rows[0]['path']), packet.PREFLIGHT_SHA)
+    packet.validate_witness_packet_cpu_receipt(cpu, preflight['receipts']['main']['torch'])
+
+
 def check_lifecycle(record: dict[str, Any], campaign_pgid: int) -> None:
     """Check actual synthetic records; they are not native or quality evidence."""
     from experiments.tennis.w8_witness_namespace_proof import check_waited_cpu
@@ -308,6 +319,7 @@ def validate(stage: Path, destination: Path) -> None:
         from experiments.tennis import w8_protected_metadata
         historical = w8_protected_metadata.read_historical(identity_path, packet.IDENTITY_SHA)
         check_protected_metadata(raw_json('packet-protected-identity.json'), historical)
+        check_retained_packet_cpu(spec, raw_json('packet-packet-cpu-only.json'))
         from experiments.tennis import w8_cuda_system_leaves as policy
         packet_leaves = raw_json('packet-packet-self-leaves.json')
         packet_namespace = raw_json('packet-packet-namespace.json')

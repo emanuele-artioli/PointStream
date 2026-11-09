@@ -461,9 +461,8 @@ if __name__ == '__main__':
     raise SystemExit(main())
 
 
-def read_witness_packet_cpu_receipt(path: Path, expected_torch: str) -> dict[str, Any]:
+def validate_witness_packet_cpu_receipt(cpu: dict[str, Any], expected_torch: str) -> dict[str, Any]:
     """Require the actual instrumented packet receipt, not a post-hoc inference."""
-    cpu = json.loads(path.read_text())
     observed = cpu.get('pre_serialization', {})
     if (cpu.get('scope') != 'CPU packet decoder only' or cpu.get('cuda_visible_devices') != ''
             or cpu.get('cuda_initialized_after_decode') is not False or cpu.get('torch_version') != expected_torch
@@ -471,6 +470,10 @@ def read_witness_packet_cpu_receipt(path: Path, expected_torch: str) -> dict[str
             or type(observed.get('unit_arrays')) is not int or observed['unit_arrays'] <= 0):
         raise ValueError('actual pre-serialization CPU packet receipt differs')
     return cpu
+
+
+def read_witness_packet_cpu_receipt(path: Path, expected_torch: str) -> dict[str, Any]:
+    return validate_witness_packet_cpu_receipt(json.loads(path.read_text()), expected_torch)
 
 
 def run_proof(stage: Path) -> dict[str, Any]:

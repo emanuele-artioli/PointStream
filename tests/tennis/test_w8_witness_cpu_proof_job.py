@@ -107,3 +107,24 @@ def test_protected_metadata_requires_historical_pin_and_current_stat_check(monke
                'historical_receipt_sha256': proof.packet.IDENTITY_SHA}
     proof.check_protected_metadata(receipt, historical)
     assert observed == [(receipt, historical, True)]
+
+
+def test_retained_packet_cpu_receipt_joins_pinned_main_and_rejects_tampering(monkeypatch):
+    from experiments.tennis import w8_protected_metadata
+    calls = []
+    def read(path, sha):
+        calls.append((str(path), sha))
+        return {'receipts': {'main': {'torch': 'pinned-torch'}}}
+    monkeypatch.setattr(w8_protected_metadata, 'read_historical', read)
+    spec = {'staged_inputs': [{'name': 'preflight', 'path': '/public/bundle.json', 'sha256': proof.packet.PREFLIGHT_SHA}]}
+    valid = {'scope': 'CPU packet decoder only', 'cuda_visible_devices': '', 'cuda_initialized_after_decode': False,
+             'torch_version': 'pinned-torch', 'pre_serialization': {'state_tensors': 480, 'restored_tensors': 480, 'unit_arrays': 2}}
+    proof.check_retained_packet_cpu(spec, valid)
+    assert calls == [('/public/bundle.json', proof.packet.PREFLIGHT_SHA)]
+    bad = dict(valid, pre_serialization=dict(valid['pre_serialization'], restored_tensors=479))
+    with pytest.raises(ValueError, match='pre-serialization'):
+        proof.check_retained_packet_cpu(spec, bad)
+    with pytest.raises(ValueError, match='pre-serialization'):
+        proof.check_retained_packet_cpu(spec, dict(valid, torch_version='other'))
+    with pytest.raises(ValueError, match='preflight'):
+        proof.check_retained_packet_cpu({'staged_inputs': []}, valid)
