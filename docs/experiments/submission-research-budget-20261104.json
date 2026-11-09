@@ -1373,6 +1373,15 @@
       "gpu_seconds": 0,
       "basis": "Entire authorized20CPU inclusive ceiling; remote self.278CPU and partial local telemetry measured, aggregate admin unmeasured. No real cache/model bulk copy, extraction or content SHA.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "parent8-parity16-readiness-20261109",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 30,
+      "basis": "Entire inclusive30readiness ceiling; actualmetadataCPU.250partial, aggregatefleet/SSH/adminunmeasured. Inside1200pilot, not extra. Exact source/receipt freshlySHAverified; bulkcachesmetadataonly.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -1891,8 +1900,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8370,
-      "cpu_seconds": 7310,
-      "status": "Remaining_unspent8370GPU7310CPU; GPU3safe-preflight20charged; no warming/GPU jobrelease."
+      "cpu_seconds": 7280,
+      "status": "Remaining_unspent8370GPU7280CPU; parent8readiness30charged; ONE1000GPU1170futureCPUparityreleased."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
