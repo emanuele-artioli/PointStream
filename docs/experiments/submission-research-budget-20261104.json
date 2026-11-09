@@ -1247,6 +1247,16 @@
       "witness_qualification": false,
       "release_stage": "research-first24/28",
       "basis": "Fullauthorized30CPUsourcepreparationchargedratherthanownerproposed12; source/readiness/subprocesspartialCPU~2.2measured,managerCPUunmetered. Rootrehashesallrawreceiptfiles,verifiesstatfirstprivatecontentunopened/public476SHA/CD6andfixedspec. Existingpreviouslyacceptedgpu5CD6cachetransitiononly;nonewexception. Family238prior+30=268closed,832futureof1100proposal;nojob/GPUyet."
+    },
+    {
+      "phase": "k5d-low-memory-da98-native-proof-closure-20261109",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "job_id": "20261109T203757Z-5331bf94",
+      "gpu_seconds": 0,
+      "cpu_seconds": 160,
+      "release_stage": "research-first24/28",
+      "basis": "50 prior preparation +130 rounded one-core lifecycle through canonical publication(120.737wall) +30 independent audit/admin. Aggregate administrative CPU not measured. Remaining90of300leaf released inside parent. Root accepted CPU mechanism only; gate SHA 511c3c777f4866bb8a7b50180918a2f14be9dd9609c5e288cb58bbf9824c70f7"
     }
   ],
   "reservations": [
@@ -1765,8 +1775,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8770,
-      "cpu_seconds": 8060,
-      "status": "Remaining_unspent8770GPU8060CPU; da98CPUproof5331running,250futureCPUinsideparent; noGPUrelease."
+      "cpu_seconds": 7900,
+      "status": "Remaining_unspent8770GPU7900CPU; da98nativeCPUproof5331rootaccepted210inclusive, noGPU16/scale release yet."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -2873,7 +2883,7 @@
       "job_id": "20261109T203757Z-5331bf94",
       "phase": "k5d-scale-first-tranche-20261105",
       "subphase": "low-memory-da98-new-source-native-CPUproof",
-      "state": "running; root freshly verified canonical status; no replay",
+      "state": "complete/rootaccepted/fourcases/19PIDbirthsandclaimabsent/eventACK/waitended",
       "revision": "da98de4a37e58af56d850eddabebb81be0642e42",
       "snapshot_sha256": "0fc1220f7aa82e7f0edfe637869cbfb5bbb1517e3cc5a51ad6e273702b03cfb1",
       "source_sha256": "62b6c4904c627d770a3d0854dc850a8871097f0053e551563e8cb4c647cc3036",
@@ -2889,7 +2899,12 @@
       "gpu_ceiling": 0,
       "local_batch": "/private/tmp/k5d-da98-proof-20261109",
       "wait_max_seconds": 2100,
-      "scope": "RealnativeCPUcontainment/accounting only; noGPU/parity/memory/timing/scale/quality qualification"
+      "scope": "RealnativeCPUcontainment/accounting only; noGPU/parity/memory/timing/scale/quality qualification",
+      "actual_inclusive_conservative_cpu_charge": 210,
+      "terminal_additional_cpu_charge": 160,
+      "root_accepted_receipt_sha256": "511c3c777f4866bb8a7b50180918a2f14be9dd9609c5e288cb58bbf9824c70f7",
+      "wait_state": "ended",
+      "gpu_seconds": 0
     },
     {
       "job_id": "20261109T203908Z-538fd91b",
@@ -2935,7 +2950,7 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "Ball5331canonicalwaitcomplete/ownerrawauditing. W8final538fproofalreadyfailedatrootfreshstatus; ONEcanonicalwaitmayreturnattention, teardown/cost/diagnosis pending. NoGPUjob/retry/timer.",
+    "state": "Ball5331CPUproofrootaccepted/closed; W8final538ffailed, ownerfailure/teardownauditpending. No liveGPUjob/retry/timer.",
     "jobs": [],
     "batches": [],
     "native_completion_resume_verified": false,
