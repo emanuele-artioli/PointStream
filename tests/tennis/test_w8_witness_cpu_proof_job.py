@@ -11,7 +11,7 @@ def test_real_fleet_spec_is_cpu_only_and_dispatches_fixed_phases():
     spec = proof.make_spec(deadline, '/home/itec/emanuele/Datasets/pointstream-data/test/inventory.json')
     validate_spec(spec)
     assert spec['device'] == 'cpu' and spec['gpu_models'] == [] and spec['gpu_memory_mib'] == 0
-    assert spec['budget_seconds'] == 650 and spec['cpu_threads'] == 1
+    assert spec['budget_seconds'] == 600 and spec['cpu_threads'] == 1
     assert phase_command(spec, 'smoke', python='/python') == ['/python', '-m',
         'experiments.tennis.w8_witness_cpu_proof_job', 'run']
     assert phase_command(spec, 'full', python='/python')[-1] == 'noop'

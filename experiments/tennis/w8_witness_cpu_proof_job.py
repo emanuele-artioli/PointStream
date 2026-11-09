@@ -67,7 +67,7 @@ def check_lifecycle(record: dict[str, Any], campaign_pgid: int) -> None:
 def remaining(dispatch: dict[str, Any], reserve: float) -> None:
     clock = dispatch['campaign_clock']
     if (not math.isfinite(reserve) or reserve <= 0
-            or time.monotonic() + reserve > min(clock['budget_end'], clock['phase_started'] + 580)):
+            or time.monotonic() + reserve > min(clock['budget_end'], clock['phase_started'] + 530)):
         raise ValueError('remaining campaign time cannot cover required proof and cleanup')
 
 
@@ -96,8 +96,8 @@ def make_spec(deadline: str, inventory: str) -> dict[str, Any]:
     native = {'name': 'native_inventory', 'path': str(path), 'sha256': NATIVE_INVENTORY_SHA, 'extract': False}
     spec['staged_inputs'].append(native)
     spec['inputs'].append({'path': str(path), 'sha256': NATIVE_INVENTORY_SHA})
-    spec.update(w8_combined_cpu_proof_profile=PROFILE, budget_seconds=650, validator_seconds=50,
-                smoke={'seconds': 580, 'representative_basis': 'Exact-source CPU namespace, packet, native and policy proof.'},
+    spec.update(w8_combined_cpu_proof_profile=PROFILE, budget_seconds=600, validator_seconds=50,
+                smoke={'seconds': 530, 'representative_basis': 'Exact-source CPU namespace, packet, native and policy proof.'},
                 full={'seconds': 5}, entrypoint=['-m', 'experiments.tennis.w8_witness_cpu_proof_job'],
                 arguments=['{phase}'], scale={'phase': {'smoke': 'run', 'full': 'noop'}},
                 validator=['{python}', '-m', 'experiments.tennis.w8_witness_cpu_proof_job', 'validate'])
@@ -118,12 +118,12 @@ def run(stage: Path) -> None:
         raise ValueError('CPU-hidden single-core fleet proof required')
     spec = json.loads((stage.parent / 'spec.json').read_text())
     dispatch = json.loads((stage / 'dispatch.json').read_text())
-    if (spec.get('w8_combined_cpu_proof_profile') != PROFILE or spec.get('budget_seconds') != 650
-            or spec.get('smoke', {}).get('seconds') != 580 or spec.get('validator_seconds') != 50
+    if (spec.get('w8_combined_cpu_proof_profile') != PROFILE or spec.get('budget_seconds') != 600
+            or spec.get('smoke', {}).get('seconds') != 530 or spec.get('validator_seconds') != 50
             or spec.get('full', {}).get('seconds') != 5):
         raise ValueError('exact combined CPU proof budget profile required')
     # Keep the inherited 3600-second hard ceiling used by the bounded workers;
-    # the one-core fleet campaign wall remains the aggregate 650-second bound.
+    # the one-core fleet campaign wall remains the aggregate 600-second bound.
     resource.setrlimit(resource.RLIMIT_CPU, (100, 3600))
     started = time.monotonic()
     remaining(dispatch, 525)
