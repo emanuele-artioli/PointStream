@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "decision": "root reviewed7b519; release bounded source preparation only",
+  "revision": "7b519d3e448135842fbd33e7007fffd1ea167a0f",
+  "snapshot_sha256": "d747b15f47dbddb72a94f4cf225338bd5cac0810a002d642e45227a80d69e8ba",
+  "source_sha256": "e0278d99b99c97179d808907476dd9b21bd69d47b800241542c6c1a6e0e27835",
+  "archive": "/private/tmp/pointstream-w8-7b519-review-20261109/source.tar",
+  "root_verified_git_blobs": 1667,
+  "root_reviewed_complete_diff_lines": 331,
+  "checks": "Ruff,mypy561,pytest2030passed39skipped,checkloghashesverified",
+  "CPU_ceiling": 30,
+  "GPU_ceiling": 0,
+  "parent_phase": "w8-full-witness-staged-20261106",
+  "parent_remaining_CPU": 4062,
+  "parent_remaining_GPU": 4550,
+  "closed_proof_family_CPU": 488,
+  "new_family_CPU_cap": 1400,
+  "target_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-7b519-20261109/source.tar",
+  "scope": "ONE fresh knownjobs/allhostdoctor/workers/gpu5CPU0claim/runtime/tool/native/localdisk check, exactstat-five-protected-before-public-hash, newd747source no-overwrite upload/publicSHA and unchangedCD6check. Prepare existing600/530/50/5 combinedproofactualspec with fresh<=45mindeadline. NOJOB.",
+  "conditions": [
+    "no source/quality/tensor threshold or access-grant change; boundedTERM escalation truthfullyrecorded; legacy packet default unchanged",
+    "only existing acceptedCD6cachepresence reconciliation; no other baseline exceptions. Protected bodies remain unopened; historical protectedSHAs not freshbyteverification",
+    "measure partialCPU; conservative30includes manager/admin,stopbeforeexceeded,preserve raw/scripts/PIDs/receipts",
+    "root separately reviews actualfixedspec/sourcepostchecks and full832futureCPU envelope beforeONECPUproof; no GPU/context/fullwitness/retry authority"
+  ]
+}
