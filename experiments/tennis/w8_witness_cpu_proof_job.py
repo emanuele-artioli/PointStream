@@ -126,7 +126,7 @@ def run(stage: Path) -> None:
     # the one-core fleet campaign wall remains the aggregate 600-second bound.
     resource.setrlimit(resource.RLIMIT_CPU, (100, 3600))
     started = time.monotonic()
-    remaining(dispatch, 525)
+    remaining(dispatch, 475)  # packet 80 + lifecycle 90 + strict 120 + native 135 + setup 20 + publish 30
     scratch = Path(os.environ['PS_SCRATCH_DIR']).resolve(strict=True)
     publish = scratch / 'publish'
     publish.mkdir(exist_ok=False)
@@ -148,7 +148,7 @@ def run(stage: Path) -> None:
     for unit in fixed.UNITS:
         keep('packet-unit-' + unit + '.npz', prepared['decoder_out'] / 'publish' / 'units' / f'{unit}.npz')
     keep('packet-decoded.pt', prepared['decoder_out'] / 'decoded.pt')
-    remaining(dispatch, 395)  # lifecycle 90 + two policy leaves 120 + native 135 + publication 50
+    remaining(dispatch, 375)  # lifecycle 90 + two policy leaves 120 + native 135 + publication 30
     life_dir = scratch / 'namespace-lifecycle'
     life_dir.mkdir()
     unshare = Path('/usr/bin/unshare').resolve(strict=True)
@@ -164,7 +164,7 @@ def run(stage: Path) -> None:
             path = case_dir / basename
             if path.is_file():
                 keep(f'namespace-{name}-{basename}', path)
-    remaining(dispatch, 305)  # strict leaves 120 + native 135 + publication 50
+    remaining(dispatch, 285)  # strict leaves 120 + native 135 + publication 30
     isolation = witness.run_isolation_proof(prepared, worker_cpu=40, worker_wall=60)
     if (isolation.get('scope') != 'cpu_isolation_proof_only'
             or [row['runtime'] for row in isolation.get('runs', [])] != ['main', 'jcv']):
@@ -173,7 +173,7 @@ def run(stage: Path) -> None:
         for key in ('config_path', 'receipt_path', 'namespace_path', 'namespace_started_path'):
             keep(f"strict-{row['runtime']}-{key}.json", row[key])
     for index, case in enumerate(('normal', 'timeout', 'kill')):
-        remaining(dispatch, (3 - index) * 45 + 50)
+        remaining(dispatch, (3 - index) * 45 + 30)
         result = witness.run_native_proof(prepared, inventory_path=prepared['native_inventory'],
                                           case=case)
         if (result.get('scope') != 'native_cpu_lifecycle_proof_only' or result.get('case') != case
@@ -241,6 +241,7 @@ def validate(stage: Path, destination: Path) -> None:
         check_lifecycle(lifecycle, lifecycle['campaign_pgid'])
         required = {'packet-packet-config.json', 'packet-packet-decoded-manifest.json',
                     'packet-packet-cpu-only.json', 'packet-decoded.pt',
+                    *(f'namespace-{case}-receipt.json.started' for case in ('normal', 'timeout', 'term', 'kill')),
                     *(f'packet-unit-{unit}.npz' for unit in fixed.UNITS),
                     *(f'strict-{runtime}-{name}.json' for runtime in ('main', 'jcv')
                       for name in ('config_path', 'receipt_path', 'namespace_path', 'namespace_started_path')),

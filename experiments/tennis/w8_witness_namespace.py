@@ -112,11 +112,14 @@ def supervise(outside: str, timeout: float, receipt: Path, target: str, args: li
     if init_identity['host_pgid'] != worker['campaign_pgid'] or init_identity['start_ticks'] <= 0:
         raise ValueError('namespace init group or birth differs')
     started_path = receipt.with_name(receipt.name + '.started')
-    with started_path.open('x') as stream:
+    pending_path = receipt.with_name(receipt.name + '.started.pending')
+    with pending_path.open('x') as stream:
         json.dump({'schema': 1, 'target': target, 'outside_namespace': outside,
                    'namespace_init': init_identity, 'worker_host_identity': worker}, stream, sort_keys=True)
         stream.flush()
         os.fsync(stream.fileno())
+    os.link(pending_path, started_path)
+    pending_path.unlink()
     child_status = None
     reason = ''
     reaped = 0

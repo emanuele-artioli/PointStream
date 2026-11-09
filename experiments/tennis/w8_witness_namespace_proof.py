@@ -105,16 +105,23 @@ def run(output: Path, unshare: Path, unshare_sha: str) -> None:
         launcher = subprocess.Popen(argv, preexec_fn=lambda: parent_death_signal(parent))
         try:
             deadline = time.monotonic() + 4
-            while not (case_dir / 'worker.json').exists() or not (case_dir / 'detached.json').exists():
+            started_record = receipt.with_name(receipt.name + '.started')
+            while (not (case_dir / 'worker.json').exists() or not (case_dir / 'detached.json').exists()
+                   or not started_record.exists()):
                 if launcher.poll() is not None or time.monotonic() >= deadline:
                     raise RuntimeError('proof worker did not become observable')
                 time.sleep(.01)
             a = json.loads((case_dir / 'worker.json').read_text())
             b = json.loads((case_dir / 'detached.json').read_text())
+            started_data = json.loads(started_record.read_text())
             init = proc(a['ppid'])
             if (proc(a['pid']) != a or proc(b['pid']) != b or a['pgid'] != campaign
                     or init['pgid'] != campaign or b['ppid'] != a['pid']
-                    or b['pgid'] != b['pid'] or a['pid'] == b['pid']):
+                    or b['pgid'] != b['pid'] or a['pid'] == b['pid']
+                    or started_data['worker_host_identity']['host_pid'] != a['pid']
+                    or started_data['worker_host_identity']['start_ticks'] != a['start_ticks']
+                    or started_data['namespace_init']['host_pid'] != init['pid']
+                    or started_data['namespace_init']['start_ticks'] != init['start_ticks']):
                 raise ValueError('live host PID/start/group join differs')
             if case in ('term', 'kill'):
                 launcher.send_signal(signal.SIGTERM if case == 'term' else signal.SIGKILL)
