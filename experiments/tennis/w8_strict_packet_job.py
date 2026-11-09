@@ -461,6 +461,18 @@ if __name__ == '__main__':
     raise SystemExit(main())
 
 
+def read_witness_packet_cpu_receipt(path: Path, expected_torch: str) -> dict[str, Any]:
+    """Require the actual instrumented packet receipt, not a post-hoc inference."""
+    cpu = json.loads(path.read_text())
+    observed = cpu.get('pre_serialization', {})
+    if (cpu.get('scope') != 'CPU packet decoder only' or cpu.get('cuda_visible_devices') != ''
+            or cpu.get('cuda_initialized_after_decode') is not False or cpu.get('torch_version') != expected_torch
+            or observed.get('state_tensors') != 480 or observed.get('restored_tensors') != 480
+            or type(observed.get('unit_arrays')) is not int or observed['unit_arrays'] <= 0):
+        raise ValueError('actual pre-serialization CPU packet receipt differs')
+    return cpu
+
+
 def run_proof(stage: Path) -> dict[str, Any]:
     """Run the fixed real packet path for the combined CPU proof, without publication."""
     from experiments.tennis import w8_strict_host_cost_job as host
@@ -543,16 +555,13 @@ def run_proof(stage: Path) -> dict[str, Any]:
     check_isolation(packet_config, decoded['isolation'], json.loads(loader_path.read_text()), manifest,
                     fixed.file_sha(loader_path))
     cpu_path = output / 'cpu-only.json'
-    cpu = json.loads(cpu_path.read_text())
+    read_witness_packet_cpu_receipt(cpu_path, preflight['receipts']['main']['torch'])
     if (decoded.get('match_tensors') != fingerprints or decoded.get('unit_sha256') != receiver.ORACLE_UNIT_SHA
             or decoded.get('packet_sha256') != fixed.WINDOW_SHA or decoded.get('profile_sha256') != fixed.PROFILE_SHA
             or decoded.get('guider_sha256') != fixed.GUIDER_SHA or decoded.get('checkpoint_sha256') != CHECKPOINT_SHA
             or receiver.verify_serialized_match(output / 'decoded.pt', fingerprints) != CHECKPOINT_SHA
             or any(fixed.file_sha(output / 'publish' / 'units' / f'{u}.npz') != receiver.ORACLE_UNIT_SHA[u] for u in fixed.UNITS)
-            or cpu.get('cuda_visible_devices') != '' or cpu.get('cuda_initialized_after_decode') is not False
-            or cpu.get('torch_version') != preflight['receipts']['main']['torch']
-            or cpu.get('pre_serialization', {}).get('state_tensors') != 480
-            or cpu.get('pre_serialization', {}).get('restored_tensors') != 480):
+):
         raise ValueError('combined proof packet/oracle identity differs')
     receipt_paths = {'packet-config.json': work / 'worker-config.json', 'packet-exit.json': work / 'exit.json',
                      'packet-self-leaves.json': work / 'self-leaves.json',

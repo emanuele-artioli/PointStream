@@ -758,7 +758,7 @@ def validate_pilot(stage: Path, target: Path) -> None:
         require_original_host(dispatch)
         group = json.loads((stage.parent / 'run/status.json').read_text())['process_group_id']
         outside = os.readlink('/proc/self/ns/pid')
-        for name, module, usage_key in (('packet-namespace.json', 'experiments.tennis.w8_strict_receiver_worker', 'packet_usage'),
+        for name, module, usage_key in (('packet-namespace.json', 'experiments.tennis.w8_strict_packet_worker', 'packet_usage'),
                                        ('generator-namespace.json', 'experiments.tennis.w8_strict_host_model_worker', 'generation_usage')):
             ns = witness.namespace_completion(retained / name, expected_pgid=group,
                                                expected_outside=outside, expected_target=module)
@@ -1455,7 +1455,7 @@ def validate_finish(stage: Path, target: Path) -> None:
                 or summary['usage'][name].get('namespace_receipt_sha256') != fixed.file_sha(retained / name / 'namespace-receipt.json')):
             raise ValueError('finish worker CPU or namespace receipt differs')
     packet_ns = witness.namespace_completion(retained / 'packet-namespace.json', expected_pgid=group,
-        expected_outside=outside, expected_target='experiments.tennis.w8_strict_receiver_worker')
+        expected_outside=outside, expected_target='experiments.tennis.w8_strict_packet_worker')
     host.strict_policy.validate_self_leaf_identity(decoded['isolation']['approved_leaves'],
                                                    packet_ns['worker_host_identity'])
     packet_usage = summary.get('packet_usage', {})

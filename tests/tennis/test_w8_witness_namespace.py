@@ -130,3 +130,17 @@ def test_kill_remaining_only_accepts_missing_process(monkeypatch):
     monkeypatch.setattr(namespace.os, 'kill', denied)
     with pytest.raises(PermissionError):
         namespace.kill_remaining()
+
+
+def test_packet_target_is_fixed_and_cuda_hidden(monkeypatch):
+    target = namespace.PACKET_TARGET
+    args = ['--config', 'a', '--config-sha256', 'b', '--loader', 'c', '--loader-sha256', 'd',
+            '--canary', 'e', '--source-root', 'f', '--witness-mode', 'packet']
+    monkeypatch.setenv('CUDA_VISIBLE_DEVICES', '')
+    assert namespace.command(target, args) == [sys.executable, '-m', target, *args]
+    for bad in (args[:-2], [*args, '--extra', 'x'], [*args[:-1], 'other']):
+        with pytest.raises(ValueError, match='fixed CPU witness packet'):
+            namespace.command(target, bad)
+    monkeypatch.setenv('CUDA_VISIBLE_DEVICES', 'GPU-not-hidden')
+    with pytest.raises(ValueError, match='fixed CPU witness packet'):
+        namespace.command(target, args)

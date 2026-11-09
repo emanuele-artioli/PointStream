@@ -41,6 +41,7 @@ def main() -> int:
     p.add_argument('--loader-sha256', required=True)
     p.add_argument('--canary', type=Path, required=True)
     p.add_argument('--source-root', type=Path, required=True)
+    p.add_argument('--witness-mode', choices=('packet',))
     args = p.parse_args()
     if receiver.digest(args.config) != args.config_sha256:
         raise ValueError('packet worker config identity mismatch')
@@ -79,7 +80,11 @@ def main() -> int:
     fixed.decode_frozen_window = decode_checked
     w8_payload.unpack_match = unpack_checked
     w8_payload.restore_tensor = restore_checked
-    receiver.launch(args.config, args.config_sha256, args.loader, args.loader_sha256, args.canary, args.source_root)
+    if args.witness_mode == 'packet':
+        receiver.launch(args.config, args.config_sha256, args.loader, args.loader_sha256, args.canary, args.source_root,
+                        witness_mode='packet')
+    else:
+        receiver.launch(args.config, args.config_sha256, args.loader, args.loader_sha256, args.canary, args.source_root)
     if observed.get('state_tensors') != 480 or observed.get('unit_arrays', 0) <= 0 or observed.get('restored_tensors', 0) <= 0:
         raise RuntimeError('pre-serialization CPU checks missing')
     if os.environ.get('CUDA_VISIBLE_DEVICES') != '' or torch.cuda.is_initialized():

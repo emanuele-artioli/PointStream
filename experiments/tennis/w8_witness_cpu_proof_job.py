@@ -310,7 +310,11 @@ def validate(stage: Path, destination: Path) -> None:
         check_protected_metadata(raw_json('packet-protected-identity.json'), historical)
         from experiments.tennis import w8_cuda_system_leaves as policy
         packet_leaves = raw_json('packet-packet-self-leaves.json')
-        policy.validate_self_leaf_identity(packet_leaves, raw_json('packet-packet-namespace.json')['worker_host_identity'])
+        packet_namespace = raw_json('packet-packet-namespace.json')
+        if (packet_namespace.get('target') != 'experiments.tennis.w8_strict_packet_worker'
+                or packet_namespace.get('reason') != 'complete' or packet_namespace.get('status') != 0):
+            raise ValueError('packet namespace target or completion differs')
+        policy.validate_self_leaf_identity(packet_leaves, packet_namespace['worker_host_identity'])
         if packet_leaves != raw_json('packet-packet-decoded-manifest.json')['isolation']['approved_leaves']:
             raise ValueError('packet self leaves differ from decoded isolation')
         for runtime in ('main', 'jcv'):
