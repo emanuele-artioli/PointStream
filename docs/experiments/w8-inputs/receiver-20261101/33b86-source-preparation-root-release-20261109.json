@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "decision": "Root reviewed33b86; source preparation ONLY",
+  "revision": "33b86cb60347ac12ad2ce0674052e36706e232d1",
+  "source_sha256": "bf26eec6c158e686bf5a0ef12b4898d08b95345b998e9c3350e6dbf2df74c08b",
+  "archive_sha256": "327e96ea67d8d21127bee7b8cd0f4a785ef6ffceecd007665483812717241f48",
+  "archive": "/private/tmp/pointstream-w8-33b86-review-20261109/source.tar",
+  "source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-33b86-20261109/source.tar",
+  "CPU_ceiling_inclusive": 30,
+  "GPU_ceiling": 0,
+  "CPU_family_cap": 1550,
+  "CPU_family_closed": 648,
+  "CPU_family_forecast_inclusive": 1510,
+  "parent_remaining_before_preparation": {
+    "gpu_seconds": 4550,
+    "cpu_seconds": 3902
+  },
+  "scope": "ONE fresh source-only preparation per runtime-roles card. All protected paths stat-only before public hashes. No job, GPU, source grant or new baseline exception. Fixed600/530/50/5 proof spec with fresh<=45min deadline for separate review."
+}
