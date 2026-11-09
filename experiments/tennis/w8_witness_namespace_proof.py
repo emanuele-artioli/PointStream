@@ -100,7 +100,9 @@ def run(output: Path, unshare: Path, unshare_sha: str) -> None:
                 '--timeout', str(timeout), '--receipt', str(receipt), '--', namespace.PROOF_TARGET,
                 'worker', case, '--output', str(case_dir)]
         usage_before = resource.getrusage(resource.RUSAGE_CHILDREN)
-        launcher = subprocess.Popen(argv)
+        from experiments.tennis.w8_receiver_native_bootstrap import parent_death_signal
+        parent = os.getpid()
+        launcher = subprocess.Popen(argv, preexec_fn=lambda: parent_death_signal(parent))
         try:
             deadline = time.monotonic() + 4
             while not (case_dir / 'worker.json').exists() or not (case_dir / 'detached.json').exists():
@@ -142,7 +144,7 @@ def run(output: Path, unshare: Path, unshare_sha: str) -> None:
                 check_waited_cpu(waited_cpu, inner['init_cpu_seconds'], inner['children_cpu_seconds'])
             if case == 'timeout' and (rc == 0 or inner is None or inner['reason'] != 'timeout'):
                 raise ValueError('timeout proof differs')
-            if case == 'term' and rc == 0 or case == 'kill' and rc != -signal.SIGKILL:
+            if (case == 'term' and rc != -signal.SIGTERM) or (case == 'kill' and rc != -signal.SIGKILL):
                 raise ValueError('signal proof differs')
             results.append({'case': case, 'launcher_rc': rc, 'outer_waited_cpu_seconds': waited_cpu,
                             'init': init, 'worker': a, 'detached': b,
