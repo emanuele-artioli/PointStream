@@ -1704,7 +1704,7 @@
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
       "cpu_seconds": 4540,
-      "status": "Remaining_unspent4550GPU4540CPU after 5 CPU metadata readiness and 5 CPU source/native transfer plus two-host postchecks. Root independent transfer audit pending; no request or GPU. CPU proof 800 includes prep 10 charged + 40 future prep + 600 campaign + 100 post + 50 audit. Qualification <=900 GPU / 1000 CPU inside parent remains unreleased; full 240/80 gates unchanged."
+      "status": "Remaining_unspent4550GPU4540CPU; rootreleasedONEexactff6CPUproof800total/790futureCPU0GPU includingprep10charged,40futureprep600campaign100post50audit; actualrequestnotyetsubmitted. Parentincludesallproof/ops/failure; no duplicateleafreservation. No GPUqualification/fullcandidate release."
     }
   ],
   "jobs": [
