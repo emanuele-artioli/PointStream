@@ -483,11 +483,14 @@ def check_stage_evidence(stage: Path, dispatch: dict[str, Any], *, terminal: boo
             or execution.get('contention') != [] or execution.get('gpu_sharing') != {'mode': 'exclusive'}):
         raise ValueError('stage execution is incomplete or GPU timing contaminated')
     if terminal:
+        from experiments.jobs.inbox import digest
+
         state = json.loads((stage.parent / 'state.json').read_text())
         gate = json.loads((stage.parent / 'gate.json').read_text())
         spec = json.loads((stage.parent / 'spec.json').read_text())
         if (state.get('status') != 'complete' or state.get('job_id') != stage.parent.name
                 or gate.get('passed') is not True or gate.get('inputs') != spec.get('inputs')
+                or gate.get('spec_sha256') != digest(spec)
                 or gate.get('source_sha256') != dispatch.get('code', {}).get('source_sha256')):
             raise ValueError('canonical terminal completion or smoke gate differs')
 

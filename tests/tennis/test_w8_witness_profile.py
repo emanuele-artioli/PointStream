@@ -763,6 +763,7 @@ def test_finish_publication_uses_real_fleet_archive(tmp_path: Path) -> None:
 
 def test_finish_rejects_contaminated_execution_and_nonterminal(tmp_path: Path) -> None:
     from experiments.tennis import w8_witness_job as job
+    from experiments.jobs.inbox import digest
 
     root = tmp_path / '20261106T000000Z-12345678'
     stage = root / 'full'
@@ -772,9 +773,14 @@ def test_finish_rejects_contaminated_execution_and_nonterminal(tmp_path: Path) -
     (stage / 'execution.json').write_text(json.dumps(execution))
     (root / 'state.json').write_text(json.dumps({'status': 'complete', 'job_id': root.name}))
     (root / 'spec.json').write_text(json.dumps({'inputs': []}))
-    (root / 'gate.json').write_text(json.dumps({'passed': True, 'inputs': [], 'source_sha256': 'a' * 64}))
+    (root / 'gate.json').write_text(json.dumps({'passed': True, 'inputs': [], 'spec_sha256': digest({'inputs': []}),
+                                                'source_sha256': 'a' * 64}))
     dispatch = {'code': {'source_sha256': 'a' * 64}}
     job.check_stage_evidence(stage, dispatch, terminal=True)
+    (root / 'spec.json').write_text(json.dumps({'inputs': [], 'tampered': True}))
+    with pytest.raises(ValueError, match='terminal'):
+        job.check_stage_evidence(stage, dispatch, terminal=True)
+    (root / 'spec.json').write_text(json.dumps({'inputs': []}))
     execution['timing_contaminated'] = True
     (stage / 'execution.json').write_text(json.dumps(execution))
     with pytest.raises(ValueError, match='contaminated'):
