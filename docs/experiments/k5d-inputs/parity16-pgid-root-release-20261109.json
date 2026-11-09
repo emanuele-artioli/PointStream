@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "decision": "release_one_bounded_gpu16_parity_after_exact_source_pgid_proof",
+  "date": "2026-11-09",
+  "parent_phase": "k5d-scale-first-tranche-20261105",
+  "inclusive_gpu_seconds": 1000,
+  "inclusive_cpu_seconds": 1200,
+  "external_cpu_included_preparation_seconds": 50,
+  "campaign_seconds": 800,
+  "smoke_seconds": 600,
+  "namespace_seconds": 580,
+  "validator_seconds": 30,
+  "full_noop_seconds": 5,
+  "post_campaign_gpu_seconds": 200,
+  "external_cpu_seconds": 400,
+  "consumer_execution_identity": {
+    "source_sha256": "71d788cf9c520c4c095f011dbf5efce157493f003a3db970e57731f06d1cb7af",
+    "snapshot_sha256": "22fb921e5cc26d04f22d6e8be6f1098f504b3319283794e341ab5952dc51815d",
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "revision": "ae6030e58a98156d3b5cb5d1cfab78967b173c9b",
+  "native_cpu_job_id": "20261106T023738Z-2793db1b",
+  "native_cpu_accepted_receipt_sha256": "c64a5890d6c2388bb54453332964e1c365aa0caa28a20836de74b0493c3abf8a",
+  "reviewed_draft_spec_sha256": "f928094312ac4e8394ccd5a012a1148eda1eeee02cd735a07d6a87861499311d",
+  "root_review": [
+    "actual normalized draft and file SHA checked",
+    "diff versus prior reviewed parity spec changes only receipt path/SHA and deadline",
+    "all source and exact1348+25 bridge checked before accepted actual Linux proof",
+    "historical numerical278.247163 times1.5=417.370745 within580NS; warmstaging61.071447 leaves103.928553othercampaign",
+    "whole lifecycle/admin independent reserves retained; timing references not guarantees"
+  ],
+  "conditions": [
+    "recheck existing canonical jobs after interruption; no unknown replay",
+    "fresh all6host/worker/cache/source/input/native/env/affinity/storage checks",
+    "upload new accepted receipt once without overwrite and hashverify",
+    "refresh only deadline <=45minutes, real normalize/hash, record jobID before ONEcanonicalwait<=1200seconds",
+    "actual native/wire/receiver pixels/all six metric+judge arrays exact accepted16; namespace actual hostPGID+CPU/lifecycle/teardown audit before promotion",
+    "stop on identity, source, parity, budget, deadline, resource or contention failure; no replacement/full30 release"
+  ]
+}

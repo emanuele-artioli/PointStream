@@ -1567,7 +1567,7 @@
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8900,
       "cpu_seconds": 9320,
-      "status": "Remaining_unspent8900GPU9320CPU after2793CPUproof210inclusive; rootacceptedexactsourceCPUcontainment/group only. NoactiveGPU/retry/parityreleaseyet. GPU16proposal then292/586/full30separategates."
+      "status": "Remaining_unspent8900GPU9320CPU. Root20261109releasesONEnewsourceGPU16parityafteraccepted2793proof, exactae6030/22fb/71d/env32e/wrapper62f. Nested1000GPU1200CPUinclusive(800campaign600smoke580NS30val5noop;200postGPU400externalCPUincluding50prep). Recheckexistingjobs/all6hosts/input/sourcecache/receipt/native/env/affinity/storage afterinterruption; freshdeadline<=45min only. All6exactparity+counters+terminal/teardownrequired before292/586. No replay/replacement/full30release."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
