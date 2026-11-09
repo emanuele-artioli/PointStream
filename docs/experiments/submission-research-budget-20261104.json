@@ -1228,6 +1228,15 @@
       "cpu_seconds": 30,
       "release_stage": "research-first24/28",
       "basis": "Fullauthorized30CPUreadinessceilingforONEallhostdoctor/inspect/knownjobs/workers+gpu2/3CPU0/claim/cache/space survey; partiallocal+remoteCPU~1.08butadministrationunmetered. V1noheadroom, lowerprofilethresholdmettransiently; no sourceupload/job/GPU. Separateprofile-choicecost,notdoublecountedinsidefutureproofpreparation50."
+    },
+    {
+      "phase": "k5d-low-memory-da98-source-preparation-20261109",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "release_stage": "research-first24/28",
+      "basis": "Fullauthorized50CPUnewda98sourcepreparation/readiness/inputZIP2.56GBfreshSHA/native/unshare/runtimechecks+gzipuploadandpublicpostSHA/admin. Measuredhost11.323+post.124+local.835+.346+.045partialCPU,remotegzip/dd8CPUeachbounded,administrationunmetered. Inside300CPUproofleaf50spent+250future; source0fcnewimmutablecacheverified,nojobyet."
     }
   ],
   "reservations": [
@@ -1746,8 +1755,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8770,
-      "cpu_seconds": 8110,
-      "status": "Remaining_unspent8770GPU8110CPU; lowerprofilelocalfreeze/rootsourcebridgeaccepted,readinesssurvey30CPUcharged; noCPU/GPUreleaseyet."
+      "cpu_seconds": 8060,
+      "status": "Remaining_unspent8770GPU8060CPU; newda98sourceprepared50CPU, proof300inclusiveleafhas250future; rootoneCPUproofreleasepending, noGPUrelease."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
