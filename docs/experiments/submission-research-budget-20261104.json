@@ -1149,6 +1149,16 @@
       "cpu_seconds": 50,
       "release_stage": "research-first24/28",
       "basis": "Conservativeauthorized50CPUpreparation forONEnewdf6sourceCPUproof: allhostdoctor/knownjobs/CPUclaims/gpu2CPU0/runtime/tools/unshare/storage/inputZIP SHA(14.41CPUreported), exactnewsourcegzipupload4.94wall+sourcepublichashverification/admin. Countsinside300CPUleaf; future250CPU(100campaign100post30audit20contingency),noGPUparity/full30release. ActualjobIDpending; no replay."
+    },
+    {
+      "phase": "k5d-shared-df6-native-closure-20261109",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "job_id": "20261109T190423Z-bbde248b",
+      "gpu_seconds": 0,
+      "cpu_seconds": 100,
+      "release_stage": "research-first24/28",
+      "basis": "Rootaccepted actualdf6sourceCPUmechanismproof; 70roundedwholeonecorelifecyclewall61.0+30audit/admin=100futureCPU, prior50prep=>150inclusiveof300cap. All19observedPIDbirths/campaign/supervisorabsent,CPUclaimempty,eventACK. NoGPUparity/timing/scale/costqualification; aggregateadminCPUnotmeasured."
     }
   ],
   "reservations": [
@@ -1667,8 +1677,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8770,
-      "cpu_seconds": 8640,
-      "status": "Remaining_unspent8770GPU8640CPU; df6nativeCPUproof300CPU0GPUrootreleased,50prepcharged/250future, sourceuploadonceverification/admissioninprogress. No sharedGPU16/292/586/full30 release."
+      "cpu_seconds": 8540,
+      "status": "Remaining_unspent8770GPU8540CPU afterrootaccepteddf6nativeCPUproof150inclusive; noactiveBalljob/wait. SharedGPU16parity+292/586/full30stillrequireseparaterootrelease."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -2697,6 +2707,24 @@
       "inclusive_cpu_charge": 210,
       "audit_receipt_sha256": "81e78f1818602d495c814ca3e1c0493991d41c7f4421ef30731480f76d5e3199",
       "wait_handle": 36823
+    },
+    {
+      "job_id": "20261109T190423Z-bbde248b",
+      "phase": "k5d-scale-first-tranche-20261105",
+      "subphase": "shared-df6-nativeCPUproof",
+      "state": "complete/rootaccepted/singlecanonicalwaitended/claimsandtaskgroupabsent/eventACK",
+      "revision": "df6eee829e56a1880397547f6d654eb47169c4f4",
+      "source_sha256": "ac77730dc24ce123fa7dac7f9e2d65003e25a11fdbded29b05f77be9bef1b15b",
+      "snapshot_sha256": "4477693bd025e633a8d14a4f8f303576e41df4cd23420c083cedd967113ce463",
+      "spec_sha256": "61e7e018757d01fda44a0342df2b4b57502fc628e26511fc633a06e1efd15f6a",
+      "deadline": "2026-11-09T19:43:33Z",
+      "inclusive_cpu_ceiling": 300,
+      "actual_inclusive_conservative_cpu_charge": 150,
+      "gpu_seconds": 0,
+      "wait_handle": 37096,
+      "wait_max_seconds": 2400,
+      "local_batch": "/private/tmp/k5d-df6-execution-20261109",
+      "root_accepted_receipt_sha256": "6a4c7d3b29b6376a6262ec618394de89b785df6d1b18d87ac8e940aa1c1621a0"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -2718,7 +2746,7 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "W8 CPU proof edd3 terminated failed before proof leaves; canonical wait stopped. Task group and CPU claim absent; no retry or GPU release.",
+    "state": "Noactivejobs/waits: BallbbdeCPUproofrootaccepted, W8edd3failedclosed. Noautomaticretry/GPUrelease; localW8resource-onlyrepairreviewandsharedBallGPU16proposalnext.",
     "jobs": [],
     "batches": [],
     "native_completion_resume_verified": false,
