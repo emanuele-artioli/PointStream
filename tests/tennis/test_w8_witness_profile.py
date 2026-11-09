@@ -665,6 +665,10 @@ def test_finish_fixed_dispatch_and_cli(qualification: bool, monkeypatch, tmp_pat
     monkeypatch.setattr(sys, 'argv', ['w8_witness_job', *command[3:]])
     job.main()
     assert called == [(stage, {'qualification': qualification})]
+    spec['contention']['resume_attempts'] = 1
+    with pytest.raises(ValueError, match='fixed dispatch'):
+        job._finish_spec(spec, qualification=qualification)
+    spec['contention']['resume_attempts'] = 0
     spec['hosts'] = ['gpu6']
     with pytest.raises(ValueError, match='fixed dispatch'):
         job._finish_spec(spec, qualification=qualification)
@@ -715,6 +719,8 @@ def test_finish_builder_binds_audit_archives_and_qualification_caps(tmp_path: Pa
     audit, producer0, producer1 = (tmp_path / n for n in ('audit', 'p0', 'p1'))
     for item in (audit, producer0, producer1):
         item.write_bytes(item.name.encode())
+    gate['completed_artifact_sha256']['unit1_context'] = fixed.file_sha(producer1)
+    promotion.write_text(json.dumps(gate))
     base = '/home/itec/emanuele/Datasets/pointstream-data/tests/'
     spec = job.make_finish_spec(deadline=deadline, proof_local=audit, proof_remote=base + 'proof',
         promotion_local=promotion, promotion_remote=base + 'promotion', ledger_local=ledger,
@@ -841,7 +847,7 @@ def test_finish_real_spec_staging_and_dispatch(tmp_path: Path, monkeypatch) -> N
         'source_sha256': 'a' * 64, 'snapshot_sha256': 'b' * 64, 'cpu_proof_sha256': fixed.file_sha(proof),
         'prior_artifact_sha256': fixed.file_sha(audit), 'ledger_sha256': fixed.file_sha(ledger),
         'raw_measurement_audit_sha256': '2' * 64, 'safety_factor': 1.5, 'remaining_components': components,
-        'completed_artifact_sha256': {'unit1_context': '3' * 64}, 'gpu_remaining_seconds': 4000,
+        'completed_artifact_sha256': {'unit1_context': fixed.file_sha(p1)}, 'gpu_remaining_seconds': 4000,
         'cpu_remaining_seconds': 4000, 'issued_epoch': time.time() - 1, 'expires_epoch': time.time() + 100,
         'qualification_charge_phases': ['pilot'], 'qualification_gpu_spent_seconds': 200,
         'qualification_cpu_spent_seconds': 300, 'qualification_next_gpu_ceiling_seconds': 600,
@@ -858,14 +864,14 @@ def test_finish_real_spec_staging_and_dispatch(tmp_path: Path, monkeypatch) -> N
     stage.mkdir(parents=True)
     rows = []
     digests = {}
-    for item in spec['staged_inputs']:
-        path = tmp_path / ('asset-' + item['name'])
-        path.write_bytes(item['name'].encode())
-        rows.append({**item, 'source': item['path'], 'path': str(path)})
-        digests[path] = item['sha256']
+    for staged_item in spec['staged_inputs']:
+        path = tmp_path / ('asset-' + staged_item['name'])
+        path.write_bytes(staged_item['name'].encode())
+        rows.append({**staged_item, 'source': staged_item['path'], 'path': str(path)})
+        digests[path] = staged_item['sha256']
     (stage.parent / 'spec.json').write_text(json.dumps(spec))
     (stage / 'staging.json').write_text(json.dumps({'inputs': rows}))
-    dispatch = {'cpu_affinity': [2], 'environment': {'alias': 'gpu5', 'gpu': {'name': 'RTX 6000 Ada'}}}
+    dispatch: dict[str, Any] = {'cpu_affinity': [2], 'environment': {'alias': 'gpu5', 'gpu': {'name': 'RTX 6000 Ada'}}}
     (stage / 'dispatch.json').write_text(json.dumps(dispatch))
     actual, _ = host.stage_inputs(stage, digest_file=lambda path: digests[path], witness=True)
     assert {'producer_audit', 'producer0', 'producer1', 'sam_weights', 'native_inventory'} <= set(actual)

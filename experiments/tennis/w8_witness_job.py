@@ -286,6 +286,11 @@ def _unit1_promotion(paths: dict[str, Path], spec: dict[str, Any], dispatch: dic
         needed = {'unit1_context'} if profile == 'w8-context-qualification-v1' else {'unit0_full', 'unit1_full'}
         if not needed.issubset(completed) or 'native_sam_compose' in completed:
             raise ValueError('finish producers incomplete or finish already completed')
+        bindings = ({'unit1_context': spec['witness_producer1_sha256']}
+                    if profile == 'w8-context-qualification-v1' else
+                    {'unit0_full': spec['witness_producer0_sha256'], 'unit1_full': spec['witness_producer1_sha256']})
+        if any(completed.get(name) != digest for name, digest in bindings.items()):
+            raise ValueError('promotion does not bind the exact producer archives')
     component = ('native_sam_compose' if profile in ('w8-context-qualification-v1', 'w8-full-finish-v1') else
                  'unit1_context' if profile == 'w8-context-unit1-v1' else
                  'unit1_full' if profile == 'w8-full-unit1-v1' else 'unit0_full')
@@ -954,6 +959,10 @@ def make_finish_spec(*, deadline: str, proof_local: Path, proof_remote: str, pro
     completed = gate.get('completed_artifact_sha256', {})
     needed = {'unit1_context'} if qualification else {'unit0_full', 'unit1_full'}
     component = gate['remaining_components']['native_sam_compose']
+    bindings = {'unit1_context': spec['witness_producer1_sha256']} if qualification else {
+        'unit0_full': spec['witness_producer0_sha256'], 'unit1_full': spec['witness_producer1_sha256']}
+    if any(completed.get(name) != digest for name, digest in bindings.items()):
+        raise ValueError('promotion does not bind the exact producer archives')
     if (not needed.issubset(completed) or 'native_sam_compose' in completed
             or any(component[k] < spec['witness_' + k.replace('_seconds', '_ceiling_seconds')]
                    for k in ('gpu_seconds', 'cpu_seconds'))):
@@ -978,6 +987,11 @@ def finish_readiness(stage: Path, *, loaded: tuple[dict[str, Path], dict[str, An
     for index, unit in enumerate(fixed.UNITS):
         if audit['producers'][unit].get('archive_sha256') != spec[f'witness_producer{index}_sha256']:
             raise ValueError('producer archive differs from pinned audit')
+    completed = json.loads(paths['promotion'].read_text()).get('completed_artifact_sha256', {})
+    bindings = {'unit1_context': spec['witness_producer1_sha256']} if qualification else {
+        'unit0_full': spec['witness_producer0_sha256'], 'unit1_full': spec['witness_producer1_sha256']}
+    if any(completed.get(name) != digest for name, digest in bindings.items()):
+        raise ValueError('promotion does not bind the exact producer archives')
     return {'scope': expected_scope, 'source_sha256': dispatch['code']['source_sha256'],
             'producer_audit_sha256': fixed.file_sha(paths['producer_audit']),
             'producer_archives': [spec['witness_producer0_sha256'], spec['witness_producer1_sha256']]}
@@ -1227,7 +1241,9 @@ def validate_finish(stage: Path, target: Path) -> None:
             producer_config = json.load(source)
             if {key: value['sha256'] for key, value in producer_config['files'].items()} != expected[unit]['files']:
                 raise ValueError('producer input identities differ')
-        if (audit['producers'][unit].get('archive_sha256') != spec[f'witness_producer{index}_sha256']
+        if (not re.fullmatch(r'\d{8}T\d{6}Z-[0-9a-f]{8}', str(audit['producers'][unit].get('job_id')))
+                or not _sha(audit['producers'][unit].get('terminal_audit_sha256'))
+                or audit['producers'][unit].get('archive_sha256') != spec[f'witness_producer{index}_sha256']
                 or expected[unit]['tensor_fingerprints'] != fingerprints
                 or expected[unit]['files']['checkpoint'] != decoded['checkpoint_sha256']
                 or expected[unit]['files']['unit'] != generation.ORACLE_UNIT_SHA[unit]
