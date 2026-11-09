@@ -13,14 +13,20 @@ import os
 import shutil
 import sys
 from pathlib import Path
+from typing import Any
 
 from experiments.tennis import k5d_checkpoint as cp, k5d_checkpoint_fleet as cf
 from experiments.tennis import k5d_coalesced as co, k5d_cost_pilot as cost
 from experiments.tennis import k5d_encoder as enc, k5d_fleet as fleet, k5d_source_oracle as oracle
 
+SHARED_PROFILE = 'k5d-parity16-shared-numerical-v1'
+SHARED_LIMIT_MIB = 16384
+PER_PROCESS_MIB = 8192
+SHARED_BASIS = 'Exact numerical parity only; shared execution is not timing, scale, or cost evidence.'
+
 
 def spec(base: dict, *, assets: dict[str, dict[str, str]], deadline: str, unshare_sha256: str,
-         identity: dict[str, str]) -> dict:
+         identity: dict[str, str], shared_numerical: bool = False) -> dict:
     """Build a bounded candidate only after actual assets are available.
 
     This does not reserve resources or approve a fleet submission.
@@ -54,9 +60,99 @@ def spec(base: dict, *, assets: dict[str, dict[str, str]], deadline: str, unshar
                   validator_seconds=30, smoke={'seconds': 600, 'representative_basis':
                   'Actual 16-frame preparation and all six native replay, metric and judge paths with exact saved parity.'},
                   full={'seconds': 5}, validator=['{python}', '-m', 'experiments.tennis.k5d_real_parity', 'validate'])
+    if shared_numerical:
+        result['arguments'].append('--shared-numerical-only')
+        result.update(k5d_shared_parity_profile=SHARED_PROFILE, gpu_memory_mib=SHARED_LIMIT_MIB,
+                      gpu_sharing={'mode': 'shared', 'basis': SHARED_BASIS, 'margin_mib': 8192},
+                      contention={'policy': 'continue', 'basis': SHARED_BASIS, 'resume_attempts': 0})
     from experiments.jobs.inbox import validate_spec
     validate_spec(result)
     return result
+
+
+def check_resource_profile(specification: dict, dispatch: dict, *, requested: bool, environ: dict) -> None:
+    """Bind the opt-in to the authenticated fleet declaration and claim."""
+    if not requested:
+        if specification.get('k5d_shared_parity_profile') is not None or environ.get('PS_GPU_SHARING') == 'shared':
+            raise ValueError('shared parity requires explicit opt-in')
+        return
+    if (specification.get('k5d_shared_parity_profile') != SHARED_PROFILE
+            or specification.get('gpu_memory_mib') != SHARED_LIMIT_MIB
+            or specification.get('gpu_models') != ['RTX A6000']
+            or specification.get('gpu_sharing') != {'mode': 'shared', 'basis': SHARED_BASIS, 'margin_mib': 8192}
+            or specification.get('contention') != {'policy': 'continue', 'basis': SHARED_BASIS, 'resume_attempts': 0}
+            or dispatch.get('gpu_sharing') != specification['gpu_sharing']
+            or dispatch.get('contention_policy') != specification['contention']
+            or environ.get('PS_GPU_SHARING') != 'shared'
+            or environ.get('PS_GPU_MEMORY_LIMIT_MIB') != str(SHARED_LIMIT_MIB)
+            or not environ.get('CUDA_VISIBLE_DEVICES', '').startswith('GPU-')
+            or environ.get('PS_CLAIMED_GPU_UUID') != environ.get('CUDA_VISIBLE_DEVICES')
+            or dispatch.get('environment', {}).get('gpu', {}).get('uuid') != environ.get('CUDA_VISIBLE_DEVICES')):
+        raise ValueError('shared numerical parity claim or policy differs')
+
+
+def apply_parent_limit(torch: Any) -> dict:
+    """Cap this allocator before loading models; DCVC children use a separate cap."""
+    cuda = torch.cuda
+    if cuda.memory_allocated(0) != 0:
+        raise ValueError('shared parent allocated CUDA before its limit')
+    total = cuda.get_device_properties(0).total_memory
+    if total < SHARED_LIMIT_MIB * 2**20:
+        raise ValueError('shared A6000 capacity is insufficient')
+    cuda.set_per_process_memory_fraction(PER_PROCESS_MIB * 2**20 / total, 0)
+    from experiments.tennis.k5d_scoped_namespace import host_group_identity
+    host = host_group_identity(Path(os.environ['PS_STAGE_DIR']).parent / 'run' / 'status.json')
+    return {'role': 'parent', 'pid': os.getpid(), 'pgid': os.getpgrp(), 'budget_mib': PER_PROCESS_MIB,
+            'total_bytes': total, 'fraction': PER_PROCESS_MIB * 2**20 / total, 'allocated_before': 0,
+            'gpu_uuid': os.environ['CUDA_VISIBLE_DEVICES'], **host}
+
+
+def configure_child_environment(saved: dict, current: dict) -> None:
+    """Propagate the already-authenticated opt-in into K5's frozen child env."""
+    if (current.get('PS_K5D_SHARED_NUMERICAL') != SHARED_PROFILE
+            or current.get('PS_GPU_SHARING') != 'shared'
+            or current.get('PS_GPU_MEMORY_LIMIT_MIB') != str(SHARED_LIMIT_MIB)
+            or not current.get('CUDA_VISIBLE_DEVICES', '').startswith('GPU-')
+            or current.get('PS_CLAIMED_GPU_UUID') != current.get('CUDA_VISIBLE_DEVICES')):
+        raise ValueError('shared child environment differs')
+    for key in ('PS_K5D_SHARED_NUMERICAL', 'PS_GPU_SHARING', 'PS_GPU_MEMORY_LIMIT_MIB', 'PS_K5D_RESOURCE_RECEIPTS',
+                'CUDA_VISIBLE_DEVICES', 'PS_CLAIMED_GPU_UUID'):
+        saved[key] = current[key]
+
+
+def validate_resource_receipts(directory: Path) -> list[dict]:
+    paths = sorted(directory.glob('*.json'))
+    if not (directory / 'parent.json').is_file() or len(paths) < 2:
+        raise ValueError('shared parent and DCVC allocator receipts required')
+    records = []
+    for path in paths:
+        value = json.loads(path.read_text())
+        role = 'parent' if path.name == 'parent.json' else 'dcvc'
+        total = value.get('total_bytes')
+        if (value.get('role') != role or not isinstance(total, int) or total < SHARED_LIMIT_MIB * 2**20
+                or value.get('budget_mib') != PER_PROCESS_MIB or value.get('allocated_before') != 0
+                or value.get('fraction') != PER_PROCESS_MIB * 2**20 / total
+                or not isinstance(value.get('pid'), int) or value['pid'] <= 0
+                or not isinstance(value.get('pgid'), int) or value['pgid'] < 0
+                or not isinstance(value.get('gpu_uuid'), str) or not value['gpu_uuid'].startswith('GPU-')
+                or any(type(value.get(key)) is not int or value[key] <= 0 for key in
+                       ('host_pid', 'host_pgid', 'start_ticks', 'campaign_pgid'))
+                or value['host_pgid'] != value['campaign_pgid']
+                or (role == 'dcvc' and path.name != f"child-{value['pid']}.json")):
+            raise ValueError('invalid shared allocator receipt')
+        records.append(value)
+    if len({(item['host_pid'], item['start_ticks']) for item in records}) != len(records):
+        raise ValueError('duplicate allocator process identity')
+    expected = {(action, f'prepared-work/dcvc-{point}/plan.json')
+                for kind, point in enc.POINTS if kind == 'dcvc' for action in ('encode', 'decode')}
+    expected.update(('decode', f'coalesced-dcvc-{point}/receiver-plan.json')
+                    for kind, point in enc.POINTS if kind == 'dcvc')
+    expected.update(('decode', f'prepared-work/receiver-dcvc-{point}/receiver-plan.json')
+                    for kind, point in enc.POINTS if kind == 'dcvc')
+    actual = [(item.get('action'), item.get('plan')) for item in records if item['role'] == 'dcvc']
+    if len(actual) != len(expected) or set(actual) != expected:
+        raise ValueError('shared allocator receipts do not cover every DCVC action')
+    return records
 
 
 def run(args: argparse.Namespace) -> None:
@@ -78,10 +174,23 @@ def run(args: argparse.Namespace) -> None:
     if (cpu.get('namespace_wrapper_sha256') != oracle.sha(Path(namespace.__file__))
             or cpu.get('unshare_sha256') != args.unshare_sha256):
         raise ValueError('CPU proof does not bind this exact namespace wrapper')
+    dispatch = json.loads((stage / 'dispatch.json').read_text())
+    specification = json.loads((stage.parent / 'spec.json').read_text())
+    check_resource_profile(specification, dispatch, requested=args.shared_numerical_only, environ=os.environ)
     import torch
     if (torch.cuda.device_count() != 1 or torch.cuda.get_device_name(0) != 'NVIDIA RTX A6000'
             or tuple(torch.cuda.get_device_capability(0)) != (8, 6)):
-        raise ValueError('exclusive A6000 CUDA device required')
+        raise ValueError('A6000 CUDA device required')
+    if args.shared_numerical_only:
+        receipt_dir = scratch / 'shared-resource-receipts'
+        receipt_dir.mkdir()
+        cp.write_new(receipt_dir / 'parent.json', apply_parent_limit(torch))
+        os.environ['PS_K5D_SHARED_NUMERICAL'] = SHARED_PROFILE
+        os.environ['PS_K5D_RESOURCE_RECEIPTS'] = str(receipt_dir)
+        # K5 snapshots its child environment at import time; update only this
+        # reviewed opt-in so native DCVC encode/decode workers receive the cap.
+        from experiments.tennis import k5
+        configure_child_environment(k5.STAGE_ENV, os.environ)
     if oracle.sha(cf.AUDIT_PATH) != cf.AUDIT_SHA or oracle.sha(fleet.SOURCE) != fleet.SOURCE_SHA or oracle.sha(fleet.EXPOSURE) != fleet.EXPOSURE_SHA:
         raise ValueError('historical audit, source manifest or exposure differs')
     data = vars(args).copy()
@@ -91,7 +200,6 @@ def run(args: argparse.Namespace) -> None:
                 exposure=str(fleet.EXPOSURE), exposure_sha256=fleet.EXPOSURE_SHA,
                 code_revision=fleet.snapshot_head(stage), output=scratch / 'prepared',
                 feasibility_no_metrics=False, cost_pilot=True)
-    dispatch = json.loads((stage / 'dispatch.json').read_text())
     data['snapshot_identity'] = {key: dispatch['code'].get(key) for key in
                                  ('git_head', 'source_sha256', 'snapshot_sha256', 'tracked_worktree_patch_sha256', 'included_untracked_sha256')}
     entries = {item['name']: item for item in json.loads((stage / 'staging.json').read_text())['inputs']}
@@ -121,9 +229,12 @@ def run(args: argparse.Namespace) -> None:
     publish.mkdir()
     shutil.move(str(prepared), publish / 'prepared')
     shutil.move(str(scored), publish / 'scored')
+    if args.shared_numerical_only:
+        shutil.move(str(receipt_dir), publish / 'shared-resource-receipts')
     cp.write_new(publish / 'parity.json', {'comparison': comparison, 'checkpoint_sha256': checkpoint_sha,
                  'execution_identity': identity, 'native_cpu_receipt_sha256': args.native_cpu_receipt_sha256,
-                 'scope': 'exact 16-frame calibration parity; not an independent sample'})
+                 'scope': 'exact 16-frame calibration parity; not an independent sample',
+                 **({'shared_numerical_only': True, 'timing_evidence': False} if args.shared_numerical_only else {})})
 
 
 def verify_scored(root: Path, identity: dict[str, str]) -> None:
@@ -173,6 +284,8 @@ def validate() -> None:
               cost.unpack(stage / 'published.tar', published_sha) as output):
             identity = cp.execution_identity()
             saved = json.loads((output / 'parity.json').read_text())
+            resource_records = (validate_resource_receipts(output / 'shared-resource-receipts')
+                                if saved.get('shared_numerical_only') is True else [])
             verify_scored(output, identity)
             cf.prepare_parity(output / 'prepared', prior, identity)
             comparison = cp.compare_equivalence(prior, output / 'scored' / 'assembled', oracle.sha(prior / 'pilot.json'))
@@ -188,11 +301,26 @@ def validate() -> None:
                 or lines[0]['namespace_init']['namespace_pid'] != 1):
             raise ValueError('actual namespace execution proof missing')
         values = [lines[0]['children_cpu_seconds'], lines[0]['init_cpu_seconds']]
+        if resource_records:
+            worker = lines[0]['worker_host_identity']
+            group = json.loads((stage.parent / 'run' / 'status.json').read_text())['process_group_id']
+            dispatch = json.loads((stage / 'dispatch.json').read_text())
+            gpu_uuid = dispatch['environment']['gpu']['uuid']
+            parent = next(item for item in resource_records if item['role'] == 'parent')
+            if (any(parent[key] != worker[key] for key in ('host_pid', 'start_ticks', 'host_pgid', 'campaign_pgid'))
+                    or any(item['host_pgid'] != group or item['gpu_uuid'] != gpu_uuid for item in resource_records)):
+                raise ValueError('shared allocator host ownership differs')
         if any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) or v < 0 for v in values) or sum(values) <= 0:
             raise ValueError('actual namespace CPU accounting invalid')
+        specification = json.loads((stage.parent / 'spec.json').read_text())
+        is_shared = specification.get('k5d_shared_parity_profile') == SHARED_PROFILE
+        if is_shared and (saved.get('shared_numerical_only') is not True or saved.get('timing_evidence') is not False):
+            raise ValueError('shared parity must disclaim timing evidence')
         target.write_text(json.dumps({'passed': True, 'checks': {'actual_preparation_reference': True,
                           'all_six_native_and_pixel_parity': True, 'all_metric_and_judge_arrays': True,
-                          'new_strict_checkpoint_identity': True}}) + '\n')
+                          'new_strict_checkpoint_identity': True},
+                          **({'shared_numerical_only': True, 'timing_evidence': False,
+                              'scale_evidence': False, 'cost_evidence': False} if is_shared else {})}) + '\n')
     except Exception as exc:
         target.write_text(json.dumps({'passed': False, 'checks': {'actual_parity': False}, 'error': str(exc)}) + '\n')
         raise
@@ -207,6 +335,7 @@ def main() -> None:
                  'unshare-sha256'):
         parser.add_argument('--' + name)
     parser.add_argument('--frames', type=int)
+    parser.add_argument('--shared-numerical-only', action='store_true')
     args = parser.parse_args()
     if args.action == 'validate':
         validate()
