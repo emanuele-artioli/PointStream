@@ -193,16 +193,19 @@ def load_config(path: Path, expected_sha: str) -> dict[str, Any]:
     if (not isinstance(protected_receipt, dict)
             or set(protected_receipt) not in ({'path', 'sha256'}, {'path', 'sha256', 'historical_sha256'})):
         raise ValueError('protected receipt identity required')
-    protected_raw = Path(protected_receipt['path']).read_bytes()
-    if hashlib.sha256(protected_raw).hexdigest() != protected_receipt['sha256']:
-        raise ValueError('protected receipt identity mismatch')
-    protected_data = json.loads(protected_raw)
     metadata_only = 'historical_sha256' in protected_receipt
     if metadata_only:
         from experiments.tennis import w8_protected_metadata
+        protected_data = w8_protected_metadata.read_historical(
+            Path(protected_receipt['path']), protected_receipt['sha256'])
         w8_protected_metadata.validate(protected_data, check_current=True)
         if protected_data['historical_receipt_sha256'] != protected_receipt['historical_sha256']:
             raise ValueError('historical protected receipt reference differs')
+    else:
+        protected_raw = Path(protected_receipt['path']).read_bytes()
+        if hashlib.sha256(protected_raw).hexdigest() != protected_receipt['sha256']:
+            raise ValueError('protected receipt identity mismatch')
+        protected_data = json.loads(protected_raw)
     verified = protected_data['protected_inputs']
     identities = {}
     for group in ('source', 'prepared', 'fit', 'golden', 'masks'):
