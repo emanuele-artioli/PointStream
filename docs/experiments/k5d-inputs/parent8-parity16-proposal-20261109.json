@@ -1,0 +1,81 @@
+{
+  "budget": {
+    "campaign_seconds": 800,
+    "external_cpu_after_readiness_seconds": 370,
+    "forecast": {
+      "campaign_headroom": 114.414914,
+      "caveat": "Historical exclusive timing only supports a bounded feasibility pilot; shared slowdown, parent8 fit, fragmentation and custom allocation remain unmeasured. Fixed limits may stop the run.",
+      "historical_numerics_with_one_1_5_margin": 417.370745,
+      "noop": 5,
+      "publication_source_cleanup": 50,
+      "total": 685.585086,
+      "two_warm_staging_with_one_1_5_margin": 183.214341,
+      "validator": 30
+    },
+    "full_noop_seconds": 5,
+    "inclusive_cpu_seconds": 1200,
+    "inclusive_gpu_seconds": 1000,
+    "namespace_seconds": 580,
+    "postcampaign_gpu_seconds": 200,
+    "readiness_cpu_seconds": 30,
+    "smoke_seconds": 600,
+    "validator_seconds": 30
+  },
+  "deadline": "2026-11-09T23:09:09.545557Z",
+  "deadline_status": "provisional; new deadline requires root review before any released submission",
+  "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "forward_resources": {
+    "ball_parent_after_full_pilot_ceiling_cpu_seconds": 6130,
+    "ball_parent_after_full_pilot_ceiling_gpu_seconds": 7370,
+    "ball_parent_current_cpu_seconds": 7330,
+    "ball_parent_current_gpu_seconds": 8370,
+    "ball_workstream_current_cpu_seconds": 53050,
+    "ball_workstream_current_gpu_seconds": 52250,
+    "caveat": "Numbers are remaining ceilings, not a complete full-study admission. Exclusive cost characterization and 292/586 scale confirmations and a full remaining forecast with failure reserve are still required. Prior full-30 example of 59035 GPU seconds may not fit Ball; no historical 188-frame reuse or denominator reduction is assumed. Programme total includes other workstream commitments and cannot be treated as free Ball allocation.",
+    "programme_current_cpu_seconds": 61042,
+    "programme_current_gpu_seconds": 67488
+  },
+  "logical_inbox_digest": "94adbffc7c14971d2f0d3aa5fbba4ab06dd0051ca785d4fa1eb66c2926d3d978",
+  "native_cpu_root_admission_sha256": "9eb8adc75eb96087aeffa334b2291fdd892745355c9fdb4f02b4cb7da1348b18",
+  "next_gate": "Root review, separate readiness release and receipt upload, fresh headroom, then separate fixed-spec GPU release; no automatic submission or retry.",
+  "normalized_file_sha256": "bc1363270edaf6d0c6599bd137f836e03eb5c2d0d46d48e160d6d67e75cf3773",
+  "profile": {
+    "child_torch_mib": 2048,
+    "claim_mib": 10240,
+    "contention": "continue",
+    "cpu_affinity_index": 0,
+    "host": [
+      "gpu2"
+    ],
+    "margin_mib": 8192,
+    "name": "k5d-parity16-shared-parent8-child2-v1",
+    "parent_torch_mib": 8192,
+    "required_free_mib": 18432,
+    "resume_attempts": 0,
+    "torch_limit_caveat": "CUDA context, driver and custom allocation are outside Torch caps; fleet guard and margin remain active."
+  },
+  "raw_spec_sha256": "9f35dd47b208661b17e7f219fc1c2524c8f7f92299dbf284b54d18e0fc966aa0",
+  "readiness_proposal": {
+    "caveat": "Large-cache presence and prior hashes are not fresh content verification; canonical staging must verify all scientific bytes. No cold gpu3 fallback or foreign process interference.",
+    "cpu_max_seconds": 30,
+    "gpu_seconds": 0,
+    "included_in_inclusive_pilot_cpu": true,
+    "requires_separate_root_release": true,
+    "steps": [
+      "fresh all-known-jobs and all-host doctor/worker checks",
+      "gpu2 CPU0/claims/GPU headroom and local space, runtime/native tools/unshare and warm input cache metadata",
+      "fresh small source cache SHA, and one no-overwrite upload of actual 9eb8 admission receipt to proposed unique path followed by SHA verification",
+      "refresh deadline and calculate raw/canonical/normalized spec hashes after root review"
+    ]
+  },
+  "receipt_proposed_remote_path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-20261104-inputs/parent8-native-edaf-parity-admission-9eb8adc7-20261109.json",
+  "receipt_remote_status": "not uploaded; unique path proposed",
+  "revision": "965d801ada4b8ccb6e54685f4560de8287931d00",
+  "schema": 1,
+  "scope": "All 16 frames and six original native/wire/receiver-pixel/full-metric/judge arrays exactly match the registered control; all 12 action/plan/PIDbirth/group/device allocator receipts required. No timing, scale, cost, independent cohort, broad quality or full-study claim.",
+  "snapshot_sha256": "9f486d70424b9d293d8774c92b36350d284edcb2513c415390b88a2b4c344aed",
+  "source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/k5d-parent8-child2-965d-20261109/source.tar",
+  "source_sha256": "58787f8664f961c2287228762c1ddd3295adab4042bd7f41d9bfee87d2666104",
+  "spec_path": "docs/experiments/k5d-inputs/parent8-parity16-draft-spec-20261109.json",
+  "status": "local proposal only; no readiness, upload or GPU release"
+}
