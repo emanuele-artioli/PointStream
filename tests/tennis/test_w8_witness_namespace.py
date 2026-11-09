@@ -210,10 +210,24 @@ def test_readiness_receipt_collision_preserves_existing_bytes(tmp_path):
     with pytest.raises(FileExistsError):
         proof.write(target, {'pid': 42})
     assert target.read_text() == 'existing'
-    assert not (tmp_path / 'worker.json.pending').exists()
+    assert json.loads((tmp_path / 'worker.json.pending').read_text()) == {'pid': 42}
     pending = tmp_path / 'other.json.pending'
     pending.write_text('partial')
     with pytest.raises(FileExistsError):
         proof.write(tmp_path / 'other.json', {'pid': 42})
     assert pending.read_text() == 'partial'
     assert not (tmp_path / 'other.json').exists()
+
+
+def test_readiness_receipt_fsync_failure_keeps_partial(tmp_path, monkeypatch):
+    from experiments.tennis import w8_witness_namespace_proof as proof
+
+    def fail_fsync(_fd):
+        raise OSError('injected fsync failure')
+
+    monkeypatch.setattr(proof.os, 'fsync', fail_fsync)
+    target = tmp_path / 'detached.json'
+    with pytest.raises(OSError, match='injected fsync failure'):
+        proof.write(target, {'pid': 42})
+    assert not target.exists()
+    assert json.loads((tmp_path / 'detached.json.pending').read_text()) == {'pid': 42}
