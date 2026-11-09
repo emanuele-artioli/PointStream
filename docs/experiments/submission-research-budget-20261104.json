@@ -1382,6 +1382,16 @@
       "cpu_seconds": 30,
       "basis": "Entire inclusive30readiness ceiling; actualmetadataCPU.250partial, aggregatefleet/SSH/adminunmeasured. Inside1200pilot, not extra. Exact source/receipt freshlySHAverified; bulkcachesmetadataonly.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "w8-7b519-cpu-proof-c2d5-closure-20261109",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 130,
+      "witness_qualification": false,
+      "basis": "110rounded created-to-canonicalterminal106.632s upper includingqueue on singlecore plus20bounded audit/admin;30sourceprep already charged. Partial counters remain partial; allocation is not measured aggregate.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -1965,8 +1975,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 4032,
-      "status": "Remaining_unspent4550GPU4032CPU;7b519 sourceprep30charged; ONE832futureCPUcombinedproofreleased; noGPU."
+      "cpu_seconds": 3902,
+      "status": "Remaining_unspent4550GPU3902CPU;7b519CPUinfrastructureaccepted/closed130additional; runtime-role contract blocksGPU; no newproofrelease."
     }
   ],
   "jobs": [
@@ -3182,7 +3192,7 @@
       "job_id": "20261109T223214Z-c2d5c561",
       "phase": "w8-full-witness-staged-20261106",
       "subphase": "7b519-real-combined-CPUproof",
-      "state": "last observed running; sole canonical wait owned by plan_research_audit",
+      "state": "complete; root accepted MAIN-controller CPU infrastructure only; JCV GPU envelope mismatch blocks launch",
       "revision": "7b519d3e448135842fbd33e7007fffd1ea167a0f",
       "source_sha256": "e0278d99b99c97179d808907476dd9b21bd69d47b800241542c6c1a6e0e27835",
       "snapshot_sha256": "d747b15f47dbddb72a94f4cf225338bd5cac0810a002d642e45227a80d69e8ba",
@@ -3202,7 +3212,11 @@
       "local_batch": "/private/tmp/pointstream-w8-7b519-proof-20261109-a1",
       "scope": "CPU packet with executing source, lifecycle with honest TERM escalation, denial/native proof only; no GPU/generation/quality",
       "supervisor_pid": 682299,
-      "campaign_pgid": 682318
+      "campaign_pgid": 682318,
+      "terminal_additional_cpu_charge": 130,
+      "actual_inclusive_conservative_cpu_charge": 160,
+      "wait_state": "ended; complete event reconciliation race inspected, no replay",
+      "usable_GPU_admission_gate": false
     },
     {
       "job_id": "20261109T223822Z-70eb4770",
