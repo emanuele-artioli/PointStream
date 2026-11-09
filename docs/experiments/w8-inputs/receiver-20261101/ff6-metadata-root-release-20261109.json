@@ -39,5 +39,6 @@
     "future transfer/hash may read only reviewed public assets after root stat audit; requires separate release",
     "trusted controller/cooperative immutable public-file scope; not a race-proof adversarial filesystem guarantee",
     "40is a cap, not prepaid measured cost or proof; CPUproof and GPU gates remain closed"
-  ]
+  ],
+  "local_cpu_accounting_clarification": "Remote observers enforce oneCPUaffinity and15CPU each. Local Mac SSH/control does not require unavailable scheduler affinity; measure total process/threadCPU with waitedclients, eachSSHcap4CPU pluswrapper/control2CPU, <=10local/control and<=40total. No claim local wall==CPU. Exact3ecobserverbytesrestored andSHAverified; no mutatedobserver authorized."
 }
