@@ -96,6 +96,14 @@ def test_parity_builder_passes_real_fleet_validator_and_outer_cli(tmp_path, monk
     with pytest.raises(ValueError, match='mutually exclusive'):
         parity.spec(base, assets=assets, deadline=deadline, unshare_sha256='a' * 64,
                     identity={}, shared_numerical=True, shared_low_memory=True)
+    parent8 = parity.spec(base, assets=assets, deadline=deadline, unshare_sha256='a' * 64,
+                          identity={}, shared_parent8_child2=True)
+    assert inbox.validate_spec(parent8)['gpu_memory_mib'] == 10240
+    assert parent8['gpu_sharing']['margin_mib'] == 8192
+    assert '--shared-parent8-child2' in parent8['arguments'] and '--shared-low-memory' not in parent8['arguments']
+    with pytest.raises(ValueError, match='mutually exclusive'):
+        parity.spec(base, assets=assets, deadline=deadline, unshare_sha256='a' * 64,
+                    identity={}, shared_low_memory=True, shared_parent8_child2=True)
     legacy = {**result, 'entrypoint': [*result['entrypoint'], 'outer'], 'arguments': result['arguments'][1:]}
     with pytest.raises(inbox.fleet.FleetError, match='entrypoint must be'):
         inbox.validate_spec(legacy)
@@ -114,3 +122,7 @@ def test_parity_builder_passes_real_fleet_validator_and_outer_cli(tmp_path, monk
     monkeypatch.setattr(sys, 'argv', ['module', *low_command[3:]])
     namespace.main()
     assert captured[1][2][0] == 'parity16' and '--shared-low-memory' in captured[1][2]
+    parent8_command = inbox.phase_command(parent8, 'smoke', staged, '/runtime/python')
+    monkeypatch.setattr(sys, 'argv', ['module', *parent8_command[3:]])
+    namespace.main()
+    assert captured[2][2][0] == 'parity16' and '--shared-parent8-child2' in captured[2][2]

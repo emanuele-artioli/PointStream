@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "revision": "02bf3b9d09a01643560c93b79bc8379255d08fb3",
+  "commands": [
+    "ruff check",
+    "mypy --config-file pyproject.toml",
+    "python -m pytest"
+  ],
+  "environment": "/private/tmp/pointstream-ci-pinned-20261105",
+  "result": {
+    "ruff": "passed",
+    "mypy": "passed567sourcefiles",
+    "pytest_passed": 2049,
+    "pytest_skipped": 40
+  },
+  "logs": {
+    "ruff.log": {
+      "path": "/private/tmp/pointstream-root-final-checks-20261109/ruff.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "mypy.log": {
+      "path": "/private/tmp/pointstream-root-final-checks-20261109/mypy.log",
+      "sha256": "ecd224107efa40b1ea4d3ac4e0f7f61646bd7537fd3ba4a482a908693510477a"
+    },
+    "pytest.log": {
+      "path": "/private/tmp/pointstream-root-final-checks-20261109/pytest.log",
+      "sha256": "a8f440aa32ef3cf248da1980073783941a2906a0e163257c7e0d84171625b9ea"
+    }
+  },
+  "scope": "Configured checks of combined root branch, including packet origin/TERM, parent8 parity and standalone safe cache publisher. No implementation diff after this revision at receipt creation. Software checks do not qualify GPU parity/native production/cache warming. One new Linux renameat2 test skipped on macOS; real Linux synthetic preflight separately bounded."
+}

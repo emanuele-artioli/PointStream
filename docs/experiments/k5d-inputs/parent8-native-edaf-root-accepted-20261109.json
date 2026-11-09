@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "job_id": "20261109T221304Z-edafe094",
+  "decision": "Root accepts complete real native CPU isolation/accounting gate only",
+  "fleet_status": "complete",
+  "fleet_gate_passed": true,
+  "source_sha256": "58787f8664f961c2287228762c1ddd3295adab4042bd7f41d9bfee87d2666104",
+  "snapshot_sha256": "9f486d70424b9d293d8774c92b36350d284edcb2513c415390b88a2b4c344aed",
+  "spec_sha256": "278f6ebf5218b37b1f6b66ebff8c55bd4cad5bde4bf4f53e449aad8ec06162a4",
+  "audit_sha256": "fe5a9c3177790f0a3cd3b3eae0b6dcc06ad329eea6782e91203d31a5020f30a8",
+  "raw_file_hashes_rechecked": 11,
+  "cases": [
+    "normal0",
+    "timeout1",
+    "TERM escalated to KILL -9",
+    "KILL -9"
+  ],
+  "observed_pid_births_absent": 19,
+  "claim_and_group_absent": true,
+  "inclusive_CPU_charge": 270,
+  "additional_CPU_charge": 250,
+  "GPU_charge": 0,
+  "CPU_basis": "Entire approved inclusive ceiling:20 preparation already charged plus250 campaign/publication/audit/contingency. Supervisor birth to canonical update120.677wall on singlecore; aggregate administrative CPU unmeasured. Conservative allocation, not measured270CPU runtime.",
+  "scope": "Real native two-frame encoder/decoder and lifecycle/CPU accounting only. No GPU memory, parity, quality, performance or scale qualification.",
+  "wait_state": "ended",
+  "events_acknowledged": true
+}

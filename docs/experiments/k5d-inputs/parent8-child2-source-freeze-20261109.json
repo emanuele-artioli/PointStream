@@ -1,0 +1,61 @@
+{
+  "branch": "codex/k5d-parent8-child2-freeze-20261109",
+  "checks": {
+    "mypy": "501 files pass",
+    "pytest": "1776 passed, 37 skipped",
+    "ruff": "pass"
+  },
+  "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "files": {
+    "archive": {
+      "path": "/private/tmp/k5d-parent8-child2-freeze-review-20261109/consumer-source.tar",
+      "sha256": "9f486d70424b9d293d8774c92b36350d284edcb2513c415390b88a2b4c344aed"
+    },
+    "blob_manifest": {
+      "path": "/private/tmp/k5d-parent8-child2-freeze-review-20261109/git-blobs.txt",
+      "sha256": "3d14c3d732e5d2b8606e2fb11d031da8335c647e3f7df0e6426d5b15893d9503"
+    },
+    "bridge": {
+      "path": "/private/tmp/k5d-parent8-child2-freeze-review-20261109/bridge.json",
+      "sha256": "69dd80513f692b73cc74fc551d80734a91abb539ab64173033a823843f542857"
+    },
+    "checks": {
+      "path": "/private/tmp/k5d-parent8-child2-freeze-review-20261109/checks.json",
+      "sha256": "8f5ded46f967c19ea70fc5e7b62a528abbbd577ed0b14ed4ee78c2d881b7daf3"
+    },
+    "cpu_proof_proposal": {
+      "path": "/private/tmp/k5d-parent8-child2-freeze-review-20261109/cpu-proofs-proposal.json",
+      "sha256": "6b849f6a44a632937f1514dd1396c9c55cbd55f651eadd0c2f1f262d93eb8f68"
+    },
+    "da98_diff": {
+      "path": "/private/tmp/k5d-parent8-child2-freeze-review-20261109/da98-diff.json",
+      "sha256": "ebff13e286d0b76fe7b08e838f281482b836cd25fdb7be2539845b66b78db007"
+    }
+  },
+  "h2_bridge_status": "actual retained H2 archive -> source bridge passed; independent root review required",
+  "limitation": "Fresh source-specific Linux failure-leaf and native proof remain unexecuted; actual GPU memory feasibility remains unknown. No GPU or scale authority.",
+  "patch_sha256": "ebe029991a1d7dbf33eb9dff1763b0cac11c6340276d0a2f5637c1ce73d7361e",
+  "profile": {
+    "child_allocator_mib": 2048,
+    "claim_mib": 10240,
+    "margin_mib": 8192,
+    "name": "k5d-parity16-shared-parent8-child2-v1",
+    "parent_allocator_mib": 8192,
+    "scope": "six exact 16-frame native/wire/pixel/metric/judge arrays; no timing/scale/cost promotion"
+  },
+  "proposed_cpu": {
+    "both_require_separate_root_release": true,
+    "combined_seconds": 420,
+    "failure_leaf_inclusive_seconds": 120,
+    "fresh_native_proof_inclusive_seconds": 300,
+    "gpu_seconds": 0
+  },
+  "revision": "965d801ada4b8ccb6e54685f4560de8287931d00",
+  "schema": 1,
+  "scope": "Prior v1 and failed low-memory profile preserved; ESRCH-only reaper correction catches no descendant, preserving failed status. EPERM and other errors propagate. Numerical gates unchanged.",
+  "snapshot_sha256": "9f486d70424b9d293d8774c92b36350d284edcb2513c415390b88a2b4c344aed",
+  "source_file_sha256": "cb2652db6fdd91fe837e94f1c4ec57a0e80a409e044326e79c4c88a9e63d695f",
+  "source_sha256": "58787f8664f961c2287228762c1ddd3295adab4042bd7f41d9bfee87d2666104",
+  "status": "local frozen source candidate only; no compute or upload release",
+  "worktree": "/private/tmp/pointstream-k5d-parent8-child2-freeze-20261109"
+}

@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "job_id": "20261109T212248Z-97844483",
+  "decision": "accept narrow instrumented packet CPU component and observed closure; combined proof failed",
+  "combined_CPU_proof_passed": false,
+  "GPU_or_quality_qualification": false,
+  "raw_audit_sha256": "60e443c869fdad68cd265726fff071440a2848092c4754b755be4157361b4da8",
+  "raw_files_independently_rehashed": 8,
+  "actual_packet_CPU_receipt": {
+    "cuda_initialized_after_decode": false,
+    "cuda_visible_devices": "",
+    "pre_serialization": {
+      "restored_tensors": 480,
+      "state_tensors": 480,
+      "unit_arrays": 14
+    },
+    "scope": "CPU packet decoder only",
+    "torch_version": "2.10.0+cu128"
+  },
+  "actual_packet_namespace_pid": 2,
+  "packet_namespace_target": "experiments.tennis.w8_strict_packet_worker",
+  "known_unit_checkpoint_hashes_match": true,
+  "EACCES_denials": 10,
+  "term_failure": "Unshare launcher did not exit after TERM within12seconds; harness killed it then raised. No final TERM receipt and no KILL case/later roles. Normal and timeout evidence retained.",
+  "executing_wrapper_origin_scope": "Fixed namespace target and authenticated staged full source manifest; actual __main__ path/SHA not directly recorded in this revision. No stronger direct executing-origin claim.",
+  "recorded_PIDs_absent": 11,
+  "campaign_and_detached_groups_empty": true,
+  "own_claim_absent": true,
+  "events_acknowledged": [
+    "4142c56bc8fa5278b6e22df66e1205e8",
+    "91502f4a0a54506fb4f384c787b07e1e"
+  ],
+  "preserved_archive_sha256": "9a5f2992145bac6745aa037a52467fb119e534fda9798a91fdfb5d40b0d4884e",
+  "preserved_archive_bytes": 2897920,
+  "protected_bodies_and_decoded_checkpoint_archived": false,
+  "additional_CPU_charge": 80,
+  "GPU_charge": 0,
+  "CPU_basis": "70 rounded created-to-canonical-terminal62.62wallupper includingqueue+10inspection/archive/ack/admin. Not measured aggregateCPU; preparation30alreadycharged.",
+  "proof_family_closed_CPU": 488,
+  "no_retry_or_GPU_release": true
+}

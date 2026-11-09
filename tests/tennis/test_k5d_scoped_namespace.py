@@ -5,6 +5,62 @@ import pytest
 from experiments.tennis import k5d_scoped_namespace as namespace
 
 
+def test_empty_namespace_signal_tolerates_only_esrch(monkeypatch: pytest.MonkeyPatch) -> None:
+    import errno
+    import signal
+
+    calls = []
+    def empty(pid: int, sig: int) -> None:
+        calls.append((pid, sig))
+        raise ProcessLookupError(errno.ESRCH, 'no remaining namespace members')
+    monkeypatch.setattr(namespace.os, 'kill', empty)
+    namespace.kill_remaining_namespace()
+    assert calls == [(-1, signal.SIGKILL)]
+    def denied(_pid: int, _sig: int) -> None:
+        raise PermissionError(errno.EPERM, 'denied')
+    monkeypatch.setattr(namespace.os, 'kill', denied)
+    with pytest.raises(PermissionError):
+        namespace.kill_remaining_namespace()
+    def unexpected(_pid: int, _sig: int) -> None:
+        raise OSError(errno.EINVAL, 'invalid')
+    monkeypatch.setattr(namespace.os, 'kill', unexpected)
+    with pytest.raises(OSError, match='invalid'):
+        namespace.kill_remaining_namespace()
+
+
+def test_failed_child_with_no_remaining_descendants_stays_failed(monkeypatch: pytest.MonkeyPatch, tmp_path) -> None:
+    import errno
+    import json
+    from types import SimpleNamespace
+    from experiments.tennis import k5d_pid_escalation_oracle as identity
+
+    monkeypatch.setattr(namespace.sys, 'platform', 'linux')
+    monkeypatch.setattr(namespace.os, 'getpid', lambda: 1)
+    monkeypatch.setattr(namespace.os, 'readlink', lambda _: 'pid:[123]')
+    monkeypatch.setattr(namespace.Path, 'read_text', lambda _: 'NSpid:\t100\t1\n')
+    monkeypatch.setattr(namespace, 'worker_command', lambda _: ['fixed'])
+    monkeypatch.setattr(namespace.signal, 'signal', lambda *_: None)
+    monkeypatch.setattr(namespace.subprocess, 'Popen', lambda *_args, **_kwargs: SimpleNamespace(pid=2))
+    monkeypatch.setattr(namespace.os, 'read', lambda *_: json.dumps({'host_pid': 123}).encode())
+    results = iter([(2, 256), ChildProcessError()])
+    def waitpid(*_args):
+        result = next(results)
+        if isinstance(result, Exception):
+            raise result
+        return result
+    monkeypatch.setattr(namespace.os, 'waitpid', waitpid)
+    monkeypatch.setattr(namespace.os, 'waitstatus_to_exitcode', lambda _: 1)
+    def no_descendants(*_args):
+        raise ProcessLookupError(errno.ESRCH, 'empty')
+    monkeypatch.setattr(namespace.os, 'kill', no_descendants)
+    monkeypatch.setattr(identity, 'process_identity', lambda: {'namespace_pid': 1})
+    monkeypatch.setenv('PS_STAGE_DIR', str(tmp_path / 'smoke'))
+    monkeypatch.delenv('PS_K5D_PROOF_ROOT', raising=False)
+    result = namespace.supervise(['native-proof'], 5, 'pid:[456]')
+    assert result['reason'] == 'worker_failed' and result['status'] == 1
+    assert result['reaped'] == 1 and result['complete_descendant_wait'] is True
+
+
 def test_constructs_fixed_worker_and_rejects_other_entrypoints() -> None:
     cmd = namespace.worker_command(['prepare', '--clip', 'tracknet/game9/Clip5'])
     assert cmd[1:5] == ['-m', namespace.TARGET, '--accounted-child', 'prepare']

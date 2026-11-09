@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "decision": "root reviewed aada source; release bounded preparation only, no job",
+  "revision": "aada886b3e0bb644c4dd180373ead4b40651c90d",
+  "snapshot_sha256": "690b8eb0ef8d39a89789688165520c183acc92abc69856bc087867b66ebb2ce6",
+  "source_sha256": "cffdb7d9ccfbfd8f53a15f3cb643c760254a93a6778c2e6620f2d550c94edc99",
+  "archive": "/private/tmp/pointstream-w8-aada-review-20261109/source.tar",
+  "root_independently_verified_git_blobs": 1667,
+  "root_checked_complete_diff_and_full_check_log_hashes": true,
+  "checks": "Ruff,mypy561,pytest2026passed39skipped",
+  "exact_public_preflight_sha256": "ab5f1b932918ae9956f6ef648e36e59c6a1fd9ef6c36a1722a1916b0da63a4c5",
+  "packet_wrapper_absent_from_historical_loaded_closure": true,
+  "fourth_preflight_override_added": false,
+  "cpu_ceiling": 30,
+  "gpu_ceiling": 0,
+  "parent_phase": "w8-full-witness-staged-20261106",
+  "parent_remaining_CPU_before_preparation": 4172,
+  "parent_remaining_GPU": 4550,
+  "proof_family_closed_CPU": 378,
+  "amended_family_CPU_cap": 1250,
+  "target_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-aada-20261109/source.tar",
+  "scope": "ONE fresh known-job/host/worker/CPUclaim/runtime/tools/localdisk/publiccache check; stat-only five protected categories BEFORE public hashing, exact new source gzip upload/no-overwrite/publicSHA; prepare fixed existing combined packet-first CPU proof spec with <=45min deadline. NO SUBMISSION.",
+  "conditions": [
+    "only existing accepted CD6 cache-presence reconciliation, no new baseline exceptions; preserve protected bodies/old archives/results",
+    "gpu5CPU0 remains intended CPU proof target; preparation metadata may use a verified unclaimed core, no GPU initialization",
+    "physical bootstrap/input/policy joins unchanged and exact wrapper source authenticated by full snapshot; no source-access/CPU480/quality changes",
+    "measure partial CPU; conservative30includes manager/admin, stop before allowance exceeded",
+    "root separately reviews actual spec/readiness/public690SHA and complete remaining CPU budget before ONE new proof; no GPU/context/fullwitness authority"
+  ]
+}

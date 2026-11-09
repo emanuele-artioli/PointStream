@@ -137,7 +137,8 @@ def _apply_optional_shared_parity_limit(torch: Any, environ: Any) -> None:
     if profile is None:
         return
     profiles = {'k5d-parity16-shared-numerical-v1': (16384, 8192),
-                'k5d-parity16-shared-numerical-low-memory-v1': (6144, 2048)}
+                'k5d-parity16-shared-numerical-low-memory-v1': (6144, 2048),
+                'k5d-parity16-shared-parent8-child2-v1': (10240, 2048)}
     if profile not in profiles:
         raise RuntimeError('unknown shared DCVC parity profile')
     declared, budget = profiles[profile]

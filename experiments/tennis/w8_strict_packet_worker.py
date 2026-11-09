@@ -41,12 +41,21 @@ def main() -> int:
     p.add_argument('--loader-sha256', required=True)
     p.add_argument('--canary', type=Path, required=True)
     p.add_argument('--source-root', type=Path, required=True)
+    p.add_argument('--witness-mode', choices=('packet',))
     args = p.parse_args()
     if receiver.digest(args.config) != args.config_sha256:
         raise ValueError('packet worker config identity mismatch')
     config = json.loads(args.config.read_text())
     if config.get('worker_kind') != 'packet' or config.get('environment', {}).get('CUDA_VISIBLE_DEVICES') != '':
         raise ValueError('packet-only worker must explicitly hide CUDA')
+    source_origin = None
+    if args.witness_mode == 'packet':
+        actual = Path(__file__).resolve(strict=True)
+        expected = args.source_root.resolve(strict=True) / 'experiments/tennis/w8_strict_packet_worker.py'
+        if actual != expected or __spec__ is None or Path(str(__spec__.origin)).resolve(strict=True) != actual:
+            raise ValueError('executing packet wrapper source origin differs')
+        source_origin = {'path': str(actual), 'relative_path': 'experiments/tennis/w8_strict_packet_worker.py',
+                         'sha256': receiver.digest(actual)}
     _, fixed, _, _ = receiver.preload()
     from experiments.tennis import w8_payload
     import numpy as np
@@ -79,13 +88,19 @@ def main() -> int:
     fixed.decode_frozen_window = decode_checked
     w8_payload.unpack_match = unpack_checked
     w8_payload.restore_tensor = restore_checked
-    receiver.launch(args.config, args.config_sha256, args.loader, args.loader_sha256, args.canary, args.source_root)
+    if args.witness_mode == 'packet':
+        receiver.launch(args.config, args.config_sha256, args.loader, args.loader_sha256, args.canary, args.source_root,
+                        witness_mode='packet')
+    else:
+        receiver.launch(args.config, args.config_sha256, args.loader, args.loader_sha256, args.canary, args.source_root)
     if observed.get('state_tensors') != 480 or observed.get('unit_arrays', 0) <= 0 or observed.get('restored_tensors', 0) <= 0:
         raise RuntimeError('pre-serialization CPU checks missing')
     if os.environ.get('CUDA_VISIBLE_DEVICES') != '' or torch.cuda.is_initialized():
         raise RuntimeError('packet decoder initialized or exposed CUDA')
     receipt = {'cuda_visible_devices': '', 'cuda_initialized_after_decode': False,
                'torch_version': str(torch.__version__), 'pre_serialization': observed, 'scope': 'CPU packet decoder only'}
+    if source_origin is not None:
+        receipt['source_origin'] = source_origin
     with (Path(config['output']) / 'cpu-only.json').open('x') as stream:
         json.dump(receipt, stream, sort_keys=True)
         stream.write('\n')

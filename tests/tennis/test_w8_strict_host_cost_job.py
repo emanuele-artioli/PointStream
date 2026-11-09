@@ -359,7 +359,8 @@ def test_aa_pin_rejects_foreign_and_mixed_preloaded_origins(tmp_path, monkeypatc
         worker.pin_declared_aa_imports(config)
 
 
-def test_witness_uses_pid_namespace_without_new_host_process_group(tmp_path, monkeypatch):
+@pytest.mark.parametrize('mode', ['packet', 'context_qualification'])
+def test_witness_uses_pid_namespace_without_new_host_process_group(tmp_path, monkeypatch, mode):
     import json
     from types import SimpleNamespace
     from experiments.tennis import w8_witness_profile as witness
@@ -386,11 +387,16 @@ def test_witness_uses_pid_namespace_without_new_host_process_group(tmp_path, mon
     loader.write_text('{}')
     work = tmp_path / 'model'
     work.mkdir()
-    job._worker(tmp_path / 'python', {'worker_kind': 'context_qualification', 'output': str(work / 'output')}, work, 100, 130,
-                tmp_path, loader, materialize_profile=True, clock_profile=True, witness_mode='context_qualification')
+    job._worker(tmp_path / 'python', {'worker_kind': mode, 'output': str(work / 'output')}, work, 100, 130,
+                tmp_path, loader, materialize_profile=mode != 'packet', clock_profile=mode != 'packet', witness_mode=mode)
     command, kwargs = calls[0]
     assert command[:7] == ['/usr/bin/unshare', '--user', '--map-root-user', '--net', '--pid', '--fork', '--kill-child=SIGKILL']
     assert 'experiments.tennis.w8_witness_namespace' in command
+    expected = ('experiments.tennis.w8_strict_packet_worker' if mode == 'packet'
+                else 'experiments.tennis.w8_strict_host_model_worker')
+    assert expected in command and command[-2:] == ['--witness-mode', mode]
+    if mode == 'packet':
+        assert kwargs['env']['CUDA_VISIBLE_DEVICES'] == ''
     assert command[command.index('--timeout') + 1] == '120'
     assert 'start_new_session' not in kwargs
     for key in ('TMPDIR', 'TMP', 'TEMP', 'HOME'):

@@ -1,0 +1,88 @@
+{
+  "accounting_note": "One-core lifecycle wall is a conservative bound for the observed process lifetime, not measured aggregate CPU; queue/admin and audit remain covered by separate existing reserve. Root owns final charge; do not double count child CPU.",
+  "birth_to_canonical_wall_seconds": 60.57070302963257,
+  "birth_to_run_terminal_wall_seconds": 20.86100673675537,
+  "canonical_update_epoch": 1794261436.9507031,
+  "cpu_affinity": [
+    0
+  ],
+  "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "events_acknowledged": [
+    "850f110c86c6561c8891ca96ff553e0e",
+    "5d23dab4bc5e54ba9da2ee01829ba435"
+  ],
+  "fleet_gate_passed": false,
+  "fleet_status": "failed",
+  "gpu_claim": false,
+  "job_id": "20261109T215520Z-a2f41fee",
+  "leaf_error": "argparse missing required arguments, exit 2",
+  "namespace_receipt": {
+    "argv": [
+      "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+      "-m",
+      "experiments.tennis.k5d_native_cpu_workload"
+    ],
+    "children_cpu_seconds": 0.043616,
+    "complete_descendant_wait": true,
+    "elapsed_seconds": 0.07850430021062493,
+    "init_cpu_seconds": 0.04876,
+    "namespace_init": {
+      "host_pid": 1865491,
+      "namespace_pgid": 0,
+      "namespace_pid": 1,
+      "namespace_pids": [
+        1865491,
+        1
+      ],
+      "namespace_sid": 0,
+      "observed_monotonic": 2728522.290364878,
+      "pid_namespace": "pid:[4026537776]",
+      "start_ticks": 272852217
+    },
+    "reaped": 1,
+    "reason": "worker_failed",
+    "status": 2,
+    "worker_host_identity": {
+      "campaign_pgid": 1865081,
+      "exec_host_pgid": 1865081,
+      "host_pgid": 1865081,
+      "host_pid": 1865492,
+      "start_ticks": 272852222
+    },
+    "worker_namespace_pid": 2
+  },
+  "outer_exit_code": 1,
+  "own_cpu_claim_absent": true,
+  "owned_pids_and_group_absent": true,
+  "process_lookup_error_in_log": false,
+  "raw_directory": "/private/tmp/k5d-parent8-forensic-20261109",
+  "raw_sha256": {
+    "ack.json": "5f3bb99e92a193bedc4bd8d5938240e86cdc651ba887991aafb5c25a2875e70f",
+    "artifacts-extra/export-receipt.json": "e750eb3585b29c1cc75f150ca8cde46e5bc0ca0a4dbf237bdb4dc69e943773c8",
+    "artifacts-extra/ready.json": "c43b6662f8398e2f706bf7ca2c9f60881871d55b69b1c1923dd4491dede5d0c3",
+    "artifacts/export-receipt.json": "32f924c0a5d90f8940d835cc83b9e74ff6ffbaa5357813f545fbce6947e8124b",
+    "artifacts/run/claim.json": "4aa5d19c1573919bd724ee46dd43bf67590050e6b4d5cb0bcf972ec2127219fe",
+    "artifacts/run/cpu-affinity.json": "46bcea43a67cd4b9d72e02bc941846a498288ecb618e666ce24d2728333bdec3",
+    "artifacts/run/status.json": "627dd2afe506734ad6f6515a77860984d9218a4c1e4dbd014c2eb34b81065c17",
+    "artifacts/run/supervisor.json": "7726683ef2890deb8a0e39a7cbef629dd008626c75527b9c7f29a0f4d99086b0",
+    "artifacts/smoke/command.log": "b124400140c2fb424f28977dcb5a12214602e4a356dd6f0fa440b5ecec405ca9",
+    "artifacts/smoke/dispatch.json": "ca8c7ff4235c881d70ff41c66e037e8d83fa800ae363d0178f9816614235da7f",
+    "artifacts/smoke/execution.json": "c39ae860f0e9a3baeaf9100617f7eba89e7277d3e51700a05916e6197dfac3d0",
+    "artifacts/smoke/staging.json": "c72fbffdb3f80876b7587d069ce15197b6bb80ed9590170fd0baa7365b9eb425",
+    "batch.json": "7b7e5aa190d1fa2781db111e46d1ec0574e9b62d84214a1ec929e49a01ef8080",
+    "events.json": "e0e2492e2d02801c9982b7dea4f0bc3f4d2626de842464d2e785941305aa0065",
+    "status.json": "c53646e7692388983fdc6ec8368898c53da308c4e746866513e9b0138cac630a",
+    "submission.json": "5f0253f094c856d66dea665fde373d6dcd275d9c48136c95ac4bf558f081d737",
+    "teardown-probe.py": "3eb23f9654cec7b9d74b166d9bcc5fcf162c750c68d3b814d49c942467d16c97",
+    "teardown.json": "942587cefe3744c555c67fbe119b74e186802142149e77955758837cb842774f",
+    "wait.json": "f45f35889cc7e105d4ad239671e949b0d04256959838558c2f207460fc68052b"
+  },
+  "run_terminal_epoch": 1794261397.2410069,
+  "schema": 1,
+  "scope": "one fixed missing-argument leaf and PID1 empty-namespace failure path; not native or GPU proof",
+  "snapshot_sha256": "9f486d70424b9d293d8774c92b36350d284edcb2513c415390b88a2b4c344aed",
+  "source_sha256": "58787f8664f961c2287228762c1ddd3295adab4042bd7f41d9bfee87d2666104",
+  "spec_sha256": "528876fc0946ed3d20466ce95f80e04362fcc3b52931a50a6c0b95e4481f914a",
+  "status": "independent expected-failure forensic audit candidate; root review required",
+  "supervisor_birth_epoch": 1794261376.38
+}

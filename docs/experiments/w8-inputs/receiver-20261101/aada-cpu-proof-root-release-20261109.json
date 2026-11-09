@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "decision": "release ONE corrected packet-first combined CPU proof under routing amendment",
+  "revision": "aada886b3e0bb644c4dd180373ead4b40651c90d",
+  "snapshot_sha256": "690b8eb0ef8d39a89789688165520c183acc92abc69856bc087867b66ebb2ce6",
+  "source_sha256": "cffdb7d9ccfbfd8f53a15f3cb643c760254a93a6778c2e6620f2d550c94edc99",
+  "source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-aada-20261109/source.tar",
+  "spec_path": "/private/tmp/pointstream-w8-aada-sourceprep-20261109-a1/spec.json",
+  "raw_spec_sha256": "4b0ebeb9626a28a572416fe99d92534bbc518a92126fc1df21a78b2a8b263655",
+  "logical_spec_sha256": "08b4b316fefa7e7265f515c47c319ab44aa71efa20d162d2924454a1f59157ff",
+  "normalized_file_sha256": "064d08e3c244c8cd42dce7e0cf6f6ac9e0e3a16bcfa742bda0a524905e55b3dc",
+  "deadline": "2026-11-09T21:58:24.609512Z",
+  "bootstrap_sha256": "01f3fed31b45dbcaab880269f87d0578dcfcab960ee5a15fbcdcd790cec2dd5f",
+  "input_job_sha256": "7a0685ba0cc7405e1833d05075d4d591723da178b1afe71da31e5e95d6e85113",
+  "system_leaves_sha256": "82ad345c9f22115c9a06bbb9ec1244fb058e1149c458a55e998a272d766639f0",
+  "host": "gpu5",
+  "cpu_affinity_index": 0,
+  "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "inclusive_family_CPU_ceiling": 1250,
+  "already_closed_family_CPU": 408,
+  "future_CPU_ceiling": 832,
+  "future_components": {
+    "single_core_campaign": 600,
+    "postcampaign_management_teardown": 150,
+    "independent_audit": 82
+  },
+  "GPU_ceiling": 0,
+  "parent_remaining_CPU": 4142,
+  "parent_remaining_GPU": 4550,
+  "root_review": "All1667actualGitblobs/full339linediff/configuredchecklogs(Ruff,mypy561,2026pass39skip) verified; exact public ab5 preflight confirms packetwrapper nothistoricalclosure, so no fourthoverride. Original CPU instrumentation restored in real PID2 route, retained CPU receipt semantically validated; no CPU480/source/denial/quality rules weakened. All38sourcepreprawhashes and bothhostpublic690/CD6/privateunopened checks verified.",
+  "forecast": "Existing packet-first serial run stops before later roles if actual CPU receipt fails. Conditional520of530smoke +50validator+5noop+15campaignslack=600; original measured CPUwrapper6.531wall and1.5x context9.797, new setup/strict/assessor/native costs partly unmeasured. This CPU correctness smoke has fixed fail-closed remaining-cost gates, not a demonstrated completion guarantee or generation admission. 408closed+832future=1240<=1250.",
+  "conditions": [
+    "submit ONE canonical request from clean aada archive cache/source_archive:true and exactfixedspec; freshknownjob/CPUclaim/workercheck; require>=900secondsbeforefixeddeadline orSTOPforrootreview, no silentrefresh",
+    "persistactualID/source/spec/deadline/budgets/output in W8entry immediately andsendrootID forcentralledger BEFOREONEcanonicalps-fleetwait<=2700; inspectuncertainsubmissionneverreplay",
+    "actual instrumented480state+480restoration/positiveunitarrays/CUDAhidden/uninitialized/pinnedMAINtorch and byte/oracle checks mustpass BEFORE later proofroles; preserve all raw receipts and relevant source-origin/namespace joins",
+    "all CPU proof stages source/denial/native/MAIN+JCV/assessor/PID containment/accounting/claim/lifecycle checks remain mandatory; no partial/rootgate until full rawindependentaudit including exactsystempolicySHA",
+    "stop on any source/packet/identity/native/receipt/cost/deadline failure; preserve outputs, cancelonlytaskownedprocesses; no automaticretry or new sourcefix admission",
+    "no GPU/contextqualification/fullwitness or quality result authorized; those need separately reviewed complete forecasts and unchanged source/scientific gates"
+  ]
+}

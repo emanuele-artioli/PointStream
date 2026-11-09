@@ -257,8 +257,7 @@ def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, 
         if not Path(stage_dir).is_absolute() or Path(stage_dir).name not in ('smoke', 'full'):
             raise ValueError('witness requires the actual fleet stage directory')
         env['PS_STAGE_DIR'] = stage_dir
-    module = ('experiments.tennis.w8_strict_receiver_worker' if witness_mode == 'packet'
-              else 'experiments.tennis.w8_strict_packet_worker' if config['worker_kind'] == 'packet'
+    module = ('experiments.tennis.w8_strict_packet_worker' if config['worker_kind'] == 'packet'
               else 'experiments.tennis.w8_strict_receiver_worker' if witness_mode in finish_modes
               else 'experiments.tennis.w8_strict_host_model_worker')
     if config['worker_kind'] in ('packet', 'isolation_proof'):

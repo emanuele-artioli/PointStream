@@ -461,6 +461,43 @@ if __name__ == '__main__':
     raise SystemExit(main())
 
 
+def validate_witness_packet_cpu_receipt(cpu: dict[str, Any], expected_torch: str) -> dict[str, Any]:
+    """Require the actual instrumented packet receipt, not a post-hoc inference."""
+    observed = cpu.get('pre_serialization', {})
+    if (cpu.get('scope') != 'CPU packet decoder only' or cpu.get('cuda_visible_devices') != ''
+            or cpu.get('cuda_initialized_after_decode') is not False or cpu.get('torch_version') != expected_torch
+            or observed.get('state_tensors') != 480 or observed.get('restored_tensors') != 480
+            or type(observed.get('unit_arrays')) is not int or observed['unit_arrays'] <= 0):
+        raise ValueError('actual pre-serialization CPU packet receipt differs')
+    return cpu
+
+
+def validate_witness_packet_source(cpu: dict[str, Any], source_root: Path, manifest: dict[str, Any]) -> None:
+    """Bind the executing __main__ file to the authenticated source manifest."""
+    name = 'experiments/tennis/w8_strict_packet_worker.py'
+    expected = manifest.get('files', {}).get(name)
+    origin = cpu.get('source_origin')
+    if (not isinstance(expected, str) or len(expected) != 64 or not isinstance(origin, dict)
+            or origin != {'path': str(source_root / name), 'relative_path': name, 'sha256': expected}):
+        raise ValueError('packet wrapper executing source identity differs')
+
+
+def validate_packet_source_archive(archive: Path, snapshot_sha: str, cpu: dict[str, Any]) -> None:
+    """Recheck the exact executed wrapper member in the authenticated archive."""
+    if fixed.file_sha(archive) != snapshot_sha:
+        raise ValueError('packet source snapshot differs')
+    name = 'experiments/tennis/w8_strict_packet_worker.py'
+    with tarfile.open(archive) as source_tar:
+        entry = source_tar.getmember(name)
+        source_bytes = source_tar.extractfile(entry) if entry.isfile() else None
+        if source_bytes is None or hashlib.sha256(source_bytes.read()).hexdigest() != cpu['source_origin']['sha256']:
+            raise ValueError('packet wrapper archive source differs')
+
+
+def read_witness_packet_cpu_receipt(path: Path, expected_torch: str) -> dict[str, Any]:
+    return validate_witness_packet_cpu_receipt(json.loads(path.read_text()), expected_torch)
+
+
 def run_proof(stage: Path) -> dict[str, Any]:
     """Run the fixed real packet path for the combined CPU proof, without publication."""
     from experiments.tennis import w8_strict_host_cost_job as host
@@ -543,16 +580,14 @@ def run_proof(stage: Path) -> dict[str, Any]:
     check_isolation(packet_config, decoded['isolation'], json.loads(loader_path.read_text()), manifest,
                     fixed.file_sha(loader_path))
     cpu_path = output / 'cpu-only.json'
-    cpu = json.loads(cpu_path.read_text())
+    cpu = read_witness_packet_cpu_receipt(cpu_path, preflight['receipts']['main']['torch'])
+    validate_witness_packet_source(cpu, root, manifest)
     if (decoded.get('match_tensors') != fingerprints or decoded.get('unit_sha256') != receiver.ORACLE_UNIT_SHA
             or decoded.get('packet_sha256') != fixed.WINDOW_SHA or decoded.get('profile_sha256') != fixed.PROFILE_SHA
             or decoded.get('guider_sha256') != fixed.GUIDER_SHA or decoded.get('checkpoint_sha256') != CHECKPOINT_SHA
             or receiver.verify_serialized_match(output / 'decoded.pt', fingerprints) != CHECKPOINT_SHA
             or any(fixed.file_sha(output / 'publish' / 'units' / f'{u}.npz') != receiver.ORACLE_UNIT_SHA[u] for u in fixed.UNITS)
-            or cpu.get('cuda_visible_devices') != '' or cpu.get('cuda_initialized_after_decode') is not False
-            or cpu.get('torch_version') != preflight['receipts']['main']['torch']
-            or cpu.get('pre_serialization', {}).get('state_tensors') != 480
-            or cpu.get('pre_serialization', {}).get('restored_tensors') != 480):
+):
         raise ValueError('combined proof packet/oracle identity differs')
     receipt_paths = {'packet-config.json': work / 'worker-config.json', 'packet-exit.json': work / 'exit.json',
                      'packet-self-leaves.json': work / 'self-leaves.json',

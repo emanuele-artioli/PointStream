@@ -15,7 +15,9 @@ import time
 from typing import Any
 
 TARGETS = frozenset({'experiments.tennis.w8_strict_host_model_worker',
-                     'experiments.tennis.w8_strict_receiver_worker'})
+                     'experiments.tennis.w8_strict_receiver_worker',
+                     'experiments.tennis.w8_strict_packet_worker'})
+PACKET_TARGET = 'experiments.tennis.w8_strict_packet_worker'
 PROOF_TARGET = 'experiments.tennis.w8_witness_namespace_proof'
 NATIVE_TARGET = 'experiments.tennis.w8_receiver_native_bootstrap'
 ASSESSMENT_TARGET = 'experiments.tennis.w8_witness_assessment'
@@ -76,6 +78,11 @@ def command(target: str, args: list[str]) -> list[str]:
                 or args[2] != '--output' or not Path(args[3]).resolve(strict=True).is_relative_to(scratch)
                 or Path(args[3]).resolve(strict=True) == scratch):
             raise ValueError('CPU proof target requires fixed scratch-bound invocation')
+    elif target == PACKET_TARGET:
+        flags = ('--config', '--config-sha256', '--loader', '--loader-sha256', '--canary', '--source-root', '--witness-mode')
+        if (len(args) != 2 * len(flags) or tuple(args[::2]) != flags or args[-1] != 'packet'
+                or os.environ.get('CUDA_VISIBLE_DEVICES') != ''):
+            raise ValueError('fixed CPU witness packet target required')
     elif target == NATIVE_TARGET:
         native_command_args(args)
     elif target == ASSESSMENT_TARGET:

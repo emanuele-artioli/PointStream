@@ -38,7 +38,8 @@ def test_lifecycle_rejects_missing_case_and_wrong_group():
     for name in ('normal', 'timeout', 'term', 'kill'):
         cases.append({'case': name, 'launcher_rc': 0 if name == 'normal' else -15 if name == 'term' else -9,
             'outer_waited_cpu_seconds': .4, 'init': init, 'worker': worker, 'detached': detached,
-            'all_absent': True, 'receipt': normal_receipt if name == 'normal' else
+            'all_absent': True, 'detached_group_absent': True, 'term_requested': name == 'term',
+            'term_escalated': False, 'receipt': normal_receipt if name == 'normal' else
                 {'reason': 'timeout'} if name == 'timeout' else None})
     record = {'scope': 'synthetic CPU namespace lifecycle only', 'campaign_pgid': group, 'cases': cases}
     proof.check_lifecycle(record, group)
@@ -46,6 +47,17 @@ def test_lifecycle_rejects_missing_case_and_wrong_group():
         proof.check_lifecycle({**record, 'cases': cases[:-1]}, group)
     with pytest.raises(ValueError):
         proof.check_lifecycle(record, group + 1)
+    term = cases[2]
+    term['term_escalated'] = True
+    term['launcher_rc'] = -9
+    proof.check_lifecycle(record, group)
+    term['launcher_rc'] = -15
+    with pytest.raises(ValueError, match='escalation'):
+        proof.check_lifecycle(record, group)
+    term['launcher_rc'] = -9
+    term['detached_group_absent'] = False
+    with pytest.raises(ValueError, match='host identity'):
+        proof.check_lifecycle(record, group)
 
 
 def test_actual_fleet_gate_accepts_cpu_proof_validation_shape(tmp_path, monkeypatch):
@@ -107,3 +119,24 @@ def test_protected_metadata_requires_historical_pin_and_current_stat_check(monke
                'historical_receipt_sha256': proof.packet.IDENTITY_SHA}
     proof.check_protected_metadata(receipt, historical)
     assert observed == [(receipt, historical, True)]
+
+
+def test_retained_packet_cpu_receipt_joins_pinned_main_and_rejects_tampering(monkeypatch):
+    from experiments.tennis import w8_protected_metadata
+    calls = []
+    def read(path, sha):
+        calls.append((str(path), sha))
+        return {'receipts': {'main': {'torch': 'pinned-torch'}}}
+    monkeypatch.setattr(w8_protected_metadata, 'read_historical', read)
+    spec = {'staged_inputs': [{'name': 'preflight', 'path': '/public/bundle.json', 'sha256': proof.packet.PREFLIGHT_SHA}]}
+    valid = {'scope': 'CPU packet decoder only', 'cuda_visible_devices': '', 'cuda_initialized_after_decode': False,
+             'torch_version': 'pinned-torch', 'pre_serialization': {'state_tensors': 480, 'restored_tensors': 480, 'unit_arrays': 2}}
+    proof.check_retained_packet_cpu(spec, valid)
+    assert calls == [('/public/bundle.json', proof.packet.PREFLIGHT_SHA)]
+    bad = dict(valid, pre_serialization=dict(valid['pre_serialization'], restored_tensors=479))
+    with pytest.raises(ValueError, match='pre-serialization'):
+        proof.check_retained_packet_cpu(spec, bad)
+    with pytest.raises(ValueError, match='pre-serialization'):
+        proof.check_retained_packet_cpu(spec, dict(valid, torch_version='other'))
+    with pytest.raises(ValueError, match='preflight'):
+        proof.check_retained_packet_cpu({'staged_inputs': []}, valid)

@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "decision": "root source review complete; release source preparation only",
+  "revision": "965d801ada4b8ccb6e54685f4560de8287931d00",
+  "snapshot_sha256": "9f486d70424b9d293d8774c92b36350d284edcb2513c415390b88a2b4c344aed",
+  "source_sha256": "58787f8664f961c2287228762c1ddd3295adab4042bd7f41d9bfee87d2666104",
+  "archive": "/private/tmp/k5d-parent8-child2-freeze-review-20261109/consumer-source.tar",
+  "root_and_reviewer_verified_Git_blobs": 1381,
+  "actual_H2_bridge_sha256": "69dd80513f692b73cc74fc551d80734a91abb539ab64173033a823843f542857",
+  "checks": "Ruff,mypy501,pytest1776passed37skipped; logs/root8-filediff reviewed",
+  "parent_phase": "k5d-scale-first-tranche-20261105",
+  "parent_remaining_CPU": 7760,
+  "parent_remaining_GPU": 8370,
+  "cpu_ceiling": 50,
+  "GPU_ceiling": 0,
+  "included_in_prospective_420CPU_qualification": true,
+  "target_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/k5d-parent8-child2-965d-20261109/source.tar",
+  "scope": "ONEallhostdoctor/knownjobs/workers then gpu2CPU0/claim/runtime/tools/unshare/localdisk/nativeinputZIP check; exact9f source no-overwrite gzip upload/publicSHA. Prepare actual fixed failed-leaf forensic spec and separate fullnative spec forrootreview; NO SUBMISSIONS.",
+  "revised_leaf_allocations_CPU": {
+    "forensic_failure_leaf": {
+      "unique_source_prep": 50,
+      "campaign": 50,
+      "post": 30,
+      "audit": 20
+    },
+    "native_four_case_leaf": {
+      "preparation": 20,
+      "campaign": 100,
+      "post": 100,
+      "audit": 30,
+      "contingency": 20
+    }
+  },
+  "conditions": [
+    "preservealloldsource/data/models/outputs; no GPU initialization, no otherusersprocess action or coldhost fallback",
+    "full configured source1381/H2 resource bridge/fixedprofile values already reviewed; no numerical/batch/dtype/point/recipe change",
+    "expected failed forensic stage may only qualify observed failure mechanism after root raw audit; never replace fullnativepass; no fabricated passed gate",
+    "stop before50CPU can be exceeded; account manager/admin conservatively and save all scripts/identity/usage/sourcepostchecks",
+    "actual final specs/deadlines<=45min/rootcostreview precede separateCPU release; no GPU/parity/scale release"
+  ]
+}
