@@ -1066,6 +1066,15 @@
       "cpu_seconds": 50,
       "release_stage": "research-first24/28",
       "basis": "Additional50CPUfreshqueuepreparation conservativelycharged insideunchanged1000GPU1200CPUattempt. Allhost/jobs/source/receipt/runtime/tools/input/CPU/space verified,actualrequest42249d1d pending,foreignGPUoccupancyhandledbyqueue. Previousblockedprep50+this50=100prepwithin400externalCPU;remaining300externalplus800campaign=1100futureCPU."
+    },
+    {
+      "phase": "k5d-parity4224-expiry-root-closure-20261109",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 300,
+      "release_stage": "research-first24/28",
+      "basis": "Expiredqueue42249d1d withnohost/supervisor/run/stage/GPU. Entire300remainingexternaladmin/watch/auditallowanceconservativelycharged; prior100prep=>400phaseCPU,800unusedcampaignCPUreleasedwithinparent. Exactwatch/managerCPUunavailable,notmeasuredaggregate; pendingwallnotGPUtime. EventACK, allcompatibleA6000stilloccupied, no retry."
     }
   ],
   "reservations": [
@@ -1584,8 +1593,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8900,
-      "cpu_seconds": 9220,
-      "status": "Remaining_unspent8900GPU9220CPU. GPU16parity42249d1dsubmittedpending inboundedqueue,deadline16:00:43UTCNov9,onewait61883max2700delegateowned. Leaf1000GPU1200CPUinclusive100prepcharged+1100futureCPU nested. Exactae/22fb/71d/env32e/c64receipt. Noautomaticretry/full30release."
+      "cpu_seconds": 8920,
+      "status": "Remaining_unspent8900GPU8920CPU afterqueuedparity4224 expirednohost/noGPU,400CPUinclusivecharged. NoactiveBalljob/wait. Source/CPUproofacceptedbutGPUparitystillopenpendingcompatibleA6000capacity. Noautomaticretry;292/586/full30notreleased."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -2552,7 +2561,7 @@
       "job_id": "20261109T151733Z-42249d1d",
       "phase": "k5d-scale-first-tranche-20261105",
       "subphase": "gpu16-pgid-parity-bounded-queue",
-      "state": "submittedinitialpending;onecanonicalwaitdelegateowned,noautomaticretry",
+      "state": "expiredwithoutassignedhost/supervisor/run/stage/gate/GPU;eventACK;noquality/parityresult;noretry",
       "revision": "ae6030e58a98156d3b5cb5d1cfab78967b173c9b",
       "source_sha256": "71d788cf9c520c4c095f011dbf5efce157493f003a3db970e57731f06d1cb7af",
       "snapshot_sha256": "22fb921e5cc26d04f22d6e8be6f1098f504b3319283794e341ab5952dc51815d",
@@ -2563,7 +2572,10 @@
       "preparation_charged_cpu_seconds": 100,
       "wait_handle": 61883,
       "wait_max_seconds": 2700,
-      "local_batch": "/private/tmp/k5d-parity1109-batch.json"
+      "local_batch": "/private/tmp/k5d-parity1109-batch.json",
+      "terminal_charged_gpu_seconds": 0,
+      "phase_total_cpu_seconds": 400,
+      "wait_state": "completed;onecanonicalwait2344seconds"
     }
   ],
   "old_budgets": "closed, not borrowed",
