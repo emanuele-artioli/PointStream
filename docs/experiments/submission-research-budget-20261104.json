@@ -1410,6 +1410,16 @@
       "cpu_seconds": 520,
       "basis": "Conservative allocation:430 rounded supervisor-birth to canonical421.562s same-path bound plus90external audit/admin +30already charged prep.450GPU supported by inferred normal successful claim-release ordering<=420.877s; exact release and aggregate CPU not measured. Late manual absence is NOT a runtime timestamp.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "w8-33b86-source-preparation-20261109",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 30,
+      "witness_qualification": false,
+      "basis": "Entire approved source preparation allocation; partialCPU telemetry excludes manager aggregate.17rawartifacts root rehashed, stat-first public source checks onbothhosts, no protected bodies.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -1993,8 +2003,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 3902,
-      "status": "Remaining_unspent4550GPU3902CPU;7b519CPUinfrastructureaccepted/closed130additional; runtime-role contract blocksGPU; no newproofrelease."
+      "cpu_seconds": 3872,
+      "status": "Remaining_unspent4550GPU3872CPU;33b86sourceprep30charged; ONE832futureCPUproofreleased; noGPU."
     }
   ],
   "jobs": [
