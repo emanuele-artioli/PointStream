@@ -1420,6 +1420,16 @@
       "witness_qualification": false,
       "basis": "Entire approved source preparation allocation; partialCPU telemetry excludes manager aggregate.17rawartifacts root rehashed, stat-first public source checks onbothhosts, no protected bodies.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "w8-33b86-1c5d-closure-20261109",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "cpu_seconds": 100,
+      "gpu_seconds": 0,
+      "witness_qualification": false,
+      "basis": "80rounded above69.7465created-to-canonical wall includingqueue on onecore +20audit/admin allocation;30prep already charged. AggregateCPUunmeasured.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2003,8 +2013,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 3872,
-      "status": "Remaining_unspent4550GPU3872CPU;33b86sourceprep30charged; ONE832futureCPUproofreleased; noGPU."
+      "cpu_seconds": 3772,
+      "status": "Remaining_unspent4550GPU3772CPU;1c5dCPUfailureclosed100additional/130inclusive; no retry orGPU."
     }
   ],
   "jobs": [
@@ -3284,7 +3294,7 @@
       "job_id": "20261109T234210Z-1c5d7e02",
       "phase": "w8-full-witness-staged-20261106",
       "subphase": "33b86-MAIN-JCV-actual-runtime-CPUproof",
-      "state": "submitted pending; sole canonical wait owned by plan_research_audit",
+      "state": "failed; root closed receipt-publication race before runtime attestations",
       "revision": "33b86cb60347ac12ad2ce0674052e36706e232d1",
       "source_sha256": "bf26eec6c158e686bf5a0ef12b4898d08b95345b998e9c3350e6dbf2df74c08b",
       "snapshot_sha256": "327e96ea67d8d21127bee7b8cd0f4a785ef6ffceecd007665483812717241f48",
@@ -3301,7 +3311,11 @@
       "audit_CPU_ceiling": 82,
       "family_CPU_cap": 1550,
       "local_batch": "/private/tmp/pointstream-w8-33b86-proof-20261109-a1",
-      "scope": "Actual new-source MAIN/JCV CPU-leaf runtime attestation and unchanged packet/native/isolation/lifecycle only. No JCV outer-controller/CUDA/generation qualification."
+      "scope": "Actual new-source MAIN/JCV CPU-leaf runtime attestation and unchanged packet/native/isolation/lifecycle only. No JCV outer-controller/CUDA/generation qualification.",
+      "terminal_additional_cpu_charge": 100,
+      "actual_inclusive_conservative_cpu_charge": 130,
+      "wait_state": "ended; failure events acknowledged",
+      "full_CPU_gate_passed": false
     }
   ],
   "old_budgets": "closed, not borrowed",
