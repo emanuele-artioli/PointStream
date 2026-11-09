@@ -1287,6 +1287,16 @@
       "cpu_seconds": 110,
       "release_stage": "research-first24/28",
       "basis": "GPU400 conservatively rounds actual claim-created to later observed-absence381s; this is an occupancy bound, not measured runtime or shared throughput. CPU110=70rounded one-core campaign/publication lifetime60.547 +40audit/admin, plus prior30prep=>140inclusive. Childcumulative15.044CPU not added again. Aggregate administrativeCPU unmeasured. No parity/memoryfit/scale or successfulnamespacecompletion; root accepted failure only."
+    },
+    {
+      "phase": "w8-aada-source-preparation-20261109",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 30,
+      "witness_qualification": false,
+      "release_stage": "research-first24/28",
+      "basis": "Full released30CPU AADA source preparation: stat-first protected metadata/public source690+CD6 verification, no-overwrite gzip upload, freshallhostdoctor/workers/jobs/gpu5CPU0claim checks and spec. Partial measuredCPU~2.1; managerCPUunmetered. Root38rawhashes checked. Family378prior+30=>408closed,832futureof1250card;0GPU."
     }
   ],
   "reservations": [
@@ -1870,8 +1880,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 4172,
-      "status": "Remaining_unspent4550GPU4172CPU; f8routingfailure538fclosed110CPU, proof-family378CPU; local routingrepaironly, noCPU/GPUrunrelease."
+      "cpu_seconds": 4142,
+      "status": "Remaining_unspent4550GPU4142CPU; aada source690 prepared30CPU, amended family1250 has408closed+832future=1240. ONEcombinedCPUproof release, no GPU/context/fullwitness."
     }
   ],
   "jobs": [
