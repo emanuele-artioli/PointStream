@@ -1048,6 +1048,15 @@
       "cpu_seconds": 160,
       "release_stage": "research-first24/28",
       "basis": "Rootaccepted exactae6030/22fb/71d/env32e/wrapper62f. Fouractualnative/group/teardowncases withlivePID/starttick/PGIDjoins; 15observed+supervisor/campaign/groupabsent,claimsfree/eventsACK. Wholeinheritedonecore120.687260 rounded130CPU +30audit=160future,prior50prep=>210inclusivevs300cap. Conservativebound,notaggregateadminCPUmeasurement. NoGPU."
+    },
+    {
+      "phase": "k5d-parity-pgid-blocked-preparation-20261109",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "release_stage": "research-first24/28",
+      "basis": "Conservative50CPUforNov9 allhost/oldjob/source/input/env/tool/CPU/storage checks anduniqueacceptedCPUreceipt c64upload/fsync/hash. AllcompatibleA6000occupied; no GPUrequest yet. Userboundedqueuepreference permitsONEpendingrequest. This50countsinside unchanged1000GPU1200CPUleaf; nextfreshprep<=50fromexisting400externalCPU, totalprep100and300remainingexternalaudit/lifecycle."
     }
   ],
   "reservations": [
@@ -1566,8 +1575,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8900,
-      "cpu_seconds": 9320,
-      "status": "Remaining_unspent8900GPU9320CPU. Root20261109releasesONEnewsourceGPU16parityafteraccepted2793proof, exactae6030/22fb/71d/env32e/wrapper62f. Nested1000GPU1200CPUinclusive(800campaign600smoke580NS30val5noop;200postGPU400externalCPUincluding50prep). Recheckexistingjobs/all6hosts/input/sourcecache/receipt/native/env/affinity/storage afterinterruption; freshdeadline<=45min only. All6exactparity+counters+terminal/teardownrequired before292/586. No replay/replacement/full30release."
+      "cpu_seconds": 9270,
+      "status": "Remaining_unspent8900GPU9270CPU. ONEGPU16parityrequestreleased; earlierblockedpreflight50CPUcharged, noGPUjobyet. Userboundedqueues: busyA6000doesnotblockpendingrequest. OperationalamendONEwait<=2700s/deadline<=45min, original1000GPU1200CPUinclusive unchanged(100CPUtotalprepallowedwithin400external,300others). NewrequestmustrecordIDandwait; expire/contendstop,noretry/full30."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",

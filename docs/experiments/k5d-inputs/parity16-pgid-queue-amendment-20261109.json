@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "amends": "parity16-pgid-root-release-20261109.json",
+  "scope": "operational queue handling only; original source, science, limits and stop conditions unchanged",
+  "decision": "Submit one pending request to the compatible warm A6000 host even while occupied, honoring the user instruction to keep bounded fleet queues.",
+  "wait_max_seconds": 2700,
+  "deadline_max_from_submission_seconds": 2700,
+  "gpu_total_seconds": 1000,
+  "cpu_total_seconds": 1200,
+  "prior_blocked_preparation_cpu_seconds": 50,
+  "additional_fresh_preparation_cpu_cap_seconds": 50,
+  "external_cpu_total_seconds": 400,
+  "external_cpu_after_both_preparations_seconds": 300,
+  "conditions": [
+    "repeat fresh host/jobs/source/cache/tool/input/affinity/space checks immediately before dispatch",
+    "GPU fleet atomic exclusive claim must wait for actual capacity; do not disturb foreign users",
+    "no earlier GPU request exists; submit only one new request, no replay",
+    "real spec normalize/hash and jobID persisted before ONE canonical45min wait",
+    "expiry, contention, correctness or budget failure stops; no replacement",
+    "remaining parent reservation already decremented prior50CPU; perjob cap nested, not double-reserved"
+  ]
+}
