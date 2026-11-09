@@ -18,6 +18,14 @@ from typing import Any
 TARGET = 'experiments.tennis.k5d_control_study'
 
 
+def kill_remaining_namespace() -> None:
+    """An empty owned namespace needs no signal; all other errors propagate."""
+    try:
+        os.kill(-1, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
+
+
 def worker_command(arguments: list[str]) -> list[str]:
     """Construct, rather than accept, the executable and worker entrypoint."""
     if (not arguments or any(not isinstance(x, str) or not x for x in arguments)
@@ -118,7 +126,7 @@ def supervise(arguments: list[str], timeout: float, outside_namespace: str) -> d
             reason = 'signal' if interrupted else 'timeout'
             # PID namespace init is excluded from kill(-1); kernel sends only
             # to processes in its namespace. The wrapper must verify isolation.
-            os.kill(-1, signal.SIGKILL)
+            kill_remaining_namespace()
         try:
             pid, raw = os.waitpid(-1, os.WNOHANG)
         except ChildProcessError:
@@ -129,7 +137,7 @@ def supervise(arguments: list[str], timeout: float, outside_namespace: str) -> d
                 status = os.waitstatus_to_exitcode(raw)
                 if status != 0 and not reason:
                     reason = 'worker_failed'
-                    os.kill(-1, signal.SIGKILL)
+                    kill_remaining_namespace()
         else:
             time.sleep(0.02)
     after = resource.getrusage(resource.RUSAGE_CHILDREN)

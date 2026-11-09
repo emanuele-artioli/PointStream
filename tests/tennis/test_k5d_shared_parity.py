@@ -56,13 +56,31 @@ def test_low_memory_claim_is_separate_and_preserves_margin():
         parity.check_resource_profile(spec, dispatch, requested=False, environ=env, low_memory=True)
 
 
-@pytest.mark.parametrize("low_memory", [False, True])
-def test_two_allocators_capped_before_allocation_and_child_env_propagates(tmp_path, monkeypatch, low_memory):
+def test_parent8_child2_claim_is_exact_and_independent():
+    spec, dispatch, env = claim()
+    spec['k5d_shared_parity_profile'] = parity.PARENT8_CHILD2_PROFILE
+    spec['gpu_memory_mib'] = 10240
+    env['PS_GPU_MEMORY_LIMIT_MIB'] = '10240'
+    parity.check_resource_profile(spec, dispatch, requested=True, environ=env, parent8_child2=True)
+    with pytest.raises(ValueError):
+        parity.check_resource_profile(spec, dispatch, requested=True, environ=env, low_memory=True)
+    with pytest.raises(ValueError, match='mutually exclusive'):
+        parity.check_resource_profile(spec, dispatch, requested=True, environ=env,
+                                      low_memory=True, parent8_child2=True)
+    with pytest.raises(ValueError):
+        parity.check_resource_profile({**spec, 'gpu_sharing': {**spec['gpu_sharing'], 'margin_mib': 4096}},
+                                      dispatch, requested=True, environ=env, parent8_child2=True)
+
+
+@pytest.mark.parametrize(("low_memory", "parent8_child2"), [(False, False), (True, False), (False, True)])
+def test_two_allocators_capped_before_allocation_and_child_env_propagates(tmp_path, monkeypatch, low_memory, parent8_child2):
     spec, _, env = claim()
     del spec
-    env['PS_K5D_SHARED_NUMERICAL'] = parity.LOW_MEMORY_PROFILE if low_memory else parity.SHARED_PROFILE
+    env['PS_K5D_SHARED_NUMERICAL'] = parity.LOW_MEMORY_PROFILE if low_memory else parity.PARENT8_CHILD2_PROFILE if parent8_child2 else parity.SHARED_PROFILE
     if low_memory:
         env['PS_GPU_MEMORY_LIMIT_MIB'] = '6144'
+    if parent8_child2:
+        env['PS_GPU_MEMORY_LIMIT_MIB'] = '10240'
     from pathlib import Path
     from experiments.tennis import k5d_scoped_namespace
     env['PS_SCRATCH_DIR'] = str(tmp_path)
@@ -83,13 +101,13 @@ def test_two_allocators_capped_before_allocation_and_child_env_propagates(tmp_pa
     receipt_dir.mkdir()
     env['PS_K5D_RESOURCE_RECEIPTS'] = str(receipt_dir)
     saved = {'OTHER': 'preserved'}
-    parity.configure_child_environment(saved, env, low_memory=low_memory)
+    parity.configure_child_environment(saved, env, low_memory=low_memory, parent8_child2=parent8_child2)
     assert saved == {key: value for key, value in env.items() if key not in ('PS_SCRATCH_DIR', 'PS_STAGE_DIR')} | {'OTHER': 'preserved'}
     saved['PS_SCRATCH_DIR'] = str(tmp_path)
     saved['PS_STAGE_DIR'] = env['PS_STAGE_DIR']
     parent, parent_calls = fake_torch()
     child, child_calls = fake_torch()
-    parent_receipt = parity.apply_parent_limit(parent, low_memory=low_memory)
+    parent_receipt = parity.apply_parent_limit(parent, low_memory=low_memory, parent8_child2=parent8_child2)
     import json
     (receipt_dir / 'parent.json').write_text(json.dumps(parent_receipt))
     plan = tmp_path / 'prepared-work/dcvc-0/plan.json'
@@ -101,7 +119,7 @@ def test_two_allocators_capped_before_allocation_and_child_env_propagates(tmp_pa
     child_file = next(receipt_dir.glob('child-*.json'))
     record = json.loads(child_file.read_text())
     with pytest.raises(ValueError, match='cover every'):
-        parity.validate_resource_receipts(receipt_dir, low_memory=low_memory)
+        parity.validate_resource_receipts(receipt_dir, low_memory=low_memory, parent8_child2=parent8_child2)
     expected = {(action, f'prepared-work/dcvc-{point}/plan.json')
                 for kind, point in parity.enc.POINTS if kind == 'dcvc' for action in ('encode', 'decode')}
     expected.update(('decode', f'coalesced-dcvc-{point}/receiver-plan.json')
@@ -113,15 +131,15 @@ def test_two_allocators_capped_before_allocation_and_child_env_propagates(tmp_pa
         value = {**record, 'pid': index, 'host_pid': index, 'start_ticks': index,
                  'action': action, 'plan': path}
         (receipt_dir / f'child-{index}.json').write_text(json.dumps(value))
-    parity.validate_resource_receipts(receipt_dir, low_memory=low_memory)
+    parity.validate_resource_receipts(receipt_dir, low_memory=low_memory, parent8_child2=parent8_child2)
     parent_receipt['budget_mib'] = 16384
     (receipt_dir / 'parent.json').write_text(json.dumps(parent_receipt))
     with pytest.raises(ValueError):
-        parity.validate_resource_receipts(receipt_dir, low_memory=low_memory)
+        parity.validate_resource_receipts(receipt_dir, low_memory=low_memory, parent8_child2=parent8_child2)
     assert parent_calls == [((4096 if low_memory else 8192) / (48 * 1024), 0)]
-    assert child_calls == [((2048 if low_memory else 8192) / (48 * 1024), 0)]
+    assert child_calls == [((2048 if low_memory or parent8_child2 else 8192) / (48 * 1024), 0)]
     with pytest.raises(ValueError):
-        parity.configure_child_environment({}, {**env, 'PS_GPU_SHARING': 'exclusive'}, low_memory=low_memory)
+        parity.configure_child_environment({}, {**env, 'PS_GPU_SHARING': 'exclusive'}, low_memory=low_memory, parent8_child2=parent8_child2)
 
 
 def test_child_default_and_invalid_caps_fail_closed():
