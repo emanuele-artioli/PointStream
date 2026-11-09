@@ -1,0 +1,149 @@
+{
+  "compression": {
+    "cpu_seconds": 0.412765,
+    "gzip_bytes": 5367278,
+    "gzip_sha256": "9db91a1ff5dd7b3d8c9d1f8a78993ed1fd3c6c8aee1933158f28fdf6b987ef50",
+    "source_bytes": 20797440,
+    "source_sha256": "d747b15f47dbddb72a94f4cf225338bd5cac0810a002d642e45227a80d69e8ba",
+    "wall_seconds": 0.42034091700043064
+  },
+  "cpu0_local_usage": {
+    "rc": 0,
+    "ssh_cpu": 0.018768,
+    "wall": 2.7808921669929987
+  },
+  "cpu0_probe": {
+    "allocations": 0,
+    "cpu0_available": true,
+    "host": "gpu5.itec.aau.at",
+    "local_free_bytes": 1469970354176,
+    "pgid": 619405,
+    "pid": 619405,
+    "self_cpu": 0.044929,
+    "time": 1794263199.0040991
+  },
+  "local_ssh_cpu_seconds": 0.199564,
+  "local_wrapper_cpu_seconds": 0.107683,
+  "manager_cpu_note": "manager/doctor aggregate not measured; full released ceiling proposed as conservative charge",
+  "postcheck_hosts": [
+    "gpu2",
+    "gpu5"
+  ],
+  "protected_content_read": false,
+  "raw_directory": "/private/tmp/pointstream-w8-7b519-sourceprep-20261109-a1",
+  "raw_file_sha256": {
+    "check.py": "0bf4ddee934372e528843667590281d2f1fc7f88b119380bafc54da841e7589d",
+    "compression.json": "55930dd87626a313ebfd24a62efc4d5cdc6ff23a9521635e5f435ea80465f4d1",
+    "cpu0-usage.json": "c03ec00e46958a22823d26bc1d02e722804b7e8cac2f74a7509d07b239bb1cca",
+    "cpu0.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "cpu0.stdout": "2f7cf001395cb7973e4aeb5990ee2191196091be03473972f4689cedb8e0ed24",
+    "doctor.json": "0386b69363560afefdfc83376774e46003a06e91675800e1120aea74f3abff34",
+    "doctor.pid": "345dad5114b3cd453211fb2463b2677b927fb8bed5528f041e0451dfd0f2dca2",
+    "doctor.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "intent.json": "da4984a745c6dbbc13a8a885dab01709288be61e026d5cd7555a10b7de4c9429",
+    "post-gpu2.local-start.json": "4b0bae4e6fbf9ee4f66eb1319ae42f915f798ea9b0ac20170617b9d80bb82fdd",
+    "post-gpu2.stderr": "9ec0f90cd19bcb4f3aa0452a41433887409289abccfcc8f37401f2d958ffab56",
+    "post-gpu2.stdout": "dd0c0ac78f5082bf77c07e91555ee82788737f122a133fa95a7ffe24874fb55f",
+    "post-gpu5.local-start.json": "3dab0feecc0709ab656a18e129f60b98ef2f5a9e10549ffb51aaed42a4346a63",
+    "post-gpu5.stderr": "08d0df5159906a5ac0696e615e5cbbadb16657cad36b73de35554bbbee3a2005",
+    "post-gpu5.stdout": "e128395dd6c5e9c5b703154c7c3e1db544ceeff6fe090951dbcb82cdf1541d7d",
+    "pre-gpu2.local-start.json": "45a5fde7eb845f576a2301b143f21c9eff6af5e221977471b108c98eab01c742",
+    "pre-gpu2.stderr": "ed2e3ed693b42371f9bf5c01f0a97b05145fb018df8deb575b48291b4500768c",
+    "pre-gpu2.stdout": "608fb0866580fc7361f0fe6c0491b6d7149b1216460b1d461c13f93f52d45579",
+    "pre-gpu5.local-start.json": "0a3288f2c57d1642e7e1512673e2a05501c2cc1ed4af48da801b89757c2b8921",
+    "pre-gpu5.stderr": "7724d8547bad64e32135181cf88a4192c4e434f8a6c0bba722e18115069bfd9e",
+    "pre-gpu5.stdout": "af9cf7c85a6c49ad5bb62a02ead5ecc118907adc2b6243ba39dc75ee5d377580",
+    "readiness-usage.json": "1069b6898d2c844ed6901beac2dfdd50012dba390b2bfb08c757220ac439dfdd",
+    "run.py": "5fa2d731a6d18a312e385bce595f8c2bebe7c367a429db37aba6a6ad0f9c771d",
+    "source.tar.gz": "9db91a1ff5dd7b3d8c9d1f8a78993ed1fd3c6c8aee1933158f28fdf6b987ef50",
+    "spec-normalized.json": "842f0c595d7eecda6d8895dc97e61e98055cc944df0e0dcf25045199e5b2eb96",
+    "spec-receipt.json": "18628f7ac4a4a62314ad68c46cea1e53ae10faf209d1759091ccea38470522bc",
+    "spec.json": "d90b2c58f9233fa247608a04c35e9f19a859372fa2d1baa92256f380af4e77ae",
+    "status.json": "fcd6838f0718a5cbe48aeee4516992d2404ae81ff1c9dc050c77b56ae2dbdb60",
+    "status.pid": "e03561822ee2eb2da08d5f6f890830660cfd611e01677a2cf70b09fb6ff4673e",
+    "status.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "upload.local-start.json": "64cd55f37c783384db8dd5a4fb5271fcfe8aac22ef482ca47364327d5cfe8432",
+    "upload.stderr": "bc2c23694a969d6c4d0e9b3aabbc9b8441a17d35483c22beff1c9bdbab752709",
+    "upload.stdout": "1f705475700daef4ed4b34164232fdee0a024d52e007823e48fe852af6009631",
+    "upload_sink.py": "6c6942cc5ae66dcb32f3de9ab44ebd5ea99c66dfe5971a01faad74e9ab28bd59",
+    "usage.json": "470bfbaa3ccd4f8dee2772d8f114ce0c9e90d15420ef8d5c382959fa0f6cf981",
+    "workers.json": "b364e4b90575b8f55d6c098e2005c4519d5f3086f933b48fe16c89e02cd2bdce",
+    "workers.pid": "24e5509714d0d5c2c547e5076151f4054cb7cd93ec32a61ca1383a0e7b0c809a",
+    "workers.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "readiness_usage": {
+    "manager_remote_cpu": "unmetered; conservative reserve required",
+    "rows": [
+      {
+        "exit_code": 0,
+        "local_waited_cpu": 0.28886599999999996,
+        "name": "status",
+        "wall": 14.587139666007715
+      },
+      {
+        "exit_code": 0,
+        "local_waited_cpu": 0.10361999999999996,
+        "name": "workers",
+        "wall": 2.959536666996428
+      },
+      {
+        "exit_code": 0,
+        "local_waited_cpu": 0.4478869999999999,
+        "name": "doctor",
+        "wall": 35.08181941699877
+      }
+    ]
+  },
+  "recommended_conservative_inclusive_charge": 30,
+  "remote_step_self_cpu_seconds": 0.589446,
+  "revision": "7b519d3e448135842fbd33e7007fffd1ea167a0f",
+  "schema": 1,
+  "scope": "source preparation only; no CPU proof or GPU",
+  "source": {
+    "bytes": 20797440,
+    "cpu_affinity": [
+      1
+    ],
+    "ctime_ns": 1794263168990299112,
+    "device": 58,
+    "inode": 41317794,
+    "mtime_ns": 1794263168990299112,
+    "pgid": 616572,
+    "pid": 616572,
+    "protected_content_read": false,
+    "scope": "fixed public source transfer only",
+    "self_cpu_seconds": 0.211593,
+    "sha256": "d747b15f47dbddb72a94f4cf225338bd5cac0810a002d642e45227a80d69e8ba",
+    "size": 20797440,
+    "target": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-7b519-20261109/source.tar",
+    "wall_seconds": 3.12014870159328
+  },
+  "spec_local_path": "/private/tmp/pointstream-w8-7b519-sourceprep-20261109-a1/spec.json",
+  "spec_normalized_local_path": "/private/tmp/pointstream-w8-7b519-sourceprep-20261109-a1/spec-normalized.json",
+  "spec_review_only": {
+    "bootstrap_sha256": "01f3fed31b45dbcaab880269f87d0578dcfcab960ee5a15fbcdcd790cec2dd5f",
+    "cpu_affinity_index": 0,
+    "deadline": "2026-11-09T23:07:04.670084Z",
+    "input_job_sha256": "7a0685ba0cc7405e1833d05075d4d591723da178b1afe71da31e5e95d6e85113",
+    "logical_spec_sha256": "9909d1c01254c881b19ec7017b58fbddbb4c3ecb7912d3bcb6d901b8e4979c90",
+    "normalized_file_sha256": "842f0c595d7eecda6d8895dc97e61e98055cc944df0e0dcf25045199e5b2eb96",
+    "phase_commands": {
+      "full": [
+        "{python}",
+        "-m",
+        "experiments.tennis.w8_witness_cpu_proof_job",
+        "noop"
+      ],
+      "smoke": [
+        "{python}",
+        "-m",
+        "experiments.tennis.w8_witness_cpu_proof_job",
+        "run"
+      ]
+    },
+    "raw_file_sha256": "d90b2c58f9233fa247608a04c35e9f19a859372fa2d1baa92256f380af4e77ae",
+    "scope": "review only; no submission; separate root execution release required",
+    "source_archive_sha256": "d747b15f47dbddb72a94f4cf225338bd5cac0810a002d642e45227a80d69e8ba",
+    "system_leaves_sha256": "82ad345c9f22115c9a06bbb9ec1244fb058e1149c458a55e998a272d766639f0"
+  }
+}
