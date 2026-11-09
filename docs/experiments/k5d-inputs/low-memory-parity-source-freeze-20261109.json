@@ -1,0 +1,55 @@
+{
+  "actual_source_bridge": "passed against actual retained H2 calibration archive; draft only, root independent review required",
+  "baseline_v1_revision": "df6eee829e56a1880397547f6d654eb47169c4f4",
+  "branch": "codex/k5d-low-memory-freeze-20261109",
+  "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "independent_verification": "12 focused tests passed and configured ruff passed in frozen checkout; actual-source CPU namespace proof and root scientific review remain required.",
+  "new_codec_sha256": "a2d04032b7bf4691939e754fb50399bb07d5107da0aaf07413568f665c80be61",
+  "not_qualified": [
+    "actual GPU allocator fit",
+    "numeric parity",
+    "timing",
+    "quality",
+    "full study"
+  ],
+  "old_codec_sha256": "d189b733c4fe18fa383ff4f193d7c2dc9ddc7a844275a8d59bc48684eee108e4",
+  "profile": {
+    "child_torch_mib": 2048,
+    "gpu_claim_mib": 6144,
+    "name": "k5d-parity16-shared-numerical-low-memory-v1",
+    "parent_torch_mib": 4096,
+    "scope": "16-frame exact numerical only; no timing, scale or cost evidence",
+    "unchanged_margin_mib": 8192
+  },
+  "prospective_cpu_proof": {
+    "audit": 30,
+    "campaign": 100,
+    "failure": 20,
+    "gpu_seconds": 0,
+    "inclusive_cpu_seconds": 300,
+    "postcampaign": 100,
+    "preparation": 50,
+    "root_release_required": true
+  },
+  "raw_paths": {
+    "archive": "/private/tmp/k5d-low-memory-freeze-review-20261109/consumer-source.tar",
+    "cpu_proof_proposal": "/private/tmp/k5d-low-memory-freeze-review-20261109/cpu-proof-proposal.json",
+    "directory": "/private/tmp/k5d-low-memory-freeze-review-20261109",
+    "git_blobs": "/private/tmp/k5d-low-memory-freeze-review-20261109/git-blobs.txt",
+    "h2_bridge": "/private/tmp/k5d-low-memory-freeze-review-20261109/bridge.json",
+    "v1_source_diff": "/private/tmp/k5d-low-memory-freeze-review-20261109/v1-diff.json"
+  },
+  "raw_sha256": {
+    "cpu_proof_proposal": "8a6bd87cc3f0c78b2d4d200b9c79f611d05acd436f16bba0eb1243d75741f1ac",
+    "git_blobs": "b6ce4fc3022bc98774971b5e05e9e052e593b7c4491b333b538303d2e3abbbbb",
+    "h2_bridge": "9c6e213f8c0e98d093d246312ad92915006696ec732a923fce9016e731b1f487",
+    "v1_source_diff": "fa812608a619e8b6115545f13bbefde00fade157153e66353d1a94c97695133c"
+  },
+  "resource_patch_sha256": "66c20e8c48776839cabddeac4aeec540e3f460002e25faefbf3a4e8b3ab16ddc",
+  "revision": "2602dd8a69500a80a5edf9a2e86a732e76eada01",
+  "schema": 1,
+  "snapshot_sha256": "55233e6bd0029ec3881f7e056a9d3939a0d200752f09caa3bf333a434ae70723",
+  "source_sha256": "4f3a78dccc4562b2dc8370e83f4f6e8b77ac473d01aa5493423be9bc1eef124a",
+  "status": "local frozen candidate only; no source upload, CPU proof or GPU execution released",
+  "worktree": "/private/tmp/pointstream-k5d-low-memory-freeze-20261109"
+}
