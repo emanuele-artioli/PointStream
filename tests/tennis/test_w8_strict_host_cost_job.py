@@ -360,19 +360,25 @@ def test_aa_pin_rejects_foreign_and_mixed_preloaded_origins(tmp_path, monkeypatc
 
 
 def test_witness_uses_pid_namespace_without_new_host_process_group(tmp_path, monkeypatch):
+    import json
     from types import SimpleNamespace
     from experiments.tennis import w8_witness_profile as witness
 
     calls = []
+    identity = {'host_pid': 1234, 'host_pgid': 77, 'start_ticks': 88}
     def launch(command, **kwargs):
         calls.append((command, kwargs))
         receipt = Path(command[command.index('--receipt') + 1])
         receipt.write_text('{}')
+        leaves = [{'name': f'/proc/self/{name}', 'resolved': f'/proc/1234/{name}',
+                   'self_process': dict(identity)} for name in ('maps', 'status')]
+        (receipt.parent / 'self-leaves.json').write_text(json.dumps(leaves))
         return SimpleNamespace(pid=123)
     monkeypatch.setattr(job.subprocess, 'Popen', launch)
     monkeypatch.setattr(job.receiver, 'wait_owned_worker', lambda proc, seconds: (0, False))
     monkeypatch.setattr(job.w8_clock_profile, 'write_parent_receipt', lambda path: 'clock-sha')
-    monkeypatch.setattr(witness, 'namespace_completion', lambda *_args, **_kwargs: {'children_cpu_seconds': 1.0})
+    monkeypatch.setattr(witness, 'namespace_completion', lambda *_args, **_kwargs: {
+        'children_cpu_seconds': 1.0, 'worker_host_identity': identity})
     monkeypatch.setenv('PS_STAGE_DIR', str(tmp_path / 'smoke'))
     readlink = job.os.readlink
     monkeypatch.setattr(job.os, 'readlink', lambda path: 'pid:[parent]' if str(path) == '/proc/self/ns/pid' else readlink(path))
@@ -380,7 +386,7 @@ def test_witness_uses_pid_namespace_without_new_host_process_group(tmp_path, mon
     loader.write_text('{}')
     work = tmp_path / 'model'
     work.mkdir()
-    job._worker(tmp_path / 'python', {'worker_kind': 'context_qualification'}, work, 100, 130,
+    job._worker(tmp_path / 'python', {'worker_kind': 'context_qualification', 'output': str(work / 'output')}, work, 100, 130,
                 tmp_path, loader, materialize_profile=True, clock_profile=True, witness_mode='context_qualification')
     command, kwargs = calls[0]
     assert command[:7] == ['/usr/bin/unshare', '--user', '--map-root-user', '--net', '--pid', '--fork', '--kill-child=SIGKILL']
