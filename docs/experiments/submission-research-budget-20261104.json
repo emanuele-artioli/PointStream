@@ -1159,6 +1159,15 @@
       "cpu_seconds": 100,
       "release_stage": "research-first24/28",
       "basis": "Rootaccepted actualdf6sourceCPUmechanismproof; 70roundedwholeonecorelifecyclewall61.0+30audit/admin=100futureCPU, prior50prep=>150inclusiveof300cap. All19observedPIDbirths/campaign/supervisorabsent,CPUclaimempty,eventACK. NoGPUparity/timing/scale/costqualification; aggregateadminCPUnotmeasured."
+    },
+    {
+      "phase": "k5d-shared-df6-parity16-readiness-20261109",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 30,
+      "release_stage": "research-first24/28",
+      "basis": "Authorizedconservative30CPUreadinessandtinynewaccepted6a4receiptupload/SHA. Allhostdoctor/jobs/claims; gpu2onlywarmeligibleA6000,one26388MiBfree>=16384+8192; gpu3cold/belowheadroomexcluded. Source447freshSHA; largecacheidentityfromstablemetadata+priorreceipts,notclaimedfreshbytechecks; canonicalstagingmustverifyallbytes. Inside1200CPUparityleaf,1170future remains,noGPUsubmittedyet."
     }
   ],
   "reservations": [
@@ -1677,8 +1686,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8770,
-      "cpu_seconds": 8540,
-      "status": "Remaining_unspent8770GPU8540CPU afterrootaccepteddf6nativeCPUproof150inclusive; noactiveBalljob/wait. SharedGPU16parity+292/586/full30stillrequireseparaterootrelease."
+      "cpu_seconds": 8510,
+      "status": "Remaining_unspent8770GPU8510CPU aftersharedGPU16readiness30charged. RootreleasesONEdf6sharednumericparity<=1000GPU1200CPUincl30prep/1170future; noactualGPUrequestIDyet. No timing/scale/cost/full30 promotion."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
