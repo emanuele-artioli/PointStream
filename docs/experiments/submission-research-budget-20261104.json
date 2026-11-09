@@ -1178,6 +1178,16 @@
       "witness_qualification": false,
       "release_stage": "research-first24/28",
       "basis": "Knownf6sourceprep prechecks stopped beforeupload atgpu5cachepresencechanged; target/source notcreated. Actualcompression0.412+wrapper0.067+localSSH0.054+gpu2remote0.077CPUplusunreportedgpu5process bounded4CPU=><=4.61; conservative6incladmin. Insidefutureprep30:24remain(14source/reconcile+10publicationreserve). No newjob/GPU/privatecontentopen."
+    },
+    {
+      "phase": "w8-f6-source-preparation-resume-20261109",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 2,
+      "witness_qualification": false,
+      "release_stage": "research-first24/28",
+      "basis": "Rootindependentlyreviewedf6metadata/upload/postpublichashreceiptsE652,bothhostprivatecontent_readfalse; solelyexpectedcd6nativecachepopulationfrompriorff6staging reconciledwithcurrentSHA. Remote0.55189+localwaitedSSH0.139089+localwrapper0.085867=~0.776846CPU, conservative2admin; priorprecheck6=>newprep8/30,22futureprep(inc10pubreserve). No CPUproofrequest/GPUyet."
     }
   ],
   "reservations": [
@@ -1761,8 +1771,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 4424,
-      "status": "Remaining_unspent4550GPU4424CPU afterfailedproof120inclusive andf6sourceprecheck6. F6cachednativepresence reconciliationbeforeupload; no replacementrequest. Prospective900CPUcumulative=120oldfailed+6newprep+774future(24prep600campaign100post50audit),0GPU; qualifiersunchanged."
+      "cpu_seconds": 4422,
+      "status": "Remaining_unspent4550GPU4422CPU; f6sourceE652uploaded/verified,bothfixedSHAs+allGitblobsreviewed/newprep8charged, oldfailedproof120. OneReplacement900cumulative includes772futureCPU(22prep600campaign100post50audit); rootexecutionreleasepending. NoGPUqualification/fullwitness."
     }
   ],
   "jobs": [
