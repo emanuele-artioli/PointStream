@@ -1392,6 +1392,15 @@
       "witness_qualification": false,
       "basis": "110rounded created-to-canonicalterminal106.632s upper includingqueue on singlecore plus20bounded audit/admin;30sourceprep already charged. Partial counters remain partial; allocation is not measured aggregate.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "gpu3-cache-warming-20261109",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "cpu_seconds": 120,
+      "gpu_seconds": 0,
+      "basis": "70 conservative one-core command lifetime upper for 68.012 s SSH elapsed, plus 20 fresh readiness/dispatch and 30 independent post audit; prior preflight 20 already charged. Admin not completely measured.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -1910,8 +1919,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8370,
-      "cpu_seconds": 7280,
-      "status": "Remaining_unspent8370GPU7280CPU; parent8readiness30charged; ONE1000GPU1170futureCPUparityreleased."
+      "cpu_seconds": 7160,
+      "status": "Remaining_unspent8370GPU7160CPU; GPU3warming120charged/140familyclosed; GPUparity70ebcompleteawaitingrootaudit; no scale release."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
