@@ -1,0 +1,68 @@
+{
+  "budget_proposal": {
+    "campaign_seconds": 800,
+    "cpu_inclusive_seconds": 1200,
+    "external_cpu_after_readiness_seconds": 370,
+    "forecast": {
+      "campaign_headroom_seconds": 114.414914,
+      "noop_allowance": 5,
+      "publication_source_cleanup_allowance": 50,
+      "qualification": "Historical exclusive timings are feasibility context, not a guarantee or a shared timing, throughput, scale or cost claim. Shared load, low cap OOM and extra cache work may fail within fixed limits.",
+      "reference_numerical_work_already_with_1_5": 417.370745,
+      "total_seconds": 685.585086,
+      "two_warm_staging_references_already_with_1_5": 183.214341,
+      "validator_allowance": 30
+    },
+    "full_noop_seconds": 5,
+    "gpu_inclusive_seconds": 1000,
+    "namespace_seconds": 580,
+    "postcampaign_gpu_seconds": 200,
+    "readiness_cpu_seconds": 30,
+    "smoke_seconds": 600,
+    "validator_seconds": 30
+  },
+  "deadline": "2026-11-09T21:28:59.304147Z",
+  "deadline_status": "provisional; refresh after review to <=45 minutes and record changed raw/normalized digests before any separately released submission",
+  "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "logical_inbox_digest": "831caf8a52eda4269399327d5590e45b959e36ffe9197ffb19d0aeae57e76269",
+  "native_cpu_root_receipt_sha256": "511c3c777f4866bb8a7b50180918a2f14be9dd9609c5e288cb58bbf9824c70f7",
+  "normalized_file_sha256": "2d329f1c28137f71b21e99b8fbe893744f957011ccd5fe5e6168373bfa3e906b",
+  "policy": {
+    "admission_margin_mib": 8192,
+    "child_torch_allocator_mib": 2048,
+    "claim_mib": 6144,
+    "contention": "continue",
+    "cpu_affinity_index": 0,
+    "host": [
+      "gpu2"
+    ],
+    "limits_caveat": "Torch allocator limits do not include contexts, driver or custom allocations; fleet reactive guard and margin apply. Fit and exact outputs remain unobserved.",
+    "parent_torch_allocator_mib": 4096,
+    "required_free_mib": 14336,
+    "resume_attempts": 0
+  },
+  "raw_spec_sha256": "6aa3cc32639b917b0191de32d07cdbfd5007e373eaa0320de4b33aa0ff6a8f04",
+  "readiness_request": {
+    "cpu_cap_seconds": 30,
+    "gpu_seconds": 0,
+    "includes": [
+      "fresh all-known-jobs and all-host doctor and worker status, no replay of prior expired requests",
+      "gpu2 CPU0 affinity, claims, memory headroom, free local disk and pinned runtime/native tools metadata",
+      "fresh SHA of source-cache archive and tiny accepted 511c receipt; upload receipt exactly once to proposed unique path with no overwrite and verify SHA",
+      "metadata presence and stable recorded prior identities for all GPU2 large input/runtime caches; do not rehash all multi-GiB inputs in readiness cap",
+      "verify exact frozen worktree/revision and spec; fresh deadline and normalized digest after root review"
+    ],
+    "not_claimed": "Large-file cache metadata is not a fresh content hash; actual scientific inputs, archives and environment must be hash verified in canonical staging inside campaign. No CPU/GPU job during readiness."
+  },
+  "receipt_proposed_remote_path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-20261104-inputs/low-memory-native-5331-root-accepted-511c3c77-20261109.json",
+  "receipt_remote_status": "not uploaded, unique path proposed",
+  "revision": "da98de4a37e58af56d850eddabebb81be0642e42",
+  "root_review_required": true,
+  "schema": 1,
+  "scope": "Six 16-frame native, wire, receiver pixel, full metric and judge arrays exactly equal registered control, and all 12 DCVC process resource receipts. Shared result supplies no timing, scale or cost evidence.",
+  "snapshot_sha256": "0fc1220f7aa82e7f0edfe637869cbfb5bbb1517e3cc5a51ad6e273702b03cfb1",
+  "source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/k5d-low-memory-da98-20261109/source.tar",
+  "source_sha256": "62b6c4904c627d770a3d0854dc850a8871097f0053e551563e8cb4c647cc3036",
+  "spec": "docs/experiments/k5d-inputs/low-memory-parity16-draft-spec-20261109.json",
+  "status": "local proposal only; readiness and upload separately require root release; no GPU submission"
+}
