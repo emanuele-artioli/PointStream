@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "decision": "Root releases ONE metadata and real Linux primitive preflight; NO warming/GPU",
+  "host": "gpu3",
+  "inclusive_CPU_ceiling": 20,
+  "GPU_ceiling": 0,
+  "parent_phase": "k5d-scale-first-tranche-20261105",
+  "prospective_warming_family_CPU_cap": 300,
+  "family_relationship": "20 preflight is inside, not additional to prospective300. Remaining280 not released.",
+  "source_revision": "02bf3b9d",
+  "helper_sha256": "44d3ba656cd6c2dfc073006e1465429ac20bf1add91ff331f5b6783965dd0350",
+  "scope": [
+    "Fresh known jobs/worker/CPU0 claim/affinity/local filesystem-space metadata; no process cancellation",
+    "Read ONLY metadata/member headers of three fixed stable extract=true archives from gpu3-warm-proposal.json; exact source stat, names/types/modes/expanded bytes, links/unsafe paths; do not extract/copy/hash bulk model bodies or environment",
+    "Transfer exact small helper/staging dependency only into a new task-private local-filesystem source path, no existing file overwrite",
+    "Exercise actual Linux no-replace primitive and full publisher on tiny task-owned synthetic files in new private/cache roots; existing/concurrent destination preservation, interruption/EXDEV/unsupported and executable-bit behavior; preserve artifacts",
+    "Report fixed archive compatibility, actual CPU and partial manager telemetry; no real cache mutation or fleet/pool/spec change"
+  ],
+  "stop": "Stop on mismatch/collision/symlink/partials/claim conflict/unsupported primitive/budget; no autonomous repair, warming, GPU, cache deletion or overwrite. Stage within45minutes and persist handles.",
+  "forecast": "<=20CPU inclusive allocation; helper/header/small primitive work not bulk input staging. No guarantee of future300CPU warming fit."
+}
