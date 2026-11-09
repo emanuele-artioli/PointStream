@@ -1237,6 +1237,16 @@
       "cpu_seconds": 50,
       "release_stage": "research-first24/28",
       "basis": "Fullauthorized50CPUnewda98sourcepreparation/readiness/inputZIP2.56GBfreshSHA/native/unshare/runtimechecks+gzipuploadandpublicpostSHA/admin. Measuredhost11.323+post.124+local.835+.346+.045partialCPU,remotegzip/dd8CPUeachbounded,administrationunmetered. Inside300CPUproofleaf50spent+250future; source0fcnewimmutablecacheverified,nojobyet."
+    },
+    {
+      "phase": "w8-f8-source-preparation-20261109",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 30,
+      "witness_qualification": false,
+      "release_stage": "research-first24/28",
+      "basis": "Fullauthorized30CPUsourcepreparationchargedratherthanownerproposed12; source/readiness/subprocesspartialCPU~2.2measured,managerCPUunmetered. Rootrehashesallrawreceiptfiles,verifiesstatfirstprivatecontentunopened/public476SHA/CD6andfixedspec. Existingpreviouslyacceptedgpu5CD6cachetransitiononly;nonewexception. Family238prior+30=268closed,832futureof1100proposal;nojob/GPUyet."
     }
   ],
   "reservations": [
@@ -1820,8 +1830,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 4312,
-      "status": "Remaining_unspent4550GPU4312CPU; finalselfleafmetadata/reaperoracleaccepted10CPU,no combinedproof/GPUrelease. Proof-family238CPUclosed."
+      "cpu_seconds": 4282,
+      "status": "Remaining_unspent4550GPU4282CPU; f8source476prepared/rootreviewed, family268closed; ONEfinalCPUproof1100cumulativehas832future,0GPU; no qualification/fullwitness."
     }
   ],
   "jobs": [
