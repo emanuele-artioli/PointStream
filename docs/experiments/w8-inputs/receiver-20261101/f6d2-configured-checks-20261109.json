@@ -1,0 +1,31 @@
+{
+  "archive_sha256": "e6527d02582402b637bf34f31ce5b661bef9b7e900d062ee77b78fc08e97f84c",
+  "checkout": "/private/tmp/pointstream-w8-a634-frozen-20261109",
+  "checks": {
+    "mypy": {
+      "command": "/private/tmp/pointstream-ci-pinned-20261105/bin/mypy --config-file pyproject.toml",
+      "exit_code": 0,
+      "local_log": "/private/tmp/w8-f6d2-mypy-20261109.log",
+      "sha256": "0720c5fd0fabaf1f766903f18a2dc4f34ce96472afd49e7509f272e3a81d35b6"
+    },
+    "pytest": {
+      "command": "/private/tmp/pointstream-ci-pinned-20261105/bin/python -m pytest",
+      "exit_code": 0,
+      "local_log": "/private/tmp/w8-f6d2-pytest-20261109.log",
+      "sha256": "8aac1ca28af3545869583d400ae484658d8d0a24d8539751a083cb41d8e7a44f"
+    },
+    "ruff": {
+      "command": "/private/tmp/pointstream-ci-pinned-20261105/bin/ruff check",
+      "exit_code": 0,
+      "local_log": "/private/tmp/w8-f6d2-ruff-20261109.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    }
+  },
+  "mypy_summary": "Success: no issues found in 561 source files",
+  "prior_a634_pytest_log": "/private/tmp/w8-a634-pytest-20261109.log",
+  "prior_a634_scope": "one obsolete import-side-effect regression failed; test-only correction in f6d2",
+  "pytest_summary": "2011 passed, 39 skipped",
+  "revision": "f6d2d8437aaf16c7e866e8ea846cc769e09dd922",
+  "schema": 1,
+  "scope": "local software checks, no GPU or scientific evidence"
+}

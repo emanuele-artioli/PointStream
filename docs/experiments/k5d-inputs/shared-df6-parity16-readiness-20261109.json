@@ -1,0 +1,112 @@
+{
+  "cpu_receipt_path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-20261104-inputs/shared-df6-native-bbde-root-accepted-6a4c7d3b-20261109.json",
+  "cpu_receipt_sha256": "6a4c7d3b29b6376a6262ec618394de89b785df6d1b18d87ac8e940aa1c1621a0",
+  "deadline": "2026-11-09T20:02:36.120866Z",
+  "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "excluded_hosts": {
+    "gpu3": "multiple large caches absent; 23183 MiB free below 24576 MiB threshold",
+    "gpu5/gpu6": "different GPU class"
+  },
+  "forecast": {
+    "campaign_ceiling_seconds": 800,
+    "campaign_headroom_seconds": 225.4863615,
+    "caveat": "The warm staging reference is historical and not a hard upper bound. Both smoke and full repeat input/environment verification; 2 \u00d7 61.071447 seconds is reserved in this forecast. Actual SHA work remains inside the 800-second campaign. Shared contention can slow execution; hard smoke/namespace limits stop overrun. The residual 42.857106 seconds for source/publication/cleanup after hard smoke and staging reference is a forecast, not a guaranteed bound; postcampaign/admin and audit draw separate inclusive reserves.",
+    "command_projection_seconds": 417.3707445,
+    "cpu_campaign_seconds": 800,
+    "cpu_inclusive_seconds": 1200,
+    "cpu_preparation_seconds": 30,
+    "cpu_remaining_external_seconds": 370,
+    "full_noop_reserved_seconds": 5,
+    "gpu_inclusive_seconds": 1000,
+    "gpu_postcampaign_reserve_seconds": 200,
+    "hard_smoke_plus_validator_noop_and_two_stage_staging_reference_seconds": 757.142894,
+    "hard_smoke_reference_residual_for_publication_source_cleanup_seconds": 42.857106,
+    "historical_command_seconds": 278.247163,
+    "historical_warm_staging_repetitions": 2,
+    "historical_warm_staging_seconds": 61.071447,
+    "margin_multiplier": 1.5,
+    "measured_reference_scope": "historical exclusive A6000 path; illustrative only, no prediction of shared-contention slowdown",
+    "namespace_limit_seconds": 580,
+    "projected_sum_seconds": 574.5136385,
+    "smoke_limit_seconds": 600,
+    "two_stage_warm_staging_reference_seconds": 122.142894,
+    "validator_reserved_seconds": 30
+  },
+  "hosts": [
+    "gpu2"
+  ],
+  "logical_inbox_digest": "fbc752f383dbe2e4507c46d179bef8dc2b9c4b82de61404f62772bf5ed1ed0a3",
+  "next_gate": "Root review exact source/spec/forecast then separate GPU release; refresh deadline and current claims/headroom before any submission.",
+  "normalized_spec_sha256": "4b386f41fbe7787e44bd9327ae8734baa61a1ee7309e2034c202fdc184858116",
+  "observed_gpu2": {
+    "excess_mib": 1812,
+    "foreign_processes_present": true,
+    "free_mib": 26388,
+    "index": 0,
+    "required_free_mib": 24576,
+    "uuid": "GPU-fc7e8fff-75be-4984-a185-fe8ce63edcd9"
+  },
+  "policy": {
+    "contention": "continue",
+    "dcvc_torch_cap_mib": 8192,
+    "declared_mib": 16384,
+    "margin_mib": 8192,
+    "outside_torch_cap": "CUDA contexts, driver and custom allocation; fleet guard and margin apply",
+    "parent_torch_cap_mib": 8192,
+    "profile": "k5d-parity16-shared-numerical-v1",
+    "resume_attempts": 0,
+    "valid_evidence": "16-frame numerical parity only; no timing, scale or cost promotion"
+  },
+  "raw_spec_sha256": "79c0b09d31de6dc8c6d038ec72f546651b47d9e486812760acb8e9ecfe3d39b5",
+  "readiness": {
+    "active_jobs": 0,
+    "all_known_jobs": 1643,
+    "doctor_passed": true,
+    "gpu2_cache_absent": [
+      "native_cpu_receipt small 2331-byte new file"
+    ],
+    "gpu2_cpu_claim_empty": true,
+    "gpu3_cache_absent": [
+      "archive",
+      "balltrack_code",
+      "balltrack_weight",
+      "wasb_code",
+      "wasb_weights",
+      "wasb_config",
+      "fidelity_gate",
+      "accepted16",
+      "native_cpu_receipt"
+    ],
+    "gpu3_cpu_claim_empty": true,
+    "multi_gib_input_checks": "warm cache presence and source stat only, no fresh large-file content hash; bbde actual ZIP hash reused as prior evidence; canonical staging must rehash",
+    "raw_paths": {
+      "doctor": "/private/tmp/k5d-shared16-readiness-doctor.json",
+      "gpu2": "/private/tmp/k5d-shared16-host-gpu2.json",
+      "gpu3": "/private/tmp/k5d-shared16-host-gpu3.json",
+      "jobs": "/private/tmp/k5d-shared16-readiness-jobs.json",
+      "workers": "/private/tmp/k5d-shared16-readiness-workers.json"
+    },
+    "raw_sha256": {
+      "doctor": "de314a4217e30ef0651f238a4770d9f54be8ed6e357a201922c19d8fa279ae03",
+      "gpu2": "bfa33093b6b25061069ca57a83f910ad7012bc7382c685381361281300fedfa6",
+      "gpu3": "4db92bedf1cf7a63934ae1ddb991efeae7d575ef498cd0f5a664c6f97d10653a",
+      "jobs": "f0b9961c1ebb3c2be567ad87d8d20a976d4ae2e112f7f7daf94d0ccc8d2f4042",
+      "workers": "2c7cbe86a3d5e6364586ce78c5d5f0567b854c098eb6c541d0b105b51834e554"
+    },
+    "receipt_fresh_sha_verified_on": [
+      "gpu2",
+      "gpu3"
+    ],
+    "source_cache_fresh_sha_verified_on": [
+      "gpu2",
+      "gpu3"
+    ]
+  },
+  "revision": "df6eee829e56a1880397547f6d654eb47169c4f4",
+  "schema": 1,
+  "snapshot_sha256": "4477693bd025e633a8d14a4f8f303576e41df4cd23420c083cedd967113ce463",
+  "source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/k5d-shared-df6-20261109/source.tar",
+  "source_sha256": "ac77730dc24ce123fa7dac7f9e2d65003e25a11fdbded29b05f77be9bef1b15b",
+  "spec_path": "docs/experiments/k5d-inputs/shared-df6-parity16-draft-spec-20261109.json",
+  "status": "readiness and prospective draft only; no GPU submission or release"
+}

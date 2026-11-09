@@ -8,11 +8,14 @@ from __future__ import annotations
 
 import json
 import re
+import resource as cpu_resource
 from pathlib import Path
 from typing import Any
 
-from experiments.tennis import w8_strict_host_cost_job as host
-from experiments.tennis import w8_input_job as fixed
+_CPU_LIMIT_BEFORE_IMPORTS = cpu_resource.getrlimit(cpu_resource.RLIMIT_CPU)
+from experiments.tennis import w8_strict_host_cost_job as host  # noqa: E402
+from experiments.tennis import w8_input_job as fixed  # noqa: E402
+_CPU_LIMIT_AFTER_IMPORTS = cpu_resource.getrlimit(cpu_resource.RLIMIT_CPU)
 
 CPU_SCOPE = 'root-reviewed W8 same-source CPU isolation and native lifecycle proof'
 REQUIRED_PROOFS = ('namespace_lifecycle', 'native_normal', 'native_timeout_kill', 'strict_modes', 'assessment_policy', 'independent_audit')
@@ -41,13 +44,13 @@ def _check_deadline(spec: dict[str, Any], *, reference_epoch: float | None = Non
         raise ValueError('45-minute recovery deadline required')
 
 
-def check_bootstrap_archive(stage: Path, dispatch: dict[str, Any], expected: str) -> None:
+def check_bootstrap_archive(stage: Path, dispatch: dict[str, Any], expected: str, input_sha: str) -> None:
     """Join the declared new bootstrap to the authenticated physical snapshot."""
     import hashlib
     import tarfile
 
     archive = stage.parent / 'source.tar'
-    if (not _sha(expected) or fixed.file_sha(archive) != dispatch.get('code', {}).get('snapshot_sha256')
+    if (not _sha(expected) or not _sha(input_sha) or fixed.file_sha(archive) != dispatch.get('code', {}).get('snapshot_sha256')
             or fixed.file_sha(Path(__file__).resolve().parent / 'w8_receiver_bootstrap.py') != expected):
         raise ValueError('witness source snapshot or bootstrap differs')
     with tarfile.open(archive) as tar:
@@ -55,6 +58,10 @@ def check_bootstrap_archive(stage: Path, dispatch: dict[str, Any], expected: str
         stream = tar.extractfile(entry) if entry.isfile() else None
         if stream is None or hashlib.sha256(stream.read()).hexdigest() != expected:
             raise ValueError('bootstrap member differs from authenticated snapshot')
+        entry = tar.getmember('experiments/tennis/w8_input_job.py')
+        stream = tar.extractfile(entry) if entry.isfile() else None
+        if stream is None or hashlib.sha256(stream.read()).hexdigest() != input_sha or fixed.file_sha(Path(fixed.__file__).resolve()) != input_sha:
+            raise ValueError('input module differs from authenticated snapshot')
 
 
 def check_cpu_gate(gate: dict[str, Any], *, gate_sha: str, expected_sha: str,
@@ -65,7 +72,7 @@ def check_cpu_gate(gate: dict[str, Any], *, gate_sha: str, expected_sha: str,
             or not _sha(source.get('source_sha256')) or not _sha(source.get('snapshot_sha256'))
             or not re.fullmatch(r'[0-9a-f]{40}', str(source.get('git_head')))
             or not _sha(environment_sha) or host_name not in ('gpu5', 'gpu6')
-            or not _sha(gate.get('bootstrap_sha256'))
+            or not _sha(gate.get('bootstrap_sha256')) or not _sha(gate.get('input_job_sha256'))
             or gate.get('source_sha256') != source.get('source_sha256')
             or gate.get('snapshot_sha256') != source.get('snapshot_sha256')
             or gate.get('revision') != source.get('git_head')
@@ -92,10 +99,11 @@ def load_inputs(stage: Path) -> tuple[dict[str, Path], dict[str, Any], dict[str,
     check_cpu_gate(proof, gate_sha=fixed.file_sha(paths['cpu_proof']),
                    expected_sha=spec['witness_cpu_proof_sha256'], source=code,
                    environment_sha=environment.get('sha256'), host_name=host_name)
-    if (spec.get('witness_bootstrap_sha256') != proof.get('bootstrap_sha256')
+    if (spec.get('witness_input_job_sha256') != proof.get('input_job_sha256')
+            or spec.get('witness_bootstrap_sha256') != proof.get('bootstrap_sha256')
             or fixed.file_sha(Path(__file__).resolve().parent / 'w8_receiver_bootstrap.py') != proof['bootstrap_sha256']):
         raise ValueError('actual witness bootstrap differs from CPU proof')
-    check_bootstrap_archive(stage, dispatch, proof['bootstrap_sha256'])
+    check_bootstrap_archive(stage, dispatch, proof['bootstrap_sha256'], proof['input_job_sha256'])
     return paths, spec, dispatch
 
 
@@ -150,9 +158,10 @@ def load_released_inputs(stage: Path) -> tuple[dict[str, Path], dict[str, Any], 
                    expected_sha=spec['witness_cpu_proof_sha256'], source=dispatch.get('code', {}),
                    environment_sha=dispatch.get('staged_environment', {}).get('sha256'),
                    host_name=(dispatch.get('environment') or {}).get('alias'))
-    if spec.get('witness_bootstrap_sha256') != proof.get('bootstrap_sha256'):
+    if (spec.get('witness_bootstrap_sha256') != proof.get('bootstrap_sha256')
+            or spec.get('witness_input_job_sha256') != proof.get('input_job_sha256')):
         raise ValueError('released witness bootstrap differs from CPU proof')
-    check_bootstrap_archive(stage, dispatch, proof['bootstrap_sha256'])
+    check_bootstrap_archive(stage, dispatch, proof['bootstrap_sha256'], proof['input_job_sha256'])
     return paths, spec, dispatch
 
 
@@ -376,6 +385,7 @@ def _pilot_spec(spec: dict[str, Any], *, unit1: bool = False, reference_epoch: f
             or spec.get('gpu_sharing') != {'mode': 'exclusive'}
             or spec.get('witness_cpu_proof_host') not in ('gpu5', 'gpu6')
             or not _sha(spec.get('witness_bootstrap_sha256'))
+            or not _sha(spec.get('witness_input_job_sha256'))
             or spec.get('hosts') != [spec.get('witness_cpu_proof_host')]
             or spec.get('single_cpu_campaign') is not True or spec.get('cpu_threads') != 1
             or spec.get('contention', {}).get('policy') != 'stop'
@@ -449,7 +459,6 @@ def _candidate_spec(spec: dict[str, Any], *, unit1: bool, reference_epoch: float
 def run_pilot(stage: Path, *, unit1: bool = False, candidate: bool = False) -> None:
     """One selected context or full candidate, each separately gated."""
     import os
-    import resource
     import sys
     import time
     from experiments.tennis import w8_witness_profile as witness
@@ -470,9 +479,10 @@ def run_pilot(stage: Path, *, unit1: bool = False, candidate: bool = False) -> N
     else:
         check_first_pilot_stage(paths, spec)
     caps = spec['witness_caps']
-    # Preserve the existing cost launcher's hard limit so each child can
-    # independently install its reviewed soft CPU cap before isolation.
-    resource.setrlimit(resource.RLIMIT_CPU, (caps['parent_cpu'], 3600))
+    if _CPU_LIMIT_BEFORE_IMPORTS != _CPU_LIMIT_AFTER_IMPORTS:
+        raise ValueError('CPU limit changed during witness imports')
+    cpu_limit = fixed.set_cpu_soft_limit(caps['parent_cpu'],
+        required_child=max(caps['packet_cpu'], caps['generator_cpu']))
     if (spec.get('clock_policy_profile') != host.w8_clock_profile.PROFILE
             or spec.get('clock_reference_audit_sha256') != host.CLOCK_AUDIT_SHA
             or spec.get('materialization_profile') != host.folder_profile.PROFILE
@@ -521,7 +531,9 @@ def run_pilot(stage: Path, *, unit1: bool = False, candidate: bool = False) -> N
                 tar.add(retained / name, arcname=name, recursive=False)
         raw.flush()
         os.fsync(raw.fileno())
-    summary = {'scope': 'candidate' if candidate else 'context_qualification_only', 'unit': unit, 'quality_claim': False,
+    summary = {'cpu_limit_telemetry': {'before_imports': list(_CPU_LIMIT_BEFORE_IMPORTS),
+               'after_imports': list(_CPU_LIMIT_AFTER_IMPORTS), 'setup': cpu_limit},
+               'scope': 'candidate' if candidate else 'context_qualification_only', 'unit': unit, 'quality_claim': False,
                'automatic_promotion': False, 'expected': result['expected'][unit],
                'validation': result['validation'][unit], 'generation_usage': result['usage'][unit],
                'packet_usage': prepared['packet_usage'], 'cpu_gate_sha256': fixed.file_sha(paths['cpu_proof']),
@@ -791,6 +803,7 @@ def make_pilot_spec(*, deadline: str, proof_local: Path, proof_remote: str,
     spec['hosts'] = [gate['host']]
     spec['witness_cpu_proof_sha256'] = digest
     spec['witness_bootstrap_sha256'] = gate['bootstrap_sha256']
+    spec['witness_input_job_sha256'] = gate['input_job_sha256']
     spec['clock_policy_profile'] = host.w8_clock_profile.PROFILE
     spec['clock_reference_audit_sha256'] = host.CLOCK_AUDIT_SHA
     spec['validator'] = ['{python}', '-m', 'experiments.tennis.w8_witness_job', 'validate']
@@ -1198,7 +1211,6 @@ def validate_finish_readiness(stage: Path, target: Path) -> None:
 
 def run_finish(stage: Path, *, qualification: bool) -> None:
     import os
-    import resource
     import sys
     import time
     from experiments.tennis import w8_witness_profile as witness
@@ -1211,7 +1223,10 @@ def run_finish(stage: Path, *, qualification: bool) -> None:
     _unit1_promotion(paths, spec, dispatch)
     finish_readiness(stage, loaded=(paths, spec, dispatch))
     caps = spec['witness_caps']
-    resource.setrlimit(resource.RLIMIT_CPU, (caps['parent_cpu'], 3600))
+    if _CPU_LIMIT_BEFORE_IMPORTS != _CPU_LIMIT_AFTER_IMPORTS:
+        raise ValueError('CPU limit changed during witness imports')
+    cpu_limit = fixed.set_cpu_soft_limit(caps['parent_cpu'],
+        required_child=max(caps['packet_cpu'], caps['native_cpu'], caps['worker_cpu']))
     host.require_gpu_uuid_api(__import__('torch'))
     prepared = host.prepare_receiver_inputs(paths, spec, packet_cpu=caps['packet_cpu'],
         materialize_profile=True, clock_profile=True, digests=host.StableDigests(), witness=True)
@@ -1258,7 +1273,9 @@ def run_finish(stage: Path, *, qualification: bool) -> None:
     with (retained / 'source-manifest.json').open('x') as stream:
         json.dump(prepared['code_manifest'], stream, sort_keys=True)
     named['source-manifest.json'] = retained / 'source-manifest.json'
-    summary = {'scope': 'context_qualification_only' if qualification else 'candidate',
+    summary = {'cpu_limit_telemetry': {'before_imports': list(_CPU_LIMIT_BEFORE_IMPORTS),
+               'after_imports': list(_CPU_LIMIT_AFTER_IMPORTS), 'setup': cpu_limit},
+               'scope': 'context_qualification_only' if qualification else 'candidate',
                'producer_audit_sha256': fixed.file_sha(paths['producer_audit']),
                'members': {name: fixed.file_sha(retained / name) for name in named},
                'expected': generations['expected'], 'trusted': result['trusted'], 'validation': result['validation'],

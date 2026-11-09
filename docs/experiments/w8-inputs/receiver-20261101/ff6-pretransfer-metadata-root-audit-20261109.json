@@ -1,0 +1,673 @@
+{
+  "schema": 1,
+  "decision": "accept_metadata_only_pretransfer_observations",
+  "source_revision": "ff6ae97cbb84dc870283e697e2763c1f62cf78f8",
+  "raw_sha256": {
+    "intent.json": "974569733e011833b72a67bf8388bc2fa763d902b048343ec99971d2ab4ad4a9",
+    "gpu2.stdout": "224402f16ec35c7796d28e99bb08dfb852c1d1ebc74e890713458269178b5184",
+    "gpu2.stderr": "dc7f50676e9ac466ffc9da005357894e824e132916ccf98fab8f95bcd3de1cb4",
+    "gpu5.stderr": "9f4c80ecb7b30874d558e43ecd087a22e37979d0178f94f400553fd2424d44a2",
+    "wrapper-usage.json": "3bae8dda7e5f1274dbf5752f5c3dde28bdab89f43a52a77f270c56ee41323777",
+    "gpu5.stdout": "c139d309bdd96bb6db4ad28c35986c4529364df77fc2ce45c4c83b1c2f3e3e1d"
+  },
+  "observations": {
+    "gpu2": {
+      "content_verified_now": false,
+      "controller_release_metadata": [
+        {
+          "content_verified_now": false,
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261105T031637Z-2503bb20/experiments/__init__.py",
+          "stamp": {
+            "ctime_ns": 1793848613671688465,
+            "device": 2097343,
+            "inode": 39704012,
+            "mtime_ns": 1793848004000000000,
+            "size": 154
+          }
+        },
+        {
+          "content_verified_now": false,
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261105T031637Z-2503bb20/experiments/jobs/__init__.py",
+          "stamp": {
+            "ctime_ns": 1793848613687688680,
+            "device": 2097343,
+            "inode": 39701214,
+            "mtime_ns": 1793848004000000000,
+            "size": 65
+          }
+        },
+        {
+          "content_verified_now": false,
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261105T031637Z-2503bb20/experiments/jobs/inbox.py",
+          "stamp": {
+            "ctime_ns": 1793848613746689473,
+            "device": 2097343,
+            "inode": 39701215,
+            "mtime_ns": 1793848004000000000,
+            "size": 97241
+          }
+        },
+        {
+          "content_verified_now": false,
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261105T031637Z-2503bb20/experiments/jobs/monitor.py",
+          "stamp": {
+            "ctime_ns": 1793848613755689594,
+            "device": 2097343,
+            "inode": 39704307,
+            "mtime_ns": 1793848004000000000,
+            "size": 35589
+          }
+        },
+        {
+          "content_verified_now": false,
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261105T031637Z-2503bb20/experiments/jobs/claims.py",
+          "stamp": {
+            "ctime_ns": 1793848613706688936,
+            "device": 2097343,
+            "inode": 39705999,
+            "mtime_ns": 1793848004000000000,
+            "size": 55947
+          }
+        },
+        {
+          "content_verified_now": false,
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261105T031637Z-2503bb20/experiments/jobs/fleet.py",
+          "stamp": {
+            "ctime_ns": 1793848613727689218,
+            "device": 2097343,
+            "inode": 39703897,
+            "mtime_ns": 1793848004000000000,
+            "size": 42661
+          }
+        },
+        {
+          "content_verified_now": false,
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261105T031637Z-2503bb20/experiments/jobs/staging.py",
+          "stamp": {
+            "ctime_ns": 1793848613765689729,
+            "device": 2097343,
+            "inode": 39704308,
+            "mtime_ns": 1793848004000000000,
+            "size": 14135
+          }
+        }
+      ],
+      "cpu_affinity": [
+        0
+      ],
+      "declared": [
+        {
+          "content_verified_now": false,
+          "expected_sha256": "eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4",
+          "expected_state": "present",
+          "observed_state": "present",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-linux-input-20261101-eff1aca8/packet-eff1aca8.psw8",
+          "role": "packet",
+          "stamp": {
+            "ctime_ns": 1793523081845522893,
+            "device": 2097343,
+            "inode": 20098919,
+            "mtime_ns": 1793523080578505901,
+            "size": 2289836
+          }
+        },
+        {
+          "content_verified_now": false,
+          "expected_sha256": "bec98d67280e9f777a0d3cc110baa51ae2bf2c876aefe6b247d9691432f61107",
+          "expected_state": "present",
+          "observed_state": "present",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-linux-input-20261101-eff1aca8/profile-bec98d67.json",
+          "role": "profile",
+          "stamp": {
+            "ctime_ns": 1793523083561545907,
+            "device": 2097343,
+            "inode": 20102588,
+            "mtime_ns": 1793523083450544418,
+            "size": 4869
+          }
+        },
+        {
+          "content_verified_now": false,
+          "expected_sha256": "8047b67694dd64171d2c0d13a9eaff53b18cd833b8fdc45ba054185c382848cc",
+          "expected_state": "present",
+          "observed_state": "present",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/oracle.json",
+          "role": "oracle",
+          "stamp": {
+            "ctime_ns": 1793540327824318589,
+            "device": 2097343,
+            "inode": 20111808,
+            "mtime_ns": 1793540327805318333,
+            "size": 145765
+          }
+        },
+        {
+          "content_verified_now": false,
+          "expected_sha256": "ab5f1b932918ae9956f6ef648e36e59c6a1fd9ef6c36a1722a1916b0da63a4c5",
+          "expected_state": "present",
+          "observed_state": "present",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/bundle.json",
+          "role": "preflight",
+          "stamp": {
+            "ctime_ns": 1793540327375312530,
+            "device": 2097343,
+            "inode": 20109105,
+            "mtime_ns": 1793540327337312017,
+            "size": 36391
+          }
+        },
+        {
+          "content_verified_now": false,
+          "expected_sha256": "0953c5284ee8dc462d4eb95b7ce49cb9bad68e4d612fce5d167706f954668ebe",
+          "expected_state": "present",
+          "observed_state": "present",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/identity.json",
+          "role": "identity",
+          "stamp": {
+            "ctime_ns": 1793540327733317361,
+            "device": 2097343,
+            "inode": 20110958,
+            "mtime_ns": 1793540327694316835,
+            "size": 67065
+          }
+        },
+        {
+          "content_verified_now": false,
+          "expected_sha256": "1a8b7c1b4db92980fd977b4fd003c1396bbae9a9cdea00c35d452136d5e4f488",
+          "expected_state": "present",
+          "observed_state": "present",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/pose_guider.pth",
+          "role": "guider",
+          "stamp": {
+            "ctime_ns": 1792672030343248779,
+            "device": 2097343,
+            "inode": 5953969,
+            "mtime_ns": 1770288622494565972,
+            "size": 4351337
+          }
+        },
+        {
+          "content_verified_now": false,
+          "expected_sha256": "cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b",
+          "expected_state": "absent",
+          "observed_state": "absent",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/w8-witness-20261109/native-v4-receipt-cd6bb8cf.json",
+          "role": "native_inventory"
+        },
+        {
+          "content_verified_now": false,
+          "expected_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+          "expected_state": "present",
+          "observed_state": "present",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+          "role": "main_environment",
+          "stamp": {
+            "ctime_ns": 1791582224027510526,
+            "device": 2097343,
+            "inode": 33649087,
+            "mtime_ns": 1791582198712166172,
+            "size": 4936811281
+          }
+        },
+        {
+          "content_verified_now": false,
+          "expected_sha256": "9e96b6764c2801c751cb583e6006002b6fb842815d8aeb1ddc61a2e4560fa70d",
+          "expected_state": "absent",
+          "observed_state": "absent",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-ff6-20261109/source.tar",
+          "role": "future_source_archive"
+        }
+      ],
+      "hostname": "gpu2.itec.aau.at",
+      "limitations": "trusted cooperative filesystem; metadata check does not prevent later substitution; missing paths require separate approved preparation",
+      "local_cache_metadata": {},
+      "management_python_reference": "/usr/bin/python3",
+      "pgid": 1439951,
+      "pid": 1439951,
+      "placeholder_spec_sha256_reference": "1ea1446c1a6173ff29b31dbd705bde87f06b643c45fc517cae9449bfd9416bc4",
+      "protected": {
+        "fit": {
+          "ctime_ns": 1793460422330291933,
+          "device": 2097343,
+          "inode": 5567094,
+          "mtime_ns": 1793460422330291933,
+          "size": 15134720
+        },
+        "golden": {
+          "ctime_ns": 1793465848373134669,
+          "device": 2097343,
+          "inode": 5554733,
+          "mtime_ns": 1793465848373134669,
+          "size": 94740480
+        },
+        "masks": {
+          "ctime_ns": 1793467944889287440,
+          "device": 2097343,
+          "inode": 20090395,
+          "mtime_ns": 1793467944889287440,
+          "size": 276480
+        },
+        "prepared": {
+          "ctime_ns": 1793463916456182036,
+          "device": 2097343,
+          "inode": 20088721,
+          "mtime_ns": 1793463916456182036,
+          "size": 7505920
+        },
+        "source": {
+          "ctime_ns": 1793455910958829848,
+          "device": 2097343,
+          "inode": 5567065,
+          "mtime_ns": 1793455910958829848,
+          "size": 78396317
+        }
+      },
+      "role": "management-gpu2",
+      "schema": 1,
+      "scope": "proposed pretransfer metadata observation only; no content checked",
+      "self_cpu_seconds": 0.10789699999999999,
+      "source_archive_sha256_reference": "9e96b6764c2801c751cb583e6006002b6fb842815d8aeb1ddc61a2e4560fa70d",
+      "source_revision": "ff6ae97cbb84dc870283e697e2763c1f62cf78f8",
+      "wall_seconds": 0.7524971454404294
+    },
+    "gpu5": {
+      "content_verified_now": false,
+      "controller_release_metadata": [
+        {
+          "content_verified_now": false,
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261105T031637Z-2503bb20/experiments/__init__.py",
+          "stamp": {
+            "ctime_ns": 1793848613671688465,
+            "device": 58,
+            "inode": 39704012,
+            "mtime_ns": 1793848004000000000,
+            "size": 154
+          }
+        },
+        {
+          "content_verified_now": false,
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261105T031637Z-2503bb20/experiments/jobs/__init__.py",
+          "stamp": {
+            "ctime_ns": 1793848613687688680,
+            "device": 58,
+            "inode": 39701214,
+            "mtime_ns": 1793848004000000000,
+            "size": 65
+          }
+        },
+        {
+          "content_verified_now": false,
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261105T031637Z-2503bb20/experiments/jobs/inbox.py",
+          "stamp": {
+            "ctime_ns": 1793848613746689473,
+            "device": 58,
+            "inode": 39701215,
+            "mtime_ns": 1793848004000000000,
+            "size": 97241
+          }
+        },
+        {
+          "content_verified_now": false,
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261105T031637Z-2503bb20/experiments/jobs/monitor.py",
+          "stamp": {
+            "ctime_ns": 1793848613755689594,
+            "device": 58,
+            "inode": 39704307,
+            "mtime_ns": 1793848004000000000,
+            "size": 35589
+          }
+        },
+        {
+          "content_verified_now": false,
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261105T031637Z-2503bb20/experiments/jobs/claims.py",
+          "stamp": {
+            "ctime_ns": 1793848613706688936,
+            "device": 58,
+            "inode": 39705999,
+            "mtime_ns": 1793848004000000000,
+            "size": 55947
+          }
+        },
+        {
+          "content_verified_now": false,
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261105T031637Z-2503bb20/experiments/jobs/fleet.py",
+          "stamp": {
+            "ctime_ns": 1793848613727689218,
+            "device": 58,
+            "inode": 39703897,
+            "mtime_ns": 1793848004000000000,
+            "size": 42661
+          }
+        },
+        {
+          "content_verified_now": false,
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261105T031637Z-2503bb20/experiments/jobs/staging.py",
+          "stamp": {
+            "ctime_ns": 1793848613765689729,
+            "device": 58,
+            "inode": 39704308,
+            "mtime_ns": 1793848004000000000,
+            "size": 14135
+          }
+        }
+      ],
+      "cpu_affinity": [
+        0
+      ],
+      "declared": [
+        {
+          "content_verified_now": false,
+          "expected_sha256": "eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4",
+          "expected_state": "present",
+          "observed_state": "present",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-linux-input-20261101-eff1aca8/packet-eff1aca8.psw8",
+          "role": "packet",
+          "stamp": {
+            "ctime_ns": 1793523081845522893,
+            "device": 58,
+            "inode": 20098919,
+            "mtime_ns": 1793523080578505901,
+            "size": 2289836
+          }
+        },
+        {
+          "content_verified_now": false,
+          "expected_sha256": "bec98d67280e9f777a0d3cc110baa51ae2bf2c876aefe6b247d9691432f61107",
+          "expected_state": "present",
+          "observed_state": "present",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-linux-input-20261101-eff1aca8/profile-bec98d67.json",
+          "role": "profile",
+          "stamp": {
+            "ctime_ns": 1793523083561545907,
+            "device": 58,
+            "inode": 20102588,
+            "mtime_ns": 1793523083450544418,
+            "size": 4869
+          }
+        },
+        {
+          "content_verified_now": false,
+          "expected_sha256": "8047b67694dd64171d2c0d13a9eaff53b18cd833b8fdc45ba054185c382848cc",
+          "expected_state": "present",
+          "observed_state": "present",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/oracle.json",
+          "role": "oracle",
+          "stamp": {
+            "ctime_ns": 1793540327824318589,
+            "device": 58,
+            "inode": 20111808,
+            "mtime_ns": 1793540327805318333,
+            "size": 145765
+          }
+        },
+        {
+          "content_verified_now": false,
+          "expected_sha256": "ab5f1b932918ae9956f6ef648e36e59c6a1fd9ef6c36a1722a1916b0da63a4c5",
+          "expected_state": "present",
+          "observed_state": "present",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/bundle.json",
+          "role": "preflight",
+          "stamp": {
+            "ctime_ns": 1793540327375312530,
+            "device": 58,
+            "inode": 20109105,
+            "mtime_ns": 1793540327337312017,
+            "size": 36391
+          }
+        },
+        {
+          "content_verified_now": false,
+          "expected_sha256": "0953c5284ee8dc462d4eb95b7ce49cb9bad68e4d612fce5d167706f954668ebe",
+          "expected_state": "present",
+          "observed_state": "present",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/identity.json",
+          "role": "identity",
+          "stamp": {
+            "ctime_ns": 1793540327733317361,
+            "device": 58,
+            "inode": 20110958,
+            "mtime_ns": 1793540327694316835,
+            "size": 67065
+          }
+        },
+        {
+          "content_verified_now": false,
+          "expected_sha256": "1a8b7c1b4db92980fd977b4fd003c1396bbae9a9cdea00c35d452136d5e4f488",
+          "expected_state": "present",
+          "observed_state": "present",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/pose_guider.pth",
+          "role": "guider",
+          "stamp": {
+            "ctime_ns": 1792672030343248779,
+            "device": 58,
+            "inode": 5953969,
+            "mtime_ns": 1770288622494565972,
+            "size": 4351337
+          }
+        },
+        {
+          "content_verified_now": false,
+          "expected_sha256": "cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b",
+          "expected_state": "absent",
+          "observed_state": "absent",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/w8-witness-20261109/native-v4-receipt-cd6bb8cf.json",
+          "role": "native_inventory"
+        },
+        {
+          "content_verified_now": false,
+          "expected_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+          "expected_state": "present",
+          "observed_state": "present",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+          "role": "main_environment",
+          "stamp": {
+            "ctime_ns": 1791582224027510526,
+            "device": 58,
+            "inode": 33649087,
+            "mtime_ns": 1791582198712166172,
+            "size": 4936811281
+          }
+        },
+        {
+          "content_verified_now": false,
+          "expected_sha256": "9e96b6764c2801c751cb583e6006002b6fb842815d8aeb1ddc61a2e4560fa70d",
+          "expected_state": "absent",
+          "observed_state": "absent",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-ff6-20261109/source.tar",
+          "role": "future_source_archive"
+        }
+      ],
+      "hostname": "gpu5.itec.aau.at",
+      "limitations": "trusted cooperative filesystem; metadata check does not prevent later substitution; missing paths require separate approved preparation",
+      "local_cache_metadata": {
+        "input:guider": {
+          "path": "/local/users/emanuele/pointstream/cache/1a8b7c1b4db92980fd977b4fd003c1396bbae9a9cdea00c35d452136d5e4f488/pose_guider.pth",
+          "stamp": {
+            "ctime_ns": 1793350116030242193,
+            "device": 64513,
+            "inode": 72024572,
+            "mtime_ns": 1793350116024241880,
+            "size": 4351337
+          },
+          "state": "present"
+        },
+        "input:identity": {
+          "path": "/local/users/emanuele/pointstream/cache/0953c5284ee8dc462d4eb95b7ce49cb9bad68e4d612fce5d167706f954668ebe/identity.json",
+          "stamp": {
+            "ctime_ns": 1793854838532061551,
+            "device": 64513,
+            "inode": 72231215,
+            "mtime_ns": 1793854838531061499,
+            "size": 67065
+          },
+          "state": "present"
+        },
+        "input:main_environment": {
+          "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/pointstream-20261009T214002Z.tar.gz",
+          "stamp": {
+            "ctime_ns": 1793214954658561865,
+            "device": 64513,
+            "inode": 63185450,
+            "mtime_ns": 1793214954511554207,
+            "size": 4936811281
+          },
+          "state": "present"
+        },
+        "input:native_inventory": {
+          "path": "/local/users/emanuele/pointstream/cache/cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b/native-v4-receipt-cd6bb8cf.json",
+          "state": "missing"
+        },
+        "input:oracle": {
+          "path": "/local/users/emanuele/pointstream/cache/8047b67694dd64171d2c0d13a9eaff53b18cd833b8fdc45ba054185c382848cc/oracle.json",
+          "stamp": {
+            "ctime_ns": 1793854838529061395,
+            "device": 64513,
+            "inode": 72231211,
+            "mtime_ns": 1793854838527061291,
+            "size": 145765
+          },
+          "state": "present"
+        },
+        "input:packet": {
+          "path": "/local/users/emanuele/pointstream/cache/eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4/packet-eff1aca8.psw8",
+          "stamp": {
+            "ctime_ns": 1793523276018914041,
+            "device": 64513,
+            "inode": 72166689,
+            "mtime_ns": 1793523276013913783,
+            "size": 2289836
+          },
+          "state": "present"
+        },
+        "input:preflight": {
+          "path": "/local/users/emanuele/pointstream/cache/ab5f1b932918ae9956f6ef648e36e59c6a1fd9ef6c36a1722a1916b0da63a4c5/bundle.json",
+          "stamp": {
+            "ctime_ns": 1793854838531061499,
+            "device": 64513,
+            "inode": 72231213,
+            "mtime_ns": 1793854838530061447,
+            "size": 36391
+          },
+          "state": "present"
+        },
+        "input:profile": {
+          "path": "/local/users/emanuele/pointstream/cache/bec98d67280e9f777a0d3cc110baa51ae2bf2c876aefe6b247d9691432f61107/profile-bec98d67.json",
+          "stamp": {
+            "ctime_ns": 1793523276019914092,
+            "device": 64513,
+            "inode": 72166691,
+            "mtime_ns": 1793523276019914092,
+            "size": 4869
+          },
+          "state": "present"
+        },
+        "jcv": {
+          "path": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree",
+          "stamp": {
+            "ctime_ns": 1793350575899217420,
+            "device": 64513,
+            "inode": 72024583,
+            "mtime_ns": 1791795104000000000,
+            "size": 4096
+          },
+          "state": "present"
+        },
+        "main": {
+          "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree",
+          "stamp": {
+            "ctime_ns": 1793215076693918841,
+            "device": 64513,
+            "inode": 63185451,
+            "mtime_ns": 1791286349000000000,
+            "size": 4096
+          },
+          "state": "present"
+        }
+      },
+      "management_python_reference": "/usr/bin/python3",
+      "pgid": 3151210,
+      "pid": 3151210,
+      "placeholder_spec_sha256_reference": "1ea1446c1a6173ff29b31dbd705bde87f06b643c45fc517cae9449bfd9416bc4",
+      "protected": {
+        "fit": {
+          "ctime_ns": 1793460422330291933,
+          "device": 58,
+          "inode": 5567094,
+          "mtime_ns": 1793460422330291933,
+          "size": 15134720
+        },
+        "golden": {
+          "ctime_ns": 1793465848373134669,
+          "device": 58,
+          "inode": 5554733,
+          "mtime_ns": 1793465848373134669,
+          "size": 94740480
+        },
+        "masks": {
+          "ctime_ns": 1793467944889287440,
+          "device": 58,
+          "inode": 20090395,
+          "mtime_ns": 1793467944889287440,
+          "size": 276480
+        },
+        "prepared": {
+          "ctime_ns": 1793463916456182036,
+          "device": 58,
+          "inode": 20088721,
+          "mtime_ns": 1793463916456182036,
+          "size": 7505920
+        },
+        "source": {
+          "ctime_ns": 1793455910958829848,
+          "device": 58,
+          "inode": 5567065,
+          "mtime_ns": 1793455910958829848,
+          "size": 78396317
+        }
+      },
+      "role": "execution-gpu5",
+      "schema": 1,
+      "scope": "proposed pretransfer metadata observation only; no content checked",
+      "self_cpu_seconds": 0.064566,
+      "source_archive_sha256_reference": "9e96b6764c2801c751cb583e6006002b6fb842815d8aeb1ddc61a2e4560fa70d",
+      "source_revision": "ff6ae97cbb84dc870283e697e2763c1f62cf78f8",
+      "wall_seconds": 0.029878740198910236
+    }
+  },
+  "usage": {
+    "host_results": [
+      {
+        "cpu": 0,
+        "host": "gpu2",
+        "local_self_cpu_delta_seconds": 0.0019769999999999996,
+        "remote_self_cpu_seconds": 0.10789699999999999,
+        "role": "management-gpu2",
+        "ssh_waited_cpu_delta_seconds": 0.026605999999999998,
+        "stdout_sha256": "224402f16ec35c7796d28e99bb08dfb852c1d1ebc74e890713458269178b5184",
+        "wall_seconds": 4.679969749995507
+      },
+      {
+        "cpu": 0,
+        "host": "gpu5",
+        "local_self_cpu_delta_seconds": 0.0020020000000000038,
+        "remote_self_cpu_seconds": 0.064566,
+        "role": "execution-gpu5",
+        "ssh_waited_cpu_delta_seconds": 0.021998999999999998,
+        "stdout_sha256": "c139d309bdd96bb6db4ad28c35986c4529364df77fc2ce45c4c83b1c2f3e3e1d",
+        "wall_seconds": 3.594814417010639
+      }
+    ],
+    "local_self_cpu_after_intent_delta_seconds": 0.006416999999999999,
+    "local_self_cpu_process_lifetime_seconds": 0.050785,
+    "note": "remote self CPU and waited local SSH CPU are distinct; do not add cumulative snapshots",
+    "status": "complete",
+    "waited_ssh_children_cpu_delta_seconds": 0.048604999999999995,
+    "wall_seconds": 8.275135582996882
+  },
+  "observed_distinct_cpu_seconds": 0.27185299999999996,
+  "conservative_charged_cpu_seconds": 5,
+  "gpu_seconds": 0,
+  "content_verified_now": false,
+  "scope": "Fixed reviewed declared public input/controller/cache metadata only. Separate perhost NFS device identities. Both new destinations absent; no upload/hash/job executed. Cooperative immutable-file trust, no adversarial race guarantee.",
+  "next_gate": "Separate root-reviewed source/native upload, post-transfer metadata+public hashes, current runtime/tool/space/cost checks and exact CPUproof release."
+}

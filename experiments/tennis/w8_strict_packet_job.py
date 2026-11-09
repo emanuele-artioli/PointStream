@@ -476,11 +476,15 @@ def run_proof(stage: Path) -> dict[str, Any]:
             or any(c not in '0123456789abcdef' for c in bootstrap_sha)):
         raise ValueError('frozen witness bootstrap SHA required')
     from experiments.tennis.w8_witness_job import check_bootstrap_archive
-    check_bootstrap_archive(stage, dispatch, bootstrap_sha)
+    input_sha = spec.get('witness_input_job_sha256')
+    if not isinstance(input_sha, str):
+        raise ValueError('frozen witness input module SHA required')
+    check_bootstrap_archive(stage, dispatch, bootstrap_sha, input_sha)
     snapshot = Path(__file__).resolve().parents[2]
     preflight = json.loads(paths['preflight'].read_text())
     host.check_preflight_bundle(preflight, paths['identity'], witness_metadata=True)
-    host.check_preflight_sources(preflight, snapshot, witness_bootstrap_sha=bootstrap_sha)
+    host.check_preflight_sources(preflight, snapshot, witness_bootstrap_sha=bootstrap_sha,
+                                 witness_input_sha=input_sha)
     fingerprints = host.read_oracle(paths['oracle'])
     rate = host.audit_public_rate(paths['packet'], paths['profile'])
     scratch = fixed.checked_scratch()

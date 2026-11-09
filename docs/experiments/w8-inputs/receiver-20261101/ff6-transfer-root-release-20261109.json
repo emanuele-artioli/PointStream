@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "decision": "release_one_fixed_source_inventory_upload_and_two_stat_first_public_hash_checks_only",
+  "source_revision": "ff6ae97cbb84dc870283e697e2763c1f62cf78f8",
+  "source_archive_sha256": "9e96b6764c2801c751cb583e6006002b6fb842815d8aeb1ddc61a2e4560fa70d",
+  "scripts_and_payload_sha256": {
+    "upload_sink.py": "f607375deb073de600544e933ae75334e7c37a3ad0b2c0f1ac937c053abf4c4c",
+    "posttransfer_check.py": "6841e52d372c72f11f956f713f43350806e9acf02ac4d41339765d81b28cb785",
+    "transfer_and_check_plan.py": "ad2cb58093dfccbab76a5541c8ddee662a542a9755d8098e2ba6ad26d66b1370",
+    "source.tar.gz": "1d9c16a983a8af20fa33e6b1adaee9b35c4fd286430defe5a1bf82a3cbfbaca0",
+    "native-inventory.json.gz": "be89c44dc02513cf74de3b768fd1002f3b813f8219d0c2faf8717ae4cb83cf9f"
+  },
+  "parent_phase": "w8-full-witness-staged-20261106",
+  "witness_qualification": false,
+  "gpu_seconds": 0,
+  "prep_prior_cpu_charge": 5,
+  "prep_total_ceiling_cpu_seconds": 50,
+  "future_transfer_stage_caps": {
+    "prior_local_compression": 1,
+    "remote_source": 8,
+    "remote_inventory": 2,
+    "local_ssh_clients": 8,
+    "local_wrapper": 2,
+    "remote_postchecks": 8,
+    "later_publication_preparation_reserved_not_released": 10,
+    "contingency": 4
+  },
+  "future_cpu_ceiling_including_unreleased_reserve": 43,
+  "max_wall_seconds": 510,
+  "conditions": [
+    "only exact two public files via exclusive new parent/O_EXCL/NOFOLLOW/fsync; preserve any partial; never overwrite/replay",
+    "gpu5 upload; gpu2+gpu5 postchecks against their own accepted baselines; protected categories metadata-only",
+    "metadata/protected inode comparisons before either new public file content open/hash; complete expected source/native hashes",
+    "allunchangeddeclared/control/cachemetadata match; rolehost and CPU0 identity checked; no GPU/currentmodel inference",
+    "capture remote+self localwaitedSSH CPU separately and lifecycle failures; allprep oncewithin50 andparent4545remaining",
+    "no fleet submission/CPUproof/qualification release; publication10 is a prospective reserve awaitingreview, not an enforced or measured manager bound",
+    "trustcooperativeimmutableinputs; no claim adversarialfilesystemraceproof"
+  ]
+}

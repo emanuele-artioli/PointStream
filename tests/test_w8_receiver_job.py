@@ -332,6 +332,16 @@ def test_preflight_checks_executed_closure_not_unrelated_future_cost_code(tmp_pa
     bundle = {'source_tree': str(source), 'receipts': {'main': receipt, 'jcv': receipt},
               'frozen_source_files': hashes}
     job.check_preflight_sources(bundle, target)
+    (target / names[2]).write_text('reviewed input-only repair')
+    repaired = job.fixed.file_sha(target / names[2])
+    with pytest.raises(ValueError, match='preflight-qualified source changed'):
+        job.check_preflight_sources(bundle, target)
+    from experiments.tennis import w8_strict_host_cost_job as strict_host
+    strict_host.check_preflight_sources(bundle, target, witness_input_sha=repaired)
+    (target / names[0]).write_text('changed preflight')
+    with pytest.raises(ValueError, match='preflight-qualified source changed'):
+        strict_host.check_preflight_sources(bundle, target, witness_input_sha=repaired)
+    (target / names[2]).write_text(names[2])
     (target / names[0]).write_text('changed preflight')
     with pytest.raises(ValueError, match='preflight-qualified source changed'):
         job.check_preflight_sources(bundle, target)

@@ -1084,6 +1084,100 @@
       "cpu_seconds": 50,
       "release_stage": "research-first24/28",
       "basis": "Prospective conservative50CPU cap for one fresh allhost/jobs/workers capacity and metadata-only admission readiness observation shared with W8. No source upload, protected-content reads, inference or request release. No recurring polling. Entire50charged; later request requires distinct root admission."
+    },
+    {
+      "phase": "k5d-parity16-9b47-contended-closeout-20261109",
+      "workstream": "ball",
+      "gpu_seconds": 130,
+      "cpu_seconds": 160,
+      "basis": "130s rounded one-core supervisor birth-to-canonical-terminal upper; CPU adds30 external audit; prior50 prep separately charged"
+    },
+    {
+      "phase": "w8-ff6-pretransfer-metadata-20261109",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 5,
+      "witness_qualification": false,
+      "release_stage": "research-first24/28",
+      "basis": "Root audited two metadata-only observers, separate NFS hostbaselines, zero CPUclaims. Remote self0.172463CPU+localwrapper0.050785+waitedSSH0.048605=0.271853CPU; conservative5 including admin. No upload/hash/job/GPU. Countsinsideprep50/CPUproof800;45prepCPUremain. Wholeparentremaining4545CPU,4550GPU."
+    },
+    {
+      "phase": "w8-ff6-transfer-postcheck-20261109",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 5,
+      "witness_qualification": false,
+      "release_stage": "research-first24/28",
+      "basis": "One approved exclusive ff6 source/native transfer and two host postchecks; actual distinct observed CPU 1.316218 seconds including local source compression and fresh claim check; conservative 5 includes unmetered small administration. Root audit pending. Prep cumulative 10/50 inside unchanged CPU proof 800; 40 preparation CPU remain. No job or GPU."
+    },
+    {
+      "phase": "w8-ff6-cpu-proof-publication-prep-20261109",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 10,
+      "witness_qualification": false,
+      "release_stage": "research-first24/28",
+      "basis": "Conservative 10 CPU seconds for fresh canonical workers and all-job status, both per-host claim/stat/public-SHA rechecks, fleet doctor, source-cache copy and publication. Includes unmetered manager/admin work; not a measured manager CPU total. Within unchanged 50 CPU preparation and 800 CPU proof ceiling."
+    },
+    {
+      "phase": "w8-ff6-cpu-proof-edd3-closeout-20261109",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 100,
+      "witness_qualification": false,
+      "release_stage": "research-first24/28",
+      "basis": "Root accepted conservative 90 CPU seconds for 87.948 s created-to-terminal wall upper including queue plus 10 CPU postchecks/admin. This is not measured aggregate CPU. Prior 20 CPU preparation separately charged; 120 CPU total, 0 GPU for failed pre-leaf proof. Task process group and CPU claim absent; no scientific evidence or retry."
+    },
+    {
+      "phase": "k5d-shared-vendor-source-audit-20261109",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 20,
+      "release_stage": "research-first24/28",
+      "basis": "Two separatelyrootauthorized <=10CPUreadonlysourceaudits onregisteredgpu5 CPU1, no model/weights/GPU. First6files47633B remote0.071327CPU; followup9modules71632B remote0.065021CPU; localSSH~0.01CPUeach. Fullconservative20CPUchargedonceincludingcontrol/admin. RootverifiedcapturedsourceSHA+AST: solePythonspawn common.start_train uncalledbyfixedadapter/collectedPythonmodules. Doesnotprove nativeextension/arbitrarydynamicbehaviour; sourcebridge andactualnewsourceCPUproofstillrequired."
+    },
+    {
+      "phase": "k5d-shared-df6-native-preparation-20261109",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "release_stage": "research-first24/28",
+      "basis": "Conservativeauthorized50CPUpreparation forONEnewdf6sourceCPUproof: allhostdoctor/knownjobs/CPUclaims/gpu2CPU0/runtime/tools/unshare/storage/inputZIP SHA(14.41CPUreported), exactnewsourcegzipupload4.94wall+sourcepublichashverification/admin. Countsinside300CPUleaf; future250CPU(100campaign100post30audit20contingency),noGPUparity/full30release. ActualjobIDpending; no replay."
+    },
+    {
+      "phase": "k5d-shared-df6-native-closure-20261109",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "job_id": "20261109T190423Z-bbde248b",
+      "gpu_seconds": 0,
+      "cpu_seconds": 100,
+      "release_stage": "research-first24/28",
+      "basis": "Rootaccepted actualdf6sourceCPUmechanismproof; 70roundedwholeonecorelifecyclewall61.0+30audit/admin=100futureCPU, prior50prep=>150inclusiveof300cap. All19observedPIDbirths/campaign/supervisorabsent,CPUclaimempty,eventACK. NoGPUparity/timing/scale/costqualification; aggregateadminCPUnotmeasured."
+    },
+    {
+      "phase": "k5d-shared-df6-parity16-readiness-20261109",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 30,
+      "release_stage": "research-first24/28",
+      "basis": "Authorizedconservative30CPUreadinessandtinynewaccepted6a4receiptupload/SHA. Allhostdoctor/jobs/claims; gpu2onlywarmeligibleA6000,one26388MiBfree>=16384+8192; gpu3cold/belowheadroomexcluded. Source447freshSHA; largecacheidentityfromstablemetadata+priorreceipts,notclaimedfreshbytechecks; canonicalstagingmustverifyallbytes. Inside1200CPUparityleaf,1170future remains,noGPUsubmittedyet."
+    },
+    {
+      "phase": "w8-f6-source-precheck-20261109",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 6,
+      "witness_qualification": false,
+      "release_stage": "research-first24/28",
+      "basis": "Knownf6sourceprep prechecks stopped beforeupload atgpu5cachepresencechanged; target/source notcreated. Actualcompression0.412+wrapper0.067+localSSH0.054+gpu2remote0.077CPUplusunreportedgpu5process bounded4CPU=><=4.61; conservative6incladmin. Insidefutureprep30:24remain(14source/reconcile+10publicationreserve). No newjob/GPU/privatecontentopen."
     }
   ],
   "reservations": [
@@ -1601,9 +1695,9 @@
       "phase": "k5d-scale-first-tranche-20261105",
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
-      "gpu_seconds": 8900,
-      "cpu_seconds": 8870,
-      "status": "Remaining_unspent8900GPU8870CPU after50CPUboundedsharedreadiness. Active one parity leaf 20261109T175655Z-9b4701ce nested <=1000GPU/1150futureCPU; no second request or scale release."
+      "gpu_seconds": 8770,
+      "cpu_seconds": 8510,
+      "status": "Remaining_unspent8770GPU8510CPU aftersharedGPU16readiness30charged. ONEsharednumericparity e4e56d4b pendingwithinparent; inclusive1000GPU1200CPUincl30prep and1170future. No timing/scale/cost/full30 promotion."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -1667,11 +1761,34 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 4550,
-      "status": "Prospectiveremaining_unspent4550GPU4550CPU;NOexecutionrelease. Nov9resourceamendment permitsproposalqualification<=900GPU1000CPUinclusiveinsideparent,eachqualification/proofsmoke<=600,oldclosed500cap supersededbeforeexecution. ExactsourceCPUisolation/namespace/nativeproof+source/spec/budgetreviewrequired;unit0contextpilot retainedonce, completeactual1.5futureforecast before furtherstages. Original30DDIM/CFG2/seeds240/80candidatequality/sourceguardsunchanged. Includesallproof/ops/failure;noautomaticretry. CPUproofproposal amended<=800CPU0GPUinclusiveinsideparent;earlier400draftunadmitted. Actualsame-sourceproof/spec/budgetreviewbeforeanyexecution;chargeactual/boundedcostandreforecastfuturebeforeGPU. Fullcandidatecommandmayexceed600but<=2700/45minandneedsseparaterelease/completeforecast;240rununchunked. Noadditionalbudget."
+      "cpu_seconds": 4424,
+      "status": "Remaining_unspent4550GPU4424CPU afterfailedproof120inclusive andf6sourceprecheck6. F6cachednativepresence reconciliationbeforeupload; no replacementrequest. Prospective900CPUcumulative=120oldfailed+6newprep+774future(24prep600campaign100post50audit),0GPU; qualifiersunchanged."
     }
   ],
   "jobs": [
+    {
+      "job_id": "20261109T184450Z-edd3f290",
+      "phase": "w8-full-witness-staged-20261106",
+      "state": "failed before proof leaves; process group and task CPU claim absent; no automatic retry",
+      "revision": "ff6ae97cbb84dc870283e697e2763c1f62cf78f8",
+      "source_sha256": "e61c4bac77b3e6f48517e6b2241841414ec2a722a867cc8eabcc08f46406d3e4",
+      "snapshot_sha256": "9e96b6764c2801c751cb583e6006002b6fb842815d8aeb1ddc61a2e4560fa70d",
+      "spec_sha256": "d93a2d4b71c35ec407ee800da0337fdb5c57e883d4eb14ed3ea3b684f0382ee9",
+      "deadline": "2026-11-09T19:15:35.387884+00:00",
+      "host": "gpu5",
+      "cpu_affinity_index": 0,
+      "source_archive": true,
+      "gpu_ceiling_seconds": 0,
+      "cpu_ceiling_including_preparation_seconds": 800,
+      "prepared_cpu_charged_seconds": 20,
+      "remaining_preparation_cpu_ceiling_seconds": 30,
+      "result_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261109T184450Z-edd3f290",
+      "local_intent": "/private/tmp/pointstream-w8-ff6-cpu-proof-submission-20261109-a1/intent.json",
+      "scope": "CPU-only source/packet/namespace/native/policy proof; not GPU, generation or quality evidence",
+      "result": "Failed at first setrlimit(RLIMIT_CPU, (100, 3600)): inherited hard limit lower than 3600. Actual inherited hard value unknown. No packet, native, namespace, policy, GPU or quality evidence.",
+      "charge_cpu_seconds_including_prior_preparation": 120,
+      "terminal_receipt": "docs/experiments/w8-inputs/receiver-20261101/ff6-cpu-proof-edd3-terminal-audit-20261109.json"
+    },
     {
       "job_id": "20261104T221616Z-49f19251",
       "phase": "w7-remux-transport-20261104",
@@ -2590,7 +2707,7 @@
       "job_id": "20261109T175655Z-9b4701ce",
       "phase": "k5d-scale-first-tranche-20261105",
       "subphase": "parity16-new-capacity-20261109",
-      "state": "pending; one bounded exclusive GPU request; no automatic retry",
+      "state": "contended; foreign GPU process; no gate or parity; observed owned PIDs and claim absent; terminal events ACK",
       "revision": "ae6030e58a98156d3b5cb5d1cfab78967b173c9b",
       "snapshot_sha256": "22fb921e5cc26d04f22d6e8be6f1098f504b3319283794e341ab5952dc51815d",
       "source_sha256": "71d788cf9c520c4c095f011dbf5efce157493f003a3db970e57731f06d1cb7af",
@@ -2603,7 +2720,50 @@
       "future_cpu_ceiling": 1150,
       "campaign_wall_ceiling": 800,
       "wait_max_seconds": 2700,
-      "batch_path": "/private/tmp/k5d-parity1752-batch.json"
+      "batch_path": "/private/tmp/k5d-parity1752-batch.json",
+      "conservative_gpu_charge": 130,
+      "conservative_future_cpu_charge": 160,
+      "inclusive_cpu_charge": 210,
+      "audit_receipt_sha256": "81e78f1818602d495c814ca3e1c0493991d41c7f4421ef30731480f76d5e3199",
+      "wait_handle": 36823
+    },
+    {
+      "job_id": "20261109T190423Z-bbde248b",
+      "phase": "k5d-scale-first-tranche-20261105",
+      "subphase": "shared-df6-nativeCPUproof",
+      "state": "complete/rootaccepted/singlecanonicalwaitended/claimsandtaskgroupabsent/eventACK",
+      "revision": "df6eee829e56a1880397547f6d654eb47169c4f4",
+      "source_sha256": "ac77730dc24ce123fa7dac7f9e2d65003e25a11fdbded29b05f77be9bef1b15b",
+      "snapshot_sha256": "4477693bd025e633a8d14a4f8f303576e41df4cd23420c083cedd967113ce463",
+      "spec_sha256": "61e7e018757d01fda44a0342df2b4b57502fc628e26511fc633a06e1efd15f6a",
+      "deadline": "2026-11-09T19:43:33Z",
+      "inclusive_cpu_ceiling": 300,
+      "actual_inclusive_conservative_cpu_charge": 150,
+      "gpu_seconds": 0,
+      "wait_handle": 37096,
+      "wait_max_seconds": 2400,
+      "local_batch": "/private/tmp/k5d-df6-execution-20261109",
+      "root_accepted_receipt_sha256": "6a4c7d3b29b6376a6262ec618394de89b785df6d1b18d87ac8e940aa1c1621a0"
+    },
+    {
+      "job_id": "20261109T193337Z-e4e56d4b",
+      "phase": "k5d-scale-first-tranche-20261105",
+      "subphase": "shared-df6-16frame-numerical-parity",
+      "state": "pending; one bounded queue; no automatic retry",
+      "revision": "df6eee829e56a1880397547f6d654eb47169c4f4",
+      "source_sha256": "ac77730dc24ce123fa7dac7f9e2d65003e25a11fdbded29b05f77be9bef1b15b",
+      "snapshot_sha256": "4477693bd025e633a8d14a4f8f303576e41df4cd23420c083cedd967113ce463",
+      "spec_sha256": "fbc752f383dbe2e4507c46d179bef8dc2b9c4b82de61404f62772bf5ed1ed0a3",
+      "deadline": "2026-11-09T20:02:36.120866Z",
+      "gpu_ceiling": 1000,
+      "inclusive_cpu_ceiling": 1200,
+      "preparation_charged_cpu_seconds": 30,
+      "future_cpu_ceiling": 1170,
+      "campaign_wall_ceiling": 800,
+      "wait_max_seconds": 1631,
+      "local_batch": "/private/tmp/k5d-shared16-queue-20261109/batch.json",
+      "source_archive": true,
+      "evidence_scope": "shared numerical parity only; no timing, scale or cost promotion"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -2625,7 +2785,7 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "No active jobs/waits. Ball4224expired and acknowledged. W8 source proof unsubmitted; bounded shared readiness only, no automatic replay.",
+    "state": "Noactivejobs/waits: BallbbdeCPUproofrootaccepted, W8edd3failedclosed. Noautomaticretry/GPUrelease; localW8resource-onlyrepairreviewandsharedBallGPU16proposalnext.",
     "jobs": [],
     "batches": [],
     "native_completion_resume_verified": false,

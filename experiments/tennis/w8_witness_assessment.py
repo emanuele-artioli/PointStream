@@ -19,8 +19,10 @@ import subprocess
 import sys
 from typing import Any
 
-from experiments.tennis import w8_input_job as fixed
-from experiments.tennis import w8_receiver_finish as finish
+_CPU_LIMIT_BEFORE_IMPORTS = resource.getrlimit(resource.RLIMIT_CPU)
+from experiments.tennis import w8_input_job as fixed  # noqa: E402
+from experiments.tennis import w8_receiver_finish as finish  # noqa: E402
+_CPU_LIMIT_AFTER_IMPORTS = resource.getrlimit(resource.RLIMIT_CPU)
 
 SOURCE_KEYS = frozenset({'source_clip', 'receiver', 'ffmpeg', 'native_inventory'})
 SCORE_KEYS = frozenset({'source_rgb', 'source_assessment', 'source_config', 'source_loader', 'source_validation',
@@ -457,7 +459,7 @@ def isolate(config: dict[str, Any], role: str, candidate: dict[str, Path],
             'execution_grants': sorted(str(path) for path in executable), 'output': str(output)}
 
 
-def policy_probe(config: dict[str, Any]) -> dict[str, Any]:
+def policy_probe(config: dict[str, Any], *, cpu_limit: dict[str, Any]) -> dict[str, Any]:
     """Exercise the real role policy on synthetic files, without any candidate claim."""
     if (sys.platform != 'linux' or os.environ.get('CUDA_VISIBLE_DEVICES') != ''
             or os.environ.get('PS_CLAIMED_GPU_UUID') or len(os.sched_getaffinity(0)) != 1):
@@ -502,7 +504,9 @@ def policy_probe(config: dict[str, Any]) -> dict[str, Any]:
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if not result.stdout.startswith(b'ffmpeg version '):
         raise ValueError('pinned native version probe differs')
-    receipt = {'schema': 1, 'scope': 'assessment policy component only; no candidate or quality claim',
+    receipt = {'cpu_limit_telemetry': {'before_imports': list(_CPU_LIMIT_BEFORE_IMPORTS),
+               'after_imports': list(_CPU_LIMIT_AFTER_IMPORTS), 'setup': cpu_limit},
+               'schema': 1, 'scope': 'assessment policy component only; no candidate or quality claim',
                'gpu_claim': False, 'quality_claim': False, 'isolation': isolation,
                'undeclared_read_denial': read_denial, 'undeclared_execute_denial': exec_denial,
                'output_write': True, 'ffmpeg_version_sha256': fixed.digest(result.stdout)}
@@ -617,7 +621,9 @@ def execute(config_path: Path, config_sha256: str) -> dict[str, Any]:
     child = config.get('child_cpu_seconds', cpu)
     if type(child) is not int or not 1 <= child <= 3600:
         raise ValueError('bounded source child CPU required')
-    resource.setrlimit(resource.RLIMIT_CPU, (cpu, max(cpu, child) if role == 'source' else cpu))
+    if _CPU_LIMIT_BEFORE_IMPORTS != _CPU_LIMIT_AFTER_IMPORTS:
+        raise ValueError('CPU limit changed during assessment imports')
+    cpu_limit = fixed.set_cpu_soft_limit(cpu, required_child=child if role == 'source' else cpu)
     os.environ.update({'TMPDIR': str(output), 'TMP': str(output), 'TEMP': str(output),
                        'XDG_CACHE_HOME': str(output / '.cache'), 'TORCH_HOME': str(output / '.cache' / 'torch'),
                        'HF_HUB_OFFLINE': '1', 'TRANSFORMERS_OFFLINE': '1', 'PYTHONDONTWRITEBYTECODE': '1',
@@ -652,7 +658,9 @@ def execute(config_path: Path, config_sha256: str) -> dict[str, Any]:
             json.dump(report, stream, sort_keys=True, allow_nan=False)
     result_names = {'source': ('source-rgb.npy', 'sealed.json'),
                     'score': ('scores.npz', 'sealed.json'), 'offline': ('offline.json',)}[role]
-    result = {'schema': 1, 'scope': 'post-seal W8 ' + role, 'producer_manifest_sha256': config['producer_manifest']['sha256'],
+    result = {'cpu_limit_telemetry': {'before_imports': list(_CPU_LIMIT_BEFORE_IMPORTS),
+              'after_imports': list(_CPU_LIMIT_AFTER_IMPORTS), 'setup': cpu_limit},
+              'schema': 1, 'scope': 'post-seal W8 ' + role, 'producer_manifest_sha256': config['producer_manifest']['sha256'],
               'asset_manifest_sha256': config['asset_manifest']['sha256'], 'producer_jobs': producer['jobs'],
               'candidate_sha256': {name: fixed.file_sha(path) for name, path in candidate.items()},
               'role_sha256': {name: row['sha256'] for name, row in assets.items()},
@@ -1007,8 +1015,10 @@ def main() -> None:
     if config.get('phase') != args.phase:
         raise ValueError('assessment CLI phase differs from sealed config')
     if args.phase == 'policy-probe':
-        resource.setrlimit(resource.RLIMIT_CPU, (30, 3600))
-        policy_probe(config)
+        if _CPU_LIMIT_BEFORE_IMPORTS != _CPU_LIMIT_AFTER_IMPORTS:
+            raise ValueError('CPU limit changed during assessment imports')
+        cpu_limit = fixed.set_cpu_soft_limit(30, required_child=30)
+        policy_probe(config, cpu_limit=cpu_limit)
     else:
         execute(args.config, args.config_sha256)
 

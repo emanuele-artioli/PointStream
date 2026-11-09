@@ -411,6 +411,7 @@ def execute_native_base(prepared: dict[str, Any], *, inventory_path: Path,
     if (fixed.file_sha(inventory_path) != inventory_sha
             or any(type(x) is not int or not 1 <= x <= 500 for x in (parent_cpu, worker_cpu, child_cpu, wall))):
         raise ValueError('native inventory or bounded worker limits differ')
+    fixed.ensure_cpu_hard_limit(max(parent_cpu, worker_cpu, child_cpu))
     profile, sections = finish._packet({'packet': prepared['paths']['packet'], 'profile': prepared['paths']['profile']})
     ivf = sections[profile['ivf']]
     if fixed.digest(ivf) != finish.IVF_SHA:

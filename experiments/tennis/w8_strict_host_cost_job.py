@@ -298,10 +298,14 @@ def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, 
     if witness_mode is not None:
         from experiments.tennis.w8_receiver_native_bootstrap import parent_death_signal
         owner_guard = parent_death_signal
+    inherited_limit = fixed.ensure_cpu_hard_limit(cpu_seconds) if witness_mode is not None else None
     def limit() -> None:
         if owner_guard is not None:
             owner_guard(parent_pid)
-        resource.setrlimit(resource.RLIMIT_CPU, (cpu_seconds, 3600))
+        if witness_mode is not None:
+            fixed.set_cpu_soft_limit(cpu_seconds, required_child=cpu_seconds)
+        else:
+            resource.setrlimit(resource.RLIMIT_CPU, (cpu_seconds, 3600))
     with (work / 'stdout').open('xb') as stdout, (work / 'stderr').open('xb') as stderr:
         proc = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr,
                                 close_fds=True, env=env, cwd=code_root, preexec_fn=limit)
@@ -311,6 +315,7 @@ def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, 
         status, timed_out = receiver.wait_owned_worker(proc, wall_seconds)
     after = resource.getrusage(resource.RUSAGE_CHILDREN)
     receipt = {'pid': proc.pid, 'pgid': owned_pgid, 'status': status, 'timed_out': timed_out,
+               **({'inherited_cpu_limit': list(inherited_limit)} if inherited_limit is not None else {}),
                'wall_seconds': time.monotonic() - started,
                'cpu_seconds': after.ru_utime + after.ru_stime - before.ru_utime - before.ru_stime,
                'config_sha256': fixed.file_sha(config_path)}
@@ -501,7 +506,8 @@ def check_preflight_bundle(preflight: dict[str, Any], identity_path: Path, *, wi
 
 
 def check_preflight_sources(preflight: dict[str, Any], root: Path, *,
-                            witness_bootstrap_sha: str | None = None) -> None:
+                            witness_bootstrap_sha: str | None = None,
+                            witness_input_sha: str | None = None) -> None:
     """Recheck the exact preflight entrypoints and imported project closure.
 
     Unexecuted files in the same source archive may change in the separately
@@ -524,6 +530,10 @@ def check_preflight_sources(preflight: dict[str, Any], root: Path, *,
             if (len(witness_bootstrap_sha) != 64 or any(c not in '0123456789abcdef' for c in witness_bootstrap_sha)):
                 raise ValueError('invalid reviewed witness bootstrap identity')
             expected = witness_bootstrap_sha
+        if witness_input_sha is not None and name == 'experiments/tennis/w8_input_job.py':
+            if len(witness_input_sha) != 64 or any(c not in '0123456789abcdef' for c in witness_input_sha):
+                raise ValueError('invalid reviewed witness input module identity')
+            expected = witness_input_sha
         if not isinstance(expected, str):
             raise ValueError(f'preflight source identity missing: {name}')
         actual = (root / name).resolve(strict=True)
@@ -664,6 +674,10 @@ def prepare_receiver_inputs(paths: dict[str, Path], spec: dict[str, Any], *, pac
     rate = audit_public_rate(paths['packet'], paths['profile'])
     fingerprints = read_oracle(paths['oracle'])
     preflight = json.loads(paths['preflight'].read_text())
+    if witness and not (isinstance(spec.get('witness_input_job_sha256'), str)
+                        and len(spec['witness_input_job_sha256']) == 64
+                        and all(c in '0123456789abcdef' for c in spec['witness_input_job_sha256'])):
+        raise ValueError('frozen witness input module SHA required')
     check_preflight_bundle(preflight, paths['identity'], witness_metadata=witness)
     if witness:
         from experiments.tennis import w8_protected_metadata
@@ -677,7 +691,8 @@ def prepare_receiver_inputs(paths: dict[str, Path], spec: dict[str, Any], *, pac
             or fixed.file_sha(snapshot_root / FOLDER_AUDIT_PATH) != FOLDER_AUDIT_SHA):
         raise ValueError('real folder I/O audit reference differs')
     check_preflight_sources(preflight, snapshot_root,
-                            witness_bootstrap_sha=spec.get('witness_bootstrap_sha256') if witness else None)
+                            witness_bootstrap_sha=spec.get('witness_bootstrap_sha256') if witness else None,
+                            witness_input_sha=spec.get('witness_input_job_sha256') if witness else None)
     scratch = fixed.checked_scratch()
     protected_path = scratch / 'protected-identity.json'
     if witness:
