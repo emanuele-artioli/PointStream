@@ -1,0 +1,289 @@
+{
+  "automatic_promotion": false,
+  "claim_check": {
+    "data": {
+      "affinity": [
+        0
+      ],
+      "claims": {
+        "gpu2.itec.aau.at": {
+          "allocations": 0,
+          "updated_at": 1794247204.6094303
+        },
+        "gpu5.itec.aau.at": {
+          "allocations": 0,
+          "updated_at": 1793927485.0861874
+        }
+      },
+      "cpu_seconds": 0.06064499999999999,
+      "host": "gpu2.itec.aau.at",
+      "observed_epoch": 1794249008.12537,
+      "pgid": 1469764,
+      "pid": 1469764,
+      "scope": "read-only CPU claim metadata"
+    },
+    "local_usage": {
+      "self_cpu_seconds": 0.039824,
+      "waited_ssh_cpu_delta_seconds": 0.022434,
+      "wall_seconds": 3.230412000004435
+    },
+    "local_usage_path": "/private/tmp/pointstream-w8-ff6-transfer-claim-20261109-a1/local-usage.json",
+    "local_usage_sha256": "72ffccabb867bd8a61cd1d525e9d75979aebbc246033af0665055d2c9cfb5427",
+    "raw_local_usage_utf8": "{\"self_cpu_seconds\": 0.039824, \"waited_ssh_cpu_delta_seconds\": 0.022434, \"wall_seconds\": 3.230412000004435}\n",
+    "raw_stdout_utf8": "{\"affinity\": [0], \"claims\": {\"gpu2.itec.aau.at\": {\"allocations\": 0, \"updated_at\": 1794247204.6094303}, \"gpu5.itec.aau.at\": {\"allocations\": 0, \"updated_at\": 1793927485.0861874}}, \"cpu_seconds\": 0.06064499999999999, \"host\": \"gpu2.itec.aau.at\", \"observed_epoch\": 1794249008.12537, \"pgid\": 1469764, \"pid\": 1469764, \"scope\": \"read-only CPU claim metadata\"}\n",
+    "stdout_path": "/private/tmp/pointstream-w8-ff6-transfer-claim-20261109-a1/stdout",
+    "stdout_sha256": "76a73578e932fa5f0c6fde8ea07532724ef84d0f185bbe13cb03056a9df109dc"
+  },
+  "conservative_charged_cpu_seconds": 5,
+  "frozen_revision": "ff6ae97cbb84dc870283e697e2763c1f62cf78f8",
+  "gpu_seconds": 0,
+  "intent": {
+    "path": "/private/tmp/pointstream-w8-ff6-transfer-20261109-a1/intent.json",
+    "raw_utf8": "{\n  \"baseline_sha256\": {\n    \"gpu2\": \"224402f16ec35c7796d28e99bb08dfb852c1d1ebc74e890713458269178b5184\",\n    \"gpu5\": \"c139d309bdd96bb6db4ad28c35986c4529364df77fc2ce45c4c83b1c2f3e3e1d\"\n  },\n  \"file_sha256\": {\n    \"native-inventory.json.gz\": \"be89c44dc02513cf74de3b768fd1002f3b813f8219d0c2faf8717ae4cb83cf9f\",\n    \"posttransfer_check.py\": \"6841e52d372c72f11f956f713f43350806e9acf02ac4d41339765d81b28cb785\",\n    \"source.tar.gz\": \"1d9c16a983a8af20fa33e6b1adaee9b35c4fd286430defe5a1bf82a3cbfbaca0\",\n    \"upload_sink.py\": \"f607375deb073de600544e933ae75334e7c37a3ad0b2c0f1ac937c053abf4c4c\"\n  },\n  \"local_self_cpu_cap_seconds\": 2,\n  \"note\": \"On timeout inspect preserved target and process identity; never replay.\",\n  \"remote_inventory_cpu_cap_seconds\": 2,\n  \"remote_source_cpu_cap_seconds\": 8,\n  \"remote_verify_cpu_cap_seconds_each\": 4,\n  \"scope\": \"review-only fixed transfer and metadata verification\",\n  \"ssh_child_cpu_cap_seconds_each\": 2,\n  \"steps\": [\n    [\n      \"upload-source\",\n      \"gpu5\",\n      \"upload_sink.py\",\n      \"source\",\n      0,\n      \"source.tar.gz\",\n      330\n    ],\n    [\n      \"upload-inventory\",\n      \"gpu5\",\n      \"upload_sink.py\",\n      \"inventory\",\n      0,\n      \"native-inventory.json.gz\",\n      60\n    ],\n    [\n      \"verify-gpu2\",\n      \"gpu2\",\n      \"posttransfer_check.py\",\n      \"gpu2\",\n      0,\n      null,\n      60\n    ],\n    [\n      \"verify-gpu5\",\n      \"gpu5\",\n      \"posttransfer_check.py\",\n      \"gpu5\",\n      0,\n      null,\n      60\n    ]\n  ]\n}\n",
+    "sha256": "030a4e27fd957e570e5f30ca8a1ea2a28823b21876931abd35722cc123a0f1d6"
+  },
+  "local_compression": {
+    "archive_bytes": 20572160,
+    "gzip_bytes": 5314247,
+    "gzip_sha256": "1d9c16a983a8af20fa33e6b1adaee9b35c4fd286430defe5a1bf82a3cbfbaca0",
+    "note": "local source-only compression; not remote throughput or aggregate transfer CPU",
+    "self_cpu_seconds": 0.417913,
+    "source_sha256": "9e96b6764c2801c751cb583e6006002b6fb842815d8aeb1ddc61a2e4560fa70d",
+    "wall_seconds": 0.43114204100857023
+  },
+  "native_inventory_sha256": "cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b",
+  "next_gate": "root independent audit and fresh reviewed CPU-only proof release; no fleet request yet",
+  "observed_distinct_cpu_seconds": 1.3162180000000003,
+  "preparation_cpu_cumulative_seconds": 10,
+  "preparation_cpu_remaining_seconds": 40,
+  "protected_content_read": false,
+  "records": {
+    "upload-inventory": {
+      "final": {
+        "bytes": 28280,
+        "cpu_affinity": [
+          0
+        ],
+        "ctime_ns": 1794249061072106756,
+        "device": 58,
+        "inode": 41290178,
+        "mtime_ns": 1794249061072106756,
+        "pgid": 3272671,
+        "pid": 3272671,
+        "protected_content_read": false,
+        "scope": "fixed public source transfer only",
+        "self_cpu_seconds": 0.041864,
+        "sha256": "cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b",
+        "size": 28280,
+        "target": "/home/itec/emanuele/Datasets/pointstream-data/w8-witness-20261109/native-v4-receipt-cd6bb8cf.json",
+        "wall_seconds": 0.17113292589783669
+      },
+      "path": "/private/tmp/pointstream-w8-ff6-transfer-20261109-a1/upload-inventory.stdout",
+      "raw_stderr_utf8": "",
+      "raw_stdout_utf8": "{\"event\": \"started\", \"pid\": 3272671, \"pgid\": 3272671, \"start_ticks\": 692867269, \"target\": \"/home/itec/emanuele/Datasets/pointstream-data/w8-witness-20261109/native-v4-receipt-cd6bb8cf.json\"}\n{\"bytes\": 28280, \"cpu_affinity\": [0], \"ctime_ns\": 1794249061072106756, \"device\": 58, \"inode\": 41290178, \"mtime_ns\": 1794249061072106756, \"pgid\": 3272671, \"pid\": 3272671, \"protected_content_read\": false, \"scope\": \"fixed public source transfer only\", \"self_cpu_seconds\": 0.041864, \"sha256\": \"cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b\", \"size\": 28280, \"target\": \"/home/itec/emanuele/Datasets/pointstream-data/w8-witness-20261109/native-v4-receipt-cd6bb8cf.json\", \"wall_seconds\": 0.17113292589783669}\n",
+      "sha256": "df7feea354d30fe22f34980b1e9aa23faf29261bc27b7222dd48941ee183a24e",
+      "started": {
+        "event": "started",
+        "pgid": 3272671,
+        "pid": 3272671,
+        "start_ticks": 692867269,
+        "target": "/home/itec/emanuele/Datasets/pointstream-data/w8-witness-20261109/native-v4-receipt-cd6bb8cf.json"
+      },
+      "stderr_path": "/private/tmp/pointstream-w8-ff6-transfer-20261109-a1/upload-inventory.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "upload-source": {
+      "final": {
+        "bytes": 20572160,
+        "cpu_affinity": [
+          0
+        ],
+        "ctime_ns": 1794249057906064326,
+        "device": 58,
+        "inode": 41288681,
+        "mtime_ns": 1794249057906064326,
+        "pgid": 3272310,
+        "pid": 3272310,
+        "protected_content_read": false,
+        "scope": "fixed public source transfer only",
+        "self_cpu_seconds": 0.24235199999999998,
+        "sha256": "9e96b6764c2801c751cb583e6006002b6fb842815d8aeb1ddc61a2e4560fa70d",
+        "size": 20572160,
+        "target": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-ff6-20261109/source.tar",
+        "wall_seconds": 2.2716480996459723
+      },
+      "path": "/private/tmp/pointstream-w8-ff6-transfer-20261109-a1/upload-source.stdout",
+      "raw_stderr_utf8": "",
+      "raw_stdout_utf8": "{\"event\": \"started\", \"pid\": 3272310, \"pgid\": 3272310, \"start_ticks\": 692866755, \"target\": \"/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-ff6-20261109/source.tar\"}\n{\"bytes\": 20572160, \"cpu_affinity\": [0], \"ctime_ns\": 1794249057906064326, \"device\": 58, \"inode\": 41288681, \"mtime_ns\": 1794249057906064326, \"pgid\": 3272310, \"pid\": 3272310, \"protected_content_read\": false, \"scope\": \"fixed public source transfer only\", \"self_cpu_seconds\": 0.24235199999999998, \"sha256\": \"9e96b6764c2801c751cb583e6006002b6fb842815d8aeb1ddc61a2e4560fa70d\", \"size\": 20572160, \"target\": \"/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-ff6-20261109/source.tar\", \"wall_seconds\": 2.2716480996459723}\n",
+      "sha256": "aeadcb5e89788858e23796fccb18d68c5479a56022a48fc22521c0dce4682d58",
+      "started": {
+        "event": "started",
+        "pgid": 3272310,
+        "pid": 3272310,
+        "start_ticks": 692866755,
+        "target": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-ff6-20261109/source.tar"
+      },
+      "stderr_path": "/private/tmp/pointstream-w8-ff6-transfer-20261109-a1/upload-source.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "verify-gpu2": {
+      "final": {
+        "baseline_sha256": "224402f16ec35c7796d28e99bb08dfb852c1d1ebc74e890713458269178b5184",
+        "cpu_affinity": [
+          0
+        ],
+        "host": "gpu2",
+        "new": {
+          "future_source_archive": {
+            "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-ff6-20261109/source.tar",
+            "sha256": "9e96b6764c2801c751cb583e6006002b6fb842815d8aeb1ddc61a2e4560fa70d",
+            "stamp": {
+              "ctime_ns": 1794249057906064326,
+              "device": 2097343,
+              "inode": 41288681,
+              "mtime_ns": 1794249057906064326,
+              "size": 20572160
+            }
+          },
+          "native_inventory": {
+            "path": "/home/itec/emanuele/Datasets/pointstream-data/w8-witness-20261109/native-v4-receipt-cd6bb8cf.json",
+            "sha256": "cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b",
+            "stamp": {
+              "ctime_ns": 1794249061072106756,
+              "device": 2097343,
+              "inode": 41290178,
+              "mtime_ns": 1794249061072106756,
+              "size": 28280
+            }
+          }
+        },
+        "pgid": 1471288,
+        "pid": 1471288,
+        "protected_content_read": false,
+        "scope": "same-host baseline and new public bytes verified; protected content unopened",
+        "self_cpu_seconds": 0.163715,
+        "wall_seconds": 0.3164863348938525
+      },
+      "path": "/private/tmp/pointstream-w8-ff6-transfer-20261109-a1/verify-gpu2.stdout",
+      "raw_stderr_utf8": "",
+      "raw_stdout_utf8": "{\"event\": \"started\", \"pid\": 1471288, \"pgid\": 1471288, \"start_ticks\": 271619362, \"host\": \"gpu2\"}\n{\"baseline_sha256\": \"224402f16ec35c7796d28e99bb08dfb852c1d1ebc74e890713458269178b5184\", \"cpu_affinity\": [0], \"host\": \"gpu2\", \"new\": {\"future_source_archive\": {\"path\": \"/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-ff6-20261109/source.tar\", \"sha256\": \"9e96b6764c2801c751cb583e6006002b6fb842815d8aeb1ddc61a2e4560fa70d\", \"stamp\": {\"ctime_ns\": 1794249057906064326, \"device\": 2097343, \"inode\": 41288681, \"mtime_ns\": 1794249057906064326, \"size\": 20572160}}, \"native_inventory\": {\"path\": \"/home/itec/emanuele/Datasets/pointstream-data/w8-witness-20261109/native-v4-receipt-cd6bb8cf.json\", \"sha256\": \"cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b\", \"stamp\": {\"ctime_ns\": 1794249061072106756, \"device\": 2097343, \"inode\": 41290178, \"mtime_ns\": 1794249061072106756, \"size\": 28280}}}, \"pgid\": 1471288, \"pid\": 1471288, \"protected_content_read\": false, \"scope\": \"same-host baseline and new public bytes verified; protected content unopened\", \"self_cpu_seconds\": 0.163715, \"wall_seconds\": 0.3164863348938525}\n",
+      "sha256": "533fac9b690144a90562b64ef16b15f50b35fd55caec1e02c96a2c757d40a09c",
+      "started": {
+        "event": "started",
+        "host": "gpu2",
+        "pgid": 1471288,
+        "pid": 1471288,
+        "start_ticks": 271619362
+      },
+      "stderr_path": "/private/tmp/pointstream-w8-ff6-transfer-20261109-a1/verify-gpu2.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "verify-gpu5": {
+      "final": {
+        "baseline_sha256": "c139d309bdd96bb6db4ad28c35986c4529364df77fc2ce45c4c83b1c2f3e3e1d",
+        "cpu_affinity": [
+          0
+        ],
+        "host": "gpu5",
+        "new": {
+          "future_source_archive": {
+            "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-ff6-20261109/source.tar",
+            "sha256": "9e96b6764c2801c751cb583e6006002b6fb842815d8aeb1ddc61a2e4560fa70d",
+            "stamp": {
+              "ctime_ns": 1794249057906064326,
+              "device": 58,
+              "inode": 41288681,
+              "mtime_ns": 1794249057906064326,
+              "size": 20572160
+            }
+          },
+          "native_inventory": {
+            "path": "/home/itec/emanuele/Datasets/pointstream-data/w8-witness-20261109/native-v4-receipt-cd6bb8cf.json",
+            "sha256": "cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b",
+            "stamp": {
+              "ctime_ns": 1794249061072106756,
+              "device": 58,
+              "inode": 41290178,
+              "mtime_ns": 1794249061072106756,
+              "size": 28280
+            }
+          }
+        },
+        "pgid": 3273104,
+        "pid": 3273104,
+        "protected_content_read": false,
+        "scope": "same-host baseline and new public bytes verified; protected content unopened",
+        "self_cpu_seconds": 0.069793,
+        "wall_seconds": 0.183500106446445
+      },
+      "path": "/private/tmp/pointstream-w8-ff6-transfer-20261109-a1/verify-gpu5.stdout",
+      "raw_stderr_utf8": "",
+      "raw_stdout_utf8": "{\"event\": \"started\", \"pid\": 3273104, \"pgid\": 3273104, \"start_ticks\": 692867895, \"host\": \"gpu5\"}\n{\"baseline_sha256\": \"c139d309bdd96bb6db4ad28c35986c4529364df77fc2ce45c4c83b1c2f3e3e1d\", \"cpu_affinity\": [0], \"host\": \"gpu5\", \"new\": {\"future_source_archive\": {\"path\": \"/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-ff6-20261109/source.tar\", \"sha256\": \"9e96b6764c2801c751cb583e6006002b6fb842815d8aeb1ddc61a2e4560fa70d\", \"stamp\": {\"ctime_ns\": 1794249057906064326, \"device\": 58, \"inode\": 41288681, \"mtime_ns\": 1794249057906064326, \"size\": 20572160}}, \"native_inventory\": {\"path\": \"/home/itec/emanuele/Datasets/pointstream-data/w8-witness-20261109/native-v4-receipt-cd6bb8cf.json\", \"sha256\": \"cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b\", \"stamp\": {\"ctime_ns\": 1794249061072106756, \"device\": 58, \"inode\": 41290178, \"mtime_ns\": 1794249061072106756, \"size\": 28280}}}, \"pgid\": 3273104, \"pid\": 3273104, \"protected_content_read\": false, \"scope\": \"same-host baseline and new public bytes verified; protected content unopened\", \"self_cpu_seconds\": 0.069793, \"wall_seconds\": 0.183500106446445}\n",
+      "sha256": "de11f914e1edc4cf2321e1f8e1b7f209eecbdd01bc4aba08e5c0b034482eb69e",
+      "started": {
+        "event": "started",
+        "host": "gpu5",
+        "pgid": 3273104,
+        "pid": 3273104,
+        "start_ticks": 692867895
+      },
+      "stderr_path": "/private/tmp/pointstream-w8-ff6-transfer-20261109-a1/verify-gpu5.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "root_release_sha256": "e23b2625859c78316c3c1d7f50309813149cc10c6c1c9974aef3d28469dde018",
+  "schema": 1,
+  "scope": "fixed public ff6 source and native inventory transfer plus two-host postcheck; no job or GPU",
+  "source_archive_sha256": "9e96b6764c2801c751cb583e6006002b6fb842815d8aeb1ddc61a2e4560fa70d",
+  "unmetered": "native gzip tiny local operation and coordination overhead included in conservative margin; remote self and local waited SSH counted separately",
+  "wrapper_usage": {
+    "data": {
+      "local_self_cpu_process_lifetime_seconds": 0.114094,
+      "note": "remote self CPU and waited local SSH CPU are separate; no cumulative double count",
+      "records": [
+        {
+          "host": "gpu5",
+          "local_self_cpu_delta_seconds": 0.051555000000000004,
+          "local_waited_ssh_cpu_delta_seconds": 0.07688199999999999,
+          "remote_self_cpu_seconds": 0.24235199999999998,
+          "stdout_sha256": "aeadcb5e89788858e23796fccb18d68c5479a56022a48fc22521c0dce4682d58",
+          "step": "upload-source",
+          "wall_seconds": 5.286864082998363
+        },
+        {
+          "host": "gpu5",
+          "local_self_cpu_delta_seconds": 0.0022709999999999952,
+          "local_waited_ssh_cpu_delta_seconds": 0.022555000000000006,
+          "remote_self_cpu_seconds": 0.041864,
+          "stdout_sha256": "df7feea354d30fe22f34980b1e9aa23faf29261bc27b7222dd48941ee183a24e",
+          "step": "upload-inventory",
+          "wall_seconds": 3.0044704580068355
+        },
+        {
+          "host": "gpu2",
+          "local_self_cpu_delta_seconds": 0.0036540000000000045,
+          "local_waited_ssh_cpu_delta_seconds": 0.026095000000000007,
+          "remote_self_cpu_seconds": 0.163715,
+          "stdout_sha256": "533fac9b690144a90562b64ef16b15f50b35fd55caec1e02c96a2c757d40a09c",
+          "step": "verify-gpu2",
+          "wall_seconds": 3.3229916669952217
+        },
+        {
+          "host": "gpu5",
+          "local_self_cpu_delta_seconds": 0.002786999999999998,
+          "local_waited_ssh_cpu_delta_seconds": 0.018051999999999985,
+          "remote_self_cpu_seconds": 0.069793,
+          "stdout_sha256": "de11f914e1edc4cf2321e1f8e1b7f209eecbdd01bc4aba08e5c0b034482eb69e",
+          "step": "verify-gpu5",
+          "wall_seconds": 2.967281124991132
+        }
+      ],
+      "status": "complete",
+      "waited_ssh_children_cpu_delta_seconds": 0.143584,
+      "wall_seconds": 14.581956624999293
+    },
+    "path": "/private/tmp/pointstream-w8-ff6-transfer-20261109-a1/usage.json",
+    "raw_utf8": "{\n  \"local_self_cpu_process_lifetime_seconds\": 0.114094,\n  \"note\": \"remote self CPU and waited local SSH CPU are separate; no cumulative double count\",\n  \"records\": [\n    {\n      \"host\": \"gpu5\",\n      \"local_self_cpu_delta_seconds\": 0.051555000000000004,\n      \"local_waited_ssh_cpu_delta_seconds\": 0.07688199999999999,\n      \"remote_self_cpu_seconds\": 0.24235199999999998,\n      \"stdout_sha256\": \"aeadcb5e89788858e23796fccb18d68c5479a56022a48fc22521c0dce4682d58\",\n      \"step\": \"upload-source\",\n      \"wall_seconds\": 5.286864082998363\n    },\n    {\n      \"host\": \"gpu5\",\n      \"local_self_cpu_delta_seconds\": 0.0022709999999999952,\n      \"local_waited_ssh_cpu_delta_seconds\": 0.022555000000000006,\n      \"remote_self_cpu_seconds\": 0.041864,\n      \"stdout_sha256\": \"df7feea354d30fe22f34980b1e9aa23faf29261bc27b7222dd48941ee183a24e\",\n      \"step\": \"upload-inventory\",\n      \"wall_seconds\": 3.0044704580068355\n    },\n    {\n      \"host\": \"gpu2\",\n      \"local_self_cpu_delta_seconds\": 0.0036540000000000045,\n      \"local_waited_ssh_cpu_delta_seconds\": 0.026095000000000007,\n      \"remote_self_cpu_seconds\": 0.163715,\n      \"stdout_sha256\": \"533fac9b690144a90562b64ef16b15f50b35fd55caec1e02c96a2c757d40a09c\",\n      \"step\": \"verify-gpu2\",\n      \"wall_seconds\": 3.3229916669952217\n    },\n    {\n      \"host\": \"gpu5\",\n      \"local_self_cpu_delta_seconds\": 0.002786999999999998,\n      \"local_waited_ssh_cpu_delta_seconds\": 0.018051999999999985,\n      \"remote_self_cpu_seconds\": 0.069793,\n      \"stdout_sha256\": \"de11f914e1edc4cf2321e1f8e1b7f209eecbdd01bc4aba08e5c0b034482eb69e\",\n      \"step\": \"verify-gpu5\",\n      \"wall_seconds\": 2.967281124991132\n    }\n  ],\n  \"status\": \"complete\",\n  \"waited_ssh_children_cpu_delta_seconds\": 0.143584,\n  \"wall_seconds\": 14.581956624999293\n}\n",
+    "sha256": "d92f3da3ffda712dcf8ce19b09fe9b60b571f51a9a685a03c436b88cde20b3d1"
+  }
+}

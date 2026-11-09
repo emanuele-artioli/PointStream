@@ -1101,6 +1101,16 @@
       "witness_qualification": false,
       "release_stage": "research-first24/28",
       "basis": "Root audited two metadata-only observers, separate NFS hostbaselines, zero CPUclaims. Remote self0.172463CPU+localwrapper0.050785+waitedSSH0.048605=0.271853CPU; conservative5 including admin. No upload/hash/job/GPU. Countsinsideprep50/CPUproof800;45prepCPUremain. Wholeparentremaining4545CPU,4550GPU."
+    },
+    {
+      "phase": "w8-ff6-transfer-postcheck-20261109",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 5,
+      "witness_qualification": false,
+      "release_stage": "research-first24/28",
+      "basis": "One approved exclusive ff6 source/native transfer and two host postchecks; actual distinct observed CPU 1.316218 seconds including local source compression and fresh claim check; conservative 5 includes unmetered small administration. Root audit pending. Prep cumulative 10/50 inside unchanged CPU proof 800; 40 preparation CPU remain. No job or GPU."
     }
   ],
   "reservations": [
@@ -1684,8 +1694,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 4545,
-      "status": "Remaining_unspent4550GPU4545CPU after5CPUmetadatareadiness. Exactff6softwarechecks/archivepassed; twostatobservationsaccepted,no sourceupload/request/GPU yet. CPUproof800includesprep5charged+45futureprep+600campaign+100post+50audit. Qualification<=900GPU1000CPUinsideparent remainsunreleased; full240/80gatesunchanged."
+      "cpu_seconds": 4540,
+      "status": "Remaining_unspent4550GPU4540CPU after 5 CPU metadata readiness and 5 CPU source/native transfer plus two-host postchecks. Root independent transfer audit pending; no request or GPU. CPU proof 800 includes prep 10 charged + 40 future prep + 600 campaign + 100 post + 50 audit. Qualification <=900 GPU / 1000 CPU inside parent remains unreleased; full 240/80 gates unchanged."
     }
   ],
   "jobs": [
