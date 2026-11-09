@@ -64,6 +64,17 @@ def check_lifecycle(record: dict[str, Any], campaign_pgid: int) -> None:
             raise ValueError('interrupted namespace lifecycle signal differs')
 
 
+def check_protected_metadata(receipt: dict[str, Any], historical: dict[str, Any]) -> None:
+    """Verify typed denial-target metadata without reading protected contents."""
+    if (receipt.get('schema') != 1 or receipt.get('scope') != 'witness protected metadata only'
+            or receipt.get('content_verified_now') is not False
+            or receipt.get('historical_receipt_sha256') != packet.IDENTITY_SHA):
+        raise ValueError('CPU proof must use stat-only protected metadata')
+    from experiments.tennis import w8_protected_metadata
+
+    w8_protected_metadata.validate(receipt, historical=historical, check_current=True)
+
+
 def remaining(dispatch: dict[str, Any], reserve: float) -> None:
     clock = dispatch['campaign_clock']
     if (not math.isfinite(reserve) or reserve <= 0
@@ -259,6 +270,7 @@ def validate(stage: Path, destination: Path) -> None:
         check_lifecycle(lifecycle, lifecycle['campaign_pgid'])
         required = {'packet-packet-config.json', 'packet-packet-decoded-manifest.json',
                     'packet-packet-cpu-only.json', 'packet-decoded.pt',
+                    'packet-protected-identity.json',
                     *(f'namespace-{case}-receipt.json.started' for case in ('normal', 'timeout', 'term', 'kill')),
                     *(f'packet-unit-{unit}.npz' for unit in fixed.UNITS),
                     *(f'strict-{runtime}-{name}.json' for runtime in ('main', 'jcv')
@@ -279,6 +291,14 @@ def validate(stage: Path, destination: Path) -> None:
             if stream is None:
                 raise ValueError('required raw JSON missing')
             return json.load(stream)
+        spec = json.loads((stage.parent / 'spec.json').read_text())
+        identity_rows = [item for item in spec['staged_inputs'] if item.get('name') == 'identity']
+        if len(identity_rows) != 1 or identity_rows[0].get('sha256') != packet.IDENTITY_SHA:
+            raise ValueError('historical identity metadata input differs')
+        identity_path = Path(identity_rows[0]['path'])
+        from experiments.tennis import w8_protected_metadata
+        historical = w8_protected_metadata.read_historical(identity_path, packet.IDENTITY_SHA)
+        check_protected_metadata(raw_json('packet-protected-identity.json'), historical)
         for runtime in ('main', 'jcv'):
             observed = raw_json(f'strict-{runtime}-receipt_path.json')
             if (observed.get('scope') != 'cpu_isolation_proof_only'

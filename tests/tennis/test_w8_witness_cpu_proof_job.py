@@ -82,3 +82,28 @@ def test_actual_fleet_gate_accepts_cpu_proof_validation_shape(tmp_path, monkeypa
     gate = json.loads((root / 'gate.json').read_text())
     assert gate['passed'] is True and gate['validation']['checks']['native_yuv_and_teardown'] is True
     assert gate['validation']['quality_claim'] is False
+
+
+def test_protected_receipt_never_claims_fresh_content_verification():
+    historical = {'protected_inputs': {}}
+    receipt = {'schema': 1, 'scope': 'witness protected metadata only',
+               'historical_receipt_sha256': proof.packet.IDENTITY_SHA, 'content_verified_now': True}
+    with pytest.raises(ValueError, match='stat-only'):
+        proof.check_protected_metadata(receipt, historical)
+    receipt['content_verified_now'] = False
+    receipt['historical_receipt_sha256'] = '0' * 64
+    with pytest.raises(ValueError, match='stat-only'):
+        proof.check_protected_metadata(receipt, historical)
+
+
+def test_protected_metadata_requires_historical_pin_and_current_stat_check(monkeypatch):
+    from experiments.tennis import w8_protected_metadata
+
+    observed = []
+    monkeypatch.setattr(w8_protected_metadata, 'validate',
+        lambda receipt, historical=None, *, check_current=False: observed.append((receipt, historical, check_current)))
+    historical = {'protected_inputs': {}}
+    receipt = {'schema': 1, 'scope': 'witness protected metadata only', 'content_verified_now': False,
+               'historical_receipt_sha256': proof.packet.IDENTITY_SHA}
+    proof.check_protected_metadata(receipt, historical)
+    assert observed == [(receipt, historical, True)]
