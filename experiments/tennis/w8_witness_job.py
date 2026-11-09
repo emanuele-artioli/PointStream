@@ -15,11 +15,11 @@ from experiments.tennis import w8_strict_host_cost_job as host
 from experiments.tennis import w8_input_job as fixed
 
 CPU_SCOPE = 'root-reviewed W8 same-source CPU isolation and native lifecycle proof'
-REQUIRED_PROOFS = ('namespace_lifecycle', 'native_normal', 'native_timeout_kill', 'strict_modes', 'independent_audit')
+REQUIRED_PROOFS = ('namespace_lifecycle', 'native_normal', 'native_timeout_kill', 'strict_modes', 'assessment_policy', 'independent_audit')
 REQUIRED_CHECKS = ('same_source_snapshot_environment', 'cpu_hidden_one_core', 'namespace_normal_timeout_term_kill',
                    'native_real_yuv_and_timeout_kill', 'owned_pid_starttick_teardown',
                    'strict_runtime_policy_deny_paths', 'strict_mode_dispatch_static_reviewed',
-                   'strict_source_closure_and_clock_leaves', 'counter_and_external_cost_coverage')
+                   'strict_source_closure_and_clock_leaves', 'assessment_role_policy', 'counter_and_external_cost_coverage')
 
 
 def _sha(value: Any) -> bool:

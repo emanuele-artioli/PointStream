@@ -807,3 +807,76 @@ def test_finish_readiness_validator_accepts_real_fleet_publication(tmp_path: Pat
     job.validate_finish_readiness(stage, target)
     result = json.loads(target.read_text())
     assert result['passed'] is True and result['checks']['source_producers_and_budget'] is True
+
+
+def test_finish_real_spec_staging_and_dispatch(tmp_path: Path, monkeypatch) -> None:
+    import sys
+    import time
+    from experiments.jobs import inbox
+    from experiments.tennis import w8_strict_host_cost_job as host, w8_witness_job as job
+
+    proof = tmp_path / 'proof'
+    proof.write_text(json.dumps({'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64,
+        'source_sha256': 'a' * 64, 'snapshot_sha256': 'b' * 64, 'revision': 'c' * 40,
+        'environment_sha256': 'd' * 64, 'host': 'gpu5', 'job_id': '20261106T000000Z-12345678',
+        'spec_sha256': 'e' * 64, 'raw_receipt_sha256': dict.fromkeys(job.REQUIRED_PROOFS, 'f' * 64),
+        'checks': dict.fromkeys(job.REQUIRED_CHECKS, True)}))
+    audit, p0, p1 = (tmp_path / name for name in ('audit', 'p0', 'p1'))
+    for item in (audit, p0, p1):
+        item.write_text(item.name)
+    ledger = tmp_path / 'ledger'
+    ledger.write_text(json.dumps({'reservation_amount_basis': 'remaining_unspent', 'gpu_total_seconds': 6000,
+        'cpu_total_seconds': 6000, 'workstreams': {'w8': {'gpu_limit_seconds': 5000, 'cpu_limit_seconds': 5000}},
+        'charges': [{'phase': 'pilot', 'parent_phase': 'w8-full-witness-staged-20261106',
+                     'workstream': 'w8', 'gpu_seconds': 200, 'cpu_seconds': 300, 'witness_qualification': True}],
+        'reservations': [{'phase': 'w8-full-witness-staged-20261106', 'workstream': 'w8',
+                          'gpu_seconds': 4000, 'cpu_seconds': 4000, 'status': 'remaining_unspent'}]}))
+    names = ('unit1_context', 'unit0_full', 'unit1_full', 'native_sam_compose', 'postseal_score',
+             'offline_validation', 'external_staging_audits', 'failure_headroom')
+    components = {name: {'gpu_seconds': 10, 'cpu_seconds': 10} for name in names}
+    components['unit1_context'] = {'gpu_seconds': 0, 'cpu_seconds': 0}
+    components['native_sam_compose'] = {'gpu_seconds': 600, 'cpu_seconds': 670}
+    promotion = tmp_path / 'promotion'
+    promotion.write_text(json.dumps({'schema': 1, 'scope': 'root-reviewed W8 remaining-work forecast',
+        'source_sha256': 'a' * 64, 'snapshot_sha256': 'b' * 64, 'cpu_proof_sha256': fixed.file_sha(proof),
+        'prior_artifact_sha256': fixed.file_sha(audit), 'ledger_sha256': fixed.file_sha(ledger),
+        'raw_measurement_audit_sha256': '2' * 64, 'safety_factor': 1.5, 'remaining_components': components,
+        'completed_artifact_sha256': {'unit1_context': '3' * 64}, 'gpu_remaining_seconds': 4000,
+        'cpu_remaining_seconds': 4000, 'issued_epoch': time.time() - 1, 'expires_epoch': time.time() + 100,
+        'qualification_charge_phases': ['pilot'], 'qualification_gpu_spent_seconds': 200,
+        'qualification_cpu_spent_seconds': 300, 'qualification_next_gpu_ceiling_seconds': 600,
+        'qualification_next_cpu_ceiling_seconds': 670}))
+    base = '/home/itec/emanuele/Datasets/pointstream-data/tests/'
+    spec = job.make_finish_spec(deadline=(datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat(),
+        proof_local=proof, proof_remote=base + 'proof', promotion_local=promotion, promotion_remote=base + 'promotion',
+        ledger_local=ledger, ledger_remote=base + 'ledger', producer_audit_local=audit,
+        producer_audit_remote=base + 'audit', producer0_local=p0, producer0_remote=base + 'p0',
+        producer1_local=p1, producer1_remote=base + 'p1', sam_remote='/home/itec/emanuele/Models/SAM/weights',
+        native_inventory_remote=base + 'native', qualification=True)
+    inbox.validate_spec(spec)
+    stage = tmp_path / 'job' / 'full'
+    stage.mkdir(parents=True)
+    rows = []
+    digests = {}
+    for item in spec['staged_inputs']:
+        path = tmp_path / ('asset-' + item['name'])
+        path.write_bytes(item['name'].encode())
+        rows.append({**item, 'source': item['path'], 'path': str(path)})
+        digests[path] = item['sha256']
+    (stage.parent / 'spec.json').write_text(json.dumps(spec))
+    (stage / 'staging.json').write_text(json.dumps({'inputs': rows}))
+    dispatch = {'cpu_affinity': [2], 'environment': {'alias': 'gpu5', 'gpu': {'name': 'RTX 6000 Ada'}}}
+    (stage / 'dispatch.json').write_text(json.dumps(dispatch))
+    actual, _ = host.stage_inputs(stage, digest_file=lambda path: digests[path], witness=True)
+    assert {'producer_audit', 'producer0', 'producer1', 'sam_weights', 'native_inventory'} <= set(actual)
+    called = []
+    monkeypatch.setenv('PS_STAGE_DIR', str(stage))
+    monkeypatch.setattr(job, 'run_finish', lambda path, **kwargs: called.append((path, kwargs)))
+    cmd = inbox.phase_command(spec, 'full', python='/python')
+    monkeypatch.setattr(sys, 'argv', ['w8_witness_job', *cmd[3:]])
+    job.main()
+    assert called == [(stage, {'qualification': True})]
+    dispatch['environment']['alias'] = 'gpu6'
+    (stage / 'dispatch.json').write_text(json.dumps(dispatch))
+    with pytest.raises(ValueError, match='dispatch differs'):
+        host.stage_inputs(stage, digest_file=lambda path: digests[path], witness=True)
