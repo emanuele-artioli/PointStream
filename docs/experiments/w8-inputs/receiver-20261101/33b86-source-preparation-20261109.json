@@ -1,0 +1,51 @@
+{
+  "archive_sha256": "327e96ea67d8d21127bee7b8cd0f4a785ef6ffceecd007665483812717241f48",
+  "artifacts": {
+    "check.py": "eb033495530430ae7e1e9c98806ee9c9d8310230d7de7c754c7780efe6f03abf",
+    "cpu0.stdout": "4f0af11b1f6e00f1c5d628ed8819e5847dcdfc8d9c9fb12458d9d5df638a4559",
+    "doctor.json": "769a319f6da85fa87023cec2d80d91695187b453938bde1e2893a85df704280b",
+    "intent.json": "62cf9b2be65d478cd6248e7b906469e7b773254cb375ded6caf9e82256c641ac",
+    "post-gpu2.stdout": "ef6eb0438a1ad7866fb2e637add019331ebea46a9f962f8f2135ba5f66d6b5e3",
+    "post-gpu5.stdout": "70ecaf83efd9e5f092496cc4bc865ed8f9bd95f21fd02573dc6fd25bb14b73f8",
+    "pre-gpu2.stdout": "2942cda1012c0829777248a82cfccda560a3de5ba242f4268b799600d2e805bd",
+    "pre-gpu5.stdout": "b2cab17701f45c9e3a645e7fc8c026c97991d6bee84d24734634847cfbe68369",
+    "run.py": "4f69907f0e4165a0973b50c16116cdfdc8ec2f05b90136db56ed5ce5b890c666",
+    "spec-normalized.json": "e817f5150ec71a785a347b7d57399cfe65f8ef6e249a8e34bcc0f0fe162abde1",
+    "spec-receipt.json": "4e5230f0b1507192c372d14423b0938c84983fe8cf12a11f3af16228fb096a4c",
+    "spec.json": "c1d9af1be2dc797768ea9f3b2ceb85413d7e35e4e371286f30ccdb79bbc7dfa6",
+    "status.json": "b9e5b0602a3cbb94cccff2a8ba9b9645ed6bca1bd41e21f94cf511abe44afb64",
+    "upload.stdout": "b1fcbe6689bd19d10cfee2efe6d01d57a0ba3317602671d04e06f60beaab63d0",
+    "upload_sink.py": "4d2c891906ff480cbe8bd21cbb741b87fbc761d06638fd0f92a4637dc9018dd0",
+    "usage.json": "938b49b8201493b50659216fb26254c9e77d65278f864abd14df83f77987ce55",
+    "workers.json": "59875eeb42058e40441d1426b2c9d468ada17003d372073b2cc717d1a4f53fc6"
+  },
+  "cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-33b86-20261109/source.tar",
+  "qualification": "public source verified on both hosts after stat-only protected checks; manager CPU unmetered; root allocation 30 CPU remains conservative",
+  "raw_directory": "/private/tmp/pointstream-w8-33b86-sourceprep-20261109-a1",
+  "revision": "33b86cb60347ac12ad2ce0674052e36706e232d1",
+  "schema": 1,
+  "scope": "source preparation only; no job or GPU",
+  "source_identity": "bf26eec6c158e686bf5a0ef12b4898d08b95345b998e9c3350e6dbf2df74c08b",
+  "spec": {
+    "deadline": "2026-11-09T23:58:16.194382Z",
+    "logical_spec_sha256": "b6bdbfb18f17d25383e6f722df50004c5047ba1ca09c48c6602a447d1c415bfc",
+    "normalized_file_sha256": "e817f5150ec71a785a347b7d57399cfe65f8ef6e249a8e34bcc0f0fe162abde1",
+    "phase_commands": {
+      "full": [
+        "{python}",
+        "-m",
+        "experiments.tennis.w8_witness_cpu_proof_job",
+        "noop"
+      ],
+      "smoke": [
+        "{python}",
+        "-m",
+        "experiments.tennis.w8_witness_cpu_proof_job",
+        "run"
+      ]
+    },
+    "raw_file_sha256": "c1d9af1be2dc797768ea9f3b2ceb85413d7e35e4e371286f30ccdb79bbc7dfa6",
+    "scope": "review only; no submission",
+    "source_archive_sha256": "327e96ea67d8d21127bee7b8cd0f4a785ef6ffceecd007665483812717241f48"
+  }
+}
