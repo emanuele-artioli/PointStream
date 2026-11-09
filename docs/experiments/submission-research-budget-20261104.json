@@ -1354,6 +1354,16 @@
       "cpu_seconds": 250,
       "basis": "Entire approved inclusive ceiling:20 preparation already charged plus250 campaign/publication/audit/contingency. Supervisor birth to canonical update120.677wall on singlecore; aggregate administrative CPU unmeasured. Conservative allocation, not measured270CPU runtime.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "w8-7b519-source-preparation-20261109",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 30,
+      "witness_qualification": false,
+      "basis": "Full conservative approved preparation ceiling; measured telemetry partial and manager aggregate unmeasured. Raw source/readiness/spec hashes root checked; no protected contents read.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -1937,8 +1947,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 4062,
-      "status": "Remaining_unspent4550GPU4062CPU; no activefleetjob, sourcequalification/localrepair only; noGPUrelease."
+      "cpu_seconds": 4032,
+      "status": "Remaining_unspent4550GPU4032CPU;7b519 sourceprep30charged; ONE832futureCPUcombinedproofreleased; noGPU."
     }
   ],
   "jobs": [
