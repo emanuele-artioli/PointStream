@@ -1075,6 +1075,15 @@
       "cpu_seconds": 300,
       "release_stage": "research-first24/28",
       "basis": "Expiredqueue42249d1d withnohost/supervisor/run/stage/GPU. Entire300remainingexternaladmin/watch/auditallowanceconservativelycharged; prior100prep=>400phaseCPU,800unusedcampaignCPUreleasedwithinparent. Exactwatch/managerCPUunavailable,notmeasuredaggregate; pendingwallnotGPUtime. EventACK, allcompatibleA6000stilloccupied, no retry."
+    },
+    {
+      "phase": "k5d-w8-shared-readiness-20261109T1752",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "release_stage": "research-first24/28",
+      "basis": "Prospective conservative50CPU cap for one fresh allhost/jobs/workers capacity and metadata-only admission readiness observation shared with W8. No source upload, protected-content reads, inference or request release. No recurring polling. Entire50charged; later request requires distinct root admission."
     }
   ],
   "reservations": [
@@ -1593,8 +1602,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8900,
-      "cpu_seconds": 8920,
-      "status": "Remaining_unspent8900GPU8920CPU afterqueuedparity4224 expirednohost/noGPU,400CPUinclusivecharged. NoactiveBalljob/wait. Source/CPUproofacceptedbutGPUparitystillopenpendingcompatibleA6000capacity. Noautomaticretry;292/586/full30notreleased."
+      "cpu_seconds": 8870,
+      "status": "Remaining_unspent8900GPU8870CPU after50CPUboundedsharedreadiness. NoactiveBalljob/wait; GPUparity,292/586/full30notreleased; old4224expiredclosed."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -2597,7 +2606,7 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "GPU16parity rootreleased/IDnotyetreceived; allpriorfleetjobscomplete. W8CPUstructureoraclecompletedawaitingrootartifactacceptance/closure; no30stepfreshwitness/benchmark30.",
+    "state": "No active jobs/waits. Ball4224expired and acknowledged. W8 source proof unsubmitted; bounded shared readiness only, no automatic replay.",
     "jobs": [],
     "batches": [],
     "native_completion_resume_verified": false,

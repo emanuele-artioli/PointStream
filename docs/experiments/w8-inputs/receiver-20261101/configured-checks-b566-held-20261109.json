@@ -1,0 +1,51 @@
+{
+  "revision": "b5661eaa1e6f96488b2a066523e33fb68832a703",
+  "worktree": "/private/tmp/pointstream-checks-b566-20261109",
+  "interpreter": "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+  "checks": [
+    {
+      "check": "ruff",
+      "command": [
+        "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+        "-m",
+        "ruff",
+        "check"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.13080395800352562,
+      "log": "/private/tmp/pointstream-checks-b566-result-20261109/ruff.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "check": "mypy",
+      "command": [
+        "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+        "-m",
+        "mypy",
+        "--config-file",
+        "pyproject.toml"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 61.24549045799358,
+      "log": "/private/tmp/pointstream-checks-b566-result-20261109/mypy.log",
+      "sha256": "06f13263d10016986bb246a31635cab06bfa662db6c06ea1d39f76c8bd1142d3"
+    },
+    {
+      "check": "pytest",
+      "command": [
+        "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+        "-m",
+        "pytest"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 116.6850822080014,
+      "log": "/private/tmp/pointstream-checks-b566-result-20261109/pytest.log",
+      "sha256": "81dcc523eccb54be6e125cffced9440aabac962873cd746022c8955b11b433d6"
+    }
+  ],
+  "wall_seconds": 178.06196754198754,
+  "waited_children_cpu_seconds": 241.83549299999999,
+  "passed": true,
+  "scope": "ordinary local configured software checks; no experiment or Linux namespace qualification",
+  "admission": "HELD: successful ordinary checks for exact revision only; later cd85/125e and external admission repair require final source checks/review. No Linux proof, upload or execution release."
+}
