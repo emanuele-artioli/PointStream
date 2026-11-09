@@ -1,0 +1,57 @@
+{
+  "cache_transition": "gpu5 native inventory local-copy observed in preserved ff6 staging; SHA verified cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b",
+  "cost_ceiling": "900 CPU inclusive: 120 prior failed proof, up to 30 future preparation, 600 campaign, 100 post-campaign, 50 audit; 0 GPU",
+  "local_waited_ssh_cpu_seconds": 0.13908900000000002,
+  "local_wrapper_cpu_seconds": 0.085867,
+  "postcheck_hosts": [
+    "gpu2",
+    "gpu5"
+  ],
+  "prior_failed_precheck_cpu_charge": 6,
+  "proposed_conservative_cpu_charge": 2,
+  "protected_content_read": false,
+  "raw_directory": "/private/tmp/pointstream-w8-f6d2-resume-20261109-a1",
+  "raw_file_sha256": {
+    "check.py": "7ad3c1a716a19d46b07030beca51b5a8c87f802b56815008d631a5aa95c58652",
+    "intent.json": "2a475b89afb9245b50106ecad27fe83e28468904e06a618535a7e10a58eb97c6",
+    "post-gpu2.local-start.json": "f7e4ed315dcbd7e1db3a9c757b6c0f49e338c284df9089e4db8a39d7a4120605",
+    "post-gpu2.stderr": "304b99abe9e33bd8154645157625453975aabb795f947382e93ed97b2258a01a",
+    "post-gpu2.stdout": "d0a4072e549eb72e8e0c61b28fdc8e869c70138ac8e2b3e167994f3f6738529e",
+    "post-gpu5.local-start.json": "272faaf807ef65e79a1f3cedddb899e09be512d3806aedd932e1f2d8464d9936",
+    "post-gpu5.stderr": "aea74415e80ff80b8f96b14b9c073b1a2096e7d841573066feb4f6c1213340c4",
+    "post-gpu5.stdout": "248b83d6cc976887e665895b5674e9550c7ea2a165b1488005bb515f1ecec425",
+    "pre-gpu5.local-start.json": "91782ffcd896b2875b7efae942f3e2aac1cba3633fb2c5d92cc33faaf1235f00",
+    "pre-gpu5.stderr": "e91b5f7dc20d2acbc3d5089653d2d8d1f9d50d7cabf934d794af1e295f1ceb01",
+    "pre-gpu5.stdout": "dc13a214f2265c13aa805fa6afb8b20b84156db4ac9901065ef4936f27e2e339",
+    "run.py": "418560edb9a5b897b57d74f4a27bb3806f2ff21c2c28cfb04162d3bc58563bff",
+    "source.tar.gz": "544fe8127ee0fe8ad03f8c640c67a56327d65978b98e969d33e8523b226aea3e",
+    "upload.local-start.json": "f99d7cb6f5c86a3aaf703c6fb8a30d1032d8cd20c00355a25eb2a079b651e66a",
+    "upload.stderr": "9ca22eb46ad9ccdcb14906fe9683b2a955ed6c1f06996c03fefbd4edbad5a630",
+    "upload.stdout": "b89bd75eb83a013375c533d66aa2011af7263bdbbf545c60587245e1311f53fe",
+    "upload_sink.py": "37171c2730342f8092e5e6bfbb56009528d79f73cec97dc099da97648f990077",
+    "usage.json": "524f4fdf20d153af105478ee1ae04a30c7c2e0895d439fb97acaf7d0e1632293"
+  },
+  "remote_process_cpu_seconds": 0.5518909999999999,
+  "revision": "f6d2d8437aaf16c7e866e8ea846cc769e09dd922",
+  "schema": 1,
+  "scope": "source preparation only; no GPU or CPU proof",
+  "source": {
+    "bytes": 20776960,
+    "cpu_affinity": [
+      1
+    ],
+    "ctime_ns": 1794253647433593857,
+    "device": 58,
+    "inode": 41293558,
+    "mtime_ns": 1794253647433593857,
+    "pgid": 3962981,
+    "pid": 3962981,
+    "protected_content_read": false,
+    "scope": "fixed public source transfer only",
+    "self_cpu_seconds": 0.24679299999999998,
+    "sha256": "e6527d02582402b637bf34f31ce5b661bef9b7e900d062ee77b78fc08e97f84c",
+    "size": 20776960,
+    "target": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-f6d2-20261109/source.tar",
+    "wall_seconds": 2.182013270445168
+  }
+}

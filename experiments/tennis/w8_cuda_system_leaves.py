@@ -276,14 +276,43 @@ APPROVED_LEAVES = (
 )
 
 
+def self_process_identity() -> dict[str, int]:
+    """Read the current process identity in the proc mount's host PID view."""
+    raw = Path('/proc/self/stat').read_text()
+    end = raw.rfind(')')
+    if end < 0:
+        raise ValueError('malformed current process stat')
+    fields = raw[end + 2:].split()
+    pid = int(raw[:raw.find(' ')])
+    pgid, start = int(fields[2]), int(fields[19])
+    nspid = [line.split()[1:] for line in Path('/proc/self/status').read_text().splitlines()
+             if line.startswith('NSpid:')]
+    if (pid <= 0 or pgid <= 0 or start <= 0 or os.readlink('/proc/self') != str(pid)
+            or len(nspid) != 1 or not nspid[0] or int(nspid[0][0]) != pid
+            or int(nspid[0][-1]) != os.getpid()):
+        raise ValueError('current host and namespace process identity differs')
+    return {'host_pid': pid, 'host_pgid': pgid, 'start_ticks': start}
+
+
+def validate_self_leaf_identity(rows: list[dict[str, Any]], worker: dict[str, Any]) -> None:
+    """Join both self leaves to the independently captured namespace worker."""
+    for name in ('/proc/self/maps', '/proc/self/status'):
+        matches = [row for row in rows if row.get('name') == name]
+        if (len(matches) != 1 or matches[0].get('self_process') != {
+                key: worker.get(key) for key in ('host_pid', 'host_pgid', 'start_ticks')}
+                or matches[0].get('resolved') != '/proc/' + str(worker.get('host_pid')) + '/' + name.rsplit('/', 1)[-1]):
+            raise ValueError('self leaf and namespace worker identity differ')
+
+
 def approved_leaves(denied: list[Path], loader: dict[str, Any]) -> tuple[list[Path], list[dict[str, Any]]]:
     protected = {(p.stat().st_dev, p.stat().st_ino) for p in denied}
+    current = self_process_identity()
     paths: list[Path] = []
     receipt: list[dict[str, Any]] = []
     for name in APPROVED_LEAVES:
         path = Path(name).resolve(strict=True)
         info = path.stat()
-        expected = name.replace('/proc/self/', f'/proc/{os.getpid()}/')
+        expected = name.replace('/proc/self/', f"/proc/{current['host_pid']}/")
         if str(path) != expected or not stat.S_ISREG(info.st_mode):
             raise ValueError('approved leaf is not the expected regular kernel or loader file: ' + name)
         if name == '/etc/ld.so.cache' and (loader['uid'] != 0 or loader['mode'] & stat.S_IWOTH
@@ -293,7 +322,8 @@ def approved_leaves(denied: list[Path], loader: dict[str, Any]) -> tuple[list[Pa
             raise ValueError('approved leaf aliases protected input')
         paths.append(path)
         receipt.append({'name': name, 'resolved': str(path), 'device': info.st_dev, 'inode': info.st_ino,
-                        'mode': info.st_mode, 'uid': info.st_uid})
+                        'mode': info.st_mode, 'uid': info.st_uid,
+                        **({'self_process': current} if name.startswith('/proc/self/') else {})})
     return paths, receipt
 
 

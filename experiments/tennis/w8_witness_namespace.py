@@ -95,6 +95,14 @@ def identity(status: Path) -> dict[str, int]:
     return {'host_pid': pid, 'host_pgid': pgid, 'start_ticks': start, 'campaign_pgid': group}
 
 
+def kill_remaining() -> None:
+    """Kill namespace children; no remaining process is a normal race."""
+    try:
+        os.kill(-1, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
+
+
 def supervise(outside: str, timeout: float, receipt: Path, target: str, args: list[str]) -> dict[str, Any]:
     if sys.platform != 'linux' or os.getpid() != 1:
         raise ValueError('Linux PID namespace init required')
@@ -151,7 +159,7 @@ def supervise(outside: str, timeout: float, receipt: Path, target: str, args: li
     while True:
         if not reason and (interrupted or time.monotonic() - start >= timeout):
             reason = 'signal' if interrupted else 'timeout'
-            os.kill(-1, signal.SIGKILL)
+            kill_remaining()
         try:
             pid, raw = os.waitpid(-1, os.WNOHANG)
         except ChildProcessError:
@@ -162,7 +170,7 @@ def supervise(outside: str, timeout: float, receipt: Path, target: str, args: li
                 child_status = os.waitstatus_to_exitcode(raw)
                 if child_status != 0 and not reason:
                     reason = 'worker_failed'
-                    os.kill(-1, signal.SIGKILL)
+                    kill_remaining()
         else:
             time.sleep(.02)
     after = resource.getrusage(resource.RUSAGE_CHILDREN)

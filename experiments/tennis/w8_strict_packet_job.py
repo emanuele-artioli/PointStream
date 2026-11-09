@@ -479,12 +479,15 @@ def run_proof(stage: Path) -> dict[str, Any]:
     input_sha = spec.get('witness_input_job_sha256')
     if not isinstance(input_sha, str):
         raise ValueError('frozen witness input module SHA required')
-    check_bootstrap_archive(stage, dispatch, bootstrap_sha, input_sha)
+    policy_sha = spec.get('witness_system_leaves_sha256')
+    if not isinstance(policy_sha, str):
+        raise ValueError('frozen witness system leaves SHA required')
+    check_bootstrap_archive(stage, dispatch, bootstrap_sha, input_sha, policy_sha)
     snapshot = Path(__file__).resolve().parents[2]
     preflight = json.loads(paths['preflight'].read_text())
     host.check_preflight_bundle(preflight, paths['identity'], witness_metadata=True)
     host.check_preflight_sources(preflight, snapshot, witness_bootstrap_sha=bootstrap_sha,
-                                 witness_input_sha=input_sha)
+                                 witness_input_sha=input_sha, witness_policy_sha=policy_sha)
     fingerprints = host.read_oracle(paths['oracle'])
     rate = host.audit_public_rate(paths['packet'], paths['profile'])
     scratch = fixed.checked_scratch()
@@ -552,6 +555,7 @@ def run_proof(stage: Path) -> dict[str, Any]:
             or cpu.get('pre_serialization', {}).get('restored_tensors') != 480):
         raise ValueError('combined proof packet/oracle identity differs')
     receipt_paths = {'packet-config.json': work / 'worker-config.json', 'packet-exit.json': work / 'exit.json',
+                     'packet-self-leaves.json': work / 'self-leaves.json',
                      'packet-namespace.json': work / 'namespace-receipt.json',
                      'packet-namespace.json.started': work / 'namespace-receipt.json.started',
                      'packet-decoded-manifest.json': decoded_path, 'packet-cpu-only.json': cpu_path,

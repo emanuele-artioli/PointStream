@@ -48,21 +48,26 @@ def test_repaired_input_module_is_bound_to_archive(tmp_path) -> None:
     source = Path(fixed.__file__).resolve().parent
     bootstrap = source / 'w8_receiver_bootstrap.py'
     input_job = Path(fixed.__file__).resolve()
+    policy = source / 'w8_cuda_system_leaves.py'
     archive = tmp_path / 'source.tar'
     with tarfile.open(archive, 'w') as tar:
         tar.add(bootstrap, arcname='experiments/tennis/w8_receiver_bootstrap.py')
         tar.add(input_job, arcname='experiments/tennis/w8_input_job.py')
+        tar.add(policy, arcname='experiments/tennis/w8_cuda_system_leaves.py')
     dispatch = {'code': {'snapshot_sha256': fixed.file_sha(archive)}}
-    job.check_bootstrap_archive(stage, dispatch, fixed.file_sha(bootstrap), fixed.file_sha(input_job))
+    job.check_bootstrap_archive(stage, dispatch, fixed.file_sha(bootstrap), fixed.file_sha(input_job), fixed.file_sha(policy))
     with pytest.raises(ValueError):
-        job.check_bootstrap_archive(stage, dispatch, fixed.file_sha(bootstrap), '0' * 64)
+        job.check_bootstrap_archive(stage, dispatch, fixed.file_sha(bootstrap), '0' * 64, fixed.file_sha(policy))
     with pytest.raises(ValueError):
-        job.check_bootstrap_archive(stage, dispatch, fixed.file_sha(bootstrap), '')
+        job.check_bootstrap_archive(stage, dispatch, fixed.file_sha(bootstrap), '', fixed.file_sha(policy))
+    with pytest.raises(ValueError, match='system leaves policy differs'):
+        job.check_bootstrap_archive(stage, dispatch, fixed.file_sha(bootstrap), fixed.file_sha(input_job), '0' * 64)
     wrong = tmp_path / 'wrong-input.py'
     wrong.write_text('changed input module')
     with tarfile.open(archive, 'w') as tar:
         tar.add(bootstrap, arcname='experiments/tennis/w8_receiver_bootstrap.py')
         tar.add(wrong, arcname='experiments/tennis/w8_input_job.py')
+        tar.add(policy, arcname='experiments/tennis/w8_cuda_system_leaves.py')
     dispatch['code']['snapshot_sha256'] = fixed.file_sha(archive)
     with pytest.raises(ValueError, match='input module differs'):
-        job.check_bootstrap_archive(stage, dispatch, fixed.file_sha(bootstrap), fixed.file_sha(input_job))
+        job.check_bootstrap_archive(stage, dispatch, fixed.file_sha(bootstrap), fixed.file_sha(input_job), fixed.file_sha(policy))

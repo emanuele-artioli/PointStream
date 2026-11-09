@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "decision": "release ONE new-source native CPU namespace proof only",
+  "revision": "da98de4a37e58af56d850eddabebb81be0642e42",
+  "snapshot_sha256": "0fc1220f7aa82e7f0edfe637869cbfb5bbb1517e3cc5a51ad6e273702b03cfb1",
+  "source_sha256": "62b6c4904c627d770a3d0854dc850a8871097f0053e551563e8cb4c647cc3036",
+  "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "actual_spec": "/private/tmp/k5d-da98-prep-20261109/spec.json",
+  "spec_file_sha256": "c6c5990f0fba9dcb0939a276f33e151644c957e29a19047945b3cfc1465cff6b",
+  "logical_spec_sha256": "1207854549d029717de6053304569501d2d4536c2ff604915ac05840f7b1ae86",
+  "normalized_file_sha256": "4cae275d62cc99597f0dcd2715774fd97ed17af47251202805dd45d37404e6a1",
+  "deadline": "2026-11-09T21:13:13Z",
+  "host": "gpu2",
+  "cpu_affinity_index": 0,
+  "source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/k5d-low-memory-da98-20261109/source.tar",
+  "inclusive_cpu_ceiling": 300,
+  "already_charged_preparation_cpu": 50,
+  "future_cpu_ceiling": 250,
+  "future_components": {
+    "single_core_campaign": 100,
+    "postcampaign_and_manager": 100,
+    "independent_audit": 30,
+    "failure_contingency": 20
+  },
+  "gpu_ceiling": 0,
+  "parent_phase": "k5d-scale-first-tranche-20261105",
+  "remaining_parent_cpu_after_prep": 8060,
+  "source_review": "Root/independent actual1379Gitblobs and H2bridge5b24296b verified; publicfixture f438 unchanged; exactda98Ruff/mypy499/pytest1771+37skip passed. Rootcombinedc8c169Ruff/mypy563/pytest2017+39skip passed.",
+  "forecast": "Previous exactnormal/interruption proofbbde supervisorlifetime60.999878seconds; once1.5margin91.499817fits100singlecorecampaign. NewsourcehasunchangedCPUproof/namespacenativecode and smallpackaging/resourcepatchdifferences; sourcefreshnessiswhynewproofrequired. 70smoke+10validator+5noop leaves15campaignstaging/cleanup; hardcapsnotruntimeguarantee. External150CPUincludesunmeteredadministration conservatively.",
+  "prep_raw_sha256": {
+    "receipt.json": "101f8cf4d643f40fc6fd9b994fb933a6334b9ef000af0e4d8e49494f51db6135",
+    "host-check.out": "696b081615323f7702517f25e163188af960dae0013ec601ef9a4089df37e881",
+    "host-check.py": "70247856141a6972f0e63732310315cf2101e07f0819cb19e48d92ecfd38a93d",
+    "upload-plan.json": "d918a2ea944337b33f912946c41a7736ebcc9219fdd3d39d413530f94a98be40",
+    "upload-result.json": "c5fbb98172ed243fc46958f2b88f95687271dac49a8881c45b97c6ae8d6aa550",
+    "postcheck.json": "9245507f146fa53f49502c21a1003f8bf0b61ae8287fab1b44bb86ca9c833d26",
+    "postcheck.py": "2de6438991498a3600fb536939d89213c1febfe11a772d383aaced711618fce9",
+    "spec-receipt.json": "4c98790b26aa5112fa43517062063e6f032616850c5b526d5a2fbf0161573ecb"
+  },
+  "conditions": [
+    "checkactualspecbytes/cleanpinnedcheckout/cachedsourceandCPUclaim/knownjobstatebeforeONEcanonicalsubmit; minimum900secondsbeforefixeddeadline orstopforrootreview, no silentrefresh",
+    "persistactualjobID/source/spec/deadline/budgets/output inBallentry; sendrootIDforcentralledgerBEFOREonecanonicalps-fleetwait<=2700; inspectuncertainsubmissionneverreplay",
+    "CPUonlyfourrealnativecasesnormal/timeout/TERM/KILL with independentaccounting/PIDbirth/group/claim/teardownrawaudit; no freshGPUmemory/parity/timing/scale/qualityclaim",
+    "stoponanynative/source/accounting/identity/budget/deadline/receiptfailure; preserveoutputs,noautoretry",
+    "rootindependentlyacceptsrawsource/native/cases/claims/cost beforeseparateGPU16release; no292/586/full30release"
+  ]
+}

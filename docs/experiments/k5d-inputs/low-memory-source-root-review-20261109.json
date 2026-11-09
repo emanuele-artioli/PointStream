@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "decision": "root accepts local source and exact resource-only bridge review; execution still gated",
+  "revision": "2602dd8a69500a80a5edf9a2e86a732e76eada01",
+  "snapshot_sha256": "55233e6bd0029ec3881f7e056a9d3939a0d200752f09caa3bf333a434ae70723",
+  "source_sha256": "4f3a78dccc4562b2dc8370e83f4f6e8b77ac473d01aa5493423be9bc1eef124a",
+  "root_independently_verified_git_blobs": 1378,
+  "root_reran_actual_H2_source_bridge": true,
+  "bridge_sha256": "9c6e213f8c0e98d093d246312ad92915006696ec732a923fce9016e731b1f487",
+  "old_blobs_unchanged_except_pinned_resource_worker": 1347,
+  "new_control_test_files": 30,
+  "relative_to_df6_changed_files": [
+    "experiments/tennis/k5d_low_memory_source_bridge.py",
+    "experiments/tennis/k5d_real_parity.py",
+    "src/codecs/dcvc_uf_worker.py",
+    "tests/tennis/test_k5d_low_memory_source_bridge.py",
+    "tests/tennis/test_k5d_real_parity.py",
+    "tests/tennis/test_k5d_shared_parity.py"
+  ],
+  "review": "Distinct opt-in 4096MiBparent/2048child,6144declaration+unchanged8192margin; oldv1 preserved. No batch/dtype/model/point/array/native comparison or tolerance changes. All12child action/plan/hostbirth/group/UUIDreceipts still required. Torch limits do not cover contexts/driver/customallocators; fleet reactive guard not hardcap.",
+  "checks": "Ruff/mypy/focused checks reported; complete pytest receipt pending. Root mainCI separately after finalsource commits.",
+  "memory_fit_observed": false,
+  "source_upload_authorized": false,
+  "cpu_or_gpu_execution_authorized": false,
+  "next": "Use one fresh readinesssurvey to choose acceptedDF6 if it fits warmcapacity; otherwise fullconfiguredchecks and separately released actualnewsourceCPUproof precede lowerprofileGPU16."
+}

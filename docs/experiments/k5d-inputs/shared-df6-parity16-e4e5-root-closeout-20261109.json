@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "job_id": "20261109T193337Z-e4e56d4b",
+  "decision": "root accepts terminal closure only; no research gate passed",
+  "audit_file": "docs/experiments/k5d-inputs/shared-df6-parity16-e4e5-expiry-audit-20261109.json",
+  "audit_sha256": "c881254a4ab9fd1e36380774c1de313dcd6ba635c7c2668eeaaf273c4965e70b",
+  "raw_files_independently_rehashed": 12,
+  "canonical_terminal_status_freshly_verified": true,
+  "gpu_charge": 0,
+  "additional_cpu_charge": 370,
+  "inclusive_cpu_charge": 400,
+  "basis": "Fullremaining370externalCPUallowancechargedconservativelyforqueue/manager/audit/admin;prior30prep=>400inclusiveof1200leaf. Noassignedhost/stage/GPU, pending1735.275wallNOTCPU. All12rawhashesrootchecked,emptyclaimbook,eventACK. Unused800campaignCPUreleasedinsideparent,notnewreservation.",
+  "retry_authorized": false
+}

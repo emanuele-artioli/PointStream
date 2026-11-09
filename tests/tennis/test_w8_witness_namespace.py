@@ -117,3 +117,16 @@ def test_native_target_requires_fixed_cpu_config_and_scratch(tmp_path, monkeypat
     with pytest.raises(ValueError):
         namespace.command(namespace.NATIVE_TARGET, args)
     assert namespace.NATIVE_TARGET not in namespace.TARGETS
+
+
+def test_kill_remaining_only_accepts_missing_process(monkeypatch):
+    from experiments.tennis import w8_witness_namespace as namespace
+    def missing(_pid, _sig):
+        raise ProcessLookupError()
+    monkeypatch.setattr(namespace.os, 'kill', missing)
+    namespace.kill_remaining()
+    def denied(_pid, _sig):
+        raise PermissionError()
+    monkeypatch.setattr(namespace.os, 'kill', denied)
+    with pytest.raises(PermissionError):
+        namespace.kill_remaining()

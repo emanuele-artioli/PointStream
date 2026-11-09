@@ -1,0 +1,47 @@
+{
+  "branch": "codex/k5d-low-memory-fixture-freeze-20261109",
+  "checks": {
+    "mypy": "499 files pass",
+    "pytest": "1771 passed, 37 skipped",
+    "ruff": "pass"
+  },
+  "cpu_proof_inclusive_ceiling": 300,
+  "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "files": {
+    "archive": {
+      "path": "/private/tmp/k5d-low-memory-fixture-freeze-review-20261109/consumer-source.tar",
+      "sha256": "0fc1220f7aa82e7f0edfe637869cbfb5bbb1517e3cc5a51ad6e273702b03cfb1"
+    },
+    "blob_manifest": {
+      "path": "/private/tmp/k5d-low-memory-fixture-freeze-review-20261109/git-blobs.txt",
+      "sha256": "75ee68189d81ea00db9a9290b1ad038dfc84515f69fa0ff17d07b503437e13ac"
+    },
+    "bridge": {
+      "path": "/private/tmp/k5d-low-memory-fixture-freeze-review-20261109/bridge.json",
+      "sha256": "5b24296ba1f640352ff6e75bed71b9bfa7164cce1182afb0b8b58f3ad1cc3edf"
+    },
+    "checks": {
+      "path": "/private/tmp/k5d-low-memory-fixture-freeze-review-20261109/checks.json",
+      "sha256": "f26f7e3adc0b9e41514559fc355e294871e9fc9cdacdc61c19e482e94fe13d66"
+    },
+    "cpu_proof_proposal": {
+      "path": "/private/tmp/k5d-low-memory-fixture-freeze-review-20261109/cpu-proof-proposal.json",
+      "sha256": "403cc21b4acd1fbb0d682d0dcd07ed2abf7117ce24b6f14c3b159c0656606860"
+    },
+    "prior_revision_diff": {
+      "path": "/private/tmp/k5d-low-memory-fixture-freeze-review-20261109/2602-diff.json",
+      "sha256": "ba0a2ff509148b100b1d02ba806e1db08b44daaa2cb496d0b84fed3287b13909"
+    }
+  },
+  "gpu_ceiling": 0,
+  "raw_directory": "/private/tmp/k5d-low-memory-fixture-freeze-review-20261109",
+  "replacement_diff": "exact pinned calibration audit fixture f438382b plus distinct low-memory bridge/test fixture pin; no numerical change",
+  "replaces": "2602dd8a69500a80a5edf9a2e86a732e76eada01",
+  "revision": "da98de4a37e58af56d850eddabebb81be0642e42",
+  "schema": 1,
+  "scope": "16-frame exact numerical parity candidate; actual allocator fit, CPU proof, GPU parity and complete-study qualification remain unproven.",
+  "snapshot_sha256": "0fc1220f7aa82e7f0edfe637869cbfb5bbb1517e3cc5a51ad6e273702b03cfb1",
+  "source_sha256": "62b6c4904c627d770a3d0854dc850a8871097f0053e551563e8cb4c647cc3036",
+  "status": "replacement frozen candidate; local only; no upload or compute release",
+  "worktree": "/private/tmp/pointstream-k5d-low-memory-fixture-freeze-20261109"
+}

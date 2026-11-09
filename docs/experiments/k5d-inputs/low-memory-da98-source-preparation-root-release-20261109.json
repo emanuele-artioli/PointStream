@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "decision": "release only bounded source preparation, not submission",
+  "revision": "da98de4a37e58af56d850eddabebb81be0642e42",
+  "snapshot_sha256": "0fc1220f7aa82e7f0edfe637869cbfb5bbb1517e3cc5a51ad6e273702b03cfb1",
+  "source_sha256": "62b6c4904c627d770a3d0854dc850a8871097f0053e551563e8cb4c647cc3036",
+  "archive": "/private/tmp/k5d-low-memory-fixture-freeze-review-20261109/consumer-source.tar",
+  "root_verified_git_blobs": 1379,
+  "root_reran_actual_H2_bridge_sha256": "5b24296ba1f640352ff6e75bed71b9bfa7164cce1182afb0b8b58f3ad1cc3edf",
+  "cpu_ceiling": 50,
+  "gpu_ceiling": 0,
+  "included_in_future_300CPUproof_leaf": true,
+  "parent_phase": "k5d-scale-first-tranche-20261105",
+  "parent_remaining_CPU_before_preparation": 8110,
+  "scope": "ONEfresh boundedallhost/knownjob/worker/claim/gpu2CPU0/tools/runtime/cache/space/nativeinputZIPchecks; gziptransfer verifiedactualsource to NEW immutable public SHA cache withoutoverwrite; public postSHA; prepare actualspecwithfresh<=45mindeadline, no jobsubmission.",
+  "target_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/k5d-low-memory-da98-20261109/source.tar",
+  "conditions": [
+    "gpu2CPU0onlyCPUproof,0GPU; localrootdistinctfilesystemandspaceverified",
+    "source tar exact andcleanconsumer; do notinclude unrelatedroot/W8changes",
+    "measureCPUwhereavailable; unmeteredadministration remainsconservative; stopbefore50canbeexceeded",
+    "preserveallinputs/oldsource/evidence, freshoutputpaths, no overwrite/delete",
+    "finalfullconfiguredchecks and rootactualspec/costreviewrequired beforeonesubmission; no GPU16/scale release"
+  ]
+}

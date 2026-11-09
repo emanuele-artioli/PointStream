@@ -126,6 +126,11 @@ def launch(config_path: Path, config_sha: str, loader_path: Path, loader_sha: st
     if any(canary == root or canary.is_relative_to(root) for root in allowed):
         raise ValueError('canary must be outside allowed roots')
     extra, leaves = policy.approved_leaves(denied, loader)
+    if witness_mode is not None:
+        with (output.parent / 'self-leaves.json').open('x') as stream:
+            json.dump(leaves, stream, sort_keys=True)
+            stream.flush()
+            os.fsync(stream.fileno())
     allowed.extend(extra)
     clock_identity = None
     if clock_profile is not None:
