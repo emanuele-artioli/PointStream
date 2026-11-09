@@ -1,7 +1,8 @@
 # Ball parent8/child2 source qualification — November9
 
-Status: source preparation only is released. Neither CPU job nor GPU pilot is
-released by this card. The approved programme and Ball parent limits are unchanged.
+Status: both CPU cases are terminal and root accepted: expected-failure forensic
+mechanism a2f41fee (honestly FAILED fleet status) and complete real native proof
+edafe094. No GPU pilot is released by this card. The approved programme and Ball parent limits are unchanged.
 
 The actual4GiB parent failed BallTrack's original batch16 concat before DCVC or
 parity. It needed a fresh1.69GiB block with about2.67GiB already reserved. This

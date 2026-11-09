@@ -1345,6 +1345,15 @@
       "cpu_seconds": 20,
       "release_stage": "research-first24/28",
       "basis": "Full authorized20CPU fresh native readiness, ZIP11.770CPU+source9fSHA.130partial probes, fleet/SSH/adminunmetered. No duplicate sourceupload. Inside270nativeleaf,250future; failedleaf140closed -> combinedqualification410if270fullyspent<=420. Rootexactrawreadiness/SHA/spec reviewed, nojobyet."
+    },
+    {
+      "phase": "parent8-native-edaf-closure-20261109",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 250,
+      "basis": "Entire approved inclusive ceiling:20 preparation already charged plus250 campaign/publication/audit/contingency. Supervisor birth to canonical update120.677wall on singlecore; aggregate administrative CPU unmeasured. Conservative allocation, not measured270CPU runtime.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -1863,8 +1872,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 8370,
-      "cpu_seconds": 7580,
-      "status": "Remaining_unspent8370GPU7580CPU; native20readinesscharged, ONE270inclusiveCPUproof released250future, noGPUrelease."
+      "cpu_seconds": 7330,
+      "status": "Remaining_unspent8370GPU7330CPU; parent8 CPU gate accepted; noGPUrelease."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -3114,7 +3123,7 @@
       "job_id": "20261109T221304Z-edafe094",
       "phase": "k5d-scale-first-tranche-20261105",
       "subphase": "parent8-real-native-fourcase-CPUproof",
-      "state": "last observed running with substantive smoke gate passed; final native/lifecycle/cost rootaudit pending",
+      "state": "complete; root accepted real native CPU gate only",
       "revision": "965d801ada4b8ccb6e54685f4560de8287931d00",
       "snapshot_sha256": "9f486d70424b9d293d8774c92b36350d284edcb2513c415390b88a2b4c344aed",
       "source_sha256": "58787f8664f961c2287228762c1ddd3295adab4042bd7f41d9bfee87d2666104",
@@ -3134,7 +3143,12 @@
       "local_batch": "/private/tmp/k5d-parent8-native-20261109/batch.json",
       "supervisor_pid": 1897099,
       "campaign_pgid": 1897104,
-      "scope": "Real native normal/timeout/TERM/KILL and CPU accounting/containment only, no GPU/memory/parity/quality claim"
+      "scope": "Real native normal/timeout/TERM/KILL and CPU accounting/containment only, no GPU/memory/parity/quality claim",
+      "actual_inclusive_conservative_cpu_charge": 270,
+      "terminal_additional_cpu_charge": 250,
+      "wait_state": "ended",
+      "root_accepted_receipt_sha256": "b0672f365ce72d7fa0f3e3b59eb14aca2cebed3be80c8e41a1354713f39a3821",
+      "full_native_gate_passed": true
     }
   ],
   "old_budgets": "closed, not borrowed",
