@@ -260,7 +260,7 @@ def test_pilot_spec_is_separate_and_never_auto_promotes(tmp_path: Path):
     from experiments.tennis import w8_witness_job as job
 
     gate = tmp_path / 'cpu-gate.json'
-    gate.write_text(json.dumps({'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64,
+    gate.write_text(json.dumps({'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64,
         'source_sha256': 'a' * 64, 'snapshot_sha256': 'b' * 64, 'revision': 'c' * 40,
         'environment_sha256': 'd' * 64, 'host': 'gpu5', 'job_id': '20261106T000000Z-12345678',
         'spec_sha256': 'e' * 64, 'raw_receipt_sha256': dict.fromkeys(job.REQUIRED_PROOFS, 'f' * 64),
@@ -312,7 +312,7 @@ def test_pilot_cpu_gate_requires_raw_audits_and_exact_source():
     from experiments.tennis import w8_witness_job as job
 
     source = {'source_sha256': 'a' * 64, 'snapshot_sha256': 'b' * 64, 'git_head': 'c' * 40}
-    gate = {'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, **source,
+    gate = {'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64, **source,
             'revision': source['git_head'], 'environment_sha256': 'd' * 64, 'host': 'gpu5',
             'job_id': '20261106T000000Z-12345678', 'spec_sha256': 'e' * 64,
             'raw_receipt_sha256': {key: 'f' * 64 for key in job.REQUIRED_PROOFS},
@@ -335,7 +335,7 @@ def test_pilot_released_validation_uses_sealed_sources_not_deleted_scratch(tmp_p
     stage = tmp_path / 'job' / 'smoke'
     stage.mkdir(parents=True)
     source = {'source_sha256': 'a' * 64, 'snapshot_sha256': 'b' * 64, 'git_head': 'c' * 40}
-    gate = {'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, **source, 'revision': source['git_head'],
+    gate = {'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64, **source, 'revision': source['git_head'],
             'environment_sha256': 'd' * 64, 'host': 'gpu5', 'job_id': '20261106T000000Z-12345678',
             'spec_sha256': 'e' * 64, 'raw_receipt_sha256': dict.fromkeys(job.REQUIRED_PROOFS, 'f' * 64),
             'checks': dict.fromkeys(job.REQUIRED_CHECKS, True)}
@@ -357,7 +357,7 @@ def test_pilot_released_validation_uses_sealed_sources_not_deleted_scratch(tmp_p
                 for name, digest in expected.items()]
     staged = [{'name': row['name'], 'sha256': row['sha256'], 'source': row['path'],
                'path': str(tmp_path / 'deleted-scratch' / str(row['name'])), 'extract': False} for row in declared]
-    spec = {'staged_inputs': declared, 'witness_cpu_proof_sha256': fixed.file_sha(cpu), 'witness_bootstrap_sha256': '9' * 64}
+    spec = {'staged_inputs': declared, 'witness_cpu_proof_sha256': fixed.file_sha(cpu), 'witness_bootstrap_sha256': '9' * 64, 'witness_input_job_sha256': '8' * 64}
     monkeypatch.setattr(job, 'check_bootstrap_archive', lambda *_args: None)
     (stage.parent / 'spec.json').write_text(json.dumps(spec))
     (stage / 'staging.json').write_text(json.dumps({'inputs': staged}))
@@ -427,7 +427,7 @@ def test_pilot_builder_phase_and_staging_bind_exact_proof_host(tmp_path: Path, m
     monkeypatch.setattr(w8_protected_metadata, 'reject_protected_alias', lambda _path: None)
 
     gate = tmp_path / 'cpu-gate.json'
-    gate.write_text(json.dumps({'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64,
+    gate.write_text(json.dumps({'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64,
         'source_sha256': 'a' * 64, 'snapshot_sha256': 'b' * 64, 'revision': 'c' * 40,
         'environment_sha256': 'd' * 64, 'host': 'gpu5', 'job_id': '20261106T000000Z-12345678',
         'spec_sha256': 'e' * 64, 'raw_receipt_sha256': dict.fromkeys(job.REQUIRED_PROOFS, 'f' * 64),
@@ -479,7 +479,7 @@ def test_unit1_spec_requires_actual_ledger_and_forecast(tmp_path: Path):
     from experiments.tennis import w8_witness_job as job
 
     proof = tmp_path / 'proof.json'
-    proof.write_text(json.dumps({'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64,
+    proof.write_text(json.dumps({'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64,
         'source_sha256': 'a' * 64, 'snapshot_sha256': 'b' * 64, 'revision': 'c' * 40,
         'environment_sha256': 'd' * 64, 'host': 'gpu5', 'job_id': '20261106T000000Z-12345678',
         'spec_sha256': 'e' * 64, 'raw_receipt_sha256': dict.fromkeys(job.REQUIRED_PROOFS, 'f' * 64),
@@ -525,7 +525,7 @@ def test_generated_pilot_phase_commands_reach_real_cli_dispatch(tmp_path: Path, 
     from experiments.tennis import w8_witness_job as job
 
     proof = tmp_path / 'proof.json'
-    proof.write_text(json.dumps({'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64,
+    proof.write_text(json.dumps({'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64,
         'source_sha256': 'a' * 64, 'snapshot_sha256': 'b' * 64, 'revision': 'c' * 40,
         'environment_sha256': 'd' * 64, 'host': 'gpu5', 'job_id': '20261106T000000Z-12345678',
         'spec_sha256': 'e' * 64, 'raw_receipt_sha256': dict.fromkeys(job.REQUIRED_PROOFS, 'f' * 64),
@@ -558,7 +558,7 @@ def test_candidate_spec_requires_qualified_producers_and_separate_readiness(tmp_
     from experiments.tennis import w8_witness_job as job
 
     proof = tmp_path / 'proof.json'
-    proof.write_text(json.dumps({'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64,
+    proof.write_text(json.dumps({'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64,
         'source_sha256': 'a' * 64, 'snapshot_sha256': 'b' * 64, 'revision': 'c' * 40,
         'environment_sha256': 'd' * 64, 'host': 'gpu5', 'job_id': '20261106T000000Z-12345678',
         'spec_sha256': 'e' * 64, 'raw_receipt_sha256': dict.fromkeys(job.REQUIRED_PROOFS, 'f' * 64),
@@ -862,7 +862,7 @@ def test_finish_real_spec_staging_and_dispatch(tmp_path: Path, monkeypatch) -> N
     monkeypatch.setattr(w8_protected_metadata, 'reject_protected_alias', lambda _path: None)
 
     proof = tmp_path / 'proof'
-    proof.write_text(json.dumps({'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64,
+    proof.write_text(json.dumps({'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64,
         'source_sha256': 'a' * 64, 'snapshot_sha256': 'b' * 64, 'revision': 'c' * 40,
         'environment_sha256': 'd' * 64, 'host': 'gpu5', 'job_id': '20261106T000000Z-12345678',
         'spec_sha256': 'e' * 64, 'raw_receipt_sha256': dict.fromkeys(job.REQUIRED_PROOFS, 'f' * 64),

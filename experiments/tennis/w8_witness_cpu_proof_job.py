@@ -17,9 +17,11 @@ import sys
 import time
 from typing import Any
 
-from experiments.jobs.inbox import validate_spec
-from experiments.tennis import w8_input_job as fixed
-from experiments.tennis import w8_strict_packet_job as packet
+_CPU_LIMIT_BEFORE_FIXED_IMPORT = resource.getrlimit(resource.RLIMIT_CPU)
+from experiments.jobs.inbox import validate_spec  # noqa: E402
+from experiments.tennis import w8_input_job as fixed  # noqa: E402
+_CPU_LIMIT_AFTER_FIXED_IMPORT = resource.getrlimit(resource.RLIMIT_CPU)
+from experiments.tennis import w8_strict_packet_job as packet  # noqa: E402
 
 PROFILE = 'w8-exact-source-cpu-proof-v1'
 NATIVE_INVENTORY_SHA = 'cd6bb8cf2a239d94f595fd92f823cf6406c018e1fbda745e81cd0c0e91d1b59b'
@@ -114,6 +116,7 @@ def make_spec(deadline: str, inventory: str) -> dict[str, Any]:
                 validator=['{python}', '-m', 'experiments.tennis.w8_witness_cpu_proof_job', 'validate'])
     bootstrap = Path(__file__).resolve().parent / 'w8_receiver_bootstrap.py'
     spec['witness_bootstrap_sha256'] = fixed.file_sha(bootstrap)
+    spec['witness_input_job_sha256'] = fixed.file_sha(Path(fixed.__file__).resolve())
     validate_spec(spec)
     return spec
 
@@ -133,9 +136,11 @@ def run(stage: Path) -> None:
             or spec.get('smoke', {}).get('seconds') != 530 or spec.get('validator_seconds') != 50
             or spec.get('full', {}).get('seconds') != 5):
         raise ValueError('exact combined CPU proof budget profile required')
-    # Keep the inherited 3600-second hard ceiling used by the bounded workers;
+    # Preserve the inherited hard ceiling for the bounded workers;
     # the one-core fleet campaign wall remains the aggregate 600-second bound.
-    resource.setrlimit(resource.RLIMIT_CPU, (100, 3600))
+    if _CPU_LIMIT_BEFORE_FIXED_IMPORT != _CPU_LIMIT_AFTER_FIXED_IMPORT:
+        raise ValueError('CPU limit changed during fixed module import')
+    cpu_limit = fixed.set_cpu_soft_limit(100, required_child=100)
     started = time.monotonic()
     remaining(dispatch, 520)  # packet 80 + lifecycle 90 + strict 120 + assessor 45 + native 135 + setup/publish 50
     scratch = Path(os.environ['PS_SCRATCH_DIR']).resolve(strict=True)
@@ -207,6 +212,8 @@ def run(stage: Path) -> None:
                'environment_sha256': dispatch['staged_environment']['sha256'],
                'host': dispatch['environment']['alias'], 'spec_sha256': dispatch['code']['spec_sha256'],
                'unshare_sha256': unshare_sha, 'affinity': sorted(os.sched_getaffinity(0)),
+               'cpu_limit_telemetry': {'before_fixed_import': list(_CPU_LIMIT_BEFORE_FIXED_IMPORT),
+                   'after_fixed_import': list(_CPU_LIMIT_AFTER_FIXED_IMPORT), 'setup': cpu_limit},
                'elapsed_seconds': time.monotonic() - started, 'receipts': retained}
     with (publish / 'raw-summary.json').open('x') as stream:
         json.dump(summary, stream, sort_keys=True, allow_nan=False)
