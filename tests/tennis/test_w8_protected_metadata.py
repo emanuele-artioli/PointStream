@@ -126,3 +126,42 @@ def test_capture_rejects_protected_or_wrong_historical_before_read(tmp_path, mon
     old.write_text('{}')
     with pytest.raises(ValueError, match='SHA differs'):
         metadata.capture(old, tmp_path / 'out', expected_historical_sha256='b' * 64)
+
+
+def test_historical_guard_rejects_alias_symlink_and_oversize_before_os_read(tmp_path, monkeypatch):
+    import os
+
+    protected = tmp_path / 'private'
+    protected.write_bytes(b'private')
+    alias = tmp_path / 'hardlink'
+    os.link(protected, alias)
+    symlink = tmp_path / 'symlink'
+    symlink.symlink_to(protected)
+    oversized = tmp_path / 'oversized'
+    with oversized.open('wb') as stream:
+        stream.truncate(2_000_001)
+    monkeypatch.setattr(metadata, 'PROTECTED', {'source': (str(protected), 'a' * 64)})
+    monkeypatch.setattr(os, 'read', lambda *_args: (_ for _ in ()).throw(AssertionError('unexpected content read')))
+    for candidate in (protected, alias, symlink, oversized):
+        with pytest.raises(ValueError):
+            metadata.read_historical(candidate, 'a' * 64)
+
+
+def test_historical_guard_rejects_opened_inode_swap_before_read(tmp_path, monkeypatch):
+    import os
+    from types import SimpleNamespace
+
+    protected = tmp_path / 'private'
+    protected.write_bytes(b'private')
+    candidate = tmp_path / 'historical.json'
+    candidate.write_text('{}')
+    monkeypatch.setattr(metadata, 'PROTECTED', {'source': (str(protected), 'a' * 64)})
+    original = os.fstat
+    def swapped(fd):
+        info = original(fd)
+        return SimpleNamespace(st_dev=info.st_dev, st_ino=info.st_ino + 1, st_size=info.st_size,
+                               st_mtime_ns=info.st_mtime_ns, st_ctime_ns=info.st_ctime_ns)
+    monkeypatch.setattr(os, 'fstat', swapped)
+    monkeypatch.setattr(os, 'read', lambda *_args: (_ for _ in ()).throw(AssertionError('unexpected content read')))
+    with pytest.raises(ValueError, match='changed before opening'):
+        metadata.read_historical(candidate, 'a' * 64)
