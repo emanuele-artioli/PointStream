@@ -21,6 +21,8 @@ from experiments.tennis import k5d_coalesced as co, k5d_cost_pilot as cost
 from experiments.tennis import k5d_encoder as enc, k5d_fleet as fleet, k5d_source_oracle as oracle
 
 SHARED_PROFILE = 'k5d-parity16-shared-numerical-v1'
+PARENT8_CHILD2_PROFILE = 'k5d-parity16-shared-parent8-child2-v1'
+PARENT8_CHILD2_LIMIT_MIB = 10240
 LOW_MEMORY_PROFILE = 'k5d-parity16-shared-numerical-low-memory-v1'
 LOW_MEMORY_LIMIT_MIB = 6144
 LOW_MEMORY_PARENT_MIB = 4096
@@ -31,12 +33,13 @@ SHARED_BASIS = 'Exact numerical parity only; shared execution is not timing, sca
 
 
 def spec(base: dict, *, assets: dict[str, dict[str, str]], deadline: str, unshare_sha256: str,
-         identity: dict[str, str], shared_numerical: bool = False, shared_low_memory: bool = False) -> dict:
+         identity: dict[str, str], shared_numerical: bool = False, shared_low_memory: bool = False,
+         shared_parent8_child2: bool = False) -> dict:
     """Build a bounded candidate only after actual assets are available.
 
     This does not reserve resources or approve a fleet submission.
     """
-    if shared_numerical and shared_low_memory:
+    if sum((shared_numerical, shared_low_memory, shared_parent8_child2)) > 1:
         raise ValueError('shared profiles are mutually exclusive')
     if set(assets) != {'fidelity_gate', 'accepted16', 'native_cpu_receipt'}:
         raise ValueError('fidelity gate, accepted reference and audited CPU receipt required')
@@ -77,17 +80,24 @@ def spec(base: dict, *, assets: dict[str, dict[str, str]], deadline: str, unshar
         result.update(k5d_shared_parity_profile=LOW_MEMORY_PROFILE, gpu_memory_mib=LOW_MEMORY_LIMIT_MIB,
                       gpu_sharing={'mode': 'shared', 'basis': SHARED_BASIS, 'margin_mib': 8192},
                       contention={'policy': 'continue', 'basis': SHARED_BASIS, 'resume_attempts': 0})
+    if shared_parent8_child2:
+        result['arguments'].append('--shared-parent8-child2')
+        result.update(k5d_shared_parity_profile=PARENT8_CHILD2_PROFILE, gpu_memory_mib=PARENT8_CHILD2_LIMIT_MIB,
+                      gpu_sharing={'mode': 'shared', 'basis': SHARED_BASIS, 'margin_mib': 8192},
+                      contention={'policy': 'continue', 'basis': SHARED_BASIS, 'resume_attempts': 0})
     from experiments.jobs.inbox import validate_spec
     validate_spec(result)
     return result
 
 
-def check_resource_profile(specification: dict, dispatch: dict, *, requested: bool, environ: Mapping[str, str], low_memory: bool = False) -> None:
+def check_resource_profile(specification: dict, dispatch: dict, *, requested: bool, environ: Mapping[str, str], low_memory: bool = False, parent8_child2: bool = False) -> None:
     """Bind the opt-in to the authenticated fleet declaration and claim."""
-    if low_memory and not requested:
+    if low_memory and parent8_child2:
+        raise ValueError('shared profiles are mutually exclusive')
+    if (low_memory or parent8_child2) and not requested:
         raise ValueError('low-memory profile requires explicit opt-in')
-    profile = LOW_MEMORY_PROFILE if low_memory else SHARED_PROFILE
-    limit = LOW_MEMORY_LIMIT_MIB if low_memory else SHARED_LIMIT_MIB
+    profile = LOW_MEMORY_PROFILE if low_memory else PARENT8_CHILD2_PROFILE if parent8_child2 else SHARED_PROFILE
+    limit = LOW_MEMORY_LIMIT_MIB if low_memory else PARENT8_CHILD2_LIMIT_MIB if parent8_child2 else SHARED_LIMIT_MIB
     if not requested:
         if specification.get('k5d_shared_parity_profile') is not None or environ.get('PS_GPU_SHARING') == 'shared':
             raise ValueError('shared parity requires explicit opt-in')
@@ -107,9 +117,11 @@ def check_resource_profile(specification: dict, dispatch: dict, *, requested: bo
         raise ValueError('shared numerical parity claim or policy differs')
 
 
-def apply_parent_limit(torch: Any, *, low_memory: bool = False) -> dict:
+def apply_parent_limit(torch: Any, *, low_memory: bool = False, parent8_child2: bool = False) -> dict:
     """Cap this allocator before loading models; DCVC children use a separate cap."""
-    limit = LOW_MEMORY_LIMIT_MIB if low_memory else SHARED_LIMIT_MIB
+    if low_memory and parent8_child2:
+        raise ValueError('shared profiles are mutually exclusive')
+    limit = LOW_MEMORY_LIMIT_MIB if low_memory else PARENT8_CHILD2_LIMIT_MIB if parent8_child2 else SHARED_LIMIT_MIB
     budget = LOW_MEMORY_PARENT_MIB if low_memory else PER_PROCESS_MIB
     cuda = torch.cuda
     if cuda.memory_allocated(0) != 0:
@@ -125,10 +137,12 @@ def apply_parent_limit(torch: Any, *, low_memory: bool = False) -> dict:
             'gpu_uuid': os.environ['CUDA_VISIBLE_DEVICES'], **host}
 
 
-def configure_child_environment(saved: MutableMapping[str, str], current: Mapping[str, str], *, low_memory: bool = False) -> None:
+def configure_child_environment(saved: MutableMapping[str, str], current: Mapping[str, str], *, low_memory: bool = False, parent8_child2: bool = False) -> None:
     """Propagate the already-authenticated opt-in into K5's frozen child env."""
-    profile = LOW_MEMORY_PROFILE if low_memory else SHARED_PROFILE
-    limit = LOW_MEMORY_LIMIT_MIB if low_memory else SHARED_LIMIT_MIB
+    if low_memory and parent8_child2:
+        raise ValueError('shared profiles are mutually exclusive')
+    profile = LOW_MEMORY_PROFILE if low_memory else PARENT8_CHILD2_PROFILE if parent8_child2 else SHARED_PROFILE
+    limit = LOW_MEMORY_LIMIT_MIB if low_memory else PARENT8_CHILD2_LIMIT_MIB if parent8_child2 else SHARED_LIMIT_MIB
     if (current.get('PS_K5D_SHARED_NUMERICAL') != profile
             or current.get('PS_GPU_SHARING') != 'shared'
             or current.get('PS_GPU_MEMORY_LIMIT_MIB') != str(limit)
@@ -140,7 +154,9 @@ def configure_child_environment(saved: MutableMapping[str, str], current: Mappin
         saved[key] = current[key]
 
 
-def validate_resource_receipts(directory: Path, *, low_memory: bool = False) -> list[dict]:
+def validate_resource_receipts(directory: Path, *, low_memory: bool = False, parent8_child2: bool = False) -> list[dict]:
+    if low_memory and parent8_child2:
+        raise ValueError('shared profiles are mutually exclusive')
     paths = sorted(directory.glob('*.json'))
     if not (directory / 'parent.json').is_file() or len(paths) < 2:
         raise ValueError('shared parent and DCVC allocator receipts required')
@@ -148,8 +164,8 @@ def validate_resource_receipts(directory: Path, *, low_memory: bool = False) -> 
     for path in paths:
         value = json.loads(path.read_text())
         role = 'parent' if path.name == 'parent.json' else 'dcvc'
-        budget = (LOW_MEMORY_PARENT_MIB if role == 'parent' else LOW_MEMORY_CHILD_MIB) if low_memory else PER_PROCESS_MIB
-        limit = LOW_MEMORY_LIMIT_MIB if low_memory else SHARED_LIMIT_MIB
+        budget = (LOW_MEMORY_PARENT_MIB if role == 'parent' else LOW_MEMORY_CHILD_MIB) if low_memory else (LOW_MEMORY_CHILD_MIB if parent8_child2 and role == 'dcvc' else PER_PROCESS_MIB)
+        limit = LOW_MEMORY_LIMIT_MIB if low_memory else PARENT8_CHILD2_LIMIT_MIB if parent8_child2 else SHARED_LIMIT_MIB
         total = value.get('total_bytes')
         if (value.get('role') != role or not isinstance(total, int) or total < limit * 2**20
                 or value.get('budget_mib') != budget or value.get('allocated_before') != 0
@@ -198,10 +214,10 @@ def run(args: argparse.Namespace) -> None:
         raise ValueError('CPU proof does not bind this exact namespace wrapper')
     dispatch = json.loads((stage / 'dispatch.json').read_text())
     specification = json.loads((stage.parent / 'spec.json').read_text())
-    if args.shared_numerical_only and args.shared_low_memory:
+    if sum((args.shared_numerical_only, args.shared_low_memory, args.shared_parent8_child2)) > 1:
         raise ValueError('shared profiles are mutually exclusive')
-    shared = args.shared_numerical_only or args.shared_low_memory
-    check_resource_profile(specification, dispatch, requested=shared, environ=os.environ, low_memory=args.shared_low_memory)
+    shared = args.shared_numerical_only or args.shared_low_memory or args.shared_parent8_child2
+    check_resource_profile(specification, dispatch, requested=shared, environ=os.environ, low_memory=args.shared_low_memory, parent8_child2=args.shared_parent8_child2)
     import torch
     if (torch.cuda.device_count() != 1 or torch.cuda.get_device_name(0) != 'NVIDIA RTX A6000'
             or tuple(torch.cuda.get_device_capability(0)) != (8, 6)):
@@ -209,13 +225,13 @@ def run(args: argparse.Namespace) -> None:
     if shared:
         receipt_dir = scratch / 'shared-resource-receipts'
         receipt_dir.mkdir()
-        cp.write_new(receipt_dir / 'parent.json', apply_parent_limit(torch, low_memory=args.shared_low_memory))
-        os.environ['PS_K5D_SHARED_NUMERICAL'] = LOW_MEMORY_PROFILE if args.shared_low_memory else SHARED_PROFILE
+        cp.write_new(receipt_dir / 'parent.json', apply_parent_limit(torch, low_memory=args.shared_low_memory, parent8_child2=args.shared_parent8_child2))
+        os.environ['PS_K5D_SHARED_NUMERICAL'] = LOW_MEMORY_PROFILE if args.shared_low_memory else PARENT8_CHILD2_PROFILE if args.shared_parent8_child2 else SHARED_PROFILE
         os.environ['PS_K5D_RESOURCE_RECEIPTS'] = str(receipt_dir)
         # K5 snapshots its child environment at import time; update only this
         # reviewed opt-in so native DCVC encode/decode workers receive the cap.
         from experiments.tennis import k5
-        configure_child_environment(k5.STAGE_ENV, os.environ, low_memory=args.shared_low_memory)
+        configure_child_environment(k5.STAGE_ENV, os.environ, low_memory=args.shared_low_memory, parent8_child2=args.shared_parent8_child2)
     if oracle.sha(cf.AUDIT_PATH) != cf.AUDIT_SHA or oracle.sha(fleet.SOURCE) != fleet.SOURCE_SHA or oracle.sha(fleet.EXPOSURE) != fleet.EXPOSURE_SHA:
         raise ValueError('historical audit, source manifest or exposure differs')
     data = vars(args).copy()
@@ -311,7 +327,8 @@ def validate() -> None:
             saved = json.loads((output / 'parity.json').read_text())
             spec_for_receipts = json.loads((stage.parent / 'spec.json').read_text())
             low_memory = spec_for_receipts.get('k5d_shared_parity_profile') == LOW_MEMORY_PROFILE
-            resource_records = (validate_resource_receipts(output / 'shared-resource-receipts', low_memory=low_memory)
+            parent8_child2 = spec_for_receipts.get('k5d_shared_parity_profile') == PARENT8_CHILD2_PROFILE
+            resource_records = (validate_resource_receipts(output / 'shared-resource-receipts', low_memory=low_memory, parent8_child2=parent8_child2)
                                 if saved.get('shared_numerical_only') is True else [])
             verify_scored(output, identity)
             cf.prepare_parity(output / 'prepared', prior, identity)
@@ -341,9 +358,9 @@ def validate() -> None:
             raise ValueError('actual namespace CPU accounting invalid')
         specification = json.loads((stage.parent / 'spec.json').read_text())
         profile = specification.get('k5d_shared_parity_profile')
-        if profile not in (None, SHARED_PROFILE, LOW_MEMORY_PROFILE):
+        if profile not in (None, SHARED_PROFILE, LOW_MEMORY_PROFILE, PARENT8_CHILD2_PROFILE):
             raise ValueError('unknown shared profile')
-        is_shared = profile in (SHARED_PROFILE, LOW_MEMORY_PROFILE)
+        is_shared = profile in (SHARED_PROFILE, LOW_MEMORY_PROFILE, PARENT8_CHILD2_PROFILE)
         if is_shared and (saved.get('shared_numerical_only') is not True or saved.get('timing_evidence') is not False):
             raise ValueError('shared parity must disclaim timing evidence')
         target.write_text(json.dumps({'passed': True, 'checks': {'actual_preparation_reference': True,
@@ -368,6 +385,7 @@ def main() -> None:
     profiles = parser.add_mutually_exclusive_group()
     profiles.add_argument('--shared-numerical-only', action='store_true')
     profiles.add_argument('--shared-low-memory', action='store_true')
+    profiles.add_argument('--shared-parent8-child2', action='store_true')
     args = parser.parse_args()
     if args.action == 'validate':
         validate()
