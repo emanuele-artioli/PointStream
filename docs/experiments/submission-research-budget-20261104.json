@@ -1659,7 +1659,7 @@
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
       "cpu_seconds": 4550,
-      "status": "Prospectiveremaining_unspent4550GPU4550CPU;NOexecutionrelease. Nov9resourceamendment permitsproposalqualification<=900GPU1000CPUinclusiveinsideparent,eachcommand<=600,oldclosed500cap supersededbeforeexecution. ExactsourceCPUisolation/namespace/nativeproof+source/spec/budgetreviewrequired;unit0contextpilot retainedonce, completeactual1.5futureforecast before furtherstages. Original30DDIM/CFG2/seeds240/80candidatequality/sourceguardsunchanged. Includesallproof/ops/failure;noautomaticretry. CPUproofproposal amended<=800CPU0GPUinclusiveinsideparent;earlier400draftunadmitted. Actualsame-sourceproof/spec/budgetreviewbeforeanyexecution;chargeactual/boundedcostandreforecastfuturebeforeGPU."
+      "status": "Prospectiveremaining_unspent4550GPU4550CPU;NOexecutionrelease. Nov9resourceamendment permitsproposalqualification<=900GPU1000CPUinclusiveinsideparent,eachqualification/proofsmoke<=600,oldclosed500cap supersededbeforeexecution. ExactsourceCPUisolation/namespace/nativeproof+source/spec/budgetreviewrequired;unit0contextpilot retainedonce, completeactual1.5futureforecast before furtherstages. Original30DDIM/CFG2/seeds240/80candidatequality/sourceguardsunchanged. Includesallproof/ops/failure;noautomaticretry. CPUproofproposal amended<=800CPU0GPUinclusiveinsideparent;earlier400draftunadmitted. Actualsame-sourceproof/spec/budgetreviewbeforeanyexecution;chargeactual/boundedcostandreforecastfuturebeforeGPU. Fullcandidatecommandmayexceed600but<=2700/45minandneedsseparaterelease/completeforecast;240rununchunked. Noadditionalbudget."
     }
   ],
   "jobs": [
