@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "decision": "clarify_submit_once_as_pending_bounded_queue_when_headroom_unavailable",
+  "prior_release": "shared-df6-parity16-root-release-20261109.json",
+  "date": "2026-11-09",
+  "no_request_previously_created": true,
+  "logical_spec_sha256_unchanged": "fbc752f383dbe2e4507c46d179bef8dc2b9c4b82de61404f62772bf5ed1ed0a3",
+  "deadline_unchanged": "2026-11-09T20:02:36.120866Z",
+  "reason": "User explicitlyprefersboundedfleetqueues. Unavailableheadroompreventsactualworkeradmission, not publicationofonependingrequest. Freshbelowthresholdreceiptisexpectedqueuecontext, notpermissiontoshrinkcaps.",
+  "conditions": [
+    "ONEpendingrequestwithunmodifiedreviewedspec/source/caps/deadline; notareplaybecausepriorrequestwasnevercreated",
+    "fleetmustwaitforactualfree>=16384+8192MiBbeforeGPUclaim; neverbypass/relaxresourcechecks orpreemptotherusers",
+    "submitonlyif>=1200secondsleftbeforefixeddeadline, elseSTOPnewrootreview",
+    "unknownsubmissioninspectexistingID,no replay; persistactualIDinexperimentANDledgerbeforeONEcanonicalwait<=remainingdeadlineand2700",
+    "recordexpirywithoutqualityevidenceifheadroomneversuffices; chargeexistingexternalallowance, no automaticnewqueue",
+    "all1000GPU/1200CPUinclusivecaps,30prepcharged,1170futureCPUandno timing/scale/costpromotionunchanged"
+  ]
+}
