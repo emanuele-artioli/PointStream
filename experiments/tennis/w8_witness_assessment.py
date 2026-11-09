@@ -23,10 +23,11 @@ from experiments.tennis import w8_input_job as fixed
 from experiments.tennis import w8_receiver_finish as finish
 
 SOURCE_KEYS = frozenset({'source_clip', 'receiver', 'ffmpeg', 'native_inventory'})
-SCORE_KEYS = frozenset({'source_rgb', 'source_assessment', 'receiver', 'region_archive', 'judge_archive', 'lpips', 'dists'})
+SCORE_KEYS = frozenset({'source_rgb', 'source_assessment', 'source_config', 'source_loader', 'source_validation',
+                        'receiver', 'region_archive', 'judge_archive', 'lpips', 'dists'})
 GOLDEN_KEYS = frozenset({'golden_base', 'golden_composite', 'golden_scores',
     *(f'golden_crop:{unit}' for unit in fixed.UNITS), *(f'golden_mask:{unit}' for unit in fixed.UNITS)})
-OFFLINE_KEYS = GOLDEN_KEYS | {'scores', 'score_receipt', 'score_assessment'}
+OFFLINE_KEYS = GOLDEN_KEYS | {'scores', 'score_receipt', 'score_assessment', 'score_config', 'score_loader', 'score_validation'}
 
 
 def cost_plan(*, phase: str, observed_wall: float, observed_cpu: float, staging: float,
@@ -89,9 +90,20 @@ def make_fleet_spec(*, template_local: Path, template_remote: str, deadline: str
         prior_path = Path(prior['path'])
         if prior_path.is_symlink() or fixed.file_sha(prior_path) != approved_previous_sha256:
             raise ValueError('previous assessment identity differs')
+        prior_config_key = 'source_config' if phase == 'score' else 'score_config'
+        prior_config_row = template['role_files'][prior_config_key]
+        prior_config = _manifest(Path(prior_config_row['path']), prior_config_row['sha256'])
+        loader_key = 'source_loader' if phase == 'score' else 'score_loader'
+        loader_record = prior_loader(template['role_files'][loader_key], prior_config)
+        prior_gate_key = 'source_validation' if phase == 'score' else 'score_validation'
+        prior_gate = template['role_files'][prior_gate_key]
+        _manifest(Path(prior_gate['path']), prior_gate['sha256'])
+        validate_prior_fleet_gate(Path(prior_gate['path']), phase='source' if phase == 'score' else 'score',
+                                  assessment_sha=approved_previous_sha256, producer_sha=approved_producer_sha256)
         validate_prior_assessment(prior_path, phase='source' if phase == 'score' else 'score',
             producer_sha=approved_producer_sha256, candidate=candidate, output_name=output_name,
-            output_sha=template['role_files'][output_key]['sha256'])
+            output_sha=template['role_files'][output_key]['sha256'], prior_config=prior_config,
+            prior_loader=loader_record)
     if (phase not in ('source', 'score', 'offline') or plan.get('phase') != phase
             or plan.get('automatic_release') is not False or host_name not in ('gpu5', 'gpu6')
             or any(type(x) is not int or x <= 0 for x in (command_wall, validator_wall, campaign_wall))
@@ -101,6 +113,10 @@ def make_fleet_spec(*, template_local: Path, template_remote: str, deadline: str
             or plan.get('command_upper_seconds', float('inf')) + 10 + plan.get('cleanup_seconds', float('inf')) > command_wall
             or plan.get('validation_seconds', float('inf')) > validator_wall):
         raise ValueError('assessment phase or prospective fleet budget differs')
+    caps = template['hard_ceilings']
+    if (caps['cpu_seconds'] < campaign_wall + caps['external_cpu_seconds'] + caps['post_campaign_cpu_seconds']
+            or (phase != 'offline' and caps['gpu_seconds'] < campaign_wall + caps['post_campaign_gpu_seconds'])):
+        raise ValueError('inclusive hard ceilings do not cover campaign and external lifecycle')
     root = Path('/home/itec/emanuele/Datasets/pointstream-data')
     remote = Path(template_remote)
     if not remote.is_absolute() or not remote.is_relative_to(root) or '..' in remote.parts:
@@ -142,6 +158,7 @@ def make_fleet_spec(*, template_local: Path, template_remote: str, deadline: str
                 w8_assessment_promotion_sha256=approved_promotion_sha256,
                 w8_assessment_ledger_sha256=approved_ledger_sha256,
                 w8_assessment_previous_sha256=approved_previous_sha256,
+                w8_assessment_hard_ceilings=caps,
                 w8_assessment_worker_wall=math.ceil(plan['command_upper_seconds']) + 10,
                 stall_seconds=command_wall)
     if phase != 'offline':
@@ -193,10 +210,20 @@ def check_assessment_promotion(config: dict[str, Any], *, producer: dict[str, An
     if phase == 'offline' and (not _sha(previous_sha) or completed.get('postseal_score') != previous_sha):
         raise ValueError('forecast does not bind the completed score assessment')
     component = gate['remaining_components']['offline_validation' if phase == 'offline' else 'postseal_score']
+    caps = config.get('hard_ceilings')
+    cap_names = {'gpu_seconds', 'cpu_seconds', 'external_cpu_seconds',
+                 'post_campaign_cpu_seconds', 'post_campaign_gpu_seconds'}
+    if (not isinstance(caps, dict) or set(caps) != cap_names
+            or any(type(caps[name]) not in (int, float) or not math.isfinite(caps[name]) or caps[name] < 0
+                   for name in cap_names) or caps['cpu_seconds'] <= 0
+            or (phase == 'offline' and (caps['gpu_seconds'] != 0 or caps['post_campaign_gpu_seconds'] != 0))
+            or (phase != 'offline' and caps['gpu_seconds'] <= 0)
+            or caps['gpu_seconds'] > component['gpu_seconds'] or caps['cpu_seconds'] > component['cpu_seconds']):
+        raise ValueError('inclusive assessment ceilings do not fit remaining-work forecast')
     if (plan.get('phase') != phase or plan.get('automatic_release') is not False
             or any(not isinstance(plan.get(key), (int, float)) or isinstance(plan[key], bool)
                    or not math.isfinite(plan[key]) or plan[key] < 0 for key in ('gpu_upper_seconds', 'cpu_upper_seconds'))
-            or plan['gpu_upper_seconds'] > component['gpu_seconds'] or plan['cpu_upper_seconds'] > component['cpu_seconds']):
+            or plan['gpu_upper_seconds'] > caps['gpu_seconds'] or plan['cpu_upper_seconds'] > caps['cpu_seconds']):
         raise ValueError('assessment phase does not fit remaining-work forecast')
 
 
@@ -288,22 +315,68 @@ def _gpu(expected_uuid: str) -> dict[str, Any]:
             'major': props.major, 'minor': props.minor, 'provider': 'torch CUDA'}
 
 
+def validate_role_isolation(record: dict[str, Any], config: dict[str, Any], phase: str, loader: dict[str, Any]) -> None:
+    from experiments.tennis import w8_clock_profile as clock, w8_cuda_system_leaves as policy
+
+    isolation = record.get('role_isolation') or {}
+    inputs = {str(Path(row['path']).resolve()) for row in
+              [*config['candidate_files'].values(), *config['role_files'].values()]}
+    denials, ns = isolation.get('read_only_inputs'), isolation.get('namespaces', {})
+    abi = isolation.get('landlock_abi', 0)
+    if (not isinstance(denials, dict) or set(denials) != inputs
+            or any(value not in (1, 13) for value in denials.values())
+            or type(abi) is not int or abi < 3 or isolation.get('handled_mask') != policy.handled_rights(abi)
+            or isolation.get('output') != config['output']
+            or not ns.get('user') or not ns.get('net') or ns['user'] == config['parent_user_namespace']
+            or ns['net'] == config['parent_network_namespace']):
+        raise ValueError('assessment role input grants or namespaces differ')
+    expected_exec = []
+    if phase == 'source':
+        expected_exec = sorted([str(Path(config['role_files']['ffmpeg']['path']).resolve()),
+                                str(Path(config['native_loader_path']).resolve())])
+    if isolation.get('execution_grants') != expected_exec:
+        raise ValueError('assessment executable grants differ')
+    leaves = isolation.get('approved_leaves')
+    if not isinstance(leaves, list):
+        raise ValueError('assessment approved system leaves missing')
+    policy.validate_leaf_receipt(leaves, loader)
+    clock.validate_receipt(isolation.get('clock_profile'))
+
+
 def validate_prior_assessment(path: Path, *, phase: str, producer_sha: str,
-                              candidate: dict[str, Path], output_name: str, output_sha: str) -> dict[str, Any]:
+                              candidate: dict[str, Path], output_name: str, output_sha: str,
+                              prior_config: dict[str, Any], prior_loader: dict[str, Any]) -> dict[str, Any]:
     record = json.loads(path.read_text())
     device = record.get('device') or {}
-    isolation = record.get('role_isolation') or {}
-    denials = isolation.get('read_only_inputs')
     if (record.get('scope') != 'post-seal W8 ' + phase or record.get('producer_manifest_sha256') != producer_sha
             or record.get('candidate_sha256') != {name: fixed.file_sha(item) for name, item in candidate.items()}
             or record.get('outputs', {}).get(output_name) != output_sha
             or device.get('provider') != 'torch CUDA' or not device.get('uuid')
             or device.get('uuid') != device.get('visible_uuid')
-            or (device.get('major'), device.get('minor')) != (8, 9)
-            or isolation.get('landlock_abi', 0) < 3 or not isinstance(denials, dict) or not denials
-            or any(value not in (1, 13) for value in denials.values())):
+            or (device.get('major'), device.get('minor')) != (8, 9)):
         raise ValueError('prior assessment provenance or isolation differs')
+    if (prior_config.get('phase') != phase
+            or {name: row['sha256'] for name, row in prior_config['candidate_files'].items()}
+            != record['candidate_sha256'] or prior_config['producer_manifest']['sha256'] != producer_sha
+            or {name: row['sha256'] for name, row in prior_config['role_files'].items()} != record['role_sha256']):
+        raise ValueError('prior assessment retained config differs')
+    validate_role_isolation(record, prior_config, phase, prior_loader)
     return record
+
+
+def validate_prior_fleet_gate(path: Path, *, phase: str, assessment_sha: str, producer_sha: str) -> None:
+    gate = json.loads(path.read_text())
+    if (gate.get('passed') is not True or gate.get('scope') != 'post-seal ' + phase + ' only'
+            or gate.get('automatic_promotion') is not False or gate.get('checks', {}).get('independent_reopen') is not True
+            or gate.get('assessment_sha256') != assessment_sha or gate.get('producer_manifest_sha256') != producer_sha
+            or not re.fullmatch(r'\d{8}T\d{6}Z-[0-9a-f]{8}', str(gate.get('job_id')))):
+        raise ValueError('prior fleet assessment validation differs')
+
+
+def prior_loader(row: dict[str, str], prior_config: dict[str, Any]) -> dict[str, Any]:
+    if row.get('sha256') != prior_config.get('loader_receipt', {}).get('sha256'):
+        raise ValueError('prior loader identity differs from retained config')
+    return _manifest(Path(row['path']), row['sha256'])
 
 
 def isolate(config: dict[str, Any], role: str, candidate: dict[str, Path],
@@ -346,6 +419,8 @@ def isolate(config: dict[str, Any], role: str, candidate: dict[str, Path],
         record = json.loads(inventory.read_text())
         binary = Path(assets['ffmpeg']['path']).resolve(strict=True)
         loader_path = Path(record['elf_interpreter']).resolve(strict=True)
+        if str(loader_path) != config.get('native_loader_path'):
+            raise ValueError('source native loader differs from retained config')
         mapped = record['mapped_files']
         libraries = {Path(name): item['sha256'] for name, item in mapped.items()
                      if name not in (str(binary), str(loader_path))}
@@ -457,6 +532,7 @@ def run_assessment_policy_proof(prepared: dict[str, Any]) -> dict[str, Any]:
     clock_sha = clock.write_parent_receipt(clock_path)
     loader = Path(prepared['loader_receipt'])
     config = {'phase': 'policy-probe', 'probe_work': str(work), 'output': str(output),
+              'native_loader_path': str(Path(native['elf_interpreter']).resolve(strict=True)),
               'runtime_root': str(Path(prepared['policies']['main']['python']).resolve(strict=True).parent.parent),
               'parent_user_namespace': os.readlink('/proc/self/ns/user'),
               'parent_network_namespace': os.readlink('/proc/self/ns/net'),
@@ -515,6 +591,21 @@ def execute(config_path: Path, config_sha256: str) -> dict[str, Any]:
         raise ValueError('invalid assessment phase')
     candidate, producer = authenticate(config)
     assets = role_files(config, role)
+    if role in ('score', 'offline'):
+        prefix = 'source' if role == 'score' else 'score'
+        previous = assets[prefix + '_assessment']
+        previous_config = json.loads(Path(assets[prefix + '_config']['path']).read_text())
+        previous_loader = prior_loader(assets[prefix + '_loader'], previous_config)
+        validate_prior_fleet_gate(Path(assets[prefix + '_validation']['path']), phase=prefix,
+                                  assessment_sha=previous['sha256'], producer_sha=config['producer_manifest']['sha256'])
+        previous_proof = validate_prior_assessment(Path(previous['path']), phase=prefix,
+            producer_sha=config['producer_manifest']['sha256'], candidate=candidate,
+            output_name='source-rgb.npy' if role == 'score' else 'scores.npz',
+            output_sha=assets['source_rgb' if role == 'score' else 'scores']['sha256'],
+            prior_config=previous_config, prior_loader=previous_loader)
+        if role == 'offline' and (previous_proof['outputs'].get('sealed.json') != assets['score_receipt']['sha256']
+                                  or previous_proof.get('quality_claim') is not False):
+            raise ValueError('scoring execution identity differs')
     output = Path(config['output'])
     scratch = Path(os.environ['PS_SCRATCH_DIR']).resolve(strict=True)
     if (not output.is_absolute() or output.is_symlink() or not output.is_dir() or any(output.iterdir())
@@ -547,21 +638,13 @@ def execute(config_path: Path, config_sha256: str) -> dict[str, Any]:
                                          **{k: v for k, v in assets.items() if k != 'native_inventory'}}})
     elif role == 'score':
         from experiments.tennis import w8_receiver_score as scorer
-        validate_prior_assessment(Path(assets['source_assessment']['path']), phase='source',
-            producer_sha=config['producer_manifest']['sha256'], candidate=candidate,
-            output_name='source-rgb.npy', output_sha=assets['source_rgb']['sha256'])
         scorer.run({'cpu_seconds': cpu, 'output': str(output),
                     'files': {**config['candidate_files'],
-                              **{k: v for k, v in assets.items() if k != 'source_assessment'}}})
+                              **{k: v for k, v in assets.items()
+                                 if k not in ('source_assessment', 'source_config', 'source_loader', 'source_validation')}}})
     else:
-        score_proof = validate_prior_assessment(Path(assets['score_assessment']['path']), phase='score',
-            producer_sha=config['producer_manifest']['sha256'], candidate=candidate,
-            output_name='scores.npz', output_sha=assets['scores']['sha256'])
-        if (score_proof.get('outputs', {}).get('scores.npz') != assets['scores']['sha256']
-                or score_proof['outputs'].get('sealed.json') != assets['score_receipt']['sha256']
-                or score_proof.get('quality_claim') is not False):
-            raise ValueError('scoring execution identity differs')
-        offline_assets = {key: value for key, value in assets.items() if key != 'score_assessment'}
+        offline_assets = {key: value for key, value in assets.items()
+                          if key not in ('score_assessment', 'score_config', 'score_loader', 'score_validation')}
         offline_config = {'files': {**config['candidate_files'], **offline_assets},
                           'scorer_identity': config['scorer_identity']}
         report = finish.validate_offline(offline_config)
@@ -596,6 +679,7 @@ def fleet_run(stage: Path, template_path: Path, template_sha: str) -> None:
             or spec.get('staged_inputs', [{}])[0].get('sha256') != template_sha
             or spec.get('w8_assessment_producer_manifest_sha256') != template.get('producer_manifest', {}).get('sha256')
             or spec.get('w8_assessment_asset_manifest_sha256') != template.get('asset_manifest', {}).get('sha256')
+            or spec.get('w8_assessment_hard_ceilings') != template.get('hard_ceilings')
             or template.get('output') != '{assessment_output}' or len(os.sched_getaffinity(0)) != 1):
         raise ValueError('assessment fleet dispatch differs')
     producer_paths, producer = authenticate(template)
@@ -606,6 +690,10 @@ def fleet_run(stage: Path, template_path: Path, template_sha: str) -> None:
         ledger_sha=spec['w8_assessment_ledger_sha256'], previous_sha=spec['w8_assessment_previous_sha256'],
         source=dispatch['code'])
     check_asset_manifest(template, phase)
+    caps = template['hard_ceilings']
+    if (caps['cpu_seconds'] < spec['budget_seconds'] + caps['external_cpu_seconds'] + caps['post_campaign_cpu_seconds']
+            or (phase != 'offline' and caps['gpu_seconds'] < spec['budget_seconds'] + caps['post_campaign_gpu_seconds'])):
+        raise ValueError('assessment hard ceilings do not cover declared lifecycle')
     scratch = Path(os.environ['PS_SCRATCH_DIR']).resolve(strict=True)
     work = scratch / 'assessment-worker'
     work.mkdir()
@@ -704,7 +792,7 @@ def fleet_run(stage: Path, template_path: Path, template_sha: str) -> None:
             os.fsync(dst.fileno())
     for name, source_path in (('namespace.json', namespace_path),
                               ('namespace.json.started', namespace_path.with_name(namespace_path.name + '.started')),
-                              ('config.json', config_path)):
+                              ('config.json', config_path), ('loader.json', loader_path)):
         shutil.copyfile(source_path, retained / name)
     publication = scratch / 'publish'
     publication.mkdir()
@@ -715,6 +803,30 @@ def fleet_run(stage: Path, template_path: Path, template_sha: str) -> None:
                'elapsed_seconds': time.monotonic() - started}
     with (publication / 'summary.json').open('x') as stream:
         json.dump(summary, stream, sort_keys=True, allow_nan=False)
+
+
+def check_clean_execution(execution: dict[str, Any], dispatch: dict[str, Any],
+                          phase: str, record: dict[str, Any]) -> None:
+    from experiments.jobs.inbox import contention_policy
+    from experiments.tennis.w8_cuda_system_leaves import canonical_gpu_uuid
+
+    if (phase not in ('source', 'score', 'offline') or execution.get('exit_code') != 0
+            or execution.get('timing_contaminated') is not False or execution.get('contention') != []
+            or execution.get('paused_seconds') != 0
+            or contention_policy(dispatch.get('contention_policy')) != {'policy': 'stop', 'resume_attempts': 0}):
+        raise ValueError('assessment execution was failed or contaminated')
+    gpu = (dispatch.get('environment') or {}).get('gpu')
+    if phase == 'offline':
+        if gpu is not None or record.get('device') is not None or execution.get('gpu_sharing') is not None:
+            raise ValueError('offline assessment unexpectedly claimed a GPU')
+    else:
+        device = record.get('device') or {}
+        if (not isinstance(gpu, dict) or execution.get('gpu_sharing') != {'mode': 'exclusive'}
+                or dispatch.get('gpu_sharing') != {'mode': 'exclusive'}
+                or canonical_gpu_uuid(device.get('uuid', '')) != canonical_gpu_uuid(gpu.get('uuid', ''))
+                or device.get('name') != gpu.get('name') or 'RTX 6000 Ada' not in str(gpu.get('name', ''))
+                or (device.get('major'), device.get('minor')) != (8, 9)):
+            raise ValueError('assessment GPU claim or exclusive execution differs')
 
 
 def fleet_validate(stage: Path, destination: Path) -> None:
@@ -762,6 +874,7 @@ def fleet_validate(stage: Path, destination: Path) -> None:
     candidate, _ = authenticate(config)
     assets = role_files(config, phase)
     record = json.loads((retained / 'assessment.json').read_text())
+    check_clean_execution(json.loads((stage / 'execution.json').read_text()), dispatch, phase, record)
     if (record.get('producer_manifest_sha256') != config['producer_manifest']['sha256']
             or record.get('asset_manifest_sha256') != config['asset_manifest']['sha256']
             or record.get('candidate_sha256') != {key: fixed.file_sha(path) for key, path in candidate.items()}
@@ -770,11 +883,14 @@ def fleet_validate(stage: Path, destination: Path) -> None:
             or not record['role_isolation'].get('read_only_inputs')
             or any(value not in (1, 13) for value in record['role_isolation']['read_only_inputs'].values())):
         raise ValueError('assessment producer or role hashes differ')
+    loader_record = prior_loader({'path': str(retained / 'loader.json'),
+                                  'sha256': fixed.file_sha(retained / 'loader.json')}, config)
+    validate_role_isolation(record, config, phase, loader_record)
     if phase in ('source', 'score'):
         name = 'source-rgb.npy' if phase == 'source' else 'scores.npz'
         validate_prior_assessment(retained / 'assessment.json', phase=phase,
             producer_sha=config['producer_manifest']['sha256'], candidate=candidate,
-            output_name=name, output_sha=fixed.file_sha(retained / name))
+            output_name=name, output_sha=fixed.file_sha(retained / name), prior_config=config, prior_loader=loader_record)
         if record['outputs'].get('sealed.json') != fixed.file_sha(retained / 'sealed.json'):
             raise ValueError('assessment original execution seal differs')
         gpu = dispatch['environment']['gpu']
@@ -790,6 +906,14 @@ def fleet_validate(stage: Path, destination: Path) -> None:
                     '5a26ceb4c08fdfac2726805bb37c5cefe29ff18b9a3c733690fd4e263d3d972d'):
                 raise ValueError('source RGB or native decode identity differs')
         else:
+            validate_prior_fleet_gate(Path(assets['source_validation']['path']), phase='source',
+                                      assessment_sha=assets['source_assessment']['sha256'],
+                                      producer_sha=config['producer_manifest']['sha256'])
+            source_config = json.loads(Path(assets['source_config']['path']).read_text())
+            validate_prior_assessment(Path(assets['source_assessment']['path']), phase='source',
+                producer_sha=config['producer_manifest']['sha256'], candidate=candidate,
+                output_name='source-rgb.npy', output_sha=assets['source_rgb']['sha256'],
+                prior_config=source_config, prior_loader=prior_loader(assets['source_loader'], source_config))
             score_seal = json.loads((retained / 'sealed.json').read_text())
             if (score_seal.get('passed') is not True or score_seal.get('scores_sha256') != fixed.file_sha(retained / name)
                     or score_seal.get('composite_sha256') != fixed.file_sha(candidate['composite'])):
@@ -803,17 +927,27 @@ def fleet_validate(stage: Path, destination: Path) -> None:
                     finish._compare_scores({key: scores[key] for key in finish.METRICS},
                                            {key: original[key][3] for key in finish.METRICS})
     else:
+        validate_prior_fleet_gate(Path(assets['score_validation']['path']), phase='score',
+                                  assessment_sha=assets['score_assessment']['sha256'],
+                                  producer_sha=config['producer_manifest']['sha256'])
         validate_prior_assessment(Path(assets['score_assessment']['path']), phase='score',
             producer_sha=config['producer_manifest']['sha256'], candidate=candidate,
-            output_name='scores.npz', output_sha=assets['scores']['sha256'])
+            output_name='scores.npz', output_sha=assets['scores']['sha256'],
+            prior_config=json.loads(Path(assets['score_config']['path']).read_text()),
+            prior_loader=prior_loader(assets['score_loader'],
+                json.loads(Path(assets['score_config']['path']).read_text())))
         report = finish.validate_offline({'files': {**config['candidate_files'],
-            **{key: value for key, value in assets.items() if key != 'score_assessment'}},
+            **{key: value for key, value in assets.items()
+               if key not in ('score_assessment', 'score_config', 'score_loader', 'score_validation')}},
             'scorer_identity': config['scorer_identity']})
         if report != json.loads((retained / 'offline.json').read_text()):
             raise ValueError('offline comparison differs from retained result')
     with destination.open('x') as validation_output:
         json.dump({'passed': True, 'scope': 'post-seal ' + phase + ' only',
-                   'automatic_promotion': False, 'checks': {'independent_reopen': True}}, validation_output, sort_keys=True)
+                   'automatic_promotion': False, 'checks': {'independent_reopen': True},
+                   'assessment_sha256': fixed.file_sha(retained / 'assessment.json'),
+                   'producer_manifest_sha256': config['producer_manifest']['sha256'],
+                   'job_id': stage.parent.name}, validation_output, sort_keys=True)
 
 
 def main() -> None:

@@ -93,20 +93,26 @@ def test_prospective_cost_requires_whole_stage_fit():
             staging=2, validation=3, cleanup=4, campaign_wall_cap=23, cpu_cap=24, gpu_cap=24)
 
 
-def test_prior_assessment_requires_real_cuda_and_landlock_receipt(tmp_path):
+def test_prior_assessment_requires_real_cuda_and_landlock_receipt(tmp_path, monkeypatch):
     item = tmp_path / 'score.json'
     record = {'scope': 'post-seal W8 score', 'producer_manifest_sha256': 'a' * 64,
               'candidate_sha256': {}, 'outputs': {'scores.npz': 'b' * 64},
               'device': {'provider': 'torch CUDA', 'uuid': 'u', 'visible_uuid': 'u', 'major': 8, 'minor': 9},
-              'role_isolation': {'landlock_abi': 3, 'read_only_inputs': {'/fixed': 13}}}
+              'role_sha256': {}, 'role_isolation': {'landlock_abi': 3, 'read_only_inputs': {'/fixed': 13}}}
+    prior_config = {'phase': 'score', 'candidate_files': {}, 'role_files': {},
+                    'producer_manifest': {'sha256': 'a' * 64}}
+    def check_policy(value, _config, _phase, _loader):
+        if not value['role_isolation']['read_only_inputs']:
+            raise ValueError('missing input denials')
+    monkeypatch.setattr(assessment, 'validate_role_isolation', check_policy)
     item.write_text(json.dumps(record))
     assert assessment.validate_prior_assessment(item, phase='score', producer_sha='a' * 64,
-        candidate={}, output_name='scores.npz', output_sha='b' * 64) == record
+        candidate={}, output_name='scores.npz', output_sha='b' * 64, prior_config=prior_config, prior_loader={}) == record
     record['role_isolation']['read_only_inputs'] = {}
     item.write_text(json.dumps(record))
     with pytest.raises(ValueError):
         assessment.validate_prior_assessment(item, phase='score', producer_sha='a' * 64,
-            candidate={}, output_name='scores.npz', output_sha='b' * 64)
+            candidate={}, output_name='scores.npz', output_sha='b' * 64, prior_config=prior_config, prior_loader={})
 
 
 def test_spec_builder_rejects_before_privileged_input_hash(tmp_path, monkeypatch):
@@ -138,6 +144,8 @@ def test_real_fleet_spec_dispatches_only_one_postseal_phase(tmp_path, monkeypatc
     row = {'path': root + 'registered', 'sha256': 'a' * 64}
     config = {'phase': 'source', 'output': '{assessment_output}', 'cpu_seconds': 10,
               'child_cpu_seconds': 10, 'wall_seconds': 10,
+              'hard_ceilings': {'gpu_seconds': 110, 'cpu_seconds': 120, 'external_cpu_seconds': 10,
+                                'post_campaign_cpu_seconds': 10, 'post_campaign_gpu_seconds': 10},
               'producer_manifest': {'path': root + 'producer', 'sha256': 'b' * 64},
               'asset_manifest': row, 'promotion_manifest': row, 'ledger': row,
               'candidate_files': {key: row for key in assessment.finish.CANDIDATE_KEYS},
@@ -228,3 +236,52 @@ def test_spec_rejects_unpinned_asset_before_manifest_read(tmp_path, monkeypatch)
             approved_asset_manifest_sha256='c' * 64, approved_promotion_sha256='d' * 64,
             approved_ledger_sha256='e' * 64, plan={}, command_wall=30, validator_wall=20, campaign_wall=100)
     assert touched == []
+
+
+def test_role_policy_rejects_missing_or_substituted_input(tmp_path, monkeypatch):
+    from experiments.tennis import w8_clock_profile as clock, w8_cuda_system_leaves as policy
+
+    candidate = tmp_path / 'candidate'
+    asset = tmp_path / 'asset'
+    candidate.write_bytes(b'candidate')
+    asset.write_bytes(b'asset')
+    config = {'candidate_files': {'c': {'path': str(candidate)}}, 'role_files': {'a': {'path': str(asset)}},
+              'parent_user_namespace': 'user:[1]', 'parent_network_namespace': 'net:[1]', 'output': '/private/output'}
+    monkeypatch.setattr(clock, 'validate_receipt', lambda _value: None)
+    monkeypatch.setattr(policy, 'validate_leaf_receipt', lambda _value, _loader: None)
+    isolation = {'landlock_abi': 3, 'handled_mask': policy.handled_rights(3),
+                 'read_only_inputs': {str(candidate): 13, str(asset): 13},
+                 'namespaces': {'user': 'user:[2]', 'net': 'net:[2]'}, 'execution_grants': [],
+                 'clock_profile': {}, 'approved_leaves': [], 'output': '/private/output'}
+    assessment.validate_role_isolation({'role_isolation': isolation}, config, 'score', {})
+    for denied in ({str(candidate): 13}, {str(candidate): 13, str(tmp_path / 'other'): 13}):
+        with pytest.raises(ValueError, match='input grants'):
+            assessment.validate_role_isolation({'role_isolation': {**isolation, 'read_only_inputs': denied}}, config, 'score', {})
+    with pytest.raises(ValueError, match='input grants'):
+        assessment.validate_role_isolation({'role_isolation': {**isolation, 'output': '/wrong'}}, config, 'score', {})
+
+
+def test_clean_execution_rejects_contention_and_wrong_device():
+    gpu = {'uuid': 'GPU-12345678-1234-1234-1234-123456789abc', 'name': 'NVIDIA RTX 6000 Ada'}
+    record = {'device': {'uuid': gpu['uuid'], 'name': gpu['name'], 'major': 8, 'minor': 9}}
+    execution = {'exit_code': 0, 'timing_contaminated': False, 'contention': [], 'paused_seconds': 0,
+                 'gpu_sharing': {'mode': 'exclusive'}}
+    dispatch = {'environment': {'gpu': gpu}, 'gpu_sharing': {'mode': 'exclusive'},
+                'contention_policy': {'policy': 'stop', 'resume_attempts': 0}}
+    assessment.check_clean_execution(execution, dispatch, 'score', record)
+    with pytest.raises(ValueError, match='contaminated'):
+        assessment.check_clean_execution({**execution, 'timing_contaminated': True}, dispatch, 'score', record)
+    with pytest.raises(ValueError, match='contaminated'):
+        assessment.check_clean_execution(execution, {**dispatch, 'contention_policy':
+            {'policy': 'stop', 'resume_attempts': 1}}, 'score', record)
+    with pytest.raises(ValueError, match='GPU claim'):
+        assessment.check_clean_execution(execution, dispatch, 'score',
+            {'device': {**record['device'], 'uuid': 'GPU-aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'}})
+    with pytest.raises(ValueError, match='GPU'):
+        assessment.check_clean_execution(execution, dispatch, 'offline', {'device': None})
+
+
+def test_prior_loader_rejects_hash_not_bound_to_retained_config():
+    with pytest.raises(ValueError, match='loader identity'):
+        assessment.prior_loader({'path': '/unread', 'sha256': 'a' * 64},
+                                {'loader_receipt': {'sha256': 'b' * 64}})
