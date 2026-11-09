@@ -203,6 +203,15 @@ def run(stage: Path) -> None:
         os.fsync(stream.fileno())
 
 
+
+def validation_receipt() -> dict[str, Any]:
+    """Describe only the raw-publication checks completed by this validator."""
+    return {'passed': True, 'scope': 'raw publication completeness only; root audit required',
+            'quality_claim': False, 'gpu_claim': False,
+            'checks': {'publication_and_source_binding': True, 'raw_receipt_hashes': True,
+                       'namespace_lifecycle': True, 'cpu_policy_receipts': True,
+                       'assessment_policy_component': True, 'native_yuv_and_teardown': True}}
+
 def validate(stage: Path, destination: Path) -> None:
     """Check raw publication completeness; independent audit remains mandatory."""
     import tarfile
@@ -294,8 +303,7 @@ def validate(stage: Path, destination: Path) -> None:
                 or native.get('inventory_sha256') != NATIVE_INVENTORY_SHA or native.get('exit_code') != 0):
             raise ValueError('actual native YUV proof differs')
     with destination.open('x') as stream:
-        json.dump({'passed': True, 'scope': 'raw publication completeness only; root audit required',
-                   'quality_claim': False, 'gpu_claim': False}, stream, sort_keys=True)
+        json.dump(validation_receipt(), stream, sort_keys=True)
 
 
 def main() -> None:

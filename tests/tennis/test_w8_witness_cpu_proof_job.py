@@ -46,3 +46,39 @@ def test_lifecycle_rejects_missing_case_and_wrong_group():
         proof.check_lifecycle({**record, 'cases': cases[:-1]}, group)
     with pytest.raises(ValueError):
         proof.check_lifecycle(record, group + 1)
+
+
+def test_actual_fleet_gate_accepts_cpu_proof_validation_shape(tmp_path, monkeypatch):
+    import json
+    from experiments.jobs import inbox, monitor
+
+    root = tmp_path / 'jobs' / 'fleet' / 'inbox' / '20261109T000000Z-12345678'
+    source = root / 'source'
+    source.mkdir(parents=True)
+    (root / 'run').mkdir()
+    (source / 'work.py').write_text('pass\n')
+    repo = str(proof.Path(proof.__file__).resolve().parents[2])
+    (source / 'validate.py').write_text(
+        'import json,os,pathlib,sys\n'
+        f'sys.path.insert(0,{repo!r})\n'
+        'from experiments.tennis.w8_witness_cpu_proof_job import validation_receipt\n'
+        "pathlib.Path(os.environ['PS_VALIDATION_PATH']).write_text(json.dumps(validation_receipt()))\n")
+    asset = tmp_path / 'input.json'
+    asset.write_text('{}')
+    spec = {'schema': 1, 'hosts': ['gpu1'], 'gpu_models': [], 'gpu_memory_mib': 100, 'cpu_threads': 1,
+            'entrypoint': ['work.py'], 'arguments': ['--phase', '{phase}'],
+            'scale': {'phase': {'smoke': 'smoke', 'full': 'full'}},
+            'inputs': [{'path': str(asset), 'sha256': inbox.file_digest(asset)}],
+            'smoke': {'seconds': 10, 'representative_basis': 'fleet validator contract'},
+            'full': {'seconds': 10}, 'budget_seconds': 60,
+            'deadline': (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat(),
+            'validator': ['{python}', 'validate.py'], 'validator_seconds': 10, 'required_commands': []}
+    normalized = inbox.validate_spec(spec)
+    monitor.write_json(root / 'spec.json', normalized)
+    monitor.write_json(root / 'ready.json', {'spec_sha256': inbox.digest(normalized),
+                                             'source_sha256': inbox.source_identity(source)})
+    monkeypatch.setenv('PS_JOB_DIR', str(root / 'run'))
+    assert inbox.campaign(root) == 0
+    gate = json.loads((root / 'gate.json').read_text())
+    assert gate['passed'] is True and gate['validation']['checks']['native_yuv_and_teardown'] is True
+    assert gate['validation']['quality_claim'] is False
