@@ -144,6 +144,15 @@ def stage_inputs(stage: Path, digest_file: Callable[[Path], str] | None = None, 
                 or any(c not in '0123456789abcdef' for c in proof_sha)):
             raise ValueError('root-pinned CPU proof SHA required')
         wanted['cpu_proof'] = proof_sha
+        if witness_profile == 'w8-context-pilot-v1':
+            ledger_sha = spec.get('witness_ledger_sha256')
+            if not isinstance(ledger_sha, str) or len(ledger_sha) != 64 or any(c not in '0123456789abcdef' for c in ledger_sha):
+                raise ValueError('first-pilot pinned ledger SHA required')
+            wanted['ledger'] = ledger_sha
+            admission_sha = spec.get('witness_admission_sha256')
+            if not isinstance(admission_sha, str) or len(admission_sha) != 64 or any(c not in '0123456789abcdef' for c in admission_sha):
+                raise ValueError('first-pilot reviewed attempt SHA required')
+            wanted['admission'] = admission_sha
         if witness_profile in ('w8-context-unit1-v1', 'w8-full-unit0-v1', 'w8-full-unit1-v1',
                                'w8-context-qualification-v1', 'w8-full-finish-v1'):
             for name, key in (('promotion', 'witness_promotion_sha256'), ('ledger', 'witness_ledger_sha256')):

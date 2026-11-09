@@ -9,6 +9,25 @@ from experiments.tennis import w8_input_job as fixed
 from experiments.tennis import w8_witness_profile as witness
 
 
+
+def first_pilot_ledger(tmp_path: Path) -> Path:
+    path = tmp_path / 'first-ledger.json'
+    path.write_text(json.dumps({'reservation_amount_basis': 'remaining_unspent', 'gpu_total_seconds': 6000,
+        'cpu_total_seconds': 6000, 'workstreams': {'w8': {'gpu_limit_seconds': 5000, 'cpu_limit_seconds': 5000}},
+        'charges': [], 'reservations': [{'phase': 'w8-full-witness-staged-20261106', 'workstream': 'w8',
+                                        'gpu_seconds': 4000, 'cpu_seconds': 4000, 'status': 'remaining_unspent'}]}))
+    return path
+
+
+def first_pilot_admission(tmp_path: Path, proof: Path) -> Path:
+    ledger = first_pilot_ledger(tmp_path)
+    path = tmp_path / 'first-admission.json'
+    path.write_text(json.dumps({'schema': 1, 'scope': 'root-reviewed first W8 qualification pilot',
+        'attempt_nonce': 'a' * 32, 'ledger_sha256': fixed.file_sha(ledger), 'cpu_proof_sha256': fixed.file_sha(proof),
+        'preparation_phases': [], 'gpu_spent_seconds': 0, 'cpu_spent_seconds': 0,
+        'gpu_ceiling_seconds': 900, 'cpu_ceiling_seconds': 1000}))
+    return path
+
 def test_qualification_requires_independently_bound_both_units(tmp_path: Path, monkeypatch) -> None:
     dirs = {unit: tmp_path / str(i) for i, unit in enumerate(fixed.UNITS)}
     for path in dirs.values():
@@ -244,7 +263,8 @@ def test_pilot_spec_is_separate_and_never_auto_promotes(tmp_path: Path):
         'spec_sha256': 'e' * 64, 'raw_receipt_sha256': dict.fromkeys(job.REQUIRED_PROOFS, 'f' * 64),
         'checks': dict.fromkeys(job.REQUIRED_CHECKS, True)}))
     spec = job.make_pilot_spec(deadline=(datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat(), proof_local=gate,
-         proof_remote='/home/itec/emanuele/Datasets/pointstream-data/tests/cpu-gate.json')
+         proof_remote='/home/itec/emanuele/Datasets/pointstream-data/tests/cpu-gate.json',
+         ledger_local=first_pilot_ledger(tmp_path), ledger_remote='/home/itec/emanuele/Datasets/pointstream-data/tests/ledger.json', admission_local=first_pilot_admission(tmp_path, gate), admission_remote='/home/itec/emanuele/Datasets/pointstream-data/tests/admission.json')
     assert spec['w8_witness_profile'] == 'w8-context-pilot-v1'
     assert spec['hosts'] == ['gpu5'] and spec['witness_cpu_proof_host'] == 'gpu5'
     assert spec['scale']['phase'] == {'smoke': 'pilot', 'full': 'noop'}
@@ -408,7 +428,8 @@ def test_pilot_builder_phase_and_staging_bind_exact_proof_host(tmp_path: Path):
         'spec_sha256': 'e' * 64, 'raw_receipt_sha256': dict.fromkeys(job.REQUIRED_PROOFS, 'f' * 64),
         'checks': dict.fromkeys(job.REQUIRED_CHECKS, True)}))
     spec = job.make_pilot_spec(deadline=(datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat(), proof_local=gate,
-        proof_remote='/home/itec/emanuele/Datasets/pointstream-data/tests/cpu-gate.json')
+        proof_remote='/home/itec/emanuele/Datasets/pointstream-data/tests/cpu-gate.json',
+         ledger_local=first_pilot_ledger(tmp_path), ledger_remote='/home/itec/emanuele/Datasets/pointstream-data/tests/ledger.json', admission_local=first_pilot_admission(tmp_path, gate), admission_remote='/home/itec/emanuele/Datasets/pointstream-data/tests/admission.json')
     inbox.validate_spec(spec)
     assert inbox.phase_command(spec, 'smoke', python='/python') == ['/python', '-m', 'experiments.tennis.w8_witness_job', 'pilot']
     stage = tmp_path / 'job' / 'smoke'
@@ -505,7 +526,8 @@ def test_generated_pilot_phase_commands_reach_real_cli_dispatch(tmp_path: Path, 
         'spec_sha256': 'e' * 64, 'raw_receipt_sha256': dict.fromkeys(job.REQUIRED_PROOFS, 'f' * 64),
         'checks': dict.fromkeys(job.REQUIRED_CHECKS, True)}))
     spec = job.make_pilot_spec(deadline=(datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat(), proof_local=proof,
-        proof_remote='/home/itec/emanuele/Datasets/pointstream-data/tests/proof.json')
+        proof_remote='/home/itec/emanuele/Datasets/pointstream-data/tests/proof.json',
+        ledger_local=first_pilot_ledger(tmp_path), ledger_remote='/home/itec/emanuele/Datasets/pointstream-data/tests/ledger.json', admission_local=first_pilot_admission(tmp_path, proof), admission_remote='/home/itec/emanuele/Datasets/pointstream-data/tests/admission.json')
     stage = tmp_path / 'smoke'
     stage.mkdir()
     seen = []
@@ -546,14 +568,17 @@ def test_candidate_spec_requires_qualified_producers_and_separate_readiness(tmp_
              'offline_validation', 'external_staging_audits', 'failure_headroom')
     components = {name: {'gpu_seconds': 10.0, 'cpu_seconds': 10.0} for name in names}
     components['unit1_context'] = {'gpu_seconds': 0.0, 'cpu_seconds': 0.0}
-    components['unit0_full'] = {'gpu_seconds': 1500.0, 'cpu_seconds': 1500.0}
-    components['unit1_full'] = {'gpu_seconds': 1500.0, 'cpu_seconds': 1500.0}
+    components['unit0_full'] = {'gpu_seconds': 1500.0, 'cpu_seconds': 1630.0}
+    components['unit1_full'] = {'gpu_seconds': 1500.0, 'cpu_seconds': 1630.0}
     gate = {'schema': 1, 'scope': 'root-reviewed W8 remaining-work forecast', 'source_sha256': 'a' * 64,
             'snapshot_sha256': 'b' * 64, 'cpu_proof_sha256': fixed.file_sha(proof),
             'prior_artifact_sha256': '1' * 64, 'ledger_sha256': fixed.file_sha(ledger),
             'raw_measurement_audit_sha256': '2' * 64, 'safety_factor': 1.5, 'remaining_components': components,
             'completed_artifact_sha256': {'unit1_context': '3' * 64}, 'qualification_receipt_sha256': '4' * 64,
             'gpu_remaining_seconds': 4000, 'cpu_remaining_seconds': 4000,
+            'candidate_next_limits': {'full_seconds': 1300, 'campaign_seconds': 1480,
+                'gpu_ceiling_seconds': 1500, 'cpu_ceiling_seconds': 1630,
+                'generator_cpu': 1100, 'generator_wall': 1100},
             'issued_epoch': time.time() - 1, 'expires_epoch': time.time() + 100}
     promotion = tmp_path / 'promotion.json'
     promotion.write_text(json.dumps(gate))
@@ -646,13 +671,15 @@ def test_finish_fixed_dispatch_and_cli(qualification: bool, monkeypatch, tmp_pat
             'scale': {'phase': {'smoke': 'finish-readiness',
                                 'full': 'finish-context' if qualification else 'finish-candidate'}},
             'smoke': {'seconds': 60}, 'full': {'seconds': 460 if qualification else 1700},
-            'budget_seconds': 570 if qualification else 1770, 'validator_seconds': 50,
-            'witness_gpu_ceiling_seconds': 600 if qualification else 1800,
-            'witness_cpu_ceiling_seconds': 670 if qualification else 1800,
+            'budget_seconds': 570 if qualification else 1850, 'validator_seconds': 50,
+            'witness_gpu_ceiling_seconds': 600 if qualification else 1900,
+            'witness_external_gpu_seconds': 30 if qualification else 50,
+            'witness_cpu_ceiling_seconds': 670 if qualification else 1950,
             'witness_caps': {'parent_cpu': 30, 'packet_cpu': 100, 'native_cpu': 30, 'native_wall': 40,
                              'worker_cpu': 100 if qualification else 450,
                              'worker_wall': 88 if qualification else 460, 'external_cpu': 100},
             'witness_cpu_proof_host': 'gpu5', 'hosts': ['gpu5'], 'gpu_models': ['RTX 6000 Ada'],
+            'device': 'gpu', 'gpu_sharing': {'mode': 'exclusive'}, 'single_cpu_campaign': True, 'cpu_threads': 1,
             'contention': {'policy': 'stop', 'resume_attempts': 0}, 'validator': ['{python}', '-m', 'experiments.tennis.w8_witness_job', 'finish-readiness-validate'],
             **{'witness_' + name + '_sha256': 'a' * 64 for name in ('producer_audit', 'producer0', 'producer1')}}
     job._finish_spec(spec, qualification=qualification)
@@ -703,7 +730,8 @@ def test_finish_builder_binds_audit_archives_and_qualification_caps(tmp_path: Pa
     monkeypatch.setattr(job, 'make_unit1_spec', lambda **_: {
         'deadline': deadline, 'entrypoint': ['-m', 'experiments.tennis.w8_witness_job'],
         'arguments': ['{phase}'], 'hosts': ['gpu5'], 'gpu_models': ['RTX 6000 Ada'],
-        'witness_cpu_proof_host': 'gpu5', 'contention': {'policy': 'stop', 'resume_attempts': 0},
+        'witness_cpu_proof_host': 'gpu5', 'device': 'gpu', 'gpu_sharing': {'mode': 'exclusive'},
+        'single_cpu_campaign': True, 'cpu_threads': 1, 'contention': {'policy': 'stop', 'resume_attempts': 0},
         'staged_inputs': [], 'inputs': []})
     monkeypatch.setattr(inbox, 'validate_spec', lambda _: None)
     gate: dict[str, Any] = {'qualification_charge_phases': ['pilot'], 'qualification_gpu_spent_seconds': 200,
@@ -892,3 +920,28 @@ def test_finish_real_spec_staging_and_dispatch(tmp_path: Path, monkeypatch) -> N
     (stage / 'dispatch.json').write_text(json.dumps(dispatch))
     with pytest.raises(ValueError, match='dispatch differs'):
         host.stage_inputs(stage, digest_file=lambda path: digests[path], witness=True)
+
+
+def test_first_pilot_rejects_prior_qualification_and_untagged_charges(tmp_path: Path) -> None:
+    from experiments.tennis import w8_witness_job as job
+    ledger = json.loads(first_pilot_ledger(tmp_path).read_text())
+    ledger['charges'].extend([
+        {'parent_phase': 'w8-full-witness-staged-20261106', 'phase': 'cpu-proof',
+         'workstream': 'w8', 'gpu_seconds': 0, 'cpu_seconds': 400, 'witness_qualification': False},
+        {'parent_phase': 'w8-full-witness-staged-20261106', 'phase': 'pilot-prep',
+         'workstream': 'w8', 'gpu_seconds': 0, 'cpu_seconds': 50, 'witness_qualification': True,
+         'qualification_charge_kind': 'pilot_preparation', 'qualification_attempt_nonce': 'a' * 32}])
+    receipt = {'schema': 1, 'scope': 'root-reviewed first W8 qualification pilot', 'attempt_nonce': 'a' * 32,
+               'ledger_sha256': 'b' * 64, 'cpu_proof_sha256': 'c' * 64, 'preparation_phases': ['pilot-prep'],
+               'gpu_spent_seconds': 0, 'cpu_spent_seconds': 50, 'gpu_ceiling_seconds': 900,
+               'cpu_ceiling_seconds': 950}
+    def check() -> None:
+        job.check_first_pilot_ledger(ledger, receipt, ledger_sha='b' * 64, cpu_proof_sha='c' * 64)
+    check()
+    ledger['charges'][1]['qualification_charge_kind'] = 'pilot_execution'
+    with pytest.raises(ValueError, match='earlier execution'):
+        check()
+    ledger['charges'][1]['qualification_charge_kind'] = 'pilot_preparation'
+    del ledger['charges'][0]['witness_qualification']
+    with pytest.raises(ValueError, match='attribution'):
+        check()

@@ -114,6 +114,8 @@ def load_released_inputs(stage: Path) -> tuple[dict[str, Path], dict[str, Any], 
                          'w8-context-qualification-v1', 'w8-full-finish-v1')
     if spec.get('w8_witness_profile') in promoted_profiles:
         expected.update(promotion=spec['witness_promotion_sha256'], ledger=spec['witness_ledger_sha256'])
+    elif spec.get('w8_witness_profile') == 'w8-context-pilot-v1':
+        expected.update(ledger=spec['witness_ledger_sha256'], admission=spec['witness_admission_sha256'])
     if spec.get('w8_witness_profile') in ('w8-context-qualification-v1', 'w8-full-finish-v1'):
         from experiments.tennis.w8_receiver_finish import SAM_SHA
         expected.update(sam_weights=SAM_SHA,
@@ -133,6 +135,8 @@ def load_released_inputs(stage: Path) -> tuple[dict[str, Path], dict[str, Any], 
     small_names = ['preflight', 'identity', 'oracle', 'cpu_proof']
     if spec.get('w8_witness_profile') in promoted_profiles:
         small_names.extend(('promotion', 'ledger'))
+    elif spec.get('w8_witness_profile') == 'w8-context-pilot-v1':
+        small_names.extend(('ledger', 'admission'))
     if spec.get('w8_witness_profile') in ('w8-context-qualification-v1', 'w8-full-finish-v1'):
         small_names.append('producer_audit')
     paths = {name: Path(staged[name]['source']) for name in small_names}
@@ -240,6 +244,44 @@ def promotion_ledger_remaining(ledger: dict[str, Any]) -> tuple[float, float]:
 
 
 
+
+def check_first_pilot_ledger(ledger: dict[str, Any], receipt: dict[str, Any], *,
+                             ledger_sha: str, cpu_proof_sha: str) -> None:
+    """Allow only attributed preparation for this first attempt; count it once."""
+    gpu, cpu = promotion_ledger_remaining(ledger)
+    nonce = receipt.get('attempt_nonce')
+    gpu_cap, cpu_cap = receipt.get('gpu_ceiling_seconds'), receipt.get('cpu_ceiling_seconds')
+    if (receipt.get('schema') != 1 or receipt.get('scope') != 'root-reviewed first W8 qualification pilot'
+            or not isinstance(nonce, str) or not re.fullmatch(r'[0-9a-f]{32}', nonce)
+            or receipt.get('ledger_sha256') != ledger_sha or receipt.get('cpu_proof_sha256') != cpu_proof_sha
+            or type(gpu_cap) is not int or type(cpu_cap) is not int or not 250 <= gpu_cap <= 900
+            or not 341 <= cpu_cap <= 1000 or gpu_cap > gpu or cpu_cap > cpu):
+        raise ValueError('first pilot receipt or remaining reservation differs')
+    rows = [row for row in ledger['charges'] if row.get('parent_phase') == 'w8-full-witness-staged-20261106']
+    if any(type(row.get('witness_qualification')) is not bool for row in rows):
+        raise ValueError('every parent charge needs explicit qualification attribution')
+    prep = [row for row in rows if row['witness_qualification']]
+    phases = [row.get('phase') for row in prep]
+    if (any(row.get('qualification_charge_kind') != 'pilot_preparation'
+            or row.get('qualification_attempt_nonce') != nonce for row in prep)
+            or any(not isinstance(phase, str) or not phase for phase in phases)
+            or len(phases) != len(set(phases)) or sorted(phases) != receipt.get('preparation_phases')):
+        raise ValueError('first pilot preparation is mixed, unattributed or follows an earlier execution')
+    for resource, cap, limit in (('gpu', gpu_cap, 900), ('cpu', cpu_cap, 1000)):
+        spent = sum(row[resource + '_seconds'] for row in prep)
+        if receipt.get(resource + '_spent_seconds') != spent or spent + cap > limit:
+            raise ValueError('first pilot cumulative qualification ceiling exceeded')
+
+
+
+def check_first_pilot_stage(paths: dict[str, Path], spec: dict[str, Any]) -> None:
+    receipt = json.loads(paths['admission'].read_text())
+    check_first_pilot_ledger(json.loads(paths['ledger'].read_text()), receipt,
+        ledger_sha=spec['witness_ledger_sha256'], cpu_proof_sha=spec['witness_cpu_proof_sha256'])
+    if (receipt['gpu_ceiling_seconds'] != spec['witness_gpu_ceiling_seconds']
+            or receipt['cpu_ceiling_seconds'] != spec['witness_cpu_ceiling_seconds']):
+        raise ValueError('first pilot stage ceilings differ from reviewed attempt')
+
 def check_qualification_subcap(ledger: dict[str, Any], gate: dict[str, Any], *,
                                gpu_cap: float, cpu_cap: float) -> None:
     """Charge tagged qualification entries once against its cumulative ceiling."""
@@ -328,6 +370,8 @@ def _pilot_spec(spec: dict[str, Any], *, unit1: bool = False, reference_epoch: f
             or not 0 < spec.get('witness_validator_cpu_seconds', 0) <= 120
             or not 0 < spec.get('witness_cpu_ceiling_seconds', 0) <= 1000):
         raise ValueError('unit-0 witness pilot spec differs')
+    if not unit1 and (not _sha(spec.get('witness_ledger_sha256')) or not _sha(spec.get('witness_admission_sha256'))):
+        raise ValueError('first pilot requires a pinned ledger')
     if unit1 and (not _sha(spec.get('witness_promotion_sha256')) or not _sha(spec.get('witness_ledger_sha256'))
                   or not _sha(spec.get('witness_prior_artifact_sha256'))):
         raise ValueError('unit-1 requires pinned prior artifact, promotion and ledger')
@@ -337,6 +381,7 @@ def _pilot_spec(spec: dict[str, Any], *, unit1: bool = False, reference_epoch: f
             or any(type(caps[x]) is not int or caps[x] <= 0 for x in names)
             or caps['generator_wall'] > 500 or caps['packet_cpu'] > 100 or caps['parent_cpu'] > 60
             or caps['generator_cpu'] > 500 or caps['external_cpu'] > 150
+            or spec['budget_seconds'] + caps['external_cpu'] > spec['witness_cpu_ceiling_seconds']
             or caps['parent_cpu'] + caps['packet_cpu'] + caps['generator_cpu']
                + spec['witness_validator_cpu_seconds'] + caps['external_cpu'] > spec['witness_cpu_ceiling_seconds']):
         raise ValueError('pilot CPU or wall caps differ')
@@ -359,6 +404,7 @@ def _candidate_spec(spec: dict[str, Any], *, unit1: bool, reference_epoch: float
             or not 0 < spec.get('smoke', {}).get('seconds', 0) <= 60
             or not 0 < spec.get('full', {}).get('seconds', 0) <= 1300
             or not 0 < spec.get('budget_seconds', 0) <= 1500
+            or spec['budget_seconds'] < 60 + spec['full']['seconds'] + spec.get('validator_seconds', 0)
             or type(spec.get('witness_external_gpu_seconds')) is not int
             or spec['witness_external_gpu_seconds'] <= 0
             or spec['budget_seconds'] + spec['witness_external_gpu_seconds'] > spec.get('witness_gpu_ceiling_seconds', 0)
@@ -371,6 +417,8 @@ def _candidate_spec(spec: dict[str, Any], *, unit1: bool, reference_epoch: float
     if (not isinstance(caps, dict) or set(caps) != names or any(type(caps[x]) is not int or caps[x] <= 0 for x in names)
             or caps['parent_cpu'] > 60 or caps['packet_cpu'] > 100 or caps['generator_cpu'] > 1200
             or caps['generator_wall'] > 1200 or caps['external_cpu'] > 200
+            or spec['full']['seconds'] < 150 + caps['generator_wall']
+            or spec['budget_seconds'] + caps['external_cpu'] > spec.get('witness_cpu_ceiling_seconds', 0)
             or not 0 < spec.get('witness_validator_cpu_seconds', 0) <= 120
             or caps['parent_cpu'] + caps['packet_cpu'] + caps['generator_cpu']
                + spec['witness_validator_cpu_seconds'] + caps['external_cpu'] > spec.get('witness_cpu_ceiling_seconds', 0)):
@@ -398,6 +446,8 @@ def run_pilot(stage: Path, *, unit1: bool = False, candidate: bool = False) -> N
         _pilot_spec(spec, unit1=unit1)
     if unit1 or candidate:
         _unit1_promotion(paths, spec, dispatch)
+    else:
+        check_first_pilot_stage(paths, spec)
     caps = spec['witness_caps']
     # Preserve the existing cost launcher's hard limit so each child can
     # independently install its reviewed soft CPU cap before isolation.
@@ -522,6 +572,8 @@ def validate_pilot(stage: Path, target: Path) -> None:
             _pilot_spec(spec, unit1=unit1, reference_epoch=dispatch['started'])
         if unit1 or candidate:
             _unit1_promotion(paths, spec, dispatch, historical=True)
+        else:
+            check_first_pilot_stage(paths, spec)
         resource.setrlimit(resource.RLIMIT_CPU, (spec['witness_validator_cpu_seconds'],
                                                  spec['witness_validator_cpu_seconds']))
         publication = stage / 'published.tar'
@@ -678,7 +730,10 @@ def validate_pilot(stage: Path, target: Path) -> None:
         raise
 
 
-def make_pilot_spec(*, deadline: str, proof_local: Path, proof_remote: str) -> dict[str, Any]:
+def make_pilot_spec(*, deadline: str, proof_local: Path, proof_remote: str,
+                    ledger_local: Path | None = None, ledger_remote: str | None = None,
+                    admission_local: Path | None = None, admission_remote: str | None = None,
+                    _promoted_base: bool = False) -> dict[str, Any]:
     """Prepare a review-only spec after a real, independently reviewed CPU gate exists."""
     digest = fixed.file_sha(proof_local)
     gate = json.loads(proof_local.read_text())
@@ -717,7 +772,29 @@ def make_pilot_spec(*, deadline: str, proof_local: Path, proof_remote: str) -> d
     spec['gpu_models'] = ['RTX 6000 Ada']
     spec['staged_inputs'].append({'name': 'cpu_proof', 'path': proof_remote, 'sha256': digest, 'extract': False})
     spec['inputs'].append({'path': proof_remote, 'sha256': digest})
-    _pilot_spec(spec)
+    if not _promoted_base:
+        if ledger_local is None or ledger_remote is None or admission_local is None or admission_remote is None:
+            raise ValueError('first pilot requires the current ledger and reviewed attempt receipt')
+        for value in (ledger_remote, admission_remote):
+            remote = Path(value)
+            if (not remote.is_absolute() or '..' in remote.parts
+                    or not remote.is_relative_to(Path('/home/itec/emanuele/Datasets/pointstream-data'))):
+                raise ValueError('first-pilot inputs require registered data paths')
+        ledger_sha, admission_sha = fixed.file_sha(ledger_local), fixed.file_sha(admission_local)
+        receipt = json.loads(admission_local.read_text())
+        check_first_pilot_ledger(json.loads(ledger_local.read_text()), receipt, ledger_sha=ledger_sha, cpu_proof_sha=digest)
+        spec['witness_ledger_sha256'], spec['witness_admission_sha256'] = ledger_sha, admission_sha
+        gpu_cap, cpu_cap = receipt['gpu_ceiling_seconds'], receipt['cpu_ceiling_seconds']
+        spec['witness_gpu_ceiling_seconds'], spec['witness_cpu_ceiling_seconds'] = gpu_cap, cpu_cap
+        spec['witness_external_gpu_seconds'] = 50
+        spec['budget_seconds'] = min(gpu_cap - 50, cpu_cap - 150)
+        spec['smoke']['seconds'] = min(580, spec['budget_seconds'] - 65)
+        spec['witness_caps']['generator_wall'] = min(310, spec['smoke']['seconds'] - 145)
+        spec['witness_caps']['generator_cpu'] = min(300, cpu_cap - 340)
+        for name, path, sha in (('ledger', ledger_remote, ledger_sha), ('admission', admission_remote, admission_sha)):
+            spec['staged_inputs'].append({'name': name, 'path': path, 'sha256': sha, 'extract': False})
+            spec['inputs'].append({'path': path, 'sha256': sha})
+        _pilot_spec(spec)
     from experiments.jobs.inbox import validate_spec
     validate_spec(spec)
     return spec
@@ -727,7 +804,7 @@ def make_unit1_spec(*, deadline: str, proof_local: Path, proof_remote: str,
                     promotion_local: Path, promotion_remote: str, ledger_local: Path,
                     ledger_remote: str, prior_artifact_sha: str, _for_candidate: bool = False) -> dict[str, Any]:
     """Build only after independent pilot audit and a root-pinned forecast exist."""
-    spec = make_pilot_spec(deadline=deadline, proof_local=proof_local, proof_remote=proof_remote)
+    spec = make_pilot_spec(deadline=deadline, proof_local=proof_local, proof_remote=proof_remote, _promoted_base=True)
     promotion_sha, ledger_sha = fixed.file_sha(promotion_local), fixed.file_sha(ledger_local)
     gate = json.loads(promotion_local.read_text())
     for remote in (promotion_remote, ledger_remote):
@@ -754,7 +831,7 @@ def make_unit1_spec(*, deadline: str, proof_local: Path, proof_remote: str,
             raise ValueError('explicit bounded qualification stage ceilings required')
         spec['witness_gpu_ceiling_seconds'], spec['witness_cpu_ceiling_seconds'] = gpu_cap, cpu_cap
         spec['witness_external_gpu_seconds'] = 50
-        spec['budget_seconds'] = gpu_cap - 50
+        spec['budget_seconds'] = min(gpu_cap - 50, cpu_cap - 150)
         spec['smoke']['seconds'] = min(580, spec['budget_seconds'] - 65)
         spec['witness_caps']['generator_wall'] = min(310, spec['smoke']['seconds'] - 145)
         spec['witness_caps']['generator_cpu'] = min(300, cpu_cap - 340)
@@ -791,10 +868,22 @@ def make_candidate_spec(*, deadline: str, proof_local: Path, proof_remote: str,
     spec['witness_gpu_ceiling_seconds'] = 1500
     spec['validator_seconds'] = 60
     spec['witness_validator_cpu_seconds'] = 60
-    spec['witness_cpu_ceiling_seconds'] = 1500
+    spec['witness_cpu_ceiling_seconds'] = 1630
     spec['witness_caps'] = {'parent_cpu': 30, 'packet_cpu': 100, 'generator_cpu': 1100,
                             'generator_wall': 1100, 'external_cpu': 150}
     spec['validator'] = ['{python}', '-m', 'experiments.tennis.w8_witness_job', 'readiness-validate']
+    gate = json.loads(promotion_local.read_text())
+    limits = gate.get('candidate_next_limits')
+    keys = {'full_seconds', 'campaign_seconds', 'gpu_ceiling_seconds', 'cpu_ceiling_seconds',
+            'generator_cpu', 'generator_wall'}
+    if not isinstance(limits, dict) or set(limits) != keys or any(type(limits[k]) is not int or limits[k] <= 0 for k in keys):
+        raise ValueError('reviewed producer stage limits required')
+    spec['full']['seconds'] = limits['full_seconds']
+    spec['budget_seconds'] = limits['campaign_seconds']
+    spec['witness_gpu_ceiling_seconds'] = limits['gpu_ceiling_seconds']
+    spec['witness_cpu_ceiling_seconds'] = limits['cpu_ceiling_seconds']
+    spec['witness_caps']['generator_cpu'] = limits['generator_cpu']
+    spec['witness_caps']['generator_wall'] = limits['generator_wall']
     _candidate_spec(spec, unit1=unit1)
     gate = json.loads(promotion_local.read_text())
     completed = gate.get('completed_artifact_sha256', {})
@@ -886,18 +975,32 @@ def _finish_spec(spec: dict[str, Any], *, qualification: bool, reference_epoch: 
             raise ValueError('qualification finish limits do not fit inclusive ceilings')
         full_seconds, campaign, ceiling = spec['full']['seconds'], spec['budget_seconds'], gpu
     else:
-        full_seconds, campaign, ceiling = 1700, 1770, 1800
-        caps = {'parent_cpu': 30, 'packet_cpu': 100, 'native_cpu': 30, 'native_wall': 40,
-                'worker_cpu': 450, 'worker_wall': 460, 'external_cpu': 100}
+        full_seconds, campaign = spec.get('full', {}).get('seconds'), spec.get('budget_seconds')
+        full_ceiling, full_cpu = spec.get('witness_gpu_ceiling_seconds'), spec.get('witness_cpu_ceiling_seconds')
+        caps = spec.get('witness_caps', {})
+        if (type(full_seconds) is not int or type(campaign) is not int or type(full_ceiling) is not int
+                or type(full_cpu) is not int or not isinstance(caps, dict) or set(caps) != {'parent_cpu', 'packet_cpu', 'native_cpu',
+                     'native_wall', 'worker_cpu', 'worker_wall', 'external_cpu'}
+                or caps.get('parent_cpu') != 30 or caps.get('packet_cpu') != 100 or caps.get('native_cpu') != 30
+                or caps.get('native_wall') != 40 or caps.get('external_cpu') != 100
+                or type(caps.get('worker_cpu')) is not int or not 1 <= caps['worker_cpu'] <= 450
+                or type(caps.get('worker_wall')) is not int or not 11 <= caps['worker_wall'] <= 460
+                or not 1 <= full_seconds <= 1700 or not 1 <= campaign <= 1850
+                or campaign < full_seconds + 110 or full_ceiling < campaign + 50 or full_ceiling > 1900
+                or full_cpu < campaign + 100 or full_cpu > 1950 or full_seconds < 195 + 3 * caps['worker_wall']):
+            raise ValueError('full finish limits do not fit inclusive ceilings')
+        ceiling = full_ceiling
     if (spec.get('w8_witness_profile') != profile or spec.get('entrypoint') != ['-m', 'experiments.tennis.w8_witness_job']
             or spec.get('arguments') != ['{phase}']
             or spec.get('scale') != {'phase': {'smoke': 'finish-readiness', 'full': 'finish-context' if qualification else 'finish-candidate'}}
             or spec.get('smoke', {}).get('seconds') != 60 or spec.get('full', {}).get('seconds') != full_seconds
             or spec.get('budget_seconds') != campaign or spec.get('validator_seconds') != 50
             or spec.get('witness_gpu_ceiling_seconds') != ceiling
-            or (not qualification and spec.get('witness_cpu_ceiling_seconds') != ceiling)
+            or spec.get('witness_external_gpu_seconds') != (30 if qualification else 50)
             or spec.get('witness_caps') != caps or spec.get('witness_cpu_proof_host') not in ('gpu5', 'gpu6')
             or spec.get('hosts') != [spec['witness_cpu_proof_host']] or spec.get('gpu_models') != ['RTX 6000 Ada']
+            or spec.get('device') != 'gpu' or spec.get('gpu_sharing') != {'mode': 'exclusive'}
+            or spec.get('single_cpu_campaign') is not True or spec.get('cpu_threads') != 1
             or spec.get('contention') != {'policy': 'stop', 'resume_attempts': 0}
             or spec.get('validator') != ['{python}', '-m', 'experiments.tennis.w8_witness_job', 'finish-readiness-validate']):
         raise ValueError('finish fixed dispatch or inclusive bounds differ')
@@ -920,10 +1023,11 @@ def make_finish_spec(*, deadline: str, proof_local: Path, proof_remote: str, pro
     spec['scale'] = {'phase': {'smoke': 'finish-readiness', 'full': 'finish-context' if qualification else 'finish-candidate'}}
     spec['smoke'] = {'seconds': 60, 'representative_basis': 'Exact reviewed source, producer and remaining-budget readiness.'}
     spec['full'] = {'seconds': 500 if qualification else 1700}
-    spec['budget_seconds'] = 570 if qualification else 1770
+    spec['budget_seconds'] = 570 if qualification else 1850
     spec['validator_seconds'] = 50
-    spec['witness_gpu_ceiling_seconds'] = spec['witness_cpu_ceiling_seconds'] = 600 if qualification else 1800
-    spec['witness_external_gpu_seconds'] = 30
+    spec['witness_gpu_ceiling_seconds'] = 600 if qualification else 1900
+    spec['witness_cpu_ceiling_seconds'] = 600 if qualification else 1950
+    spec['witness_external_gpu_seconds'] = 30 if qualification else 50
     spec['witness_caps'] = {'parent_cpu': 30, 'packet_cpu': 100, 'native_cpu': 30, 'native_wall': 40,
                             'worker_cpu': 100 if qualification else 450,
                             'worker_wall': 110 if qualification else 460, 'external_cpu': 100}
@@ -939,6 +1043,17 @@ def make_finish_spec(*, deadline: str, proof_local: Path, proof_remote: str, pro
         spec['full']['seconds'] = spec['budget_seconds'] - 110
         spec['witness_caps']['worker_wall'] = min(110, (spec['full']['seconds'] - 195) // 3)
         spec['witness_caps']['worker_cpu'] = min(100, spec['witness_caps']['worker_wall'])
+    else:
+        gate = json.loads(promotion_local.read_text())
+        limits = gate.get('finish_next_limits')
+        keys = {'full_seconds', 'campaign_seconds', 'gpu_ceiling_seconds', 'cpu_ceiling_seconds',
+                'worker_cpu', 'worker_wall'}
+        if not isinstance(limits, dict) or set(limits) != keys or any(type(limits[k]) is not int or limits[k] <= 0 for k in keys):
+            raise ValueError('reviewed full finish stage limits required')
+        spec['full']['seconds'], spec['budget_seconds'] = limits['full_seconds'], limits['campaign_seconds']
+        spec['witness_gpu_ceiling_seconds'] = limits['gpu_ceiling_seconds']
+        spec['witness_cpu_ceiling_seconds'] = limits['cpu_ceiling_seconds']
+        spec['witness_caps']['worker_cpu'], spec['witness_caps']['worker_wall'] = limits['worker_cpu'], limits['worker_wall']
     additions = [('producer_audit', producer_audit_remote, audit_sha),
                  ('producer0', producer0_remote, fixed.file_sha(producer0_local)),
                  ('producer1', producer1_remote, fixed.file_sha(producer1_local)),
@@ -1379,6 +1494,10 @@ def main() -> None:
     make.add_argument('--deadline', required=True)
     make.add_argument('--cpu-proof-local', type=Path, required=True)
     make.add_argument('--cpu-proof-remote', required=True)
+    make.add_argument('--ledger-local', type=Path, required=True)
+    make.add_argument('--ledger-remote', required=True)
+    make.add_argument('--admission-local', type=Path, required=True)
+    make.add_argument('--admission-remote', required=True)
     make.add_argument('--output', type=Path, required=True)
     unit1 = sub.add_parser('make-unit1-spec')
     for arg in ('deadline', 'cpu-proof-remote', 'promotion-remote', 'ledger-remote', 'prior-artifact-sha'):
@@ -1412,7 +1531,9 @@ def main() -> None:
     args = parser.parse_args()
     if args.action == 'make-spec':
         spec = make_pilot_spec(deadline=args.deadline, proof_local=args.cpu_proof_local,
-                               proof_remote=args.cpu_proof_remote)
+                               proof_remote=args.cpu_proof_remote, ledger_local=args.ledger_local,
+                               ledger_remote=args.ledger_remote, admission_local=args.admission_local,
+                               admission_remote=args.admission_remote)
         with args.output.open('x') as stream:
             json.dump(spec, stream, indent=2, allow_nan=False)
             stream.write('\n')
