@@ -97,8 +97,10 @@ def apply_parent_limit(torch: Any) -> dict:
     if total < SHARED_LIMIT_MIB * 2**20:
         raise ValueError('shared A6000 capacity is insufficient')
     cuda.set_per_process_memory_fraction(PER_PROCESS_MIB * 2**20 / total, 0)
+    from experiments.tennis.k5d_scoped_namespace import host_group_identity
+    host = host_group_identity(Path(os.environ['PS_STAGE_DIR']).parent / 'run' / 'status.json')
     return {'role': 'parent', 'pid': os.getpid(), 'pgid': os.getpgrp(), 'budget_mib': PER_PROCESS_MIB,
-            'total_bytes': total, 'fraction': PER_PROCESS_MIB * 2**20 / total, 'allocated_before': 0}
+            'total_bytes': total, 'fraction': PER_PROCESS_MIB * 2**20 / total, 'allocated_before': 0, **host}
 
 
 def configure_child_environment(saved: dict, current: dict) -> None:
@@ -111,10 +113,11 @@ def configure_child_environment(saved: dict, current: dict) -> None:
         saved[key] = current[key]
 
 
-def validate_resource_receipts(directory: Path) -> None:
+def validate_resource_receipts(directory: Path) -> list[dict]:
     paths = sorted(directory.glob('*.json'))
     if not (directory / 'parent.json').is_file() or len(paths) < 2:
         raise ValueError('shared parent and DCVC allocator receipts required')
+    records = []
     for path in paths:
         value = json.loads(path.read_text())
         role = 'parent' if path.name == 'parent.json' else 'dcvc'
@@ -124,8 +127,24 @@ def validate_resource_receipts(directory: Path) -> None:
                 or value.get('fraction') != PER_PROCESS_MIB * 2**20 / total
                 or not isinstance(value.get('pid'), int) or value['pid'] <= 0
                 or not isinstance(value.get('pgid'), int) or value['pgid'] < 0
+                or any(type(value.get(key)) is not int or value[key] <= 0 for key in
+                       ('host_pid', 'host_pgid', 'start_ticks', 'campaign_pgid'))
+                or value['host_pgid'] != value['campaign_pgid']
                 or (role == 'dcvc' and path.name != f"child-{value['pid']}.json")):
             raise ValueError('invalid shared allocator receipt')
+        records.append(value)
+    if len({(item['host_pid'], item['start_ticks']) for item in records}) != len(records):
+        raise ValueError('duplicate allocator process identity')
+    expected = {(action, f'prepared-work/dcvc-{point}/plan.json')
+                for kind, point in enc.POINTS if kind == 'dcvc' for action in ('encode', 'decode')}
+    expected.update(('decode', f'coalesced-dcvc-{point}/receiver-plan.json')
+                    for kind, point in enc.POINTS if kind == 'dcvc')
+    expected.update(('decode', f'prepared-work/receiver-dcvc-{point}/receiver-plan.json')
+                    for kind, point in enc.POINTS if kind == 'dcvc')
+    actual = [(item.get('action'), item.get('plan')) for item in records if item['role'] == 'dcvc']
+    if len(actual) != len(expected) or set(actual) != expected:
+        raise ValueError('shared allocator receipts do not cover every DCVC action')
+    return records
 
 
 def run(args: argparse.Namespace) -> None:
@@ -257,8 +276,8 @@ def validate() -> None:
               cost.unpack(stage / 'published.tar', published_sha) as output):
             identity = cp.execution_identity()
             saved = json.loads((output / 'parity.json').read_text())
-            if saved.get('shared_numerical_only') is True:
-                validate_resource_receipts(output / 'shared-resource-receipts')
+            resource_records = (validate_resource_receipts(output / 'shared-resource-receipts')
+                                if saved.get('shared_numerical_only') is True else [])
             verify_scored(output, identity)
             cf.prepare_parity(output / 'prepared', prior, identity)
             comparison = cp.compare_equivalence(prior, output / 'scored' / 'assembled', oracle.sha(prior / 'pilot.json'))
@@ -274,6 +293,13 @@ def validate() -> None:
                 or lines[0]['namespace_init']['namespace_pid'] != 1):
             raise ValueError('actual namespace execution proof missing')
         values = [lines[0]['children_cpu_seconds'], lines[0]['init_cpu_seconds']]
+        if resource_records:
+            worker = lines[0]['worker_host_identity']
+            group = json.loads((stage.parent / 'run' / 'status.json').read_text())['process_group_id']
+            parent = next(item for item in resource_records if item['role'] == 'parent')
+            if (any(parent[key] != worker[key] for key in ('host_pid', 'start_ticks', 'host_pgid', 'campaign_pgid'))
+                    or any(item['host_pgid'] != group for item in resource_records)):
+                raise ValueError('shared allocator host ownership differs')
         if any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) or v < 0 for v in values) or sum(values) <= 0:
             raise ValueError('actual namespace CPU accounting invalid')
         specification = json.loads((stage.parent / 'spec.json').read_text())

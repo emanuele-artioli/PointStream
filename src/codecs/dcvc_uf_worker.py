@@ -151,9 +151,23 @@ def _apply_optional_shared_parity_limit(torch: Any, environ: Any) -> None:
     receipts = Path(environ['PS_K5D_RESOURCE_RECEIPTS']).resolve(strict=True)
     if receipts != scratch / 'shared-resource-receipts':
         raise RuntimeError('shared DCVC resource receipt path differs')
+    status = json.loads((Path(environ['PS_STAGE_DIR']).parent / 'run' / 'status.json').read_text())
+    stat = Path('/proc/self/stat').read_text()
+    fields = stat[stat.rfind(')') + 2:].split()
+    host_pid, host_pgid, start_ticks = int(stat[:stat.find(' ')]), int(fields[2]), int(fields[19])
+    group = status.get('process_group_id')
+    if type(group) is not int or group <= 0 or group != host_pgid or start_ticks <= 0:
+        raise RuntimeError('shared DCVC worker host process group differs')
+    if len(sys.argv) != 6 or sys.argv[1] not in ('encode', 'decode') or sys.argv[2] != '--plan' or sys.argv[4] != '--report':
+        raise RuntimeError('shared DCVC action differs')
+    plan = Path(sys.argv[3]).resolve(strict=True)
+    if not plan.is_relative_to(scratch):
+        raise RuntimeError('shared DCVC plan is outside scratch')
     with (receipts / f'child-{os.getpid()}.json').open('x') as stream:
         json.dump({'role': 'dcvc', 'pid': os.getpid(), 'pgid': os.getpgrp(), 'budget_mib': 8192,
-                   'total_bytes': total, 'fraction': fraction, 'allocated_before': 0}, stream)
+                   'total_bytes': total, 'fraction': fraction, 'allocated_before': 0, 'host_pid': host_pid,
+                   'host_pgid': host_pgid, 'start_ticks': start_ticks, 'campaign_pgid': group,
+                   'action': sys.argv[1], 'plan': str(plan.relative_to(scratch))}, stream)
 
 
 def _load_state(path: str, expected_sha256: str) -> tuple[dict[str, Any], dict[str, Any]]:

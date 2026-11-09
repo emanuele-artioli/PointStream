@@ -40,24 +40,59 @@ def test_shared_claim_requires_exact_opt_in_and_unchanged_default():
         parity.check_resource_profile(spec, {'gpu_sharing': {'mode': 'exclusive'}}, requested=True, environ=env)
 
 
-def test_two_allocators_capped_before_allocation_and_child_env_propagates(tmp_path):
+def test_two_allocators_capped_before_allocation_and_child_env_propagates(tmp_path, monkeypatch):
     spec, _, env = claim()
     del spec
     env['PS_K5D_SHARED_NUMERICAL'] = parity.SHARED_PROFILE
+    from pathlib import Path
+    from experiments.tennis import k5d_scoped_namespace
     env['PS_SCRATCH_DIR'] = str(tmp_path)
+    env['PS_STAGE_DIR'] = str(tmp_path / 'smoke')
+    monkeypatch.setenv('PS_STAGE_DIR', env['PS_STAGE_DIR'])
+    host = {'host_pid': 101, 'host_pgid': 77, 'start_ticks': 1001, 'campaign_pgid': 77}
+    monkeypatch.setattr(k5d_scoped_namespace, 'host_group_identity', lambda _path: host)
+    original_read = Path.read_text
+    def fake_read(path, *args, **kwargs):
+        if str(path) == '/proc/self/stat':
+            return '102 (worker) ' + ' '.join(['S', '1', '77'] + ['0'] * 16 + ['1002'])
+        if path.name == 'status.json':
+            return '{\"process_group_id\": 77}'
+        return original_read(path, *args, **kwargs)
+    monkeypatch.setattr(Path, 'read_text', fake_read)
     receipt_dir = tmp_path / 'shared-resource-receipts'
     receipt_dir.mkdir()
     env['PS_K5D_RESOURCE_RECEIPTS'] = str(receipt_dir)
     saved = {'OTHER': 'preserved'}
     parity.configure_child_environment(saved, env)
-    assert saved == {key: value for key, value in env.items() if key != 'PS_SCRATCH_DIR'} | {'OTHER': 'preserved'}
+    assert saved == {key: value for key, value in env.items() if key not in ('PS_SCRATCH_DIR', 'PS_STAGE_DIR')} | {'OTHER': 'preserved'}
     saved['PS_SCRATCH_DIR'] = str(tmp_path)
+    saved['PS_STAGE_DIR'] = env['PS_STAGE_DIR']
     parent, parent_calls = fake_torch()
     child, child_calls = fake_torch()
     parent_receipt = parity.apply_parent_limit(parent)
     import json
     (receipt_dir / 'parent.json').write_text(json.dumps(parent_receipt))
+    plan = tmp_path / 'prepared-work/dcvc-0/plan.json'
+    plan.parent.mkdir(parents=True)
+    plan.write_text('{}')
+    import sys
+    monkeypatch.setattr(sys, 'argv', ['worker', 'encode', '--plan', str(plan), '--report', 'report'])
     dcvc._apply_optional_shared_parity_limit(child, saved)
+    child_file = next(receipt_dir.glob('child-*.json'))
+    record = json.loads(child_file.read_text())
+    with pytest.raises(ValueError, match='cover every'):
+        parity.validate_resource_receipts(receipt_dir)
+    expected = {(action, f'prepared-work/dcvc-{point}/plan.json')
+                for kind, point in parity.enc.POINTS if kind == 'dcvc' for action in ('encode', 'decode')}
+    expected.update(('decode', f'coalesced-dcvc-{point}/receiver-plan.json')
+                    for kind, point in parity.enc.POINTS if kind == 'dcvc')
+    expected.update(('decode', f'prepared-work/receiver-dcvc-{point}/receiver-plan.json')
+                    for kind, point in parity.enc.POINTS if kind == 'dcvc')
+    expected.remove(('encode', 'prepared-work/dcvc-0/plan.json'))
+    for index, (action, path) in enumerate(sorted(expected), 10000):
+        value = {**record, 'pid': index, 'host_pid': index, 'start_ticks': index,
+                 'action': action, 'plan': path}
+        (receipt_dir / f'child-{index}.json').write_text(json.dumps(value))
     parity.validate_resource_receipts(receipt_dir)
     parent_receipt['budget_mib'] = 16384
     (receipt_dir / 'parent.json').write_text(json.dumps(parent_receipt))
