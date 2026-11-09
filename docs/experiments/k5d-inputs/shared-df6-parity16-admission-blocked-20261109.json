@@ -1,0 +1,42 @@
+{
+  "cpu0_available": true,
+  "cpu_claim_empty": true,
+  "cpu_receipt_sha256": "6a4c7d3b29b6376a6262ec618394de89b785df6d1b18d87ac8e940aa1c1621a0",
+  "deadline": "2026-11-09T20:02:36.120866Z",
+  "gpu2": [
+    {
+      "claimed": false,
+      "free_mib": 16288,
+      "index": 0,
+      "uuid": "GPU-fc7e8fff-75be-4984-a185-fe8ce63edcd9"
+    },
+    {
+      "claimed": false,
+      "free_mib": 14786,
+      "index": 1,
+      "uuid": "GPU-40e9a544-b3d6-e5f3-a736-7020a6401bfc"
+    }
+  ],
+  "job_id": null,
+  "known_jobs": 1643,
+  "next_gate": "Fresh root review and authorized new admission only if fixed headroom and deadline gates hold; do not modify margin or replay.",
+  "no_automatic_retry": true,
+  "observed_utc": "2026-11-09T19:29:39.074176+00:00",
+  "raw_paths": {
+    "doctor": "/private/tmp/k5d-shared16-release-doctor.json",
+    "gpu2": "/private/tmp/k5d-shared16-release-gpu2.json",
+    "jobs": "/private/tmp/k5d-shared16-release-jobs.json",
+    "workers": "/private/tmp/k5d-shared16-release-workers.json"
+  },
+  "raw_sha256": {
+    "doctor": "16e5e1b04fe7731d134ffdc75660c4aa28b711203ac57fb443f765427d3085f5",
+    "gpu2": "651f25f4e6e07abe7ba558b140e1ec548f56d3a5f54bda2daa785c4b77c3cbbc",
+    "jobs": "f0b9961c1ebb3c2be567ad87d8d20a976d4ae2e112f7f7daf94d0ccc8d2f4042",
+    "workers": "74d7702a8d5b76c689e68a2f272ae868cfd4e3f8346111672a10b369e7ed81d4"
+  },
+  "required_free_mib": 24576,
+  "schema": 1,
+  "source_cache_sha256": "4477693bd025e633a8d14a4f8f303576e41df4cd23420c083cedd967113ce463",
+  "status": "blocked before submission; fresh headroom below fixed admission threshold",
+  "submitted": false
+}
