@@ -120,19 +120,22 @@ def test_qualification_finish_rejects_wrong_gpu_and_sam_source(tmp_path: Path, m
 
 
 def test_sam_qualification_binds_historical_and_fresh_protected_identity(monkeypatch):
-    from experiments.tennis import w8_receiver_finish as finish, w8_receiver_preflight as preflight
+    from experiments.tennis import w8_receiver_finish as finish, w8_protected_metadata as metadata
 
-    monkeypatch.setattr(preflight, 'PROTECTED', {'source': ('/protected', 'sha')})
+    monkeypatch.setattr(metadata, 'PROTECTED', {'source': ('/protected', 'sha')})
     old = {'source': {'path': '/protected', 'sha256': 'sha', 'inode': 4, 'device': 1}}
-    fresh = {'source': {'path': '/protected', 'sha256': 'sha', 'inode': 4, 'device': 2}}
-    finish._qual_sam_identity(old, fresh)
-    with pytest.raises(ValueError, match='protected identities'):
-        finish._qual_sam_identity({}, {})
-    with pytest.raises(ValueError, match='protected identities'):
-        finish._qual_sam_identity(old, {'source': {**fresh['source'], 'sha256': 'altered'}})
-    fresh['source']['inode'] = 5
-    with pytest.raises(ValueError, match='protected identities'):
-        finish._qual_sam_identity(old, fresh)
+    fresh = {'schema': 1, 'scope': metadata.SCOPE, 'content_verified_now': False,
+             'historical_receipt_sha256': 'a' * 64, 'protected_inputs': {'source': {
+                 'path': '/protected', 'reference_sha256': 'sha', 'inode': 4, 'device': 2,
+                 'size': 9, 'mtime_ns': 10, 'ctime_ns': 11}}}
+    finish._qual_sam_identity(old, fresh, historical_sha256='a' * 64)
+    with pytest.raises(ValueError):
+        finish._qual_sam_identity({}, {}, historical_sha256='a' * 64)
+    with pytest.raises(ValueError, match='historical receipt'):
+        finish._qual_sam_identity(old, fresh, historical_sha256='b' * 64)
+    fresh['protected_inputs']['source']['inode'] = 5
+    with pytest.raises(ValueError, match='historical protected'):
+        finish._qual_sam_identity(old, fresh, historical_sha256='a' * 64)
 
 
 def test_generation_helper_rejects_mixed_or_unbounded_modes() -> None:
@@ -326,7 +329,8 @@ def test_pilot_cpu_gate_requires_raw_audits_and_exact_source():
 
 
 def test_pilot_released_validation_uses_sealed_sources_not_deleted_scratch(tmp_path: Path, monkeypatch):
-    from experiments.tennis import w8_strict_host_cost_job as host, w8_witness_job as job
+    from experiments.tennis import w8_strict_host_cost_job as host, w8_witness_job as job, w8_protected_metadata
+    monkeypatch.setattr(w8_protected_metadata, 'reject_protected_alias', lambda _path: None)
 
     stage = tmp_path / 'job' / 'smoke'
     stage.mkdir(parents=True)
@@ -417,9 +421,10 @@ def test_promotion_ledger_counts_remaining_once_and_rejects_overreservation():
         job.promotion_ledger_remaining(ledger)
 
 
-def test_pilot_builder_phase_and_staging_bind_exact_proof_host(tmp_path: Path):
+def test_pilot_builder_phase_and_staging_bind_exact_proof_host(tmp_path: Path, monkeypatch):
     from experiments.jobs import inbox
-    from experiments.tennis import w8_strict_host_cost_job as host, w8_witness_job as job
+    from experiments.tennis import w8_strict_host_cost_job as host, w8_witness_job as job, w8_protected_metadata
+    monkeypatch.setattr(w8_protected_metadata, 'reject_protected_alias', lambda _path: None)
 
     gate = tmp_path / 'cpu-gate.json'
     gate.write_text(json.dumps({'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64,
@@ -853,7 +858,8 @@ def test_finish_real_spec_staging_and_dispatch(tmp_path: Path, monkeypatch) -> N
     import sys
     import time
     from experiments.jobs import inbox
-    from experiments.tennis import w8_strict_host_cost_job as host, w8_witness_job as job
+    from experiments.tennis import w8_strict_host_cost_job as host, w8_witness_job as job, w8_protected_metadata
+    monkeypatch.setattr(w8_protected_metadata, 'reject_protected_alias', lambda _path: None)
 
     proof = tmp_path / 'proof'
     proof.write_text(json.dumps({'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64,

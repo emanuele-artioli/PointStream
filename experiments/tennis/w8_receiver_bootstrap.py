@@ -55,12 +55,16 @@ def _restrict(paths: list[Path]) -> int:
     return abi
 
 
-def _check_denials(paths: list[Path]) -> dict[str, int]:
+def _check_denials(paths: list[Path], *, open_only: bool = False) -> dict[str, int]:
     result = {}
     for path in paths:
         try:
-            with path.open('rb') as stream:
-                stream.read(1)
+            if open_only:
+                fd = os.open(path, os.O_RDONLY | os.O_CLOEXEC)
+                os.close(fd)
+            else:
+                with path.open('rb') as stream:
+                    stream.read(1)
         except OSError as exc:
             if exc.errno not in (errno.EACCES, errno.EPERM):
                 raise RuntimeError(f'probe did not establish denial: {path}') from exc
@@ -186,19 +190,32 @@ def load_config(path: Path, expected_sha: str) -> dict[str, Any]:
     from experiments.tennis.w8_receiver_preflight import PROTECTED
 
     protected_receipt = config['protected_receipt']
-    if not isinstance(protected_receipt, dict) or set(protected_receipt) != {'path', 'sha256'}:
+    if (not isinstance(protected_receipt, dict)
+            or set(protected_receipt) not in ({'path', 'sha256'}, {'path', 'sha256', 'historical_sha256'})):
         raise ValueError('protected receipt identity required')
     protected_raw = Path(protected_receipt['path']).read_bytes()
     if hashlib.sha256(protected_raw).hexdigest() != protected_receipt['sha256']:
         raise ValueError('protected receipt identity mismatch')
-    verified = json.loads(protected_raw)['protected_inputs']
+    protected_data = json.loads(protected_raw)
+    metadata_only = 'historical_sha256' in protected_receipt
+    if metadata_only:
+        from experiments.tennis import w8_protected_metadata
+        w8_protected_metadata.validate(protected_data, check_current=True)
+        if protected_data['historical_receipt_sha256'] != protected_receipt['historical_sha256']:
+            raise ValueError('historical protected receipt reference differs')
+    verified = protected_data['protected_inputs']
     identities = {}
     for group in ('source', 'prepared', 'fit', 'golden', 'masks'):
         expected_path, expected_sha = PROTECTED[group]
         if denials[group] != [expected_path]:
             raise ValueError('protected probe is not the fixed original input')
         st = Path(expected_path).stat()
-        if verified.get(group) != {'path': expected_path, 'sha256': expected_sha, 'device': st.st_dev, 'inode': st.st_ino}:
+        if metadata_only:
+            row = verified.get(group, {})
+            if (row.get('path') != expected_path or row.get('reference_sha256') != expected_sha
+                    or (row.get('device'), row.get('inode')) != (st.st_dev, st.st_ino)):
+                raise ValueError('protected probe differs from metadata-only receipt')
+        elif verified.get(group) != {'path': expected_path, 'sha256': expected_sha, 'device': st.st_dev, 'inode': st.st_ino}:
             raise ValueError('protected probe differs from verified identity receipt')
 
         identities[group] = {(Path(path).stat().st_dev, Path(path).stat().st_ino) for path in denials[group]}

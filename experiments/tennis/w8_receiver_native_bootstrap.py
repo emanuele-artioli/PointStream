@@ -148,6 +148,25 @@ def validate_inventory(path: Path, expected_sha: str, binary: Path, loader: Path
     return inventory
 
 
+
+def _probe_denials(denied: list[Path], *, open_only: bool = False) -> dict[str, int]:
+    probes = {}
+    for path in denied:
+        try:
+            if open_only:
+                fd = os.open(path, os.O_RDONLY | os.O_CLOEXEC)
+                os.close(fd)
+            else:
+                with path.open('rb') as stream:
+                    stream.read(1)
+        except OSError as exc:
+            if exc.errno not in (errno.EACCES, errno.EPERM):
+                raise RuntimeError(f'denial probe inconclusive: {path}') from exc
+            probes[str(path)] = exc.errno
+        else:
+            raise ValueError(f'protected input readable: {path}')
+    return probes
+
 def run(config: dict[str, Any]) -> None:
     if sys.platform != 'linux' or len(os.sched_getaffinity(0)) != 1:
         raise RuntimeError('Linux and one CPU required')
@@ -195,17 +214,7 @@ def run(config: dict[str, Any]) -> None:
     # Any directory grants permit listing only, not reads of arbitrary files.
     dirs = sorted({p.parent for p in files + executables}, key=str)
     abi = _landlock(files, dirs, executables, output)
-    probes = {}
-    for path in denied:
-        try:
-            with path.open('rb') as stream:
-                stream.read(1)
-        except OSError as exc:
-            if exc.errno not in (errno.EACCES, errno.EPERM):
-                raise RuntimeError(f'denial probe inconclusive: {path}') from exc
-            probes[str(path)] = exc.errno
-        else:
-            raise ValueError(f'protected input readable: {path}')
+    probes = _probe_denials(denied, open_only=config.get('denial_probe_open_only') is True)
     sys.addaudithook(_audit_policy(argv))
     parent_pid = os.getpid()
     def limit_child() -> None:

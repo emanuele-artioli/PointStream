@@ -60,6 +60,9 @@ def bound_inputs(stage: Path) -> tuple[dict[str, Path], dict[str, Any], dict[str
                 or declared[name].get('extract', False) or item.get('extract', False)):
             raise ValueError('input binding differs: ' + name)
         path = Path(item['path']).resolve(strict=True)
+        if combined:
+            from experiments.tennis.w8_protected_metadata import reject_protected_alias
+            reject_protected_alias(path)
         if not path.is_relative_to(root) or fixed.file_sha(path) != expected:
             raise ValueError('staged public input differs: ' + name)
         paths[name] = path
@@ -476,16 +479,14 @@ def run_proof(stage: Path) -> dict[str, Any]:
     check_bootstrap_archive(stage, dispatch, bootstrap_sha)
     snapshot = Path(__file__).resolve().parents[2]
     preflight = json.loads(paths['preflight'].read_text())
-    host.check_preflight_bundle(preflight, paths['identity'])
+    host.check_preflight_bundle(preflight, paths['identity'], witness_metadata=True)
     host.check_preflight_sources(preflight, snapshot, witness_bootstrap_sha=bootstrap_sha)
-    identity = json.loads(paths['identity'].read_text())
     fingerprints = host.read_oracle(paths['oracle'])
     rate = host.audit_public_rate(paths['packet'], paths['profile'])
     scratch = fixed.checked_scratch()
     protected_path = scratch / 'protected-identity.json'
-    protected = policy.protected_identity({'denied_paths': {group: [name] for group, (name, _) in PROTECTED.items()}},
-                                          protected_path)
-    reconcile_protected_identity(identity, json.loads(protected_path.read_text()))
+    from experiments.tennis import w8_protected_metadata
+    protected = w8_protected_metadata.capture(paths['identity'], protected_path, expected_historical_sha256=IDENTITY_SHA)
     root = scratch / 'receiver-source'
     manifest = source.stage_source(snapshot, root)
     source.verify_source(root, manifest)

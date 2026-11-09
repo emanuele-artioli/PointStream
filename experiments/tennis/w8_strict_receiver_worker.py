@@ -155,7 +155,7 @@ def launch(config_path: Path, config_sha: str, loader_path: Path, loader_sha: st
     abi, mask = (clock_profile.restrict(policy, allowed, output) if clock_profile is not None
                  else policy.restrict(allowed, output))
     mutation = policy.mutation_probes(canary, output)
-    probes = bootstrap._check_denials(denied)
+    probes = bootstrap._check_denials(denied, open_only=witness_mode is not None)
     after = fixed.synthetic_torch_bootstrap(torch)
     if before != after or torch.cuda.is_initialized():
         raise RuntimeError('post-isolation CPU warmup failed')

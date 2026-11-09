@@ -312,7 +312,7 @@ def execute_qualification_finish(prepared: dict[str, Any], generations: dict[str
     if (not visible or visible != os.environ.get('PS_CLAIMED_GPU_UUID')
             or policy.canonical_gpu_uuid(visible) != policy.canonical_gpu_uuid(gpu.get('uuid', ''))):
         raise ValueError('qualification finish dispatch GPU differs')
-    host.check_preflight_bundle(prepared['preflight'], identity_path)
+    host.check_preflight_bundle(prepared['preflight'], identity_path, witness_metadata=True)
     if fixed.file_sha(sam_weights) != finish.SAM_SHA:
         raise ValueError('qualification SAM checkpoint differs')
     outputs, expected = generations['outputs'], generations['expected']
@@ -372,8 +372,9 @@ def execute_qualification_finish(prepared: dict[str, Any], generations: dict[str
                                loader=json.loads(prepared['loader_receipt'].read_text()),
                                loader_sha=fixed.file_sha(prepared['loader_receipt']))
         stage_outputs[name], configs[name], usages[name] = output, config, usage
-    identity = json.loads(identity_path.read_text())
-    trusted = {'native_receipt': native, 'sam_record_sha256': fixed.file_sha(identity_path),
+    from experiments.tennis import w8_protected_metadata
+    identity = w8_protected_metadata.read_historical(identity_path, prepared['preflight']['identity_sha256'])
+    trusted = {'native_receipt': native, 'sam_record_sha256': prepared['preflight']['identity_sha256'],
                'protected_record_sha256': fixed.file_sha(prepared['protected_path']),
                'gpu_name': gpu['name'], 'claimed_gpu_uuid': visible,
                'sam_verified_files': identity['sam_distribution']['verified_files']}
@@ -433,7 +434,7 @@ def execute_native_base(prepared: dict[str, Any], *, inventory_path: Path,
               'loader': {'path': str(loader), 'sha256': loader_sha},
               'libraries': [{'path': str(path), 'sha256': digest} for path, digest in sorted(libraries.items())],
               'inventory': {'path': str(inventory_path), 'sha256': inventory_sha},
-              'denied_paths': [value[0] for value in PROTECTED.values()],
+              'denied_paths': [value[0] for value in PROTECTED.values()], 'denial_probe_open_only': True,
               'parent_user_namespace': os.readlink('/proc/self/ns/user'),
               'parent_network_namespace': os.readlink('/proc/self/ns/net'),
               'parent_cpu_seconds': worker_cpu, 'child_cpu_seconds': child_cpu, 'wall_seconds': wall,

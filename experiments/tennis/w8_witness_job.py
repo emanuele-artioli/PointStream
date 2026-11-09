@@ -140,6 +140,9 @@ def load_released_inputs(stage: Path) -> tuple[dict[str, Path], dict[str, Any], 
     if spec.get('w8_witness_profile') in ('w8-context-qualification-v1', 'w8-full-finish-v1'):
         small_names.append('producer_audit')
     paths = {name: Path(staged[name]['source']) for name in small_names}
+    from experiments.tennis.w8_protected_metadata import reject_protected_alias
+    for path in paths.values():
+        reject_protected_alias(path)
     if any(fixed.file_sha(path) != expected[name] for name, path in paths.items()):
         raise ValueError('released proof or preflight source differs')
     proof = json.loads(paths['cpu_proof'].read_text())
@@ -683,7 +686,7 @@ def validate_pilot(stage: Path, target: Path) -> None:
                 stream = tar.extractfile(member) if member.isfile() else None
                 if stream is None or hashlib.sha256(stream.read()).hexdigest() != digest:
                     raise ValueError('pilot source member differs')
-        host.check_preflight_bundle(json.loads(paths['preflight'].read_text()), paths['identity'])
+        host.check_preflight_bundle(json.loads(paths['preflight'].read_text()), paths['identity'], witness_metadata=True)
         fingerprints = host.read_oracle(paths['oracle'])
         decoded = json.loads((retained / 'decoded-manifest.json').read_text())
         packet_config = json.loads((retained / 'packet-config.json').read_text())
@@ -692,8 +695,12 @@ def validate_pilot(stage: Path, target: Path) -> None:
         host.packet_audit.check_grants(packet_config, preflight['runtimes']['main'])
         host.packet_audit.check_isolation(packet_config, decoded['isolation'], json.loads(loader_path.read_text()),
                                           manifest, fixed.file_sha(loader_path))
-        host.packet_audit.reconcile_protected_identity(json.loads(paths['identity'].read_text()),
-            json.loads((retained / 'protected-identity.json').read_text()))
+        from experiments.tennis import w8_protected_metadata
+        protected_metadata = json.loads((retained / 'protected-identity.json').read_text())
+        historical = w8_protected_metadata.read_historical(paths['identity'], preflight['identity_sha256'])
+        w8_protected_metadata.validate(protected_metadata, historical, check_current=True)
+        if protected_metadata['historical_receipt_sha256'] != preflight['identity_sha256']:
+            raise ValueError('historical protected receipt differs')
         cpu_only = json.loads((retained / 'packet-cpu-only.json').read_text())
         if (cpu_only.get('cuda_visible_devices') != '' or cpu_only.get('cuda_initialized_after_decode') is not False
                 or cpu_only.get('torch_version') != preflight['receipts']['main']['torch']
@@ -1329,10 +1336,14 @@ def validate_finish(stage: Path, target: Path) -> None:
             stream = source_tar.extractfile(entry) if entry.isfile() else None
             if stream is None or hashlib.sha256(stream.read()).hexdigest() != digest:
                 raise ValueError('finish source member differs')
-    identity = json.loads(paths['identity'].read_text())
     preflight = json.loads(paths['preflight'].read_text())
-    host.check_preflight_bundle(preflight, paths['identity'])
-    host.packet_audit.reconcile_protected_identity(identity, json.loads((retained / 'protected-identity.json').read_text()))
+    host.check_preflight_bundle(preflight, paths['identity'], witness_metadata=True)
+    from experiments.tennis import w8_protected_metadata
+    identity = w8_protected_metadata.read_historical(paths['identity'], preflight['identity_sha256'])
+    protected_metadata = json.loads((retained / 'protected-identity.json').read_text())
+    w8_protected_metadata.validate(protected_metadata, identity, check_current=True)
+    if protected_metadata['historical_receipt_sha256'] != preflight['identity_sha256']:
+        raise ValueError('historical protected receipt differs')
     fingerprints = host.read_oracle(paths['oracle'])
     decoded = json.loads((retained / 'packet-decoded.json').read_text())
     packet_config = json.loads((retained / 'packet-config.json').read_text())
@@ -1390,7 +1401,7 @@ def validate_finish(stage: Path, target: Path) -> None:
     from experiments.tennis.w8_cuda_system_leaves import canonical_gpu_uuid
 
     trusted = summary['trusted']
-    if (trusted.get('sam_record_sha256') != fixed.file_sha(paths['identity'])
+    if (trusted.get('sam_record_sha256') != preflight['identity_sha256']
             or trusted.get('protected_record_sha256') != fixed.file_sha(retained / 'protected-identity.json')
             or trusted.get('sam_verified_files') != identity['sam_distribution']['verified_files']
             or trusted.get('native_receipt') != json.loads((retained / 'native-sealed.json').read_text())

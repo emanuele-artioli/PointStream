@@ -230,17 +230,13 @@ def _sam_module_closure(verified: dict[str, str]) -> dict[str, str]:
     return modules
 
 
-def _qual_sam_identity(historical: dict[str, Any], fresh: dict[str, Any]) -> None:
-    from experiments.tennis.w8_receiver_preflight import PROTECTED
+def _qual_sam_identity(historical: dict[str, Any], fresh: dict[str, Any], *, historical_sha256: str) -> None:
+    """Join historical content reference to current stat-only metadata."""
+    from experiments.tennis import w8_protected_metadata
 
-    if (set(historical) != set(PROTECTED) or set(fresh) != set(PROTECTED) or any(
-            not isinstance(record, dict) or set(record) != {'path', 'sha256', 'inode', 'device'}
-            or (record['path'], record['sha256']) != PROTECTED[key]
-            or type(record['inode']) is not int or record['inode'] <= 0
-            or type(record['device']) is not int or record['device'] < 0
-            for key in PROTECTED for record in (historical[key], fresh[key])) or any(
-            historical[key]['inode'] != fresh[key]['inode'] for key in PROTECTED)):
-        raise ValueError('SAM preflight and fresh protected identities differ')
+    w8_protected_metadata.validate(fresh, {'protected_inputs': historical})
+    if fresh['historical_receipt_sha256'] != historical_sha256:
+        raise ValueError('SAM historical receipt reference differs')
 
 
 def run_sam_isolated(config: dict[str, Any], isolation: dict[str, Any], *, qualification: bool = False,
@@ -261,8 +257,8 @@ def run_sam_isolated(config: dict[str, Any], isolation: dict[str, Any], *, quali
         if fixed.file_sha(paths['protected_record']) != config['protected_receipt']['sha256']:
             raise ValueError('fresh protected identity receipt differs')
         historical = sam_record['protected_inputs']
-        fresh = json.loads(paths['protected_record'].read_text())['protected_inputs']
-        _qual_sam_identity(historical, fresh)
+        fresh = json.loads(paths['protected_record'].read_text())
+        _qual_sam_identity(historical, fresh, historical_sha256=fixed.file_sha(paths['sam_record']))
     elif fixed.file_sha(paths['sam_record']) != config['protected_receipt']['sha256']:
         raise ValueError('SAM distribution preflight identity mismatch')
     distribution = sam_record['sam_distribution']

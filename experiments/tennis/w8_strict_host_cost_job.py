@@ -183,6 +183,9 @@ def stage_inputs(stage: Path, digest_file: Callable[[Path], str] | None = None, 
                 or declared[name].get('extract', False) or actual[name].get('extract', False)):
             raise ValueError(f'staged identity mismatch: {name}')
         path = Path(actual[name]['path']).resolve(strict=True)
+        if witness:
+            from experiments.tennis.w8_protected_metadata import reject_protected_alias
+            reject_protected_alias(path)
         if digest_file(path) != expected:
             raise ValueError(f'staged bytes mismatch: {name}')
         paths[name] = path
@@ -438,15 +441,21 @@ def verify_durable_archive(retained: Path, receipt: dict[str, Any], *, materiali
                 raise ValueError('durable archive member bytes differ')
 
 
-def check_preflight_bundle(preflight: dict[str, Any], identity_path: Path) -> None:
+def check_preflight_bundle(preflight: dict[str, Any], identity_path: Path, *, witness_metadata: bool = False) -> None:
     """Bind embedded MAIN/JCV receipts to the accepted preflight result."""
     from experiments.tennis.w8_receiver_preflight import EXPECTED_TORCH
 
-    if (preflight.get('passed') is not True or preflight.get('identity_sha256') != fixed.file_sha(identity_path)
+    if witness_metadata:
+        from experiments.tennis import w8_protected_metadata
+        identity = w8_protected_metadata.read_historical(identity_path, preflight['identity_sha256'])
+        actual_sha = preflight['identity_sha256']
+    else:
+        actual_sha = fixed.file_sha(identity_path)
+        identity = json.loads(identity_path.read_text())
+    if (preflight.get('passed') is not True or preflight.get('identity_sha256') != actual_sha
             or set(preflight.get('runtimes', {})) != {'main', 'jcv'}
             or set(preflight.get('receipts', {})) != {'main', 'jcv'}):
         raise ValueError('accepted preflight bundle and identity receipt required')
-    identity = json.loads(identity_path.read_text())
     assets = identity['files']
     expected_assets = {'main_archive': MAIN_ENV, 'jcv_archive': JCV_ENV, 'aa_archive': receiver.AA_ARCHIVE_SHA,
                        **{f'weight_{name}': receiver.PINNED_WEIGHTS[weight] for name, weight in (
@@ -655,8 +664,12 @@ def prepare_receiver_inputs(paths: dict[str, Path], spec: dict[str, Any], *, pac
     rate = audit_public_rate(paths['packet'], paths['profile'])
     fingerprints = read_oracle(paths['oracle'])
     preflight = json.loads(paths['preflight'].read_text())
-    check_preflight_bundle(preflight, paths['identity'])
-    identity = json.loads(paths['identity'].read_text())
+    check_preflight_bundle(preflight, paths['identity'], witness_metadata=witness)
+    if witness:
+        from experiments.tennis import w8_protected_metadata
+        identity = w8_protected_metadata.read_historical(paths['identity'], preflight['identity_sha256'])
+    else:
+        identity = json.loads(paths['identity'].read_text())
     snapshot_root = Path(__file__).resolve().parents[2]
     if spec.get('packet_reference_audit_sha256') != PACKET_AUDIT_SHA or fixed.file_sha(snapshot_root / PACKET_AUDIT_PATH) != PACKET_AUDIT_SHA:
         raise ValueError('accepted CPU packet reference evidence differs')
@@ -667,8 +680,12 @@ def prepare_receiver_inputs(paths: dict[str, Path], spec: dict[str, Any], *, pac
                             witness_bootstrap_sha=spec.get('witness_bootstrap_sha256') if witness else None)
     scratch = fixed.checked_scratch()
     protected_path = scratch / 'protected-identity.json'
-    fresh_receipt = strict_policy.protected_identity({'denied_paths': {group: [path] for group, (path, _) in PROTECTED.items()}}, protected_path)
-    packet_audit.reconcile_protected_identity(identity, json.loads(protected_path.read_text()))
+    if witness:
+        from experiments.tennis import w8_protected_metadata
+        fresh_receipt = w8_protected_metadata.capture(paths['identity'], protected_path, expected_historical_sha256=preflight['identity_sha256'])
+    else:
+        fresh_receipt = strict_policy.protected_identity({'denied_paths': {group: [path] for group, (path, _) in PROTECTED.items()}}, protected_path)
+        packet_audit.reconcile_protected_identity(identity, json.loads(protected_path.read_text()))
     root = scratch / 'receiver-source'
     code_manifest = strict_source.stage_source(snapshot_root, root)
     strict_source.verify_source(root, code_manifest)
