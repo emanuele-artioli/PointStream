@@ -136,8 +136,13 @@ def _apply_optional_shared_parity_limit(torch: Any, environ: Any) -> None:
     profile = environ.get('PS_K5D_SHARED_NUMERICAL')
     if profile is None:
         return
-    if (profile != 'k5d-parity16-shared-numerical-v1' or environ.get('PS_GPU_SHARING') != 'shared'
-            or environ.get('PS_GPU_MEMORY_LIMIT_MIB') != '16384'
+    profiles = {'k5d-parity16-shared-numerical-v1': (16384, 8192),
+                'k5d-parity16-shared-numerical-low-memory-v1': (6144, 2048)}
+    if profile not in profiles:
+        raise RuntimeError('unknown shared DCVC parity profile')
+    declared, budget = profiles[profile]
+    if (environ.get('PS_GPU_SHARING') != 'shared'
+            or environ.get('PS_GPU_MEMORY_LIMIT_MIB') != str(declared)
             or not environ.get('CUDA_VISIBLE_DEVICES', '').startswith('GPU-')
             or environ.get('PS_CLAIMED_GPU_UUID') != environ.get('CUDA_VISIBLE_DEVICES')
             or torch.cuda.get_device_name(0) != 'NVIDIA RTX A6000'
@@ -145,9 +150,9 @@ def _apply_optional_shared_parity_limit(torch: Any, environ: Any) -> None:
             or torch.cuda.memory_allocated(0) != 0):
         raise RuntimeError('shared DCVC parity allocator claim or device differs')
     total = torch.cuda.get_device_properties(0).total_memory
-    if total < 16384 * 2**20:
+    if total < declared * 2**20:
         raise RuntimeError('shared DCVC parity GPU capacity is insufficient')
-    fraction = 8192 * 2**20 / total
+    fraction = budget * 2**20 / total
     torch.cuda.set_per_process_memory_fraction(fraction, 0)
     scratch = Path(environ['PS_SCRATCH_DIR']).resolve(strict=True)
     receipts = Path(environ['PS_K5D_RESOURCE_RECEIPTS']).resolve(strict=True)
@@ -166,7 +171,7 @@ def _apply_optional_shared_parity_limit(torch: Any, environ: Any) -> None:
     if not plan.is_relative_to(scratch):
         raise RuntimeError('shared DCVC plan is outside scratch')
     with (receipts / f'child-{os.getpid()}.json').open('x') as stream:
-        json.dump({'role': 'dcvc', 'pid': os.getpid(), 'pgid': os.getpgrp(), 'budget_mib': 8192,
+        json.dump({'role': 'dcvc', 'pid': os.getpid(), 'pgid': os.getpgrp(), 'budget_mib': budget,
                    'total_bytes': total, 'fraction': fraction, 'allocated_before': 0, 'host_pid': host_pid,
                    'host_pgid': host_pgid, 'start_ticks': start_ticks, 'campaign_pgid': group,
                    'action': sys.argv[1], 'plan': str(plan.relative_to(scratch)),
