@@ -1,0 +1,148 @@
+"""CPU-only synthetic lifecycle proof for the real W8 namespace init.
+
+This is infrastructure evidence only; it does not run a model or prove quality.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import signal
+import subprocess
+import sys
+import time
+
+from experiments.tennis import w8_witness_namespace as namespace
+
+
+def proc(pid: int) -> dict[str, int]:
+    raw = (Path('/proc') / str(pid) / 'stat').read_text()
+    fields = raw[raw.rfind(')') + 2:].split()
+    return {'pid': pid, 'ppid': int(fields[1]), 'pgid': int(fields[2]), 'start_ticks': int(fields[19])}
+
+
+def own_identity() -> dict[str, int]:
+    raw = Path('/proc/self/stat').read_text()
+    return proc(int(raw[:raw.find(' ')]))
+
+
+def write(path: Path, value: dict) -> None:
+    with path.open('x') as stream:
+        json.dump(value, stream, sort_keys=True)
+        stream.flush()
+        os.fsync(stream.fileno())
+
+
+def absent(item: dict[str, int]) -> bool:
+    try:
+        return proc(item['pid'])['start_ticks'] != item['start_ticks']
+    except FileNotFoundError:
+        return True
+
+
+def worker(case: str, output: Path) -> None:
+    # The fixed detached synthetic child tests PID-namespace teardown, not codecs.
+    child = os.fork()
+    if child == 0:
+        os.setsid()
+        write(output / 'detached.json', own_identity())
+        time.sleep(2 if case == 'normal' else 60)
+        os._exit(0)
+    write(output / 'worker.json', own_identity())
+    if case == 'normal':
+        os.waitpid(child, 0)
+        return
+    time.sleep(60)
+
+
+def run(output: Path, unshare: Path, unshare_sha: str) -> None:
+    scratch = Path(os.environ['PS_SCRATCH_DIR']).resolve(strict=True)
+    output = output.resolve(strict=True)
+    if (sys.platform != 'linux' or os.environ.get('CUDA_VISIBLE_DEVICES') != ''
+            or len(os.sched_getaffinity(0)) != 1 or output == scratch or not output.is_relative_to(scratch)
+            or any(output.iterdir()) or not unshare.is_absolute()
+            or hashlib.sha256(unshare.read_bytes()).hexdigest() != unshare_sha):
+        raise ValueError('invalid fixed CPU proof inputs')
+    campaign = json.loads((Path(os.environ['PS_STAGE_DIR']).parent / 'run' / 'status.json').read_text())['process_group_id']
+    if campaign != os.getpgrp():
+        raise ValueError('proof is outside campaign process group')
+    outside = os.readlink('/proc/self/ns/pid')
+    results = []
+    for case in ('normal', 'timeout', 'term', 'kill'):
+        case_dir = output / case
+        case_dir.mkdir()
+        receipt = case_dir / 'receipt.json'
+        timeout = 5 if case == 'timeout' else 20
+        argv = [str(unshare), '--user', '--map-root-user', '--pid', '--fork', '--kill-child=SIGKILL',
+                sys.executable, '-m', 'experiments.tennis.w8_witness_namespace', '--outside', outside,
+                '--timeout', str(timeout), '--receipt', str(receipt), '--', namespace.PROOF_TARGET,
+                'worker', case, '--output', str(case_dir)]
+        launcher = subprocess.Popen(argv)
+        try:
+            deadline = time.monotonic() + 4
+            while not (case_dir / 'worker.json').exists() or not (case_dir / 'detached.json').exists():
+                if launcher.poll() is not None or time.monotonic() >= deadline:
+                    raise RuntimeError('proof worker did not become observable')
+                time.sleep(.01)
+            a = json.loads((case_dir / 'worker.json').read_text())
+            b = json.loads((case_dir / 'detached.json').read_text())
+            init = proc(a['ppid'])
+            if (proc(a['pid']) != a or proc(b['pid']) != b or a['pgid'] != campaign
+                    or init['pgid'] != campaign or b['ppid'] != a['pid']
+                    or b['pgid'] != b['pid'] or a['pid'] == b['pid']):
+                raise ValueError('live host PID/start/group join differs')
+            if case in ('term', 'kill'):
+                launcher.send_signal(signal.SIGTERM if case == 'term' else signal.SIGKILL)
+            try:
+                rc = launcher.wait(timeout=12)
+            except subprocess.TimeoutExpired:
+                launcher.kill()
+                launcher.wait(timeout=5)
+                raise RuntimeError('proof launcher exceeded bound')
+            end = time.monotonic() + 3
+            while not (absent(a) and absent(b) and absent(init)) and time.monotonic() < end:
+                time.sleep(.02)
+            if not (absent(a) and absent(b) and absent(init)):
+                raise RuntimeError('owned proof descendants survived')
+            inner = json.loads(receipt.read_text()) if receipt.exists() else None
+            if case == 'normal' and (rc != 0 or inner is None or inner['reason'] != 'complete'
+                                     or inner['status'] != 0 or inner['worker_host_identity']['host_pid'] != a['pid']
+                                     or inner['worker_host_identity']['start_ticks'] != a['start_ticks']
+                                     or inner['namespace_init']['host_pid'] != init['pid']
+                                     or inner['children_cpu_seconds'] < 0 or inner['init_cpu_seconds'] < 0):
+                raise ValueError('normal waited proof differs')
+            if case == 'timeout' and (rc == 0 or inner is None or inner['reason'] != 'timeout'):
+                raise ValueError('timeout proof differs')
+            if case == 'term' and rc == 0 or case == 'kill' and rc != -signal.SIGKILL:
+                raise ValueError('signal proof differs')
+            results.append({'case': case, 'launcher_rc': rc, 'init': init, 'worker': a, 'detached': b,
+                            'all_absent': True, 'receipt': inner})
+        finally:
+            if launcher.poll() is None:
+                launcher.kill()
+                launcher.wait(timeout=5)
+    write(output / 'proof.json', {'scope': 'synthetic CPU namespace lifecycle only', 'outside': outside,
+                                   'campaign_pgid': campaign, 'cases': results})
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    sub = parser.add_subparsers(dest='mode', required=True)
+    proof = sub.add_parser('run')
+    proof.add_argument('--output', type=Path, required=True)
+    proof.add_argument('--unshare', type=Path, required=True)
+    proof.add_argument('--unshare-sha256', required=True)
+    leaf = sub.add_parser('worker')
+    leaf.add_argument('case', choices=('normal', 'timeout', 'term', 'kill'))
+    leaf.add_argument('--output', type=Path, required=True)
+    args = parser.parse_args()
+    if args.mode == 'run':
+        run(args.output, args.unshare, args.unshare_sha256)
+    else:
+        worker(args.case, args.output)
+
+
+if __name__ == '__main__':
+    main()

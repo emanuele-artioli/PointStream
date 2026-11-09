@@ -52,3 +52,21 @@ def test_receipt_rejects_wrong_group_and_failed_cleanup(tmp_path):
     path.write_text(json.dumps(receipt))
     with pytest.raises(ValueError):
         namespace.validate_receipt(path, **{**check, 'expected_pgid': 98})
+
+
+def test_cpu_proof_target_is_fixed_and_not_a_candidate(tmp_path, monkeypatch):
+    import os
+    monkeypatch.setenv('PS_SCRATCH_DIR', str(tmp_path))
+    monkeypatch.setenv('CUDA_VISIBLE_DEVICES', '')
+    monkeypatch.setattr(os, 'sched_getaffinity', lambda _pid: {0}, raising=False)
+    output = tmp_path / 'proof'
+    output.mkdir()
+    args = ['worker', 'normal', '--output', str(output)]
+    assert namespace.command(namespace.PROOF_TARGET, args)[3:] == args
+    with pytest.raises(ValueError):
+        namespace.command(namespace.PROOF_TARGET, ['worker', 'arbitrary', '--output', str(output)])
+    monkeypatch.setenv('CUDA_VISIBLE_DEVICES', 'GPU-123')
+    with pytest.raises(ValueError):
+        namespace.command(namespace.PROOF_TARGET, args)
+    with pytest.raises(ValueError):
+        namespace.command(namespace.PROOF_TARGET, ['worker', 'normal', '--output', str(tmp_path)])

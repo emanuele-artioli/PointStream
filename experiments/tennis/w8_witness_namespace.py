@@ -15,10 +15,18 @@ from typing import Any
 
 TARGETS = frozenset({'experiments.tennis.w8_strict_host_model_worker',
                      'experiments.tennis.w8_strict_receiver_worker'})
+PROOF_TARGET = 'experiments.tennis.w8_witness_namespace_proof'
 
 
 def command(target: str, args: list[str]) -> list[str]:
-    if target not in TARGETS:
+    if target == PROOF_TARGET:
+        scratch = Path(os.environ.get('PS_SCRATCH_DIR', '')).resolve(strict=True)
+        if (os.environ.get('CUDA_VISIBLE_DEVICES') != '' or len(os.sched_getaffinity(0)) != 1
+                or len(args) != 4 or args[0] != 'worker' or args[1] not in ('normal', 'timeout', 'term', 'kill')
+                or args[2] != '--output' or not Path(args[3]).resolve(strict=True).is_relative_to(scratch)
+                or Path(args[3]).resolve(strict=True) == scratch):
+            raise ValueError('CPU proof target requires fixed scratch-bound invocation')
+    elif target not in TARGETS:
         raise ValueError('unapproved witness worker')
     return [sys.executable, '-m', target, *args]
 
@@ -89,12 +97,14 @@ def supervise(outside: str, timeout: float, receipt: Path, target: str, args: li
         else:
             time.sleep(.02)
     after = resource.getrusage(resource.RUSAGE_CHILDREN)
+    own = resource.getrusage(resource.RUSAGE_SELF)
     result = {'schema': 1, 'reason': reason or 'complete', 'status': child_status,
               'target': target, 'outside_namespace': outside,
               'worker_host_identity': worker, 'worker_namespace_pid': child.pid,
               'namespace_init': {'host_pid': int(nspid[0][0]), 'namespace_pid': 1, 'pid_namespace': current},
               'reaped': reaped, 'complete_descendant_wait': True,
               'elapsed_seconds': time.monotonic() - start,
+              'init_cpu_seconds': own.ru_utime + own.ru_stime,
               'children_cpu_seconds': after.ru_utime + after.ru_stime - before.ru_utime - before.ru_stime}
     with receipt.open('x') as stream:
         json.dump(result, stream, sort_keys=True, allow_nan=False)
