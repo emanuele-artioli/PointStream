@@ -2336,7 +2336,7 @@
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 7920,
       "cpu_seconds": 2700,
-      "status": "Remaining_unspent;f018closed0GPU400CPU;no eighthqueue orscale admitted"
+      "status": "Remaining_unspent;1000GPU/1200CPU nested eighth4d0dqueue;no scale release"
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -4465,6 +4465,39 @@
       "local_batch": "/private/tmp/pointstream-w8-aecf-pilot-next-20261110-a1",
       "qualification_budget_approval_sha256": "12ab3f2a9fe465845bac690a69672fe72a5f0d42a3e834a3679977a65193f8e4",
       "no_prior_execution_audit_sha256": "d1dbf68aa12db5e8cfcacfe3accc8666bc874d052bc06b20eed69d447c84d528"
+    },
+    {
+      "job_id": "20261110T190907Z-4d0dd928",
+      "phase": "k5d-scale-first-tranche-20261105",
+      "subphase": "same-job-0bb5-exclusive16-eighth-admission-window",
+      "state": "pending;rootACKbeforeonecanonicalwait",
+      "revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
+      "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
+      "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+      "spec_sha256": "f9952779b23693f3ff626aa9fa87df651133609149d2aafe32a110702a927137",
+      "source_archive": true,
+      "deadline": "2026-11-10T19:46:33.818327Z",
+      "hosts": [
+        "gpu2",
+        "gpu3"
+      ],
+      "gpu_models": [
+        "RTX A6000"
+      ],
+      "future_GPU": 1000,
+      "future_CPU": 1200,
+      "campaign": 800,
+      "namespace": 580,
+      "smoke": 600,
+      "validator": 30,
+      "noop": 5,
+      "external_CPU": 400,
+      "GPU_post": 200,
+      "local_storage_gib": 32,
+      "local_batch": "/private/tmp/k5d-same-job-0bb5-eighth-window-20261110",
+      "scope": "Sameoriginalsixpoint16parity/retainedreceiverIOcost only; no48/292/586/full30 or extra independent clip.",
+      "raw_spec_sha256": "cdba80c26f1227a9c0f06fdb365f5bee2741842cf275e2dcd133c6435b55e0c3",
+      "client_revision": "revieweddoctorhelper420c78a3descendant;sourceworktree0bbunchanged"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -4486,8 +4519,9 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "Ballf018closedunassigned0GPU400CPU;W84c24solewaitdeadline19:17:38+sweep",
+    "state": "Ball4d0drootACKbeforeonewaitdeadline19:46:33+sweep;W84c24solewaitdeadline19:17:38+sweep",
     "jobs": [
+      "20261110T190907Z-4d0dd928",
       "20261110T183845Z-4c240783"
     ],
     "batches": [],

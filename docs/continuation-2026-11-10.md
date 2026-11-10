@@ -276,3 +276,18 @@ session49754; intent/handle/PID/output saved under
 **19:17:38.103222UTC**, single root check **19:19:15UTC** if no substantive
 completion. No repeatpoll/newwait/replay. Latest PR359 merged with successful
 CI; root owns next coherent publication. Manuscripts remain untouched.
+
+
+## Current Ball eighth queue — November 10, 19:12 UTC
+
+`20261110T190907Z-4d0dd928` canonically pending; deadline **19:46:33.818327UTC**,
+original0bb/450d/21cd source/archive and same sixpoint16. Root joined rawspec
+cdba80c2/canonicalf9952779/ready; future1000GPU/1200CPU nestedBall7920/2700.
+RootACK before ONEcanonicalwait<=2700; handles/output under
+`/private/tmp/k5d-same-job-0bb5-eighth-window-20261110/`. Independent shared
+alternative review found no useful gate-unlocking path: existing source rejects
+retained firstpair+shared profile, and sharedtiming cannot provide requiredcost
+qualification. No shared-source implementation/newproof/GPU release or rule
+change. No ninthqueue/48/292/586/full30 authority.
+W84c24 existingsolewait deadline19:17:38, rootcheck **19:19:15UTC**. LaterBall
+singlecheck **19:48:10UTC** if no substantive event; no duplicatewait/timers.
