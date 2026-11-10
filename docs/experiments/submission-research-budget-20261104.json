@@ -3708,6 +3708,41 @@
       "local_storage_gib": 32,
       "local_batch": "/private/tmp/k5d-same-job-0bb5-exclusive16-preparation-20261110",
       "scope": "Originalsixpoint16parity actualsame-jobretainedreceiver+IOpilot; no48/292/586/full30/independentclipclaim."
+    },
+    {
+      "job_id": "20261110T133353Z-0a5e1789",
+      "phase": "w8-full-witness-staged-20261106",
+      "subphase": "174ac-unit0-second-admission-window-no-prior-execution",
+      "state": "publishedpending;solecanonicalwaitw8_resume_queue",
+      "revision": "174ac84b84a1f405e06700a34aa4c3e225fa3265",
+      "source_sha256": "4cad9e47ebeb88f1cdb272634921f2aed79100e0e15ace4d01f9a3a33720d9d6",
+      "snapshot_sha256": "5e62a2e912f5dba0cd945d33388b95154d5d8e88ed6cf5b5998e595a323c6fd1",
+      "spec_sha256": "f9da4bb36f55ae76c4f47df4e25e69bf608f79676431f6daa17bc5e34e44934a",
+      "source_archive": true,
+      "deadline": "2026-11-10T14:13:53.663675Z",
+      "hosts": [
+        "gpu5"
+      ],
+      "GPU_models": [
+        "RTX 6000 Ada"
+      ],
+      "future_GPU": 500,
+      "future_CPU": 550,
+      "qualification_preparation_CPU_alreadycharged": 450,
+      "qualification_CPU_max": 1000,
+      "qualification_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+      "campaign": 400,
+      "smoke": 335,
+      "validator": 60,
+      "noop": 5,
+      "generator_CPU": 210,
+      "generator_wall": 240,
+      "external_CPU": 150,
+      "external_GPU": 50,
+      "final_readiness_inside_external_CPU": 10,
+      "admission_ledger_sha256": "d6c69484c55df0a4df701b314177aa01a5a313507767f4e97943932b6481165a",
+      "local_batch": "/private/tmp/pointstream-w8-second-window-20261110-a1",
+      "scope": "Sameoriginal24/30cost/operationalcontext,neverpreviouslyexecuted. Nootherunit/full240/80/quality/furtherretry."
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -3729,9 +3764,10 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "Ball389eonlyactiveGPUqueue,sourceownerwait. W8firstqueueexpiredrootclosed;oneboundedrefinedfuturequeueapprovedrecipebelow,nopublishedjobyet.",
+    "state": "Ball389esolewaitdeadline13:38;W8new0a5esolewaitdeadline14:13 aftercentralACK. Old0e193expiredclosed0GPU150CPUprep-only; no timers/replay.",
     "jobs": [
-      "20261110T130538Z-389ebe94"
+      "20261110T130538Z-389ebe94",
+      "20261110T133353Z-0a5e1789"
     ],
     "batches": [],
     "native_completion_resume_verified": false,
