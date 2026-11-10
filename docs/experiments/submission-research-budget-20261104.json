@@ -1653,6 +1653,18 @@
       "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
       "basis": "Entire150externalCPU inclreadiness,queue/admin/audit conservativelyallocated;0.202CPUremoteaudit onlyobserved,notaggregate. CanonicalEXPIREDnoassignment/run/attempts/gate/output/claims;gpu3ownerdeadline-sweeper. Sourcearchive5e62,canonicalf9da. 450priortruepreparation+150=600. No actualqualification orGPU.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "w8-cumulative-preparation-guard-source-preparation-20261110",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "witness_qualification": true,
+      "qualification_charge_kind": "pilot_preparation",
+      "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+      "basis": "Prospectivefull50CPU sourcepackaging/readiness for explicit cumulativepreparationguard amendment. No inference/job/nextqueue authorized. Allpasttruepreparationpreserved650afterthischarge.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2236,7 +2248,7 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 2458,
+      "cpu_seconds": 2408,
       "status": "Remaining_unspent;0a5eunassignedexpiryclosed0GPU150CPUallocation;furtherpilotheld1000cumulativeguard"
     }
   ],
