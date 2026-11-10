@@ -1705,6 +1705,15 @@
       "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
       "basis": "Full150externalCPUinclreadiness/queue/admin/auditconservativelyallocated;remoteaudit0.173CPUonlynotaggregate. CanonicalEXPIREDnoassignment/run/attempt/gate/claims,actualarchive631/source985/spec6a4. Ownergpu1expiry-sweeper, gpu5busyreason.650priortrueprep+150=800; no GPU/model execution.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "k5d-legacy188-scoped-rate-analysis-20261110",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 20,
+      "basis": "Prospectivelyprecharged20CPU inclusive LOCALonly saved188native/wire/metric/GTjoinedrows achievable-envelope PCHIP analysis; no inference/download/newdecoder/reusecredit ornewclip.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2223,7 +2232,7 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 7920,
-      "cpu_seconds": 4340,
+      "cpu_seconds": 4320,
       "status": "Remaining_unspent;6e96unassignedexpiry400CPU0GPUclosed;allqualifiedGPUssnapshotcomputepresent;noadditionalBalljobreleasedyet"
     },
     {
