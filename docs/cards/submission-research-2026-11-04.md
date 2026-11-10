@@ -8,6 +8,14 @@ workstream ceilings. Ordinary bounded implementation corrections need no new
 permission; source/numerical rules and stops below remain binding. Closed
 K5c/W8/W9 balances are not transferred. Unknown submissions are never replayed.
 
+Execution status, November10: **BLOCKED by fleet connectivity, research unfinished**.
+The two existing Ball/W8 jobs have unknown execution/terminal states after
+failed solewaits and final correctly routed status timeouts. Keep their full
+nested reservations; no further queue/replay until their exact states, claims
+and ownership can be inspected. No new allocation or scientific rule change.
+See the [live continuation](../continuation-2026-11-10.md) and
+[connectivity receipt](../experiments/fleet-connectivity-block-20261110.json).
+
 ## Goal and scope
 
 Develop the ball prototype into a reproducible, fully billed small-object
