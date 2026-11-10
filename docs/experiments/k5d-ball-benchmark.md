@@ -382,3 +382,7 @@ Parent8/child2 shared pilot `20261109T223822Z-70eb4770` completed with the exact
 ### Root acceptance of parent8 numerical feasibility — November9
 
 Root accepts `20261109T223822Z-70eb4770` after rechecking raw hashes, joining117smoke/47reference/1noop archive members and rerunning source/input/all6packet/savedpixel/192metric/384judge/resource/teardown assertions. All13allocator receipts and14observedbirths joined; foreign other-GPU process was identified and untouched.450GPU/550CPUinclusive30prep is a conservative allocation:normal successful release-order inference supports421.562s lifetime upper, not measured occupancy;90externalCPU allowance covers partial admin/audit telemetry. Shared timing is contaminated and cannot support cost/scale. This is the original16frame development control, not a new clip or corpus result. Separate uncontaminated current-path cost and292/586 gates remain; parentunspent7920GPU/6640CPU.
+
+### First292 source preparation and native proof release — November10
+
+Root rehashed all preparation artifacts, exact recoveredH2c3ff/d8reference8758 and approved source bridge, and separately releases ONE FFE actual-source four-case native CPU proof:source390e/archive202466,rawspecbfe20/logicalb21f0/normalizedlogical51b73,deadline10:27:19UTC,gpu2CPU0.300CPUinclusive50prep+250future,0GPU;100campaign/70smoke/10validator/5noop. Allsixdoctors passed;gpu3ffmpeg versionprobe timedout butbinarySHA matched. No newGPU/292/full30 release. ActualID must precede one boundedcanonicalwait.

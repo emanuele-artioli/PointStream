@@ -1450,6 +1450,15 @@
       "witness_qualification": false,
       "basis": "110rounded wholecreated-to-terminal104.814onecorewallinclqueue +entire150post+82auditexternalallocations=342future.30prep alreadycharged. Allocation-based coverage, not measuredaggregateCPU. Interrupted local extraction had12s observedwriteinterval but no completeCPUcounter;3.11GBpartial retained. Remoteauditor SSHtimedout withoutstartPID/limitreceipt,actual50CPUlimitinstallation unverified; latercommandpatterninspectionfoundnone,not birth-boundteardown. Successfulremoteexport2.090CPU. No auxiliaryresult used as proof; actualexportedbytes independentlyrevalidated locally.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "k5d-first292-ffe51-sourceprep-20261110",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "basis": "Full approved50CPU preparation:recovered exactH2/d8,actualbridge recheck,nooverwrite source/bridgeuploads,allhostdoctor/claims/runtime/toolspacechecks. Aggregateadministrationunmeasured.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -1968,8 +1977,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 7920,
-      "cpu_seconds": 6640,
-      "status": "Remaining_unspent7920GPU6640CPU;70ebnumericalgateacceptedandclosed450GPU550CPUinclusive30prep; no cost/scale/full30 release."
+      "cpu_seconds": 6590,
+      "status": "Remaining_unspent7920GPU6590CPU; FFEprep50charged,ONE250futureCPU nativeproofreleased; noGPU."
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
