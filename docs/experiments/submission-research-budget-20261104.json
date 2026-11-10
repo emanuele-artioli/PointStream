@@ -1605,6 +1605,15 @@
       "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
       "basis": "Entire150externalCPU allowance incl10finalreadiness,queue/manager/worker/admin/audit,allocationnotmeasuredaggregate. No assignment/run/attempts/gate/campaign/outputs/claims; gpu6owneronlydeadlinesweeper. Actualremoteaudit0.057CPU. ZeroGPU/qualificationexecution, therefore prep-only;300priortrueprep+150=450.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "k5d-legacy188-reuse-local-audit-20261110",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 20,
+      "basis": "Prospectivelyprechargedfull20CPU read-onlyLOCALlegacy188reuseaudit; no inference/remoterecovery/automaticcredit.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2123,7 +2132,7 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 7920,
-      "cpu_seconds": 5610,
+      "cpu_seconds": 5590,
       "status": "Remaining_unspent;new0bb5GPU16prep30precharged;noGPUreleaseyet;48/292/586held"
     },
     {
