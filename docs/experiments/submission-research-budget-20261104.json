@@ -3618,10 +3618,7 @@
       "job_id": "20261110T124427Z-d20121f2",
       "phase": "k5d-scale-first-tranche-20261105",
       "subphase": "same-job-0bb5-actual-native-CPUproof",
-      "state": "IDallocated;transfer/publicationinprogressNOTconfirmed; no wait until actualreceipt verified",
-      "expected_revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
-      "expected_source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
-      "expected_snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+      "state": "completepercanonicalwait;actualpublicationmatched;independentauditpending",
       "spec_sha256": "3831ddc767f3dd3960e6964cd0e08443b06f6e47e50949041b6512645b854842",
       "deadline": "2026-11-10T13:15:50.779434Z",
       "host": "gpu2",
@@ -3636,7 +3633,12 @@
       "audit_CPU": 30,
       "contingency_CPU": 20,
       "local_batch": "/private/tmp/k5d-same-job-0bb5-preparation-20261110",
-      "scope": "Actualnewsource4casenativeCPUonly; noGPU/numerical16/48/volume/scale/quality."
+      "scope": "Actualnewsource4casenativeCPUonly; noGPU/numerical16/48/volume/scale/quality.",
+      "revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
+      "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
+      "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+      "source_archive": true,
+      "wait_state": "singlecanonicalwaitcompleted;eventnotyetACKuntilaudit"
     }
   ],
   "old_budgets": "closed, not borrowed",

@@ -1,0 +1,74 @@
+{
+  "approved_bridge_sha256": "b052efdf6cdaea51bc9f19ac141b3c56cf4caec96c3e9f9ae25d6df37d965782",
+  "archive_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+  "bridge_remote": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-same-job-0bb5-bridge-20261110/bridge.json",
+  "cpu_accounting": "50 CPU seconds precharged conservatively; no aggregate CPU measurement",
+  "deadline": "2026-11-10T13:15:50.779434+00:00",
+  "doctor": "six hosts passed",
+  "future_cpu_allocation": "250 seconds: 100 campaign, 100 postcampaign, 30 audit, 20 contingency; requires separate root release",
+  "host_readiness": "gpu2 and gpu3 CPU claims empty; CPU0 allowed; separate local filesystems >40 GiB free; tool and unshare hashes match; environment tree and input cache metadata present; input and large environment caches not freshly hashed",
+  "logical_spec_sha256": "b43222b118f30b589ba2d498f11ae48489bcf1a98a68fed477cf25f7b56bdb13",
+  "normalized_logical_sha256": "3831ddc767f3dd3960e6964cd0e08443b06f6e47e50949041b6512645b854842",
+  "promotion": "submitted receipt and canonical manifest must prove source_archive:true, exact source and archive; no automatic fallback; no 16/48 parity or 292/586 admission",
+  "raw": {
+    "bridge-upload.txt": {
+      "bytes": 70,
+      "path": "/private/tmp/k5d-same-job-0bb5-preparation-20261110/bridge-upload.txt",
+      "sha256": "4b7dcca77353f4d965e24301b6a498a0003e33101e3a962ed90a689046530eeb"
+    },
+    "doctor.json": {
+      "bytes": 16554,
+      "path": "/private/tmp/k5d-same-job-0bb5-preparation-20261110/doctor.json",
+      "sha256": "675bb5e52a072a43c218588dd315d54af4c218e7f0a356029966cb3f912cbf75"
+    },
+    "gpu2.json": {
+      "bytes": 1890,
+      "path": "/private/tmp/k5d-same-job-0bb5-preparation-20261110/gpu2.json",
+      "sha256": "ae9c6ccbefa9b9e91e7cad8a41b3e03f3a90e6307abf8fa97509a18e160a7fc1"
+    },
+    "gpu3.json": {
+      "bytes": 1596,
+      "path": "/private/tmp/k5d-same-job-0bb5-preparation-20261110/gpu3.json",
+      "sha256": "097d1b8f82ebd01dd25d6e3a02ca8e5253c925269dc033260d77933d208ae115"
+    },
+    "native-spec-normalized.json": {
+      "bytes": 2388,
+      "path": "/private/tmp/k5d-same-job-0bb5-preparation-20261110/native-spec-normalized.json",
+      "sha256": "6cd72f293c9e92b2bb37b0e185e72a1c141987d93118a894d9ee5efc6fc98b5e"
+    },
+    "native-spec.json": {
+      "bytes": 2347,
+      "path": "/private/tmp/k5d-same-job-0bb5-preparation-20261110/native-spec.json",
+      "sha256": "2b73949dcbfd0fc66886a9828b962e6923b86308c0e63d36ae62b9c09dd28999"
+    },
+    "remote-sha.txt": {
+      "bytes": 352,
+      "path": "/private/tmp/k5d-same-job-0bb5-preparation-20261110/remote-sha.txt",
+      "sha256": "ce4937369d982fe5357f0e05694ab38e6c096cc5af92cf4a983abe938703b3f4"
+    },
+    "source-upload.txt": {
+      "bytes": 74,
+      "path": "/private/tmp/k5d-same-job-0bb5-preparation-20261110/source-upload.txt",
+      "sha256": "4b9e1e2ecbd1cbab49d520bbd80bb03a8cc20b2494768df7859a9389e1054fda"
+    },
+    "status.json": {
+      "bytes": 5185272,
+      "path": "/private/tmp/k5d-same-job-0bb5-preparation-20261110/status.json",
+      "sha256": "5ab5b4f2e7ee7b3e510438af3a511d1c922719a1dba1b4f815cbd7b4df4039e9"
+    },
+    "workers.json": {
+      "bytes": 1623,
+      "path": "/private/tmp/k5d-same-job-0bb5-preparation-20261110/workers.json",
+      "sha256": "3efb779b14f68c577ae076bf4203c4e9623cf97f7571e8cf861b1b662640a303"
+    }
+  },
+  "raw_spec_sha256": "2b73949dcbfd0fc66886a9828b962e6923b86308c0e63d36ae62b9c09dd28999",
+  "revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
+  "schema": 1,
+  "scope": "Preparation only; no inference, CPU job or GPU. Future job needs separate root release.",
+  "source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/k5d-same-job-0bb5-20261110/source.tar",
+  "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
+  "status": "one pending job 20261110T123904Z-0e193d36, host unassigned at snapshot; inspect again before release",
+  "upload": "exclusive new directories and files; remote readback SHA matches",
+  "workers": "six fresh with source_archive and indexed_cpu_affinity_v1"
+}
