@@ -20,6 +20,7 @@ from typing import Any
 _CPU_LIMIT_BEFORE_FIXED_IMPORT = resource.getrlimit(resource.RLIMIT_CPU)
 from experiments.jobs.inbox import validate_spec  # noqa: E402
 from experiments.tennis import w8_input_job as fixed  # noqa: E402
+from experiments.tennis import w8_staged_bindings as staged_cli  # noqa: E402
 _CPU_LIMIT_AFTER_FIXED_IMPORT = resource.getrlimit(resource.RLIMIT_CPU)
 from experiments.tennis import w8_strict_packet_job as packet  # noqa: E402
 
@@ -135,6 +136,7 @@ def make_spec(deadline: str, inventory: str) -> dict[str, Any]:
     spec['witness_bootstrap_sha256'] = fixed.file_sha(bootstrap)
     spec['witness_input_job_sha256'] = fixed.file_sha(Path(fixed.__file__).resolve())
     spec['witness_system_leaves_sha256'] = fixed.file_sha(bootstrap.parent / 'w8_cuda_system_leaves.py')
+    staged_cli.configure(spec)
     validate_spec(spec)
     return spec
 
@@ -393,7 +395,9 @@ def main() -> None:
     spec.add_argument('--native-inventory', required=True)
     spec.add_argument('--output', required=True, type=Path)
     for action in ('run', 'noop', 'validate'):
-        sub.add_parser(action)
+        command = sub.add_parser(action)
+        if action in ('run', 'noop'):
+            command.add_argument('--staged', action='append', nargs=2)
     args = parser.parse_args()
     if args.action == 'make-spec':
         result = make_spec(args.deadline, args.native_inventory)
@@ -401,10 +405,13 @@ def main() -> None:
             json.dump(result, stream, sort_keys=True, indent=2, allow_nan=False)
             stream.write('\n')
     elif args.action == 'run':
-        run(Path(os.environ['PS_STAGE_DIR']))
+        stage = Path(os.environ['PS_STAGE_DIR'])
+        staged_cli.check_cli(stage, args.staged, args.action)
+        run(stage)
     elif args.action == 'validate':
         validate(Path(os.environ['PS_STAGE_DIR']), Path(os.environ['PS_VALIDATION_PATH']))
     elif args.action == 'noop':
+        staged_cli.check_cli(Path(os.environ['PS_STAGE_DIR']), args.staged, args.action)
         if os.environ.get('PS_STAGE') != 'full' or os.environ.get('CUDA_VISIBLE_DEVICES') != '':
             raise ValueError('CPU-only full completion marker required')
         publish = Path(os.environ['PS_SCRATCH_DIR']) / 'publish'

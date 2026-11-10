@@ -15,6 +15,7 @@ from typing import Any
 _CPU_LIMIT_BEFORE_IMPORTS = cpu_resource.getrlimit(cpu_resource.RLIMIT_CPU)
 from experiments.tennis import w8_strict_host_cost_job as host  # noqa: E402
 from experiments.tennis import w8_input_job as fixed  # noqa: E402
+from experiments.tennis import w8_staged_bindings as staged_cli  # noqa: E402
 _CPU_LIMIT_AFTER_IMPORTS = cpu_resource.getrlimit(cpu_resource.RLIMIT_CPU)
 
 CPU_SCOPE = 'root-reviewed W8 same-source CPU isolation and native lifecycle proof'
@@ -390,7 +391,7 @@ def _pilot_spec(spec: dict[str, Any], *, unit1: bool = False, reference_epoch: f
     _check_deadline(spec, reference_epoch=reference_epoch)
     if (spec.get('w8_witness_profile') != profile
             or spec.get('entrypoint') != ['-m', 'experiments.tennis.w8_witness_job']
-            or spec.get('arguments') != ['{phase}']
+            or not staged_cli.compatible_arguments(spec)
             or spec.get('scale') != {'phase': {'smoke': phase, 'full': 'noop'}}
             or spec.get('validator') != ['{python}', '-m', 'experiments.tennis.w8_witness_job', 'validate']
             or spec.get('device') != 'gpu' or spec.get('gpu_models') != ['RTX 6000 Ada']
@@ -438,7 +439,7 @@ def _candidate_spec(spec: dict[str, Any], *, unit1: bool, reference_epoch: float
     if (spec.get('w8_witness_profile') != profile or spec.get('hosts') != [spec.get('witness_cpu_proof_host')]
             or spec.get('witness_cpu_proof_host') not in ('gpu5', 'gpu6')
             or spec.get('entrypoint') != ['-m', 'experiments.tennis.w8_witness_job']
-            or spec.get('arguments') != ['{phase}']
+            or not staged_cli.compatible_arguments(spec)
             or spec.get('scale') != {'phase': {'smoke': 'readiness', 'full': phase}}
             or spec.get('validator') != ['{python}', '-m', 'experiments.tennis.w8_witness_job', 'readiness-validate']
             or spec.get('gpu_models') != ['RTX 6000 Ada'] or spec.get('gpu_sharing') != {'mode': 'exclusive'}
@@ -849,6 +850,7 @@ def make_pilot_spec(*, deadline: str, proof_local: Path, proof_remote: str,
         for name, path, sha in (('ledger', ledger_remote, ledger_sha), ('admission', admission_remote, admission_sha)):
             spec['staged_inputs'].append({'name': name, 'path': path, 'sha256': sha, 'extract': False})
             spec['inputs'].append({'path': path, 'sha256': sha})
+        staged_cli.configure(spec)
         _pilot_spec(spec)
     from experiments.jobs.inbox import validate_spec
     validate_spec(spec)
@@ -900,6 +902,7 @@ def make_unit1_spec(*, deadline: str, proof_local: Path, proof_remote: str,
     for name, path, digest in (('promotion', promotion_remote, promotion_sha), ('ledger', ledger_remote, ledger_sha)):
         spec['staged_inputs'].append({'name': name, 'path': path, 'sha256': digest, 'extract': False})
         spec['inputs'].append({'path': path, 'sha256': digest})
+    staged_cli.configure(spec)
     _pilot_spec(spec, unit1=True)
     from experiments.jobs.inbox import validate_spec
     validate_spec(spec)
@@ -939,6 +942,7 @@ def make_candidate_spec(*, deadline: str, proof_local: Path, proof_remote: str,
     spec['witness_cpu_ceiling_seconds'] = limits['cpu_ceiling_seconds']
     spec['witness_caps']['generator_cpu'] = limits['generator_cpu']
     spec['witness_caps']['generator_wall'] = limits['generator_wall']
+    staged_cli.configure(spec)
     _candidate_spec(spec, unit1=unit1)
     gate = json.loads(promotion_local.read_text())
     completed = gate.get('completed_artifact_sha256', {})
@@ -1046,7 +1050,7 @@ def _finish_spec(spec: dict[str, Any], *, qualification: bool, reference_epoch: 
             raise ValueError('full finish limits do not fit inclusive ceilings')
         ceiling = full_ceiling
     if (spec.get('w8_witness_profile') != profile or spec.get('entrypoint') != ['-m', 'experiments.tennis.w8_witness_job']
-            or spec.get('arguments') != ['{phase}']
+            or not staged_cli.compatible_arguments(spec)
             or spec.get('scale') != {'phase': {'smoke': 'finish-readiness', 'full': 'finish-context' if qualification else 'finish-candidate'}}
             or spec.get('smoke', {}).get('seconds') != 60 or spec.get('full', {}).get('seconds') != full_seconds
             or spec.get('budget_seconds') != campaign or spec.get('validator_seconds') != 50
@@ -1123,6 +1127,7 @@ def make_finish_spec(*, deadline: str, proof_local: Path, proof_remote: str, pro
             spec['witness_' + name + '_sha256'] = digest
         spec['staged_inputs'].append({'name': name, 'path': path, 'sha256': digest, 'extract': False})
         spec['inputs'].append({'path': path, 'sha256': digest})
+    staged_cli.configure(spec)
     _finish_spec(spec, qualification=qualification)
     gate = json.loads(promotion_local.read_text())
     if qualification:
@@ -1594,7 +1599,9 @@ def main() -> None:
     audit.add_argument('--output', type=Path, required=True)
     for action in ('pilot', 'unit1', 'readiness', 'readiness-validate', 'candidate0', 'candidate1', 'noop', 'validate', 'finish-readiness', 'finish-readiness-validate',
                    'finish-context', 'finish-candidate'):
-        sub.add_parser(action)
+        command = sub.add_parser(action)
+        if action not in ('validate', 'readiness-validate', 'finish-readiness-validate'):
+            command.add_argument('--staged', action='append', nargs=2)
     args = parser.parse_args()
     if args.action == 'make-spec':
         spec = make_pilot_spec(deadline=args.deadline, proof_local=args.cpu_proof_local,
@@ -1641,6 +1648,8 @@ def main() -> None:
         run_producer_audit(args.stage, args.output)
         return
     stage = Path(os.environ['PS_STAGE_DIR'])
+    if args.action not in ('validate', 'readiness-validate', 'finish-readiness-validate'):
+        staged_cli.check_cli(stage, args.staged, args.action)
     if args.action == 'finish-readiness':
         run_finish_readiness(stage)
     elif args.action == 'finish-readiness-validate':

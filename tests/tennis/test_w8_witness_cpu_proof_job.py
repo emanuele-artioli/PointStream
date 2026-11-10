@@ -12,9 +12,9 @@ def test_real_fleet_spec_is_cpu_only_and_dispatches_fixed_phases():
     validate_spec(spec)
     assert spec['device'] == 'cpu' and spec['gpu_models'] == [] and spec['gpu_memory_mib'] == 0
     assert spec['budget_seconds'] == 600 and spec['cpu_threads'] == 1
-    assert phase_command(spec, 'smoke', python='/python') == ['/python', '-m',
+    assert phase_command(spec, 'smoke', python='/python')[:4] == ['/python', '-m',
         'experiments.tennis.w8_witness_cpu_proof_job', 'run']
-    assert phase_command(spec, 'full', python='/python')[-1] == 'noop'
+    assert phase_command(spec, 'full', python='/python')[3] == 'noop'
     assert {x['name'] for x in spec['staged_inputs']} == set(proof.packet.NAMES) | {'native_inventory'}
 
 
