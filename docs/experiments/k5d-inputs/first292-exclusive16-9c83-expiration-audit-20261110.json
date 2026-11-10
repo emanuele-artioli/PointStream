@@ -1,0 +1,43 @@
+{
+  "canonical_wait": "timed out once while pending immediately before terminal deadline",
+  "cpu_accounting": "queue wall is not CPU; manager, worker polling, submission and audit CPU are not measured. No 800-second campaign allocation was consumed. Conservative option is 50 already-charged preparation + remaining 350 external = 400 CPU seconds inclusive, an allocation ceiling not measured use; root may choose a lower defensible external allowance.",
+  "created_epoch": 1794306044.7654874,
+  "event_acknowledged": true,
+  "event_id": "ccb8bf3d927c5a698e74a10a842f749a",
+  "fresh_w8_shared_doctor": {
+    "observation": "gpu2 both A6000s and gpu3 A6000 each have foreign compute; none exclusive-idle",
+    "path": "/private/tmp/pointstream-w8-174ac-sourceprep-20261110-a1/doctor.json",
+    "sha256": "4fe6e917d10185a22f4b92137aec530ef7b4b5cd31f1cade06d73fc085c6af24"
+  },
+  "gpu_claim_acquisition": "no campaign/supervisor or archived admission attempts; worker deadline-expiry branch precedes GPU selection",
+  "gpu_seconds": 0,
+  "input_staging": "never started; source.tar request copy retained",
+  "job_id": "20261110T102034Z-9c83c9fc",
+  "job_tree_no_run_smoke_full_or_attempts": true,
+  "own_cpu_claim_tokens_absent": true,
+  "queue_wall_seconds": 2118.937605857849,
+  "raw_sha256": {
+    "/private/tmp/k5d-first292-exclusive16-preparation-20261110/expiry-artifacts/export-receipt.json": "a978cd50e9856510d9904c5da3037d19e758791ce5beb27898e2051dd8f588b9",
+    "/private/tmp/k5d-first292-exclusive16-preparation-20261110/expiry-artifacts/ready.json": "26b0c07d704023b8b194a2236dfb74852aa058db3a9fe1ef59516aeb46dd7bf2",
+    "/private/tmp/k5d-first292-exclusive16-preparation-20261110/expiry-artifacts/spec.json": "231646888ec716ffa0ff677fd5b9051ca4edb357338a23428dbc8be768a9bbf4",
+    "/private/tmp/k5d-first292-exclusive16-preparation-20261110/expiry-artifacts/state.json": "d555f4ffc29ec266c4f99641b911b372d504d5a6945f936531a96e9e0c3822e4",
+    "/private/tmp/k5d-first292-exclusive16-preparation-20261110/raw/expiry-ack.json": "e5ab1971b1a2b6818e6167a51091e177fbcf11bec883e0cf31f87ca807760b0b",
+    "/private/tmp/k5d-first292-exclusive16-preparation-20261110/raw/expiry-claim-layout.txt": "dcbf1d22c27062d74257d77855ef8c3f7a69c8e8f8268608b5c0aaea97911332",
+    "/private/tmp/k5d-first292-exclusive16-preparation-20261110/raw/expiry-device-claims-tree.txt": "e363a023144602685b8cc615f6d7d6e76a84289e207b9c68f1f1204b317d42ea",
+    "/private/tmp/k5d-first292-exclusive16-preparation-20261110/raw/expiry-events.json": "0facf4d86929bdf2e4bc4e04f35175146701b74a1b17674a64bccf72aef2e9a2",
+    "/private/tmp/k5d-first292-exclusive16-preparation-20261110/raw/expiry-job-tree.json": "e59208223d8bf6e30dfd1a611dd4e3f983ab2af9f662ed37f2ff777b90ebf3c8",
+    "/private/tmp/k5d-first292-exclusive16-preparation-20261110/raw/expiry-status.json": "58dd3be9e28c560a86e040119bd26ca47c7a545ae6d7ffff6c6930ba22ced5b2",
+    "/private/tmp/k5d-first292-exclusive16-preparation-20261110/raw/submit.json": "8eb1b5d9919065d78d5a789254775ff4d7c91c5917d10f245d3d08fdc06872c6",
+    "/private/tmp/k5d-first292-exclusive16-preparation-20261110/raw/wait-handle.json": "669f03ac8aa80662758c3998caf5258a6576faa79eb2a4f15b02170fecad31a3",
+    "/private/tmp/k5d-first292-exclusive16-preparation-20261110/raw/wait-plan.json": "b3ffc495e3983effeb769489eaaa5afac82ef46523acd54a3dfba36e2ecf9565",
+    "/private/tmp/k5d-first292-exclusive16-preparation-20261110/raw/wait.json": "87830773b09e9f484cff76e826fac62fba24b9e473530182ecf85212e073f7ff"
+  },
+  "schema": 1,
+  "snapshot_sha256": "202466a711d17b742a17270bab91da2dc581af7a9fc1e411405f8bb37a924372",
+  "source_sha256": "390e157a9aabc1db8006a936a7de54a43c8810650260136bc59a67036e7dfd39",
+  "spec_digest": "0cdd4e93b83375b5a4144059bb26e603a7dd368c126b2e4e384a8b663fd32df3",
+  "status": "independent expiration audit; root closure pending",
+  "terminal_status": "expired",
+  "updated_epoch": 1794308163.7030933,
+  "worker_owner": "gpu3 worker acquired request at deadline to mark expired; no supervisor or campaign state"
+}
