@@ -1,0 +1,113 @@
+{
+  "archive_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+  "canonical_wait": "one wait returned attention expired",
+  "cpu_accounting": "Manager, polling, submission and audit CPU unmetered; recommend full 400 external CPU inclusive of metadata; queue wall is not CPU; root closeout pending",
+  "event_acknowledged": true,
+  "event_id": "81871b615f4e50c1852b2473a569ab85",
+  "evidence": "no host/supervisor/gate/campaign, no run/smoke/full/environment/attempts, no CPU or device claims; physical source archive SHA matches; gpu6 worker acquired request to mark expiry; expiry branch precedes eligibility",
+  "gpu_seconds": 0,
+  "job_id": "20261110T181703Z-f018d258",
+  "limitations": "No numerical, inference, timing, storage or parity evidence; no next queue or scale admission.",
+  "queue_wall_seconds": 2289.048927307129,
+  "raw": {
+    "/private/tmp/k5d-same-job-0bb5-seventh-window-20261110/bridge.txt": {
+      "bytes": 176,
+      "sha256": "b1cef1661b9d893d594f86450e2c0ea99e50d33e14d5a9aa539281575d49e8ea"
+    },
+    "/private/tmp/k5d-same-job-0bb5-seventh-window-20261110/gpu2.json": {
+      "bytes": 5968,
+      "sha256": "1557d30aa67c63f788ede56034d6ed2db87dc1e671258304a5742163f3bead7e"
+    },
+    "/private/tmp/k5d-same-job-0bb5-seventh-window-20261110/gpu3.json": {
+      "bytes": 5602,
+      "sha256": "d4f9af4eebf4d2d0299d55255cc74cdbdaf5f6d9dc9bb3d948adc204c26e1c15"
+    },
+    "/private/tmp/k5d-same-job-0bb5-seventh-window-20261110/normalized.json": {
+      "bytes": 10648,
+      "sha256": "06f06bf1db46f3659af5ec2067ddc28d08987632fc7250825e6b8f40aa90c429"
+    },
+    "/private/tmp/k5d-same-job-0bb5-seventh-window-20261110/ready.json": {
+      "bytes": 2831,
+      "sha256": "5eaa70ba7879beeb5ae73ffc820ecb486820f8932ea592fee142828005c59ff3"
+    },
+    "/private/tmp/k5d-same-job-0bb5-seventh-window-20261110/spec-record.json": {
+      "bytes": 448,
+      "sha256": "7766671fefa1e0af061da1eb0c158ba12c4a4a7e9163da3bf74e2d6f6ee99ca2"
+    },
+    "/private/tmp/k5d-same-job-0bb5-seventh-window-20261110/spec.json": {
+      "bytes": 10607,
+      "sha256": "0f2a4f74475da9455d0ebf61cce31d6c33a4db8794f2be3fbe4b79b3dfa951a7"
+    },
+    "/private/tmp/k5d-same-job-0bb5-seventh-window-20261110/status.json": {
+      "bytes": 5197083,
+      "sha256": "9bec6c45ff144e12abd2d2833fcf90d8c275bf5e64d417e1ca329558500fcb9a"
+    },
+    "/private/tmp/k5d-same-job-0bb5-seventh-window-20261110/submit.json": {
+      "bytes": 4599,
+      "sha256": "a4d97b91e49ba0e3b8a4098a82e9ca21fc0a3d81b4840a39fad090a376c8edcf"
+    },
+    "/private/tmp/k5d-same-job-0bb5-seventh-window-20261110/submit.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/private/tmp/k5d-same-job-0bb5-seventh-window-20261110/wait.json": {
+      "bytes": 563,
+      "sha256": "8dc1cd45683041f5e53dd0ce834cd6aa871fab7917a4721c6cfe7a3595e5d9c3"
+    },
+    "/private/tmp/k5d-same-job-0bb5-seventh-window-20261110/wait.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/private/tmp/k5d-same-job-0bb5-seventh-window-20261110/workers.json": {
+      "bytes": 1623,
+      "sha256": "64f1f46c1a4eec8deb51e2e3c96249004bd22889a85fe7ac17f815fa146ed48c"
+    },
+    "/private/tmp/k5d-same-job-f018-expiration-audit-20261110/ack.json": {
+      "bytes": 67,
+      "sha256": "b754a40b42fafafdba8cbc3227e39197c8eb877c7c5bee150099326a0636736d"
+    },
+    "/private/tmp/k5d-same-job-f018-expiration-audit-20261110/events.json": {
+      "bytes": 240,
+      "sha256": "2ee0266138878e6874fdd29fb654888dd15bf23284b50608520f2d1fc44d1640"
+    },
+    "/private/tmp/k5d-same-job-f018-expiration-audit-20261110/export-response.json": {
+      "bytes": 196,
+      "sha256": "498eeeafab5ce1c29cfb7666779fd901804c141f6ca408e9c8fc361264cc4de6"
+    },
+    "/private/tmp/k5d-same-job-f018-expiration-audit-20261110/export/export-receipt.json": {
+      "bytes": 1071,
+      "sha256": "7b458c42a1ec3d5dba2c8c427a6f0fec72677690414e5416c9149821e04ccc5f"
+    },
+    "/private/tmp/k5d-same-job-f018-expiration-audit-20261110/export/ready.json": {
+      "bytes": 2831,
+      "sha256": "5eaa70ba7879beeb5ae73ffc820ecb486820f8932ea592fee142828005c59ff3"
+    },
+    "/private/tmp/k5d-same-job-f018-expiration-audit-20261110/export/spec.json": {
+      "bytes": 10648,
+      "sha256": "e9df2fcca4417698f44951647debf98ea2493f987b89bdbb9108d1e8d12cac29"
+    },
+    "/private/tmp/k5d-same-job-f018-expiration-audit-20261110/export/state.json": {
+      "bytes": 133,
+      "sha256": "e3ded74a904130cf4e6abaac2843f27b8010cfd573600beb2a6eb43e1e82b674"
+    },
+    "/private/tmp/k5d-same-job-f018-expiration-audit-20261110/source-sha.txt": {
+      "bytes": 166,
+      "sha256": "6015549c07d85c4a0b243c2e870e4eae3578dd74297e291ce786c09618be1e14"
+    },
+    "/private/tmp/k5d-same-job-f018-expiration-audit-20261110/status.json": {
+      "bytes": 282,
+      "sha256": "0fdd727329d3141981cdccb573f2f34dfb6bc8b5ce82292507b044b3bc2f1a6d"
+    },
+    "/private/tmp/k5d-same-job-f018-expiration-audit-20261110/tree-claims.json": {
+      "bytes": 1227,
+      "sha256": "5f8ee74ee7eeb4e4f063c01cf3a896a56c046e3e47d43a0d4fb213b1a7f8b9ad"
+    }
+  },
+  "schema": 1,
+  "source_revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
+  "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
+  "spec_digest": "2d57f4423c596812a61733d2889af96a148fa4e06e6fc3f70743f9ec066f2b23",
+  "status": "independent expiry audit; root closeout pending",
+  "terminal_status": "expired",
+  "worker_admission": "gpu2 and gpu3 report no eligible GPU: busy, non-idle, or insufficient free memory"
+}

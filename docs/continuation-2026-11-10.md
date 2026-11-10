@@ -2,6 +2,55 @@
 
 Continue the worthwhile, authorized PLAN research before manuscript or PRESLEY work. Do not submit the paper, train models, use paid API fallback, or revive the legacy 200-GPU-hour study. The user prefers bounded fleet queues. Before any action after interruption, read the experiment entry and canonical status for the recorded job; never replay an unknown or failed submission. Earlier bounded queues expired unassigned; the latest two live queues are identified in the final checkpoint below; no 292/586 study or full W8 GPU witness is released at this checkpoint. Source-footage rights and coauthor review remain open. The authoritative ledger is [submission-research-budget-20261104.json](experiments/submission-research-budget-20261104.json); root owns accounting and admission.
 
+## CURRENT authoritative checkpoint — November 10, 19:34 UTC
+
+Fleet communication is blocking further admissions. **Do not submit or replay
+anything until the two existing jobs and their ownership/claims are inspected.**
+Earlier live and expired checkpoints below are history, not current authority.
+
+- Ball **`20261110T190907Z-4d0dd928`**, source0bb/archive450d/source21cd,
+  last canonically pending; deadline **19:46:33.818327UTC**. Its solewait17697 /
+  PID22122 ended exit2 on gpu2 status timeout; PID absent and outputempty.
+  No terminal/execution state is established. Future maximum1,000GPU/1,200CPU
+  (400external) remains held inside Ballremaining7,920GPU/2,700CPU.
+- W8 **`20261110T183845Z-4c240783`**, sourceaecf/archivef784/sourcec9d,
+  last canonically pending; deadline **19:17:38.103222UTC**. Solewait49754 ended
+  exit2 after496.874s on gpu2 events timeout. Rootgpu2status120s and a truly
+  routedgpu1status60s also timedout; no terminal/execution state established.
+  Future500GPU/550CPU (150external) held inside W8remaining4,550GPU/1,079CPU.
+- Actual conservative charges still **19,362GPU /47,371CPU** of86,400/100,800.
+  Neither unknown job has been closed or assigned a zero-GPU charge. True W8
+  qualification preparation remains1,300CPU/G0/samenonce22578404. No further
+  queue, model retry, source change, scale or witness has been released.
+- Two distinct read-only metadata attempts (full auditgpu5 local90s, tiny
+  isolatedstdlibgpu1 local30s) returned no PID/start/output. Their remote
+  outcomes remain unknown and untouched. They were not replayed. The tiny
+  probe mistakenly used an inferred Balltimestamp; preserve that exact raw
+  script and its disclosed error. Correct BallID above is from its journal.
+  This wrong-path probe supplies no state evidence. Future tools must copy
+  complete actual IDs from the experiment entry, never infer timestamps.
+- Root reviewed and integrated client fix **3b5a9795** (isolateda78d2f4e):
+  job-specificstatus/events/cancel now honor validated management host/Python
+  overrides for same-base current config; old/incompatiblefallback preserved.
+  Full isolatedchecks Ruff/mypy575PASS, pytest2,127PASS/40skip; root focused
+  integrationchecks passed. This is not a server connectivity fix and does
+  not change any frozen scientific source, profile or running job.
+- FixedCLI supports `PS_FLEET_MANAGEMENT_HOST=gpu1` or gpu5 and
+  `PS_FLEET_MANAGEMENT_PYTHON=/usr/bin/python3` for job-specific status. The
+  earlier unpatched env route silently still usedgpu2; root subsequently
+  made one isolatedlocalstate-dir copy and confirmed an actualgpu1timeout.
+  Original localjobrecords/config and shared services are unchanged.
+- **ONE final canonical read-only batch planned19:48:10UTC**, existing actual
+  two jobs only, fixedclient/managementgpu1/status60s. No new waits, recurring
+  polls or keepalives. If still unavailable, preserve unresolved jobs and
+  report the external connectivity block; do not claim research complete.
+
+Raw uncertainty receipts are `experiments/k5d-inputs/same-job-4d0d-wait-uncertainty-20261110.json`
+and `experiments/w8-inputs/receiver-20261101/aecf-4c24-wait-and-audit-uncertainty-20261110.json`.
+Root verified all21 listed raw size/SHA joins. No GPU process was signalled;
+unknown read-only processes are preserved. Research and submission remain
+unfinished; no PointStream manuscript or PRESLEY changes.
+
 ## Authoritative live checkpoint — November 10, 17:55 UTC
 
 The current ledger charges are **19,362 GPU / 46,421 workload CPU seconds**,
@@ -242,3 +291,62 @@ No actualID yet. Ballf018 existing solewait session28627/PID15495/output
 18:55:14.653945 UTC; root single nextcheck18:56:50 unless a substantive event.
 No eighthBallqueue/scale or furtherW8queue automaticauthority. PR358 merged,
 CIchecksSUCCESS; latest accounting checkpoint will be published separately.
+
+
+## Current live W8 successor — November 10, 18:42 UTC
+
+`20261110T183845Z-4c240783` is canonically pending, deadline **19:17:38.103222 UTC**,
+exact frozenaecf sourcec9d/archivef784/source_archive:true. Root joined raw
+spec586ba386/canonical67e47969 with the submitted manifest and actual readiness
+receipt; pinnedledger06645f39/admission09d4d87b contain1300trueprep/samenonce,
+approval12ab/auditd1db. Future500GPU/550CPU unchanged and nestedW84550/1079.
+Source+two warmverify0.517s/guard5.775<65 are observations, not bounds. Controls,
+intent and output: `/private/tmp/pointstream-w8-aecf-pilot-next-20261110-a1/`.
+Root ACK precedes ONEcanonicalwait<=2700coverdeadline+sweep. No furtherqueue,
+fullwitness/unit1/quality release. Ballf018 solewait remains; next single root
+checkpoint18:56:50UTC, then W8deadline+sweep **19:19:15UTC** if unresolved.
+
+
+## Ball f018 terminal checkpoint — November 10, 19:02 UTC
+
+Root accepted fresh canonical expiry and all23 raw byte/SHA joins for f018:
+no assignment/campaign/inference/claims, exact originalsource/archive/spec,
+terminal eventACK. Charge full400externalCPU, zeroGPU, aggregateunmeasured.
+Programme **19,362GPU/47,371CPU**; Ball remaining **7,920/2,700**, W8 unchanged
+**4,550/1,079**. No eighthBall queue or scale release. Independent read-only
+review is assessing whether any source-supported shared quality-only route
+could answer a new useful research question; no implementation, source change,
+gate weakening or GPU release follows. Fleet shared timings are never evidence
+and cannot promote the existing exclusive cost/full-study certificate.
+
+W8 `20261110T183845Z-4c240783` still uses its existing sole canonical wait
+session49754; intent/handle/PID/output saved under
+`/private/tmp/pointstream-w8-aecf-pilot-next-20261110-a1/wait*`. Deadline
+**19:17:38.103222UTC**, single root check **19:19:15UTC** if no substantive
+completion. No repeatpoll/newwait/replay. Latest PR359 merged with successful
+CI; root owns next coherent publication. Manuscripts remain untouched.
+
+
+## Current Ball eighth queue — November 10, 19:12 UTC
+
+`20261110T190907Z-4d0dd928` canonically pending; deadline **19:46:33.818327UTC**,
+original0bb/450d/21cd source/archive and same sixpoint16. Root joined rawspec
+cdba80c2/canonicalf9952779/ready; future1000GPU/1200CPU nestedBall7920/2700.
+RootACK before ONEcanonicalwait<=2700; handles/output under
+`/private/tmp/k5d-same-job-0bb5-eighth-window-20261110/`. Independent shared
+alternative review found no useful gate-unlocking path: existing source rejects
+retained firstpair+shared profile, and sharedtiming cannot provide requiredcost
+qualification. No shared-source implementation/newproof/GPU release or rule
+change. No ninthqueue/48/292/586/full30 authority.
+W84c24 existingsolewait deadline19:17:38, rootcheck **19:19:15UTC**. LaterBall
+singlecheck **19:48:10UTC** if no substantive event; no duplicatewait/timers.
+
+
+Final read-only batch intent is persisted at
+`/private/tmp/pointstream-final-existing-job-status-batch-20261110-a1/intent.json`:
+19:48:10UTC, exact W84c24 via managementgpu5 and Ball4d0d via managementgpu3,
+60s each in parallel, fixedCLI. This supersedes the earlier proposedgpu1route;
+originalinboxes/jobrecords remain unchanged. No newqueue/wait/replay/signal.
+Durable read-only uncertainty snapshot (26files/36,088bytes plusmanifest):
+`/Users/manu/.cache/pointstream-evidence/fleet-communication-uncertainty-20261110-a1/`.
+Root softwarefix/sourcefullchecks2127/40passed; PR360 merge-auto enabled.

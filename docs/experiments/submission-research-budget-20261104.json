@@ -1808,6 +1808,15 @@
       "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
       "basis": "Full150externalCPU inclusive of original readiness/submission/queue/audit, aggregate unmeasured. Root canonical status expired; all28raw byte/SHA joins reviewed, exact source/archive/spec, no execution/claims; gpu4owner expiry sweeper, gpu5busyreason, client terminal eventACK. Trueprep1150+150=1300,G0; no retagging/reset.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "k5d-f018-queue-closeout-20261110",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 400,
+      "basis": "Seventh corrected16 queue canonical expiredunassigned, root independentlyverified23rawsizeSHA/source/spec/archive, no execution/claims, eventACK. Full400externalCPU allocation inclusive ofmetadata/submission/queue/audit, unmeasuredaggregate; notqueuewall orGPU.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2326,8 +2335,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 7920,
-      "cpu_seconds": 3100,
-      "status": "Remaining_unspent;1000GPU/1200CPU nested seventh f018 queue;no scale release"
+      "cpu_seconds": 2700,
+      "status": "Remaining_unspent;1000GPU/1200CPU nested eighth4d0dqueue;no scale release"
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -2392,7 +2401,7 @@
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
       "cpu_seconds": 1079,
-      "status": "Remaining_unspent;e797unassignedclosed0G150Ctrueprep;oneprospectiveversionedqueuefuture500G550C"
+      "status": "Remaining_unspent;500GPU/550CPU nested originalunit0 schema2 pilot4c24;no fullwitness release"
     }
   ],
   "jobs": [
@@ -4385,7 +4394,7 @@
       "job_id": "20261110T181703Z-f018d258",
       "phase": "k5d-scale-first-tranche-20261105",
       "subphase": "same-job-0bb5-exclusive16-seventh-admission-window",
-      "state": "pending;rootACKbeforeonecanonicalwait",
+      "state": "expiredunassigned;rootaccepted23rawjoins,eventACK",
       "revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
       "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
       "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
@@ -4412,7 +4421,87 @@
       "local_batch": "/private/tmp/k5d-same-job-0bb5-seventh-window-20261110",
       "scope": "Sameoriginalsixpoint16parity/retainedreceiverIOcost only; no48/292/586/full30 or extra independent clip.",
       "raw_spec_sha256": "0f2a4f74475da9455d0ebf61cce31d6c33a4db8794f2be3fbe4b79b3dfa951a7",
-      "client_revision": "revieweddoctorhelper420c78a3descendant;sourceworktree0bbunchanged"
+      "client_revision": "revieweddoctorhelper420c78a3descendant;sourceworktree0bbunchanged",
+      "terminal_CPU_charge": 400,
+      "terminal_GPU_charge": 0,
+      "qualification_executed": false,
+      "wait_state": "solewaitendedexpired,eventACK,noexecutionclaims"
+    },
+    {
+      "job_id": "20261110T183845Z-4c240783",
+      "phase": "w8-full-witness-staged-20261106",
+      "subphase": "aecf-q0-versioned-next-original24-30-cost-pilot",
+      "state": "unknownaftercommunicationfailure;lastconfirmedpending;noexecution/expiryinference",
+      "revision": "aecf9ee21c6a5d0face390c9f0a3b5044112ef36",
+      "source_sha256": "c9d56ee3c6e857e3cf92978690b20007645c2c13549469686c700434f2b8ebe6",
+      "snapshot_sha256": "f784c0919dc8f223253637684b71636063649831bc32b3ad23534e585322e84a",
+      "raw_spec_sha256": "586ba386ab77d0be9540d56a11d62e5814060058ee71e3656a1a845c811c1331",
+      "spec_sha256": "67e47969656e0ba9a46743bace615b8adad09296a1ef7ff17d953ced41f95392",
+      "source_archive": true,
+      "deadline": "2026-11-10T19:17:38.103222Z",
+      "hosts": [
+        "gpu5"
+      ],
+      "gpu_models": [
+        "RTX 6000 Ada"
+      ],
+      "future_GPU": 500,
+      "future_CPU": 550,
+      "campaign": 400,
+      "smoke": 335,
+      "validator": 60,
+      "noop": 5,
+      "generator_CPU": 210,
+      "generator_wall": 240,
+      "external_CPU": 150,
+      "external_GPU": 50,
+      "qualification_preparation_CPU_alreadycharged": 1300,
+      "qualification_CPU_max": 2300,
+      "qualification_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+      "admission_ledger_sha256": "06645f393b0358699625d8ed2f4fe82834165a65bf953166d21affbf1fddd16d",
+      "admission_sha256": "09d4d87b89cce9ddd11a3e407cbd56e077b1a3ad50e7cccf3f4e099e9a657c58",
+      "approved_CPU_gate_sha256": "d55b812ee13662408b404ce2bcc67f5f2effff91a76d6836965edca8d4d44c7e",
+      "scope": "ONE original unit0 24-frame/30-step operational cost/provider/isolation pilot; no quality/full-witness/unit1/retry.",
+      "local_batch": "/private/tmp/pointstream-w8-aecf-pilot-next-20261110-a1",
+      "qualification_budget_approval_sha256": "12ab3f2a9fe465845bac690a69672fe72a5f0d42a3e834a3679977a65193f8e4",
+      "no_prior_execution_audit_sha256": "d1dbf68aa12db5e8cfcacfe3accc8666bc874d052bc06b20eed69d447c84d528",
+      "wait_state": "solecanonicalwaitfailedSSH/RPC;no replacementwait;onefinaldeadlinecanonicalmetadata batchplanned19:48:10UTC",
+      "accounting_hold": "KeepfullfutureGPU/CPUmaximuminsideexistingremainingreservation;noterminalcharge/noinferenceofzeroGPU"
+    },
+    {
+      "job_id": "20261110T190907Z-4d0dd928",
+      "phase": "k5d-scale-first-tranche-20261105",
+      "subphase": "same-job-0bb5-exclusive16-eighth-admission-window",
+      "state": "unknownaftercommunicationfailure;lastconfirmedpending;noexecution/expiryinference",
+      "revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
+      "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
+      "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+      "spec_sha256": "f9952779b23693f3ff626aa9fa87df651133609149d2aafe32a110702a927137",
+      "source_archive": true,
+      "deadline": "2026-11-10T19:46:33.818327Z",
+      "hosts": [
+        "gpu2",
+        "gpu3"
+      ],
+      "gpu_models": [
+        "RTX A6000"
+      ],
+      "future_GPU": 1000,
+      "future_CPU": 1200,
+      "campaign": 800,
+      "namespace": 580,
+      "smoke": 600,
+      "validator": 30,
+      "noop": 5,
+      "external_CPU": 400,
+      "GPU_post": 200,
+      "local_storage_gib": 32,
+      "local_batch": "/private/tmp/k5d-same-job-0bb5-eighth-window-20261110",
+      "scope": "Sameoriginalsixpoint16parity/retainedreceiverIOcost only; no48/292/586/full30 or extra independent clip.",
+      "raw_spec_sha256": "cdba80c26f1227a9c0f06fdb365f5bee2741842cf275e2dcd133c6435b55e0c3",
+      "client_revision": "revieweddoctorhelper420c78a3descendant;sourceworktree0bbunchanged",
+      "wait_state": "solecanonicalwaitfailedSSH/RPC;no replacementwait;onefinaldeadlinecanonicalmetadata batchplanned19:48:10UTC",
+      "accounting_hold": "KeepfullfutureGPU/CPUmaximuminsideexistingremainingreservation;noterminalcharge/noinferenceofzeroGPU"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -4433,10 +4522,11 @@
     "Rootnativeproofaccountingamendment20261106: original220CPUleafprospectiveforecastwasnotprovencompletebecausemanager/publicationpostcampaignnotmetered. Wholeone-core120.698wallupper\u2192130CPU+30audit revisesleaf250CPU including90prior, allinsideunchangedballtranche/programme/workstream. No newGPU/computation oruserceilingincrease."
   ],
   "monitoring": {
-    "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "Ballef018existingsolewaitdeadline18:55:14+sweep;W8e797closed0G150C;next500G550Cprospectivereleaseonly",
+    "mode": "bothsolewaitsendedcommunicationfailure;onefinalexisting-jobdeadlinebatch",
+    "state": "W84c24unknown/Ball4d0dunknown;no new submissions; one finalcanonicalmetadata batch19:48:10UTC withfixedclient. No recurringtimer or job replay.",
     "jobs": [
-      "20261110T181703Z-f018d258"
+      "20261110T190907Z-4d0dd928",
+      "20261110T183845Z-4c240783"
     ],
     "batches": [],
     "native_completion_resume_verified": false,
