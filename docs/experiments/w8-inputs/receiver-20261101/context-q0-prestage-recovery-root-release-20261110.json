@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "decision": "Release ONE corrected CPU-only cost oracle with immutable source recovery; GPU stays held",
+  "phase": "w8-context-q0-prestage-source-recovery-oracle-20261110",
+  "parent_phase": "w8-full-witness-staged-20261106",
+  "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+  "qualification_charge_kind": "pilot_preparation",
+  "witness_qualification": true,
+  "cpu_ceiling_inclusive": 100,
+  "precharged_full_cpu_seconds": 100,
+  "gpu_ceiling": 0,
+  "remote_one_core_CPU_cap": 70,
+  "local_ssh_CPU_cap": 5,
+  "admin_failure_CPU_allocation": 25,
+  "wall_cap": 180,
+  "reviewed_scripts": {
+    "recover.py": "4ddecde59a0db2b3a8910fe330310e796d795b23896c8b995a54edb2680ed167",
+    "probe-v2.py": "ed7f584804caab3859e589fd20ed875b1c14b3dccb24e558f05d406420263113"
+  },
+  "local_scripts": "/private/tmp/pointstream-w8-q0-prestage-recovery-proposal-20261110-a1",
+  "scope": "Stat protectedidentities/publicarchive nonalias; verify e303 archiveSHA then safe tarfiledatafilter extraction into NEW exclusive taskownedhostlocaldirectory, preservepartial.20wall recovery, nooverwrite/delete. Rununchangedactualsource_identity+twoverify_inputs costprobe withonlyrecoveredsourcepath changed, sourceidentity1b8 required.65wall pre-stage gate. RecoveryincludedwholeCPU/wallchargebutseparatefromactualprestage timing. No model/native/frame/GPUexecution.",
+  "prior_failure": "a58fc4e9: priorfleettemp sourcetree absent, no cost result; full100charge retained. Thisprospectiveamendmentrepairs prerequisite; notautomaticreplay.",
+  "decision_rule": "1.5guardedactualprestagewall+5<=65 necessaryonly. Completepipelinefit remainsunproved. Any alias/source/hash/claim/limit/timing/nonfinite mismatch stops. FreshoneCPUclaim/affinity/CUDAhidden guardsmandatory; runtime scratch/caches localroot notremote/tmp.",
+  "accounting": "Insideunchanged W8/qualification/programme.250CPUpreparationinclthisfull100; hypothetical550futurewouldmake800CPUqualification, notauthorizingGPU. Final ledger/receipt/spec mustbe rebuilt/reviewedafteractualcostanswer."
+}
