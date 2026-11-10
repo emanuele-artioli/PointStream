@@ -1,0 +1,65 @@
+{
+  "members": {
+    "native-kill-interruption": {
+      "bytes": 309,
+      "sha256": "5db1ae47e5244b5383565e6411f60868cd4064544ce298383a55019c2c7eb62d"
+    },
+    "native-kill-launcher_execution": {
+      "bytes": 243,
+      "sha256": "28f08df72c155a1460d60d077dd19cee719eb13831a513fc185a3de5c0dea0a5"
+    },
+    "native-kill-namespace_started": {
+      "bytes": 382,
+      "sha256": "fd52e3e95d9d669c77e1cbd5a51c1b6ded2958490918dc6c84d91b1f69deba47"
+    },
+    "native-kill-native_handle": {
+      "bytes": 61,
+      "sha256": "846edc5f723cebfeafbba9a81b7ef157b81f776292b7d1bc023998a8a696bfec"
+    },
+    "native-kill-native_handle_committed": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "native-kill-native_handle_ready": {
+      "bytes": 78,
+      "sha256": "2cdf9dcc76b9687e32d4a9d07a2132c912f6b1bd0166eba7a2fcf753b10b5ac4"
+    },
+    "native-kill-teardown": {
+      "bytes": 112,
+      "sha256": "cc5dd35f555ea5fc09d2b6ee710a8cf4759bd4628c2e07092c175d02de61ced3"
+    },
+    "native-timeout-interruption": {
+      "bytes": 312,
+      "sha256": "17b4ae877b9f1ee4d87aefc06d014c032b0cd8108bc608f8c742247c0af7ba62"
+    },
+    "native-timeout-launcher_execution": {
+      "bytes": 239,
+      "sha256": "f62ca5298b416f93fad9e11061b35530048918bd6ee4047be0a946bff322398a"
+    },
+    "native-timeout-namespace_final": {
+      "bytes": 593,
+      "sha256": "38e48b541483a1bdd08c07a7ccacc9be087328c5288df49f9cab6d0c6e22bbd8"
+    },
+    "native-timeout-namespace_started": {
+      "bytes": 382,
+      "sha256": "db10fc2c8cb7f73043c8e8e96834a2762c95e7f484b1b319b726709658436957"
+    },
+    "native-timeout-native_handle": {
+      "bytes": 61,
+      "sha256": "0f357529c8d6af719f3c49130d340acaa04e55b701359deefcd94da3fa5f2320"
+    },
+    "native-timeout-native_handle_committed": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "native-timeout-native_handle_ready": {
+      "bytes": 78,
+      "sha256": "cd1b2393df5253fb7aa754dc7854f722c900231f931621a97cf0231956025248"
+    },
+    "native-timeout-teardown": {
+      "bytes": 112,
+      "sha256": "cc5dd35f555ea5fc09d2b6ee710a8cf4759bd4628c2e07092c175d02de61ced3"
+    }
+  },
+  "scope": "candidate raw receipt index, root review required"
+}

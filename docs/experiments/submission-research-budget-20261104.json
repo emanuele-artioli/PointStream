@@ -1440,6 +1440,16 @@
       "witness_qualification": false,
       "basis": "Entire approved30CPU preparation; root checked17rawartifact hashes and actualspec/stat-first publicsource onbothhosts. Manager aggregateunmeasured; no protectedcontent.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "w8-67bfd-8089-closure-20261110",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 342,
+      "witness_qualification": false,
+      "basis": "110rounded wholecreated-to-terminal104.814onecorewallinclqueue +entire150post+82auditexternalallocations=342future.30prep alreadycharged. Allocation-based coverage, not measuredaggregateCPU. Interrupted local extraction had12s observedwriteinterval but no completeCPUcounter;3.11GBpartial retained. Remoteauditor SSHtimedout withoutstartPID/limitreceipt,actual50CPUlimitinstallation unverified; latercommandpatterninspectionfoundnone,not birth-boundteardown. Successfulremoteexport2.090CPU. No auxiliaryresult used as proof; actualexportedbytes independentlyrevalidated locally.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2023,8 +2033,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 3742,
-      "status": "Remaining_unspent4550GPU3742CPU;67bfdprep30charged; ONE832futureCPUproofreleased; noGPU."
+      "cpu_seconds": 3400,
+      "status": "Remaining_unspent4550GPU3400CPU;8089CPUproofacceptedandclosed342additional/372inclusive; schema2gateapproved; noGPUrelease."
     }
   ],
   "jobs": [
@@ -3331,7 +3341,7 @@
       "job_id": "20261110T001842Z-808952c3",
       "phase": "w8-full-witness-staged-20261106",
       "subphase": "67bfd-atomic-runtime-CPUproof",
-      "state": "submitted pending; sole wait owned by plan_research_audit",
+      "state": "complete; root accepted same-source CPU runtime/atomic/lifecycle proof and schema2 gate only",
       "revision": "67bfdc4aed8dd5d5630d9c81abf6e0afead063e0",
       "source_sha256": "1b8a2cf175f0b9541594628180addff9b204ccf7774a899c420189d9f83b21d8",
       "snapshot_sha256": "e303cd2a796aaf51f8c22f9982b359cfd198cfd127e8b96e92a78f7de94c2a39",
@@ -3348,7 +3358,12 @@
       "audit_CPU_ceiling": 82,
       "family_CPU_cap": 1700,
       "local_batch": "/private/tmp/pointstream-w8-67bfd-proof-20261110-a1",
-      "scope": "Actual new-source atomic lifecycle/CPU-runtime/packet/native/isolation only; no generation controller/CUDA/quality qualification"
+      "scope": "Actual new-source atomic lifecycle/CPU-runtime/packet/native/isolation only; no generation controller/CUDA/quality qualification",
+      "terminal_additional_cpu_charge": 342,
+      "actual_inclusive_conservative_cpu_charge": 372,
+      "wait_state": "ended; terminaleventACK",
+      "approved_gate_sha256": "81d078b1738d977a167f267ecbfaf9eb10cd1874ea1c32d917b01aafb68bdfaa",
+      "generation_controller_or_CUDA_qualified": false
     }
   ],
   "old_budgets": "closed, not borrowed",
