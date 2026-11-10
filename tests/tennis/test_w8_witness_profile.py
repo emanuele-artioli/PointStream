@@ -454,7 +454,7 @@ def test_pilot_builder_phase_and_staging_bind_exact_proof_host(tmp_path: Path, m
         proof_remote='/home/itec/emanuele/Datasets/pointstream-data/tests/cpu-gate.json',
          ledger_local=first_pilot_ledger(tmp_path), ledger_remote='/home/itec/emanuele/Datasets/pointstream-data/tests/ledger.json', admission_local=first_pilot_admission(tmp_path, gate), admission_remote='/home/itec/emanuele/Datasets/pointstream-data/tests/admission.json')
     inbox.validate_spec(spec)
-    assert inbox.phase_command(spec, 'smoke', python='/python') == ['/python', '-m', 'experiments.tennis.w8_witness_job', 'pilot']
+    assert inbox.phase_command(spec, 'smoke', python='/python')[:4] == ['/python', '-m', 'experiments.tennis.w8_witness_job', 'pilot']
     stage = tmp_path / 'job' / 'smoke'
     stage.mkdir(parents=True)
     (stage.parent / 'spec.json').write_text(json.dumps(spec))
@@ -542,6 +542,7 @@ def test_generated_pilot_phase_commands_reach_real_cli_dispatch(tmp_path: Path, 
     import sys
     from experiments.jobs import inbox
     from experiments.tennis import w8_witness_job as job
+    monkeypatch.setattr(job.staged_cli, 'check_cli', lambda *args: None)
 
     proof = tmp_path / 'proof.json'
     proof.write_text(json.dumps({'schema': 2, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64, 'system_leaves_sha256': '7' * 64,
@@ -576,6 +577,7 @@ def test_candidate_spec_requires_qualified_producers_and_separate_readiness(tmp_
     import sys
     from experiments.jobs import inbox
     from experiments.tennis import w8_witness_job as job
+    monkeypatch.setattr(job.staged_cli, 'check_cli', lambda *args: None)
 
     proof = tmp_path / 'proof.json'
     proof.write_text(json.dumps({'schema': 2, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64, 'system_leaves_sha256': '7' * 64,
@@ -613,8 +615,8 @@ def test_candidate_spec_requires_qualified_producers_and_separate_readiness(tmp_
         proof_local=proof, proof_remote=base + 'proof.json', promotion_local=promotion,
         promotion_remote=base + 'promotion.json', ledger_local=ledger, ledger_remote=base + 'ledger.json',
         qualification_artifact_sha='1' * 64, unit1=False)
-    assert inbox.phase_command(spec, 'smoke', python='/python')[-1] == 'readiness'
-    assert inbox.phase_command(spec, 'full', python='/python')[-1] == 'candidate0'
+    assert inbox.phase_command(spec, 'smoke', python='/python')[3] == 'readiness'
+    assert inbox.phase_command(spec, 'full', python='/python')[3] == 'candidate0'
     assert spec['full']['seconds'] == 1300 and spec['witness_gpu_ceiling_seconds'] == 1500
     stage = tmp_path / 'stage'
     stage.mkdir()
@@ -690,6 +692,7 @@ def test_finish_fixed_dispatch_and_cli(qualification: bool, monkeypatch, tmp_pat
     import sys
     from experiments.jobs import inbox
     from experiments.tennis import w8_witness_job as job
+    monkeypatch.setattr(job.staged_cli, 'check_cli', lambda *args: None)
 
     spec: dict[str, Any] = {'deadline': (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat(),
             'w8_witness_profile': 'w8-context-qualification-v1' if qualification else 'w8-full-finish-v1',
@@ -923,6 +926,7 @@ def test_finish_real_spec_staging_and_dispatch(tmp_path: Path, monkeypatch) -> N
         native_inventory_remote=base + 'native', qualification=True)
     inbox.validate_spec(spec)
     stage = tmp_path / 'job' / 'full'
+    monkeypatch.setattr(job.staged_cli, 'check_cli', lambda *args: None)
     stage.mkdir(parents=True)
     rows = []
     digests = {}
