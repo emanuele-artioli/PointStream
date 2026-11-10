@@ -979,6 +979,33 @@ def test_first_pilot_rejects_prior_qualification_and_untagged_charges(tmp_path: 
         check()
 
 
+@pytest.mark.parametrize(('spent', 'accepted'), [(650, True), (950, True), (951, False)])
+def test_first_pilot_cumulative_preparation_cpu_limit(tmp_path: Path, spent: int, accepted: bool) -> None:
+    from experiments.tennis import w8_witness_job as job
+    ledger = json.loads(first_pilot_ledger(tmp_path).read_text())
+    ledger['charges'].append({'parent_phase': 'w8-full-witness-staged-20261106', 'phase': 'prep',
+        'workstream': 'w8', 'gpu_seconds': 0, 'cpu_seconds': spent, 'witness_qualification': True,
+        'qualification_charge_kind': 'pilot_preparation', 'qualification_attempt_nonce': 'a' * 32})
+    receipt = {'schema': 1, 'scope': 'root-reviewed first W8 qualification pilot', 'attempt_nonce': 'a' * 32,
+        'ledger_sha256': 'b' * 64, 'cpu_proof_sha256': 'c' * 64, 'preparation_phases': ['prep'],
+        'gpu_spent_seconds': 0, 'cpu_spent_seconds': spent, 'gpu_ceiling_seconds': 500,
+        'cpu_ceiling_seconds': 550}
+    def check() -> None:
+        job.check_first_pilot_ledger(ledger, receipt, ledger_sha='b' * 64, cpu_proof_sha='c' * 64)
+    if not accepted:
+        with pytest.raises(ValueError, match='cumulative qualification ceiling'):
+            check()
+        return
+    check()
+    ledger['charges'][0]['qualification_attempt_nonce'] = 'd' * 32
+    with pytest.raises(ValueError, match='mixed'):
+        check()
+    ledger['charges'][0]['qualification_attempt_nonce'] = 'a' * 32
+    ledger['charges'][0]['qualification_charge_kind'] = 'pilot_execution'
+    with pytest.raises(ValueError, match='earlier execution'):
+        check()
+
+
 @pytest.mark.parametrize('runtime', ['main', 'jcv'])
 def test_cpu_runtime_attestation_binds_actual_leaf_to_pinned_role(runtime):
     from experiments.tennis import w8_strict_host_cost_job as host
