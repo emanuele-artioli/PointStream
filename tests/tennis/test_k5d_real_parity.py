@@ -104,7 +104,7 @@ def test_parity_builder_passes_real_fleet_validator_and_outer_cli(tmp_path, monk
     with pytest.raises(ValueError, match='mutually exclusive'):
         parity.spec(base, assets=assets, deadline=deadline, unshare_sha256='a' * 64,
                     identity={}, shared_low_memory=True, shared_parent8_child2=True)
-    from experiments.tennis import k5d_first292_source_bridge as scoped
+    from experiments.tennis import k5d_same_job_source_bridge as scoped
     # Synthetic boundary: the actual archive verifier has separate real-archive review.
     monkeypatch.setattr(scoped, 'verify_signed', lambda *_: None)
     pair_assets = dict(assets)
