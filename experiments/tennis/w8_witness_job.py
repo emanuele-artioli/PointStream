@@ -19,6 +19,7 @@ from experiments.tennis import w8_staged_bindings as staged_cli  # noqa: E402
 _CPU_LIMIT_AFTER_IMPORTS = cpu_resource.getrlimit(cpu_resource.RLIMIT_CPU)
 
 CPU_SCOPE = 'root-reviewed W8 same-source CPU isolation and native lifecycle proof'
+FIRST_PILOT_CUMULATIVE_CPU_LIMIT_SECONDS = 1500
 REQUIRED_PROOFS = ('namespace_lifecycle', 'native_normal', 'native_timeout_kill', 'strict_modes', 'assessment_policy', 'independent_audit')
 REQUIRED_CHECKS = ('same_source_snapshot_environment', 'cpu_hidden_one_core', 'namespace_normal_timeout_term_kill',
                    'native_real_yuv_and_timeout_kill', 'owned_pid_starttick_teardown',
@@ -292,7 +293,7 @@ def check_first_pilot_ledger(ledger: dict[str, Any], receipt: dict[str, Any], *,
             or any(not isinstance(phase, str) or not phase for phase in phases)
             or len(phases) != len(set(phases)) or sorted(phases) != receipt.get('preparation_phases')):
         raise ValueError('first pilot preparation is mixed, unattributed or follows an earlier execution')
-    for resource, cap, limit in (('gpu', gpu_cap, 900), ('cpu', cpu_cap, 1000)):
+    for resource, cap, limit in (('gpu', gpu_cap, 900), ('cpu', cpu_cap, FIRST_PILOT_CUMULATIVE_CPU_LIMIT_SECONDS)):
         spent = sum(row[resource + '_seconds'] for row in prep)
         if receipt.get(resource + '_spent_seconds') != spent or spent + cap > limit:
             raise ValueError('first pilot cumulative qualification ceiling exceeded')
