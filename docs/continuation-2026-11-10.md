@@ -203,3 +203,17 @@ Branch `codex/submission-benchmark-2026-11-04` carries reviewed changes after me
 - Old188rateanalysisreport and rootacceptance JSON in k5d-inputs; actualanalysisJSON/script under /Users/manu/.cache/pointstream-evidence/legacy188-rate-analysis-20261110-a1/ SHA01c4d9b5aad822a33aa04e633d376b1e316347d27b941278c9d39e3e466825de. Rootrecalculation in legacy188-rate-root-review-20261110-a1. Read-onlycopiespreserved. Diagnosticrevision2PNG/SVG in analysis/diagnostic-plot/revision2,rootvisuallyaccepted: firstnativepointvisible, helperquality_at is linearLOG-rate andplateaustobudgetmaxrawsupport. Rootinitiallinear-raw assumptioncorrected byactualhelperreview; no numericmethodchange. EarlierfailedmacOSfontimport preserved; budgetamended20to40CPUfamily, extra20precharged. Parent+childfailedlimits8eachseparate, aggregateunmeasured;planning33.283<40includesknownanalysis/render/rootcosts+adminreserve. Newrender0.825CPU/0children, noexternalfontquery. No manuscriptedit.
 - Buildercombined_checks_publish nowONLYordinarylocalimplementation inindependentbranch forfutureversionedrootSHA-bound cumulativequalificationCPUallowance (legacy1500,explicitnewlimitboundedbyexistingworkstream+ledger), same nonce/allcharges/first-noexec/later-no-replay/perjob1000/GPU900/deadline45/sourcehiddenqualityguards. NOnewsourcepackaging/readiness/proof/GPU/limitrelease whileb446pending (wouldaddtrueprep andinvalidateits exact1500 accounting). Primaryreviews/codeintegration/useonlyafterterminaloutcome; newsource stillneedsactualexactCPUproof. Proposal identifies worstproof900+pilot550 leaves356of1806beforecurrentexpiry/futureprep,notfitprooforauthority. No global/workstreamtransfer approved.
 - Client-onlydoctorfix420c78a3/PR355MERGED,allprobe/visibilityfailclosed retained. Fullchecks2100PASS40skip/Ruff/mypy575; laterdocschecks3PASS. PR356latestcheckpointmerge-auto; inspectstateonceonnextpublication. Preserveuntrackedcalibration-controls-spec-20261105.json. Source269CPUproof6b4b acceptedmechanismonly,gateg3761/rawread-onlycachepersist; CUDA/freshgeneration/fullwitnessstillunqualified.
+
+
+## Live queue addition — November 10, 18:20 UTC
+
+The seventh Ball queue is `20261110T181703Z-f018d258`, canonical pending,
+deadline **18:55:14.653945 UTC**, exact original0bb/450d/21cd source/archive.
+Root independently joined local raw spec0f2a4f74 and ready canonical2d57f442,
+then acknowledged its nested1,000GPU/1,200CPU future maximum before ONEwait.
+Output/handles: `/private/tmp/k5d-same-job-0bb5-seventh-window-20261110/`.
+No past charge is deducted again; remainingBall7,920/3,100, W84,550/1,229.
+W8e797 existing wait still governs its18:26:36deadline; next single root
+check **18:28:10 UTC** unless a substantive event arrives first. Ball later
+check **18:56:50 UTC** if unresolved, no duplicate wait or recurring timer.
+No eighth queue, scale or full witness is released.
