@@ -1796,6 +1796,18 @@
       "cpu_seconds": 400,
       "basis": "Sixth corrected-source queue canonically expired unassigned. Root verified all23raw hashes, source/spec/archive joins and absent execution/claims; terminal event acknowledged. Submission, polling, failed gpu2 status and gpu5 audit unmetered: full external400 allocation inclusive, not measured CPU or queue wall.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "w8-aecf-e797-unassigned-expiry-closure-20261110",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 150,
+      "witness_qualification": true,
+      "qualification_charge_kind": "pilot_preparation",
+      "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+      "basis": "Full150externalCPU inclusive of original readiness/submission/queue/audit, aggregate unmeasured. Root canonical status expired; all28raw byte/SHA joins reviewed, exact source/archive/spec, no execution/claims; gpu4owner expiry sweeper, gpu5busyreason, client terminal eventACK. Trueprep1150+150=1300,G0; no retagging/reset.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2379,8 +2391,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 1229,
-      "status": "Remaining_unspent;500GPU/550CPU nested original unit0 schema2 pilot e797; no full-witness release"
+      "cpu_seconds": 1079,
+      "status": "Remaining_unspent;e797unassignedclosed0G150Ctrueprep;oneprospectiveversionedqueuefuture500G550C"
     }
   ],
   "jobs": [
@@ -4332,7 +4344,7 @@
       "job_id": "20261110T174559Z-e797d6bc",
       "phase": "w8-full-witness-staged-20261106",
       "subphase": "aecf-q0-versioned-original24-30-cost-pilot",
-      "state": "pending;rootcentralACKbeforeonecanonicalwait",
+      "state": "expiredunassigned;rootaccepted28rawjoins,eventACK",
       "revision": "aecf9ee21c6a5d0face390c9f0a3b5044112ef36",
       "source_sha256": "c9d56ee3c6e857e3cf92978690b20007645c2c13549469686c700434f2b8ebe6",
       "snapshot_sha256": "f784c0919dc8f223253637684b71636063649831bc32b3ad23534e585322e84a",
@@ -4363,7 +4375,11 @@
       "admission_sha256": "0ef2c81fbe0c1b23c7ecbba94f80e87c544ef02851f116805b928fe199c37098",
       "approved_CPU_gate_sha256": "d55b812ee13662408b404ce2bcc67f5f2effff91a76d6836965edca8d4d44c7e",
       "scope": "ONE original unit0 24-frame/30-step operational cost/provider/isolation pilot; no quality/full-witness/unit1/retry.",
-      "local_batch": "/private/tmp/pointstream-w8-aecf-pilot-20261110-a1"
+      "local_batch": "/private/tmp/pointstream-w8-aecf-pilot-20261110-a1",
+      "terminal_CPU_charge": 150,
+      "terminal_GPU_charge": 0,
+      "qualification_executed": false,
+      "wait_state": "solewaitendedexpired,eventACK,noexecutionclaims"
     },
     {
       "job_id": "20261110T181703Z-f018d258",
@@ -4418,10 +4434,9 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "Ballf018rootACKforonewaitdeadline18:55:14+sweep;W8e797solewaitdeadline18:26:36+sweep",
+    "state": "Ballef018existingsolewaitdeadline18:55:14+sweep;W8e797closed0G150C;next500G550Cprospectivereleaseonly",
     "jobs": [
-      "20261110T181703Z-f018d258",
-      "20261110T174559Z-e797d6bc"
+      "20261110T181703Z-f018d258"
     ],
     "batches": [],
     "native_completion_resume_verified": false,
@@ -4469,6 +4484,24 @@
       "authority": "Userstaged24GPUh/28CPUh programme; root prospectively assigns internal qualification allowance inside unchanged W8workstream/parent. Everypriorcharge/samenonce retained; record SHA identity not cryptographic signature.",
       "stop": "Anyactualearlierexecution/unknownrequest/source/proof/ledger mismatch, insufficientremainingreservation, no currentCPUproof or scientificgatefailure. No automatic fullwitness/modelretry/newtraining.",
       "approval_sha256": "1b34f7add2a4c0c6cc76dd32f9d29d0085db1974536569a5d9b7bc0fabf52407"
+    },
+    {
+      "schema": 1,
+      "scope": "Root-approved cumulative qualification CPU allowance only; next job requires separate release",
+      "status": "approved",
+      "attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+      "cumulative_cpu_ceiling_seconds": 2300,
+      "source_sha256": "c9d56ee3c6e857e3cf92978690b20007645c2c13549469686c700434f2b8ebe6",
+      "snapshot_sha256": "f784c0919dc8f223253637684b71636063649831bc32b3ad23534e585322e84a",
+      "cpu_proof_sha256": "d55b812ee13662408b404ce2bcc67f5f2effff91a76d6836965edca8d4d44c7e",
+      "no_prior_execution_audit_sha256": "d1dbf68aa12db5e8cfcacfe3accc8666bc874d052bc06b20eed69d447c84d528",
+      "qualification_cpu_spent_seconds": 1300,
+      "qualification_gpu_spent_seconds": 0,
+      "remaining_parent_CPU": 1079,
+      "ceiling_bound_basis": "Unchanged2300ceiling revalidated <=1300truequalificationCPU+1079remainingparent=2379 and<=11300workstream; next550fits1079 and1300+5501850<=2300,G0+500<=900. No global/workstream increase/transfer/reset. All prior preparation phases retained.",
+      "authority": "Userstaged24GPUh/28CPUh programme; root prospectively assigns internal qualification allowance inside unchanged W8workstream/parent. Everypriorcharge/samenonce retained; record SHA identity not cryptographic signature.",
+      "stop": "Anyactualearlierexecution/unknownrequest/source/proof/ledger mismatch, insufficientremainingreservation, no currentCPUproof or scientificgatefailure. No automatic fullwitness/modelretry/newtraining.",
+      "approval_sha256": "12ab3f2a9fe465845bac690a69672fe72a5f0d42a3e834a3679977a65193f8e4"
     }
   ]
 }

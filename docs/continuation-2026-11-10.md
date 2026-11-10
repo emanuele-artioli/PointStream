@@ -217,3 +217,28 @@ W8e797 existing wait still governs its18:26:36deadline; next single root
 check **18:28:10 UTC** unless a substantive event arrives first. Ball later
 check **18:56:50 UTC** if unresolved, no duplicate wait or recurring timer.
 No eighth queue, scale or full witness is released.
+
+
+## W8 e797 terminal checkpoint — November 10, 18:36 UTC
+
+Root canonical status and all28 raw size/SHA joins accepted e797 as expired
+unassigned; owner gpu4 was the deadline sweeper. No generation, campaign,
+claim or GPU use. Source/client terminal-expiry event mapping is by job+kind
+(the solewait omitted its client-event timestamp), not a proved timestamp join;
+client event acknowledged. Full150externalCPU charged as true preparation,
+not measured aggregate. Programme charges **19,362GPU/46,971CPU**; Ball remains
+**7,920/3,100**, W8 **4,550/1,079**. Truequalificationprep **1,300CPU/0GPU**,
+original nonce retained. Unchanged2300CPUallowance is revalidated under approval
+`12ab3f2a9fe465845bac690a69672fe72a5f0d42a3e834a3679977a65193f8e4`
+with extended noexecutionaudit `d1dbf68aa12db5e8cfcacfe3accc8666bc874d052bc06b20eed69d447c84d528`.
+
+Root releases ONE next unchanged aecf original24/30 cost queue, future500GPU/
+550CPU, inside currentW8remaining; no source change/newproof/quality/fullwitness.
+Use `aecf-q0-versioned-next-root-pilot-release-20261110.json`; new gate/ledger/
+admission files and freshsource+twoverify passes/alloriginal metadata guards
+are mandatory. After maximum550,529CPU would remain; fullwitnessfit unknown.
+No actualID yet. Ballf018 existing solewait session28627/PID15495/output
+`/private/tmp/k5d-same-job-0bb5-seventh-window-20261110/wait.json`, deadline
+18:55:14.653945 UTC; root single nextcheck18:56:50 unless a substantive event.
+No eighthBallqueue/scale or furtherW8queue automaticauthority. PR358 merged,
+CIchecksSUCCESS; latest accounting checkpoint will be published separately.
