@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "decision": "Root releases ONE new0bb5same-job-receiver exclusive16GPUparity/costpilot",
+  "local_spec": "/private/tmp/k5d-same-job-0bb5-exclusive16-preparation-20261110/actual-spec/spec.json",
+  "raw_spec_sha256": "c6dd2ffe89a7d1c6baf638f1759eb8768baf6bd7afea7202a091297d48097585",
+  "canonical_spec_digest": "25f4fbe509fa1f431fe9250e9c04c9a1be359743fa1cbba72afe8ea9b3cc0ed9",
+  "deadline": "2026-11-10T13:38:57.226322+00:00",
+  "deadline_refresh": "ForUNSUBMITTEDrequestonly, freshdeadline<=43minfromfinalizationmayberegeneratedwithoutanapprovalroundifALLotherfields/inputSHAs/source/settings/capsunchanged; preserveeachversion/recordactualhashesbeforepublish. Neverreplayunknownsubmission.",
+  "revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
+  "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
+  "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+  "source_archive_required": true,
+  "native_CPU_gate_sha256": "9445895e80c29d26c305134a3551347a2b4393a07d3985599768edf937ecb687",
+  "source_bridge_sha256": "b052efdf6cdaea51bc9f19ac141b3c56cf4caec96c3e9f9ae25d6df37d965782",
+  "hosts": [
+    "gpu2",
+    "gpu3"
+  ],
+  "GPU_models": [
+    "RTX A6000"
+  ],
+  "GPU_sharing": {
+    "mode": "exclusive"
+  },
+  "contention": {
+    "policy": "stop",
+    "resume_attempts": 0
+  },
+  "GPU_memory_mib": 16000,
+  "local_storage_gib": 32,
+  "scope": "Originalsixsettings/16fullresolutionframes/native/wire/receiver-pixel/fullmetric/judge-array equality toacceptedA6000D8reference. Newprepare retainsactualsamejobpacketreceiveroutputs; coalescedscoreverifies/usesonlysavedreceiverpixels, no laternative/DCVCdecode. Extra0.398GBrawretention mustbeactuallypublished/audited; alloldnumericalloops/sourcefit/PSNRguards unchanged.",
+  "caps": {
+    "GPU_inclusive": 1000,
+    "CPU_inclusive": 1200,
+    "preparation_alreadycharged": 30,
+    "future_CPU": 1170,
+    "campaign": 800,
+    "namespace": 580,
+    "smoke": 600,
+    "validator": 30,
+    "noop": 5,
+    "GPU_post": 200,
+    "external_CPU_after_preparation": 370
+  },
+  "conditional_forecast": {
+    "legacy_shared316_386_times1_5": 474.5791103839874,
+    "known_staging_once_margin": 183.214341,
+    "validator": 30,
+    "noop": 5,
+    "newsource_bridge_allowance": 50,
+    "subtotal": 742.7934513839874,
+    "additional_retention_IO_and_error_max_allowance": 57.2065486160126,
+    "namespace_legacy_conditional_allowance_remaining": 105.4208896160126,
+    "caveat": "Planningmodelusescontaminatedhistoricaltiming+assumptions;IOallowance NOTmeasured. Thisboundedpilot testswhetherrealnewpathfits; no fullstudyfitclaimed."
+  },
+  "root_review": "Staticroot+independentall1386Gitblobs+exactH2bridge5patches1343unchanged; combinedRuff/mypy574/pytest2088pass40skip. Actualnewsource4caseCPUproofaccepted. Oldreal16publishedreceiptmetadataresourceID/nativebytes/geometrycheckedagainstnewretainercontract.",
+  "stops": "Anyactualsourcearchivefallback/hash/source/claim/receipt/contamination/numericparity/nonfinite/time/memory/budget/deadline mismatch stopswithartifacts. No automaticretry/relaxedquality;busyGPUspermittedforqueueonly,workerexclusiveadmissionmandatory. Onlytask-ownedcleanup.",
+  "scale_hold": "No48/292/586/full30release. Actual16/48parity+publishedbytes/staging/CPU/GPUlifecycle/space mustsupportnewcompleteforecast. Known586localfloors39/37GiBbeforeotherfiles+50GiBreserve;32GiBnotlargefit. Legacyothercrossjobsplitsstillhelduntilcorrectmodeadmitted.",
+  "monitoring": "Submitonce actualsourcearchive450d/source21cd;logID/source/spec/deadline/budget/output thenrootcentralACKbeforeONEcanonicalwait<=2700. Callback/cachelifetimeunknown,no recurringpoll/timer."
+}

@@ -1,0 +1,95 @@
+{
+  "accounting": "30 CPU seconds precharged in full; 0 GPU",
+  "bridge_sha256": "b052efdf6cdaea51bc9f19ac141b3c56cf4caec96c3e9f9ae25d6df37d965782",
+  "cost_worksheet": "docs/experiments/k5d-inputs/same-job-0bb5-exclusive16-cost-worksheet-20261110.md",
+  "gate_remote": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-same-job-0bb5-d201-gate-20261110/gate.json",
+  "gate_sha256": "9445895e80c29d26c305134a3551347a2b4393a07d3985599768edf937ecb687",
+  "gpu_occupancy": "Both gpu2 A6000 and the gpu3 A6000 each reported one foreign compute process; exclusive admission requires waiting; no process touched",
+  "known_jobs": "one pending job 20261110T123904Z-0e193d36 without assigned host at snapshot; refresh before publication",
+  "limitation": "Prospective separate root release required for ONE GPU job; no 48, 292, 586 or full-study admission",
+  "normalized_path": "/private/tmp/k5d-same-job-0bb5-exclusive16-preparation-20261110/actual-spec/normalized.json",
+  "raw": {
+    "bridge-sha.txt": {
+      "bytes": 176,
+      "path": "/private/tmp/k5d-same-job-0bb5-exclusive16-preparation-20261110/bridge-sha.txt",
+      "sha256": "b1cef1661b9d893d594f86450e2c0ea99e50d33e14d5a9aa539281575d49e8ea"
+    },
+    "build-result.json": {
+      "bytes": 682,
+      "path": "/private/tmp/k5d-same-job-0bb5-exclusive16-preparation-20261110/build-result.json",
+      "sha256": "374e9a1e8320735c1cc378a9f1f1c1ac929490a1d68c34db2afc711505907502"
+    },
+    "build.py": {
+      "bytes": 3619,
+      "path": "/private/tmp/k5d-same-job-0bb5-exclusive16-preparation-20261110/build.py",
+      "sha256": "6d647c740961ad9ed114e256e9fec2603bc799444abb356c305a270bc35cb13d"
+    },
+    "doctor.json": {
+      "bytes": 5376,
+      "path": "/private/tmp/k5d-same-job-0bb5-exclusive16-preparation-20261110/doctor.json",
+      "sha256": "a94ddfdf2a9c14483077cb2e1137c05110e674a84e02249b0b7c9fc0a1b55946"
+    },
+    "gate-upload.txt": {
+      "bytes": 70,
+      "path": "/private/tmp/k5d-same-job-0bb5-exclusive16-preparation-20261110/gate-upload.txt",
+      "sha256": "5c8c777dbd5d82e6d79c05b35b6cf4b760d0960735939876af74bf52a20fb982"
+    },
+    "gpu2-assets.json": {
+      "bytes": 5957,
+      "path": "/private/tmp/k5d-same-job-0bb5-exclusive16-preparation-20261110/gpu2-assets.json",
+      "sha256": "890ca61ca1eba4dab743cf07443e74cb913babd6be30e4ba207edec487bedc68"
+    },
+    "gpu2.json": {
+      "bytes": 1891,
+      "path": "/private/tmp/k5d-same-job-0bb5-exclusive16-preparation-20261110/gpu2.json",
+      "sha256": "211c3260e6474ce32473bbd3e17a9f177540e43f4cd0c54be3c6db523154f1a5"
+    },
+    "gpu3-assets.json": {
+      "bytes": 5603,
+      "path": "/private/tmp/k5d-same-job-0bb5-exclusive16-preparation-20261110/gpu3-assets.json",
+      "sha256": "48ce454480c2ff240fb7dbe70fdddad858ff3cbcc839ab63b05af0323fffce0d"
+    },
+    "gpu3.json": {
+      "bytes": 1607,
+      "path": "/private/tmp/k5d-same-job-0bb5-exclusive16-preparation-20261110/gpu3.json",
+      "sha256": "f828ae0ddf4bc797807edaa3e907c48393b2495044fa48ea238b3dabfea978ea"
+    },
+    "host-readiness.py": {
+      "bytes": 5123,
+      "path": "/private/tmp/k5d-same-job-0bb5-exclusive16-preparation-20261110/host-readiness.py",
+      "sha256": "5c04070ee2e7268837654feb7fafed9cdb6caf8adb844d9835ccb39ebad2ad02"
+    },
+    "status.json": {
+      "bytes": 5187008,
+      "path": "/private/tmp/k5d-same-job-0bb5-exclusive16-preparation-20261110/status.json",
+      "sha256": "a4e6521b9ff1a87625f1aa52f7d6ca7fb41b12ec7ef06c891b28d408c2b5105a"
+    },
+    "workers.json": {
+      "bytes": 1621,
+      "path": "/private/tmp/k5d-same-job-0bb5-exclusive16-preparation-20261110/workers.json",
+      "sha256": "d78be9625ee44975c593415e7f3f6f9aba4eda54fc851caffe8c4b2cc5cecfd1"
+    }
+  },
+  "readiness": "gpu2 and gpu3 doctor passed, archive mode workers fresh, CPU claim books empty and tools/unshare hashes match; source archive readback SHA and CPU gate SHA match on both hosts; all staged-input paths exist; large environment and inputs checked by metadata, not freshly hashed; separate local filesystems have >1.9 TB free",
+  "schema": 1,
+  "scope": "readiness and local spec generation only; no GPU or model inference, no job",
+  "source_identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+    "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db"
+  },
+  "source_revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
+  "spec": {
+    "deadline": "2026-11-10T13:38:57.226322+00:00",
+    "logical_sha256": "6a6260b5c6d68fe4152656964e0edda14c166e929e9ac7b535b8f840aa11a822",
+    "normalized_file_sha256": "caa1799f3769af6faab67b0bac2f5c3fe81f4565a192c604720dea57259950db",
+    "normalized_logical_sha256": "25f4fbe509fa1f431fe9250e9c04c9a1be359743fa1cbba72afe8ea9b3cc0ed9",
+    "path": "/private/tmp/k5d-same-job-0bb5-exclusive16-preparation-20261110/actual-spec/spec.json",
+    "raw_sha256": "c6dd2ffe89a7d1c6baf638f1759eb8768baf6bd7afea7202a091297d48097585",
+    "source": {
+      "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+      "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db"
+    }
+  }
+}
