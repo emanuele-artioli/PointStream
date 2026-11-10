@@ -2,6 +2,90 @@
 
 Continue the worthwhile, authorized PLAN research before manuscript or PRESLEY work. Do not submit the paper, train models, use paid API fallback, or revive the legacy 200-GPU-hour study. The user prefers bounded fleet queues. Before any action after interruption, read the experiment entry and canonical status for the recorded job; never replay an unknown or failed submission. Earlier bounded queues expired unassigned; the latest two live queues are identified in the final checkpoint below; no 292/586 study or full W8 GPU witness is released at this checkpoint. Source-footage rights and coauthor review remain open. The authoritative ledger is [submission-research-budget-20261104.json](experiments/submission-research-budget-20261104.json); root owns accounting and admission.
 
+## Authoritative live checkpoint — November 10, 17:55 UTC
+
+The current ledger charges are **19,362 GPU / 46,421 workload CPU seconds**,
+inside **86,400 GPU / 100,800 CPU seconds**. Remaining-unspent child reservations
+are Ball **7,920 GPU / 3,500 CPU**, W8 **4,550 GPU / 1,229 CPU**. Job maxima
+below are nested in those balances, not new reservations; reduce a parent when
+charging actual work, never subtract old charges twice. No workstream transfer,
+training, new user allocation or full-witness release is authorized.
+
+Two jobs have existing sole canonical waits. Before any action, re-read their
+IDs from the experiment entry and run canonical status; never resubmit them.
+
+| Job | Frozen source and scope | Deadline UTC | Future maximum and wait |
+|---|---|---|---|
+| Ball `20261110T172134Z-f311cadf` | `0bb51211475d091e53d413b7cc491f7c9266ff2b`; original six-point 16-frame same-job retained receiver parity/I/O cost only, exclusive gpu2/gpu3 A6000 | 18:00:30.192710 | 1,000 GPU / 1,200 CPU, including 400 external CPU; sole wait 2,250 s, session 10386/PID 4855, `/private/tmp/k5d-same-job-0bb5-sixth-window-20261110/wait.json` |
+| W8 `20261110T174559Z-e797d6bc` | `aecf9ee21c6a5d0face390c9f0a3b5044112ef36`; original unit0 24-frame/30-step operational cost/provider/isolation pilot only, exclusive gpu5 RTX 6000 Ada | 18:26:36.123950 | 500 GPU / 550 CPU, including 150 external CPU; sole wait 2,500 s, session 89539, `/private/tmp/pointstream-w8-aecf-pilot-20261110-a1/wait.json` |
+
+Root central W8 ACK is `afcd1ab9`; its journal records the exact raw/canonical,
+admission, ledger and source/archive hashes. W8 campaign/smoke/validator/noop
+caps are 400/335/60/5 seconds; generator 210 CPU / 240 wall. Conditional forecast
+378.394 < 400 is not a measured bound. Ball campaign/namespace/smoke/validator
+caps are 800/580/600/30; local storage 32 GiB. No seventh Ball queue, 48/292/586,
+full-30, W8 unit1/full240/80/quality or automatic further retry is released.
+
+Native completion-triggered model resume and cache TTL remain unknown. Do not
+create another wait or recurring model poll. Root's one input-interruptible
+check is targeted at **18:02:05 UTC**, the first deadline plus sweep; inspect
+the existing wait handle/output and canonical job at that meaningful checkpoint.
+After terminal handling, use at most one next deadline check for W8, no later
+than **18:28:10 UTC**. Preserve handles if they are agent-local.
+
+### Accepted W8 source mechanism and explicit internal allowance
+
+Actual CPU job `20261110T172634Z-0afe4e35` completed and was independently
+accepted: exact source `aecf9ee2`, source SHA `c9d56ee3c6e857e3cf92978690b20007645c2c13549469686c700434f2b8ebe6`,
+archive `f784c0919dc8f223253637684b71636063649831bc32b3ad23534e585322e84a`,
+root gate `d55b812ee13662408b404ce2bcc67f5f2effff91a76d6836965edca8d4d44c7e`.
+All 68 raw entries, packet/arrays, four lifecycle cases, actual isolated native
+checks, 20 leaf births/groups plus two parents and claims joined. Charge is
+377 future CPU, 427 inclusive of earlier 50 preparation, zero GPU. Aggregate
+CPU and per-descendant affinity were not measured; the reviewed trusted Linux
+inheritance/no-Python-widening/native-thread-one assumption remains explicit.
+This is CPU mechanism evidence; generation controller and CUDA were not run.
+
+Root prospectively approved schema-2 cumulative qualification CPU **2,300 s**
+inside the unchanged W8 workstream and parent: true previous preparation
+**1,150 s**, same nonce `22578404a2dc13eb5c71431ee0593d1a`, next 550 fits 1,229,
+and 2,300 <= 1,150 + 1,229. Approval identity `1b34f7add2a4c0c6cc76dd32f9d29d0085db1974536569a5d9b7bc0fabf52407`
+and no-prior-original-24/30-execution audit `9f9098094748a30a148e78ed22df7b4684eccac40f2d03428d3fe5fcec61ffa8`
+are SHA references in the pinned ledger, not cryptographic signatures. All old
+charges and original attempt identities are retained. The real historical
+one-/three-step model run is separately retained; do not claim no prior model use.
+Schema1's legacy 1,500 limit, per-job CPU 1,000, cumulative GPU 900, source-hidden
+quality rules and 45-minute recovery limit remain unchanged. Frozen final source
+checks: Ruff and mypy pass, pytest **2,106 passed / 40 skipped**.
+
+Durable read-only CPU raw/root audit copy:
+`/Users/manu/.cache/pointstream-evidence/w8-aecf-0afe-raw-root-audit-20261110-a1/`;
+source/package copy:
+`/Users/manu/.cache/pointstream-evidence/w8-aecf-versioned-source-20261110-a1/`.
+Each has a size/SHA manifest; canonical remote job evidence is preserved.
+
+### Research decisions still open
+
+Ball corrected16 execution, retained I/O/performance qualification and separate
+48/292/586/full30 admissions remain unproved. Existing accepted historical188
+rate analysis is useful but one calibration-exposed all-visible clip, no new
+independent clip/full30 credit. Its full-frame BD-rate costs +4.017% PSNR,
++2.520% LPIPS and +3.344% DISTS accompany crop LPIPS -76.925% and crop DISTS
+-48.454%; crop-LPIPS overlap is narrow (0.0238). Source-negative 10/197 judge
+calibration failure remains. Report, raw/source joins, root recomputation and
+visually checked diagnostic are linked from the Ball journal; no new inference
+or manuscript change produced these descriptive results.
+
+W8 needs the actual uncontended pilot, then a complete remaining-witness forecast
+inside its remaining CPU and original scientific rules. A pilot pass alone is
+not a full receiver or quality claim. Other PLAN negative/scoped/deferred
+research decisions remain in `experiments/remaining-plan-research-20261105.md`;
+read-only re-audit is in progress, no reopened computation. PRESLEY and the
+PointStream manuscript remain untouched. Coauthor review, footage rights and
+submission authorization are still separate human prerequisites.
+
+## Historical checkpoints — superseded by the live checkpoint above
+
 ## Current decisions and budget
 
 The approved programme ceiling is **86,400 GPU / 100,800 workload-CPU seconds** (24/28 hours). At the current ledger checkpoint, conservative charges total **19,362 GPU / 45,444 CPU seconds**. The Ball first-tranche reservation has **7,920 GPU / 3,900 CPU** remaining; W8's separate staged-witness reservation has **4,550 GPU / 1,806 CPU** remaining. Future job charges are not included. These are remaining-unspent child reservations inside the existing programme/workstream limits, not extra allocations; do not subtract past charges twice. Root must reconcile later jobs and other active reservations against the current ledger before any release. Do not request further user budget until a concrete measured remaining schedule exists.

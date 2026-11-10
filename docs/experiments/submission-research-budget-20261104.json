@@ -2306,7 +2306,7 @@
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 7920,
       "cpu_seconds": 3500,
-      "status": "Remaining_unspent;alllatestGPUqueuesexpiredunassigned;newsourceoradmissionprepseparatelygated"
+      "status": "Remaining_unspent;1000GPU/1200CPU nested sixth f311 queue;no scale release"
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",

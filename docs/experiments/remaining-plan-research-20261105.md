@@ -78,3 +78,22 @@ namespace/native proof remain mandatory. No new W8 job or remote upload has
 been released yet. Software checks on b5661eaa passed2,001tests/39skips, Ruff
 and mypy, but are superseded for final-source admission by subsequent patches.
 The paper and PRESLEY remain untouched.
+
+
+## Independent read-only re-audit — November 10, 17:56 UTC
+
+The parallel builder re-read PLAN, this inventory and the current ledger.
+Root accepts its recommendation: no additional admitted experiment has an
+available prerequisite, a clear paper decision and independence from the
+corrected Ball16 or original W8 24/30 cost gates. Preserve both bounded queues
+and audit their outcomes before implementing the historical188 reuse adapter
+or releasing scale. The accepted saved188 rate analysis and diagnostic already
+extract the useful information available without those gates.
+
+W11 remains prerequisite-deferred for new independently annotated, exactly
+frame-linked racket pixels. A narrower paid-mask idea would likewise need a
+distinct independently selected small-foreground window with real paid masks,
+then a new decision and forecast; do not silently select a favorable pooled
+failure subset. Neither prerequisite is currently evidenced. No repeat search,
+inference, fleet job, manuscript edit or new claim was run for this audit.
+This re-audit does not turn incomplete measurements into completed PLAN items.
