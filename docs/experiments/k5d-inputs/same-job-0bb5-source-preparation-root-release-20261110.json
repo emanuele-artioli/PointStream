@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "decision": "Root releases new-source preparation only; no CPU job or GPU",
+  "phase": "k5d-same-job-0bb5-source-preparation-20261110",
+  "parent_phase": "k5d-scale-first-tranche-20261105",
+  "revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
+  "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
+  "archive_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+  "local_archive": "/private/tmp/k5d-same-job-receiver-review-0bb5-20261110/consumer-source.tar",
+  "source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/k5d-same-job-0bb5-20261110/source.tar",
+  "approved_bridge_sha256": "b052efdf6cdaea51bc9f19ac141b3c56cf4caec96c3e9f9ae25d6df37d965782",
+  "approved_bridge": "docs/experiments/k5d-inputs/same-job-0bb5-root-approved-source-bridge-20261110.json",
+  "CPU_ceiling_inclusive": 50,
+  "precharged_full_CPU_seconds": 50,
+  "GPU_ceiling": 0,
+  "prospective_native_CPU_family": {
+    "total": 300,
+    "preparation": 50,
+    "future": 250,
+    "campaign": 100,
+    "postcampaign": 100,
+    "audit": 30,
+    "contingency": 20
+  },
+  "scope": "Freshallknownjobs/eligiblehostsdoctor/workers andgpu2/gpu3CPU0/claims/space/runtime/unshare/native-tool/cache/public-inputmetadata (reuseexactfreshreportsallowed). Verifynewsourcearchiveandapprovedbridge, uploadonce tonewpathsnooverwrite, freshSHA. RecoveractualexistingH2/D8 read-onlyifneedednobulkNFSmodelreads. BuildsamefourcaseactualnativeCPUoracle specwithnewsource,MAIN32e,CPU0gp2initial,onecore/100campaign70smoke10validator5noop/source_archive:true, fresh<=45mindeadlineatfinalization. Returnexactspecforrootreview beforeanyCPUjob. No model/native/GPUinference underprep.",
+  "stops": "Anyclaim/source/tool/input/runtime/space/deadline/capability mismatch stops. Actualcanonicalreceipt MUSTsource_archive:true/archive450d/source21cd;no silentNFSextractionfallback. OldFFE/7e1fprooftypedgatenotvalidforthissource.",
+  "scale_hold": "16/48originalarray/wireparity and real7.27GB292/14.58GB586 transfer/publication/staging/hash/disk+CPU/GPUcostmustbequalifiedbefore292/586/full30. No previous3350/32GiBfitclaim. Newmodeforcedonlyfirst292/firstpairGPU16; otherlegacysplitpaths remainunreleasedunlessprotocol-correctmodeexplicitlyadmitted."
+}

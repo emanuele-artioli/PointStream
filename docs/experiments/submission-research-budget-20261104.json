@@ -1566,6 +1566,15 @@
       "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
       "basis": "Prospectivelyprechargedfull50CPU new174readiness+actualprestagecostoracle,existing250CPUqualprepsretained,300trueprepnow. GPUheld; future500GPU600CPUprospectiveonly.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "k5d-same-job-0bb5-source-preparation-20261110",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "basis": "Prospectivelyprechargedfull50CPU source/readiness only, new0bb5same-jobretainedreceiver. Staticbridgeactualarchivesverified; noCPU/GPUjobreleased.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2084,8 +2093,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 7920,
-      "cpu_seconds": 5940,
-      "status": "Remaining_unspent;9c83expiryclosed400CPUincl;currentFFE292splitHELDfordecoderprotocolrepair"
+      "cpu_seconds": 5890,
+      "status": "Remaining_unspent;new0bb5sourceprep50precharged;292splitHELDpendingnewactualqual/storage/cost"
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
