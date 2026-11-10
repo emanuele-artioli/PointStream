@@ -1674,6 +1674,16 @@
       "cpu_seconds": 400,
       "basis": "Entire400externalCPUinclfreshmetadata/admin/queue/auditconservativelyallocated;notmeasuredaggregate,queuewallnotCPU. CanonicalEXPIREDunassigned/nomodel/noattempt/gate/claims;actualarchive450d/source21cd/spec9f005,allrawSHArootjoined. EventACK4f9a38701bd3513a8a55dd04fdf9f884.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "w8-26905-6b4b-cpu-proof-closeout-20261110",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 302,
+      "witness_qualification": false,
+      "basis": "Ceil70actualcreated-terminal69.8436walloneCPUwithreviewedtrustedinheritance/noPythonwidening/native-thread1 +full150external+82audit=302future;50sourceprepalreadycharged352inclusive. No perchildaffinitysnapshots/exhaustivemeasuredaggregate, explicitassumptionretained. Nottrimmedpastallocations;sourceproofrealruntime/raw/native/teardownrootverified.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2257,8 +2267,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 2408,
-      "status": "Remaining_unspent;0a5eunassignedexpiryclosed0GPU150CPUallocation;furtherpilotheld1000cumulativeguard"
+      "cpu_seconds": 2106,
+      "status": "Remaining_unspent;269exactCPUproofaccepted302future/352inclusiveCPU0GPU;GPUcontextstillprospective"
     }
   ],
   "jobs": [
@@ -3867,7 +3877,7 @@
       "job_id": "20261110T143525Z-6b4be46f",
       "phase": "w8-full-witness-staged-20261106",
       "subphase": "26905-exact-source-CPU-mechanism-proof",
-      "state": "runninggpu5CPU0;rawsmokevalidatorpassed;rootauditpending",
+      "state": "complete;rootacceptedCPUmechanismonly",
       "spec_sha256": "24be3ab72cd90ce2a555513dcc03042a48a9b1a254875b74f48a0d93cd5715d2",
       "raw_spec_sha256": "391a54c8e93760a503841cf1f600ee9d953fb39005781f01a812faa5dbb4fb94",
       "source_archive": true,
@@ -3888,7 +3898,12 @@
       "validator": 50,
       "noop": 5,
       "external_post_admin_CPU": 150,
-      "independent_audit_CPU": 82
+      "independent_audit_CPU": 82,
+      "terminal_CPU_charge": 302,
+      "inclusive_CPU_charge": 352,
+      "terminal_GPU_charge": 0,
+      "approved_gate_sha256": "3761a9429e8f77f7c6b68faa3a2a6a4daad59fc99ba6a410724241dbda37667f",
+      "wait_state": "onecanonicalwaitendedcomplete,eventACK,allleaf+parentPIDs/groups/claimsabsent"
     },
     {
       "job_id": "20261110T143544Z-6e96d868",
@@ -3942,9 +3957,8 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "TwoownedjobscentralACKbeforeonecanonicalwaiteach;CPUproofrootauditpending;Ballpending15:11UTCdeadline. No repeats/recurringchecks.",
+    "state": "Ball6e96solecanonicalwaitdeadline15:11:24+sweep;CPUproof6b4bclosedacceptedmechanismonly. NoactiveW8GPUjob orrepeatpolls.",
     "jobs": [
-      "20261110T143525Z-6b4be46f",
       "20261110T143544Z-6e96d868"
     ],
     "batches": [],
