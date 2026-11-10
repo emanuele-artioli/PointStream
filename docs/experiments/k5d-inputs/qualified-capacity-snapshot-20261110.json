@@ -1,0 +1,139 @@
+{
+  "aggregate_budget": "at most 10 CPU seconds allocated including all hosts, 60 seconds wall; per-helper Python CPU is measured but nvidia-smi and SSH CPU are not aggregated",
+  "helper": {
+    "path": "/private/tmp/pointstream-capacity-snapshot-20261110/helper.py",
+    "rlimit_cpu_seconds_per_host": [
+      2,
+      3
+    ],
+    "sha256": "4fade11ca3edbcc7aa0a8cd7384ec81558847933026c7a9312880ec6f4b9b685"
+  },
+  "helper_python_cpu_seconds": 0.262177,
+  "hosts": {
+    "gpu2": {
+      "available": true,
+      "cpu_claim_allocations": 0,
+      "cpu_seconds": 0.057826999999999996,
+      "gpus": [
+        {
+          "compute_pid_count": 2,
+          "free_mib": 8240,
+          "index": 0,
+          "model": "NVIDIA RTX A6000",
+          "total_mib": 49140,
+          "utilization_pct": 97
+        },
+        {
+          "compute_pid_count": 1,
+          "free_mib": 11839,
+          "index": 1,
+          "model": "NVIDIA RTX A6000",
+          "total_mib": 49140,
+          "utilization_pct": 100
+        }
+      ],
+      "host": "gpu2.itec.aau.at",
+      "timestamp_epoch": 1794323963.00746,
+      "worker_admission": {
+        "job_id": "20261110T143544Z-6e96d868",
+        "reason": "No eligible GPU is available: all inspected GPUs are busy, non-idle, or below the memory requirement",
+        "updated": 1794323441.0807486
+      }
+    },
+    "gpu3": {
+      "available": true,
+      "cpu_claim_allocations": 0,
+      "cpu_seconds": 0.119332,
+      "gpus": [
+        {
+          "compute_pid_count": 1,
+          "free_mib": 23183,
+          "index": 0,
+          "model": "NVIDIA RTX A6000",
+          "total_mib": 49140,
+          "utilization_pct": 0
+        }
+      ],
+      "host": "gpu3.itec.aau.at",
+      "timestamp_epoch": 1794323967.0762987,
+      "worker_admission": {
+        "job_id": "20261110T143544Z-6e96d868",
+        "reason": "No eligible GPU is available: all inspected GPUs are busy, non-idle, or below the memory requirement",
+        "updated": 1794323443.5760202
+      }
+    },
+    "gpu5": {
+      "available": true,
+      "cpu_claim_allocations": 0,
+      "cpu_seconds": 0.044229,
+      "gpus": [
+        {
+          "compute_pid_count": 1,
+          "free_mib": 21987,
+          "index": 0,
+          "model": "NVIDIA RTX 6000 Ada Generation",
+          "total_mib": 49140,
+          "utilization_pct": 52
+        },
+        {
+          "compute_pid_count": 1,
+          "free_mib": 23657,
+          "index": 1,
+          "model": "NVIDIA RTX 6000 Ada Generation",
+          "total_mib": 49140,
+          "utilization_pct": 57
+        }
+      ],
+      "host": "gpu5.itec.aau.at",
+      "timestamp_epoch": 1794323963.5497825,
+      "worker_admission": {
+        "job_id": "20261110T145240Z-eb925299",
+        "reason": "No eligible GPU is available: all inspected GPUs are busy, non-idle, or below the memory requirement",
+        "updated": 1794323903.9104774
+      }
+    },
+    "gpu6": {
+      "available": true,
+      "cpu_claim_allocations": 0,
+      "cpu_seconds": 0.040789,
+      "gpus": [
+        {
+          "compute_pid_count": 2,
+          "free_mib": 34403,
+          "index": 0,
+          "model": "NVIDIA RTX 6000 Ada Generation",
+          "total_mib": 49140,
+          "utilization_pct": 91
+        },
+        {
+          "compute_pid_count": 2,
+          "free_mib": 14983,
+          "index": 1,
+          "model": "NVIDIA RTX 6000 Ada Generation",
+          "total_mib": 49140,
+          "utilization_pct": 100
+        }
+      ],
+      "host": "gpu6.itec.aau.at",
+      "timestamp_epoch": 1794323963.3743503,
+      "worker_admission": {
+        "job_id": "20261105T025257Z-f893c63e",
+        "reason": "No eligible GPU is available: gpu6: CPU allowance exceeds 90% of current headroom",
+        "updated": 1793847291.5485928
+      }
+    }
+  },
+  "limitations": "Compute PID counts are all compute processes; ownership is not independently verified. Zero utilization does not prove exclusive idle while a compute PID exists. Worker admission is a last recorded reason and may be stale. No host class or job eligibility changed.",
+  "raw_sha256": {
+    "/private/tmp/pointstream-capacity-snapshot-20261110/gpu2.json": "4cc4be33744d008ecc3fa9df4e2847d0632b7f8cb31f6fb6d662dd9ccecf3ba4",
+    "/private/tmp/pointstream-capacity-snapshot-20261110/gpu3.json": "2bd7b959ca2d3ea014122b72ea2e41a4344c1c457689deb57b34d8aafea7a5ad",
+    "/private/tmp/pointstream-capacity-snapshot-20261110/gpu5.json": "837bf3aae86ec07723cee03ee3a1c0f6706286e4a04ea55762360fc81c18275a",
+    "/private/tmp/pointstream-capacity-snapshot-20261110/gpu6.json": "34d79f4adf3ade769e9fe13ffcfafb302391f1cbd4eb8ea49b00f5424d053ce7"
+  },
+  "schema": 1,
+  "scope": "one bounded read-only GPU capacity snapshot; no reservation, job, inference, or GPU work",
+  "timestamp_utc_range": [
+    "2026-11-10T15:19:23.007460+00:00",
+    "2026-11-10T15:19:27.076299+00:00"
+  ]
+}

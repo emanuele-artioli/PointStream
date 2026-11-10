@@ -54,7 +54,11 @@ complete. Independent metadata queries overlap, and SSH connections expire
 after120idle seconds. See [health recovery](fleet-health-recovery-2026-10-27.md).
 `doctor` verifies each host's environment,
 cross-host visibility of a fresh token, and exactly one winner of concurrent
-atomic mkdir. It retains its report under `jobs/fleet/checks`; worker startup is
+atomic mkdir. The standard-library token, atomic-claim and report helpers use
+`/usr/bin/python3`, the same local interpreter used by the fleet host probe;
+the configured workload interpreter is still checked and recorded separately.
+A helper failure or timeout does not pass the doctor. It retains its report under
+`jobs/fleet/checks`; worker startup is
 blocked when these checks fail. `workers start` installs a HEAD snapshot once on
 the shared filesystem and starts a detached worker per host. Worker releases
 contain only the manager and its contract dependencies; workload snapshots retain
