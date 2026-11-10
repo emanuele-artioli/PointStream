@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "decision": "Release bounded source/readiness preparation only; no GPU submission",
+  "phase": "k5d-first292-exclusive16-preparation-20261110",
+  "parent_phase": "k5d-scale-first-tranche-20261105",
+  "cpu_ceiling_inclusive": 50,
+  "gpu_ceiling": 0,
+  "precharged_full_cpu_seconds": 50,
+  "native_admission_sha256": "aa8aa24c7bd3439bc5b4973edc16415d5305ac962ec66dc0c58d3454e58fadad",
+  "native_admission_path": "docs/experiments/k5d-inputs/first292-native-7e1f-root-approved-admission-20261110.json",
+  "proposal_sha256": "de0aa5a5342e380afe5d094ffbc349939f4059576eba18e6149d8479b73269e2",
+  "builder_sha256": "ccb1d02902ed76822455649cfe01cfdcb8a1e30b514e1a06ae253f980b7b33c0",
+  "scope": "Fresh allknownjobs/allhostdoctor/workers; gpu2/gpu3 A6000 resource/claim/CPU/runtime/tool/unshare/space/warmcache metadata. Hash exactsmallsource/bridge/nativegate, nooverwrite upload typedgate to unique path. No large rehash outside canonicalstaging, no model/native/frame/GPU inference. Build actual exclusive first_pair_source spec for separate rootreview. No scientific/sourcechanges.",
+  "prospective_pilot_envelope": {
+    "gpu_seconds": 1000,
+    "cpu_seconds_including_this_preparation": 1200,
+    "future_cpu_after_precharge": 1150,
+    "campaign_wall": 800,
+    "gpu_post": 200,
+    "remaining_external_cpu_after_preparation": 350
+  },
+  "stops": "Unknown submissions inspectedneverreplayed; no foreignprocesssignals or overwrite. MissingSHAs/tools/space/source/defaultmemorycontract stops. <=45min. No292/586/full30 release."
+}

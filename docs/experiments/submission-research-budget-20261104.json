@@ -1480,6 +1480,15 @@
       "witness_qualification": true,
       "qualification_charge_kind": "pilot_preparation",
       "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a"
+    },
+    {
+      "phase": "k5d-first292-exclusive16-preparation-20261110",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "basis": "Prospectively precharged full50CPU bounded readiness/source preparation; failure retains entirecharge; inside1200CPU firstexclusive16 envelope",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -1998,8 +2007,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 7920,
-      "cpu_seconds": 6340,
-      "status": "Remaining_unspent; nativeCPUclosed; prospectiveGPUcostpilot pending separate rootrelease"
+      "cpu_seconds": 6290,
+      "status": "Remaining_unspent;50CPU exclusive16preparationprecharged; noGPUrelease"
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
