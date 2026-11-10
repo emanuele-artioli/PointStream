@@ -273,6 +273,15 @@ def pair_producer(gate: dict[str, Any]) -> dict[str, Any]:
     return producer
 
 
+def validate_pair_checkpoint_asset(item: dict[str, str], producer: dict[str, Any]) -> None:
+    """Bind both staged archive aliases and the checkpoint to the audited producer."""
+    if (item.get('remote') != producer['remote']
+            or item.get('sha256') != producer['archive_sha256']
+            or item.get('archive_sha256') != producer['archive_sha256']
+            or item.get('checkpoint_sha256') != producer['checkpoint_sha256']):
+        raise ValueError('pair score checkpoint differs from audited producer')
+
+
 def verify_pair_producer_audit(gate: dict[str, Any], path: Path, identity: dict[str, str]) -> None:
     producer = pair_producer(gate)
     audit = study.checked_json(path, producer['audit_sha256'])
@@ -529,6 +538,8 @@ def spec(base: dict[str, Any], *, phase: str, clip: str, identity: dict[str, str
     gate_data = study.checked_json(Path(assets['full_gate']['local']), assets['full_gate']['sha256'])
     full_release = gate_data.get('release') == 'full-study'
     for name, item in assets.items():
+        if name == 'checkpoint' and gate_data.get('release') == PAIR_RELEASE and phase == 'score':
+            validate_pair_checkpoint_asset(item, pair_producer(gate_data))
         if name == 'checkpoint' and item.get('archive_sha256') != item.get('sha256'):
             raise ValueError('checkpoint archive SHA aliases differ')
         if not (full_release and name == 'checkpoint'):
@@ -617,8 +628,7 @@ def spec(base: dict[str, Any], *, phase: str, clip: str, identity: dict[str, str
         item = assets['checkpoint']
         if gate_data['release'] == PAIR_RELEASE:
             producer = pair_producer(gate_data)
-            if any(item.get(key) != producer[key] for key in ('remote', 'archive_sha256', 'checkpoint_sha256')):
-                raise ValueError('pair score checkpoint differs from audited producer')
+            validate_pair_checkpoint_asset(item, producer)
         if full_release:
             producer = cert['targets'][clip]['score']['producer']
             if (item.get('remote') != producer['remote'] or item.get('sha256') != producer['archive_sha256']

@@ -844,3 +844,37 @@ def test_score_rechecks_retained_pair_checkpoint_before_device(tmp_path, monkeyp
     gate_path.write_text('{}')
     with pytest.raises(ValueError, match='checkpoint content'):
         co.score_all(argparse.Namespace(checkpoint=str(root), output=str(tmp_path / 'score')), digest, identity)
+
+
+def test_pair_checkpoint_real_archive_staged_sha_is_audited(tmp_path):
+    import hashlib
+    import io
+    import json
+    import tarfile
+    from experiments.tennis import k5d_encoder
+
+    identity = {'source_sha256': '1' * 64, 'snapshot_sha256': '2' * 64, 'environment_sha256': '3' * 64}
+    manifest = json.dumps({'schema': 1, 'clip': control.PAIR_CLIP, 'frames': 292,
+                           'execution_identity': identity, 'points': [list(p) for p in k5d_encoder.POINTS]}).encode()
+    archive = tmp_path / 'producer.tar'
+    with tarfile.open(archive, 'w') as tar:
+        member = tarfile.TarInfo('publish/checkpoint.json')
+        member.size = len(manifest)
+        tar.addfile(member, io.BytesIO(manifest))
+    archive_sha = hashlib.sha256(archive.read_bytes()).hexdigest()
+    checkpoint_sha = hashlib.sha256(manifest).hexdigest()
+    remote = str(control.cf.DATA_ROOT / 'jobs/real-shaped-synthetic-producer.tar')
+    producer = {'remote': remote, 'archive_sha256': archive_sha, 'checkpoint_sha256': checkpoint_sha}
+    asset = {'local': str(archive), 'remote': remote, 'sha256': archive_sha,
+             'archive_sha256': archive_sha, 'checkpoint_sha256': checkpoint_sha}
+    control.validate_pair_checkpoint_asset(asset, producer)
+    staged = control.study.checkpoint(asset, 'checkpoint', control.PAIR_CLIP, 292, identity)
+    assert staged['sha256'] == archive_sha and staged['path'] == remote and staged['extract'] is True
+    for key, value in [('sha256', '0' * 64), ('archive_sha256', '0' * 64),
+                       ('checkpoint_sha256', '0' * 64), ('remote', remote + '.wrong')]:
+        with pytest.raises(ValueError, match='audited producer'):
+            control.validate_pair_checkpoint_asset({**asset, key: value}, producer)
+    missing = dict(asset)
+    del missing['sha256']
+    with pytest.raises(ValueError, match='audited producer'):
+        control.validate_pair_checkpoint_asset(missing, producer)
