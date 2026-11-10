@@ -4015,7 +4015,16 @@
     "batches": [],
     "native_completion_resume_verified": false,
     "recurring_llm_polling": false,
-    "completed": false
+    "completed": false,
+    "one_shot_deadline_check": {
+      "mode": "one input-interruptible clock.sleep, no recurring timer",
+      "target_UTC": "2026-11-10T15:33:50Z",
+      "purpose": "Inspect existing W8 eb925299 sole wait after deadline+sweep; new Ball candidate is not yet acknowledged",
+      "job_ids": [
+        "20261110T145240Z-eb925299"
+      ],
+      "native_completion_resume_verified": false
+    }
   },
   "approval_history": [
     {
