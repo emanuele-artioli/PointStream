@@ -394,6 +394,8 @@ def check_qualification_subcap(ledger: dict[str, Any], gate: dict[str, Any], *,
         raise ValueError('qualification charge attribution differs from reviewed gate')
     cpu_spent = sum(row['cpu_seconds'] for row in qualified)
     ceiling = qualification_cpu_limit(ledger, gate, spent=cpu_spent, cpu_cap=cpu_cap)
+    if gate.get('schema', 1) == 2 and gpu_cap > promotion_ledger_remaining(ledger)[0]:
+        raise ValueError('qualification GPU cap exceeds approved ledger reservation')
     if gate.get('schema', 1) == 2 and any(
             row.get('qualification_attempt_nonce') != gate['qualification_attempt_nonce'] for row in qualified):
         raise ValueError('qualification allowance nonce differs from ledger')

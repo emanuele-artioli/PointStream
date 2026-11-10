@@ -1143,6 +1143,11 @@ def test_versioned_promotion_subcap_uses_same_nonce_and_approved_ledger(tmp_path
     job.check_qualification_subcap(ledger, gate, gpu_cap=500, cpu_cap=550)
     with pytest.raises(ValueError, match='ceiling exceeded'):
         job.check_qualification_subcap(ledger, gate, gpu_cap=500, cpu_cap=551)
+    limited = copy.deepcopy(ledger)
+    limited['reservations'][0]['gpu_seconds'] = 400
+    with pytest.raises(ValueError, match='GPU cap exceeds approved ledger reservation'):
+        job.check_qualification_subcap(limited, gate, gpu_cap=500, cpu_cap=550)
+    job.check_qualification_subcap(limited, gate, gpu_cap=0, cpu_cap=0)
     bad = copy.deepcopy(ledger)
     bad['charges'][0]['qualification_attempt_nonce'] = 'f' * 32
     with pytest.raises(ValueError, match='nonce differs'):
