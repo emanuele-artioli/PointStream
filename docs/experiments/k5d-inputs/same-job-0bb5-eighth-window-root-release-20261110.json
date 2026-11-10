@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "decision": "Release ONE eighth bounded A6000 queue for never-executed corrected16; user prefers bounded fleet queues",
+  "previous_job": "20261110T181703Z-f018d258",
+  "previous_expiry_audit_sha256": "6d76ed83e2f2bc78e8291abdc9256b589f5fbca7aeecb4868ef36832f0ea2bf8",
+  "previous_GPU": 0,
+  "previous_CPU": 400,
+  "revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
+  "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+  "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
+  "source_archive_required": true,
+  "native_CPU_gate_sha256": "9445895e80c29d26c305134a3551347a2b4393a07d3985599768edf937ecb687",
+  "bridge_sha256": "b052efdf6cdaea51bc9f19ac141b3c56cf4caec96c3e9f9ae25d6df37d965782",
+  "future_caps": {
+    "GPU": 1000,
+    "CPU": 1200,
+    "campaign": 800,
+    "namespace": 580,
+    "smoke": 600,
+    "validator": 30,
+    "noop": 5,
+    "GPU_post": 200,
+    "external_CPU": 400,
+    "final_metadata_within_external_CPU": 10
+  },
+  "family": "Seven prior corrected queues closed0GPU/2800CPU conservatively. Future1200CPU/1000GPU fits CURRENTremainingBall2700CPU/7920GPU; do NOT subtract previouschargesagain. Sharedalternative reviewed and doesnotunlocknewclip/cost evidence underexistingrules, so no new source or gatechange.",
+  "spec_recipe": "Same seventh f018 frozen spec except freshUNSUBMITTEDdeadline<=43min; original0bb/450d/21cd gates9445/b052 and gpu2/gpu3 A6000. Root-reviewedcurrentclient explicit--source-worktree /private/tmp/pointstream-k5d-same-job-receiver preserves source. Preserveversions/rawcanonicalSHAs.",
+  "prepublication": "Freshknownjobs/allfixedeligiblehosts/CPUclaims/sourcegatebridge/toolcache/localSSDspace/publicstat-firstmetadata inside10CPU ofexternal400. FreshCLIrequiredallhostdoctorusesreviewed/locallytestedlocalstdlibPython; allpinnedworkloadenvironment/tool/dataview checksstillmandatory, no bypass/fallback/workerrestart. No redundantstandalonedoctor ifCLIwillperformit. Prior observations established no eligible device, not a prediction of future availability; pendingqueuesstillallowed,exclusiveadmissionrequired. Stopifactualsourcearchive/specchanges. Preserveeverything,noGPUprocessownershipinference/signals.",
+  "forecast": "Unchangedconditionalcampaign742.793+57.207retainedIO/errorallowance=800;actualnewretentioncostunmeasured. Namespace580 separate. No48/292/586/full30,exclusivetimingorcorpusclaim.",
+  "monitoring": "SubmitONCEafteralloriginalfreshmetadata/source/spec/budgetchecks; journalID/SHAs/deadline/caps/output thenROOTcentralACKbeforeONEcanonicalwait<=2700coverdeadline+sweep. Unknownrequestsinspectneverreplay. No ninthqueue/48/292/586/full30/modelretry automaticallyreleased."
+}
