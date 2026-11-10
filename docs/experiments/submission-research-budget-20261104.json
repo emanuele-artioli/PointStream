@@ -1632,6 +1632,15 @@
       "cpu_seconds": 50,
       "basis": "Prospectivelyprecharged50CPU boundedreadonly64MiBlegacy188recovery+audit,noinference/noautomaticcredit.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "k5d-legacy188-label-method-join-20261110",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 30,
+      "basis": "Prospectivelyprecharged30CPU cacheZIPGTjoin+localactualsourcecompatibilityaudit; no inference/autocredit.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2150,7 +2159,7 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 7920,
-      "cpu_seconds": 5170,
+      "cpu_seconds": 5140,
       "status": "Remaining_unspent;389eunassignedexpiryclosed400CPUincl0GPU;onefurtheradmissionwindowprospective"
     },
     {

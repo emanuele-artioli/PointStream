@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "decision": "Release boundedlabel/source-methodcompatibility audit only; no inference orresultpromotion",
+  "phase": "k5d-legacy188-label-method-join-20261110",
+  "parent_phase": "k5d-scale-first-tranche-20261105",
+  "CPU_ceiling_inclusive": 30,
+  "precharged_full_CPU": 30,
+  "GPU": 0,
+  "scope": "HashKNOWNhost-localstaged TrackNetZIP againstbb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18, readonlyCSV/membernames viaoriginalbyte-identicallabelreader; no JPEGdecode/model/codec/nativeGPUorCPUinference. Joinexact188game10Clip3orderedframeIDs/GT label kinds/XY andsourcegeometry tophysicallyrecoveredsavedresult, allrows. Remoteonecore<=15CPU+local/audit<=15CPU,wall<=180s, source/runtime/tool/probeSHA/PIDreceipt preserved; CUDAhidden/freshCPUclaims,ownlocalSSD scratch only, no/tmp orsourceoverwrite. Exporttinylabels/metadata onlynotwhole2.5GBarchive. Ifcachemissing/wrongSHA orneednewunapprovedsourcebody/modelreadstop.",
+  "local_method_audit": "Compareactualoldb26/c212sourcearchive48b51... to0bb5source21cd/450d acrossALLchangedoldcodepaths/reachableencoder-renderer/nativewire/metric/judgemodules+runtime/model/tool/arg/defaults. Oldk5d_encoder28plus6minus cannotbeassumednumericbenign; inspect actualdiff/call/branch equivalence. Permitcode-onlysource recoveryunderownnewdir/exactpinnedarchiveifneeded,neverinferoldsourcefromGitheadalone. No defaultvalues/thresholds/outcomes changed toenablecredit.",
+  "output": "A clearlyscopedcandidate-reuse/sourcefamilycertificate orremaininggaps carryingactualoldjob/source/hardware/resultSHA pluscurrent-methodcompatibility grounds. Olddataidentityneverrewritten;full188countsONCEinthirtyregisteredclipsiffutureanalysisadapterverified. No autoadmission/full30dispatch orconfidence/generalizationupgrade."
+}
