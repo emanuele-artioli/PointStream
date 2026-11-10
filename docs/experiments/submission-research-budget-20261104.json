@@ -3581,6 +3581,38 @@
       "approved_gate_sha256": "e4f770e60fe45ce2eb4e5b717a0edf19ef0141cb4212f5b371c23463059b526e",
       "generation_controller_or_CUDA_qualified": false,
       "wait_state": "ended;eventACK"
+    },
+    {
+      "job_id": "20261110T123904Z-0e193d36",
+      "phase": "w8-full-witness-staged-20261106",
+      "subphase": "174ac-unit0-original24frame30step-costpilot",
+      "state": "submitted pending;solecanonicalwait w8_resume_queue",
+      "revision": "174ac84b84a1f405e06700a34aa4c3e225fa3265",
+      "source_sha256": "4cad9e47ebeb88f1cdb272634921f2aed79100e0e15ace4d01f9a3a33720d9d6",
+      "snapshot_sha256": "5e62a2e912f5dba0cd945d33388b95154d5d8e88ed6cf5b5998e595a323c6fd1",
+      "spec_sha256": "abd6e55920bb2c4ede6ec9cee594c5e8daef5d1cacad45d756e61b7eb69e88ef",
+      "deadline": "2026-11-10T13:12:16.562376Z",
+      "hosts": [
+        "gpu5"
+      ],
+      "gpu_models": [
+        "RTX 6000 Ada"
+      ],
+      "source_archive": true,
+      "future_gpu_ceiling": 500,
+      "future_cpu_ceiling": 600,
+      "qualification_preparation_CPU_alreadycharged": 300,
+      "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+      "campaign_onecore_wall": 450,
+      "generator_wall": 240,
+      "generator_CPU": 260,
+      "external_GPU": 50,
+      "external_CPU": 150,
+      "final_readiness_CPU_inside_external": 10,
+      "local_batch": "/private/tmp/pointstream-w8-resume-final-20261110-a1",
+      "admission_ledger_sha256": "f0d1370afbdf21a4219896bf5a5f7549a5cd6bed2cf48f99d9407a29f361b9ba",
+      "budget_attestation_note": "LaterunrelatedBall50prepchargeoffsetby50Ballreservereduction; W8parentandglobalcharged+reservedunchanged, rootacceptedoriginalpinnedledgercapacity.",
+      "scope": "Firstactualsinglequeued24/30cost+operationalqualification; nofull240/RNGprefix/otherunit/quality. PriorCLIvalidationerrorbeforepublicationpreserved; nootherGPUjobcreated."
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -3602,12 +3634,14 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "Allfleetjobsclosed/audited. Ballprotocolcorrecthandoffbuilderactive;W8newCPUgateaccepted,nextcostreadinesspending;noGPUreleased.",
-    "jobs": [],
+    "state": "ONEcanonicalboundedwait0e193 w8_resume_queue afterrootACK;Ball0bb5sourceprepactive,noGPU/CPUjobyet,no timers/retry.",
+    "jobs": [
+      "20261110T123904Z-0e193d36"
+    ],
     "batches": [],
     "native_completion_resume_verified": false,
     "recurring_llm_polling": false,
-    "completed": true
+    "completed": false
   },
   "approval_history": [
     {
