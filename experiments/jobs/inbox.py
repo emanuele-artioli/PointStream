@@ -1202,10 +1202,12 @@ def doctor(hosts: list[str]) -> dict[str, Any]:
     path = str(Path(base) / "checks" / nonce)
     token = uuid.uuid4().hex
     init = "import pathlib; p=pathlib.Path(" + repr(path) + "); p.mkdir(parents=True); (p/'token').write_text(" + repr(token) + ")"
-    fleet._remote_json(hosts[0], probes[0]["python"], init + "; print('{}')")
+    # The fleet probe already used system Python on each host and recorded the
+    # workload interpreter separately; these filesystem checks need only stdlib.
+    fleet._remote_json(hosts[0], "/usr/bin/python3", init + "; print('{}')")
     script = "import pathlib,json,socket; p=pathlib.Path(" + repr(path) + "); visible=(p/'token').read_text()==" + repr(token) + "; won=False\nif visible:\n try:\n  (p/'claim').mkdir(); won=True\n except FileExistsError: pass\nprint(json.dumps({'visible':visible,'won':won,'host':socket.getfqdn()}))"
     with ThreadPoolExecutor(max_workers=len(hosts)) as pool:
-        futures = {h["alias"]: pool.submit(fleet._remote_json, h["alias"], h["python"], script) for h in probes}
+        futures = {h["alias"]: pool.submit(fleet._remote_json, h["alias"], "/usr/bin/python3", script) for h in probes}
         checks = {}
         for alias, future in futures.items():
             try:
@@ -1214,7 +1216,7 @@ def doctor(hosts: list[str]) -> dict[str, Any]:
                 checks[alias] = {"visible": False, "error": str(exc)}
     passed = all(c.get("visible") for c in checks.values()) and sum(c.get("won", False) for c in checks.values()) == 1
     report = {"passed": passed, "base": base, "probes": probes, "atomic_checks": checks, "checked_at": time.time(), "evidence_path": path}
-    fleet._remote_json(hosts[0], probes[0]["python"], "import pathlib,json; pathlib.Path(" + repr(path + "/report.json") + ").write_text(" + repr(json.dumps(report)) + "); print('{}')")
+    fleet._remote_json(hosts[0], "/usr/bin/python3", "import pathlib,json; pathlib.Path(" + repr(path + "/report.json") + ").write_text(" + repr(json.dumps(report)) + "); print('{}')")
     return report
 
 
