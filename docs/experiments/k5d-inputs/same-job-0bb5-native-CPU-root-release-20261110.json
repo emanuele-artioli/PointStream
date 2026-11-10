@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "decision": "Root releases ONE exact0bb5nativeCPUproof; noGPU",
+  "revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
+  "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
+  "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+  "source_archive_required": true,
+  "local_spec": "/private/tmp/k5d-same-job-0bb5-preparation-20261110/native-spec.json",
+  "raw_spec_sha256": "2b73949dcbfd0fc66886a9828b962e6923b86308c0e63d36ae62b9c09dd28999",
+  "canonical_spec_digest": "3831ddc767f3dd3960e6964cd0e08443b06f6e47e50949041b6512645b854842",
+  "deadline": "2026-11-10T13:15:50.779434+00:00",
+  "hosts": [
+    "gpu2"
+  ],
+  "CPU_affinity_index": 0,
+  "GPU_ceiling": 0,
+  "future_CPU_ceiling": 250,
+  "preparation_CPU_alreadycharged": 50,
+  "inclusive_CPU_cap": 300,
+  "campaign": 100,
+  "postcampaign_CPU": 100,
+  "audit_CPU": 30,
+  "contingency_CPU": 20,
+  "scope": "Actualnewsource four-case native normal/timeout/TERM/KILL, namespace/PIDbirth/subtree/waitedCPU proof only. No numericalGPU/16/48/cost/scale/data-volumeclaim. Newsourcebridgealreadyactualarchiveverified5patches1343unchanged.",
+  "stops": "CanonicalreceiptmustsourcearchiveTRUE/450d/source21cd orstop,noNFSsourcefallback. Anytool/input/source/claim/runtime/budget/deadlinemismatch stopsandpreservesallraw. No automaticretry. ExistingoldFgatecannotqualifynewsource.",
+  "monitoring": "SubmitONCEafterfreshknownjobs/CPUclaimcheck boundedinsidepriorprep/externalallowance; recordID/source/spec/deadline/budget/output beforeONEcanonicalwaitafterrootcentralACK<=45m. No recurringpoll/timer; cacheTTL/completioncallbackunknown."
+}

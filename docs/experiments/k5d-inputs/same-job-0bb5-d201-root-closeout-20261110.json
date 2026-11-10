@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "decision": "Root accepts exactnewsource nativeCPUproof only",
+  "job_id": "20261110T124427Z-d20121f2",
+  "approved_gate_sha256": "9445895e80c29d26c305134a3551347a2b4393a07d3985599768edf937ecb687",
+  "independent_audit_sha256": "c363225a7de428f6689c1afa46061b66ad67c9bd8e4cd24dd7223cc12026544b",
+  "root_checks": [
+    "FreshcanonicalCOMPLETE/source/spec/substantivefourchecks",
+    "All14rawartifactSHA independentlyverified",
+    "Fourreturncodes/normalstream+decodedidentities andindependentCPUcounterdifference",
+    "15births/groups/supervisor/claimabsence perevidencedindependentaudit;TERMneededKILL"
+  ],
+  "additional_CPU_allocation": 250,
+  "preparation_CPU_alreadycharged": 50,
+  "inclusive_CPU_allocation": 300,
+  "GPU": 0,
+  "accounting": "Fullapprovedremaining250retainedallocation,notmeasuredaggregate; lifecycle120.911wallnotconvertedtoaggregateCPU.",
+  "exclusions": [
+    "GPUmemory",
+    "16/48numericparity",
+    "performance",
+    "checkpointvolume/transfer",
+    "292/586/full30"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "decision": "Release newsourceGPU16 readiness/preparation ONLY; noGPUjob",
+  "phase": "k5d-same-job-0bb5-exclusive16-preparation-20261110",
+  "parent_phase": "k5d-scale-first-tranche-20261105",
+  "CPU_ceiling_inclusive": 30,
+  "precharged_full_CPU_seconds": 30,
+  "GPU_ceiling": 0,
+  "source_revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
+  "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
+  "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+  "root_native_CPU_gate": "docs/experiments/k5d-inputs/same-job-0bb5-d201-root-approved-gate-20261110.json",
+  "root_native_CPU_gate_sha256": "9445895e80c29d26c305134a3551347a2b4393a07d3985599768edf937ecb687",
+  "source_bridge_sha256": "b052efdf6cdaea51bc9f19ac141b3c56cf4caec96c3e9f9ae25d6df37d965782",
+  "prospective_GPU16_caps": {
+    "GPU_inclusive": 1000,
+    "CPU_inclusive": 1200,
+    "preparation_alreadycharged": 30,
+    "future_CPU": 1170,
+    "campaign": 800,
+    "GPU_post": 200,
+    "external_CPU_after_preparation": 370
+  },
+  "scope": "Freshknownjobs/eligibleA6000gpu2gpu3metadata/claim/runtime/localdisk/native/unshare/sourcebridge/archiveSHA checks, no model/nativeinference. Bounded<=30CPUincludingtinyO_EXCLsource-nativegateuploaduniqueSHAverification andactualspecbuilderfirst_pair_source=True source0bb5 (samejobreceiverforced). BusyGPUmeanseligiblequeuewait,notpreparationfailure; exclusiveadmission remainsmandatory. Prepareactualspec fromapprovedCPUgate/b052bridge/originalD8/H2assets, preserve6settings/16frames/16000MiB/defaultnonsharedguards/stop-noresume. No Ada or changednumerics.",
+  "deadline_rule": "Materializespecwithfreshdeadline<=43minutesfromfinalization. Rootmayreviewsource/settings/capsrecipewhiledeadlineexpires; routine deadline-only refresh allowed forUNSUBMITTEDspec whenallotherfields/inputSHAsunchanged, preserveeachsupersededfile andrecordfinalraw/canonicalhash/timebeforepublication. No oldjob replay. GPUjobrequiresseparaterootrelease.",
+  "cost_gate": "Conditionaloldshared316.386*1.5+knownstaging183.214+validator30+noop5+source50=742.793under800 beforenewretentionIO. Explicitnew0.4GBcopy/hash/possiblepublicationallowance andwholeruntimefailure/post/auditcoverage needed; actual16willtesthypothesis, notprove292/586. Recordactualpublishedcontents/bulkretentionandI/Opasscounts so16/48volumeforecastnotfaked.",
+  "stops": "Anyidentity/source/claim/runtime/space/budget/receipt mismatch stops. No oldFCPUgate, no automaticretry, no48/292/586/full30admission. Storageworksheet39/37GiB586floorbeforeextrasand50GiBfleetreserve; old32GiBnotlarger-runfit."
+}
