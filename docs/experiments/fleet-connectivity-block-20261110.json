@@ -49,5 +49,63 @@
     }
   ],
   "accounting": "No terminal charge/nozeroGPUinference. Full existing future maxima held inside unchanged remaining reservations. Programme conservativecharges19362G47371C; Ball7920G2700C and W84550G1079C remaining.",
-  "next_action": "On restored fleet access, inspect these exact existing IDs, claims/ownership and uncertain read-only process evidence before ANY further queue or computation. No recurringpolls/keepalives/newwait/timer retained."
+  "next_action": "On restored fleet access, inspect these exact existing IDs, claims/ownership and uncertain read-only process evidence before ANY further queue or computation. No recurringpolls/keepalives/newwait/timer retained.",
+  "remaining_routes_extension": {
+    "schema": 1,
+    "observed_utc": "2026-11-10T19:58:54.177419+00:00",
+    "scope": "Adaptive one-time inspection of the remaining two untested configured management routes; not recurring polling or a new wait/submission",
+    "jobs": [
+      {
+        "label": "W8",
+        "job_id": "20261110T183845Z-4c240783",
+        "management_host_observed_in_error": "gpu4",
+        "local_session": 24716,
+        "local_exit_code": 2,
+        "status_timeout_seconds": 60,
+        "canonical_state_learned": false,
+        "raw": {
+          "stdout": {
+            "path": "/private/tmp/pointstream-final-untested-management-routes-20261110-a1/w8.stdout",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "path": "/private/tmp/pointstream-final-untested-management-routes-20261110-a1/w8.stderr",
+            "bytes": 544,
+            "sha256": "dacb7af1b9b3e724a9c996301fd2643b1b732efa0dd2e683a66ba25f343f0cc8"
+          }
+        }
+      },
+      {
+        "label": "Ball",
+        "job_id": "20261110T190907Z-4d0dd928",
+        "management_host_observed_in_error": "gpu6",
+        "local_session": 13247,
+        "local_exit_code": 2,
+        "status_timeout_seconds": 60,
+        "canonical_state_learned": false,
+        "raw": {
+          "stdout": {
+            "path": "/private/tmp/pointstream-final-untested-management-routes-20261110-a1/ball.stdout",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "path": "/private/tmp/pointstream-final-untested-management-routes-20261110-a1/ball.stderr",
+            "bytes": 544,
+            "sha256": "6815e322f5857a5335dae78e2a8ff6f7936b7d2dff5512ae4ee3ee8a4e8eacfb"
+          }
+        }
+      }
+    ],
+    "result": "Both remaining configured management routes also timedout. Every configured management host gpu1-gpu6 has now had a status/metadata communication failure during this incident; no exact execution or terminal state learned. All unknown jobs and earlier metadata processes remain untouched/unreplayed."
+  },
+  "all_configured_management_routes_observed_failed": [
+    "gpu1",
+    "gpu2",
+    "gpu3",
+    "gpu4",
+    "gpu5",
+    "gpu6"
+  ]
 }

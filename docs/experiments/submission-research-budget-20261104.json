@@ -4523,7 +4523,7 @@
   ],
   "monitoring": {
     "mode": "blocked_external_fleet_connectivity;all_localwaits_and_one-shotchecksended",
-    "state": "Finalfixedclientbatch W84c24viagpu5/Ball4d0dviagpu3 both60stimeout. Execution/expiry unknown; preserve1750CPU/1500GPU futuremaxima nestedinremainingparents. No new submissions/replays/polls/waits/timers until restoredaccess permits actualjob/claim/owner audit.",
+    "state": "All6configuredmanagementroutes failed duringincident; finaladaptivegpu4/gpu6also60stimeout aftergpu5/gpu3finalbatch. W84c24/Ball4d0dexecution/expiryunknown. Preservefuture1750CPU/1500GPU nestedparents. No furtherpoll/wait/timer/admission/replay until restoredaccess permits actualjob/claim/owner audit.",
     "jobs": [
       "20261110T190907Z-4d0dd928",
       "20261110T183845Z-4c240783"

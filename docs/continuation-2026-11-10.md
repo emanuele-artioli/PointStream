@@ -42,7 +42,10 @@ Earlier live and expired checkpoints below are history, not current authority.
   Original localjobrecords/config and shared services are unchanged.
 - **Final canonical batch completed after both deadlines**, fixedCLI and exact
   two actual IDs: W8 via managementgpu5, Ball via managementgpu3, each60s.
-  Both exited2/emptystdout on SSH/RPC timeout; actualhost routing is confirmed
+  Both exited2/emptystdout on SSH/RPC timeout. An adaptive one-time extension
+  tested remaining untried managementgpu4/gpu6, also60s timeout/emptystdout.
+  All six configured management routes have now failed in this incident;
+  actualhost routing is confirmed
   in their stderr, so this is no longer the ignored-override bug. Neither
   execution nor expiry was established. The full receipt is
   `experiments/fleet-connectivity-block-20261110.json`, raw/durable copies at
@@ -356,3 +359,12 @@ originalinboxes/jobrecords remain unchanged. No newqueue/wait/replay/signal.
 Durable read-only uncertainty snapshot (26files/36,088bytes plusmanifest):
 `/Users/manu/.cache/pointstream-evidence/fleet-communication-uncertainty-20261110-a1/`.
 Root softwarefix/sourcefullchecks2127/40passed; PR360 merge-auto enabled.
+
+The one-time final inspection was extended adaptively to the remaining untried
+managementgpu4/gpu6 routes (60s each, exact existingIDs), both also timeout.
+All configuredmanagementroutesgpu1–gpu6 have now failed during this incident.
+No additional poll/wait/replay. Additive raw receipts are preserved in the same
+connectivity record; original completed copies remain read-only, newcopy at
+`/Users/manu/.cache/pointstream-evidence/fleet-final-untested-routes-20261110-a1/`.
+Work remains blocked until fleet access permits inspection; no further action
+is queued locally and programme/parent/child budgets remain unchanged.
