@@ -4104,7 +4104,17 @@
     "batches": [],
     "native_completion_resume_verified": false,
     "recurring_llm_polling": false,
-    "completed": false
+    "completed": false,
+    "one_shot_deadline_check": {
+      "mode": "one input-interruptible clock.sleep, self-expiring; no recurring timer",
+      "target_UTC": "2026-11-10T16:12:40Z",
+      "purpose": "Inspect existing Ball wait at deadline+sweep and existing W8 status/output at meaningful batch checkpoint",
+      "job_ids": [
+        "20261110T153401Z-e6722010",
+        "20261110T154043Z-11179b2a"
+      ],
+      "native_completion_resume_verified": false
+    }
   },
   "approval_history": [
     {
