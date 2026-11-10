@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "decision": "Root releases ONE exact frozen cost/correctness qualification job; bounded exclusive queue; no retry",
+  "scope": "Originalsixsettings16frame first-pair-source numerical/native/metric/judge parity, memory and uncontaminated operational cost",
+  "local_spec": "/private/tmp/k5d-first292-exclusive16-preparation-20261110/actual-spec/spec.json",
+  "raw_spec_sha256": "08b1fee1f5265005cc72165bd2a9d96822598507830e0254c1aa1e796fb49b6f",
+  "canonical_spec_digest": "0cdd4e93b83375b5a4144059bb26e603a7dd368c126b2e4e384a8b663fd32df3",
+  "deadline": "2026-11-10T10:55:46.693498+00:00",
+  "hosts": [
+    "gpu2",
+    "gpu3"
+  ],
+  "gpu_models": [
+    "RTX A6000"
+  ],
+  "exclusive": true,
+  "contention": {
+    "policy": "stop",
+    "resume_attempts": 0
+  },
+  "campaign_seconds": 800,
+  "future_gpu_ceiling_seconds": 1000,
+  "future_cpu_ceiling_seconds": 1150,
+  "preparation_cpu_already_charged": 50,
+  "source_revision": "ffe51da48b4088609cd8f799e4655d608fcacbad",
+  "source_sha256": "390e157a9aabc1db8006a936a7de54a43c8810650260136bc59a67036e7dfd39",
+  "snapshot_sha256": "202466a711d17b742a17270bab91da2dc581af7a9fc1e411405f8bb37a924372",
+  "source_archive": true,
+  "forecast_assessment": "Conditional bounded pilot is justified to measure missing cost dimension. 1.5 applied once; models use historical contaminated/floor timings and explicit reserves, not measured completion upperbounds. Correctness CPU gate and physical readonly readiness passed. No fullstudy forecast or automaticpromotion.",
+  "stop_conditions": "Any source/runtime/input/device/claim/namespace/kernel/native/parity/nonfinite/contamination/budget/deadline failure stops with savedartifact; no automaticretry or quality-rulechange. Onlytaskownedprocesscleanup. Canonicalstaging mustverifylargeinputSHAs.",
+  "monitoring": "Publish eachjobID, source/spec/budget/deadline/resultpaths in experiment+ledger before ONE canonical ps-fleet wait forwhole two-job batch<=2700seconds. RootACKbothIDs beforewait. plan_research_audit owns batchwait. No recurringpolls/timers."
+}
