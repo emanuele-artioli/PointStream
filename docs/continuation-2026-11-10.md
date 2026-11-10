@@ -33,6 +33,23 @@ the existing wait handle/output and canonical job at that meaningful checkpoint.
 After terminal handling, use at most one next deadline check for W8, no later
 than **18:28:10 UTC**. Preserve handles if they are agent-local.
 
+### Later outcome — Ball sixth expiry and seventh prospective queue
+
+At 18:14 UTC root accepted the f311 expiry audit: no assignment, campaign,
+inference or GPU use. All 23 raw hashes and exact source/spec/archive joined;
+event acknowledged. Charge full 400 external CPU, not measured aggregate.
+Programme charges now **19,362 GPU / 46,821 CPU**; Ball remaining **7,920 / 3,100**,
+W8 unchanged **4,550 / 1,229**. The sixth wait ended on gpu2 SSH failure;
+subsequent canonical status through gpu5 confirmed expiry. Do not replay f311.
+
+Root prospectively releases ONE seventh unchanged corrected16 queue after
+fresh mandatory metadata/source/spec checks, future maximum1,000 GPU/1,200 CPU
+nested within Ball. Exact source/pool/settings unchanged, deadline<=43min,
+central ACK before one canonical wait. No eighth queue or scale authorization.
+The prior live-job table is historical for f311; W8 e797 remains unresolved.
+Root next planned deadline check is **18:28:10 UTC** for e797; preserve its
+existing canonical wait, no duplicate waits or recurring timers.
+
 ### Accepted W8 source mechanism and explicit internal allowance
 
 Actual CPU job `20261110T172634Z-0afe4e35` completed and was independently

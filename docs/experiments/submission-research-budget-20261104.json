@@ -1787,6 +1787,15 @@
       "witness_qualification": false,
       "basis": "Actualcanonicalcreated-terminal144.010ceil145oneCPUunderreviewedtrustedinheritance/noPythonwidening/native-thread1 +full150post/admin82audit=377future;50sourceprepalreadycharged427inclusive. No perchildaffinitysnapshots/measuredaggregate;earlyRUNNINGexportnotusedfortimestamp. Actualallraw/root/source/PIDchecksacceptedCPUonly.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "k5d-f311-queue-closeout-20261110",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 400,
+      "basis": "Sixth corrected-source queue canonically expired unassigned. Root verified all23raw hashes, source/spec/archive joins and absent execution/claims; terminal event acknowledged. Submission, polling, failed gpu2 status and gpu5 audit unmetered: full external400 allocation inclusive, not measured CPU or queue wall.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2305,8 +2314,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 7920,
-      "cpu_seconds": 3500,
-      "status": "Remaining_unspent;1000GPU/1200CPU nested sixth f311 queue;no scale release"
+      "cpu_seconds": 3100,
+      "status": "Remaining_unspent;f311 closed0GPU400CPU;no new queue or scale released"
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -4250,7 +4259,7 @@
       "job_id": "20261110T172134Z-f311cadf",
       "phase": "k5d-scale-first-tranche-20261105",
       "subphase": "same-job-0bb5-exclusive16-sixth-admission-window",
-      "state": "publishedpending;rootACKbeforeonecanonicalwait",
+      "state": "expiredunassigned;rootaccepted23rawjoins,eventACK",
       "revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
       "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
       "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
@@ -4277,7 +4286,11 @@
       "local_batch": "/private/tmp/k5d-same-job-0bb5-sixth-window-20261110",
       "scope": "Sameoriginalsixpoint16parity/retainedreceiverIOcost only; no48/292/586/full30 or extra independent clip.",
       "raw_spec_sha256": "6c9a79fb6e60ff6e3b2f9a7e3e2bbe5dca5adadc7eb6b4f00c3185d4e15a74ed",
-      "client_revision": "revieweddoctorhelper420c78a3descendant;sourceworktree0bbunchanged"
+      "client_revision": "revieweddoctorhelper420c78a3descendant;sourceworktree0bbunchanged",
+      "terminal_CPU_charge": 400,
+      "terminal_GPU_charge": 0,
+      "qualification_executed": false,
+      "wait_state": "solewaittimedoutSSH;canonicalgpu5expiryverified,eventACK,noexecutionclaims"
     },
     {
       "revision": "aecf9ee21c6a5d0face390c9f0a3b5044112ef36",
@@ -4372,9 +4385,8 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "Ballf311 solewait deadline18:00:30+sweep;W8e797 rootACK for solewait deadline18:26:36+sweep",
+    "state": "Ballf311closedunassigned0GPU400CPU;W8e797solewaitdeadline18:26:36+sweep",
     "jobs": [
-      "20261110T172134Z-f311cadf",
       "20261110T174559Z-e797d6bc"
     ],
     "batches": [],
