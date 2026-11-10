@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "decision": "Root releases ONE combined current-source readiness/pre-stage CPU oracle; no GPU",
+  "phase": "w8-174ac-q0-source-readiness-cost-preparation-20261110",
+  "parent_phase": "w8-full-witness-staged-20261106",
+  "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+  "qualification_charge_kind": "pilot_preparation",
+  "witness_qualification": true,
+  "CPU_ceiling_inclusive": 50,
+  "precharged_full_cpu_seconds": 50,
+  "GPU_ceiling": 0,
+  "component_CPU_caps": {
+    "onecore_probe_recovery_upload": 35,
+    "local_SSH": 5,
+    "management_postcheck_and_admin": 10
+  },
+  "wall_cap": 180,
+  "scripts": {
+    "probe.py": "e4233d02e409621defac9f6d03f61c976a569ef70fd0a63a006df7af4663ade7",
+    "postcheck.py": "efe2063d0cbd5f1df94e03d722eacbe6335ce6ab8da9720f457767df161e4868"
+  },
+  "local_scripts": "/private/tmp/pointstream-w8-174-q0-prestage-proposal-20261110-a1",
+  "approved_CPU_gate_sha256": "e4f770e60fe45ce2eb4e5b717a0edf19ef0141cb4212f5b371c23463059b526e",
+  "scope": "Freshknownjobs/eligiblehostclaims/runtime/space andpublicstat-first identities (reuseexactfreshdoctorallowed); recoverexact5e62archive intoNEWpersistentownlocaldirectory,nooverwrite.35CPU/20wall recovery cap. Uploadfreshgate/currentprechargedledger/realattemptreceipt once O_EXCL/O_NOFOLLOW/fsync toNEWq0-174acdirectory. BuildactualnonbypassGPU500/CPU600spec from174source, then timeactualsourceidentity4cad+twoinbox.verify_inputs on exact18inputs,12stageddata/weighttokens/sixsmalldirectcontrols; noNFSweightbodyreads. Protectedmetadataonly. Boundedmanagementsource/controlSHApostcheck. No model/native/frame/GPUwork.",
+  "decision_rule": "1.5guardedactualpre-stagewall+5 strictly<65; necessaryonly. Anyclaim/source/alias/limit/input/runtime/hash/budget/deadline failure stops,preservepartial/fullcharge,noretry. Sourcefromnewarchive notcleanedfleetjobtree.",
+  "prospective_pilot_caps_NOT_GPU_release": {
+    "future_GPU": 500,
+    "future_CPU": 600,
+    "campaign": 450,
+    "smoke": 385,
+    "generator_wall": 240,
+    "generator_CPU": 260,
+    "validator": 60,
+    "noop": 5,
+    "external_GPU": 50,
+    "external_CPU": 150,
+    "qualification_prep_including_this": 300,
+    "qualification_CPU_max_after_future": 900
+  },
+  "forecast_assessment": "Allfivegeneratorphases*1.5+40bootstrap=200.601<240. Wholeconditionalmodel287.869+40bootstrap+65prestage+5noop=397.869,leaves52.131campaign forfinalsource/directchecks,parentpublication andotherresidual. MustitemizethisresidualbeforeGPUrelease; modelusesfloors/short-latentassumptions,notmeasuredcompletionupperbound. No fullwitness/downstreamfit established."
+}

@@ -1554,6 +1554,18 @@
       "basis": "80rounded created-to-canonical76.787singlecorelifecyclewallinclqueue +entire150post/admin+82audit=312future,30prep alreadycharged342inclusive. Allocationnotmeasuredaggregate. Actualsmoke40.578;all68rawbytes+deepreceipt joins independentlyrerunroot. FirstexportSSHrejectedbeforeexecution; correctedexport1.990CPU/teardown0.184CPU,local/adminunmetered.",
       "release_stage": "research-first24/28firstnewtranche",
       "witness_qualification": false
+    },
+    {
+      "phase": "w8-174ac-q0-source-readiness-cost-preparation-20261110",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "witness_qualification": true,
+      "qualification_charge_kind": "pilot_preparation",
+      "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+      "basis": "Prospectivelyprechargedfull50CPU new174readiness+actualprestagecostoracle,existing250CPUqualprepsretained,300trueprepnow. GPUheld; future500GPU600CPUprospectiveonly.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2137,8 +2149,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 2808,
-      "status": "Remaining_unspent;c38fCPUproofaccepted342inclusive;newGPUcostpilotnotreleased"
+      "cpu_seconds": 2758,
+      "status": "Remaining_unspent;50CPU current174readiness/prestageoracleprecharged;GPUheldpendingactualcost/fullforecast"
     }
   ],
   "jobs": [
