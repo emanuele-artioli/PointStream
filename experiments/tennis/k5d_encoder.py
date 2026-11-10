@@ -129,7 +129,8 @@ def fidelity_gate(path: Path, digest: str, archive_sha: str, *, purpose: str = "
     if oracle.sha(path) != digest:
         raise ValueError("fidelity gate receipt hash mismatch")
     receipt = json.loads(path.read_text())
-    required = {"source_transform", "native_and_wire", "receiver_parity", "perceptual_metrics", "full_cost"}
+    required = {"source_transform", "native_and_wire", "receiver_parity", "perceptual_metrics",
+                "pair_cost" if purpose == "first-292-pair-v1" else "full_cost"}
     evidence = receipt.get("evidence_sha256")
     if (not isinstance(evidence, str) or len(evidence) != 64 or any(c not in "0123456789abcdef" for c in evidence)
             or receipt.get("schema_version") != 1 or receipt.get("passed") is not True
@@ -149,6 +150,13 @@ def fidelity_gate(path: Path, digest: str, archive_sha: str, *, purpose: str = "
         if (receipt.get("clip") != "tracknet/game10/Clip3" or clip != receipt["clip"]
                 or receipt.get("max_frames") != 188 or frames not in (16, 188)):
             raise ValueError("confirmation fidelity gate clip or frame limit mismatch")
+    elif purpose == "first-292-pair-v1":
+        if (receipt.get("clip") != "tracknet/game9/Clip5" or clip != receipt["clip"]
+                or receipt.get("max_frames") != 292 or frames != 292
+                or not isinstance(receipt.get("pair_cost_bound_sha256"), str)
+                or len(receipt["pair_cost_bound_sha256"]) != 64
+                or any(c not in "0123456789abcdef" for c in receipt["pair_cost_bound_sha256"])):
+            raise ValueError("pair fidelity scope or cost identity differs")
     elif purpose != "full-retrospective-benchmark":
         raise ValueError("unrecognized fidelity gate purpose")
     return receipt
@@ -306,9 +314,13 @@ def run(args: argparse.Namespace) -> None:
     gate_purpose = getattr(args, "gate_purpose", None)
     if gate_purpose not in (None, "188-frame-confirmation") or (gate_purpose and (benchmark or cost_pilot)):
         raise ValueError("invalid or conflicting explicit gate purpose")
+    fidelity_purpose = getattr(args, "fidelity_purpose", None)
+    if fidelity_purpose is not None and (not benchmark or fidelity_purpose != "first-292-pair-v1"
+                                         or args.clip != "tracknet/game9/Clip5" or args.frames != 292):
+        raise ValueError("invalid scoped benchmark fidelity purpose")
     if benchmark or gate_purpose or (cost_pilot and not report["qualified"]):
         gate_path = Path(args.fidelity_gate)
-        purpose = "48-frame-cost-pilot" if cost_pilot else gate_purpose or "full-retrospective-benchmark"
+        purpose = "48-frame-cost-pilot" if cost_pilot else gate_purpose or fidelity_purpose or "full-retrospective-benchmark"
         fidelity_gate(gate_path, args.fidelity_gate_sha256, args.archive_sha256, purpose=purpose, clip=args.clip, frames=args.frames)
         shutil.copyfile(gate_path, args.output / "fidelity-gate.json")
         gate_record = {"sha256": args.fidelity_gate_sha256, "scope": "fidelity-only", "purpose": purpose}

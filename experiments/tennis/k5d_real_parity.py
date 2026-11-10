@@ -34,15 +34,24 @@ SHARED_BASIS = 'Exact numerical parity only; shared execution is not timing, sca
 
 def spec(base: dict, *, assets: dict[str, dict[str, str]], deadline: str, unshare_sha256: str,
          identity: dict[str, str], shared_numerical: bool = False, shared_low_memory: bool = False,
-         shared_parent8_child2: bool = False) -> dict:
+         shared_parent8_child2: bool = False, first_pair_source: bool = False) -> dict:
     """Build a bounded candidate only after actual assets are available.
 
     This does not reserve resources or approve a fleet submission.
     """
     if sum((shared_numerical, shared_low_memory, shared_parent8_child2)) > 1:
         raise ValueError('shared profiles are mutually exclusive')
-    if set(assets) != {'fidelity_gate', 'accepted16', 'native_cpu_receipt'}:
-        raise ValueError('fidelity gate, accepted reference and audited CPU receipt required')
+    required = {'fidelity_gate', 'accepted16', 'native_cpu_receipt'}
+    if first_pair_source:
+        if shared_numerical or shared_low_memory or shared_parent8_child2:
+            raise ValueError('first pair source qualification must be exclusive')
+        required |= {'first_pair_bridge', 'calibration_source', 'consumer_source'}
+    if set(assets) != required:
+        raise ValueError('exact fidelity gate, accepted reference and audited CPU receipt assets required')
+    if first_pair_source:
+        from experiments.tennis import k5d_first292_source_bridge as scoped
+        scoped.verify_signed(Path(assets['first_pair_bridge']['local']), assets['first_pair_bridge']['sha256'],
+                             Path(assets['calibration_source']['local']), Path(assets['consumer_source']['local']), identity)
     if not cf.digest_string(unshare_sha256) or assets['accepted16']['sha256'] != cf.D8_SMOKE_SHA:
         raise ValueError('unshare or historical reference identity differs')
     extra = [cf.asset(name, item['remote'], item['sha256'], Path(item['local']), extract=False)
@@ -64,6 +73,11 @@ def spec(base: dict, *, assets: dict[str, dict[str, str]], deadline: str, unshar
                            '--native-cpu-receipt-sha256', assets['native_cpu_receipt']['sha256'],
                            '--unshare-sha256', unshare_sha256]
     result['scale']['frames'] = {'smoke': 16, 'full': 16}
+    if first_pair_source:
+        result['arguments'] += ['--first-pair-bridge', '{staged:first_pair_bridge}',
+                                '--first-pair-bridge-sha256', assets['first_pair_bridge']['sha256'],
+                                '--calibration-source', '{staged:calibration_source}',
+                                '--consumer-source', '{staged:consumer_source}']
     result['scale']['proof_mode'] = {'smoke': 'parity16', 'full': 'parity-noop'}
     result['scale']['namespace_timeout'] = {'smoke': 580, 'full': 4}
     result.update(gpu_models=['RTX A6000'], gpu_sharing={'mode': 'exclusive'}, budget_seconds=800,
@@ -199,6 +213,14 @@ def run(args: argparse.Namespace) -> None:
     if os.environ['PS_STAGE'] != 'smoke' or args.frames != 16:
         raise ValueError('only the 16-frame calibration clip is admitted')
     identity = cp.execution_identity()
+    source_args = tuple(getattr(args, name, None) for name in
+                        ('first_pair_bridge', 'first_pair_bridge_sha256', 'calibration_source', 'consumer_source'))
+    if any(source_args):
+        if not all(source_args):
+            raise ValueError('complete scoped source bridge inputs required')
+        from experiments.tennis import k5d_first292_source_bridge as scoped
+        scoped.verify_signed(Path(args.first_pair_bridge), args.first_pair_bridge_sha256,
+                             Path(args.calibration_source), Path(args.consumer_source), identity)
     cpu = json.loads(Path(args.native_cpu_receipt).read_text())
     if (oracle.sha(Path(args.native_cpu_receipt)) != args.native_cpu_receipt_sha256
             or cpu.get('schema') != 1 or cpu.get('audited') is not True or cpu.get('passed') is not True
@@ -217,6 +239,8 @@ def run(args: argparse.Namespace) -> None:
     if sum((args.shared_numerical_only, args.shared_low_memory, args.shared_parent8_child2)) > 1:
         raise ValueError('shared profiles are mutually exclusive')
     shared = args.shared_numerical_only or args.shared_low_memory or args.shared_parent8_child2
+    if any(source_args) and shared:
+        raise ValueError('first pair source qualification must be exclusive')
     check_resource_profile(specification, dispatch, requested=shared, environ=os.environ, low_memory=args.shared_low_memory, parent8_child2=args.shared_parent8_child2)
     import torch
     if (torch.cuda.device_count() != 1 or torch.cuda.get_device_name(0) != 'NVIDIA RTX A6000'
@@ -382,6 +406,10 @@ def main() -> None:
                  'unshare-sha256'):
         parser.add_argument('--' + name)
     parser.add_argument('--frames', type=int)
+    parser.add_argument('--first-pair-bridge')
+    parser.add_argument('--first-pair-bridge-sha256')
+    parser.add_argument('--calibration-source')
+    parser.add_argument('--consumer-source')
     profiles = parser.add_mutually_exclusive_group()
     profiles.add_argument('--shared-numerical-only', action='store_true')
     profiles.add_argument('--shared-low-memory', action='store_true')
