@@ -1,0 +1,150 @@
+{
+  "cpu_accounting": "conservative full allocation; host gpu2/gpu3 measured script CPU only; SSH, fleet, transfer and administration aggregate not measured",
+  "native_spec": {
+    "deadline": "2026-11-10T10:27:19.891062+00:00",
+    "delta_from_edafe_spec": [
+      "deadline"
+    ],
+    "logical_sha256": "b21f0dd70a70a3adac9be2c6bbad8183dca02e677dc572d565d0160691605e8c",
+    "normalized_file_sha256": "57b98c1ccdcbf60758eac12ae64ab8730663b485d4290da712b46a5fa9ef7c28",
+    "normalized_logical_sha256": "51b73aedf1d44ab4ebc6309be351db113e6a57aaef82a44e90c5bb748a1a3fe2",
+    "normalized_path": "/private/tmp/k5d-first292-source-prep-20261110/spec/native-spec-normalized.json",
+    "path": "/private/tmp/k5d-first292-source-prep-20261110/spec/native-spec.json",
+    "raw_sha256": "bfe20c51eeb2e20311ba9b4ceaafc6a2290d2371df5ff71e50f95d92faafa1dd",
+    "release_status": "not released"
+  },
+  "raw": {
+    "all-status-gpu5.json": {
+      "bytes": 5179549,
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/raw/all-status-gpu5.json",
+      "sha256": "330e83565b63eb4bac40034e7dc5ef42ed0498d26309ccb0b3e2117804c41b0d"
+    },
+    "all-status.json": {
+      "bytes": 0,
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/raw/all-status.json",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "bridge-recheck.json": {
+      "bytes": 273,
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/raw/bridge-recheck.json",
+      "sha256": "8f36254d55a9d7bffab15c991655890e7993e3686069faa4127b10c001eca9d5"
+    },
+    "bridge-upload.stderr": {
+      "bytes": 0,
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/raw/bridge-upload.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "bridge-upload.stdout": {
+      "bytes": 0,
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/raw/bridge-upload.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "d8-status.json": {
+      "bytes": 4922,
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/raw/d8-status.json",
+      "sha256": "03777b1ad856c7fcce6415e5a77f7f1336c11c3ebfbe1bfe3fbbf4bad114f7f4"
+    },
+    "doctor-146.json": {
+      "bytes": 8800,
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/raw/doctor-146.json",
+      "sha256": "073fdff4bbfe0ca4b32c1c8afa874af857f690dc6c45d63ac3de806963781403"
+    },
+    "doctor-235.json": {
+      "bytes": 7578,
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/raw/doctor-235.json",
+      "sha256": "fef82cd095085bcb7ee8c75f894da190319abcfaa995a2e443cbf17c1c5595af"
+    },
+    "fe-status.json": {
+      "bytes": 5031,
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/raw/fe-status.json",
+      "sha256": "233e900e03fb22fd209d6ab36bc10b1b6ee8e0ff744c5d9f046af7481de6f21e"
+    },
+    "gpu2-host.json": {
+      "bytes": 1376,
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/raw/gpu2-host.json",
+      "sha256": "e7aa20d883eb9db695fc54b55a69d3f88a79165949bbc466adb054d8a2f444f2"
+    },
+    "gpu2-host.stderr": {
+      "bytes": 0,
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/raw/gpu2-host.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "gpu3-host.json": {
+      "bytes": 1363,
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/raw/gpu3-host.json",
+      "sha256": "23b0f5eaf1e298d730414096c464bb71f4b01c05eeede524dd694ebaf87c2281"
+    },
+    "gpu3-host.stderr": {
+      "bytes": 0,
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/raw/gpu3-host.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "inspect.json": {
+      "bytes": 4537,
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/raw/inspect.json",
+      "sha256": "133a92d8901196fc3e2008395397a549d1bdd8759e97651fe268eb370e1f521d"
+    },
+    "original-hashes.txt": {
+      "bytes": 341,
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/raw/original-hashes.txt",
+      "sha256": "94bf8dc4d2ca79c647f8e29ec0628ccfbbe3a88e61570bdc4bf96366b7fddb9f"
+    },
+    "recovered-hashes.txt": {
+      "bytes": 273,
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/raw/recovered-hashes.txt",
+      "sha256": "c484882e326100a0f9e29698a84edfd001f819d51dec29513cabc307d30ad37c"
+    },
+    "recovery-paths.txt": {
+      "bytes": 500,
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/raw/recovery-paths.txt",
+      "sha256": "a674c3357f6b984981e21d94244dd481664fac412a5eb31845ade17452669e19"
+    },
+    "score-status.json": {
+      "bytes": 5016,
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/raw/score-status.json",
+      "sha256": "5b21fe15dc5905e04ae4d4c3c11f718b2122e6b6452498c554107e440fa11bdc"
+    },
+    "source-upload.stderr": {
+      "bytes": 0,
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/raw/source-upload.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "source-upload.stdout": {
+      "bytes": 0,
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/raw/source-upload.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "upload-verified.txt": {
+      "bytes": 616,
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/raw/upload-verified.txt",
+      "sha256": "9db6ce9b1ca569690b1c4f76652542d79cf2be79c45b9a3d42691220c5e71225"
+    },
+    "workers.json": {
+      "bytes": 1623,
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/raw/workers.json",
+      "sha256": "3bbabaa7a18c098c4029d017e92b99e417881125a2d16607c7598c904f98d9d7"
+    }
+  },
+  "readiness": "all six hosts doctor passed; global status through gpu2 timed out once and gpu5 fallback showed no running/pending/queued/starting/launching jobs; gpu2/gpu3 claim books empty, pinned runtime and archive cache metadata present, tools/unshare SHA matched, enough separate local disk; gpu3 doctor ffmpeg -version timed out, runtime ffmpeg binary SHA still matched; no large cache fresh SHA asserted",
+  "recovered": {
+    "d8": {
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/recovered/d8-smoke.tar",
+      "remote_origin": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T000550Z-d8b5c76b/smoke/published.tar",
+      "sha256": "8758597ba524cafc017e25cbd20c15ecbeaeed534d5622dfe67d66eb16521377"
+    },
+    "h2": {
+      "path": "/private/tmp/k5d-first292-source-prep-20261110/recovered/h2-source.tar",
+      "remote_origin": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T025241Z-fe451f9e/source.tar",
+      "sha256": "c3ff5419167504afcd84d25931791eddfe8bae16b5e492ed124df31e43f66f67"
+    }
+  },
+  "schema": 1,
+  "scope": "root-released source preparation only; no job, GPU, model, codec or native inference",
+  "snapshot_sha256": "202466a711d17b742a17270bab91da2dc581af7a9fc1e411405f8bb37a924372",
+  "source_bridge_remote": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-first292-ffe51-bridge-20261110/bridge.json",
+  "source_bridge_sha256": "0397392df6bc14b62b0a85697c06bf923bda25f3ad3132a9d7bb2ffb8c5d4569",
+  "source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/k5d-first292-ffe51-20261110/source.tar",
+  "source_preparation_charge_recommendation_cpu_seconds": 50,
+  "source_revision": "ffe51da48b4088609cd8f799e4655d608fcacbad",
+  "source_sha256": "390e157a9aabc1db8006a936a7de54a43c8810650260136bc59a67036e7dfd39"
+}
