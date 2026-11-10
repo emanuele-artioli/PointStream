@@ -3856,6 +3856,71 @@
       "terminal_CPU_allocation": 400,
       "qualification_executed": false,
       "wait_state": "onewaitendedpendingjustbeforedeadline;independentauditterminalexpired,eventACK,allclaimsabsent"
+    },
+    {
+      "revision": "26905f82f5983aaa8c93b2373f443908160a2b03",
+      "source_sha256": "985782cb5c04bbeb6e3b701642b1f5bb05fbf9e6a1277c87955d91f09deef69d",
+      "snapshot_sha256": "63133e3c1485763e94891c87601cdf23a04f52027d528be2683fdf772091f686",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "future_CPU": 832,
+      "inclusive_CPU": 882,
+      "job_id": "20261110T143525Z-6b4be46f",
+      "phase": "w8-full-witness-staged-20261106",
+      "subphase": "26905-exact-source-CPU-mechanism-proof",
+      "state": "runninggpu5CPU0;rawsmokevalidatorpassed;rootauditpending",
+      "spec_sha256": "24be3ab72cd90ce2a555513dcc03042a48a9b1a254875b74f48a0d93cd5715d2",
+      "raw_spec_sha256": "391a54c8e93760a503841cf1f600ee9d953fb39005781f01a812faa5dbb4fb94",
+      "source_archive": true,
+      "deadline": "2026-11-10T15:11:44.105447Z",
+      "hosts": [
+        "gpu5"
+      ],
+      "device": "cpu",
+      "cpu_affinity_index": 0,
+      "future_GPU": 0,
+      "preparation_CPU_alreadycharged": 50,
+      "supervisor_pid": 3192873,
+      "campaign_pid": 3192950,
+      "local_batch": "/private/tmp/pointstream-w8-269-sourceprep-20261110-a1",
+      "scope": "ExactsourceCPUmechanismonly;noGPU/generation/qualityclaim.",
+      "campaign": 600,
+      "smoke": 530,
+      "validator": 50,
+      "noop": 5,
+      "external_post_admin_CPU": 150,
+      "independent_audit_CPU": 82
+    },
+    {
+      "job_id": "20261110T143544Z-6e96d868",
+      "phase": "k5d-scale-first-tranche-20261105",
+      "subphase": "same-job-0bb5-exclusive16-third-admission-window",
+      "state": "publishedpending;rootACKbeforeonecanonicalwait",
+      "revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
+      "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
+      "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+      "spec_sha256": "789c0a35dce23b238dded9aa0010272ee65c700655b9f4f491cc2b7c3269b260",
+      "source_archive": true,
+      "deadline": "2026-11-10T15:11:24.205828Z",
+      "hosts": [
+        "gpu2",
+        "gpu3"
+      ],
+      "gpu_models": [
+        "RTX A6000"
+      ],
+      "future_GPU": 1000,
+      "future_CPU": 1200,
+      "campaign": 800,
+      "namespace": 580,
+      "smoke": 600,
+      "validator": 30,
+      "noop": 5,
+      "external_CPU": 400,
+      "GPU_post": 200,
+      "local_storage_gib": 32,
+      "local_batch": "/private/tmp/k5d-same-job-0bb5-third-window-20261110",
+      "scope": "Sameoriginalsixpoint16parity/retainedreceiverIOcost only; no48/292/586/full30 or extra independent clip.",
+      "raw_spec_sha256": "d53b6f40f5d48ac93ad6ac485a36fc316f03a7f82c4105411927af219148ab2e"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -3877,8 +3942,11 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "BothlatestGPUqueuesexpiredunassigned/eventACK. NoactiveGPUjob;W8source269CPUproofreleasedawaitpublication. No recurringchecks.",
-    "jobs": [],
+    "state": "TwoownedjobscentralACKbeforeonecanonicalwaiteach;CPUproofrootauditpending;Ballpending15:11UTCdeadline. No repeats/recurringchecks.",
+    "jobs": [
+      "20261110T143525Z-6b4be46f",
+      "20261110T143544Z-6e96d868"
+    ],
     "batches": [],
     "native_completion_resume_verified": false,
     "recurring_llm_polling": false,
