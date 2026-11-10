@@ -1164,3 +1164,79 @@ def test_out_of_bounds_index_fails_before_supervisor_claim(tmp_path, monkeypatch
     status = monitor.read_json(run / 'status.json')
     assert status['status'] == 'failed' and status['admission_rejected']
     assert 'exceeds' in status['error'] and not (run / 'claim.json').exists()
+
+
+@pytest.mark.parametrize('action', ['status', 'events', 'cancel'])
+def test_job_actions_honor_compatible_management_override_without_mutating_record(tmp_path, monkeypatch, action):
+    import subprocess
+    from argparse import Namespace
+
+    job_id = '20261110T123456Z-12345678'
+    original = {'hosts': ['gpu2'], 'base': '/shared/jobs/fleet', 'release': '/old/release',
+                'pythons': {'gpu2': '/old/python'}, 'management_host': 'gpu2'}
+    current = {'hosts': ['gpu1', 'gpu2'], 'base': original['base'], 'release': '/new/release',
+               'pythons': {'gpu1': '/pinned/gpu1', 'gpu2': '/pinned/gpu2'}, 'management_host': 'gpu2'}
+    record = {'job_id': job_id, 'config': original}
+    monitor.write_json(tmp_path / f'{job_id}.json', record)
+    monitor.write_json(tmp_path / 'inbox.json', current)
+    monkeypatch.setenv('PS_FLEET_MANAGEMENT_HOST', 'gpu1')
+    monkeypatch.setenv('PS_FLEET_MANAGEMENT_PYTHON', '/usr/bin/python3')
+    calls = []
+    def ssh(host, argv, **kwargs):
+        calls.append((host, argv, kwargs))
+        return subprocess.CompletedProcess([], 0, '{"events": []}' if action == 'events' else '{"status": "ok"}', '')
+    monkeypatch.setattr(fleet, '_ssh', ssh)
+    args = Namespace(state_dir=tmp_path, action=action, job_id=job_id,
+                     status_timeout_seconds=60 if action == 'status' else None)
+    inbox.remote_job(args)
+    assert len(calls) == 1 and calls[0][0] == 'gpu1' and calls[0][1][0] == '/usr/bin/python3'
+    assert '/new/release' in calls[0][1][-1] and job_id in calls[0][1][-1]
+    assert calls[0][2]['timeout'] == (60 if action == 'status' else 120)
+    assert monitor.read_json(tmp_path / f'{job_id}.json') == record
+    assert monitor.read_json(tmp_path / 'inbox.json') == current
+
+
+@pytest.mark.parametrize('state', ['missing', 'different_base', 'empty_hosts', 'changed_during_read'])
+@pytest.mark.parametrize('action', ['status', 'events', 'cancel'])
+def test_job_actions_fall_back_to_recorded_inbox(tmp_path, monkeypatch, state, action):
+    from argparse import Namespace
+
+    job_id = '20261110T123456Z-12345678'
+    original = {'hosts': ['gpu2'], 'base': '/old/jobs/fleet', 'release': '/old/release',
+                'pythons': {'gpu2': '/old/python'}}
+    monitor.write_json(tmp_path / f'{job_id}.json', {'job_id': job_id, 'config': original})
+    if state != 'missing':
+        current = {**original, 'base': '/new/jobs/fleet' if state == 'different_base' else original['base'],
+                   'hosts': [] if state == 'empty_hosts' else ['gpu1']}
+        monitor.write_json(tmp_path / 'inbox.json', current)
+    if state == 'changed_during_read':
+        monkeypatch.setattr(inbox, 'load_config', lambda _: {**original, 'base': '/changed/jobs/fleet'})
+    monkeypatch.setenv('PS_FLEET_MANAGEMENT_HOST', 'gpu1')
+    routed = []
+    def rpc(config, received_action, payload, **kwargs):
+        routed.append((config, received_action, payload, kwargs))
+        return {'events': []} if received_action == 'events' else {'status': 'ok'}
+    monkeypatch.setattr(inbox, 'remote_rpc', rpc)
+    inbox.remote_job(Namespace(state_dir=tmp_path, action=action, job_id=job_id, status_timeout_seconds=None))
+    assert routed == [(original, action, {'job_id': job_id}, {})]
+
+
+@pytest.mark.parametrize('action', ['status', 'events', 'cancel'])
+@pytest.mark.parametrize(('host', 'python', 'error'), [
+    ('gpu6', '/usr/bin/python3', 'configured fleet host'),
+    ('gpu1', 'relative/python', 'absolute executable path'),
+])
+def test_job_action_rejects_invalid_management_override(tmp_path, monkeypatch, host, python, error, action):
+    from argparse import Namespace
+
+    job_id = '20261110T123456Z-12345678'
+    config = {'hosts': ['gpu1', 'gpu2'], 'base': '/shared/jobs/fleet', 'release': '/release',
+              'pythons': {'gpu1': '/python', 'gpu2': '/python'}}
+    monitor.write_json(tmp_path / f'{job_id}.json', {'job_id': job_id, 'config': config})
+    monitor.write_json(tmp_path / 'inbox.json', config)
+    monkeypatch.setenv('PS_FLEET_MANAGEMENT_HOST', host)
+    monkeypatch.setenv('PS_FLEET_MANAGEMENT_PYTHON', python)
+    monkeypatch.setattr(inbox, 'remote_rpc', lambda *_a, **_kw: pytest.fail('invalid override reached RPC'))
+    with pytest.raises(fleet.FleetError, match=error):
+        inbox.remote_job(Namespace(state_dir=tmp_path, action=action, job_id=job_id,
+                                   status_timeout_seconds=60 if action == 'status' else None))
