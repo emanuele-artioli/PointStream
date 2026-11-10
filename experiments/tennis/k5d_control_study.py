@@ -264,6 +264,7 @@ def pair_producer(gate: dict[str, Any]) -> dict[str, Any]:
     producer = gate.get('pair_producer')
     if (not isinstance(producer, dict) or producer.get('audited') is not True
             or producer.get('clip') != PAIR_CLIP or producer.get('frames') != 292
+            or producer.get('prepare_external_included') is not True
             or not isinstance(producer.get('job_id'), str) or not producer['job_id'].startswith('2026')
             or any(not isinstance(producer.get(key), str) or not cf.digest_string(producer[key])
                    for key in ('archive_sha256', 'checkpoint_sha256', 'audit_sha256'))
@@ -290,11 +291,12 @@ def verify_pair_producer_audit(gate: dict[str, Any], path: Path, identity: dict[
             or audit.get('consumer_execution_identity') != identity
             or any(audit.get(key) != producer.get(key) for key in
                    ('job_id', 'clip', 'frames', 'remote', 'archive_sha256', 'checkpoint_sha256',
-                    'gpu_charge_seconds', 'cpu_charge_seconds', 'ledger_charge_phases'))):
+                    'gpu_charge_seconds', 'cpu_charge_seconds', 'ledger_charge_phases', 'prepare_external_included'))):
         raise ValueError('independent pair producer audit differs')
 
 
 def verify_pair_ledger_charge(gate: dict[str, Any], ledger: dict[str, Any]) -> None:
+    """Join the audited whole prepare charge, including source prep and audit, to ledger rows."""
     producer = pair_producer(gate)
     phases = producer.get('ledger_charge_phases')
     if (not isinstance(phases, list) or not phases or len(phases) != len(set(phases))
@@ -326,19 +328,23 @@ def first_pair_budget(gate: dict[str, Any], receipt: dict[str, Any], attestation
         jobs = budget['jobs']
         if not isinstance(jobs, dict) or set(jobs) != {f'{PAIR_CLIP}:prepare', f'{PAIR_CLIP}:score'}:
             raise ValueError('exact pair jobs required')
-        values = [*jobs.values(), budget['external'], budget['total']]
+        external = budget['external']
+        if not isinstance(external, dict) or set(external) != {'prepare', 'score'}:
+            raise ValueError('pair external caps must cover prepare and score separately')
+        values = [*jobs.values(), *external.values(), budget['total']]
         if any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) or v <= 0 for v in values):
             raise ValueError('invalid pair cap')
-        if sum(jobs.values()) + budget['external'] > budget['total'] or budget['total'] > 3350:
+        if sum(jobs.values()) + sum(external.values()) > budget['total'] or budget['total'] > 3350:
             raise ValueError('pair cap exceeds inclusive allocation')
         remaining = budget['total']
         if phase == 'score':
             producer = pair_producer(gate)
             charged = producer.get(resource + '_charge_seconds')
             if (isinstance(charged, bool) or not isinstance(charged, (int, float))
-                    or not math.isfinite(charged) or charged <= 0 or charged > jobs[f'{PAIR_CLIP}:prepare']):
+                    or not math.isfinite(charged) or charged <= 0
+                    or charged > jobs[f'{PAIR_CLIP}:prepare'] + external['prepare']):
                 raise ValueError('invalid audited producer charge')
-            remaining = jobs[f'{PAIR_CLIP}:score'] + budget['external']
+            remaining = jobs[f'{PAIR_CLIP}:score'] + external['score']
             if charged + remaining > budget['total']:
                 raise ValueError('pair including producer charge exceeds inclusive allocation')
         elif phase != 'prepare':

@@ -176,7 +176,7 @@ def test_confirmation_requires_both_audited_receipts_without_full30_fit(
     gate['allowed_clips'] = [clips[0]]
     gate['future_study_fit_proven'] = False
     gate['confirmation_caps'] = {resource: {'jobs': {f'{clips[0]}:prepare': 1450, f'{clips[0]}:score': 1700},
-                                            'external': 200, 'total': 3350}
+                                            'external': {'prepare': 100, 'score': 100}, 'total': 3350}
                                  for resource in ('gpu', 'cpu')}
     bridge['bridge_type'] = 'parent8-resource-v1'
     monkeypatch.setattr(control, 'parent8_bridge_record', lambda *_: {k: v for k, v in bridge.items() if k != 'approved'})
@@ -560,7 +560,7 @@ def test_first_pair_budget_is_exact_bounded_and_not_full_study() -> None:
     clip = control.PAIR_CLIP
     gate: dict[str, Any] = {'allowed_clips': [clip], 'future_study_fit_proven': False,
             'confirmation_caps': {resource: {'jobs': {f'{clip}:prepare': 1450, f'{clip}:score': 1700},
-                                              'external': 200, 'total': 3350}
+                                              'external': {'prepare': 100, 'score': 100}, 'total': 3350}
                                   for resource in ('gpu', 'cpu')}}
     control.validate_calibration(data)
     control.first_pair_budget(gate, data, {})
@@ -581,7 +581,7 @@ def test_first_pair_budget_is_exact_bounded_and_not_full_study() -> None:
 
 
 def test_pair_producer_requires_root_audited_real_checkpoint() -> None:
-    gate = {'pair_producer': {'audited': True, 'clip': control.PAIR_CLIP, 'frames': 292,
+    gate = {'pair_producer': {'audited': True, 'prepare_external_included': True, 'clip': control.PAIR_CLIP, 'frames': 292,
                               'job_id': '20261109T000000Z-12345678', 'archive_sha256': 'a' * 64,
                               'checkpoint_sha256': 'b' * 64, 'audit_sha256': 'c' * 64,
                               'remote': str(control.cf.DATA_ROOT / 'jobs/example.tar')}}
@@ -596,7 +596,7 @@ def test_pair_producer_audit_checks_actual_sealed_record(tmp_path) -> None:
     import json
 
     identity = {'source_sha256': '1' * 64, 'snapshot_sha256': '2' * 64, 'environment_sha256': '3' * 64}
-    producer = {'audited': True, 'clip': control.PAIR_CLIP, 'frames': 292,
+    producer = {'audited': True, 'prepare_external_included': True, 'clip': control.PAIR_CLIP, 'frames': 292,
                 'job_id': '20261109T000000Z-12345678', 'archive_sha256': 'a' * 64,
                 'checkpoint_sha256': 'b' * 64, 'gpu_charge_seconds': 1200, 'cpu_charge_seconds': 1200,
                 'remote': str(control.cf.DATA_ROOT / 'jobs/example.tar')}
@@ -618,23 +618,25 @@ def test_pair_producer_audit_checks_actual_sealed_record(tmp_path) -> None:
 def test_pair_score_accounts_only_unspent_pair_after_audited_prepare() -> None:
     data = receipt()
     clip = control.PAIR_CLIP
-    jobs = {f'{clip}:prepare': 1450, f'{clip}:score': 1700}
+    jobs = {f'{clip}:prepare': 1500, f'{clip}:score': 1650}
     gate: dict[str, Any] = {'allowed_clips': [clip], 'future_study_fit_proven': False,
-            'confirmation_caps': {kind: {'jobs': dict(jobs), 'external': 200, 'total': 3350}
+            'confirmation_caps': {kind: {'jobs': dict(jobs), 'external': {'prepare': 100, 'score': 100}, 'total': 3350}
                                   for kind in ('gpu', 'cpu')},
-            'pair_producer': {'audited': True, 'clip': clip, 'frames': 292, 'job_id': '20261109T000000Z-12345678',
+            'pair_producer': {'audited': True, 'prepare_external_included': True, 'clip': clip, 'frames': 292, 'job_id': '20261109T000000Z-12345678',
                               'archive_sha256': 'a' * 64, 'checkpoint_sha256': 'b' * 64, 'audit_sha256': 'c' * 64,
                               'remote': str(control.cf.DATA_ROOT / 'jobs/producer.tar'),
-                              'gpu_charge_seconds': 1400, 'cpu_charge_seconds': 1400}}
+                              'gpu_charge_seconds': 1550, 'cpu_charge_seconds': 1550}}
     for kind in ('gpu', 'cpu'):
-        data['programme'][kind]['ball_remaining_seconds'] = 1950
-        data['programme'][kind]['global_remaining_seconds'] = 1950
+        data['programme'][kind]['ball_remaining_seconds'] = 1750
+        data['programme'][kind]['global_remaining_seconds'] = 1750
     control.first_pair_budget(gate, data, {}, 'score')
-    gate['pair_producer']['gpu_charge_seconds'] = 1451
+    gate['pair_producer']['gpu_charge_seconds'] = 1600
+    control.first_pair_budget(gate, data, {}, 'score')
+    gate['pair_producer']['gpu_charge_seconds'] = 1601
     with pytest.raises(ValueError, match='producer charge'):
         control.first_pair_budget(gate, data, {}, 'score')
-    gate['pair_producer']['gpu_charge_seconds'] = 1400
-    data['programme']['cpu']['ball_remaining_seconds'] = 1899
+    gate['pair_producer']['gpu_charge_seconds'] = 1550
+    data['programme']['cpu']['ball_remaining_seconds'] = 1749
     with pytest.raises(ValueError, match='reconciled'):
         control.first_pair_budget(gate, data, {}, 'score')
 
@@ -662,7 +664,7 @@ def test_pair_fidelity_gate_is_distinct_and_binds_cost(tmp_path) -> None:
 
 
 def test_pair_producer_charges_join_reconciled_ledger() -> None:
-    producer = {'audited': True, 'clip': control.PAIR_CLIP, 'frames': 292,
+    producer = {'audited': True, 'prepare_external_included': True, 'clip': control.PAIR_CLIP, 'frames': 292,
                 'job_id': '20261109T000000Z-12345678', 'archive_sha256': 'a' * 64,
                 'checkpoint_sha256': 'b' * 64, 'audit_sha256': 'c' * 64,
                 'remote': str(control.cf.DATA_ROOT / 'jobs/p.tar'), 'ledger_charge_phases': ['prep', 'close'],
