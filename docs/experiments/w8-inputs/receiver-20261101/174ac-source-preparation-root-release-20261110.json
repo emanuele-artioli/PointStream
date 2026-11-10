@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "decision": "Root approves reviewed staged-command repair; release source preparation only",
+  "phase": "w8-174ac-source-preparation-20261110",
+  "parent_phase": "w8-full-witness-staged-20261106",
+  "witness_qualification": false,
+  "revision": "174ac84b84a1f405e06700a34aa4c3e225fa3265",
+  "source_sha256": "4cad9e47ebeb88f1cdb272634921f2aed79100e0e15ace4d01f9a3a33720d9d6",
+  "archive_sha256": "5e62a2e912f5dba0cd945d33388b95154d5d8e88ed6cf5b5998e595a323c6fd1",
+  "archive": "/private/tmp/pointstream-w8-174ac-review-20261109/source.tar",
+  "source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-174ac-staged-20261110/source.tar",
+  "CPU_ceiling_inclusive": 30,
+  "precharged_full_cpu_seconds": 30,
+  "GPU_ceiling": 0,
+  "root_review": "Actual1669Gitblobs/archive verified; actualfinalhelper/productiondiff reviewed. Ruff/mypy563/focused43finalsourcepassed; combinedrootfullchecksactive,noimmutableisolatefullsuiteclaim. Only3productionfiles+3tests changed, hosthelper included, original3physicalsourcepins unchanged. Stage-command-only datarefs explicit/bound; originalvalidatorcontrol/producer-source checks remain. No numerical/quality/grant changes.",
+  "scope": "Freshallknownjobs/allhostsdoctor/workers +gpu5CPU0claims/publicstat-first/space/runtime/input-cachemetadata andexactnewsourceSHA; nooverwriteuploadone sourcearchive. Do notreadprotectedcontent orlargeNFSweightbodies. Buildactualnew-source CPUproofspec (allgenuine staged-onlyplaceholderrefs, directpreflight/identityretained) withnew<=45minute deadline, separate rootreview beforeCPUjob. Newphysicalsource identity mandatory; no reusing67CPUgate asnewsource.",
+  "prospective_new_CPU_proof_family": {
+    "inclusive_CPU_cap": 862,
+    "already_precharged_preparation": 30,
+    "future_CPU_cap": 832,
+    "campaign_onecore_wall": 600,
+    "postcampaign_CPU_cap": 150,
+    "audit_CPU_cap": 82,
+    "GPU": 0
+  },
+  "stops": "Claim/source/alias/input/runtime/space/profile/budget/deadline mismatch stops, preserveallraw. No CPUjob/GPU/model/nativeinference underthisprep release; unknownjobsinspectnotreplay. No original400/335GPUrequest or fullwitnessrelease."
+}

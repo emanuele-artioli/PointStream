@@ -1525,6 +1525,16 @@
       "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
       "basis": "Prospectivelyprecharged full100CPU correctedsource-recovery+prestagecostoracle. Prior100failureclosed.70onecore+5localSSH+25adminfailure, GPUheld.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "w8-174ac-source-preparation-20261110",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 30,
+      "witness_qualification": false,
+      "basis": "Prospectivelyprecharged full30CPU new174source-readiness only. SourceCPUproof separatefromcontextqualification; programme/parentunchanged.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2108,8 +2118,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 3150,
-      "status": "Remaining_unspent;corrected100CPU source-recoveryoracleprecharged; GPUheld"
+      "cpu_seconds": 3120,
+      "status": "Remaining_unspent;30CPU new174sourcepreparationprecharged; CPU/GPUjobnotreleased"
     }
   ],
   "jobs": [
