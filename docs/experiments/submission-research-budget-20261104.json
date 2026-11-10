@@ -4366,5 +4366,25 @@
       "change": "Move1000GPU/500CPU shared toW8: W8limits8200/11300; shared6200/3980. PairedsameAda cost2082.691GPUtwo30steps model plusstructurallyequal240frameunits supports scoping onegated freshwitness; not a fit or quality guarantee. Ballalreadyopen tranche unchanged; no training or qualityrulechange."
     }
   ],
-  "reservation_amount_basis": "remaining_unspent"
+  "reservation_amount_basis": "remaining_unspent",
+  "qualification_budget_approvals": [
+    {
+      "schema": 1,
+      "scope": "Root-approved cumulative qualification CPU allowance only; next job requires separate release",
+      "status": "approved",
+      "attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+      "cumulative_cpu_ceiling_seconds": 2300,
+      "source_sha256": "c9d56ee3c6e857e3cf92978690b20007645c2c13549469686c700434f2b8ebe6",
+      "snapshot_sha256": "f784c0919dc8f223253637684b71636063649831bc32b3ad23534e585322e84a",
+      "cpu_proof_sha256": "d55b812ee13662408b404ce2bcc67f5f2effff91a76d6836965edca8d4d44c7e",
+      "no_prior_execution_audit_sha256": "9f9098094748a30a148e78ed22df7b4684eccac40f2d03428d3fe5fcec61ffa8",
+      "qualification_cpu_spent_seconds": 1150,
+      "qualification_gpu_spent_seconds": 0,
+      "remaining_parent_CPU": 1229,
+      "ceiling_bound_basis": "2300<=1150truequalificationCPU+1229currentremainingparent=2379 and<=11300workstream. Next550CPUfits1229remaining,1150+5501700<=2300;G0+500<=900. Existing global100800CPU/86400GPU,workstream and perjob<=1000/GPU900/deadline45/scientific gates unchanged. No Ball/shared transfer or new user allocation.",
+      "authority": "Userstaged24GPUh/28CPUh programme; root prospectively assigns internal qualification allowance inside unchanged W8workstream/parent. Everypriorcharge/samenonce retained; record SHA identity not cryptographic signature.",
+      "stop": "Anyactualearlierexecution/unknownrequest/source/proof/ledger mismatch, insufficientremainingreservation, no currentCPUproof or scientificgatefailure. No automatic fullwitness/modelretry/newtraining.",
+      "approval_sha256": "1b34f7add2a4c0c6cc76dd32f9d29d0085db1974536569a5d9b7bc0fabf52407"
+    }
+  ]
 }
