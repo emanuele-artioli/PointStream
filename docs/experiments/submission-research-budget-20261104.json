@@ -2371,7 +2371,7 @@
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
       "cpu_seconds": 1229,
-      "status": "Remaining_unspent;aecfCPUmechanismrootaccepted377future427inclusive0GPU;noGPUallowancereleasedyet"
+      "status": "Remaining_unspent;500GPU/550CPU nested original unit0 schema2 pilot e797; no full-witness release"
     }
   ],
   "jobs": [
@@ -4314,6 +4314,43 @@
       "terminal_GPU_charge": 0,
       "approved_gate_sha256": "d55b812ee13662408b404ce2bcc67f5f2effff91a76d6836965edca8d4d44c7e",
       "wait_state": "solewaitendedcomplete,eventACK,20leaf+2parentbirths/groups/claimsabsent"
+    },
+    {
+      "job_id": "20261110T174559Z-e797d6bc",
+      "phase": "w8-full-witness-staged-20261106",
+      "subphase": "aecf-q0-versioned-original24-30-cost-pilot",
+      "state": "pending;rootcentralACKbeforeonecanonicalwait",
+      "revision": "aecf9ee21c6a5d0face390c9f0a3b5044112ef36",
+      "source_sha256": "c9d56ee3c6e857e3cf92978690b20007645c2c13549469686c700434f2b8ebe6",
+      "snapshot_sha256": "f784c0919dc8f223253637684b71636063649831bc32b3ad23534e585322e84a",
+      "raw_spec_sha256": "910ea3af5c93753e3e6f15276b0914f7adc7cdb3f907e13dc055f8194736ef18",
+      "spec_sha256": "53db2b49019911a0d4546c7461bcdffe29e1b1dcde83c7e5be92af8f2cec904a",
+      "source_archive": true,
+      "deadline": "2026-11-10T18:26:36.123950Z",
+      "hosts": [
+        "gpu5"
+      ],
+      "gpu_models": [
+        "RTX 6000 Ada"
+      ],
+      "future_GPU": 500,
+      "future_CPU": 550,
+      "campaign": 400,
+      "smoke": 335,
+      "validator": 60,
+      "noop": 5,
+      "generator_CPU": 210,
+      "generator_wall": 240,
+      "external_CPU": 150,
+      "external_GPU": 50,
+      "qualification_preparation_CPU_alreadycharged": 1150,
+      "qualification_CPU_max": 2300,
+      "qualification_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+      "admission_ledger_sha256": "e8a5ab85a123d40090712cbc0fef38a233a4bb86afa12811eb163bdcd692c8cf",
+      "admission_sha256": "0ef2c81fbe0c1b23c7ecbba94f80e87c544ef02851f116805b928fe199c37098",
+      "approved_CPU_gate_sha256": "d55b812ee13662408b404ce2bcc67f5f2effff91a76d6836965edca8d4d44c7e",
+      "scope": "ONE original unit0 24-frame/30-step operational cost/provider/isolation pilot; no quality/full-witness/unit1/retry.",
+      "local_batch": "/private/tmp/pointstream-w8-aecf-pilot-20261110-a1"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -4335,9 +4372,10 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "Ballf311existingsolewaitdeadline18:00:30+sweep;newsource0afeCPUaccepted,noW8GPUallowance/jobyet.",
+    "state": "Ballf311 solewait deadline18:00:30+sweep;W8e797 rootACK for solewait deadline18:26:36+sweep",
     "jobs": [
-      "20261110T172134Z-f311cadf"
+      "20261110T172134Z-f311cadf",
+      "20261110T174559Z-e797d6bc"
     ],
     "batches": [],
     "native_completion_resume_verified": false,
