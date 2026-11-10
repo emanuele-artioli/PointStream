@@ -340,3 +340,13 @@ qualification. No shared-source implementation/newproof/GPU release or rule
 change. No ninthqueue/48/292/586/full30 authority.
 W84c24 existingsolewait deadline19:17:38, rootcheck **19:19:15UTC**. LaterBall
 singlecheck **19:48:10UTC** if no substantive event; no duplicatewait/timers.
+
+
+Final read-only batch intent is persisted at
+`/private/tmp/pointstream-final-existing-job-status-batch-20261110-a1/intent.json`:
+19:48:10UTC, exact W84c24 via managementgpu5 and Ball4d0d via managementgpu3,
+60s each in parallel, fixedCLI. This supersedes the earlier proposedgpu1route;
+originalinboxes/jobrecords remain unchanged. No newqueue/wait/replay/signal.
+Durable read-only uncertainty snapshot (26files/36,088bytes plusmanifest):
+`/Users/manu/.cache/pointstream-evidence/fleet-communication-uncertainty-20261110-a1/`.
+Root softwarefix/sourcefullchecks2127/40passed; PR360 merge-auto enabled.
