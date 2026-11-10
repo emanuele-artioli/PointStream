@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "decision": "ReleaseONEactualexact-versioned-sourceCPUmechanismproof; no GPU or cumulativeallowance",
+  "revision": "aecf9ee21c6a5d0face390c9f0a3b5044112ef36",
+  "source_sha256": "c9d56ee3c6e857e3cf92978690b20007645c2c13549469686c700434f2b8ebe6",
+  "snapshot_sha256": "f784c0919dc8f223253637684b71636063649831bc32b3ad23534e585322e84a",
+  "source_archive_required": true,
+  "source_archive_local": "/private/tmp/pointstream-w8-versioned-source-package-20261110-a1/source.tar",
+  "parent_phase": "w8-full-witness-staged-20261106",
+  "preparation_alreadycharged_CPU": 50,
+  "future_CPU": 832,
+  "inclusive_CPU": 882,
+  "inclusive_CPU_ceiling": 900,
+  "GPU": 0,
+  "caps": {
+    "campaign": 600,
+    "smoke": 530,
+    "validator": 50,
+    "noop": 5,
+    "external_post_admin_CPU": 150,
+    "independent_audit_CPU": 82
+  },
+  "reservation_remaining_before_future_charge_CPU": 1606,
+  "qualification_preparation_alreadycharged_CPU": 1150,
+  "proof_charge_attribution": "witness_qualification:false; exactCPUmechanismproof not generatorpreparation or execution. Preserveeverypriortruecharge+nonce.",
+  "actual_spec_recipe": "FrozenaecfCPUproofmake_spec(host5)unchangedvsaccepted269CPUproofexceptfreshdeadline<=43min. Actualsourceaecf/archivef784/sourcec9d mandatory; old269gatecannotproveit. Threefixedleavesunchangedbutallnative/runtime/namespace/raw/teardownchecks actualnewsource stillrequired. MayrefreshUNSUBMITTEDdeadlineonly,preserveversions. Host6runtimebound_inputsrejects,NOhostoverride/newinventory/profile.",
+  "prepublication": "INSIDEprepaid50sourceprep: freshknownjobs/eligiblefixedhostgpu5/CPUclaims/space/cache/source/nativepins/publicstat-firstdenialtarget+allconcreteinput metadata;O_EXCL/fsyncnewSHAarchivecache,actualSHAverify. No protectedbody/publiclargeweightsreads/model/nativeGPU/CPUinferencebeforedeclaredjob. BusyGPUirrelevantCPUproof;actualCPU0singlecoreclaimmandatory. Preservehost6guardfailureasdiagnostic,nooverwriteassets.",
+  "enforcement": "CPUhiddenonecoreentirecampaignandallchildren; known600campaign boundsCPUonlywithverifiedinheritedaffinity/namespaceactualnativecounter+teardown. Packet100CPU/etc fixedleaflimits preserved. ActualCPUproofconstructor/cpuworker checks failstop if any guard/source/spec/runtime differs. Externalcommandsbounded and receipts preserve CPUs/PIDs/tool/env/source. NativeGPUinference prohibited.",
+  "monitoring": "SubmitONCE recordjobID/source/actualrawcanonicalSHA/deadline/caps/output then rootcentralACK beforeONEcanonicalfleetwait<=2700. Unknownsubmissioninspectneverreplay. Noautomaticnewjob/retry/GPUrelease.",
+  "forecast_basis": "600singleCPUcampaignincludes530smoke50validator5noop plus150post/admin82audit=832future;sourceprep50prior882inclusive<900. Withcurrent1606remaining,aftermaxproof774;onefuture550pilotwouldleave224, NOTreleased. Latercumulativequalificationapprovalmustfittrue1150+actualremaining(parent),atworst<=1924;no1900orotherlimitapprovedhere.",
+  "checks": "Rootreviewedeb28cd97+aecf9ee2productionchanges/versionedapproval/attribution/first-noexec/later-no-replay/perjob1000/GPU900/deadline45/sourcequalitypreserved;explicitparentGPUboundcorrected. Actualarchive1865Gitblobsindependentlyrootverified. ActualCPUconstructorallfieldsunchangedfromreal2696b4specexceptdeadline;bootstrap01f3/input7a06/system82adunchanged. ExactfinalisolatedchecksRuff/mypy575/full2106pass40skip,rootfocused43passafterintegration."
+}

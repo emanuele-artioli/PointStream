@@ -4235,6 +4235,39 @@
       "terminal_GPU_charge": 0,
       "qualification_executed": false,
       "wait_state": "solecanonicalwaitendedexpired,eventACK,allclaimsabsent"
+    },
+    {
+      "job_id": "20261110T172134Z-f311cadf",
+      "phase": "k5d-scale-first-tranche-20261105",
+      "subphase": "same-job-0bb5-exclusive16-sixth-admission-window",
+      "state": "publishedpending;rootACKbeforeonecanonicalwait",
+      "revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
+      "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
+      "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+      "spec_sha256": "85f20fceae5fd445bd964abae65adc475cdcd4d08c18d0122b19752b87be348a",
+      "source_archive": true,
+      "deadline": "2026-11-10T18:00:30.192710Z",
+      "hosts": [
+        "gpu2",
+        "gpu3"
+      ],
+      "gpu_models": [
+        "RTX A6000"
+      ],
+      "future_GPU": 1000,
+      "future_CPU": 1200,
+      "campaign": 800,
+      "namespace": 580,
+      "smoke": 600,
+      "validator": 30,
+      "noop": 5,
+      "external_CPU": 400,
+      "GPU_post": 200,
+      "local_storage_gib": 32,
+      "local_batch": "/private/tmp/k5d-same-job-0bb5-sixth-window-20261110",
+      "scope": "Sameoriginalsixpoint16parity/retainedreceiverIOcost only; no48/292/586/full30 or extra independent clip.",
+      "raw_spec_sha256": "6c9a79fb6e60ff6e3b2f9a7e3e2bbe5dca5adadc7eb6b4f00c3185d4e15a74ed",
+      "client_revision": "revieweddoctorhelper420c78a3descendant;sourceworktree0bbunchanged"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -4256,8 +4289,10 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "AlllatestGPUqueuesexpiredunassigned/eventACK. NoactiveGPUjob. NewW8sourcepreparationonly,notproof/job/limitrelease.",
-    "jobs": [],
+    "state": "Ballsixthf311solewaitafterrootACKdeadline18:00:30+sweep;W8newsourceprepared,CPUproofreleasereviewcomplete/noIDyet.",
+    "jobs": [
+      "20261110T172134Z-f311cadf"
+    ],
     "batches": [],
     "native_completion_resume_verified": false,
     "recurring_llm_polling": false,
