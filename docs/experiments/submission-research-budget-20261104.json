@@ -1723,6 +1723,18 @@
       "cpu_seconds": 400,
       "basis": "Full400externalCPUconservativeallocation;rootcanonicalEXPIRED,24rawSHAjoins,actualsource0bb/450d/21cd/spec97bf,noassignment/run/attempt/gate/claims. gpu6expiry-sweepernotexecution;workerreasonsbothA6000unavailable,eventACK. No inference/CPUaggregate;queuewallnotCPU.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "w8-26905-1117-unassigned-expiry-closure-20261110",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 150,
+      "witness_qualification": true,
+      "qualification_charge_kind": "pilot_preparation",
+      "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+      "basis": "Full150externalCPUconservativeallocationinclreadiness/admin/queue/audit;remoteaudit0.215CPUonlynotaggregate. RootcanonicalEXPIRED,actualsource631/985/speca9d0/ledgerbc510/admissionda1a,noassignment/run/attempt/gate/claims. gpu6expiry-sweeper,gpu5busyreason,eventACK.800priortrueprep+150=950;0GPU/model.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2306,8 +2318,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 1956,
-      "status": "Remaining_unspent;eb92unassignedexpired150CPU0GPU;neworiginalcontextreleasepending"
+      "cpu_seconds": 1806,
+      "status": "Remaining_unspent;1117unassignedclosed150CPU0GPU;one550CPUwindowwouldreach1500truequalificationceiling"
     }
   ],
   "jobs": [
@@ -4063,7 +4075,7 @@
       "job_id": "20261110T154043Z-11179b2a",
       "phase": "w8-full-witness-staged-20261106",
       "subphase": "26905-unit0-next-bounded-admission-window-no-prior-execution",
-      "state": "publishedpending;rootACKbeforeonecanonicalwait",
+      "state": "expiredunassigned;rootclosed150CPU0GPU",
       "revision": "26905f82f5983aaa8c93b2373f443908160a2b03",
       "source_sha256": "985782cb5c04bbeb6e3b701642b1f5bb05fbf9e6a1277c87955d91f09deef69d",
       "snapshot_sha256": "63133e3c1485763e94891c87601cdf23a04f52027d528be2683fdf772091f686",
@@ -4096,7 +4108,11 @@
       "raw_spec_sha256": "9a7e7704170280d603b2e9ebcab7cea2fa7daf8d6f974f1238250df3ceeb1339",
       "admission_sha256": "da1af0343897ae465fdb21419c01c2f05d485f837474d35a93a59df09092da7a",
       "approved_CPU_gate_sha256": "3761a9429e8f77f7c6b68faa3a2a6a4daad59fc99ba6a410724241dbda37667f",
-      "client_revision": "1334264f revieweddoctorhelper;sourceworktree269unchanged"
+      "client_revision": "1334264f revieweddoctorhelper;sourceworktree269unchanged",
+      "terminal_CPU_charge": 150,
+      "terminal_GPU_charge": 0,
+      "qualification_executed": false,
+      "wait_state": "solewaitendedexpired2380s,eventACK,allclaimsabsent"
     },
     {
       "job_id": "20261110T162033Z-685f7fb9",

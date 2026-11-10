@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "job_id": "20261110T154043Z-11179b2a",
+  "decision": "Close unassigned expiry; noGPU/generation",
+  "GPU": 0,
+  "CPU_conservative_allocation": 150,
+  "true_qualification_preparation_CPU_total": 950,
+  "raw_audit_directory": "/private/tmp/pointstream-w8-269-pilot-next-expiry-audit-20261110-a1",
+  "audit_sha256": "1800d0d64eba6b55ed2e2e7f04901a3dbe86ca8c8a9aa8416381622eabec6b09",
+  "event_acknowledged": true,
+  "terminal_event": "16b3827bd379510c95410adad0349d21",
+  "scope": "No assignment/run/attempt/gate/claims;gpu6ownerexpiry-sweeper,gpu5busyreason."
+}
