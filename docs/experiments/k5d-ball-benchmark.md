@@ -430,3 +430,9 @@ Root closed the previous zero-execution expiry at 0 GPU and 400 CPU seconds incl
 The single second-window submission returned PENDING as `20261110T135257Z-8868b966`, source archive mode true, archive `450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c`, normalized spec `9f005b51c53f192fffc83d9cac4f7fac589b0d2008c23fd9400896ff85a15fb6`; expected source `21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db` awaits published manifest confirmation. Output `/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261110T135257Z-8868b966`. Raw submit receipt `/private/tmp/k5d-same-job-0bb5-second-window-20261110/submit.json`. Pending is not assignment or numerical evidence. Root ledger acknowledgment precedes the single canonical wait.
 
 Published manifest confirms exact source `21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db`, archive `450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c`, source archive `source.tar` and spec `9f005b51c53f192fffc83d9cac4f7fac589b0d2008c23fd9400896ff85a15fb6`; manifest `/private/tmp/k5d-same-job-0bb5-second-window-20261110/ready.json`. Some large inputs and environment checks are deferred to campaign.
+
+Root central ledger ACK `bb920efd` accepted the exact PENDING manifest. One canonical wait is authorized: `scripts/ps-fleet wait 20261110T135257Z-8868b966 --max-seconds 1200`, output `/private/tmp/k5d-same-job-0bb5-second-window-20261110/wait.json`, deadline `2026-11-10T14:26:05.118755Z`, caps 1,000 GPU and 1,200 CPU seconds inclusive including 400 external. No repeated wait or automatic retry; terminal audit is bounded by the existing external allocation.
+
+The one wait is running with local session handle `51062`; preserve the handle and output. Completion callback is unverified; root retains the deadline check.
+
+Local wait process PID `74308` was observed at launch; it is a client process identifier, not a completion callback or remote supervisor.
