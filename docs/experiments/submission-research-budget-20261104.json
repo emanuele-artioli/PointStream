@@ -4223,7 +4223,17 @@
     "batches": [],
     "native_completion_resume_verified": false,
     "recurring_llm_polling": false,
-    "completed": false
+    "completed": false,
+    "one_shot_deadline_check": {
+      "mode": "one input-interruptibleclock.sleep, self-expiring,no recurringtimer",
+      "target_UTC": "2026-11-10T17:00:55Z",
+      "purpose": "InspectexistingBallwaitafterdeadline+sweepandW8atmeaningfulbatchcheckpoint",
+      "job_ids": [
+        "20261110T162033Z-685f7fb9",
+        "20261110T162815Z-b44688fa"
+      ],
+      "native_completion_resume_verified": false
+    }
   },
   "approval_history": [
     {
