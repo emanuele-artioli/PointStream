@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "decision": "Release boundedreadonlylegacy188artifactrecovery+audit only",
+  "phase": "k5d-legacy188-bounded-recovery-20261110",
+  "parent_phase": "k5d-scale-first-tranche-20261105",
+  "GPU": 0,
+  "CPU_ceiling_inclusive": 50,
+  "precharged_full_CPU": 50,
+  "scope": "Canonicalstatus/jobtree and selectedexistingmetadata/sourcearchive/fullpublishedarchive for20261105T003756Z-cc450baf. NoModelreads/inference/codec/native/storedDCVCdecode/re-encode/training/sourcechanges. Readonlyserverexport<=64MiB total intoNEWpersistentMacreviewdirectory preservingalloriginals. Stat/canonicalregularnonaliaspaths,hash actualarchives+ready/spec/env/code metadata, cappedsingleCPU helper<=30CPU+local/audit20CPU,wholewall<=180sec. NoNFSperfilewalkoflegacyextractedsource ifnoarchive:recordmissingandplanseparately.",
+  "reuse_gate": "Original188publication4,648,960B SHA622fd68d5380b97449a09872bc15402117dd9c3e7a2576a757cd6aff8fd090d7 andactualoriginalsource/provenance/input/model/tool/frame-native/wire/judgejoins needed;noautomatic30clipcredit. ExistingGitobjectaloneinsufficient; reproducible reconstructiononlyifalloriginalready/source/archivehashesmatch,andexplicitlylabelreconstructednotrecoveredoriginal. Oldactualidentityb26e/c212preserved,sourceH2laternotassumedcoverold.",
+  "stops": "Anyunknownalias/source/identity/archive/cost/volume/canonical-state issue stops,preservepartial, no destructivecleanup. Candidateonlyno full30dispatch. Exactoldsource/envelope/methodcompatibility needed,labels188visible0absent(noFPRcoverage),onecalibrationclipcountsONCE."
+}

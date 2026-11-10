@@ -1593,6 +1593,54 @@
       "cpu_seconds": 30,
       "basis": "Prospectivelyfull30CPU new0bb5exclusiveGPU16preparation only; within1200CPUprospectivepilot; noGPUrelease.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "w8-174ac-0e193-unassigned-expiry-closure-20261110",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 150,
+      "witness_qualification": true,
+      "qualification_charge_kind": "pilot_preparation",
+      "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+      "basis": "Entire150externalCPU allowance incl10finalreadiness,queue/manager/worker/admin/audit,allocationnotmeasuredaggregate. No assignment/run/attempts/gate/campaign/outputs/claims; gpu6owneronlydeadlinesweeper. Actualremoteaudit0.057CPU. ZeroGPU/qualificationexecution, therefore prep-only;300priortrueprep+150=450.",
+      "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "k5d-legacy188-reuse-local-audit-20261110",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 20,
+      "basis": "Prospectivelyprechargedfull20CPU read-onlyLOCALlegacy188reuseaudit; no inference/remoterecovery/automaticcredit.",
+      "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "k5d-same-job-389e-expiry-closure-20261110",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 370,
+      "basis": "Full370remainingexternalCPUallocation queue/admin/audit;30prepalreadycharged400inclusive. CanonicalEXPIREDnohost/supervisor/run/attempts/sourceextraction/claims,physical450darchiveandready21cd/spec25f4. Ownerdeadline-sweepernotGPU. QueuewallnotCPU,aggregateadminunmeasured.",
+      "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "k5d-legacy188-bounded-recovery-20261110",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "basis": "Prospectivelyprecharged50CPU boundedreadonly64MiBlegacy188recovery+audit,noinference/noautomaticcredit.",
+      "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "k5d-legacy188-label-method-join-20261110",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 30,
+      "basis": "Prospectivelyprecharged30CPU cacheZIPGTjoin+localactualsourcecompatibilityaudit; no inference/autocredit.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2111,8 +2159,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 7920,
-      "cpu_seconds": 5610,
-      "status": "Remaining_unspent;new0bb5GPU16prep30precharged;noGPUreleaseyet;48/292/586held"
+      "cpu_seconds": 5140,
+      "status": "Remaining_unspent;389eunassignedexpiryclosed400CPUincl0GPU;onefurtheradmissionwindowprospective"
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -2176,8 +2224,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 2758,
-      "status": "Remaining_unspent;50CPU current174readiness/prestageoracleprecharged;GPUheldpendingactualcost/fullforecast"
+      "cpu_seconds": 2608,
+      "status": "Remaining_unspent;0e193unassignedexpiryclosed0GPU150CPUallocation;onefurther550CPUprototypeprospective"
     }
   ],
   "jobs": [
@@ -3604,7 +3652,7 @@
       "job_id": "20261110T123904Z-0e193d36",
       "phase": "w8-full-witness-staged-20261106",
       "subphase": "174ac-unit0-original24frame30step-costpilot",
-      "state": "submitted pending;solecanonicalwait w8_resume_queue",
+      "state": "expiredunassigned;rootclosed0GPU150CPUprep-onlyallocation",
       "revision": "174ac84b84a1f405e06700a34aa4c3e225fa3265",
       "source_sha256": "4cad9e47ebeb88f1cdb272634921f2aed79100e0e15ace4d01f9a3a33720d9d6",
       "snapshot_sha256": "5e62a2e912f5dba0cd945d33388b95154d5d8e88ed6cf5b5998e595a323c6fd1",
@@ -3630,7 +3678,11 @@
       "local_batch": "/private/tmp/pointstream-w8-resume-final-20261110-a1",
       "admission_ledger_sha256": "f0d1370afbdf21a4219896bf5a5f7549a5cd6bed2cf48f99d9407a29f361b9ba",
       "budget_attestation_note": "LaterunrelatedBall50prepchargeoffsetby50Ballreservereduction; W8parentandglobalcharged+reservedunchanged, rootacceptedoriginalpinnedledgercapacity.",
-      "scope": "Firstactualsinglequeued24/30cost+operationalqualification; nofull240/RNGprefix/otherunit/quality. PriorCLIvalidationerrorbeforepublicationpreserved; nootherGPUjobcreated."
+      "scope": "Firstactualsinglequeued24/30cost+operationalqualification; nofull240/RNGprefix/otherunit/quality. PriorCLIvalidationerrorbeforepublicationpreserved; nootherGPUjobcreated.",
+      "terminal_gpu_charge": 0,
+      "terminal_CPU_allocation": 150,
+      "qualification_executed": false,
+      "wait_state": "ended;onecanonicaldeadlineinspection+physicalexpiryverified;eventACK"
     },
     {
       "job_id": "20261110T124427Z-d20121f2",
@@ -3660,6 +3712,109 @@
       "approved_gate_sha256": "9445895e80c29d26c305134a3551347a2b4393a07d3985599768edf937ecb687",
       "terminal_additional_cpu_charge": 250,
       "actual_inclusive_conservative_cpu_charge": 300
+    },
+    {
+      "job_id": "20261110T130538Z-389ebe94",
+      "phase": "k5d-scale-first-tranche-20261105",
+      "subphase": "same-job-0bb5-exclusive16-parity-IO-cost",
+      "state": "expiredunassigned;rootclosed0GPU400CPUinclusive",
+      "revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
+      "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
+      "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+      "spec_sha256": "25f4fbe509fa1f431fe9250e9c04c9a1be359743fa1cbba72afe8ea9b3cc0ed9",
+      "source_archive": true,
+      "deadline": "2026-11-10T13:38:57.226322Z",
+      "hosts": [
+        "gpu2",
+        "gpu3"
+      ],
+      "gpu_models": [
+        "RTX A6000"
+      ],
+      "GPU_inclusive": 1000,
+      "CPU_inclusive": 1200,
+      "preparation_alreadycharged": 30,
+      "future_CPU": 1170,
+      "campaign": 800,
+      "namespace": 580,
+      "smoke": 600,
+      "validator": 30,
+      "GPU_post": 200,
+      "CPU_external_after_preparation": 370,
+      "local_storage_gib": 32,
+      "local_batch": "/private/tmp/k5d-same-job-0bb5-exclusive16-preparation-20261110",
+      "scope": "Originalsixpoint16parity actualsame-jobretainedreceiver+IOpilot; no48/292/586/full30/independentclipclaim.",
+      "terminal_GPU_charge": 0,
+      "terminal_additional_CPU_allocation": 370,
+      "inclusive_CPU_allocation": 400,
+      "qualification_executed": false,
+      "wait_state": "ended;canonicaldeadlinecheck+independentexpiryproof,eventACK"
+    },
+    {
+      "job_id": "20261110T133353Z-0a5e1789",
+      "phase": "w8-full-witness-staged-20261106",
+      "subphase": "174ac-unit0-second-admission-window-no-prior-execution",
+      "state": "publishedpending;solecanonicalwaitw8_resume_queue",
+      "revision": "174ac84b84a1f405e06700a34aa4c3e225fa3265",
+      "source_sha256": "4cad9e47ebeb88f1cdb272634921f2aed79100e0e15ace4d01f9a3a33720d9d6",
+      "snapshot_sha256": "5e62a2e912f5dba0cd945d33388b95154d5d8e88ed6cf5b5998e595a323c6fd1",
+      "spec_sha256": "f9da4bb36f55ae76c4f47df4e25e69bf608f79676431f6daa17bc5e34e44934a",
+      "source_archive": true,
+      "deadline": "2026-11-10T14:13:53.663675Z",
+      "hosts": [
+        "gpu5"
+      ],
+      "GPU_models": [
+        "RTX 6000 Ada"
+      ],
+      "future_GPU": 500,
+      "future_CPU": 550,
+      "qualification_preparation_CPU_alreadycharged": 450,
+      "qualification_CPU_max": 1000,
+      "qualification_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+      "campaign": 400,
+      "smoke": 335,
+      "validator": 60,
+      "noop": 5,
+      "generator_CPU": 210,
+      "generator_wall": 240,
+      "external_CPU": 150,
+      "external_GPU": 50,
+      "final_readiness_inside_external_CPU": 10,
+      "admission_ledger_sha256": "d6c69484c55df0a4df701b314177aa01a5a313507767f4e97943932b6481165a",
+      "local_batch": "/private/tmp/pointstream-w8-second-window-20261110-a1",
+      "scope": "Sameoriginal24/30cost/operationalcontext,neverpreviouslyexecuted. Nootherunit/full240/80/quality/furtherretry."
+    },
+    {
+      "job_id": "20261110T135257Z-8868b966",
+      "phase": "k5d-scale-first-tranche-20261105",
+      "subphase": "same-job-0bb5-exclusive16-second-admission-window",
+      "state": "publishedpending;rootACK;solecanonicalwaitball_source_qualification",
+      "revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
+      "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
+      "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+      "spec_sha256": "9f005b51c53f192fffc83d9cac4f7fac589b0d2008c23fd9400896ff85a15fb6",
+      "source_archive": true,
+      "deadline": "2026-11-10T14:26:05.118755Z",
+      "hosts": [
+        "gpu2",
+        "gpu3"
+      ],
+      "gpu_models": [
+        "RTX A6000"
+      ],
+      "future_GPU": 1000,
+      "future_CPU": 1200,
+      "campaign": 800,
+      "namespace": 580,
+      "smoke": 600,
+      "validator": 30,
+      "noop": 5,
+      "external_CPU": 400,
+      "GPU_post": 200,
+      "local_storage_gib": 32,
+      "local_batch": "/private/tmp/k5d-same-job-0bb5-second-window-20261110",
+      "scope": "Sameoriginalsixpoint16parity/retainedreceiverIOcost only; no48/292/586/full30 or extra independent clip."
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -3681,9 +3836,10 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "ONEcanonicalboundedwait0e193 w8_resume_queue afterrootACK;Ball0bb5sourceprepactive,noGPU/CPUjobyet,no timers/retry.",
+    "state": "Two solecanonicalwaits, W8deadline14:13UTC and Ball14:26UTC; no repeatedpolls/timers. Legacy188 bounded30CPUlabel/methodaudit independent.",
     "jobs": [
-      "20261110T123904Z-0e193d36"
+      "20261110T133353Z-0a5e1789",
+      "20261110T135257Z-8868b966"
     ],
     "batches": [],
     "native_completion_resume_verified": false,
