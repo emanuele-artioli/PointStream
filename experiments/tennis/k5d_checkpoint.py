@@ -78,6 +78,9 @@ def validate_prepared(root: Path) -> dict[str, Any]:
 def seal(root: Path, identity: dict[str, str]) -> dict[str, Any]:
     enc.validate(root, prepared=True)
     report = validate_prepared(root)
+    from experiments.tennis import k5d_same_job_receiver as receiver
+    if (root / receiver.MARKER).exists():
+        receiver.verify(root, report, identity)
     data = {'schema': 1, 'execution_identity': identity, 'clip': report['clip'],
             'frames': report['frames'], 'points': [list(p) for p in enc.POINTS],
             'files': manifest_files(root), 'scope': 'full native contexts and joint fit; no scored output'}
@@ -85,7 +88,8 @@ def seal(root: Path, identity: dict[str, str]) -> dict[str, Any]:
     return data
 
 
-def verify(root: Path, expected_sha: str, identity: dict[str, str]) -> dict[str, Any]:
+def verify(root: Path, expected_sha: str, identity: dict[str, str], *,
+           require_same_job_receiver: bool = False) -> dict[str, Any]:
     if oracle.sha(root / 'checkpoint.json') != expected_sha:
         raise ValueError('checkpoint manifest SHA256 mismatch')
     data = json.loads((root / 'checkpoint.json').read_text())
@@ -94,6 +98,9 @@ def verify(root: Path, expected_sha: str, identity: dict[str, str]) -> dict[str,
             or data.get('files') != manifest_files(root)):
         raise ValueError('checkpoint content, source or runtime mismatch')
     report = validate_prepared(root)
+    from experiments.tennis import k5d_same_job_receiver as receiver
+    if require_same_job_receiver or (root / receiver.MARKER).exists():
+        receiver.verify(root, report, identity, verified_manifest=data['files'])
     if (report['clip'] != data['clip'] or report['frames'] != data['frames']
             or report['full_metrics'] is not False):
         raise ValueError('checkpoint report scope mismatch')
@@ -123,6 +130,8 @@ def score_point(args: argparse.Namespace, checkpoint_sha: str, identity: dict[st
     from src.codecs import quality
 
     root, output = Path(args.checkpoint), Path(args.output)
+    if (root / 'same-job-receiver.json').exists():
+        raise ValueError('same-job receiver checkpoints require coalesced retained-pixel scoring')
     verify(root, checkpoint_sha, identity)
     if len(os.sched_getaffinity(0)) != 1 or os.environ.get('PS_CPU_ALLOWANCE') != '1' or torch.cuda.device_count() != 1:
         raise ValueError('one CPU and one CUDA device required')
@@ -211,7 +220,19 @@ def assemble(checkpoint: Path, checkpoint_sha: str, point_files: list[dict[str, 
         raise ValueError('all six point checkpoints required')
     if output.exists():
         raise ValueError('assemble output already exists')
-    shutil.copytree(checkpoint, output)
+    from experiments.tennis import k5d_same_job_receiver as receiver
+    retained = (checkpoint / receiver.MARKER).exists()
+    marker = json.loads((checkpoint / receiver.MARKER).read_text()) if retained else None
+    if retained:
+        for record in (json.loads(Path(item['path']).read_text()) for item in point_files):
+            key = (record['point']['codec'], record['point']['point'])
+            if (record.get('receiver_origin') != marker
+                    or record.get('receiver_origin_role') != 'producer job; no later native decode'
+                    or record['receiver_replay'] != expected[key]['receiver']):
+                raise ValueError('scored point does not bind retained producer receipt')
+    def ignore_receiver(_path: str, names: list[str]) -> list[str]:
+        return [name for name in names if name in ('receiver-evidence', receiver.MARKER)] if retained else []
+    shutil.copytree(checkpoint, output, ignore=ignore_receiver)
     # Fleet stages verified archives read-only; copytree preserves those modes.
     # Make only the new assembly copy writable, leaving the checkpoint untouched.
     for path in (output, *output.rglob('*')):
@@ -274,6 +295,9 @@ def prepare(args: argparse.Namespace, identity: dict[str, str]) -> None:
     args.checkpoint_prepare = True
     args.timer = Timer(scratch / 'checkpoint-prepare-timing.json')
     enc.run(args)
+    if getattr(args, 'same_job_receiver', False):
+        from experiments.tennis import k5d_same_job_receiver as receiver
+        receiver.retain(out, scratch / (out.name + '-work'), identity, Path(os.environ['PS_STAGE_DIR']))
     if getattr(args, 'cost_pilot', False):
         gate_path = out / 'fidelity-gate.json'
         if not gate_path.exists():

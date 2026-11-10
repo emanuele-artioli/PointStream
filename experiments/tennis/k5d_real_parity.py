@@ -49,7 +49,7 @@ def spec(base: dict, *, assets: dict[str, dict[str, str]], deadline: str, unshar
     if set(assets) != required:
         raise ValueError('exact fidelity gate, accepted reference and audited CPU receipt assets required')
     if first_pair_source:
-        from experiments.tennis import k5d_first292_source_bridge as scoped
+        from experiments.tennis import k5d_same_job_source_bridge as scoped
         scoped.verify_signed(Path(assets['first_pair_bridge']['local']), assets['first_pair_bridge']['sha256'],
                              Path(assets['calibration_source']['local']), Path(assets['consumer_source']['local']), identity)
     if not cf.digest_string(unshare_sha256) or assets['accepted16']['sha256'] != cf.D8_SMOKE_SHA:
@@ -216,9 +216,10 @@ def run(args: argparse.Namespace) -> None:
     source_args = tuple(getattr(args, name, None) for name in
                         ('first_pair_bridge', 'first_pair_bridge_sha256', 'calibration_source', 'consumer_source'))
     if any(source_args):
+        args.same_job_receiver = True
         if not all(source_args):
             raise ValueError('complete scoped source bridge inputs required')
-        from experiments.tennis import k5d_first292_source_bridge as scoped
+        from experiments.tennis import k5d_same_job_source_bridge as scoped
         scoped.verify_signed(Path(args.first_pair_bridge), args.first_pair_bridge_sha256,
                              Path(args.calibration_source), Path(args.consumer_source), identity)
     cpu = json.loads(Path(args.native_cpu_receipt).read_text())
