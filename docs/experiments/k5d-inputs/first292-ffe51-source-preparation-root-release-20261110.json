@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "decision": "Root releases first292 source preparation ONLY",
+  "revision": "ffe51da48b4088609cd8f799e4655d608fcacbad",
+  "source_sha256": "390e157a9aabc1db8006a936a7de54a43c8810650260136bc59a67036e7dfd39",
+  "snapshot_sha256": "202466a711d17b742a17270bab91da2dc581af7a9fc1e411405f8bb37a924372",
+  "archive": "/private/tmp/k5d-first292-review-ffe51-20261109/consumer-source.tar",
+  "source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/k5d-first292-ffe51-20261110/source.tar",
+  "CPU_ceiling": 50,
+  "GPU_ceiling": 0,
+  "native_CPU_family_prospective_cap": 300,
+  "parent_phase": "k5d-scale-first-tranche-20261105",
+  "scope": "ONE<=50CPU source preparation including read-only recovery of exact H2c3ff and d8reference8758 into new local paths, fresh SHA/metadata and no-overwrite source/bridge uploads. No job/native/model/GPU. Unknown source/reference availability stops; no reconstructed or relabeled evidence. Fresh actual nativeCPU spec for separate root review.",
+  "recovery_required": {
+    "H2_snapshot_sha256": "c3ff5419167504afcd84d25931791eddfe8bae16b5e492ed124df31e43f66f67",
+    "d8_reference_sha256": "8758597ba524cafc017e25cbd20c15ecbeaeed534d5622dfe67d66eb16521377"
+  }
+}
