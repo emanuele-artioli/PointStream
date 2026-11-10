@@ -1593,6 +1593,18 @@
       "cpu_seconds": 30,
       "basis": "Prospectivelyfull30CPU new0bb5exclusiveGPU16preparation only; within1200CPUprospectivepilot; noGPUrelease.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "w8-174ac-0e193-unassigned-expiry-closure-20261110",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 150,
+      "witness_qualification": true,
+      "qualification_charge_kind": "pilot_preparation",
+      "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+      "basis": "Entire150externalCPU allowance incl10finalreadiness,queue/manager/worker/admin/audit,allocationnotmeasuredaggregate. No assignment/run/attempts/gate/campaign/outputs/claims; gpu6owneronlydeadlinesweeper. Actualremoteaudit0.057CPU. ZeroGPU/qualificationexecution, therefore prep-only;300priortrueprep+150=450.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2176,8 +2188,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 2758,
-      "status": "Remaining_unspent;50CPU current174readiness/prestageoracleprecharged;GPUheldpendingactualcost/fullforecast"
+      "cpu_seconds": 2608,
+      "status": "Remaining_unspent;0e193unassignedexpiryclosed0GPU150CPUallocation;onefurther550CPUprototypeprospective"
     }
   ],
   "jobs": [
@@ -3604,7 +3616,7 @@
       "job_id": "20261110T123904Z-0e193d36",
       "phase": "w8-full-witness-staged-20261106",
       "subphase": "174ac-unit0-original24frame30step-costpilot",
-      "state": "submitted pending;solecanonicalwait w8_resume_queue",
+      "state": "expiredunassigned;rootclosed0GPU150CPUprep-onlyallocation",
       "revision": "174ac84b84a1f405e06700a34aa4c3e225fa3265",
       "source_sha256": "4cad9e47ebeb88f1cdb272634921f2aed79100e0e15ace4d01f9a3a33720d9d6",
       "snapshot_sha256": "5e62a2e912f5dba0cd945d33388b95154d5d8e88ed6cf5b5998e595a323c6fd1",
@@ -3630,7 +3642,11 @@
       "local_batch": "/private/tmp/pointstream-w8-resume-final-20261110-a1",
       "admission_ledger_sha256": "f0d1370afbdf21a4219896bf5a5f7549a5cd6bed2cf48f99d9407a29f361b9ba",
       "budget_attestation_note": "LaterunrelatedBall50prepchargeoffsetby50Ballreservereduction; W8parentandglobalcharged+reservedunchanged, rootacceptedoriginalpinnedledgercapacity.",
-      "scope": "Firstactualsinglequeued24/30cost+operationalqualification; nofull240/RNGprefix/otherunit/quality. PriorCLIvalidationerrorbeforepublicationpreserved; nootherGPUjobcreated."
+      "scope": "Firstactualsinglequeued24/30cost+operationalqualification; nofull240/RNGprefix/otherunit/quality. PriorCLIvalidationerrorbeforepublicationpreserved; nootherGPUjobcreated.",
+      "terminal_gpu_charge": 0,
+      "terminal_CPU_allocation": 150,
+      "qualification_executed": false,
+      "wait_state": "ended;onecanonicaldeadlineinspection+physicalexpiryverified;eventACK"
     },
     {
       "job_id": "20261110T124427Z-d20121f2",
@@ -3713,9 +3729,8 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "TwoindependentboundedGPUqueues:W80e193waitw8_resume_queue deadline13:12;Ball389ewaitball_source_qualification deadline13:38. No otherjobs/retry/timer.",
+    "state": "Ball389eonlyactiveGPUqueue,sourceownerwait. W8firstqueueexpiredrootclosed;oneboundedrefinedfuturequeueapprovedrecipebelow,nopublishedjobyet.",
     "jobs": [
-      "20261110T123904Z-0e193d36",
       "20261110T130538Z-389ebe94"
     ],
     "batches": [],
