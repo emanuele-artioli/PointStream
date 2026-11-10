@@ -253,6 +253,9 @@ def validate(stage: Path, destination: Path) -> None:
     import tarfile
 
     dispatch = json.loads((stage / 'dispatch.json').read_text())
+    from experiments.tennis import w8_strict_host_cost_job as host
+    if dispatch.get('staged_environment', {}).get('sha256') != host.MAIN_ENV:
+        raise ValueError('CPU proof campaign must use pinned MAIN environment')
     staging = json.loads((stage / 'staging.json').read_text())
     archive = stage / 'published.tar'
     if fixed.file_sha(archive) != staging['published']['sha256']:
@@ -342,8 +345,15 @@ def validate(stage: Path, destination: Path) -> None:
         policy.validate_self_leaf_identity(packet_leaves, packet_namespace['worker_host_identity'])
         if packet_leaves != raw_json('packet-packet-decoded-manifest.json')['isolation']['approved_leaves']:
             raise ValueError('packet self leaves differ from decoded isolation')
+        preflight_rows = [item for item in spec['staged_inputs'] if item.get('name') == 'preflight']
+        if len(preflight_rows) != 1 or preflight_rows[0].get('sha256') != packet.PREFLIGHT_SHA:
+            raise ValueError('historical preflight metadata input differs')
+        preflight = w8_protected_metadata.read_historical(Path(preflight_rows[0]['path']), packet.PREFLIGHT_SHA)
+        from experiments.tennis import w8_witness_profile as witness
         for runtime in ('main', 'jcv'):
             observed = raw_json(f'strict-{runtime}-receipt_path.json')
+            config = raw_json(f'strict-{runtime}-config_path.json')
+            witness.validate_cpu_runtime_attestation(observed, config, preflight, runtime)
             leaves = raw_json(f'strict-{runtime}-self_leaves_path.json')
             policy.validate_self_leaf_identity(leaves, raw_json(f'strict-{runtime}-namespace_path.json')['worker_host_identity'])
             if leaves != observed['isolation']['approved_leaves']:

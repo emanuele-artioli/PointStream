@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "status": "Root accepts actual Linux primitive and fixed archive-header compatibility only",
+  "GPU_charge": 0,
+  "CPU_charge": 20,
+  "family_prospective_CPU_cap": 300,
+  "family_remaining_unreleased_CPU": 280,
+  "basis": "Entire authorized20CPU inclusive ceiling; remote self.278CPU and partial local telemetry measured, aggregate admin unmeasured. No real cache/model bulk copy, extraction or content SHA.",
+  "raw_directory": "/private/tmp/k5d-gpu3-safe-preflight-20261109",
+  "helper_sha256": "44d3ba656cd6c2dfc073006e1465429ac20bf1add91ff331f5b6783965dd0350",
+  "staging_sha256": "f94156c1d5b9a6bf2ac1ec8c3437a82cd6f36a9085a7f68a6122381b7cfd0422",
+  "raw_hashes": {
+    "intent.json": "4d9ff31d8c3bfb29979229f7f421437ef9ea677c211ae9285440c2c4d4dea6fd",
+    "dispatch-receipt.json": "c27e15c4e0feac78883391b5ba3b6e24d13a8d2a3d57c9fc0a5d8dc935453919",
+    "handle.json": "7c597c17c4631e055c92c6f38e57bdd607c3f0c29ab13e52d69016a7ab4a232b",
+    "remote.py": "d98dd86575ea92a07cb219bb82c147a825e3ffe537ca811fd2392d6bb57b3899",
+    "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "dispatch.py": "1c3f07d0b161b015d4889a8e945bd3800d403ff192b37cf3ae01a0c55f0ab6b7",
+    "workers.json": "8d0b451c11505fef1ab56fe3227c1ba781070b2ed442ebe21e88d508a729fc81",
+    "payload.json": "5b7872756aae334c6190e0cbf9a742c9b2a25a93c1da384d26a40f8a284bf609",
+    "readiness.py": "a5cc3b46019ad0cbde29faf7ecb32abbdce3c046b7e901c2e42f703da6f940ec",
+    "jobs.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout.json": "a156a7ccca9525812c664308b37d3eb1fa04f4d2222338c0b2a76ef75bb3e880",
+    "jobs.json": "fcd6838f0718a5cbe48aeee4516992d2404ae81ff1c9dc050c77b56ae2dbdb60",
+    "workers.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "receipt.json": "d925ff3ce6eba221244fd2e723705e02ecb0f36831c2b05b3159e01fca3d5607"
+  },
+  "archive_headers": [
+    {
+      "name": "balltrack_code",
+      "members": 93,
+      "expanded_bytes": 250876,
+      "source_stat": {
+        "device": 57,
+        "inode": 36525358,
+        "mtime_ns": 1792523333623036937,
+        "size": 327680
+      }
+    },
+    {
+      "name": "wasb_code",
+      "members": 133,
+      "expanded_bytes": 305230,
+      "source_stat": {
+        "device": 57,
+        "inode": 36525308,
+        "mtime_ns": 1792523222465535372,
+        "size": 409600
+      }
+    },
+    {
+      "name": "wasb_weights",
+      "members": 7,
+      "expanded_bytes": 123598117,
+      "source_stat": {
+        "device": 57,
+        "inode": 36534951,
+        "mtime_ns": 1792523635230111430,
+        "size": 123607040
+      }
+    }
+  ],
+  "actual_linux_noreplace": true,
+  "existing_nonempty_target_preserved": true,
+  "injected_error_cases": [
+    "interrupt",
+    "EXDEV",
+    "unsupported"
+  ],
+  "filesystem_reserve_correction": "Preserve stock50GiB plus new incremental/private/race bytes; later GPU job separately requires32GiB workload above reserve. Earlier32GiB wording was incomplete.",
+  "qualification_exclusions": [
+    "bulk source content integrity",
+    "real cache warming",
+    "300CPU fit",
+    "GPU pool/spec change"
+  ]
+}

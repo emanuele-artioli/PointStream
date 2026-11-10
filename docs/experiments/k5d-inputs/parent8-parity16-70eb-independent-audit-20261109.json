@@ -1,0 +1,470 @@
+{
+  "audit_script_sha256": "3ab4fa81d16b5a8211c0ed0030a3b58775d5247d8ce4cce755eea513f88ec00e",
+  "canonical_status": "complete",
+  "canonical_update_epoch": 1794264336.1023362,
+  "children_allocator_receipts": [
+    {
+      "action": "decode",
+      "allocated_before": 0,
+      "budget_mib": 2048,
+      "campaign_pgid": 1945019,
+      "fraction": 0.042073474502714335,
+      "gpu_uuid": "GPU-40e9a544-b3d6-e5f3-a736-7020a6401bfc",
+      "host_pgid": 1945019,
+      "host_pid": 1954809,
+      "pgid": 0,
+      "pid": 1061,
+      "plan": "coalesced-dcvc-42/receiver-plan.json",
+      "role": "dcvc",
+      "start_ticks": 273132374,
+      "total_bytes": 51041271808
+    },
+    {
+      "action": "encode",
+      "allocated_before": 0,
+      "budget_mib": 2048,
+      "campaign_pgid": 1945019,
+      "fraction": 0.042073474502714335,
+      "gpu_uuid": "GPU-40e9a544-b3d6-e5f3-a736-7020a6401bfc",
+      "host_pgid": 1945019,
+      "host_pid": 1946611,
+      "pgid": 0,
+      "pid": 13,
+      "plan": "prepared-work/dcvc-0/plan.json",
+      "role": "dcvc",
+      "start_ticks": 273109629,
+      "total_bytes": 51041271808
+    },
+    {
+      "action": "encode",
+      "allocated_before": 0,
+      "budget_mib": 2048,
+      "campaign_pgid": 1945019,
+      "fraction": 0.042073474502714335,
+      "gpu_uuid": "GPU-40e9a544-b3d6-e5f3-a736-7020a6401bfc",
+      "host_pgid": 1945019,
+      "host_pid": 1947522,
+      "pgid": 0,
+      "pid": 155,
+      "plan": "prepared-work/dcvc-21/plan.json",
+      "role": "dcvc",
+      "start_ticks": 273112249,
+      "total_bytes": 51041271808
+    },
+    {
+      "action": "decode",
+      "allocated_before": 0,
+      "budget_mib": 2048,
+      "campaign_pgid": 1945019,
+      "fraction": 0.042073474502714335,
+      "gpu_uuid": "GPU-40e9a544-b3d6-e5f3-a736-7020a6401bfc",
+      "host_pgid": 1945019,
+      "host_pid": 1947881,
+      "pgid": 0,
+      "pid": 226,
+      "plan": "prepared-work/dcvc-21/plan.json",
+      "role": "dcvc",
+      "start_ticks": 273113522,
+      "total_bytes": 51041271808
+    },
+    {
+      "action": "encode",
+      "allocated_before": 0,
+      "budget_mib": 2048,
+      "campaign_pgid": 1945019,
+      "fraction": 0.042073474502714335,
+      "gpu_uuid": "GPU-40e9a544-b3d6-e5f3-a736-7020a6401bfc",
+      "host_pgid": 1945019,
+      "host_pid": 1948475,
+      "pgid": 0,
+      "pid": 297,
+      "plan": "prepared-work/dcvc-42/plan.json",
+      "role": "dcvc",
+      "start_ticks": 273115169,
+      "total_bytes": 51041271808
+    },
+    {
+      "action": "decode",
+      "allocated_before": 0,
+      "budget_mib": 2048,
+      "campaign_pgid": 1945019,
+      "fraction": 0.042073474502714335,
+      "gpu_uuid": "GPU-40e9a544-b3d6-e5f3-a736-7020a6401bfc",
+      "host_pgid": 1945019,
+      "host_pid": 1948839,
+      "pgid": 0,
+      "pid": 368,
+      "plan": "prepared-work/dcvc-42/plan.json",
+      "role": "dcvc",
+      "start_ticks": 273116356,
+      "total_bytes": 51041271808
+    },
+    {
+      "action": "decode",
+      "allocated_before": 0,
+      "budget_mib": 2048,
+      "campaign_pgid": 1945019,
+      "fraction": 0.042073474502714335,
+      "gpu_uuid": "GPU-40e9a544-b3d6-e5f3-a736-7020a6401bfc",
+      "host_pgid": 1945019,
+      "host_pid": 1950208,
+      "pgid": 0,
+      "pid": 692,
+      "plan": "prepared-work/receiver-dcvc-0/receiver-plan.json",
+      "role": "dcvc",
+      "start_ticks": 273120174,
+      "total_bytes": 51041271808
+    },
+    {
+      "action": "decode",
+      "allocated_before": 0,
+      "budget_mib": 2048,
+      "campaign_pgid": 1945019,
+      "fraction": 0.042073474502714335,
+      "gpu_uuid": "GPU-40e9a544-b3d6-e5f3-a736-7020a6401bfc",
+      "host_pgid": 1945019,
+      "host_pid": 1950714,
+      "pgid": 0,
+      "pid": 764,
+      "plan": "prepared-work/receiver-dcvc-21/receiver-plan.json",
+      "role": "dcvc",
+      "start_ticks": 273121751,
+      "total_bytes": 51041271808
+    },
+    {
+      "action": "decode",
+      "allocated_before": 0,
+      "budget_mib": 2048,
+      "campaign_pgid": 1945019,
+      "fraction": 0.042073474502714335,
+      "gpu_uuid": "GPU-40e9a544-b3d6-e5f3-a736-7020a6401bfc",
+      "host_pgid": 1945019,
+      "host_pid": 1951185,
+      "pgid": 0,
+      "pid": 836,
+      "plan": "prepared-work/receiver-dcvc-42/receiver-plan.json",
+      "role": "dcvc",
+      "start_ticks": 273123373,
+      "total_bytes": 51041271808
+    },
+    {
+      "action": "decode",
+      "allocated_before": 0,
+      "budget_mib": 2048,
+      "campaign_pgid": 1945019,
+      "fraction": 0.042073474502714335,
+      "gpu_uuid": "GPU-40e9a544-b3d6-e5f3-a736-7020a6401bfc",
+      "host_pgid": 1945019,
+      "host_pid": 1947024,
+      "pgid": 0,
+      "pid": 84,
+      "plan": "prepared-work/dcvc-0/plan.json",
+      "role": "dcvc",
+      "start_ticks": 273110914,
+      "total_bytes": 51041271808
+    },
+    {
+      "action": "decode",
+      "allocated_before": 0,
+      "budget_mib": 2048,
+      "campaign_pgid": 1945019,
+      "fraction": 0.042073474502714335,
+      "gpu_uuid": "GPU-40e9a544-b3d6-e5f3-a736-7020a6401bfc",
+      "host_pgid": 1945019,
+      "host_pid": 1952332,
+      "pgid": 0,
+      "pid": 917,
+      "plan": "coalesced-dcvc-0/receiver-plan.json",
+      "role": "dcvc",
+      "start_ticks": 273127192,
+      "total_bytes": 51041271808
+    },
+    {
+      "action": "decode",
+      "allocated_before": 0,
+      "budget_mib": 2048,
+      "campaign_pgid": 1945019,
+      "fraction": 0.042073474502714335,
+      "gpu_uuid": "GPU-40e9a544-b3d6-e5f3-a736-7020a6401bfc",
+      "host_pgid": 1945019,
+      "host_pid": 1953180,
+      "pgid": 0,
+      "pid": 989,
+      "plan": "coalesced-dcvc-21/receiver-plan.json",
+      "role": "dcvc",
+      "start_ticks": 273130034,
+      "total_bytes": 51041271808
+    }
+  ],
+  "cpu_accounting_caveat": "One-core whole lifecycle wall is a conservative bound under inherited affinity; aggregate manager/publication/admin CPU is not directly measured. Do not add cumulative child CPU to wall. Root determines external audit/admin and final charge.",
+  "gpu_claim_created_epoch": 1794263915.225406,
+  "gpu_claim_to_canonical_inferred_upper_seconds": 420.8769302368164,
+  "gpu_uuid": "GPU-40e9a544-b3d6-e5f3-a736-7020a6401bfc",
+  "input_count": 13,
+  "job_id": "20261109T223822Z-70eb4770",
+  "judge_rows_compared": 384,
+  "logical_spec_sha256": "b6ae2c411b8ddf677d68b40d651a570bbd9dfd35ff290baa2c13b4a78a753850",
+  "metric_rows_compared": 192,
+  "namespace_receipt": {
+    "argv": [
+      "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+      "-m",
+      "experiments.tennis.k5d_real_parity",
+      "run",
+      "--archive",
+      "/local/users/emanuele/pointstream/cache/bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18/tracknet-dataset.zip",
+      "--balltrack-code",
+      "/local/users/emanuele/pointstream/cache/5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff/tree",
+      "--balltrack-weight",
+      "/local/users/emanuele/pointstream/cache/b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec/balltrack_best.state_dict.pt",
+      "--wasb-code",
+      "/local/users/emanuele/pointstream/cache/657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55/tree",
+      "--wasb-weights",
+      "/local/users/emanuele/pointstream/cache/4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6/tree",
+      "--wasb-config",
+      "/local/users/emanuele/pointstream/cache/6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d/wasb-tennis.yaml",
+      "--image-ckpt",
+      "/local/users/emanuele/pointstream/cache/b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302/cvpr2026_image.pth.tar",
+      "--video-ckpt",
+      "/local/users/emanuele/pointstream/cache/934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3/cvpr2026_video_htl.pth.tar",
+      "--lpips-backbone",
+      "/local/users/emanuele/pointstream/cache/7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02/alexnet-owt-7be5be79.pth",
+      "--dists-backbone",
+      "/local/users/emanuele/pointstream/cache/397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0/vgg16-397923af.pth",
+      "--frames",
+      "16",
+      "--fidelity-gate",
+      "/local/users/emanuele/pointstream/cache/2104eac96fca55bf01047d67aef91a14611eee11dfb5eda67f8291d717082257/fidelity-cost48-gate-20261104.json",
+      "--fidelity-gate-sha256",
+      "2104eac96fca55bf01047d67aef91a14611eee11dfb5eda67f8291d717082257",
+      "--accepted16",
+      "/local/users/emanuele/pointstream/cache/8758597ba524cafc017e25cbd20c15ecbeaeed534d5622dfe67d66eb16521377/published.tar",
+      "--native-cpu-receipt",
+      "/local/users/emanuele/pointstream/cache/9eb8adc75eb96087aeffa334b2291fdd892745355c9fdb4f02b4cb7da1348b18/parent8-native-edaf-parity-admission-9eb8adc7-20261109.json",
+      "--native-cpu-receipt-sha256",
+      "9eb8adc75eb96087aeffa334b2291fdd892745355c9fdb4f02b4cb7da1348b18",
+      "--unshare-sha256",
+      "9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6",
+      "--shared-parent8-child2"
+    ],
+    "children_cpu_seconds": 313.082491,
+    "complete_descendant_wait": true,
+    "elapsed_seconds": 316.1523253088817,
+    "init_cpu_seconds": 0.543319,
+    "namespace_init": {
+      "host_pid": 1945696,
+      "namespace_pgid": 0,
+      "namespace_pid": 1,
+      "namespace_pids": [
+        1945696,
+        1
+      ],
+      "namespace_sid": 0,
+      "observed_monotonic": 2731384.641439215,
+      "pid_namespace": "pid:[4026537776]",
+      "start_ticks": 273106844
+    },
+    "reaped": 1,
+    "reason": "complete",
+    "status": 0,
+    "worker_host_identity": {
+      "campaign_pgid": 1945019,
+      "exec_host_pgid": 1945019,
+      "host_pgid": 1945019,
+      "host_pid": 1945697,
+      "start_ticks": 273106850
+    },
+    "worker_namespace_pid": 2
+  },
+  "observed_foreign_pid_untouched": 1918503,
+  "observed_process_identities_absent": 14,
+  "occupancy_caveat": "Inferred bound, not measured GPU occupancy: checked actual release monitor finally releases claims after child stop, and actual release inbox reconciles only after supervisor exits. Empty supervisor log and later absent claim support normal release path; exact release time is not recorded. Pending queue is not GPU time.",
+  "owned_cpu_and_gpu_claims_absent": true,
+  "parent_allocator_receipt": {
+    "allocated_before": 0,
+    "budget_mib": 8192,
+    "campaign_pgid": 1945019,
+    "fraction": 0.16829389801085734,
+    "gpu_uuid": "GPU-40e9a544-b3d6-e5f3-a736-7020a6401bfc",
+    "host_pgid": 1945019,
+    "host_pid": 1945697,
+    "pgid": 0,
+    "pid": 2,
+    "role": "parent",
+    "start_ticks": 273106850,
+    "total_bytes": 51041271808
+  },
+  "per_point_checks": "retained native, wire and baseline packet bytes exactly equal; retained decoded/rendered SHA and all per-frame metric and judge arrays exactly equal; no fresh independent pixel decode or model rerun",
+  "published_tar_sha256": "889fe3e58037c16dc3808896fb248b368d3f514f1f8ac49f359475a49c959a09",
+  "raw_directory": "/private/tmp/k5d-parent8-gpu16-pilot-20261109",
+  "raw_sha256": {
+    "batch.json": "298092ec032641b31c87edf94966bc2f712568a224448151dc1c06a5bb8cf612",
+    "contention-ack.json": "c5f9ca01ed180831216d3de41486943dd66cd2955f7e5923fef5fa548e586043",
+    "control-ordering-probe.py": "5306b16a715aad7c0d0c9652e37671b51b0e85725abdf5649aeff2be9598289c",
+    "control-ordering.json": "a8dd7bca34834f306b4856893850e39f27bb26be9a0d652d0f4b9dd59db803ab",
+    "events-contention.json": "6de99ec86510e9a220285a844cc3c981ef9df0bced5488df59bc0041d7b6d6c4",
+    "events-terminal.json": "0777e735c84c045bfa2a6d25c5d594e7d94d5b124de68b856e78822db61daac2",
+    "full-published.tar": "f08297f7c62fe5bf021293c1ee8e8cc62ac96a67c91c44211803d6acad9f9a5d",
+    "inventory.json": "ce8b54639ee8006755ad53ffe4681904b727fe79167b5e4e6a8c2e5b7f8b996b",
+    "metadata-bundle.json": "626dbee9591d97989c2313c39ee2a451de66a6092f10637c30df7fcd4467fbf6",
+    "owned-pids.json": "c24fbb153d4ef8a8bc9d365e79714f3e285eb95c7541bd49edfab898930eb23e",
+    "pid1945549-v2.json": "51ede2c5a12da8bc779e5d3078d5fcb2340636d88f45f265b44ad266e3c8a5ee",
+    "pid1945549.json": "b35b234ac5bc8e4aacecb73dedbc169fa72f0aa44ff1362333f8cbf2c0ac4351",
+    "post-cleanup-check.py": "9f19b84cbd7500ce2878f853b744e4981cfbddf9a2a10b1102c9cf6a37ee2cd7",
+    "post-cleanup.json": "2ace29c511ca3f139da87be9cc4b536e8be4275bb5ad1dfcdabd09cddcff62bf",
+    "smoke-published.tar": "889fe3e58037c16dc3808896fb248b368d3f514f1f8ac49f359475a49c959a09",
+    "status.json": "e863d0605d1895decdaccc95a72c9e189cdc42129629e3ebef9a6a6131b21331",
+    "submission.json": "85aa8bf4d6259c206bb24690d6367ba22c401aae4fdd6f433e0b88ac4591184b",
+    "terminal-ack.json": "b0b8b37101e4f0ce2f3d00fea7cdcc3de3a25dacbf163a04db9cfcb9c5386039",
+    "wait-rearm.json": "f0d6233a3d5eebe067ae1d88f9ac85c86cbed9c4a9c10a9f0bd6913c8dc92666",
+    "wait.json": "819bf989d1f8e50bb3ae0ca279074946cdf46c454cf5e62a006f5f527b1abb8d"
+  },
+  "reference_tar_sha256": "8758597ba524cafc017e25cbd20c15ecbeaeed534d5622dfe67d66eb16521377",
+  "resource_receipt_count": 13,
+  "run_terminal_epoch": 1794264282.4740648,
+  "runtime_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "schema": 1,
+  "scope": "exact old 16-frame development clip numerical feasibility only; no independent cohort or timing/scale/cost evidence",
+  "shared_timing_contaminated": true,
+  "six_points": [
+    {
+      "codec": "dcvc",
+      "decoded_sha256": "8e67f141e112146e4d5712f51d48c5c9a515680b5532337ccfe4f119c3bf5f3e",
+      "judge_rows_per_model_per_arm": 16,
+      "metric_frames_per_arm": 16,
+      "native_and_packet_files": {
+        "baseline.psbl": {
+          "bytes": 8313,
+          "sha256": "e2258bcd34cd33ec97f04e97c3e9f801548712b32838d7db7b4167c3930a4801"
+        },
+        "native.bin": {
+          "bytes": 8244,
+          "sha256": "66a9a6e44d5087d2e2ed5b379196bbd995d900dcf414884c6218e4e08cbc795a"
+        },
+        "stream.psbl": {
+          "bytes": 8387,
+          "sha256": "6ea2d9c78fbfd0071be22760ff1327582d9e64e74b8af8c01cef80a89045b1c6"
+        }
+      },
+      "point": 0,
+      "rendered_sha256": "eb6f379158f40f6a5616bae22db411d805aca60dedb0feca30368e83308cc6e8"
+    },
+    {
+      "codec": "dcvc",
+      "decoded_sha256": "553f86b91a020d50fd88c0bb359380c2075181de0c0b34ecac793a00b010d517",
+      "judge_rows_per_model_per_arm": 16,
+      "metric_frames_per_arm": 16,
+      "native_and_packet_files": {
+        "baseline.psbl": {
+          "bytes": 20945,
+          "sha256": "e30d0d0288f43f6824feafae5a8075d0109f6f15f19a191ea69214a05dbd5ee6"
+        },
+        "native.bin": {
+          "bytes": 20876,
+          "sha256": "1e3f40b5016293fe4986695d70dbdad2979ebd105c27c77422ea5838f04244dd"
+        },
+        "stream.psbl": {
+          "bytes": 21025,
+          "sha256": "df04ad91475df8e30d36bdec48005a560a0fefd850854c0bd57c97ce08da0df5"
+        }
+      },
+      "point": 21,
+      "rendered_sha256": "9fa67170ebae583c7349fcc51f39bd5fe8fe36969d9c790cb6ec4f885bb1e415"
+    },
+    {
+      "codec": "dcvc",
+      "decoded_sha256": "c56fafd61069b991d73fcec9d71d1f62ac24b8af5d5ec6fc0a2d9c7bfd8434fa",
+      "judge_rows_per_model_per_arm": 16,
+      "metric_frames_per_arm": 16,
+      "native_and_packet_files": {
+        "baseline.psbl": {
+          "bytes": 46195,
+          "sha256": "1dee90cc5e525bc9ef9a6b455102cf452f822788989b983f12cf5caaa0374be0"
+        },
+        "native.bin": {
+          "bytes": 46126,
+          "sha256": "a6632d68cfa35adf91c71d824bf3395c11471acfec19a04f20f8fbfc130d90cf"
+        },
+        "stream.psbl": {
+          "bytes": 46273,
+          "sha256": "ecadc36fa172df83df0c99ca2bfd2c5ab700e98d8b0fa98c8862d62631cb2161"
+        }
+      },
+      "point": 42,
+      "rendered_sha256": "be0ab414d64cc338697f9573dc9256b7ee1bf11bd1c1550fbc00632ca96e4c35"
+    },
+    {
+      "codec": "svt",
+      "decoded_sha256": "5c43d78f12f2e7b41ccf0b794d735af31e1d46c87011d078c53dd20402e4694c",
+      "judge_rows_per_model_per_arm": 16,
+      "metric_frames_per_arm": 16,
+      "native_and_packet_files": {
+        "baseline.psbl": {
+          "bytes": 57549,
+          "sha256": "28514f7c63cf4b1d4363f3ff79fc0f422c63f595bda88b0cb3264bfa12f4bf32"
+        },
+        "native.bin": {
+          "bytes": 57481,
+          "sha256": "589bc1eda7467ff7c038c444d531327dd300f21c637caa703025ad4996fbf610"
+        },
+        "stream.psbl": {
+          "bytes": 57625,
+          "sha256": "33e6278aaa1c15769bd7c16f637922c11fcfa3c4d0fa7e4a3e6f9a19cf1660fe"
+        }
+      },
+      "point": 48,
+      "rendered_sha256": "e3c4341445104ce94e87af25ba40fd0a5eda493ef099524e3725ca7f417160fd"
+    },
+    {
+      "codec": "svt",
+      "decoded_sha256": "b0fcf54eb2c307e0752f2257b315a9d6d03a5d4ce8440535fac41854a2d5283c",
+      "judge_rows_per_model_per_arm": 16,
+      "metric_frames_per_arm": 16,
+      "native_and_packet_files": {
+        "baseline.psbl": {
+          "bytes": 41096,
+          "sha256": "f1a1e3251e5b4ebaf057c378a09dfc7d9da70da63ada16aa03aa767faabf47b4"
+        },
+        "native.bin": {
+          "bytes": 41028,
+          "sha256": "cd18309ada9ea15a8fa93f09633d39d11eba4d8165364ee0622570a09c59b265"
+        },
+        "stream.psbl": {
+          "bytes": 41173,
+          "sha256": "47ce6c1a8f41ab4825f3fba7ceffd772ab7ad73bb05fd0edb7d5f48e0111b8ba"
+        }
+      },
+      "point": 55,
+      "rendered_sha256": "68b4c9f5a88dacec488527641d30e65fe275c57118064091626fc436c418e581"
+    },
+    {
+      "codec": "svt",
+      "decoded_sha256": "b1439bb4911d4450b559ab95ea4186b7941ebec29de125532a43655fc5a2e409",
+      "judge_rows_per_model_per_arm": 16,
+      "metric_frames_per_arm": 16,
+      "native_and_packet_files": {
+        "baseline.psbl": {
+          "bytes": 21751,
+          "sha256": "34e07025ccf0b0fb1b1bedc8457d75035f646e1a169c8741646c4075e6400214"
+        },
+        "native.bin": {
+          "bytes": 21683,
+          "sha256": "91a304e1df95d7a7b553615d3b120ae9c1a7f0767f524eedd4bc7af621916504"
+        },
+        "stream.psbl": {
+          "bytes": 21826,
+          "sha256": "be9f6bbb3784b77355a0069852cd1eb7dc333f2e5c17c5a29ddbcf7e79135411"
+        }
+      },
+      "point": 62,
+      "rendered_sha256": "7d28bdc6064388f6f9305625fb0b10fba4e92f381bebdf10d1869c47a2fae493"
+    }
+  ],
+  "snapshot_sha256": "9f486d70424b9d293d8774c92b36350d284edcb2513c415390b88a2b4c344aed",
+  "source_rows": 16,
+  "source_sha256": "58787f8664f961c2287228762c1ddd3295adab4042bd7f41d9bfee87d2666104",
+  "status": "independent numerical audit candidate; root acceptance required",
+  "supervisor_birth_epoch": 1794263914.54,
+  "supervisor_birth_to_canonical_wall_upper_seconds": 421.56233620643616,
+  "terminal_event_acknowledged": true
+}

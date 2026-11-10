@@ -1,0 +1,57 @@
+{
+  "members": {
+    "packet-packet-cpu-only.json": {
+      "bytes": 537,
+      "sha256": "0296bdd2147ced63f29ca297665fccbeb030bd3b85a2eedf394e644743d4df70"
+    },
+    "packet-packet-namespace.json": {
+      "bytes": 610,
+      "sha256": "0966d49c05087aeabb977641f822e3386d5f0613b0a1d6a207ac4d2315f5dbbb"
+    },
+    "packet-packet-self-leaves.json": {
+      "bytes": 1878,
+      "sha256": "fb6ea5968519bba568b33b3a0763882891b441b8baff0180c74f4dc9efd929bd"
+    },
+    "strict-jcv-config_path.json": {
+      "bytes": 3536,
+      "sha256": "8706aa17e1762f1e4c7311f24feb8bfad3c1b7ebb31c6f69fb3db46ec428df58"
+    },
+    "strict-jcv-namespace_path.json": {
+      "bytes": 591,
+      "sha256": "ec4b54629b2e49ad9c016870afba6327e7ca76cc2751141448bb81871d615f42"
+    },
+    "strict-jcv-namespace_started_path.json": {
+      "bytes": 379,
+      "sha256": "21b50cbf96eb08555cb4cbc7de7b37c7e70bee3c9e028266a5d724e41761d64a"
+    },
+    "strict-jcv-receipt_path.json": {
+      "bytes": 6456,
+      "sha256": "25a3660855a25ad30764d364b1d15f2fe2922a89bd27b48dcec7880e0424339c"
+    },
+    "strict-jcv-self_leaves_path.json": {
+      "bytes": 1878,
+      "sha256": "9b1cdb35a9fb3b7ddf833a75d71ca7ecbcacbfd9fc86203c3cbf52552bad7a10"
+    },
+    "strict-main-config_path.json": {
+      "bytes": 3543,
+      "sha256": "8e5650d0898850a2de84658ba8ace428d43dfc8223f748543acdca4239e75a28"
+    },
+    "strict-main-namespace_path.json": {
+      "bytes": 601,
+      "sha256": "2b64b1e536753cd7d738002dcfc1cfa9f0bc8b672cfae118c30467fb57ebb881"
+    },
+    "strict-main-namespace_started_path.json": {
+      "bytes": 379,
+      "sha256": "feeba9272ed2a2d9f5f4dbfff764d1ee00eaf74cba92ae96df7d301937165282"
+    },
+    "strict-main-receipt_path.json": {
+      "bytes": 6457,
+      "sha256": "b67bb4fc7c8dbf79e76aba4537f3dd8f4ca890b4fc99ea934777644e688afd37"
+    },
+    "strict-main-self_leaves_path.json": {
+      "bytes": 1878,
+      "sha256": "4a2e8474c0d908993e80bfcc24a326f472878fa4ca64021c071e53959bb7ba9d"
+    }
+  },
+  "scope": "candidate raw receipt index, root review required"
+}

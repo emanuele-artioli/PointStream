@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "decision": "Root releases source/readiness preparation only; no GPU submission",
+  "phase": "w8-context-q0-source-readiness-preparation-20261110",
+  "parent_phase": "w8-full-witness-staged-20261106",
+  "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+  "qualification_charge_kind": "pilot_preparation",
+  "witness_qualification": true,
+  "cpu_ceiling_inclusive": 30,
+  "precharged_full_cpu_seconds": 30,
+  "gpu_ceiling": 0,
+  "scope": "Freshcanonicalalljobs/workers/doctor (reuseexactfreshotherownerread-onlyrecordallowed); boundedgpu2management/gpu5execution metadata and public-sourceSHA. Statallfiveprotectedidentities before publicreads; excludealiases/symlinks/nonregular. Exactsource67/e303 and JCVenvironment/cache/inputprovenance/claims/space checks; largeinputmetadata notfreshcontentverification, fleetstagingmusthashbeforeinference. Nooverwrite three small reviewedgate/ledger/receipt uploads O_EXCL/O_NOFOLLOW/fsync, SHApostcheck. No model/GPU/native/frame inference or scientificchanges.",
+  "component_cpu_allowances": {
+    "manager": 10,
+    "remote_metadata_publichash_total": 12,
+    "local_ssh": 2,
+    "contingency": 6
+  },
+  "prospective_context_pilot": {
+    "future_gpu": 500,
+    "future_cpu": 550,
+    "new_preparation": 30,
+    "old_preparation": 20,
+    "inclusive_qualification_cpu_max": 600,
+    "remaining_qualification_gpu_after_full_caps": 400,
+    "remaining_qualification_cpu_after_full_caps": 400
+  },
+  "stops": "Cold/missingpriorSHA/alias/identity/runtime/claim/space/budgetambiguity stops. Preserveallrawandfullcharge. Finalcandidate mustbindthischargedledger andsame50CPUpreparationphases; noGPUuntilseparaterootrelease. <=45min perboundedstage."
+}

@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "job_id": "20261109T234210Z-1c5d7e02",
+  "decision": "Root closes failed CPU proof; no new-source qualification",
+  "source_revision": "33b86cb60347ac12ad2ce0674052e36706e232d1",
+  "failure": "Lifecycle helper JSON final name appeared before contents completed; JSONDecodeError at namespace_proof line137. Strict runtime attestations not reached.",
+  "partial_archive_sha256": "79215bad69da6ba05a2ecabaed93fafc183ab9d4d6e33457df05fff440e32de3",
+  "partial_scope": "Physical packet480/480CPU tensors and14arrays only; original and retained CPU receipt byte-identical. No full CPU, controller, CUDA or quality result.",
+  "observed_PID_births_absent": 8,
+  "groups_and_claims_absent": true,
+  "CPU_charge_additional": 100,
+  "CPU_charge_inclusive": 130,
+  "CPU_preparation_already_charged": 30,
+  "GPU_charge": 0,
+  "CPU_basis": "80rounded above69.7465created-to-canonical wall includingqueue on onecore +20audit/admin allocation;30prep already charged. AggregateCPUunmeasured.",
+  "raw_directory": "/private/tmp/pointstream-w8-33b86-proof-20261109-a1",
+  "raw_sha256": {
+    "terminal-status.json": "7023002020df7e3f273ff068319195f3a7a5b0c3c600502ae4c5da8b4df0a168",
+    "command.log": "a5fa6b6a1ced3fd177182f3f01583f24a9885b07986a9a732cc8a2984cf02fb6",
+    "teardown.json": "1a3588a0db39c2d1f7b458be766cde75688e78c567a491df1d117092d0bc2463",
+    "teardown.py": "af6786c8eaef69dc233791a984021697dad8fbf8b8d6ef7b2ac036d62393a27b",
+    "ack.json": "8067c827cf4d59669dd33e6252d7ef1db5d669b78193fa5af0d715b07d4f3532",
+    "wait.stdout": "1b60f60848d8cfdaaf2f739cf02e321015678c9db3a647623add6a52b062ed11"
+  },
+  "next_step": "Local atomic no-replace readiness JSON publication and tests; new source review before any separately released proof. No automatic retry."
+}

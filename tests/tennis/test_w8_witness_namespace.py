@@ -183,3 +183,51 @@ def test_detached_group_absence_rejects_live_or_inaccessible(monkeypatch):
         raise ProcessLookupError()
     monkeypatch.setattr(proof.os, 'killpg', missing)
     assert proof.group_absent(123) is True
+
+
+def test_readiness_receipt_is_complete_before_atomic_publication(tmp_path, monkeypatch):
+    from experiments.tennis import w8_witness_namespace_proof as proof
+
+    target = tmp_path / 'detached.json'
+    real_link = proof.os.link
+
+    def checked_link(source, destination):
+        assert not target.exists()
+        assert json.loads(source.read_text()) == {'pid': 42}
+        real_link(source, destination)
+
+    monkeypatch.setattr(proof.os, 'link', checked_link)
+    proof.write(target, {'pid': 42})
+    assert json.loads(target.read_text()) == {'pid': 42}
+    assert not (tmp_path / 'detached.json.pending').exists()
+
+
+def test_readiness_receipt_collision_preserves_existing_bytes(tmp_path):
+    from experiments.tennis import w8_witness_namespace_proof as proof
+
+    target = tmp_path / 'worker.json'
+    target.write_text('existing')
+    with pytest.raises(FileExistsError):
+        proof.write(target, {'pid': 42})
+    assert target.read_text() == 'existing'
+    assert json.loads((tmp_path / 'worker.json.pending').read_text()) == {'pid': 42}
+    pending = tmp_path / 'other.json.pending'
+    pending.write_text('partial')
+    with pytest.raises(FileExistsError):
+        proof.write(tmp_path / 'other.json', {'pid': 42})
+    assert pending.read_text() == 'partial'
+    assert not (tmp_path / 'other.json').exists()
+
+
+def test_readiness_receipt_fsync_failure_keeps_partial(tmp_path, monkeypatch):
+    from experiments.tennis import w8_witness_namespace_proof as proof
+
+    def fail_fsync(_fd):
+        raise OSError('injected fsync failure')
+
+    monkeypatch.setattr(proof.os, 'fsync', fail_fsync)
+    target = tmp_path / 'detached.json'
+    with pytest.raises(OSError, match='injected fsync failure'):
+        proof.write(target, {'pid': 42})
+    assert not target.exists()
+    assert json.loads((tmp_path / 'detached.json.pending').read_text()) == {'pid': 42}

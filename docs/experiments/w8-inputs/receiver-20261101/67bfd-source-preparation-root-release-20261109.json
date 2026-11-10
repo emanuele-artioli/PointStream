@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "decision": "Root reviewed67bfd; source preparation ONLY",
+  "revision": "67bfdc4aed8dd5d5630d9c81abf6e0afead063e0",
+  "source_sha256": "1b8a2cf175f0b9541594628180addff9b204ccf7774a899c420189d9f83b21d8",
+  "archive_sha256": "e303cd2a796aaf51f8c22f9982b359cfd198cfd127e8b96e92a78f7de94c2a39",
+  "archive": "/private/tmp/pointstream-w8-67bfd-review-20261109/source.tar",
+  "source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-67bfd-20261109/source.tar",
+  "CPU_ceiling_inclusive": 30,
+  "GPU_ceiling": 0,
+  "CPU_family_cap": 1700,
+  "CPU_family_closed": 778,
+  "CPU_family_forecast_inclusive": 1640,
+  "parent_remaining_before_preparation": {
+    "gpu_seconds": 4550,
+    "cpu_seconds": 3772
+  },
+  "scope": "ONE source preparation per atomic receipt card. No protected content, new grant, baseline exception, CPU job or GPU. Fresh actual spec for separate review."
+}

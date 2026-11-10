@@ -30,10 +30,14 @@ def own_identity() -> dict[str, int]:
 
 
 def write(path: Path, value: dict) -> None:
-    with path.open('x') as stream:
+    # Publish only complete, durable JSON; link refuses to replace a receipt.
+    pending = path.with_name(path.name + '.pending')
+    with pending.open('x') as stream:
         json.dump(value, stream, sort_keys=True)
         stream.flush()
         os.fsync(stream.fileno())
+        os.link(pending, path)
+    pending.unlink()
 
 
 def absent(item: dict[str, int]) -> bool:

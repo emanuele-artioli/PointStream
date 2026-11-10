@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "decision": "Root accepts source preparation and releases ONE exact atomic-receipt CPU proof",
+  "revision": "67bfdc4aed8dd5d5630d9c81abf6e0afead063e0",
+  "source_sha256": "1b8a2cf175f0b9541594628180addff9b204ccf7774a899c420189d9f83b21d8",
+  "snapshot_sha256": "e303cd2a796aaf51f8c22f9982b359cfd198cfd127e8b96e92a78f7de94c2a39",
+  "source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-67bfd-20261109/source.tar",
+  "source_archive": true,
+  "local_spec": "/private/tmp/pointstream-w8-67bfd-sourceprep-20261109-a1/spec.json",
+  "deadline": "2026-11-10T00:48:31.541634Z",
+  "logical_spec_sha256": "d32d64eea7ba788b0c108c9ae64f4dfc755979ff35223d5b27dfe56f91225b89",
+  "normalized_file_sha256": "b138b8cf42afb02d418d46379a44f70d0c86328dfa99d60202c19d050d513a85",
+  "phase_commands": {
+    "full": [
+      "{python}",
+      "-m",
+      "experiments.tennis.w8_witness_cpu_proof_job",
+      "noop"
+    ],
+    "smoke": [
+      "{python}",
+      "-m",
+      "experiments.tennis.w8_witness_cpu_proof_job",
+      "run"
+    ]
+  },
+  "raw_file_sha256": "baa15b1ae3a9519ed2ee30aea2c70574b15954711b2f4e50cd1179f9915c9494",
+  "scope": "ONE new-source CPU packet/runtime-role/atomic-lifecycle/native/denial proof only. No generation controller/CUDA/quality or full-witness admission.",
+  "source_archive_sha256": "e303cd2a796aaf51f8c22f9982b359cfd198cfd127e8b96e92a78f7de94c2a39",
+  "host": "gpu5",
+  "cpu_affinity_index": 0,
+  "GPU_ceiling": 0,
+  "CPU_future_ceiling": 832,
+  "campaign_wall_ceiling": 600,
+  "postcampaign_CPU_ceiling": 150,
+  "audit_CPU_ceiling": 82,
+  "CPU_preparation_already_charged": 30,
+  "CPU_family_cap": 1700,
+  "CPU_family_forecast_inclusive": 1640,
+  "root_preparation_raw_hashes_verified": 17,
+  "stop": "Any source/runtime/receipt/policy/native/tensor/PID/resource/deadline error stops; no automatic replay. Persist actualID and handles before ONE canonical wait<=1800s ending beforedeadline; root ledger ACK first."
+}

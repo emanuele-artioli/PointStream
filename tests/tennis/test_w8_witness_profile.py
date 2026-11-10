@@ -260,9 +260,10 @@ def test_pilot_spec_is_separate_and_never_auto_promotes(tmp_path: Path):
     from experiments.tennis import w8_witness_job as job
 
     gate = tmp_path / 'cpu-gate.json'
-    gate.write_text(json.dumps({'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64, 'system_leaves_sha256': '7' * 64,
+    gate.write_text(json.dumps({'schema': 2, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64, 'system_leaves_sha256': '7' * 64,
         'source_sha256': 'a' * 64, 'snapshot_sha256': 'b' * 64, 'revision': 'c' * 40,
-        'environment_sha256': 'd' * 64, 'host': 'gpu5', 'job_id': '20261106T000000Z-12345678',
+        'proof_campaign_environment_sha256': job.host.MAIN_ENV, 'generation_environment_sha256': job.host.JCV_ENV,
+        'generation_controller_executed': False, 'cuda_qualified': False, 'host': 'gpu5', 'job_id': '20261106T000000Z-12345678',
         'spec_sha256': 'e' * 64, 'raw_receipt_sha256': dict.fromkeys(job.REQUIRED_PROOFS, 'f' * 64),
         'checks': dict.fromkeys(job.REQUIRED_CHECKS, True)}))
     spec = job.make_pilot_spec(deadline=(datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat(), proof_local=gate,
@@ -312,25 +313,35 @@ def test_pilot_cpu_gate_requires_raw_audits_and_exact_source():
     from experiments.tennis import w8_witness_job as job
 
     source = {'source_sha256': 'a' * 64, 'snapshot_sha256': 'b' * 64, 'git_head': 'c' * 40}
-    gate = {'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64, 'system_leaves_sha256': '7' * 64, **source,
-            'revision': source['git_head'], 'environment_sha256': 'd' * 64, 'host': 'gpu5',
+    gate = {'schema': 2, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64, 'system_leaves_sha256': '7' * 64, **source,
+            'revision': source['git_head'], 'proof_campaign_environment_sha256': job.host.MAIN_ENV, 'generation_environment_sha256': job.host.JCV_ENV,
+        'generation_controller_executed': False, 'cuda_qualified': False, 'host': 'gpu5',
             'job_id': '20261106T000000Z-12345678', 'spec_sha256': 'e' * 64,
             'raw_receipt_sha256': {key: 'f' * 64 for key in job.REQUIRED_PROOFS},
             'checks': dict.fromkeys(job.REQUIRED_CHECKS, True)}
     job.check_cpu_gate(gate, gate_sha='1' * 64, expected_sha='1' * 64, source=source,
-                       environment_sha='d' * 64, host_name='gpu5')
+                       environment_sha=job.host.JCV_ENV, host_name='gpu5')
     with pytest.raises(ValueError, match='identity'):
         job.check_cpu_gate(gate, gate_sha='1' * 64, expected_sha='1' * 64, source=source,
-                           environment_sha='d' * 64, host_name='gpu6')
+                           environment_sha=job.host.JCV_ENV, host_name='gpu6')
+    for wrong in (dict(gate, schema=1), dict(gate, proof_campaign_environment_sha256=job.host.JCV_ENV),
+                  dict(gate, generation_environment_sha256=job.host.MAIN_ENV),
+                  dict(gate, generation_controller_executed=True), dict(gate, cuda_qualified=True)):
+        with pytest.raises(ValueError, match='identity'):
+            job.check_cpu_gate(wrong, gate_sha='1' * 64, expected_sha='1' * 64, source=source,
+                               environment_sha=job.host.JCV_ENV, host_name='gpu5')
+    with pytest.raises(ValueError, match='identity'):
+        job.check_cpu_gate(gate, gate_sha='1' * 64, expected_sha='1' * 64, source=source,
+                           environment_sha=job.host.MAIN_ENV, host_name='gpu5')
     missing_policy = dict(gate)
     missing_policy.pop('system_leaves_sha256')
     with pytest.raises(ValueError, match='identity'):
         job.check_cpu_gate(missing_policy, gate_sha='1' * 64, expected_sha='1' * 64, source=source,
-                           environment_sha='d' * 64, host_name='gpu5')
+                           environment_sha=job.host.JCV_ENV, host_name='gpu5')
     gate['raw_receipt_sha256'].pop('native_timeout_kill')
     with pytest.raises(ValueError, match='proof references'):
         job.check_cpu_gate(gate, gate_sha='1' * 64, expected_sha='1' * 64, source=source,
-                           environment_sha='d' * 64, host_name='gpu5')
+                           environment_sha=job.host.JCV_ENV, host_name='gpu5')
 
 
 def test_pilot_released_validation_uses_sealed_sources_not_deleted_scratch(tmp_path: Path, monkeypatch):
@@ -340,8 +351,9 @@ def test_pilot_released_validation_uses_sealed_sources_not_deleted_scratch(tmp_p
     stage = tmp_path / 'job' / 'smoke'
     stage.mkdir(parents=True)
     source = {'source_sha256': 'a' * 64, 'snapshot_sha256': 'b' * 64, 'git_head': 'c' * 40}
-    gate = {'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64, 'system_leaves_sha256': '7' * 64, **source, 'revision': source['git_head'],
-            'environment_sha256': 'd' * 64, 'host': 'gpu5', 'job_id': '20261106T000000Z-12345678',
+    gate = {'schema': 2, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64, 'system_leaves_sha256': '7' * 64, **source, 'revision': source['git_head'],
+            'proof_campaign_environment_sha256': job.host.MAIN_ENV, 'generation_environment_sha256': job.host.JCV_ENV,
+        'generation_controller_executed': False, 'cuda_qualified': False, 'host': 'gpu5', 'job_id': '20261106T000000Z-12345678',
             'spec_sha256': 'e' * 64, 'raw_receipt_sha256': dict.fromkeys(job.REQUIRED_PROOFS, 'f' * 64),
             'checks': dict.fromkeys(job.REQUIRED_CHECKS, True)}
     cpu = tmp_path / 'cpu.json'
@@ -366,7 +378,7 @@ def test_pilot_released_validation_uses_sealed_sources_not_deleted_scratch(tmp_p
     monkeypatch.setattr(job, 'check_bootstrap_archive', lambda *_args: None)
     (stage.parent / 'spec.json').write_text(json.dumps(spec))
     (stage / 'staging.json').write_text(json.dumps({'inputs': staged}))
-    (stage / 'dispatch.json').write_text(json.dumps({'code': source, 'staged_environment': {'sha256': 'd' * 64},
+    (stage / 'dispatch.json').write_text(json.dumps({'code': source, 'staged_environment': {'sha256': host.JCV_ENV},
                                                    'environment': {'alias': 'gpu5'}}))
     actual_sha = fixed.file_sha
     monkeypatch.setattr(fixed, 'file_sha', lambda p: host.ORACLE_SHA if Path(p) == oracle else actual_sha(Path(p)))
@@ -432,9 +444,10 @@ def test_pilot_builder_phase_and_staging_bind_exact_proof_host(tmp_path: Path, m
     monkeypatch.setattr(w8_protected_metadata, 'reject_protected_alias', lambda _path: None)
 
     gate = tmp_path / 'cpu-gate.json'
-    gate.write_text(json.dumps({'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64, 'system_leaves_sha256': '7' * 64,
+    gate.write_text(json.dumps({'schema': 2, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64, 'system_leaves_sha256': '7' * 64,
         'source_sha256': 'a' * 64, 'snapshot_sha256': 'b' * 64, 'revision': 'c' * 40,
-        'environment_sha256': 'd' * 64, 'host': 'gpu5', 'job_id': '20261106T000000Z-12345678',
+        'proof_campaign_environment_sha256': job.host.MAIN_ENV, 'generation_environment_sha256': job.host.JCV_ENV,
+        'generation_controller_executed': False, 'cuda_qualified': False, 'host': 'gpu5', 'job_id': '20261106T000000Z-12345678',
         'spec_sha256': 'e' * 64, 'raw_receipt_sha256': dict.fromkeys(job.REQUIRED_PROOFS, 'f' * 64),
         'checks': dict.fromkeys(job.REQUIRED_CHECKS, True)}))
     spec = job.make_pilot_spec(deadline=(datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat(), proof_local=gate,
@@ -484,9 +497,10 @@ def test_unit1_spec_requires_actual_ledger_and_forecast(tmp_path: Path):
     from experiments.tennis import w8_witness_job as job
 
     proof = tmp_path / 'proof.json'
-    proof.write_text(json.dumps({'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64, 'system_leaves_sha256': '7' * 64,
+    proof.write_text(json.dumps({'schema': 2, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64, 'system_leaves_sha256': '7' * 64,
         'source_sha256': 'a' * 64, 'snapshot_sha256': 'b' * 64, 'revision': 'c' * 40,
-        'environment_sha256': 'd' * 64, 'host': 'gpu5', 'job_id': '20261106T000000Z-12345678',
+        'proof_campaign_environment_sha256': job.host.MAIN_ENV, 'generation_environment_sha256': job.host.JCV_ENV,
+        'generation_controller_executed': False, 'cuda_qualified': False, 'host': 'gpu5', 'job_id': '20261106T000000Z-12345678',
         'spec_sha256': 'e' * 64, 'raw_receipt_sha256': dict.fromkeys(job.REQUIRED_PROOFS, 'f' * 64),
         'checks': dict.fromkeys(job.REQUIRED_CHECKS, True)}))
     ledger = tmp_path / 'ledger.json'
@@ -530,9 +544,10 @@ def test_generated_pilot_phase_commands_reach_real_cli_dispatch(tmp_path: Path, 
     from experiments.tennis import w8_witness_job as job
 
     proof = tmp_path / 'proof.json'
-    proof.write_text(json.dumps({'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64, 'system_leaves_sha256': '7' * 64,
+    proof.write_text(json.dumps({'schema': 2, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64, 'system_leaves_sha256': '7' * 64,
         'source_sha256': 'a' * 64, 'snapshot_sha256': 'b' * 64, 'revision': 'c' * 40,
-        'environment_sha256': 'd' * 64, 'host': 'gpu5', 'job_id': '20261106T000000Z-12345678',
+        'proof_campaign_environment_sha256': job.host.MAIN_ENV, 'generation_environment_sha256': job.host.JCV_ENV,
+        'generation_controller_executed': False, 'cuda_qualified': False, 'host': 'gpu5', 'job_id': '20261106T000000Z-12345678',
         'spec_sha256': 'e' * 64, 'raw_receipt_sha256': dict.fromkeys(job.REQUIRED_PROOFS, 'f' * 64),
         'checks': dict.fromkeys(job.REQUIRED_CHECKS, True)}))
     spec = job.make_pilot_spec(deadline=(datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat(), proof_local=proof,
@@ -563,9 +578,10 @@ def test_candidate_spec_requires_qualified_producers_and_separate_readiness(tmp_
     from experiments.tennis import w8_witness_job as job
 
     proof = tmp_path / 'proof.json'
-    proof.write_text(json.dumps({'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64, 'system_leaves_sha256': '7' * 64,
+    proof.write_text(json.dumps({'schema': 2, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64, 'system_leaves_sha256': '7' * 64,
         'source_sha256': 'a' * 64, 'snapshot_sha256': 'b' * 64, 'revision': 'c' * 40,
-        'environment_sha256': 'd' * 64, 'host': 'gpu5', 'job_id': '20261106T000000Z-12345678',
+        'proof_campaign_environment_sha256': job.host.MAIN_ENV, 'generation_environment_sha256': job.host.JCV_ENV,
+        'generation_controller_executed': False, 'cuda_qualified': False, 'host': 'gpu5', 'job_id': '20261106T000000Z-12345678',
         'spec_sha256': 'e' * 64, 'raw_receipt_sha256': dict.fromkeys(job.REQUIRED_PROOFS, 'f' * 64),
         'checks': dict.fromkeys(job.REQUIRED_CHECKS, True)}))
     ledger = tmp_path / 'ledger.json'
@@ -867,9 +883,10 @@ def test_finish_real_spec_staging_and_dispatch(tmp_path: Path, monkeypatch) -> N
     monkeypatch.setattr(w8_protected_metadata, 'reject_protected_alias', lambda _path: None)
 
     proof = tmp_path / 'proof'
-    proof.write_text(json.dumps({'schema': 1, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64, 'system_leaves_sha256': '7' * 64,
+    proof.write_text(json.dumps({'schema': 2, 'scope': job.CPU_SCOPE, 'passed': True, 'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64, 'system_leaves_sha256': '7' * 64,
         'source_sha256': 'a' * 64, 'snapshot_sha256': 'b' * 64, 'revision': 'c' * 40,
-        'environment_sha256': 'd' * 64, 'host': 'gpu5', 'job_id': '20261106T000000Z-12345678',
+        'proof_campaign_environment_sha256': job.host.MAIN_ENV, 'generation_environment_sha256': job.host.JCV_ENV,
+        'generation_controller_executed': False, 'cuda_qualified': False, 'host': 'gpu5', 'job_id': '20261106T000000Z-12345678',
         'spec_sha256': 'e' * 64, 'raw_receipt_sha256': dict.fromkeys(job.REQUIRED_PROOFS, 'f' * 64),
         'checks': dict.fromkeys(job.REQUIRED_CHECKS, True)}))
     audit, p0, p1 = (tmp_path / name for name in ('audit', 'p0', 'p1'))
@@ -956,3 +973,29 @@ def test_first_pilot_rejects_prior_qualification_and_untagged_charges(tmp_path: 
     del ledger['charges'][0]['witness_qualification']
     with pytest.raises(ValueError, match='attribution'):
         check()
+
+
+@pytest.mark.parametrize('runtime', ['main', 'jcv'])
+def test_cpu_runtime_attestation_binds_actual_leaf_to_pinned_role(runtime):
+    from experiments.tennis import w8_strict_host_cost_job as host
+    from experiments.tennis import w8_witness_profile as profile
+
+    digest = host.MAIN_ENV if runtime == 'main' else host.JCV_ENV
+    prefix = '/local/users/emanuele/pointstream/cache/' + digest + '/tree'
+    executable = prefix + '/bin/python3.12'
+    preflight = {'receipts': {runtime: {'executable': executable, 'prefix': prefix, 'torch': 'pinned-torch'}},
+                 'runtimes': {runtime: {'python': executable}}}
+    config = {'allow_paths': [prefix], 'environment': {'CUDA_VISIBLE_DEVICES': ''}}
+    receipt = {'scope': 'cpu_isolation_proof_only', 'cuda_initialized': False, 'visible_devices': '',
+               'runtime_identity': {'executable': executable, 'prefix': prefix, 'torch': 'pinned-torch'}}
+    profile.validate_cpu_runtime_attestation(receipt, config, preflight, runtime)
+    for key, value in (('executable', '/other/bin/python'), ('prefix', '/other'), ('torch', 'wrong')):
+        broken = dict(receipt, runtime_identity=dict(receipt['runtime_identity'], **{key: value}))
+        with pytest.raises(ValueError, match='runtime attestation'):
+            profile.validate_cpu_runtime_attestation(broken, config, preflight, runtime)
+    with pytest.raises(ValueError, match='runtime attestation'):
+        profile.validate_cpu_runtime_attestation(dict(receipt, runtime_identity={}), config, preflight, runtime)
+    with pytest.raises(ValueError, match='runtime attestation'):
+        profile.validate_cpu_runtime_attestation(receipt, dict(config, allow_paths=[]), preflight, runtime)
+    with pytest.raises(ValueError, match='runtime attestation'):
+        profile.validate_cpu_runtime_attestation(receipt, dict(config, environment={'CUDA_VISIBLE_DEVICES': 'GPU'}), preflight, runtime)

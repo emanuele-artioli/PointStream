@@ -1,3 +1,7 @@
+from typing import Any
+from pathlib import Path
+import os
+
 import pytest
 
 from experiments.tennis import k5d_control_study as control
@@ -168,6 +172,20 @@ def test_confirmation_requires_both_audited_receipts_without_full30_fit(
     with pytest.raises(ValueError, match='qualification receipt'):
         control.approved(*args, paths)
     parity['all_six_exact'] = True
+    gate['release'] = control.PAIR_RELEASE
+    gate['allowed_clips'] = [clips[0]]
+    gate['future_study_fit_proven'] = False
+    gate['confirmation_caps'] = {resource: {'jobs': {f'{clips[0]}:prepare': 1450, f'{clips[0]}:score': 1700},
+                                            'external': {'prepare': 100, 'score': 100}, 'total': 3350}
+                                 for resource in ('gpu', 'cpu')}
+    bridge['bridge_type'] = 'parent8-resource-v1'
+    monkeypatch.setattr(control, 'parent8_bridge_record', lambda *_: {k: v for k, v in bridge.items() if k != 'approved'})
+    parity.update(exclusive=True, timing_contaminated=False, source_bridge_sha256='b' * 64)
+    _, frames = control.approved(*args, paths)
+    assert frames == 292
+    parity['timing_contaminated'] = True
+    with pytest.raises(ValueError, match='clean exclusive'):
+        control.approved(*args, paths)
     gate['release'] = 'full-study'
     data['budget_fits'] = {'gpu': True, 'cpu': True}
     with pytest.raises(ValueError, match='compact certificate'):
@@ -252,7 +270,9 @@ def test_full_study_spec_routes_through_qualified_namespace(tmp_path, monkeypatc
     names = ('full_gate', 'cost_receipt', 'fidelity_gate', 'budget_ledger', 'budget_attestation',
              'native_cpu_receipt', 'gpu_parity_receipt', 'certificate', 'certificate_microbench', 'certificate_microbench_audit')
     assets = {name: {'local': str(tmp_path / name), 'remote': '/remote/' + name, 'sha256': 'a' * 64} for name in names}
-    monkeypatch.setattr(control.study, 'checked_json', lambda *_: gate)
+    monkeypatch.setattr(control.study, 'checked_json', lambda path, *_: (
+        {'pair_cost_bound_sha256': 'a' * 64} if path.name == 'fidelity_gate' else gate))
+    monkeypatch.setattr(control.benchmark.encoder, 'fidelity_gate', lambda *_args, **_kwargs: {})
     monkeypatch.setattr(control, 'approved', lambda *_: ({'cost': {'prepare': {'seconds16': 1}},
         'programme': {r: {'failed_start_reserve_seconds': 500, 'noncommand_groups': {'whole': 5}}
                       for r in ('gpu', 'cpu')}}, 292))
@@ -493,7 +513,7 @@ def test_forecast_owned_reservation_is_counted_once_across_advance():
         control.check_budget(ledger, att, 'a' * 64, 'b' * 64, data)
 
 
-@pytest.mark.parametrize('release', ['cost-confirmation', 'full-study'])
+@pytest.mark.parametrize('release', ['cost-confirmation', 'full-study', control.PAIR_RELEASE])
 def test_control_builders_pass_real_fleet_validator(release: str, tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
     import json
     from datetime import datetime, timedelta, timezone
@@ -513,7 +533,9 @@ def test_control_builders_pass_real_fleet_validator(release: str, tmp_path, monk
     remote = '/home/itec/emanuele/Datasets/pointstream-data/test/'
     assets = {name: {'local': str(tmp_path / name), 'remote': remote + name + '.json', 'sha256': 'a' * 64}
               for name in names}
-    monkeypatch.setattr(control.study, 'checked_json', lambda *_: gate)
+    monkeypatch.setattr(control.study, 'checked_json', lambda path, *_: (
+        {'pair_cost_bound_sha256': 'a' * 64} if path.name == 'fidelity_gate' else gate))
+    monkeypatch.setattr(control.benchmark.encoder, 'fidelity_gate', lambda *_args, **_kwargs: {})
     monkeypatch.setattr(control, 'approved', lambda *_: ({'cost': {'prepare': {'seconds16': 1}},
         'programme': {r: {'failed_start_reserve_seconds': 500, 'noncommand_groups': {'whole': 5}}
                       for r in ('gpu', 'cpu')}}, 292))
@@ -531,3 +553,330 @@ def test_control_builders_pass_real_fleet_validator(release: str, tmp_path, monk
     staged = [{'name': item['name'], 'path': '/staged/' + item['name']} for item in result['staged_inputs']]
     command = inbox.phase_command(result, 'smoke', staged, '/runtime/python')
     assert command[:4] == ['/runtime/python', '-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']
+
+
+def test_first_pair_budget_is_exact_bounded_and_not_full_study() -> None:
+    data = receipt()
+    clip = control.PAIR_CLIP
+    gate: dict[str, Any] = {'allowed_clips': [clip], 'future_study_fit_proven': False,
+            'confirmation_caps': {resource: {'jobs': {f'{clip}:prepare': 1450, f'{clip}:score': 1700},
+                                              'external': {'prepare': 100, 'score': 100}, 'total': 3350}
+                                  for resource in ('gpu', 'cpu')}}
+    control.validate_calibration(data)
+    control.first_pair_budget(gate, data, {})
+    gate['confirmation_caps']['gpu']['jobs'][f'{clip}:score'] = 100
+    with pytest.raises(ValueError, match='forecast'):
+        control.first_pair_budget(gate, data, {})
+    gate['confirmation_caps']['gpu']['jobs'][f'{clip}:score'] = 1700
+    gate['allowed_clips'].append('tracknet/game10/Clip12')
+    with pytest.raises(ValueError, match='registered clip'):
+        control.first_pair_budget(gate, data, {})
+    gate['allowed_clips'].pop()
+    gate['confirmation_caps']['cpu']['total'] = 3351
+    with pytest.raises(ValueError, match='allocation'):
+        control.first_pair_budget(gate, data, {})
+    data['cost']['prepare']['seconds48'] -= 1
+    with pytest.raises(ValueError, match='understates'):
+        control.validate_calibration(data)
+
+
+def test_pair_producer_requires_root_audited_real_checkpoint() -> None:
+    gate = {'pair_producer': {'audited': True, 'prepare_external_included': True, 'clip': control.PAIR_CLIP, 'frames': 292,
+                              'job_id': '20261109T000000Z-12345678', 'archive_sha256': 'a' * 64,
+                              'checkpoint_sha256': 'b' * 64, 'audit_sha256': 'c' * 64,
+                              'remote': str(control.cf.DATA_ROOT / 'jobs/example.tar')}}
+    assert control.pair_producer(gate)['frames'] == 292
+    gate['pair_producer']['frames'] = 16
+    with pytest.raises(ValueError, match='producer'):
+        control.pair_producer(gate)
+
+
+def test_pair_producer_audit_checks_actual_sealed_record(tmp_path) -> None:
+    import hashlib
+    import json
+
+    identity = {'source_sha256': '1' * 64, 'snapshot_sha256': '2' * 64, 'environment_sha256': '3' * 64}
+    producer = {'audited': True, 'prepare_external_included': True, 'clip': control.PAIR_CLIP, 'frames': 292,
+                'job_id': '20261109T000000Z-12345678', 'archive_sha256': 'a' * 64,
+                'checkpoint_sha256': 'b' * 64, 'gpu_charge_seconds': 1200, 'cpu_charge_seconds': 1200,
+                'remote': str(control.cf.DATA_ROOT / 'jobs/example.tar')}
+    audit = dict(producer, schema=1, terminal_status='COMPLETE', exclusive=True, timing_contaminated=False,
+                 consumer_execution_identity=identity)
+    path = tmp_path / 'audit.json'
+    path.write_text(json.dumps(audit))
+    gate = {'pair_producer': dict(producer, audit_sha256=hashlib.sha256(path.read_bytes()).hexdigest())}
+    control.verify_pair_producer_audit(gate, path, identity)
+    audit['timing_contaminated'] = True
+    path.write_text(json.dumps(audit))
+    gate['pair_producer']['audit_sha256'] = hashlib.sha256(path.read_bytes()).hexdigest()
+    with pytest.raises(ValueError, match='producer audit differs'):
+        control.verify_pair_producer_audit(gate, path, identity)
+    with pytest.raises(ValueError):
+        control.pair_producer({'pair_producer': {}})
+
+
+def test_pair_score_accounts_only_unspent_pair_after_audited_prepare() -> None:
+    data = receipt()
+    clip = control.PAIR_CLIP
+    jobs = {f'{clip}:prepare': 1500, f'{clip}:score': 1650}
+    gate: dict[str, Any] = {'allowed_clips': [clip], 'future_study_fit_proven': False,
+            'confirmation_caps': {kind: {'jobs': dict(jobs), 'external': {'prepare': 100, 'score': 100}, 'total': 3350}
+                                  for kind in ('gpu', 'cpu')},
+            'pair_producer': {'audited': True, 'prepare_external_included': True, 'clip': clip, 'frames': 292, 'job_id': '20261109T000000Z-12345678',
+                              'archive_sha256': 'a' * 64, 'checkpoint_sha256': 'b' * 64, 'audit_sha256': 'c' * 64,
+                              'remote': str(control.cf.DATA_ROOT / 'jobs/producer.tar'),
+                              'gpu_charge_seconds': 1550, 'cpu_charge_seconds': 1550}}
+    for kind in ('gpu', 'cpu'):
+        data['programme'][kind]['ball_remaining_seconds'] = 1750
+        data['programme'][kind]['global_remaining_seconds'] = 1750
+    control.first_pair_budget(gate, data, {}, 'score')
+    gate['pair_producer']['gpu_charge_seconds'] = 1600
+    control.first_pair_budget(gate, data, {}, 'score')
+    gate['pair_producer']['gpu_charge_seconds'] = 1601
+    with pytest.raises(ValueError, match='producer charge'):
+        control.first_pair_budget(gate, data, {}, 'score')
+    gate['pair_producer']['gpu_charge_seconds'] = 1550
+    data['programme']['cpu']['ball_remaining_seconds'] = 1749
+    with pytest.raises(ValueError, match='reconciled'):
+        control.first_pair_budget(gate, data, {}, 'score')
+
+
+def test_pair_fidelity_gate_is_distinct_and_binds_cost(tmp_path) -> None:
+    import json
+
+    from experiments.tennis import k5d_encoder
+
+    gate = {'schema_version': 1, 'passed': True, 'scope': 'fidelity-only', 'purpose': control.PAIR_RELEASE,
+            'archive_sha256': 'archive', 'calibration_job_id': '20261105T000000Z-example',
+            'evidence_sha256': 'a' * 64, 'pair_cost_bound_sha256': 'b' * 64,
+            'clip': control.PAIR_CLIP, 'max_frames': 292,
+            'checks': ['source_transform', 'native_and_wire', 'receiver_parity', 'perceptual_metrics', 'pair_cost']}
+    path = tmp_path / 'fidelity.json'
+    path.write_text(json.dumps(gate))
+    sha = control.oracle.sha(path)
+    assert k5d_encoder.fidelity_gate(path, sha, 'archive', purpose=control.PAIR_RELEASE,
+                                     clip=control.PAIR_CLIP, frames=292)['passed']
+    with pytest.raises(ValueError):
+        k5d_encoder.fidelity_gate(path, sha, 'archive', purpose=control.PAIR_RELEASE,
+                                  clip=control.PAIR_CLIP, frames=188)
+    with pytest.raises(ValueError):
+        k5d_encoder.fidelity_gate(path, sha, 'archive')
+
+
+def test_pair_producer_charges_join_reconciled_ledger() -> None:
+    producer = {'audited': True, 'prepare_external_included': True, 'clip': control.PAIR_CLIP, 'frames': 292,
+                'job_id': '20261109T000000Z-12345678', 'archive_sha256': 'a' * 64,
+                'checkpoint_sha256': 'b' * 64, 'audit_sha256': 'c' * 64,
+                'remote': str(control.cf.DATA_ROOT / 'jobs/p.tar'), 'ledger_charge_phases': ['prep', 'close'],
+                'gpu_charge_seconds': 1400, 'cpu_charge_seconds': 1450}
+    ledger = {'charges': [{'phase': 'prep', 'workstream': 'ball', 'gpu_seconds': 0, 'cpu_seconds': 50},
+                          {'phase': 'close', 'workstream': 'ball', 'gpu_seconds': 1400, 'cpu_seconds': 1400}]}
+    control.verify_pair_ledger_charge({'pair_producer': producer}, ledger)
+    ledger['charges'][1]['gpu_seconds'] = 1399
+    with pytest.raises(ValueError, match='charge differs'):
+        control.verify_pair_ledger_charge({'pair_producer': producer}, ledger)
+
+
+@pytest.mark.parametrize('pair', [False, True])
+def test_readiness_calls_real_fidelity_gate_for_both_purposes(tmp_path, monkeypatch, pair):
+    import argparse
+    import json
+
+    from experiments.tennis import k5d_control_readiness as readiness
+
+    purpose = control.PAIR_RELEASE if pair else 'full-retrospective-benchmark'
+    checks = ['source_transform', 'native_and_wire', 'receiver_parity', 'perceptual_metrics',
+              'pair_cost' if pair else 'full_cost']
+    gate = {'schema_version': 1, 'passed': True, 'scope': 'fidelity-only', 'purpose': purpose,
+            'archive_sha256': control.fleet.EXPECTED['archive'], 'calibration_job_id': '2026-example',
+            'evidence_sha256': 'a' * 64, 'checks': checks}
+    if pair:
+        gate.update(clip=control.PAIR_CLIP, max_frames=292, pair_cost_bound_sha256='b' * 64)
+    path = tmp_path / 'gate.json'
+    path.write_text(json.dumps(gate))
+    identity = {'environment_sha256': 'a', 'source_sha256': 'b', 'snapshot_sha256': 'c'}
+    (tmp_path / 'dispatch.json').write_text(json.dumps({'staged_environment': {'sha256': 'a'},
+        'code': {'source_sha256': 'b', 'snapshot_sha256': 'c'}, 'environment': {'gpu': {'name': 'RTX A6000'}}}))
+    monkeypatch.setattr(readiness, 'asset_inputs', lambda *_: {'model_source_tree_sha256': {}})
+    monkeypatch.setattr(readiness, 'source', lambda *_: {'frames': 292, 'labels': 292})
+    args = argparse.Namespace(fidelity_gate=str(path), fidelity_gate_sha256=control.oracle.sha(path),
+                              fidelity_purpose=purpose, clip=control.PAIR_CLIP, frames=292,
+                              archive='unused', action='prepare')
+    assert readiness.inputs(args, tmp_path, identity)['source']['frames'] == 292
+
+
+@pytest.mark.parametrize('pair', [False, True])
+@pytest.mark.parametrize('qualified', [False, True])
+def test_benchmark_prepare_reaches_real_encoder_fidelity_gate(tmp_path, monkeypatch, pair, qualified):
+    """Synthetic I/O and device boundary; actual builder, checkpoint and fidelity gate calls."""
+    import argparse
+    import json
+    import sys
+    import types
+
+    from experiments.tennis import k5d_benchmark, k5d_checkpoint, k5d_encoder
+
+    purpose = control.PAIR_RELEASE if pair else 'full-retrospective-benchmark'
+    checks = ['source_transform', 'native_and_wire', 'receiver_parity', 'perceptual_metrics',
+              'pair_cost' if pair else 'full_cost']
+    gate = {'schema_version': 1, 'passed': True, 'scope': 'fidelity-only', 'purpose': purpose,
+            'archive_sha256': 'z' * 64, 'calibration_job_id': '2026-example',
+            'evidence_sha256': 'a' * 64, 'checks': checks}
+    if pair:
+        gate.update(clip=control.PAIR_CLIP, max_frames=292, pair_cost_bound_sha256='b' * 64)
+    path = tmp_path / 'gate.json'
+    path.write_text(json.dumps(gate))
+    real_sha = control.oracle.sha
+    digest = real_sha(path)
+    monkeypatch.setattr(control.oracle, 'sha', lambda p: digest if Path(p) == path else 'z' * 64)
+    monkeypatch.setattr(control.fleet, 'SOURCE_SHA', 'z' * 64)
+    monkeypatch.setattr(control.fleet, 'EXPOSURE_SHA', 'z' * 64)
+    monkeypatch.setattr(control.fleet, 'EXPECTED', {name: 'z' * 64 for name in control.fleet.EXPECTED})
+    monkeypatch.setattr(control.oracle, 'select', lambda *_: {'label_rows': 292})
+    monkeypatch.setattr(control.oracle, 'tree_sha', lambda *_: 'z' * 64)
+    monkeypatch.setattr(control.fleet, 'archive_tree_sha', lambda *_: 'z' * 64)
+    monkeypatch.setattr(control.fleet, 'snapshot_head', lambda *_: 'a' * 40)
+    monkeypatch.setattr(control.oracle, 'validate_output', lambda *_: None)
+    monkeypatch.setattr(control.oracle, 'run', lambda *_: {'qualified': qualified})
+    monkeypatch.setattr(os, 'sched_getaffinity', lambda *_: {0}, raising=False)
+    fake_torch = types.ModuleType('torch')
+    fake_torch.cuda = types.SimpleNamespace(device_count=lambda: 1)
+    monkeypatch.setitem(sys.modules, 'torch', fake_torch)
+    monkeypatch.setitem(sys.modules, 'src.codecs.quality', types.ModuleType('src.codecs.quality'))
+    monkeypatch.setitem(sys.modules, 'src.codecs.svtav1', types.ModuleType('src.codecs.svtav1'))
+    monkeypatch.setenv('PS_STAGE', 'full')
+    monkeypatch.setenv('PS_STAGE_DIR', str(tmp_path))
+    monkeypatch.setenv('PS_SCRATCH_DIR', str(tmp_path))
+    monkeypatch.setenv('PS_CPU_ALLOWANCE', '1')
+    monkeypatch.delenv('PS_LOCAL_ROOT', raising=False)
+    (tmp_path / 'dispatch.json').write_text(json.dumps({'code': {}}))
+    (tmp_path / 'staging.json').write_text(json.dumps({'inputs': [
+        {'name': name, 'source': '/shared/archive.tar', 'sha256': 'z' * 64}
+        for name in ('wasb_code', 'balltrack_code')]}))
+    names = ('archive', 'balltrack_code', 'balltrack_weight', 'wasb_code', 'wasb_weights', 'wasb_config',
+             'image_ckpt', 'video_ckpt', 'lpips_backbone', 'dists_backbone')
+    args = argparse.Namespace(**{name: str(tmp_path / name) for name in names}, clip=control.PAIR_CLIP,
+                              frames=292, fidelity_gate=str(path), fidelity_gate_sha256=digest)
+    if pair:
+        args.fidelity_purpose = purpose
+    data = k5d_benchmark.build(args)
+    class ReachedGate(Exception):
+        pass
+    monkeypatch.setattr(k5d_encoder.shutil, 'copyfile', lambda *_: (_ for _ in ()).throw(ReachedGate()))
+    with pytest.raises(ReachedGate):
+        k5d_checkpoint.prepare(data, {})
+
+
+def test_retained_checkpoint_and_encoder_revalidate_pair_fidelity(tmp_path, monkeypatch):
+    import json
+    from experiments.tennis import k5d_checkpoint, k5d_encoder
+
+    gate = {'schema_version': 1, 'passed': True, 'scope': 'fidelity-only', 'purpose': control.PAIR_RELEASE,
+            'archive_sha256': 'z' * 64, 'calibration_job_id': '2026-example', 'evidence_sha256': 'a' * 64,
+            'pair_cost_bound_sha256': 'b' * 64, 'clip': control.PAIR_CLIP, 'max_frames': 292,
+            'checks': ['source_transform', 'native_and_wire', 'receiver_parity', 'perceptual_metrics', 'pair_cost']}
+    gate_path = tmp_path / 'fidelity-gate.json'
+    gate_path.write_text(json.dumps(gate))
+    report = {'frames': 292, 'clip': control.PAIR_CLIP, 'checkpoint_prepare': True, 'full_metrics': False,
+              'fidelity_gate': {'sha256': control.oracle.sha(gate_path), 'purpose': control.PAIR_RELEASE},
+              'points': []}
+    (tmp_path / 'pilot.json').write_text(json.dumps(report))
+    (tmp_path / 'source-qualification.json').write_text(json.dumps({'qualified': False, 'frames': 292,
+        'clip': control.PAIR_CLIP, 'identities': {'archive': {'sha256': 'z' * 64}}, 'rows': []}))
+    monkeypatch.setattr(control.oracle, 'validate_report', lambda *_: None)
+    # Both real validators get through fidelity and reject the deliberately incomplete synthetic payload.
+    with pytest.raises(ValueError, match='complete six-point'):
+        k5d_checkpoint.validate_prepared(tmp_path)
+    with pytest.raises(KeyError, match='size'):
+        k5d_encoder.validate(tmp_path, prepared=True)
+    report['fidelity_gate']['purpose'] = 'full-retrospective-benchmark'
+    (tmp_path / 'pilot.json').write_text(json.dumps(report))
+    with pytest.raises(ValueError):
+        k5d_checkpoint.validate_prepared(tmp_path)
+    with pytest.raises(ValueError):
+        k5d_encoder.validate(tmp_path, prepared=True)
+
+
+def test_score_rechecks_retained_pair_checkpoint_before_device(tmp_path, monkeypatch):
+    """Synthetic bytes; actual coalesced score calls checkpoint and fidelity verification."""
+    import argparse
+    import json
+    import sys
+    import types
+    from experiments.tennis import k5d_checkpoint as cp, k5d_coalesced as co
+
+    root = tmp_path / 'prepared'
+    root.mkdir()
+    gate = {'schema_version': 1, 'passed': True, 'scope': 'fidelity-only', 'purpose': control.PAIR_RELEASE,
+            'archive_sha256': 'z' * 64, 'calibration_job_id': '2026-example', 'evidence_sha256': 'a' * 64,
+            'pair_cost_bound_sha256': 'b' * 64, 'clip': control.PAIR_CLIP, 'max_frames': 292,
+            'checks': ['source_transform', 'native_and_wire', 'receiver_parity', 'perceptual_metrics', 'pair_cost']}
+    gate_path = root / 'fidelity-gate.json'
+    gate_path.write_text(json.dumps(gate))
+    points = []
+    for codec, setting in cp.enc.POINTS:
+        folder = root / f'{codec}-{setting}'
+        folder.mkdir()
+        for name in ('native.bin', 'stream.psbl', 'baseline.psbl'):
+            (folder / name).write_bytes((name + codec + str(setting)).encode())
+        points.append({'codec': codec, 'point': setting, 'native_sha256': cp.oracle.sha(folder / 'native.bin'),
+                       'wire_sha256': cp.oracle.sha(folder / 'stream.psbl'), 'encoder_decoded_sha256': 'decode',
+                       'encoder_rendered_sha256': 'render', 'decode_parity': True, 'render_parity': True,
+                       'baseline': {'metrics': [], 'judges': {}, 'zero_ball_wire_sha256': cp.oracle.sha(folder / 'baseline.psbl')},
+                       'streak': {'guard_off': False, 'metrics': [], 'judges': {}, 'reuse': None}})
+    report = {'frames': 292, 'clip': control.PAIR_CLIP, 'checkpoint_prepare': True, 'full_metrics': False,
+              'fidelity_gate': {'sha256': cp.oracle.sha(gate_path), 'purpose': control.PAIR_RELEASE}, 'points': points}
+    (root / 'pilot.json').write_text(json.dumps(report))
+    (root / 'source-qualification.json').write_text(json.dumps({'qualified': False,
+        'identities': {'archive': {'sha256': 'z' * 64}}}))
+    monkeypatch.setattr(cp.oracle, 'validate_report', lambda *_: None)
+    identity = {'source_sha256': 'a', 'snapshot_sha256': 'b', 'environment_sha256': 'c'}
+    checkpoint = {'schema': 1, 'execution_identity': identity, 'clip': control.PAIR_CLIP, 'frames': 292,
+                  'points': [list(p) for p in cp.enc.POINTS], 'files': cp.manifest_files(root)}
+    (root / 'checkpoint.json').write_text(json.dumps(checkpoint))
+    digest = cp.oracle.sha(root / 'checkpoint.json')
+    fake_torch = types.ModuleType('torch')
+    monkeypatch.setitem(sys.modules, 'torch', fake_torch)
+    monkeypatch.setitem(sys.modules, 'src.codecs.quality', types.ModuleType('src.codecs.quality'))
+    class ReachedDevice(Exception):
+        pass
+    monkeypatch.setattr(os, 'sched_getaffinity', lambda *_: (_ for _ in ()).throw(ReachedDevice()), raising=False)
+    with pytest.raises(ReachedDevice):
+        co.score_all(argparse.Namespace(checkpoint=str(root), output=str(tmp_path / 'score')), digest, identity)
+    gate_path.write_text('{}')
+    with pytest.raises(ValueError, match='checkpoint content'):
+        co.score_all(argparse.Namespace(checkpoint=str(root), output=str(tmp_path / 'score')), digest, identity)
+
+
+def test_pair_checkpoint_real_archive_staged_sha_is_audited(tmp_path):
+    import hashlib
+    import io
+    import json
+    import tarfile
+    from experiments.tennis import k5d_encoder
+
+    identity = {'source_sha256': '1' * 64, 'snapshot_sha256': '2' * 64, 'environment_sha256': '3' * 64}
+    manifest = json.dumps({'schema': 1, 'clip': control.PAIR_CLIP, 'frames': 292,
+                           'execution_identity': identity, 'points': [list(p) for p in k5d_encoder.POINTS]}).encode()
+    archive = tmp_path / 'producer.tar'
+    with tarfile.open(archive, 'w') as tar:
+        member = tarfile.TarInfo('publish/checkpoint.json')
+        member.size = len(manifest)
+        tar.addfile(member, io.BytesIO(manifest))
+    archive_sha = hashlib.sha256(archive.read_bytes()).hexdigest()
+    checkpoint_sha = hashlib.sha256(manifest).hexdigest()
+    remote = str(control.cf.DATA_ROOT / 'jobs/real-shaped-synthetic-producer.tar')
+    producer = {'remote': remote, 'archive_sha256': archive_sha, 'checkpoint_sha256': checkpoint_sha}
+    asset = {'local': str(archive), 'remote': remote, 'sha256': archive_sha,
+             'archive_sha256': archive_sha, 'checkpoint_sha256': checkpoint_sha}
+    control.validate_pair_checkpoint_asset(asset, producer)
+    staged = control.study.checkpoint(asset, 'checkpoint', control.PAIR_CLIP, 292, identity)
+    assert staged['sha256'] == archive_sha and staged['path'] == remote and staged['extract'] is True
+    for key, value in [('sha256', '0' * 64), ('archive_sha256', '0' * 64),
+                       ('checkpoint_sha256', '0' * 64), ('remote', remote + '.wrong')]:
+        with pytest.raises(ValueError, match='audited producer'):
+            control.validate_pair_checkpoint_asset({**asset, key: value}, producer)
+    missing = dict(asset)
+    del missing['sha256']
+    with pytest.raises(ValueError, match='audited producer'):
+        control.validate_pair_checkpoint_asset(missing, producer)

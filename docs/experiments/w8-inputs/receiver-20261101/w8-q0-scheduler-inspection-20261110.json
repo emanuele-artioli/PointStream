@@ -1,0 +1,71 @@
+{
+  "CPU_release_seconds": 20,
+  "GPU_release_seconds": 0,
+  "counts": {
+    "24": {
+      "probe_windows_per_timestep": 1,
+      "scheduler_invocations": 60,
+      "used_denoiser_calls_30steps": 30,
+      "used_windows_per_timestep": 1,
+      "window_lengths": [
+        24
+      ],
+      "wrapped_windows": 0
+    },
+    "240": {
+      "probe_windows_per_timestep": 10,
+      "scheduler_invocations": 60,
+      "used_denoiser_calls_30steps": 360,
+      "used_windows_per_timestep": 12,
+      "window_lengths": [
+        24
+      ],
+      "wrapped_windows": 1
+    }
+  },
+  "launcher_usage": {
+    "exit_code": 0,
+    "self_cpu": 0.063013,
+    "ssh_cpu": 0.012740999999999999,
+    "wall": 3.222295875
+  },
+  "local_count_cpu_seconds": 0.038384999999999996,
+  "parent_phase": "w8-full-witness-staged-20261106",
+  "phase": "w8-context-q0-source-inspection-20261110",
+  "postcheck_ssh_cpu": "unmeasured, bounded within released full 20 CPU seconds",
+  "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+  "qualification_charge_kind": "pilot_preparation",
+  "raw_directory": "/private/tmp/pointstream-w8-q0-scheduler-20261110-a1",
+  "raw_file_sha256": {
+    "count.json": "a6d6042af91da90d8d5d18e31ca0a2d59b4f7bd04e7b46300acb62672e5242ad",
+    "count.py": "acd7890a48c6bea069be9b095b4bc9ac5249bb6e9135d2c1dfe31a160961a86a",
+    "handle.json": "d497407e8dd20fc411c97dc726b083681d94d0bcee60598163494a333a78890d",
+    "pid-check.txt": "7925d3e9a9613a093e5eb4054b32aa39de910d2b03ba7e8046c3b4550b8de1e4",
+    "raw.json": "ba1a0a399d7a8573417a644b212a567fecbd834c58506bff1617dcf9f861d3ad",
+    "recover.py": "c95b136cefa238f799636db7123a9d19c192c4878c41f0c4162287651d813852",
+    "run.py": "f1c60f7248db2a10282b11e84e992effff6160cd3a8c69147f1afa5db8bc0296",
+    "ssh.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "usage.json": "23bfebfa440ebcca1bb4a6f094d79764d3e78ff675767d1b3ac60e800c29a43e"
+  },
+  "remote_cpu_seconds": 0.07853399999999999,
+  "remote_pgid": 1116979,
+  "remote_pid": 1116979,
+  "remote_pid_absence": "absent",
+  "remote_wall_seconds": 0.06252246629446745,
+  "schema": 1,
+  "scope": "public source recovery and pure scheduler index evaluation, no model/GPU or protected content",
+  "source_archive_sha256": "bfca6cf1129a0154bf2c3431c0e01b34f5e815eda5ba504f54e001c8ceeb99ee",
+  "sources": {
+    "context.py": {
+      "bytes": 1951,
+      "member": "animate_anyone/pipelines/context.py",
+      "sha256": "aa019bb1dac4e7e736231c85d48131e21ea51012347b1810cb03c8b37cade71a"
+    },
+    "pipeline_pose2vid_long.py": {
+      "bytes": 21214,
+      "member": "animate_anyone/pipelines/pipeline_pose2vid_long.py",
+      "sha256": "480971c58c845c8636a9b0e616708f07bd7d7a5c19ae3c20b9439c0c9ac90a7f"
+    }
+  },
+  "witness_qualification": true
+}

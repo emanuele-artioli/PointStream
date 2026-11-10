@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "decision": "Root accepts completed no-replace GPU3 cache preparation only",
+  "CPU_charge_additional": 120,
+  "CPU_charge_family_inclusive": 140,
+  "GPU_charge": 0,
+  "CPU_basis": "70 conservative one-core command lifetime upper for 68.012 s SSH elapsed, plus 20 fresh readiness/dispatch and 30 independent post audit; prior preflight 20 already charged. Admin not completely measured.",
+  "raw_directory": "/private/tmp/k5d-gpu3-warm-candidate-20261109",
+  "candidate_audit_sha256": "1f1e0c24b1fc5f28b1bff5188b01dcaaa071a41423d12ecf3e5f8206c649afd9",
+  "root_raw_hashes_rechecked": 16,
+  "root_receipt_bodies_reconstructed_and_hashed": 13,
+  "new_entries": 8,
+  "existing_entries_readonly_sha_verified": 5,
+  "new_tree_regular_file_counts": {
+    "balltrack_code": 68,
+    "wasb_code": 109,
+    "wasb_weights": 7
+  },
+  "startup": {
+    "affinity": [
+      0
+    ],
+    "deadline_utc": "2026-11-09T23:20:00Z",
+    "host": "gpu3.itec.aau.at",
+    "payload_sha256": "470627633728fc11a5373c02aac2adaecec8c6dd4c740e4dede8c2f19f7b14a1",
+    "pgid": 160335,
+    "pid": 160335,
+    "script_sha256": "55c8326d9d69cebedea7f6ad62bef19eb43f80d5f1373acb87db2f1cce01b9c5",
+    "start_ticks": 694409111,
+    "task_root": "/local/users/emanuele/pointstream/k5d-gpu3-warm-965d-20261109-a1",
+    "type": "startup"
+  },
+  "source_identity_preservation": true,
+  "existing_preservation_scope": "Existing branch has no writes; each successful read-only hash checks full stat before/after. Later postcheck matches existing target device/inode/size; full post-run mtime/ctime fields are not retained in post rows. No second independent bulk rehash.",
+  "pid_birth_and_group_absent": true,
+  "cpu_claim_empty": true,
+  "free_bytes": 2873588674560,
+  "environment_archive_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "environment_tree_full_integrity_certified": false,
+  "qualification_exclusions": [
+    "GPU host-pool or experiment spec change",
+    "new CPU admission receipt staging",
+    "numerical parity",
+    "GPU performance",
+    "complete runtime tree certification"
+  ],
+  "unused_family_CPU_ceiling": 160,
+  "no_automatic_retry": true
+}
