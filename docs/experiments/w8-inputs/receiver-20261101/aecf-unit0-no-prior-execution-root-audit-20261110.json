@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "scope": "Root-reviewed no-prior-execution evidence for registered original unit0 24frame/30step first context, not a claim of no historical model inference",
+  "requests": [
+    {
+      "job_id": "20261110T123904Z-0e193d36",
+      "source_sha256": "4cad9e47ebeb88f1cdb272634921f2aed79100e0e15ace4d01f9a3a33720d9d6",
+      "snapshot_sha256": "5e62a2e912f5dba0cd945d33388b95154d5d8e88ed6cf5b5998e595a323c6fd1",
+      "spec_sha256": "abd6e55920bb2c4ede6ec9cee594c5e8daef5d1cacad45d756e61b7eb69e88ef",
+      "terminal_state": "expired unassigned",
+      "actual_model_execution": false,
+      "basis": "Independent retained source/spec/tree/owner/claim/worker audits and terminal events, recorded in journal and root closeouts; no run/attempt/gate artifacts."
+    },
+    {
+      "job_id": "20261110T133353Z-0a5e1789",
+      "source_sha256": "4cad9e47ebeb88f1cdb272634921f2aed79100e0e15ace4d01f9a3a33720d9d6",
+      "snapshot_sha256": "5e62a2e912f5dba0cd945d33388b95154d5d8e88ed6cf5b5998e595a323c6fd1",
+      "spec_sha256": "f9da4bb36f55ae76c4f47df4e25e69bf608f79676431f6daa17bc5e34e44934a",
+      "terminal_state": "expired unassigned",
+      "actual_model_execution": false,
+      "basis": "Independent retained source/spec/tree/owner/claim/worker audits and terminal events, recorded in journal and root closeouts; no run/attempt/gate artifacts."
+    },
+    {
+      "job_id": "20261110T145240Z-eb925299",
+      "source_sha256": "985782cb5c04bbeb6e3b701642b1f5bb05fbf9e6a1277c87955d91f09deef69d",
+      "snapshot_sha256": "63133e3c1485763e94891c87601cdf23a04f52027d528be2683fdf772091f686",
+      "spec_sha256": "6a4e5ed508580477c67f2ca3852abe429603e177adacf896ac33d581fd1dc16b",
+      "terminal_state": "expired unassigned",
+      "actual_model_execution": false,
+      "basis": "Independent retained source/spec/tree/owner/claim/worker audits and terminal events, recorded in journal and root closeouts; no run/attempt/gate artifacts."
+    },
+    {
+      "job_id": "20261110T154043Z-11179b2a",
+      "source_sha256": "985782cb5c04bbeb6e3b701642b1f5bb05fbf9e6a1277c87955d91f09deef69d",
+      "snapshot_sha256": "63133e3c1485763e94891c87601cdf23a04f52027d528be2683fdf772091f686",
+      "spec_sha256": "a9d05321e8f3ad34afea7203d690bb15eda739a7c893dae624b3f788ab8e47c1",
+      "terminal_state": "expired unassigned",
+      "actual_model_execution": false,
+      "basis": "Independent retained source/spec/tree/owner/claim/worker audits and terminal events, recorded in journal and root closeouts; no run/attempt/gate artifacts."
+    },
+    {
+      "job_id": "20261110T162815Z-b44688fa",
+      "source_sha256": "985782cb5c04bbeb6e3b701642b1f5bb05fbf9e6a1277c87955d91f09deef69d",
+      "snapshot_sha256": "63133e3c1485763e94891c87601cdf23a04f52027d528be2683fdf772091f686",
+      "spec_sha256": "6d5d4b18986edcd61b41383946da529a2669e4d79892110b70f59bca007bca9b",
+      "terminal_state": "expired unassigned",
+      "actual_model_execution": false,
+      "basis": "Independent retained source/spec/tree/owner/claim/worker audits and terminal events, recorded in journal and root closeouts; no run/attempt/gate artifacts."
+    }
+  ],
+  "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+  "preparation_phases": [
+    "w8-174ac-0a5e-unassigned-expiry-closure-20261110",
+    "w8-174ac-0e193-unassigned-expiry-closure-20261110",
+    "w8-174ac-q0-source-readiness-cost-preparation-20261110",
+    "w8-26905-1117-unassigned-expiry-closure-20261110",
+    "w8-26905-b446-unassigned-expiry-closure-20261110",
+    "w8-26905-eb92-unassigned-expiry-closure-20261110",
+    "w8-context-q0-prestage-cost-oracle-20261110",
+    "w8-context-q0-prestage-source-recovery-oracle-20261110",
+    "w8-context-q0-source-inspection-20261110",
+    "w8-context-q0-source-readiness-preparation-20261110",
+    "w8-cumulative-preparation-guard-source-preparation-20261110",
+    "w8-versioned-budget-source-preparation-20261110"
+  ],
+  "qualification_cpu_spent_seconds": 1150,
+  "qualification_gpu_spent_seconds": 0,
+  "all_registered_original_context_requests_reviewed": true,
+  "history_scope": "Actual historical240frame1/3step77c cost generation is preserved separately; CPU packet/runtime/native proofs did not execute generation controller or qualify CUDA. No old costs were removed/reclassified. Unknown or real earlier execution would stop first admission.",
+  "root_references": [
+    "docs/experiments/w8-wire-audit.md",
+    "docs/experiments/w8-inputs/receiver-20261101/aecf-0afe-root-cpu-closeout-20261110.json"
+  ]
+}

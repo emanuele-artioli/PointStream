@@ -189,7 +189,8 @@ def check_promotion(gate: dict[str, Any], *, gate_sha: str, expected_sha: str,
 
     if (not _sha(gate_sha) or gate_sha != expected_sha
             or gate.get('scope') != 'root-reviewed W8 remaining-work forecast'
-            or gate.get('schema') != 1 or gate.get('cpu_proof_sha256') != cpu_gate_sha
+            or type(gate.get('schema')) is not int or gate.get('schema') not in (1, 2)
+            or gate.get('cpu_proof_sha256') != cpu_gate_sha
             or gate.get('prior_artifact_sha256') != prior_artifact_sha
             or gate.get('ledger_sha256') != ledger_sha
             or not all(_sha(value) for value in (cpu_gate_sha, prior_artifact_sha, ledger_sha))
@@ -200,6 +201,15 @@ def check_promotion(gate: dict[str, Any], *, gate_sha: str, expected_sha: str,
             or not math.isfinite(gate['safety_factor']) or gate['safety_factor'] < 1.5
             or not _sha(gate.get('raw_measurement_audit_sha256'))):
         raise ValueError('root-reviewed promotion evidence differs')
+    allowance_fields = ('qualification_cumulative_cpu_ceiling_seconds',
+                        'qualification_budget_approval_sha256', 'qualification_attempt_nonce')
+    if gate['schema'] == 1 and any(key in gate for key in allowance_fields):
+        raise ValueError('legacy artifact cannot carry a new qualification allowance')
+    if gate['schema'] == 2 and (type(gate.get(allowance_fields[0])) is not int
+            or gate[allowance_fields[0]] <= 0 or not _sha(gate.get(allowance_fields[1]))
+            or not isinstance(gate.get(allowance_fields[2]), str)
+            or not re.fullmatch(r'[0-9a-f]{32}', gate[allowance_fields[2]])):
+        raise ValueError('explicit root-approved qualification allowance required')
     issued, expires = gate.get('issued_epoch'), gate.get('expires_epoch')
     now = time.time() if reference_epoch is None else reference_epoch
     if (isinstance(issued, bool) or not isinstance(issued, (int, float)) or not math.isfinite(issued)
@@ -271,13 +281,61 @@ def promotion_ledger_remaining(ledger: dict[str, Any]) -> tuple[float, float]:
 
 
 
+def qualification_cpu_limit(ledger: dict[str, Any], artifact: dict[str, Any], *, spent: float,
+                            cpu_cap: float) -> int:
+    """Resolve a root-pinned, versioned ceiling without resetting prior charges."""
+    import math
+
+    fields = ('qualification_cumulative_cpu_ceiling_seconds', 'qualification_budget_approval_sha256',
+              'qualification_attempt_nonce')
+    schema = artifact.get('schema', 1)
+    if type(schema) is not int:
+        raise ValueError('invalid qualification allowance schema')
+    if schema == 1:
+        if any(key in artifact for key in fields):
+            raise ValueError('legacy artifact cannot carry a new qualification allowance')
+        return QUALIFICATION_CUMULATIVE_CPU_LIMIT_SECONDS
+    if schema != 2:
+        raise ValueError('invalid qualification allowance schema')
+    limit = artifact.get(fields[0])
+    nonce = artifact.get(fields[2])
+    if (type(limit) is not int or limit <= 0 or not _sha(artifact.get(fields[1]))
+            or not isinstance(nonce, str) or not re.fullmatch(r'[0-9a-f]{32}', nonce)):
+        raise ValueError('explicit root-approved qualification allowance required')
+    approvals = ledger.get('qualification_budget_approvals')
+    if not isinstance(approvals, list):
+        raise ValueError('root budget approval missing from pinned ledger')
+    matches = [row for row in approvals if isinstance(row, dict)
+               and row.get('approval_sha256') == artifact[fields[1]]]
+    if len(matches) != 1:
+        raise ValueError('root budget approval identity missing or duplicated')
+    approval = matches[0]
+    bindings = {'attempt_nonce': nonce, 'cumulative_cpu_ceiling_seconds': limit,
+                'source_sha256': artifact.get('source_sha256'),
+                'snapshot_sha256': artifact.get('snapshot_sha256'),
+                'cpu_proof_sha256': artifact.get('cpu_proof_sha256')}
+    if ('no_prior_execution_audit_sha256' in artifact
+            and approval.get('no_prior_execution_audit_sha256') != artifact['no_prior_execution_audit_sha256']):
+        raise ValueError('root budget approval execution audit differs')
+    if (approval.get('status') != 'approved' or any(approval.get(k) != v for k, v in bindings.items())
+            or not all(_sha(bindings[k]) for k in ('source_sha256', 'snapshot_sha256', 'cpu_proof_sha256'))):
+        raise ValueError('root budget approval source, proof, nonce or ceiling differs')
+    _, remaining = promotion_ledger_remaining(ledger)
+    workstream_limit = ledger['workstreams']['w8']['cpu_limit_seconds']
+    if (type(workstream_limit) not in (int, float) or not math.isfinite(workstream_limit)
+            or limit > workstream_limit or limit > spent + remaining or cpu_cap > remaining):
+        raise ValueError('qualification allowance exceeds approved ledger reservation')
+    return limit
+
+
 def check_first_pilot_ledger(ledger: dict[str, Any], receipt: dict[str, Any], *,
-                             ledger_sha: str, cpu_proof_sha: str) -> None:
+                             ledger_sha: str, cpu_proof_sha: str, source: dict[str, Any] | None = None) -> None:
     """Allow only attributed preparation for this first attempt; count it once."""
     gpu, cpu = promotion_ledger_remaining(ledger)
     nonce = receipt.get('attempt_nonce')
     gpu_cap, cpu_cap = receipt.get('gpu_ceiling_seconds'), receipt.get('cpu_ceiling_seconds')
-    if (receipt.get('schema') != 1 or receipt.get('scope') != 'root-reviewed first W8 qualification pilot'
+    if (type(receipt.get('schema')) is not int or receipt.get('schema') not in (1, 2)
+            or receipt.get('scope') != 'root-reviewed first W8 qualification pilot'
             or not isinstance(nonce, str) or not re.fullmatch(r'[0-9a-f]{32}', nonce)
             or receipt.get('ledger_sha256') != ledger_sha or receipt.get('cpu_proof_sha256') != cpu_proof_sha
             or type(gpu_cap) is not int or type(cpu_cap) is not int or not 250 <= gpu_cap <= 900
@@ -293,7 +351,15 @@ def check_first_pilot_ledger(ledger: dict[str, Any], receipt: dict[str, Any], *,
             or any(not isinstance(phase, str) or not phase for phase in phases)
             or len(phases) != len(set(phases)) or sorted(phases) != receipt.get('preparation_phases')):
         raise ValueError('first pilot preparation is mixed, unattributed or follows an earlier execution')
-    for resource, cap, limit in (('gpu', gpu_cap, 900), ('cpu', cpu_cap, QUALIFICATION_CUMULATIVE_CPU_LIMIT_SECONDS)):
+    cpu_spent = sum(row['cpu_seconds'] for row in prep)
+    cpu_limit = qualification_cpu_limit(ledger, receipt, spent=cpu_spent, cpu_cap=cpu_cap)
+    if receipt['schema'] == 2:
+        if (not _sha(receipt.get('no_prior_execution_audit_sha256'))
+                or receipt['qualification_attempt_nonce'] != nonce or source is None
+                or not all(_sha(source.get(key)) and receipt.get(key) == source[key]
+                           for key in ('source_sha256', 'snapshot_sha256'))):
+            raise ValueError('qualification allowance source or nonce differs')
+    for resource, cap, limit in (('gpu', gpu_cap, 900), ('cpu', cpu_cap, cpu_limit)):
         spent = sum(row[resource + '_seconds'] for row in prep)
         if receipt.get(resource + '_spent_seconds') != spent or spent + cap > limit:
             raise ValueError('first pilot cumulative qualification ceiling exceeded')
@@ -302,8 +368,15 @@ def check_first_pilot_ledger(ledger: dict[str, Any], receipt: dict[str, Any], *,
 
 def check_first_pilot_stage(paths: dict[str, Path], spec: dict[str, Any]) -> None:
     receipt = json.loads(paths['admission'].read_text())
+    proof = json.loads(paths['cpu_proof'].read_text())
+    if ('witness_qualification_cumulative_cpu_ceiling_seconds' in spec
+            or (receipt.get('schema') == 1 and 'witness_qualification_budget_approval_sha256' in spec)):
+        raise ValueError('qualification allowance must be in the reviewed versioned artifact')
     check_first_pilot_ledger(json.loads(paths['ledger'].read_text()), receipt,
-        ledger_sha=spec['witness_ledger_sha256'], cpu_proof_sha=spec['witness_cpu_proof_sha256'])
+        ledger_sha=spec['witness_ledger_sha256'], cpu_proof_sha=spec['witness_cpu_proof_sha256'], source=proof)
+    if (receipt.get('qualification_budget_approval_sha256')
+            != spec.get('witness_qualification_budget_approval_sha256')):
+        raise ValueError('qualification budget approval identity differs')
     if (receipt['gpu_ceiling_seconds'] != spec['witness_gpu_ceiling_seconds']
             or receipt['cpu_ceiling_seconds'] != spec['witness_cpu_ceiling_seconds']):
         raise ValueError('first pilot stage ceilings differ from reviewed attempt')
@@ -319,7 +392,14 @@ def check_qualification_subcap(ledger: dict[str, Any], gate: dict[str, Any], *,
     if (any(not isinstance(phase, str) or not phase for phase in phases)
             or len(phases) != len(set(phases)) or sorted(phases) != gate.get('qualification_charge_phases')):
         raise ValueError('qualification charge attribution differs from reviewed gate')
-    for resource, cap, ceiling in (('gpu', gpu_cap, 900), ('cpu', cpu_cap, QUALIFICATION_CUMULATIVE_CPU_LIMIT_SECONDS)):
+    cpu_spent = sum(row['cpu_seconds'] for row in qualified)
+    ceiling = qualification_cpu_limit(ledger, gate, spent=cpu_spent, cpu_cap=cpu_cap)
+    if gate.get('schema', 1) == 2 and gpu_cap > promotion_ledger_remaining(ledger)[0]:
+        raise ValueError('qualification GPU cap exceeds approved ledger reservation')
+    if gate.get('schema', 1) == 2 and any(
+            row.get('qualification_attempt_nonce') != gate['qualification_attempt_nonce'] for row in qualified):
+        raise ValueError('qualification allowance nonce differs from ledger')
+    for resource, cap, ceiling in (('gpu', gpu_cap, 900), ('cpu', cpu_cap, ceiling)):
         spent = sum(row[resource + '_seconds'] for row in qualified)
         if gate.get('qualification_' + resource + '_spent_seconds') != spent or spent + cap > ceiling:
             raise ValueError('qualification cumulative ceiling exceeded')
@@ -327,6 +407,9 @@ def check_qualification_subcap(ledger: dict[str, Any], gate: dict[str, Any], *,
 def _unit1_promotion(paths: dict[str, Path], spec: dict[str, Any], dispatch: dict[str, Any], *,
                      historical: bool = False) -> None:
     gate = json.loads(paths['promotion'].read_text())
+    if ('witness_qualification_cumulative_cpu_ceiling_seconds' in spec
+            or (gate.get('schema') == 1 and 'witness_qualification_budget_approval_sha256' in spec)):
+        raise ValueError('qualification allowance must be in the reviewed versioned artifact')
     ledger_sha = fixed.file_sha(paths['ledger'])
     ledger = json.loads(paths['ledger'].read_text())
     gpu_remaining, cpu_remaining = promotion_ledger_remaining(ledger)
@@ -338,7 +421,12 @@ def _unit1_promotion(paths: dict[str, Path], spec: dict[str, Any], dispatch: dic
         cpu_gate_sha=spec['witness_cpu_proof_sha256'], prior_artifact_sha=spec['witness_prior_artifact_sha256'],
         ledger_sha=ledger_sha, gpu_remaining=gpu_remaining, cpu_remaining=cpu_remaining,
         reference_epoch=dispatch['started'] if historical else None)
+    if (gate.get('qualification_budget_approval_sha256')
+            != spec.get('witness_qualification_budget_approval_sha256')):
+        raise ValueError('qualification budget approval identity differs')
     profile = spec.get('w8_witness_profile')
+    if gate.get('schema') == 2 and profile not in ('w8-context-unit1-v1', 'w8-context-qualification-v1'):
+        check_qualification_subcap(ledger, gate, gpu_cap=0, cpu_cap=0)
     if profile in ('w8-context-unit1-v1', 'w8-context-qualification-v1'):
         check_qualification_subcap(ledger, gate, gpu_cap=spec['witness_gpu_ceiling_seconds'],
                                    cpu_cap=spec['witness_cpu_ceiling_seconds'])
@@ -839,8 +927,11 @@ def make_pilot_spec(*, deadline: str, proof_local: Path, proof_remote: str,
                 raise ValueError('first-pilot inputs require registered data paths')
         ledger_sha, admission_sha = fixed.file_sha(ledger_local), fixed.file_sha(admission_local)
         receipt = json.loads(admission_local.read_text())
-        check_first_pilot_ledger(json.loads(ledger_local.read_text()), receipt, ledger_sha=ledger_sha, cpu_proof_sha=digest)
+        check_first_pilot_ledger(json.loads(ledger_local.read_text()), receipt, ledger_sha=ledger_sha,
+                                 cpu_proof_sha=digest, source=gate)
         spec['witness_ledger_sha256'], spec['witness_admission_sha256'] = ledger_sha, admission_sha
+        if receipt['schema'] == 2:
+            spec['witness_qualification_budget_approval_sha256'] = receipt['qualification_budget_approval_sha256']
         gpu_cap, cpu_cap = receipt['gpu_ceiling_seconds'], receipt['cpu_ceiling_seconds']
         spec['witness_gpu_ceiling_seconds'], spec['witness_cpu_ceiling_seconds'] = gpu_cap, cpu_cap
         spec['witness_external_gpu_seconds'] = 50
@@ -874,10 +965,14 @@ def make_unit1_spec(*, deadline: str, proof_local: Path, proof_remote: str,
                     source={'source_sha256': gate.get('source_sha256'), 'snapshot_sha256': gate.get('snapshot_sha256')},
                     cpu_gate_sha=spec['witness_cpu_proof_sha256'], prior_artifact_sha=prior_artifact_sha,
                     ledger_sha=ledger_sha, gpu_remaining=gpu_remaining, cpu_remaining=cpu_remaining)
+    if gate.get('schema') == 2:
+        check_qualification_subcap(ledger, gate, gpu_cap=0, cpu_cap=0)
     spec['w8_witness_profile'] = 'w8-context-unit1-v1'
     spec['scale'] = {'phase': {'smoke': 'unit1', 'full': 'noop'}}
     spec['witness_promotion_sha256'] = promotion_sha
     spec['witness_ledger_sha256'] = ledger_sha
+    if gate['schema'] == 2:
+        spec['witness_qualification_budget_approval_sha256'] = gate['qualification_budget_approval_sha256']
     spec['witness_prior_artifact_sha256'] = prior_artifact_sha
     spec['witness_gpu_remaining_seconds'] = gate['gpu_remaining_seconds']
     spec['witness_cpu_remaining_seconds'] = gate['cpu_remaining_seconds']

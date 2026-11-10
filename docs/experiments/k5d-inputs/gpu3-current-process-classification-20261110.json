@@ -1,0 +1,25 @@
+{
+  "limits": "one CPU affinity, RLIMIT_CPU 4/5, SIGALRM 15 seconds, query timeout 7 seconds, SSH subprocess timeout 30 seconds; process CPU accounting excludes SSH and nvidia-smi",
+  "raw": {
+    "execution.json": {
+      "path": "/private/tmp/gpu3-current-classification-20261110/execution.json",
+      "sha256": "79d2750ebfbd6ec7507c3217333e2cd0fcbe57fa8c819595e8ebcc08ab81476a"
+    },
+    "helper.py": {
+      "path": "/private/tmp/gpu3-current-classification-20261110/helper.py",
+      "sha256": "b8be5cbd2c904f593268941dbc5890b3bfbc3847ee90945b722710d13e359f87"
+    },
+    "stderr.bin": {
+      "path": "/private/tmp/gpu3-current-classification-20261110/stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout.jsonl": {
+      "path": "/private/tmp/gpu3-current-classification-20261110/stdout.jsonl",
+      "sha256": "7c82b272668f9a9a4f7653c09487cbfc1a974c5f1972aa17a0466955db3b5314"
+    }
+  },
+  "result": "one compute PID observed; /proc access PermissionError, ownership unknown; no job identity or start ticks could be determined",
+  "schema": 1,
+  "scope": "one new read-only current gpu3 compute-process metadata classification; no signals, cleanup, model or data file reads",
+  "tag": "pointstream-gpu3-current-20261110-unique"
+}
