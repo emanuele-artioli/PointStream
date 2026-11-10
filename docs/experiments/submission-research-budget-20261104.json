@@ -1479,7 +1479,7 @@
       "release_stage": "research-first24/28firstnewtranche",
       "witness_qualification": true,
       "qualification_charge_kind": "pilot_preparation",
-      "attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a"
+      "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a"
     }
   ],
   "reservations": [
