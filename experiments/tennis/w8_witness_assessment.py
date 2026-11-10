@@ -197,6 +197,8 @@ def check_assessment_promotion(config: dict[str, Any], *, producer: dict[str, An
     job.check_promotion(gate, gate_sha=promotion_sha, expected_sha=promotion_sha, source=source,
                         cpu_gate_sha=config['cpu_proof_sha256'], prior_artifact_sha=producer_sha,
                         ledger_sha=ledger_sha, gpu_remaining=gpu, cpu_remaining=cpu)
+    if gate.get('schema') == 2:
+        job.check_qualification_subcap(ledger, gate, gpu_cap=0, cpu_cap=0)
     completed = gate['completed_artifact_sha256']
     producer_artifacts = producer.get('completed_artifact_sha256')
     required = {'unit0_full', 'unit1_full', 'native_sam_compose'}
