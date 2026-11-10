@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "decision": "Root releases ONE bounded current174 unit0 context cost pilot; exclusive queue; no retry",
+  "scope": "Original24frame30DDIM/CFG2/context24overlap4/registeredseed freshsourcehiddenoperational qualification only; notfull240pixel/RNGprefix orqualityclaim",
+  "source_revision": "174ac84b84a1f405e06700a34aa4c3e225fa3265",
+  "source_sha256": "4cad9e47ebeb88f1cdb272634921f2aed79100e0e15ace4d01f9a3a33720d9d6",
+  "snapshot_sha256": "5e62a2e912f5dba0cd945d33388b95154d5d8e88ed6cf5b5998e595a323c6fd1",
+  "source_archive": true,
+  "local_spec": "/private/tmp/pointstream-w8-174-q0-prestage-proposal-20261110-a1/spec.json",
+  "raw_spec_sha256": "7e0044d96a56e87a1648ac1adfd5c8963a7af4dae33f62724f1ea8352a5c0838",
+  "canonical_spec_digest": "9e1703f8026121c2a80081de195a4ffa88e38a95263646d2c20999b704275437",
+  "deadline": "2026-11-10T12:07:45.783001Z",
+  "hosts": [
+    "gpu5"
+  ],
+  "GPU_models": [
+    "RTX 6000 Ada"
+  ],
+  "GPU_sharing": {
+    "mode": "exclusive"
+  },
+  "contention": {
+    "policy": "stop",
+    "resume_attempts": 0
+  },
+  "approved_CPU_gate_sha256": "e4f770e60fe45ce2eb4e5b717a0edf19ef0141cb4212f5b371c23463059b526e",
+  "admission_sha256": "a8d4c4fc5671f4282b9ae833a58f9827ef3b25dacfc6c8b47d3f65d4d80b2e90",
+  "admission_ledger_sha256": "f0d1370afbdf21a4219896bf5a5f7549a5cd6bed2cf48f99d9407a29f361b9ba",
+  "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+  "future_GPU_ceiling": 500,
+  "future_CPU_ceiling": 600,
+  "qualification_preparation_CPU_alreadycharged": 300,
+  "qualification_inclusive_CPU_max": 900,
+  "caps": {
+    "campaign450": 450,
+    "smoke": 385,
+    "validator": 60,
+    "noop": 5,
+    "external_cpu": 150,
+    "generator_cpu": 260,
+    "generator_wall": 240,
+    "packet_cpu": 100,
+    "parent_cpu": 30,
+    "external_GPU": 50
+  },
+  "actual_necessary_prestage_gate": {
+    "warm_guarded_wall": 0.3502905694767833,
+    "once1_5_plus5": 5.525435854215175,
+    "required_less_than": 65
+  },
+  "forecast": {
+    "generator_once1_5_plus40": 200.6012730189832,
+    "generator_wall_cap": 240,
+    "conditional_base_once1_5": 287.86869693466,
+    "bootstrap_reserve": 40,
+    "initialsource_directguard_reserve": 65,
+    "noop_cap": 5,
+    "residual_campaign_allowance": 52.13130306534,
+    "residual_breakdown": {
+      "finalsource_direct_checks": 10,
+      "extra_parent_publication_monitor": 10,
+      "fullloop_dispatch": 10,
+      "incampaigncleanup": 10,
+      "contingency": 12.13130306534
+    },
+    "external_GPU": 50,
+    "external_CPU": 150
+  },
+  "limitations": "Historicalmodel/floors and1/12windowcostassumption are conditional, notmeasuredcompletionupperbounds. Actualoldpacket/provider/kernel/CUDA/budget/source/denial gates retained. No2ndunit/full240/80/nativeSAMcompose/qualityfit orautomaticpromotion. Old67requestremainsheld.",
+  "stops": "Anyidentity/policy/device/kernel/nonfinite/receipt/contamination/timing/budget/deadline failure stops,preserveallartifacts; no thresholds/sourcegrants/qualitychange. Onlytaskownedcleanup. GPUallocationonlyifexclusivefleetchecks pass; no reservationagainstothers.",
+  "monitoring": "Submitonce, persistID/source/spec/deadline/budget/output inexperiment+centralledger beforeONEcanonicalwait<=2700afterrootACK. Nativecompletionresumeverificationunknown; no recurringLLMpolls/timers. Rootacceptance/audit required."
+}
