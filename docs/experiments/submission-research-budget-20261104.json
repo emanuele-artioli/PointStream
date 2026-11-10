@@ -4097,6 +4097,39 @@
       "admission_sha256": "da1af0343897ae465fdb21419c01c2f05d485f837474d35a93a59df09092da7a",
       "approved_CPU_gate_sha256": "3761a9429e8f77f7c6b68faa3a2a6a4daad59fc99ba6a410724241dbda37667f",
       "client_revision": "1334264f revieweddoctorhelper;sourceworktree269unchanged"
+    },
+    {
+      "job_id": "20261110T162033Z-685f7fb9",
+      "phase": "k5d-scale-first-tranche-20261105",
+      "subphase": "same-job-0bb5-exclusive16-fifth-admission-window",
+      "state": "publishedpending;rootACKbeforeonecanonicalwait",
+      "revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
+      "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
+      "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+      "spec_sha256": "a2a7ac908766a99f2e72c43fcb5dbb65659ced84c36b22434944a9218cc802e9",
+      "source_archive": true,
+      "deadline": "2026-11-10T16:59:22.260778Z",
+      "hosts": [
+        "gpu2",
+        "gpu3"
+      ],
+      "gpu_models": [
+        "RTX A6000"
+      ],
+      "future_GPU": 1000,
+      "future_CPU": 1200,
+      "campaign": 800,
+      "namespace": 580,
+      "smoke": 600,
+      "validator": 30,
+      "noop": 5,
+      "external_CPU": 400,
+      "GPU_post": 200,
+      "local_storage_gib": 32,
+      "local_batch": "/private/tmp/k5d-same-job-0bb5-fifth-window-20261110",
+      "scope": "Sameoriginalsixpoint16parity/retainedreceiverIOcost only; no48/292/586/full30 or extra independent clip.",
+      "raw_spec_sha256": "74101b012fee1b74a3c2c7dca6af1bca487ccffb2c599d69d7354dffc35bb1d2",
+      "client_revision": "revieweddoctorhelper420c78a3descendant;sourceworktree0bbunchanged"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -4118,9 +4151,9 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "Ball e672closedexpired;W8 11179solewaitdeadline16:20:57+sweep. No newBalljob yet.",
+    "state": "Ball685fsolewaitafterACKdeadline16:59:22+sweep;W811179expiredrootcanonical,independentauditpending. No repeatpolls.",
     "jobs": [
-      "20261110T154043Z-11179b2a"
+      "20261110T162033Z-685f7fb9"
     ],
     "batches": [],
     "native_completion_resume_verified": false,
