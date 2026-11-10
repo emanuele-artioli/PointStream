@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import difflib
 import hashlib
+import json
 import tarfile
 from pathlib import Path
 from typing import Any
@@ -14,12 +15,12 @@ PATCHES = {
     resource.MEMBER: (resource.OLD_SHA, resource.NEW_SHA, resource.PATCH_SHA),
     'experiments/tennis/k5d_encoder.py': (
         'e98895cee0999d97db09ba27f54b1857c73f0c8eceda3be391c40aaf2cce0621',
-        '7602effa778c18053c03fe71f51be57ebdbc554a73b83dabdea38779e2421d27',
-        '917b3f5055e8860c6b305eb431e9b2990116e31102d34a67bca2642dc68a919c'),
+        'aa06febbf2429ec8b81cd4640fb6b39cf777e5557bf7b7ee05f391e33cd8eb08',
+        '11dd724975b52831c832fa9703700b208f9117021bbe0f31b53a8266a9e61bd0'),
     'experiments/tennis/k5d_benchmark.py': (
         '3377e5b4370e19f25dc3e011a0a292004fe004ccca54acff3a2585d351b86abd',
-        'a95935bdeadbbb4e0df9fdeedb75e0cfd7ff310343a2b0353c68cd25e241db7c',
-        'f7a1fcaa388ad3dbf5a4170f99fe3e1ffde461ab389f8da510cbea23ed002932'),
+        '6a6929a68db95db0e6ee54e41102e58883583b468c4bbe3737c0fa36fa254699',
+        'e7a0bcd5122a050be169392f8ee48b2892dd7f7f3b9bf63d574efc125c5dc33a'),
 }
 ADDITIONS = resource.ADDITIONS | {'experiments/tennis/k5d_first292_source_bridge.py'}
 
@@ -57,3 +58,15 @@ def bridge(old_archive: Path, old_identity: dict[str, str], new_archive: Path,
             'consumer_snapshot_sha256': new_identity['snapshot_sha256'], 'changed_paths': sorted(changed),
             'unchanged_files': sum(old[name] == new.get(name) for name in old),
             'patches': {name: list(digests) for name, digests in PATCHES.items()}}
+
+
+def verify_signed(record_path: Path, record_sha: str, old_archive: Path, new_archive: Path,
+                  identity: dict[str, str]) -> None:
+    if hashlib.sha256(record_path.read_bytes()).hexdigest() != record_sha:
+        raise ValueError('scoped bridge receipt hash differs')
+    signed = json.loads(record_path.read_text())
+    if signed.get('approved') is not True or signed.get('consumer_execution_identity') != identity:
+        raise ValueError('scoped bridge not approved for this source')
+    actual = bridge(old_archive, signed['calibration_execution_identity'], new_archive, identity)
+    if any(signed.get(key) != value for key, value in actual.items()):
+        raise ValueError('scoped bridge archived identities differ')

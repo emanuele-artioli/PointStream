@@ -281,8 +281,24 @@ def verify_pair_producer_audit(gate: dict[str, Any], path: Path, identity: dict[
             or audit.get('consumer_execution_identity') != identity
             or any(audit.get(key) != producer.get(key) for key in
                    ('job_id', 'clip', 'frames', 'remote', 'archive_sha256', 'checkpoint_sha256',
-                    'gpu_charge_seconds', 'cpu_charge_seconds'))):
+                    'gpu_charge_seconds', 'cpu_charge_seconds', 'ledger_charge_phases'))):
         raise ValueError('independent pair producer audit differs')
+
+
+def verify_pair_ledger_charge(gate: dict[str, Any], ledger: dict[str, Any]) -> None:
+    producer = pair_producer(gate)
+    phases = producer.get('ledger_charge_phases')
+    if (not isinstance(phases, list) or not phases or len(phases) != len(set(phases))
+            or any(not isinstance(phase, str) or not phase for phase in phases)):
+        raise ValueError('pair producer charge phases required')
+    rows = [row for row in ledger['charges'] if row.get('phase') in phases]
+    if len(rows) != len(phases) or any(row.get('workstream') != 'ball' for row in rows):
+        raise ValueError('pair producer charges missing from ledger')
+    for resource in ('gpu', 'cpu'):
+        amounts = [row.get(resource + '_seconds') for row in rows]
+        if (any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) or v < 0
+                for v in amounts) or sum(amounts) != producer.get(resource + '_charge_seconds')):
+            raise ValueError('pair producer charge differs from reconciled ledger')
 
 
 def first_pair_budget(gate: dict[str, Any], receipt: dict[str, Any], attestation: dict[str, Any],
@@ -417,12 +433,15 @@ def audit_raw_approval(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha
                 or parity.get('unshare_sha256') != qualification['unshare_sha256']):
             raise ValueError('actual native or GPU qualification receipt differs')
         if gate['release'] == PAIR_RELEASE and (parity.get('exclusive') is not True
-                                                   or parity.get('timing_contaminated') is not False):
+                                                   or parity.get('timing_contaminated') is not False
+                                                   or parity.get('source_bridge_sha256') != bridge_sha):
             raise ValueError('pair requires clean exclusive GPU qualification')
         if gate['release'] == 'cost-confirmation':
             confirmation_budget(gate, receipt)
         elif gate['release'] == PAIR_RELEASE:
             validate_calibration(receipt)
+            if phase == 'score':
+                verify_pair_ledger_charge(gate, ledger)
             first_pair_budget(gate, receipt, attestation, phase)
     if gate['release'] == 'full-study':
         qualification = gate.get('confirmation_qualification')

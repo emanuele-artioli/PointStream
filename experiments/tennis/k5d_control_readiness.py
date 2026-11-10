@@ -106,8 +106,9 @@ def inputs(args: Any, stage: Path, identity: dict[str, str]) -> dict[str, Any]:
         raise ValueError('source, runtime, or A6000 GPU class differs')
     checked = asset_inputs(args, stage)
     source_result = source(Path(args.archive), args.clip, args.frames)
-    enc.fidelity_gate(Path(args.fidelity_gate, purpose=getattr(args, 'fidelity_purpose', 'full-retrospective-benchmark'),
-                      clip=args.clip, frames=args.frames), args.fidelity_gate_sha256, fleet.EXPECTED['archive'])
+    enc.fidelity_gate(Path(args.fidelity_gate), args.fidelity_gate_sha256, fleet.EXPECTED['archive'],
+                      purpose=getattr(args, 'fidelity_purpose', 'full-retrospective-benchmark'),
+                      clip=args.clip, frames=args.frames)
     checkpoint = None
     if args.action == 'score':
         checkpoint = cp.verify(Path(args.checkpoint) / 'publish', args.checkpoint_sha256, identity)
