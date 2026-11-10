@@ -256,3 +256,23 @@ intent and output: `/private/tmp/pointstream-w8-aecf-pilot-next-20261110-a1/`.
 Root ACK precedes ONEcanonicalwait<=2700coverdeadline+sweep. No furtherqueue,
 fullwitness/unit1/quality release. Ballf018 solewait remains; next single root
 checkpoint18:56:50UTC, then W8deadline+sweep **19:19:15UTC** if unresolved.
+
+
+## Ball f018 terminal checkpoint — November 10, 19:02 UTC
+
+Root accepted fresh canonical expiry and all23 raw byte/SHA joins for f018:
+no assignment/campaign/inference/claims, exact originalsource/archive/spec,
+terminal eventACK. Charge full400externalCPU, zeroGPU, aggregateunmeasured.
+Programme **19,362GPU/47,371CPU**; Ball remaining **7,920/2,700**, W8 unchanged
+**4,550/1,079**. No eighthBall queue or scale release. Independent read-only
+review is assessing whether any source-supported shared quality-only route
+could answer a new useful research question; no implementation, source change,
+gate weakening or GPU release follows. Fleet shared timings are never evidence
+and cannot promote the existing exclusive cost/full-study certificate.
+
+W8 `20261110T183845Z-4c240783` still uses its existing sole canonical wait
+session49754; intent/handle/PID/output saved under
+`/private/tmp/pointstream-w8-aecf-pilot-next-20261110-a1/wait*`. Deadline
+**19:17:38.103222UTC**, single root check **19:19:15UTC** if no substantive
+completion. No repeatpoll/newwait/replay. Latest PR359 merged with successful
+CI; root owns next coherent publication. Manuscripts remain untouched.

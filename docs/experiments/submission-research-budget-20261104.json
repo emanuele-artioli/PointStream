@@ -1808,6 +1808,15 @@
       "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
       "basis": "Full150externalCPU inclusive of original readiness/submission/queue/audit, aggregate unmeasured. Root canonical status expired; all28raw byte/SHA joins reviewed, exact source/archive/spec, no execution/claims; gpu4owner expiry sweeper, gpu5busyreason, client terminal eventACK. Trueprep1150+150=1300,G0; no retagging/reset.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "k5d-f018-queue-closeout-20261110",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 400,
+      "basis": "Seventh corrected16 queue canonical expiredunassigned, root independentlyverified23rawsizeSHA/source/spec/archive, no execution/claims, eventACK. Full400externalCPU allocation inclusive ofmetadata/submission/queue/audit, unmeasuredaggregate; notqueuewall orGPU.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2326,8 +2335,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 7920,
-      "cpu_seconds": 3100,
-      "status": "Remaining_unspent;1000GPU/1200CPU nested seventh f018 queue;no scale release"
+      "cpu_seconds": 2700,
+      "status": "Remaining_unspent;f018closed0GPU400CPU;no eighthqueue orscale admitted"
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -4385,7 +4394,7 @@
       "job_id": "20261110T181703Z-f018d258",
       "phase": "k5d-scale-first-tranche-20261105",
       "subphase": "same-job-0bb5-exclusive16-seventh-admission-window",
-      "state": "pending;rootACKbeforeonecanonicalwait",
+      "state": "expiredunassigned;rootaccepted23rawjoins,eventACK",
       "revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
       "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
       "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
@@ -4412,7 +4421,11 @@
       "local_batch": "/private/tmp/k5d-same-job-0bb5-seventh-window-20261110",
       "scope": "Sameoriginalsixpoint16parity/retainedreceiverIOcost only; no48/292/586/full30 or extra independent clip.",
       "raw_spec_sha256": "0f2a4f74475da9455d0ebf61cce31d6c33a4db8794f2be3fbe4b79b3dfa951a7",
-      "client_revision": "revieweddoctorhelper420c78a3descendant;sourceworktree0bbunchanged"
+      "client_revision": "revieweddoctorhelper420c78a3descendant;sourceworktree0bbunchanged",
+      "terminal_CPU_charge": 400,
+      "terminal_GPU_charge": 0,
+      "qualification_executed": false,
+      "wait_state": "solewaitendedexpired,eventACK,noexecutionclaims"
     },
     {
       "job_id": "20261110T183845Z-4c240783",
@@ -4473,9 +4486,8 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "Ballf018solewaitdeadline18:55:14+sweep;W84c24rootACKbeforeonewaitdeadline19:17:38+sweep",
+    "state": "Ballf018closedunassigned0GPU400CPU;W84c24solewaitdeadline19:17:38+sweep",
     "jobs": [
-      "20261110T181703Z-f018d258",
       "20261110T183845Z-4c240783"
     ],
     "batches": [],
