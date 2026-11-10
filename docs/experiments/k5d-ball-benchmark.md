@@ -436,3 +436,9 @@ Root central ledger ACK `bb920efd` accepted the exact PENDING manifest. One cano
 The one wait is running with local session handle `51062`; preserve the handle and output. Completion callback is unverified; root retains the deadline check.
 
 Local wait process PID `74308` was observed at launch; it is a client process identifier, not a completion callback or remote supervisor.
+
+### Root legacy reuse disposition — November 10, 14:12 UTC
+
+The recovered full188 Clip3 labels now independently match every original CSV row and ordered ZIP member name; recorded geometry bounds pass, actual JPEG dimensions were not independently decoded. The [source-chain review](k5d-inputs/legacy188-source-chain-review-20261110.md) identifies the real native subprocesses, model and scoring paths: unchanged numerical functions, same ten scientific assets and packed runtime, old same-job receiver pixel equality, and current sealed-pixel scoring with no later DCVC decode. Root accepts that as a conditional method-family argument, rather than requiring an unnecessary second GPU reproduction simply because infrastructure changed. This is not current runtime qualification or reuse credit.
+
+After the actual corrected16 output, join its tool/head/runtime identities and absent shared allocator profile to the saved old report. A future frozen full-study analysis must explicitly admit a provenance-preserving old-monolithic adapter carrying actual b26e/c212 and publication SHA, verified label/byte/metric/judge joins, current analysis identity and exactly one registered Clip3 slot. No relabeling as0bb5, synthetic retained marker, later decode or extra independent clip. Do not build that adapter or spend on a fresh188 solely to satisfy generic dynamic-import doubts: the source review mapped the actual imports/calls. Current16/48 cost and storage gates still control scaled study admission.
