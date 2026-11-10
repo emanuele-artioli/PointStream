@@ -1575,6 +1575,15 @@
       "cpu_seconds": 50,
       "basis": "Prospectivelyprechargedfull50CPU source/readiness only, new0bb5same-jobretainedreceiver. Staticbridgeactualarchivesverified; noCPU/GPUjobreleased.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "k5d-same-job-0bb5-d201-native-closure-20261110",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 250,
+      "basis": "Fullapprovedremaining250CPU closureallocation;50prep alreadycharged300inclusive. Freshcanonical/source/gate/all14rawSHA/countercasechecks rootverified. Lifecycle120.911wall/aggregateunmeasured; noGPU orvolumeclaim.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2093,8 +2102,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 7920,
-      "cpu_seconds": 5890,
-      "status": "Remaining_unspent;new0bb5sourceprep50precharged;292splitHELDpendingnewactualqual/storage/cost"
+      "cpu_seconds": 5640,
+      "status": "Remaining_unspent;new0bb5nativeCPUaccepted300inclusive;GPU/16/48/volumegatesstillpending"
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -3618,7 +3627,7 @@
       "job_id": "20261110T124427Z-d20121f2",
       "phase": "k5d-scale-first-tranche-20261105",
       "subphase": "same-job-0bb5-actual-native-CPUproof",
-      "state": "completepercanonicalwait;actualpublicationmatched;independentauditpending",
+      "state": "complete;rootacceptedexactsourceCPUproofonly",
       "spec_sha256": "3831ddc767f3dd3960e6964cd0e08443b06f6e47e50949041b6512645b854842",
       "deadline": "2026-11-10T13:15:50.779434Z",
       "host": "gpu2",
@@ -3638,7 +3647,10 @@
       "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
       "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
       "source_archive": true,
-      "wait_state": "singlecanonicalwaitcompleted;eventnotyetACKuntilaudit"
+      "wait_state": "ended;eventACK;allobservedbirths/claimsabsent",
+      "approved_gate_sha256": "9445895e80c29d26c305134a3551347a2b4393a07d3985599768edf937ecb687",
+      "terminal_additional_cpu_charge": 250,
+      "actual_inclusive_conservative_cpu_charge": 300
     }
   ],
   "old_budgets": "closed, not borrowed",
