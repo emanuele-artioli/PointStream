@@ -1501,6 +1501,30 @@
       "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
       "basis": "Prospectively precharged full30CPU source/readiness preparation. Stoponfailure,retaincharge. Samequalificationnonce;20old+30new+550future=600CPUmax, within1000CPU unchangedqualification.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "w8-context-q0-prestage-cost-oracle-20261110",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 100,
+      "witness_qualification": true,
+      "qualification_charge_kind": "pilot_preparation",
+      "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+      "basis": "Prospectively precharged full100CPU actual source+two NFS-input cost oracle. GPUheld. Fullcharge retainedonfailure; onecore70+localSSH5+adminfailure25.",
+      "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "w8-context-q0-prestage-source-recovery-oracle-20261110",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 100,
+      "witness_qualification": true,
+      "qualification_charge_kind": "pilot_preparation",
+      "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+      "basis": "Prospectivelyprecharged full100CPU correctedsource-recovery+prestagecostoracle. Prior100failureclosed.70onecore+5localSSH+25adminfailure, GPUheld.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2084,8 +2108,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 3350,
-      "status": "Remaining_unspent;30CPU source-readinessprecharged; noGPUrelease"
+      "cpu_seconds": 3150,
+      "status": "Remaining_unspent;corrected100CPU source-recoveryoracleprecharged; GPUheld"
     }
   ],
   "jobs": [
@@ -3445,6 +3469,35 @@
       "wait_state": "ended;terminaleventACK",
       "full_native_gate_passed": true,
       "GPU_or_scale_qualified": false
+    },
+    {
+      "job_id": "20261110T102034Z-9c83c9fc",
+      "phase": "k5d-scale-first-tranche-20261105",
+      "subphase": "first292-source-exclusive16-cost-parity",
+      "state": "submitted pending; solecanonicalwait decoder_cost_finish",
+      "revision": "ffe51da48b4088609cd8f799e4655d608fcacbad",
+      "source_sha256": "390e157a9aabc1db8006a936a7de54a43c8810650260136bc59a67036e7dfd39",
+      "snapshot_sha256": "202466a711d17b742a17270bab91da2dc581af7a9fc1e411405f8bb37a924372",
+      "spec_sha256": "0cdd4e93b83375b5a4144059bb26e603a7dd368c126b2e4e384a8b663fd32df3",
+      "deadline": "2026-11-10T10:55:46.693498Z",
+      "hosts": [
+        "gpu2",
+        "gpu3"
+      ],
+      "gpu_models": [
+        "RTX A6000"
+      ],
+      "source_archive": true,
+      "inclusive_gpu_ceiling": 1000,
+      "inclusive_cpu_ceiling": 1200,
+      "preparation_charged_cpu_seconds": 50,
+      "future_CPU_ceiling": 1150,
+      "campaign_wall_ceiling": 800,
+      "postcampaign_GPU_ceiling": 200,
+      "external_CPU_remaining_ceiling": 350,
+      "local_batch": "/private/tmp/k5d-first292-exclusive16-preparation-20261110",
+      "result_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261110T102034Z-9c83c9fc",
+      "scope": "Same6settings16frames actualfirstpairsourceparity/memory/cost only. No292/586/full30. AllthreeeligibleA6000s busyatpreparation; boundedqueueonly, no claim of admission."
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -3466,8 +3519,10 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "NativeCPUproofedaf recorded; ONEcanonicalwait authorized then completeaudit. NoGPUjob/retry/timer; W87b519localreviewonly; gpu3warmingproposalonly.",
-    "jobs": [],
+    "state": "ONEcanonicalBallwait<=2700 decoder_cost_finish afterrootACK. W8GPUheldforrepeatedinputcost; no timer/retry.",
+    "jobs": [
+      "20261110T102034Z-9c83c9fc"
+    ],
     "batches": [],
     "native_completion_resume_verified": false,
     "recurring_llm_polling": false,

@@ -1,0 +1,31 @@
+{
+  "CPU_seconds_precharged": 100,
+  "GPU_seconds": 0,
+  "actual_remote_cpu": "not measured; RLIMIT_CPU 70 observed at start",
+  "attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+  "launcher_usage": {
+    "exit_code": 1,
+    "self_cpu_seconds": 0.061599,
+    "ssh_cpu_seconds": 0.027160999999999998,
+    "wall_seconds": 3.9759851659999996
+  },
+  "phase": "w8-context-q0-prestage-cost-oracle-20261110",
+  "raw_directory": "/private/tmp/pointstream-w8-q0-prestage-probe-proposal-20261110-a1",
+  "raw_sha256": {
+    "handle.json": "669c39c80940f493e144d47c5761c92c14481a239985241ac4f1f40b14ea605a",
+    "intent.json": "7cbf316538c09152bbc55b22862f555213997099724d1e792600b14c62dc3265",
+    "pid-check.json": "c117e96f1912697aaae2301175565ef43ecb1939820d17db5b6f196265594bd8",
+    "probe.py": "3a130b7b0d8a2115f14c0e3d2a61fdd68493571d6bae855de60a4568bf8db8a9",
+    "run.py": "22a4cc276290e3f734a0072c73fbd2a92a46fac827f7fc1e7ad42e78886482f6",
+    "stderr.txt": "efa8801fe2e830817859db3993ef7848b1c79d1394d6f9f54294199d31689c3f",
+    "stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "usage.json": "3e11d49fd1a221d9474d5d8fe96d4bea8c8576af2e79b952e09602892a8c92e7"
+  },
+  "remote_pid": 1380833,
+  "remote_pid_absent": true,
+  "remote_start_ticks": 698595309,
+  "schema": 1,
+  "scope": "CPU infrastructure only; no model/GPU/quality claim; no timing result",
+  "source_path": "/local/users/emanuele/pointstream/sources/20261110T001842Z-808952c3",
+  "status": "failed before source identity or direct-input verification; original fleet source directory already cleaned"
+}
