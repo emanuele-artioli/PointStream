@@ -242,3 +242,17 @@ No actualID yet. Ballf018 existing solewait session28627/PID15495/output
 18:55:14.653945 UTC; root single nextcheck18:56:50 unless a substantive event.
 No eighthBallqueue/scale or furtherW8queue automaticauthority. PR358 merged,
 CIchecksSUCCESS; latest accounting checkpoint will be published separately.
+
+
+## Current live W8 successor — November 10, 18:42 UTC
+
+`20261110T183845Z-4c240783` is canonically pending, deadline **19:17:38.103222 UTC**,
+exact frozenaecf sourcec9d/archivef784/source_archive:true. Root joined raw
+spec586ba386/canonical67e47969 with the submitted manifest and actual readiness
+receipt; pinnedledger06645f39/admission09d4d87b contain1300trueprep/samenonce,
+approval12ab/auditd1db. Future500GPU/550CPU unchanged and nestedW84550/1079.
+Source+two warmverify0.517s/guard5.775<65 are observations, not bounds. Controls,
+intent and output: `/private/tmp/pointstream-w8-aecf-pilot-next-20261110-a1/`.
+Root ACK precedes ONEcanonicalwait<=2700coverdeadline+sweep. No furtherqueue,
+fullwitness/unit1/quality release. Ballf018 solewait remains; next single root
+checkpoint18:56:50UTC, then W8deadline+sweep **19:19:15UTC** if unresolved.
