@@ -1489,6 +1489,18 @@
       "cpu_seconds": 50,
       "basis": "Prospectively precharged full50CPU bounded readiness/source preparation; failure retains entirecharge; inside1200CPU firstexclusive16 envelope",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "w8-context-q0-source-readiness-preparation-20261110",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 30,
+      "witness_qualification": true,
+      "qualification_charge_kind": "pilot_preparation",
+      "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+      "basis": "Prospectively precharged full30CPU source/readiness preparation. Stoponfailure,retaincharge. Samequalificationnonce;20old+30new+550future=600CPUmax, within1000CPU unchangedqualification.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2072,8 +2084,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 3380,
-      "status": "Remaining_unspent;20CPU schedulerpreparationcharged under qualificationnonce; noGPUrelease"
+      "cpu_seconds": 3350,
+      "status": "Remaining_unspent;30CPU source-readinessprecharged; noGPUrelease"
     }
   ],
   "jobs": [
