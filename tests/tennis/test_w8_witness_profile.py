@@ -1057,3 +1057,204 @@ def test_cpu_runtime_attestation_binds_actual_leaf_to_pinned_role(runtime):
         profile.validate_cpu_runtime_attestation(receipt, dict(config, allow_paths=[]), preflight, runtime)
     with pytest.raises(ValueError, match='runtime attestation'):
         profile.validate_cpu_runtime_attestation(receipt, dict(config, environment={'CUDA_VISIBLE_DEVICES': 'GPU'}), preflight, runtime)
+
+
+def versioned_qualification_fixture(tmp_path: Path) -> tuple[dict, dict, dict]:
+    ledger = json.loads(first_pilot_ledger(tmp_path).read_text())
+    ledger['reservations'][0]['cpu_seconds'] = 3000
+    nonce = 'a' * 32
+    ledger['charges'] = [{'parent_phase': 'w8-full-witness-staged-20261106', 'phase': 'prep',
+        'workstream': 'w8', 'gpu_seconds': 0, 'cpu_seconds': 1050, 'witness_qualification': True,
+        'qualification_charge_kind': 'pilot_preparation', 'qualification_attempt_nonce': nonce}]
+    source = {'source_sha256': '1' * 64, 'snapshot_sha256': '2' * 64}
+    ledger['qualification_budget_approvals'] = [{'status': 'approved', 'approval_sha256': 'd' * 64,
+        'attempt_nonce': nonce, 'cumulative_cpu_ceiling_seconds': 1600,
+        'no_prior_execution_audit_sha256': 'e' * 64, **source, 'cpu_proof_sha256': 'c' * 64}]
+    receipt = {'schema': 2, 'scope': 'root-reviewed first W8 qualification pilot',
+        'attempt_nonce': nonce, 'qualification_attempt_nonce': nonce,
+        'qualification_cumulative_cpu_ceiling_seconds': 1600,
+        'qualification_budget_approval_sha256': 'd' * 64,
+        'no_prior_execution_audit_sha256': 'e' * 64, **source,
+        'ledger_sha256': 'b' * 64, 'cpu_proof_sha256': 'c' * 64,
+        'preparation_phases': ['prep'], 'gpu_spent_seconds': 0, 'cpu_spent_seconds': 1050,
+        'gpu_ceiling_seconds': 500, 'cpu_ceiling_seconds': 550}
+    return ledger, receipt, source
+
+
+def test_versioned_first_pilot_requires_exact_budget_approval_and_no_prior_execution(tmp_path: Path) -> None:
+    import copy
+    from experiments.tennis import w8_witness_job as job
+
+    ledger, receipt, source = versioned_qualification_fixture(tmp_path)
+    def check(ledger_value: dict, receipt_value: dict, source_value: dict = source) -> None:
+        job.check_first_pilot_ledger(ledger_value, receipt_value, ledger_sha='b' * 64,
+                                     cpu_proof_sha='c' * 64, source=source_value)
+    check(ledger, receipt)
+    for field, value in (('qualification_cumulative_cpu_ceiling_seconds', None),
+                         ('qualification_cumulative_cpu_ceiling_seconds', True),
+                         ('qualification_cumulative_cpu_ceiling_seconds', 1599),
+                         ('qualification_budget_approval_sha256', 'f' * 64),
+                         ('qualification_attempt_nonce', 'f' * 32),
+                         ('no_prior_execution_audit_sha256', None), ('source_sha256', 'f' * 64)):
+        bad = copy.deepcopy(receipt)
+        bad[field] = value
+        with pytest.raises(ValueError):
+            check(ledger, bad)
+    for alteration in ('duplicate', 'retag', 'nonce', 'overreservation', 'approval_source', 'missing_phase'):
+        bad = copy.deepcopy(ledger)
+        if alteration == 'duplicate':
+            bad['charges'].append(copy.deepcopy(bad['charges'][0]))
+        elif alteration == 'retag':
+            bad['charges'][0]['qualification_charge_kind'] = 'pilot_execution'
+        elif alteration == 'nonce':
+            bad['charges'][0]['qualification_attempt_nonce'] = 'f' * 32
+        elif alteration == 'overreservation':
+            bad['reservations'][0]['cpu_seconds'] = 500
+        elif alteration == 'approval_source':
+            bad['qualification_budget_approvals'][0]['source_sha256'] = 'f' * 64
+        else:
+            bad['charges'][0]['phase'] = 'unreviewed'
+        with pytest.raises(ValueError):
+            check(bad, receipt)
+    bad = copy.deepcopy(receipt)
+    bad['schema'] = 1
+    with pytest.raises(ValueError, match='legacy artifact'):
+        check(ledger, bad)
+    bad = copy.deepcopy(receipt)
+    bad['cpu_ceiling_seconds'] = 1001
+    with pytest.raises(ValueError):
+        check(ledger, bad)
+    bad = copy.deepcopy(receipt)
+    bad['gpu_ceiling_seconds'] = 901
+    with pytest.raises(ValueError):
+        check(ledger, bad)
+
+
+def test_versioned_promotion_subcap_uses_same_nonce_and_approved_ledger(tmp_path: Path) -> None:
+    import copy
+    from experiments.tennis import w8_witness_job as job
+
+    ledger, receipt, _ = versioned_qualification_fixture(tmp_path)
+    gate = {k: receipt[k] for k in ('schema', 'source_sha256', 'snapshot_sha256', 'cpu_proof_sha256',
+        'qualification_attempt_nonce', 'qualification_cumulative_cpu_ceiling_seconds',
+        'qualification_budget_approval_sha256')}
+    gate.update(qualification_charge_phases=['prep'], qualification_gpu_spent_seconds=0,
+                qualification_cpu_spent_seconds=1050)
+    job.check_qualification_subcap(ledger, gate, gpu_cap=500, cpu_cap=550)
+    with pytest.raises(ValueError, match='ceiling exceeded'):
+        job.check_qualification_subcap(ledger, gate, gpu_cap=500, cpu_cap=551)
+    bad = copy.deepcopy(ledger)
+    bad['charges'][0]['qualification_attempt_nonce'] = 'f' * 32
+    with pytest.raises(ValueError, match='nonce differs'):
+        job.check_qualification_subcap(bad, gate, gpu_cap=500, cpu_cap=550)
+    bad = copy.deepcopy(ledger)
+    bad['qualification_budget_approvals'].append(copy.deepcopy(bad['qualification_budget_approvals'][0]))
+    with pytest.raises(ValueError, match='duplicated'):
+        job.check_qualification_subcap(bad, gate, gpu_cap=500, cpu_cap=550)
+
+
+def test_versioned_first_stage_binds_root_identity_and_proof(tmp_path: Path) -> None:
+    from experiments.tennis import w8_witness_job as job
+
+    ledger, receipt, source = versioned_qualification_fixture(tmp_path)
+    paths = {'ledger': tmp_path / 'ledger.json', 'admission': tmp_path / 'admission.json',
+             'cpu_proof': tmp_path / 'proof.json'}
+    paths['ledger'].write_text(json.dumps(ledger))
+    paths['admission'].write_text(json.dumps(receipt))
+    paths['cpu_proof'].write_text(json.dumps(source))
+    spec = {'witness_ledger_sha256': 'b' * 64, 'witness_cpu_proof_sha256': 'c' * 64,
+            'witness_qualification_budget_approval_sha256': 'd' * 64,
+            'witness_gpu_ceiling_seconds': 500, 'witness_cpu_ceiling_seconds': 550}
+    job.check_first_pilot_stage(paths, spec)
+    spec['witness_qualification_budget_approval_sha256'] = 'f' * 64
+    with pytest.raises(ValueError, match='approval identity'):
+        job.check_first_pilot_stage(paths, spec)
+    spec['witness_qualification_budget_approval_sha256'] = 'd' * 64
+    paths['cpu_proof'].write_text(json.dumps({**source, 'source_sha256': 'f' * 64}))
+    with pytest.raises(ValueError, match='source or nonce'):
+        job.check_first_pilot_stage(paths, spec)
+
+
+def test_versioned_promotion_requires_explicit_allowance_and_pinned_root_digest():
+    import time
+    from experiments.tennis import w8_witness_job as job
+
+    source = {'source_sha256': 'a' * 64, 'snapshot_sha256': 'b' * 64}
+    components = {name: {'gpu_seconds': 8.0, 'cpu_seconds': 10.0} for name in (
+        'unit1_context', 'unit0_full', 'unit1_full', 'native_sam_compose', 'postseal_score',
+        'offline_validation', 'external_staging_audits', 'failure_headroom')}
+    gate = {'schema': 2, 'scope': 'root-reviewed W8 remaining-work forecast', **source,
+        'cpu_proof_sha256': 'c' * 64, 'prior_artifact_sha256': 'd' * 64, 'ledger_sha256': 'e' * 64,
+        'qualification_budget_approval_sha256': 'f' * 64, 'qualification_attempt_nonce': 'a' * 32,
+        'qualification_cumulative_cpu_ceiling_seconds': 1600,
+        'raw_measurement_audit_sha256': 'f' * 64, 'safety_factor': 1.5, 'remaining_components': components,
+        'gpu_remaining_seconds': 70, 'cpu_remaining_seconds': 84,
+        'issued_epoch': time.time() - 1, 'expires_epoch': time.time() + 100}
+    args = {'gate_sha': '1' * 64, 'expected_sha': '1' * 64, 'source': source, 'cpu_gate_sha': 'c' * 64,
+            'prior_artifact_sha': 'd' * 64, 'ledger_sha': 'e' * 64, 'gpu_remaining': 70, 'cpu_remaining': 84}
+    job.check_promotion(gate, **args)
+    with pytest.raises(ValueError, match='promotion evidence'):
+        job.check_promotion(gate, **{**args, 'expected_sha': '2' * 64})
+    for key in ('qualification_cumulative_cpu_ceiling_seconds', 'qualification_budget_approval_sha256',
+                'qualification_attempt_nonce'):
+        bad = dict(gate)
+        del bad[key]
+        with pytest.raises(ValueError, match='allowance required'):
+            job.check_promotion(bad, **args)
+    gate['schema'] = 1
+    with pytest.raises(ValueError, match='legacy artifact'):
+        job.check_promotion(gate, **args)
+
+
+def test_versioned_pilot_builder_pins_approval_and_staged_artifacts(tmp_path: Path) -> None:
+    from experiments.tennis import w8_witness_job as job
+
+    ledger, receipt, source = versioned_qualification_fixture(tmp_path)
+    proof = tmp_path / 'proof.json'
+    proof.write_text(json.dumps({'schema': 2, 'scope': job.CPU_SCOPE, 'passed': True,
+        'bootstrap_sha256': '9' * 64, 'input_job_sha256': '8' * 64, 'system_leaves_sha256': '7' * 64,
+        **source, 'revision': 'c' * 40, 'proof_campaign_environment_sha256': job.host.MAIN_ENV,
+        'generation_environment_sha256': job.host.JCV_ENV, 'generation_controller_executed': False,
+        'cuda_qualified': False, 'host': 'gpu5', 'job_id': '20261106T000000Z-12345678',
+        'spec_sha256': 'e' * 64, 'raw_receipt_sha256': dict.fromkeys(job.REQUIRED_PROOFS, 'f' * 64),
+        'checks': dict.fromkeys(job.REQUIRED_CHECKS, True)}))
+    digest = fixed.file_sha(proof)
+    receipt['cpu_proof_sha256'] = digest
+    ledger['qualification_budget_approvals'][0]['cpu_proof_sha256'] = digest
+    ledger_path = tmp_path / 'ledger-v2.json'
+    ledger_path.write_text(json.dumps(ledger))
+    receipt['ledger_sha256'] = fixed.file_sha(ledger_path)
+    admission = tmp_path / 'admission-v2.json'
+    admission.write_text(json.dumps(receipt))
+    base = '/home/itec/emanuele/Datasets/pointstream-data/tests/'
+    spec = job.make_pilot_spec(deadline=(datetime.now(timezone.utc) + timedelta(minutes=20)).isoformat(),
+        proof_local=proof, proof_remote=base + 'proof.json', ledger_local=ledger_path,
+        ledger_remote=base + 'ledger.json', admission_local=admission, admission_remote=base + 'admission.json')
+    assert spec['witness_qualification_budget_approval_sha256'] == 'd' * 64
+    assert spec['witness_admission_sha256'] == fixed.file_sha(admission)
+    assert spec['witness_ledger_sha256'] == fixed.file_sha(ledger_path)
+    assert spec['witness_cpu_proof_sha256'] == digest
+    assert spec['witness_cpu_ceiling_seconds'] == 550 and spec['witness_gpu_ceiling_seconds'] == 500
+
+
+def test_versioned_allowance_does_not_allow_completed_unit_replay(tmp_path: Path, monkeypatch) -> None:
+    from experiments.tennis import w8_witness_job as job
+
+    ledger, receipt, _ = versioned_qualification_fixture(tmp_path)
+    gate = {k: receipt[k] for k in ('schema', 'source_sha256', 'snapshot_sha256', 'cpu_proof_sha256',
+        'qualification_attempt_nonce', 'qualification_cumulative_cpu_ceiling_seconds',
+        'qualification_budget_approval_sha256')}
+    gate.update(qualification_charge_phases=['prep'], qualification_gpu_spent_seconds=0,
+        qualification_cpu_spent_seconds=1050, qualification_next_gpu_ceiling_seconds=500,
+        qualification_next_cpu_ceiling_seconds=550, completed_artifact_sha256={'unit1_context': 'a' * 64})
+    paths = {'ledger': tmp_path / 'ledger.json', 'promotion': tmp_path / 'promotion.json'}
+    paths['ledger'].write_text(json.dumps(ledger))
+    paths['promotion'].write_text(json.dumps(gate))
+    spec = {'witness_gpu_remaining_seconds': 4000, 'witness_cpu_remaining_seconds': 3000,
+        'witness_promotion_sha256': 'b' * 64, 'witness_cpu_proof_sha256': 'c' * 64,
+        'witness_prior_artifact_sha256': 'd' * 64, 'w8_witness_profile': 'w8-context-unit1-v1',
+        'witness_qualification_budget_approval_sha256': 'd' * 64,
+        'witness_gpu_ceiling_seconds': 500, 'witness_cpu_ceiling_seconds': 550}
+    monkeypatch.setattr(job, 'check_promotion', lambda *_args, **_kwargs: None)
+    with pytest.raises(ValueError, match='unit-1 context already completed; no replay'):
+        job._unit1_promotion(paths, spec, {'code': {}, 'started': 0})
