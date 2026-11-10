@@ -3660,6 +3660,38 @@
       "approved_gate_sha256": "9445895e80c29d26c305134a3551347a2b4393a07d3985599768edf937ecb687",
       "terminal_additional_cpu_charge": 250,
       "actual_inclusive_conservative_cpu_charge": 300
+    },
+    {
+      "job_id": "20261110T130538Z-389ebe94",
+      "phase": "k5d-scale-first-tranche-20261105",
+      "subphase": "same-job-0bb5-exclusive16-parity-IO-cost",
+      "state": "publishedpending;solecanonicalwait ball_source_qualification",
+      "revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
+      "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
+      "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+      "spec_sha256": "25f4fbe509fa1f431fe9250e9c04c9a1be359743fa1cbba72afe8ea9b3cc0ed9",
+      "source_archive": true,
+      "deadline": "2026-11-10T13:38:57.226322Z",
+      "hosts": [
+        "gpu2",
+        "gpu3"
+      ],
+      "gpu_models": [
+        "RTX A6000"
+      ],
+      "GPU_inclusive": 1000,
+      "CPU_inclusive": 1200,
+      "preparation_alreadycharged": 30,
+      "future_CPU": 1170,
+      "campaign": 800,
+      "namespace": 580,
+      "smoke": 600,
+      "validator": 30,
+      "GPU_post": 200,
+      "CPU_external_after_preparation": 370,
+      "local_storage_gib": 32,
+      "local_batch": "/private/tmp/k5d-same-job-0bb5-exclusive16-preparation-20261110",
+      "scope": "Originalsixpoint16parity actualsame-jobretainedreceiver+IOpilot; no48/292/586/full30/independentclipclaim."
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -3681,9 +3713,10 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "ONEcanonicalboundedwait0e193 w8_resume_queue afterrootACK;Ball0bb5sourceprepactive,noGPU/CPUjobyet,no timers/retry.",
+    "state": "TwoindependentboundedGPUqueues:W80e193waitw8_resume_queue deadline13:12;Ball389ewaitball_source_qualification deadline13:38. No otherjobs/retry/timer.",
     "jobs": [
-      "20261110T123904Z-0e193d36"
+      "20261110T123904Z-0e193d36",
+      "20261110T130538Z-389ebe94"
     ],
     "batches": [],
     "native_completion_resume_verified": false,
