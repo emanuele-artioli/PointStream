@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "decision": "Release ONE further bounded A6000 admission window for still-unexecuted corrected16 context",
+  "previous_job": "20261110T135257Z-8868b966",
+  "previous_expiry_audit_sha256": "5799bdbceebddabe21e37f208e44bab1135cf0cdc9420aaa543a8f6eb76d2aeb",
+  "previous_GPU": 0,
+  "previous_CPU": 400,
+  "revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
+  "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+  "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
+  "source_archive_required": true,
+  "native_CPU_gate_sha256": "9445895e80c29d26c305134a3551347a2b4393a07d3985599768edf937ecb687",
+  "bridge_sha256": "b052efdf6cdaea51bc9f19ac141b3c56cf4caec96c3e9f9ae25d6df37d965782",
+  "future_caps": {
+    "GPU": 1000,
+    "CPU": 1200,
+    "campaign": 800,
+    "namespace": 580,
+    "smoke": 600,
+    "validator": 30,
+    "noop": 5,
+    "GPU_post": 200,
+    "external_CPU": 400,
+    "final_metadata_within_external_CPU": 10
+  },
+  "family": "Priorcorrectedsourcewindows400+400=800CPU/0GPU closed. New1200future gives2000CPUmax family prospectivelyinsideunchangedBallparent4740CPU/7920GPUremaining. No fullallocation/workstream/programmeincrease;no actualmodelretry.",
+  "spec_recipe": "Exactlysame spec/inputs/settings/hostsA6000gpu2gpu3 as8868 canonical9f005, exceptfreshdeadline<=43minutesatfinalization. MayrefreshUNSUBMITTEDdeadlineonly preservingversions; recordactualrawcanonicalSHA beforepublish. No newsource/model/GPUclass orcost/qualitychange.",
+  "prepublication": "Freshknownjobs/allfixedeligiblehosts/claims/sourcegatebridge/toolcache/localSSDspace/publicstat-firstmetadata inside10CPU ofexternal400,neveroverwriteassets. Bothpriorqueues expiredunassignedwithconfirmedphysicalsourceSHA and17rawhashes. BusyGPUsallowQUEUE; exclusiveadmissionmandatory. Scopeunchangedactualsixpoint16retainedreceiverparity/IOcost. Stopifsource/spec/guarddiffers.",
+  "forecast": "Unchangedconditionalcampaign742.793+57.207retainedIO/errorallowance=800;actualnewretentioncostunmeasured. Namespace580 separate. No48/292/586/full30,exclusivetimingorcorpusclaim.",
+  "monitoring": "SubmitONCE recordID/source/actualrawcanonicalSHA/deadline/caps/outputimmediately then rootcentralACKbeforeONEcanonicalwait<=2700coveringdeadline+expectedworkersweepwithout45minexceed. Do notsetwaitshorterthanremainingdeadline;uncertainremoteinspectneverreplay. No automaticfurtherwindow/modelretry."
+}

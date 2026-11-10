@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "decision": "Release ONE exact-source CPU mechanism proof; no GPU pilot",
+  "revision": "26905f82f5983aaa8c93b2373f443908160a2b03",
+  "source_sha256": "985782cb5c04bbeb6e3b701642b1f5bb05fbf9e6a1277c87955d91f09deef69d",
+  "snapshot_sha256": "63133e3c1485763e94891c87601cdf23a04f52027d528be2683fdf772091f686",
+  "source_archive_required": true,
+  "source_archive_local": "/private/tmp/pointstream-w8-guard-source-final-20261110-a1/source.tar",
+  "parent_phase": "w8-full-witness-staged-20261106",
+  "preparation_alreadycharged_CPU": 50,
+  "future_CPU": 832,
+  "inclusive_CPU": 882,
+  "inclusive_CPU_ceiling": 900,
+  "GPU": 0,
+  "caps": {
+    "campaign": 600,
+    "smoke": 530,
+    "validator": 50,
+    "noop": 5,
+    "external_post_admin_CPU": 150,
+    "independent_audit_CPU": 82
+  },
+  "reservation_remaining_before_future_charge_CPU": 2408,
+  "qualification_preparation_alreadycharged_CPU": 650,
+  "proof_charge_attribution": "witness_qualification:false; exactCPUmechanismproof not generatorpreparation or execution. Preserveeverypriortruecharge+nonce.",
+  "actual_spec_recipe": "Frozenmake_spec unchangedvsoldc38exceptfreshdeadline<=43min; actualproofsource269/archive631/source985 mandatory. Locallyvalidateactualspec and strictleafpins. RefreshUNSUBMITTEDdeadlineonlyifneeded,preserveactualrawcanonicalSHAs beforepublication.",
+  "prepublication": "Withinprepaid50 source/readiness allowance: freshcanonicalknownjobs/allfixedeligiblehosts/CPUclaims/localSSDstaging/free-space/sourcecache+actualsourcearchiveSHA/nativepins/publicstat-firstdeny-targetpathmetadata. O_EXCL/fsync newuniqueSHA sourcecache, actualMAIN/JCVroles unchanged, no protectedbody reads/newmodelwork. BusyGPUirrelevantCPUproof; actualsingleCPUclaim mandatory. No destinationoverwrite.",
+  "enforcement": "CPUhiddenonecoreentirecampaignandallchildren; known600campaign boundsCPUonlywithverifiedinheritedaffinity/namespaceactualnativecounter+teardown. Packet100CPU/etc fixedleaflimits preserved. ActualCPUproofconstructor/cpuworker checks failstop if any guard/source/spec/runtime differs. Externalcommandsbounded and receipts preserve CPUs/PIDs/tool/env/source. NativeGPUinference prohibited.",
+  "monitoring": "SubmitONCE recordjobID/source/actualrawcanonicalSHA/deadline/caps/output then rootcentralACK beforeONEcanonicalfleetwait<=2700. Unknownsubmissioninspectneverreplay. Noautomaticnewjob/retry/GPUrelease.",
+  "forecast_basis": "600onecorecampaign incl530smoke+50validator+5noop plus150post/admin+82independentaudit=832future;50prep prior882inclusive. Alltermscountonce. No claimthateverytermwillbeused orremainingfullwitnessfits.",
+  "checks": "Rootreviewedactualthree-lineproductionbudgetguarddiffandtests; independentactualarchive1840Gitblobs PASS. Frozen269cleanworktree Ruff/mypy574/pytest2092passed40skipped. Rootintegratede753a288+9914159b; archive remainsoriginal269identity."
+}

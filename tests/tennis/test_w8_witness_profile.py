@@ -743,12 +743,39 @@ def test_qualification_subcap_uses_only_explicit_parent_charges_once() -> None:
     job.check_qualification_subcap(ledger, gate, gpu_cap=700, cpu_cap=700)
     with pytest.raises(ValueError, match='ceiling exceeded'):
         job.check_qualification_subcap(ledger, gate, gpu_cap=701, cpu_cap=700)
+    ledger['charges'][1]['cpu_seconds'] = 650
+    gate['qualification_cpu_spent_seconds'] = 650
+    job.check_qualification_subcap(ledger, gate, gpu_cap=700, cpu_cap=550)
+    job.check_qualification_subcap(ledger, gate, gpu_cap=700, cpu_cap=850)
+    with pytest.raises(ValueError, match='ceiling exceeded'):
+        job.check_qualification_subcap(ledger, gate, gpu_cap=700, cpu_cap=851)
     gate['qualification_cpu_spent_seconds'] = 0
     with pytest.raises(ValueError, match='ceiling exceeded'):
         job.check_qualification_subcap(ledger, gate, gpu_cap=700, cpu_cap=700)
     del ledger['charges'][0]['witness_qualification']
     with pytest.raises(ValueError, match='attribution'):
         job.check_qualification_subcap(ledger, gate, gpu_cap=700, cpu_cap=700)
+
+
+def test_qualification_increased_ceiling_does_not_allow_unit1_replay(tmp_path: Path, monkeypatch) -> None:
+    from experiments.tennis import w8_witness_job as job
+
+    ledger = {'charges': [{'parent_phase': 'w8-full-witness-staged-20261106', 'phase': 'prep',
+        'witness_qualification': True, 'gpu_seconds': 0, 'cpu_seconds': 650}]}
+    gate = {'qualification_charge_phases': ['prep'], 'qualification_gpu_spent_seconds': 0,
+        'qualification_cpu_spent_seconds': 650, 'qualification_next_gpu_ceiling_seconds': 500,
+        'qualification_next_cpu_ceiling_seconds': 550, 'completed_artifact_sha256': {'unit1_context': 'a' * 64}}
+    paths = {'ledger': tmp_path / 'ledger.json', 'promotion': tmp_path / 'promotion.json'}
+    paths['ledger'].write_text(json.dumps(ledger))
+    paths['promotion'].write_text(json.dumps(gate))
+    spec = {'witness_gpu_remaining_seconds': 500, 'witness_cpu_remaining_seconds': 550,
+        'witness_promotion_sha256': 'b' * 64, 'witness_cpu_proof_sha256': 'c' * 64,
+        'witness_prior_artifact_sha256': 'd' * 64, 'w8_witness_profile': 'w8-context-unit1-v1',
+        'witness_gpu_ceiling_seconds': 500, 'witness_cpu_ceiling_seconds': 550}
+    monkeypatch.setattr(job, 'promotion_ledger_remaining', lambda _: (500, 550))
+    monkeypatch.setattr(job, 'check_promotion', lambda *_args, **_kwargs: None)
+    with pytest.raises(ValueError, match='unit-1 context already completed; no replay'):
+        job._unit1_promotion(paths, spec, {'code': {}, 'started': 0})
 
 
 def test_finish_builder_binds_audit_archives_and_qualification_caps(tmp_path: Path, monkeypatch) -> None:
@@ -976,6 +1003,33 @@ def test_first_pilot_rejects_prior_qualification_and_untagged_charges(tmp_path: 
     ledger['charges'][1]['qualification_charge_kind'] = 'pilot_preparation'
     del ledger['charges'][0]['witness_qualification']
     with pytest.raises(ValueError, match='attribution'):
+        check()
+
+
+@pytest.mark.parametrize(('spent', 'accepted'), [(650, True), (950, True), (951, False)])
+def test_first_pilot_cumulative_preparation_cpu_limit(tmp_path: Path, spent: int, accepted: bool) -> None:
+    from experiments.tennis import w8_witness_job as job
+    ledger = json.loads(first_pilot_ledger(tmp_path).read_text())
+    ledger['charges'].append({'parent_phase': 'w8-full-witness-staged-20261106', 'phase': 'prep',
+        'workstream': 'w8', 'gpu_seconds': 0, 'cpu_seconds': spent, 'witness_qualification': True,
+        'qualification_charge_kind': 'pilot_preparation', 'qualification_attempt_nonce': 'a' * 32})
+    receipt = {'schema': 1, 'scope': 'root-reviewed first W8 qualification pilot', 'attempt_nonce': 'a' * 32,
+        'ledger_sha256': 'b' * 64, 'cpu_proof_sha256': 'c' * 64, 'preparation_phases': ['prep'],
+        'gpu_spent_seconds': 0, 'cpu_spent_seconds': spent, 'gpu_ceiling_seconds': 500,
+        'cpu_ceiling_seconds': 550}
+    def check() -> None:
+        job.check_first_pilot_ledger(ledger, receipt, ledger_sha='b' * 64, cpu_proof_sha='c' * 64)
+    if not accepted:
+        with pytest.raises(ValueError, match='cumulative qualification ceiling'):
+            check()
+        return
+    check()
+    ledger['charges'][0]['qualification_attempt_nonce'] = 'd' * 32
+    with pytest.raises(ValueError, match='mixed'):
+        check()
+    ledger['charges'][0]['qualification_attempt_nonce'] = 'a' * 32
+    ledger['charges'][0]['qualification_charge_kind'] = 'pilot_execution'
+    with pytest.raises(ValueError, match='earlier execution'):
         check()
 
 
