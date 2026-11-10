@@ -4003,7 +4003,17 @@
     "batches": [],
     "native_completion_resume_verified": false,
     "recurring_llm_polling": false,
-    "completed": false
+    "completed": false,
+    "one_shot_deadline_check": {
+      "mode": "one input-interruptible clock.sleep, self-expiring; no recurring timer",
+      "target_UTC": "2026-11-10T15:12:55Z",
+      "purpose": "Inspect existing Ball wait at deadline+sweep; also inspect sealed W8 wait output once at meaningful batch checkpoint, not duplicate waits",
+      "job_ids": [
+        "20261110T143544Z-6e96d868",
+        "20261110T145240Z-eb925299"
+      ],
+      "verified_semantics": "clock.sleep already returned after its duration and interrupted early for new input in this client; native fleet completion callback remains unverified"
+    }
   },
   "approval_history": [
     {
