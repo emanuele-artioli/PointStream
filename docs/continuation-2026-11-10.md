@@ -2,6 +2,55 @@
 
 Continue the worthwhile, authorized PLAN research before manuscript or PRESLEY work. Do not submit the paper, train models, use paid API fallback, or revive the legacy 200-GPU-hour study. The user prefers bounded fleet queues. Before any action after interruption, read the experiment entry and canonical status for the recorded job; never replay an unknown or failed submission. Earlier bounded queues expired unassigned; the latest two live queues are identified in the final checkpoint below; no 292/586 study or full W8 GPU witness is released at this checkpoint. Source-footage rights and coauthor review remain open. The authoritative ledger is [submission-research-budget-20261104.json](experiments/submission-research-budget-20261104.json); root owns accounting and admission.
 
+## CURRENT authoritative checkpoint — November 10, 19:34 UTC
+
+Fleet communication is blocking further admissions. **Do not submit or replay
+anything until the two existing jobs and their ownership/claims are inspected.**
+Earlier live and expired checkpoints below are history, not current authority.
+
+- Ball **`20261110T190907Z-4d0dd928`**, source0bb/archive450d/source21cd,
+  last canonically pending; deadline **19:46:33.818327UTC**. Its solewait17697 /
+  PID22122 ended exit2 on gpu2 status timeout; PID absent and outputempty.
+  No terminal/execution state is established. Future maximum1,000GPU/1,200CPU
+  (400external) remains held inside Ballremaining7,920GPU/2,700CPU.
+- W8 **`20261110T183845Z-4c240783`**, sourceaecf/archivef784/sourcec9d,
+  last canonically pending; deadline **19:17:38.103222UTC**. Solewait49754 ended
+  exit2 after496.874s on gpu2 events timeout. Rootgpu2status120s and a truly
+  routedgpu1status60s also timedout; no terminal/execution state established.
+  Future500GPU/550CPU (150external) held inside W8remaining4,550GPU/1,079CPU.
+- Actual conservative charges still **19,362GPU /47,371CPU** of86,400/100,800.
+  Neither unknown job has been closed or assigned a zero-GPU charge. True W8
+  qualification preparation remains1,300CPU/G0/samenonce22578404. No further
+  queue, model retry, source change, scale or witness has been released.
+- Two distinct read-only metadata attempts (full auditgpu5 local90s, tiny
+  isolatedstdlibgpu1 local30s) returned no PID/start/output. Their remote
+  outcomes remain unknown and untouched. They were not replayed. The tiny
+  probe mistakenly used an inferred Balltimestamp; preserve that exact raw
+  script and its disclosed error. Correct BallID above is from its journal.
+  This wrong-path probe supplies no state evidence. Future tools must copy
+  complete actual IDs from the experiment entry, never infer timestamps.
+- Root reviewed and integrated client fix **3b5a9795** (isolateda78d2f4e):
+  job-specificstatus/events/cancel now honor validated management host/Python
+  overrides for same-base current config; old/incompatiblefallback preserved.
+  Full isolatedchecks Ruff/mypy575PASS, pytest2,127PASS/40skip; root focused
+  integrationchecks passed. This is not a server connectivity fix and does
+  not change any frozen scientific source, profile or running job.
+- FixedCLI supports `PS_FLEET_MANAGEMENT_HOST=gpu1` or gpu5 and
+  `PS_FLEET_MANAGEMENT_PYTHON=/usr/bin/python3` for job-specific status. The
+  earlier unpatched env route silently still usedgpu2; root subsequently
+  made one isolatedlocalstate-dir copy and confirmed an actualgpu1timeout.
+  Original localjobrecords/config and shared services are unchanged.
+- **ONE final canonical read-only batch planned19:48:10UTC**, existing actual
+  two jobs only, fixedclient/managementgpu1/status60s. No new waits, recurring
+  polls or keepalives. If still unavailable, preserve unresolved jobs and
+  report the external connectivity block; do not claim research complete.
+
+Raw uncertainty receipts are `experiments/k5d-inputs/same-job-4d0d-wait-uncertainty-20261110.json`
+and `experiments/w8-inputs/receiver-20261101/aecf-4c24-wait-and-audit-uncertainty-20261110.json`.
+Root verified all21 listed raw size/SHA joins. No GPU process was signalled;
+unknown read-only processes are preserved. Research and submission remain
+unfinished; no PointStream manuscript or PRESLEY changes.
+
 ## Authoritative live checkpoint — November 10, 17:55 UTC
 
 The current ledger charges are **19,362 GPU / 46,421 workload CPU seconds**,

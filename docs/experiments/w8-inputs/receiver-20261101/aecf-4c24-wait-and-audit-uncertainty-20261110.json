@@ -1,0 +1,112 @@
+{
+  "disposition": "Hold all remote audit actions until primary canonical status; no claim of expiry or 150 CPU closure. Preserve potential remote process, all raw files and original job.",
+  "distinct_gpu1_probe": {
+    "ball_actual_journal_job_id": "20261110T190907Z-4d0dd928",
+    "ball_incorrect_inferred_job_path": "20261110T183715Z-4d0dd928",
+    "disposition": "preserve unknown remote process and raw logs; no replay or additional remote attempt",
+    "error": "timestamp prefix was inferred without verification; neither path yielded observed state",
+    "local_timeout_seconds": 30,
+    "raw_file_sha256": {
+      "/private/tmp/pointstream-4c24-ball-distinct-metadata-20261110-a1/handle.json": {
+        "bytes": 15,
+        "sha256": "00d1f0af4614908ee1c6e75005a9e880f6eb6294a7916ed48377d94998b78c33"
+      },
+      "/private/tmp/pointstream-4c24-ball-distinct-metadata-20261110-a1/intent.json": {
+        "bytes": 326,
+        "sha256": "11611ec97963e5fcf3e841b6f6a13d5ff7cac252fb672e493d1ce843a911221a"
+      },
+      "/private/tmp/pointstream-4c24-ball-distinct-metadata-20261110-a1/probe.py": {
+        "bytes": 1387,
+        "sha256": "ec566a38c7a41121bb7c0999e973b87dc3e93f86e46b36d4f7c61d438ea1e5cf"
+      },
+      "/private/tmp/pointstream-4c24-ball-distinct-metadata-20261110-a1/probe.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "/private/tmp/pointstream-4c24-ball-distinct-metadata-20261110-a1/probe.stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "/private/tmp/pointstream-4c24-ball-distinct-metadata-20261110-a1/result.json": {
+        "bytes": 119,
+        "sha256": "3c411ee1989975dd2ced8698528ae8db078e9dbde4421cc63423f8c331a3d61c"
+      }
+    },
+    "remote_alarm_seconds": 20,
+    "remote_cpu_limit": [
+      3,
+      4
+    ],
+    "remote_pid_start_receipt_observed": false,
+    "result": {
+      "exit_code": null,
+      "remote_outcome": "unknown; do not replay",
+      "timed_out": true,
+      "wall_seconds": 30.008959208003944
+    },
+    "scope": "one distinct stdlib-only remote metadata probe, no observed remote start",
+    "stdout_and_stderr_empty": true,
+    "w8_exact_path_job": "20261110T183845Z-4c240783"
+  },
+  "job_id": "20261110T183845Z-4c240783",
+  "raw_file_sha256": {
+    "/private/tmp/pointstream-w8-aecf-pilot-next-20261110-a1/wait-handle.json": {
+      "bytes": 71,
+      "sha256": "098d923244065a74c167e9f96c162238520a9851d36d4bde02335d896f455b74"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-next-20261110-a1/wait-plan.json": {
+      "bytes": 417,
+      "sha256": "b67cefc5fe86e132a17870d2fb5d98fb4546a0faeac38dcb09f8d454ab22fd89"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-next-20261110-a1/wait-result.json": {
+      "bytes": 53,
+      "sha256": "ea1a01bd707d6814f79e8a26000cef98a642f5573ac299eb61d7a593d6bc2225"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-next-20261110-a1/wait.stderr": {
+      "bytes": 545,
+      "sha256": "9cd73dcaf730c2a4d3c96e565938dcd362d5367eece604e2f58d3d49ca2217a8"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-next-20261110-a1/wait.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-next-expiry-audit-20261110-a1/audit.py": {
+      "bytes": 1671,
+      "sha256": "7b0971f3c3171476268dd4d71b885eba5ef73923641f433fb8ef3edec8510333"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-next-expiry-audit-20261110-a1/audit.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-next-expiry-audit-20261110-a1/audit.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-next-expiry-audit-20261110-a1/handle.json": {
+      "bytes": 15,
+      "sha256": "f24fc123122b804e37cf63652cb854b998bfdb2d442f7ed17be5ca453ab2ec12"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-next-expiry-audit-20261110-a1/intent.json": {
+      "bytes": 236,
+      "sha256": "2dce9ecfe34b486edf761623a4ad1005e5f0b169775776497e2dc8425e30e2a2"
+    }
+  },
+  "read_only_audit": {
+    "local_ssh_killed": true,
+    "local_ssh_timeout_seconds": 90,
+    "remote_outcome": "unknown; may have started or continued",
+    "remote_pid_or_start_receipt_observed": false,
+    "replayed": false,
+    "stdout_and_stderr_empty": true,
+    "target": "gpu5"
+  },
+  "schema": 1,
+  "scope": "failed sole wait and uncertain read-only audit; not a terminal result",
+  "sole_wait": {
+    "error": "gpu2 events RPC timed out after 120 seconds",
+    "exit_code": 2,
+    "replacement_wait_started": false,
+    "stdout_empty": true,
+    "wall_seconds": 496.87376704101916
+  }
+}
