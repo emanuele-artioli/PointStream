@@ -1501,6 +1501,18 @@
       "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
       "basis": "Prospectively precharged full30CPU source/readiness preparation. Stoponfailure,retaincharge. Samequalificationnonce;20old+30new+550future=600CPUmax, within1000CPU unchangedqualification.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "w8-context-q0-prestage-cost-oracle-20261110",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 100,
+      "witness_qualification": true,
+      "qualification_charge_kind": "pilot_preparation",
+      "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+      "basis": "Prospectively precharged full100CPU actual source+two NFS-input cost oracle. GPUheld. Fullcharge retainedonfailure; onecore70+localSSH5+adminfailure25.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2084,8 +2096,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 3350,
-      "status": "Remaining_unspent;30CPU source-readinessprecharged; noGPUrelease"
+      "cpu_seconds": 3250,
+      "status": "Remaining_unspent;100CPU pre-stagecostoracleprecharged; GPUheld"
     }
   ],
   "jobs": [
