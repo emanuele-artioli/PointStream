@@ -1584,6 +1584,15 @@
       "cpu_seconds": 250,
       "basis": "Fullapprovedremaining250CPU closureallocation;50prep alreadycharged300inclusive. Freshcanonical/source/gate/all14rawSHA/countercasechecks rootverified. Lifecycle120.911wall/aggregateunmeasured; noGPU orvolumeclaim.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "k5d-same-job-0bb5-exclusive16-preparation-20261110",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 30,
+      "basis": "Prospectivelyfull30CPU new0bb5exclusiveGPU16preparation only; within1200CPUprospectivepilot; noGPUrelease.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2102,8 +2111,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 7920,
-      "cpu_seconds": 5640,
-      "status": "Remaining_unspent;new0bb5nativeCPUaccepted300inclusive;GPU/16/48/volumegatesstillpending"
+      "cpu_seconds": 5610,
+      "status": "Remaining_unspent;new0bb5GPU16prep30precharged;noGPUreleaseyet;48/292/586held"
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
