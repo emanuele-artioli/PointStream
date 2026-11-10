@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "job_id": "20261110T143525Z-6b4be46f",
+  "persistent_audit_directory": "/Users/manu/.cache/pointstream-evidence/w8-269-6b4b-20261110-a1",
+  "persistent_manifest_sha256": "ad0bf0732d8a746435720ac6675aa8913853a34473dbedb2acdefe3d158a7c33",
+  "copied_files": 55,
+  "persistent_source_archive": "/Users/manu/.cache/pointstream-source-archives/63133e3c1485763e94891c87601cdf23a04f52027d528be2683fdf772091f686.tar",
+  "source_archive_sha256": "63133e3c1485763e94891c87601cdf23a04f52027d528be2683fdf772091f686",
+  "scope": "No new inference; exact completed evidence copies made read-only, original audit and remote fleet artifacts preserved."
+}
