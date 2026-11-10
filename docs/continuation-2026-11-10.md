@@ -2,7 +2,7 @@
 
 Continue the worthwhile, authorized PLAN research before manuscript or PRESLEY work. Do not submit the paper, train models, use paid API fallback, or revive the legacy 200-GPU-hour study. The user prefers bounded fleet queues. Before any action after interruption, read the experiment entry and canonical status for the recorded job; never replay an unknown or failed submission. Earlier bounded queues expired unassigned; the latest two live queues are identified in the final checkpoint below; no 292/586 study or full W8 GPU witness is released at this checkpoint. Source-footage rights and coauthor review remain open. The authoritative ledger is [submission-research-budget-20261104.json](experiments/submission-research-budget-20261104.json); root owns accounting and admission.
 
-## CURRENT authoritative checkpoint — November 10, 19:34 UTC
+## CURRENT authoritative checkpoint — November 10, final connectivity audit
 
 Fleet communication is blocking further admissions. **Do not submit or replay
 anything until the two existing jobs and their ownership/claims are inspected.**
@@ -40,10 +40,16 @@ Earlier live and expired checkpoints below are history, not current authority.
   earlier unpatched env route silently still usedgpu2; root subsequently
   made one isolatedlocalstate-dir copy and confirmed an actualgpu1timeout.
   Original localjobrecords/config and shared services are unchanged.
-- **ONE final canonical read-only batch planned19:48:10UTC**, existing actual
-  two jobs only, fixedclient/managementgpu1/status60s. No new waits, recurring
-  polls or keepalives. If still unavailable, preserve unresolved jobs and
-  report the external connectivity block; do not claim research complete.
+- **Final canonical batch completed after both deadlines**, fixedCLI and exact
+  two actual IDs: W8 via managementgpu5, Ball via managementgpu3, each60s.
+  Both exited2/emptystdout on SSH/RPC timeout; actualhost routing is confirmed
+  in their stderr, so this is no longer the ignored-override bug. Neither
+  execution nor expiry was established. The full receipt is
+  `experiments/fleet-connectivity-block-20261110.json`, raw/durable copies at
+  `/Users/manu/.cache/pointstream-evidence/fleet-final-status-batch-20261110-a1/`.
+  **No new submissions, localwaits, recurringpolls, keepalives or timers remain.**
+  Restore access and inspect the exact existing jobs/claims/owners before
+  further computation; do not declare research complete or replay requests.
 
 Raw uncertainty receipts are `experiments/k5d-inputs/same-job-4d0d-wait-uncertainty-20261110.json`
 and `experiments/w8-inputs/receiver-20261101/aecf-4c24-wait-and-audit-uncertainty-20261110.json`.

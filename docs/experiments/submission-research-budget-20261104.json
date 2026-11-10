@@ -4522,8 +4522,8 @@
     "Rootnativeproofaccountingamendment20261106: original220CPUleafprospectiveforecastwasnotprovencompletebecausemanager/publicationpostcampaignnotmetered. Wholeone-core120.698wallupper\u2192130CPU+30audit revisesleaf250CPU including90prior, allinsideunchangedballtranche/programme/workstream. No newGPU/computation oruserceilingincrease."
   ],
   "monitoring": {
-    "mode": "bothsolewaitsendedcommunicationfailure;onefinalexisting-jobdeadlinebatch",
-    "state": "W84c24unknown/Ball4d0dunknown;no new submissions; one finalcanonicalmetadata batch19:48:10UTC withfixedclient. No recurringtimer or job replay.",
+    "mode": "blocked_external_fleet_connectivity;all_localwaits_and_one-shotchecksended",
+    "state": "Finalfixedclientbatch W84c24viagpu5/Ball4d0dviagpu3 both60stimeout. Execution/expiry unknown; preserve1750CPU/1500GPU futuremaxima nestedinremainingparents. No new submissions/replays/polls/waits/timers until restoredaccess permits actualjob/claim/owner audit.",
     "jobs": [
       "20261110T190907Z-4d0dd928",
       "20261110T183845Z-4c240783"
