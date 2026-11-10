@@ -1641,6 +1641,18 @@
       "cpu_seconds": 30,
       "basis": "Prospectivelyprecharged30CPU cacheZIPGTjoin+localactualsourcecompatibilityaudit; no inference/autocredit.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "w8-174ac-0a5e-unassigned-expiry-closure-20261110",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 150,
+      "witness_qualification": true,
+      "qualification_charge_kind": "pilot_preparation",
+      "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+      "basis": "Entire150externalCPU inclreadiness,queue/admin/audit conservativelyallocated;0.202CPUremoteaudit onlyobserved,notaggregate. CanonicalEXPIREDnoassignment/run/attempts/gate/output/claims;gpu3ownerdeadline-sweeper. Sourcearchive5e62,canonicalf9da. 450priortruepreparation+150=600. No actualqualification orGPU.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2224,8 +2236,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 2608,
-      "status": "Remaining_unspent;0e193unassignedexpiryclosed0GPU150CPUallocation;onefurther550CPUprototypeprospective"
+      "cpu_seconds": 2458,
+      "status": "Remaining_unspent;0a5eunassignedexpiryclosed0GPU150CPUallocation;furtherpilotheld1000cumulativeguard"
     }
   ],
   "jobs": [
@@ -3754,7 +3766,7 @@
       "job_id": "20261110T133353Z-0a5e1789",
       "phase": "w8-full-witness-staged-20261106",
       "subphase": "174ac-unit0-second-admission-window-no-prior-execution",
-      "state": "publishedpending;solecanonicalwaitw8_resume_queue",
+      "state": "expiredunassigned;rootclosed0GPU150CPUallocation",
       "revision": "174ac84b84a1f405e06700a34aa4c3e225fa3265",
       "source_sha256": "4cad9e47ebeb88f1cdb272634921f2aed79100e0e15ace4d01f9a3a33720d9d6",
       "snapshot_sha256": "5e62a2e912f5dba0cd945d33388b95154d5d8e88ed6cf5b5998e595a323c6fd1",
@@ -3783,7 +3795,11 @@
       "final_readiness_inside_external_CPU": 10,
       "admission_ledger_sha256": "d6c69484c55df0a4df701b314177aa01a5a313507767f4e97943932b6481165a",
       "local_batch": "/private/tmp/pointstream-w8-second-window-20261110-a1",
-      "scope": "Sameoriginal24/30cost/operationalcontext,neverpreviouslyexecuted. Nootherunit/full240/80/quality/furtherretry."
+      "scope": "Sameoriginal24/30cost/operationalcontext,neverpreviouslyexecuted. Nootherunit/full240/80/quality/furtherretry.",
+      "terminal_GPU_charge": 0,
+      "terminal_CPU_allocation": 150,
+      "qualification_executed": false,
+      "wait_state": "solewaitendedexit10,eventACK,allclaimsabsent"
     },
     {
       "job_id": "20261110T135257Z-8868b966",
@@ -3836,9 +3852,8 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "Two solecanonicalwaits, W8deadline14:13UTC and Ball14:26UTC; no repeatedpolls/timers. Legacy188 bounded30CPUlabel/methodaudit independent.",
+    "state": "Ball8868solecanonicalwaitdeadline14:26UTC;W8twoqueuesexpiredunassigned,noneactive. No recurringchecks/replay.",
     "jobs": [
-      "20261110T133353Z-0a5e1789",
       "20261110T135257Z-8868b966"
     ],
     "batches": [],
