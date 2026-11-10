@@ -1430,6 +1430,16 @@
       "witness_qualification": false,
       "basis": "80rounded above69.7465created-to-canonical wall includingqueue on onecore +20audit/admin allocation;30prep already charged. AggregateCPUunmeasured.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "w8-67bfd-source-preparation-20261110",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "cpu_seconds": 30,
+      "gpu_seconds": 0,
+      "witness_qualification": false,
+      "basis": "Entire approved30CPU preparation; root checked17rawartifact hashes and actualspec/stat-first publicsource onbothhosts. Manager aggregateunmeasured; no protectedcontent.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2013,8 +2023,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 3772,
-      "status": "Remaining_unspent4550GPU3772CPU;1c5dCPUfailureclosed100additional/130inclusive; no retry orGPU."
+      "cpu_seconds": 3742,
+      "status": "Remaining_unspent4550GPU3742CPU;67bfdprep30charged; ONE832futureCPUproofreleased; noGPU."
     }
   ],
   "jobs": [
