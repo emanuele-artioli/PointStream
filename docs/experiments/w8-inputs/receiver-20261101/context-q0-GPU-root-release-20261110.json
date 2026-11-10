@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "decision": "Root releases ONE exact frozen cost/correctness qualification job; bounded exclusive queue; no retry",
+  "decision": "HELD: no GPU submission authorized until repeated input-hashing cost is reviewed",
   "scope": "Unit0 original24frame30DDIM/CFG2/context24overlap4/seed cost and receiver-runtime qualification only; not a full240frame prefix or qualityresult",
   "local_spec": "/private/tmp/pointstream-w8-q0-readiness-20261110-a1/spec.json",
   "raw_spec_sha256": "1c3be03467baf9c815e4b07385b8bf5a59e5f4d2f9c71aaf0442f3f6fd58dd66",
@@ -31,5 +31,6 @@
   "admission_sha256": "7275440ee980201af3c6bedf007fe14ae7a6a8c17b906746ebd0fabe9c8c43c2",
   "admission_ledger_sha256": "7dbf9984569f2017b11b2fd626ae7391b8c77a2a6401ce06c916e1c3d7f8b40a",
   "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
-  "qualification_inclusive_cpu_max": 600
+  "qualification_inclusive_cpu_max": 600,
+  "hold_reason": "Immediately after prospective release, reviewer identified verify_inputs beforeloop+everystage plus staging hash onbothstages. Existing203.835floor doesnotestablish exactcomplete repeatedNFS/localhash fit. No jobsubmitted. Retainedactual77c timings/order mustbe reviewed orboundedCPUcostmeasurement designedbefore renewedrelease."
 }
