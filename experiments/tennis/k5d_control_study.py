@@ -256,7 +256,7 @@ PAIR_CLIP = 'tracknet/game9/Clip5'
 def parent8_bridge_record(old_source: Path, calibration: dict[str, str], new_source: Path,
                           identity: dict[str, str]) -> dict[str, Any]:
     """Normalize the independently pinned resource-only archive comparison."""
-    from experiments.tennis import k5d_first292_source_bridge as scoped_bridge
+    from experiments.tennis import k5d_same_job_source_bridge as scoped_bridge
     return scoped_bridge.bridge(old_source, calibration, new_source, identity)
 
 
@@ -783,6 +783,9 @@ def run(args: argparse.Namespace) -> None:
     verify_gate(args, identity)
     gate = study.checked_json(Path(args.full_gate), args.full_gate_sha256)
     if gate.get('release') == PAIR_RELEASE:
+        args.same_job_receiver = True
+        if args.action == 'score':
+            args.receiver_producer_job = pair_producer(gate)['job_id']
         fidelity = study.checked_json(Path(args.fidelity_gate), args.fidelity_gate_sha256)
         if fidelity.get('pair_cost_bound_sha256') != args.cost_receipt_sha256:
             raise ValueError('pair fidelity cost evidence differs')

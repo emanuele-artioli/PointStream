@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "decision": "Root accepts exact174CPU infrastructure proof only",
+  "job_id": "20261110T110102Z-c38f0357",
+  "approved_gate_sha256": "e4f770e60fe45ce2eb4e5b717a0edf19ef0141cb4212f5b371c23463059b526e",
+  "publication_sha256": "4cfb1b7317354e0e1b7e53d3ff72e49fe6a0f49e75fd9781c871014ffd593521",
+  "root_checks": [
+    "FreshcanonicalCOMPLETE/source/spec/gate",
+    "Actual11candidateartifacthashes",
+    "Actualphysical68member hash/size/source/runtime audit rerun intoNEW root-physical-audit file",
+    "Deep packet480/480+14/source/isolation/MAIN-JCV/lifecycle purevalidators rerun intoNEW root-deep-audit file",
+    "Actual5CLIstagebindings +2originaldirectcontrolsource identities",
+    "20birth/group/claimabsence perindependentaudit"
+  ],
+  "accounting": {
+    "gpu": 0,
+    "additional_cpu_allocation": 312,
+    "preparation_alreadycharged": 30,
+    "inclusive_cpu_allocation": 342,
+    "basis": "80created-to-canonicalwallupper+150post/admin+82audit,notmeasuredaggregate"
+  },
+  "raw_directory": "/private/tmp/pointstream-w8-174ac-proof-20261110-a1",
+  "root_raw_sha256": {
+    "root-physical-audit.json": "c1fd6ac9931b923e71b2f054afed30fc800ecf4b76f15d42db90a66b3cbc97d3",
+    "root-deep-audit.json": "da6da690111ea88c59c18c93dbfc996ee60000d77229f90c1ce1552d6ed4ae2f",
+    "independent-candidate-summary.json": "37b13ac84b3f9c78bf70fb30a115fb0456149807ce69b6c467f7f70f28791494"
+  },
+  "scope_exclusions": [
+    "JCV generationcontroller",
+    "CUDAqualification",
+    "quality",
+    "fullwitness"
+  ]
+}

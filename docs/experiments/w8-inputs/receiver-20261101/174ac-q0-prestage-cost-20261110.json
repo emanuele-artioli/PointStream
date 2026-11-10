@@ -1,0 +1,144 @@
+{
+  "CPU_precharged_seconds": 50,
+  "GPU_seconds": 0,
+  "gate_1_5_plus_5_seconds": 5.525435854215175,
+  "gate_passed": true,
+  "gate_scope": "necessary warm pre-stage condition only, not full pilot fit",
+  "gate_threshold_seconds_strict": 65,
+  "gpu2_pid_absent": true,
+  "gpu5_pid_absent": true,
+  "management_postcheck": {
+    "controls": {
+      "admission.json": "a8d4c4fc5671f4282b9ae833a58f9827ef3b25dacfc6c8b47d3f65d4d80b2e90",
+      "cpu-gate.json": "e4f770e60fe45ce2eb4e5b717a0edf19ef0141cb4212f5b371c23463059b526e",
+      "ledger.json": "f0d1370afbdf21a4219896bf5a5f7549a5cd6bed2cf48f99d9407a29f361b9ba"
+    },
+    "cpu_seconds": 0.264609,
+    "pgid": 3494709,
+    "pid": 3494709,
+    "scope": "management public control/source postcheck; protected content unopened",
+    "source_sha256": "5e62a2e912f5dba0cd945d33388b95154d5d8e88ed6cf5b5998e595a323c6fd1",
+    "wall_seconds": 1.035284694749862
+  },
+  "phase": "w8-174ac-q0-source-readiness-cost-preparation-20261110",
+  "probe_result": {
+    "affinity": [
+      0
+    ],
+    "guarded_wall_seconds": 0.3502905694767833,
+    "logical_spec_sha256": "9e1703f8026121c2a80081de195a4ffa88e38a95263646d2c20999b704275437",
+    "pgid": 1879448,
+    "pid": 1879448,
+    "protected_content_read": false,
+    "scope": "first-pilot pre-stage identity and two real direct-input verifications; no GPU/model",
+    "sections": [
+      {
+        "cpu_seconds": 0.14430699999999996,
+        "name": "source_identity",
+        "result": "4cad9e47ebeb88f1cdb272634921f2aed79100e0e15ace4d01f9a3a33720d9d6",
+        "wall_seconds": 0.14431883953511715
+      },
+      {
+        "cpu_seconds": 0.0030749999999999944,
+        "name": "verify_initial",
+        "result": null,
+        "wall_seconds": 0.0061083221808075905
+      },
+      {
+        "cpu_seconds": 0.002576999999999996,
+        "name": "verify_smoke",
+        "result": null,
+        "wall_seconds": 0.0031486209481954575
+      }
+    ],
+    "status": "complete",
+    "whole_cpu_seconds": 0.692547,
+    "whole_wall_seconds": 2.7609927961602807
+  },
+  "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+  "qualification_charge_kind": "pilot_preparation",
+  "qualification_note": "candidate receipt/spec require root review; staging, later full/noop and all downstream remain unmeasured",
+  "raw_directory": "/private/tmp/pointstream-w8-174-q0-prestage-proposal-20261110-a1",
+  "raw_sha256": {
+    "admission.json": "a8d4c4fc5671f4282b9ae833a58f9827ef3b25dacfc6c8b47d3f65d4d80b2e90",
+    "cpu-gate.json": "e4f770e60fe45ce2eb4e5b717a0edf19ef0141cb4212f5b371c23463059b526e",
+    "gpu2.handle.json": "4393d5faff3c948efe67493480288b5956d6ff6532bfbddb9e244e16b8e72b97",
+    "gpu2.pid-check.json": "057b7b229ec483c5b6d004ae28d79b088b6fbd285bdec772ca60fda32f781ed8",
+    "gpu2.stderr": "a22953d2db497a386f310b5d586ac31858da07a6cb21847902252295080215c2",
+    "gpu2.stdout": "76dad1600e785369c2385d6e21fda09739119b023f57bad1a916d7a313ce31d3",
+    "gpu5.handle.json": "0180e4a1da8aff0c4a1b272cbb193152234a79e76b44b39dba2c27f3506c59fe",
+    "gpu5.pid-check.json": "55a3b8b13a76ad7e0033e713b8b2b3ff53dcf2922cd2d546eef8e9c8b5ee3d15",
+    "gpu5.stderr": "96f97a44cbad5b658008db5a264f977d896e1a39ab65d944442c42c84d716e76",
+    "gpu5.stdout": "b5ec87022ba15b25438ea2f7659557654b2c6d90487ab8706e10880f9521b82d",
+    "intent.json": "baf623fa1005ffcccb6efeb1f557e4ee5d7a479da9ec909d83ee211e3e8d6c4b",
+    "ledger.json": "f0d1370afbdf21a4219896bf5a5f7549a5cd6bed2cf48f99d9407a29f361b9ba",
+    "payload.json": "bcbe1fe0a7101fe9aebd9a70fb5594005fa2dcb725c4af6d60300a5123f13a1b",
+    "postcheck.py": "efe2063d0cbd5f1df94e03d722eacbe6335ce6ab8da9720f457767df161e4868",
+    "probe.py": "e4233d02e409621defac9f6d03f61c976a569ef70fd0a63a006df7af4663ade7",
+    "run.py": "479f94ab5e1ba78155f393696a2ab08d95d625b56a5f37de71bf91c39d527cf0",
+    "spec-normalized.json": "d239d488210aaab23931e09ad8242d9746cf4d3475d506ced0a02ab23adfe14f",
+    "spec-receipt.json": "d9b0fc634fccb539d4a1f6dbc19f63acf331062cd62c4b47e43d2520ee85d7ca",
+    "spec.json": "7e0044d96a56e87a1648ac1adfd5c8963a7af4dae33f62724f1ea8352a5c0838",
+    "usage.json": "dc368066b5341e955c01496edb873058220a8e2ce8c47a554b44414fddcc0924"
+  },
+  "schema": 1,
+  "scope": "exact source recovery, public controls upload and pre-stage cost; no GPU/model/native/frame evidence",
+  "spec_receipt": {
+    "budget_seconds": 450,
+    "deadline": "2026-11-10T12:07:45.783001Z",
+    "direct_names": [
+      "preflight",
+      "identity",
+      "oracle",
+      "cpu_proof",
+      "ledger",
+      "admission"
+    ],
+    "gate_sha256": "e4f770e60fe45ce2eb4e5b717a0edf19ef0141cb4212f5b371c23463059b526e",
+    "ledger_sha256": "f0d1370afbdf21a4219896bf5a5f7549a5cd6bed2cf48f99d9407a29f361b9ba",
+    "logical_spec_sha256": "9e1703f8026121c2a80081de195a4ffa88e38a95263646d2c20999b704275437",
+    "normalized_spec_sha256": "d239d488210aaab23931e09ad8242d9746cf4d3475d506ced0a02ab23adfe14f",
+    "raw_spec_sha256": "7e0044d96a56e87a1648ac1adfd5c8963a7af4dae33f62724f1ea8352a5c0838",
+    "receipt_sha256": "a8d4c4fc5671f4282b9ae833a58f9827ef3b25dacfc6c8b47d3f65d4d80b2e90",
+    "scope": "candidate only; CPU oracle release is not GPU release",
+    "smoke_seconds": 385,
+    "staged_only_names": [
+      "packet",
+      "profile",
+      "base",
+      "aa",
+      "w0",
+      "w1",
+      "w2",
+      "w3",
+      "w4",
+      "w5",
+      "w6",
+      "w7"
+    ],
+    "worker_caps": {
+      "external_cpu": 150,
+      "generator_cpu": 260,
+      "generator_wall": 240,
+      "packet_cpu": 100,
+      "parent_cpu": 30
+    }
+  },
+  "usage": {
+    "rows": [
+      {
+        "exit_code": 0,
+        "host": "gpu5"
+      },
+      {
+        "exit_code": 0,
+        "host": "gpu2"
+      }
+    ],
+    "self_cpu_seconds": 0.099059,
+    "ssh_cpu_seconds": 0.046599999999999996,
+    "status": "complete",
+    "wall_seconds": 10.861165416
+  },
+  "witness_qualification": true
+}
