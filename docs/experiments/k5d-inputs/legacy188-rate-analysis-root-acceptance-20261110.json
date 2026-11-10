@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "decision": "Accept single-old-clip descriptive rate analysis and diagnostic visual QA; no currentstudycredit",
+  "old_job_id": "20261105T003756Z-cc450baf",
+  "old_publication_sha256": "622fd68d5380b97449a09872bc15402117dd9c3e7a2576a757cd6aff8fd090d7",
+  "root_recalculation": "Unchanged old publication encoder.validate PASS; all5pooled comparison completeobjects exact afterJSONtuple/listnormalization. Initialdirectequalityrejected only serialization shape, notnumbers.",
+  "artifacts": {
+    "analysis": {
+      "path": "/Users/manu/.cache/pointstream-evidence/legacy188-rate-analysis-20261110-a1/analysis.json",
+      "sha256": "01c4d9b5aad822a33aa04e633d376b1e316347d27b941278c9d39e3e466825de"
+    },
+    "analysis_script": {
+      "path": "/Users/manu/.cache/pointstream-evidence/legacy188-rate-analysis-20261110-a1/analyze.py",
+      "sha256": "e79999d83ceb237ca98a3159cf74d40e83e2190bed8081fe9a4db05787fae44f"
+    },
+    "root_recalculation": {
+      "path": "/Users/manu/.cache/pointstream-evidence/legacy188-rate-root-review-20261110-a1/review.json",
+      "sha256": "069b32a3badf592c9f2d4f17f4bd0fb600835c4f445cc67cf843921b41f49efb"
+    },
+    "plot_png": {
+      "path": "/Users/manu/.cache/pointstream-evidence/legacy188-rate-analysis-20261110-a1/diagnostic-plot/revision2/diagnostic.png",
+      "sha256": "498b641a848826d9fb0c8a6485a4721033c86ac2d341b6f15e10a621a952cab4"
+    },
+    "plot_svg": {
+      "path": "/Users/manu/.cache/pointstream-evidence/legacy188-rate-analysis-20261110-a1/diagnostic-plot/revision2/diagnostic.svg",
+      "sha256": "dbf97e0eb57b722721ac39ac96c8e1294a7586cb1b92b830b8f16f963f9e6fac"
+    }
+  },
+  "visual_review": "Revision2 rootinspected: allmarkersvisible, croptextboxnoocclusion, exactquality_at log-ratehelperincludesrecallplateauto maxrawnativebudget; no supportextrapolation. Revision0/1/failurepreserved.",
+  "scientific_scope": "Singlecalibration-exposed188framegame10Clip3,allvisible/noabsent. NarrowpooledcropLPIPSoverlap0.0238. NoCI/independentnewclip/corpus/full30reuse/current16gate/freshdecoderclaim. FullframeBDpenalties2.52-4.02percent alongsidecropbenefits; source-negative10/197calibrationfailureunchanged.",
+  "CPU_accounting": "Family40CPUprecharged includingextra20prospectiveplotcorrection. Failedfontparent+child8eachseparateCPUlimits,aggregateunmeasured; knownsubsequentplot2.15+0.825self,rootreviewabout1.5+analysis0.633. Conservative33.283planningboundincludesadminreserve; notmeasuredaggregate. No model/native/remote/decoder calls."
+}
