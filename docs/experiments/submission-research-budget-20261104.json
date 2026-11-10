@@ -1614,6 +1614,24 @@
       "cpu_seconds": 20,
       "basis": "Prospectivelyprechargedfull20CPU read-onlyLOCALlegacy188reuseaudit; no inference/remoterecovery/automaticcredit.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "k5d-same-job-389e-expiry-closure-20261110",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 370,
+      "basis": "Full370remainingexternalCPUallocation queue/admin/audit;30prepalreadycharged400inclusive. CanonicalEXPIREDnohost/supervisor/run/attempts/sourceextraction/claims,physical450darchiveandready21cd/spec25f4. Ownerdeadline-sweepernotGPU. QueuewallnotCPU,aggregateadminunmeasured.",
+      "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "k5d-legacy188-bounded-recovery-20261110",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "basis": "Prospectivelyprecharged50CPU boundedreadonly64MiBlegacy188recovery+audit,noinference/noautomaticcredit.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2132,8 +2150,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 7920,
-      "cpu_seconds": 5590,
-      "status": "Remaining_unspent;new0bb5GPU16prep30precharged;noGPUreleaseyet;48/292/586held"
+      "cpu_seconds": 5170,
+      "status": "Remaining_unspent;389eunassignedexpiryclosed400CPUincl0GPU;onefurtheradmissionwindowprospective"
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -3690,7 +3708,7 @@
       "job_id": "20261110T130538Z-389ebe94",
       "phase": "k5d-scale-first-tranche-20261105",
       "subphase": "same-job-0bb5-exclusive16-parity-IO-cost",
-      "state": "publishedpending;solecanonicalwait ball_source_qualification",
+      "state": "expiredunassigned;rootclosed0GPU400CPUinclusive",
       "revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
       "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
       "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
@@ -3716,7 +3734,12 @@
       "CPU_external_after_preparation": 370,
       "local_storage_gib": 32,
       "local_batch": "/private/tmp/k5d-same-job-0bb5-exclusive16-preparation-20261110",
-      "scope": "Originalsixpoint16parity actualsame-jobretainedreceiver+IOpilot; no48/292/586/full30/independentclipclaim."
+      "scope": "Originalsixpoint16parity actualsame-jobretainedreceiver+IOpilot; no48/292/586/full30/independentclipclaim.",
+      "terminal_GPU_charge": 0,
+      "terminal_additional_CPU_allocation": 370,
+      "inclusive_CPU_allocation": 400,
+      "qualification_executed": false,
+      "wait_state": "ended;canonicaldeadlinecheck+independentexpiryproof,eventACK"
     },
     {
       "job_id": "20261110T133353Z-0a5e1789",
