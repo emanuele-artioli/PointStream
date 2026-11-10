@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "job_id": "20261110T172634Z-0afe4e35",
+  "decision": "Accept exact-source CPU mechanism only, notCUDA orbudgetallowance",
+  "approved_gate_sha256": "d55b812ee13662408b404ce2bcc67f5f2effff91a76d6836965edca8d4d44c7e",
+  "publication_sha256": "0a0810a7ed05206ea657ee952bae561ca56819da49662d26ec073d953c165846",
+  "raw_receipts_root_verified": 68,
+  "source_Git_blobs_root_verified": 1865,
+  "root_check_sha256": {
+    "root-local-physical-audit.json": "30760621b0d3c896654dc149546f3b47341bdf20aca9de3065c3a932d6999db1",
+    "root-local-deep-audit.json": "497421730001f8ec03c44d714a79c08d0fae05dcfd94f953e95a5f38ad071fc9",
+    "root-native-policy-audit.json": "65a378838fa9a9e144d22964aa484d26e71a3868cd60b60d3a3a31a7cc85e8ac",
+    "root-canonical-status.json": "129bd563532b301460d4e7907f8a4306b606ccaa838562f7c40f38b0762a993a",
+    "final-pid-audit.json": "f3e86eedeb569facc4c3a350ced1ea2c88576716ab16eed0cb9675542a743cb4"
+  },
+  "created_to_terminal_wall_seconds": 144.00997757911682,
+  "campaign_CPU_conservative_upper": 145,
+  "external_CPU_full_allocation": 150,
+  "independent_audit_CPU_full_allocation": 82,
+  "future_CPU_charge": 377,
+  "source_preparation_alreadycharged": 50,
+  "inclusive_CPU_charge": 427,
+  "GPU": 0,
+  "aggregate_CPU_measured": false,
+  "accounting_basis": "Ceil145canonicalcreated-terminal144.010walloneCPUatdispatch/rawsummary,reviewedtrustedLinuxfork/exec/threadinheritance/noPythonwidening/native-thread1 +full150external82audit. No per-descendantaffinitysnapshots or exhaustiveaggregatecounter; explicitcooperativeinheritanceassumptionretained. EarlierexportstateRUNNINGracepreserved,notusedforclosuretimestamps. Actualbody/lifecyclebound nottrimmingpastallocations.",
+  "teardown": "20leafbirths/allgroups/claimsabsent,supervisor246265andcampaign246336individuallyabsent;eventACK.",
+  "cuda_qualified": false,
+  "generation_controller_executed": false,
+  "scope": "MAIN32e/JCVbf738CPUactualruntime/packet480plus14/native/namespace/denialmechanism,newsourceaecf/f784/c9d. No qualificationceilingapprovedbythisCPUgate."
+}

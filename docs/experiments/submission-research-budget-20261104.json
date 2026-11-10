@@ -1777,6 +1777,16 @@
       "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
       "basis": "Prospective50CPU sourcepackaging/readiness/proposalonly AFTERcurrent269modelqueuecanonicalexpired. Sameeverypriorcharge/nonce,1100+50=1150trueprep. No newCPUproof/GPU/caprelease.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "w8-aecf-0afe-cpu-proof-closeout-20261110",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 377,
+      "witness_qualification": false,
+      "basis": "Actualcanonicalcreated-terminal144.010ceil145oneCPUunderreviewedtrustedinheritance/noPythonwidening/native-thread1 +full150post/admin82audit=377future;50sourceprepalreadycharged427inclusive. No perchildaffinitysnapshots/measuredaggregate;earlyRUNNINGexportnotusedfortimestamp. Actualallraw/root/source/PIDchecksacceptedCPUonly.",
+      "release_stage": "research-first24/28firstnewtranche"
     }
   ],
   "reservations": [
@@ -2360,8 +2370,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 1606,
-      "status": "Remaining_unspent;alllatestGPUqueuesexpiredunassigned;newsourceoradmissionprepseparatelygated"
+      "cpu_seconds": 1229,
+      "status": "Remaining_unspent;aecfCPUmechanismrootaccepted377future427inclusive0GPU;noGPUallowancereleasedyet"
     }
   ],
   "jobs": [
@@ -4279,7 +4289,7 @@
       "job_id": "20261110T172634Z-0afe4e35",
       "phase": "w8-full-witness-staged-20261106",
       "subphase": "aecf-exact-source-versioned-budget-CPU-mechanism-proof",
-      "state": "publishedpending;rootACKbeforeonecanonicalwait",
+      "state": "complete;rootacceptedCPUmechanismonly",
       "spec_sha256": "2c9003cf429a4b9ab818c29769e5d6ef876a5c808899abe4f62e099fbffa70ac",
       "raw_spec_sha256": "8b939ca85da625855fb6fa5cff95102fcd1cfb8c9af10ebd0bec09636083d506",
       "source_archive": true,
@@ -4298,7 +4308,12 @@
       "validator": 50,
       "noop": 5,
       "external_post_admin_CPU": 150,
-      "independent_audit_CPU": 82
+      "independent_audit_CPU": 82,
+      "terminal_CPU_charge": 377,
+      "inclusive_CPU_charge": 427,
+      "terminal_GPU_charge": 0,
+      "approved_gate_sha256": "d55b812ee13662408b404ce2bcc67f5f2effff91a76d6836965edca8d4d44c7e",
+      "wait_state": "solewaitendedcomplete,eventACK,20leaf+2parentbirths/groups/claimsabsent"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -4320,10 +4335,9 @@
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwaitaftermeaningfulcompletioncheckpoint",
-    "state": "ExistingBallf311solewait18:00deadline;newCPUproof0afeafterACKonewait;noW8GPUjob/limitapproved. No duplicates/recurringchecks.",
+    "state": "Ballf311existingsolewaitdeadline18:00:30+sweep;newsource0afeCPUaccepted,noW8GPUallowance/jobyet.",
     "jobs": [
-      "20261110T172134Z-f311cadf",
-      "20261110T172634Z-0afe4e35"
+      "20261110T172134Z-f311cadf"
     ],
     "batches": [],
     "native_completion_resume_verified": false,
