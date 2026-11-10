@@ -1459,6 +1459,27 @@
       "cpu_seconds": 50,
       "basis": "Full approved50CPU preparation:recovered exactH2/d8,actualbridge recheck,nooverwrite source/bridgeuploads,allhostdoctor/claims/runtime/toolspacechecks. Aggregateadministrationunmeasured.",
       "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "k5d-first292-7e1f-closure-20261110",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 250,
+      "basis": "Full remaining250CPU approved closure allocation, not measured aggregate. Root rehashed12 rawartifacts, checked actualoracle/native/CPU cases and freshcanonicalCOMPLETE. 50CPU prep alreadycharged, inclusive300. Retains fullpost/audit/contingency rather than crediting inferred lifecycle saving.",
+      "release_stage": "research-first24/28firstnewtranche"
+    },
+    {
+      "phase": "w8-context-q0-source-inspection-20261110",
+      "parent_phase": "w8-full-witness-staged-20261106",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 20,
+      "basis": "Full approved20CPU source-only inspection allocation. Actual24/30 scheduler1window versus240/30 12windows; no model/GPU/native/frame execution. Partial CPU telemetry only; fullallocation covers unmetered postSSH.",
+      "release_stage": "research-first24/28firstnewtranche",
+      "witness_qualification": true,
+      "qualification_charge_kind": "pilot_preparation",
+      "attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a"
     }
   ],
   "reservations": [
@@ -1977,8 +1998,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 7920,
-      "cpu_seconds": 6590,
-      "status": "Remaining_unspent7920GPU6590CPU; FFEprep50charged,ONE250futureCPU nativeproofreleased; noGPU."
+      "cpu_seconds": 6340,
+      "status": "Remaining_unspent; nativeCPUclosed; prospectiveGPUcostpilot pending separate rootrelease"
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -2042,8 +2063,8 @@
       "workstream": "w8",
       "release_stage": "research-first24/28",
       "gpu_seconds": 4550,
-      "cpu_seconds": 3400,
-      "status": "Remaining_unspent4550GPU3400CPU;8089CPUproofacceptedandclosed342additional/372inclusive; schema2gateapproved; noGPUrelease."
+      "cpu_seconds": 3380,
+      "status": "Remaining_unspent;20CPU schedulerpreparationcharged under qualificationnonce; noGPUrelease"
     }
   ],
   "jobs": [
@@ -3378,11 +3399,11 @@
       "job_id": "20261110T095341Z-7e1f4b1b",
       "phase": "k5d-scale-first-tranche-20261105",
       "subphase": "first292-ffe51-real-native-CPUproof",
-      "state": "submitted pending;solewait decoder_cost_finish",
+      "state": "complete; root accepted exact-source nativeCPU proof only",
       "revision": "ffe51da48b4088609cd8f799e4655d608fcacbad",
       "source_sha256": "390e157a9aabc1db8006a936a7de54a43c8810650260136bc59a67036e7dfd39",
       "snapshot_sha256": "202466a711d17b742a17270bab91da2dc581af7a9fc1e411405f8bb37a924372",
-      "spec_sha256": "b21f0dd70a70a3adac9be2c6bbad8183dca02e677dc572d565d0160691605e8c",
+      "spec_sha256": "51b73aedf1d44ab4ebc6309be351db113e6a57aaef82a44e90c5bb748a1a3fe2",
       "deadline": "2026-11-10T10:27:19.891062+00:00",
       "host": "gpu2",
       "cpu_affinity_index": 0,
@@ -3396,7 +3417,13 @@
       "contingency_CPU_ceiling": 20,
       "gpu_ceiling": 0,
       "local_batch": "/private/tmp/k5d-first292-source-prep-20261110",
-      "scope": "ExactFFE CPU native normal/timeout/TERM/KILL and subtree accounting only. RecoveredH2/d8physicalSHAs verified. No GPU/scientific parity/cost/scale/full30 admission."
+      "scope": "ExactFFE CPU native normal/timeout/TERM/KILL and subtree accounting only. RecoveredH2/d8physicalSHAs verified. No GPU/scientific parity/cost/scale/full30 admission.",
+      "raw_spec_digest": "b21f0dd70a70a3adac9be2c6bbad8183dca02e677dc572d565d0160691605e8c",
+      "terminal_additional_cpu_charge": 250,
+      "actual_inclusive_conservative_cpu_charge": 300,
+      "wait_state": "ended;terminaleventACK",
+      "full_native_gate_passed": true,
+      "GPU_or_scale_qualified": false
     }
   ],
   "old_budgets": "closed, not borrowed",
