@@ -1429,7 +1429,13 @@ def remote_job(args: argparse.Namespace) -> Any:
         # Preserve the original execution config as provenance, but use the
         # current compatible management release for this same shared inbox.
         current = monitor.read_json(args.state_dir / "inbox.json", {})
-        management = current if current.get("base") == record["config"].get("base") and current.get("hosts") else record["config"]
+        management = record["config"]
+        if current.get("base") == record["config"].get("base") and current.get("hosts"):
+            routed = load_config(args.state_dir)
+            # Do not route into a different inbox if the configuration changed
+            # while it was being read; keep the recorded execution config.
+            if routed.get("base") == record["config"].get("base"):
+                management = routed
         result = remote_rpc(management, args.action, {"job_id": args.job_id}, **timeout_options)
         if args.action == "events":
             # Acknowledge only after the consumer actually reports the event.
