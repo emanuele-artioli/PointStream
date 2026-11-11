@@ -2,7 +2,20 @@
 
 Continue the worthwhile, authorized PLAN research before manuscript or PRESLEY work. Do not submit the paper, train models, use paid API fallback, or revive the legacy 200-GPU-hour study. The user prefers bounded fleet queues. Before any action after interruption, read the experiment entry and canonical status for the recorded job; never replay an unknown or failed submission. Earlier bounded queues expired unassigned; the latest two live queues are identified in the final checkpoint below; no 292/586 study or full W8 GPU witness is released at this checkpoint. Source-footage rights and coauthor review remain open. The authoritative ledger is [submission-research-budget-20261104.json](experiments/submission-research-budget-20261104.json); root owns accounting and admission.
 
-## CURRENT authoritative checkpoint — November 10, final connectivity audit
+## Subsequent SSH diagnosis — November 10 local / November 11 UTC
+
+The user also cannot SSH from their terminal in a Brazilian hotel. Read-only
+diagnosis found active NordVPN routing, reachable SSH transport and successful
+key exchange, followed by public-key authentication stalls on gpu1/2/3/5.
+gpu2/3 no-key controls promptly rejected authentication; gpu5 also returned
+`Exceeded MaxStartups`. Server-side key lookup/shared-home health is the leading
+unconfirmed hypothesis. Direct Wi-Fi-bound SSH/HTTPS timed out; a separate
+hotel/VPN restriction is not excluded. No SSH/VPN/server settings changed and
+no research jobs inspected or replayed. See
+[diagnosis and administrator handoff](fleet-hotel-ssh-diagnosis-20261110.md).
+The unknown jobs, budgets and admission block below remain unchanged.
+
+## CURRENT authoritative research checkpoint — November 10, final connectivity audit
 
 Fleet communication is blocking further admissions. **Do not submit or replay
 anything until the two existing jobs and their ownership/claims are inspected.**

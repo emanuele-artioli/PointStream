@@ -1,0 +1,87 @@
+{
+  "recorded_utc": "2026-11-11T00:46:29.566765+00:00",
+  "purpose": "Read-only hotel/VPN/SSH diagnosis; no scientific jobs or settings changed",
+  "raw_logs": [
+    {
+      "path": "/private/tmp/pointstream-hotel-ssh-debug-20261110/aau-direct-wifi.log",
+      "bytes": 87,
+      "sha256": "884d47c1dd34fd1a34e142838a137cea0bb81b4a408db76c3ac7a93e2ccb4d5f",
+      "excerpt": [
+        "curl: (28) Failed to connect to www.aau.at port 443 after 5002 ms: Timeout was reached"
+      ]
+    },
+    {
+      "path": "/private/tmp/pointstream-hotel-ssh-debug-20261110/gpu1-key.log",
+      "bytes": 10118,
+      "sha256": "d320024061a9785257c6632957aa09bd8c62d51d5f83c0358bbcf87a3d0136e1",
+      "excerpt": [
+        "debug1: Connection established.",
+        "debug1: Offering configured Ed25519 public key",
+        "debug2: we sent a publickey packet, wait for reply",
+        "Connection to 143.205.173.64 port 22 timed out"
+      ]
+    },
+    {
+      "path": "/private/tmp/pointstream-hotel-ssh-debug-20261110/gpu2-key-confirm.log",
+      "bytes": 10121,
+      "sha256": "260fc34ac3675e309bed3ad36095cd3416fb56fd3546d89196a8f98c1ff40895",
+      "excerpt": [
+        "debug1: Connection established.",
+        "debug1: Offering configured Ed25519 public key",
+        "debug2: we sent a publickey packet, wait for reply",
+        "Connection to 143.205.173.126 port 22 timed out"
+      ]
+    },
+    {
+      "path": "/private/tmp/pointstream-hotel-ssh-debug-20261110/gpu2-without-key.log",
+      "bytes": 9327,
+      "sha256": "164eaf82c1fd394cd7fed5f4cf224fc770fef538498c1c8cf46bace3604f5073",
+      "excerpt": [
+        "debug1: Connection established.",
+        "emanuele@gpu2.itec.aau.at: Permission denied (publickey,keyboard-interactive)."
+      ]
+    },
+    {
+      "path": "/private/tmp/pointstream-hotel-ssh-debug-20261110/gpu3-direct-wifi.log",
+      "bytes": 1683,
+      "sha256": "2cdd914a3ec3899a1027332b6b299aea0c12cf1a6bc32b0cc4cf7cd4fdedbac4",
+      "excerpt": [
+        "Connection timed out during banner exchange",
+        "Connection to UNKNOWN port 65535 timed out"
+      ]
+    },
+    {
+      "path": "/private/tmp/pointstream-hotel-ssh-debug-20261110/gpu3-key.log",
+      "bytes": 10119,
+      "sha256": "c8cb947cd55de775603baab90808116e67e7ed6a43eebea69ce593c0bc288268",
+      "excerpt": [
+        "debug1: Connection established.",
+        "debug1: Offering configured Ed25519 public key",
+        "debug2: we sent a publickey packet, wait for reply",
+        "Connection to 143.205.173.65 port 22 timed out"
+      ]
+    },
+    {
+      "path": "/private/tmp/pointstream-hotel-ssh-debug-20261110/gpu3-no-key-confirm.log",
+      "bytes": 9326,
+      "sha256": "47deb3532510ea6eb361a3fca3afea9851bc65e604a4c4e0d48036e023eeefd5",
+      "excerpt": [
+        "debug1: Connection established.",
+        "emanuele@gpu3.itec.aau.at: Permission denied (publickey,keyboard-interactive)."
+      ]
+    },
+    {
+      "path": "/private/tmp/pointstream-hotel-ssh-debug-20261110/gpu5-no-key.log",
+      "bytes": 1897,
+      "sha256": "b1d3a8c9b46f8d6f7929f5fef798bdd6008cf27de89808003b0662c2afb543e5",
+      "excerpt": [
+        "debug1: Connection established.",
+        "debug1: kex_exchange_identification: banner line 0: Exceeded MaxStartups"
+      ]
+    }
+  ],
+  "confirmed": "Public-key authentication stalls on multiple fleet hosts; initial SSH transport succeeds through active VPN; gpu5 returned Exceeded MaxStartups",
+  "hypothesis_not_confirmed": "Server-side key lookup or shared authentication/storage dependency",
+  "research_job_states_unchanged": true,
+  "budget_ledger_unchanged": true
+}
