@@ -13,6 +13,17 @@ and the legacy 200-GPU-hour study are outside scope. No new computation was run
 for this audit. Costs below are ceilings or historical charges where explicitly
 identified, not forecasts for an unprepared new job.
 
+## November11 outage update
+
+Start with the [current handoff](../continuation-2026-11-11.md). Ball
+`20261110T190907Z-4d0dd928` and W8 `20261110T183845Z-4c240783` are submitted
+but unknown, not merely prospective. Later exact-source CPU gates are Ball
+`9445895e…` and W8 `d55b812e…`; earlier proofs in the table below are historical
+mechanism evidence. None qualifies unobserved GPU execution or a complete
+fresh receiver. No further admission/replay until existing states and ownership
+are inspected. The narrower-paper fallback is a scoped option, not a decision
+to close remaining experiments or resume manuscript edits.
+
 ## Decisions with potential submission value
 
 | Item | Evidence and remaining question | Cheapest next gate, cost and stop |

@@ -16,6 +16,11 @@ and ownership can be inspected. No new allocation or scientific rule change.
 See the [live continuation](../continuation-2026-11-10.md) and
 [connectivity receipt](../experiments/fleet-connectivity-block-20261110.json).
 
+November11 handoff audit: the [current entry](../continuation-2026-11-11.md)
+records the narrower-paper fallback and migration prerequisites. This does not
+change research-first scope, closed/open decisions, budgets or admission stops.
+No paid hosting is approved.
+
 ## Goal and scope
 
 Develop the ball prototype into a reproducible, fully billed small-object

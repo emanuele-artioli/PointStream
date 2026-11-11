@@ -1,5 +1,8 @@
 # Continuation — 2026-11-10 research-first checkpoint
 
+For the latest outage contingency and resume entry, start with
+[November11](continuation-2026-11-11.md); detailed job identities below remain binding.
+
 Continue the worthwhile, authorized PLAN research before manuscript or PRESLEY work. Do not submit the paper, train models, use paid API fallback, or revive the legacy 200-GPU-hour study. The user prefers bounded fleet queues. Before any action after interruption, read the experiment entry and canonical status for the recorded job; never replay an unknown or failed submission. Earlier bounded queues expired unassigned; the latest two live queues are identified in the final checkpoint below; no 292/586 study or full W8 GPU witness is released at this checkpoint. Source-footage rights and coauthor review remain open. The authoritative ledger is [submission-research-budget-20261104.json](experiments/submission-research-budget-20261104.json); root owns accounting and admission.
 
 ## Subsequent SSH diagnosis — November 10 local / November 11 UTC
@@ -73,7 +76,7 @@ Root verified all21 listed raw size/SHA joins. No GPU process was signalled;
 unknown read-only processes are preserved. Research and submission remain
 unfinished; no PointStream manuscript or PRESLEY changes.
 
-## Authoritative live checkpoint — November 10, 17:55 UTC
+## Historical record — Authoritative live checkpoint — November 10, 17:55 UTC
 
 The current ledger charges are **19,362 GPU / 46,421 workload CPU seconds**,
 inside **86,400 GPU / 100,800 CPU seconds**. Remaining-unspent child reservations
@@ -172,13 +175,13 @@ read-only re-audit is in progress, no reopened computation. PRESLEY and the
 PointStream manuscript remain untouched. Coauthor review, footage rights and
 submission authorization are still separate human prerequisites.
 
-## Historical checkpoints — superseded by the live checkpoint above
+## Historical record — Historical checkpoints — superseded by the live checkpoint above
 
-## Current decisions and budget
+## Historical record — Current decisions and budget
 
 The approved programme ceiling is **86,400 GPU / 100,800 workload-CPU seconds** (24/28 hours). At the current ledger checkpoint, conservative charges total **19,362 GPU / 45,444 CPU seconds**. The Ball first-tranche reservation has **7,920 GPU / 3,900 CPU** remaining; W8's separate staged-witness reservation has **4,550 GPU / 1,806 CPU** remaining. Future job charges are not included. These are remaining-unspent child reservations inside the existing programme/workstream limits, not extra allocations; do not subtract past charges twice. Root must reconcile later jobs and other active reservations against the current ledger before any release. Do not request further user budget until a concrete measured remaining schedule exists.
 
-## Ball: accepted pieces, not a scale release
+## Historical record — Ball: accepted pieces, not a scale release
 
 - Shared parent-8-GiB/child-2-GiB numerical feasibility job `20261109T223822Z-70eb4770` is root accepted for the original 16-frame development clip: all six native/wire/saved-pixel and metric/judge arrays and 13 resource receipts joined. Its shared timing is contaminated and **cannot** establish performance, scale, or a current-path cost bound. The earlier distinct 4-GiB parent job `20261109T205759Z-f1141a7c` failed with a real BallTrack allocation OOM; preserve that negative result. See [K5d](experiments/k5d-ball-benchmark.md).
 - The earlier, now-held first-292 admission source was `ffe51da48b4088609cd8f799e4655d608fcacbad`, source SHA `390e157a9aabc1db8006a936a7de54a43c8810650260136bc59a67036e7dfd39`, archive SHA `202466a711d17b742a17270bab91da2dc581af7a9fc1e411405f8bb37a924372`. Its root-reviewed bridge names the exact three old-file patches; it does not release the full study. The source cache and preparation record are in [the preparation receipt](experiments/k5d-inputs/first292-ffe51-source-preparation-20261110.json).
@@ -188,14 +191,14 @@ The approved programme ceiling is **86,400 GPU / 100,800 workload-CPU seconds** 
 - Root released only **30 CPU seconds of GPU16 source preparation**, already charged, within a prospective **1,000 GPU / 1,200 CPU seconds inclusive** qualification ceiling; no new Ball GPU job has been released. Original 16/48-frame parity and real I/O, publication, storage and cost remain separate gates before 292. Retained receiver payloads are 7,265,894,400 bytes at 292 and 14,581,555,200 at 586. The [storage review](experiments/k5d-inputs/same-job-storage-plan-20261110.md) establishes necessary 586 local floors of 39 GiB prepare / 37 GiB score before additional files, plus the fleet's separate 50 GiB reserve; it is not a sufficient declaration or cost proof. No Ada broadening is qualified and no idle-host inference follows from the old snapshot. The 586 and full-30 gates remain separate; all **30** clips remain the denominator. Source false detections 10/197 exceed the 0.05 calibration threshold, limiting absent-frame realism.
 - GPU3's 12 stable data assets plus environment archive were warmed and independently audited with no-replace publication; the existing unpacked runtime tree was **not** fully certified. The separately accepted warming family cost 140 CPU seconds inclusive, zero GPU. It did not change any host pool, spec or scientific qualification.
 
-## W8: CPU infrastructure accepted; generation remains prospective
+## Historical record — W8: CPU infrastructure accepted; generation remains prospective
 
 - CPU proof `20261110T001842Z-808952c3` is root accepted for exact-source packet, namespace, native and strict CPU leaf infrastructure. Source revision `67bfdc4aed8dd5d5630d9c81abf6e0afead063e0`, source SHA `1b8a2cf175f0b9541594628180addff9b204ccf7774a899c420189d9f83b21d8`, archive SHA `e303cd2a796aaf51f8c22f9982b359cfd198cfd127e8b96e92a78f7de94c2a39`. The [schema-2 gate](experiments/w8-inputs/receiver-20261101/67bfd-8089-root-approved-schema2-gate-20261110.json) distinguishes the MAIN CPU campaign from JCV generation target; it explicitly says no generation controller was executed and CUDA was not qualified. The [closeout](experiments/w8-inputs/receiver-20261101/67bfd-8089-root-cpu-closeout-20261110.json) records the allocation-based accounting and its telemetry limits. This is not a fresh receiver-quality result.
 - The real exclusive paired one-/three-step cost-only job `20261106T005057Z-77c276fa` supplied a historical paired slope; it does not bound the final source-hidden 240-frame workflow. The later [scheduler inspection](experiments/w8-inputs/receiver-20261101/w8-q0-scheduler-inspection-20261110.json) used no GPU/model/protected content: a 24-frame context has one used window per step, while a 240-frame context has 12, and the 24-frame latent is not a prefix-equivalence result. Its 20 CPU-second allowance is already charged under qualification-attempt nonce `22578404a2dc13eb5c71431ee0593d1a`.
 - The original proposed **24-frame/30-step** first-unit GPU pilot (400-second campaign, 335-second smoke) is **held**. In the corrected CPU-only cost probe, actual source identity passed but the first direct NFS input-verification pass timed out at 65 seconds; the second pass never started. The earlier source-recovery failure is also retained. Neither probe used GPU or produced generation/quality evidence. The 250 CPU seconds already charged for qualification preparation include both bounded 100-second probes plus 50 earlier preparation. The reviewed staged-command binding repair is source revision `174ac` (archive SHA prefix `5e62`, source SHA prefix `4cad`; integrated at `0ad041bc`). Root verified all 1,669 source archive blobs. Exact-source CPU proof `20261110T110102Z-c38f0357` is root accepted for infrastructure only, with 342 CPU seconds inclusive and zero GPU. The real staged-input pre-stage gate passed in 0.350 seconds. The new original unit-0 24-frame/30-step qualification `20261110T123904Z-0e193d36` was last observed queued on exclusive gpu5 Ada, source `174ac84b84a1f405e06700a34aa4c3e225fa3265`, canonical spec `abd6e55920bb2c4ede6ec9cee594c5e8daef5d1cacad45d756e61b7eb69e88ef`, deadline 13:12:16 UTC. Its future ceilings are 500 GPU / 600 CPU seconds. Its sole 2,050-second canonical wait is session `89267`, with files under `/private/tmp/pointstream-w8-resume-final-20261110-a1/`; completion callback is unverified, and root owns one deadline check. Inspect the existing job and wait after interruption; do not replay. It does not release a full witness or prove generation quality. The historical one-/three-step slope and scheduler inspection do not establish this forecast.
 - The intended full witness remains a fresh, unbroken 240-frame generation per unit and 80 selected ticks, with protected source/golden content unavailable until independent full-producer promotion. Native/RGB, SAM masks, composition, scoring and offline validation each require their own real sealed outputs and bounded costs; exact RGB or the registered one-level tolerance, bit-identical masks and per-tick/mean LPIPS/DISTS rules are unchanged. No other unit or full-witness quality result is released.
 
-## Checks, Git and preserved state
+## Historical record — Checks, Git and preserved state
 
 The former `/private/tmp/pointstream-ci-pinned-20261105/bin/python` resolved into the base conda prefix and was not a valid pinned CI environment; its final old-environment pytest logged 11 failures (including missing PyYAML and OpenCV-related type errors), 2,060 passes and 41 skips in `/private/tmp/pointstream-root-admission-checks-20261110/pytest.log`. Do not interpret those failures as a corrected-environment result.
 
@@ -207,7 +210,7 @@ There is no pending user question. Footage rights and coauthor review remain hum
 
 Branch `codex/submission-benchmark-2026-11-04` carries reviewed changes after merged PR 346. Review its current diff against `origin/main` and the latest ledger when publishing. Preserve the unrelated untracked `docs/experiments/k5d-inputs/calibration-controls-spec-20261105.json`, prior job outputs, partials and raw evidence. No cleanup or automatic replay is authorized.
 
-## Active two-queue handoff (November 10, 13:08 UTC)
+## Historical record — Active two-queue handoff (November 10, 13:08 UTC)
 
 - Programme charges: 19,362 GPU / 42,782 CPU seconds of 86,400 / 100,800; Ball remaining-unspent reservation 7,920 GPU / 5,610 CPU; W8 4,550 GPU / 2,758 CPU. Pending leaf caps are inside these reservations, not additional charges.
 - W8 `20261110T123904Z-0e193d36`: first actual queued 24-frame/30-step operational cost pilot, source174/archive5e62/source4cad, canonical specabd6, GPU5 exclusive Ada. Deadline13:12:16UTC; sole canonical wait2050s, session89267, `/private/tmp/pointstream-w8-resume-final-20261110-a1/wait*`. Future500GPU/600CPU incl450campaign, gen240wall/260CPU,50GPUpost/150CPUexternal (10final-readiness included once). 300CPU qualification preparation already charged. No full240/80, second unit or quality release. Source CPU c38 gate accepted; actual warm pre-stage0.350s passed necessary gate only. Root deadline-only inspection after13:12, no replay.
@@ -217,7 +220,7 @@ Branch `codex/submission-benchmark-2026-11-04` carries reviewed changes after me
 - Completion-triggered model resume/cache TTL unknown. Do not start duplicate waits, recurring timers or keepalives. Preserve existing handles; one bounded deadline inspection per owned batch if no completion notification. After interruption read journal and canonical status before acting.
 - Combined source checks passed Ruff, mypy574, pytest2088/40skips; later changes documentation/ledger only. Prototype calibration-controls-spec stays untracked. Manuscript/PRESLEY remain paused; latest paper5cf2823 unchanged, author review and footage rights unresolved, no submission authority.
 
-## Live two-queue checkpoint (November 10, 14:07 UTC; supersedes earlier queue state)
+## Historical record — Live two-queue checkpoint (November 10, 14:07 UTC; supersedes earlier queue state)
 
 - Charges: 19,362 GPU / 43,402 CPU seconds; Ball remaining reservation 7,920 GPU / 5,140 CPU; W8 4,550 GPU / 2,608 CPU. Current ledger is authoritative. Full conservative CPU allowances are charged, not measured aggregate use or queue wall.
 - W8 first queue `20261110T123904Z-0e193d36` expired without execution and closed at zero GPU / 150 CPU prep allocation. Second queue `20261110T133353Z-0a5e1789` uses unchanged source174/archive5e62/source4cad, canonical specf9da, deadline14:13:53 UTC, future500GPU/550CPU. Source/gate/prestaging verified; generator210CPU/240wall, campaign400, smoke335, validator60, external150CPU including readiness. One canonical wait session40550, `/private/tmp/pointstream-w8-second-window-20261110-a1/wait*`; root central ACKa0041cbd. No further queue/unit/full witness automatically released. True qualification preparation450CPU plus this550 fits frozen1000CPU subcap.
@@ -225,7 +228,7 @@ Branch `codex/submission-benchmark-2026-11-04` carries reviewed changes after me
 - Old188 `20261105T003756Z-cc450baf` actual source archive and full publication recovered under `/Users/manu/.cache/pointstream-evidence/legacy188-20261110-a1/`; saved-byte/metric/judge joins pass. All30 remain denominator, old188 counts once only if reuse later qualified. The savedGT labels were not independently joined to originalZIP, and full method compatibility is not established. Bounded30CPU label/source-method audit precharged under cac6cb0d; remote15CPU/local15CPU, no JPEG/model/native inference. Root release and recovery review in k5d-inputs; preserve b26e/c212 old source identity, no relabeling as0bb5.
 - Latest combined source checks remain2088passed/40skipped, Ruff and mypy574; later docs-only changes. PR351 merged, main fetched and merged safely into scoped branch. Manuscript/PRESLEY unchanged. Native completion wakeup/cache lifetime unknown; one deadline check for each existing wait if needed, no recurring polling.
 
-## Later checkpoint (November 10, 14:36 UTC; supersedes both earlier queues)
+## Historical record — Later checkpoint (November 10, 14:36 UTC; supersedes both earlier queues)
 
 - W8 `20261110T133353Z-0a5e1789` and Ball `20261110T135257Z-8868b966` both expired without assignment, attempts, gates, claims or inference. Independent raw source/spec/tree/owner/worker audits and event acknowledgments are recorded. Root closed W8 at0GPU/150CPU and Ball at0GPU/400CPU conservative external allocations. Root did not convert queue wall into CPU.
 - Programme charges19,362GPU/44,002CPU; remaining-unspent Ball7,920GPU/4,740CPU and W84,550GPU/2,408CPU. The 50CPU source-readiness preparation for the new W8 guard is already included and remains true qualification preparation (650CPU cumulative, same nonce22578404a2dc13eb5c71431ee0593d1a). No charges were retagged or erased.
@@ -236,7 +239,7 @@ Branch `codex/submission-benchmark-2026-11-04` carries reviewed changes after me
 - Legacy188 full label join passed, actualsource-chain reviewed and conditional methodfamily accepted. Minimal old-monolithic adapter design is recorded; implementation/credit awaits actual corrected16 runtime/gate and frozen full-study analysis. Oldb26/c212/pub622fd identity must be preserved and Clip3 countedonce among30; no syntheticcurrentmarker or laterdecode.
 - Manuscript/PRESLEY still unchanged. No recurring timers/cache keepalive. Native completion resume/cache lifetime unknown; preserve actual job/wait handles and do one bounded deadline inspection if needed.
 
-## Live checkpoint (November 10, 14:56 UTC; resume here)
+## Historical record — Live checkpoint (November 10, 14:56 UTC; superseded; do not resume from this section)
 
 - Charges: 19,362 GPU / 44,304 CPU of 86,400 / 100,800. Remaining-unspent Ball 7,920 GPU / 4,740 CPU; W8 4,550 GPU / 2,106 CPU. Pending jobs are inside these reservations. No global/workstream increase; no manuscript/PRESLEY edits.
 - W8 CPU proof 20261110T143525Z-6b4be46f is ROOT ACCEPTED for mechanism only, zero GPU. Root independently revalidated 68 raw members, 1,840 source blobs, packet 480/480 plus 14 arrays, MAIN/JCV runtime, isolation/denials, real native and namespace lifecycle, all 20 leaf and both parent PIDs/groups/claims absent. Approved gate SHA3761a9429e8f77f7c6b68faa3a2a6a4daad59fc99ba6a410724241dbda37667f and closeout are under w8-inputs/receiver-20261101/26905-6b4b*. Source269/archive631/source985, as recorded in the ledger, never CUDA or generation qualification.
@@ -249,7 +252,7 @@ Branch `codex/submission-benchmark-2026-11-04` carries reviewed changes after me
 - Exact frozen269 checks: Ruff,mypy574,pytest2092passed40skipped; root integrated e753a288+9914159b and focused profile+docs37PASS. Later changes docs only. PR353 merge-auto enabled; inspect state once on next coherent publication. Preserve unrelated untracked calibration-controls-spec-20261105.json.
 - Legacy188 original labels and source/method chain verified; adapter designed, no implementation or reuse credit until real corrected16 gate/runtime and frozen analysis. Oldb26/c212/pub622fd lineage preserved, Clip3 once among30, no synthetic current marker or later DCVC decode. Footage rights/coauthor review remain open; no submission authority.
 
-## Latest live checkpoint (November 10, 15:46 UTC; supersedes prior live IDs)
+## Historical record — Latest live checkpoint (November 10, 15:46 UTC; supersedes prior live IDs)
 
 - Research remains open and manuscripts remain paused. Charges19,362GPU/44,854CPU; Ball remaining-unspent7,920GPU/4,340CPU, W84,550GPU/1,956CPU. All pending leaf caps inside these reservations. User authority still24GPUh/28CPUh, no training/legacy200h/paidAPI/submission. No pending user question.
 - Ball6e96d868 expired unassigned and closed400CPU/0GPU,19rawSHAjoins rootchecked; eventACK. W8eb925299 expired unassigned and closed150CPU/0GPU,actualsource/tree/claimsaudit rootchecked; eventACK. Neither produced model/parity/timing/quality evidence. True W8 qualification preparation now800CPU with same22578404a2dc13eb5c71431ee0593d1a nonce; no charge retagging.
@@ -262,7 +265,7 @@ Branch `codex/submission-benchmark-2026-11-04` carries reviewed changes after me
 - All actual compute gates unchanged. RootacceptedCPUproof6b4b metadata/rawread-only cache persists; source/method/label review makes old188 conditionalreusecandidate but no adapter/credit before corrected16. FullW8completecoststillunknown; current1956CPU minus next550 leaves1406 under fullallocation scenario, not a measured deficit. Only sharedreserve transfers root-authorized; no Ball-to-W8 transfer withoutuserdecision. Footage rights/coauthorreview open, no submission authority.
 - Preserve prototypecalibration-controls-spec-20261105.json untracked. Currentrootbranchcodex/submission-benchmark-2026-11-04 includes reviewedcode and committedledger/releases; nextpublishcheckpointaftermainfetch/merge, documentchecks appropriate. No manuscript or PRESLEY changes.
 
-## Latest live checkpoint (November 10, 16:34 UTC; resume here)
+## Historical record — Latest live checkpoint (November 10, 16:34 UTC; superseded; do not resume from this section)
 
 - Research open; manuscript/PRESLEY untouched. Current charges19,362GPU/45,444CPU of86,400/100,800; Ball remaining-unspent7,920GPU/3,900CPU and W84,550GPU/1,806CPU. Current queued caps inside reservations, not extracharges. No training/paidAPI/legacy200GPUh/submission. Human footage rights/coauthor review still open.
 - PriorBalle6722010 andW811179b2a both expiredunassigned,zeroGPU,nomodel/quality/cost/parity evidence;actualsource/tree/claimsauditsrootverified,eventACKs. Ball closed400CPU/W8closed150CPU. RoottrueW8qualificationprep now950withunchanged22578404a2dc13eb5c71431ee0593d1a nonce. No retagging.
@@ -276,7 +279,7 @@ Branch `codex/submission-benchmark-2026-11-04` carries reviewed changes after me
 - Client-onlydoctorfix420c78a3/PR355MERGED,allprobe/visibilityfailclosed retained. Fullchecks2100PASS40skip/Ruff/mypy575; laterdocschecks3PASS. PR356latestcheckpointmerge-auto; inspectstateonceonnextpublication. Preserveuntrackedcalibration-controls-spec-20261105.json. Source269CPUproof6b4b acceptedmechanismonly,gateg3761/rawread-onlycachepersist; CUDA/freshgeneration/fullwitnessstillunqualified.
 
 
-## Live queue addition — November 10, 18:20 UTC
+## Historical record — Live queue addition — November 10, 18:20 UTC
 
 The seventh Ball queue is `20261110T181703Z-f018d258`, canonical pending,
 deadline **18:55:14.653945 UTC**, exact original0bb/450d/21cd source/archive.
@@ -290,7 +293,7 @@ check **18:56:50 UTC** if unresolved, no duplicate wait or recurring timer.
 No eighth queue, scale or full witness is released.
 
 
-## W8 e797 terminal checkpoint — November 10, 18:36 UTC
+## Historical record — W8 e797 terminal checkpoint — November 10, 18:36 UTC
 
 Root canonical status and all28 raw size/SHA joins accepted e797 as expired
 unassigned; owner gpu4 was the deadline sweeper. No generation, campaign,
@@ -315,7 +318,7 @@ No eighthBallqueue/scale or furtherW8queue automaticauthority. PR358 merged,
 CIchecksSUCCESS; latest accounting checkpoint will be published separately.
 
 
-## Current live W8 successor — November 10, 18:42 UTC
+## Historical record — Current live W8 successor — November 10, 18:42 UTC
 
 `20261110T183845Z-4c240783` is canonically pending, deadline **19:17:38.103222 UTC**,
 exact frozenaecf sourcec9d/archivef784/source_archive:true. Root joined raw
@@ -329,7 +332,7 @@ fullwitness/unit1/quality release. Ballf018 solewait remains; next single root
 checkpoint18:56:50UTC, then W8deadline+sweep **19:19:15UTC** if unresolved.
 
 
-## Ball f018 terminal checkpoint — November 10, 19:02 UTC
+## Historical record — Ball f018 terminal checkpoint — November 10, 19:02 UTC
 
 Root accepted fresh canonical expiry and all23 raw byte/SHA joins for f018:
 no assignment/campaign/inference/claims, exact originalsource/archive/spec,
@@ -349,7 +352,7 @@ completion. No repeatpoll/newwait/replay. Latest PR359 merged with successful
 CI; root owns next coherent publication. Manuscripts remain untouched.
 
 
-## Current Ball eighth queue — November 10, 19:12 UTC
+## Historical record — Current Ball eighth queue — November 10, 19:12 UTC
 
 `20261110T190907Z-4d0dd928` canonically pending; deadline **19:46:33.818327UTC**,
 original0bb/450d/21cd source/archive and same sixpoint16. Root joined rawspec
