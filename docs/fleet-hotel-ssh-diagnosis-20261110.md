@@ -71,8 +71,9 @@ existing Ball and W8 jobs before any further admission. Their unknown states
 and maximum reservations are unchanged. See
 [the continuation](continuation-2026-11-10.md).
 
-Raw bounded-client logs remain under
-`/private/tmp/pointstream-hotel-ssh-debug-20261110/`. A compact
+Raw bounded-client logs were recorded under
+`/private/tmp/pointstream-hotel-ssh-debug-20261110/`; that temporary directory
+was absent at the November11 handoff audit. A tracked compact
 [receipt](experiments/fleet-hotel-ssh-diagnosis-20261110.json) records their
 SHA256 hashes and diagnostic excerpts. Logs contain
 public host/key identifiers, not private-key contents or passwords. No
