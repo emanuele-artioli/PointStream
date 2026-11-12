@@ -337,6 +337,8 @@ def run(args: argparse.Namespace) -> None:
     work = scratch / (args.output.name + "-work")
     work.mkdir(exist_ok=False)
     yuv = work / "source.yuv"
+    if getattr(args, "isolated_receiver", False):
+        (work / "source-frame.rgb").write_bytes(source[0].tobytes())
     conversion = measure("source.rgb_to_yuv", lambda: convert_rgb(args.ffmpeg, source, yuv, fps))
     converted = measure("source.yuv_to_rgb_floor", lambda: tw.rgb_frames(yuv, w, h, n, work / "converted.npy"))
     tracker = measure("model.balltrack_init", lambda: trk.BallTrack(Path(args.balltrack_code), Path(args.balltrack_weight)))
@@ -395,9 +397,26 @@ def run(args: argparse.Namespace) -> None:
                                              ball.encode_frames([None] * n, [None] * n, w, h))
         baseline_wire.write_bytes(ball_stream.pack(baseline_stream))
         receive = work / f"receiver-{kind}-{point}"
-        cmd = [sys.executable, "-m", "experiments.tennis.k5d_worker", "decode", "--wire", str(wire), "--resources", str(map_path), "--work-dir", str(receive)]
-        measure(f"receiver.{kind}.{point}", lambda: subprocess.run(cmd, check=True, capture_output=True, timeout=3600))
-        receipt = json.loads((receive / "receiver.json").read_text())
+        if getattr(args, "isolated_receiver", False):
+            from experiments.tennis import k5d_isolated_receiver
+            protected = getattr(args, "receiver_protected_paths", None)
+            context = getattr(args, "receiver_producer_context", None)
+            if not isinstance(protected, dict) or not isinstance(context, dict):
+                raise ValueError("isolated receiver requires actual protected paths and producer context")
+            protected = {key: [Path(p) for p in value] for key, value in protected.items()}
+            protected.setdefault("source_frame", []).append(work / "source-frame.rgb")
+            protected.setdefault("encoder_state", []).append(directory / "native-checkpoint.json")
+            protected.setdefault("source_archive", []).append(Path(args.archive))
+            protected.setdefault("ground_truth", []).append(Path(args.manifest))
+            protected.setdefault("private_detector", []).extend((Path(args.balltrack_weight), Path(args.wasb_weights) / "wasb_tennis_best.pth.tar"))
+            receipt = measure(f"receiver.{kind}.{point}", lambda: k5d_isolated_receiver.replay(
+                wire, map_path, receive, config_path=Path(args.receiver_isolation_config),
+                config_sha256=args.receiver_isolation_config_sha256,
+                protected_paths=protected, producer_context=context))
+        else:
+            cmd = [sys.executable, "-m", "experiments.tennis.k5d_worker", "decode", "--wire", str(wire), "--resources", str(map_path), "--work-dir", str(receive)]
+            measure(f"receiver.{kind}.{point}", lambda: subprocess.run(cmd, check=True, capture_output=True, timeout=3600))
+            receipt = json.loads((receive / "receiver.json").read_text())
         if cost_pilot and kind == "dcvc":
             shutil.copyfile(receive / "native-decoder-report.json", directory / "receiver-native-decoder-report.json")
         parity = oracle.sha(Path(rec["decoded"])) == receipt["decoded_yuv_sha256"]

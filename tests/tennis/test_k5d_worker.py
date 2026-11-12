@@ -38,3 +38,63 @@ def test_resource_identifier_and_file_hash(tmp_path: Path) -> None:
     decoder.write_bytes(b"different")
     with pytest.raises(ValueError, match="invalid installed"):
         resource(stream(), mapping)
+
+
+def test_failed_isolated_native_persists_stderr_before_missing_preexec(tmp_path, monkeypatch):
+    import json
+    from experiments.tennis import k5d_worker as worker
+
+    decoder = tmp_path / 'decoder'
+    decoder.write_text('fixture')
+    work = tmp_path / 'result'
+    work.mkdir()
+    observation = {'nonce': 'n', 'namespace_pids': [7], 'namespaces': {'pid': 'private'}, 'birth': '9'}
+    (tmp_path / 'native-observer.json').write_text(json.dumps(observation))
+    stderr = b'x' * 5000 + b'actual startup failure'
+    class FailedProcess:
+        pid = 7
+        returncode = 73
+        def __enter__(self): return self
+        def __exit__(self, *args): return False
+        def communicate(self, **kwargs): return b'', stderr
+        def kill(self): pass
+        def wait(self): pass
+    monkeypatch.setenv('PYTHONPATH', '/reviewed')
+    monkeypatch.setattr(worker.subprocess, 'Popen', lambda *a, **kw: FailedProcess())
+    isolation = {'nonce': 'n', 'actual_policy': {'execute_files': [str(decoder)]},
+                 'namespaces': {'namespaces': {'pid': 'private'}}}
+    with pytest.raises(RuntimeError, match='actual startup failure'):
+        worker._execute_native([str(decoder)], work, isolation)
+    record = json.loads((tmp_path / 'native-process-result.json').read_text())
+    assert record['returncode'] == 73
+    assert record['stderr_bytes'] == len(stderr) and record['stderr_sha256'] == hashlib.sha256(stderr).hexdigest()
+    assert len(record['stderr_tail']) == 4096 and record['stderr_tail'].endswith('actual startup failure')
+    assert not (tmp_path / 'native-preexec.json').exists()
+
+
+def test_native_failure_before_observer_is_not_reported_as_timeout(tmp_path, monkeypatch):
+    import json
+    from experiments.tennis import k5d_worker as worker
+
+    decoder = tmp_path / 'decoder'
+    decoder.write_text('fixture')
+    work = tmp_path / 'result'
+    work.mkdir()
+    class FailedProcess:
+        pid = 7
+        returncode = 1
+        def __enter__(self): return self
+        def __exit__(self, *args): return False
+        def poll(self): return 1
+        def communicate(self, **kwargs): return b'', b'wrapper cannot import'
+        def kill(self): pass
+        def wait(self): pass
+    monkeypatch.setenv('PYTHONPATH', '/reviewed')
+    monkeypatch.setattr(worker.subprocess, 'Popen', lambda *a, **kw: FailedProcess())
+    isolation = {'nonce': 'n', 'actual_policy': {'execute_files': [str(decoder)]},
+                 'namespaces': {'namespaces': {'pid': 'private'}}}
+    with pytest.raises(RuntimeError, match='wrapper cannot import'):
+        worker._execute_native([str(decoder)], work, isolation)
+    record = json.loads((tmp_path / 'native-process-result.json').read_text())
+    assert record['returncode'] == 1 and record['stderr_tail'] == 'wrapper cannot import'
+    assert not (tmp_path / 'native-observer.json').exists()
