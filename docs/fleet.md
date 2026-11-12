@@ -698,6 +698,11 @@ GPU request `20261112T192044Z-461e16e8` expired unassigned; no GPU execution. Th
 a passing Ada parity/cost row, nor downstream study admission. RTX6000Ada is the
 best documented alternative for these models; the RTX8000 lacks this HT-L
 pipeline qualification, and GV100 has the upstream failure recorded above.
+Qualification37b3 then actually ran on exclusive gpu6 Ada but failed exact
+cross-class preparation equivalence: WASB coordinates and DCVC native/pixel
+hashes differed, while source YUV/scores and SVT hashes matched. Scoring was not
+reached; no quality conclusion. A separate prospective fresh Ada reference/repeat
+protocol is in preparation, without changing the old failed gate.
 The same-job DCVC rule below remains unchanged. See the
 [qualification card](cards/k5d-ada-qualification-2026-11-12.md).
 

@@ -13,16 +13,17 @@ and the legacy 200-GPU-hour study are outside scope. No new computation was run
 for this audit. Costs below are ceilings or historical charges where explicitly
 identified, not forecasts for an unprepared new job.
 
-## Current November12 alternate-GPU qualification
+## Current November 12 alternate-GPU qualification
 
-The user requested regular resource polling and a non-A6000 route. CPU proofd24d
-is accepted; Ada16 request `20261112T192044Z-461e16e8` expired unassigned and
-rootclosed350CPU/0GPU. No GPU parity or cost result exists. A separate bounded
-standing capacity phase started20:24UTC for native five-minute A6000/Ada
-checks, found idlegpu6 and published37b3, now running smoke with one canonicalwait. All exact reference
-checks remain; downstream Ada/scale admission is held.
+Native monitoring found idle gpu6 Ada and qualification37b3 ran, but failed
+exact cross-class reproduction. Source YUV/scores matched; WASB coordinate and
+DCVC native/pixel differences were localized from saved artifacts. Root closed
+the failed gate without a quality claim. A separately registered fresh Ada
+reference/repeat/cost protocol is in preparation, preserving accepted16 and the
+failed comparator. Passive five-minute capacity checks continue for at most
+45minutes while code/source/CPU proof are prepared; no automatic GPU dispatch.
 [Current handoff](../continuation-2026-11-12.md) and
-[standing card](../cards/k5d-standing-capacity-2026-11-12.md) are authoritative.
+[fresh card](../cards/k5d-ada-fresh-reference-2026-11-12.md) are authoritative.
 
 ## Historical November12 recovery update
 

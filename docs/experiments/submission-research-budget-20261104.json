@@ -462,7 +462,7 @@
       "release_stage": "larger stage2",
       "gpu_seconds": 0,
       "cpu_seconds": 77,
-      "basis": "ceil16.5004wholecreation\u2192terminal17+60external=77CPUupper. PIDs/CPUclaimabsent; failedbeforepacket onhost-specificNFSdeviceIDs, oldinode/contentnotnewlyverified."
+      "basis": "ceil16.5004wholecreation→terminal17+60external=77CPUupper. PIDs/CPUclaimabsent; failedbeforepacket onhost-specificNFSdeviceIDs, oldinode/contentnotnewlyverified."
     },
     {
       "phase": "explicit-gzip-source-transfer-probe-20261105",
@@ -488,7 +488,7 @@
       "release_stage": "larger stage2",
       "gpu_seconds": 0,
       "cpu_seconds": 223,
-      "basis": "ceil132.215wholecreation\u2192status133+90external223CPUupper. All75actualindependentdecodeproofs/rawSHA/ratesaudited; PID/CPUclaimabsent, sourcecleanupverified. No GPU/qualitypoint."
+      "basis": "ceil132.215wholecreation→status133+90external223CPUupper. All75actualindependentdecodeproofs/rawSHA/ratesaudited; PID/CPUclaimabsent, sourcecleanupverified. No GPU/qualitypoint."
     },
     {
       "phase": "w8-cpu-current-host-identity-20261105",
@@ -497,7 +497,7 @@
       "release_stage": "larger stage2",
       "gpu_seconds": 0,
       "cpu_seconds": 122,
-      "basis": "ceil61.5668creation\u2192terminal62+60external=122CPUupper; offlineauditall480 serializedfprints+2units+328sourcefiles+actualinputs+exactgrantsets/namespace/canaries. Originalvalidatorfailedorder,no fleetpassrelabeled; PIDs/claimabsent."
+      "basis": "ceil61.5668creation→terminal62+60external=122CPUupper; offlineauditall480 serializedfprints+2units+328sourcefiles+actualinputs+exactgrantsets/namespace/canaries. Originalvalidatorfailedorder,no fleetpassrelabeled; PIDs/claimabsent."
     },
     {
       "phase": "w7-shared-score-asset-preflight-20261105",
@@ -523,7 +523,7 @@
       "release_stage": "larger stage2",
       "gpu_seconds": 243,
       "cpu_seconds": 343,
-      "basis": "ceil142.133creation\u2192terminal143+100external=243GPU; plus100CPUexternal=343CPUconservativeupper. ModelconstructorstoppedbeforeVAEloadingonMAKE_SYMEACCES, no kernel/UUIDreceipt. Packet480/2unit/sourceproofpassedinscratchnotdurable; PIDs/PGID/claimsreleased."
+      "basis": "ceil142.133creation→terminal143+100external=243GPU; plus100CPUexternal=343CPUconservativeupper. ModelconstructorstoppedbeforeVAEloadingonMAKE_SYMEACCES, no kernel/UUIDreceipt. Packet480/2unit/sourceproofpassedinscratchnotdurable; PIDs/PGID/claimsreleased."
     },
     {
       "phase": "w7-historical-reuse-review-20261105",
@@ -730,7 +730,7 @@
       "release_stage": "larger stage2",
       "gpu_seconds": 0,
       "cpu_seconds": 180,
-      "basis": "Entire100campaign80external ceiling charged; independentf44597cd actualsource/spec/unshareexecPID/startticks/nspid/8caseproof and32PIDs+claimreleaseaccepted. Normal/directSIGKILLpass;SIGTERM/timeoutescalatedafter0.1s then-9, cleanup0.033\u20130.236s beforeexpiry. Syntheticonly; no native/CUDA/nestednamespace/productionqualification."
+      "basis": "Entire100campaign80external ceiling charged; independentf44597cd actualsource/spec/unshareexecPID/startticks/nspid/8caseproof and32PIDs+claimreleaseaccepted. Normal/directSIGKILLpass;SIGTERM/timeoutescalatedafter0.1s then-9, cleanup0.033–0.236s beforeexpiry. Syntheticonly; no native/CUDA/nestednamespace/productionqualification."
     },
     {
       "phase": "frozen-configured-checks-20261105",
@@ -781,7 +781,7 @@
       "gpu_seconds": 250,
       "cpu_seconds": 600,
       "release_stage": "research-first24/28",
-      "basis": "Conservative250GPUabove224.407screated\u2192terminalupdatedwhole-requestspan(includesqueue) and171.299ssupervisorlifetime. CPU600=remaining940minusunused340full3stepworkerallowance; retainsallone-stepworker340+validator30+admin120+postaudit100+contingency10 caps. Prior60proof+100freshreadinesschargedseparately: cumulative760CPU/250GPUphase. Actualone-stepcommand130.837s, gen109.494/packet6.460/parent13.253CPU; administrativeaggregateunmetered. OldcombinedcostgateFAILED,no3step. Rootindependentcanonicalstatus/rawseal/source/KERNEL/denialreview acceptedqualification-onlyscope."
+      "basis": "Conservative250GPUabove224.407screated→terminalupdatedwhole-requestspan(includesqueue) and171.299ssupervisorlifetime. CPU600=remaining940minusunused340full3stepworkerallowance; retainsallone-stepworker340+validator30+admin120+postaudit100+contingency10 caps. Prior60proof+100freshreadinesschargedseparately: cumulative760CPU/250GPUphase. Actualone-stepcommand130.837s, gen109.494/packet6.460/parent13.253CPU; administrativeaggregateunmetered. OldcombinedcostgateFAILED,no3step. Rootindependentcanonicalstatus/rawseal/source/KERNEL/denialreview acceptedqualification-onlyscope."
     },
     {
       "phase": "k5d-native-cpu-oracle-readiness-20261105",
@@ -858,7 +858,7 @@
       "gpu_seconds": 300,
       "cpu_seconds": 570,
       "release_stage": "research-first24/28",
-      "basis": "Contended64ef0bb9no1/3costpair. Conservative300GPUabove291.424created\u2192updatedwhole-requestspan(includesqueue) vs70.809ssupervisor; nohonesttimingclaim. FutureCPU1050minusunusedfull420/unusedvalidator60=570charged, prior50preparationseparate gives620phaseCPU; retainsoneattempt420+remainingexternal50+postaudit100; aggregateadminunmetered. ForeignPID3729578 causedstop, no seal/publishedsmoke/gate/full;allownPIDs/claimsabsent,eventsACK. Oldsource/specactuale66/e14/398verified; no retry."
+      "basis": "Contended64ef0bb9no1/3costpair. Conservative300GPUabove291.424created→updatedwhole-requestspan(includesqueue) vs70.809ssupervisor; nohonesttimingclaim. FutureCPU1050minusunusedfull420/unusedvalidator60=570charged, prior50preparationseparate gives620phaseCPU; retainsoneattempt420+remainingexternal50+postaudit100; aggregateadminunmetered. ForeignPID3729578 causedstop, no seal/publishedsmoke/gate/full;allownPIDs/claimsabsent,eventsACK. Oldsource/specactuale66/e14/398verified; no retry."
     },
     {
       "phase": "k5d-e64-source-cache-preparation-20261105",
@@ -948,7 +948,7 @@
       "gpu_seconds": 0,
       "cpu_seconds": 160,
       "release_stage": "research-first24/28",
-      "basis": "Rootconservative130CPU wholeone-core supervisorbirth1793926741.19\u2192canonicalterminal1793926861.887658=120.697658wall upper +30CPUindependentaudit. Prior40capability+50prep=90chargedseparately; nativeleaf250CPUtotal. Earlier220forecast preserved, accountingallowance increased30CPU insideunchangedfirsttranche, no additionalGPU/userceiling. Actual normalouter2.363826/PID1+children2.240979CPU; completeadministrativeCPUnotmetered, cap100campaignwasnotwholelifecyclebound. Rootverified18rawblobSHA/ready/spec/source/fourcauses/19PIDabsence/claims/ACK; scope nativeCPUmechanics only."
+      "basis": "Rootconservative130CPU wholeone-core supervisorbirth1793926741.19→canonicalterminal1793926861.887658=120.697658wall upper +30CPUindependentaudit. Prior40capability+50prep=90chargedseparately; nativeleaf250CPUtotal. Earlier220forecast preserved, accountingallowance increased30CPU insideunchangedfirsttranche, no additionalGPU/userceiling. Actual normalouter2.363826/PID1+children2.240979CPU; completeadministrativeCPUnotmetered, cap100campaignwasnotwholelifecyclebound. Rootverified18rawblobSHA/ready/spec/source/fourcauses/19PIDabsence/claims/ACK; scope nativeCPUmechanics only."
     },
     {
       "phase": "w8-paired-cost-bounded-queue-20261105-closure",
@@ -957,7 +957,7 @@
       "gpu_seconds": 400,
       "cpu_seconds": 550,
       "release_stage": "research-first24/28",
-      "basis": "W8wholeexclusiveGPUhold365.666\u2192400GPU, noarchivedattempts. Wholeinheritedonecore400CPU +50remainingexternal+100postaudit=550future,prior50prep =>600inclusive. Rootexactreceipt/scientific/terminalreviewaccepted; allownedPIDs/claimsabsent/eventsACK. Inheritedaffinityandexternalcapsconservative\u2014notmeasuredaggregate; cumulativechildCPUnotadded."
+      "basis": "W8wholeexclusiveGPUhold365.666→400GPU, noarchivedattempts. Wholeinheritedonecore400CPU +50remainingexternal+100postaudit=550future,prior50prep =>600inclusive. Rootexactreceipt/scientific/terminalreviewaccepted; allownedPIDs/claimsabsent/eventsACK. Inheritedaffinityandexternalcapsconservative—notmeasuredaggregate; cumulativechildCPUnotadded."
     },
     {
       "phase": "gvcrt-qp9-bounded-queue-20261105-closure",
@@ -966,7 +966,7 @@
       "gpu_seconds": 200,
       "cpu_seconds": 400,
       "release_stage": "research-first24/28",
-      "basis": "GVCfinalGPUhold180.541+twoCPUadmissionfailureholds0.755=181.296\u2192200GPU;thirdGPUreject0GPU. Wholeonecore200CPU+priorattempts10+remainingexternal/audit150+rounding40=400future,prior50prep=>450inclusive. Rootexactreceipt/scientific/terminalreviewaccepted; allownedPIDs/claimsabsent/eventsACK. Inheritedaffinityandexternalcapsconservative\u2014notmeasuredaggregate; cumulativechildCPUnotadded."
+      "basis": "GVCfinalGPUhold180.541+twoCPUadmissionfailureholds0.755=181.296→200GPU;thirdGPUreject0GPU. Wholeonecore200CPU+priorattempts10+remainingexternal/audit150+rounding40=400future,prior50prep=>450inclusive. Rootexactreceipt/scientific/terminalreviewaccepted; allownedPIDs/claimsabsent/eventsACK. Inheritedaffinityandexternalcapsconservative—notmeasuredaggregate; cumulativechildCPUnotadded."
     },
     {
       "phase": "k5d-parity16-preflight-blocked-20261106",
@@ -993,7 +993,7 @@
       "gpu_seconds": 0,
       "cpu_seconds": 160,
       "release_stage": "research-first24/28",
-      "basis": "Rootaccepted c09c exactd056/92fb/5f2c/env32e/wrapperdc909 with19rawblobhashes/all4nativecauses/CPUdelta0.123191/19PIDsabsent/emptyclaim/ACK/latercanonicalcomplete. Wholeinheritedonecorelifetime120.789687\u2192130CPU+30independentaudit=160future,prior50sourceprep=>210CPUinclusivevs300cap;90unusedreleasedwithinparent. Earlyrunningstatepreservednotusedasterminal. NocompleteaggregateadminCPUmeasurement; conservativeboundnotmeasuredCPU. NoGPU."
+      "basis": "Rootaccepted c09c exactd056/92fb/5f2c/env32e/wrapperdc909 with19rawblobhashes/all4nativecauses/CPUdelta0.123191/19PIDsabsent/emptyclaim/ACK/latercanonicalcomplete. Wholeinheritedonecorelifetime120.789687→130CPU+30independentaudit=160future,prior50sourceprep=>210CPUinclusivevs300cap;90unusedreleasedwithinparent. Earlyrunningstatepreservednotusedasterminal. NocompleteaggregateadminCPUmeasurement; conservativeboundnotmeasuredCPU. NoGPU."
     },
     {
       "phase": "w8-run-structure-preexecution-repairs-20261106",
@@ -1917,6 +1917,24 @@
       "cpu_seconds": 200,
       "basis": "Prospective entire200monitoradministrative allowance charged before release; watcher180countedguard+outer20, fixedcooperativequeries. SSHserver/login andaggregateprocess-treeCPUunmetered; no whole-host200guarantee. No model ortraining. OnefutureGPUphaseexternalreserve separatelyincludescanonicalCLI/doctor/wait/audit.",
       "release_stage": "research-first24/28-capacity-watch"
+    },
+    {
+      "phase": "ball-ada-37b3-closeout-20261112",
+      "parent_phase": "ball-opportunistic-capacity-20261112",
+      "workstream": "ball",
+      "gpu_seconds": 143,
+      "cpu_seconds": 493,
+      "basis": "Whole143secondrequestspan conservativeGPU/onecoreCPUupper +350externalCPU. Actualsmoke85.423s/83.206childCPU; aggregateadmin/GPUoccupancyunmetered. No scientificcost/scalepass.",
+      "release_stage": "research-first24/28-capacity-watch"
+    },
+    {
+      "phase": "ball-ada-fresh-source-and-passive-watch-20261112",
+      "parent_phase": "ball-ada-fresh-reference-20261112",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 150,
+      "basis": "Prospective50sourcepreparation+100passivenativeresourcewatchCPUcharged. Watch45min/5mininterval;inner80CPUfixedqueries+outer20allowance, noautoGPUdispatch. Samecounter/SSHDaggregateaccountinguncertaintyasreviewedwatch; no paidmodelcalls.",
+      "release_stage": "research-first24/28-independentAdaqualification"
     }
   ],
   "reservations": [
@@ -2251,7 +2269,7 @@
       "release_stage": "larger stage2",
       "gpu_seconds": 700,
       "cpu_seconds": 1000,
-      "status": "closed; ceil142.133creation\u2192terminal143+100external=243GPU; plus100CPUexternal=343CPUconservativeupper. ModelconstructorstoppedbeforeVAEloadingonMAKE_SYMEACCES, no kernel/UUIDreceipt. Packet480/2unit/sourceproofpassedinscratchnotdurable; PIDs/PGID/claimsreleased."
+      "status": "closed; ceil142.133creation→terminal143+100external=243GPU; plus100CPUexternal=343CPUconservativeupper. ModelconstructorstoppedbeforeVAEloadingonMAKE_SYMEACCES, no kernel/UUIDreceipt. Packet480/2unit/sourceproofpassedinscratchnotdurable; PIDs/PGID/claimsreleased."
     },
     {
       "phase": "w7-historical-reuse-review-20261105",
@@ -2507,9 +2525,19 @@
       "phase": "ball-opportunistic-capacity-20261112",
       "workstream": "ball",
       "release_stage": "research-first24/28-capacity-watch",
-      "gpu_seconds": 1000,
-      "cpu_seconds": 1200,
-      "status": "Remaining_unspent; max1000GPU/1200CPUonefrozenA6000(or1150Ada) attempt triggered by standingwatch; no scale/retry"
+      "gpu_seconds": 0,
+      "cpu_seconds": 0,
+      "status": "Closed;143GPU493CPUjob+200CPUmonitorcharged; unused857GPU707CPUreleased",
+      "released_unspent_gpu_seconds": 857,
+      "released_unspent_cpu_seconds": 707
+    },
+    {
+      "phase": "ball-ada-fresh-reference-20261112",
+      "workstream": "ball",
+      "release_stage": "research-first24/28-independentAdaqualification",
+      "gpu_seconds": 1400,
+      "cpu_seconds": 1950,
+      "status": "Remaining_unspent;50prep100passivemonitorprecharged; pending250CPUproof+1600GPUphaseCPU+100monitorreserve; GPUunreleased"
     }
   ],
   "jobs": [
@@ -4732,7 +4760,7 @@
       "job_id": "20261112T202503Z-37b3b79b",
       "phase": "ball-opportunistic-capacity-20261112",
       "subphase": "Ada21482exclusive16qualification",
-      "state": "running;pending root terminal review",
+      "state": "failedexactcrossclassprepareparity;rootacceptednegative",
       "revision": "21482f35c2d5d1d476d5e9cf099151c69c597a9c",
       "source_sha256": "9e2376330c76eab979efbe0a3f8dcf21175f5e9d470a6b1219cf8c39e823fa0a",
       "snapshot_sha256": "5fd841f7e2fc718fb198a7f47a5e737e4cbbc88f1793e6574883dd7cd9fcc3cd",
@@ -4758,8 +4786,38 @@
       "local_storage_gib": 32,
       "scope": "One frozen exclusive Ada 16-frame qualification; no further submission or automatic promotion.",
       "local_batch": "/private/tmp/pointstream-ada-37b3-20261112",
-      "wait_state": "solecanonicalwaitactive;clientPID21329/backend40593",
-      "wait_handle": "/private/tmp/pointstream-ada-37b3-20261112/"
+      "wait_state": "solewaitended;rootacceptedfailedexactcrossclassparity;bothcanonicaleventsACKed",
+      "wait_handle": "/private/tmp/pointstream-ada-37b3-20261112/",
+      "terminal_GPU_charge": 143,
+      "terminal_CPU_charge": 493,
+      "qualification_executed": true,
+      "qualification_passed": false,
+      "recovery_receipt": "docs/experiments/k5d-inputs/ada-37b3-root-closeout-20261112.json"
+    },
+    {
+      "job_id": "20261112T204701Z-6c0c0a86",
+      "phase": "ball-ada-fresh-reference-20261112",
+      "subphase": "new-source-native-CPU-proof",
+      "state": "pending; root review required",
+      "revision": "bbe94eddde3e8596b98d93667b3ffbdeaed184a6",
+      "source_sha256": "ed89052108dbd4a8242d7fd7ae35ac37aa1f41332d204a4d11e9d7b799bf715d",
+      "snapshot_sha256": "4f7f6546b7eb4552ea77b8d1607a0ccc68c7ae42e73965a70a2902f40f4e7402",
+      "source_archive": true,
+      "spec_sha256": "b8868b5c561af89bbdd0591ecabd0fb21ffa314a72aef689fa9a8c5290c24e12",
+      "raw_spec_sha256": "1c532d6fa93cae4c725fb625a9b9c937fa11c3c2c74accd5388896b9a2dd4731",
+      "deadline": "2026-11-12T21:26:06.069711+00:00",
+      "hosts": [
+        "gpu2"
+      ],
+      "future_GPU": 0,
+      "future_CPU": 250,
+      "campaign": 100,
+      "postcampaign_CPU": 100,
+      "audit_CPU": 30,
+      "contingency_CPU": 20,
+      "scope": "One native CPU containment proof for frozen source; no GPU or automatic promotion.",
+      "local_batch": "/private/tmp/pointstream-ada-fresh-cpu-run-20261112",
+      "wait_state": "one canonical wait pending"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -4767,30 +4825,31 @@
     "Every job is recorded before one bounded fleet wait.",
     "All-in initial and workstream limits include failed starts, staging, validations, monitoring and release.",
     "Never replay an unknown request.",
-    "Root20261105prospectivelytransferred560CPUsharedreserve\u2192svt_gaps: workstream3260CPUand4840CPU, global86400unchanged; no newuserallocation.",
+    "Root20261105prospectivelytransferred560CPUsharedreserve→svt_gaps: workstream3260CPUand4840CPU, global86400unchanged; no newuserallocation.",
     "CompressedtransferfreshCPUallowances20261105",
-    "Rootprospective240CPUshared\u2192SVT for separatemanifest-cadenceprofileafterall75framingoraclepassed; old50fps9240failureclosed, no changedinput/quality/gate. SVT3560/shared4540CPUglobal86400unchanged, futurequality1670CPUretained.",
+    "Rootprospective240CPUshared→SVT for separatemanifest-cadenceprofileafterall75framingoraclepassed; old50fps9240failureclosed, no changedinput/quality/gate. SVT3560/shared4540CPUglobal86400unchanged, futurequality1670CPUretained.",
     "ExplicitgzipSVT60CPUtransfer20261105",
     "Root20261105userapprovedpending24GPUh/28CPUh (+14400/+14400seconds), assigned increase toball:64800GPU72000CPU. Firstnewtranche9000GPU10800CPU requiresperjobrelease; nofull30automaticadmission. Manuscripteditspauseduntilworthwhileresearchdecisionsresolved.",
-    "Root20261105prospectivelyraisesW8clockcostphaseCPU1000\u21921100insideexistingW8/programmeCPUcap, specifically100postrunauditafterfreshreadinessconsumed100external. Existingnumericcaps/source/scientificgatesunchanged; configured930includesalreadycharged100readiness, futureconfigured830. Futurephase940CPU700GPU, cumulative160chargedCPU+940=1100.",
-    "RootCPUproofsubcap100\u2192150withinGVC2200, noaggregate/workstreamincrease; 20readinesscharged, futureproof130inclusive. Remaining2180CPUopenGVCaggregateincludesit\u2014nodooublecount.",
+    "Root20261105prospectivelyraisesW8clockcostphaseCPU1000→1100insideexistingW8/programmeCPUcap, specifically100postrunauditafterfreshreadinessconsumed100external. Existingnumericcaps/source/scientificgatesunchanged; configured930includesalreadycharged100readiness, futureconfigured830. Futurephase940CPU700GPU, cumulative160chargedCPU+940=1100.",
+    "RootCPUproofsubcap100→150withinGVC2200, noaggregate/workstreamincrease; 20readinesscharged, futureproof130inclusive. Remaining2180CPUopenGVCaggregateincludesit—nodooublecount.",
     "Userresourcequestionpending20261105: canuserarrange~1hexclusiveAdaongpu5orpreferboundedqueues? Raisedafter64efforeigncontention; independentball/GVCcontinue. NoW8retryauthorizedwhileawaitingcapacitydecision. Localconfiguredsoftwarechecks07f8Ruff/mypy542PASS/pytest1898pass37skip1docformatfailure; docfixed/focused3PASS, CIpublicationnext. Ordinarysoftwarechecksnotnewinferencechargespercard.",
-    "AUTHORITATIVERESERVATIONSEMANTICS: everyopenreservationamountisREMAINING_UNSPENT; rootreducesitwhenchargesareadded. Sumcurrentopenamountsdirectly; NEVERsubtractphase/parentchargesagain. Closedhistoricalrowsignored. Auditedattestationmustmatchexactactivephase\u2192remainingmapping.",
+    "AUTHORITATIVERESERVATIONSEMANTICS: everyopenreservationamountisREMAINING_UNSPENT; rootreducesitwhenchargesareadded. Sumcurrentopenamountsdirectly; NEVERsubtractphase/parentchargesagain. Closedhistoricalrowsignored. Auditedattestationmustmatchexactactivephase→remainingmapping.",
     "User20261105resourceanswer: Keep using bounded fleet queues. Root opens ONEfresh W8paired900GPU1100CPU and ONEfreshGVCQP9 900GPU1000CPU inclusive; metadata<=50CPUeach first, rootreleasepending, no changedsource/math/gates orfullwitness. Prior64ef/2f65contendedattemptsclosedandpreserved. Allremaining_unspent semantics unchanged.",
-    "Rootnativeproofaccountingamendment20261106: original220CPUleafprospectiveforecastwasnotprovencompletebecausemanager/publicationpostcampaignnotmetered. Wholeone-core120.698wallupper\u2192130CPU+30audit revisesleaf250CPU including90prior, allinsideunchangedballtranche/programme/workstream. No newGPU/computation oruserceilingincrease.",
+    "Rootnativeproofaccountingamendment20261106: original220CPUleafprospectiveforecastwasnotprovencompletebecausemanager/publicationpostcampaignnotmetered. Wholeone-core120.698wallupper→130CPU+30audit revisesleaf250CPU including90prior, allinsideunchangedballtranche/programme/workstream. No newGPU/computation oruserceilingincrease.",
     "Root20261112conditionalONEpost-outagecorrected16release: source0bb/450d/21cd, spec81579349/raw5b1b8192, deadline17:46:24.716400UTC.1000GPU/1200futureCPU nested inexistingBall7920/2250;400externalincluded. Passingfreshdoctor/localpath/SHAreadinessrootreviewed. Noautomaticretry/scale. ExactnewIDwillberecordedonce; no replayuncertainty.",
     "Root20261112partial-pool operational correction: one new submission may use isolatedlocalconfig hosts[gpu5,gpu2,gpu3], samebase/workeridentities, originalscientifichosts gpu2/3 andsource0bb. Allparticipating-hostsharedvisibility/atomicchecks mandatory; globalconfig/workers unchanged.1000GPU/1200futureCPU incl400external nested inBall7920GPU/1850CPU; no automaticretryifpartialreadinessfails. OldfailedcommandcreatednoID, never a replay.",
     "User20261112explicitlyrequestsregularresourcepolls andnonA6000task. Native5min<=45minwatchmayreportpotentialidleA6000/Ada, neverexecutesjoborweakensfleetgates. No recurringLLM/automation. Opt-inAdaimplementationmaybeprepared, butfreshCPUproof/exclusiveexactreferenceparity/costgatesandbudgetsrequired; noautoAda/fullstudyadmission.",
-    "Root20261112prospectivelyallocates separate Ball1000GPU/1400CPU:200nativewatch+max1200oneA6000(or1150Ada) attempt. Prior461e closedexpired no scientificexecution. No transfer/outerceilingincrease, no newscience/numericthreshold/reference or automaticretry. UnspentBallworkstream covers newreservation; monitorSSHserver/login CPUunmetered, CLIadministrative costs in GPUexternal reserve."
+    "Root20261112prospectivelyallocates separate Ball1000GPU/1400CPU:200nativewatch+max1200oneA6000(or1150Ada) attempt. Prior461e closedexpired no scientificexecution. No transfer/outerceilingincrease, no newscience/numericthreshold/reference or automaticretry. UnspentBallworkstream covers newreservation; monitorSSHserver/login CPUunmetered, CLIadministrative costs in GPUexternal reserve.",
+    "RootprospectivefreshAdaqualification1400GPU2100CPUinsideunchangedBall/programmeceilings, after37b3read-onlyauditlocalizedexactcrossclassdifferences. Existingaccepted16/referencevalidatorunchanged; sourceprep/nativeCPUproof,rootreviewandcompleteforecastrequired beforefreshsixpoint16repeat/scoring. Noscale/papermanuscript/training/newproviderrelease. Carddocs/cards/k5d-ada-fresh-reference-2026-11-12.md."
   ],
   "monitoring": {
-    "mode": "one_canonical_fleet_wait_after_native_resource_candidate",
-    "state": "Resourcewatchstoppedfirsttickidle gpu6; actual37b3runningAda smoke, solecanonicalwaitclient21329/session40593. No recurringAI/secondwatch/retry/promotion.",
+    "mode": "bounded_passive_native_resource_checks",
+    "state": "Passive4host5minchecks<=45wallminutes;PID22535,start20:36:36UTC,max21:21:36UTC;noautosubmit.37b3failedrootacceptedandACKed;solefleetwaitended. FreshAdacodepreparationonly.",
     "jobs": [
-      "20261112T202503Z-37b3b79b"
+      "20261112T204701Z-6c0c0a86"
     ],
     "batches": [
-      "/Users/manu/.cache/pointstream-resource-watch-20261112-standing/run"
+      "/Users/manu/.cache/pointstream-resource-watch-20261112-passive/"
     ],
     "native_completion_resume_verified": false,
     "recurring_llm_polling": false,

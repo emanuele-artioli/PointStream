@@ -1,35 +1,63 @@
 # Continuation — November 12, restored fleet access
 
-## Current state — idle gpu6 found; Ada qualification running on gpu6
+## Current state — Ada cross-class failure retained; fresh protocol in preparation
 
-Root independently closed `20261112T192044Z-461e16e8` EXPIRED unassigned: no
-execution, GPU charge or Ada parity result. Canonical event acknowledged.
-[Closeout](experiments/k5d-inputs/ada-461e-root-closeout-20261112.json).
-Programme charges19,362GPU/49,681CPU; old Ball reservation7,920GPU/800CPU,
-W8 4,550GPU/929CPU. A **separate prospective** Ball phase reserves1,000GPU/
-1,200CPU remaining (200monitoring already charged; max1,200one fixed A6000 test or1,150Ada test), within
-unchanged Ball64,800GPU/72,000CPU and programme86,400GPU/100,800CPU ceilings.
+Root closed **`20261112T202503Z-37b3b79b`** FAILED and acknowledged both events.
+It actually ran on exclusive gpu6 Ada, source21482/archive5fd8, and prepared all
+six points. Saved source YUV and source scores match the A6000 reference, but
+15/16 WASB row coordinates differ slightly. All three SVT points match native/
+wire/decoded/rendered hashes; all three DCVC points differ. Final scoring never
+ran. This fails exact cross-class reproduction; it is not a quality result.
+[Root closeout](experiments/k5d-inputs/ada-37b3-root-closeout-20261112.json).
+Observed worker/init/supervisor PIDs, group and claims absent. Charge143GPU/
+493CPU conservatively; prior monitoring200CPU separately charged. Earlier461e
+expired unassigned and is also closed/acknowledged. No GPU job or fleet wait is
+active, and the one-submit controller has ended. Never restart/replay it.
 
-The machine-only watcher started20:24:21UTC, controllerPID21084, and **stopped
-on its first20:24:45UTC tick**: gpu6index0 RTX6000Ada was idle (1MiBused,
-48,645MiBfree,util0,no computePID). Allfour host probes succeeded; A6000gpu2/3
-and Adagpu5 were occupied. Root accepted the live tick and8fixtures; exact
-seal9e9ace75 matches all released files. The one canonical request **`20261112T202503Z-37b3b79b`** is now running
-smoke on gpu6, exclusive Ada, source21482/tree9e2376/archive5fd8,
-source_archive:true. Canonical specc7e3cce7/raw4d6c79c0 differs only in deadline
-**2026-11-12T21:04:45.903087UTC**. Max1,000GPU/1,150CPU including350external.
-One canonicalwait2500, clientPID21329/backend40593; outputs/handle
-`/private/tmp/pointstream-ada-37b3-20261112/`. Runner attending; no secondwait.
-The standing controller ended after publishing and copied the default jobrecord.
-No second watcher, retry or automatic scale promotion. ActualnewID must be
-read from the Balljournal, then canonical status before any action.
-[Standing card](cards/k5d-standing-capacity-2026-11-12.md).
-CPU-only proofd24d remains accepted; Ada GPU qualification is unresolved.
-Originalwatch maximum was2026-11-13T00:24:21UTC; it already stopped oncandidate. Launch/runstate and once-only flags:
-`/Users/manu/.cache/pointstream-resource-watch-20261112-standing/`.
-No verified agent completion wake; desktopnoticeonly. Inspect run/state.json
-and actualjournalID before fleetactions; do not restart this controller.
-Older pending/wait instructions below are historical and superseded.
+Root registered a **separate** [fresh Ada protocol](cards/k5d-ada-fresh-reference-2026-11-12.md)
+before further inference: complete six-point16 A with a conditional independently
+initialized B on the same Ada/fleet job, exact same-class repeatability, unchanged
+source pixels/labels, original thresholds, actual bytes, source-hidden receivers
+and real metrics/judges. Existing accepted16/failed strict gate remain unchanged.
+A complete-cost gate must fit B with1.5margin, setup/validator/reserves. No scale
+release follows. Builder `ada_fresh_reference_builder` is implementing on isolated
+branch `codex/ball-ada-fresh-reference-20261112` in
+`/private/tmp/pointstream-ball-ada-fresh-reference-20261112`, based21482. Frozen scientific source is now bbe94eddde3e8596b98d93667b3ffbdeaed184a6:
+sourceed89052108dbd4a8242d7fd7ae35ac37aa1f41332d204a4d11e9d7b799bf715d,
+archive4f7f6546b7eb4552ea77b8d1607a0ccc68c7ae42e73965a70a2902f40f4e7402,
+MAIN32e. Root reviewed all five changed source/test files; actual archive bridge
+has1,340unchanged files/52changed paths/8pinned patches and is approved SHA
+0c32187b4a16d4b047c95c16c6145e973abcbdc9e4d9a165edbb6efcbb59ab0f.
+Root integrated code as3b0b8caf/808a3481; full local checks2,134passed/40skipped,
+Ruff and mypy581 pass. New native CPU proof was released at250CPU/0GPU;
+runnerpreflight passed gpu5/gpu2 doctor, CPU0claim empty, separateSSD1.90TB,
+actualnative/tool/input/cache hashes. Actual CPU proof **`20261112T204701Z-6c0c0a86`** is pending/running;
+canonical specb8868b5c, source_archive:true, deadline21:26:06.069711UTC,
+max250CPU/0GPU. One canonicalwait2500 backend25026, clientPID/outputs
+`/private/tmp/pointstream-ada-fresh-cpu-run-20261112/`. ActualID/source/spec are
+in Balljournal and ledger before waiting. Do not submit or wait again.
+Source proof/root GPU release remain pending. Raw preparation `/private/tmp/pointstream-ada-fresh-bbe94edd-20261112/`.
+No new GPU run is currently released.
+
+Passive resource checks remain active, every5minutes for<=45wallminutes:
+PID22535, start20:36:36UTC, maximum21:21:36UTC; no autosubmit or model turns.
+State/logs `/Users/manu/.cache/pointstream-resource-watch-20261112-passive/`.
+Inner80countedCPU plus20outer allowance is conservatively charged100CPU;
+unmetered SSHserver/login substrate means no whole-host CPU bound is claimed.
+Source preparation50CPU also precharged. Programme now **19,505GPU/50,324CPU**
+of86,400/100,800. Remaining oldBall7,920GPU/800CPU; new freshAda1,400GPU/1,950CPU
+includes250CPUproof+1,600futureGPUstageCPU+100unusedmonitorreserve. W8 remains
+4,550GPU/929CPU and held for its complete-cost gate; shared1CPU uncharged.
+No paid services, training, manuscript/PRESLEY change or submission.
+
+Durable closed37b3 evidence: `/Users/manu/.cache/pointstream-evidence/ada-crossclass-20261112-a5/`,41read-onlyfiles+SHAmanifest.
+Current raw37b3 audit `/private/tmp/pointstream-ada-37b3-20261112/`, including
+paired prepared/reference JSON and cleanup proofs; root recomputed comparisons.
+Durable source worktrees for0bb/21482/f7 live under
+`/Users/manu/.cache/pointstream-source-worktrees/`. Existing source/model/data
+archives and all earlier evidence remain preserved. Before any fleet action,
+copy the actual ID from Ball experiment journal and run canonical status.
+Older running/pending instructions below are historical, not current commands.
 
 ## Historical alternate-GPU qualification — closed expired
 

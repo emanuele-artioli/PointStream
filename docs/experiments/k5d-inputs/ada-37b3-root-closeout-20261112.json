@@ -1,0 +1,24 @@
+{
+  "job_id": "20261112T202503Z-37b3b79b",
+  "recorded_utc": "2026-11-12T20:32:51.179437+00:00",
+  "root_decision": "FAILED exact cross-class parity; no scored quality conclusion. Source scores/YUV same,15of16WASBx/yrows differ; threeSVT point hashes same, threeDCVCnative/wire/decoded/rendered different. Existingstrictgateunchanged; noautomaticpromotion.",
+  "canonical_status_independently_checked": "failed;gpu6exclusiveAda;smokexit1;gate null",
+  "creation_to_terminal_wall_seconds": 141.99993419647217,
+  "GPU_charge": 143,
+  "CPU_charge": 493,
+  "basis": "Whole143secondrequestspan conservativeGPU/onecoreCPUupper +350externalCPU. Actualsmoke85.423s/83.206childCPU; aggregateadmin/GPUoccupancyunmetered. No scientificcost/scalepass.",
+  "audit_candidate_sha256": "2bad4e0fd2f29266e64546fca4fb94186059ccee0a2a4d3af9567090a96988b4",
+  "cleanup": {
+    "all_observed_pids_absent": true,
+    "campaign_group_absent": true,
+    "cpu_claim_job_absent": true,
+    "device_claim_job_absent_in_discovered_files": true
+  },
+  "failed_guard": "prepare source or converted pixels differ from accepted16; now localizedusingactualsavedoutputs",
+  "next_scientific_option": "Separate prospectivelyregisteredAda reference/repeat study; neverreplaceoldaccepted16 orrelaxfailedgate. Sourcepixel/labelidentity,actualbytes andwithineachfreshencodejob receiverparityremainmandatory.",
+  "unacknowledged_event_ids": [
+    "5bdf57d144c15d74b9fb57b4c9c34a6f",
+    "3e39d55c57d85af8985be177671b3402"
+  ],
+  "terminal_and_decision_events_acknowledged": true
+}
