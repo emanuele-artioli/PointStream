@@ -12,6 +12,7 @@ import os
 import struct
 import subprocess
 import sys
+import time
 from fractions import Fraction
 from pathlib import Path
 from typing import Any
@@ -56,7 +57,7 @@ def validate_native_header(stream: ball_stream.Stream) -> None:
             raise ValueError("DCVC header differs from PSBL")
 
 
-def decode(wire_path: Path, map_path: Path, work: Path) -> dict[str, Any]:
+def decode(wire_path: Path, map_path: Path, work: Path, *, isolation: dict[str, Any] | None = None) -> dict[str, Any]:
     """Decode persisted native bytes and render persisted symbols with no source inputs."""
     import numpy as np
     from experiments.tennis import windows as tw
@@ -74,10 +75,28 @@ def decode(wire_path: Path, map_path: Path, work: Path) -> dict[str, Any]:
     native = work / ("native.ivf" if stream.codec == "svt-av1-ivf" else "native.psdc")
     native.write_bytes(stream.native)
     decoded = work / "native.yuv"
+    def execute(command: list[str], **kwargs: Any) -> None:
+        if isolation is None:
+            subprocess.run(command, check=True, capture_output=True, timeout=3600, **kwargs)
+            return
+        with subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                              close_fds=True, **kwargs) as process:
+            try:
+                birth = time.monotonic_ns()
+                _, stderr = process.communicate(timeout=3600)
+            except BaseException:
+                process.kill()
+                process.wait()
+                raise
+            isolation["decoder"] = {"pid": process.pid, "birth": birth, "argv": command,
+                                    "returncode": process.returncode}
+            if process.returncode:
+                raise RuntimeError(f"native decoder failed: {process.returncode}: {stderr[-1000:]!r}")
+
     if stream.codec == "svt-av1-ivf":
         from src.codecs.svtav1 import decode_command
         command = decode_command(installed["decoder"], native, decoded, threads=1)
-        subprocess.run(command, check=True, capture_output=True, timeout=3600)
+        execute(command)
     else:
         from src.codecs.dcvc_uf_worker import dcvc_command
         plan = {"structure": "htl", "src_type": "yuv420", "container": str(native), "out_file": str(decoded),
@@ -86,7 +105,7 @@ def decode(wire_path: Path, map_path: Path, work: Path) -> dict[str, Any]:
         plan_path = work / "receiver-plan.json"
         plan_path.write_text(json.dumps(plan))
         command, env, cwd = dcvc_command(Path(sys.prefix), "decode", plan_path, work / "native-decoder-report.json")
-        subprocess.run(command, env={**os.environ, **env}, cwd=cwd, check=True, capture_output=True, timeout=3600)
+        execute(command, env={**os.environ, **env}, cwd=cwd)
         decoder_report = json.loads((work / "native-decoder-report.json").read_text())
         if not decoder_report.get("deterministic") or decoder_report.get("frame_count") != stream.frames:
             raise ValueError("DCVC decoder determinism or frame count failed")
@@ -105,6 +124,11 @@ def decode(wire_path: Path, map_path: Path, work: Path) -> dict[str, Any]:
                "rendered_rgb_sha256": sha(output), "frames": stream.frames, "size": [stream.width, stream.height],
                "fps": str(stream.fps), "codec": stream.codec, "resource_id": stream.resource_id,
                "resource_map_sha256": sha(map_path), "colour_conversion": "limited-range YUV420 to RGB, BT.709"}
+    if isolation is not None:
+        from experiments.tennis.k5d_isolated_receiver import SCOPE, verify_receipt
+        receipt["scope"] = SCOPE
+        receipt["isolation"] = isolation
+        verify_receipt(receipt, expected_context=isolation["context"], expected_config_sha256=isolation["config_sha256"])
     (work / "receiver.json").write_text(json.dumps(receipt, indent=2) + "\n")
     return receipt
 

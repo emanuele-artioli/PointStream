@@ -1,0 +1,61 @@
+"""Unit tests only: these do not establish a Linux isolation witness."""
+import errno
+import hashlib
+from pathlib import Path
+from typing import Any
+
+import pytest
+
+from experiments.tennis import k5d_isolated_receiver as isolated
+
+
+def row(path: Path) -> dict[str, object]:
+    return {'sha256': hashlib.sha256(path.read_bytes()).hexdigest(), 'size': path.stat().st_size}
+
+
+def test_inventory_rejects_escape_and_changed_bytes(tmp_path: Path) -> None:
+    root = tmp_path / 'source'
+    root.mkdir()
+    item = root / 'worker.py'
+    item.write_bytes(b'code')
+    assert isolated._manifest(root, {'worker.py': row(item)}) == [item]
+    with pytest.raises(ValueError):
+        isolated._manifest(root, {'../other': row(item)})
+    old = row(item)
+    item.write_bytes(b'evil')
+    with pytest.raises(ValueError):
+        isolated._manifest(root, {'worker.py': old})
+    alias = root / 'alias'
+    alias.symlink_to(item)
+    with pytest.raises(ValueError):
+        isolated._manifest(root, {'alias': row(item)})
+
+
+def test_protected_requires_real_positive_files(tmp_path: Path) -> None:
+    target = tmp_path / 'source'
+    target.write_bytes(b'private')
+    paths = {category: [target] for category in isolated.CATEGORIES}
+    evidence, flat = isolated._protected(paths)
+    assert len(flat) == 5 and evidence['source_frame'][0]['sha256'] == row(target)['sha256']
+    paths['ground_truth'] = [tmp_path / 'missing']
+    with pytest.raises(ValueError):
+        isolated._protected(paths)
+
+
+def test_receipt_rejects_legacy_and_incomplete_proof() -> None:
+    with pytest.raises(ValueError):
+        isolated.verify_receipt({'scope': 'fresh packet-path replay; filesystem isolation NOT established'},
+                                expected_context={}, expected_config_sha256='a' * 64)
+    proof: dict[str, Any] = {'context': {}, 'config_sha256': 'a' * 64, 'landlock_abi': 3,
+             'handled_mask': isolated.leaves.handled_rights(3), 'threads': 1, 'extra_fds': False,
+             'pid': 9, 'postexec_pid': 9, 'birth': '2', 'postexec_birth': '2',
+             'decoder': {'pid': 10, 'returncode': 0},
+             'denials': {k: [{'errno': errno.EACCES, 'path': '/real', 'inode': 2, 'sha256': 'a' * 64}]
+                         for k in isolated.CATEGORIES}}
+    receipt = {'scope': isolated.SCOPE, 'isolation': proof,
+               **{k: 'b' * 64 for k in ('wire_sha256', 'resource_map_sha256', 'native_sha256',
+                                        'decoded_yuv_sha256', 'rendered_rgb_sha256')}}
+    assert isolated.verify_receipt(receipt, expected_context={}, expected_config_sha256='a' * 64) is proof
+    proof['denials']['source_frame'][0]['errno'] = errno.ENOENT
+    with pytest.raises(ValueError):
+        isolated.verify_receipt(receipt, expected_context={}, expected_config_sha256='a' * 64)
