@@ -193,6 +193,9 @@ def _birth() -> str:
 def _denials(evidence: dict[str, list[dict[str, Any]]]) -> None:
     for rows in evidence.values():
         for row in rows:
+            info = os.stat(row['path'])
+            if (info.st_dev, info.st_ino) != (row['device'], row['inode']):
+                raise ValueError('protected target identity changed before denial probe')
             try:
                 with open(row['path'], 'rb') as f:
                     f.read(1)
