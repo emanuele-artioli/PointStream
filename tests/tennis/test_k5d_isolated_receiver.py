@@ -48,7 +48,7 @@ def test_receipt_rejects_legacy_and_incomplete_proof() -> None:
                                 expected_context={}, expected_config_sha256='a' * 64)
     proof: dict[str, Any] = {'context': {}, 'config_sha256': 'a' * 64, 'landlock_abi': 3,
              'handled_mask': isolated.leaves.handled_rights(3), 'threads': 1, 'extra_fds': False,
-             'pid': 9, 'postexec_pid': 9, 'birth': '2', 'postexec_birth': '2',
+             'pid': 1, 'postexec_pid': 1, 'birth': '2', 'postexec_birth': '2',
              'decoder': {'pid': 10, 'returncode': 0, 'started_monotonic_ns': 1,
                          'argv': ['/native'], 'executable_resolved': '/native',
                          'argv_sha256': isolated._object_sha(['/native'])},
@@ -56,7 +56,13 @@ def test_receipt_rejects_legacy_and_incomplete_proof() -> None:
              'actual_policy': {}, 'actual_policy_sha256': isolated._object_sha({}),
              'denials': {k: [{'errno': errno.EACCES, 'path': '/real', 'inode': 2, 'sha256': 'a' * 64}]
                          for k in isolated.CATEGORIES}}
-    proof['actual_policy'] = {'execute_files': ['/native'], 'context': {}, 'pid': 9, 'birth': '2', 'handled_mask': proof['handled_mask'],
+    ns = {k: k + '-inner' for k in ('user', 'pid', 'mnt', 'ipc')}
+    proof['namespaces'] = {'private_proc': True, 'initial_pids': [1], 'namespaces': ns,
+                           'parent_namespaces': {k: k + '-outer' for k in ns}}
+    proof['worker_observer'] = {'birth': '2', 'namespaces': ns}
+    proof['decoder']['outer_observation'] = {'namespace_pids': [10], 'namespaces': ns, 'birth': '3'}
+    proof['actual_policy'] = {'private_proc_read_only': True, 'namespaces': proof['namespaces'],
+                              'execute_files': ['/native'], 'context': {}, 'pid': 1, 'birth': '2', 'handled_mask': proof['handled_mask'],
                               'denials': {k: [{x: y for x, y in row.items() if x != 'errno'} for row in rows]
                                           for k, rows in proof['denials'].items()}}
     proof['actual_policy_sha256'] = isolated._object_sha(proof['actual_policy'])
@@ -64,6 +70,10 @@ def test_receipt_rejects_legacy_and_incomplete_proof() -> None:
                **{k: 'b' * 64 for k in ('wire_sha256', 'resource_map_sha256', 'native_sha256',
                                         'decoded_yuv_sha256', 'rendered_rgb_sha256')}}
     assert isolated.verify_receipt(receipt, expected_context={}, expected_config_sha256='a' * 64) is proof
+    proof['decoder']['outer_observation']['namespace_pids'] = [11]
+    with pytest.raises(ValueError):
+        isolated.verify_receipt(receipt, expected_context={}, expected_config_sha256='a' * 64)
+    proof['decoder']['outer_observation']['namespace_pids'] = [10]
     proof['denials']['source_frame'][0]['errno'] = errno.ENOENT
     with pytest.raises(ValueError):
         isolated.verify_receipt(receipt, expected_context={}, expected_config_sha256='a' * 64)

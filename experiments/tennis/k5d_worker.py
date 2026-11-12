@@ -87,13 +87,23 @@ def decode(wire_path: Path, map_path: Path, work: Path, *, isolation: dict[str, 
                               close_fds=True, **kwargs) as process:
             try:
                 birth = time.monotonic_ns()
+                observer_path = work.parent / "native-observer.json"
+                deadline = time.monotonic() + 30
+                while not observer_path.is_file():
+                    if time.monotonic() >= deadline:
+                        raise RuntimeError("outer native decoder observation missing")
+                    time.sleep(0.01)
+                observation = json.loads(observer_path.read_text())
+                if (observation.get("namespace_pids", [])[-1:] != [process.pid]
+                        or observation.get("namespaces") != isolation["namespaces"]["namespaces"]):
+                    raise ValueError("native decoder observer identity differs")
                 _, stderr = process.communicate(timeout=3600)
             except BaseException:
                 process.kill()
                 process.wait()
                 raise
             isolation["decoder"] = {"pid": process.pid, "started_monotonic_ns": birth, "argv": command,
-                                    "executable_resolved": resolved_executable,
+                                    "executable_resolved": resolved_executable, "outer_observation": observation,
                                     "argv_sha256": hashlib.sha256(json.dumps(command, separators=(",", ":")).encode()).hexdigest(),
                                     "returncode": process.returncode}
             if process.returncode:
