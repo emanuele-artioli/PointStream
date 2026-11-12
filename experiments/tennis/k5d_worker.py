@@ -83,8 +83,16 @@ def decode(wire_path: Path, map_path: Path, work: Path, *, isolation: dict[str, 
         resolved_executable = str(Path(command[0]).resolve(strict=True))
         if resolved_executable not in isolation["actual_policy"]["execute_files"]:
             raise ValueError("native decoder executable is not in actual policy")
-        with subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                              close_fds=True, **kwargs) as process:
+        child_env = kwargs.pop("env", None)
+        native_env = dict(os.environ if child_env is None else child_env)
+        payload_path = work.parent / "native-exec.json"
+        payload_path.write_text(json.dumps({"argv": command, "env": native_env, "nonce": isolation["nonce"]}, sort_keys=True))
+        wrapper_env = dict(native_env)
+        wrapper_env["PYTHONPATH"] = os.environ["PYTHONPATH"]
+        wrapper = [sys.executable, "-S", "-m", "experiments.tennis.k5d_isolated_receiver",
+                   "native-wrapper", str(payload_path)]
+        with subprocess.Popen(wrapper, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                              close_fds=True, env=wrapper_env, **kwargs) as process:
             try:
                 birth = time.monotonic_ns()
                 observer_path = work.parent / "native-observer.json"
@@ -94,16 +102,22 @@ def decode(wire_path: Path, map_path: Path, work: Path, *, isolation: dict[str, 
                         raise RuntimeError("outer native decoder observation missing")
                     time.sleep(0.01)
                 observation = json.loads(observer_path.read_text())
-                if (observation.get("namespace_pids", [])[-1:] != [process.pid]
+                if (observation.get("nonce") != isolation["nonce"]
+                        or observation.get("namespace_pids", [])[-1:] != [process.pid]
                         or observation.get("namespaces") != isolation["namespaces"]["namespaces"]):
                     raise ValueError("native decoder observer identity differs")
                 _, stderr = process.communicate(timeout=3600)
+                preexec = json.loads((work.parent / "native-preexec.json").read_text())
+                if (preexec.get("pid") != process.pid or preexec.get("birth") != observation.get("birth")
+                        or preexec.get("observer") != observation or preexec.get("closed_extra_fds") is not True
+                        or preexec.get("argv_sha256") != hashlib.sha256(json.dumps(command, separators=(",", ":")).encode()).hexdigest()):
+                    raise ValueError("native pre-exec identity differs")
             except BaseException:
                 process.kill()
                 process.wait()
                 raise
             isolation["decoder"] = {"pid": process.pid, "started_monotonic_ns": birth, "argv": command,
-                                    "executable_resolved": resolved_executable, "outer_observation": observation,
+                                    "executable_resolved": resolved_executable, "outer_observation": observation, "preexec": preexec,
                                     "argv_sha256": hashlib.sha256(json.dumps(command, separators=(",", ":")).encode()).hexdigest(),
                                     "returncode": process.returncode}
             if process.returncode:
