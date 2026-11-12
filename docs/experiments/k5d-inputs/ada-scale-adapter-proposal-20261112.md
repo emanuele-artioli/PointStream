@@ -6,15 +6,13 @@ reference is smoke A from `20261112T210150Z-2c8b49a0`, archive SHA256
 The reference establishes packet replay and calibrated measurements only; its
 receiver did not establish filesystem denial.
 
-The separate adapter provides strict 16-frame source/score/native comparisons
-and authenticates retained checkpoint pixels, producer job, stage and Ada GPU.
-The scoring comparison reuses the original scoring validator; it does not decode
-archived DCVC. A producer cannot pass the helper without an actual isolated
-receiver's `verify_checkpoint(root, identity, job, stage)` verifier. That
-interface is provisional and must be reconciled with the independently built
-receiver, including a root-reviewed, exact-source witness asset and policy
-receipt, before it is callable. The current helper is not a producer or scorer
-entrypoint and cannot authorize a workload.
+The separate adapter provides strict 16-frame source/score/native comparisons,
+producer and sealed-pixel scorer entrypoints, fixed namespace modes and a spec
+builder. It authenticates retained checkpoint pixels, producer job, stage and
+Ada GPU. The scorer does not decode archived DCVC. Every point receipt must
+pass the independently built `verify_receipt` API with the producing context
+and config hash. A SHA-bound root-approved actual denial witness and the
+source-bound native CPU proof are mandatory; none is supplied by this code.
 
 A prospective producer job has two stages: independently prepare all six
 points for 16 frames and compare them to the Ada reference, then prepare all
