@@ -5,6 +5,7 @@ not collect or approve one, dispatch jobs, or claim that any witness has run.
 """
 from __future__ import annotations
 
+import argparse
 import ctypes
 import errno
 import hashlib
@@ -64,13 +65,19 @@ def _manifest(root: Path, entries: dict[str, Any]) -> list[Path]:
     return files
 
 
+def _source_root(profile: dict[str, Any]) -> Path:
+    if profile['source_root'] != '$FROZEN_SOURCE':
+        raise ValueError('source root must use frozen source token')
+    return _canonical(Path(__file__).resolve().parents[2])
+
+
 def inventory(config: dict[str, Any]) -> tuple[list[Path], list[Path], list[Path]]:
     """Verify the exact reviewed read and execute file inventory."""
     if config.get('schema') != 1:
         raise ValueError('unknown policy schema')
     profile = config['profiles'][os.uname().nodename.split('.')[0]]
     runtime = _manifest(Path(profile['runtime_root']), profile['runtime_files'])
-    source = _manifest(Path(profile['source_root']), profile['source_files'])
+    source = _manifest(_source_root(profile), profile['source_files'])
     for name in profile['source_files']:
         path = Path(name)
         if path.suffix != '.py' or any(part in {'docs', 'tests', 'test', 'data', 'fixtures'} for part in path.parts):
@@ -86,7 +93,11 @@ def inventory(config: dict[str, Any]) -> tuple[list[Path], list[Path], list[Path
     # System leaves are exact typed nodes, never recursive directory grants.
     system = []
     for row in profile['system_leaves']:
-        path = _canonical(Path(row['path']))
+        raw_path = Path(row['path'])
+        if str(raw_path) in ('/proc/self/maps', '/proc/self/status'):
+            path = raw_path.resolve(strict=True)
+        else:
+            path = _canonical(raw_path)
         info = path.stat()
         kind = row['kind']
         if kind not in ('regular', 'character') or not (stat.S_ISREG(info.st_mode) if kind == 'regular' else stat.S_ISCHR(info.st_mode)):
@@ -203,6 +214,13 @@ def verify_receipt(receipt: dict[str, Any], *, expected_context: dict[str, Any],
             or not isinstance(proof.get('decoder'), dict) or not proof['decoder'].get('pid')
             or proof['decoder'].get('returncode') != 0):
         raise ValueError('isolated receiver evidence missing or inconsistent')
+    decoder = proof['decoder']
+    argv = decoder.get('argv')
+    if (type(decoder.get('pid')) is not int or decoder['pid'] <= 1
+            or type(decoder.get('started_monotonic_ns')) is not int or decoder['started_monotonic_ns'] <= 0
+            or not isinstance(argv, list) or not argv or not all(isinstance(x, str) for x in argv)
+            or decoder.get('argv_sha256') != _object_sha(argv)):
+        raise ValueError('native child execution identity missing')
     for name in ('profile_sha256', 'actual_policy_sha256', 'runtime_inventory_sha256'):
         value = proof.get(name)
         if not isinstance(value, str) or len(value) != 64 or any(c not in '0123456789abcdef' for c in value):
@@ -237,6 +255,9 @@ def replay(wire_path: Path, map_path: Path, work: Path, *, config_path: Path, co
     if sys.platform != 'linux' or len(os.sched_getaffinity(0)) != 1:
         raise RuntimeError('Linux and one CPU required')
     _context(producer_context)
+    scratch_value = os.environ.get('PS_SCRATCH_DIR')
+    if not scratch_value or not work.resolve().is_relative_to(Path(scratch_value).resolve(strict=True)):
+        raise ValueError('receiver output must be inside fleet scratch')
     if sha(config_path) != config_sha256:
         raise ValueError('policy configuration digest differs')
     config = json.loads(config_path.read_text())
@@ -270,15 +291,18 @@ def replay(wire_path: Path, map_path: Path, work: Path, *, config_path: Path, co
         raise ValueError('interpreter not in executable inventory')
     import_paths = [_canonical(Path(p)) for p in profile['runtime_import_paths']]
     runtime_root = Path(profile['runtime_root'])
+    runtime_prefix = _canonical(Path(profile['runtime_prefix']))
+    if not runtime_prefix.is_dir() or not runtime_prefix.is_relative_to(runtime_root):
+        raise ValueError('runtime prefix must be within packed runtime')
     if not import_paths or any(not p.is_dir() or not p.is_relative_to(runtime_root) for p in import_paths):
         raise ValueError('runtime import paths must stay in packed runtime')
-    env = {'PATH': '/nonexistent', 'PYTHONPATH': os.pathsep.join([profile['source_root'], *(str(p) for p in import_paths)]), 'PYTHONNOUSERSITE': '1',
+    env = {'PATH': '/nonexistent', 'PYTHONPATH': os.pathsep.join([str(_source_root(profile)), *(str(p) for p in import_paths)]), 'PYTHONNOUSERSITE': '1',
            'PYTHONDONTWRITEBYTECODE': '1', 'OMP_NUM_THREADS': '1', 'OPENBLAS_NUM_THREADS': '1',
            'MKL_NUM_THREADS': '1', 'NUMEXPR_NUM_THREADS': '1', 'PS_SCRATCH_DIR': str(work),
            'TMPDIR': str(work), 'TMP': str(work), 'TEMP': str(work), 'XDG_CACHE_HOME': str(work)}
     if 'CUDA_VISIBLE_DEVICES' in os.environ:
         env['CUDA_VISIBLE_DEVICES'] = os.environ['CUDA_VISIBLE_DEVICES']
-    with subprocess.Popen([str(python), '-S', '-m', 'experiments.tennis.k5d_isolated_receiver', str(work)], env=env,
+    with subprocess.Popen([str(python), '-S', '-m', 'experiments.tennis.k5d_isolated_receiver', 'worker', str(work)], env=env,
                           stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                           close_fds=True, start_new_session=True) as process:
         try:
@@ -315,7 +339,7 @@ def _worker(work: Path) -> None:
         raise RuntimeError('worker is not single-threaded or inherited descriptors')
     launch = json.loads((work / 'launch.json').read_text())
     files, execute, system = inventory(launch['config'])
-    if [str(p) for p in files] != launch['files'] or [str(p) for p in execute] != launch['execute'] or [str(p) for p in system] != launch['system']:
+    if [str(p) for p in files] != launch['files'] or [str(p) for p in execute] != launch['execute']:
         raise ValueError('inventory changed before restriction')
     files += [work / 'packet.psbl', work / 'resources.json']
     pid, birth = os.getpid(), _birth()
@@ -330,6 +354,8 @@ def _worker(work: Path) -> None:
     _denials(launch['denials'])
     if sha(work / 'packet.psbl') != launch['wire_sha256'] or sha(work / 'resources.json') != launch['map_sha256']:
         raise ValueError('positive control identity differs')
+    profile = launch['config']['profiles'][os.uname().nodename.split('.')[0]]
+    sys.prefix = str(_canonical(Path(profile['runtime_prefix'])))
     from experiments.tennis import k5d_worker
     proof = {'context': launch['context'], 'config_sha256': launch['config_sha256'], 'landlock_abi': abi,
              'handled_mask': mask, 'threads': 1, 'extra_fds': False, 'pid': pid, 'postexec_pid': os.getpid(),
@@ -340,5 +366,48 @@ def _worker(work: Path) -> None:
     k5d_worker.decode(work / 'packet.psbl', work / 'resources.json', work / 'result', isolation=proof)
 
 
+def cpu_oracle(wire_path: Path, map_path: Path, work: Path, *, wire_sha256: str, map_sha256: str,
+               expected_yuv_sha256: str, expected_rgb_sha256: str, config_path: Path,
+               config_sha256: str, protected_paths: dict[str, list[Path]],
+               producer_context: dict[str, Any]) -> dict[str, Any]:
+    """Replay an authenticated stored conventional packet, checking both pixel hashes."""
+    from src.pointstream import ball_stream
+    if producer_context.get('gpu') != {'kind': 'cpu'}:
+        raise ValueError('CPU oracle requires CPU producer context')
+    if sha(wire_path) != wire_sha256 or sha(map_path) != map_sha256:
+        raise ValueError('authenticated oracle input identity differs')
+    if ball_stream.unpack(wire_path.read_bytes()).codec != 'svt-av1-ivf':
+        raise ValueError('CPU oracle admits only stored conventional SVT packets')
+    receipt = replay(wire_path, map_path, work, config_path=config_path, config_sha256=config_sha256,
+                     protected_paths=protected_paths, producer_context=producer_context)
+    if (receipt['decoded_yuv_sha256'] != expected_yuv_sha256
+            or receipt['rendered_rgb_sha256'] != expected_rgb_sha256):
+        raise ValueError('isolated CPU oracle pixels differ from authenticated replay')
+    return receipt
+
+
+def _main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    commands = parser.add_subparsers(dest='command', required=True)
+    child = commands.add_parser('worker')
+    child.add_argument('work', type=Path)
+    oracle = commands.add_parser('cpu-oracle')
+    for name in ('wire', 'resources', 'work', 'config', 'protected', 'context'):
+        oracle.add_argument('--' + name, type=Path, required=True)
+    for name in ('wire-sha256', 'map-sha256', 'expected-yuv-sha256', 'expected-rgb-sha256', 'config-sha256'):
+        oracle.add_argument('--' + name, required=True)
+    args = parser.parse_args()
+    if args.command == 'worker':
+        _worker(args.work)
+        return
+    protected = {k: [Path(p) for p in v] for k, v in json.loads(args.protected.read_text()).items()}
+    receipt = cpu_oracle(args.wire, args.resources, args.work, wire_sha256=args.wire_sha256,
+                         map_sha256=args.map_sha256, expected_yuv_sha256=args.expected_yuv_sha256,
+                         expected_rgb_sha256=args.expected_rgb_sha256, config_path=args.config,
+                         config_sha256=args.config_sha256, protected_paths=protected,
+                         producer_context=json.loads(args.context.read_text()))
+    print(json.dumps(receipt, sort_keys=True))
+
+
 if __name__ == '__main__':
-    _worker(Path(sys.argv[1]))
+    _main()

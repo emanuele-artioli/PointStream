@@ -49,7 +49,8 @@ def test_receipt_rejects_legacy_and_incomplete_proof() -> None:
     proof: dict[str, Any] = {'context': {}, 'config_sha256': 'a' * 64, 'landlock_abi': 3,
              'handled_mask': isolated.leaves.handled_rights(3), 'threads': 1, 'extra_fds': False,
              'pid': 9, 'postexec_pid': 9, 'birth': '2', 'postexec_birth': '2',
-             'decoder': {'pid': 10, 'returncode': 0},
+             'decoder': {'pid': 10, 'returncode': 0, 'started_monotonic_ns': 1,
+                         'argv': ['/native'], 'argv_sha256': isolated._object_sha(['/native'])},
              'profile_sha256': 'a' * 64, 'runtime_inventory_sha256': 'b' * 64,
              'actual_policy': {}, 'actual_policy_sha256': isolated._object_sha({}),
              'denials': {k: [{'errno': errno.EACCES, 'path': '/real', 'inode': 2, 'sha256': 'a' * 64}]
@@ -65,3 +66,18 @@ def test_receipt_rejects_legacy_and_incomplete_proof() -> None:
     proof['denials']['source_frame'][0]['errno'] = errno.ENOENT
     with pytest.raises(ValueError):
         isolated.verify_receipt(receipt, expected_context={}, expected_config_sha256='a' * 64)
+
+
+def test_source_root_requires_frozen_token() -> None:
+    assert isolated._source_root({'source_root': '$FROZEN_SOURCE'}) == Path(isolated.__file__).resolve().parents[2]
+    with pytest.raises(ValueError):
+        isolated._source_root({'source_root': '/untrusted/source'})
+
+
+def test_cpu_oracle_rejects_non_cpu_before_reading(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match='CPU producer'):
+        isolated.cpu_oracle(tmp_path / 'missing', tmp_path / 'map', tmp_path / 'work',
+                            wire_sha256='a' * 64, map_sha256='b' * 64,
+                            expected_yuv_sha256='c' * 64, expected_rgb_sha256='d' * 64,
+                            config_path=tmp_path / 'config', config_sha256='e' * 64,
+                            protected_paths={}, producer_context={'gpu': {'uuid': 'GPU-test'}})
