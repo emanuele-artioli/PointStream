@@ -40,3 +40,29 @@ The complete source/model/environment/CPU proof, producer publication and
 witness assets must be bound by their real hashes. No later decode fallback,
 188/292/586/full30 release, manuscript claim, or scientific acceptance follows
 from these helpers.
+
+The provisional `k5d_ada_witness.spec` constructor also defines a CPU-only SVT
+oracle and a separate first GPU witness. Both need the exact-source `bridge`,
+`native_cpu_receipt`, and `receiver_isolation_config` assets; each asset entry
+has `local`, `remote`, and `sha256` fields. The CPU oracle additionally needs
+`wire`, `resources`, and `protected` assets and expected decoded YUV and RGB
+SHA256 arguments. The protected JSON maps each of `source_archive`,
+`source_frame`, `ground_truth`, `encoder_state`, and `private_detector` to a
+nonempty array of existing readable absolute file paths, with any required
+aliases included. The worker derives CPU context from its actual dispatch.
+
+The first GPU witness additionally needs `cpu_denial`, `fidelity_gate`, and
+`ada_reference` assets. Its CPU-denial approval JSON includes `schema: 1`,
+`approved: true`, `actual_filesystem_denial_passed: true`, `host: gpu6`,
+`codec: svt-av1-ivf`, the CPU oracle `publication_sha256`,
+`consumer_execution_identity`, `config_sha256`, `producer_context`, `receipt`,
+and `actual_policy_sha256`. Its actual source-frame and encoder-state denial
+targets are derived at replay time. The witness does not consume a previous GPU
+witness; regular 16/48 jobs still do. Score specs additionally require root
+producer16/48 attestation assets, each binding the producing job, stage, archive
+SHA, device, identity, approved config/profile/inventory and denial result.
+
+The CPU oracle candidate reserves 220 campaign seconds and 30 additional CPU
+seconds within its 250-second envelope. The first GPU witness reserves a
+500-second campaign, 400 external CPU seconds, and 200 GPU lifecycle seconds.
+No actual runtime, source inventory, denial proof or release is supplied here.

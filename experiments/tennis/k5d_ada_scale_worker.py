@@ -41,8 +41,8 @@ def checked(path: Path, digest: str) -> dict[str, Any]:
     return result
 
 
-def admission(args: argparse.Namespace, identity: dict[str, str]) -> None:
-    """Fail closed on missing root approvals, actual witness, and CPU proof."""
+def base_admission(args: argparse.Namespace, identity: dict[str, str]) -> dict[str, Any]:
+    """Authenticate the source bridge, configuration and native CPU proof."""
     from experiments.tennis import k5d_scoped_namespace as namespace
 
     bridge = checked(Path(args.bridge), args.bridge_sha256)
@@ -64,6 +64,11 @@ def admission(args: argparse.Namespace, identity: dict[str, str]) -> None:
             or proof.get('all_owned_pids_absent') is not True or proof.get('independent_cpu_match') is not True
             or proof.get('cases') != ['normal', 'timeout', 'sigterm', 'sigkill']):
         raise ValueError('actual source-bound native CPU proof required')
+    return config
+
+
+def admission(args: argparse.Namespace, identity: dict[str, str]) -> None:
+    config = base_admission(args, identity)
     witness = checked(Path(args.denial_witness), args.denial_witness_sha256)
     context = witness.get('producer_context')
     gpu = context.get('gpu', {}) if isinstance(context, dict) else {}
@@ -91,6 +96,27 @@ def admission(args: argparse.Namespace, identity: dict[str, str]) -> None:
             or verified.get('runtime_inventory_sha256') != witness['runtime_inventory_sha256']):
         raise ValueError('witness policy or runtime inventory binding differs')
 
+
+
+def producer_attestation(args: argparse.Namespace, identity: dict[str, str], frames: int,
+                         marker: dict[str, Any]) -> None:
+    """Bind a root-reviewed fleet audit to the exact immutable producer archive."""
+    suffix = str(frames)
+    audit = checked(Path(getattr(args, 'producer' + suffix + '_attestation')),
+                    getattr(args, 'producer' + suffix + '_attestation_sha256'))
+    config = checked(Path(args.receiver_isolation_config), args.receiver_isolation_config_sha256)
+    profile = config['profiles']['gpu6']
+    expected_gpu = {**marker['gpu'], 'capability': [8, 9]}
+    if (audit.get('schema') != 1 or audit.get('approved') is not True
+            or audit.get('consumer_execution_identity') != identity
+            or audit.get('producer_job') != marker['producer_job']
+            or audit.get('producer_stage') != marker['producer_stage']
+            or audit.get('publication_sha256') != getattr(args, 'prepare' + suffix + '_sha256')
+            or audit.get('gpu') != expected_gpu or audit.get('receiver_denial_passed') is not True
+            or audit.get('config_sha256') != args.receiver_isolation_config_sha256
+            or audit.get('profile_sha256') != canonical_sha(profile)
+            or audit.get('runtime_inventory_sha256') != canonical_sha(profile['runtime_files'])):
+        raise ValueError('approved producer audit does not bind this job and publication')
 
 def data_args(args: argparse.Namespace, stage: Path, scratch: Path, dispatch: dict) -> argparse.Namespace:
     data = vars(args).copy()
@@ -198,9 +224,10 @@ def run(args: argparse.Namespace) -> None:
         archive_sha = getattr(args, 'prepare' + str(args.frames) + '_sha256')
         expected_job = getattr(args, 'producer' + str(args.frames) + '_job')
         with cost.unpack(archive, archive_sha) as prepared:
-            adapter.producer(prepared, identity, job=expected_job, stage=phase, frames=args.frames,
+            marker = adapter.producer(prepared, identity, job=expected_job, stage=phase, frames=args.frames,
                              config_sha256=args.receiver_isolation_config_sha256,
                              config_path=Path(args.receiver_isolation_config))
+            producer_attestation(args, identity, args.frames, marker)
             if args.frames == 16:
                 adapter.prepare16(Path(args.ada_reference), prepared, identity)
             else:
@@ -243,9 +270,10 @@ def validate() -> None:
                 adapter.prepare16(Path(args.ada_reference), output, identity)
             else:
                 with cost.unpack(Path(args.prepare16), args.prepare16_sha256) as prepared:
-                    adapter.producer(prepared, identity, job=args.producer16_job, stage='smoke', frames=16,
+                    marker = adapter.producer(prepared, identity, job=args.producer16_job, stage='smoke', frames=16,
                                      config_sha256=args.receiver_isolation_config_sha256,
                              config_path=Path(args.receiver_isolation_config))
+                    producer_attestation(args, identity, 16, marker)
                     adapter.prepare16(Path(args.ada_reference), prepared, identity)
                     validate_score(output, prepared, oracle.sha(prepared / 'checkpoint.json'), identity)
                     with cost.unpack(Path(args.accepted16), cf.D8_SMOKE_SHA) as accepted:
@@ -266,7 +294,7 @@ def spec(base: dict, *, action: str, assets: dict[str, dict[str, str]], deadline
     required = {'bridge', 'receiver_isolation_config', 'native_cpu_receipt', 'denial_witness',
                 'fidelity_gate', 'accepted16', 'ada_reference'}
     if action == 'score':
-        required |= {'prepare16', 'prepare48'}
+        required |= {'prepare16', 'prepare48', 'producer16_attestation', 'producer48_attestation'}
         if not producer16_job.startswith('2026') or not producer48_job.startswith('2026'):
             raise ValueError('actual producer jobs required for sealed-pixel scoring')
     elif action != 'prepare':
@@ -310,7 +338,8 @@ def parser() -> argparse.ArgumentParser:
                  'image-ckpt', 'video-ckpt', 'lpips-backbone', 'dists-backbone'):
         p.add_argument('--' + name)
     for name in ('bridge', 'receiver-isolation-config', 'native-cpu-receipt', 'denial-witness',
-                 'fidelity-gate', 'accepted16', 'ada-reference', 'prepare16', 'prepare48'):
+                 'fidelity-gate', 'accepted16', 'ada-reference', 'prepare16', 'prepare48',
+                 'producer16-attestation', 'producer48-attestation'):
         p.add_argument('--' + name)
         p.add_argument('--' + name + '-sha256')
     p.add_argument('--unshare-sha256')

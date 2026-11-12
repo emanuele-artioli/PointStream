@@ -43,6 +43,12 @@ def worker_command(arguments: list[str]) -> list[str]:
     if arguments[0] in ('ada-scale-prepare', 'ada-scale-score') and os.environ.get('CUDA_VISIBLE_DEVICES') not in (None, ''):
         action = 'prepare' if arguments[0] == 'ada-scale-prepare' else 'score'
         return [sys.executable, '-m', 'experiments.tennis.k5d_ada_scale_worker', action, *arguments[1:]]
+    if arguments[0] in ('ada-denial-cpu', 'ada-denial-cpu-noop') and os.environ.get('CUDA_VISIBLE_DEVICES') == '':
+        action = 'cpu' if arguments[0] == 'ada-denial-cpu' else 'noop'
+        return [sys.executable, '-m', 'experiments.tennis.k5d_ada_witness', action, *arguments[1:]]
+    if arguments[0] in ('ada-first-witness', 'ada-first-noop') and os.environ.get('CUDA_VISIBLE_DEVICES') not in (None, ''):
+        action = 'witness' if arguments[0] == 'ada-first-witness' else 'noop'
+        return [sys.executable, '-m', 'experiments.tennis.k5d_ada_witness', action, *arguments[1:]]
     raise ValueError('only fixed prepare/score or approved proof workers are allowed')
 
 
