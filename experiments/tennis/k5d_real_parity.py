@@ -60,10 +60,12 @@ def spec(base: dict, *, assets: dict[str, dict[str, str]], deadline: str, unshar
         raise ValueError('exact fidelity gate, accepted reference and audited CPU receipt assets required')
     if first_pair_source:
         if gpu_profile == ADA_PROFILE:
-            from experiments.tennis import k5d_ada_source_bridge as scoped
+            from experiments.tennis import k5d_ada_source_bridge as ada_scoped
+            verify_bridge = ada_scoped.verify_signed
         else:
-            from experiments.tennis import k5d_same_job_source_bridge as scoped
-        scoped.verify_signed(Path(assets['first_pair_bridge']['local']), assets['first_pair_bridge']['sha256'],
+            from experiments.tennis import k5d_same_job_source_bridge as same_job_scoped
+            verify_bridge = same_job_scoped.verify_signed
+        verify_bridge(Path(assets['first_pair_bridge']['local']), assets['first_pair_bridge']['sha256'],
                              Path(assets['calibration_source']['local']), Path(assets['consumer_source']['local']), identity)
     if not cf.digest_string(unshare_sha256) or assets['accepted16']['sha256'] != cf.D8_SMOKE_SHA:
         raise ValueError('unshare or historical reference identity differs')
@@ -262,10 +264,12 @@ def run(args: argparse.Namespace) -> None:
         if not all(source_args):
             raise ValueError('complete scoped source bridge inputs required')
         if getattr(args, 'gpu_profile', A6000_PROFILE) == ADA_PROFILE:
-            from experiments.tennis import k5d_ada_source_bridge as scoped
+            from experiments.tennis import k5d_ada_source_bridge as ada_scoped
+            verify_bridge = ada_scoped.verify_signed
         else:
-            from experiments.tennis import k5d_same_job_source_bridge as scoped
-        scoped.verify_signed(Path(args.first_pair_bridge), args.first_pair_bridge_sha256,
+            from experiments.tennis import k5d_same_job_source_bridge as same_job_scoped
+            verify_bridge = same_job_scoped.verify_signed
+        verify_bridge(Path(args.first_pair_bridge), args.first_pair_bridge_sha256,
                              Path(args.calibration_source), Path(args.consumer_source), identity)
     cpu = json.loads(Path(args.native_cpu_receipt).read_text())
     if (oracle.sha(Path(args.native_cpu_receipt)) != args.native_cpu_receipt_sha256
