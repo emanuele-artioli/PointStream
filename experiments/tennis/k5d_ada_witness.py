@@ -151,7 +151,7 @@ def validate() -> None:
                                           config_sha256=args.receiver_isolation_config_sha256,
                                           config_path=Path(args.receiver_isolation_config))
                 spec = json.loads((stage.parent / 'spec.json').read_text())
-                device = {**marker['gpu'], 'capability': [8, 9]}
+                device = adapter.persisted_device(output, marker, dispatch_gpu=dispatch['environment']['gpu'])
                 parity.validate_gpu_evidence(parity.ADA_PROFILE, spec, dispatch, device)
                 adapter.prepare16(Path(args.ada_reference), output, identity)
         from experiments.tennis import k5d_ada_fresh as fresh

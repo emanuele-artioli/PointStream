@@ -99,14 +99,14 @@ def admission(args: argparse.Namespace, identity: dict[str, str]) -> None:
 
 
 def producer_attestation(args: argparse.Namespace, identity: dict[str, str], frames: int,
-                         marker: dict[str, Any]) -> None:
+                         marker: dict[str, Any], prepared: Path) -> None:
     """Bind a root-reviewed fleet audit to the exact immutable producer archive."""
     suffix = str(frames)
     audit = checked(Path(getattr(args, 'producer' + suffix + '_attestation')),
                     getattr(args, 'producer' + suffix + '_attestation_sha256'))
     config = checked(Path(args.receiver_isolation_config), args.receiver_isolation_config_sha256)
     profile = config['profiles']['gpu6']
-    expected_gpu = {**marker['gpu'], 'capability': [8, 9]}
+    expected_gpu = adapter.persisted_device(prepared, marker)
     if (audit.get('schema') != 1 or audit.get('approved') is not True
             or audit.get('consumer_execution_identity') != identity
             or audit.get('producer_job') != marker['producer_job']
@@ -227,7 +227,7 @@ def run(args: argparse.Namespace) -> None:
             marker = adapter.producer(prepared, identity, job=expected_job, stage=phase, frames=args.frames,
                              config_sha256=args.receiver_isolation_config_sha256,
                              config_path=Path(args.receiver_isolation_config))
-            producer_attestation(args, identity, args.frames, marker)
+            producer_attestation(args, identity, args.frames, marker, prepared)
             if args.frames == 16:
                 adapter.prepare16(Path(args.ada_reference), prepared, identity)
             else:
@@ -273,7 +273,7 @@ def validate() -> None:
                     marker = adapter.producer(prepared, identity, job=args.producer16_job, stage='smoke', frames=16,
                                      config_sha256=args.receiver_isolation_config_sha256,
                              config_path=Path(args.receiver_isolation_config))
-                    producer_attestation(args, identity, 16, marker)
+                    producer_attestation(args, identity, 16, marker, prepared)
                     adapter.prepare16(Path(args.ada_reference), prepared, identity)
                     validate_score(output, prepared, oracle.sha(prepared / 'checkpoint.json'), identity)
                     with cost.unpack(Path(args.accepted16), cf.D8_SMOKE_SHA) as accepted:

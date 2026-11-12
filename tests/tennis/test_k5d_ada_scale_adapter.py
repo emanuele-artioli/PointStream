@@ -104,12 +104,14 @@ def test_producer_verifies_every_isolation_receipt_against_actual_context(tmp_pa
     (tmp_path / 'checkpoint.json').write_text('{}')
     points = [{'codec': c, 'point': n} for c, n in adapter.enc.POINTS]
     (tmp_path / 'pilot.json').write_text(json.dumps({'points': points}))
+    (tmp_path / 'source-qualification.json').write_text(json.dumps({'device': {'name': adapter.GPU_NAME,
+        'capability': [8, 9], 'uuid': 'dbbb295f-6156-1133-8658-841f3f5b17d0'}}))
     for point in points:
         path = tmp_path / f"{point['codec']}-{point['point']}" / 'receiver-evidence'
         path.mkdir(parents=True)
         (path / 'receiver.json').write_text(json.dumps({'key': [point['codec'], point['point']]}))
     marker = {'producer_job': job, 'producer_stage': 'smoke', 'frames': 16,
-              'gpu': {'name': adapter.GPU_NAME, 'uuid': 'GPU-test'}}
+              'gpu': {'name': adapter.GPU_NAME, 'uuid': 'GPU-dbbb295f-6156-1133-8658-841f3f5b17d0'}}
     monkeypatch.setattr(adapter.cp, 'verify', lambda *a, **kw: None)
     monkeypatch.setattr(adapter.receiver, 'verify', lambda *a, **kw: marker)
     seen = []
@@ -239,7 +241,7 @@ def test_scorer_attestation_binds_job_publication_gpu_and_denial(tmp_path):
     config = tmp_path / 'config'
     config_sha = write(config, {'profiles': {'gpu6': profile}})
     marker = {'producer_job': '20261112T000001Z-a', 'producer_stage': 'smoke',
-              'gpu': {'uuid': 'GPU-test', 'name': adapter.GPU_NAME}}
+              'gpu': {'uuid': 'GPU-dbbb295f-6156-1133-8658-841f3f5b17d0', 'name': adapter.GPU_NAME}}
     audit = {'schema': 1, 'approved': True, 'consumer_execution_identity': identity,
              'producer_job': marker['producer_job'], 'producer_stage': 'smoke', 'publication_sha256': 'a' * 64,
              'gpu': {**marker['gpu'], 'capability': [8, 9]}, 'receiver_denial_passed': True,
@@ -249,11 +251,13 @@ def test_scorer_attestation_binds_job_publication_gpu_and_denial(tmp_path):
     args = Namespace(producer16_attestation=str(path), producer16_attestation_sha256=write(path, audit),
                      receiver_isolation_config=str(config), receiver_isolation_config_sha256=config_sha,
                      prepare16_sha256='a' * 64)
-    worker.producer_attestation(args, identity, 16, marker)
+    (tmp_path / 'source-qualification.json').write_text(json.dumps({'device': {'name': adapter.GPU_NAME,
+        'capability': [8, 9], 'uuid': 'dbbb295f-6156-1133-8658-841f3f5b17d0'}}))
+    worker.producer_attestation(args, identity, 16, marker, tmp_path)
     audit['receiver_denial_passed'] = False
     args.producer16_attestation_sha256 = write(path, audit)
     with pytest.raises(ValueError, match='producer audit'):
-        worker.producer_attestation(args, identity, 16, marker)
+        worker.producer_attestation(args, identity, 16, marker, tmp_path)
 
 
 def test_cpu_oracle_derives_actual_dispatch_context_and_protected_files(tmp_path, monkeypatch):
@@ -353,3 +357,37 @@ def test_denial_namespace_modes_enforce_cpu_and_gpu_separation(monkeypatch):
     assert namespace.worker_command(['ada-first-witness'])[2:4] == ['experiments.tennis.k5d_ada_witness', 'witness']
     with pytest.raises(ValueError):
         namespace.worker_command(['ada-denial-cpu'])
+
+
+@pytest.mark.parametrize('mutation', ['missing_capability', 'wrong_capability', 'source_uuid', 'marker_uuid', 'dispatch_uuid', 'dispatch_name'])
+def test_persisted_device_rejects_missing_or_mismatched_hardware(tmp_path, mutation):
+    import json
+
+    source = {'name': adapter.GPU_NAME, 'uuid': 'dbbb295f-6156-1133-8658-841f3f5b17d0', 'capability': [8, 9]}
+    marker = {'gpu': {'name': adapter.GPU_NAME, 'uuid': 'GPU-dbbb295f-6156-1133-8658-841f3f5b17d0'}}
+    dispatch = dict(marker['gpu'])
+    if mutation == 'missing_capability':
+        source.pop('capability')
+    elif mutation == 'wrong_capability':
+        source['capability'] = [8, 6]
+    elif mutation == 'source_uuid':
+        source['uuid'] = 'fbbb295f-6156-1133-8658-841f3f5b17d0'
+    elif mutation == 'marker_uuid':
+        marker['gpu']['uuid'] = 'GPU-invalid'
+    elif mutation == 'dispatch_uuid':
+        dispatch['uuid'] = 'GPU-fbbb295f-6156-1133-8658-841f3f5b17d0'
+    else:
+        dispatch['name'] = 'NVIDIA RTX A6000'
+    (tmp_path / 'source-qualification.json').write_text(json.dumps({'device': source}))
+    with pytest.raises(ValueError):
+        adapter.persisted_device(tmp_path, marker, dispatch_gpu=dispatch)
+
+
+def test_persisted_device_uses_sealed_capability_and_normalizes_uuid(tmp_path):
+    import json
+
+    source = {'name': adapter.GPU_NAME, 'uuid': 'dbbb295f-6156-1133-8658-841f3f5b17d0', 'capability': [8, 9]}
+    marker = {'gpu': {'name': adapter.GPU_NAME, 'uuid': 'GPU-dbbb295f-6156-1133-8658-841f3f5b17d0'}}
+    (tmp_path / 'source-qualification.json').write_text(json.dumps({'device': source}))
+    assert adapter.persisted_device(tmp_path, marker, dispatch_gpu=marker['gpu']) == {
+        'name': source['name'], 'uuid': marker['gpu']['uuid'], 'capability': source['capability']}
