@@ -127,12 +127,13 @@ def reference16(root: Path) -> tuple[dict[str, Any], dict[str, Any]]:
     return report, source
 
 
-def prepare_parity(checkpoint: Path, prior: Path, identity: dict[str, str]) -> None:
+def prepare_parity(checkpoint: Path, prior: Path, identity: dict[str, str], *,
+                   capability: tuple[int, int] = (8, 6)) -> None:
     cp.verify(checkpoint, oracle.sha(checkpoint / 'checkpoint.json'), identity)
     reference, old_source = reference16(prior)
     new = json.loads((checkpoint / 'pilot.json').read_text())
     source = json.loads((checkpoint / 'source-qualification.json').read_text())
-    cost.compare_contract(reference, old_source, new, source, exact=False)
+    cost.compare_contract(reference, old_source, new, source, exact=False, capability=capability)
     if (new['frames'] != 16 or source['rows'] != old_source['rows'] or source['scores'] != old_source['scores']
             or new['conversion']['yuv_sha256'] != reference['conversion']['yuv_sha256']):
         raise ValueError('prepare source or converted pixels differ from accepted16')

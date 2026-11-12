@@ -64,10 +64,17 @@ def test_exact_contract_rejects_changed_pixel_or_metric():
                                'dists': {'weights_sha256': 'w', 'backbone_sha256': 'v'}},
              'conversion': {'yuv_sha256': 'y'}, 'points': [point]}
     cost.compare_contract(prior, source, copy.deepcopy(prior), copy.deepcopy(source), exact=True)
+    ada_source = copy.deepcopy(source)
+    ada_source['device']['capability'] = [8, 9]
+    with pytest.raises(ValueError, match='GPU class'):
+        cost.compare_contract(prior, source, prior, ada_source, exact=True)
+    cost.compare_contract(prior, source, prior, ada_source, exact=True, capability=(8, 9))
     changed = copy.deepcopy(prior)
     changed['points'][0]['encoder_rendered_sha256'] = 'different'
     with pytest.raises(ValueError, match='pixel parity'):
         cost.compare_contract(prior, source, changed, source, exact=True)
+    with pytest.raises(ValueError, match='pixel parity'):
+        cost.compare_contract(prior, source, changed, ada_source, exact=True, capability=(8, 9))
     changed = copy.deepcopy(prior)
     changed['points'][0]['baseline']['metrics'][0]['crop_dists'] = .401
     with pytest.raises(ValueError, match='metric output'):
