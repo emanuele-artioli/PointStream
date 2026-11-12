@@ -8,18 +8,17 @@ workstream ceilings. Ordinary bounded implementation corrections need no new
 permission; source/numerical rules and stops below remain binding. Closed
 K5c/W8/W9 balances are not transferred. Unknown submissions are never replayed.
 
-Execution status, November12: **ACCESS RESTORED, research unfinished**.
-The old Ball/W8 requests are independently closed expired unassigned and events
-acknowledged. No unknown GPU job remains among those two. Use the
+Execution status, November12: **ACCESS RESTORED; required A6000 CAPACITY BLOCKED**.
+The two old requests and new `20261112T172806Z-8709406d` are independently closed
+expired unassigned, with canonical events acknowledged. No activeGPUjob/wait/timer
+or furtherqueue release remains. The fresh A6000 occupants are otherusers;
+no own stale GPU process was identified among those occupants. Keep NFS archives
+and verified local staging; no broad cleanup/migration. See the
 [current handoff](../continuation-2026-11-12.md) and
-[storage decision](../fleet-recovery-2026-11-12.md). No broad cleanup/migration
-is warranted by measured capacity. After a pre-ID doctorstop, one original corrected16 Ball request is being
-submitted as `20261112T172806Z-8709406d` through an isolated verified
-participating pool; all safety gates remain. One canonicalwait2500, deadline
-17:52:06.008295UTC. Uncertain publication is never replayed. W8 full
-witness is resource-held because its complete forecast is not shown to fit929CPU;
-no new pilot or reallocation is released. Source/science/budgets stay unchanged.
-The narrowed-paper fallback remains an option, not a changed research instruction.
+[storage decision](../fleet-recovery-2026-11-12.md). W8full-witness compute remains
+resource-held: complete forecast is not shown to fit929CPU. No newpilot,
+reallocation, paidserver, scientificsource or paper change. The research-first
+instruction and all scientific gates/stop conditions below remain binding.
 
 ## Goal and scope
 

@@ -39,7 +39,7 @@
   "spec_sha256": "6a3c357084045b1e37b1b8b85f9b1eca4ef28a667a2005599aca62a502f1ee18",
   "deadline": "2026-11-12T17:52:06.008295+00:00",
   "readiness": "Root verified fresh passingallhostdoctor, bothgpu2/3separate localdisks>82GiB, all17declaredpaths, exactCPUgate/H2bridge/consumerarchiveSHA andunshareSHA. Scientificsourceworktree rebuilt450d unchanged.",
-  "submission_state": "pending;rootverifiedactualnewID/sourcearchive/spec",
+  "submission_state": "closedexpiredunassigned;rootaccepted,canonicaleventACK,no activewait/timer/furtherqueue",
   "submit_tool_session": 69826,
   "submit_client_pid_file": "/private/tmp/pointstream-ball-partial-resume-20261112/submit-client.pid",
   "submit_stdout": "/private/tmp/pointstream-ball-partial-resume-20261112/submit.json",
@@ -76,5 +76,8 @@
   "root_manifest_ACK": true,
   "default_client_record_copied": true,
   "global_configuration_unchanged": true,
-  "sole_wait_max_seconds": 2500
+  "sole_wait_max_seconds": 2500,
+  "terminal_GPU_charge": 0,
+  "terminal_CPU_charge": 400,
+  "closeout": "docs/experiments/k5d-inputs/8709-recovery-root-closeout-20261112.json"
 }

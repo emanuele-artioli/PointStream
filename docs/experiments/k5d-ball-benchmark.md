@@ -605,3 +605,24 @@ Manifest/handles under `/private/tmp/pointstream-ball-partial-resume-20261112/`.
 Single canonical wait for `20261112T172806Z-8709406d`: local PID `7932`, deadline `2026-11-12T17:52:06.008295Z`, command `PS_FLEET_MANAGEMENT_HOST=gpu5 PS_FLEET_MANAGEMENT_PYTHON=/usr/bin/python3 scripts/ps-fleet wait 20261112T172806Z-8709406d --max-seconds 2500`; stdout/stderr and handle under `/private/tmp/pointstream-ball-8709-wait-20261112/`. Initial canonical status pending. Completion wakeup remains unverified.
 
 Wait tool session: `46210`; wrapper handle retained in `/private/tmp/pointstream-ball-8709-wait-20261112/handle.json`.
+
+
+### 2026-11-12 — Resumed queue final closeout; capacity block
+
+The sole wait for `20261112T172806Z-8709406d` ended attention/exit10 after1301s,
+with terminalexpired event and a pending status fetched just before it. Root's
+single18:10UTC expected-finish check obtained canonicalexpired; independent
+raw audit confirms exact0bb/450d/21cd/spec6a3c, no run/attempt/gate/execution or
+claims, and ownergpu6 expiry worker. Both eligible workers recorded noGPUmeeting
+admission. Fresh ownership probes found the A6000 occupants belong to otherusers;
+no own stale GPU process was identified among them or signaled.
+
+Root independently verified manager canonicalevent07724b3fb54d5e15b3d089e42eaceb7d
+and physical195375fce47e5753b991aeb6286387c4 are the same event with distinct
+UUID recipes, and acknowledged the canonical ID. Full400externalCPU/0GPU is
+charged conservatively, aggregateadminCPUunmetered; queuewall is not CPU.
+Parentremaining7920GPU/1450CPU, programme19362GPU/48791CPU. No model ran and no
+corrected16 parity/cost or new scientific result follows. [Root closeout](k5d-inputs/8709-recovery-root-closeout-20261112.json).
+No activewait/timer/newqueue or automaticretry remains. PreserveNFSarchive and
+localstaging; consider a new bounded request only after fresh capacity/readiness
+review, not folder cleanup. The existing188-frame result stays scoped/unchanged.

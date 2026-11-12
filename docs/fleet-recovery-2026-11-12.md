@@ -74,10 +74,11 @@ endpoint. Reconsider a concrete reallocation only after protecting the Ball
 forecast, or define a separately justified narrowed endpoint. No Ball-to-W8
 transfer is authorized by this decision, and the fresh-witness limitation remains.
 
-Current charges are **19,362 GPU / 48,391 workload CPU seconds**, including the full
+Current charges are **19,362 GPU / 48,791 workload CPU seconds**, including the full
 400/150 external expiry charges, 20 shared recovery-diagnostic CPU seconds and
-50 Ball readiness CPU seconds and400CPU for the subsequent prepublication stop. Aggregate administrative CPU was not measured.
-Ball remaining nested reservation: 7,920 GPU / 1,850 CPU; W8: 4,550 / 929.
+50 Ball readiness CPU seconds,400CPU for the subsequent prepublication stop,
+and400CPU for the resumed unassigned queue. Aggregate administrative CPU was not measured.
+Ball remaining nested reservation: 7,920 GPU / 1,450 CPU; W8: 4,550 / 929.
 Global authority remains 24 GPU-hours / 28 CPU-hours. No paid server is needed
 for this recovery decision and none has been purchased or authorized.
 
@@ -97,9 +98,22 @@ gpu5 for management/upload and the original gpu2/3 A6000 workload pool. Source,
 inputs, validators and local32GiB/runtime contracts are unchanged. Global
 client config and shared workers remain unchanged.
 
-Actual request **`20261112T172806Z-8709406d`** is pending, deadline
+Actual request **`20261112T172806Z-8709406d`** ultimately expired unassigned; its deadline was
 2026-11-12T17:52:06.008295UTC, original1000GPU/1200CPU maximum nested in its
 parent. One canonicalwait2500 is authorized; no automatic further queue/scale.
 The [Ball journal](experiments/k5d-ball-benchmark.md) records its handle and outcome.
 A later small distinct readiness probe also confirmed gpu3 has a separate local
 disk with2,676GiB free; its earlier unknown read-only probe remains unresolved.
+
+
+## Final result
+
+The one canonicalwait ended after1301s. Root checked once at18:10UTC and
+independently accepted the unassigned expiry, source/spec/archive and noexecution/
+claim evidence. Both eligible workers recorded noGPUmeetingadmission; a fresh
+minimal ownership check found the A6000 occupants are otherusers. Their processes
+were not inspected beyond ownership or signaled. No own stale GPU process was
+identified among those current occupants. No new numerical result was obtained.
+The canonical event is acknowledged; no wait/timer/newqueue remains. The present
+blocker is required GPU capacity; preserve existing staging rather than delete
+folders. [Final closeout](experiments/k5d-inputs/8709-recovery-root-closeout-20261112.json).

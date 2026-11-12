@@ -1,0 +1,159 @@
+{
+  "recorded_utc": "2026-11-12T18:14:59.301227+00:00",
+  "job_id": "20261112T172806Z-8709406d",
+  "root_decision": "Expiredunassigned; no scientific execution. Exactarchive/spec/source manifest and empty execution/claims evidence accepted; ownergpu6 matches expiryworker.",
+  "canonical_status": {
+    "job_id": "20261112T172806Z-8709406d",
+    "created": 1794504498.8215826,
+    "status": "expired",
+    "updated": 1794505929.6791842
+  },
+  "canonical_spec_sha256": "6a3c357084045b1e37b1b8b85f9b1eca4ef28a667a2005599aca62a502f1ee18",
+  "physical_archive_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+  "physical_raw_spec_sha256": "4aec7ec9e87ed64cc2b7725f1f6b26c92c9efb441391401a1cfe9bcbd1cf3f96",
+  "source_identity_basis": "Currentmanifest assertion joined to exact physical archive previously rootverified; no repeated source extraction or model inference.",
+  "terminal_event": {
+    "canonical_API_id": "07724b3fb54d5e15b3d089e42eaceb7d",
+    "physical_file_id": "195375fce47e5753b991aeb6286387c4",
+    "kind": "terminal:expired",
+    "timestamp": 1794505929.8541827,
+    "mapping": "API uuid5(directory+kind); physical uuid5(directory+kind+digest(null)), independently recomputed. Sameevent, no conflicting state.",
+    "wait_snapshot_race": "Waitpoll fetched pending before separate terminalevent read; finalcanonicalstatus expired.",
+    "canonical_API_id_acknowledged": true
+  },
+  "wait": {
+    "exit_code": 10,
+    "exit_code_basis": "Agentcollected its originalsession46210 once; rootsessionnamespacecouldnotaccess it",
+    "waited_seconds": 1301,
+    "raw_sha256": "ce1f570aaae8c84ce6dc920a40632aea6b12862d64690534eac176ff38ea8f79",
+    "no_second_wait": true,
+    "root_one_expected_finish_check_utc": "2026-11-12T18:10:00Z"
+  },
+  "admission": "Botheligibleworkers recorded no eligibleGPU; separatefreshownershipprobe shows currentoccupants onallA6000s areotherusers, notstalepointstream. No processes signaled.",
+  "charge_GPU": 0,
+  "charge_CPU": 400,
+  "CPU_basis": "Full external400CPU conservatively charged inclusive readiness/submission/wait/audit; aggregate adminCPUunmetered, queuewall not CPU. No physical15CPUaggregateclaim.",
+  "no_further_queue_or_scale": true,
+  "raw_files": [
+    {
+      "scope": "closeout",
+      "path": "/private/tmp/pointstream-ball-8709-closeout-20261112/audit.py",
+      "bytes": 1916,
+      "sha256": "13de957007be41afc08b0b9520c729d0ce5ac2d298542437c6a8966adf9dae59"
+    },
+    {
+      "scope": "closeout",
+      "path": "/private/tmp/pointstream-ball-8709-closeout-20261112/audit.raw",
+      "bytes": 16622,
+      "sha256": "3c0e9e8cad1ceb9cf34a5307fc7595243bf40a1e97bdf488a38cfe17a9d4a1e8"
+    },
+    {
+      "scope": "closeout",
+      "path": "/private/tmp/pointstream-ball-8709-closeout-20261112/audit.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "closeout",
+      "path": "/private/tmp/pointstream-ball-8709-closeout-20261112/transport.txt",
+      "bytes": 11,
+      "sha256": "3724d9d97b35d70e30245dcb86dbb949d3d845821bf1cb33bdcfc61c1d6b06fb"
+    },
+    {
+      "scope": "closeout",
+      "path": "/private/tmp/pointstream-ball-8709-closeout-20261112/workers-transport.txt",
+      "bytes": 11,
+      "sha256": "3724d9d97b35d70e30245dcb86dbb949d3d845821bf1cb33bdcfc61c1d6b06fb"
+    },
+    {
+      "scope": "closeout",
+      "path": "/private/tmp/pointstream-ball-8709-closeout-20261112/workers.py",
+      "bytes": 680,
+      "sha256": "bb4129007747ce6210e99aaf19fe03351c4ee98479f55b7d762cf289eb4def9b"
+    },
+    {
+      "scope": "closeout",
+      "path": "/private/tmp/pointstream-ball-8709-closeout-20261112/workers.raw",
+      "bytes": 1833,
+      "sha256": "2e628c86848a75d013b29318057c35c9190c0fe41acd8db9e47d7cacebc635c7"
+    },
+    {
+      "scope": "closeout",
+      "path": "/private/tmp/pointstream-ball-8709-closeout-20261112/workers.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "wait",
+      "path": "/private/tmp/pointstream-ball-8709-wait-20261112/capacity-owner-probe.py",
+      "bytes": 1472,
+      "sha256": "4945c9d8663c64cb23a49d64f1f76def512bbf61fc0e1eabd93318098d7d15c2"
+    },
+    {
+      "scope": "wait",
+      "path": "/private/tmp/pointstream-ball-8709-wait-20261112/final-status.json",
+      "bytes": 282,
+      "sha256": "ec2af34e0002b4449ac3a50d112ec218c8293cd83b2cc126a573f485bd3cd1bb"
+    },
+    {
+      "scope": "wait",
+      "path": "/private/tmp/pointstream-ball-8709-wait-20261112/final-status.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "wait",
+      "path": "/private/tmp/pointstream-ball-8709-wait-20261112/gpu2-capacity.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "wait",
+      "path": "/private/tmp/pointstream-ball-8709-wait-20261112/gpu2-capacity.stdout",
+      "bytes": 910,
+      "sha256": "1ebddecee521600468f6e1d8e563652e6219349603d141379609ad27fc31c9ae"
+    },
+    {
+      "scope": "wait",
+      "path": "/private/tmp/pointstream-ball-8709-wait-20261112/gpu3-capacity.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "wait",
+      "path": "/private/tmp/pointstream-ball-8709-wait-20261112/gpu3-capacity.stdout",
+      "bytes": 427,
+      "sha256": "b18f9d0fc90d35ff2437576010cf074445f759e5deb779743658aa5e31bf0e67"
+    },
+    {
+      "scope": "wait",
+      "path": "/private/tmp/pointstream-ball-8709-wait-20261112/handle.json",
+      "bytes": 277,
+      "sha256": "0ca8ee794f759d0722d221754da222895d5fa1648cd359f5a5cea0ae2b84829f"
+    },
+    {
+      "scope": "wait",
+      "path": "/private/tmp/pointstream-ball-8709-wait-20261112/status.json",
+      "bytes": 281,
+      "sha256": "bf9da5e6b25172348a2d74b95cd854a0d773ccd0fddea829199493b8624e2ba5"
+    },
+    {
+      "scope": "wait",
+      "path": "/private/tmp/pointstream-ball-8709-wait-20261112/status.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "wait",
+      "path": "/private/tmp/pointstream-ball-8709-wait-20261112/wait.json",
+      "bytes": 563,
+      "sha256": "ce1f570aaae8c84ce6dc920a40632aea6b12862d64690534eac176ff38ea8f79"
+    },
+    {
+      "scope": "wait",
+      "path": "/private/tmp/pointstream-ball-8709-wait-20261112/wait.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}
