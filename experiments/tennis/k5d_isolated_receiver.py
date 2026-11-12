@@ -203,10 +203,16 @@ def verify_receipt(receipt: dict[str, Any], *, expected_context: dict[str, Any],
             or not isinstance(proof.get('decoder'), dict) or not proof['decoder'].get('pid')
             or proof['decoder'].get('returncode') != 0):
         raise ValueError('isolated receiver evidence missing or inconsistent')
-    for name in ('policy_sha256', 'runtime_inventory_sha256'):
+    for name in ('profile_sha256', 'actual_policy_sha256', 'runtime_inventory_sha256'):
         value = proof.get(name)
         if not isinstance(value, str) or len(value) != 64 or any(c not in '0123456789abcdef' for c in value):
             raise ValueError('policy inventory digest missing')
+    if not isinstance(proof.get('actual_policy'), dict) or _object_sha(proof['actual_policy']) != proof['actual_policy_sha256']:
+        raise ValueError('actual policy digest differs')
+    policy = proof['actual_policy']
+    if (policy.get('context') != expected_context or policy.get('pid') != proof['pid']
+            or policy.get('birth') != proof['birth'] or policy.get('handled_mask') != proof['handled_mask']):
+        raise ValueError('actual policy process or context differs')
     denied = proof.get('denials')
     if not isinstance(denied, dict) or set(denied) != set(CATEGORIES):
         raise ValueError('denial categories incomplete')
@@ -217,6 +223,9 @@ def verify_receipt(receipt: dict[str, Any], *, expected_context: dict[str, Any],
             or not isinstance(row.get('path'), str) or not row.get('inode') for row in rows
         ):
             raise ValueError('post-exec denial evidence incomplete')
+    if policy.get('denials') != {key: [{k: v for k, v in row.items() if k != 'errno'} for row in rows]
+                                  for key, rows in denied.items()}:
+        raise ValueError('actual denial targets differ from policy')
     for key in ('wire_sha256', 'resource_map_sha256', 'native_sha256', 'decoded_yuv_sha256', 'rendered_rgb_sha256'):
         if not isinstance(receipt.get(key), str) or len(receipt[key]) != 64:
             raise ValueError('receiver output hash missing')
@@ -286,7 +295,7 @@ def replay(wire_path: Path, map_path: Path, work: Path, *, config_path: Path, co
             raise RuntimeError(f'isolated receiver failed: {process.returncode}: {stderr[-2000:]!r}')
     receipt = json.loads((work / 'result' / 'receiver.json').read_text())
     proof = verify_receipt(receipt, expected_context=producer_context, expected_config_sha256=config_sha256)
-    if (proof['policy_sha256'] != _object_sha(profile)
+    if (proof['profile_sha256'] != _object_sha(profile)
             or proof['runtime_inventory_sha256'] != _object_sha(profile['runtime_files'])):
         raise ValueError('policy inventory identity differs')
     if proof['pid'] != process.pid or proof['birth'] != observed_birth:
@@ -310,7 +319,14 @@ def _worker(work: Path) -> None:
         raise ValueError('inventory changed before restriction')
     files += [work / 'packet.psbl', work / 'resources.json']
     pid, birth = os.getpid(), _birth()
+    actual_policy = {'read_files': [str(p) for p in files], 'execute_files': [str(p) for p in execute],
+                     'system_leaves': [str(p) for p in system], 'writable_output': str(work),
+                     'read_directories': sorted(str(p) for p in {p.parent for p in files + execute + system}),
+                     'denials': launch['denials'], 'context': launch['context'], 'pid': pid, 'birth': birth}
+    # The denial records are later augmented in place, so retain the pre-restriction inventory separately.
+    actual_policy = json.loads(json.dumps(actual_policy))
     abi, mask = _restrict(files, execute, system, work)
+    actual_policy['handled_mask'] = mask
     _denials(launch['denials'])
     if sha(work / 'packet.psbl') != launch['wire_sha256'] or sha(work / 'resources.json') != launch['map_sha256']:
         raise ValueError('positive control identity differs')
@@ -318,7 +334,8 @@ def _worker(work: Path) -> None:
     proof = {'context': launch['context'], 'config_sha256': launch['config_sha256'], 'landlock_abi': abi,
              'handled_mask': mask, 'threads': 1, 'extra_fds': False, 'pid': pid, 'postexec_pid': os.getpid(),
              'birth': birth, 'postexec_birth': birth, 'denials': launch['denials'],
-             'policy_sha256': _object_sha(launch['config']['profiles'][os.uname().nodename.split('.')[0]]),
+             'actual_policy': actual_policy, 'actual_policy_sha256': _object_sha(actual_policy),
+             'profile_sha256': _object_sha(launch['config']['profiles'][os.uname().nodename.split('.')[0]]),
              'runtime_inventory_sha256': _object_sha(launch['config']['profiles'][os.uname().nodename.split('.')[0]]['runtime_files'])}
     k5d_worker.decode(work / 'packet.psbl', work / 'resources.json', work / 'result', isolation=proof)
 
