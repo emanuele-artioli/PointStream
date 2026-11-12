@@ -4,18 +4,45 @@ from experiments.tennis import k5d_ada_scale_adapter as adapter
 
 
 def test_producer_rejects_legacy_receipt_without_actual_denial_verifier(tmp_path, monkeypatch):
+    import json
+    from types import SimpleNamespace
+
     (tmp_path / 'checkpoint.json').write_text('{}')
-    (tmp_path / 'pilot.json').write_text('{}')
+    point = {'codec': 'svt', 'point': 48}
+    (tmp_path / 'pilot.json').write_text(json.dumps({'points': [point]}))
+    gpu_uuid = 'dbbb295f-6156-1133-8658-841f3f5b17d0'
+    (tmp_path / 'source-qualification.json').write_text(json.dumps({'device': {
+        'name': adapter.GPU_NAME, 'capability': [8, 9], 'uuid': gpu_uuid}}))
+    config = tmp_path / 'config'
+    config.write_text(json.dumps({'profiles': {'gpu6': {'runtime_files': {}}}}))
+    config_sha = adapter.oracle.sha(config)
+    receipt = tmp_path / 'svt-48' / 'receiver-evidence'
+    receipt.mkdir(parents=True)
+    (receipt / 'receiver.json').write_text(json.dumps({
+        'scope': 'fresh packet-path replay; filesystem isolation NOT established'}))
     marker = {'producer_job': '20261112T000000Z-test', 'producer_stage': 'smoke', 'frames': 16,
-              'gpu': {'name': adapter.GPU_NAME, 'uuid': 'GPU-test'}}
+              'gpu': {'name': adapter.GPU_NAME, 'uuid': 'GPU-' + gpu_uuid}}
     monkeypatch.setattr(adapter.cp, 'verify', lambda *a, **kw: None)
     monkeypatch.setattr(adapter.receiver, 'verify', lambda *a, **kw: marker)
-    with pytest.raises(ValueError, match='denial verifier unavailable'):
-        adapter.producer(tmp_path, {}, job=marker['producer_job'], stage='smoke', frames=16, config_sha256='a' * 64, config_path=tmp_path / 'config')
+
+    def missing(_name):
+        raise ImportError('synthetic unavailable verifier')
+
+    with monkeypatch.context() as patch:
+        patch.setattr(adapter, 'importlib', SimpleNamespace(import_module=missing))
+        with pytest.raises(ValueError, match='denial verifier unavailable'):
+            adapter.producer(tmp_path, {}, job=marker['producer_job'], stage='smoke', frames=16,
+                             config_sha256=config_sha, config_path=config)
+    # Exercise the real integrated verifier against the old API-only receipt.
+    with pytest.raises(ValueError, match='isolated receiver evidence missing'):
+        adapter.producer(tmp_path, {}, job=marker['producer_job'], stage='smoke', frames=16,
+                         config_sha256=config_sha, config_path=config)
     with pytest.raises(ValueError, match='producer job'):
-        adapter.producer(tmp_path, {}, job='20261112T000000Z-other', stage='smoke', frames=16, config_sha256='a' * 64, config_path=tmp_path / 'config')
+        adapter.producer(tmp_path, {}, job='20261112T000000Z-other', stage='smoke', frames=16,
+                         config_sha256=config_sha, config_path=config)
     with pytest.raises(ValueError, match='paired 16/48'):
-        adapter.producer(tmp_path, {}, job=marker['producer_job'], stage='full', frames=188, config_sha256='a' * 64, config_path=tmp_path / 'config')
+        adapter.producer(tmp_path, {}, job=marker['producer_job'], stage='full', frames=188,
+                         config_sha256=config_sha, config_path=config)
 
 
 def test_score16_uses_pinned_ada_archive_and_exact_comparison(tmp_path, monkeypatch):
