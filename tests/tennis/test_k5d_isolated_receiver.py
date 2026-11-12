@@ -50,12 +50,13 @@ def test_receipt_rejects_legacy_and_incomplete_proof() -> None:
              'handled_mask': isolated.leaves.handled_rights(3), 'threads': 1, 'extra_fds': False,
              'pid': 9, 'postexec_pid': 9, 'birth': '2', 'postexec_birth': '2',
              'decoder': {'pid': 10, 'returncode': 0, 'started_monotonic_ns': 1,
-                         'argv': ['/native'], 'argv_sha256': isolated._object_sha(['/native'])},
+                         'argv': ['/native'], 'executable_resolved': '/native',
+                         'argv_sha256': isolated._object_sha(['/native'])},
              'profile_sha256': 'a' * 64, 'runtime_inventory_sha256': 'b' * 64,
              'actual_policy': {}, 'actual_policy_sha256': isolated._object_sha({}),
              'denials': {k: [{'errno': errno.EACCES, 'path': '/real', 'inode': 2, 'sha256': 'a' * 64}]
                          for k in isolated.CATEGORIES}}
-    proof['actual_policy'] = {'context': {}, 'pid': 9, 'birth': '2', 'handled_mask': proof['handled_mask'],
+    proof['actual_policy'] = {'execute_files': ['/native'], 'context': {}, 'pid': 9, 'birth': '2', 'handled_mask': proof['handled_mask'],
                               'denials': {k: [{x: y for x, y in row.items() if x != 'errno'} for row in rows]
                                           for k, rows in proof['denials'].items()}}
     proof['actual_policy_sha256'] = isolated._object_sha(proof['actual_policy'])
