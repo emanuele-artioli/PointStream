@@ -80,6 +80,9 @@ def decode(wire_path: Path, map_path: Path, work: Path, *, isolation: dict[str, 
         if isolation is None:
             subprocess.run(command, check=True, capture_output=True, timeout=3600, **kwargs)
             return
+        resolved_executable = str(Path(command[0]).resolve(strict=True))
+        if resolved_executable not in isolation["actual_policy"]["execute_files"]:
+            raise ValueError("native decoder executable is not in actual policy")
         with subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                               close_fds=True, **kwargs) as process:
             try:
@@ -90,6 +93,7 @@ def decode(wire_path: Path, map_path: Path, work: Path, *, isolation: dict[str, 
                 process.wait()
                 raise
             isolation["decoder"] = {"pid": process.pid, "started_monotonic_ns": birth, "argv": command,
+                                    "executable_resolved": resolved_executable,
                                     "argv_sha256": hashlib.sha256(json.dumps(command, separators=(",", ":")).encode()).hexdigest(),
                                     "returncode": process.returncode}
             if process.returncode:

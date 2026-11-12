@@ -231,7 +231,8 @@ def verify_receipt(receipt: dict[str, Any], *, expected_context: dict[str, Any],
     if not isinstance(proof.get('actual_policy'), dict) or _object_sha(proof['actual_policy']) != proof['actual_policy_sha256']:
         raise ValueError('actual policy digest differs')
     policy = proof['actual_policy']
-    if (policy.get('context') != expected_context or policy.get('pid') != proof['pid']
+    if (decoder.get('executable_resolved') not in policy.get('execute_files', [])
+            or policy.get('context') != expected_context or policy.get('pid') != proof['pid']
             or policy.get('birth') != proof['birth'] or policy.get('handled_mask') != proof['handled_mask']):
         raise ValueError('actual policy process or context differs')
     denied = proof.get('denials')
