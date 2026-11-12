@@ -72,7 +72,8 @@ def test_spec_builder_limits_stages_hosts_and_requires_producer_jobs(tmp_path, m
     from experiments.tennis import k5d_ada_scale_worker as worker
 
     keys = ('bridge', 'receiver_isolation_config', 'native_cpu_receipt', 'denial_witness',
-            'fidelity_gate', 'accepted16', 'ada_reference', 'prepare16', 'prepare48')
+            'fidelity_gate', 'accepted16', 'ada_reference', 'prepare16', 'prepare48',
+            'producer16_attestation', 'producer48_attestation')
     assets = {name: {'local': str(tmp_path / name),
                      'remote': '/home/itec/emanuele/Datasets/pointstream-data/test/' + name,
                      'sha256': 'a' * 64} for name in keys}
@@ -186,3 +187,169 @@ def test_namespace_uses_fixed_ada_worker_and_refuses_cpu_dispatch(monkeypatch):
     monkeypatch.setenv('CUDA_VISIBLE_DEVICES', '')
     with pytest.raises(ValueError):
         namespace.worker_command(['ada-scale-score'])
+
+
+def test_cpu_oracle_and_first_witness_specs_have_distinct_bounded_modes(tmp_path, monkeypatch):
+    import json
+    from datetime import datetime, timedelta, timezone
+    from experiments.jobs import inbox
+    from experiments.tennis import k5d_ada_witness as witness
+
+    keys = ('bridge', 'receiver_isolation_config', 'native_cpu_receipt', 'wire', 'resources', 'protected',
+            'cpu_denial', 'fidelity_gate', 'ada_reference')
+    all_assets = {name: {'local': str(tmp_path / name),
+                         'remote': '/home/itec/emanuele/Datasets/pointstream-data/test/' + name,
+                         'sha256': 'a' * 64} for name in keys}
+    all_assets['ada_reference']['sha256'] = adapter.REFERENCE_SHA256
+    monkeypatch.setattr(witness.scale, 'base_admission', lambda *a: {})
+    monkeypatch.setattr(witness, 'cpu_denial_approval', lambda *a: None)
+    monkeypatch.setattr(witness.cf, 'asset', lambda name, remote, digest, local, *, extract:
+                        {'name': name, 'path': remote, 'sha256': digest, 'extract': extract})
+    base = json.loads(witness.cf.BASE.read_text())
+    deadline = (datetime.now(timezone.utc) + timedelta(minutes=30)).isoformat()
+    common = {'bridge', 'receiver_isolation_config', 'native_cpu_receipt'}
+    cpu_assets = {k: all_assets[k] for k in common | {'wire', 'resources', 'protected'}}
+    cpu = witness.spec(base, action='cpu', assets=cpu_assets, deadline=deadline, unshare_sha256='a' * 64,
+                       identity={}, expected_yuv_sha256='b' * 64, expected_rgb_sha256='c' * 64)
+    inbox.validate_spec(cpu)
+    assert cpu['device'] == 'cpu' and cpu['gpu_models'] == [] and cpu['gpu_memory_mib'] == 0
+    assert cpu['hosts'] == ['gpu6'] and cpu['budget_seconds'] == 220
+    assert cpu['scale']['proof_mode'] == {'smoke': 'ada-denial-cpu', 'full': 'ada-denial-cpu-noop'}
+    witness_assets = {k: all_assets[k] for k in common | {'cpu_denial', 'fidelity_gate', 'ada_reference'}}
+    gpu = witness.spec(base, action='witness', assets=witness_assets, deadline=deadline,
+                       unshare_sha256='a' * 64, identity={})
+    inbox.validate_spec(gpu)
+    assert gpu['gpu_sharing'] == {'mode': 'exclusive'} and gpu['hosts'] == ['gpu6']
+    assert gpu['budget_seconds'] == 500 and gpu['smoke']['seconds'] == 420
+    assert gpu['scale']['proof_mode'] == {'smoke': 'ada-first-witness', 'full': 'ada-first-noop'}
+    assert 'denial_witness' not in witness_assets
+
+
+def test_scorer_attestation_binds_job_publication_gpu_and_denial(tmp_path):
+    import hashlib
+    import json
+    from argparse import Namespace
+    from experiments.tennis import k5d_ada_scale_worker as worker
+
+    def write(path, data):
+        path.write_text(json.dumps(data))
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+    identity = {'source_sha256': 'source'}
+    profile = {'runtime_files': {}}
+    config = tmp_path / 'config'
+    config_sha = write(config, {'profiles': {'gpu6': profile}})
+    marker = {'producer_job': '20261112T000001Z-a', 'producer_stage': 'smoke',
+              'gpu': {'uuid': 'GPU-test', 'name': adapter.GPU_NAME}}
+    audit = {'schema': 1, 'approved': True, 'consumer_execution_identity': identity,
+             'producer_job': marker['producer_job'], 'producer_stage': 'smoke', 'publication_sha256': 'a' * 64,
+             'gpu': {**marker['gpu'], 'capability': [8, 9]}, 'receiver_denial_passed': True,
+             'config_sha256': config_sha, 'profile_sha256': worker.canonical_sha(profile),
+             'runtime_inventory_sha256': worker.canonical_sha({})}
+    path = tmp_path / 'audit'
+    args = Namespace(producer16_attestation=str(path), producer16_attestation_sha256=write(path, audit),
+                     receiver_isolation_config=str(config), receiver_isolation_config_sha256=config_sha,
+                     prepare16_sha256='a' * 64)
+    worker.producer_attestation(args, identity, 16, marker)
+    audit['receiver_denial_passed'] = False
+    args.producer16_attestation_sha256 = write(path, audit)
+    with pytest.raises(ValueError, match='producer audit'):
+        worker.producer_attestation(args, identity, 16, marker)
+
+
+def test_cpu_oracle_derives_actual_dispatch_context_and_protected_files(tmp_path, monkeypatch):
+    import hashlib
+    import json
+    import sys
+    from argparse import Namespace
+    from types import SimpleNamespace
+    from experiments.tennis import k5d_ada_witness as worker
+
+    stage = tmp_path / '20261112T000001Z-cpu' / 'smoke'
+    stage.mkdir(parents=True)
+    scratch = tmp_path / 'scratch'
+    scratch.mkdir()
+    monkeypatch.setenv('PS_STAGE_DIR', str(stage))
+    monkeypatch.setenv('PS_SCRATCH_DIR', str(scratch))
+    monkeypatch.setenv('PS_STAGE', 'smoke')
+    monkeypatch.setenv('CUDA_VISIBLE_DEVICES', '')
+    monkeypatch.setattr(worker.cp, 'execution_identity', lambda: {'source_sha256': 's'})
+    monkeypatch.setattr(worker.scale, 'base_admission', lambda *a: {})
+    target = tmp_path / 'protected-file'
+    target.write_text('present')
+    protected = tmp_path / 'protected.json'
+    protected.write_text(json.dumps({k: [str(target)] for k in ('source_archive', 'source_frame', 'ground_truth',
+                                                                'encoder_state', 'private_detector')}))
+    protected_sha = hashlib.sha256(protected.read_bytes()).hexdigest()
+    calls = []
+    def run(*a, **kw):
+        calls.append(kw)
+        return {'isolation': True}
+    def verify(receipt, *, expected_context, expected_config_sha256):
+        assert expected_context == {'job_id': stage.parent.name, 'stage': 'smoke',
+                                    'execution_identity': {'source_sha256': 's'}, 'gpu': {'kind': 'cpu'}}
+        return {'actual_policy_sha256': 'a' * 64}
+    monkeypatch.setitem(sys.modules, 'experiments.tennis.k5d_isolated_receiver',
+                        SimpleNamespace(cpu_oracle=run, verify_receipt=verify))
+    args = Namespace(protected=str(protected), protected_sha256=protected_sha, wire='wire', resources='resources',
+                     wire_sha256='w', resources_sha256='m', expected_yuv_sha256='y', expected_rgb_sha256='r',
+                     receiver_isolation_config='config', receiver_isolation_config_sha256='c')
+    worker.cpu(args)
+    assert calls[0]['protected_paths']['source_frame'] == [target]
+    target.unlink()
+    with pytest.raises(ValueError, match='real readable files'):
+        worker.cpu(args)
+
+
+def test_first_witness_uses_actual_context_without_prior_gpu_witness(tmp_path, monkeypatch):
+    import sys
+    from argparse import Namespace
+    from types import SimpleNamespace
+    from experiments.tennis import k5d_ada_witness as worker
+
+    stage = tmp_path / '20261112T000001Z-witness' / 'smoke'
+    stage.mkdir(parents=True)
+    scratch = tmp_path / 'scratch'
+    scratch.mkdir()
+    (stage / 'dispatch.json').write_text('{}')
+    (stage.parent / 'spec.json').write_text('{}')
+    monkeypatch.setenv('PS_STAGE_DIR', str(stage))
+    monkeypatch.setenv('PS_SCRATCH_DIR', str(scratch))
+    monkeypatch.setenv('PS_STAGE', 'smoke')
+    identity = {'source_sha256': 's'}
+    device = {'name': adapter.GPU_NAME, 'uuid': 'GPU-test', 'capability': [8, 9]}
+    monkeypatch.setattr(worker.cp, 'execution_identity', lambda: identity)
+    monkeypatch.setattr(worker.scale, 'base_admission', lambda *a: {})
+    monkeypatch.setattr(worker, 'cpu_denial_approval', lambda *a: None)
+    monkeypatch.setitem(sys.modules, 'torch', SimpleNamespace())
+    monkeypatch.setattr(worker.parity, 'check_gpu_profile', lambda *a: device)
+    expected = {worker.cf.AUDIT_PATH: worker.cf.AUDIT_SHA, worker.fleet.SOURCE: worker.fleet.SOURCE_SHA,
+                worker.fleet.EXPOSURE: worker.fleet.EXPOSURE_SHA}
+    monkeypatch.setattr(worker.oracle, 'sha', lambda path: expected[path])
+    monkeypatch.setattr(worker.scale, 'data_args', lambda *a: Namespace(output=scratch / 'publish',
+                                                                       isolated_receiver=True, same_job_receiver=True))
+    monkeypatch.setattr(worker.enc, 'fidelity_gate', lambda *a, **kw: None)
+    prepared = []
+    monkeypatch.setattr(worker.cp, 'prepare', lambda data, _: prepared.append(data))
+    monkeypatch.setattr(worker.adapter, 'producer', lambda *a, **kw: {})
+    monkeypatch.setattr(worker.adapter, 'prepare16', lambda *a: None)
+    args = Namespace(frames=16, receiver_isolation_config='config', receiver_isolation_config_sha256='c',
+                     archive='archive', balltrack_weight='weight', wasb_config='wasb', wasb_weights='weights',
+                     fidelity_gate='gate', fidelity_gate_sha256='g', ada_reference='reference')
+    worker.witness(args)
+    assert prepared[0].receiver_producer_context == {'job_id': stage.parent.name, 'stage': 'smoke',
+                                                     'execution_identity': identity, 'gpu': device}
+    assert set(prepared[0].receiver_protected_paths) == {'source_archive', 'ground_truth', 'private_detector'}
+    assert prepared[0].isolated_receiver and prepared[0].same_job_receiver
+
+
+def test_denial_namespace_modes_enforce_cpu_and_gpu_separation(monkeypatch):
+    from experiments.tennis import k5d_scoped_namespace as namespace
+    monkeypatch.setenv('CUDA_VISIBLE_DEVICES', '')
+    assert namespace.worker_command(['ada-denial-cpu'])[2:4] == ['experiments.tennis.k5d_ada_witness', 'cpu']
+    assert namespace.worker_command(['ada-denial-cpu-noop'])[2:4] == ['experiments.tennis.k5d_ada_witness', 'noop']
+    with pytest.raises(ValueError):
+        namespace.worker_command(['ada-first-witness'])
+    monkeypatch.setenv('CUDA_VISIBLE_DEVICES', 'GPU-test')
+    assert namespace.worker_command(['ada-first-witness'])[2:4] == ['experiments.tennis.k5d_ada_witness', 'witness']
+    with pytest.raises(ValueError):
+        namespace.worker_command(['ada-denial-cpu'])
