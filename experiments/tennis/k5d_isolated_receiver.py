@@ -273,6 +273,9 @@ def verify_receipt(receipt: dict[str, Any], *, expected_context: dict[str, Any],
     observer = proof.get('worker_observer')
     if (not isinstance(namespace, dict) or namespace.get('private_proc') is not True
             or namespace.get('initial_pids') != [1] or proof['pid'] != 1 or not isinstance(observer, dict)
+            or type(namespace.get('outer_pid_hidden')) is not int or namespace['outer_pid_hidden'] <= 1
+            or not isinstance(namespace.get('mountinfo'), str) or ' - proc ' not in namespace['mountinfo']
+            or observer.get('namespace_pids', [])[-1:] != [1] or type(observer.get('pid')) is not int
             or observer.get('birth') != proof['birth'] or observer.get('namespaces') != namespace.get('namespaces')
             or any(namespace['namespaces'].get(k) == namespace['parent_namespaces'].get(k)
                    for k in ('user', 'pid', 'mnt', 'ipc'))):
@@ -294,7 +297,7 @@ def verify_receipt(receipt: dict[str, Any], *, expected_context: dict[str, Any],
     native_observer = decoder.get('outer_observation')
     if (not isinstance(native_observer, dict) or native_observer.get('namespaces') != namespace['namespaces']
             or native_observer.get('namespace_pids', [])[-1:] != [decoder['pid']]
-            or not native_observer.get('birth')):
+            or type(native_observer.get('pid')) is not int or not native_observer.get('birth')):
         raise ValueError('outer native decoder observation missing')
     if (policy.get('private_proc_read_only') is not True or policy.get('namespaces') != namespace
             or decoder.get('executable_resolved') not in policy.get('execute_files', [])
