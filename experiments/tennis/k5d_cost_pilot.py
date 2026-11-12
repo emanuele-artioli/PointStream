@@ -59,8 +59,8 @@ def reference(path: Path) -> tuple[dict[str, Any], dict[str, Any]]:
 
 
 def compare_contract(prior: dict[str, Any], original: dict[str, Any], current: dict[str, Any],
-                     source: dict[str, Any], *, exact: bool) -> None:
-    if current["clip"] != CLIP or source["clip"] != CLIP or source["device"]["capability"] != [8, 6]:
+                     source: dict[str, Any], *, exact: bool, capability: tuple[int, int] = (8, 6)) -> None:
+    if current["clip"] != CLIP or source["clip"] != CLIP or source["device"]["capability"] != list(capability):
         raise ValueError("clip or GPU class differs from accepted reference")
     for key in ("manifest", "archive", "balltrack_weight", "wasb_config", "exposure", "balltrack_code", "wasb_code", "wasb_weights"):
         a, b = original["identities"][key], source["identities"][key]

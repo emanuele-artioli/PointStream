@@ -20,6 +20,11 @@ from experiments.tennis import k5d_checkpoint as cp, k5d_checkpoint_fleet as cf
 from experiments.tennis import k5d_coalesced as co, k5d_cost_pilot as cost
 from experiments.tennis import k5d_encoder as enc, k5d_fleet as fleet, k5d_source_oracle as oracle
 
+ADA_PROFILE = 'rtx6000ada'
+A6000_PROFILE = 'a6000'
+GPU_PROFILES = {A6000_PROFILE: ('RTX A6000', 'NVIDIA RTX A6000', (8, 6)),
+                ADA_PROFILE: ('RTX 6000 Ada', 'NVIDIA RTX 6000 Ada Generation', (8, 9))}
+
 SHARED_PROFILE = 'k5d-parity16-shared-numerical-v1'
 PARENT8_CHILD2_PROFILE = 'k5d-parity16-shared-parent8-child2-v1'
 PARENT8_CHILD2_LIMIT_MIB = 10240
@@ -34,11 +39,16 @@ SHARED_BASIS = 'Exact numerical parity only; shared execution is not timing, sca
 
 def spec(base: dict, *, assets: dict[str, dict[str, str]], deadline: str, unshare_sha256: str,
          identity: dict[str, str], shared_numerical: bool = False, shared_low_memory: bool = False,
-         shared_parent8_child2: bool = False, first_pair_source: bool = False) -> dict:
+         shared_parent8_child2: bool = False, first_pair_source: bool = False,
+         gpu_profile: str = A6000_PROFILE) -> dict:
     """Build a bounded candidate only after actual assets are available.
 
     This does not reserve resources or approve a fleet submission.
     """
+    if gpu_profile not in GPU_PROFILES:
+        raise ValueError('unknown GPU profile')
+    if gpu_profile == ADA_PROFILE and (not first_pair_source or shared_numerical or shared_low_memory or shared_parent8_child2):
+        raise ValueError('Ada qualification requires exclusive same-job source')
     if sum((shared_numerical, shared_low_memory, shared_parent8_child2)) > 1:
         raise ValueError('shared profiles are mutually exclusive')
     required = {'fidelity_gate', 'accepted16', 'native_cpu_receipt'}
@@ -72,6 +82,8 @@ def spec(base: dict, *, assets: dict[str, dict[str, str]], deadline: str, unshar
                            '--native-cpu-receipt', '{staged:native_cpu_receipt}',
                            '--native-cpu-receipt-sha256', assets['native_cpu_receipt']['sha256'],
                            '--unshare-sha256', unshare_sha256]
+    if gpu_profile == ADA_PROFILE:
+        result['arguments'] += ['--gpu-profile', ADA_PROFILE]
     result['scale']['frames'] = {'smoke': 16, 'full': 16}
     if first_pair_source:
         result['arguments'] += ['--first-pair-bridge', '{staged:first_pair_bridge}',
@@ -80,7 +92,7 @@ def spec(base: dict, *, assets: dict[str, dict[str, str]], deadline: str, unshar
                                 '--consumer-source', '{staged:consumer_source}']
     result['scale']['proof_mode'] = {'smoke': 'parity16', 'full': 'parity-noop'}
     result['scale']['namespace_timeout'] = {'smoke': 580, 'full': 4}
-    result.update(gpu_models=['RTX A6000'], gpu_sharing={'mode': 'exclusive'}, budget_seconds=800,
+    result.update(gpu_models=[GPU_PROFILES[gpu_profile][0]], gpu_sharing={'mode': 'exclusive'}, budget_seconds=800,
                   validator_seconds=30, smoke={'seconds': 600, 'representative_basis':
                   'Actual 16-frame preparation and all six native replay, metric and judge paths with exact saved parity.'},
                   full={'seconds': 5}, validator=['{python}', '-m', 'experiments.tennis.k5d_real_parity', 'validate'])
@@ -207,6 +219,33 @@ def validate_resource_receipts(directory: Path, *, low_memory: bool = False, par
     return records
 
 
+def validate_gpu_evidence(profile: str, specification: dict, dispatch: dict, device: Any) -> None:
+    if profile not in GPU_PROFILES:
+        raise ValueError('unknown GPU profile')
+    model, name, capability = GPU_PROFILES[profile]
+    gpu = dispatch.get('environment', {}).get('gpu', {})
+    if (specification.get('gpu_models') != [model] or specification.get('gpu_sharing') != {'mode': 'exclusive'}
+            or dispatch.get('gpu_sharing') != {'mode': 'exclusive'} or model not in gpu.get('name', '')
+            or not gpu.get('uuid') or device != {'name': name, 'capability': list(capability), 'uuid': gpu['uuid']}):
+        raise ValueError('GPU profile, dispatch or device evidence differs')
+
+
+def check_gpu_profile(profile: str, specification: dict, dispatch: dict, torch: Any,
+                      environ: Mapping[str, str]) -> dict:
+    if profile not in GPU_PROFILES:
+        raise ValueError('unknown GPU profile')
+    _, name, capability = GPU_PROFILES[profile]
+    cuda = torch.cuda
+    if cuda.device_count() != 1 or cuda.get_device_name(0) != name or tuple(cuda.get_device_capability(0)) != capability:
+        raise ValueError('CUDA device differs from GPU profile')
+    device = {'name': name, 'capability': list(capability), 'uuid': environ.get('CUDA_VISIBLE_DEVICES')}
+    if profile == ADA_PROFILE:
+        if environ.get('PS_GPU_SHARING') not in (None, 'exclusive') or not device['uuid'] or environ.get('PS_CLAIMED_GPU_UUID') != device['uuid']:
+            raise ValueError('Ada exclusive GPU claim differs')
+        validate_gpu_evidence(profile, specification, dispatch, device)
+    return device
+
+
 def run(args: argparse.Namespace) -> None:
     stage = Path(os.environ['PS_STAGE_DIR'])
     scratch = Path(os.environ['PS_SCRATCH_DIR'])
@@ -243,10 +282,11 @@ def run(args: argparse.Namespace) -> None:
     if any(source_args) and shared:
         raise ValueError('first pair source qualification must be exclusive')
     check_resource_profile(specification, dispatch, requested=shared, environ=os.environ, low_memory=args.shared_low_memory, parent8_child2=args.shared_parent8_child2)
+    profile = getattr(args, 'gpu_profile', A6000_PROFILE)
+    if profile == ADA_PROFILE and (shared or not all(source_args)):
+        raise ValueError('Ada qualification requires exclusive same-job source')
     import torch
-    if (torch.cuda.device_count() != 1 or torch.cuda.get_device_name(0) != 'NVIDIA RTX A6000'
-            or tuple(torch.cuda.get_device_capability(0)) != (8, 6)):
-        raise ValueError('A6000 CUDA device required')
+    device = check_gpu_profile(profile, specification, dispatch, torch, os.environ)
     if shared:
         receipt_dir = scratch / 'shared-resource-receipts'
         receipt_dir.mkdir()
@@ -285,7 +325,7 @@ def run(args: argparse.Namespace) -> None:
     with cost.unpack(Path(args.accepted16), cf.D8_SMOKE_SHA) as prior:
         cp.prepare(argparse.Namespace(**data), identity)
         prepared = Path(data['output'])
-        cf.prepare_parity(prepared, prior, identity)
+        cf.prepare_parity(prepared, prior, identity, capability=tuple(device['capability']))
         checkpoint_sha = oracle.sha(prepared / 'checkpoint.json')
         data.update(checkpoint=str(prepared), output=str(scratch / 'scored'))
         co.score_all(argparse.Namespace(**data), checkpoint_sha, identity)
@@ -299,6 +339,7 @@ def run(args: argparse.Namespace) -> None:
         shutil.move(str(receipt_dir), publish / 'shared-resource-receipts')
     cp.write_new(publish / 'parity.json', {'comparison': comparison, 'checkpoint_sha256': checkpoint_sha,
                  'execution_identity': identity, 'native_cpu_receipt_sha256': args.native_cpu_receipt_sha256,
+                 'gpu_profile': profile, 'device': device,
                  'scope': 'exact 16-frame calibration parity; not an independent sample',
                  **({'shared_numerical_only': True, 'timing_evidence': False} if shared else {})})
 
@@ -355,8 +396,25 @@ def validate() -> None:
             parent8_child2 = spec_for_receipts.get('k5d_shared_parity_profile') == PARENT8_CHILD2_PROFILE
             resource_records = (validate_resource_receipts(output / 'shared-resource-receipts', low_memory=low_memory, parent8_child2=parent8_child2)
                                 if saved.get('shared_numerical_only') is True else [])
+            profile = saved.get('gpu_profile', A6000_PROFILE)
+            if spec_for_receipts.get('gpu_models') == [GPU_PROFILES[ADA_PROFILE][0]] and profile != ADA_PROFILE:
+                raise ValueError('Ada specification requires Ada evidence')
+            if profile == ADA_PROFILE:
+                if spec_for_receipts.get('arguments', []).count('--gpu-profile') != 1 or not any(
+                        spec_for_receipts['arguments'][i:i + 2] == ['--gpu-profile', ADA_PROFILE]
+                        for i in range(len(spec_for_receipts['arguments']))):
+                    raise ValueError('Ada profile must be explicitly selected')
+                dispatch = json.loads((stage / 'dispatch.json').read_text())
+                validate_gpu_evidence(profile, spec_for_receipts, dispatch, saved.get('device'))
+                source = json.loads((output / 'prepared' / 'source-qualification.json').read_text())
+                if (source['device']['name'] != GPU_PROFILES[profile][1]
+                        or source['device']['capability'] != list(GPU_PROFILES[profile][2])
+                        or not (output / 'prepared' / 'same-job-receiver.json').exists()):
+                    raise ValueError('Ada source or same-job receiver evidence differs')
+            elif profile != A6000_PROFILE:
+                raise ValueError('unknown GPU profile')
             verify_scored(output, identity)
-            cf.prepare_parity(output / 'prepared', prior, identity)
+            cf.prepare_parity(output / 'prepared', prior, identity, capability=GPU_PROFILES[profile][2])
             comparison = cp.compare_equivalence(prior, output / 'scored' / 'assembled', oracle.sha(prior / 'pilot.json'))
             if (saved['comparison'] != comparison or saved['execution_identity'] != identity
                     or saved['checkpoint_sha256'] != oracle.sha(output / 'prepared' / 'checkpoint.json')
@@ -407,6 +465,7 @@ def main() -> None:
                  'unshare-sha256'):
         parser.add_argument('--' + name)
     parser.add_argument('--frames', type=int)
+    parser.add_argument('--gpu-profile', choices=tuple(GPU_PROFILES), default=A6000_PROFILE)
     parser.add_argument('--first-pair-bridge')
     parser.add_argument('--first-pair-bridge-sha256')
     parser.add_argument('--calibration-source')
