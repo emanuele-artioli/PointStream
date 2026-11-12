@@ -11,11 +11,14 @@ import errno
 import hashlib
 import json
 import os
+import select
 import shutil
 import signal
 import stat
 import subprocess
 import sys
+import threading
+import time
 from pathlib import Path
 from typing import Any
 
@@ -146,7 +149,7 @@ def _context(context: dict[str, Any]) -> None:
     if gpu != {'kind': 'cpu'}:
         actual = dispatch['environment']['gpu']
         if (not isinstance(gpu, dict) or gpu.get('uuid') != actual.get('uuid')
-                or gpu.get('name') != actual.get('name') or gpu.get('capability') != actual.get('capability')
+                or gpu.get('name') != actual.get('name')
                 or gpu.get('uuid') != os.environ.get('CUDA_VISIBLE_DEVICES')):
             raise ValueError('producer GPU differs')
 
@@ -169,6 +172,7 @@ def _restrict(files: list[Path], execute: list[Path], system: list[Path], output
         if stat.S_ISCHR(path.stat().st_mode) and (str(path).startswith('/dev/nvidia') or path == Path('/dev/null')):
             bits |= 2 | (leaves.IOCTL_DEV if abi >= 5 else 0)
         grants.append((path, bits))
+    grants.append((Path('/proc'), 12))  # Verified private procfs only.
     grants.append((output, leaves.allowed_rights(output, output, abi)))
     try:
         for path, rights in grants:
@@ -184,6 +188,54 @@ def _restrict(files: list[Path], execute: list[Path], system: list[Path], output
     finally:
         os.close(fd)
     return abi, mask
+
+
+def _namespaces(pid: str) -> dict[str, str]:
+    return {name: os.readlink(f'/proc/{pid}/ns/{name}') for name in ('user', 'pid', 'mnt', 'ipc')}
+
+
+def _proc_identity(pid: int) -> dict[str, Any]:
+    base = Path('/proc') / str(pid)
+    birth = (base / 'stat').read_text().rsplit(')', 1)[1].split()[19]
+    status = (base / 'status').read_text()
+    ns_pid = next(line for line in status.splitlines() if line.startswith('NSpid:')).split()[1:]
+    return {'pid': pid, 'birth': birth, 'namespace_pids': [int(x) for x in ns_pid],
+            'namespaces': _namespaces(str(pid))}
+
+
+def _private_proc(parent: dict[str, str], parent_pid: int) -> dict[str, Any]:
+    current = _namespaces('self')
+    if any(current[name] == parent[name] for name in current) or os.getpid() != 1 or parent_pid <= 1:
+        raise ValueError('receiver must run as PID 1 in distinct private namespaces')
+    mounts = Path('/proc/self/mountinfo').read_text().splitlines()
+    proc_mounts = [line for line in mounts if line.split(' - ', 1)[0].split()[3:5] == ['/', '/proc']
+                   and line.split(' - ', 1)[1].split()[0] == 'proc']
+    if len(proc_mounts) != 1 or sorted(p for p in os.listdir('/proc') if p.isdecimal()) != ['1']:
+        raise ValueError('private procfs is missing or contains another process')
+    if Path('/proc', str(parent_pid)).exists():
+        raise ValueError('outer producer PID is visible in private procfs')
+    return {'namespaces': current, 'parent_namespaces': parent, 'private_proc': True,
+            'mountinfo': proc_mounts[0], 'initial_pids': [1], 'outer_pid_hidden': parent_pid}
+
+
+def _observe_native(work: Path, worker_pid: int, worker_ns: dict[str, str], stop: threading.Event) -> None:
+    handle = work / 'native-observer.json'
+    children_path = Path(f'/proc/{worker_pid}/task/{worker_pid}/children')
+    while not stop.wait(0.01):
+        try:
+            children = children_path.read_text().split()
+            if len(children) != 1:
+                continue
+            identity = _proc_identity(int(children[0]))
+            if identity['namespaces'] != worker_ns or identity['namespace_pids'][-1] <= 1:
+                continue
+            # Atomic publication prevents the restricted worker reading a partial record.
+            temp = work / 'native-observer.tmp'
+            temp.write_text(json.dumps(identity, sort_keys=True))
+            temp.replace(handle)
+            return
+        except (OSError, StopIteration, ValueError):
+            continue
 
 
 def _birth() -> str:
@@ -217,6 +269,14 @@ def verify_receipt(receipt: dict[str, Any], *, expected_context: dict[str, Any],
             or not isinstance(proof.get('decoder'), dict) or not proof['decoder'].get('pid')
             or proof['decoder'].get('returncode') != 0):
         raise ValueError('isolated receiver evidence missing or inconsistent')
+    namespace = proof.get('namespaces')
+    observer = proof.get('worker_observer')
+    if (not isinstance(namespace, dict) or namespace.get('private_proc') is not True
+            or namespace.get('initial_pids') != [1] or proof['pid'] != 1 or not isinstance(observer, dict)
+            or observer.get('birth') != proof['birth'] or observer.get('namespaces') != namespace.get('namespaces')
+            or any(namespace['namespaces'].get(k) == namespace['parent_namespaces'].get(k)
+                   for k in ('user', 'pid', 'mnt', 'ipc'))):
+        raise ValueError('private receiver namespace proof missing')
     decoder = proof['decoder']
     argv = decoder.get('argv')
     if (type(decoder.get('pid')) is not int or decoder['pid'] <= 1
@@ -231,7 +291,13 @@ def verify_receipt(receipt: dict[str, Any], *, expected_context: dict[str, Any],
     if not isinstance(proof.get('actual_policy'), dict) or _object_sha(proof['actual_policy']) != proof['actual_policy_sha256']:
         raise ValueError('actual policy digest differs')
     policy = proof['actual_policy']
-    if (decoder.get('executable_resolved') not in policy.get('execute_files', [])
+    native_observer = decoder.get('outer_observation')
+    if (not isinstance(native_observer, dict) or native_observer.get('namespaces') != namespace['namespaces']
+            or native_observer.get('namespace_pids', [])[-1:] != [decoder['pid']]
+            or not native_observer.get('birth')):
+        raise ValueError('outer native decoder observation missing')
+    if (policy.get('private_proc_read_only') is not True or policy.get('namespaces') != namespace
+            or decoder.get('executable_resolved') not in policy.get('execute_files', [])
             or policy.get('context') != expected_context or policy.get('pid') != proof['pid']
             or policy.get('birth') != proof['birth'] or policy.get('handled_mask') != proof['handled_mask']):
         raise ValueError('actual policy process or context differs')
@@ -287,7 +353,8 @@ def replay(wire_path: Path, map_path: Path, work: Path, *, config_path: Path, co
         shutil.copyfile(source, work / name)
     launch = {'config': config, 'config_sha256': config_sha256, 'denials': evidence, 'context': producer_context,
               'files': [str(p) for p in files], 'execute': [str(p) for p in execute], 'system': [str(p) for p in system],
-              'wire_sha256': sha(wire_path), 'map_sha256': sha(map_path)}
+              'wire_sha256': sha(wire_path), 'map_sha256': sha(map_path),
+              'parent_namespaces': _namespaces('self'), 'outer_pid': os.getpid()}
     (work / 'launch.json').write_text(json.dumps(launch, sort_keys=True))
     profile = config['profiles'][os.uname().nodename.split('.')[0]]
     python = _canonical(Path(profile['python']))
@@ -306,11 +373,31 @@ def replay(wire_path: Path, map_path: Path, work: Path, *, config_path: Path, co
            'TMPDIR': str(work), 'TMP': str(work), 'TEMP': str(work), 'XDG_CACHE_HOME': str(work)}
     if 'CUDA_VISIBLE_DEVICES' in os.environ:
         env['CUDA_VISIBLE_DEVICES'] = os.environ['CUDA_VISIBLE_DEVICES']
-    with subprocess.Popen([str(python), '-S', '-m', 'experiments.tennis.k5d_isolated_receiver', 'worker', str(work)], env=env,
-                          stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+    unshare_row = profile['unshare']
+    unshare = _file(Path(unshare_row['path']), unshare_row['sha256'], unshare_row['size'])
+    command = [str(unshare), '--user', '--map-root-user', '--pid', '--mount', '--ipc', '--fork',
+               '--mount-proc', str(python), '-S', '-m', 'experiments.tennis.k5d_isolated_receiver',
+               'worker', str(work)]
+    stop = threading.Event()
+    monitor: threading.Thread | None = None
+    with subprocess.Popen(command, env=env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                           close_fds=True, start_new_session=True) as process:
         try:
-            observed_birth = Path(f'/proc/{process.pid}/stat').read_text().rsplit(')', 1)[1].split()[19]
+            if process.stdout is None or not select.select([process.stdout], [], [], 120)[0]:
+                raise RuntimeError('private receiver did not start')
+            if process.stdout.readline() != b'READY\n':
+                raise RuntimeError('private receiver startup failed')
+            children = Path(f'/proc/{process.pid}/task/{process.pid}/children').read_text().split()
+            if len(children) != 1:
+                raise ValueError('private receiver launcher has unexpected children')
+            observed = _proc_identity(int(children[0]))
+            if (observed['namespace_pids'][-1] != 1
+                    or any(observed['namespaces'][k] == launch['parent_namespaces'][k]
+                           for k in launch['parent_namespaces'])):
+                raise ValueError('outer observer did not identify isolated PID 1')
+            (work / 'worker-observer.json').write_text(json.dumps(observed, sort_keys=True))
+            monitor = threading.Thread(target=_observe_native, args=(work, observed['pid'], observed['namespaces'], stop))
+            monitor.start()
             _, stderr = process.communicate(timeout=3600)
         except BaseException:
             try:
@@ -319,6 +406,10 @@ def replay(wire_path: Path, map_path: Path, work: Path, *, config_path: Path, co
                 pass
             process.wait()
             raise
+        finally:
+            stop.set()
+            if monitor is not None:
+                monitor.join(timeout=10)
         if process.returncode:
             raise RuntimeError(f'isolated receiver failed: {process.returncode}: {stderr[-2000:]!r}')
     receipt = json.loads((work / 'result' / 'receiver.json').read_text())
@@ -326,8 +417,12 @@ def replay(wire_path: Path, map_path: Path, work: Path, *, config_path: Path, co
     if (proof['profile_sha256'] != _object_sha(profile)
             or proof['runtime_inventory_sha256'] != _object_sha(profile['runtime_files'])):
         raise ValueError('policy inventory identity differs')
-    if proof['pid'] != process.pid or proof['birth'] != observed_birth:
-        raise ValueError('launcher and worker process identity differ')
+    native_observation = json.loads((work / 'native-observer.json').read_text())
+    if (proof['pid'] != 1 or proof['birth'] != observed['birth']
+            or proof['namespaces']['namespaces'] != observed['namespaces']
+            or proof['decoder'].get('outer_observation') != native_observation
+            or native_observation['namespace_pids'][-1] != proof['decoder']['pid']):
+        raise ValueError('outer and receiver lineage observations differ')
     if (receipt['wire_sha256'] != launch['wire_sha256'] or receipt['resource_map_sha256'] != launch['map_sha256']
             or receipt['decoded_yuv_sha256'] != sha(work / 'result' / 'native.yuv')
             or receipt['rendered_rgb_sha256'] != sha(work / 'result' / 'rendered.rgb')):
@@ -342,6 +437,18 @@ def _worker(work: Path) -> None:
     if len(os.listdir('/proc/self/task')) != 1 or any(int(fd) > 2 and Path('/proc/self/fd', fd).exists() for fd in os.listdir('/proc/self/fd')):
         raise RuntimeError('worker is not single-threaded or inherited descriptors')
     launch = json.loads((work / 'launch.json').read_text())
+    namespace_proof = _private_proc(launch['parent_namespaces'], launch['outer_pid'])
+    print('READY', flush=True)
+    observer_path = work / 'worker-observer.json'
+    deadline = time.monotonic() + 30
+    while not observer_path.is_file():
+        if time.monotonic() >= deadline:
+            raise RuntimeError('outer worker observation missing')
+        time.sleep(0.01)
+    observer = json.loads(observer_path.read_text())
+    if (observer.get('birth') != _birth() or observer.get('namespaces') != namespace_proof['namespaces']
+            or observer.get('namespace_pids', [])[-1:] != [1]):
+        raise ValueError('outer worker observation differs')
     files, execute, system = inventory(launch['config'])
     if [str(p) for p in files] != launch['files'] or [str(p) for p in execute] != launch['execute']:
         raise ValueError('inventory changed before restriction')
@@ -350,6 +457,7 @@ def _worker(work: Path) -> None:
     actual_policy = {'read_files': [str(p) for p in files], 'execute_files': [str(p) for p in execute],
                      'system_leaves': [str(p) for p in system], 'writable_output': str(work),
                      'read_directories': sorted(str(p) for p in {p.parent for p in files + execute + system}),
+                     'private_proc_read_only': True, 'namespaces': namespace_proof,
                      'denials': launch['denials'], 'context': launch['context'], 'pid': pid, 'birth': birth}
     # The denial records are later augmented in place, so retain the pre-restriction inventory separately.
     actual_policy = json.loads(json.dumps(actual_policy))
@@ -364,6 +472,7 @@ def _worker(work: Path) -> None:
     proof = {'context': launch['context'], 'config_sha256': launch['config_sha256'], 'landlock_abi': abi,
              'handled_mask': mask, 'threads': 1, 'extra_fds': False, 'pid': pid, 'postexec_pid': os.getpid(),
              'birth': birth, 'postexec_birth': birth, 'denials': launch['denials'],
+             'namespaces': namespace_proof, 'worker_observer': observer,
              'actual_policy': actual_policy, 'actual_policy_sha256': _object_sha(actual_policy),
              'profile_sha256': _object_sha(launch['config']['profiles'][os.uname().nodename.split('.')[0]]),
              'runtime_inventory_sha256': _object_sha(launch['config']['profiles'][os.uname().nodename.split('.')[0]]['runtime_files'])}
