@@ -700,3 +700,15 @@ newprospectivefreshAda study; neverweakenoldreferenceafteroutcomes.
 
 Ada qualification wait: job `20261112T192044Z-461e16e8`, initial canonical status pending; one `ps-fleet wait --max-seconds 2500` via management gpu5 and /usr/bin/python3, deadline 2026-11-12T20:00:05.184948Z. Client PID stored before execution in `/private/tmp/pointstream-ada-461e-wait-20261112/client.pid`; output `wait.json` and `wait.stderr` in same directory. Source revision 21482f35c2d5d1d476d5e9cf099151c69c597a9c, snapshot 5fd841f7e2fc718fb198a7f47a5e737e4cbbc88f1793e6574883dd7cd9fcc3cd; GPU 1000 and CPU 1150 ceilings, including 350 external CPU.
 Ada qualification wait backend session `19953`; PID and output files recorded above.
+
+
+Root461e closeout: `20261112T192044Z-461e16e8` EXPIRED unassigned; no GPU/native parity execution. Exact ready/raw/spec/source and missing execution/empty admission inventory accepted. Full350externalCPU/0GPU charged; programme19362GPU/49481CPU, oldBallparent7920GPU/800CPU. Receipt `k5d-inputs/ada-461e-root-closeout-20261112.json`. One new prospective separate Ball capacity phase1000GPU/1400CPU (200monitor+max1200one frozen test), inside unchanged64800GPU/72000CPU Ball and global86400/100800. Standing controller not yet running; source paths now durable; no automatic scientific promotion.
+
+Standing capacity release: rootreviewed seal9e9ace75,8fixtures, exactunchangedsource/spec identities. Monitoring200CPU conservativelyprecharged inside newBallphase; global19362GPU/49681CPU. FutureonefrozenGPUphase1000GPU/max1200CPUreserved. Durablecontroller path `/Users/manu/.cache/pointstream-resource-watch-20261112-standing/`; sourceworktrees/cacheandjournalpinned. Five-minutechecks<=4wallhours, no recurringmodelcalls, one attemptflag beforecanonicalsubmission, no replay/promotion. ActualstartPID/expiry recorded bylauncher beforewaiting.
+
+- 2026-11-12T20:25:16.906359+00:00 Standing resource watch: fleet submission `20261112T202503Z-37b3b79b`, profile `ada`, source snapshot `5fd841f7e2fc718fb198a7f47a5e737e4cbbc88f1793e6574883dd7cd9fcc3cd`; inspect status before any further action.
+
+Controller publication verified: job `20261112T202503Z-37b3b79b`, source21482/tree9e2376330c76eab979efbe0a3f8dcf21175f5e9d470a6b1219cf8c39e823fa0a/archive5fd841f7e2fc718fb198a7f47a5e737e4cbbc88f1793e6574883dd7cd9fcc3cd source_archive:true; canonical spec c7e3cce7f60fadf156ef5cdd6c303d138439b2a25de9ceb8ff914641210f5df6, release file SHA 4d6c79c00ce0834b395c194cd60c1cf8c00f3d3b849cd5b82b1de2265f4baaf7, only deadline differs from 461e. Deadline 2026-11-12T21:04:45.903087Z, max 1000 GPU-s and 1150 CPU-s including 350 external. Canonical status running on gpu6 Ada exclusive, PID/PGID 3168531. One wait pending.
+
+Job `20261112T202503Z-37b3b79b` sole canonical wait `scripts/ps-fleet wait --max-seconds 2500` via gpu5, deadline 2026-11-12T21:04:45.903087Z; output and client PID in `/private/tmp/pointstream-ada-37b3-20261112/`; no retry or automatic promotion.
+Ada 37b3 sole wait backend session `40593`; client PID `21329`, output paths above.

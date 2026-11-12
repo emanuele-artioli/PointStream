@@ -15,15 +15,14 @@ identified, not forecasts for an unprepared new job.
 
 ## Current November12 alternate-GPU qualification
 
-The user requested regular resource polling and a non-A6000 route. Native
-monitoring found gpu5 Ada capacity, then stopped on that candidate. Root accepted
-new source-bound CPU proof d24d; Ada16 job `20261112T192044Z-461e16e8` was
-published pending on gpu5/6. Native workers check every minute until20:00UTC;
-one canonicalwait2500 handles the outcome, with no AI heartbeat. All exact
-old-reference checks remain. Downstream Ada/scale admission is held pending
-actual qualification and later review. [Current handoff](../continuation-2026-11-12.md)
-and [card](../cards/k5d-ada-qualification-2026-11-12.md) override earlier recovery
-states below. No GPU outcome is claimed at publication.
+The user requested regular resource polling and a non-A6000 route. CPU proofd24d
+is accepted; Ada16 request `20261112T192044Z-461e16e8` expired unassigned and
+rootclosed350CPU/0GPU. No GPU parity or cost result exists. A separate bounded
+standing capacity phase started20:24UTC for native five-minute A6000/Ada
+checks, found idlegpu6 and published37b3, now running smoke with one canonicalwait. All exact reference
+checks remain; downstream Ada/scale admission is held.
+[Current handoff](../continuation-2026-11-12.md) and
+[standing card](../cards/k5d-standing-capacity-2026-11-12.md) are authoritative.
 
 ## Historical November12 recovery update
 

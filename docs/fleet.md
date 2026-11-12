@@ -694,7 +694,7 @@ smoke gates had passed (Ada) or they were rerun (GV100).
 **November12 Ball hardware qualification:** the opt-in Ada16 source profile
 preserves every exact accepted A6000 reference comparison and requires a new
 source-bound CPU proof plus exclusive GPU validation. CPU proof d24d is accepted;
-GPU request `20261112T192044Z-461e16e8` is pending at publication. This is not yet
+GPU request `20261112T192044Z-461e16e8` expired unassigned; no GPU execution. This is not yet
 a passing Ada parity/cost row, nor downstream study admission. RTX6000Ada is the
 best documented alternative for these models; the RTX8000 lacks this HT-L
 pipeline qualification, and GV100 has the upstream failure recorded above.

@@ -21,6 +21,15 @@ See [handoff](../continuation-2026-11-12.md) and
 gate under929CPU. No paid server, source/numerical relaxation, manuscript or
 PRESLEY change, training or paper submission.
 
+## Latest capacity decision — November12, after20:00UTC
+
+Ada461e expired unassigned, rootaccepted and eventACKed; no GPU parity result.
+Current programme charges19,362GPU/49,681CPU. Separate Ball capacity phase
+1,000GPU/1,400CPU is prospectively reserved, no outer ceiling or transfer.
+Actual37b3 is running the one Ada qualification on gpu6; sole canonicalwait.
+See [standing card](k5d-standing-capacity-2026-11-12.md); earlier pending461e
+instructions above are historical. W8 stays held; paper/PRESLEY untouched.
+
 ## Goal and scope
 
 Develop the ball prototype into a reproducible, fully billed small-object

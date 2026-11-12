@@ -1899,6 +1899,24 @@
       "cpu_seconds": 250,
       "basis": "Rootacceptedexact21482CPUproof d24d: canonicalCOMPLETE,26actualpublishedmemberSHAjoins,4native/namespaceexitmodes,19observedbirths/campaign/supervisor/claimabsent,normal2.89028inner/3.036772outerCPU; alltool/source/specsha match. Full250futureCPU charged,50prep separatelyalreadycharged; administrativeaggregateunmetered. NoGPU/numeric/cost/scaleclaim.",
       "release_stage": "research-first24/28-hardware-qualification"
+    },
+    {
+      "phase": "ball-ada-461e-closeout-20261112",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 350,
+      "basis": "Entire external reserve conservatively charged; aggregate administrative CPU unmetered. No GPU admission.",
+      "release_stage": "research-first24/28-hardware-qualification"
+    },
+    {
+      "phase": "ball-standing-monitoring-20261112",
+      "parent_phase": "ball-opportunistic-capacity-20261112",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 200,
+      "basis": "Prospective entire200monitoradministrative allowance charged before release; watcher180countedguard+outer20, fixedcooperativequeries. SSHserver/login andaggregateprocess-treeCPUunmetered; no whole-host200guarantee. No model ortraining. OnefutureGPUphaseexternalreserve separatelyincludescanonicalCLI/doctor/wait/audit.",
+      "release_stage": "research-first24/28-capacity-watch"
     }
   ],
   "reservations": [
@@ -2417,8 +2435,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 7920,
-      "cpu_seconds": 1150,
-      "status": "Remaining_unspent;1000GPU/1150CPU nested461e exclusiveAdaqualification; no otherGPU/scale release"
+      "cpu_seconds": 800,
+      "status": "Remaining_unspent; prior461e expired unassigned rootaccepted; no active GPU request"
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -2484,6 +2502,14 @@
       "gpu_seconds": 4550,
       "cpu_seconds": 929,
       "status": "Remaining_unspent; prior unknown queue rootclosedexpiredunassigned20261112; no new queue/fullstudy release"
+    },
+    {
+      "phase": "ball-opportunistic-capacity-20261112",
+      "workstream": "ball",
+      "release_stage": "research-first24/28-capacity-watch",
+      "gpu_seconds": 1000,
+      "cpu_seconds": 1200,
+      "status": "Remaining_unspent; max1000GPU/1200CPUonefrozenA6000(or1150Ada) attempt triggered by standingwatch; no scale/retry"
     }
   ],
   "jobs": [
@@ -4667,7 +4693,7 @@
       "job_id": "20261112T192044Z-461e16e8",
       "phase": "k5d-scale-first-tranche-20261105",
       "subphase": "Ada21482exclusive16qualification",
-      "state": "pending;rootverifiedmanifest/sourcearchive/spec",
+      "state": "expiredunassigned;rootaccepted20261112",
       "revision": "21482f35c2d5d1d476d5e9cf099151c69c597a9c",
       "source_sha256": "9e2376330c76eab979efbe0a3f8dcf21175f5e9d470a6b1219cf8c39e823fa0a",
       "snapshot_sha256": "5fd841f7e2fc718fb198a7f47a5e737e4cbbc88f1793e6574883dd7cd9fcc3cd",
@@ -4695,8 +4721,45 @@
       "CPU_gate_SHA": "3da5120c7c420271b572fb2d7b20cb17963b612e741e3d7420cecce86fd2a4e1",
       "scope": "ONEexplicitAda exclusive actual16 retainedreceiver+exactA6000referenceparity/lifecyclecost; no48/292/586/full30/retry. Nativefleetavailabilitychecks1min, noAIheartbeat.",
       "local_batch": "/private/tmp/pointstream-ada-gpu-run-20261112",
-      "wait_state": "Solecanonicalwait2500active;PID17045/session19953;runnerattending;fallbackonecheck20:02UTC,no recurringAI",
-      "wait_handle": "/private/tmp/pointstream-ada-461e-wait-20261112/handle.json"
+      "wait_state": "solewaitended;rootacceptedexpired;canonicaleventACKed",
+      "wait_handle": "/private/tmp/pointstream-ada-461e-wait-20261112/handle.json",
+      "terminal_CPU_charge": 350,
+      "terminal_GPU_charge": 0,
+      "qualification_executed": false,
+      "recovery_receipt": "docs/experiments/k5d-inputs/ada-461e-root-closeout-20261112.json"
+    },
+    {
+      "job_id": "20261112T202503Z-37b3b79b",
+      "phase": "ball-opportunistic-capacity-20261112",
+      "subphase": "Ada21482exclusive16qualification",
+      "state": "running;pending root terminal review",
+      "revision": "21482f35c2d5d1d476d5e9cf099151c69c597a9c",
+      "source_sha256": "9e2376330c76eab979efbe0a3f8dcf21175f5e9d470a6b1219cf8c39e823fa0a",
+      "snapshot_sha256": "5fd841f7e2fc718fb198a7f47a5e737e4cbbc88f1793e6574883dd7cd9fcc3cd",
+      "source_archive": true,
+      "spec_sha256": "c7e3cce7f60fadf156ef5cdd6c303d138439b2a25de9ceb8ff914641210f5df6",
+      "release_spec_sha256": "4d6c79c00ce0834b395c194cd60c1cf8c00f3d3b849cd5b82b1de2265f4baaf7",
+      "deadline": "2026-11-12T21:04:45.903087+00:00",
+      "hosts": [
+        "gpu5",
+        "gpu6"
+      ],
+      "gpu_models": [
+        "RTX 6000 Ada"
+      ],
+      "future_GPU": 1000,
+      "future_CPU": 1150,
+      "external_CPU": 350,
+      "campaign": 800,
+      "namespace": 580,
+      "smoke": 600,
+      "validator": 30,
+      "noop": 5,
+      "local_storage_gib": 32,
+      "scope": "One frozen exclusive Ada 16-frame qualification; no further submission or automatic promotion.",
+      "local_batch": "/private/tmp/pointstream-ada-37b3-20261112",
+      "wait_state": "solecanonicalwaitactive;clientPID21329/backend40593",
+      "wait_handle": "/private/tmp/pointstream-ada-37b3-20261112/"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -4717,16 +4780,18 @@
     "Rootnativeproofaccountingamendment20261106: original220CPUleafprospectiveforecastwasnotprovencompletebecausemanager/publicationpostcampaignnotmetered. Wholeone-core120.698wallupper\u2192130CPU+30audit revisesleaf250CPU including90prior, allinsideunchangedballtranche/programme/workstream. No newGPU/computation oruserceilingincrease.",
     "Root20261112conditionalONEpost-outagecorrected16release: source0bb/450d/21cd, spec81579349/raw5b1b8192, deadline17:46:24.716400UTC.1000GPU/1200futureCPU nested inexistingBall7920/2250;400externalincluded. Passingfreshdoctor/localpath/SHAreadinessrootreviewed. Noautomaticretry/scale. ExactnewIDwillberecordedonce; no replayuncertainty.",
     "Root20261112partial-pool operational correction: one new submission may use isolatedlocalconfig hosts[gpu5,gpu2,gpu3], samebase/workeridentities, originalscientifichosts gpu2/3 andsource0bb. Allparticipating-hostsharedvisibility/atomicchecks mandatory; globalconfig/workers unchanged.1000GPU/1200futureCPU incl400external nested inBall7920GPU/1850CPU; no automaticretryifpartialreadinessfails. OldfailedcommandcreatednoID, never a replay.",
-    "User20261112explicitlyrequestsregularresourcepolls andnonA6000task. Native5min<=45minwatchmayreportpotentialidleA6000/Ada, neverexecutesjoborweakensfleetgates. No recurringLLM/automation. Opt-inAdaimplementationmaybeprepared, butfreshCPUproof/exclusiveexactreferenceparity/costgatesandbudgetsrequired; noautoAda/fullstudyadmission."
+    "User20261112explicitlyrequestsregularresourcepolls andnonA6000task. Native5min<=45minwatchmayreportpotentialidleA6000/Ada, neverexecutesjoborweakensfleetgates. No recurringLLM/automation. Opt-inAdaimplementationmaybeprepared, butfreshCPUproof/exclusiveexactreferenceparity/costgatesandbudgetsrequired; noautoAda/fullstudyadmission.",
+    "Root20261112prospectivelyallocates separate Ball1000GPU/1400CPU:200nativewatch+max1200oneA6000(or1150Ada) attempt. Prior461e closedexpired no scientificexecution. No transfer/outerceilingincrease, no newscience/numericthreshold/reference or automaticretry. UnspentBallworkstream covers newreservation; monitorSSHserver/login CPUunmetered, CLIadministrative costs in GPUexternal reserve."
   ],
   "monitoring": {
-    "mode": "blocked_external_fleet_connectivity;all_localwaits_and_one-shotchecksended",
-    "state": "All6configuredmanagementroutes failed duringincident; finaladaptivegpu4/gpu6also60stimeout aftergpu5/gpu3finalbatch. W84c24/Ball4d0dexecution/expiryunknown. Preservefuture1750CPU/1500GPU nestedparents. No furtherpoll/wait/timer/admission/replay until restoredaccess permits actualjob/claim/owner audit.",
+    "mode": "one_canonical_fleet_wait_after_native_resource_candidate",
+    "state": "Resourcewatchstoppedfirsttickidle gpu6; actual37b3runningAda smoke, solecanonicalwaitclient21329/session40593. No recurringAI/secondwatch/retry/promotion.",
     "jobs": [
-      "20261110T190907Z-4d0dd928",
-      "20261110T183845Z-4c240783"
+      "20261112T202503Z-37b3b79b"
     ],
-    "batches": [],
+    "batches": [
+      "/Users/manu/.cache/pointstream-resource-watch-20261112-standing/run"
+    ],
     "native_completion_resume_verified": false,
     "recurring_llm_polling": false,
     "completed": false
