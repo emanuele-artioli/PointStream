@@ -13,7 +13,19 @@ and the legacy 200-GPU-hour study are outside scope. No new computation was run
 for this audit. Costs below are ceilings or historical charges where explicitly
 identified, not forecasts for an unprepared new job.
 
-## November12 recovery update
+## Current November12 alternate-GPU qualification
+
+The user requested regular resource polling and a non-A6000 route. Native
+monitoring found gpu5 Ada capacity, then stopped on that candidate. Root accepted
+new source-bound CPU proof d24d; Ada16 job `20261112T192044Z-461e16e8` was
+published pending on gpu5/6. Native workers check every minute until20:00UTC;
+one canonicalwait2500 handles the outcome, with no AI heartbeat. All exact
+old-reference checks remain. Downstream Ada/scale admission is held pending
+actual qualification and later review. [Current handoff](../continuation-2026-11-12.md)
+and [card](../cards/k5d-ada-qualification-2026-11-12.md) override earlier recovery
+states below. No GPU outcome is claimed at publication.
+
+## Historical November12 recovery update
 
 The [current handoff](../continuation-2026-11-12.md) supersedes the unknown-job
 state below. Both old requests expired unassigned and are charged/acknowledged.

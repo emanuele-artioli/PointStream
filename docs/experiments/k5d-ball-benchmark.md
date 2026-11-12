@@ -626,3 +626,77 @@ corrected16 parity/cost or new scientific result follows. [Root closeout](k5d-in
 No activewait/timer/newqueue or automaticretry remains. PreserveNFSarchive and
 localstaging; consider a new bounded request only after fresh capacity/readiness
 review, not folder cleanup. The existing188-frame result stays scoped/unchanged.
+
+
+### 2026-11-12 — User-requested native watch and Ada qualification
+
+User requests regularresourcepolling and a nonA6000 route. A machine-only
+5min/45min watcher (no modelturns/jobs) found both gpu5 Ada devices potentially
+idle on its first18:43:50UTC tick and stopped. The actual task still requires
+fresh fleet checks and qualification, not merely an idle observation. Full40
+shared administrativeCPU charged; counted-process bound does not measure the
+SSHserver/login substrate. Sourceprep50BallCPU charged; programme19362GPU/48881CPU,
+parentBall7920GPU/1400CPU, shared1CPUleft.
+
+Root reviewed and approved the actualarchive Ada bridge for21482f35, source9e2376,
+archive5fd841. It adds explicitAda8.9 exclusive qualification while preserving
+all old A6000 defaults and accepted16 comparisons; downstreamA6000 gates stay
+held. [Card](../cards/k5d-ada-qualification-2026-11-12.md) and
+[CPU release](k5d-inputs/ada-2148-native-CPU-root-release-20261112.json).
+One newactualsource CPUproof is released at250futureCPU plus50chargedprep,0GPU,
+using the prior d201100onecorecampaign and same helper/tool/input hashes. Only
+deadline changes in its spec; sourcearchive binds21482. PublicationIDwillbe
+recorded once. No automaticGPU/retry/scale; uncertain submissions inspected,
+never replayed. A distinct large readonlyprerequisitefetch timedout55s after
+6MB; its PID2266035/birth718893878 remainsunproven, partialtarunused. Verified
+localcalibrationarchive and tinycanonicald201spec export were used instead.
+
+
+CPUproof submit-in-progress actualallocatedID `20261112T190032Z-d24d7c7c`; source21482/archive5fd8,
+future250CPU/0GPU, deadline19:33:44.288441UTC. CLItransport session53407,
+stdout/stderr under `/private/tmp/pointstream-ada-preparation-21482f35-20261112/`.
+Publication is not yet confirmed; inspectexactID anddo not replay ifinterrupted.
+
+
+RootpublicationACK: `20261112T190032Z-d24d7c7c` pending, exact21482/5fd8/9e2376,
+sourcearchive:true, spec51e93319, rawc05be32e, CPU-only250future +50prep within
+parent1400remaining. Rootauthorizes ONEcanonicalwait600. Localrecordcopiedonce
+todefaulttracker; globalconfig unchanged. NoGPU/automaticretry/scale.
+
+CPU proof d24d canonical wait: job `20261112T190032Z-d24d7c7c`, status running on gpu2, supervisor PID 932748, worker PID/PGID 933010; deadline 2026-11-12T19:33:44.288441Z. One `ps-fleet wait --max-seconds 600`; output `/private/tmp/pointstream-ada-d24d-audit-20261112/wait.json`, client PID recorded in `wait-client.pid` before invocation. Source archive 5fd841f7e2fc718fb198a7f47a5e737e4cbbc88f1793e6574883dd7cd9fcc3cd; CPU allocation 250 future plus 50 preparation; no GPU.
+
+
+AdaGPU submit-in-progress actualID `20261112T192044Z-461e16e8`; source21482/5fd8/9e2376,
+GPU1000/futureCPU1150 including350external, sameexact16checks. Deadlinefrom
+rootGPUrelease; CLI session88896, stdout/stderr
+`/private/tmp/pointstream-ada-gpu-run-20261112/`. Publicationnotconfirmedyet;
+inspectexactID, neverreplay.
+
+
+### 2026-11-12 — Root-approved CPU gate and actual Ada GPU request
+
+Root accepted `20261112T190032Z-d24d7c7c` CPU mechanism only after26actualmember
+SHAjoins, allfourmodes,19observedbirths/campaign/supervisor/claimabsence and
+normalCPU2.89028inner/3.036772outer. TERMneededKILL escalation. Native stream
+matchesoldreal d201, notstandin. Gate3da5120c7c420271b572fb2d7b20cb17963b612e741e3d7420cecce86fd2a4e1,
+canonicaleventc0cefd09693d59cdbc99d9e9d1120928ACK.250futureCPUcharged,50prep
+separatealreadycharged: global19362GPU/49131CPU, Ballparent7920GPU/1150CPU.
+
+RootnowpublishedONE Ada GPU request **`20261112T192044Z-461e16e8`**, pending,
+source21482/tree9e2376/archive5fd841, sourcearchive:true. Rawspec917299cd2f142d699f7d194a9429953771673b9ccd37f086b94645db0ec8cee7,
+canonicalb4c7259f047bda1cc25507c9decbecebabbcfd47a3f3dec664df4c59fef83cfe,
+deadline**2026-11-12T20:00:05.184948UTC**. Both5/6MAINandlargeinputscached,
+separateSSDs andgpu6unshare9fchecked. Newgate/bridgepublishedimmutablecheckdir;
+actuald24dsourcearchive reused, no new upload. Stage800,namespace580,smoke600,
+validator30,noop5,CPU1150including350external/GPU1000, nestedwhole1150parent.
+
+Fleet polls availabilityonceaminute, notrecurringmodelturns. Fortyminuteabsolute
+admission/executiondeadline; hardbudget/latedeadlinefailure stops withoutretry.
+Rootmanifest/specACKauthorizesonecanonicalwait2500; oneexpectedfinishcheck20:02UTC
+ifcompletioncallbackunverified. No otherqueue/48/292/586/full30/newhardware or
+source/numericrelaxation. NativeDCVCencoded/decodedfreshwithinthesamejob.
+Ifexactoldreferencefails, retaincrossclassnegative andseparatelyconsider a
+newprospectivefreshAda study; neverweakenoldreferenceafteroutcomes.
+
+Ada qualification wait: job `20261112T192044Z-461e16e8`, initial canonical status pending; one `ps-fleet wait --max-seconds 2500` via management gpu5 and /usr/bin/python3, deadline 2026-11-12T20:00:05.184948Z. Client PID stored before execution in `/private/tmp/pointstream-ada-461e-wait-20261112/client.pid`; output `wait.json` and `wait.stderr` in same directory. Source revision 21482f35c2d5d1d476d5e9cf099151c69c597a9c, snapshot 5fd841f7e2fc718fb198a7f47a5e737e4cbbc88f1793e6574883dd7cd9fcc3cd; GPU 1000 and CPU 1150 ceilings, including 350 external CPU.
+Ada qualification wait backend session `19953`; PID and output files recorded above.

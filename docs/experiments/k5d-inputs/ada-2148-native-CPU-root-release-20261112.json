@@ -1,0 +1,33 @@
+{
+  "scope": "ONE exact21482 CPU nativeproof only; noGPU",
+  "source_revision": "21482f35c2d5d1d476d5e9cf099151c69c597a9c",
+  "source_sha256": "9e2376330c76eab979efbe0a3f8dcf21175f5e9d470a6b1219cf8c39e823fa0a",
+  "archive_sha256": "5fd841f7e2fc718fb198a7f47a5e737e4cbbc88f1793e6574883dd7cd9fcc3cd",
+  "actual_spec": "/private/tmp/pointstream-ada-preparation-21482f35-20261112/cpu-operational-spec.json",
+  "raw_spec_sha256": "c05be32ec2f29c119fcfbb567aad2ad6e29972ffbec21e9583ae7bf30d301c5c",
+  "canonical_spec_sha256": "51e933190d4d0af6098efd9ef636a4e8023e77bb7e397ff6429cf65bc2cbfb4d",
+  "deadline": "2026-11-12T19:33:44.288441+00:00",
+  "prior_d201_changed_fields": [
+    "deadline",
+    "deadline_epoch"
+  ],
+  "future_CPU": 250,
+  "preparation_CPU_alreadycharged": 50,
+  "GPU": 0,
+  "campaign": 100,
+  "postcampaign_CPU": 100,
+  "audit_CPU": 30,
+  "contingency_CPU": 20,
+  "old_helpers_unchanged": true,
+  "host": [
+    "gpu2"
+  ],
+  "source_archive_required": true,
+  "stops": "Any source/tool/input/native correctness/teardown/isolation/budget/deadline mismatch stops; no automaticretry/GPUrelease. No transfer/budgetincrease.",
+  "accounting": "Nested inremainingBall1400CPU. Bound not measuredaggregate; administrativeuncertainty remains.",
+  "job_id": "20261112T190032Z-d24d7c7c",
+  "submission_state": "pending;rootverifiedarchive/source/spec",
+  "submit_tool_session": 53407,
+  "root_manifest_acknowledged": true,
+  "canonical_wait_max_seconds": 600
+}

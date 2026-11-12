@@ -1,5 +1,63 @@
 # Continuation — November 12, restored fleet access
 
+## Current alternate-GPU qualification — native polling active
+
+The user requested regular resource checks and an alternative to the A6000.
+A machine-only five-minute watcher found both gpu5 Ada devices idle on its first
+18:43:50UTC check and stopped; no recurring AI automation was created. Later
+readiness checks found the Ada devices occupied again. The native fleet now
+checks once a minute for the approved queued request below, with no AI polling.
+
+**`20261112T192044Z-461e16e8`** is the actual new Ada16 qualification request,
+pending at publication. Frozen source21482f35/tree9e2376/archive5fd841,
+source_archive:true, specb4c7259f/raw917299cd, hosts gpu5/gpu6, hard deadline
+**2026-11-12T20:00:05.184948UTC**. Maximum1,000GPU/1,150CPU including350external,
+800campaign/580namespace/600smoke/30validator/5no-op,32GiB local, packedMAIN32e.
+This entire maximum is nested in the remaining parent, not additional budget.
+The single canonicalwait2500 has localPID17045/backend session19953; the runner
+is attending it. Handle/outputs:
+`/private/tmp/pointstream-ada-461e-wait-20261112/`. No second wait or replay.
+Root's single expected-finish check is20:02UTC if no completion wake arrives.
+Copy the complete actual ID from the Ball journal before any fleet action.
+
+Root accepted CPU proof **`20261112T190032Z-d24d7c7c`**, canonicalCOMPLETE:
+26 publication member hashes, four real native modes,19 observed births and
+campaign/supervisor/claim absence. Normal2.89028inner/3.036772outerCPU; TERM
+required KILL escalation. Gate3da5120c is approved for exact21482; canonical
+eventc0cefd09 acknowledged. This is CPU containment evidence, not CUDA parity.
+Actual source bridge c87f91d3 compares the real archives:1,340unchanged files,
+48changed paths,8pinned patches. Default A6000 behavior and every accepted16
+native/wire/pixel/metric/judge equality are unchanged. Downstream Ada admission
+remains held even if the initial16 passes. Full integrated checks passed:
+2,129tests/40skips, Ruff, mypy577files. [Qualification card](cards/k5d-ada-qualification-2026-11-12.md).
+
+Current charges **19,362GPU/49,131CPU** of86,400/100,800. Remaining parent Ball
+**7,920GPU/1,150CPU**, W8 **4,550GPU/929CPU**; shared1CPU uncharged. The native
+watch was charged40CPU conservatively (not a measured whole-SSH-system bound).
+CPU proof was300inclusiveCPU (50prep +250closure),0GPU. No GPU outcome or charge
+is established yet; preserve the full queued maximum if communication fails.
+
+Durable pre-outcome snapshot: `/Users/manu/.cache/pointstream-evidence/ada-qualification-20261112-a4/`; the source is also cached by archive SHA. Live wait snapshots do not establish completion.
+
+Frozen source checkout `/private/tmp/pointstream-ball-ada-source-20261112`;
+source/spec preparation `/private/tmp/pointstream-ada-preparation-21482f35-20261112/`.
+GPU spec/submit receipts `/private/tmp/pointstream-ada-gpu-run-20261112/`;
+CPU audit `/private/tmp/pointstream-ada-d24d-audit-20261112/`. Selected job records
+were copied to the default tracker; isolated client pools and global workers
+remain distinct, and the global configuration was not changed. Approved gate
+and bridge are immutable new files under fleet/checks/k5d-ada-2148-d24d-root-20261112.
+Source archive reuses the completed CPU job; it was not uploaded a second time.
+A large read-only prerequisite fetch timed out after6MB: PID2266035/birth718893878
+remains unproven; partialtar is unused and no remote signal/replay was sent.
+The verified local calibration cache and tiny canonical d201 export were used.
+
+No further job, automatic retry, source/numeric relaxation,48/292/586/full30,
+training, paid server/API, manuscript/PRESLEY edit or submission is authorized by
+this qualification. Failed exact parity narrows only cross-class reproduction;
+it cannot prove a separately registered fresh Ada study impossible. Preserve
+that distinction and the negative before any new scope decision. Older
+recovery outcomes below are history, not current monitoring instructions.
+
 ## Final authoritative outcome — after the single18:10UTC check
 
 **No active GPU request, wait or timer remains.** The one resumed request

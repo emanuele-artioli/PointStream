@@ -8,17 +8,18 @@ workstream ceilings. Ordinary bounded implementation corrections need no new
 permission; source/numerical rules and stops below remain binding. Closed
 K5c/W8/W9 balances are not transferred. Unknown submissions are never replayed.
 
-Execution status, November12: **ACCESS RESTORED; required A6000 CAPACITY BLOCKED**.
-The two old requests and new `20261112T172806Z-8709406d` are independently closed
-expired unassigned, with canonical events acknowledged. No activeGPUjob/wait/timer
-or furtherqueue release remains. The fresh A6000 occupants are otherusers;
-no own stale GPU process was identified among those occupants. Keep NFS archives
-and verified local staging; no broad cleanup/migration. See the
-[current handoff](../continuation-2026-11-12.md) and
-[storage decision](../fleet-recovery-2026-11-12.md). W8full-witness compute remains
-resource-held: complete forecast is not shown to fit929CPU. No newpilot,
-reallocation, paidserver, scientificsource or paper change. The research-first
-instruction and all scientific gates/stop conditions below remain binding.
+Execution status, November12: **ALTERNATE-GPU QUALIFICATION QUEUED**.
+User requests regular native resource checks and a non-A6000 path. The new
+source-bound CPU proof d24d is accepted; Ada16 request
+`20261112T192044Z-461e16e8` was published pending on gpu5/6. Native workers
+check capacity every minute through20:00:05.184948UTC; one canonicalwait2500,
+no recurring AI turns or automatic retry. Source21482 preserves all exact
+reference comparisons; no GPU outcome or downstream Ada promotion is assumed.
+See [handoff](../continuation-2026-11-12.md) and
+[Ada qualification card](k5d-ada-qualification-2026-11-12.md). Bound1,000GPU /
+1,150CPU is nested in the Ball parent. W8 remains held for its complete-cost
+gate under929CPU. No paid server, source/numerical relaxation, manuscript or
+PRESLEY change, training or paper submission.
 
 ## Goal and scope
 

@@ -1873,6 +1873,32 @@
       "cpu_seconds": 400,
       "basis": "Root accepted canonicalexpiry, physicalarchive450d/spec6a3c/source21cd and emptyexecution/claims; botheligibleworkers noeligibleGPU. Full external400CPU conservativeinclusive readiness/submit/wait/audit; actualaggregateadminCPUunmetered, notqueuewall. No scientificresult. See8709-recovery-root-closeout-20261112.json.",
       "release_stage": "research-first24/28-recovery"
+    },
+    {
+      "phase": "bounded-native-resource-watch-20261112",
+      "workstream": "shared",
+      "gpu_seconds": 0,
+      "cpu_seconds": 40,
+      "basis": "Prospective full40CPU administrative allocation for user-requested native watch,5min intervals<=45min,4hosts. Per-probe counted-process CPU caps and measured waited children; reserve worstnextprobe+controller tostopbefore40 countedCPU. No provenwhole-systemCPUtotal: SSHserver/login/sharedOS substrateunmetered and nativequerybinaryassumednotforking; administrativeuncertainty disclosed, no model/GPU/jobmutation. Stopsfirstcandidate/deadline/budget; no recurringLLM.",
+      "release_stage": "research-first24/28-monitoring-request"
+    },
+    {
+      "phase": "ball-ada-qualification-source-preparation-20261112",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "basis": "Prospective full50CPU preparation for opt-in Ada qualification source/archive/staticbridge and oldnativeCPUproofspec retrieval only. Newactual-source CPUproof mustseparatelypass beforeGPU; no inference/sharedtiming/qualityrelaxation. Nativewatchfoundgpu5Ada idle; no reservation implied.",
+      "release_stage": "research-first24/28-hardware-qualification"
+    },
+    {
+      "phase": "ball-ada-d24d-CPU-proof-closeout-20261112",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 250,
+      "basis": "Rootacceptedexact21482CPUproof d24d: canonicalCOMPLETE,26actualpublishedmemberSHAjoins,4native/namespaceexitmodes,19observedbirths/campaign/supervisor/claimabsent,normal2.89028inner/3.036772outerCPU; alltool/source/specsha match. Full250futureCPU charged,50prep separatelyalreadycharged; administrativeaggregateunmetered. NoGPU/numeric/cost/scaleclaim.",
+      "release_stage": "research-first24/28-hardware-qualification"
     }
   ],
   "reservations": [
@@ -2391,8 +2417,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 7920,
-      "cpu_seconds": 1450,
-      "status": "Remaining_unspent;8709rootclosedexpiredunassigned; no activejob/newqueue/scale release"
+      "cpu_seconds": 1150,
+      "status": "Remaining_unspent;1000GPU/1150CPU nested461e exclusiveAdaqualification; no otherGPU/scale release"
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -4609,6 +4635,68 @@
       "qualification_executed": false,
       "recovery_receipt": "docs/experiments/k5d-inputs/8709-recovery-root-closeout-20261112.json",
       "root_single_deadline_check_state": "completed once18:10UTC;no furthercheck/timer"
+    },
+    {
+      "job_id": "20261112T190032Z-d24d7c7c",
+      "phase": "k5d-scale-first-tranche-20261105",
+      "subphase": "Ada21482exact-source-nativeCPUproof",
+      "state": "complete;rootacceptedCPUmechanismonly",
+      "revision": "21482f35c2d5d1d476d5e9cf099151c69c597a9c",
+      "source_sha256": "9e2376330c76eab979efbe0a3f8dcf21175f5e9d470a6b1219cf8c39e823fa0a",
+      "snapshot_sha256": "5fd841f7e2fc718fb198a7f47a5e737e4cbbc88f1793e6574883dd7cd9fcc3cd",
+      "source_archive": true,
+      "spec_sha256": "51e933190d4d0af6098efd9ef636a4e8023e77bb7e397ff6429cf65bc2cbfb4d",
+      "raw_spec_sha256": "c05be32ec2f29c119fcfbb567aad2ad6e29972ffbec21e9583ae7bf30d301c5c",
+      "deadline": "2026-11-12T19:33:44.288441+00:00",
+      "hosts": [
+        "gpu2"
+      ],
+      "cpu_affinity_index": 0,
+      "future_GPU": 0,
+      "future_CPU": 250,
+      "preparation_CPU_alreadycharged": 50,
+      "campaign": 100,
+      "scope": "Actualnewsource nativeCPUcontainment/teardown only. NoGPU/models/numeric16/scale.",
+      "local_batch": "/private/tmp/pointstream-ada-preparation-21482f35-20261112",
+      "wait_state": "SolewaitCOMPLETE,root26member/PID/claim/counteraudit accepted;canonicaleventACK;CPUmechanismonly",
+      "terminal_CPU_charge": 250,
+      "terminal_GPU_charge": 0,
+      "approved_gate_sha256": "3da5120c7c420271b572fb2d7b20cb17963b612e741e3d7420cecce86fd2a4e1"
+    },
+    {
+      "job_id": "20261112T192044Z-461e16e8",
+      "phase": "k5d-scale-first-tranche-20261105",
+      "subphase": "Ada21482exclusive16qualification",
+      "state": "pending;rootverifiedmanifest/sourcearchive/spec",
+      "revision": "21482f35c2d5d1d476d5e9cf099151c69c597a9c",
+      "source_sha256": "9e2376330c76eab979efbe0a3f8dcf21175f5e9d470a6b1219cf8c39e823fa0a",
+      "snapshot_sha256": "5fd841f7e2fc718fb198a7f47a5e737e4cbbc88f1793e6574883dd7cd9fcc3cd",
+      "source_archive": true,
+      "spec_sha256": "b4c7259f047bda1cc25507c9decbecebabbcfd47a3f3dec664df4c59fef83cfe",
+      "raw_spec_sha256": "917299cd2f142d699f7d194a9429953771673b9ccd37f086b94645db0ec8cee7",
+      "deadline": "2026-11-12T20:00:05.184948+00:00",
+      "hosts": [
+        "gpu5",
+        "gpu6"
+      ],
+      "gpu_models": [
+        "RTX 6000 Ada"
+      ],
+      "future_GPU": 1000,
+      "future_CPU": 1150,
+      "external_CPU": 350,
+      "campaign": 800,
+      "namespace": 580,
+      "smoke": 600,
+      "validator": 30,
+      "noop": 5,
+      "GPU_post": 200,
+      "local_storage_gib": 32,
+      "CPU_gate_SHA": "3da5120c7c420271b572fb2d7b20cb17963b612e741e3d7420cecce86fd2a4e1",
+      "scope": "ONEexplicitAda exclusive actual16 retainedreceiver+exactA6000referenceparity/lifecyclecost; no48/292/586/full30/retry. Nativefleetavailabilitychecks1min, noAIheartbeat.",
+      "local_batch": "/private/tmp/pointstream-ada-gpu-run-20261112",
+      "wait_state": "Solecanonicalwait2500active;PID17045/session19953;runnerattending;fallbackonecheck20:02UTC,no recurringAI",
+      "wait_handle": "/private/tmp/pointstream-ada-461e-wait-20261112/handle.json"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -4628,7 +4716,8 @@
     "User20261105resourceanswer: Keep using bounded fleet queues. Root opens ONEfresh W8paired900GPU1100CPU and ONEfreshGVCQP9 900GPU1000CPU inclusive; metadata<=50CPUeach first, rootreleasepending, no changedsource/math/gates orfullwitness. Prior64ef/2f65contendedattemptsclosedandpreserved. Allremaining_unspent semantics unchanged.",
     "Rootnativeproofaccountingamendment20261106: original220CPUleafprospectiveforecastwasnotprovencompletebecausemanager/publicationpostcampaignnotmetered. Wholeone-core120.698wallupper\u2192130CPU+30audit revisesleaf250CPU including90prior, allinsideunchangedballtranche/programme/workstream. No newGPU/computation oruserceilingincrease.",
     "Root20261112conditionalONEpost-outagecorrected16release: source0bb/450d/21cd, spec81579349/raw5b1b8192, deadline17:46:24.716400UTC.1000GPU/1200futureCPU nested inexistingBall7920/2250;400externalincluded. Passingfreshdoctor/localpath/SHAreadinessrootreviewed. Noautomaticretry/scale. ExactnewIDwillberecordedonce; no replayuncertainty.",
-    "Root20261112partial-pool operational correction: one new submission may use isolatedlocalconfig hosts[gpu5,gpu2,gpu3], samebase/workeridentities, originalscientifichosts gpu2/3 andsource0bb. Allparticipating-hostsharedvisibility/atomicchecks mandatory; globalconfig/workers unchanged.1000GPU/1200futureCPU incl400external nested inBall7920GPU/1850CPU; no automaticretryifpartialreadinessfails. OldfailedcommandcreatednoID, never a replay."
+    "Root20261112partial-pool operational correction: one new submission may use isolatedlocalconfig hosts[gpu5,gpu2,gpu3], samebase/workeridentities, originalscientifichosts gpu2/3 andsource0bb. Allparticipating-hostsharedvisibility/atomicchecks mandatory; globalconfig/workers unchanged.1000GPU/1200futureCPU incl400external nested inBall7920GPU/1850CPU; no automaticretryifpartialreadinessfails. OldfailedcommandcreatednoID, never a replay.",
+    "User20261112explicitlyrequestsregularresourcepolls andnonA6000task. Native5min<=45minwatchmayreportpotentialidleA6000/Ada, neverexecutesjoborweakensfleetgates. No recurringLLM/automation. Opt-inAdaimplementationmaybeprepared, butfreshCPUproof/exclusiveexactreferenceparity/costgatesandbudgetsrequired; noautoAda/fullstudyadmission."
   ],
   "monitoring": {
     "mode": "blocked_external_fleet_connectivity;all_localwaits_and_one-shotchecksended",

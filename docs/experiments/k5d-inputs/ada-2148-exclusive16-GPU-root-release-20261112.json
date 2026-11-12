@@ -1,0 +1,42 @@
+{
+  "recorded_utc": "2026-11-12T19:11:29.593687+00:00",
+  "decision": "Rootacceptsd24d CPUproof; conditionallyreleasesONE exclusiveAda16exactreferencequalification afterfreshcapacity/localcache/tool/input/doctorchecks. NoautoGPU afterproof, no furtherstage/retry.",
+  "source_revision": "21482f35c2d5d1d476d5e9cf099151c69c597a9c",
+  "source_sha256": "9e2376330c76eab979efbe0a3f8dcf21175f5e9d470a6b1219cf8c39e823fa0a",
+  "archive_sha256": "5fd841f7e2fc718fb198a7f47a5e737e4cbbc88f1793e6574883dd7cd9fcc3cd",
+  "CPUgate_sha256": "3da5120c7c420271b572fb2d7b20cb17963b612e741e3d7420cecce86fd2a4e1",
+  "bridge_sha256": "c87f91d3e2a4fa8475bee6841fe896eb60463a989f5b70c367914cc1db5c7d35",
+  "hosts": [
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [
+    "RTX 6000 Ada"
+  ],
+  "future_GPU": 1000,
+  "future_CPU": 1150,
+  "campaign": 800,
+  "external_CPU": 350,
+  "GPU_post": 200,
+  "namespace": 580,
+  "smoke": 600,
+  "validator": 30,
+  "noop": 5,
+  "local_storage_gib": 32,
+  "reference": "Oldaccepted16 unchanged; allsixnative/wire/pixel/metric/judgeequalities; no crosshostarchivedDCVCdecode. Failedparitynarrowscrossclassscope, not proofAdaqualitycannotwork.",
+  "accounting": "Allremaining1150parentCPU. External350excludes50sourceprep separatelycharged inCPUproof300; sourcearchive reusednotuploadedagain. No scientifictimeout/costmargin lowered. Any missingstage/runtimereadiness/forecast stops ratherthanforcedfit.",
+  "gates": "No full30/292/586/qualityclaim; downstreamA6000admissionheld. NeedactualGPUdeviceUUID8.9/model/provider/native andexclusivecostproof; CPUmechanismproofalone insufficient.",
+  "actual_spec": "/private/tmp/pointstream-ada-gpu-run-20261112/spec.json",
+  "raw_spec_sha256": "917299cd2f142d699f7d194a9429953771673b9ccd37f086b94645db0ec8cee7",
+  "spec_sha256": "b4c7259f047bda1cc25507c9decbecebabbcfd47a3f3dec664df4c59fef83cfe",
+  "deadline": "2026-11-12T20:00:05.184948+00:00",
+  "queue_policy": "Nativefleetchecks1min;40minabsoluteexecution/admissiondeadline. No recurringLLM. Lateadmission or harddeadline failure stops, no retry.",
+  "ready_check": "Both5/6 MAINruntime andlargeinputarchivescached, separateSSD>82GiB, gpu6unshareSHAexpected9f; gate/bridgepublishednewdir. Bothbusy; mandatoryfreshdoctor repeatsduringcanonicalsubmit.",
+  "source_cache": "ExactcompletedCPUjobd24d/source.tar reused, no newupload. Source21482 verified;2129tests40skip/Ruff/mypy577.",
+  "submission_state": "pending;rootverifiedexactsource/archive/spec",
+  "job_id": "20261112T192044Z-461e16e8",
+  "submit_tool_session": 88896,
+  "root_manifest_acknowledged": true,
+  "canonical_wait_max_seconds": 2500,
+  "root_expected_finish_check_utc": "2026-11-12T20:02:00Z"
+}

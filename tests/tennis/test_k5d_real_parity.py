@@ -106,7 +106,9 @@ def test_parity_builder_passes_real_fleet_validator_and_outer_cli(tmp_path, monk
                     identity={}, shared_low_memory=True, shared_parent8_child2=True)
     from experiments.tennis import k5d_same_job_source_bridge as scoped
     # Synthetic boundary: the actual archive verifier has separate real-archive review.
+    from experiments.tennis import k5d_ada_source_bridge as ada_bridge
     monkeypatch.setattr(scoped, 'verify_signed', lambda *_: None)
+    monkeypatch.setattr(ada_bridge, 'verify_signed', lambda *_: None)
     pair_assets = dict(assets)
     for name in ('first_pair_bridge', 'calibration_source', 'consumer_source'):
         pair_assets[name] = {'local': str(cpu), 'remote': remote + name + '.tar', 'sha256': 'e' * 64}
@@ -114,6 +116,15 @@ def test_parity_builder_passes_real_fleet_validator_and_outer_cli(tmp_path, monk
                        identity={}, first_pair_source=True)
     assert inbox.validate_spec(pair)['gpu_sharing']['mode'] == 'exclusive'
     assert '--first-pair-bridge' in pair['arguments']
+    ada = parity.spec(base, assets=pair_assets, deadline=deadline, unshare_sha256='a' * 64,
+                      identity={}, first_pair_source=True, gpu_profile=parity.ADA_PROFILE)
+    assert inbox.validate_spec(ada)['gpu_models'] == ['RTX 6000 Ada']
+    assert ada['gpu_sharing'] == {'mode': 'exclusive'}
+    assert ['--gpu-profile', parity.ADA_PROFILE] == ada['arguments'][ada['arguments'].index('--gpu-profile'):][:2]
+    with pytest.raises(ValueError, match='exclusive same-job'):
+        parity.spec(base, assets=assets, deadline=deadline, unshare_sha256='a' * 64,
+                    identity={}, gpu_profile=parity.ADA_PROFILE)
+    assert result['gpu_models'] == ['RTX A6000'] and '--gpu-profile' not in result['arguments']
     with pytest.raises(ValueError, match='must be exclusive'):
         parity.spec(base, assets=pair_assets, deadline=deadline, unshare_sha256='a' * 64,
                     identity={}, first_pair_source=True, shared_numerical=True)
@@ -139,3 +150,24 @@ def test_parity_builder_passes_real_fleet_validator_and_outer_cli(tmp_path, monk
     monkeypatch.setattr(sys, 'argv', ['module', *parent8_command[3:]])
     namespace.main()
     assert captured[2][2][0] == 'parity16' and '--shared-parent8-child2' in captured[2][2]
+
+
+def test_ada_device_and_dispatch_identity_rejections():
+    from types import SimpleNamespace
+
+    spec = {'gpu_models': ['RTX 6000 Ada'], 'gpu_sharing': {'mode': 'exclusive'}}
+    dispatch = {'gpu_sharing': {'mode': 'exclusive'}, 'environment': {'gpu': {'name': 'NVIDIA RTX 6000 Ada Generation', 'uuid': 'GPU-123'}}}
+    env = {'CUDA_VISIBLE_DEVICES': 'GPU-123', 'PS_CLAIMED_GPU_UUID': 'GPU-123'}
+    cuda = SimpleNamespace(device_count=lambda: 1, get_device_name=lambda _: 'NVIDIA RTX 6000 Ada Generation',
+                           get_device_capability=lambda _: (8, 9))
+    device = parity.check_gpu_profile(parity.ADA_PROFILE, spec, dispatch, SimpleNamespace(cuda=cuda), env)
+    parity.validate_gpu_evidence(parity.ADA_PROFILE, spec, dispatch, device)
+    with pytest.raises(ValueError, match='claim'):
+        parity.check_gpu_profile(parity.ADA_PROFILE, spec, dispatch, SimpleNamespace(cuda=cuda), {**env, 'PS_CLAIMED_GPU_UUID': 'GPU-other'})
+    with pytest.raises(ValueError, match='evidence'):
+        parity.validate_gpu_evidence(parity.ADA_PROFILE, spec, dispatch, {**device, 'capability': [8, 6]})
+    with pytest.raises(ValueError, match='evidence'):
+        parity.validate_gpu_evidence(parity.ADA_PROFILE, {**spec, 'gpu_sharing': {'mode': 'shared'}}, dispatch, device)
+    cuda.get_device_capability = lambda _: (8, 6)
+    with pytest.raises(ValueError, match='CUDA device'):
+        parity.check_gpu_profile(parity.ADA_PROFILE, spec, dispatch, SimpleNamespace(cuda=cuda), env)
