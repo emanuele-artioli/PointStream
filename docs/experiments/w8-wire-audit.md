@@ -603,3 +603,23 @@ Root accepts `c38f0357` exact174 CPU proof and the [new schema2 gate](w8-inputs/
 - **Distinct bounded metadata probe also uncertain:** A separately authorized stdlib-only gpu1 state/ready probe timed out locally after 30 s with no output or remote PID/start receipt; neither W8 nor Ball state was observed. Its script incorrectly inferred the Ball path `20261110T183715Z-4d0dd928`; the verified Ball journal ID is `20261110T190907Z-4d0dd928`. The error and all raw hashes are retained in the uncertainty record above. Neither uncertain read-only process was replayed or signaled remotely; no terminal or accounting inference follows.
 
 Final root canonical status batch, after both deadlines: exact W84c24 via gpu5 and Ball4d0d via gpu3 each timed out at60s with empty stdout using the fixed client. [Receipt](fleet-connectivity-block-20261110.json) records actual routes, raw hashes and unresolved states. No execution/expiry/zeroGPU conclusion, terminal charge or replay. Full child maxima remain held; localwaits/checks have ended and new admissions are blocked until existing job/claim/ownership inspection is possible.
+
+
+### 2026-11-12 — Recovery closeout and remaining-cost decision
+
+Root accepts `20261110T183845Z-4c240783` expired unassigned: exact physical
+archivef784/canonicalspec67e4, no execution tree or resource claim, ownergpu5
+matching expiry-worker heartbeat. Terminal event6dcc8c6f752f517cb7d2e651eabe8867
+acknowledged. Full150externalCPU is true qualification preparation, not model
+execution; cumulative preparation1450CPU with original22578404nonce,0GPU. Parent
+remaining4550GPU/929CPU. See [root closeout](fleet-recovery-closeout-20261112.json).
+
+Root holds further compute for the full witness because its complete forecast
+is not shown to fit the remaining CPU budget. The accepted sampling CPU slope
+suggests approximately1150CPU for both full sampling phases,1724 after1.5margin,
+before loading/downstream/qualification/audit; this is an extrapolation, not a
+measured lower bound. A550CPU pilot alone cannot establish a full witness and
+would leave379CPU. No additional queue, reallocation or narrower endpoint is
+released. This is a resource stop, not a failed-quality result. Revisit after a
+concrete forecast and approved allocation; preserve packet/CPU/isolation/cost
+evidence and the fresh-witness limitation. [Recovery decision](../fleet-recovery-2026-11-12.md).

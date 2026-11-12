@@ -13,7 +13,18 @@ and the legacy 200-GPU-hour study are outside scope. No new computation was run
 for this audit. Costs below are ceilings or historical charges where explicitly
 identified, not forecasts for an unprepared new job.
 
-## November11 outage update
+## November12 recovery update
+
+The [current handoff](../continuation-2026-11-12.md) supersedes the unknown-job
+state below. Both old requests expired unassigned and are charged/acknowledged.
+Local disks have ample space; preserve NFS archives and use existing verified
+local staging, without broad cleanup. The corrected16 Ball gate may receive one
+new bounded queue after fresh readiness. Hold W8 full-witness compute because a
+complete fit under929CPU is not shown; a550CPU cost pilot would leave379. No
+source/quality change, reallocation, new scale or manuscript revision follows.
+See the [root decision](../fleet-recovery-2026-11-12.md).
+
+## Historical November11 outage update
 
 Start with the [current handoff](../continuation-2026-11-11.md). Ball
 `20261110T190907Z-4d0dd928` and W8 `20261110T183845Z-4c240783` are submitted
