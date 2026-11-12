@@ -58,9 +58,10 @@ def test_receipt_rejects_legacy_and_incomplete_proof() -> None:
                          for k in isolated.CATEGORIES}}
     ns = {k: k + '-inner' for k in ('user', 'pid', 'mnt', 'ipc')}
     proof['namespaces'] = {'private_proc': True, 'initial_pids': [1], 'namespaces': ns,
-                           'parent_namespaces': {k: k + '-outer' for k in ns}}
-    proof['worker_observer'] = {'birth': '2', 'namespaces': ns}
-    proof['decoder']['outer_observation'] = {'namespace_pids': [10], 'namespaces': ns, 'birth': '3'}
+                           'parent_namespaces': {k: k + '-outer' for k in ns},
+                           'outer_pid_hidden': 20, 'mountinfo': '1 2 0:3 / /proc - proc proc rw'}
+    proof['worker_observer'] = {'birth': '2', 'namespaces': ns, 'pid': 30, 'namespace_pids': [1]}
+    proof['decoder']['outer_observation'] = {'namespace_pids': [10], 'namespaces': ns, 'birth': '3', 'pid': 31}
     proof['actual_policy'] = {'private_proc_read_only': True, 'namespaces': proof['namespaces'],
                               'execute_files': ['/native'], 'context': {}, 'pid': 1, 'birth': '2', 'handled_mask': proof['handled_mask'],
                               'denials': {k: [{x: y for x, y in row.items() if x != 'errno'} for row in rows]
