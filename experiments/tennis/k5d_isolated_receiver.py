@@ -75,6 +75,25 @@ def _source_root(profile: dict[str, Any]) -> Path:
     return _canonical(Path(__file__).resolve().parents[2])
 
 
+def _import_directories(profile: dict[str, Any]) -> list[Path]:
+    """Resolve only the frozen source root and configured packed-runtime import roots."""
+    source = _source_root(profile)
+    runtime_root = _canonical(Path(profile['runtime_root']))
+    prefix = _canonical(Path(profile['runtime_prefix']))
+    if not source.is_dir() or not runtime_root.is_dir() or not prefix.is_dir() or not prefix.is_relative_to(runtime_root):
+        raise ValueError('frozen source and packed runtime directories required')
+    paths = [_canonical(Path(p)) for p in profile['runtime_import_paths']]
+    if not paths or any(not p.is_dir() or not p.is_relative_to(runtime_root) for p in paths):
+        raise ValueError('runtime import paths must stay in packed runtime')
+    return [source, *paths]
+
+
+def _read_directories(files: list[Path], execute: list[Path], system: list[Path],
+                      import_directories: list[Path]) -> set[Path]:
+    """READ_DIR grants only; file content grants remain separately enumerated."""
+    return {p.parent for p in files + execute + system} | set(import_directories)
+
+
 def inventory(config: dict[str, Any]) -> tuple[list[Path], list[Path], list[Path]]:
     """Verify the exact reviewed read and execute file inventory."""
     if config.get('schema') != 1:
@@ -155,7 +174,8 @@ def _context(context: dict[str, Any]) -> None:
             raise ValueError('producer GPU differs')
 
 
-def _restrict(files: list[Path], execute: list[Path], system: list[Path], output: Path) -> tuple[int, int]:
+def _restrict(files: list[Path], execute: list[Path], system: list[Path], output: Path,
+              import_directories: list[Path]) -> tuple[int, int]:
     lib = ctypes.CDLL(None, use_errno=True)
     abi = int(lib.syscall(444, 0, 0, 1))
     mask = leaves.handled_rights(abi)
@@ -166,7 +186,7 @@ def _restrict(files: list[Path], execute: list[Path], system: list[Path], output
         _pack_ = 1
         _fields_ = [('allowed_access', ctypes.c_uint64), ('parent_fd', ctypes.c_int32)]
     # READ_DIR is nonrecursive with respect to file reads; do not grant parent file reads.
-    dirs = {p.parent for p in files + execute + system}
+    dirs = _read_directories(files, execute, system, import_directories)
     grants = [(p, 4) for p in files] + [(p, 5) for p in execute] + [(p, 8) for p in dirs]
     for path in system:
         bits = 4
@@ -412,14 +432,8 @@ def replay(wire_path: Path, map_path: Path, work: Path, *, config_path: Path, co
     python = _canonical(Path(profile['python']))
     if python not in execute:
         raise ValueError('interpreter not in executable inventory')
-    import_paths = [_canonical(Path(p)) for p in profile['runtime_import_paths']]
-    runtime_root = Path(profile['runtime_root'])
-    runtime_prefix = _canonical(Path(profile['runtime_prefix']))
-    if not runtime_prefix.is_dir() or not runtime_prefix.is_relative_to(runtime_root):
-        raise ValueError('runtime prefix must be within packed runtime')
-    if not import_paths or any(not p.is_dir() or not p.is_relative_to(runtime_root) for p in import_paths):
-        raise ValueError('runtime import paths must stay in packed runtime')
-    env = {'PATH': '/nonexistent', 'PYTHONPATH': os.pathsep.join([str(_source_root(profile)), *(str(p) for p in import_paths)]), 'PYTHONNOUSERSITE': '1',
+    import_directories = _import_directories(profile)
+    env = {'PATH': '/nonexistent', 'PYTHONPATH': os.pathsep.join(str(p) for p in import_directories), 'PYTHONNOUSERSITE': '1',
            'PYTHONDONTWRITEBYTECODE': '1', 'OMP_NUM_THREADS': '1', 'OPENBLAS_NUM_THREADS': '1',
            'MKL_NUM_THREADS': '1', 'NUMEXPR_NUM_THREADS': '1', 'PS_SCRATCH_DIR': str(work),
            'TMPDIR': str(work), 'TMP': str(work), 'TEMP': str(work), 'XDG_CACHE_HOME': str(work)}
@@ -507,9 +521,11 @@ def _worker(work: Path) -> None:
         raise ValueError('inventory changed before restriction')
     files += [work / 'packet.psbl', work / 'resources.json']
     pid, birth = os.getpid(), _birth()
+    profile = launch['config']['profiles'][os.uname().nodename.split('.')[0]]
+    import_directories = _import_directories(profile)
     actual_policy = {'read_files': [str(p) for p in files], 'execute_files': [str(p) for p in execute],
                      'system_leaves': [str(p) for p in system], 'writable_output': str(work),
-                     'read_directories': sorted(str(p) for p in {p.parent for p in files + execute + system}),
+                     'read_directories': sorted(str(p) for p in _read_directories(files, execute, system, import_directories)),
                      'private_proc_read_only': True, 'namespaces': namespace_proof,
                      'denials': launch['denials'], 'context': launch['context'], 'pid': pid, 'birth': birth}
     # The denial records are later augmented in place, so retain the pre-restriction inventory separately.
@@ -517,7 +533,7 @@ def _worker(work: Path) -> None:
     if len(os.listdir('/proc/self/task')) != 1 or any(int(fd) > 2 and Path('/proc/self/fd', fd).exists()
                                                         for fd in os.listdir('/proc/self/fd')):
         raise RuntimeError('threads or descriptors appeared before restriction')
-    abi, mask = _restrict(files, execute, system, work)
+    abi, mask = _restrict(files, execute, system, work, import_directories)
     actual_policy['handled_mask'] = mask
     _denials(launch['denials'])
     if sha(work / 'packet.psbl') != launch['wire_sha256'] or sha(work / 'resources.json') != launch['map_sha256']:

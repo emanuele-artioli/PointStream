@@ -142,3 +142,56 @@ def test_native_wrapper_waits_for_matching_birth_and_nonce(tmp_path: Path, monke
     (tmp_path / 'native-observer.json').write_text(json.dumps(observer))
     with pytest.raises(ValueError):
         isolated._native_wrapper(payload)
+
+
+def test_import_roots_are_canonical_packed_dirs_and_read_dir_only(tmp_path: Path, monkeypatch: Any) -> None:
+    import ctypes
+
+    source = tmp_path / 'source'
+    runtime = tmp_path / 'runtime'
+    imports = runtime / 'lib' / 'python3.12'
+    for directory in (source, imports):
+        directory.mkdir(parents=True)
+    monkeypatch.setattr(isolated, '_source_root', lambda _: source)
+    profile = {'runtime_root': str(runtime), 'runtime_prefix': str(runtime), 'runtime_import_paths': [str(imports)]}
+    roots = isolated._import_directories(profile)
+    assert roots == [source, imports]
+    protected = tmp_path / 'protected'
+    protected.write_text('private')
+    allowed = runtime / 'module.py'
+    allowed.write_text('public')
+    output = tmp_path / 'output'
+    output.mkdir()
+    opened: dict[int, Path] = {}
+    grants: list[tuple[Path, int]] = []
+    class Rule(ctypes.Structure):
+        _pack_ = 1
+        _fields_ = [('allowed_access', ctypes.c_uint64), ('parent_fd', ctypes.c_int32)]
+    class FakeLib:
+        def syscall(self, number, *args):
+            if number == 444:
+                return 3
+            if number == 445:
+                rule = ctypes.cast(args[2], ctypes.POINTER(Rule)).contents
+                grants.append((opened[rule.parent_fd], rule.allowed_access))
+            return 0
+        def prctl(self, *args): return 0
+    def fake_open(path, flags):
+        descriptor = len(opened) + 20
+        opened[descriptor] = Path(path)
+        return descriptor
+    monkeypatch.setattr(isolated.ctypes, 'CDLL', lambda *a, **kw: FakeLib())
+    monkeypatch.setattr(isolated.os, 'O_PATH', 0x200000, raising=False)
+    monkeypatch.setattr(isolated.os, 'open', fake_open)
+    monkeypatch.setattr(isolated.os, 'close', lambda _: None)
+    monkeypatch.setattr(isolated.leaves, 'handled_rights', lambda _: 1)
+    monkeypatch.setattr(isolated.leaves, 'allowed_rights', lambda *a: 2)
+    isolated._restrict([allowed], [], [], output, roots)
+    assert (source, 8) in grants and (imports, 8) in grants
+    assert all(bits == 8 for path, bits in grants if path in (source, imports))
+    assert all(path != protected for path, _ in grants)
+    assert (allowed, 4) in grants
+    outside = tmp_path / 'outside'
+    outside.mkdir()
+    with pytest.raises(ValueError, match='packed runtime'):
+        isolated._import_directories({**profile, 'runtime_import_paths': [str(outside)]})

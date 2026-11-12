@@ -58,6 +58,70 @@ def validate_native_header(stream: ball_stream.Stream) -> None:
             raise ValueError("DCVC header differs from PSBL")
 
 
+def _native_result(process: Any, path: Path) -> None:
+    """Persist bounded native diagnostics before inspecting a pre-exec receipt."""
+    _, stderr = process.communicate(timeout=3600)
+    tail = stderr[-4096:]
+    result = {"returncode": process.returncode, "stderr_bytes": len(stderr),
+              "stderr_sha256": hashlib.sha256(stderr).hexdigest(),
+              "stderr_tail": tail.decode("utf-8", errors="replace")}
+    with path.open("x") as output:
+        json.dump(result, output, sort_keys=True, allow_nan=False)
+        output.write("\n")
+    if process.returncode:
+        raise RuntimeError(f"native decoder failed: {process.returncode}: {tail!r}")
+
+
+def _execute_native(command: list[str], work: Path, isolation: dict[str, Any] | None, **kwargs: Any) -> None:
+    if isolation is None:
+        subprocess.run(command, check=True, capture_output=True, timeout=3600, **kwargs)
+        return
+    resolved_executable = str(Path(command[0]).resolve(strict=True))
+    if resolved_executable not in isolation["actual_policy"]["execute_files"]:
+        raise ValueError("native decoder executable is not in actual policy")
+    child_env = kwargs.pop("env", None)
+    native_env = dict(os.environ if child_env is None else child_env)
+    payload_path = work.parent / "native-exec.json"
+    payload_path.write_text(json.dumps({"argv": command, "env": native_env, "nonce": isolation["nonce"]}, sort_keys=True))
+    wrapper_env = dict(native_env)
+    wrapper_env["PYTHONPATH"] = os.environ["PYTHONPATH"]
+    wrapper = [sys.executable, "-S", "-m", "experiments.tennis.k5d_isolated_receiver",
+               "native-wrapper", str(payload_path)]
+    with subprocess.Popen(wrapper, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                          close_fds=True, env=wrapper_env, **kwargs) as process:
+        try:
+            birth = time.monotonic_ns()
+            observer_path = work.parent / "native-observer.json"
+            deadline = time.monotonic() + 30
+            while not observer_path.is_file():
+                if process.poll() is not None:
+                    _native_result(process, work.parent / "native-process-result.json")
+                    raise RuntimeError("native decoder exited before observation")
+                if time.monotonic() >= deadline:
+                    raise RuntimeError("outer native decoder observation missing")
+                time.sleep(0.01)
+            observation = json.loads(observer_path.read_text())
+            if (observation.get("nonce") != isolation["nonce"]
+                    or observation.get("namespace_pids", [])[-1:] != [process.pid]
+                    or observation.get("namespaces") != isolation["namespaces"]["namespaces"]):
+                raise ValueError("native decoder observer identity differs")
+            _native_result(process, work.parent / "native-process-result.json")
+            preexec = json.loads((work.parent / "native-preexec.json").read_text())
+            if (preexec.get("pid") != process.pid or preexec.get("birth") != observation.get("birth")
+                    or preexec.get("observer") != observation or preexec.get("closed_extra_fds") is not True
+                    or preexec.get("argv_sha256") != hashlib.sha256(json.dumps(command, separators=(",", ":")).encode()).hexdigest()):
+                raise ValueError("native pre-exec identity differs")
+        except BaseException:
+            process.kill()
+            process.wait()
+            raise
+        isolation["decoder"] = {"pid": process.pid, "started_monotonic_ns": birth, "argv": command,
+                                "executable_resolved": resolved_executable, "outer_observation": observation, "preexec": preexec,
+                                "argv_sha256": hashlib.sha256(json.dumps(command, separators=(",", ":")).encode()).hexdigest(),
+                                "returncode": process.returncode}
+
+
+
 def decode(wire_path: Path, map_path: Path, work: Path, *, isolation: dict[str, Any] | None = None) -> dict[str, Any]:
     """Decode persisted native bytes and render persisted symbols with no source inputs."""
     import numpy as np
@@ -76,57 +140,11 @@ def decode(wire_path: Path, map_path: Path, work: Path, *, isolation: dict[str, 
     native = work / ("native.ivf" if stream.codec == "svt-av1-ivf" else "native.psdc")
     native.write_bytes(stream.native)
     decoded = work / "native.yuv"
-    def execute(command: list[str], **kwargs: Any) -> None:
-        if isolation is None:
-            subprocess.run(command, check=True, capture_output=True, timeout=3600, **kwargs)
-            return
-        resolved_executable = str(Path(command[0]).resolve(strict=True))
-        if resolved_executable not in isolation["actual_policy"]["execute_files"]:
-            raise ValueError("native decoder executable is not in actual policy")
-        child_env = kwargs.pop("env", None)
-        native_env = dict(os.environ if child_env is None else child_env)
-        payload_path = work.parent / "native-exec.json"
-        payload_path.write_text(json.dumps({"argv": command, "env": native_env, "nonce": isolation["nonce"]}, sort_keys=True))
-        wrapper_env = dict(native_env)
-        wrapper_env["PYTHONPATH"] = os.environ["PYTHONPATH"]
-        wrapper = [sys.executable, "-S", "-m", "experiments.tennis.k5d_isolated_receiver",
-                   "native-wrapper", str(payload_path)]
-        with subprocess.Popen(wrapper, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                              close_fds=True, env=wrapper_env, **kwargs) as process:
-            try:
-                birth = time.monotonic_ns()
-                observer_path = work.parent / "native-observer.json"
-                deadline = time.monotonic() + 30
-                while not observer_path.is_file():
-                    if time.monotonic() >= deadline:
-                        raise RuntimeError("outer native decoder observation missing")
-                    time.sleep(0.01)
-                observation = json.loads(observer_path.read_text())
-                if (observation.get("nonce") != isolation["nonce"]
-                        or observation.get("namespace_pids", [])[-1:] != [process.pid]
-                        or observation.get("namespaces") != isolation["namespaces"]["namespaces"]):
-                    raise ValueError("native decoder observer identity differs")
-                _, stderr = process.communicate(timeout=3600)
-                preexec = json.loads((work.parent / "native-preexec.json").read_text())
-                if (preexec.get("pid") != process.pid or preexec.get("birth") != observation.get("birth")
-                        or preexec.get("observer") != observation or preexec.get("closed_extra_fds") is not True
-                        or preexec.get("argv_sha256") != hashlib.sha256(json.dumps(command, separators=(",", ":")).encode()).hexdigest()):
-                    raise ValueError("native pre-exec identity differs")
-            except BaseException:
-                process.kill()
-                process.wait()
-                raise
-            isolation["decoder"] = {"pid": process.pid, "started_monotonic_ns": birth, "argv": command,
-                                    "executable_resolved": resolved_executable, "outer_observation": observation, "preexec": preexec,
-                                    "argv_sha256": hashlib.sha256(json.dumps(command, separators=(",", ":")).encode()).hexdigest(),
-                                    "returncode": process.returncode}
-            if process.returncode:
-                raise RuntimeError(f"native decoder failed: {process.returncode}: {stderr[-1000:]!r}")
 
     if stream.codec == "svt-av1-ivf":
         from src.codecs.svtav1 import decode_command
         command = decode_command(installed["decoder"], native, decoded, threads=1)
-        execute(command)
+        _execute_native(command, work, isolation)
     else:
         from src.codecs.dcvc_uf_worker import dcvc_command
         plan = {"structure": "htl", "src_type": "yuv420", "container": str(native), "out_file": str(decoded),
@@ -135,7 +153,7 @@ def decode(wire_path: Path, map_path: Path, work: Path, *, isolation: dict[str, 
         plan_path = work / "receiver-plan.json"
         plan_path.write_text(json.dumps(plan))
         command, env, cwd = dcvc_command(Path(sys.prefix), "decode", plan_path, work / "native-decoder-report.json")
-        execute(command, env={**os.environ, **env}, cwd=cwd)
+        _execute_native(command, work, isolation, env={**os.environ, **env}, cwd=cwd)
         decoder_report = json.loads((work / "native-decoder-report.json").read_text())
         if not decoder_report.get("deterministic") or decoder_report.get("frame_count") != stream.frames:
             raise ValueError("DCVC decoder determinism or frame count failed")
