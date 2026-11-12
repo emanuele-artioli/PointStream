@@ -461,6 +461,9 @@ def _worker(work: Path) -> None:
                      'denials': launch['denials'], 'context': launch['context'], 'pid': pid, 'birth': birth}
     # The denial records are later augmented in place, so retain the pre-restriction inventory separately.
     actual_policy = json.loads(json.dumps(actual_policy))
+    if len(os.listdir('/proc/self/task')) != 1 or any(int(fd) > 2 and Path('/proc/self/fd', fd).exists()
+                                                        for fd in os.listdir('/proc/self/fd')):
+        raise RuntimeError('threads or descriptors appeared before restriction')
     abi, mask = _restrict(files, execute, system, work)
     actual_policy['handled_mask'] = mask
     _denials(launch['denials'])
