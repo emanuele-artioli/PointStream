@@ -34,7 +34,7 @@ def test_cost_gate_enforces_complete_a_and_remaining_time(tmp_path, monkeypatch)
     import time
     from experiments.tennis import k5d_ada_fresh as worker
 
-    (tmp_path / 'execution.json').write_text(json.dumps({'exit_code': 0, 'seconds': 200}))
+    (tmp_path / 'execution.json').write_text(json.dumps({'exit_code': 0, 'seconds': 200, 'timing_contaminated': False, 'contention': [], 'paused_seconds': 0}))
     (tmp_path / 'dispatch.json').write_text(json.dumps({'campaign_clock': {'started': 1, 'phase_started': 10, 'budget_end': 800}}))
     receipt = {'reason': 'complete', 'status': 0, 'complete_descendant_wait': True,
                'namespace_init': {'namespace_pid': 1}, 'children_cpu_seconds': 195, 'init_cpu_seconds': 1}
@@ -45,7 +45,7 @@ def test_cost_gate_enforces_complete_a_and_remaining_time(tmp_path, monkeypatch)
     with pytest.raises(ValueError, match='remaining campaign'):
         worker.cost_gate(tmp_path)
     monkeypatch.setattr(time, 'monotonic', lambda: 250)
-    (tmp_path / 'execution.json').write_text(json.dumps({'exit_code': 0, 'seconds': 301}))
+    (tmp_path / 'execution.json').write_text(json.dumps({'exit_code': 0, 'seconds': 301, 'timing_contaminated': False, 'contention': [], 'paused_seconds': 0}))
     with pytest.raises(ValueError, match='complete A cost'):
         worker.cost_gate(tmp_path)
 
