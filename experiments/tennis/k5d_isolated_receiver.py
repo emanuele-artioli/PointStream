@@ -12,6 +12,7 @@ import hashlib
 import json
 import os
 import select
+import secrets
 import shutil
 import signal
 import stat
@@ -203,22 +204,59 @@ def _proc_identity(pid: int) -> dict[str, Any]:
             'namespaces': _namespaces(str(pid))}
 
 
-def _private_proc(parent: dict[str, str], parent_pid: int) -> dict[str, Any]:
+def _effective_proc_mount(lines: list[str], mount_id: int, device: tuple[int, int]) -> str:
+    matches = []
+    for line in lines:
+        left, sep, right = line.partition(' - ')
+        fields, tail = left.split(), right.split()
+        if (sep and len(fields) >= 6 and len(tail) >= 1 and fields[0] == str(mount_id)
+                and fields[2] == f'{device[0]}:{device[1]}' and fields[3:5] == ['/', '/proc']
+                and tail[0] == 'proc'):
+            matches.append(line)
+    if len(matches) != 1:
+        raise ValueError('effective /proc mount identity differs')
+    return matches[0]
+
+
+def _private_proc(parent: dict[str, str], parent_host_pid: int) -> dict[str, Any]:
     current = _namespaces('self')
-    if any(current[name] == parent[name] for name in current) or os.getpid() != 1 or parent_pid <= 1:
+    if any(current[name] == parent[name] for name in current) or os.getpid() != 1 or parent_host_pid <= 1:
         raise ValueError('receiver must run as PID 1 in distinct private namespaces')
-    mounts = Path('/proc/self/mountinfo').read_text().splitlines()
-    proc_mounts = [line for line in mounts if line.split(' - ', 1)[0].split()[3:5] == ['/', '/proc']
-                   and line.split(' - ', 1)[1].split()[0] == 'proc']
-    if len(proc_mounts) != 1 or sorted(p for p in os.listdir('/proc') if p.isdecimal()) != ['1']:
-        raise ValueError('private procfs is missing or contains another process')
-    if Path('/proc', str(parent_pid)).exists():
-        raise ValueError('outer producer PID is visible in private procfs')
+    descriptor = os.open('/proc', os.O_PATH | os.O_CLOEXEC)
+    try:
+        info = os.fstat(descriptor)
+        fdinfo = Path(f'/proc/self/fdinfo/{descriptor}').read_text()
+        mount_id = int(next(line for line in fdinfo.splitlines() if line.startswith('mnt_id:')).split()[1])
+        mount = _effective_proc_mount(Path('/proc/self/mountinfo').read_text().splitlines(), mount_id,
+                                      (os.major(info.st_dev), os.minor(info.st_dev)))
+    finally:
+        os.close(descriptor)
+    if sorted(p for p in os.listdir('/proc') if p.isdecimal()) != ['1']:
+        raise ValueError('private procfs contains another process')
+    if Path('/proc', str(parent_host_pid)).exists():
+        raise ValueError('outer producer host PID is visible in private procfs')
     return {'namespaces': current, 'parent_namespaces': parent, 'private_proc': True,
-            'mountinfo': proc_mounts[0], 'initial_pids': [1], 'outer_pid_hidden': parent_pid}
+            'mountinfo': mount, 'mount_id': mount_id, 'initial_pids': [1], 'outer_pid_hidden': parent_host_pid}
 
 
-def _observe_native(work: Path, worker_pid: int, worker_ns: dict[str, str], stop: threading.Event) -> None:
+def _translate_child(namespace_pid: int, parent_host_pid: int, parent_namespace: str) -> dict[str, Any]:
+    """Translate a Popen PID through host-mounted proc using parent/namespace identity."""
+    children = Path(f'/proc/{parent_host_pid}/task/{parent_host_pid}/children').read_text().split()
+    matches = []
+    for value in children:
+        try:
+            candidate = _proc_identity(int(value))
+        except (OSError, StopIteration, ValueError):
+            continue
+        if (candidate['namespace_pids'][-1:] == [namespace_pid]
+                and candidate['namespaces']['pid'] == parent_namespace):
+            matches.append(candidate)
+    if len(matches) != 1:
+        raise ValueError('cannot uniquely translate child PID in parent namespace')
+    return matches[0]
+
+
+def _observe_native(work: Path, worker_pid: int, worker_ns: dict[str, str], nonce: str, stop: threading.Event) -> None:
     handle = work / 'native-observer.json'
     children_path = Path(f'/proc/{worker_pid}/task/{worker_pid}/children')
     while not stop.wait(0.01):
@@ -229,6 +267,7 @@ def _observe_native(work: Path, worker_pid: int, worker_ns: dict[str, str], stop
             identity = _proc_identity(int(children[0]))
             if identity['namespaces'] != worker_ns or identity['namespace_pids'][-1] <= 1:
                 continue
+            identity['nonce'] = nonce
             # Atomic publication prevents the restricted worker reading a partial record.
             temp = work / 'native-observer.tmp'
             temp.write_text(json.dumps(identity, sort_keys=True))
@@ -294,11 +333,20 @@ def verify_receipt(receipt: dict[str, Any], *, expected_context: dict[str, Any],
     if not isinstance(proof.get('actual_policy'), dict) or _object_sha(proof['actual_policy']) != proof['actual_policy_sha256']:
         raise ValueError('actual policy digest differs')
     policy = proof['actual_policy']
+    nonce = proof.get('nonce')
+    if not isinstance(nonce, str) or len(nonce) != 32 or any(c not in '0123456789abcdef' for c in nonce):
+        raise ValueError('native observer nonce missing')
     native_observer = decoder.get('outer_observation')
     if (not isinstance(native_observer, dict) or native_observer.get('namespaces') != namespace['namespaces']
             or native_observer.get('namespace_pids', [])[-1:] != [decoder['pid']]
-            or type(native_observer.get('pid')) is not int or not native_observer.get('birth')):
+            or type(native_observer.get('pid')) is not int or not native_observer.get('birth')
+            or native_observer.get('nonce') != proof.get('nonce')):
         raise ValueError('outer native decoder observation missing')
+    preexec = decoder.get('preexec')
+    if (not isinstance(preexec, dict) or preexec.get('pid') != decoder['pid']
+            or preexec.get('birth') != native_observer['birth'] or preexec.get('observer') != native_observer
+            or preexec.get('argv_sha256') != decoder['argv_sha256'] or preexec.get('closed_extra_fds') is not True):
+        raise ValueError('native pre-exec barrier evidence missing')
     if (policy.get('private_proc_read_only') is not True or policy.get('namespaces') != namespace
             or decoder.get('executable_resolved') not in policy.get('execute_files', [])
             or policy.get('context') != expected_context or policy.get('pid') != proof['pid']
@@ -357,7 +405,8 @@ def replay(wire_path: Path, map_path: Path, work: Path, *, config_path: Path, co
     launch = {'config': config, 'config_sha256': config_sha256, 'denials': evidence, 'context': producer_context,
               'files': [str(p) for p in files], 'execute': [str(p) for p in execute], 'system': [str(p) for p in system],
               'wire_sha256': sha(wire_path), 'map_sha256': sha(map_path),
-              'parent_namespaces': _namespaces('self'), 'outer_pid': os.getpid()}
+              'parent_namespaces': _namespaces('self'), 'outer_pid': int(os.readlink('/proc/self')),
+              'nonce': secrets.token_hex(16)}
     (work / 'launch.json').write_text(json.dumps(launch, sort_keys=True))
     profile = config['profiles'][os.uname().nodename.split('.')[0]]
     python = _canonical(Path(profile['python']))
@@ -390,7 +439,8 @@ def replay(wire_path: Path, map_path: Path, work: Path, *, config_path: Path, co
                 raise RuntimeError('private receiver did not start')
             if process.stdout.readline() != b'READY\n':
                 raise RuntimeError('private receiver startup failed')
-            children = Path(f'/proc/{process.pid}/task/{process.pid}/children').read_text().split()
+            launcher = _translate_child(process.pid, launch['outer_pid'], launch['parent_namespaces']['pid'])
+            children = Path(f"/proc/{launcher['pid']}/task/{launcher['pid']}/children").read_text().split()
             if len(children) != 1:
                 raise ValueError('private receiver launcher has unexpected children')
             observed = _proc_identity(int(children[0]))
@@ -399,7 +449,7 @@ def replay(wire_path: Path, map_path: Path, work: Path, *, config_path: Path, co
                            for k in launch['parent_namespaces'])):
                 raise ValueError('outer observer did not identify isolated PID 1')
             (work / 'worker-observer.json').write_text(json.dumps(observed, sort_keys=True))
-            monitor = threading.Thread(target=_observe_native, args=(work, observed['pid'], observed['namespaces'], stop))
+            monitor = threading.Thread(target=_observe_native, args=(work, observed['pid'], observed['namespaces'], launch['nonce'], stop))
             monitor.start()
             _, stderr = process.communicate(timeout=3600)
         except BaseException:
@@ -478,11 +528,42 @@ def _worker(work: Path) -> None:
     proof = {'context': launch['context'], 'config_sha256': launch['config_sha256'], 'landlock_abi': abi,
              'handled_mask': mask, 'threads': 1, 'extra_fds': False, 'pid': pid, 'postexec_pid': os.getpid(),
              'birth': birth, 'postexec_birth': birth, 'denials': launch['denials'],
-             'namespaces': namespace_proof, 'worker_observer': observer,
+             'namespaces': namespace_proof, 'worker_observer': observer, 'nonce': launch['nonce'],
              'actual_policy': actual_policy, 'actual_policy_sha256': _object_sha(actual_policy),
              'profile_sha256': _object_sha(launch['config']['profiles'][os.uname().nodename.split('.')[0]]),
              'runtime_inventory_sha256': _object_sha(launch['config']['profiles'][os.uname().nodename.split('.')[0]]['runtime_files'])}
     k5d_worker.decode(work / 'packet.psbl', work / 'resources.json', work / 'result', isolation=proof)
+
+
+def _native_wrapper(payload_path: Path) -> None:
+    """Wait for an outer birth observation before replacing this process with the codec."""
+    payload = json.loads(payload_path.read_text())
+    observer_path = payload_path.parent / 'native-observer.json'
+    deadline = time.monotonic() + 30
+    while not observer_path.is_file():
+        if time.monotonic() >= deadline:
+            raise RuntimeError('native exec observer did not acknowledge')
+        time.sleep(0.01)
+    observer = json.loads(observer_path.read_text())
+    birth = _birth()
+    if (observer.get('nonce') != payload['nonce']
+            or observer.get('namespace_pids', [])[-1:] != [os.getpid()] or observer.get('birth') != birth
+            or observer.get('namespaces') != _namespaces('self')):
+        raise ValueError('native pre-exec observer differs')
+    command = payload['argv']
+    if not isinstance(command, list) or not command or not all(isinstance(x, str) for x in command):
+        raise ValueError('native argv malformed')
+    preexec = {'pid': os.getpid(), 'birth': birth, 'argv_sha256': _object_sha(command),
+               'observer': observer, 'closed_extra_fds': True}
+    for fd in os.listdir('/proc/self/fd'):
+        if int(fd) > 2:
+            try:
+                os.close(int(fd))
+            except OSError as exc:
+                if exc.errno != errno.EBADF:
+                    raise
+    (payload_path.parent / 'native-preexec.json').write_text(json.dumps(preexec, sort_keys=True))
+    os.execve(command[0], command, payload['env'])
 
 
 def cpu_oracle(wire_path: Path, map_path: Path, work: Path, *, wire_sha256: str, map_sha256: str,
@@ -510,6 +591,8 @@ def _main() -> None:
     commands = parser.add_subparsers(dest='command', required=True)
     child = commands.add_parser('worker')
     child.add_argument('work', type=Path)
+    wrapper = commands.add_parser('native-wrapper')
+    wrapper.add_argument('payload', type=Path)
     oracle = commands.add_parser('cpu-oracle')
     for name in ('wire', 'resources', 'work', 'config', 'protected', 'context'):
         oracle.add_argument('--' + name, type=Path, required=True)
@@ -518,6 +601,9 @@ def _main() -> None:
     args = parser.parse_args()
     if args.command == 'worker':
         _worker(args.work)
+        return
+    if args.command == 'native-wrapper':
+        _native_wrapper(args.payload)
         return
     protected = {k: [Path(p) for p in v] for k, v in json.loads(args.protected.read_text()).items()}
     receipt = cpu_oracle(args.wire, args.resources, args.work, wire_sha256=args.wire_sha256,

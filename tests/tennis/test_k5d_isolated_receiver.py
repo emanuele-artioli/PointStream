@@ -61,7 +61,10 @@ def test_receipt_rejects_legacy_and_incomplete_proof() -> None:
                            'parent_namespaces': {k: k + '-outer' for k in ns},
                            'outer_pid_hidden': 20, 'mountinfo': '1 2 0:3 / /proc - proc proc rw'}
     proof['worker_observer'] = {'birth': '2', 'namespaces': ns, 'pid': 30, 'namespace_pids': [1]}
-    proof['decoder']['outer_observation'] = {'namespace_pids': [10], 'namespaces': ns, 'birth': '3', 'pid': 31}
+    proof['nonce'] = 'a' * 32
+    proof['decoder']['outer_observation'] = {'namespace_pids': [10], 'namespaces': ns, 'birth': '3', 'pid': 31, 'nonce': 'a' * 32}
+    proof['decoder']['preexec'] = {'pid': 10, 'birth': '3', 'observer': proof['decoder']['outer_observation'],
+                                    'argv_sha256': proof['decoder']['argv_sha256'], 'closed_extra_fds': True}
     proof['actual_policy'] = {'private_proc_read_only': True, 'namespaces': proof['namespaces'],
                               'execute_files': ['/native'], 'context': {}, 'pid': 1, 'birth': '2', 'handled_mask': proof['handled_mask'],
                               'denials': {k: [{x: y for x, y in row.items() if x != 'errno'} for row in rows]
@@ -93,3 +96,49 @@ def test_cpu_oracle_rejects_non_cpu_before_reading(tmp_path: Path) -> None:
                             expected_yuv_sha256='c' * 64, expected_rgb_sha256='d' * 64,
                             config_path=tmp_path / 'config', config_sha256='e' * 64,
                             protected_paths={}, producer_context={'gpu': {'uuid': 'GPU-test'}})
+
+
+def test_effective_mount_handles_overmounted_proc() -> None:
+    old = '5698 1 0:20 / /proc rw - proc proc rw'
+    new = '5781 1 0:21 / /proc rw - proc proc rw'
+    assert isolated._effective_proc_mount([old, new], 5781, (0, 21)) == new
+    with pytest.raises(ValueError):
+        isolated._effective_proc_mount([old, new], 5781, (0, 20))
+
+
+def test_child_translation_uses_host_parent_and_namespace(monkeypatch: Any) -> None:
+    original = Path.read_text
+    def read(path: Path, *args: Any, **kwargs: Any) -> str:
+        if str(path) == '/proc/3392605/task/3392605/children':
+            return '3392606 3392607'
+        return original(path, *args, **kwargs)
+    monkeypatch.setattr(Path, 'read_text', read)
+    rows = {3392606: {'pid': 3392606, 'namespace_pids': [3392606, 2], 'namespaces': {'pid': 'pid:[4]'}},
+            3392607: {'pid': 3392607, 'namespace_pids': [3392607, 3], 'namespaces': {'pid': 'pid:[4]'}}}
+    monkeypatch.setattr(isolated, '_proc_identity', lambda pid: rows[pid])
+    assert isolated._translate_child(2, 3392605, 'pid:[4]')['pid'] == 3392606
+    with pytest.raises(ValueError):
+        isolated._translate_child(2, 3392605, 'pid:[wrong]')
+
+
+def test_native_wrapper_waits_for_matching_birth_and_nonce(tmp_path: Path, monkeypatch: Any) -> None:
+    import json
+    namespace = {'pid': 'pid:[inner]'}
+    observer = {'nonce': 'secret', 'namespace_pids': [2], 'birth': '55', 'namespaces': namespace}
+    (tmp_path / 'native-observer.json').write_text(json.dumps(observer))
+    payload = tmp_path / 'native-exec.json'
+    payload.write_text(json.dumps({'argv': ['/native', '--decode'], 'env': {'PATH': '/none'}, 'nonce': 'secret'}))
+    monkeypatch.setattr(isolated, '_birth', lambda: '55')
+    monkeypatch.setattr(isolated, '_namespaces', lambda _: namespace)
+    monkeypatch.setattr(isolated.os, 'getpid', lambda: 2)
+    monkeypatch.setattr(isolated.os, 'listdir', lambda _: ['0', '1', '2'])
+    called = []
+    monkeypatch.setattr(isolated.os, 'execve', lambda *args: called.append(args))
+    isolated._native_wrapper(payload)
+    record = json.loads((tmp_path / 'native-preexec.json').read_text())
+    assert record['observer'] == observer and record['pid'] == 2 and record['closed_extra_fds'] is True
+    assert called == [('/native', ['/native', '--decode'], {'PATH': '/none'})]
+    observer['nonce'] = 'wrong'
+    (tmp_path / 'native-observer.json').write_text(json.dumps(observer))
+    with pytest.raises(ValueError):
+        isolated._native_wrapper(payload)
