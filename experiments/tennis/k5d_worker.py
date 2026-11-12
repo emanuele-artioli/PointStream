@@ -7,6 +7,7 @@ not filesystem isolation, which requires a separate denial witness.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import struct
@@ -88,7 +89,8 @@ def decode(wire_path: Path, map_path: Path, work: Path, *, isolation: dict[str, 
                 process.kill()
                 process.wait()
                 raise
-            isolation["decoder"] = {"pid": process.pid, "birth": birth, "argv": command,
+            isolation["decoder"] = {"pid": process.pid, "started_monotonic_ns": birth, "argv": command,
+                                    "argv_sha256": hashlib.sha256(json.dumps(command, separators=(",", ":")).encode()).hexdigest(),
                                     "returncode": process.returncode}
             if process.returncode:
                 raise RuntimeError(f"native decoder failed: {process.returncode}: {stderr[-1000:]!r}")
