@@ -1,0 +1,47 @@
+{
+  "all_owned_pids_absent": true,
+  "audited": true,
+  "candidate_audit_sha256": "5a6e05e3064b3d1c0bf67327ec3f806396b28f138ba7122e9be6af1f82de586e",
+  "cases": [
+    "normal",
+    "timeout",
+    "sigterm",
+    "sigkill"
+  ],
+  "consumer_execution_identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "4f7f6546b7eb4552ea77b8d1607a0ccc68c7ae42e73965a70a2902f40f4e7402",
+    "source_sha256": "ed89052108dbd4a8242d7fd7ae35ac37aa1f41332d204a4d11e9d7b799bf715d"
+  },
+  "gpu_used": false,
+  "independent_cpu_match": true,
+  "job_id": "20261112T204701Z-6c0c0a86",
+  "namespace_wrapper_sha256": "57f4cba09df3f8a46a6589d9540a79e679c82beafcafd65f7263850eb767c571",
+  "native_stream_bytes": 29010,
+  "native_stream_sha256": "fd445f424549a3bfec7c4966f98f8b67252f64ab46ea1083f1551450beded494",
+  "native_tools": {
+    "SvtAv1EncApp": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+    "dav1d": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+    "ffmpeg": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2"
+  },
+  "normal_inner_cpu_seconds": 2.504883,
+  "normal_outer_cpu_seconds": 2.628974,
+  "passed": true,
+  "qualification_exclusions": [
+    "GPU memory",
+    "numerical GPU parity",
+    "performance",
+    "scale",
+    "quality"
+  ],
+  "root_observed_births_absent": 19,
+  "root_publication_SHA": "5d04d1a1a5650055e751ea7bda5fd88c10ae7f63661bb3085ac9650d0035aa0d",
+  "root_raw_members_verified": 26,
+  "root_validation_sha256": "489be969f6cdae68aae00206101c32d9d07fd7cd4ce525e876c1902df50a2468",
+  "schema": 1,
+  "scope": "native CPU PID containment and accounting",
+  "source_spec_sha256": "b8868b5c561af89bbdd0591ecabd0fb21ffa314a72aef689fa9a8c5290c24e12",
+  "status": "Rootacceptedexactbbe9CPUmechanismonly; noGPU/cost/scale/qualityqualification",
+  "termination_caveat": "TERM case required recorded KILL escalation; not TERM-only success.",
+  "unshare_sha256": "9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6"
+}

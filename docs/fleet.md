@@ -703,7 +703,12 @@ cross-class preparation equivalence: WASB coordinates and DCVC native/pixel
 hashes differed, while source YUV/scores and SVT hashes matched. Scoring was not
 reached; no quality conclusion. A separate prospective fresh Ada reference/repeat
 protocol is in preparation, without changing the old failed gate.
-The same-job DCVC rule below remains unchanged. See the
+Fresh separate Ada2c8b then passed exact same-physical-GPU six-point16 packet
+replay, native/receiver bytes and complete metrics/judges (A126.574s/B112.491s).
+This qualifies the scoped packet-repeat/cost path, not independent data or
+filesystem denial. The actual receiver still declares filesystem isolation
+unestablished; the new denial/scale source is unproven and benchmark promotion
+held. The same-job DCVC rule below remains unchanged. See the
 [qualification card](cards/k5d-ada-qualification-2026-11-12.md).
 
 **Choosing `gpu_models`:** SAM 3.1 and DCVC-UF on Ada and A6000 only (DCVC-UF

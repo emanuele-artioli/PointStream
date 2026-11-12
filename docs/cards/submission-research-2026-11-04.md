@@ -21,21 +21,24 @@ See [handoff](../continuation-2026-11-12.md) and
 gate under929CPU. No paid server, source/numerical relaxation, manuscript or
 PRESLEY change, training or paper submission.
 
-## Latest capacity decision — November 12
+## Latest capacity decision — November12
 
-The native watcher found idle gpu6 Ada capacity and qualification37b3 actually
-ran there. It failed exact A6000 equivalence: source YUV/scores matched, WASB
-coordinates and DCVC native/pixel outputs differed. Root retained that negative,
-closed/charged143GPU493CPU and acknowledged events. It is not a quality result.
-No GPU job or fleet wait is active. Programme charges19,505GPU/50,324CPU.
+Ada2c8b completed exact same-GPU packet-replay repeatability and measured full
+six-point16 costs126.6/112.5seconds. Root physically audited all bytes, metrics
+and judges. This is calibration only; original37b3cross-class failure is kept.
+Actual worker receipts say filesystem isolation NOT established; our previous
+source-hidden wording was too broad. Denial proof remains unmet, no benchmark
+promotion. Two code builders prepare a real receiver witness and separate Ada
+16/48 producer/scorer. No new GPU or CPU oracle is released; source still has
+material observer/capability issues under independent review.
 
-A separate [fresh Ada reference/repeat protocol](k5d-ada-fresh-reference-2026-11-12.md)
-is in code preparation, preserving the old strict gate. Its internal Ball
-reservation is1,400GPU/1,950CPU remaining after50source/100passivemonitor charges;
-no programme ceiling or workstream transfer. Source/CPU proof and root review
-must precede a new inference release. Passive five-minute resource checks run
-for at most45minutes, ending no later than21:21:36UTC. W8 remains held under
-929CPU; manuscript and PRESLEY are unchanged.
+[Current handoff](../continuation-2026-11-12.md),
+[stage card](k5d-ada-scale-and-denial-2026-11-12.md),
+[API contract](k5d-receiver-isolation-contract-2026-11-12.md).
+Programme19,859GPU/51,578CPU charged; new internal Ball stage6,000GPU/8,750CPU
+remaining, oldBall7,920GPU/800CPU and W84,550GPU/929CPU preserved. All original
+ceilings unchanged. Native5minute passive resource checks from21:44UTC stop
+by4wallhours or CPUguard; no model timers/autosubmit. Paper/PRESLEY unchanged.
 
 ## Goal and scope
 

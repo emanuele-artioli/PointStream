@@ -1,5 +1,12 @@
 # Fresh Ada reference and repeatability — November 12
 
+**Closed:** job20261112T210150Z-2c8b49a0 passed same-Ada packet-repeat/cost
+checks (A126.574s/B112.491s), charged354GPU/754CPU. Its actual receiver receipts
+explicitly do not establish filesystem isolation. References below to
+source-hidden receiving expressed the intended condition too broadly; that
+condition remains unmet and no benchmark promotion is credited. The separate
+[denial/scale card](k5d-ada-scale-and-denial-2026-11-12.md) addresses it.
+
 This is a separate prospective hardware qualification, inside the user's Ball
 research scope and 24 GPU-hour/28 workload CPU-hour programme. It does not amend
 the failed A6000-equivalence test or replace accepted16. Preserve 37b3 as a
@@ -122,3 +129,26 @@ Actual CPU proof `20261112T204701Z-6c0c0a86`, source_archive:true, speccanonical
 b8868b5c, deadline21:26:06.069711UTC. Solewait2500/backend25026; handle and
 outputs `/private/tmp/pointstream-ada-fresh-cpu-run-20261112/`. No secondwait,
 replay, GPUrelease or automatic acceptance.
+
+Root accepted CPU6c0c after independently rerunning the frozen validator and
+hashing26 actual tar members;19 observed births/group/supervisor/claim absent.
+Approved CPUgateSHA b6213dedbf0e7a24d4d02b92114d1ce06766b872fd86b60ce788b44b5aee3d28,
+namespacewrapperSHA57f4cba0, cases including TERM requiring KILL escalation.
+Full250CPU/0GPU charged; programme19,505GPU/50,574CPU; fresh phase remaining
+1,400GPU/1,700CPU (1,600 future GPU-phaseCPU +100monitorreserve). EventACKed.
+GPU spec/readiness preparation is released inside the400externalCPU allowance,
+but submission remains pending root review. Declare32,000MiB GPU capacity for
+the complete scoring pipeline; the previous16,000MiB prepare-only request did
+not establish a complete scorer memory peak. Both eligible Ada hosts have48GB
+devices; actual fresh memory/cost evidence still requires this pilot.
+
+## Root closeout and scope correction
+
+2c8b completed exact fresh same-Ada packet replay, metrics and judges, with
+A126.574wall/B112.491wall, independently joined to physical bytes. This accepts
+calibration repeat/cost only. Actual worker receipts and validators explicitly
+say filesystem isolation NOT established: this card called the packet-only API
+source-hidden too broadly. That condition remains unmet; no benchmark promotion.
+Preserve the gap, prior37b3negative and all original records. Charged354GPU/
+754CPU; unused1046GPU/946CPUreleased; terminaleventACKed. Separate actual denial
+and scale preparation is registered in the November12 receiver/scale card.

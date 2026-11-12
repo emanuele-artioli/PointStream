@@ -1,0 +1,19 @@
+{
+  "job_id": "20261112T204701Z-6c0c0a86",
+  "root_decision": "AcceptedexactnewsourceCPUmechanismonly; independentcanonicalCOMPLETE,frozenvalidatorpass,26actualtarmembershashed,19births/supervisor/group/claimabsent,normalCPUwithin0.5s;TERMescalatedKILLretained",
+  "source_identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "4f7f6546b7eb4552ea77b8d1607a0ccc68c7ae42e73965a70a2902f40f4e7402",
+    "source_sha256": "ed89052108dbd4a8242d7fd7ae35ac37aa1f41332d204a4d11e9d7b799bf715d"
+  },
+  "namespace_wrapper_sha256": "57f4cba09df3f8a46a6589d9540a79e679c82beafcafd65f7263850eb767c571",
+  "approved_gate_sha256": "b6213dedbf0e7a24d4d02b92114d1ce06766b872fd86b60ce788b44b5aee3d28",
+  "GPU_charge": 0,
+  "CPU_charge": 250,
+  "CPU_basis": "Whole250futureCPUconservativecharge incl6.77preflightCPU/upload/submit/wait/audit;50prepalreadycharged;aggregateexternalunmetered",
+  "publication_sha256": "5d04d1a1a5650055e751ea7bda5fd88c10ae7f63661bb3085ac9650d0035aa0d",
+  "candidate_audit_sha256": "5a6e05e3064b3d1c0bf67327ec3f806396b28f138ba7122e9be6af1f82de586e",
+  "claim_check": "Rootreviewedhashedremotehelperandits128byteclaimbookabsenceassertion;claimbodywasnotexported",
+  "terminal_event": "d23e9192d5d957ec9f58a08590d4ab5f",
+  "event_acknowledged": true
+}
