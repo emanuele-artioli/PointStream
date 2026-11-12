@@ -151,15 +151,18 @@ def stage_receipt(stage: Path) -> tuple[float, float]:
     prefix = 'K5D_NAMESPACE_CANDIDATE '
     lines = [json.loads(line.removeprefix(prefix)) for line in (stage / 'command.log').read_text().splitlines()
              if line.startswith(prefix)]
-    if (execution['exit_code'] != 0 or len(lines) != 1 or lines[0].get('reason') != 'complete'
+    if (execution['exit_code'] != 0 or execution.get('timing_contaminated') is not False
+            or execution.get('contention') != [] or execution.get('paused_seconds') != 0
+            or len(lines) != 1 or lines[0].get('reason') != 'complete'
             or lines[0].get('status') != 0 or lines[0].get('complete_descendant_wait') is not True
             or lines[0]['namespace_init']['namespace_pid'] != 1):
         raise ValueError('complete native namespace receipt required')
     wall = execution['seconds']
-    cpu = lines[0]['children_cpu_seconds'] + lines[0]['init_cpu_seconds']
-    if any(isinstance(x, bool) or not isinstance(x, (int, float)) or not math.isfinite(x) or x <= 0
-           for x in (wall, cpu)):
+    parts = [lines[0]['children_cpu_seconds'], lines[0]['init_cpu_seconds']]
+    if (any(isinstance(x, bool) or not isinstance(x, (int, float)) or not math.isfinite(x) or x < 0
+            for x in [wall, *parts]) or wall <= 0 or sum(parts) <= 0):
         raise ValueError('invalid complete-stage cost')
+    cpu = sum(parts)
     return float(wall), float(cpu)
 
 
