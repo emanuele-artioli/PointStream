@@ -99,3 +99,12 @@ source archive is reused. One canonicalwait2500 has its handle in the Ball
 journal. No other stage or retry follows automatically. The absolute deadline
 includes execution: a late admission or budget failure must stop, never be
 reported as a scientific-quality negative.
+
+## Root closeout
+
+Request461e expired unassigned; no GPU execution or parity result. Root checked
+canonical status, exact source/spec manifest, empty admission inventory, missing
+execution files and absent exact-job CPU claims. Full350externalCPU/0GPU charged,
+canonical eventACKed. This card is closed; no automatic retry. A separate
+[standing capacity phase](k5d-standing-capacity-2026-11-12.md) is prospectively
+allocated within the unchanged Ball/user ceilings.

@@ -1,6 +1,37 @@
 # Continuation — November 12, restored fleet access
 
-## Current alternate-GPU qualification — native polling active
+## Current state — idle gpu6 found; Ada qualification running on gpu6
+
+Root independently closed `20261112T192044Z-461e16e8` EXPIRED unassigned: no
+execution, GPU charge or Ada parity result. Canonical event acknowledged.
+[Closeout](experiments/k5d-inputs/ada-461e-root-closeout-20261112.json).
+Programme charges19,362GPU/49,681CPU; old Ball reservation7,920GPU/800CPU,
+W8 4,550GPU/929CPU. A **separate prospective** Ball phase reserves1,000GPU/
+1,200CPU remaining (200monitoring already charged; max1,200one fixed A6000 test or1,150Ada test), within
+unchanged Ball64,800GPU/72,000CPU and programme86,400GPU/100,800CPU ceilings.
+
+The machine-only watcher started20:24:21UTC, controllerPID21084, and **stopped
+on its first20:24:45UTC tick**: gpu6index0 RTX6000Ada was idle (1MiBused,
+48,645MiBfree,util0,no computePID). Allfour host probes succeeded; A6000gpu2/3
+and Adagpu5 were occupied. Root accepted the live tick and8fixtures; exact
+seal9e9ace75 matches all released files. The one canonical request **`20261112T202503Z-37b3b79b`** is now running
+smoke on gpu6, exclusive Ada, source21482/tree9e2376/archive5fd8,
+source_archive:true. Canonical specc7e3cce7/raw4d6c79c0 differs only in deadline
+**2026-11-12T21:04:45.903087UTC**. Max1,000GPU/1,150CPU including350external.
+One canonicalwait2500, clientPID21329/backend40593; outputs/handle
+`/private/tmp/pointstream-ada-37b3-20261112/`. Runner attending; no secondwait.
+The standing controller ended after publishing and copied the default jobrecord.
+No second watcher, retry or automatic scale promotion. ActualnewID must be
+read from the Balljournal, then canonical status before any action.
+[Standing card](cards/k5d-standing-capacity-2026-11-12.md).
+CPU-only proofd24d remains accepted; Ada GPU qualification is unresolved.
+Originalwatch maximum was2026-11-13T00:24:21UTC; it already stopped oncandidate. Launch/runstate and once-only flags:
+`/Users/manu/.cache/pointstream-resource-watch-20261112-standing/`.
+No verified agent completion wake; desktopnoticeonly. Inspect run/state.json
+and actualjournalID before fleetactions; do not restart this controller.
+Older pending/wait instructions below are historical and superseded.
+
+## Historical alternate-GPU qualification — closed expired
 
 The user requested regular resource checks and an alternative to the A6000.
 A machine-only five-minute watcher found both gpu5 Ada devices idle on its first

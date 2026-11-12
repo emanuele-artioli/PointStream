@@ -1,0 +1,81 @@
+{
+  "recorded_utc": "2026-11-12T20:24:15.460429+00:00",
+  "phase": "ball-opportunistic-capacity-20261112",
+  "release": "Rootreviewed oneboundedstandingwatch andoneconditionalfrozenfleetrequest",
+  "seal_sha256": "9e9ace75a69d0db42156360327f15fb9ed86cc7603e676d67c8f57e07c6bc9c1",
+  "durable_directory": "/Users/manu/.cache/pointstream-resource-watch-20261112-standing",
+  "interval_seconds": 300,
+  "maximum_watch_wall_seconds": 14400,
+  "CPU_monitor_precharged": 200,
+  "future_GPU_max": 1000,
+  "future_CPU_max": 1200,
+  "proofs": "CPUd24daccepted,A6000originalCPUproofunchanged; noGPUparityresult; exactsources/snapshots/templatessealed",
+  "tests": "8controller/watcherfixtures passedrootindependently; deterministicarchives matched; fullintegratedproductiontests2129passed40skipped/Ruff/mypy577 priorunchangedproductioncode",
+  "accounting_limits": "Perprocesslimitsandcountedwatchbudget do notenforcewholehostSSHD/loginaggregate. CPUallowancesconservative; no paid/newallocation.",
+  "completion": "Desktopnoticeonly; agentresumeunverified; no recurringAIorautomation",
+  "launch": {
+    "pid": 21084,
+    "started_utc": "2026-11-12T20:24:21.281105+00:00",
+    "argv": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-B",
+      "/Users/manu/.cache/pointstream-resource-watch-20261112-standing/controller.py",
+      "--ack-accounting-limits",
+      "--reviewed-seal-sha256",
+      "9e9ace75a69d0db42156360327f15fb9ed86cc7603e676d67c8f57e07c6bc9c1"
+    ],
+    "seal_sha256": "9e9ace75a69d0db42156360327f15fb9ed86cc7603e676d67c8f57e07c6bc9c1",
+    "output": "/Users/manu/.cache/pointstream-resource-watch-20261112-standing/run",
+    "native_agent_resume_verified": false
+  },
+  "first_live_tick": {
+    "candidates": [
+      {
+        "host": "gpu6",
+        "index": "0",
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "qualification": "required",
+        "uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0"
+      }
+    ],
+    "controller_cpu_reserve_seconds": 2,
+    "finished_utc": "2026-11-12T20:24:45.468716+00:00",
+    "remote_worst_case_charge_seconds": 4.215035,
+    "ssh_waited_children_cpu_seconds": 0.143817,
+    "tick": 0
+  },
+  "root_live_tick_review": "All4hostprobes succeeded; A6000gpu2/3 andAdagpu5 occupied, gpu6index0 1MiBused/48645MiBfree/util0/noGPU0computePID. Localresourcewatchstoppedonfirstcandidate; onecanonicalsubmissioninprogress. NoreservationorGPUparityclaimed.",
+  "watch_files": [
+    {
+      "path": "/Users/manu/.cache/pointstream-resource-watch-20261112-standing/run/watch/tick-00-gpu3.json",
+      "sha256": "952ab3fa4ce98da1dac853436cd6dfabc4152ae7dd831c169659a9ac542f37c2"
+    },
+    {
+      "path": "/Users/manu/.cache/pointstream-resource-watch-20261112-standing/run/watch/tick-00-gpu2.json",
+      "sha256": "4e804d1588d5bcbccee6daf62931a2ff263503e636fe415b3c6bb525fca18d36"
+    },
+    {
+      "path": "/Users/manu/.cache/pointstream-resource-watch-20261112-standing/run/watch/tick-00-gpu5.json",
+      "sha256": "ab122e5e45332e68a252ececb27a0d0a1c2c89a28cff991f1e0b2240f25277c3"
+    },
+    {
+      "path": "/Users/manu/.cache/pointstream-resource-watch-20261112-standing/run/watch/tick-00-summary.json",
+      "sha256": "c6d6939841e36f1332bfd747907f245c8cee6696ec048d88159e4d185dc8138b"
+    },
+    {
+      "path": "/Users/manu/.cache/pointstream-resource-watch-20261112-standing/run/watch/tick-00-gpu6.json",
+      "sha256": "13ceb90f5bc353450361871ec5b9702d98cc6f9d742c4ef2be31ec94b540869f"
+    },
+    {
+      "path": "/Users/manu/.cache/pointstream-resource-watch-20261112-standing/run/watch/finished.json",
+      "sha256": "cf377c99068ae0bd4b97974bf3429c5afd4a41fc68612c87c4ca5da3653fdbe7"
+    },
+    {
+      "path": "/Users/manu/.cache/pointstream-resource-watch-20261112-standing/run/watch/receipt.json",
+      "sha256": "6735fcacbda6511201201640ccc7f9e254dff7e6bfae3979f0cb21e3100f13d8"
+    }
+  ],
+  "actual_job_id": "20261112T202503Z-37b3b79b",
+  "state": "PublishedandrunningexclusiveAdaongpu6;solecanonicalwait21329/40593",
+  "deadline": "2026-11-12T21:04:45.903087+00:00"
+}
