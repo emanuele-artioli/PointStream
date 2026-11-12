@@ -1864,6 +1864,15 @@
       "cpu_seconds": 400,
       "basis": "Full external400CPU conservatively charged for reviewed readiness/source restore/first submission that stopped at gpu1 SSH timeout in repeated doctor. CLI source order and unchanged local client job record inventory establish no job ID allocation/publication; zeroGPU/scientific execution. Wall is not measuredCPU. Unspent800campaignCPU released.",
       "release_stage": "research-first24/28-recovery"
+    },
+    {
+      "phase": "ball-8709-partialpool-expiry-closeout-20261112",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 400,
+      "basis": "Root accepted canonicalexpiry, physicalarchive450d/spec6a3c/source21cd and emptyexecution/claims; botheligibleworkers noeligibleGPU. Full external400CPU conservativeinclusive readiness/submit/wait/audit; actualaggregateadminCPUunmetered, notqueuewall. No scientificresult. See8709-recovery-root-closeout-20261112.json.",
+      "release_stage": "research-first24/28-recovery"
     }
   ],
   "reservations": [
@@ -2382,8 +2391,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 7920,
-      "cpu_seconds": 1850,
-      "status": "Remaining_unspent;1000GPU/1200CPU nested 8709406d originalcorrected16 partialpoolqueue; no scale/full30release"
+      "cpu_seconds": 1450,
+      "status": "Remaining_unspent;8709rootclosedexpiredunassigned; no activejob/newqueue/scale release"
     },
     {
       "phase": "fleet-upload-routing-qualification-20261105",
@@ -4560,7 +4569,7 @@
       "job_id": "20261112T172806Z-8709406d",
       "phase": "k5d-scale-first-tranche-20261105",
       "subphase": "same-job-0bb5-postoutage-verifiedpartialpool-exclusive16",
-      "state": "pending;rootverifiedsourcearchive/spec/manifest20261112",
+      "state": "expiredunassigned;rootaccepted20261112",
       "revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
       "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
       "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
@@ -4592,9 +4601,14 @@
       "local_storage_gib": 32,
       "local_batch": "/private/tmp/pointstream-ball-partial-resume-20261112",
       "scope": "ONEoriginalsixpoint16retainedreceiverparity/lifecyclecost; no48/292/586/full30/retry. Unchanged0bb science, packedMAIN andlocalstaging.",
-      "wait_state": "solecanonicalwait2500running;localPID7932/session46210;no completionwakeupverified;one expectedfinishrootcheck18:10UTC;no secondwait",
+      "wait_state": "solewaitendedattention/exit10;rootcanonicalexpired+rawauditaccepted;canonicaleventACK;no newqueue",
       "wait_handle": "/private/tmp/pointstream-ball-8709-wait-20261112/handle.json",
-      "root_single_deadline_check_utc": "2026-11-12T18:10:00Z"
+      "root_single_deadline_check_utc": "2026-11-12T18:10:00Z",
+      "terminal_GPU_charge": 0,
+      "terminal_CPU_charge": 400,
+      "qualification_executed": false,
+      "recovery_receipt": "docs/experiments/k5d-inputs/8709-recovery-root-closeout-20261112.json",
+      "root_single_deadline_check_state": "completed once18:10UTC;no furthercheck/timer"
     }
   ],
   "old_budgets": "closed, not borrowed",

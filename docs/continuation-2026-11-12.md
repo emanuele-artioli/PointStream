@@ -1,30 +1,40 @@
 # Continuation — November 12, restored fleet access
 
-Latest operational update: **new request `20261112T172806Z-8709406d` is
-pending**, source0bb/archive450d/source21cd, source_archive:true, spec6a3c3570 /
-raw4aec7ec9, deadline **2026-11-12T17:52:06.008295UTC**. This is the original
-corrected16 parity/lifecycle-cost gate only,1000GPU/1200futureCPU including400
-external, nested in Ball7,920GPU/1,850CPU. A runner owns **one canonical wait2500**;
-its recorded localPID is7932, execsession46210, handle
-`/private/tmp/pointstream-ball-8709-wait-20261112/handle.json`. No second wait.
-Background-completion wakeup is unverified. Root will make one attended
-expected-finish check at18:10UTC, within45minutes of publication/release. No further
-queue/scale/replay. Copy actual ID from that journal before fleet actions.
+## Final authoritative outcome — after the single18:10UTC check
 
-The first submit stopped in repeated all-host doctor on gpu1 TCP timeout
-**before ID allocation** and was conservatively charged400externalCPU/0GPU.
-A new isolated local client pool `[gpu5,gpu2,gpu3]` passed the same participating-
-host visibility/atomic gates and successfully published the request. Required
-scientific hosts remain gpu2/3; globalconfig/workers are unchanged. The selected
-new job metadata was copied into the normal client tracker. Management access
-uses `PS_FLEET_MANAGEMENT_HOST=gpu5 PS_FLEET_MANAGEMENT_PYTHON=/usr/bin/python3`.
+**No active GPU request, wait or timer remains.** The one resumed request
+`20261112T172806Z-8709406d` expired unassigned. Root canonical status, raw
+source/spec/archive, absent execution/claims and both eligible workers' admission
+reasons agree. All A6000 occupants in a fresh ownership probe were other users;
+no own stale GPU process was identified among those occupants or signaled.
+Canonical terminalevent07724b3fb54d5e15b3d089e42eaceb7d is acknowledged.
+Physicalevent195375fc is the same event with a different documented UUID recipe;
+the wait's earlier pending status is a status/event read race, not execution.
+The sole wait ended after1301seconds, exit10, and its agent collected session46210
+once. Root's one expected-finish check is complete; no second wait or wakeup.
 
-Current programme charges **19,362GPU/48,391CPU**; remaining nested Ball
-**7,920GPU/1,850CPU**, W8 **4,550GPU/929CPU**. The new1200CPU/1000GPU maximum is
-already inside those balances. Source/spec receipts are under
-`/private/tmp/pointstream-ball-partial-resume-20261112/`; isolated client config
-under `/private/tmp/pointstream-ball-partial-client-20261112/`. Preserve their
-continuation if communication fails; never infer failure or replay publication.
+Final immutable raw snapshot: `/Users/manu/.cache/pointstream-evidence/fleet-8709-closeout-20261112-a3/` (21files25,432bytes plusmanifest). Earlier resumption snapshota2 retains24files69,756bytes; do not overwrite either.
+
+Current programme charges **19,362GPU/48,791CPU** of86,400/100,800. Remaining
+nested Ball **7,920GPU/1,450CPU**, W8 **4,550GPU/929CPU**; no active child maximum.
+The resumed queue is charged400externalCPU/0GPU conservatively. No queue wall
+is counted as CPU, and no scientific result is inferred. The
+[root closeout](experiments/k5d-inputs/8709-recovery-root-closeout-20261112.json)
+preserves exact identities, mapping, raw joins and limitations.
+
+**Decision:** keep NFS as the archive and use existing local staging; no broad
+cleanup/migration. Actual readiness proved separate local storage on all six
+hosts. RequiredA6000capacity is the present blocker, not a demonstrated lack of
+disk space. Retain the isolated participating-pool config as a reviewed option,
+without changing global config/workers. After an external capacity change,
+inspect the actual prior ID and fresh eligible hosts before considering a new
+bounded request. No further queue or hardware broadening is released now.
+
+W8 remains resource-held; no complete forecast fits its remaining CPU allowance
+under the currently qualified evidence. No Ball-to-W8 transfer, training, paid
+hosting/API, legacy study, manuscript/PRESLEY edit or submission is authorized.
+The user requested research-first; that remains active. Coauthors/rights remain
+open. Prior notes below are historical; latest ledger and final outcome govern.
 
 Start here and read the [storage/recovery decision](fleet-recovery-2026-11-12.md),
 [approved research card](cards/submission-research-2026-11-04.md),

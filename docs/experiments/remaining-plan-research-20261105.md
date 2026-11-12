@@ -18,8 +18,9 @@ identified, not forecasts for an unprepared new job.
 The [current handoff](../continuation-2026-11-12.md) supersedes the unknown-job
 state below. Both old requests expired unassigned and are charged/acknowledged.
 Local disks have ample space; preserve NFS archives and use existing verified
-local staging, without broad cleanup. The corrected16 Ball gate may receive one
-new bounded queue after fresh readiness. Hold W8 full-witness compute because a
+local staging, without broad cleanup. The corrected16 Ball gate received one new partial-pool queue8709406d, which
+expired unassigned and is rootclosed400CPU/0GPU. Fresh A6000 occupants are
+otherusers, not own stale processes; no furtherqueue is released. Hold W8 full-witness compute because a
 complete fit under929CPU is not shown; a550CPU cost pilot would leave379. No
 source/quality change, reallocation, new scale or manuscript revision follows.
 See the [root decision](../fleet-recovery-2026-11-12.md).

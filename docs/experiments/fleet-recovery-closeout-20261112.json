@@ -13,7 +13,8 @@
     "source_identity_basis": "Physical archive matches previously root-verified0bb source. Manifest source not re-expanded now; original submitted raw file not locally available.",
     "charge_GPU": 0,
     "charge_CPU": 400,
-    "terminal_event": "589b684cf7ee5e51a1af7117b5bbedf7"
+    "terminal_event": "589b684cf7ee5e51a1af7117b5bbedf7",
+    "canonical_API_event_id": "1c6cf14d42475b7cb1ae4559f07c9e59"
   },
   "w8": {
     "job_id": "20261110T183845Z-4c240783",
@@ -45,7 +46,8 @@
     "charge_GPU": 0,
     "charge_CPU": 150,
     "true_qualification_preparation_CPU_after": 1450,
-    "terminal_event": "6dcc8c6f752f517cb7d2e651eabe8867"
+    "terminal_event": "6dcc8c6f752f517cb7d2e651eabe8867",
+    "canonical_API_event_id": "3682fe3f7a8351a8bf57f40b31f04fc1"
   },
   "accounting": "Full external allowances conservatively charged; aggregate CPU unmeasured. W8 auditor per-command CPU maxima sum20 exceeded requested15 but stays within inclusive150; no proven15CPU aggregate claim. Queue wall is not CPU.",
   "raw_files": [
@@ -435,5 +437,6 @@
     }
   ],
   "uncertainty": "Historical read-only probes and some gpu3 reads lack proven remote teardown; no signals or cleanup. No unknown GPU job remains among these two.",
-  "terminal_events_acknowledged": true
+  "terminal_events_acknowledged": true,
+  "canonical_event_acknowledgement_note": "EarlierACKused physicalworker eventIDs; manager normalizes terminal UUIDs. On final8709closeout root independently computed andACKed canonicalIDs for these two, too. No event/state conflict; bothlocalmarkers preserved."
 }
