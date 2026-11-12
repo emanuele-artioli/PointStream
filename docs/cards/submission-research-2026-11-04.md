@@ -21,14 +21,21 @@ See [handoff](../continuation-2026-11-12.md) and
 gate under929CPU. No paid server, source/numerical relaxation, manuscript or
 PRESLEY change, training or paper submission.
 
-## Latest capacity decision — November12, after20:00UTC
+## Latest capacity decision — November 12
 
-Ada461e expired unassigned, rootaccepted and eventACKed; no GPU parity result.
-Current programme charges19,362GPU/49,681CPU. Separate Ball capacity phase
-1,000GPU/1,400CPU is prospectively reserved, no outer ceiling or transfer.
-Actual37b3 is running the one Ada qualification on gpu6; sole canonicalwait.
-See [standing card](k5d-standing-capacity-2026-11-12.md); earlier pending461e
-instructions above are historical. W8 stays held; paper/PRESLEY untouched.
+The native watcher found idle gpu6 Ada capacity and qualification37b3 actually
+ran there. It failed exact A6000 equivalence: source YUV/scores matched, WASB
+coordinates and DCVC native/pixel outputs differed. Root retained that negative,
+closed/charged143GPU493CPU and acknowledged events. It is not a quality result.
+No GPU job or fleet wait is active. Programme charges19,505GPU/50,324CPU.
+
+A separate [fresh Ada reference/repeat protocol](k5d-ada-fresh-reference-2026-11-12.md)
+is in code preparation, preserving the old strict gate. Its internal Ball
+reservation is1,400GPU/1,950CPU remaining after50source/100passivemonitor charges;
+no programme ceiling or workstream transfer. Source/CPU proof and root review
+must precede a new inference release. Passive five-minute resource checks run
+for at most45minutes, ending no later than21:21:36UTC. W8 remains held under
+929CPU; manuscript and PRESLEY are unchanged.
 
 ## Goal and scope
 

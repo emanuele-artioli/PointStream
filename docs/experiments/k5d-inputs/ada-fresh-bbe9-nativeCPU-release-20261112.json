@@ -1,0 +1,17 @@
+{
+  "phase": "ball-ada-fresh-reference-20261112",
+  "release": "ONEexactsourceCPUmechanismproofonly",
+  "revision": "bbe94eddde3e8596b98d93667b3ffbdeaed184a6",
+  "identity": {
+    "source_sha256": "ed89052108dbd4a8242d7fd7ae35ac37aa1f41332d204a4d11e9d7b799bf715d",
+    "snapshot_sha256": "4f7f6546b7eb4552ea77b8d1607a0ccc68c7ae42e73965a70a2902f40f4e7402",
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "spec": "/private/tmp/pointstream-ada-fresh-bbe94edd-20261112/cpu-spec.json",
+  "future_CPU_max": 250,
+  "GPU": 0,
+  "conditions": "Freshparticipatinghostdoctor/nativeCPUaffinityindex0/runtime/input/localSSD checks; original100campaign70smoke10validator5noop unchanged; noautomaticretry/GPUrelease. SourceproofmustbindactualnewnamespacewrapperSHA; rootindependentauditrequired.",
+  "source_archive": "/private/tmp/pointstream-ada-fresh-bbe94edd-20261112/source.tar",
+  "allocation": "250insidefreshremaining1950CPU,50preparationalreadychargedseparately",
+  "raw_spec_sha256": "2d8e7612f0ecd7dcdfc6edb671752fcd0fcb0aed9124319707aa3feaf3971f92"
+}
