@@ -13,17 +13,18 @@ and the legacy 200-GPU-hour study are outside scope. No new computation was run
 for this audit. Costs below are ceilings or historical charges where explicitly
 identified, not forecasts for an unprepared new job.
 
-## Current November 12 alternate-GPU qualification
+## Current November12 Ada route and receiver gap
 
-Native monitoring found idle gpu6 Ada and qualification37b3 ran, but failed
-exact cross-class reproduction. Source YUV/scores matched; WASB coordinate and
-DCVC native/pixel differences were localized from saved artifacts. Root closed
-the failed gate without a quality claim. A separately registered fresh Ada
-reference/repeat/cost protocol is in preparation, preserving accepted16 and the
-failed comparator. Passive five-minute capacity checks continue for at most
-45minutes while code/source/CPU proof are prepared; no automatic GPU dispatch.
+The accepted fresh Ada2c8b calibration reproduces actual six-point packet bytes,
+receiver pixels and scores across fresh executions, with complete126.6/112.5s
+commands. No independent new-clip result. Actual receiver/validator declares
+filesystem isolation unestablished; keep that unmet condition and earlier37b3
+cross-class failure. Real filesystem-denial and class-aware16/48 source code
+are being prepared independently, with material issues under review. Runtime
+inventory and nested private-proc feasibility are available but are not decoder
+proof. All inference/benchmark promotion remains gated.
 [Current handoff](../continuation-2026-11-12.md) and
-[fresh card](../cards/k5d-ada-fresh-reference-2026-11-12.md) are authoritative.
+[stage card](../cards/k5d-ada-scale-and-denial-2026-11-12.md) are authoritative.
 
 ## Historical November12 recovery update
 

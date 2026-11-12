@@ -1,0 +1,134 @@
+# Ada receiver denial and scale preparation — November 12
+
+Authority: the user's research-first PointStream task, regular fleet checks and
+24 GPU-hour/28 workload CPU-hour ceiling. This is a staged internal Ball
+allocation of **6,000GPU /9,000CPU seconds**, inside unchanged Ball64,800GPU/
+72,000CPU and programme86,400GPU/100,800CPU. No paid server, training, legacy
+200-GPU-hour study, manuscript/PRESLEY edit or submission.
+
+## Evidence and unresolved condition
+
+Fresh Ada job2c8b completed two independent six-point16 executions on the same
+gpu6 RTX6000Ada: A126.574wall/125.244namespaceCPU, B112.491wall/111.751CPU.
+Root checked153 raw JSON hashes against249 physically hashed archive members,
+all packet/native/receiver byte and pixel hashes, six-point metrics/judges and
+process/claim cleanup. This establishes repeatable real packet replay and
+calibration cost, not an independent data sample or A6000 equivalence.
+
+The worker, actual receipt and encoder/assembler explicitly say filesystem
+isolation NOT established. The preceding fresh card called the API-only
+receiver source-hidden too broadly. Preserve that unmet condition; do not
+rewrite old receipts, report a filesystem witness as passed, or promote a
+benchmark on that claim. Existing failed cross-class37b3 and all old results
+remain unchanged. Code preparation can run in parallel; GPU scale release is
+held until a real denial witness and complete forecasts are accepted.
+
+## Receiver witness, first
+
+Reuse the reviewed W8 Landlock/native-bootstrap machinery where suitable, but
+its synthetic/tiny CUDA and W8-specific inventories do not qualify Ball.
+The actual Ball worker must start through fresh exec with clean environment,
+closed inherited descriptors/stdin, and a verified single-thread bootstrap
+before kernel filesystem restriction. Native grandchildren inherit the policy.
+Allow only packet, installed decoder resources and code/runtime/system leaves,
+and fresh writable output. No blanket home, dataset, cache or code-tree grant
+that exposes evaluation source/labels. Preserve real native codec invocation,
+serialized bytes, renderer and all numerical settings; default legacy behavior
+and old validators stay unchanged.
+
+Prove real original archive/source frame, GT/source manifest, encoder state and
+private detector assets are readable outside; inside the SAME restricted
+receiver process, actual reads and relevant aliases must return EACCES/EPERM,
+not ENOENT or a Python-only simulated guard. Positive controls require packet/
+resource reads, output writes and actual decoder success. Bind policy/inventory,
+code/source/input/model/tool hashes, process births, denial records and output
+hashes to the actual producing job/stage/device. Scoring legitimately reads
+source/labels; it must consume sealed producer receiver pixels and cannot
+substitute later native decoding.
+
+First run a CPU oracle with an authenticated real SVT PSBL packet and installed
+dav1d resource, preferably on gpu6 CPU to keep host colour conversion fixed.
+A stored conventional packet is allowed for this CPU isolation oracle; do not
+reuse/decode archived DCVC. Compare native YUV/rendered RGB against authenticated
+packet replay and prove denial in the actual decoder execution. This is not a
+GPU/model/quality qualification. CPU containment/accounting and filesystem
+denial are separate checks and both are required for the new consumer.
+
+Only after source review, exact-source CPU containment proof, actual CPU denial
+oracle and a complete fit forecast: one bounded exclusive Ada witness freshly
+encodes and receives real SVT/DCVC in the SAME producing job/GPU. Prefer all six
+16-frame settings if forecast fits; do not narrow after outcomes. The isolated
+receiver's real YUV/RGB/native hashes must match its fresh producer. Prove CUDA
+provider/device/kernels and the actual inherited denial policy. Stop on denied
+required resources, missing asset, source access, mismatch, nonfinite/incorrect
+output, unknown submission or exhausted budget. Preserve failures and narrow
+before any new policy change; no automatic retry or reference relaxation.
+
+## Separate Ada benchmark adapter
+
+Prepare a separate class-aware consumer/reference and admission path from the
+new accepted Ada reference; leave the strict A6000 chain intact. Bind source,
+environment, installed resources, actual physical GPU, original six settings,
+source/label/pixel identity, exposure, guard and all score definitions. Require
+real producing-job receiver markers and filesystem-denial evidence; forbid the
+legacy later-decode fallback. A different later scorer may read sealed pixels
+but cannot decode archived DCVC or manufacture receiver evidence.
+
+After the denial witness passes, the next prospective numerical/cost question
+is paired16/48 preparation and scoring, including exact16 Ada-reference checks,
+whole-clip judge context, real bytes and all metrics. Separate producer/scorer
+jobs are allowed only with authenticated immutable receiver pixels and producer
+job/stage/UUID linkage. No partial-context chunk that changes native streams or
+temporal judges. No 188/292/586/full30 release follows automatically. Later292/
+586 confirmations require independently complete prepare and score costs,
+disjoint lifecycle accounting and the original1.5margin/failure reserve. The
+586 clip may need a producer/scorer or point-group split to stay within45minutes;
+that fit must be measured and must preserve whole-clip context.
+
+Only then evaluate the registered30-clip forecast and source-qualified coverage.
+All30 remain retrospective/calibration-exposed; retain three source failures,
+197 absent and six unknown frames, explicit training overlap and independent
+judge exclusions. Do not promise a clean unseen-data or cross-sport result.
+
+## Internal stage ceilings, not releases
+
+- Source preparation50CPU; exact-source native CPU proof250CPU, zeroGPU.
+- Actual SVT filesystem-denial CPU oracle250CPU, zeroGPU.
+- Potential same-job Ada denial witness700GPU /900CPU: at most500 one-core
+  campaign +400externalCPU and200GPU lifecycle reserve; smoke<=420,
+  namespace<=400, validator<=30, full no-op<=5. Source and CPU oracle first.
+- Potential paired16/48 producer1,100GPU /1,300CPU and scorer1,100GPU/1,300CPU:
+  each at most900 one-core campaign +400externalCPU and200GPU lifecycle
+  reserve. Actual stage limits/smokes need complete forecast and root review;
+  smoke<=600 and every wait stage<=45minutes.
+- Resource monitoring200CPU reserved for bounded machine-only five-minute
+  checks, with per-probe guards and explicit SSHserver/login accounting limits.
+- Remaining3,100GPU /4,750CPU is unallocated within this stage envelope; it
+  cannot admit292/586 or full30 absent measured forecasts and separate release.
+
+All preflight, failed starts, staging, validation, publication, monitoring and
+root audit count. Native single-core wall is a conservative CPU upper bound
+only with verified campaign affinity; do not call unmeasured administrative or
+GPU occupancy a measurement. Use canonical ps-fleet, check existing jobs and
+all eligible/participating hosts, pinned archives and packed local environment,
+verified separate local SSD, actual ID before one bounded wait, no replay of
+unknown submissions. Preserve evidence/data/models and completed old paths.
+
+Status: **code preparation only**. No native oracle, CPU proof, GPU witness or
+scale run released by this card yet. Root reviews the merged frozen source and
+actual source archives before per-job release.
+
+## Prospective private-proc amendment — before any oracle
+
+Root CPU-only feasibility found nested user/PID/mount/IPC and private proc work
+on gpu6 (receipt5611e6af). This is not a Landlock or decoder qualification; maps
+was stat-checked only. Exact parent `/proc/self` grants do not cover native
+child self paths. The candidate may therefore grant READ_FILE/READ_DIR only on
+a VERIFIED freshly mounted PRIVATEproc containing only receiver descendants,
+with distinct namespace identities, no encoder PID visibility, closed FDs and
+actual outside worker/native birth observation. No broad host-global proc grant.
+Stacked old/active proc mounts must be resolved by effective mount identity;
+namespace PIDs must not be mistaken for host proc PIDs. Actual source/GT/encoder
+file denials remain EACCES/EPERM, while process invisibility is separate proof.
+A real pre-exec native-child observation barrier is required. CPU oracle must
+exercise these conditions before any GPU witness; all limits remain unchanged.

@@ -1,0 +1,99 @@
+{
+  "job_id": "20261112T210150Z-2c8b49a0",
+  "root_decision": "Accepted fresh same-Ada packet-path repeatability and measured calibration cost ONLY; filesystem denial NOT established, so source-hidden requirement remains unmet and benchmarkpromotionheld for separatewitness. Not an independentclip orA6000equivalencepass.",
+  "source_identity": {
+    "source_sha256": "ed89052108dbd4a8242d7fd7ae35ac37aa1f41332d204a4d11e9d7b799bf715d",
+    "snapshot_sha256": "4f7f6546b7eb4552ea77b8d1607a0ccc68c7ae42e73965a70a2902f40f4e7402",
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "device": {
+    "capability": [
+      8,
+      9
+    ],
+    "name": "NVIDIA RTX 6000 Ada Generation",
+    "uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0"
+  },
+  "actual_A_wall_seconds": 126.57390284538269,
+  "actual_B_wall_seconds": 112.49123215675354,
+  "namespace_stage_receipts": [
+    {
+      "children_cpu_seconds": 125.130955,
+      "init_cpu_seconds": 0.11290399999999999,
+      "namespace_init": {
+        "host_pid": 3252383,
+        "namespace_pgid": 0,
+        "namespace_pid": 1,
+        "namespace_pids": [
+          3252383,
+          1
+        ],
+        "namespace_sid": 0,
+        "observed_monotonic": 5580284.364701838,
+        "pid_namespace": "pid:[4026537587]",
+        "start_ticks": 558015834
+      },
+      "stage": "smoke",
+      "worker_host_identity": {
+        "campaign_pgid": 3252045,
+        "exec_host_pgid": 3252045,
+        "host_pgid": 3252045,
+        "host_pid": 3252384,
+        "start_ticks": 558015838
+      }
+    },
+    {
+      "children_cpu_seconds": 111.651993,
+      "init_cpu_seconds": 0.099502,
+      "namespace_init": {
+        "host_pid": 3259123,
+        "namespace_pgid": 0,
+        "namespace_pid": 1,
+        "namespace_pids": [
+          3259123,
+          1
+        ],
+        "namespace_sid": 0,
+        "observed_monotonic": 5580407.726565953,
+        "pid_namespace": "pid:[4026537587]",
+        "start_ticks": 558029535
+      },
+      "stage": "full",
+      "worker_host_identity": {
+        "campaign_pgid": 3252045,
+        "exec_host_pgid": 3252045,
+        "host_pgid": 3252045,
+        "host_pid": 3259124,
+        "start_ticks": 558029538
+      }
+    }
+  ],
+  "conditional_A_gate": {
+    "a_cpu_seconds": 125.243859,
+    "a_wall_seconds": 126.57390284538269,
+    "b_forecast_seconds": 239.86085426807404,
+    "remaining_seconds": 1058.8405229942873,
+    "setup_before_a_seconds": 8.515291805379093,
+    "validator_and_reserve_seconds": 130
+  },
+  "physical_binary_audit_sha256": "0848c7b735484cc036c77f997f72ef4306c38d57d1a58ab53e8ac6bd6fff9c5b",
+  "json_audit_sha256": "c7c8bf1d0a67a154456b5bc0a7a3b2eba4f63c42aa55cf0c85c2907300456313",
+  "root_metadata_SHA_joins": 153,
+  "physical_regular_members": 249,
+  "checkpoint_members_each": 66,
+  "physical_joins": "Each6pointnative/wire/zero packetandreceiverYUV/RGB actualSHA+geometrybytes matched; realreceiver.json/marker boundjob/stage/physicalGPU. BotharchiveswholeSHAchecked.",
+  "old_crossclass_37b3_failed_gate_preserved": true,
+  "filesystem_scope_gap": "Receiver API is packet/resources-only, but original worker receipt and encoder/assembler validator explicitly state filesystem isolation NOT established. Prior card called this source-hidden too broadly; retain this unmet condition and correct promotion status.",
+  "GPU_charge": 354,
+  "CPU_charge": 754,
+  "creation_to_terminal_wall_seconds": 353.86905813217163,
+  "cost_basis": "Conservativewhole354screated-to-terminalGPU/onecoreCPUupper +full400externalCPU. Actualcommandwall126.574/112.491 andnamespaceCPU125.244/111.751; administrativeaggregate/GPUoccupancyunmeasured.",
+  "cleanup": {
+    "campaign_group_absent": true,
+    "cpu_claim_absent": true,
+    "discovered_device_claim_absent": true,
+    "supervisor_and_group_leader_absent": true
+  },
+  "terminal_event": "94d28aa92f5f5a6aa0facfd7d6ce76fe",
+  "event_acknowledged": true
+}

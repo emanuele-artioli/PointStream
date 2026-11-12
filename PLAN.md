@@ -23,16 +23,17 @@ new dependency.
 
 ## Where PointStream stands (2026-11-12)
 
-**Current capacity phase, November 12:** five-minute resource checks found an
-idle Ada on gpu6 and ran qualification37b3. It failed exact cross-class parity:
-source YUV/scores match, WASB coordinates and DCVC native/pixel hashes differ;
-no final quality scoring. Root retained the failure and registered a separate
-fresh Ada reference/repeat/cost protocol, preserving the existing failed gate.
-Code preparation is underway; source/CPU proof/GPU release pending. Passive
-resource checks continue every5minutes until at most21:21UTC, without model
-polling or autosubmission. No GPU job/wait is active. All work stays within the
-original programme/workstream ceilings. [Current handoff](docs/continuation-2026-11-12.md)
-and [fresh Ada card](docs/cards/k5d-ada-fresh-reference-2026-11-12.md).
+**Current research phase, November12:** Ada job2c8b reproduced all six real
+packet outputs, metrics and judges in two fresh same-GPU executions; full cost
+was126.6/112.5seconds per run. Root accepted packet-replay repeat/cost only.
+Filesystem denial was not established, despite the previous card's too-broad
+source-hidden wording; preserve that gap and hold benchmark promotion. Two
+builders prepare an actual private-proc/Landlock receiver witness and a separate
+Ada16/48 producer/scorer path. Current source has material observer/capability
+issues under review; no new compute release. Actual runtime inventory and
+nested-namespace feasibility are available, not decoder proof. Native5minute
+resource checks active from21:44UTC, bounded4hours/CPUguard. [Current handoff](docs/continuation-2026-11-12.md)
+and [stage card](docs/cards/k5d-ada-scale-and-denial-2026-11-12.md).
 
 **Historical access recovery, November12:** start with the [current handoff](docs/continuation-2026-11-12.md) and [storage decision](docs/fleet-recovery-2026-11-12.md). Both unknown requests are independently closed expired unassigned and events acknowledged. Current charges19,362GPU/48,791CPU; nested Ball7,920GPU/1,450CPU andW84,550/929 remain. Existing local disks have ample space: no broad cleanup or migration is warranted. Use packed local source/environment/input/scratch and retain NFS archives. First launch stopped beforeIDallocation; the subsequent verified partial-pool request `20261112T172806Z-8709406d` expired unassigned. Both eligible workers found no admittedGPU; fresh A6000 occupants were otherusers. Rootclosed400externalCPU/0GPU andACKedcanonicalevent. No activejob/wait/timer or furtherqueue release; corrected16 remains unexecuted. W8full-witness compute held for insufficient complete-cost evidence under929CPU, not a quality failure. No paid hosting, source or paper change.
 
