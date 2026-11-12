@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import importlib
 import json
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -27,6 +28,36 @@ REFERENCE_IDENTITY = {
 GPU_NAME = 'NVIDIA RTX 6000 Ada Generation'
 
 
+
+def _uuid(value: Any, *, prefixed: bool) -> uuid.UUID:
+    if not isinstance(value, str) or (prefixed and not value.startswith('GPU-')):
+        raise ValueError('GPU UUID format differs')
+    raw = value[4:] if value.startswith('GPU-') else value
+    try:
+        parsed = uuid.UUID(raw)
+    except ValueError as exc:
+        raise ValueError('GPU UUID format differs') from exc
+    if str(parsed) != raw.lower():
+        raise ValueError('GPU UUID must use canonical hyphenated form')
+    return parsed
+
+
+def persisted_device(root: Path, marker: dict[str, Any], *, dispatch_gpu: Any = None) -> dict[str, Any]:
+    """Join sealed Torch device evidence to marker and, where available, dispatch."""
+    qualification = json.loads((root / 'source-qualification.json').read_text())
+    source = qualification.get('device')
+    marked = marker.get('gpu')
+    if (not isinstance(source, dict) or not isinstance(marked, dict)
+            or source.get('name') != GPU_NAME or marked.get('name') != source['name']
+            or source.get('capability') != [8, 9]
+            or _uuid(source.get('uuid'), prefixed=False) != _uuid(marked.get('uuid'), prefixed=True)):
+        raise ValueError('persisted producer device does not match marker')
+    if dispatch_gpu is not None:
+        if (not isinstance(dispatch_gpu, dict) or dispatch_gpu.get('name') != source['name']
+                or _uuid(dispatch_gpu.get('uuid'), prefixed=True) != _uuid(marked['uuid'], prefixed=True)):
+            raise ValueError('persisted producer device does not match dispatch')
+    return {'name': source['name'], 'uuid': marked['uuid'], 'capability': source['capability']}
+
 def reference(root: Path) -> tuple[dict[str, Any], dict[str, Any]]:
     """Check the pinned publication after its archive hash has been checked."""
     saved = json.loads((root / 'fresh.json').read_text())
@@ -38,8 +69,9 @@ def reference(root: Path) -> tuple[dict[str, Any], dict[str, Any]]:
     prepared = root / 'prepared'
     report = json.loads((prepared / 'pilot.json').read_text())
     marker = receiver.verify(prepared, report, REFERENCE_IDENTITY)
+    actual = persisted_device(prepared, marker)
     if (marker['producer_job'] != REFERENCE_JOB or marker['producer_stage'] != 'smoke'
-            or marker['gpu']['uuid'] != device.get('uuid')):
+            or actual != device):
         raise ValueError('accepted Ada reference producer differs')
     return report, json.loads((prepared / 'source-qualification.json').read_text())
 
@@ -112,7 +144,7 @@ def producer(root: Path, identity: dict[str, str], *, job: str, stage: str, fram
         return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()).hexdigest()
     profile_sha, inventory_sha = canonical(profile), canonical(profile['runtime_files'])
     context = {'job_id': job, 'stage': stage, 'execution_identity': identity,
-               'gpu': {**marker['gpu'], 'capability': [8, 9]}}
+               'gpu': persisted_device(root, marker)}
     for point in report['points']:
         receipt = json.loads((root / f"{point['codec']}-{point['point']}" / 'receiver-evidence' / 'receiver.json').read_text())
         verified = verify(receipt, expected_context=context, expected_config_sha256=config_sha256)
