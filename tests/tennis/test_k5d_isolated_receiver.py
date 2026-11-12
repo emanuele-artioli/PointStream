@@ -50,6 +50,7 @@ def test_receipt_rejects_legacy_and_incomplete_proof() -> None:
              'handled_mask': isolated.leaves.handled_rights(3), 'threads': 1, 'extra_fds': False,
              'pid': 9, 'postexec_pid': 9, 'birth': '2', 'postexec_birth': '2',
              'decoder': {'pid': 10, 'returncode': 0},
+             'policy_sha256': 'a' * 64, 'runtime_inventory_sha256': 'b' * 64,
              'denials': {k: [{'errno': errno.EACCES, 'path': '/real', 'inode': 2, 'sha256': 'a' * 64}]
                          for k in isolated.CATEGORIES}}
     receipt = {'scope': isolated.SCOPE, 'isolation': proof,

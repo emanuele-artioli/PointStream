@@ -32,6 +32,10 @@ def sha(path: Path) -> str:
     return h.hexdigest()
 
 
+def _object_sha(value: Any) -> str:
+    return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()).hexdigest()
+
+
 def _canonical(path: Path) -> Path:
     if not path.is_absolute() or path.resolve(strict=True) != path:
         raise ValueError(f'noncanonical path: {path}')
@@ -199,6 +203,10 @@ def verify_receipt(receipt: dict[str, Any], *, expected_context: dict[str, Any],
             or not isinstance(proof.get('decoder'), dict) or not proof['decoder'].get('pid')
             or proof['decoder'].get('returncode') != 0):
         raise ValueError('isolated receiver evidence missing or inconsistent')
+    for name in ('policy_sha256', 'runtime_inventory_sha256'):
+        value = proof.get(name)
+        if not isinstance(value, str) or len(value) != 64 or any(c not in '0123456789abcdef' for c in value):
+            raise ValueError('policy inventory digest missing')
     denied = proof.get('denials')
     if not isinstance(denied, dict) or set(denied) != set(CATEGORIES):
         raise ValueError('denial categories incomplete')
@@ -278,6 +286,9 @@ def replay(wire_path: Path, map_path: Path, work: Path, *, config_path: Path, co
             raise RuntimeError(f'isolated receiver failed: {process.returncode}: {stderr[-2000:]!r}')
     receipt = json.loads((work / 'result' / 'receiver.json').read_text())
     proof = verify_receipt(receipt, expected_context=producer_context, expected_config_sha256=config_sha256)
+    if (proof['policy_sha256'] != _object_sha(config['profile'])
+            or proof['runtime_inventory_sha256'] != _object_sha(config['profile']['runtime_files'])):
+        raise ValueError('policy inventory identity differs')
     if proof['pid'] != process.pid or proof['birth'] != observed_birth:
         raise ValueError('launcher and worker process identity differ')
     if (receipt['wire_sha256'] != launch['wire_sha256'] or receipt['resource_map_sha256'] != launch['map_sha256']
@@ -306,7 +317,9 @@ def _worker(work: Path) -> None:
     from experiments.tennis import k5d_worker
     proof = {'context': launch['context'], 'config_sha256': launch['config_sha256'], 'landlock_abi': abi,
              'handled_mask': mask, 'threads': 1, 'extra_fds': False, 'pid': pid, 'postexec_pid': os.getpid(),
-             'birth': birth, 'postexec_birth': birth, 'denials': launch['denials']}
+             'birth': birth, 'postexec_birth': birth, 'denials': launch['denials'],
+             'policy_sha256': _object_sha(launch['config']['profile']),
+             'runtime_inventory_sha256': _object_sha(launch['config']['profile']['runtime_files'])}
     k5d_worker.decode(work / 'packet.psbl', work / 'resources.json', work / 'result', isolation=proof)
 
 
