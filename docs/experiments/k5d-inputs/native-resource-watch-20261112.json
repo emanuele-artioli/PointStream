@@ -1,0 +1,72 @@
+{
+  "scope": "Userrequestedmachine-onlyresourcewatch; nojobs or recurringLLM",
+  "interval_seconds": 300,
+  "maximum_window_seconds": 2700,
+  "CPU_administrative_allocation": 40,
+  "counts_and_limits": "Controller/remote/SSHcountedprocessguards; wholehostSSHserver/loginCPUunmetered; no measuredaggregateclaim",
+  "outcome": {
+    "controller_cpu_seconds_observed": 0.082358,
+    "finished_utc": "2026-11-12T18:43:50.948517+00:00",
+    "reason": "potential_idle_fresh_fleet_gates_required",
+    "remote_worst_case_charge_seconds": 3.1460269999999997,
+    "ssh_waited_children_cpu_seconds": 0.102417,
+    "ticks": 1
+  },
+  "availability_snapshot": {
+    "candidates": [
+      {
+        "host": "gpu5",
+        "index": "0",
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "qualification": "required",
+        "uuid": "GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162"
+      },
+      {
+        "host": "gpu5",
+        "index": "1",
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "qualification": "required",
+        "uuid": "GPU-7754164a-33cd-265c-3696-c20966d228fe"
+      }
+    ],
+    "controller_cpu_reserve_seconds": 2,
+    "finished_utc": "2026-11-12T18:43:50.947988+00:00",
+    "remote_worst_case_charge_seconds": 3.1460269999999997,
+    "ssh_waited_children_cpu_seconds": 0.102417,
+    "tick": 0
+  },
+  "actual_receipt": "/private/tmp/pointstream-resource-watch-20261112/run-20261112T184324.057570Z-12630/receipt.json",
+  "watcher_sha256": "cca4a3a14e632bc9bfb676d6849e97fc1c7c24ccba306660bd4a8646c3fa5118",
+  "raw_files": [
+    {
+      "path": "/private/tmp/pointstream-resource-watch-20261112/run-20261112T184324.057570Z-12630/tick-00-gpu3.json",
+      "bytes": 2821,
+      "sha256": "a8f1970b31ab0e14d054e4a1119fba76a9a4ee58060b461d70602e91f07897b1"
+    },
+    {
+      "path": "/private/tmp/pointstream-resource-watch-20261112/run-20261112T184324.057570Z-12630/tick-00-gpu2.json",
+      "bytes": 3010,
+      "sha256": "0b9d8ad2485a77a66e5a18d0fa81193e55165e382141213512318e5426fc572b"
+    },
+    {
+      "path": "/private/tmp/pointstream-resource-watch-20261112/run-20261112T184324.057570Z-12630/tick-00-gpu5.json",
+      "bytes": 3257,
+      "sha256": "e57780adce0253868a41f52bc230d76bfaf338cfd6887b0316f6206f8ecfb160"
+    },
+    {
+      "path": "/private/tmp/pointstream-resource-watch-20261112/run-20261112T184324.057570Z-12630/tick-00-summary.json",
+      "bytes": 626,
+      "sha256": "6c3d376b77604dab7a5ed6d4d335cdf9bfc27f35920ec1a6651f42fb0e19020d"
+    },
+    {
+      "path": "/private/tmp/pointstream-resource-watch-20261112/run-20261112T184324.057570Z-12630/finished.json",
+      "bytes": 280,
+      "sha256": "1b0f4a81f3a9f3e1851fc7e4404253b7585f72f398a3e160800d8ff35b4b45af"
+    },
+    {
+      "path": "/private/tmp/pointstream-resource-watch-20261112/run-20261112T184324.057570Z-12630/receipt.json",
+      "bytes": 1117,
+      "sha256": "b32ac0cce10932f4f5c02cd286041867777926157bb4b2d8f2d8b527d20d4c3d"
+    }
+  ]
+}

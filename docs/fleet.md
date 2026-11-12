@@ -691,6 +691,16 @@ evidence. Ada `yoloe-codecs` and `hamer` and the first GV100 hand jobs were
 stopped as `contended` by another user's process on the claimed GPU; their
 smoke gates had passed (Ada) or they were rerun (GV100).
 
+**November12 Ball hardware qualification:** the opt-in Ada16 source profile
+preserves every exact accepted A6000 reference comparison and requires a new
+source-bound CPU proof plus exclusive GPU validation. CPU proof d24d is accepted;
+GPU request `20261112T192044Z-461e16e8` is pending at publication. This is not yet
+a passing Ada parity/cost row, nor downstream study admission. RTX6000Ada is the
+best documented alternative for these models; the RTX8000 lacks this HT-L
+pipeline qualification, and GV100 has the upstream failure recorded above.
+The same-job DCVC rule below remains unchanged. See the
+[qualification card](cards/k5d-ada-qualification-2026-11-12.md).
+
 **Choosing `gpu_models`:** SAM 3.1 and DCVC-UF on Ada and A6000 only (DCVC-UF
 also runs on the RTX 8000). The hand models and YOLOE run on all four classes.
 
