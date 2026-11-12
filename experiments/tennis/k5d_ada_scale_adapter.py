@@ -6,6 +6,7 @@ receipts alone never qualify a producer.
 """
 from __future__ import annotations
 
+import hashlib
 import importlib
 import json
 from pathlib import Path
@@ -67,6 +68,18 @@ def prepare16(reference_archive: Path, prepared: Path, identity: dict[str, str])
                 raise ValueError('Ada guard differs')
 
 
+
+def prepare48(reference_archive: Path, prepared: Path, identity: dict[str, str]) -> None:
+    """Validate full-context source and frozen model contract without 16-frame output parity."""
+    with cost.unpack(reference_archive, REFERENCE_SHA256) as root:
+        old, old_source = reference(root)
+        cp.verify(prepared, oracle.sha(prepared / 'checkpoint.json'), identity, require_same_job_receiver=True)
+        report = json.loads((prepared / 'pilot.json').read_text())
+        source = json.loads((prepared / 'source-qualification.json').read_text())
+        cost.compare_contract(old, old_source, report, source, exact=False, capability=(8, 9))
+        if report['frames'] != 48 or len(source['rows']) != 48:
+            raise ValueError('whole 48-frame source required')
+
 def score16(reference_archive: Path, assembled: Path, accepted16: Path) -> dict[str, Any]:
     """Require all original exact metrics and judges without decoding a packet."""
     with cost.unpack(reference_archive, REFERENCE_SHA256) as root:
@@ -74,7 +87,7 @@ def score16(reference_archive: Path, assembled: Path, accepted16: Path) -> dict[
         return fresh.compare(root / 'scored' / 'assembled', assembled, accepted16)
 
 
-def producer(root: Path, identity: dict[str, str], *, job: str, stage: str, frames: int) -> dict[str, Any]:
+def producer(root: Path, identity: dict[str, str], *, job: str, stage: str, frames: int, config_sha256: str, config_path: Path) -> dict[str, Any]:
     """Authenticate retained producer pixels and require the actual denial verifier."""
     if (stage, frames) not in (('smoke', 16), ('full', 48)) or not job.startswith('2026'):
         raise ValueError('only the paired 16/48 producer stages are admitted')
@@ -89,8 +102,24 @@ def producer(root: Path, identity: dict[str, str], *, job: str, stage: str, fram
     # verifier interface and its cryptographic binding before any release.
     try:
         isolated = importlib.import_module('experiments.tennis.k5d_isolated_receiver')
-        verify = isolated.verify_checkpoint
+        verify = isolated.verify_receipt
     except (ImportError, AttributeError) as exc:
         raise ValueError('actual receiver denial verifier unavailable') from exc
-    verify(root, identity, job, stage)
+    if oracle.sha(config_path) != config_sha256:
+        raise ValueError('receiver config checksum differs')
+    profile = json.loads(config_path.read_text())['profiles']['gpu6']
+    def canonical(value: Any) -> str:
+        return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()).hexdigest()
+    profile_sha, inventory_sha = canonical(profile), canonical(profile['runtime_files'])
+    context = {'job_id': job, 'stage': stage, 'execution_identity': identity,
+               'gpu': {**marker['gpu'], 'capability': [8, 9]}}
+    for point in report['points']:
+        receipt = json.loads((root / f"{point['codec']}-{point['point']}" / 'receiver-evidence' / 'receiver.json').read_text())
+        verified = verify(receipt, expected_context=context, expected_config_sha256=config_sha256)
+        if (not isinstance(verified, dict) or verified.get('profile_sha256') != profile_sha
+                or verified.get('runtime_inventory_sha256') != inventory_sha
+                or not isinstance(verified.get('actual_policy_sha256'), str)
+                or len(verified['actual_policy_sha256']) != 64
+                or any(c not in '0123456789abcdef' for c in verified['actual_policy_sha256'])):
+            raise ValueError('actual receiver policy or inventory evidence differs')
     return marker
