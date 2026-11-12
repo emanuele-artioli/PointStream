@@ -8,18 +8,18 @@ workstream ceilings. Ordinary bounded implementation corrections need no new
 permission; source/numerical rules and stops below remain binding. Closed
 K5c/W8/W9 balances are not transferred. Unknown submissions are never replayed.
 
-Execution status, November10: **BLOCKED by fleet connectivity, research unfinished**.
-The two existing Ball/W8 jobs have unknown execution/terminal states after
-failed solewaits and final correctly routed status timeouts. Keep their full
-nested reservations; no further queue/replay until their exact states, claims
-and ownership can be inspected. No new allocation or scientific rule change.
-See the [live continuation](../continuation-2026-11-10.md) and
-[connectivity receipt](../experiments/fleet-connectivity-block-20261110.json).
-
-November11 handoff audit: the [current entry](../continuation-2026-11-11.md)
-records the narrower-paper fallback and migration prerequisites. This does not
-change research-first scope, closed/open decisions, budgets or admission stops.
-No paid hosting is approved.
+Execution status, November12: **ACCESS RESTORED, research unfinished**.
+The old Ball/W8 requests are independently closed expired unassigned and events
+acknowledged. No unknown GPU job remains among those two. Use the
+[current handoff](../continuation-2026-11-12.md) and
+[storage decision](../fleet-recovery-2026-11-12.md). No broad cleanup/migration
+is warranted by measured capacity. After a pre-ID doctorstop, one original corrected16 Ball request is being
+submitted as `20261112T172806Z-8709406d` through an isolated verified
+participating pool; all safety gates remain. One canonicalwait2500, deadline
+17:52:06.008295UTC. Uncertain publication is never replayed. W8 full
+witness is resource-held because its complete forecast is not shown to fit929CPU;
+no new pilot or reallocation is released. Source/science/budgets stay unchanged.
+The narrowed-paper fallback remains an option, not a changed research instruction.
 
 ## Goal and scope
 

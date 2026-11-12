@@ -1,5 +1,7 @@
 # Continuation — November 11, outage contingency and evidence audit
 
+Latest resume entry: [November12 restored access](continuation-2026-11-12.md). Earlier states below are historical; do not replay them.
+
 Start here, then read the [detailed November 10 checkpoint](continuation-2026-11-10.md),
 [approved card](cards/submission-research-2026-11-04.md),
 [decision inventory](experiments/remaining-plan-research-20261105.md) and

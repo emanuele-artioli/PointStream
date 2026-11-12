@@ -538,3 +538,70 @@ The one wait runs as local session handle `17697`, PID `22122`; preserve both an
 The sole `20261110T190907Z-4d0dd928` wait exited locally with code 2 before its deadline: gpu2 status RPC SSH timed out after 120 seconds. At the offline inspection the client PID `22122` was absent, `wait.json` was empty, and stderr recorded the timeout; [uncertainty record](k5d-inputs/same-job-4d0d-wait-uncertainty-20261110.json) preserves raw hashes and bytes. No canonical terminal status was learned; the last confirmed state was PENDING at publication. No second wait, remote query or replay was performed. Root retains its single deadline check.
 
 Final root canonical status batch, after both deadlines: exact W84c24 via gpu5 and Ball4d0d via gpu3 each timed out at60s with empty stdout using the fixed client. [Receipt](fleet-connectivity-block-20261110.json) records actual routes, raw hashes and unresolved states. No execution/expiry/zeroGPU conclusion, terminal charge or replay. Full child maxima remain held; localwaits/checks have ended and new admissions are blocked until existing job/claim/ownership inspection is possible.
+
+
+### 2026-11-12 — Access recovery and eighth queue closeout
+
+Root canonical status and independent metadata/archive/spec/claims review accept
+`20261110T190907Z-4d0dd928` as expired unassigned, not a scientific execution.
+Physical archive450d and canonical specf995 match; ownergpu4 is the expiry worker,
+not an executing host. Terminal event589b684cf7ee5e51a1af7117b5bbedf7 acknowledged.
+Full400externalCPU conservatively charged,0GPU; queue wall is not CPU. See the
+[root closeout](fleet-recovery-closeout-20261112.json). Older unknown gpu3 metadata
+probe outcomes remain preserved, unsignaled. No corrected16 parity or scale
+result follows. One new bounded same-source request may be prepared after fresh
+readiness review, not automatically submitted. NFS/local staging decision is
+[here](../fleet-recovery-2026-11-12.md); no broad cleanup or source change.
+
+
+### 2026-11-12 — Conditional post-outage submission release
+
+Root verified fresh all-hostdoctor and both eligible localdisks,17declaredpaths,
+exact9445CPUgate/b052bridge/450dconsumerarchive andunshareSHA. The clean0bb
+worktree rebuilds exact450d. Root releases one new deadline-only corrected16
+request: [release](k5d-inputs/post-outage-corrected16-root-release-20261112.json),
+rawspec5b1b8192a941ce65fac80613409db6582ffb5e3fb1c20bf7549d82f7c2e0cde7,
+canonical8157934930450ca44433833485518c940d87603910034a7aaac5ede4db0b8a3a.
+Deadline2026-11-12T17:46:24.716400UTC is25minutes from readiness/release, allowing
+the bounded queue and800campaign/200GPUpost inside45minutes. Future1000GPU/1200CPU
+including400external remains nested in parent7920GPU/2250CPU. No source/scientific
+settings or sampling changes; no shared timing/48/292/586/full30/retry. Source
+copy uses verified snapshot cache through current operationalclient. Submission
+will be recorded once with its actual complete ID; uncertain publication is
+inspected, never replayed.
+
+
+### 2026-11-12 — Prepublication access stop and verified-pool amendment
+
+The first submit command exited2 on gpu1 TCP timeout in the repeated all-host
+doctor, before the CLI allocates a job ID. No new client job record or remote
+publication was created. Root conservatively charged full400externalCPU/0GPU;
+parentremaining7920GPU/1850CPU. Do not call this a failed numerical experiment.
+
+Root conditionally prepares one next attempt through an isolated local client
+configuration listing only participating `[gpu5,gpu2,gpu3]`: same required
+scientific A6000hosts2/3, management/upload5, same base and existing workers.
+Every participating host still must pass the shared-token visibility and
+one-winner atomic claim checks. Global config/workers remain unchanged.
+Future1000GPU/1200CPU including400external stays nested in parent1850CPU; no
+retry after failed/uncertain partial-pool checks. Deadline remains prospective
+until fresh readiness completes. Source0bb and all scientific rules unchanged.
+
+
+### 2026-11-12 — Actual partial-pool request and root acknowledgement
+
+The one new request is `20261112T172806Z-8709406d`, pending, deadline
+2026-11-12T17:52:06.008295UTC. Root verified sourcearchive:true, exact0bb/450d/21cd,
+rawspec4aec7ec9e87ed64cc2b7725f1f6b26c92c9efb441391401a1cfe9bcbd1cf3f96 and
+canonical6a3c357084045b1e37b1b8b85f9b1eca4ef28a667a2005599aca62a502f1ee18.
+The isolated participating poolgpu5/2/3 passed visibility+singlewinner, with
+originalscientifichostsgpu2/3. The exact new client record was copied once to
+defaultstate for recovery; globalconfig andsharedworkers unchanged. Future
+1000GPU/1200CPU including400external nested inparent7920GPU/1850CPU. Root
+authorizes one canonicalwait2500seconds for this exact ID, no further
+submission/queue/scale/replay. Pending is not GPU assignment or evidence.
+Manifest/handles under `/private/tmp/pointstream-ball-partial-resume-20261112/`.
+
+Single canonical wait for `20261112T172806Z-8709406d`: local PID `7932`, deadline `2026-11-12T17:52:06.008295Z`, command `PS_FLEET_MANAGEMENT_HOST=gpu5 PS_FLEET_MANAGEMENT_PYTHON=/usr/bin/python3 scripts/ps-fleet wait 20261112T172806Z-8709406d --max-seconds 2500`; stdout/stderr and handle under `/private/tmp/pointstream-ball-8709-wait-20261112/`. Initial canonical status pending. Completion wakeup remains unverified.
+
+Wait tool session: `46210`; wrapper handle retained in `/private/tmp/pointstream-ball-8709-wait-20261112/handle.json`.

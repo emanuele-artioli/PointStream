@@ -1,5 +1,7 @@
 # Continuation — 2026-11-10 research-first checkpoint
 
+Latest resume entry: [November12 restored access](continuation-2026-11-12.md). Earlier states below are historical; do not replay them.
+
 For the latest outage contingency and resume entry, start with
 [November11](continuation-2026-11-11.md); detailed job identities below remain binding.
 
