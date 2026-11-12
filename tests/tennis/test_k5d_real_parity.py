@@ -106,7 +106,9 @@ def test_parity_builder_passes_real_fleet_validator_and_outer_cli(tmp_path, monk
                     identity={}, shared_low_memory=True, shared_parent8_child2=True)
     from experiments.tennis import k5d_same_job_source_bridge as scoped
     # Synthetic boundary: the actual archive verifier has separate real-archive review.
+    from experiments.tennis import k5d_ada_source_bridge as ada_bridge
     monkeypatch.setattr(scoped, 'verify_signed', lambda *_: None)
+    monkeypatch.setattr(ada_bridge, 'verify_signed', lambda *_: None)
     pair_assets = dict(assets)
     for name in ('first_pair_bridge', 'calibration_source', 'consumer_source'):
         pair_assets[name] = {'local': str(cpu), 'remote': remote + name + '.tar', 'sha256': 'e' * 64}
