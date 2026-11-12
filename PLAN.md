@@ -28,10 +28,15 @@ packet outputs, metrics and judges in two fresh same-GPU executions; full cost
 was126.6/112.5seconds per run. Root accepted packet-replay repeat/cost only.
 Filesystem denial was not established, despite the previous card's too-broad
 source-hidden wording; preserve that gap and hold benchmark promotion. Two
-builders prepare an actual private-proc/Landlock receiver witness and a separate
-Ada16/48 producer/scorer path. Current source has material observer/capability
-issues under review; no new compute release. Actual runtime inventory and
-nested-namespace feasibility are available, not decoder proof. Native5minute
+builders prepared an actual private-proc/Landlock receiver and a separate
+Ada16/48 producer/scorer path. Source fbca94d6 fixes the reviewed observer and
+capability issues; its full software checks pass. New exact-source native CPU
+proof3db415d5 is COMPLETE/root accepted. Actual SVT filesystem-denial CPU
+oracles b9e0fd16/cda90430 failed at native startup/preexec, were rootclosed and
+are retained (zeroGPU/250inclusiveCPU each). Source observability/import-root
+fixes are under review; any new source needs renewed qualification. GPU witness
+and scale remain unreleased. Runtime inventory and namespace feasibility alone are not
+decoder proof. Native5minute
 resource checks active from21:44UTC, bounded4hours/CPUguard. [Current handoff](docs/continuation-2026-11-12.md)
 and [stage card](docs/cards/k5d-ada-scale-and-denial-2026-11-12.md).
 

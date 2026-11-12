@@ -114,9 +114,15 @@ all eligible/participating hosts, pinned archives and packed local environment,
 verified separate local SSD, actual ID before one bounded wait, no replay of
 unknown submissions. Preserve evidence/data/models and completed old paths.
 
-Status: **code preparation only**. No native oracle, CPU proof, GPU witness or
-scale run released by this card yet. Root reviews the merged frozen source and
-actual source archives before per-job release.
+Status: exact-source native CPU proof3db415d5 COMPLETE/root accepted.
+Two actual SVT denial CPU oracles b9e0/cda9 failed and are rootclosed/ACKed,
+250CPU inclusive charge each. Source diagnostics/import-root correction is under
+review; a changed source needs new proof and real oracle. No GPU witness or scale run released. Sourcefbca94d6/
+ebd37c62/aa06c0cf, rootCPUgate84ac21dd and archivebridgea6188de5. Current stage
+remaining6,000GPU/7,800CPU after1,200CPU conservative precharges. The CPU-only
+config cannot qualify a later GPU witness: that witness requires CPU denial
+under the exact same final GPU-capable config. Actual lazy-loading closure and
+filesystem oracle results remain unqualified.
 
 ## Prospective private-proc amendment — before any oracle
 

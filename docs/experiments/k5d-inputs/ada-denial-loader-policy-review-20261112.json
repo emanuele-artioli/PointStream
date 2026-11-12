@@ -1,0 +1,19 @@
+{
+  "approved": true,
+  "basis": "Actual b9e0 exec EACCES; actual python/dav1d ldd resolved loader inventory; existing w8_receiver_native_bootstrap.py grants binary+loader execute. Does not yet prove root cause or any decoder result.",
+  "kernel_basis": "get_required_file_open_access adds EXECUTE for __FMODE_EXEC; exact installed kernel diagnostic was not captured",
+  "native_cpu_proof_remains_source_bound": true,
+  "new_config_sha256": "6117c197d49f00eccc6e738277274d800ab3a8c547fab73048711ea40b758d59",
+  "old_config_sha256": "0ba0a62110fe1f565ec643826fb90903fa7cd22d666d720d7ec76deb7e6c4593",
+  "only_added_executable": {
+    "path": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+    "sha256": "41daf7836f7fce21a40ca63a00c5caf21b05a35a76ccc075d86f1716212cdf01",
+    "size": 240936
+  },
+  "primary_kernel_reference": "https://raw.githubusercontent.com/torvalds/linux/master/security/landlock/fs.c",
+  "protected_paths_unchanged": true,
+  "schema": 1,
+  "scope": "prospective exact-loader execute policy amendment for a separately bounded CPU oracle; hypothesis only, original failure retained",
+  "source_unchanged": true,
+  "stop": "No new GPU/scale, source reads or native hash mismatch allowed; failure stops and must be diagnosed before any further release."
+}

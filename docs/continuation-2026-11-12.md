@@ -1,12 +1,13 @@
 # Continuation — November 12, restored fleet access
 
-## Current state — Ada packet replay works; denial implementation in preparation
+## Current state — Ada packet replay works; two CPU denial gates failed and are preserved
 
 User requests regular native resource polling and a non-A6000 route, while
 finishing worthwhile research before paper edits. No paid server/API, training,
 legacy200GPUh study, PRESLEY edit or submission. Current root branch
-`codex/ada-fresh-qualification-2026-11-12`, code3b0b8caf/808a3481 and checkpoint
-74f9775b; PR368 contains the separate Ada path. All new receiver/scale code below
+`codex/ada-denial-cpu-qualification-2026-11-12`; closeout6460f014/PR369 merged
+with green CI; PR368 merged
+the separate Ada path. All new receiver/scale code below
 is isolated, not merged, not experimentally qualified.
 
 **Accepted scoped evidence:** `20261112T210150Z-2c8b49a0` COMPLETE on exclusive
@@ -33,10 +34,15 @@ jobs are terminal and acknowledged. No replay or unrecorded second submission.
 **Current staged work:** [receiver/scale card](cards/k5d-ada-scale-and-denial-2026-11-12.md),
 [API contract](cards/k5d-receiver-isolation-contract-2026-11-12.md). Internal Ball
 stage6,000GPU/9,000CPU, sourceprep50+runtimeinventory100+passivewatch100 charged;
-remaining6,000GPU/8,700CPU. CODE/READONLYINVENTORY ONLY. No CPU oracle, new
-source-bound native proof, GPU denial witness,16/48 or larger benchmark released.
-Programme charged **19,859GPU/51,628CPU** of86,400/100,800. Ball spent13,497GPU/
-27,627CPU against64,800/72,000; old Ball reservation7,920GPU/800CPU preserved;
+remaining6,000GPU/7,800CPU after1,200CPU cumulative precharges: source/input/inventory250, native proof250,
+two actual-SVT oracles500, resourcewatch200. The earlier source/input/inventory
+250 includes50ELFmetadata.
+Exact-source native proof20261112T224626Z-3db415d5 COMPLETE and root accepted.
+Both actual filesystem CPU oracles b9e0fd16/cda90430 FAILED/rootclosed and
+ACKed. No scientific job or wait active. No GPU denial witness,16/48 or larger
+benchmark released.
+Programme charged **19,859GPU/52,528CPU** of86,400/100,800. Ball spent13,497GPU/
+28,527CPU against64,800/72,000; old Ball reservation7,920GPU/800CPU preserved;
 W8 4,550GPU/929CPU remains held; shared1CPU uncharged. Never transfer Ball toW8
 without authority; no outer budget increase.
 
@@ -58,12 +64,13 @@ Independent code branches, both basedbbe94edd, to review/merge/freeze together:
   observation. Source fixes are integrated and source-reviewed; actual CPU
   execution is still required. Composite scientific worktree
   `/private/tmp/pointstream-ada-denial-scale-source-20261112`, branch
-  `codex/ball-ada-denial-scale-source-20261112`, HEAD37f73d4f. Full Ruff and
-  mypy518files pass. Full pytest1836pass/37skip/oneFAIL: an older negative test
-  supplies a nonexistent config and now fails at the earlier SHA check;
-  builder is repairing the fixture, without relaxing production admission.
+  `codex/ball-ada-denial-scale-source-20261112`, HEADfbca94d6. Full Ruff and
+  mypy518files pass. Full pytest exit0 after correcting the single stale
+  negative-test fixture; focused tests also exercise actual verifier rejecting
+  the old API-only receipt. Production admission was not relaxed.
   Config/source closure preparation and exact-source CPU-proof preparation
-  continue locally; no new proof/oracle/job has been released.
+  continue locally. Exact-source native proof is now the sole released job;
+  filesystem oracle and all GPU/scale remain unreleased.
 
 **Actual read-only prerequisites, not proof:** runtime inventory on gpu6:
 40,201regular files9.02GB,1,683symlinks allwithinprefix,106linked-library records,
@@ -116,16 +123,61 @@ is unmetered; no whole-host100CPU guarantee. Inspect launch/run/finished state;
 never restart an unknown process. Actual GPU jobs must use one canonical fleet
 wait after actualID/source/spec/budget recorded. Read actualID from Balljournal,
 then status before acting, even if a summary names it.
-Latest observed tick10 at22:34:23UTC: gpu6GPU0 RTX6000Ada idle; counted remote
-CPU46.336 plus0.821SSH-childCPU. This is a snapshot, not reserved capacity.
+Watcha2 ended23:09:09UTC after18ticks atCPUguard(remote72.624, SSHchildren1.429,
+controller.376). Next same-code nativewatcha3 PID43098 started23:10:57UTC;
+`/Users/manu/.cache/pointstream-resource-watch-20261112-passive-a3/`, every300s,
+80countedCPU/4hmax to2026-11-13T03:10:57UTC orbudgetstop; second100CPUfrom
+original200monitorlineprecharged. Noautosubmit/LLM/API/wakeupguarantee. Inspect
+actual launch/run/finished state, never restartunknownwatch.
 
-Next root actions: review fixes and combined code, freeze one source and archive
-bridge, full configured checks, build actual authenticated config/source closure
-from inventory, fit native CPU proof+SVT denial oracle. Only after both pass and
-complete cost fits, release fresh same-job/GPU all-six denial witness. Then
-conditional paired16/48 cost/provenance gates;292/586/full30 remain unadmitted.
-Paper/PRESLEY stay unchanged; author review/footage permissions remain later
-submission issues. Keep negatives beside positive evidence, no hidden scope lift.
+
+**Latest exact-source qualification:** frozen fbca94d6, sourceebd37c62cd6c27be66ddfdf58547ee66ba14ff36f31380b8316a392f06e9d4c2,
+archiveaa06c0cff324e084cae01b3dccaf2eea8e987e3a32cd571677d148cadd285cc7,
+MAIN32e. Actual archive bridge1389unchanged/7added/3modified/0deleted root-reviewed,
+approvedSHAa6188de546eb85337efa02d476580d34c95d584085d96e155b770cc8cfc934d4.
+This is source compatibility only. ZeroGPU/250inclusiveCPU proof
+`20261112T224626Z-3db415d5` COMPLETE/rootaccepted, spec c46ad99f769b7e3afeca1755a6b862ead30146b1e8f34c1af9971b24087711cb,
+deadline23:25:08UTC, campaign100/onecore plus150external, sourcearchive:true.
+Files/clientstate `/private/tmp/pointstream-denial-fbca-freeze-20261112/`.
+gpu5 doctor timedout, gpu6 doctor/readiness passed with1.58TB separate localSSD,
+CPU0/emptyclaim and actual native/input hashes; unshare9f41 size31336. Newjob
+uses scoped clientstate/control/upload on existing gpu6 without worker restart
+or global fleet reconfiguration. Sole canonicalwait24174 endedCOMPLETE/72s. Root recomputed9exportedraw/26tar
+memberSHAjoins,19hostbirths/group/supervisor/claimabsent. NormalCPU1.233580inner/
+1.317957outer; TERMrequiredKILL. ApprovedCPUgateSHA84ac21dd0e899cadfa3db0e871f3a1b763f0039945597a00042a0696baa6f698.
+Nativecontainment/accountingONLY, noFS/GPU. TerminaleventACKed. No native-proof job/wait active.
+Unknown publication is never replayed.
+
+CPU-only candidate config `/private/tmp/pointstream-ball-config-20261112/`:
+30 archive-matched sourcefiles,1106 actual runtimefiles and exact OS libraries;
+NumPy/cv2 dynamic linkage still unqualified. It is not the full GPU profile.
+A GPU witness must use an actual CPU-denial approval bound to its SAME config;
+changing to GPU resources later therefore requires another exact-config CPU
+oracle, not reuse of a CPU-only policy. No filesystem result exists yet.
+
+Next root actions: review the new scoped diagnostics/import-directory fix from
+ada_fresh_reference_builder (basedfbca); no source change is yet qualified.
+Both actual CPU oracles are rootclosed/ACKed, no job/wait active. Firstb9e0
+(config0ba0) failed restricted PythonexecEACCES before native startup. Secondcda9
+(config6117:onlyexactELFloaderEXECadded) produced nativeobserver but no preexec;
+parent reads missing preexec before checking returncode/printingcapturedstderr,
+so actual childfailure is unreported. Source correction must preserve stderr and
+may add exact READ_DIR-only source/PYTHONPATH roots; importbootstrap gap is a
+hypothesis, not established actualcause. No broad directory READ_FILE grants.
+Any code change requires fresh full checks, archive/bridge/source-bound CPU proof
+and exact-config real SVT oracle before GPU. Retain both failed scratch roots and
+rawreceipts. Rootcloseouts under k5d-inputs; consumed250CPU each/0GPU.
+
+Prospective GPU config is local-only and bound to OLDfbca source:
+`/private/tmp/pointstream-ball-config-20261112/gpu-candidate/refined-v2/`,
+SHAe45db9422431c8608f8e9582daec95f60f333578327b02d88c858f68cee02cdf,
+33086files8.7904GB (7115excluded test/docs/example/image/detector assets).
+All16knownsourceJPEG SHAintersections empty. Exact31sourcefiles, publicDCVC
+weights/drivers/typedleaves from actualinventory; noGPUqualification. Needs
+new execution_identity/sourcefilehashes for any future frozen code, plus exact
+opt/DCVC runtime_import_path for its fresh payload bootstrap. Twelve full hash
+passes roughly128CPU by byte-only heuristic; excludes rules/metadata/dlopen.
+Must pass actual CPU oracle under this EXACTfinalGPUconfig before GPU witness.
 
 ## Historical alternate-GPU qualification — closed expired
 

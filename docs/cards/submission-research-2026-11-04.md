@@ -8,7 +8,7 @@ workstream ceilings. Ordinary bounded implementation corrections need no new
 permission; source/numerical rules and stops below remain binding. Closed
 K5c/W8/W9 balances are not transferred. Unknown submissions are never replayed.
 
-Execution status, November12: **ALTERNATE-GPU QUALIFICATION QUEUED**.
+Historical execution status, earlier November12: **ALTERNATE-GPU QUALIFICATION QUEUED**.
 User requests regular native resource checks and a non-A6000 path. The new
 source-bound CPU proof d24d is accepted; Ada16 request
 `20261112T192044Z-461e16e8` was published pending on gpu5/6. Native workers
