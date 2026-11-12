@@ -1,0 +1,20 @@
+{
+  "GPU_not_used": true,
+  "accepted": true,
+  "actual_host_pid_births_absent": 19,
+  "all_four_cases_passed": true,
+  "campaign_group_supervisor_claim_absent": true,
+  "candidate_audit_sha256": "93274b99347731aab5411eaffd6e4f148b77914cc540945bffa0d8b5fd570c1f",
+  "cpu_seconds_charged": 250,
+  "filesystem_denial_not_qualified": true,
+  "gate_sha256": "84ac21dd0e899cadfa3db0e871f3a1b763f0039945597a00042a0696baa6f698",
+  "gpu_seconds_charged": 0,
+  "job_id": "20261112T224626Z-3db415d5",
+  "normal_inner_cpu_seconds": 1.23358,
+  "normal_outer_cpu_seconds": 1.3179569999999998,
+  "root_recomputed_exported_raw_artifacts": 9,
+  "root_recomputed_physical_members": 26,
+  "schema": 1,
+  "scope": "native CPU PID containment and accounting",
+  "sigterm_required_sigkill": true
+}

@@ -19,10 +19,13 @@ The accepted fresh Ada2c8b calibration reproduces actual six-point packet bytes,
 receiver pixels and scores across fresh executions, with complete126.6/112.5s
 commands. No independent new-clip result. Actual receiver/validator declares
 filesystem isolation unestablished; keep that unmet condition and earlier37b3
-cross-class failure. Real filesystem-denial and class-aware16/48 source code
-are being prepared independently, with material issues under review. Runtime
-inventory and nested private-proc feasibility are available but are not decoder
-proof. All inference/benchmark promotion remains gated.
+cross-class failure. Real filesystem-denial and class-aware16/48 code is frozen
+at fbca94d6 after reviewed source fixes and full software checks. Its exact-source
+native CPU proof3db415d5 is COMPLETE/root accepted; actual SVT filesystem CPU
+oraclesb9e0/cda9 failed and are rootclosed/retained, zeroGPU/250inclusiveCPU each.
+Source diagnostics/import-directory fixes are under review, not qualified. Runtime inventory and private
+proc feasibility are prerequisites, not decoder proof. All GPU/benchmark
+promotion remains gated.
 [Current handoff](../continuation-2026-11-12.md) and
 [stage card](../cards/k5d-ada-scale-and-denial-2026-11-12.md) are authoritative.
 
