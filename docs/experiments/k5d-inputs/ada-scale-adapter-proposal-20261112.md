@@ -1,0 +1,44 @@
+# Ada 16/48 adapter: code-preparation proposal
+
+This is not a fleet specification, witness, cost forecast, or release. The
+reference is smoke A from `20261112T210150Z-2c8b49a0`, archive SHA256
+`4bfff442081d988039abb308a3e0b8ed22632f5f598858d6eeaf4d0ef6824a1a`.
+The reference establishes packet replay and calibrated measurements only; its
+receiver did not establish filesystem denial.
+
+The separate adapter provides strict 16-frame source/score/native comparisons
+and authenticates retained checkpoint pixels, producer job, stage and Ada GPU.
+The scoring comparison reuses the original scoring validator; it does not decode
+archived DCVC. A producer cannot pass the helper without an actual isolated
+receiver's `verify_checkpoint(root, identity, job, stage)` verifier. That
+interface is provisional and must be reconciled with the independently built
+receiver, including a root-reviewed, exact-source witness asset and policy
+receipt, before it is callable. The current helper is not a producer or scorer
+entrypoint and cannot authorize a workload.
+
+A prospective producer job has two stages: independently prepare all six
+points for 16 frames and compare them to the Ada reference, then prepare all
+six points on the entire 48-frame clip with isolated receiving. A prospective
+scorer takes the sealed output of each corresponding producer stage, checks
+producer linkage and actual receiver denial, and scores all 16 or 48 frames
+with whole-clip temporal context; the 16-frame output must exactly match the
+Ada reference. The 48-frame stage is not a cross-class parity claim.
+
+Separate producer and scorer candidate ceilings are each 900 one-core campaign
+seconds, 400 external CPU seconds and 200 additional GPU lifecycle seconds. A
+possible fleet shape is 300 seconds for smoke, 600 seconds for full, 30 seconds
+for validation, and namespace limits strictly below their stage limits. This
+shape is only a ceiling proposal: setup, publication, validation and available
+campaign time must be included, and there must be a prospective, complete
+forecast and fail-closed promotion gate before an actual specification is
+created. The 2c8b combined A/B measurements (126.574/112.491 wall seconds and
+125.244/111.751 namespace CPU seconds) are not separate 48-frame production
+or scoring measurements, and do not establish this forecast.
+
+Before either job, root must review the combined source, source bridge and
+exact-source native CPU accounting proof; authenticate the policy and real
+SVT CPU denial oracle; and accept the separate same-job Ada denial witness.
+The complete source/model/environment/CPU proof, producer publication and
+witness assets must be bound by their real hashes. No later decode fallback,
+188/292/586/full30 release, manuscript claim, or scientific acceptance follows
+from these helpers.
