@@ -68,7 +68,7 @@ def inventory(config: dict[str, Any]) -> tuple[list[Path], list[Path], list[Path
     """Verify the exact reviewed read and execute file inventory."""
     if config.get('schema') != 1:
         raise ValueError('unknown policy schema')
-    profile = config['profile']
+    profile = config['profiles'][os.uname().nodename.split('.')[0]]
     runtime = _manifest(Path(profile['runtime_root']), profile['runtime_files'])
     source = _manifest(Path(profile['source_root']), profile['source_files'])
     for name in profile['source_files']:
@@ -255,7 +255,7 @@ def replay(wire_path: Path, map_path: Path, work: Path, *, config_path: Path, co
               'files': [str(p) for p in files], 'execute': [str(p) for p in execute], 'system': [str(p) for p in system],
               'wire_sha256': sha(wire_path), 'map_sha256': sha(map_path)}
     (work / 'launch.json').write_text(json.dumps(launch, sort_keys=True))
-    profile = config['profile']
+    profile = config['profiles'][os.uname().nodename.split('.')[0]]
     python = _canonical(Path(profile['python']))
     if python not in execute:
         raise ValueError('interpreter not in executable inventory')
@@ -286,8 +286,8 @@ def replay(wire_path: Path, map_path: Path, work: Path, *, config_path: Path, co
             raise RuntimeError(f'isolated receiver failed: {process.returncode}: {stderr[-2000:]!r}')
     receipt = json.loads((work / 'result' / 'receiver.json').read_text())
     proof = verify_receipt(receipt, expected_context=producer_context, expected_config_sha256=config_sha256)
-    if (proof['policy_sha256'] != _object_sha(config['profile'])
-            or proof['runtime_inventory_sha256'] != _object_sha(config['profile']['runtime_files'])):
+    if (proof['policy_sha256'] != _object_sha(profile)
+            or proof['runtime_inventory_sha256'] != _object_sha(profile['runtime_files'])):
         raise ValueError('policy inventory identity differs')
     if proof['pid'] != process.pid or proof['birth'] != observed_birth:
         raise ValueError('launcher and worker process identity differ')
@@ -318,8 +318,8 @@ def _worker(work: Path) -> None:
     proof = {'context': launch['context'], 'config_sha256': launch['config_sha256'], 'landlock_abi': abi,
              'handled_mask': mask, 'threads': 1, 'extra_fds': False, 'pid': pid, 'postexec_pid': os.getpid(),
              'birth': birth, 'postexec_birth': birth, 'denials': launch['denials'],
-             'policy_sha256': _object_sha(launch['config']['profile']),
-             'runtime_inventory_sha256': _object_sha(launch['config']['profile']['runtime_files'])}
+             'policy_sha256': _object_sha(launch['config']['profiles'][os.uname().nodename.split('.')[0]]),
+             'runtime_inventory_sha256': _object_sha(launch['config']['profiles'][os.uname().nodename.split('.')[0]]['runtime_files'])}
     k5d_worker.decode(work / 'packet.psbl', work / 'resources.json', work / 'result', isolation=proof)
 
 
