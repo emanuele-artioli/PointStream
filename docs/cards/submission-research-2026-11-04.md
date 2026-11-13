@@ -8,6 +8,16 @@ workstream ceilings. Ordinary bounded implementation corrections need no new
 permission; source/numerical rules and stops below remain binding. Closed
 K5c/W8/W9 balances are not transferred. Unknown submissions are never replayed.
 
+Current execution status, later November12: actual restricted SVT CPU oracle030d
+passed under the exact GPU-capable policy on frozen5cb source, after nativeCPU
+proof69c7 and full software checks. Prior startup failures remain preserved.
+ONE first CUDA/DCVC/Ada decoder witness13aba806 is queued on gpu6 until
+2026-11-13T00:33:53UTC,900GPU/1100CPU inclusive within the existing6k/9k internal
+Ball stage. No scale/paper promotion. Programme charged19,859GPU/53,078CPU;
+current ledger/handoff give reservations and the sole wait. No independent ready
+worthwhile experiment was identified beyond active Ball/heldW8; prerequisite
+blocked and out-of-scope work remains explicit.
+
 Historical execution status, earlier November12: **ALTERNATE-GPU QUALIFICATION QUEUED**.
 User requests regular native resource checks and a non-A6000 path. The new
 source-bound CPU proof d24d is accepted; Ada16 request

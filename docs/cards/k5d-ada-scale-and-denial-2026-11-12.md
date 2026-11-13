@@ -6,6 +6,13 @@ allocation of **6,000GPU /9,000CPU seconds**, inside unchanged Ball64,800GPU/
 72,000CPU and programme86,400GPU/100,800CPU. No paid server, training, legacy
 200-GPU-hour study, manuscript/PRESLEY edit or submission.
 
+Current status: source5cb passed native CPU proof69c7 and actual SVT CPU denial
+oracle030d under exact GPU-capable policyd5fad311. All five protected categories
+were denied and native/pixel bytes matched. CUDA/DCVC/GPU and scale remain gated.
+ONE first GPU witness13aba806 is queued, deadline2026-11-13T00:33:53UTC, using the
+later900GPU/1100CPU amendment below. Stage remaining6,000GPU/7,250CPU includes
+its900GPU/1050futureCPU (50prep charged); no extra doublecount. See current handoff.
+
 ## Evidence and unresolved condition
 
 Fresh Ada job2c8b completed two independent six-point16 executions on the same
@@ -114,7 +121,7 @@ all eligible/participating hosts, pinned archives and packed local environment,
 verified separate local SSD, actual ID before one bounded wait, no replay of
 unknown submissions. Preserve evidence/data/models and completed old paths.
 
-Status: exact-source native CPU proof3db415d5 COMPLETE/root accepted.
+Historical status before startup correction: exact-source native CPU proof3db415d5 COMPLETE/root accepted.
 Two actual SVT denial CPU oracles b9e0/cda9 failed and are rootclosed/ACKed,
 250CPU inclusive charge each. Source diagnostics/import-root correction is under
 review; a changed source needs new proof and real oracle. No GPU witness or scale run released. Sourcefbca94d6/
@@ -138,3 +145,28 @@ namespace PIDs must not be mistaken for host proc PIDs. Actual source/GT/encoder
 file denials remain EACCES/EPERM, while process invisibility is separate proof.
 A real pre-exec native-child observation barrier is required. CPU oracle must
 exercise these conditions before any GPU witness; all limits remain unchanged.
+
+## Measured CPU oracle and prospective first-GPU amendment
+
+Actual SVT CPU oracle030de220 passed under the exact GPU-capable policyd5fad311
+on source5cb45c80/06f5d9c7/b3b48/env32e. Root accepted original packet/native/
+YUV/RGB equality, all five real file denials, exact policy and process cleanup.
+Command25.558wall/21.117namespaceCPU, publication.717s. This does not qualify
+CUDA, DCVC or GPU behavior. Earlier b9e0/cda9 failures remain preserved.
+
+Before any GPU release, replace the provisional700GPU/900CPU witness ceiling
+with **900GPU/1,100CPU**, inside the unchanged6,000GPU/9,000CPU stage. Shift
+200GPU/200CPU from internal unallocated capacity. One-core campaign700 plus
+400externalCPU (50preparation precharged now; future1,050CPU), and200GPU
+post-campaign reserve. Namespace500/smoke550/validator30/fullno-op5. All six
+original points and16frames, same-job native receiving, exact reference/pixel
+checks and exclusive Ada remain unchanged. No new user allocation or GPU release.
+
+Conservative planning: old complete Ada preparation83.206CPU plus six times the
+measured25.558s full-policy receiver, another4s per receiver for duplicated/
+additional private hashes, then1.5margin and30s control/reference allowance,
+gives420.831s. This exceeds the old400s namespace; the new500/550/700 bounds
+leave explicit publication, validation and lifecycle reserve. Neural runtime
+and resource closure still need the actual witness; failure stops without retry.
+Source/spec preparation may read the existing full Ada reference on the server
+to satisfy the constructor's byte checks, avoiding a raw-pixel WAN transfer.

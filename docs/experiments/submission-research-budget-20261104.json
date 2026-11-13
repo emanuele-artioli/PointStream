@@ -2025,6 +2025,33 @@
       "cpu_seconds": 100,
       "basis": "Second100CPUfromoriginal200CPUinternalmonitorline; previousa2endedverified23:09:09UTC/18ticks/72.624remote+1.429SSHchildren+.376controllerCPU. Samepreviouslyreviewedpassivewatch every300s all4hosts, inner80/outer20 countedCPU, maximum4hwall orbudgetstop, noautosubmit/LLM/API. SSHserver/loginunmetered; no wholehost100CPUguarantee.",
       "release_stage": "research-first24/28-native-resource-watch"
+    },
+    {
+      "phase": "ball-5cb4-native-cpu-proof-20261112",
+      "parent_phase": "ball-ada-scale-and-denial-20261112",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 250,
+      "basis": "Prospectiveoneexact5cb4sourceCPUproofafterfullRuff/mypy/pytest;100onecorecampaign+150externalincludingfreshreadiness/wait/audit/cleanup. NoGPU/FS/scale. Priorfbcaproofcannotqualifychangedsource; failedb9e0/cda9 kept.",
+      "release_stage": "research-first24/28-startup-source-qualification"
+    },
+    {
+      "phase": "ball-5cb4-gpu-policy-svt-cpu-oracle-20261112",
+      "parent_phase": "ball-ada-scale-and-denial-20261112",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 250,
+      "basis": "Two8.790GBhashes~21.3CPU byte-onlyestimate; small1124filefailedreceiver3.2s gives onlybootstrapbound. Allow another40 for33086rules/imports/protected/nativework,1.5margin~92command<160namespace, publication+validator/overhead inside220campaign. Rule/import/warmcache scaling unknown; this is bounded correctness/costpilot, stopsifnotfit, no fullGPU release.30external included.",
+      "release_stage": "research-first24/28-exactGPU-policy-CPU-preflight"
+    },
+    {
+      "phase": "ball-first-gpu-denial-witness-prep-20261112",
+      "parent_phase": "ball-ada-scale-and-denial-20261112",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "basis": "Prospective firstGPUwitness external preparation only: publish fullCPUdenialapproval immutable, construct exactfrozencanonicalwitnessspec on gpu6 by reading existing actual400MBreference there, noWANpixelarchive/no model/GPU. Onecorehelper<=30CPU90wall+20client/root; counts INSIDE prospectiveGPUwitness1100CPU envelope (future1050remaining:700campaign+350external), not extra. NoGPUreleaseuntilspec/readiness/rootreview.",
+      "release_stage": "research-first24/28-firstGPU-denial-preparation"
     }
   ],
   "reservations": [
@@ -2636,8 +2663,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28-denial-and-scale-preparation",
       "gpu_seconds": 6000,
-      "cpu_seconds": 7800,
-      "status": "Remaining_unspent;fbcaCPUproofaccepted;b9e0/cda9FSoraclesfailedclosedACKed;newsourcecodeunderreview,nojob/GPU/scale;watcha3active"
+      "cpu_seconds": 7250,
+      "status": "Remaining_unspent;CPU030dSVTdenialaccepted;includesONEqueued13aba806900GPU1050CPUfuture(50prepcharged);noextradoublecount,noscale"
     }
   ],
   "jobs": [
@@ -5007,6 +5034,66 @@
       "terminal_CPU_charge": 250,
       "wait_state": "solewaitended;eventsACKed",
       "recovery_receipt": "docs/experiments/k5d-inputs/ada-denial-cda9-root-closeout-20261112.json"
+    },
+    {
+      "phase": "ball-ada-scale-and-denial-20261112",
+      "revision": "5cb45c80ff7da609a6aae6caecaaaeda90882b5c",
+      "source_sha256": "06f5d9c7f1b51e1ec85567a6255d4c6d4055e086762d4d8fd987514376fb0928",
+      "snapshot_sha256": "b3b48bebfb2dc721ef70735a49364337dbdd3bdf584e788eca8289258b8a6b00",
+      "source_archive": true,
+      "hosts": [
+        "gpu6"
+      ],
+      "job_id": "20261112T232248Z-69c7f4d9",
+      "state": "complete;rootacceptednativeCPUonly;eventACKed",
+      "terminal_GPU_charge": 0,
+      "terminal_CPU_charge": 250,
+      "wait_state": "solewaitended;eventACKed",
+      "recovery_receipt": "docs/experiments/k5d-inputs/ada-denial-69c7-root-CPU-closeout-20261112.json"
+    },
+    {
+      "phase": "ball-ada-scale-and-denial-20261112",
+      "revision": "5cb45c80ff7da609a6aae6caecaaaeda90882b5c",
+      "source_sha256": "06f5d9c7f1b51e1ec85567a6255d4c6d4055e086762d4d8fd987514376fb0928",
+      "snapshot_sha256": "b3b48bebfb2dc721ef70735a49364337dbdd3bdf584e788eca8289258b8a6b00",
+      "source_archive": true,
+      "hosts": [
+        "gpu6"
+      ],
+      "job_id": "20261112T233107Z-030de220",
+      "state": "complete;rootacceptedactualSVTCPUdenialunderexactGPUprofile;noCUDA/DCVC/GPU/scale;eventACKed",
+      "terminal_GPU_charge": 0,
+      "terminal_CPU_charge": 250,
+      "wait_state": "solewaitended;eventACKed",
+      "recovery_receipt": "docs/experiments/k5d-inputs/ada-denial-030d-root-closeout-20261112.json"
+    },
+    {
+      "phase": "ball-ada-scale-and-denial-20261112",
+      "revision": "5cb45c80ff7da609a6aae6caecaaaeda90882b5c",
+      "source_sha256": "06f5d9c7f1b51e1ec85567a6255d4c6d4055e086762d4d8fd987514376fb0928",
+      "snapshot_sha256": "b3b48bebfb2dc721ef70735a49364337dbdd3bdf584e788eca8289258b8a6b00",
+      "source_archive": true,
+      "hosts": [
+        "gpu6"
+      ],
+      "job_id": "20261112T235535Z-13aba806",
+      "state": "pending;onefirstGPUdenialwitness;noadmissionorqualityresultassumed",
+      "spec_sha256": "4c942ef94d7a0b89ffd0df921482552f78d74746f5ee72cc67cf304cf1134a49",
+      "deadline": "2026-11-13T00:33:53.646189+00:00",
+      "future_GPU": 900,
+      "future_CPU": 1050,
+      "preparation_CPU_already_charged": 50,
+      "campaign_onecore": 700,
+      "external_future_CPU": 350,
+      "GPU_post": 200,
+      "namespace": 500,
+      "smoke": 550,
+      "validator": 30,
+      "full": 5,
+      "scope": "All6freshnative16pointSender+isolatedreceiver;exactAdareference;not48/full30",
+      "wait_state": "ONEcanonicalwaitbackend62543/max2500active",
+      "local_batch": "/private/tmp/pointstream-ada-first-denial-witness-20261112",
+      "recovery_receipt": "docs/experiments/k5d-inputs/ada-first-denial-witness-release-20261112.json"
     }
   ],
   "old_budgets": "closed, not borrowed",
