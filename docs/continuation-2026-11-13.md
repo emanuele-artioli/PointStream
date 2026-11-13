@@ -5,7 +5,7 @@ The [budget ledger](experiments/submission-research-budget-20261104.json) is the
 accounting authority; [Ball journal](experiments/k5d-ball-benchmark.md) retains
 chronology and raw-result references. Times below are UTC.
 
-## Current scheduling decision — shared-SVT16 accepted; study port code only
+## Current scheduling decision — study source cache accepted; native preparation only
 
 Actual job `20261113T130719Z-9f94f30c` is canonical COMPLETE/gatePASS/exit0
 on gpu6 Ada1 UUID `GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553`, independently
@@ -60,25 +60,40 @@ closes further spending solely on its two omissions: CRF70 is the legal family
 maximum, the original two cells remain unresolved, and primary achievable-hull
 comparisons remain bracketed. No new encode was run.
 
-The next active work is the [SVT study port](cards/k5d-svt-study-port-2026-11-13.md),
-CODE ONLY300CPU/GPU0; candidate4282c96f checks completed, root review pending.
-Queue agent worktree
-`/private/tmp/pointstream-svt-study-scientific-a71-20261113`. Preserve original
-six-point/16-only defaults and all native/CPU/pixel/metric/judge rules. Freeze
-and qualify the complete future source once; separately admit same-source16/48
-cost controls, then fixed game9/Clip5 (292 frames) and game10/Clip12 (586 frames).
-No clip selection by observed quality. All source qualification, GPU48,292/586
-and30-clip execution remain unreleased; the neural comparison is still open.
+The [SVT study port](cards/k5d-svt-study-port-2026-11-13.md) is code-complete:
+immutable scientific4282c96f8aaf7d229f53df4c1c5f8225d8454d6e passed review;
+integration PR398 passed CI and merged625647fa, documentation PR399/359824f8.
+The independent worktree remains
+`/private/tmp/pointstream-svt-study-scientific-a71-20261113`; preserve original
+six-point/16-only defaults and all native/CPU/pixel/metric/judge rules.
 
-Next qualification envelope is [1100CPU/GPU0](cards/k5d-svt-study-source-qualification-2026-11-13.md): sourceprep100 is precharged for offline UNRUN helper preparation; native327/receiver585/reserve88 remain held. Final freeze/cache execution requires CI and exact root helper release. Scientific4282c96f is preserved; no new GPU/scale release.
+Sourceprep100 is independently accepted/CLOSED: sourcee4d4a856, archivef813e09d,
+config4fa67547, source-only ROOTbridge849 and immutable cache71ef. Seven files
+are0444/directory0555 with physical readback; all31 grants are unchanged and
+only config execution_identity changed. Root certificate370b9aff and physical
+report5545bca3, including exact raw receipt bytes, are recoverable from the
+[tracked source-cache index](experiments/k5d-inputs/svt-study4282-source-cache-acceptance-20261113.json).
+Preserve both local caller failures, original candidate bridge/review versions
+and all conservative charges. Source approval transfers no old native/receiver
+outcome or GPU/scale qualification.
+
+The [1100CPU/GPU0 qualification envelope](cards/k5d-svt-study-source-qualification-2026-11-13.md)
+now has1032CPU precharged: source100 +native327 +receiver585 +native local
+repair10 +receiver local preparation10. Only68CPU reserve remains held.
+Only OFFLINE local UNRUN metadata/package preparation is released for either
+job; the receiver's new native proof remains unbound. No actual native/receiver
+job, runtime preflight, publication or GPU release exists yet. Exact new-source
+native and actual CPU receiver proofs still precede separately admitted16/48
+controls, fixed292/586-frame confirmations and any30-clip stage. All those GPU
+stages remain unreleased; the neural comparison remains open.
 
 Primary exclusive2c6d stays separate:1160CPU/900GPU held, metadata50CPU
 precharged UNRUN, false plan463f50d0 preserved. No general client/GPU readiness
 or retroactive kernel pass follows. Manuscript/PRESLEY remain paused.
-Passive a19 backend67637/PID50947 is bounded to14:05:30.255090UTC,
-300s/maxnine ticks. Latest root-inspected tick4 at13:40:49 found no idle.
-A18 completed nine ticks and PID44010 is absent. No autosubmit, recurring model
-timer or verified completion-to-model resumption.
+Passive a20 backend19402/PID57608 started14:04:00.074441UTC, hard deadline
+14:49:00.074349UTC,300s/maxnine ticks. Latest local tick2 at14:14:20.546222UTC
+found no idle candidate. A19 finished nine ticks and its PID is absent.
+No autosubmit, recurring model timer or verified completion-to-model resumption.
 
 ## Completed CPU-readiness snapshot — historical, superseded at11:58 UTC
 

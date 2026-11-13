@@ -19,14 +19,27 @@ absence and historical negative-calibration failures remain unresolved.
 closes further spending solely on its two omissions: the legal CRF maximum is70,
 the two original cells stay unresolved and primary hull comparisons stay bracketed.
 
-The [SVT study port](../cards/k5d-svt-study-port-2026-11-13.md) is CODE ONLY:
-candidate4282c96f checks completed and are under root review. Source freeze,
-new qualification and all16/48/full-clip runtime stages remain unreleased.
-Programme25,041GPU/69,656CPU and Ball18,679GPU/45,655CPU are charged; the
-ledger retains authority for live holds. Repair unused75CPU returned, without
-refunding prior charges. Passive a19 backend67637/PID50947 checks A6000/Ada
-every300s until14:05:30.255090UTC; latest inspected tick6 at13:50:49.976972UTC
-found no idle candidate. No autosubmit or verified model-completion wakeup.
+The [SVT study port](../cards/k5d-svt-study-port-2026-11-13.md) is code-complete:
+scientific4282c96f remains immutable; PR398 passed CI and merged625647fa,
+followed by documentation PR399/359824f8. Exact sourceprep100 is accepted/CLOSED,
+sourcee4d4a856/archivef813e09d/config4fa67547/source-only bridge849/cache71ef.
+The [tracked source-cache index](k5d-inputs/svt-study4282-source-cache-acceptance-20261113.json)
+retains recoverable root certificate370b and physical report5545/raw receipts:
+seven files0444/directory0555/readback, all31 grants unchanged, config identity
+only. Original caller failures and old evidence remain preserved.
+
+The [qualification envelope](../cards/k5d-svt-study-source-qualification-2026-11-13.md)
+is1100CPU/GPU0:1032CPU precharged as source100 +native327 +receiver585
++native local repair10 +receiver local preparation10; only68CPU reserve held.
+Only OFFLINE local UNRUN metadata/package preparation is released for both
+jobs, with the receiver's new native proof unbound. No actual native/receiver
+job, runtime preflight, publication or GPU release exists yet. Old runtime
+proofs are not rebound; all16/48/292/586/full30 GPU stages remain unreleased. The ledger
+owns authoritative programme/Ball charges and holds; repair unused75CPU was
+returned without refunding prior charges. Passive a20 backend19402/PID57608
+started14:04UTC and ends no later than14:49:00.074349UTC,300s/maxnine ticks;
+latest local tick2 at14:14:20.546222UTC found no idle. A19 closed after nine ticks
+with its PID absent. No autosubmit or verified model-completion wakeup.
 Paper/PRESLEY remain paused. Exact earlier receipts remain below.
 
 ### Historical early-November13 disposition — superseded by current summary
@@ -1794,3 +1807,21 @@ SVT16qualificationarchive publication18958 COMPLETE0 ROOTphysicallyaccepted: SHA
 ROOTfinalbudgetcloseout ofmemoryrepaircard: actual9f94ROOTaccepted/currentcleanup+durablearchive18958+exactACKallclosed; unexecuted/unreleased75CPUreserve returnedtoBallunallocated, oldreservationnow0held. Complete1925CPU/600GPU conservativechargesretained inside2000ceiling; no earliercharge refunded. Newstudycode300separatecardonlyactive.
 
 ROOTprospectivelyallocatesnew1100CPU/GPU0 exactSVTstudy-sourcequalificationenvelope insideunchanged24G28C/Balllimits: sourceprep100fullyprecharged, native327+receiver585+reserve88=1000held. Scientific4282c96f/finalreviewGO/PR398 pendingintegrationCI. OnlyofflineUNRUNhelperadaptationreleasednow; exactfreeze/cacheexecution requireCI/rootpinsrelease. Freshnative+actualCPUdenialrequired, nooldproofrebind/GPU/48/scale/paper. Cardk5d-svt-study-source-qualification-2026-11-13.
+
+A19passivewatchfinished14:00:49.569678UTC/ninechecks/noidle; PID50947absenceverified before replacement. ROOTprecharged/releasedONEa20passive100CPU/G0: releasefc76736915c4e2ad6493fcd4759f3f7fe5c3def86b5f0c4466256354b45d2c00; backend19402/PID57608 started2026-11-13T14:04:00.074441+00:00 deadline2026-11-13T14:49:00.074349+00:00; watch2b931/specf517/launch7fb319 unchangedexceptliteralpath.300s/max9/noautosubmit/model/claims/LLMtimer; SSHserverloginaggregateunmetered/nativecompletionresumptionUNVERIFIED.
+
+PR398integration3d002953CIrun43438501359 PASS14:04:28UTC; all5production/testfiles byteidentical scientific4282. ROOTapprovedsourcefreeze releasec385586d/command19149181/helpera33b9a13. Firstlocalwrapper mistakenlysethardCPU2, helperhard28 rejectedbeforeoutput/archive/remoteaction; failurepreserved. Rootverifiedtargetabsent andamendedwrapperonly28hard/newcreateonlyintent, repairba206d10 insideprep100/16admin; ONEreplacementlocalfreeze backend66145/120wall, noSSH/native/model/GPU. CIwatch52271COMPLETE0/.194305CPU/noactivewait. A20watch19402/PID57608deadline14:49:00.074349UTC active; a19closed/ninechecks/noidle/PIDabsent.
+
+ROOTprechargesnative327from1100study-sourceenvelope: hold1000→673(receiver585+reserve88), onlyOFFLINEUNRUNnativepackageadaptationreleasedinitially. Source4282/e4d4/archivef813/config4fa; cachephysical/rootacceptance pending. No actualnativejobID/preflight/runtimeauthorityyet.
+
+Study4282localfreeze66145 COMPLETE0:2002actualGitblobs/sourcefiles/24002560archiveB; helper1.588288+child.656377CPU/wall4.4665235. Sourcee4d4a856a06c5f9a06586056ab4a30f0c73b232e5a3db035ae6eb5546063f80b/archivef813e09d2fa0eb51b5ec160dcda0cd230d3dada7be697882f9b657201490e61d/config4fa67547b1288e46f979040f0de5315288bd8bfc5d6065e3b6abaeeee32bea1c/delta063e9f7c. Independentreviewjoinsall31grants/configidentityonly/Git/archive/extracted/source-deltareconstruction/fullreferencebridge. ROOTsource-onlybridge849c059a5074851431862955c913731de345a428f2015ad31afe9df409190465; noactualprooftransfer/runtimeGPU. Originalreview4eaf exactbytesrestoredNEWreadonly afterrevieweraddedonefield; final82bereport separatelyretained/locked, noactualsourcechanged. All100prepcharge retained; cachephysicalqualificationpending.
+
+ROOTactualstudy4282cachewire joinsrelease221aa409/wire52f67cde/manifest2edf4405/assets config4fa+bridge849PASS. ONEmetadataupload25CPUinsideprep100ROOTreleasedcontract7c107c508a7deb5cd8e87b5cc3b9c5db82c16051a08b74ffbe2ad001ba4e65a8/backend21182/max150wall, no model/native/GPUjob. Transportoutputcache-bridge-bound-UNRUN-v2/cache-transport-study4282-ROOT-v1; inspectUNKNOWN ratherthanreplay. BothPR398(code625647fa)and399(closeout359824f8)CIgreen/MERGED. Rootworkingbranchfastforwardedmain thennewscoped codex/pointstream-study4282-qualification-20261113; frozen4282unchanged.
+
+Study4282sourcecacheupload21182 COMPLETE0:12.72866transportwall/.088496local+.102669SSH/.635853remoteCPU/8.67097remotewall. Cache71ef32b0c16fdc74e3030075de428061 sevenfiles0444/dir0555/readback/oldsingleNFSreadunchanged; sourcef813/config4fa/bridge849/rootrelease221aa/manifest2edf. ROOTphysicalreadonly9CPUcontractc375eb4f/request0019eba1 reviewed. Initialcallerwrongliteralhash rejectedlocallybeforetransportoutput/SSH; correctedexactc375caller authorized, failuresretainedinside100prep/admin16. No native/GPUjob/oldreplay.
+
+ROOTsourceprep100CLOSEDaccepted: physical54512COMPLETE0/.212178remoteCPU/.059899local+.023397SSH/3.487959transportwall, fullsevenfiles/modes/inodes/hashidentity/31grantpermissionjoinsPASS; certificate370b9aff/physical5545bca3 exactlyrecoverabletrackedsourcecacheindex. Freshnative327UNRUNpackagepreparedonly; ROOTlocalmaterializationreleased, runtimepreflight/publicationstilllocked.
+
+NativeLOCALmaterializerknownimportfailure: wrongfleet.validate_spec API, beforeanynormalizedobject/SSH/runtime. PartialBOUND-FALSE-141408andstderrpreserved; ROOTauthorizesONEinbox.validate_speccorrection+failureCPU/stderrreceipt/newoutput, unchanged14:54:08.878628deadlineif865sremain. ROOTassigns10from88cardreserve(parent4+2APIchildren2=8+review2), hold673→663=receiver585+reserve78; original327fullcharge retained/no experimentaljob.
+
+ROOTprechargesreceiver585+metadata10 beforeOFFLINEUNRUNCPUdenialpackageprep, insideunchanged1100studyqualenvelope: hold663→68reserveonly.327native+585receiver+100source+10nativerepair+10receiverprep=1032charged. NativeproofstillUNBOUND/actualCPUdenialjobnone; newsource/physicalcacheacceptedbutnotruntimeproof. No GPU/scale.

@@ -2772,6 +2772,41 @@
       "cpu_seconds": 100,
       "gpu_seconds": 0,
       "basis": "ROOTprospective1100CPU/GPU0 exactnewstudy-source envelope;100 includesofflinehelperadaptation/review/finalfreeze/immutablecache/readback. InitialUNRUNpreparationonly; exactfreeze/remoteaction requireCI+rootpinsrelease. Scientific4282c96f/PR398, unchanged31grants; olda71readonly. No native/receiver/GPU released."
+    },
+    {
+      "phase": "ball-passive-resource-watch-a20-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 100,
+      "gpu_seconds": 0,
+      "basis": "ROOTprechargesONEreplacementpassive45min/300s/max9resourcewatch aftera19finishedreceipt+PIDabsenceverification only. PrepareUNRUNhelpernow, releaseexactlaunchafterpriorends. Samewatch2b931/specf517,80counted+20external; SSHserverloginaggregateunmeteredacknowledged. Noautosubmit/model/claims/LLMtimer."
+    },
+    {
+      "phase": "ball-svt-study-native327-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 327,
+      "gpu_seconds": 0,
+      "basis": "ROOTwithinnew1100 exactstudy-source qualification.30preflight+68solepublication+100campaign+67finitewait+62post includesmetadataadaptation. OnlyofflineUNRUNpackagepreparation initiallyreleased; runtimepreflight/submission requireacceptedsourcecache+rootexactpins. No oldproofrebind/GPU/scale. Scientific4282/sourcee4d4/archivef813/config4fa67547."
+    },
+    {
+      "phase": "ball-svt-study-native-metadata-repair10-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 10,
+      "gpu_seconds": 0,
+      "basis": "ROOTuses10of88qualificationreserve forONEcorrectedlocalnative metadata materialization+review. Initialfleet.validate_spec importfailedbeforeAPIobjects/SSH/runtime, retainedinnative327; correctioninbox.validate_spec APIonly, newoutput, parent4+twochild2=8 plusreview2; no science/deadline/budgetincrease/remote/job."
+    },
+    {
+      "phase": "ball-svt-study-CPUdenial585-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 585,
+      "gpu_seconds": 0,
+      "basis": "ROOTwithin1100newstudy-source qualification.30preflight+68solepub+265campaign+155finitewait+40audit+12proofupload+15ACK; initialreleaseOFFLINEUNRUNpackageadaptationonly. Newnativeproof/physicalcache/exactrootcontextrelease mandatorybeforeanyCPUdenialruntime. Source4282/e4d4/f813/config4fa unchanged."
+    },
+    {
+      "phase": "ball-svt-study-CPUdenial-metadata10-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 10,
+      "gpu_seconds": 0,
+      "basis": "ROOTuses10of78qualificationreserve forCPUdenialOFFLINEmetadataadaptation/localmaterialization/review, parent4+twoCPU2APIs=8+review2. Incorporatelearnedcorrectinbox API/skipunchangedreadonlyshims. NoSSH/runtime/submission/model untilrootexactrelease. Noouterincrease."
     }
   ],
   "reservations": [
@@ -3459,9 +3494,9 @@
     {
       "phase": "ball-svt-study-source-qualification-20261113",
       "workstream": "ball",
-      "cpu_seconds": 1000,
+      "cpu_seconds": 68,
       "gpu_seconds": 0,
-      "status": "Remaining_unspent1000CPU/GPU0: native327+actualCPUreceiver585+reserve88 held; sourceprep100fullyprecharged. Only offlineUNRUNhelperpreparationreleased, finalfreeze/cache requireCI/rootpins. No runtime proof rebind, GPU or scale.",
+      "status": "Remaining_unspent68CPU/GPU0 qualification failure/closeoutreserve only. Sourceprep100+native327+receiver585+metadatarepair10+receiver metadata10 precharged. Only offlineLOCALpackages, no actualproof/runtime/GPU stage released yet.",
       "card": "docs/cards/k5d-svt-study-source-qualification-2026-11-13.md"
     }
   ],
@@ -6430,19 +6465,19 @@
     "RootprospectiveSVTqualification413\u2192443CPU/GPU0: failedpreflight20retained +ONEreplacementpreflight30 +393remaining. Add30unallocatedBall/programme; allouter/workstreamceilingsunchanged. Readonlystatus-ONLY6CPU/120wallbootstrap proposed; originalpublication68V4shims/scienceunchanged. No replacementexecutionbeforeexactrootreview."
   ],
   "monitoring": {
-    "state": "a19_active_bounded_passive_only",
+    "state": "a20_active_bounded_passive_only",
     "scope": "gpu2/gpu3 A6000 and gpu5/gpu6 Ada",
-    "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a19/run",
+    "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a20/run",
     "native_completion_wakeup_verified": false,
     "native_completion_resume_verified": false,
     "accounting_limits": "SSH server/login aggregate unmetered; inner80 countedCPU plus20 external reserve; full100CPU charge retained",
     "scientific_jobs": "NoactiveownGPUjob. Accepted9f94/a71closed+exactACK. Study4282c96f codechecks complete/PR398 integrationpending; newsource qualification1100CPU/GPU0 allocated, onlyofflineprep100 released, runtime qualification/GPU/scale unreleased.",
     "source_sha256": "2b931eb5a25f7a87cc3594103ee845ec2582cc017309b7d479a99f637f6ee10c",
     "mode": "bounded_passive_native_resource_checks",
-    "pid": 50947,
-    "backend": 67637,
-    "started_utc": "2026-11-13T13:20:30.255180+00:00",
-    "deadline_utc": "2026-11-13T14:05:30.255090+00:00",
+    "pid": 57608,
+    "backend": 19402,
+    "started_utc": "2026-11-13T14:04:00.074441+00:00",
+    "deadline_utc": "2026-11-13T14:49:00.074349+00:00",
     "interval_seconds": 300,
     "max_ticks": 9,
     "jobs": [],
