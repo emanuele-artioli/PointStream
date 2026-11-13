@@ -2133,6 +2133,33 @@
       "cpu_seconds": 250,
       "basis": "Prospective entire250CPU exact5ebc/abcc/7fd4 nativeCPUproof:100onecorecampaign (70smoke10validator5noop15overhead),150external readiness/admission/onewait/rawpublication/independentaudit/cleanup. Root rehashed archive/tree/delta, full1855tests37skip/Ruff/mypy520; same native fourcase path and prior23.8s basis. Native mechanism only; no real receiverFS/GPU/scale/retry release.",
       "release_stage": "research-first24/28-5ebc-nativeCPU-proof"
+    },
+    {
+      "phase": "ball-resource-watch-a6-20261113",
+      "parent_phase": "ball-ada-scale-and-denial-20261112",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 100,
+      "basis": "Prospective100CPU same-reviewed passivewatch2b931 every300s fourA6000/Ada hosts,45minmax,inner80counted+20outer. Prior a5 ended02:08:02UTC9ticks53.533remote+1.156SSH+.361controller countedCPU,noidle; PIDabsentverified. Noautosubmit/models/API/chatwake;SSHserver/loginaggregateunmetered.",
+      "release_stage": "research-first24/28-native-resource-watch"
+    },
+    {
+      "phase": "ball-5ebc-real-svt-lifecycle-cpu-oracle-20261113",
+      "parent_phase": "ball-ada-scale-and-denial-20261112",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 365,
+      "basis": "Prospective entire365CPU source5ebc real two-case SVT correctness pilot:265onecorecampaign incl230smoke30validator5noop,100external incl20assetprep+submission/wait/rawaudit/cleanup. Rootacceptedf2db exactsource nativeCPUproof and actual2c8bbridge. Same original16packet/YUV/RGB/fiveEACCES, normal+initiallauncherpidfdSIGKILL withscopednamespaceassistedcleanup/controlintact; integercallerrepair only. 2*old030d25.558*1.5=76.674s beforeoverheads versus220namespace,230smoke; priorc1 normal22.047s. Conditionalfit pilot stopsfailure; noGPU/scale/automaticretry. Assets/spec rootreview required beforeonecanonicalsubmission.",
+      "release_stage": "research-first24/28-5ebc-realCPU-correctness-pilot"
+    },
+    {
+      "phase": "ball-5ebc-GPU-witness-metadata-preparation-20261113",
+      "parent_phase": "ball-ada-scale-and-denial-20261112",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "basis": "Prospective bounded metadata-only GPU witness preparation: exact5eb source/cache, full accepted50b CPUapproval, configf826, original2c8b reference assets, source/input/spec/control/host identity and two-observer configuration. HiddenCUDA, localSSD scratch; no encoding/model/inference/GPU/submission. This50CPU is INCLUDED in prospective1100CPU witness ceiling, leaving1050 for future campaign700+observers200+otheradmin150; no release of those later amounts. Failure/unknown stops.",
+      "release_stage": "research-first24/28-5ebc-GPU-metadata-only"
     }
   ],
   "reservations": [
@@ -2744,8 +2771,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28-denial-and-scale-preparation",
       "gpu_seconds": 4718,
-      "cpu_seconds": 4353,
-      "status": "Remaining_unspent; c1 CPU oracle failed signal-type harness check;365CPU retained; observer byte-only canary100CPU precharged; GPU held pending corrected source/CPU/denial/accounting gates"
+      "cpu_seconds": 3838,
+      "status": "Remaining_unspent; exact5eb nativeCPU f2db and realCPU50b gates accepted;50CPU GPU metadata preparation precharged, GPU/CUDA release pending exact spec, complete forecast and dual-observer readiness"
     }
   ],
   "jobs": [

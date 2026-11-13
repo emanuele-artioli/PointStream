@@ -945,3 +945,39 @@ deadline2026-11-13T02:27:01UTC. Rootrelease/freeze at
 canonical submission delegated. ActualID must be recorded immediately; status
 before any one wait. No actualreceiver/FS/GPU/scale retry released. Programme
 21,141GPU/55,975CPU; Ball14,779GPU/31,974CPU; stage4,718GPU/4,353CPU remaining.
+
+Actual sole new-source nativeCPUproof request `20261113T015222Z-c4503e69` is **submission_unknown**: canonical submit source transfer timed out during SSH banner exchange; no replay. Exact5ebc sourceabccdf05/archive7fd4e0e6/env32e, spec1223945d, deadline2026-11-13T02:27:01.002271UTC. Entire250CPU/GPU0 already precharged. ActualID recorded immediately after failed submit; canonicalstatus inspection pending, no wait begun. Source/readiness/submitbackend37644/rawstate at `/private/tmp/pointstream-pidfd-signal-freeze-20261113/`. No receiverFS/GPU/scale release.
+
+20261113T015222Z-c4503e69 canonicalstatus says unpublished/unknown aftersourcebanner timeout. Boundedreadonlymetadata inspection found requestdirectory with only events; no ready/spec/sourcearchive/status/smoke/owner. No worker/native/validator result established, no wait begun or replay. Preserve directory and entire250CPU/GPU0 precharge; rawstatus/unknown-inspect/unknown-summary in newfreeze.
+
+Rootamendment after c450KNOWN_UNPUBLISHED authorized exactlyONEfreshsubmit within SAME250CPU/GPU0, notanothercharge. Actual `20261113T015753Z-3e136ddc` now submission_unknown: sourcegzip/ddSSHtransfer timedout119.647s; solebackend28875ended2. Exact5ebc/abcc/7fd4/env32e spec1223945d/deadline02:27:01UTC unchanged, nochatheartbeat. ActualID recorded beforestatus; inspectpreservedpartial, no thirdattempt/wait/FS/GPU. Amendment/rawhandles at newfreeze.
+
+3e136ddc canonicalunpublished/unknown independentlyreconciled: onlyevents+partialsource.tar1,291,699B SHAa5da1349 (expected16,752,640B/7fd4e0e6), no ready/spec/owner/status/smoke. No matchingownedtransfertree remains. Shellstartup hascondacommands but noprocesstimeline establishesstartup/condacause; partialwrite provesgzip/ddprogress. Preservepartial/read-onlyaudit transport-audit.json/unknown-summary-attempt2.json, retainSAME250CPUreservation, no thirdattempt/wait/ACK. NativeCPU100campaignstillunexecuted; noFS/GPUclaim.
+
+Rootreviewed exact7fd4 cache and releasedONEcachebased nativeCPUproof withinSAME250CPU/GPU0; mandatoryfreshdoctor passed throughcanonicalCLI. Actual `20261113T021221Z-f2db8617` published pending, exact5ebc/abcc/7fd4/env32e/spec1223945d/deadline02:27:01UTC, sourcearchive:true, no chatheartbeat. ActualID recorded beforecanonicalstatus/onewait; noFS/GPU/scale/ACK. Cache/rootrelease/backend25690 at `/private/tmp/pointstream-pidfd-signal-freeze-20261113/`; oldc450/3e136unpublishedpartialrequests preserved.
+
+Root explicitly changed transport after known-unpublished reconciliation: exact
+7fd4 archive reconstructed on server from69,663-byte delta and177c old archive,
+physical output16,752,640bytes verified,0.22569CPU/1.11641wall. New immutable
+cache path in `delta-preparation/remote-result.json`. ONE nativecache-based
+canonical request released afterdoctor, SAME250CPUallocation/spec1223945d/
+source5ebc-abcc-7fd4/env32e/deadline02:27:01UTC; pendingbackend25690, no ID yet.
+No new250charge/scientificsourcechange/blind fullupload; old requests preserved.
+Unknown/failure stops for inspection, no actualreceiver/GPU/scale admission.
+
+Watcha5 ended02:08:02UTC9ticks/noidle/PIDabsentverified; newa6PID70368 started
+02:11:03UTC fourhosts/300s/max45min02:56:03UTC orCPUguard, same2b931script,
+100CPUprecharged. Programme21,141GPU/56,075CPU; Ball14,779GPU/32,074CPU;
+stage4,718GPU/4,253CPU remaining. Noautosubmit/model/API/chatwake; SSH
+server/loginaggregateCPU unmetered. BothPR374/375 mergedCIgreen.
+
+f2db8617 COMPLETE aftersole75swait; unACKedterminaleventaeb05f302b405298a33eab2cf6eec241. Native4casegatepass exactabcc/7fd4/env32e/spec1223945d; smoke25.75326gatewall (execution17.37438wall), validator.28385s. Independentrawaudit21hostPIDs incl19births+campaign/supervisor absent,4groupsempty,gpu6CPUclaimabsent. Normalinner1.667991/outer1.776926CPU; TERMrequiredKILL. Actualsourcearchive physically7fd4,26publicationmembers rehashed. Rootrawreviewpending; noACK/realreceiverFS/GPU/quality/scale. Same250CPUcharge retained; audit/summary atnewfreeze.
+
+Actual sole repaired real2caseCPUoracle `20261113T022437Z-50b4e24e` published pending, exact5ebc/abcc/7fd4/env32e/spec952f9f0a/deadline03:01:08UTC; sourcearchive:true fromverifiedcache, mandatoryfreshdoctor and no chatheartbeat. Entire365CPU/GPU0 alreadycharged265campaign100external(20failedprep20corrected60remaining). ActualID recordedimmediately beforecanonicalstatus/ONEwaitmax600; noGPU/scale/retry/ACK. Rawrootrelease/spec/submitbackend38955 in `/private/tmp/pointstream-pidfd-signal-real-cpu-prep-20261113/`.
+
+50b4e24e COMPLETE aftersole75swait, unACKedaec1d7a083ad570f97c0befd58288cad. Gate2e369c03 passesrealnormal+surrogatelifecycle exactabcc/7fd4/env32e/spec952f9f0a. Physical72,960,000Bpub265c79a4,7members hashedremotely; normalreceipt951b4cb0/native589bc1ed/YUV5c43d78f/RGBe3c43414 match,16frames/fiveerrno13denials. LauncherpidfdSIGKILL9succeeded; actualscopedteardown, bothnative_at_barrier=null, zeroemergencycleanup; unrelatedcontrolalivebothcases. Independent16hostPIDs(14births pluscampaign/supervisor)absent/4groupsempty/CPUclaimabsent. Smokeexecution35.35952wall, namespace35.045156CPU; gatewall41.58247includespublication,val.63435s. Rawaudit~.3815CPU; rootreviewpending/noACK/GPU/scale. Retain365CPUcharge; rawsummary atrealpreppath.
+
+
+Root accepted f2db nativeCPU proof (event ACKed) and50b realCPU gate after independently rehashing complete receiver/oracle metadata and verifying frozen production receipt consumer. Process count reconciled16 unique=14main+2outer, no duplicate. Thin closeout `ada-5ebc-50b4-root-CPU-denial-closeout-20261113.json` a911dc62; fullapproval outsidegit75ae95a6,6,230,259B. Fresh canonical50b status COMPLETE/noerror and eventaec1d7a083ad570f97c0befd58288cad ACKed. Actual normalSVT/fiveaccessdenials +initiallauncherkill/scopedteardown only; no active-native/unshare-only/fleetwatchdog/GPU/CUDA/scale claim. Full365CPU retained.
+
+Prospective metadata-only GPU witness preparation50CPU/GPU0 precharged after these acceptances. Programme21,141GPU/56,490CPU; Ball14,779GPU/32,489CPU; active4,718GPU/3,838CPU remaining. This50 is inside prospective900GPU/1100CPU witness (700campaign+200dualobservers+50prep+150admin); future1050CPU/GPU900 UNRELEASED. Exact5eb/abcc/7fd4/cache/configf826/full50approval required; no model/encoding/submission yet.

@@ -5,7 +5,91 @@ The [budget ledger](experiments/submission-research-budget-20261104.json) is the
 accounting authority; [Ball journal](experiments/k5d-ball-benchmark.md) retains
 chronology and raw-result references. Times below are UTC.
 
-## Latest accepted decision
+## Current accepted CPU gates and stop (UTC)
+
+Root accepted exact-source native CPU proof `20261113T021221Z-f2db8617` and
+real two-case SVT CPU receiver oracle `20261113T022437Z-50b4e24e` on frozen
+`5ebc7831` / source `abccdf05` / archive `7fd4e0e6` / environment `32e`.
+The native proof covers CPU containment/accounting. The real oracle passed
+normal SVT filesystem denial and initial-launcher interruption with scoped
+teardown: 16 distinct host processes reconcile as 14 main-audit + 2 outer-audit
+checks (14 captured births plus supervisor and campaign). No active-native, unshare-only or fleet-watchdog claim follows.
+The 50b event is acknowledged; root verified its canonical status.
+
+The full real-CPU approval is outside git (SHA `75ae95a6984c`); its thin
+[closeout](experiments/k5d-inputs/ada-5ebc-50b4-root-CPU-denial-closeout-20261113.json) records the exact source, policy, publication and audits.
+Prior `c1bededa` remains a failed combined gate with acknowledged events; its
+signal-enum diagnosis and the accepted caller fix are retained beside the pass.
+
+Programme charges: **21,141 GPU / 56,490 CPU seconds**; Ball: 14,779 GPU /
+32,489 CPU. Active internal stage remaining: 4,718 GPU / 3,838 CPU.
+Old held Ball 7,920 GPU / 800 CPU and W8 4,550 GPU / 929 CPU are unchanged,
+inside the approved 24 GPU-hour / 28 CPU-hour programme. The 365-CPU real-oracle
+precharge is retained. Root charged 50 CPU seconds for metadata-only witness
+preparation inside the whole 1,100-CPU leaf. Future 900 GPU / 1,050 CPU seconds
+remain UNRELEASED; no GPU execution is authorized.
+
+Passive watch a6 PID 70368 checks gpu2/gpu3 A6000 and gpu5/gpu6 Ada every 300
+seconds until 2026-11-13 02:56:03 UTC or its CPU guard; no idle eligible GPU
+through tick 05. Its 100 CPU seconds are precharged. No autosubmit, model timer
+or verified chat wake. The dual-observer helper passed narrow code re-review;
+its normal synthetic canary does not qualify production or failure teardown.
+
+Ada's same-GPU repeat `2c8b49a0` supports its own qualified reference; failed
+cross-A6000 comparison `37b3b79b` is retained. Current validators require exclusive
+GPU access. GPU/CUDA/DCVC denial, new clips and scale/full30 remain unqualified.
+Further GPU work requires separate root-reviewed preparation, exact-source
+joins, durable actual-claim observation and complete forecasts. Paper/PRESLEY
+remain paused; no training, paid hosting or submission is authorized.
+
+Native gate: [root-accepted f2 proof](experiments/k5d-inputs/ada-5ebc-f2db-root-approved-CPU-gate-20261113.json).
+Full real-CPU approval: `/private/tmp/pointstream-pidfd-signal-real-cpu-prep-20261113/root-approved-real-CPU-denial.json`,
+SHA256 `75ae95a6984cd880cfadfa92f46589320cb4b165bb44eba5f5b1e33c1b471479`.
+Current source remains `5ebc7831291c91a6c45f72791e1959dbd76ac5f3`, tree
+`abccdf05666392ae8ad6d2ac8d944a8a30c25ccf5d944d29eccdb3f84d595b2e`, archive
+`7fd4e0e6ed2655b646d5601ba458fe66532f03040bba9b87c1607cca2e2fbfd0`.
+Selected source archive, exact config, full CPU approval and raw audits are also
+read-only under `.cache/pointstream-evidence/5ebc-CPU-gates-20261113/` in this
+checkout (21 files,29,973,174 bytes).
+[Tracked cache manifest](experiments/k5d-inputs/ada-5ebc-CPU-evidence-cache-20261113.json)
+records every physical hash; it is not a GPU release.
+
+All earlier release/wait/watch statuses below are historical; this current section
+supersedes them without changing their provenance or earlier charges.
+
+## Historical recovery state before f2/50b acceptance
+
+Native CPU upload requests `20261113T015222Z-c4503e69` and
+`20261113T015753Z-3e136ddc` are reconciled UNPUBLISHED: no spec/ready/owner/
+execution output or live transfer remains. First has events only; second
+retains a partial1,291,699-byte archive. Cause among startup/network/NFS delay
+is unresolved. Preserve both; no canonical terminal state or ACK is invented.
+
+Root changed transport after inspection: a69,663-byte delta reconstructed
+exact source archive7fd4 on gpu6, physically rehashed16,752,640bytes,0.226CPU/
+1.116wall. New immutable cache:
+`/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-source-7fd4-delta-b18b0fd9aa3a4ebf9c5fcb9fd11a6b44/source.tar`.
+ONE cache-based canonical native proof is released after required singlehost
+doctor, now published actual `20261113T021221Z-f2db8617`; first canonical status
+PENDING. Sole canonicalwait600 backend40409 is active; do not start another wait. Same250CPU allocation
+(100campaign still unexecuted,150external includes prior70 +cacheprep20 +
+remaining60); no new250charge/source/quality change. Same5ebc/abcc/7fd4/env32e/
+spec1223945d/deadline02:27:01UTC. ActualID is recorded in Balljournal and job-id-cache-attempt.txt before
+status/wait. Any uncertainty stops.
+Freeze `/private/tmp/pointstream-pidfd-signal-freeze-20261113/` preserves all
+releases, raw transport and delta receipts. No actualreceiver/GPU/scale release.
+
+Resource watcha5 ended02:08:02UTC9ticks/noidle/PIDabsent; its100C is retained.
+Newwatcha6PID70368 started02:11:03UTC, fourhosts/300s/max45min to02:56:03UTC
+orCPUguard, same2b931script,100CPU precharged. Programme21,141GPU/56,075CPU,
+Ball14,779GPU/32,074CPU; stage4,718GPU/4,253CPU remaining. Noautosubmit/model
+timer/API/chatwake. Prior watcha5 section below is historical.
+
+PR374(observer) and375(researchstate) mergedCIgreen. PR376(client-only
+non-login upload hygiene) has auto-merge enabled; rootcause remains unproven.
+Currentrootbranch `codex/pointstream-native-proof-recovery-2026-11-13`.
+
+## Historical caller-fix and synthetic-canary decision
 
 The failed CPU oracle is closed and both events acknowledged. Its normal SVT
 partial output is retained; no combined gate pass. Minimal caller fix5ebc7831
@@ -19,7 +103,7 @@ test or production/GPU credit. Root acceptance is
 Read-only durable selected source/audits:
 `/Users/manu/.cache/pointstream-evidence/ada-d2db-and-observer-20261113/`.
 
-## Current result and immediate stop
+## Historical failed c1 receiver oracle
 
 Real receiver CPU oracle `20261113T012427Z-c1bededa` is **FAILED**. Its sole
 canonical wait ended after 9 seconds (backend 17491, exit 10). Bounded read-only
@@ -47,7 +131,7 @@ namespace 220, smoke 230, validator 30 and no-op 5 seconds. Preparation, release
 actual ID and wait handles are in
 `/private/tmp/pointstream-pgid-d2db-real-cpu-prep-20261113`.
 
-## Frozen source and independently accepted proof
+## Historical d2db source and accepted native proof
 
 Scientific branch `codex/ball-campaign-pgid-oracle-20261113` is pushed and frozen:
 source `d2db015d4d90094bcd9dde8286f1ef05b9bc164d`, tree
@@ -72,7 +156,7 @@ production scoped-supervisor assistance allowed, all captured births/groups
 absent and unrelated control alive. No unshare-only, active-native-abort,
 fleet-watchdog or external emergency-cleanup credit follows.
 
-## Resource checks and independent accounting
+## Historical a5 watch and synthetic observer evidence
 
 User requests bounded resource checks and an alternative GPU path. Passive
 watch a5 PID 59213 started `2026-11-13T01:27:37.040296Z`; deadline
@@ -97,10 +181,10 @@ durable claim accounting and renewed exact-source receiver/denial gates pass.
 
 ## Budget snapshot — seconds, inclusive conservative charges
 
-- Programme: 21,141 GPU / 55,975 CPU charged (5.8725 / 15.5486 hours).
+- Programme: 21,141 GPU / 56,490 CPU charged (5.8725 / 15.6917 hours).
   User ceiling remains 86,400 GPU / 100,800 CPU (24 / 28 hours).
-- Ball: 14,779 GPU / 31,974 CPU charged. Internal denial/scale stage remaining:
-  4,718 GPU / 4,353 CPU, inside its original 6,000 / 9,000 allocation.
+- Ball: 14,779 GPU / 32,489 CPU charged. Internal denial/scale stage remaining:
+  4,718 GPU / 3,838 CPU, inside its original 6,000 / 9,000 allocation.
 - Old held Ball reservation: 7,920 GPU / 800 CPU. W8: 4,550 GPU / 929 CPU,
   held on complete-cost/prerequisite gates. No transfer or new authority.
 - Charges are conservative allocations where stated, not complete measured use.

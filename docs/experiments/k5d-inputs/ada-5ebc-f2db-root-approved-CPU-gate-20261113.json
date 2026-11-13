@@ -1,0 +1,37 @@
+{
+  "all_owned_pids_absent": true,
+  "audited": true,
+  "candidate_audit_sha256": "e45367eca92804d1312b2b4babad8c850335de4b7339873c36f05324346de75f",
+  "cases": [
+    "normal",
+    "timeout",
+    "sigterm",
+    "sigkill"
+  ],
+  "consumer_execution_identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "7fd4e0e6ed2655b646d5601ba458fe66532f03040bba9b87c1607cca2e2fbfd0",
+    "source_sha256": "abccdf05666392ae8ad6d2ac8d944a8a30c25ccf5d944d29eccdb3f84d595b2e"
+  },
+  "gpu_used": false,
+  "independent_cpu_match": true,
+  "job_id": "20261113T021221Z-f2db8617",
+  "namespace_wrapper_sha256": "efeae854e87663e0b09741432b5bc4ee84fa2955dcf5c68edeea5dd35aae2072",
+  "native_tools": {
+    "SvtAv1EncApp": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+    "dav1d": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+    "ffmpeg": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2"
+  },
+  "normal_inner_cpu_seconds": 1.667991,
+  "normal_outer_cpu_seconds": 1.776926,
+  "passed": true,
+  "schema": 1,
+  "scope": "native CPU PID containment and accounting",
+  "source_spec_sha256": "1223945d623281fa6ea4eb6bbf12e361a4f6fac757e65f6cfc70781861efc54b",
+  "status": "Root accepted exact5ebc source native CPU containment/accounting only",
+  "unshare_sha256": "9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6",
+  "root_publication_sha256": "071330963fd67c60a53beb709b1b9672b5dd483b3e2d63011073159a2f821f13",
+  "root_physical_member_count": 26,
+  "root_post_job_absent_host_births": 21,
+  "native_stream_bytes_independently_reread": false
+}

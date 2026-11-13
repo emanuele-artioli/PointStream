@@ -8,36 +8,40 @@ allocation of **6,000GPU /9,000CPU seconds**, inside unchanged Ball64,800GPU/
 
 ## Current November 13 status (UTC)
 
-The failed CPU receiver oracle `20261113T012427Z-c1bededa` is closed and its
-events acknowledged. Strict pidfd validation rejected a signal enum before
-sending it. Normal SVT decoded with exact pixels and five access denials,
-but the combined lifecycle gate failed. Retain the full365CPU charge.
+Root accepted exact-source native CPU proof `20261113T021221Z-f2db8617` and
+real two-case SVT CPU receiver oracle `20261113T022437Z-50b4e24e` on frozen
+`5ebc7831` / source `abccdf05` / archive `7fd4e0e6` / environment `32e`.
+The native proof covers CPU containment/accounting. The real oracle passed
+normal SVT filesystem denial and initial-launcher interruption with scoped
+teardown: 16 distinct host processes reconcile as 14 main-audit + 2 outer-audit
+checks (14 captured births plus supervisor and campaign). No active-native, unshare-only or fleet-watchdog claim follows.
+The 50b event is acknowledged; root verified its canonical status.
 
-Minimal caller fix `5ebc7831` passed Ruff, mypy520 and1,855 tests (37 skipped).
-Root rehashed its actual source/archive and the two-file delta againstd2db:
-source `abccdf05`, archive `7fd4e0e6`, environment unchanged `32e`. One exact-source
-four-case native CPU proof is prospectively released for250CPU/GPU0 after
-readiness; actual ID must be recorded in the Ball journal. No real receiver
-retry, GPU or scale release follows from this mechanism test. Prior6b proof
-remains valid only for its originald2db source.
+The full real-CPU approval is outside git (SHA `75ae95a6984c`); its thin
+[closeout](../experiments/k5d-inputs/ada-5ebc-50b4-root-CPU-denial-closeout-20261113.json) records the exact source, policy, publication and audits.
+Prior `c1bededa` remains a failed combined gate with acknowledged events; its
+signal-enum diagnosis and the accepted caller fix are retained beside the pass.
 
-Standalone observer canary `cd45a0b3` with collector `8e340a78` passed independent
-hash/journal/CPU/cleanup review:7.112wall/1.068933countedCPU seconds, bounded
-synthetic claim interval4.032s, missing finalUNKNOWN. Retain100CPU debit. This
-proves same-host synthetic fixture behavior only; timeout-expiry/PDEATHSIG
-failure teardown and production/GPU behavior remain untested.
+Programme charges: **21,141 GPU / 56,490 CPU seconds**; Ball: 14,779 GPU /
+32,489 CPU. Active internal stage remaining: 4,718 GPU / 3,838 CPU.
+Old held Ball 7,920 GPU / 800 CPU and W8 4,550 GPU / 929 CPU are unchanged,
+inside the approved 24 GPU-hour / 28 CPU-hour programme. The 365-CPU real-oracle
+precharge is retained. Root charged 50 CPU seconds for metadata-only witness
+preparation inside the whole 1,100-CPU leaf. Future 900 GPU / 1,050 CPU seconds
+remain UNRELEASED; no GPU execution is authorized.
 
-Programme charges: **21,141GPU /55,975CPU seconds**; Ball14,779GPU/31,974CPU.
-Internal stage remaining4,718GPU/4,353CPU. Old held Ball7,920GPU/800CPU and
-W84,550GPU/929CPU are unchanged. All remain inside24GPUh/28CPUh authority.
-Passive watcha5 PID59213 checks gpu2/gpu3 A6000 and gpu5/gpu6 Ada every300s,
-ending by2026-11-13 02:12:37UTC or its CPUguard;100CPU precharged. No autosubmit,
-model timer or verified chat wake. Latest sweeps found no idle eligible card.
+Passive watch a6 PID 70368 checks gpu2/gpu3 A6000 and gpu5/gpu6 Ada every 300
+seconds until 2026-11-13 02:56:03 UTC or its CPU guard; no idle eligible GPU
+through tick 05. Its 100 CPU seconds are precharged. No autosubmit, model timer
+or verified chat wake. The dual-observer helper passed narrow code re-review;
+its normal synthetic canary does not qualify production or failure teardown.
 
-Ada's same-GPU repeat `2c8b49a0` supports the same ball benchmark under its
-own reference; failed cross-A6000 comparison `37b3b79b` is retained. Current
-validators require exclusive GPU access. CUDA/DCVC denial, new-clip and full30
-results remain unproved. Paper/PRESLEY edits remain paused.
+Ada's same-GPU repeat `2c8b49a0` supports its own qualified reference; failed
+cross-A6000 comparison `37b3b79b` is retained. Current validators require exclusive
+GPU access. GPU/CUDA/DCVC denial, new clips and scale/full30 remain unqualified.
+Further GPU work requires separate root-reviewed preparation, exact-source
+joins, durable actual-claim observation and complete forecasts. Paper/PRESLEY
+remain paused; no training, paid hosting or submission is authorized.
 
 [Current handoff](../continuation-2026-11-13.md) and [ledger](../experiments/submission-research-budget-20261104.json) supersede historical allocations below.
 
