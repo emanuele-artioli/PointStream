@@ -12,6 +12,8 @@ K5c/W8/W9 balances are not transferred. Unknown submissions are never replayed.
 
 ### Current research decision
 
+Use the [current disposition](../experiments/research-disposition-20261113.md) for item-by-item closure decisions. Ball586 is running on qualified Ada; the neural comparison is accepted on48 development frames; targeted absence feasibility is local-only. Historical balances and “pending” instructions below are not current authority.
+
 Read the [canonical continuation](../continuation-2026-11-13.md) and live budget ledger for
 current jobs, releases, balances and watcher handles. Frozen scientific source
 2c6d must not advance. The historical phases below retain their original results

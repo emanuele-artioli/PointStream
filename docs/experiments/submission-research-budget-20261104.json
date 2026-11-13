@@ -3400,6 +3400,13 @@
       "cpu_seconds": 2904,
       "gpu_seconds": 2420,
       "basis": "Prospective entire remaining ONE586 lifecycle inclcampaign2200/tail95/publication68/admission18/wait330/audit120/ACK6/archive27/failure40; prior129 included separately in3033. No retry/full30 authority."
+    },
+    {
+      "phase": "ball-targeted-absence-feasibility20-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 20,
+      "gpu_seconds": 0,
+      "basis": "Prospective local readonly source/lifecycle information oracle only, card k5d-targeted-absence-feasibility-2026-11-13.md; no edits/network/models/GPU admission"
     }
   ],
   "reservations": [
@@ -8440,5 +8447,11 @@
       "CPU_precharged": 330,
       "completion_model_resume_verified": false
     }
+  },
+  "targeted_absence_feasibility_current": {
+    "state": "LOCAL_READONLY20CPU_RELEASED",
+    "card": "docs/cards/k5d-targeted-absence-feasibility-2026-11-13.md",
+    "source_judge_failures_retained": true,
+    "runtime_released": false
   }
 }

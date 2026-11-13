@@ -1,0 +1,21 @@
+# Current research disposition — 2026-11-13 UTC
+
+This decision map supersedes historical “pending” prose in PLAN. It distinguishes completed experiments from unresolved scientific questions. The live budget ledger and current continuation govern execution. User direction: finish worthwhile research before revising the manuscript; PRESLEY stays read-only. The approved programme remains24GPUh/28CPUh; no training, paid hosting or legacy200GPUh sweep.
+
+| Item | Evidence and current decision | Reopening condition |
+|---|---|---|
+| Ball primary neural/conventional comparison | Six-point prepare16/48 and sealed score16/48 accepted and archived. ROI BD-rate savings coexist with full-frame penalties; no task BD without quality overlap. | Different footage and absence coverage, only under complete gates. |
+| Ball conventional coverage | Accepted16/48/292, saved292 rescue/harm and absent false3→5/30 retained. Actual586 job20261113T235001Z-efa7e3e5 is running; no586 result yet. | Fresh16 quality/wholecost and terminal physical acceptance. |
+| Targeted absence follow-up | Clip11 selected before new encoded quality for80frames/41absent. Local20CPU source/lifecycle feasibility only is released. Source25/39 failure retained. OptionalClip7 cross-game second. | Full source/receiver/native qualification and complete lifecycle must fit; no automatic runtime admission. |
+| SVT gaps / W7 | [Fixed-family disposition](w7-inputs/native70-fixed-family-disposition-20261113.json): legalmaxCRF70 misses med000/019 strict targets by69/39bytes; primary achievable envelopes bracket comparisons. Close spending on these fixed-family omissions, retain them unresolved. | Different preset/framing would be a different comparison, not a repair of this family. |
+| W8 fresh decoder | [Exact-dispatch plan](w8-inputs/receiver-20261101/w8-exact-dispatch-static-plan-20261113.md) has no demonstrated complete fresh-witness fit. STOP at whole-endpoint cost/readiness gate; decoder question remains open. | Complete feasible endpoint forecast before a pilot; no standalone550CPU pilot or changed quality rule. |
+| W6 temporal smoothing | Accepted [production-array audit](w6-inputs/smoothing-independent-audit-30f6379a-20261105.json), job30f6379a: both fixed profiles improve descriptive flicker/player metrics, all fail original temporal rule. Experiment CLOSED. | New method needs a dominating oracle; no automatic sweep of weights. |
+| GVC peer | [Feasibility record](ego-peer-feasibility-20261104.md),16frames/QP0,3,9: QP9 loses to a lower-rate sampledSVT point on five means. Scoped experiment CLOSED. | Concrete new hypothesis, not additional endpoints merely seeking a win. |
+| Paid egocentric masks | Same record: four-item exact-mask/fixed-pixel oracle fails, pooledDISTS+27.92%; P09_106 narrow positive retained. Broad tested route STOP. | New predeclared independent small-foreground case only if necessary for a claim; not currently prioritized above ball absence. |
+| Racket/W11 | [Annotation audit](w11-racket.md): no independently aligned pixel masks identified. Blocked, not a negative codec result; W6 3% proxy is not recall. | Recover true annotation/source identity before a paste oracle. No proxy substitution. |
+| Cross-sport | [Disposition](remaining-plan-research-20261105.md): OpenTT judge0/85 visible, eligibility failed before coding. | Independent source-qualified judge and concrete claim. Not a codec-negative result. |
+| Legacy full34/200GPUh pipeline and new training | Deferred outside authority; not completed or disproven. Current pilot-scoped claims do not require it. | Explicit new scope/budget plus dominating oracle. |
+
+The next highest-value scientific decision is absence/rescue-harm coverage, not repeating an all-visible development sweep. After586 and feasible targeted tests, stop research when further complete lifecycles do not fit or do not change the defensible claim. Preserve negatives, eligibility failures and untested scope separately in the paper. Broader source-judge/absence safety and population claims remain unestablished; failed pooledsource10/197 stays failed.
+
+This map is a ROOT decision informed by independent documentation review; it releases no experiment beyond the separately recorded20CPU feasibility audit. Historical experiment records remain unchanged.
