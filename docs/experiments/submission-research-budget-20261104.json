@@ -2498,6 +2498,34 @@
       "cpu_seconds": 20,
       "gpu_seconds": 0,
       "basis": "Rootreviewed exact915f/7836/6fd4 two-callcontinuation12+8CPU120wall; actualprioralarmreceipts/currentgroups andONEretainedPopenCPUexpiry only, no passed-stage replay. Sameadmin300now120past+148futurechain+32other; noextraallocation/GPU/model/job"
+    },
+    {
+      "phase": "ball-svt-only-CPU-qualification-local-repair-20261113",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 200,
+      "basis": "RootGOlocalnewcheckoutrepair/integration ofexisting582SVTadapter: explicitCPU-only qualification path, originaldualdefaults/privatepolicyhardening preserved, meaningfulconstructor/parser/admission tests +pinnedCIchecks. No remote/scientificmodel/GPU/sourceproofreuse. 20prep+30focused+60lint/type+80broader+10reserve"
+    },
+    {
+      "phase": "ball-calibration-GPU-witness-external-metadata50-20261113",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "basis": "Rootreviewed exact885c metadatahelper39+query1+10external, 32e/source6f/archive5ca/confige478/native9095/approvedCPU7adf andscientific8f29/b290. NEWimmutablemetadata only; no observer/job/model/GPUauthority, completebootstrap/launcher reviewedseparatelybeforeexecution"
+    },
+    {
+      "phase": "ball-control-only-UUID-routing-local-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 220,
+      "gpu_seconds": 0,
+      "basis": "Rootprospectiveboundedlocalimplementation/checks optionalUUID eligibility +legacy-safe bare required_commands sentinel/clientcapability/CHILD-onlyworkerPATH. Independentbranch; science2c6d/confige478/source6f/archive5ca/env32e andmonitor/claims/launch/campaign unchanged. No remote/deployment/GPU. Stopbefore220CPUcompleteimplementation/checksceiling. Rootprospectivetighterdesign: NOworker_start/PATH edits; sentinel resolvedONLYviaexplicit eligibility-only which path, exactimmutabletoken verified. OrdinaryPATH andalldownstreamenv unchanged."
+    },
+    {
+      "phase": "ball-passive-resource-watch-a14-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 100,
+      "gpu_seconds": 0,
+      "basis": "One new<=45min/max9ticks passive5min inventory gpu2/gpu3A6000+gpu5/gpu6Ada; identicalwatch/spec, uniquea14 outputs. Prior a13 finished09:33:48/PID13657absent; nojobs/autosubmit/cancel/modeltimer.80work+20external conservativecharge"
     }
   ],
   "reservations": [
@@ -3117,8 +3145,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28-conventional-only-feasibility",
       "gpu_seconds": 600,
-      "cpu_seconds": 1800,
-      "status": "Remaining_unspent; internaltransferfromAda-stage; sourcebuildonly authorized, scientificcomputeUNRELEASED; same30clips/3SVTpoints/fullmetrics/CPUreceiver/sharedAda ordinaryjudges; noDCVC/scale/training or changedrules",
+      "cpu_seconds": 1600,
+      "status": "Remaining_unspent1600CPU/600GPU; rootreleased200CPUlocalqualification-pathrepair only from1800; realCPU/GPUoracle/48/full30UNRELEASED; preserve30clips/3SVTpoints/allmetrics/judges; no dualsourceadvance",
       "card": "docs/cards/k5d-svt-only-confirmation-2026-11-13.md"
     },
     {
@@ -3161,9 +3189,17 @@
       "phase": "ball-Ada-calibration-source-qualification-20261113",
       "workstream": "ball",
       "gpu_seconds": 900,
-      "cpu_seconds": 1130,
-      "status": "Remaining_unspent1130CPU/900GPU = GPUmetadata50/admin180/witness900CPU; native250/denial365/twopilots100/signalcontinuation20released; noGPUexecutionrelease",
+      "cpu_seconds": 1080,
+      "status": "Remaining_unspent1080CPU/900GPU = admin180/witness900CPU; native250/denial365/queuepilots+continuation120/GPUmetadata50 released; scientificGPUexecutionUNRELEASED",
       "card": "docs/cards/k5d-Ada-calibration-source-qualification-2026-11-13.md"
+    },
+    {
+      "phase": "ball-control-only-UUID-routing-activation-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 60,
+      "gpu_seconds": 0,
+      "status": "Remaining_unspent60CPU; realLinux control/API/sourceplane activation qualification only after exactcandidate review andquiescentownworkercheck; noGPU/model",
+      "card": "docs/cards/k5d-control-only-uuid-routing-2026-11-13.md"
     }
   ],
   "jobs": [
@@ -5912,7 +5948,7 @@
     {
       "job_id": "20261113T090138Z-e039d7c0",
       "phase": "ball-calibration-denial365-campaign-audit-20261113",
-      "state": "COMPLETE0; independentactualSVTnativepixels/fiveerrno13/31sourcegrants/PIDnamespace/lifecycleauditPASS recommendation; rootacceptance/ACK PENDING",
+      "state": "ROOTACCEPTED actualnormalSVTfilesystemdenial/nativepixels+initiallauncherkill/scopedteardown only; freshcanonicalCOMPLETE/gateTrue/noerror thenexactterminaleventACKed",
       "revision": "2c6d8581fbd64279dde554ca1402047d27ab7fa2",
       "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
       "snapshot_sha256": "5ca2d194b7e1a6032faf7ef60fe44924649e0a57471c12cda6264f9586260219",
@@ -5932,12 +5968,24 @@
       "no_resubmission": true,
       "local_run": "/private/tmp/pointstream-calibration-source-qualification-20261113/CPU-denial365-preflight-UNRELEASED/actual-run",
       "wait_backend": 16525,
-      "terminal_event_unacknowledged": "05f54ed1560f5446b855561f790919f2",
       "actual_denial_audit_local": "/private/tmp/pointstream-calibration-source-qualification-20261113/CPU-denial365-preflight-UNRELEASED/actual-run/actual-receiver-audit/independent-audit-summary.json",
       "smoke_publication_sha256": "fbbe16fa7d71bdec2e07667178967a982eeb58ffb1c994ac323d97a85ea7bdaf",
       "prospective_CPU_denial_proof_sha256": "a32d8f06fe83d5c404cabb66fba2958dcd8439c382b88a82509448cddefe1835",
-      "root_approval": null,
-      "current_cleanup_scope": "currentonly16births/18PIDsabsent/4groupsclear/FQDNCPUtokenabsent/alloc0; nohistoricalreleaseinterval"
+      "root_approval": true,
+      "current_cleanup_scope": "currentonly16births/18PIDsabsent/4groupsclear/FQDNCPUtokenabsent/alloc0; nohistoricalreleaseinterval",
+      "root_approval_local": "/private/tmp/pointstream-calibration-source-qualification-20261113/CPU-denial365-preflight-UNRELEASED/actual-run/root-acceptance.json",
+      "root_approval_sha256": "16a7d34e819a3d05cfbb0747bf89c01059547894e8bf464a7d0366af28dcc64a",
+      "terminal_event_acknowledged": "05f54ed1560f5446b855561f790919f2",
+      "approved_CPU_denial_proof_sha256": "7adf5e5dc70d64e0cd84406187db73311fb2d10dbcbcb83f2d84cb0f41a12865",
+      "approved_CPU_denial_proof_publication": {
+        "state": "COMPLETE0/physicalhash+0444file0555directoryverified",
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-calibration-Ada-real-CPU-4ef7b5301263acb0317e9aea3716d163/real-CPU-denial.json",
+        "sha256": "7adf5e5dc70d64e0cd84406187db73311fb2d10dbcbcb83f2d84cb0f41a12865",
+        "bytes": 7312495,
+        "receipt_local": "/private/tmp/pointstream-calibration-source-qualification-20261113/accepted-CPU-proof-and-witness-UNRUN/actual-upload/receipt.json",
+        "upload_backend": 35359,
+        "CPU_scope": "within365externalaudit40, noextraallocation"
+      }
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -5965,19 +6013,19 @@
     "Root20261113:13aba contended beforepoints/receivers;exactclaimreleaseunknown. Conservative1282GPU1632CPUdebit notmeasured use/perjoboverrun evidence; capcomplianceunverified. No newGPU untilPGID/sourcegates+durableindependentobserver. Outer/workstreamcapsunchanged."
   ],
   "monitoring": {
-    "state": "Active a13 passive five-minute resource watcher;100CPUprecharged; a12 ended9ticks/PIDabsent; no autosubmit/cancel/modeltimer",
+    "state": "running passive a14; no scientific job auto-submit",
     "scope": "gpu2/gpu3 A6000 and gpu5/gpu6 Ada",
-    "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a13",
+    "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a14",
     "native_completion_wakeup_verified": false,
     "native_completion_resume_verified": false,
     "accounting_limits": "SSH server/login aggregate unmetered; inner80 countedCPU plus20 external reserve; full100CPU charge retained",
     "scientific_jobs": "New2c6d nativeece387dc rootaccepted/ACKed/proof9095 physicallypublished; actualCPUdenialpreflight20 released only; oldae892/d1bb receiptpixelPASS/resourceobserverFAIL retained; noGPUrequest known",
     "source_sha256": "2b931eb5a25f7a87cc3594103ee845ec2582cc017309b7d479a99f637f6ee10c",
     "mode": "bounded_passive_native_resource_checks",
-    "pid": 13657,
-    "backend": 42714,
-    "started_utc": "2026-11-13T08:53:27.072383+00:00",
-    "deadline_utc": "2026-11-13T09:38:27.072274+00:00",
+    "pid": 18482,
+    "backend": 38838,
+    "started_utc": "2026-11-13T09:37:12.403346+00:00",
+    "deadline_utc": "2026-11-13T10:22:12.403246+00:00",
     "interval_seconds": 300,
     "max_ticks": 9,
     "jobs": [],
@@ -5988,11 +6036,7 @@
     ],
     "recurring_llm_polling": false,
     "completed": false,
-    "latest_inspected_completed_tick": {
-      "tick": 0,
-      "finished_utc": "2026-11-13T08:53:47.789114+00:00",
-      "eligible_idle_candidates": []
-    },
+    "latest_inspected_completed_tick": null,
     "previous_monitoring_snapshot": {
       "state": "Activea5passive5min45minwatch100CPUprecharged;priora4endedverified;noautosubmit/modeltimer",
       "scope": "gpu2/gpu3 A6000 and gpu5/gpu6 Ada",
@@ -6012,6 +6056,15 @@
       "native_completion_resume_verified": false,
       "recurring_llm_polling": false,
       "completed": false
+    },
+    "latest_inspected_completed_tick_UTC": "2026-11-13T09:13:52.902669+00:00",
+    "latest_inspected_candidates": [],
+    "prior_a13_final": {
+      "finished_utc": "2026-11-13T09:33:48.050607+00:00",
+      "ticks": 9,
+      "eligible_idle": false,
+      "PID13657_absent": true,
+      "backend42714": "unknown to currenttool; terminalreceipt+PIDcheck retained"
     }
   },
   "approval_history": [

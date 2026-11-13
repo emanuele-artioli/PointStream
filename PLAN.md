@@ -23,16 +23,21 @@ new dependency.
 
 ## Where PointStream stands (2026-11-13, UTC)
 
-### Current research decision (November 13, 09:05 UTC)
+### Current research decision (November 13, UTC)
 
 Frozen 2c6d source/cache and actual native CPU proof are accepted. Actual
 SVT receiver-denial job `20261113T090138Z-e039d7c0` completed and passed its
-validator and root evidence review; terminal acknowledgment is being closed. The external queue controller
+validator and root evidence review; terminal acknowledgment is complete and proof 7adf5e5d is published. The external queue controller
 passed its bounded Linux qualification; earlier failed attempts remain retained.
-No new-source GPU witness, paired calibration or full 30-clip run is released.
+No new-source GPU witness, paired calibration or full 30-clip run is released. The witness is held pending a separately reviewed scheduler route
+that guarantees one physical GPU across the two calibration jobs. The existing
+queue filters model names only. Minimal UUID/sentinel implementation is released
+for 220 local CPU-seconds; Linux activation remains separately held. Independent
+SVT-only draft PR387 is repairing one CI fixture sensitivity; no scientific
+release follows from its code checks.
 
 Five-minute resource checks cover A6000 and RTX 6000 Ada through one bounded
-window ending 09:38 UTC. Latest inspected completed check, 08:58:47 UTC, found
+window ending 10:22 UTC (a14). Latest inspected completed check, 09:37:30 UTC, found
 no eligible idle GPU. No automatic submission or verified model callback.
 The [canonical continuation](docs/continuation-2026-11-13.md) owns live job IDs,
 proofs and handles; the [budget ledger](docs/experiments/submission-research-budget-20261104.json)

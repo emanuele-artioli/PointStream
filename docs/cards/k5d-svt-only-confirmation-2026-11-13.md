@@ -69,3 +69,6 @@ paid compute, unbounded retries, full30 release, or changed quality rule.
 Original decision audits:
 `/private/tmp/pointstream-cpu-conventional-fallback-audit-20261113.md` and
 `/private/tmp/pointstream-shared-ada-fallback-audit-20261113.md`.
+
+
+November13 readiness audit found existing582fb64c adapter alreadybuilt (16frameonly; archived82focused/1880fullPASS,37skipped, Ruff/mypy524PASS) but actualCPU-only qualificationpath missing: oracle requirescpu_onlyTrue, witnesscallerdefaultsFalse. Rootreleased200CPU/zeroGPULOCALrepair fromheld1800; remaining1600CPU600GPU scientificallyUNRELEASED. Newindependentcheckout integrates frozen2c6d hardening withoutadvancingoriginals, explicitqualificationflag andnonmockedconstructor/parser/admission checks, preserving6pointdefaults. Completefutureforecastnotyetproven: native250+denial365+prep100+metadata50+admin200+reserve100 leaves535CPU foractual16oracle; measuredfitrequired,48/full30notcoveredbyreadiness. No paper/PRESLEY/training/runtime.
