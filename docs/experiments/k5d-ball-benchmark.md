@@ -2251,3 +2251,12 @@ Archive9054 COMPLETE0/SHA/fullreadbackPASS,235members/19500687B/file0444dir0555,
 Frozen readinessmanifest8cca4eca/ROOTconditional8b272791 confirms unchanged4282/sourcee4d4/archivef813/env32/config4fa on actualqualifiedgpu6Ada1ef96 (never siblingdbbb), fixed game10Clip12/586=581visible5abs. External4GiB/1GiBmember collector caps must widen; scientificsource/publish/full-livevalidation unchanged. Planning1.5*(586/292)*534.078900099+50=1657.724≤1750 remainsconditional. Originalquality-FIRST fresh16 executionwall slowdown(max1), ≤113.2016s effectivecutoff and≥1900campaignsecondsremaining stop early ifslow; no originalpooled10/197 override. Allnewsource/header/label/RAM64GiB/SSD128GiB/local96GiB/control/UUID/source-return/clock/caller gates remain before release. Fullraw/serverSSDverifier, Macfullgzip+compactsummary only.
 
 ROOT reservesphase3033CPU2420GPU, includespriorreadiness30. Newlocalops30CPU/G0 charged fromfailure90→60: expandedserverauditbuilder20, exactFALSExmetadata/validatorrecipebuilder10. Futurehold2973CPU2420GPU. No constructor/network/model/GPU release; no full30 or automaticretry. Latest programmefree11829CPU34121GPU/Ballfree7969CPU23433GPU afterreservation, subjectliveledger. Primarycloseout6d40e8c7 PR410automergeMERGE/CIpending; no paper/PRESLEY changes.
+
+
+### ONE SVT586 publication — 2026-11-13 23:50 UTC
+
+Actual job `20261113T235001Z-efa7e3e5` published once by backend93344 COMPLETE0; pending at canonical publication. Source4282/e4d4/f813/env32/config4fa, speca01aec57/raw822c213f, deadline2026-11-14T00:41:35.619983UTC, qualifiedgpu6Ada1ef96 shared. Full3033CPU2420GPU conservatively precharged including129 prior and2904 runtime. Metadata backend13309 ROOTaccepted11d13140; global97704 no active jobs and currentworker63425/control/cache/storage PASS. Runtime `/private/tmp/pointstream-SVT586-runtime-ROOT-20261113`. Actual fresh16 correctness/wholecost guard must pass before586. Before further action re-read this ID and run canonical ps-fleet status; never replay. No completion wait has started at this record.
+
+Canonical status71075 is RUNNING; admissionevents94378 retained. Solewait330 pending; no new request or replay.
+
+Sole canonical completionwait330 backend73024 IN_FLIGHT from23:52:40.940776UTC, outerdeadline2026-11-14T00:34:00.940776UTC/max2400/outer2480. Handle+PID receipt `actual-wait330/runner-backend-handle.json`; rootdelegatedqueue_binding_designownscommand. No secondwait. Nativecompletionmodelresume unverified.
