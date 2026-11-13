@@ -86,17 +86,22 @@ def _members(host_group: int) -> dict[int, str]:
     return found
 
 
-def _finish_group(host_group: int, known: dict[int, str], namespace_depth: int) -> None:
+def _finish_group(host_group: int, known: dict[int, str], namespace_depth: int) -> bool:
     """Signal only captured births via pidfds; unknown residuals fail closed."""
     deadline = time.monotonic() + 10
+    natural_deadline = time.monotonic() + 2
+    emergency_signal = False
     while True:
         remaining = _members(host_group)
         if not remaining:
-            return
+            return emergency_signal
         if any(known.get(pid) != birth for pid, birth in remaining.items()):
             raise RuntimeError('unknown residual surrogate member; no stale group signal')
         if time.monotonic() >= deadline:
             raise TimeoutError('surrogate process group did not become empty')
+        if time.monotonic() < natural_deadline:
+            time.sleep(.02)
+            continue
         for pid, birth in remaining.items():
             try:
                 identity = isolated._proc_identity(pid)
@@ -111,6 +116,7 @@ def _finish_group(host_group: int, known: dict[int, str], namespace_depth: int) 
                     if current['birth'] != birth or current['host_pgid'] != host_group:
                         raise RuntimeError('residual process changed before signal')
                     adapter.send(fd, signal.SIGKILL)
+                    emergency_signal = True
                 finally:
                     os.close(fd)
             except OSError as exc:
@@ -155,6 +161,11 @@ def _cleanup_group(process: subprocess.Popen[Any], host_group: int, known: dict[
             pass
     process.wait(timeout=10)
     _finish_group(host_group, known, depth)
+
+
+def _require_natural_group_exit(host_group: int, known: dict[int, str], depth: int) -> None:
+    if _finish_group(host_group, known, depth):
+        raise ValueError('surrogate required emergency cleanup after leader exit')
 
 
 def run(args: list[str]) -> None:
@@ -258,7 +269,7 @@ def run(args: list[str]) -> None:
                         os.killpg(_group(process), signal.SIGKILL)
                         process.wait(timeout=10)
                     raise
-            _finish_group(group, members_before, depth)
+            _require_natural_group_exit(group, members_before, depth)
             members_after = _members(group)
             if members_after:
                 raise ValueError('surrogate group still has host members')
@@ -300,6 +311,7 @@ def run(args: list[str]) -> None:
                             'namespace_depth': depth, 'leader': leader, 'control': control_identity,
                             'launcher_kill': kill_receipt,
                             'members_before': members_before, 'members_after': members_after,
+                            'emergency_cleanup_signals': 0,
                             'launcher': launcher, 'worker': observed,
                             'native_at_barrier': native, 'all_observed_births_absent': gone,
                             'unrelated_control_alive': control.poll() is None, 'returncode': process.returncode,
@@ -308,7 +320,7 @@ def run(args: list[str]) -> None:
                             'log_sha256': oracle.sha(log_copy), 'normal': normal})
         (output / 'oracle.json').write_text(json.dumps({'schema': 1, 'execution_identity': identity,
             'cases': results, 'scope': 'task-owned surrogate campaigns; not the fleet watchdog or GPU monitor',
-            'interruption_scope': 'launcher-only pidfd kill at synchronized startup; native may not have started',
+            'interruption_scope': 'launcher pidfd kill and scoped supervisor teardown; native may not have started',
             'abort_native_scope': 'native child only where observed at barrier',
             'claims_scope': 'fleet claim removal requires independent post-job audit'}, indent=2, sort_keys=True) + '\n')
     finally:
@@ -343,6 +355,7 @@ def validate() -> None:
                 native = case['native_at_barrier']
                 depth = case['namespace_depth']
                 if (leader['pid'] != case['group'] or leader['host_pgid'] != case['group']
+                        or case['emergency_cleanup_signals'] != 0
                         or type(depth) is not int or depth < 2
                         or len(leader['namespace_pids']) != depth
                         or leader['namespace_pids'][depth - 1] != case['namespace_group']
@@ -404,7 +417,7 @@ def validate() -> None:
         wall, cpu_seconds = fresh.stage_receipt(stage)
         target.write_text(json.dumps({'passed': True, 'checks': {'surrogate_lifecycle': True,
             'real_svt_normal': True}, 'wall_seconds': wall, 'cpu_seconds': cpu_seconds,
-            'limitation': 'fleet watchdog and post-job claims not tested'}) + '\n')
+            'limitation': 'supervisor may assist teardown; unshare-only cleanup, fleet watchdog and post-job claims not tested'}) + '\n')
     except Exception as exc:
         target.write_text(json.dumps({'passed': False, 'error': str(exc)}) + '\n')
         raise

@@ -86,3 +86,9 @@ def test_exited_leader_still_checks_group(monkeypatch: Any) -> None:
     monkeypatch.setattr(oracle, '_finish_group', lambda *_: events.append('finish'))
     oracle._cleanup_group(cast(Any, Child()), 100, {}, 2)
     assert events == ['wait', 'finish']
+
+
+def test_emergency_cleanup_cannot_pass_as_natural_exit(monkeypatch: Any) -> None:
+    monkeypatch.setattr(oracle, '_finish_group', lambda *_: True)
+    with pytest.raises(ValueError, match='emergency cleanup'):
+        oracle._require_natural_group_exit(100, {}, 2)
