@@ -2,17 +2,32 @@
 
 ## Current November 13 disposition (UTC)
 
-As of13:13UTC, exact-source a71 shared-Ada SVT16 job
-`20261113T130719Z-9f94f30c` is canonical COMPLETE/gatePASS/exit0. Independent
-physical artifacts/current cleanup and sole ACK remain pending before root
-acceptance. Fresh a71 native797deaed/receiver6af48d82 proofs are independently
-accepted, published and ACKed. The original strict memory-row failurec6b01236,
-two local packaging failures and all conservative charges are retained.
-Programme25041GPU/69151CPU, reserve120CPU on the repair card; no scale/neural
-comparison/speed claim. Live handles/pins are in the
-[current continuation](../continuation-2026-11-13.md) and ledger. Watcha18
-checks A6000/Ada every300s until13:22:34UTC, with no idle candidate at tick6.
-Paper/PRESLEY remain paused. Later dated journal entries retain exact receipts.
+Exact-source a71 shared-Ada SVT16 job `20261113T130719Z-9f94f30c`
+is independently ROOT accepted, current-cleanup verified and terminal-ACKed.
+All three SVT points, both arms, full/ROI metrics, both judges and isolated CPU
+receiving passed. The [acceptance index](k5d-inputs/svt-a71-9f94-shared16-root-acceptance-20261113.json)
+binds the original physical partial, separate semantic cleanup and immutable
+qualification archive80cf8ee8 (publication18958). Original post40 namespace-PID2
+collector failure and its full charge remain preserved. No neural, speed,
+independent GPU-span, scale or new-clip claim follows.
+
+The [saved188 failure-transition diagnostic](../cards/k5d-legacy188-failure-transitions-2026-11-13.md)
+is CLOSED at60CPU/GPU0 with independently reproduced4512 rows/48 tables and
+immutable archive5c181 (publication79394). It is retrospective and all-visible;
+absence and historical negative-calibration failures remain unresolved.
+[W7's native70 disposition](w7-inputs/native70-fixed-family-disposition-20261113.json)
+closes further spending solely on its two omissions: the legal CRF maximum is70,
+the two original cells stay unresolved and primary hull comparisons stay bracketed.
+
+The [SVT study port](../cards/k5d-svt-study-port-2026-11-13.md) is CODE ONLY:
+candidate4282c96f checks completed and are under root review. Source freeze,
+new qualification and all16/48/full-clip runtime stages remain unreleased.
+Programme25,041GPU/69,656CPU and Ball18,679GPU/45,655CPU are charged; the
+ledger retains authority for live holds. Repair unused75CPU returned, without
+refunding prior charges. Passive a19 backend67637/PID50947 checks A6000/Ada
+every300s until14:05:30.255090UTC; latest inspected tick6 at13:50:49.976972UTC
+found no idle candidate. No autosubmit or verified model-completion wakeup.
+Paper/PRESLEY remain paused. Exact earlier receipts remain below.
 
 ### Historical early-November13 disposition — superseded by current summary
 
@@ -1741,3 +1756,41 @@ ActualONEcanonicalwait82 backend79917 nowrunning for20261113T130719Z-9f94f30c; e
 ONEwait79917 stoppedexit1 onrootwrapperterminalassertion: actualcanonicalCLI10/reasonattention, savedstatusRUNNINGsmoke butfreshevents terminal:complete84da5e6ff49d5437a7e90255809572d4 +contentione2260965d25b5baf89f5ed1e56604dd7 samejob9f94f30c. Bothactualsnapshotsretained; no scientificfailure/pass inferred/no replay. ROOTreleasesONEfreshcanonicalstatus6 fromremaining12of18status/admission (leaves6), newcreateonlyactual-status6-refresh/helper5a56b2551f3df6f14b0f644a8e61e832d09e7a73520be6edf17111a93851bf10/release2d6257a28b6caa5b8a022edfdf65dfed09d3148ac2a77caf8055b01a0bf38bfc; source/model unchanged.
 
 Freshcanonicalstatus33861 confirms20261113T130719Z-9f94f30c COMPLETE/gatePASS/exit0 exactgpu6Ada1; terminalstatusSHA03f836399d1746773c1f06964494593fe3ab6eb6ee03800499fdab650bffb56d. Snapshotrace resolvedwithonefundedread, notjobreplay. Independentphysicalartifact/CPUreceiver/native/quality/currentcleanup audit pending beforeacceptance/soleeventACK/anyscale. Full848CPU600GPUchargeunchanged.
+
+ROOTpredeclares/releasesCPU-onlysaved188mechanismdiagnostic60CPU/GPU0 (cardk5d-legacy188-failure-transitions-2026-11-13), exactarchive622fd/rawlabel247c. All188/all6points/bothjudges/10pxprimary5secondary/sourcehit-missstrata/pairedrescueharm; noabsence/newclip/inference/CI/matched-ratecredit. Full60chargedfromunallocatedBall; stopmismatch/cap/noinputrepair, closeifnoveltynegative.
+
+ROOTreviews/releasesprepaidpost40ONEread-onlyactual9f94audit /private/tmp/pointstream-a71-SVT16-9f94-post40-FALSE-20261113 contractda126566/driver373c1735339ec1d19a460d0114abc23d963a589373dcbbba54a29bdcc109289f/release9bbd3e449ff7ed63ac2d14c68ca7c475d039929bb1d66fe22be0b8282d2262bf. Physical21native/wire/YUV/RGBmembers+6literalpacket/nativepairs, bounded32MiB/member256MiBJSON512MiBbinary, frozenCPUreceipt/native/reference/fullROI/judgejoins andcurrentcleanup/afterworkercontext. Source/runtime/oldpackageunchanged; rootdriveronlyaddsdefaultSIGXCPU forsoft3hard40. Complete40includes15remote+1query+2payloadSSH+3driver+5local+4aftercontext+10rootreview; no reserve120spent. No model/native rerun/GPU/ACK/upload/speed/scale.
+
+Saved188analysis firsta1STOP beforetransitions dueincorrectrawvisibility2==kind1 assertion; .073941CPU/nochildren/allinputpinsPASS. Rootcheckedexistingtracknet_labels raw1/2→kind1,0→0,other→-1; inputsunchanged. ROOTamendscardONEcorrecteda2analysis/retainrawvisibilitycolumn, cumulativeimplementation35CPU(a2<=34), same60precharge/rootreview10/reserve15. Nooutcomeselection/model/fetch/inputrepair; preservefailure.
+
+Post40actual9f94artifactaudit backend87049 nowrunning exactdriver373c/release9bbd; prepaid40, no newGPU/native/model/ACK.
+
+a18finished13:17:56UTC/9ticks/noidle/PID44010absent independentlyverified; full100charge retained. ROOTreleases/prechargesnewa19passive100CPU/GPU0 exactwatch2b931/byteexactspecf517/onlylaunchlabelpathdelta,300s/max9ticks/<=45min. Releaseea2deb065b0ccb935b0281036a6546debd0b8d203071ab2c9bf4fec5e5b8a176 path/private/tmp/pointstream-resource-watch-20261113-passive-a19; noautosubmit/modeltimer/GPUclaims/foreignchanges; nativecompletion-to-modelresumeUNVERIFIED.
+
+a19actualbackend67637/PID50947 started2026-11-13T13:20:30.093628+00:00 harddeadline2026-11-13T14:05:30.093628+00:00; exactruntime receipt retained at/private/tmp/pointstream-resource-watch-20261113-passive-a19/run/receipt.json. No modelwake/resumptionclaim orautosubmit.
+
+Post40backend87049 FAIL atcurrentPID/groupassertion beforequery/aftercontext/localchecks. Physical21members199667628B/6literalpairs/103007759JSONB completedverified, partialraw7742380e retained;1.225723remote+.02044waitedCPU/.473265localSSH. CapturedmapincorrectlyincludesnamespacePID2 fromactualdecoder/preexec rows; ROOTdiagnosisnotyetpromotion. No source/model rerun/ACK; full40charge retained.
+
+Saved188failuretransitions A2ROOTACCEPTED all4512source/prediction/distance/transition/bytejoins+48tables independentlyrecomputed againstarchive622fd. WASB10sourcehit174/miss14, sourcehitrescue/harm SVT48=43/0,SVT55=98/1,SVT62=146/0; source-miss0/0,1/0,7/0. DCVCallpointsretained; occasionalharmvisible. Newmechanismdiagnostic, noabsence/newclip/matched-rate/current-sourcecredit. Thinindexlegacy188-failure-transitions-root-acceptance-20261113.json; full60CPUretained, GPU0. Durabledatapublicationpendingwithinoriginal15reserve.
+
+ROOTreleasesONEboundedimmutablearchivepublication ofaccepted188transitions; deterministicarchive5c181ba8/265106B/12selectedmembers (allanalysiscode/results/CSV+ROOTreceipt+a1failure, noframes). Rootreleasedf334229f3ab38fe378ae39adbaaa10052e98c9052d87fdc6472e9948f50aaa4 helper25d5677d/remote63f9129f;15CPU withinoriginal60failure/adminreserve, notnewcharge. Targetk5d-legacy188-transitions-5c181ba8d5b1397addf6eb06/analysis.tar.gz, createonly/readback/0444file/0555dir/no replay.
+
+Saved188transitionarchive publication79394 COMPLETE0 ROOTphysicallyaccepted SHA5c181ba8/265106B/0444file/0555dir/readback, path/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-legacy188-transitions-5c181ba8d5b1397addf6eb06/analysis.tar.gz. Remote.038103+local.066909+SSH.017070CPU/4.265402wall. Full60CPUretained/GPU0, cardCLOSED andthinindexupdated; all6points/48tables/4512rows/code/provenance/rootreceipt/firstfailure recoverable. No codec/newclip/absence/scalecredit.
+
+ROOTdiagnosisconfirmedgenericcollectorwronglyread6decoder namespacePID2rows ashostPID2; explicitobservernamespace_pids mappings joinhost2003542/2005537/2007117+births. No foreignprocessscopedascandidateandnostrongcleanupyet. ROOTreleasesONEnewsemanticHOSTcleanup/localproofchain30CPU/GPU0 fromreserve120→90 inside2000card; originalpost40failure/fullcharge/raw774statusABSENTretained. New12hostidentities+onegroup, knownmodelbirthpreserved; all21savedphysicalhashbytejoins+frozenreceipt/wire/reference/fullROI/judges independentlyrechecked, no199MBtar/native/model rerun. Package/private/tmp/pointstream-SVT16-9f94-cleanup-repair30-FALSE-20261113 driver3e20591a5a1c515ed10a82fbcc6273a2324499e5020cfe4eeefbc3baf6f5eedc release576babccd1ffbd907c8afc108b45f78d52070fe1fd7abb7269ba8c92ce80a02c;30includesprep/review, currentcleanup only/no span/speed/scale/ACK.
+
+ROOTACCEPTSactuala71SVT16 job20261113T130719Z-9f94f30c: correctedsemanticcleanup62364 COMPLETE0/.950556completeCPU;12hostbirthscurrentlyabsent/onegroupempty/owntokens+GPUrowsabsent/sameworker1470412 controlsunchanged. Source/native/CPUreceipts/21physicalmembers/6literalpairs/fullROI/botharms/judges/referenceprojectionPASS; summary10e0aaef/rootapproval4525fc47bd4be8fe2d544c7f7c4fe6e154dd8facca61e367b48acc01c32c21f9. Observed29memorysnapshotsmaxdriver7276MiB/reserved6844MiBwithin10GiBclaim; noabsolutepeak/liveGPUspan/speed/scale/neural/newclipclaim. Post40failure/raw774unchanged retained besidecorrected30, no codec rerun. ROOTreleasesprepaidsoleACK6 exactsavedthisjobterminal84da+contentione226; eventfilejoinedtojob/terminalCOMPLETEexit0, release5e8de687e557e715346bbc41459d52284bd69f24da11dff25c3c337b2d579ef3. NoextraRPC/otherACK/automatic48.
+
+SoleACKfirstattemptSTOPknownlocalTypeErrorbeforeargv/intent/ACK/RPC: ROOTreleaseactual_job_identitywasNULL. Emptyactual-ackpreserved, original6charge retained. ROOTcorrectsreleasewithactualcanonicalidentity43659045+newcreateonlyactual-ack-corrected; exactevent84da/e226andacceptedproof4525unchanged. Replacement6CPU reassignedfromunused6of18status/admission (twoactualstatuscalls12), full848unchanged/noaddedcharge/GPU. Newhelper49ce821e4485d06ecc83095e25f40bae39d4cb3736bd0ade9b0b4e4216f8ff85 onlyoutputsuffixchange/ROOTrelease7cfc4080e8b5214dccdd3147a9c26d73e222f76a627f94dce4797e58bf21c746; ONElocalACKonly/nofreshstatus/events/SSH.
+
+AfterROOTactual9f94acceptance4525+exacteventACK, ROOTreleases/prechargesCODEONLY300CPU/GPU0 forONEopt-inSVTstudyport onindependenta71worktree: separatelynamedprofile/16+48+registeredfull modes, unchangedglobal6points/old16/defaults/31receivergrants/numerics, fullnativewirepixels/CPUreceipts/judges/absence/exposure/caps. Upperboundaccepted188tradeoff+current16supports evaluation, notfullstudywin. Freezecompleteportonce; freshsourcequalification/16/48cost/292/586/full30 requireseparaterootforecast/release. Cardk5d-svt-study-port-2026-11-13; notraining/models/GPU/native/paper/PRESLEY.
+
+CorrectedsoleACK COMPLETE0 exact84da/e226localonly/SSH0/.110897CPU, originalNULLidentityfailurepreserved/noextraGPU. ROOTcloses9f94scientific/correctness/currentcleanup phase; metadataarchive15CPU fromreserve90→75 prospectivelyreleased/precharged (archive2+verify2+local2+SSH2+remote2+reserve5), exactimmutablepublicationreleaseafterlocalpinsreview. Selectedpartial774+originalfailedtrace+semanticcleanup/rootproof/code, <=32MiBinputs/<=4MiBarchive/no newpixels/inference. OriginalDatasetsjobarchivesreadonly/preserved.
+
+ROOTreviews/releasesONEa71SVT16qualificationarchivepublication15prepaid:81selectedmembers/21842428inputB/archive1263646B/SHA80cf8ee8. Helpersbyteexacttoaccepted79394 exceptprefix/filename; currentROOTproof4525+partial774/failedtrace+semanticcleanup/code/bindings/terminal/events/ACKretained. Rootreleasedc9e389619c277de92c98d278d7a99283e1c1bc6a38a7169b63b641d05a2e228; no newsource/model/native/GPU/overwrite/retry. Targetk5d-a71-SVT16-9f94-80cf8ee8a741e0ebce364995/qualification.tar.gz createonlyreadback0444/0555.
+
+SVT16qualificationarchive publication18958 COMPLETE0 ROOTphysicallyaccepted: SHA80cf8ee8/1263646B/81members/readback/file0444/dir0555 at/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-a71-SVT16-9f94-80cf8ee8a741e0ebce364995/qualification.tar.gz. Fullrootproof/partial774+failedcollectortrace/newsemanticcleanup/code/provenance/terminal/events/exactACK recoverablewithoutlocaltmp. Remote.051101/local.076100/SSH.028500CPU/5.338843wall; prepaid15retained. Actual9f94phaseCLOSED, repairreserve75held; sourceportcode300onlyactive, noGPU/newsourcequal/48/scaleinferenceyet.
+
+ROOTfinalbudgetcloseout ofmemoryrepaircard: actual9f94ROOTaccepted/currentcleanup+durablearchive18958+exactACKallclosed; unexecuted/unreleased75CPUreserve returnedtoBallunallocated, oldreservationnow0held. Complete1925CPU/600GPU conservativechargesretained inside2000ceiling; no earliercharge refunded. Newstudycode300separatecardonlyactive.
+
+ROOTprospectivelyallocatesnew1100CPU/GPU0 exactSVTstudy-sourcequalificationenvelope insideunchanged24G28C/Balllimits: sourceprep100fullyprecharged, native327+receiver585+reserve88=1000held. Scientific4282c96f/finalreviewGO/PR398 pendingintegrationCI. OnlyofflineUNRUNhelperadaptationreleasednow; exactfreeze/cacheexecution requireCI/rootpinsrelease. Freshnative+actualCPUdenialrequired, nooldproofrebind/GPU/48/scale/paper. Cardk5d-svt-study-source-qualification-2026-11-13.

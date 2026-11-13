@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "date": "2026-11-13",
+  "approved": true,
+  "scope": "Read-only re-audit of existing accepted W7 native strict-family omissions; no new encode/score/GPU run.",
+  "decision": "CLOSED research decision to spend solely on these omissions. Original strict-family cells remain unresolved; pooled primary achievable-envelope SVT comparisons already bracketed. New preset/ROI/cadence/framing would be a different scientific comparison.",
+  "original_oracle_sha256": "95788528fdef505ead5a341dd5e9e11a7b0b5fa6d690a80d2489fa9efa29fe2f",
+  "scorer_receipt": "docs/experiments/w7-inputs/narrow-five-40ee5e97-score-receipt-20261105.json",
+  "accepted_primary_report": "docs/experiments/w7-inputs/ivf-mkv-corrected-tier1-report-20261105.json",
+  "existing_disposition": "docs/experiments/remaining-plan-research-20261105.md#root-disposition--w7-strict-family-sensitivity-november5",
+  "fixed_family_legal_CRF": [
+    1,
+    70
+  ],
+  "fixed_family": "preset4/keyint-1/lp6/half960x544/offset-20-outside/240frames-50fps/nativeIVF",
+  "rows": [
+    {
+      "window": "med000",
+      "family": "s2_o20_crf70",
+      "native_ivf_bytes": 25420,
+      "native_ivf_sha256": "29266563b82ff50bef0fbc11644b9d1040829c5385d949be547ca32794112111",
+      "native_kbps": 42.366666666666674,
+      "target_kbps_2hour": 42.25204888888889,
+      "strict_below_target_max_bytes": 25351,
+      "remaining_byte_gap": 69,
+      "crf": 70
+    },
+    {
+      "window": "med019",
+      "family": "s2_o20_crf70",
+      "native_ivf_bytes": 25248,
+      "native_ivf_sha256": "a7a5678ca18ec89c8b28e00198b441d1c780325ef706129a8d52ed3e5c82b80b",
+      "native_kbps": 42.080000000000005,
+      "target_kbps_2hour": 42.01554888888889,
+      "strict_below_target_max_bytes": 25209,
+      "remaining_byte_gap": 39,
+      "crf": 70
+    }
+  ],
+  "hardware": "Encoder is CPU; Ada can score under existing --allow-ada and all original controls, but accepted narrow caller is A6000-only and has no shared-memory receipt. No Ada oracle warranted just for these omissions.",
+  "new_GPU": 0,
+  "new_workload_CPU": 0
+}

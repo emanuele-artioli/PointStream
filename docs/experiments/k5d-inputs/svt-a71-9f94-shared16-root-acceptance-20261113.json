@@ -1,0 +1,52 @@
+{
+  "approved": true,
+  "job_id": "20261113T130719Z-9f94f30c",
+  "source_revision": "a71dc6e27743efaa4fb5bbe2e8c8b387ae51ba02",
+  "source_sha256": "bb717a9d9fa7d848a3891717c37c0973add82706bc1690bc96aa0961c4804108",
+  "snapshot_sha256": "e05187c40ebc81f7505172be11ed20807b4baa97803c80039dc43f3ea33c8abc",
+  "spec_sha256": "09483746720ed7a18657540f4b1a217c7375ef86d9892cb35ef60dc39b0970ca",
+  "canonical_status_sha256": "03f836399d1746773c1f06964494593fe3ab6eb6ee03800499fdab650bffb56d",
+  "partial_raw_sha256": "7742380ec79de55195cba9a668de582c849d1490b7204d42b9db8e757196ba83",
+  "independent_summary_sha256": "10e0aaef5cb6a4766b7958d1f208c69064367e822ecec9cfd4ed43bce92c52b8",
+  "cleanup_sha256": "659f1a2d564a7b8e2d7062e1929ba5b5b69d034d680ce35e02dcaf98d663036a",
+  "aftercontext_sha256": "ae09735a30f00caf6e44c982bc321bd2101f390541e86c244b93500ccad6bec2",
+  "physical_members": 21,
+  "literal_packet_native_pairs": 6,
+  "captured_host_identities": 12,
+  "empty_groups": 1,
+  "frames": 16,
+  "SVT_points": [
+    48,
+    55,
+    62
+  ],
+  "GPU": "gpu6 RTX6000Ada UUIDef96",
+  "scope": "Exact-source shared-SVT16 correctness and feasibility with actual CPU-only isolated receiver/native-wire-pixel joins/fullROI/botharms/judges/sameGPUreferenceprojection. No newclip/fullstudy/neural/speed/scale/independentGPUspan claim.",
+  "memory_scope": "29observed snapshots, noabsolutehardwarepeak claim",
+  "max_observed_driver_MiB": 7276.0,
+  "max_observed_reserved_MiB": 6844.0,
+  "preserved_failure": "Post40collector falselytreatednamespacePID2ashost; originalraw774/statusabsent/error/full40charge preserved. Separate30correctsemanticcleanup/currentproof, no codec rerun.",
+  "event_ids": [
+    "84da5e6ff49d5437a7e90255809572d4",
+    "e2260965d25b5baf89f5ed1e56604dd7"
+  ],
+  "events_sha256": "bde2d79743f88ad3f20e348dd6c2e521eaf8c4aea361d601ffcaa9c7f3205820",
+  "current_cleanup_only": true,
+  "root_approval_sha256": "4525fc47bd4be8fe2d544c7f7c4fe6e154dd8facca61e367b48acc01c32c21f9",
+  "CPU_precharged_real16": 848,
+  "GPU_precharged": 600,
+  "additional_cleanup_CPU": 30,
+  "root_local_approval": "/private/tmp/pointstream-SVT16-a71-9f94-ROOT-acceptance-20261113/root-approved-SVT16.json",
+  "terminal_events_acknowledged": true,
+  "ACK_receipt_path": "/private/tmp/pointstream-SVT-a71-first16-stock-FINAL-FALSE-20261113-ROOT-singlethread-correct-limit/actual-ack-corrected/stdout.json",
+  "durable_qualification_archive": {
+    "approved": true,
+    "backend": 18958,
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-a71-SVT16-9f94-80cf8ee8a741e0ebce364995/qualification.tar.gz",
+    "sha256": "80cf8ee8a741e0ebce3649950a46cf879c011be529fe4927c89b40eefbd098c4",
+    "bytes": 1263646,
+    "file_mode": "0444",
+    "directory_mode": "0555",
+    "receipt_sha256": "372d9812a98e97d2515816f7332f3c06d499783521a7de3d856e5b9aac87db90"
+  }
+}
