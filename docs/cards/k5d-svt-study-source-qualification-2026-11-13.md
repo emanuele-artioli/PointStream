@@ -1,17 +1,27 @@
 # K5d: qualify the frozen opt-in SVT study source
 
 Status: sourceprep100CPU/GPU0 is accepted/CLOSED. Scientific4282/sourcee4d4/
-archivef813/config4fa/ROOTsourcebridge849/cache71ef passed immutable seven-file
-physical readback; certificate370b and physical report5545/raw receipts are
-recoverable in the [tracked index](../experiments/k5d-inputs/svt-study4282-source-cache-acceptance-20261113.json).
-PR398 passed CI and merged625647fa; documentation PR399 merged359824f8.
-The1100CPU/GPU0 envelope has1032CPU precharged: source100 +native327
-+receiver585 +native local repair10 +receiver local preparation10. Only68CPU
-reserve remains held. Only OFFLINE local UNRUN metadata/package preparation is
-released for either job; the receiver's new native proof is unbound. No actual
-native/receiver job, runtime preflight, publication or GPU release exists yet.
-No GPU16/48/292/586/full30 authority. The protocol below retains the prospective
-requirements; the current source-only acceptance does not supply runtime proofs.
+archivef813/config4fa/ROOTsourcebridge849/cache71ef has immutable physical
+readback; the [source index](../experiments/k5d-inputs/svt-study4282-source-cache-acceptance-20261113.json)
+retains exact receipts. PR398 passed CI/merged625647fa; documentation PR399/359824f8.
+Actual native job `20261113T142805Z-d1090553` is COMPLETE/gatePASS/exit0/GPU-null,
+independently root accepted for native CPU containment/accounting only. Four
+cases passed;21 host processes/19 births/four groups are cleared currently,
+and worker context matches except CPU6.67→6.97. Normal CPU1.350349 inner/
+1.446699 outer. Proofb79de312 is physically published via71472,7907B/0444/0555;
+[the native index](../experiments/k5d-inputs/svt-study4282-d109-native-CPU-acceptance-20261113.json)
+retains recoverable proof/receipt/status/events/ACK bytes and provenance. Sole
+terminal event220b51c0f4ad5b2289913d73103fb738 is ACK-closed after fresh canonical
+PASS; the first local release-hash guard rejection is preserved within ACK15.
+No restricted-receiver/GPU/general/kernel/quality
+or scale credit follows.
+The1100CPU/GPU0 envelope retains1062CPU precharged: source100 +native327
++receiver585 +native local repair10 +receiver local preparation10 +replacement
+native preflight30; only38CPU reserve remains held. Original preflight80721
+stale-pin failure and all caller failures/charges remain preserved. Receiver585
+is still local UNRUN package preparation only; no actual receiver job or runtime
+release, and no GPU16/48/292/586/full30 authority. The protocol below retains the
+prospective requirements; source/native acceptance does not replace CPU receiving.
 
 Goal: establish exact-source native and CPU receiver evidence for the complete
 study port, preserving the accepted a71 source/proofs/results read-only. The

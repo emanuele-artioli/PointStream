@@ -1,0 +1,104 @@
+{
+  "ACK_events_raw": "{\n  \"job_id\": \"20261113T142805Z-d1090553\",\n  \"status\": \"complete\",\n  \"events\": [\n    {\n      \"id\": \"220b51c0f4ad5b2289913d73103fb738\",\n      \"kind\": \"terminal:complete\",\n      \"timestamp\": 1794580165.4260263,\n      \"status\": {\n        \"status\": \"complete\",\n        \"started\": 1794580125.0793822,\n        \"last_progress\": 1794580165.4260263,\n        \"emitted\": [],\n        \"pid\": 2271402,\n        \"proc_start_time\": 1794580125.17,\n        \"process_group_id\": 2271402,\n        \"progress\": {\n          \"stage\": \"full\",\n          \"completed\": 1,\n          \"updated\": 1794580155.6529012,\n          \"decision\": null\n        },\n        \"exit_code\": 0,\n        \"ended\": 1794580165.4260263\n      },\n      \"one_shot\": true\n    }\n  ]\n}\n",
+  "ACK_events_sha256": "fadfe371d72ba3113e858aecfda30b0368845053db0a57eebe3b40d41dbb5d9b",
+  "ACK_fresh_canonical_status_raw": "{\n  \"job_id\": \"20261113T142805Z-d1090553\",\n  \"created\": 1794580097.6816192,\n  \"status\": \"complete\",\n  \"updated\": 1794580185.1353273,\n  \"host_alias\": \"gpu6\",\n  \"gpu\": null,\n  \"gpu_sharing\": null,\n  \"supervisor_pid\": 2271383,\n  \"remote_status\": {\n    \"status\": \"complete\",\n    \"started\": 1794580125.0793822,\n    \"last_progress\": 1794580165.4260263,\n    \"emitted\": [\n      \"terminal:complete\"\n    ],\n    \"pid\": 2271402,\n    \"proc_start_time\": 1794580125.17,\n    \"process_group_id\": 2271402,\n    \"progress\": {\n      \"stage\": \"full\",\n      \"completed\": 1,\n      \"updated\": 1794580155.6529012,\n      \"decision\": null\n    },\n    \"exit_code\": 0,\n    \"ended\": 1794580165.4260263\n  },\n  \"directory\": \"/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261113T142805Z-d1090553\",\n  \"gate\": {\n    \"passed\": true,\n    \"spec_sha256\": \"ab80b3e689f12d5a347002be4c92022e64a4b987b59f204acae15c0f98c61fd8\",\n    \"source_sha256\": \"e4d4a856a06c5f9a06586056ab4a30f0c73b232e5a3db035ae6eb5546063f80b\",\n    \"inputs\": [\n      {\n        \"path\": \"/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-20261104-inputs/tracknet-dataset.zip\",\n        \"sha256\": \"bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18\"\n      }\n    ],\n    \"validation\": {\n      \"checks\": {\n        \"four_exit_modes\": true,\n        \"native_and_namespace\": true,\n        \"normal_cpu_comparison\": true,\n        \"owned_pids_absent\": true\n      },\n      \"passed\": true\n    },\n    \"validator_seconds\": 0.12481451034545898,\n    \"smoke_seconds\": 23.97036337852478,\n    \"remaining_seconds\": 75.79817748069763,\n    \"attempt\": 1\n  },\n  \"campaign_error\": null\n}\n",
+  "ACK_fresh_canonical_status_sha256": "34c9ffcc29294bf68731159ce142365abf318d9f038b699dbb2a86f940fd4354",
+  "ACK_measured_CPU": {
+    "SSH": 0.12966,
+    "SSH_calls": 2,
+    "local": 0.154438,
+    "wall": 8.795690541999647
+  },
+  "ACK_receipt": "/private/tmp/pointstream-study4282-native327-COMPLETE-FALSE-141408-v3-final/post62/actual-20261113T142805Z-d1090553/ACK15-ROOT/result.json",
+  "ACK_response_raw": "{\n  \"acknowledged\": [\n    \"220b51c0f4ad5b2289913d73103fb738\"\n  ]\n}\n",
+  "ACK_response_sha256": "786bad03f4ce6b9e90986c293eb6c531cba9a8e678f86727cacfeece7799daba",
+  "ACK_result_raw": "{\n  \"job_id\": \"20261113T142805Z-d1090553\",\n  \"ack\": {\n    \"acknowledged\": [\n      \"220b51c0f4ad5b2289913d73103fb738\"\n    ]\n  },\n  \"other_events_not_ACKed\": [],\n  \"canonicalstatus_pass\": true,\n  \"local_CPU\": 0.154438,\n  \"waited_SSH_CPU\": 0.12966,\n  \"wall\": 8.795690541999647,\n  \"SSHcalls\": 2,\n  \"no_new_allocation\": true\n}\n",
+  "ACK_result_sha256": "19d9364e98b3aeb612fa95858f98f01bdadf7e6a49c85aafce32eb947d085774",
+  "ACK_scope": "Fresh canonical COMPLETE/gatePASS source/spec joins, only exact terminal event;2SSH calls; root first wrong literal release hash rejected before intent/output/SSH and retained inside15CPU ACK envelope; no job replay.",
+  "ACK_status": "CLOSED; sole exact terminal event acknowledged, no others",
+  "GPU_precharged": 0,
+  "GPU_qualified": false,
+  "additional_preflight_repair_CPU": 30,
+  "approved": true,
+  "canonical_status_sha256": "34c9ffcc29294bf68731159ce142365abf318d9f038b699dbb2a86f940fd4354",
+  "cases": [
+    {
+      "case": "normal",
+      "escalated_to_sigkill": false,
+      "returncode": 0
+    },
+    {
+      "case": "timeout",
+      "escalated_to_sigkill": false,
+      "returncode": 1
+    },
+    {
+      "case": "sigterm",
+      "escalated_to_sigkill": true,
+      "returncode": -9
+    },
+    {
+      "case": "sigkill",
+      "escalated_to_sigkill": false,
+      "returncode": -9
+    }
+  ],
+  "current_cleanup": {
+    "allocations": {},
+    "births_absent": 19,
+    "correct_FQDN_claim_exists": true,
+    "empty_groups": {
+      "2271402": [],
+      "2272008": [],
+      "2272565": [],
+      "2272584": []
+    },
+    "host_processes_absent": 21
+  },
+  "evidence_limit": "Native two-frame workload reports source RGB/YUV/native-IVF/decoded-YUV hashes and real commands. This publication does not retain PSBL/receiver-rendered RGB bytes and proves no restricted receiver, GPU or quality gate.",
+  "general_or_kernel_readiness": false,
+  "identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "f813e09d2fa0eb51b5ec160dcda0cd230d3dada7be697882f9b657201490e61d",
+    "source_sha256": "e4d4a856a06c5f9a06586056ab4a30f0c73b232e5a3db035ae6eb5546063f80b"
+  },
+  "independent_summary_sha256": "73125c7b208f04187a6eaffc18746df0bc393c02f1a704c7f1fdd297078a544d",
+  "job_id": "20261113T142805Z-d1090553",
+  "local_actual_package": "/private/tmp/pointstream-study4282-native327-COMPLETE-FALSE-141408-v3-final/post62/actual-20261113T142805Z-d1090553",
+  "local_metadata_repair_CPU": 10,
+  "native_phase_CPU_precharged": 327,
+  "native_proof_bytes": 7907,
+  "native_proof_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-SVT-native-CPU-7121801d23aeac8a5350451a97edd867/native-CPU.json",
+  "native_proof_raw": "{\n  \"GPU_qualified\": false,\n  \"ROOT_review\": \"ROOT accepts actual native CPU containment/accounting/currentcleanup only after source/spec/commands/fourcases/CPU/join audit; no receiver/GPU/general/kernel/quality/scale authority.\",\n  \"accounting\": \"Full native327+preflight repair30+localmetadatarepair10 conservative charges retained; no measured aggregate-fit claim\",\n  \"all_owned_pids_absent\": true,\n  \"approved\": true,\n  \"audited\": true,\n  \"canonical_status_sha256\": \"34c9ffcc29294bf68731159ce142365abf318d9f038b699dbb2a86f940fd4354\",\n  \"case_results\": [\n    {\n      \"case\": \"normal\",\n      \"escalated_to_sigkill\": false,\n      \"returncode\": 0\n    },\n    {\n      \"case\": \"timeout\",\n      \"escalated_to_sigkill\": false,\n      \"returncode\": 1\n    },\n    {\n      \"case\": \"sigterm\",\n      \"escalated_to_sigkill\": true,\n      \"returncode\": -9\n    },\n    {\n      \"case\": \"sigkill\",\n      \"escalated_to_sigkill\": false,\n      \"returncode\": -9\n    }\n  ],\n  \"cases\": [\n    \"normal\",\n    \"timeout\",\n    \"sigterm\",\n    \"sigkill\"\n  ],\n  \"consumer_execution_identity\": {\n    \"environment_sha256\": \"32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661\",\n    \"snapshot_sha256\": \"f813e09d2fa0eb51b5ec160dcda0cd230d3dada7be697882f9b657201490e61d\",\n    \"source_sha256\": \"e4d4a856a06c5f9a06586056ab4a30f0c73b232e5a3db035ae6eb5546063f80b\"\n  },\n  \"current_cleanup\": {\n    \"allocations\": {},\n    \"births_absent\": 19,\n    \"correct_FQDN_claim_exists\": true,\n    \"empty_groups\": {\n      \"2271402\": [],\n      \"2272008\": [],\n      \"2272565\": [],\n      \"2272584\": []\n    },\n    \"host_processes_absent\": 21\n  },\n  \"evidence_limit\": \"Native two-frame workload reports source RGB/YUV/native-IVF/decoded-YUV hashes and real commands. This publication does not retain PSBL/receiver-rendered RGB bytes and proves no restricted receiver, GPU or quality gate.\",\n  \"general_readiness\": false,\n  \"gpu_used\": false,\n  \"independent_cpu_match\": true,\n  \"independent_summary_sha256\": \"73125c7b208f04187a6eaffc18746df0bc393c02f1a704c7f1fdd297078a544d\",\n  \"job_id\": \"20261113T142805Z-d1090553\",\n  \"kernel_readiness\": false,\n  \"namespace_wrapper_sha256\": \"efeae854e87663e0b09741432b5bc4ee84fa2955dcf5c68edeea5dd35aae2072\",\n  \"native_artifact_audit_sha256\": \"02ec49922d04522f49196b43fc90a1f02b021367db685f59457d1fd837524320\",\n  \"normal_CPU\": {\n    \"difference_CPU\": 0.09635000000000016,\n    \"inner_CPU\": 1.3503489999999998,\n    \"native_commands_sha256\": \"7c6c40e820a3274b9ef70e895ae7b9620a47f311b94828f9cfb405f546fe236f\",\n    \"native_output\": {\n      \"clip\": \"tracknet/game9/Clip5\",\n      \"conversion_command\": [\n        \"/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg\",\n        \"-v\",\n        \"error\",\n        \"-nostdin\",\n        \"-f\",\n        \"rawvideo\",\n        \"-pix_fmt\",\n        \"rgb24\",\n        \"-s\",\n        \"1280x720\",\n        \"-r\",\n        \"30\",\n        \"-i\",\n        \"pipe:0\",\n        \"-frames:v\",\n        \"2\",\n        \"-vf\",\n        \"scale=in_range=pc:out_range=tv:out_color_matrix=bt709,format=yuv420p\",\n        \"-f\",\n        \"rawvideo\",\n        \"/local/users/emanuele/pointstream/scratch/20261113T142805Z-d1090553-smoke/native-normal/source.yuv\"\n      ],\n      \"decoded_sha256\": \"8178fcadb82e8abf3571fe6e88015512b55be76122eadb26a55bbe52c60840e5\",\n      \"frames\": 2,\n      \"native\": {\n        \"cpus\": [\n          0\n        ],\n        \"decode_command\": [\n          \"/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d\",\n          \"-i\",\n          \"/local/users/emanuele/pointstream/scratch/20261113T142805Z-d1090553-smoke/native-normal/stream.ivf\",\n          \"-o\",\n          \"/local/users/emanuele/pointstream/scratch/20261113T142805Z-d1090553-smoke/native-normal/decoded.yuv\",\n          \"--threads\",\n          \"1\",\n          \"--quiet\"\n        ],\n        \"decode_cpu_seconds\": 0.01,\n        \"decode_seconds\": 0.013,\n        \"decoded\": \"/local/users/emanuele/pointstream/scratch/20261113T142805Z-d1090553-smoke/native-normal/decoded.yuv\",\n        \"decoded_frames\": 2.0,\n        \"encode_command\": [\n          \"/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp\",\n          \"-i\",\n          \"/local/users/emanuele/pointstream/scratch/20261113T142805Z-d1090553-smoke/native-normal/source.yuv\",\n          \"-b\",\n          \"/local/users/emanuele/pointstream/scratch/20261113T142805Z-d1090553-smoke/native-normal/stream.ivf\",\n          \"-w\",\n          \"1280\",\n          \"-h\",\n          \"720\",\n          \"--input-depth\",\n          \"8\",\n          \"--fps-num\",\n          \"30\",\n          \"--fps-denom\",\n          \"1\",\n          \"-n\",\n          \"2\",\n          \"--color-range\",\n          \"0\",\n          \"--rc\",\n          \"0\",\n          \"--crf\",\n          \"48\",\n          \"--preset\",\n          \"4\",\n          \"--keyint\",\n          \"-1\",\n          \"--lp\",\n          \"6\",\n          \"--progress\",\n          \"0\"\n        ],\n        \"encode_cpu_seconds\": 0.856,\n        \"encode_seconds\": 0.862,\n        \"file_bytes\": 29010,\n        \"host_load_before\": [\n          5.28,\n          5.56,\n          5.11\n        ],\n        \"payload_bytes\": 28954,\n        \"stream\": \"/local/users/emanuele/pointstream/scratch/20261113T142805Z-d1090553-smoke/native-normal/stream.ivf\",\n        \"stream_sha256\": \"fd445f424549a3bfec7c4966f98f8b67252f64ab46ea1083f1551450beded494\",\n        \"temporal_units\": 2\n      },\n      \"source_rgb_sha256\": \"0e1babb508275844bc16798ce0ff2ea42dedd3be2998710303ae432a0d43679e\",\n      \"source_sha256\": \"bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18\",\n      \"tools\": {\n        \"decoder\": \"e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6\",\n        \"encoder\": \"4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4\",\n        \"ffmpeg\": \"7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2\"\n      },\n      \"yuv_sha256\": \"3b12ccda5a3b56fa3dd59f0bbf8f3604b4e731aeb7a0a3b02ddd8d45347c661a\"\n    },\n    \"outer_CPU\": 1.446699\n  },\n  \"passed\": true,\n  \"physical_source_archive\": {\n    \"bytes\": 24002560,\n    \"path\": \"/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261113T142805Z-d1090553/source.tar\",\n    \"sha256\": \"f813e09d2fa0eb51b5ec160dcda0cd230d3dada7be697882f9b657201490e61d\"\n  },\n  \"producer_execution_identity\": {\n    \"environment_sha256\": \"32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661\",\n    \"snapshot_sha256\": \"f813e09d2fa0eb51b5ec160dcda0cd230d3dada7be697882f9b657201490e61d\",\n    \"source_sha256\": \"e4d4a856a06c5f9a06586056ab4a30f0c73b232e5a3db035ae6eb5546063f80b\"\n  },\n  \"production_validator\": {\n    \"checks\": {\n      \"four_exit_modes\": true,\n      \"native_and_namespace\": true,\n      \"normal_cpu_comparison\": true,\n      \"owned_pids_absent\": true\n    },\n    \"passed\": true\n  },\n  \"production_validator_source_sha256\": \"b48bd93f146e52265ae7508090f866313609c75d75a61496605397ed381d29fe\",\n  \"restricted_receiver_qualified\": false,\n  \"revision\": \"4282c96f8aaf7d229f53df4c1c5f8225d8454d6e\",\n  \"schema\": 1,\n  \"scope\": \"native CPU PID containment and accounting\",\n  \"smoke_publication_sha256\": \"aa3ad35b5abeb32d2e0da0191f95b95b01ab7036cd064552bc4492ed07e8b2fd\",\n  \"source_cache_ROOT_acceptance_sha256\": \"370b9aff662334f382f84cd2529818f0ef2795108135b9f6663ecce06b8f6818\",\n  \"source_clip_input_sha256\": \"bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18\",\n  \"spec_sha256\": \"ab80b3e689f12d5a347002be4c92022e64a4b987b59f204acae15c0f98c61fd8\",\n  \"unshare_sha256\": \"9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6\",\n  \"worker_CPU_after\": 6.97,\n  \"worker_CPU_before\": 6.67,\n  \"worker_after_sha256\": \"3d59cbcf007c26a77f2984b8e31ca9793010d4697f3baca77b59879ab31b5381\",\n  \"worker_before_sha256\": \"09329f50d04759b93e4a7993b297c109be702cc01c01721366cd3f826584d499\",\n  \"worker_context_equal_except_CPU\": true\n}\n",
+  "native_proof_sha256": "b79de31293dee3cf044414db3432de433664e298fe790763fe4811aace174e1b",
+  "normal_inner_CPU": 1.3503489999999998,
+  "normal_outer_CPU": 1.446699,
+  "physical_publication_directory_mode": "0555",
+  "physical_publication_file_mode": "0444",
+  "physical_receipt_raw": "{\"CPU\": 0.035837999999999995, \"bytes\": 7907, \"directory_mode\": \"0555\", \"file_mode\": \"0444\", \"path\": \"/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-SVT-native-CPU-7121801d23aeac8a5350451a97edd867/native-CPU.json\", \"sha256\": \"b79de31293dee3cf044414db3432de433664e298fe790763fe4811aace174e1b\", \"status\": \"exact root-approved newnativeproof uploaded only; no scientific execution\", \"wall\": 0.20997403096407652}\n",
+  "physical_receipt_sha256": "918584cd66afb4d7e7e915656463f26a63a224828ff09c538a9c45a4da624a84",
+  "producer_execution_identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "f813e09d2fa0eb51b5ec160dcda0cd230d3dada7be697882f9b657201490e61d",
+    "source_sha256": "e4d4a856a06c5f9a06586056ab4a30f0c73b232e5a3db035ae6eb5546063f80b"
+  },
+  "quality_or_scale_qualified": false,
+  "raw_audit_sha256": "02ec49922d04522f49196b43fc90a1f02b021367db685f59457d1fd837524320",
+  "raw_recovery": "Encode each *_raw string as UTF-8 without added whitespace/newlines; SHA256 must match its named proof/receipt digest. Original proof/audits/candidate/failures remain read-only at actual-package provenance paths.",
+  "restricted_receiver_qualified": false,
+  "revision": "4282c96f8aaf7d229f53df4c1c5f8225d8454d6e",
+  "schema": 1,
+  "scope": "native CPU PID containment and accounting",
+  "source_cache_ROOT_acceptance_sha256": "370b9aff662334f382f84cd2529818f0ef2795108135b9f6663ecce06b8f6818",
+  "spec_sha256": "ab80b3e689f12d5a347002be4c92022e64a4b987b59f204acae15c0f98c61fd8",
+  "terminal_event_ids": [
+    "220b51c0f4ad5b2289913d73103fb738"
+  ],
+  "terminal_events_acknowledged": true,
+  "upload_backend": 71472,
+  "worker_CPU_after": 6.97,
+  "worker_CPU_before": 6.67,
+  "worker_after_sha256": "3d59cbcf007c26a77f2984b8e31ca9793010d4697f3baca77b59879ab31b5381",
+  "worker_before_sha256": "09329f50d04759b93e4a7993b297c109be702cc01c01721366cd3f826584d499",
+  "worker_context_equal_except_CPU": true
+}

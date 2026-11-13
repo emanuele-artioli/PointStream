@@ -23,7 +23,7 @@ new dependency.
 
 ## Where PointStream stands (2026-11-13, UTC)
 
-### Current research decision (November 13, 14:14 UTC)
+### Current research decision (November 13, 14:45 UTC)
 
 **Shared-Ada SVT16 correctness and feasibility are independently accepted and
 ACK-closed.** Job `20261113T130719Z-9f94f30c`, frozen a71/source bb717/archive
@@ -66,12 +66,17 @@ are sampled observations, not an absolute peak, speed or full-neural result.
 
 Next: [exact-study-source CPU qualification](docs/cards/k5d-svt-study-source-qualification-2026-11-13.md),
 1100CPU/GPU0 within existing limits. Sourceprep100 is accepted/CLOSED;
-1032CPU is precharged: source100 +native327 +receiver585 +native local repair10
-+receiver local preparation10. Only68CPU reserve remains held. Both native and
-receiver releases cover OFFLINE local UNRUN package preparation only; the
-receiver's new native proof remains unbound. No actual native/receiver job,
-runtime preflight, publication or GPU release exists yet. All GPU16/48,292/586
-and30-clip execution remains unreleased.
+1062CPU is precharged and38CPU reserve remains held. New-source native job
+`20261113T142805Z-d1090553` is independently accepted, physically published
+and terminal-ACK closed ([native index](docs/experiments/k5d-inputs/svt-study4282-d109-native-CPU-acceptance-20261113.json)).
+Receiver585 LOCAL constructor and both normalized returns passed; exact runtime
+preflight/publication remains root-gated. No GPU16/48/292/586/30-clip release.
+Separate50CPU LOCAL preparation for qualification16 and cost48 is precharged,
+included within the proposed future48 lifecycle, without GPU/runtime authority.
+Passive resource watcher a21 checks gpu2/gpu3 A6000 and gpu5/gpu6 Ada every300s,
+backend15608/PID61857, harddeadline15:30:19.643754UTC; a20 ended after nine
+checks with no idle candidate and its process is absent. Full100CPU is retained
+per bounded batch; no recurring LLM timer or automatic job submission.
 
 The primary exclusive2c6d route remains separate:1160CPU/900GPU held,
 metadata50CPU precharged UNRUN. Use the [ledger](docs/experiments/submission-research-budget-20261104.json)
@@ -587,7 +592,7 @@ marked `card ready` is waiting for the user to start it.
 
 | item | card | branch | model / effort | status |
 |---|---|---|---|---|
-| Submission research completion / K5d | [staged card](docs/cards/submission-research-2026-11-04.md); [ball protocol](docs/experiments/k5d-ball-benchmark.md) | `codex/submission-benchmark-2026-11-04`; PR333–337 merged | primary plus requested Terra 6.1 medium delegates; actual telemetry unverified | **Current: 2c6d native ece387dc accepted/ACKed/proof9095 physically published.** Full CPU-denial365 released, ONEpublication in progress/no ID yet; no GPU. Queuepilots92693/29588 overallFAIL, <=20CPU continuation UNRELEASED/admin200 held. Qualification900GPU/1150CPU held. A13 backend42714/PID13657 to09:38:27UTC, recordedtick0(08:53:47) no eligible idle. Charges23,841GPU/64,185CPU (Ball17,479/40,184). [Current handoff](docs/continuation-2026-11-13.md). |
+| Submission research completion / K5d | [staged card](docs/cards/submission-research-2026-11-04.md); [ball protocol](docs/experiments/k5d-ball-benchmark.md) | `codex/submission-benchmark-2026-11-04`; PR333–337 merged | primary plus requested Terra 6.1 medium delegates; actual telemetry unverified | **Current:** source4282/e4d4/f813/cache71ef accepted; native d109 independently accepted, physically published/ACK-closed (b79/918). Actualreceiver585 LOCALmaterialized, runtime root-gated; GPU16/48/292/586/full30 unreleased. Shared-Ada prior16 accepted; 50CPU new16/48package preparation only. Passive a21 backend15608/PID61857 to15:30:19UTC. Live budget/continuation own current counts. [Current handoff](docs/continuation-2026-11-13.md). |
 | Paper strengthening and independent ball pilot | [research priorities](docs/paper/research-and-figure-priorities-2026-11-01.md); [K5c](docs/experiments/k5c-independent-ball.md) | `codex/paper-strengthening-2026-11-01`, PR #329 | primary plus requested Terra 6.1 medium delegates; actual tier telemetry unavailable | 2026-11-03: eight main/two appendix figures implemented, ball retained in main, negative guards visible; 23 main/reference plus five appendix pages. Original four-window audit recovered. K5c original 48-frame pilot completed and independently audited as `20261103T141758Z-f5d52fac`, gpu6 Ada, code `6040fe5c`; first 16-frame cost stop preserved. WASB 42–44/48 versus 0–8/48 native, all 48 positive; no confirmation/full-codec win. Closed cumulative 463/900 GPU-s and 1,413/1,800 CPU-s; administrative telemetry uncertainty disclosed. Both requests/processes/claims/waits closed, events acknowledged; no further compute admitted. Two original SVT gaps remain after read-only audit; med000 DCVC dropped. Manuscript a297279 pushed; selected source and separate anonymous data frozen in the November3 review record. PRESLEY untouched; coauthor approval and footage permissions unresolved; no submission. |
 | W8 exclusive upper-baseline attempt | [approved exclusive amendment](docs/experiments/w8-inputs/amendment-20261101/exclusive-prospective-card.md) | `codex/w8-exclusive-results-2026-11-01` (policy PR #322 merged) | primary plus Terra 6.1 medium delegates | complete: `20261101T081828Z-d70bc44f`, gpu6 exclusive Ada, frozen source `c0f25e4e` / spec `e9d926b6`; independent full audit and raw screen pass all 8 cells at 46.3151 kbps. Initial two cost stops preserved. Combined inclusive scoring 224 GPU-s / ≤304 CPU-s of 450/450; original total after 15 CPU-s runtime preflight: 224 GPU-s / ≤1,169 CPU-s of 3,600/3,600. Processes/claims/waits closed. No training/encoding/model/payload/quality-rule change. |
 | W8 Linux exact-input oracle and fresh receiver gates | [original W8 card](docs/cards/w8-fresh-decoder-witness.md); [approved repair](docs/cards/w8-source-package-repair.md) | `codex/w8-source-repair-2026-11-01` | primary plus scoped delegates | Input/runtime/native/pixel gates passed within recorded scope. Sole replacement `20261101T151030Z-df638d2f` packet worker passed, then CUDA device count error 2/unavailable before model/kernel/sampling; cause unknown, no quality result or cost slope. All task-owned processes/claims/wait/events closed. Phase ≤292 CPU-s/188 GPU-s; original cumulative ≤2,457/540 of 3,600 each. No retry or 30-step admission. Empirical paper retains fresh-decoder limitation; CUDA-only diagnostic is an unauthorized future proposal. PR #325 merged `06ce6374`; final documentation update belongs to [PR #326](https://github.com/emanuele-artioli/PointStream/pull/326), whose live checks/merge state should be consulted. |

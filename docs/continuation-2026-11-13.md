@@ -5,7 +5,9 @@ The [budget ledger](experiments/submission-research-budget-20261104.json) is the
 accounting authority; [Ball journal](experiments/k5d-ball-benchmark.md) retains
 chronology and raw-result references. Times below are UTC.
 
-## Current scheduling decision — study source cache accepted; native preparation only
+## Current scheduling decision — native accepted; receiver qualification next
+
+Live update: actual study4282 native CPU job `20261113T142805Z-d1090553` is independently accepted, physically published and terminal-ACK closed (proofb79,receipt918,event220b51c0). Actual receiver585 LOCAL constructor and both normalized returns passed; a copied false acceptance flag is being corrected in a new metadata-only package before root release. Its fixed deadline is15:17:07.502633UTC; complete865s forecast must still fit. Qualification reserve38CPU; no GPU stage release. Passive watcher a20 ended after nine checks/noidle/PIDabsence; replacement a21 checks every300s until15:30:19.643754UTC at latest, backend15608/PID61857. Shared Ada is already qualified for the prior sixteen-frame conventional study; exact new-source qualification16/cost48 preparation is separately precharged50CPU/GPU0 only. Paper and PRESLEY remain paused.
 
 Actual job `20261113T130719Z-9f94f30c` is canonical COMPLETE/gatePASS/exit0
 on gpu6 Ada1 UUID `GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553`, independently
@@ -77,15 +79,29 @@ Preserve both local caller failures, original candidate bridge/review versions
 and all conservative charges. Source approval transfers no old native/receiver
 outcome or GPU/scale qualification.
 
+Actual new-source native job `20261113T142805Z-d1090553` is COMPLETE/gatePASS/
+exit0/GPU-null; canonical status34c9ff and independent audit64009 passed.
+Root accepted native CPU containment/accounting only: four modes,21 host
+processes/19 births/four groups currently clear, same worker context except
+CPU6.67→6.97, normal1.350349 inner versus1.446699 outer CPU. Actual proofb79de312
+is physically published (upload71472,receipt918,7907B/0444file/0555dir/readback).
+The [native acceptance index](experiments/k5d-inputs/svt-study4282-d109-native-CPU-acceptance-20261113.json)
+retains exact recoverable proof/receipt bytes, source/spec/producer joins and
+scope. Fresh canonical PASS preceded sole terminal ACK
+220b51c0f4ad5b2289913d73103fb738; no other events were acknowledged. Two SSH
+calls used0.154438 local +0.129660 SSH CPU/8.795691wall. The first wrong literal
+release hash was rejected before intent/output/SSH and retained within ACK15;
+no scientific replay. Native qualification is ACK-closed. No restricted receiver,
+GPU/general/kernel readiness, quality or scale credit follows.
+
 The [1100CPU/GPU0 qualification envelope](cards/k5d-svt-study-source-qualification-2026-11-13.md)
-now has1032CPU precharged: source100 +native327 +receiver585 +native local
-repair10 +receiver local preparation10. Only68CPU reserve remains held.
-Only OFFLINE local UNRUN metadata/package preparation is released for either
-job; the receiver's new native proof remains unbound. No actual native/receiver
-job, runtime preflight, publication or GPU release exists yet. Exact new-source
-native and actual CPU receiver proofs still precede separately admitted16/48
-controls, fixed292/586-frame confirmations and any30-clip stage. All those GPU
-stages remain unreleased; the neural comparison remains open.
+has1062CPU precharged: source100 +native327 +receiver585 +native local repair10
++receiver local preparation10 +replacement native preflight30. Only38CPU reserve
+remains held; preserve original stale-pin preflight80721 and all caller failures.
+Receiver585 remains OFFLINE local UNRUN package preparation only; no actual
+receiver job or runtime preflight/publication release. Fresh actual CPU receiving
+still precedes separately admitted16/48 controls, fixed292/586 confirmations
+and any30-clip stage. All GPU stages remain unreleased; neural comparison open.
 
 Primary exclusive2c6d stays separate:1160CPU/900GPU held, metadata50CPU
 precharged UNRUN, false plan463f50d0 preserved. No general client/GPU readiness
