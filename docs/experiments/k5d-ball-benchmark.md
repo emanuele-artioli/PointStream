@@ -2149,3 +2149,42 @@ Primaryarchive30 LOCALbuild+independentallmembersverifyPASS:352files/158722512Bi
 PrimaryarchiveONEpublication94624 persistedbeforejoin; durableactual-publication/intent+handle /targetdb448076e64522ec36520caa. No overwrite/replay; waitforverifiedreceiptbeforeclaimdurable.
 
 Primary06650791 archivepublication94624COMPLETE0/immutable0444-0555/readbackPASS: /home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-primary2c6d-qualification16-db448076e64522ec36520caa/qualification.tar.gz SHAdb448076e64522ec36520caad84e52ff5d1de1e0b9e304d85c7462cb299f27ec /11814291B/352members. Trackedthinindexdocs/experiments/k5d-inputs/primary-06650791-Ada-sixpoint16-root-acceptance-20261113.json SHAc399bf601374ea8e7f9f9ae996e8204addaa46deb42f8a09c6db216391c18fb9 with15recoverableUTF8records+fullmembermap; ROOT2a5fcf27/observer4210d38b/correctedhelper+sourcefixtures/alloldfailures+exactACK recoverable. OriginalstageCLOSED0; neverreleased2CPUreserve returned(nochargesrefunded). Preparationonlyaccepted/encodedqualityseparate/NFSconditional330.385725s/otherUNKNOWN.
+
+
+### 2026-11-13 — paired Ada encoded-quality readiness
+
+PR407 merged with CI success; accepted06650791 preparation and SVT292 remain durable and ACK-closed. ROOT allocates5,300CPU/4,000GPU prospectively inside unchanged24GPUh/28CPUh programme and Ball limits for paired prepare16/48 followed by separate score16/48. See [card](../cards/k5d-primary-paired-quality-2026-11-13.md) for hypothesis, competing explanations, exact gates, full lifecycle forecast and stops. Runtime remains blocked on concrete metadata/audit/wait readiness; no actual new fleet ID exists.
+
+Independent source reviewce3efec5 accepts truthful reuse of original066 GPU-denial context for same source/config/environment/exactgpu6 UUIDdbbb. Derivedcandidate0f73d555 and ROOTapprovedproofa6b75f7b retain originalreceipt/context and allsixpolicySHAs; no new witness or quality result is claimed. Publication first failed locally before SSH exec: parent hardCPU4 prevented child6; original20CPU charge/failure preserved. ROOT expressly corrects inheritance (parentsoft4/hard10), releases a separate20CPU replacement inside5300 and retains all failed artifacts at /private/tmp/pointstream-primary-paired16-48-ROOT-20261113. No GPU execution occurred.
+
+Actual16 pilot JSON44,891,455B tripled exceeds128MiB; prospective perJSON cap corrected to256MiB before release, keeping512MiB/stage,1GiBcombined JSON and2GiB physical. Real source/control normalized returns, sameUUID joins, fresh16 cost gates, full48 archive/attestations and sealed scoring remain mandatory. No independent resource/span/speed/cohort promotion.
+
+A27 completed nine checks20:34:34UTC; PID1412 verified absent. Fresh finite A28 backend95590/PID5879 checks gpu2/gpu3/gpu5/gpu6 every300s, hard deadline21:24:44UTC,100CPUprecharged; no auto-renewal or automatic job submission. Native completion-to-model wakeup remains unverified.
+
+ROOT releases ONE actualmetadata30/GPU0 before any runtime. Case /private/tmp/pointstream-primary-paired-metadata30-ROOT-7daddff21cde4e9ba9a206ffcdf0ea0c contractd21d0fc2c09726d9ef5e1ac69dbdfde23ecacdb90003f92e36b56d114269adea release3c4245f24a5622af88d6cb63aa0fdd66fc9fbfa5840f9629154a63c1d862efcc fixeddeadline2026-11-13T21:39:43.357986+00:00. Native/model/judge dispatch forbidden; no newfleet ID. Backendpending. Initial local materialization failed manifest string-vs-dict before anyrelease/SSH; empty private directory retained, scripts unchanged.
+
+ONE actualmetadata30 backend61724 persisted before waiting; fixed21:39:43UTC; no fleet job or GPU release.
+
+Actualmetadata61724 ROOTaccepted constructors/rawnormalizedscopeonly; runtimebinder stopped BEFORE newcase/job because plannedCPUaffinity index0 was absent. ROOTexplicitlyreleases NEWmetadata30 replacement setting base.cpu_affinity_index=0 before actual frozenconstructor, preserving source/proofs/old30charge/same21:39:43deadline. Case /private/tmp/pointstream-primary-paired-metadata30-affinity0-ROOT-e521bfeef2734b84b05ab5a6f14613e1 release1836a4e7e9760550e7b0c70e4a8ce85bc3cdccc0714925dd10640f4cf64a0bd0; within5300 pair/producerfailure, noGPUjob orautomaticretry.
+
+Metadataaffinity0 backend85328 persistedbeforewait; original61724 preserved, nojob. Independentactualguardcheck foundmissingcpu0 only; hypotheticalguardpass is diagnostic, notactualspec evidence.
+
+Affinity0 metadata85328 COMPLETE0 ROOTaccepted0a4f9e0a; actualnormalizedraw6584caa9/canonicalf3680af8 fixed21:39:43UTC. Runtimebinding d1ff7382 at /private/tmp/pointstream-primary-paired-runtime-ROOT-e521bfeef2734b84b05ab5a6f14613e1; exactcompleteassetinventory/pinsPASS. ROOTreleasesfreshglobal10+before6 within5300; runtime notyetreleased.
+
+Freshglobal33564/beforecontext39964 handles persistedbeforewait; noactualnewjob/GPUrelease.
+
+ROOTaccepts global33564 COMPLETE0/1718jobs, noactive/newunknown; unchanged unrelatedgpu3 attention3cb3 remainsunreplayed. Before39964 COMPLETE0 sameworker1470412/sevencontrols. ROOT releases ONEcanonicalpairedprepare publication, entirefirst2650CPU2000GPU prepaid (prior154CPU included); second2650CPU2000GPU held/unreleased. Exactrelease7bbb321cc7d1f21144c3e08b160d7ad7df661c9a276151bf8a555052b1284096 fixed21:39:43; stockdoctor/admission/strictsource-and-cost gates mandatory, noobservers/nospeedclaim. Backend/actualIDpending. Localbudgetsum firstencounteredlegacychargewithoutphase beforeanypublication; correctedget(phase)nocharge duplication.
+
+SOLEpairedprepare publication backend79873 persistedbeforewait; full2650CPU2000GPU charged, secondstageunreleased. ActualIDmustbereadfrom generated-job-ID-before-publication.json /actual-job-identity.json inruntimecase and recordedbeforecanonicalquery. Unknownsubmissions neverreplayed.
+
+Actualgeneratedpairedprepare ID 20261113T210157Z-41ee26e3 source2c6d/source6f/archive5ca/env32/specf3680af8 exists in canonicalpreparingrecord beforepublicationresponse. Publication79873 still in flight/unknown; ID nowpersistedledger+journal BEFORE anycanonicalquery/wait. Neverreplay.
+
+ONEpublication79873 COMPLETE0/37.295s/7Git8SSH, actual20261113T210157Z-41ee26e3 canonicalpublishedPENDING. ROOTreleasesONEstatus6+events6 withinprepaidadmission18, IDrereadjournal/ledger; nowait/ACKstarted, no replay.
+
+Actual41ee26e3 status18723/events95250 handlespersistedbeforewait; canonicalsavedoutputs governstate.
+
+Actual41ee26e3 canonicalstatus18723 PENDING/events95250 EMPTY. ROOTreleasesONEcanonicalwait330/max2400/outer2480/max82SSH exactrelease4099d43dbbbd831e7a0efeac7eb743beb1f1c6ec811a62bff1126f486ef4e0f1 at /private/tmp/pointstream-primary-paired-wait330-FALSE-v2-20261113/release-41ee26e3.ROOT.json. Noautomaticsecondwait/resubmission/ACK; fullfirst2650CPU2000GPU alreadycharged. Nativecompletion-modelwake unverified; preservehandle beforewaiting.
+
+Actual41ee26e3 ONEcanonicalwait backend71064/max2400 outer2480 persistedbeforewaiting. ROOT assigns15CPU second-stage localreadiness design within5300 (three5CPU independentroles), no scorer dispatch. Nativecompletionmodelresume remainsunverified; no recurringLLMtimer.
+
+ONEwait71064 cachedcanonical saved-status-03 shows41ee26e3 RUNNING gpu6Ada0dbbb/supervisor3487938; probeGPUfields are admissionsnapshot, notliveutilization/spanproof. No directpoll/newwait, noqualityacceptance.
