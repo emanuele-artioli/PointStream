@@ -14,7 +14,6 @@ import os
 import select
 import secrets
 import shutil
-import signal
 import stat
 import subprocess
 import sys
@@ -217,10 +216,11 @@ def _namespaces(pid: str) -> dict[str, str]:
 
 def _proc_identity(pid: int) -> dict[str, Any]:
     base = Path('/proc') / str(pid)
-    birth = (base / 'stat').read_text().rsplit(')', 1)[1].split()[19]
+    fields = (base / 'stat').read_text().rsplit(')', 1)[1].split()
+    birth, host_pgid, host_ppid = fields[19], int(fields[2]), int(fields[1])
     status = (base / 'status').read_text()
     ns_pid = next(line for line in status.splitlines() if line.startswith('NSpid:')).split()[1:]
-    return {'pid': pid, 'birth': birth, 'namespace_pids': [int(x) for x in ns_pid],
+    return {'pid': pid, 'birth': birth, 'host_pgid': host_pgid, 'host_ppid': host_ppid, 'namespace_pids': [int(x) for x in ns_pid],
             'namespaces': _namespaces(str(pid))}
 
 
@@ -276,7 +276,8 @@ def _translate_child(namespace_pid: int, parent_host_pid: int, parent_namespace:
     return matches[0]
 
 
-def _observe_native(work: Path, worker_pid: int, worker_ns: dict[str, str], nonce: str, stop: threading.Event) -> None:
+def _observe_native(work: Path, worker_pid: int, worker_ns: dict[str, str], nonce: str,
+                    campaign_pgid: int, stop: threading.Event) -> None:
     handle = work / 'native-observer.json'
     children_path = Path(f'/proc/{worker_pid}/task/{worker_pid}/children')
     while not stop.wait(0.01):
@@ -285,7 +286,8 @@ def _observe_native(work: Path, worker_pid: int, worker_ns: dict[str, str], nonc
             if len(children) != 1:
                 continue
             identity = _proc_identity(int(children[0]))
-            if identity['namespaces'] != worker_ns or identity['namespace_pids'][-1] <= 1:
+            if (identity['namespaces'] != worker_ns or identity['namespace_pids'][-1] <= 1
+                    or identity['host_pgid'] != campaign_pgid or identity['host_ppid'] != worker_pid):
                 continue
             identity['nonce'] = nonce
             # Atomic publication prevents the restricted worker reading a partial record.
@@ -330,12 +332,28 @@ def verify_receipt(receipt: dict[str, Any], *, expected_context: dict[str, Any],
         raise ValueError('isolated receiver evidence missing or inconsistent')
     namespace = proof.get('namespaces')
     observer = proof.get('worker_observer')
+    campaign = proof.get('campaign_host')
+    launcher = proof.get('launcher_observer')
+    if (not isinstance(campaign, dict) or not isinstance(launcher, dict)
+            or type(campaign.get('campaign_pgid')) is not int or campaign['campaign_pgid'] <= 0
+            or campaign.get('host_pgid') != campaign['campaign_pgid']
+            or type(campaign.get('host_pid')) is not int or campaign['host_pid'] <= 0
+            or type(campaign.get('start_ticks')) is not int or campaign['start_ticks'] <= 0
+            or launcher.get('host_pgid') != campaign['campaign_pgid']
+            or launcher.get('host_ppid') != campaign['host_pid']
+            or type(launcher.get('pid')) is not int or launcher['pid'] <= 0
+            or not launcher.get('birth') or not launcher.get('namespace_pids')):
+        raise ValueError('campaign or launcher host identity missing')
     if (not isinstance(namespace, dict) or namespace.get('private_proc') is not True
             or namespace.get('initial_pids') != [1] or proof['pid'] != 1 or not isinstance(observer, dict)
             or type(namespace.get('outer_pid_hidden')) is not int or namespace['outer_pid_hidden'] <= 1
             or not isinstance(namespace.get('mountinfo'), str) or ' - proc ' not in namespace['mountinfo']
             or observer.get('namespace_pids', [])[-1:] != [1] or type(observer.get('pid')) is not int
             or observer.get('birth') != proof['birth'] or observer.get('namespaces') != namespace.get('namespaces')
+            or observer.get('host_pgid') != campaign['campaign_pgid']
+            or observer.get('host_ppid') != launcher['pid']
+            or observer.get('launcher_observer') != launcher
+            or namespace.get('outer_pid_hidden') != campaign['host_pid']
             or any(namespace['namespaces'].get(k) == namespace['parent_namespaces'].get(k)
                    for k in ('user', 'pid', 'mnt', 'ipc'))):
         raise ValueError('private receiver namespace proof missing')
@@ -360,7 +378,9 @@ def verify_receipt(receipt: dict[str, Any], *, expected_context: dict[str, Any],
     if (not isinstance(native_observer, dict) or native_observer.get('namespaces') != namespace['namespaces']
             or native_observer.get('namespace_pids', [])[-1:] != [decoder['pid']]
             or type(native_observer.get('pid')) is not int or not native_observer.get('birth')
-            or native_observer.get('nonce') != proof.get('nonce')):
+            or native_observer.get('nonce') != proof.get('nonce')
+            or native_observer.get('host_pgid') != campaign['campaign_pgid']
+            or native_observer.get('host_ppid') != observer['pid']):
         raise ValueError('outer native decoder observation missing')
     preexec = decoder.get('preexec')
     if (not isinstance(preexec, dict) or preexec.get('pid') != decoder['pid']
@@ -370,7 +390,8 @@ def verify_receipt(receipt: dict[str, Any], *, expected_context: dict[str, Any],
     if (policy.get('private_proc_read_only') is not True or policy.get('namespaces') != namespace
             or decoder.get('executable_resolved') not in policy.get('execute_files', [])
             or policy.get('context') != expected_context or policy.get('pid') != proof['pid']
-            or policy.get('birth') != proof['birth'] or policy.get('handled_mask') != proof['handled_mask']):
+            or policy.get('birth') != proof['birth'] or policy.get('handled_mask') != proof['handled_mask']
+            or policy.get('campaign_host') != campaign or policy.get('launcher_observer') != launcher):
         raise ValueError('actual policy process or context differs')
     denied = proof.get('denials')
     if not isinstance(denied, dict) or set(denied) != set(CATEGORIES):
@@ -389,6 +410,22 @@ def verify_receipt(receipt: dict[str, Any], *, expected_context: dict[str, Any],
         if not isinstance(receipt.get(key), str) or len(receipt[key]) != 64:
             raise ValueError('receiver output hash missing')
     return proof
+
+
+def _launch_receiver(command: list[str], env: dict[str, str]) -> subprocess.Popen[Any]:
+    """Preserve the campaign process group; isolation comes from namespaces."""
+    return subprocess.Popen(command, env=env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE, close_fds=True)
+
+
+def _stop_launcher(process: subprocess.Popen[Any]) -> None:
+    """Kill only our Popen child; unshare kills its private PID namespace."""
+    if process.poll() is None:
+        try:
+            process.kill()
+        except ProcessLookupError:
+            pass
+    process.wait(timeout=10)
 
 
 def replay(wire_path: Path, map_path: Path, work: Path, *, config_path: Path, config_sha256: str,
@@ -422,7 +459,9 @@ def replay(wire_path: Path, map_path: Path, work: Path, *, config_path: Path, co
     work.mkdir(mode=0o700, parents=False, exist_ok=False)
     for source, name in ((wire_path, 'packet.psbl'), (map_path, 'resources.json')):
         shutil.copyfile(source, work / name)
-    launch = {'config': config, 'config_sha256': config_sha256, 'denials': evidence, 'context': producer_context,
+    from experiments.tennis.k5d_scoped_namespace import host_group_identity
+    campaign = host_group_identity(Path(os.environ['PS_STAGE_DIR']).parent / 'run' / 'status.json')
+    launch = {'campaign_host': campaign, 'config': config, 'config_sha256': config_sha256, 'denials': evidence, 'context': producer_context,
               'files': [str(p) for p in files], 'execute': [str(p) for p in execute], 'system': [str(p) for p in system],
               'wire_sha256': sha(wire_path), 'map_sha256': sha(map_path),
               'parent_namespaces': _namespaces('self'), 'outer_pid': int(os.readlink('/proc/self')),
@@ -442,36 +481,36 @@ def replay(wire_path: Path, map_path: Path, work: Path, *, config_path: Path, co
     unshare_row = profile['unshare']
     unshare = _file(Path(unshare_row['path']), unshare_row['sha256'], unshare_row['size'])
     command = [str(unshare), '--user', '--map-root-user', '--pid', '--mount', '--ipc', '--fork',
-               '--mount-proc', str(python), '-S', '-m', 'experiments.tennis.k5d_isolated_receiver',
+               '--kill-child=SIGKILL', '--mount-proc', str(python), '-S', '-m', 'experiments.tennis.k5d_isolated_receiver',
                'worker', str(work)]
     stop = threading.Event()
     monitor: threading.Thread | None = None
-    with subprocess.Popen(command, env=env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                          close_fds=True, start_new_session=True) as process:
+    with _launch_receiver(command, env) as process:
         try:
             if process.stdout is None or not select.select([process.stdout], [], [], 120)[0]:
                 raise RuntimeError('private receiver did not start')
             if process.stdout.readline() != b'READY\n':
                 raise RuntimeError('private receiver startup failed')
             launcher = _translate_child(process.pid, launch['outer_pid'], launch['parent_namespaces']['pid'])
+            if launcher['host_pgid'] != campaign['campaign_pgid'] or launcher['host_ppid'] != campaign['host_pid']:
+                raise ValueError('launcher left campaign process group')
             children = Path(f"/proc/{launcher['pid']}/task/{launcher['pid']}/children").read_text().split()
             if len(children) != 1:
                 raise ValueError('private receiver launcher has unexpected children')
             observed = _proc_identity(int(children[0]))
-            if (observed['namespace_pids'][-1] != 1
+            if (observed['host_pgid'] != campaign['campaign_pgid'] or observed['host_ppid'] != launcher['pid']
+                    or observed['namespace_pids'][-1] != 1
                     or any(observed['namespaces'][k] == launch['parent_namespaces'][k]
                            for k in launch['parent_namespaces'])):
                 raise ValueError('outer observer did not identify isolated PID 1')
+            observed['launcher_observer'] = launcher
             (work / 'worker-observer.json').write_text(json.dumps(observed, sort_keys=True))
-            monitor = threading.Thread(target=_observe_native, args=(work, observed['pid'], observed['namespaces'], launch['nonce'], stop))
+            monitor = threading.Thread(target=_observe_native, args=(work, observed['pid'], observed['namespaces'],
+                                                                       launch['nonce'], campaign['campaign_pgid'], stop))
             monitor.start()
             _, stderr = process.communicate(timeout=3600)
         except BaseException:
-            try:
-                os.killpg(process.pid, signal.SIGKILL)
-            except ProcessLookupError:
-                pass
-            process.wait()
+            _stop_launcher(process)
             raise
         finally:
             stop.set()
@@ -513,7 +552,9 @@ def _worker(work: Path) -> None:
             raise RuntimeError('outer worker observation missing')
         time.sleep(0.01)
     observer = json.loads(observer_path.read_text())
-    if (observer.get('birth') != _birth() or observer.get('namespaces') != namespace_proof['namespaces']
+    if (observer.get('host_pgid') != launch['campaign_host']['campaign_pgid']
+            or observer.get('launcher_observer', {}).get('host_pgid') != launch['campaign_host']['campaign_pgid']
+            or observer.get('birth') != _birth() or observer.get('namespaces') != namespace_proof['namespaces']
             or observer.get('namespace_pids', [])[-1:] != [1]):
         raise ValueError('outer worker observation differs')
     files, execute, system = inventory(launch['config'])
@@ -527,6 +568,7 @@ def _worker(work: Path) -> None:
                      'system_leaves': [str(p) for p in system], 'writable_output': str(work),
                      'read_directories': sorted(str(p) for p in _read_directories(files, execute, system, import_directories)),
                      'private_proc_read_only': True, 'namespaces': namespace_proof,
+                     'campaign_host': launch['campaign_host'], 'launcher_observer': observer['launcher_observer'],
                      'denials': launch['denials'], 'context': launch['context'], 'pid': pid, 'birth': birth}
     # The denial records are later augmented in place, so retain the pre-restriction inventory separately.
     actual_policy = json.loads(json.dumps(actual_policy))
@@ -545,6 +587,7 @@ def _worker(work: Path) -> None:
              'handled_mask': mask, 'threads': 1, 'extra_fds': False, 'pid': pid, 'postexec_pid': os.getpid(),
              'birth': birth, 'postexec_birth': birth, 'denials': launch['denials'],
              'namespaces': namespace_proof, 'worker_observer': observer, 'nonce': launch['nonce'],
+             'campaign_host': launch['campaign_host'], 'launcher_observer': observer['launcher_observer'],
              'actual_policy': actual_policy, 'actual_policy_sha256': _object_sha(actual_policy),
              'profile_sha256': _object_sha(launch['config']['profiles'][os.uname().nodename.split('.')[0]]),
              'runtime_inventory_sha256': _object_sha(launch['config']['profiles'][os.uname().nodename.split('.')[0]]['runtime_files'])}
@@ -562,9 +605,11 @@ def _native_wrapper(payload_path: Path) -> None:
         time.sleep(0.01)
     observer = json.loads(observer_path.read_text())
     birth = _birth()
-    if (observer.get('nonce') != payload['nonce']
+    if (type(payload.get('campaign_pgid')) is not int or payload['campaign_pgid'] <= 0
+            or observer.get('nonce') != payload['nonce']
             or observer.get('namespace_pids', [])[-1:] != [os.getpid()] or observer.get('birth') != birth
-            or observer.get('namespaces') != _namespaces('self')):
+            or observer.get('namespaces') != _namespaces('self')
+            or observer.get('host_pgid') != payload.get('campaign_pgid')):
         raise ValueError('native pre-exec observer differs')
     command = payload['argv']
     if not isinstance(command, list) or not command or not all(isinstance(x, str) for x in command):

@@ -48,7 +48,7 @@ def test_failed_isolated_native_persists_stderr_before_missing_preexec(tmp_path,
     decoder.write_text('fixture')
     work = tmp_path / 'result'
     work.mkdir()
-    observation = {'nonce': 'n', 'namespace_pids': [7], 'namespaces': {'pid': 'private'}, 'birth': '9'}
+    observation = {'nonce': 'n', 'namespace_pids': [7], 'namespaces': {'pid': 'private'}, 'birth': '9', 'host_pgid': 40}
     (tmp_path / 'native-observer.json').write_text(json.dumps(observation))
     stderr = b'x' * 5000 + b'actual startup failure'
     class FailedProcess:
@@ -61,7 +61,7 @@ def test_failed_isolated_native_persists_stderr_before_missing_preexec(tmp_path,
         def wait(self): pass
     monkeypatch.setenv('PYTHONPATH', '/reviewed')
     monkeypatch.setattr(worker.subprocess, 'Popen', lambda *a, **kw: FailedProcess())
-    isolation = {'nonce': 'n', 'actual_policy': {'execute_files': [str(decoder)]},
+    isolation = {'nonce': 'n', 'campaign_host': {'campaign_pgid': 40}, 'actual_policy': {'execute_files': [str(decoder)]},
                  'namespaces': {'namespaces': {'pid': 'private'}}}
     with pytest.raises(RuntimeError, match='actual startup failure'):
         worker._execute_native([str(decoder)], work, isolation)
@@ -91,7 +91,7 @@ def test_native_failure_before_observer_is_not_reported_as_timeout(tmp_path, mon
         def wait(self): pass
     monkeypatch.setenv('PYTHONPATH', '/reviewed')
     monkeypatch.setattr(worker.subprocess, 'Popen', lambda *a, **kw: FailedProcess())
-    isolation = {'nonce': 'n', 'actual_policy': {'execute_files': [str(decoder)]},
+    isolation = {'nonce': 'n', 'campaign_host': {'campaign_pgid': 40}, 'actual_policy': {'execute_files': [str(decoder)]},
                  'namespaces': {'namespaces': {'pid': 'private'}}}
     with pytest.raises(RuntimeError, match='wrapper cannot import'):
         worker._execute_native([str(decoder)], work, isolation)
