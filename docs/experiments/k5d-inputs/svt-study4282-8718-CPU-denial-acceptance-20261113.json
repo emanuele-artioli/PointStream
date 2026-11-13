@@ -1,0 +1,63 @@
+{
+  "ACK_backend": 79222,
+  "ACK_receipt_path": "/private/tmp/pointstream-study4282-CPUdenial585-BOUND-FALSE-ROOT-v3/post40-semantic-UNRUN/actual-20261113T144952Z-8718fbe1/ACK15-ROOT/result.json",
+  "ACK_receipt_sha256": "975c31d3fd59af636bb7257dd2982dab67c38ecd86ebd55f9c3f0b77c3ffaa66",
+  "CPU_denial_proof_bytes": 7312987,
+  "CPU_denial_proof_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-SVT-real-CPU-denial-d7a0923c67634137bc90880fe539f95f/real-CPU-denial.json",
+  "CPU_denial_proof_sha256": "a636600b5631b331e40630c4f00839414b99c8863d308dbe90b172ea6b547020",
+  "CPU_precharged": 585,
+  "GPU_kernel_general_readiness": false,
+  "GPU_precharged": 0,
+  "actual_FQDN_CPU_claim": {
+    "actual_token_absent": true,
+    "allocation_count": 0,
+    "exists": true,
+    "own_allocations": {},
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/claims/cpu/gpu6.itec.aau.at.json",
+    "scope": "CURRENT post-job observation only; no historical release-time inference; generic job_id=run ignored"
+  },
+  "aftercontext_sha256": "8ebe711253406cea21c116baaa6da68055507bb104b0a3383485b2e4043e7dac",
+  "all31_source_grants_physically_joined": true,
+  "approved": true,
+  "bridge_sha256": "849c059a5074851431862955c913731de345a428f2015ad31afe9df409190465",
+  "canonical_status_sha256": "b77b348ef8a5dfcae2f665534422ab528732d980069d8536aabecf801c28f487",
+  "captured_births": 18,
+  "config_sha256": "4fa67547b1288e46f979040f0de5315288bd8bfc5d6065e3b6abaeeee32bea1c",
+  "current_absent_host_processes": 18,
+  "empty_groups": 4,
+  "five_errno13": true,
+  "identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "f813e09d2fa0eb51b5ec160dcda0cd230d3dada7be697882f9b657201490e61d",
+    "source_sha256": "e4d4a856a06c5f9a06586056ab4a30f0c73b232e5a3db035ae6eb5546063f80b"
+  },
+  "independent_audit_summary_sha256": "ef270610ba217c3b7e77dc3d57ca1c3b12eaabe27be5a02c89813d2c19d83130",
+  "initial_launcher_SIGKILL_scoped_teardown": true,
+  "job_id": "20261113T144952Z-8718fbe1",
+  "native_proof_sha256": "b79de31293dee3cf044414db3432de433664e298fe790763fe4811aace174e1b",
+  "normal_native_YUV_RGB_match": true,
+  "physical_publication_backend": 11735,
+  "physical_receipt": {
+    "CPU": 0.11371400000000001,
+    "bytes": 7312987,
+    "directory_mode": "0555",
+    "file_mode": "0444",
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-SVT-real-CPU-denial-d7a0923c67634137bc90880fe539f95f/real-CPU-denial.json",
+    "sha256": "a636600b5631b331e40630c4f00839414b99c8863d308dbe90b172ea6b547020",
+    "status": "exact root-approved newCPUdenialproof uploaded only; no scientific execution",
+    "wall": 4.358483500778675
+  },
+  "physical_receipt_sha256": "5cdeff8b2cbce6b69603f98b3ce31f64accbd3ccad643e3c667de66773e4dcf4",
+  "raw_audit_sha256": "c35d5e4db5961427544bda0e6c45730f5f02ed3094e42a661c3ee3853bdebc33",
+  "raw_local_audit": "/private/tmp/pointstream-study4282-CPUdenial585-BOUND-FALSE-ROOT-v3/post40-semantic-UNRUN/actual-20261113T144952Z-8718fbe1/audit/raw-audit.json",
+  "revision": "4282c96f8aaf7d229f53df4c1c5f8225d8454d6e",
+  "root_local_proof": "/private/tmp/pointstream-study4282-CPUdenial585-BOUND-FALSE-ROOT-v3/post40-semantic-UNRUN/actual-20261113T144952Z-8718fbe1/proof-upload12-ROOT/root-approved-real-CPU-denial.json",
+  "schema": 1,
+  "scope": "Actual normal SVT filesystem denial plus initial-launcher interruption/scoped teardown only. Current cleanup only, no immediate historical claim interval. No active-native/unshare-only/fleet-watchdog/GPU/scale claim.",
+  "spec_raw_sha256": "80be790fd055f868327065f390a7a5bc5f8cc9f1e77db37f6e289693de193f71",
+  "spec_sha256": "ed246d0d89cb4ebc88ec66688aa805f1b3b51ae07d907897814850b0ed581c6e",
+  "terminal_event_acknowledged": [
+    "33a90d32b71f57d9a4e164d31a5488da"
+  ],
+  "worker_context_equal_except_CPU": true
+}

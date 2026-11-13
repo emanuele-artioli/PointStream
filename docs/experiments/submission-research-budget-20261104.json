@@ -2829,6 +2829,27 @@
       "cpu_seconds": 100,
       "gpu_seconds": 0,
       "basis": "ROOTprechargesONEpassive45min300smax9watch aftera20ninechecksfinished/PID57608absentverified. Identicalwatch2b931/specf517,80counted+20external/SSHserverloginaggregateunmetered. Noautosubmit/model/claims/LLMtimer."
+    },
+    {
+      "phase": "ball-gpu5-idle-alternative-design10-20261113",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 10,
+      "basis": "ROOTprospectiveLOCALdesignaudit only afterwatcher15:00:39foundgpu5Ada1potentialidle7754164a: primary6point16orW8value, actualhost/control/source/config/proofbarriers andminimalrepair. NoSSH/install/query/retarget/model/newjob; no automaticreusegpu6UUID/proofs. Separatefromgoldprep50."
+    },
+    {
+      "phase": "ball-study4282-qualification16-prep10-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 10,
+      "gpu_seconds": 0,
+      "basis": "ROOTprospectiveLOCALFALSE qualification16stagegate/helper/card preparation only withinnew848CPU/600GPUstage envelope. Remaining838CPU/600GPUheld; noSSH/constructor/inference/runtimeauthority."
+    },
+    {
+      "phase": "ball-study4282-remote-constructor20-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 20,
+      "gpu_seconds": 0,
+      "basis": "ROOTchoosesONEbounded remoteCPU-only metadata sourcefreezeextract/actualproductionconstructor+twoactualnormalizedvalidators toavoid400MBhoteltransfer. Parent10+children4+SSH2+local2+review2=20;210wall, newSSD scratch/smallcreateonlystagegate publication, noTorch/model/native/quality/GPU/newscientificjob/sourcechange. Originalprep50/copyfailurechargesretained; suffixrepairUNRELEASED. Offlinehelpersfirst; exactrootreleasebeforeanySSH/extract/constructor."
     }
   ],
   "reservations": [
@@ -3516,10 +3537,18 @@
     {
       "phase": "ball-svt-study-source-qualification-20261113",
       "workstream": "ball",
-      "cpu_seconds": 38,
+      "cpu_seconds": 0,
       "gpu_seconds": 0,
-      "status": "Remaining_unspent38CPU/GPU0 qualification failure/closeoutreserve. Nativeactuald109 ROOTaccepted/physicallypublished/terminalACKclosed; receiver585 charged LOCALmaterialized runtimeUNRELEASED; noGPUstage.",
+      "status": "CLOSED source/native/actualCPUreceiver accepted, physicallypublished/ACKed;1062CPU/GPU0 conservativelycharged, unused38CPU returned withno priorcharge refunded. NoGPUstageauthority.",
       "card": "docs/cards/k5d-svt-study-source-qualification-2026-11-13.md"
+    },
+    {
+      "phase": "ball-study4282-qualification16-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 838,
+      "gpu_seconds": 600,
+      "status": "Remaining_unspent; proposednewsource16qualification848CPU/600GPU includes10LOCALprep charged. Source/native/CPUreceiver accepted; gold/realconstructor/gate/runtimehelper reviews pending; noGPUrelease.",
+      "card": "docs/cards/k5d-study4282-qualification16-2026-11-13.md"
     }
   ],
   "jobs": [
@@ -6486,6 +6515,39 @@
         "220b51c0f4ad5b2289913d73103fb738"
       ],
       "scope": "Exactsource native CPUcontainment/accounting only; no actualreceiver/GPU/general/kernel/quality/scale credit"
+    },
+    {
+      "job_id": "20261113T144952Z-8718fbe1",
+      "workstream": "ball",
+      "phase": "study4282-real-CPUreceiver",
+      "state": "ROOT_accepted_physically_published_terminal_ACK_closed",
+      "source_revision": "4282c96f8aaf7d229f53df4c1c5f8225d8454d6e",
+      "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "snapshot_sha256": "f813e09d2fa0eb51b5ec160dcda0cd230d3dada7be697882f9b657201490e61d",
+      "source_sha256": "e4d4a856a06c5f9a06586056ab4a30f0c73b232e5a3db035ae6eb5546063f80b",
+      "spec_sha256": "ed246d0d89cb4ebc88ec66688aa805f1b3b51ae07d907897814850b0ed581c6e",
+      "spec_raw_sha256": "80be790fd055f868327065f390a7a5bc5f8cc9f1e77db37f6e289693de193f71",
+      "host": "gpu6",
+      "GPU": 0,
+      "deadline": "2026-11-13T15:17:07.502633+00:00",
+      "publication_backend": 78888,
+      "package": "/private/tmp/pointstream-study4282-CPUdenial585-BOUND-FALSE-ROOT-v3",
+      "CPU_precharged": 585,
+      "no_automatic_replay": true,
+      "canonical_status_sha256": "b77b348ef8a5dfcae2f665534422ab528732d980069d8536aabecf801c28f487",
+      "status_backend": 33630,
+      "no_wait_needed": true,
+      "audit_backend": 8699,
+      "audit_release_sha256": "27ed7ffe4dceaf622a83e9ce38619ed5ce412edfdf885a34b0c5bfadfdbe2f20",
+      "proof_sha256": "a636600b5631b331e40630c4f00839414b99c8863d308dbe90b172ea6b547020",
+      "proof_bytes": 7312987,
+      "physical_receipt_sha256": "5cdeff8b2cbce6b69603f98b3ce31f64accbd3ccad643e3c667de66773e4dcf4",
+      "proof_remote_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-SVT-real-CPU-denial-d7a0923c67634137bc90880fe539f95f/real-CPU-denial.json",
+      "ACK_backend": 79222,
+      "acknowledged_event_ids": [
+        "33a90d32b71f57d9a4e164d31a5488da"
+      ],
+      "scope": "Actual normal SVT private-file denial/native packet/YUV/RGB plus initial-launcher interruption and current scoped cleanup only; no active-native/unshare-only/fleet-watchdog/general/GPU/scale claim."
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -6542,7 +6604,7 @@
     ],
     "recurring_llm_polling": false,
     "completed": false,
-    "latest_inspected_completed_tick": null,
+    "latest_inspected_completed_tick": 3,
     "previous_monitoring_snapshot": {
       "state": "Activea5passive5min45minwatch100CPUprecharged;priora4endedverified;noautosubmit/modeltimer",
       "scope": "gpu2/gpu3 A6000 and gpu5/gpu6 Ada",
@@ -6563,8 +6625,16 @@
       "recurring_llm_polling": false,
       "completed": false
     },
-    "latest_inspected_completed_tick_UTC": null,
-    "latest_inspected_candidates": [],
+    "latest_inspected_completed_tick_UTC": "2026-11-13T15:00:39.423838+00:00",
+    "latest_inspected_candidates": [
+      {
+        "host": "gpu5",
+        "index": "1",
+        "model": "RTX 6000 Ada",
+        "uuid": "GPU-7754164a-33cd-265c-3696-c20966d228fe",
+        "qualification": "required"
+      }
+    ],
     "prior_a13_final": {
       "finished_utc": "2026-11-13T09:33:48.050607+00:00",
       "ticks": 9,
