@@ -2,7 +2,7 @@
 
 Each case is a separate task-owned surrogate campaign session. It exercises the
 real scoped namespace and SVT receiver, not the fleet supervisor's watchdog.
-An externally frozen cost proof is required before building a candidate spec.
+The spec constructor does not check cost; approval is required before dispatch.
 """
 from __future__ import annotations
 
@@ -53,11 +53,16 @@ def _group(process: subprocess.Popen[Any]) -> int:
 
 def _gone(identity: dict[str, Any]) -> bool:
     try:
-        return isolated._proc_identity(identity['pid'])['birth'] != identity['birth']
+        raw = (Path('/proc') / str(identity['pid']) / 'stat').read_text()
     except OSError as exc:
         if exc.errno in (errno.ENOENT, errno.ESRCH):
             return True
         raise
+    end = raw.rfind(')')
+    fields = raw[end + 2:].split()
+    if end < 0 or len(fields) <= 19:
+        raise ValueError('malformed process stat; birth is unknown')
+    return fields[19] != identity['birth']
 
 
 def _members(host_group: int) -> dict[int, str]:

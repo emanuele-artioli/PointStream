@@ -50,7 +50,7 @@ def test_surrogate_cleanup_kills_only_owned_group_before_wait(monkeypatch: Any) 
 
 
 def test_gone_uses_birth_to_detect_pid_reuse(monkeypatch: Any) -> None:
-    monkeypatch.setattr(oracle.isolated, '_proc_identity', lambda _: {'birth': 'new'})
+    monkeypatch.setattr(oracle.Path, 'read_text', lambda _: '17 (x) ' + ' '.join(['0'] * 19 + ['new']))
     assert oracle._gone({'pid': 17, 'birth': 'old'})
     assert not oracle._gone({'pid': 17, 'birth': 'new'})
 
@@ -58,9 +58,14 @@ def test_gone_uses_birth_to_detect_pid_reuse(monkeypatch: Any) -> None:
 def test_unknown_proc_access_is_not_absence(monkeypatch: Any) -> None:
     def denied(_: Any) -> None:
         raise PermissionError('proc denied')
-    monkeypatch.setattr(oracle.isolated, '_proc_identity', denied)
+    monkeypatch.setattr(oracle.Path, 'read_text', denied)
     with pytest.raises(PermissionError):
         oracle._gone({'pid': 17, 'birth': 'old'})
+
+
+def test_zombie_stat_is_not_absent(monkeypatch: Any) -> None:
+    monkeypatch.setattr(oracle.Path, 'read_text', lambda _: '17 (x) Z ' + ' '.join(['0'] * 18 + ['birth']))
+    assert not oracle._gone({'pid': 17, 'birth': 'birth'})
 
 
 def test_unknown_residual_is_never_signalled(monkeypatch: Any) -> None:
