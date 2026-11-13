@@ -2216,6 +2216,89 @@
       "gpu_seconds": 0,
       "cpu_seconds": 100,
       "basis": "User-requested four-host passive resource checks every300s, max45minutes, script2b931/80CPUguard+20admin, no jobs/models/automatic submission/API/chat wake; a7 already ended and A2 failed at runtime permission gate."
+    },
+    {
+      "phase": "ball-real-DCVC-CPU-import-closure-v2-20261113",
+      "parent_phase": "ball-public-runtime-permission-repair-20261113",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 90,
+      "basis": "ONE corrected diagnostic only: match actual minimal receiver environment, existing typedcharacter/devnull write right; initial OS maps separate from new importclosure, no newruntime grants, preserve first failed90CPU trace. Same60child10controller20external/wall180, no model/weights/packet/GPU."
+    },
+    {
+      "phase": "ball-real-DCVC-CPU-import-closure-v3-20261113",
+      "parent_phase": "ball-public-runtime-permission-repair-20261113",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "basis": "Final narrower CPU import diagnostic only: v2 real decoder prefix reached device sentinel; public NumPy definition import needs OSError-compatible denied subprocess (no actual children); preserve partial closure and separate OS mapping metadata/no grants.30child5controller15externalCPU/wall90inner130transport. Internal+50CPU from approved unallocated Ball headroom, cardCPU1750/GPU900 unchanged; no GPU retry authority."
+    },
+    {
+      "phase": "ball-public-runtime-exact-config-construction-20261113",
+      "parent_phase": "ball-public-runtime-permission-repair-20261113",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "basis": "Root accepted v3 CPUimportprefix+allfivepuredefinitions, exact11publicruntimeleaves originalmanifest+supplement verified; onlyconfigconstruction/staging/hash/privateintersection review. No newCPUdenial/GPUrun release yet."
+    },
+    {
+      "phase": "ball-ca866-exact-config-real-CPU-denial-20261113",
+      "parent_phase": "ball-public-runtime-permission-repair-20261113",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 365,
+      "basis": "RootreleasedONEactual2case normalSVT+initiallauncher-kill/scopedteardown oracle exactca86611publicleafconfig; unchanged5eb/abcc/7fd4/env32e/nativef2;265campaign100external, same originalprivate/pixel/nativechecks. No GPU/CUDA/scale release."
+    },
+    {
+      "phase": "ball-ca866-Ada-metadata-preparation-20261113",
+      "parent_phase": "ball-public-runtime-permission-repair-20261113",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "basis": "Metadata-only newca866GPUwitness spec/twoobserverconfigs/control joins, no models/observer/jobstart. Rootacceptedactualfa824380 CPUgate/fullapprovalb031/nativef2/source5eb.50insidefuture1100CPU/900GPUwitness; future1050CPU900GPU UNRELEASED."
+    },
+    {
+      "phase": "ball-ca866-sixpoint16-GPU-witness-20261113",
+      "parent_phase": "ball-public-runtime-permission-repair-20261113",
+      "workstream": "ball",
+      "gpu_seconds": 900,
+      "cpu_seconds": 1050,
+      "basis": "RootreleasedONEexclusivegpu6Ada originalsixpoint16witness source5eb/abcc/7fd4/env32e/newca866 afteractualCPUfa accepted/b031+physicalmetadata pass.1050new+50metadata=1100 inclusive(700campaign200dualobservers150admin+50prep), GPU900.Prospectivenamespace458.804<500,550smoke30validator5noop; no qualityrule/source/modelchange, no full48/30/training or retry."
+    },
+    {
+      "phase": "ball-lazy-public-runtime-import-20261113",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 80,
+      "basis": "Entire CPU-only v4 inclusive ceiling prospectively charged, child50+controller5+external25; actual guarded deterministic setter plus lazyimports; one attempt/noGPU/models/packets/config/scale",
+      "release_stage": "research-first24/28-lazy-import-oracle"
+    },
+    {
+      "phase": "ball-complete-public-Python-config-metadata-20261113",
+      "parent_phase": "ball-complete-public-Python-runtime-repair-20261113",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "basis": "Rootreviewed exact3407originalpublic.py additions/allotherfieldsidentical; ONE attended twohashpass metadata/privateSTATonly helper +createonlyatomicpublication; remote35/local5/SSH5/external5; no Torch/denial/GPU/scoring/jobs/observers",
+      "release_stage": "research-first24/28-complete-public-Python-category"
+    },
+    {
+      "phase": "ball-passive-resource-watch-a9-20261113",
+      "parent_phase": "ball-ada-scale-and-denial-20261112",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 100,
+      "basis": "User regularresourcechecking; exactacceptedwatcher2b931eb5/freshnonce root,4hosts300scadence9ticks<=45min;80counted20external acceptedadministrativeallocation/SSHserver substrate unmetered caveat retained; noGPU/models/claims/autosubmit",
+      "release_stage": "research-first24/28-bounded-passive-resource-monitoring"
+    },
+    {
+      "phase": "ball-public-Python-publication-readonly-recovery-20261113",
+      "parent_phase": "ball-complete-public-Python-runtime-repair-20261113",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 15,
+      "basis": "ONE read-only physical publication/metadata/privateSTAT audit afteroriginalhelperreachedfinalabsoluteCHILDRENcheckandfailed; remote5/local5/SSH5; no replay/configwrites/models/native/denial/GPU/refund",
+      "release_stage": "research-first24/28-complete-public-Python-category"
     }
   ],
   "reservations": [
@@ -2827,8 +2910,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28-denial-and-scale-preparation",
       "gpu_seconds": 3218,
-      "cpu_seconds": 388,
-      "status": "Remaining_unspent; af6 expired/unassigned closed; A2 failed public Torch import/ACKed/full debit retained; all prior observers ended; a8 passive watch100CPU charged; actual GPU/CUDA gate unmet"
+      "cpu_seconds": 288,
+      "status": "Remaining_unspent; passivea9 metadata watcher100CPU released/precharged; no GPU request/scale/newsource release"
     },
     {
       "phase": "ball-svt-only-confirmation-feasibility-20261113",
@@ -2843,10 +2926,28 @@
       "phase": "ball-public-runtime-permission-repair-20261113",
       "workstream": "ball",
       "release_stage": "research-first24/28-public-runtime-closure-repair",
-      "gpu_seconds": 900,
-      "cpu_seconds": 1610,
-      "status": "Remaining_unspent; newlyassignedfromunallocatedapprovedBallheadroom1700CPU900GPU, first90CPUdiagnosticcharged; laterconfig50/CPUdenial365/GPUwitness1100UNRELEASED, exact5ebsource/envunchanged, no otherheldfundstransferred",
+      "gpu_seconds": 0,
+      "cpu_seconds": 5,
+      "status": "Remaining_unspent5CPU only; fullstagedca866GPUwitness900GPU1100CPUinclprior50metadata prospectivelycharged; no automaticretry/full48/30 release",
       "card": "docs/cards/k5d-public-runtime-repair-2026-11-13.md"
+    },
+    {
+      "phase": "ball-lazy-public-runtime-import-20261113",
+      "workstream": "ball",
+      "release_stage": "research-first24/28-lazy-import-oracle",
+      "gpu_seconds": 0,
+      "cpu_seconds": 0,
+      "status": "Remaining_unspent0; ONE attended80CPU/zeroGPU diagnostic released and fully precharged; no GPU/config/scale release",
+      "card": "docs/cards/k5d-lazy-runtime-closure-2026-11-13.md"
+    },
+    {
+      "phase": "ball-complete-public-Python-runtime-repair-20261113",
+      "workstream": "ball",
+      "release_stage": "research-first24/28-complete-public-Python-category",
+      "gpu_seconds": 900,
+      "cpu_seconds": 1485,
+      "status": "Remaining_unspent; metadata65CPU charged/originalprotocolFAILED/recoveryconfigphysicallyverified; actualCPU/GPUqualification DEFERRED untilfinalAda source review",
+      "card": "docs/cards/k5d-public-python-runtime-repair-2026-11-13.md"
     }
   ],
   "jobs": [
@@ -5405,6 +5506,111 @@
       "failure_audit_sha256": "695974bd6703d941bed90dd2933ac719e64844806ceae9778742eca989cc09ac",
       "cleanup": "11 unique captured PIDs absent; five groups empty; correct FQDN CPU allocations empty and assigned GPU claim absent",
       "reservation_upper_seconds_conditional": 150.362107921
+    },
+    {
+      "job_id": "20261113T041417Z-fa824380",
+      "phase": "ball-ca866-exact-config-real-CPU-denial-20261113",
+      "state": "COMPLETE rootaccepted exactca866 actualnormalSVT denial+initiallauncherkill/scopedteardown only; frozenproductionconsumerPASS; eventACKed",
+      "revision": "5ebc7831291c91a6c45f72791e1959dbd76ac5f3",
+      "source_sha256": "abccdf05666392ae8ad6d2ac8d944a8a30c25ccf5d944d29eccdb3f84d595b2e",
+      "snapshot_sha256": "7fd4e0e6ed2655b646d5601ba458fe66532f03040bba9b87c1607cca2e2fbfd0",
+      "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "config_sha256": "ca866e023b20cfeb51a52d96d56bab27f8d3b5529ec042d1d8eebbad5b8ea3af",
+      "deadline": "2026-11-13T04:31:32.632046+00:00",
+      "cpu_ceiling_precharged": 365,
+      "GPU_ceiling": 0,
+      "submit_backend": 97997,
+      "local_preparation": "/private/tmp/pointstream-runtime-permission-repair-20261113",
+      "fleet_wait_backend": 43249,
+      "fleet_wait_contract": "/private/tmp/pointstream-runtime-permission-repair-20261113/CPU-wait-contract.json",
+      "spec_sha256": "6775fa351755c623a072ceb2c03edd2b6acbcccf8bc82cdfab5a9ed30c33224c",
+      "fleet_wait_state": "ENDED10attentionCOMPLETEafter72s/no replacementwait",
+      "events_acknowledged": [
+        "98a746e86d845bc388ae69b400242c18"
+      ],
+      "root_approved_full_CPU_receipt_sha256": "b0315f7a487fa128a510bfeb7e12698ba0a7efdbca26949c306a4e5268f8d836",
+      "cleanup": "18 host PIDs absent/16capturedbirths+sup+campaign,4emptygroups; correctFQDNCPUfilezeroallocations;CURRENTobservationonly",
+      "root_approval_scope": "actualnormalSVTfilesystemdenial+initiallauncherinterruption; no active-native/unshare-only/fleet-watchdog/GPU/scale"
+    },
+    {
+      "job_id": "20261113T043746Z-55dd755d",
+      "phase": "ball-ca866-sixpoint16-GPU-witness-20261113",
+      "state": "FAILED CLOSED; actual public-import EACCES, six native preparations/zero accepted receivers/end-to-end; both eventsACKed; full debit retained",
+      "revision": "5ebc7831291c91a6c45f72791e1959dbd76ac5f3",
+      "source_sha256": "abccdf05666392ae8ad6d2ac8d944a8a30c25ccf5d944d29eccdb3f84d595b2e",
+      "snapshot_sha256": "7fd4e0e6ed2655b646d5601ba458fe66532f03040bba9b87c1607cca2e2fbfd0",
+      "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "config_sha256": "ca866e023b20cfeb51a52d96d56bab27f8d3b5529ec042d1d8eebbad5b8ea3af",
+      "cpu_approval_sha256": "b0315f7a487fa128a510bfeb7e12698ba0a7efdbca26949c306a4e5268f8d836",
+      "spec_sha256": "8da0b135de86eb9c9d33f4636a925ce1aa9ab3fc2ba2bf2ce3c0f59ac82838e0",
+      "deadline": "2026-11-13T04:52:21.321823+00:00",
+      "GPU_ceiling": 900,
+      "cpu_ceiling_precharged": 1100,
+      "submit_backend": 21559,
+      "root_observer_manifest_sha256": "7e9426a42ec29e5f665bcef61bcea26a306aec35131d39733450aa71053c4972",
+      "local_batch": "/private/tmp/pointstream-ada-window-ca866-20261113",
+      "host": "gpu6",
+      "canonical_status_GPU_UUID": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+      "fleet_wait_backend": 21884,
+      "fleet_wait_state": "ENDED10failedattentionafter72s/NOreplacementwait",
+      "assigned_GPU_UUID": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+      "selected_observer_index": 0,
+      "selection_receipt_sha256": "1923054da418b418dee65d55caeee23c417ccb5cdb75e1bed95d2e3543f11662",
+      "actual_GPU_claim_token_sha256": "9dc8ea6cacc40ea60b93e175576b4446926f4f8d4b6bf724ba4fa8e79523dfc1",
+      "observer_batch_wait_backend": 46867,
+      "observer_batch_state": "46867 ENDED naturally0; selected0 UNKNOWN/no live join, peer1UNKNOWN; no accepted reservation bound/reselection",
+      "failure_summary": "/private/tmp/pointstream-ada-window-ca866-20261113/failure-audit/summary.json",
+      "failure_summary_sha256": "a7ad737642628bd55382a6202703f1b6eb56a757e734b57372d39dfc62958bc1",
+      "failure_raw_sha256": "a19110c7cb0180937d3ede6e3fc9f2549281b5157fb774ffd759d74e1b173ca1",
+      "actual_failure": "PermissionError errno13 importing torch/_inductor/test_operators.py via torch._dynamo.trace_rules",
+      "current_claim_cleanup": "actual FQDN CPU file zero allocations; selected GPU claim absent; supervisor/leader absent and campaign group empty; historical release interval unproved",
+      "events_acknowledged": [
+        "2fb169b43fd956fdb1ce73a6094c2b1c",
+        "614c26143a055800b69a3fe7259a3c39"
+      ],
+      "known_process_cleanup": "All five observer wrapper/timeout/wait-helper births absent; empty timeout groups; campaign/supervisor/claims clear at earlier physical snapshot; no historical immediate release bound",
+      "closeout": "docs/experiments/k5d-inputs/ada-ca866-55dd-root-failure-closeout-20261113.json"
+    },
+    {
+      "phase": "ball-lazy-public-runtime-import-20261113",
+      "state": "COMPLETE rootaccepted CPU-only dependency evidence, no receiver/CUDA/inference/quality qualification",
+      "GPU_seconds": 0,
+      "CPU_precharge_retained": 80,
+      "backend": 55191,
+      "remote_root": "/local/users/emanuele/pointstream/metadata-prep/runtime-closure-ed380033c05e47c6ac2fc08018146153",
+      "result_sha256": "71cec2a164e19683f69b6a09813a5f6f4d50a88e2bb41eb3ea7ddee341079ee5",
+      "actual_prefix_determinism_setter_and_seven_imports": true,
+      "candidate_public_Python_leaves": 3,
+      "candidate_bytes": 1987,
+      "actual_child_CPU": 11.924533,
+      "no_followup_release": true
+    },
+    {
+      "phase": "ball-complete-public-Python-config-metadata-20261113",
+      "state": "Original helper FAILED after publication; independent read-only recovery physically verified complete immutable config/3407 rows/private intersections; not scientific qualification",
+      "backend": 94122,
+      "helper_sha256": "f1e6fe3ceea0e7c9843428f7198cffe494af116da61a1ca624945e42dcd6247b",
+      "config_sha256": "ae67091f3abfd17b9c414fe4485897ab063aadb7f541a8c96be0123a6c317e46",
+      "CPU_precharge_retained": 50,
+      "GPU_seconds": 0,
+      "stderr": "stage_remote.py101 ValueError unexpected child process; actualabsoluteCHILDRENnumericvalue notprinted; no assertion of new helper-spawned child",
+      "source_revision": "5ebc7831291c91a6c45f72791e1959dbd76ac5f3",
+      "local_root": "/private/tmp/pointstream-public-python-runtime-repair-20261113",
+      "recovery_summary_sha256": "efd7ef87331bed504510a82c1c6b2f4f2f4e1864f0f6711d21efbb6032e914ff",
+      "recovery_raw_sha256": "f9f3a75d5f482ec4d436cefd55a36d214caf61eff05dfc2133692c7bc9deef1d",
+      "recovery_CPU_charge": 15,
+      "original_absolute_CHILDREN_cause": "unproven; no zero-new-child claim retroactively"
+    },
+    {
+      "phase": "ball-public-Python-publication-readonly-recovery-20261113",
+      "state": "COMPLETE rootaccepted physical publication scope only; originalhelperremainsFAILED; no qualification/refund",
+      "CPU_precharge_retained": 15,
+      "GPU_seconds": 0,
+      "config_sha256": "ae67091f3abfd17b9c414fe4485897ab063aadb7f541a8c96be0123a6c317e46",
+      "raw_sha256": "f9f3a75d5f482ec4d436cefd55a36d214caf61eff05dfc2133692c7bc9deef1d",
+      "summary_sha256": "efd7ef87331bed504510a82c1c6b2f4f2f4e1864f0f6711d21efbb6032e914ff",
+      "actual_remote_CPU": 1.003159,
+      "actual_child_CPU_delta": 0
     }
   ],
   "old_budgets": "closed, not borrowed",
