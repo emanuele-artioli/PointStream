@@ -1,0 +1,177 @@
+{
+  "schema": 1,
+  "ROOT_accepted": true,
+  "state": "CLOSED_SCOPED_ANALYSIS_ACK_NOT_APPLICABLE_IMMUTABLY_ARCHIVED",
+  "scope": "Descriptivepairedsaved292analysis,3SVTpoints/bothjudges/10pxprimary5secondary; one retrospectiveclip; no new inference/codec/frame independence/matchedrate/BD/sourcequalification/realism claim",
+  "producer_job": "20261113T173340Z-64160888",
+  "execution_identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "f813e09d2fa0eb51b5ec160dcda0cd230d3dada7be697882f9b657201490e61d",
+    "source_sha256": "e4d4a856a06c5f9a06586056ab4a30f0c73b232e5a3db035ae6eb5546063f80b"
+  },
+  "producer_source_revision": "4282c96f8aaf7d229f53df4c1c5f8225d8454d6e",
+  "original641_acceptance_index": {
+    "path": "docs/experiments/k5d-inputs/svt-study4282-64160888-confirmation292-root-acceptance-20261113.json",
+    "sha256": "4922cb4f14c380aedf88f80be686f2f1c32755852b67f64f8976d8ebf798dc43"
+  },
+  "ROOT_analysis_acceptance": {
+    "local": "/private/tmp/pointstream-saved292-rescue-absence-analysis-ROOT-actual-20261113/ROOT-accepted-saved292-rescue-absence-analysis.json",
+    "sha256": "4776e9e7926076c5bd10409c6ba07e4a54a1c8b4ffc401d614979cbf726085a0"
+  },
+  "independent_review": {
+    "local": "/private/tmp/pointstream-saved292-independent-review-v3-20261113/independent-review.ROOT-UNSET.json",
+    "sha256": "b25df14e91dd01d0b84dd61682d0cd5e68f17765639047926e11287c74db344d",
+    "status": "PASS_INDEPENDENT_RAW_RECOMPUTATION",
+    "helper_imported": false
+  },
+  "authenticated_original_raw": {
+    "sha256": "9e3fec85a65383eea161d6b9e1cb21910e1077e06d2251333105053508a6c12c",
+    "bytes": 202181082,
+    "ROOT_original_acceptance_sha256": "437bc322ab01a3d16e4f927be2c1488f1efb13fa1bf85b1207a54d4eb88e11a1",
+    "not_duplicated_in_new_archive": true
+  },
+  "coverage": {
+    "visible": 261,
+    "absent": 30,
+    "excluded": 1,
+    "SVT_points": [
+      48,
+      55,
+      62
+    ],
+    "judges": [
+      "WASB_primary",
+      "BallTrack_encoder_model_diagnostic"
+    ],
+    "thresholds_px_inclusive": [
+      10,
+      5
+    ],
+    "aggregate_tables": 54,
+    "frame_CSV_rows": 3504,
+    "unique_frame_point_judge_combinations": 1752,
+    "CSV_threshold_duplication_disclosed": true
+  },
+  "accepted_findings": {
+    "WASB10_rescue_harm_by_CRF": {
+      "48": [
+        136,
+        0
+      ],
+      "55": [
+        175,
+        0
+      ],
+      "62": [
+        224,
+        0
+      ]
+    },
+    "CRF62_absence_both_judges": {
+      "persistent_false": 3,
+      "new_false": 2,
+      "removed_false": 0,
+      "negative_frames": 30
+    },
+    "secondary5px_harms_CRF48": {
+      "WASB": 2,
+      "BallTrack": 1
+    },
+    "CRF62_baseline_streak_wire_kbps": [
+      63.05753424657535,
+      64.08493150684933
+    ]
+  },
+  "pointwise_absence": {
+    "CRF48": {
+      "WASB": {
+        "both_false": 3,
+        "introduced": 0,
+        "removed": 0
+      },
+      "BallTrack": {
+        "both_false": 2,
+        "introduced": 1,
+        "removed": 0
+      }
+    },
+    "CRF55": {
+      "both_judges": {
+        "both_false": 2,
+        "introduced": 0,
+        "removed": 0
+      }
+    },
+    "CRF62": {
+      "both_judges": {
+        "both_false": 3,
+        "introduced": 2,
+        "removed": 0,
+        "negative_frames": 30
+      }
+    }
+  },
+  "guard_off": {
+    "svt-48": false,
+    "svt-55": false,
+    "svt-62": false
+  },
+  "rate_scope": "CRF62 baselinePSBL63.05753424657535\u2192streakPSBL64.08493150684933kbps, actualdifferentprices; notmatchedrate. NoBD/PCHIP computed.",
+  "closed_failed_gates_unchanged": [
+    "pooled10/197>.05",
+    "292source2/30>.05/min100negativesunmet"
+  ],
+  "evidence_files": {
+    "intent.json": {
+      "sha256": "c2ac6081335547c95a2705c26aff59df41a60c25c6bebe534fc642fc3ea9c4c3",
+      "bytes": 371
+    },
+    "provenance.json": {
+      "sha256": "3a3b147234bb62da25eb27d3f3b07548cbb3e7e69d928838ee3703485e76944b",
+      "bytes": 5545
+    },
+    "frame-transitions.csv": {
+      "sha256": "e50089b4659ad8c84d84f1794347ad08445b8552784d607cb1af3b68ad9cdfba",
+      "bytes": 1291955
+    },
+    "results.ROOT-UNSET.json": {
+      "sha256": "e9883053e13a7486c2d7b23c933b331c116cc5bd5b925ca3fcebd9ce4aa5e699",
+      "bytes": 20115
+    },
+    "CPU-receipt.json": {
+      "sha256": "63c7bcd09e28d1d449271f1d7db5cbf25687199507cce2474868811793e47300",
+      "bytes": 136
+    },
+    "aggregate-transitions.csv": {
+      "sha256": "1ff1211b50fc5ca72a3d0d70e5ada57447fc3d08d4dc7dac595fd9e45a621fda",
+      "bytes": 2991
+    }
+  },
+  "immutable_archive": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-saved292-rescue-absence-e3ae88ccbab68a19aa0a34a9/analysis.tar.gz",
+    "sha256": "e3ae88ccbab68a19aa0a34a9ad12328352d00a69ae44901edfd7cbe01220aa12",
+    "bytes": 580309,
+    "members": 26,
+    "file_mode": "0444",
+    "directory_mode": "0555",
+    "publication_backend": 28118,
+    "receipt_local": "/private/tmp/pointstream-saved292-rescue-absence-archive10-FALSE-20261113/actual-publication/verified.json",
+    "receipt_sha256": "d5a2e188d2e2eb5deb29cafc799a7ed964dad46da392959e1f59df23cb49a3ff"
+  },
+  "budget_closeout": {
+    "parent_CPU": 60,
+    "charged_CPU": 50,
+    "GPU": 0,
+    "never_released_CPU_returned": 10,
+    "returned_parts": {
+      "unused_status": 6,
+      "reserve": 4
+    },
+    "refund_of_prior_charges": false
+  },
+  "preserved_review_failures": [
+    "Reviewer syntax typo stoppedbeforeexecution",
+    "Reviewer initialnonvisiblehitFalse expectation corrected toNA/blank; actualanalysisunchanged"
+  ],
+  "limits": "One selection-exposed retrospectiveclip, correlatedframes; sourcepredictions strata do not reconstructautomatic senderstate. No newframes/inference, judgeindependence, sourcequalificationoverride, absence/realism/generalization/speed/full30 claim."
+}

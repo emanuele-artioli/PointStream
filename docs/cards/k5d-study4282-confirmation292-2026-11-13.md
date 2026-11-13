@@ -77,3 +77,13 @@ Strong absence/realism claims remain blocked. Relative counts stay descriptive.
 The sender starts with automatic BallTrack predictions followed by pixel fitting;
 labels do not seed its trajectory. WASB is the distinct primary judge, while
 reused BallTrack is an encoder-model diagnostic.
+
+Retrospective forecast arithmetic audit (November13 closeout): the historical
+listed campaign2230 +tail95 +external775 totals3100CPU, while its headline
+ceiling is3000CPU. Preserve this discrepancy and all charges; no retrospective
+allowance increase or refund is inferred. The accepted534.0789s command wall
+and scoped527.046201CPU do not establish complete aggregate lifecycleCPU, so
+they neither prove an overrun nor repair the original complete-forecast claim.
+Future confirmation must use a new disjoint, correctly summed prospective
+partition and fresh measured cost gate. Physical/quality acceptance is retained
+with this resource-accounting limitation.
