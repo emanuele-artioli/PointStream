@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "decision": "Root closes unassignedW8queue asprep-only; no modelresult",
+  "job_id": "20261110T123904Z-0e193d36",
+  "gpu_seconds": 0,
+  "CPU_allocation": 150,
+  "qualification_execution": false,
+  "observed_tree": [
+    "events",
+    "owner",
+    "ready.json",
+    "source.tar",
+    "spec.json",
+    "state.json",
+    "events/a125236bf617507382c3874075073733.json",
+    "owner/identity.json"
+  ],
+  "matching_claim_files": [],
+  "sweeper_owner_is_not_execution_host": true,
+  "raw_directory": "/private/tmp/pointstream-w8-expiry-audit-20261110-a1",
+  "raw_sha256": {
+    "source-event-owner.txt": "8e39b06b741aa41fdc2e1b305b8168345ec724ef9fd883a9df57bb403a005ea4",
+    "intent.json": "a298c4d41838928ecda66507c294f55c517a2639f78536c1d400390fae80866f",
+    "audit.stdout": "cb168d2cee672f594394702c4d39b8900bab612f12666bad623af8ec4f924252",
+    "ack.json": "43fbb92295dce6b1e54ca3f1c8eaa249760ead2f6635cdda59e7e53f4744f259",
+    "handle.json": "c250b7bc58922b42b6422f9a75bae2141a2cac06dffc155f27dcfa86378d0a83",
+    "audit.py": "8f21a4a22e895dbad750c8aee84a59e1e0ccda42406fb2856844ea3974284137",
+    "result.json": "f2a466af07b1e50ed48f7f4f414fbcf81f70084b9a6047e4efc1256721905339",
+    "events.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "events.json": "25994e0796f0e9ce5036db764d0836685e17d1a5b2eb4e6253817d36797e2f62",
+    "audit.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ack.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "REVIEW-ONLY-550-worksheet.json": "9fb67e2a675cf6284e6fc1564bbcc14014356fdf9f6ec77b39ee112dccbcedfb"
+  },
+  "accounting": "Full150externalallocationincl10readiness;queuewallnotCPU;aggregatemanageradministrationunmeasured;old450campaignneverran."
+}

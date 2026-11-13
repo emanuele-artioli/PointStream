@@ -1,0 +1,60 @@
+{
+  "accounting_note": "Fleet, SSH and administrative aggregate CPU unmeasured; conservative30 within proposed1200 CPU pilot, root owns charge.",
+  "active_jobs": 0,
+  "conservative_readiness_cpu_charge": 30,
+  "cpu0_available": true,
+  "deadline": "2026-11-09T23:14:04.716638Z",
+  "doctor_passed": true,
+  "gpu2_cpu_claim_empty": true,
+  "gpu2_free_mib": [
+    24948,
+    29031
+  ],
+  "gpu2_required_free_mib": 18432,
+  "gpu_seconds": 0,
+  "host_metadata_cpu_seconds": [
+    0.13166799999999998,
+    0.11832299999999998
+  ],
+  "known_jobs": 1651,
+  "large_cache_note": "All large caches present by metadata; prior hashes are not fresh content verification. Canonical staging must hash bytes.",
+  "logical_inbox_digest": "b6ae2c411b8ddf677d68b40d651a570bbd9dfd35ff290baa2c13b4a78a753850",
+  "native_admission_fresh_sha256": "9eb8adc75eb96087aeffa334b2291fdd892745355c9fdb4f02b4cb7da1348b18",
+  "native_admission_path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-20261104-inputs/parent8-native-edaf-parity-admission-9eb8adc7-20261109.json",
+  "new_receipt_cache": "tiny newly uploaded receipt not yet warm",
+  "next_gate": "Root exact-spec review and separate GPU release; no automatic submission or retry.",
+  "normalized_diff_from_reviewed_draft": [
+    "deadline",
+    "deadline_epoch"
+  ],
+  "normalized_file_sha256": "809087c06d2cfb7200f55b27d547065b709ebef44b7d9d7707a48526a0afc7d3",
+  "raw_paths": {
+    "doctor": "/private/tmp/k5d-parent8-gpu16-readiness-doctor.json",
+    "gpu2_post": "/private/tmp/k5d-parent8-gpu16-readiness-host-post.json",
+    "gpu2_pre": "/private/tmp/k5d-parent8-gpu16-readiness-host-pre.json",
+    "host_script": "/private/tmp/k5d-parent8-gpu16-readiness-host.py",
+    "jobs": "/private/tmp/k5d-parent8-gpu16-readiness-jobs.json",
+    "normalized": "/private/tmp/k5d-parent8-gpu16-final-20261109/normalized.json",
+    "upload_plan": "/private/tmp/k5d-parent8-gpu16-readiness-upload-plan.json",
+    "workers": "/private/tmp/k5d-parent8-gpu16-readiness-workers.json"
+  },
+  "raw_sha256": {
+    "doctor": "fded226b2ebafd24b5e9c147e288d596e1c4de7abf6430bb846bb4b8988a308e",
+    "gpu2_post": "f8a7777676ff5a8fa531c41caac43eac11d341a4f796f03f97f9990198a7eca0",
+    "gpu2_pre": "45ede30d946f86b50f6525653a5d110d224d9734284956cfb62b298e19adaa54",
+    "host_script": "1aa81fec83ce368a1340f459987c735ffb1ad61e9956a762e2f1506a4f09a3b4",
+    "jobs": "fcd6838f0718a5cbe48aeee4516992d2404ae81ff1c9dc050c77b56ae2dbdb60",
+    "normalized": "809087c06d2cfb7200f55b27d547065b709ebef44b7d9d7707a48526a0afc7d3",
+    "upload_plan": "d17ee9058d9cc01c4366ab692eb106e4f50ce089aa0ab19013939b391435d265",
+    "workers": "1e3f7e3ac241f4db32f75c142ccc84f81a24b2be964e58fef6acec46a5b4362a"
+  },
+  "raw_spec_sha256": "032125cb4a47ecd7cbe7a14b75e0ac971f300b9b97c5b42fa9e1e78d20730079",
+  "revision": "965d801ada4b8ccb6e54685f4560de8287931d00",
+  "schema": 1,
+  "snapshot_sha256": "9f486d70424b9d293d8774c92b36350d284edcb2513c415390b88a2b4c344aed",
+  "source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/k5d-parent8-child2-965d-20261109/source.tar",
+  "source_cache_fresh_sha256": "9f486d70424b9d293d8774c92b36350d284edcb2513c415390b88a2b4c344aed",
+  "source_sha256": "58787f8664f961c2287228762c1ddd3295adab4042bd7f41d9bfee87d2666104",
+  "spec_path": "docs/experiments/k5d-inputs/parent8-parity16-final-spec-20261109.json",
+  "status": "readiness complete; separate root review and GPU release required"
+}

@@ -1,0 +1,29 @@
+{
+  "scope": "Code validation only; not model or scientific qualification",
+  "revision": "f33d2246734b27e19525fe5cac79b99fa99d686e",
+  "ruff": "passed",
+  "mypy": {
+    "passed": true,
+    "files": 531
+  },
+  "pytest": {
+    "passed": 1861,
+    "skipped": 37,
+    "failed": 0
+  },
+  "wall_seconds": 167.9389570839994,
+  "waited_children_and_supervisor_cpu_seconds": 243.06792099999998,
+  "charged_cpu_seconds": 500,
+  "limitations": [
+    "A runner print formatting error occurred after all checks and receipt were written; the runner process exited nonzero despite all three checked commands exiting zero.",
+    "Primary live ps parser discarded samples; a separate machine-only guard monitored the process tree and did not trip.",
+    "The separate guard CPU was not included in RUSAGE totals and detached descendants were not proven; charge the reserved 500 CPU seconds conservatively."
+  ],
+  "receipt_sha256": "7b0e128bf3fa43f15dae7d031ce117bbc4a693845ca4c830e7b1b5a8f27ced83",
+  "addendum_sha256": "85a3ab038b9c501964aa28c498ce7bcd683aab37e12928713a760993d0018dd8",
+  "logs": {
+    "ruff": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "mypy": "466c6031e91133d84e4fa6db6762b2b69300a7fdfa9ac97292a224d5de58d534",
+    "pytest": "94cce6b0a98d609a89e54cbb2e6f6b902ecd74a00d16e7c611c3de8c93abf3dc"
+  }
+}

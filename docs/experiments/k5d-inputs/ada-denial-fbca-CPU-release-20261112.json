@@ -1,0 +1,47 @@
+{
+  "approved": true,
+  "canonical_spec_sha256": "c46ad99f769b7e3afeca1755a6b862ead30146b1e8f34c1af9971b24087711cb",
+  "cpu_basis": "100 single-core native campaign plus150 external preparation/readiness/admission/wait/audit/cleanup; includes earlier same-phase readiness",
+  "cpu_seconds": 250,
+  "deadline": "2026-11-12T23:25:08.275770+00:00",
+  "gpu_seconds": 0,
+  "host_checks": {
+    "claims": {
+      "allocations": {},
+      "available_cores": 85,
+      "cap": 81,
+      "host": "gpu6.itec.aau.at",
+      "updated_at": 1794517640.9579322
+    },
+    "cpu_affinity_0": true,
+    "environment_python": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+    "file_sizes": {
+      "archive": 2564111322,
+      "decoder": 43080,
+      "encoder": 121792,
+      "ffmpeg": 444592,
+      "unshare": 31336
+    },
+    "hashes": {
+      "archive": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18",
+      "decoder": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+      "encoder": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+      "ffmpeg": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+      "unshare": "9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6"
+    },
+    "host": "gpu6",
+    "local_free_bytes": 1586878648320,
+    "self_cpu_seconds": 2.117704,
+    "separate_filesystem": true
+  },
+  "identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "aa06c0cff324e084cae01b3dccaf2eea8e987e3a32cd571677d148cadd285cc7",
+    "source_sha256": "ebd37c62cd6c27be66ddfdf58547ee66ba14ff36f31380b8316a392f06e9d4c2"
+  },
+  "namespace_wrapper_sha256": "fd06c46d992741ce5c86791608363bd6566cd2737f8c49e0098897291972e316",
+  "no_automatic_retry": true,
+  "readiness_gpu6_doctor_passed": true,
+  "revision": "fbca94d6ad8b90ff564f896425dfca198be78c3f",
+  "scope": "one exact-source native CPU containment/accounting proof, not filesystem isolation or model/GPU inference"
+}

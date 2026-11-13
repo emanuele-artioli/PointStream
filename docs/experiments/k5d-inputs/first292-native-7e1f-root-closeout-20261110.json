@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "decision": "Root accepts exact-source nativeCPU proof only; no GPU or292 release",
+  "job_id": "20261110T095341Z-7e1f4b1b",
+  "source_sha256": "390e157a9aabc1db8006a936a7de54a43c8810650260136bc59a67036e7dfd39",
+  "snapshot_sha256": "202466a711d17b742a17270bab91da2dc581af7a9fc1e411405f8bb37a924372",
+  "spec_sha256": "51b73aedf1d44ab4ebc6309be351db113e6a57aaef82a44e90c5bb748a1a3fe2",
+  "independent_audit_sha256": "3d80afbfaa2da51b87ab7dd2273c746cd740fe5b3bc6442fe99bf6abb1f4c947",
+  "root_checks": [
+    "Fresh canonical COMPLETE and substantive gate",
+    "All12 independent rawartifact hashes rechecked",
+    "Actual smokeoracle normal native bytes and decoded SHA, four exitcodes and independently waited CPU comparison inspected",
+    "15 recorded births/groups/claim absent per audited later observation"
+  ],
+  "gpu_seconds": 0,
+  "additional_cpu_allocation_seconds": 250,
+  "already_charged_preparation_cpu_seconds": 50,
+  "inclusive_cpu_allocation_seconds": 300,
+  "accounting": "Full approved ceiling retained; aggregate CPU unmeasured. Lifecycle inference not converted to measured CPU.",
+  "gpu_or_scale_qualified": false
+}

@@ -1,0 +1,42 @@
+{
+  "job_id": "20261105T051402Z-14f7a33e",
+  "status": "complete",
+  "git_head": "1f648764203bc0288334bffa4fc668a6c8892fa2",
+  "source_sha256": "524c33d1dad80c2c8a55fc3202234c29900e0dd6267e6a4d5d4ee66c5f7bbe54",
+  "spec_sha256": "84cf12e6579c534e09701c9076aa86793bedac14be31f31cd6ef1e23d3124c93",
+  "snapshot_sha256": "5fcb732b958baf63bddd3bd633c6fbfd4d793b4086cb5180acb8737e142fd6f7",
+  "window_manifest_sha256": "18d184cd39f6a4029a98e6fd9852d1e38f5cfde5c2ee19e5bc67bd69299c5e15",
+  "publication_sha256": "55739efe3cbf6937b6251e26c2ed1322663f8d1d2d1ee5f36bfb1ace593cdb59",
+  "publication_bytes": 5283840,
+  "audit_full_passed": true,
+  "logical_roles": 75,
+  "counts": {
+    "rerate": 53,
+    "control": 18,
+    "new_score": 4
+  },
+  "delivery_map_sha256": "fd53ad6f70b589e1849cd94ede731c1259867b48d0e2b80cf64fcd52dbc5377e",
+  "host": "gpu5",
+  "cpu_affinity": [
+    0
+  ],
+  "supervisor_and_campaign_pids_absent": true,
+  "matching_claim_absent": true,
+  "source_tree_removed": true,
+  "smoke_gate": {
+    "passed": true,
+    "checks": {
+      "two_mixed_cadence_roles": true,
+      "independent_native_yuv": true,
+      "all_frame_timestamps": true,
+      "cost_forecast": true
+    },
+    "full_forecast_seconds": 574.50352001586,
+    "phase_elapsed_seconds": 19.962631464004517
+  },
+  "full_execution_seconds": 74.98207020759583,
+  "created_to_status_update_seconds": 132.21519899368286,
+  "recommended_inclusive_cpu_seconds": 223,
+  "cpu_accounting": "conservative elapsed lifecycle plus 90 external; not measured CPU occupation",
+  "scope": "native YUV, ordered payloads and timestamps only; no GPU or quality admission"
+}

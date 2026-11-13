@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "decision": "Release LOCAL saved188 rate-quality analysis only, notcurrentfull30credit",
+  "CPU": 20,
+  "GPU": 0,
+  "precharged_CPU": 20,
+  "old_job": "20261105T003756Z-cc450baf",
+  "old_revision": "b26e5b43702a21c37bcb4357223e0e6a25e1bec5",
+  "old_source_sha256": "c212f85b429f3a1abbca925de25736334fd06ffe9e821fac7798aaa99703fda7",
+  "old_publication_sha256": "622fd68d5380b97449a09872bc15402117dd9c3e7a2576a757cd6aff8fd090d7",
+  "scope": "Usephysicallyrecoveredsavedpublicationplusoriginal-source/GT/method/receipt audits alreadyaccepted. Exactrealwirebytes+sixpoint/twoarmframearrays. Existingachievableanchorhull/PCHIPpermetricatqualityoverlap; nocurveoverlapreportbetter/worse at everyrate onlyifstrongdominanceconditionactuallymet. Full/cropLPIPS/DISTS/pooledPSNR and WASB5/10px/BallTrackdiagnostic if existinganalysis supports; donotinventafullpopulationCI/BDnumber. Preservefidelity-gate/purpose andcalibration exposure. No new model/native decode/ZIPframe extraction/network/remote/codec/judge calls. No current16 gate surrogate ornewindependentclip/reusecredit.",
+  "outputs": "NewseparatecacheanalysisJSON+shortscopedreport withallsource/input/code/metric/accountingidentity+command+checks. Useexistingpureanalysisfunctions/semantics ratherthanstandins. Missinghistoricalvalidatorinputmustbereported,nopath/reportmutationorvalidationbypass. Ifonlypureperpointanalysissafelysupportedreportthatandremaininggap.",
+  "guard": "20CPU inclusive enforced local command cap, wall<=120s; preserveoldrawdataread-only, writeonlynewanalysisdir. Thisisresearchanalysisnotmanuscriptwork."
+}

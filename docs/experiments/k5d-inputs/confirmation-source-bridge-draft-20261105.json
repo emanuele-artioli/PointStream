@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "status": "draft; no actual dispatch, scientific approval, or CPU/GPU qualification",
+  "approved": false,
+  "calibration_execution_identity": {
+    "source_sha256": "8a3b51c487cf9b456e304fdf24300f230ece3f3c7b2c8569ab6681fbd8166f13",
+    "snapshot_sha256": "c3ff5419167504afcd84d25931791eddfe8bae16b5e492ed124df31e43f66f67",
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "consumer_execution_identity": {
+    "source_sha256": "199fe3b510bce86310bbf9b63cb5f413a8f7106e1cb210fc95be90f48ba082ce",
+    "snapshot_sha256": "fc890decea70a8ec78c547fb102b937943ae03570327b14099e7de3365dc0c8f",
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "calibration_snapshot_sha256": "c3ff5419167504afcd84d25931791eddfe8bae16b5e492ed124df31e43f66f67",
+  "consumer_snapshot_sha256": "fc890decea70a8ec78c547fb102b937943ae03570327b14099e7de3365dc0c8f",
+  "changed_paths": [
+    "experiments/tennis/k5d_control_bridge.py",
+    "experiments/tennis/k5d_control_readiness.py",
+    "experiments/tennis/k5d_control_study.py",
+    "experiments/tennis/k5d_cpu_accounting.py",
+    "experiments/tennis/k5d_full_cost_builder.py",
+    "experiments/tennis/k5d_native_cpu_workload.py",
+    "experiments/tennis/k5d_native_pid_oracle.py",
+    "experiments/tennis/k5d_pid_escalation_oracle.py",
+    "experiments/tennis/k5d_pid_namespace_wrapper.py",
+    "experiments/tennis/k5d_readiness_cost_probe.py",
+    "experiments/tennis/k5d_real_parity.py",
+    "experiments/tennis/k5d_scoped_namespace.py",
+    "experiments/tennis/k5d_study_wave.py",
+    "tests/tennis/test_k5d_control_bridge.py",
+    "tests/tennis/test_k5d_control_readiness.py",
+    "tests/tennis/test_k5d_control_study.py",
+    "tests/tennis/test_k5d_cpu_accounting.py",
+    "tests/tennis/test_k5d_full_cost_builder.py",
+    "tests/tennis/test_k5d_native_pid_oracle.py",
+    "tests/tennis/test_k5d_readiness_cost_probe.py",
+    "tests/tennis/test_k5d_real_parity.py",
+    "tests/tennis/test_k5d_scoped_namespace.py",
+    "tests/tennis/test_k5d_study_wave.py"
+  ],
+  "unchanged_files": 1348,
+  "scope": "complete archived source manifests; no checkpoint identity substitution",
+  "candidate_git_head": "e64a7bc612f651514aa0645516697913f25b0545"
+}

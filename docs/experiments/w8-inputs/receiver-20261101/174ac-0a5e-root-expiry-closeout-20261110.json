@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "job_id": "20261110T133353Z-0a5e1789",
+  "decision": "Close unassigned expiry; no generation or GPU evidence",
+  "canonical_state": "expired",
+  "GPU": 0,
+  "CPU_conservative_allocation": 150,
+  "measured_remote_audit_CPU": 0.201886,
+  "aggregate_CPU_measured": false,
+  "true_qualification_preparation_CPU_total": 600,
+  "raw_audit_directory": "/private/tmp/pointstream-w8-second-expiry-audit-20261110-a1",
+  "audit_sha256": "bb67bef0f271ff7ebac210f42ace1219af07c75c7dcd98fbc1568ea483bd58ba",
+  "wait": "Solecanonicalwaitendedexit10,2364.46wall;notCPU",
+  "terminal_client_event": "b2b5977c5518521b8805af465140881a",
+  "event_acknowledged": true,
+  "remaining_W8_CPU_reservation": 2458,
+  "scope": "No assignment/run/attempt/gate/claims;gpu3ownerexpiry-sweeper,gpu5admissionbusy/nonidle/lowmemory. No nextqueue released. Cumulative1000guardcannotfit600prep+550future; preserveattribution,nonce,limits."
+}

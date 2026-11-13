@@ -1,0 +1,273 @@
+{
+  "audit_cpu_seconds": 0.141193,
+  "environment_sha256": "bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e",
+  "full_source_files_verified": {
+    "experiments/__init__.py": "06f003a15341e1a630da290bb9f66f11bd79de593e85aff33fdd1b548db2cba9",
+    "experiments/tennis/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "experiments/tennis/k6b_generate.py": "00248aa4fdd47e634f82b37a7a33c99f1794440d65cbfe9395255a4225735542",
+    "experiments/tennis/w8_cuda_system_leaves.py": "4cbca949843da0254644e666b6c6d86400fe37e22b316f921da3fc8715e0f970",
+    "experiments/tennis/w8_folder_oracle.py": "1db0c096065f4e5c710de02a99679cf81ad15738312b6d37572a7b0b91f378ee",
+    "experiments/tennis/w8_profiler_clock_oracle.py": "f8166c5d9db64ea41c28f18311dc6fecdc0af4f1ae77c10e2da147318dae2c39",
+    "experiments/tennis/w8_public_folder_materialize.py": "e127da6bffbf055b40a163b0026b50f9bb56e083c75ad017007d4145453b1fcc",
+    "experiments/tennis/w8_receiver_bootstrap.py": "3fb7f0b2ab33fdfa185f38c3bfe8f977540dc13cc10b8f0ccce0625c1de03e49"
+  },
+  "gate": {
+    "arms_complete": true,
+    "checks": {
+      "cpu_profile_arms": true,
+      "experimental_clock_grants": true,
+      "namespaces": true,
+      "publication_identity_and_raw_traces": true,
+      "source_identity": true,
+      "strict_denials_and_mutations": true,
+      "synthetic_input": true
+    },
+    "passed": true,
+    "policy_denials": true,
+    "scope": "CPU only; no model or GPU qualification",
+    "source_verified": true
+  },
+  "job_id": "20261105T122632Z-6246e036",
+  "lifecycle": {
+    "created": 1793881613.2978358,
+    "creation_to_ended_seconds": 58.810166120529175,
+    "creation_to_updated_seconds": 98.61644649505615,
+    "ended": 1793881672.108002,
+    "gpu_seconds": 0,
+    "proposed_conservative_cpu_seconds_including_80_external": 179,
+    "started": 1793881651.898277,
+    "updated": 1793881711.9142823
+  },
+  "normalized_spec_sha256": "4ea9817ef7df3a448b95fc55a5dfde90695bc0c25214005c44d6f3cf8e56ae06",
+  "publication_sha256": "35aa172fde8987633c94c7aaf3d9817cc158262c43eb832a6d7390142ac8da0d",
+  "raw_artifact_sha256": {
+    "clock": {
+      "config": "2d136b675458438e0d6fe417e8ece33245ad7c2acfc2f1789a612bbc04683721",
+      "receipt": "6d70c03c82744b1c0c5eaf903e647d79036df2c8add5a683888e73c81b35b5ec",
+      "stderr": "16a32dd57158751863fe4d87493a04ee23c9de76090c3be59f94da2c184cb358",
+      "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "trace": "89ca1471ed4ee070a8a085ddb7cb99191df1f729612218748913b415eb2d67aa"
+    },
+    "strict": {
+      "config": "b48c5943dba3840cd537384ac22fd9ee383723d6078ba582af99a1b9d3a9665d",
+      "receipt": "0e5efc271eb7bf871f700479570f34ad2ba35985132ef60be0c5f037409b0f55",
+      "stderr": "e1ab7df75afbea84483da755706337940ba1a558a00fc68f7cc25402958221c9",
+      "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "trace": "48293a25e6f7182a4bcf945f5405b653e437748d77c38225c2401bbdc9e04955"
+    },
+    "unrestricted": {
+      "config": "17261a21417ffead35f2576a07accf6b17e8575eb3325271f4f24d66e5ecd694",
+      "receipt": "e3b3c207e8ad97920f4ab3bd71bb17c1f838fb1379de2aa6620e88863ff244c0",
+      "stderr": "e9cc732f9ee5b2a0d0a9fc0c6c06caf4a36ddf38781c849c78f480870bc7a5d7",
+      "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "trace": "8b094feb082648d25428196520466b7ed47231c3dbdd8023667cf4066c143d13"
+    }
+  },
+  "release": {
+    "campaign_pgid": 409742,
+    "cpu_claim_released": true,
+    "device_claim": null,
+    "pids_present": [],
+    "process_group_present": false,
+    "supervisor_and_campaign_pids": [
+      409741,
+      409742
+    ]
+  },
+  "results": [
+    {
+      "all_clock_lines": [],
+      "arm": "unrestricted",
+      "clock_calls_between_markers": {
+        "cpu": [],
+        "requested_cpu_cuda": []
+      },
+      "clock_grants": null,
+      "cuda_after": false,
+      "cuda_before": false,
+      "denial_count": 0,
+      "mutations": null,
+      "namespace_distinct": true,
+      "parent_clock_identity": null,
+      "results": {
+        "cpu": {
+          "success": true,
+          "warnings": []
+        },
+        "requested_cpu_cuda": {
+          "success": true,
+          "warnings": [
+            "CUDA is not available, disabling CUDA profiling"
+          ]
+        }
+      },
+      "torch_version": "2.7.0+cu128",
+      "trace_bytes": 1476427,
+      "trace_sha256": "8b094feb082648d25428196520466b7ed47231c3dbdd8023667cf4066c143d13"
+    },
+    {
+      "all_clock_lines": [],
+      "arm": "strict",
+      "clock_calls_between_markers": {
+        "cpu": [],
+        "requested_cpu_cuda": []
+      },
+      "clock_grants": null,
+      "cuda_after": false,
+      "cuda_before": false,
+      "denial_count": 10,
+      "mutations": {
+        "create": 13,
+        "link": 18,
+        "mkdir": 13,
+        "remove": 13,
+        "rename": 13,
+        "truncate": 13,
+        "write": 13
+      },
+      "namespace_distinct": true,
+      "parent_clock_identity": null,
+      "results": {
+        "cpu": {
+          "success": true,
+          "warnings": []
+        },
+        "requested_cpu_cuda": {
+          "success": true,
+          "warnings": [
+            "CUDA is not available, disabling CUDA profiling"
+          ]
+        }
+      },
+      "torch_version": "2.7.0+cu128",
+      "trace_bytes": 1484398,
+      "trace_sha256": "48293a25e6f7182a4bcf945f5405b653e437748d77c38225c2401bbdc9e04955"
+    },
+    {
+      "all_clock_lines": [
+        "410186 openat(AT_FDCWD</local/users/emanuele/pointstream/sources/20261105T122632Z-6246e036>, \"/sys/devices/system/clocksource\", O_RDONLY|O_CLOEXEC|O_PATH) = 4</sys/devices/system/clocksource>",
+        "410186 openat(AT_FDCWD</local/users/emanuele/pointstream/sources/20261105T122632Z-6246e036>, \"/sys/devices/system/clocksource/clocksource0/current_clocksource\", O_RDONLY|O_CLOEXEC|O_PATH) = 4</sys/devices/system/clocksource/clocksource0/current_clocksource>",
+        "410186 openat(AT_FDCWD</local/users/emanuele/pointstream/sources/20261105T122632Z-6246e036>, \"/sys/devices/system/clocksource/clocksource0/available_clocksource\", O_RDONLY|O_CLOEXEC|O_PATH) = 4</sys/devices/system/clocksource/clocksource0/available_clocksource>"
+      ],
+      "arm": "clock",
+      "clock_calls_between_markers": {
+        "cpu": [],
+        "requested_cpu_cuda": []
+      },
+      "clock_grants": [
+        {
+          "device": 23,
+          "inode": 82495,
+          "mode": 16877,
+          "path": "/sys/devices/system/clocksource",
+          "rights": "READ_DIR recursive",
+          "sha256_before": null,
+          "uid": 65534
+        },
+        {
+          "device": 23,
+          "inode": 82509,
+          "mode": 33188,
+          "path": "/sys/devices/system/clocksource/clocksource0/current_clocksource",
+          "rights": "READ_FILE",
+          "sha256_before": "53038def32a9c25e6d962a247d9b3dfe213ce648d291ced6939d60ed92f1d6d8",
+          "uid": 65534
+        },
+        {
+          "device": 23,
+          "inode": 82511,
+          "mode": 33060,
+          "path": "/sys/devices/system/clocksource/clocksource0/available_clocksource",
+          "rights": "READ_FILE",
+          "sha256_before": "309c9b2702da091c26ae707a11349c2eed75acf2928c466f7447e2b1a72b3cf0",
+          "uid": 65534
+        }
+      ],
+      "cuda_after": false,
+      "cuda_before": false,
+      "denial_count": 10,
+      "mutations": {
+        "create": 13,
+        "link": 18,
+        "mkdir": 13,
+        "remove": 13,
+        "rename": 13,
+        "truncate": 13,
+        "write": 13
+      },
+      "namespace_distinct": true,
+      "parent_clock_identity": [
+        {
+          "device": 23,
+          "inode": 82495,
+          "mode": 16877,
+          "path": "/sys/devices/system/clocksource",
+          "sha256": null,
+          "uid": 0
+        },
+        {
+          "device": 23,
+          "inode": 82509,
+          "mode": 33188,
+          "path": "/sys/devices/system/clocksource/clocksource0/current_clocksource",
+          "sha256": "53038def32a9c25e6d962a247d9b3dfe213ce648d291ced6939d60ed92f1d6d8",
+          "uid": 0
+        },
+        {
+          "device": 23,
+          "inode": 82511,
+          "mode": 33060,
+          "path": "/sys/devices/system/clocksource/clocksource0/available_clocksource",
+          "sha256": "309c9b2702da091c26ae707a11349c2eed75acf2928c466f7447e2b1a72b3cf0",
+          "uid": 0
+        }
+      ],
+      "results": {
+        "cpu": {
+          "success": true,
+          "warnings": []
+        },
+        "requested_cpu_cuda": {
+          "success": true,
+          "warnings": [
+            "CUDA is not available, disabling CUDA profiling"
+          ]
+        }
+      },
+      "torch_version": "2.7.0+cu128",
+      "trace_bytes": 1485093,
+      "trace_sha256": "89ca1471ed4ee070a8a085ddb7cb99191df1f729612218748913b415eb2d67aa"
+    }
+  ],
+  "revision": "af0dbcbd3c9036fbdc489bdd24e633916a28bca2",
+  "scope_limit": "CUDA requested with CUDA_VISIBLE_DEVICES empty; torch disabled CUDA profiling, so no evidence of CUDA profiler clocksource operations, kernel qualification, or repair sufficiency. Setup O_PATH operations are outside profiler markers.",
+  "smoke_execution": {
+    "children_resource_usage": [
+      5.758093,
+      1.162278,
+      593408,
+      0,
+      0,
+      0,
+      234813,
+      162,
+      0,
+      261840,
+      18152,
+      0,
+      0,
+      0,
+      429012,
+      15896
+    ],
+    "contention": [],
+    "exit_code": 0,
+    "gpu_sharing": null,
+    "paused_seconds": 0.0,
+    "seconds": 7.226454973220825,
+    "timing_contaminated": false
+  },
+  "snapshot_sha256": "c88be1167b2405c22ff41a7c74be1d7a957b85df60407070dcdf8b983ed2e2a3",
+  "status": "complete, CPU-only oracle; not CUDA qualification",
+  "synthetic_input_sha256": "5452a5d6bb865152556a0e26dc99798a0ee88dff1c1c86b9a4fd1f5c904413dd"
+}

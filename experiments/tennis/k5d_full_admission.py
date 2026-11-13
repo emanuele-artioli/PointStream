@@ -77,10 +77,15 @@ def check_certificate(cert: dict[str, Any], gate: dict[str, Any], identity: dict
                       clip: str, phase: str, cost_sha: str, ledger_sha: str, attestation_sha: str,
                       qualification_paths: dict[str, Path] | None, receipt: dict[str, Any]) -> None:
     """Cheap verifier: root's pinned hash attests the expensive primary audit."""
+    from experiments.tennis import k5d_ada_study as ada
+    gpu_profile = ada.profile(gate)
+    model, capability = ada.hardware(gate)
+    if ada.profile(cert) != gpu_profile or ada.profile(receipt) != gpu_profile:
+        raise ValueError('certificate, cost and gate GPU profiles differ')
     if (gate.get('schema') != 1 or gate.get('approved') is not True or gate.get('release') != 'full-study'
             or gate.get('purpose') != 'full-retrospective-benchmark-cpu-readiness'
             or gate.get('selection_sha256') != fleet.SOURCE_SHA or gate.get('consumer_execution_identity') != identity
-            or gate.get('gpu_models') != ['RTX A6000'] or gate.get('gpu_capability') != [8, 6]
+            or gate.get('gpu_models') != [model] or gate.get('gpu_capability') != capability
             or gate.get('fidelity_only_for_unqualified') is not True
             or gate.get('cost_receipt_sha256') != cost_sha
             or cert.get('scope') != 'server-side full raw admission audit; root must review exact SHA'
@@ -92,6 +97,8 @@ def check_certificate(cert: dict[str, Any], gate: dict[str, Any], identity: dict
             or not isinstance(cert.get('targets'), dict) or len(cert['targets']) > 30
             or _deadline(cert['valid_until']) <= datetime.now(timezone.utc)):
         raise ValueError('certificate, gate, budget, source or validity differs')
+    if gpu_profile == ada.ADA and cert.get('receiver_isolation_config_sha256') != gate.get('receiver_isolation_config_sha256'):
+        raise ValueError('Ada certificate isolation config differs')
     target = cert['targets'].get(clip, {}).get(phase)
     if (phase not in ('prepare', 'score') or clip not in (gate.get('allowed_clips') or [])
             or not isinstance(target, dict) or target.get('state') != 'pending'
@@ -159,6 +166,8 @@ def check_certificate(cert: dict[str, Any], gate: dict[str, Any], identity: dict
             publication = completed.get('publications', {}).get('full', {})
             job = completed.get('job_id')
             remote = DATA_ROOT / 'jobs/fleet/inbox' / str(job) / 'full/published.tar'
+            if gpu_profile == ada.ADA:
+                ada.score_producer(gate, c, cert)
             if (producer.get('job_id') != job or producer.get('remote') != str(remote)
                     or producer.get('archive_sha256') != publication.get('sha256')
                     or producer.get('checkpoint_sha256') != publication.get('checkpoint_sha256')
@@ -173,6 +182,11 @@ def check_certificate(cert: dict[str, Any], gate: dict[str, Any], identity: dict
         raise ValueError('actual qualification receipt paths required')
     q = cert['qualification']
     parity = study.checked_json(qualification_paths['gpu_parity'], q['gpu_parity_receipt_sha256'])
+    if gpu_profile == ada.ADA:
+        ada.qualification(gate, parity, identity)
+        ada.validate_calibration(receipt)
+        if receipt['ada_calibration']['config_sha256'] != gate['receiver_isolation_config_sha256']:
+            raise ValueError('Ada calibration and certified config differ')
     bootstrap = parity.get('namespace_bootstrap_seconds')
     reserve = gate.get('namespace_bootstrap_reserve_seconds')
     if (isinstance(bootstrap, bool) or not isinstance(bootstrap, (int, float)) or not math.isfinite(bootstrap)
@@ -221,7 +235,11 @@ def cost_core_sha256(receipt: dict[str, Any]) -> str:
     from experiments.jobs.inbox import digest
     if any(key not in receipt for key in COST_CORE_KEYS):
         raise ValueError('immutable scientific cost core incomplete')
-    return digest({key: receipt[key] for key in COST_CORE_KEYS})
+    from experiments.tennis import k5d_ada_study as ada
+    keys = COST_CORE_KEYS + (('registered_gpu_profile', 'ada_calibration') if ada.profile(receipt) == ada.ADA else ())
+    if any(key not in receipt for key in keys):
+        raise ValueError('Ada scientific cost core incomplete')
+    return digest({key: receipt[key] for key in keys})
 
 def author(config: dict[str, Any]) -> dict[str, Any]:
     """Run expensive immutable raw joins on the fleet server, before root review."""
@@ -243,6 +261,14 @@ def author(config: dict[str, Any]) -> dict[str, Any]:
     gate = study.checked_json(sources['gate'], raw['gate']['sha256'])
     incoming_cost = study.checked_json(sources['cost'], raw['cost']['sha256'])
     core_sha = cost_core_sha256(incoming_cost)
+    from experiments.tennis import k5d_ada_study as ada
+    gpu_profile = ada.profile(gate)
+    if ada.profile(incoming_cost) != gpu_profile:
+        raise ValueError('cost and authoring GPU profile differ')
+    if gpu_profile == ada.ADA:
+        ada.validate_calibration(incoming_cost)
+        if incoming_cost['ada_calibration']['config_sha256'] != gate.get('receiver_isolation_config_sha256'):
+            raise ValueError('Ada calibration and authoring config differ')
     if gate.get('release') != 'full-study':
         raise ValueError('full-study draft gate required')
     status = study.checked_json(sources['canonical_status'], raw['canonical_status']['sha256'])
@@ -263,9 +289,11 @@ def author(config: dict[str, Any]) -> dict[str, Any]:
         prior = read_certificate(sources['prior_certificate'], raw['prior_certificate']['sha256'])
         if (prior.get('execution_identity') != identity or prior.get('selection_sha256') != fleet.SOURCE_SHA
                 or prior.get('cost_core_sha256') != core_sha
-                or prior.get('qualification') != gate.get('confirmation_qualification')):
+                or prior.get('qualification') != gate.get('confirmation_qualification')
+                or ada.profile(prior) != gpu_profile or ada.profile(previous_gate) != gpu_profile
+                or (gpu_profile == ada.ADA and prior.get('receiver_isolation_config_sha256') != gate.get('receiver_isolation_config_sha256'))):
             raise ValueError('prior audited source, costs or qualifications differ')
-    inventory = wave.inventory(inventory_doc, identity, prior.get('completed') if prior else None)
+    inventory = wave.inventory(inventory_doc, identity, prior.get('completed') if prior else None, gpu_profile=gpu_profile) if gpu_profile == ada.ADA else wave.inventory(inventory_doc, identity, prior.get('completed') if prior else None)
     pending = [(clip, phase) for clip, row in inventory.items() for phase in ('prepare', 'score')
                if row[phase]['state'] == 'pending' and (phase == 'prepare' or row['prepare']['state'] == 'complete')]
     if not pending:
@@ -277,6 +305,7 @@ def author(config: dict[str, Any]) -> dict[str, Any]:
     if not re.fullmatch(r'\d{8}T\d{6}Z-[0-9a-f]{8}', native_job):
         raise ValueError('native qualification job identity missing')
     qualification_epoch = datetime.strptime(native_job[:16], '%Y%m%dT%H%M%SZ').replace(tzinfo=timezone.utc).timestamp()
+    ada_qualification = study.checked_json(sources['gpu_parity'], gate['confirmation_qualification']['gpu_parity_receipt_sha256']) if gpu_profile == ada.ADA else None
     inspected = []
     blocked: list[list[str]] = []
     for item in status['jobs']:
@@ -311,6 +340,12 @@ def author(config: dict[str, Any]) -> dict[str, Any]:
             arguments = live_spec.get('arguments', [])
             if live_spec.get('entrypoint') == ['-m', 'experiments.tennis.k5d_native_pid_oracle']:
                 continue
+            if gpu_profile == ada.ADA:
+                if ada.known_calibration_job(job, state, directory, incoming_cost):
+                    continue
+                assert ada_qualification is not None
+                if ada.known_qualification_job(job, state, directory, ada_qualification, identity):
+                    continue
             if (live_spec.get('entrypoint') != ['-m', 'experiments.tennis.k5d_scoped_namespace']
                     or arguments[:1] != ['outer'] or arguments.count('--') != 1):
                 raise ValueError('same-consumer job target is unknown')
@@ -353,7 +388,7 @@ def author(config: dict[str, Any]) -> dict[str, Any]:
             identity, clip, phase, qualification_paths, full_paths, authoring=True, verified_inventory=inventory)
         noncommand_doc = study.checked_json(sources['noncommand'], raw['noncommand']['sha256'])
         noncommand = wave.verified_noncommand(noncommand_doc, identity, inventory)
-        cpu_models = wave.verified_cpu_calibration(cost['cpu_calibration'], identity, inventory)
+        cpu_models = wave.verified_cpu_calibration(cost['cpu_calibration'], identity, inventory, **({'gpu_profile': gpu_profile} if gpu_profile == ada.ADA else {}))
         forecast = control.programme_projection(cost, inventory=inventory, noncommand=noncommand)
         compact_forecast = control.programme_projection(cost, inventory=inventory, noncommand=noncommand,
                                                        certified_cpu=cpu_models)
@@ -377,6 +412,10 @@ def author(config: dict[str, Any]) -> dict[str, Any]:
             target_entry['producer'] = {'job_id': prep['job_id'], 'archive_sha256': published['sha256'],
                                 'checkpoint_sha256': published['checkpoint_sha256'], 'remote': str(remote)}
         targets.setdefault(clip, {})[phase] = target_entry
+    if gpu_profile == ada.ADA:
+        for phases in targets.values():
+            if 'score' in phases:
+                phases['score']['producer']['config_sha256'] = gate['receiver_isolation_config_sha256']
     valid_until = _deadline(config['valid_until'])
     if not now < valid_until or (valid_until - now).total_seconds() > 28800:
         raise ValueError('certificate validity must be within eight hours')
@@ -396,6 +435,9 @@ def author(config: dict[str, Any]) -> dict[str, Any]:
               'targets': targets, 'blocked_targets': blocked,
               'canonical_status_captured_at': status['captured_at'],
               'authored_at': now.isoformat(), 'valid_until': valid_until.isoformat()}
+    if gpu_profile == ada.ADA:
+        result['registered_gpu_profile'] = ada.ADA
+        result['receiver_isolation_config_sha256'] = gate['receiver_isolation_config_sha256']
     if len(json.dumps(result, sort_keys=True, allow_nan=False).encode()) > MAX_CERT_BYTES:
         raise ValueError('certificate exceeds bounded size')
     return result

@@ -1,0 +1,36 @@
+{
+  "added": [],
+  "approved": true,
+  "changed": [
+    "experiments/tennis/k5d_pgid_oracle.py",
+    "tests/tennis/test_k5d_pgid_oracle.py"
+  ],
+  "deleted": [],
+  "new_identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "7fd4e0e6ed2655b646d5601ba458fe66532f03040bba9b87c1607cca2e2fbfd0",
+    "source_sha256": "abccdf05666392ae8ad6d2ac8d944a8a30c25ccf5d944d29eccdb3f84d595b2e"
+  },
+  "new_revision": "5ebc7831291c91a6c45f72791e1959dbd76ac5f3",
+  "old_identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "177c96760f9429b2fbf7c5756d026b7b009ba292dc885ff727f18457924a5249",
+    "source_sha256": "b1a6b36cc14637db4a390db9a12c615d7ac042eb42b1415821e797b15af6e331"
+  },
+  "old_revision": "d2db015d4d90094bcd9dde8286f1ef05b9bc164d",
+  "patches": {
+    "experiments/tennis/k5d_pgid_oracle.py": {
+      "new_sha256": "3b9204f3f35e6f71600879691d0f4976f950221c01ed94dc6e107ed07786ad49",
+      "old_sha256": "6baddfc0930ee30ff3f73b7b054ae02c0b300e96ab6f0392f2f7f2eb6c757894",
+      "patch_sha256": "0b3d605ef5a215cf84e853384b9d8de872f29f069cde3e2f230f6c7b043233fa"
+    },
+    "tests/tennis/test_k5d_pgid_oracle.py": {
+      "new_sha256": "6838632cbcbf2d033dac02c298016b6e223d7a859a9d2fcb2deea18fdc9cd5a2",
+      "old_sha256": "1e3e8a33a58191e1ae08f85bd4116c1905176bd6c80257316dbc44ae5ddfd648",
+      "patch_sha256": "17245be2d5c94ee6833c03762139a003d6871b151b592c5e221079a50b5443ef"
+    }
+  },
+  "schema": 1,
+  "scope": "Root reviewed actual archive delta: minimal two integer caller conversions plus behavioral regressions. Strict adapter, native/numerical/default/runtime paths unchanged. No new gate pass.",
+  "unchanged_files": 1399
+}

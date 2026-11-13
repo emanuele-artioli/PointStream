@@ -1,0 +1,122 @@
+{
+  "job_id": "20261105T055250Z-24f354fd",
+  "fleet_status": "failed; no gate or quality result",
+  "producer_revision": "29a82e8ce0c6b672d1a47ede780e5b9b81969f77",
+  "source_sha256": "9189338eda9849d82d694eefa0dcf946d55ad65d61c203670186d6bf7a85b134",
+  "snapshot_sha256": "97b7e3557d3d0afc82b716aa6922d54be11d7e181787b397048ddaadf5fc74cf",
+  "spec_sha256": "426757b7a5e268bb04ec1d3e08125af10ae57cafb635caa94dbd61d0eb499767",
+  "host": "gpu6",
+  "gpu_uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+  "failure": "Renderer.folder symlink_to fails EACCES in output/scratch/folders/vae because Landlock output grant does not include MAKE_SYM; renderer constructor began but VAE from_pretrained did not run.",
+  "worker_stderr_sha256": "a524a3777e536a884486c9ac93fe61c389324017dbbee50824fdb2378691a82c",
+  "stderr_tail": ", scratch, checkpoint, paths['base'], 0, 2.0)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/local/users/emanuele/pointstream/scratch/20261105T055250Z-24f354fd-smoke/receiver-source/experiments/tennis/k6b_generate.py\", line 138, in __init__\n    vae, info = AutoencoderKL.from_pretrained(str(folder(weights, \"vae\", scratch)), output_loading_info=True)\n                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/local/users/emanuele/pointstream/scratch/20261105T055250Z-24f354fd-smoke/receiver-source/experiments/tennis/k6b_generate.py\", line 103, in folder\n    link.symlink_to(path.resolve())\n  File \"/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/lib/python3.12/pathlib.py\", line 1386, in symlink_to\n    os.symlink(target, self, target_is_directory)\nPermissionError: [Errno 13] Permission denied: '/local/users/emanuele/pointstream/cache/92d3dfb746fca211a2c9e019e285f8597412211728dce3c5bcf4eda0f2d62e7e/config.json' -> '/local/users/emanuele/pointstream/scratch/20261105T055250Z-24f354fd-smoke/cost-worker/output/scratch/folders/vae/config.json'\n",
+  "packet_worker": {
+    "config_sha256": "a13b9bdeab171280d61c9cfdc7de7c5bc38f8dbe3178f76e22ba42137d09d392",
+    "cpu_seconds": 14.914447,
+    "pgid": 3523761,
+    "pid": 3525510,
+    "status": 0,
+    "timed_out": false,
+    "wall_seconds": 15.155721130780876
+  },
+  "model_worker": {
+    "config_sha256": "8c2200355ec5a56516000092fef762ee3c4de33f744adaf4fd87f2494ca39a01",
+    "cpu_seconds": 22.896410999999997,
+    "pgid": 3523761,
+    "pid": 3526124,
+    "status": 1,
+    "timed_out": false,
+    "wall_seconds": 23.827987855300307
+  },
+  "packet_cpu_receipt": {
+    "cuda_initialized_after_decode": false,
+    "cuda_visible_devices": "",
+    "pre_serialization": {
+      "restored_tensors": 480,
+      "state_tensors": 480,
+      "unit_arrays": 14
+    },
+    "scope": "CPU packet decoder only",
+    "torch_version": "2.10.0+cu128"
+  },
+  "packet_manifest_summary": {
+    "tensor_count": 480,
+    "unit_sha256": {
+      "nadal_kyrgios__000_at120__person_000000000000": "387544a3fc344685f7c07632879affbdafcfd54fd6e1c00e0d9d6c06ca98995d",
+      "nadal_kyrgios__000_at120__person_000000000001": "74be8c9e2f8eb65ca67e6339ef9a2a2f8238df36c60a4b5a07a45fc68d3712a7"
+    },
+    "checkpoint_sha256": "1bb95a11c25ac66774b887c93277b695779e21cc9803cc565408206934f0fdeb",
+    "denials": 10,
+    "mutation": {
+      "create": 13,
+      "link": 18,
+      "mkdir": 13,
+      "remove": 13,
+      "rename": 13,
+      "truncate": 13,
+      "write": 13
+    },
+    "source_origins": 14,
+    "policy": "w8-approved-system-leaves-mutation-v1"
+  },
+  "independent_saved_scratch_packet_proof": {
+    "independent_480_match": true,
+    "unit_sha256": {
+      "nadal_kyrgios__000_at120__person_000000000000": "387544a3fc344685f7c07632879affbdafcfd54fd6e1c00e0d9d6c06ca98995d",
+      "nadal_kyrgios__000_at120__person_000000000001": "74be8c9e2f8eb65ca67e6339ef9a2a2f8238df36c60a4b5a07a45fc68d3712a7"
+    },
+    "checkpoint_sha256": "1bb95a11c25ac66774b887c93277b695779e21cc9803cc565408206934f0fdeb",
+    "source_members": 332,
+    "source_tar_sha256": "97b7e3557d3d0afc82b716aa6922d54be11d7e181787b397048ddaadf5fc74cf",
+    "protected_receipt_sha256": "aa07461ea2216a633b08d49dc959280326a6d63e7b92198d6d378143d1ad3bca",
+    "cpu_seconds": 1.20072,
+    "wall_seconds": 1.363948076032102
+  },
+  "source_archive_matches_dispatch": true,
+  "protected_fresh_path_sha_inode_match_historical": true,
+  "protected_current_host_stats_match": true,
+  "gpu_identity_receipt_present": false,
+  "model_kernel_qualification": false,
+  "smoke_wall_seconds": 47.528584003448486,
+  "smoke_children_resource_usage_cumulative": [
+    29.224185,
+    17.033245,
+    1427532,
+    0,
+    0,
+    0,
+    686187,
+    435,
+    0,
+    821360,
+    129928,
+    0,
+    0,
+    0,
+    7648,
+    2497
+  ],
+  "created_to_terminal_status_update_seconds": 142.13285183906555,
+  "proposed_gpu_seconds": 243,
+  "proposed_cpu_seconds": 343,
+  "closure_scope": "conservative lifecycle and external reserve; root reconciles ledger",
+  "pids_absent": [
+    3523722,
+    3523761,
+    3525510,
+    3526124
+  ],
+  "process_group_absent": 3523761,
+  "claims_with_job_id": [],
+  "gpu_compute_processes": [],
+  "gpu_pointstream_claimed": false,
+  "retention": "failed local scratch, not a durable published archive; subject to cleanup",
+  "next_test": "CPU-only strict-policy folder oracle; actual 1,550,638,493-byte folder materialization/hash I/O and scratch need independent bounded forecast before any GPU retry. Existing output-empty guard requires separately reviewed versioned receiver bridge or equivalent.",
+  "artifact_sha256": {
+    "smoke/command.log": "939188b4d375aeee274c9dda5282948395c7e31783c2339d337c7a97d3153074",
+    "smoke/execution.json": "142e1e0d23eef5cc119a788ba5117fd93c5b42b927fe8f375b36632594af07f7",
+    "smoke/staging.json": "228da9b348a9e992b6fb1fd44c155eaad8172895ebb5ac91c566c005014e5299",
+    "smoke/dispatch.json": "03e9e7062359dfb096cbe2f04b18ee359f6aca8e899e050764002d7176161f79",
+    "run/status.json": "e615897fc4716dfffc21ef3931372f641f2a20d753603603f47c83fe58c55590"
+  }
+}

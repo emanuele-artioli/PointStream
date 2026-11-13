@@ -1,0 +1,12 @@
+{
+  "status": "complete",
+  "target": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/gzip-source-20261105T051216Z/source",
+  "sha256": "5fcb732b958baf63bddd3bd633c6fbfd4d793b4086cb5180acb8737e142fd6f7",
+  "size": 16506880,
+  "timeout_seconds": 90,
+  "receiver": "explicit gzip -dc | dd bs=1M iflag=fullblock",
+  "revision": "6281d892",
+  "failed_request": "20261105T050656Z-d253d580",
+  "source_archive_local": "/var/folders/dm/2nks9rj5417726rl0kgrsg4h0000gn/T/pointstream-fleet-tuqzty4u.tar",
+  "compression_transfer_sha_seconds": 18.230040166992694
+}

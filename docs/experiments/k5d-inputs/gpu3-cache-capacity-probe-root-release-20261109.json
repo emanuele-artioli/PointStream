@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "decision": "release ONE bounded GPU3 cache-capacity inventory and prefix throughput probe only",
+  "parent_phase": "k5d-scale-first-tranche-20261105",
+  "CPU_ceiling": 20,
+  "GPU_ceiling": 0,
+  "authority": "Inside approved Ball workstream/programme; separate from420CPU source qualification. No host-pool change or GPU run.",
+  "purpose": "Decide whether warming the second compatible A6000 has a complete affordable CPU/disk forecast; prior gpu3free23183MiB is stale.",
+  "scope": "Fresh gpu3 worker/CPU0claim/affinity/runtime/unshare/tool/native/cache/filesystem+space metadata for exact13 scientific assets/environment/newsource, preserving existing caches. No full multiGiB rehash yet. One first64MiB sourceZIP prefix read/copy/hash/fsync into a NEW task-owned local pilot file, never a canonical cache entry. Record source before/after stat and both prefix hashes, phase CPU/wall and current GPU memory metadata.",
+  "source_zip": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-20261104-inputs/tracknet-dataset.zip",
+  "source_zip_historical_expected_sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18",
+  "new_source_snapshot_sha256": "9f486d70424b9d293d8774c92b36350d284edcb2513c415390b88a2b4c344aed",
+  "conditions": [
+    "save exact script/command/hash/deadline/owned process handles before dispatch; command-only,no remote agent",
+    "verified unclaimed CPU affinity, remoteCPU<=10 plus boundedSSH/local/admin within20aggregate; wall<=300s; stop on budget/identity/claim/storage errors, inspect uncertain submissions no replay",
+    "local scratch under /local/users/emanuele/pointstream on separatefilesystem, >=512MiBfree, newunique outputdir/nooverwrite; no /tmp, Models/Datasets/cache deletion or mutation",
+    "only metadata on existing caches, detect corrupt/partial indicators and stop; stockstager must not delete/repair existing content",
+    "64MiB prefix is throughput evidence only, NOT fullZIP SHA or scientific/source/model qualification; preserve file in separate pilot path",
+    "no GPU workload or actual cachewarming, no pool expansion/coldfallback/current-spec changes; report full stage forecast with extraction/source/CPU/disk/admin uncertainties for separate rootreview"
+  ]
+}

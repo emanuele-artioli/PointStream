@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "decision": "root accepts public metadata and no-descendant reaper failure mechanism only",
+  "gpu_evidence": false,
+  "packet_native_or_quality_evidence": false,
+  "direct_policy_namespace_pid": 1,
+  "actual_production_worker_namespace_pid": 2,
+  "scope": "same user/PID namespace and host proc-mount semantics; no full packet integration qualification",
+  "source_sha256": {
+    "w8_cuda_system_leaves.py": "82ad345c9f22115c9a06bbb9ec1244fb058e1149c458a55e998a272d766639f0",
+    "w8_witness_namespace.py": "852cc709ff9ef6e3e58a151f86c36811c799286e12ced6333512f0fc57500f92",
+    "w8_witness_namespace_proof.py": "9cc4a8c94b801168370f6ee5f37d30e42d2a745f8942fd00ec60426e707ba272"
+  },
+  "raw_file_sha256": {
+    "intent.json": "ba19a2f481fd7ef4673ba6970d83df2226ace6112295c6f8be56c369ee66ccaf",
+    "sources.json": "056ba21a74984ffb45f489d05e8cf6c7b351ee242b2ccb36e9cd664dabc5918e",
+    "usage.json": "09d16f637da33ea0b10de121a637971be1c99a11863188e2b8aaf0191a3477dd",
+    "handle.json": "8a2abf122d1dfc4ec4ba2a886b438caed52563120932d57034ae70f6225d329f",
+    "stdout": "3e94efc5385e9cbf4dd342295864d4aff9727732c56b3383dfcce78a65388bc8",
+    "remote.py": "c4878773ca9688118c50f924d10980fdfe99e99d6aa3985d2341cdd397470252",
+    "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "payload.json": "63c8a30d8d48ee1db6af11154ccc3ba1f96751f66621c39e0665270c772087fa"
+  },
+  "raw_directory": "/private/tmp/w8-f6-all-leaf-oracle-20261109",
+  "all14_regular_nonprotected_inodes": true,
+  "failed_worker_receipt_preserved_nonzero": true,
+  "cpu_charge_seconds_inclusive_both_probes": 10,
+  "charge_basis": "Full authorized10CPU aggregate allowance; first proc-view probe~0.235 and second self0.059525+waited0.18049+localSSH0.023 measured CPU; remaining conservatively charged for administration. Not full administrative telemetry.",
+  "combined_proof_or_gpu_run_authorized": false
+}

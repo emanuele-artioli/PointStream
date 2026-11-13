@@ -1,0 +1,46 @@
+{
+  "CPU_seconds_charged": 250,
+  "GPU_seconds_charged": 0,
+  "accepted_as": "failed correctness gate; no filesystem/native GPU/quality qualification",
+  "basis": "entire prospective phase cap retained, including external audit; not measured aggregate CPU",
+  "campaign_group_absent": true,
+  "config_sha256": "0ba0a62110fe1f565ec643826fb90903fa7cd22d666d720d7ec76deb7e6c4593",
+  "execution_identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "aa06c0cff324e084cae01b3dccaf2eea8e987e3a32cd571677d148cadd285cc7",
+    "source_sha256": "ebd37c62cd6c27be66ddfdf58547ee66ba14ff36f31380b8316a392f06e9d4c2"
+  },
+  "failed_scratch_and_source_preserved": true,
+  "failure": "Actual restricted receiver fails subprocess.Popen(packed python3.12) with EACCES",
+  "job_id": "20261112T225652Z-b9e0fd16",
+  "next_prospective_test": "separate same-source CPU oracle with only exact recorded ELF loader execute permission added; root cause remains hypothesis",
+  "no_partial_or_valid_publication": true,
+  "owned_births_absent": [
+    {
+      "host_pid": 3549024,
+      "observed": null,
+      "source": "namespace-init-log",
+      "start_ticks": 558703191
+    },
+    {
+      "host_pid": 3549025,
+      "observed": null,
+      "source": "outer-worker-log",
+      "start_ticks": 558703194
+    },
+    {
+      "host_pid": 3549157,
+      "observed": null,
+      "source": "worker-observer.json",
+      "start_ticks": 558703439
+    }
+  ],
+  "raw_cleanup_sha256": "51bbf9eafe01b8cabaa131e15ff66095f80f116c4dc034ce9f0aff18e17fd008",
+  "raw_diagnostic_sha256": "10ca02b274aab40a4b2cef875a7a245d407f362faf6379d2a337adb1fe7f7c89",
+  "root_hashed_exported_diagnostics": 10,
+  "root_hashed_failed_launch_and_worker_observer": true,
+  "schema": 1,
+  "smoke_seconds": 3.3732376098632812,
+  "source_revision": "fbca94d6ad8b90ff564f896425dfca198be78c3f",
+  "supervisor_and_CPU_claim_absent": true
+}

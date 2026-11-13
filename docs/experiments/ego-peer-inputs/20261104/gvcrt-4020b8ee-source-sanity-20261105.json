@@ -1,0 +1,201 @@
+{
+  "job": "20261105T121902Z-4020b8ee",
+  "scope": "CPU-only source/API and saved-array review; no model, GPU or fresh native decode",
+  "official_source_archive_sha256": "a7ad708cfaea7d0030cc1d78bd2cd1f1d62a1df999d8eaece292bff510c30f7e",
+  "official_revision": "d0e32bfa3e8e282f9a77437c223c605858eea637",
+  "pixel_sanity": {
+    "shape": [
+      16,
+      3,
+      720,
+      1280
+    ],
+    "dtype": "float32",
+    "sha256": "4a952197d241f5c38e8c544da3d8c58d952c3df7da255a691867ada3e23a11ac",
+    "hash_matches": true,
+    "rows": [
+      {
+        "min": 0.0,
+        "max": 1.0,
+        "finite": true,
+        "channel_mean": [
+          0.3876078724861145,
+          0.47624441981315613,
+          0.6373871564865112
+        ]
+      },
+      {
+        "min": 0.0,
+        "max": 1.0,
+        "finite": true,
+        "channel_mean": [
+          0.377179354429245,
+          0.4648014307022095,
+          0.6436523199081421
+        ]
+      },
+      {
+        "min": 0.0,
+        "max": 1.0,
+        "finite": true,
+        "channel_mean": [
+          0.37410593032836914,
+          0.46465495228767395,
+          0.6399082541465759
+        ]
+      },
+      {
+        "min": 0.0,
+        "max": 1.0,
+        "finite": true,
+        "channel_mean": [
+          0.37447482347488403,
+          0.4674162268638611,
+          0.6433213353157043
+        ]
+      },
+      {
+        "min": 0.0,
+        "max": 1.0,
+        "finite": true,
+        "channel_mean": [
+          0.3755265772342682,
+          0.46696576476097107,
+          0.6422684788703918
+        ]
+      },
+      {
+        "min": 0.0,
+        "max": 1.0,
+        "finite": true,
+        "channel_mean": [
+          0.3743283450603485,
+          0.4675995111465454,
+          0.6446909308433533
+        ]
+      },
+      {
+        "min": 0.0,
+        "max": 1.0,
+        "finite": true,
+        "channel_mean": [
+          0.37368839979171753,
+          0.4674876034259796,
+          0.6433794498443604
+        ]
+      },
+      {
+        "min": 0.0,
+        "max": 1.0,
+        "finite": true,
+        "channel_mean": [
+          0.3740485608577728,
+          0.46729105710983276,
+          0.6446460485458374
+        ]
+      },
+      {
+        "min": 0.0,
+        "max": 1.0,
+        "finite": true,
+        "channel_mean": [
+          0.37397798895835876,
+          0.4684063792228699,
+          0.6446433663368225
+        ]
+      },
+      {
+        "min": 0.0,
+        "max": 1.0,
+        "finite": true,
+        "channel_mean": [
+          0.37946030497550964,
+          0.4623093008995056,
+          0.6458778977394104
+        ]
+      },
+      {
+        "min": 0.0,
+        "max": 1.0,
+        "finite": true,
+        "channel_mean": [
+          0.3750663697719574,
+          0.46322160959243774,
+          0.6403396129608154
+        ]
+      },
+      {
+        "min": 0.0,
+        "max": 1.0,
+        "finite": true,
+        "channel_mean": [
+          0.3763672411441803,
+          0.4666595458984375,
+          0.6439436078071594
+        ]
+      },
+      {
+        "min": 0.0,
+        "max": 1.0,
+        "finite": true,
+        "channel_mean": [
+          0.37657681107521057,
+          0.46622422337532043,
+          0.6438359022140503
+        ]
+      },
+      {
+        "min": 0.0,
+        "max": 1.0,
+        "finite": true,
+        "channel_mean": [
+          0.37668004631996155,
+          0.46702495217323303,
+          0.6446025967597961
+        ]
+      },
+      {
+        "min": 0.0,
+        "max": 1.0,
+        "finite": true,
+        "channel_mean": [
+          0.3761862814426422,
+          0.4674423635005951,
+          0.6453430652618408
+        ]
+      },
+      {
+        "min": 0.0,
+        "max": 1.0,
+        "finite": true,
+        "channel_mean": [
+          0.3758963942527771,
+          0.4665294289588928,
+          0.6438866257667542
+        ]
+      }
+    ],
+    "cpu": 8.82004166,
+    "wall": 0.8536735400557518
+  },
+  "wasb_checkpoint": {
+    "path": "/local/users/emanuele/pointstream/cache/4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6/tree/wasb_tennis_best.pth.tar",
+    "sha256": "9d391239ab10c733f8e5bfadf16ab72838e7a8ebc88e8ae2038501c03d42b4bb",
+    "bytes": 6102633,
+    "cpu": 0.03531137,
+    "wall": 0.015184950083494186
+  },
+  "creation": 1793881162.6506932,
+  "terminal_updated": 1793881350.068301,
+  "creation_to_terminal_updated_seconds": 187.41760778427124,
+  "supervisor_start": 1793881169.7660193,
+  "supervisor_end": 1793881300.7848656,
+  "supervisor_lifecycle_seconds": 131.01884627342224,
+  "conversion_floor_pooled_rgb_psnr_db": 41.45716184079476,
+  "limitations": [
+    "No official-entrypoint side-by-side re-encode or independent codec implementation",
+    "No fresh pixel decode, source array regeneration, model execution, or kernel profiling",
+    "Author-reported WASB split does not establish all optimizer input history; BallTrack and codec exposure remain unknown"
+  ],
+  "external_cpu_note": "Pixel-array check measured 8.82 CPU seconds; numpy was imported before affinity and used multiple threads during initialization; checkpoint hash 0.035 CPU seconds. Earlier failed probe did not complete; total conservative charge 20 CPU seconds recommended."
+}

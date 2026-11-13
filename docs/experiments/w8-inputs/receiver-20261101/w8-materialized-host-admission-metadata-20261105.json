@@ -1,0 +1,251 @@
+{
+  "scope": "read-only host/cache metadata; no GPU execution, model, checkpoint or weight bodies, no cache population",
+  "observed_utc": "2026-11-05T07:44:26.617863+00:00",
+  "candidate_revision": "00aff80a",
+  "candidate_original_pool": [
+    "gpu6"
+  ],
+  "hosts": {
+    "gpu5": {
+      "cpu_headroom": 253,
+      "gpus": [
+        {
+          "index": 0,
+          "uuid": "GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162",
+          "name": "NVIDIA RTX 6000 Ada Generation",
+          "memory_used_mib": 1,
+          "memory_total_mib": 49140,
+          "memory_free_mib": 48645,
+          "utilization_pct": 0,
+          "compute_processes": [],
+          "pointstream_claimed": false,
+          "pointstream_shared_claims": []
+        },
+        {
+          "index": 1,
+          "uuid": "GPU-7754164a-33cd-265c-3696-c20966d228fe",
+          "name": "NVIDIA RTX 6000 Ada Generation",
+          "memory_used_mib": 1,
+          "memory_total_mib": 49140,
+          "memory_free_mib": 48645,
+          "utilization_pct": 0,
+          "compute_processes": [],
+          "pointstream_claimed": false,
+          "pointstream_shared_claims": []
+        }
+      ]
+    },
+    "gpu6": {
+      "cpu_headroom": 93,
+      "gpus": [
+        {
+          "index": 0,
+          "uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+          "name": "NVIDIA RTX 6000 Ada Generation",
+          "memory_used_mib": 23963,
+          "memory_total_mib": 49140,
+          "memory_free_mib": 24683,
+          "utilization_pct": 100,
+          "compute_processes": [
+            {
+              "pid": 3749997,
+              "memory_mib": 23956
+            }
+          ],
+          "pointstream_claimed": false,
+          "pointstream_shared_claims": []
+        },
+        {
+          "index": 1,
+          "uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+          "name": "NVIDIA RTX 6000 Ada Generation",
+          "memory_used_mib": 2771,
+          "memory_total_mib": 49140,
+          "memory_free_mib": 45875,
+          "utilization_pct": 14,
+          "compute_processes": [
+            {
+              "pid": 3776643,
+              "memory_mib": 2764
+            }
+          ],
+          "pointstream_claimed": false,
+          "pointstream_shared_claims": []
+        }
+      ]
+    }
+  },
+  "gpu6_external_process_cpu_affinity": {
+    "3749997": "0-95",
+    "3776643": "0-95"
+  },
+  "cpu_exclusivity_claimed": false,
+  "gpu5_cache": {
+    "inputs": {
+      "packet": {
+        "exists": true,
+        "size": 2289836,
+        "source_size": 2289836,
+        "sizes_match": true,
+        "regular": true
+      },
+      "profile": {
+        "exists": true,
+        "size": 4869,
+        "source_size": 4869,
+        "sizes_match": true,
+        "regular": true
+      },
+      "oracle": {
+        "exists": true,
+        "size": 145765,
+        "source_size": 145765,
+        "sizes_match": true,
+        "regular": true
+      },
+      "preflight": {
+        "exists": true,
+        "size": 36391,
+        "source_size": 36391,
+        "sizes_match": true,
+        "regular": true
+      },
+      "identity": {
+        "exists": true,
+        "size": 67065,
+        "source_size": 67065,
+        "sizes_match": true,
+        "regular": true
+      },
+      "base": {
+        "exists": true,
+        "size": 48885760,
+        "source_size": 48885760,
+        "sizes_match": true,
+        "regular": true
+      },
+      "aa": {
+        "exists": false,
+        "error": "FileNotFoundError"
+      },
+      "w0": {
+        "exists": true,
+        "size": 547,
+        "source_size": 547,
+        "sizes_match": true,
+        "regular": true
+      },
+      "w1": {
+        "exists": true,
+        "size": 334643276,
+        "source_size": 334643276,
+        "sizes_match": true,
+        "regular": true
+      },
+      "w2": {
+        "exists": true,
+        "size": 703,
+        "source_size": 703,
+        "sizes_match": true,
+        "regular": true
+      },
+      "w3": {
+        "exists": true,
+        "size": 1215993967,
+        "source_size": 1215993967,
+        "sizes_match": true,
+        "regular": true
+      },
+      "w4": {
+        "exists": true,
+        "size": 3438374293,
+        "source_size": 3438374293,
+        "sizes_match": true,
+        "regular": true
+      },
+      "w5": {
+        "exists": true,
+        "size": 3438323817,
+        "source_size": 3438323817,
+        "sizes_match": true,
+        "regular": true
+      },
+      "w6": {
+        "exists": true,
+        "size": 4351337,
+        "source_size": 4351337,
+        "sizes_match": true,
+        "regular": true
+      },
+      "w7": {
+        "exists": true,
+        "size": 1817900227,
+        "source_size": 1817900227,
+        "sizes_match": true,
+        "regular": true
+      }
+    },
+    "runtimes": {
+      "main": {
+        "python_exists": true,
+        "resolved": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python3.12"
+      },
+      "jcv": {
+        "python_exists": true,
+        "resolved": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/bin/python3.12"
+      }
+    },
+    "protected": {
+      "fit": {
+        "old_device": 59,
+        "actual_device": 58,
+        "inode_matches": true
+      },
+      "golden": {
+        "old_device": 59,
+        "actual_device": 58,
+        "inode_matches": true
+      },
+      "masks": {
+        "old_device": 59,
+        "actual_device": 58,
+        "inode_matches": true
+      },
+      "prepared": {
+        "old_device": 59,
+        "actual_device": 58,
+        "inode_matches": true
+      },
+      "source": {
+        "old_device": 59,
+        "actual_device": 58,
+        "inode_matches": true
+      }
+    },
+    "identity_sha256": "0953c5284ee8dc462d4eb95b7ce49cb9bad68e4d612fce5d167706f954668ebe",
+    "preflight_sha256": "ab5f1b932918ae9956f6ef648e36e59c6a1fd9ef6c36a1722a1916b0da63a4c5",
+    "aa_source": {
+      "available": true,
+      "files": 91,
+      "missing_count": 0,
+      "missing_sample": []
+    },
+    "local_device": 64513,
+    "datasets_device": 58,
+    "local_free_bytes": 1704668098560,
+    "cpu_seconds": 0.035990999999999995,
+    "wall_seconds": 0.02052894327789545,
+    "scope": "metadata only; no model, checkpoint or weight bodies read; cache SHA not verified"
+  },
+  "gpu5_aa_source_archive_bytes": 10424320,
+  "gpu5_cache_missing": [
+    "aa"
+  ],
+  "cache_sha256_verified": false,
+  "gpu5_historical_device_note": "five current device values are 58 vs historical 59 with same inodes; new host-receipt code must hash bodies and bind current device; this metadata check does not do so",
+  "synthetic_b4be_status": "client submission_unknown after upload timeout; per-ID canonical status unpublished/unknown; no replay",
+  "all_job_status": "one bounded status attempt timed out on gpu2; cannot infer absence of active jobs",
+  "all_host_doctor_passed": true,
+  "no_job_submitted": true,
+  "decision": "Original GPU6 pool currently has no idle exclusive Ada; alternate GPU5 incomplete warm cache. No host amendment or cache population without root decision."
+}

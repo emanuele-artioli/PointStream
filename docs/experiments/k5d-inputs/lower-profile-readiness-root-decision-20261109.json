@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "decision": "root chooses prospective lowerprofile for next gated qualification; no execution yet",
+  "survey_directory": "/private/tmp/k5d-readiness-survey-20261109",
+  "raw_sha256": {
+    "inspect.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "survey.py": "88479d334a716381a8611dc6aa188a3a2038204185b546c02553b711fcf29e7b",
+    "gpu3-metadata-corrected.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "host-metadata-corrected-receipt.json": "430dad1a3a7fccfb99c5c6e21205d5d313a9121b621202514b9b0fd029c507d9",
+    "host_metadata_corrected.py": "05f007e482bb0b4349a1c7a953e3691808ce1c4b20051645fc8e0359e4e0153c",
+    "doctor.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "gpu3-metadata.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "gpu2-metadata-corrected.json": "dae78bed4e100b040f53a8e1f371625c4bcd3d03333a4ed6ae3bbefad2a615ea",
+    "doctor.json": "31aab7c06b746163f1715fe2cd43d454c1139f8cd5d530169dcc3db04d7a6931",
+    "gpu3-metadata.stderr": "266d31acbb467e8dce4af5bbb69395033f40d11f6eef42519584db21c0aa5737",
+    "workers.json": "3d83d4bd20a9d6dfb2dc5bfc392f4675d6bc8eb899edd3e5b6d35919fcd7e7f0",
+    "inspect.json": "984c1f984216ff8beeef775308e9f3c3d7bee053b454f4047b0cd44babec2d63",
+    "gpu3-metadata-corrected.json": "1cafbc85271092d5eae02004d9cb96933c660e8caa986cae1c4cc614b1a3fa9f",
+    "jobs.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "gpu2-metadata.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "host_metadata.py": "abfc7f895ce97a329f179231942516a97caacd75a291d77f12719a879362fff1",
+    "gpu2-metadata-corrected.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "jobs.json": "3ea3b1772ccdb6f9cba97dd37c92ae7ff937305e1b2122c1442241285ab11343",
+    "workers.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "receipt.json": "ccbabb415a353b38a9c6bae4633e801f2f5ca92ab1f2491340df223db727b85a",
+    "host-metadata-receipt.json": "a6f5fcccd8f67b50dbc622a651f059622a073a5662cf2ee04e87208a604af7b3",
+    "gpu2-metadata.stderr": "266d31acbb467e8dce4af5bbb69395033f40d11f6eef42519584db21c0aa5737"
+  },
+  "cpu_charge": 30,
+  "gpu_charge": 0,
+  "basis": "Fullauthorized30CPUreadinessceilingforONEallhostdoctor/inspect/knownjobs/workers+gpu2/3CPU0/claim/cache/space survey; partiallocal+remoteCPU~1.08butadministrationunmetered. V1noheadroom, lowerprofilethresholdmettransiently; no sourceupload/job/GPU. Separateprofile-choicecost,notdoublecountedinsidefutureproofpreparation50.",
+  "reported_free_mib": {
+    "gpu2_0": 18825,
+    "gpu2_1": 13746,
+    "gpu3_0": 23183
+  },
+  "v1_required_free_mib": 24576,
+  "lowerprofile_required_free_mib": 14336,
+  "availability_is_reservation": false,
+  "no_source_upload_or_job": true,
+  "next": "Completeconfiguredchecks; separatelyreleaseactualnewsourceCPUproof; newGPUparityreleaseonlyafterrootrawproofreview."
+}

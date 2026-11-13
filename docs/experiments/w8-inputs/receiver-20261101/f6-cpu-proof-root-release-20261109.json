@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "decision": "release_ONE_corrected_f6_exact_source_CPUproof_replacement",
+  "revision": "f6d2d8437aaf16c7e866e8ea846cc769e09dd922",
+  "snapshot_sha256": "e6527d02582402b637bf34f31ce5b661bef9b7e900d062ee77b78fc08e97f84c",
+  "source_sha256": "269820305152e06bd7e2421e821acf9a63895f3487fbc53327e0870c2d73d7e2",
+  "input_job_sha256": "7a0685ba0cc7405e1833d05075d4d591723da178b1afe71da31e5e95d6e85113",
+  "bootstrap_sha256": "01f3fed31b45dbcaab880269f87d0578dcfcab960ee5a15fbcdcd790cec2dd5f",
+  "raw_spec_sha256": "da96031e94c8eaefd4fc45dd3c1a0d686ddd8317c329522c8616202e45106a29",
+  "logical_spec_sha256": "d45ea01e2f60d05eeedebe2f9d6320b81d8c862bcadd675e5205d680ab30e776",
+  "normalized_file_sha256": "59809d059f3654a9439d81769a6cbeedefbdaa93f3b165e7e392673313f27274",
+  "deadline": "2026-11-09T20:24:24.188435Z",
+  "parent_phase": "w8-full-witness-staged-20261106",
+  "witness_qualification": false,
+  "cumulative_CPUproof_ceiling": 900,
+  "already_charged_failed_proof": 120,
+  "already_charged_replacement_preparation": 8,
+  "future_CPU_ceiling": 772,
+  "future_components": {
+    "preparation": 22,
+    "campaign_onecore": 600,
+    "postcampaign_to_terminal": 100,
+    "independent_audit": 50
+  },
+  "GPU_seconds": 0,
+  "source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-f6d2-20261109/source.tar",
+  "conditions": [
+    "ONEnewreplacementrequest; not replay ofclosedfailededd3. Noautomaticretry",
+    "frozenf6cleanworktree, all1667Gitblobs+E652/2698+physical01f+7asourcebridge/rootchecks2011/39reviewed; no laterrootbranchdata included",
+    "freshknownjobs/worker/gpu5CPU0/runtime/tools/nativecd6/publicinputs/cache/space andsourcepoststat checkswithinprep22; no protectedsource/golden/fit/prepared/maskcontentopen/read/hash",
+    "verifiednewcachecopy(source_archive:true)canonicalps-fleet; no fallback/extraction/newmodeldownload/encoding",
+    "fixedspecd45deadline20:24:24Z; submitonly>=900secondsleft, otherwiseSTOPnewrootreview; exactmake_spec+index0comparisonperformedroot",
+    "600campaign530smoke50validator5noop; actualstartup/beforeafterimports/appliedinheritedlimits telemetry mandatory, no OSlimitraising",
+    "900cumulative includesfailed120+newprep8+future772insideparent4422CPU/4550GPU, notnew/duplicatereservation",
+    "persistactualjobID/source/spec/inputs/caps/deadline/output+ONEcanonicalwait<=2700inexperimentANDledgerBEFOREwait; no recurringpoll/timer",
+    "captureallrawpacket480tensor/unit/oracle, strictMAIN/JCV/assessorpolicy/native/synthetic lifecycle cases, subprocess identity/teardown/claims andcompletecosts",
+    "CPUproofselfvalidator is rawcompletenessonly; ROOTindependentenvelopeacceptanceafterrawaudit, no GPU/kernel/generation/quality/fullwitness promotion",
+    "firstboundedimplementationrepair ofnewCPUproof; source/access/frame/seed/model/numerical/qualityrulesunchanged; all240/80/30-stepgates retained"
+  ]
+}

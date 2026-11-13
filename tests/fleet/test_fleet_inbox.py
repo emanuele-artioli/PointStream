@@ -469,10 +469,10 @@ def test_preauthorized_entrypoint_exposes_only_public_actions(internal, capsys):
     assert "invalid choice" in capsys.readouterr().err
 
 
-@pytest.mark.parametrize("seconds", [0, float("nan"), 91])
+@pytest.mark.parametrize("seconds", [0, float("nan"), 451])
 def test_invalid_bounded_transfer_limit_fails_before_publication(tmp_path, seconds):
     from argparse import Namespace
-    with pytest.raises(fleet.FleetError, match="positive and finite|<=90"):
+    with pytest.raises(fleet.FleetError, match="positive and finite|<=450"):
         inbox.submit(Namespace(snapshot_transfer_seconds=seconds), tmp_path)
     assert not list(tmp_path.iterdir())
 
@@ -949,3 +949,294 @@ def test_all_status_reads_requests_concurrently(tmp_path, monkeypatch):
 
     monkeypatch.setattr(monitor, "read_json", synchronized_read)
     assert [result["job_id"] for result in inbox.rpc(base, "status", {})] == ["first", "second"]
+
+
+@pytest.mark.parametrize('index', [-1, True, 1.0, '1', None])
+def test_single_cpu_affinity_index_rejects_invalid_types(tmp_path, index):
+    spec = specification(tmp_path)
+    spec.update(single_cpu_campaign=True, cpu_affinity_index=index)
+    with pytest.raises(fleet.FleetError, match='nonnegative integer'):
+        inbox.validate_spec(spec)
+
+
+def test_affinity_index_requires_opted_in_single_cpu_campaign(tmp_path):
+    spec = specification(tmp_path)
+    spec['cpu_affinity_index'] = 0
+    with pytest.raises(fleet.FleetError, match='single_cpu_campaign'):
+        inbox.validate_spec(spec)
+    spec.update(single_cpu_campaign=True, cpu_threads=2)
+    with pytest.raises(fleet.FleetError, match='cpu_threads'):
+        inbox.validate_spec(spec)
+    with pytest.raises(fleet.FleetError, match='single_cpu_campaign'):
+        inbox.campaign_cpu_affinity({'device': 'gpu', 'cpu_threads': 1, 'cpu_affinity_index': 1})
+
+
+def test_two_single_cpu_gpu_campaigns_choose_distinct_available_cores(monkeypatch):
+    allowed = {3, 5, 7}
+    current = set(allowed)
+    monkeypatch.setattr(inbox.os, 'sched_getaffinity', lambda _: current.copy(), raising=False)
+    def select(_pid, cpus):
+        current.clear()
+        current.update(cpus)
+    monkeypatch.setattr(inbox.os, 'sched_setaffinity', select, raising=False)
+    spec = {'device': 'gpu', 'cpu_threads': 1, 'single_cpu_campaign': True}
+    first = inbox.campaign_cpu_affinity({**spec, 'cpu_affinity_index': 0})
+    current.clear()
+    current.update(allowed)  # Separate worker process starts from the same parent CPU set.
+    second = inbox.campaign_cpu_affinity({**spec, 'cpu_affinity_index': 1})
+    assert first == [3] and second == [5] and set(first).isdisjoint(second)
+    current.clear()
+    current.update(allowed)
+    with pytest.raises(fleet.FleetError, match='affinity index'):
+        inbox.campaign_cpu_affinity({**spec, 'cpu_affinity_index': 3})
+    assert current == allowed
+
+
+def test_indexed_gpu_affinity_precedes_source_checks_and_is_recorded(campaign, monkeypatch):
+    spec = monitor.read_json(campaign / 'spec.json')
+    spec.update(single_cpu_campaign=True, cpu_affinity_index=1)
+    assert inbox.validate_spec(spec)['cpu_affinity_index'] == 1
+    monitor.write_json(campaign / 'spec.json', spec)
+    # Both scientific commands and their validator must receive the frozen source root,
+    # rather than the separate fleet-control release in the parent environment.
+    frozen = campaign / 'source'
+    for name in ('work.py', 'validate.py'):
+        path = frozen / name
+        path.write_text(path.read_text() + f"\nassert os.environ['PYTHONPATH'] == {str(frozen)!r}\n")
+    ready = monitor.read_json(campaign / 'ready.json')
+    ready['spec_sha256'] = inbox.digest(spec)
+    ready['source_sha256'] = inbox.source_identity(frozen)
+    monitor.write_json(campaign / 'ready.json', ready)
+    current = {5}  # The indexed monitor has already narrowed its own affinity.
+    monitor.write_json(campaign / 'run' / 'cpu-affinity.json', {'index': 1, 'available': [3, 5], 'selected': [5]})
+    control_root = Path(inbox.__file__).resolve().parents[2]
+    identity = {name: inbox.file_digest(control_root / name) for name in inbox.INDEXED_CONTROL_FILES}
+    monitor.write_json(campaign / 'run' / 'request.json', {'fleet_control': {'root': str(control_root), 'files': identity}})
+    monkeypatch.setattr(inbox.os, 'sched_getaffinity', lambda _: current.copy(), raising=False)
+    monkeypatch.setattr(inbox.os, 'sched_setaffinity', lambda *_: (_ for _ in ()).throw(AssertionError('must inherit')), raising=False)
+    original = inbox.source_identity
+    def check_source(path):
+        assert current == {5}
+        return original(path)
+    monkeypatch.setattr(inbox, 'source_identity', check_source)
+    assert inbox.campaign(campaign) == 0
+    for phase in ('smoke', 'full'):
+        assert monitor.read_json(campaign / phase / 'dispatch.json')['cpu_affinity'] == [5]
+
+
+def test_two_real_indexed_campaigns_inherit_distinct_affinity_on_linux():
+    import os
+    import subprocess
+    import sys
+
+    if not hasattr(os, 'sched_getaffinity') or not hasattr(os, 'sched_setaffinity') or len(os.sched_getaffinity(0)) < 2:
+        pytest.skip('two allowed Linux CPUs required')
+    code = '''import json,os,subprocess,sys
+from experiments.jobs.inbox import campaign_cpu_affinity
+from experiments.jobs.monitor import apply_indexed_cpu_affinity
+spec = {"device":"gpu", "cpu_threads":1, "single_cpu_campaign":True, "cpu_affinity_index":int(sys.argv[1])}
+binding = apply_indexed_cpu_affinity(spec["cpu_affinity_index"])
+selected = campaign_cpu_affinity(spec, binding)
+child = json.loads(subprocess.check_output([sys.executable, "-c", "import os,json;print(json.dumps(sorted(os.sched_getaffinity(0))))"], text=True))
+print(json.dumps({"selected":selected,"child":child}))
+'''
+    processes = [subprocess.Popen([sys.executable, '-c', code, str(index)], stdout=subprocess.PIPE,
+                                  stderr=subprocess.PIPE, text=True) for index in (0, 1)]
+    results = []
+    for proc in processes:
+        stdout, stderr = proc.communicate(timeout=10)
+        assert proc.returncode == 0, stderr
+        results.append(json.loads(stdout))
+    assert all(len(row['selected']) == 1 and row['selected'] == row['child'] for row in results)
+    assert results[0]['selected'] != results[1]['selected']
+
+
+def test_indexed_campaign_requires_valid_inherited_supervisor_binding(campaign, monkeypatch):
+    spec = monitor.read_json(campaign / 'spec.json')
+    spec.update(single_cpu_campaign=True, cpu_affinity_index=1)
+    monitor.write_json(campaign / 'spec.json', spec)
+    monkeypatch.setattr(inbox.os, 'sched_getaffinity', lambda _: {3, 5}, raising=False)
+    monkeypatch.setattr(inbox.os, 'sched_setaffinity', lambda *_: None, raising=False)
+    assert inbox.campaign(campaign) == 1
+    assert 'supervisor affinity binding' in monitor.read_json(campaign / 'campaign-error.json')['error']
+    with pytest.raises(fleet.FleetError, match='binding differs'):
+        inbox.campaign_cpu_affinity(spec, {'index': 1, 'available': [3, 5], 'selected': [3]})
+    with pytest.raises(fleet.FleetError, match='binding differs'):
+        inbox.campaign_cpu_affinity(spec, {'index': 1, 'available': [3, 5], 'selected': [5]})
+
+
+def test_supervisor_affinity_selection_is_checked_before_mutation(monkeypatch):
+    current = {3, 5, 7}
+    monkeypatch.setattr(monitor.os, 'sched_getaffinity', lambda _: current.copy(), raising=False)
+    def select(_pid, cpus):
+        current.clear()
+        current.update(cpus)
+    monkeypatch.setattr(monitor.os, 'sched_setaffinity', select, raising=False)
+    with pytest.raises(ValueError, match='exceeds'):
+        monitor.apply_indexed_cpu_affinity(3)
+    assert current == {3, 5, 7}
+    receipt = monitor.apply_indexed_cpu_affinity(1)
+    assert receipt == {'index': 1, 'available': [3, 5, 7], 'selected': [5]}
+    assert current == {5}
+
+
+def test_indexed_supervisor_uses_release_control_not_frozen_workload(campaign, monkeypatch):
+    spec = monitor.read_json(campaign / 'spec.json')
+    spec.update(single_cpu_campaign=True, cpu_affinity_index=1)
+    monitor.write_json(campaign / 'spec.json', spec)
+    ready = monitor.read_json(campaign / 'ready.json')
+    ready['spec_sha256'] = inbox.digest(spec)
+    monitor.write_json(campaign / 'ready.json', ready)
+    monitor.write_json(campaign / 'state.json', {'status': 'pending'})
+    (campaign / 'run').rmdir()
+    monkeypatch.setattr(inbox, 'acquire_request', lambda *_: True)
+    monkeypatch.setattr(inbox, 'precheck_inputs', lambda *_: None)
+    monkeypatch.setattr(inbox, 'transition', lambda *_args, **_kwargs: None)
+    captured = {}
+    class Child:
+        pid = 12345
+    def popen(command, **kwargs):
+        captured['command'] = command
+        captured['kwargs'] = kwargs
+        return Child()
+    monkeypatch.setattr(inbox.subprocess, 'Popen', popen)
+    monkeypatch.setattr(inbox, 'get_process_start_time', lambda *_: 1)
+    inbox.start_request(campaign, spec, None, {'alias': 'gpu1', 'host': 'host'}, campaign.parent)
+    request = monitor.read_json(campaign / 'run' / 'request.json')
+    release = Path(inbox.__file__).resolve().parents[2]
+    assert request['cpu_affinity_index'] == 1
+    assert request['command'][1] == str(release / 'experiments/jobs/inbox.py')
+    assert request['salvage'][1] == str(release / 'experiments/jobs/inbox.py')
+    assert request['fleet_control']['root'] == str(release)
+    assert set(request['fleet_control']['files']) == set(inbox.INDEXED_CONTROL_FILES)
+    assert captured['command'][1] == str(release / 'experiments/jobs/monitor.py')
+    assert captured['kwargs']['env']['PYTHONPATH'] == str(release)
+    assert Path(request['cwd']) == campaign / 'source'
+
+
+def test_legacy_supervisor_keeps_original_module_path(campaign, monkeypatch):
+    spec = monitor.read_json(campaign / 'spec.json')
+    monitor.write_json(campaign / 'state.json', {'status': 'pending'})
+    (campaign / 'run').rmdir()
+    monkeypatch.setattr(inbox, 'acquire_request', lambda *_: True)
+    monkeypatch.setattr(inbox, 'precheck_inputs', lambda *_: None)
+    monkeypatch.setattr(inbox, 'transition', lambda *_args, **_kwargs: None)
+    captured = {}
+    class Child:
+        pid = 12345
+    def popen(command, **kwargs):
+        captured['command'] = command
+        captured['env'] = kwargs['env']
+        return Child()
+    monkeypatch.setattr(inbox.subprocess, 'Popen', popen)
+    monkeypatch.setattr(inbox, 'get_process_start_time', lambda *_: 1)
+    inbox.start_request(campaign, spec, None, {'alias': 'gpu1', 'host': 'host'}, campaign.parent)
+    request = monitor.read_json(campaign / 'run' / 'request.json')
+    assert request['command'][1:3] == ['-m', 'experiments.jobs.inbox']
+    assert captured['command'][1:3] == ['-m', 'experiments.jobs.monitor']
+    assert captured['env']['PYTHONPATH'] == str(campaign / 'source')
+    assert 'cpu_affinity_index' not in request and 'fleet_control' not in request
+
+
+def test_indexed_request_rejects_worker_without_new_release(tmp_path, monkeypatch):
+    from argparse import Namespace
+
+    spec = specification(tmp_path)
+    spec.update(single_cpu_campaign=True, cpu_affinity_index=1)
+    path = tmp_path / 'spec.json'
+    path.write_text(json.dumps(spec))
+    args = Namespace(spec=path, state_dir=tmp_path, source_worktree=None, snapshot_transfer_seconds=None)
+    monkeypatch.setattr(inbox, 'snapshot_root', lambda root, _: root)
+    monkeypatch.setattr(inbox, 'load_config', lambda _: {'hosts': ['gpu1']})
+    monkeypatch.setattr(inbox, 'remote_rpc', lambda *_a, **_k: {'workers': {'gpu1': {'updated': time.time(), 'capabilities': ['source_archive']}}})
+    with pytest.raises(fleet.FleetError, match='does not advertise indexed CPU affinity'):
+        inbox.submit(args, tmp_path)
+
+
+def test_out_of_bounds_index_fails_before_supervisor_claim(tmp_path, monkeypatch):
+    run = tmp_path / 'run'
+    run.mkdir()
+    monitor.write_json(run / 'request.json', {'cpu_affinity_index': 2, 'claims': {'cpu_threads': 1},
+                                              'deadline_epoch': time.time() + 30})
+    monkeypatch.setattr(monitor.os, 'sched_getaffinity', lambda _: {3, 5}, raising=False)
+    monkeypatch.setattr(monitor.os, 'sched_setaffinity', lambda *_: (_ for _ in ()).throw(AssertionError('must not set')), raising=False)
+    assert monitor.supervise(run) == 1
+    status = monitor.read_json(run / 'status.json')
+    assert status['status'] == 'failed' and status['admission_rejected']
+    assert 'exceeds' in status['error'] and not (run / 'claim.json').exists()
+
+
+@pytest.mark.parametrize('action', ['status', 'events', 'cancel'])
+def test_job_actions_honor_compatible_management_override_without_mutating_record(tmp_path, monkeypatch, action):
+    import subprocess
+    from argparse import Namespace
+
+    job_id = '20261110T123456Z-12345678'
+    original = {'hosts': ['gpu2'], 'base': '/shared/jobs/fleet', 'release': '/old/release',
+                'pythons': {'gpu2': '/old/python'}, 'management_host': 'gpu2'}
+    current = {'hosts': ['gpu1', 'gpu2'], 'base': original['base'], 'release': '/new/release',
+               'pythons': {'gpu1': '/pinned/gpu1', 'gpu2': '/pinned/gpu2'}, 'management_host': 'gpu2'}
+    record = {'job_id': job_id, 'config': original}
+    monitor.write_json(tmp_path / f'{job_id}.json', record)
+    monitor.write_json(tmp_path / 'inbox.json', current)
+    monkeypatch.setenv('PS_FLEET_MANAGEMENT_HOST', 'gpu1')
+    monkeypatch.setenv('PS_FLEET_MANAGEMENT_PYTHON', '/usr/bin/python3')
+    calls = []
+    def ssh(host, argv, **kwargs):
+        calls.append((host, argv, kwargs))
+        return subprocess.CompletedProcess([], 0, '{"events": []}' if action == 'events' else '{"status": "ok"}', '')
+    monkeypatch.setattr(fleet, '_ssh', ssh)
+    args = Namespace(state_dir=tmp_path, action=action, job_id=job_id,
+                     status_timeout_seconds=60 if action == 'status' else None)
+    inbox.remote_job(args)
+    assert len(calls) == 1 and calls[0][0] == 'gpu1' and calls[0][1][0] == '/usr/bin/python3'
+    assert '/new/release' in calls[0][1][-1] and job_id in calls[0][1][-1]
+    assert calls[0][2]['timeout'] == (60 if action == 'status' else 120)
+    assert monitor.read_json(tmp_path / f'{job_id}.json') == record
+    assert monitor.read_json(tmp_path / 'inbox.json') == current
+
+
+@pytest.mark.parametrize('state', ['missing', 'different_base', 'empty_hosts', 'changed_during_read'])
+@pytest.mark.parametrize('action', ['status', 'events', 'cancel'])
+def test_job_actions_fall_back_to_recorded_inbox(tmp_path, monkeypatch, state, action):
+    from argparse import Namespace
+
+    job_id = '20261110T123456Z-12345678'
+    original = {'hosts': ['gpu2'], 'base': '/old/jobs/fleet', 'release': '/old/release',
+                'pythons': {'gpu2': '/old/python'}}
+    monitor.write_json(tmp_path / f'{job_id}.json', {'job_id': job_id, 'config': original})
+    if state != 'missing':
+        current = {**original, 'base': '/new/jobs/fleet' if state == 'different_base' else original['base'],
+                   'hosts': [] if state == 'empty_hosts' else ['gpu1']}
+        monitor.write_json(tmp_path / 'inbox.json', current)
+    if state == 'changed_during_read':
+        monkeypatch.setattr(inbox, 'load_config', lambda _: {**original, 'base': '/changed/jobs/fleet'})
+    monkeypatch.setenv('PS_FLEET_MANAGEMENT_HOST', 'gpu1')
+    routed = []
+    def rpc(config, received_action, payload, **kwargs):
+        routed.append((config, received_action, payload, kwargs))
+        return {'events': []} if received_action == 'events' else {'status': 'ok'}
+    monkeypatch.setattr(inbox, 'remote_rpc', rpc)
+    inbox.remote_job(Namespace(state_dir=tmp_path, action=action, job_id=job_id, status_timeout_seconds=None))
+    assert routed == [(original, action, {'job_id': job_id}, {})]
+
+
+@pytest.mark.parametrize('action', ['status', 'events', 'cancel'])
+@pytest.mark.parametrize(('host', 'python', 'error'), [
+    ('gpu6', '/usr/bin/python3', 'configured fleet host'),
+    ('gpu1', 'relative/python', 'absolute executable path'),
+])
+def test_job_action_rejects_invalid_management_override(tmp_path, monkeypatch, host, python, error, action):
+    from argparse import Namespace
+
+    job_id = '20261110T123456Z-12345678'
+    config = {'hosts': ['gpu1', 'gpu2'], 'base': '/shared/jobs/fleet', 'release': '/release',
+              'pythons': {'gpu1': '/python', 'gpu2': '/python'}}
+    monitor.write_json(tmp_path / f'{job_id}.json', {'job_id': job_id, 'config': config})
+    monitor.write_json(tmp_path / 'inbox.json', config)
+    monkeypatch.setenv('PS_FLEET_MANAGEMENT_HOST', host)
+    monkeypatch.setenv('PS_FLEET_MANAGEMENT_PYTHON', python)
+    monkeypatch.setattr(inbox, 'remote_rpc', lambda *_a, **_kw: pytest.fail('invalid override reached RPC'))
+    with pytest.raises(fleet.FleetError, match=error):
+        inbox.remote_job(Namespace(state_dir=tmp_path, action=action, job_id=job_id,
+                                   status_timeout_seconds=60 if action == 'status' else None))

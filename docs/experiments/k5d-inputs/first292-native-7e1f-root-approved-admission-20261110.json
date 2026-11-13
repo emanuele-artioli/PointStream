@@ -1,0 +1,44 @@
+{
+  "all_owned_pids_absent": true,
+  "audited": true,
+  "cases": [
+    "normal",
+    "timeout",
+    "sigterm",
+    "sigkill"
+  ],
+  "consumer_execution_identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "202466a711d17b742a17270bab91da2dc581af7a9fc1e411405f8bb37a924372",
+    "source_sha256": "390e157a9aabc1db8006a936a7de54a43c8810650260136bc59a67036e7dfd39"
+  },
+  "gpu_used": false,
+  "independent_cpu_match": true,
+  "job_id": "20261110T095341Z-7e1f4b1b",
+  "namespace_wrapper_sha256": "7610b0d45ffaf07536c1f3f5a77e3133f4fcf938ca7263e7b8266ebf56697cda",
+  "native_stream_bytes": 29010,
+  "native_stream_sha256": "fd445f424549a3bfec7c4966f98f8b67252f64ab46ea1083f1551450beded494",
+  "native_tools": {
+    "SvtAv1EncApp": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+    "dav1d": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+    "ffmpeg": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2"
+  },
+  "normal_inner_cpu_seconds": 2.3907420000000004,
+  "normal_outer_cpu_seconds": 2.523053,
+  "passed": true,
+  "qualification_exclusions": [
+    "GPU memory",
+    "numerical parity",
+    "performance",
+    "scale",
+    "quality"
+  ],
+  "root_accepted_audit_sha256": "3d80afbfaa2da51b87ab7dd2273c746cd740fe5b3bc6442fe99bf6abb1f4c947",
+  "root_closeout_sha256": "0fd5f6ea6971c72ea0000d87e7cb4999bae4ff2e09c1ee66c46a4e0c4d3c2093",
+  "schema": 1,
+  "scope": "native CPU PID containment and accounting",
+  "source_spec_sha256": "51b73aedf1d44ab4ebc6309be351db113e6a57aaef82a44e90c5bb748a1a3fe2",
+  "status": "Root accepted typed actual nativeCPU proof; GPU/parity/performance/scale excluded",
+  "termination_caveat": "TERM case requested TERM and required recorded KILL escalation; not TERM-only success.",
+  "unshare_sha256": "9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6"
+}

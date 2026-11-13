@@ -36,8 +36,11 @@ POLL_SECONDS = 60
 # worker unpacks it under its host-local root. Workers advertise the capability
 # in their heartbeat so a client never uses it against an older worker.
 SOURCE_ARCHIVE = "source.tar"
-WORKER_CAPABILITIES = ("source_archive",)
+WORKER_CAPABILITIES = ("source_archive", "indexed_cpu_affinity_v1")
 SOURCE_EXTRACT_SECONDS = 300
+INDEXED_CONTROL_FILES = ("experiments/__init__.py", "experiments/jobs/__init__.py",
+                         "experiments/jobs/inbox.py", "experiments/jobs/monitor.py",
+                         "experiments/jobs/claims.py", "experiments/jobs/fleet.py", "experiments/jobs/staging.py")
 # Publication runs under the client's 120 s SSH limit and admission inside the
 # worker scan that also refreshes the heartbeat, so neither may stream large
 # inputs over NFS (8 MB/s on 2026-10-30: 429 s for one 3.4 GB UNet). They hash
@@ -82,6 +85,11 @@ def validate_spec(spec: Any, *, now: float | None = None) -> dict[str, Any]:
             raise fleet.FleetError('single_cpu_campaign must be boolean')
         if spec['single_cpu_campaign'] and (type(spec.get('cpu_threads')) is not int or spec['cpu_threads'] != 1):
             raise fleet.FleetError('single_cpu_campaign requires cpu_threads: 1')
+    if 'cpu_affinity_index' in spec:
+        if type(spec['cpu_affinity_index']) is not int or spec['cpu_affinity_index'] < 0:
+            raise fleet.FleetError('cpu_affinity_index must be a nonnegative integer')
+        if spec.get('single_cpu_campaign') is not True:
+            raise fleet.FleetError('cpu_affinity_index requires single_cpu_campaign: true')
     if 'defer_failed_publication' in spec:
         if not isinstance(spec['defer_failed_publication'], bool):
             raise fleet.FleetError('defer_failed_publication must be boolean')
@@ -550,28 +558,44 @@ def start_request(directory: Path, spec: dict[str, Any], gpu: dict[str, Any] | N
     run = directory / "run"
     run.mkdir()
     (run / "events").mkdir()
+    indexed = "cpu_affinity_index" in spec
+    # An indexed request must execute the reviewed fleet release, even when
+    # its scientific source snapshot embeds an older fleet implementation.
+    control_root = Path(__file__).resolve().parents[2]
+    if indexed:
+        control_identity = {name: file_digest(control_root / name) for name in INDEXED_CONTROL_FILES}
+        campaign_command = [sys.executable, str(control_root / "experiments/jobs/inbox.py"), "campaign", str(directory)]
+        supervisor_command = [sys.executable, str(control_root / "experiments/jobs/monitor.py"), "serve", str(run)]
+        salvage_command = [sys.executable, str(control_root / "experiments/jobs/inbox.py"), "salvage", str(directory)]
+    else:
+        control_identity = None
+        campaign_command = [sys.executable, "-m", "experiments.jobs.inbox", "campaign", str(directory)]
+        supervisor_command = [sys.executable, "-m", "experiments.jobs.monitor", "serve", str(run)]
+        salvage_command = [sys.executable, "-m", "experiments.jobs.inbox", "salvage", str(directory)]
     claims: dict[str, Any] = {"gpu": gpu["uuid"] if gpu else None, "cpu_threads": spec["cpu_threads"], "claims_dir": str(base.parent / "claims"), "min_free_memory_mb": spec["gpu_memory_mib"] + fleet.DEFAULT_MEMORY_MARGIN_MIB}
     sharing = gpu_sharing(spec) if gpu else None
     if sharing and sharing["mode"] == "shared":
         claims.update(sharing="shared", memory_mib=spec["gpu_memory_mib"], margin_mib=sharing["margin_mib"], min_free_memory_mb=spec["gpu_memory_mib"] + sharing["margin_mib"])
     monitor.write_json(run / "request.json", {
-        "command": [sys.executable, "-m", "experiments.jobs.inbox", "campaign", str(directory)],
+        "command": campaign_command,
         "cwd": str(source), "budget_seconds": remaining, "deadline_epoch": spec["deadline_epoch"],
         "thread": None, "codex": "codex", "cancel_path": str(directory / "cancel.json"),
         "contention": spec.get("contention") or {"policy": "stop"}, "attempt": state.get("attempt", 1),
         # Preserve host-local failed scratch for a separately budgeted manual
         # salvage when explicitly requested; automatic salvage is otherwise unchanged.
         **({} if spec.get("defer_failed_publication") else
-           {"salvage": [sys.executable, "-m", "experiments.jobs.inbox", "salvage", str(directory)]}),
+           {"salvage": salvage_command}),
+        **({"cpu_affinity_index": spec["cpu_affinity_index"]} if "cpu_affinity_index" in spec else {}),
+        **({"fleet_control": {"root": str(control_root), "files": control_identity}} if indexed else {}),
         # Without a GPU claim the supervisor claims only CPU threads and hides every GPU.
         "claims": claims, "gpu_sharing": sharing,
     })
     monitor.write_json(run / "policy.json", {"stall_seconds": spec["stall_seconds"], "report_at": None, "quiet_until": 0})
     monitor.write_json(directory / "environment.json", {"host": host["host"], "alias": host["alias"], "gpu": gpu, "python": host.get("python_version"), "tools": host.get("tool_versions"), "started": time.time()})
     transition(directory, "launching", host_alias=host["alias"], gpu=gpu, gpu_sharing=sharing)
-    env = {**os.environ, "PYTHONPATH": str(source), "PS_DATA_ROOT": str(base.parent.parent)}
+    env = {**os.environ, "PYTHONPATH": str(control_root if indexed else source), "PS_DATA_ROOT": str(base.parent.parent)}
     with (run / "supervisor.log").open("a") as output:
-        child = subprocess.Popen([sys.executable, "-m", "experiments.jobs.monitor", "serve", str(run)], cwd=source, env=env, stdin=subprocess.DEVNULL, stdout=output, stderr=subprocess.STDOUT, start_new_session=True)
+        child = subprocess.Popen(supervisor_command, cwd=source, env=env, stdin=subprocess.DEVNULL, stdout=output, stderr=subprocess.STDOUT, start_new_session=True)
     monitor.write_json(run / "supervisor.json", {"pid": child.pid, "proc_start_time": get_process_start_time(child.pid), "host": host["host"]})
     transition(directory, "running", supervisor_pid=child.pid)
 
@@ -726,12 +750,17 @@ def contention_during(run: Path, started: float, ended: float) -> dict[str, Any]
     return {"timing_contaminated": bool(episodes), "contention": episodes, "paused_seconds": monitor.paused_seconds(status, started, ended)}
 
 
-def campaign_cpu_affinity(spec: dict[str, Any]) -> list[int] | None:
+def campaign_cpu_affinity(spec: dict[str, Any], supervisor_binding: dict[str, Any] | None = None) -> list[int] | None:
     """Restrict CPU campaigns, or an explicitly opted-in GPU campaign.
 
     Affinity is inherited by ordinary children, but is not a security boundary:
     reviewed workload code and native tools must not widen it or escape teardown.
     """
+    index = spec.get("cpu_affinity_index", 0)
+    if type(index) is not int or index < 0:
+        raise fleet.FleetError("cpu_affinity_index must be a nonnegative integer")
+    if "cpu_affinity_index" in spec and spec.get("single_cpu_campaign") is not True:
+        raise fleet.FleetError("cpu_affinity_index requires single_cpu_campaign: true")
     if spec.get("device", "gpu") != "cpu" and not spec.get("single_cpu_campaign", False):
         return None
     count = spec.get("cpu_threads")
@@ -745,9 +774,18 @@ def campaign_cpu_affinity(spec: dict[str, Any]) -> list[int] | None:
         raise fleet.FleetError("CPU campaign requires process affinity support")
     try:
         available = sorted(get_affinity(0))
-        if len(available) < count:
-            raise fleet.FleetError(f"CPU campaign needs {count} allowed CPUs; only {len(available)} available")
-        selected = available[:count]
+        if supervisor_binding is not None:
+            original = supervisor_binding.get("available")
+            selected = supervisor_binding.get("selected")
+            if (type(original) is not list or any(type(cpu) is not int for cpu in original)
+                    or original != sorted(set(original)) or index >= len(original)
+                    or supervisor_binding.get("index") != index or selected != [original[index]]
+                    or count != 1 or available != selected):
+                raise fleet.FleetError("CPU campaign supervisor affinity binding differs")
+            return selected
+        if index + count > len(available):
+            raise fleet.FleetError(f"CPU campaign affinity index {index} needs {count} allowed CPUs; only {len(available)} available")
+        selected = available[index:index + count]
         set_affinity(0, selected)
         if set(get_affinity(0)) != set(selected):
             raise fleet.FleetError("CPU campaign affinity did not take effect")
@@ -771,7 +809,10 @@ def campaign(directory: Path) -> int:
         return 1
     spec = monitor.read_json(directory / "spec.json")
     try:
-        cpu_affinity = campaign_cpu_affinity(spec)
+        binding = monitor.read_json(directory / "run" / "cpu-affinity.json") if "cpu_affinity_index" in spec else None
+        if "cpu_affinity_index" in spec and binding is None:
+            raise fleet.FleetError("indexed CPU campaign requires supervisor affinity binding")
+        cpu_affinity = campaign_cpu_affinity(spec, binding)
         manifest = monitor.read_json(directory / "ready.json")
         # Archive-mode jobs link source/ to host-local disk: read it there, not through NFS.
         source = (directory / "source").resolve()
@@ -779,6 +820,12 @@ def campaign(directory: Path) -> int:
         started = time.time()
         supervisor_state = monitor.read_json(run / "status.json", {})
         supervisor_request = monitor.read_json(run / "request.json", {})
+        if "cpu_affinity_index" in spec:
+            control = supervisor_request.get("fleet_control", {})
+            control_root = Path(__file__).resolve().parents[2]
+            if (control.get("root") != str(control_root) or set(control.get("files", {})) != set(INDEXED_CONTROL_FILES)
+                    or any(file_digest(control_root / name) != control["files"][name] for name in INDEXED_CONTROL_FILES)):
+                raise fleet.FleetError("indexed fleet control release identity differs")
         budget_end = min(supervisor_state.get("started", started) + supervisor_request.get("budget_seconds", spec["budget_seconds"]), spec["deadline_epoch"])
         budget_end_monotonic = time.monotonic() + max(0.0, budget_end - time.time())
         if digest(spec) != manifest["spec_sha256"]:
@@ -829,6 +876,10 @@ def campaign(directory: Path) -> int:
                 "PS_VALIDATION_PATH": str(directory / "validation.json"),
                 **temporary_env,
             }
+            if "cpu_affinity_index" in spec:
+                # Scientific modules and validators must import the frozen
+                # workload, even though the supervisor runs from the release.
+                env["PYTHONPATH"] = str(source)
             if packed:
                 env.update(PATH=os.pathsep.join([packed["bin"], env.get("PATH", "")]), CONDA_PREFIX=packed["prefix"])
             monitor.write_json(output / "dispatch.json", {
@@ -837,6 +888,7 @@ def campaign(directory: Path) -> int:
                 "citable": False if stage == "smoke" else None, "attempt": attempt, "resumed_from": resumed_from,
                 "contention_policy": spec.get("contention"), "gpu_sharing": gpu_sharing(spec),
                 **({"cpu_affinity": cpu_affinity} if cpu_affinity is not None else {}),
+                **({"fleet_control": supervisor_request["fleet_control"]} if "cpu_affinity_index" in spec else {}),
                 **({"campaign_clock": {"started": campaign_started_monotonic,
                                         "phase_started": time.monotonic(),
                                         "budget_end": budget_end_monotonic}}
@@ -1150,10 +1202,12 @@ def doctor(hosts: list[str]) -> dict[str, Any]:
     path = str(Path(base) / "checks" / nonce)
     token = uuid.uuid4().hex
     init = "import pathlib; p=pathlib.Path(" + repr(path) + "); p.mkdir(parents=True); (p/'token').write_text(" + repr(token) + ")"
-    fleet._remote_json(hosts[0], probes[0]["python"], init + "; print('{}')")
+    # The fleet probe already used system Python on each host and recorded the
+    # workload interpreter separately; these filesystem checks need only stdlib.
+    fleet._remote_json(hosts[0], "/usr/bin/python3", init + "; print('{}')")
     script = "import pathlib,json,socket; p=pathlib.Path(" + repr(path) + "); visible=(p/'token').read_text()==" + repr(token) + "; won=False\nif visible:\n try:\n  (p/'claim').mkdir(); won=True\n except FileExistsError: pass\nprint(json.dumps({'visible':visible,'won':won,'host':socket.getfqdn()}))"
     with ThreadPoolExecutor(max_workers=len(hosts)) as pool:
-        futures = {h["alias"]: pool.submit(fleet._remote_json, h["alias"], h["python"], script) for h in probes}
+        futures = {h["alias"]: pool.submit(fleet._remote_json, h["alias"], "/usr/bin/python3", script) for h in probes}
         checks = {}
         for alias, future in futures.items():
             try:
@@ -1162,7 +1216,7 @@ def doctor(hosts: list[str]) -> dict[str, Any]:
                 checks[alias] = {"visible": False, "error": str(exc)}
     passed = all(c.get("visible") for c in checks.values()) and sum(c.get("won", False) for c in checks.values()) == 1
     report = {"passed": passed, "base": base, "probes": probes, "atomic_checks": checks, "checked_at": time.time(), "evidence_path": path}
-    fleet._remote_json(hosts[0], probes[0]["python"], "import pathlib,json; pathlib.Path(" + repr(path + "/report.json") + ").write_text(" + repr(json.dumps(report)) + "); print('{}')")
+    fleet._remote_json(hosts[0], "/usr/bin/python3", "import pathlib,json; pathlib.Path(" + repr(path + "/report.json") + ").write_text(" + repr(json.dumps(report)) + "); print('{}')")
     return report
 
 
@@ -1276,17 +1330,29 @@ def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
     transfer_seconds = getattr(args, "snapshot_transfer_seconds", None)
     if transfer_seconds is not None:
         number(transfer_seconds, "snapshot transfer seconds")
-        if transfer_seconds > 90:
-            raise fleet.FleetError("bounded snapshot transfer seconds must be <=90")
+        if transfer_seconds > 450:
+            raise fleet.FleetError("bounded snapshot transfer seconds must be <=450")
     config = load_config(args.state_dir)
+    upload_host = getattr(args, "snapshot_upload_host", None)
+    cache_archive = getattr(args, "snapshot_cache_archive", None)
+    if cache_archive is not None and upload_host is None:
+        raise fleet.FleetError("snapshot cache archive requires an explicitly verified upload host")
+    if upload_host is not None:
+        if upload_host not in config["hosts"]:
+            raise fleet.FleetError("snapshot upload host must be in the verified fleet configuration")
+        report = doctor(config["hosts"])
+        if not report.get("passed") or report.get("base") != config.get("base"):
+            raise fleet.FleetError("snapshot upload host requires a passing shared-visibility fleet doctor")
     spec = validate_spec(json.loads(args.spec.read_text()), now=time.time())
     if not set(spec["hosts"]).issubset(config["hosts"]):
         raise fleet.FleetError("job hosts must have verified workers")
     health = remote_rpc(config, "health", {"hosts": config["hosts"]})
-    for alias in spec["hosts"]:
+    for alias in dict.fromkeys([*spec["hosts"], *([upload_host] if upload_host is not None else [])]):
         heartbeat = health["workers"].get(alias)
         if not heartbeat or time.time() - heartbeat["updated"] > 3 * POLL_SECONDS:
             raise fleet.FleetError(f"worker {alias} has no fresh heartbeat; run doctor and inspect before submission")
+        if alias in spec["hosts"] and "cpu_affinity_index" in spec and "indexed_cpu_affinity_v1" not in (heartbeat.get("capabilities") or []):
+            raise fleet.FleetError(f"worker {alias} does not advertise indexed CPU affinity; activate the reviewed fleet release first")
     # Keep the archive on NFS and unpack host-locally only when every eligible worker can.
     archive_mode = all("source_archive" in (health["workers"][alias].get("capabilities") or []) for alias in spec["hosts"])
     job_id =datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ-") + uuid.uuid4().hex[:8]
@@ -1302,6 +1368,10 @@ def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
     archive_options = {"include_paths": archive_paths} if archive_paths else {}
     snapshot, sha, metadata = fleet._build_snapshot(source_root, include_changes=tuple(args.include_change), include_untracked=tuple(args.include_untracked), **archive_options)
     record = {"job_id": job_id, "status": "preparing", "config": config, "spec_sha256": digest(spec), "snapshot": metadata, "chat_id": args.chat_id}
+    if upload_host is not None:
+        record["snapshot_upload_host"] = upload_host
+    if cache_archive is not None:
+        record["snapshot_cache_archive"] = cache_archive
     monitor.write_json(args.state_dir / f"{job_id}.json", record)
     try:
         prepare: dict[str, Any] = {"job_id": job_id}
@@ -1314,7 +1384,14 @@ def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
         transfer_options: dict[str, Any] = {"timeout": transfer_seconds} if transfer_seconds is not None else {}
         if archive_mode:
             transfer_options["extract"] = False
-        fleet._send_snapshot(config["hosts"][0], snapshot, str(Path(prepared["directory"]) / "source"), sha, **transfer_options)
+        target = str(Path(prepared["directory"]) / "source")
+        if cache_archive is not None:
+            if not archive_mode or upload_host is None:
+                raise fleet.FleetError("snapshot cache reuse requires verified source-archive mode")
+            fleet._copy_snapshot_from_cache(upload_host, config["pythons"][upload_host], config["base"],
+                                            cache_archive, target, sha, timeout=transfer_seconds)
+        else:
+            fleet._send_snapshot(upload_host or config["hosts"][0], snapshot, target, sha, **transfer_options)
         publish: dict[str, Any] = {"job_id": job_id, "spec": spec, "snapshot": metadata}
         if archive_mode:
             publish["source_archive"] = True
@@ -1352,7 +1429,13 @@ def remote_job(args: argparse.Namespace) -> Any:
         # Preserve the original execution config as provenance, but use the
         # current compatible management release for this same shared inbox.
         current = monitor.read_json(args.state_dir / "inbox.json", {})
-        management = current if current.get("base") == record["config"].get("base") and current.get("hosts") else record["config"]
+        management = record["config"]
+        if current.get("base") == record["config"].get("base") and current.get("hosts"):
+            routed = load_config(args.state_dir)
+            # Do not route into a different inbox if the configuration changed
+            # while it was being read; keep the recorded execution config.
+            if routed.get("base") == record["config"].get("base"):
+                management = routed
         result = remote_rpc(management, args.action, {"job_id": args.job_id}, **timeout_options)
         if args.action == "events":
             # Acknowledge only after the consumer actually reports the event.
@@ -1439,8 +1522,12 @@ def wait_snapshot(state_dir: Path, job_id: str, now: float) -> dict[str, Any]:
     return {**summary, "attention": bool(events), "unacknowledged_event_ids": [e["id"] for e in events], "events": [{"id": e["id"], "kind": e["kind"]} for e in events]}
 
 
-def wait_jobs(state_dir: Path, job_ids: list[str], max_seconds: float, *, poll_seconds: float = POLL_SECONDS, clock: Any = time.monotonic, sleep: Any = time.sleep) -> dict[str, Any]:
-    """Block until a listed job needs attention or the bounded wait ends. Read-only."""
+def wait_jobs(state_dir: Path, job_ids: list[str], max_seconds: float, *, until_running: bool = False, poll_seconds: float = POLL_SECONDS, clock: Any = time.monotonic, sleep: Any = time.sleep) -> dict[str, Any]:
+    """Wait read-only for attention, terminal jobs or the optional admission condition.
+
+    Admission succeeds only with reason ``all_running``; terminal jobs and
+    incomplete event reads cannot establish that condition. No events are acked.
+    """
     limit = min(max_seconds, WAIT_MAX_SECONDS)
     begun = clock()
     while True:
@@ -1449,10 +1536,12 @@ def wait_jobs(state_dir: Path, job_ids: list[str], max_seconds: float, *, poll_s
         elapsed = clock() - begun
         attention = any(job["attention"] for job in jobs)
         settled = all(job["status"] in TERMINAL for job in jobs)
+        admitted = until_running and all(job["status"] == "running" and "events_error" not in job for job in jobs)
+        terminal = until_running and any(job["status"] in TERMINAL for job in jobs)
         # Stop before a further poll would end past the limit.
         remaining = limit - elapsed - (clock() - poll_started)
-        if attention or settled or remaining <= 0:
-            reason = "attention" if attention else "all_terminal" if settled else "timeout"
+        if attention or settled or terminal or admitted or remaining <= 0:
+            reason = "attention" if attention else "all_terminal" if settled else "terminal" if terminal else "all_running" if admitted else "timeout"
             return {"reason": reason, "attention": attention, "waited_seconds": round(elapsed), "max_seconds": limit, "jobs": jobs}
         sleep(min(poll_seconds, remaining))
 
@@ -1480,7 +1569,9 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
     submission = actions.add_parser("submit")
     submission.add_argument("spec", type=Path)
     submission.add_argument("--source-worktree", type=Path, help="snapshot an explicit checkout of this same repository; default is the canonical checkout")
-    submission.add_argument("--snapshot-transfer-seconds", type=float, help="bound each archive transfer/extraction to at most 90 seconds; default preserves the fleet timeout")
+    submission.add_argument("--snapshot-cache-archive", help="copy a verified matching .tar from shared fleet storage into a fresh job archive")
+    submission.add_argument("--snapshot-upload-host", help="route archive upload through a verified fleet host after a fresh shared-visibility doctor")
+    submission.add_argument("--snapshot-transfer-seconds", type=float, help="bound each archive transfer/extraction to at most 450 seconds; default preserves the fleet timeout")
     submission.add_argument("--snapshot-path", action="append", default=[], help="archive only this reviewed tracked file/directory from HEAD; repeat for a complete workload dependency set")
     submission.add_argument("--chat-id", default=os.environ.get("CODEX_THREAD_ID"), help="submitting Codex chat; register its five-minute heartbeat")
     for command in (workers, submission):
@@ -1504,6 +1595,7 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
     waiting = actions.add_parser("wait", help="block until a listed job needs attention, at most 45 minutes; read-only")
     waiting.add_argument("job_ids", nargs="+")
     waiting.add_argument("--max-seconds", type=float, default=WAIT_MAX_SECONDS, help=f"stop waiting after this many seconds; capped at {WAIT_MAX_SECONDS}")
+    waiting.add_argument("--until-running", action="store_true", help="return when every listed job is running, or any job is terminal or needs attention; read-only")
     ack = actions.add_parser("ack")
     ack.add_argument("event_ids", nargs="+")
     for name in (() if public_only else ("worker", "campaign", "salvage", "rpc")):
@@ -1551,7 +1643,8 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
         elif args.action == "wait":
             if not args.max_seconds > 0:
                 raise fleet.FleetError("--max-seconds must be positive")
-            value = wait_jobs(args.state_dir, args.job_ids, args.max_seconds)
+            value = (wait_jobs(args.state_dir, args.job_ids, args.max_seconds, until_running=True)
+                     if args.until_running else wait_jobs(args.state_dir, args.job_ids, args.max_seconds))
             print(json.dumps(value, indent=2, allow_nan=False))
             return WAIT_ATTENTION_EXIT if value["attention"] else 0
         elif args.action == "ack":

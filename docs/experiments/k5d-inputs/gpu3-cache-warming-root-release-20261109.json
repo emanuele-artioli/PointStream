@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "decision": "Root releases ONE bounded GPU3 cache preparation command only",
+  "host": "gpu3.itec.aau.at",
+  "CPU_ceiling_inclusive": 280,
+  "GPU_ceiling": 0,
+  "family_CPU_ceiling": 300,
+  "family_CPU_preflight_already_charged": 20,
+  "parent_phase": "k5d-scale-first-tranche-20261105",
+  "deadline_utc": "2026-11-09T23:20:00Z",
+  "remote_CPU_hard_limit": 190,
+  "remote_wall_limit_seconds": "min2300,remaining absolute deadline",
+  "external_CPU_envelope": {
+    "readiness_dispatch": 20,
+    "audit": 30,
+    "failure_admin": 40
+  },
+  "script_path": "/private/tmp/k5d-gpu3-warm-candidate-20261109/warm.py",
+  "script_sha256": "55c8326d9d69cebedea7f6ad62bef19eb43f80d5f1373acb87db2f1cce01b9c5",
+  "payload_sha256": "470627633728fc11a5373c02aac2adaecec8c6dd4c740e4dede8c2f19f7b14a1",
+  "bootstrap_sha256": "fb941ef5e4ff7676ef8acd82d6aef8bdf3d141a3d0f21a30f3bf291c84f43b3c",
+  "parser_sha256": "2e9587d5aaee29ce457353e89aca303774e55fc1df862862a69b276d7844d48d",
+  "task_root": "/local/users/emanuele/pointstream/k5d-gpu3-warm-965d-20261109-a1",
+  "scope": "12 stable assets and pinned environment archive only. Private verified no-replace publication of8missing entries/3trees; read-only SHA of existing hits. Fresh jobs/worker/CPU0claims and local space before dispatch; task startup identity fsynced before bulk work. No real model inference, GPU job, pool/spec change or source/denial/quality gate relaxation.",
+  "source_identity_basis": "Exact13name/path/SHA/extract tuples checked against prior proposal, excluding obsoleteCPUreceipt; source metadata must match and remain unchanged. New9eb8CPUadmission staged separately later.",
+  "cost_basis": "1.5prefix extrapolations for copy/hash, bounded extraction and uncertainty allowances. Several real costs unmeasured; stop on190selfCPU/absolute deadline and include externalcosts within280. No completion guarantee.",
+  "storage": "50GiBfleetreserve+32GiBfutureworkload+2GiBmisc+twice2.859GBincremental/privatebytes. No existing cache mutation on mismatch. Existing environment tree NOT fully integrity-certified.",
+  "preservation": "All preexisting/verified cache/source bytes, completed entries and receipts, private failure directories retained. Existing copier may unlink only its own unverified partial. Interrupted byte copy cannot resume. Uncertain atomic publication must be inspected, never replayed.",
+  "stop": "Any checksum/identity/collision/symlink/partial/claim/resource/deadline error stops; preserve status and inspect. No automatic restart, cleanup or fallback. Persist intent/command handle and startup identity; one bounded completion wait only."
+}

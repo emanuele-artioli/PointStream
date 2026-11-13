@@ -1,12 +1,137 @@
 # Submission research program — 2026-11-04
 
-Status: **APPROVED by the user, 2026-11-04**: a fresh staged ceiling of
-20 GPU-hours /24 workload CPU-hours. Initial release: at most 2 GPU-hours /
+Status: **APPROVED by the user, 2026-11-04; ceiling increased 2026-11-05**:
+24 GPU-hours /28 workload CPU-hours total, including all earlier programme charges. Initial release: at most 2 GPU-hours /
 3 workload CPU-hours across feasibility. Larger stages remain conditional on
 correctness and complete-cost forecasts fitting the approved aggregate and
 workstream ceilings. Ordinary bounded implementation corrections need no new
 permission; source/numerical rules and stops below remain binding. Closed
 K5c/W8/W9 balances are not transferred. Unknown submissions are never replayed.
+
+## Current execution status — November13 (UTC)
+
+### Current research decision (November 13, UTC)
+
+The 55dd GPU witness is closed: six ordinary native preparations completed,
+but its first restricted decoder failed on a lazy Torch import; no receiver or
+quality point passed. Final cleanup is recorded, while the selected observer
+remains UNKNOWN with no reservation bound. Events and both waits are closed.
+
+The scoped lazy-import CPU diagnostic passed. The separate [public-Python
+category repair](k5d-public-python-runtime-repair-2026-11-13.md) metadata helper failed after publication;
+a read-only recovery audit verified the published files and private-data
+separation. The original helper remains failed; no qualification follows.
+
+**The Ada registered-study port is merged and CI-green.** Final revision
+`ae892df1`, source `9d3d7b2c` and archive `ad635b0b` are frozen. Native CPU job
+`cc884861` and actual SVT CPU denial job `c53fb111` are COMPLETE and root accepted.
+The GPU witness remains held pending exact metadata and observer release. Use
+this same source/environment/archive for fresh 16/48 calibration
+through 292/586/full30, preserving defaults and fresh receivers at every new
+stage; new source qualification is mandatory. The [SVT-only route](k5d-svt-only-confirmation-2026-11-13.md)
+remains separately held and scientifically unreleased.
+
+Programme charges are 22,941 GPU / 60,945 CPU seconds within unchanged 24/28-hour
+authority. Bounded passive watch a10 is active; no autosubmit or model timers.
+The [canonical continuation](../continuation-2026-11-13.md) records all current jobs, limits, balances,
+artifacts and remaining gates. Final-source CPU qualification is complete.
+GPU/scale and paper/PRESLEY work remain held.
+
+### Historical af6 phase — balances, waits and watch superseded above
+
+Root accepted exact-source native CPU proof `20261113T021221Z-f2db8617` and
+real two-case SVT CPU receiver oracle `20261113T022437Z-50b4e24e` on frozen
+`5ebc7831` / source `abccdf05` / archive `7fd4e0e6` / environment `32e`.
+The native proof covers CPU containment/accounting. The real oracle passed
+normal SVT filesystem denial and initial-launcher interruption with scoped
+teardown: 16 distinct host processes reconcile as 14 main-audit + 2 outer-audit
+checks (14 captured births plus supervisor and campaign). No active-native, unshare-only or fleet-watchdog claim follows.
+The 50b event is acknowledged; root verified its canonical status.
+
+The full real-CPU approval is outside git (SHA `75ae95a6984c`); its thin
+[closeout](../experiments/k5d-inputs/ada-5ebc-50b4-root-CPU-denial-closeout-20261113.json) records the exact source, policy, publication and audits.
+Prior `c1bededa` remains a failed combined gate with acknowledged events; its
+signal-enum diagnosis and the accepted caller fix are retained beside the pass.
+
+Exclusive Ada witness `20261113T030323Z-af6c09da` **EXPIRED unassigned**.
+Physical inspection establishes NO ADMISSION and no execution; the canonical
+event is acknowledged. Its sole native wait (backend 70306) ended after 599
+seconds, exit 10. The original observer batch wait (backend 66293) later ended 0; both journals
+retained UNKNOWN and all four wrapper/timeout PIDs are absent. Do not replay the job.
+No assigned UUID, GPU/decoder result, quality or scale claim follows.
+
+The unused 900 GPU / 700 campaign CPU seconds were released. Retained cost is
+400 CPU seconds: 50 preparation + 200 observers + 150 administration.
+Programme charges: **21,141 GPU / 56,940 CPU seconds**; Ball: 14,779 GPU /
+32,939 CPU. After a transfer of unspent funds, the Ada stage has 4,118 GPU /
+1,588 CPU seconds remaining. A separate **600 GPU / 1,800 CPU reservation**
+now funds conventional-only feasibility; it is not spending or new user authority.
+Old held Ball 7,920 GPU / 800 CPU and W8 4,550 GPU / 929 CPU are unchanged;
+the programme ceiling remains 24 GPU-hours / 28 workload CPU-hours.
+
+**Next PLAN point: [SVT-only confirmation feasibility](k5d-svt-only-confirmation-2026-11-13.md).** Source design/build
+only is authorized; scientific compute is UNRELEASED. Preserve the same 30
+registered clips and original three SVT settings (CRF48/55/62, preset4), with
+restricted CPU decoding, ordinary models on shared Ada, full-frame and ROI
+metrics, independent judges and existing guards. First qualify a separately
+named 16-frame correctness/cost oracle; only then prospectively admit 48-frame/
+absent controls and a complete scale forecast. The original dual-codec goal
+remains open; this narrower route does not replace its missing neural comparison.
+
+[CPU claim-path correction](../experiments/k5d-inputs/ada-cpu-claim-path-correction-20261113.json): earlier alias `gpu6.json` absence checks
+were unsupported. The actual `gpu6.itec.aau.at.json` file exists with zero
+allocations; all six own allocations are absent now. This proves CURRENT
+cleanup only, not immediate historical release intervals. Native process,
+normal decoding and filesystem-denial proofs are unaffected. Preserve all
+original gate, source and raw hashes; the addendum corrects interpretation.
+
+At the af6 phase, watch a7 had not yet found capacity; it later found idle
+Ada at 03:23:52 UTC and ended 03:33:49 with PID 73984 absent. Current watch a8
+is recorded above. Earlier a6 ended 02:51:25 UTC after nine ticks with no idle
+GPU. PR 378 later merged with green CI (Ruff, mypy 591 files, 2,197 tests /
+40 skipped); the main integration advanced to `1a1f63c7`, while frozen
+scientific source `5ebc7831` is unchanged.
+
+Ada's same-GPU repeat `2c8b49a0` supports its own qualified reference; failed
+cross-A6000 comparison `37b3b79b` is retained. Current validators require exclusive
+GPU access. GPU/CUDA/DCVC denial, new clips and scale/full30 remain unqualified.
+The expired witness provides no GPU qualification. The next route has separate
+source, correctness, resource and budget gates. Paper/PRESLEY
+remain paused; no training, paid hosting or submission is authorized.
+
+See [current handoff](../continuation-2026-11-13.md), [ledger](../experiments/submission-research-budget-20261104.json) and [stage card](k5d-ada-scale-and-denial-2026-11-12.md).
+
+Historical execution status, earlier November12: **ALTERNATE-GPU QUALIFICATION QUEUED**.
+User requests regular native resource checks and a non-A6000 path. The new
+source-bound CPU proof d24d is accepted; Ada16 request
+`20261112T192044Z-461e16e8` was published pending on gpu5/6. Native workers
+check capacity every minute through20:00:05.184948UTC; one canonicalwait2500,
+no recurring AI turns or automatic retry. Source21482 preserves all exact
+reference comparisons; no GPU outcome or downstream Ada promotion is assumed.
+See [handoff](../continuation-2026-11-12.md) and
+[Ada qualification card](k5d-ada-qualification-2026-11-12.md). Bound1,000GPU /
+1,150CPU is nested in the Ball parent. W8 remains held for its complete-cost
+gate under929CPU. No paid server, source/numerical relaxation, manuscript or
+PRESLEY change, training or paper submission.
+
+## Historical capacity decision — November12
+
+Ada2c8b completed exact same-GPU packet-replay repeatability and measured full
+six-point16 costs126.6/112.5seconds. Root physically audited all bytes, metrics
+and judges. This is calibration only; original37b3cross-class failure is kept.
+Actual worker receipts say filesystem isolation NOT established; our previous
+source-hidden wording was too broad. Denial proof remains unmet, no benchmark
+promotion. Two code builders prepare a real receiver witness and separate Ada
+16/48 producer/scorer. No new GPU or CPU oracle is released; source still has
+material observer/capability issues under independent review.
+
+[Current handoff](../continuation-2026-11-12.md),
+[stage card](k5d-ada-scale-and-denial-2026-11-12.md),
+[API contract](k5d-receiver-isolation-contract-2026-11-12.md).
+Programme19,859GPU/51,578CPU charged; new internal Ball stage6,000GPU/8,750CPU
+remaining, oldBall7,920GPU/800CPU and W84,550GPU/929CPU preserved. All original
+ceilings unchanged. Native5minute passive resource checks from21:44UTC stop
+by4wallhours or CPUguard; no model timers/autosubmit. Paper/PRESLEY unchanged.
 
 ## Goal and scope
 
@@ -30,7 +155,7 @@ negatives. No claim of independent matches beyond documented source identity.
 
 ## Approved inclusive ceilings
 
-A fresh **20 GPU-hours and 24 workload CPU-hours**, including staging, failed
+A total **24 GPU-hours and 28 workload CPU-hours**, including staging, failed
 starts, pilots, native encoding/decoding, inference, metrics, independent audits,
 monitoring and cleanup. All jobs inherit one-CPU bounds unless a separately
 reviewed measured process-tree bound is demonstrably cheaper. Aggregate
@@ -40,16 +165,18 @@ No training, paid API fallback or remote agent session is included.
 
 | Work | GPU ceiling | Workload CPU ceiling |
 |---|---:|---:|
-| Ball source oracles, controls, matched native ladders, 30-clip benchmark and qualified cross-sport subset |14h|16h|
-| Two original SVT half-out gaps, original scoring controls and updated intervals |0.5h|0.75h|
-| New W8 CUDA diagnosis, then cost pilot and one complete fresh witness only on gates |2h|3h|
+| Ball source oracles, controls, matched native ladders, 30-clip benchmark and qualified cross-sport subset |18h|20h|
+| Two original SVT half-out gaps, original scoring controls and updated intervals |0.5h|3,620 s|
+| New W8 CUDA diagnosis, then cost pilot and one complete fresh witness only on gates |8,200 s|11,300 s|
 | W6 literal control reproduction and bounded smoothing study |0.5h|1.25h|
 | Paid-mask / generative-peer feasibility oracles, no full 34-window sweep |1h|1.5h|
-| Shared admission, audit and uncertainty reserve |2h|1.5h|
-| **Total** |**20h**|**24h**|
+| Shared admission, audit and uncertainty reserve |6,200 s|3,980 s|
+| **Total** |**24h**|**28h**|
 
-The initial release is at most **2 GPU-hours /3 workload CPU-hours** across
-feasibility stages. The rest is usable only after representative smoke and
+The original initial release was at most **2 GPU-hours /3 workload CPU-hours** across
+feasibility stages. The November5 revision adds a separately gated first tranche
+of at most **2.5 GPU-hours /3 workload CPU-hours** for ball qualification and scale.
+The CPU allocation table includes the recorded transfers from shared reserve to SVT. The rest is usable only after representative smoke and
 measured complete-cost forecasts fit both remaining ceilings and the relevant
 workstream cap. Root may move the shared reserve to a named workstream with a
 prospective written justification, never exceeding aggregate ceilings or
@@ -134,3 +261,17 @@ The trace controls passed without a file policy, including NoNewPrivs alone. The
 The exact leaves are recorded in the new module and W8 entry: loader cache, CPU/device/driver metadata, this process's maps/status, memory configuration and the two NVIDIA MIG metadata files. No parent directory is granted. The child resolves its own proc paths; a supervisor receipt binds the root-owned loader cache. All ten actual-source/alias denials remain required. The strict arm must also deny safe scratch mutations outside the output leaf and prove output writes work. No model, protected worker body read or generation is included.
 
 The ceiling is150GPU/200CPU, including a120-second one-core campaign and30GPU/80CPU external, with25-second arms and15-second reserve. Any missing leaf, identity, bootstrap, budget or mutation failure stops as incomplete. A tiny CUDA pass qualifies only that configuration for a later separately gated model pilot.
+
+## Verified baseline and decoder-input phase — 2026-11-05
+
+The four new SVT scores and 75 complete-byte/native-YUV roles are independently audited. Corrected report `d09b0543` and audit `5a435128` cover six familiar-match windows only, using every valid control (71 distinct streams), complete native IVF as primary and complete MKV separately. Conditional player gaps remain positive, whole-frame anchors are better, med000 DCVC is missing and the Medvedev subgroup is inconclusive. The original-IVF strict half-out brackets remain unresolved; MKV resolves them. Tier 2 remains unchanged. The first report is preserved as invalid after independent endpoint/coverage review; both 120 CPU-second analysis allocations are charged. This is a fairer, more complete conditional comparison, not full-codec certification.
+
+The real public-folder I/O oracle `20261105T071725Z-b5eb8a21` independently passes the unchanged strict policy and all four real file hashes/cleanup; conservative charge 135 CPU-seconds, zero GPU. It qualifies warm-cache mechanics only. An opt-in one-/three-step generation cost candidate remains prospective until its full source/spec/forecast is reviewed. The original 20/24 ceiling is unchanged; proposed 24/28 and larger ball release are pending. No training, paper submission or source-footage redistribution follows.
+
+## Research-first ceiling revision —2026-11-05
+
+User approved the pending24GPUh/28CPUh proposal in `submission-research-budget-revision-2026-11-05.md`, with the first additional9,000GPU/10,800CPU-second tranche conditional on per-job correctness, source-compatibility, real native/namespace/CPU-accounting qualification and292/586 scale confirmations. The aggregate increase is assigned to ball; the full30 study remains gated by a complete forecast and reserves. Pause manuscript edits until worthwhile research endpoints are resolved. Preserve completed negatives, historical ceilings and failed attempts. No training, legacy200GPUh study, or submission.
+
+### Root prospective reserve transfer — November6 UTC
+
+The explicit shared-reserve authority above is used prospectively to move1,000GPU/500CPU seconds toW8; aggregate24GPUh/28CPUh and ball ceilings stay unchanged. W8limit is8,200GPU/11,300CPU; shared6,200GPU/3,980CPU. After paired-cost and CPU-structure acceptance, W8has5,159GPU/4,616CPU remaining. Reserve at most4,550GPU/4,550CPU for the staged fresh-witness attempt described in `w8-full-witness-staged-proposal-2026-11-06.md`, including newsourceproof and alloperational costs, leaving66CPU insideW8. This is a ceiling reservation, never proof of fit or execution authority. Actualsource/securityreview and complete forecast precede each released stage; no full candidate/quality run is released. A failed or unfundable stage stops and retains evidence. The old witness allocation stays closed.

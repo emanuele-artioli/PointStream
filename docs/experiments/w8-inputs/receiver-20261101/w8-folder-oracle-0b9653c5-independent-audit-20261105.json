@@ -1,0 +1,58 @@
+{
+  "job_id": "20261105T062850Z-0b9653c5",
+  "status": "failed before Landlock or folder test",
+  "revision": "2650d595d5748e328c8aa152af4d76ca8f5379bf",
+  "source_sha256": "d568084962f8ad3721690092ebbe24a66d7f6fc8c47a7b33c53d343fe7132712",
+  "snapshot_sha256": "2ed3ad806379ced8c28582257314361175271834e8977ae51bfbebab43457017",
+  "spec_sha256": "2db83da86b4d76644388dcaabfcbc0e61fb1be42fc7cb003df52fc18359011bc",
+  "host": "gpu5",
+  "gpu": null,
+  "observed_failure": "ValueError loader identity invalid at child pre-Landlock uid check",
+  "host_loader_stat": {
+    "uid": 0,
+    "mode": 33188,
+    "device": 64512,
+    "inode": 3934945
+  },
+  "child_loader_uid": "not recorded; user-namespace UID mapping is a likely explanation, not a direct observation",
+  "scratch_metadata": "synthetic inputs and canaries present; output empty; no materialization or model",
+  "command_wall_seconds": 0.4201517105102539,
+  "command_children_resource_usage_cumulative": [
+    0.33671999999999996,
+    0.072639,
+    45056,
+    0,
+    0,
+    0,
+    20054,
+    0,
+    0,
+    8,
+    480,
+    0,
+    0,
+    0,
+    22,
+    40
+  ],
+  "created_to_latest_terminal_update_seconds": 60.919363260269165,
+  "conservative_lifecycle_ceiling_seconds": 61,
+  "external_cpu_reserve_seconds": 50,
+  "proposed_cpu_charge_seconds": 111,
+  "gpu_charge_seconds": 0,
+  "pids_absent": [
+    1136364,
+    1136365
+  ],
+  "process_group_absent": 1136365,
+  "matching_cpu_claims": [],
+  "scope": "oracle bootstrap failure; no test of real or synthetic folder method, no GPU, no model",
+  "artifact_sha256": {
+    "smoke/command.log": "ccf7e14058512aa55f49696eba3681a0d37843bdfc75c9c907dea1ea0f939cc6",
+    "smoke/execution.json": "b1fff61532f68ce5a4cc6e203e9213a7d7ca8bdf265ea0bd1c3e31cc3b27291a",
+    "smoke/staging.json": "076b080749411ed84d6599f30cb81d25592f2748c6c42762267810d7550e4ae7",
+    "smoke/dispatch.json": "72797a72e4021ac4c8f70054b94d02ff3259ed6be066a0e3717bb0da089494f2",
+    "run/status.json": "25ba4ffb580ed18c601629de357b5a353348d95888feec40ca7a2e8006d2d35f",
+    "run/cpu-affinity.json": "105adf575bb00ad581cef2917defe420563f14e9e0f7f60ee9162c95c308229b"
+  }
+}

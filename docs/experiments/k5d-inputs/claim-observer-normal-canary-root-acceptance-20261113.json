@@ -1,0 +1,50 @@
+{
+  "status": "accepted within same-host synthetic fixture scope",
+  "manifest_hashes": {
+    "outer-receipt.json": "2559ad816087f426e56197c20c9ee23c59870deda77f784bd90b9b8cda2b142d",
+    "result.json": "d3cb621d7c6da56a22140f23cb333d510f758699bf10bf300ec2085a9d56fff9",
+    "config.json": "d0c128588c8fc1b9afb818b25c49b8565f359ca813edee9257f4d7f4f9781277",
+    "journal.jsonl": "d1f6fbc888dc5c1a99f61a47353230fbda37b2eda480fea4a5fd4365b64b5302",
+    "incomplete.jsonl": "68eaec5e08c8fba2aadff88495a0d3f68d7948b355ed82cb110457facc934185",
+    "helper.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "source_observer_sha256": "ddd3938add1ceb5dcb77dd54578ac8803c4dfd2a179c7e78377168f58f55ea55",
+  "normal": {
+    "status": "bounded",
+    "job_id": "20261113T000000Z-deadbeef",
+    "gpu_token_sha256": "3ba3f5f43b92602683c19aee62a20342b084dd5971ddd33808d81a328879a547",
+    "start_lower_ns": 5596944443375837,
+    "release_upper_ns": 5596948475600322,
+    "claim_upper_seconds": 4.032224485,
+    "scope": "reservation interval only; conditional on independently verified NFS visibility",
+    "cpu_accounting": "not established by this observer"
+  },
+  "missing_final": {
+    "status": "unknown",
+    "reason": "incomplete journal"
+  },
+  "outer_cpu_sum_seconds": 1.068933,
+  "observer_cpu_seconds": 0.442557453,
+  "reader_cpu_seconds": 0.017721,
+  "samples": 3,
+  "wall_seconds": 7.1117886528372765,
+  "conservative_cpu_debit_seconds": 100,
+  "root_decision": {
+    "status": "accepted normal synthetic fixture only",
+    "scientific_credit": false,
+    "gpu_qualification": false,
+    "production_protocol_deployment": false,
+    "source_revision": "589470b3",
+    "helper_sha256": "cd45a0b3a7c0a035468568c70950ffee914c551e6427c94c07ce6b734c8c1457",
+    "collector_sha256": "8e340a787f12c5afb896c650afbf655608fabf3a22f77635bbd8e060b8781bf6",
+    "raw_directory": "/private/tmp/pointstream-claim-canary-prep-20261113/raw",
+    "durable_cache": "/Users/manu/.cache/pointstream-evidence/ada-d2db-and-observer-20261113",
+    "limits": [
+      "Same-host synthetic NFS close/open visibility only; real observer and management publisher must both be gpu6 under pinned boot.",
+      "Normal case does not exercise timeout expiry or PDEATHSIG failure teardown; any incomplete final/ambiguity fails UNKNOWN.",
+      "Reader group inheritance follows pinned source; individual reader PIDs not observed.",
+      "Waited CPU counters are not whole-host administrative telemetry; retain conservative100CPU debit."
+    ],
+    "next_gate": "Any actual observer must pin exact real source/spec/inputs, GPU UUID, installed control root+seven file hashes and publisher host/boot, bind only sole returned jobID, preserve prepublication READY and full terminal receipt. Renewed exact-source CPU/denial proof and forecast required before GPU."
+  }
+}

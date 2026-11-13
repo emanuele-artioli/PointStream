@@ -1,0 +1,8 @@
+{
+  "accounting": "created-to-terminal wall upper bound, not measured aggregate CPU; pending root charge",
+  "local_deep_audit_sha256": "da6da690111ea88c59c18c93dbfc996ee60000d77229f90c1ce1552d6ed4ae2f",
+  "local_physical_audit_sha256": "c1fd6ac9931b923e71b2f054afed30fc800ecf4b76f15d42db90a66b3cbc97d3",
+  "publication_sha256": "4cfb1b7317354e0e1b7e53d3ff72e49fe6a0f49e75fd9781c871014ffd593521",
+  "scope": "candidate independent audit; root review required",
+  "teardown_audit_sha256": "2df37ccc65ecad1512e0579defb190cbfd11667f7fc6752767b2b7f944199cbb"
+}

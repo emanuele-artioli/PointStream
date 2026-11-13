@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "job_id": "20261110T143525Z-6b4be46f",
+  "decision": "Accept exact-source CPU mechanism proof only",
+  "approved_gate_sha256": "3761a9429e8f77f7c6b68faa3a2a6a4daad59fc99ba6a410724241dbda37667f",
+  "publication_sha256": "e1554ba92d7ef91c883bce71658dd35bafa35ceb55d039db08f23f3940bd945f",
+  "raw_receipts_root_verified": 68,
+  "source_archive_git_blobs_root_verified": 1840,
+  "root_check_sha256": {
+    "root-local-physical-audit.json": "022ef9a7a171e4a273bc21a65e93261f2702fa4c5ed005fc4d5238e21564a3fd",
+    "root-local-deep-audit.json": "4126730c3dbca3053282c77ac1089124eff6ff1ae072b0a07d1bfc853a77b75d",
+    "root-native-policy-audit.json": "8d038046239f43817fd246183fc07703d8568b969c0188553d3a1adad8caa775",
+    "final-pid-audit.json": "39a73487a8a6bbd19e921ef71366903701d7a397155c6b65cf0bf910f0b08d1d",
+    "root-canonical-status.json": "1ede959a6f797e9af7490e8d471476d971dc46cdb7b62954c260af77bfa0624d"
+  },
+  "created_to_terminal_wall_seconds": 69.84359788894653,
+  "campaign_CPU_conservative_upper": 70,
+  "external_CPU_full_allocation": 150,
+  "independent_audit_CPU_full_allocation": 82,
+  "future_CPU_charge": 302,
+  "source_preparation_alreadycharged": 50,
+  "inclusive_CPU_charge": 352,
+  "GPU": 0,
+  "aggregate_CPU_measured": false,
+  "accounting_basis": "ActualcampaignsingleCPUaffinity[0], inheritedbyfork/exec/threads; reviewedW8Python/namespace/strict/nativecallchaincontainsnoaffinitywidening andtrustednativeinvocationsusethread1.70ceilcreated-terminalboundsworkloadCPUunderthatverifiedinheritanceassumption. No separateperdescendantaffinitysnapshots; notamaliciousexecutableproof ormeasuredallprocessaggregate. Full150external+82auditcountedonceoutside. This is an actual observed lifecycle bound, not trimmingpastallocations or reclassifyingcharges.",
+  "teardown": "All20recordedleafbirths absent;campaign/detachedgroups absent;finalsupervisor3192873/campaign3192950absentandallownedCPUclaimsabsent;eventACK.",
+  "cuda_qualified": false,
+  "generation_controller_executed": false,
+  "scope": "CPU MAIN32e/JCVbf738 runtimepacket/native/namespace/denialmechanism only; GPUgeneration andqualityremainunqualified."
+}

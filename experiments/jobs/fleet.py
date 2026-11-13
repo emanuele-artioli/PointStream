@@ -10,6 +10,7 @@ import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 import hashlib
+import gzip
 import json
 import math
 import os
@@ -19,6 +20,7 @@ import shlex
 import subprocess
 import tarfile
 import tempfile
+import time
 import uuid
 from typing import Any
 
@@ -483,6 +485,57 @@ def _remote_path(host: dict[str, Any], *parts: str) -> str:
     return str(Path(host["data_root"]).joinpath("jobs", "fleet", *parts))
 
 
+_CACHE_COPY_PROGRAM = r'''import hashlib, os, pathlib, stat, sys
+base, source, target, expected = sys.argv[1:]
+base = pathlib.Path(base).resolve(strict=True)
+source = pathlib.Path(source)
+target = pathlib.Path(target)
+if not source.is_absolute() or not target.is_absolute() or ".." in source.parts or ".." in target.parts:
+    raise ValueError("absolute normalized paths required")
+if not source.resolve(strict=True).is_relative_to(base) or not target.parent.resolve(strict=True).is_relative_to(base):
+    raise ValueError("cache and target must be within shared fleet storage")
+def digest(stream):
+    h = hashlib.sha256()
+    while block := stream.read(1024 * 1024): h.update(block)
+    return h.hexdigest()
+fd = os.open(source, os.O_RDONLY | os.O_NOFOLLOW)
+with os.fdopen(fd, "rb") as src:
+    before = os.fstat(src.fileno())
+    if not stat.S_ISREG(before.st_mode) or digest(src) != expected:
+        raise ValueError("cache is not a regular file with the expected SHA256")
+    src.seek(0)
+    dest_fd = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+    with os.fdopen(dest_fd, "wb") as dest:
+        h = hashlib.sha256()
+        while block := src.read(1024 * 1024):
+            dest.write(block)
+            h.update(block)
+        dest.flush()
+        os.fsync(dest.fileno())
+    after = os.fstat(src.fileno())
+    if (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns) != (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns) or h.hexdigest() != expected:
+        raise ValueError("cache changed during copy")
+with target.open("rb") as dest:
+    if digest(dest) != expected: raise ValueError("destination SHA256 mismatch")
+print(expected)
+'''
+
+
+def _copy_snapshot_from_cache(host: str, python: str, base: str, source: str, target: str,
+                              expected_sha256: str, *, timeout: float | None = None) -> None:
+    """Copy verified shared storage to a fresh archive; retain failed partials."""
+    limit = SNAPSHOT_TRANSFER_TIMEOUT_SECONDS if timeout is None else timeout
+    if not isinstance(limit, (int, float)) or not math.isfinite(limit) or limit <= 0:
+        raise FleetError("snapshot transfer timeout must be positive and finite")
+    cache, root = PurePosixPath(source), PurePosixPath(base)
+    if not cache.is_absolute() or ".." in cache.parts or not cache.is_relative_to(root) or cache.suffix != ".tar":
+        raise FleetError("snapshot cache archive must be a .tar within shared fleet storage")
+    destination = str(PurePosixPath(target).with_suffix(".tar"))
+    result = _ssh(host, [python, "-c", _CACHE_COPY_PROGRAM, base, source, destination, expected_sha256], timeout=limit)
+    if result.returncode or result.stdout.strip() != expected_sha256:
+        raise FleetError(f"{host}: snapshot cache copy failed: {(result.stderr or result.stdout)[-4000:]}")
+
+
 def _send_snapshot(
     host: str, source: Path, target: str, expected_sha256: str, *, timeout: float | None = None, extract: bool = True,
 ) -> None:
@@ -497,18 +550,36 @@ def _send_snapshot(
     if not isinstance(timeout, (int, float)) or not math.isfinite(timeout) or timeout <= 0:
         raise FleetError("snapshot transfer timeout must be positive and finite")
     remote_tar = str(Path(target).with_suffix(".tar"))
-    receive = f"umask 077; set -o noclobber; cat > {shlex.quote(remote_tar)}"
-    with source.open("rb") as stream:
+    # Coalesce pipe reads before writing NFS; noclobber preserves partial uploads.
+    receive = ("umask 077; set -o noclobber -o pipefail; "
+               "if [[ ! -x /usr/bin/gzip || ! -x /usr/bin/dd ]]; then "
+               "printf 'snapshot receiver tools unavailable\\n' >&2; exit 127; fi; "
+               f"/usr/bin/gzip -dc | /usr/bin/dd bs=1M iflag=fullblock status=none > {shlex.quote(remote_tar)}")
+    deadline = time.monotonic() + timeout
+    def remaining() -> float:
+        left = deadline - time.monotonic()
+        if left <= 0:
+            raise FleetError(f"{host}: snapshot transfer time budget exhausted")
+        return left
+    # Compress on the client, independent of any existing SSH ControlMaster.
+    # TemporaryFile uses the client's configured TMPDIR and is never on the GPU host.
+    with tempfile.TemporaryFile() as compressed, source.open("rb") as stream:
+        with gzip.GzipFile(fileobj=compressed, mode="wb", compresslevel=6, mtime=0) as encoder:
+            while block := stream.read(1024 * 1024):
+                remaining()
+                encoder.write(block)
+        remaining()
+        compressed.seek(0)
         proc = subprocess.run(
-            ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=8", host, shlex.join(["bash", "-lc", receive])],
-            stdin=stream,
+            ["ssh", "-C", "-o", "BatchMode=yes", "-o", "ConnectTimeout=8", host, shlex.join(["bash", "--noprofile", "--norc", "-c", receive])],
+            stdin=compressed,
             capture_output=True,
-            timeout=timeout,
+            timeout=remaining(),
             check=False,
         )
     if proc.returncode:
         raise FleetError(f"{host}: snapshot transfer failed: {proc.stderr.decode(errors='replace').strip()}")
-    checksum = _ssh(host, ["sha256sum", "--", remote_tar])
+    checksum = _ssh(host, ["sha256sum", "--", remote_tar], timeout=remaining())
     if checksum.returncode or checksum.stdout.split(maxsplit=1)[0] != expected_sha256:
         raise FleetError(f"{host}: transferred snapshot checksum does not match the local archive")
     if not extract:
@@ -516,11 +587,11 @@ def _send_snapshot(
     unpacked = _ssh(
         host,
         ["tar", "-xf", remote_tar, "-C", target],
-        timeout=timeout,
+        timeout=remaining(),
     )
     if unpacked.returncode:
         raise FleetError(f"{host}: snapshot extraction failed: {unpacked.stderr.strip()}")
-    remove_archive = _ssh(host, ["/usr/bin/python3", "-c", "import pathlib,sys; pathlib.Path(sys.argv[1]).unlink()", remote_tar])
+    remove_archive = _ssh(host, ["/usr/bin/python3", "-c", "import pathlib,sys; pathlib.Path(sys.argv[1]).unlink()", remote_tar], timeout=remaining())
     if remove_archive.returncode:
         raise FleetError(f"{host}: snapshot extracted but its temporary archive could not be removed")
 

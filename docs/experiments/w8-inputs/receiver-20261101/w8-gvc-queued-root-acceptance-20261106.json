@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "scope": "primary acceptance of bounded W8 paired pilot and fixed-QP9 peer; no full witness/GPU quality authority",
+  "w8": {
+    "job_id": "20261106T005057Z-77c276fa",
+    "paired_audit_sha256": "06cecf48c5462cfc8bac90b53989ab95d3fdce32dda88ea7cc54d57af8b64c94",
+    "guard_audit_sha256": "291e578ae29a915a2fd76216861edc33b83a70edc55aa5b542e71c41be143823",
+    "accepted": true,
+    "source_tree_sha256": "727aaedd8b6783302bd83f1a24d1ea44bade54a8166846a396bd6ea1e622d077",
+    "source_archive_sha256": "e66ed9c7f02835a719cf8f5defbdbf67785cd08f55011dd26239c724212bef90",
+    "steps": [
+      1,
+      3
+    ],
+    "sampling_seconds": [
+      34.28883651737124,
+      71.63973653130233
+    ],
+    "measured_extra_overhead_floor_seconds": 73.58795049972832,
+    "unit0_based_two_unit30_generation_model_1_5_seconds": 2082.691023111809,
+    "limitation": "First unit only. Unit1 structural workload/cost and full downstream SAM/base/80-tick scoring/golden reproduction remain unqualified. Original debug300overhead/1remaining fits=false is not a budget decision; no new fits or authorization asserted.",
+    "canonical_terminal_sha256": "e9cc172c604c15b4026b61fdb33bd147ae27bd9aca8e8508ec375a7ccce5d365"
+  },
+  "gvc": {
+    "job_id": "20261106T005107Z-0202f092",
+    "candidate_audit_sha256": "bb6cd32bfa3cc1dc6e928c8989fc214966998f950c898ac37373e7966a1e2fad",
+    "accepted": true,
+    "frame_means_recomputed": {
+      "crop_dists": 0.13311699777841568,
+      "crop_lpips": 0.05598921107593924,
+      "frame_psnr": 22.46040676211514,
+      "full_dists": 0.06763492897152901,
+      "full_lpips": 0.07821878645155166
+    },
+    "stream_bytes": 64314,
+    "manifest_bytes": 2928,
+    "native_kbps": 964.71,
+    "wire_kbps": 1008.63,
+    "highest_sampled_anchor_native_kbps": 862.215,
+    "lower_rate_svt_sample_native_kbps": 862.215,
+    "lower_rate_svt_sample_better_all5_means": true,
+    "source": {
+      "git_head": "e6e0b530aebc84b1a73ef6200b7fc24db7f28c21",
+      "snapshot_sha256": "cde9046414f4412a92652b11c0c75ac7a4965e7843badb65a1f449b3368ae7ff",
+      "source_sha256": "a4f3b2d25a7d9c9d38b30761d1cb187fc9b63d60ccf33ba7972b106b95ba1558",
+      "spec_sha256": "ad5422963054df3d61d177fb6b02df2803070fb397516692e23701216afff052"
+    },
+    "decision": "Three fixed native points0/3/9 sensitivity complete on same16distinctvisibleframes. QP9 exceedsanchor-rate range; no equal-rate interpolation or BD. Directsampleddominanceobviatesadditionalanchorencoding. Prior0/3 crop/full tradeoffs retained. No official-entrypoint replication/corpus/absent/trainingclean claim.",
+    "canonical_terminal_sha256": "b1075a9e61f1fbefecef55ed48b3a42bf4498aabd13fba7b796d761e7541e7a2"
+  },
+  "accounting_evidence_sha256": "0520622b0fea0f012af2222c40f58fad6549e83d59b2e6cca5dbdd1651c7dcd7",
+  "accounting_limit": "CPU amounts are conservative inherited-one-core lifecycle plus external allowance envelopes, not directly measured aggregate. Not every descendant affinity was continuously observed; original larger ceilings remain historical authorization. Cumulative waited-child CPU prefixes were not added."
+}

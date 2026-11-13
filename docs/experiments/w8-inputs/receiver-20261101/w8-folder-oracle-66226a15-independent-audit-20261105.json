@@ -1,0 +1,163 @@
+{
+  "job_id": "20261105T064712Z-66226a15",
+  "status": "complete; synthetic strict folder oracle passed",
+  "scope": "266 synthetic bytes, no Torch, GPU, model or real-weight copy; not a real I/O forecast",
+  "revision": "b805e3d268f6d7881804b5d50eb31778c1abd0e0",
+  "source_sha256": "2850a8696c0211032ef64d55ad4e6b0acef3000f09a1a5ba2953b8c1ca741a3b",
+  "source_archive_sha256": "451f3b99bf3283eb219631e8c567597ebb7f7df208224106bb1811b4c3a20430",
+  "published_sha256": "5452a5d6bb865152556a0e26dc99798a0ee88dff1c1c86b9a4fd1f5c904413dd",
+  "code_sha256_verified_against_archive": {
+    "experiments/tennis/k6b_generate.py": "00248aa4fdd47e634f82b37a7a33c99f1794440d65cbfe9395255a4225735542",
+    "experiments/tennis/w8_cuda_system_leaves.py": "4cbca949843da0254644e666b6c6d86400fe37e22b316f921da3fc8715e0f970",
+    "experiments/tennis/w8_folder_oracle.py": "1db0c096065f4e5c710de02a99679cf81ad15738312b6d37572a7b0b91f378ee",
+    "experiments/tennis/w8_public_folder_materialize.py": "e127da6bffbf055b40a163b0026b50f9bb56e083c75ad017007d4145453b1fcc",
+    "experiments/tennis/w8_receiver_bootstrap.py": "3fb7f0b2ab33fdfa185f38c3bfe8f977540dc13cc10b8f0ccce0625c1de03e49"
+  },
+  "synthetic_bytes_verified": 266,
+  "synthetic_files": {
+    "image_encoder/config.json": {
+      "bytes": 64,
+      "copy_inode": 72624155,
+      "copy_sha256": "ec44a86f5cc1397c53aa8b3859575782537f0528adbb34f0d444191c5ed39c00",
+      "source_sha256": "ec44a86f5cc1397c53aa8b3859575782537f0528adbb34f0d444191c5ed39c00",
+      "source_stat": [
+        64513,
+        72624133,
+        64,
+        1793861294775180067,
+        1793861294775180067
+      ]
+    },
+    "image_encoder/pytorch_model.bin": {
+      "bytes": 70,
+      "copy_inode": 72624156,
+      "copy_sha256": "1d88152b08854acb9c48ed1a2d905486260a9e84d5b04ed401b6707dde9d4ada",
+      "source_sha256": "1d88152b08854acb9c48ed1a2d905486260a9e84d5b04ed401b6707dde9d4ada",
+      "source_stat": [
+        64513,
+        72624134,
+        70,
+        1793861294775180067,
+        1793861294775180067
+      ]
+    },
+    "vae/config.json": {
+      "bytes": 54,
+      "copy_inode": 72624157,
+      "copy_sha256": "38aff52ce4a60a3b824a9744ea73480e749ac2ef7153ff97dbb6bd8ceb733360",
+      "source_sha256": "38aff52ce4a60a3b824a9744ea73480e749ac2ef7153ff97dbb6bd8ceb733360",
+      "source_stat": [
+        64513,
+        72624131,
+        54,
+        1793861294775180067,
+        1793861294775180067
+      ]
+    },
+    "vae/diffusion_pytorch_model.safetensors": {
+      "bytes": 78,
+      "copy_inode": 72624158,
+      "copy_sha256": "48dea5101b8a902e2f09e473ef48aef7bfd8d7de1140f444c04884b180921ffc",
+      "source_sha256": "48dea5101b8a902e2f09e473ef48aef7bfd8d7de1140f444c04884b180921ffc",
+      "source_stat": [
+        64513,
+        72624132,
+        78,
+        1793861294775180067,
+        1793861294775180067
+      ]
+    }
+  },
+  "landlock_abi": 4,
+  "landlock_mask": 32767,
+  "denial_errnos": [
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13
+  ],
+  "symlink_errno": 13,
+  "mutation_denials": {
+    "create": 13,
+    "link": 18,
+    "mkdir": 13,
+    "remove": 13,
+    "rename": 13,
+    "truncate": 13,
+    "write": 13
+  },
+  "namespace_parent": {
+    "net": "net:[4026531840]",
+    "user": "user:[4026531837]"
+  },
+  "namespace_child": {
+    "net": "net:[4026537868]",
+    "user": "user:[4026537867]"
+  },
+  "host_loader": {
+    "device": 64512,
+    "inode": 3934945,
+    "mode": 33188,
+    "uid": 0
+  },
+  "child_loader": {
+    "device": 64512,
+    "inode": 3934945,
+    "mode": 33188,
+    "name": "/etc/ld.so.cache",
+    "resolved": "/etc/ld.so.cache",
+    "uid": 65534
+  },
+  "leaves_verified": 12,
+  "no_torch": true,
+  "cuda_visible_devices": "",
+  "cleanup_complete": true,
+  "child_cpu_seconds": 0.26976100000000003,
+  "child_wall_seconds": 0.2729762028902769,
+  "command_resource_usage_cumulative": [
+    0.33416999999999997,
+    0.075933,
+    45056,
+    0,
+    0,
+    0,
+    19944,
+    0,
+    0,
+    0,
+    536,
+    0,
+    0,
+    0,
+    9,
+    28
+  ],
+  "creation_to_latest_status_wall_seconds": 98.9513750076294,
+  "pids_absent": [
+    1155955,
+    1155956
+  ],
+  "process_group_absent": 1155956,
+  "matching_cpu_claims": [],
+  "recommended_cpu_charge_seconds": 120,
+  "gpu_charge_seconds": 0,
+  "accounting_note": "conservatively charge full reservation; creation-to-status wall includes uncertain noncampaign administration and is not assumed CPU",
+  "artifact_sha256": {
+    "ready.json": "85abcf7a7348c62a885ba901c4ccb2cba6bb8db87ab4c13abfbfe19e463636c7",
+    "state.json": "6e409108fbde43cb6949495ec10b8397d7f239c306e3169d8db687ddf5055534",
+    "gate.json": "b93a6de3e6619d83ef7f22b7692334b4de0c7ef904bd23db5ddc632f514986b8",
+    "validation.json": "f603014b7fd1661d4d58f6cc08d660bc6ca4e0baaff4fcd9f5483e5f53f7c337",
+    "smoke/staging.json": "7ee9efb097c9ba15e18e459c0e7992bb6717b6211e8099e8ed7f7238ab37c152",
+    "smoke/execution.json": "e493fa9dee55395380bfe120fc44132af1308c0042efe9f397a6f6b1c428417b",
+    "smoke/dispatch.json": "0e3ea90495193a00f13a78ba7689748c0b09c72872957fc55e6f75858854fe72",
+    "full/execution.json": "e1e6fb8aae89d9c0d3b014639b1621e6c7e889a254d74ba1cfbfe2dcfe94d85f",
+    "run/status.json": "16897ad9aacc71946581cb5b28ccd20b06fbeb879f9852a2da1f8432ae01790f",
+    "run/cpu-affinity.json": "105adf575bb00ad581cef2917defe420563f14e9e0f7f60ee9162c95c308229b"
+  }
+}

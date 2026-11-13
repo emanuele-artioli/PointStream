@@ -1,0 +1,101 @@
+{
+  "recorded_utc": "2026-11-12T20:16:16.846049+00:00",
+  "job_id": "20261112T192044Z-461e16e8",
+  "root_decision": "Expired unassigned; no execution, no Ada parity result. Canonical status independently checked; physical source/spec manifest, empty admission inventory, missing execution artifacts and two absent exact-job CPU claims joined.",
+  "canonical_status": {
+    "job_id": "20261112T192044Z-461e16e8",
+    "created": 1794511257.2778604,
+    "status": "expired",
+    "updated": 1794513608.9558208
+  },
+  "source_sha256": "9e2376330c76eab979efbe0a3f8dcf21175f5e9d470a6b1219cf8c39e823fa0a",
+  "snapshot_sha256": "5fd841f7e2fc718fb198a7f47a5e737e4cbbc88f1793e6574883dd7cd9fcc3cd",
+  "spec_sha256": "b4c7259f047bda1cc25507c9decbecebabbcfd47a3f3dec664df4c59fef83cfe",
+  "terminal_event": "b79f9b41516f5c4499233b6eb1f123de",
+  "charge_GPU": 0,
+  "charge_CPU": 350,
+  "CPU_basis": "Entire external reserve conservatively charged; aggregate administrative CPU unmetered. No GPU admission.",
+  "evidence": [
+    {
+      "path": "/private/tmp/pointstream-ada-461e-wait-20261112/wait.json",
+      "sha256": "e230366049637ed96c80244e97e323d78af52e06c6124da6efced4f76bcc04f9",
+      "bytes": 563
+    },
+    {
+      "path": "/private/tmp/pointstream-ada-461e-wait-20261112/status.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/pointstream-ada-461e-wait-20261112/client.pid",
+      "sha256": "4e13a03542d737e955e09b27dc0ada7123464a8c9f313ddfb19816a8f8d7ac5a",
+      "bytes": 6
+    },
+    {
+      "path": "/private/tmp/pointstream-ada-461e-wait-20261112/backend-session.txt",
+      "sha256": "ed078b3388dfd9b2648713ca29aa7bcece909148240707b56ac6271464b0ae0f",
+      "bytes": 6
+    },
+    {
+      "path": "/private/tmp/pointstream-ada-461e-wait-20261112/wait.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/pointstream-ada-461e-wait-20261112/claims-check.py",
+      "sha256": "66b467a20190a6c71c1eac8e888076f8f32c339e465874167ca81a7933f27e89",
+      "bytes": 1307
+    },
+    {
+      "path": "/private/tmp/pointstream-ada-461e-wait-20261112/terminal-export.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/pointstream-ada-461e-wait-20261112/claims.stderr",
+      "sha256": "24231e30de557072049f54492b0d8865fc5434ca4a1016ab8de70d85f996697f",
+      "bytes": 63
+    },
+    {
+      "path": "/private/tmp/pointstream-ada-461e-wait-20261112/terminal-export.json",
+      "sha256": "cf0a11d7a74fca02a76f1f23d00daaa0590adcb2f80824ed75cb3fecc24c04db",
+      "bytes": 198
+    },
+    {
+      "path": "/private/tmp/pointstream-ada-461e-wait-20261112/claims.json",
+      "sha256": "e945b340f0aff1674899819f5971bb8e8dbb90eda3b2ceb87477e6ed69f1738a",
+      "bytes": 498
+    },
+    {
+      "path": "/private/tmp/pointstream-ada-461e-wait-20261112/status.json",
+      "sha256": "5689dc188022ef825c88e57ac09e4d9ec4bb43ac118c7ea219a071c206d584b5",
+      "bytes": 282
+    },
+    {
+      "path": "/private/tmp/pointstream-ada-461e-wait-20261112/terminal-artifacts/spec.json",
+      "sha256": "917299cd2f142d699f7d194a9429953771673b9ccd37f086b94645db0ec8cee7",
+      "bytes": 10656
+    },
+    {
+      "path": "/private/tmp/pointstream-ada-461e-wait-20261112/terminal-artifacts/admission-index.json",
+      "sha256": "01724c4fbe031f2d73555f5a56a989eb873a43d88371b7d3a2748555f1c60762",
+      "bytes": 57
+    },
+    {
+      "path": "/private/tmp/pointstream-ada-461e-wait-20261112/terminal-artifacts/state.json",
+      "sha256": "005286c05f9ade5eee37976fdab8f681ab8fd7a40600d8bc174d3cd615986240",
+      "bytes": 133
+    },
+    {
+      "path": "/private/tmp/pointstream-ada-461e-wait-20261112/terminal-artifacts/export-receipt.json",
+      "sha256": "61e212e7e6f78d3bce01b2be856d9c523e3f1ea10f54b878d3b3f46d4698828e",
+      "bytes": 1690
+    },
+    {
+      "path": "/private/tmp/pointstream-ada-461e-wait-20261112/terminal-artifacts/ready.json",
+      "sha256": "937e1cd242208688e7a230df9844794bf3d295a1decf13b2ff654af910f2b9b5",
+      "bytes": 2815
+    }
+  ],
+  "terminal_event_acknowledged": true
+}

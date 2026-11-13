@@ -1,0 +1,41 @@
+{
+  "job_id": "20261105T045948Z-f5ee7c4a",
+  "outcome": "failed before packet, isolation or decoder; GPU not claimed",
+  "revision": "46fe9f5b36e68a836c47ed3d4cf117ff6fe2e614",
+  "host": "gpu5",
+  "selected_cpu": [
+    1
+  ],
+  "creation": 1793854831.887062,
+  "terminal": 1793854848.3874357,
+  "smoke_wall_seconds": 0.2187514305114746,
+  "smoke_child_cpu_seconds": 0.177971,
+  "cpu_lifecycle_charge_ceiling_seconds": 17,
+  "external_cpu_reserve_seconds": 60,
+  "proposed_cpu_charge_seconds": 77,
+  "gpu_charge_seconds": 0,
+  "identity_receipt_sha256": "0953c5284ee8dc462d4eb95b7ce49cb9bad68e4d612fce5d167706f954668ebe",
+  "protected_historical_device": 59,
+  "protected_host_device": 58,
+  "protected_inodes": {
+    "source": 5567065,
+    "prepared": 20088721,
+    "fit": 5567094,
+    "golden": 5554733,
+    "masks": 20090395
+  },
+  "protected_current_sha_bodies_read": false,
+  "finding": "All five inode numbers match; all five host device IDs differ. No inference about current content identity without fresh hashing.",
+  "recorded_pids_absent": [
+    1037884,
+    1037885
+  ],
+  "cpu_claim_check": "no allocation with this job ID in current shared CPU claim files",
+  "artifact_sha256": {
+    "smoke/command.log": "d51256742d77502074ec02b555a2dc136b4c8f3aae598555bbd4197519c43a58",
+    "smoke/staging.json": "552ee4d3fb47d86404fae9ca6275c15c667140abbe5cb60f5829cc1b298ffa36",
+    "smoke/execution.json": "ca56c18b82660e40e02a7c8849849b124ae61f6e15c6e86834522f3593ba40a0",
+    "run/status.json": "4b7a6f6486f383dabfac3ccfcc5340ec9b87c8fcf0184c0524f9f5c404822c9e",
+    "run/cpu-affinity.json": "5effc6df5962b1bdae87f895aa4457a79de14b1e6240f6beb7b4128ac7ba0a5d"
+  }
+}

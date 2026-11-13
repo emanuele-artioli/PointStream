@@ -52,3 +52,23 @@ def test_real_source_only_tree_imports_packet_and_generator_helpers(tmp_path):
             'preload(); from experiments.tennis import k6b, w2_pose_rate, w8_payload; '
             'assert k6b.__file__.startswith(__import__("os").environ["PYTHONPATH"])')
     subprocess.run([sys.executable, '-c', code], cwd=tmp_path, env=env, check=True, timeout=20)
+
+
+def test_fresh_process_rejects_checkout_shadowing_and_accepts_pinned_source(tmp_path):
+    import os
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    original = Path(__file__).resolve().parents[2]
+    staged = tmp_path / 'source'
+    source.stage_source(original, staged)
+    env = {**os.environ, 'PYTHONPATH': str(staged), 'PYTHONDONTWRITEBYTECODE': '1',
+           'OMP_NUM_THREADS': '1', 'OPENBLAS_NUM_THREADS': '1', 'MKL_NUM_THREADS': '1'}
+    code = ('from pathlib import Path; from experiments.tennis.w8_strict_receiver_worker import '
+            'preload, validate_source_origins; preload(); validate_source_origins(Path(__import__("os").environ["PYTHONPATH"]))')
+    good = subprocess.run([sys.executable, '-c', code], cwd=staged, env=env, capture_output=True, text=True, timeout=20)
+    assert good.returncode == 0, good.stderr
+    shadowed = subprocess.run([sys.executable, '-c', code], cwd=original, env=env, capture_output=True, text=True, timeout=20)
+    assert shadowed.returncode != 0
+    assert 'worker is not executing from authenticated source root' in shadowed.stderr

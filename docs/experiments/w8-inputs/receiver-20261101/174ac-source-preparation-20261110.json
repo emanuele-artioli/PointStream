@@ -1,0 +1,139 @@
+{
+  "CPU_seconds_precharged": 30,
+  "GPU_seconds": 0,
+  "archive_sha256": "5e62a2e912f5dba0cd945d33388b95154d5d8e88ed6cf5b5998e595a323c6fd1",
+  "cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-174ac-staged-20261110/source.tar",
+  "phase": "w8-174ac-source-preparation-20261110",
+  "raw_directory": "/private/tmp/pointstream-w8-174ac-sourceprep-20261110-a1",
+  "raw_sha256": {
+    "check.py": "f5563c7e62cbe51258134936c650fb7f7769705c1dc5031537a6526e3be9d257",
+    "cpu0.stdout": "adda7c56d3498c7f2a64113e9c618f0fc56a3c2271c7b71634de950429d46c9e",
+    "doctor.json": "4fe6e917d10185a22f4b92137aec530ef7b4b5cd31f1cade06d73fc085c6af24",
+    "intent.json": "5875040e7016af7011c4c4188f6b6ff8be4088304e01dd02222b094aa265da58",
+    "post-gpu2.stdout": "46f96a8b4f7af7e84405b4723f25aabb02847ec47b553ec57c9174c26b8a6128",
+    "post-gpu5.stdout": "4b2fc75ea16650af56a6e4f8f1d1526f6226e5731a13120e32233dd2c75e702a",
+    "pre-gpu2.stdout": "7de7af9bd54d707253c4365139c364b9d0bb18260e4e0f77fa259f4a68e5d5a7",
+    "pre-gpu5.stdout": "c3befb23a8608555eb0686a371f444cc3e4a44d3e94c514ed07d4aa3cf2d84df",
+    "run.py": "ec7b6b9364ccd89686cf30f475bf9ceec302f2f74dc9b22c0050a77687c9c416",
+    "spec-normalized.json": "f433a63b5f9574e76e47d93758d596361dcc87255568ddb5dbde181bee25e7ab",
+    "spec-receipt.json": "34340f5531a4171dbb368609c20aca18fa345219ff943b7c488e4b9e6451c466",
+    "spec.json": "9c66bd1103aabc680527d55511cd298873c831e97d31461a4beb44834c45e8bd",
+    "status.json": "58f6cb7b5a04f2a7b5d2830ede8ca543628d6160a50d6d9287b8a5464b970cb5",
+    "upload.stdout": "f3c6dcc6611847ba5011cb8027dfa5ec7d98957dc08a82b6c4e4536cedb81000",
+    "upload_sink.py": "c2d0e7539f5c5857491706186cf16b28921bfe44c6c3fd58ddeaa90ebe80974c",
+    "usage.json": "7cc71497cf987771e2851ed54e54db5516193406883db9f19037f252ee9a3475",
+    "workers.json": "08373f7375449d3fbbc4f9b02b130ef6b828de87f3a4fce7d3bd5b3fcfe151c7"
+  },
+  "revision": "174ac84b84a1f405e06700a34aa4c3e225fa3265",
+  "schema": 1,
+  "scope": "source preparation only; no CPU job or GPU",
+  "scope_note": "protected content unopened; exact new source public SHA checked on both hosts; manager CPU unmetered; no old CPU gate reuse",
+  "source_identity": "4cad9e47ebeb88f1cdb272634921f2aed79100e0e15ace4d01f9a3a33720d9d6",
+  "spec": {
+    "deadline": "2026-11-10T11:37:42.982786Z",
+    "direct_names": [
+      "identity",
+      "preflight"
+    ],
+    "logical_spec_sha256": "5c1e999678137c5ca472570096f5a4d4e462cdb38dd832c5492fd0c2559c6369",
+    "normalized_file_sha256": "f433a63b5f9574e76e47d93758d596361dcc87255568ddb5dbde181bee25e7ab",
+    "phase_commands_placeholders": {
+      "full": [
+        "{python}",
+        "-m",
+        "experiments.tennis.w8_witness_cpu_proof_job",
+        "noop",
+        "--staged",
+        "packet",
+        "/STAGED/packet",
+        "--staged",
+        "profile",
+        "/STAGED/profile",
+        "--staged",
+        "oracle",
+        "/STAGED/oracle",
+        "--staged",
+        "guider",
+        "/STAGED/guider",
+        "--staged",
+        "native_inventory",
+        "/STAGED/native_inventory"
+      ],
+      "smoke": [
+        "{python}",
+        "-m",
+        "experiments.tennis.w8_witness_cpu_proof_job",
+        "run",
+        "--staged",
+        "packet",
+        "/STAGED/packet",
+        "--staged",
+        "profile",
+        "/STAGED/profile",
+        "--staged",
+        "oracle",
+        "/STAGED/oracle",
+        "--staged",
+        "guider",
+        "/STAGED/guider",
+        "--staged",
+        "native_inventory",
+        "/STAGED/native_inventory"
+      ]
+    },
+    "raw_file_sha256": "9c66bd1103aabc680527d55511cd298873c831e97d31461a4beb44834c45e8bd",
+    "scope": "review only; placeholder staged paths; no submission",
+    "source_archive_sha256": "5e62a2e912f5dba0cd945d33388b95154d5d8e88ed6cf5b5998e595a323c6fd1",
+    "staged_only_names": [
+      "packet",
+      "profile",
+      "oracle",
+      "guider",
+      "native_inventory"
+    ]
+  },
+  "usage": {
+    "rows": [
+      {
+        "label": "pre-gpu2",
+        "remote_cpu": 0.067277,
+        "ssh_cpu": 0.022966,
+        "stdout_sha256": "7de7af9bd54d707253c4365139c364b9d0bb18260e4e0f77fa259f4a68e5d5a7",
+        "wall": 3.476807625
+      },
+      {
+        "label": "pre-gpu5",
+        "remote_cpu": 0.057068999999999995,
+        "ssh_cpu": 0.03613999999999999,
+        "stdout_sha256": "c3befb23a8608555eb0686a371f444cc3e4a44d3e94c514ed07d4aa3cf2d84df",
+        "wall": 3.0189767919999997
+      },
+      {
+        "label": "upload",
+        "remote_cpu": 0.274732,
+        "ssh_cpu": 0.08167000000000002,
+        "stdout_sha256": "f3c6dcc6611847ba5011cb8027dfa5ec7d98957dc08a82b6c4e4536cedb81000",
+        "wall": 5.3798875420000005
+      },
+      {
+        "label": "post-gpu2",
+        "remote_cpu": 0.18794,
+        "ssh_cpu": 0.03522599999999998,
+        "stdout_sha256": "46f96a8b4f7af7e84405b4723f25aabb02847ec47b553ec57c9174c26b8a6128",
+        "wall": 3.129332332999999
+      },
+      {
+        "label": "post-gpu5",
+        "remote_cpu": 0.06916599999999999,
+        "ssh_cpu": 0.03517000000000001,
+        "stdout_sha256": "4b2fc75ea16650af56a6e4f8f1d1526f6226e5731a13120e32233dd2c75e702a",
+        "wall": 2.994781833000001
+      }
+    ],
+    "self_cpu": 0.135551,
+    "ssh_cpu_delta": 0.211172,
+    "status": "complete",
+    "wall": 18.008998042
+  },
+  "witness_qualification": false
+}

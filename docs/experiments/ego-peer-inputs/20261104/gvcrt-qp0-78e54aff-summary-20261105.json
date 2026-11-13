@@ -1,0 +1,62 @@
+{
+  "job": "20261105T231555Z-78e54aff",
+  "status": "complete",
+  "qp": 0,
+  "audit_passed": true,
+  "result_sha256": "b7647ce009863cc97be55838808362345635737549b1fd150e08aaba4c0d390f",
+  "audit_sha256": "85a14dbcd1189b7aa12c888710e35febc9a9dfba1dc9c3142fcc20c56d99e415",
+  "audit_script_sha256": "a53c7536603b9b984871da9ea9f58a1d6df3bb04873de6384a5c5941fb0ab8d6",
+  "source_archive_sha256": "cde9046414f4412a92652b11c0c75ac7a4965e7843badb65a1f449b3368ae7ff",
+  "source_identity": "a4f3b2d25a7d9c9d38b30761d1cb187fc9b63d60ccf33ba7972b106b95ba1558",
+  "normalized_spec_sha256": "bdb7173235a77c7ca8166b3acf3c9a481589de228faef6d86255d0d2bdfaee76",
+  "gpu": {
+    "name": "NVIDIA RTX 6000 Ada Generation",
+    "uuid": "GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162"
+  },
+  "native_kbps": 175.815,
+  "wire_kbps": 219.27,
+  "stream_bytes": 11721,
+  "manifest_bytes": 2897,
+  "peer": {
+    "judges": {
+      "balltrack": {
+        "absent": 0,
+        "false_on_absent": 0,
+        "false_per_negative": null,
+        "frames": 16,
+        "hit10": 4,
+        "hit5": 3,
+        "miss10": 12,
+        "recall10": 0.25,
+        "recall5": 0.1875,
+        "unknown": 0,
+        "visible": 16
+      },
+      "wasb": {
+        "absent": 0,
+        "false_on_absent": 0,
+        "false_per_negative": null,
+        "frames": 16,
+        "hit10": 4,
+        "hit5": 3,
+        "miss10": 12,
+        "recall10": 0.25,
+        "recall5": 0.1875,
+        "unknown": 0,
+        "visible": 16
+      }
+    },
+    "metrics": {
+      "crop_dists": 0.1981329843401909,
+      "crop_lpips": 0.16044672718271613,
+      "frame_psnr": 19.95825407305474,
+      "full_dists": 0.10238288715481758,
+      "full_lpips": 0.13642892731560602
+    },
+    "native_kbps": 175.815,
+    "wire_kbps": 219.27
+  },
+  "teardown": "post-terminal supervisor3723481, campaign process group3723491 and children/threads absent; gpu5 CPU allocations empty; device exclusive/lock claims absent, shared directory empty",
+  "scope": "one 16-frame visible-clip point; no BD-rate, absent-frame or corpus claim; QP9 pending",
+  "event": "8cae46d7ff53564c9e7e7f9c102ac490"
+}

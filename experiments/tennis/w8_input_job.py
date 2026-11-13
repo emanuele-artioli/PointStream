@@ -23,7 +23,7 @@ from typing import Any
 
 # Legacy diagnostic process limits are retained below. The fixed path requires
 # a fleet-wide one-core campaign of at most 300 seconds in fixed_inputs().
-if len(sys.argv) > 1 and sys.argv[1] in {"run", "worker", "validate"}:
+if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] in {"run", "worker", "validate"}:
     _cpu = {"run": 120, "worker": 60, "validate": 120}[sys.argv[1]]
     resource.setrlimit(resource.RLIMIT_CPU, (_cpu, 650))
 
@@ -60,6 +60,28 @@ FIXED_INPUTS = {
 }
 PREP_ENV_SHA = '32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661'
 
+
+
+def ensure_cpu_hard_limit(required: int) -> tuple[int, int]:
+    """Fail before launch when the inherited hard CPU limit cannot cover a child."""
+    if type(required) is not int or required <= 0:
+        raise ValueError('positive CPU allowance required')
+    soft, hard = resource.getrlimit(resource.RLIMIT_CPU)
+    if hard != resource.RLIM_INFINITY and hard < required:
+        raise ValueError('inherited hard CPU limit is below required worker allowance')
+    return soft, hard
+
+
+def set_cpu_soft_limit(soft: int, *, required_child: int) -> dict[str, Any]:
+    """Set a soft limit without ever raising or lowering the inherited hard limit."""
+    if type(soft) is not int or soft <= 0 or type(required_child) is not int or required_child <= 0:
+        raise ValueError('positive CPU allowances required')
+    before = ensure_cpu_hard_limit(max(soft, required_child))
+    resource.setrlimit(resource.RLIMIT_CPU, (soft, before[1]))
+    after = resource.getrlimit(resource.RLIMIT_CPU)
+    if after != (soft, before[1]):
+        raise ValueError('CPU limit changed unexpectedly')
+    return {'before': list(before), 'after': list(after), 'required_child': required_child}
 
 def digest(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()

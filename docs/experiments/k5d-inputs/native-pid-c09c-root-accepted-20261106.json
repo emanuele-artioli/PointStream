@@ -1,0 +1,132 @@
+{
+  "schema": 1,
+  "audited": true,
+  "passed": true,
+  "status": "primary accepted canonical-entrypoint source native CPU proof; GPU parity still gated",
+  "scope": "native CPU PID containment and accounting",
+  "job_id": "20261106T013231Z-c09c562a",
+  "consumer_execution_identity": {
+    "source_sha256": "5f2cb62e80b2dc87b29eaf730429daee153762131724207b4e13a1e1307c089b",
+    "snapshot_sha256": "92fb2b141814bf9fbf539fdbcc6d945a64e42eb7d9580b74287d0bf63481c62a",
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "namespace_wrapper_sha256": "dc909dff86fb23d0b5578918fe7f42e9e22c75137e98953cebebdd33939c8992",
+  "unshare_sha256": "9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6",
+  "gpu_used": false,
+  "cases": [
+    "normal",
+    "timeout",
+    "sigterm",
+    "sigkill"
+  ],
+  "case_results": [
+    {
+      "case": "normal",
+      "returncode": 0,
+      "escalated_to_sigkill": false,
+      "outer_waited_cpu_seconds": 2.384171,
+      "members_absent": true
+    },
+    {
+      "case": "timeout",
+      "returncode": 1,
+      "escalated_to_sigkill": false,
+      "outer_waited_cpu_seconds": 0.5802480000000005,
+      "members_absent": true
+    },
+    {
+      "case": "sigterm",
+      "returncode": -9,
+      "escalated_to_sigkill": true,
+      "outer_waited_cpu_seconds": 0.10253999999999941,
+      "members_absent": true
+    },
+    {
+      "case": "sigkill",
+      "returncode": -9,
+      "escalated_to_sigkill": false,
+      "outer_waited_cpu_seconds": 0.06469300000000011,
+      "members_absent": true
+    }
+  ],
+  "all_owned_pids_absent": true,
+  "observed_distinct_pid_count": 19,
+  "independent_cpu_match": true,
+  "normal_outer_cpu_seconds": 2.384171,
+  "normal_pid1_plus_children_cpu_seconds": 2.26098,
+  "smoke_command_wall_seconds": 21.976215839385986,
+  "full_noop_command_wall_seconds": 0.06900978088378906,
+  "supervisor": {
+    "pid": 3352814,
+    "proc_start_time": 1793928787.7
+  },
+  "campaign_status": {
+    "status": "complete",
+    "started": 1793928788.2047956,
+    "last_progress": 1793928848.4001286,
+    "emitted": [
+      "terminal:complete"
+    ],
+    "pid": 3352827,
+    "proc_start_time": 1793928787.85,
+    "process_group_id": 3352827,
+    "progress": {
+      "stage": "full",
+      "completed": 1,
+      "updated": 1793928844.128948,
+      "decision": null
+    },
+    "exit_code": 0,
+    "ended": 1793928848.4001286
+  },
+  "canonical_status_local_path": "/private/tmp/pointstream-k5d-c09c-canonical-status-20261106.json",
+  "canonical_status_sha256": "25801322692b258b743291109558f8d2a592eeaff932066728be3b1908b8783f",
+  "canonical_terminal_updated_epoch": 1793928908.4896865,
+  "supervisor_birth_to_terminal_seconds": 120.789686,
+  "cpu_affinity_index": 0,
+  "selected_cpus": [
+    0
+  ],
+  "actual_source_archive_sha256": "92fb2b141814bf9fbf539fdbcc6d945a64e42eb7d9580b74287d0bf63481c62a",
+  "artifact_sha256": {
+    "ready.json": "d7717481062864c9937b48e33b3cff67327078609748bc2c114b01cd3287dcd4",
+    "spec.json": "fee172e69f382bbc0cdea1ed9450da01dc90dd8dee129a4eb79fd3bd5388fb87",
+    "state.json": "dcd0098fd0743818ed71f0641bc90d7563205d7c32eb85bf7d05bef70110b02b",
+    "environment.json": "8843d60b9117f9c76d2786443eebab083b062b3fdb5981429f5f9757edd65ef3",
+    "gate.json": "7ac203471a9a2c19642c1310d2bd2f31c6e23e6c4634a8be478bf9f709528831",
+    "validation.json": "489be969f6cdae68aae00206101c32d9d07fd7cd4ce525e876c1902df50a2468",
+    "smoke/dispatch.json": "f72c9bacdeee303fa88660e07e5c57b75a814c302cd1ebdbda411bc3c21c1223",
+    "smoke/execution.json": "46c6e29c959d72fb0d057615bdbb654b99ec81c95db547fa0fe68914698b1575",
+    "smoke/staging.json": "dffea3db7a5eb234704e6391e6539f00c6ff246fca3b2eaa5016b19ab1572909",
+    "smoke/published.tar": "eb7ff14543410ace1ba93db27d715261b61b879417b651a313f9500b07ebfdfa",
+    "full/dispatch.json": "8324be8bd6b0df0ae359de1fa9176090c7e625f019ee2fbd71a42a143f48ff84",
+    "full/execution.json": "388a59832768dbffedfa59a57b0b45efee50264aa4c4c07d577d458473475b9b",
+    "full/staging.json": "68fa4089dbdb8b6bdef928175b830eed07c9a6cbc3309c98ee2feff73f24914c",
+    "full/published.tar": "92ff943de112b27a416fe9274084795e7489510c1360e353ce2c6345cfc864d2",
+    "run/request.json": "f32a2ac2c698fa550731be57f061a43bf3fea43058dd1514b9badd507784332f",
+    "run/status.json": "629e1d07fae07afa5b38e3839b5a067265833c9149d8c56cbefa83daa2ac1be3",
+    "run/supervisor.json": "8cdf1e831e8ffb78cdb0c243d618e31fcf9b2e203d9eff47412349c7840d8801",
+    "run/cpu-affinity.json": "46bcea43a67cd4b9d72e02bc941846a498288ecb618e666ce24d2728333bdec3",
+    "run/claim.json": "ed14957dbeaeae9a0d2e6c5bb09d58ad8f241835a3cbde179a628c1de876a1d5"
+  },
+  "raw_local_path": "/private/tmp/pointstream-k5d-c09c-independent-raw-20261106.json",
+  "raw_sha256": "767c751225035e042d65bde5ffaa7287e2358bf0b4f964d280e391b19b9ca63c",
+  "process_check_sha256": "64cbcc0a96422a7df09ac6a4ab48a9d619f03692da924a2a5c175207e13df07b",
+  "stale_state_note": "first raw read captured state.json running while run/status and canonical fleet status were complete; retained as observed, not used as final state",
+  "budget_caveat": "100-second campaign is not a verified whole-lifecycle CPU upper bound; 300 CPU inclusive allocation includes 50 preparation, 220 lifecycle and 30 independent audit; root owns ledger closure",
+  "limits": "actual two-frame native and observed process teardown only; no GPU parity, source-hidden or file-denial claim",
+  "events_acknowledged": [
+    "2dcce3a7166a5b3595e2a2acc9fb94a3"
+  ],
+  "primary_candidate_sha256": "e852749306c9847a1745df3147fbb648efbe512445211b28324a2b6e444188ff",
+  "primary_review": {
+    "raw_blob_sha256s_independently_verified": 19,
+    "later_canonical_terminal_separately_verified": true,
+    "earlier_stale_running_state_retained": true,
+    "ready_spec_gate_source_join": true,
+    "four_actual_causes_recomputed": true,
+    "normal_cpu_delta_seconds": 0.12319099999999983,
+    "all19_pid_absence_and_claim_bindings_verified": true,
+    "gpu_dispatch_authorized": false
+  }
+}

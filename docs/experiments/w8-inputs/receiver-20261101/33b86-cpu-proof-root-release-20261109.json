@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "decision": "Root accepts source preparation and releases ONE new-source CPU role-attestation proof",
+  "revision": "33b86cb60347ac12ad2ce0674052e36706e232d1",
+  "source_sha256": "bf26eec6c158e686bf5a0ef12b4898d08b95345b998e9c3350e6dbf2df74c08b",
+  "snapshot_sha256": "327e96ea67d8d21127bee7b8cd0f4a785ef6ffceecd007665483812717241f48",
+  "source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-33b86-20261109/source.tar",
+  "source_archive": true,
+  "local_spec": "/private/tmp/pointstream-w8-33b86-sourceprep-20261109-a1/spec.json",
+  "deadline": "2026-11-09T23:58:16.194382Z",
+  "logical_spec_sha256": "b6bdbfb18f17d25383e6f722df50004c5047ba1ca09c48c6602a447d1c415bfc",
+  "normalized_file_sha256": "e817f5150ec71a785a347b7d57399cfe65f8ef6e249a8e34bcc0f0fe162abde1",
+  "phase_commands": {
+    "full": [
+      "{python}",
+      "-m",
+      "experiments.tennis.w8_witness_cpu_proof_job",
+      "noop"
+    ],
+    "smoke": [
+      "{python}",
+      "-m",
+      "experiments.tennis.w8_witness_cpu_proof_job",
+      "run"
+    ]
+  },
+  "raw_file_sha256": "c1d9af1be2dc797768ea9f3b2ceb85413d7e35e4e371286f30ccdb79bbc7dfa6",
+  "scope": "ONE real CPU proof only; no GPU, JCV generation controller, numerical quality or full-witness admission.",
+  "source_archive_sha256": "327e96ea67d8d21127bee7b8cd0f4a785ef6ffceecd007665483812717241f48",
+  "host": "gpu5",
+  "cpu_affinity_index": 0,
+  "GPU_ceiling": 0,
+  "CPU_future_ceiling": 832,
+  "campaign_wall_ceiling": 600,
+  "postcampaign_CPU_ceiling": 150,
+  "audit_CPU_ceiling": 82,
+  "CPU_preparation_already_charged": 30,
+  "CPU_family_cap": 1550,
+  "CPU_family_forecast_inclusive": 1510,
+  "root_preparation_raw_hashes_verified": 17,
+  "stop": "Any source/runtime/receipt/policy/native/tensor/PID/resource/deadline failure stops. No replay or automatic retry. Persist actualID/handle/experiment entry before sole canonical wait<=1800s ending beforedeadline; root ledger ACK first."
+}

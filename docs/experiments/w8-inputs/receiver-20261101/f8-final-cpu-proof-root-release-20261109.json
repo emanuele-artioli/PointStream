@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "decision": "release ONE second/final implementation-repair combined CPU-only proof",
+  "revision": "f8b93b638a8ef9cdd1eb28d612967b4f5e4527b7",
+  "snapshot_sha256": "476ea5c810e650888660ab6d9fb2c2f317b7d848041b43cfa01e41c65aaeb671",
+  "source_sha256": "7d9fae842f2154f2dea33f94a7efc014b7422dcb97bbd68ca6d98248f4535f82",
+  "bootstrap_sha256": "01f3fed31b45dbcaab880269f87d0578dcfcab960ee5a15fbcdcd790cec2dd5f",
+  "input_job_sha256": "7a0685ba0cc7405e1833d05075d4d591723da178b1afe71da31e5e95d6e85113",
+  "system_leaves_sha256": "82ad345c9f22115c9a06bbb9ec1244fb058e1149c458a55e998a272d766639f0",
+  "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-f8b93-20261109/source.tar",
+  "spec": "/private/tmp/pointstream-w8-f8-sourceprep-20261109-a1/spec.json",
+  "spec_file_sha256": "0d5cea4db11b94151387462636d00b217ff4f1f05543d1d352b75e2c85b8e58b",
+  "logical_spec_sha256": "c26924d17eb9d4a556aa670afc09e1fbb8cf5df516bb88238969ac4aa3ee042b",
+  "normalized_file_sha256": "65f7e1ba186fddbb2120739100fc76b3c3430b79c7a112ce36f1e3e90074010e",
+  "deadline": "2026-11-09T21:14:33.571803Z",
+  "host": "gpu5",
+  "cpu_affinity_index": 0,
+  "inclusive_proof_family_cpu_ceiling": 1100,
+  "closed_family_cpu": 268,
+  "future_CPU_ceiling": 832,
+  "future_components": {
+    "single_core_campaign": 600,
+    "postcampaign_management_teardown": 150,
+    "independent_audit_contingency": 82
+  },
+  "GPU_ceiling": 0,
+  "parent_remaining_CPU": 4282,
+  "parent_remaining_GPU": 4550,
+  "root_source_and_checks": "All1667actualGitblobs independentlyverified,14fileimplementationdiffreviewed,exactoracle82adpolicy/852reaper,sourcechecklogsrehashed:Ruff/mypy561/2014tests39skipped; rootcombined2017pass39skip. ThirdsystempolicySHAphysicalarchive/spec/rootapprovalgatebindingmandatory.",
+  "root_preparation_review": "Allrawfilesrehashed,statonlyfiveprotectedcategoriesbeforepublichashing,bothhostpublic476/CD6SHA,allhostdoctor/workers/noactivejobs/gpu5CPU0claimempty. SameacceptedoldCD6cachetransitiononly;nootherbaselineexception.",
+  "scope": "RealCPU-onlypacket/native/MAIN+JCVstrict/assessorpolicy/PIDcontainmentproof, no model/CUDA/generation/quality claim. Trustedcontrollerandcooperativeimmutablefiles,notmalicioussameuserpathswap protection.",
+  "conditions": [
+    "ONEcanonicalsubmitfromcleanf8onlysource_archive:true/fixedreviewedspec;freshjobclaimCPU0check;require>=900secondsleftbeforedeadlineorSTOPforrootreview,nosilentrefresh",
+    "persistactualjobID/immutableidentities/budget/deadline/output inW8entry,sendrootIDforcentralledgerBEFOREONEcanonicalps-fleetwait<=2700;neverreplayuncertainsubmissions",
+    "600campaign includes530smoke+50validator+5noopplus15staging/management; thesearecapsnotguaranteedruntime. Allremaining832CPUinsideparent; stopifcannotfitincludingpost/audit.",
+    "stoponanysource/packet/native/denial/identity/accounting/receipt/budget/deadlinefailure; retainallrawandtaskownedprocessIDs; no automaticthirdimplementation-repairproof",
+    "rootrawauditmustindependentlyjoinactualPID2selfleaf/namespace/protecteddenials/native/runtimesandlifecyclebeforegate; includeexactsystem_leaves_sha256fromphysicalarchive/spec",
+    "noGPU/contextqualification/fullwitnessadmission; originalscientificrecipe/qualitythresholds/protectedpresealboundaryunchanged"
+  ]
+}

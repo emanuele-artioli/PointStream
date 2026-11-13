@@ -1,0 +1,35 @@
+{
+  "constraints": "No remote query, new wait, replay or new job. Root one deadline check remains planned.",
+  "deadline": "2026-11-10T19:46:33.818327+00:00",
+  "failure": "gpu2 status RPC ssh timed out after 120 seconds; wait.json empty; local wait PID no longer present",
+  "job_id": "20261110T190907Z-4d0dd928",
+  "last_confirmed_status": "PENDING at publication; source archive and spec previously joined; no later state inferred",
+  "local_wait_exit_code": 2,
+  "local_wait_pid": 22122,
+  "local_wait_session": 17697,
+  "observed_utc": "2026-11-10T19:32:02.475720+00:00",
+  "raw": {
+    "/private/tmp/k5d-same-job-0bb5-eighth-window-20261110/ready.json": {
+      "bytes": 2831,
+      "sha256": "4d3c4c22fb4244b189564a9218ce4633d390f4b505f16de382ac41ff10bc46b4"
+    },
+    "/private/tmp/k5d-same-job-0bb5-eighth-window-20261110/spec.json": {
+      "bytes": 10607,
+      "sha256": "cdba80c26f1227a9c0f06fdb365f5bee2741842cf275e2dcd133c6435b55e0c3"
+    },
+    "/private/tmp/k5d-same-job-0bb5-eighth-window-20261110/submit.json": {
+      "bytes": 4599,
+      "sha256": "33ac0f2cb4befc0e659892713cd41e05ae0b172f790a6824ced26a0fb9502b45"
+    },
+    "/private/tmp/k5d-same-job-0bb5-eighth-window-20261110/wait.json": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/private/tmp/k5d-same-job-0bb5-eighth-window-20261110/wait.stderr": {
+      "bytes": 545,
+      "sha256": "172aec3e25d28aed7f8cf038d5f49282dc732e7c61cffe308ee33abf0a273cf4"
+    }
+  },
+  "schema": 1,
+  "status": "unknown; sole client wait failed; no canonical terminal conclusion"
+}

@@ -13,6 +13,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from experiments.tennis import k5d_ada_study as ada
 from experiments.tennis import k5d_benchmark as benchmark, k5d_checkpoint as cp
 from experiments.tennis import k5d_checkpoint_fleet as cf, k5d_coalesced as co
 from experiments.tennis import k5d_control_bridge as bridge, k5d_control_readiness as readiness
@@ -38,6 +39,9 @@ CALIBRATION_ARCHIVES = {
 
 
 def validate_calibration(receipt: dict[str, Any]) -> None:
+    if ada.profile(receipt) == ada.ADA:
+        ada.validate_calibration(receipt)
+        return
     if receipt.get('budget_reconciled') is not True:
         raise ValueError('budget and active reservations require reconciliation')
     costs = receipt['cost']
@@ -86,7 +90,7 @@ def programme_projection(receipt: dict[str, Any], *, inventory: dict[str, dict[s
     if certified_cpu is not None or 'cpu_calibration' in receipt:
         if certified_cpu is None:
             from experiments.tennis import k5d_study_wave as wave
-            cpu_costs = wave.verified_cpu_calibration(receipt['cpu_calibration'], receipt['consumer_execution_identity'], inventory)
+            cpu_costs = wave.verified_cpu_calibration(receipt['cpu_calibration'], receipt['consumer_execution_identity'], inventory, **({'gpu_profile': ada.ADA} if ada.profile(receipt) == ada.ADA else {}))
         else:
             cpu_costs = certified_cpu
         if set(cpu_costs) != {'prepare', 'score'}:
@@ -370,11 +374,17 @@ def audit_raw_approval(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha
     gate = study.checked_json(gate_path, gate_sha)
     receipt = study.checked_json(cost_path, cost_sha)
     signed_bridge = study.checked_json(bridge_path, bridge_sha)
+    gpu_profile = ada.profile(gate)
+    model, capability = ada.hardware(gate)
+    if ada.profile(receipt) != gpu_profile:
+        raise ValueError('cost and gate GPU profiles differ')
+    if gpu_profile == ada.ADA and gate.get('release') == PAIR_RELEASE:
+        raise ValueError('Ada uses registered cost-confirmation, not historical first-pair release')
     if (gate.get('schema') != 1 or (gate.get('approved') is not True and not (authoring and gate.get('approved') is False))
             or gate.get('purpose') != 'full-retrospective-benchmark-cpu-readiness'
             or gate.get('selection_sha256') != fleet.SOURCE_SHA or gate.get('consumer_execution_identity') != identity
             or gate.get('cost_receipt_sha256') != cost_sha or gate.get('bridge_sha256') != bridge_sha
-            or gate.get('gpu_models') != ['RTX A6000'] or gate.get('gpu_capability') != [8, 6]
+            or gate.get('gpu_models') != [model] or gate.get('gpu_capability') != capability
             or gate.get('fidelity_only_for_unqualified') is not True):
         raise ValueError('CPU readiness release gate differs')
     evidence.historical(gate)
@@ -389,7 +399,10 @@ def audit_raw_approval(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha
     calibration = signed_bridge['calibration_execution_identity']
     if signed_bridge.get('approved') is not True or signed_bridge.get('consumer_execution_identity') != identity:
         raise ValueError('unapproved or wrong source bridge')
-    if gate['release'] == PAIR_RELEASE:
+    if gpu_profile == ada.ADA:
+        actual_bridge = ada.source_bridge(old_source, calibration, new_source, identity)
+        bridge_fields = tuple(actual_bridge)
+    elif gate['release'] == PAIR_RELEASE:
         actual_bridge = parent8_bridge_record(old_source, calibration, new_source, identity)
         bridge_fields = tuple(actual_bridge)
     else:
@@ -404,8 +417,8 @@ def audit_raw_approval(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha
             or receipt.get('calibration_execution_identity') != calibration
             or receipt.get('consumer_execution_identity') != identity
             or receipt.get('bridge_sha256') != bridge_sha
-            or receipt.get('gpu_model') != 'RTX A6000' or receipt.get('gpu_capability') != [8, 6]
-            or receipt.get('calibration_jobs') != {'prepare': '20261105T025241Z-fe451f9e', 'score': '20261105T032433Z-1423f92a'}
+            or receipt.get('gpu_model') != model or receipt.get('gpu_capability') != capability
+            or (gpu_profile == ada.A6000 and receipt.get('calibration_jobs') != {'prepare': '20261105T025241Z-fe451f9e', 'score': '20261105T032433Z-1423f92a'})
             or receipt.get('stage_caps_fit') is not True
             or any(receipt['cost'][kind]['margin'] < 1.5 for kind in ('prepare', 'score'))):
         raise ValueError('full programme cost evidence does not authorize this profile')
@@ -422,7 +435,7 @@ def audit_raw_approval(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha
         if (qualification.get('audited') is not True or qualification.get('cpu_native_pid_passed') is not True
                 or qualification.get('gpu_16_parity_passed') is not True
                 or qualification.get('consumer_execution_identity') != identity
-                or qualification.get('gpu_model') != 'RTX A6000' or qualification.get('gpu_capability') != [8, 6]
+                or qualification.get('gpu_model') != model or qualification.get('gpu_capability') != capability
                 or qualification.get('namespace_wrapper_sha256') != oracle.sha(Path(namespace.__file__))
                 or any(not isinstance(qualification.get(key), str) or not cf.digest_string(qualification[key])
                        for key in ('native_cpu_receipt_sha256', 'gpu_parity_receipt_sha256', 'unshare_sha256'))):
@@ -442,11 +455,16 @@ def audit_raw_approval(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha
                 or parity.get('schema') != 1 or parity.get('audited') is not True or parity.get('passed') is not True
                 or parity.get('scope') != 'actual 16-frame GPU native and score parity'
                 or not isinstance(parity.get('job_id'), str) or not parity['job_id'].startswith('2026')
-                or parity.get('consumer_execution_identity') != identity or parity.get('gpu_model') != 'RTX A6000'
-                or parity.get('gpu_capability') != [8, 6] or parity.get('all_six_exact') is not True
+                or parity.get('consumer_execution_identity') != identity or parity.get('gpu_model') != model
+                or parity.get('gpu_capability') != capability or parity.get('all_six_exact') is not True
                 or parity.get('namespace_wrapper_sha256') != qualification['namespace_wrapper_sha256']
                 or parity.get('unshare_sha256') != qualification['unshare_sha256']):
             raise ValueError('actual native or GPU qualification receipt differs')
+        if gpu_profile == ada.ADA:
+            ada.validate_calibration(receipt)
+            if receipt['ada_calibration']['config_sha256'] != gate.get('receiver_isolation_config_sha256'):
+                raise ValueError('Ada calibration and consumer isolation configs differ')
+            ada.qualification(gate, parity, identity)
         if gate['release'] == PAIR_RELEASE and (parity.get('exclusive') is not True
                                                    or parity.get('timing_contaminated') is not False
                                                    or parity.get('source_bridge_sha256') != bridge_sha):
@@ -469,7 +487,7 @@ def audit_raw_approval(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha
         noncommand_doc = study.checked_json(full_evidence_paths['noncommand'], gate['noncommand_evidence_sha256'])
         if verified_inventory is not None and not authoring:
             raise ValueError('preverified inventory is author-only')
-        inventory = verified_inventory if verified_inventory is not None else wave.inventory(inventory_doc, identity)
+        inventory = verified_inventory if verified_inventory is not None else wave.inventory(inventory_doc, identity, gpu_profile=gpu_profile) if gpu_profile == ada.ADA else wave.inventory(inventory_doc, identity)
         if any(inventory[clip][stage]['state'] != 'complete'
                for clip in wave.CONFIRMATIONS for stage in ('prepare', 'score')):
             raise ValueError('all four verified confirmation stages required')
@@ -543,6 +561,7 @@ def spec(base: dict[str, Any], *, phase: str, clip: str, identity: dict[str, str
         raise ValueError('missing approved evidence asset: full_gate')
     gate_data = study.checked_json(Path(assets['full_gate']['local']), assets['full_gate']['sha256'])
     full_release = gate_data.get('release') == 'full-study'
+    gpu_profile = ada.profile(gate_data)
     for name, item in assets.items():
         if name == 'checkpoint' and gate_data.get('release') == PAIR_RELEASE and phase == 'score':
             validate_pair_checkpoint_asset(item, pair_producer(gate_data))
@@ -553,6 +572,8 @@ def spec(base: dict[str, Any], *, phase: str, clip: str, identity: dict[str, str
     required = {'full_gate', 'cost_receipt', 'fidelity_gate', 'budget_ledger', 'budget_attestation',
                 'native_cpu_receipt', 'gpu_parity_receipt'}
     required |= {'certificate', 'certificate_microbench', 'certificate_microbench_audit'} if full_release else {'bridge', 'calibration_source', 'consumer_source'}
+    if gpu_profile == ada.ADA:
+        required |= set(ada.ASSETS)
     if not required.issubset(assets):
         raise ValueError('missing approved evidence asset')
     if full_release and set(assets) != required | ({'checkpoint'} if phase == 'score' else set()):
@@ -571,6 +592,11 @@ def spec(base: dict[str, Any], *, phase: str, clip: str, identity: dict[str, str
         benchmark.encoder.fidelity_gate(Path(assets['fidelity_gate']['local']), assets['fidelity_gate']['sha256'],
                                         fleet.EXPECTED['archive'], purpose=PAIR_RELEASE, clip=clip, frames=292)
     qualification_paths = {name: Path(assets[name + '_receipt']['local']) for name in ('native_cpu', 'gpu_parity')}
+    if gpu_profile == ada.ADA:
+        binding_args = {name: assets[name]['local'] for name in ada.ASSETS}
+        binding_args.update({name + '_sha256': assets[name]['sha256'] for name in ada.ASSETS})
+        ada.bindings(gate_data, argparse.Namespace(**binding_args, registered_gpu_profile=ada.ADA,
+                     native_cpu_receipt=assets['native_cpu_receipt']['local']), identity)
     full_evidence_paths = {'certificate': Path(assets['certificate']['local']),
                            'microbenchmark': Path(assets['certificate_microbench']['local']),
                            'microbenchmark_audit': Path(assets['certificate_microbench_audit']['local'])} if full_release else None
@@ -617,6 +643,11 @@ def spec(base: dict[str, Any], *, phase: str, clip: str, identity: dict[str, str
             '--budget-ledger', '{staged:budget_ledger}', '--budget-ledger-sha256', assets['budget_ledger']['sha256'],
             '--budget-attestation', '{staged:budget_attestation}', '--budget-attestation-sha256', assets['budget_attestation']['sha256'],
             '--fidelity-gate', '{staged:fidelity_gate}', '--fidelity-gate-sha256', assets['fidelity_gate']['sha256']]
+    if gpu_profile == ada.ADA:
+        args += ['--registered-gpu-profile', ada.ADA]
+        for name in ada.ASSETS:
+            args += ['--' + name.replace('_', '-'), '{staged:' + name + '}',
+                     '--' + name.replace('_', '-') + '-sha256', assets[name]['sha256']]
     if not full_release:
         args += ['--bridge', '{staged:bridge}', '--bridge-sha256', assets['bridge']['sha256'],
                  '--calibration-source', '{staged:calibration_source}', '--consumer-source', '{staged:consumer_source}']
@@ -632,6 +663,11 @@ def spec(base: dict[str, Any], *, phase: str, clip: str, identity: dict[str, str
         if 'checkpoint' not in assets:
             raise ValueError('actual full-context checkpoint required')
         item = assets['checkpoint']
+        if gpu_profile == ada.ADA:
+            producer = ada.score_producer(gate_data, clip, cert if full_release else None)
+            if (item.get('remote') != producer['remote'] or item.get('sha256') != producer['archive_sha256']
+                    or item.get('checkpoint_sha256') != producer['checkpoint_sha256']):
+                raise ValueError('Ada score checkpoint differs from root-approved producer')
         if gate_data['release'] == PAIR_RELEASE:
             producer = pair_producer(gate_data)
             validate_pair_checkpoint_asset(item, producer)
@@ -649,7 +685,9 @@ def spec(base: dict[str, Any], *, phase: str, clip: str, identity: dict[str, str
         args += ['--checkpoint', '{staged:checkpoint}', '--checkpoint-sha256', item['checkpoint_sha256']]
     result = cf.common_spec(base, extra, deadline)
     result.update(entrypoint=['-m', 'experiments.tennis.k5d_control_study'], arguments=args,
-                  gpu_models=['RTX A6000'], budget_seconds=campaign_seconds, validator_seconds=30)
+                  gpu_models=[ada.hardware(gate_data)[0]], budget_seconds=campaign_seconds, validator_seconds=30)
+    if gpu_profile == ada.ADA:
+        result['hosts'] = ['gpu6']
     result['scale']['frames'] = {'smoke': frames, 'full': frames}
     result['scale']['mode'] = {'smoke': 'readiness', 'full': 'full'}
     result['smoke'] = {'seconds': readiness_seconds, 'representative_basis': 'CPU validation of the complete source timeline, model identities, source bridge and prepared checkpoint.'}
@@ -689,6 +727,12 @@ def verify_gate(args: argparse.Namespace, identity: dict[str, str]) -> int:
     if args.frames != frames:
         raise ValueError('full native timeline differs')
     gate = study.checked_json(Path(args.full_gate), args.full_gate_sha256)
+    if ada.profile(gate) != getattr(args, 'registered_gpu_profile', ada.A6000):
+        raise ValueError('worker and gate registered GPU profile differ')
+    if ada.profile(gate) == ada.ADA:
+        ada.bindings(gate, args, identity)
+        if args.action == 'score':
+            ada.score_binding(gate, args, identity)
     if gate.get('release') == PAIR_RELEASE and args.action == 'score':
         producer = pair_producer(gate)
         if not args.pair_producer_audit:
@@ -792,6 +836,8 @@ def run(args: argparse.Namespace) -> None:
         args.fidelity_purpose = PAIR_RELEASE
     stage = Path(os.environ['PS_STAGE_DIR'])
     scratch = Path(os.environ['PS_SCRATCH_DIR'])
+    if ada.profile(gate) == ada.ADA:
+        ada.configure(args, gate, identity, stage)
     if {'smoke': 'readiness', 'full': 'full'}.get(os.environ.get('PS_STAGE', '')) != args.mode:
         raise ValueError('stage and control profile differ')
     if args.mode == 'readiness':
@@ -803,9 +849,19 @@ def run(args: argparse.Namespace) -> None:
         data = benchmark.build(args)
         if args.action == 'prepare':
             cp.prepare(data, identity)
+            if ada.profile(gate) == ada.ADA:
+                ada.registered_producer(Path(data.output), identity, job=stage.parent.name, clip=args.clip,
+                     frames=args.frames, config=Path(args.receiver_isolation_config),
+                     config_sha=args.receiver_isolation_config_sha256, dispatch_gpu=args.receiver_producer_context['gpu'])
         else:
             data.checkpoint = str(Path(args.checkpoint) / 'publish')
+            if ada.profile(gate) == ada.ADA:
+                ada.registered_producer(Path(data.checkpoint), identity, job=args.receiver_producer_job,
+                    clip=args.clip, frames=args.frames, config=Path(args.receiver_isolation_config),
+                    config_sha=args.receiver_isolation_config_sha256, dispatch_gpu=args.receiver_producer_context['gpu'])
             co.score_all(data, args.checkpoint_sha256, identity)
+            if ada.profile(gate) == ada.ADA:
+                ada.full_metrics(Path(data.output) / 'assembled', args.frames)
 
 
 
@@ -906,6 +962,10 @@ def main() -> None:
     parser.add_argument('--checkpoint')
     parser.add_argument('--checkpoint-sha256')
     parser.add_argument('--pair-producer-audit')
+    parser.add_argument('--registered-gpu-profile', choices=(ada.A6000, ada.ADA), default=ada.A6000)
+    for name in ada.ASSETS:
+        parser.add_argument('--' + name.replace('_', '-'))
+        parser.add_argument('--' + name.replace('_', '-') + '-sha256')
     parser.add_argument('--frames', type=int, required=True)
     args = parser.parse_args()
     if args.action == 'score' and (not args.checkpoint or not args.checkpoint_sha256):

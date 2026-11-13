@@ -1,0 +1,64 @@
+{
+  "job_id": "20261105T082120Z-df001de2",
+  "status": "failed smoke exit 1; no published smoke archive",
+  "revision": "ceff74aa766eb2cf8c051fb7a6ad332e08440af5",
+  "source_snapshot_sha256": "ef9b1324fe2eff914ac54931eb1416c2e8a984f7f5c5118350b3766267738393",
+  "normalized_spec_sha256": "628a99d7ce65e545f0a1cd2bc8758fb2dc84fec3132ce094bcd44f142d7791c2",
+  "physical_source_verified": true,
+  "retained_receiver_files_matched_archive": 340,
+  "state_sha256": "cefb03e2f947dedfaacc34c58ef4e2bed7bd12ca45cc40d77a30efc70418ce2c",
+  "ready_sha256": "2881756de7fe61ed8b686bc9286d9431b54f17b9444d014739231cc13f26351f",
+  "spec_file_sha256": "e41c2b8d8e6948b5a26ca2afed1b1d43a49aaabdcaf9af872f893ee7ca64e6e6",
+  "smoke_execution_sha256": "85a3475e278df1ff396ef33e2af14c3f4510fe6ce4714c273f62e912f450e1cc",
+  "model_stderr_sha256": "61d169821d9cb493a2ef59c8a55b83468e1cec99d8cff661f71c7b07960ee706",
+  "failure": "torch profiler prepare_trace raises RuntimeError boost::filesystem::directory_iterator::construct permission denied /sys/devices/system/clocksource",
+  "stage": "Renderer constructor and source guard returned; profiler failed at entry before original probe render, context probe, kernel qualification, full step, 3-step pilot, model/device receipt or quality",
+  "packet": {
+    "status": 0,
+    "cpu_seconds": 6.561624,
+    "wall_seconds": 6.591707932762802,
+    "decoded_checkpoint_sha256": "1bb95a11c25ac66774b887c93277b695779e21cc9803cc565408206934f0fdeb",
+    "manifest_sha256": "33b8b69b88efdd2cfc8025e1007dfb72e3d36d6a56ae5d4bef0d48b05e547175",
+    "independent_cpu_reload_fingerprints_match_oracle_and_manifest": 480,
+    "independent_reload_cpu_seconds": 1.330276,
+    "independent_reload_cuda_initialized": false,
+    "unit_sha256": [
+      "387544a3fc344685f7c07632879affbdafcfd54fd6e1c00e0d9d6c06ca98995d",
+      "74be8c9e2f8eb65ca67e6339ef9a2a2f8238df36c60a4b5a07a45fc68d3712a7"
+    ],
+    "scope": "retained scratch only; independent oracle matches; no durable published fleet validation"
+  },
+  "model_worker": {
+    "pid": 1271944,
+    "exit": 1,
+    "cpu_seconds": 59.161283,
+    "wall_seconds": 59.39909016434103
+  },
+  "smoke": {
+    "wall_seconds": 77.43062448501587,
+    "child_cpu_seconds": 77.140604
+  },
+  "lifecycle": {
+    "created": 1793866904.35742,
+    "started": 1793866951.8052444,
+    "ended": 1793867062.5916052,
+    "canonical_updated": 1793867071.9481006,
+    "creation_to_ended_seconds": 158.2341852,
+    "creation_to_updated_seconds": 167.5906806,
+    "proposed_conservative_gpu_seconds": 168,
+    "proposed_conservative_cpu_seconds_including_external_100": 268,
+    "note": "Root owns final accounting; conservative wall-based upper bound, not measured GPU utilization."
+  },
+  "release": {
+    "supervisor_pid": 1271051,
+    "campaign_pid_and_pgid": 1271073,
+    "packet_pid": 1271823,
+    "model_pid": 1271944,
+    "pids_absent": true,
+    "campaign_group_empty": true,
+    "matching_cpu_and_gpu_claims_absent": true,
+    "other_gpu_processes_observed_and_untouched": true,
+    "artifacts_preserved": true
+  },
+  "recommendation": "Determine exact profiler directory enumeration and leaf accesses with bounded CPU-only trace and authenticated strict-isolation oracle before designing least-privilege change. The traceback establishes directory enumeration, not which leaf filenames are needed; leaf-only permissions may not suffice. Do not assume pre-initialization crosses isolation safely. Preserve kernel, isolation and device gates; no repair or retry dispatched."
+}

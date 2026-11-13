@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "decision": "Root refreshes deadline only for ONE unsent174q0 request; no newexperiment/settings/budget",
+  "supersedes": "a9ed0522 expiredbeforeanysubmission;oldspecpreserved",
+  "local_spec": "/private/tmp/pointstream-w8-174-q0-prestage-proposal-20261110-a1/spec-deadline-refresh-20261110T122916Z.json",
+  "raw_spec_sha256": "394edf732116afe8d80a2235dce1f4b74ea7c483f99c16158bf862786a92ad0d",
+  "canonical_spec_digest": "abd6e55920bb2c4ede6ec9cee594c5e8daef5d1cacad45d756e61b7eb69e88ef",
+  "deadline": "2026-11-10T13:12:16.562376Z",
+  "source_revision": "174ac84b84a1f405e06700a34aa4c3e225fa3265",
+  "source_sha256": "4cad9e47ebeb88f1cdb272634921f2aed79100e0e15ace4d01f9a3a33720d9d6",
+  "snapshot_sha256": "5e62a2e912f5dba0cd945d33388b95154d5d8e88ed6cf5b5998e595a323c6fd1",
+  "source_archive": true,
+  "future_GPU_ceiling": 500,
+  "future_CPU_ceiling": 600,
+  "campaign": 450,
+  "smoke": 385,
+  "generator_wall": 240,
+  "scope": "Exactlyapproveda9ed0522 original24/30/CFG2/context24/overlap4/seed/sourcehidden costpilot. Allinput/gate/ledger/admissionSHA/workerpathsunchanged. Solechange deadline.",
+  "final_readiness": "Bound<=10CPU freshcanonicalalljobs/eligiblehostmetadata/publicstat-first/source/archive/claims check, charged INSIDE prospective150externalCPU (leaves140post/audit). Recordactualhandle/usage underthissamepilotfuture600, no additionalgrant/precharge oruploadchange. Stopifcannotfit/anyidentitymismatch. Canonicalstagingstillfreshlyhasheseverybyteactuallyconsumed.",
+  "stops": "No submissioniftiming/claim/source/gates/sourceidentity differs. Submitonce; recordID thenrootcentralACK beforeONEcanonicalwait<=2700. No retry, otherunit/fullwitness/qualityrelease.",
+  "budget": "Earlier300qualificationpreps+600future=900CPU<=1000; parent4550GPU2758CPU/programmeunchanged. Finalreadiness10isincludedonce infuture600/external150, notadditional."
+}

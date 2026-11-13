@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "decision": "release_one_fresh_df6_native_CPU_containment_proof_after_bounded_source_preparation",
+  "date": "2026-11-09",
+  "parent_phase": "k5d-scale-first-tranche-20261105",
+  "revision": "df6eee829e56a1880397547f6d654eb47169c4f4",
+  "snapshot_sha256": "4477693bd025e633a8d14a4f8f303576e41df4cd23420c083cedd967113ce463",
+  "source_sha256": "ac77730dc24ce123fa7dac7f9e2d65003e25a11fdbded29b05f77be9bef1b15b",
+  "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "source_cache_archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/k5d-shared-df6-20261109/source.tar",
+  "draft_spec_sha256": "4f9f9fa7ebe983a359c6dac990c165a5603d32a4190890070b32819e011209cd",
+  "allowed_spec_changes": [
+    "freshdeadline<=45minutes; recordraw+normalizedSHA before submit"
+  ],
+  "inclusive_cpu_ceiling": 300,
+  "inclusive_gpu_ceiling": 0,
+  "cpu_components": {
+    "preparation": 50,
+    "one_core_campaign": 100,
+    "post_campaign_to_terminal": 100,
+    "independent_audit": 30,
+    "failure_contingency": 20
+  },
+  "scientific_scope": "ActualtwoframeClip5FFmpeg/SVT/dav1d normal+timeout+TERM+KILL native CPU mechanism, no CUDA, decoder quality, GPUparity, memory peak, cost scaling or full30 claim. Root audit required; oldc64proof not newsource evidence.",
+  "source_bridge_review": "Root+independentreviewer actualarchives/Gitblobs:1376new,1347originalH2unchanged,1pinnedresource-onlycodecpatch+28controls. Finaldf6deltafromreviewed0f onlytypeannotations. VendorPythonclosure9modulesoneunusedstart_trainspawn; no nativeextension/adversarialclaim.",
+  "conditions": [
+    "recordsourceworktreepathandassertcleanexactHEADdf6,archive447/sourceac777; no currentrootW8codeincluded",
+    "fresh allknownjobs/claim/eligiblehostgpu2 CPU0/worker/runtimecache/ffmpeg/SVT/dav1d/unshare/affinity/storage/inputSHA checks",
+    "sourceprep onlypubliccode underowncanonicalnewcacheparent; no overwrite/replay, preservepartials; boundedtransport, actualcompressedsourcehash andremoteuncompressed447checked",
+    "singleCPUcampaign100/smoke70/validator10/noop5; propertwo-elementmoduleentrypoint; noGPUclaim orCUDAinitialization",
+    "resourcebridge explicitlyonechangedoldfile, defaultcodecbehaviourunchanged; CPUproofdoesnotexerciseGPUallocatorbranch",
+    "canonicalsubmit pinnedsourceworktree+verifiedsourcecache, source_archive:true no fallback; deadlinefresh<=45min andsubstantivevalidator",
+    "recordactualjobID/spec/source/budget/deadline/outputpaths+onecanonicalwait<=2700beforewait; no recurringpoll or automaticretry",
+    "chargeonecorewholeactualsupervisor-through-terminal upper separatelyfromprep/audit, no cumulativecounterdoublecount; queuewallnotmeasuredCPU",
+    "before root acceptance actualPID/startticks/PGID/ns,parent/child CPUjoin, allnormal/interruption cases, nativebytes, noownedPIDs/claim; ACK terminalevents afterreport",
+    "no sharedGPU16/292/586/full30 release; requiresfreshrootaudit+separatecompleteforecast"
+  ]
+}

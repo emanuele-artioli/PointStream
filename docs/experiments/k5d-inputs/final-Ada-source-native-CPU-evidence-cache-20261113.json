@@ -1,0 +1,12 @@
+{
+  "bytes": 38787514,
+  "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/final-Ada-source-native-CPU-20261113",
+  "claim": "CPU native containment/accounting only; no receiver/CUDA/GPU/quality/scale; currentcleanupnot historicalreleasebound",
+  "files": 54,
+  "job_id": "20261113T060019Z-cc884861",
+  "manifest_sha256": "69538dfbcb7ccbc69dc6d9aeaed9e5268fdf481fbc82e7989920acaf7340c1ed",
+  "native_approval_NFS": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-final-Ada-native-CPU-709c3b720f41423a87e0a058e12c52e4/native-CPU.json",
+  "native_approval_sha256": "5f89d0c1d7973f2ee781cd13e203020bcc61ea5b2fe018a4b280c8638677eaba",
+  "remote_immutable_source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-final-Ada-source-cache-23ac26952ec2ca21922f8cf2a1933f59",
+  "source_archive_sha256": "ad635b0b46428a3fa934081ded5d2b408c453bc5f7e46854dd8b8eb0c6abbea9"
+}

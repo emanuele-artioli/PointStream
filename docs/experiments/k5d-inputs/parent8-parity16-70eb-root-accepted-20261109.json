@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "decision": "Root accepts exact16frame numerical/resource feasibility gate only",
+  "job_id": "20261109T223822Z-70eb4770",
+  "audit_sha256": "fda7d2dff8166ec22a020c56ffdbb93cf47abffba7b56f89e17545f98620804f",
+  "source_sha256": "58787f8664f961c2287228762c1ddd3295adab4042bd7f41d9bfee87d2666104",
+  "snapshot_sha256": "9f486d70424b9d293d8774c92b36350d284edcb2513c415390b88a2b4c344aed",
+  "spec_sha256": "b6ae2c411b8ddf677d68b40d651a570bbd9dfd35ff290baa2c13b4a78a753850",
+  "runtime_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "gpu_uuid": "GPU-40e9a544-b3d6-e5f3-a736-7020a6401bfc",
+  "root_raw_hashes_rechecked": 20,
+  "root_archive_member_joins": {
+    "smoke": 117,
+    "reference": 47,
+    "noop": 1
+  },
+  "root_assertions_rerun": "All source/input/native/wire/savedpixel/192metric/384judge and13resource/PID/group/claim assertions; no fresh GPU/native decode or model inference",
+  "frames": 16,
+  "point_count": 6,
+  "resource_receipts": 13,
+  "observed_pid_births_absent": 14,
+  "GPU_charge": 450,
+  "CPU_charge_inclusive": 550,
+  "CPU_charge_additional": 520,
+  "CPU_preparation_already_charged": 30,
+  "accounting_basis": "Conservative allocation:430 rounded supervisor-birth to canonical421.562s same-path bound plus90external audit/admin +30already charged prep.450GPU supported by inferred normal successful claim-release ordering<=420.877s; exact release and aggregate CPU not measured. Late manual absence is NOT a runtime timestamp.",
+  "shared_timing_contaminated": true,
+  "qualification_exclusions": [
+    "timing",
+    "cost model",
+    "scale",
+    "new cohort",
+    "full30",
+    "new scientific quality result"
+  ],
+  "next_gate": "Separately reviewed uncontaminated current-path cost and292/586 scale confirmations, then complete remaining forecast/failure reserve; preserve all30 denominator."
+}

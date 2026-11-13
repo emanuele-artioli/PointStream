@@ -1,0 +1,75 @@
+{
+  "bridge_type": "first292-admission-v1",
+  "calibration_execution_identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "c3ff5419167504afcd84d25931791eddfe8bae16b5e492ed124df31e43f66f67",
+    "source_sha256": "8a3b51c487cf9b456e304fdf24300f230ece3f3c7b2c8569ab6681fbd8166f13"
+  },
+  "calibration_snapshot_sha256": "c3ff5419167504afcd84d25931791eddfe8bae16b5e492ed124df31e43f66f67",
+  "changed_paths": [
+    "docs/experiments/k5d-inputs/controls-3ec159d8-independent-audit-20261105.json",
+    "experiments/tennis/k5d_benchmark.py",
+    "experiments/tennis/k5d_control_bridge.py",
+    "experiments/tennis/k5d_control_readiness.py",
+    "experiments/tennis/k5d_control_study.py",
+    "experiments/tennis/k5d_cpu_accounting.py",
+    "experiments/tennis/k5d_encoder.py",
+    "experiments/tennis/k5d_first292_source_bridge.py",
+    "experiments/tennis/k5d_full_admission.py",
+    "experiments/tennis/k5d_full_cost_builder.py",
+    "experiments/tennis/k5d_low_memory_source_bridge.py",
+    "experiments/tennis/k5d_native_cpu_workload.py",
+    "experiments/tennis/k5d_native_pid_oracle.py",
+    "experiments/tennis/k5d_parent8_child2_source_bridge.py",
+    "experiments/tennis/k5d_pid_escalation_oracle.py",
+    "experiments/tennis/k5d_pid_namespace_wrapper.py",
+    "experiments/tennis/k5d_pidfd.py",
+    "experiments/tennis/k5d_readiness_cost_probe.py",
+    "experiments/tennis/k5d_real_parity.py",
+    "experiments/tennis/k5d_scoped_namespace.py",
+    "experiments/tennis/k5d_shared_source_bridge.py",
+    "experiments/tennis/k5d_study_wave.py",
+    "src/codecs/dcvc_uf_worker.py",
+    "tests/tennis/test_k5d_control_bridge.py",
+    "tests/tennis/test_k5d_control_readiness.py",
+    "tests/tennis/test_k5d_control_study.py",
+    "tests/tennis/test_k5d_cpu_accounting.py",
+    "tests/tennis/test_k5d_full_cost_builder.py",
+    "tests/tennis/test_k5d_low_memory_source_bridge.py",
+    "tests/tennis/test_k5d_native_pid_oracle.py",
+    "tests/tennis/test_k5d_parent8_child2_source_bridge.py",
+    "tests/tennis/test_k5d_readiness_cost_probe.py",
+    "tests/tennis/test_k5d_real_parity.py",
+    "tests/tennis/test_k5d_scoped_namespace.py",
+    "tests/tennis/test_k5d_shared_parity.py",
+    "tests/tennis/test_k5d_shared_source_bridge.py",
+    "tests/tennis/test_k5d_study_wave.py"
+  ],
+  "consumer_execution_identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "202466a711d17b742a17270bab91da2dc581af7a9fc1e411405f8bb37a924372",
+    "source_sha256": "390e157a9aabc1db8006a936a7de54a43c8810650260136bc59a67036e7dfd39"
+  },
+  "consumer_snapshot_sha256": "202466a711d17b742a17270bab91da2dc581af7a9fc1e411405f8bb37a924372",
+  "patches": {
+    "experiments/tennis/k5d_benchmark.py": [
+      "3377e5b4370e19f25dc3e011a0a292004fe004ccca54acff3a2585d351b86abd",
+      "6a6929a68db95db0e6ee54e41102e58883583b468c4bbe3737c0fa36fa254699",
+      "e7a0bcd5122a050be169392f8ee48b2892dd7f7f3b9bf63d574efc125c5dc33a"
+    ],
+    "experiments/tennis/k5d_encoder.py": [
+      "e98895cee0999d97db09ba27f54b1857c73f0c8eceda3be391c40aaf2cce0621",
+      "aa06febbf2429ec8b81cd4640fb6b39cf777e5557bf7b7ee05f391e33cd8eb08",
+      "11dd724975b52831c832fa9703700b208f9117021bbe0f31b53a8266a9e61bd0"
+    ],
+    "src/codecs/dcvc_uf_worker.py": [
+      "d189b733c4fe18fa383ff4f193d7c2dc9ddc7a844275a8d59bc48684eee108e4",
+      "cb2652db6fdd91fe837e94f1c4ec57a0e80a409e044326e79c4c88a9e63d695f",
+      "ebe029991a1d7dbf33eb9dff1763b0cac11c6340276d0a2f5637c1ce73d7361e"
+    ]
+  },
+  "unchanged_files": 1345,
+  "approved": true,
+  "approval_scope": "Static compatibility based on recorded independent actual H2/archive comparisons and current primary consumer Git-blob/diff review. No compute, CPU/GPU qualification or cost admission.",
+  "temporary_copy_status": "Old local H2 and d8 reference tar copies are absent; no actor reports moving/deleting them. No fresh primary H2 physical rehash is claimed. Recover exact immutable originals and reverify SHA before stage authoring/execution; worker bridge verifies real archives."
+}

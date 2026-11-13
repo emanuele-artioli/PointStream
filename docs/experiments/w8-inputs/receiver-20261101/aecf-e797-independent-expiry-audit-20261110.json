@@ -1,0 +1,241 @@
+{
+  "accounting_recommendation": "0 GPU execution; conservative full 150 external CPU as true preparation, subject to root review; not measured aggregate",
+  "evidence": {
+    "acknowledgment": {
+      "acknowledged": [
+        "171d8926447550bf94f9849b813b6c95"
+      ]
+    },
+    "audit_host_pid": 638570,
+    "audit_remote_cpu_seconds": 0.079424,
+    "client_event": "171d8926447550bf94f9849b813b6c95",
+    "client_wait_exit": {
+      "exit_code": 10,
+      "wall_seconds": 1401.021028624993
+    },
+    "event_mapping_basis": "same job and terminal-expired kind; sole wait does not expose client event timestamp",
+    "gpu5_job_admission": {
+      "job_id": "20261110T174559Z-e797d6bc",
+      "reason": "No eligible GPU is available: all inspected GPUs are busy, non-idle, or below the memory requirement",
+      "updated": 1794335158.5100691
+    },
+    "matching_claim_files": [],
+    "no_run_attempt_gate_supervisor_campaign_or_outputs": true,
+    "source_event": {
+      "detail": null,
+      "id": "e10e5210467b5421ad3a4dadbf9a1cc4",
+      "kind": "terminal:expired",
+      "timestamp": 1794335199.6177843
+    },
+    "state": {
+      "created": 1794332773.2606018,
+      "job_id": "20261110T174559Z-e797d6bc",
+      "status": "expired",
+      "updated": 1794335199.213893
+    },
+    "sweeper_interpretation": "worker expiry branch acquires request before host eligibility check; this owner is not execution assignment",
+    "sweeper_owner": {
+      "alias": "gpu4",
+      "host": "gpu4.itec.aau.at",
+      "pid": 2698989,
+      "proc_start_time": 1793848734.81,
+      "token": "0c670c17f15a421885ba2104daa60ad4"
+    },
+    "sweeper_worker_heartbeat": {
+      "alias": "gpu4",
+      "capabilities": [
+        "source_archive",
+        "indexed_cpu_affinity_v1"
+      ],
+      "pid": 2698989,
+      "proc_start_time": 1793848734.81,
+      "updated": 1794335320.1668255
+    },
+    "tree": [
+      {
+        "mode": "0o40755",
+        "path": "events",
+        "size": 3,
+        "symlink": false
+      },
+      {
+        "mode": "0o40755",
+        "path": "owner",
+        "size": 3,
+        "symlink": false
+      },
+      {
+        "mode": "0o100644",
+        "path": "ready.json",
+        "size": 3121,
+        "symlink": false
+      },
+      {
+        "mode": "0o100444",
+        "path": "source.tar",
+        "size": 22282240,
+        "symlink": false
+      },
+      {
+        "mode": "0o100444",
+        "path": "spec.json",
+        "size": 12380,
+        "symlink": false
+      },
+      {
+        "mode": "0o100644",
+        "path": "state.json",
+        "size": 132,
+        "symlink": false
+      },
+      {
+        "mode": "0o100644",
+        "path": "events/e10e5210467b5421ad3a4dadbf9a1cc4.json",
+        "size": 130,
+        "symlink": false
+      },
+      {
+        "mode": "0o100644",
+        "path": "owner/identity.json",
+        "size": 153,
+        "symlink": false
+      }
+    ]
+  },
+  "job_id": "20261110T174559Z-e797d6bc",
+  "raw_file_sha256": {
+    "/private/tmp/pointstream-w8-aecf-pilot-20261110-a1/admission.json": {
+      "bytes": 1653,
+      "sha256": "0ef2c81fbe0c1b23c7ecbba94f80e87c544ef02851f116805b928fe199c37098"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-20261110-a1/cpu-gate.json": {
+      "bytes": 2100,
+      "sha256": "d55b812ee13662408b404ce2bcc67f5f2effff91a76d6836965edca8d4d44c7e"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-20261110-a1/ledger.json": {
+      "bytes": 234872,
+      "sha256": "e8a5ab85a123d40090712cbc0fef38a233a4bb86afa12811eb163bdcd692c8cf"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-20261110-a1/receipt.json": {
+      "bytes": 777,
+      "sha256": "a953012b6625bd816346385187de15ea2d385f6cca7fad79fb47c594189997b2"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-20261110-a1/remote-intent.json": {
+      "bytes": 257,
+      "sha256": "aee455f10d444e0f8276cd28145a0b698b416c0cbee7acd1ad517a057918c069"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-20261110-a1/remote-result.json": {
+      "bytes": 93,
+      "sha256": "19bc05749d0ae5da074721d463c83b3befa1af892fee8edbe7f8187a09087ec3"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-20261110-a1/remote.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-20261110-a1/remote.stdout": {
+      "bytes": 1068,
+      "sha256": "052a93522835dbc9ae26b8baffb5a0c56fc1d7a28af2d0745e31beae7944510a"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-20261110-a1/spec.json": {
+      "bytes": 12340,
+      "sha256": "910ea3af5c93753e3e6f15276b0914f7adc7cdb3f907e13dc055f8194736ef18"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-20261110-a1/submit-handle.json": {
+      "bytes": 51,
+      "sha256": "34f4489d0522f0c16749757f7eea2bf1cf9a354aa7fc1de6fa6d5fe11695d444"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-20261110-a1/submit-intent.json": {
+      "bytes": 608,
+      "sha256": "e7d03ff325b7e4c5bc42aeaa9d536ec912f8d6cccf7170f999be49ea7febb204"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-20261110-a1/submit-result.json": {
+      "bytes": 52,
+      "sha256": "568d2e3cd9488ba6f1ed636464438fd73dafef7d80a81b62ff2a294809351fda"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-20261110-a1/submit.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-20261110-a1/submit.stdout": {
+      "bytes": 4892,
+      "sha256": "da3eea1357c34328674f06a78ee433fec82b54d6e08ed57a8237b9f2834ec594"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-20261110-a1/wait-handle.json": {
+      "bytes": 73,
+      "sha256": "cb15a92db01f9c5e0bd1571ce2c830ea8cc40b628a95ca48ff274963a540d295"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-20261110-a1/wait-plan.json": {
+      "bytes": 417,
+      "sha256": "8aaaa8b767e9d01212bb73b91f1f88448685d9b9af7763e77761ea7860236ec1"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-20261110-a1/wait-result.json": {
+      "bytes": 53,
+      "sha256": "0067becf3d74a2ee33f9066bd0fc1e37ef79d0f8fa22a7da6351ae3979300aa2"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-20261110-a1/wait.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-20261110-a1/wait.stdout": {
+      "bytes": 563,
+      "sha256": "36c1e3ece3fe045f0369ec88f8f395a84318011223ea9e08a6e61b23d2d76a9b"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-expiry-audit-20261110-a1/ack.json": {
+      "bytes": 67,
+      "sha256": "2a8ef7b6357391bd3b90ab43bbbd9265d71983ce9589859bb320c2cfa3801faf"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-expiry-audit-20261110-a1/ack.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-expiry-audit-20261110-a1/audit.py": {
+      "bytes": 1671,
+      "sha256": "38616bf1434f59bbad31e1991b230386a7e4669bf4e979fedcae1286b9b37939"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-expiry-audit-20261110-a1/audit.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-expiry-audit-20261110-a1/audit.stdout": {
+      "bytes": 17911,
+      "sha256": "46cee86f709d106afee938ac6371499766dd8ff6455e2f3992a27e0cf1664b06"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-expiry-audit-20261110-a1/handle.json": {
+      "bytes": 15,
+      "sha256": "0e3401d7e1e77e758b5b13c41063ccb6825efcd37d8c8942a6d0b8389c208064"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-expiry-audit-20261110-a1/intent.json": {
+      "bytes": 236,
+      "sha256": "b43a57aff8337a83e114a74480e32fe3314cfc2c96835ba78e0fe35b89e4fa38"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-expiry-audit-20261110-a1/result.json": {
+      "bytes": 52,
+      "sha256": "1cc71b41eb47f650f52f9b9484661a31dccafb78a957467e8cd2674acaaee0ee"
+    },
+    "/private/tmp/pointstream-w8-aecf-pilot-expiry-audit-20261110-a1/source-event.json": {
+      "bytes": 130,
+      "sha256": "4f0ce33c9207f357b554040895f922a81a3d4e6c4b049cd766e9338c7c1c6a2a"
+    }
+  },
+  "schema": 1,
+  "scope": "independent read-only expiry audit; no generation or quality result",
+  "source": {
+    "actual_archive_rehashed_sha256": "f784c0919dc8f223253637684b71636063649831bc32b3ad23534e585322e84a",
+    "revision": "aecf9ee21c6a5d0face390c9f0a3b5044112ef36",
+    "snapshot_sha256": "f784c0919dc8f223253637684b71636063649831bc32b3ad23534e585322e84a",
+    "source_archive": "source.tar",
+    "source_sha256": "c9d56ee3c6e857e3cf92978690b20007645c2c13549469686c700434f2b8ebe6"
+  },
+  "spec": {
+    "admission_sha256": "0ef2c81fbe0c1b23c7ecbba94f80e87c544ef02851f116805b928fe199c37098",
+    "approval_sha256": "1b34f7add2a4c0c6cc76dd32f9d29d0085db1974536569a5d9b7bc0fabf52407",
+    "canonical_sha256": "53db2b49019911a0d4546c7461bcdffe29e1b1dcde83c7e5be92af8f2cec904a",
+    "deadline": "2026-11-10T18:26:36.123950Z",
+    "future_cpu_seconds": 550,
+    "future_gpu_seconds": 500,
+    "ledger_sha256": "e8a5ab85a123d40090712cbc0fef38a233a4bb86afa12811eb163bdcd692c8cf",
+    "raw_sha256": "910ea3af5c93753e3e6f15276b0914f7adc7cdb3f907e13dc055f8194736ef18",
+    "saved_spec_file_sha256": "2d92b2db6106b361f7e83bff3f17027d83f1c115d102bbe70223a23dcd0f3e56"
+  },
+  "status": "expired"
+}

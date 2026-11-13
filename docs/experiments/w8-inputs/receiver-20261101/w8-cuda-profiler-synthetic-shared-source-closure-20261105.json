@@ -1,0 +1,23 @@
+{
+  "files": {
+    "experiments/__init__.py": "06f003a15341e1a630da290bb9f66f11bd79de593e85aff33fdd1b548db2cba9",
+    "experiments/tennis/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "experiments/tennis/k6b_generate.py": "00248aa4fdd47e634f82b37a7a33c99f1794440d65cbfe9395255a4225735542",
+    "experiments/tennis/w8_cuda_profiler_synthetic.py": "304bfb6ae505fa57631f2840a7717b793567a03ccb2f561cc0ff4b2c3da55545",
+    "experiments/tennis/w8_cuda_system_leaves.py": "4cbca949843da0254644e666b6c6d86400fe37e22b316f921da3fc8715e0f970",
+    "experiments/tennis/w8_folder_oracle.py": "1db0c096065f4e5c710de02a99679cf81ad15738312b6d37572a7b0b91f378ee",
+    "experiments/tennis/w8_profiler_clock_oracle.py": "f8166c5d9db64ea41c28f18311dc6fecdc0af4f1ae77c10e2da147318dae2c39",
+    "experiments/tennis/w8_public_folder_materialize.py": "e127da6bffbf055b40a163b0026b50f9bb56e083c75ad017007d4145453b1fcc",
+    "experiments/tennis/w8_receiver_bootstrap.py": "3fb7f0b2ab33fdfa185f38c3bfe8f977540dc13cc10b8f0ccce0625c1de03e49"
+  },
+  "fleet_automatically_adds": [
+    "experiments/jobs",
+    "src/__init__.py"
+  ],
+  "normalized_spec_sha256": "8e6276d21bdb800f699dfed9ebfd52e9d2ee96a9aafccca41c1beda18ab35868",
+  "note": "Pending required root review of shared allocator-cap patch; archive SHA computed at submission, not yet published.",
+  "source_closure_test": "Same nine-file package closure imported under Python -I from separate local directory without checkout fallback; shared cap adds only stdlib math. Linux/CUDA execution not yet tested.",
+  "source_revision": "971ca13a9bf458f6503404a70768f9fb4aee83fa",
+  "spec_deadline_utc": "2026-11-05T13:17:00Z",
+  "spec_file_sha256": "3a3006a763e2d11122fc40da7aa40d44887f194c723a754729c0e4a11274a3d4"
+}

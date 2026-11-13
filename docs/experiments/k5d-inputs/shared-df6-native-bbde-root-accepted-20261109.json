@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "audited": true,
+  "passed": true,
+  "scope": "native CPU PID containment and accounting",
+  "gpu_used": false,
+  "consumer_execution_identity": {
+    "source_sha256": "ac77730dc24ce123fa7dac7f9e2d65003e25a11fdbded29b05f77be9bef1b15b",
+    "snapshot_sha256": "4477693bd025e633a8d14a4f8f303576e41df4cd23420c083cedd967113ce463",
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "job_id": "20261109T190423Z-bbde248b",
+  "all_owned_pids_absent": true,
+  "independent_cpu_match": true,
+  "cases": [
+    "normal",
+    "timeout",
+    "sigterm",
+    "sigkill"
+  ],
+  "namespace_wrapper_sha256": "62f9513b4058143eaa1bdb738d675842ed43c5b197dea658a93bde40e4ae0fa0",
+  "unshare_sha256": "9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6",
+  "root_accepted_audit_sha256": "3af7ece3b1755c6b9a968b6d0bf2b57af0046aeb001db01578333e3e1760284c",
+  "source_spec_sha256": "61e7e018757d01fda44a0342df2b4b57502fc628e26511fc633a06e1efd15f6a",
+  "native_tools": {
+    "SvtAv1EncApp": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+    "dav1d": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+    "ffmpeg": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2"
+  },
+  "native_stream_bytes": 29010,
+  "native_stream_sha256": "fd445f424549a3bfec7c4966f98f8b67252f64ab46ea1083f1551450beded494",
+  "decoded_sha256": "8178fcadb82e8abf3571fe6e88015512b55be76122eadb26a55bbe52c60840e5",
+  "observed_pid_count": 19,
+  "normal_outer_cpu_seconds": 2.462532,
+  "normal_inner_cpu_seconds": 2.342084,
+  "supervisor_lifetime_wall_upper": 60.9998779296875,
+  "inclusive_conservative_cpu_charge": 150,
+  "charge_basis": "Prior50prep +70roundedonecorelifetime61s +30independentaudit/admin; aggregateadministrativeCPUunmeasured. No duplicatedcumulativeCPUcounters. Unspent150of300leafreleasedinsideparent.",
+  "containment_scope": "All19observedhostPID/starttickidentitiesandcampaign/supervisorabsent; PID1namespace teardown coversunobserveddescendants, not anindividualcensus. Nativepath/bytesidentifiedbyretainednativeworkerreceipts+logs, no freshrootredecodeclaim.",
+  "not_qualified": [
+    "GPUallocatorbranch",
+    "sharedGPUparity",
+    "numericalquality",
+    "timing",
+    "scale",
+    "costforecast",
+    "full30study"
+  ]
+}

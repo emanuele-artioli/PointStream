@@ -1,0 +1,172 @@
+{
+  "CPU_precharge_retained": 65,
+  "GPU_seconds": 0,
+  "cache_manifest_sha256": "ef7091601fe1330ca820fef8a1f83ae53b216e63cc8d0640ca2719c63b7dbedb",
+  "cache_root": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/public-Python-config-recovery-20261113",
+  "config_sha256": "ae67091f3abfd17b9c414fe4485897ab063aadb7f541a8c96be0123a6c317e46",
+  "file_count": 26,
+  "files": [
+    {
+      "bytes": 1950,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/REVIEW.md",
+      "path": "REVIEW.md",
+      "sha256": "37c838e33be409264fef0546aa3b69cc032223b1bfc82bb10de4123c20a30134"
+    },
+    {
+      "bytes": 88,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/backend.json",
+      "path": "backend.json",
+      "sha256": "82c5617cd992adf60b9b16cf2d57469d58f119128dc6dbc3c159495890508f26"
+    },
+    {
+      "bytes": 4134,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/build_local.py",
+      "path": "build_local.py",
+      "sha256": "654bd20d9f7eac9554129810a4b27b296e6ab878a97ecb5351f57a67a2b53568"
+    },
+    {
+      "bytes": 7204015,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/config.json",
+      "path": "config.json",
+      "sha256": "ae67091f3abfd17b9c414fe4485897ab063aadb7f541a8c96be0123a6c317e46"
+    },
+    {
+      "bytes": 322,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/controller-748309fac8e542329a4efec98956d250/controller-receipt.json",
+      "path": "controller-748309fac8e542329a4efec98956d250/controller-receipt.json",
+      "sha256": "696f9a26ef29ef053d106f6389bfeac5d1bd64aed78bd7fbccce0c3624868548"
+    },
+    {
+      "bytes": 658,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/controller-748309fac8e542329a4efec98956d250/handle.json",
+      "path": "controller-748309fac8e542329a4efec98956d250/handle.json",
+      "sha256": "1847acbd9b82b7611e2de9aedb2b90ca44c6063631852b2e5ee993bd82a159b3"
+    },
+    {
+      "bytes": 517,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/controller-748309fac8e542329a4efec98956d250/stderr.log",
+      "path": "controller-748309fac8e542329a4efec98956d250/stderr.log",
+      "sha256": "b2f1d013016945d932b4ce90d50e522c23ec33dbd5d121e951c44757db7e23c7"
+    },
+    {
+      "bytes": 0,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/controller-748309fac8e542329a4efec98956d250/stdout.json",
+      "path": "controller-748309fac8e542329a4efec98956d250/stdout.json",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 1518,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/launch-spec.json",
+      "path": "launch-spec.json",
+      "sha256": "1a80cd27b05fc1c2a1da231238839bf6f5c77888e738731b2d3b2d52665ca149"
+    },
+    {
+      "bytes": 377059,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/public-python-runtime-metadata-bundle.tar.gz",
+      "path": "public-python-runtime-metadata-bundle.tar.gz",
+      "sha256": "3819ea63bffb2c620a73f935e55ce2dae0bf71b92269e14c1df7d9be6b89a62c"
+    },
+    {
+      "bytes": 3814,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/recovery-audit/audit-local.py",
+      "path": "recovery-audit/audit-local.py",
+      "sha256": "4b09cb65c8ed93514e172ad7162312c81c50216a29341debb6bc3c23bc95371e"
+    },
+    {
+      "bytes": 215,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/recovery-audit/handle.json",
+      "path": "recovery-audit/handle.json",
+      "sha256": "a7e057e2034a46967f1aec2204f02a5953cfee7d0d553d2e12f52040a4593785"
+    },
+    {
+      "bytes": 378,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/recovery-audit/intent.json",
+      "path": "recovery-audit/intent.json",
+      "sha256": "10f8177ef8d8c62c483603a29796b3d17f928612262a565c1543bdafd1cbf4ac"
+    },
+    {
+      "bytes": 33516895,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/recovery-audit/raw.json",
+      "path": "recovery-audit/raw.json",
+      "sha256": "f9f3a75d5f482ec4d436cefd55a36d214caf61eff05dfc2133692c7bc9deef1d"
+    },
+    {
+      "bytes": 4800,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/recovery-audit/remote.py",
+      "path": "recovery-audit/remote.py",
+      "sha256": "e89802f68953b1cdaf730a53a637ce0c3e1f30aca1e89891eddbc8261c847484"
+    },
+    {
+      "bytes": 2210,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/recovery-audit/run.py",
+      "path": "recovery-audit/run.py",
+      "sha256": "6e74e18f9766285e0f8cae54734f8b0dfc595e08fb2039561102c9ffbdd52ab7"
+    },
+    {
+      "bytes": 0,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/recovery-audit/stderr.log",
+      "path": "recovery-audit/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 2322,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/recovery-audit/summary.json",
+      "path": "recovery-audit/summary.json",
+      "sha256": "efd7ef87331bed504510a82c1c6b2f4f2f4e1864f0f6711d21efbb6032e914ff"
+    },
+    {
+      "bytes": 283,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/recovery-audit/transport.json",
+      "path": "recovery-audit/transport.json",
+      "sha256": "bafdd586fefa704659f73300a4449f268067b18b9024035442963818abc15954"
+    },
+    {
+      "bytes": 2270422,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/request.json",
+      "path": "request.json",
+      "sha256": "0428ae5eabd75b3dc25a69e7d761bc238b986b1098e343878092e22b3169ddce"
+    },
+    {
+      "bytes": 1359,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/review.json",
+      "path": "review.json",
+      "sha256": "a2290792e6d5f67f447ca84cda28a304bfb9a1820944df026a09ce4aebe45a6c"
+    },
+    {
+      "bytes": 812,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/root-recovery-acceptance.json",
+      "path": "root-recovery-acceptance.json",
+      "sha256": "19dbef957fda23f426182be98bdbee1fefdc0ddedb8c825b5ec8df6efbcc5f92"
+    },
+    {
+      "bytes": 907,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/root-release.json",
+      "path": "root-release.json",
+      "sha256": "d77c6748c037e7b0af78e19d9e175ea16b937fcb1c7750d9f51e72fca178775d"
+    },
+    {
+      "bytes": 3272,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/stage_controller.py",
+      "path": "stage_controller.py",
+      "sha256": "3ed1c6b51d33a9a58c1914b28e23bb1800418a52c31486679c6af5876e08e4dd"
+    },
+    {
+      "bytes": 8827,
+      "original": "/private/tmp/pointstream-public-python-runtime-repair-20261113/stage_remote.py",
+      "path": "stage_remote.py",
+      "sha256": "f1e6fe3ceea0e7c9843428f7198cffe494af116da61a1ca624945e42dcd6247b"
+    },
+    {
+      "bytes": 989177,
+      "original": "/private/tmp/pointstream-public-runtime-closure-design-20261113.json",
+      "path": "original-public-Python-category-design.json",
+      "sha256": "8d2443fb49387f5c22c41c2681babf2cf884267ec1ba732cfb4b8380f70089d2"
+    }
+  ],
+  "omitted_duplicate_decoded_files": "Recovery raw.json includes exact base64 originals; fetched-bytes duplicates are preserved at original location and reproducible offline using saved audit script",
+  "originals_unchanged": true,
+  "readonly_copies": true,
+  "schema": 1,
+  "scope": "Original metadata-helper failure after publication plus independent read-only physical config recovery; not source/receiver/CUDA/inference/quality qualification",
+  "total_bytes": 44395954
+}

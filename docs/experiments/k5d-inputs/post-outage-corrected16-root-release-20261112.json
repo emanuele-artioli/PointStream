@@ -1,0 +1,83 @@
+{
+  "recorded_utc": "2026-11-12T17:17:39.845950+00:00",
+  "scope": "ONE conditional new bounded queue for original corrected16 retained-receiver parity/lifecycle cost; old4d0d rootclosedexpiredunassigned. No48/292/586/full30/retry admission.",
+  "scientific_revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
+  "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
+  "archive_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+  "baseline_spec_sha256": "f9952779b23693f3ff626aa9fa87df651133609149d2aafe32a110702a927137",
+  "permitted_spec_changes": [
+    "deadline",
+    "deadline_epoch"
+  ],
+  "parent": "k5d-scale-first-tranche-20261105",
+  "future_GPU_seconds": 1000,
+  "future_CPU_seconds": 1200,
+  "external_CPU_included": 400,
+  "campaign_seconds": 800,
+  "namespace_seconds": 580,
+  "smoke_seconds": 600,
+  "validator_seconds": 30,
+  "noop_seconds": 5,
+  "GPU_post_seconds": 200,
+  "hosts": [
+    "gpu2",
+    "gpu3"
+  ],
+  "gpu_models": [
+    "RTX A6000"
+  ],
+  "local_storage_gib": 32,
+  "source_archive_required": true,
+  "packed_MAIN_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "gates": "Existing exact0bbCPU9445895e andH2bridgeb052 unchanged. Actualcorrected16 notyetexecuted. Passing fresh allconfiguredhostdoctor, source/archive/input/tool identities and verifiedlocalspace required. Failed/uncertain readiness stops before submission; no shared/contention/timing relaxation.",
+  "queue_deadline": "25minutes from rootrelease; solecanonicalwait2700covers queue+800campaign+200GPUpost within45min",
+  "capacity": "AllA6000busy at rootinspect; boundedqueue mayexpireunassigned.",
+  "accounting": "1200CPU/1000GPU nested inremaining2250CPU/7920GPU; no newreservation. Earlier50readinessCPUalreadychargedoutsidefuture. New400external includes readiness/source/submission/queue/audit; aggregateadminCPUuncertain, multi-hostdoctorCPU not bounded by commandwall.",
+  "generator_review": "17line temporary helper reviewed. Existing testfile is valid JSON; root normalized equivalent terminal newline to bytes([10]) without changing spec contents. No scientific source mutation.",
+  "actual_spec": "/private/tmp/pointstream-ball-partial-resume-20261112/spec.json",
+  "raw_spec_sha256": "4aec7ec9e87ed64cc2b7725f1f6b26c92c9efb441391401a1cfe9bcbd1cf3f96",
+  "spec_sha256": "6a3c357084045b1e37b1b8b85f9b1eca4ef28a667a2005599aca62a502f1ee18",
+  "deadline": "2026-11-12T17:52:06.008295+00:00",
+  "readiness": "Root verified fresh passingallhostdoctor, bothgpu2/3separate localdisks>82GiB, all17declaredpaths, exactCPUgate/H2bridge/consumerarchiveSHA andunshareSHA. Scientificsourceworktree rebuilt450d unchanged.",
+  "submission_state": "closedexpiredunassigned;rootaccepted,canonicaleventACK,no activewait/timer/furtherqueue",
+  "submit_tool_session": 69826,
+  "submit_client_pid_file": "/private/tmp/pointstream-ball-partial-resume-20261112/submit-client.pid",
+  "submit_stdout": "/private/tmp/pointstream-ball-partial-resume-20261112/submit.json",
+  "submit_stderr": "/private/tmp/pointstream-ball-partial-resume-20261112/submit.stderr",
+  "prepublication_failure": "Repeatedallconfiguredhostdoctor: gpu1 SSH timeout before allocation/preparation. Latestdefaultjobrecord stillNov10. CLIcode doctor precedes job_id construction.",
+  "partial_pool_amendment": {
+    "hosts": [
+      "gpu5",
+      "gpu2",
+      "gpu3"
+    ],
+    "operational_only": true,
+    "scope": "ONE next submission after partial participating pool passes unchanged sharedvisibility+atomic safety gates. Same scientificsource/hosts/params. Stop any failed/uncertain stage; never replay.",
+    "new_future_GPU": 1000,
+    "new_future_CPU": 1200,
+    "external_CPU_included": 400,
+    "nested_parent_remaining_CPU": 1850,
+    "global_config_unchanged": true
+  },
+  "isolated_state_dir": "/private/tmp/pointstream-ball-partial-client-20261112",
+  "partial_readiness": {
+    "passed": true,
+    "doctor_file": "/private/tmp/pointstream-ball-partial-client-20261112/doctor.json",
+    "doctor_SHA": "a0a2d0300e6f954b87633ee4b44ee2db40eba83d73e877176754d33255b3f88f",
+    "hosts": [
+      "gpu5",
+      "gpu2",
+      "gpu3"
+    ],
+    "atomic_one_winner": true,
+    "global_config_SHA": "e85e81d79cd0391d54a389714c40e9abb45c8fa94a63df5efe8093f199a74edb"
+  },
+  "job_id": "20261112T172806Z-8709406d",
+  "root_manifest_ACK": true,
+  "default_client_record_copied": true,
+  "global_configuration_unchanged": true,
+  "sole_wait_max_seconds": 2500,
+  "terminal_GPU_charge": 0,
+  "terminal_CPU_charge": 400,
+  "closeout": "docs/experiments/k5d-inputs/8709-recovery-root-closeout-20261112.json"
+}

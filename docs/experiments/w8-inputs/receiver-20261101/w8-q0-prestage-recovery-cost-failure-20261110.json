@@ -1,0 +1,56 @@
+{
+  "CPU_seconds_precharged": 100,
+  "GPU_seconds": 0,
+  "decision": "current 400s campaign/335s smoke 65s pre-stage slack fails; no GPU admission",
+  "launcher_usage": {
+    "exit_code": 1,
+    "self_cpu_seconds": 0.23823299999999997,
+    "ssh_cpu_seconds": 0.028795,
+    "wall_seconds": 69.384850083
+  },
+  "phase": "w8-context-q0-prestage-recovery-cost-oracle-20261110",
+  "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+  "raw_directory": "/private/tmp/pointstream-w8-q0-prestage-recovery-proposal-20261110-a1",
+  "raw_sha256": {
+    "handle.json": "a15540b373e765609cd116b5848727063804d04ab81e7eb88feb3c9dec65ddf9",
+    "intent.json": "c156cd6cdafb9d7614ea53e200951cca94e607dfb8540aeb9f0c8ad2be86e11c",
+    "payload.json": "6aff2481f3dfb90df414ea0311735bfaf14f6584a5cb8efe4aa037568bc1d4df",
+    "pid-check.json": "6a0d659461ec4c11b15b4bec1121b519e16e1d8155b9c8984efdd9df84aff11e",
+    "probe-v2.py": "ed7f584804caab3859e589fd20ed875b1c14b3dccb24e558f05d406420263113",
+    "recover.py": "4ddecde59a0db2b3a8910fe330310e796d795b23896c8b995a54edb2680ed167",
+    "run.py": "3151d435c2e9663aa96251946c3f12b81e65fab53db2bcd68dbe5e4b3ee5cbe2",
+    "stderr.txt": "34e31ce16438894ec6dc54f0218203a1a75c6a6d1ddfea0092d33ffb65a45900",
+    "stdout.json": "125f0285d2270e2136fd834628b4e6bcea805c592ee0df66dd06a11c34b85fe4",
+    "usage.json": "6ce141d976e5a2c01aa4bd362b86cde3d1bc2793ae9c3225b078da7d46b316cf"
+  },
+  "remote_pgid": 1404632,
+  "remote_pid": 1404632,
+  "remote_pid_absent": true,
+  "remote_start_ticks": 698624368,
+  "result": {
+    "affinity": [
+      0
+    ],
+    "cpu_seconds": 5.00654,
+    "pgid": 1404632,
+    "pid": 1404632,
+    "protected_content_read": false,
+    "scope": "pre-stage source identity and two real NFS input verifications only; no GPU/model",
+    "sections": [
+      {
+        "cpu_seconds": 0.18102200000000007,
+        "name": "source_identity",
+        "result": "1b8a2cf175f0b9541594628180addff9b204ccf7774a899c420189d9f83b21d8",
+        "wall_seconds": 0.1810753084719181
+      }
+    ],
+    "spec_sha256": "385beb2098c4f3fd0c67587359f4615e8bbffc0f0120eb1297f1876c6936a979",
+    "status": "failed",
+    "wall_seconds": 65.00732298847288
+  },
+  "schema": 1,
+  "scope": "bounded CPU-only real pre-stage cost oracle; no model/GPU/quality claim",
+  "source_archive_sha256": "e303cd2a796aaf51f8c22f9982b359cfd198cfd127e8b96e92a78f7de94c2a39",
+  "source_identity": "1b8a2cf175f0b9541594628180addff9b204ccf7774a899c420189d9f83b21d8",
+  "status": "failed 65 second pre-stage wall gate during first verify_inputs; second verification not started"
+}

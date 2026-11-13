@@ -1,0 +1,46 @@
+{
+  "ABI": 4,
+  "CPU_seconds_charged": 250,
+  "GPU_seconds_charged": 0,
+  "accepted": true,
+  "actual_denial_errno": "EACCES",
+  "actual_policy_sha256": "1be534c4cff9d4c419fce9371998825d6684f47de23e404ca7b17cb941f5283e",
+  "approved_gate_local_path": "/private/tmp/pointstream-gpu-policy-svt-audit-prep-20261112/root-approved-cpu-denial.json",
+  "approved_gate_remote_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-5cb4-gpu-witness-prep-cbab9f654c3245d0acdcec5382f74773/cpu-denial.json",
+  "approved_gate_sha256": "b4ffd1598873869373e0fc2f85416755993a2b7bd6c57d0ef3bc447a5756f9d5",
+  "campaign_group_supervisor_CPUclaim_absent": true,
+  "config_sha256": "d5fad31168e04c3eb41fb32a5b77602a1545167c2b27401455e2edc76f2b6610",
+  "frames": 16,
+  "host_births_absent": 4,
+  "job_id": "20261112T233107Z-030de220",
+  "namespace_CPU_seconds": 21.117482,
+  "pixel_and_native_hashes_match_original": true,
+  "policy_counts": {
+    "execute_files": 3,
+    "read_directories": 2824,
+    "read_files": 33138,
+    "system_leaves": 23
+  },
+  "profile_sha256": "339f60ffb29b84c405957a9cb0e3a02fb5c4312d6e23d7342e4d9f927c98534f",
+  "publication_bytes": 84029440,
+  "publication_seconds": 0.717,
+  "publication_sha256": "fe3e89a1bdfcb89406d3483333364b5e3cd6ce49fa1d7fd954bcf35ffb3effe6",
+  "real_protected_category_count": 5,
+  "root_recomputed_raw_artifact_hashes": 16,
+  "root_reran_frozen_receipt_verifier": true,
+  "runtime_inventory_sha256": "da41be6d9019f26e2b68bb11e29d9673a34180f15a626394f8ea2a0d355247c6",
+  "schema": 1,
+  "scope": "actual isolated SVT CPU packet receiver under exactGPU-capableprofile; notCUDA/DCVC/GPU/quality/scale",
+  "scope_limits": "No isolated per-rule timings, CUDA behavior, independent admin/GPU occupancy accounting or scale result; full phase charge retained.",
+  "size": [
+    1280,
+    720
+  ],
+  "smoke_wall_seconds": 25.55760359764099,
+  "source": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "b3b48bebfb2dc721ef70735a49364337dbdd3bdf584e788eca8289258b8a6b00",
+    "source_sha256": "06f5d9c7f1b51e1ec85567a6255d4c6d4055e086762d4d8fd987514376fb0928"
+  },
+  "streamed_physical_member_count": 12
+}

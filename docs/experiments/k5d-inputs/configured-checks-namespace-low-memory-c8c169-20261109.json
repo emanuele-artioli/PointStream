@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "revision": "c8c16929c7b8223b25fb70e1edd143a259d2a0ff",
+  "commands": [
+    "ruff check",
+    "mypy --config-file pyproject.toml",
+    "python -m pytest"
+  ],
+  "interpreter": "/private/tmp/pointstream-ci-pinned-20261105/bin/python",
+  "results": {
+    "ruff": "passed exit0",
+    "mypy": "passed exit0,563files",
+    "pytest": "passed exit0,2017passed39skipped121.93seconds"
+  },
+  "log_sha256": {
+    "ruff": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "mypy": "f553a39f5df8dde7298346f97ddc6e8be2f0a7089dd16d9f0f1f5b03b1077497",
+    "pytest": "3aceeb5a0d6ac217402c1221c8d282c0b192a543022d71424194622d5b7eeaa8"
+  },
+  "raw_directory": "/private/tmp/pointstream-root-checks-c8c169-20261109",
+  "prior_failed_checks_preserved": "/private/tmp/pointstream-root-checks-20261109-finalrepair;one staleW8mockfailurefixed; priorzshreadonlystatuswrapperfailure alsopreserved, didnotaffecttestbody"
+}

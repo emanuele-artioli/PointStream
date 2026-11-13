@@ -1,0 +1,190 @@
+{
+  "accounting_scope": "GPU hold includes final supervisor-birth to terminal.updated plus two postrelease CPU-claim-failure attempts; no pending queue charged. CPU aggregate not measured; ledger owned by root.",
+  "admission_attempts": [
+    {
+      "name": "28826bb4faa34aedb05265847d250abb",
+      "status.json": {
+        "data": {
+          "admission_rejected": true,
+          "emitted": [],
+          "error": "CPU claim failed: Requested 1 threads exceeds cap 1 on gpu5.itec.aau.at (currently allocated: 1/1)",
+          "gpu_sharing": {
+            "mode": "exclusive"
+          },
+          "last_progress": 1793927232.2196586,
+          "started": 1793927232.2196581,
+          "status": "failed"
+        },
+        "mtime": 1793927232.341413
+      },
+      "supervisor.json": {
+        "data": {
+          "pid": 3935836,
+          "proc_start_time": 1793927231.98
+        },
+        "mtime": 1793927232.2154114
+      }
+    },
+    {
+      "name": "61d45d1a2475449ca11b0a89a6c886b2",
+      "status.json": {
+        "data": {
+          "admission_rejected": true,
+          "emitted": [],
+          "error": "CPU claim failed: Requested 1 threads exceeds cap 1 on gpu5.itec.aau.at (currently allocated: 1/1)",
+          "gpu_sharing": {
+            "mode": "exclusive"
+          },
+          "last_progress": 1793927110.8699512,
+          "started": 1793927110.869951,
+          "status": "failed"
+        },
+        "mtime": 1793927111.013781
+      },
+      "supervisor.json": {
+        "data": {
+          "pid": 3932364,
+          "proc_start_time": 1793927110.62
+        },
+        "mtime": 1793927110.865779
+      }
+    },
+    {
+      "name": "6ea7d2eb76804846ae2ea00f54317aaf",
+      "status.json": {
+        "data": {
+          "admission_rejected": true,
+          "emitted": [],
+          "error": "GPU claim failed: Device GPU-7754164a-33cd-265c-3696-c20966d228fe on gpu5.itec.aau.at is already claimed",
+          "gpu_sharing": {
+            "mode": "exclusive"
+          },
+          "last_progress": 1793926988.8328197,
+          "started": 1793926988.8328195,
+          "status": "failed"
+        },
+        "mtime": 1793926988.9061384
+      },
+      "supervisor.json": {
+        "data": {
+          "pid": 3928746,
+          "proc_start_time": 1793926988.59
+        },
+        "mtime": 1793926988.8281374
+      }
+    }
+  ],
+  "all_equal_rate_contexts_outside_bracket": true,
+  "anchor_svt_crf48": {
+    "metrics": {
+      "crop_dists": 0.12333407253026962,
+      "crop_lpips": 0.0497497824835591,
+      "frame_psnr": 36.73532863390596,
+      "full_dists": 0.023005466908216476,
+      "full_lpips": 0.014703962206840514
+    },
+    "native_kbps": 862.215,
+    "wire_kbps": 863.235
+  },
+  "cleanup": {
+    "own_cpu_claim": false,
+    "own_gpu_claim": false,
+    "pid_exists": {
+      "3939221": false,
+      "3939246": false,
+      "3939485": false,
+      "3939628": false,
+      "3939709": false,
+      "3939959": false,
+      "3940306": false,
+      "3940958": false,
+      "3941097": false,
+      "3941168": false,
+      "3941477": false,
+      "3941794": false
+    }
+  },
+  "frames": 16,
+  "full_validator": {
+    "checks": {
+      "actual_bytes": true,
+      "artifacts": true,
+      "backend": true,
+      "baseline": true,
+      "baseline_recomputed": true,
+      "checkpoint_bytes": true,
+      "child_receipts_and_probe_order": true,
+      "current_code": true,
+      "ffmpeg_identity": true,
+      "fixed_sources": true,
+      "frames_and_qp": true,
+      "gate": true,
+      "input_checkpoint_identity": true,
+      "input_transform": true,
+      "metric_checkpoint_bytes": true,
+      "metric_source_identity": true,
+      "metric_sources_recomputed": true,
+      "model_coverage": true,
+      "native_schedule_and_isolation": true,
+      "native_timing": true,
+      "paired_comparison": true,
+      "parity": true,
+      "probe": true,
+      "protected_input_coverage": true,
+      "receiver_denials": true,
+      "score_rows": true,
+      "scorer_config": true,
+      "scorer_device": true,
+      "scorer_models": true,
+      "smoke_promotion_and_prefix": true,
+      "source_denied": true,
+      "source_members_and_floor": true
+    },
+    "passed": true
+  },
+  "full_validator_sha256": "31597a3de27906b36e4db74bb673600430357ec97f906721bf28bb1b25ad7166",
+  "gpu": {
+    "capability": [
+      8,
+      9
+    ],
+    "count": 1,
+    "model_first_parameters_on_cuda": true,
+    "name": "NVIDIA RTX 6000 Ada Generation",
+    "provider": "torch_cuda",
+    "uuid": "07aa7586-7116-8c7b-1e9c-e5dbdc74b162",
+    "visible": "GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162"
+  },
+  "job_id": "20261106T005107Z-0202f092",
+  "manifest_bytes": 2928,
+  "native_kbps": 964.71,
+  "peer_metric_means_recomputed": {
+    "crop_dists": 0.13311699777841568,
+    "crop_lpips": 0.05598921107593924,
+    "frame_psnr": 22.46040676211514,
+    "full_dists": 0.06763492897152901,
+    "full_lpips": 0.07821878645155166
+  },
+  "qp": 9,
+  "raw_result_path": "/private/tmp/gvc-0202-full-result-20261106.json",
+  "raw_score_path": "/private/tmp/gvc-0202-score-20261106.json",
+  "remote_audit_directory": "/local/users/emanuele/pointstream/audits/gvcrt-0202-full-audit-20261106",
+  "result_sha256": "e830160cc1e953c0af00a8f59368dbb0c73fc13ff071f051ead913e5d54a349c",
+  "schema": 1,
+  "scope": "16-frame fixed-QP9 peer; not a corpus claim or BD-rate",
+  "score_sha256": "5c652464910d6eb8058709037255e1994dcff7f6d5a7b5dadb36a756296e00ca",
+  "source": {
+    "git_head": "e6e0b530aebc84b1a73ef6200b7fc24db7f28c21",
+    "snapshot_sha256": "cde9046414f4412a92652b11c0c75ac7a4965e7843badb65a1f449b3368ae7ff",
+    "source_sha256": "a4f3b2d25a7d9c9d38b30761d1cb187fc9b63d60ccf33ba7972b106b95ba1558",
+    "spec_sha256": "ad5422963054df3d61d177fb6b02df2803070fb397516692e23701216afff052"
+  },
+  "source_archive_sha256": "cde9046414f4412a92652b11c0c75ac7a4965e7843badb65a1f449b3368ae7ff",
+  "spec_file_sha256": "2d444fe2a069425fc3e9914098ee89ffc856101c1b7743a046dc0b7a82c73c20",
+  "stream_bytes": 64314,
+  "supervisor_birth": 1793927353.7,
+  "terminal_status": "complete",
+  "terminal_updated": 1793927534.2410522,
+  "training_overlap": "unknown",
+  "wire_kbps": 1008.63
+}

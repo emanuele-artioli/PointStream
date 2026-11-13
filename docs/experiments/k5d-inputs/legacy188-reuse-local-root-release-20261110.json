@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "decision": "Release read-only saved-result reuse audit only; no rerun or proof promotion",
+  "phase": "k5d-legacy188-reuse-local-audit-20261110",
+  "parent_phase": "k5d-scale-first-tranche-20261105",
+  "GPU_ceiling": 0,
+  "CPU_ceiling_inclusive": 20,
+  "precharged_full_CPU_seconds": 20,
+  "scope": "LOCALexistingartifacts/sourcearchives only: determinewhetherwhole188framegame10Clip3 originaljob20261105T003756Z-cc450baf cancountonceinregisteredretrospective30. Verifyoldactualsourceb26e/c212/provenance/frame-label joins, complete6native/wirebyteledgers/2256metric4512judge rows, existing same-encoding-jobreceiver evidence andactualnonnumericalsourcechanges tocurrent0bb5. Newsource/schema/reportcontext maybeincompatible; donotforceadmission or rewriteoldidentity. No model/nativecodec/judgeinference,storedDCVCdecode,training,newdata,remotecommands orinputchanges.",
+  "output": "Conciseauditedcandidate_reuse_or_missing_prerequisites report, exactoldcode/input/model/tool/environment/GPU/native/wireartifactrefs, methoddifferences andcountoncecondition. Notnewclip/independenttest;sourceallselectionexposed188visible0absent,doesnotaddFPRcoverage. Freezeanalysiscriteria.",
+  "stops": "Missingactualsource/rawoutput/byte/provenancejoin orcost>20CPU stopsandrecordsunknown; newremoteartifactrecoveryneedsseparaterelease. No newfull30dispatch/credit/source-relabeling basedonlyonthisaudit."
+}

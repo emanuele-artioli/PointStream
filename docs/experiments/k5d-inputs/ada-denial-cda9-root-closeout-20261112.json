@@ -1,0 +1,50 @@
+{
+  "CPU_seconds_charged": 250,
+  "GPU_seconds_charged": 0,
+  "accounting": "Full prospective inclusive cap retained; not measured aggregate CPU",
+  "actual_child_stderr_unavailable": "current parent reads missing preexec before checking childreturncode/printing stderr; cannot diagnose root cause from this run",
+  "campaign_group_supervisor_CPUclaim_absent": true,
+  "config_sha256": "6117c197d49f00eccc6e738277274d800ab3a8c547fab73048711ea40b758d59",
+  "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "failed_scratch_retained": true,
+  "failure": "receiver process attempted reading native-preexec.json and got ENOENT; actual cause unproven",
+  "job_id": "20261112T230721Z-cda90430",
+  "native_observer_present": true,
+  "native_preexec_absent": true,
+  "next_test": "source diagnostics and exact READ_DIR import roots reviewed/frozen/tested; new source-bound CPU proof then new separately released oracle",
+  "owned_births_absent": [
+    {
+      "host_pid": 3576430,
+      "observed": null,
+      "source": "command:namespace_init",
+      "start_ticks": 558763658
+    },
+    {
+      "host_pid": 3576431,
+      "observed": null,
+      "source": "command:worker_host_identity",
+      "start_ticks": 558763661
+    },
+    {
+      "host_pid": 3576503,
+      "observed": null,
+      "source": "worker-observer.json",
+      "start_ticks": 558763885
+    },
+    {
+      "host_pid": 3576598,
+      "observed": null,
+      "source": "native-observer.json",
+      "start_ticks": 558763955
+    }
+  ],
+  "raw_evidence_sha256": "1c507613e217dc666e9e92f5cc5e67839d78e26f6b7cbf249ce000e4e4786511",
+  "root_recomputed_raw_artifacts": 13,
+  "schema": 1,
+  "scope": "failed CPU correctness gate; no filesystem/native/GPU/quality qualification",
+  "smoke_wall_seconds": 3.1766064167022705,
+  "snapshot_sha256": "aa06c0cff324e084cae01b3dccaf2eea8e987e3a32cd571677d148cadd285cc7",
+  "source_revision": "fbca94d6ad8b90ff564f896425dfca198be78c3f",
+  "source_sha256": "ebd37c62cd6c27be66ddfdf58547ee66ba14ff36f31380b8316a392f06e9d4c2",
+  "spec_sha256": "ce7cbfc9c13c79c6d77715d121080c9f9e906b7f3f4536ec4a4fc61e942ab816"
+}

@@ -1,0 +1,442 @@
+{
+  "recorded_utc": "2026-11-12T17:13:08.703681+00:00",
+  "decision": "Root accepts both expiredunassigned; canonical status, exact physical archives and canonical specs, absent execution trees/claims; owner identities match expiry workers. No scientific execution or numerical result.",
+  "ball": {
+    "job_id": "20261110T190907Z-4d0dd928",
+    "body_SHA_joins": [
+      "ready.json",
+      "spec.json",
+      "state.json"
+    ],
+    "spec_sha256": "f9952779b23693f3ff626aa9fa87df651133609149d2aafe32a110702a927137",
+    "archive_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+    "source_identity_basis": "Physical archive matches previously root-verified0bb source. Manifest source not re-expanded now; original submitted raw file not locally available.",
+    "charge_GPU": 0,
+    "charge_CPU": 400,
+    "terminal_event": "589b684cf7ee5e51a1af7117b5bbedf7",
+    "canonical_API_event_id": "1c6cf14d42475b7cb1ae4559f07c9e59"
+  },
+  "w8": {
+    "job_id": "20261110T183845Z-4c240783",
+    "body_SHA_joins": [
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261110T183845Z-4c240783/owner/identity.json",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261110T183845Z-4c240783/events/6dcc8c6f752f517cb7d2e651eabe8867.json",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261110T183845Z-4c240783/state.json",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261110T183845Z-4c240783/ready.json",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261110T183845Z-4c240783/spec.json",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/workers/gpu5/admission.json",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/workers/gpu5/error.json",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/workers/gpu5/heartbeat.json",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/workers/gpu5/worker-1791062701-69bfd82e.log",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/workers/gpu5/worker-1791065276-ede4d598.log",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/workers/gpu5/worker-1791232449-1c324fc7.log",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/workers/gpu5/worker-1791299445-2f8d9376.log",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/workers/gpu5/worker-1791567952-5afcf543.log",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/workers/gpu5/worker-1791574231-deab5bfa.log",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/workers/gpu5/worker-1791754131-53ef0361.log",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/workers/gpu5/worker-1793343259-1da88071.log",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/workers/gpu5/worker-1793369830-13d97c13.log",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/workers/gpu5/worker-1793517262-293678cc.log",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/workers/gpu5/worker-1793848742-ca7f59b8.log",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/workers/gpu5/worker.lock"
+    ],
+    "spec_sha256": "67e47969656e0ba9a46743bace615b8adad09296a1ef7ff17d953ced41f95392",
+    "archive_sha256": "f784c0919dc8f223253637684b71636063649831bc32b3ad23534e585322e84a",
+    "source_identity_basis": "Physical archive matches previously root-verifiedAECF source. Manifest source not re-expanded now; original submitted raw file not locally available.",
+    "charge_GPU": 0,
+    "charge_CPU": 150,
+    "true_qualification_preparation_CPU_after": 1450,
+    "terminal_event": "6dcc8c6f752f517cb7d2e651eabe8867",
+    "canonical_API_event_id": "3682fe3f7a8351a8bf57f40b31f04fc1"
+  },
+  "accounting": "Full external allowances conservatively charged; aggregate CPU unmeasured. W8 auditor per-command CPU maxima sum20 exceeded requested15 but stays within inclusive150; no proven15CPU aggregate claim. Queue wall is not CPU.",
+  "raw_files": [
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/ball-status.json",
+      "bytes": 282,
+      "sha256": "07cf4921c4c4fd12db39e155d754c24074ad18d5e99b6c1ef7a6a59ef7bf2835"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/ball-status.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/fleet-inspect.json",
+      "bytes": 14334,
+      "sha256": "215c8296dabba993e8dec922118f575270347e19f96d31719690edf564acef86"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/fleet-inspect.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/gpu1-storage-receipt.json",
+      "bytes": 240,
+      "sha256": "10420d55f3df321a66b5f657a5035b78404450e0e13c61be7cc2ff1c0b78a4a2"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/gpu1-storage.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/gpu1-storage.stdout",
+      "bytes": 1649,
+      "sha256": "bdda7b79e3b5b0f69a733c87fc51c03715a648b785c6b1646b6483345c75f966"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/gpu2-storage-receipt.json",
+      "bytes": 240,
+      "sha256": "dc504ef40a515f95f28c19f43a85b35497604de832b60d725dc25d1c39d0996d"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/gpu2-storage.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/gpu2-storage.stdout",
+      "bytes": 1622,
+      "sha256": "7a873a942ba534f961303a8fa602cc14459d2259b4df186ba44b53c51537c21a"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/gpu3-storage-receipt.json",
+      "bytes": 254,
+      "sha256": "b5da5c3fdf5218323383a1fcd44159d1d2e6a07349ceb1c4eb3d2e46e9217d4c"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/gpu3-storage.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/gpu3-storage.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/gpu4-storage-receipt.json",
+      "bytes": 240,
+      "sha256": "10ab1ef008a3c9490616fb78f51174fd6ac01859d3d4e35833ea600cb8955d90"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/gpu4-storage.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/gpu4-storage.stdout",
+      "bytes": 1650,
+      "sha256": "b284a2935b9bf13473beb2715409f7165b4d8e8eb766facbd2aa5f474ff9803f"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/gpu5-storage-receipt.json",
+      "bytes": 240,
+      "sha256": "cfb17fccc9c569c7505d7f5548979d7e7968d8d609d52ad7c2c8e72ffae4383c"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/gpu5-storage.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/gpu5-storage.stdout",
+      "bytes": 1641,
+      "sha256": "d905d8768b64f18faecb71e006167516ab8acf008c88400847df647c688c45cc"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/gpu6-storage-receipt.json",
+      "bytes": 240,
+      "sha256": "1d8483a513c99067c3cc1fc31f197a99cb3b094ced9495800f44a5545fd6b94c"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/gpu6-storage.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/gpu6-storage.stdout",
+      "bytes": 1652,
+      "sha256": "05af78610da948cf215d9e14f3185426745f6c52d47b2c8adacbc76a0c022c69"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/root-closeout.py",
+      "bytes": 6487,
+      "sha256": "dc5d2e0fd8a3d3b80ff09b2847875b9fff00e979d639af804c712643c4bb89bb"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/storage-intent.json",
+      "bytes": 642,
+      "sha256": "ea014871a0c6444fb3d96a1b8f169545a5b18815df937b313f3c2b278390f828"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/storage-probe.py",
+      "bytes": 2644,
+      "sha256": "1fcf16c95273064402712926a0e6e59a5924a1d19109361d6bf381cf6bf4afb3"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/w8-status.json",
+      "bytes": 282,
+      "sha256": "005cf49ad583acf66d7e3356b384f1af4bca64e127fc8b9fe3aefcf6da27d700"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/w8-status.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/workers-status.json",
+      "bytes": 1623,
+      "sha256": "274fd45689e20e76b22e02495b6fd2e565caf057557da8d50edb555e4fe4368a"
+    },
+    {
+      "scope": "root",
+      "path": "/private/tmp/pointstream-recovery-20261112/workers-status.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "ball",
+      "path": "/private/tmp/pointstream-ball-recovery-20261112/claims.err",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "ball",
+      "path": "/private/tmp/pointstream-ball-recovery-20261112/claims.py",
+      "bytes": 596,
+      "sha256": "32f415bacb8f0c3bdfafff1366dc7f2fbc78df7e0ee2ce282905f7e1a287d166"
+    },
+    {
+      "scope": "ball",
+      "path": "/private/tmp/pointstream-ball-recovery-20261112/claims.txt",
+      "bytes": 558,
+      "sha256": "1c8669eba307f75bc2efd18c676b7268fcab4aec992681d40a75e80bf12ed35b"
+    },
+    {
+      "scope": "ball",
+      "path": "/private/tmp/pointstream-ball-recovery-20261112/gpu5-inspect.err",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "ball",
+      "path": "/private/tmp/pointstream-ball-recovery-20261112/gpu5-inspect.json",
+      "bytes": 15733,
+      "sha256": "60249d1b54b9b636c0ac03036bcebc22f21fd0039cc86138b2febf4f52e28b92"
+    },
+    {
+      "scope": "ball",
+      "path": "/private/tmp/pointstream-ball-recovery-20261112/inspect.err",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "ball",
+      "path": "/private/tmp/pointstream-ball-recovery-20261112/inspect.json",
+      "bytes": 31,
+      "sha256": "5d5ee0958596de73fc613fcbe58f5b8a333b257df316dd90be76ba667d1c741a"
+    },
+    {
+      "scope": "ball",
+      "path": "/private/tmp/pointstream-ball-recovery-20261112/inspect.py",
+      "bytes": 914,
+      "sha256": "47d059f8a7eeab5b181ccd2d8ed82d050f73b3df05c5b813e266c829e5a39d44"
+    },
+    {
+      "scope": "ball",
+      "path": "/private/tmp/pointstream-ball-recovery-20261112/inspect2.err",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "ball",
+      "path": "/private/tmp/pointstream-ball-recovery-20261112/inspect2.json",
+      "bytes": 15732,
+      "sha256": "fb1f801c2a507b45e8161ecfda27f932f88d8beb362320d9521f10fdc6183fa9"
+    },
+    {
+      "scope": "ball",
+      "path": "/private/tmp/pointstream-ball-recovery-20261112/inspect2.py",
+      "bytes": 774,
+      "sha256": "fa313a2a821beadfcf21052812167cd51184840cb20391154820ce6f552fa90f"
+    },
+    {
+      "scope": "ball",
+      "path": "/private/tmp/pointstream-ball-recovery-20261112/joins.err",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "ball",
+      "path": "/private/tmp/pointstream-ball-recovery-20261112/joins.py",
+      "bytes": 794,
+      "sha256": "77bf73526fe323434a564ec25d1eaa69e475f757a4dbb427896b59d48f2099e1"
+    },
+    {
+      "scope": "ball",
+      "path": "/private/tmp/pointstream-ball-recovery-20261112/joins.txt",
+      "bytes": 1261,
+      "sha256": "2e1513eb79f5db7114f2f86da1f4a278768570321fd33f96c32245dd17cfdf4c"
+    },
+    {
+      "scope": "ball",
+      "path": "/private/tmp/pointstream-ball-recovery-20261112/tree.err",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "ball",
+      "path": "/private/tmp/pointstream-ball-recovery-20261112/tree.json",
+      "bytes": 207,
+      "sha256": "3eea5f28f716dc0276575f251d2f2af4628f2e24c57b34fc2416e0d231ee0b7e"
+    },
+    {
+      "scope": "w8",
+      "path": "/private/tmp/pointstream-w8-recovery-20261112/claims-result.json",
+      "bytes": 48,
+      "sha256": "08aacfee2dc1029e0769bf06b45b96fa7e46a62401f80c0e35504e193976ee20"
+    },
+    {
+      "scope": "w8",
+      "path": "/private/tmp/pointstream-w8-recovery-20261112/claims.py",
+      "bytes": 975,
+      "sha256": "4683b9c6e642772f064db013b4138696b867f1bd7d4cdf9b018b2790dfe1a68f"
+    },
+    {
+      "scope": "w8",
+      "path": "/private/tmp/pointstream-w8-recovery-20261112/claims.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "w8",
+      "path": "/private/tmp/pointstream-w8-recovery-20261112/claims.stdout",
+      "bytes": 5489,
+      "sha256": "375bbf8c743b64b811af031906f308078fab8b09efeda500fd542938e802730d"
+    },
+    {
+      "scope": "w8",
+      "path": "/private/tmp/pointstream-w8-recovery-20261112/detail-result.json",
+      "bytes": 48,
+      "sha256": "9b8c218773f38cda61aa2ab544254a977fd43f3d81a5542fd3b154ae0b84d3a8"
+    },
+    {
+      "scope": "w8",
+      "path": "/private/tmp/pointstream-w8-recovery-20261112/detail.py",
+      "bytes": 1201,
+      "sha256": "bbf05d11c227d93b7bf6655f6b63c95b615fe4f5f0ec0b03b8ff99016a9bce56"
+    },
+    {
+      "scope": "w8",
+      "path": "/private/tmp/pointstream-w8-recovery-20261112/detail.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "w8",
+      "path": "/private/tmp/pointstream-w8-recovery-20261112/detail.stdout",
+      "bytes": 8700,
+      "sha256": "b387f790e14f1115dd53c0d29e5ea45dad6f7f774431e70b360082b149198245"
+    },
+    {
+      "scope": "w8",
+      "path": "/private/tmp/pointstream-w8-recovery-20261112/device-result.json",
+      "bytes": 47,
+      "sha256": "43664c6c8798ad6b3cb9a5760ca1ebcd066f78d410442da674160a1bb76096b2"
+    },
+    {
+      "scope": "w8",
+      "path": "/private/tmp/pointstream-w8-recovery-20261112/device.py",
+      "bytes": 766,
+      "sha256": "e400cbbfdd3e6ac88c125867b046eb12c1f38320cbc2ee2d7c08011d43cfb04f"
+    },
+    {
+      "scope": "w8",
+      "path": "/private/tmp/pointstream-w8-recovery-20261112/device.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "w8",
+      "path": "/private/tmp/pointstream-w8-recovery-20261112/device.stdout",
+      "bytes": 599,
+      "sha256": "25611c0f0ede31f4815ecd7e07b606a5490e9f873d9806578a70212d6fc1b0b3"
+    },
+    {
+      "scope": "w8",
+      "path": "/private/tmp/pointstream-w8-recovery-20261112/probe-result.json",
+      "bytes": 52,
+      "sha256": "9e8caafdbb5a6359a1a9c8a38109e2fdce5fdfe33147e7161a0f8ddf8e3167f6"
+    },
+    {
+      "scope": "w8",
+      "path": "/private/tmp/pointstream-w8-recovery-20261112/probe.py",
+      "bytes": 1070,
+      "sha256": "248e900eeb52f70839e43bc80fd80887095f55f92bf3c17608c09429d22c50b8"
+    },
+    {
+      "scope": "w8",
+      "path": "/private/tmp/pointstream-w8-recovery-20261112/probe.stderr",
+      "bytes": 96,
+      "sha256": "d7f754b002683e35d7e62a89ba5fc79b9ffe49b4950f35b28ee2a4f997847cfd"
+    },
+    {
+      "scope": "w8",
+      "path": "/private/tmp/pointstream-w8-recovery-20261112/probe.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "w8",
+      "path": "/private/tmp/pointstream-w8-recovery-20261112/probe2-result.json",
+      "bytes": 48,
+      "sha256": "fd0e6e9a63e120a5c2fa9fd9f3e0ca71307b2bd5e2f5da373be8d93ba0085487"
+    },
+    {
+      "scope": "w8",
+      "path": "/private/tmp/pointstream-w8-recovery-20261112/probe2.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "w8",
+      "path": "/private/tmp/pointstream-w8-recovery-20261112/probe2.stdout",
+      "bytes": 18362,
+      "sha256": "30cff4d9ce6ecc5154abfe92e1f1fd855afa2a9658d05d4251ce74b374facf38"
+    }
+  ],
+  "uncertainty": "Historical read-only probes and some gpu3 reads lack proven remote teardown; no signals or cleanup. No unknown GPU job remains among these two.",
+  "terminal_events_acknowledged": true,
+  "canonical_event_acknowledgement_note": "EarlierACKused physicalworker eventIDs; manager normalizes terminal UUIDs. On final8709closeout root independently computed andACKed canonicalIDs for these two, too. No event/state conflict; bothlocalmarkers preserved."
+}

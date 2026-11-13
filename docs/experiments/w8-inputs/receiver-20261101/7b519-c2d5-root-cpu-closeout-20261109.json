@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "job_id": "20261109T223214Z-c2d5c561",
+  "root_checks": "68physical member hashes, source/bootstrap/input/policy/executing origin, packet480/480+14, lifecycle flags, 3direct+3composite proof references,20observedbirths/group/claims joined",
+  "publication_sha256": "6cfaf340be432526cf4891ff3bc5cce35b579d072d9eca14752c1ecfbf77d2a2",
+  "candidate_gate_sha256": "457c71ee45e641c0fad505d824ea3290212fdeffecbcba5b854f564b02c3c9f0",
+  "raw_archive_bytes": 57640960,
+  "CPU_only": true,
+  "no_GPU_or_quality_qualification": true,
+  "decision": "Root accepts CPU infrastructure proof with explicit MAIN controller scope; not a usable JCV GPU admission gate",
+  "proof_environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "inference_limit": "Strict JCV subordinate leaf runtime follows actual pinned code/config; its receipt lacks executable/prefix/version attestation. No execution of JCV outer generation controller or CUDA is established. Old schema1 environment identity conflates proof and generation roles and cannot admit current JCV stage.",
+  "source_revision": "7b519d3e448135842fbd33e7007fffd1ea167a0f",
+  "source_sha256": "e0278d99b99c97179d808907476dd9b21bd69d47b800241542c6c1a6e0e27835",
+  "snapshot_sha256": "d747b15f47dbddb72a94f4cf225338bd5cac0810a002d642e45227a80d69e8ba",
+  "CPU_charge_additional": 130,
+  "CPU_charge_inclusive": 160,
+  "GPU_charge": 0,
+  "CPU_basis": "110rounded created-to-canonicalterminal106.632s upper includingqueue on singlecore plus20bounded audit/admin;30sourceprep already charged. Partial counters remain partial; allocation is not measured aggregate.",
+  "TERM_scope": "TERM requested with recorded KILL escalation, not TERM-only success.",
+  "teardown": "20recorded PIDbirths absent, campaign and4detached groups empty, zero unreadable records, own CPUclaim absent",
+  "raw_sha256": {
+    "publication-audit.json": "a603653d951630bd78f3ae7a8831516f115da55a983f459fb99322babec041d7",
+    "teardown-audit.json": "aa2a8d101b889748e7716de659555348ba82a5b7ab4b6ee9d28cd8579b18753e",
+    "candidate-independent-audit-index.json": "b0027c20235544990d5c1986db69392215a04da9f35d319a5c060d2f218d9e73",
+    "candidate-strict-main-jcv-index.json": "e2238dd6e1466ff003a1b6a139186ffc1398fa197e3e5eb7484c68cc875cfd6d",
+    "candidate-native-timeout-kill-index.json": "ac73be45460362018e9070a30008c1a6cae7301b72113f19dab2cbb67d64f7f9",
+    "local-deep-audit.json": "5369feb85c9ac4a11d71e0fbf2df5ca80cb86d5d76da4dbb8c9798fb6defc56b"
+  },
+  "root_audit_script_sha256": "d8a52633b1a9587f427e3a06cfcbce6ed144202ea90c72b6578c84598244c93f",
+  "next_step": "Explicit runtime-role schema and real strict-leaf executable attestation, source review then separately released fresh-source CPU proof. No GPU or old-envelope relabeling."
+}

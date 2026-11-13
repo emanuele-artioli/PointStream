@@ -1,0 +1,148 @@
+{
+  "schema": 1,
+  "audited": false,
+  "passed": true,
+  "status": "independent agent audit; primary review and final budget reconciliation pending",
+  "scope": "native CPU PID containment and accounting",
+  "job_id": "20261106T005828Z-fdb5ed8f",
+  "consumer_execution_identity": {
+    "source_sha256": "46c23588ba8cdafe305604645099691622c43b8e8438fe3e3a721b8aeb30c688",
+    "snapshot_sha256": "4bf9f93c6c3eb038efc3617697db2c3383ca5ec42521dd306ddef3be443c3e46",
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "namespace_wrapper_sha256": "9e68ec7e229f8cccf77c53eed5f561912b6caaf73149c00181205a8242412477",
+  "unshare_sha256": "9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6",
+  "gpu_used": false,
+  "cases": [
+    "normal",
+    "timeout",
+    "sigterm",
+    "sigkill"
+  ],
+  "case_results": [
+    {
+      "case": "normal",
+      "returncode": 0,
+      "escalated_to_sigkill": false,
+      "outer_waited_cpu_seconds": 2.363826,
+      "members_absent": true
+    },
+    {
+      "case": "timeout",
+      "returncode": 1,
+      "escalated_to_sigkill": false,
+      "outer_waited_cpu_seconds": 0.5811649999999999,
+      "members_absent": true
+    },
+    {
+      "case": "sigterm",
+      "returncode": -9,
+      "escalated_to_sigkill": true,
+      "outer_waited_cpu_seconds": 0.103491,
+      "members_absent": true
+    },
+    {
+      "case": "sigkill",
+      "returncode": -9,
+      "escalated_to_sigkill": false,
+      "outer_waited_cpu_seconds": 0.06725499999999984,
+      "members_absent": true
+    }
+  ],
+  "all_owned_pids_absent": true,
+  "observed_distinct_pid_count": 19,
+  "independent_cpu_match": true,
+  "normal_outer_cpu_seconds": 2.363826,
+  "normal_pid1_plus_children_cpu_seconds": 2.240979,
+  "smoke_command_wall_seconds": 21.935786485671997,
+  "full_noop_command_wall_seconds": 0.0694575309753418,
+  "smoke_gpu": null,
+  "supervisor": {
+    "pid": 3290165,
+    "proc_start_time": 1793926741.19
+  },
+  "campaign_status": {
+    "status": "complete",
+    "started": 1793926741.6910295,
+    "last_progress": 1793926803.030622,
+    "emitted": [
+      "terminal:complete"
+    ],
+    "pid": 3290166,
+    "proc_start_time": 1793926741.34,
+    "process_group_id": 3290166,
+    "progress": {
+      "stage": "full",
+      "completed": 1,
+      "updated": 1793926798.0012255,
+      "decision": null
+    },
+    "exit_code": 0,
+    "ended": 1793926803.030622
+  },
+  "cpu_affinity_index": 0,
+  "selected_cpus": [
+    0
+  ],
+  "actual_source_archive_sha256": "4bf9f93c6c3eb038efc3617697db2c3383ca5ec42521dd306ddef3be443c3e46",
+  "artifact_sha256": {
+    "ready.json": "d04cb7a6efed869938dc12fc62c8127a8233d2c8a68c349581bf13271ec191b5",
+    "spec.json": "89a35771716d67a32c94f0e0a9ce2981e7f88be2050ee9909910981e7a8a76b9",
+    "state.json": "5ed353a96c25804b57d4c62232750db7e12c6e821f5fbf7027535f834665530b",
+    "environment.json": "cb77db6c487c105e59ce2a7a6dde815c73b0f887681615193e0145ac3b1656bd",
+    "gate.json": "ac246a0160c9eff280d6e5f88c0b74fa5e9c3fd9f5ca6310a0bbfe6aa644f3c0",
+    "validation.json": "489be969f6cdae68aae00206101c32d9d07fd7cd4ce525e876c1902df50a2468",
+    "smoke/dispatch.json": "1e28f1e01c52ff84f33c2f6ef8a963e2d437666ae6bb6adf41243478a0a9bc18",
+    "smoke/execution.json": "de1926c6df96f71b3662a2d0a782e50c0817fafc4d11c95dba5ceb1a64292408",
+    "smoke/staging.json": "76d6c07732c022898a047a7131e286beb02971328e5b43594129ae656e7868d2",
+    "smoke/published.tar": "b6114b0ae50992705c8bfaee73820b6645e964aed6bd2dddc076d78f4d9dd3ef",
+    "full/dispatch.json": "c8a8baaac4e04023e135a3889642c39974f4dd86c6e339bb97a3a91d9e80bdcb",
+    "full/execution.json": "b516ff0691452de79a2948a422f5dfb00e947f20ddbf9c8e1a2cfaa4a7dcfab5",
+    "full/staging.json": "ae4c65eadd2a29c54bccd14c0c941ed82d746f396e00083947ebcbbdeaef30d6",
+    "full/published.tar": "476ae38377275d613e71489997ad925efc0aa0d76feef45e4c6f3d32fea0415a",
+    "run/status.json": "115a16a079ac81dd9d1837f1ccb132d8dda2ce9f943bfe60c951d48b196e57ff",
+    "run/supervisor.json": "7d8376ae955a21532667dc94e8e9dfdc1cd7b442f3c59b15bcb793c4f715c576",
+    "run/cpu-affinity.json": "46bcea43a67cd4b9d72e02bc941846a498288ecb618e666ce24d2728333bdec3",
+    "run/claim.json": "cd9bf65d1334598c9a2d822c103abc82e5c1036eb42e85282731c0c568327c88",
+    "run/request.json": "1497f61b90f215baa16331cd00990b3fc0fadaba5bfd088e6af4e25eeb6fd55c"
+  },
+  "raw_local_path": "/private/tmp/pointstream-k5d-fdb5-independent-raw-20261106.json",
+  "raw_sha256": "da3678b6a6c132b073c34efa9d0169955dfe258f2243e23af373fba0efbe0229",
+  "process_check_sha256": "afeefba3a036cba109f9ec93912e4d11235d478132eafa20fd5f0cd0a066ab99",
+  "charge_caveat": "100-second campaign is not a verified whole-lifecycle CPU upper bound; post-campaign publication/cleanup and external administration are not completely metered; final conservative charge is owned by root",
+  "limits": "actual two-frame native and observed process teardown only; no GPU parity, source-hidden or file-denial claim",
+  "run_request_local_path": "/private/tmp/pointstream-k5d-fdb5-run-request-20261106.json",
+  "supervisor_affinity_evidence": {
+    "request_cpu_affinity_index": 0,
+    "request_cpu_threads": 1,
+    "actual_selected_cpus": [
+      0
+    ],
+    "smoke_dispatch_cpus": [
+      0
+    ],
+    "full_dispatch_cpus": [
+      0
+    ],
+    "supervisor_kernel_birth_epoch": 1793926741.19,
+    "campaign_kernel_birth_epoch": 1793926741.34,
+    "campaign_status_start_epoch": 1793926741.6910295,
+    "campaign_status_end_epoch": 1793926803.030622,
+    "canonical_terminal_updated_epoch": 1793926861.8876576,
+    "supervisor_birth_to_terminal_seconds": 120.697658,
+    "scope": "supervisor affinity and stage bindings observed; no independent aggregate CPU meter covers all manager/publication/administrative processes"
+  },
+  "budget_decision": {
+    "prior_capability_cpu_seconds": 40,
+    "source_preparation_cpu_seconds": 50,
+    "supervisor_lifecycle_conservative_cpu_seconds": 130,
+    "independent_audit_cpu_seconds": 30,
+    "inclusive_total_cpu_seconds": 250,
+    "gpu_seconds": 0,
+    "status": "root authorized within existing first tranche; root owns ledger closure",
+    "prior_220_cpu": "historical prospective forecast, not a measured lifecycle bound"
+  },
+  "events_acknowledged": [
+    "f4b93d1363355f609667bb5823902a75"
+  ]
+}

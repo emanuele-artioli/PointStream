@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "decision": "Release ONE fourth bounded A6000 window; corrected16 context still never executed",
+  "previous_job": "20261110T143544Z-6e96d868",
+  "previous_expiry_audit_sha256": "e923bf06b988c3710ad91d1e36acd02635a4f944ab3c441d759ab84eadc2af31",
+  "previous_GPU": 0,
+  "previous_CPU": 400,
+  "revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
+  "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+  "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
+  "source_archive_required": true,
+  "native_CPU_gate_sha256": "9445895e80c29d26c305134a3551347a2b4393a07d3985599768edf937ecb687",
+  "bridge_sha256": "b052efdf6cdaea51bc9f19ac141b3c56cf4caec96c3e9f9ae25d6df37d965782",
+  "future_caps": {
+    "GPU": 1000,
+    "CPU": 1200,
+    "campaign": 800,
+    "namespace": 580,
+    "smoke": 600,
+    "validator": 30,
+    "noop": 5,
+    "GPU_post": 200,
+    "external_CPU": 400,
+    "final_metadata_within_external_CPU": 10
+  },
+  "family": "Threecorrectedwindows400+400+400=1200CPU/0GPUclosed. New1200future gives2400CPUmaxfamily insideunchangedBallparent4340CPU/7920GPUremaining. No modelretry/global/workstreamincrease.",
+  "spec_recipe": "Sameexact0bb5/450d/21cd/gate9445/bridgeb052 and numerical/IO/settings/hostsA6000gpu2gpu3 as6e96canonical789c0a35; onlyUNSUBMITTEDfreshdeadline<=43min differs. Preserveold/newversions/rawcanonicalSHA. NewCLIENTroot420c78a3 mayrunsubmit with --source-worktree /private/tmp/pointstream-k5d-same-job-receiver, keepingfrozenworkloadsource0bb5 andexpectedarchive450d. Do notuseclientHEADasscientificsource.",
+  "prepublication": "Freshknownjobs/allfixedeligiblehosts/CPUclaims/sourcegatebridge/toolcache/localSSDspace/publicstat-firstmetadata inside10CPU ofexternal400. FreshCLIrequiredallhostdoctorusesreviewed/locallytestedlocalstdlibPython; allpinnedworkloadenvironment/tool/dataview checksstillmandatory, no bypass/fallback/workerrestart. No redundantstandalonedoctor ifCLIwillperformit. All7qualifiedGPUscomputepresentatsnapshot15:19; pendingqueuesstillallowed,exclusiveadmissionrequired. Stopifactualsourcearchive/specchanges. Preserveeverything,noGPUprocessownershipinference/signals.",
+  "forecast": "Unchangedconditionalcampaign742.793+57.207retainedIO/errorallowance=800;actualnewretentioncostunmeasured. Namespace580 separate. No48/292/586/full30,exclusivetimingorcorpusclaim.",
+  "monitoring": "SubmitONCE recordID/source/actualrawcanonicalSHA/deadline/caps/outputimmediatelythenrootcentralACKbeforeONEcanonicalwait<=2700coversdeadline+sweep. Unknownrequestsinspectneverreplay. No automaticfifthwindow/modelretry/48/292/full30."
+}

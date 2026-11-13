@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "decision": "release_bounded_f6_source_preparation_only",
+  "date": "2026-11-09",
+  "revision": "f6d2d8437aaf16c7e866e8ea846cc769e09dd922",
+  "snapshot_sha256": "e6527d02582402b637bf34f31ce5b661bef9b7e900d062ee77b78fc08e97f84c",
+  "source_sha256": "269820305152e06bd7e2421e821acf9a63895f3487fbc53327e0870c2d73d7e2",
+  "bootstrap_sha256": "01f3fed31b45dbcaab880269f87d0578dcfcab960ee5a15fbcdcd790cec2dd5f",
+  "input_job_sha256": "7a0685ba0cc7405e1833d05075d4d591723da178b1afe71da31e5e95d6e85113",
+  "source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-f6d2-20261109/source.tar",
+  "archive_bytes": 20776960,
+  "parent_phase": "w8-full-witness-staged-20261106",
+  "witness_qualification": false,
+  "cpu_ceiling_preparation_total_future": 30,
+  "source_preparation_subcap": 20,
+  "publication_reserved_not_released": 10,
+  "gpu_seconds": 0,
+  "source_review": "Rootindependentlymatchedall1667Gitblobs+physicalsourcearchiveandbothrepairedmemberSHAs; realmake_spec+index0 equalsdraft. Fullconfiguredchecks2011passed39skip/Ruff/mypy561, independentcallpathandclosurebridge reviewed.",
+  "conditions": [
+    "readonlyfreshknownjobs/claims/worker/runtimecache/native/tool/storage/currentpublicpaths metadata beforeanypubliccontentreads",
+    "all5protectedcategoriesstatonly; no privatecontentopen/read/hash; trustedcooperativefixed-inputscope",
+    "oneexactnewpublicsourcearchive transferunderownnewcanonicalcacheparent O_EXCL/NOFOLLOW/noclobber/fsync,nooverwrite/no replay; preserveoldff6source/evidence",
+    "unchangednativecd6/publicpacket/oracle/profile/identity/guider not reuploaded; verifycurrentstablemetadata/reuseauthenticated priorhash scope explicitly",
+    "newsourceposttransferstat/inodechecks againstprotected beforepublicSHA; bothgpu2controllerandgpu5worker perhostbaselines; do notcompareNFSdeviceIDsacrosshosts",
+    "recordcompressed+uncompressedhash/commands/PID/host/source/self+waitedCPU/limits,2processdomainsnotdoublecounted; totalprep<=30includesreservedpub10",
+    "fixedsmallwork canuseprioractual0.24CPUupload/0.16CPUpostchecks/0.42CPUcompression asforecastwithamplemargins; caps+remainingchecksstopbeforeoverrun; maxsegment45min",
+    "prepareactualnewCPUproofspecbothsourcehashfields+index0/Main32e/nativecd6/freshdeadline<=45min, recordlogicaldigestandraw+normalizedfileSHA distinctly",
+    "no fleetrequest, GPU, producercandidate or CPUgateapproval; rootreviewssourceprep/actualspec/costbeforereplacementrelease",
+    "900cumulativeCPUproofinsideparent=120failed+780future, notextraallocation/reservation; oldfailedsourcepreserved"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "CPU_approval_NFS": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-final-Ada-real-CPU-5bdc119c009440c29866617a96306c28/real-CPU-denial.json",
+  "CPU_approval_sha256": "85a52c4abaa369f515f081ffefa784740b555663e160e6659eac376e67ddb5f0",
+  "bytes": 28778067,
+  "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/final-Ada-actual-CPU-denial-20261113",
+  "cache_preparation_CPU_seconds": 0.14071499999999998,
+  "cache_preparation_wall_seconds": 0.10029199999553384,
+  "claim": "Actual normal SVT16frame/fiveerrno13 and initial launcher-kill scoped teardown ONLY; CURRENT cleanup only. No GPU/CUDA/native-active/unshare-only/fleet-watchdog/scale proof. Future new-source bootstrap and actual GPU qualification remain mandatory.",
+  "files": 30,
+  "identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "ad635b0b46428a3fa934081ded5d2b408c453bc5f7e46854dd8b8eb0c6abbea9",
+    "source_sha256": "9d3d7b2c6ec0fd99466ae3592345795a4916e982fdee3924a9749b83a81b39da"
+  },
+  "job_id": "20261113T061438Z-c53fb111",
+  "manifest_bytes": 9353,
+  "manifest_sha256": "2cea2e9a901981a7b0155e66c1901b220aec19f7f5e0a5a4f35655afc0d370ef",
+  "publication_sha256": "cd2316612e7e740921fed0a4d2f26cdc259493ccbca75a0d45c0cdce605bda27",
+  "retained_CPU_precharge": 365,
+  "root_accepted": true,
+  "schema": 1,
+  "shared_native_cache_reference": {
+    "files": 54,
+    "index": "docs/experiments/k5d-inputs/final-Ada-source-native-CPU-evidence-cache-20261113.json",
+    "manifest_sha256": "69538dfbcb7ccbc69dc6d9aeaed9e5268fdf481fbc82e7989920acaf7340c1ed",
+    "no_duplicate_source_config_or_archive": true
+  },
+  "source_revision": "ae892df1cbb2b8c28eb413187effc28d70b74326",
+  "spec_sha256": "6eb6fda9daebfc7db842d9d19e3f4a51599daea43257586bf73c345d19c85720",
+  "total_bytes_including_manifest": 28787420,
+  "total_files_including_manifest": 31
+}

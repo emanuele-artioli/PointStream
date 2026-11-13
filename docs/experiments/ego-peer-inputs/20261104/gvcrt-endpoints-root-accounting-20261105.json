@@ -1,0 +1,255 @@
+{
+  "schema": "pointstream-gvcrt-endpoint-root-accounting-v1",
+  "scope": "Two fixed-QP endpoint attempts on the same 16 distinct frames; no corpus or absent-frame evidence. QP9 missing. Root accepts QP0 one-clip native/manifest result only.",
+  "gpu_bound_basis": "GPU claim is acquired inside this supervisor lifetime. experiments/jobs/inbox.py reconcile transitions canonical terminal only after verified supervisor exit; experiments/jobs/monitor.py finally releases owned claims after stopping child. Birth-to-canonical-terminal interval conservatively contains claim occupancy and salvage. No queue is charged as GPU occupancy; these are conservative accounting envelopes, not measured command time.",
+  "cpu_bound_basis": "Keep inclusive job allowance where full completed. For contended smoke retain all smoke/admin/external caps and release only full500 + validator30 not run. Cumulative RUSAGE_CHILDREN entries are not summed.",
+  "root_scientific_review": "QP0 native11721 + manifest2897 =14618B; 175.815native/219.270wire kbps. Root recomputed all five metric means from16 score rows and inspected independent frozen full validator, actual source/spec and sender bytes. At native rate cropLPIPS and fullDISTS beat interpolated anchor; full PSNR/fullLPIPS worse. At adapter wire rate DISTS direction reverses, cropLPIPS remains better. Released adapter padding/YUV420/eager path and exposure limitations retained.",
+  "rows": [
+    {
+      "job_id": "20261105T231555Z-78e54aff",
+      "qp": 0,
+      "canonical_status": {
+        "job_id": "20261105T231555Z-78e54aff",
+        "created": 1793920566.9732306,
+        "status": "complete",
+        "updated": 1793920780.15555,
+        "host_alias": "gpu5",
+        "gpu": {
+          "index": 0,
+          "uuid": "GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162",
+          "name": "NVIDIA RTX 6000 Ada Generation",
+          "memory_used_mib": 1,
+          "memory_total_mib": 49140,
+          "memory_free_mib": 48645,
+          "utilization_pct": 0,
+          "compute_processes": [],
+          "pointstream_claimed": false,
+          "pointstream_shared_claims": []
+        },
+        "gpu_sharing": {
+          "mode": "exclusive"
+        },
+        "supervisor_pid": 3723481,
+        "remote_status": {
+          "status": "complete",
+          "started": 1793920599.561614,
+          "last_progress": 1793920750.798898,
+          "emitted": [
+            "terminal:complete"
+          ],
+          "gpu_sharing": {
+            "mode": "exclusive"
+          },
+          "pid": 3723491,
+          "proc_start_time": 1793920599.58,
+          "process_group_id": 3723491,
+          "progress": {
+            "stage": "full",
+            "completed": 1,
+            "updated": 1793920742.7356136,
+            "decision": null
+          },
+          "exit_code": 0,
+          "ended": 1793920750.798898
+        },
+        "directory": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T231555Z-78e54aff",
+        "gate": {
+          "passed": true,
+          "spec_sha256": "bdb7173235a77c7ca8166b3acf3c9a481589de228faef6d86255d0d2bdfaee76",
+          "source_sha256": "a4f3b2d25a7d9c9d38b30761d1cb187fc9b63d60ccf33ba7972b106b95ba1558",
+          "inputs": [
+            {
+              "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-20261104-inputs/tracknet-dataset.zip",
+              "sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18"
+            },
+            {
+              "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/RacketVision-c44af2a.tar",
+              "sha256": "5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff"
+            },
+            {
+              "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/balltrack_best.state_dict.pt",
+              "sha256": "b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec"
+            },
+            {
+              "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/WASB-SBDT-923462c.tar",
+              "sha256": "657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55"
+            },
+            {
+              "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/wasb-tennis-weights.tar",
+              "sha256": "4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6"
+            },
+            {
+              "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5c-independent-judge-20261101-2031/wasb-tennis.yaml",
+              "sha256": "6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d"
+            },
+            {
+              "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3-2026-10-10/inputs/lpips/alexnet-owt-7be5be79.pth",
+              "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02"
+            },
+            {
+              "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+              "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
+            },
+            {
+              "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/gvcrt-20261104-inputs/source-export.tar.gz",
+              "sha256": "a7ad708cfaea7d0030cc1d78bd2cd1f1d62a1df999d8eaece292bff510c30f7e"
+            },
+            {
+              "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261104T223611Z-ed28cf8e/source.tar",
+              "sha256": "748591675c350fe3e0214b0a4aca4529b56199419f0c4838b167e6e52440ecba"
+            },
+            {
+              "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261104T223611Z-ed28cf8e/smoke/published.tar",
+              "sha256": "dc1bc14133cf210589f2452785fbaf6d4905e91aae05fdc6d7ac0f25da8ec066"
+            },
+            {
+              "path": "/home/itec/emanuele/Datasets/pointstream-data/third_party/gvcrt-qualified-20261001/downloads/GVC-RT_I.pt",
+              "sha256": "c8a840415cc028307131c66f68076b7e9f6fcc4db7fed423c62e8b202f83a22d"
+            },
+            {
+              "path": "/home/itec/emanuele/Datasets/pointstream-data/third_party/gvcrt-qualified-20261001/downloads/GVC-RT_P.pt",
+              "sha256": "7a89bd342a1484b3da7dfc3f03834ff81e0e4180e02f8a286dec0d1025c99f4e"
+            },
+            {
+              "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261104T230325Z-e340664f/smoke/gvcrt-entropy/MLCodec_extensions_cpp.so",
+              "sha256": "f0951974be2a1168f87a67f8d3683844874aa1902b2d135cde46c2e5b915262e"
+            }
+          ],
+          "validation": {
+            "checks": {
+              "actual_bytes": true,
+              "artifacts": true,
+              "backend": true,
+              "baseline": true,
+              "baseline_recomputed": true,
+              "checkpoint_bytes": true,
+              "child_receipts_and_probe_order": true,
+              "cost_recomputed": true,
+              "current_code": true,
+              "ffmpeg_identity": true,
+              "fixed_sources": true,
+              "frames_and_qp": true,
+              "gate": true,
+              "input_checkpoint_identity": true,
+              "input_transform": true,
+              "metric_checkpoint_bytes": true,
+              "metric_source_identity": true,
+              "metric_sources_recomputed": true,
+              "model_coverage": true,
+              "native_schedule_and_isolation": true,
+              "native_timing": true,
+              "paired_comparison": true,
+              "parity": true,
+              "probe": true,
+              "protected_input_coverage": true,
+              "receiver_denials": true,
+              "score_rows": true,
+              "scorer_config": true,
+              "scorer_device": true,
+              "scorer_models": true,
+              "source_denied": true,
+              "source_members_and_floor": true
+            },
+            "passed": true
+          },
+          "validator_seconds": 1.570457935333252,
+          "smoke_seconds": 76.74149584770203,
+          "remaining_seconds": 722.9706764221191,
+          "attempt": 1
+        },
+        "campaign_error": null
+      },
+      "canonical_status_sha256": "3300927150aa11586e5cbfe23274efcb51b150ba004b160f3309ce7f2cca18b3",
+      "supervisor_identity": {
+        "pid": 3723481,
+        "proc_start_time": 1793920599.32
+      },
+      "supervisor_identity_sha256": "d41966451385f7e1a81ccfb07219f6f0dc4565030205a393b9ad532fccacd03d",
+      "conservative_gpu_hold_span_seconds": 180.83555006980896,
+      "charged_gpu_seconds": 200,
+      "charged_cpu_seconds": 1000
+    },
+    {
+      "job_id": "20261105T231706Z-2f65a26e",
+      "qp": 9,
+      "canonical_status": {
+        "job_id": "20261105T231706Z-2f65a26e",
+        "created": 1793920639.7146888,
+        "status": "contended",
+        "updated": 1793921567.1574695,
+        "host_alias": "gpu5",
+        "gpu": {
+          "index": 0,
+          "uuid": "GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162",
+          "name": "NVIDIA RTX 6000 Ada Generation",
+          "memory_used_mib": 1,
+          "memory_total_mib": 49140,
+          "memory_free_mib": 48645,
+          "utilization_pct": 0,
+          "compute_processes": [],
+          "pointstream_claimed": false,
+          "pointstream_shared_claims": []
+        },
+        "gpu_sharing": {
+          "mode": "exclusive"
+        },
+        "supervisor_pid": 3754169,
+        "admission_retry": "GPU claim failed: Device GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162 on gpu5.itec.aau.at is already claimed",
+        "remote_status": {
+          "status": "contended",
+          "started": 1793921507.1202621,
+          "last_progress": 1793921527.5877721,
+          "emitted": [
+            "terminal:contended",
+            "contention:1793921527.5877721"
+          ],
+          "gpu_sharing": {
+            "mode": "exclusive"
+          },
+          "pid": 3754185,
+          "proc_start_time": 1793921507.16,
+          "process_group_id": 3754185,
+          "contention": [
+            {
+              "detected": 1793921527.5877721,
+              "action": "stop",
+              "foreign_gpu_pids": [
+                3754420
+              ],
+              "ended": 1793921527.5877721
+            }
+          ],
+          "timing_contaminated": true,
+          "foreign_gpu_pids": [
+            3754420
+          ],
+          "error": "A process outside this job began using its claimed GPU",
+          "ended": 1793921527.5877721,
+          "progress": {
+            "stage": "smoke",
+            "completed": 0,
+            "updated": 1793921519.064529,
+            "decision": null
+          }
+        },
+        "resume_declined": "no declared resume attempts remain (0 declared)",
+        "directory": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T231706Z-2f65a26e",
+        "gate": null,
+        "campaign_error": null
+      },
+      "canonical_status_sha256": "cb57d6a8d32152488957bd10e45420238d22d2eac0fbc70e112465bd51c5e49c",
+      "supervisor_identity": {
+        "pid": 3754169,
+        "proc_start_time": 1793921506.88
+      },
+      "supervisor_identity_sha256": "02b03c091c998642f2bfeb4ff6db2e8c76d91e4e3ee5ce1adaa270d47508263d",
+      "conservative_gpu_hold_span_seconds": 60.27746939659119,
+      "charged_gpu_seconds": 100,
+      "charged_cpu_seconds": 470
+    }
+  ],
+  "phase_total_charged_gpu_seconds": 300,
+  "phase_total_charged_cpu_seconds": 1670,
+  "released_unused_gpu_seconds": 1500,
+  "released_unused_cpu_seconds": 530
+}

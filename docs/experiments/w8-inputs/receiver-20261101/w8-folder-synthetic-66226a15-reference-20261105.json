@@ -1,0 +1,11 @@
+{
+  "job_id": "20261105T064712Z-66226a15",
+  "sha256": {
+    "proof_validation": "f603014b7fd1661d4d58f6cc08d660bc6ca4e0baaff4fcd9f5483e5f53f7c337",
+    "proof_gate": "b93a6de3e6619d83ef7f22b7692334b4de0c7ef904bd23db5ddc632f514986b8",
+    "proof_state": "6e409108fbde43cb6949495ec10b8397d7f239c306e3169d8db687ddf5055534",
+    "proof_ready": "85abcf7a7348c62a885ba901c4ccb2cba6bb8db87ab4c13abfbfe19e463636c7",
+    "proof_published": "5452a5d6bb865152556a0e26dc99798a0ee88dff1c1c86b9a4fd1f5c904413dd",
+    "proof_source": "451f3b99bf3283eb219631e8c567597ebb7f7df208224106bb1811b4c3a20430"
+  }
+}

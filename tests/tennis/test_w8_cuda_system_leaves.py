@@ -94,3 +94,27 @@ def test_spec_and_fresh_namespace_commands():
     fixture = Path(__file__).with_name('w8_portable_actual_dispatch_fixture.json')
     dispatch = json.loads(fixture.read_text())
     assert pilot.check_dispatch(dispatch, Path(dispatch['staged_environment']['python']))['sha256'] == pilot.RUNTIME_SHA
+
+
+def test_self_leaves_join_exact_namespace_worker_identity():
+    worker = {'host_pid': 1234, 'host_pgid': 987, 'start_ticks': 42, 'campaign_pgid': 987}
+    identity = {key: worker[key] for key in ('host_pid', 'host_pgid', 'start_ticks')}
+    rows = [{'name': f'/proc/self/{name}', 'resolved': f'/proc/1234/{name}', 'self_process': dict(identity)}
+            for name in ('maps', 'status')]
+    pilot.validate_self_leaf_identity(rows, worker)
+    for key in ('host_pid', 'host_pgid', 'start_ticks'):
+        changed = dict(worker, **{key: worker[key] + 1})
+        with pytest.raises(ValueError, match='namespace worker'):
+            pilot.validate_self_leaf_identity(rows, changed)
+    rows[0]['resolved'] = '/proc/1235/maps'
+    with pytest.raises(ValueError, match='namespace worker'):
+        pilot.validate_self_leaf_identity(rows, worker)
+
+
+def test_system_leaf_cannot_alias_protected_inode(tmp_path, monkeypatch):
+    leaf = tmp_path / 'public'
+    leaf.write_text('fixture')
+    monkeypatch.setattr(pilot, 'APPROVED_LEAVES', (str(leaf),))
+    monkeypatch.setattr(pilot, 'self_process_identity', lambda: {'host_pid': 1, 'host_pgid': 1, 'start_ticks': 1})
+    with pytest.raises(ValueError, match='aliases protected'):
+        pilot.approved_leaves([leaf], {})

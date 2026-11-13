@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "revision": "9c6c7d4bea67314fff66aa8ef7f9e4fe0dd208f9",
+  "commands": [
+    "ruff check",
+    "mypy --config-file pyproject.toml",
+    "python -m pytest"
+  ],
+  "results": {
+    "ruff": "passed",
+    "mypy_files": 567,
+    "pytest_passed": 2052,
+    "pytest_skipped": 40
+  },
+  "logs": {
+    "ruff.log": {
+      "path": "/private/tmp/pointstream-root-runtime-roles-checks-20261109/ruff.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "mypy.log": {
+      "path": "/private/tmp/pointstream-root-runtime-roles-checks-20261109/mypy.log",
+      "sha256": "ecd224107efa40b1ea4d3ac4e0f7f61646bd7537fd3ba4a482a908693510477a"
+    },
+    "pytest.log": {
+      "path": "/private/tmp/pointstream-root-runtime-roles-checks-20261109/pytest.log",
+      "sha256": "18943afd0e7ec2c6bc3fad4d7d9dc7aa93c5b85e28428fb9f916a9eaaa709dcf"
+    }
+  },
+  "scope": "Combined root code at9c6c runtime-role integration; later1c5d actual lifecycle race failed, so these software checks do not establish CPU runtime qualification. Atomic race fix and Ball292 runner remain separately isolated local WIP."
+}

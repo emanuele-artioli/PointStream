@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "scope": "CPU-only MAIN Torch class API inspection; no GPU query, CUDA initialization or model execution",
+  "host": "gpu5",
+  "cpu_affinity": [2],
+  "runtime_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "torch_version": "2.10.0+cu128",
+  "cuda_visible_devices": "",
+  "cuda_initialized": false,
+  "properties_api_callable": true,
+  "property_class_present": true,
+  "class_has_uuid": true,
+  "class_has_major_minor": true,
+  "limitations": "Class API presence does not prove actual physical GPU UUID values or qualify kernels or models."
+}

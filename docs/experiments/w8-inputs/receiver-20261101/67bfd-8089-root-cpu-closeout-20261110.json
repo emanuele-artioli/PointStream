@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "job_id": "20261110T001842Z-808952c3",
+  "decision": "Root accepts exact-source CPU infrastructure and schema2 generation-target admission envelope only",
+  "approved_gate_sha256": "81d078b1738d977a167f267ecbfaf9eb10cd1874ea1c32d917b01aafb68bdfaa",
+  "publication_sha256": "4e724fd1a548cf0bf0513cca616bcd86a32292e49b363f4b9f389a18edaf5692",
+  "root_checks": "All68physicalraw members;6proofrefs;3sourcepins;packet480/480+14;actualMAIN/JCV executable-prefix-Torch tied to physicalab5fpreflight;source/clock/denials;4lifecycle modes;nativeYUV;20recordedPIDbirths/groups/claims;schema2 targetjoin",
+  "proof_campaign_environment": "MAIN32e",
+  "generation_target_environment": "JCVbf738",
+  "generation_controller_executed": false,
+  "CUDA_qualified": false,
+  "CPU_charge_additional": 342,
+  "CPU_charge_inclusive": 372,
+  "CPU_preparation_already_charged": 30,
+  "GPU_charge": 0,
+  "CPU_basis": "110rounded wholecreated-to-terminal104.814onecorewallinclqueue +entire150post+82auditexternalallocations=342future.30prep alreadycharged. Allocation-based coverage, not measuredaggregateCPU.",
+  "auxiliary_limitations": "Interrupted local extraction had12s observedwriteinterval but no completeCPUcounter;3.11GBpartial retained. Remoteauditor SSHtimedout withoutstartPID/limitreceipt,actual50CPUlimitinstallation unverified; latercommandpatterninspectionfoundnone,not birth-boundteardown. Successfulremoteexport2.090CPU. No auxiliaryresult used as proof; actualexportedbytes independentlyrevalidated locally.",
+  "canonical_teardown_scope": "20recordedscientificPIDbirths,campaign/detachedgroups/ownedclaims absent; distinct from auxiliaryauditorinspection.",
+  "raw_directory": "/private/tmp/pointstream-w8-67bfd-proof-20261110-a1",
+  "raw_hashes": {
+    "local-physical-audit.json": "61eb7e0967b0e743bd2cdc93d74cdb6099d2ff519e15f98d457d9a61a1089913",
+    "local-deep-audit.json": "4a46362a4cf95dbdb4c792f2f33a765463c8c00bce0ce41764bfd870745e62a7",
+    "teardown-audit.json": "85d0cb4d87e99e06aa966e6d768a304e67c25bb198054b30903964d8ccb2ec88",
+    "ack.json": "86072eeddd22abbb5e0aeca7d16c0feaf1adf0bbfed90eba1ece6458ac4c51a2"
+  },
+  "family_CPU_closed_inclusive": 1150,
+  "next_step": "Local bounded unit0contextcost proposal and complete forecast; separate root readiness/GPUrelease. Originalboth240frame/80tick quality gates unchanged."
+}

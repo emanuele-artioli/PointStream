@@ -162,7 +162,7 @@ def test_gpu_uuid_canonical_comparison():
             job.canonical_gpu_uuid(malformed)
 
 
-def test_archived_worker_cli_import_effect_is_avoided_with_hard_limit():
+def test_archived_worker_cli_import_preserves_hard_limit():
     import subprocess
     import sys
 
@@ -172,13 +172,9 @@ from experiments.tennis.w8_cuda_job import without_legacy_worker_argv
 resource.setrlimit(resource.RLIMIT_CPU, (60, 60))
 sys.argv = ['w8_cuda_job.py', 'worker', '--condition', 'isolated']
 saved = sys.argv
-try:
-    importlib.import_module('experiments.tennis.w8_input_job')
-except ValueError as exc:
-    assert 'raise maximum limit' in str(exc)
-else:
-    raise AssertionError('legacy import unexpectedly changed hard CPU limit')
-module = without_legacy_worker_argv(lambda: importlib.import_module('experiments.tennis.w8_input_job'))
+module = importlib.import_module('experiments.tennis.w8_input_job')
+assert resource.getrlimit(resource.RLIMIT_CPU) == (60, 60)
+assert without_legacy_worker_argv(lambda: module) is module
 assert callable(module.synthetic_torch_bootstrap)
 assert sys.argv is saved and sys.argv[1] == 'worker'
 assert resource.getrlimit(resource.RLIMIT_CPU) == (60, 60)

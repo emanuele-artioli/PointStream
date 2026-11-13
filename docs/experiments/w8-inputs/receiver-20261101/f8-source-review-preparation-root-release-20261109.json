@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "decision": "root reviewed exact new source; release bounded source preparation only",
+  "revision": "f8b93b638a8ef9cdd1eb28d612967b4f5e4527b7",
+  "snapshot_sha256": "476ea5c810e650888660ab6d9fb2c2f317b7d848041b43cfa01e41c65aaeb671",
+  "source_sha256": "7d9fae842f2154f2dea33f94a7efc014b7422dcb97bbd68ca6d98248f4535f82",
+  "archive": "/private/tmp/pointstream-w8-f8b93-review-20261109/source.tar",
+  "root_independently_verified_all_git_blobs": 1667,
+  "root_checked_full_suite_log_hashes": true,
+  "full_suite": "Ruff,mypy561,pytest2014passed39skipped",
+  "bootstrap_sha256": "01f3fed31b45dbcaab880269f87d0578dcfcab960ee5a15fbcdcd790cec2dd5f",
+  "input_job_sha256": "7a0685ba0cc7405e1833d05075d4d591723da178b1afe71da31e5e95d6e85113",
+  "system_leaves_sha256": "82ad345c9f22115c9a06bbb9ec1244fb058e1149c458a55e998a272d766639f0",
+  "system_policy_identical_to_real_oracle": true,
+  "reaper_sha256": "852cc709ff9ef6e3e58a151f86c36811c799286e12ced6333512f0fc57500f92",
+  "parent_phase": "w8-full-witness-staged-20261106",
+  "cpu_ceiling": 30,
+  "gpu_ceiling": 0,
+  "included_in_1100_cumulative_CPU_proof_family": true,
+  "closed_before_preparation": 238,
+  "target_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-f8b93-20261109/source.tar",
+  "scope": "ONEknownjob/eligiblehost/worker/CPUclaim/packedruntime/tools/localdiskandpubliccachemetadata precheck; statonlyfiveprotectedcategoriesBEFOREpublicbytehashing; exactnewsourcecachegzipupload/nooverwrite/publicSHA; actualfixedspecdeadline<=45minutes. NOJOBSUBMISSION.",
+  "source_admission_boundary": "Trustedcontroller/cooperativeimmutablefiles; concretepublicinputs/environment/source comparedbydev/inodeagainstprotectedtargets beforepublication. HistoricalprotectedSHAsnotfreshbodyverification; no protectedopen/read/hash. No hostilepath-swap securityclaim.",
+  "source_review": "Exact14-fileW8diff; same testedpolicy/reaper; selfleavesjoinedpacket/strictMAIN+JCV/assessorrawreceipts to namespacePID/birth/group; physicalarchive/spec/rootCPUgate threeSHAjoins. ESRCHonlyhandled; nonzeroworkerretained. Existing12leaves+2clockhelpers/no broadproc/UIDrelaxation.",
+  "conditions": [
+    "rootreviewsreadiness/sourcepublicSHA/newactualspecandcompleteCPUboundsbeforeONEcombinedproofrelease",
+    "nativecd6alreadyexists; no recopied/rehashprotecteddata or silentbaselineexception",
+    "no GPU qualification/full witness authority; scientificrecipe/denial/tolerances unchanged",
+    "stop before30CPUexceeded; preservefailure/rawusage; rootledgerwrite afterclosure"
+  ]
+}

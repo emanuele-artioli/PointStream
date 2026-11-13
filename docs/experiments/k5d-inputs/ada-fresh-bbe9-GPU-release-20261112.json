@@ -1,0 +1,36 @@
+{
+  "phase": "ball-ada-fresh-reference-20261112",
+  "release": "RootapprovedONEfreshAdaA/conditionalBpilot",
+  "revision": "bbe94eddde3e8596b98d93667b3ffbdeaed184a6",
+  "identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "4f7f6546b7eb4552ea77b8d1607a0ccc68c7ae42e73965a70a2902f40f4e7402",
+    "source_sha256": "ed89052108dbd4a8242d7fd7ae35ac37aa1f41332d204a4d11e9d7b799bf715d"
+  },
+  "raw_spec_sha256": "fa4466d848ada4aafde0d9db7b0a292ccaa14c98a1012bff2e65e5331cc571b2",
+  "canonical_spec_sha256": "f36d9c688de75b1b9bab2e84d31d6d90abb34d07a2a6ea5d8c625232cfde53f1",
+  "deadline": "2026-11-12T21:39:05.728335+00:00",
+  "spec_path": "/private/tmp/pointstream-ada-fresh-gpu-prep-20261112/spec.json",
+  "source_archive_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261112T204701Z-6c0c0a86/source.tar",
+  "GPU_max": 1400,
+  "CPU_max": 1600,
+  "campaign_onecore_seconds": 1200,
+  "external_CPU_included": 400,
+  "GPU_post_included": 200,
+  "namespace_stage_max": 580,
+  "smoke_stage_max": 600,
+  "full_stage_max": 600,
+  "validator_max": 30,
+  "future_parent_remaining": "1400GPU/1700CPUincludes1600thisjob+100monitorreserve",
+  "CPU_gate_sha256": "b6213dedbf0e7a24d4d02b92114d1ce06766b872fd86b60ce788b44b5aee3d28",
+  "source_bridge_sha256": "0c32187b4a16d4b047c95c16c6145e973abcbdc9e4d9a165edbb6efcbb59ab0f",
+  "readiness_sha256": "288d9bdf32aa6e3346d9455d528f49e7a8293fd96fc9e7d6a3f5d9a45d82a5b4",
+  "readiness_limits": [
+    "GPU availability and claims may change before admission",
+    "Archive and model hashes checked; extracted environment tree is not independently fully hashed",
+    "Measured helper CPU is not total external preflight CPU",
+    "New inputs not yet cached will be staged and verified at admission"
+  ],
+  "planning_basis": "HistoricalactualexclusiveA6000full16~205.769wall/204.864CPU, currentAdaprepare85.423wall/83.206CPU; plausibilityonly, notmeasuredAdascoringbound. A iscompletecostpilot. Coldstagingcountsincampaignclock; no B withoutprospective1.5costforecast+50 andremaining>=forecast+130. HardstopifAcompletewall/CPU>300 ormissing/contaminatedtiming.",
+  "stop": "Unknownsubmissionorfailedstage/cost/source/metric/repeatstops; no retry/tolerance/referencechange/scale/paper. Preservefailed37b3oldgate; exactfreshsameclassrepeatrequired; independentrootpostauditbeforeacceptance."
+}

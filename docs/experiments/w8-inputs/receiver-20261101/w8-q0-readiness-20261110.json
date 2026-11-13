@@ -1,0 +1,103 @@
+{
+  "CPU_precharged_seconds": 30,
+  "GPU_seconds": 0,
+  "accounting": "30 CPU precharged inclusive; shared manager CPU unmeasured",
+  "evidence": "protected stat-only baselines match; all 16 public input and gpu5 local cache sizes match, small public files and source snapshot hashed; larger input/cache content is historical evidence and must be verified by actual staging before inference; fixed trusted-path assumption",
+  "note": "candidate receipt and GPU request await root review; no job submitted",
+  "phase": "w8-context-q0-source-readiness-preparation-20261110",
+  "qualification_attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+  "raw_directory": "/private/tmp/pointstream-w8-q0-readiness-20261110-a1",
+  "raw_sha256": {
+    "admission.json": "7275440ee980201af3c6bedf007fe14ae7a6a8c17b906746ebd0fabe9c8c43c2",
+    "cpu-gate.json": "81d078b1738d977a167f267ecbfaf9eb10cd1874ea1c32d917b01aafb68bdfaa",
+    "gpu2-post.stdout": "c4a3da472ede1bf4a6ecc94fa2b23a12e1f58d7eb5013c3854795629a7de1d20",
+    "gpu2-pre.stdout": "3e41f9b6247e9f1fbba71fbc0a3df93d2b8bc8a825d9ad195dbfdc3f1742ad0f",
+    "gpu5-post.stdout": "e1965e6e788d8ee41dcabed111edfd5c14b6e6b6a3dab3f9f4a1668bf5367310",
+    "gpu5-upload.stdout": "8f5e57ef0e71f459fcaa25b87c3c356e27870417ab47ddef9f04a357cd27e952",
+    "intent.json": "7fa7cf9d215f6883f6b6c2650edddcdb9ff860d5f1edcc7fd92fcb53f5a01cf0",
+    "ledger.json": "7dbf9984569f2017b11b2fd626ae7391b8c77a2a6401ce06c916e1c3d7f8b40a",
+    "observe.py": "93bda903b5b90a8a08a121d4f89b6dcc8c98ee8e87e133e1eeaf67685c8daa7b",
+    "payload.json": "26e532fc6038044f5c8ea2248504388a816229c6765132c196530a7f82c6654c",
+    "run.py": "eb1892aee4d11a23135933741229d052661705488a1b2267cf672e6a3063c76f",
+    "spec-normalized.json": "0780c2c70f8db0b800e0490205b0087b0038db86818dbbcfb20fa465bd7ea839",
+    "spec-receipt.json": "72830bd204369c9221dc64aa41d341ff27b056651531a082ad569836a46285ed",
+    "spec.json": "1c3be03467baf9c815e4b07385b8bf5a59e5f4d2f9c71aaf0442f3f6fd58dd66",
+    "usage.json": "6ba555577c3c782bb6f9a10c1998cf87a3eedc91bd7f0ae5589311569a8fe262"
+  },
+  "schema": 1,
+  "scope": "source/readiness only, no GPU or scientific execution",
+  "shared_manager_reports": {
+    "directory": "/private/tmp/k5d-first292-exclusive16-preparation-20261110/raw",
+    "doctor_sha256": "44e092a1fe9f615ff6d566a245f29a3b6385d4ad2ab54579e423f54f44add84a",
+    "status_sha256": "e5ad42ec9f3c034187c41607b8ebb394c745224b908d0c52822dba545456b57e",
+    "workers_sha256": "393b1f3a4d83526810cb045aa20ccf933cd83de9d2efd1f512345122add122a7"
+  },
+  "source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/w8-witness-67bfd-20261109/source.tar",
+  "source_snapshot_sha256": "e303cd2a796aaf51f8c22f9982b359cfd198cfd127e8b96e92a78f7de94c2a39",
+  "spec_receipt": {
+    "budget_seconds": 400,
+    "deadline": "2026-11-10T10:53:37.532204Z",
+    "gate_sha256": "81d078b1738d977a167f267ecbfaf9eb10cd1874ea1c32d917b01aafb68bdfaa",
+    "ledger_sha256": "7dbf9984569f2017b11b2fd626ae7391b8c77a2a6401ce06c916e1c3d7f8b40a",
+    "logical_spec_sha256": "385beb2098c4f3fd0c67587359f4615e8bbffc0f0120eb1297f1876c6936a979",
+    "normalized_spec_sha256": "0780c2c70f8db0b800e0490205b0087b0038db86818dbbcfb20fa465bd7ea839",
+    "phase_commands": {
+      "full": [
+        "{python}",
+        "-m",
+        "experiments.tennis.w8_witness_job",
+        "noop"
+      ],
+      "smoke": [
+        "{python}",
+        "-m",
+        "experiments.tennis.w8_witness_job",
+        "pilot"
+      ]
+    },
+    "raw_spec_sha256": "1c3be03467baf9c815e4b07385b8bf5a59e5f4d2f9c71aaf0442f3f6fd58dd66",
+    "receipt_sha256": "7275440ee980201af3c6bedf007fe14ae7a6a8c17b906746ebd0fabe9c8c43c2",
+    "remote_directory": "/home/itec/emanuele/Datasets/pointstream-data/w8-witness-20261110/q0-22578404a2dc13eb5c71431ee0593d1a/",
+    "scope": "candidate source/readiness, no GPU release",
+    "smoke_seconds": 335,
+    "worker_caps": {
+      "external_cpu": 150,
+      "generator_cpu": 210,
+      "generator_wall": 190,
+      "packet_cpu": 100,
+      "parent_cpu": 30
+    }
+  },
+  "usage": {
+    "local_self_cpu_seconds": 0.11670499999999999,
+    "local_ssh_cpu_seconds": 0.12686999999999998,
+    "rows": [
+      {
+        "host": "gpu2",
+        "mode": "pre",
+        "remote_cpu_seconds": 0.29703199999999996,
+        "stdout_sha256": "3e41f9b6247e9f1fbba71fbc0a3df93d2b8bc8a825d9ad195dbfdc3f1742ad0f"
+      },
+      {
+        "host": "gpu5",
+        "mode": "upload",
+        "remote_cpu_seconds": 0.09312999999999999,
+        "stdout_sha256": "8f5e57ef0e71f459fcaa25b87c3c356e27870417ab47ddef9f04a357cd27e952"
+      },
+      {
+        "host": "gpu2",
+        "mode": "post",
+        "remote_cpu_seconds": 0.172833,
+        "stdout_sha256": "c4a3da472ede1bf4a6ecc94fa2b23a12e1f58d7eb5013c3854795629a7de1d20"
+      },
+      {
+        "host": "gpu5",
+        "mode": "post",
+        "remote_cpu_seconds": 0.092763,
+        "stdout_sha256": "e1965e6e788d8ee41dcabed111edfd5c14b6e6b6a3dab3f9f4a1668bf5367310"
+      }
+    ],
+    "status": "complete",
+    "wall_seconds": 18.478875459
+  }
+}

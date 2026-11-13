@@ -1,0 +1,22 @@
+{
+  "scope": "Independent root deterministic replay from a clean all-committed source checkout; no new metrics/models",
+  "code_revision": "00aff80adac40c5cc5db4ea598d6ebbb9330be8d",
+  "all_550_project_python_files_match_git_blobs": true,
+  "scientific_module_sha256": "91f82e456624cae0b2b33cd57200c413114002a57154305b9ba03e624a6f26fc",
+  "gate_sha256": "ca0c50d9dce8fe5462368a1d929df9470bd7f5d289fcf780838fb9a36a36e451",
+  "original_report_sha256": "d09b054369e2c435d2347e0455a0b244af52f2af03d599becdb48110cbb1156b",
+  "replay_report_sha256": "e1e9881432a5303e6d2725a806823324291ffe5990b088e745cd66cac2c8031b",
+  "outcomes_roles_rates_coverage_and_limits_equal": true,
+  "difference": "Only the unrelated tracked-source manifest fingerprint changes from the first report; numerical runtime and scientific module identical. All substantive JSON sections compared exactly.",
+  "accounting": "replay is verification within the already charged120CPU corrected analysis envelope; cumulative actual command CPU remains well under60, no extra GPU",
+  "scientific_source_identity": {
+    "tracked_python_files": 550,
+    "tracked_python_manifest_sha256": "efec8728d771bd100a78973d3513fafd88d1450ee92e50f56590217d5f7e4a3d",
+    "python_version": "3.12.7 | packaged by conda-forge | (main, Oct  4 2024, 15:57:01) [Clang 17.0.6 ]",
+    "numpy_version": "1.26.4",
+    "scipy_version": "1.17.1",
+    "numpy_binary_sha256": "a51276f3aab2d91051aa0ced3ddaa39a776ae60132ca4c07a91b82a8b7a92ea7",
+    "scipy_special_binary_sha256": "5ff965ce3b560fa7e2f6901b665e42b96554024a5b32a253c7f7f5bc95c2134f",
+    "scipy_interpolate_binary_sha256": "70886697c9ae4bf98ed1ef0fe1b7a05b8f241ab72f21b0db4d4e698d5bdf1ec4"
+  }
+}

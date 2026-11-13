@@ -1,0 +1,38 @@
+{
+  "bootstrap_sha256": "01f3fed31b45dbcaab880269f87d0578dcfcab960ee5a15fbcdcd790cec2dd5f",
+  "checks": {
+    "assessment_role_policy": true,
+    "counter_and_external_cost_coverage": true,
+    "cpu_hidden_one_core": true,
+    "namespace_normal_timeout_term_kill": true,
+    "native_real_yuv_and_timeout_kill": true,
+    "owned_pid_starttick_teardown": true,
+    "same_source_snapshot_environment": true,
+    "strict_mode_dispatch_static_reviewed": true,
+    "strict_runtime_policy_deny_paths": true,
+    "strict_source_closure_and_clock_leaves": true
+  },
+  "cuda_qualified": false,
+  "generation_controller_executed": false,
+  "generation_environment_sha256": "bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e",
+  "host": "gpu5",
+  "input_job_sha256": "7a0685ba0cc7405e1833d05075d4d591723da178b1afe71da31e5e95d6e85113",
+  "job_id": "20261110T110102Z-c38f0357",
+  "passed": true,
+  "proof_campaign_environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "raw_receipt_sha256": {
+    "assessment_policy": "5f1e07a21b3012a409e4a7e370661b806bf031ade9ac1058c668052a92734e88",
+    "independent_audit": "bf7fee66eca04b4158b08a6c58b1dba2732957837309dbee29081287dc7322ff",
+    "namespace_lifecycle": "7a5a96cf41d9e5d3b3ac014cba6eca1ac5832b0b9f3bc964fc2c7affbe1a37c9",
+    "native_normal": "c8a5e6c0a5ee6b4388d67c42b6c88293bd87e996d3a28bc9dbad1fe36c033c03",
+    "native_timeout_kill": "750c3ab355cb6d3355534f871dafbf82647d88732b591c5bf7cf26b2da6c8c99",
+    "strict_modes": "72611fc1f6c5430be8f35afef2bc4d7dd4f2ca6f8cf5ae6bfc1ab4f9caeb1804"
+  },
+  "revision": "174ac84b84a1f405e06700a34aa4c3e225fa3265",
+  "schema": 2,
+  "scope": "root-reviewed W8 same-source CPU isolation and native lifecycle proof",
+  "snapshot_sha256": "5e62a2e912f5dba0cd945d33388b95154d5d8e88ed6cf5b5998e595a323c6fd1",
+  "source_sha256": "4cad9e47ebeb88f1cdb272634921f2aed79100e0e15ace4d01f9a3a33720d9d6",
+  "spec_sha256": "5c1e999678137c5ca472570096f5a4d4e462cdb38dd832c5492fd0c2559c6369",
+  "system_leaves_sha256": "82ad345c9f22115c9a06bbb9ec1244fb058e1149c458a55e998a272d766639f0"
+}

@@ -1,0 +1,148 @@
+{
+  "schema": 1,
+  "job_id": "20261105T122208Z-a62ad658",
+  "status": "complete",
+  "scope": "synthetic Linux CPU accounting only; no GPU, models or native teardown qualification",
+  "source_revision": "b96e81bd021e2bb36fe78c4f461b4a8a4512830c",
+  "source_tree_sha256": "8df50d964f7af8283c0d7d05695af6885e77f1dd667d09f9b7261577bca97060",
+  "source_archive_sha256": "7cca0cdd84cf2b145718ccfbeb451e55106d6ec8348a7800bf806772b3809108",
+  "normalized_spec_sha256": "311e078b159bc6bce04ab0b908e2ac3dd9e49e4558934ce043c13c157a605170",
+  "oracle_source_sha256": "03a190fc929e73ecac59297e0ab5e51e4ed865f3faa73bb58287f223e6120056",
+  "accounting_source_sha256": "a4e160ef35960ced42e773335bb34705372306d723797ea18fe3bba7f8629f3a",
+  "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "host": "gpu2",
+  "cpu_affinity": [
+    0
+  ],
+  "gpu": null,
+  "stage_records": {
+    "smoke": {
+      "publication_sha256": "f38e3d6a305b1d8f779ccc696ce1c419a3258114b1830c6c2ad53812e2945a1d",
+      "dispatch_sha256": "82f5aa0679f4a0a4fb27d0cffe3e1dddb97ef74b9fd657f8418c4369a2027ee8",
+      "staging_sha256": "e0ac6637d93d22f803121aab5fb204fd75e6760debe72b528dec367fd7315644",
+      "execution_sha256": "4f9fc62b50f30cc1a9939ea860f8ceeeb2a0d40aee65029339b19376ef04eab8",
+      "command_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "command_elapsed_seconds": 0.47403621673583984,
+      "accounting": {
+        "adopted_children_waited": 1,
+        "child_exit_code": 0,
+        "children_cpu_seconds": 0.174267,
+        "clip": "synthetic",
+        "command_pid": 1944156,
+        "complete_descendant_wait": true,
+        "execution_identity": {
+          "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+          "snapshot_sha256": "7cca0cdd84cf2b145718ccfbeb451e55106d6ec8348a7800bf806772b3809108",
+          "source_sha256": "8df50d964f7af8283c0d7d05695af6885e77f1dd667d09f9b7261577bca97060"
+        },
+        "frames": 1,
+        "method": "linux-subreaper-waited-rusage-v1",
+        "phase": "prepare",
+        "schema": 1,
+        "scope": "stage command only; excludes fleet staging, publication and validation",
+        "stage": "smoke",
+        "wrapper_cpu_seconds": 0.043426,
+        "wrapper_pid": 1944155
+      },
+      "children": [
+        {
+          "pid": 1944156,
+          "ppid": 1944155,
+          "role": "direct",
+          "self_cpu_seconds": 0.078131,
+          "value": 727399
+        },
+        {
+          "pid": 1944157,
+          "ppid": 1944156,
+          "role": "forked",
+          "self_cpu_seconds": 0.040471999999999994,
+          "value": 896314
+        },
+        {
+          "pid": 1944159,
+          "ppid": 1944155,
+          "role": "double_forked",
+          "self_cpu_seconds": 0.040309,
+          "value": 741936
+        }
+      ],
+      "independent_children_cpu_seconds": 0.174267,
+      "individual_self_cpu_sum_seconds": 0.158912,
+      "all_children_absent": true
+    },
+    "full": {
+      "publication_sha256": "ad0ca8d4ff033662872df2e810b1946c824d55184d2b999fb564f505f0e2dbe2",
+      "dispatch_sha256": "0b71001839898cb2d73069e1af19aa4c96daf380a3332649c3fb43a018670526",
+      "staging_sha256": "d23d7905e1a8b9de1143c3f6b3a2f3a9e21637f28d5d35c04fe4ff5a19d79607",
+      "execution_sha256": "184be76e1d601f662b354829ba021d815471f9ecf99b83f221e707834cc64e0d",
+      "command_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "command_elapsed_seconds": 0.47272729873657227,
+      "accounting": {
+        "adopted_children_waited": 1,
+        "child_exit_code": 0,
+        "children_cpu_seconds": 0.17371999999999999,
+        "clip": "synthetic",
+        "command_pid": 1944861,
+        "complete_descendant_wait": true,
+        "execution_identity": {
+          "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+          "snapshot_sha256": "7cca0cdd84cf2b145718ccfbeb451e55106d6ec8348a7800bf806772b3809108",
+          "source_sha256": "8df50d964f7af8283c0d7d05695af6885e77f1dd667d09f9b7261577bca97060"
+        },
+        "frames": 1,
+        "method": "linux-subreaper-waited-rusage-v1",
+        "phase": "prepare",
+        "schema": 1,
+        "scope": "stage command only; excludes fleet staging, publication and validation",
+        "stage": "full",
+        "wrapper_cpu_seconds": 0.039023999999999996,
+        "wrapper_pid": 1944853
+      },
+      "children": [
+        {
+          "pid": 1944861,
+          "ppid": 1944853,
+          "role": "direct",
+          "self_cpu_seconds": 0.078968,
+          "value": 131594
+        },
+        {
+          "pid": 1944899,
+          "ppid": 1944861,
+          "role": "forked",
+          "self_cpu_seconds": 0.04047,
+          "value": 713239
+        },
+        {
+          "pid": 1944902,
+          "ppid": 1944853,
+          "role": "double_forked",
+          "self_cpu_seconds": 0.04027699999999999,
+          "value": 489792
+        }
+      ],
+      "independent_children_cpu_seconds": 0.17371999999999999,
+      "individual_self_cpu_sum_seconds": 0.159715,
+      "all_children_absent": true
+    }
+  },
+  "gate_sha256": "b0716b6b2b41fbc945bcd2425860068ef8fa5cdb26f28293dc5766382dcd1a8b",
+  "supervisor_pid": 1943827,
+  "supervisor_process_group": 1943828,
+  "task_process_ids_absent": true,
+  "supervisor_process_group_absent": true,
+  "cpu_claim_allocations": {},
+  "cpu_claim_receipt_sha256": "86fba3e8e0ee8f11b0d458ca7e5b5d42c8b6403e50f407684634d52518443b8a",
+  "task_process_receipt_sha256": "dc77ea2db4f75e9d326db478e5300f452a67c4d51aff6d05a61888ef8b7f8e5f",
+  "raw_remote_root": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T122208Z-a62ad658",
+  "local_audit_copy": "/private/tmp/k5d-a62ad658-audit/records.tar",
+  "whole_lifecycle_actual_cpu_seconds": null,
+  "conservative_charge_cpu_seconds": 180,
+  "limitations": [
+    "Command CPU excludes staging, publication, validation and audit.",
+    "No signal interruption, escaped session, failed or stuck subprocess, native encoder, Torch, CUDA or GPU behavior was tested.",
+    "PID absence reflects observed current /proc and process group; PID reuse is possible.",
+    "No production admission, source-bridge approval or full-study cost proof follows."
+  ]
+}

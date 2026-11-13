@@ -1,0 +1,170 @@
+{
+  "scope": "failed contended parity attempt; no parity evidence",
+  "job_id": "20261109T175655Z-9b4701ce",
+  "status": "contended",
+  "host": "gpu2",
+  "gpu": {
+    "index": 1,
+    "uuid": "GPU-40e9a544-b3d6-e5f3-a736-7020a6401bfc",
+    "name": "NVIDIA RTX A6000",
+    "memory_used_mib": 3,
+    "memory_total_mib": 49140,
+    "memory_free_mib": 48672,
+    "utilization_pct": 0,
+    "compute_processes": [],
+    "pointstream_claimed": false,
+    "pointstream_shared_claims": []
+  },
+  "foreign_gpu_pids": [
+    1414544
+  ],
+  "foreign_pid_observation": "gpu2 process listing identifies 1414544 as another user training process; not touched",
+  "source_sha256": "71d788cf9c520c4c095f011dbf5efce157493f003a3db970e57731f06d1cb7af",
+  "snapshot_sha256": "22fb921e5cc26d04f22d6e8be6f1098f504b3319283794e341ab5952dc51815d",
+  "normalized_spec_sha256": "13c30c660c375af9bdfd53dddf783df49dd6496349eddf05ec3bf37d1364ecc0",
+  "supervisor": {
+    "pid": 1411439,
+    "proc_start_time": 1794247089.1
+  },
+  "canonical_updated_epoch": 1794247212.2982185,
+  "supervisor_lifetime_seconds": 123.19821858406067,
+  "campaign_status": {
+    "status": "contended",
+    "started": 1794247089.9565248,
+    "last_progress": 1794247121.287005,
+    "emitted": [
+      "terminal:contended",
+      "contention:1794247203.9929864"
+    ],
+    "gpu_sharing": {
+      "mode": "exclusive"
+    },
+    "pid": 1411447,
+    "proc_start_time": 1794247090.22,
+    "process_group_id": 1411447,
+    "progress": {
+      "stage": "smoke",
+      "completed": 0,
+      "updated": 1794247118.7367237,
+      "decision": null
+    },
+    "contention": [
+      {
+        "detected": 1794247203.9929864,
+        "action": "stop",
+        "foreign_gpu_pids": [
+          1414544
+        ],
+        "ended": 1794247203.9929864
+      }
+    ],
+    "timing_contaminated": true,
+    "foreign_gpu_pids": [
+      1414544
+    ],
+    "error": "A process outside this job began using its claimed GPU",
+    "ended": 1794247203.9929864
+  },
+  "namespace_receipt": {
+    "argv": [
+      "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+      "-m",
+      "experiments.tennis.k5d_real_parity",
+      "run",
+      "--archive",
+      "/local/users/emanuele/pointstream/cache/bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18/tracknet-dataset.zip",
+      "--balltrack-code",
+      "/local/users/emanuele/pointstream/cache/5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff/tree",
+      "--balltrack-weight",
+      "/local/users/emanuele/pointstream/cache/b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec/balltrack_best.state_dict.pt",
+      "--wasb-code",
+      "/local/users/emanuele/pointstream/cache/657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55/tree",
+      "--wasb-weights",
+      "/local/users/emanuele/pointstream/cache/4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6/tree",
+      "--wasb-config",
+      "/local/users/emanuele/pointstream/cache/6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d/wasb-tennis.yaml",
+      "--image-ckpt",
+      "/local/users/emanuele/pointstream/cache/b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302/cvpr2026_image.pth.tar",
+      "--video-ckpt",
+      "/local/users/emanuele/pointstream/cache/934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3/cvpr2026_video_htl.pth.tar",
+      "--lpips-backbone",
+      "/local/users/emanuele/pointstream/cache/7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02/alexnet-owt-7be5be79.pth",
+      "--dists-backbone",
+      "/local/users/emanuele/pointstream/cache/397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0/vgg16-397923af.pth",
+      "--frames",
+      "16",
+      "--fidelity-gate",
+      "/local/users/emanuele/pointstream/cache/2104eac96fca55bf01047d67aef91a14611eee11dfb5eda67f8291d717082257/fidelity-cost48-gate-20261104.json",
+      "--fidelity-gate-sha256",
+      "2104eac96fca55bf01047d67aef91a14611eee11dfb5eda67f8291d717082257",
+      "--accepted16",
+      "/local/users/emanuele/pointstream/cache/8758597ba524cafc017e25cbd20c15ecbeaeed534d5622dfe67d66eb16521377/published.tar",
+      "--native-cpu-receipt",
+      "/local/users/emanuele/pointstream/cache/c64a5890d6c2388bb54453332964e1c365aa0caa28a20836de74b0493c3abf8a/pgid-native-2793-root-accepted-c64a5890-20261106.json",
+      "--native-cpu-receipt-sha256",
+      "c64a5890d6c2388bb54453332964e1c365aa0caa28a20836de74b0493c3abf8a",
+      "--unshare-sha256",
+      "9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6"
+    ],
+    "children_cpu_seconds": 80.64245199999999,
+    "complete_descendant_wait": true,
+    "elapsed_seconds": 83.47855922719464,
+    "init_cpu_seconds": 0.151342,
+    "namespace_init": {
+      "host_pid": 1412297,
+      "namespace_pgid": 0,
+      "namespace_pid": 1,
+      "namespace_pids": [
+        1412297,
+        1
+      ],
+      "namespace_sid": 0,
+      "observed_monotonic": 2714333.999248954,
+      "pid_namespace": "pid:[4026537776]",
+      "start_ticks": 271425046
+    },
+    "reaped": 2,
+    "reason": "signal",
+    "status": -15,
+    "worker_host_identity": {
+      "campaign_pgid": 1411447,
+      "exec_host_pgid": 1411447,
+      "host_pgid": 1411447,
+      "host_pid": 1412298,
+      "start_ticks": 271425053
+    },
+    "worker_namespace_pid": 2
+  },
+  "pid_check": {
+    "pids_present": {
+      "1411439": false,
+      "1411447": false,
+      "1412297": false,
+      "1412298": false
+    },
+    "process_group_present": false
+  },
+  "raw_artifact_sha256": {
+    "spec.json": "9bf6c156878adef6438475f8dcfc33bb4dcd2d6a0086f688f13514a2277fed26",
+    "state.json": "7f2ab62a8fc084a966458a0fa076ea8828c569cd14504353aa83daa0a4adfa61",
+    "ready.json": "9822e9de4146a64e5ef33fbe37bfcbd2dd94495200e839fc2c68cd129c99c81c",
+    "environment.json": "f9659ea12c1de6e78d15d55f430dfb8d4ad4894877c2afd51ddb7cc689d58ef0",
+    "smoke/staging.json": "b40c810c1cc0c09e53cc76a645680bf7be87ec12309130ca8d7270a4829717cc",
+    "smoke/dispatch.json": "d722431f6bbd29411513d1ee5f6e8252bcc3bb7525260cee8f5d75fc90e3ca3d",
+    "smoke/command.log": "c555a9fbb40c63ef7a5c2d89c2c0394c57aec760b3d2ffd1a038de3dd49f4d7e",
+    "run/request.json": "c333adc58bf229bc69ad6fd463599c9d0dcf827b66e78c08da8694d9c8e6364e",
+    "run/supervisor.json": "6a39d79b87a18721eae343727afb500c61653ddb8f6c3d43cf4cc3c7c4acf476",
+    "run/cpu-affinity.json": "46bcea43a67cd4b9d72e02bc941846a498288ecb618e666ce24d2728333bdec3",
+    "run/claim.json": "0a89f1aa9b843ee0d3e7980932096d980000a02367fe573d0ca9736e77b8a449",
+    "run/status.json": "f4262e7cd6ab8150d97d5e72041ef2b95133b0c9b661039cfa58afaee52e84c8"
+  },
+  "raw_remote_listing_and_foreign_observation": "/private/tmp/k5d-parity1752-raw.txt",
+  "event_acknowledged": true,
+  "prospective_conservative_charge": {
+    "gpu_seconds": 130,
+    "future_cpu_seconds": 160,
+    "prior_preparation_cpu_seconds": 50,
+    "inclusive_cpu_seconds": 210,
+    "basis": "round one-core supervisor birth-to-terminal upper 123.2s to 130 for GPU and CPU, plus 30 CPU external audit; prior 50 prep separately charged; manager/other admin CPU not directly measured"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "decision": "Root releases bounded source-only scheduler inspection; no GPU or model/native inference",
+  "attempt_nonce": "22578404a2dc13eb5c71431ee0593d1a",
+  "qualification_charge_kind": "pilot_preparation",
+  "phase": "w8-context-q0-source-inspection-20261110",
+  "parent_phase": "w8-full-witness-staged-20261106",
+  "witness_qualification": true,
+  "CPU_ceiling_inclusive": 20,
+  "GPU_ceiling": 0,
+  "source_archive_sha256": "bfca6cf1129a0154bf2c3431c0e01b34f5e815eda5ba504f54e001c8ceeb99ee",
+  "context_source_sha256": "aa019bb1dac4e7e736231c85d48131e21ea51012347b1810cb03c8b37cade71a",
+  "scope": "Read-only recover exact declared AA source members from existing immutable archive, stat protected aliases before publichash, pin archive/member SHA. Preserve originals and newcopies. Inspect real scheduler/caller; optional pure-source CPU index count for24/240 using original30step/context24/overlap4/stride1 recipe. No training,render,torchmodel execution,CUDArun,source/golden footage or grants.",
+  "constraints": "Inside existing W8parent3400CPU and cumulative900GPU/1000CPUcontextqualification cap. Record current attemptnonce in every preparation charge; future actualpilot receipt/caps/ledger remain unapproved. Bound command<=45minutes; unknown originals/hash/alias/cost failure stops, no replay."
+}

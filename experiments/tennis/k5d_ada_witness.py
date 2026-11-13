@@ -66,9 +66,11 @@ def cpu(args: argparse.Namespace) -> None:
         wire_sha256=args.wire_sha256, map_sha256=args.resources_sha256,
         expected_yuv_sha256=args.expected_yuv_sha256, expected_rgb_sha256=args.expected_rgb_sha256,
         config_path=Path(args.receiver_isolation_config), config_sha256=args.receiver_isolation_config_sha256,
-        protected_paths=protected, producer_context=actual_context)
+        protected_paths=protected, producer_context=actual_context,
+        **({'cpu_only': True} if getattr(args, 'cpu_only_receiver', False) else {}))
     proof = isolated.verify_receipt(receipt, expected_context=actual_context,
-                                    expected_config_sha256=args.receiver_isolation_config_sha256)
+                                    expected_config_sha256=args.receiver_isolation_config_sha256,
+                                    **({'require_cpu_only': True} if getattr(args, 'cpu_only_receiver', False) else {}))
     if not isinstance(proof, dict) or not scale.digest(proof.get('actual_policy_sha256')):
         raise ValueError('actual CPU receiver denial proof missing')
 
@@ -136,7 +138,8 @@ def validate() -> None:
                 receipt = json.loads((output / 'receiver.json').read_text())
                 actual_context = context(stage, identity, {'kind': 'cpu'})
                 proof = isolated.verify_receipt(receipt, expected_context=actual_context,
-                                                expected_config_sha256=args.receiver_isolation_config_sha256)
+                                                expected_config_sha256=args.receiver_isolation_config_sha256,
+                                                **({'require_cpu_only': True} if getattr(args, 'cpu_only_receiver', False) else {}))
                 if (not isinstance(proof, dict) or not scale.digest(proof.get('actual_policy_sha256'))
                         or receipt.get('wire_sha256') != args.wire_sha256
                         or receipt.get('resource_map_sha256') != args.resources_sha256
@@ -165,10 +168,12 @@ def validate() -> None:
 
 def spec(base: dict, *, action: str, assets: dict[str, dict[str, str]], deadline: str,
          unshare_sha256: str, identity: dict[str, str], expected_yuv_sha256: str = '',
-         expected_rgb_sha256: str = '') -> dict:
+         expected_rgb_sha256: str = '', cpu_only_receiver: bool = False) -> dict:
     """Build a bounded CPU oracle or first GPU witness, not an authorization."""
     from experiments.jobs.inbox import validate_spec
 
+    if type(cpu_only_receiver) is not bool or (cpu_only_receiver and action != 'cpu'):
+        raise ValueError('CPU-only receiving is an explicit CPU-oracle option')
     required = {'bridge', 'receiver_isolation_config', 'native_cpu_receipt'}
     if action == 'cpu':
         required |= {'wire', 'resources', 'protected'}
@@ -209,6 +214,8 @@ def spec(base: dict, *, action: str, assets: dict[str, dict[str, str]], deadline
         result['arguments'] += ['--' + flag, '{staged:' + name + '}', '--' + flag + '-sha256', item['sha256']]
     if action == 'cpu':
         result['scale'].pop('frames', None)
+        if cpu_only_receiver:
+            result['arguments'].append('--cpu-only-receiver')
         result['arguments'] += ['--expected-yuv-sha256', expected_yuv_sha256, '--expected-rgb-sha256', expected_rgb_sha256]
         result.pop('gpu_sharing', None)
         result.update(device='cpu', gpu_models=[], gpu_memory_mib=0, contention={'policy': 'stop', 'resume_attempts': 0},
@@ -238,11 +245,16 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument('--expected-rgb-sha256')
     p.add_argument('--unshare-sha256')
     p.add_argument('--frames', type=int)
+    p.add_argument('--cpu-only-receiver', action='store_true',
+                   help='Require CUDA-hidden SVT receiving for the CPU qualification only')
     return p
 
 
 def main() -> None:
     args = parser().parse_args()
+    if args.cpu_only_receiver and not (args.action == 'cpu' or
+            (args.action == 'noop' and os.environ.get('CUDA_VISIBLE_DEVICES') == '')):
+        raise ValueError('CPU-only receiving is restricted to CPU qualification')
     if args.action == 'validate':
         validate()
     elif args.action == 'noop':

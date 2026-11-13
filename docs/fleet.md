@@ -54,7 +54,11 @@ complete. Independent metadata queries overlap, and SSH connections expire
 after120idle seconds. See [health recovery](fleet-health-recovery-2026-10-27.md).
 `doctor` verifies each host's environment,
 cross-host visibility of a fresh token, and exactly one winner of concurrent
-atomic mkdir. It retains its report under `jobs/fleet/checks`; worker startup is
+atomic mkdir. The standard-library token, atomic-claim and report helpers use
+`/usr/bin/python3`, the same local interpreter used by the fleet host probe;
+the configured workload interpreter is still checked and recorded separately.
+A helper failure or timeout does not pass the doctor. It retains its report under
+`jobs/fleet/checks`; worker startup is
 blocked when these checks fail. `workers start` installs a HEAD snapshot once on
 the shared filesystem and starts a detached worker per host. Worker releases
 contain only the manager and its contract dependencies; workload snapshots retain
@@ -170,6 +174,29 @@ affinity or escape the process group. It does not itself impose a CPU-time
 limit, cover earlier worker admission or a separate audit, or eliminate monitor
 polling and termination overhead. Those need their own accounting and bounds.
 Workers must run the release implementing the opt-in before it is used.
+
+An opted-in single-CPU campaign may also declare `"cpu_affinity_index": 1`
+to select the second CPU in the supervisor's sorted allowed CPU set; an
+omitted index keeps the existing first-CPU behavior. The index must be a
+nonnegative integer and is valid only with `"single_cpu_campaign": true`.
+An out-of-range index fails before a device or CPU claim. For indexed requests,
+the reviewed fleet-release supervisor pins itself first and records its
+available and selected CPUs; the campaign verifies that inherited binding, and
+the smoke, full stage, validator and their ordinary children inherit it.
+`dispatch.json` records the physical CPU and fleet-control file hashes. The
+supervisor and campaign execute from the reviewed fleet release; scientific
+commands still execute from their separately frozen workload snapshot.
+
+The index is a selection, not a core reservation or automatic collision
+detector. Coordinate indices for concurrent campaigns and check their recorded
+physical CPUs: different inherited CPU sets can map the same index to
+different cores, and different indices from different sets can still collide.
+The GPU contention checker does not detect CPU collisions. Until the indexed
+release has passed the fleet doctor and host-specific inheritance checks, run
+only one timing-sensitive single-CPU campaign per host, even on separate GPUs.
+An indexed submission requires every eligible host's fresh worker heartbeat to
+advertise `indexed_cpu_affinity_v1`; activating a new worker release must be
+reviewed separately and must preserve active supervisors and their artifacts.
 
 Children inherit `PS_STAGE` (smoke/full), `PS_STAGE_DIR` (separate output directory),
 `PS_JOB_DIR` (supervisor directory), `PS_VALIDATION_PATH`, `PS_SCRATCH_DIR`,
@@ -619,6 +646,7 @@ and choose `gpu_models` from it.
 
 | Model | GPU class | Device / provider / kernels verified | Job |
 |---|---|---|---|
+| GVC-RT native fixed-QP3 peer, I/P + judges | RTX 6000 Ada (8.9), exclusive gpu6 | CUDA device, UUID, visibility and provider checked; I/P strict state coverage and sender/receiver parity pass. Selected eager backend records `disable_fused=true`, `customized_cuda_inference=false`; individual kernel names were not profiled. Scorer checks the first parameter of each model. Scope: 16-frame peer, no kernel-trace qualification | `20261105T121902Z-4020b8ee` |
 | MoQSplat external reproduction, gsplat 1.5.3 | RTX 6000 Ada (8.9), exclusive gpu6 | passes: full 6,131,954-Gaussian scene through CUDA gsplat with CPU fallback forbidden; Torch 2.10.0+cu128, compiler 12.4.131, explicit target headers/libs, SH3 and asymmetric camera intrinsics; received-data/source render agreement within 2/255 channel levels on 3 frames. CUDA extension exercised; individual kernel names were not profiled. Scope/identities in [record](moqsplat-reproduction-2026-11-01.md#final-correctness-result); no performance claim | `20261101T161843Z-425ac71f` |
 | SAM 3.1 multiplex | RTX 6000 Ada (8.9) | passes: CUDA, torch 2.10.0+cu128, cuDNN 9.10; bf16 flash attention (+ mem-efficient), policy `native_flash`; hand IoU 0.65; peak 11.3 GiB | `20261006T113911Z-fb135803` |
 | SAM 3.1 multiplex | RTX A6000 (8.6) | passes: as Ada; flash attention; hand IoU 0.65; peak 11.3 GiB | `20261006T114724Z-5b302ae5` |
@@ -663,6 +691,26 @@ evidence. Ada `yoloe-codecs` and `hamer` and the first GV100 hand jobs were
 stopped as `contended` by another user's process on the claimed GPU; their
 smoke gates had passed (Ada) or they were rerun (GV100).
 
+**November12 Ball hardware qualification:** the opt-in Ada16 source profile
+preserves every exact accepted A6000 reference comparison and requires a new
+source-bound CPU proof plus exclusive GPU validation. CPU proof d24d is accepted;
+GPU request `20261112T192044Z-461e16e8` expired unassigned; no GPU execution. This is not yet
+a passing Ada parity/cost row, nor downstream study admission. RTX6000Ada is the
+best documented alternative for these models; the RTX8000 lacks this HT-L
+pipeline qualification, and GV100 has the upstream failure recorded above.
+Qualification37b3 then actually ran on exclusive gpu6 Ada but failed exact
+cross-class preparation equivalence: WASB coordinates and DCVC native/pixel
+hashes differed, while source YUV/scores and SVT hashes matched. Scoring was not
+reached; no quality conclusion. A separate prospective fresh Ada reference/repeat
+protocol is in preparation, without changing the old failed gate.
+Fresh separate Ada2c8b then passed exact same-physical-GPU six-point16 packet
+replay, native/receiver bytes and complete metrics/judges (A126.574s/B112.491s).
+This qualifies the scoped packet-repeat/cost path, not independent data or
+filesystem denial. The actual receiver still declares filesystem isolation
+unestablished; the new denial/scale source is unproven and benchmark promotion
+held. The same-job DCVC rule below remains unchanged. See the
+[qualification card](cards/k5d-ada-qualification-2026-11-12.md).
+
 **Choosing `gpu_models`:** SAM 3.1 and DCVC-UF on Ada and A6000 only (DCVC-UF
 also runs on the RTX 8000). The hand models and YOLOE run on all four classes.
 
@@ -693,3 +741,7 @@ The [2026-10-27 storage recovery](storage-maintenance-2026-10-27.md) records
 migration journals, fresh-shell checks, protected live files and the remaining
 gpu5/gpu6 live-path approval restriction. The shared startup script is maintained
 at `env/bootstrap-hostlocal.sh`; runtime aliases must be prepared before installation.
+
+Linuxindexed-controlindex0probejob `20261105T032852Z-5b36881b` recorded2026-11-05; CPU-onlyoldscientificsource3bc4b873+released538control, no model/data. Newrelease `/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261105T031637Z-2503bb20`; doctorpassedallhosts, freshcapabilityheartbeatsverified. ActualLinuxplacementacceptedwithindependentaudit `experiments/k5d-inputs/indexed-control-probes-independent-audit-20261105.json`; the probe uses CPU0.
+
+Indexed-controlindex1probejob `20261105T033020Z-48761453` is a CPU-onlyverification; actualsupervisor/workload/child/validatorCPU1 andsource/controlseparationacceptedinthesameaudit. The two probes ran sequentially; no concurrent-schedulingperformanceclaim.

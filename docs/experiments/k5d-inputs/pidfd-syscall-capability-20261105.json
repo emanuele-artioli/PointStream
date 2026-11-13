@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "scope": "self pidfd signal-zero capability only; not native or GPU qualification",
+  "host": "gpu2",
+  "launcher_sha256": "90e8690474ff880f128d6348c4707e5b52b2603e17c7319f542df7a78d66b6f5",
+  "ssh_exit_code": 0,
+  "stderr": "",
+  "client_wall_seconds": 4.073217166005634,
+  "probe": {
+    "affinity": [
+      0
+    ],
+    "capability": {
+      "abi_source": "https://raw.githubusercontent.com/torvalds/linux/v6.8/arch/x86/entry/syscalls/syscall_64.tbl",
+      "backend": "linux-x86_64-syscall",
+      "libc_version": "2.35",
+      "machine": "x86_64",
+      "own_pid_signal_zero": true,
+      "python_version": "3.12.14"
+    },
+    "cpu_seconds": 0.019172589000000004,
+    "cuda_visible_devices": "",
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "exit_code": 0,
+    "helper_sha256": "21ed2775eaafd2f55c19cc65c91c2a4f73c042b4bfc7a616bbcde36b99e6bd8e",
+    "interpreter": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+    "pgid": 3164011,
+    "pid": 3164011,
+    "schema": 1,
+    "scope": "self pidfd signal-zero capability only",
+    "status": "passed",
+    "torch_after": false,
+    "torch_before": false,
+    "wall_seconds": 0.20892701297998428
+  },
+  "recommended_charge_cpu_seconds": 20,
+  "gpu_seconds": 0
+}

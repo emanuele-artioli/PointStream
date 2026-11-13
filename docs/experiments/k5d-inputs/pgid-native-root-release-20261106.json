@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "decision": "root_release_one_cpu_native_pgid_proof",
+  "inclusive_cpu_cap_seconds": 300,
+  "gpu_cap_seconds": 0,
+  "parent_phase": "k5d-scale-first-tranche-20261105",
+  "cap_breakdown": {
+    "preparation": 50,
+    "whole_lifecycle": 220,
+    "independent_audit": 30
+  },
+  "source_receipt": "/private/tmp/k5d-pgid-source-review-20261106.json",
+  "revision": "ae6030e58a98156d3b5cb5d1cfab78967b173c9b",
+  "snapshot_sha256": "22fb921e5cc26d04f22d6e8be6f1098f504b3319283794e341ab5952dc51815d",
+  "source_sha256": "71d788cf9c520c4c095f011dbf5efce157493f003a3db970e57731f06d1cb7af",
+  "wrapper_sha256": "62f9513b4058143eaa1bdb738d675842ed43c5b197dea658a93bde40e4ae0fa0",
+  "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "root_checks": [
+    "all1373archiveblobs equal assembledcommit",
+    "all1348H2files byteidentical and exact25control additions",
+    "reviewedpreexec hostPID/startticks/PGID and independentlivePGIDjoins",
+    "productionaccounted-child bypasses olddetachingfallback;paritydirect prepare/score",
+    "independentreview no remainingstaticblocker;actualLinuxproof pending"
+  ],
+  "campaign_caps": {
+    "budget_seconds": 100,
+    "smoke_seconds": 70,
+    "validator_seconds": 10,
+    "noop_seconds": 5
+  },
+  "required_proof": [
+    "normal inheritedcampaignPGID",
+    "timeout,TERM,KILL detached CPU-nativechildren",
+    "actualffmpeg/SVT/dav1d native path",
+    "livehostPID/starttick/PGID joins",
+    "independentnormalCPUcounters",
+    "allownedPIDs/claimsabsent/eventACK/canonicalcomplete"
+  ],
+  "conditions": "Freshall6host/jobs/source/input/env/tool/storage/affinity checks;deadlineonlyrefresh<=45min then recordnormalizedspec/jobID beforeONEcanonicalwait<=150s. Sourceuploadunder50CPUprep once, verifiedcachecopy30s. Stoponanyfailure; noGPUrelease, replay orreplacement."
+}

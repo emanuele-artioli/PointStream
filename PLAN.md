@@ -21,28 +21,135 @@ Every dataset is used for what it labels ([resources](docs/resources.md#what-eac
 The environment audit (step 0) comes before the first component that needs a
 new dependency.
 
-## Where PointStream stands (2026-11-04)
+## Where PointStream stands (2026-11-13, UTC)
 
-**Research completion reopened, 2026-11-04:** the user requests expansion of
+### Current research decision (November 13, UTC)
+
+The 55dd GPU witness is closed: six ordinary native preparations completed,
+but its first restricted decoder failed on a lazy Torch import; no receiver or
+quality point passed. Final cleanup is recorded, while the selected observer
+remains UNKNOWN with no reservation bound. Events and both waits are closed.
+
+The scoped lazy-import CPU diagnostic passed. The separate [public-Python
+category repair](docs/cards/k5d-public-python-runtime-repair-2026-11-13.md) metadata helper failed after publication;
+a read-only recovery audit verified the published files and private-data
+separation. The original helper remains failed; no qualification follows.
+
+**The Ada registered-study port is merged and CI-green.** Final revision
+`ae892df1`, source `9d3d7b2c` and archive `ad635b0b` are frozen. Native CPU job
+`cc884861` and actual SVT CPU denial job `c53fb111` are COMPLETE and root accepted.
+The GPU witness remains held pending exact metadata and observer release. Use
+this same source/environment/archive for fresh 16/48 calibration
+through 292/586/full30, preserving defaults and fresh receivers at every new
+stage; new source qualification is mandatory. The [SVT-only route](docs/cards/k5d-svt-only-confirmation-2026-11-13.md)
+remains separately held and scientifically unreleased.
+
+Programme charges are 22,941 GPU / 60,945 CPU seconds within unchanged 24/28-hour
+authority. Bounded passive watch a10 is active; no autosubmit or model timers.
+The [canonical continuation](docs/continuation-2026-11-13.md) records all current jobs, limits, balances,
+artifacts and remaining gates. Final-source CPU qualification is complete.
+GPU/scale and paper/PRESLEY work remain held.
+
+### Historical af6 phase — balances, waits and watch superseded above
+
+Root accepted exact-source native CPU proof `20261113T021221Z-f2db8617` and
+real two-case SVT CPU receiver oracle `20261113T022437Z-50b4e24e` on frozen
+`5ebc7831` / source `abccdf05` / archive `7fd4e0e6` / environment `32e`.
+The native proof covers CPU containment/accounting. The real oracle passed
+normal SVT filesystem denial and initial-launcher interruption with scoped
+teardown: 16 distinct host processes reconcile as 14 main-audit + 2 outer-audit
+checks (14 captured births plus supervisor and campaign). No active-native, unshare-only or fleet-watchdog claim follows.
+The 50b event is acknowledged; root verified its canonical status.
+
+The full real-CPU approval is outside git (SHA `75ae95a6984c`); its thin
+[closeout](docs/experiments/k5d-inputs/ada-5ebc-50b4-root-CPU-denial-closeout-20261113.json) records the exact source, policy, publication and audits.
+Prior `c1bededa` remains a failed combined gate with acknowledged events; its
+signal-enum diagnosis and the accepted caller fix are retained beside the pass.
+
+Exclusive Ada witness `20261113T030323Z-af6c09da` **EXPIRED unassigned**.
+Physical inspection establishes NO ADMISSION and no execution; the canonical
+event is acknowledged. Its sole native wait (backend 70306) ended after 599
+seconds, exit 10. The original observer batch wait (backend 66293) later ended 0; both journals
+retained UNKNOWN and all four wrapper/timeout PIDs are absent. Do not replay the job.
+No assigned UUID, GPU/decoder result, quality or scale claim follows.
+
+The unused 900 GPU / 700 campaign CPU seconds were released. Retained cost is
+400 CPU seconds: 50 preparation + 200 observers + 150 administration.
+Programme charges: **21,141 GPU / 56,940 CPU seconds**; Ball: 14,779 GPU /
+32,939 CPU. After a transfer of unspent funds, the Ada stage has 4,118 GPU /
+1,588 CPU seconds remaining. A separate **600 GPU / 1,800 CPU reservation**
+now funds conventional-only feasibility; it is not spending or new user authority.
+Old held Ball 7,920 GPU / 800 CPU and W8 4,550 GPU / 929 CPU are unchanged;
+the programme ceiling remains 24 GPU-hours / 28 workload CPU-hours.
+
+**Next PLAN point: [SVT-only confirmation feasibility](docs/cards/k5d-svt-only-confirmation-2026-11-13.md).** Source design/build
+only is authorized; scientific compute is UNRELEASED. Preserve the same 30
+registered clips and original three SVT settings (CRF48/55/62, preset4), with
+restricted CPU decoding, ordinary models on shared Ada, full-frame and ROI
+metrics, independent judges and existing guards. First qualify a separately
+named 16-frame correctness/cost oracle; only then prospectively admit 48-frame/
+absent controls and a complete scale forecast. The original dual-codec goal
+remains open; this narrower route does not replace its missing neural comparison.
+
+[CPU claim-path correction](docs/experiments/k5d-inputs/ada-cpu-claim-path-correction-20261113.json): earlier alias `gpu6.json` absence checks
+were unsupported. The actual `gpu6.itec.aau.at.json` file exists with zero
+allocations; all six own allocations are absent now. This proves CURRENT
+cleanup only, not immediate historical release intervals. Native process,
+normal decoding and filesystem-denial proofs are unaffected. Preserve all
+original gate, source and raw hashes; the addendum corrects interpretation.
+
+At the af6 phase, watch a7 had not yet found capacity; it later found idle
+Ada at 03:23:52 UTC and ended 03:33:49 with PID 73984 absent. Current watch a8
+is recorded above. Earlier a6 ended 02:51:25 UTC after nine ticks with no idle
+GPU. PR 378 later merged with green CI (Ruff, mypy 591 files, 2,197 tests /
+40 skipped); the main integration advanced to `1a1f63c7`, while frozen
+scientific source `5ebc7831` is unchanged.
+
+Ada's same-GPU repeat `2c8b49a0` supports its own qualified reference; failed
+cross-A6000 comparison `37b3b79b` is retained. Current validators require exclusive
+GPU access. GPU/CUDA/DCVC denial, new clips and scale/full30 remain unqualified.
+The expired witness provides no GPU qualification. The next route has separate
+source, correctness, resource and budget gates. Paper/PRESLEY
+remain paused; no training, paid hosting or submission is authorized.
+
+The earlier PLAN audit found no other ready independent experiment; the new
+SVT-only feasibility point above is a narrowed source-build decision. W8 remains
+held on complete-cost prerequisites.
+See [current handoff](docs/continuation-2026-11-13.md) and
+[stage card](docs/cards/k5d-ada-scale-and-denial-2026-11-12.md).
+
+**Historical access recovery, November12:** start with the [current handoff](docs/continuation-2026-11-12.md) and [storage decision](docs/fleet-recovery-2026-11-12.md). Both unknown requests are independently closed expired unassigned and events acknowledged. Current charges19,362GPU/48,791CPU; nested Ball7,920GPU/1,450CPU andW84,550/929 remain. Existing local disks have ample space: no broad cleanup or migration is warranted. Use packed local source/environment/input/scratch and retain NFS archives. First launch stopped beforeIDallocation; the subsequent verified partial-pool request `20261112T172806Z-8709406d` expired unassigned. Both eligible workers found no admittedGPU; fresh A6000 occupants were otherusers. Rootclosed400externalCPU/0GPU andACKedcanonicalevent. No activejob/wait/timer or furtherqueue release; corrected16 remains unexecuted. W8full-witness compute held for insufficient complete-cost evidence under929CPU, not a quality failure. No paid hosting, source or paper change.
+
+**Historical outage contingency audit, November11:** start with the [current handoff](docs/continuation-2026-11-11.md). Existing evidence supports consideration of a narrower empirical trade-off paper, not the unproved full ball/generalization or complete fresh-decoder claims. Recover university access before considering paid hosting; selected local evidence is not a full dataset/model backup. No paid server is authorized, no experiment is newly closed, and the research-first manuscript pause remains in force. The two unknown jobs and all charges/reservations below are unchanged.
+
+**Research-first continuation, 2026-11-05:** manuscript editing is paused until the worthwhile scientific endpoints are resolved. Broad legacy/training/prerequisite-blocked tasks remain explicitly separate; a closed negative is a completed decision, not a reason to repeat the same test. The user approved the concrete24GPUh/28CPUh ceiling revision.
+
+**Historical research decisions, November10, before restored access (superseded by November12 above):** research remains open and is now blocked by fleet access; manuscript and PRESLEY edits remain paused. Ball `20261110T190907Z-4d0dd928` (original corrected16 retained-receiver parity/I/O cost) and W8 `20261110T183845Z-4c240783` (original24/30 operational cost pilot) were last canonically pending. Both sole waits failed with communication errors. Final correctly routed read-only status checks through gpu3/gpu5 also timed out after their deadlines; execution, expiry and claims remain unknown. Preserve the jobs and full nested reservations; no replay or further admission until existing states/ownership are inspected after access returns. No fresh GPU scientific result is inferred. Programme conservative charges are19,362GPU/47,371CPU seconds within the unchanged24GPUh/28CPUh ceiling. Root fixed the client management-override bug; all2,127tests passed with40skipped, Ruff/mypy passed, and the fix does not change frozen scientific sources or repair server connectivity. See the [connectivity receipt](docs/experiments/fleet-connectivity-block-20261110.json), [current continuation](docs/continuation-2026-11-10.md) and [live budget](docs/experiments/submission-research-budget-20261104.json).
+
+The saved full188Clip3 analysis has independently reproduced crop BD-rate benefits (-76.9% LPIPS/-48.5% DISTS within measured overlaps) beside full-frame rate penalties (+2.5–4.0%); it is one calibration-exposed all-visible clip, not full30 credit. Corrected16 execution, separate48/292/586 gates, full30 cost admission and the full fresh decoder witness remain unproved. W8's accepted exact-source CPU proof is mechanism evidence only; true qualification preparation is1,300CPU with the original nonce and charges retained. The explicit2,300CPU cumulative allowance remains inside the existing workstream/parent, not a programme increase. The independent PLAN re-audit found no other currently ready, admitted independent experiment worth diverting to. Closed negatives, missing prerequisites, training exclusions, footage rights and coauthor review remain explicit in the [research decisions](docs/experiments/remaining-plan-research-20261105.md).
+
+**Historical research completion reopening, November4–5 (later gates/status supersede this paragraph):** the user requests expansion of
 the ball proof of concept and completion of the remaining submission-relevant
 PLAN. The previous author-review package remains preserved; it is not the
 endpoint of this new work. The CPU exposure audit found all 30 TrackNet games 8–10
 clips and 43 RacketVision tennis test rallies were used in tracker selection.
 A larger TrackNet study must be described as retrospective; its 5,675 frames
 include 5,472 visible, 197 explicitly absent and 6 occluded. Exact selections and
-hashes are in [K5d](docs/experiments/k5d-ball-benchmark.md). New source/model,
-wire/receiver, task/fidelity analysis and budget gates are being prepared;
-the user approved a fresh staged20GPU-hour/24workloadCPU-hour program, initially2GPU-hours/3CPU-hours for feasibility. Larger stages require correctness and complete forecasts; authority and charges are recorded in the approved card and budget ledger. Code preparation already fixes
+hashes are in [K5d](docs/experiments/k5d-ball-benchmark.md). The new actual-native+BALL wire/receiver path passed 16/48-frame controls and a separately admitted 188-frame six-point confirmation; shared six-setting scoring now reproduces the accepted 16/48 evidence exactly. The frozen 30-clip retrospective benchmark still awaits 292/586-frame scale confirmations and complete cost admission. The user approved the pending ceiling increase to24 GPU-hours /28 workload CPU-hours on November5. The first additional2.5GPUh/3CPUh tranche is conditional on per-job qualification and292/586 scale confirmations; no full30 admission follows automatically. The separate table-tennis source judge failed (0/85 visible), so cross-sport coding was not admitted. W6 smoothing improves its descriptive one-window scores but still fails the original temporal rule. Paid-mask oracle and cross-sport source-judge negatives remain scoped. A new GVC native 16-frame point has fresh-decoder parity and a crop/full-frame trade-off, without a curve or corpus claim. A strict-isolation CUDA probe and the repaired real one-step source-hidden output/kernel checks pass; the combined cost gate fails, and a fresh paired pilot is contended before sealing a completed step. No 1→3 cost slope, full fresh witness or quality claim follows. Historical clocksource failures and the separate CPU packet proof remain retained. Historical November5 job IDs and gates are in [that dated continuation](docs/continuation-2026-11-05.md); use [the November11 handoff](docs/continuation-2026-11-11.md) for current authority;
+the user initially approved20GPU-hours/24workloadCPU-hours, then increased the inclusive total to24GPU-hours/28workloadCPU-hours on November5. Larger stages require correctness and complete forecasts; authority and charges are recorded in the approved card and budget ledger. Code preparation already fixes
 the W6 diagnostic's improper float32 override of its literal registered control.
 The old pilot/receiver budgets stay closed. The approved finite staged program is
 in [the card](docs/cards/submission-research-2026-11-04.md); full 34-window/training
-work cannot be silently borrowed into it. The complete remaining-work audit is
-[here](docs/paper/submission-completion-audit-2026-11-04.md).
+work cannot be silently borrowed into it. The historical November4 remaining-work audit is
+[here](docs/paper/submission-completion-audit-2026-11-04.md); later decisions are in the [current inventory](docs/experiments/remaining-plan-research-20261105.md).
 
-**Latest manuscript checkpoint:** Overleaf `184e2e0`
+**New verified baseline evidence, 2026-11-05:** all 75 SVT roles have complete-byte/native-YUV proof and the four new scores passed audited controls. The corrected six-window Tier 1 analysis uses all 71 distinct valid streams, complete native IVF as primary, complete MKV as a separate sensitivity, and affordable measured endpoints. Conditional player-region gaps remain positive; whole-frame anchors remain better, med000 DCVC is absent, the Medvedev subgroup is inconclusive, and unseen-match Tier 2 is unchanged. The two half-out strict brackets remain unresolved under original IVF but resolve under MKV; this is not full native-family closure. The first flawed endpoint analysis is retained as invalid. See [the accepted report and audit](docs/experiments/w7-anchor-rate-repair.md). Source-hidden CPU packet and real model-file folder mechanics are audited; actual generation is still unqualified. The [PLAN closure scan](docs/paper/plan-closure-scan-2026-11-05.md) identifies the wider pipeline work that cannot be marked complete from current evidence.
+
+**Bounded native peer result, 2026-11-05:** the separately audited GVC fixed-QP3 adapter decodes the first16 TrackNet game10/Clip3 frames identically at sender and fresh source-hidden receiver, with22570 native and2907 manifest bytes. At338.55kb/s native, cropLPIPS0.1018 is better than the modeled anchor envelope0.1351, while whole-frame PSNR21.106dB is worse than33.712dB. This is one retrospective development point, not BD-rate, absent-frame performance, an official-entrypoint replication or complete-codec superiority. Inputconversion, unfused backend, unknown codec/BallTrack exposure, author-reported WASB split and unprofiled kernel names remain explicit. The [full independent report](docs/experiments/ego-peer-inputs/20261104/gvcrt-4020b8ee-independent-report-20261105.md) and [adapter sanity check](docs/experiments/ego-peer-inputs/20261104/gvcrt-4020b8ee-source-sanity-20261105.md) are retained; all own processes and claims are released.
+
+**Latest manuscript checkpoint:** Overleaf `5cf2823`
 is pushed: eight main figures and two appendix figures, 23 body/reference pages
-(references on 22–23) plus five appendix pages. The historical ball result and
-new separate-judge 48-frame pilot are in the main text/figure; a per-setting
+(references on 22–23) plus five appendix pages. The historical ball result, separate-judge 48-frame pilot and six-setting 188-frame companion are in the main text/figure; the bright-mark control negative is retained. A per-setting
 physical-byte/PSNR table supports them in the appendix. Negative whole-frame
 guards and broader limitations remain visible. Both current variants build to the same page limits; the previous
 23-file selected-source ZIP is preserved pending a new research-final package; previous anonymous review data contains only saved
@@ -223,12 +330,13 @@ sessions update their own items and their files in `docs/experiments/`
 
 ### Resume here after the root chat is archived
 
-**Latest (2026-11-01): read [the 2026-11-01 continuation](docs/continuation-2026-11-01.md) first.**
+**Current: read [the November12 handoff](docs/continuation-2026-11-12.md) first.**
+The November1 and October27 continuations below are historical.
 The later billing correction above supersedes the earlier two-tier W7 closure.
 Work continues in Codex sessions; the 2026-10-27 text below is historical.
 
-Read [the 2026-10-27 continuation](docs/continuation-2026-10-27.md) first. It
-contains the current scientific stop, exact job/artifact identities, remaining
+The historical [2026-10-27 continuation](docs/continuation-2026-10-27.md)
+contains the then-current scientific stop, exact job/artifact identities, remaining
 budget, storage state and the next decision. The existing study chat is
 `01a16e7a-e752-78f3-b372-c338d8cdbf46` ("Prepare tennis confirmation study");
 its code and reports are merged. It is idle. Do not create duplicate studies or
@@ -447,7 +555,7 @@ marked `card ready` is waiting for the user to start it.
 
 | item | card | branch | model / effort | status |
 |---|---|---|---|---|
-| Submission research completion / K5d | [staged card](docs/cards/submission-research-2026-11-04.md); [ball protocol](docs/experiments/k5d-ball-benchmark.md) | `codex/submission-research-2026-11-04`, from main `98d12601`, PR #331 | primary plus requested Terra 6.1 medium delegates; actual telemetry unverified | Running CPU preparation: retrospective 30-clip/5,675-frame inventory and deterministic selection frozen; new actual-native+BALL wire/parser, matched-envelope analysis and source-judge oracle CPU-tested; W6 literal control gate fixed; W8 CUDA-only per-condition preparation remains supervisor-gated. No new GPU allocation/submission. Proposed 20 GPU-h /24 CPU-h program first 2 GPU-h /3 CPU-h on feasibility, pending user approval. No training/full 34-window run or med000 DCVC retry. Paper prior-exposure correction prepared separately; PRESLEY untouched. |
+| Submission research completion / K5d | [staged card](docs/cards/submission-research-2026-11-04.md); [ball protocol](docs/experiments/k5d-ball-benchmark.md) | `codex/submission-benchmark-2026-11-04`; PR333–337 merged | primary plus requested Terra 6.1 medium delegates; actual telemetry unverified | **Current: Ada16 `20261112T192044Z-461e16e8`, pending at publication, native capacity checks1min through20:00:05.184948UTC; ONEcanonicalwait2500.** Exact21482source/newCPUproofd24drootaccepted; exactoldreference checks unchanged. RemainingBall7920GPU/1150CPU coverswhole1000/1150maximum. Charges19362GPU/49131CPU; W8held929CPU. [Current handoff](docs/continuation-2026-11-12.md), [Ada card](docs/cards/k5d-ada-qualification-2026-11-12.md). NoAIheartbeats/retry/scale/paper edits. |
 | Paper strengthening and independent ball pilot | [research priorities](docs/paper/research-and-figure-priorities-2026-11-01.md); [K5c](docs/experiments/k5c-independent-ball.md) | `codex/paper-strengthening-2026-11-01`, PR #329 | primary plus requested Terra 6.1 medium delegates; actual tier telemetry unavailable | 2026-11-03: eight main/two appendix figures implemented, ball retained in main, negative guards visible; 23 main/reference plus five appendix pages. Original four-window audit recovered. K5c original 48-frame pilot completed and independently audited as `20261103T141758Z-f5d52fac`, gpu6 Ada, code `6040fe5c`; first 16-frame cost stop preserved. WASB 42–44/48 versus 0–8/48 native, all 48 positive; no confirmation/full-codec win. Closed cumulative 463/900 GPU-s and 1,413/1,800 CPU-s; administrative telemetry uncertainty disclosed. Both requests/processes/claims/waits closed, events acknowledged; no further compute admitted. Two original SVT gaps remain after read-only audit; med000 DCVC dropped. Manuscript a297279 pushed; selected source and separate anonymous data frozen in the November3 review record. PRESLEY untouched; coauthor approval and footage permissions unresolved; no submission. |
 | W8 exclusive upper-baseline attempt | [approved exclusive amendment](docs/experiments/w8-inputs/amendment-20261101/exclusive-prospective-card.md) | `codex/w8-exclusive-results-2026-11-01` (policy PR #322 merged) | primary plus Terra 6.1 medium delegates | complete: `20261101T081828Z-d70bc44f`, gpu6 exclusive Ada, frozen source `c0f25e4e` / spec `e9d926b6`; independent full audit and raw screen pass all 8 cells at 46.3151 kbps. Initial two cost stops preserved. Combined inclusive scoring 224 GPU-s / ≤304 CPU-s of 450/450; original total after 15 CPU-s runtime preflight: 224 GPU-s / ≤1,169 CPU-s of 3,600/3,600. Processes/claims/waits closed. No training/encoding/model/payload/quality-rule change. |
 | W8 Linux exact-input oracle and fresh receiver gates | [original W8 card](docs/cards/w8-fresh-decoder-witness.md); [approved repair](docs/cards/w8-source-package-repair.md) | `codex/w8-source-repair-2026-11-01` | primary plus scoped delegates | Input/runtime/native/pixel gates passed within recorded scope. Sole replacement `20261101T151030Z-df638d2f` packet worker passed, then CUDA device count error 2/unavailable before model/kernel/sampling; cause unknown, no quality result or cost slope. All task-owned processes/claims/wait/events closed. Phase ≤292 CPU-s/188 GPU-s; original cumulative ≤2,457/540 of 3,600 each. No retry or 30-step admission. Empirical paper retains fresh-decoder limitation; CUDA-only diagnostic is an unauthorized future proposal. PR #325 merged `06ce6374`; final documentation update belongs to [PR #326](https://github.com/emanuele-artioli/PointStream/pull/326), whose live checks/merge state should be consulted. |

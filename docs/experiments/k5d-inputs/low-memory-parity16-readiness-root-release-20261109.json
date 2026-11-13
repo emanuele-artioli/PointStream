@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "decision": "release ONE bounded GPU16 readiness and tiny gate publication only; NO GPU submission",
+  "parent_phase": "k5d-scale-first-tranche-20261105",
+  "revision": "da98de4a37e58af56d850eddabebb81be0642e42",
+  "snapshot_sha256": "0fc1220f7aa82e7f0edfe637869cbfb5bbb1517e3cc5a51ad6e273702b03cfb1",
+  "source_sha256": "62b6c4904c627d770a3d0854dc850a8871097f0053e551563e8cb4c647cc3036",
+  "cpu_ceiling": 30,
+  "gpu_ceiling": 0,
+  "included_in_prospective_1200CPU_GPU16_leaf": true,
+  "parent_remaining_cpu_before_readiness": 7900,
+  "actual_native_cpu_root_receipt": "docs/experiments/k5d-inputs/low-memory-native-5331-root-accepted-20261109.json",
+  "receipt_sha256": "511c3c777f4866bb8a7b50180918a2f14be9dd9609c5e288cb58bbf9824c70f7",
+  "unique_receipt_remote_path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-20261104-inputs/low-memory-native-5331-root-accepted-511c3c77-20261109.json",
+  "source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/k5d-low-memory-da98-20261109/source.tar",
+  "scope": "Freshallhostdoctor/knownjobs/workers then gpu2CPU0/claim/headroom/localdisk/runtime/tools/nativecache/inputmetadata; actualsourcecache0fcSHA and tiny511receipt no-overwrite upload/SHA. Largecacheidentities reusedasmetadata/priorchecksONLY, notfreshhashes; canonicalstage verifiesbytes.",
+  "candidate_policy": "lowerprofile6144MiBclaim+8192margin(14336free); Torch4096parent/2048serialchild; gpu2A6000only; shared/continue/noresume. No margin/numeric/point/frame/dtype/batch changes. No coldgpu3fallback.",
+  "conditions": [
+    "do not submit job or initialize GPU inference; preservealloldjobs/data/source/weights and unrelatedprocesses",
+    "stop before30CPUbudget can be exceeded; reportpartialmeasurementsandunmeteredadmin",
+    "prepare actualfixedspec fromcleanda98 and actualacceptedgate, refreshprovisionaldeadlineonlyinNEWreviewfileto<=45minutes and recordraw/normalizeddigests; rootmustreviewactualspec/readiness beforeONEGPU16release",
+    "if currentheadroombelow14336 recordit; do not lower declaration/margin or publishGPUjobwithoutrootexplicitqueue decision",
+    "nextGPU16onlynumerical/memoryfeasibility gate; no timing/scale/cost/full30claim or release"
+  ]
+}

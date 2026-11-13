@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "decision": "release ONE expected-failure CPU forensic namespace case only",
+  "revision": "965d801ada4b8ccb6e54685f4560de8287931d00",
+  "snapshot_sha256": "9f486d70424b9d293d8774c92b36350d284edcb2513c415390b88a2b4c344aed",
+  "source_sha256": "58787f8664f961c2287228762c1ddd3295adab4042bd7f41d9bfee87d2666104",
+  "source_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/snapshot-cache/k5d-parent8-child2-965d-20261109/source.tar",
+  "spec_path": "/private/tmp/k5d-parent8-actual-specs-v2-20261109/forensic-spec.json",
+  "raw_spec_sha256": "7102798364b7508078e50834b4beb6bea1eb6b5dba1478ca6d078668113ee495",
+  "logical_spec_sha256": "528876fc0946ed3d20466ce95f80e04362fcc3b52931a50a6c0b95e4481f914a",
+  "normalized_file_sha256": "4eb6a95b0c53b13423b24eb0d2be37971dac572e6b014eca6e092be1570e0b97",
+  "deadline": "2026-11-09T22:16:36.094055Z",
+  "host": "gpu2",
+  "cpu_affinity_index": 0,
+  "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "CPU_inclusive_leaf_cap": 150,
+  "source_preparation_already_charged": 50,
+  "future_CPU_cap": 100,
+  "future_components": {
+    "single_core_campaign": 50,
+    "postcampaign": 30,
+    "independent_audit": 20
+  },
+  "GPU_cap": 0,
+  "qualification_total_prospective_CPU": 420,
+  "scope": "Actual frozen outer->PID1->fixed native-proof module without required args. Leaf must fail argparse2 before creating descendants; PID1 must truthfully report worker_failed/status2/complete_descendant_wait and source/host/PIDbirth/group/namespace joins. Expected outer1 and FAILED fleet smoke are preserved.",
+  "validator_interpretation": "Existing substantive full native validator remains configured but is unreachable on expected failed smoke; this is a forensic case, never a passed fleet/native/scientific gate. Unexpected success or a different failure is NOT accepted. Full independent raw audit plus a separate passed real four-case native proof still required before GPU.",
+  "root_review": "1381actualGitblobs/H2bridge69dd/full1776tests+37skip,mypy501,Ruff and8filediff verified;12readinessrawhashes/exactspec normalized. Source9f and realZIP/tool/unshare checks reviewed.",
+  "conditions": [
+    "ONEcanonicalsubmitfromclean965d with exact9f cache/source_archive:true and fixedspec; fresh minimal knownjob/CPUclaim/workercheck; require>=900secondsremaining orSTOPforrootreview, no silentrefresh",
+    "record actualID/source/spec/deadline/budget/output inBallentry FIRST, sendrootID forcentralledger BEFORE ONEcanonicalps-fleetwait bounded byfixeddeadline<=2700; inspectunknownsubmission,neverreplay",
+    "preserve command.log/actualnamespace record, leafargparseerror, parent and all observedinit/workerPIDbirth/group/CPUdevice identity, teardown/claim and eventACK evidence; no fake passedgate",
+    "accept only expected failure and complete-rootaudited identity/absence/noESRCH mechanism. No actualnativeencode/decode, GPUallocator, memoryfit, parity, timing, scale or quality qualification",
+    "no retry/fullnative/GPU release here; second270CPUleaf is prospective only and requires separate actualspec/rootcost review"
+  ]
+}

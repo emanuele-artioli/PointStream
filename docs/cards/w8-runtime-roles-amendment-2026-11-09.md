@@ -1,0 +1,13 @@
+# W8 runtime roles and CPU-leaf attestation — November 9
+
+Status: reviewed local source; root releases source preparation only. No new CPU job or GPU release. Programme24GPU-hours/28CPU-hours and the W8 parent4550GPU/3902CPU remaining are unchanged.
+
+The complete7b519 CPU proof ran its campaign controller in MAIN and exercised subordinate strict leaves in MAIN and JCV. Its old schema1 single-environment envelope cannot admit the JCV generation controller. Root accepted that narrower CPU infrastructure result and charged160CPUinclusive; no field is relabeled and no JCV outer-controller/CUDA execution is inferred.
+
+Reviewed33b86 source uses schema2 with separate pinned MAIN proof-campaign and JCV generation roles, and explicitly records that generation-controller/CUDA qualification has not occurred. Both real strict CPU leaves attest executable, prefix and Torch version; producer and retained validator join those to the exact role-specific preflight and config. The source, access grants, clock/denial/native requirements and scientific240-frame/80-tick quality rules remain unchanged. The previous three physical source pins and five-module historical import closure need no new override.
+
+Root and independent reviewer verified all1667Gitblobs/archive and check-log identities. Ruff,mypy561,pytest2033passed39skipped. New actual Linux attestations and exact-source CPU proof remain unexecuted. Freeze revision33b86cb60347ac12ad2ce0674052e36706e232d1, archive327e96ea67d8d21127bee7b8cd0f4a785ef6ffceecd007665483812717241f48, sourcebf26eec6c158e686bf5a0ef12b4898d08b95345b998e9c3350e6dbf2df74c08b.
+
+Prospectively amend the nested CPU-proof-family cap1400→1550, within the unchanged parent:648closed+30sourcepreparation+600campaign+150post+82audit=1510,40slack. NoGPU. This is a fail-stop correctness envelope, not guaranteed completion or full-witness fit. Reforecast all remaining qualification/generation/finish/score/audit/failure costs before a later GPU release; old budgets remain closed.
+
+Source preparation only, at most30CPU/0GPU: fresh known-job/all-host doctor/workers/gpu5CPU0/claim/runtime/tool/localdisk checks; stat-five-protected-before-publichash; one no-overwrite exact new source-cache upload and publicSHA; prior admittedCD6 cache reconciliation only. No protected body read, new exception or source grant. Prepare the existing600/530/50/5 fixed CPU proof with a new<=45minute deadline and raw/logical/normalized identities. Root separately reviews and releases execution. Persist actual IDs before one bounded canonical wait; inspect uncertain submissions, never replay.

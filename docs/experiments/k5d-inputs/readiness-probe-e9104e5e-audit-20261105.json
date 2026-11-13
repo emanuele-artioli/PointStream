@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "approved": false,
+  "scope": "CPU readiness cost only; no GPU or production admission",
+  "job": "20261105T050105Z-e9104e5e",
+  "host": "gpu2",
+  "cpu_affinity": [
+    0
+  ],
+  "source_sha256": "d9825bd52d1c10c1108155bde9cc5fe082cc79fbc7aada651535173acd7e4454",
+  "snapshot_sha256": "0b7d1a7e38359c6f3f0ad90acb951928d77e4fb5e0592fa2326c46e41f74e3e6",
+  "spec_sha256": "d81876e285ec5e772e96a89e78874fced655b31aa864a0a6c3958522c2ab27b3",
+  "receipt_sha256": {
+    "ready.json": "b982a6cc5f0b40f544cc74ff43ec966c67bc47d8ed27e8691b93467a1188b1a5",
+    "spec.json": "ad584910518d2d5f44a50d6914816de5b4f566cafc784f94633b9f0621c67560",
+    "gate.json": "56a3245b72396cb6e767c43c41a0ad8dc859054ee3476850b35125a572d9566c",
+    "validation.json": "a16b83e8a0943eb3932cc4a503b4caf0995fc9916fd31bcf35be0eff8b8357ff",
+    "run/cpu-affinity.json": "46bcea43a67cd4b9d72e02bc941846a498288ecb618e666ce24d2728333bdec3",
+    "smoke/dispatch.json": "2f78de03238dea839d6b0406973a499c2330e53d023701b1c16935531962d2ad",
+    "smoke/execution.json": "2e0a6ee875f438e602c976212daf4a96b2db76e0025f143b43180c2a9ee11695",
+    "smoke/staging.json": "9df8773e249f092c6e65c7700415324e3887dcee65dbde09fc6d6cca48097340",
+    "smoke/published.tar": "6fced63d64d83b13cb3d428fe995f1772e72843428da641316192dbffe75ddcc",
+    "full/dispatch.json": "c7c448731aa839db734514f340d7942670b0576ce720783403e20fa6e620e73a",
+    "full/execution.json": "c6cd9576b5f724c1eff07f28f92d0bf2a1847bb5e2df331da5d0c8f371ef6eb7",
+    "full/staging.json": "b70e21dd2c4fec14c82048ff81c0bbb33e559a43d35008bc3c9e51aabf8a77f6",
+    "full/published.tar": "c668410d75f95e4146bdda03c1c25412b41f1b2179b6db5f420eb676179be672"
+  },
+  "validation_scope": "fleet validator checks smoke only; full artifact independently inspected, no full-stage fleet validator",
+  "source": {
+    "archive_sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18",
+    "clip": "tracknet/game10/Clip12",
+    "frames": 586,
+    "labels": 586,
+    "scope": "full timeline labels and JPEG headers; no source image decode",
+    "visibility_counts": {
+      "0": 5,
+      "1": 506,
+      "2": 75,
+      "3": 0
+    }
+  },
+  "checkpoint": {
+    "clip": "tracknet/game10/Clip3",
+    "frames": 48,
+    "points": [
+      [
+        "dcvc",
+        0
+      ],
+      [
+        "dcvc",
+        21
+      ],
+      [
+        "dcvc",
+        42
+      ],
+      [
+        "svt",
+        48
+      ],
+      [
+        "svt",
+        55
+      ],
+      [
+        "svt",
+        62
+      ]
+    ],
+    "file_count": 47,
+    "execution_identity": {
+      "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "snapshot_sha256": "c3ff5419167504afcd84d25931791eddfe8bae16b5e492ed124df31e43f66f67",
+      "source_sha256": "8a3b51c487cf9b456e304fdf24300f230ece3f3c7b2c8569ab6681fbd8166f13"
+    },
+    "archive_sha256": "4a5ba08205dee1b3a51ad4634dcf00b1f528534b91d772e30a316a4d860357a6"
+  },
+  "timing_seconds": {
+    "smoke_command_wall": 3.770817995071411,
+    "full_command_wall": 6.3702263832092285,
+    "smoke_inner_cpu": 3.390442,
+    "full_inner_cpu": 6.140111,
+    "smoke_staging_components_sum": 20.350204467773438,
+    "full_staging_components_sum": 20.357149362564087,
+    "validator": 0.22173213958740234
+  },
+  "timing_caveats": [
+    "All staging inputs and environment were local cache hits; cold staging remains unmeasured.",
+    "Full readiness includes 48-frame historical checkpoint, not a 586-frame production checkpoint; no GPU/model/decode executed.",
+    "Stage children resource-usage counters are cumulative; do not add them.",
+    "Campaign setup, audit, failed starts and external reserves remain unpriced."
+  ],
+  "forecast": {
+    "kind": "illustrative conservative provisional arithmetic; not a complete cost gate",
+    "margin": 1.5,
+    "clips": 30,
+    "frames": 5675,
+    "jobs_and_readiness": 60,
+    "staging_passes": 120,
+    "gpu_science_seconds_1_5x": 51022.734,
+    "readiness_staging_validation_seconds_1_5x": 4596.311731338501,
+    "readiness_all_charged_as_gpu_conservative_scenario": true,
+    "forecast_work_seconds": 55619.0457313385,
+    "prior_recorded_global_gpu_seconds": 15013,
+    "prior_recorded_global_cpu_seconds": 23730,
+    "prior_recorded_ball_gpu_seconds": 11920,
+    "prior_recorded_ball_cpu_seconds": 14940,
+    "ledger_sha256": "7f2d8a258d656255ed87531ec154b5bdac2c2a5c25e7cf483ac90de9ee7c0a8a",
+    "global_gpu_total_scenario": 70632.0457313385,
+    "ball_gpu_total_scenario": 67539.0457313385,
+    "global_20h_gpu_headroom_before_unpriced_reserves": 1367.9542686615023,
+    "global_24h_gpu_headroom_before_unpriced_reserves": 15767.954268661502,
+    "ball_gpu_limit": 50400,
+    "missing": "CPU forecast, CPU and GPU cold staging, failed starts, external/audit, additional validator/publication and root-selected reserves; existing active reservations; no budget release implied"
+  }
+}

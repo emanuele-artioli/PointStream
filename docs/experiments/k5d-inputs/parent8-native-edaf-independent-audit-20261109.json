@@ -1,0 +1,210 @@
+{
+  "accounting_scope": "one-core whole lifecycle wall upper bound; aggregate CPU not measured; preparation already charged separately; root owns final charge",
+  "actual_native_tool_sha256": {
+    "SvtAv1EncApp": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+    "dav1d": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+    "ffmpeg": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2"
+  },
+  "all_observed_pid_births_absent": true,
+  "audit_script_sha256": "77bfa1b9e1d85a3d00b63c5ca5626e5075e9a60885dcb458a848cec470b3c58d",
+  "campaign_group_and_supervisor_absent": true,
+  "canonical_status": "complete",
+  "canonical_update_epoch": 1794262521.3870564,
+  "cases": [
+    {
+      "case": "normal",
+      "escalated_to_sigkill": false,
+      "init": {
+        "host_pid": 1897723,
+        "namespace_pgid": 0,
+        "namespace_pid": 1,
+        "namespace_pids": [
+          1897723,
+          1
+        ],
+        "namespace_sid": 0,
+        "observed_monotonic": 2729555.821018685,
+        "pid_namespace": "pid:[4026537776]",
+        "start_ticks": 272955577
+      },
+      "members_absent": true,
+      "native": {
+        "executable": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+        "host_pgid": 1897104,
+        "host_pid": 1897728,
+        "namespace_pid": 3,
+        "namespace_pids": [
+          1897728,
+          3
+        ],
+        "pid_namespace": "pid:[4026537776]",
+        "start_ticks": 272955637
+      },
+      "outer_waited_cpu_seconds": 2.390136,
+      "returncode": 0,
+      "worker_group": {
+        "campaign_pgid": 1897104,
+        "exec_host_pgid": 1897104,
+        "host_pgid": 1897104,
+        "host_pid": 1897724,
+        "start_ticks": 272955582
+      }
+    },
+    {
+      "case": "timeout",
+      "escalated_to_sigkill": false,
+      "init": {
+        "host_pid": 1897901,
+        "namespace_pgid": 0,
+        "namespace_pid": 1,
+        "namespace_pids": [
+          1897901,
+          1
+        ],
+        "namespace_sid": 0,
+        "observed_monotonic": 2729558.264221634,
+        "pid_namespace": "pid:[4026537776]",
+        "start_ticks": 272955822
+      },
+      "members_absent": true,
+      "native": {
+        "executable": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+        "host_pgid": 1897902,
+        "host_pid": 1897923,
+        "namespace_pid": 9,
+        "namespace_pids": [
+          1897923,
+          9
+        ],
+        "pid_namespace": "pid:[4026537776]",
+        "start_ticks": 272955878
+      },
+      "outer_waited_cpu_seconds": 0.6327339999999997,
+      "returncode": 1,
+      "worker_group": {
+        "campaign_pgid": 1897104,
+        "exec_host_pgid": 1897902,
+        "host_pgid": 1897104,
+        "host_pid": 1897902,
+        "start_ticks": 272955826
+      }
+    },
+    {
+      "case": "sigterm",
+      "escalated_to_sigkill": true,
+      "init": {
+        "host_pid": 1898210,
+        "namespace_pgid": 0,
+        "namespace_pid": 1,
+        "namespace_pids": [
+          1898210,
+          1
+        ],
+        "namespace_sid": 0,
+        "observed_monotonic": 2729570.508315433,
+        "pid_namespace": "pid:[4026537776]",
+        "start_ticks": 272957044
+      },
+      "members_absent": true,
+      "native": {
+        "executable": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+        "host_pgid": 1898211,
+        "host_pid": 1898246,
+        "namespace_pid": 9,
+        "namespace_pids": [
+          1898246,
+          9
+        ],
+        "pid_namespace": "pid:[4026537776]",
+        "start_ticks": 272957105
+      },
+      "outer_waited_cpu_seconds": 0.10112100000000002,
+      "returncode": -9,
+      "worker_group": {
+        "campaign_pgid": 1897104,
+        "exec_host_pgid": 1898211,
+        "host_pgid": 1897104,
+        "host_pid": 1898211,
+        "start_ticks": 272957050
+      }
+    },
+    {
+      "case": "sigkill",
+      "escalated_to_sigkill": false,
+      "init": {
+        "host_pid": 1898250,
+        "namespace_pgid": 0,
+        "namespace_pid": 1,
+        "namespace_pids": [
+          1898250,
+          1
+        ],
+        "namespace_sid": 0,
+        "observed_monotonic": 2729571.304350087,
+        "pid_namespace": "pid:[4026537776]",
+        "start_ticks": 272957126
+      },
+      "members_absent": true,
+      "native": {
+        "executable": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+        "host_pgid": 1898251,
+        "host_pid": 1898258,
+        "namespace_pid": 9,
+        "namespace_pids": [
+          1898258,
+          9
+        ],
+        "pid_namespace": "pid:[4026537776]",
+        "start_ticks": 272957178
+      },
+      "outer_waited_cpu_seconds": 0.06843900000000014,
+      "returncode": -9,
+      "worker_group": {
+        "campaign_pgid": 1897104,
+        "exec_host_pgid": 1898251,
+        "host_pgid": 1897104,
+        "host_pid": 1898251,
+        "start_ticks": 272957130
+      }
+    }
+  ],
+  "cpu_claim_empty": true,
+  "decoded_sha256": "8178fcadb82e8abf3571fe6e88015512b55be76122eadb26a55bbe52c60840e5",
+  "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "event_acknowledged": true,
+  "event_id": "960e66830a2b53b0965207f16bae2330",
+  "gpu_quality_or_shared_allocator_qualified": false,
+  "gpu_used": false,
+  "input_sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18",
+  "job_id": "20261109T221304Z-edafe094",
+  "namespace_wrapper_sha256": "7610b0d45ffaf07536c1f3f5a77e3133f4fcf938ca7263e7b8266ebf56697cda",
+  "native_stream_bytes": 29010,
+  "native_stream_sha256": "fd445f424549a3bfec7c4966f98f8b67252f64ab46ea1083f1551450beded494",
+  "normal_inner_cpu_seconds": 2.270531,
+  "normal_outer_cpu_seconds": 2.390136,
+  "observed_pid_count": 19,
+  "raw_directory": "/private/tmp/k5d-parent8-native-20261109",
+  "raw_sha256": {
+    "ack.json": "3df554e8e47650c931ddd623720c19fbacd10633753dcdeeacbe2d5132299326",
+    "artifacts-core/export-receipt.json": "d2c4ac749ba09d5901a07c1ba55e19d7ec86076de59000f2cdbc53a82eaaad73",
+    "artifacts-run/export-receipt.json": "930c53fde505b0ecf10dfa999d9b8b09cfc86c210acae5d29664c63bcfb2053d",
+    "events.json": "a83825f1b99dc17438c7a0f382d975936fab05152db9c28383fb2e758a4f9c8e",
+    "full-published.tar": "cbe69a4a03851e096033cb3bc72845766d00245ccc2fc90a3947da4d105c93b7",
+    "owned-pids.json": "fd4fc6424342f404a489cd2088d060099991d8b75592bb3f3b436299c0c97873",
+    "post-cleanup.json": "5351775d357370f09d323968a4ca7823e6b6882e4def50189cd87a246899a5d7",
+    "smoke-published.tar": "9446b186e6c588b0f98aa950eb764f2c84bd29a4bddf901118560944cfd4cfe1",
+    "status.json": "0411da5bf14a65c767097ebbd5549305c20bb5a65b1d069667ffdf3674feae03",
+    "submission.json": "08a83371231fed57506fceaf72770eda392f490432b356617d92daefe2861b9f",
+    "wait.json": "b13f8b93f1412b7210a3377092667d366774f0f99ad9c5fc42fbacc6e4614968"
+  },
+  "run_terminal_epoch": 1794262461.7660067,
+  "schema": 1,
+  "snapshot_sha256": "9f486d70424b9d293d8774c92b36350d284edcb2513c415390b88a2b4c344aed",
+  "source_sha256": "58787f8664f961c2287228762c1ddd3295adab4042bd7f41d9bfee87d2666104",
+  "spec_sha256": "278f6ebf5218b37b1f6b66ebff8c55bd4cad5bde4bf4f53e449aad8ec06162a4",
+  "status": "independent audit candidate; primary acceptance required",
+  "supervisor_birth_epoch": 1794262400.71,
+  "supervisor_birth_to_canonical_update_wall_seconds": 120.67705631256104,
+  "supervisor_birth_to_run_terminal_wall_seconds": 61.05600666999817,
+  "unshare_sha256": "9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6"
+}

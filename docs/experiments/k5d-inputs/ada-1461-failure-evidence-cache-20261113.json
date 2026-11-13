@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "job_id": "20261113T033048Z-1461dd9d",
+  "cache_directory": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/ada-1461-failure-20261113",
+  "manifest_sha256": "7a4a4a476bfb6c1cfb98ae287d3271aa2558aa732a6d7cff34bbb6ba35953171",
+  "files": 21,
+  "total_bytes": 280904,
+  "source_and_CPU_evidence": "ada-5ebc-CPU-evidence-cache-20261113.json",
+  "scope": "Selected read-only A2 failure evidence, not a successful receiver or quality result"
+}

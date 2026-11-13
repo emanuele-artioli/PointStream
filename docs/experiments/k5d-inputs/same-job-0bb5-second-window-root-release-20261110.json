@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "decision": "Root closes zero-executionexpiry and releases ONEfurtherboundedA6000admissionwindow",
+  "previous_job": "20261110T130538Z-389ebe94",
+  "previous_expiry_audit_sha256": "cd63a483da52a204d8bf6e1ee3d63cdd5b5dac86aaaf8f02c9bc352ebc839d74",
+  "previous_GPU": 0,
+  "previous_CPU_inclusive": 400,
+  "scope": "Sameoriginal6points16frames numerical/IOqualification,neverexecutedyet. Noactualmodelretry, source/math/quality/settingsunchanged. Correctsamejobreceiverpixelhandoff0bb5 remainsunqualifiedGPU;no48/292/full30release.",
+  "revision": "0bb51211475d091e53d413b7cc491f7c9266ff2b",
+  "source_sha256": "21cd2553113497bbbdc5157a1db74869f8494f76ff140df3b09e3361d8c039db",
+  "snapshot_sha256": "450dede7b58b37c5d48a742c9bb31f5651f07713f787d4137b77dfcb5c831a3c",
+  "source_archive_required": true,
+  "native_CPU_gate_sha256": "9445895e80c29d26c305134a3551347a2b4393a07d3985599768edf937ecb687",
+  "source_bridge_sha256": "b052efdf6cdaea51bc9f19ac141b3c56cf4caec96c3e9f9ae25d6df37d965782",
+  "spec_recipe": "Identicalallfields/inputSHAs/settings topreviousrawc6dd2ffe/canonical25f4 exceptfreshdeadline<=43minatfinalization. Localcandidate next-spec.jsonraw441d0b82201cee079fa1c08e5b903be514dd44a3b3593cc5eccd8e226f43d5ca canonical9f005b51c53f192fffc83d9cac4f7fac589b0d2008c23fd9400896ff85a15fb6 deadline14:26:05UTC mayrefreshifUNSUBMITTEDandallotherfieldsunchanged,preserveversions/logactualbeforepublish.",
+  "future_caps": {
+    "GPU": 1000,
+    "CPU": 1200,
+    "campaign": 800,
+    "namespace": 580,
+    "smoke": 600,
+    "validator": 30,
+    "noop": 5,
+    "GPU_post": 200,
+    "CPU_external": 400
+  },
+  "family_accounting": "Priorwindow400CPUclosed/0GPU;newfuture1200CPU makesnestedfamily1600CPUmax/1000GPUaggregateifthesolefirstactualmodelrun. ProspectivelyamendedinsideunchangedBallparent/workstream/programme;no globalincrease,old600campaignunusednotcharged. Freshmetadata<=10CPU INSIDEnew400external (leaves390post/audit),noadditionalprecharge.",
+  "prepublication": "Freshknownjobs/eligibleA6000gpu2gpu3/CPUclaims/publicstat-first/source/gate/bridge/archive/tool/cache/space metadata within10CPU; preserveexistingcachedassets,nooverwrite. BusyGPUpermitsQUEUE,exclusiveworkeradmissionmandatory. No model/nativeinferencebeforejob. Canonicalactualsourcearchive450d/source21cd/inputspecmustmatchorstop.",
+  "forecast": "Sameconditional742.793+57.207newretentionIO/errorallowance under800,580namespaceindependent. Notmeasuredfit. Recordactual398MBpublishedretention/CPU/GPUlifetimes/arrayandbyteparityifexecuted;noAdabroadening/budget/qualityrelaxation.",
+  "monitoring": "SubmitONCE,recordID/actualrawcanonicalSHA/deadline/caps/source/outputbeforeONEcanonicalwaitafterrootACK<=2700. KnownlocalCLIvalidationerrorsbeforepubmaybecorrectedroutinely;uncertainremoteinspectneverreplay. Noautomaticfurtherqueue/modelretry orrecurringpolls/timers."
+}

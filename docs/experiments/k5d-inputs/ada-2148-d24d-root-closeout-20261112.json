@@ -1,0 +1,204 @@
+{
+  "accounting": "Remote helper CPU is measured for that process only; administrative and aggregate CPU unmeasured. Retain full 250 future CPU allocation; prep 50 separately charged.",
+  "all_observed_pid_births_absent": true,
+  "campaign_group_absent": true,
+  "canonical_status": "complete",
+  "case_summary": [
+    {
+      "case": "normal",
+      "escalated_to_sigkill": false,
+      "members_absent": true,
+      "outer_waited_cpu_seconds": 3.036772,
+      "returncode": 0
+    },
+    {
+      "case": "timeout",
+      "escalated_to_sigkill": false,
+      "members_absent": true,
+      "outer_waited_cpu_seconds": 0.6768849999999995,
+      "returncode": 1
+    },
+    {
+      "case": "sigterm",
+      "escalated_to_sigkill": true,
+      "members_absent": true,
+      "outer_waited_cpu_seconds": 0.1224280000000002,
+      "returncode": -9
+    },
+    {
+      "case": "sigkill",
+      "escalated_to_sigkill": false,
+      "members_absent": true,
+      "outer_waited_cpu_seconds": 0.08648900000000026,
+      "returncode": -9
+    }
+  ],
+  "claim_job_absent": true,
+  "claim_sha256": "b5863b1a88dfdd77fecb0be9d4210be6e672fc380c9847bc9a5b186d94b1d726",
+  "decoded_sha256": "8178fcadb82e8abf3571fe6e88015512b55be76122eadb26a55bbe52c60840e5",
+  "exclusions": [
+    "GPU memory",
+    "numerical GPU parity",
+    "performance",
+    "scale",
+    "quality"
+  ],
+  "execution_identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "5fd841f7e2fc718fb198a7f47a5e737e4cbbc88f1793e6574883dd7cd9fcc3cd",
+    "source_sha256": "9e2376330c76eab979efbe0a3f8dcf21175f5e9d470a6b1219cf8c39e823fa0a"
+  },
+  "gpu_used": false,
+  "independent_validation_sha256": "489be969f6cdae68aae00206101c32d9d07fd7cd4ce525e876c1902df50a2468",
+  "inner_cpu_seconds": 2.8902799999999997,
+  "job_id": "20261112T190032Z-d24d7c7c",
+  "native_tools": {
+    "SvtAv1EncApp": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+    "dav1d": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+    "ffmpeg": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2"
+  },
+  "observed_births": [
+    {
+      "observed": null,
+      "pid": 934396,
+      "start_ticks": 297726319
+    },
+    {
+      "observed": null,
+      "pid": 934397,
+      "start_ticks": 297726334
+    },
+    {
+      "observed": null,
+      "pid": 934398,
+      "start_ticks": 297726339
+    },
+    {
+      "observed": null,
+      "pid": 934517,
+      "start_ticks": 297726418
+    },
+    {
+      "observed": null,
+      "pid": 934674,
+      "start_ticks": 297726653
+    },
+    {
+      "observed": null,
+      "pid": 934675,
+      "start_ticks": 297726714
+    },
+    {
+      "observed": null,
+      "pid": 934676,
+      "start_ticks": 297726719
+    },
+    {
+      "observed": null,
+      "pid": 934695,
+      "start_ticks": 297726765
+    },
+    {
+      "observed": null,
+      "pid": 934701,
+      "start_ticks": 297726774
+    },
+    {
+      "observed": null,
+      "pid": 935110,
+      "start_ticks": 297727925
+    },
+    {
+      "observed": null,
+      "pid": 935115,
+      "start_ticks": 297727937
+    },
+    {
+      "observed": null,
+      "pid": 935120,
+      "start_ticks": 297727946
+    },
+    {
+      "observed": null,
+      "pid": 935145,
+      "start_ticks": 297728035
+    },
+    {
+      "observed": null,
+      "pid": 935256,
+      "start_ticks": 297728054
+    },
+    {
+      "observed": null,
+      "pid": 935273,
+      "start_ticks": 297728069
+    },
+    {
+      "observed": null,
+      "pid": 935284,
+      "start_ticks": 297728078
+    },
+    {
+      "observed": null,
+      "pid": 935285,
+      "start_ticks": 297728083
+    },
+    {
+      "observed": null,
+      "pid": 935286,
+      "start_ticks": 297728136
+    },
+    {
+      "observed": null,
+      "pid": 935292,
+      "start_ticks": 297728146
+    }
+  ],
+  "outer_cpu_seconds": 3.036772,
+  "publication_member_sha256": {
+    "publish/cases/normal/before-interruption.json": "677e015befbcd501915988720e107280b39f404c1366c05e70af604110afe500",
+    "publish/cases/normal/command.log": "a1e92cf2d83c429f8314f2feb865d92ef6c9e77776b4ff3003a62037894a6cb6",
+    "publish/cases/normal/init.json": "a41dc0b2c694ab7eb4791136b5418fa15154a5cb81a2dc6850ad7cbc266d498b",
+    "publish/cases/normal/launcher.json": "0be5b854584f630d1c8e0ccac7d5eb483017dcb9ef6fbfa8b247242c095e7a67",
+    "publish/cases/normal/result.json": "5fdd15a9c2f1184b44abaa14242a761ffd5078bba5030c9c2645997ae06cea5b",
+    "publish/cases/normal/worker-group.json": "e6095511f0206e77f9d2c642a865e7ae0e37a01af27879302214cf751f5a5073",
+    "publish/cases/sigkill/before-interruption.json": "7bbea82df6ed3230a9c06c38d02241385f0dd25c2224efdf174c42e0f6db2352",
+    "publish/cases/sigkill/command.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "publish/cases/sigkill/init.json": "56a7b2ccfe0a714ef0873a164a5d7a741202d9893318a9fad0a34df36b0621dd",
+    "publish/cases/sigkill/launcher.json": "edd5f7829237687f0acfe0776828818b1d03daef44dc331a347b07ee9937afac",
+    "publish/cases/sigkill/result.json": "08a1e275e72afeb7a34a5fee535194a72e3e35023611a6d4ee5e3f6712771fa0",
+    "publish/cases/sigkill/worker-group.json": "a0971f9ebadc66f7abf0cba2ff94ce643690489672ab2e731798212c61346ed9",
+    "publish/cases/sigterm/before-interruption.json": "d07f5d33dc74682b350112bc48b95b6def4e2d87677752ab9299b8e412ca1779",
+    "publish/cases/sigterm/command.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "publish/cases/sigterm/init.json": "9e277659aaee1703669cb6d12e5644b47036b0990269a80715ba8a436617b710",
+    "publish/cases/sigterm/launcher.json": "c8dd510215640d58d53025293555bf651fcde2b49c3df32bb67087fd82b885cb",
+    "publish/cases/sigterm/result.json": "72cd89b41d66c93ecfced02a97439935757211f346c64588b525add58b8155cb",
+    "publish/cases/sigterm/worker-group.json": "f64ad3682c642b6b6c2b560b05e85be07e5c3653467bf5a152fb2764af9f3d68",
+    "publish/cases/timeout/before-interruption.json": "2d4c0f0dd3c89e7bac7a4b1542bba2d4ab740214273df44c42cefff2f77c50f3",
+    "publish/cases/timeout/command.log": "beed4a459022b045866b5a21d455f6b228fa84ce865287087bd92ed00fc626a1",
+    "publish/cases/timeout/init.json": "57753b529b644ab4c8739138eb2c564f649f5a2225e6e18e7300cdd731bfc214",
+    "publish/cases/timeout/launcher.json": "e90b8b8e4055b8a4264b00f7b9c0072c88d3d3aa861a282502dfe5f1782c530a",
+    "publish/cases/timeout/result.json": "4a2425e9006400e2f2a9e2c4ac2bc4e13d19c02ba40255e1ca66f7f55f0bace2",
+    "publish/cases/timeout/worker-group.json": "083b65eda1be3f7f5ab66d3f81c650299c64bce6a72e2a5c4e3a837a8b6462bd",
+    "publish/oracle.json": "9152e9f0847ef20d494d78ef4a0f16957fdd37d8ea8ce31881ff839ae4ccd35c",
+    "publish/pidfd-capability.json": "0f329091577f084f36adc5bb5bf0d4c63e53e3566e47af76c3105a7a6e85655c"
+  },
+  "publication_sha256": "1e5b59941d366a5540d18f6d58d7621f73e6018523861d6799a5f66fa6cfae29",
+  "remote_helper_cpu_seconds": 0.155657,
+  "remote_helper_sha256": "d7e5883ce85e4d9a9c1cfa5343a49a62ac87a223c79413aa833acc4a4f512052",
+  "remote_result_sha256": "379fb7ac239ae35db29236fc2071df0834fc7c7ddcfc7db3ea158d243269fc99",
+  "schema": 1,
+  "source_revision": "21482f35c2d5d1d476d5e9cf099151c69c597a9c",
+  "spec_sha256": "51e933190d4d0af6098efd9ef636a4e8023e77bb7e397ff6429cf65bc2cbfb4d",
+  "status": "RootacceptedCPUmechanismonly",
+  "stream_sha256": "fd445f424549a3bfec7c4966f98f8b67252f64ab46ea1083f1551450beded494",
+  "supervisor_absent": true,
+  "unshare_sha256": "9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6",
+  "root_canonical_status": "complete",
+  "root_26_member_SHA_joins": true,
+  "claim_check_basis": "Rawhashedremotehelper matched jobabsence in128-byteclaimbook; claimbody wasnot exported, not a localclaimbodySHAjoin.",
+  "root_counter_review": "Normal2.89028inner vs3.036772outerCPU, four real modes; TERM requiredKILL escalation, notTERM-onlysuccess.",
+  "root_gate_sha256": "3da5120c7c420271b572fb2d7b20cb17963b612e741e3d7420cecce86fd2a4e1",
+  "inclusive_CPU_charge": 300,
+  "GPU_charge": 0
+}
