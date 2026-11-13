@@ -1,10 +1,9 @@
 # K5d: final Ada source CPU qualification
 
-Status: preparation 100 CPU, native 250 CPU and actual SVT CPU-denial 365 CPU
-completed and root accepted. Final source `ae892df1` / `9d3d7b2c` / `ad635b0b`
-remains frozen. Actual `d1bb8926` now has root-accepted scientific receipt/pixel
-qualification only; its resource-observer operation failed. No complete-cost
-or scale acceptance follows. See the [current continuation](../continuation-2026-11-13.md).
+Current execution state is maintained in the [canonical continuation](../continuation-2026-11-13.md)
+and [new source-qualification card](k5d-Ada-calibration-source-qualification-2026-11-13.md).
+This card retains its original scope and historical gates; its old results do not
+qualify a changed source. Read the ledger and existing job state before acting.
 
 ## Goal and fixed scope
 

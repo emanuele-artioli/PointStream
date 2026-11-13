@@ -1,0 +1,156 @@
+{
+  "status": "ROOT_ACCEPTED_ACTUAL_SVT_CPU_DENIAL_ONLY",
+  "job_id": "20261113T090138Z-e039d7c0",
+  "approved": true,
+  "at_UTC": "2026-11-13T09:07:18.855728+00:00",
+  "scope": "Actual normal SVT filesystem denial plus initial-launcher interruption/scoped teardown only. Current cleanup only, no immediate historical claim interval. No active-native/unshare-only/fleet-watchdog/GPU/scale claim.",
+  "scientific_source_revision": "2c6d8581fbd64279dde554ca1402047d27ab7fa2",
+  "audit_sha256": "c1feeb2fb580dd75dd736a35dd82f568fc95b0d745b6a1ed11a6927aff7a47ac",
+  "audit": {
+    "CPU_namespace_candidates": [
+      {
+        "argv": [
+          "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+          "-m",
+          "experiments.tennis.k5d_pgid_oracle",
+          "run",
+          "--unshare-sha256",
+          "9f41a192393e7a05b843ae51bd187a76e09482392d37275d796f8881db97dde6",
+          "--receiver-isolation-config",
+          "/local/users/emanuele/pointstream/cache/e478cbf16830b7788f835dc888b87ee119505f767a0ac535fb902f76690505ed/config.json",
+          "--receiver-isolation-config-sha256",
+          "e478cbf16830b7788f835dc888b87ee119505f767a0ac535fb902f76690505ed",
+          "--bridge",
+          "/local/users/emanuele/pointstream/cache/8f4ba5f4fdd93f60b2cc6802829c64c34aca660d0ab9c944101de075f316e5d0/bridge.json",
+          "--bridge-sha256",
+          "8f4ba5f4fdd93f60b2cc6802829c64c34aca660d0ab9c944101de075f316e5d0",
+          "--native-cpu-receipt",
+          "/local/users/emanuele/pointstream/cache/909558234ceca59ff944f29be8a7a1df7313309fa10e281464bb16adf29aab36/native-CPU.json",
+          "--native-cpu-receipt-sha256",
+          "909558234ceca59ff944f29be8a7a1df7313309fa10e281464bb16adf29aab36",
+          "--protected",
+          "/local/users/emanuele/pointstream/cache/aad0d8f49b3e41f701d11e8342d7d3474b4382cbdcf8148f8a53a0be32ae284e/protected.json",
+          "--protected-sha256",
+          "aad0d8f49b3e41f701d11e8342d7d3474b4382cbdcf8148f8a53a0be32ae284e",
+          "--resources",
+          "/local/users/emanuele/pointstream/cache/fff91f6583c117fd3f63e001c7aa31db6fb651ffad8bf3401bdcd42defc9a346/resources.json",
+          "--resources-sha256",
+          "fff91f6583c117fd3f63e001c7aa31db6fb651ffad8bf3401bdcd42defc9a346",
+          "--wire",
+          "/local/users/emanuele/pointstream/cache/33e6278aaa1c15769bd7c16f637922c11fcfa3c4d0fa7e4a3e6f9a19cf1660fe/stream.psbl",
+          "--wire-sha256",
+          "33e6278aaa1c15769bd7c16f637922c11fcfa3c4d0fa7e4a3e6f9a19cf1660fe",
+          "--expected-yuv-sha256",
+          "5c43d78f12f2e7b41ccf0b794d735af31e1d46c87011d078c53dd20402e4694c",
+          "--expected-rgb-sha256",
+          "e3c4341445104ce94e87af25ba40fd0a5eda493ef099524e3725ca7f417160fd"
+        ],
+        "children_cpu_seconds": 33.015885,
+        "complete_descendant_wait": true,
+        "elapsed_seconds": 33.68741679750383,
+        "init_cpu_seconds": 0.049988,
+        "namespace_init": {
+          "host_pid": 1096062,
+          "namespace_pgid": 0,
+          "namespace_pid": 1,
+          "namespace_pids": [
+            1096062,
+            1
+          ],
+          "namespace_sid": 0,
+          "observed_monotonic": 5623328.029045144,
+          "pid_namespace": "pid:[4026538343]",
+          "start_ticks": 562329431
+        },
+        "reaped": 1,
+        "reason": "complete",
+        "status": 0,
+        "worker_host_identity": {
+          "campaign_pgid": 1095858,
+          "exec_host_pgid": 1095858,
+          "host_pgid": 1095858,
+          "host_pid": 1096065,
+          "start_ticks": 562329434
+        },
+        "worker_namespace_pid": 2
+      }
+    ],
+    "GPU_seconds": 0,
+    "actual_FQDN_CPU_claim": {
+      "actual_token_absent": true,
+      "allocation_count": 0,
+      "exists": true,
+      "own_allocations": {},
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/claims/cpu/gpu6.itec.aau.at.json",
+      "scope": "CURRENT post-job observation only; no historical release-time inference; generic job_id=run ignored"
+    },
+    "actual_policy_sha256": "52ecc2a29085f4713039998a7062bc5b65c10fbf6d20e8add65a8dad85b05b45",
+    "captured_birth_count": 16,
+    "current_absent_host_processes": 18,
+    "empty_groups": 4,
+    "five_errno13": true,
+    "full_noop_publication_sha256": "aa83925da3abdd6266fc458e1e4ac7969742e7b6a9af97d1f82bdf43d0b79ed1",
+    "identity": {
+      "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "snapshot_sha256": "5ca2d194b7e1a6032faf7ef60fe44924649e0a57471c12cda6264f9586260219",
+      "source_sha256": "6f898f753a056981a107f5115a5a36f1310bc9d4a705a1805b75f758a0bc0117"
+    },
+    "initial_launcher_SIGKILL_scoped_teardown": true,
+    "job_id": "20261113T090138Z-e039d7c0",
+    "local_validation_CPU_seconds": 0.28918499999999997,
+    "normal_native_YUV_RGB_match": true,
+    "normal_receipt_sha256": "37c4ef9dc8213c1d65352029e3dbd14cc9a326372d277d5f433d86daf6d43643",
+    "physical_assets": {
+      "bridge": {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-calibration-Ada-source-cache-487a034f577c09bd390e9d1b1ca1aac5/bridge.json",
+        "sha256": "8f4ba5f4fdd93f60b2cc6802829c64c34aca660d0ab9c944101de075f316e5d0"
+      },
+      "native_cpu_receipt": {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-calibration-Ada-native-CPU-cc1866be63dad4a438d5349fff9958e3/native-CPU.json",
+        "sha256": "909558234ceca59ff944f29be8a7a1df7313309fa10e281464bb16adf29aab36"
+      },
+      "protected": {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-svt-denial-inputs-20261112-3a23e0db8fb641f18494d31a7f71a086/materialized-560e495d4d2549b9a028f0ec89633f6f/protected.json",
+        "sha256": "aad0d8f49b3e41f701d11e8342d7d3474b4382cbdcf8148f8a53a0be32ae284e"
+      },
+      "receiver_isolation_config": {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-calibration-Ada-source-cache-487a034f577c09bd390e9d1b1ca1aac5/config.json",
+        "sha256": "e478cbf16830b7788f835dc888b87ee119505f767a0ac535fb902f76690505ed"
+      },
+      "resources": {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-svt-denial-inputs-20261112-3a23e0db8fb641f18494d31a7f71a086/materialized-560e495d4d2549b9a028f0ec89633f6f/public/resources.json",
+        "sha256": "fff91f6583c117fd3f63e001c7aa31db6fb651ffad8bf3401bdcd42defc9a346"
+      },
+      "wire": {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-svt-denial-inputs-20261112-3a23e0db8fb641f18494d31a7f71a086/materialized-560e495d4d2549b9a028f0ec89633f6f/public/stream.psbl",
+        "sha256": "33e6278aaa1c15769bd7c16f637922c11fcfa3c4d0fa7e4a3e6f9a19cf1660fe"
+      }
+    },
+    "physical_member_count": 7,
+    "profile_sha256": "ecf4c1bb0b2694b9b7b4c55e51e2c9bc30822e8a81dc25b412077891ee79100d",
+    "publication_bytes": 73676800,
+    "publication_sha256": "fbbe16fa7d71bdec2e07667178967a982eeb58ffb1c994ac323d97a85ea7bdaf",
+    "raw_audit_sha256": "174018c9ac0972bfafa77cff2123bb68d189bbf56e0ea159ecd246c62495c527",
+    "remote_CPU_seconds": 0.7749189999999999,
+    "remote_audit_limitations": [
+      "None; single complete read-only audit; frozen receipt and original packet parser checked locally in CI environment"
+    ],
+    "remote_wall_seconds": 0.7693573040887713,
+    "retained_CPU_precharge": 365,
+    "root_approval": null,
+    "runtime_inventory_sha256": "6034e7ef33a96dfc74dfb8c7ca33e97b1f1c91fd780208e7161ab3a875c1cd07",
+    "scope_limit": "Actual normal SVT filesystem denial plus initial-launcher interruption/scoped teardown only. Current cleanup only, no immediate historical claim interval. No active-native/unshare-only/fleet-watchdog/GPU/scale claim.",
+    "source_leaf_join": {
+      "physical_job_archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261113T090138Z-e039d7c0/source.tar",
+      "policy_source_prefix": "/local/users/emanuele/pointstream/sources/20261113T090138Z-e039d7c0",
+      "scope": "All31 exact source leaves physically joined to actual finalarchive; ephemeral policy source path not required after cleanup",
+      "source_leaf_count": 31
+    },
+    "spec_sha256": "043bbf10c851e3ce57dd6554ec3c62eb777a98dc31415961638b34c51dff0d81",
+    "status": "independent actual artifact checks PASS; ROOT approval and ACK UNSET"
+  },
+  "terminal_event": "05f54ed1560f5446b855561f790919f2",
+  "ACK_state": "authorizedafterfreshcanonicalCOMPLETE/gateTrue/noerror; receiptpending",
+  "full_CPU_charge": 365,
+  "GPU_seconds": 0
+}

@@ -1,10 +1,9 @@
 # Ada resource-window timing refresh — November13
 
-Current closeout: actual `d1bb8926` completed and root accepted scientific
-receipt/pixel qualification only. All six receivers/native pixel joins passed.
-The controller failed before binding; observers remain UNBOUND/UNKNOWN, with
-no resource span/complete-cost/scale acceptance. Original charges and scope
-decision are retained. See the [canonical continuation](../continuation-2026-11-13.md).
+Current execution state is maintained in the [canonical continuation](../continuation-2026-11-13.md)
+and [new source-qualification card](k5d-Ada-calibration-source-qualification-2026-11-13.md).
+This card retains its original scope and historical gates; its old results do not
+qualify a changed source. Read the ledger and existing job state before acting.
 
 ## Historical timing refresh and release
 

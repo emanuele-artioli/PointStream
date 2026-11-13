@@ -1,0 +1,39 @@
+{
+  "status": "ROOT_ACCEPTED_BOUNDED_ADMINISTRATIVE_QUALIFICATION_ONLY",
+  "at_UTC": "2026-11-13T09:04:40.637494+00:00",
+  "prior_attempts_retained": [
+    {
+      "backend": 92693,
+      "status": "FAIL_wrongfixturemodule",
+      "CPU_charge": 50
+    },
+    {
+      "backend": 29588,
+      "status": "FAIL_driver_signalinterpretation_after_actualfixturePASS",
+      "CPU_charge": 50
+    }
+  ],
+  "continuation": {
+    "backend": 35283,
+    "exit_code": 0,
+    "CPU_charge": 20,
+    "alarm_actual_elapsed": 19.955418767407537,
+    "alarm_ssh_returncode": 255,
+    "CPU_child_returncode": -9,
+    "CPU_child_measured": 1.999423,
+    "owned_old_and_CPUchild_groups_currently_absent": true
+  },
+  "scientific_source_unchanged": true,
+  "whole_admin_budget": {
+    "past_pilots_continuation_CPU": 120,
+    "future_chain_upper_CPU": 148,
+    "future_other_CPU": 32,
+    "inclusive": 300
+  },
+  "scope": "ActualpinnedlocalGit/snapshot, remoteprobe, clientcachecopy/native-tarfixture, alarm/CPUlimits andcurrentownedgroupcleanup. Trustedfinitecontrols; no wholehostCPUclaim. Realobserver/resourcejoin andnewGPUwitness remainUNRELEASED.",
+  "files": {
+    "precheck.stdout": "dc244f78a513bb062f5d5aaf6b8caecc0678f89183c044766bd376c4a0de7472",
+    "cpu.stdout": "d6260ba2c4ab3993b8f61c0b503fab6528c5beeaa99043c383b86695975d7649",
+    "complete.json": "236a493a06bbcba44fd50096cfa4c8f6abde681342bf31a646d0a540b670b1a3"
+  }
+}

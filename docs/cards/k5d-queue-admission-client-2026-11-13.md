@@ -1,11 +1,9 @@
 # Queue-compatible observer admission client — November13
 
-Current implementation status: PR383 merged at `ca8db2902d3c352cd2b4025d056263a61a352d29`,
-checks passed in 4m13. This is client-only; no server controller was installed.
-Actual `d1bb8926` is scientifically accepted for receipt/pixel evidence only;
-its old operation failed and both observers remain UNBOUND/UNKNOWN. The repair
-is prospective: no current-job replay or new scientific release. Future
-resource gates still require root review and complete-cost evidence.
+Current execution state is maintained in the [canonical continuation](../continuation-2026-11-13.md)
+and [new source-qualification card](k5d-Ada-calibration-source-qualification-2026-11-13.md).
+This card retains its original scope and historical gates; its old results do not
+qualify a changed source. Read the ledger and existing job state before acting.
 
 ## Original authorized build and decision rule
 

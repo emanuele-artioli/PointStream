@@ -1,12 +1,9 @@
 # K5d: complete public Python runtime category repair
 
-Status: the repaired final-source16frame scientific receipt/pixel witness
-`d1bb8926` passed and root accepted all six receipts/native pixel joins. The
-original metadata helper failure and prior55dd failure remain retained.
-The operation failed before resource-observer binding; both journals remain
-UNBOUND/UNKNOWN. No complete-cost/span or scale gate passed. Future GPU stages
-remain resource-gated; see the [canonical continuation](../continuation-2026-11-13.md)
-and [scientific closeout](../experiments/k5d-inputs/ada-d1bb-root-scientific-closeout-20261113.json).
+Current execution state is maintained in the [canonical continuation](../continuation-2026-11-13.md)
+and [new source-qualification card](k5d-Ada-calibration-source-qualification-2026-11-13.md).
+This card retains its original scope and historical gates; its old results do not
+qualify a changed source. Read the ledger and existing job state before acting.
 
 ## Authority and fixed scope
 

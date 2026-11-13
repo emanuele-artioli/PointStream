@@ -8,27 +8,12 @@ allocation of **6,000GPU /9,000CPU seconds**, inside unchanged Ball64,800GPU/
 
 ## Current November 13 status (UTC)
 
-### Current research decision (November 13, UTC)
+### Current research decision
 
-**Scientific receipt/pixel qualification passed; the resource-observer operation
-failed.** Actual job `20261113T072420Z-d1bb8926` completed on gpu6 Ada1.
-Root accepted all six fresh isolated receiver receipts and native pixel joins
-on frozen `ae892df1` / source `9d3d7b2c` / archive `ad635b0b` / environment32e.
-This preserves the narrower decision recorded before outcome inspection.
-
-The publication controller failed before binding either observer. Both remain
-**UNBOUND/UNKNOWN**; no resource span, complete-cost or full-scale gate passed.
-Native and actual SVT CPU proofs remain accepted. Previous failures, charges
-and raw evidence are retained; no publication/binding replay is authorized.
-
-PR383 is merged (`ca8db290`, checks passed): a client-only queue-admission
-repair for future use. No server controller was installed. Future calibration
-and scale remain resource-gated. Programme charges are 23,841 GPU / 63,245 CPU seconds;
-Ball 17,479 GPU / 39,244 CPU seconds, inside unchanged 24 GPU-hour / 28 CPU-hour authority.
-A separate 300 CPU [calibration-cap revision build](k5d-Ada-calibration-budget-revision-2026-11-13.md) is code-only; new source qualification and GPU release remain separate gates.
-See the [canonical continuation](../continuation-2026-11-13.md) for actual raw/canonical spec hashes,
-read-only evidence, limitations and the next gate. No new computation or
-paper/PRESLEY work is released by this closeout.
+Read the [canonical continuation](../continuation-2026-11-13.md) and live budget ledger for
+current jobs, releases, balances and watcher handles. Frozen scientific source
+2c6d must not advance. The historical phases below retain their original results
+and do not grant execution authority for changed source.
 
 ### Historical af6 phase — balances, waits and watch superseded above
 
