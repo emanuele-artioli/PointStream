@@ -1,10 +1,15 @@
 # K5d: qualify the frozen study source on sixteen frames
 
-Status: preparation only. Ten CPU-seconds are precharged; 838 CPU-seconds and
-600 GPU-seconds remain held within an inclusive 848 CPU / 600 GPU envelope.
-No GPU job has been released. The separately precharged 20-CPU remote metadata
-constructor is outside this envelope; its cost is counted once in the programme.
-The earlier preparation50 allocation and failed reference copy remain charged.
+Status: actual job `20261113T153712Z-f831db6a` ROOT accepted, canonical
+COMPLETE/gatePASS/exit0 (fresh74026), exact terminal/shared-contention events
+ACK-closed. Independent physical/current-cleanup/timing review passed.
+Full848CPU/600GPU retained; separate metadata20CPU also retained. Durable
+archive8f275100/172members/publication53471 is accepted0444/0555/readback inside prepaid73 reserve (18status/events,
+15archive prospectively assigned,40remaining subslots). Original failed wait
+attention/terminal assertion, earlier preparation50 and failed reference copy
+remain preserved. Actual command112.940423965s passes48 proxy558.231908<=640;
+no48 execution authority follows from this card. See the
+[acceptance index](../experiments/k5d-inputs/svt-study4282-f831-shared16-root-acceptance-20261113.json).
 
 Goal: establish actual sixteen-frame correctness and cost for the opt-in SVT
 study at scientific revision `4282c96f8aaf7d229f53df4c1c5f8225d8454d6e` before
