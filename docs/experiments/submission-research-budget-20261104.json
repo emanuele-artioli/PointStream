@@ -2983,6 +2983,153 @@
       "cpu_seconds": 100,
       "gpu_seconds": 0,
       "basis": "ROOTprospective finite300s/max9/45min passivewatch; A25finished9ticks18:17:06/PID84632absence verified. Same80countedCPU+20external reserve/full100retained. Preflight localfailures beforewatch/SSH preserved; noautosubmit/model/LLMtimer/nativecompletionresume guarantee."
+    },
+    {
+      "phase": "ball-primary-fresh-global-beforecontext20-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 20,
+      "gpu_seconds": 0,
+      "basis": "ROOTpre-clockONEglobal10+primaryworkercontext6+prep4 prechargedfrom1320hold leaves1300. Exactcontract261e88c4/global94d/beforec07/PRIMARYbody624266. Canonicalsubmitdoctorinside148 notdoublecharged; noGPU/job/observer/sourceproofpromotion. Noautomaticretry."
+    },
+    {
+      "phase": "ball-primary-both-UUID-metadata30-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 30,
+      "gpu_seconds": 0,
+      "basis": "ROOTprospectiveONEdeadline-onlybothUUIDrefresh; actualpreflight20passed; remote12+normalizers4+SSH3+caller3+reviewprep3+reserve5. Separatecurrent1300C900Ghold; noGPU/job/observer/scientificsourcechange/replay."
+    },
+    {
+      "phase": "ball-primary-actual-binding-review3-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 3,
+      "gpu_seconds": 0,
+      "basis": "ROOTprospectiveindependentLOCALactualmetadata/selectedoperatorbindingreview3 fromterminal15review3 leavesevents6ACK6; hold1300to1297. NoAPI/SSH/source/model/observer/GPU; no duplicated laterreview3."
+    },
+    {
+      "phase": "ball-primary-Ada0-observer-START30-payload200-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 230,
+      "gpu_seconds": 0,
+      "basis": "ROOTONESTART30+twoobserverUNKNOWNpayload100each prospectivelyprecharged; actualmetadata476b/independentbindinge742 PASS. Full230retainedonfailure; noGPU/job/publication orautomaticretry. Hold1297to1067CPU900GPUunchanged."
+    },
+    {
+      "phase": "ball-primary-Ada0-READY30-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 30,
+      "gpu_seconds": 0,
+      "basis": "ROOTONEexactREADYafteractualSTART53494PASS/twoownedwrapperbirths+sessions; hold1067to1037CPU900GPUunchanged. NoGPU/job/publication/retry; full30retained."
+    },
+    {
+      "phase": "ball-primary-Ada0-sole-V5chain148-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 148,
+      "gpu_seconds": 0,
+      "basis": "ROOTONEexactsolepublication/doctor/earlybind/canonicaladmission/actualUUIDassignment; actualREADY39321PASS/fixed19:38:46/complete820guard. Chain148charged hold1037to889; science700C900Gremainheldandexplicitlyauthorizedthissolejob, convertwhenactualIDknown. Noautomaticretry/sourcechange."
+    },
+    {
+      "phase": "ball-primary-Ada0-06650791-science700-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 700,
+      "gpu_seconds": 900,
+      "basis": "ROOTpreauthorizedreservedONEscientific700C900G convertedonceactualID06650791known. Exact2c6d/6f/5ca/specd739/fixeddeadline19:38:46. Noquality/scalepromote/automaticretry."
+    },
+    {
+      "phase": "ball-primary-06650791-fresh-status6-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 6,
+      "gpu_seconds": 0,
+      "basis": "ROOTprospective6unallocatedBall/programme permandatorynewrootjobaction freshcanonicalstatus; originalartifact60terminalstatus6 stillreserved. Completephaseceiling1326CPU900GPU +metadata30separate; noGPU/source/science/outercapchange, noautomaticretry."
+    },
+    {
+      "phase": "ball-primary-06650791-ONEcompletion70-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 70,
+      "gpu_seconds": 0,
+      "basis": "ROOTONEcanonicalcompletionwait900/max34SSH/outer980; currentcanonical37625RUNNING/exactUUIDassignment; local2+34SSH1+34remote1=70. Hold189to119C0G; nosecondcompletionwait/autoACK/replay/outcomeacceptance."
+    },
+    {
+      "phase": "ball-primary-06650791-artifact60-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 60,
+      "gpu_seconds": 0,
+      "basis": "ROOT releases ONE canonicalterminalstatus6 then frozenartifact54 inclusiveplanning3/independentreview2. No extraquery/retry/GPU/source/qualitychange."
+    },
+    {
+      "phase": "ball-primary-paired-nextstage-offline-plan5-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 5,
+      "gpu_seconds": 0,
+      "basis": "ROOT localplanning5 unallocatedBall forFALSEexisting2c6d pairedproducer/scorer concreteroute; no network/deadline/GPU/newsource/release. Quality/correctnessonly future noindependentresource/speed/spanclaim."
+    },
+    {
+      "phase": "ball-primary-06650791-status60repair6-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 6,
+      "gpu_seconds": 0,
+      "basis": "ROOT one read-onlycanonicalstatus repair afterknown10stimeout. CLI60/outer80/remotealarm70/same2CPUeach localSSHremote. Originalfailureand60chargepreserved; noGPU/native/source/science/replay."
+    },
+    {
+      "phase": "ball-primary-06650791-observer-collect15-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 15,
+      "gpu_seconds": 0,
+      "basis": "ROOT onecollect ownedobservers afterfreshcanonicalstatus14657COMPLETEgatePASS; local3SSH2remote5reserve5/outer2690. Noobserverrestart/foreignsignals/retry."
+    },
+    {
+      "phase": "ball-primary-06650791-TARheader8-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 8,
+      "gpu_seconds": 0,
+      "basis": "ROOT8unallocatedBall oneTARheaderdiagnostic local2SSH2remote4; actualaudit34836knownJSONsizeguardfailed. Readonlyheaders/noGPU/native/wholeartifactacceptance."
+    },
+    {
+      "phase": "ball-primary-06650791-audit-repair-offline10-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 10,
+      "gpu_seconds": 0,
+      "basis": "ROOT prospectiveLOCALofflineguardrepairreview<=10. Actualheaders67regular/531052103B/JSON132332996B/pilot44891455B; sourceprovenancerequirednotblind66to67. NoGPU/network/newsource/release."
+    },
+    {
+      "phase": "ball-primary-06650791-auditrepair-builder10-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 10,
+      "gpu_seconds": 0,
+      "basis": "ROOT prospective100CPU readonlyrepair inclbuilder10charged/90held. Diagnosticheaders actualpilot44891455/sumJSON132332996/67regular. Separateindepoffline10 retained; no science/source/GPUchange."
+    },
+    {
+      "phase": "ball-resource-watch-passive-a27-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 100,
+      "gpu_seconds": 0,
+      "basis": "ROOTonefinite45min300s/max9ticks passivefleetwatch/80workload20administrativereserve same2b931eb5; A26finished+PID91332absenceverified. Userregularresourcechecks/noLLMtimer/autosubmit/renewal."
+    },
+    {
+      "phase": "ball-primary-06650791-auditrepair90-execution-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 90,
+      "gpu_seconds": 0,
+      "basis": "ROOT freezes+reviews 48pins/frozenallsciencechecks/strict67checkpoint66/9negatives2gzipfixtures. Future90convertedfromhold, phase100inclbuilder10/outer750; noGPU/models/native/sourcechange/retry. Remotehard30includesJSONgzipTail, reportedCPUscoped."
+    },
+    {
+      "phase": "ball-primary-06650791-closeout-status6-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 6,
+      "gpu_seconds": 0,
+      "basis": "ROOTbeforeACK/archivereassigns unusedevents6 toONEfreshstatus60/80outer/exactcapturedRPC; events859alreadycanonicalretained. Existinghold44to38/noextraouter/noGPU."
+    },
+    {
+      "phase": "ball-primary-06650791-terminalACK6-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 6,
+      "gpu_seconds": 0,
+      "basis": "ROOT exactsinglecanonicalterminalevent859 afterfresh38968completegatePASS andactualROOTscientific/currentcleanupacceptance2a5fcf27. maxSSH0/nootherjobACK/noGPU."
+    },
+    {
+      "phase": "ball-primary-06650791-archive30-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 30,
+      "gpu_seconds": 0,
+      "basis": "ROOT prospectivecompletearchive30:build6/verify6/localupload4/SSH6/remote4/review2/reserve2; selectedallactualaccepted+oldfailures/helpers/metadata/ACK. Immutablecreate-only/readback noGPU."
     }
   ],
   "reservations": [
@@ -3645,12 +3792,22 @@
     {
       "phase": "ball-Ada-calibration-source-qualification-20261113",
       "workstream": "ball",
-      "gpu_seconds": 900,
-      "cpu_seconds": 1270,
-      "status": "Remaining_unspent1230CPU900GPU primaryexclusive6pointqualification; +70ROOTunallocatedforcompletewait70/artifact60 (oldobserverexternal40/artifact20retained); source/proofsunchanged; runtimeUNRELEASED.",
+      "gpu_seconds": 0,
+      "cpu_seconds": 0,
+      "status": "Closed0; primary06650791ROOTacceptedPREPARATIONonly/exactACKclosed/immutablearchivedb448076verified. Neverreleased2CPUreserve returnedwithoutrefundingcharges.",
       "card": "docs/cards/k5d-primary-Ada0-qualification-2026-11-13.md",
       "observer_unknown_failure_allowance_CPU": 200,
-      "root_amendment_20261113": "Prospective+40unallocatedBall/programme tocoverTWOunknownobserver100each instead160normalpayload; remainingruntime1270CPU900GPU. NoGPU/source/quality/outercapincrease; metadata30separateunfundeduntilkitready."
+      "root_amendment_20261113": "Prospective+40unallocatedBall/programme tocoverTWOunknownobserver100each instead160normalpayload; remainingruntime1270CPU900GPU. NoGPU/source/quality/outercapincrease; metadata30separateunfundeduntilkitready. ROOTsubsequentcomplete-lifecycle+50:20global/beforecontext/prepreview+30immutablearchive; currenthold1320CPU900GPU, metadata30separate.",
+      "root_additional_lifecycle_CPU": {
+        "global_beforecontext_preflight_review": 20,
+        "immutable_archive": 30
+      },
+      "authorized_scientific_unspent": {
+        "cpu_seconds": 0,
+        "gpu_seconds": 0,
+        "scope": "ConvertedtochargeonceactualIDknown06650791; no additionaljobauthority"
+      },
+      "released_never_spent_cpu_seconds": 2
     },
     {
       "phase": "ball-control-only-UUID-routing-activation-20261113",
@@ -3708,6 +3865,13 @@
       "gpu_seconds": 0,
       "status": "Full3000CPU2390GPU conservativelyprecharged:83prior+2917runtime; ROOTconditionalONEpublication released afterdeadline-onlynormalizers; actualIDpending; nofull30.",
       "card": "docs/cards/k5d-study4282-confirmation292-2026-11-13.md"
+    },
+    {
+      "phase": "ball-primary-06650791-readonly-auditrepair100-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 0,
+      "gpu_seconds": 0,
+      "status": "Closedreserved0; ROOTsole readonlyrepair90released+fullyprecharged plusbuilder10=100; no automaticretry/GPU/sourcechange."
     }
   ],
   "jobs": [
@@ -6853,7 +7017,7 @@
       "wait_result": "CLI10earlynonterminalcontention; nosecondwait",
       "physical_audit_backend": 81442,
       "physical_audit_status": "KNOWNFAILEDdirectartifacttransferexit255/incomplete189530112B preserved/noGPUrerun",
-      "scientific_acceptance": "ROOTaccepted292scoped; actualclip sourcequalifiedTRUE; historical10/197failure retained; CRF62false3to5bothjudges",
+      "scientific_acceptance": "ROOTaccepted292scoped; literal sourcequalifiedTRUE is visible-recall>=0.8 ONLY. Separate pooledabsence calibration10/197fails<=5%; strongabsence/realismclaimsblocked. CRF62false3to5bothjudges retained.",
       "terminal_acknowledged": true,
       "failure100_suballocations": {
         "metadata_deadline_refresh": 20,
@@ -6884,7 +7048,95 @@
         "wall": 21.610099013894796
       },
       "tracked_acceptance_index": "docs/experiments/k5d-inputs/svt-study4282-64160888-confirmation292-root-acceptance-20261113.json",
-      "tracked_acceptance_index_sha256": "9d845132047999dabb61693e435e5345fcb90d5db2057f912046cafaa1630dc9"
+      "tracked_acceptance_index_sha256": "4922cb4f14c380aedf88f80be686f2f1c32755852b67f64f8976d8ebf798dc43"
+    },
+    {
+      "job_id": "20261113T192206Z-06650791",
+      "phase": "primary-Ada0-sixpoint16-preparation",
+      "workstream": "ball",
+      "source": {
+        "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+        "snapshot_sha256": "5ca2d194b7e1a6032faf7ef60fe44924649e0a57471c12cda6264f9586260219",
+        "source_sha256": "6f898f753a056981a107f5115a5a36f1310bc9d4a705a1805b75f758a0bc0117"
+      },
+      "source_revision": "2c6d8581fbd64279dde554ca1402047d27ab7fa2",
+      "spec_sha256": "d7398f4724bbbbf576c00810820cbe731f3e8316cefcfddb3e23b4aa7b012d5d",
+      "spec_raw_sha256": "1d35a2b7058ebdef5fea82d073dca60fdc252b092d652e1ee3b6b51424bed4a3",
+      "actual_identity": "/private/tmp/pointstream-primary-exclusive-Ada0-ROOT-5f64063ae30f453993d9c1259f7f3e8b/operator/actual-chain-output/sole-actual-job.json",
+      "actual_identity_sha256": "6e951fecc8e1785ac42684656f2c972e5012cefd06dd1b0fa8ce2baf58f91fc2",
+      "runtime": "/private/tmp/pointstream-primary-exclusive-Ada0-ROOT-5f64063ae30f453993d9c1259f7f3e8b",
+      "status": "complete/gatePASS/ROOTacceptedPREPARATIONonly",
+      "deadline": "2026-11-13T19:38:46.406552+00:00",
+      "publication_backend": 38926,
+      "GPU_precharged": 900,
+      "scientific_CPU_precharged": 700,
+      "scope": "16frame6pointPREPARATIONonly; encodedmetric/judgearraysEMPTY/fullNOOP; noquality/scale/resourceacceptance",
+      "no_replay": true,
+      "publication_result": "38926COMPLETE0/V5earlybind+actualassignmentPASS",
+      "assignment": {
+        "actual_gpu_uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+        "assignment_rule": "exact hashed spec.gpu_uuid equals expected selector and admitted request.claims.gpu; no outcomes read; other UNKNOWN retained",
+        "boot": "a9b0d171-6701-49c6-8a2e-7108424a8927",
+        "expected_gpu_uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+        "inputs_sha256": "68c2a0425cdb5abae751cad20adb03e60c85d43dded5944d3b7f60f8224f096d",
+        "job_id": "20261113T192206Z-06650791",
+        "recorded_wall_ns": 1794597821492845276,
+        "request_sha256": "d9a6c38c71bbf27df1492ce083f8bd3afa3a0aa52b4713a14030bf8f390f2649",
+        "selected_observer": 0,
+        "source_sha256": "6f898f753a056981a107f5115a5a36f1310bc9d4a705a1805b75f758a0bc0117",
+        "spec_sha256": "d7398f4724bbbbf576c00810820cbe731f3e8316cefcfddb3e23b4aa7b012d5d"
+      },
+      "fresh_status_release_sha256": "151f9b79683afaecdd5e6dfb51e9e83ab0986bc90ecec09b9829629ce0c4a811",
+      "fresh_status_backend": 37625,
+      "fresh_status_state": "37625COMPLETE0/RUNNINGsmoke/exactsource",
+      "completion_wait_state": "COMPLETEcanonicalattentionCLI10/terminalcomplete/noimplicitACK",
+      "completion_wait_release_sha256": "17a4f5b163cfe4ff53fbd432e9883609668c87dc97bbfa58e53ebdc748c7fdb3",
+      "completion_package": "/private/tmp/pointstream-primary-exclusive-Ada0-ROOT-5f64063ae30f453993d9c1259f7f3e8b/completion70-ROOT",
+      "completion_wait_backend": "unrecovered; durableactual-wait70outputscomplete",
+      "completion_wait_result": "11.602601wall/2SSH; localCPU0.106033/SSHCPU0.152245; savedstatusCOMPLETEgatePASSexit0; notscientificacceptance",
+      "completion_wait_output": "/private/tmp/pointstream-primary-exclusive-Ada0-ROOT-5f64063ae30f453993d9c1259f7f3e8b/completion70-ROOT/actual-wait70/stdout.json",
+      "canonical_status": "complete",
+      "artifact_terminal_status_backend": 26430,
+      "artifact_terminal_status_state": "FAILEDknownexit2/read-onlySSHstatusRPC10s timeout/emptystdout/stderrpreserved; completedscientificjobnotreplayed",
+      "status_repair6_backend": 14657,
+      "status_repair6_state": "14657COMPLETE0/canonicalCOMPLETEgatePASSexit0/3.501277wall",
+      "observer_collect_backend": 80752,
+      "artifact_case": "/private/tmp/pointstream-primary-exclusive-Ada0-ROOT-5f64063ae30f453993d9c1259f7f3e8b/artifact60-06650791-BOUND-FALSE",
+      "artifact_release_sha256": "3aaa623154628b6644f6bfcfa8c79d33253e5a4917a1403b6947e815bc27169d",
+      "physical_audit_backend": 34836,
+      "physical_audit_state": "KNOWNFAILEDexit1 JSONsizeguard source61; partialraw13061511B/errorpreserved/currentcleanupnotreached",
+      "TAR_header8_backend": 46161,
+      "physical_audit_repair_case": "/private/tmp/pointstream-primary-06650791-audit-repair100-FALSE-20261113",
+      "physical_audit_repair_release_sha256": "ccefb5c664791047ed9fa8863fcb7634d133b683c7ea13c9dc03e4bb6555e32f",
+      "physical_audit_repair_backend": 64353,
+      "physical_audit_repair_state": "64353KNOWNFAILEDlocalverifierline60 perframehashLIST vswholeYUVhash scalar; remotephysical+cleanupPASS/gzipCRC+bothSHAsPASS/aftercontextPASS; noGPUrerun",
+      "readonly_repair100_reserve25_amendment": {
+        "local_schema_fix": 5,
+        "ONE_local_verify": 10,
+        "independent_review_and_observer_replay": 5,
+        "still_unspent": 5,
+        "basis": "Existingfullycharged100reserve25; noadditionaloutercharge/SSH/GPU/relaxingphysicalbytechecks. Originalfailedhelper/errorremain."
+      },
+      "local_schema_verifier_backend": 22224,
+      "local_schema_verifier_sha256": "ea2988502fa3db07baf98994bffc774fb5b5c4aaee4447c9f77ca0dcba5ce815",
+      "scientific_acceptance": "ROOTaccepted67regular/30binary/sixCPUreceipts/native-wire-YUV-RGB/sourcegolddevicekernel/currentcleanup; EMPTYencodedmetrics/fullNOOP; noquality/cohort/resourcepromotion",
+      "root_acceptance": "/private/tmp/pointstream-primary-06650791-audit-repair100-FALSE-20261113/ROOT-accepted-sixpoint16-preparation.json",
+      "root_acceptance_sha256": "2a5fcf2722bfc210579b490cab352b57b1139115450f37f5ec833f23cf34a249",
+      "observer_review_sha256": "4210d38bdd780ba09ab4a14fffd02f62ee6f0dd8fba61103ba8b2244a70d64b7",
+      "observer_scope": "Selectedconditional330.385725s/NFSvisibilityunproven; otherUNKNOWN; noCPU/speed/fullscaleclaim",
+      "closeout_status_backend": 38968,
+      "terminal_acknowledged": true,
+      "acknowledged_events": [
+        "8593867817145457a55f78ebd7a2e485"
+      ],
+      "terminal_ACK_output": "/private/tmp/pointstream-primary-06650791-terminalACK6-ROOT-20261113/actual-ack/stdout.json",
+      "archive_case": "/private/tmp/pointstream-primary-06650791-archive30-ROOT-20261113",
+      "archive_publication_backend": 94624,
+      "archive_publication_status": "94624COMPLETE0/immutable0444-0555/readbackPASS",
+      "durable_archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-primary2c6d-qualification16-db448076e64522ec36520caa/qualification.tar.gz",
+      "durable_archive_sha256": "db448076e64522ec36520caad84e52ff5d1de1e0b9e304d85c7462cb299f27ec",
+      "tracked_acceptance_index": "docs/experiments/k5d-inputs/primary-06650791-Ada-sixpoint16-root-acceptance-20261113.json",
+      "tracked_acceptance_index_sha256": "c399bf601374ea8e7f9f9ae996e8204addaa46deb42f8a09c6db216391c18fb9"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -6914,16 +7166,17 @@
     "RootprospectiveSVTdenial365\u2192413CPU/GPU0 (+48unallocatedBall/programmeCPU) retainqualifiedV4fullpublication68 insteaduncertain20; original265campaign/science/source/qualityunchanged. External148=20preflight+68publication+10wait+40audit+10reserve. Existingouter24GPUh28CPUh/Ball72000CPUunchanged; noexecutionbyallocation.",
     "RootprospectiveSVTqualification413\u2192443CPU/GPU0: failedpreflight20retained +ONEreplacementpreflight30 +393remaining. Add30unallocatedBall/programme; allouter/workstreamceilingsunchanged. Readonlystatus-ONLY6CPU/120wallbootstrap proposed; originalpublication68V4shims/scienceunchanged. No replacementexecutionbeforeexactrootreview.",
     "ROOT292 failure100 assignment20metadata+63ONEgzipreadonlyrepair+17unspent; alreadyinsidefull3000charge, NOadditionaloutercharge/refund. Original60failedartifact retained. Noautomaticretry/GPUrerun.",
-    "ROOTprospectiveprimaryruntime1230to1270CPU +40unallocatedBall/programme coversobserverunknownfailure100each/200insteadaccepted80each/160. Nochargeyet/noextraGPU/source/science/outerceilingchange; metadata30separatereleaseonlywhenoperativekitreviewed."
+    "ROOTprospectiveprimaryruntime1230to1270CPU +40unallocatedBall/programme coversobserverunknownfailure100each/200insteadaccepted80each/160. Nochargeyet/noextraGPU/source/science/outerceilingchange; metadata30separatereleaseonlywhenoperativekitreviewed.",
+    "ROOTprimarywhole-lifecycle1270to1320CPU+50unallocatedBall/programme:20globalinventory/beforecontext/prepreview +30immutablearchive. V5remote readiness does not supply artifactbinder beforecontext. Stockdoctorwithinsolecanonicalsubmit148 notchargedtwice. Metadata30separate/unreleased; noGPU/source/science/outercapchange."
   ],
   "monitoring": {
-    "state": "a26_active_bounded_passive_only",
+    "state": "a26_finished_capacity_found_gated_neural_attempt_preparing",
     "scope": "gpu2/gpu3 A6000 and gpu5/gpu6 Ada",
     "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a26/run",
     "native_completion_wakeup_verified": false,
     "native_completion_resume_verified": false,
     "accounting_limits": "SSH server/login aggregate unmetered; inner80 countedCPU plus20 external reserve; full100CPU charge retained",
-    "scientific_jobs": "64160888 ROOTaccepted292 only/terminalACKclosed/archiveimmutablePASS. Primaryneuralpreparationheld1230C900G; W8wholefitSTOP. No automaticGPUsubmission.",
+    "scientific_jobs": "PrimaryAda0observersSTARTPASS/READY39321running; noGPUjobyet. SVT292accepted/ACKclosed/archiveimmutable. Watchhasnoautosubmit/nativewakeguarantee.",
     "source_sha256": "2b931eb5a25f7a87cc3594103ee845ec2582cc017309b7d479a99f637f6ee10c",
     "mode": "bounded_passive_native_resource_checks",
     "pid": 91332,
@@ -6942,8 +7195,8 @@
       "/private/tmp/pointstream-resource-watch-20261113-passive-a16"
     ],
     "recurring_llm_polling": false,
-    "completed": false,
-    "latest_inspected_completed_tick": null,
+    "completed": true,
+    "latest_inspected_completed_tick": 8,
     "previous_monitoring_snapshot": {
       "state": "Activea5passive5min45minwatch100CPUprecharged;priora4endedverified;noautosubmit/modeltimer",
       "scope": "gpu2/gpu3 A6000 and gpu5/gpu6 Ada",
@@ -7082,6 +7335,29 @@
         "ticks": 9
       },
       "pid_absence_verified": true
+    },
+    "finished": {
+      "controller_cpu_seconds_observed": 0.48899699999999996,
+      "finished_utc": "2026-11-13T19:12:29.517862+00:00",
+      "reason": "deadline",
+      "remote_worst_case_charge_seconds": 51.575364,
+      "ssh_waited_children_cpu_seconds": 1.062187,
+      "ticks": 9
+    },
+    "a27": {
+      "state": "ONEfinitewatchinflight/noautomaticrenewal",
+      "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a27",
+      "interval_seconds": 300,
+      "duration_seconds": 2700,
+      "prior_A26_finished_and_PID_absent": true,
+      "no_automatic_renewal": true,
+      "backend": 78950,
+      "launch_handle": "/private/tmp/pointstream-resource-watch-20261113-passive-a27/launch.json",
+      "receipt": "/private/tmp/pointstream-resource-watch-20261113-passive-a27/run/receipt.json",
+      "pid": 1412,
+      "started_utc": "2026-11-13T19:54:13.543609+00:00",
+      "deadline_utc": "2026-11-13T20:39:13.543508+00:00",
+      "receipt_verified": true
     }
   },
   "approval_history": [
@@ -7189,5 +7465,66 @@
       "promotion": "Onlyroot afteractualcanonicalCOMPLETEexit0+independentartifact/currentcleanup+sameworker/controlbefore-after review."
     },
     "conditional_client_state": "/private/tmp/pointstream-SVT-denial413-CONDITIONAL-client-20261113/client-state"
+  },
+  "primary_preflight_current": {
+    "path": "/private/tmp/pointstream-primary-preflight20-ROOT-CANDIDATE-20261113",
+    "global_backend": 42165,
+    "before_backend": 50497,
+    "status": "COMPLETE0both/ROOTaccepted/globalnoactive/sameworker",
+    "contract_sha256": "261e88c4d4d0a6bcbbcc6f2ced42545da403d156db551a4f11e8ef17f9744225",
+    "root_acceptance": "/private/tmp/pointstream-primary-preflight20-ROOT-CANDIDATE-20261113/ROOT-accepted-preflight20.json"
+  },
+  "primary_metadata_current": {
+    "path": "/private/tmp/pointstream-primary-metadata30-ROOT-5f64063ae30f453993d9c1259f7f3e8b",
+    "deadline": "2026-11-13T19:38:46.406552+00:00",
+    "contract_sha256": "23695b829f0dbdb9570aa3b50689dccc35fce4d27580ffbc1172d0a397b60962",
+    "release_sha256": "be8b27ae3b04e94bc450bdea898531f18c50ae8d41fc4c78b5adee2b5affe906",
+    "status": "COMPLETE0/readbackPASS/ROOTacceptedmetadataONLY",
+    "backend": 42845,
+    "root_acceptance": "/private/tmp/pointstream-primary-metadata30-ROOT-5f64063ae30f453993d9c1259f7f3e8b/ROOT-accepted-actual-metadata30.json",
+    "root_acceptance_sha256": "476b23aa9a7fdb582bccce8f8f40df60005a71d48242fe5a7d178160b805a7bd",
+    "selected": "Ada0/dbbb",
+    "selected_case": "/private/tmp/pointstream-primary-exclusive-Ada0-ROOT-5f64063ae30f453993d9c1259f7f3e8b",
+    "operator_config": "/private/tmp/pointstream-primary-exclusive-Ada0-ROOT-5f64063ae30f453993d9c1259f7f3e8b/operator/operator-config.ROOT-PREPARED.json",
+    "operator_config_sha256": "a43effb5e54ff39f0052116035ccfccb767e1187509183c7b4b19910f5c72130",
+    "phase_bindings": "/private/tmp/pointstream-primary-exclusive-Ada0-ROOT-5f64063ae30f453993d9c1259f7f3e8b/phase-bindings.ROOT-PREPARED.json",
+    "runtime_remaining_CPU": 119,
+    "start_release_sha256": "bf79be829b989ed06979b808d6b9159b4d2f4ee7772ad838b0f79de16dec9669",
+    "start_status": "COMPLETE0/twoownedhandlesROOTaccepted/noGPU",
+    "start_backend": 53494,
+    "failed_local_checksum_before_SSH": true,
+    "observer_wrappers": [
+      {
+        "index": 0,
+        "pid": 3290627,
+        "identity": {
+          "pid": 3290627,
+          "birth_ticks": 566014486,
+          "pgid": 3290627
+        },
+        "receipt": "/local/users/emanuele/pointstream/metadata-prep/primary-both-clock-5f64063ae30f453993d9c1259f7f3e8b/Ada0/observer-0/wrapper-output/receipt.json",
+        "owned_timeout_handle": "/local/users/emanuele/pointstream/metadata-prep/primary-both-clock-5f64063ae30f453993d9c1259f7f3e8b/Ada0/observer-0/wrapper-output/handle.json"
+      },
+      {
+        "index": 1,
+        "pid": 3290628,
+        "identity": {
+          "pid": 3290628,
+          "birth_ticks": 566014487,
+          "pgid": 3290628
+        },
+        "receipt": "/local/users/emanuele/pointstream/metadata-prep/primary-both-clock-5f64063ae30f453993d9c1259f7f3e8b/Ada0/observer-1/wrapper-output/receipt.json",
+        "owned_timeout_handle": "/local/users/emanuele/pointstream/metadata-prep/primary-both-clock-5f64063ae30f453993d9c1259f7f3e8b/Ada0/observer-1/wrapper-output/handle.json"
+      }
+    ],
+    "ready_release_sha256": "5c438484298406d23e069fb4e809f85d1c0cfaee9759570a054d1bbd2c9758ae",
+    "ready_status": "COMPLETE0/bothREADY+absenceROOTaccepted",
+    "ready_backend": 39321,
+    "operator_release_sha256": "ee311415791998ef455295dae8516968e10197a2a7471786f9032d5278450604",
+    "publication_status": "ACTUALIDpublished/canonicaladmissionpending",
+    "prepublication_remaining_wall": 1039.17502617836,
+    "publication_backend": 38926,
+    "actual_job_id": "20261113T192206Z-06650791",
+    "actual_identity": "/private/tmp/pointstream-primary-exclusive-Ada0-ROOT-5f64063ae30f453993d9c1259f7f3e8b/operator/actual-chain-output/sole-actual-job.json"
   }
 }

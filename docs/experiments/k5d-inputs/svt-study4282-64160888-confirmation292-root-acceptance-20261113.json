@@ -44,7 +44,10 @@
     "crop_metrics_only_for261_visible": true,
     "source_task_qualified_actual_clip": true,
     "historical_source_calibration_10_of197_failures_retained": true,
-    "population": "Retrospective registered calibration clip, not heldout/newpopulation."
+    "population": "Retrospective registered calibration clip, not heldout/newpopulation.",
+    "source_task_qualified_rule": "Literal frozen k5d_source_oracle qualified flag: WASB visible recall10 >=0.8 only. It does not test absence calibration.",
+    "absence_calibration_scope": "Separate proposed screen requires >=100 explicit negatives and false rate <=0.05. Historical pooled source10/197=0.0507614 fails; current clip2/30=0.0666667 also does not establish that screen. Strong absence/realism claims remain blocked; relative detector counts are descriptive.",
+    "automatic_sender": "Image-based BallTrack predictions rounded/clamped by track_of, then local pixel fitting; TrackNet labels supply evaluation/source qualification/ROI, not the starting trajectory. WASB is the distinct primary judge; reused BallTrack is an encoder-model diagnostic."
   },
   "quality_and_absence": {
     "source_scores": {
