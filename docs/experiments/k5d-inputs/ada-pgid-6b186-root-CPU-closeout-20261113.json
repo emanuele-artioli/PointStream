@@ -1,0 +1,55 @@
+{
+  "job_id": "20261113T010449Z-6b186df7",
+  "root_accepted": true,
+  "scope": "native CPU PID containment and accounting",
+  "gpu_used": false,
+  "source_identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "177c96760f9429b2fbf7c5756d026b7b009ba292dc885ff727f18457924a5249",
+    "source_sha256": "b1a6b36cc14637db4a390db9a12c615d7ac042eb42b1415821e797b15af6e331"
+  },
+  "audit_sha256": "6eda9d18dd452d15dcef75f98e83cb19750cb50cb42a63d1c284f9876dc5ae1f",
+  "publication_sha256": "c654d3a73df9892c34eac8558d76f01897a8729df2eed273717fda0b5d79b8ed",
+  "physically_verified_members": 26,
+  "raw_metadata_root_rehashed": 8,
+  "observed_births_absent": 19,
+  "CPU": {
+    "inner": 1.366698,
+    "outer": 1.453698,
+    "normal_comparison_passed": true
+  },
+  "CPU_charge_already_precharged": 250,
+  "limitation": "No GPU or receiver-isolation claim. TERM case required KILL escalation. Helper CPU is process-only; whole administrative and aggregate CPU not measured. Native scratch stream bytes not independently reread; hash from actual component publication. No actual receiver filesystem/CUDA/GPU/scale qualification.",
+  "all_owned_group_supervisor_CPUclaim_absent": true,
+  "cases": [
+    {
+      "case": "normal",
+      "escalated_to_sigkill": false,
+      "members_absent": true,
+      "outer_waited_cpu_seconds": 1.453698,
+      "returncode": 0
+    },
+    {
+      "case": "timeout",
+      "escalated_to_sigkill": false,
+      "members_absent": true,
+      "outer_waited_cpu_seconds": 0.40878700000000023,
+      "returncode": 1
+    },
+    {
+      "case": "sigterm",
+      "escalated_to_sigkill": true,
+      "members_absent": true,
+      "outer_waited_cpu_seconds": 0.05475199999999991,
+      "returncode": -9
+    },
+    {
+      "case": "sigkill",
+      "escalated_to_sigkill": false,
+      "members_absent": true,
+      "outer_waited_cpu_seconds": 0.04875399999999974,
+      "returncode": -9
+    }
+  ],
+  "events": "terminal077b5991437b589287c5ca9676ed2c1e ACKedafterfreshcanonicalstatus/journalread"
+}

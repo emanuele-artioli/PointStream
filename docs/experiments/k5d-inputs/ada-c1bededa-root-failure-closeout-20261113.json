@@ -1,0 +1,133 @@
+{
+  "ack_authorization": {
+    "only_event_ids": [
+      "8eb4c52662f0554fa2719493f8efcbe7",
+      "81277000d17a574da21b0983227b2d73"
+    ],
+    "receipt": "/private/tmp/pointstream-pgid-c1bededa-failure-audit-20261113/ack.json",
+    "receipt_directory": "/private/tmp/pointstream-pgid-c1bededa-failure-audit-20261113",
+    "receipt_sha256": "0de3f0bb818af198a87a71ec79e1f7e7a53f5d1920622a70fca3d3b57bd8d337",
+    "status": "completed only these two events after journal/canonical failed status reread; local ack files verified"
+  },
+  "budget": {
+    "CPU_seconds_precharge_retained": 365,
+    "GPU_seconds": 0,
+    "campaign_CPU_seconds": 265,
+    "diagnostic": {
+      "helper_total_CPU": 0.24619899999999997,
+      "helper_total_wall": 0.19336028024554253,
+      "inclusive_external_CPU_conservative_charge": 50,
+      "ssh_server_login_CPU": "unmetered; included in conservative charge estimate",
+      "within_existing_external_precharge": 100
+    },
+    "external_CPU_seconds": 100
+  },
+  "canonical_spec_sha256": "3717ea7dc63b423c1207d51df7a6d9837ccc456a11d3d0b108360fa2851817ec",
+  "deadline": "2026-11-13T01:59:26.284491+00:00",
+  "failure": "oracle.py:258 passes signal.SIGKILL (Signals IntEnum) to Pidfd.send; k5d_pidfd.py:68 strict type(signum) is not int rejects before signal syscall at line69. No launcher pidfd kill receipt; no oracle.json.",
+  "host": "gpu6",
+  "identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "177c96760f9429b2fbf7c5756d026b7b009ba292dc885ff727f18457924a5249",
+    "source_sha256": "b1a6b36cc14637db4a390db9a12c615d7ac042eb42b1415821e797b15af6e331"
+  },
+  "job_id": "20261113T012427Z-c1bededa",
+  "normal_partial": {
+    "campaign_pgid": 4055922,
+    "decoder_pid": 4056986,
+    "decoder_returncode": 0,
+    "denials_errno": {
+      "encoder_state": [
+        13
+      ],
+      "ground_truth": [
+        13
+      ],
+      "private_detector": [
+        13
+      ],
+      "source_archive": [
+        13
+      ],
+      "source_frame": [
+        13
+      ]
+    },
+    "exec_identity": {
+      "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "snapshot_sha256": "177c96760f9429b2fbf7c5756d026b7b009ba292dc885ff727f18457924a5249",
+      "source_sha256": "b1a6b36cc14637db4a390db9a12c615d7ac042eb42b1415821e797b15af6e331"
+    },
+    "frames": 16,
+    "hashes": {
+      "native.ivf": {
+        "bytes": 57481,
+        "sha256": "589bc1eda7467ff7c038c444d531327dd300f21c637caa703025ad4996fbf610"
+      },
+      "native.yuv": {
+        "bytes": 22118400,
+        "sha256": "5c43d78f12f2e7b41ccf0b794d735af31e1d46c87011d078c53dd20402e4694c"
+      },
+      "rendered.rgb": {
+        "bytes": 44236800,
+        "sha256": "e3c4341445104ce94e87af25ba40fd0a5eda493ef099524e3725ca7f417160fd"
+      }
+    },
+    "landlock_abi": 4,
+    "launcher_pid": 4056538,
+    "normal_elapsed_wall": 22.046942403540015,
+    "normal_namespace_children_CPU_noninclusive": 21.803128,
+    "receipt_copies_exact": true,
+    "receipt_sha256": "3fc84fe017c2c540f1f8ee8cf3b249e90a2f20284457dfaf44367b4fed4845ae",
+    "scope": "normal real isolated CPU receiver completed, not full two-case gate success",
+    "size": [
+      1280,
+      720
+    ],
+    "worker_pid": 4056539
+  },
+  "observations": {
+    "all_14_captured_host_pids_absent": true,
+    "fleet_children_CPU": 23.020539,
+    "gpu6_cpu_claim_absent": true,
+    "groups_empty": {
+      "4055619": [],
+      "4055922": [],
+      "4057041": []
+    },
+    "note": "PID2 in generic raw capture is namespace pid from decoder, host kthreadd; excluded from task-owned host PID claims.",
+    "outer_namespace_children_CPU": 22.835874,
+    "outer_namespace_complete_descendant_wait": true,
+    "outer_namespace_init_CPU": 0.071017,
+    "outer_namespace_reason": "worker_failed",
+    "stage_wall": 34.53984761238098
+  },
+  "outcome": "failed; smoke exit1; gate null; validator not run",
+  "raw_audit": {
+    "/private/tmp/pointstream-pgid-c1bededa-failure-audit-20261113/diagnose.py": "d1040f0cf057661fd00ba3830ec423616833a8617462bb273c8eb2cd97a17942",
+    "/private/tmp/pointstream-pgid-c1bededa-failure-audit-20261113/pre-ack-status.json": "01b8e2e93f19a7b7afa7f8dd761a1942354e1d513f20e87f28c31bc5ebd9559f",
+    "/private/tmp/pointstream-pgid-c1bededa-failure-audit-20261113/raw.json": "63698a40c7e676c43762beef11e637db2156def48ad652e7cf38194562f17814",
+    "/private/tmp/pointstream-pgid-c1bededa-failure-audit-20261113/receipt-filtered.json": "611063a5a1c12b7c2ecd2c20689990380bf27ca316f4a7d759e2641ed7a22ee7",
+    "/private/tmp/pointstream-pgid-c1bededa-failure-audit-20261113/receipt.py": "e953bdc6d9283e832aa672f1e0653cf49a4daeb2828b2e6f56930ac283824979",
+    "/private/tmp/pointstream-pgid-c1bededa-failure-audit-20261113/status.json": "01b8e2e93f19a7b7afa7f8dd761a1942354e1d513f20e87f28c31bc5ebd9559f",
+    "/private/tmp/pointstream-pgid-c1bededa-failure-audit-20261113/summary.json": "fa49653709c3c0797562c81bad27f38b70527286d4fc231789c5cdfd0d029d52"
+  },
+  "recorded_utc": "2026-11-13T01:40:44.691021+00:00",
+  "remote_preserved_scratch": "/local/users/emanuele/pointstream/scratch/20261113T012427Z-c1bededa-smoke",
+  "revision": "d2db015d4d90094bcd9dde8286f1ef05b9bc164d",
+  "root_decision": "accept failed diagnosis and normal partial receipt scope; no promotion",
+  "root_next_test": {
+    "change": "int(signal.SIGKILL) at both oracle callers; add regression; no other numerical or fleet control change",
+    "competing_explanation": "later lifecycle or receiver issues remain untested after this pre-syscall failure",
+    "decision_rule": "minimal code repair and regression/new-source CPU gates before any prospective attempt; no automatic retry",
+    "gates": "review minimal repair and regression, freeze new source, pass fresh CPU correctness gates under separately reviewed prospective budget before any actual receiver or GPU attempt",
+    "hypothesis": "both launcher-kill oracle callers fail because strict pidfd signum guard rejects signal.Signals IntEnum; explicitly converting to int reaches intended pidfd send"
+  },
+  "schema": 1,
+  "scope_limits": "No source edits, retry, new job, wait, GPU, process signal or cleanup. Scratch preserved. No pixel/native/source-frame transfers; native files only hashed remotely. Only two root-authorized terminal events acknowledged after audit.",
+  "source_file_sha256": {
+    "/private/tmp/pointstream-pgid-source-freeze-d2db015d-20261113/source/experiments/tennis/k5d_pgid_oracle.py": "6baddfc0930ee30ff3f73b7b054ae02c0b300e96ab6f0392f2f7f2eb6c757894",
+    "/private/tmp/pointstream-pgid-source-freeze-d2db015d-20261113/source/experiments/tennis/k5d_pidfd.py": "21ed2775eaafd2f55c19cc65c91c2a4f73c042b4bfc7a616bbcde36b99e6bd8e"
+  },
+  "spec_raw_sha256": "ee26f91ce2701148ae3ccf3b97a2f439cac44933bde7b9ca9adb3acd52d26a9f"
+}

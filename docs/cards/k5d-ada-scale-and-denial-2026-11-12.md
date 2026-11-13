@@ -6,33 +6,40 @@ allocation of **6,000GPU /9,000CPU seconds**, inside unchanged Ball64,800GPU/
 72,000CPU and programme86,400GPU/100,800CPU. No paid server, training, legacy
 200-GPU-hour study, manuscript/PRESLEY edit or submission.
 
-## Current November13 status
+## Current November 13 status (UTC)
 
-The first Ada GPU denial witness `20261112T235535Z-13aba806` is **CONTENDED**,
-not queued: another GPU PID was detected before any point or isolated receiver
-started. The sole canonical wait ended; recorded own group/supervisor and CPU/
-GPU claims are absent, events acknowledged, and failed scratch is preserved.
-It provides no decoder/quality result and is not automatically retried. A latent
-receiver process-group incompatibility has a software-only candidate correction
-`16679f50`; new source-bound CPU/lifecycle and actual denial gates are required.
+The failed CPU receiver oracle `20261113T012427Z-c1bededa` is closed and its
+events acknowledged. Strict pidfd validation rejected a signal enum before
+sending it. Normal SVT decoded with exact pixels and five access denials,
+but the combined lifecycle gate failed. Retain the full365CPU charge.
 
-Exact claim-release time was not recorded. Root conservatively debited1,282GPU/
-1,632CPU seconds using the later same-host absence observation and conditional
-one-core/external allowances. These are not measured use: per-run900GPU/1100CPU
-cap compliance is unverified, and actual overrun is not established. Programme
-charges21,141GPU/54,810CPU, Ball14,779GPU/30,809CPU; internal stage remaining
-4,718GPU/5,518CPU. All outer/workstream ceilings and held old reservations stay
-unchanged. No new GPU release until independently durable claim accounting and
-renewed source/CPU/denial qualification; no16/48/full30 promotion.
+Minimal caller fix `5ebc7831` passed Ruff, mypy520 and1,855 tests (37 skipped).
+Root rehashed its actual source/archive and the two-file delta againstd2db:
+source `abccdf05`, archive `7fd4e0e6`, environment unchanged `32e`. One exact-source
+four-case native CPU proof is prospectively released for250CPU/GPU0 after
+readiness; actual ID must be recorded in the Ball journal. No real receiver
+retry, GPU or scale release follows from this mechanism test. Prior6b proof
+remains valid only for its originald2db source.
 
-Passive watcha4 PID51630 began2026-11-13T00:43:58UTC, all four A6000/Ada hosts
-at five-minute intervals, ending by01:28:58UTC or CPU guard.100CPU precharged;
-no autosubmit, model timer or verified chat wake. Prior a3 ended00:36:02UTC after
-18ticks. New watch/output/launch:
-`/Users/manu/.cache/pointstream-resource-watch-20261113-passive-a4/`.
-SSHserver/login aggregate CPU remains unmetered. Inspect existing run/finished
-before any restart. Ada's accepted same-GPU packet-repeat/cost and real SVT CPU
-filesystem-denial evidence remain valid within their original scope.
+Standalone observer canary `cd45a0b3` with collector `8e340a78` passed independent
+hash/journal/CPU/cleanup review:7.112wall/1.068933countedCPU seconds, bounded
+synthetic claim interval4.032s, missing finalUNKNOWN. Retain100CPU debit. This
+proves same-host synthetic fixture behavior only; timeout-expiry/PDEATHSIG
+failure teardown and production/GPU behavior remain untested.
+
+Programme charges: **21,141GPU /55,975CPU seconds**; Ball14,779GPU/31,974CPU.
+Internal stage remaining4,718GPU/4,353CPU. Old held Ball7,920GPU/800CPU and
+W84,550GPU/929CPU are unchanged. All remain inside24GPUh/28CPUh authority.
+Passive watcha5 PID59213 checks gpu2/gpu3 A6000 and gpu5/gpu6 Ada every300s,
+ending by2026-11-13 02:12:37UTC or its CPUguard;100CPU precharged. No autosubmit,
+model timer or verified chat wake. Latest sweeps found no idle eligible card.
+
+Ada's same-GPU repeat `2c8b49a0` supports the same ball benchmark under its
+own reference; failed cross-A6000 comparison `37b3b79b` is retained. Current
+validators require exclusive GPU access. CUDA/DCVC denial, new-clip and full30
+results remain unproved. Paper/PRESLEY edits remain paused.
+
+[Current handoff](../continuation-2026-11-13.md) and [ledger](../experiments/submission-research-budget-20261104.json) supersede historical allocations below.
 
 ## Evidence and unresolved condition
 

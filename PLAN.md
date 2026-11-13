@@ -21,28 +21,43 @@ Every dataset is used for what it labels ([resources](docs/resources.md#what-eac
 The environment audit (step 0) comes before the first component that needs a
 new dependency.
 
-## Where PointStream stands (2026-11-12)
+## Where PointStream stands (2026-11-13, UTC)
 
-**Current research phase, November12:** Ada job2c8b reproduced all six real
-packet outputs, metrics and judges in fresh same-GPU executions (126.6/112.5s).
-Root retains the failed exact cross-A6000 gate37b3; Ada uses its own reference.
-New source5cb45c80 passed full software checks and exact-source native CPU
-proof69c7. Actual SVT CPU oracle030d then passed exact original16-frame packet/
-YUV/RGB checks and all five real filesystem denials under the exact proposed
-GPU-capable policy. Earlier startup failuresb9e0/cda9 are retained, not quality
-findings. CUDA/DCVC behavior and scale remain unqualified. First Ada GPU witness
-`20261112T235535Z-13aba806` stopped CONTENDED before points/receivers. Own cleanup
-was observed, but exact claim release was not recorded: per-run cap compliance
-is unverified, not a demonstrated actual overrun. Conservative programme debit
-now21,141GPU/54,810CPU; stage4,718GPU/5,518CPU remaining. No retry/GPU/scale release
-until corrected campaign-PGID source, renewed CPU/denial gates and independent
-claim-accounting observation are qualified. Five-minute passive resource watcha4
-runs until2026-11-13T01:28:58UTC or CPUguard; no autosubmit/modeltimer.
-See [current handoff](docs/continuation-2026-11-12.md) and rootcloseout.
-The read-only PLAN audit found no other independent ready/worthwhile experiment
-inside the current finite no-training programme; W8 stays held on cost and
-prerequisite-blocked/out-of-scope tasks stay explicit.
-[Stage card](docs/cards/k5d-ada-scale-and-denial-2026-11-12.md).
+The failed CPU receiver oracle `20261113T012427Z-c1bededa` is closed and its
+events acknowledged. Strict pidfd validation rejected a signal enum before
+sending it. Normal SVT decoded with exact pixels and five access denials,
+but the combined lifecycle gate failed. Retain the full365CPU charge.
+
+Minimal caller fix `5ebc7831` passed Ruff, mypy520 and1,855 tests (37 skipped).
+Root rehashed its actual source/archive and the two-file delta againstd2db:
+source `abccdf05`, archive `7fd4e0e6`, environment unchanged `32e`. One exact-source
+four-case native CPU proof is prospectively released for250CPU/GPU0 after
+readiness; actual ID must be recorded in the Ball journal. No real receiver
+retry, GPU or scale release follows from this mechanism test. Prior6b proof
+remains valid only for its originald2db source.
+
+Standalone observer canary `cd45a0b3` with collector `8e340a78` passed independent
+hash/journal/CPU/cleanup review:7.112wall/1.068933countedCPU seconds, bounded
+synthetic claim interval4.032s, missing finalUNKNOWN. Retain100CPU debit. This
+proves same-host synthetic fixture behavior only; timeout-expiry/PDEATHSIG
+failure teardown and production/GPU behavior remain untested.
+
+Programme charges: **21,141GPU /55,975CPU seconds**; Ball14,779GPU/31,974CPU.
+Internal stage remaining4,718GPU/4,353CPU. Old held Ball7,920GPU/800CPU and
+W84,550GPU/929CPU are unchanged. All remain inside24GPUh/28CPUh authority.
+Passive watcha5 PID59213 checks gpu2/gpu3 A6000 and gpu5/gpu6 Ada every300s,
+ending by2026-11-13 02:12:37UTC or its CPUguard;100CPU precharged. No autosubmit,
+model timer or verified chat wake. Latest sweeps found no idle eligible card.
+
+Ada's same-GPU repeat `2c8b49a0` supports the same ball benchmark under its
+own reference; failed cross-A6000 comparison `37b3b79b` is retained. Current
+validators require exclusive GPU access. CUDA/DCVC denial, new-clip and full30
+results remain unproved. Paper/PRESLEY edits remain paused.
+
+The PLAN audit found no other independent ready worthwhile experiment in the
+finite no-training programme; W8 remains held on complete-cost prerequisites.
+See [current handoff](docs/continuation-2026-11-13.md) and
+[stage card](docs/cards/k5d-ada-scale-and-denial-2026-11-12.md).
 
 **Historical access recovery, November12:** start with the [current handoff](docs/continuation-2026-11-12.md) and [storage decision](docs/fleet-recovery-2026-11-12.md). Both unknown requests are independently closed expired unassigned and events acknowledged. Current charges19,362GPU/48,791CPU; nested Ball7,920GPU/1,450CPU andW84,550/929 remain. Existing local disks have ample space: no broad cleanup or migration is warranted. Use packed local source/environment/input/scratch and retain NFS archives. First launch stopped beforeIDallocation; the subsequent verified partial-pool request `20261112T172806Z-8709406d` expired unassigned. Both eligible workers found no admittedGPU; fresh A6000 occupants were otherusers. Rootclosed400externalCPU/0GPU andACKedcanonicalevent. No activejob/wait/timer or furtherqueue release; corrected16 remains unexecuted. W8full-witness compute held for insufficient complete-cost evidence under929CPU, not a quality failure. No paid hosting, source or paper change.
 

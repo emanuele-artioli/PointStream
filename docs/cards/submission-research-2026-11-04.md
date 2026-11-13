@@ -8,14 +8,40 @@ workstream ceilings. Ordinary bounded implementation corrections need no new
 permission; source/numerical rules and stops below remain binding. Closed
 K5c/W8/W9 balances are not transferred. Unknown submissions are never replayed.
 
-Current execution status, November13: first Ada GPU witness13aba stopped
-CONTENDED before points/receivers; no scientific result or automatic retry.
-Cleanup observed, exact release unrecorded; per-job cap compliance is unverified.
-Conservative programme charges21,141GPU/54,810CPU; internal Ball stage remaining
-4,718GPU/5,518CPU. Renewed source/CPU/denial and independent accounting gates
-hold further GPU work. Passive four-host watcha4 checks every5min until01:28:58UTC
-or CPUguard,100CPU precharged. See current handoff and stage card. Paper/PRESLEY
-remain paused. Ada same-GPU repeat and SVT CPU denial keep their scoped passes.
+## Current execution status — November13 (UTC)
+
+The failed CPU receiver oracle `20261113T012427Z-c1bededa` is closed and its
+events acknowledged. Strict pidfd validation rejected a signal enum before
+sending it. Normal SVT decoded with exact pixels and five access denials,
+but the combined lifecycle gate failed. Retain the full365CPU charge.
+
+Minimal caller fix `5ebc7831` passed Ruff, mypy520 and1,855 tests (37 skipped).
+Root rehashed its actual source/archive and the two-file delta againstd2db:
+source `abccdf05`, archive `7fd4e0e6`, environment unchanged `32e`. One exact-source
+four-case native CPU proof is prospectively released for250CPU/GPU0 after
+readiness; actual ID must be recorded in the Ball journal. No real receiver
+retry, GPU or scale release follows from this mechanism test. Prior6b proof
+remains valid only for its originald2db source.
+
+Standalone observer canary `cd45a0b3` with collector `8e340a78` passed independent
+hash/journal/CPU/cleanup review:7.112wall/1.068933countedCPU seconds, bounded
+synthetic claim interval4.032s, missing finalUNKNOWN. Retain100CPU debit. This
+proves same-host synthetic fixture behavior only; timeout-expiry/PDEATHSIG
+failure teardown and production/GPU behavior remain untested.
+
+Programme charges: **21,141GPU /55,975CPU seconds**; Ball14,779GPU/31,974CPU.
+Internal stage remaining4,718GPU/4,353CPU. Old held Ball7,920GPU/800CPU and
+W84,550GPU/929CPU are unchanged. All remain inside24GPUh/28CPUh authority.
+Passive watcha5 PID59213 checks gpu2/gpu3 A6000 and gpu5/gpu6 Ada every300s,
+ending by2026-11-13 02:12:37UTC or its CPUguard;100CPU precharged. No autosubmit,
+model timer or verified chat wake. Latest sweeps found no idle eligible card.
+
+Ada's same-GPU repeat `2c8b49a0` supports the same ball benchmark under its
+own reference; failed cross-A6000 comparison `37b3b79b` is retained. Current
+validators require exclusive GPU access. CUDA/DCVC denial, new-clip and full30
+results remain unproved. Paper/PRESLEY edits remain paused.
+
+See [current handoff](../continuation-2026-11-13.md), [ledger](../experiments/submission-research-budget-20261104.json) and [stage card](k5d-ada-scale-and-denial-2026-11-12.md).
 
 Historical execution status, earlier November12: **ALTERNATE-GPU QUALIFICATION QUEUED**.
 User requests regular native resource checks and a non-A6000 path. The new
@@ -30,7 +56,7 @@ See [handoff](../continuation-2026-11-12.md) and
 gate under929CPU. No paid server, source/numerical relaxation, manuscript or
 PRESLEY change, training or paper submission.
 
-## Latest capacity decision — November12
+## Historical capacity decision — November12
 
 Ada2c8b completed exact same-GPU packet-replay repeatability and measured full
 six-point16 costs126.6/112.5seconds. Root physically audited all bytes, metrics

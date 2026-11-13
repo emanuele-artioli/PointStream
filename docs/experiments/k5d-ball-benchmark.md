@@ -839,3 +839,109 @@ bug. Root closeout: `k5d-inputs/ada-denial-13aba-root-closeout-20261113.json`.
 New source implementation and safe CPU lifecycle harness proceed separately;
 standalone observational accounting is preferred over changing live fleet protocol.
 No GPU/control deployment/claim bypass is authorized by code preparation.
+
+### November13 — reviewed d2db source and prospective native CPU proof
+
+Final receiver source d2db015d4d90094bcd9dde8286f1ef05b9bc164d, tree
+b1a6b36cc14637db4a390db9a12c615d7ac042eb42b1415821e797b15af6e331, archive
+177c96760f9429b2fbf7c5756d026b7b009ba292dc885ff727f18457924a5249, MAIN32e.
+Root independently rehashed tree/archive and actual2c8b bridge9added/4modified/
+0deleted/1388unchanged. Fullchecks1853pass37skip/Ruff/mypy520 pass; independent
+reviewaccepted narrowed combinedpath (normal realSVT+initiallauncherpidfdkill
+withactualscopednamespaceassistedteardown), no unshare-only/fleetwatchdog claim.
+Source50CPUpreparation charged; separate250CPU/GPU0 exactsource genericnative
+4case proof prospectively precharged (100campaign+150external). NoFS/GPU/scale
+release. Frozen localspec/release/readiness at
+/private/tmp/pointstream-pgid-source-freeze-d2db015d-20261113/. Freshall4hosts
+healthy/occupied; gpu6localSSDseparate1.578TBfree, CPUclaimempty, exactnative
+input/toolSHA match. All1688requestscan:1687terminal plusknownunrelatedgpu3
+attention3cb3f467(noGPU/ownerdisappeared), preserved/no replay. Source/config
+rebound; actualjobID mustbe recordedimmediatelyaftersolecanonicalsubmit.
+
+Actual sole nativeCPUproof request `20261113T010449Z-6b186df7` published, initialpending; spec46dda6091deaef848bb8f0c8548304ed8af4d1d0a7dc513bc20c61443b1c5ca4, source_archive=True. 250CPU/GPU0 alreadyprecharged; noFS/GPU/scale. Canonicalstatusrequired beforeONEwait; logs/submitbackend21440 atfreeze directory.
+
+6b186df7 canonical COMPLETE beforefirststatus, source/specexact and4casegatepass;
+smoke23.7878wall/validator.1247. No waitstarted/needed. Rawhash/hostbirth/claim/
+CPUcomparison audit delegatedread-only, rootacceptancepending. No actualFS/GPU
+qualification or automaticnextstage. Currentcharges21,141GPU/55,110CPU (Ball
+14,779GPU/31,109CPU); stage4,718GPU/5,218CPU, oldreservationsunchanged.
+
+Rootaccepted6b186nativeCPUproof: independently rehashed8rawmetadata/26physical
+publicationmembers andsourcearchivejoins;19hostbirths/group/supervisor/CPUclaim
+absent; normal1.366698inner/1.453698outerCPU, TERMrequiredKILL. Gate7148f0d5,
+no actualreceiverFS/GPU/scale credit. Prospective365CPU/GPU0 two-casepilot now
+precharged(265campaign+100external), scopefixedbeforeoutcomes. 2*25.558*1.5
+=76.674s priornormalbasis inside220namespace; overheadunmeasured, pilotstopsif
+notfit. Artifactpreparationmayuse<=20CPU120wall helper within100external; no
+newtraining/encoding/qualityrule/referencechange. Actualpilotsubmissionpending
+rootreview ofasset/SHA/frozenspec. Currentstage4718GPU/4853CPU; programme
+21141GPU/55475CPU, Ball14779GPU/31474CPU.
+
+Rootreviewed/RELEASEDONE d2db2caseCPUoracle compute365CPU/GPU0 withinprecharge: canonical3717ea7dc63b423c1207d51df7a6d9837ccc456a11d3d0b108360fa2851817ec,rawee26f91c,deadline2026-11-13T01:59:26.284491+00:00. Preparedactual6assets/3newimmutableSHA andsourcebefore/afterchecked;1.195prepCPU/8.95wall/noTorch. Literal365budget265campaign100external,220namespace230smoke30validator5noop. Submissionpending; noGPU/scale/retry. 6bterminalevent077b5991437b589287c5ca9676ed2c1e ACKverified.
+
+Actual sole2caseCPUoracle `20261113T012427Z-c1bededa` published initialpending, sourcearchive:true d2db/b1a6/177c/env32e, spec3717ea7dc63b423c1207d51df7a6d9837ccc456a11d3d0b108360fa2851817ec, deadline2026-11-13T01:59:26.284491UTC. Entire365CPU/GPU0 precharged, no GPU/scale/retry. ReadactualID thencanonicalstatusbeforeONEwaitmax<=45min. Allhandles/spec/rootrelease at/private/tmp/pointstream-pgid-d2db-real-cpu-prep-20261113; submitbackend73960 ended.
+
+c1bededa canonicalRUNNINGgpu6CPU; ONEcanonicalwaitmax600 starts2026-11-13T01:27:07.389808+00:00, output/handleinreal-cpu-prep. No repeatedstatus/jobwait orretry.
+
+c1bededa solewaitended9s/attention/FAILED; noactualFS/GPU/qualitypromotion.
+UnACKedevents8eb4c52662f0554fa2719493f8efcbe7/81277000d17a574da21b0983227b2d73.
+Boundedreadonlyrawfailurediagnosticdelegated, no sourceedit/retry/newjob/ACK yet.
+Existing6bnativeproofacceptednotinvalidatedbyunassessednewerror. Watcha4ended
+01:24:23UTC9ticks37.963remote/1.069SSH/.297controllercountedCPU,noidle;PIDabsent.
+Newa5PID59213 started01:27:37UTC(all4hosts/5min/max45min to02:12:37 or CPUguard),
+sameSHA2b931,100CPUprecharged/inner80outer20,SSHserver/loginaggregateunmetered,
+noautoGPUdispatch/model/API/chatwake. Programme21141GPU55575CPU/Ball14779GPU
+31574CPU/stage4718GPU4753CPU.
+
+### November 13 — receiver failure diagnosed; byte-only observer canary released
+
+Canonical failed `20261113T012427Z-c1bededa` stopped because both oracle
+callers passed `signal.SIGKILL` (an IntEnum) to a strict integer-only pidfd
+adapter. The launcher-kill signal was never sent; no validator or combined
+lifecycle gate passed. The normal partial SVT receipt reports exact original
+16-frame YUV/RGB hashes and all five real EACCES denials in campaign PGID4055922.
+This is partial diagnostic evidence, not a promoted combined witness. All14
+captured host births, three groups and the CPU claim were absent. The entire
+365CPU/GPU0 charge is retained. Root closeout `ada-c1bededa-root-failure-closeout-20261113.json`
+records the source and receipt joins; both failure events are acknowledged.
+Before new outcomes, root selected the minimal correction: convert both caller
+signals to integers, retain strict adapter validation and all numerical/default
+paths, add behavioral regressions, then separately qualify any new source.
+No scientific retry or GPU release follows automatically.
+
+The independent observer source589470b3 and helpercd45 passed code review after
+collector fixes (inherited CPU hard limit and matching birth-time units). Root
+prospectively charged100CPU/GPU0 from the existing internal stage: programme
+21,141GPU/55,675CPU; Ball14,779GPU/31,674CPU; stage4,718GPU/4,653CPU remaining.
+One attended synthetic byte-only Linux/NFS canary is released, not completed:
+helper10+observer40+supervisor2+childlessleader2 hardCPU,26 counted reserve,20
+external including collector hard10. GNUtimeout120s group; helperalarm110;
+childless separate leader PDEATHSIG/PPID/selfalarm. No production claim or GPU
+is touched. Runtime/boot/hash/missing-final/remaining-process errors stop UNKNOWN
+without retry; successful fixture coherence is same-host only.
+Preflight gpu6 localSSD separate from NFS,1.578TB available; GNUtimeout8.32
+SHA2e3f2616, Python3.10.12. Prepared helpers/pinned source archivec75fd4d7
+and new roots token54881acc24ae41908b217d33f7954a06 preserve all old data.
+Release, exact command, prep receipts and backend44215 are under
+`/private/tmp/pointstream-claim-canary-prep-20261113/`; no GPU/quality/scale credit.
+
+Observer canary completed return0: independent raw six-file hashes and pinned
+source replay accepted normalBOUNDED4.032224485s /missing-finalUNKNOWN,
+7.111789wall and1.068933outerSELF+waitedCHILDREN CPU. Recorded watchdog group
+empty and leader absent; reader membership follows pinned source inheritance.
+Normal success does not exercise timeout/PDEATHSIG failure teardown. Root
+acceptance `claim-observer-normal-canary-root-acceptance-20261113.json`; no
+production/GPU/scientific qualification. Full100CPU retained. New minimal
+signal-caller fix5ebc7831 passed full1,855tests/37skip/Ruff/mypy520; source
+freeze/configbridge preparation50CPU precharged, native proof not released.
+Programme21,141GPU/55,725CPU; Ball14,779GPU/31,724CPU; stage4,718GPU/4,603CPU.
+
+Root rehashed minimal5ebc sourceabccdf05/archive7fd4e0e6 and both actual
+archive deltas. Accepted root bridge is `pidfd-signal-5ebc-root-approved-bridge-20261113.json`.
+Prospective ONE exact-source native4case CPUproof250CPU/GPU0 precharged,
+100campaign(70smoke10validator5noop15overhead)+150external. Spec1223945d,
+deadline2026-11-13T02:27:01UTC. Rootrelease/freeze at
+`/private/tmp/pointstream-pidfd-signal-freeze-20261113/`; readiness and sole
+canonical submission delegated. ActualID must be recorded immediately; status
+before any one wait. No actualreceiver/FS/GPU/scale retry released. Programme
+21,141GPU/55,975CPU; Ball14,779GPU/31,974CPU; stage4,718GPU/4,353CPU remaining.
