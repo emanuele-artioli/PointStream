@@ -1536,7 +1536,7 @@ def wait_jobs(state_dir: Path, job_ids: list[str], max_seconds: float, *, until_
         elapsed = clock() - begun
         attention = any(job["attention"] for job in jobs)
         settled = all(job["status"] in TERMINAL for job in jobs)
-        admitted = until_running and all(job["status"] == "running" and not job.get("events_error") for job in jobs)
+        admitted = until_running and all(job["status"] == "running" and "events_error" not in job for job in jobs)
         terminal = until_running and any(job["status"] in TERMINAL for job in jobs)
         # Stop before a further poll would end past the limit.
         remaining = limit - elapsed - (clock() - poll_started)

@@ -44,7 +44,7 @@ def test_admission_transition_oracle(tmp_path, monkeypatch, states, events, limi
     assert list(tmp_path.iterdir()) == []
 
 
-@pytest.mark.parametrize('status,events_error', [('unreachable', None), ('running', 'events unavailable')])
+@pytest.mark.parametrize('status,events_error', [('unreachable', None), ('running', 'events unavailable'), ('running', '')])
 def test_admission_does_not_accept_incomplete_metadata(tmp_path, monkeypatch, status, events_error):
     clock = Clock()
     monkeypatch.setattr(inbox, 'wait_snapshot', lambda *args: {
