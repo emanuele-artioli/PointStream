@@ -23,35 +23,43 @@ new dependency.
 
 ## Where PointStream stands (2026-11-13, UTC)
 
-### Current research decision (November 13, 11:58 UTC)
+### Current research decision (November 13, 13:13 UTC)
 
-Shared-SVT16 job `20261113T114623Z-c6b01236` was assigned gpu6 Ada1 ef96,
-then failed the strict `before_models` memory-row check. Diagnostic 79617
-confirmed source admission; zero quality points are accepted. Cleanup 29077
-completed with two captured PIDs absent, one empty group and no owned shared
-GPU/FQDN CPU tokens; root closeout is accepted and terminal ACK is complete. The old
-848 CPU/600 GPU phase remains fully charged and closed to automatic retry.
+The new shared-Ada SVT16 job `20261113T130719Z-9f94f30c` is canonical
+COMPLETE/gate PASS/exit0 on gpu6 Ada1 ef96. All three original SVT settings,
+both arms, full/ROI metrics, judges, CPU isolation and observed-memory gates
+passed. **Independent physical-artifact and current-cleanup acceptance is
+pending; no scale, speed or complete dual-codec claim follows.** A status/event
+snapshot race in wait79917 was resolved by one funded fresh status33861,
+without replaying the experiment. The unrelated gpu5 job is preserved.
 
 - **Ball/SVT subitem: qualify CUDA context memory accounting**
-  ([card](docs/cards/k5d-svt-memory-context-repair-2026-11-13.md)). Independent
-  candidate a71dc6e2 (patch-identical to PR393/93ebb351) materializes a tiny CUDA allocation after the cap, then
-  synchronizes/releases it before resetting peaks. Strict memory/PID guards
-  remain. New600 GPU/2000 CPU is reserved, UNRELEASED; local checks 300 CPU are
-  separately precharged. Despite identical 31 receiver grants, fresh native
-  and actual CPU-denial proofs are required for the new source identity.
-  Only CI, exact freeze/CPU qualification and root forecasts can gate one
-  new real16 test. No thresholds, permissions, training or scale claims change.
+  ([card](docs/cards/k5d-svt-memory-context-repair-2026-11-13.md)). Frozen a71dc6e2
+  (source bb717/archive e051/config5fc) retains strict memory/PID guards.
+  Its fresh native job797deaed and receiver6af48d82 are independently accepted,
+  physically published and ACKed as native7e6fd454/receiver6e882f1f.
+  The full 2000 CPU/600 GPU envelope comprises qualification1012, local
+  metadata30, preflight16, remaining real16 lifecycle822, and reserve120.
+  All but reserve120 is conservatively charged. The two failed local metadata
+  attempts and original failed shared jobc6b01236 retain their charges.
+- After actual acceptance, consider one opt-in study port covering16/48/full
+  registered clips together, retaining the global six-point defaults. A real48
+  cost oracle and separate fixed292/586-frame confirmations precede any full30
+  admission. The missing neural comparison remains open; no shared-neural
+  execution is admitted without an aggregate memory/cost bound.
 
-Accepted source 7a9f/native 6bf/receiver c8 remain evidence for their original
-identities. The primary exclusive 2c6d route is separate:1160 CPU/900 GPU held,
-metadata 50 CPU precharged UNRUN, false plan 463f50d0. Failed kernel-readiness
-gates and the earlier publication UNKNOWN/metadata erratum remain preserved.
+The primary exclusive 2c6d route remains separate:1160 CPU/900 GPU held,
+metadata50 precharged UNRUN. Native/receiver evidence from older identities
+is preserved without relabeling. Programme charges are25041 GPU/69151 CPU
+seconds within the unchanged24GPUh/28CPUh ceiling; the ledger is authoritative.
 
-Passive a17 backend 10511 / PID 37616 is bounded to 12:39:15UTC, every 300s/max nine
-checks; a16 ended with no idle candidate. No autosubmit, recurring model timer
-or verified completion resumption. Manuscript and PRESLEY work remain paused.
-See the [continuation](docs/continuation-2026-11-13.md) and
-[ledger](docs/experiments/submission-research-budget-20261104.json) for live pins.
+Passive resource watch a18 backend7796/PID44010 checks A6000 and Ada hosts
+every300s/maxnine checks, bounded to13:22:34UTC. Its latest inspected tick6
+at13:08:06UTC found no idle candidate. No autosubmit, recurring model timer or
+verified completion-to-model resumption. Ada supports the same study using its
+own qualified reference; shared timings are contaminated. Manuscript and
+PRESLEY work remain paused. See the [continuation](docs/continuation-2026-11-13.md)
+and [ledger](docs/experiments/submission-research-budget-20261104.json).
 
 ### Historical af6 phase — balances, waits and watch superseded above
 

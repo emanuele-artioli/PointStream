@@ -1,24 +1,27 @@
 # K5d: qualify CUDA context memory accounting before the SVT16 pilot
 
-Status (November 13, 12:30 UTC): source/cache and native CPU evidence are accepted;
-GPU runtime remains unqualified. CI-supported scientific source a71 is frozen
-as source bb717 / archive e051 / config 5fc. Root approved source bridge
-1f371bd75240924632204be5bb94b8717b403131d7b3c82fdc70f9714a7fc622 after
-all 2001 tree hashes, the two-file delta and unchanged 31 grants joined. Cache
-physical approval is accepted: metadata-only publication71660 and read-only
-audit80318 completed with exact seven-file hashes/modes and identity-only policy
-change. See `svt-a71-source-cache-acceptance-20261113.json` in the evidence index.
-PR395 merged CI-green at 12:28:36 UTC. Sourceprep100 and native 327 are fully charged.
-Fresh native job `20261113T122511Z-797deaed` is COMPLETE/gatePASS/exit0/GPU-null.
-Preflight 99709 accepted worker 1470412/birth562919381 and seven controls;
-artifact audit 36475 plus the frozen validator passed four modes, 19 absent
-births/21 absent PIDs/four empty groups. Normal CPU was 1.355179 inner versus
-1.444979 outer. Root accepted proof 7e6fd454; upload 14761 is COMPLETE0 and
-physically accepted at c2e5dbbe/native-CPU.json (6844B,0444file/0555dir).
-Sole ACK49167 completed0, only eventd913a547fd305859b8c3889d1cf4a021;
-the native327 phase is closed. [Native acceptance index](../experiments/k5d-inputs/svt-a71-797deaed-native-CPU-acceptance-20261113.json). This is
-CPU containment/accounting only, not GPU/kernel/general-readiness/quality proof.
-Actual CPU-denial 585 and real16 stages remain UNRELEASED.
+Status: exact-source CPU qualification is complete; GPU runtime is unqualified.
+Scientific a71 is frozen as source bb717 / archive e051 / config 5fc, with
+source-only bridge1f371 and sealed cache21ce independently accepted.
+Native job `20261113T122511Z-797deaed` passed its four modes, CPU accounting and
+cleanup; proof7e6fd454 is published and ACKed. Receiver job
+`20261113T124019Z-6af48d82` passed five actual private-file denials, native/wire/
+YUV/RGB equality, frozen CPU-only receipt verification and scoped cleanup;
+proof6e882f1f is published and ACKed. The [native index](../experiments/k5d-inputs/svt-a71-797deaed-native-CPU-acceptance-20261113.json)
+and [receiver index](../experiments/k5d-inputs/svt-a71-6af48d82-CPU-denial-acceptance-20261113.json)
+retain exact provenance. Qualification1012 CPU is fully charged.
+
+Two local metadata attempts stopped before output or remote action: first a3CPU
+cap, then a launcher hard2 limit that prevented the helper from setting3.
+Both10CPU charges remain. Root corrected the launcher (soft2/hard40 with default
+SIGXCPU; child3), retained one numerical-library thread, and used a new output.
+The third allocation10 passed: .780028 helper/validators +.048366 driverCPU.
+Frozen production source admission and both normalized validator returns agree.
+All30CPU is charged; reserve is now120. GPU pilot is released for ONE publication after accepted final preflight.
+Final false package:
+`/private/tmp/pointstream-SVT-a71-first16-stock-FINAL-FALSE-20261113-ROOT-singlethread-correct-limit`;
+raw ecae6bea / canonical09483746, deadline13:29:21.937243UTC.
+
 The original shared-SVT job `20261113T114623Z-c6b01236` failed before models,
 with zero accepted quality points. Its card is closed to automatic retries.
 This is the separate PLAN subitem for a source repair and fresh qualification;
@@ -89,18 +92,22 @@ No paper, PRESLEY, training or paid API work is released.
 
 ## Prospective resources
 
-The total envelope stays **600 GPU-seconds / 2000 CPU-seconds**. Qualification
-is1012 CPU: source preparation100 and native327 are charged; actual CPU
-receiver-denial585 remains UNRELEASED. Remaining hold is1573 CPU/600 GPU
-(denial585 +real16 848 +reserve140):
+The total envelope stays **600 GPU-seconds / 2000 CPU-seconds**. Exact-source
+qualification1012 is accepted. All three local metadata allocations retain their
+charges; remaining hold is120 CPU/0 GPU. Read-only preflight16 completed; the final
+822 CPU/600 GPU pilot is prospectively charged and released once:
 
 | Stage | CPU-seconds | GPU-seconds |
 | --- | ---: | ---: |
-| Source preparation, already charged | 100 | 0 |
-| Fresh native qualification, charged/root accepted | 327 | 0 |
-| Fresh actual CPU receiver-denial qualification | 585 | 0 |
-| One real16 lifecycle, prospective estimate | 848 | 600 |
-| Reserve | 140 | 0 |
+| Source preparation, charged/accepted | 100 | 0 |
+| Native qualification, charged/accepted | 327 | 0 |
+| Actual CPU receiver qualification, charged/accepted | 585 | 0 |
+| First local metadata freeze, failed/charged | 10 | 0 |
+| Second metadata, failed launcher/charged from reserve | 10 | 0 |
+| Corrected metadata, passed/charged from reserve | 10 | 0 |
+| Global queue and same-worker preflight, precharged | 16 | 0 |
+| Remaining real16 lifecycle, released/precharged once | 822 | 600 |
+| Reserve | 120 | 0 |
 | Total | 2000 | 600 |
 
 The separate 300 CPU local code/check allocation is already precharged and is not
