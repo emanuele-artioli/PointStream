@@ -3228,6 +3228,48 @@
       "cpu_seconds": 15,
       "gpu_seconds": 0,
       "basis": "Prospective second-stage local readiness3agents*5CPU: source-guided scorer metadata/assets, qualityaudit verifier/collector and exactpublication/materializer/wait scope. No remote/models/GPU. Included5300, scoreexecution not released."
+    },
+    {
+      "phase": "ball-resource-watch-a29-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 100,
+      "gpu_seconds": 0,
+      "basis": "ONE finite passivewatch300s/max9ticks/45min;80workload+20administrative; priorA28backend95590COMPLETE0verified; noauto-submit/renewal/LLMtimer"
+    },
+    {
+      "phase": "ball-primary-paired16-48-20261113-score-proofs-publication20",
+      "workstream": "ball",
+      "cpu_seconds": 20,
+      "gpu_seconds": 0,
+      "basis": "Inside second2650: metadata/localdesign15+normalizer30+publication20=65 versus originalmetadata50; failure107->92. Audit120 unchanged. No extra parentfunding."
+    },
+    {
+      "phase": "ball-primary-paired16-48-20261113-score-metadata30",
+      "workstream": "ball",
+      "cpu_seconds": 30,
+      "gpu_seconds": 0,
+      "basis": "ROOTreviewed sourceunchanged actualscoreconstructor+twoactualnormalizedRETURNs+11assetSHAs/4TARheaders21bytes/RAMSSD; noGPU. Includedsecond2650 metadata65 afterfailure107->92."
+    },
+    {
+      "phase": "ball-primary-paired16-48-20261113-score-remoteaudit-design5",
+      "workstream": "ball",
+      "cpu_seconds": 5,
+      "gpu_seconds": 0,
+      "basis": "Rootprospective5localdesign from secondfailure92->87; frozenverifierunchanged remoteRAMfit/readiness only, no runtime/GPU"
+    },
+    {
+      "phase": "ball-primary-paired16-48-20261113-score-global10",
+      "workstream": "ball",
+      "cpu_seconds": 10,
+      "gpu_seconds": 0,
+      "basis": "Inside second2650 operator102; ONE fresh canonicalglobalstate bounded120s metadata complete/scienceunreleased"
+    },
+    {
+      "phase": "ball-primary-paired16-48-20261113-score-checkpoint-checks4",
+      "workstream": "ball",
+      "cpu_seconds": 4,
+      "gpu_seconds": 0,
+      "basis": "Prospectivebounded meaningfulledgerbudgettests andsmallrootchecks fromsecondfailure87->83; noGPU"
     }
   ],
   "reservations": [
@@ -3974,7 +4016,7 @@
     {
       "phase": "ball-primary-paired16-48-20261113",
       "workstream": "ball",
-      "cpu_seconds": 2635,
+      "cpu_seconds": 2566,
       "gpu_seconds": 2000,
       "status": "ROOT reserved5300CPU/4000GPU within unchanged programme/Ball;15CPU local readiness precharged; runtime blocked on concrete readiness/cost/normalizer/resource gates; no automatic retry.",
       "card": "docs/cards/k5d-primary-paired-quality-2026-11-13.md"
@@ -7248,7 +7290,7 @@
       "job_id": "20261113T210157Z-41ee26e3",
       "workstream": "ball",
       "phase": "ball-primary-paired16-48-20261113-prepare",
-      "status": "canonicalRUNNING gpu6Ada0dbbb; scientificacceptancepending",
+      "status": "CLOSED_ROOTacceptedprepare16/48/currentcleanup/soleACK/immutablearchive5c1134a8; qualityEMPTY",
       "source_revision": "2c6d8581fbd64279dde554ca1402047d27ab7fa2",
       "source_sha256": "6f898f753a056981a107f5115a5a36f1310bc9d4a705a1805b75f758a0bc0117",
       "spec_sha256": "f3680af8ae17295e3e931fc5b4183101cfcfbe1c1bfebc2d428bb369e52cee5f",
@@ -7258,7 +7300,8 @@
       "CPU_inclusive_precharged": 2650,
       "GPU_inclusive_precharged": 2000,
       "publication_backend": 79873,
-      "runtime_case": "/private/tmp/pointstream-primary-paired-runtime-ROOT-e521bfeef2734b84b05ab5a6f14613e1"
+      "runtime_case": "/private/tmp/pointstream-primary-paired-runtime-ROOT-e521bfeef2734b84b05ab5a6f14613e1",
+      "durable_archive_sha256": "5c1134a8d6447ef754f805aaa840949fff4cfd3f6e4f94ec8c3efe040d683ac0"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -7491,7 +7534,7 @@
       "PID_absent_verified": true
     },
     "a28": {
-      "state": "ONEfinitewatchinflight/noautomaticrenewal",
+      "state": "COMPLETE0 ninefinite ticks; backend95590returnedexit0",
       "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a28",
       "CPU_precharged": 100,
       "GPU": 0,
@@ -7506,7 +7549,34 @@
       "receipt": "/private/tmp/pointstream-resource-watch-20261113-passive-a28/run/receipt.json",
       "pid": 5879,
       "started_utc": "2026-11-13T20:39:44.226787+00:00",
-      "deadline_utc": "2026-11-13T21:24:44.226677+00:00"
+      "deadline_utc": "2026-11-13T21:24:44.226677+00:00",
+      "finished": {
+        "controller_cpu_seconds_observed": 0.5192749999999999,
+        "finished_utc": "2026-11-13T21:20:03.882246+00:00",
+        "reason": "deadline",
+        "remote_worst_case_charge_seconds": 39.916328000000014,
+        "ssh_waited_children_cpu_seconds": 1.183795,
+        "ticks": 9
+      },
+      "backend_terminal_verified": true
+    },
+    "a29": {
+      "state": "ONEfinitewatchrunning/noautomaticrenewal",
+      "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a29",
+      "CPU_precharged": 100,
+      "GPU": 0,
+      "interval_seconds": 300,
+      "max_ticks": 9,
+      "duration_seconds": 2700,
+      "no_automatic_renewal": true,
+      "native_completion_resume_verified": false,
+      "spec_sha256": "2791d340c43888a92bee1ff6035fa77de159f61efed67a0046b57d30f1cfb4f2",
+      "backend": 34396,
+      "pid": 12699,
+      "started_utc": "2026-11-13T21:29:51.153081+00:00",
+      "deadline_utc": "2026-11-13T22:14:51.152981+00:00",
+      "receipt": "/private/tmp/pointstream-resource-watch-20261113-passive-a29/run/receipt.json",
+      "launch_handle": "/private/tmp/pointstream-resource-watch-20261113-passive-a29/launch.json"
     }
   },
   "approval_history": [
@@ -7677,7 +7747,7 @@
     "actual_identity": "/private/tmp/pointstream-primary-exclusive-Ada0-ROOT-5f64063ae30f453993d9c1259f7f3e8b/operator/actual-chain-output/sole-actual-job.json"
   },
   "primary_paired_quality_current": {
-    "state": "Actual41ee26e3 RUNNING on gpu6 Ada0dbbb; ONEwait71064 in flight",
+    "state": "CLOSEDactualROOTprepare16/48/currentcleanup/ACK/immutablearchive; scoreMETADATAaccepted conditionalcollectorfit; GPUunreleased",
     "case": "/private/tmp/pointstream-primary-paired-metadata30-affinity0-ROOT-e521bfeef2734b84b05ab5a6f14613e1",
     "contract_sha256": "d1ff73820c0dfc9cfd21fab24480bf6534e8b1cd9b9e57cbed72d9e098301ced",
     "release_sha256": "1836a4e7e9760550e7b0c70e4a8ce85bc3cdccc0714925dd10640f4cf64a0bd0",
@@ -7706,6 +7776,100 @@
     "wait_output": "/private/tmp/pointstream-primary-paired-wait330-FALSE-v2-20261113/actual-41ee26e3-ONEwait330",
     "wait_backend": 71064,
     "wait_max_seconds": 2400,
-    "wait_outer_seconds": 2480
+    "wait_outer_seconds": 2480,
+    "actual16_forecast": {
+      "wall_seconds": 218.79711413383484,
+      "cpu_seconds": 217.700211,
+      "full_estimate_seconds": 1034.5870136022568,
+      "remaining_seconds": 1566.557617282495,
+      "required_remaining_seconds": 1350,
+      "setup_seconds": 7.690628523007035
+    },
+    "checkpoint_PR": 408,
+    "score_audit_prospective_reallocation": {
+      "CPU": 120,
+      "prior_CPU": 90,
+      "source": "Second-stage failure137 ->107, unchanged2650second/5300pair; not additional funding",
+      "remote_collector_CPU": 60,
+      "execution": 104,
+      "terminal_status": 6,
+      "review": 5,
+      "audit_reserve": 5,
+      "fit": "Stillblockedpendingactualacceptedproducer/referencebyteforecast; noGPUrelease"
+    },
+    "wait_complete": true,
+    "terminal_event": "bf4e63348bc15414acf2314e3df63289",
+    "terminal_status_release_sha256": "0334a5543a8e56e31aac2ad66017a18f51787fbb780972dfcac02eff8af044b5",
+    "terminal_status_backend": 57790,
+    "audit_case": "/private/tmp/pointstream-primary-41ee26e3-actual-audit90-ROOT-20261113",
+    "audit_release_sha256": "d4d2609339d093572fc6c5436d83452d9d66d439e6be237b87d5814761a87d47",
+    "audit_backend": 64251,
+    "ROOT_producer_acceptance": "/private/tmp/pointstream-primary-41ee26e3-actual-audit90-ROOT-20261113/ROOT-accepted-paired16-48-preparation.json",
+    "ROOT_producer_acceptance_sha256": "2b4cf52e10c6c9ed3d727394f92e8d200bf5044f3c7cf1e0c59a09b2f98f9708",
+    "audit_complete": true,
+    "independent_review_sha256": "d85a740309aefe49cba926d67b11689020026890d5063f5b1f5decc00d2d2914",
+    "postcompact_status6": {
+      "case": "/private/tmp/pointstream-primary-41ee26e3-postcompact-status6-ROOT-20261113",
+      "CPU": 6,
+      "funding": "Inside already fully chargedfirst2650 lifecyclefailure/reserve; not another debit",
+      "state": "ROOTreleased ONEcanonicalstatus"
+    },
+    "terminal_ACK": {
+      "path": "/private/tmp/pointstream-primary-41ee26e3-ACK6-ROOT-20261113/actual-ack/stdout.json",
+      "event_id": "bf4e63348bc15414acf2314e3df63289",
+      "scope": "localonlyzeroSSH;0.089418selfCPUwithinprepaidACK6",
+      "state": "COMPLETE0"
+    },
+    "score_attestation_publication_prospective": {
+      "CPU": 20,
+      "split": "builder3/root+SSH+remote17",
+      "state": "COMPLETE0immutable3files0444/0555/readbackPASS",
+      "funding": "Inside second2650: metadata/localdesign15+normalizer30+publication20=65 versus originalmetadata50; failure107->92. Audit120 unchanged. No extra parentfunding.",
+      "release": "/private/tmp/pointstream-primary-41ee26e3-proof-publication20-FALSE-20261113/ROOT-release20.json",
+      "release_sha256": "11b000b65c7a77a7af7e14f770541cb94da8df2a441954003b89b96ada9545f1",
+      "backend": 96082,
+      "verified": "/private/tmp/pointstream-primary-41ee26e3-proof-publication20-FALSE-20261113/actual-publication/verified.json"
+    },
+    "producer_archive40": {
+      "case": "/private/tmp/pointstream-primary-41ee26e3-archive40-FALSE-v2-20261113",
+      "archive_sha256": "5c1134a8d6447ef754f805aaa840949fff4cfd3f6e4f94ec8c3efe040d683ac0",
+      "bytes": 15352961,
+      "state": "COMPLETE0immutable213members0444/0555/readbackPASS",
+      "funding": "Inside alreadyfullychargedfirst2650; builder3pack5verify5upload14ROOT3reserve10=40; no newcharge",
+      "backend": 81560
+    },
+    "score_metadata": {
+      "case": "/private/tmp/pointstream-primary-paired-score-metadata30-ROOT-d85b0d1da5894e2fa5d5edd960cdb132",
+      "deadline": "2026-11-13T22:18:18.927190+00:00",
+      "state": "Actualmetadataacceptedforconstructor/assets/headercostONLY; oldlaunchclockSTOP pendingRAMsafeauditcore; noGPU",
+      "contract": "/private/tmp/pointstream-primary-paired-score-metadata30-ROOT-d85b0d1da5894e2fa5d5edd960cdb132/contract.ROOT.json",
+      "contract_sha256": "ecee9e9b0dff1de5811b549adb3d4676b918942041bf6c2d526472d038b5833b",
+      "release": "/private/tmp/pointstream-primary-paired-score-metadata30-ROOT-d85b0d1da5894e2fa5d5edd960cdb132/root-release.ROOT.json",
+      "release_sha256": "d3842c128c237c3f897c382d136212deb84c0df6918ff0510d538c6c7b4c32e1",
+      "backend": 18390,
+      "metadata_stdout_sha256": "b6987e2b18dd3bbb3a8aa2c094409656d1ff670922f6afeeebaa8eaa009cabb4",
+      "spec_raw_sha256": "ba2e47adb224c7cae4ce1d42f842178c66cbe4937e767119cbd0fd2bfc37cab1",
+      "spec_canonical_sha256": "7162d0614e977db7a5f1d6e03cf92aa4346a8899f28efae133ee1baef737f7bd"
+    },
+    "score_remote_audit_design": {
+      "CPU": 5,
+      "funding": "From secondstagefailure92->87 inside2650; noextraoutercap",
+      "reason": "Mac16GB memorypressure versus rawforecast594940949+producer264371357 and parsedcopies; serverMemAvailable511GBSSD1.57TB",
+      "state": "FALSElocaldesignonly; no network/GPU",
+      "collector_forecast": "7558a316265f9e45b084216b707d9474be84bd9d86d43e788bdb0d0ff5b22252",
+      "collector_CPU_proxy": 31.024575397364348
+    },
+    "score_runtime": {
+      "case": "/private/tmp/pointstream-primary-paired-score-runtime-ROOT-d85b0d1da5894e2fa5d5edd960cdb132",
+      "state": "AllGPUreleasesFALSE; oldplanningclockSTOP awaiting serverauditcore. Must rerunrealmetadatawithfutureclock afterreadiness, notmutatenormalizedspec.",
+      "deadline": "2026-11-13T22:18:18.927190+00:00",
+      "minimum_publication_headroom_seconds": 2180,
+      "global_status": {
+        "backend": 1887,
+        "state": "COMPLETE0/1719jobs/noactive/newunknown; oldunrelatedattention3cb3preserved",
+        "wall_seconds": 19.342115292005474
+      }
+    },
+    "postprepare_checkpoint_checks_CPU": 4
   }
 }

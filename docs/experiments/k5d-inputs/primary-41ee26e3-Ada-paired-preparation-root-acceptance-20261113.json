@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "job_id": "20261113T210157Z-41ee26e3",
+  "ROOT_accepted": true,
+  "scope": "Six-point paired16/48 PREPARATION correctness/currentcleanup only. Encodedquality/independentNFScoherence/span/speed/fullCPUaccounting/absence/population not qualified.",
+  "source_revision": "2c6d8581fbd64279dde554ca1402047d27ab7fa2",
+  "execution_identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "5ca2d194b7e1a6032faf7ef60fe44924649e0a57471c12cda6264f9586260219",
+    "source_sha256": "6f898f753a056981a107f5115a5a36f1310bc9d4a705a1805b75f758a0bc0117"
+  },
+  "receiver_config_sha256": "e478cbf16830b7788f835dc888b87ee119505f767a0ac535fb902f76690505ed",
+  "GPU_denial_sha256": "a6b75f7b74c0d9a37bb7645d417c3b6808ad711ce55052f720864476463670ee",
+  "native_CPU_proof_sha256": "909558234ceca59ff944f29be8a7a1df7313309fa10e281464bb16adf29aab36",
+  "bridge_sha256": "8f4ba5f4fdd93f60b2cc6802829c64c34aca660d0ab9c944101de075f316e5d0",
+  "spec_sha256": "f3680af8ae17295e3e931fc5b4183101cfcfbe1c1bfebc2d428bb369e52cee5f",
+  "spec_raw_sha256": "6584caa9f743a394cc550f253bf4c1bd01f57040fddd24399b5f7ce5e5273634",
+  "GPU": {
+    "host": "gpu6",
+    "uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+    "class": "RTX6000Ada8.9",
+    "sharing": "exclusive"
+  },
+  "ROOT_proof": {
+    "local": "/private/tmp/pointstream-primary-41ee26e3-actual-audit90-ROOT-20261113/ROOT-accepted-paired16-48-preparation.json",
+    "sha256": "2b4cf52e10c6c9ed3d727394f92e8d200bf5044f3c7cf1e0c59a09b2f98f9708"
+  },
+  "independent_review_sha256": "d85a740309aefe49cba926d67b11689020026890d5063f5b1f5decc00d2d2914",
+  "physical_scope": {
+    "stages": {
+      "smoke": 16,
+      "full": 48
+    },
+    "regular_members_per_stage": 67,
+    "checkpoint_payloads_per_stage": 66,
+    "binary_members_per_stage": 30,
+    "actual_original_receiver_receipts": 12,
+    "current_host_identities_absent": 40,
+    "current_groups_empty": 1,
+    "strict_own_Ada16_gold": true,
+    "full48_archived_gold": false,
+    "encoded_metrics": "EMPTY",
+    "encoded_judges": "EMPTY",
+    "full_metrics": false
+  },
+  "scientific_command_wall_seconds": {
+    "smoke": 218.79711413383484,
+    "full": 251.44940614700317
+  },
+  "cost_scope": "Commandwall only. FullCPU/independentNFScoherence/claimspan unestablished; cumulativechildCPU not summed/subtracted. Auditreported7.610957 excludesremoteJSONgziptail; full90CPU retained.",
+  "conservative_charge": {
+    "CPU_seconds": 2650,
+    "GPU_seconds": 2000,
+    "refunds": false
+  },
+  "raw_evidence": {
+    "raw_local": "/private/tmp/pointstream-primary-41ee26e3-actual-audit90-ROOT-20261113/raw-audit.json",
+    "raw_sha256": "3fbe5502ce9690b39d89e28b68fe01fb65ca68e9159dccff0166d55466f7deb0",
+    "raw_bytes": 264371357,
+    "gzip_local": "/private/tmp/pointstream-primary-41ee26e3-actual-audit90-ROOT-20261113/raw-audit.json.gz",
+    "gzip_sha256": "6cc96f04341e90dd0d1e205602840368489582080677bd447bb39ee71486965a",
+    "gzip_bytes": 14424747,
+    "duplicate_raw_JSON_not_archived": true
+  },
+  "terminal_ACK": {
+    "kind": "terminal:complete",
+    "event_ids": [
+      "bf4e63348bc15414acf2314e3df63289"
+    ],
+    "receipt_local": "/private/tmp/pointstream-primary-41ee26e3-ACK6-ROOT-20261113/actual-ack/stdout.json",
+    "receipt_sha256": "8979db540681ce93634e523625ddd337c0831aa90c62050bbff02bbd47212316",
+    "closed": true
+  },
+  "immutable_archive": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-primary-paired-41ee26e3-5c1134a8d6447ef754f805aa/preparation.tar.gz",
+    "sha256": "5c1134a8d6447ef754f805aaa840949fff4cfd3f6e4f94ec8c3efe040d683ac0",
+    "bytes": 15352961,
+    "members": 213,
+    "file_mode": "0444",
+    "directory_mode": "0555",
+    "publication_backend": 81560,
+    "receipt_local": "/private/tmp/pointstream-primary-41ee26e3-archive40-FALSE-v2-20261113/actual-publication/verified.json",
+    "receipt_sha256": "dd8aa8d2b10fa988ce97d6addaa2767d6d883b2e68fd47efa4f66cbaa381293b"
+  },
+  "producer_proof_publication": {
+    "backend": 96082,
+    "directory": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-primary2c6d-producer41ee26e3-986ce55f1acaa403d92bce4d",
+    "ROOT_proof_local": "/private/tmp/pointstream-primary-41ee26e3-actual-audit90-ROOT-20261113/ROOT-accepted-paired16-48-preparation.json",
+    "attestations": [
+      {
+        "local": "/private/tmp/pointstream-primary-41ee26e3-actual-audit90-ROOT-20261113/producer16-attestation.ROOT.json",
+        "sha256": "10ace37eb387df6a148b434807f3318c0f3233a2ba5cf873384af5958ce16756"
+      },
+      {
+        "local": "/private/tmp/pointstream-primary-41ee26e3-actual-audit90-ROOT-20261113/producer48-attestation.ROOT.json",
+        "sha256": "84d518a6b6fd17f1ba5718d816f7552ee19ce452604d640d0a756ef9d9a04974"
+      }
+    ]
+  },
+  "preserved_failures": [
+    "Originalmetadata61724 omittedCPUaffinity0; binder stoppedbeforejob; replacement85328 actualconstructor fixesbasecpu_affinity_index0. Both30CPU retained.",
+    "Independentreview initialschemafailure and correctedreview retained.",
+    "Initialarchive inventory2MiBguard rejected5.3MB globalstatus; correctedinventory preserved; no archive/runtime replay."
+  ],
+  "future": "Separate genuine sealed score16/48 requires actualarchive/ROOTattestation inputs and fresh complete admission. No GPUrelease fromthisindex."
+}
