@@ -320,7 +320,7 @@ def _denials(evidence: dict[str, list[dict[str, Any]]]) -> None:
                 raise RuntimeError('protected file remains readable')
 
 
-def verify_receipt(receipt: dict[str, Any], *, expected_context: dict[str, Any], expected_config_sha256: str) -> dict[str, Any]:
+def verify_receipt(receipt: dict[str, Any], *, expected_context: dict[str, Any], expected_config_sha256: str, require_cpu_only: bool = False) -> dict[str, Any]:
     proof = receipt.get('isolation')
     if (receipt.get('scope') != SCOPE or not isinstance(proof, dict)
             or proof.get('context') != expected_context or proof.get('config_sha256') != expected_config_sha256
@@ -330,6 +330,11 @@ def verify_receipt(receipt: dict[str, Any], *, expected_context: dict[str, Any],
             or not isinstance(proof.get('decoder'), dict) or not proof['decoder'].get('pid')
             or proof['decoder'].get('returncode') != 0):
         raise ValueError('isolated receiver evidence missing or inconsistent')
+    if require_cpu_only and (receipt.get('codec') != 'svt-av1-ivf' or proof.get('cpu_only') is not True
+            or proof.get('actual_policy', {}).get('cpu_only') is not True
+            or proof.get('cuda_visible_devices') != ''
+            or proof.get('decoder', {}).get('preexec', {}).get('cuda_visible_devices') != ''):
+        raise ValueError('actual restricted CPU-only decoder policy required')
     namespace = proof.get('namespaces')
     observer = proof.get('worker_observer')
     campaign = proof.get('campaign_host')
@@ -429,7 +434,8 @@ def _stop_launcher(process: subprocess.Popen[Any]) -> None:
 
 
 def replay(wire_path: Path, map_path: Path, work: Path, *, config_path: Path, config_sha256: str,
-           protected_paths: dict[str, list[Path]], producer_context: dict[str, Any]) -> dict[str, Any]:
+           protected_paths: dict[str, list[Path]], producer_context: dict[str, Any],
+           cpu_only: bool = False) -> dict[str, Any]:
     if sys.platform != 'linux' or len(os.sched_getaffinity(0)) != 1:
         raise RuntimeError('Linux and one CPU required')
     _context(producer_context)
@@ -445,6 +451,8 @@ def replay(wire_path: Path, map_path: Path, work: Path, *, config_path: Path, co
     from experiments.tennis.k5d_worker import resource
     from src.pointstream import ball_stream
     stream = ball_stream.unpack(wire_path.read_bytes())
+    if cpu_only and stream.codec != 'svt-av1-ivf':
+        raise ValueError('CPU-only receiver admits only conventional SVT packets')
     installed = resource(stream, json.loads(map_path.read_text()))
     for key in (('decoder',) if stream.codec == 'svt-av1-ivf' else ('image_ckpt', 'video_ckpt')):
         target = _canonical(Path(installed[key]))
@@ -466,6 +474,8 @@ def replay(wire_path: Path, map_path: Path, work: Path, *, config_path: Path, co
               'wire_sha256': sha(wire_path), 'map_sha256': sha(map_path),
               'parent_namespaces': _namespaces('self'), 'outer_pid': int(os.readlink('/proc/self')),
               'nonce': secrets.token_hex(16)}
+    if cpu_only:
+        launch['cpu_only'] = True
     (work / 'launch.json').write_text(json.dumps(launch, sort_keys=True))
     profile = config['profiles'][os.uname().nodename.split('.')[0]]
     python = _canonical(Path(profile['python']))
@@ -476,7 +486,9 @@ def replay(wire_path: Path, map_path: Path, work: Path, *, config_path: Path, co
            'PYTHONDONTWRITEBYTECODE': '1', 'OMP_NUM_THREADS': '1', 'OPENBLAS_NUM_THREADS': '1',
            'MKL_NUM_THREADS': '1', 'NUMEXPR_NUM_THREADS': '1', 'PS_SCRATCH_DIR': str(work),
            'TMPDIR': str(work), 'TMP': str(work), 'TEMP': str(work), 'XDG_CACHE_HOME': str(work)}
-    if 'CUDA_VISIBLE_DEVICES' in os.environ:
+    if cpu_only:
+        env['CUDA_VISIBLE_DEVICES'] = ''
+    elif 'CUDA_VISIBLE_DEVICES' in os.environ:
         env['CUDA_VISIBLE_DEVICES'] = os.environ['CUDA_VISIBLE_DEVICES']
     unshare_row = profile['unshare']
     unshare = _file(Path(unshare_row['path']), unshare_row['sha256'], unshare_row['size'])
@@ -519,7 +531,7 @@ def replay(wire_path: Path, map_path: Path, work: Path, *, config_path: Path, co
         if process.returncode:
             raise RuntimeError(f'isolated receiver failed: {process.returncode}: {stderr[-2000:]!r}')
     receipt = json.loads((work / 'result' / 'receiver.json').read_text())
-    proof = verify_receipt(receipt, expected_context=producer_context, expected_config_sha256=config_sha256)
+    proof = verify_receipt(receipt, expected_context=producer_context, expected_config_sha256=config_sha256, require_cpu_only=cpu_only)
     if (proof['profile_sha256'] != _object_sha(profile)
             or proof['runtime_inventory_sha256'] != _object_sha(profile['runtime_files'])):
         raise ValueError('policy inventory identity differs')
@@ -543,6 +555,8 @@ def _worker(work: Path) -> None:
     if len(os.listdir('/proc/self/task')) != 1 or any(int(fd) > 2 and Path('/proc/self/fd', fd).exists() for fd in os.listdir('/proc/self/fd')):
         raise RuntimeError('worker is not single-threaded or inherited descriptors')
     launch = json.loads((work / 'launch.json').read_text())
+    if launch.get('cpu_only') and os.environ.get('CUDA_VISIBLE_DEVICES') != '':
+        raise ValueError('CPU-only isolated worker has visible CUDA')
     namespace_proof = _private_proc(launch['parent_namespaces'], launch['outer_pid'])
     print('READY', flush=True)
     observer_path = work / 'worker-observer.json'
@@ -570,6 +584,8 @@ def _worker(work: Path) -> None:
                      'private_proc_read_only': True, 'namespaces': namespace_proof,
                      'campaign_host': launch['campaign_host'], 'launcher_observer': observer['launcher_observer'],
                      'denials': launch['denials'], 'context': launch['context'], 'pid': pid, 'birth': birth}
+    if launch.get('cpu_only'):
+        actual_policy['cpu_only'] = True
     # The denial records are later augmented in place, so retain the pre-restriction inventory separately.
     actual_policy = json.loads(json.dumps(actual_policy))
     if len(os.listdir('/proc/self/task')) != 1 or any(int(fd) > 2 and Path('/proc/self/fd', fd).exists()
@@ -591,12 +607,17 @@ def _worker(work: Path) -> None:
              'actual_policy': actual_policy, 'actual_policy_sha256': _object_sha(actual_policy),
              'profile_sha256': _object_sha(launch['config']['profiles'][os.uname().nodename.split('.')[0]]),
              'runtime_inventory_sha256': _object_sha(launch['config']['profiles'][os.uname().nodename.split('.')[0]]['runtime_files'])}
+    if launch.get('cpu_only'):
+        proof.update(cpu_only=True, cuda_visible_devices=os.environ['CUDA_VISIBLE_DEVICES'])
     k5d_worker.decode(work / 'packet.psbl', work / 'resources.json', work / 'result', isolation=proof)
 
 
 def _native_wrapper(payload_path: Path) -> None:
     """Wait for an outer birth observation before replacing this process with the codec."""
     payload = json.loads(payload_path.read_text())
+    if payload.get('cpu_only') and (os.environ.get('CUDA_VISIBLE_DEVICES') != ''
+                                   or payload['env'].get('CUDA_VISIBLE_DEVICES') != ''):
+        raise ValueError('CPU-only native exec has visible CUDA')
     observer_path = payload_path.parent / 'native-observer.json'
     deadline = time.monotonic() + 30
     while not observer_path.is_file():
@@ -616,6 +637,8 @@ def _native_wrapper(payload_path: Path) -> None:
         raise ValueError('native argv malformed')
     preexec = {'pid': os.getpid(), 'birth': birth, 'argv_sha256': _object_sha(command),
                'observer': observer, 'closed_extra_fds': True}
+    if payload.get('cpu_only'):
+        preexec['cuda_visible_devices'] = os.environ['CUDA_VISIBLE_DEVICES']
     for fd in os.listdir('/proc/self/fd'):
         if int(fd) > 2:
             try:
@@ -630,7 +653,7 @@ def _native_wrapper(payload_path: Path) -> None:
 def cpu_oracle(wire_path: Path, map_path: Path, work: Path, *, wire_sha256: str, map_sha256: str,
                expected_yuv_sha256: str, expected_rgb_sha256: str, config_path: Path,
                config_sha256: str, protected_paths: dict[str, list[Path]],
-               producer_context: dict[str, Any]) -> dict[str, Any]:
+               producer_context: dict[str, Any], cpu_only: bool = False) -> dict[str, Any]:
     """Replay an authenticated stored conventional packet, checking both pixel hashes."""
     from src.pointstream import ball_stream
     if producer_context.get('gpu') != {'kind': 'cpu'}:
@@ -640,7 +663,7 @@ def cpu_oracle(wire_path: Path, map_path: Path, work: Path, *, wire_sha256: str,
     if ball_stream.unpack(wire_path.read_bytes()).codec != 'svt-av1-ivf':
         raise ValueError('CPU oracle admits only stored conventional SVT packets')
     receipt = replay(wire_path, map_path, work, config_path=config_path, config_sha256=config_sha256,
-                     protected_paths=protected_paths, producer_context=producer_context)
+                     protected_paths=protected_paths, producer_context=producer_context, **({"cpu_only": True} if cpu_only else {}))
     if (receipt['decoded_yuv_sha256'] != expected_yuv_sha256
             or receipt['rendered_rgb_sha256'] != expected_rgb_sha256):
         raise ValueError('isolated CPU oracle pixels differ from authenticated replay')

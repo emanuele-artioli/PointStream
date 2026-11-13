@@ -28,13 +28,14 @@ CASES = ('normal', 'launcher_kill')
 
 def spec(base: dict[str, Any], *, assets: dict[str, dict[str, str]], deadline: str,
          unshare_sha256: str, identity: dict[str, str], expected_yuv_sha256: str,
-         expected_rgb_sha256: str) -> dict[str, Any]:
+         expected_rgb_sha256: str, cpu_only_receiver: bool = False) -> dict[str, Any]:
     """Prepare a candidate only; approval and a fresh source CPU proof are external."""
     from experiments.jobs.inbox import validate_spec
 
     result = witness.spec(base, action='cpu', assets=assets, deadline=deadline,
                           unshare_sha256=unshare_sha256, identity=identity,
-                          expected_yuv_sha256=expected_yuv_sha256, expected_rgb_sha256=expected_rgb_sha256)
+                          expected_yuv_sha256=expected_yuv_sha256, expected_rgb_sha256=expected_rgb_sha256,
+                          cpu_only_receiver=cpu_only_receiver)
     result['scale']['proof_mode'] = {'smoke': 'ada-pgid-cpu', 'full': 'ada-pgid-cpu-noop'}
     result['scale']['namespace_timeout'] = {'smoke': 220, 'full': 4}
     result['smoke'] = {'seconds': 230, 'representative_basis':
@@ -293,7 +294,8 @@ def run(args: list[str]) -> None:
                 receipt_path = case_scratch / 'publish' / 'receiver.json'
                 receipt = json.loads(receipt_path.read_text())
                 proof = isolated.verify_receipt(receipt, expected_context=witness.context(stage, identity, {'kind': 'cpu'}),
-                                                expected_config_sha256=parsed.receiver_isolation_config_sha256)
+                                                expected_config_sha256=parsed.receiver_isolation_config_sha256,
+                                                **({'require_cpu_only': True} if parsed.cpu_only_receiver else {}))
                 if (proof['campaign_host']['campaign_pgid'] != group
                         or proof['decoder']['outer_observation']['host_pgid'] != group
                         or receipt['decoded_yuv_sha256'] != parsed.expected_yuv_sha256
@@ -398,7 +400,8 @@ def validate() -> None:
             stream = ball_stream.unpack(wire)
             native_bytes = (output / 'native.ivf').read_bytes()
             proof = isolated.verify_receipt(receipt, expected_context=witness.context(stage, identity, {'kind': 'cpu'}),
-                                            expected_config_sha256=args.receiver_isolation_config_sha256)
+                                            expected_config_sha256=args.receiver_isolation_config_sha256,
+                                            **({'require_cpu_only': True} if args.cpu_only_receiver else {}))
             if (oracle.sha(receipt_path) != cases[0]['normal']['receipt_sha256']
                     or proof['campaign_host']['campaign_pgid'] != cases[0]['group']
                     or proof['worker_observer'] != cases[0]['worker']

@@ -80,15 +80,18 @@ def decode_command(decoder: str, stream: Path, output: Path, *, threads: int) ->
     return [decoder, "-i", str(stream), "-o", str(output), "--threads", str(threads), "--quiet"]
 
 
-def run(command: list[str], timeout: float, cpus: list[int] | None = None) -> dict[str, float]:
+def run(command: list[str], timeout: float, cpus: list[int] | None = None, *, env: dict[str, str] | None = None) -> dict[str, float]:
     """Run a tool, optionally confined to ``cpus``; wall seconds and the CPU seconds it used."""
     def confine() -> None:
         if cpus:
             os.sched_setaffinity(0, cpus)  # type: ignore[attr-defined,unused-ignore]
 
+    options: dict[str, Any] = {}
+    if env is not None:
+        options["env"] = env
     before = resource.getrusage(resource.RUSAGE_CHILDREN)
     started = time.perf_counter()
-    done = subprocess.run(command, capture_output=True, text=True, timeout=timeout, preexec_fn=confine if cpus else None)
+    done = subprocess.run(command, capture_output=True, text=True, timeout=timeout, preexec_fn=confine if cpus else None, **options)
     wall = time.perf_counter() - started
     after = resource.getrusage(resource.RUSAGE_CHILDREN)
     if done.returncode:
@@ -100,16 +103,19 @@ def run(command: list[str], timeout: float, cpus: list[int] | None = None) -> di
 def code(
     source: Path, work: Path, *, width: int, height: int, fps: Fraction, frames: int, crf: float,
     preset: int, threads: int, full_range: bool, encoder: str, decoder: str, timeout: float = 7200,
-    cpus: list[int] | None = None, extra: list[str] | None = None,
+    cpus: list[int] | None = None, extra: list[str] | None = None, env: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     """Encode ``source`` and decode it again; returns the stream record and the decoded file."""
     stream, decoded = work / "stream.ivf", work / "decoded.yuv"
     encode = encode_command(encoder, source, stream, width=width, height=height, fps=fps, frames=frames,
                             crf=crf, preset=preset, full_range=full_range, extra=extra)
+    options: dict[str, Any] = {}
+    if env is not None:
+        options["env"] = env
     load = os.getloadavg()
-    encoded = run(encode, timeout, cpus)
+    encoded = run(encode, timeout, cpus, **options)
     decode = decode_command(decoder, stream, decoded, threads=threads)
-    decoded_time = run(decode, timeout, cpus)
+    decoded_time = run(decode, timeout, cpus, **options)
     data = stream.read_bytes()
     sizes = ivf_frames(data)
     frame_bytes = width * height * 3 // 2
