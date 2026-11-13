@@ -7,7 +7,7 @@ chronology and raw-result references. Times below are UTC.
 
 ## Current scheduling decision — native accepted; receiver qualification next
 
-Live update: actual study4282 native CPU job `20261113T142805Z-d1090553` is independently accepted, physically published and terminal-ACK closed (proofb79,receipt918,event220b51c0). Actual receiver585 LOCAL constructor and both normalized returns passed; a copied false acceptance flag is being corrected in a new metadata-only package before root release. Its fixed deadline is15:17:07.502633UTC; complete865s forecast must still fit. Qualification reserve38CPU; no GPU stage release. Passive watcher a20 ended after nine checks/noidle/PIDabsence; replacement a21 checks every300s until15:30:19.643754UTC at latest, backend15608/PID61857. Shared Ada is already qualified for the prior sixteen-frame conventional study; exact new-source qualification16/cost48 preparation is separately precharged50CPU/GPU0 only. Paper and PRESLEY remain paused.
+Live update: study4282 source/cache, native d109 and actual CPUreceiver8718 are accepted, physically published and terminal-ACK closed. Sourcequalification CLOSED1062CPU/GPU0; unused38CPU reserve returned without prior refund. Qualification16 now has a [prospective card](cards/k5d-study4282-qualification16-2026-11-13.md):848CPU/600GPU, prep10 charged and remaining838CPU/600GPU held; no GPU job release. ROOT scope gateaa208f42 approves16/Clip3/qualification only, outerexecution remains locked. Original gold-copy13808 failed after219217920/400291840B at the hotel connection's throughput; target absent, partial0444/SHA17fae995 preserved, SSH64699absent. Originalprep50 stayscharged. Root chose a separately precharged20CPU remote METADATA constructor using the existing full archive on gpu6 instead of another transfer; helper/review pending, no SSH/constructor yet. Source, models and scientific input bytes stay unchanged. Passivea21 backend15608/PID61857 runs every300s to15:30:19UTC at latest; transientgpu5idle at15:00:39 was gone by15:15:43. LOCAL10CPU audit found current bundles hostgpu6-bound; no unqualifiedretarget. Qualifiedgpu6sharedSVT route remains preferred. Paper/PRESLEY paused.
 
 Actual job `20261113T130719Z-9f94f30c` is canonical COMPLETE/gatePASS/exit0
 on gpu6 Ada1 UUID `GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553`, independently
@@ -96,8 +96,7 @@ GPU/general/kernel readiness, quality or scale credit follows.
 
 The [1100CPU/GPU0 qualification envelope](cards/k5d-svt-study-source-qualification-2026-11-13.md)
 has1062CPU precharged: source100 +native327 +receiver585 +native local repair10
-+receiver local preparation10 +replacement native preflight30. Only38CPU reserve
-remains held; preserve original stale-pin preflight80721 and all caller failures.
++receiver local preparation10 +replacement native preflight30. The phase is CLOSED; unused38CPU reserve is returned, with no prior charge refunded; preserve original stale-pin preflight80721 and all caller failures.
 Receiver585 remains OFFLINE local UNRUN package preparation only; no actual
 receiver job or runtime preflight/publication release. Fresh actual CPU receiving
 still precedes separately admitted16/48 controls, fixed292/586 confirmations

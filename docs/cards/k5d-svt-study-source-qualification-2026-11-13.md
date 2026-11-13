@@ -1,27 +1,32 @@
 # K5d: qualify the frozen opt-in SVT study source
 
-Status: sourceprep100CPU/GPU0 is accepted/CLOSED. Scientific4282/sourcee4d4/
-archivef813/config4fa/ROOTsourcebridge849/cache71ef has immutable physical
-readback; the [source index](../experiments/k5d-inputs/svt-study4282-source-cache-acceptance-20261113.json)
-retains exact receipts. PR398 passed CI/merged625647fa; documentation PR399/359824f8.
-Actual native job `20261113T142805Z-d1090553` is COMPLETE/gatePASS/exit0/GPU-null,
-independently root accepted for native CPU containment/accounting only. Four
-cases passed;21 host processes/19 births/four groups are cleared currently,
-and worker context matches except CPU6.67→6.97. Normal CPU1.350349 inner/
-1.446699 outer. Proofb79de312 is physically published via71472,7907B/0444/0555;
-[the native index](../experiments/k5d-inputs/svt-study4282-d109-native-CPU-acceptance-20261113.json)
-retains recoverable proof/receipt/status/events/ACK bytes and provenance. Sole
-terminal event220b51c0f4ad5b2289913d73103fb738 is ACK-closed after fresh canonical
-PASS; the first local release-hash guard rejection is preserved within ACK15.
-No restricted-receiver/GPU/general/kernel/quality
-or scale credit follows.
+Status: CLOSED; exact-source scientific4282/sourcee4d4/archivef813/config4fa is
+qualified for the scoped native and CPU receiver checks below. Sourceprep100
+and immutable cache71ef/ROOTsourcebridge849 are accepted; see the
+[source index](../experiments/k5d-inputs/svt-study4282-source-cache-acceptance-20261113.json).
+Native job `20261113T142805Z-d1090553` is independently accepted, physically
+published and terminal-ACKed under proofb79; the
+[native index](../experiments/k5d-inputs/svt-study4282-d109-native-CPU-acceptance-20261113.json)
+preserves its four-case CPU containment/accounting evidence.
+
+Fresh receiver job `20261113T144952Z-8718fbe1` is COMPLETE/gatePASS/exit0,
+independently ROOT accepted and physically published under proofa636600b
+(7,312,987B,0444/0555/readback). Sole event33a90d32b71f57d9a4e164d31a5488da
+is ACK-closed via79222. The
+[thin receiver index](../experiments/k5d-inputs/svt-study4282-8718-CPU-denial-acceptance-20261113.json)
+pins source/config/spec/native proof, actual packet/native/YUV/RGB, five real
+errno13 denials, initial-launcher SIGKILL,18 absent host births/four empty groups
+and current FQDN CPU-token cleanup. Worker1470412/birth562919381 and control56c
+context match except CPU accounting. No GPU/kernel/general-readiness, quality,
+new-clip or scale credit follows; GPU16/48/292/586/full30 remain unreleased.
+
 The1100CPU/GPU0 envelope retains1062CPU precharged: source100 +native327
 +receiver585 +native local repair10 +receiver local preparation10 +replacement
-native preflight30; only38CPU reserve remains held. Original preflight80721
-stale-pin failure and all caller failures/charges remain preserved. Receiver585
-is still local UNRUN package preparation only; no actual receiver job or runtime
-release, and no GPU16/48/292/586/full30 authority. The protocol below retains the
-prospective requirements; source/native acceptance does not replace CPU receiving.
+native preflight30. Unused38CPU reserve is returned; no prior charge is
+refunded. Preserve preflight80721 stale-pin
+failure and all local metadata failures/charges. PR398/625647fa passed CI and
+merged. The prospective protocol below retains the original requirements;
+accepted old a71 source/proofs/results remain immutable and are not relabelled.
 
 Goal: establish exact-source native and CPU receiver evidence for the complete
 study port, preserving the accepted a71 source/proofs/results read-only. The
