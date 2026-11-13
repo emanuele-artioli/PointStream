@@ -1,7 +1,9 @@
 # K5d: conventional-only confirmation feasibility
 
-Status: repaired candidate merged CI-green; source preparation100CPU released.
-Scientific native/denial/GPU compute remains UNRELEASED.
+Status: source7a9f/cache accepted; native CPU job20261113T102450Z-7a3274d8
+passed independent root audit. Immutable proof6bf5c1a5 is physically published.
+Prep100CPU/native288CPU charged; remaining1250CPU/600GPU held. Receiver-denial
+and GPU compute remain UNRELEASED; this native proof gives no GPU/quality credit.
 Root decision: the exclusive Ada queue `20261113T030323Z-af6c09da` expired
 without admission. Keep the registered dual-codec benchmark open. Test a
 separately named, narrower confirmation route against SVT-AV1 that can score
@@ -104,3 +106,14 @@ contains seven hash-verified0444files in0555directory. The
 records exact identity and physical evidence. Native250/CPU-onlydenial365/GPU
 remain held; UNRUNnative plan is in the preparation directory. Cached native
 spec deadline10:25:33UTC; never submit expired or silently mutate it.
+
+Root prospective CPU-only amendment: native ceiling250→288, adding38CPU from
+unallocated Ball/programme headroom under unchanged24/28 totals. GPU ceiling
+stays600. Canonical submission repeats full stock eligible-host doctor, making
+publication68CPU with the already Linux-qualified V4 shims (62individual caps
+plus6externalstartupreserve). Keep original shims and substantive checks; do
+not force new1CPU variants or squeeze later audit allowances. Complete288 is
+preflight30+native100+publication68+wait15+audit/proof60+failure15. Preflight30
+COMPLETE/PASS,1701records/noactiveunknown, gpu6doctor/headroom93 and physical
+source/control/cache PASS. Remaining258native is held until exact root launch
+review; old250plans stay historical. No native/GPU publication yet.

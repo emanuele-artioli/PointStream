@@ -2541,6 +2541,34 @@
       "gpu_seconds": 0,
       "cpu_seconds": 20,
       "basis": "Rootprospectiverelease20fromadminother32, notnewallocation: NEWexternalV5copy ofV4; bindexpectedGPUUUIDtoexacthashedspec/requestandrejectmismatchedclaimbeforeobserverassignment. Meaningfulpositive/negative tests, configuredclientpin forfutureUUIDcandidate; noSSH/job/observer/GPU/helperexecution. V4preserved. Futurechain148/other12, past140 totaladmin300 unchanged."
+    },
+    {
+      "phase": "ball-svt-native250-preflight30-old-control-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 30,
+      "gpu_seconds": 0,
+      "basis": "Rootreview exact6408helper/6956contract/e75cmetadata; ONEglobalcanonicalstatus120 +FULLstockdoctor SOLEeligiblehostgpu6 +actualold7control/cache7files/unshare/SSDmetadata andlocalsourcechecks. Originalnative250 partition30+220. Fulltree24CPUindividualcaps+6externalstartupreserve (notwholehostkernelcap); nojob/worker/model/GPU. No automaticretry."
+    },
+    {
+      "phase": "ball-svt-native288-remaining258-ONEpublication-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 258,
+      "gpu_seconds": 0,
+      "basis": "Rootreviews exact082cfhelper/0e023contract/raw899d/canonical3b777 NEWdeadline11:03:48UTC; oldc21 unsubmitted preserved. Originalfullstockdoctor+V4shims:100native+68publication+15wait+60audit/proof+15failure. Complete288inclprior30preflight; ONEpublication no automaticreplay; generatedID durablycaptured beforeprepare. NoGPU/model."
+    },
+    {
+      "phase": "ball-passive-resource-watch-a15-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 100,
+      "gpu_seconds": 0,
+      "basis": "Rootprospectiverelease: a14actualfinished10:17:32/ninechecks/noidle/PID18482absent. NEWa15 exacthelper/spec, changedlabelonly launch00bfac69; bounded2700wall/300s/nineticks/80countedCPU+20externaladministrativereserve. Noautosubmit/model/claim/cancel/LLMtimer. Nativecompletionwakeupunverified."
+    },
+    {
+      "phase": "ball-control-only-UUID-routing-activation60-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 60,
+      "gpu_seconds": 0,
+      "basis": "Rootreviews exacte6ddlocal/00aaremote/payload6024/contract8cd plusindependentreview; actualnative7a3274d8 cleanupaccepted. ONE fourphaseownedgpu6workeractivation/quiescence/firsttick+selectororacles. 42forecast+18contingency; startup4CPUobservational, unchangedworkerlimits. NoGPU/model/claim/publication orautomaticreplay."
     }
   ],
   "reservations": [
@@ -3160,8 +3188,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28-conventional-only-feasibility",
       "gpu_seconds": 600,
-      "cpu_seconds": 1500,
-      "status": "Remaining_unspent1500CPU/600GPU; localrepair200closedCI387PASS/merge7a9f; sourceprep100prospectivelycharged, exactfreeze/cachehelpersmustrootreviewbeforeexecution. Native250/CPUonlydenial365/meta50/admin200/reserve100/first16unproven535 remainheld; noGPUrelease",
+      "cpu_seconds": 1250,
+      "status": "Remaining_unspent1250CPU/600GPU; native288 fully charged inclpriorpreflight30/newremaining258; denial365/meta50/admin200/reserve100/first16unproven535. ONE native publication released, noGPUrelease",
       "card": "docs/cards/k5d-svt-only-confirmation-2026-11-13.md"
     },
     {
@@ -3211,9 +3239,9 @@
     {
       "phase": "ball-control-only-UUID-routing-activation-20261113",
       "workstream": "ball",
-      "cpu_seconds": 60,
+      "cpu_seconds": 0,
       "gpu_seconds": 0,
-      "status": "Remaining_unspent60CPU; realLinux control/API/sourceplane activation qualification only after exactcandidate review andquiescentownworkercheck; noGPU/model",
+      "status": "Closed fullycharged60CPU/0GPU; ONE reviewedreadygateactualactivation released; qualificationpending, no scientificGPUauthority",
       "card": "docs/cards/k5d-control-only-uuid-routing-2026-11-13.md"
     }
   ],
@@ -6001,6 +6029,24 @@
         "upload_backend": 35359,
         "CPU_scope": "within365externalaudit40, noextraallocation"
       }
+    },
+    {
+      "job_id": "20261113T102450Z-7a3274d8",
+      "workstream": "ball",
+      "status": "rootACCEPTED nativeCPU/currentcleanup; physicalproof6bf5published; terminalACKcomplete",
+      "phase": "SVT7a9f native CPU only",
+      "gpu_seconds": 0,
+      "CPU_precharged_total": 288,
+      "receipt": "/private/tmp/pointstream-SVT-source-qualification-plan-20261113/native250-UNRELEASED/publication68-deadline-v2-UNRELEASED/actual-ONEsubmit-freshnonce/actual-job-identity.json",
+      "source_sha256": "bbc63eda6d58b14c1fd9cb88bacac0e574c8ada2594cdae517073e1009cb5d15",
+      "spec_sha256": "3b7779ad9717673feb2d1de65523ca66e268ffb1b7722e0a8c647021b30c6376",
+      "deadline": "2026-11-13T11:03:48.403497UTC",
+      "no_replay": true,
+      "canonical_status_receipt": "/private/tmp/pointstream-SVT-source-qualification-plan-20261113/native250-UNRELEASED/postsubmit-UNRUN/canonical-status-once.stdout.json",
+      "audit_sha256": "98d18044bab4892158ef9e8d78a382a03fa65beb60bd3ccdd7ca93c708a41fa5",
+      "native_proof_sha256": "6bf5c1a51febb72ab501899f7553ebab957e9d36305765327ee1c2d10ed86d49",
+      "native_proof_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-SVT-native-CPU-d1cdb795391c277c1a3a81909895f642/native-CPU.json",
+      "terminal_event_ack": "712fa28181d65b7898b2b23e0566bf70"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -6025,29 +6071,31 @@
     "Root20261112prospectivelyallocates separate Ball1000GPU/1400CPU:200nativewatch+max1200oneA6000(or1150Ada) attempt. Prior461e closedexpired no scientificexecution. No transfer/outerceilingincrease, no newscience/numericthreshold/reference or automaticretry. UnspentBallworkstream covers newreservation; monitorSSHserver/login CPUunmetered, CLIadministrative costs in GPUexternal reserve.",
     "RootprospectivefreshAdaqualification1400GPU2100CPUinsideunchangedBall/programmeceilings, after37b3read-onlyauditlocalizedexactcrossclassdifferences. Existingaccepted16/referencevalidatorunchanged; sourceprep/nativeCPUproof,rootreviewandcompleteforecastrequired beforefreshsixpoint16repeat/scoring. Noscale/papermanuscript/training/newproviderrelease. Carddocs/cards/k5d-ada-fresh-reference-2026-11-12.md.",
     "Rootsource-hiddenclaimcorrection20261112:actualk5d_worker/receiver/enc.validateclearlystatefilesystemdenialNOTestablished.2c8bpositiveispacketAPIrepeat/costonly, notFSdenial. NewprospectiveBall6000GPU9000CPUphaseinsideexistingceilingscoverscodepreponlyandconditionaldenial/costscalegates. No retroactivegatepass/newtraining/W8transfer/benchmarkrelease.",
-    "Root20261113:13aba contended beforepoints/receivers;exactclaimreleaseunknown. Conservative1282GPU1632CPUdebit notmeasured use/perjoboverrun evidence; capcomplianceunverified. No newGPU untilPGID/sourcegates+durableindependentobserver. Outer/workstreamcapsunchanged."
+    "Root20261113:13aba contended beforepoints/receivers;exactclaimreleaseunknown. Conservative1282GPU1632CPUdebit notmeasured use/perjoboverrun evidence; capcomplianceunverified. No newGPU untilPGID/sourcegates+durableindependentobserver. Outer/workstreamcapsunchanged.",
+    "Root20261113 prospectivelyadds38CPU/GPU0 fromunallocatedBall/programme toSVTsourcequalification hold insideunchanged24GPUh/28CPUh/Ball72000CPUceilings. Nativecompleteceiling250\u2192288=30preflight+100campaign+68publication(fullstockdoctor+qualifiedV4shims)+15wait+60audit/proof+15reserve. No newshims/loosenedquality/native rule/GPU; chargeonlyafterexactrootlaunchreview. Prior250planretainedhistorical."
   ],
   "monitoring": {
-    "state": "running passive a14; no scientific job auto-submit",
+    "state": "running passive a15; no scientific auto-submit",
     "scope": "gpu2/gpu3 A6000 and gpu5/gpu6 Ada",
-    "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a14",
+    "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a15",
     "native_completion_wakeup_verified": false,
     "native_completion_resume_verified": false,
     "accounting_limits": "SSH server/login aggregate unmetered; inner80 countedCPU plus20 external reserve; full100CPU charge retained",
-    "scientific_jobs": "New2c6d nativeece387dc rootaccepted/ACKed/proof9095 physicallypublished; actualCPUdenialpreflight20 released only; oldae892/d1bb receiptpixelPASS/resourceobserverFAIL retained; noGPUrequest known",
+    "scientific_jobs": "SVT7a9f nativeCPU actual20261113T102450Z-7a3274d8 published, noGPU; allothernewGPUheld",
     "source_sha256": "2b931eb5a25f7a87cc3594103ee845ec2582cc017309b7d479a99f637f6ee10c",
     "mode": "bounded_passive_native_resource_checks",
-    "pid": 18482,
-    "backend": 38838,
-    "started_utc": "2026-11-13T09:37:12.403346+00:00",
-    "deadline_utc": "2026-11-13T10:22:12.403246+00:00",
+    "pid": 23932,
+    "backend": 41308,
+    "started_utc": "2026-11-13T10:25:21.191305+00:00",
+    "deadline_utc": "2026-11-13T11:10:21.338809+00:00",
     "interval_seconds": 300,
     "max_ticks": 9,
     "jobs": [],
     "batches": [
       "/Users/manu/.cache/pointstream-resource-watch-20261113-passive-a5",
       "/private/tmp/pointstream-resource-watch-20261113-passive-a12",
-      "/private/tmp/pointstream-resource-watch-20261113-passive-a13"
+      "/private/tmp/pointstream-resource-watch-20261113-passive-a13",
+      "/private/tmp/pointstream-resource-watch-20261113-passive-a14"
     ],
     "recurring_llm_polling": false,
     "completed": false,
@@ -6090,6 +6138,12 @@
       "eligible_idle": false,
       "PID13657_absent": true,
       "backend42714": "unknown to currenttool; terminalreceipt+PIDcheck retained"
+    },
+    "prior_a14_final": {
+      "finished_utc": "2026-11-13T10:17:32.699682+00:00",
+      "ticks": 9,
+      "eligible_idle": false,
+      "PID18482_absent": true
     }
   },
   "approval_history": [
@@ -6152,5 +6206,16 @@
       "stop": "Anyactualearlierexecution/unknownrequest/source/proof/ledger mismatch, insufficientremainingreservation, no currentCPUproof or scientificgatefailure. No automatic fullwitness/modelretry/newtraining.",
       "approval_sha256": "12ab3f2a9fe465845bac690a69672fe72a5f0d42a3e834a3679977a65193f8e4"
     }
-  ]
+  ],
+  "control_activation": {
+    "status": "newworkerstarted; firsttickreadinessandLinuxqualificationpending; no scientificrelease",
+    "backend": 46477,
+    "output": "/private/tmp/pointstream-uuid-control-activation-readygate-UNRUN-20261113/execution-uuid-control-56c5f2ec-20261113-a1279b5c8048",
+    "worker_pid": 1470412,
+    "worker_birth_ticks": 562919381,
+    "release": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/uuid-control-56c5f2ec-20261113-a1279b5c8048",
+    "CPU_precharged": 60,
+    "GPU": 0,
+    "no_replay": true
+  }
 }

@@ -31,15 +31,20 @@ validator and root evidence review; terminal acknowledgment is complete and proo
 passed its bounded Linux qualification; earlier failed attempts remain retained.
 No new-source GPU witness, paired calibration or full30 run is released.
 Physical-UUID routing PR389 merged CI-green at56c5f2ec; scoped gpu6 activation
-is still held. External V5 expected-selector guard passed60 local tests.
+has started on the owned gpu6 dispatcher; first-tick qualification remains
+pending with backend46477 and no GPU release. External V5 expected-selector guard passed60 local tests.
 Independent SVT-only PR387 merged CI-green at7a9f5b04; its new sourcebbc63eda,
 archive14dc232a, config56a88f5a and sealed source cache are accepted. Fresh
-native/CPU-only receiver proofs and measured16-frame fit remain required.
+CPU-only receiver proof and measured16-frame fit remain required. Native
+CPU containment/accounting proof6bf5c1a5 from7a3274d8 is root accepted and
+physically published; it gives no receiver-denial/GPU/quality/scale credit.
 
-Five-minute resource checks continue through10:22UTC(a14). Last inspected
-09:52:36 check found potentially idle gpu5/Ada1, qualification required. The
-current receiver/study guards explicitly bind gpu6; no host substitution or
-automatic submission follows. No verified model-completion callback.
+Five-minute resource checks continue through11:10:21UTC(a15); its10:25:44
+check found no idle eligible target. Prior a14 completed nine checks, with no
+idle target in its final check. The current receiver/study guards explicitly
+bind gpu6; no host substitution or automatic submission follows. No verified
+model-completion callback. SVT-only native CPU job20261113T102450Z-7a3274d8
+is root accepted after independent artifact/current-cleanup review. No new GPU workload has started.
 The [canonical continuation](docs/continuation-2026-11-13.md) owns live job IDs,
 proofs and handles; the [budget ledger](docs/experiments/submission-research-budget-20261104.json)
 owns charges and remaining holds. Preserve the immutable 2c6d scientific worktree.

@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "status": "rootaccepted; immutablephysicalproofpublished; terminalACKcomplete",
+  "job_id": "20261113T102450Z-7a3274d8",
+  "revision": "7a9f5b0424740b3055b0047dfd99c68bce22e489",
+  "scope": "native CPU PID containment and accounting",
+  "identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "14dc232a1fb20a7ec0284e1c42bdbb15524dc26d3ad7d9b6507995784ef75dc7",
+    "source_sha256": "bbc63eda6d58b14c1fd9cb88bacac0e574c8ada2594cdae517073e1009cb5d15"
+  },
+  "spec_sha256": "3b7779ad9717673feb2d1de65523ca66e268ffb1b7722e0a8c647021b30c6376",
+  "proof_sha256": "6bf5c1a51febb72ab501899f7553ebab957e9d36305765327ee1c2d10ed86d49",
+  "proof_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-SVT-native-CPU-d1cdb795391c277c1a3a81909895f642/native-CPU.json",
+  "proof_bytes": 2601,
+  "proof_mode": "0444",
+  "directory_mode": "0555",
+  "audit_sha256": "98d18044bab4892158ef9e8d78a382a03fa65beb60bd3ccdd7ca93c708a41fa5",
+  "current_cleanup_only": {
+    "allocations": {},
+    "births_absent": 19,
+    "correct_FQDN_claim_exists": true,
+    "empty_groups": {
+      "1426813": [],
+      "1428682": [],
+      "1429301": [],
+      "1429337": []
+    },
+    "host_processes_absent": 21
+  },
+  "production_validator": {
+    "checks": {
+      "four_exit_modes": true,
+      "native_and_namespace": true,
+      "normal_cpu_comparison": true,
+      "owned_pids_absent": true
+    },
+    "passed": true
+  },
+  "normal_CPU": {
+    "difference_CPU": 0.08885100000000024,
+    "inner_CPU": 1.2797649999999998,
+    "outer_CPU": 1.368616
+  },
+  "native_CPU_ceiling_retained": 288,
+  "GPU_seconds": 0,
+  "limitations": "NoGPU/receiverdenial/quality/scale/historicalintervalcredit; noold9095transfer.",
+  "audit_path": "/private/tmp/pointstream-SVT-source-qualification-plan-20261113/native250-UNRELEASED/postsubmit-UNRUN/audit-7a3274d8-replacement-ACTUAL",
+  "first_audit_failure": "SSHbanner timeout8/no rawreceipt; preserved; ONE explicit replacement PASS",
+  "audit_CPU_partition": "priorconservative15 +replacement15 +local15 +proof12=57 insidecharged60; no newallocation",
+  "upload_backend": 54749,
+  "control_provenance": "old20261105T031637Z-2503bb20; retained explicitly, not new56c runtime proof",
+  "terminal_event_ack": "712fa28181d65b7898b2b23e0566bf70"
+}
