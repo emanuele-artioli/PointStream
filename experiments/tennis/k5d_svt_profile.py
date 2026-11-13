@@ -48,6 +48,10 @@ def admit(spec: dict, dispatch: dict, env: Mapping[str, str], torch: Any) -> dic
     if total < CLAIM_MIB * 2**20:
         raise ValueError('GPU capacity below declared claim')
     torch.cuda.set_per_process_memory_fraction(ALLOCATOR_MIB * 2**20 / total, 0)
+    # Materialize the capped CUDA context before requiring its actual driver row.
+    probe = torch.empty(1, dtype=torch.uint8, device='cuda:0')
+    torch.cuda.synchronize(0)
+    del probe
     torch.cuda.reset_peak_memory_stats(0)
     from experiments.tennis.k5d_scoped_namespace import host_group_identity
     host = host_group_identity(Path(env['PS_STAGE_DIR']).parent/'run'/'status.json')
