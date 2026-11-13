@@ -62,8 +62,12 @@ def timestamp(value: str) -> datetime:
 
 
 def verify_completed(clip: str, phase: str, entry: dict[str, Any], frames: int,
-                     identity: dict[str, str], preparation: dict[str, Any] | None = None) -> dict[str, Any] | None:
+                     identity: dict[str, str], preparation: dict[str, Any] | None = None, *,
+                     gpu_profile: str = 'a6000') -> dict[str, Any] | None:
     """Verify fleet provenance and independently inspect the actual full artifact."""
+    from experiments.tennis import k5d_ada_study as ada
+    profile_record = {'registered_gpu_profile': gpu_profile}
+    model, _ = ada.hardware(profile_record)
     job = entry.get('job_id', '')
     if not re.fullmatch(r'\d{8}T\d{6}Z-[0-9a-f]{8}', job):
         raise ValueError('invalid completed job ID')
@@ -71,7 +75,7 @@ def verify_completed(clip: str, phase: str, entry: dict[str, Any], frames: int,
     if (receipt.get('job_id') != job or receipt.get('state') != 'succeeded'
             or receipt.get('clip') != clip or receipt.get('phase') != phase
             or receipt.get('frames') != frames or receipt.get('execution_identity') != identity
-            or receipt.get('gpu_model') != 'RTX A6000'):
+            or receipt.get('gpu_model') != model or ada.profile(receipt) != gpu_profile):
         raise ValueError('completed receipt provenance differs')
     names = ('smoke', 'full')
     publications = receipt.get('publications', {})
@@ -109,6 +113,10 @@ def verify_completed(clip: str, phase: str, entry: dict[str, Any], frames: int,
         expected_frames = frames if control or stage == 'full' else 16
         code = dispatch['code']
         gpu = dispatch['environment']['gpu']['name']
+        if gpu_profile == ada.ADA:
+            ada.device(spec, dispatch)
+            if cf.option(dispatch['command'], '--registered-gpu-profile') != ada.ADA:
+                raise ValueError('Ada completed command profile differs')
         if (execution.get('exit_code') != 0 or execution.get('timing_contaminated') is not False
                 or execution.get('contention') != [] or dispatch.get('gpu_sharing') != {'mode': 'exclusive'}
                 or code['spec_sha256'] != inbox.digest(spec)
@@ -119,8 +127,8 @@ def verify_completed(clip: str, phase: str, entry: dict[str, Any], frames: int,
                 or dispatch['input_identity'] != spec['inputs']
                 or staging['published']['sha256'] != artifact['sha256']
                 or Path(staging['published']['path']).parts[-3:] != (job, stage, 'published.tar')
-                or 'RTX A6000' not in gpu or 'Ada' in gpu
-                or spec['gpu_models'] != ['RTX A6000']
+                or (gpu_profile == ada.A6000 and ('RTX A6000' not in gpu or 'Ada' in gpu))
+                or spec['gpu_models'] != [model]
                 or cf.option(dispatch['command'], '--clip') != clip
                 or cf.option(dispatch['command'], '--frames') != str(expected_frames)
                 or spec['entrypoint'][1] not in dispatch['command']
@@ -152,16 +160,29 @@ def verify_completed(clip: str, phase: str, entry: dict[str, Any], frames: int,
                         or readiness['source'].get('labels') != frames
                         or readiness.get('scope') != 'CPU asset, source header and checkpoint readiness; no GPU scoring'):
                     raise ValueError('readiness artifact differs')
+    if gpu_profile == ada.ADA:
+        return validate_full(clip, phase, frames, identity, publications['full'], preparation, dispatch,
+                             gpu_profile=gpu_profile, producer_job=job if phase == 'prepare' else (preparation or {})['job_id'])
     return validate_full(clip, phase, frames, identity, publications['full'], preparation, dispatch)
 
 
 
 def validate_full(clip: str, phase: str, frames: int, identity: dict[str, str],
                   artifact: dict[str, Any], preparation: dict[str, Any] | None,
-                  dispatch: dict[str, Any]) -> dict[str, Any] | None:
+                  dispatch: dict[str, Any], *, gpu_profile: str = 'a6000',
+                  producer_job: str = '') -> dict[str, Any] | None:
     """Reconstruct score from the exact producer and validate native data and metrics."""
+    from experiments.tennis import k5d_ada_study as ada
+    ada.profile({'registered_gpu_profile': gpu_profile})
+    def verify_ada(root: Path) -> None:
+        config = Path(cf.option(dispatch['command'], '--receiver-isolation-config'))
+        config_sha = cf.option(dispatch['command'], '--receiver-isolation-config-sha256')
+        ada.registered_producer(root, identity, job=producer_job, clip=clip, frames=frames,
+                                config=config, config_sha=config_sha, dispatch_gpu=dispatch['environment']['gpu'])
     with unpack_publication(Path(artifact['local_path']), artifact['sha256']) as output:
         if phase == 'prepare':
+            if gpu_profile == ada.ADA:
+                verify_ada(output)
             record = cp.verify(output, artifact['checkpoint_sha256'], identity)
             enc.validate(output, prepared=True)
             if record['clip'] != clip or record['frames'] != frames:
@@ -178,7 +199,7 @@ def validate_full(clip: str, phase: str, frames: int, identity: dict[str, str],
                 or not any(x.get('sha256') == prepared['sha256'] for x in dispatch.get('staged_inputs', []))):
             raise ValueError('score dispatch is not bound to prepared publication')
         trusted = preparation.get('_prepared_evidence')
-        if trusted is not None:
+        if trusted is not None and gpu_profile == ada.A6000:
             assembled = output / 'assembled'
             actual_files = cp.manifest_files(assembled)
             expected_files = trusted['manifest_files']
@@ -211,6 +232,8 @@ def validate_full(clip: str, phase: str, frames: int, identity: dict[str, str],
             enc.validate(assembled)
             return None
         with unpack_publication(Path(prepared['local_path']), prepared['sha256']) as root:
+            if gpu_profile == ada.ADA:
+                verify_ada(root)
             record = cp.verify(root, checkpoint_sha, identity)
             if record['clip'] != clip or record['frames'] != frames:
                 raise ValueError('score producer timeline differs')
@@ -228,6 +251,8 @@ def validate_full(clip: str, phase: str, frames: int, identity: dict[str, str],
                 cp.assemble(root, checkpoint_sha, points, rebuilt, identity)
                 actual = output / 'assembled'
                 enc.validate(actual)
+                if gpu_profile == ada.ADA:
+                    ada.full_metrics(actual, frames)
                 if json.loads((rebuilt / 'pilot.json').read_text()) != json.loads((actual / 'pilot.json').read_text()):
                     raise ValueError('score assembly differs from exact producer and point receipts')
         return None
@@ -254,7 +279,8 @@ def verify_independent_confirmation(clip: str, phase: str, entry: dict[str, Any]
         raise ValueError('independent confirmation audit differs')
 
 def verified_cpu_calibration(samples: dict[str, Any], identity: dict[str, str],
-                             verified_inventory: dict[str, dict[str, Any]] | None = None) -> dict[str, dict[str, float]]:
+                             verified_inventory: dict[str, dict[str, Any]] | None = None, *,
+                             gpu_profile: str = 'a6000') -> dict[str, dict[str, float]]:
     """Fit CPU only from the two independently validated full confirmation jobs per phase."""
     if set(samples) != {'prepare', 'score'}:
         raise ValueError('both CPU calibration phases required')
@@ -280,11 +306,11 @@ def verified_cpu_calibration(samples: dict[str, Any], identity: dict[str, str],
                 if not sample.get('preparation'):
                     raise ValueError('score calibration needs its actual producer job')
                 if verified_inventory is None:
-                    verify_completed(clip, 'prepare', sample['preparation'], frames, identity)
+                    verify_completed(clip, 'prepare', sample['preparation'], frames, identity, None, **({'gpu_profile': gpu_profile} if gpu_profile != 'a6000' else {}))
                 elif sample['preparation']['job_id'] != verified_inventory[clip]['prepare']['job_id']:
                     raise ValueError('CPU score producer differs from verified inventory')
             if verified_inventory is None:
-                verify_completed(clip, phase, entry, frames, identity, sample.get('preparation'))
+                verify_completed(clip, phase, entry, frames, identity, sample.get('preparation'), **({'gpu_profile': gpu_profile} if gpu_profile != 'a6000' else {}))
             verify_independent_confirmation(clip, phase, entry, identity)
             receipt = read(Path(entry['receipt_path']), entry['receipt_sha256'])
             directory = Path(receipt['job_directory'])
@@ -524,10 +550,14 @@ def completed_summary(entry: dict[str, Any]) -> dict[str, Any]:
 
 
 def inventory(ledger: dict[str, Any], identity: dict[str, str],
-              trusted_completed: dict[str, dict[str, Any]] | None = None) -> dict[str, dict[str, Any]]:
+              trusted_completed: dict[str, dict[str, Any]] | None = None, *,
+              gpu_profile: str = 'a6000') -> dict[str, dict[str, Any]]:
+    from experiments.tennis import k5d_ada_study as ada
+    model, _ = ada.hardware({'registered_gpu_profile': gpu_profile})
     selected = study.selection()
     if (ledger.get('schema') != 1 or ledger.get('selection_sha256') != study.fleet.SOURCE_SHA
-            or ledger.get('execution_identity') != identity or ledger.get('gpu_model') != 'RTX A6000'):
+            or ledger.get('execution_identity') != identity or ledger.get('gpu_model') != model
+            or ada.profile(ledger) != gpu_profile):
         raise ValueError('ledger study identity differs')
     rows = ledger.get('clips')
     if not isinstance(rows, list) or len(rows) != 30:
@@ -546,7 +576,7 @@ def inventory(ledger: dict[str, Any], identity: dict[str, str],
             if entry['state'] == 'complete':
                 previous = (trusted_completed or {}).get(clip, {}).get(phase)
                 if previous is None:
-                    proof = verify_completed(clip, phase, entry, frames, identity, row['prepare'] if phase == 'score' else None)
+                    proof = verify_completed(clip, phase, entry, frames, identity, row['prepare'] if phase == 'score' else None, **({'gpu_profile': gpu_profile} if gpu_profile != ada.A6000 else {}))
                     if phase == 'prepare':
                         entry['_prepared_evidence'] = proof
                 else:
@@ -566,9 +596,12 @@ def inventory(ledger: dict[str, Any], identity: dict[str, str],
     return by_clip
 
 
-def inspect_hosts(snapshot: dict[str, Any], now: datetime) -> None:
-    if (snapshot.get('schema') != 1 or snapshot.get('gpu_models') != ['RTX A6000']
-            or set(snapshot.get('inspected_hosts', [])) != {f'gpu{i}' for i in range(1, 7)}
+def inspect_hosts(snapshot: dict[str, Any], now: datetime, *, gpu_profile: str = 'a6000') -> None:
+    from experiments.tennis import k5d_ada_study as ada
+    model, _ = ada.hardware({'registered_gpu_profile': gpu_profile})
+    if (snapshot.get('schema') != 1 or snapshot.get('gpu_models') != [model]
+            or ada.profile(snapshot) != gpu_profile
+            or set(snapshot.get('inspected_hosts', [])) != ({'gpu6'} if gpu_profile == ada.ADA else {f'gpu{i}' for i in range(1, 7)})
             or timestamp(snapshot['observed_at']) > now or timestamp(snapshot['valid_until']) <= now):
         raise ValueError('fresh all-host inspection required')
     if snapshot.get('active_or_uncertain_jobs') != []:
@@ -590,9 +623,13 @@ def propose(*, ledger_path: Path, ledger_sha: str, gate_path: Path, gate_sha: st
         from experiments.tennis import k5d_full_admission as admission
         gate = read(gate_path, gate_sha)
         cert = admission.read_certificate(Path(control_assets['certificate']), gate['certificate_sha256'])
+    from experiments.tennis import k5d_ada_study as ada
+    gpu_profile = ada.profile(read(gate_path, gate_sha))
     rows = inventory(read(ledger_path, ledger_sha), identity,
-                     trusted_completed=None if cert is None else cert['completed'])
-    inspect_hosts(read(inspection_path, inspection_sha), now.astimezone(timezone.utc))
+                     trusted_completed=None if cert is None else cert['completed'],
+                     **({'gpu_profile': gpu_profile} if gpu_profile == ada.ADA else {}))
+    inspect_hosts(read(inspection_path, inspection_sha), now.astimezone(timezone.utc),
+                  **({'gpu_profile': gpu_profile} if gpu_profile == ada.ADA else {}))
     uncertain = [(clip, phase, row[phase]['state']) for clip, row in rows.items() for phase in ('prepare', 'score')
                  if row[phase]['state'] in ('running', 'failed', 'unknown')]
     if uncertain:
