@@ -68,3 +68,12 @@ preflight16+refresh20=83CPU charged;2917CPU/2390GPU held inside the unchanged
 3000CPU/2390GPU total. Original metadata evidence and missed-clock variant remain
 preserved; fresh normalization changes only deadline/deadline_epoch. No GPU
 execution or late publication of the predecessor is authorized.
+
+Source-qualification scope clarification: the literal TRUE flag tests only
+WASB visible recall10 >=0.8. It does not test absence calibration. The separate
+pooled10/197=0.0507614 false-rate screen fails the proposed <=0.05 requirement
+with >=100 negatives; this clip2/30 does not establish that requirement either.
+Strong absence/realism claims remain blocked. Relative counts stay descriptive.
+The sender starts with automatic BallTrack predictions followed by pixel fitting;
+labels do not seed its trajectory. WASB is the distinct primary judge, while
+reused BallTrack is an encoder-model diagnostic.

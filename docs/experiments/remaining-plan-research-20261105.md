@@ -21,22 +21,21 @@ and [live ledger](submission-research-budget-20261104.json) for authority/eviden
 **SVT292 is ROOT accepted and all known events ACK-closed.** Actual
 `20261113T173340Z-64160888`, ROOT 437bc322/independent 603bda5e, passed complete
 physical/native/packet/pixel/CPU-receiver/full+ROI/judge/current-cleanup checks.
-Actual game9/Clip5 source-task qualification is TRUE; historical 10/197 failures
-remain. CRF62 visible10-pixel hits5→229/261 WASB and7→229/261 BallTrack accompany
+Literal game9/Clip5 source `qualified=True` means only legacy WASB recall10≥0.8.
+It is no absence certificate:2/30=0.0667 exceeds0.05 and fewer than100 negatives
+are available. Historical10/197=0.0507614 is a failed pooled false-rate screen. Strong absence/realism claims remain blocked. CRF62 visible10-pixel hits5→229/261 WASB and7→229/261 BallTrack accompany
 **false-on-absent3→5/30 for both judges**. Report both gains and harm. Full-command
 wall 534.0789s/scoped527.046201CPU is shared cost metadata, not whole CPU or speed.
 Full 3000CPU/2390GPU charge remains. The failed direct audit and successful gzip
 repair are preserved; no GPU replay. Archive publication 39715 passed immutable readback (SHA2cf8ef0f,41,820,486B,0444/0555). No 586-frame or 30-clip promotion follows.
 
-First priority is the missing six-point neural-plus-SVT comparison, including
-encoded scoring AFTER preparation. Primary 1270CPU/900GPU remains held; old
-window closed and new metadata 30 prototype unfunded/not clocked. Empty encoded
-metric/judge arrays are required in preparation; they are not encoded-quality
-results. W8 static 10 returned whole-endpoint-fit STOP, with no GPU release.
-Only a new complete cost/value decision could authorize586/cohort work; do not
-replace either missing comparator or fresh decoder evidence with more SVT clips.
+**Automatic sender provenance (source inspection):** frozen `4282` seeds the ball payload from image-based BallTrack predictions (`k5d_encoder.py:385`), then fits position/appearance to source pixels and native reconstructions before the PSNR guard and serialization. TrackNet labels provide evaluation/source-qualification and ROI centres; they do not supply the sender's starting positions or presence. WASB is the distinct primary evaluator; reused BallTrack is an encoder-model diagnostic. This call path establishes automatic sender provenance separately from evaluator qualification. Broader automatic-sender failure/absence coverage remains useful; the separate neural comparator stays first priority.
 
-Passive a25 finished nine ticks at 18:17:06UTC; a26 is active (backend 63980/PID 91332),18:32:08.890423–19:17:08.890323UTC, every 300s/max 9 ticks,100CPU precharged. No autosubmit or verified model wakeup. Paper/PRESLEY paused.
+Primary six-point16 preparation06650791 is now ROOT accepted and exact-ACK/immutable-archive closed. The [durable index](k5d-inputs/primary-06650791-Ada-sixpoint16-root-acceptance-20261113.json) retains67 regular files' hashes,30 binary members, six real CPU receipts, native/packet/pixels/reference/source/device/kernel/current-cleanup acceptance and original audit-helper failures. Encoded metric/judge arrays remain EMPTY/full NOOP. Conditional observer330.385725s requires unproven NFS visibility; other observer UNKNOWN, no complete CPU/speed/fullscale claim. Original and repair holds are closed0; no charges were refunded.
+
+First priority remains the separate actual prepare16/48 then sealed score16/48 comparison. Its5226CPU/3920GPU proposal is unreleased; same-source/device correctness, full audit/transport fit and fresh same-job forecast gates remain required. W8 static10 remains whole-endpoint-fit STOP. A new complete cost/value decision is needed for586/cohort work; existing SVT coverage does not close either comparator or fresh-decoder gap.
+
+A26 finished and its PID is absent. A27 passive checks run every300s until20:39:13UTC (backend78950/PID1412,100CPU precharged), with no autosubmit, automatic renewal or verified model wakeup. Paper/PRESLEY remain paused.
 
 ### Earlier November 13 route and receiver-gap snapshot — history
 
