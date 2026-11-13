@@ -1,6 +1,15 @@
 # K5d: qualify CUDA context memory accounting before the SVT16 pilot
 
-Status (November 13, 11:58 UTC): build-only candidate, not runtime qualified.
+Status (November 13, source-cache phase complete): CI-supported scientific source a71 is frozen
+as source bb717 / archive e051 / config 5fc. Root approved source bridge
+1f371bd75240924632204be5bb94b8717b403131d7b3c82fdc70f9714a7fc622 after
+all 2001 tree hashes, the two-file delta and unchanged 31 grants joined. Cache
+physical approval is accepted: metadata-only publication71660 and read-only
+audit80318 completed with exact seven-file hashes/modes and identity-only policy
+change. See `svt-a71-source-cache-acceptance-20261113.json` in the evidence index.
+The full sourceprep100 charge is retained. Native, actual CPU-denial
+and real16 stages remain UNRELEASED;
+runtime qualification is not established. Source preparation 100 CPU is charged.
 The original shared-SVT job `20261113T114623Z-c6b01236` failed before models,
 with zero accepted quality points. Its card is closed to automatic retries.
 This is the separate PLAN subitem for a source repair and fresh qualification;
@@ -43,8 +52,10 @@ excluding inherited control changes. The candidate is immutable. Four setup line
 allocate one CUDA uint8 element **after** the allocator cap, synchronize,
 release the probe and then reset peak statistics. Strict memory-row, campaign
 PID and foreign-process checks remain unchanged. This is context setup, not
-a threshold, model, training or decoder-permission change. CI and runtime
-qualification are prerequisites, not inferred from this candidate commit.
+a threshold, model, training or decoder-permission change. PR393 passed full CI
+and merged at c4ab531a (12:01:22 UTC); documentation PR394 merged at 12:09:48 UTC.
+Runtime qualification remains
+unproven and is required before promotion.
 
 ## Qualification and stop conditions
 
@@ -69,19 +80,38 @@ No paper, PRESLEY, training or paid API work is released.
 
 ## Prospective resources
 
-The ledger reserves **600 GPU-seconds / 2000 CPU-seconds**, entirely UNRELEASED:
+The total envelope stays **600 GPU-seconds / 2000 CPU-seconds**. Qualification
+is 1012 CPU: source preparation 100 already charged, native 327 and actual CPU
+receiver-denial 585 still UNRELEASED. The remaining hold is 1900 CPU/600 GPU:
 
 | Stage | CPU-seconds | GPU-seconds |
 | --- | ---: | ---: |
-| Clean source and fresh CPU qualification | 818 | 0 |
+| Source preparation, already charged | 100 | 0 |
+| Fresh native qualification | 327 | 0 |
+| Fresh actual CPU receiver-denial qualification | 585 | 0 |
 | One real16 lifecycle, prospective estimate | 848 | 600 |
-| Reserve | 334 | 0 |
+| Reserve | 140 | 0 |
 | Total | 2000 | 600 |
 
 The separate 300 CPU local code/check allocation is already precharged and is not
-part of this new hold. These are prospective envelopes, not a measured fit;
+part of this envelope. Complete qualification costs include local callers,
+Git, SSH, remote Python, doctor/probe children, archive staging/publication,
+monitoring, independent audits and proof/ACK closeout. No caller is hidden in
+the scientific cap. These remain prospective envelopes, not a measured fit;
 each concrete stage needs exact pins, a complete forecast and root release.
 No extra user allocation or GPU release is implied. The primary exclusive
 2c6d route remains separate:1160 CPU/900 GPU held, metadata 50 CPU precharged but
 UNRUN, false plan 463f50d0. See the [continuation](../continuation-2026-11-13.md)
 and [ledger](../experiments/submission-research-budget-20261104.json).
+
+## Conditional roadmap after a real16 pass
+
+Only after that actual gate passes, consider one opt-in SVT study port covering
+48 and registered full clips together, while preserving global six-point
+defaults. Qualify one final source and its16/48 calibration; use a real48
+three-point/full-metric cost oracle. Then confirm the two fixed full-context
+clips, game9/Clip5 (292 frames) and game10/Clip12 (586 frames), without selecting
+clips after quality results. The registered 30-clip/5675-frame study remains
+conditional on complete stage costs and remaining programme/Ball budgets.
+Parts stay within 45 minutes; negative outcomes remain reported. No adapter,
+48-frame, full-clip or 30-clip execution is released now.

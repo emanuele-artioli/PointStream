@@ -5,9 +5,9 @@ The [budget ledger](experiments/submission-research-budget-20261104.json) is the
 accounting authority; [Ball journal](experiments/k5d-ball-benchmark.md) retains
 chronology and raw-result references. Times below are UTC.
 
-## Current scheduling decision (November 13, 11:58 UTC)
+## Current scheduling decision (November 13, 12:14 UTC)
 
-**The first shared-SVT16 pilot failed before models; the repair is build-only.**
+**The first shared-SVT16 pilot failed before models; repair source is frozen, runtime unqualified.**
 Actual job `20261113T114623Z-c6b01236` was assigned gpu6 Ada1 UUID
 `GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553`, then failed the strict
 `before_models` memory-row check. Diagnostic 79617 confirmed source admission,
@@ -15,19 +15,37 @@ with zero accepted quality points. All848 CPU/600 GPU from that phase remain
 charged; the original card authorizes no retry. Cleanup 29077 completed with
 two captured PIDs absent, one empty group, owned shared-GPU and FQDN CPU tokens
 absent, and the same worker context unchanged except CPU accounting. Root
-closeout is being written; terminal ACK remains pending.
+closeout582bb644 is accepted; sole terminal event7c0c1189bc545d2082bd6846b4331f40
+is acknowledged (backend63255).
 
 New [PLAN repair subitem](cards/k5d-svt-memory-context-repair-2026-11-13.md):
-independent candidate 93ebb351 on `codex/svt-cuda-context-memory-20261113`,
-worktree `/private/tmp/pointstream-svt-cuda-context-memory-20261113`. A tiny CUDA
+minimal scientific candidate a71dc6e27743efaa4fb5bbe2e8c8b387ae51ba02 on
+`codex/svt-cuda-context-scientific-7a9f-20261113`, worktree
+`/private/tmp/pointstream-svt-cuda-context-scientific-7a9f-20261113`. Its parent is
+exact7a9f; its two-file patch matches PR393/head93ebb351 byte-for-byte
+(da80bed4543021b45eb063fd9765ae4f85674ea5558f8a8692a917ef0fc42eb9).
+PR393 passed full CI and merged at c4ab531a; this candidate stays immutable. A tiny CUDA
 allocation follows the allocator cap, then synchronization/release precedes
 peak reset. Strict actual-row/PID/foreign-process guards stay unchanged.
 Lazy context initialization is a hypothesis; lineage/query visibility remain
 competing explanations. No missing row may be fabricated or treated as zero.
 
-The new reservation 600 GPU/2000 CPU is UNRELEASED:818 clean CPU qualification,
-about 848 for one real16 lifecycle,334 reserve. Local source/check work 300 CPU
-is separately precharged. All 31 receiver grants are identical, but strict
+Source a71 is now frozen as source bb717 / archive e051 / config 5fc.
+Root approved source bridge 1f371bd75240924632204be5bb94b8717b403131d7b3c82fdc70f9714a7fc622
+by all 2001 tree hashes, the two-file delta and unchanged 31 grants. Cache
+physical approval is accepted: metadata-only publication71660 and read-only
+audit80318 completed0 within sourceprep100. Exact seven-file hashes/modes and
+identity-only policy change passed; tracked thin index is
+`docs/experiments/k5d-inputs/svt-a71-source-cache-acceptance-20261113.json`. PR393 merged 12:01:22 UTC;
+documentation PR394 merged 12:09:48 UTC. This is source-scope approval only.
+
+The complete repair envelope remains 2000 CPU/600 GPU. Qualification is 1012 CPU:
+sourceprep 100 already charged +native 327 +actual CPU-denial 585. Real16 remains
+848 CPU/600 GPU with 140 CPU reserve. The remaining hold stays 1900 CPU/600 GPU;
+native, denial and real16 remain UNRELEASED. The revised qualification prices
+include complete local/Git/SSH/remote-Python/doctor-child/archive staging and
+publication, monitoring, independent audits and proof/ACK closeout callers.
+Local source/check work 300 CPU is separately precharged. All 31 receiver grants are identical, but strict
 execution-identity/config/producer/receipt joins require fresh native and
 actual CPU-denial proofs (independent report 69b86104). Preserve old native 6bf,
 receiver c8 and original 7a9f evidence; do not relabel them for the new source.
@@ -35,11 +53,19 @@ Next runtime is at most one separately frozen real16 test after CI, exact-source
 qualification and full root forecasts. No thresholds, decoder permissions,
 training, speed/span, extrapolation or scale claims change.
 
+Only after an actual real16 pass, consider one opt-in SVT study port covering
+48 and the registered full clips together, then a real 48 three-point/full-metric
+cost oracle. Confirm the two fixed full-context clips, game9/Clip5 (292 frames)
+and game10/Clip12 (586 frames), without quality-based clip selection. All 30 clips
+remain conditional on complete caller/stage caps and both programme/Ball budgets;
+parts stay within 45 minutes and negative outcomes are retained. No adapter,
+48-frame or full-clip stage is released now; global six-point defaults stay fixed.
+
 The primary exclusive 2c6d/source 6f route stays separate:1160 CPU/900 GPU held,
 metadata 50 CPU precharged UNRUN and false plan 463f50d0 preserved. No general
 GPU/readiness promotion or retroactive kernel pass follows from either route.
-Ledger snapshot: programme24441 GPU/67171 CPU, Ball18079 GPU/43170 CPU; the new
-600 GPU/2000 CPU is held, not spent. The ledger owns subsequent changes.
+Ledger snapshot: programme 24441 GPU/67271 CPU, Ball 18079 GPU/43270 CPU;
+sourceprep 100 is charged and 1900 CPU/600 GPU remains held. The ledger owns subsequent changes.
 
 Passive a17 backend 10511 / PID 37616 began 11:54:15UTC and ends no later than
 12:39:15.139892UTC, every 300s/max nine ticks; receipt:

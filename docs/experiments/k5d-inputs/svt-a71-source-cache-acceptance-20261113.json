@@ -1,0 +1,68 @@
+{
+  "CPU_accounting": "full sourceprep100 conservative charge retained; no scientific compute released",
+  "CPU_receiver_released": false,
+  "GPU": 0,
+  "GPU_released": false,
+  "approved": true,
+  "cache_directory": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-SVT-source-cache-21ce0d1c3889c197bc1e714ee475c846",
+  "config_sha256": "5fc595d43f23e0dafcc54242bfcb63662f0e0eca1ddbbaf79b94862b8799e0a6",
+  "files": {
+    "bridge.json": {
+      "bytes": 271103,
+      "inode": 41754205,
+      "mode": "0444",
+      "sha256": "1f371bd75240924632204be5bb94b8717b403131d7b3c82fdc70f9714a7fc622"
+    },
+    "config.json": {
+      "bytes": 7204015,
+      "inode": 41756323,
+      "mode": "0444",
+      "sha256": "5fc595d43f23e0dafcc54242bfcb63662f0e0eca1ddbbaf79b94862b8799e0a6"
+    },
+    "identity.json": {
+      "bytes": 953,
+      "inode": 41750896,
+      "mode": "0444",
+      "sha256": "a808317b5fddf78fedbc09fc1473050f5f7358de23fb1767f10cb9c07368d0e5"
+    },
+    "native-spec.UNRELEASED.json": {
+      "bytes": 2376,
+      "inode": 41757062,
+      "mode": "0444",
+      "sha256": "e0f658d99d91ac1f8d7df5bd283d9b15046056a61515c52482e2d81fb7db947d"
+    },
+    "payload-manifest.json": {
+      "bytes": 1073,
+      "inode": 41757184,
+      "mode": "0444",
+      "sha256": "0596804b7c7576bb3c8f735eb28a8d92b4cb83256b672cc966dc1bf591fb9927"
+    },
+    "root-release.json": {
+      "bytes": 792,
+      "inode": 41755564,
+      "mode": "0444",
+      "sha256": "36f4d80415e2c1da7f25def372339dcb61b1a653df4334e0e0bb26d64bcaaf54"
+    },
+    "source.tar": {
+      "bytes": 23971840,
+      "inode": 41753782,
+      "mode": "0444",
+      "sha256": "e05187c40ebc81f7505172be11ed20807b4baa97803c80039dc43f3ea33c8abc"
+    }
+  },
+  "identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "e05187c40ebc81f7505172be11ed20807b4baa97803c80039dc43f3ea33c8abc",
+    "source_sha256": "bb717a9d9fa7d848a3891717c37c0973add82706bc1690bc96aa0961c4804108"
+  },
+  "local_acceptance_sha256": "3f534c56a2d796931d4bf3ebfd96cb3d10a4cff64c9abcff691ceff7d965045b",
+  "native_released": false,
+  "no_replay": true,
+  "physical_audit_backend": 80318,
+  "physical_report_sha256": "2fcfc97bee59bf8ad8fd7d27ed438a486867da0a312dae1cb5c83ee920f7341c",
+  "precharged_CPU": 100,
+  "publication_backend": 71660,
+  "revision": "a71dc6e27743efaa4fb5bbe2e8c8b387ae51ba02",
+  "scope": "immutable a71 source cache and source-only reference mapping; fresh native and CPU receiver proofs still required",
+  "source_bridge_sha256": "1f371bd75240924632204be5bb94b8717b403131d7b3c82fdc70f9714a7fc622"
+}
