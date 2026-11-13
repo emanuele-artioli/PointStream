@@ -2052,6 +2052,24 @@
       "cpu_seconds": 50,
       "basis": "Prospective firstGPUwitness external preparation only: publish fullCPUdenialapproval immutable, construct exactfrozencanonicalwitnessspec on gpu6 by reading existing actual400MBreference there, noWANpixelarchive/no model/GPU. Onecorehelper<=30CPU90wall+20client/root; counts INSIDE prospectiveGPUwitness1100CPU envelope (future1050remaining:700campaign+350external), not extra. NoGPUreleaseuntilspec/readiness/rootreview.",
       "release_stage": "research-first24/28-firstGPU-denial-preparation"
+    },
+    {
+      "phase": "ball-13aba-contention-closeout-20261113",
+      "parent_phase": "ball-ada-scale-and-denial-20261112",
+      "workstream": "ball",
+      "gpu_seconds": 1282,
+      "cpu_seconds": 1632,
+      "basis": "Conservative debit, NOT measured use: same-host preclaim start to observed original-token absence1281.870s rounded1282GPU. CPU1282 conditional one-core supervisor/campaign elapsed bound plus entire350future external allowance; prior50prep alreadycharged. Affinity inheritance/no widening/no unobserved escaped descendants are assumptions, aggregateCPU unmetered. Exactreleaseunknown;900GPU/1100CPU per-job compliance CANNOT be certified, nor actual overrun concluded. Queuewall excluded. Recordedownprocesses/groups/claims absent; no points/receivers. No retroactiveallocation/retry.",
+      "release_stage": "research-first24/28-contention-recovery"
+    },
+    {
+      "phase": "ball-resource-watch-a4-20261113",
+      "parent_phase": "ball-ada-scale-and-denial-20261112",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 100,
+      "basis": "Prospective100CPU administrative charge: same reviewed passivewatch SHA2b931eb5, fourhosts/300sinterval/45minwallmax/inner80countedCPU+20outer. No autosubmit/models/API/wake guarantee; SSHserver/login aggregate unmetered. Previousa3ended00:36:02UTC18ticks.",
+      "release_stage": "research-first24/28-contention-recovery"
     }
   ],
   "reservations": [
@@ -2662,9 +2680,9 @@
       "phase": "ball-ada-scale-and-denial-20261112",
       "workstream": "ball",
       "release_stage": "research-first24/28-denial-and-scale-preparation",
-      "gpu_seconds": 6000,
-      "cpu_seconds": 7250,
-      "status": "Remaining_unspent;CPU030dSVTdenialaccepted;includesONEqueued13aba806900GPU1050CPUfuture(50prepcharged);noextradoublecount,noscale"
+      "gpu_seconds": 4718,
+      "cpu_seconds": 5518,
+      "status": "Remaining_unspent;13aba debited1282GPU1632CPUwithuncertainty;watcha4precharged100CPU;GPUheldpendingPGID/source/CPU/denial/newaccountinggates;noretry/scale"
     }
   ],
   "jobs": [
@@ -5077,11 +5095,9 @@
         "gpu6"
       ],
       "job_id": "20261112T235535Z-13aba806",
-      "state": "pending;onefirstGPUdenialwitness;noadmissionorqualityresultassumed",
+      "state": "contended;no points/receiver/scientificresult;cleanupobserved;perjobcapcomplianceunverified",
       "spec_sha256": "4c942ef94d7a0b89ffd0df921482552f78d74746f5ee72cc67cf304cf1134a49",
       "deadline": "2026-11-13T00:33:53.646189+00:00",
-      "future_GPU": 900,
-      "future_CPU": 1050,
       "preparation_CPU_already_charged": 50,
       "campaign_onecore": 700,
       "external_future_CPU": 350,
@@ -5091,9 +5107,13 @@
       "validator": 30,
       "full": 5,
       "scope": "All6freshnative16pointSender+isolatedreceiver;exactAdareference;not48/full30",
-      "wait_state": "ONEcanonicalwaitbackend62543/max2500active",
+      "wait_state": "solewaitended;noactivejob;noreplay",
       "local_batch": "/private/tmp/pointstream-ada-first-denial-witness-20261112",
-      "recovery_receipt": "docs/experiments/k5d-inputs/ada-first-denial-witness-release-20261112.json"
+      "recovery_receipt": "docs/experiments/k5d-inputs/ada-denial-13aba-root-closeout-20261113.json",
+      "terminal_GPU_charge": 1282,
+      "terminal_CPU_charge": 1632,
+      "original_future_GPU": 900,
+      "original_future_CPU": 1050
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -5117,14 +5137,24 @@
     "User20261112explicitlyrequestsregularresourcepolls andnonA6000task. Native5min<=45minwatchmayreportpotentialidleA6000/Ada, neverexecutesjoborweakensfleetgates. No recurringLLM/automation. Opt-inAdaimplementationmaybeprepared, butfreshCPUproof/exclusiveexactreferenceparity/costgatesandbudgetsrequired; noautoAda/fullstudyadmission.",
     "Root20261112prospectivelyallocates separate Ball1000GPU/1400CPU:200nativewatch+max1200oneA6000(or1150Ada) attempt. Prior461e closedexpired no scientificexecution. No transfer/outerceilingincrease, no newscience/numericthreshold/reference or automaticretry. UnspentBallworkstream covers newreservation; monitorSSHserver/login CPUunmetered, CLIadministrative costs in GPUexternal reserve.",
     "RootprospectivefreshAdaqualification1400GPU2100CPUinsideunchangedBall/programmeceilings, after37b3read-onlyauditlocalizedexactcrossclassdifferences. Existingaccepted16/referencevalidatorunchanged; sourceprep/nativeCPUproof,rootreviewandcompleteforecastrequired beforefreshsixpoint16repeat/scoring. Noscale/papermanuscript/training/newproviderrelease. Carddocs/cards/k5d-ada-fresh-reference-2026-11-12.md.",
-    "Rootsource-hiddenclaimcorrection20261112:actualk5d_worker/receiver/enc.validateclearlystatefilesystemdenialNOTestablished.2c8bpositiveispacketAPIrepeat/costonly, notFSdenial. NewprospectiveBall6000GPU9000CPUphaseinsideexistingceilingscoverscodepreponlyandconditionaldenial/costscalegates. No retroactivegatepass/newtraining/W8transfer/benchmarkrelease."
+    "Rootsource-hiddenclaimcorrection20261112:actualk5d_worker/receiver/enc.validateclearlystatefilesystemdenialNOTestablished.2c8bpositiveispacketAPIrepeat/costonly, notFSdenial. NewprospectiveBall6000GPU9000CPUphaseinsideexistingceilingscoverscodepreponlyandconditionaldenial/costscalegates. No retroactivegatepass/newtraining/W8transfer/benchmarkrelease.",
+    "Root20261113:13aba contended beforepoints/receivers;exactclaimreleaseunknown. Conservative1282GPU1632CPUdebit notmeasured use/perjoboverrun evidence; capcomplianceunverified. No newGPU untilPGID/sourcegates+durableindependentobserver. Outer/workstreamcapsunchanged."
   ],
   "monitoring": {
+    "state": "Activea4passive5min45minwatch100CPUprecharged;priora3ended;noautosubmit/modeltimer",
+    "scope": "gpu2/gpu3 A6000 and gpu5/gpu6 Ada",
+    "path": "/Users/manu/.cache/pointstream-resource-watch-20261113-passive-a4",
+    "native_completion_wakeup_verified": false,
+    "accounting_limits": "SSHserver/loginaggregateunmetered;inner80countedCPU+20outer",
+    "scientific_jobs": "noneactive;13abacontendednotretry",
+    "source_sha256": "2b931eb5a25f7a87cc3594103ee845ec2582cc017309b7d479a99f637f6ee10c",
     "mode": "bounded_passive_native_resource_checks",
-    "state": "NewpassivewatchPID28708since21:44:05UTC;4hosts/5min,max4wallhoursor80countedCPU,noautosubmit/modeltimer. AllfleetjobsclosedACKed; actualdenial/scaleCODEONLY.",
+    "pid": 51630,
+    "started_utc": "2026-11-13T00:43:58.431315+00:00",
+    "deadline_utc": "2026-11-13T01:28:58.483483+00:00",
     "jobs": [],
     "batches": [
-      "/Users/manu/.cache/pointstream-resource-watch-20261112-passive-a2/"
+      "/Users/manu/.cache/pointstream-resource-watch-20261113-passive-a4"
     ],
     "native_completion_resume_verified": false,
     "recurring_llm_polling": false,

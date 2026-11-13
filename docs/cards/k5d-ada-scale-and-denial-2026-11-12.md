@@ -6,12 +6,33 @@ allocation of **6,000GPU /9,000CPU seconds**, inside unchanged Ball64,800GPU/
 72,000CPU and programme86,400GPU/100,800CPU. No paid server, training, legacy
 200-GPU-hour study, manuscript/PRESLEY edit or submission.
 
-Current status: source5cb passed native CPU proof69c7 and actual SVT CPU denial
-oracle030d under exact GPU-capable policyd5fad311. All five protected categories
-were denied and native/pixel bytes matched. CUDA/DCVC/GPU and scale remain gated.
-ONE first GPU witness13aba806 is queued, deadline2026-11-13T00:33:53UTC, using the
-later900GPU/1100CPU amendment below. Stage remaining6,000GPU/7,250CPU includes
-its900GPU/1050futureCPU (50prep charged); no extra doublecount. See current handoff.
+## Current November13 status
+
+The first Ada GPU denial witness `20261112T235535Z-13aba806` is **CONTENDED**,
+not queued: another GPU PID was detected before any point or isolated receiver
+started. The sole canonical wait ended; recorded own group/supervisor and CPU/
+GPU claims are absent, events acknowledged, and failed scratch is preserved.
+It provides no decoder/quality result and is not automatically retried. A latent
+receiver process-group incompatibility has a software-only candidate correction
+`16679f50`; new source-bound CPU/lifecycle and actual denial gates are required.
+
+Exact claim-release time was not recorded. Root conservatively debited1,282GPU/
+1,632CPU seconds using the later same-host absence observation and conditional
+one-core/external allowances. These are not measured use: per-run900GPU/1100CPU
+cap compliance is unverified, and actual overrun is not established. Programme
+charges21,141GPU/54,810CPU, Ball14,779GPU/30,809CPU; internal stage remaining
+4,718GPU/5,518CPU. All outer/workstream ceilings and held old reservations stay
+unchanged. No new GPU release until independently durable claim accounting and
+renewed source/CPU/denial qualification; no16/48/full30 promotion.
+
+Passive watcha4 PID51630 began2026-11-13T00:43:58UTC, all four A6000/Ada hosts
+at five-minute intervals, ending by01:28:58UTC or CPU guard.100CPU precharged;
+no autosubmit, model timer or verified chat wake. Prior a3 ended00:36:02UTC after
+18ticks. New watch/output/launch:
+`/Users/manu/.cache/pointstream-resource-watch-20261113-passive-a4/`.
+SSHserver/login aggregate CPU remains unmetered. Inspect existing run/finished
+before any restart. Ada's accepted same-GPU packet-repeat/cost and real SVT CPU
+filesystem-denial evidence remain valid within their original scope.
 
 ## Evidence and unresolved condition
 

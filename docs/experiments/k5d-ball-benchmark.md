@@ -801,3 +801,41 @@ ROOTGPUrelease ONE exclusiveAda6point16freshsender+isolatedreceiverwitness: sour
 FIRSTGPUdenialwitness publishedONE `20261112T235535Z-13aba806`, sourcearchive:true, source5cb45c80/06f5d9c7/b3b48/env32e, canonical4c942ef94d7a0b89ffd0df921482552f78d74746f5ee72cc67cf304cf1134a49/raw03b1dd4e3083ccf55971595c3e7942bbde0ffb62c66db98efb9d1059dbfe7004, deadline2026-11-13T00:33:53.646189UTC. Exclusivegpu6Adaonly,900GPU/1100CPUtotalincl50prepcharged(future1050CPU700campaign+350external), namespace500/smoke550/val30/noop5/200GPUpost. Configd5fad/CPUdenialb4ffd/CPUgateedcb/bridge9b9da/reference4bfff pinned. ActualIDmuststatusbeforeONEcanonicalwait; no replay/promote. Files /private/tmp/pointstream-ada-first-denial-witness-20261112/, scopedclientstate samefbca.
 
 13aba806 actualcanonicalPENDING/unassigned, oneboundedcanonicalwait --max-seconds2500 backend62543, deadline2026-11-13T00:33:53UTC. Source/capsunchanged; waitoutputandhandle infirst-denial-witnessdirectory, nosecondwait/replay. Independentproductionintegration600343cf pushed: all11codeblobsrootverifiedequal5cb; Ruff/mypy587/fullpytest2164pass40skip. Experimentalqualification remainsfrozen5cb only.
+
+### November13 — first Ada witness contended; no scientific promotion
+
+The first Ada GPU denial witness `20261112T235535Z-13aba806` is **CONTENDED**,
+not queued: another GPU PID was detected before any point or isolated receiver
+started. The sole canonical wait ended; recorded own group/supervisor and CPU/
+GPU claims are absent, events acknowledged, and failed scratch is preserved.
+It provides no decoder/quality result and is not automatically retried. A latent
+receiver process-group incompatibility has a software-only candidate correction
+`16679f50`; new source-bound CPU/lifecycle and actual denial gates are required.
+
+Exact claim-release time was not recorded. Root conservatively debited1,282GPU/
+1,632CPU seconds using the later same-host absence observation and conditional
+one-core/external allowances. These are not measured use: per-run900GPU/1100CPU
+cap compliance is unverified, and actual overrun is not established. Programme
+charges21,141GPU/54,810CPU, Ball14,779GPU/30,809CPU; internal stage remaining
+4,718GPU/5,518CPU. All outer/workstream ceilings and held old reservations stay
+unchanged. No new GPU release until independently durable claim accounting and
+renewed source/CPU/denial qualification; no16/48/full30 promotion.
+
+Passive watcha4 PID51630 began2026-11-13T00:43:58UTC, all four A6000/Ada hosts
+at five-minute intervals, ending by01:28:58UTC or CPU guard.100CPU precharged;
+no autosubmit, model timer or verified chat wake. Prior a3 ended00:36:02UTC after
+18ticks. New watch/output/launch:
+`/Users/manu/.cache/pointstream-resource-watch-20261113-passive-a4/`.
+SSHserver/login aggregate CPU remains unmetered. Inspect existing run/finished
+before any restart. Ada's accepted same-GPU packet-repeat/cost and real SVT CPU
+filesystem-denial evidence remain valid within their original scope.
+
+Root audited actual installed monitor73671c/claims4ce against requested hashes;
+contention/stop/claim paths match frozen5cb. Same later foreign PID was another
+user's process in a different PGID; no detection-time birth means continuity is
+unproved. Scratch has source qualification/conversion only, no points/receivers.
+This supports external contention, not the separate latent nested-receiver PGID
+bug. Root closeout: `k5d-inputs/ada-denial-13aba-root-closeout-20261113.json`.
+New source implementation and safe CPU lifecycle harness proceed separately;
+standalone observational accounting is preferred over changing live fleet protocol.
+No GPU/control deployment/claim bypass is authorized by code preparation.
