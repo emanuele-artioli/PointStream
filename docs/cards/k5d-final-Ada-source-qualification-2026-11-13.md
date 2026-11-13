@@ -1,9 +1,10 @@
 # K5d: final Ada source CPU qualification
 
-Status: preparation100CPU COMPLETE; native250CPU COMPLETE and root accepted.
-The original reservation was350 CPU-seconds /zero
-GPU from unallocated Ball headroom inside the user-approved24GPUh/28CPUh
-programme. No held SVT/W8 funds or new user allocation.
+Status: preparation 100 CPU, native 250 CPU and actual SVT CPU-denial 365 CPU
+completed and root accepted. Final source `ae892df1` / `9d3d7b2c` / `ad635b0b`
+remains frozen. Actual `d1bb8926` now has root-accepted scientific receipt/pixel
+qualification only; its resource-observer operation failed. No complete-cost
+or scale acceptance follows. See the [current continuation](../continuation-2026-11-13.md).
 
 ## Goal and fixed scope
 
@@ -96,3 +97,10 @@ The subsequent separately funded actual CPU denial jobc53fb111 is now also
 COMPLETE and root accepted under the public-Python card (proof85a52c4a).
 The earlier prospective holds above describe the original ordering; the GPU
 witness and larger study remain held. Both CPU completion events are ACKed.
+
+Final GPU metadata completed/audited and its operator/observer candidate reviewed;
+no observer/GPU job started because every eligible GPU is occupied. Current
+spec658ccbad is now too short for the whole-stage bound; preserve it unsubmitted,
+prepare fresh timing metadata only after a clean window appears. Both accepted
+CPU proofs remain bound to unchanged finalae892 source; no proof rerun follows
+from timing metadata alone. GPU and later full metric/scaling gates remain held.

@@ -1,0 +1,31 @@
+{
+  "created_UTC": "2026-11-13T07:29:35.366930+00:00",
+  "job_id": "20261113T072420Z-d1bb8926",
+  "decision": "Prospective narrowed interpretation frozen BEFORE scientific outcome inspection",
+  "last_inspected_scientific_state": "none; only canonicalstatus running/exclusivegpu6Ada1/smoke completed0",
+  "unchanged_scientific_acceptance": [
+    "Actual COMPLETE/exit0/no contention/no pauses",
+    "Exactae892 source9d3d/archivead635/env32e/rawspec0608/canonical8cad and actual dispatch/stage/execution pins",
+    "Original frozenk5d_ada_witness validator checks, allsix actual receiver denial/native pixels/producer/device/PID namespace receipts, independently rehashed actual evidence"
+  ],
+  "allowed_if_original_checks_pass": "Scientifically scoped decoder/native/PID qualification only; preserve original evidence with its actual device/source/inputs",
+  "not_accepted": [
+    "Entire timing-refresh card PASS",
+    "Independent observer live joins or reservation spans",
+    "Actual full GPU/CPU consumption inferred from charged ceilings",
+    "Any binding replay or retroactive assignment",
+    "Full registered scale or timing/resource-fit promotion without separately accepted prospective resource gate"
+  ],
+  "historical_failures_preserved": "Localpsutilprelaunch failure; e71/2538bindinghelper15svisibilitytimeoutBEFORErequest/assignment/actualbind; operatorFAILED, observersUNBOUND/UNKNOWN",
+  "resource_interpretation": "900GPU/700campaignCPU/200observerCPU are conservatively precharged caps, never measured occupancy or actual aggregate use. Native CPU source proofs remain scoped as previously accepted.",
+  "source_rationale": {
+    "witness": "experiments/tennis/k5d_ada_witness.py:117-162 validates actual decoder/native/isolation evidence without observer consumption",
+    "study_qualification": "experiments/tennis/k5d_ada_study.py:365-414 validates exact qualificationjob provenance/complete/no-contention/no-pause without observer consumption"
+  },
+  "future_resource_gate": "Separately prospective publication-time observer binding plus bounded admission/15sstablereadactualUUID assignment; synthetic deferred-admission/partial/failure tests first. No GPU repetition solely for monitoring.",
+  "budget": "programme23841GPU62345CPU/Ball17479GPU38344CPU; originalallcapsunchanged; no new GPU release",
+  "root_wait_backend": 11686,
+  "operator_backend": 75626,
+  "operator_state": "ended1",
+  "binding_retry_authorized": false
+}

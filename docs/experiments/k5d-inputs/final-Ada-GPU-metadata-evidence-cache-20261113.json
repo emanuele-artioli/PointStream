@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "cache_root": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/final-Ada-GPU-metadata-20261113-658ccbad",
+  "manifest_sha256": "04bafce70c42183d7cc819807fe3a3b5acae1cd9f34e880853bf936e06df6db3",
+  "file_count": 110,
+  "bytes": 465133,
+  "readonly": "files0444/directories0555",
+  "scope": "Exact accepted metadata and reviewed UNRUN launch candidates, mocked offline transport tests; no GPU qualification",
+  "all_source_bytes_rehashed_after_copy": true,
+  "scientific_source_archive": "See final-Ada-source-native-CPU-evidence-cache-20261113.json; unchanged ad635/source9d3d/env32e",
+  "CPU_proofs": "See final-Ada-actual-CPU-denial-evidence-cache-20261113.json and final-Ada-CPU-root-closeout-20261113.json",
+  "root_closeout": "final-Ada-GPU-metadata-root-closeout-20261113.json",
+  "current_spec": "658ccbad; unsubmitted and no longer whole-stage-feasible; preserve original deadline07:10:30UTC",
+  "GPU_job": null,
+  "observers_started": false,
+  "tests": {
+    "offline_mocked_fault_cases": 3,
+    "PASS": true,
+    "script_sha256": "670933c5225e191e146694dd5dc226d354c16de3f5142a15bc5969a1f7e18797",
+    "result_sha256": "682e25613712b14c7c90dce2c3bebe9f891051a8a3b385b6cbf520db5cf87298",
+    "CPU_seconds": 0.196678,
+    "CPU_cap_within_existing_admin": 5,
+    "limitation": "Mocked SSH Popen and process-birth provider; does not test actual transport, remote execution, CPU ceilings or GPU qualification."
+  }
+}

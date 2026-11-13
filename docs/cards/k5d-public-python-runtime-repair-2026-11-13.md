@@ -1,9 +1,12 @@
 # K5d: complete public Python runtime category repair
 
-Status: final-source native and actual SVT CPU gates are COMPLETE and root
-accepted. The original metadata helper remains failed after publication;
-its separate recovery and all previous failures are retained. Ada GPU witness
-900GPU/1100CPU is held pending exact metadata, forecast and observer review.
+Status: the repaired final-source16frame scientific receipt/pixel witness
+`d1bb8926` passed and root accepted all six receipts/native pixel joins. The
+original metadata helper failure and prior55dd failure remain retained.
+The operation failed before resource-observer binding; both journals remain
+UNBOUND/UNKNOWN. No complete-cost/span or scale gate passed. Future GPU stages
+remain resource-gated; see the [canonical continuation](../continuation-2026-11-13.md)
+and [scientific closeout](../experiments/k5d-inputs/ada-d1bb-root-scientific-closeout-20261113.json).
 
 ## Authority and fixed scope
 

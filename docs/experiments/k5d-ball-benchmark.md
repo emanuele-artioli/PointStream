@@ -1331,3 +1331,68 @@ ActualCPUc53fb111ONEwait backend46277 persisted; max300s; rootcontinuesindepende
 
 Rootaccepted actualfinalCPUdenial20261113T061438Z-c53fb111 afterfrozenverify_receipt+positivecpu_denial_approvalPASS .684397CPU. Approvedfullreceipt85a52c4a (7,312,372B), actual31source/publicruntime/profile/readset/spec/stagejoins,16framewire33e/native/YUV5c43/RGBe3c/allfiveerrno13; launcherpidfdSIGKILL9+scopedcleanup/controlalive,16births+2outer18PIDsgone/4groupsclear/correctFQDNCPUfileexists0allocations. Oneauditremote1.123757CPU; no native-active/unshare-only/fleetwatchdog/GPU/scaleclaim. FullproofimmutableNFS5bdc119c/real-CPU-denial.json0444/dir0555, uploadactual.247189CPUwithin100external. RootONEwait46277endedexit10attentionCOMPLETE/6seconds; noactivewait; eventb60f8a76c4ba5a99a11cb99c59d77506pendingACKafterfreshcanonicalstatus.
 ActualCPUeventb60f8a76c4ba5a99a11cb99c59d77506ACKed afterfreshcanonicalCOMPLETE/noerror. Both CPUqualificationsclosed; noactivejobwait. ActualCPUreadonlycache30files28,778,067B manifest2cea2e9a indexed; source/nativecache54files38,787,514B manifest69538dfb. Rootcloseoutfinal-Ada-CPU-root-closeout-20261113.json recordsactualproofs+currentcleanup-onlylimitations. GPU900/1100 remainsheld; independentlyreviewedforecast476.624732s<500 empiricalonly.
+
+Resourcewatcha10 ended0 06:32:00UTC/ninechecks; PID95846absent. Retain100CPU (38.04239remote+.533376SSH+.321879controllercounted). Rootreleases/precharges next100CPU fromAda188→88 forsameexactpassivea11watcher2b931 300scadence9ticks<=45min, noGPU/autosubmit/modeltimer. Programme22941G61045C/Ball16579G37044C; launchhandlepending.
+Passivea11 active backend87453/PID99739/deadline2026-11-13T07:19:52.695050+00:00; samewatcher2b931/nativechatwakeunverified; noLLMheartbeat.
+
+Root+independentreviewPASSmetadata50c28a/spec/cost476.624732<500 empiricalonly; rootreleases/prechargesmetadata50CPU/GPU0 frompubliccategory1120→1070 (future900GPU1050CPUwitnessstillheld+20buffer). Exactrelease+bundlemanifest at/private/tmp/pointstream-final-Ada-GPU-witness-plan-20261113/root-released-metadata50; freshSSDsourceextract9d3dad635 BEFOREconstructor, all6proof/assets sourcejoins, same55dd500/550/700caps. Remote39parent+query1/external10,230helperwall260transport; bootstrap+launchimplementationrootreviewbeforeexecution; noobserver/job/model/claimwrite. Programme22941G61095C/Ball16579G37094C.
+Metadata50ONEinvocation backend96680; exactrootreleased744de6b/bundle3738eefb/bootstrapfcb6b1e7/launcher41b0efa6 recorded atroot-released-metadata50. BootstrapfreshSSD9bd3b97d/39CPUcumulative+helper230wall/query1CPU, outer260; local3SSH2+external5 within50. Noobserver/job/model launched.
+
+Metadata50 backend96680 ended0; root accepts independently auditedmetadata only: actualspec658ccbad/rawf9745587/deadline07:10:30.537997UTC; helper1.306983CPU+.011588queryCPU/1.358676wall. Actual4files+7controls+boot+Python+source/proofassets PASS rawfeb599ea; no GPU/observer starts. Freshdoctorall6 at06:51:54UTC finds bothgpu6Ada98% foreignPIDs624056/624530 and gpu5bothbusy; priorpotentialidle superseded. Witness900GPU1050CPU remainsheld plus20CPUbuffer; chargedprogramme22941G61095C/Ball16579G37094C. No knowingly contended publication, no deadline extension. PR382 mergedCIgreen bfd1ac417; preserve frozen scientificae892 worktree.
+
+Rootseparatelyreleases/precharges150CPU/zeroGPU administrativeportion for freshdoctor/status/currentexactmetadata/operator+startREADYpreparation/audits; no actualobserver/campaign/GPUrelease underknowncontention. Newpubliccategoryreservation900GPU920CPU =held900GPU700campaignCPU200observerCPU+20CPUbuffer; metadata50+admin150fullyretained. Programme22941G61245C/Ball16579G37244C. No newuserallocation or capincrease.
+
+07:00UTC root closescurrentmetadata launchconsideration: remaining10m30s is alreadyshorterthan700campaign alone plusobserverstartREADY/solepublication; allrecent5minutechecksnoeligibleGPU. NoactualGPUjob/observersstarted and noGPUcharge. Preparednormalizedspeca41(rawf974+ONLYdeadline_epoch)/manifest584/operator3ea remainUNRELEASED/approvalfalse; independentfinalreviewPASS, localSSHdurablehandlefix11dc; frozenpublisher e71/2538 unchanged. Next cleanwindow needsNEWprospectivenonce/deadline metadata withsameae892source+acceptedCPUproofs; do notextend/replaycurrent658spec. Rootcloseoutfinal-Ada-GPU-metadata-root-closeout-20261113.json; nativecompletionwakeunverified/passivea11continuesuntilboundeddeadline.
+
+Rootoffline3transportfaultcasesPASS normal/timeout/spawnfailure on unchanged11dc, .070849self+.125829child=.196678CPU withhardparent1+3children1+external1<=5 withinadmin150; no actualSSH/GPU/model. MockedPopen+birthprovider/strictertestCPUlimit means no realtransport/CPUqualification. Exactmetadata/candidates/helpers/reviews/tests archived read-only 110files/465133B manifest04bafce70c42183d7cc819807fe3a3b5acae1cd9f34e880853bf936e06df6db3; trackedfinal-Ada-GPU-metadata-evidence-cache-20261113.json indexes it.
+
+07:08UTC NEWopportunity a11tick6 at07:05:14potentialidle gpu6Ada0/gpu5Ada0; rootprospectivelychargesNEW50metadata+150adminCPU fromunallocatedBall/programme, retainingoldceilings. Samec28helper/finalae892source/proofs/caps; freshnonce/timingonly underk5d-Ada-resource-window-refresh-2026-11-13.md. GPU900700campaign200observerheldunchanged; no replayof658spec. Newroot/private/tmp/pointstream-Ada-resource-window-20261113-new, freshdoctorall6+exacthelperreviewbeforeexecution. Programme22941G61445C/Ball16579G37444C.
+
+FreshmetadataONElaunchbackend65822; root+independentreviewPASS newreleasee158/bundle8ae719/bootstrap2cd/launchere01; helperc28/all6otherpayloadbytesunchanged, bootstraponlynewSSDnonce/releaseSHA, bounds39+1+10CPU230/260 retained. MetadataONLY, noobserver/GPU/model; sourceae8929d3dad635env32e/proofsunchanged. Actualintent/rootnonce/handlepersistedmetadata50/backend.json; inspectoutcomeneverreplay.
+
+Passiveresourcewatcha11wholebatch backend87453ended0 naturally07:15:08UTC/nineticks; PID99739absent; latesttick8rootrecorded. Retain100CPUceiling (.324296controller+.531167SSH/37.879615conservativeRemotecharge); newGPUcandidateappearedticks6/7/8. Noactivepassivewatch, no timer/autosubmit. Freshmetadata65822ended0:1.240751parent+.010179queryCPU/1.267020wall; newraw0608d72/canonical8cad58/deadline07:40:13.459716UTC/runccfb22af; GPU0currently5015MiB92%, GPU1idle1MiB0. BothobserverUUIDsretained; actualadmittedUUIDselectiononly. Awaitingphysicalaudit/candidatebindings; no actualGPUjobyet.
+
+RootRELEASES/prechargesONEnew8cadwitness900GPU700campaignCPU200observerCPU afteractualphysicalaudit97dc/manifest0d3a/configreview45b andfreshidleGPU1(07:19:45,no computeprocess,1MiB0%). Finalreadyconfigf831b0f671a6f264f66999e5d89438130c8dd2c310373c8cd49b2ac8db4e2cfd/release81acf2f8b9c9eadf514f96a47534ba8e3c8bb55b8de4147f486b020fa8b8d48a; same500namespace/550smoke/700campaign and476.6247forecast; complete1080slaunchboundfits07:40:13. Source9d3dad635env32e/proofsunchanged. Programme23841G62345C/Ball17479G38344C; publicreservation20CPUonly; no actualjobyet. Twoobserverstart->READY->solee71/2538publication/status/promptbind withoutLLMgap; no retry/scale. Rootreleasepaths persistedbeforestart.
+
+LocalstagefirstattemptFAILED beforeanyintent/Popen/SSH: CIpythonnopsutil. No remoteobserver/GPUjobstarted. Rootpreservesfailedlogs andrepairsONLYlocalbirthprovider tofixed/bin/ps hard1CPU2s (actualbirthsmokePASS outsidedefaultprocess-inspection sandbox), transportf8baa8fb/stagechain3b01369d; frozenremote/observer/publisher/scientificsourceunchanged. AddedafterREADY>=910s deadlineguard(operator210+campaign700) preventspublicationiflate. Existing150admin reserve covers2extra1CPUpsprobes; GPU/campaign/observer ceilingsunchanged, not retried. Exactrepairreviewbeforefirstrealstart.
+
+FirstactualstartREADYpublishchainbackend75626 persisted; exactlocaldependencyrepairf8baa/3b013 root+independentreviewPASS/actualpsbirthsmokePASS, correctedcontrollerCPUinside150admin. ExistingrootstageFAILEDimportlogs preserved; noearlierremoteaction. Newchainfirstrealstart, bothobserversREADY->frozenpublisherwithoutLLMgap, >=910safterREADYguard, no replay/cancel/scale. ActualIDmustreadfromroot-GPU-release/operator-chain-output/sole-actual-job.json beforejobaction; no inventedID. Resourcewatcha11ended0/nineticks, noactivepassivewatch.
+
+ACTUALSOLEJOB 20261113T072420Z-d1bb8926 publishedcanonicalspec8cad/source9d3d/archivead635/env32e; IDdurablebeforestatus, initialcanonicalpending. Rootstage75626ended1: remotehelper15srequestvisibilityalarmexpired BEFOREactualrequestread/assignment/frozenbind. No bindingreplay. Actualjobmaystillrun; inspectcanonicalstatus thenONEboundedfleetwait. Observerwrappersstillactive/unbound; preserveall, no reselection/qualityPASS. SolepublicationNOTreplayed; alreadyprecharged900GPU700campaign200observerCPU retained.
+
+Freshcanonicalstatus of ACTUAL20261113T072420Z-d1bb8926 confirmsRUNNING/exclusivegpu6Ada1 UUIDef96fc4f, supervisor797194/campaign797203; smokeinprogress, scientificoutcomeUNREAD. Old15srequestbindingcontrollerFAILED beforeassignment/bind; observersremainunbound, no replay. RootpersistsONEfleetwaitcontractmax1100sec beforewait. Programme23841G62345C/Ball17479G38344C charged, no extraGPUallocation.
+
+BEFOREANYscientificoutcomeread rootfreezes narrower interpretation ada-d1bb-pre-outcome-scope-decision-20261113.json: actuald1bb runningAda1; unchanged originalnative/decoder/PID/source/device/validator checks mayyield scientificallyuseful qualification if COMPLETE0/no contention/no pauses/allactualhashjoins pass. EntiretimingcardNOTPASS, operatorFAILED/observersUNKNOWN remain; no livejoin/reservationduration/actualfullcostinferredfromceilings; no bindingreplay. Fullregisteredscale remainsresource-gated, prospectivequeueprotocol mustbindpublishedIDbeforeadmission andboundactualrequestread/assignment separately. NoGPUrepetitionpurelyforobserverfailure. ONEfleetwait11686 active max1100s; actualsourceoutcomesUNREAD.
+
+Rootprospectivelyallocates500CPU/zeroGPU fromunallocatedBall/programme forqueue-admissionclientbuild+syntheticoracles+requiredchecks underk5d-queue-admission-client-2026-11-13.md; samePLANBallitem. Addminimalcanonicalps-fleetwait admissioncondition(defaultunchanged), earlypublishedIDbindthenboundedwaitthen15sactualrequestread/UUIDassignmentbeforeoutcomeinspection. Nocurrentd1bbreplay/worker/servercontrolchanges/newGPUrelease. Programme23841G62845C/Ball17479G38844C; scaleheld.
+
+
+### Actual d1bb closeout — scientific receipt/pixel PASS, operational FAIL
+
+Root accepted `20261113T072420Z-d1bb8926` under the narrower scope fixed before
+outcome inspection. All six16frame fresh receiver receipts/native pixel joins
+pass on frozen ae892/9d3d/ad635/env32e, gpu6 Ada1 UUIDef96fc4f (capability8.9).
+The audit hashed80 publication members and joined66 checkpoint files. Actual
+stored spec raw SHA76aac233 differs from constructor raw0608d72; both normalize
+to canonical8cad58. The first controller failed before observer binding;
+UNBOUND/UNKNOWN journals prove no complete resource span or full-cost/scale gate.
+Current observed campaign/process/group/claim cleanup does not prove historical
+release timing. No binding/publication replay or GPU repeat is authorized by
+this closeout. PR383 merged ca8db290 with passing checks; it is client-only and
+installs no server controller. Programme23,841GPU/62,845CPU; Ball17,479GPU/38,844CPU
+charges remain retained. See [root scientific closeout](k5d-inputs/ada-d1bb-root-scientific-closeout-20261113.json) and [read-only cache index](k5d-inputs/ada-d1bb-scientific-evidence-cache-20261113.json) for exact hashes and raw evidence.
+
+
+Observer phase is now closed: the original wait 52306 ended with exit 0 after 1,802s;
+both journals contain 63 events / 60 samples, zero bound events, and final UNKNOWN
+reason deadline. Both wrapper remaining groups are empty. The scientific cache
+index references a separate immutable final-journal supplement; resource/span
+acceptance remains false. Root separately charged 300 CPU for the build-only
+[calibration-cap revision](../cards/k5d-Ada-calibration-budget-revision-2026-11-13.md). Old 580s admission fails at 1072.167382s;
+no affine subtraction is supported. Prospective 1200/1220/1800s bounds require new
+source qualification and release. Full 30-clip feasibility is unestablished, not
+precluded by mistaking charged totals for the Ball 64,800 GPU / 72,000 CPU limits.
+Current charges: programme 23,841 GPU / 63,145 CPU; Ball 17,479 GPU / 39,144 CPU.
+
+
+Passive resource watcher a12 started 2026-11-13T07:59:17.604752+00:00; owned PID 8649, backend41965, deadline 2026-11-13T08:44:17.604642+00:00. Checks gpu2/gpu3 A6000 and gpu5/gpu6 Ada every300s for ONE45minute window, no submission/cancel/replay. Source helper2b931e unchanged, watch-onlyspeca8124901 peak32000MiB. Full100CPU/zeroGPU charged from unallocated Ball headroom (oldholds/charges retained). Current programme23841G63245C/Ball17479G39244C. Receipt /private/tmp/pointstream-resource-watch-20261113-passive-a12/run/receipt.json; native completion wakeupUNVERIFIED, no recurringLLMtimer. Inspect existing handle/results at deadline; never replay this launch.

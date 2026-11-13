@@ -1,0 +1,93 @@
+{
+  "Ball_charged": {
+    "CPU_seconds": 39144,
+    "GPU_seconds": 17479
+  },
+  "actual_stored_spec_raw_sha256": "76aac2334c70aa91999199f5369524c2f12ec392a2ba9ba369b6e426abc4264d",
+  "cache_index": "docs/experiments/k5d-inputs/ada-d1bb-scientific-evidence-cache-20261113.json",
+  "canonical_spec_sha256": "8cad58d154f3839eff2920a8529fb42921cef2b71a7b65c7bb8db391b312ce22",
+  "cleanup_scope": "CURRENT post-job observations only; no historical reservation/release-time bound",
+  "client_PR383": {
+    "merge_revision": "ca8db2902d3c352cd2b4025d056263a61a352d29",
+    "scientific_source_unchanged": true,
+    "state": "MERGED; checks PASS"
+  },
+  "complete_cost_or_span_proved": false,
+  "config_sha256": "6b3d8c5f317f14d2f4e78cb1c03bbfd166f44164cdd86c4035111d563e9d51fd",
+  "constructor_spec_raw_sha256": "0608d72de771be30360c84c15b46f4a28bbe8414336e0da9885f5282c1042698",
+  "corrected_cost_design_supplement": {
+    "affine_fixed_subtraction_supported": false,
+    "budget_correction_sha256": "0f45279a60958569c7ba1cf59011c88c9e3a6ce00761642616187d671e104031",
+    "budget_snapshot_note": "Corrected cost report predates the subsequent300CPU build-only calibration-cap revision charge; current charged totals are in this index/ledger.",
+    "bytes": 12783,
+    "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/ada-d1bb-cost-design-20261113",
+    "corrected_report_sha256": "1e814aa7528d8f94dc92067e6ec24c60e5b91eee91f5a2b64591a38e872e2b99",
+    "files": 2,
+    "full30_feasibility": "UNESTABLISHED; conditionally plausible within actual Ball64800GPU/72000CPU limits; charges are not limits; complete calibration/projection required",
+    "manifest_sha256": "c83412c69cc062f6d93786bc47e843d21213c940c24d39cbba52427b5ed4ffff",
+    "old_580_gate": "FAIL: 1.5 * 3 * 227.14830708503723 + 50 = 1072.1673818826675 > 580"
+  },
+  "device": {
+    "capability": [
+      8,
+      9
+    ],
+    "name": "NVIDIA RTX 6000 Ada Generation",
+    "uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553"
+  },
+  "event_ACK": "Root-owned, pending canonical status review at this closeout; this builder made no ACK",
+  "execution_identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "ad635b0b46428a3fa934081ded5d2b408c453bc5f7e46854dd8b8eb0c6abbea9",
+    "source_sha256": "9d3d7b2c6ec0fd99466ae3592345795a4916e982fdee3924a9749b83a81b39da"
+  },
+  "fullscale_passed": false,
+  "future_gate": "Future queue-safe operator resource join and complete cost/scale evidence are required; no current publication/bind replay or extra GPU execution is authorized.",
+  "hashed_publication_members": 80,
+  "job_id": "20261113T072420Z-d1bb8926",
+  "manifest_sha256": "c191aaca98fcbccfe96a26f4014de0f87b7819ce5a94e72ce8883f93c268665b",
+  "next_build_only_card": "docs/cards/k5d-Ada-calibration-budget-revision-2026-11-13.md",
+  "observer_final_supplement": {
+    "batch_wait": {
+      "backend": 52306,
+      "natural_seconds": 1802,
+      "returncode": 0
+    },
+    "bytes": 78614,
+    "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/ada-d1bb-observer-closeout-20261113",
+    "files": 5,
+    "manifest_sha256": "2014ccd190c84d2cf5718af3cdf6f426780090dd38064081ceba4f3c4ec68258",
+    "observers": {
+      "bound_events": 0,
+      "each_events": 63,
+      "each_samples": 60,
+      "final": "UNKNOWN, reason deadline",
+      "remaining_group": []
+    },
+    "resource_acceptance": false
+  },
+  "operational_status": "FAIL: published job was not bound to either resource observer; observers UNBOUND/UNKNOWN",
+  "pre_outcome_scope_decision_sha256": "705364ee497beb6b873c61b53d8701a6906a119814dd7cb5647533ca3b7fcbd5",
+  "programme_charged": {
+    "CPU_seconds": 63145,
+    "GPU_seconds": 23841
+  },
+  "publication_NFS": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261113T072420Z-d1bb8926/smoke/published.tar",
+  "publication_bytes": 531200000,
+  "publication_sha256": "c316a32dd528d8723dbd317a641dc66d89ca44eacf5a0cbf8c690ca6a86ffd80",
+  "reference_limit": "actual frozen validator PASS; code reviewed, reference data not fetched independently",
+  "report_sha256": "edcd5ae39f27fc9bd63ce9fdd7b5ba308b8d53054adda6137ddba0d2d7fa689d",
+  "resource_gate_passed": false,
+  "root_accepted_scope": "PASS_SCIENTIFIC_RECEIPT_AND_PIXEL_AUDIT_ONLY",
+  "root_decision": "Root formally accepts scientific receipt/pixel qualification ONLY after independent report/supplement/actual gate/spec/cleanup review; pre-outcome narrowing preserved.",
+  "schema": 1,
+  "server_controller_installed": false,
+  "shared_proof_cache_indices": [
+    "docs/experiments/k5d-inputs/final-Ada-source-native-CPU-evidence-cache-20261113.json",
+    "docs/experiments/k5d-inputs/final-Ada-actual-CPU-denial-evidence-cache-20261113.json"
+  ],
+  "six_frozen_receiver_receipts_and_native_pixels_pass": true,
+  "source_revision": "ae892df1cbb2b8c28eb413187effc28d70b74326",
+  "supplement_sha256": "4bb2608822cb5d74afdf0b80fbb3a8da05f8805d02ba5cbdf2102a1ae73e4e72",
+  "verified_checkpoint_files": 66
+}

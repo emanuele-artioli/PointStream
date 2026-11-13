@@ -1,8 +1,10 @@
 # K5d: registered-study Ada source profile
 
-Status: code and tests only. No research compute or qualification is released.
-This implements the existing PLAN Ball confirmation goal on another available
-GPU class within the unchanged research-first programme.
+Status: the Ada source profile is merged and frozen at `ae892df1`.
+Both final-source CPU gates and the six-point 16-frame scientific receipt/pixel
+qualification `d1bb8926` are root accepted. Its resource-observer operation
+failed, so complete-cost calibration and registered-scale release remain held.
+The [canonical continuation](../continuation-2026-11-13.md) records scope and evidence.
 
 ## Goal and nontransferable evidence
 

@@ -2335,6 +2335,88 @@
       "cpu_seconds": 365,
       "basis": "RootacceptedNEWnativecc884proof5f89/exactfinalae8929d3dad635env32e/config6b3d/bridge0c3c; ONEactualnormalSVTpixel+fiveerrno13+initiallauncherkill/scopedteardown, unchanged265campaign+100external; no GPU/native-active/fleetwatchdog/scale claim",
       "release_stage": "research-first24/28-final-Ada-actual-CPU"
+    },
+    {
+      "phase": "ball-passive-resource-watch-a11-20261113",
+      "parent_phase": "ball-ada-scale-and-denial-20261112",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 100,
+      "basis": "Userregularresourcechecking; samewatcher2b931 exactfreshnonce root,4hosts300scadence9ticks<=45min,80counted20external/SSHserverunmetered; a10ended0ninechecks/PID95846absent; noGPU/models/claims/autosubmit",
+      "release_stage": "research-first24/28-bounded-passive-resource-monitoring"
+    },
+    {
+      "phase": "ball-final-Ada-witness-metadata-20261113",
+      "parent_phase": "ball-complete-public-Python-runtime-repair-20261113",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "basis": "Root+independentreviewPASS exactc28a metadatahelper; sourceSSDcopyextracttree9d3d beforeconstructor; actual6assets/spec55ddonly4bindings+deadline;39parent+1query+10external,230helper260outerwall; metadataONLY/NOobserversorGPUrelease",
+      "release_stage": "research-first24/28-final-Ada-witness-metadata"
+    },
+    {
+      "phase": "ball-final-Ada-GPU-witness-admin-20261113",
+      "parent_phase": "ball-complete-public-Python-runtime-repair-20261113",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 150,
+      "basis": "Rootaccepts actualmetadata independentlyaudited; bounded observer/operator admin preparation inclfreshdoctor/status and optionalexactreviewed launch chain, prechargedentire150; NOobserver/campaign/GPUrelease whileknownbusy; exactcurrentmetadata expires07:10:30UTC; no replay/extension",
+      "release_stage": "research-first24/28-final-Ada-GPU-witness-admin"
+    },
+    {
+      "phase": "ball-Ada-resource-window-refresh-20261113-metadata",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "basis": "Rootprospectiverelease aftera11tick6 reports07:05:14potentialidlegpu6Ada0; NEWfreshnonce/deadline metadata andadministration, sameae8929d3dad635env32e/config6b3d/native5f89/CPU85a/bridge0c3c/c28metadatahelper; retainallold50+150charges; withinunallocatedBall/programme; noGPU/observerexecutionauthority",
+      "release_stage": "research-first24/28-resource-window-refresh",
+      "card": "docs/cards/k5d-Ada-resource-window-refresh-2026-11-13.md"
+    },
+    {
+      "phase": "ball-Ada-resource-window-refresh-20261113-admin",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 150,
+      "basis": "Rootprospectiverelease aftera11tick6 reports07:05:14potentialidlegpu6Ada0; NEWfreshnonce/deadline metadata andadministration, sameae8929d3dad635env32e/config6b3d/native5f89/CPU85a/bridge0c3c/c28metadatahelper; retainallold50+150charges; withinunallocatedBall/programme; noGPU/observerexecutionauthority",
+      "release_stage": "research-first24/28-resource-window-refresh",
+      "card": "docs/cards/k5d-Ada-resource-window-refresh-2026-11-13.md"
+    },
+    {
+      "phase": "ball-Ada-resource-window-witness-20261113",
+      "parent_phase": "ball-complete-public-Python-runtime-repair-20261113",
+      "workstream": "ball",
+      "gpu_seconds": 900,
+      "cpu_seconds": 900,
+      "basis": "Root+independentreviewPASS actual8cad/raw0608/metadata+source9d3d/ad635/env32e/native5f89/CPU85a/config6b3d; finalGPU1idle noforeignprocess; completewall1080fitsremainingdeadline07:40:13; ONE700campaign+200observerCPU andGPU900. TwoREADYfreshabsent->solee71/2538publishstatusbindactualUUID; no replay/retry/scale",
+      "release_stage": "research-first24/28-resource-window-witness",
+      "card": "docs/cards/k5d-Ada-resource-window-refresh-2026-11-13.md"
+    },
+    {
+      "phase": "ball-queue-admission-controller-build-20261113",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 500,
+      "basis": "RootprospectivelyallocatesfromunallocatedBall/programmeforminimalqueuecompatibleclientwaitcondition+earlypublishedIDbindingcontroller and syntheticfailuretests/localrequiredchecks; currentd1bbnotreplayed, no remoteGPU/model/sourcequalification change",
+      "release_stage": "research-first24/28-queue-admission-client-build",
+      "card": "docs/cards/k5d-queue-admission-client-2026-11-13.md"
+    },
+    {
+      "phase": "ball-Ada-calibration-budget-build-20261113",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 300,
+      "basis": "Rootprospective local-only minimal1200namespace/1220full/1800campaign calibration budget guard revision and requiredchecks; conservativeformula unchanged, ae892 frozenoldgateFAIL retained; no remote/sourcequalification/GPU release",
+      "release_stage": "research-first24/28-calibration-budget-revision-build",
+      "card": "docs/cards/k5d-Ada-calibration-budget-revision-2026-11-13.md"
+    },
+    {
+      "phase": "ball-passive-resource-watch-a12-20261113",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 100,
+      "basis": "Rootreleasesone45minute5minpassivewatch acrossgpu2gpu3gpu5gpu6 fromunallocatedheadroom; 80countedworkload+20externalreserve, noGPU/model/submission/cancellation; prioracceptedwatchaccountinglimitsretained",
+      "release_stage": "research-first24/28-resource-watch-a12",
+      "card": "docs/cards/k5d-Ada-resource-window-refresh-2026-11-13.md"
     }
   ],
   "reservations": [
@@ -2946,8 +3028,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28-denial-and-scale-preparation",
       "gpu_seconds": 3218,
-      "cpu_seconds": 188,
-      "status": "Remaining_unspent; passivea10 metadata watcher100CPU released/precharged; no GPU request/scale/newsource release"
+      "cpu_seconds": 88,
+      "status": "Remaining_unspent; passivea11 metadata watcher100CPU released/precharged; no GPU request/scale release"
     },
     {
       "phase": "ball-svt-only-confirmation-feasibility-20261113",
@@ -2980,9 +3062,9 @@
       "phase": "ball-complete-public-Python-runtime-repair-20261113",
       "workstream": "ball",
       "release_stage": "research-first24/28-complete-public-Python-category",
-      "gpu_seconds": 900,
-      "cpu_seconds": 1120,
-      "status": "Remaining_unspent; finalsourceactualCPU365COMPLETErootaccepted; GPU900/1100CPUheld plus20buffer; no scale release",
+      "gpu_seconds": 0,
+      "cpu_seconds": 20,
+      "status": "Remaining_unspent20CPUbuffer only; ONEnew8cadGPU900/campaign700CPU/observers200CPUwitness released/precharged afterfinalphysical+review+idleGPU1; no retry/scale",
       "card": "docs/cards/k5d-public-python-runtime-repair-2026-11-13.md"
     },
     {
@@ -5685,6 +5767,29 @@
       "cpu_ceiling_seconds": 365,
       "source_archive": true,
       "root_approval_sha256": "85a52c4abaa369f515f081ffefa784740b555663e160e6659eac376e67ddb5f0"
+    },
+    {
+      "job_id": "20261113T072420Z-d1bb8926",
+      "phase": "ball-Ada-resource-window-witness-20261113",
+      "state": "COMPLETE0; original six isolated decoder/native pixel checks independently PASS; scientific receipt/pixel qualification ACCEPTED; operator binding FAILED before request visibility, observers UNBOUND/UNKNOWN; full-scale resource/cost gate remains open",
+      "revision": "ae892df1cbb2b8c28eb413187effc28d70b74326",
+      "source_sha256": "9d3d7b2c6ec0fd99466ae3592345795a4916e982fdee3924a9749b83a81b39da",
+      "snapshot_sha256": "ad635b0b46428a3fa934081ded5d2b408c453bc5f7e46854dd8b8eb0c6abbea9",
+      "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "spec_sha256": "8cad58d154f3839eff2920a8529fb42921cef2b71a7b65c7bb8db391b312ce22",
+      "deadline": "2026-11-13T07:40:13.459716+00:00",
+      "host": "gpu6",
+      "gpu_uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+      "gpu_ceiling_seconds": 900,
+      "cpu_ceiling_campaign_seconds": 700,
+      "cpu_ceiling_observers_seconds": 200,
+      "controller_backend": 75626,
+      "controller_binding": "UNKNOWNexpiredwithoutactualbind, cannotclaimlivejoins",
+      "no_resubmission": true,
+      "stored_normalized_spec_raw_sha256": "76aac2334c70aa91999199f5369524c2f12ec392a2ba9ba369b6e426abc4264d",
+      "constructor_request_raw_sha256": "0608d72de771be30360c84c15b46f4a28bbe8414336e0da9885f5282c1042698",
+      "scientific_audit_local": "/private/tmp/pointstream-Ada-resource-window-20261113-new/scientific-audit/report.json",
+      "resource_claim_scope": "no live-join/reservation-span/actual complete-resource-cost acceptance; charged ceilings retained"
     }
   ],
   "old_budgets": "closed, not borrowed",
