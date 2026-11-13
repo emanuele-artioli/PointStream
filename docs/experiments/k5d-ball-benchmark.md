@@ -1605,3 +1605,41 @@ RootprospectivelyRESERVES(notspends/releases) new600GPU2000CPU fromunallocatedBa
 Failedcleanup29077 COMPLETE0/ROOTaccepted: exactsource/archive/spec/staticcontrol+requestclaimdispatchassignedUUID joins; actualownsharedtoken+FQDNCPUtokenabsent;2capturedsupervisor/campaignPIDsabsent/1groupempty/currentcapturedGPUrowsnone. Afterworker1470412/birth562919381 controls/PATH/limits/cache/errorunchangedexceptCPU. ModelPIDnotindependentlycaptured; before_models traceback excludeslearnedmodelinference butGPUcontextusageUNKNOWN, no quality/fullruntimeUUID/span/scaleclaim. ROOTfailurecleanup582bb6447ec3104d7f802d86edc1cf2e831b3a81b775cf1e267f6145050e0778; thinindex svt-7a9f-c6b01236-failed-shared16-20261113.json. FailedterminalACKpending, prospectivereassign15CPUfromunexecutedcompletion82 forfreshstatus/events/solefailedACK, existing848totalunchanged.
 
 FailedterminalACK63255COMPLETE0 afterfreshFAILED/exit1/gateunset/UUIDef96+exactlocalrecordsource/archive/spec checks; ONLY7c0c1189bc545d2082bd6846b4331f40 ACKed, othersretained. Scope15CPU fromunexecutedcompletion82 alreadycharged848; no newdebit. ROOTreviewed4linefix93ebb351 andstrictcap-order/failuretests; configuredRuff/mypy/focused23 passed, full2318PASS41skip1sandbox-psfailure preserved+thatsolecasepassedoutside. MinimalNEWscientificcandidatea71dc6e27743efaa4fb5bbe2e8c8b387ae51ba02 parentEXACT7a9f, patchSHAda80bed4543021b45eb063fd9765ae4f85674ea5558f8a8692a917ef0fc42eb9 byteidenticaltoPR393,31grantsunchanged, focused23PASS, branchpushed/checkoutclean. Candidateimmutable, noarchive/config/bridge/runtimeyet. PR393CIpending/auto-merge; PR392mergedCIgreen652dddc6. Rootnewdocsbranch codex/pointstream-shared-ada16-pilot-20261113 from9eb ff652.
+
+PR393 fullCI SUCCESS12:00:47UTC mergedc4ab531a837bbd0c271a2b06455a780bc8f5866c; rootaccepts minimala71 identicalpatch asCI-supportedscientificcandidate, runtimeUNQUALIFIED. Sourceprep100FALSEpackage+native288/denial430FALSEtemplates beingprepared independently; no component/GPUrelease. Failedphase4e4542e7 pushedPR394 auto-mergeenabled; source/cleanup/nextcardcontinuation preserved. Latestinspecteda17tick1 at11:59:38UTC noidle.
+
+ROOTreviewedqualifiedsourceprepminimaldiff+mapping/grantguard/100fullforecast; releasesandprecharges100CPU/GPU0 fromnew2000hold forsourcefreeze/cache/physical ONLY. Sourcea71 immutable/CI393green, all31grantsunchanged/configidentityonly. NewROOTrelease3b0e67990b144f529a4eac37edcc2e7711c05ccafd16cb67b469be869338b65a /helper93eb4f77, freshprepdeadline2026-11-13T12:42:39+00:00. Hold1900CPU600GPU; freshnative288/CPUdenial430/pilot848/334reserveUNRELEASED. Native/denialtemplate hashes UNRUN; actualfuturejobsspecmustnormalizevalidatedreturn andfreshdeadline (notstalesourcepreptemplateprediction).
+
+
+Current repair cost repartition (no new charge/reservation-size change): the
+complete 2000 CPU/600 GPU envelope is qualification1012 CPU (sourceprep100
+already charged + fresh native327 + actual CPU-denial585), real16 848 CPU/600
+GPU, and reserve140 CPU. Remaining hold stays1900 CPU/600 GPU. Revised prices
+include complete local/Git/SSH/remote-Python/doctor/probe/tar, staging/publication,
+monitoring, artifact/proof/ACK callers; no costs are hidden in the scientific cap.
+Source a71 is frozen as source bb717/archive e051/config 5fc. Root approved source
+bridge1f371bd75240924632204be5bb94b8717b403131d7b3c82fdc70f9714a7fc622 after
+all2001 tree hashes, the two-file delta and unchanged31 grant joins. Cache
+approval is pending; no remote cache action has run. Native327, denial585 and
+real16 remain UNRELEASED. PR393 merged12:01:22UTC; PR394 merged12:09:48UTC.
+
+Only after an actual real16 pass, consider one opt-in SVT study port covering48
+and registered full clips together: qualify one final source, use a real48
+three-point/full-metric cost oracle, then the fixed full-context game9/Clip5(292)
+and game10/Clip12(586). All30 clips remain conditional on complete costs and
+programme/Ball headroom. No quality-selected fallback, six-point-default,
+metric/judge/exposure/absence/serialized-byte/receiver-rule change or adapter
+release is authorized now. Parts stay within45min; negative outcomes are retained,
+with no speed/span/scale, training or manuscript claim. A17 tick3 at
+12:09:36.452411UTC reports no idle candidate; monitoring's latest inspected tick
+was updated from the stored summary, without a new query, watch or charge.
+
+Cache71660 COMPLETE0 sourcebb717/e051/config5fc/bridge1f371: NEWimmutable cache21ce0d1c3889c197bc1e714ee475c846, seven0444files/0555directory, readbackhashesPASS, oldarchiveunchanged, localSSDreconstruction/nochildren,0.5663remoteCPU/9.383wall. ROOTauthorizes one read-onlyphysicalaudit contract27bd70f9a6ef230cf84f01f9988ead46cf9ec4c1d993391fb7f1aee3bac3222e request6ac03a4cca3b6ce01df33120f47a5c45980570d32b250ddb4c6f0eace6565c34 withinprechargedsourceprep100; no native/CPUproof/model/GPUauthority.
+
+ROOTsource-onlybridge1f371bd7 approved after independent2001treehashcomparison exacttwofile7a-to-a71 delta/all31grants+nonidentityconfig unchanged. NEWsealedcacheonepublication releasedwithinprechargedsourceprep100; approvedcontractaf00d401868729f1140e9346d47936dfcbe9ac0031dead39f9104d1ecabe092e, release36f4d80415e2c1da7f25def372339dcb61b1a653df4334e0e0bb26d64bcaaf54, wireb6512f89ac73161b88cb59bbaac6bdea850b3cb306d52eb6bf8a074955040af7, manifest0596804b7c7576bb3c8f735eb28a8d92b4cb83256b672cc966dc1bf591fb9927. Metadata20remote+3local+2SSH; no job/model/GPU/native/CPUproofrelease; no replay on unknown. Transportoutput /private/tmp/pointstream-SVT-a71-source-preparation-UNRUN-20261113/cache-transport-a71-ROOT-v1.
+
+Cachepublicationa71 backend71660 running; no fleetjobexists/submitted. Preserve cachetransport intent/handle; inspect existing output on loss, never replay.
+
+Cache71660 COMPLETE0 sourcebb717/e051/config5fc/bridge1f371: NEWimmutable cache21ce0d1c3889c197bc1e714ee475c846, seven0444files/0555directory, readbackhashesPASS, oldarchiveunchanged, localSSDreconstruction/nochildren,0.5663remoteCPU/9.383wall. ROOTauthorizes one read-onlyphysicalaudit contract27bd70f9a6ef230cf84f01f9988ead46cf9ec4c1d993391fb7f1aee3bac3222e request6ac03a4cca3b6ce01df33120f47a5c45980570d32b250ddb4c6f0eace6565c34 withinprechargedsourceprep100; no native/CPUproof/model/GPUauthority. Physicalbackend80318 running.
+
+Physical80318 COMPLETE0/read-only raw2fcfc97bee59bf8ad8fd7d27ed438a486867da0a312dae1cb5c83ee920f7341c; allsevenexacthashes/inventory/modes/stabilityPASS, configidentityonly/all31unchanged. ROOTaccepts cache21ce sourcebb717/archivee051/config5fc/bridge1f371; acceptance3f534c56a2d796931d4bf3ebfd96cb3d10a4cff64c9abcff691ceff7d965045b at/private/tmp/pointstream-SVT-a71-source-preparation-UNRUN-20261113/source-cache-acceptance.ROOT-APPROVED.json. Sourceprep100closedfullcharge(noCPU/GPUqualificationtransfer). Freshnative327/CPUdenial585/one16pilot848/140reserve stillUNRELEASED.

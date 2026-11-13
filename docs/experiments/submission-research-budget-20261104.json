@@ -2653,6 +2653,13 @@
       "gpu_seconds": 0,
       "cpu_seconds": 100,
       "basis": "ProspectiveROOTbounded next45min passivehardwarewatch/300s/max9ticks, onlyafter a16 terminalreceipt+ownedPIDabsence verified. Reuseexact2b931eb5 watcher; no model/GPUclaim/auto-submit/LLMtimer, nativecompletionresumptionunverified. Inner80CPU+20externalreserve, SSHserver/loginaggregateunmeteredhonestly. No capincrease."
+    },
+    {
+      "phase": "ball-svt-a71-sourceprep100-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 100,
+      "gpu_seconds": 0,
+      "basis": "ROOTreviewedminimaldiff toqualified7a freeze/cache: fixeda71,configexecutionidentityONLY/all31grantsunchanged/newsealedcache. PR393CIgreen+c4abmerge, sourcepatchda80identical. Completefreeze50/cache25/physical9/review16=100. Native+CPUdenial+GPUallUNRELEASED; no proofreuse. Exactsourcefreezehelper93eb andsourcepreprelease3b0e67990b144f529a4eac37edcc2e7711c05ccafd16cb67b469be869338b65a"
     }
   ],
   "reservations": [
@@ -3332,8 +3339,8 @@
       "phase": "ball-svt-shared16-real-context-repair-20261113",
       "workstream": "ball",
       "gpu_seconds": 600,
-      "cpu_seconds": 2000,
-      "status": "Remaining_unspent; PROSPECTIVE newsourceCPUqualification+ONEreal16startup-memory repair only. NO compute release until exactsource/CI/card/fullstageforecasts reviewed. Priorfailedc6b neverreplayed. No quality-rule/decodergrant changes.",
+      "cpu_seconds": 1900,
+      "status": "Remaining_unspent1900CPU/600GPU unchanged; qualification1012CPU=sourceprep100 alreadycharged+freshnative327+actualCPUdenial585. Real16 848CPU/600GPU andreserve140CPU remainUNRELEASED; completeenvelope2000CPU/600GPU. Sourcea71 frozenbb717/archivee051/config5fc; sourcebridge1f371bd7 ROOTapproved, metadata-cachepublication71660/physicalaudit80318 running, physicalacceptancepending. Completecallercosts included; no charge or numerical reservation change.",
       "card": "docs/cards/k5d-svt-memory-context-repair-2026-11-13.md"
     }
   ],
@@ -6239,10 +6246,10 @@
     "latest_inspected_completed_tick": {
       "candidates": [],
       "controller_cpu_reserve_seconds": 2,
-      "finished_utc": "2026-11-13T11:54:37.424577+00:00",
-      "remote_worst_case_charge_seconds": 4.255368000000001,
-      "ssh_waited_children_cpu_seconds": 0.056362999999999996,
-      "tick": 0
+      "finished_utc": "2026-11-13T12:14:43.033859+00:00",
+      "remote_worst_case_charge_seconds": 21.088805,
+      "ssh_waited_children_cpu_seconds": 0.577175,
+      "tick": 4
     },
     "previous_monitoring_snapshot": {
       "state": "Activea5passive5min45minwatch100CPUprecharged;priora4endedverified;noautosubmit/modeltimer",
