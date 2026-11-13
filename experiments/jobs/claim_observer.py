@@ -388,7 +388,8 @@ def main() -> None:
             or not cfg['gpu_uuid'].startswith('GPU-') or not local_mount(args.output.parent)
             or not local_mount(Path(cfg['binding_file']).parent)
             or socket.gethostname().split('.')[0] != cfg['host'] or cfg['max_samples'] < 1
-            or cfg['max_samples'] * (cfg['poll_seconds'] + cfg['read_timeout_seconds'] + 4) > 2700 or cfg['poll_seconds'] < 2
+            or cfg['max_samples'] * (cfg['poll_seconds'] + cfg['read_timeout_seconds'] + 4)
+            + 2 * (cfg['read_timeout_seconds'] + 4) + 10 > 2700 or cfg['poll_seconds'] < 2
             or not 0 < cfg['read_timeout_seconds'] <= 10 or cfg['max_gap_ns'] <= 0
             or cfg['cpu_seconds'] <= cfg['parent_cpu_reserve'] + 1 or cfg['parent_cpu_reserve'] < 1
             or len(os.sched_getaffinity(0)) != 1
