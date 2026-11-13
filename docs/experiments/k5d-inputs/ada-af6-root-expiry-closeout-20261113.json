@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "job_id": "20261113T030323Z-af6c09da",
+  "status": "EXPIRED_UNASSIGNED_NO_EXECUTION",
+  "root_accepted": true,
+  "audit_summary": {
+    "path": "/private/tmp/pointstream-real-claim-observer-prep-20261113/expired-job-audit-summary.json",
+    "sha256": "d41658655059c8f4d51cfb6e01842c8ad10861dc8b5e079c079d1af764e0e52a"
+  },
+  "raw_audit": {
+    "path": "/private/tmp/pointstream-real-claim-observer-prep-20261113/expired-job-physical-audit.json",
+    "sha256": "892fa9d500724f7951bcbcf41bae079ea97befa467613050582d0511356c889c"
+  },
+  "released_unspent_GPU": 900,
+  "released_unspent_campaign_CPU": 700,
+  "retained_CPU_including_prior_preparation": 400,
+  "observer_batch_backend": 66293,
+  "observer_status": "Existingread-onlyobserverscontinue;noGPUclaimtobound/assignedUUID;no productionreservationqualification",
+  "scope_limit": "No scientificGPUwork, quality or scale result. No replay."
+}

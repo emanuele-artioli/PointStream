@@ -5,7 +5,113 @@ The [budget ledger](experiments/submission-research-budget-20261104.json) is the
 accounting authority; [Ball journal](experiments/k5d-ball-benchmark.md) retains
 chronology and raw-result references. Times below are UTC.
 
-## Current accepted CPU gates and stop (UTC)
+## Current A2 failure and preserved continuation (UTC)
+
+### A2 failure audited; public-runtime diagnostic released (UTC)
+
+Root closed `20261113T033048Z-1461dd9d` as a failed GPU witness on gpu6 Ada.
+All six native encode/standalone decode preparations completed, but the first
+restricted DCVC receiver failed importing public `torch/testing/__init__.py`:
+config `f826` omitted that runtime module. No accepted receiver receipt,
+end-to-end point, quality comparison or scale gate follows. Both events are
+acknowledged. The [root closeout](experiments/k5d-inputs/ada-1461-root-failure-closeout-20261113.json)
+binds exact source `5ebc7831` / `abccdf05` / archive `7fd4e0e6` / environment `32e`,
+physical config and raw failure evidence.
+
+Observer 0 was selected from the actual admitted UUID before quality inspection.
+Its independently replayed reservation upper bound is 150.362107921 seconds,
+conditional on NFS visibility; observer 1 remains UNKNOWN. Both observer batches
+85796 and old-af6 66293 ended, all wrappers/timeouts exited, and all 11 captured
+A2 host PIDs / five groups were absent. The actual FQDN CPU claim file has zero
+allocations; the selected GPU claim is absent. Earlier alias-path checks remain
+unsupported; the corrected current-state check does not prove a historical interval.
+
+Retain the full **900 GPU / 1,100 CPU-second A2 debit**. Programme charges are
+**22,041 GPU / 58,230 CPU seconds**; Ball: 15,679 GPU / 34,229 CPU. The
+[public-runtime repair card](cards/k5d-public-runtime-repair-2026-11-13.md)
+releases only a **90 CPU-second / zero-GPU import-closure diagnostic**. Its
+separate reservation has **900 GPU / 1,610 CPU seconds unspent**; config repair,
+fresh CPU denial and another GPU witness remain unreleased. Existing Ada-stage
+headroom is 3,218 GPU / 388 CPU; held SVT-only 600 GPU / 1,800 CPU is unchanged.
+No transfer, retry, numerical change, training or scale release is implied.
+
+Watch a7 found both gpu6 Ada cards idle at 03:23:52 UTC, enabling A2 admission,
+and ended 03:33:49 with PID 73984 absent. Requested passive watch **a8** is now
+active: PID 80489, start 03:51:59.829792 UTC, deadline 04:36:59 UTC, four hosts /
+300-second cadence, same source `2b931`, 100 CPU precharged with an 80-CPU guard.
+It never submits jobs or invokes models/APIs/chat wakeups. Raw handle:
+`/private/tmp/pointstream-resource-watch-20261113-passive-a8/launch.json`.
+
+The independent [SVT-only source build](cards/k5d-svt-only-confirmation-2026-11-13.md)
+continues without remote scientific release. Paired 16/48 producer/scorer stages
+require an accepted GPU witness and complete forecasts; Ada 292/586 still needs
+a profile port. No manuscript/PRESLEY edit or submission is released.
+
+### Closed A2 handles and unreleased next-stage conditions
+
+Selected A2 evidence is also preserved read-only at
+`.cache/pointstream-evidence/ada-1461-failure-20261113/` (21 files, 280,904 bytes).
+The [tracked cache index](experiments/k5d-inputs/ada-1461-failure-evidence-cache-20261113.json)
+binds manifest `7a4a4a476bfb6c1cfb98ae287d3271aa2558aa732a6d7cff34bbb6ba35953171`;
+original remote/scratch evidence remains preserved. This is failure evidence,
+not a successful receiver or quality result.
+
+
+Raw A2 artifacts/handles remain under
+`/private/tmp/pointstream-ada-window-20261113-a2/`; failure evidence is in `failure-audit/`.
+Wrappers PID/birth: `295501/560333327`, `295502/560333328`; owned GNU timeout
+PID/birth: `295503/560333375`, `295505/560333375`.
+Batch 85796 ended 0; the original deadline `5605933.27365` is retained as provenance,
+not an active wait. All listed wrapper/timeout identities are absent.
+A7 observed 37.944 remote + 0.501 SSH + 0.149 controller CPU seconds; retain
+its conservative charge. Old af6 batch 66293 ended 0 with both journals UNKNOWN
+at deadline; all four old wrapper/timeout PIDs are absent. No new wait or replay.
+
+Frozen 5eb already implements paired 16/48 via
+`experiments.tennis.k5d_ada_scale_worker.spec(base, action='prepare', assets=...,
+deadline=..., unshare_sha256=..., identity=...)`; no source edit is needed there.
+Keep original base inputs/arguments, six points, exclusive gpu6 Ada and whole
+clip context. Seven assets (each local/remote/sha256): bridge,
+receiver_isolation_config, native_cpu_receipt, denial_witness, fidelity_gate,
+accepted16 (`cf.D8_SMOKE_SHA`), ada_reference (`4bfff...`). Constructor gates:
+smoke16 namespace280/wall300; full48 namespace580/wall600; campaign900,
+validator30. Full48 follows only the authenticated smoke forecast.
+
+The root GPU denial approval must bind approved/actual_filesystem_denial_passed,
+host gpu6, codecs dcvc+svt, exact consumer execution identity/config, producing
+job/stage and physical Ada UUID/name/capability [8,9], actual policy/profile/
+runtime-inventory hashes and a complete receipt accepted by verify_receipt.
+Root must independently audit all six producing receipts before approval.
+CPU approval cannot substitute for that GPU gate.
+
+Then use the same constructor with action='score', adding prepare16, prepare48,
+producer16_attestation, producer48_attestation and actual producer16_job /
+producer48_job. Attestations bind schema1/approved, identity, producing job/stage,
+publication hash, GPU, receiver-denial flag and config/profile/runtime hashes.
+Scoring consumes sealed pixels; co.score_all and validate_score retain all six
+score proofs, assembly and exact16 reference checks. The current GPU witness
+measures preparation/denial, not this complete scorer workload.
+
+Cost evidence required: execution.json exit_code, seconds, timing_contaminated,
+contention and paused_seconds; the sole K5D_NAMESPACE_CANDIDATE record's complete
+reason/status, complete_descendant_wait, namespace_init PID1, children_cpu_seconds
+and init_cpu_seconds; dispatch.campaign_clock started/phase_started/budget_end;
+actual cold setup/staging/publication bytes and hashes, validator costs, claim
+interval, teardown and external observer/audit/administrative accounting.
+For each separate producer/scorer smoke wall W, smoke_forecast requires
+estimate48 = 1.5 * 3 * W + 50 <=580 and remaining campaign time >=
+max(600, estimate48+130). This is an admission rule, not measured48 evidence.
+Use independently measured prepare AND score costs, 1.5 margin/failure reserve,
+smokes<=600 and stages<=45 minutes. Root must reserve sufficient internal CPU
+headroom prospectively; current Ada488CPU does not fund the card's provisional
+paired1300CPU+1300CPU envelopes. Held SVT/old Ball funds are not silently borrowed.
+
+Ada worker/adapter explicitly allow only smoke16/full48. Existing larger-study
+k5d_control_study gates require A6000 capability [8,6], so spec-only GPU-name
+changes cannot admit Ada292/586. Defer that port until valid16/48 evidence.
+No next-stage scientific release is made by this audit.
+
+### Historical af6 phase — balances, waits and watch superseded above
 
 Root accepted exact-source native CPU proof `20261113T021221Z-f2db8617` and
 real two-case SVT CPU receiver oracle `20261113T022437Z-50b4e24e` on frozen
@@ -21,38 +127,73 @@ The full real-CPU approval is outside git (SHA `75ae95a6984c`); its thin
 Prior `c1bededa` remains a failed combined gate with acknowledged events; its
 signal-enum diagnosis and the accepted caller fix are retained beside the pass.
 
-Programme charges: **21,141 GPU / 56,490 CPU seconds**; Ball: 14,779 GPU /
-32,489 CPU. Active internal stage remaining: 4,718 GPU / 3,838 CPU.
-Old held Ball 7,920 GPU / 800 CPU and W8 4,550 GPU / 929 CPU are unchanged,
-inside the approved 24 GPU-hour / 28 CPU-hour programme. The 365-CPU real-oracle
-precharge is retained. Root charged 50 CPU seconds for metadata-only witness
-preparation inside the whole 1,100-CPU leaf. Future 900 GPU / 1,050 CPU seconds
-remain UNRELEASED; no GPU execution is authorized.
+Exclusive Ada witness `20261113T030323Z-af6c09da` **EXPIRED unassigned**.
+Physical inspection establishes NO ADMISSION and no execution; the canonical
+event is acknowledged. Its sole native wait (backend 70306) ended after 599
+seconds, exit 10. The original observer batch wait (backend 66293) later ended 0; both journals
+retained UNKNOWN and all four wrapper/timeout PIDs are absent. Do not replay the job.
+No assigned UUID, GPU/decoder result, quality or scale claim follows.
 
-Passive watch a6 PID 70368 checks gpu2/gpu3 A6000 and gpu5/gpu6 Ada every 300
-seconds until 2026-11-13 02:56:03 UTC or its CPU guard; no idle eligible GPU
-through tick 05. Its 100 CPU seconds are precharged. No autosubmit, model timer
-or verified chat wake. The dual-observer helper passed narrow code re-review;
-its normal synthetic canary does not qualify production or failure teardown.
+The unused 900 GPU / 700 campaign CPU seconds were released. Retained cost is
+400 CPU seconds: 50 preparation + 200 observers + 150 administration.
+Programme charges: **21,141 GPU / 56,940 CPU seconds**; Ball: 14,779 GPU /
+32,939 CPU. After a transfer of unspent funds, the Ada stage has 4,118 GPU /
+1,588 CPU seconds remaining. A separate **600 GPU / 1,800 CPU reservation**
+now funds conventional-only feasibility; it is not spending or new user authority.
+Old held Ball 7,920 GPU / 800 CPU and W8 4,550 GPU / 929 CPU are unchanged;
+the programme ceiling remains 24 GPU-hours / 28 workload CPU-hours.
+
+**Next PLAN point: [SVT-only confirmation feasibility](cards/k5d-svt-only-confirmation-2026-11-13.md).** Source design/build
+only is authorized; scientific compute is UNRELEASED. Preserve the same 30
+registered clips and original three SVT settings (CRF48/55/62, preset4), with
+restricted CPU decoding, ordinary models on shared Ada, full-frame and ROI
+metrics, independent judges and existing guards. First qualify a separately
+named 16-frame correctness/cost oracle; only then prospectively admit 48-frame/
+absent controls and a complete scale forecast. The original dual-codec goal
+remains open; this narrower route does not replace its missing neural comparison.
+
+[CPU claim-path correction](experiments/k5d-inputs/ada-cpu-claim-path-correction-20261113.json): earlier alias `gpu6.json` absence checks
+were unsupported. The actual `gpu6.itec.aau.at.json` file exists with zero
+allocations; all six own allocations are absent now. This proves CURRENT
+cleanup only, not immediate historical release intervals. Native process,
+normal decoding and filesystem-denial proofs are unaffected. Preserve all
+original gate, source and raw hashes; the addendum corrects interpretation.
+
+At the af6 phase, watch a7 had not yet found capacity; it later found idle
+Ada at 03:23:52 UTC and ended 03:33:49 with PID 73984 absent. Current watch a8
+is recorded above. Earlier a6 ended 02:51:25 UTC after nine ticks with no idle
+GPU. PR 378 later merged with green CI (Ruff, mypy 591 files, 2,197 tests /
+40 skipped); the main integration advanced to `1a1f63c7`, while frozen
+scientific source `5ebc7831` is unchanged.
 
 Ada's same-GPU repeat `2c8b49a0` supports its own qualified reference; failed
 cross-A6000 comparison `37b3b79b` is retained. Current validators require exclusive
 GPU access. GPU/CUDA/DCVC denial, new clips and scale/full30 remain unqualified.
-Further GPU work requires separate root-reviewed preparation, exact-source
-joins, durable actual-claim observation and complete forecasts. Paper/PRESLEY
+The expired witness provides no GPU qualification. The next route has separate
+source, correctness, resource and budget gates. Paper/PRESLEY
 remain paused; no training, paid hosting or submission is authorized.
 
 Native gate: [root-accepted f2 proof](experiments/k5d-inputs/ada-5ebc-f2db-root-approved-CPU-gate-20261113.json).
 Full real-CPU approval: `/private/tmp/pointstream-pidfd-signal-real-cpu-prep-20261113/root-approved-real-CPU-denial.json`,
 SHA256 `75ae95a6984cd880cfadfa92f46589320cb4b165bb44eba5f5b1e33c1b471479`.
-Current source remains `5ebc7831291c91a6c45f72791e1959dbd76ac5f3`, tree
+Frozen scientific source remains `5ebc7831291c91a6c45f72791e1959dbd76ac5f3`, tree
 `abccdf05666392ae8ad6d2ac8d944a8a30c25ccf5d944d29eccdb3f84d595b2e`, archive
 `7fd4e0e6ed2655b646d5601ba458fe66532f03040bba9b87c1607cca2e2fbfd0`.
 Selected source archive, exact config, full CPU approval and raw audits are also
 read-only under `.cache/pointstream-evidence/5ebc-CPU-gates-20261113/` in this
 checkout (21 files,29,973,174 bytes).
 [Tracked cache manifest](experiments/k5d-inputs/ada-5ebc-CPU-evidence-cache-20261113.json)
-records every physical hash; it is not a GPU release.
+records every physical hash; CPU acceptance does not imply GPU qualification.
+
+PR 377 is merged with green CI. That phase used documentation branch
+`codex/pointstream-ada-witness-queue-2026-11-13`. Release, accepted metadata audit and orchestration
+artifacts are at `/private/tmp/pointstream-real-claim-observer-prep-20261113/`;
+manifest `b60a98a3`, orchestrator `b64e889f`, wrappers `3edabc0b`.
+Actual wrapper PID/birth-ticks: `182609/560163568`, `182610/560163569`;
+owned GNU timeout PID/birth-ticks: `182655/560163613`, `182645/560163605`.
+Both native and observer batch waits later ended; preserve their original
+handles and receipts at that path. All four wrapper/timeout identities are absent.
+Never infer an assignment or replay an uncertain submission.
 
 All earlier release/wait/watch statuses below are historical; this current section
 supersedes them without changing their provenance or earlier charges.
@@ -181,12 +322,15 @@ durable claim accounting and renewed exact-source receiver/denial gates pass.
 
 ## Budget snapshot — seconds, inclusive conservative charges
 
-- Programme: 21,141 GPU / 56,490 CPU charged (5.8725 / 15.6917 hours).
+- Programme: 22,041 GPU / 58,230 CPU charged (6.1225 / 16.175 hours).
   User ceiling remains 86,400 GPU / 100,800 CPU (24 / 28 hours).
-- Ball: 14,779 GPU / 32,489 CPU charged. Internal denial/scale stage remaining:
-  4,718 GPU / 3,838 CPU, inside its original 6,000 / 9,000 allocation.
+- Ball: 15,679 GPU / 34,229 CPU charged. Ada stage remaining:
+  3,218 GPU / 388 CPU; held SVT-only reservation 600 GPU / 1,800 CPU is unspent.
+- Public-runtime repair: first90 CPU diagnostic charged; 900 GPU / 1,610 CPU
+  remains unspent, with all later stages unreleased.
 - Old held Ball reservation: 7,920 GPU / 800 CPU. W8: 4,550 GPU / 929 CPU,
-  held on complete-cost/prerequisite gates. No transfer or new authority.
+  held on complete-cost/prerequisite gates. These held balances are unchanged;
+  the SVT-only transfer above uses the Ada stage, within existing authority.
 - Charges are conservative allocations where stated, not complete measured use.
   The contended witness's 1,282 GPU / 1,632 CPU debit leaves per-job cap compliance
   unverified; it does not establish an actual overrun.
@@ -222,6 +366,6 @@ paired 16/48 prepare/score costs; 188/292/586 and full30 are not automatic.
 292/586 require whole-clip context, complete prepare/score accounting, 1.5 margin
 and failure reserve. Every wait stage ends within 45 minutes with saved results.
 See [stage card](cards/k5d-ada-scale-and-denial-2026-11-12.md) for binding stops.
-The PLAN audit found no other independent ready worthwhile experiment in this
-finite programme. No training, paid hosting, manuscript/PRESLEY edit or submission.
+The earlier PLAN audit preceded the newly authorized SVT-only source-build
+feasibility point; its scientific compute remains unreleased. No training, paid hosting, manuscript/PRESLEY edit or submission.
 Preserve raw evidence, frozen sources, datasets, models and failed scratch.

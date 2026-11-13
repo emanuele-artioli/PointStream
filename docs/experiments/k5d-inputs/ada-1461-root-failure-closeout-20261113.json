@@ -1,0 +1,72 @@
+{
+  "actual_gpu_uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+  "blocked_module": {
+    "bytes": 219,
+    "mode": "0o444",
+    "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/torch/testing/__init__.py",
+    "sha256": "29619702d335c066237a7cf99467f61f5eabdfea88d5998e56c1eec479fb4b69"
+  },
+  "cleanup_current": {
+    "CPU_allocations": 0,
+    "CPU_claim_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/claims/cpu/gpu6.itec.aau.at.json",
+    "CPU_claim_sha256": "8dde39d1bd5517202f13ab9129dd5b265fa935fb33ce15417ebb567194563036",
+    "CPU_match_rule": "every allocation validated; canonical job_dir ancestry or actual historical token, not generic job_id run alone",
+    "GPU_claim": {
+      "exists": false,
+      "own_claim": false,
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/claims/devices/gpu6.itec.aau.at_GPU-dbbb295f-6156-1133-8658-841f3f5b17d0/claim.json"
+    },
+    "captured_groups_empty": 5,
+    "main_audit_host_PIDs": 6,
+    "observers": "both wrappers completed; batch85796 ended0; all four wrapper/timeout identities absent",
+    "supplementary_host_PIDs": 5,
+    "unique_host_PIDs_absent": 11
+  },
+  "config_sha256": "f8263fa236696f0c5525b306fceaf71d96037237b1fb95d3f48dab91fd4ccc86",
+  "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "event_ACKs": {
+    "63dcb5b86b115fc19a813f0eac083d3b": {
+      "path": "/private/tmp/pointstream-denial-fbca-freeze-20261112/client-state/event-acks/63dcb5b86b115fc19a813f0eac083d3b.json",
+      "sha256": "f3d60c86645efcc203bafd9f11506f7473cb015548ada368692fa419efa9bc90"
+    },
+    "a2b63d895a4558aea1c2ebe8e3b6ef92": {
+      "path": "/private/tmp/pointstream-denial-fbca-freeze-20261112/client-state/event-acks/a2b63d895a4558aea1c2ebe8e3b6ef92.json",
+      "sha256": "02696b481f112ae7d257ea876658f92aaed4bda197116984e9138a8d24e16e76"
+    }
+  },
+  "first_failure": "receiver.dcvc.0; public torch/testing/__init__.py import denied in isolated receiver; omitted from config runtime grants",
+  "immutable_evidence_preserved": true,
+  "job_id": "20261113T033048Z-1461dd9d",
+  "next_test": "Registered public-runtime import closure diagnostic:90CPU/zeroGPU only. Separate repair reservation remains900GPU/1610CPU; config construction, revised CPU denial and GPU witness remain unreleased.",
+  "other_observer": "UNKNOWN retained; actual read error, independent replay also UNKNOWN",
+  "partial_scope": "Six native encode/standalone decode preparations completed. First restricted receiver failed; zero accepted receiver receipts/end-to-end points, no quality comparison or validator pass.",
+  "raw_evidence": {
+    "/private/tmp/pointstream-ada-window-20261113-a2/failure-audit/extra-process-source-audit.json": "dcb88d5d906b76f0f46abffa2e4d2e245eb06ec029f0b32ebda0acb851b24576",
+    "/private/tmp/pointstream-ada-window-20261113-a2/failure-audit/independent-observer-replay.json": "2301e438a6b0a0b90d0cd8476fe09b681a402791b8cb3a7e6c6be5491bd4dce1",
+    "/private/tmp/pointstream-ada-window-20261113-a2/failure-audit/raw.json": "01c45f04e16680c2d30614038e44a2b1df8d2db5f969b0b06fb1366bdf0fbe2f",
+    "/private/tmp/pointstream-ada-window-20261113-a2/failure-audit/summary.json": "695974bd6703d941bed90dd2933ac719e64844806ceae9778742eca989cc09ac"
+  },
+  "retained_charge": {
+    "CPU_breakdown": {
+      "administration": 150,
+      "campaign": 700,
+      "metadata": 50,
+      "observers": 200
+    },
+    "CPU_seconds_inclusive": 1100,
+    "GPU_seconds": 900
+  },
+  "revision": "5ebc7831291c91a6c45f72791e1959dbd76ac5f3",
+  "root_review": "accepted failure classification and current cleanup; no receiver or quality credit",
+  "schema": 1,
+  "selected_observer": {
+    "assignment_source": "actual run/request.json claims.gpu before quality inspection",
+    "predeclared_index": 0,
+    "replayed_claim_upper_seconds": 150.362107921,
+    "scope": "reservation interval conditional on NFS visibility; not utilization or independent CPU accounting"
+  },
+  "snapshot_sha256": "7fd4e0e6ed2655b646d5601ba458fe66532f03040bba9b87c1607cca2e2fbfd0",
+  "source_sha256": "abccdf05666392ae8ad6d2ac8d944a8a30c25ccf5d944d29eccdb3f84d595b2e",
+  "spec_sha256": "f48a12fc2c4f8d4221a2b012529a2f29cac0287c9cf6ca255f983576c84ccc4f",
+  "status": "failed; smoke exit1; events acknowledged by root"
+}
