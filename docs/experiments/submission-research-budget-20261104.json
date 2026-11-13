@@ -2730,6 +2730,48 @@
       "cpu_seconds": 822,
       "gpu_seconds": 600,
       "basis": "ROOTacceptsexactfinala71/CPUproof6e882/native7e6/preflights72755+97613/targetgpu6quiescence.535science+68pub+18status/admission+82completion+40audit+6ACK+63life+10admin=822; full848with10metadata+16preflight. Otherhostgpu5preserved. Fullchargeanyoutcome/no retry/timing/scale. Release4bddb72500f6a747d3a733d71138849eeec633e6290b8f7a4af24b952c7a584e"
+    },
+    {
+      "phase": "ball-legacy188-failure-transitions60-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 60,
+      "gpu_seconds": 0,
+      "basis": "ROOTpredeclaredsaved188all6points/bothjudges10primary5secondary/source-detectabilitypairedrescueharm, exactacceptedarchive+rawlabels. Complete10pins+15implementation/checks+10analysis+10review+15reserve=60CPU/nochildren/wall180; noSSH/models/fetch/repair. UnallocatedBallunder24G/28Cprogramme, noouterincrease. Cardk5d-legacy188-failure-transitions-2026-11-13."
+    },
+    {
+      "phase": "ball-passive-resource-watch-a19-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 100,
+      "gpu_seconds": 0,
+      "basis": "ROOTone45min/300s/max9passivechecks exactwatch2b931aftera18finished9/PID44010absent independentlyverified.80counted+20external/SSHserverloginunmeteredacknowledged,noautosubmit/models/claims/LLMtimer. Releaseea2deb065b0ccb935b0281036a6546debd0b8d203071ab2c9bf4fec5e5b8a176"
+    },
+    {
+      "phase": "ball-svt-a71-9f94-semantic-cleanup30-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 30,
+      "gpu_seconds": 0,
+      "basis": "ROOTretainsoriginalpost40failure/raw774; fixescollector namespacePID2 wronglyhost, semantic12hostbirths/onegroup.30fromreserve120\u219290 inside2000card, includes8remote+1query+2SSH+3driver+4context+5local+7review/prep. No model/native/GPUjob/retry/sourcechange. Release576babccd1ffbd907c8afc108b45f78d52070fe1fd7abb7269ba8c92ce80a02c"
+    },
+    {
+      "phase": "ball-svt-study-code300-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 300,
+      "gpu_seconds": 0,
+      "basis": "ROOTafteractualshared16acceptance4525/soleACK authorizesONEopt-instudyportcode+configuredchecks+review only, complete300CPU/GPU0 fromunallocatedBallinside24G28C. Sourcebaseda71/freezeonce, originaldefaults/grants/numerics unchanged. Actual48/292/586/full30 allconditional/unreleased; cardk5d-svt-study-port-2026-11-13."
+    },
+    {
+      "phase": "ball-svt-a71-9f94-durable-archive15-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 15,
+      "gpu_seconds": 0,
+      "basis": "ROOTafteractualacceptance4525/exactACK authorizesboundedmetadataarchivepublication: selected21MBphysicalpartial+failuretrace/newsemanticcleanup+code+ROOTapproval, no newpixel/model/native/GPU.15fromreserve90\u219275 inside2000card, completearchive2+verify2+local2+SSH2+remote2+reserve5. CreateonlyimmutableNFSfile/readback; exactpublicationrelease stillrequired."
+    },
+    {
+      "phase": "ball-svt-study-source-preparation100-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 100,
+      "gpu_seconds": 0,
+      "basis": "ROOTprospective1100CPU/GPU0 exactnewstudy-source envelope;100 includesofflinehelperadaptation/review/finalfreeze/immutablecache/readback. InitialUNRUNpreparationonly; exactfreeze/remoteaction requireCI+rootpinsrelease. Scientific4282c96f/PR398, unchanged31grants; olda71readonly. No native/receiver/GPU released."
     }
   ],
   "reservations": [
@@ -3409,9 +3451,18 @@
       "phase": "ball-svt-shared16-real-context-repair-20261113",
       "workstream": "ball",
       "gpu_seconds": 0,
-      "cpu_seconds": 120,
-      "status": "Remaining_unspent120CPU/0GPU cardreserve only; source/native/receiver1012+metadata30+preflight16+remainingpilot822/600GPU charged. ONEGPUpublication released; no automaticretry/scale.",
-      "card": "docs/cards/k5d-svt-memory-context-repair-2026-11-13.md"
+      "cpu_seconds": 0,
+      "status": "closed; acceptedSVT16/physicalarchive/ACK complete;75CPU neverreleased/executed reserve returned to unallocatedBall, no priorcharge refunded.",
+      "card": "docs/cards/k5d-svt-memory-context-repair-2026-11-13.md",
+      "released_unspent_cpu_seconds": 75
+    },
+    {
+      "phase": "ball-svt-study-source-qualification-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 1000,
+      "gpu_seconds": 0,
+      "status": "Remaining_unspent1000CPU/GPU0: native327+actualCPUreceiver585+reserve88 held; sourceprep100fullyprecharged. Only offlineUNRUNhelperpreparationreleased, finalfreeze/cache requireCI/rootpins. No runtime proof rebind, GPU or scale.",
+      "card": "docs/cards/k5d-svt-study-source-qualification-2026-11-13.md"
     }
   ],
   "jobs": [
@@ -6310,7 +6361,7 @@
       "job_id": "20261113T130719Z-9f94f30c",
       "workstream": "ball",
       "phase": "a71-SVTshared16-correctness",
-      "state": "canonical_complete_gate_pass_exit0_independent_artifact_audit_pending",
+      "state": "ROOT_accepted_shared16_correctness_cleanup_and_exact_events_ACKed",
       "source_sha256": "bb717a9d9fa7d848a3891717c37c0973add82706bc1690bc96aa0961c4804108",
       "snapshot_sha256": "e05187c40ebc81f7505172be11ed20807b4baa97803c80039dc43f3ea33c8abc",
       "spec_sha256": "09483746720ed7a18657540f4b1a217c7375ef86d9892cb35ef60dc39b0970ca",
@@ -6325,7 +6376,30 @@
       "shared_timing_contaminated": true,
       "terminal_status_sha256": "03f836399d1746773c1f06964494593fe3ab6eb6ee03800499fdab650bffb56d",
       "refresh_status_backend": 33861,
-      "wait_backend": 79917
+      "wait_backend": 79917,
+      "root_approval_sha256": "4525fc47bd4be8fe2d544c7f7c4fe6e154dd8facca61e367b48acc01c32c21f9",
+      "artifact_audit_backend": 87049,
+      "semantic_cleanup_backend": 62364,
+      "terminal_events": [
+        "84da5e6ff49d5437a7e90255809572d4",
+        "e2260965d25b5baf89f5ed1e56604dd7"
+      ],
+      "thin_index": "docs/experiments/k5d-inputs/svt-a71-9f94-shared16-root-acceptance-20261113.json",
+      "terminal_event_acknowledged": [
+        "84da5e6ff49d5437a7e90255809572d4",
+        "e2260965d25b5baf89f5ed1e56604dd7"
+      ],
+      "sole_ACK_scope": "localonly_noSSH_orfreshRPC_correctedrelease",
+      "qualification_archive": {
+        "approved": true,
+        "backend": 18958,
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-a71-SVT16-9f94-80cf8ee8a741e0ebce364995/qualification.tar.gz",
+        "sha256": "80cf8ee8a741e0ebce3649950a46cf879c011be529fe4927c89b40eefbd098c4",
+        "bytes": 1263646,
+        "file_mode": "0444",
+        "directory_mode": "0555",
+        "receipt_sha256": "372d9812a98e97d2515816f7332f3c06d499783521a7de3d856e5b9aac87db90"
+      }
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -6356,19 +6430,19 @@
     "RootprospectiveSVTqualification413\u2192443CPU/GPU0: failedpreflight20retained +ONEreplacementpreflight30 +393remaining. Add30unallocatedBall/programme; allouter/workstreamceilingsunchanged. Readonlystatus-ONLY6CPU/120wallbootstrap proposed; originalpublication68V4shims/scienceunchanged. No replacementexecutionbeforeexactrootreview."
   ],
   "monitoring": {
-    "state": "a18_running",
+    "state": "a19_active_bounded_passive_only",
     "scope": "gpu2/gpu3 A6000 and gpu5/gpu6 Ada",
-    "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a18",
+    "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a19/run",
     "native_completion_wakeup_verified": false,
     "native_completion_resume_verified": false,
     "accounting_limits": "SSH server/login aggregate unmetered; inner80 countedCPU plus20 external reserve; full100CPU charge retained",
-    "scientific_jobs": "NoactiveownGPUjob: c6bfailedbefore_models/cleanupaccepted/ACKcomplete. Newa71source memory-contextrepair reserved2000CPU600GPU UNRELEASED; no oldreplay.",
+    "scientific_jobs": "NoactiveownGPUjob. Accepted9f94/a71closed+exactACK. Study4282c96f codechecks complete/PR398 integrationpending; newsource qualification1100CPU/GPU0 allocated, onlyofflineprep100 released, runtime qualification/GPU/scale unreleased.",
     "source_sha256": "2b931eb5a25f7a87cc3594103ee845ec2582cc017309b7d479a99f637f6ee10c",
     "mode": "bounded_passive_native_resource_checks",
-    "pid": 44010,
-    "backend": 7796,
-    "started_utc": "2026-11-13T12:37:34.379338+00:00",
-    "deadline_utc": "2026-11-13T13:22:34.379229+00:00",
+    "pid": 50947,
+    "backend": 67637,
+    "started_utc": "2026-11-13T13:20:30.255180+00:00",
+    "deadline_utc": "2026-11-13T14:05:30.255090+00:00",
     "interval_seconds": 300,
     "max_ticks": 9,
     "jobs": [],
@@ -6444,6 +6518,19 @@
         "ticks": 9
       },
       "PID": 37616,
+      "PID_absent_independently_verified": true
+    },
+    "a18_final_closeout": {
+      "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a18/run",
+      "finished": {
+        "controller_cpu_seconds_observed": 0.465449,
+        "finished_utc": "2026-11-13T13:17:56.308653+00:00",
+        "reason": "deadline",
+        "remote_worst_case_charge_seconds": 45.766471999999986,
+        "ssh_waited_children_cpu_seconds": 1.0420699999999998,
+        "ticks": 9
+      },
+      "PID": 44010,
       "PID_absent_independently_verified": true
     }
   },

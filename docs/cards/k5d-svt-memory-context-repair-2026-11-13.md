@@ -1,31 +1,39 @@
 # K5d: qualify CUDA context memory accounting before the SVT16 pilot
 
-Status: exact-source CPU qualification is complete; GPU runtime is unqualified.
-Scientific a71 is frozen as source bb717 / archive e051 / config 5fc, with
-source-only bridge1f371 and sealed cache21ce independently accepted.
-Native job `20261113T122511Z-797deaed` passed its four modes, CPU accounting and
-cleanup; proof7e6fd454 is published and ACKed. Receiver job
-`20261113T124019Z-6af48d82` passed five actual private-file denials, native/wire/
-YUV/RGB equality, frozen CPU-only receipt verification and scoped cleanup;
-proof6e882f1f is published and ACKed. The [native index](../experiments/k5d-inputs/svt-a71-797deaed-native-CPU-acceptance-20261113.json)
-and [receiver index](../experiments/k5d-inputs/svt-a71-6af48d82-CPU-denial-acceptance-20261113.json)
-retain exact provenance. Qualification1012 CPU is fully charged.
+Status: exact-source shared-SVT16 correctness/feasibility is root accepted and
+terminal-ACKed; this repair's scientific decision is complete. Job
+`20261113T130719Z-9f94f30c` passed all original three points/both arms/full+ROI/
+both judges and isolated CPU/native-wire-pixel checks on shared gpu6 Ada1 ef96.
+The [acceptance index](../experiments/k5d-inputs/svt-a71-9f94-shared16-root-acceptance-20261113.json)
+joins canonical03f/summary10e0/root4525. Independent checks cover21 physical
+members/six literal packet-native pairs; semantic cleanup62364 finds12 host
+births absent/one empty group/owned tokens and NVIDIA rows clear. All29 observed
+memory snapshots satisfy the guards, with maxima7276MiB driver/6844MiB reserved;
+this is no absolute peak, speed, neural or scale claim.
 
-Two local metadata attempts stopped before output or remote action: first a3CPU
-cap, then a launcher hard2 limit that prevented the helper from setting3.
-Both10CPU charges remain. Root corrected the launcher (soft2/hard40 with default
-SIGXCPU; child3), retained one numerical-library thread, and used a new output.
-The third allocation10 passed: .780028 helper/validators +.048366 driverCPU.
-Frozen production source admission and both normalized validator returns agree.
-All30CPU is charged; reserve is now120. GPU pilot is released for ONE publication after accepted final preflight.
-Final false package:
-`/private/tmp/pointstream-SVT-a71-first16-stock-FINAL-FALSE-20261113-ROOT-singlethread-correct-limit`;
-raw ecae6bea / canonical09483746, deadline13:29:21.937243UTC.
+Source a71/bb717/archivee051/config5fc/cache21ce/bridge1f371 remains immutable.
+Fresh native797deaed/proof7e6fd454 and receiver6af48d82/proof6e882f1f are
+physically published and ACKed; see the [native](../experiments/k5d-inputs/svt-a71-797deaed-native-CPU-acceptance-20261113.json)
+and [receiver](../experiments/k5d-inputs/svt-a71-6af48d82-CPU-denial-acceptance-20261113.json)
+indices. All31 receiver grants remain unchanged.
 
-The original shared-SVT job `20261113T114623Z-c6b01236` failed before models,
-with zero accepted quality points. Its card is closed to automatic retries.
-This is the separate PLAN subitem for a source repair and fresh qualification;
-the original dual-codec comparison remains open.
+Preserve the original failed c6b01236 job, two failed local metadata attempts,
+wait79917 snapshot race and post40 collector failure/raw774. The collector
+incorrectly included namespace-localPID2; the separate30CPU semantic host-
+cleanup repair reused the authenticated physical partial without rewriting its
+absent PASS status or rerunning codecs/models. Current cleanup alone is proved.
+Events84da5e6ff49d5437a7e90255809572d4/e2260965d25b5baf89f5ed1e56604dd7
+are ACKed by the corrected local exit0 command/no SSH; its null-path failure
+remains preserved. Corrected ACK completed immediately without a session ID,
+using0.110897CPU/no SSH. Immutable archive publication18958 is physically
+accepted:1263646 bytes/81 members/0444file/0555dir/readback, SHA
+80cf8ee8a741e0ebce3649950a46cf879c011be529fe4927c89b40eefbd098c4 at
+`/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-a71-SVT16-9f94-80cf8ee8a741e0ebce364995/qualification.tar.gz`.
+The repair phase is CLOSED; unused75CPU returned, with no prior charge refunded.
+
+The following decision rule and source history record the prospective protocol;
+the accepted outcome above does not authorize scale work. The separate
+[study-port card](k5d-svt-study-port-2026-11-13.md) releases code/checks only.
 
 ## Goal and decision rule
 
@@ -66,8 +74,8 @@ release the probe and then reset peak statistics. Strict memory-row, campaign
 PID and foreign-process checks remain unchanged. This is context setup, not
 a threshold, model, training or decoder-permission change. PR393 passed full CI
 and merged at c4ab531a (12:01:22 UTC); documentation PR394 merged at 12:09:48 UTC.
-Runtime qualification remains
-unproven and is required before promotion.
+Runtime qualification was unproven at source selection; the scoped accepted
+real16 outcome is recorded above.
 
 ## Qualification and stop conditions
 
@@ -94,8 +102,8 @@ No paper, PRESLEY, training or paid API work is released.
 
 The total envelope stays **600 GPU-seconds / 2000 CPU-seconds**. Exact-source
 qualification1012 is accepted. All three local metadata allocations retain their
-charges; remaining hold is120 CPU/0 GPU. Read-only preflight16 completed; the final
-822 CPU/600 GPU pilot is prospectively charged and released once:
+charges. Read-only preflight16 and the single822 CPU/600 GPU lifecycle are
+complete; the1925 CPU/600 GPU complete charges are retained and unused75 CPU is returned:
 
 | Stage | CPU-seconds | GPU-seconds |
 | --- | ---: | ---: |
@@ -105,30 +113,32 @@ charges; remaining hold is120 CPU/0 GPU. Read-only preflight16 completed; the fi
 | First local metadata freeze, failed/charged | 10 | 0 |
 | Second metadata, failed launcher/charged from reserve | 10 | 0 |
 | Corrected metadata, passed/charged from reserve | 10 | 0 |
-| Global queue and same-worker preflight, precharged | 16 | 0 |
-| Remaining real16 lifecycle, released/precharged once | 822 | 600 |
-| Reserve | 120 | 0 |
+| Global queue and same-worker preflight, complete/charged | 16 | 0 |
+| Remaining real16 lifecycle, accepted/charged once | 822 | 600 |
+| Separate semantic host-cleanup repair, accepted/charged | 30 | 0 |
+| Bounded archive closeout, physically accepted/charged | 15 | 0 |
+| Unused reserve, returned (no charge refund) | 75 | 0 |
 | Total | 2000 | 600 |
 
 The separate 300 CPU local code/check allocation is already precharged and is not
 part of this envelope. Complete qualification costs include local callers,
 Git, SSH, remote Python, doctor/probe children, archive staging/publication,
 monitoring, independent audits and proof/ACK closeout. No caller is hidden in
-the scientific cap. These remain prospective envelopes, not a measured fit;
-each concrete stage needs exact pins, a complete forecast and root release.
+the scientific cap. These are conservative complete charges, not aggregate measured usage.
+Any future stage needs exact pins, a complete forecast and root release.
 No extra user allocation or GPU release is implied. The primary exclusive
 2c6d route remains separate:1160 CPU/900 GPU held, metadata 50 CPU precharged but
 UNRUN, false plan 463f50d0. See the [continuation](../continuation-2026-11-13.md)
 and [ledger](../experiments/submission-research-budget-20261104.json).
 
-## Conditional roadmap after a real16 pass
+## Conditional roadmap after the accepted real16 pass
 
-Only after that actual gate passes, consider one opt-in SVT study port covering
+The separate300CPU/GPU0 code-only release covers one opt-in SVT study port for
 48 and registered full clips together, while preserving global six-point
 defaults. Qualify one final source and its16/48 calibration; use a real48
 three-point/full-metric cost oracle. Then confirm the two fixed full-context
 clips, game9/Clip5 (292 frames) and game10/Clip12 (586 frames), without selecting
 clips after quality results. The registered 30-clip/5675-frame study remains
 conditional on complete stage costs and remaining programme/Ball budgets.
-Parts stay within 45 minutes; negative outcomes remain reported. No adapter,
-48-frame, full-clip or 30-clip execution is released now.
+Parts stay within 45 minutes; negative outcomes remain reported. All source qualification,48-frame, full-clip and30-clip execution remains
+unreleased; code support alone grants no experimental stage.

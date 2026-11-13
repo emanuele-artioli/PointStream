@@ -38,3 +38,18 @@ The first gated report is preserved as invalid; its endpoint/coverage defect and
 At the modeled two-hour reuse rate, the six-window native-IVF player gaps (anchor error minus hybrid error) are LPIPS 0.096499, 95% window-level t interval [0.034903, 0.158095], and DISTS 0.080991 [0.052890, 0.109092]. The corresponding MKV sensitivity gives 0.093770 [0.039110, 0.148429] and 0.080156 [0.054071, 0.106240]. These are conditional on the available anchors: med000 DCVC is absent. The five-window sensitivity excluding it remains positive; the three-window Medvedev subgroup is inconclusive on both metrics. All six whole-frame anchor-minus-hybrid gaps are negative. Primary results retain the best affordable measured endpoint above a codec's range; intermediate hull values use the established modeled log-rate interpolation. The historical family comparison still requires strict brackets: the two Medvedev half-out families remain unresolved for native IVF but resolve for the separate MKV profile. No additional encoding is authorized to eliminate that distinction.
 
 The 30/60/120-minute checks and deterministic ±0.001 stress preserve the conditional primary result, with smaller gaps at shorter reuse. They do not establish a global break-even duration, a complete-codec advantage or a distributional GPU-class uncertainty bound. This report covers Tier 1 only; the separate three-window unseen-match result and its inconclusive LPIPS interval are unchanged. Reference reuse and fresh source-hidden model reconstruction remain unproved. Manuscript updates must distinguish these scopes and retain the old strict metadata-remux failure.
+
+### 2026-11-13 — fixed-family endpoint and alternate-GPU re-audit
+
+No further encoding is warranted solely for the two historical strict-family
+omissions, consistent with the accepted November5 disposition. Both original
+native endpoints are already CRF70, the fixed encoder's legal maximum: med000
+25,420B versus below-target cap25,351B; med01925,248B versus25,209B. The75-role
+native proof and accepted scores already include both streams. Changing GPU
+cannot provide a new CRF setting; changing preset, ROI policy, cadence or framing
+would define a new comparison. The primary pooled SVT achievable-envelope
+comparisons are bracketed. Preserve the two original-family omissions and the
+separate MKV sensitivity without relabeling either. Ada scoring is possible with
+controls but gives no missing endpoint, so no warm-Ada oracle is released.
+[Exact read-only disposition](w7-inputs/native70-fixed-family-disposition-20261113.json).
+No new encoding, scoring or experimental charge.

@@ -23,43 +23,54 @@ new dependency.
 
 ## Where PointStream stands (2026-11-13, UTC)
 
-### Current research decision (November 13, 13:13 UTC)
+### Current research decision (November 13, 13:50 UTC)
 
-The new shared-Ada SVT16 job `20261113T130719Z-9f94f30c` is canonical
-COMPLETE/gate PASS/exit0 on gpu6 Ada1 ef96. All three original SVT settings,
-both arms, full/ROI metrics, judges, CPU isolation and observed-memory gates
-passed. **Independent physical-artifact and current-cleanup acceptance is
-pending; no scale, speed or complete dual-codec claim follows.** A status/event
-snapshot race in wait79917 was resolved by one funded fresh status33861,
-without replaying the experiment. The unrelated gpu5 job is preserved.
+**Shared-Ada SVT16 correctness and feasibility are independently accepted and
+ACK-closed.** Job `20261113T130719Z-9f94f30c`, frozen a71/source bb717/archive
+e051/config5fc, passed all three original SVT settings, both arms, full/ROI
+metrics, both judges and fresh CPU-only receiving on gpu6 Ada1 UUID ef96.
+The [root acceptance index](docs/experiments/k5d-inputs/svt-a71-9f94-shared16-root-acceptance-20261113.json)
+joins canonical03f, independent summary10e0 and approval4525. Independent checks
+cover21 physical members/six literal packet-native pairs and current cleanup:
+12 host births, one empty group, owned tokens absent and no owned NVIDIA rows.
+The29 observed memory snapshots reached7276MiB driver/6844MiB reserved; these
+are sampled observations, not an absolute peak, speed or full-neural result.
 
-- **Ball/SVT subitem: qualify CUDA context memory accounting**
-  ([card](docs/cards/k5d-svt-memory-context-repair-2026-11-13.md)). Frozen a71dc6e2
-  (source bb717/archive e051/config5fc) retains strict memory/PID guards.
-  Its fresh native job797deaed and receiver6af48d82 are independently accepted,
-  physically published and ACKed as native7e6fd454/receiver6e882f1f.
-  The full 2000 CPU/600 GPU envelope comprises qualification1012, local
-  metadata30, preflight16, remaining real16 lifecycle822, and reserve120.
-  All but reserve120 is conservatively charged. The two failed local metadata
-  attempts and original failed shared jobc6b01236 retain their charges.
-- After actual acceptance, consider one opt-in study port covering16/48/full
-  registered clips together, retaining the global six-point defaults. A real48
-  cost oracle and separate fixed292/586-frame confirmations precede any full30
-  admission. The missing neural comparison remains open; no shared-neural
-  execution is admitted without an aggregate memory/cost bound.
+- **CUDA context repair is accepted** ([card](docs/cards/k5d-svt-memory-context-repair-2026-11-13.md)).
+  Native797deaed and receiver6af48d82 proofs are physically published and ACKed.
+  Original failed shared jobc6b01236, local metadata failures, wait/status race,
+  and post40 namespace-PID2 collector failure/raw774 remain preserved with
+  their charges. Semantic cleanup62364 corrected host identity collection
+  without rerunning the codec. The2000CPU/600GPU envelope now comprises
+  qualification1012 +metadata30 +preflight16 +real16 lifecycle822 +cleanup30
+  +archive15 +reserve75. The phase is CLOSED; the unused75CPU reserve is returned, with no prior charge refunded. Immutable archive publication18958
+  is physically accepted (80cf8ee8,81 members,0444/0555/readback).
+- **Saved188-frame diagnostic is CLOSED** ([card](docs/cards/k5d-legacy188-failure-transitions-2026-11-13.md)).
+  All six points/188 frames/both judges show source-detectability-conditioned
+  repairs alongside occasional harms. The60CPU/GPU0 analysis is durably archived
+  as5c181 via publication79394; no absence, new-clip or current-source credit.
+- **Opt-in SVT study port is active, CODE ONLY** ([card](docs/cards/k5d-svt-study-port-2026-11-13.md)).
+  Candidate4282c96f checks completed; root review is pending.
+  Root released300CPU/GPU0 for implementation/checks in
+  `/private/tmp/pointstream-svt-study-scientific-a71-20261113`. Freeze and qualify
+  its eventual exact source before separately admitted16/48 cost controls and
+  fixed292/586-frame confirmations. All source qualification, GPU48/full-clip
+  and30-clip stages remain unreleased; global six-point defaults stay fixed.
+- **W7 strict-family spending decision is CLOSED, without another encode**
+  ([native70 disposition](docs/experiments/w7-inputs/native70-fixed-family-disposition-20261113.json)).
+  CRF70 is the fixed family's legal maximum. The two original family cells
+  remain unresolved; the primary achievable-envelope comparisons are bracketed.
+  The missing neural comparison remains open.
 
-The primary exclusive 2c6d route remains separate:1160 CPU/900 GPU held,
-metadata50 precharged UNRUN. Native/receiver evidence from older identities
-is preserved without relabeling. Programme charges are25041 GPU/69151 CPU
-seconds within the unchanged24GPUh/28CPUh ceiling; the ledger is authoritative.
+Next: [exact-study-source CPU qualification](docs/cards/k5d-svt-study-source-qualification-2026-11-13.md),1100CPU/GPU0 within existing limits. Only offline source-helper preparation100 is released; final freeze/cache execution awaits CI/root, native327/receiver585/reserve88 remain held. No GPU/48/scale release.
 
-Passive resource watch a18 backend7796/PID44010 checks A6000 and Ada hosts
-every300s/maxnine checks, bounded to13:22:34UTC. Its latest inspected tick6
-at13:08:06UTC found no idle candidate. No autosubmit, recurring model timer or
-verified completion-to-model resumption. Ada supports the same study using its
-own qualified reference; shared timings are contaminated. Manuscript and
-PRESLEY work remain paused. See the [continuation](docs/continuation-2026-11-13.md)
-and [ledger](docs/experiments/submission-research-budget-20261104.json).
+The primary exclusive2c6d route remains separate:1160CPU/900GPU held,
+metadata50CPU precharged UNRUN. Use the [ledger](docs/experiments/submission-research-budget-20261104.json)
+for authoritative current charges under unchanged24GPUh/28CPUh limits.
+Passive a19 backend67637/PID50947 has hard deadline14:05:30.255090UTC,
+300s/maxnine ticks; latest root-inspected tick6 at13:50:49.976972 found no idle.
+A18 finished nine ticks and PID44010 is absent. No autosubmit or new GPU release;
+manuscript/PRESLEY remain paused. See the [continuation](docs/continuation-2026-11-13.md).
 
 ### Historical af6 phase — balances, waits and watch superseded above
 
