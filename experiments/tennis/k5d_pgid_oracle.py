@@ -7,6 +7,7 @@ An externally frozen cost proof is required before building a candidate spec.
 from __future__ import annotations
 
 import argparse
+import errno
 import json
 import os
 import resource
@@ -22,7 +23,7 @@ from experiments.tennis import k5d_ada_witness as witness, k5d_checkpoint as cp
 from experiments.tennis import k5d_isolated_receiver as isolated, k5d_source_oracle as oracle
 from experiments.tennis.k5d_pidfd import Pidfd
 
-CASES = ('normal', 'timeout', 'sigterm', 'sigkill', 'launcher_kill')
+CASES = ('normal', 'launcher_kill')
 
 
 def spec(base: dict[str, Any], *, assets: dict[str, dict[str, str]], deadline: str,
@@ -37,7 +38,7 @@ def spec(base: dict[str, Any], *, assets: dict[str, dict[str, str]], deadline: s
     result['scale']['proof_mode'] = {'smoke': 'ada-pgid-cpu', 'full': 'ada-pgid-cpu-noop'}
     result['scale']['namespace_timeout'] = {'smoke': 220, 'full': 4}
     result['smoke'] = {'seconds': 230, 'representative_basis':
-                       'One real SVT decode and four synchronized lifecycle interruptions.'}
+                       'One real SVT decode and one synchronized launcher-only interruption.'}
     result['budget_seconds'] = 265
     result['validator'] = ['{python}', '-m', 'experiments.tennis.k5d_pgid_oracle', 'validate']
     validate_spec(result)
@@ -53,8 +54,64 @@ def _group(process: subprocess.Popen[Any]) -> int:
 def _gone(identity: dict[str, Any]) -> bool:
     try:
         return isolated._proc_identity(identity['pid'])['birth'] != identity['birth']
-    except (OSError, StopIteration, ValueError):
-        return True
+    except OSError as exc:
+        if exc.errno in (errno.ENOENT, errno.ESRCH):
+            return True
+        raise
+
+
+def _members(host_group: int) -> dict[int, str]:
+    """Enumerate the whole host group; inaccessible or malformed proc is unknown."""
+    found: dict[int, str] = {}
+    with os.scandir('/proc') as entries:
+        for entry in entries:
+            if not entry.name.isdecimal():
+                continue
+            try:
+                raw = (Path('/proc') / entry.name / 'stat').read_text()
+            except OSError as exc:
+                if exc.errno in (errno.ENOENT, errno.ESRCH):
+                    continue
+                raise
+            fields = raw[raw.rfind(')') + 2:].split()
+            if raw.rfind(')') < 0 or len(fields) <= 19:
+                raise ValueError('malformed process stat; group membership unknown')
+            if int(fields[2]) == host_group:
+                found[int(entry.name)] = fields[19]
+    return found
+
+
+def _finish_group(host_group: int, known: dict[int, str], namespace_depth: int) -> None:
+    """Signal only captured births via pidfds; unknown residuals fail closed."""
+    deadline = time.monotonic() + 10
+    while True:
+        remaining = _members(host_group)
+        if not remaining:
+            return
+        if any(known.get(pid) != birth for pid, birth in remaining.items()):
+            raise RuntimeError('unknown residual surrogate member; no stale group signal')
+        if time.monotonic() >= deadline:
+            raise TimeoutError('surrogate process group did not become empty')
+        for pid, birth in remaining.items():
+            try:
+                identity = isolated._proc_identity(pid)
+                if identity['birth'] != birth or identity['host_pgid'] != host_group:
+                    raise RuntimeError('residual process identity changed')
+                if len(identity['namespace_pids']) < namespace_depth:
+                    raise RuntimeError('residual process outside owned PID namespace')
+                adapter = Pidfd()
+                fd = adapter.open(identity['namespace_pids'][namespace_depth - 1])
+                try:
+                    current = isolated._proc_identity(pid)
+                    if current['birth'] != birth or current['host_pgid'] != host_group:
+                        raise RuntimeError('residual process changed before signal')
+                    adapter.send(fd, signal.SIGKILL)
+                finally:
+                    os.close(fd)
+            except OSError as exc:
+                if exc.errno not in (errno.ENOENT, errno.ESRCH):
+                    raise
+        time.sleep(.02)
 
 
 def _child(stage: Path, unshare: Path, unshare_sha: str, args: list[str]) -> None:
@@ -85,13 +142,14 @@ def _wait_marker(path: Path, process: subprocess.Popen[Any], timeout: float) -> 
     raise TimeoutError('receiver observer barrier not reached')
 
 
-def _cleanup_group(process: subprocess.Popen[Any]) -> None:
+def _cleanup_group(process: subprocess.Popen[Any], host_group: int, known: dict[int, str], depth: int) -> None:
     if process.poll() is None:
         try:
             os.killpg(_group(process), signal.SIGKILL)
         except ProcessLookupError:
             pass
     process.wait(timeout=10)
+    _finish_group(host_group, known, depth)
 
 
 def run(args: list[str]) -> None:
@@ -144,6 +202,9 @@ def run(args: list[str]) -> None:
             with log.open('wb') as stream:
                 process = subprocess.Popen(cmd, env=env, stdin=subprocess.DEVNULL, stdout=stream,
                                            stderr=subprocess.STDOUT, close_fds=True, start_new_session=True)
+                group = None
+                members_before: dict[int, str] = {}
+                depth = len(own['namespace_pids'])
                 try:
                     namespace_group = _group(process)
                     harness_host_pid = int(os.readlink('/proc/self'))
@@ -160,37 +221,38 @@ def run(args: list[str]) -> None:
                     live_launcher = isolated._proc_identity(launcher['pid'])
                     if worker['birth'] != observed['birth'] or live_launcher['birth'] != launcher['birth']:
                         raise ValueError('observer process birth changed')
+                    members_before = _members(group)
+                    if any(members_before.get(item['pid']) != item['birth'] for item in (leader, launcher, worker)):
+                        raise ValueError('observed group inventory does not bind process births')
                     native_path = case_scratch / 'publish' / 'native-observer.json'
                     native = json.loads(native_path.read_text()) if native_path.is_file() else None
-                    if case != 'normal':
+                    if case == 'launcher_kill':
                         os.killpg(_group(process), signal.SIGSTOP)
-                        if case == 'launcher_kill':
-                            adapter = Pidfd()
-                            harness_depth = len(isolated._proc_identity(harness_host_pid)['namespace_pids'])
-                            launcher_pid = launcher['namespace_pids'][harness_depth - 1]
-                            fd = adapter.open(launcher_pid)
-                            try:
-                                if isolated._proc_identity(launcher['pid'])['birth'] != launcher['birth']:
-                                    raise ValueError('launcher birth changed before pidfd signal')
-                                adapter.send(fd, signal.SIGKILL)
-                            finally:
-                                os.close(fd)
-                            os.killpg(namespace_group, signal.SIGCONT)
-                        elif case == 'sigterm':
-                            os.killpg(_group(process), signal.SIGTERM)
-                            os.killpg(_group(process), signal.SIGCONT)
-                        else:
-                            if case == 'timeout':
-                                time.sleep(.2)  # external test watchdog, never production algorithm
-                            os.killpg(_group(process), signal.SIGKILL)
+                        adapter = Pidfd()
+                        launcher_pid = launcher['namespace_pids'][depth - 1]
+                        fd = adapter.open(launcher_pid)
+                        try:
+                            if isolated._proc_identity(launcher['pid'])['birth'] != launcher['birth']:
+                                raise ValueError('launcher birth changed before pidfd signal')
+                            adapter.send(fd, signal.SIGKILL)
+                        finally:
+                            os.close(fd)
+                        os.killpg(namespace_group, signal.SIGCONT)
                     try:
                         process.wait(timeout=160 if case == 'normal' else 10)
                     except subprocess.TimeoutExpired:
-                        _cleanup_group(process)
                         raise TimeoutError('surrogate campaign did not terminate')
                 except BaseException:
-                    _cleanup_group(process)
+                    if group is not None:
+                        _cleanup_group(process, group, members_before, depth)
+                    elif process.poll() is None:
+                        os.killpg(_group(process), signal.SIGKILL)
+                        process.wait(timeout=10)
                     raise
+            _finish_group(group, members_before, depth)
+            members_after = _members(group)
+            if members_after:
+                raise ValueError('surrogate group still has host members')
             after = resource.getrusage(resource.RUSAGE_CHILDREN)
             owned = (observed, launcher) + ((native,) if native else ())
             reap_deadline = time.monotonic() + 10
@@ -216,28 +278,27 @@ def run(args: list[str]) -> None:
                         or oracle.sha(case_scratch / 'publish' / 'rendered.rgb') != parsed.expected_rgb_sha256):
                     raise ValueError('normal native or denial evidence differs')
                 shutil.copyfile(receipt_path, output / 'normal-receiver.json')
-                for name in ('native.yuv', 'rendered.rgb'):
+                for name in ('native.ivf', 'native.yuv', 'rendered.rgb'):
                     shutil.copyfile(case_scratch / 'publish' / name, output / name)
                 normal = {'receipt_sha256': oracle.sha(output / 'normal-receiver.json'),
                           'decoded_yuv_sha256': receipt['decoded_yuv_sha256'],
                           'rendered_rgb_sha256': receipt['rendered_rgb_sha256']}
-            elif case in ('timeout', 'sigkill') and process.returncode != -signal.SIGKILL:
-                raise ValueError('surrogate group kill did not terminate leader')
-            elif case == 'sigterm' and process.returncode != -signal.SIGTERM:
-                raise ValueError('surrogate group TERM did not terminate leader')
             elif case == 'launcher_kill' and process.returncode == 0:
                 raise ValueError('launcher-only kill unexpectedly succeeded')
             log_copy = output / (case + '.log')
             shutil.copyfile(log, log_copy)
-            results.append({'case': case, 'group': group, 'leader': leader, 'control': control_identity,
+            results.append({'case': case, 'group': group, 'namespace_group': namespace_group,
+                            'namespace_depth': depth, 'leader': leader, 'control': control_identity,
+                            'members_before': members_before, 'members_after': members_after,
                             'launcher': launcher, 'worker': observed,
                             'native_at_barrier': native, 'all_observed_births_absent': gone,
                             'unrelated_control_alive': control.poll() is None, 'returncode': process.returncode,
-                            'waited_cpu_seconds': (after.ru_utime + after.ru_stime) - (before.ru_utime + before.ru_stime),
+                            'reaped_children_cpu_seconds_noninclusive':
+                                (after.ru_utime + after.ru_stime) - (before.ru_utime + before.ru_stime),
                             'log_sha256': oracle.sha(log_copy), 'normal': normal})
         (output / 'oracle.json').write_text(json.dumps({'schema': 1, 'execution_identity': identity,
             'cases': results, 'scope': 'task-owned surrogate campaigns; not the fleet watchdog or GPU monitor',
-            'timeout_scope': 'harness-initiated surrogate group kill at synchronized barrier',
+            'interruption_scope': 'launcher-only pidfd kill at synchronized startup; native may not have started',
             'abort_native_scope': 'native child only where observed at barrier',
             'claims_scope': 'fleet claim removal requires independent post-job audit'}, indent=2, sort_keys=True) + '\n')
     finally:
@@ -270,7 +331,16 @@ def validate() -> None:
             for case in cases:
                 leader, launcher, worker = case['leader'], case['launcher'], case['worker']
                 native = case['native_at_barrier']
+                depth = case['namespace_depth']
                 if (leader['pid'] != case['group'] or leader['host_pgid'] != case['group']
+                        or type(depth) is not int or depth < 2
+                        or len(leader['namespace_pids']) != depth
+                        or leader['namespace_pids'][depth - 1] != case['namespace_group']
+                        or len(launcher['namespace_pids']) < depth or len(worker['namespace_pids']) < depth
+                        or case['members_after'] != {} or _members(case['group']) != {}
+                        or case['members_before'].get(str(leader['pid'])) != leader['birth']
+                        or case['members_before'].get(str(launcher['pid'])) != launcher['birth']
+                        or case['members_before'].get(str(worker['pid'])) != worker['birth']
                         or case['control']['host_pgid'] == case['group']
                         or case['control']['host_pgid'] != case['control']['pid']
                         or launcher['host_pgid'] != case['group'] or worker['host_pgid'] != case['group']
@@ -281,17 +351,31 @@ def validate() -> None:
                                                     or native['host_ppid'] != worker['pid']))
                         or oracle.sha(output / (case['case'] + '.log')) != case['log_sha256']):
                     raise ValueError('lifecycle identity or cleanup differs')
-            if (cases[0]['returncode'] != 0 or cases[1]['returncode'] != -signal.SIGKILL
-                    or cases[2]['returncode'] != -signal.SIGTERM or cases[3]['returncode'] != -signal.SIGKILL
-                    or cases[4]['returncode'] == 0):
+            if cases[0]['returncode'] != 0 or cases[1]['returncode'] == 0:
                 raise ValueError('case exit status differs')
             receipt_path = output / 'normal-receiver.json'
             receipt = json.loads(receipt_path.read_text())
+            from src.pointstream import ball_stream
+            wire = Path(args.wire).read_bytes()
+            if oracle.sha(Path(args.wire)) != args.wire_sha256:
+                raise ValueError('staged packet identity differs')
+            stream = ball_stream.unpack(wire)
+            native_bytes = (output / 'native.ivf').read_bytes()
             proof = isolated.verify_receipt(receipt, expected_context=witness.context(stage, identity, {'kind': 'cpu'}),
                                             expected_config_sha256=args.receiver_isolation_config_sha256)
             if (oracle.sha(receipt_path) != cases[0]['normal']['receipt_sha256']
                     or proof['campaign_host']['campaign_pgid'] != cases[0]['group']
+                    or proof['worker_observer'] != cases[0]['worker']
+                    or proof['launcher_observer'] != cases[0]['launcher']
+                    or cases[0]['members_before'].get(str(proof['campaign_host']['host_pid']))
+                       != str(proof['campaign_host']['start_ticks'])
                     or not _gone(proof['decoder']['outer_observation'])
+                    or stream.codec != 'svt-av1-ivf' or stream.frames != 16 or native_bytes != stream.native
+                    or receipt['frames'] != stream.frames or receipt['size'] != [stream.width, stream.height]
+                    or oracle.sha(output / 'native.ivf') != receipt['native_sha256']
+                    or len(native_bytes) != receipt['native_bytes']
+                    or (output / 'native.yuv').stat().st_size != stream.width * stream.height * 3 // 2 * stream.frames
+                    or (output / 'rendered.rgb').stat().st_size != stream.width * stream.height * 3 * stream.frames
                     or receipt['wire_sha256'] != args.wire_sha256 or receipt['resource_map_sha256'] != args.resources_sha256
                     or receipt['decoded_yuv_sha256'] != args.expected_yuv_sha256
                     or receipt['rendered_rgb_sha256'] != args.expected_rgb_sha256

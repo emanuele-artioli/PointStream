@@ -44,11 +44,40 @@ def test_surrogate_cleanup_kills_only_owned_group_before_wait(monkeypatch: Any) 
     monkeypatch.setattr(oracle.os, 'getpgid', lambda _: 23)
     monkeypatch.setattr(oracle.os, 'getpgrp', lambda: 12)
     monkeypatch.setattr(oracle.os, 'killpg', lambda pid, sig: events.append(('killpg', pid, sig)))
-    oracle._cleanup_group(cast(Any, Child()))
-    assert events == [('killpg', 23, signal.SIGKILL), ('wait', 10)]
+    monkeypatch.setattr(oracle, '_finish_group', lambda *args: events.append(('finish', *args)))
+    oracle._cleanup_group(cast(Any, Child()), 100, {100: '7'}, 2)
+    assert events == [('killpg', 23, signal.SIGKILL), ('wait', 10), ('finish', 100, {100: '7'}, 2)]
 
 
 def test_gone_uses_birth_to_detect_pid_reuse(monkeypatch: Any) -> None:
     monkeypatch.setattr(oracle.isolated, '_proc_identity', lambda _: {'birth': 'new'})
     assert oracle._gone({'pid': 17, 'birth': 'old'})
     assert not oracle._gone({'pid': 17, 'birth': 'new'})
+
+
+def test_unknown_proc_access_is_not_absence(monkeypatch: Any) -> None:
+    def denied(_: Any) -> None:
+        raise PermissionError('proc denied')
+    monkeypatch.setattr(oracle.isolated, '_proc_identity', denied)
+    with pytest.raises(PermissionError):
+        oracle._gone({'pid': 17, 'birth': 'old'})
+
+
+def test_unknown_residual_is_never_signalled(monkeypatch: Any) -> None:
+    monkeypatch.setattr(oracle, '_members', lambda _: {91: 'new'})
+    monkeypatch.setattr(oracle, 'Pidfd', lambda: pytest.fail('must not signal unknown process'))
+    with pytest.raises(RuntimeError, match='unknown residual'):
+        oracle._finish_group(90, {91: 'old'}, 2)
+
+
+def test_exited_leader_still_checks_group(monkeypatch: Any) -> None:
+    events: list[str] = []
+    class Child:
+        def poll(self) -> int:
+            return 1
+        def wait(self, timeout: int) -> None:
+            events.append('wait')
+    monkeypatch.setattr(oracle.os, 'killpg', lambda *_: pytest.fail('must not signal stale group'))
+    monkeypatch.setattr(oracle, '_finish_group', lambda *_: events.append('finish'))
+    oracle._cleanup_group(cast(Any, Child()), 100, {}, 2)
+    assert events == ['wait', 'finish']
