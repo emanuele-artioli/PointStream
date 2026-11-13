@@ -158,3 +158,63 @@ def test_context_synchronization_failure_is_not_a_memory_receipt(monkeypatch):
     with pytest.raises(RuntimeError, match='CUDA synchronization failed'):
         profile.admit(spec, dispatch, env, torch)
     assert [event[0] for event in events] == ['cap', 'allocate']
+
+
+def test_study_scope_is_fixed_to_registered_spans():
+    from experiments.tennis.k5d_full_study import selection
+
+    clips = selection()
+    assert len(clips) == 30 and sum(c['label_rows'] for c in clips.values()) == 5675
+    fixed = (('qualification16', 'tracknet/game10/Clip3', 16),
+             ('cost48', 'tracknet/game10/Clip3', 48),
+             ('confirmation292', 'tracknet/game9/Clip5', 292),
+             ('confirmation586', 'tracknet/game10/Clip12', 586))
+    for stage, clip, frames in fixed:
+        value = profile.scope(stage, clip, frames)
+        assert value['full_context'] is stage.startswith('confirmation')
+        with pytest.raises(ValueError):
+            profile.scope(stage, clip, frames - 1)
+    assert 'not evidence of absence' in profile.scope(*fixed[1])['purpose']
+    for clip, value in clips.items():
+        assert profile.scope('study', clip, value['label_rows'])['full_context']
+        with pytest.raises(ValueError):
+            profile.scope('study', clip, value['label_rows'] - 1)
+    for args in (('unknown', fixed[0][1], 16), ('study', 'unknown', 16),
+                 ('qualification16', fixed[0][1], True), ('cost48', fixed[2][1], 48)):
+        with pytest.raises(ValueError):
+            profile.scope(*args)
+
+
+def test_study_profile_opt_in_and_phase_admission(monkeypatch):
+    assert profile.select(enc.POINTS, profile.STUDY_PROFILE) == profile.POINTS
+    spec, dispatch, env, torch, _ = admission_fixture(monkeypatch)
+    env['PS_STAGE'] = 'full'
+    with pytest.raises(ValueError, match='admission'):
+        profile.admit(spec, dispatch, env, torch)
+    spec['k5d_evaluation_profile'] = profile.STUDY_PROFILE
+    assert profile.admit(spec, dispatch, env, torch)['profile'] == profile.STUDY_PROFILE
+    env['PS_STAGE'] = 'unknown'
+    with pytest.raises(ValueError, match='admission'):
+        profile.admit(spec, dispatch, env, torch)
+
+
+def test_memory_validation_requires_exact_known_profile():
+    setup = {'profile': profile.PROFILE, 'allocator_mib': profile.ALLOCATOR_MIB,
+             'context_nonallocator_allowance_mib': profile.OTHER_MIB, 'claim_mib': profile.CLAIM_MIB,
+             'allocator_before': 0, 'total_bytes': 48*2**30, 'fraction': 8192/49152,
+             'gpu_uuid': 'GPU-x', 'host_pid': 7, 'host_pgid': 70, 'campaign_pgid': 70, 'start_ticks': 99}
+    sample = {'host_pid': 7, 'gpu_uuid': 'GPU-x', 'driver_used_bytes': 1, 'reserved_bytes': 0,
+              'peak_reserved_bytes': 0, 'allocated_bytes': 0}
+    report = {'setup': setup, 'snapshots': [{**sample, 'phase': 'before_models', 'monotonic_ns': 1},
+                                            {**sample, 'phase': 'after_complete', 'monotonic_ns': 2}],
+              'self_cpu_seconds': 1, 'waited_children_cpu_seconds': 0, 'wall_seconds': 1}
+    profile.validate_memory(report)
+    with pytest.raises(ValueError):
+        profile.validate_memory(report, expected_profile=profile.STUDY_PROFILE)
+    setup['profile'] = profile.STUDY_PROFILE
+    with pytest.raises(ValueError):
+        profile.validate_memory(report)
+    profile.validate_memory(report, expected_profile=profile.STUDY_PROFILE)
+    setup['profile'] = 'unknown'
+    with pytest.raises(ValueError):
+        profile.validate_memory(report, expected_profile='unknown')

@@ -168,6 +168,10 @@ def validate(out: Path, *, prepared: bool = False, point_profile: str | None = N
     points = svt_profile.select(POINTS, point_profile)
     if report.get("evaluation_profile") != point_profile:
         raise ValueError("evaluation profile differs from explicit validator")
+    if point_profile == svt_profile.STUDY_PROFILE:
+        span = report.get("svt_study_scope", {})
+        if span != svt_profile.scope(span.get("stage"), report["clip"], report["frames"]):
+            raise ValueError("SVT study scope differs from frozen registered span")
     if prepared:
         if report.get("checkpoint_prepare") is not True or report["full_metrics"] is not False:
             raise ValueError("invalid prepared report marker or metrics status")
@@ -263,16 +267,29 @@ def validate(out: Path, *, prepared: bool = False, point_profile: str | None = N
             "scope": "packet replay; filesystem denial not established"}
 
 
+def study_scope(args: argparse.Namespace) -> dict:
+    """Only the separate study profile can opt into its registered complete spans."""
+    value = svt_profile.scope(getattr(args, 'study_stage', None), args.clip, args.frames)
+    cost = value['stage'] in ('qualification16', 'cost48')
+    if (args.start_frame != 0 or args.feasibility_no_metrics or getattr(args, 'checkpoint_prepare', False)
+            or not getattr(args, 'isolated_receiver', False) or not getattr(args, 'same_job_receiver', False)
+            or bool(getattr(args, 'cost_pilot', False)) != cost
+            or bool(getattr(args, 'benchmark', False)) == cost):
+        raise ValueError('SVT study requires complete scoring, isolated receiving and exact span mode')
+    return value
+
+
 def run(args: argparse.Namespace, *, point_profile: str | None = None) -> None:
     import torch
     from src.codecs import quality, svtav1
 
     points = svt_profile.select(POINTS, point_profile)
-    conventional = point_profile == svt_profile.PROFILE
+    study = study_scope(args) if point_profile == svt_profile.STUDY_PROFILE else None
+    conventional = point_profile in (svt_profile.PROFILE, svt_profile.STUDY_PROFILE)
     if conventional and (args.feasibility_no_metrics or getattr(args, "checkpoint_prepare", False)
                          or not getattr(args, "isolated_receiver", False)):
         raise ValueError("SVT oracle requires complete scoring and actual isolated CPU receiving")
-    if conventional and (args.frames != 16 or args.clip != "tracknet/game10/Clip3"
+    if conventional and study is None and (args.frames != 16 or args.clip != "tracknet/game10/Clip3"
                          or not getattr(args, "cost_pilot", False) or getattr(args, "benchmark", False)):
         raise ValueError("SVT oracle is restricted to the original 16-frame cost span")
     codec_inputs = () if conventional else ("image_ckpt", "video_ckpt")
@@ -303,7 +320,7 @@ def run(args: argparse.Namespace, *, point_profile: str | None = None) -> None:
             or (not benchmark and not cost_pilot and args.frames not in (16, selection["label_rows"]))):
         raise ValueError("benchmark requires full clip; calibration requires smoke or full clip")
     args.output.mkdir(parents=True, exist_ok=False)
-    if cost_pilot:
+    if cost_pilot or study is not None:
         if getattr(args, "timer", None) is None:
             from experiments.tennis.k5d_timing import Timer
             args.timer = Timer(args.output / "timing.json")
@@ -490,6 +507,9 @@ def run(args: argparse.Namespace, *, point_profile: str | None = None) -> None:
     if conventional:
         output["evaluation_profile"] = point_profile
         output["scope"] = "SVT-only16 correctness/cost oracle; original dual-codec benchmark remains unmet"
+        if study is not None:
+            output["svt_study_scope"] = study
+            output["scope"] = "SVT-only registered study stage; no aggregate or dual-codec completion claim"
     if checkpoint_prepare:
         output["checkpoint_prepare"] = True
     (args.output / "pilot.json").write_text(json.dumps(output, indent=2, allow_nan=False) + "\n")

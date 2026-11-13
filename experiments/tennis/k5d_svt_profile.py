@@ -10,6 +10,8 @@ import time
 from typing import Any, Mapping
 
 PROFILE = 'k5d-svt-only16-shared-ada-v1'
+STUDY_PROFILE = 'k5d-svt-study-shared-ada-v1'
+STUDY_STAGES = ('qualification16', 'cost48', 'confirmation292', 'confirmation586', 'study')
 POINTS = (('svt', 48), ('svt', 55), ('svt', 62))
 ALLOCATOR_MIB = 8192
 OTHER_MIB = 2048
@@ -20,24 +22,57 @@ BASIS = 'SVT-only quality/cost oracle; shared timings are not codec speed eviden
 def select(default: tuple, profile: str | None) -> tuple:
     if profile is None:
         return default
-    if profile != PROFILE:
+    if profile not in (PROFILE, STUDY_PROFILE):
         raise ValueError('unknown separately named point profile')
     return POINTS
+
+
+def scope(stage: object, clip: object, frames: object) -> dict:
+    """Validate a prospective span against the immutable registered selection."""
+    from experiments.tennis.k5d_full_study import selection
+
+    if not isinstance(stage, str) or not isinstance(clip, str) or stage not in STUDY_STAGES or type(frames) is not int:
+        raise ValueError('unknown study stage or invalid frame count')
+    clips = selection()
+    if clip not in clips:
+        raise ValueError('clip absent from frozen selection')
+    label_rows = clips[clip]['label_rows']
+    fixed = {
+        'qualification16': ('tracknet/game10/Clip3', 16),
+        'cost48': ('tracknet/game10/Clip3', 48),
+        'confirmation292': ('tracknet/game9/Clip5', 292),
+        'confirmation586': ('tracknet/game10/Clip12', 586),
+    }
+    if stage == 'study':
+        valid = frames == label_rows
+    else:
+        valid = (clip, frames) == fixed[stage] and frames <= label_rows
+        if stage.startswith('confirmation'):
+            valid = valid and frames == label_rows
+    if not valid:
+        raise ValueError('study stage clip or span differs from registered scope')
+    purpose = ('all-visible calibration; not evidence of absence behavior' if stage == 'cost48'
+               else 'qualification prefix; no absence claim' if stage == 'qualification16'
+               else 'complete registered clip')
+    return {'stage': stage, 'clip': clip, 'frames': frames, 'label_rows': label_rows,
+            'full_context': frames == label_rows, 'purpose': purpose}
 
 
 def admit(spec: dict, dispatch: dict, env: Mapping[str, str], torch: Any) -> dict:
     sharing = {'mode':'shared', 'basis':BASIS, 'margin_mib':8192}
     contention = {'policy':'continue', 'basis':BASIS, 'resume_attempts':0}
     uuid = env.get('CUDA_VISIBLE_DEVICES')
+    selected = spec.get('k5d_evaluation_profile')
     if (socket.gethostname().split('.')[0] != 'gpu6' or spec.get('cpu_threads') != 1
-            or spec.get('single_cpu_campaign') is not True or spec.get('k5d_evaluation_profile') != PROFILE or spec.get('hosts') != ['gpu6']
+            or spec.get('single_cpu_campaign') is not True or selected not in (PROFILE, STUDY_PROFILE) or spec.get('hosts') != ['gpu6']
             or spec.get('gpu_models') != ['RTX 6000 Ada'] or spec.get('gpu_memory_mib') != CLAIM_MIB
             or spec.get('gpu_sharing') != sharing or spec.get('contention') != contention
             or dispatch.get('gpu_sharing') != sharing or dispatch.get('contention_policy') != contention
             or env.get('PS_GPU_SHARING') != 'shared' or env.get('PS_GPU_MEMORY_LIMIT_MIB') != str(CLAIM_MIB)
             or not uuid or not uuid.startswith('GPU-') or env.get('PS_CLAIMED_GPU_UUID') != uuid
             or env.get('PS_CPU_ALLOWANCE') != '1' or len(os.sched_getaffinity(0)) != 1
-            or env.get('PS_STAGE') != 'smoke' or torch.cuda.device_count() != 1
+            or env.get('PS_STAGE') not in (('smoke', 'full') if selected == STUDY_PROFILE else ('smoke',))
+            or torch.cuda.device_count() != 1
             or dispatch.get('environment', {}).get('gpu', {}).get('uuid') != uuid
             or torch.cuda.get_device_name(0) != 'NVIDIA RTX 6000 Ada Generation'
             or tuple(torch.cuda.get_device_capability(0)) != (8, 9)):
@@ -55,7 +90,7 @@ def admit(spec: dict, dispatch: dict, env: Mapping[str, str], torch: Any) -> dic
     torch.cuda.reset_peak_memory_stats(0)
     from experiments.tennis.k5d_scoped_namespace import host_group_identity
     host = host_group_identity(Path(env['PS_STAGE_DIR']).parent/'run'/'status.json')
-    return {'profile':PROFILE, 'gpu_uuid':uuid, 'allocator_mib':ALLOCATOR_MIB,
+    return {'profile':selected, 'gpu_uuid':uuid, 'allocator_mib':ALLOCATOR_MIB,
             'context_nonallocator_allowance_mib':OTHER_MIB, 'claim_mib':CLAIM_MIB,
             'allocator_before':0, 'total_bytes':total, 'fraction':ALLOCATOR_MIB*2**20/total,
             **host, 'scope':'prospective cap plus observed memory snapshots; not an absolute hardware peak bound'}
@@ -102,10 +137,11 @@ def snapshot(torch: Any, receipt: dict, phase: str) -> dict:
     return value
 
 
-def validate_memory(report: dict) -> None:
+def validate_memory(report: dict, expected_profile: str = PROFILE) -> None:
     setup, samples = report['setup'], report['snapshots']
     total = setup['total_bytes']
-    if (setup['profile'] != PROFILE or setup['allocator_mib'] != ALLOCATOR_MIB
+    if (expected_profile not in (PROFILE, STUDY_PROFILE) or setup['profile'] != expected_profile
+            or setup['allocator_mib'] != ALLOCATOR_MIB
             or setup['context_nonallocator_allowance_mib'] != OTHER_MIB or setup['claim_mib'] != CLAIM_MIB
             or setup['allocator_before'] != 0 or type(total) is not int or total < CLAIM_MIB*2**20
             or setup['fraction'] != ALLOCATOR_MIB*2**20/total or not samples):
