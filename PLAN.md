@@ -23,7 +23,7 @@ new dependency.
 
 ## Where PointStream stands (2026-11-13, UTC)
 
-### Current research decision (November 13, 13:50 UTC)
+### Current research decision (November 13, 14:14 UTC)
 
 **Shared-Ada SVT16 correctness and feasibility are independently accepted and
 ACK-closed.** Job `20261113T130719Z-9f94f30c`, frozen a71/source bb717/archive
@@ -49,28 +49,38 @@ are sampled observations, not an absolute peak, speed or full-neural result.
   All six points/188 frames/both judges show source-detectability-conditioned
   repairs alongside occasional harms. The60CPU/GPU0 analysis is durably archived
   as5c181 via publication79394; no absence, new-clip or current-source credit.
-- **Opt-in SVT study port is active, CODE ONLY** ([card](docs/cards/k5d-svt-study-port-2026-11-13.md)).
-  Candidate4282c96f checks completed; root review is pending.
-  Root released300CPU/GPU0 for implementation/checks in
-  `/private/tmp/pointstream-svt-study-scientific-a71-20261113`. Freeze and qualify
-  its eventual exact source before separately admitted16/48 cost controls and
-  fixed292/586-frame confirmations. All source qualification, GPU48/full-clip
-  and30-clip stages remain unreleased; global six-point defaults stay fixed.
+- **Opt-in SVT study port code is complete** ([card](docs/cards/k5d-svt-study-port-2026-11-13.md)).
+  Immutable scientific4282c96f passed review; integration PR398 passed CI and
+  merged625647fa, followed by documentation PR399/359824f8. Original six-point/
+  16-only defaults remain unchanged. Sourceprep100 is accepted/CLOSED:
+  sourcee4d4a856/archivef813e09d/config4fa67547/source-only bridge849/cache71ef.
+  The [tracked source-cache index](docs/experiments/k5d-inputs/svt-study4282-source-cache-acceptance-20261113.json)
+  retains recoverable root certificate370b and physical receipt5545, seven
+  files0444/directory0555/readback, all31 grants unchanged and config identity
+  only. This transfers no old native/receiver runtime result or GPU evidence.
 - **W7 strict-family spending decision is CLOSED, without another encode**
   ([native70 disposition](docs/experiments/w7-inputs/native70-fixed-family-disposition-20261113.json)).
   CRF70 is the fixed family's legal maximum. The two original family cells
   remain unresolved; the primary achievable-envelope comparisons are bracketed.
   The missing neural comparison remains open.
 
-Next: [exact-study-source CPU qualification](docs/cards/k5d-svt-study-source-qualification-2026-11-13.md),1100CPU/GPU0 within existing limits. Only offline source-helper preparation100 is released; final freeze/cache execution awaits CI/root, native327/receiver585/reserve88 remain held. No GPU/48/scale release.
+Next: [exact-study-source CPU qualification](docs/cards/k5d-svt-study-source-qualification-2026-11-13.md),
+1100CPU/GPU0 within existing limits. Sourceprep100 is accepted/CLOSED;
+1032CPU is precharged: source100 +native327 +receiver585 +native local repair10
++receiver local preparation10. Only68CPU reserve remains held. Both native and
+receiver releases cover OFFLINE local UNRUN package preparation only; the
+receiver's new native proof remains unbound. No actual native/receiver job,
+runtime preflight, publication or GPU release exists yet. All GPU16/48,292/586
+and30-clip execution remains unreleased.
 
 The primary exclusive2c6d route remains separate:1160CPU/900GPU held,
 metadata50CPU precharged UNRUN. Use the [ledger](docs/experiments/submission-research-budget-20261104.json)
 for authoritative current charges under unchanged24GPUh/28CPUh limits.
-Passive a19 backend67637/PID50947 has hard deadline14:05:30.255090UTC,
-300s/maxnine ticks; latest root-inspected tick6 at13:50:49.976972 found no idle.
-A18 finished nine ticks and PID44010 is absent. No autosubmit or new GPU release;
-manuscript/PRESLEY remain paused. See the [continuation](docs/continuation-2026-11-13.md).
+Passive a20 backend19402/PID57608 started14:04:00UTC, hard deadline
+14:49:00.074349UTC,300s/maxnine ticks. Latest local tick2 at14:14:20.546222UTC
+found no idle candidate. A19 closed after nine ticks and its PID is absent.
+No autosubmit or new GPU release; manuscript/PRESLEY remain paused. See the
+[continuation](docs/continuation-2026-11-13.md).
 
 ### Historical af6 phase — balances, waits and watch superseded above
 

@@ -1,9 +1,17 @@
 # K5d: qualify the frozen opt-in SVT study source
 
-Status: prospective1100 workload CPU-seconds/GPU0 envelope within the unchanged
-24GPU-hour/28CPU-hour programme; only offline source preparation100 is released.
-Native327 and actual receiver585 remain held and require exact root releases;
-88 is an unspent failure/closeout reserve. No GPU, 48-frame or larger run.
+Status: sourceprep100CPU/GPU0 is accepted/CLOSED. Scientific4282/sourcee4d4/
+archivef813/config4fa/ROOTsourcebridge849/cache71ef passed immutable seven-file
+physical readback; certificate370b and physical report5545/raw receipts are
+recoverable in the [tracked index](../experiments/k5d-inputs/svt-study4282-source-cache-acceptance-20261113.json).
+PR398 passed CI and merged625647fa; documentation PR399 merged359824f8.
+The1100CPU/GPU0 envelope has1032CPU precharged: source100 +native327
++receiver585 +native local repair10 +receiver local preparation10. Only68CPU
+reserve remains held. Only OFFLINE local UNRUN metadata/package preparation is
+released for either job; the receiver's new native proof is unbound. No actual
+native/receiver job, runtime preflight, publication or GPU release exists yet.
+No GPU16/48/292/586/full30 authority. The protocol below retains the prospective
+requirements; the current source-only acceptance does not supply runtime proofs.
 
 Goal: establish exact-source native and CPU receiver evidence for the complete
 study port, preserving the accepted a71 source/proofs/results read-only. The
@@ -48,3 +56,15 @@ gate. Inspect and preserve; never replay automatically. Any repair needs a new
 root decision and must fit this envelope or another expressly assigned allocation.
 This card grants no training, paid compute, quality-rule change, neural comparison,
 GPU16/48/292/586/full30, manuscript/PRESLEY work or paper submission.
+
+Historical source-acceptance snapshot — budget/release amounts superseded by
+the current status above: source preparation accepted/CLOSED at full100CPU/GPU0.
+Scientific4282 and PR398 integration passed CI; PR398 merged625647fa. Actual
+sourcee4d4/archivef813/config4fa67547/ROOTsourcebridge849 and seven-file
+immutable cache71ef are independently accepted,0444/0555/readback. Root
+acceptance370b9aff and physical5545bca3 are exactly recoverable from the
+[tracked index](../experiments/k5d-inputs/svt-study4282-source-cache-acceptance-20261113.json).
+Retain the two local pre-SSH/pre-archive caller failures within prep100; no
+remote scientific job was replayed. Native327 is now fully precharged for
+metadata materialization only, runtime preflight/publication still needs exact
+root release. Remaining673CPU holds receiver585 plus reserve88. No GPU stage.
