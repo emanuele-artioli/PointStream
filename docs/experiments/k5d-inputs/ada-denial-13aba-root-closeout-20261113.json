@@ -1,0 +1,24 @@
+{
+  "job_id": "20261112T235535Z-13aba806",
+  "status": "contended",
+  "scientific_result": null,
+  "root_decision": "Preserve scratch; no retry. Ada packetrepeat viable; isolatedGPU unqualified.",
+  "diagnostics_sha256": {
+    "/private/tmp/pointstream-13aba-contention-audit-20261113/diagnostic-summary.json": "145d082d66c613b4f37fc0092e8f57f36322e3b0bd292cb3d8797f820aab666a",
+    "/private/tmp/pointstream-13aba-contention-audit-20261113/lifecycle/lifecycle-summary.json": "808094943ee0430b3742526e96681adc1e06e65f5e76bdd00b21af23ec219ff5"
+  },
+  "observed_cleanup": "recorded leader/supervisor/group and own CPU/GPU tokens absent; no points/receivers",
+  "foreign_pid": 3787551,
+  "foreign_pid_limit": "another user/differentPGID observed later; detectionbirth absent, continuity unproved",
+  "conservative_debit_gpu_seconds": 1282,
+  "conservative_debit_cpu_seconds": 1632,
+  "accounting_limit": "Conservative debit, NOT measured use: same-host preclaim start to observed original-token absence1281.870s rounded1282GPU. CPU1282 conditional one-core supervisor/campaign elapsed bound plus entire350future external allowance; prior50prep alreadycharged. Affinity inheritance/no widening/no unobserved escaped descendants are assumptions, aggregateCPU unmetered. Exactreleaseunknown;900GPU/1100CPU per-job compliance CANNOT be certified, nor actual overrun concluded. Queuewall excluded. Recordedownprocesses/groups/claims absent; no points/receivers. No retroactiveallocation/retry.",
+  "latent_separate_issue": "receiver startsnewsession; not supported as currentcause because none started",
+  "candidate_fix_commit": "16679f500eb9c872a0fe065800810d262116bfc4",
+  "candidate_gate": "software checks only; no Linux/native/source-boundCPU/denial qualification",
+  "next_gate": "real CPU lifecycle/sourcegates; independent same-host claimobserver beforeGPU",
+  "events_acknowledged": [
+    "b9db82a05b2654c88c24cc75189b0415",
+    "fd1d8fdb65175c4e94e0794878ea7a01"
+  ]
+}

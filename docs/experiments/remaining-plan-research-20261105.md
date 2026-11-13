@@ -21,9 +21,13 @@ Source5cb passed full checks and native CPU proof69c7. Actual SVT CPU oracle030d
 passed original16-frame packet/native/YUV/RGB equality, all five real EACCES
 probes, exact GPU-capable policy and process cleanup. This qualifies SVT CPU
 filesystem denial; CUDA/DCVC/GPU and scale remain unproved. Priorb9e0/cda9
-startup failures and37b3 cross-class failure stay recorded. ONE frozen first GPU
-witness13aba806 is queued on gpu6 Ada until2026-11-13T00:33:53UTC,900GPU/1100CPU
-inclusive; no48/292/586/full30 promotion. Native resource polling continues.
+startup failures and37b3 cross-class failure stay recorded. First GPU witness
+13aba806 stopped CONTENDED before points/receivers; own cleanup observed, exact
+release unknown, per-job cap compliance unverified. No automatic retry. Candidate
+PGID source needs renewed CPU/lifecycle/denial proof; independent bounded claim
+observer is the selected alternative to a broad fleet protocol change. Programme
+conservative charges21,141GPU/54,810CPU; current stage4,718GPU/5,518CPU. Passive
+five-minute watcha4 runs at most45minutes to01:28:58UTC or CPUguard.
 [Current handoff](../continuation-2026-11-12.md) and
 [stage card](../cards/k5d-ada-scale-and-denial-2026-11-12.md) are authoritative.
 

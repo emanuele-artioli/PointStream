@@ -8,15 +8,14 @@ workstream ceilings. Ordinary bounded implementation corrections need no new
 permission; source/numerical rules and stops below remain binding. Closed
 K5c/W8/W9 balances are not transferred. Unknown submissions are never replayed.
 
-Current execution status, later November12: actual restricted SVT CPU oracle030d
-passed under the exact GPU-capable policy on frozen5cb source, after nativeCPU
-proof69c7 and full software checks. Prior startup failures remain preserved.
-ONE first CUDA/DCVC/Ada decoder witness13aba806 is queued on gpu6 until
-2026-11-13T00:33:53UTC,900GPU/1100CPU inclusive within the existing6k/9k internal
-Ball stage. No scale/paper promotion. Programme charged19,859GPU/53,078CPU;
-current ledger/handoff give reservations and the sole wait. No independent ready
-worthwhile experiment was identified beyond active Ball/heldW8; prerequisite
-blocked and out-of-scope work remains explicit.
+Current execution status, November13: first Ada GPU witness13aba stopped
+CONTENDED before points/receivers; no scientific result or automatic retry.
+Cleanup observed, exact release unrecorded; per-job cap compliance is unverified.
+Conservative programme charges21,141GPU/54,810CPU; internal Ball stage remaining
+4,718GPU/5,518CPU. Renewed source/CPU/denial and independent accounting gates
+hold further GPU work. Passive four-host watcha4 checks every5min until01:28:58UTC
+or CPUguard,100CPU precharged. See current handoff and stage card. Paper/PRESLEY
+remain paused. Ada same-GPU repeat and SVT CPU denial keep their scoped passes.
 
 Historical execution status, earlier November12: **ALTERNATE-GPU QUALIFICATION QUEUED**.
 User requests regular native resource checks and a non-A6000 path. The new

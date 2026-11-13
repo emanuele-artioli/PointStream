@@ -1,6 +1,52 @@
 # Continuation — November 12, restored fleet access
 
-## Current state — real SVT denial accepted; first Ada GPU witness queued
+## Current state — November13 contention closed; receiver qualification held
+
+The first Ada GPU denial witness `20261112T235535Z-13aba806` is **CONTENDED**,
+not queued: another GPU PID was detected before any point or isolated receiver
+started. The sole canonical wait ended; recorded own group/supervisor and CPU/
+GPU claims are absent, events acknowledged, and failed scratch is preserved.
+It provides no decoder/quality result and is not automatically retried. A latent
+receiver process-group incompatibility has a software-only candidate correction
+`16679f50`; new source-bound CPU/lifecycle and actual denial gates are required.
+
+Exact claim-release time was not recorded. Root conservatively debited1,282GPU/
+1,632CPU seconds using the later same-host absence observation and conditional
+one-core/external allowances. These are not measured use: per-run900GPU/1100CPU
+cap compliance is unverified, and actual overrun is not established. Programme
+charges21,141GPU/54,810CPU, Ball14,779GPU/30,809CPU; internal stage remaining
+4,718GPU/5,518CPU. All outer/workstream ceilings and held old reservations stay
+unchanged. No new GPU release until independently durable claim accounting and
+renewed source/CPU/denial qualification; no16/48/full30 promotion.
+
+Passive watcha4 PID51630 began2026-11-13T00:43:58UTC, all four A6000/Ada hosts
+at five-minute intervals, ending by01:28:58UTC or CPU guard.100CPU precharged;
+no autosubmit, model timer or verified chat wake. Prior a3 ended00:36:02UTC after
+18ticks. New watch/output/launch:
+`/Users/manu/.cache/pointstream-resource-watch-20261113-passive-a4/`.
+SSHserver/login aggregate CPU remains unmetered. Inspect existing run/finished
+before any restart. Ada's accepted same-GPU packet-repeat/cost and real SVT CPU
+filesystem-denial evidence remain valid within their original scope.
+
+Root branch `codex/ada-contention-recovery-2026-11-13`, based origin/main after
+PR372 MERGED/CIgreen. Candidate code and observer work are isolated, not released.
+[Root closeout](experiments/k5d-inputs/ada-denial-13aba-root-closeout-20261113.json).
+Durable read-only contention evidence:42files/312,857B plus SHA manifest at
+`/Users/manu/.cache/pointstream-evidence/ada-13aba-contention-20261113/`.
+Receiver candidate headc14482e has unresolved lifecycle-review blockers; it is
+not qualified. A smaller normal+launcher-kill CPU gate is being prepared before
+new outcomes; existing four-case enclosing-namespace proof must be renewed.
+Observer prototype is separate in `/private/tmp/pointstream-fleet-lifecycle-20261113`.
+Its reviewed contract uses prepublication READY with exacthost/UUID/source/spec,
+then client atomic binding to the sole returned canonicaljobID; missed or
+ambiguous tokens/read failures remain UNKNOWN. No control protocol rollout.
+Neither candidate admits remote execution; root reviews corrected code first.
+Root documentation closeout checks: full Ruff/mypy587 pass, full pytest2,164pass/
+40skip108.38s with required process inspection available. Initial sandboxed suite
+had only the OS-denied ps test failure; no code failure reproduced outside it.
+All six workstream charged+remaining caps independently checked.
+
+## Historical November12 state before first GPU contention
 
 User requests regular resource polling and a non-A6000 route while completing
 worthwhile research before paper edits. Keep manuscript/PRESLEY paused. No paid

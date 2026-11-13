@@ -30,10 +30,15 @@ New source5cb45c80 passed full software checks and exact-source native CPU
 proof69c7. Actual SVT CPU oracle030d then passed exact original16-frame packet/
 YUV/RGB checks and all five real filesystem denials under the exact proposed
 GPU-capable policy. Earlier startup failuresb9e0/cda9 are retained, not quality
-findings. CUDA/DCVC behavior and scale remain unqualified. ONE first GPU witness
-`20261112T235535Z-13aba806` is queued on gpu6 Ada,900GPU/1100CPU inclusive,
-deadline2026-11-13T00:33:53UTC; source/spec/caps and solewait in [current handoff](docs/continuation-2026-11-12.md).
-Native5minute resource checks continue;16/48/full30 promotion remains gated.
+findings. CUDA/DCVC behavior and scale remain unqualified. First Ada GPU witness
+`20261112T235535Z-13aba806` stopped CONTENDED before points/receivers. Own cleanup
+was observed, but exact claim release was not recorded: per-run cap compliance
+is unverified, not a demonstrated actual overrun. Conservative programme debit
+now21,141GPU/54,810CPU; stage4,718GPU/5,518CPU remaining. No retry/GPU/scale release
+until corrected campaign-PGID source, renewed CPU/denial gates and independent
+claim-accounting observation are qualified. Five-minute passive resource watcha4
+runs until2026-11-13T01:28:58UTC or CPUguard; no autosubmit/modeltimer.
+See [current handoff](docs/continuation-2026-11-12.md) and rootcloseout.
 The read-only PLAN audit found no other independent ready/worthwhile experiment
 inside the current finite no-training programme; W8 stays held on cost and
 prerequisite-blocked/out-of-scope tasks stay explicit.
