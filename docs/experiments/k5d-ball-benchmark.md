@@ -1474,3 +1474,46 @@ SVTsourcecache51474COMPLETE0; actualNFS/home/itec/emanuele/Datasets/pointstream-
 SVTactualreadonlyphysicalauditbackend63381/outputphysical-audit-APPROVED-v2;4remote+4localCPU wall45underprep100. Nojob/GPU.
 
 SVTphysical63381COMPLETE0:7files/sourcebbc/archive14dc/config56a/approvedbridge9f0/sealed555-444 andidentity+exact4sourcehashupdatesONLY PASS. Remote.176429CPU/.322031wall, local.064406/SSH.013866CPU/3.551896wall. Rootacceptssource/cacheONLY,100ceilingretained; docs svt-7a9f-source-cache-provenance-20261113.json. V5threehelperlocaldiff/rootreview and60testsPASS acceptedCODEONLY; no remote/runtime/GPU. RoutingPR389CIgreenmerge56c5f2ec rootnamedforprospectivecontrolactivation only; deploymentstillUNRUN.
+
+Rootreleases/prechargesSVTnativepreflight30CPU/GPU0; remaining1470CPU600GPUheld. ExplicitOLDcontrol5db/ecb7 choice whileactivationpackageUNRUN. Exact6408helper/6956contract/e75cmetadata +rootreleasecb8e1b89b208e5d395ba82d32020e1d65697cf773e528f0d52a7fbc770105a45; allglobalstatus120 andFULLsoleeligiblegpu6doctor, all6inventory09:00historical retained. ONEpreflightabouttostart/nojob. NewcontrolactivationmustwaitfuturepublishednativeTerminal+ownedcleanup.
+
+SVTnativepreflightactualbackend21056/outputnative250-UNRELEASED/preflight30-actual-old-control, wall410secCPU30. Nojob/worker/GPUpublication; inspectpartialstate, neverautomaticreplay.
+
+Rootaccepts preflight21056PASS:1701records/noactiveunknown, Oct24legacyattentionpreserved; fullsoleeligiblegpu6doctorPASS/headroom93; actualoldcontrol5db/ecb7/cache7/unshare/SSD1.57TBPASS. ProspectiveCPU-onlynative250→288 (+38unallocatedBall/programme, outer24/28/GPUunchanged):30preflight+100native+68canonicalpublication+15wait+60audit+15failure. RetainexactLinuxqualifiedV4shims/fullsubmitdoctor; no1CPUshim variants. Native258remaininghelduntilconcretelaunchreview; nojobyet.
+
+
+Root releases/precharges native remaining258CPU/GPU0 (288total incl30preflight), SVThold1250C600G. NEW deadline-only raw899d94f0/canonical3b7779ad until2026-11-13T11:03:48.403497UTC, contract0e023b8a/helper082cf0c0; originalc21 deadline missed with NOjob, preserved. ExactqualifiedV4shims andfullcanonicaldoctor unchanged; ONEsubmit, actualID retainedbeforewait/no replay. Approvedrelease /private/tmp/pointstream-SVT-source-qualification-plan-20261113/native250-UNRELEASED/publication68-deadline-v2-UNRELEASED/root-release.APPROVED.json SHA bc712d63a79a01460f9212d634e1e2e5c09727c9b3118b0bebe23c6d3cbe2711. NoGPUrelease.
+
+
+a14 completed10:17:32UTC/9ticks/noidle atfinaltick/allfourhostsreachable, actualPID18482absent. Rootprecharges100CPU/GPU0 NEWa15 identicalwatch/spec, launch00bfac69, <=45min/300s/max9ticks. Noautosubmit/LLMtimer; exacthandle/deadline followsactualstart.
+
+
+ONE native published20261113T102450Z-7a3274d8, sourcebbc/archive14dc/config56a/env32e, canonical3b7779ad/raw899d94f0, deadline11:03:48UTC,288CPUcharged/0GPU. Actualbackend47823COMPLETE0; receipt /private/tmp/pointstream-SVT-source-qualification-plan-20261113/native250-UNRELEASED/publication68-deadline-v2-UNRELEASED/actual-ONEsubmit-freshnonce/actual-job-identity.json. RereadthisID andcanonicalstatus beforeONEwait; no replay. Newroutingactivation MUSTwaitterminal+ownedcleanup.
+
+a15 actualbackend41308 PID23932 started2026-11-13T10:25:21.191305+00:00; actualwatchreceipt /private/tmp/pointstream-resource-watch-20261113-passive-a15/run/receipt.json. Noverifiedcompletionwakeup.
+
+
+Freshcanonicalstatus97935 confirmsnative20261113T102450Z-7a3274d8 COMPLETEexit0/GPU-null/sourcebbc/spec3b777/gatepassed:four_exit_modes/native_and_namespace/normal_cpu_comparison/owned_pids_absent, smoke23.652557validator.126178. No fleetwaitneeded. RootreleasesONEreadonly10CPUartifact+currentcleanup audit/local15/SSH5 withincharged60; proofpublication/ACKheldforrootrawreview. Activationstillhelduntilindependentcleanupacceptance.
+
+
+Actualnativeaudit35808 failed255/8.3804s SSHbanner timeoutConnectTimeout8 beforeanyrawbytes/remoteCPUreceipt; canonicalCOMPLETE/gatePASS unchanged. Rootexplicitly approvesONE replacementREADONLYaudit/freshoutput, unchangedremote10/local3/SSH2 CPU, ConnectTimeout20/transport125wall. Priorunknownconservative15+replacement15+localverify15+proof12=57<=existingcharged60audit; noadditionalceiling/GPU/scientificjob. Preservefailure; STOP ifreplacementfails. Independentcleanupacceptance/controlactivationstillheld.
+
+
+RootACCEPTS native7a3274d8 independentactualaudit13570PASS/raw98d18044: sourcebbc/archive14dc/spec3b777, allfourcases,26smoke+1fullnoopmembers, nativecommands/pixels, inner1.279765CPU vsouter1.368616 diff.088851;21hostPIDs/19birthsabsent/all4groupsEMPTY/FQDNcpuclaimEXISTSallocations{}. CurrentcleanupONLY/noGPU/receiverdenial/historyclaim. Retaincomplete288CPU (auditoldsummary250labelincorrect, notchargeauthority). Rootreleases/precharges60CPU/GPU0 ONE scopedreadygateactivation e6dd/00aa/contract8cd/release 0a1f45485e238eb453e4fa9f2f756eb85c2ea805386694fdee9eeabfeb8cef2c until2026-11-13T10:52:01.348493+00:00. NoGPUrelease/replay; exacthandlesfollow.
+
+
+RootwritesNEWapprovednativeCPUproof6bf5c1a51febb72ab501899f7553ebab957e9d36305765327ee1c2d10ed86d49 (scopeCPUonly/currentcleanup/288retained) afterrawauditreview. ONEcreate-onlyimmutableupload12CPU withinnativeaudit60 approved exact7284local/c84remote/release2ab963... atnative-proof-upload12-ROOT-APPROVED-v1; targetchecks/k5d-SVT-native-CPU-d1cdb795391c277c1a3a81909895f642/native-CPU.json. Originalfalseproof/summary250/failure preserved. Publicationactualreceiptpending, noACK or receiver/GPUcredit.
+
+
+Activationinitialfunctions978 exec approvalreviewTIMEOUT beforeprocesscreation, actualoutputabsentverified. Notasafetyfinding/noSSHexecuted. RootusesONEtool-permittedapprovalretry sameexactcontract/helper/60CPUcharged, NEWdeadline-onlyapprovedrelease 0dc085566d3217818cfdbdbcce438fd4681354daecfbc90fd1be3158b5dc5789 fresh890s; oldreleasepreserved. No remoteactivationreplay.
+
+
+Activationapprovalretry actualbackend46477 running; actualfourphaseoutput /private/tmp/pointstream-uuid-control-activation-readygate-UNRUN-20261113/execution-uuid-control-56c5f2ec-20261113-a1279b5c8048; exactcontract8cd/release0dc085.../60CPUprecharged/0GPU, no scientificjob. Preserveownedhandles; unknowninspectednoreplay.
+
+Nativeproof actualupload54749COMPLETE0 physicalNFSchecks/k5d-SVT-native-CPU-d1cdb795391c277c1a3a81909895f642/native-CPU.json SHA6bf5c1a5/2601B/0444file0555dir; remote.035936CPU/.654593wall, local.059936/SSH.026743CPU/5.085265wall. Rootacceptsphysicallyreturnedidentity/modes; proofCPUonly288retained/noGPU/receiverdenial. TerminalACKpendingfreshcanonicalstatus.
+
+
+Actualactivationpreflight/stage/activate returned0: ownedoldworkerPID3141491/birth491152331 safelyreplacedbynewPID1470412/birth562919381 atimmutable56c release;15payloadfileshashverified. Samepointstreaminterpretercae73/CPUlimits[-1,-1]/ordinaryPATH16d7 andsafeSSDcacheenvironment preserved; initialnewCPU.17. Firstfulltick/LinuxselectorqualificationPENDING; no acceptedclientstate/GPUauthority yet. Backend46477 retained, inspectunknown/noreplay.
+
+
+NativeACK97598COMPLETE0 afterfreshcanonicalcomplete/exit0/GPU-null/gatepassed/sourcebbc/spec3b777. ONLY terminalcompleteevent712fa28181d65b7898b2b23e0566bf70 acknowledged; receipt native250-UNRELEASED/event-ack-7a3274d8/result.json/manifest16906bf2. TwoSSH/local.118463/waitedSSH.124158CPU/wall9.4029 withinexistingnative15monitoring; no wait/additionalcharge/controlchanges.

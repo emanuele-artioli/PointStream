@@ -1,7 +1,11 @@
 # Control-only physical GPU routing — November 13
 
 Status: source reviewed,206focused tests/Ruff/mypy/fullCI PASS; PR389 merged
-at56c5f2ec219c14831cdbc5e54a3353a6a202b53b. Actual activation remains held.
+at56c5f2ec219c14831cdbc5e54a3353a6a202b53b. Actual activation backend46477
+started after native7a3274d8 independent cleanup acceptance; new worker
+PID1470412/birth562919381, first-tick qualification pending.60CPU is charged,
+0GPU. Existing activation must be inspected, never replayed.
+Output: `/private/tmp/pointstream-uuid-control-activation-readygate-UNRUN-20261113/execution-uuid-control-56c5f2ec-20261113-a1279b5c8048`.
 Scientific2c6d is immutable; no new GPU result follows.
 
 Root releases 220 local CPU-seconds for implementation and checks; separately holds
@@ -63,4 +67,5 @@ with attended bounded parent supervision and measured administrative cost;
 steady-state machine infrastructure is separate from scientific campaign time.
 A fresh capability heartbeat does not prove the first1700-record historical
 scan is finished; verify readiness before relying on the60s admission window.
-No launch/stop/staging helper has yet been released or run.
+At that historical review, no launch/stop/staging helper had run; current
+actual activation is recorded at the top and in the Ball journal.

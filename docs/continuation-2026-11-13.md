@@ -7,14 +7,24 @@ chronology and raw-result references. Times below are UTC.
 
 ## Current scheduling decision (November 13, UTC)
 
-**GPU work remains held while the new routing control is qualified.** The
+**GPU work remains held while the new routing control finishes qualification.** The
 physical-UUID guard passed 206 focused tests, Ruff/mypy and full CI; PR389 merged
-at `56c5f2ec219c14831cdbc5e54a3353a6a202b53b`. Root named that exact control
-revision for a prospective gpu6-only activation package, not deployment.
-Installed control remains old20261105/5db/ecb7. Native/CPU source2c6d stays
+at `56c5f2ec219c14831cdbc5e54a3353a6a202b53b`. Root released one gpu6-only activation after accepting the completed native
+job and its independent current-cleanup audit.
+Owned gpu6 dispatcher was replaced once by the reviewed56c control; actual
+new PID1470412/birth562919381 is recorded. Backend46477 is finishing first-tick
+qualification, with no accepted new client state or GPU release yet. Old control
+20261105/5db/ecb7 remains preserved. Native/CPU source2c6d stays
 immutable; source/config/runtime/receiver and downstream launch functions do
 not change with the reviewed routing-only code. Old proofs retain old-control
-provenance. Local220CPU is charged; real Linux activation60CPU is held.
+provenance. Local220CPU and real Linux activation60CPU are charged.
+Activation output: `/private/tmp/pointstream-uuid-control-activation-readygate-UNRUN-20261113/execution-uuid-control-56c5f2ec-20261113-a1279b5c8048`.
+Inspect this existing worker after interruption; never replay activation.
+The running ready-gate package uses local helper `e6dd3a07`, contract
+`8cd3b1b6`. It refuses client-state/complete output unless the first worker
+tick is ready. Remote helper and payload are unchanged. Initial automatic
+approval review timed out before process creation; one permitted approval
+retry started the actual command. This was not a remote activation replay.
 
 External V5 controller is code-reviewed:60 tests pass, observerddd unchanged.
 It binds the canonical scientific spec and expected UUID to the actual admitted
@@ -44,19 +54,35 @@ verified7files0444/dir0555 at
 `/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-SVT-source-cache-c91dcd939eff59e52015977ff8bdad3f`.
 [Source/cache provenance](experiments/k5d-inputs/svt-7a9f-source-cache-provenance-20261113.json).
 Localfreeze85890/cache51474/physical63381 are COMPLETE0; no fleet job or GPU ran.
-Prep100CPU is charged, leaving1500CPU/600GPU held for250native/365CPU-only denial/
-50metadata/200admin/100reserve/535first16. Actual535CPU/600GPU fit is unproven;
+Prep100CPU and complete native288CPU are charged (including preflight30).
+Native preflight21056 passed; old c21 was never submitted and is preserved.
+The fresh deadline-only raw899d94f0/canonical3b7779ad package published exactly
+one job, `20261113T102450Z-7a3274d8`, deadline11:03:48UTC. Canonical status
+is COMPLETE/exit0/GPU-null/gatepassed; all four exit modes, native namespace,
+normal CPU comparison and owned PID checks passed. Independent artifact/current
+cleanup audit passed and root accepted:21PIDs/19births absent, four groups empty,
+FQDN CPU claim exists with no allocations. Immutable proof6bf5c1a5 is physically
+published at checks/k5d-SVT-native-CPU-d1cdb795391c277c1a3a81909895f642/native-CPU.json,
+2601bytes/0444file/0555dir. Original audit SSH failure is preserved.
+[Native acceptance](experiments/k5d-inputs/svt-7a9f-native-7a3274d8-acceptance-20261113.json).
+Terminal-complete event712fa28181d65b7898b2b23e0566bf70 is acknowledged
+after fresh canonical source/spec/exit0 checks; no other event was acknowledged.
+No fleet wait was needed. Current SVT hold is1250CPU/600GPU; ledger owns live
+amounts. Native250→288 added38CPU from existing unallocated headroom.
+Actual535CPU/600GPU first16 fit is unproven;
 48/full-study adapter remains absent. The retained initial CI fixture failure
 exposed BLAS rounding sensitivity; production fitting and strict actual
 reference native/wire/pixel/metric comparisons remain unchanged.
 
-Passive a14 continues every300s on gpu2/gpu3/gpu5/gpu6, backend38838/PID18482,
-harddeadline10:22:12.403246UTC. Last root-inspected tick3 finished09:52:36UTC and
-found potentially idle gpu5/Ada1/GPU-7754164a-33cd-265c-3696-c20966d228fe,
-qualification required. Current source/receiver/study guards are explicitly
-host-bound to gpu6; do not silently broaden hosts or transfer source proofs.
-No autosubmit, recurring model calls or verified completion wakeup. Full
-programme charges23841GPU/64895CPU, Ball17479GPU/40894CPU; ledger owns live holds.
+Passive a14 finished10:17:32UTC/nine ticks, final check no idle target,
+PID18482 absent. Passive a15 launched backend41308; its receipt at
+`/private/tmp/pointstream-resource-watch-20261113-passive-a15/run/receipt.json`
+sets deadline11:10:21.338809UTC, every300s/maxnine ticks,100CPU precharged.
+First check10:25:44 found no idle eligible GPU. Current source/receiver/study
+guards explicitly bind gpu6; do not silently broaden hosts or transfer proofs.
+No autosubmit, recurring model calls or verified completion wakeup. Programme
+charges23841GPU/65343CPU, Ball17479GPU/41342CPU at this update; the ledger owns
+live charges/holds. No new GPU execution has been released.
 
 ## Current source/native-proof phase (November 13, UTC)
 

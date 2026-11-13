@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "status": "root-reviewed local prospective template ONLY; no runtime/metadata/GPU release",
+  "template_path": "/private/tmp/pointstream-calibration-witness-v5-2c6d-template-UNRUN-20261113",
+  "template_plan_sha256": "8dce24c28c43fd7155546d24e9cba28cec29a6867d303dd03da721116df72fb5",
+  "source_sha256": "6f898f753a056981a107f5115a5a36f1310bc9d4a705a1805b75f758a0bc0117",
+  "archive_sha256": "5ca2d194b7e1a6032faf7ef60fe44924649e0a57471c12cda6264f9586260219",
+  "activation_contract_sha256": "8cd3b1b65c4a2e146f34e85116806053cb15105f16e9b9cfa609fdd3115b082d",
+  "expected_gpu_uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+  "metadata_helper_sha256": "3180da52a8e6b18bfac46bd3e846d1d46e0a20083a13ef2adbba852d8bdb3fd6",
+  "control_root": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/uuid-control-56c5f2ec-20261113-a1279b5c8048",
+  "future_client_state": "/private/tmp/pointstream-uuid-control-activation-readygate-UNRUN-20261113/execution-uuid-control-56c5f2ec-20261113-a1279b5c8048/new-client-state",
+  "metadata_precharged_CPU": 50,
+  "remaining_admin_CPU": 160,
+  "witness_hold_CPU": 900,
+  "witness_hold_GPU": 900,
+  "release_conditions": [
+    "actual reviewed activation readiness and exact new-client-state hash",
+    "fresh root-reviewed 40minute spec/deadline/raw/canonical pins",
+    "actual seven control file and sentinel hashes",
+    "first GPU witness joins requested UUID, claim, dispatch and CUDA device",
+    "original six-point/native/quality/cost gates unchanged"
+  ],
+  "no_live_deadline": true,
+  "root_review": "Read three-line metadata-helper delta: accepted CPU-proof pin/control path/budget prose only. Old packages preserved; externalV5 guard code previously reviewed; no new qualified runtime claimed."
+}
