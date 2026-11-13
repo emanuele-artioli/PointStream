@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "scope": "Correctionaddendum; preserve all originalsource/gate/receipt/rawchecksums",
+  "wrong_prior_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/claims/cpu/gpu6.json",
+  "actual_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/claims/cpu/gpu6.itec.aau.at.json",
+  "current_result": "Actualclaimfileexistswithzeroallocations,zero_threads;all six ownjobs allocationsabsent;no gpu6GPUclaimrecords",
+  "ownership_match": "canonicaljob_dirancestry ORhistoricalownclaimtoken ORcanonicaljobid; actualclaims job_id may be run",
+  "limitation": "Oldaliaspathabsence statementsunsupported. NewreceiptprovesCURRENTcleanup only; immediatehistoricalreleaseintervalnotmeasured. NativeCPUprocess proofs, normal SVT bytes/filesystemdenials andsourceidentities unchanged; no GPU/productionreservationqualification.",
+  "receipt": {
+    "path": "/private/tmp/pointstream-real-claim-observer-prep-20261113/claim-path-correction-receipt.json",
+    "sha256": "9667d58d679fd32b25e90c08bf98405d8326e52f33be9a71eb02d59a4af2117b"
+  },
+  "raw": {
+    "path": "/private/tmp/pointstream-real-claim-observer-prep-20261113/claim-path-correction-raw.json",
+    "sha256": "589a173e7f01f82487c03bfbe2776d261c8f0fe17415f26a3f7557dcf212965c"
+  },
+  "affected_jobs": [
+    "20261113T010449Z-6b186df7",
+    "20261113T012427Z-c1bededa",
+    "20261113T021221Z-f2db8617",
+    "20261113T022437Z-50b4e24e",
+    "20261112T235535Z-13aba806",
+    "20261113T030323Z-af6c09da"
+  ]
+}
