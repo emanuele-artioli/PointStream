@@ -97,6 +97,13 @@ def _cleanup_group(process: subprocess.Popen[Any]) -> None:
 def run(args: list[str]) -> None:
     if os.environ.get('CUDA_VISIBLE_DEVICES') != '' or len(os.sched_getaffinity(0)) != 1:
         raise ValueError('CPU-only one-core execution required')
+    own = isolated._proc_identity(int(os.readlink('/proc/self')))
+    supervisor = Path('/proc') / str(own['host_ppid'])
+    supervisor_command = (supervisor / 'cmdline').read_bytes().split(b'\0')
+    if (os.getppid() != 1 or len(own['namespace_pids']) < 2
+            or b'experiments.tennis.k5d_scoped_namespace' not in supervisor_command
+            or b'inner' not in supervisor_command):
+        raise ValueError('scoped namespace supervisor required for surrogate teardown')
     parsed = witness.parser().parse_args(['cpu', *args])
     if not parsed.unshare_sha256:
         raise ValueError('pinned unshare required')
