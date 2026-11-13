@@ -2969,6 +2969,20 @@
       "cpu_seconds": 100,
       "gpu_seconds": 0,
       "basis": "ROOTfinite300s/max9/45minupperbound insideexistingauthority; same80counted+20external/fullcharge. Localprecharge-scriptKeyError historicalrowwithoutphase preventedwrite; launch66147occurredbeforeledgerpersist, correctedimmediately/NOreplay. A24finished/PIDabsentverified. Noautosubmit/model/LLMtimer/nativewakeguarantee."
+    },
+    {
+      "phase": "w8-exact-dispatch-static10-20261113",
+      "workstream": "w8",
+      "cpu_seconds": 10,
+      "gpu_seconds": 0,
+      "basis": "ROOTprospectiveLOCALONLY exactfrozenaecf9stage/caller/constraints audit+purefixtures insideunallocatedprogramme; noSSH/model/API/GPU/productionreceipt. Existing929C4550Gholdunchanged,4800proposalNOTadopted."
+    },
+    {
+      "phase": "ball-passive-resource-watch-a26-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 100,
+      "gpu_seconds": 0,
+      "basis": "ROOTprospective finite300s/max9/45min passivewatch; A25finished9ticks18:17:06/PID84632absence verified. Same80countedCPU+20external reserve/full100retained. Preflight localfailures beforewatch/SSH preserved; noautosubmit/model/LLMtimer/nativecompletionresume guarantee."
     }
   ],
   "reservations": [
@@ -3632,9 +3646,11 @@
       "phase": "ball-Ada-calibration-source-qualification-20261113",
       "workstream": "ball",
       "gpu_seconds": 900,
-      "cpu_seconds": 1230,
+      "cpu_seconds": 1270,
       "status": "Remaining_unspent1230CPU900GPU primaryexclusive6pointqualification; +70ROOTunallocatedforcompletewait70/artifact60 (oldobserverexternal40/artifact20retained); source/proofsunchanged; runtimeUNRELEASED.",
-      "card": "docs/cards/k5d-primary-Ada0-qualification-2026-11-13.md"
+      "card": "docs/cards/k5d-primary-Ada0-qualification-2026-11-13.md",
+      "observer_unknown_failure_allowance_CPU": 200,
+      "root_amendment_20261113": "Prospective+40unallocatedBall/programme tocoverTWOunknownobserver100each instead160normalpayload; remainingruntime1270CPU900GPU. NoGPU/source/quality/outercapincrease; metadata30separateunfundeduntilkitready."
     },
     {
       "phase": "ball-control-only-UUID-routing-activation-20261113",
@@ -6811,10 +6827,10 @@
         "source_sha256": "e4d4a856a06c5f9a06586056ab4a30f0c73b232e5a3db035ae6eb5546063f80b"
       },
       "spec_sha256": "af7c05a138d6faf716ecacc633a7ea104f82d312d96a66fc4b49d71e765d8dbc",
-      "status": "pending",
+      "status": "complete",
       "deadline": "2026-11-13T18:17:58.431688+00:00",
       "chat_id": null,
-      "scope": "publicationonly; no denialacceptance/ACK; no wait started",
+      "scope": "Accepted retrospective292only; no586/full30/neuralpromotion",
       "phase": "study4282-confirmation292",
       "workstream": "ball",
       "actual_identity": "/private/tmp/pointstream-study4282-confirmation292-refresh20-ROOT-e8830898217f44c297731b08c07ddaa7/runtime-ROOT-candidate/actual-ONEsubmit-confirmation292/actual-job-identity.json",
@@ -6824,7 +6840,7 @@
       "full_stage_CPU_inclusive": 3000,
       "GPU_precharged": 2390,
       "no_replay": true,
-      "canonical_status": "running",
+      "canonical_status": "complete",
       "status_backend": 98159,
       "events_backend": 20357,
       "operational_warning_acknowledged": [
@@ -6832,7 +6848,43 @@
       ],
       "wait_backend": 68911,
       "single_wait_max_seconds": 2400,
-      "no_second_wait_implicit": true
+      "no_second_wait_implicit": true,
+      "terminal_status_backend": 56011,
+      "wait_result": "CLI10earlynonterminalcontention; nosecondwait",
+      "physical_audit_backend": 81442,
+      "physical_audit_status": "KNOWNFAILEDdirectartifacttransferexit255/incomplete189530112B preserved/noGPUrerun",
+      "scientific_acceptance": "ROOTaccepted292scoped; actualclip sourcequalifiedTRUE; historical10/197failure retained; CRF62false3to5bothjudges",
+      "terminal_acknowledged": true,
+      "failure100_suballocations": {
+        "metadata_deadline_refresh": 20,
+        "ONE_readonly_gzip_audit63": 63,
+        "unspent": 17
+      },
+      "gzip_repair_status": "COMPLETE0/frozenphysicalverificationPASS",
+      "gzip_repair_backend": 15914,
+      "gzip_repair_package": "/private/tmp/pointstream-study4282-64160888-gzip-repair63-ROOT-ONE-20261113",
+      "gzip_repair_release_sha256": "453bdbe71ec2b63a2b96d2bb5d35203ab4ca5bceacd3e9cd03865729fc5e7332",
+      "gzip_repair_fresh_status_backend": 86895,
+      "root_acceptance_sha256": "437bc322ab01a3d16e4f927be2c1488f1efb13fa1bf85b1207a54d4eb88e11a1",
+      "independent_actual_review_sha256": "603bda5edc2fcd383a4b2b87a97266fbeb603428ee7e3bc2a7716c3bd5ff56fd",
+      "acknowledged_events": [
+        "bd0b924d29ab58c29b901e6630bc9a14",
+        "2a91736282ec5274a73a05f8206274fb",
+        "d7dad68372b15788892a66b49ba2ae58"
+      ],
+      "archive_publication_backend": 39715,
+      "archive_publication": {
+        "status": "PASS_IMMUTABLE_ARCHIVE_ONLY",
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-study4282-confirmation292-641-2cf8ef0f21be04e979436493/qualification.tar.gz",
+        "sha256": "2cf8ef0f21be04e9794364937ef1801a4363d65a54fd7f89eadf2d64b476ec3e",
+        "bytes": 41820486,
+        "file_mode": "0444",
+        "directory_mode": "0555",
+        "CPU": 0.321164,
+        "wall": 21.610099013894796
+      },
+      "tracked_acceptance_index": "docs/experiments/k5d-inputs/svt-study4282-64160888-confirmation292-root-acceptance-20261113.json",
+      "tracked_acceptance_index_sha256": "9d845132047999dabb61693e435e5345fcb90d5db2057f912046cafaa1630dc9"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -6860,22 +6912,24 @@
     "Root20261113:13aba contended beforepoints/receivers;exactclaimreleaseunknown. Conservative1282GPU1632CPUdebit notmeasured use/perjoboverrun evidence; capcomplianceunverified. No newGPU untilPGID/sourcegates+durableindependentobserver. Outer/workstreamcapsunchanged.",
     "Root20261113 prospectivelyadds38CPU/GPU0 fromunallocatedBall/programme toSVTsourcequalification hold insideunchanged24GPUh/28CPUh/Ball72000CPUceilings. Nativecompleteceiling250\u2192288=30preflight+100campaign+68publication(fullstockdoctor+qualifiedV4shims)+15wait+60audit/proof+15reserve. No newshims/loosenedquality/native rule/GPU; chargeonlyafterexactrootlaunchreview. Prior250planretainedhistorical.",
     "RootprospectiveSVTdenial365\u2192413CPU/GPU0 (+48unallocatedBall/programmeCPU) retainqualifiedV4fullpublication68 insteaduncertain20; original265campaign/science/source/qualityunchanged. External148=20preflight+68publication+10wait+40audit+10reserve. Existingouter24GPUh28CPUh/Ball72000CPUunchanged; noexecutionbyallocation.",
-    "RootprospectiveSVTqualification413\u2192443CPU/GPU0: failedpreflight20retained +ONEreplacementpreflight30 +393remaining. Add30unallocatedBall/programme; allouter/workstreamceilingsunchanged. Readonlystatus-ONLY6CPU/120wallbootstrap proposed; originalpublication68V4shims/scienceunchanged. No replacementexecutionbeforeexactrootreview."
+    "RootprospectiveSVTqualification413\u2192443CPU/GPU0: failedpreflight20retained +ONEreplacementpreflight30 +393remaining. Add30unallocatedBall/programme; allouter/workstreamceilingsunchanged. Readonlystatus-ONLY6CPU/120wallbootstrap proposed; originalpublication68V4shims/scienceunchanged. No replacementexecutionbeforeexactrootreview.",
+    "ROOT292 failure100 assignment20metadata+63ONEgzipreadonlyrepair+17unspent; alreadyinsidefull3000charge, NOadditionaloutercharge/refund. Original60failedartifact retained. Noautomaticretry/GPUrerun.",
+    "ROOTprospectiveprimaryruntime1230to1270CPU +40unallocatedBall/programme coversobserverunknownfailure100each/200insteadaccepted80each/160. Nochargeyet/noextraGPU/source/science/outerceilingchange; metadata30separatereleaseonlywhenoperativekitreviewed."
   ],
   "monitoring": {
-    "state": "a25_active_bounded_passive_only",
+    "state": "a26_active_bounded_passive_only",
     "scope": "gpu2/gpu3 A6000 and gpu5/gpu6 Ada",
-    "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a25/run",
+    "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a26/run",
     "native_completion_wakeup_verified": false,
     "native_completion_resume_verified": false,
     "accounting_limits": "SSH server/login aggregate unmetered; inner80 countedCPU plus20 external reserve; full100CPU charge retained",
-    "scientific_jobs": "20261113T173340Z-64160888 RUNNING sharedgpu6Ada1/ef96; expectednonterminalbd0bACKoperationalONLY; ONEcanonicalwait68911 max2400s active, stage3000C2390G fullycharged/no30fit. Primary1230C900Gheld.",
+    "scientific_jobs": "64160888 ROOTaccepted292 only/terminalACKclosed/archiveimmutablePASS. Primaryneuralpreparationheld1230C900G; W8wholefitSTOP. No automaticGPUsubmission.",
     "source_sha256": "2b931eb5a25f7a87cc3594103ee845ec2582cc017309b7d479a99f637f6ee10c",
     "mode": "bounded_passive_native_resource_checks",
-    "pid": 84632,
-    "backend": 66147,
-    "started_utc": "2026-11-13T17:36:42.375451+00:00",
-    "deadline_utc": "2026-11-13T18:21:42.375350+00:00",
+    "pid": 91332,
+    "backend": 63980,
+    "started_utc": "2026-11-13T18:32:08.735544+00:00",
+    "deadline_utc": "2026-11-13T19:17:08.890323+00:00",
     "interval_seconds": 300,
     "max_ticks": 9,
     "jobs": [],
@@ -7016,6 +7070,18 @@
       "ssh_waited_children_cpu_seconds": 1.18306,
       "ticks": 9,
       "PID79197_absent": true
+    },
+    "previous_batch": {
+      "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a25/run",
+      "finished": {
+        "controller_cpu_seconds_observed": 0.512232,
+        "finished_utc": "2026-11-13T18:17:06.134382+00:00",
+        "reason": "deadline",
+        "remote_worst_case_charge_seconds": 45.62150499999999,
+        "ssh_waited_children_cpu_seconds": 1.1204239999999999,
+        "ticks": 9
+      },
+      "pid_absence_verified": true
     }
   },
   "approval_history": [

@@ -2,7 +2,7 @@
 
 Status: both actual same-host Ada UUID metadata variants are accepted:
 Ada0 metadata 77773 and Ada1 variant 84985. The fixed 17:10:13.226212UTC
-window is closed without a GPU submission. Runtime1230CPU/900GPU remains
+window is closed without a GPU submission. Runtime1270CPU/900GPU remains
 held and unreleased; metadata is not an idle lease or GPU qualification.
 A future attempt needs fresh timing, resource/admission checks and exact
 caller releases. Genuine frozen source/config/CPU proofs remain unchanged.
@@ -27,8 +27,8 @@ contention, cold-start or observer/publication costs. An idle inventory sample
 is only a candidate; it is not an admission result or a speed measurement.
 
 Allocation is unchanged: metadata50CPU already charged separately; runtime
-900GPU/1230CPU held (root added70CPU within unallocated Ball/programme).
-Runtime CPU comprises700 campaign +160 observer payload +70 completion wait
+900GPU/1270CPU held (root added110CPU within unallocated Ball/programme).
+Runtime CPU comprises700 campaign +200 observer payload/failure allowance +70 completion wait
 +148 existing chain +START30 +READY30 +collect15 +artifact60
 +status-events-ACK15 +2 reserve. The70 wait uses the previous40 external observer
 allowance plus30 newCPU; artifact60 uses previous20 plus40 newCPU. Metadata50 additive caps are39 remote same-process
@@ -72,3 +72,10 @@ source judge/reference/guard checks. Full stage is a NOOP. Encoded full/ROI
 metrics and judge scoring require the separate scorer; this first qualification
 does not close the neural quality comparison. Audit the actual30 binary members
 and66 regular checkpoint-manifest files, not the SVT-only receiver file layout.
+
+November13 ROOT prospective amendment: +40 unallocated Ball/programme CPU to
+cover two observer unknown outcomes at100CPU each. Successful payload receipts
+can establish80CPU each; the whole forecast reserves200CPU regardless. Runtime
+hold1270CPU/900GPU; source/quality and outer24GPUh/28CPUh unchanged. The fresh
+metadata30 remains separate and unreleased until the operative caller/audit kit
+is ready. Old static START/READY callers target old bindings and cannot be reused.

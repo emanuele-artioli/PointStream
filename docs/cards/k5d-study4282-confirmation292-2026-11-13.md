@@ -1,6 +1,15 @@
 # Complete292-frame SVT correctness and cost oracle
 
-Status: one scientific publication released; actual job`20261113T173340Z-64160888` RUNNING on shared gpu6/ef96. Deadline-only refresh67686 passed both actual normalizers/ROOT review; spec canonicalaf7c05a1/rawdd0752, fixed deadline18:17:58.431688UTC. ROOT publication68 release1856b9b8 passed2610s headroom with2682.07s observed. Full3000CPU/2390GPU now charged (83CPU prior+2917CPU/2390GPU runtime); no stage hold remains. Refresh20 used failure100, leaving80 future failure provision. ONE canonical wait330 backend68911 is active (max2400/82SSH, outer2480). Expected nonterminal contention bd0b924d (foreign PID2751761) was operationally ACKed only; timing is contaminated. No scientific result, terminal acceptance,586/30 fit or automatic retry follows. Preserve original33706 metadata success and prepublication guard failure; old18:08:37 deadline remains unusable.
+Status: ROOT accepted actual `20261113T173340Z-64160888` (proof 437bc322,
+independent 603bda5e); canonical COMPLETE/gatePASS/exit0, all known events ACK-closed.
+Both stages' physical/native/PSBL/pixels/CPU receipts/metrics/judges/current
+cleanup passed. Actual clip source-task qualification is TRUE; historical 10/197
+calibration failures remain. At CRF62,10-pixel hits5→229/261 (WASB),7→229/261
+(BallTrack), alongside false-on-absent3→5/30 for BOTH judges. Full-command
+wall 534.0789s/scoped527.046201CPU is shared cost metadata, not speed or whole
+command CPU. Full 3000CPU/2390GPU and failed audit 60 remain charged; gziprepair63
+passed without a GPU replay. Archive publication 39715 passed immutable readback (SHA2cf8ef0f,41,820,486B,0444/0555). No 586/cohort promotion. Primary neural comparison stays first priority;
+paper and PRESLEY paused.
 
 Goal: evaluate complete tracknet/game9/Clip5 (292 frames:30 absent,261 visible,
 one excluded) on the unchanged three SVT points48/55/62, preset4, with both
