@@ -1,9 +1,17 @@
 # K5d: conventional-only confirmation feasibility
 
-Status: source7a9f/cache accepted; native CPU job20261113T102450Z-7a3274d8
-passed independent root audit. Immutable proof6bf5c1a5 is physically published.
-Prep100CPU/native288CPU charged; remaining1250CPU/600GPU held. Receiver-denial
-and GPU compute remain UNRELEASED; this native proof gives no GPU/quality credit.
+Status (November13,11:35UTC): actualCPUreceiverb40b90d4 is root accepted,
+proofc8c3949b physically published and sole terminal event ACKed. Native6bf,
+source7a9f/cache and same56c CPU-admission joins are accepted. Failed kernel
+readiness gates and original UNKNOWN/metadata erratum remain retained.
+No GPU/general-routing pass follows. Receiver480CPU retained; SVThold848CPU/
+600GPU (meta50/admin200/reserve63/science535). Root prospectively narrowed
+sharedSVT16 to correctness/feasibility with full conservative caps, CURRENT
+cleanup and exact own-Ada parity, omitting live-span/speed/scale claims and
+copied observers. Exact lifecycle/package review is pending; no GPU release.
+Primary V5 exclusive route remains separate. The current continuation and
+budget ledger own live state; manuscript/PRESLEY remain paused.
+
 Root decision: the exclusive Ada queue `20261113T030323Z-af6c09da` expired
 without admission. Keep the registered dual-codec benchmark open. Test a
 separately named, narrower confirmation route against SVT-AV1 that can score
@@ -117,3 +125,25 @@ preflight30+native100+publication68+wait15+audit/proof60+failure15. Preflight30
 COMPLETE/PASS,1701records/noactiveunknown, gpu6doctor/headroom93 and physical
 source/control/cache PASS. Remaining258native is held until exact root launch
 review; old250plans stay historical. No native/GPU publication yet.
+
+
+## Historical phase443 prepublication plan — superseded by current status
+
+Native288 and prep100 remain charged. The first20CPU conditional preflight
+failed at global status with a truncated response, before worker-context fetch
+or publication; retain it. Root adds a separate30CPU read-only replacement
+with an exact status-only6CPU/120s bootstrap. This does not modify the published
+control or the publication's qualified shims. The full phase is443CPU/GPU0:
+20failed +30replacement +393future (265campaign/68publication/10wait/40audit/10reserve).
+All allocations stay inside the unchanged Ball/programme ceilings. Current hold
+is1278CPU/600GPU:393futuredenial/50metadata/200admin/100reserve/535first16.
+
+Replacement preflight backend26454 is running at
+`/private/tmp/pointstream-SVT-denial443-replacement-preflight30-v2-UNRUN-20261113`.
+No job has been published. Conditional stateef3cb1f1 authorizes only the exact
+CPU-only spec776abe28/canonical2a7a16cd, deadline11:39:37UTC. No GPU/general
+readiness pass; original kernel gates and local launch mistakes remain recorded.
+Complete operational window865s must fit before release. Publication still runs
+mandatory fresh stock doctor on sole eligible hostgpu6. Stop on context/source
+mismatch, insufficient forecast, unknown submission, failed scientific gates or
+no admission within120s; inspect actual ID before any owned cancellation.

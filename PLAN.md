@@ -23,31 +23,42 @@ new dependency.
 
 ## Where PointStream stands (2026-11-13, UTC)
 
-### Current research decision (November 13, UTC)
+### Current research decision (November 13, 11:35 UTC)
 
-Frozen 2c6d source/cache and actual native CPU proof are accepted. Actual
-SVT receiver-denial job `20261113T090138Z-e039d7c0` completed and passed its
-validator and root evidence review; terminal acknowledgment is complete and proof 7adf5e5d is published. The external queue controller
-passed its bounded Linux qualification; earlier failed attempts remain retained.
-No new-source GPU witness, paired calibration or full30 run is released.
-Physical-UUID routing PR389 merged CI-green at56c5f2ec; scoped gpu6 activation
-has started on the owned gpu6 dispatcher; first-tick qualification remains
-pending with backend46477 and no GPU release. External V5 expected-selector guard passed60 local tests.
-Independent SVT-only PR387 merged CI-green at7a9f5b04; its new sourcebbc63eda,
-archive14dc232a, config56a88f5a and sealed source cache are accepted. Fresh
-CPU-only receiver proof and measured16-frame fit remain required. Native
-CPU containment/accounting proof6bf5c1a5 from7a3274d8 is root accepted and
-physically published; it gives no receiver-denial/GPU/quality/scale credit.
+Actual SVT-only CPU receiver job `20261113T111519Z-b40b90d4` is root accepted,
+physically published (proof `c8c3949b`, 7,313,201 bytes, immutable0444/0555)
+and terminal-ACKed (`06e252891c1f5883a1e83541746526ed`). Independent checks
+joined exact source/config/environment, native wire/YUV/RGB, five private-file
+denials, initial-launcher SIGKILL, eighteen absent processes/sixteen captured
+births/four empty groups and the actual empty FQDN CPU claim. The same56c
+worker/control passed the before/after CPU-admission joins. This establishes
+CPU operational readiness; it does not establish GPU routing or general readiness.
+Failed kernel gates and the original publication guard UNKNOWN remain retained;
+actual normalized spec5d425 is accepted solely under deadline_epoch erratum0bf13.
+No resubmission or scientific-source change occurred.
 
-Five-minute resource checks continue through11:10:21UTC(a15); its10:25:44
-check found no idle eligible target. Prior a14 completed nine checks, with no
-idle target in its final check. The current receiver/study guards explicitly
-bind gpu6; no host substitution or automatic submission follows. No verified
-model-completion callback. SVT-only native CPU job20261113T102450Z-7a3274d8
-is root accepted after independent artifact/current-cleanup review. No new GPU workload has started.
-The [canonical continuation](docs/continuation-2026-11-13.md) owns live job IDs,
-proofs and handles; the [budget ledger](docs/experiments/submission-research-budget-20261104.json)
-owns charges and remaining holds. Preserve the immutable 2c6d scientific worktree.
+No GPU stage is released. The primary exclusive-Ada16 witness can retain V5;
+a new purpose-specific GPU authorization/state is being prepared, preserving
+2c6d/source6f and its native9095/receiver7adf proofs. The first real witness must
+itself join the physical UUID through request, claim, dispatch and CUDA/producer.
+For shared SVT16, root prospectively selected correctness/feasibility only with
+full600GPU/535CPU conservative charging, CURRENT cleanup, exact own-Ada parity,
+and no independent live-span, speed, extrapolation or scale claim. This avoids
+building a copied shared observer system. Its complete stock-fleet lifecycle
+forecast and external package still require root review; completion is unproven.
+
+The receiver phase retains480CPU/0GPU (443 original +20 launcher repair +17
+proof closeout). SVT remaining hold848CPU/600GPU is meta50/admin200/reserve63/
+science535. Programme charges23841GPU/65923CPU; Ball17479GPU/41922CPU.
+All spent-plus-held ceilings pass. Source7a9f/native6bf and source2c6d stay immutable.
+
+Passive a16 backend60680/PID27368 checks A6000 and Ada every300s, maxnine ticks,
+with hard deadline11:53:06.240058UTC. Latest inspected tick4 at11:28:26UTC found
+no idle candidate. No automatic submission or verified completion resumption;
+no recurring LLM timer. Manuscript and PRESLEY work remain paused.
+
+See the [canonical continuation](docs/continuation-2026-11-13.md) and
+[accepted receiver evidence](docs/experiments/k5d-inputs/svt-7a9f-b40b90d4-CPU-denial-acceptance-20261113.json).
 
 ### Historical af6 phase — balances, waits and watch superseded above
 

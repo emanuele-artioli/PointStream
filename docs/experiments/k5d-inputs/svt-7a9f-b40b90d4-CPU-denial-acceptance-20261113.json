@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "job_id": "20261113T111519Z-b40b90d4",
+  "source": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "14dc232a1fb20a7ec0284e1c42bdbb15524dc26d3ad7d9b6507995784ef75dc7",
+    "source_sha256": "bbc63eda6d58b14c1fd9cb88bacac0e574c8ada2594cdae517073e1009cb5d15"
+  },
+  "actual_canonical_spec_sha256": "5d4253a840887d4cb2fe6e9a35c98b275411187f5668df35e48b9af4af4c9d47",
+  "config_sha256": "56a88f5a7105888e03f3687ba7f1258b05d8b98b342fc72ce62ae32976ad951f",
+  "proof": {
+    "CPU": 0.110386,
+    "bytes": 7313201,
+    "directory_mode": "0555",
+    "file_mode": "0444",
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-SVT-real-CPU-denial-ff9f6e423f894ebb9e299aea2242b64b/real-CPU-denial.json",
+    "sha256": "c8c3949bf84e77d1554f994a8070c4996b70f619784c24d7ba57c94a414e2415",
+    "status": "exact root-approved newCPUdenialproof uploaded only; no scientific execution",
+    "wall": 4.419341885484755
+  },
+  "independent_audit_sha256": "f83b680c5d39805c3127e365ecb802886ab6a22fe7d36f13fe611910138485a7",
+  "audit_summary_sha256": "cb4bc849648a59cd78ff7bdb6fb928f6bafb3caeea8a1f7282f2721e4675eee6",
+  "audit_aftercontext_sha256": "4cac04371bc68aac2e3a47ce8745f9cfee94dbf4258cadeb307f677d9f5f618a",
+  "metadata_erratum": {
+    "status": "INDEPENDENT_METADATA_ERRATUM_ROOT_ACCEPTANCE_UNSET",
+    "approved": true,
+    "job_id": "20261113T111519Z-b40b90d4",
+    "publication_backend": 42888,
+    "original_guard_failure": "UNKNOWN retained. Canonical submission happened once; helper rejected response against predicted raw-dict digest. No replay/cancel.",
+    "submitted_raw_spec": {
+      "path": "/private/tmp/pointstream-SVT-denial443-publication393-ROOT-preflight-bound-UNRUN-20261113/spec.UNRELEASED.json",
+      "sha256": "776abe28ada89670e7243440541e3172bd1a7be54aac1d211bed361a1595e6ec",
+      "unchanged": true,
+      "deadline": "2026-11-13T11:39:37.274038+00:00",
+      "raw_dictionary_digest": "2a7a16cdfdc55cf72e4ce04201e1a9680fe20964d301cb15a671c400b72fd741"
+    },
+    "actual_normalized_canonical_sha256": "5d4253a840887d4cb2fe6e9a35c98b275411187f5668df35e48b9af4af4c9d47",
+    "independent_validation": {
+      "frozen7a9f_file": "/private/tmp/pointstream-SVT-qualified-source-7a9f-20261113/experiments/jobs/inbox.py",
+      "frozen7a9f_file_sha256": "cf680edbf04f1a9757212cf52975400f596dc9691f25c8e75d7ebb95f1794fd9",
+      "control56c_file": "/private/tmp/pointstream-gpu-uuid-control-56c5f2e-20261113/experiments/jobs/inbox.py",
+      "control56c_file_sha256": "46123d6df975e4c9e6bddf6907b00bc5fcacbc057f39e6c05753b68ebd0774a8",
+      "same_raw_input": true,
+      "normalized_outputs_exactly_equal": true,
+      "raw_vs_normalized_only_change": [
+        {
+          "path": "/deadline_epoch",
+          "raw": "<absent>",
+          "validated": 1794569977.274038
+        }
+      ],
+      "derived_epoch": 1794569977.274038,
+      "epoch_equals_existing_deadline_timestamp_exactly": true,
+      "normalized_minus_deadline_epoch_equals_raw_exactly": true
+    },
+    "cause": "Constructor returns raw spec and ignores validate_spec return; builder predicted inbox.digest(raw constructor result). Fleet submit correctly hashes validate_spec(raw), whose normalized copy adds deadline_epoch. Original anticipated2a7 metadata pin was wrong; source/spec/budget/argv/assets/runtime/quality did not change.",
+    "claim_scope": "Metadata identity correction only. Root independently decides whether to accept this erratum and authorize actual saved-artifact audit. No scientific gate waived or outcome inferred by this comparison.",
+    "preservation": [
+      "Original helper/contract/spec and failed guard output unchanged",
+      "Actual raw776a and old expected2a7 retained beside actual normalized5d4",
+      "Completed original job not replayed/cancelled",
+      "No quality inspection, remote access, source/spec modification or ACK"
+    ],
+    "report_sha256": "a5b1ebe62172dfb8309c3976d3720700a84a741f125f272b23bb3f5818b78974",
+    "normalization_results_sha256": "ab7d60df6eb34e90af1016cff171eed56f88d171e3f2b54f29d66cda3bcee7e8",
+    "local_erratum_CPU_seconds": 0.0005789999999999962,
+    "root_acceptance": "Rootindependentlycomputedactual56c validate_spec(raw776a) digest5d425 andrawdigest2a7; soleaddedfielddeadline_epoch, independentlycrosscheckedold7a9and56c equal/exactoriginaldeadline. Acceptactualnormalizedspec identityONLY; guardfailurepreserved, no qualitymethod/gates changed."
+  },
+  "accepted_checks": {
+    "native_wire_YUV_RGB": true,
+    "five_real_private_file_denials": true,
+    "normal_and_initial_launcher_SIGKILL_scoped_teardown": true,
+    "current_absent_processes": 18,
+    "captured_births": 16,
+    "empty_groups": 4,
+    "actual_FQDN_CPU_claim_empty": true,
+    "same56cworker_CPU_admission_request_and_dispatch_joins": true
+  },
+  "CPU_precharged_total": 480,
+  "GPU_seconds": 0,
+  "limits": [
+    "Supervisor-assisted scoped teardown allowed; no active-native/unshare-only/fleet-watchdog claim",
+    "Current cleanup only; no immediate historical claim release interval",
+    "Original publication hash guard UNKNOWN and failed kernel gates retained; sole deadline_epoch metadata erratum accepted separately",
+    "CPU-only operational readiness. No GPU route/timing/exclusive access/scale/quality claim."
+  ],
+  "terminal_event_ACK": "06e252891c1f5883a1e83541746526ed",
+  "terminal_ACK_backend": 59760
+}

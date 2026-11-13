@@ -1,12 +1,18 @@
 # Control-only physical GPU routing — November 13
 
-Status: source reviewed,206focused tests/Ruff/mypy/fullCI PASS; PR389 merged
-at56c5f2ec219c14831cdbc5e54a3353a6a202b53b. Actual activation backend46477
-started after native7a3274d8 independent cleanup acceptance; new worker
-PID1470412/birth562919381, first-tick qualification pending.60CPU is charged,
-0GPU. Existing activation must be inspected, never replayed.
-Output: `/private/tmp/pointstream-uuid-control-activation-readygate-UNRUN-20261113/execution-uuid-control-56c5f2ec-20261113-a1279b5c8048`.
-Scientific2c6d is immutable; no new GPU result follows.
+Status (November13,11:35UTC): actualCPUreceiverb40b90d4 is root accepted,
+proofc8c3949b physically published and sole terminal event ACKed. Native6bf,
+source7a9f/cache and same56c CPU-admission joins are accepted. Failed kernel
+readiness gates and original UNKNOWN/metadata erratum remain retained.
+No GPU/general-routing pass follows. Receiver480CPU retained; SVThold848CPU/
+600GPU (meta50/admin200/reserve63/science535). Root prospectively narrowed
+sharedSVT16 to correctness/feasibility with full conservative caps, CURRENT
+cleanup and exact own-Ada parity, omitting live-span/speed/scale claims and
+copied observers. Exact lifecycle/package review is pending; no GPU release.
+Primary V5 exclusive route remains separate. The current continuation and
+budget ledger own live state; manuscript/PRESLEY remain paused.
+
+## Historical implementation and activation protocol
 
 Root releases 220 local CPU-seconds for implementation and checks; separately holds
 60 CPU-seconds for a reviewed Linux activation qualification. Both come from
@@ -69,3 +75,33 @@ A fresh capability heartbeat does not prove the first1700-record historical
 scan is finished; verify readiness before relying on the60s admission window.
 At that historical review, no launch/stop/staging helper had run; current
 actual activation is recorded at the top and in the Ball journal.
+
+
+## Historical conditional CPU readiness plan — superseded above
+
+The first10CPU follow-up rejected its pilot because it assumed syscall23.
+The final8CPU pilot confirmed the same Python binary sleeps in zero-FD
+pselect6(270); the host denied peer `/proc/PID/syscall` inspection. Both
+failed gates remain failed. No further kernel probe or worker restart is released.
+
+Root selects the already planned SVT-only receiver-denial qualification as a
+conditional, useful CPU readiness witness. Its separate413CPU/GPU0 reservation
+retains265campaign plus148external; scientific source7a9f/config56a/bridge9f0,
+native proof6bf, packed environment32e, private-path/native-pixel checks and
+validator remain unchanged. A NEW client state differs from old configuration
+only in the installed56c release, with authorization restricted to this exact
+reviewed CPU spec. It is not a technical capability boundary. No GPU request,
+UUID-routing result, universal queue-latency result or general readiness pass
+follows from this state.
+
+Before release require fresh global quiescence, actual worker1470412/birth562919381,
+control/token/interpreter/PATH/limits/error/heartbeat and all source/native pins.
+The20CPU preflight omits a duplicate doctor: the68CPU publication still runs
+the full stock doctor for the sole eligible hostgpu6 before publication. Stop
+on mismatches, unknown publication, failed scientific gates, or failure to admit
+within120seconds; preserve the actual ID and inspect before any owned cancellation.
+Only real completion/validator PASS plus independent source/control/environment
+and current-cleanup audit can establish operational qualification for this CPU
+workload. Installed control/PYTHONPATH provenance changes explicitly; scientific
+packed environment and receiver policy stay pinned. GPU qualification remains
+separately gated.
