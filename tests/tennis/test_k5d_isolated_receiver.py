@@ -2,7 +2,7 @@
 import errno
 import hashlib
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import pytest
 
@@ -60,13 +60,17 @@ def test_receipt_rejects_legacy_and_incomplete_proof() -> None:
     proof['namespaces'] = {'private_proc': True, 'initial_pids': [1], 'namespaces': ns,
                            'parent_namespaces': {k: k + '-outer' for k in ns},
                            'outer_pid_hidden': 20, 'mountinfo': '1 2 0:3 / /proc - proc proc rw'}
-    proof['worker_observer'] = {'birth': '2', 'namespaces': ns, 'pid': 30, 'namespace_pids': [1]}
+    proof['campaign_host'] = {'host_pid': 20, 'host_pgid': 40, 'campaign_pgid': 40, 'start_ticks': 11}
+    proof['launcher_observer'] = {'pid': 25, 'host_ppid': 20, 'host_pgid': 40, 'birth': '1', 'namespace_pids': [25, 2]}
+    proof['worker_observer'] = {'birth': '2', 'namespaces': ns, 'pid': 30, 'host_ppid': 25, 'host_pgid': 40,
+                                'namespace_pids': [1], 'launcher_observer': proof['launcher_observer']}
     proof['nonce'] = 'a' * 32
-    proof['decoder']['outer_observation'] = {'namespace_pids': [10], 'namespaces': ns, 'birth': '3', 'pid': 31, 'nonce': 'a' * 32}
+    proof['decoder']['outer_observation'] = {'namespace_pids': [10], 'namespaces': ns, 'birth': '3', 'pid': 31, 'host_ppid': 30, 'host_pgid': 40, 'nonce': 'a' * 32}
     proof['decoder']['preexec'] = {'pid': 10, 'birth': '3', 'observer': proof['decoder']['outer_observation'],
                                     'argv_sha256': proof['decoder']['argv_sha256'], 'closed_extra_fds': True}
     proof['actual_policy'] = {'private_proc_read_only': True, 'namespaces': proof['namespaces'],
                               'execute_files': ['/native'], 'context': {}, 'pid': 1, 'birth': '2', 'handled_mask': proof['handled_mask'],
+                              'campaign_host': proof['campaign_host'], 'launcher_observer': proof['launcher_observer'],
                               'denials': {k: [{x: y for x, y in row.items() if x != 'errno'} for row in rows]
                                           for k, rows in proof['denials'].items()}}
     proof['actual_policy_sha256'] = isolated._object_sha(proof['actual_policy'])
@@ -74,6 +78,10 @@ def test_receipt_rejects_legacy_and_incomplete_proof() -> None:
                **{k: 'b' * 64 for k in ('wire_sha256', 'resource_map_sha256', 'native_sha256',
                                         'decoded_yuv_sha256', 'rendered_rgb_sha256')}}
     assert isolated.verify_receipt(receipt, expected_context={}, expected_config_sha256='a' * 64) is proof
+    proof['decoder']['outer_observation']['host_pgid'] = 41
+    with pytest.raises(ValueError, match='native decoder observation'):
+        isolated.verify_receipt(receipt, expected_context={}, expected_config_sha256='a' * 64)
+    proof['decoder']['outer_observation']['host_pgid'] = 40
     proof['decoder']['outer_observation']['namespace_pids'] = [11]
     with pytest.raises(ValueError):
         isolated.verify_receipt(receipt, expected_context={}, expected_config_sha256='a' * 64)
@@ -124,10 +132,10 @@ def test_child_translation_uses_host_parent_and_namespace(monkeypatch: Any) -> N
 def test_native_wrapper_waits_for_matching_birth_and_nonce(tmp_path: Path, monkeypatch: Any) -> None:
     import json
     namespace = {'pid': 'pid:[inner]'}
-    observer = {'nonce': 'secret', 'namespace_pids': [2], 'birth': '55', 'namespaces': namespace}
+    observer = {'nonce': 'secret', 'namespace_pids': [2], 'birth': '55', 'namespaces': namespace, 'host_pgid': 40}
     (tmp_path / 'native-observer.json').write_text(json.dumps(observer))
     payload = tmp_path / 'native-exec.json'
-    payload.write_text(json.dumps({'argv': ['/native', '--decode'], 'env': {'PATH': '/none'}, 'nonce': 'secret'}))
+    payload.write_text(json.dumps({'argv': ['/native', '--decode'], 'env': {'PATH': '/none'}, 'nonce': 'secret', 'campaign_pgid': 40}))
     monkeypatch.setattr(isolated, '_birth', lambda: '55')
     monkeypatch.setattr(isolated, '_namespaces', lambda _: namespace)
     monkeypatch.setattr(isolated.os, 'getpid', lambda: 2)
@@ -195,3 +203,45 @@ def test_import_roots_are_canonical_packed_dirs_and_read_dir_only(tmp_path: Path
     outside.mkdir()
     with pytest.raises(ValueError, match='packed runtime'):
         isolated._import_directories({**profile, 'runtime_import_paths': [str(outside)]})
+
+
+def test_launcher_cleanup_only_signals_owned_child_and_reaps() -> None:
+    events: list[str] = []
+    class Process:
+        def poll(self):
+            events.append('poll')
+            return None
+        def kill(self):
+            events.append('kill-child')
+        def wait(self, timeout):
+            assert timeout == 10
+            events.append('wait-child')
+    isolated._stop_launcher(cast(Any, Process()))
+    assert events == ['poll', 'kill-child', 'wait-child']
+
+
+def test_launcher_cleanup_reaps_already_exited_child() -> None:
+    events: list[str] = []
+    class Process:
+        def poll(self): return 1
+        def kill(self): raise AssertionError('must not signal exited child')
+        def wait(self, timeout): events.append('wait')
+    isolated._stop_launcher(cast(Any, Process()))
+    assert events == ['wait']
+
+
+def test_receiver_inherits_group_and_monitor_keeps_foreign_processes(monkeypatch: Any) -> None:
+    from types import SimpleNamespace
+    from experiments.jobs import monitor
+
+    calls: list[tuple] = []
+    monkeypatch.setattr(isolated.subprocess, 'Popen', lambda command, **kwargs: calls.append((command, kwargs)))
+    isolated._launch_receiver(['/unshare', '--kill-child=SIGKILL'], {'PATH': '/none'})
+    command, kwargs = calls[0]
+    assert command == ['/unshare', '--kill-child=SIGKILL']
+    assert kwargs.get('start_new_session', False) is False and kwargs['close_fds'] is True
+    monkeypatch.setattr(monitor.subprocess, 'run', lambda *a, **kw:
+                        SimpleNamespace(stdout='GPU-test, 501\nGPU-test, 502\nGPU-test, 999\n'))
+    groups = {501: 70, 502: 70, 999: 99}
+    monkeypatch.setattr(monitor.os, 'getpgid', lambda pid: groups[pid])
+    assert monitor.foreign_gpu_processes('GPU-test', 70) == [999]
