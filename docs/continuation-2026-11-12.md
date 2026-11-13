@@ -144,7 +144,9 @@ Raw/receipts are in respective /private/tmp/pointstream-*audit-20261112 paths an
 immutable original NFS inbox. Small rootcloseouts under experiments/k5d-inputs.
 Prior durable metadata/source snapshot:
 `/Users/manu/.cache/pointstream-evidence/ada-denial-prep-20261112-fbca/` (41files20MB).
-Preserve newer5cb/030d evidence durably after first-witness preparation.
+Newer5cb/030d/currentwitness metadata and source are durably cached read-only at
+`/Users/manu/.cache/pointstream-evidence/ada-denial-5cb4-030d-20261112/`
+(53selectedfiles83,732,241B plusSHAmanifest); originalsunchanged/no pixelWAN.
 
 Read-only PLAN audit (alternate_gpu_audit): noadditional independentexperiment
 isreadyandworthwhileinsidecurrentprogramme, beyondactiveBall/heldW8. W11needs
@@ -308,3 +310,19 @@ Durable recovery snapshot:
 No training, paid server/API, legacy200GPUh study, manuscript/PRESLEY edits or
 submission. Footage rights and coauthor approval remain open. The narrowed-paper
 fallback is an option; the user has not replaced the research-first instruction.
+
+
+## Host5 portability decision (read-only, not released)
+
+`/private/tmp/pointstream-gpu5-portability-review-20261112/REVIEW.md`
+SHA77bc6c27b6d30669a103795b97428e8eef73044ebda98912bb8fe0a9b67b17f8:
+gpu5 is not a host-list-only switch; current witness/admission/producer-proof code
+binds gpu6. Lowest-cost sound port needs explicit dispatch-host/config/receipt
+selection, new frozen source/bridge/nativeCPUproof, actualgpu5 runtime/kernel/
+privateproc/input inventory and same-config realSVT oracle, then exclusive
+same-job6pointGPUwitness against unchanged2c8b reference. Sketch1600CPU/900GPU
+plusinventory/prep/review is NOT a demonstrated fit or release. Keep13aba806's
+one queue through its authorizeddeadline first; gpu5wasalsobusy atlastsnapshot.
+CPUindex0 is a caller choice, not a scientific requirement; futureconcurrent
+jobsneedverifieddisjointphysicalcores and explicitcontentionassessment, not
+merelydifferentindices. Nochangedsource, experiment orGPUjob fromthisreview.
