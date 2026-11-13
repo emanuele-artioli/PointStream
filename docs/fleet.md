@@ -152,6 +152,17 @@ Python entrypoint is supported. Smoke is capped at 600 seconds. Stage `seconds`
 is both the saved duration allowance and timeout; reserve validation and overhead
 in the total budget. The deadline includes waiting and bounds execution too.
 
+For an opt-in physical GPU target, set `gpu_uuid` to a full canonical NVIDIA UUID
+and include `ps-fleet-gpu-uuid-v1-6ccde7f4` in `required_commands`. Other model,
+memory, sharing and idle checks still apply; a busy or missing target waits
+without falling back to another GPU. Submission requires every eligible worker
+to advertise `gpu_uuid_v1`. The new control resolves this unique marker only in
+its own `experiments/jobs/uuid-routing-bin`; it never changes process `PATH`.
+Legacy controls cannot admit the request while the marker is absent from their
+ordinary `PATH`. Qualify that absence before activation/publication and rollback;
+never put the marker in a global command directory. Jobs may wait between stages;
+this option does not hold a GPU lease across jobs. Existing defaults are unchanged.
+
 ### CPU jobs
 
 `"device": "cpu"` (the default is `"gpu"`) admits a job on CPU headroom alone:
