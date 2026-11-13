@@ -46,6 +46,9 @@ def worker_command(arguments: list[str]) -> list[str]:
     if arguments[0] in ('ada-denial-cpu', 'ada-denial-cpu-noop') and os.environ.get('CUDA_VISIBLE_DEVICES') == '':
         action = 'cpu' if arguments[0] == 'ada-denial-cpu' else 'noop'
         return [sys.executable, '-m', 'experiments.tennis.k5d_ada_witness', action, *arguments[1:]]
+    if arguments[0] in ('ada-pgid-cpu', 'ada-pgid-cpu-noop') and os.environ.get('CUDA_VISIBLE_DEVICES') == '':
+        action = 'run' if arguments[0] == 'ada-pgid-cpu' else 'noop'
+        return [sys.executable, '-m', 'experiments.tennis.k5d_pgid_oracle', action, *arguments[1:]]
     if arguments[0] in ('ada-first-witness', 'ada-first-noop') and os.environ.get('CUDA_VISIBLE_DEVICES') not in (None, ''):
         action = 'witness' if arguments[0] == 'ada-first-witness' else 'noop'
         return [sys.executable, '-m', 'experiments.tennis.k5d_ada_witness', action, *arguments[1:]]
