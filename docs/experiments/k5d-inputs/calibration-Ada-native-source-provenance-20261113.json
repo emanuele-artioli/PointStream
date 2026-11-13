@@ -1,0 +1,132 @@
+{
+  "current_cleanup_only": true,
+  "event_ACKed": true,
+  "execution_identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "5ca2d194b7e1a6032faf7ef60fe44924649e0a57471c12cda6264f9586260219",
+    "source_sha256": "6f898f753a056981a107f5115a5a36f1310bc9d4a705a1805b75f758a0bc0117"
+  },
+  "files": {
+    "accepted-native-proof-publication-UNRUN/actual-upload/receipt.json": {
+      "bytes": 429,
+      "path": "/private/tmp/pointstream-calibration-source-qualification-20261113/accepted-native-proof-publication-UNRUN/actual-upload/receipt.json",
+      "sha256": "22e6fc78c78ca9540c44de056657f73af7c9c36674fc02ea76a46e2ed3ce28ce"
+    },
+    "accepted-native-proof-publication-UNRUN/root-approved-native-CPU.json": {
+      "bytes": 2409,
+      "path": "/private/tmp/pointstream-calibration-source-qualification-20261113/accepted-native-proof-publication-UNRUN/root-approved-native-CPU.json",
+      "sha256": "909558234ceca59ff944f29be8a7a1df7313309fa10e281464bb16adf29aab36"
+    },
+    "actual-audit-and-payload-sha256.json": {
+      "bytes": 1132,
+      "path": "/private/tmp/pointstream-calibration-source-qualification-20261113/actual-audit-and-payload-sha256.json",
+      "sha256": "cdc049284fb19bf58cf5d2862743654a3a7bd4e64f0a7153c39acacc55724f1a"
+    },
+    "approved-source-delta.json": {
+      "bytes": 3652,
+      "path": "/private/tmp/pointstream-calibration-source-qualification-20261113/approved-source-delta.json",
+      "sha256": "ec72ee918940c5666190e209a75b553b5911e2d5690bf8b473b7d1c2b1cf9699"
+    },
+    "frozen-2c6d/identity.json": {
+      "bytes": 953,
+      "path": "/private/tmp/pointstream-calibration-source-qualification-20261113/frozen-2c6d/identity.json",
+      "sha256": "923852a9035542ee405d1c4e06c8ac65bd05be6a6fab7522e9f3e2950d86df32"
+    },
+    "native250-UNRELEASED/actual-run/native-evidence-audit/summary.json": {
+      "bytes": 6426,
+      "path": "/private/tmp/pointstream-calibration-source-qualification-20261113/native250-UNRELEASED/actual-run/native-evidence-audit/summary.json",
+      "sha256": "fc1a664aafab926b9aeafa50fde32a62c1667e1c09057774b685f3a53becb297"
+    },
+    "native250-UNRELEASED/actual-run/root-acceptance.json": {
+      "bytes": 750,
+      "path": "/private/tmp/pointstream-calibration-source-qualification-20261113/native250-UNRELEASED/actual-run/root-acceptance.json",
+      "sha256": "323c6f7575990b37b590ba2c18b5e600994608d5d32b1a67fad7097b99783f90"
+    },
+    "native250-UNRELEASED/actual-run/root-event-ack.json": {
+      "bytes": 67,
+      "path": "/private/tmp/pointstream-calibration-source-qualification-20261113/native250-UNRELEASED/actual-run/root-event-ack.json",
+      "sha256": "e01e526759e6d4b7929326a861c4b912ea8db1128040d700442b7add95d61855"
+    },
+    "native250-UNRELEASED/actual-run/root-final-canonical-status.json": {
+      "bytes": 1620,
+      "path": "/private/tmp/pointstream-calibration-source-qualification-20261113/native250-UNRELEASED/actual-run/root-final-canonical-status.json",
+      "sha256": "d3847e93c9140f7fc730bc4459b94608481afd2aa7e9a5f078c2dd78bb93ee82"
+    },
+    "physical-cache-audit/raw.json": {
+      "bytes": 1459,
+      "path": "/private/tmp/pointstream-calibration-source-qualification-20261113/physical-cache-audit/raw.json",
+      "sha256": "ceac312878d86d910a4f8245431f1b06554c0b56d5d67911dca26e0330f8c9bb"
+    }
+  },
+  "job_id": "20261113T083603Z-ece387dc",
+  "no_archive_or_runtime_action": true,
+  "originals_unchanged": true,
+  "proof_NFS": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-calibration-Ada-native-CPU-cc1866be63dad4a438d5349fff9958e3/native-CPU.json",
+  "proof_bytes": 2409,
+  "proof_permissions": {
+    "directory": "0555",
+    "file": "0444"
+  },
+  "proof_sha256": "909558234ceca59ff944f29be8a7a1df7313309fa10e281464bb16adf29aab36",
+  "retained_native_CPU_seconds": 250,
+  "schema": 1,
+  "scope": "ROOT ACCEPTED exact2c6d native CPU PID containment/accounting and source/cache provenance only; no actual receiver-denial/GPU/calibration/cost/span/scale acceptance",
+  "source_cache_NFS": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-calibration-Ada-source-cache-487a034f577c09bd390e9d1b1ca1aac5",
+  "source_cache_audit": {
+    "CPU": 0.195259,
+    "files": {
+      "bridge.json": {
+        "bytes": 265586,
+        "inode": 41733685,
+        "mode": "0o444",
+        "sha256": "8f4ba5f4fdd93f60b2cc6802829c64c34aca660d0ab9c944101de075f316e5d0"
+      },
+      "config.json": {
+        "bytes": 7204015,
+        "inode": 41737111,
+        "mode": "0o444",
+        "sha256": "e478cbf16830b7788f835dc888b87ee119505f767a0ac535fb902f76690505ed"
+      },
+      "identity.json": {
+        "bytes": 953,
+        "inode": 41733117,
+        "mode": "0o444",
+        "sha256": "923852a9035542ee405d1c4e06c8ac65bd05be6a6fab7522e9f3e2950d86df32"
+      },
+      "native-spec.UNRELEASED.json": {
+        "bytes": 2388,
+        "inode": 41733684,
+        "mode": "0o444",
+        "sha256": "985472c9facff641871fd53b5948802bd60e91209b93987535c3ad66fc6d307b"
+      },
+      "payload-manifest.json": {
+        "bytes": 1073,
+        "inode": 41737349,
+        "mode": "0o444",
+        "sha256": "5fb436005d630db02b473e1cf2fd3ea89e97e2f4b987a101afebc9a739b8c862"
+      },
+      "root-release.json": {
+        "bytes": 1007,
+        "inode": 41733686,
+        "mode": "0o444",
+        "sha256": "2a32e2f3d351f6e5475b2bdecd456daf381034f14d2395670f460c38578ad8e2"
+      },
+      "source.tar": {
+        "bytes": 23756800,
+        "inode": 41735060,
+        "mode": "0o444",
+        "sha256": "5ca2d194b7e1a6032faf7ef60fe44924649e0a57471c12cda6264f9586260219"
+      }
+    },
+    "identity": {
+      "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "snapshot_sha256": "5ca2d194b7e1a6032faf7ef60fe44924649e0a57471c12cda6264f9586260219",
+      "source_sha256": "6f898f753a056981a107f5115a5a36f1310bc9d4a705a1805b75f758a0bc0117"
+    },
+    "policy_change": "execution_identity only",
+    "read_only": true,
+    "wall": 0.3271655151620507
+  },
+  "source_delta": "strict17files:13reviewed314edocs+4code/tests; all31source grants/otherpolicy unchanged",
+  "source_revision": "2c6d8581fbd64279dde554ca1402047d27ab7fa2"
+}

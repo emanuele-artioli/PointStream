@@ -42,3 +42,6 @@ and negative outcomes beside any narrower claim.
 
 
 Implementation0118786c is committed in isolated checkout /private/tmp/pointstream-ada-calibration-budget-20261113. Root reviewed worker/test diff: no scientific-rule change; full-stage remaining-time reserve is1350s (1220+30+100). ExactCI Ruff0.11.2 andmypy1.15 pass594files; Python3.12.7 focused25testsPASS. Wrong-toolchain fullpytest was stopped andretained, no fullsuitePASS claimed; exact fullsuite delegated toPR CI because projected210CPU didnotfitremaininglocalallocation. Measuredchecks165.384362CPU, conservativewholebuild180/300CPU, retainfull300charge. Report /private/tmp/pointstream-Ada-resource-window-20261113-new/scientific-audit/budget-build-checks/build-report.json. Pushedbranch; no runtime/qualification/GPU release.
+
+
+PR384 passed fullCI (3m17s) andmerged2c6d8581fbd64279dde554ca1402047d27ab7fa2. That exactcommit is nowfrozen in /private/tmp/pointstream-ada-calibration-qualified-source-20261113; source6f898f75/archive5ca2d194/confige478. Newsourcequalification is tracked in [its card](k5d-Ada-calibration-source-qualification-2026-11-13.md); oldae892/d1bb evidence remains unchanged. The source/cache stage passed independently; native CPU and actual SVT CPU-denial evidence passed their scoped root reviews. No new GPU/calibration release.

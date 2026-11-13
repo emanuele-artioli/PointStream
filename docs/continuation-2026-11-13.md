@@ -1,5 +1,3 @@
-Current update: passive a12 resource watcher backend41965 runs until 2026-11-13T08:44:17.604642+00:00; CPU100 newly charged, programme23841G63245C/Ball17479G39244C. See Ball journal for immutable handle/limits; no automatic launch or verified native model callback. New cost-guard code build300CPU remains local-only.
-
 # Continuation — November 13, 2026 (UTC)
 
 This snapshot supersedes the current-status summaries in the November 12 handoff.
@@ -7,7 +5,102 @@ The [budget ledger](experiments/submission-research-budget-20261104.json) is the
 accounting authority; [Ball journal](experiments/k5d-ball-benchmark.md) retains
 chronology and raw-result references. Times below are UTC.
 
-## Current decision and continuation (November 13, UTC)
+## Current source/native-proof phase (November 13, UTC)
+
+Status snapshot: 2026-11-13 09:02:03 UTC. This section stops before an actual CPU-denial
+job ID is returned; no ID is invented or uncertain publication replayed.
+
+
+**Root accepted the new source/cache and actual native CPU proof.** Actual
+receiver-denial completed and passed root evidence review; no new GPU proof has run. PR384 merged CI-green
+at `2c6d8581`; PR385 also merged CI-green at `a183902e`. Never advance the frozen
+scientific worktree `/private/tmp/pointstream-ada-calibration-qualified-source-20261113`.
+The [new source-qualification card](cards/k5d-Ada-calibration-source-qualification-2026-11-13.md)
+owns its staged authority and later gates.
+
+Freeze backend 2242 completed with source
+`6f898f753a056981a107f5115a5a36f1310bc9d4a705a1805b75f758a0bc0117`, archive
+`5ca2d194b7e1a6032faf7ef60fe44924649e0a57471c12cda6264f9586260219`,
+unchanged environment `32e68872`, and config `e478cbf1`. The audit joined 1,982
+Git blobs / 2,058 archive members and the exact 17-file delta: 13 approved docs
+(the 314e set) plus 4 code/test files. All 31 source grants and every other policy
+field are unchanged; only configuration execution identity is rebound.
+The new source-scope-approved bridge is `8f4ba5f4`; original unapproved bridge
+`64665164` remains preserved. Neither bridge is a new runtime qualification.
+
+Cache attempt 13743 failed at line 71 because the launcher omitted three digest
+arguments. It created only SSD scratch 086c, read no wire and published no new
+NFS files. Retain the entire 100 CPU preparation charge and failure artifacts.
+A separately released 25 CPU corrected command, backend 32596, completed with
+helper `b4288162`, release `2a32e2f3` and wire `36db86c3`; one old-archive read was
+stable. Its new immutable NFS directory is
+`/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-calibration-Ada-source-cache-487a034f577c09bd390e9d1b1ca1aac5`.
+Remote CPU/wall were 0.549190/3.385s. Physical audit 16253 completed: seven files,
+31,231,822 bytes, permissions 0444, execution-identity-only config change;
+CPU 0.195259 remote / 0.071221 local / 0.016254 SSH. Exact audit plans and raw provenance
+are under `/private/tmp/pointstream-calibration-source-qualification-20261113`.
+Preserve failed and corrected attempts separately; no replay.
+
+Actual native job `20261113T083603Z-ece387dc` is COMPLETE, root accepted and
+ACKed. It passed the original normal/timeout/TERM/KILL cases and frozen validator.
+Proof `909558234ceca59ff944f29be8a7a1df7313309fa10e281464bb16adf29aab36`
+is physically published at
+`/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-calibration-Ada-native-CPU-cc1866be63dad4a438d5349fff9958e3/native-CPU.json`
+(2,409 bytes, file 0444 / dir 0555). Full native 250 CPU remains charged. Its audit
+establishes current-only 19 births / 21 PIDs absent, 4 groups empty and no FQDN CPU
+allocations; not a historical resource interval. The [small provenance index](experiments/k5d-inputs/calibration-Ada-native-source-provenance-20261113.json)
+joins acceptance, ACK, physical proof receipt and source/cache identities without
+copying archives or changing runtime state.
+
+The external V4 queue controller passed its bounded Linux qualification.
+Earlier pilots 92693 (wrong fixture module) and 29588 (SSH signal-exit assumption)
+remain overall FAIL, charged 50 CPU each. Continuation 35283 completed normally:
+actual alarm receipts join one process identity and show 19.955419 seconds;
+its original groups are absent. The retained CPU child ended with SIGKILL/-9
+at 1.999423 measured CPU seconds; old and child groups are absent. The
+[administrative acceptance](experiments/k5d-inputs/queue-v4-Linux-administration-qualification-20261113.json)
+accepts pinned snapshot/probe/cache-copy/native-tar/limit behavior only.
+Real observer/resource joining remains to be established by a separately
+released scientific witness. Administration 300 includes 120 charged, future
+chain 148 and other reserve 32; no whole-host CPU accounting claim.
+
+Fresh actual-denial preflight passed 1,700 existing records/no active unknown,
+all-six-host doctor and CPU headroom 92. A first read-only inventory RPC timed
+out at 30 seconds; one approved 120-second read succeeded. No job was replayed.
+The full 365 CPU is charged, including preflight 20. Actual ONE publication
+`20261113T090138Z-e039d7c0` completed with original validator PASS: stage
+33.878553s wall / 33.065873 CPU, smoke 39.990443s. Sole wait 16525 ended with
+attention. Root accepted the [actual receiver evidence](experiments/k5d-inputs/calibration-Ada-e039-CPU-denial-acceptance-20261113.json).
+Event `05f54ed1560f5446b855561f790919f2` acknowledgment is authorized only after
+a fresh canonical COMPLETE/gate-true/no-error check; receipt pending. No active
+fleet wait or GPU release.
+Actual run: `/private/tmp/pointstream-calibration-source-qualification-20261113/CPU-denial365-preflight-UNRELEASED/actual-run`.
+Spec canonical `043bbf10` / raw `a69700c2`, source 2c6d/6f898f75, archive 5ca2d194,
+environment 32e68872; deadline 09:27:46 UTC. Do not replay.
+
+Remaining qualification 900 GPU / 1,130 CPU is held: metadata 50 + administration
+180 + witness 900 CPU (700 campaign + 200 observers). No GPU/calibration/full30
+release. Preserve the frozen scientific source while client/documentation evolves.
+
+Passive a13 started 08:53:27 UTC: backend 42714 / PID 13657, exact helper 2b931eb5,
+spec f5170928, four hosts every 300s / max 9 ticks, deadline 09:38:27.072274 UTC.
+It was prospectively charged 100 CPU / 0 GPU after checking a12 had ended 9 ticks and
+PID 8649 was absent. The completed tick 1 at 08:58:47.765846 UTC found no eligible
+idle GPU on gpu2/gpu3/gpu5/gpu6. Root supplied this completed tick snapshot; no additional query was made.
+Release/helper/launch/backend/receipt are under
+`/private/tmp/pointstream-resource-watch-20261113-passive-a13`; the Ball journal
+and ledger monitoring field preserve the handle. No autosubmit, cancellation,
+job launch, model timer or verified native model-completion callback.
+
+Current charges: programme 23,841 GPU / 64,205 CPU; Ball 17,479 GPU / 40,204 CPU, within
+unchanged 24 GPU-hour / 28 CPU-hour authority. Old ae892/d1bb receipt/pixel PASS and observer
+FAIL remain separately scoped. New-source native proof alone does not qualify
+actual receiver denial, CUDA/GPU, complete cost/span or full scale. Frozen 2c6d
+must not advance; later paired 16/48 producer+scorer through 292/586/full 30-clip stages still
+requires one exact qualified source/archive/environment, fresh receivers,
+original metrics/judges and prospective complete-cost/resource gates.
+
+## Completed d1bb phase — historical receipt/pixel qualification
 
 **Scientific PASS, operational FAIL.** Root accepted actual job
 `20261113T072420Z-d1bb8926` as `PASS_SCIENTIFIC_RECEIPT_AND_PIXEL_AUDIT_ONLY`,

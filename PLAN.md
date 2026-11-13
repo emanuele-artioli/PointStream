@@ -23,28 +23,20 @@ new dependency.
 
 ## Where PointStream stands (2026-11-13, UTC)
 
-### Current research decision (November 13, UTC)
+### Current research decision (November 13, 09:05 UTC)
 
-**Scientific receipt/pixel qualification passed; the resource-observer operation
-failed.** Actual job `20261113T072420Z-d1bb8926` completed on gpu6 Ada1.
-Root accepted all six fresh isolated receiver receipts and native pixel joins
-on frozen `ae892df1` / source `9d3d7b2c` / archive `ad635b0b` / environment32e.
-This preserves the narrower decision recorded before outcome inspection.
+Frozen 2c6d source/cache and actual native CPU proof are accepted. Actual
+SVT receiver-denial job `20261113T090138Z-e039d7c0` completed and passed its
+validator and root evidence review; terminal acknowledgment is being closed. The external queue controller
+passed its bounded Linux qualification; earlier failed attempts remain retained.
+No new-source GPU witness, paired calibration or full 30-clip run is released.
 
-The publication controller failed before binding either observer. Both remain
-**UNBOUND/UNKNOWN**; no resource span, complete-cost or full-scale gate passed.
-Native and actual SVT CPU proofs remain accepted. Previous failures, charges
-and raw evidence are retained; no publication/binding replay is authorized.
-
-PR383 is merged (`ca8db290`, checks passed): a client-only queue-admission
-repair for future use. No server controller was installed. Future calibration
-and scale remain resource-gated. Programme charges are 23,841 GPU / 63,245 CPU seconds;
-Ball 17,479 GPU / 39,244 CPU seconds, inside unchanged 24 GPU-hour / 28 CPU-hour authority.
-A separate 300 CPU [calibration-cap revision build](docs/cards/k5d-Ada-calibration-budget-revision-2026-11-13.md) is code-only; new source qualification and GPU release remain separate gates.
-The related new controller/deadline/sample proposal is unreleased; administration fit still needs independent qualification.
-See the [canonical continuation](docs/continuation-2026-11-13.md) for actual raw/canonical spec hashes,
-read-only evidence, limitations and the next gate. No new computation or
-paper/PRESLEY work is released by this closeout.
+Five-minute resource checks cover A6000 and RTX 6000 Ada through one bounded
+window ending 09:38 UTC. Latest inspected completed check, 08:58:47 UTC, found
+no eligible idle GPU. No automatic submission or verified model callback.
+The [canonical continuation](docs/continuation-2026-11-13.md) owns live job IDs,
+proofs and handles; the [budget ledger](docs/experiments/submission-research-budget-20261104.json)
+owns charges and remaining holds. Preserve the immutable 2c6d scientific worktree.
 
 ### Historical af6 phase — balances, waits and watch superseded above
 
@@ -551,7 +543,7 @@ marked `card ready` is waiting for the user to start it.
 
 | item | card | branch | model / effort | status |
 |---|---|---|---|---|
-| Submission research completion / K5d | [staged card](docs/cards/submission-research-2026-11-04.md); [ball protocol](docs/experiments/k5d-ball-benchmark.md) | `codex/submission-benchmark-2026-11-04`; PR333–337 merged | primary plus requested Terra 6.1 medium delegates; actual telemetry unverified | **Current: scientific receipt/pixel PASS; resource operation FAIL.** Actual `20261113T072420Z-d1bb8926`: six fresh receiver/native pixel joins accepted on ae892/9d3d/ad635/env32e; observers UNBOUND/UNKNOWN, no cost/span/full-scale acceptance. Charges23,841GPU/63,245CPU (Ball17,479/39,244). PR383 client-only merged ca8db290; future resource gate held. [Current handoff](docs/continuation-2026-11-13.md). No replay/paper edits. |
+| Submission research completion / K5d | [staged card](docs/cards/submission-research-2026-11-04.md); [ball protocol](docs/experiments/k5d-ball-benchmark.md) | `codex/submission-benchmark-2026-11-04`; PR333–337 merged | primary plus requested Terra 6.1 medium delegates; actual telemetry unverified | **Current: 2c6d native ece387dc accepted/ACKed/proof9095 physically published.** Full CPU-denial365 released, ONEpublication in progress/no ID yet; no GPU. Queuepilots92693/29588 overallFAIL, <=20CPU continuation UNRELEASED/admin200 held. Qualification900GPU/1150CPU held. A13 backend42714/PID13657 to09:38:27UTC, recordedtick0(08:53:47) no eligible idle. Charges23,841GPU/64,185CPU (Ball17,479/40,184). [Current handoff](docs/continuation-2026-11-13.md). |
 | Paper strengthening and independent ball pilot | [research priorities](docs/paper/research-and-figure-priorities-2026-11-01.md); [K5c](docs/experiments/k5c-independent-ball.md) | `codex/paper-strengthening-2026-11-01`, PR #329 | primary plus requested Terra 6.1 medium delegates; actual tier telemetry unavailable | 2026-11-03: eight main/two appendix figures implemented, ball retained in main, negative guards visible; 23 main/reference plus five appendix pages. Original four-window audit recovered. K5c original 48-frame pilot completed and independently audited as `20261103T141758Z-f5d52fac`, gpu6 Ada, code `6040fe5c`; first 16-frame cost stop preserved. WASB 42–44/48 versus 0–8/48 native, all 48 positive; no confirmation/full-codec win. Closed cumulative 463/900 GPU-s and 1,413/1,800 CPU-s; administrative telemetry uncertainty disclosed. Both requests/processes/claims/waits closed, events acknowledged; no further compute admitted. Two original SVT gaps remain after read-only audit; med000 DCVC dropped. Manuscript a297279 pushed; selected source and separate anonymous data frozen in the November3 review record. PRESLEY untouched; coauthor approval and footage permissions unresolved; no submission. |
 | W8 exclusive upper-baseline attempt | [approved exclusive amendment](docs/experiments/w8-inputs/amendment-20261101/exclusive-prospective-card.md) | `codex/w8-exclusive-results-2026-11-01` (policy PR #322 merged) | primary plus Terra 6.1 medium delegates | complete: `20261101T081828Z-d70bc44f`, gpu6 exclusive Ada, frozen source `c0f25e4e` / spec `e9d926b6`; independent full audit and raw screen pass all 8 cells at 46.3151 kbps. Initial two cost stops preserved. Combined inclusive scoring 224 GPU-s / ≤304 CPU-s of 450/450; original total after 15 CPU-s runtime preflight: 224 GPU-s / ≤1,169 CPU-s of 3,600/3,600. Processes/claims/waits closed. No training/encoding/model/payload/quality-rule change. |
 | W8 Linux exact-input oracle and fresh receiver gates | [original W8 card](docs/cards/w8-fresh-decoder-witness.md); [approved repair](docs/cards/w8-source-package-repair.md) | `codex/w8-source-repair-2026-11-01` | primary plus scoped delegates | Input/runtime/native/pixel gates passed within recorded scope. Sole replacement `20261101T151030Z-df638d2f` packet worker passed, then CUDA device count error 2/unavailable before model/kernel/sampling; cause unknown, no quality result or cost slope. All task-owned processes/claims/wait/events closed. Phase ≤292 CPU-s/188 GPU-s; original cumulative ≤2,457/540 of 3,600 each. No retry or 30-step admission. Empirical paper retains fresh-decoder limitation; CUDA-only diagnostic is an unauthorized future proposal. PR #325 merged `06ce6374`; final documentation update belongs to [PR #326](https://github.com/emanuele-artioli/PointStream/pull/326), whose live checks/merge state should be consulted. |
