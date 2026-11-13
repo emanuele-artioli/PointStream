@@ -119,7 +119,7 @@ def _finish_group(host_group: int, known: dict[int, str], namespace_depth: int) 
                     current = isolated._proc_identity(pid)
                     if current['birth'] != birth or current['host_pgid'] != host_group:
                         raise RuntimeError('residual process changed before signal')
-                    adapter.send(fd, signal.SIGKILL)
+                    adapter.send(fd, int(signal.SIGKILL))
                     emergency_signal = True
                 finally:
                     os.close(fd)
@@ -255,7 +255,7 @@ def run(args: list[str]) -> None:
                         try:
                             if isolated._proc_identity(launcher['pid'])['birth'] != launcher['birth']:
                                 raise ValueError('launcher birth changed before pidfd signal')
-                            adapter.send(fd, signal.SIGKILL)
+                            adapter.send(fd, int(signal.SIGKILL))
                             kill_receipt = {'host_pid': launcher['pid'], 'birth': launcher['birth'],
                                             'namespace_pid': launcher_pid, 'namespace_depth': depth,
                                             'signal': int(signal.SIGKILL), 'pidfd_send_succeeded': True}
