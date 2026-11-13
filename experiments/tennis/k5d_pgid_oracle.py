@@ -86,6 +86,10 @@ def _members(host_group: int) -> dict[int, str]:
     return found
 
 
+def _captured_gone(members: dict[Any, str]) -> bool:
+    return all(_gone({'pid': int(pid), 'birth': birth}) for pid, birth in members.items())
+
+
 def _finish_group(host_group: int, known: dict[int, str], namespace_depth: int) -> bool:
     """Signal only captured births via pidfds; unknown residuals fail closed."""
     deadline = time.monotonic() + 10
@@ -271,8 +275,8 @@ def run(args: list[str]) -> None:
                     raise
             _require_natural_group_exit(group, members_before, depth)
             members_after = _members(group)
-            if members_after:
-                raise ValueError('surrogate group still has host members')
+            if members_after or not _captured_gone(members_before):
+                raise ValueError('surrogate group or captured process birth still exists')
             after = resource.getrusage(resource.RUSAGE_CHILDREN)
             owned = (observed, launcher) + ((native,) if native else ())
             reap_deadline = time.monotonic() + 10
@@ -361,6 +365,7 @@ def validate() -> None:
                         or leader['namespace_pids'][depth - 1] != case['namespace_group']
                         or len(launcher['namespace_pids']) < depth or len(worker['namespace_pids']) < depth
                         or case['members_after'] != {} or _members(case['group']) != {}
+                        or not _captured_gone(case['members_before'])
                         or case['members_before'].get(str(leader['pid'])) != leader['birth']
                         or case['members_before'].get(str(launcher['pid'])) != launcher['birth']
                         or case['members_before'].get(str(worker['pid'])) != worker['birth']

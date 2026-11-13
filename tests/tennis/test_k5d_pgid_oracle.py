@@ -92,3 +92,9 @@ def test_emergency_cleanup_cannot_pass_as_natural_exit(monkeypatch: Any) -> None
     monkeypatch.setattr(oracle, '_finish_group', lambda *_: True)
     with pytest.raises(ValueError, match='emergency cleanup'):
         oracle._require_natural_group_exit(100, {}, 2)
+
+
+def test_all_captured_births_must_disappear_even_after_group_change(monkeypatch: Any) -> None:
+    monkeypatch.setattr(oracle, '_gone', lambda item: item['pid'] != 18)
+    assert not oracle._captured_gone({'17': 'first', '18': 'second'})
+    assert oracle._captured_gone({'17': 'first'})
