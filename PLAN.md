@@ -25,6 +25,18 @@ new dependency.
 
 ### Current research decision (November 13, UTC)
 
+**The fixed 292-frame SVT cost and correctness oracle is RUNNING.** Actual job `20261113T173340Z-64160888` is RUNNING on shared gpu6 Ada1 UUIDef96. Saved events20357 contain only the expected nonterminal contention warning `bd0b924d29ab58c29b901e6630bc9a14` (continue; foreign PID2751761), locally ACKed for operational monitoring only. Timing is contaminated; no quality or terminal acceptance follows. The ONE canonical completion wait330 is active (backend68911, max2400s/82SSH, outer2480s, helper5744d368); its handle is persisted. The [292-frame card](docs/cards/k5d-study4282-confirmation292-2026-11-13.md) retains all three original SVT settings, both arms, full/ROI metrics and both judges on complete game9/Clip5:30 absent,261 visible and one excluded frame. This retrospective clip is not independent held-out confirmation.
+
+The deadline-only refresh passed both real source/control normalizers and ROOT review. Actual spec is canonical`af7c05a1` / raw`dd0752`, with fixed deadline **18:17:58.431688UTC**. ROOT released publication68 only after the2610-second headroom guard passed (2682.07s observed). Full **3000CPU/2390GPU** is now conservatively charged:83CPU prior preparation/metadata/preflight plus2917CPU/2390GPU transferred from hold. No stage hold remains; this is not a measured cost or a result. Refresh20CPU used the existing100CPU failure allocation, leaving80CPU future failure provision inside the charged envelope.
+
+**The preceding 16/48 calibration is complete.** Cost48 job `20261113T155953Z-e86afcb5` is accepted, ACK-closed and durably archived; see its [acceptance index](docs/experiments/k5d-inputs/svt-study4282-e86-shared48-root-acceptance-20261113.json). Shared timing gives no speed/live-span claim, and all 48 labels are visible. Neither the 48 result nor the 292 forecast admits 586 frames or all 30 clips. PR404 merged with passing CI.
+
+The separate six-point route retains accepted metadata for both gpu6 Ada UUIDs, but its old window is closed without a GPU submission. Its 1230CPU/900GPU remains held and unreleased; the preparation-artifact guard now covers all66 regular manifest files. Frozen source and CPU proofs remain distinct from shared SVT; later encoded scoring and observer resource qualification are separate.
+
+Passive watcher a24 ended at17:32:51UTC with no eligible idle GPU; PID79197 absence was verified. Finite watcher a25 is active: PID84632/backend66147,17:36:42–18:21:42UTC, every300 seconds/max9 checks. Watchers never submit scientific jobs, and model wakeup remains unverified. Paper and PRESLEY remain paused. The [continuation](docs/continuation-2026-11-13.md) retains evidence and historical failures.
+
+### Completed 16/48 evidence and earlier scheduling snapshots — history
+
 **The fresh shared-Ada 48-frame pilot is accepted, ACK-closed and durably archived.**
 Actual job `20261113T155953Z-e86afcb5` is canonical COMPLETE/gatePASS/exit0.
 The [acceptance index](docs/experiments/k5d-inputs/svt-study4282-e86-shared48-root-acceptance-20261113.json)
@@ -50,8 +62,9 @@ geometry/RAM/storage/large-audit fit remain gates. A frame-linear48 planning pro
 is1544.59s for292 but29097.28s for5675, before complete lifecycle costs. It cannot
 admit30 clips. No292/586/30 execution is released. The missing neural comparison
 remains separate: a NEW same-host gpu6 Ada0 metadata binding is being prepared
-within existing900GPU/1160CPU hold and already charged metadata50; genuine CPU
-proofs stay unchanged. Resource/admission checks must be fresh; idle is transient.
+within existing900GPU/1160CPU hold and already charged metadata50; see the
+[primary Ada0 card](docs/cards/k5d-primary-Ada0-qualification-2026-11-13.md).
+Genuine CPU proofs stay unchanged. Resource/admission checks must be fresh; idle is transient.
 
 
 
