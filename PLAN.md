@@ -24,21 +24,20 @@ new dependency.
 ## Where PointStream stands (2026-11-12)
 
 **Current research phase, November12:** Ada job2c8b reproduced all six real
-packet outputs, metrics and judges in two fresh same-GPU executions; full cost
-was126.6/112.5seconds per run. Root accepted packet-replay repeat/cost only.
-Filesystem denial was not established, despite the previous card's too-broad
-source-hidden wording; preserve that gap and hold benchmark promotion. Two
-builders prepared an actual private-proc/Landlock receiver and a separate
-Ada16/48 producer/scorer path. Source fbca94d6 fixes the reviewed observer and
-capability issues; its full software checks pass. New exact-source native CPU
-proof3db415d5 is COMPLETE/root accepted. Actual SVT filesystem-denial CPU
-oracles b9e0fd16/cda90430 failed at native startup/preexec, were rootclosed and
-are retained (zeroGPU/250inclusiveCPU each). Source observability/import-root
-fixes are under review; any new source needs renewed qualification. GPU witness
-and scale remain unreleased. Runtime inventory and namespace feasibility alone are not
-decoder proof. Native5minute
-resource checks active from21:44UTC, bounded4hours/CPUguard. [Current handoff](docs/continuation-2026-11-12.md)
-and [stage card](docs/cards/k5d-ada-scale-and-denial-2026-11-12.md).
+packet outputs, metrics and judges in fresh same-GPU executions (126.6/112.5s).
+Root retains the failed exact cross-A6000 gate37b3; Ada uses its own reference.
+New source5cb45c80 passed full software checks and exact-source native CPU
+proof69c7. Actual SVT CPU oracle030d then passed exact original16-frame packet/
+YUV/RGB checks and all five real filesystem denials under the exact proposed
+GPU-capable policy. Earlier startup failuresb9e0/cda9 are retained, not quality
+findings. CUDA/DCVC behavior and scale remain unqualified. ONE first GPU witness
+`20261112T235535Z-13aba806` is queued on gpu6 Ada,900GPU/1100CPU inclusive,
+deadline2026-11-13T00:33:53UTC; source/spec/caps and solewait in [current handoff](docs/continuation-2026-11-12.md).
+Native5minute resource checks continue;16/48/full30 promotion remains gated.
+The read-only PLAN audit found no other independent ready/worthwhile experiment
+inside the current finite no-training programme; W8 stays held on cost and
+prerequisite-blocked/out-of-scope tasks stay explicit.
+[Stage card](docs/cards/k5d-ada-scale-and-denial-2026-11-12.md).
 
 **Historical access recovery, November12:** start with the [current handoff](docs/continuation-2026-11-12.md) and [storage decision](docs/fleet-recovery-2026-11-12.md). Both unknown requests are independently closed expired unassigned and events acknowledged. Current charges19,362GPU/48,791CPU; nested Ball7,920GPU/1,450CPU andW84,550/929 remain. Existing local disks have ample space: no broad cleanup or migration is warranted. Use packed local source/environment/input/scratch and retain NFS archives. First launch stopped beforeIDallocation; the subsequent verified partial-pool request `20261112T172806Z-8709406d` expired unassigned. Both eligible workers found no admittedGPU; fresh A6000 occupants were otherusers. Rootclosed400externalCPU/0GPU andACKedcanonicalevent. No activejob/wait/timer or furtherqueue release; corrected16 remains unexecuted. W8full-witness compute held for insufficient complete-cost evidence under929CPU, not a quality failure. No paid hosting, source or paper change.
 

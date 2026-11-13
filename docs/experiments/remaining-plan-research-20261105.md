@@ -16,18 +16,24 @@ identified, not forecasts for an unprepared new job.
 ## Current November12 Ada route and receiver gap
 
 The accepted fresh Ada2c8b calibration reproduces actual six-point packet bytes,
-receiver pixels and scores across fresh executions, with complete126.6/112.5s
-commands. No independent new-clip result. Actual receiver/validator declares
-filesystem isolation unestablished; keep that unmet condition and earlier37b3
-cross-class failure. Real filesystem-denial and class-aware16/48 code is frozen
-at fbca94d6 after reviewed source fixes and full software checks. Its exact-source
-native CPU proof3db415d5 is COMPLETE/root accepted; actual SVT filesystem CPU
-oraclesb9e0/cda9 failed and are rootclosed/retained, zeroGPU/250inclusiveCPU each.
-Source diagnostics/import-directory fixes are under review, not qualified. Runtime inventory and private
-proc feasibility are prerequisites, not decoder proof. All GPU/benchmark
-promotion remains gated.
+pixels and scores across fresh executions (126.6/112.5s), not new-clip evidence.
+Source5cb passed full checks and native CPU proof69c7. Actual SVT CPU oracle030d
+passed original16-frame packet/native/YUV/RGB equality, all five real EACCES
+probes, exact GPU-capable policy and process cleanup. This qualifies SVT CPU
+filesystem denial; CUDA/DCVC/GPU and scale remain unproved. Priorb9e0/cda9
+startup failures and37b3 cross-class failure stay recorded. ONE frozen first GPU
+witness13aba806 is queued on gpu6 Ada until2026-11-13T00:33:53UTC,900GPU/1100CPU
+inclusive; no48/292/586/full30 promotion. Native resource polling continues.
 [Current handoff](../continuation-2026-11-12.md) and
 [stage card](../cards/k5d-ada-scale-and-denial-2026-11-12.md) are authoritative.
+
+The later repo-only decision audit found no additional independent ready and
+worthwhile experiment beyond active Ball and held W8. W11 requires missing
+independent aligned pixel masks; B2b's broader34-item timing/ROI claim is not
+retained and is outside the finite programme; W7 missing sensitivity cells do
+not change the bracketed primary decision; a narrower H5q test needs a genuinely
+preselected new source/rule/budget. These are not silently marked completed.
+No new compute, paper claim, data source or release follows from this audit.
 
 ## Historical November12 recovery update
 
