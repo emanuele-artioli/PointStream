@@ -1,0 +1,131 @@
+{
+  "schema": 1,
+  "status": "source/cacheonlyrootaccepted; native/CPUonlydenial/GPU pending",
+  "revision": "7a9f5b0424740b3055b0047dfd99c68bce22e489",
+  "identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "14dc232a1fb20a7ec0284e1c42bdbb15524dc26d3ad7d9b6507995784ef75dc7",
+    "source_sha256": "bbc63eda6d58b14c1fd9cb88bacac0e574c8ada2594cdae517073e1009cb5d15"
+  },
+  "source_archive_NFS": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-SVT-source-cache-c91dcd939eff59e52015977ff8bdad3f/source.tar",
+  "cache_directory": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-SVT-source-cache-c91dcd939eff59e52015977ff8bdad3f",
+  "config_sha256": "56a88f5a7105888e03f3687ba7f1258b05d8b98b342fc72ce62ae32976ad951f",
+  "approved_source_bridge_sha256": "9f0c74725a30776fee51b01db2581879a8ccfe317078519a4683ad13ef7f4cf5",
+  "mapping_sha256": "9fb640a7ce181832e688706c6fbe98c1da17b1ac3e827ac72bd61a1a6221369d",
+  "root_source_review": {
+    "passed": true,
+    "scope": "localSVTsource/archive/config/bridgepatchreviewONLY; no runtime proof",
+    "identity": {
+      "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "snapshot_sha256": "14dc232a1fb20a7ec0284e1c42bdbb15524dc26d3ad7d9b6507995784ef75dc7",
+      "source_sha256": "bbc63eda6d58b14c1fd9cb88bacac0e574c8ada2594cdae517073e1009cb5d15"
+    },
+    "config_sha256": "56a88f5a7105888e03f3687ba7f1258b05d8b98b342fc72ce62ae32976ad951f",
+    "candidate_bridge_sha256": "70c3b421ff273804fb91c8ae105eb676bde918d86f91dc5ac3968081d78d4254",
+    "source_grants": 31,
+    "changed_grant_paths": [
+      "experiments/tennis/k5.py",
+      "experiments/tennis/k5d_isolated_receiver.py",
+      "experiments/tennis/k5d_worker.py",
+      "src/codecs/svtav1.py"
+    ],
+    "all_other_permission_fields_equal": true,
+    "reviewed_delta_paths": 40,
+    "bridge_patches_verified": 653,
+    "CPU": 0.186213,
+    "wall": 0.1375695419992553
+  },
+  "physical_audit": {
+    "CPU": 0.176429,
+    "directory": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-SVT-source-cache-c91dcd939eff59e52015977ff8bdad3f",
+    "directory_mode": "0555",
+    "files": {
+      "bridge.json": {
+        "bytes": 270931,
+        "inode": 41745854,
+        "mode": "0444",
+        "sha256": "9f0c74725a30776fee51b01db2581879a8ccfe317078519a4683ad13ef7f4cf5"
+      },
+      "config.json": {
+        "bytes": 7204015,
+        "inode": 41745855,
+        "mode": "0444",
+        "sha256": "56a88f5a7105888e03f3687ba7f1258b05d8b98b342fc72ce62ae32976ad951f"
+      },
+      "identity.json": {
+        "bytes": 953,
+        "inode": 41745993,
+        "mode": "0444",
+        "sha256": "ae29d35fd58486850d2850cd5160174510a9bffec827a1dbe640d0dbbbca97e6"
+      },
+      "native-spec.UNRELEASED.json": {
+        "bytes": 2388,
+        "inode": 41745992,
+        "mode": "0444",
+        "sha256": "c21c990d8e0b34ffeba35582db0111e158f7294084f5075f28749b1060f1c933"
+      },
+      "payload-manifest.json": {
+        "bytes": 1073,
+        "inode": 41744599,
+        "mode": "0444",
+        "sha256": "253a798df0d7664078d2ad62ba28d866db1cb2a7529e21643f48bb7b74f34578"
+      },
+      "root-release.json": {
+        "bytes": 732,
+        "inode": 41744473,
+        "mode": "0444",
+        "sha256": "caa3e95c3fc26edb1c3b946e0b8c12c975fd18a09cd5a7af484bf6f98a01e2bb"
+      },
+      "source.tar": {
+        "bytes": 23961600,
+        "inode": 41745991,
+        "mode": "0444",
+        "sha256": "14dc232a1fb20a7ec0284e1c42bdbb15524dc26d3ad7d9b6507995784ef75dc7"
+      }
+    },
+    "identity": {
+      "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "snapshot_sha256": "14dc232a1fb20a7ec0284e1c42bdbb15524dc26d3ad7d9b6507995784ef75dc7",
+      "source_sha256": "bbc63eda6d58b14c1fd9cb88bacac0e574c8ada2594cdae517073e1009cb5d15"
+    },
+    "policy_change": "identity+exactfour sourcehash-size only",
+    "read_only": true,
+    "wall": 0.32203056011348963
+  },
+  "transport": {
+    "returncode": 0,
+    "wall": 12.337893208998139,
+    "local_CPU": 0.085419,
+    "SSH_CPU": 0.049242999999999995,
+    "status": "inspect remote result; no automatic replay"
+  },
+  "metadata_publication": {
+    "CPU": 0.49938899999999997,
+    "identity": {
+      "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "snapshot_sha256": "14dc232a1fb20a7ec0284e1c42bdbb15524dc26d3ad7d9b6507995784ef75dc7",
+      "source_sha256": "bbc63eda6d58b14c1fd9cb88bacac0e574c8ada2594cdae517073e1009cb5d15"
+    },
+    "immutable_directory": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-SVT-source-cache-c91dcd939eff59e52015977ff8bdad3f",
+    "manifest_sha256": "253a798df0d7664078d2ad62ba28d866db1cb2a7529e21643f48bb7b74f34578",
+    "old_NFS_reads": 1,
+    "old_stat_unchanged": true,
+    "published_directory_mode": "0555",
+    "published_file_mode": "0444",
+    "published_files_verified": 7,
+    "published_readback_hashes_verified": true,
+    "release_sha256": "caa3e95c3fc26edb1c3b946e0b8c12c975fd18a09cd5a7af484bf6f98a01e2bb",
+    "scratch": "/local/users/emanuele/pointstream/metadata-prep/SVT-source-cache-c91dcd939eff59e52015977ff8bdad3f",
+    "source_archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-SVT-source-cache-c91dcd939eff59e52015977ff8bdad3f/source.tar",
+    "status": "immutable metadata/cache prepared only; no scientific release or fleet request",
+    "waited_children_cpu_delta": [
+      0.0,
+      0.0
+    ],
+    "wall": 7.832545596174896,
+    "wire_sha256": "5b439e8ecd37e8be8185b4837d3514d6515f87d66cd84ef22c79161fbaf78ade"
+  },
+  "CPU_ceiling": 100,
+  "GPU": 0,
+  "no_scientific_job_submitted": true
+}

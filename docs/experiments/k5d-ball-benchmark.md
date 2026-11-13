@@ -1456,3 +1456,21 @@ Passive a13 finished09:33:48UTC,9ticks/no eligibleidle targets, PID13657 absent;
 a14 actualbackend38838 PID18482; started2026-11-13T09:37:12.403346+00:00 harddeadline2026-11-13T10:22:12.403246+00:00; receipt /private/tmp/pointstream-resource-watch-20261113-passive-a14/run/receipt.json. Nativecompletionwakeup unverified; no recurringLLMcall.
 
 Root schedules control-only UUID implementation220localCPU and separatelyholds60CPU activation under new routingcard; science2c6d unchanged. Independent actualconfig/CPUproof audit report90970adb accepts workload-proof relevance CONDITIONALLY on reviewed selection/client-only delta; existingproofs retain oldcontrol provenance. No newGPU/controlactivation. SVTdraftPR387 initialfullCI: one582-origin D3/D6 BLAS-sensitivefixturefailure; actualreferencegate remainsstrict and productionfitter unchanged; repairinprogress underexisting200allocation.
+
+Rootnames CIpassingPR387merge7a9f5b0424740b3055b0047dfd99c68bce22e489 fornewSVT-onlysource; releases/precharges100CPU/GPU0 fromheld1600 (remaining1500C600G). Exactmapping/helper/cache rootreviewrequired; nofreeze/native/denial/GPU yet. Templateoutputancestorbugcaughtbeforeexecution/fixed9cad2110, purepathchecksPASS. Initialfloat32fixtureCI failure retained;production/referencegatesunchanged.
+
+SVTsourcefreeze50 rootreviewed helper07ab7c02/map9fb640a7/merge7a9f exact40paths,14production/test +26docs; approvedrelease88c93680466b9b5e817c1bb3bf66586353e79bed71a87e59b02b3589b527cde0 andfreshdeadline2026-11-13T10:25:33.559131+00:00. Actualsinglelocalfreeze abouttostart, noSSH/model/GPU. Rootrelease/futurehandle in /private/tmp/pointstream-SVT-source-qualification-plan-20261113.
+
+SVTsinglelocalfreeze actualbackend85890; outputfrozen-7a9f-b4ea97d477708d55, wall120/CPU50withinprep100; no replay/SSH/GPU.
+
+SVTlocalfreeze85890COMPLETE0,2001Gitblobsjoined/10Git+1tar; actualsourcebbc63eda/archive14dc232a/config56a88f5a/env32e. Measured2.803248self+childCPU/5.266477wall;50ceilingretainedwithinprep100. Independentrootreview31grants exactly4hash-sizechanges/nootherpermissiondelta,40sourcepaths and653bridgepatchesverified; source-onlyapprovedbridge9f0c74725a30776fee51b01db2581879a8ccfe317078519a4683ad13ef7f4cf5. No native/CPUdenial/GPU yet.
+
+SVTsourcecache rootreviewedsealedhelper0ccc/full3argvpins/releasecaa3e95c3fc26edb1c3b946e0b8c12c975fd18a09cd5a7af484bf6f98a01e2bb/manifest253a798d/contractb8c9e2dcf0376c13e44fc49d5d583c806b84bb57c985dd6163dd8fdc64d5d21c; actualapprovedwire5b439e8ecd37e8be8185b4837d3514d6515f87d66cd84ef22c79161fbaf78ade. ONEpublicationunderprep100 abouttostart; nojob/model/GPU; exactcommand in /private/tmp/pointstream-SVT-source-qualification-plan-20261113/cache-upload-approved-command.json.
+
+SVTsourcecache actualbackend51474/transportcache-transport-APPROVED-v2, singlecreate-onlyinvocation, wall150sec/prep100; nofleetjob/GPU. Inspectexistingstate onerror, neverreplay.
+
+SVTsourcecache51474COMPLETE0; actualNFS/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-SVT-source-cache-c91dcd939eff59e52015977ff8bdad3f; sealed7files444/dir555/hashesPASSreported, oldarchiveunchanged, remote.499389CPU/7.832546wall, transport.085419local/.049243SSHCPU/12.337893wall. Rootreviewed4CPUreadonlyphysicalhelper5d7db41d +4localcompletecost; approvesONEactual7fileaudit exactrequest/contract144a7d02163e49b91490dcc73bebb509529fcf262b94819692c85377b1653e6b withinprep100. Nojob/GPU.
+
+SVTactualreadonlyphysicalauditbackend63381/outputphysical-audit-APPROVED-v2;4remote+4localCPU wall45underprep100. Nojob/GPU.
+
+SVTphysical63381COMPLETE0:7files/sourcebbc/archive14dc/config56a/approvedbridge9f0/sealed555-444 andidentity+exact4sourcehashupdatesONLY PASS. Remote.176429CPU/.322031wall, local.064406/SSH.013866CPU/3.551896wall. Rootacceptssource/cacheONLY,100ceilingretained; docs svt-7a9f-source-cache-provenance-20261113.json. V5threehelperlocaldiff/rootreview and60testsPASS acceptedCODEONLY; no remote/runtime/GPU. RoutingPR389CIgreenmerge56c5f2ec rootnamedforprospectivecontrolactivation only; deploymentstillUNRUN.

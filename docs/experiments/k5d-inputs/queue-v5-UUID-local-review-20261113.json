@@ -1,0 +1,90 @@
+{
+  "status": "UNRUN_ROOT_REVIEW_REQUIRED",
+  "scope": "V5 external operator helper only; no scientific source/config changes; no SSH/job/observer/GPU/runtime",
+  "baseline": "/private/tmp/pointstream-calibration-witness-external-UNRUN-20261113",
+  "changed_helpers": {
+    "build_operator_config.py": {
+      "old_sha256": "5213abf19d4fedf516867b1698715c0ec57d6a1edf588ee6489076ec3d9eca76",
+      "new_sha256": "8f7c8fe1b770e9076703b5c598711fe59d12477a23c5c3ad802cfe915430d3dd"
+    },
+    "publish_then_bind.py": {
+      "old_sha256": "89b6940b8be19df6724dd371a8fc7b11001ed1b2b358331ccf2ab8970194ee7c",
+      "new_sha256": "14ecd33c2c96fe037aa1777c2e16bce6dc4a711e10aada1f6dc29cbb44e047c7"
+    },
+    "remote_metadata_bind.py": {
+      "old_sha256": "c1e9f9f0b9e8230d9951ac51b0aec34d6b90650f72cdfe61642496dc07e7e750",
+      "new_sha256": "b7ac39b2788b2d7f2f0a3255963a6531e91bb8659a3397c563962d81ff798d92"
+    }
+  },
+  "unchanged_helpers": {
+    "claim_observer.py": "ddd3938add1ceb5dcb77dd54578ac8803c4dfd2a179c7e78377168f58f55ea55",
+    "dual_orchestration.py": "21baff1ec3c077383a1981c21661c1432bf15ba17341a1f16b3efd4d2a85836e",
+    "launch_one.py": "9a663f5156e09aa76a80bc3beab375bd0efc6244c45a96309716d6816c52fd53",
+    "materialize_metadata.py": "f9123c9304a8cc0231b4383d65e81a2e0f1227a02252403eeae031b5e3d21125",
+    "prepare_dual.py": "3c7934f2e28a319567a360817ef43096cdfb22903babf7fbb09d775cbfcf5630",
+    "prepare_witness.UNRUN.py": "8b710c7d2f71ce66b87703e6ce3cec3385ce862bfec942b5f50d82183e00eea7",
+    "test_external.py": "819b6cc39d28698f3450d658bdd9a55eaf4fc4eedc7c529ebab77b52609da2ef"
+  },
+  "tests": {
+    "interpreter": "/Users/manu/.cache/pointstream-ci-20261110-a1/bin/python",
+    "argv": [
+      "-m",
+      "pytest",
+      "-q",
+      "/private/tmp/pointstream-queue-controller-v5-uuid-20261113/test_candidate.py",
+      "/private/tmp/pointstream-queue-controller-v5-uuid-20261113/test_external.py",
+      "/private/tmp/pointstream-queue-controller-v5-uuid-20261113/test_uuid_binding.py"
+    ],
+    "final": "60 passed in0.30s",
+    "test_CPU_seconds": 0.97,
+    "first_check": "2 failed/58 passed: V4 management_python.py dependency not copied. Preserved first log; dependency copied byte-exact; final60PASS.",
+    "tests_cover": [
+      "correct exact spec/request selector",
+      "missing actual spec or selector",
+      "changed spec digest or science argv",
+      "missing/different expected selector",
+      "missing/different request claim",
+      "sentinel missing",
+      "noncanonical UUID",
+      "absent/duplicate observer",
+      "inherited V4 admission/deadline/coverage/metadata guards"
+    ]
+  },
+  "CPU_accounting": {
+    "released_local_cap": 20,
+    "test_measured_CPU_including_failed_check": 0.97,
+    "build_script_CPU_seconds": 0.007560999999999998,
+    "administrative_commands": "Short reads/copies/JSON bookkeeping not individually timed; conservative entire-phase upper forecast5CPU including remaining root handoff, below released20; no background processes.",
+    "report_process_CPU_seconds": 0.002920000000000006
+  },
+  "forecast": {
+    "queue_admin_inclusive": 300,
+    "past_charged": 140,
+    "future_chain": 148,
+    "future_other": 12,
+    "remaining": 160,
+    "admin_other_reserved_in_chain_config": 152,
+    "observers_CPU": 200,
+    "witness_campaign_CPU": 700,
+    "witness_total_CPU": 900,
+    "witness_GPU": 900,
+    "control_activation_CPU_held_separately": 60
+  },
+  "binding": "Local hashed spec equals selector_spec and expected selector. Remote preflight/bind validates selector_spec against canonical spec SHA; before assignment reads actual job spec within same request15s hard deadline, checks canonical SHA and canonical full UUID/sentinel, compares configured selector and admitted request.claims.gpu, requires unique observer. No scientific outcome read or retry.",
+  "client": "build_operator_config now requires explicit --client-checkout; no default stale client. Root must choose exact CI-passing UUID capability + wait --until-running client and approve physical installed control pins separately. Candidate dfcb14af supplied by builder, not auto-selected or deployed.",
+  "unchanged_observer_sha256": "ddd3938add1ceb5dcb77dd54578ac8803c4dfd2a179c7e78377168f58f55ea55",
+  "preserved_or_pending": [
+    "V4 untouched",
+    "copied inherited metadata files and sha256.json are baseline evidence, not fresh V5 releases; do not execute them",
+    "prepare_witness CONTROL/API/metadata/scientific spec/deadline and installed pins still require fresh separate root-reviewed preparation after activation",
+    "no separate GPU control smoke required by this plan: first useful witness remains conditional pending independently joined actual hardware eligibility/request/claim/dispatch/CVD/producer UUID",
+    "No claim that old-RPC/new-client Linux audit qualified new worker"
+  ],
+  "root_review": {
+    "accepted": "localcode/testscopeonly; actualremote/control/resource/GPU stillunqualified",
+    "reviewed_diff_sha256": "41a239247bdcdb732a973bac46351621ef0e57d7ed505ec98c1a6c8dac06531b",
+    "reviewed_report_sha256": "ad06a2de774da3df886b52b8727ac5e2202c4affdb5813f6b0077d8207a48c3a",
+    "source_immutable": "2c6d/source6f/archive5ca/confige478/env32e",
+    "requirement": "Fresh prospective spec/deadline/control/token/client/metadata pins; inherited false metadata helper not released. Actual expectedGPU joins required. No automatic publication."
+  }
+}
