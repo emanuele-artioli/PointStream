@@ -1,0 +1,34 @@
+{
+  "CPU_precharge_retained_inclusive": 1100,
+  "GPU_precharge_retained": 900,
+  "accepted_receiver_receipts": 0,
+  "accepted_scientific_result": false,
+  "automatic_retry": false,
+  "cache_index": "docs/experiments/k5d-inputs/ca866-55dd-failure-evidence-cache-20261113.json",
+  "cleanup": "Current FQDN CPU zero allocations/GPU claim absent/supervisor+leader gone/empty campaign group; all five known wrapper/timeout/wait-helper births absent and timeout groups empty; no immediate historical claim-release interval",
+  "config_sha256": "ca866e023b20cfeb51a52d96d56bab27f8d3b5529ec042d1d8eebbad5b8ea3af",
+  "end_to_end_quality_points": 0,
+  "events_ACKed": [
+    "2fb169b43fd956fdb1ce73a6094c2b1c",
+    "614c26143a055800b69a3fe7259a3c39"
+  ],
+  "failure": "First isolated DCVC receiver EACCES torch/_inductor/test_operators.py via deterministic setter/lazy Dynamo",
+  "failure_summary_sha256": "a7ad737642628bd55382a6202703f1b6eb56a757e734b57372d39dfc62958bc1",
+  "job_id": "20261113T043746Z-55dd755d",
+  "limitations": [
+    "No joined-live sample: claim observed before binding was read; first bound sample already terminal/leader gone.",
+    "No reselection; other observer UNKNOWN retained.",
+    "Final-payload and replay UNKNOWN reasons may differ; no accepted BOUNDED receipt or terminal control qualification follows.",
+    "Reader membership remains reviewed inheritance, not individually captured reader PID instrumentation.",
+    "Counters are scoped SELF+waited CHILDREN once; do not add journal child counters again; preflight/trailing costs conservatively debited.",
+    "No quality/native/model outputs inspected; no GPU/scientific qualification or physical utilization claim."
+  ],
+  "native_preparations_completed": 6,
+  "observer_final_summary_sha256": "ba2b24227c15dadaf129b3d69c9e2cbc20c92a34ce864ce982f7425128632edb",
+  "observer_wait_46867": "ENDED naturally0; no replacement wait",
+  "reservation_bound": "UNKNOWN; zero joined-live samples, no reselection",
+  "schema": 1,
+  "selected_GPU_UUID": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+  "selected_observer": 0,
+  "source_sha256": "abccdf05666392ae8ad6d2ac8d944a8a30c25ccf5d944d29eccdb3f84d595b2e"
+}

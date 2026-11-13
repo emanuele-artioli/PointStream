@@ -1,0 +1,29 @@
+{
+  "cache_directory": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/runtime-import-v1-v2-20261113",
+  "files": 28,
+  "manifest_sha256": "72655b649183ef8e10ed1ef00718a5ee11900b2cbabd7210e4afe0cce050fdea",
+  "originals_preserved": true,
+  "schema": 1,
+  "scope": "Selected metadata-only failed CPU import diagnostics v1/v2; no private file contents, scientific payloads, grants or qualification",
+  "total_bytes": 1601109,
+  "versions": {
+    "v1": {
+      "child_status": "failed",
+      "controller_returncode": 1,
+      "controller_waited_child_CPU": 5.627481,
+      "controller_wall_seconds": 6.637524356134236,
+      "full_import_closure_passed": false,
+      "prefix_sentinel_reached": false,
+      "receiver_credit": false
+    },
+    "v2": {
+      "child_status": "failed",
+      "controller_returncode": 1,
+      "controller_waited_child_CPU": 8.133097000000001,
+      "controller_wall_seconds": 8.190302279777825,
+      "full_import_closure_passed": false,
+      "prefix_sentinel_reached": true,
+      "receiver_credit": false
+    }
+  }
+}

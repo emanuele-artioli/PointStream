@@ -5,47 +5,106 @@ The [budget ledger](experiments/submission-research-budget-20261104.json) is the
 accounting authority; [Ball journal](experiments/k5d-ball-benchmark.md) retains
 chronology and raw-result references. Times below are UTC.
 
-## Current A2 failure and preserved continuation (UTC)
+## Current decision and continuation (November 13, UTC)
 
-### A2 failure audited; public-runtime diagnostic released (UTC)
+**55dd is closed; future GPU work is deferred while the registered-study source
+port is built.** Actual job `20261113T043746Z-55dd755d` failed on public
+`torch/_inductor/test_operators.py` through the deterministic setter/lazy Dynamo
+path. Six ordinary native preparations completed; zero receiver receipts,
+end-to-end quality points or scale gates were accepted. Events are acknowledged.
+Source5eb/environment32e and all prior raw evidence remain unchanged.
 
-Root closed `20261113T033048Z-1461dd9d` as a failed GPU witness on gpu6 Ada.
-All six native encode/standalone decode preparations completed, but the first
-restricted DCVC receiver failed importing public `torch/testing/__init__.py`:
-config `f826` omitted that runtime module. No accepted receiver receipt,
-end-to-end point, quality comparison or scale gate follows. Both events are
-acknowledged. The [root closeout](experiments/k5d-inputs/ada-1461-root-failure-closeout-20261113.json)
-binds exact source `5ebc7831` / `abccdf05` / archive `7fd4e0e6` / environment `32e`,
-physical config and raw failure evidence.
+Job wait 21884 is ended; the original observer batch wait 46867 ended naturally0.
+All five known observer wrapper/timeout/wait-helper births are gone; current
+CPU/GPU claims and campaign/supervisor are clear. This establishes current
+cleanup only. Preselected observer0 remains **UNKNOWN: 60 samples, zero live
+joins**, with no reservation bound or reselection. The [root closeout](experiments/k5d-inputs/ada-ca866-55dd-root-failure-closeout-20261113.json)
+and [failure cache index](experiments/k5d-inputs/ca866-55dd-failure-evidence-cache-20261113.json)
+preserve final journals, failures and scoped cleanup. No active job/observer wait.
 
-Observer 0 was selected from the actual admitted UUID before quality inspection.
-Its independently replayed reservation upper bound is 150.362107921 seconds,
-conditional on NFS visibility; observer 1 remains UNKNOWN. Both observer batches
-85796 and old-af6 66293 ended, all wrappers/timeouts exited, and all 11 captured
-A2 host PIDs / five groups were absent. The actual FQDN CPU claim file has zero
-allocations; the selected GPU claim is absent. Earlier alias-path checks remain
-unsupported; the corrected current-state check does not prove a historical interval.
+The [v4 CPU lazy-import diagnostic](cards/k5d-lazy-runtime-closure-2026-11-13.md)
+(backend55191) completed and root accepted its prefix, deterministic setter and
+seven reviewed imports under guards. Result `71cec2a1` identified three public
+leaves /1,987 bytes; retain80CPU. This is CPU import evidence, not model,
+CUDA or decoder qualification. Its [read-only evidence index](experiments/k5d-inputs/lazy-runtime-CPU-evidence-cache-20261113.json)
+binds the complete trace and selected metadata.
 
-Retain the full **900 GPU / 1,100 CPU-second A2 debit**. Programme charges are
-**22,041 GPU / 58,230 CPU seconds**; Ball: 15,679 GPU / 34,229 CPU. The
-[public-runtime repair card](cards/k5d-public-runtime-repair-2026-11-13.md)
-releases only a **90 CPU-second / zero-GPU import-closure diagnostic**. Its
-separate reservation has **900 GPU / 1,610 CPU seconds unspent**; config repair,
-fresh CPU denial and another GPU witness remain unreleased. Existing Ada-stage
-headroom is 3,218 GPU / 388 CPU; held SVT-only 600 GPU / 1,800 CPU is unchanged.
-No transfer, retry, numerical change, training or scale release is implied.
+The [new complete public-Python category](cards/k5d-public-python-runtime-repair-2026-11-13.md)
+config `ae67091f` adds exactly3,407 original regular .py leaves /49,088,680 bytes,
+with all other fields unchanged. Metadata backend94122 FAILED after publication
+at its final absolute RUSAGE_CHILDREN check. That result proves neither a new
+spawn nor inherited login work. Retain the full50CPU charge and failed artifacts;
+do not replay, rewrite the published config or call staging/qualification passed.
+The separately charged15CPU read-only recovery audit verified both immutable
+7,204,015B config files, exact3407 public records/current metadata and five
+private-category/known16frame SHA/inode nonintersection. No private bytes were
+read; the original helper birth is absent. Recovery child-CPU delta was zero.
+Original helper remains FAILED and no scientific qualification follows.
+The [read-only recovery evidence index](experiments/k5d-inputs/public-Python-config-recovery-evidence-cache-20261113.json) preserves actual bytes, code and failure beside the metadata design.
+Raw f9f3a75d / summary efd7ef87 and root recovery approval are preserved under
+`/private/tmp/pointstream-public-python-runtime-repair-20261113/recovery-audit/`.
 
-Watch a7 found both gpu6 Ada cards idle at 03:23:52 UTC, enabling A2 admission,
-and ended 03:33:49 with PID 73984 absent. Requested passive watch **a8** is now
-active: PID 80489, start 03:51:59.829792 UTC, deadline 04:36:59 UTC, four hosts /
-300-second cadence, same source `2b931`, 100 CPU precharged with an 80-CPU guard.
-It never submits jobs or invokes models/APIs/chat wakeups. Raw handle:
-`/private/tmp/pointstream-resource-watch-20261113-passive-a8/launch.json`.
+[Build-only source port](cards/k5d-ada-registered-study-profile-2026-11-13.md): `/private/tmp/pointstream-ball-ada-registered-study-profile-20261113`,
+branch `codex/ball-ada-registered-study-profile-20261113`. Use the **same final
+source, environment and archive** for the new Ada16/48 calibration, then292/586
+confirmations/full30. Preserve defaults, all six points, complete metrics/judges,
+whole-clip context and fresh restricted receivers for every new stage. A changed
+source needs its own qualification; no earlier gate is relabelled. No GPU stage
+is released while this port/design is being prepared. The separately held
+[SVT-only route](cards/k5d-svt-only-confirmation-2026-11-13.md) is not an equivalent
+replacement for the open dual-codec goal and remains scientifically unreleased.
 
-The independent [SVT-only source build](cards/k5d-svt-only-confirmation-2026-11-13.md)
-continues without remote scientific release. Paired 16/48 producer/scorer stages
-require an accepted GPU witness and complete forecasts; Ada 292/586 still needs
-a profile port. No manuscript/PRESLEY edit or submission is released.
+Current charges: **programme22,941GPU /60,130CPU; Ball16,579GPU /36,129CPU**.
+The new public-Python reservation has900GPU /1,485CPU remaining; old Ada-stage
+funds3,218GPU /288CPU and held SVT600GPU /1,800CPU are unchanged. The closed prior
+repair spent900GPU /1,745CPU, with5CPU held and no further release. Other held
+balances and the user24GPU-hour/28CPU-hour ceiling remain unchanged.
+
+Passive watch **a9** is active: backend46259, PID89739, four hosts every300s,
+maximum nine checks, deadline `2026-11-13T05:55:15.734208Z`;100CPU is charged.
+First05:10UTC snapshot found no available A6000 and three potential idle Ada
+cards (gpu5 index1, gpu6 indices0/1); fresh fleet admission is still mandatory.
+Native completion-triggered model resumption is unverified. No autosubmit,
+recurring LLM/model timer, additional scientific compute, paper/PRESLEY edit or
+submission release.
+
+### Historical import-diagnostic attempts and conditional next-stage audit
+
+The first runtime diagnostic transport ended 0 / process 1 (backend 40666),
+before the prefix sentinel: Torch/dill opened `/dev/null` as `r+b`, rejected by
+the diagnostic write guard although the real restriction already permits the
+canonical typed character-device write. Collection separately flagged initial
+locale/gconv mappings. Waited child CPU was 5.627481 seconds; controller wall
+6.637524 seconds. No model, packet, CUDA or import-complete result occurred.
+Original artifacts: `/private/tmp/pointstream-runtime-closure-20261113/remote-artifacts/`;
+remote root `/local/users/emanuele/pointstream/metadata-prep/runtime-closure-7011a5adb86541f1ac7ddd6dcf2bce17`.
+Preserve that first 90-CPU debit. Version 2 backend84563 also ended transport0 /
+diagnostic1: real prefix sentinel reached, then the diagnostic blocked a
+`numpy.testing` CPU probe with `RuntimeError`; no import-triggered child ran.
+Collection separately flagged an OS nscd map. Waited child8.133097 CPU /
+controller8.190302 wall seconds; preserve its complete second90 debit and raw
+artifacts under the same local root's `v2/remote-artifacts/`.
+V3 backend26476 ended0 and root accepted only its CPU import scope: prefix and
+all five definition imports completed; one EACCES-denied subprocess attempt,
+zero observed child CPU. Waited child8.387892 CPU / controller8.438452 wall.
+Helper `9330480a`, result `2a522c17`; OS nscd information is metadata only, with
+no permission grant. Preserve both failed90 debits beside this scoped result.
+New prospective config `ca866e02` adds exactly11 public leaves / 183,620 bytes;
+no other field changed. Config preparation50 CPU is charged; repair remainder
+900 GPU / 1,470 CPU. The exact-config CPU denial oracle is PREPARING / UNRELEASED;
+no receiver/GPU qualification or additional diagnostic release follows.
+
+Read-only failed diagnostic evidence is cached at
+`.cache/pointstream-evidence/runtime-import-v1-v2-20261113/` (28 files, 1,601,109 bytes).
+The [tracked metadata-only index](experiments/k5d-inputs/runtime-import-v1-v2-evidence-cache-20261113.json)
+binds manifest `72655b649183ef8e10ed1ef00718a5ee11900b2cbabd7210e4afe0cce050fdea`;
+originals are preserved. It includes no private target contents or qualification.
+
+The [v3/config read-only cache index](experiments/k5d-inputs/runtime-import-v3-and-config-evidence-cache-20261113.json)
+binds 31 files / 8,757,538 bytes, manifest `a26296be`, under
+`.cache/pointstream-evidence/runtime-import-v3-and-config-20261113/`. The
+[11-leaf config review](experiments/k5d-inputs/public-runtime-11-leaf-config-review-20261113.json)
+retains the exact delta; these artifacts do not qualify a receiver or GPU run.
 
 ### Closed A2 handles and unreleased next-stage conditions
 
@@ -322,18 +381,14 @@ durable claim accounting and renewed exact-source receiver/denial gates pass.
 
 ## Budget snapshot — seconds, inclusive conservative charges
 
-- Programme: 22,041 GPU / 58,230 CPU charged (6.1225 / 16.175 hours).
-  User ceiling remains 86,400 GPU / 100,800 CPU (24 / 28 hours).
-- Ball: 15,679 GPU / 34,229 CPU charged. Ada stage remaining:
-  3,218 GPU / 388 CPU; held SVT-only reservation 600 GPU / 1,800 CPU is unspent.
-- Public-runtime repair: first90 CPU diagnostic charged; 900 GPU / 1,610 CPU
-  remains unspent, with all later stages unreleased.
-- Old held Ball reservation: 7,920 GPU / 800 CPU. W8: 4,550 GPU / 929 CPU,
-  held on complete-cost/prerequisite gates. These held balances are unchanged;
-  the SVT-only transfer above uses the Ada stage, within existing authority.
-- Charges are conservative allocations where stated, not complete measured use.
-  The contended witness's 1,282 GPU / 1,632 CPU debit leaves per-job cap compliance
-  unverified; it does not establish an actual overrun.
+- Programme22,941GPU /60,130CPU; Ball16,579GPU /36,129CPU.
+- New public-Python reservation900GPU /1,485CPU remaining, unreleased beyond
+  the one pending15CPU read-only recovery audit.
+- Old Ada-stage3,218GPU /288CPU; closed prior repair0GPU /5CPU held.
+- Held SVT-only600GPU /1,800CPU, old Ball7,920GPU /800CPU and
+  W8 4,550GPU /929CPU are unchanged. No silent transfer or new user allocation.
+- User ceiling:86,400GPU /100,800CPU (24/28hours). Conservative debits are not
+  complete measured usage; current cleanup is not a historical release interval.
 
 ## Valid evidence, failures and remaining scientific gates
 

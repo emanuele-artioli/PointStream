@@ -1,0 +1,61 @@
+{
+  "CPU_precharge_retained": 365,
+  "GPU_seconds": 0,
+  "actual_policy_sha256": "7c85fa543d6d961d8ddba90748f6fc2457b38e5d43d10b6b82ec05f81fd126f0",
+  "approved": true,
+  "audit_limitations": [
+    "Initial failed audit assumed ephemeral source path survived; stderr retained",
+    "Corrected audit completed physical archive/source/policy/pixel checks and all artifact/cleanup capture, then -S NumPy parser import failed; identical pinned original packet parsed locally to complete remaining comparisons; no third remote execution"
+  ],
+  "cleanup": {
+    "CPU_file": {
+      "actual_token_absent": true,
+      "allocation_count": 0,
+      "exists": true,
+      "own_allocations": {},
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/claims/cpu/gpu6.itec.aau.at.json",
+      "scope": "CURRENT post-job observation only; no historical release-time inference; generic job_id=run ignored"
+    },
+    "captured_births": 16,
+    "empty_groups": 4,
+    "scope": "CURRENT post-job cleanup only; not immediate historical release interval",
+    "unique_host_processes_absent": 18
+  },
+  "config_sha256": "ca866e023b20cfeb51a52d96d56bab27f8d3b5529ec042d1d8eebbad5b8ea3af",
+  "consumer_execution_identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "7fd4e0e6ed2655b646d5601ba458fe66532f03040bba9b87c1607cca2e2fbfd0",
+    "source_sha256": "abccdf05666392ae8ad6d2ac8d944a8a30c25ccf5d944d29eccdb3f84d595b2e"
+  },
+  "evidence_cache_manifest": "docs/experiments/k5d-inputs/ca866-CPU-gate-evidence-cache-20261113.json",
+  "five_errno13_denials": true,
+  "frozen_production_consumer_passed": true,
+  "full_approval": {
+    "bytes": 6596606,
+    "path": "/private/tmp/pointstream-runtime-permission-repair-20261113/root-approved-real-CPU-denial.json",
+    "sha256": "b0315f7a487fa128a510bfeb7e12698ba0a7efdbca26949c306a4e5268f8d836"
+  },
+  "host": "gpu6",
+  "initial_launcher_interruption_scoped_teardown": true,
+  "job_id": "20261113T041417Z-fa824380",
+  "later_GPU": "UNRELEASED; observer metadata preparation only",
+  "normal_native_YUV_RGB_match": true,
+  "normal_receipt_sha256": "03da3054083a4ac268eaebf6a76432d34a1eed58d430c3ac737d53fd8030ded3",
+  "profile_sha256": "21e3c60f2279bbad20d2cfd288820dc21d73a79e8ca00b747d6c885b2c60b863",
+  "publication_sha256": "5f88bc00fe7ed0d4c2fee83f99b7287e3ac1256333e8bffafdb5d3f4741222ae",
+  "raw_audit": {
+    "path": "/private/tmp/pointstream-runtime-permission-repair-20261113/result-audit/raw-audit-v2.json",
+    "sha256": "930b91b93e03640d397743fdec4ed942ed098be10f346cce6ac759e32a1a11fd"
+  },
+  "runtime_inventory_sha256": "78211cb12ffd09fe5e9b6b2972af2f49fe5ee2eb6d356db28aeea0d737aaa9ca",
+  "schema": 1,
+  "scope_limit": "Actual normal SVT filesystem denial plus initial-launcher interruption/scoped teardown only. Current cleanup only, no immediate historical claim interval. No active-native/unshare-only/fleet-watchdog/GPU/scale claim.",
+  "summary": {
+    "path": "/private/tmp/pointstream-runtime-permission-repair-20261113/result-audit/independent-audit-summary.json",
+    "sha256": "b0720ad647be3d5ab821181318c805285047f1e9cf85e06a9e66ea55034f9956"
+  },
+  "terminal_event": {
+    "ACKed_by_root": true,
+    "id": "98a746e86d845bc388ae69b400242c18"
+  }
+}

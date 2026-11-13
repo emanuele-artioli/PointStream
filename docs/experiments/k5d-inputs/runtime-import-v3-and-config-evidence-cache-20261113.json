@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "cache_directory": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/runtime-import-v3-and-config-20261113",
+  "manifest_sha256": "a26296be218fc5f1f743943d298927050519cf03b6b9350f7c7492ac52372364",
+  "files": 31,
+  "total_bytes": 8757538,
+  "scope": "CPUpublicimportdiagnostic+prospectiveexactconfig only; not receiver/GPUproof",
+  "config_sha256": "ca866e023b20cfeb51a52d96d56bab27f8d3b5529ec042d1d8eebbad5b8ea3af"
+}
