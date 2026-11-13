@@ -23,70 +23,82 @@ new dependency.
 
 ## Where PointStream stands (2026-11-13, UTC)
 
-### Current research decision (November 13, 15:20 UTC)
+### Current research decision (November 13, UTC)
 
-**Shared-Ada SVT16 correctness and feasibility are independently accepted and
-ACK-closed.** Job `20261113T130719Z-9f94f30c`, frozen a71/source bb717/archive
-e051/config5fc, passed all three original SVT settings, both arms, full/ROI
-metrics, both judges and fresh CPU-only receiving on gpu6 Ada1 UUID ef96.
-The [root acceptance index](docs/experiments/k5d-inputs/svt-a71-9f94-shared16-root-acceptance-20261113.json)
-joins canonical03f, independent summary10e0 and approval4525. Independent checks
-cover21 physical members/six literal packet-native pairs and current cleanup:
-12 host births, one empty group, owned tokens absent and no owned NVIDIA rows.
-The29 observed memory snapshots reached7276MiB driver/6844MiB reserved; these
-are sampled observations, not an absolute peak, speed or full-neural result.
-
-- **CUDA context repair is accepted** ([card](docs/cards/k5d-svt-memory-context-repair-2026-11-13.md)).
-  Native797deaed and receiver6af48d82 proofs are physically published and ACKed.
-  Original failed shared jobc6b01236, local metadata failures, wait/status race,
-  and post40 namespace-PID2 collector failure/raw774 remain preserved with
-  their charges. Semantic cleanup62364 corrected host identity collection
-  without rerunning the codec. The2000CPU/600GPU envelope now comprises
-  qualification1012 +metadata30 +preflight16 +real16 lifecycle822 +cleanup30
-  +archive15 +reserve75. The phase is CLOSED; the unused75CPU reserve is returned, with no prior charge refunded. Immutable archive publication18958
-  is physically accepted (80cf8ee8,81 members,0444/0555/readback).
-- **Saved188-frame diagnostic is CLOSED** ([card](docs/cards/k5d-legacy188-failure-transitions-2026-11-13.md)).
-  All six points/188 frames/both judges show source-detectability-conditioned
-  repairs alongside occasional harms. The60CPU/GPU0 analysis is durably archived
-  as5c181 via publication79394; no absence, new-clip or current-source credit.
-- **Opt-in SVT study port code is complete** ([card](docs/cards/k5d-svt-study-port-2026-11-13.md)).
-  Immutable scientific4282c96f passed review; integration PR398 passed CI and
-  merged625647fa, followed by documentation PR399/359824f8. Original six-point/
-  16-only defaults remain unchanged. Sourceprep100 is accepted/CLOSED:
-  sourcee4d4a856/archivef813e09d/config4fa67547/source-only bridge849/cache71ef.
-  The [tracked source-cache index](docs/experiments/k5d-inputs/svt-study4282-source-cache-acceptance-20261113.json)
-  retains recoverable root certificate370b and physical receipt5545, seven
-  files0444/directory0555/readback, all31 grants unchanged and config identity
-  only. This transfers no old native/receiver runtime result or GPU evidence.
-- **W7 strict-family spending decision is CLOSED, without another encode**
-  ([native70 disposition](docs/experiments/w7-inputs/native70-fixed-family-disposition-20261113.json)).
-  CRF70 is the fixed family's legal maximum. The two original family cells
-  remain unresolved; the primary achievable-envelope comparisons are bracketed.
-  The missing neural comparison remains open.
-
-[Exact-study-source CPU qualification](docs/cards/k5d-svt-study-source-qualification-2026-11-13.md)
-is CLOSED:1062CPU/GPU0 charged, unused38CPU reserve returned without prior
-refund. Source/cache, native d109 and restricted receiver8718 are accepted,
-physically published and terminal-ACK closed ([receiver index](docs/experiments/k5d-inputs/svt-study4282-8718-CPU-denial-acceptance-20261113.json)).
+**New-source shared-Ada SVT16 correctness and cost are accepted and ACK-closed.**
+Actual job `20261113T153712Z-f831db6a` is canonical COMPLETE/gatePASS/exit0
+(fresh status74026). Independent post40 audit46099 and review6b8423a8 passed:
+21 physical members, six literal packet/native pairs, three actual CPU receivers,
+both arms/full+ROI/both judges, bridged own-Ada gold and current12 host births/
+one group/FQDN-token/NVIDIA cleanup. Root proof75733036 and exact two-event ACK
+are recoverable from the [acceptance index](docs/experiments/k5d-inputs/svt-study4282-f831-shared16-root-acceptance-20261113.json).
 The [qualification16 card](docs/cards/k5d-study4282-qualification16-2026-11-13.md)
-allocates848CPU/600GPU: prep10 charged, remaining838CPU/600GPU held, no GPU
-release. Originalprep50 and its failed219MB reference-copy partial are retained;
-separate20CPU prepares a real server-side metadata constructor using the full
-existing archive, avoiding another hotel-network transfer. This changes no
-scientific source or inputs. Scope gateaa208f42 approves16 only; actual spec,
-fresh deadline, helper/device checks and root execution release remain pending.
-GPU48/292/586/30-clip work is unreleased. Passivea21 checks every300s until
-15:30:19UTC at latest; transientgpu5idle was gone by15:15:43, and LOCAL10CPU
-audit found current bundles hostgpu6-bound. Continue qualifiedgpu6sharedSVT.
+retains848CPU/600GPU plus separate constructor20CPU; durable archive8f275100 (172members, publication53471) is physically accepted
+0444/0555/readback within prepaid reserve15. Wait66951 returned intentional shared-GPU
+attention while running; its failed terminal assertion/raw output and full charge
+are preserved. Fresh status established completion, with no experiment replay.
 
-The primary exclusive2c6d route remains separate:1160CPU/900GPU held,
-metadata50CPU precharged UNRUN. Use the [ledger](docs/experiments/submission-research-budget-20261104.json)
-for authoritative current charges under unchanged24GPUh/28CPUh limits.
-Passive a20 backend19402/PID57608 started14:04:00UTC, hard deadline
-14:49:00.074349UTC,300s/maxnine ticks. Latest local tick2 at14:14:20.546222UTC
-found no idle candidate. A19 closed after nine ticks and its PID is absent.
-No autosubmit or new GPU release; manuscript/PRESLEY remain paused. See the
-[continuation](docs/continuation-2026-11-13.md).
+Actual scientific command wall112.940423965s gives558.231907845<=640 under the
+prospective48 rule. All29 required/68 total timer events passed; nested intervals
+and cumulative CPU vectors are not summed. Shared timing is not speed evidence.
+The [cost48 card](docs/cards/k5d-study4282-cost48-2026-11-13.md) reserves future
+1526CPU/1240GPU plus separate constructor20CPU, original preparation50 included
+once in stage1576. Complete lifecycle1175CPU/1240GPU and external phase ceilings
+are prospectively reviewed; actual constructor/spec/device/helpers/deadline
+still precede any48 execution. Target remains qualified gpu6 Ada1 UUIDef96,
+shared10240MiB plus8192MiB margin. No48 result or scale admission yet.
+
+Frozen scientific4282/sourcee4d4/archivef813/env32e/config4fa/bridge849/cache71ef
+remains immutable; PR398 and proof-closeout PR402 merged with green CI.
+[Exact-source CPU qualification](docs/cards/k5d-svt-study-source-qualification-2026-11-13.md)
+is CLOSED1062CPU/GPU0: source/cache, native jobd109/proofb79 and actual receiver
+job8718/proofa636 are accepted, physically published and terminal-ACK closed.
+[Source](docs/experiments/k5d-inputs/svt-study4282-source-cache-acceptance-20261113.json),
+[native](docs/experiments/k5d-inputs/svt-study4282-d109-native-CPU-acceptance-20261113.json)
+and [receiver](docs/experiments/k5d-inputs/svt-study4282-8718-CPU-denial-acceptance-20261113.json)
+indices retain exact evidence. Unused38CPU was returned without refunding charges.
+Original preparation50, failed219MB gold-copy partial and all earlier failures
+remain preserved; no suffix repair or old-proof relabeling occurred.
+
+Earlier a71 job `20261113T130719Z-9f94f30c` is independently accepted/ACK-closed
+for shared-SVT16 correctness/feasibility ([index](docs/experiments/k5d-inputs/svt-a71-9f94-shared16-root-acceptance-20261113.json)).
+Its21 physical members/six literal packet-native pairs and current12 host
+births/one group/token/NVIDIA cleanup passed. The29 sampled memory observations
+(max7276MiB driver/6844MiB reserved) are not absolute peaks or speed/span proof.
+That result does not qualify the new4282 GPU run or a full neural comparison.
+The [CUDA context repair](docs/cards/k5d-svt-memory-context-repair-2026-11-13.md)
+is CLOSED with durable archive80cf8ee8; unused75CPU returned, no prior refund.
+
+After accepted4282 new16, separately admit
+Clip3 first48 cost control, then fixed full-context game9/Clip5 (292) and
+game10/Clip12 (586), then a complete remaining-study cost gate before30 clips.
+The proposed48 full640 cap needs `1.5*3*actual_new16_command_wall+50 <=640`
+and complete lifecycle fit; no affine subtraction from old16. Keep all raw
+physical evidence, full/ROI/both-arm/both-judge/CPU checks;48/full have no archived
+gold. Actual292/586 must forecast the entire remaining cohort with at least1.5
+margin and failure reserve. Full30 fit is unknown; any narrowing needs prospective,
+quality-independent selection. All48/292/586/30 GPU execution remains unreleased.
+Retain source-task calibration failure10/197 and retrospective exposure:
+independently gated fidelity-only results do not qualify task/absence behavior.
+The first16/48 Clip3 spans are all visible; the registered30-clip cohort stays fixed.
+
+The primary neural-plus-SVT six-point exclusive2c6d route remains separate:
+1160CPU/900GPU held, its metadata50 precharged UNRUN. Old-source d1bb receipt/
+native-pixel evidence retains its scope; resource observers UNBOUND/UNKNOWN.
+A transient idle gpu5 does not qualify its worker/control/isolation/proofs or
+permit retargeting gpu6 UUIDs. The missing neural comparison remains open.
+Saved188 diagnostic is [CLOSED](docs/cards/k5d-legacy188-failure-transitions-2026-11-13.md),
+with occasional harms retained; [W7 native70 spending](docs/experiments/w7-inputs/native70-fixed-family-disposition-20261113.json)
+is CLOSED without another encode, with two original cells still unresolved.
+
+The [ledger](docs/experiments/submission-research-budget-20261104.json) controls
+current charges/remaining holds under unchanged24GPUh/28CPUh programme limits.
+Finite passive watch a22 backend87021/PID67233 runs300s/maxnine ticks to hard
+deadline16:11:59.172587UTC; no autosubmit. Native completion-to-model wakeup remains
+unverified: use bounded canonical waits, preserve handles and avoid recurring
+model polls/cache keepalives. Paper/PRESLEY remain paused. See the
+[current continuation](docs/continuation-2026-11-13.md); historical sections below
+retain their original evidence and superseded scheduling snapshots.
 
 ### Historical af6 phase — balances, waits and watch superseded above
 

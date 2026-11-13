@@ -2850,6 +2850,34 @@
       "cpu_seconds": 20,
       "gpu_seconds": 0,
       "basis": "ROOTchoosesONEbounded remoteCPU-only metadata sourcefreezeextract/actualproductionconstructor+twoactualnormalizedvalidators toavoid400MBhoteltransfer. Parent10+children4+SSH2+local2+review2=20;210wall, newSSD scratch/smallcreateonlystagegate publication, noTorch/model/native/quality/GPU/newscientificjob/sourcechange. Originalprep50/copyfailurechargesretained; suffixrepairUNRELEASED. Offlinehelpersfirst; exactrootreleasebeforeanySSH/extract/constructor."
+    },
+    {
+      "phase": "ball-passive-resource-watch-a22-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 100,
+      "gpu_seconds": 0,
+      "basis": "ROOTprechargesONEpassive45min300smax9watch aftera21ninechecksfinished/PID61857absentverified. Samewatch2b931/specf517/80counted+20external/SSHserverloginaggregateunmetered. Noautosubmit/model/claims/LLMtimer."
+    },
+    {
+      "phase": "ball-study4282-qualification16-preflight16-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 16,
+      "gpu_seconds": 0,
+      "basis": "ROOT actual62155 binding review/independentGO; canonicalglobal10+beforecontext6 only, within848qualification. No publication/GPU. Fixed16:04:40.598342UTC deadline."
+    },
+    {
+      "phase": "ball-study4282-qualification16-runtime822-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 822,
+      "gpu_seconds": 600,
+      "basis": "ROOT ONE q16 release afteractual62155 normalizedspec andindependentreview/fresh1714terminalglobal/sameworkercontextPASS. Science535+publication68+admission18+completion82+audit40+ACK6+reserve73=822; prep10/preflight16 alreadycharged once. Initialstatus6 fromreserve73. Whole848CPU600GPU retained; unknownpublicationinspectneverreplay; fixeddeadline16:04:40.598342UTC; no48/scale/speedclaim."
+    },
+    {
+      "phase": "ball-study4282-cost48-remote-constructor20-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 20,
+      "gpu_seconds": 0,
+      "basis": "ROOT exactcost48metadata20 release afterq16ROOT757/ACKclosed, independentactualhelperreviewGO; parent10+2actualvalidatorchildren4+SSH2+local2+review2. Separateoutside1576/q16848/original50. Fixed16:27:19UTC, createonlySSD/NFSgate, actualproductionconstructor/2normalizers noTorch/native/model/GPU. UNKNOWNinspectneverreplay."
     }
   ],
   "reservations": [
@@ -3545,10 +3573,26 @@
     {
       "phase": "ball-study4282-qualification16-20261113",
       "workstream": "ball",
-      "cpu_seconds": 838,
-      "gpu_seconds": 600,
-      "status": "Remaining_unspent; proposednewsource16qualification848CPU/600GPU includes10LOCALprep charged. Source/native/CPUreceiver accepted; gold/realconstructor/gate/runtimehelper reviews pending; noGPUrelease.",
+      "cpu_seconds": 0,
+      "gpu_seconds": 0,
+      "status": "CLOSED actualf831ROOTaccepted/21physicalmembers/3CPUreceipts/68timers/currentcleanup/ARCHIVE8f275100+ACKdone; full848CPU600GPU retained, no refund/48executionauthority.",
       "card": "docs/cards/k5d-study4282-qualification16-2026-11-13.md"
+    },
+    {
+      "phase": "ball-study4282-cost48-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 1526,
+      "gpu_seconds": 1240,
+      "status": "Remaining_unspent; prospective1576CPUstage includesoriginal50alreadycharged once. Actualq16ROOTacceptance/evidenceSHA andcompleteforecast beforeconstructor/runtime. No48executionrelease.",
+      "card": "docs/cards/k5d-study4282-cost48-2026-11-13.md"
+    },
+    {
+      "phase": "ball-study4282-cost48-remote-constructor20-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 0,
+      "gpu_seconds": 0,
+      "status": "Full20CPUprecharged forONE rootreviewedmetadata productionconstructor; actualhandlepending/noGPUrelease.",
+      "card": "docs/cards/k5d-study4282-cost48-2026-11-13.md"
     }
   ],
   "jobs": [
@@ -6548,6 +6592,59 @@
         "33a90d32b71f57d9a4e164d31a5488da"
       ],
       "scope": "Actual normal SVT private-file denial/native packet/YUV/RGB plus initial-launcher interruption and current scoped cleanup only; no active-native/unshare-only/fleet-watchdog/general/GPU/scale claim."
+    },
+    {
+      "job_id": "20261113T153712Z-f831db6a",
+      "source": {
+        "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+        "snapshot_sha256": "f813e09d2fa0eb51b5ec160dcda0cd230d3dada7be697882f9b657201490e61d",
+        "source_sha256": "e4d4a856a06c5f9a06586056ab4a30f0c73b232e5a3db035ae6eb5546063f80b"
+      },
+      "spec_sha256": "9c449b56a8386135e753997573753cb4b41b6857bedcc34ecee8ae27b18471ef",
+      "status": "preparing; publicationunknownuntilcanonicalresponse",
+      "no_replay": true,
+      "workstream": "ball",
+      "phase": "study4282-qualification16",
+      "state": "CLOSED_ROOTaccepted_shared16_correctness_cost_currentcleanup_durably_archived_exactACK",
+      "GPU_precharged": 600,
+      "CPU_precharged": 848,
+      "publication_backend": 56856,
+      "package": "/private/tmp/pointstream-study4282-qualification16-cost48-UNRUN-20261113/qualification16-runtime-62155-FALSE-v1",
+      "deadline": "2026-11-13T16:04:40.598342+00:00",
+      "actual_identity": "/private/tmp/pointstream-study4282-qualification16-cost48-UNRUN-20261113/qualification16-runtime-62155-FALSE-v1/actual-ONEsubmit-qualification16/actual-job-identity.json",
+      "publication_canonical_response_accepted": true,
+      "status_backend": 13809,
+      "canonical_status": "pending",
+      "single_completion_wait_released": true,
+      "admission_wait_skipped_full_charge_retained": true,
+      "wait_backend": 66951,
+      "fresh_status_backend": 74026,
+      "canonical_status_sha256": "ce43a91a532cccaac31edacdbbc09c9485b96149ae2d47089527b5a1ecc4e4d4",
+      "wait_backend_result": "attention_running_sharedGPU_event_helperassert_FAILED_rawpreserved",
+      "reserve73_subslots_used": 33,
+      "remaining_reserve_subslots": 40,
+      "post40_backend": 46099,
+      "ROOT_proof_sha256": "7573303601c40677ad218699d17dd2f4b4345952bb8a419a7aa2a5317df6bdfd",
+      "independent_review_sha256": "6b8423a8d1d38538e85caf714474c9484edf9c2fc208cc1529c2b2079929f364",
+      "actual_command_wall_seconds": 112.9404239654541,
+      "cost48_necessary_proxy_pass": true,
+      "terminal_event_acknowledged": [
+        "420bb26b20ca5eb0932ce0f2fd4b1632",
+        "2a77444e0ada5c81bf536ccb780c189b"
+      ],
+      "thin_index": "docs/experiments/k5d-inputs/svt-study4282-f831-shared16-root-acceptance-20261113.json",
+      "archive15_prospectively_within_prepaid_reserve": true,
+      "durable_archive": {
+        "status": "PASS_IMMUTABLE_ARCHIVE_ONLY",
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-study4282-q16-f831-8f275100aaaefc752c7ed666/qualification.tar.gz",
+        "sha256": "8f275100aaaefc752c7ed6664b6edfade7b4d24ed0325a5d635d017cc51e8e1b",
+        "bytes": 1951583,
+        "file_mode": "0444",
+        "directory_mode": "0555",
+        "CPU": 0.046268,
+        "wall": 3.2364468863233924,
+        "publication_backend": 53471
+      }
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -6578,19 +6675,19 @@
     "RootprospectiveSVTqualification413\u2192443CPU/GPU0: failedpreflight20retained +ONEreplacementpreflight30 +393remaining. Add30unallocatedBall/programme; allouter/workstreamceilingsunchanged. Readonlystatus-ONLY6CPU/120wallbootstrap proposed; originalpublication68V4shims/scienceunchanged. No replacementexecutionbeforeexactrootreview."
   ],
   "monitoring": {
-    "state": "a21_active_bounded_passive_only",
+    "state": "a22_active_bounded_passive_only",
     "scope": "gpu2/gpu3 A6000 and gpu5/gpu6 Ada",
-    "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a21/run",
+    "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a22/run",
     "native_completion_wakeup_verified": false,
     "native_completion_resume_verified": false,
     "accounting_limits": "SSH server/login aggregate unmetered; inner80 countedCPU plus20 external reserve; full100CPU charge retained",
-    "scientific_jobs": "Nativeactuald109closed/acceptedACK; actualreceiverqualificationnotpublished; no activeGPUstage.",
+    "scientific_jobs": "NoactiveGPUjob.Study4282source/native/receiverclosed; actualservermetadata62155PASS,new16spec9c449review/bindingpending; noGPUrelease.",
     "source_sha256": "2b931eb5a25f7a87cc3594103ee845ec2582cc017309b7d479a99f637f6ee10c",
     "mode": "bounded_passive_native_resource_checks",
-    "pid": 61857,
-    "backend": 15608,
-    "started_utc": "2026-11-13T14:45:19.643850+00:00",
-    "deadline_utc": "2026-11-13T15:30:19.643754+00:00",
+    "pid": 67233,
+    "backend": 87021,
+    "started_utc": "2026-11-13T15:26:59.172693+00:00",
+    "deadline_utc": "2026-11-13T16:11:59.172587+00:00",
     "interval_seconds": 300,
     "max_ticks": 9,
     "jobs": [],
@@ -6604,7 +6701,7 @@
     ],
     "recurring_llm_polling": false,
     "completed": false,
-    "latest_inspected_completed_tick": 3,
+    "latest_inspected_completed_tick": null,
     "previous_monitoring_snapshot": {
       "state": "Activea5passive5min45minwatch100CPUprecharged;priora4endedverified;noautosubmit/modeltimer",
       "scope": "gpu2/gpu3 A6000 and gpu5/gpu6 Ada",
@@ -6625,16 +6722,8 @@
       "recurring_llm_polling": false,
       "completed": false
     },
-    "latest_inspected_completed_tick_UTC": "2026-11-13T15:00:39.423838+00:00",
-    "latest_inspected_candidates": [
-      {
-        "host": "gpu5",
-        "index": "1",
-        "model": "RTX 6000 Ada",
-        "uuid": "GPU-7754164a-33cd-265c-3696-c20966d228fe",
-        "qualification": "required"
-      }
-    ],
+    "latest_inspected_completed_tick_UTC": null,
+    "latest_inspected_candidates": [],
     "prior_a13_final": {
       "finished_utc": "2026-11-13T09:33:48.050607+00:00",
       "ticks": 9,
@@ -6700,6 +6789,18 @@
         "ticks": 9
       },
       "PID57608_absent_verified": true
+    },
+    "a21_final_closeout": {
+      "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a21/run",
+      "finished": {
+        "controller_cpu_seconds_observed": 0.521215,
+        "finished_utc": "2026-11-13T15:25:39.103704+00:00",
+        "reason": "deadline",
+        "remote_worst_case_charge_seconds": 37.95281799999999,
+        "ssh_waited_children_cpu_seconds": 1.1480059999999999,
+        "ticks": 9
+      },
+      "PID61857_absent_verified": true
     }
   },
   "approval_history": [
