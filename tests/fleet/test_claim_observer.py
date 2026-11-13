@@ -1,6 +1,6 @@
 from experiments.jobs.claim_observer import observe
 
-CFG = {'nonce':'n', 'spec_sha256':'s', 'source_sha256':'x', 'inputs_sha256':'i', 'inbox':'/inbox', 'boot':'b', 'management_host':'gpu6', 'max_gap_ns':100, 'ready_wall_ns':1}
+CFG = {'nonce':'n', 'spec_sha256':'s', 'source_sha256':'x', 'inputs_sha256':'i', 'inbox':'/inbox', 'boot':'b', 'management_host':'gpu6', 'max_gap_ns':100, 'ready_wall_ns':1, 'control_sha256':{'/release/a':'h'}, 'parent_cpu_reserve':20, 'cpu_seconds':80}
 BIND = {'nonce':'n', 'spec_sha256':'s', 'source_sha256':'x', 'inputs_sha256':'i', 'management_host':'gpu6', 'management_boot':'b', 'job_id':'job'}
 
 
@@ -52,14 +52,16 @@ def test_replay_rejects_missing_final_or_changed_result(tmp_path):
     from experiments.jobs.claim_observer import validate_journal
     path = tmp_path / 'journal'
     rows = [{'event':'ready', 'config':CFG, 'monotonic_ns':0, 'boot':'b'},
-            {'event':'ready_complete', 'wall_ns':1, 'monotonic_ns':1}]
+            {'event':'ready_complete', 'wall_ns':1, 'monotonic_ns':1, 'boot':'b'}]
     samples = valid()
     samples[0]['start_ns'], samples[0]['end_ns'] = 2, 3
     rows += [{'event':'sample', **samples[0]}, {'event':'binding', 'binding':BIND, 'monotonic_ns':4, 'boot':'b'}]
     rows += [{'event':'sample', **s} for s in samples[1:]]
     path.write_text(''.join(json.dumps(r)+'\n' for r in rows))
     assert validate_journal(path)['status'] == 'unknown'
-    rows.append({'event':'final', 'result':{'status':'bounded'}, 'monotonic_ns':11, 'boot':'b'})
+    rows.append({'event':'terminal_control', 'control_sha256':CFG['control_sha256'], 'monotonic_ns':11, 'boot':'b'})
+    rows.append({'event':'final', 'result':{'status':'bounded'}, 'monotonic_ns':12, 'boot':'b',
+                 'observer_cpu_seconds':1, 'reader_cpu_seconds':2})
     path.write_text(''.join(json.dumps(r)+'\n' for r in rows))
     assert validate_journal(path)['status'] == 'unknown'
     rows[-1]['result'] = observe(CFG, BIND, samples)
@@ -194,3 +196,39 @@ def test_overlapping_sample_intervals_fail():
     data = valid()
     data[1]['start_ns'] = data[0]['start_ns']
     assert observe(CFG, BIND, data)['status'] == 'unknown'
+
+
+def test_inherited_hard_limit_and_no_fractional_spawn():
+    import pytest
+    from experiments.jobs.claim_observer import _capped_cpu_limit
+    assert _capped_cpu_limit(59.9, 20) == 20
+    assert _capped_cpu_limit(3.9, 20) == 3
+    with pytest.raises(ValueError, match='insufficient'):
+        _capped_cpu_limit(0.99, 20)
+
+
+def test_missing_boot_bad_cpu_or_terminal_control_is_unknown(tmp_path):
+    import json
+    from experiments.jobs.claim_observer import validate_journal
+    samples = valid()
+    samples[0]['start_ns'], samples[0]['end_ns'] = 2, 3
+    rows = [{'event':'ready', 'config':CFG, 'monotonic_ns':0, 'boot':'b'},
+            {'event':'ready_complete', 'wall_ns':1, 'monotonic_ns':1, 'boot':'b'},
+            {'event':'sample', **samples[0]}, {'event':'binding', 'binding':BIND, 'monotonic_ns':4, 'boot':'b'},
+            *[{'event':'sample', **s} for s in samples[1:]],
+            {'event':'terminal_control', 'control_sha256':CFG['control_sha256'], 'monotonic_ns':11, 'boot':'b'},
+            {'event':'final', 'result':observe(CFG, BIND, samples), 'monotonic_ns':12, 'boot':'b',
+             'observer_cpu_seconds':1, 'reader_cpu_seconds':2}]
+    path = tmp_path/'journal'
+    def check():
+        path.write_text(''.join(json.dumps(r)+'\n' for r in rows))
+        return validate_journal(path)['status']
+    assert check() == 'bounded'
+    del rows[-1]['boot']
+    assert check() == 'unknown'
+    rows[-1]['boot'] = 'b'
+    rows[-1]['reader_cpu_seconds'] = 80
+    assert check() == 'unknown'
+    rows[-1]['reader_cpu_seconds'] = 2
+    rows[-2]['control_sha256'] = {}
+    assert check() == 'unknown'

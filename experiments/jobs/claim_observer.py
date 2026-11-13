@@ -226,9 +226,19 @@ def sample_once(cfg: dict[str, Any], binding: dict[str, Any] | None) -> dict[str
     return s
 
 
+def _capped_cpu_limit(seconds: float, hard: int) -> int:
+    limit = math.floor(seconds)
+    if hard != resource.RLIM_INFINITY:
+        limit = min(limit, hard)
+    if limit < 1:
+        raise ValueError('insufficient remaining CPU budget')
+    return limit
+
+
 def _control_child(controls: dict[str, str], seconds: int, pipe: Any) -> None:
     try:
-        resource.setrlimit(resource.RLIMIT_CPU, (seconds, seconds))
+        limit = _capped_cpu_limit(seconds, resource.getrlimit(resource.RLIMIT_CPU)[1])
+        resource.setrlimit(resource.RLIMIT_CPU, (limit, limit))
         for name, expected in controls.items():
             if hashlib.sha256(bounded_bytes(Path(name))).hexdigest() != expected:
                 raise ValueError('installed control identity differs')
@@ -241,9 +251,7 @@ def _control_child(controls: dict[str, str], seconds: int, pipe: Any) -> None:
 
 def bounded_controls(cfg: dict[str, Any]) -> None:
     usage = resource.getrusage(resource.RUSAGE_CHILDREN)
-    remaining = math.floor(cfg['cpu_seconds'] - cfg['parent_cpu_reserve'] - time.process_time() - usage.ru_utime - usage.ru_stime)
-    if remaining < 1:
-        raise ValueError('insufficient CPU budget for controls')
+    remaining = _capped_cpu_limit(cfg['cpu_seconds'] - cfg['parent_cpu_reserve'] - time.process_time() - usage.ru_utime - usage.ru_stime, resource.getrlimit(resource.RLIMIT_CPU)[1])
     parent, child = multiprocessing.Pipe(duplex=False)
     proc = multiprocessing.Process(target=_control_child,
                                    args=(cfg['control_sha256'], remaining, child))
@@ -267,9 +275,7 @@ def bounded_controls(cfg: dict[str, Any]) -> None:
 
 def _read_child(cfg: dict[str, Any], binding: dict[str, Any] | None, pipe: Any) -> None:
     try:
-        limit = math.floor(cfg['reader_cpu_limit'])
-        if limit < 1:
-            raise ValueError('insufficient remaining CPU budget')
+        limit = _capped_cpu_limit(cfg['reader_cpu_limit'], resource.getrlimit(resource.RLIMIT_CPU)[1])
         resource.setrlimit(resource.RLIMIT_CPU, (limit, limit))
         current = read(Path(cfg['binding_file']))
         if binding is not None and current != binding:
@@ -282,6 +288,7 @@ def _read_child(cfg: dict[str, Any], binding: dict[str, Any] | None, pipe: Any) 
 
 
 def bounded_sample(cfg: dict[str, Any], binding: dict[str, Any] | None) -> dict[str, Any]:
+    _capped_cpu_limit(cfg['reader_cpu_limit'], resource.getrlimit(resource.RLIMIT_CPU)[1])
     parent, child = multiprocessing.Pipe(duplex=False)
     proc = multiprocessing.Process(target=_read_child, args=(cfg, binding, child))
     proc.start()
@@ -309,7 +316,7 @@ def _validate_journal(path: Path) -> dict[str, Any]:
     if len(rows) < 3 or rows[0].get('event') != 'ready' or rows[-1].get('event') != 'final':
         return {'status': 'unknown', 'reason': 'incomplete journal'}
     if (rows[1].get('event') != 'ready_complete'
-            or any(r.get('event') not in ('sample', 'binding') for r in rows[2:-1])):
+            or any(r.get('event') not in ('sample', 'binding', 'terminal_control') for r in rows[2:-1])):
         return {'status': 'unknown', 'reason': 'journal order differs'}
     cfg = rows[0]['config']
     previous = rows[0]['monotonic_ns']
@@ -326,7 +333,7 @@ def _validate_journal(path: Path) -> dict[str, Any]:
             if type(stamp) is not int or stamp < previous:
                 return {'status': 'unknown', 'reason': 'journal time order differs'}
             previous = stamp
-        if row.get('boot', cfg['boot']) != cfg['boot']:
+        if row.get('boot') != cfg['boot']:
             return {'status': 'unknown', 'reason': 'journal boot differs'}
     readiness = [r for r in rows if r.get('event') == 'ready_complete']
     if len(readiness) != 1:
@@ -338,6 +345,15 @@ def _validate_journal(path: Path) -> dict[str, Any]:
     samples = [{k:v for k,v in r.items() if k != 'event'} for r in rows if r.get('event') == 'sample']
     result = observe(cfg, bindings[0], samples)
     final = rows[-1]['result']
+    if result.get('status') == 'bounded':
+        controls = [r for r in rows if r.get('event') == 'terminal_control']
+        if (len(controls) != 1 or rows[-2] != controls[0]
+                or controls[0].get('control_sha256') != cfg['control_sha256']):
+            return {'status': 'unknown', 'reason': 'terminal control check missing'}
+        parent, children = rows[-1]['observer_cpu_seconds'], rows[-1]['reader_cpu_seconds']
+        if (any(isinstance(x, bool) or not isinstance(x, (int, float)) or not math.isfinite(x) or x < 0 for x in (parent, children))
+                or parent > cfg['parent_cpu_reserve'] or parent + children > cfg['cpu_seconds']):
+            return {'status': 'unknown', 'reason': 'CPU usage invalid or exhausted'}
     if final != result:
         return {'status': 'unknown', 'reason': 'final receipt differs from replay'}
     return result
@@ -388,7 +404,7 @@ def main() -> None:
             or cfg.get('management_boot') != Path('/proc/sys/kernel/random/boot_id').read_text().strip()):
         raise ValueError('control or same-boot management attestation differs')
     soft, hard = resource.getrlimit(resource.RLIMIT_CPU)
-    parent_limit = math.floor(cfg['cpu_seconds'])
+    parent_limit = math.floor(cfg['parent_cpu_reserve'])
     if hard != resource.RLIM_INFINITY and parent_limit > hard:
         raise ValueError('parent CPU limit exceeds existing hard limit')
     resource.setrlimit(resource.RLIMIT_CPU, (parent_limit, parent_limit))
@@ -445,6 +461,13 @@ def main() -> None:
                 append(journal, {'event':'binding', 'binding':b, 'monotonic_ns':time.monotonic_ns(), 'boot':s['boot']})
             result = observe(cfg, binding, samples)
             if result['status'] == 'bounded':
+                bounded_controls(cfg)
+                after = resource.getrusage(resource.RUSAGE_CHILDREN)
+                if (time.process_time() > cfg['parent_cpu_reserve']
+                        or time.process_time() + after.ru_utime + after.ru_stime > cfg['cpu_seconds']):
+                    raise ValueError('observer CPU guard exceeded during terminal control check')
+                append(journal, {'event':'terminal_control', 'control_sha256':cfg['control_sha256'],
+                                 'monotonic_ns':time.monotonic_ns(), 'boot':cfg['boot']})
                 reason = 'complete'
                 break
             if s.get('error'):
