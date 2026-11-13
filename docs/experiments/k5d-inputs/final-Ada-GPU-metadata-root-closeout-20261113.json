@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "created_UTC": "2026-11-13T07:01:05.666967+00:00",
+  "status": "Metadata accepted; final launch candidate reviewed; GPU+observers UNRELEASED because resources occupied and remaining whole-stage deadline cannot fit",
+  "scientific_identity": {
+    "revision": "ae892df1cbb2b8c28eb413187effc28d70b74326",
+    "source_sha256": "9d3d7b2c6ec0fd99466ae3592345795a4916e982fdee3924a9749b83a81b39da",
+    "snapshot_sha256": "ad635b0b46428a3fa934081ded5d2b408c453bc5f7e46854dd8b8eb0c6abbea9",
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "actual_metadata": {
+    "backend": 96680,
+    "state": "ended0",
+    "spec_sha256": "658ccbadbff437d4c91d5599090ad0d4aa8e17dd379348ea88fff3035a7f802d",
+    "spec_raw_sha256": "f974558784756cf7e718f3d182255bdffe733da7e7c3c16da14af0a3eafc90f2",
+    "helper_CPU": 1.306983,
+    "query_CPU": 0.011588,
+    "wall_seconds": 1.3586760330945253,
+    "deadline_UTC": "2026-11-13T07:10:30.537997+00:00",
+    "raw_physical_audit_sha256": "feb599eaf6e5604cf5e98eb61158785d8d039a07850f5cc5332b135f8791a7ea"
+  },
+  "accepted_CPU_jobs": {
+    "native": "20261113T060019Z-cc884861",
+    "real_SVT_denial": "20261113T061438Z-c53fb111"
+  },
+  "GPU_job": null,
+  "observers_started": false,
+  "root_operator_release": false,
+  "future_stage": {
+    "forecast_namespace_seconds": 476.62473208992185,
+    "namespace_cap": 500,
+    "smoke": 550,
+    "campaign": 700,
+    "GPU_held": 900,
+    "CPU_held_campaign": 700,
+    "CPU_held_observers": 200,
+    "other_CPU_buffer": 20,
+    "scale_released": false
+  },
+  "accounting": {
+    "programme_GPU_charged": 22941,
+    "programme_CPU_charged": 61245,
+    "Ball_GPU_charged": 16579,
+    "Ball_CPU_charged": 37244,
+    "metadata_CPU_retained": 50,
+    "admin_CPU_retained": 150,
+    "resource_watch_a11_CPU_retained": 100,
+    "budget_authority": "docs/experiments/submission-research-budget-20261104.json"
+  },
+  "resources": {
+    "all6_doctor_UTC": "2026-11-13T06:51:54Z",
+    "all4_Ada_busy": true,
+    "gpu6_foreign_PIDs": [
+      624056,
+      624530
+    ],
+    "watch_root": "/private/tmp/pointstream-resource-watch-20261113-passive-a11",
+    "watch_backend": 87453,
+    "watch_PID": 99739,
+    "watch_deadline_UTC": "2026-11-13T07:19:52.695050Z",
+    "interval_seconds": 300,
+    "max_checks": 9,
+    "native_completion_model_resumption": "unverified; do not promise autonomous follow-up",
+    "latest_watch_tick": 5,
+    "latest_watch_finished_UTC": "2026-11-13T07:00:13.609962Z",
+    "latest_watch_candidates": []
+  },
+  "next": "Use fresh live occupancy; if an eligible window appears, prospectively prepare NEW nonce/deadline metadata and audit/approve it before launch using same final source and CPU proofs. Preserve this unsubmitted spec/candidates unchanged; never extend/replay them. Need a complete cost fit including stage/start/readiness/publication before deadline. No current job may be invented. Both metadata50 and administrative150 charges remain retained; a new preparation/admin allocation must be recorded prospectively within the programme and Ball headroom. Do not recycle those spent ceilings or silently exceed the old card. GPU900/campaign700/observers200 are still held, never charged or executed.",
+  "paper": "Paused per user; no Overleaf/PRESLEY edits",
+  "local_candidate": "/private/tmp/pointstream-final-Ada-GPU-witness-plan-20261113/root-GPU-release",
+  "independent_review": "/private/tmp/pointstream-final-Ada-GPU-witness-plan-20261113/root-GPU-release/review-independent-observer-final.json",
+  "pins": {
+    "/private/tmp/pointstream-final-Ada-GPU-witness-plan-20261113/root-released-metadata50/actual-preparation-result.json": {
+      "sha256": "6448ba07d3a4782ce61a9dda03cd5a947e671d53702ed92e45840817dee5dfc9",
+      "bytes": 7231
+    }
+  },
+  "evidence_cache": "docs/experiments/k5d-inputs/final-Ada-GPU-metadata-evidence-cache-20261113.json",
+  "evidence_cache_manifest_sha256": "04bafce70c42183d7cc819807fe3a3b5acae1cd9f34e880853bf936e06df6db3",
+  "offline_mocked_fault_tests": {
+    "offline_mocked_fault_cases": 3,
+    "PASS": true,
+    "script_sha256": "670933c5225e191e146694dd5dc226d354c16de3f5142a15bc5969a1f7e18797",
+    "result_sha256": "682e25613712b14c7c90dce2c3bebe9f891051a8a3b385b6cbf520db5cf87298",
+    "CPU_seconds": 0.196678,
+    "CPU_cap_within_existing_admin": 5,
+    "limitation": "Mocked SSH Popen and process-birth provider; does not test actual transport, remote execution, CPU ceilings or GPU qualification."
+  }
+}

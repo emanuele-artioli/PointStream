@@ -1,3 +1,5 @@
+Current update: passive a12 resource watcher backend41965 runs until 2026-11-13T08:44:17.604642+00:00; CPU100 newly charged, programme23841G63245C/Ball17479G39244C. See Ball journal for immutable handle/limits; no automatic launch or verified native model callback. New cost-guard code build300CPU remains local-only.
+
 # Continuation — November 13, 2026 (UTC)
 
 This snapshot supersedes the current-status summaries in the November 12 handoff.
@@ -6,6 +8,90 @@ accounting authority; [Ball journal](experiments/k5d-ball-benchmark.md) retains
 chronology and raw-result references. Times below are UTC.
 
 ## Current decision and continuation (November 13, UTC)
+
+**Scientific PASS, operational FAIL.** Root accepted actual job
+`20261113T072420Z-d1bb8926` as `PASS_SCIENTIFIC_RECEIPT_AND_PIXEL_AUDIT_ONLY`,
+preserving the [scope decision made before outcome inspection](experiments/k5d-inputs/ada-d1bb-pre-outcome-scope-decision-20261113.json).
+The actual GPU was gpu6 Ada1, UUID `GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553`,
+RTX6000Ada capability 8.9. Frozen source remains revision `ae892df1`,
+source `9d3d7b2c`, archive `ad635b0b`, environment `32e68872`; config `6b3d8c5f`.
+Native CPU proof `cc884861` and actual SVT CPU-denial proof `c53fb111` remain accepted.
+
+All six original points (DCVC0/21/42; SVT48/55/62), each 16 frames, passed the frozen
+receipt verifier and native decoded/rendered pixel joins. The audit hashed all 80
+publication members and joined 66 checkpoint-manifest files. It accepted the
+actual fleet gate and retained own-Ada reference validation; reference data was
+not independently fetched again. This is receipt/pixel qualification, not a
+new full-metric, complete-cost, calibration or full30 result.
+
+The actual stored spec raw SHA is
+`76aac2334c70aa91999199f5369524c2f12ec392a2ba9ba369b6e426abc4264d`;
+the constructor raw SHA is
+`0608d72de771be30360c84c15b46f4a28bbe8414336e0da9885f5282c1042698`.
+Fleet normalization/serialization accounts for that distinction; the canonical
+spec SHA is `8cad58d154f3839eff2920a8529fb42921cef2b71a7b65c7bb8db391b312ce22`.
+Smoke publication is `c316a32dd528d8723dbd317a641dc66d89ca44eacf5a0cbf8c690ca6a86ffd80`.
+The [root scientific closeout](experiments/k5d-inputs/ada-d1bb-root-scientific-closeout-20261113.json)
+and [read-only evidence index](experiments/k5d-inputs/ada-d1bb-scientific-evidence-cache-20261113.json)
+preserve report, supplement, failure/command history, full receipt metadata and
+actual stored spec; large native/video payloads remain in their original publication.
+
+The old controller's 15-second request-visibility step failed before assignment
+or observer binding. Both observers are **UNBOUND/UNKNOWN**, with no replay or
+reselection. No complete resource span/cost or scale gate is accepted. Nested
+reported timing intervals overlap and cannot be added into a complete lifetime.
+The supplement establishes current campaign/observed-process and claim cleanup
+only, not a historical reservation/release-time bound. Root reread canonical COMPLETE status and acknowledged completion event
+`c213ada6a4045c629823ea1d941a13d6` after accepting and reporting the scoped result.
+
+The original observer batch wait 52306 ended naturally with exit 0 after 1,802s. Both
+journals contain 63 events / 60 samples and zero bound events; both final results are
+UNKNOWN, reason deadline, and wrapper remaining groups are empty. The evidence
+index links a separate read-only final-observer supplement. This closes their
+wait/cleanup phase without establishing a retrospective resource join.
+
+Next: use the merged client-only queue-admission repair PR383 (`ca8db290`, checks
+passed in 4m13) in a separately reviewed future resource gate. No server controller
+was installed. Do not repeat GPU work solely to repair the missing observer
+join. Any later 16/48 producer/scorer calibration and 292/586/full 30-clip stages still require
+prospective complete-cost/resource evidence, original metrics/judges, fresh
+receivers and the same final scientific source/archive/environment.
+
+The corrected prospective cost audit gives an additional stop: the existing
+48-frame gate estimates `1.5 × 3 × 227.148307 + 50 = 1072.167382s`, above its
+580s cap. No fixed-cost subtraction or alternate affine admission is supported
+by the current code or one 16-frame observation. A separately reviewed gate/source
+revision and renewed exact-source proofs would be required before that route.
+Full 30-clip feasibility remains unestablished but conditionally plausible within the
+actual Ball 64,800 GPU / 72,000 CPU limits; charged totals are not those limits.
+The evidence index preserves both the corrected report and budget correction.
+
+A separate [calibration-budget revision build](cards/k5d-Ada-calibration-budget-revision-2026-11-13.md)
+now has 300 CPU charged for code only. Its prospective bounds are 1200s namespace,
+1220s full stage and 1800s campaign, retaining the conservative formula and
+scientific validators. No GPU or old-source proof reuse is released. Before new
+results, the declared endpoint is the full 30-clip study only if complete costs fit; otherwise
+the full-context game9/Clip5 and game10/Clip12 fallback applies. A changed source
+needs its own frozen identity and new qualification; current ae892 evidence
+remains scoped to ae892.
+
+A further external-controller proposal is **UNRELEASED and under independent
+audit**: the future 1800s campaign cannot fit frozen b64's READY+1500s bound.
+Only a new copied helper would raise that upper bound to READY+2100s, preserving
+atomic identity/binding checks. The proposed observer config uses 72 samples at 30s
+with 3s read timeouts (2688s maximum bound within 2700s); observer source ddd remains exact. The frozen wrapper3ed requires exactly60
+samples, so a separately pinned copied wrapper would change only that count to72.
+The original wrapper and its historical evidence remain unchanged. Queue<=60s and a proposed 2 CPU management wrapper still
+need conditional wait-tree/administration proof. Root has not accepted 150 CPU
+administration fit. Existing scientific sources, b64 contract and authorities
+remain unchanged; this proposal uses existing code-build allocation, with no new
+charge, deployment, freeze or execution release.
+
+Ledger charges verified: programme23,841GPU/63,245CPU; Ball 17,479 GPU / 39,244 CPU seconds,
+inside unchanged 24 GPU-hour / 28 CPU-hour authority. All failed-stage charges and separate
+held SVT funds remain unchanged. No new scientific or paper/PRESLEY release.
+
+### Historical runtime-repair and earlier resource-window phases
 
 **55dd is closed; the Ada source port is merged and final-source preparation
 is complete; both CPU gates are accepted. GPU work remains deferred until its bounded witness is released.** Actual job `20261113T043746Z-55dd755d` failed on public
@@ -77,26 +163,55 @@ COMPLETE, no active job wait. New proof is immutable at
 `.../checks/k5d-final-Ada-real-CPU-5bdc119c009440c29866617a96306c28/real-CPU-denial.json`.
 Both completion events are acknowledged. The [root closeout](experiments/k5d-inputs/final-Ada-CPU-root-closeout-20261113.json)
 and [actual CPU evidence index](experiments/k5d-inputs/final-Ada-actual-CPU-denial-evidence-cache-20261113.json) preserve exact qualifications and limits.
-GPU witness900/1100 remains UNRELEASED. Operatorv2 helpers e71cbba6/2538e252
+GPU900/campaign700CPU/observers200CPU remain UNRELEASED; the original
+1,100CPU phase includes metadata50/admin150 already charged. Operatorv2 helpers e71cbba6/2538e252
 passed independent review and12 tests: latest absent samples must be fresh and
 successful reads must still meet the bind deadline. Frozen observer bytes remain
 unchanged. Actual final normal policy20.15594s is below the retained25.558s term;
 adding three whole12.3986s import diagnostics with1.5 margin gives476.6247s
 namespace forecast<500. This is a prospective estimate, not CUDA qualification.
 
-Current charges: **programme22,941GPU /60,945CPU; Ball16,579GPU /36,944CPU**.
-The new public-Python reservation has900GPU /1,120CPU remaining; old Ada-stage
-funds3,218GPU /188CPU and held SVT600GPU /1,800CPU are unchanged. The closed prior
+Current charges: **programme22,941GPU /61,445CPU; Ball16,579GPU /37,444CPU**.
+The new public-Python reservation has900GPU /920CPU remaining (700campaign +200observers +20buffer);150adminCPU is now fully charged; old Ada-stage
+funds3,218GPU /88CPU and held SVT600GPU /1,800CPU are unchanged. The closed prior
 repair spent900GPU /1,745CPU, with5CPU held and no further release. Other held
 balances and the user24GPU-hour/28CPU-hour ceiling remain unchanged.
 
-Passive watch **a10** is active: backend48064, PID95846, four hosts every300s,
-maximum nine checks, deadline `2026-11-13T06:36:38.523801Z`;100CPU is charged
-from the Ada held reservation. Prior a9 ended0 after nine checks05:50:34UTC,
-PID89739 absent; last snapshot no idle A6000 and potential idle Ada gpu5:1,
-gpu6:0/1. Fresh fleet admission remains mandatory. Native completion-triggered
-model resumption is unverified. No autosubmit, recurring LLM/model timer,
-additional scientific compute, paper/PRESLEY edit or submission release.
+Passive watch **a11** is active: backend87453, PID99739, four hosts every300s,
+maximum nine checks, deadline `2026-11-13T07:19:52.695050Z`;100CPU is charged
+from the Ada held reservation. Prior a10 ended0 after nine checks06:32:00UTC,
+PID95846 absent. The fresh all-six-host doctor at06:51:54UTC found every Ada
+GPU busy (gpu6 both98%, foreign PIDs624056/624530); no clean A6000 window.
+Earlier potential-idle snapshots are superseded. No GPU publication or observers
+are released amid known contention. CPU closure PR382 merged CI-green as
+`bfd1ac417bbdae6bd523dafdfc1aa061d83f1363`; do not advance the frozen scientific source. Native completion-triggered model resumption is unverified.
+No autosubmit, recurring LLM/model timer, paper/PRESLEY edit or submission release.
+The final GPU metadata50 helper completed once, backend96680/exit0:1.306983CPU
+plus.011588 queryCPU,1.358676wall. Root accepts its independently audited
+metadata only: actual spec658ccbad (rawf9745587), final tree9d3d/archivead635/env32e,
+config6b3d/native5f89/CPU85a52/bridge0c3c. Physical four-file auditfeb599ea
+checks seven controls, boot, Python, both UUIDs and all original caps.
+`/private/tmp/pointstream-final-Ada-GPU-witness-plan-20261113/root-released-metadata50/actual-preparation-result.json`
+names actual immutable assets. Its deadline is07:10:30.537997UTC; do not extend
+or reuse it after expiry. The metadata50CPU charge is retained; future GPU900 /
+CPU900 remains held plus20CPUbuffer;150adminCPU is fully charged. Final operator/observer candidate review passes: normalizedspeca41 is rawf974
+plus ONLYdeadline_epoch, manifest584 changes only release-status; operator3ea
+remains UNRELEASED/outerapprovalfalse. The local transport now durably records its
+actual SSH handle/deadline and UNKNOWN failures (11dc); frozen publisher and
+observer code are unchanged. Three offline mocked transport cases pass (normal, timeout and spawn failure):
+.196678CPU under a separate5CPU envelope inside admin150. These test durable
+handles/UNKNOWN/local-only cleanup, not real SSH or remote execution. No actual
+observer or GPU job started. At07:00UTC, remaining10m30s is less than700campaign
+alone plus launch work, so this spec is no longer eligible for release. Preserve
+it unsubmitted; a clean resource window needs NEW prospectively bounded
+nonce/deadline metadata using the same accepted source/CPU proofs, never an ad
+hoc extension or replay. The [metadata closeout](experiments/k5d-inputs/final-Ada-GPU-metadata-root-closeout-20261113.json)
+and [read-only evidence cache](experiments/k5d-inputs/final-Ada-GPU-metadata-evidence-cache-20261113.json)
+record this decision and exact tested candidate bytes. Retain both metadata50/admin150 charges; prospectively
+record any fresh preparation/admin allocation within programme/Ball headroom
+before running it, rather than recycling spent ceilings. The held GPU900 /
+campaign700CPU /observers200CPU has not been charged or executed. Resource watch
+continues within its recorded bound; tick5 at07:00:13UTC found no candidates.
 
 ### Historical import-diagnostic attempts and conditional next-stage audit
 

@@ -10,26 +10,25 @@ allocation of **6,000GPU /9,000CPU seconds**, inside unchanged Ball64,800GPU/
 
 ### Current research decision (November 13, UTC)
 
-The 55dd GPU witness is closed: six ordinary native preparations completed,
-but its first restricted decoder failed on a lazy Torch import; no receiver or
-quality point passed. Final cleanup is recorded, while the selected observer
-remains UNKNOWN with no reservation bound. Events and both waits are closed.
+**Scientific receipt/pixel qualification passed; the resource-observer operation
+failed.** Actual job `20261113T072420Z-d1bb8926` completed on gpu6 Ada1.
+Root accepted all six fresh isolated receiver receipts and native pixel joins
+on frozen `ae892df1` / source `9d3d7b2c` / archive `ad635b0b` / environment32e.
+This preserves the narrower decision recorded before outcome inspection.
 
-The scoped lazy-import CPU diagnostic passed. The separate [public-Python
-category repair](k5d-public-python-runtime-repair-2026-11-13.md) metadata helper failed after publication;
-a read-only recovery audit verified the published files and private-data
-separation. The original helper remains failed; no qualification follows.
+The publication controller failed before binding either observer. Both remain
+**UNBOUND/UNKNOWN**; no resource span, complete-cost or full-scale gate passed.
+Native and actual SVT CPU proofs remain accepted. Previous failures, charges
+and raw evidence are retained; no publication/binding replay is authorized.
 
-**The Ada registered-study port is merged and CI-green.** Next is final-source
-preparation and fresh CPU qualification; GPU work remains deferred. Use one final source/environment/archive for fresh 16/48 calibration
-through 292/586/full30, preserving defaults and fresh receivers at every new
-stage; new source qualification is mandatory. The [SVT-only route](k5d-svt-only-confirmation-2026-11-13.md)
-remains separately held and scientifically unreleased.
-
-Programme charges are 22,941 GPU / 60,130 CPU seconds within unchanged 24/28-hour
-authority. Bounded passive watch a9 is active; no autosubmit or model timers.
-The [canonical continuation](../continuation-2026-11-13.md) records all current jobs, limits, balances,
-artifacts and remaining gates. No new scientific or paper/PRESLEY work is released.
+PR383 is merged (`ca8db290`, checks passed): a client-only queue-admission
+repair for future use. No server controller was installed. Future calibration
+and scale remain resource-gated. Programme charges are 23,841 GPU / 63,245 CPU seconds;
+Ball 17,479 GPU / 39,244 CPU seconds, inside unchanged 24 GPU-hour / 28 CPU-hour authority.
+A separate 300 CPU [calibration-cap revision build](k5d-Ada-calibration-budget-revision-2026-11-13.md) is code-only; new source qualification and GPU release remain separate gates.
+See the [canonical continuation](../continuation-2026-11-13.md) for actual raw/canonical spec hashes,
+read-only evidence, limitations and the next gate. No new computation or
+paper/PRESLEY work is released by this closeout.
 
 ### Historical af6 phase — balances, waits and watch superseded above
 
