@@ -1,0 +1,69 @@
+{
+  "ACK_backend": 49167,
+  "CPU_precharged": 327,
+  "GPU_precharged": 0,
+  "GPU_qualified": false,
+  "approved": true,
+  "artifact_audit_sha256": "d9c73b71f428e49d7dda668df50950eaf26a20eaca98494a8fd7f3d02941d1b7",
+  "cases": [
+    {
+      "case": "normal",
+      "escalated_to_sigkill": false,
+      "returncode": 0
+    },
+    {
+      "case": "timeout",
+      "escalated_to_sigkill": false,
+      "returncode": 1
+    },
+    {
+      "case": "sigterm",
+      "escalated_to_sigkill": true,
+      "returncode": -9
+    },
+    {
+      "case": "sigkill",
+      "escalated_to_sigkill": false,
+      "returncode": -9
+    }
+  ],
+  "current_cleanup": {
+    "allocations": {},
+    "births_absent": 19,
+    "correct_FQDN_claim_exists": true,
+    "empty_groups": {
+      "1838086": [],
+      "1838691": [],
+      "1839288": [],
+      "1839326": []
+    },
+    "host_processes_absent": 21
+  },
+  "general_or_kernel_readiness": false,
+  "identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "e05187c40ebc81f7505172be11ed20807b4baa97803c80039dc43f3ea33c8abc",
+    "source_sha256": "bb717a9d9fa7d848a3891717c37c0973add82706bc1690bc96aa0961c4804108"
+  },
+  "job_id": "20261113T122511Z-797deaed",
+  "native_proof_bytes": 6844,
+  "native_proof_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-SVT-native-CPU-c2e5dbbe31767622a4d8104163261d1d/native-CPU.json",
+  "native_proof_sha256": "7e6fd45415a9384754d667fdbe715d9553f20fc4c369c978aef950c15203f03e",
+  "normal_inner_CPU": 1.355179,
+  "normal_outer_CPU": 1.444979,
+  "physical_publication_directory_mode": "0555",
+  "physical_publication_file_mode": "0444",
+  "restricted_receiver_qualified": false,
+  "retained_local_checksum_guard_rejection": "Wrong2446 hash rejected before intent/SSH/ACK; <=3parentCPU reassigned from existing4CPU ACK externalreserve; 15total unchanged; corrected invocation succeeded.",
+  "revision": "a71dc6e27743efaa4fb5bbe2e8c8b387ae51ba02",
+  "schema": 1,
+  "scope": "Actual source-bound native CPU containment and accounting only",
+  "spec_sha256": "7e39e27704625005d3e8ebbff31ad17aec68be514e665077700cd927f2a2f932",
+  "summary_sha256": "8359349dca7aa11f5251e99c4962879f6a2f0ade7b4fbc1c494be0ed308aa873",
+  "terminal_event_acknowledged": [
+    "d913a547fd305859b8c3889d1cf4a021"
+  ],
+  "worker_PID": 1470412,
+  "worker_birth_ticks": 562919381,
+  "worker_context_unchanged_except_CPU": true
+}

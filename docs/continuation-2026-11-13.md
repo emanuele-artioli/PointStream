@@ -5,9 +5,9 @@ The [budget ledger](experiments/submission-research-budget-20261104.json) is the
 accounting authority; [Ball journal](experiments/k5d-ball-benchmark.md) retains
 chronology and raw-result references. Times below are UTC.
 
-## Current scheduling decision (November 13, 12:14 UTC)
+## Current scheduling decision (November 13, 12:30 UTC)
 
-**The first shared-SVT16 pilot failed before models; repair source is frozen, runtime unqualified.**
+**The first shared-SVT16 pilot failed before models; source/cache/native CPU evidence is now accepted, GPU runtime unqualified.**
 Actual job `20261113T114623Z-c6b01236` was assigned gpu6 Ada1 UUID
 `GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553`, then failed the strict
 `before_models` memory-row check. Diagnostic 79617 confirmed source admission,
@@ -34,15 +34,28 @@ Source a71 is now frozen as source bb717 / archive e051 / config 5fc.
 Root approved source bridge 1f371bd75240924632204be5bb94b8717b403131d7b3c82fdc70f9714a7fc622
 by all 2001 tree hashes, the two-file delta and unchanged 31 grants. Cache
 physical approval is accepted: metadata-only publication71660 and read-only
-audit80318 completed0 within sourceprep100. Exact seven-file hashes/modes and
+audit80318 completed0 within sourceprep 100. Exact seven-file hashes/modes and
 identity-only policy change passed; tracked thin index is
-`docs/experiments/k5d-inputs/svt-a71-source-cache-acceptance-20261113.json`. PR393 merged 12:01:22 UTC;
+`docs/experiments/k5d-inputs/svt-a71-source-cache-acceptance-20261113.json`.
+PR395 merged CI-green 12:28:36 UTC. PR393 merged 12:01:22 UTC;
 documentation PR394 merged 12:09:48 UTC. This is source-scope approval only.
 
+Fresh native job `20261113T122511Z-797deaed` is canonical COMPLETE/gatePASS/
+exit0/GPU-null. Preflight 99709 accepted the same worker 1470412/birth562919381
+and seven controls. Artifact audit 36475 plus the frozen local validator passed
+all four modes; 19 captured births/21 PIDs absent, four groups empty. Normal CPU
+was 1.355179 inner versus 1.444979 outer. Root accepted proof 7e6fd454 for native
+CPU containment/accounting only. Upload 14761 is COMPLETE0 and physically accepted
+at c2e5dbbe/native-CPU.json,6844B/0444file/0555dir. Sole terminal ACK49167
+completed0, only eventd913a547fd305859b8c3889d1cf4a021; native327 is closed.
+[Native acceptance index](experiments/k5d-inputs/svt-a71-797deaed-native-CPU-acceptance-20261113.json).
+Fresh CPU-denial585 remains UNRELEASED; no GPU/kernel/general-readiness/quality
+credit follows.
+
 The complete repair envelope remains 2000 CPU/600 GPU. Qualification is 1012 CPU:
-sourceprep 100 already charged +native 327 +actual CPU-denial 585. Real16 remains
-848 CPU/600 GPU with 140 CPU reserve. The remaining hold stays 1900 CPU/600 GPU;
-native, denial and real16 remain UNRELEASED. The revised qualification prices
+sourceprep 100 and native 327 fully charged +actual CPU-denial 585 UNRELEASED.
+Real16 remains 848 CPU/600 GPU with 140 CPU reserve. Remaining hold is 1573 CPU/
+600 GPU: denial585 +real16 848 +reserve140, all future stages UNRELEASED. The revised qualification prices
 include complete local/Git/SSH/remote-Python/doctor-child/archive staging and
 publication, monitoring, independent audits and proof/ACK closeout callers.
 Local source/check work 300 CPU is separately precharged. All 31 receiver grants are identical, but strict
@@ -64,13 +77,14 @@ parts stay within 45 minutes and negative outcomes are retained. No adapter,
 The primary exclusive 2c6d/source 6f route stays separate:1160 CPU/900 GPU held,
 metadata 50 CPU precharged UNRUN and false plan 463f50d0 preserved. No general
 GPU/readiness promotion or retroactive kernel pass follows from either route.
-Ledger snapshot: programme 24441 GPU/67271 CPU, Ball 18079 GPU/43270 CPU;
-sourceprep 100 is charged and 1900 CPU/600 GPU remains held. The ledger owns subsequent changes.
+Sourceprep100 and native 327 are charged;1573 CPU/600 GPU remains held.
+The ledger owns live programme/Ball charges and subsequent changes.
 
 Passive a17 backend 10511 / PID 37616 began 11:54:15UTC and ends no later than
 12:39:15.139892UTC, every 300s/max nine ticks; receipt:
 `/private/tmp/pointstream-resource-watch-20261113-passive-a17/run/receipt.json`.
-A16 finished 11:48:23UTC/nine ticks/no idle, PID 27368 absent. No new watch or
+Latest inspected a17 tick 7 at 12:29:39 UTC reported no idle candidate.
+A16 finished11:48:23UTC/nine ticks/no idle, PID27368 absent. No new watch or
 SSH was started in this documentation phase. No autosubmit, recurring model
 timer or verified completion resumption; manuscript/PRESLEY remain paused.
 
