@@ -1,16 +1,16 @@
 # K5d: conventional-only confirmation feasibility
 
-Status (November13,11:35UTC): actualCPUreceiverb40b90d4 is root accepted,
-proofc8c3949b physically published and sole terminal event ACKed. Native6bf,
-source7a9f/cache and same56c CPU-admission joins are accepted. Failed kernel
-readiness gates and original UNKNOWN/metadata erratum remain retained.
-No GPU/general-routing pass follows. Receiver480CPU retained; SVThold848CPU/
-600GPU (meta50/admin200/reserve63/science535). Root prospectively narrowed
-sharedSVT16 to correctness/feasibility with full conservative caps, CURRENT
-cleanup and exact own-Ada parity, omitting live-span/speed/scale claims and
-copied observers. Exact lifecycle/package review is pending; no GPU release.
-Primary V5 exclusive route remains separate. The current continuation and
-budget ledger own live state; manuscript/PRESLEY remain paused.
+Status (November 13, 11:58 UTC): shared real16 job `20261113T114623Z-c6b01236`
+failed before models on assigned Ada1 ef96: source admission passed, but the
+strict actual memory row was missing. Zero quality points are accepted.
+Old 848 CPU/600 GPU remains charged; no automatic retry under this card.
+Cleanup 29077 completed with two captured PIDs/one group clear and owned shared
+GPU/FQDN CPU tokens absent; root closeout/sole terminal ACK complete. Accepted native 6bf and
+receiver c8 retain their original source identity. The separate
+[PLAN memory-context repair](k5d-svt-memory-context-repair-2026-11-13.md) holds
+new 600 GPU/2000 CPU UNRELEASED and requires fresh CPU proofs after CI/freeze.
+Primary exclusive 2c6d remains separate; no speed/span/scale or manuscript claim.
+See the [current continuation](../continuation-2026-11-13.md) for live state.
 
 Root decision: the exclusive Ada queue `20261113T030323Z-af6c09da` expired
 without admission. Keep the registered dual-codec benchmark open. Test a

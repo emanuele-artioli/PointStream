@@ -5,7 +5,50 @@ The [budget ledger](experiments/submission-research-budget-20261104.json) is the
 accounting authority; [Ball journal](experiments/k5d-ball-benchmark.md) retains
 chronology and raw-result references. Times below are UTC.
 
-## Current scheduling decision (November 13, 11:35 UTC)
+## Current scheduling decision (November 13, 11:58 UTC)
+
+**The first shared-SVT16 pilot failed before models; the repair is build-only.**
+Actual job `20261113T114623Z-c6b01236` was assigned gpu6 Ada1 UUID
+`GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553`, then failed the strict
+`before_models` memory-row check. Diagnostic 79617 confirmed source admission,
+with zero accepted quality points. All848 CPU/600 GPU from that phase remain
+charged; the original card authorizes no retry. Cleanup 29077 completed with
+two captured PIDs absent, one empty group, owned shared-GPU and FQDN CPU tokens
+absent, and the same worker context unchanged except CPU accounting. Root
+closeout is being written; terminal ACK remains pending.
+
+New [PLAN repair subitem](cards/k5d-svt-memory-context-repair-2026-11-13.md):
+independent candidate 93ebb351 on `codex/svt-cuda-context-memory-20261113`,
+worktree `/private/tmp/pointstream-svt-cuda-context-memory-20261113`. A tiny CUDA
+allocation follows the allocator cap, then synchronization/release precedes
+peak reset. Strict actual-row/PID/foreign-process guards stay unchanged.
+Lazy context initialization is a hypothesis; lineage/query visibility remain
+competing explanations. No missing row may be fabricated or treated as zero.
+
+The new reservation 600 GPU/2000 CPU is UNRELEASED:818 clean CPU qualification,
+about 848 for one real16 lifecycle,334 reserve. Local source/check work 300 CPU
+is separately precharged. All 31 receiver grants are identical, but strict
+execution-identity/config/producer/receipt joins require fresh native and
+actual CPU-denial proofs (independent report 69b86104). Preserve old native 6bf,
+receiver c8 and original 7a9f evidence; do not relabel them for the new source.
+Next runtime is at most one separately frozen real16 test after CI, exact-source
+qualification and full root forecasts. No thresholds, decoder permissions,
+training, speed/span, extrapolation or scale claims change.
+
+The primary exclusive 2c6d/source 6f route stays separate:1160 CPU/900 GPU held,
+metadata 50 CPU precharged UNRUN and false plan 463f50d0 preserved. No general
+GPU/readiness promotion or retroactive kernel pass follows from either route.
+Ledger snapshot: programme24441 GPU/67171 CPU, Ball18079 GPU/43170 CPU; the new
+600 GPU/2000 CPU is held, not spent. The ledger owns subsequent changes.
+
+Passive a17 backend 10511 / PID 37616 began 11:54:15UTC and ends no later than
+12:39:15.139892UTC, every 300s/max nine ticks; receipt:
+`/private/tmp/pointstream-resource-watch-20261113-passive-a17/run/receipt.json`.
+A16 finished 11:48:23UTC/nine ticks/no idle, PID 27368 absent. No new watch or
+SSH was started in this documentation phase. No autosubmit, recurring model
+timer or verified completion resumption; manuscript/PRESLEY remain paused.
+
+## Completed CPU-readiness snapshot — historical, superseded at11:58 UTC
 
 Actual SVT-only CPU receiver job `20261113T111519Z-b40b90d4` is root accepted,
 physically published (proof `c8c3949b`, 7,313,201 bytes, immutable0444/0555)
