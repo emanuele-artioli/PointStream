@@ -22,6 +22,7 @@ import numpy as np
 from experiments.tennis import k5, k5b1b, k5b_trackers as trk, k5c_independent_ball as old
 from experiments.tennis import k5d_source_oracle as oracle, windows as tw
 from experiments.tennis.k5d_analysis import score_frames
+from experiments.tennis import k5d_svt_profile as svt_profile
 from src.pointstream import ball, ball_stream
 
 POINTS = old.POINTS
@@ -162,8 +163,11 @@ def fidelity_gate(path: Path, digest: str, archive_sha: str, *, purpose: str = "
     return receipt
 
 
-def validate(out: Path, *, prepared: bool = False) -> dict[str, Any]:
+def validate(out: Path, *, prepared: bool = False, point_profile: str | None = None) -> dict[str, Any]:
     report = json.loads((out / "pilot.json").read_text())
+    points = svt_profile.select(POINTS, point_profile)
+    if report.get("evaluation_profile") != point_profile:
+        raise ValueError("evaluation profile differs from explicit validator")
     if prepared:
         if report.get("checkpoint_prepare") is not True or report["full_metrics"] is not False:
             raise ValueError("invalid prepared report marker or metrics status")
@@ -189,8 +193,8 @@ def validate(out: Path, *, prepared: bool = False) -> dict[str, Any]:
     if (width <= 0 or height <= 0 or width % 2 or height % 2 or fps <= 0
             or report["duration_seconds"] != n / float(fps)):
         raise ValueError("invalid source geometry or duration")
-    if [(p["codec"], p["point"]) for p in report["points"]] != list(POINTS):
-        raise ValueError("six point coverage incomplete")
+    if [(p["codec"], p["point"]) for p in report["points"]] != list(points):
+        raise ValueError("SVT-only three-point coverage incomplete" if point_profile else "six point coverage incomplete")
     if oracle.sha(out / "resources.json") != report["resource_map_sha256"]:
         raise ValueError("resource map mismatch")
     for p in report["points"]:
@@ -259,14 +263,23 @@ def validate(out: Path, *, prepared: bool = False) -> dict[str, Any]:
             "scope": "packet replay; filesystem denial not established"}
 
 
-def run(args: argparse.Namespace) -> None:
+def run(args: argparse.Namespace, *, point_profile: str | None = None) -> None:
     import torch
     from src.codecs import quality, svtav1
 
+    points = svt_profile.select(POINTS, point_profile)
+    conventional = point_profile == svt_profile.PROFILE
+    if conventional and (args.feasibility_no_metrics or getattr(args, "checkpoint_prepare", False)
+                         or not getattr(args, "isolated_receiver", False)):
+        raise ValueError("SVT oracle requires complete scoring and actual isolated CPU receiving")
+    if conventional and (args.frames != 16 or args.clip != "tracknet/game10/Clip3"
+                         or not getattr(args, "cost_pilot", False) or getattr(args, "benchmark", False)):
+        raise ValueError("SVT oracle is restricted to the original 16-frame cost span")
+    codec_inputs = () if conventional else ("image_ckpt", "video_ckpt")
     started = time.monotonic()
     cpu_started = time.process_time()
     scratch = Path(os.environ["PS_SCRATCH_DIR"])
-    inputs = [Path(getattr(args, key)) for key in ("manifest", "archive", "balltrack_code", "balltrack_weight", "wasb_code", "wasb_weights", "wasb_config", "exposure", "image_ckpt", "video_ckpt", "lpips_backbone", "dists_backbone")]
+    inputs = [Path(getattr(args, key)) for key in ("manifest", "archive", "balltrack_code", "balltrack_weight", "wasb_code", "wasb_weights", "wasb_config", "exposure", *codec_inputs, "lpips_backbone", "dists_backbone")]
     oracle.validate_output(args.output, scratch, inputs)
     if len(args.code_revision) != 40 or any(c not in "0123456789abcdef" for c in args.code_revision):
         raise ValueError("code revision must be a full lowercase Git SHA1")
@@ -299,7 +312,7 @@ def run(args: argparse.Namespace) -> None:
     timer = getattr(args, "timer", None)
     def measure(name: str, fn: Any) -> Any:
         return timer.measure(name, fn) if timer is not None else fn()
-    for name in ("image_ckpt", "video_ckpt", "lpips_backbone", "dists_backbone"):
+    for name in (*codec_inputs, "lpips_backbone", "dists_backbone"):
         if measure(f"preflight.hash.{name}", lambda: oracle.sha(Path(getattr(args, name)))) != getattr(args, name + "_sha256"):
             raise ValueError(f"{name} hash mismatch")
     try:
@@ -326,8 +339,9 @@ def run(args: argparse.Namespace) -> None:
         gate_record = {"sha256": args.fidelity_gate_sha256, "scope": "fidelity-only", "purpose": purpose}
     elif not report["qualified"]:
         raise ValueError("source qualification failed; retained before coding")
-    args.image_sha256 = args.image_ckpt_sha256
-    args.video_sha256 = args.video_ckpt_sha256
+    if not conventional:
+        args.image_sha256 = args.image_ckpt_sha256
+        args.video_sha256 = args.video_ckpt_sha256
     clip = next(c for c in trk.tracknet_clips(Path(args.archive), [int(args.clip.split('/')[1][4:])]) if c["id"] == args.clip)
     clip = {**clip, "rows": clip["rows"][:args.frames]}
     source = measure("source.encoder_rgb_decode", lambda: trk.tracknet_frames(Path(args.archive), clip))
@@ -354,9 +368,10 @@ def run(args: argparse.Namespace) -> None:
     start = measure("encoder.source_track", lambda: k5b1b.track_of(tracker.run(source), (h, w)))
     window = {"size": [w, h], "fps": float(fps)}
     coded = []
-    for kind, point in POINTS:
+    for kind, point in points:
         path = work / f"{kind}-{point}"
-        rec = measure(f"native.{kind}.{point}.total", lambda: k5.dcvc_attempt(args, yuv, path, window, n, point) if kind == "dcvc" else k5.code_svt(args, yuv, path, window, n, point, sorted(os.sched_getaffinity(0))))
+        rec = measure(f"native.{kind}.{point}.total", lambda: k5.dcvc_attempt(args, yuv, path, window, n, point) if kind == "dcvc" else k5.code_svt(args, yuv, path, window, n, point, sorted(os.sched_getaffinity(0)),
+            **({"env": {**os.environ, "CUDA_VISIBLE_DEVICES": ""}} if conventional else {})))
         if kind == "dcvc" and not (rec["deterministic"] and rec["decoder_matches_encoder_intra"] and rec["luma_psnr"] >= k5.SANE_FRAME_PSNR):
             raise ValueError("DCVC native validation failed")
         native = path / ("stream.psdc" if kind == "dcvc" else "stream.ivf")
@@ -370,9 +385,10 @@ def run(args: argparse.Namespace) -> None:
         (directory / "native-checkpoint.json").write_text(json.dumps(rec, indent=2, allow_nan=False) + "\n")
         coded.append((kind, point, native, rec, decoded))
     fits = measure("encoder.fit_streak", lambda: old.fit_streak(start, source, [x[4] for x in coded], (h, w)))
-    resource_map = {"resources": {"svt": {"codec": "svt-av1-ivf", "decoder": args.decoder, "decoder_sha256": oracle.sha(Path(args.decoder))},
-                      "dcvc": {"codec": "dcvc-uf", "image_ckpt": args.image_ckpt, "image_ckpt_sha256": args.image_ckpt_sha256,
-                               "video_ckpt": args.video_ckpt, "video_ckpt_sha256": args.video_ckpt_sha256}}}
+    resource_map = {"resources": {"svt": {"codec": "svt-av1-ivf", "decoder": args.decoder, "decoder_sha256": oracle.sha(Path(args.decoder))}}}
+    if not conventional:
+        resource_map["resources"]["dcvc"] = {"codec": "dcvc-uf", "image_ckpt": args.image_ckpt,
+            "image_ckpt_sha256": args.image_ckpt_sha256, "video_ckpt": args.video_ckpt, "video_ckpt_sha256": args.video_ckpt_sha256}
     map_path = work / "resources.json"
     map_path.write_text(json.dumps(resource_map))
     shutil.copyfile(map_path, args.output / "resources.json")
@@ -412,7 +428,7 @@ def run(args: argparse.Namespace) -> None:
             receipt = measure(f"receiver.{kind}.{point}", lambda: k5d_isolated_receiver.replay(
                 wire, map_path, receive, config_path=Path(args.receiver_isolation_config),
                 config_sha256=args.receiver_isolation_config_sha256,
-                protected_paths=protected, producer_context=context))
+                protected_paths=protected, producer_context=context, **({"cpu_only": True} if conventional else {})))
         else:
             cmd = [sys.executable, "-m", "experiments.tennis.k5d_worker", "decode", "--wire", str(wire), "--resources", str(map_path), "--work-dir", str(receive)]
             measure(f"receiver.{kind}.{point}", lambda: subprocess.run(cmd, check=True, capture_output=True, timeout=3600))
@@ -446,6 +462,8 @@ def run(args: argparse.Namespace) -> None:
                                "zero_ball_wire_kbps": baseline_wire.stat().st_size * 8 / (n / float(fps)) / 1000,
                                "metrics": baseline_metrics, "judges": baseline_judges},
                   "streak": {"guard_off": guard, "metrics": streak_metrics, "judges": streak_judges, "reuse": reuse}}
+        if conventional:
+            shutil.move(str(receive), directory / "cpu-receiver-evidence")
         results.append(result)
         (directory / "point.json").write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
     output = {"frames": n, "clip": args.clip, "size": [w, h], "fps": str(fps), "duration_seconds": n / float(fps),
@@ -455,22 +473,27 @@ def run(args: argparse.Namespace) -> None:
               "conversion": {"command": conversion, "yuv_sha256": measure("source.hash.yuv", lambda: oracle.sha(yuv)),
                              "floor_psnr": measure("source.conversion_floor", lambda: pooled_psnr(source, converted))},
               "resource_map_sha256": oracle.sha(map_path), "fidelity_gate": gate_record,
-              "installed_decoder_resources": measure("resources.hash_installed", lambda: installed_decoder_resources(Path(args.image_ckpt), Path(args.video_ckpt), Path(args.decoder))),
+              "installed_decoder_resources": measure("resources.hash_installed", lambda: ({"scope": "generic installed SVT decoder; excluded from wire bytes",
+                    "svt": {"decoder": {"sha256": oracle.sha(Path(args.decoder)), "bytes": Path(args.decoder).stat().st_size}}}
+                    if conventional else installed_decoder_resources(Path(args.image_ckpt), Path(args.video_ckpt), Path(args.decoder)))),
               "source_task_qualified": bool(report["qualified"]),
               "cost_pilot": cost_pilot, "metric_geometry": {"width": w, "height": h, "frames": n,
                     "visible_crop_frames": sum(label[0] == 1 for label in labels), "crop_size": 64, "arms_per_point": 2},
               "metric_models": None if nets is None else {"lpips": quality.lpips_record(Path(args.lpips_backbone)),
                                                              "dists": quality.dists_record(Path(args.dists_backbone))},
-              "identities": {name: {"path": getattr(args, name), "sha256": getattr(args, name + "_sha256")} for name in ("image_ckpt", "video_ckpt", "lpips_backbone", "dists_backbone")},
+              "identities": {name: {"path": getattr(args, name), "sha256": getattr(args, name + "_sha256")} for name in (*codec_inputs, "lpips_backbone", "dists_backbone")},
               "tools": {name: svtav1.tool(name) for name in (args.ffmpeg, args.encoder, args.decoder)},
               "elapsed_seconds": time.monotonic() - started, "parent_cpu_seconds": time.process_time() - cpu_started,
               "cpu_accounting": "parent process only; fleet must meter whole process tree", "python": sys.version, "torch": torch.__version__,
               "revision": args.code_revision, "snapshot_identity": getattr(args, "snapshot_identity", None),
               "encoder_source_sha256": oracle.sha(Path(__file__)), "points": results}
+    if conventional:
+        output["evaluation_profile"] = point_profile
+        output["scope"] = "SVT-only16 correctness/cost oracle; original dual-codec benchmark remains unmet"
     if checkpoint_prepare:
         output["checkpoint_prepare"] = True
     (args.output / "pilot.json").write_text(json.dumps(output, indent=2, allow_nan=False) + "\n")
-    validate(args.output, prepared=checkpoint_prepare)
+    validate(args.output, prepared=checkpoint_prepare, point_profile=point_profile)
 
 
 def main() -> int:

@@ -82,8 +82,13 @@ def _execute_native(command: list[str], work: Path, isolation: dict[str, Any] | 
     child_env = kwargs.pop("env", None)
     native_env = dict(os.environ if child_env is None else child_env)
     payload_path = work.parent / "native-exec.json"
-    payload_path.write_text(json.dumps({"argv": command, "env": native_env, "nonce": isolation["nonce"],
-                                        "campaign_pgid": isolation["campaign_host"]["campaign_pgid"]}, sort_keys=True))
+    payload = {"argv": command, "env": native_env, "nonce": isolation["nonce"],
+               "campaign_pgid": isolation["campaign_host"]["campaign_pgid"]}
+    if isolation.get("cpu_only"):
+        if native_env.get("CUDA_VISIBLE_DEVICES") != "":
+            raise ValueError("CPU-only native decoder has visible CUDA")
+        payload["cpu_only"] = True
+    payload_path.write_text(json.dumps(payload, sort_keys=True))
     wrapper_env = dict(native_env)
     wrapper_env["PYTHONPATH"] = os.environ["PYTHONPATH"]
     wrapper = [sys.executable, "-S", "-m", "experiments.tennis.k5d_isolated_receiver",

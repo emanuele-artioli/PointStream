@@ -70,14 +70,18 @@ def mse_to_psnr(mse: float) -> float:
 # ----------------------------------------------------------------- coders
 
 
-def code_svt(args: argparse.Namespace, yuv: Path, work: Path, window: dict[str, Any], frames: int, crf: int, cpus: list[int]) -> dict[str, Any]:
+def code_svt(args: argparse.Namespace, yuv: Path, work: Path, window: dict[str, Any], frames: int, crf: int, cpus: list[int], *, env: dict[str, str] | None = None) -> dict[str, Any]:
     from src.codecs import svtav1
 
     width, height = window["size"]
     work.mkdir(parents=True, exist_ok=True)
     fps = Fraction(window["fps"]).limit_denominator(1001)
+    options: dict[str, Any] = {}
+    if env is not None:
+        options["env"] = env
     rec = svtav1.code(yuv, work, width=width, height=height, fps=fps, frames=frames, crf=crf, preset=PRESET,
-                      threads=len(cpus), full_range=False, encoder=args.encoder, decoder=args.decoder, cpus=cpus)
+                      threads=len(cpus), full_range=False, encoder=args.encoder, decoder=args.decoder, cpus=cpus,
+                      **options)
     if rec["decoded_frames"] != frames:
         raise RuntimeError(f"SVT-AV1 CRF {crf}: decoded {rec['decoded_frames']} of {frames} frames")
     result = {"codec": "svt-av1", "param": crf, "kbps": rec["payload_bytes"] * 8 / (frames / float(window["fps"])) / 1000.0,

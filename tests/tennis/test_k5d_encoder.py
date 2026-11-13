@@ -279,3 +279,45 @@ def test_prepared_validator_rejects_scored_or_incomplete_reports(tmp_path, monke
     write()
     with pytest.raises(ValueError, match='six point'):
         enc.validate(tmp_path, prepared=True)
+
+
+def test_svt_profile_requires_explicit_validator_and_keeps_full_metric_guards(tmp_path,monkeypatch):
+    from experiments.tennis import k5d_svt_profile as profile
+    report = fixture_output(tmp_path,monkeypatch)
+    report['points'] = [p for p in report['points'] if p['codec']=='svt']
+    report['evaluation_profile'] = profile.PROFILE
+    (tmp_path/'pilot.json').write_text(json.dumps(report))
+    with pytest.raises(ValueError,match='profile'):
+        enc.validate(tmp_path)
+    assert enc.validate(tmp_path,point_profile=profile.PROFILE)['points'] == 3
+    report['points'][0]['baseline']['metrics'][0]['full_dists'] = None
+    (tmp_path/'pilot.json').write_text(json.dumps(report))
+    with pytest.raises(ValueError,match='metric'):
+        enc.validate(tmp_path,point_profile=profile.PROFILE)
+
+
+def test_svt_native_environment_is_explicit_and_does_not_mutate_parent(monkeypatch):
+    from types import SimpleNamespace
+    from src.codecs import svtav1
+    calls=[]
+    monkeypatch.setenv('CUDA_VISIBLE_DEVICES','GPU-parent')
+    monkeypatch.setattr(svtav1.subprocess,'run',lambda *a,**kw:calls.append(kw) or SimpleNamespace(returncode=0))
+    svtav1.run(['/native'],1,env={'CUDA_VISIBLE_DEVICES':''})
+    assert calls[-1]['env']['CUDA_VISIBLE_DEVICES'] == ''
+    assert __import__('os').environ['CUDA_VISIBLE_DEVICES'] == 'GPU-parent'
+    svtav1.run(['/native'],1)
+    assert 'env' not in calls[-1]
+
+
+@pytest.mark.parametrize('change',({'frames':48},{'benchmark':True},{'feasibility_no_metrics':True},{'isolated_receiver':False}))
+def test_svt_profile_cannot_enable_full_benchmark_or_partial_scoring(monkeypatch,change):
+    import argparse
+    import sys
+    import types
+    from experiments.tennis import k5d_svt_profile as profile
+    monkeypatch.setitem(sys.modules,'torch',types.ModuleType('torch'))
+    values={'frames':16,'clip':'tracknet/game10/Clip3','cost_pilot':True,'feasibility_no_metrics':False,
+            'isolated_receiver':True,'checkpoint_prepare':False,'benchmark':False}
+    values.update(change)
+    with pytest.raises(ValueError,match='SVT oracle'):
+        enc.run(argparse.Namespace(**values),point_profile=profile.PROFILE)

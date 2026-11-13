@@ -78,6 +78,18 @@ def test_receipt_rejects_legacy_and_incomplete_proof() -> None:
                **{k: 'b' * 64 for k in ('wire_sha256', 'resource_map_sha256', 'native_sha256',
                                         'decoded_yuv_sha256', 'rendered_rgb_sha256')}}
     assert isolated.verify_receipt(receipt, expected_context={}, expected_config_sha256='a' * 64) is proof
+    with pytest.raises(ValueError, match='CPU-only'):
+        isolated.verify_receipt(receipt, expected_context={}, expected_config_sha256='a' * 64, require_cpu_only=True)
+    receipt['codec'] = 'svt-av1-ivf'
+    proof.update(cpu_only=True, cuda_visible_devices='')
+    proof['actual_policy']['cpu_only'] = True
+    proof['actual_policy_sha256'] = isolated._object_sha(proof['actual_policy'])
+    proof['decoder']['preexec']['cuda_visible_devices'] = ''
+    assert isolated.verify_receipt(receipt, expected_context={}, expected_config_sha256='a' * 64, require_cpu_only=True) is proof
+    proof['decoder']['preexec']['cuda_visible_devices'] = 'GPU-leak'
+    with pytest.raises(ValueError, match='CPU-only'):
+        isolated.verify_receipt(receipt, expected_context={}, expected_config_sha256='a' * 64, require_cpu_only=True)
+    proof['decoder']['preexec']['cuda_visible_devices'] = ''
     proof['decoder']['outer_observation']['host_pgid'] = 41
     with pytest.raises(ValueError, match='native decoder observation'):
         isolated.verify_receipt(receipt, expected_context={}, expected_config_sha256='a' * 64)
@@ -245,3 +257,16 @@ def test_receiver_inherits_group_and_monitor_keeps_foreign_processes(monkeypatch
     groups = {501: 70, 502: 70, 999: 99}
     monkeypatch.setattr(monitor.os, 'getpgid', lambda pid: groups[pid])
     assert monitor.foreign_gpu_processes('GPU-test', 70) == [999]
+
+
+def test_cpu_only_native_exec_refuses_visible_device_before_wait(tmp_path,monkeypatch):
+    import json
+    payload = tmp_path/'native-exec.json'
+    payload.write_text(json.dumps({'cpu_only':True,'env':{'CUDA_VISIBLE_DEVICES':''}}))
+    monkeypatch.setenv('CUDA_VISIBLE_DEVICES','GPU-parent')
+    with pytest.raises(ValueError,match='visible CUDA'):
+        isolated._native_wrapper(payload)
+    monkeypatch.setenv('CUDA_VISIBLE_DEVICES','')
+    payload.write_text(json.dumps({'cpu_only':True,'env':{'CUDA_VISIBLE_DEVICES':'GPU-leaked'}}))
+    with pytest.raises(ValueError,match='visible CUDA'):
+        isolated._native_wrapper(payload)
