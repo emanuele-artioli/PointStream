@@ -13,12 +13,13 @@ import multiprocessing
 import os
 import resource
 import socket
+import stat
 import time
 from pathlib import Path
 from typing import Any
 
 from experiments.jobs import inbox
-from experiments.jobs.claims import get_process_start_time
+from experiments.jobs.claims import get_process_start_time, sanitize_uuid
 
 TERMINAL = {'complete', 'failed', 'cancelled', 'contended', 'budget_exhausted', 'interrupted', 'expired'}
 
@@ -27,10 +28,21 @@ def digest(value: str) -> str:
     return hashlib.sha256(value.encode()).hexdigest()
 
 
+def bounded_bytes(path: Path, limit: int = 8 * 1024 * 1024) -> bytes:
+    fd = os.open(path, os.O_RDONLY | os.O_NONBLOCK | os.O_NOFOLLOW)
+    with os.fdopen(fd, 'rb') as f:
+        info = os.fstat(f.fileno())
+        if not stat.S_ISREG(info.st_mode) or info.st_size > limit:
+            raise ValueError('input is not a bounded regular file')
+        data = f.read(limit + 1)
+        if len(data) > limit:
+            raise ValueError('input exceeds limit')
+        return data
+
+
 def read(path: Path) -> dict[str, Any] | None:
     try:
-        with path.open('rb') as f:
-            value = json.load(f)
+        value = json.loads(bounded_bytes(path))
     except FileNotFoundError:
         return None
     if not isinstance(value, dict):
@@ -49,7 +61,7 @@ def observe(config: dict[str, Any], binding: dict[str, Any] | None, samples: lis
     """Validate recorded samples; missing, ambiguous or interrupted evidence is unknown."""
     unknown: dict[str, Any] = {'status': 'unknown', 'reason': 'incomplete or ambiguous observation'}
     try:
-        if not binding or binding['nonce'] != config['nonce'] or binding['spec_sha256'] != config['spec_sha256'] or binding['source_sha256'] != config['source_sha256'] or binding.get('inputs_sha256') != config['inputs_sha256']:
+        if not binding or binding['nonce'] != config['nonce'] or binding['spec_sha256'] != config['spec_sha256'] or binding['source_sha256'] != config['source_sha256'] or binding.get('inputs_sha256') != config['inputs_sha256'] or binding.get('management_host') != config['management_host'] or binding.get('management_boot') != config['boot']:
             return unknown
         job = binding['job_id']
         expected_dir = str(Path(config['inbox']) / job / 'run')
@@ -132,7 +144,8 @@ def sample_once(cfg: dict[str, Any], binding: dict[str, Any] | None) -> dict[str
     else:
         if claim['host'] != cfg['host_fqdn'] or claim['device_uuid'] != cfg['gpu_uuid'] or claim['sharing'] != 'exclusive':
             raise ValueError('claim device identity mismatch')
-        s.update(gpu_state='other', gpu_job_dir=claim['job_dir'], gpu_token_sha256=digest(claim['token']))
+        s.update(gpu_state='other', gpu_job_dir=claim['job_dir'], gpu_token_sha256=digest(claim['token']),
+                 gpu_owner_pid=claim['pid'], gpu_owner_birth=claim['proc_start_time'])
     if binding is None:
         return s
     job = binding['job_id']
@@ -140,25 +153,43 @@ def sample_once(cfg: dict[str, Any], binding: dict[str, Any] | None) -> dict[str
         raise ValueError('invalid job ID')
     run = Path(cfg['inbox']) / job / 'run'
     record, status, supervisor = read(run/'claim.json'), read(run/'status.json'), read(run/'supervisor.json')
-    ready, spec = read(run.parent/'ready.json'), read(run.parent/'spec.json')
+    ready, spec, request = read(run.parent/'ready.json'), read(run.parent/'spec.json'), read(run/'request.json')
     cpu = read(Path(cfg['cpu_claim']))
-    if any(x is None for x in (record, status, supervisor, ready, spec)):
+    if any(x is None for x in (record, status, supervisor, ready, spec, request)):
         return s
-    assert record is not None and status is not None and supervisor is not None and ready is not None and spec is not None
+    assert record is not None and status is not None and supervisor is not None and ready is not None and spec is not None and request is not None
     if (spec.get('hosts') != ['gpu6'] or spec.get('single_cpu_campaign') is not True
             or spec.get('cpu_threads') != 1 or spec.get('gpu_sharing', {}).get('mode') != 'exclusive'
             or inbox.digest(spec) != cfg['spec_sha256'] or ready['spec_sha256'] != cfg['spec_sha256']
             or ready['source_sha256'] != cfg['source_sha256'] or inbox.digest(spec['inputs']) != binding['inputs_sha256']):
         raise ValueError('canonical spec, source or inputs differ')
+    control = request['fleet_control']
+    claims = request['claims']
+    if (control['root'] != cfg['control_root'] or control['files'] != cfg['control_files']
+            or claims['claims_dir'] != cfg['claims_dir'] or claims['gpu'] != cfg['gpu_uuid']
+            or claims['cpu_threads'] != 1 or request['gpu_sharing'] != {'mode': 'exclusive'}):
+        raise ValueError('actual supervisor request differs from pinned control and claims')
+    expected_gpu = Path(cfg['claims_dir']) / 'devices' / (cfg['host_fqdn'] + '_' + sanitize_uuid(cfg['gpu_uuid'])) / 'claim.json'
+    expected_cpu = Path(cfg['claims_dir']) / 'cpu' / (cfg['host_fqdn'] + '.json')
+    if Path(cfg['gpu_claim']) != expected_gpu or Path(cfg['cpu_claim']) != expected_cpu:
+        raise ValueError('claim paths differ from actual request')
     dc, cc = record['device_claim'], record['cpu_claim']
     if (dc['job_dir'] != str(run) or dc['device_uuid'] != cfg['gpu_uuid'] or dc['host'] != cfg['host_fqdn']
-            or cc['job_dir'] != str(run) or cc['host'] != cfg['host_fqdn'] or cc['threads'] != 1):
+            or cc['job_dir'] != str(run) or cc['host'] != cfg['host_fqdn'] or cc['threads'] != 1
+            or any(x.get('pid') != supervisor['pid'] or x.get('proc_start_time') != supervisor['proc_start_time']
+                   for x in (dc, cc))):
         raise ValueError('run claim identity mismatch')
-    s['job_join'] = s.get('gpu_token_sha256') == digest(dc['token'])
+    s['job_join'] = (s.get('gpu_token_sha256') == digest(dc['token'])
+                     and s.get('gpu_owner_pid') == supervisor['pid']
+                     and s.get('gpu_owner_birth') == supervisor['proc_start_time'])
     s['cpu_token_sha256'] = digest(cc['token'])
     if cpu is None:
         raise ValueError('CPU allocation file absent')
-    s['cpu_token_present'] = cc['token'] in cpu['allocations']
+    allocation = cpu['allocations'].get(cc['token'])
+    if allocation is not None and any(allocation.get(k) != cc.get(k)
+                                      for k in ('token', 'host', 'job_dir', 'threads', 'pid', 'proc_start_time')):
+        raise ValueError('CPU allocation owner differs')
+    s['cpu_token_present'] = allocation is not None
     s['terminal'] = status['status']
     s['spec_sha256'], s['source_sha256'] = ready['spec_sha256'], ready['source_sha256']
     s['published_ns'] = int(ready['published'] * 1_000_000_000)
@@ -199,7 +230,7 @@ def _control_child(controls: dict[str, str], seconds: int, pipe: Any) -> None:
     try:
         resource.setrlimit(resource.RLIMIT_CPU, (seconds, seconds))
         for name, expected in controls.items():
-            if hashlib.sha256(Path(name).read_bytes()).hexdigest() != expected:
+            if hashlib.sha256(bounded_bytes(Path(name))).hexdigest() != expected:
                 raise ValueError('installed control identity differs')
         pipe.send(True)
     except BaseException as exc:
@@ -209,9 +240,13 @@ def _control_child(controls: dict[str, str], seconds: int, pipe: Any) -> None:
 
 
 def bounded_controls(cfg: dict[str, Any]) -> None:
+    usage = resource.getrusage(resource.RUSAGE_CHILDREN)
+    remaining = math.floor(cfg['cpu_seconds'] - cfg['parent_cpu_reserve'] - time.process_time() - usage.ru_utime - usage.ru_stime)
+    if remaining < 1:
+        raise ValueError('insufficient CPU budget for controls')
     parent, child = multiprocessing.Pipe(duplex=False)
     proc = multiprocessing.Process(target=_control_child,
-                                   args=(cfg['control_sha256'], max(1, math.ceil(cfg['cpu_seconds'])), child))
+                                   args=(cfg['control_sha256'], remaining, child))
     proc.start()
     child.close()
     try:
@@ -232,9 +267,14 @@ def bounded_controls(cfg: dict[str, Any]) -> None:
 
 def _read_child(cfg: dict[str, Any], binding: dict[str, Any] | None, pipe: Any) -> None:
     try:
-        limit = max(1, math.ceil(cfg['reader_cpu_limit']))
+        limit = math.floor(cfg['reader_cpu_limit'])
+        if limit < 1:
+            raise ValueError('insufficient remaining CPU budget')
         resource.setrlimit(resource.RLIMIT_CPU, (limit, limit))
-        pipe.send({'sample': sample_once(cfg, binding)})
+        current = read(Path(cfg['binding_file']))
+        if binding is not None and current != binding:
+            raise ValueError('binding changed')
+        pipe.send({'sample': sample_once(cfg, current), 'binding': current})
     except BaseException as exc:
         pipe.send({'error': repr(exc)})
     finally:
@@ -253,7 +293,7 @@ def bounded_sample(cfg: dict[str, Any], binding: dict[str, Any] | None) -> dict[
         reply = parent.recv()
         if 'error' in reply:
             raise ValueError(reply['error'])
-        return dict(reply['sample'])
+        return dict(reply)
     finally:
         parent.close()
         proc.join(timeout=2)
@@ -265,13 +305,29 @@ def bounded_sample(cfg: dict[str, Any], binding: dict[str, Any] | None) -> dict[
 
 
 def _validate_journal(path: Path) -> dict[str, Any]:
-    rows = [json.loads(line) for line in path.read_text().splitlines()]
+    rows = [json.loads(line) for line in bounded_bytes(path, 64 * 1024 * 1024).splitlines()]
     if len(rows) < 3 or rows[0].get('event') != 'ready' or rows[-1].get('event') != 'final':
         return {'status': 'unknown', 'reason': 'incomplete journal'}
     if (rows[1].get('event') != 'ready_complete'
             or any(r.get('event') not in ('sample', 'binding') for r in rows[2:-1])):
         return {'status': 'unknown', 'reason': 'journal order differs'}
     cfg = rows[0]['config']
+    previous = rows[0]['monotonic_ns']
+    if type(previous) is not int or rows[0]['boot'] != cfg['boot']:
+        return {'status': 'unknown', 'reason': 'ready time or boot differs'}
+    for row in rows[1:]:
+        if row['event'] == 'sample':
+            start, end = row['start_ns'], row['end_ns']
+            if type(start) is not int or type(end) is not int or start < previous or end < start:
+                return {'status': 'unknown', 'reason': 'sample intervals overlap'}
+            previous = end
+        else:
+            stamp = row['monotonic_ns']
+            if type(stamp) is not int or stamp < previous:
+                return {'status': 'unknown', 'reason': 'journal time order differs'}
+            previous = stamp
+        if row.get('boot', cfg['boot']) != cfg['boot']:
+            return {'status': 'unknown', 'reason': 'journal boot differs'}
     readiness = [r for r in rows if r.get('event') == 'ready_complete']
     if len(readiness) != 1:
         return {'status': 'unknown', 'reason': 'readiness incomplete'}
@@ -298,13 +354,19 @@ def main() -> None:
     parser.add_argument('config', type=Path, nargs='?')
     parser.add_argument('output', type=Path, nargs='?')
     parser.add_argument('--validate', type=Path)
+    parser.add_argument('--config-sha256')
     args = parser.parse_args()
     if args.validate is not None:
         print(json.dumps(validate_journal(args.validate), sort_keys=True))
         return
     if args.config is None or args.output is None:
         parser.error('config and output are required')
-    cfg = json.loads(args.config.read_text())
+    if not local_mount(args.config.parent):
+        raise ValueError('config must be on a separate local filesystem')
+    raw_config = bounded_bytes(args.config)
+    if len(raw_config) > 8 * 1024 * 1024 or hashlib.sha256(raw_config).hexdigest() != args.config_sha256:
+        raise ValueError('pinned configuration identity differs')
+    cfg = json.loads(raw_config)
     # Configuration and control files must be pinned before READY.
     if (cfg['host'] != 'gpu6' or cfg['host_fqdn'].split('.')[0] != 'gpu6'
             or not cfg['gpu_uuid'].startswith('GPU-') or not local_mount(args.output.parent)
@@ -312,18 +374,31 @@ def main() -> None:
             or socket.gethostname().split('.')[0] != cfg['host'] or cfg['max_samples'] < 1
             or cfg['max_samples'] * (cfg['poll_seconds'] + cfg['read_timeout_seconds'] + 4) > 2700 or cfg['poll_seconds'] < 2
             or not 0 < cfg['read_timeout_seconds'] <= 10 or cfg['max_gap_ns'] <= 0
-            or cfg['cpu_seconds'] <= 0 or len(os.sched_getaffinity(0)) != 1
+            or cfg['cpu_seconds'] <= cfg['parent_cpu_reserve'] + 1 or cfg['parent_cpu_reserve'] < 1
+            or len(os.sched_getaffinity(0)) != 1
             or not cfg['control_sha256'] or not cfg['nonce']
             or any(len(cfg[k]) != 64 or any(c not in '0123456789abcdef' for c in cfg[k])
                    for k in ('spec_sha256', 'source_sha256', 'inputs_sha256'))):
         raise ValueError('host, one-core affinity or bounded observer configuration differs')
+    if (not Path(cfg['control_root']).is_absolute() or any(Path(k).is_absolute() or '..' in Path(k).parts
+            for k in cfg['control_files'])):
+        raise ValueError('invalid control root or relative file path')
+    expected_control = {str(Path(cfg['control_root']) / k): v for k, v in cfg['control_files'].items()}
+    if (expected_control != cfg['control_sha256'] or cfg.get('management_host') != 'gpu6'
+            or cfg.get('management_boot') != Path('/proc/sys/kernel/random/boot_id').read_text().strip()):
+        raise ValueError('control or same-boot management attestation differs')
+    soft, hard = resource.getrlimit(resource.RLIMIT_CPU)
+    parent_limit = math.floor(cfg['cpu_seconds'])
+    if hard != resource.RLIM_INFINITY and parent_limit > hard:
+        raise ValueError('parent CPU limit exceeds existing hard limit')
+    resource.setrlimit(resource.RLIMIT_CPU, (parent_limit, parent_limit))
     cfg['boot'] = Path('/proc/sys/kernel/random/boot_id').read_text().strip()
     bounded_controls(cfg)
     control_usage = resource.getrusage(resource.RUSAGE_CHILDREN)
     if time.process_time() + control_usage.ru_utime + control_usage.ru_stime > cfg['cpu_seconds']:
         raise ValueError('observer CPU guard exceeded before ready')
     # A fresh directory and local journal avoid overwriting evidence.
-    cfg['config_sha256'] = hashlib.sha256(args.config.read_bytes()).hexdigest()
+    cfg['config_sha256'] = hashlib.sha256(raw_config).hexdigest()
     args.output.mkdir(mode=0o700, parents=False, exist_ok=False)
     journal = args.output / 'journal.jsonl'
     append(journal, {'event':'ready', 'host':cfg['host'], 'boot':cfg['boot'], 'nonce':cfg['nonce'],
@@ -337,7 +412,7 @@ def main() -> None:
         os.close(directory_fd)
     cfg['ready_wall_ns'] = time.time_ns()
     append(journal, {'event':'ready_complete', 'wall_ns':cfg['ready_wall_ns'],
-                     'monotonic_ns':time.monotonic_ns()})
+                     'monotonic_ns':time.monotonic_ns(), 'boot':cfg['boot']})
     samples: list[dict[str, Any]] = []
     binding: dict[str, Any] | None = None
     reason = 'deadline'
@@ -347,17 +422,16 @@ def main() -> None:
             if time.process_time() + usage.ru_utime + usage.ru_stime >= cfg['cpu_seconds']:
                 reason = 'CPU limit'
                 break
-            cfg['reader_cpu_limit'] = cfg['cpu_seconds'] - time.process_time() - usage.ru_utime - usage.ru_stime
+            cfg['reader_cpu_limit'] = cfg['cpu_seconds'] - cfg['parent_cpu_reserve'] - time.process_time() - usage.ru_utime - usage.ru_stime
+            if cfg['reader_cpu_limit'] < 1:
+                reason = 'CPU reserve'
+                break
             start = time.monotonic_ns()
             s: dict[str, Any] = {'start_ns':start, 'wall_ns':time.time_ns(), 'boot':Path('/proc/sys/kernel/random/boot_id').read_text().strip()}
             try:
-                b = read(Path(cfg['binding_file']))
-                if binding is not None and b != binding:
-                    raise ValueError('binding changed')
-                if b is not None and binding is None:
-                    binding = b
-                    append(journal, {'event':'binding', 'binding':b})
-                s.update(bounded_sample(cfg, binding))
+                reply = bounded_sample(cfg, binding)
+                s.update(reply['sample'])
+                b = reply['binding']
                 child_usage = resource.getrusage(resource.RUSAGE_CHILDREN)
                 if time.process_time() + child_usage.ru_utime + child_usage.ru_stime > cfg['cpu_seconds']:
                     raise ValueError('observer CPU guard exceeded')
@@ -366,6 +440,9 @@ def main() -> None:
             s['end_ns'] = time.monotonic_ns()
             samples.append(s)
             append(journal, {'event':'sample', **s})
+            if not s.get('error') and b is not None and binding is None:
+                binding = b
+                append(journal, {'event':'binding', 'binding':b, 'monotonic_ns':time.monotonic_ns(), 'boot':s['boot']})
             result = observe(cfg, binding, samples)
             if result['status'] == 'bounded':
                 reason = 'complete'
@@ -381,7 +458,8 @@ def main() -> None:
         result = {'status':'unknown', 'reason':reason}
     final_usage = resource.getrusage(resource.RUSAGE_CHILDREN)
     append(journal, {'event':'final', 'result':result, 'observer_cpu_seconds':time.process_time(),
-                     'reader_cpu_seconds':final_usage.ru_utime + final_usage.ru_stime, 'max_rss':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss})
+                     'reader_cpu_seconds':final_usage.ru_utime + final_usage.ru_stime, 'max_rss':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
+                     'monotonic_ns':time.monotonic_ns(), 'boot':Path('/proc/sys/kernel/random/boot_id').read_text().strip()})
 
 
 if __name__ == '__main__':
