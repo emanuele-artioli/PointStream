@@ -3344,6 +3344,20 @@
       "cpu_seconds": 30,
       "gpu_seconds": 0,
       "basis": "ROOTprospectiveboundedlocalactual4282source/gates/saved292IOcost/bytes partitionaudit30, no models/network/runtime. Next Clip12/586 stage3033CPU2420GPU onlyproposalunreleased;30mustbeinanyfuturewholepartition. No source/fidelitygatebypass."
+    },
+    {
+      "phase": "ball-586-operational-audit-build20-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 20,
+      "gpu_seconds": 0,
+      "basis": "Inside reserved586phase3033CPU2420GPU, reallocatefailure90->60. Adapt externalONLY collector/caller/serverSSDfrozenverifier and exact completecost/storage/negativefixtures; localCPU only, no SSH/model/GPU"
+    },
+    {
+      "phase": "ball-586-operational-metadata-build10-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 10,
+      "gpu_seconds": 0,
+      "basis": "Inside reserved586phase3033CPU2420GPU, reallocatefailure90->60. FALSE-only exactsourceconstructor/normalizers/gates/bootstrap/validatorbinding recipe, no actualconstructor/network/model/GPU"
     }
   ],
   "reservations": [
@@ -4102,6 +4116,18 @@
       "gpu_seconds": 0,
       "status": "CLOSEDROOTacceptedarchivedanalysis;50CPUcharged;neverreleasedstatus6+reserve4returned withoutrefund",
       "card": "docs/cards/k5d-saved292-rescue-absence-analysis-2026-11-13.md"
+    },
+    {
+      "phase": "ball-study4282-confirmation586-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 2973,
+      "gpu_seconds": 2420,
+      "status": "RESERVED conditionalstage; ONLY30CPU localoperationalbuild released; runtime/metadata/GPU NOTreleased",
+      "card": "docs/cards/k5d-study4282-confirmation586-readiness-2026-11-13.md",
+      "total_phase_CPU": 3033,
+      "already_charged_design_CPU": 30,
+      "operational_build_CPU_charged": 30,
+      "scope": "DifferentClip12 full586, unchanged4282 science, sharedqualifiedgpu6Ada1ef96; hardfreshcost/storage/completecaller gates before onefutureattempt"
     }
   ],
   "jobs": [
@@ -8160,7 +8186,13 @@
       "scope": "Thin acceptance index/frontdocs/card/rootchecks; source/paper unchanged",
       "state": "COMPLETE scopedcloseout/index ROOTreviewed; threebudgetregressions and liveledgerchecks PASS; CIpublication next"
     },
-    "score_acceptance_index": "docs/experiments/k5d-inputs/primary-0cfa5558-Ada-paired-score-root-acceptance-20261113.json"
+    "score_acceptance_index": "docs/experiments/k5d-inputs/primary-0cfa5558-Ada-paired-score-root-acceptance-20261113.json",
+    "closeout_checkpoint": {
+      "commit": "6d40e8c7",
+      "PR": 410,
+      "url": "https://github.com/emanuele-artioli/PointStream/pull/410",
+      "state": "OPEN auto-merge MERGE; initialCI failedbranchlabels; labels corrected, focused4PASS, freshCIpending"
+    }
   },
   "saved292_rescue_harm_analysis_current": {
     "scope": "Independent savedpredictionsactual292game9Clip5,261visible30absent1excluded; rescues/harms andactualbytes atallthreepoints/bothjudges, primaryWASB diagnosticBallTrack",
@@ -8198,7 +8230,7 @@
     "unused_never_released_CPU": 10
   },
   "confirmation586_readiness_current": {
-    "state": "Localreadiness30ONLYreleased; noGPUnoractualconstructormetadataexecution",
+    "state": "3033CPU2420GPU phase RESERVED;30design+30localoperationalbuild charged;2973CPU2420GPU held, runtime/metadata/GPU NOTreleased",
     "scope": "game10/Clip12/586=581visible5abs; differentfrom292game9Clip5; source4282e4d4/f813/env32/config4fa; requiresactualcomplete1.5cost/storage/audit/identitygates",
     "prospective_CPU_ceiling": 3033,
     "prospective_GPU_ceiling": 2420,
@@ -8212,6 +8244,26 @@
       "frozenROOTstudy_gate/qualification16/cost48/292proofs",
       "allsource/runtime/host/control/inputidentities/pins",
       "no originalpooledabsencegatereset"
-    ]
+    ],
+    "reservation_phase": "ball-study4282-confirmation586-20261113",
+    "operational_build_CPU": 30,
+    "conditional_failure_remaining_CPU": 60,
+    "decision": "Worthdifferentclip/context scale confirmation with roomremaining; preserveallnegatives, nofull30admission",
+    "physical_UUID": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+    "source_readiness": {
+      "state": "CLOSED conditionalROOTaccepted; allactualruntimeSTOPgates retained",
+      "case": "/private/tmp/pointstream-SVT586-readiness30-FALSE-20261113",
+      "manifest_sha256": "8cca4eca254fbaf0b1c78f3e6340a0d321e48a00ac2e58bcaccd92f49a07dca5",
+      "ROOT_acceptance_sha256": "8b272791944f20ecaead3b04a7effbbeccd10f3488ebeeda7f4b6f94ddf6b372",
+      "CPU_charged": 30,
+      "GPU_charged": 0
+    },
+    "audit_wall_clarification": {
+      "server_whole": 1170,
+      "ONE_SSH": 1180,
+      "local_whole": 1200,
+      "CPU": 120,
+      "scope": "Supersedes original660transport; 910childwalls+240finaltransfer+20setup; unchangedCPU/newoperativekitreviewrequired"
+    }
   }
 }
