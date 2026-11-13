@@ -20,8 +20,8 @@ category repair](k5d-public-python-runtime-repair-2026-11-13.md) metadata helper
 a read-only recovery audit verified the published files and private-data
 separation. The original helper remains failed; no qualification follows.
 
-**Next: build the Ada registered-study source port only.** Future GPU work is
-deferred. Use one final source/environment/archive for fresh 16/48 calibration
+**The Ada registered-study port is merged and CI-green.** Next is final-source
+preparation and fresh CPU qualification; GPU work remains deferred. Use one final source/environment/archive for fresh 16/48 calibration
 through 292/586/full30, preserving defaults and fresh receivers at every new
 stage; new source qualification is mandatory. The [SVT-only route](k5d-svt-only-confirmation-2026-11-13.md)
 remains separately held and scientifically unreleased.

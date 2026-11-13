@@ -27,16 +27,20 @@ category repair](../cards/k5d-public-python-runtime-repair-2026-11-13.md) metada
 a read-only recovery audit verified the published files and private-data
 separation. The original helper remains failed; no qualification follows.
 
-**Next: build the Ada registered-study source port only.** Future GPU work is
-deferred. Use one final source/environment/archive for fresh 16/48 calibration
+**The Ada registered-study port is merged and CI-green.** Final revision
+`ae892df1`, source `9d3d7b2c` and archive `ad635b0b` are frozen. Native CPU job
+`cc884861` and actual SVT CPU denial job `c53fb111` are COMPLETE and root accepted.
+The GPU witness remains held pending exact metadata and observer release. Use
+this same source/environment/archive for fresh 16/48 calibration
 through 292/586/full30, preserving defaults and fresh receivers at every new
 stage; new source qualification is mandatory. The [SVT-only route](../cards/k5d-svt-only-confirmation-2026-11-13.md)
 remains separately held and scientifically unreleased.
 
-Programme charges are 22,941 GPU / 60,130 CPU seconds within unchanged 24/28-hour
-authority. Bounded passive watch a9 is active; no autosubmit or model timers.
+Programme charges are 22,941 GPU / 60,945 CPU seconds within unchanged 24/28-hour
+authority. Bounded passive watch a10 is active; no autosubmit or model timers.
 The [canonical continuation](../continuation-2026-11-13.md) records all current jobs, limits, balances,
-artifacts and remaining gates. No new scientific or paper/PRESLEY work is released.
+artifacts and remaining gates. Final-source CPU qualification is complete.
+GPU/scale and paper/PRESLEY work remain held.
 
 ### Historical af6 phase — balances, waits and watch superseded above
 

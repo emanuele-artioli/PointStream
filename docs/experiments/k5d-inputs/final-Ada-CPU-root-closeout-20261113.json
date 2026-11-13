@@ -1,0 +1,57 @@
+{
+  "GPU_qualified": false,
+  "actual_SVT_CPU": {
+    "ACK_sha256": "96371998f7392e62434674687915e388a1322ee7e52d61f467cfdc8e5d7f3459",
+    "captured_births": 16,
+    "current_absent_PIDs": 18,
+    "empty_groups": 4,
+    "event": "b60f8a76c4ba5a99a11cb99c59d77506",
+    "five_EACCES_categories": true,
+    "frames": 16,
+    "frozen_positive_consumer_PASS": true,
+    "job_id": "20261113T061438Z-c53fb111",
+    "native_YUV_RGB_exact": true,
+    "root_approval_sha256": "85a52c4abaa369f515f081ffefa784740b555663e160e6659eac376e67ddb5f0",
+    "scope": "normalSVTFSdenial plus initial-launcherSIGKILL/scopedcleanup only",
+    "spec_sha256": "6eb6fda9daebfc7db842d9d19e3f4a51599daea43257586bf73c345d19c85720"
+  },
+  "claim_observation": "correctgpu6.itec.aau.atCPUfileEXISTSzerobalance; CURRENTcleanup only, nohistoricalimmediatereleasebound",
+  "config_sha256": "6b3d8c5f317f14d2f4e78cb1c03bbfd166f44164cdd86c4035111d563e9d51fd",
+  "evidence_indexes": [
+    "final-Ada-source-native-CPU-evidence-cache-20261113.json",
+    "final-Ada-actual-CPU-denial-evidence-cache-20261113.json"
+  ],
+  "execution_identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "ad635b0b46428a3fa934081ded5d2b408c453bc5f7e46854dd8b8eb0c6abbea9",
+    "source_sha256": "9d3d7b2c6ec0fd99466ae3592345795a4916e982fdee3924a9749b83a81b39da"
+  },
+  "future": "actualexclusiveAdaGPUwitness/complete16and48scores+cost/292586registered30 remain gated; preserveallfailures",
+  "larger_study_released": false,
+  "native": {
+    "ACK_sha256": "54c9313dcc48cc7f2d985f08500a0f366463a937e4ade54c86869db11b89c219",
+    "captured_births": 19,
+    "cases": [
+      "normal",
+      "timeout",
+      "sigterm",
+      "sigkill"
+    ],
+    "current_absent_PIDs": 21,
+    "empty_groups": 4,
+    "event": "e5d10d8116385155a4cd75ce8a36e909",
+    "job_id": "20261113T060019Z-cc884861",
+    "root_approval_sha256": "5f89d0c1d7973f2ee781cd13e203020bcc61ea5b2fe018a4b280c8638677eaba",
+    "scope": "native CPU PID containment andaccounting only",
+    "spec_sha256": "4d1b100daf9c52841126760256bbc227641326c77282839216d734c8812ea629"
+  },
+  "operator_v2": "e71cbba6/2538e252 reviewed; noexecution/release implied",
+  "retained_CPU": {
+    "actual_CPU_denial": 365,
+    "native": 250,
+    "source_preparation": 100
+  },
+  "revision": "ae892df1cbb2b8c28eb413187effc28d70b74326",
+  "source_bridge_sha256": "0c3c073c9d8df10f3d72154afff8ff77b4d1a933f6b55e49f460ea8c781868f1",
+  "status": "ROOT accepted both finalsource CPU gates; completioneventsACKed; no activejobwait"
+}

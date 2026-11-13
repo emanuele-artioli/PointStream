@@ -1281,3 +1281,53 @@ Validated metadata6f8068aa / rawf9f3a75d / summaryefd7ef87; recoverychildbaselin
 absoluteCHILDRENorigin unproven/no refund. Complete65CPU retained. GPUstage
 deferred finalsourceport review/same-source calibration. Firsta9tick05:10UTC
 found no idleA6000/three potentialAda(gpu5:1,gpu6:0/1), notfleetqualification.
+
+Source-port build phase completed: candidate62139206/codebyteidentical docs-merge
+HEAD83891d10 pushed; focused120PASS, RuffPASS/mypy593PASS, finalfull2241PASS/
+40skip. Both independent reviews PASS finalff4ff265helper; foundandfixednamespace
+cost gap (complete PID1 receipt/descendantwait/no pause/contention/logSHA+CPU).
+Exact successful-sourcequalification/calibration joballowlists require physical
+root-pinned IDs/spec/ready/stage hashes+canonicalcommands; unknown/failed remain
+inspectSTOP. SourcePRcreationbackend87172; no archivefreeze/GPU/source proof
+release. RootdocsPR380mergedCIgreen/main55d6fea1; rootnowon scoped
+`codex/pointstream-ada-source-qualification-20261113`. Resourcewatcha9 backend
+46259/PID89739/05:55:15UTC unchanged; noLLMtimer/autosubmit.
+
+PR381sourceauto-mergeenabled/CIpending. Rootreserves350CPU/zeroGPU fromBall
+unallocatedheadroom forfinalsourceprep100+native250, BOTH UNRELEASED.
+Sourcegrantactual5eb archive comparison30/31unchanged; w8_cuda_system_leaves
+hostPIDsecurityhelperdelta8c0e1e1e requires ONE new sourceSHA/size plusglobal
+executionidentity. Rootreviewedexactpatch: no retained leaf/import/device/
+runtime/numerical expansion. Newactualsource/archivebridge mustexplicitly
+include it, notclaimall31unchanged/relabel5eb. Finalmergedidentityunknown until
+PR381CIpasses; oldproofs donottransfer. Card/Draftmanifest1189b1e3 record
+prospectivegates; no scientificstage or GPU released.
+
+PR381MERGED CIgreen, FINALMAINae892df1cbb2b8c28eb413187effc28d70b74326.
+Rootfflatestmain onsourcequalificationbranch, preservingdirtydocs andunrelated
+calibration-controls file. Sourcearchive/globalSHAs notyetfrozen; helperreview
+and100CPUprep precharge pending, native250unreleased. Latest05:35watchsnapshot
+stillthreepotentialAda/noidleA6000; no rootGPUjob submitted orautowakeup.
+
+Resourcewatcha9 ended0 after9checks05:50:34UTC; PID89739absent. Lastsnapshot noidleA6000, gpu6Ada0/1andgpu5Ada1potentialfree. Retain100CPU. Rootreleases/precharges next100CPUfromAda288→188 for sameexactwatcher2b931 passivea10 /private/tmp/pointstream-resource-watch-20261113-passive-a10; launchintent/backend pending, maximum45min/300scadence, noautosubmit ormodeltimer. Programme22941G60230C/Ball16579G36229C.
+Passivea10 active backend48064/PID95846/deadline2026-11-13T06:36:38.523801+00:00; exactlaunch andbackend records saved. Nativecompletionchatwakeup unverified; rootattendedexecution continues.
+
+Root+independentreview PASS exacthelper65d0c9d1;14testsPASSincl productiontar onsyntheticinput. Rootreleases/precharges sourceprep100CPU/GPU0 (local50/remote20/external30), native250UNRELEASED. Rootrelease /private/tmp/pointstream-final-Ada-source-qualification-20261113/root-release-preparation100.json SHAd71af3fde2f83d59bc1d30c11e2693d9ad3ca9c03e1801262b0ec1c0df159523; output/private/tmp/pointstream-final-Ada-source-qualification-20261113/frozen-ae892; exactfinalae892; deadline2026-11-13T06:34:29.546526+00:00. ONE localfreezeintent, preservepartial/unknown/no replay; helpercommandhandle pending. Programme22941G60330C/Ball16579G36329C.
+Localfinalsourcefreeze backend93319; handle andexactrelease persisted before wait.
+
+Freeze93319 ended0:1977Gitblobs10Git+1Tar exactae892/tree9d3d7b2c/archivead635b0b/env32e;2.53607CPU/5.31986wall. Config6b3d8c5f exactlyglobalidentity+oneW8grant; bridge924b44ef remainscandidate. Rootreleases/precharges native250CPU=100campaign+150external, rootrelease/private/tmp/pointstream-final-Ada-source-qualification-20261113/root-release-native250.json SHA3448c6c5222b16d250253e91a36699a02bae17f344a52d4311646c520c828e30; exactspec rawSHAba9a8c48a100010e0203f5527b1936a970c63f35d17055d573411b0a729f1ef5/deadline2026-11-13T06:34:29.546526UTC. Budgetmutation initialattemptKeyError beforewrites; doctorbackend95313 alreadylaunched underauthorizedread-onlyscope, includednative150externalnow. Freshallhostdoctor/cacheuploadphysicalverification before ONEpublication; noGPU. Programme22941G60580C/Ball16579G36579C.
+Rootapproves actualownAda2c→final sourcebridgeSCOPEONLY /private/tmp/pointstream-final-Ada-source-qualification-20261113/frozen-ae892/root-approved-own-Ada-reference-bridge.json SHA0c3c073c9d8df10f3d72154afff8ff77b4d1a933f6b55e49f460ea8c781868f1;585added41modified0deleted1351unchanged (fullactualmanifests, mostlydocs/unrelatedadditions). Builderindependentfocus: encoder/worker2c→finalpatches EXACTpriorapprovedfebde05c; allnumeric/decoder/metric/judge+Adaadapter/worker unchanged5eb→final; oneW8hostPIDsecuritydelta8c0. Freshnative/actualCPU/GPU/all16/48scores+cost remainmandatory; no historicreceiptpromotion.
+Exactmetadatarelease at/private/tmp/pointstream-final-Ada-source-qualification-20261113/root-released-upload: helper51896e4f784060d928b30e8a6b9922db5a7109c2767ea0d8479b602d281b3ae3,manifest0b0302a97ae50034ace489a7d92672b4dc4518026856d470e0d4424b56e492ff,wire179b66877da507e9e8184d4e8a5a06b05374bb3ba9257c725d077c193f9c5bf6/6918667B,raw25385814B. Rootreview minimaltransportcaps8MiBwire32MiBraw (original4/16insufficient);20CPU120wall/outer140 SAMEprep100 allocation; newapprovedbridge0c3c073c included. Freshdoctor all6hostsPASS/sharedvisible/gpu6Adabothidle; existingstatusbackend4818ended0. ONE uploadintent, preservepartial/no replay.
+Metadataupload backend78731 persisted; exact140souter+20CPU120sremote; oneattempt only. Rootrelease93e7dbfc/wire179b6687/manifest0b0302a9.
+Metadata78731 ended0; rootaccepts actualarchive/config/bridge/spec physicalSHA publication, newcache/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-final-Ada-source-cache-23ac26952ec2ca21922f8cf2a1933f59; remote.975572CPU/4.977045wall, childdelta0, local+.SSH.14826CPU, oldNFSunchanged/oneread. Prepublicationcanonicalstatus1696records/noactivependingrunningpreparing. Rootsole nativeCPU publicationintent usingexactae892 sourceworktree/cache/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-final-Ada-source-cache-23ac26952ec2ca21922f8cf2a1933f59/source.tar, rawspecba9a8c48/deadline06:34:29UTC,150externalincludesdoctor+submit/status/audit. NoGPU.
+NativeCPUsolepublication backend80880; recordactualIDfromclientjournal/submitresult thencanonicalstatus beforeONEfleetwait. No submissionreplay.
+SoleactualnativeCPU job 20261113T060019Z-cc884861 publishedpending/submit80880ended0; spec4d1b100daf9c52841126760256bbc227641326c77282839216d734c8812ea629/ae892/tree9d3d7b2c/archivead635b0b/env32e/deadline06:34:29UTC; chat_idnull/noheartbeat. Initialledgerappendfailedonhistoricalrowwithoutjob_id beforewrites; canonicalreadonlystatus3177startedfromactualsubmitrecord; correctedledger/journalnow. Re-readthisIDthen canonicalstatus beforeONEwait.
+Rootacceptedactualnativecc884 finalproof5f89d0c1, independentlyrehash26pubmembers+frozenvalidatorPASS; all4cases/normalCPU1.264738inner1.353184outerdiff.088446;19births21PIDs/4groupsempty/currentFQDNclaimexists0allocations; nohistoricalreleaseinterval. Evente5d10d8116385155a4cd75ce8a36e909ACKed. NewproofimmutableNFS709c3b72/native-CPU.json0444/dir0555. Rootreleases/precharges ONEactualCPU365 spec6eb6fda9/raw0a3ee40f/deadline06:50:32UTC/exactae8929d3dad635env32e/config6b3d/bridge0c3c/native5f89. Same265campaign100external, unchangednormalpixels/fiveerrno13/initiallauncherkill/scopedcleanup; freshdoctor/status beforeONEpublication. Programme22941G60945C/Ball16579G36944C, cardGPU900/1120CPUheld includingfuture1100CPU GPUwitness. NoGPU/scale release.
+FreshactualCPUdoctor59260all6hosts/sharedvisibilityPASS; canonicalprepublicationstatus2418noactivepending/running/preparing. Nativecompletedread-onlycache54files38,787,514B manifest69538dfb preserves sourcearchive/config/bridge/metadata/failures/nativeproof; trackedindexfinal-Ada-source-native-CPU-evidence-cache-20261113.json. ONEactualCPU365canonicalpublicationintent exact6eb6/ae8929d3dad635env32e/newnative5f89/config6b3d/bridge0c3c; do not replayunknown.
+ActualCPUdenial solepublication backend69014; handle persistedbeforewaiting; inspectjournalactualID/no replay.
+SoleactualfinalCPUdenial job 20261113T061438Z-c53fb111 published/pending; submit69014ended0, canonicalspec6eb6fda9/ae8929d3dad635env32e/deadline06:50:32UTC. Re-readthisactualIDthenps-fleetstatus beforeONEwait; noGPU/scale/replay.
+Actualc53fb111 canonicalRUNNING/smoke/noerror; rootONEps-fleetwait<=300sintent persisted, handlepending; nodecoderreplay/LLMtimer.
+ActualCPUc53fb111ONEwait backend46277 persisted; max300s; rootcontinuesindependentmetadata/sourcechecks, nativechatcompletionwakeunverified.
+
+Rootaccepted actualfinalCPUdenial20261113T061438Z-c53fb111 afterfrozenverify_receipt+positivecpu_denial_approvalPASS .684397CPU. Approvedfullreceipt85a52c4a (7,312,372B), actual31source/publicruntime/profile/readset/spec/stagejoins,16framewire33e/native/YUV5c43/RGBe3c/allfiveerrno13; launcherpidfdSIGKILL9+scopedcleanup/controlalive,16births+2outer18PIDsgone/4groupsclear/correctFQDNCPUfileexists0allocations. Oneauditremote1.123757CPU; no native-active/unshare-only/fleetwatchdog/GPU/scaleclaim. FullproofimmutableNFS5bdc119c/real-CPU-denial.json0444/dir0555, uploadactual.247189CPUwithin100external. RootONEwait46277endedexit10attentionCOMPLETE/6seconds; noactivewait; eventb60f8a76c4ba5a99a11cb99c59d77506pendingACKafterfreshcanonicalstatus.
+ActualCPUeventb60f8a76c4ba5a99a11cb99c59d77506ACKed afterfreshcanonicalCOMPLETE/noerror. Both CPUqualificationsclosed; noactivejobwait. ActualCPUreadonlycache30files28,778,067B manifest2cea2e9a indexed; source/nativecache54files38,787,514B manifest69538dfb. Rootcloseoutfinal-Ada-CPU-root-closeout-20261113.json recordsactualproofs+currentcleanup-onlylimitations. GPU900/1100 remainsheld; independentlyreviewedforecast476.624732s<500 empiricalonly.
