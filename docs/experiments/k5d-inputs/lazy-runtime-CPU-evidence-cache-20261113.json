@@ -1,0 +1,206 @@
+{
+  "CPU_precharge_retained": 80,
+  "GPU_seconds": 0,
+  "cache_manifest_sha256": "b20507ca516bd78ab4d64529abb0e4246092dae1578feaa4b012afd3f9baebcd",
+  "cache_root": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/lazy-runtime-CPU-20261113",
+  "file_count": 32,
+  "files": [
+    {
+      "bytes": 1979,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/REVIEW.md",
+      "path": "REVIEW.md",
+      "sha256": "b29be1f4d8428692c5e9b5a2ee74e10a1e1a3ce18b5662d805baf7d19c5eaa9c"
+    },
+    {
+      "bytes": 120,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/backend.json",
+      "path": "backend.json",
+      "sha256": "af1596d539b52cd3a7eafa85d55c823f1b6136707b3f9c87724c5a625957beec"
+    },
+    {
+      "bytes": 2503,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/bootstrap.py",
+      "path": "bootstrap.py",
+      "sha256": "06ed0d5620ce07278f84076d45f1f6dabd36029fba193c966b8a1eb6425a7640"
+    },
+    {
+      "bytes": 21575,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/import_closure.py",
+      "path": "import_closure.py",
+      "sha256": "fdbd86fc709ee72c389d328dee9cbf3bb4630115a557e7287a5f78f3fc8fe98b"
+    },
+    {
+      "bytes": 2619,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/independent-review.json",
+      "path": "independent-review.json",
+      "sha256": "b9ad3db0c500da4ede0cc6ae0f34311fd652ca4e2f4461451f1ad9153acb613a"
+    },
+    {
+      "bytes": 215,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/launch-handle.json",
+      "path": "launch-handle.json",
+      "sha256": "2950045d8dc7d98119e2101995aea4ec553307293d1572de811b89907f4ee426"
+    },
+    {
+      "bytes": 2202,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/launch-manifest.json",
+      "path": "launch-manifest.json",
+      "sha256": "8218df37774ed2098aaea78376f0efe73185687cc20b1726b421f0287bfff2f6"
+    },
+    {
+      "bytes": 4606,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/launch_attended.py",
+      "path": "launch_attended.py",
+      "sha256": "15780870af781d38ba1762b71dad905192e9ef03fd0027511e255fb3571b9d3a"
+    },
+    {
+      "bytes": 548,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/pins.json",
+      "path": "pins.json",
+      "sha256": "8c15eaacfd90f22b8184dc972e00a52afeea82c5c9c57ac847b1f5c2004c5ba8"
+    },
+    {
+      "bytes": 1549,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/protected-targets.json",
+      "path": "protected-targets.json",
+      "sha256": "cb33b449b4d43094b481aecaca8860cbe059093d86a9c4c7270fa47e259559d7"
+    },
+    {
+      "bytes": 1979,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/remote-artifacts/REVIEW.md",
+      "path": "remote-artifacts/REVIEW.md",
+      "sha256": "b29be1f4d8428692c5e9b5a2ee74e10a1e1a3ce18b5662d805baf7d19c5eaa9c"
+    },
+    {
+      "bytes": 287,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/remote-artifacts/bootstrap-receipt.json",
+      "path": "remote-artifacts/bootstrap-receipt.json",
+      "sha256": "36f1bd23f4de316c9eb8872e14d9668fd90fc155fbb9316bbe20b0fa8079a84a"
+    },
+    {
+      "bytes": 21575,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/remote-artifacts/import_closure.py",
+      "path": "remote-artifacts/import_closure.py",
+      "sha256": "fdbd86fc709ee72c389d328dee9cbf3bb4630115a557e7287a5f78f3fc8fe98b"
+    },
+    {
+      "bytes": 2202,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/remote-artifacts/launch-manifest.json",
+      "path": "remote-artifacts/launch-manifest.json",
+      "sha256": "8218df37774ed2098aaea78376f0efe73185687cc20b1726b421f0287bfff2f6"
+    },
+    {
+      "bytes": 0,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/remote-artifacts/launch.stderr",
+      "path": "remote-artifacts/launch.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 270,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/remote-artifacts/launch.stdout",
+      "path": "remote-artifacts/launch.stdout",
+      "sha256": "6a464667f30116b8611413eda14a84bd14356a0f1d2e3bd8595cceb00e62676c"
+    },
+    {
+      "bytes": 2187491,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/remote-artifacts/output-3e071ed2af3b46e2950ddde256aaae20/audit.jsonl",
+      "path": "remote-artifacts/output-3e071ed2af3b46e2950ddde256aaae20/audit.jsonl",
+      "sha256": "b9a85d06ccf5715d577e1035a3eeb51e86eb0dd4efe28c7ddcc6c6902797cd16"
+    },
+    {
+      "bytes": 1162,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/remote-artifacts/output-3e071ed2af3b46e2950ddde256aaae20/candidate-events.jsonl",
+      "path": "remote-artifacts/output-3e071ed2af3b46e2950ddde256aaae20/candidate-events.jsonl",
+      "sha256": "1c848a7e302caa326906929b4816b6e717d0ab1de1a844966767e2dfe9d07b07"
+    },
+    {
+      "bytes": 1197206,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/remote-artifacts/output-3e071ed2af3b46e2950ddde256aaae20/child-result.json",
+      "path": "remote-artifacts/output-3e071ed2af3b46e2950ddde256aaae20/child-result.json",
+      "sha256": "71cec2a164e19683f69b6a09813a5f6f4d50a88e2bb41eb3ea7ddee341079ee5"
+    },
+    {
+      "bytes": 286,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/remote-artifacts/output-3e071ed2af3b46e2950ddde256aaae20/controller-receipt.json",
+      "path": "remote-artifacts/output-3e071ed2af3b46e2950ddde256aaae20/controller-receipt.json",
+      "sha256": "82de7e4b16ba38792f84235ed408215b6147048cfb25adf3070b14516de2289a"
+    },
+    {
+      "bytes": 1992,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/remote-artifacts/output-3e071ed2af3b46e2950ddde256aaae20/handle.json",
+      "path": "remote-artifacts/output-3e071ed2af3b46e2950ddde256aaae20/handle.json",
+      "sha256": "e9d46ce7ed2ed9dec47a20071c4748f9a25cee8478a758521a8c6c8a2bcfb009"
+    },
+    {
+      "bytes": 407266,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/remote-artifacts/output-3e071ed2af3b46e2950ddde256aaae20/module-files.json",
+      "path": "remote-artifacts/output-3e071ed2af3b46e2950ddde256aaae20/module-files.json",
+      "sha256": "cc53a36dbdfcabcbb9a66d37fec8e48bafd13f62c576efed9a1f6e98f2f23543"
+    },
+    {
+      "bytes": 0,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/remote-artifacts/output-3e071ed2af3b46e2950ddde256aaae20/stderr",
+      "path": "remote-artifacts/output-3e071ed2af3b46e2950ddde256aaae20/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 0,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/remote-artifacts/output-3e071ed2af3b46e2950ddde256aaae20/stdout",
+      "path": "remote-artifacts/output-3e071ed2af3b46e2950ddde256aaae20/stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 548,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/remote-artifacts/pins.json",
+      "path": "remote-artifacts/pins.json",
+      "sha256": "8c15eaacfd90f22b8184dc972e00a52afeea82c5c9c57ac847b1f5c2004c5ba8"
+    },
+    {
+      "bytes": 1549,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/remote-artifacts/protected-targets.json",
+      "path": "remote-artifacts/protected-targets.json",
+      "sha256": "cb33b449b4d43094b481aecaca8860cbe059093d86a9c4c7270fa47e259559d7"
+    },
+    {
+      "bytes": 1101,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/remote-artifacts/run.sh",
+      "path": "remote-artifacts/run.sh",
+      "sha256": "05b1b37abc626b7af7224a2ef799402dde4fdff726a8b78b085605bf3a8d13bb"
+    },
+    {
+      "bytes": 804,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/root-acceptance.json",
+      "path": "root-acceptance.json",
+      "sha256": "5177013c8d0280f2de36c2d86e8fdc96e04d362df53867f446f0ae24f46b22b9"
+    },
+    {
+      "bytes": 821,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/root-release.json",
+      "path": "root-release.json",
+      "sha256": "3623d5fbabc97af2af2b64e7e6c2b37dc8fc88431fea23d59a7ddbf73c35c900"
+    },
+    {
+      "bytes": 1101,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/run.sh",
+      "path": "run.sh",
+      "sha256": "05b1b37abc626b7af7224a2ef799402dde4fdff726a8b78b085605bf3a8d13bb"
+    },
+    {
+      "bytes": 10011,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/runtime-lazy-closure-v4-bundle.tar.gz",
+      "path": "runtime-lazy-closure-v4-bundle.tar.gz",
+      "sha256": "9c2b19bf98178327fe569440223797f5c5bf33028d629f06815d3d0378702726"
+    },
+    {
+      "bytes": 0,
+      "original": "/private/tmp/pointstream-runtime-lazy-closure-20261113/transport.stderr",
+      "path": "transport.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "originals_unchanged": true,
+  "readonly_copies": true,
+  "schema": 1,
+  "scope": "Accepted CPU-only lazy-import dependency diagnostic and original package/review; no receiver/GPU/inference/quality qualification",
+  "total_bytes": 3875567
+}

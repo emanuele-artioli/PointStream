@@ -1,0 +1,706 @@
+{
+  "CPU_precharge_retained_inclusive": 1100,
+  "GPU_precharge_retained": 900,
+  "cache_manifest_sha256": "1b3d257e2c64fbcd3cbd30e6079a8d9b46609ba6bc92de70ffb5c5d309bdf5ac",
+  "cache_root": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/ca866-55dd-failure-20261113",
+  "file_count": 115,
+  "files": [
+    {
+      "bytes": 4540,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/audit-observers-final.py",
+      "path": "audit-observers-final.py",
+      "sha256": "479aaada7c794e5b87760ab3c1f5fa525212a06c0b7b45623cf44e103f9eaf2d"
+    },
+    {
+      "bytes": 6,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/binding-fetch-backend.txt",
+      "path": "binding-fetch-backend.txt",
+      "sha256": "ebb65aa17a39f4cd2fbd88efcce6817dba3e5a29568c96e2b294bf8228c942a4"
+    },
+    {
+      "bytes": 1876,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/binding-fetch.py",
+      "path": "binding-fetch.py",
+      "sha256": "02129a6da82d91a65cf28d72615ffc4b696cb46763560fe1d370ad8976d78851"
+    },
+    {
+      "bytes": 0,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/binding-fetch.stderr",
+      "path": "binding-fetch.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 425,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/binding-metadata/binding-0.json",
+      "path": "binding-metadata/binding-0.json",
+      "sha256": "741e93182e2733a21700594a5de0390b3a544c8feec27149c95c94ea998e848e"
+    },
+    {
+      "bytes": 425,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/binding-metadata/binding-1.json",
+      "path": "binding-metadata/binding-1.json",
+      "sha256": "c15f9576ab3d60673e60153bc27e2920852ce9dce977f83243f21aa0d684382b"
+    },
+    {
+      "bytes": 426,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/binding-metadata/binding-complete.json",
+      "path": "binding-metadata/binding-complete.json",
+      "sha256": "cf86dc1cae7f7c1167ac7d53664dd8ce7c5c636560d912d9287e8093bddc943a"
+    },
+    {
+      "bytes": 412,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/binding-metadata/binding-intent.json",
+      "path": "binding-metadata/binding-intent.json",
+      "sha256": "de9bc8649c0f224e605b930fed45e42b0f282d7330959792ee5367b9d035c258"
+    },
+    {
+      "bytes": 1874,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/binding-metadata/request.json",
+      "path": "binding-metadata/request.json",
+      "sha256": "9a20fd705e86fc4f87d40919d9292eaa505b60fb7978f4579423ad6e6e245fb8"
+    },
+    {
+      "bytes": 5867,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/binding-physical-audit.json",
+      "path": "binding-physical-audit.json",
+      "sha256": "197280a9c4d5d45602036ee5b08112991388099c8fc48e2363b1843b1cf59a8a"
+    },
+    {
+      "bytes": 709,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/binding-selection-audit-summary.json",
+      "path": "binding-selection-audit-summary.json",
+      "sha256": "34859df8f96fb58bb19037b6d86930b3f39c758170d77dee3793bf3ec3d3e890"
+    },
+    {
+      "bytes": 11640,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/dual_orchestration.py",
+      "path": "dual_orchestration.py",
+      "sha256": "b64e889f8a7eef97eefec50d4aca5b377fd2f4ba7f1b1a3600278562dc74b844"
+    },
+    {
+      "bytes": 6,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/failure-audit/backend.txt",
+      "path": "failure-audit/backend.txt",
+      "sha256": "ff1a98a969d0ba33b8f9d508cbcb6548fa91bad1e2050848b0a7f4df25d63c62"
+    },
+    {
+      "bytes": 220983,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/failure-audit/raw.jsonl",
+      "path": "failure-audit/raw.jsonl",
+      "sha256": "a19110c7cb0180937d3ede6e3fc9f2549281b5157fb774ffd759d74e1b173ca1"
+    },
+    {
+      "bytes": 5962,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/failure-audit/read-failure.py",
+      "path": "failure-audit/read-failure.py",
+      "sha256": "a00adc6ec6f4deb6c4f4f407f94f9d7248019a2cc9f6af782cb7c8af8046659b"
+    },
+    {
+      "bytes": 0,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/failure-audit/remote.stderr",
+      "path": "failure-audit/remote.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 5149,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/failure-audit/summary.json",
+      "path": "failure-audit/summary.json",
+      "sha256": "a7ad737642628bd55382a6202703f1b6eb56a757e734b57372d39dfc62958bc1"
+    },
+    {
+      "bytes": 8185,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/launch_one.py",
+      "path": "launch_one.py",
+      "sha256": "3edabc0bc7061f791ece8d1d7b34c47f173f2cc26620f33f86c2bcfd88981883"
+    },
+    {
+      "bytes": 21352,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-audit-prefix/journal-0.jsonl",
+      "path": "observer-audit-prefix/journal-0.jsonl",
+      "sha256": "d1c56bf1df613df78ce965055bdbfe92eb8b720d9b5e196b3d8d78565702cfd1"
+    },
+    {
+      "bytes": 7461,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-audit-prefix/journal-1.jsonl",
+      "path": "observer-audit-prefix/journal-1.jsonl",
+      "sha256": "f815b6b54b5443847f7a3647d7d86f8e1cc522549c7da7fccafa7e7ecac1da91"
+    },
+    {
+      "bytes": 854,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-audit-prefix/receipt-1.json",
+      "path": "observer-audit-prefix/receipt-1.json",
+      "sha256": "f7572281aea18e0acbc7921d0ff992d24a503c9e1659ebf8026bf59aea20b691"
+    },
+    {
+      "bytes": 2128,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-audit-prefix-summary.json",
+      "path": "observer-audit-prefix-summary.json",
+      "sha256": "5e4e6d91765a3377bc69ba0074742a1d4c3b2e4069219f73555ebb5dc326131d"
+    },
+    {
+      "bytes": 6,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-batch-wait-backend.txt",
+      "path": "observer-batch-wait-backend.txt",
+      "sha256": "41969f39a424b49733dfdeb18acd66ed45c40f5688de14fcf51edef39d14034a"
+    },
+    {
+      "bytes": 120,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-batch-wait-local-handle.json",
+      "path": "observer-batch-wait-local-handle.json",
+      "sha256": "2a68c927bc3fa5a92e2f4501b192f9506a9c3a6093c1a33d4c310f8e39cb3b44"
+    },
+    {
+      "bytes": 146,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-batch-wait-local-intent.json",
+      "path": "observer-batch-wait-local-intent.json",
+      "sha256": "f931aae3ad48151da2902cdabcae760f8091ab9f68170435437a48e86edb7c11"
+    },
+    {
+      "bytes": 2097,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-batch-wait-output.jsonl",
+      "path": "observer-batch-wait-output.jsonl",
+      "sha256": "bb72dcf889717d98a0c03dbf4c96f86b1955761c616cdc10c24523b92ffe95ef"
+    },
+    {
+      "bytes": 403,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-batch-wait-start.json",
+      "path": "observer-batch-wait-start.json",
+      "sha256": "ddbc52c10d26852b70d34fcf2aba5ee2d190b0a0489505fd987415f2f8e52067"
+    },
+    {
+      "bytes": 46,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-batch-wait-transport.json",
+      "path": "observer-batch-wait-transport.json",
+      "sha256": "9fa25098fdc5ef6c30f8f38f5909916ca1792241596e7a24dfb20f0fff547f70"
+    },
+    {
+      "bytes": 0,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-batch-wait.stderr",
+      "path": "observer-batch-wait.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 176,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-bind-attempt.json",
+      "path": "observer-bind-attempt.json",
+      "sha256": "65c72edece0ae295855d6ff49f393228d24d94e65f0f6f9e2de5ca7a9667fb06"
+    },
+    {
+      "bytes": 6,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-bind-backend.txt",
+      "path": "observer-bind-backend.txt",
+      "sha256": "09112010c8988f4f239230110cba9b0960dd9712e5be64fb4b8cc62faa3d842d"
+    },
+    {
+      "bytes": 69,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-bind-output.json",
+      "path": "observer-bind-output.json",
+      "sha256": "c1f87de22840069b773af5f550319b860060dbe940f92db15e3a9ccbe282f58c"
+    },
+    {
+      "bytes": 46,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-bind-transport.json",
+      "path": "observer-bind-transport.json",
+      "sha256": "4488700e0fbaa7eb731126030806fdefde8840f20143bb1ffd75b5107159de98"
+    },
+    {
+      "bytes": 0,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-bind.stderr",
+      "path": "observer-bind.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 40399,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-completion-fetch.json",
+      "path": "observer-completion-fetch.json",
+      "sha256": "13245bb5535ea963805d0b1d0e1c7a646121c97df73ba604312fd706d37e88ed"
+    },
+    {
+      "bytes": 1730,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-completion-fetch.py",
+      "path": "observer-completion-fetch.py",
+      "sha256": "8649ae4009bf0f79700b251ca76ec0fc4af5f8cd038bf268868654b29ceec03c"
+    },
+    {
+      "bytes": 0,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-completion-fetch.stderr",
+      "path": "observer-completion-fetch.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 6,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-fetch-backend.txt",
+      "path": "observer-fetch-backend.txt",
+      "sha256": "e1f4368ecaa3d93fe5ad652252c85b79d32f75b2300d993143b134185b58f6a5"
+    },
+    {
+      "bytes": 3782,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-final-audit-summary.json",
+      "path": "observer-final-audit-summary.json",
+      "sha256": "ba2b24227c15dadaf129b3d69c9e2cbc20c92a34ce864ce982f7425128632edb"
+    },
+    {
+      "bytes": 3564,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-final-evidence/handle-0.json",
+      "path": "observer-final-evidence/handle-0.json",
+      "sha256": "934a35853a109c3f43b50919f38150f6a8da1c4c91cea6bb6dc752b64380a813"
+    },
+    {
+      "bytes": 3567,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-final-evidence/handle-1.json",
+      "path": "observer-final-evidence/handle-1.json",
+      "sha256": "596d81cb0ee9e22b165a76c79874d61d1cff2599d87044be2ea956e0bd0626b7"
+    },
+    {
+      "bytes": 47752,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-final-evidence/journal-0.jsonl",
+      "path": "observer-final-evidence/journal-0.jsonl",
+      "sha256": "e42289860d30d55c4a23c9ae22a8d0959d8cf7c82ce4f68095ceb311eba55ae9"
+    },
+    {
+      "bytes": 7461,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-final-evidence/journal-1.jsonl",
+      "path": "observer-final-evidence/journal-1.jsonl",
+      "sha256": "f815b6b54b5443847f7a3647d7d86f8e1cc522549c7da7fccafa7e7ecac1da91"
+    },
+    {
+      "bytes": 864,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-final-evidence/receipt-0.json",
+      "path": "observer-final-evidence/receipt-0.json",
+      "sha256": "216ec4e83b064c2ff7317775864a6a3106d9ef13f559f1a7bb99d7850aecb32d"
+    },
+    {
+      "bytes": 854,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-final-evidence/receipt-1.json",
+      "path": "observer-final-evidence/receipt-1.json",
+      "sha256": "f7572281aea18e0acbc7921d0ff992d24a503c9e1659ebf8026bf59aea20b691"
+    },
+    {
+      "bytes": 70158,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-final-fetch.json",
+      "path": "observer-final-fetch.json",
+      "sha256": "05ec50551288ac1075f64f6e993e04054af568fa7a23e509872b95ac974bf6f8"
+    },
+    {
+      "bytes": 2367,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-final-fetch.py",
+      "path": "observer-final-fetch.py",
+      "sha256": "f2e2136702ed777089d2f8331e018caad0baf511d1e0c6b7ea3cb359b97b5fdc"
+    },
+    {
+      "bytes": 0,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-final-fetch.stderr",
+      "path": "observer-final-fetch.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 1753,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-handle-fetch.py",
+      "path": "observer-handle-fetch.py",
+      "sha256": "511c6a4851a79d2c76fd46edd5f6fd756b88ac80d67b53b66a4200cd33512459"
+    },
+    {
+      "bytes": 0,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-handle-fetch.stderr",
+      "path": "observer-handle-fetch.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 623,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-natural-completion-contract.json",
+      "path": "observer-natural-completion-contract.json",
+      "sha256": "93867d2b333fcc92adadecfd701eaeb24b2828d56529aa98f669115b3c614d34"
+    },
+    {
+      "bytes": 2061,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-readiness-handles/fetch-index.json",
+      "path": "observer-readiness-handles/fetch-index.json",
+      "sha256": "90724b49556b7153f8f1beabd77a2bd295b985ee383e60ce9c0d58d36c63e9ed"
+    },
+    {
+      "bytes": 1459,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-readiness-handles/handles.json",
+      "path": "observer-readiness-handles/handles.json",
+      "sha256": "467872f28189159a273a478f79d09da6f2e9564e23c99ae957415edb0f7f5a9f"
+    },
+    {
+      "bytes": 5881,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-readiness-handles/journal-0.jsonl",
+      "path": "observer-readiness-handles/journal-0.jsonl",
+      "sha256": "c0d12d53d87295ae627e4c5593f3ddf0d70dbfe02d0d9d18502f6e265fccbea0"
+    },
+    {
+      "bytes": 5881,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-readiness-handles/journal-1.jsonl",
+      "path": "observer-readiness-handles/journal-1.jsonl",
+      "sha256": "b2cc4441aa5ad833fca4e093909f0adaabbf36f5275a92f39d8673762a5d1677"
+    },
+    {
+      "bytes": 1546,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-readiness-handles/ready.json",
+      "path": "observer-readiness-handles/ready.json",
+      "sha256": "6dc0e0b47d2d2c815fbc41955b2d43f3ccecdef4f41add828c2ddac7f570b581"
+    },
+    {
+      "bytes": 3564,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-readiness-handles/wrapper-handle-0.json",
+      "path": "observer-readiness-handles/wrapper-handle-0.json",
+      "sha256": "934a35853a109c3f43b50919f38150f6a8da1c4c91cea6bb6dc752b64380a813"
+    },
+    {
+      "bytes": 3567,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-readiness-handles/wrapper-handle-1.json",
+      "path": "observer-readiness-handles/wrapper-handle-1.json",
+      "sha256": "596d81cb0ee9e22b165a76c79874d61d1cff2599d87044be2ea956e0bd0626b7"
+    },
+    {
+      "bytes": 3559,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-readiness-handles.tar.gz",
+      "path": "observer-readiness-handles.tar.gz",
+      "sha256": "40e6c4a5ea77332fb069e149cdf497c25ad1997ccd4d316c88be5d315db4105f"
+    },
+    {
+      "bytes": 6,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-ready-backend.txt",
+      "path": "observer-ready-backend.txt",
+      "sha256": "8f26afe16abfa4c0455d7e04983602395065889db4ca3f1a00e1751d294be17f"
+    },
+    {
+      "bytes": 1327,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-ready-output.json",
+      "path": "observer-ready-output.json",
+      "sha256": "311b9673d81aaf86b6d195738a9f7b07398874c54f6596dc1e7b5afb8abdeb70"
+    },
+    {
+      "bytes": 46,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-ready-transport.json",
+      "path": "observer-ready-transport.json",
+      "sha256": "c246a58d15ba637a9292aa832b4ac73275d8bbda66af7e2e215d933ceade4d41"
+    },
+    {
+      "bytes": 0,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-ready.stderr",
+      "path": "observer-ready.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 2707,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-start-attempt.json",
+      "path": "observer-start-attempt.json",
+      "sha256": "c6819a9d4b54cf3dc6499f62229eabd7e3ec0e8b32bf2c9addcd3e0036223f0f"
+    },
+    {
+      "bytes": 6,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-start-backend.txt",
+      "path": "observer-start-backend.txt",
+      "sha256": "ae139095edfd534d2787acf7bc41964f4751f942b173b0cdff619aa47ae62f92"
+    },
+    {
+      "bytes": 5632,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-start-bundle.tar.gz",
+      "path": "observer-start-bundle.tar.gz",
+      "sha256": "5692f34485e1ecdf61a86914c1905645f76dbc883059a7aa8620f67fd6153746"
+    },
+    {
+      "bytes": 1820,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-start-output.jsonl",
+      "path": "observer-start-output.jsonl",
+      "sha256": "81c9228364513c26566bdfb5092e350e23f5520317771c291b0f136246c7c02b"
+    },
+    {
+      "bytes": 4356,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-start-readiness-summary.json",
+      "path": "observer-start-readiness-summary.json",
+      "sha256": "82195eb4afa96b028c49e0e22f83c9ed3143760374e7a6b484524123557d2115"
+    },
+    {
+      "bytes": 158,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-start-transport.json",
+      "path": "observer-start-transport.json",
+      "sha256": "8ea31b4d401eb246694db324713c332ad27ba2232d1efc91f482c4671c92a386"
+    },
+    {
+      "bytes": 0,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-start.stderr",
+      "path": "observer-start.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 1882,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/observer-upload-start.py",
+      "path": "observer-upload-start.py",
+      "sha256": "09a4a683edb27c3d6300f018428f509ec45af44bd29af7b90dca1bc7ca620f08"
+    },
+    {
+      "bytes": 1352,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/predeclared-actual-GPU-assignment.json",
+      "path": "predeclared-actual-GPU-assignment.json",
+      "sha256": "1923054da418b418dee65d55caeee23c417ccb5cdb75e1bed95d2e3543f11662"
+    },
+    {
+      "bytes": 4791,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/prepare_dual.py",
+      "path": "prepare_dual.py",
+      "sha256": "9e837f7a6dc85715bc841e07d21e26fa919881a66c96b88b50731e8b953349e9"
+    },
+    {
+      "bytes": 11819,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/prepare_witness.py",
+      "path": "prepare_witness.py",
+      "sha256": "15caafffde7c66be810562acd4bb77692651b8ececcb7d15704768ea06066fd1"
+    },
+    {
+      "bytes": 5550,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/readonly-actual/audit-index.json",
+      "path": "readonly-actual/audit-index.json",
+      "sha256": "04e846ceb0e77ff263a5cf7a23ac6095813736dd1863f911f308fbb1d4ebdf37"
+    },
+    {
+      "bytes": 15654,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/readonly-actual/capture.json",
+      "path": "readonly-actual/capture.json",
+      "sha256": "801f19f772bf5645d70323f1d5487dc34c0598b89e4f501f9c6cc968a4064465"
+    },
+    {
+      "bytes": 3451,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/readonly-actual/config-0.json",
+      "path": "readonly-actual/config-0.json",
+      "sha256": "085fd9eb7eb91f4ebbd5e5338566313cd5f6838ffa7919fa0458494b3b36151b"
+    },
+    {
+      "bytes": 3451,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/readonly-actual/config-1.json",
+      "path": "readonly-actual/config-1.json",
+      "sha256": "f4f3807dbfc832cacc1ce7af542f63ac6bd68aaf674a5c7fd6df25b08a3b06f7"
+    },
+    {
+      "bytes": 3915,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/readonly-actual/manifest.json",
+      "path": "readonly-actual/manifest.json",
+      "sha256": "d8006046dca7fcb0c69b94ebadee507242c9c24a9b4a81de01ae6c935738d447"
+    },
+    {
+      "bytes": 11135,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/readonly-actual/witness-spec.json",
+      "path": "readonly-actual/witness-spec.json",
+      "sha256": "e17824eca12f48451cab442c69d7501a1d7a834633d058fc53c12a668dca4887"
+    },
+    {
+      "bytes": 5860,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/readonly-actual-metadata-small.tar.gz",
+      "path": "readonly-actual-metadata-small.tar.gz",
+      "sha256": "6aeffd7157687637e59d3d75d4a658a50c958c82c282d04e6111deeffb7b5015"
+    },
+    {
+      "bytes": 0,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/readonly-actual-metadata.tar.gz",
+      "path": "readonly-actual-metadata.tar.gz",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 6,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/readonly-fetch-backend.txt",
+      "path": "readonly-fetch-backend.txt",
+      "sha256": "a674fa70df13b4ee2f97cd0a2f371f0f01ea27469e4da38bea366570ee805ae6"
+    },
+    {
+      "bytes": 6,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/readonly-fetch-small-backend.txt",
+      "path": "readonly-fetch-small-backend.txt",
+      "sha256": "4d6418d1b663173f0db2d1636651b9f7d3803923fa6597097fc87fc356371be4"
+    },
+    {
+      "bytes": 10097,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/readonly-fetch-small.py",
+      "path": "readonly-fetch-small.py",
+      "sha256": "aa38b422394678193117efbf702fc45ac6019d1b00eecd5c07dd22952b85c630"
+    },
+    {
+      "bytes": 0,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/readonly-fetch-small.stderr",
+      "path": "readonly-fetch-small.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 10132,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/readonly-fetch.py",
+      "path": "readonly-fetch.py",
+      "sha256": "664fd0e5ef13e767622f654c69c772aedd396a2e5eae2d2a4cec510c9b888d33"
+    },
+    {
+      "bytes": 150,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/readonly-fetch.stderr",
+      "path": "readonly-fetch.stderr",
+      "sha256": "80c88f97c9c659914ea5db42a400f49d476c3cdc21e05b64b89022ea720f94af"
+    },
+    {
+      "bytes": 26,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/root-GPU-job-id.txt",
+      "path": "root-GPU-job-id.txt",
+      "sha256": "1bf7dfffd3ad29c9b9dc9c56576ecc2774f5a3182fc20fd26a0d2575392fb1f7"
+    },
+    {
+      "bytes": 197,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/root-GPU-submit-receipt.json",
+      "path": "root-GPU-submit-receipt.json",
+      "sha256": "9ccd1b72616b5d2cbb35de00abcb766aadb9d5d2c4043d5da33deeeaf81a26ce"
+    },
+    {
+      "bytes": 4230,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/root-GPU-submit.json",
+      "path": "root-GPU-submit.json",
+      "sha256": "c69787695d3b5158b5a325b78b4af436d48c15f9232f699f08016b494fc78897"
+    },
+    {
+      "bytes": 0,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/root-GPU-submit.stderr",
+      "path": "root-GPU-submit.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 399,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/root-GPU-wait-contract.json",
+      "path": "root-GPU-wait-contract.json",
+      "sha256": "54eba1d1ae5b85ba9b7932cf50892e5197b8992e7d07061978c3cd23e705ab28"
+    },
+    {
+      "bytes": 1689,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/root-bootstrap.py",
+      "path": "root-bootstrap.py",
+      "sha256": "09163d281471547bf49a260ace87b0aa791ad85945d25e5f509c992d431ce6ec"
+    },
+    {
+      "bytes": 685,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/root-canonical-submit-command.json",
+      "path": "root-canonical-submit-command.json",
+      "sha256": "7caacdfee618b6c94726dec8deacaad0d2a50ac67ba0051a7a9b1280ddbebfe6"
+    },
+    {
+      "bytes": 903,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/root-metadata-release.json",
+      "path": "root-metadata-release.json",
+      "sha256": "2b35e08210b89d37bbe370f4ee3219e32226c9ebbc5722660c8bd335af166bf3"
+    },
+    {
+      "bytes": 6069,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/root-preparation-output.jsonl",
+      "path": "root-preparation-output.jsonl",
+      "sha256": "f779a56d7d0c4bbd93749661bdb5009e21f06de21664f222e459766591728bc9"
+    },
+    {
+      "bytes": 6565,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/root-preparation-result.json",
+      "path": "root-preparation-result.json",
+      "sha256": "8fc4c8da458e915542bf0f558fdc7839e6826e18f3ab16f1fe0f51d2278dee9d"
+    },
+    {
+      "bytes": 162,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/root-preparation-stderr",
+      "path": "root-preparation-stderr",
+      "sha256": "bc5727288879c1b88990fbf279aa6376fafc7c8b6d72b2bef59f33856b061fd7"
+    },
+    {
+      "bytes": 187,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/root-preparation-transport.json",
+      "path": "root-preparation-transport.json",
+      "sha256": "43471b942f3c9b7b50c2f73b0264aae5ad9e3fbf5aaf901021ddda22b239fd5b"
+    },
+    {
+      "bytes": 1089,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/root-prospective-cost-forecast.json",
+      "path": "root-prospective-cost-forecast.json",
+      "sha256": "430888081afe106352e0c3e0f4d2da6a8d892b5792fafb66b3865429234a685d"
+    },
+    {
+      "bytes": 4559,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/root-released-manifest.json",
+      "path": "root-released-manifest.json",
+      "sha256": "7e9426a42ec29e5f665bcef61bcea26a306aec35131d39733450aa71053c4972"
+    },
+    {
+      "bytes": 1765,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/root-witness-release.json",
+      "path": "root-witness-release.json",
+      "sha256": "2410fc2eaddad730df8bdda6234a83b021f656a0128559413e7268f0a689a523"
+    },
+    {
+      "bytes": 3103,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/run-binding-fetch.py",
+      "path": "run-binding-fetch.py",
+      "sha256": "1bdf5eca86573dfcdffb10fc0a8df25030de7c2178a451e910d7fd4e052010a4"
+    },
+    {
+      "bytes": 3011,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/run-observer-batch-wait.py",
+      "path": "run-observer-batch-wait.py",
+      "sha256": "105b834816fe2a6c951c0289bc28b849dd7edc1c41bd06a8a519c720da62b145"
+    },
+    {
+      "bytes": 2097,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/run-observer-bind.py",
+      "path": "run-observer-bind.py",
+      "sha256": "0468a7556862ef8bdd4556790a65dd03d86523aaf8fe69d9acf5f7248f0a3c42"
+    },
+    {
+      "bytes": 2856,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/run-observer-completion-fetch.py",
+      "path": "run-observer-completion-fetch.py",
+      "sha256": "62a6a9857ceac45c0923effeb982d77ca580e98ca364bb0a21fc982dd92b9e6d"
+    },
+    {
+      "bytes": 2885,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/run-observer-fetch.py",
+      "path": "run-observer-fetch.py",
+      "sha256": "35fb8451b4021a2e1ad0067954010e19bdab5f14731258711f053ec23ed07efe"
+    },
+    {
+      "bytes": 3897,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/run-observer-final-fetch.py",
+      "path": "run-observer-final-fetch.py",
+      "sha256": "c261de1336232c7390ea76a8f29f00e7e5399f2e9a9a10671a6374fb90feb1cc"
+    },
+    {
+      "bytes": 1829,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/run-observer-ready.py",
+      "path": "run-observer-ready.py",
+      "sha256": "38457fe9bb38fb64fde7ff31b6056f6bbdcb98eea98c4dcd4a67f2d4d4b1d01b"
+    },
+    {
+      "bytes": 3659,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/run-observer-start.py",
+      "path": "run-observer-start.py",
+      "sha256": "536fab46961a256867e947f22e111e0323f1818dd48873f5f98f0d80c07dccc8"
+    },
+    {
+      "bytes": 2211,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/run-root-GPU-submit.py",
+      "path": "run-root-GPU-submit.py",
+      "sha256": "0803896abbd65b709c8617b65af81e1d5d655b6a503922c273befc4c95e0ed95"
+    },
+    {
+      "bytes": 3984,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/run-root-preparation.py",
+      "path": "run-root-preparation.py",
+      "sha256": "0e9fac201658e3d131dbb43c645e00d27c44d27a58946537817317a11c789510"
+    },
+    {
+      "bytes": 1760,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/witness-metadata-prep-bundle.json",
+      "path": "witness-metadata-prep-bundle.json",
+      "sha256": "dc7b49016af01bcd5f5b0cae6a95130a1b853ebb53a4548e3b072dc1b772b569"
+    },
+    {
+      "bytes": 228759,
+      "original": "/private/tmp/pointstream-ada-window-ca866-20261113/witness-metadata-prep-bundle.tar.gz",
+      "path": "witness-metadata-prep-bundle.tar.gz",
+      "sha256": "f97a4687129765810f1d77e772aa4b9992bd2e749431bd5b83816275ea9ec537"
+    }
+  ],
+  "job_id": "20261113T043746Z-55dd755d",
+  "omitted_duplicate_root_CPU_approval": "Full b031 approval already preserved in ca866-CPU-gate-20261113 cache",
+  "originals_unchanged": true,
+  "readonly_copies": true,
+  "schema": 1,
+  "scope": "Failed first isolated DCVC receiver and terminal observer/known process evidence; not a receiver, quality or timing qualification",
+  "total_bytes": 909678
+}

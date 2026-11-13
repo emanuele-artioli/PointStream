@@ -1,0 +1,119 @@
+{
+  "cache_root": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/ca866-CPU-gate-20261113",
+  "file_count": 17,
+  "files": [
+    {
+      "bytes": 6505210,
+      "original": "/private/tmp/pointstream-runtime-permission-repair-20261113/config.json",
+      "path": "config.json",
+      "sha256": "ca866e023b20cfeb51a52d96d56bab27f8d3b5529ec042d1d8eebbad5b8ea3af"
+    },
+    {
+      "bytes": 2945,
+      "original": "/private/tmp/pointstream-runtime-permission-repair-20261113/review.json",
+      "path": "review.json",
+      "sha256": "f8272faa35a167c29a66d675eba9c7615122d06ae0b36a7a63f8e6eb7b07414e"
+    },
+    {
+      "bytes": 2168,
+      "original": "/private/tmp/pointstream-runtime-permission-repair-20261113/delta.json",
+      "path": "delta.json",
+      "sha256": "91c1d6531a6c74cc6209d730422e97f78d7758251e05ddc847599d17bc3976f5"
+    },
+    {
+      "bytes": 652,
+      "original": "/private/tmp/pointstream-runtime-permission-repair-20261113/staged.json",
+      "path": "staged.json",
+      "sha256": "b2e0dddd1d5aca4270181fd947bb1a6f8c50107d79d97ee5acbe2d770f8ab5c5"
+    },
+    {
+      "bytes": 6346,
+      "original": "/private/tmp/pointstream-runtime-permission-repair-20261113/CPU-denial-spec.json",
+      "path": "CPU-denial-spec.json",
+      "sha256": "a450c118b07ecf9e64ed4592324452764e4f6fb09513ecfa43314fd338206637"
+    },
+    {
+      "bytes": 830,
+      "original": "/private/tmp/pointstream-runtime-permission-repair-20261113/CPU-root-release.json",
+      "path": "CPU-root-release.json",
+      "sha256": "98e4223eac5a912d5a85b66d409827c54d1201821a21a3c4a60b9d1c56ed6261"
+    },
+    {
+      "bytes": 196,
+      "original": "/private/tmp/pointstream-runtime-permission-repair-20261113/CPU-submit-receipt.json",
+      "path": "CPU-submit-receipt.json",
+      "sha256": "9ffeca4d5f15d7c6dbfe54dd5f777af02fa1d53e4d53db149a3a7a2d16d88dfd"
+    },
+    {
+      "bytes": 717,
+      "original": "/private/tmp/pointstream-runtime-permission-repair-20261113/root-CPU-acceptance.json",
+      "path": "root-CPU-acceptance.json",
+      "sha256": "06fd8ac01b39e6aa6d1e30844354b54007aee2f9be780f0dce27f6a4d695e9f8"
+    },
+    {
+      "bytes": 6596606,
+      "original": "/private/tmp/pointstream-runtime-permission-repair-20261113/root-approved-real-CPU-denial.json",
+      "path": "root-approved-real-CPU-denial.json",
+      "sha256": "b0315f7a487fa128a510bfeb7e12698ba0a7efdbca26949c306a4e5268f8d836"
+    },
+    {
+      "bytes": 0,
+      "original": "/private/tmp/pointstream-runtime-permission-repair-20261113/result-audit/raw-audit.json",
+      "path": "result-audit/raw-audit.json",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 121,
+      "original": "/private/tmp/pointstream-runtime-permission-repair-20261113/result-audit/raw-audit.stderr",
+      "path": "result-audit/raw-audit.stderr",
+      "sha256": "02b311a4df69d31fa8934f93b373268f3b2dd11e945f8eb1c19932305195ed4f"
+    },
+    {
+      "bytes": 6322958,
+      "original": "/private/tmp/pointstream-runtime-permission-repair-20261113/result-audit/raw-audit-v2.json",
+      "path": "result-audit/raw-audit-v2.json",
+      "sha256": "930b91b93e03640d397743fdec4ed942ed098be10f346cce6ac759e32a1a11fd"
+    },
+    {
+      "bytes": 302,
+      "original": "/private/tmp/pointstream-runtime-permission-repair-20261113/result-audit/raw-audit-v2.stderr",
+      "path": "result-audit/raw-audit-v2.stderr",
+      "sha256": "70c7cd8cf84f813dd7e1ec0a8f84d3d1ad6f30711b9916ab2d5ef6ce313668c7"
+    },
+    {
+      "bytes": 12649,
+      "original": "/private/tmp/pointstream-runtime-permission-repair-20261113/result-audit/audit-fa824380.py",
+      "path": "result-audit/audit-fa824380.py",
+      "sha256": "5d2bcf40f13e8a38dea932eb710c0dbe40e9e25d800c4c3029f639106a9dd138"
+    },
+    {
+      "bytes": 13901,
+      "original": "/private/tmp/pointstream-runtime-permission-repair-20261113/result-audit/audit-fa824380-v2.py",
+      "path": "result-audit/audit-fa824380-v2.py",
+      "sha256": "43dd2a7278d59ce78d8f75fb87a1ef4e736a70966aaeb9542f4f8082949b9d2d"
+    },
+    {
+      "bytes": 4968,
+      "original": "/private/tmp/pointstream-runtime-permission-repair-20261113/result-audit/finish-local.py",
+      "path": "result-audit/finish-local.py",
+      "sha256": "eec8d0b0189c0e427165c32653cd622d5aa61771c026df28ff9ce4bcc4c242b6"
+    },
+    {
+      "bytes": 2580,
+      "original": "/private/tmp/pointstream-runtime-permission-repair-20261113/result-audit/independent-audit-summary.json",
+      "path": "result-audit/independent-audit-summary.json",
+      "sha256": "b0720ad647be3d5ab821181318c805285047f1e9cf85e06a9e66ea55034f9956"
+    }
+  ],
+  "job_id": "20261113T041417Z-fa824380",
+  "limitations": [
+    "Initial failed audit assumed ephemeral source path survived; stderr retained",
+    "Corrected audit completed physical archive/source/policy/pixel checks and all artifact/cleanup capture, then -S NumPy parser import failed; identical pinned original packet parsed locally to complete remaining comparisons; no third remote execution"
+  ],
+  "originals_unchanged": true,
+  "readonly_copies": true,
+  "schema": 1,
+  "scope": "Selected ca866 CPU proof/cache only; no GPU/runtime qualification",
+  "source_archive_reference": "Existing immutable 5ebc-CPU-gates-20261113 cache; archive7fd4 unchanged, not duplicated here",
+  "total_bytes": 19473149
+}

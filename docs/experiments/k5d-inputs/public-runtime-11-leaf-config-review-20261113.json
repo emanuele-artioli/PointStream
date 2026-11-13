@@ -1,0 +1,61 @@
+{
+  "scope": "Prospective config-only exact11publicruntimeleaves; no receiver/GPUqualification",
+  "old_config_sha256": "f8263fa236696f0c5525b306fceaf71d96037237b1fb95d3f48dab91fd4ccc86",
+  "new_config_sha256": "ca866e023b20cfeb51a52d96d56bab27f8d3b5529ec042d1d8eebbad5b8ea3af",
+  "source_environment_unchanged": true,
+  "all_other_config_fields_unchanged": true,
+  "import_diagnostic_result_sha256": "2a522c17aebc644e667fdf15ed4fc0fd02a160db776e3d375c6ef0f5cf3e649d",
+  "additions": {
+    "lib/python3.12/site-packages/numpy/testing/__init__.py": {
+      "sha256": "227a552a80c0ccc28efe5fc735c6adce25bfbb593dfc96737bffedda7c9bacbd",
+      "size": 595
+    },
+    "lib/python3.12/site-packages/numpy/testing/_private/__init__.py": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    "lib/python3.12/site-packages/numpy/testing/_private/extbuild.py": {
+      "sha256": "9c6d9dc0fe27526412ddee5e2118a7c6dd2cfdfe2cc7103561fa210a0fa76afa",
+      "size": 8017
+    },
+    "lib/python3.12/site-packages/numpy/testing/_private/utils.py": {
+      "sha256": "dc5ad24cc8b439da43383043a27720883433768e4d280e9855f437b8a4524277",
+      "size": 85242
+    },
+    "lib/python3.12/site-packages/numpy/testing/overrides.py": {
+      "sha256": "bba7dc292042f0723330f58a01b772a3053bd61d85c767a40d0c691b936122bf",
+      "size": 2123
+    },
+    "lib/python3.12/site-packages/torch/testing/__init__.py": {
+      "sha256": "29619702d335c066237a7cf99467f61f5eabdfea88d5998e56c1eec479fb4b69",
+      "size": 219
+    },
+    "lib/python3.12/site-packages/torch/testing/_comparison.py": {
+      "sha256": "edd0df8451eda64aa03527d794c209075810e105d02a3e9b0fae6c77c64401ea",
+      "size": 66541
+    },
+    "lib/python3.12/site-packages/torch/testing/_creation.py": {
+      "sha256": "93c4474ada628980eb43a50c97d0e7732e06066ed9611bb9e08e6a27d9f113f6",
+      "size": 12198
+    },
+    "lib/python3.12/site-packages/torch/testing/_internal/__init__.py": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    "lib/python3.12/site-packages/torch/testing/_internal/logging_tensor.py": {
+      "sha256": "184db734267a861c24724e3c80e3b23853b94a2827b55ed5792c5474d17c8ee9",
+      "size": 6646
+    },
+    "lib/python3.12/site-packages/torch/testing/_utils.py": {
+      "sha256": "42cc5f6bf18e3a02cee9b0b5f52c7d317293b6bf782cd0b76eb7dd923a992915",
+      "size": 2039
+    }
+  },
+  "added_count": 11,
+  "added_bytes": 183620,
+  "new_import_paths_or_system_device_grants": false,
+  "directory_rights": "Only existing receiver auto-derived nonrecursive READ_DIR parents, no explicit recursive rights",
+  "CPU_precharged": 50,
+  "native_CPU_source_proof_reused": "f2db8617 exactunchanged5ebsource/environment/wrapper/unshare; actualbase_admissionconfig-unbound",
+  "requires": "Fresh exactconfig actualCPUdenial+rootreview before anyGPUwitness; all later stages unreleased"
+}

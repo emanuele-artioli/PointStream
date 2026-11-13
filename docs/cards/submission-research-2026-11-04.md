@@ -10,45 +10,28 @@ K5c/W8/W9 balances are not transferred. Unknown submissions are never replayed.
 
 ## Current execution status — November13 (UTC)
 
-### A2 failure audited; public-runtime diagnostic released (UTC)
+### Current research decision (November 13, UTC)
 
-Root closed `20261113T033048Z-1461dd9d` as a failed GPU witness on gpu6 Ada.
-All six native encode/standalone decode preparations completed, but the first
-restricted DCVC receiver failed importing public `torch/testing/__init__.py`:
-config `f826` omitted that runtime module. No accepted receiver receipt,
-end-to-end point, quality comparison or scale gate follows. Both events are
-acknowledged. The [root closeout](../experiments/k5d-inputs/ada-1461-root-failure-closeout-20261113.json)
-binds exact source `5ebc7831` / `abccdf05` / archive `7fd4e0e6` / environment `32e`,
-physical config and raw failure evidence.
+The 55dd GPU witness is closed: six ordinary native preparations completed,
+but its first restricted decoder failed on a lazy Torch import; no receiver or
+quality point passed. Final cleanup is recorded, while the selected observer
+remains UNKNOWN with no reservation bound. Events and both waits are closed.
 
-Observer 0 was selected from the actual admitted UUID before quality inspection.
-Its independently replayed reservation upper bound is 150.362107921 seconds,
-conditional on NFS visibility; observer 1 remains UNKNOWN. Both observer batches
-85796 and old-af6 66293 ended, all wrappers/timeouts exited, and all 11 captured
-A2 host PIDs / five groups were absent. The actual FQDN CPU claim file has zero
-allocations; the selected GPU claim is absent. Earlier alias-path checks remain
-unsupported; the corrected current-state check does not prove a historical interval.
+The scoped lazy-import CPU diagnostic passed. The separate [public-Python
+category repair](k5d-public-python-runtime-repair-2026-11-13.md) metadata helper failed after publication;
+a read-only recovery audit verified the published files and private-data
+separation. The original helper remains failed; no qualification follows.
 
-Retain the full **900 GPU / 1,100 CPU-second A2 debit**. Programme charges are
-**22,041 GPU / 58,230 CPU seconds**; Ball: 15,679 GPU / 34,229 CPU. The
-[public-runtime repair card](k5d-public-runtime-repair-2026-11-13.md)
-releases only a **90 CPU-second / zero-GPU import-closure diagnostic**. Its
-separate reservation has **900 GPU / 1,610 CPU seconds unspent**; config repair,
-fresh CPU denial and another GPU witness remain unreleased. Existing Ada-stage
-headroom is 3,218 GPU / 388 CPU; held SVT-only 600 GPU / 1,800 CPU is unchanged.
-No transfer, retry, numerical change, training or scale release is implied.
+**Next: build the Ada registered-study source port only.** Future GPU work is
+deferred. Use one final source/environment/archive for fresh 16/48 calibration
+through 292/586/full30, preserving defaults and fresh receivers at every new
+stage; new source qualification is mandatory. The [SVT-only route](k5d-svt-only-confirmation-2026-11-13.md)
+remains separately held and scientifically unreleased.
 
-Watch a7 found both gpu6 Ada cards idle at 03:23:52 UTC, enabling A2 admission,
-and ended 03:33:49 with PID 73984 absent. Requested passive watch **a8** is now
-active: PID 80489, start 03:51:59.829792 UTC, deadline 04:36:59 UTC, four hosts /
-300-second cadence, same source `2b931`, 100 CPU precharged with an 80-CPU guard.
-It never submits jobs or invokes models/APIs/chat wakeups. Raw handle:
-`/private/tmp/pointstream-resource-watch-20261113-passive-a8/launch.json`.
-
-The independent [SVT-only source build](k5d-svt-only-confirmation-2026-11-13.md)
-continues without remote scientific release. Paired 16/48 producer/scorer stages
-require an accepted GPU witness and complete forecasts; Ada 292/586 still needs
-a profile port. No manuscript/PRESLEY edit or submission is released.
+Programme charges are 22,941 GPU / 60,130 CPU seconds within unchanged 24/28-hour
+authority. Bounded passive watch a9 is active; no autosubmit or model timers.
+The [canonical continuation](../continuation-2026-11-13.md) records all current jobs, limits, balances,
+artifacts and remaining gates. No new scientific or paper/PRESLEY work is released.
 
 ### Historical af6 phase — balances, waits and watch superseded above
 

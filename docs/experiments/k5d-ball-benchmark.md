@@ -11,14 +11,24 @@ Both observer batches ended; selected 0 replayed a conditional 150.362107921-sec
 reservation bound, other 1 remained UNKNOWN. Eleven captured PIDs / five groups
 and own claims are cleared using the correct FQDN CPU allocation path.
 
-Only the [90-CPU public-runtime import diagnostic](../cards/k5d-public-runtime-repair-2026-11-13.md)
-is released; its 900 GPU / 1,610 CPU remainder and all later stages are unreleased.
-Programme: 22,041 GPU / 58,230 CPU; Ball: 15,679 GPU / 34,229 CPU.
-SVT-only source build continues without scientific compute. A7 ended after finding
-capacity; passive a8 (PID 80489) runs 03:51:59–04:36:59 UTC, four hosts / 300 seconds,
-100 CPU precharged / 80 CPU guard, no automatic job submission or model wakeups.
-Earlier balances and pending statuses below are chronological, superseded here.
+Root accepted exact-config CPU oracle `20261113T041417Z-fa824380` under approval
+`b031`: normal SVT filesystem denial and initial-launcher interruption with scoped
+teardown on frozen5eb/abcc/7fd4/env32e, config `ca866e02`. Failed A2 and both failed
+import diagnostics remain beside this scoped CPU pass; no GPU qualification follows.
 
+ONE new exclusive gpu6 Ada original six-point16 witness is ROOT RELEASED:
+spec `8da0b135…38e0`, manifest `7e9426a4…c4972`, deadline04:52:21.321823 UTC.
+Complete forecast458.804034929<namespace500; smoke550/validator30/noop5/campaign700
+unchanged. Only new observer upload/start/BOTH READY+absence is delegated;
+**root canonical publication has not started and no actual job ID exists yet.**
+Both new readiness records precede publication; old pairs are never rebound.
+New900 GPU / 1,050 CPU plus prior50 prep=1,100 CPU inclusive (700campaign /
+200observers /150admin /50prep). Programme22,941 GPU /59,885 CPU; Ball16,579 GPU /
+35,884 CPU. Repair remainder0 GPU /5 CPU. No48/30/source/algorithm/quality-rule,
+training, retry, paper/PRESLEY or submission release.
+Frozen SVT-only582fb64c remains code-only. A8's bounded deadline is04:36:59 UTC;
+completion reconciliation needs a physical receipt, so do not assume still active.
+No autosubmit or model/API/chat wakeups. Earlier status/balances are chronological.
 
 ### 2026-11-04 — registered preparation and engineering checks
 
@@ -1055,3 +1065,219 @@ only its first 90 CPU import-closure diagnostic is precharged/released, leaving
 config repair, denial run or GPU witness is released. SVT-only implementation
 continues independently. A8 passive watch has the saved PID/deadline above;
 no automatic dispatch. Ledger remains the accounting authority.
+
+Root released ONE attended CPU-only real decoder import diagnostic, original90CPU/0GPU already charged. Bundleb5630f17/helper08ef157c/source5eb/env32e/configf826, exactfiveprivatepath+savedSHAmetadata cb33b449. Hard60child+10controller+20external, wall180inner/230transport; no model/packet/weights/GPU or newconfiguration. Backend40666; localroot `/private/tmp/pointstream-runtime-closure-20261113/`, launch-handle.json+root-release.json persisted. Unknown launch is inspected, never replayed; laterconfig/CPUdenial/GPUstages remainunreleased.
+
+First runtime diagnostic backend40666 ended transport0/process1 beforeprefix:
+its own write guard rejected Torch/dill `/dev/null` r+b; collection separately
+flagged initial locale maps. Waited child5.627481CPU/controller6.637524wall, no
+model/packet/CUDA/import-complete credit. Preserve originals in
+`/private/tmp/pointstream-runtime-closure-20261113/remote-artifacts/`, remote root
+`runtime-closure-7011a5adb86541f1ac7ddd6dcf2bce17`. Root retained first90 and
+precharged ONE corrected90 within the same1700CPU repair ceiling; v2 matches
+actual minimal environment/existing typed `/dev/null` right, with startup maps
+recorded separately. Repair900GPU1520CPU remains; all later stages unreleased.
+Programme22041GPU58320CPU/Ball15679GPU34319CPU. SVT-only582fb64c frozen/checks
+passed; code-only UNRELEASED. No ledger/source/evidence change by this update.
+
+Root released ONE corrected import diagnostic within precharged second90CPU/zeroGPU: bundle18f7546d/helperb23ea0b3, unchanged exactsource/env/config/private targetmetadata. Minimal delta uses actualcleanreceiverenv, existing configuredcharacter/devnull write right, and separately recorded startupmaps withoutnewgrants. Backend84563/root `/private/tmp/pointstream-runtime-closure-20261113/v2/`, handle+releasepersisted. No automaticretry or laterconfig/CPUdenial/GPUstage release.
+
+V2 import diagnostic backend84563 ended transport0/diagnostic1: real prefix
+sentinel TRUE; definition imports stopped on the diagnostic's RuntimeError for
+a NumPy testing CPU probe, with no import-triggered subprocess. Collection also
+flagged an OS nscd map. Retain second90 CPU (waited8.133097CPU/controller8.190302wall),
+all original partial traces; no import-complete, receiver or scientific credit.
+Root precharged ONE final50 CPU v3 (30child5controller15external/wall90), from
+unallocated Ball headroom: internalcard1750 CPU/GPU900, remainder900GPU1520CPU
+unchanged, programme58370CPU/Ball34369CPU. V3 only adjusts diagnostic denial
+exception/partial-trace preservation/OS metadata; no grants. No additional
+diagnostic after v3 without a new root decision. Frozen SVT-only source unchanged.
+
+Finalnarrowedv3CPUdiagnostic released withinprecharged50CPU/0GPU: a1d89965bundle/9330480ahelper, identicalfrozenpins/privatecb33, deniedexecEACCES/zeroactualchildren andOSmetadataonly/no grants. Backend26476 and `/private/tmp/pointstream-runtime-closure-20261113/v3/` handle/release persisted. Bounds30child5controller15externalCPU/90inner130transportwall. Noautomaticfurtherdiagnostic/config/CPUdenial/GPUrelease.
+The [v1/v2 metadata evidence cache](k5d-inputs/runtime-import-v1-v2-evidence-cache-20261113.json)
+preserves 28 read-only files / 1,601,109 bytes, manifest `72655b64`; original raw
+artifacts remain unchanged and no private target contents are included.
+
+Root accepted scoped v3 CPU import diagnostic, backend26476 ended0: realprefix
+and all5definition imports completed, one EACCES-prevented subprocess attempt /
+zero observed child CPU; waited8.387892CPU/controller8.438452wall. First two failed90
+debits remain beside it. Prospectiveconfigca866e02 addsONLY11publicleaves183620B,
+allotherfieldsidentical; preparation50 CPU charged. Exact-config CPU denial is
+PREPARING, UNRELEASED; no receiver/CUDA/GPU credit. Repair900GPU1470CPU remains,
+card1750CPU/planned1745; programme58420CPU/Ball34419CPU. PR379 mergedgreen.
+[V3/config cache](k5d-inputs/runtime-import-v3-and-config-evidence-cache-20261113.json)
+(31files8757538B/manifesta26296be) and
+[exactdelta review](k5d-inputs/public-runtime-11-leaf-config-review-20261113.json)
+preserve metadata; originals and prior failures unchanged. No additional
+scientific or diagnostic release is implied.
+
+RootreleasedONEfresh actual2caseCPUdenialoracle source5eb/abcc/7fd4/env32e/newconfigca866, rawspeca450c118/deadline04:31:32.632046UTC, unchangednormalSVT/fiveprivatecategories/pixelchecks +initiallauncherkill/scopedteardown. Entire365CPU/GPU0charged(265campaign100external); programmeCPU58785/Ball34784, repair900G1105C. ConfigstagedreadonlyNFS k5d-public-runtime-ca866-20261113-4587425aae5148f08a8bc3cb7b05bca0/config.json, independent11leafdeepdiff accepted. Solecanonicalsubmitbackend97997 in flight; sourcecache7fd4/mandatorydoctoruploadhostgpu6/nochatheartbeat. Localroot `/private/tmp/pointstream-runtime-permission-repair-20261113/`; no actualIDyet, inspectunknownneverreplay/noGPUrelease.
+
+Actualsole exactca866CPUdenial request 20261113T041417Z-fa824380 publishedreturn0, source5eb/abcc/7fd4/env32e/deadline04:31:32UTC. Entire365CPU/GPU0 alreadycharged. ReadcanonicalstatusbeforeONEwait; no replay/GPU/scale/ACK. Submitreceipt+job-id at publicruntimepreproot.
+
+fa824380 freshcanonicalstatusPENDING/unassigned, noerror. RootstartedONEps-fleetwaitmax600 backend43249; contract+handlepersisted atpublicruntimepreproot. No secondwait/unknownreplay, deadline04:31:32UTC and365CPUcharge unchanged. NoGPUrelease.
+
+Publishedfa824380 canonicalspecSHA6775fa351755c623a072ceb2c03edd2b6acbcccf8bc82cdfab5a9ed30c33224c (rawlocala450differsaftercanonicalsourceinjection); sourceabcc/archive7fd4/env32e andconfigca866 exactlypreserved. Originalsinglefleetwait43249 remainsactive; no newquery/replay.
+
+fa824380 ONEfleetwait43249ENDEDexit10/attentionafter72sec, actualstatusCOMPLETE/full/gpu6; terminalevent98a746e86d845bc388ae69b400242c18 unACKpendingrootphysicalsource/config/native/publication/denial/cleanup review. No secondwait/retry/GPU/scale. Full365CPU retained.
+
+Root accepted actualfa824380 exactca866CPUgate afterphysical7fd4/31source/archive+native/YUV/RGB/allfiveerrno13/readset/runtime/profilechecks andfrozenproductioncpu_denial_approvalPASS. Fullrootapprovalb0315f7a (6,596,606B), summaryb0720ad6/raw930b91b9.18hostPIDs(16captured+sup/campaign)absent/4emptygroups/correctFQDNCPUfileEXISTSzeroallocations; currentcleanupnotreleaseinterval. NormalSVT+initiallauncherkill/scopedteardown ONLY; noactive-native/unshare-only/fleetwatchdog/GPU/scaleclaim. Originalfirstauditpostjobpathassertion andcorrected-SNumPyimportfailure retained; packetcomparisonsfinishedlocallyagainstsame33e packet, nothirdremoteaudit/modelrerun. Event98a746e86d845bc388ae69b400242c18 ACKed. Entire365CPU retained. Localapproval+rawatpublicruntimepreproot/result-audit; noGPUreleaseyet.
+
+
+### Current reconciliation — ca866 CPU accepted, next metadata only
+
+Root accepted fa824380 exact-config CPU denial and frozen production-consumer
+check; full approval `b0315f7a487f` remains outside git. Event98a746e86d845bc388ae69b400242c18
+is root-ACKed; all earlier jobs are closed. Retain365CPU, with no GPU/scale credit.
+[Thin closeout](k5d-inputs/ada-ca866-fa824-root-CPU-denial-closeout-20261113.json)
+and [read-only cache manifest](k5d-inputs/ca866-CPU-gate-evidence-cache-20261113.json)
+record actual source/config/policy/pixels, 18 host processes /16 captured births /
+4 empty groups and current FQDN-file zero-allocation cleanup. No immediate
+historical claim interval follows. Failed audit stderrs/raw and local packet
+completion are retained; no third remote audit or scientific rerun occurred.
+
+Root precharged next metadata/observer preparation50CPU only. Programme22,041GPU/
+58,835CPU; Ball15,679GPU/34,834CPU; repair900GPU/1,055CPU remains. Future scientific
+witness900GPU/1,050CPU is UNRELEASED. Source5eb/abcc/7fd4/env32e and old6b/50b
+records remain unchanged. Watcha8 remains bounded to04:36:59UTC/guard; no autosubmit.
+
+RootreleasedONEmetadata-onlyca866witnesshelper15caafff/bundlef97a4687 withrootb031CPUapproval, unchanged5eb/abcc/7fd4/env32e. Existing50CPU prechargecovers39helper1nvidia5local5SSH;230wall/hiddenCUDA/SSDscratch. Backend24341 at `/private/tmp/pointstream-ada-window-ca866-20261113/`; release/bootstrap/launcherhash+forecasts saved. No models/observers/job/GPUexecuted; future900GPU1050CPU remainsunreleased. Unknowninspectownedstate/neverreplay.
+
+ROOTreleasedONEnewca866exclusivegpu6Ada original6point16 witness: source5eb/abcc/7fd4/env32e/CPUapprovalb031, canonicalspec8da0b135de86eb9c9d33f4636a925ce1aa9ab3fc2ba2bf2ce3c0f59ac82838e0/deadline04:52:21.321823UTC. Manifest7e9426a4/orchestratorbyteexactb64, physical6assets+sourcecache/7controls/pythonwrapperverified. Completeprospectivenamespaceforecast458.804034929<500;550smoke30val5noop700campaign/900GPU1100CPUinclusive. New900GPU1050CPUprecharged+prior50metadata: programme22941GPU59885CPU/Ball16579GPU35884CPU; repair5CPU0GPU. ObserverrunnerauthorizedONLYupload/starttwoNEWwrappers+checkBOTHREADY/absentsamplesbeforeROOTsolecanonicalpublication. No actualjobIDyet; no full48/30/changedqualityrule/automaticretry. Localroot ca866window/release/forecast/manifests persisted.
+
+Newca866 TWOobserverwrappersstartedknownreturn0: index0PID/PGID418254/birth560732395; index1PID/PGID418255/birth560732396. BOTHREADY+absenceverifiedbeforeROOTpublication at1794544587690170860wallns byexactb64helper/manifest7e9426, sameboota9b0; rawready+start atca866window. Physicalsmallhandle/journalprefixfetchpending; nojobID/bind yet. Existing900GPU1100CPUinclusiveprechargeunchanged.
+
+Root physicalmetadata review accepted ca866 witness spec8da0b135…38e0/rawe17824ec,
+newnoncece1d450e, manifest7e9426a4…c4972, source5eb/abcc/7fd4/env32e/approvalb031.
+ReleaseONEnewexclusivegpu6Ada six-point16 originalwitness, deadline04:52:21.321823UTC,
+forecast458.804034929<500 with550smoke30validator5noop700campaign. New900GPU1050CPU
+plus prior50prep=1100CPUinclusive; programme22941GPU59885CPU/Ball16579GPU35884CPU,
+repairremaining0GPU5CPU. DelegateONLYnewobserverupload/start/BOTHREADY+absence
+beforeROOTsolecanonicalpublication; no actualjobID/publicationyet, nooldpairrebind.
+A8deadline04:36:59 completionreconciliationpendingphysicalreceipt. No otherrelease.
+
+RootsoleNEWca866GPUcanonicalpublication NOWrunningbackend21559 afterrootreadBOTHREADY+absentproof/manifest7e9426. Deadline04:52:21UTC, expectedcanonicalspec8da0b135/sourceabcc/archive7fd4/env32e/configca866/CPUb031,900GPU1100CPUalreadycharged. No actualIDyet/unknowninspectneverreplay; sourcecache7fd4/mandatorydoctoruploadhostgpu6/nochatheartbeat. Handles/release/command atca866window. No full48/30/qualityclaim.
+
+Actual soleca8665ebGPU witness submission 20261113T043746Z-55dd755d returned0; exactspec8da0b135/sourceabcc/archive7fd4/env32e/deadline04:52:21UTC;900GPU/1100CPUinclusiveprecharged. BothREADY+absencebeforepublication, manifest7e9426a4, nochatheartbeat. Status/bindinspectionpending; no replay/no scale. Rawroot-GPU-submit files andjob-id in dualpreppath.
+
+A8watchENDED04:32:17UTCninechecks/38.078349remote+.512797SSH+.149809controllerCPU, PID80489absentverified;100CPUretained. Itfoundbothgpu6Adasidleandnewtaskwaspublished: actual20261113T043746Z-55dd755d returned0/exact8da0spec. BothREADY+absence+physicalbirthhandlesverifiedprepublication, no qualityselection; status/bind/ONEwait pending. No newpassivewatch while newjobawaitsadmission.
+
+Actual55dd755d freshcanonicalstatusRUNNING/exclusivegpu6/smoke, GPUstatusindex0dbbb; process423345/sup423330. Bothobserverbindings+actualrunrequestUUIDpreselection delegatedmetadataONLYbeforequalityinspection. RootstartedONEps-fleetwaitmax900 backend21884, contract/handlepersisted atca866window beforewaiting; nosecondwait/replay. Actualrequest(notstatus alone) mustdetermineselectedobserver. No48/30/qualityresultyet.
+
+Actual55ddrunrequest GPUdbbb selectsobserver0ONLY BEFOREquality/outcomeinspection, predeclaredselectionSHA1923054da418b418dee65d55caeee23c417ccb5cdb75e1bed95d2e3543f11662, tokenHASH9dc8ea6c. BothNEWatomicbindingsmatchsole55dd/8da/abcc/input/boota9b0,7fleetcontrols/exclusiveoneCPUverified; supervisor423330/leader423345 actualbirthsretained. PhysicalrequestSHA9a20fd70.../bindingauditlocalca866window. RootONEfleetwait21884active; observerrunnerstartingONEseparateboundedbatchwait/handlepending. OtherobserverUNKNOWNretained, noresult-basedchoice.
+
+55dd755d ROOTONEfleetwait21884ENDEDfailedattentionafter72sec; actualcauseUNKNOWNpendingread-onlytrace/cleanup audit, noquality/scale/retry. Events2fb169b43fd956fdb1ce73a6094c2b1c+614c26143a055800b69a3fe7259a3c39 UNACK. Actualselection0/dbbb/tok9dc8 fixedprequality; ONEobserverbatchwait46867 originaldeadline preserved/resumeONLYsamehandledelegated. All900GPU1100CPUprecharge retained; no newcompute.
+
+
+Root failure review for `20261113T043746Z-55dd755d`: actual lazy import of
+`torch/_inductor/test_operators.py` through `torch._dynamo.trace_rules` received
+EACCES at the first isolated DCVC receiver. All six native preparations completed,
+but zero receiver receipts, end-to-end points or quality validations passed.
+Raw SHA a19110c7cb01 / summary a7ad73764262 are preserved at the ca866 witness
+root under `failure-audit/`. Actual FQDN CPU allocations are zero, selected GPU
+claim is absent, supervisor/leader are absent and campaign group is empty;
+selected observer still runs under its original bounded contract, so all-process
+cleanup is not yet claimed. Its existing ONE wait46867 remains pending.
+Preselected observer0 has no live joined sample and remains UNKNOWN; the peer
+ended UNKNOWN. No reselection or conditional reservation bound is valid.
+Both failure events were acknowledged after root review and notification.
+Retain the full 900-GPU / 1,100-CPU inclusive witness debit; no retry, scale or
+new experiment is released. Complete public-runtime repair design is under
+review; the separately frozen SVT-only route remains narrower and unreleased.
+
+
+Root designs one separate 80-CPU / zero-GPU lazy-import oracle; reserved from
+previously unallocated Ball headroom, package still UNRELEASED. Card
+`docs/cards/k5d-lazy-runtime-closure-2026-11-13.md` fixes actual source5eb,
+ca866 config and original inventory; actual prefix + five definitions + two
+explicit Dynamo/test_operators imports with model construction/CUDA blocked.
+This targets the observed lazy chain and cannot qualify inference. Stop after
+one attempt, preserve partial failure, no config/GPU/scale release.
+
+Root RELEASED ONE attended v4 CPU lazy-import oracle after independent review
+PASS b9ad3db0: bundle9c2b19bf/helperfdbd86fc/launcher15780870, actual ca866
+config and source5eb/env32e unchanged. Full80CPU/zeroGPU precharged: programme
+22,941GPU/59,965CPU; Ball16,579GPU/35,964CPU. Actual guarded deterministic
+setter precedes two lazy imports; no model, packet or native DCVC extension.
+Unique remote root and local launch handle must be recorded; unknown launches
+are inspected, never replayed. No config/GPU/scale release follows.
+
+v4 attended launch backend55191 is in flight; unique local handle/root release
+under `/private/tmp/pointstream-runtime-lazy-closure-20261113`. Resume only
+55191; no replacement launch or experiment. Full80CPU debit retained.
+
+V4 backend55191 ENDED0, rootaccepted CPU dependency scope only: actual prefix,
+actual deterministic setter and seven imports completed with model/CUDA guards;
+three additional pinned public.py leaves /1,987B were observed. No private
+intersection/outside-path ambiguity or native DCVC extension mapping; one
+subprocess attempt denied, zero actual childCPU. Result71cec2a164e1, child
+11.924533CPU/11.929224wall, controller waited12.297257CPU. Retain80CPU debit.
+Remote root runtime-closure-ed380033c05e47c6ac2fc08018146153; originals/read-only
+outputs preserved. No receiver, CUDA, inference, quality or new configuration
+qualification follows. Root chooses a separately budgeted complete pinned
+public-Python category correction; no GPU experiment is yet released.
+
+Root fixes the next scope BEFORE new outcomes: complete public-Python category
+repair, 3407 original658 regular.py /49,088,680B absentca866; no other field or
+content/executable/data/device grant. One metadata helper50CPU, then conditional
+365CPU exact-denial oracle and 900GPU/1100CPU six-point16 witness; total planned
+1515CPU, new internal reservation900GPU/1550CPU from unallocated Ball headroom.
+No remote helper or scientific stage is released yet. The actual55dd trace
+reached _build after native-extension/device steps, so an extra import-only GPU
+oracle would repeat partial evidence and is not worthwhile. Card records
+fresh private inode/SHA checks and fail/forecast stops; no full48/30 or retry.
+
+Root authorizes code/test-only preparation of an explicit Ada registered-study
+profile in an independent checkout/branch, preserving default A6000 behavior
+and existing Ada16/48 contracts. New Ada292/586/full30 profiles must enforce
+fresh isolated receivers and exact producer/config joins beyond first292; no
+metric, judge, quality, accounting or timing/certificate rule changes. Static
+design1d85dcb8 at `/private/tmp/pointstream-ada-full30-port-design-20261113.json`.
+No source/compute release is implied; new source must be reviewed and qualified
+before use. Root will decide whether to qualify the final ported source once
+rather than spend a full5eb witness before another source-bound qualification.
+Current public-Python metadata work remains bound to5eb; GPUstage UNRELEASED.
+
+Root CLOSED55dd failure after original observer wait46867 ENDED naturally0.
+Selected0/dbbb remains UNKNOWN:60samples/zero joined-live, deadlineUNKNOWN and
+frozen replayUNKNOWN(final differs from replay); peer1UNKNOWN retained, no
+reselection or accepted reservation bound. All five known wrapper/timeout/
+batch-helper births are absent, timeout groups empty; earlier current FQDN
+CPU/GPU claims and campaign/supervisor cleanup remain scoped observations,
+not a historical immediate release interval. Entire900GPU1100CPU retained;
+eventsACKed. Thin closeout and read-only ca866-55dd failure cache indices bind
+all metadata, failures and final journals; CPU approval b031 is referenced in
+its existing cache, not duplicated. No active observer/fleet wait or retry.
+
+Root RELEASED ONE complete-public-Python metadata helper50CPU/zeroGPU:
+config ae67091f/helperf1e6fe3c/controller3ed1c6b5; actualprivateSTATonly/two
+complete publichashpasses/freshimmutableNFS+SSD publication. No actualCPU/GPU
+qualification released. Root also RELEASED passivewatcha9 exact2b931watcher/
+launcher924d15fb, 4hosts/300s/9ticks<=45min,100CPU from oldAda remaining388→288.
+No models/claims/autosubmit/recurringLLM calls. Programme22,941GPU/60,115CPU;
+Ball16,579GPU/36,114CPU. Native completion-driven model resumption unverified.
+Persist bothuniquehandles/deadlines beforewaiting, inspect unknownneverreplay.
+
+NewpublicPython metadata backend94122; passivea9 backend46259. Exact launch
+handles and authoritative watch deadline are persisted in their unique roots.
+No replacement execution; no GPU scientific request exists.
+
+Public-Python metadata94122 ENDED1 after stagedpublication: finalabsolute
+RUSAGE_CHILDREN!=0 check raised ValueError atstage_remote101; absolutevalue
+notprinted, so neither actualnewchild nor inheritedlogin work is established.
+Full50CPU retained. Codepath reached bothhashpasses/allchecks/publications
+beforethat check, but originalhelper remainsFAILED. Rootreleases exactlyone
+15CPU read-only recoveryaudit fromcard35buffer tocheckactualNFS/SSDconfig+
+validated3407metadata/currentprivateSTAT/intersections/knownprocessbirth.
+No original replay, rehash experiment, newconfigwrite, models or qualification.
+Programme22941GPU60130CPU/Ball16579GPU36129CPU; card900GPU1485CPUremains.
+
+Root accepted read-only publication recovery ONLY: two actualae670 configs
+7,204,015B each/0444/dirs0555,3407 exact metadata/currentstat rows, five private
+categories and known16frame SHA/inode nonintersection, no privatebytes.
+Validated metadata6f8068aa / rawf9f3a75d / summaryefd7ef87; recoverychildbaseline
+.025473/final.025473/delta0, remote1.003159CPU, local+.SSH1.027663CPU. Original
+481929birth absent; originalmetadatahelper remainsFAILEDafterpublication,
+absoluteCHILDRENorigin unproven/no refund. Complete65CPU retained. GPUstage
+deferred finalsourceport review/same-source calibration. Firsta9tick05:10UTC
+found no idleA6000/three potentialAda(gpu5:1,gpu6:0/1), notfleetqualification.
