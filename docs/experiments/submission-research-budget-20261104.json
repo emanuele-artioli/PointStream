@@ -2526,6 +2526,21 @@
       "cpu_seconds": 100,
       "gpu_seconds": 0,
       "basis": "One new<=45min/max9ticks passive5min inventory gpu2/gpu3A6000+gpu5/gpu6Ada; identicalwatch/spec, uniquea14 outputs. Prior a13 finished09:33:48/PID13657absent; nojobs/autosubmit/cancel/modeltimer.80work+20external conservativecharge"
+    },
+    {
+      "phase": "ball-svt-only-final-source-preparation100-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 100,
+      "gpu_seconds": 0,
+      "basis": "RootnamesPR387CIpassingmerge7a9f5b0424740b3055b0047dfd99c68bce22e489 forNEWseparateSVTsource. Completeprep100=50localfreeze(28self+11children2)+20planpayloadadmin+20remote+2SSH+4localphysical+4remotephysical. Exactfinalmapping/boundhelper/cachepinsreviewbeforeexecution; source-only, no native/denial/GPU/model. Preserve2c6doriginal.",
+      "closeout": "COMPLETErootacceptedsource/cacheonly:freeze85890/cache51474/physical63381; bbc63eda/14dc232a/config56a88f5a/bridge9f0c;7files444dir555. Full100retained; no native/denial/GPUjob."
+    },
+    {
+      "phase": "ball-queue-v5-UUID-selector-local20-20261113",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 20,
+      "basis": "Rootprospectiverelease20fromadminother32, notnewallocation: NEWexternalV5copy ofV4; bindexpectedGPUUUIDtoexacthashedspec/requestandrejectmismatchedclaimbeforeobserverassignment. Meaningfulpositive/negative tests, configuredclientpin forfutureUUIDcandidate; noSSH/job/observer/GPU/helperexecution. V4preserved. Futurechain148/other12, past140 totaladmin300 unchanged."
     }
   ],
   "reservations": [
@@ -3145,8 +3160,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28-conventional-only-feasibility",
       "gpu_seconds": 600,
-      "cpu_seconds": 1600,
-      "status": "Remaining_unspent1600CPU/600GPU; rootreleased200CPUlocalqualification-pathrepair only from1800; realCPU/GPUoracle/48/full30UNRELEASED; preserve30clips/3SVTpoints/allmetrics/judges; no dualsourceadvance",
+      "cpu_seconds": 1500,
+      "status": "Remaining_unspent1500CPU/600GPU; localrepair200closedCI387PASS/merge7a9f; sourceprep100prospectivelycharged, exactfreeze/cachehelpersmustrootreviewbeforeexecution. Native250/CPUonlydenial365/meta50/admin200/reserve100/first16unproven535 remainheld; noGPUrelease",
       "card": "docs/cards/k5d-svt-only-confirmation-2026-11-13.md"
     },
     {
@@ -3189,8 +3204,8 @@
       "phase": "ball-Ada-calibration-source-qualification-20261113",
       "workstream": "ball",
       "gpu_seconds": 900,
-      "cpu_seconds": 1080,
-      "status": "Remaining_unspent1080CPU/900GPU = admin180/witness900CPU; native250/denial365/queuepilots+continuation120/GPUmetadata50 released; scientificGPUexecutionUNRELEASED",
+      "cpu_seconds": 1060,
+      "status": "Remaining_unspent1060CPU/900GPU = admin160/witness900CPU; admin300 comprisespast140(inclV5local20)/futurechain148/other12. Metadata50prechargedUNRUN; native/denialaccepted. ScientificGPUexecutionUNRELEASED",
       "card": "docs/cards/k5d-Ada-calibration-source-qualification-2026-11-13.md"
     },
     {
@@ -6036,7 +6051,17 @@
     ],
     "recurring_llm_polling": false,
     "completed": false,
-    "latest_inspected_completed_tick": null,
+    "latest_inspected_completed_tick": {
+      "tick": 3,
+      "finished_utc": "2026-11-13T09:52:36.129410+00:00",
+      "candidates": [
+        {
+          "host": "gpu5",
+          "gpu_uuid": "GPU-7754164a-33cd-265c-3696-c20966d228fe",
+          "qualification": "required; currentreceiver/studyisgpu6hostbound, noautosubmit"
+        }
+      ]
+    },
     "previous_monitoring_snapshot": {
       "state": "Activea5passive5min45minwatch100CPUprecharged;priora4endedverified;noautosubmit/modeltimer",
       "scope": "gpu2/gpu3 A6000 and gpu5/gpu6 Ada",

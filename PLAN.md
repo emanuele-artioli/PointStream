@@ -29,16 +29,17 @@ Frozen 2c6d source/cache and actual native CPU proof are accepted. Actual
 SVT receiver-denial job `20261113T090138Z-e039d7c0` completed and passed its
 validator and root evidence review; terminal acknowledgment is complete and proof 7adf5e5d is published. The external queue controller
 passed its bounded Linux qualification; earlier failed attempts remain retained.
-No new-source GPU witness, paired calibration or full 30-clip run is released. The witness is held pending a separately reviewed scheduler route
-that guarantees one physical GPU across the two calibration jobs. The existing
-queue filters model names only. Minimal UUID/sentinel implementation is released
-for 220 local CPU-seconds; Linux activation remains separately held. Independent
-SVT-only draft PR387 is repairing one CI fixture sensitivity; no scientific
-release follows from its code checks.
+No new-source GPU witness, paired calibration or full30 run is released.
+Physical-UUID routing PR389 merged CI-green at56c5f2ec; scoped gpu6 activation
+is still held. External V5 expected-selector guard passed60 local tests.
+Independent SVT-only PR387 merged CI-green at7a9f5b04; its new sourcebbc63eda,
+archive14dc232a, config56a88f5a and sealed source cache are accepted. Fresh
+native/CPU-only receiver proofs and measured16-frame fit remain required.
 
-Five-minute resource checks cover A6000 and RTX 6000 Ada through one bounded
-window ending 10:22 UTC (a14). Latest inspected completed check, 09:37:30 UTC, found
-no eligible idle GPU. No automatic submission or verified model callback.
+Five-minute resource checks continue through10:22UTC(a14). Last inspected
+09:52:36 check found potentially idle gpu5/Ada1, qualification required. The
+current receiver/study guards explicitly bind gpu6; no host substitution or
+automatic submission follows. No verified model-completion callback.
 The [canonical continuation](docs/continuation-2026-11-13.md) owns live job IDs,
 proofs and handles; the [budget ledger](docs/experiments/submission-research-budget-20261104.json)
 owns charges and remaining holds. Preserve the immutable 2c6d scientific worktree.

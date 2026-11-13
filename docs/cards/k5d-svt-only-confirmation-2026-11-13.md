@@ -1,6 +1,7 @@
 # K5d: conventional-only confirmation feasibility
 
-Status: source design/build authorized; scientific compute UNRELEASED.
+Status: repaired candidate merged CI-green; source preparation100CPU released.
+Scientific native/denial/GPU compute remains UNRELEASED.
 Root decision: the exclusive Ada queue `20261113T030323Z-af6c09da` expired
 without admission. Keep the registered dual-codec benchmark open. Test a
 separately named, narrower confirmation route against SVT-AV1 that can score
@@ -72,3 +73,34 @@ Original decision audits:
 
 
 November13 readiness audit found existing582fb64c adapter alreadybuilt (16frameonly; archived82focused/1880fullPASS,37skipped, Ruff/mypy524PASS) but actualCPU-only qualificationpath missing: oracle requirescpu_onlyTrue, witnesscallerdefaultsFalse. Rootreleased200CPU/zeroGPULOCALrepair fromheld1800; remaining1600CPU600GPU scientificallyUNRELEASED. Newindependentcheckout integrates frozen2c6d hardening withoutadvancingoriginals, explicitqualificationflag andnonmockedconstructor/parser/admission checks, preserving6pointdefaults. Completefutureforecastnotyetproven: native250+denial365+prep100+metadata50+admin200+reserve100 leaves535CPU foractual16oracle; measuredfitrequired,48/full30notcoveredbyreadiness. No paper/PRESLEY/training/runtime.
+
+
+Current root decision: PR387 merged CI-green at exact
+7a9f5b0424740b3055b0047dfd99c68bce22e489. Freeze ONLY a new independent checkout
+of that merge for this separate SVT route; never advance scientific2c6d.
+The retained initial CI failure exposed a fixture with float32 BLAS ties;
+the corrected fixture tests an explicitly limited asymmetric case. Production
+fitter, tolerances and actual reference wire/pixel/metric gates are unchanged.
+Root reviewed the real CPU-only opt-in constructor/parser/admission path and
+all candidate production deltas; defaults stay six-point. Localrepair200 retains
+its full charge (measured79.160825CPU +10controlreserve).
+
+Preparation100CPU is prospectively charged from the existing1600CPU hold;
+remaining1500CPU/600GPU is scientifically held. Prep consists of50localfreeze,
+20localplan/payload/admin,20remotecache,2SSH,4localphysical and4remotephysical.
+Every helper and final source mapping needs root review before execution;
+cache publication alone authorizes no native/denial/model/GPU run. The UNRUN
+package is /private/tmp/pointstream-SVT-source-qualification-plan-20261113.
+Output-path preflight bug was caught and fixed before execution, original
+helper preserved; pure positive/negative path checks pass. Do not relabel
+2c6d proofs for this changed scientific source.
+
+Actual source-preparation phase is accepted: localfreeze85890, cache51474 and
+physicalaudit63381 all COMPLETE0. Newbbc63eda/14dc232a/56a88f5a/env32e,
+source-only bridge9f0c7472;2001Gitblobs/40reviewedpaths/653bridgepatches.
+Sealed NFS cache checks/k5d-SVT-source-cache-c91dcd939eff59e52015977ff8bdad3f
+contains seven hash-verified0444files in0555directory. The
+[provenance index](../experiments/k5d-inputs/svt-7a9f-source-cache-provenance-20261113.json)
+records exact identity and physical evidence. Native250/CPU-onlydenial365/GPU
+remain held; UNRUNnative plan is in the preparation directory. Cached native
+spec deadline10:25:33UTC; never submit expired or silently mutate it.
