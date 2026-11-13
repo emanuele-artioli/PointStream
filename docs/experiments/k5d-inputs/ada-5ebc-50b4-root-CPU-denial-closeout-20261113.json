@@ -1,0 +1,48 @@
+{
+  "GPU_seconds": 0,
+  "actual_filesystem_denial_passed": true,
+  "actual_policy_sha256": "6e65eb436b8e86fbe9391bf701f5fc911024a797c739e6407be16d6199490c27",
+  "approved": true,
+  "codec": "svt-av1-ivf",
+  "config_sha256": "f8263fa236696f0c5525b306fceaf71d96037237b1fb95d3f48dab91fd4ccc86",
+  "consumer_execution_identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "7fd4e0e6ed2655b646d5601ba458fe66532f03040bba9b87c1607cca2e2fbfd0",
+    "source_sha256": "abccdf05666392ae8ad6d2ac8d944a8a30c25ccf5d944d29eccdb3f84d595b2e"
+  },
+  "count_reconciliation": {
+    "path": "/private/tmp/pointstream-pidfd-signal-real-cpu-prep-20261113/process-count-reconciliation.json",
+    "sha256": "37fb43eebf6d3c906ba1075013273f95bab42c4fc24688a1cc73e75b7bbf3886"
+  },
+  "full_approval": {
+    "path": "/private/tmp/pointstream-pidfd-signal-real-cpu-prep-20261113/root-approved-real-CPU-denial.json",
+    "sha256": "75ae95a6984cd880cfadfa92f46589320cb4b165bb44eba5f5b1e33c1b471479"
+  },
+  "host": "gpu6",
+  "outer_audit": {
+    "path": "/private/tmp/pointstream-pidfd-signal-real-cpu-prep-20261113/audit-outer.json",
+    "sha256": "31efdc65792be478f7111d8a82e5895af2b414f9a13734f637cdb0221177e04a"
+  },
+  "process_union_count": 16,
+  "producer_context": {
+    "execution_identity": {
+      "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "snapshot_sha256": "7fd4e0e6ed2655b646d5601ba458fe66532f03040bba9b87c1607cca2e2fbfd0",
+      "source_sha256": "abccdf05666392ae8ad6d2ac8d944a8a30c25ccf5d944d29eccdb3f84d595b2e"
+    },
+    "gpu": {
+      "kind": "cpu"
+    },
+    "job_id": "20261113T022437Z-50b4e24e",
+    "stage": "smoke"
+  },
+  "publication_sha256": "265c79a4af0bd6e70f8e928ac4c4070e850c47befa0b188966ffb3951a6b0cbc",
+  "raw_audit": {
+    "path": "/private/tmp/pointstream-pidfd-signal-real-cpu-prep-20261113/raw-audit.json",
+    "sha256": "853318d57f385a9240ebf7bf9d6be98f6f051164066a8ed5e445d89491a27781"
+  },
+  "retained_CPU_precharge": 365,
+  "schema": 1,
+  "scope_limit": "Actual normal SVT filesystem denial plus initial-launcher interruption with scoped teardown. No active-native/unshare-only/fleet-watchdog or GPU qualification.",
+  "summary_sha256": "109d79f29f87ae380f8b37c37446ab9c1aa115954972e96af7caabaffef2716a"
+}

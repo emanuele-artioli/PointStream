@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "scope": "selected exact5eb source/CPU gate/observer prospective metadata; no full GPU evidence or future release",
+  "files": [
+    {
+      "origin": "/private/tmp/pointstream-pidfd-signal-freeze-20261113/source.tar",
+      "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/5ebc-CPU-gates-20261113/0/source.tar",
+      "bytes": 16752640,
+      "sha256": "7fd4e0e6ed2655b646d5601ba458fe66532f03040bba9b87c1607cca2e2fbfd0"
+    },
+    {
+      "origin": "/private/tmp/pointstream-pidfd-signal-freeze-20261113/candidate-gpu-config.json",
+      "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/5ebc-CPU-gates-20261113/0/candidate-gpu-config.json",
+      "bytes": 6503072,
+      "sha256": "f8263fa236696f0c5525b306fceaf71d96037237b1fb95d3f48dab91fd4ccc86"
+    },
+    {
+      "origin": "/private/tmp/pointstream-pidfd-signal-freeze-20261113/native-proof-summary.json",
+      "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/5ebc-CPU-gates-20261113/0/native-proof-summary.json",
+      "bytes": 6944,
+      "sha256": "e45367eca92804d1312b2b4babad8c850335de4b7339873c36f05324346de75f"
+    },
+    {
+      "origin": "/private/tmp/pointstream-pidfd-signal-freeze-20261113/audit-cache-complete.json",
+      "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/5ebc-CPU-gates-20261113/0/audit-cache-complete.json",
+      "bytes": 78666,
+      "sha256": "d1cab30f1cf53eea6f91459ae4a250c3d815bd91eeb2040fce91ab6592512847"
+    },
+    {
+      "origin": "/private/tmp/pointstream-pidfd-signal-freeze-20261113/ack.json",
+      "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/5ebc-CPU-gates-20261113/0/ack.json",
+      "bytes": 67,
+      "sha256": "a3be8964fd8267c7b142fb6bee2d6b8d2437e303ab39a1fdc608971340584683"
+    },
+    {
+      "origin": "/private/tmp/pointstream-pidfd-signal-real-cpu-prep-20261113/root-approved-real-CPU-denial.json",
+      "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/5ebc-CPU-gates-20261113/1/root-approved-real-CPU-denial.json",
+      "bytes": 6230259,
+      "sha256": "75ae95a6984cd880cfadfa92f46589320cb4b165bb44eba5f5b1e33c1b471479"
+    },
+    {
+      "origin": "/private/tmp/pointstream-pidfd-signal-real-cpu-prep-20261113/root-receiver-metadata.tar.gz",
+      "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/5ebc-CPU-gates-20261113/1/root-receiver-metadata.tar.gz",
+      "bytes": 267327,
+      "sha256": "5ece8a2252a130cfd801a71dfcd112254fd1d981f1c28442a02183880ed7970a"
+    },
+    {
+      "origin": "/private/tmp/pointstream-pidfd-signal-real-cpu-prep-20261113/real-oracle-summary.json",
+      "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/5ebc-CPU-gates-20261113/1/real-oracle-summary.json",
+      "bytes": 8249,
+      "sha256": "109d79f29f87ae380f8b37c37446ab9c1aa115954972e96af7caabaffef2716a"
+    },
+    {
+      "origin": "/private/tmp/pointstream-pidfd-signal-real-cpu-prep-20261113/raw-audit.json",
+      "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/5ebc-CPU-gates-20261113/1/raw-audit.json",
+      "bytes": 77581,
+      "sha256": "853318d57f385a9240ebf7bf9d6be98f6f051164066a8ed5e445d89491a27781"
+    },
+    {
+      "origin": "/private/tmp/pointstream-pidfd-signal-real-cpu-prep-20261113/audit-outer.json",
+      "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/5ebc-CPU-gates-20261113/1/audit-outer.json",
+      "bytes": 112,
+      "sha256": "31efdc65792be478f7111d8a82e5895af2b414f9a13734f637cdb0221177e04a"
+    },
+    {
+      "origin": "/private/tmp/pointstream-pidfd-signal-real-cpu-prep-20261113/process-count-reconciliation.json",
+      "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/5ebc-CPU-gates-20261113/1/process-count-reconciliation.json",
+      "bytes": 2068,
+      "sha256": "37fb43eebf6d3c906ba1075013273f95bab42c4fc24688a1cc73e75b7bbf3886"
+    },
+    {
+      "origin": "/private/tmp/pointstream-pidfd-signal-real-cpu-prep-20261113/root-release.json",
+      "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/5ebc-CPU-gates-20261113/1/root-release.json",
+      "bytes": 1437,
+      "sha256": "9e39c06e74a627679db7092e11878de769f3ec974a43b7d4be7d9f224769b29a"
+    },
+    {
+      "origin": "/private/tmp/pointstream-pidfd-signal-real-cpu-prep-20261113/spec.json",
+      "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/5ebc-CPU-gates-20261113/1/spec.json",
+      "bytes": 6314,
+      "sha256": "183ca17e262c8078eec44d2c897c3244b2d7d2ec22ddb8ace72ca26c4df0e54a"
+    },
+    {
+      "origin": "/private/tmp/pointstream-pidfd-signal-real-cpu-prep-20261113/root-final-status.json",
+      "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/5ebc-CPU-gates-20261113/1/root-final-status.json",
+      "bytes": 3213,
+      "sha256": "ee6d0ff8643df86a325160aa6aaa5ef0181871e635bdc94bed8f4c644a385672"
+    },
+    {
+      "origin": "/private/tmp/pointstream-pidfd-signal-real-cpu-prep-20261113/root-ack.json",
+      "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/5ebc-CPU-gates-20261113/1/root-ack.json",
+      "bytes": 67,
+      "sha256": "6298c44fbb91f7d043500da7f1882e539ea26fd39ccf30040f8e0e9e3fef3f00"
+    },
+    {
+      "origin": "/private/tmp/pointstream-real-claim-observer-prep-20261113/prepare_dual.py",
+      "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/5ebc-CPU-gates-20261113/2/prepare_dual.py",
+      "bytes": 4791,
+      "sha256": "9e837f7a6dc85715bc841e07d21e26fa919881a66c96b88b50731e8b953349e9"
+    },
+    {
+      "origin": "/private/tmp/pointstream-real-claim-observer-prep-20261113/launch_one.py",
+      "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/5ebc-CPU-gates-20261113/2/launch_one.py",
+      "bytes": 8185,
+      "sha256": "3edabc0bc7061f791ece8d1d7b34c47f173f2cc26620f33f86c2bcfd88981883"
+    },
+    {
+      "origin": "/private/tmp/pointstream-real-claim-observer-prep-20261113/PLAN.md",
+      "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/5ebc-CPU-gates-20261113/2/PLAN.md",
+      "bytes": 12099,
+      "sha256": "fc7f092620d4b1c4af9506500ecb602e62f77afc8fd0f56bf2ca16aa104bb681"
+    },
+    {
+      "origin": "/private/tmp/pointstream-real-claim-observer-prep-20261113/DECISION.json",
+      "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/5ebc-CPU-gates-20261113/2/DECISION.json",
+      "bytes": 1024,
+      "sha256": "86aadaea4db45c031739162ebfa30f13929ab019a832d267d002ee2b7d4eeeae"
+    },
+    {
+      "origin": "/private/tmp/pointstream-real-claim-observer-prep-20261113/review-independent.md",
+      "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/5ebc-CPU-gates-20261113/2/review-independent.md",
+      "bytes": 5021,
+      "sha256": "33d14f799e8603f47963e76d8ec48b6b84343b4c5fde4816ac48339afac4f61d"
+    },
+    {
+      "origin": "/private/tmp/pointstream-real-claim-observer-prep-20261113/witness-construction-contract.json",
+      "cache": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/5ebc-CPU-gates-20261113/2/witness-construction-contract.json",
+      "bytes": 4038,
+      "sha256": "40011ef8e4618c59ff610dc9d0b61b4983b4b4a6d1e64d0092b76e34c4986102"
+    }
+  ],
+  "read_only_manifest": {
+    "path": "/Users/manu/.codex/worktrees/3cb5/PointStream/.cache/pointstream-evidence/5ebc-CPU-gates-20261113/manifest.json",
+    "sha256": "214ba2f7542e56c15df49a04d9fbcaf334906101fa580a88e0e76939d5440783"
+  }
+}
