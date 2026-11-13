@@ -36,7 +36,10 @@ POLL_SECONDS = 60
 # worker unpacks it under its host-local root. Workers advertise the capability
 # in their heartbeat so a client never uses it against an older worker.
 SOURCE_ARCHIVE = "source.tar"
-WORKER_CAPABILITIES = ("source_archive", "indexed_cpu_affinity_v1")
+GPU_UUID_CAPABILITY = "gpu_uuid_v1"
+GPU_UUID_SENTINEL = "ps-fleet-gpu-uuid-v1-6ccde7f4"
+GPU_UUID_SENTINEL_BYTES = b"#!/bin/sh\nexit 0\n"
+WORKER_CAPABILITIES = ("source_archive", "indexed_cpu_affinity_v1", GPU_UUID_CAPABILITY)
 SOURCE_EXTRACT_SECONDS = 300
 INDEXED_CONTROL_FILES = ("experiments/__init__.py", "experiments/jobs/__init__.py",
                          "experiments/jobs/inbox.py", "experiments/jobs/monitor.py",
@@ -182,6 +185,16 @@ def validate_spec(spec: Any, *, now: float | None = None) -> dict[str, Any]:
     number(spec.get("validator_seconds", 60), "validator_seconds")
     if not isinstance(spec["required_commands"], list) or any(not isinstance(v, str) or not v for v in spec["required_commands"]):
         raise fleet.FleetError("required_commands must be an array of executables")
+    if "gpu_uuid" in spec:
+        target = spec["gpu_uuid"]
+        try:
+            valid = isinstance(target, str) and target.startswith("GPU-") and str(uuid.UUID(target[4:])) == target[4:]
+        except ValueError:
+            valid = False
+        if not valid or device != "gpu":
+            raise fleet.FleetError("gpu_uuid requires a canonical full GPU UUID on a GPU job")
+        if GPU_UUID_SENTINEL not in spec["required_commands"]:
+            raise fleet.FleetError("gpu_uuid requires the bare routing sentinel in required_commands")
     try:
         date = datetime.fromisoformat(spec["deadline"].replace("Z", "+00:00"))
         if date.tzinfo is None:
@@ -474,14 +487,33 @@ def local_probe(alias: str) -> dict[str, Any]:
     return value
 
 
+def uuid_routing_command() -> str:
+    """Check the release-local marker without changing any process's PATH."""
+    directory = Path(__file__).resolve().parent / "uuid-routing-bin"
+    sentinel = directory / GPU_UUID_SENTINEL
+    try:
+        if (directory.is_symlink() or sentinel.is_symlink() or not sentinel.is_file()
+                or {path.name for path in directory.iterdir()} != {GPU_UUID_SENTINEL}
+                or sentinel.stat().st_uid != os.getuid()
+                or sentinel.read_bytes() != GPU_UUID_SENTINEL_BYTES
+                or shutil.which(GPU_UUID_SENTINEL, path=str(directory)) != str(sentinel)):
+            raise fleet.FleetError("UUID routing sentinel identity or executable path differs")
+    except OSError as exc:
+        raise fleet.FleetError("UUID routing sentinel unavailable: " + str(exc)) from exc
+    return str(sentinel)
+
+
 def eligible(spec: dict[str, Any], host: dict[str, Any]) -> dict[str, Any] | None:
     """The GPU this job claims on this host; None for an admitted cpu job."""
     if host["alias"] not in spec["hosts"]:
         raise fleet.FleetError("host is not compatible")
-    host = {**host, "gpus": [g for g in host.get("gpus", []) if not spec["gpu_models"] or any(m in g["name"] for m in spec["gpu_models"])]}
+    host = {**host, "gpus": [g for g in host.get("gpus", [])
+                              if (not spec["gpu_models"] or any(m in g["name"] for m in spec["gpu_models"]))
+                              and ("gpu_uuid" not in spec or g["uuid"] == spec["gpu_uuid"])]}
     for command in spec["required_commands"]:
         import shutil
-        if not shutil.which(command):
+        found = uuid_routing_command() if "gpu_uuid" in spec and command == GPU_UUID_SENTINEL else shutil.which(command)
+        if not found:
             raise fleet.FleetError("required executable unavailable: " + command)
     storage = staging.admission_error(spec)
     if storage:
@@ -1353,6 +1385,8 @@ def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
             raise fleet.FleetError(f"worker {alias} has no fresh heartbeat; run doctor and inspect before submission")
         if alias in spec["hosts"] and "cpu_affinity_index" in spec and "indexed_cpu_affinity_v1" not in (heartbeat.get("capabilities") or []):
             raise fleet.FleetError(f"worker {alias} does not advertise indexed CPU affinity; activate the reviewed fleet release first")
+        if alias in spec["hosts"] and "gpu_uuid" in spec and GPU_UUID_CAPABILITY not in (heartbeat.get("capabilities") or []):
+            raise fleet.FleetError(f"worker {alias} does not advertise GPU UUID routing; activate the reviewed fleet release first")
     # Keep the archive on NFS and unpack host-locally only when every eligible worker can.
     archive_mode = all("source_archive" in (health["workers"][alias].get("capabilities") or []) for alias in spec["hosts"])
     job_id =datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ-") + uuid.uuid4().hex[:8]

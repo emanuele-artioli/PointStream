@@ -23,25 +23,43 @@ new dependency.
 
 ## Where PointStream stands (2026-11-13, UTC)
 
-### Current research decision (November 13, UTC)
+### Current research decision (November 13, 13:13 UTC)
 
-Frozen 2c6d source/cache and actual native CPU proof are accepted. Actual
-SVT receiver-denial job `20261113T090138Z-e039d7c0` completed and passed its
-validator and root evidence review; terminal acknowledgment is complete and proof 7adf5e5d is published. The external queue controller
-passed its bounded Linux qualification; earlier failed attempts remain retained.
-No new-source GPU witness, paired calibration or full 30-clip run is released. The witness is held pending a separately reviewed scheduler route
-that guarantees one physical GPU across the two calibration jobs. The existing
-queue filters model names only. Minimal UUID/sentinel implementation is released
-for 220 local CPU-seconds; Linux activation remains separately held. Independent
-SVT-only draft PR387 is repairing one CI fixture sensitivity; no scientific
-release follows from its code checks.
+The new shared-Ada SVT16 job `20261113T130719Z-9f94f30c` is canonical
+COMPLETE/gate PASS/exit0 on gpu6 Ada1 ef96. All three original SVT settings,
+both arms, full/ROI metrics, judges, CPU isolation and observed-memory gates
+passed. **Independent physical-artifact and current-cleanup acceptance is
+pending; no scale, speed or complete dual-codec claim follows.** A status/event
+snapshot race in wait79917 was resolved by one funded fresh status33861,
+without replaying the experiment. The unrelated gpu5 job is preserved.
 
-Five-minute resource checks cover A6000 and RTX 6000 Ada through one bounded
-window ending 10:22 UTC (a14). Latest inspected completed check, 09:37:30 UTC, found
-no eligible idle GPU. No automatic submission or verified model callback.
-The [canonical continuation](docs/continuation-2026-11-13.md) owns live job IDs,
-proofs and handles; the [budget ledger](docs/experiments/submission-research-budget-20261104.json)
-owns charges and remaining holds. Preserve the immutable 2c6d scientific worktree.
+- **Ball/SVT subitem: qualify CUDA context memory accounting**
+  ([card](docs/cards/k5d-svt-memory-context-repair-2026-11-13.md)). Frozen a71dc6e2
+  (source bb717/archive e051/config5fc) retains strict memory/PID guards.
+  Its fresh native job797deaed and receiver6af48d82 are independently accepted,
+  physically published and ACKed as native7e6fd454/receiver6e882f1f.
+  The full 2000 CPU/600 GPU envelope comprises qualification1012, local
+  metadata30, preflight16, remaining real16 lifecycle822, and reserve120.
+  All but reserve120 is conservatively charged. The two failed local metadata
+  attempts and original failed shared jobc6b01236 retain their charges.
+- After actual acceptance, consider one opt-in study port covering16/48/full
+  registered clips together, retaining the global six-point defaults. A real48
+  cost oracle and separate fixed292/586-frame confirmations precede any full30
+  admission. The missing neural comparison remains open; no shared-neural
+  execution is admitted without an aggregate memory/cost bound.
+
+The primary exclusive 2c6d route remains separate:1160 CPU/900 GPU held,
+metadata50 precharged UNRUN. Native/receiver evidence from older identities
+is preserved without relabeling. Programme charges are25041 GPU/69151 CPU
+seconds within the unchanged24GPUh/28CPUh ceiling; the ledger is authoritative.
+
+Passive resource watch a18 backend7796/PID44010 checks A6000 and Ada hosts
+every300s/maxnine checks, bounded to13:22:34UTC. Its latest inspected tick6
+at13:08:06UTC found no idle candidate. No autosubmit, recurring model timer or
+verified completion-to-model resumption. Ada supports the same study using its
+own qualified reference; shared timings are contaminated. Manuscript and
+PRESLEY work remain paused. See the [continuation](docs/continuation-2026-11-13.md)
+and [ledger](docs/experiments/submission-research-budget-20261104.json).
 
 ### Historical af6 phase — balances, waits and watch superseded above
 

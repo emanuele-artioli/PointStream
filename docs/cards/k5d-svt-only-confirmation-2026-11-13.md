@@ -1,6 +1,17 @@
 # K5d: conventional-only confirmation feasibility
 
-Status: source design/build authorized; scientific compute UNRELEASED.
+Status (November 13, 11:58 UTC): shared real16 job `20261113T114623Z-c6b01236`
+failed before models on assigned Ada1 ef96: source admission passed, but the
+strict actual memory row was missing. Zero quality points are accepted.
+Old 848 CPU/600 GPU remains charged; no automatic retry under this card.
+Cleanup 29077 completed with two captured PIDs/one group clear and owned shared
+GPU/FQDN CPU tokens absent; root closeout/sole terminal ACK complete. Accepted native 6bf and
+receiver c8 retain their original source identity. The separate
+[PLAN memory-context repair](k5d-svt-memory-context-repair-2026-11-13.md) holds
+new 600 GPU/2000 CPU UNRELEASED and requires fresh CPU proofs after CI/freeze.
+Primary exclusive 2c6d remains separate; no speed/span/scale or manuscript claim.
+See the [current continuation](../continuation-2026-11-13.md) for live state.
+
 Root decision: the exclusive Ada queue `20261113T030323Z-af6c09da` expired
 without admission. Keep the registered dual-codec benchmark open. Test a
 separately named, narrower confirmation route against SVT-AV1 that can score
@@ -72,3 +83,67 @@ Original decision audits:
 
 
 November13 readiness audit found existing582fb64c adapter alreadybuilt (16frameonly; archived82focused/1880fullPASS,37skipped, Ruff/mypy524PASS) but actualCPU-only qualificationpath missing: oracle requirescpu_onlyTrue, witnesscallerdefaultsFalse. Rootreleased200CPU/zeroGPULOCALrepair fromheld1800; remaining1600CPU600GPU scientificallyUNRELEASED. Newindependentcheckout integrates frozen2c6d hardening withoutadvancingoriginals, explicitqualificationflag andnonmockedconstructor/parser/admission checks, preserving6pointdefaults. Completefutureforecastnotyetproven: native250+denial365+prep100+metadata50+admin200+reserve100 leaves535CPU foractual16oracle; measuredfitrequired,48/full30notcoveredbyreadiness. No paper/PRESLEY/training/runtime.
+
+
+Current root decision: PR387 merged CI-green at exact
+7a9f5b0424740b3055b0047dfd99c68bce22e489. Freeze ONLY a new independent checkout
+of that merge for this separate SVT route; never advance scientific2c6d.
+The retained initial CI failure exposed a fixture with float32 BLAS ties;
+the corrected fixture tests an explicitly limited asymmetric case. Production
+fitter, tolerances and actual reference wire/pixel/metric gates are unchanged.
+Root reviewed the real CPU-only opt-in constructor/parser/admission path and
+all candidate production deltas; defaults stay six-point. Localrepair200 retains
+its full charge (measured79.160825CPU +10controlreserve).
+
+Preparation100CPU is prospectively charged from the existing1600CPU hold;
+remaining1500CPU/600GPU is scientifically held. Prep consists of50localfreeze,
+20localplan/payload/admin,20remotecache,2SSH,4localphysical and4remotephysical.
+Every helper and final source mapping needs root review before execution;
+cache publication alone authorizes no native/denial/model/GPU run. The UNRUN
+package is /private/tmp/pointstream-SVT-source-qualification-plan-20261113.
+Output-path preflight bug was caught and fixed before execution, original
+helper preserved; pure positive/negative path checks pass. Do not relabel
+2c6d proofs for this changed scientific source.
+
+Actual source-preparation phase is accepted: localfreeze85890, cache51474 and
+physicalaudit63381 all COMPLETE0. Newbbc63eda/14dc232a/56a88f5a/env32e,
+source-only bridge9f0c7472;2001Gitblobs/40reviewedpaths/653bridgepatches.
+Sealed NFS cache checks/k5d-SVT-source-cache-c91dcd939eff59e52015977ff8bdad3f
+contains seven hash-verified0444files in0555directory. The
+[provenance index](../experiments/k5d-inputs/svt-7a9f-source-cache-provenance-20261113.json)
+records exact identity and physical evidence. Native250/CPU-onlydenial365/GPU
+remain held; UNRUNnative plan is in the preparation directory. Cached native
+spec deadline10:25:33UTC; never submit expired or silently mutate it.
+
+Root prospective CPU-only amendment: native ceiling250→288, adding38CPU from
+unallocated Ball/programme headroom under unchanged24/28 totals. GPU ceiling
+stays600. Canonical submission repeats full stock eligible-host doctor, making
+publication68CPU with the already Linux-qualified V4 shims (62individual caps
+plus6externalstartupreserve). Keep original shims and substantive checks; do
+not force new1CPU variants or squeeze later audit allowances. Complete288 is
+preflight30+native100+publication68+wait15+audit/proof60+failure15. Preflight30
+COMPLETE/PASS,1701records/noactiveunknown, gpu6doctor/headroom93 and physical
+source/control/cache PASS. Remaining258native is held until exact root launch
+review; old250plans stay historical. No native/GPU publication yet.
+
+
+## Historical phase443 prepublication plan — superseded by current status
+
+Native288 and prep100 remain charged. The first20CPU conditional preflight
+failed at global status with a truncated response, before worker-context fetch
+or publication; retain it. Root adds a separate30CPU read-only replacement
+with an exact status-only6CPU/120s bootstrap. This does not modify the published
+control or the publication's qualified shims. The full phase is443CPU/GPU0:
+20failed +30replacement +393future (265campaign/68publication/10wait/40audit/10reserve).
+All allocations stay inside the unchanged Ball/programme ceilings. Current hold
+is1278CPU/600GPU:393futuredenial/50metadata/200admin/100reserve/535first16.
+
+Replacement preflight backend26454 is running at
+`/private/tmp/pointstream-SVT-denial443-replacement-preflight30-v2-UNRUN-20261113`.
+No job has been published. Conditional stateef3cb1f1 authorizes only the exact
+CPU-only spec776abe28/canonical2a7a16cd, deadline11:39:37UTC. No GPU/general
+readiness pass; original kernel gates and local launch mistakes remain recorded.
+Complete operational window865s must fit before release. Publication still runs
+mandatory fresh stock doctor on sole eligible hostgpu6. Stop on context/source
+mismatch, insufficient forecast, unknown submission, failed scientific gates or
+no admission within120s; inspect actual ID before any owned cancellation.

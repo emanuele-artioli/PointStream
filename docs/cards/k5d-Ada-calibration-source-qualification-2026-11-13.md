@@ -7,17 +7,18 @@ controller Linux qualification is accepted, with both earlier failures retained.
 No new-source GPU witness or later calibration/scale run is released.
 
 The [canonical continuation](../continuation-2026-11-13.md) owns live handles and
-stage state; the ledger owns balances. Current qualification hold is 900 GPU /
-1,080 CPU (administration 180, witness 900 CPU). Metadata 50 CPU is separately
-released; exact bootstrap/launcher review remains required before execution. The administration
-300 ceiling includes 120 already charged, future chain 148 and other reserve 32.
-Frozen source 2c6d never advances; no old-source proof is relabelled.
+stage state; the ledger owns balances. Current qualification hold is900GPU/
+1060CPU (administration160 and witness900CPU). Administration300 comprises
+120Linuxqualification charges plus20V5local review,148futurechain and12other.
+Metadata50CPU is precharged UNRUN; the original8f29/b290 package expired without
+submission. Preserve it and regenerate a new reviewed prospective package after
+control activation. Frozen2c6d never advances; old proofs keep original tuples.
 
-GPU witness is now held pending a separately reviewed control-only GPU-UUID
-routing design: the existing model-name filter cannot ensure one physical GPU
-across the two calibration jobs. Metadata 50 is precharged but unrun; control-only implementation220CPU is separately released in the routing card;
-no worker/control deployment is authorized by this card. Read the current scheduling
-decision in the continuation before acting on the prospective packages.
+Routing guard PR389 merged CI-green at56c5f2ec. The separately held60CPU
+activation stage remains UNRELEASED while its exact package/limits are reviewed.
+Scientific GPU witness and paired calibration remain held. V5 selector/controller
+passed60local tests and root code review; no actual new-control/observer/GPU
+proof follows. Read the canonical continuation before any runtime action.
 
 ## Original staged scope and retained chronology
 

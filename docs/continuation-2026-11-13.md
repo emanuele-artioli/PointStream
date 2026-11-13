@@ -5,38 +5,253 @@ The [budget ledger](experiments/submission-research-budget-20261104.json) is the
 accounting authority; [Ball journal](experiments/k5d-ball-benchmark.md) retains
 chronology and raw-result references. Times below are UTC.
 
-## Current scheduling decision (November 13, UTC)
+## Current scheduling decision — CPU qualification complete, ONE GPU publication released
+Final preflight72755/97613 completed: no nonterminal gpu6 jobs; one unrelated
+gpu5 job4230a04b is preserved. Same worker1470412/birth562919381 and all
+controls/cache/native pins match. Root released ONE GPU publication with
+release4bddb725; full remaining822 CPU/600 GPU is charged, cardreserve120 CPU
+remains. Final package is
+`/private/tmp/pointstream-SVT-a71-first16-stock-FINAL-FALSE-20261113-ROOT-singlethread-correct-limit`;
+canonical09483746, deadline13:29:21.937243UTC. Publication80856 completed0 as job`20261113T130719Z-9f94f30c` (canonical pending);
+inspect its create-only `actual-ONEsubmit-ROOT-20261113-a71` records before any
+status/wait, never resubmit. Known completion CLI exit10 needs saved terminal
+verification; bind sole ACK to exact saved events, and independently check
+physical packet/native/YUV/RGB artifacts before scientific acceptance.
 
-**Hold the new GPU witness and paired calibration.** The later calibration
-requires one physical GPU UUID across two jobs; existing fleet eligibility
-filters model names only. An idle snapshot, post-assignment observer or retry
-cannot guarantee that condition. A control-only UUID/capability design and independent proof-relevance audit
-are complete. Root released 220 local CPU-seconds for its minimal implementation
-and holds 60 CPU-seconds for separately reviewed Linux activation. No deployment
-or GPU release is authorized. See the [routing card](cards/k5d-control-only-uuid-routing-2026-11-13.md). Keep scientific source 2c6d immutable. Old CPU proofs
-retain their original scoped claims; any new-control applicability must be
-reviewed explicitly.
 
-Witness metadata 50 CPU is precharged, but its concrete launcher has NOT run.
-Preserve false and approved prospective bundles. Their scientific spec
-8f29/b290 deadline is 09:41:14 UTC; never submit an expired or unreviewed revision.
-An unrun deadline may be rebound only through a new root-reviewed prospective
-package; no unknown job or finished result is replayed. The paired planning
-package is `/private/tmp/pointstream-calibration-source-qualification-20261113/paired-calibration-plan-UNRUN`.
-Its illustrative 4,000 GPU / 4,400 CPU pair allowance is NOT allocated.
+**The first shared-SVT16 pilot failed before models; fresh a71 CPU qualification and final read-only preflight are accepted, GPU runtime unqualified.**
+Actual job `20261113T114623Z-c6b01236` was assigned gpu6 Ada1 UUID
+`GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553`, then failed the strict
+`before_models` memory-row check. Diagnostic 79617 confirmed source admission,
+with zero accepted quality points. All848 CPU/600 GPU from that phase remain
+charged; the original card authorizes no retry. Cleanup 29077 completed with
+two captured PIDs absent, one empty group, owned shared-GPU and FQDN CPU tokens
+absent, and the same worker context unchanged except CPU accounting. Root
+closeout582bb644 is accepted; sole terminal event7c0c1189bc545d2082bd6846b4331f40
+is acknowledged (backend63255).
 
-Independent SVT-only LOCAL qualification repair is a draft candidate in
-`/private/tmp/pointstream-k5d-svt-cpu-qualification-repair-20261113`, based on
-582fb64c with 2c6d integrated. The 200 CPU ceiling includes the retained cold
-mypy timeout and a prospectively approved 20 CPU internal stage reallocation;
-no additional overall allocation or scientific compute follows. Draft PR387
-passed 349 local K5d tests/Ruff/mypy; full CI found one 582-origin fixture
-sensitive to BLAS rounding in three-versus-six decode fitting. The builder is
-repairing that test without changing fitting or the exact real-reference gate.
-Root review and
-actual source/CPU/memory/cost gates remain required before its 16-frame oracle.
+New [PLAN repair subitem](cards/k5d-svt-memory-context-repair-2026-11-13.md):
+minimal scientific candidate a71dc6e27743efaa4fb5bbe2e8c8b387ae51ba02 on
+`codex/svt-cuda-context-scientific-7a9f-20261113`, worktree
+`/private/tmp/pointstream-svt-cuda-context-scientific-7a9f-20261113`. Its parent is
+exact7a9f; its two-file patch matches PR393/head93ebb351 byte-for-byte
+(da80bed4543021b45eb063fd9765ae4f85674ea5558f8a8692a917ef0fc42eb9).
+PR393 passed full CI and merged at c4ab531a; this candidate stays immutable. A tiny CUDA
+allocation follows the allocator cap, then synchronization/release precedes
+peak reset. Strict actual-row/PID/foreign-process guards stay unchanged.
+Lazy context initialization is a hypothesis; lineage/query visibility remain
+competing explanations. No missing row may be fabricated or treated as zero.
 
-## Current source/native-proof phase (November 13, UTC)
+Source a71 is now frozen as source bb717 / archive e051 / config 5fc.
+Root approved source bridge 1f371bd75240924632204be5bb94b8717b403131d7b3c82fdc70f9714a7fc622
+by all 2001 tree hashes, the two-file delta and unchanged 31 grants. Cache
+physical approval is accepted: metadata-only publication71660 and read-only
+audit80318 completed0 within sourceprep 100. Exact seven-file hashes/modes and
+identity-only policy change passed; tracked thin index is
+`docs/experiments/k5d-inputs/svt-a71-source-cache-acceptance-20261113.json`.
+PR395 merged CI-green 12:28:36 UTC. PR393 merged 12:01:22 UTC;
+documentation PR394 merged 12:09:48 UTC. This is source-scope approval only.
+
+Fresh native job `20261113T122511Z-797deaed` is canonical COMPLETE/gatePASS/
+exit0/GPU-null. Preflight 99709 accepted the same worker 1470412/birth562919381
+and seven controls. Artifact audit 36475 plus the frozen local validator passed
+all four modes; 19 captured births/21 PIDs absent, four groups empty. Normal CPU
+was 1.355179 inner versus 1.444979 outer. Root accepted proof 7e6fd454 for native
+CPU containment/accounting only. Upload 14761 is COMPLETE0 and physically accepted
+at c2e5dbbe/native-CPU.json,6844B/0444file/0555dir. Sole terminal ACK49167
+completed0, only eventd913a547fd305859b8c3889d1cf4a021; native327 is closed.
+[Native acceptance index](experiments/k5d-inputs/svt-a71-797deaed-native-CPU-acceptance-20261113.json).
+Fresh receiver job `20261113T124019Z-6af48d82` is COMPLETE/gatePASS/exit0/GPU-null.
+Actual audit72331 and frozen CPU-only receipt validation passed all five private
+errno13 denials, native/wire/YUV/RGB equality,31 source grants, launcher SIGKILL,
+18 absent PIDs/16 births/four empty groups and the actual FQDN CPU claim.
+Root proof6e882f1f is physically published at9bb59708/real-CPU-denial.json,
+7,313,185 bytes/0444/0555; upload89367 and soleACK66939 completed0, only event
+f43aa010ce4754cfa975e29e27dc3598. [Receiver index](experiments/k5d-inputs/svt-a71-6af48d82-CPU-denial-acceptance-20261113.json).
+No GPU/kernel/general-readiness/quality credit follows.
+
+The complete repair envelope remains2000 CPU/600 GPU. Qualification1012
+(sourceprep100 +native327 +receiver585) is fully charged/accepted.
+Two local metadata10 allocations failed before output/remote work: the initial
+helper3CPU cap, then a runner inherited hard2 that prevented helperhard3.
+Both charges/logs remain. Corrected root launcher soft2/hard40/defaultSIGXCPU,
+childpreexec3 and numerical-library threads1 passed using a third10CPU from
+reserve130→120: .780028helper/validators+.048366driverCPU, .953wall.
+Exact source admission and both normalized validator returns passed. Final
+FALSE package (GPU release still false):
+`/private/tmp/pointstream-SVT-a71-first16-stock-FINAL-FALSE-20261113-ROOT-singlethread-correct-limit`.
+Raw ecae6bea4f539e68160d86fa50d70e0f00721accf7e5c4b8dc57ec641c25c838;
+canonical09483746720ed7a18657540f4b1a217c7375ef86d9892cb35ef60dc39b0970ca;
+contractd8ee62af6850d0853a81a5f7805e9f2ff9f990beafbf6bffa41923ece9a55537;
+deadline13:29:21.937243UTC. Same four runtime helpers remain byte-identical to
+the reviewed old stock workflow. Qualification1012+metadata30 is charged;
+remaining hold958 CPU/600 GPU is pilot822+reserve120, UNRELEASED.
+All31 receiver grants remain unchanged; fresh producer/config/source joins are
+now proved. Preserve old6bf/c8/7a9f evidence; no relabeling. The next GPU stage
+is one separately frozen real16 after full root forecast/release. Strict memory,
+PID, decoder, native, judge and reference gates remain unchanged; no training,
+speed/span, extrapolation or scale claim follows.
+
+Only after an actual real16 pass, consider one opt-in SVT study port covering
+48 and the registered full clips together, then a real 48 three-point/full-metric
+cost oracle. Confirm the two fixed full-context clips, game9/Clip5 (292 frames)
+and game10/Clip12 (586 frames), without quality-based clip selection. All 30 clips
+remain conditional on complete caller/stage caps and both programme/Ball budgets;
+parts stay within 45 minutes and negative outcomes are retained. No adapter,
+48-frame or full-clip stage is released now; global six-point defaults stay fixed.
+
+The primary exclusive 2c6d/source 6f route stays separate:1160 CPU/900 GPU held,
+metadata 50 CPU precharged UNRUN and false plan 463f50d0 preserved. No general
+GPU/readiness promotion or retroactive kernel pass follows from either route.
+Qualification1012 and three localmetadata10 allocations are charged;958 CPU/600 GPU remains held.
+The ledger owns live programme/Ball charges and subsequent changes.
+
+Passive a18 backend7796/PID44010 started12:37:34.379338UTC, hard deadline
+13:22:34.379229UTC,300s/max9 ticks,100CPU/GPU0 precharged outside the repair card.
+Exact watcher2b931/specf517, root release6cfeddc0; receipt:
+`/private/tmp/pointstream-resource-watch-20261113-passive-a18/run/receipt.json`.
+A17 finished12:34:44UTC/nine checks/no idle; PID37616 absent independently
+verified before a18. A18's latest inspected tick1 at12:42:54UTC had no idle
+candidate. No autosubmit, recurring model timer or verified completion-to-model
+resumption. Manuscript/PRESLEY remain paused.
+
+## Completed CPU-readiness snapshot — historical, superseded at11:58 UTC
+
+Actual SVT-only CPU receiver job `20261113T111519Z-b40b90d4` is root accepted,
+physically published (proof `c8c3949b`, 7,313,201 bytes, immutable0444/0555)
+and terminal-ACKed (`06e252891c1f5883a1e83541746526ed`). Independent checks
+joined exact source/config/environment, native wire/YUV/RGB, five private-file
+denials, initial-launcher SIGKILL, eighteen absent processes/sixteen captured
+births/four empty groups and the actual empty FQDN CPU claim. The same56c
+worker/control passed the before/after CPU-admission joins. This establishes
+CPU operational readiness; it does not establish GPU routing or general readiness.
+Failed kernel gates and the original publication guard UNKNOWN remain retained;
+actual normalized spec5d425 is accepted solely under deadline_epoch erratum0bf13.
+No resubmission or scientific-source change occurred.
+
+No GPU stage is released. The primary exclusive-Ada16 witness can retain V5;
+a new purpose-specific GPU authorization/state is being prepared, preserving
+2c6d/source6f and its native9095/receiver7adf proofs. The first real witness must
+itself join the physical UUID through request, claim, dispatch and CUDA/producer.
+For shared SVT16, root prospectively selected correctness/feasibility only with
+full600GPU/535CPU conservative charging, CURRENT cleanup, exact own-Ada parity,
+and no independent live-span, speed, extrapolation or scale claim. This avoids
+building a copied shared observer system. Its complete stock-fleet lifecycle
+forecast and external package still require root review; completion is unproven.
+
+The receiver phase retains480CPU/0GPU (443 original +20 launcher repair +17
+proof closeout). SVT remaining hold848CPU/600GPU is meta50/admin200/reserve63/
+science535. Programme charges23841GPU/65923CPU; Ball17479GPU/41922CPU.
+All spent-plus-held ceilings pass. Source7a9f/native6bf and source2c6d stay immutable.
+
+Passive a16 backend60680/PID27368 checks A6000 and Ada every300s, maxnine ticks,
+with hard deadline11:53:06.240058UTC. Latest inspected tick4 at11:28:26UTC found
+no idle candidate. No automatic submission or verified completion resumption;
+no recurring LLM timer. Manuscript and PRESLEY work remain paused.
+
+[Accepted CPU evidence](experiments/k5d-inputs/svt-7a9f-b40b90d4-CPU-denial-acceptance-20261113.json).
+
+## Previous scheduling snapshot — historical, superseded at11:25 UTC
+
+**GPU work remains held while actual worker readiness is established.** The
+physical-UUID guard passed 206 focused tests, Ruff/mypy and full CI; PR389 merged
+at `56c5f2ec219c14831cdbc5e54a3353a6a202b53b`. Root released one gpu6-only activation after accepting the completed native
+job and its independent current-cleanup audit.
+Owned gpu6 dispatcher was replaced once by the reviewed56c control; actual
+new PID1470412/birth562919381 is recorded. Backend46477 ended CONDITIONAL/exit10: token/capability/selector tests pass,
+but the readiness detector expected nanosleep and actual wchan is `do_select`.
+Observed startup CPU is0.43 and worker error hash is unchanged. No new client
+state or GPU release. The10CPU probe failed a too-narrow syscall23 pilot check; the final8CPU
+pilot confirmed pselect6(270) but peer syscall inspection was denied. Both
+failed gates remain failed; no more kernel probes or worker restart. Root
+prospectively selects the planned SVT-only CPU receiver-denial413 as a useful,
+conditional operational-readiness witness. No GPU/general readiness promotion.
+NEW scoped state: `/private/tmp/pointstream-SVT-denial413-CONDITIONAL-client-20261113/client-state`,
+config SHAef3cb1f1; exact CPU spec/helper release still requires root review. Old control
+20261105/5db/ecb7 remains preserved. Native/CPU source2c6d stays
+immutable; source/config/runtime/receiver and downstream launch functions do
+not change with the reviewed routing-only code. Old proofs retain old-control
+provenance. Local220CPU and real Linux activation60CPU are charged.
+Activation output: `/private/tmp/pointstream-uuid-control-activation-readygate-UNRUN-20261113/execution-uuid-control-56c5f2ec-20261113-a1279b5c8048`.
+Inspect this existing worker after interruption; never replay activation.
+The preserved ready-gate package used local helper `e6dd3a07`, contract
+`8cd3b1b6`. It refuses client-state/complete output unless the first worker
+tick is ready. Remote helper and payload are unchanged. Initial automatic
+approval review timed out before process creation; one permitted approval
+retry started the actual command. This was not a remote activation replay.
+
+External V5 controller is code-reviewed:60 tests pass, observerddd unchanged.
+It binds the canonical scientific spec and expected UUID to the actual admitted
+request before assignment. Its20CPU comes from queueadminother32: admin300 now
+140past,148futurechain,12other (160remaining). See
+[routing card](cards/k5d-control-only-uuid-routing-2026-11-13.md) and
+[local review](experiments/k5d-inputs/queue-v5-UUID-local-review-20261113.json).
+V4 and its failed attempts remain preserved. No V5 runtime proof is claimed.
+
+Witness metadata50CPU is precharged UNRUN. Its old scientific8f29/b290 spec
+expired09:41:14UTC without submission. Preserve all old packages. After control
+activation, regenerate fresh exact control/token/client/spec/deadline/metadata
+pins in a NEW root-reviewed package; no unknown job is replayed. Remaining
+qualification hold is900GPU/1060CPU: witness900CPU plus administration160CPU.
+The paired planning package remains UNRUN and its illustrative4000GPU/4400CPU
+is not allocated. Prepare/score16/48 must use one physical UUID and exact
+2c6d/source6f/archive5ca/confige478/env32e; original cost formula remains.
+
+Independent SVT-only repair PR387 passed full CI and merged at exact
+`7a9f5b0424740b3055b0047dfd99c68bce22e489`. Root froze a separate clean worktree
+`/private/tmp/pointstream-SVT-qualified-source-7a9f-20261113`; never move2c6d.
+Actual sourcebbc63eda/archive14dc232a/config56a88f5a/env32e and source-only
+bridge9f0c7472 are accepted after2001Git joins,40pathmapping review and653bridge
+patch checks. Native/private permission sets are unchanged;31source grants
+have exactly four reviewed hash/size updates. The source cache is physically
+verified7files0444/dir0555 at
+`/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-SVT-source-cache-c91dcd939eff59e52015977ff8bdad3f`.
+[Source/cache provenance](experiments/k5d-inputs/svt-7a9f-source-cache-provenance-20261113.json).
+Localfreeze85890/cache51474/physical63381 are COMPLETE0; no fleet job or GPU ran.
+Prep100CPU and complete native288CPU are charged (including preflight30).
+Native preflight21056 passed; old c21 was never submitted and is preserved.
+The fresh deadline-only raw899d94f0/canonical3b7779ad package published exactly
+one job, `20261113T102450Z-7a3274d8`, deadline11:03:48UTC. Canonical status
+is COMPLETE/exit0/GPU-null/gatepassed; all four exit modes, native namespace,
+normal CPU comparison and owned PID checks passed. Independent artifact/current
+cleanup audit passed and root accepted:21PIDs/19births absent, four groups empty,
+FQDN CPU claim exists with no allocations. Immutable proof6bf5c1a5 is physically
+published at checks/k5d-SVT-native-CPU-d1cdb795391c277c1a3a81909895f642/native-CPU.json,
+2601bytes/0444file/0555dir. Original audit SSH failure is preserved.
+[Native acceptance](experiments/k5d-inputs/svt-7a9f-native-7a3274d8-acceptance-20261113.json).
+Terminal-complete event712fa28181d65b7898b2b23e0566bf70 is acknowledged
+after fresh canonical source/spec/exit0 checks; no other event was acknowledged.
+No fleet wait was needed. Current SVT hold is1298CPU/600GPU (denial413 plus50metadata/200admin/100reserve/535first16); ledger owns live
+amounts. Native250→288 added38CPU from existing unallocated headroom.
+Actual535CPU/600GPU first16 fit is unproven;
+48/full-study adapter remains absent. The retained initial CI fixture failure
+exposed BLAS rounding sensitivity; production fitting and strict actual
+reference native/wire/pixel/metric comparisons remain unchanged.
+
+Current conditional CPU qualification has not been submitted. First preflight20
+backend59221 failed on truncated canonical global status; no context or job.
+ONE replacement30 backend26454 is running at
+`/private/tmp/pointstream-SVT-denial443-replacement-preflight30-v2-UNRUN-20261113`,
+contract755e496a/helper4ec1243d/status-only shimfe4319ce/release66c43b4a.
+The status-only shim uses6CPU/120s only for exact global status; actual frozen
+remote_rpc constructor→guard passed offline. Publication393 remains false and
+must bind this successful actual receipt plus independent root quiescence/context
+review. Its original V4 shims and source/scientific gates are unchanged.
+Spec776abe28/canonical2a7a16cd deadline11:39:37UTC, minimum complete window865s.
+Retain failed20 +new30 +future393=443CPU/GPU0. Current SVT hold1278CPU600GPU;
+source/native proofs are not general worker/GPU readiness proofs.
+
+Passive a15 finished11:05:48UTC/nine checks, final no idle, PID23932 absent.
+New passive a16 runs every300s/maxnine checks, backend60680/PID27368,
+harddeadline11:53:06.240058UTC; receipt:
+`/private/tmp/pointstream-resource-watch-20261113-passive-a16/run/receipt.json`.
+100CPU precharged; no autosubmit, recurring model calls or verified completion
+wakeup. Source/receiver/study guards remain gpu6-bound. Programme charges
+23841GPU/65493CPU, Ball17479GPU/41492CPU at this update; ledger owns live values.
+No new GPU execution is released. No cleanup/migration follows from these probes;
+scientific hot paths remain staged on local SSD, raw evidence preserved.
+
+## Historical source/native-proof phase (November 13, UTC)
 
 The accepted source/CPU evidence and retained preparation chronology follow.
 The scheduling decision above governs prospective runtime releases.
@@ -132,7 +347,7 @@ CPU-only qualification path and preserve 2c6d hardening. Remaining 1,600 CPU /
 600 GPU is scientifically UNRELEASED; the real 16-frame oracle has not run.
 No full 48-frame/corpus adapter or complete cost fit is established.
 
-Current charges: programme 23,841 GPU / 64,775 CPU; Ball 17,479 GPU / 40,774 CPU, within
+Current charges: programme 23,841 GPU / 64,895 CPU; Ball 17,479 GPU / 40,894 CPU, within
 unchanged 24 GPU-hour / 28 CPU-hour authority. Old ae892/d1bb receipt/pixel PASS and observer
 FAIL remain separately scoped. New-source native proof alone does not qualify
 actual receiver denial, CUDA/GPU, complete cost/span or full scale. Frozen 2c6d
