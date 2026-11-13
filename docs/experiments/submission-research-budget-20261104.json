@@ -2660,6 +2660,20 @@
       "cpu_seconds": 100,
       "gpu_seconds": 0,
       "basis": "ROOTreviewedminimaldiff toqualified7a freeze/cache: fixeda71,configexecutionidentityONLY/all31grantsunchanged/newsealedcache. PR393CIgreen+c4abmerge, sourcepatchda80identical. Completefreeze50/cache25/physical9/review16=100. Native+CPUdenial+GPUallUNRELEASED; no proofreuse. Exactsourcefreezehelper93eb andsourcepreprelease3b0e67990b144f529a4eac37edcc2e7711c05ccafd16cb67b469be869338b65a"
+    },
+    {
+      "phase": "ball-svt-a71-native-preflight30-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 30,
+      "gpu_seconds": 0,
+      "basis": "ROOT reviewed freshnative327 firststage only: exactglobalstatus6CPU+conditional sameworkercontext; all sourcecache/config/bridge/control/state/spec pins; no doctor duplication/publication/model/GPU. Complete30 includes local/Git/SSH/remote reserve. Release3b8686ae857025d26a7c57909d480bea2ff8107541e7f83af6b22e6dae61ce42"
+    },
+    {
+      "phase": "ball-svt-a71-native-remaining297-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 297,
+      "gpu_seconds": 0,
+      "basis": "ROOTaccepts preflight99709/f0a4b3c34bc37ba7b3f027fae9b8d7f2c469086d3002e91be294afaa803346d8 exactworker/control/cache/nonterminal0. Remaining68publication+100CPUcampaign+67finitecanonicalwait+62auditproofACK; retain full phase327anyoutcome, no GPU or receiverrelease. Rootrelease43810ba03f4e409647a64400f459e7dcc041f991c9da18be981249c876c2d0ef"
     }
   ],
   "reservations": [
@@ -3339,8 +3353,8 @@
       "phase": "ball-svt-shared16-real-context-repair-20261113",
       "workstream": "ball",
       "gpu_seconds": 600,
-      "cpu_seconds": 1900,
-      "status": "Remaining_unspent1900CPU/600GPU unchanged; qualification1012CPU=sourceprep100 alreadycharged+freshnative327+actualCPUdenial585. Real16 848CPU/600GPU andreserve140CPU remainUNRELEASED; completeenvelope2000CPU/600GPU. Sourcea71 frozenbb717/archivee051/config5fc; sourcebridge1f371bd7 ROOTapproved, metadata-cachepublication71660/physicalaudit80318 running, physicalacceptancepending. Completecallercosts included; no charge or numerical reservation change.",
+      "cpu_seconds": 1573,
+      "status": "Remaining_unspent1573CPU/600GPU; sourceprep100accepted/native327fullyreleasedandcharged; denial585/onepilot848/reserve140 UNRELEASED.",
       "card": "docs/cards/k5d-svt-memory-context-repair-2026-11-13.md"
     }
   ],
@@ -6187,6 +6201,29 @@
       "scope": "Correctness/feasibility only, not newclip/generalization/timing/span/speed/extrapolation/scale",
       "terminal_event_ack": "7c0c1189bc545d2082bd6846b4331f40",
       "cleanup_approval_sha256": "582bb6447ec3104d7f802d86edc1cf2e831b3a81b775cf1e267f6145050e0778"
+    },
+    {
+      "job_id": "20261113T122511Z-797deaed",
+      "workstream": "ball",
+      "phase": "a71-native327",
+      "state": "complete_native_proof_physically_accepted_and_sole_terminal_ACKed",
+      "source_sha256": "bb717a9d9fa7d848a3891717c37c0973add82706bc1690bc96aa0961c4804108",
+      "snapshot_sha256": "e05187c40ebc81f7505172be11ed20807b4baa97803c80039dc43f3ea33c8abc",
+      "spec_sha256": "7e39e27704625005d3e8ebbff31ad17aec68be514e665077700cd927f2a2f932",
+      "GPU": 0,
+      "phase_CPU_precharged": 327,
+      "publication_backend": 4989,
+      "deadline": "2026-11-13T13:00:18.711224+00:00",
+      "no_replay": true,
+      "proof_sha256": "7e6fd45415a9384754d667fdbe715d9553f20fc4c369c978aef950c15203f03e",
+      "proof_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-SVT-native-CPU-c2e5dbbe31767622a4d8104163261d1d/native-CPU.json",
+      "artifact_audit_backend": 36475,
+      "proof_publication_backend": 14761,
+      "sole_ACK_backend": 49167,
+      "terminal_event_acknowledged": [
+        "d913a547fd305859b8c3889d1cf4a021"
+      ],
+      "thin_index": "docs/experiments/k5d-inputs/svt-a71-797deaed-native-CPU-acceptance-20261113.json"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -6246,10 +6283,10 @@
     "latest_inspected_completed_tick": {
       "candidates": [],
       "controller_cpu_reserve_seconds": 2,
-      "finished_utc": "2026-11-13T12:14:43.033859+00:00",
-      "remote_worst_case_charge_seconds": 21.088805,
-      "ssh_waited_children_cpu_seconds": 0.577175,
-      "tick": 4
+      "finished_utc": "2026-11-13T12:29:39.631614+00:00",
+      "remote_worst_case_charge_seconds": 37.673840999999996,
+      "ssh_waited_children_cpu_seconds": 0.960691,
+      "tick": 7
     },
     "previous_monitoring_snapshot": {
       "state": "Activea5passive5min45minwatch100CPUprecharged;priora4endedverified;noautosubmit/modeltimer",

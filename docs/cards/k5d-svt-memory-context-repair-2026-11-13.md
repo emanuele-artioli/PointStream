@@ -1,15 +1,24 @@
 # K5d: qualify CUDA context memory accounting before the SVT16 pilot
 
-Status (November 13, source-cache phase complete): CI-supported scientific source a71 is frozen
+Status (November 13, 12:30 UTC): source/cache and native CPU evidence are accepted;
+GPU runtime remains unqualified. CI-supported scientific source a71 is frozen
 as source bb717 / archive e051 / config 5fc. Root approved source bridge
 1f371bd75240924632204be5bb94b8717b403131d7b3c82fdc70f9714a7fc622 after
 all 2001 tree hashes, the two-file delta and unchanged 31 grants joined. Cache
 physical approval is accepted: metadata-only publication71660 and read-only
 audit80318 completed with exact seven-file hashes/modes and identity-only policy
 change. See `svt-a71-source-cache-acceptance-20261113.json` in the evidence index.
-The full sourceprep100 charge is retained. Native, actual CPU-denial
-and real16 stages remain UNRELEASED;
-runtime qualification is not established. Source preparation 100 CPU is charged.
+PR395 merged CI-green at 12:28:36 UTC. Sourceprep100 and native 327 are fully charged.
+Fresh native job `20261113T122511Z-797deaed` is COMPLETE/gatePASS/exit0/GPU-null.
+Preflight 99709 accepted worker 1470412/birth562919381 and seven controls;
+artifact audit 36475 plus the frozen validator passed four modes, 19 absent
+births/21 absent PIDs/four empty groups. Normal CPU was 1.355179 inner versus
+1.444979 outer. Root accepted proof 7e6fd454; upload 14761 is COMPLETE0 and
+physically accepted at c2e5dbbe/native-CPU.json (6844B,0444file/0555dir).
+Sole ACK49167 completed0, only eventd913a547fd305859b8c3889d1cf4a021;
+the native327 phase is closed. [Native acceptance index](../experiments/k5d-inputs/svt-a71-797deaed-native-CPU-acceptance-20261113.json). This is
+CPU containment/accounting only, not GPU/kernel/general-readiness/quality proof.
+Actual CPU-denial 585 and real16 stages remain UNRELEASED.
 The original shared-SVT job `20261113T114623Z-c6b01236` failed before models,
 with zero accepted quality points. Its card is closed to automatic retries.
 This is the separate PLAN subitem for a source repair and fresh qualification;
@@ -81,13 +90,14 @@ No paper, PRESLEY, training or paid API work is released.
 ## Prospective resources
 
 The total envelope stays **600 GPU-seconds / 2000 CPU-seconds**. Qualification
-is 1012 CPU: source preparation 100 already charged, native 327 and actual CPU
-receiver-denial 585 still UNRELEASED. The remaining hold is 1900 CPU/600 GPU:
+is1012 CPU: source preparation100 and native327 are charged; actual CPU
+receiver-denial585 remains UNRELEASED. Remaining hold is1573 CPU/600 GPU
+(denial585 +real16 848 +reserve140):
 
 | Stage | CPU-seconds | GPU-seconds |
 | --- | ---: | ---: |
 | Source preparation, already charged | 100 | 0 |
-| Fresh native qualification | 327 | 0 |
+| Fresh native qualification, charged/root accepted | 327 | 0 |
 | Fresh actual CPU receiver-denial qualification | 585 | 0 |
 | One real16 lifecycle, prospective estimate | 848 | 600 |
 | Reserve | 140 | 0 |
