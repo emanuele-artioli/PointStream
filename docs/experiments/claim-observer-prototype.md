@@ -1,4 +1,6 @@
-# Task-specific claim observer
+# Experiments: task-specific claim observer
+
+### Read-only observer prototype
 
 This is a review candidate, not a released fleet component. It does not submit, retry, signal another process, release claims, execute inference, or measure physical GPU use. It is scoped to one gpu6 exclusive one-core request. Use requires separate source review, a CPU-only host pilot, and root approval; it does not repair the missing historical 13aba release timestamp.
 
