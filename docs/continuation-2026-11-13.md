@@ -7,6 +7,36 @@ chronology and raw-result references. Times below are UTC.
 
 ## Current research decision — November 13, 2026 (UTC)
 
+**The fresh shared-Ada 48-frame pilot is accepted, ACK-closed and durably archived.**
+Actual job `20261113T155953Z-e86afcb5` is canonical COMPLETE/gatePASS/exit0.
+The [acceptance index](experiments/k5d-inputs/svt-study4282-e86-shared48-root-acceptance-20261113.json)
+retains ROOT proofa394f33c, independent reviewe98abd0e, exact terminal ACK76f8ec
+and archive5323d373 (233 members,29,762,383B, immutable0444/0555/readback).
+Both smoke16 and fresh48 passed physical native/packet/YUV/RGB checks, six actual
+CPU receivers, twelve literal pairs, both arms/full+ROI/both judges and current
+22 host identities/one group/token/NVIDIA cleanup. All29 required timers occur
+once per stage and all68 events completed. Strict accepted16 gold was checked;
+full48 has no archived gold. Failed original audit67466/raw91MB and independent
+3CPU recheck failure remain preserved beside the successful frozen verifier and
+independent retained-output review. Repair14186 passed without another GPU run.
+
+Full48 command wall163.790822506s was below640; scoped oracle CPU161.529047s
+is not complete cold-command CPU. Both stages shared the GPU: no speed/live-span
+claim. All48 labels are visible, so this is not a new-clip or absence result.
+Stage1582CPU/1240GPU, separate constructor20CPU and archive30CPU remain charged;
+repair33 used the original prepaid failure reserve, without refunds.
+Source4282/e4d4/f813/env32e/config4fa/spec4fa301 is unchanged.
+
+Next, consider a separately bounded292-only complete-clip cost/correctness oracle;
+geometry/RAM/storage/large-audit fit remain gates. A frame-linear48 planning proxy
+is1544.59s for292 but29097.28s for5675, before complete lifecycle costs. It cannot
+admit30 clips. No292/586/30 execution is released. The missing neural comparison
+remains separate: a NEW same-host gpu6 Ada0 metadata binding is being prepared
+within existing900GPU/1160CPU hold and already charged metadata50; genuine CPU
+proofs stay unchanged. Resource/admission checks must be fresh; idle is transient.
+
+
+
 Actual qualification16 job `20261113T153712Z-f831db6a` is ROOT accepted,
 canonical COMPLETE/gatePASS/exit0 (fresh status74026) and exactly two-event
 ACK-closed. Post40 audit46099/independent review6b8423a8 passed; root proof
@@ -22,10 +52,10 @@ Actual command112.940423965s, all29required/68timers valid, yields
 558.231907845<=640 under the next-stage proxy. Both arms/judges/physical21members/
 six pairs/threeCPUreceipts/bridgedgold/current12births1group cleanup passed.
 Shared timing supplies no speed/live-span claim. The next scientific test is
-[Clip3 cost48](cards/k5d-study4282-cost48-2026-11-13.md), with future1526CPU/1240GPU
-and separate constructor20CPU held; originalprep50 is included once in1576.
+[Clip3 cost48](cards/k5d-study4282-cost48-2026-11-13.md), with full1576CPU/1240GPU
+and separate constructor20CPU charged; originalprep50 is included once in1576.
 Root accepted the prospective complete lifecycle/phase forecast, but actual
-constructor/spec/deadline/worker/device/helpers still precede GPU release.
+constructor35874/spec1e589/preflight/worker/device/helpers passed before release.
 Frozen scientific4282 /
 sourcee4d4 / archivef813 / env32e / config4fa / source-only bridge849 / cache71ef
 has accepted, physically published and ACK-closed native jobd109/proofb79 and
@@ -76,7 +106,7 @@ subtraction from old16. Increase external physical-audit byte bounds explicitly,
 retaining all raw evidence. Actual292/586 must forecast the entire remaining
 cohort with at least1.5 margin and failure reserve. Full30 fit is unknown;
 future narrowing requires prospectively declared quality-independent selection.
-All48/292/586/30 GPU stages remain unreleased. Proposed48 1576CPU/1240GPU includes
+Only the bounded48 pilot is released;292/586/30 GPU stages remain unreleased. Proposed48 1576CPU/1240GPU includes
 preparation50; paired848+1576+separate20=2444CPU is planning, not scale admission.
 
 The ledger controls current charges and remaining_unspent holds under programme
@@ -86,8 +116,8 @@ conservative charges. Saved188 diagnostic and W7 strict-family spending decision
 are closed, with occasional harms and unresolved original cells preserved.
 Paper/PRESLEY remain paused; no new paper/submission authority.
 
-Finite passive watch a22 backend87021/PID67233 runs300s/maxnine ticks to hard
-deadline16:11:59.172587UTC. Latest local tick1 at15:32:31.421832UTC found no idle.
+Finite passive watch a23 backend8516/PID73579 runs300s/maxnine ticks to hard
+deadline2026-11-13T16:55:01.498341+00:00. Latest local tick1 at15:32:31.421832UTC found no idle.
 A21 finished15:25:39 after nine checks/PID absent; a20 is historical. No
 autosubmit, recurring model polling or cache keepalive. Native completion-to-model
 wakeup is unverified. Persist actual IDs/deadlines/budgets/inputs/handles before

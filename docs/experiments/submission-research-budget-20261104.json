@@ -2878,6 +2878,41 @@
       "cpu_seconds": 20,
       "gpu_seconds": 0,
       "basis": "ROOT exactcost48metadata20 release afterq16ROOT757/ACKclosed, independentactualhelperreviewGO; parent10+2actualvalidatorchildren4+SSH2+local2+review2. Separateoutside1576/q16848/original50. Fixed16:27:19UTC, createonlySSD/NFSgate, actualproductionconstructor/2normalizers noTorch/native/model/GPU. UNKNOWNinspectneverreplay."
+    },
+    {
+      "phase": "ball-study4282-cost48-preflight16-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 16,
+      "gpu_seconds": 0,
+      "basis": "ROOT preflight16 (global10+beforecontext6) from1576stage envelope withoriginal50alreadycounted; exactactual35874 spec/all21pins/currentproofs/rootindependentreviewPASS. NoGPUpublication; fixed16:27:19/1640publicationfreshnessguard retained."
+    },
+    {
+      "phase": "ball-study4282-cost48-runtime1510-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 1510,
+      "gpu_seconds": 1240,
+      "basis": "ROOT actualq16ROOT757/W112.9404/proxy558.23<640, actualmetadata35874 andindependent594a review, global1715terminal/sameworker/all21pinsPASS. Remaining1510=1175science+68pub+18admissionstatus/events/operationalwarningACK+170singlecompletion+40audit+6finalACK+33reserve. Original50/preflight16/separateconstructor20 countedonce. Fixed16:27:19/1640freshnessguard; ONEcost48 only/noautoscale/replay/speedclaim."
+    },
+    {
+      "phase": "ball-passive-resource-watch-a23-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 100,
+      "gpu_seconds": 0,
+      "basis": "ROOTONEfinitepassive45min300smax9 replacement aftera22finished16:07:22.260203/ninechecks andPID67233absenceverified. Samewatch2b931/specf517/80counted+20external, SSHserverloginunmetered/noautosubmit/model/claims/LLMtimer; no sourcequalificationfromidle."
+    },
+    {
+      "phase": "ball-study4282-cost48-repair-status6-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 6,
+      "gpu_seconds": 0,
+      "basis": "ROOTadditionalfreshcanonicalstatus6 beforeONEreadonlyrepair33 toactuale86; separatefrom33alreadychargedreserve/original40, withinprogramme/Ballunallocated/noextraGPU. Exactjournal/ledgerID; noexperimentreplay."
+    },
+    {
+      "phase": "ball-study4282-cost48-e86-archive30-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 30,
+      "gpu_seconds": 0,
+      "basis": "ROOTprospectiveONEimmutablecost48archive closure inclselectedbinding/build6/verify6/local4/SSH6/remote4/review2/reserve2. Max360MiBselected/40MiBgzip. Separatefromconsumedstagefailure33; oldchargesretained/noGPU."
     }
   ],
   "reservations": [
@@ -3581,9 +3616,9 @@
     {
       "phase": "ball-study4282-cost48-20261113",
       "workstream": "ball",
-      "cpu_seconds": 1526,
-      "gpu_seconds": 1240,
-      "status": "Remaining_unspent; prospective1576CPUstage includesoriginal50alreadycharged once. Actualq16ROOTacceptance/evidenceSHA andcompleteforecast beforeconstructor/runtime. No48executionrelease.",
+      "cpu_seconds": 0,
+      "gpu_seconds": 0,
+      "status": "Full1576CPUstageincloriginal50+separate20constructor and1240GPU conservativelyprecharged. Preflight16PASS/rootONEcost48publicationreleased; actualjobIDpending. No292/586/30.",
       "card": "docs/cards/k5d-study4282-cost48-2026-11-13.md"
     },
     {
@@ -3591,7 +3626,7 @@
       "workstream": "ball",
       "cpu_seconds": 0,
       "gpu_seconds": 0,
-      "status": "Full20CPUprecharged forONE rootreviewedmetadata productionconstructor; actualhandlepending/noGPUrelease.",
+      "status": "CLOSED20CPUconservativecharge; actual35874metadataROOTaccepted/independentreview594a45cb, normalizedraw1e5892/canonical4fa301/gateda87physicalPASS, no48job/GPUrelease.",
       "card": "docs/cards/k5d-study4282-cost48-2026-11-13.md"
     }
   ],
@@ -6645,6 +6680,64 @@
         "wall": 3.2364468863233924,
         "publication_backend": 53471
       }
+    },
+    {
+      "job_id": "20261113T155953Z-e86afcb5",
+      "source": {
+        "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+        "snapshot_sha256": "f813e09d2fa0eb51b5ec160dcda0cd230d3dada7be697882f9b657201490e61d",
+        "source_sha256": "e4d4a856a06c5f9a06586056ab4a30f0c73b232e5a3db035ae6eb5546063f80b"
+      },
+      "spec_sha256": "4fa301eac0e4234ee1180ec5ac7b2fd1614ecb3fc497412ecdf86ae7bf625a76",
+      "status": "complete",
+      "no_replay": true,
+      "workstream": "ball",
+      "phase": "study4282-cost48",
+      "state": "CLOSED_ROOT_ACCEPTED_ACK_CLOSED_DURABLY_ARCHIVED",
+      "publication_backend": 23492,
+      "CPU_stage_conservative": 1582,
+      "CPU_constructor_separate": 20,
+      "GPU_conservative": 1240,
+      "deadline": "2026-11-13T16:27:19+00:00",
+      "package": "/private/tmp/pointstream-study4282-qualification16-cost48-UNRUN-20261113/cost48-runtime-35874-FALSE-v1",
+      "actual_identity": "/private/tmp/pointstream-study4282-qualification16-cost48-UNRUN-20261113/cost48-runtime-35874-FALSE-v1/actual-ONEsubmit-cost48/actual-job-identity.json",
+      "publication_canonical_response_accepted": true,
+      "canonical_admission_status_backend": 2412,
+      "canonical_admission_events_backend": 65296,
+      "operational_warning_event_acknowledged": [
+        "5cc08655444f5e8fa5f3b90fe8bb8e3e"
+      ],
+      "operational_ACK_CPU": 0.102961,
+      "operational_ACK_no_children_network": true,
+      "scientific_or_terminal_event_acceptance": true,
+      "single_wait170_released": true,
+      "wait_backend": 38295,
+      "wait_result": "attention_terminal_COMPLETE_noassertfailure",
+      "wait_CLI_exit": 10,
+      "wait_seconds": 208.653861667,
+      "wait_SSH_count": 8,
+      "unacknowledged_terminal_events": [],
+      "post40_backend": 67466,
+      "post40_partial_sha256": "382278397e83ccbe3d65036d75498f03015a78ae21b62aa57e9a6cded95e181b",
+      "post40_partial_bytes": 90996736,
+      "post40_failed_child_exit": -24,
+      "post40_old_conservative_charge_retained": true,
+      "reserve33_prospectively_for_single_readonlyrepair": true,
+      "remaining_failure_reserve_CPU_after_repair_release": 0,
+      "repair33_backend": 14186,
+      "repair33_release_sha256": "f98e054a9c91d48830e093f903bf910071333a785340166e80608c9a2d824b81",
+      "repair33_contract_sha256": "0b591af3214afe71f13359ef3b10e428bfe42c86fdf6e71e8c0526e63b59ce92",
+      "pre_repair_fresh_status_sha256": "9d3368d35bc0c2bcaf394348103bed8eefdf172b6e7c9cf85a0500b9e65c9055",
+      "root_proof_sha256": "a394f33c75596231887f401741a667ff995836a3b6aa289a00b55c90936e648d",
+      "acknowledged_terminal_events": [
+        "76f8ec3eda635051a4035a3825684c22"
+      ],
+      "full48_command_wall_seconds": 163.79082250595093,
+      "full48_oracle_interval_CPU_seconds": 161.529047,
+      "repair33_backend_result": "COMPLETE0_originalpartial_and_charges_retained",
+      "durable_archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-study4282-cost48-e86-5323d373a8e8d175fd47c262/qualification.tar.gz",
+      "durable_archive_sha256": "5323d373a8e8d175fd47c262e6b84470bb3e5bd132e6c165bdc0ec1496c11975",
+      "durable_archive_publication_backend": 81407
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -6675,19 +6768,19 @@
     "RootprospectiveSVTqualification413\u2192443CPU/GPU0: failedpreflight20retained +ONEreplacementpreflight30 +393remaining. Add30unallocatedBall/programme; allouter/workstreamceilingsunchanged. Readonlystatus-ONLY6CPU/120wallbootstrap proposed; originalpublication68V4shims/scienceunchanged. No replacementexecutionbeforeexactrootreview."
   ],
   "monitoring": {
-    "state": "a22_active_bounded_passive_only",
+    "state": "a23_active_bounded_passive_only",
     "scope": "gpu2/gpu3 A6000 and gpu5/gpu6 Ada",
-    "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a22/run",
+    "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a23/run",
     "native_completion_wakeup_verified": false,
     "native_completion_resume_verified": false,
     "accounting_limits": "SSH server/login aggregate unmetered; inner80 countedCPU plus20 external reserve; full100CPU charge retained",
-    "scientific_jobs": "NoactiveGPUjob.Study4282source/native/receiverclosed; actualservermetadata62155PASS,new16spec9c449review/bindingpending; noGPUrelease.",
+    "scientific_jobs": "NoactiveGPUjob.Study4282q16+cost48ROOTaccepted/ACKclosed/immutablearchived. Newprimarygpu6Ada0metadata-onlycandidatepreparingwithinheld900G1160C; no292/586/full30executionrelease.",
     "source_sha256": "2b931eb5a25f7a87cc3594103ee845ec2582cc017309b7d479a99f637f6ee10c",
     "mode": "bounded_passive_native_resource_checks",
-    "pid": 67233,
-    "backend": 87021,
-    "started_utc": "2026-11-13T15:26:59.172693+00:00",
-    "deadline_utc": "2026-11-13T16:11:59.172587+00:00",
+    "pid": 73579,
+    "backend": 8516,
+    "started_utc": "2026-11-13T16:10:01.498430+00:00",
+    "deadline_utc": "2026-11-13T16:55:01.498341+00:00",
     "interval_seconds": 300,
     "max_ticks": 9,
     "jobs": [],
@@ -6801,7 +6894,16 @@
         "ticks": 9
       },
       "PID61857_absent_verified": true
-    }
+    },
+    "prior_finished": {
+      "controller_cpu_seconds_observed": 0.5092159999999999,
+      "finished_utc": "2026-11-13T16:07:22.260203+00:00",
+      "reason": "deadline",
+      "remote_worst_case_charge_seconds": 37.91379500000001,
+      "ssh_waited_children_cpu_seconds": 1.1729180000000001,
+      "ticks": 9
+    },
+    "prior_PID_absent_verified": true
   },
   "approval_history": [
     {
