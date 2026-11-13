@@ -7,6 +7,22 @@ chronology and raw-result references. Times below are UTC.
 
 ## Current research decision — November 13, 2026 (UTC)
 
+**Fixed full-context SVT292 is RUNNING.** Actual job `20261113T173340Z-64160888` is RUNNING on shared gpu6 Ada1 UUIDef96. Saved events20357 contain only the expected nonterminal contention warning `bd0b924d29ab58c29b901e6630bc9a14` (continue; foreign PID2751761), locally ACKed for operational monitoring only. Timing is contaminated; no quality or terminal acceptance follows. The ONE canonical completion wait330 is active (backend68911, max2400s/82SSH, outer2480s, helper5744d368); its handle is persisted. The [card](cards/k5d-study4282-confirmation292-2026-11-13.md) keeps game9/Clip5, all three original SVT settings and all 292 frames (30 absent,261 visible,one excluded), both arms/full+ROI/both judges/serialized bytes/fresh CPU receiving. Retrospective exposure and source-task calibration failure10/197 remain visible. This is fidelity-only investigation; no independent held-out/task-reliability,586-frame or30-clip claim follows.
+
+Original metadata33706 passed292 header/label/RAM/SSD and genuine asset/source/control checks, but its publication guard missed; preserve that failure and unusable18:08:37 deadline. Deadline-only refresh chain67686 then passed (.560272CPU), retaining all scientific arguments/assets/policies. Actual spec canonical`af7c05a138d6faf716ecacc633a7ea104f82d312d96a66fc4b49d71e765d8dbc` / raw`dd0752`; fixed new deadline **18:17:58.431688UTC**. Independent review183108 and ROOT metadata proof are in `/private/tmp/pointstream-study4282-confirmation292-refresh20-ROOT-e8830898217f44c297731b08c07ddaa7`. ROOT conditional scriptdc24226b/GO74a7 released publication68 under release1856b9b8 after observing2682.07s headroom against2610. This is not an extension of a submitted job.
+
+Full **3000CPU/2390GPU** is precharged:83CPU prior work plus2917CPU/2390GPU transferred from hold; no stage hold remains. Refresh20CPU came from failure100, leaving80 future failure provision inside the full charged stage. Whole lifecycle and audit charges are conservative ceilings, not measured inference cost. GPU admission is known; scientific quality/cost and 292 acceptance remain pending. Source4282/treee4d4/archivef813/environment32e/config4fa and accepted nativeb79/receivera636 remain unchanged; one canonical completion wait and current physical/quality/cleanup audit remain required. No automatic second wait, retry, clip substitution or586/30 admission.
+
+**Cost48 remains completed evidence.** Job `20261113T155953Z-e86afcb5` is accepted, ACK-closed and immutably archived; [index](experiments/k5d-inputs/svt-study4282-e86-shared48-root-acceptance-20261113.json) binds ROOT proofa394f33c/raw e75ea4c4/exact ACK76f8ec/archive5323d373. Failed audit/review artifacts remain preserved. Stage1582CPU/1240GPU plus separate constructor20CPU/archive30CPU stay charged. Strict16 gold passed; full48 has no archived gold. Shared timing/all-visible48 supply no speed,live-span orabsence evidence. PR404 merged with passing CI.
+
+**Primary six-point route:** both Ada UUID metadata variants accepted; old17:10:13 window closed without GPU submission. Runtime1230CPU/900GPU remains held/unreleased; v2 artifact guard covers all66 regular manifest files. Genuine frozen2c6d/source6f898/archive5ca2/confige478/native9095/CPU7adf remain separate. Its checkpoint preparation requires empty encoded metric/judge arrays; later scoring and actual bound-observer resource acceptance remain separate.
+
+**Monitoring:** a24 ended17:32:51UTC; no eligible idle GPU and PID79197 absence verified. Finite a25 is active, PID84632/backend66147,17:36:42.375451–18:21:42.375350UTC, every300 seconds/max9 checks. No autosubmit/model-wakeup guarantee. Fresh ledger charges are **29271GPU/76848CPU** programme and **22909GPU/52847CPU** Ball. Ledger remains the authority. Paper and PRESLEY stay paused.
+
+## Completed 16/48 evidence and earlier scheduling snapshots — history
+
+Older prospective or running states below are preserved chronology and do not supersede the current front.
+
 **The fresh shared-Ada 48-frame pilot is accepted, ACK-closed and durably archived.**
 Actual job `20261113T155953Z-e86afcb5` is canonical COMPLETE/gatePASS/exit0.
 The [acceptance index](experiments/k5d-inputs/svt-study4282-e86-shared48-root-acceptance-20261113.json)

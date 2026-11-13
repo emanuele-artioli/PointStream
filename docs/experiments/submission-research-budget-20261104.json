@@ -2913,6 +2913,62 @@
       "cpu_seconds": 30,
       "gpu_seconds": 0,
       "basis": "ROOTprospectiveONEimmutablecost48archive closure inclselectedbinding/build6/verify6/local4/SSH6/remote4/review2/reserve2. Max360MiBselected/40MiBgzip. Separatefromconsumedstagefailure33; oldchargesretained/noGPU."
+    },
+    {
+      "phase": "ball-primary-Ada-both-variant-metadata20-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 20,
+      "gpu_seconds": 0,
+      "basis": "ROOTprospectiveONEsamehostactualmetadatarebind20 after77773PASS; preserveoriginal0, addgenuineproductiondualconstructor/spec1variant using unchangedsource/CPUproof/config and same17:10:13deadline. Capsremote10+twonormalizerchildren2each+SSH2+local2+review2. NoGPU/observer/job/proofrenaming/source/goldcopy; noautomaticretry."
+    },
+    {
+      "phase": "ball-passive-resource-watch-a24-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 100,
+      "gpu_seconds": 0,
+      "basis": "ROOTprospectivefinitepassive300s/max9ticks/45minupperbound; a23completed38.028714remote+.487319controller+1.183994SSH,PID73579absenceverified; noautosubmit/model/LLMtimer. Full80counted+20externalprecharge, SSHserver/loginunmetered."
+    },
+    {
+      "phase": "ball-study4282-confirmation292-20261113-metadata30",
+      "workstream": "ball",
+      "cpu_seconds": 30,
+      "gpu_seconds": 0,
+      "basis": "ROOTprospectivemetadata-onlyfirstrelease within3000stage; exactexecuteUNRELEASED untiloperativecallers/auditready+freshdeadline; noGPU/sourcechange."
+    },
+    {
+      "phase": "ball-study4282-confirmation292-20261113-preparation17",
+      "workstream": "ball",
+      "cpu_seconds": 17,
+      "gpu_seconds": 0,
+      "basis": "ROOTprospective localbinding/review/preparation within3000stage; no duplicatecost48prep, noGPU."
+    },
+    {
+      "phase": "ball-study4282-confirmation292-preflight16-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 16,
+      "gpu_seconds": 0,
+      "basis": "ROOTprospectiveglobal10+beforecontext6 BEFOREnewdeadline, inside3000stage deductedoncefromhold. Source/config/proofs/pinsexact; noGPUjob."
+    },
+    {
+      "phase": "ball-study4282-confirmation292-deadline-refresh20-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 20,
+      "gpu_seconds": 0,
+      "basis": "ROOTprospectiveONEmetadata-onlydeadlinechange fromactual33706constructor, BOTH realnormalizerRETURNs; takenfromexisting3000stagefailure100 leaving80future, oldmetadata30charge retained. Packageexecutionrequiresreview; noGPU/source/config/gates/qualitychange."
+    },
+    {
+      "phase": "ball-study4282-confirmation292-runtime2917-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 2917,
+      "gpu_seconds": 2390,
+      "basis": "ROOTfixed292 afteractual33706anddeadline-onlytwoREALnormalizers/independentreview; total3000inclusive83prior; failure100includes20refresh+80future. No30fit/noautomaticretry."
+    },
+    {
+      "phase": "ball-passive-resource-watch-a25-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 100,
+      "gpu_seconds": 0,
+      "basis": "ROOTfinite300s/max9/45minupperbound insideexistingauthority; same80counted+20external/fullcharge. Localprecharge-scriptKeyError historicalrowwithoutphase preventedwrite; launch66147occurredbeforeledgerpersist, correctedimmediately/NOreplay. A24finished/PIDabsentverified. Noautosubmit/model/LLMtimer/nativewakeguarantee."
     }
   ],
   "reservations": [
@@ -3576,9 +3632,9 @@
       "phase": "ball-Ada-calibration-source-qualification-20261113",
       "workstream": "ball",
       "gpu_seconds": 900,
-      "cpu_seconds": 1160,
-      "status": "Remaining_unspent1160CPU/900GPU: witness900CPU/admin260CPU (148chain+110boundedexternalcallers+2margin). Prospective100additionaladmin fromunallocatedBall; metadata50alreadychargedUNRUN. No GPU release.",
-      "card": "docs/cards/k5d-Ada-calibration-source-qualification-2026-11-13.md"
+      "cpu_seconds": 1230,
+      "status": "Remaining_unspent1230CPU900GPU primaryexclusive6pointqualification; +70ROOTunallocatedforcompletewait70/artifact60 (oldobserverexternal40/artifact20retained); source/proofsunchanged; runtimeUNRELEASED.",
+      "card": "docs/cards/k5d-primary-Ada0-qualification-2026-11-13.md"
     },
     {
       "phase": "ball-control-only-UUID-routing-activation-20261113",
@@ -3618,7 +3674,7 @@
       "workstream": "ball",
       "cpu_seconds": 0,
       "gpu_seconds": 0,
-      "status": "Full1576CPUstageincloriginal50+separate20constructor and1240GPU conservativelyprecharged. Preflight16PASS/rootONEcost48publicationreleased; actualjobIDpending. No292/586/30.",
+      "status": "CLOSED actual20261113T155953Z-e86afcb5 ROOTaccepted/ACK-closed/immutablearchive5323d373. Conservative stage1582CPU/1240GPU plus separate constructor20CPU/archive30CPU retained; failed audit/review artifacts preserved. No292/586/30 authority.",
       "card": "docs/cards/k5d-study4282-cost48-2026-11-13.md"
     },
     {
@@ -3628,6 +3684,14 @@
       "gpu_seconds": 0,
       "status": "CLOSED20CPUconservativecharge; actual35874metadataROOTaccepted/independentreview594a45cb, normalizedraw1e5892/canonical4fa301/gateda87physicalPASS, no48job/GPUrelease.",
       "card": "docs/cards/k5d-study4282-cost48-2026-11-13.md"
+    },
+    {
+      "phase": "ball-study4282-confirmation292-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 0,
+      "gpu_seconds": 0,
+      "status": "Full3000CPU2390GPU conservativelyprecharged:83prior+2917runtime; ROOTconditionalONEpublication released afterdeadline-onlynormalizers; actualIDpending; nofull30.",
+      "card": "docs/cards/k5d-study4282-confirmation292-2026-11-13.md"
     }
   ],
   "jobs": [
@@ -6636,7 +6700,7 @@
         "source_sha256": "e4d4a856a06c5f9a06586056ab4a30f0c73b232e5a3db035ae6eb5546063f80b"
       },
       "spec_sha256": "9c449b56a8386135e753997573753cb4b41b6857bedcc34ecee8ae27b18471ef",
-      "status": "preparing; publicationunknownuntilcanonicalresponse",
+      "status": "complete",
       "no_replay": true,
       "workstream": "ball",
       "phase": "study4282-qualification16",
@@ -6649,7 +6713,7 @@
       "actual_identity": "/private/tmp/pointstream-study4282-qualification16-cost48-UNRUN-20261113/qualification16-runtime-62155-FALSE-v1/actual-ONEsubmit-qualification16/actual-job-identity.json",
       "publication_canonical_response_accepted": true,
       "status_backend": 13809,
-      "canonical_status": "pending",
+      "canonical_status": "complete",
       "single_completion_wait_released": true,
       "admission_wait_skipped_full_charge_retained": true,
       "wait_backend": 66951,
@@ -6738,6 +6802,37 @@
       "durable_archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-study4282-cost48-e86-5323d373a8e8d175fd47c262/qualification.tar.gz",
       "durable_archive_sha256": "5323d373a8e8d175fd47c262e6b84470bb3e5bd132e6c165bdc0ec1496c11975",
       "durable_archive_publication_backend": 81407
+    },
+    {
+      "job_id": "20261113T173340Z-64160888",
+      "source": {
+        "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+        "snapshot_sha256": "f813e09d2fa0eb51b5ec160dcda0cd230d3dada7be697882f9b657201490e61d",
+        "source_sha256": "e4d4a856a06c5f9a06586056ab4a30f0c73b232e5a3db035ae6eb5546063f80b"
+      },
+      "spec_sha256": "af7c05a138d6faf716ecacc633a7ea104f82d312d96a66fc4b49d71e765d8dbc",
+      "status": "pending",
+      "deadline": "2026-11-13T18:17:58.431688+00:00",
+      "chat_id": null,
+      "scope": "publicationonly; no denialacceptance/ACK; no wait started",
+      "phase": "study4282-confirmation292",
+      "workstream": "ball",
+      "actual_identity": "/private/tmp/pointstream-study4282-confirmation292-refresh20-ROOT-e8830898217f44c297731b08c07ddaa7/runtime-ROOT-candidate/actual-ONEsubmit-confirmation292/actual-job-identity.json",
+      "runtime": "/private/tmp/pointstream-study4282-confirmation292-refresh20-ROOT-e8830898217f44c297731b08c07ddaa7/runtime-ROOT-candidate",
+      "source_revision": "4282c96f8aaf7d229f53df4c1c5f8225d8454d6e",
+      "publication_backend": 67686,
+      "full_stage_CPU_inclusive": 3000,
+      "GPU_precharged": 2390,
+      "no_replay": true,
+      "canonical_status": "running",
+      "status_backend": 98159,
+      "events_backend": 20357,
+      "operational_warning_acknowledged": [
+        "bd0b924d29ab58c29b901e6630bc9a14"
+      ],
+      "wait_backend": 68911,
+      "single_wait_max_seconds": 2400,
+      "no_second_wait_implicit": true
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -6768,19 +6863,19 @@
     "RootprospectiveSVTqualification413\u2192443CPU/GPU0: failedpreflight20retained +ONEreplacementpreflight30 +393remaining. Add30unallocatedBall/programme; allouter/workstreamceilingsunchanged. Readonlystatus-ONLY6CPU/120wallbootstrap proposed; originalpublication68V4shims/scienceunchanged. No replacementexecutionbeforeexactrootreview."
   ],
   "monitoring": {
-    "state": "a23_active_bounded_passive_only",
+    "state": "a25_active_bounded_passive_only",
     "scope": "gpu2/gpu3 A6000 and gpu5/gpu6 Ada",
-    "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a23/run",
+    "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a25/run",
     "native_completion_wakeup_verified": false,
     "native_completion_resume_verified": false,
     "accounting_limits": "SSH server/login aggregate unmetered; inner80 countedCPU plus20 external reserve; full100CPU charge retained",
-    "scientific_jobs": "NoactiveGPUjob.Study4282q16+cost48ROOTaccepted/ACKclosed/immutablearchived. Newprimarygpu6Ada0metadata-onlycandidatepreparingwithinheld900G1160C; no292/586/full30executionrelease.",
+    "scientific_jobs": "20261113T173340Z-64160888 RUNNING sharedgpu6Ada1/ef96; expectednonterminalbd0bACKoperationalONLY; ONEcanonicalwait68911 max2400s active, stage3000C2390G fullycharged/no30fit. Primary1230C900Gheld.",
     "source_sha256": "2b931eb5a25f7a87cc3594103ee845ec2582cc017309b7d479a99f637f6ee10c",
     "mode": "bounded_passive_native_resource_checks",
-    "pid": 73579,
-    "backend": 8516,
-    "started_utc": "2026-11-13T16:10:01.498430+00:00",
-    "deadline_utc": "2026-11-13T16:55:01.498341+00:00",
+    "pid": 84632,
+    "backend": 66147,
+    "started_utc": "2026-11-13T17:36:42.375451+00:00",
+    "deadline_utc": "2026-11-13T18:21:42.375350+00:00",
     "interval_seconds": 300,
     "max_ticks": 9,
     "jobs": [],
@@ -6903,7 +6998,25 @@
       "ssh_waited_children_cpu_seconds": 1.1729180000000001,
       "ticks": 9
     },
-    "prior_PID_absent_verified": true
+    "prior_PID_absent_verified": true,
+    "prior_a23_final": {
+      "controller_cpu_seconds_observed": 0.48731899999999995,
+      "finished_utc": "2026-11-13T16:50:23.964163+00:00",
+      "reason": "deadline",
+      "remote_worst_case_charge_seconds": 38.028713999999994,
+      "ssh_waited_children_cpu_seconds": 1.1839939999999998,
+      "ticks": 9,
+      "PID73579_absent": true
+    },
+    "prior_a24_final": {
+      "controller_cpu_seconds_observed": 0.504791,
+      "finished_utc": "2026-11-13T17:32:51.207315+00:00",
+      "reason": "deadline",
+      "remote_worst_case_charge_seconds": 38.04712,
+      "ssh_waited_children_cpu_seconds": 1.18306,
+      "ticks": 9,
+      "PID79197_absent": true
+    }
   },
   "approval_history": [
     {
