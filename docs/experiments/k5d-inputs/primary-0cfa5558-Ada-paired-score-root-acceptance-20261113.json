@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "state": "CLOSED_ROOT_ACCEPTED_ACK_CLOSED_IMMUTABLY_ARCHIVED",
+  "job_id": "20261113T220101Z-0cfa5558",
+  "scope": "Actualsealed16/48scoringcorrectness/fullROI/bothjudges/currentcleanup on originalROOTacceptedproducerpixels; separately ROOTaccepted posthoc native-anchor BD-rate only over measured commonquality. Developmentclip only; no newnative decode/newfootage/absence/population/independentNFScoherence/fullCPU/speed claim.",
+  "source_revision": "2c6d8581fbd64279dde554ca1402047d27ab7fa2",
+  "execution_identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "5ca2d194b7e1a6032faf7ef60fe44924649e0a57471c12cda6264f9586260219",
+    "source_sha256": "6f898f753a056981a107f5115a5a36f1310bc9d4a705a1805b75f758a0bc0117"
+  },
+  "receiver_config_sha256": "e478cbf16830b7788f835dc888b87ee119505f767a0ac535fb902f76690505ed",
+  "spec_sha256": "554a79e99f530f5c2a9fc63d43dc71dc4e85ad9b92d9cd346c26c10a8e6e1bd1",
+  "spec_raw_sha256": "bccffd39839bf51338e01f8caa0942f1cda603b7684375aa9faa719408f9947a",
+  "GPU": {
+    "host": "gpu6",
+    "uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+    "class": "RTX6000Ada8.9"
+  },
+  "ROOT_authoritative_V2": {
+    "path": "/private/tmp/pointstream-primary-score-0cfa5558-remote-audit120-ROOT-20261113/actual-ROOT-once/ROOT-accepted-paired-score16-48-v2.json",
+    "sha256": "a567869ed541763bdd7ae46121ec51cd2e471b17801a7f592668f79bce751ceb",
+    "supersedes_sha256": "42ec4fec518d60c8ad35a9031f04af4f7028d814b0884a3f57c214eb69930063",
+    "original_proof_path": "/private/tmp/pointstream-primary-score-0cfa5558-remote-audit120-ROOT-20261113/actual-ROOT-once/ROOT-accepted-paired-score16-48.json",
+    "correction_scope": "Exactfullcommandwall copiedfromauthenticatedsummaryexecution.seconds ratherthanmanuallytranscribedfloat; scientificacceptanceunchanged. Originalproofretained."
+  },
+  "independent_review_sha256": "8f78e3c28907e4811830632b77d90656760b444ef624eb286e31b256438efb09",
+  "summary_sha256": "30bd7ea7d255516cd79d9b572124da2c1fdf4e1ae6d77eb16f60380080eda626",
+  "producer": {
+    "job_id": "20261113T210157Z-41ee26e3",
+    "ROOT_acceptance_sha256": "2b4cf52e10c6c9ed3d727394f92e8d200bf5044f3c7cf1e0c59a09b2f98f9708",
+    "index": "docs/experiments/k5d-inputs/primary-41ee26e3-Ada-paired-preparation-root-acceptance-20261113.json",
+    "original_receipts": 12,
+    "new_native_decode_contexts": 0
+  },
+  "frames": {
+    "nested16": "correctness only; strict ownAda metrics/judges gold",
+    "primary48": "tracknet/game10/Clip3 start0; all48visible/noabsence; full48 no archivedgold"
+  },
+  "full_ROI_both_judges_authenticated": true,
+  "metric_digest": {
+    "path": "/private/tmp/pointstream-primary-score-0cfa5558-metric-extract20-ROOT-20261113/actual-ROOT-once/metrics.ROOT-UNSET.json",
+    "sha256": "3fba3081e2dcad0fb9722f097a85bda4b012fadffeadb8fc1ce7db2ecc74e312",
+    "ROOT_acceptance_path": "/private/tmp/pointstream-primary-score-0cfa5558-metric-extract20-ROOT-20261113/ROOT-accepted-metric-digest.json",
+    "ROOT_acceptance_sha256": "b3b1ab96f24336d57b25e92f563785573fda8f91406e305f2fd136ca04368cad"
+  },
+  "posthoc_curves": {
+    "report_path": "/private/tmp/pointstream-primary-score-0cfa5558-curves10-LOCAL-20261113/report.ROOT-UNSET.json",
+    "report_sha256": "e431d384a1b019942ce7c880b3e8d8aa4673d5f08086d406cc9df0934f08b539",
+    "ROOT_acceptance_path": "/private/tmp/pointstream-primary-score-0cfa5558-curves10-LOCAL-20261113/ROOT-accepted-curves.json",
+    "ROOT_acceptance_sha256": "220246469e7c8da3d0ecef15c822da49430720cd9d1009fd5bb50f2126b9b3a4",
+    "independently_reconstructed_comparisons": 35,
+    "method": "PCHIP lograte integration on measured commonquality intervals against pooled native achievable upperconcave anchor; no extrapolation",
+    "native_anchor": "actual native.bin bytes; zero-ball PSBL only ablation",
+    "pooled_BD_rate_percent": {
+      "full_LPIPS": 1.2158967864773622,
+      "full_DISTS": 3.2955660342142803,
+      "ROI_LPIPS": -76.96525232176282,
+      "ROI_DISTS": -44.439360050226675,
+      "pooled_RGB_PSNR": 1.001812150948193,
+      "WASB_recall10": null,
+      "BallTrack_recall10_diagnostic": null
+    },
+    "quality_overlap_metric_units": {
+      "full_LPIPS": [
+        0.011316529843542311,
+        0.09947797881232368
+      ],
+      "full_DISTS": [
+        0.016462981700897217,
+        0.1313506749769052
+      ],
+      "ROI_LPIPS": [
+        0.03069898276589811,
+        0.05981800829370817
+      ],
+      "ROI_DISTS": [
+        0.09374611700574557,
+        0.17405345166722933
+      ],
+      "pooled_RGB_PSNR": [
+        29.26568942910304,
+        37.470961942644344
+      ],
+      "WASB_recall10": null,
+      "BallTrack_recall10_diagnostic": null
+    },
+    "task_scope": "WASB10px hits40..45/48 vs native0..38/48; disjoint observed quality ranges, NOtaskBD. BallTrack diagnostic also no taskBD.",
+    "sign": "Positive means bitratepenalty; negative means saving. ROI savings coexist with wholeframe penalties."
+  },
+  "terminal_ACK": {
+    "event_ids": [
+      "bf260a397d475380ba1de6ec8246ca15"
+    ],
+    "kind": "terminal:complete",
+    "path": "/private/tmp/pointstream-primary-score-0cfa5558-terminalACK6-ROOT-20261113/actual-ack/stdout.json",
+    "sha256": "39d4b16142e83b2857413bda5fa3ae3f014787c4115db4edbb7ffd930f22f1ab",
+    "closed": true
+  },
+  "durable_archive": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-primary-score-0cfa5558-6561f4e084ba37a4ca6b9b8c/preparation.tar.gz",
+    "sha256": "6561f4e084ba37a4ca6b9b8c552a5e2d40d4f5ac71027bdcb3af8bef172a0bb2",
+    "bytes": 19500687,
+    "members": 235,
+    "publication_backend": 9054,
+    "release_sha256_prefix": "e03e1177",
+    "file_mode": "0444",
+    "directory_mode": "0555",
+    "readback_receipt_path": "/private/tmp/pointstream-primary-score-0cfa5558-archive40-FALSE-20261113/actual-publication/verified.json",
+    "readback_receipt_sha256": "e9a6d0cb3e9e434cf5aa233cbbd8c55b35f22e8608763b7cc3286ab191c56eaa"
+  },
+  "raw_evidence": {
+    "raw_sha256": "0b73f9b95637ae526b87735982ea52a44c1c663379d02af9b2c6ce95973cdbb0",
+    "raw_bytes": 348464780,
+    "raw_duplicate_not_archived": true,
+    "gzip_path": "/private/tmp/pointstream-primary-score-0cfa5558-remote-audit120-ROOT-20261113/actual-ROOT-once/raw-audit.json.gz",
+    "gzip_sha256": "d8e66c3aca47e6d1db55cf31a25866d64b5e8ef0a1a8369738991bb3879dd453",
+    "gzip_bytes": 18308209
+  },
+  "conservative_budget_closeout": {
+    "paired_CPU_charged": 5300,
+    "paired_GPU_charged": 4000,
+    "reservation_hold": 0,
+    "residual_prepaid_failure_CPU": 5,
+    "refund": false
+  },
+  "limitations": "Development/calibration48allvisibleclip; nested16notadditionalfootage. No absence/newfootage/population/speed/completeCPU/independentNFScoherence or globaldominance claim. Differentclip586 readiness remains separate, no runtimeauthority fromthisindex."
+}

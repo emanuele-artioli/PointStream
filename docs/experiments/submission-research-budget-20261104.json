@@ -3270,6 +3270,94 @@
       "cpu_seconds": 4,
       "gpu_seconds": 0,
       "basis": "Prospectivebounded meaningfulledgerbudgettests andsmallrootchecks fromsecondfailure87->83; noGPU"
+    },
+    {
+      "phase": "ball-postpaired-worthwhile-plan-audit5-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 5,
+      "gpu_seconds": 0,
+      "basis": "Prospective bounded independentread-only PLAN/evidence/costprioritization while serverauditisbuilt; fromunallocatedBall/programme, notpaired5300; no newruntime/scientificresult"
+    },
+    {
+      "phase": "ball-saved292-rescue-harm-analysis-20261113-design10",
+      "parent_phase": "ball-saved292-rescue-harm-analysis-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 10,
+      "gpu_seconds": 0,
+      "basis": "Prospectiveindependentcard/design/recipe10inside60CPU/G0savedaccepted292analysis; original188closednotreused. Noactualparse/network/runtimeyet."
+    },
+    {
+      "phase": "ball-primary-paired16-48-20261113-score-fresh-clock-metadata30",
+      "workstream": "ball",
+      "cpu_seconds": 30,
+      "gpu_seconds": 0,
+      "basis": "Prospectiveactualconstructor+twoactualnormalizers freshclock afterRAMsafecoreROOTreview. PrioroldclockSTOPpreserved, no refund. Inside second2650/failure83->53beforefreshglobal10."
+    },
+    {
+      "phase": "ball-primary-paired16-48-20261113-score-freshglobal10",
+      "workstream": "ball",
+      "cpu_seconds": 10,
+      "gpu_seconds": 0,
+      "basis": "Freshcanonicalglobalinventoryafterauditcorefit; inside second2650/failure53->43"
+    },
+    {
+      "phase": "ball-primary-paired16-48-20261113-score-freshbeforecontext6",
+      "workstream": "ball",
+      "cpu_seconds": 6,
+      "gpu_seconds": 0,
+      "basis": "Sameworker/control/SSD/sentinel/safestoragebeforecontext inside second2650 operator102"
+    },
+    {
+      "phase": "ball-primary-paired16-48-20261113-score-lifecycle-release2520",
+      "workstream": "ball",
+      "cpu_seconds": 2520,
+      "gpu_seconds": 2000,
+      "basis": "ROOTconditionalcompleteauditcorev2review/actualfreshmetadata/sourcecontrolRETURNs/freshglobal1719/sameworker/allAdaeligiblehostwatch pass. Soleactualpublication released; fullsecond2650CPU2000GPU prepaidinclallfuturecampaign/tail/wait/audit120/ACK/archive/failure43, no automatic retry. Prior130CPUretained. No refundevenifSTOP."
+    },
+    {
+      "phase": "ball-saved292-rescue-harm-analysis-20261113-actual20",
+      "parent_phase": "ball-saved292-rescue-harm-analysis-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 20,
+      "gpu_seconds": 0,
+      "basis": "ProspectiveROOTreviewed20CPU180wall1processlocalactualparse/counters/rates. AuthenticatedROOTraw202181082B. Parent60unchanged; noGPU/inference/network."
+    },
+    {
+      "phase": "ball-saved292-rescue-harm-analysis-20261113-review10",
+      "parent_phase": "ball-saved292-rescue-harm-analysis-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 10,
+      "gpu_seconds": 0,
+      "basis": "Prospectiveindependent8CPUactualraw/hash/count/rates review+ROOT2CPU; insideparent60; noGPU/network/codec/models/sourcechanges"
+    },
+    {
+      "phase": "ball-saved292-rescue-harm-analysis-20261113-archive10",
+      "parent_phase": "ball-saved292-rescue-harm-analysis-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 10,
+      "gpu_seconds": 0,
+      "basis": "Prospectivebuilder/pack3+localupload2+SSH2+remote2+reserve1; newimmutablecompleteanalysisarchive/readback, raworiginalnotduplicated. Parent60unchanged."
+    },
+    {
+      "phase": "ball-confirmation586-readiness-design30-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 30,
+      "gpu_seconds": 0,
+      "basis": "ROOTprospectiveboundedlocalactual4282source/gates/saved292IOcost/bytes partitionaudit30, no models/network/runtime. Next Clip12/586 stage3033CPU2420GPU onlyproposalunreleased;30mustbeinanyfuturewholepartition. No source/fidelitygatebypass."
+    },
+    {
+      "phase": "ball-586-operational-audit-build20-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 20,
+      "gpu_seconds": 0,
+      "basis": "Inside reserved586phase3033CPU2420GPU, reallocatefailure90->60. Adapt externalONLY collector/caller/serverSSDfrozenverifier and exact completecost/storage/negativefixtures; localCPU only, no SSH/model/GPU"
+    },
+    {
+      "phase": "ball-586-operational-metadata-build10-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 10,
+      "gpu_seconds": 0,
+      "basis": "Inside reserved586phase3033CPU2420GPU, reallocatefailure90->60. FALSE-only exactsourceconstructor/normalizers/gates/bootstrap/validatorbinding recipe, no actualconstructor/network/model/GPU"
     }
   ],
   "reservations": [
@@ -4016,10 +4104,30 @@
     {
       "phase": "ball-primary-paired16-48-20261113",
       "workstream": "ball",
-      "cpu_seconds": 2566,
-      "gpu_seconds": 2000,
-      "status": "ROOT reserved5300CPU/4000GPU within unchanged programme/Ball;15CPU local readiness precharged; runtime blocked on concrete readiness/cost/normalizer/resource gates; no automatic retry.",
+      "cpu_seconds": 0,
+      "gpu_seconds": 0,
+      "status": "CLOSEDsecondlifecycle2650CPU2000GPUfullyprechargedbeforeONEpublication; no automaticretry",
       "card": "docs/cards/k5d-primary-paired-quality-2026-11-13.md"
+    },
+    {
+      "phase": "ball-saved292-rescue-harm-analysis-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 0,
+      "gpu_seconds": 0,
+      "status": "CLOSEDROOTacceptedarchivedanalysis;50CPUcharged;neverreleasedstatus6+reserve4returned withoutrefund",
+      "card": "docs/cards/k5d-saved292-rescue-absence-analysis-2026-11-13.md"
+    },
+    {
+      "phase": "ball-study4282-confirmation586-20261113",
+      "workstream": "ball",
+      "cpu_seconds": 2973,
+      "gpu_seconds": 2420,
+      "status": "RESERVED conditionalstage; ONLY30CPU localoperationalbuild released; runtime/metadata/GPU NOTreleased",
+      "card": "docs/cards/k5d-study4282-confirmation586-readiness-2026-11-13.md",
+      "total_phase_CPU": 3033,
+      "already_charged_design_CPU": 30,
+      "operational_build_CPU_charged": 30,
+      "scope": "DifferentClip12 full586, unchanged4282 science, sharedqualifiedgpu6Ada1ef96; hardfreshcost/storage/completecaller gates before onefutureattempt"
     }
   ],
   "jobs": [
@@ -7302,6 +7410,28 @@
       "publication_backend": 79873,
       "runtime_case": "/private/tmp/pointstream-primary-paired-runtime-ROOT-e521bfeef2734b84b05ab5a6f14613e1",
       "durable_archive_sha256": "5c1134a8d6447ef754f805aaa840949fff4cfd3f6e4f94ec8c3efe040d683ac0"
+    },
+    {
+      "job_id": "20261113T220101Z-0cfa5558",
+      "phase": "ball-primary-paired16-48-20261113",
+      "workstream": "ball",
+      "status": "CLOSED ROOTaccepted16/48/gatePASS/exit0/currentcleanup/soleACK/immutablearchive6561f4e0; scopedqualitytradeoff",
+      "source_revision": "2c6d8581fbd64279dde554ca1402047d27ab7fa2",
+      "identity": {
+        "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+        "snapshot_sha256": "5ca2d194b7e1a6032faf7ef60fe44924649e0a57471c12cda6264f9586260219",
+        "source_sha256": "6f898f753a056981a107f5115a5a36f1310bc9d4a705a1805b75f758a0bc0117"
+      },
+      "spec_sha256": "554a79e99f530f5c2a9fc63d43dc71dc4e85ad9b92d9cd346c26c10a8e6e1bd1",
+      "deadline": "2026-11-13T22:42:59.827919+00:00",
+      "host": "gpu6",
+      "gpu_uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+      "GPU_prepaid": 2000,
+      "CPU_second_lifecycle_prepaid": 2650,
+      "ROOT_acceptance_sha256": "a567869ed541763bdd7ae46121ec51cd2e471b17801a7f592668f79bce751ceb",
+      "independent_review_sha256": "8f78e3c28907e4811830632b77d90656760b444ef624eb286e31b256438efb09",
+      "terminal_status_backend": 5748,
+      "durable_archive_sha256": "6561f4e084ba37a4ca6b9b8c552a5e2d40d4f5ac71027bdcb3af8bef172a0bb2"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -7335,7 +7465,7 @@
     "ROOTprimarywhole-lifecycle1270to1320CPU+50unallocatedBall/programme:20globalinventory/beforecontext/prepreview +30immutablearchive. V5remote readiness does not supply artifactbinder beforecontext. Stockdoctorwithinsolecanonicalsubmit148 notchargedtwice. Metadata30separate/unreleased; noGPU/source/science/outercapchange."
   ],
   "monitoring": {
-    "state": "a26_finished_capacity_found_gated_neural_attempt_preparing",
+    "state": "a29_COMPLETE9ticks_resources_found_actual_Ada_work_accepted_no_current_capacity_wait",
     "scope": "gpu2/gpu3 A6000 and gpu5/gpu6 Ada",
     "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a26/run",
     "native_completion_wakeup_verified": false,
@@ -7561,7 +7691,7 @@
       "backend_terminal_verified": true
     },
     "a29": {
-      "state": "ONEfinitewatchrunning/noautomaticrenewal",
+      "state": "COMPLETE9ticks no renewal",
       "path": "/private/tmp/pointstream-resource-watch-20261113-passive-a29",
       "CPU_precharged": 100,
       "GPU": 0,
@@ -7576,7 +7706,10 @@
       "started_utc": "2026-11-13T21:29:51.153081+00:00",
       "deadline_utc": "2026-11-13T22:14:51.152981+00:00",
       "receipt": "/private/tmp/pointstream-resource-watch-20261113-passive-a29/run/receipt.json",
-      "launch_handle": "/private/tmp/pointstream-resource-watch-20261113-passive-a29/launch.json"
+      "launch_handle": "/private/tmp/pointstream-resource-watch-20261113-passive-a29/launch.json",
+      "finished_utc": "2026-11-13T22:10:10.710007+00:00",
+      "ticks": 9,
+      "scope": "Bounded passive resource observations; no leases/submissions; no GPU task currently awaiting resources"
     }
   },
   "approval_history": [
@@ -7747,7 +7880,7 @@
     "actual_identity": "/private/tmp/pointstream-primary-exclusive-Ada0-ROOT-5f64063ae30f453993d9c1259f7f3e8b/operator/actual-chain-output/sole-actual-job.json"
   },
   "primary_paired_quality_current": {
-    "state": "CLOSEDactualROOTprepare16/48/currentcleanup/ACK/immutablearchive; scoreMETADATAaccepted conditionalcollectorfit; GPUunreleased",
+    "state": "CLOSED actualpaired16/48scorer ROOTaccepted currentcleanup/ACKclosed/immutablearchive6561f4e0; scopedROI gains andfullframe penalties retained",
     "case": "/private/tmp/pointstream-primary-paired-metadata30-affinity0-ROOT-e521bfeef2734b84b05ab5a6f14613e1",
     "contract_sha256": "d1ff73820c0dfc9cfd21fab24480bf6534e8b1cd9b9e57cbed72d9e098301ced",
     "release_sha256": "1836a4e7e9760550e7b0c70e4a8ce85bc3cdccc0714925dd10640f4cf64a0bd0",
@@ -7765,8 +7898,8 @@
     "publication_release_sha256": "7bbb321cc7d1f21144c3e08b160d7ad7df661c9a276151bf8a555052b1284096",
     "first_lifecycle_CPU_charged": 2650,
     "first_lifecycle_GPU_charged": 2000,
-    "remaining_future_second_CPU": 2650,
-    "remaining_future_second_GPU": 2000,
+    "remaining_future_second_CPU": 0,
+    "remaining_future_second_GPU": 0,
     "publication_backend": 79873,
     "actual_job_id": "20261113T210157Z-41ee26e3",
     "status_backend": 18723,
@@ -7785,7 +7918,12 @@
       "required_remaining_seconds": 1350,
       "setup_seconds": 7.690628523007035
     },
-    "checkpoint_PR": 408,
+    "checkpoint_PR": {
+      "number": 409,
+      "commit": "d59c66d5",
+      "state": "CI_SUCCESS; OPEN/CLEAN/automergeenabled aslastchecked; no mergeclaim",
+      "url": "https://github.com/emanuele-artioli/PointStream/pull/409"
+    },
     "score_audit_prospective_reallocation": {
       "CPU": 120,
       "prior_CPU": 90,
@@ -7870,6 +8008,262 @@
         "wall_seconds": 19.342115292005474
       }
     },
-    "postprepare_checkpoint_checks_CPU": 4
+    "postprepare_checkpoint_checks_CPU": 4,
+    "second_stage_complete_disjoint_partition_ROOT": {
+      "CPU": 2650,
+      "parts_CPU": {
+        "campaign": 1800,
+        "tail": 95,
+        "metadata_design15_original30_proofs20": 65,
+        "operator_global10_before6_publication68_admission12_local6": 102,
+        "solewait": 330,
+        "remoteaudit": 120,
+        "ACK": 6,
+        "archive": 40,
+        "remoteaudit_design": 5,
+        "checkpoint_checks": 4,
+        "fresh_actual_metadata_clock": 30,
+        "fresh_global_inventory": 10,
+        "failure_remaining": 5,
+        "actual_metric_digest": 20,
+        "local_curve_analysis": 10,
+        "final_documentation_checks": 8
+      },
+      "GPU": 2000,
+      "basis": "Actualsecond lifecycle fullyprecharged2650CPU/2000GPU; disjointaudit120/solewait330/ACK6/archive40. Digest20+curves10+finaldocs/checks8 reallocated fromfailure43 leaving5. No refund/outerincrease.",
+      "charged_so_far_CPU": 2650,
+      "unspent_held_CPU": 0,
+      "prepaid_future_work": true
+    },
+    "score_fresh_metadata": {
+      "case": "/private/tmp/pointstream-primary-paired-score-fresh-metadata30-ROOT-9a3189c3b1b149668a4cf796dbc990ad",
+      "state": "COMPLETE0actualsource/twoequalnormalizedRETURNs; ONLYoldRETURNdeltas deadline/epoch; conditionalforecastfea4a06fits31.0246CPU60/RAMSSD",
+      "deadline": "2026-11-13T22:42:59.827919+00:00",
+      "contract_sha256": "4b8cf9ea5e62b207ec757019e6dc1df3c159f81ac61887173b1334d59934f157",
+      "release_sha256": "f486056603cd7f78be067fec8b747fab1af1b7a1a03eb9bf751d8b6bebcc849a",
+      "conditional_readiness": "/private/tmp/pointstream-primary-paired-score-fresh-metadata30-ROOT-9a3189c3b1b149668a4cf796dbc990ad/ROOT-complete-readiness-conditional.json",
+      "backend": 9099,
+      "spec_raw_sha256": "bccffd39839bf51338e01f8caa0942f1cda603b7684375aa9faa719408f9947a",
+      "spec_canonical_sha256": "554a79e99f530f5c2a9fc63d43dc71dc4e85ad9b92d9cd346c26c10a8e6e1bd1"
+    },
+    "score_fresh_runtime": {
+      "case": "/private/tmp/pointstream-primary-paired-score-fresh-runtime-ROOT-9a3189c3b1b149668a4cf796dbc990ad",
+      "state": "Actualscore16/48COMPLETEsourcegatePASS; independentphysicalqualityauditpending; NO_ROOTqualityacceptance",
+      "deadline": "2026-11-13T22:42:59.827919+00:00",
+      "contract_sha256": "5d28621a3c792c835bf63a5ea73b0c96da642629b464a02a674176496b200792",
+      "audit_core_manifest_sha256": "37179742a714b0772ea3a4e736a77f87cdef46b10b99359bbd8301a6de9783c6",
+      "global_backend": 72787,
+      "beforecontext_backend": 42659,
+      "publication_release": "/private/tmp/pointstream-primary-paired-score-fresh-runtime-ROOT-9a3189c3b1b149668a4cf796dbc990ad/publication-release.ROOT.json",
+      "publication_release_sha256": "0dd37ee9a3386fa9e160f0258710140eb922f6f15f89bb008239943f7c90c7b9",
+      "capacity_observation": "/private/tmp/pointstream-resource-watch-20261113-passive-a29/run/tick-06-summary.json",
+      "job_id": "20261113T220101Z-0cfa5558",
+      "publication_backend": 98124,
+      "actual_job_identity": "/private/tmp/pointstream-primary-paired-score-fresh-runtime-ROOT-9a3189c3b1b149668a4cf796dbc990ad/actual-ONEsubmit-pairedscore/actual-job-identity.json",
+      "admission_status_backend": 77138,
+      "admission_events_backend": 31045,
+      "wait_case": "/private/tmp/pointstream-primary-score-0cfa5558-ONEwait330-ROOT-20261113",
+      "wait_release": "/private/tmp/pointstream-primary-score-0cfa5558-ONEwait330-ROOT-20261113/release.ROOT.json",
+      "wait_release_sha256": "8b8e43212ebbeecd49791def9ce84672fa097435b57d034c3f9eaa2ce4c92a51",
+      "wait_CPU_prepaid": 330,
+      "wait_max_seconds": 2400,
+      "wait_outer_seconds": 2480,
+      "wait_backend": 87366,
+      "wait_state": "COMPLETEcanonicalallterminal/gatePASS; backend87366returned; nosecondwait",
+      "terminal_status_case": "/private/tmp/pointstream-primary-score-0cfa5558-terminal-status6-ROOT-20261113"
+    },
+    "score_physical_audit": {
+      "case": "/private/tmp/pointstream-primary-score-0cfa5558-remote-audit120-ROOT-20261113",
+      "state": "COMPLETE0 ROOTaccepted V2a567; independent8f78e3c2 PASS; currentcleanup PASS",
+      "contract_sha256": "e5535073370591ab46e76f68f73080e293282f74eb132effb31b95edd296b5da",
+      "release_sha256": "a6f0a1f023e8f363badb841ef65fde70a54fecc1fd96569743158c761c68f6c4",
+      "remote_root": "/local/users/emanuele/pointstream/metadata-prep/score-audit-0cfa5558-23e17badf60d45f58db0783e874f2c76",
+      "scope": "Fullactualscorer16/48quality/packet/metrics/judges andoriginalproducerpixels; sourceverifierf279unchanged; ROOTacceptancepending",
+      "CPU": 120,
+      "execution_CPU": 106,
+      "terminalstatus_CPU": 6,
+      "review_CPU": 5,
+      "reserve_CPU": 3,
+      "local_wrong_hash_rejection_before_any_RPC_preserved": true,
+      "backend": 12627,
+      "gzip_sha256": "d8e66c3aca47e6d1db55cf31a25866d64b5e8ef0a1a8369738991bb3879dd453",
+      "gzip_bytes": 18308209,
+      "raw_sha256": "0b73f9b95637ae526b87735982ea52a44c1c663379d02af9b2c6ce95973cdbb0",
+      "raw_bytes": 348464780,
+      "summary_sha256": "30bd7ea7d255516cd79d9b572124da2c1fdf4e1ae6d77eb16f60380080eda626",
+      "independent_review": {
+        "released": true,
+        "agent_CPU": 3,
+        "ROOT_CPU": 2,
+        "funding": "Insidealreadyfullyprepaid audit120 review5; no extra debit",
+        "scope": "StreamfullgzipCRC/rawSHAandactualreceipt/summary/status/contract/source/producer/currentcontextjoin; noMacRAWJSONexpand/no remotererun"
+      }
+    },
+    "score_metric_digest_prospective": {
+      "CPU": 20,
+      "GPU": 0,
+      "funding": "Inside alreadyfullyprepaidsecond2650failure43->23; no newdebit oroutercap",
+      "partition_CPU": {
+        "builder": 3,
+        "remote": 10,
+        "SSH": 3,
+        "ROOT": 4
+      },
+      "released": "ROOTreviewedfull20CPUextractor; actualauditROOTa567sourcejob/spec/rawSHA joins; ONEread-onlysavedrawRPCreleased",
+      "scope": "Actual16/48sixpoints twoarmsmeans/SSEPSNR/byteprices/judges/guard fromROOTauditedserverraw; no inference/BDclaimyet",
+      "case": "/private/tmp/pointstream-primary-score-0cfa5558-metric-extract20-ROOT-20261113",
+      "contract_sha256": "61e31d5a66e1acd39312f0b9633aa59d9a26765dc081aad2ca80b178fef235cd",
+      "release_sha256": "f247b1ba4a2e9416f8b121add7276e0f743791b0959d29bebed1df08249959e1",
+      "output_directory": "/local/users/emanuele/pointstream/metadata-prep/score-metrics-0cfa5558-58c8902e18bf4d6fb589eeaa9659a018",
+      "state": "COMPLETE0 backend47570; ROOT compact arithmetic/frame/rate checks PASS; no new inference",
+      "sha256": "3fba3081e2dcad0fb9722f097a85bda4b012fadffeadb8fc1ce7db2ecc74e312",
+      "backend": 47570,
+      "ROOT_acceptance_sha256": "b3b1ab96f24336d57b25e92f563785573fda8f91406e305f2fd136ca04368cad"
+    },
+    "score_ROOT_acceptance": {
+      "path": "/private/tmp/pointstream-primary-score-0cfa5558-remote-audit120-ROOT-20261113/actual-ROOT-once/ROOT-accepted-paired-score16-48-v2.json",
+      "sha256": "a567869ed541763bdd7ae46121ec51cd2e471b17801a7f592668f79bce751ceb",
+      "state": "CLOSED ROOTaccepted/independentreview/digest/curves/terminalACK/immutablearchive PASS",
+      "supersedes_sha256": "42ec4fec518d60c8ad35a9031f04af4f7028d814b0884a3f57c214eb69930063"
+    },
+    "score_terminal_ACK": {
+      "path": "/private/tmp/pointstream-primary-score-0cfa5558-terminalACK6-ROOT-20261113/actual-ack/stdout.json",
+      "event_id": "bf260a397d475380ba1de6ec8246ca15",
+      "state": "COMPLETE0localonlyzeroSSH/0.091448selfCPU withinprepaidACK6"
+    },
+    "score_curve_analysis_prospective": {
+      "CPU": 10,
+      "GPU": 0,
+      "funding": "Inside already fully prepaid second2650 remaining failure23->13; no new debit",
+      "partition_CPU": {
+        "builder": 4,
+        "local_run": 2,
+        "independent_ROOT_review": 4
+      },
+      "scope": "Local-only actual48 native achievable anchor upper concave hull and PCHIP overlapping quality; 16 correctness only; no extrapolation/population claim",
+      "state": "ROOTaccepted all35actualcomparisonjoins/hulls/overlapPCHIP noextrapolation",
+      "report_sha256": "e431d384a1b019942ce7c880b3e8d8aa4673d5f08086d406cc9df0934f08b539",
+      "ROOT_acceptance_sha256": "220246469e7c8da3d0ecef15c822da49430720cd9d1009fd5bb50f2126b9b3a4"
+    },
+    "checkpoint_PR409": {
+      "state": "MERGED",
+      "CI": "SUCCESS",
+      "merged_at": "2026-11-13T21:49:45Z",
+      "url": "https://github.com/emanuele-artioli/PointStream/pull/409"
+    },
+    "score_archive40": {
+      "state": "COMPLETE0 backend9054; immutable0444/0555/fullSHAreadback PASS; all235members locallyverified",
+      "case": "/private/tmp/pointstream-primary-score-0cfa5558-archive40-FALSE-20261113",
+      "CPU": 40,
+      "GPU": 0,
+      "funding": "already prepaid in second2650, no new debit",
+      "partition_CPU": {
+        "builder": 3,
+        "pack": 5,
+        "whole_archive_verify": 5,
+        "upload_local": 3,
+        "SSH": 3,
+        "remote": 8,
+        "ROOT_review": 3,
+        "reserve": 10
+      },
+      "manifest_sha256": "beeb25a8d93f2ca1f9ff49ffaa9883bdb6f036a4ce56c6b802db167ad1f524d7",
+      "archive_sha256": "6561f4e084ba37a4ca6b9b8c552a5e2d40d4f5ac71027bdcb3af8bef172a0bb2",
+      "archive_bytes": 19500687,
+      "members": 235,
+      "target": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-primary-score-0cfa5558-6561f4e084ba37a4ca6b9b8c/preparation.tar.gz",
+      "publication_release_sha256": "e03e1177998752f572428518a787bab35f31b8a8823b66c65852b4af02eba82a",
+      "publication_backend": 9054
+    },
+    "final_documentation_checks": {
+      "CPU": 8,
+      "GPU": 0,
+      "partition_CPU": {
+        "builder": 4,
+        "ROOT_review_checks": 4
+      },
+      "funding": "Inside prepaid second2650 failure13->5; no new debit",
+      "scope": "Thin acceptance index/frontdocs/card/rootchecks; source/paper unchanged",
+      "state": "COMPLETE scopedcloseout/index ROOTreviewed; threebudgetregressions and liveledgerchecks PASS; CIpublication next"
+    },
+    "score_acceptance_index": "docs/experiments/k5d-inputs/primary-0cfa5558-Ada-paired-score-root-acceptance-20261113.json",
+    "closeout_checkpoint": {
+      "commit": "6d40e8c7",
+      "PR": 410,
+      "url": "https://github.com/emanuele-artioli/PointStream/pull/410",
+      "state": "OPEN auto-merge MERGE; initialCI failedbranchlabels; labels corrected, focused4PASS, freshCIpending"
+    }
+  },
+  "saved292_rescue_harm_analysis_current": {
+    "scope": "Independent savedpredictionsactual292game9Clip5,261visible30absent1excluded; rescues/harms andactualbytes atallthreepoints/bothjudges, primaryWASB diagnosticBallTrack",
+    "CPU_ceiling": 60,
+    "GPU_ceiling": 0,
+    "released": "design10+actual20+review10+archive10;status6/reserve4held",
+    "scientific_rule": "No cherry-pick orpopulation/sourceabsencequalification; keepfailedoriginalpooled10/197and292falsealarmcostbesidegains",
+    "partition_CPU": {
+      "design": 10,
+      "actual_analysis": 20,
+      "canonical_status": 6,
+      "review": 10,
+      "archive": 10,
+      "reserve": 4
+    },
+    "source_report": "/private/tmp/pointstream-postpaired-research-priorities-20261113/recommendations.ROOT-UNSET.json",
+    "case": "/private/tmp/pointstream-saved292-rescue-absence-analysis60-FALSE-20261113",
+    "output": "/private/tmp/pointstream-saved292-rescue-absence-analysis-ROOT-actual-20261113",
+    "actual_release": "/private/tmp/pointstream-saved292-rescue-absence-analysis60-FALSE-20261113/root-release.ROOT.json",
+    "actual_release_sha256": "85ba541b5e19e3ce22570398544146052ba10a7eff82cb2b447f8eb8489a2f22",
+    "state": "CLOSED_ROOTaccepted/independent54tables3504rows/immutablearchivee3ae88ccreadbackPASS",
+    "ROOT_acceptance": "/private/tmp/pointstream-saved292-rescue-absence-analysis-ROOT-actual-20261113/ROOT-accepted-saved292-rescue-absence-analysis.json",
+    "ROOT_acceptance_sha256": "4776e9e7926076c5bd10409c6ba07e4a54a1c8b4ffc401d614979cbf726085a0",
+    "independent_review": "/private/tmp/pointstream-saved292-independent-review-v3-20261113/independent-review.ROOT-UNSET.json",
+    "independent_review_sha256": "b25df14e91dd01d0b84dd61682d0cd5e68f17765639047926e11287c74db344d",
+    "archive": {
+      "state": "COMPLETE0immutable26members/readbackPASS",
+      "backend": 28118,
+      "sha256": "e3ae88ccbab68a19aa0a34a9ad12328352d00a69ae44901edfd7cbe01220aa12",
+      "bytes": 580309,
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-saved292-rescue-absence-e3ae88ccbab68a19aa0a34a9/analysis.tar.gz"
+    },
+    "CPU_charged": 50,
+    "GPU_charged": 0,
+    "unused_never_released_CPU": 10
+  },
+  "confirmation586_readiness_current": {
+    "state": "3033CPU2420GPU phase RESERVED;30design+30localoperationalbuild charged;2973CPU2420GPU held, runtime/metadata/GPU NOTreleased",
+    "scope": "game10/Clip12/586=581visible5abs; differentfrom292game9Clip5; source4282e4d4/f813/env32/config4fa; requiresactualcomplete1.5cost/storage/audit/identitygates",
+    "prospective_CPU_ceiling": 3033,
+    "prospective_GPU_ceiling": 2420,
+    "already_charged_design_CPU": 30,
+    "runtime_released": false,
+    "gates": [
+      "exactold4GiBcaplocation/externalonlyornewsourcequalificationcost",
+      "completeactual292IOtimers+7.29GBphysicalpayloadfit",
+      "disjointwholepartitionincludes30design",
+      "actualnative16/metricscorrectnessbefore586",
+      "frozenROOTstudy_gate/qualification16/cost48/292proofs",
+      "allsource/runtime/host/control/inputidentities/pins",
+      "no originalpooledabsencegatereset"
+    ],
+    "reservation_phase": "ball-study4282-confirmation586-20261113",
+    "operational_build_CPU": 30,
+    "conditional_failure_remaining_CPU": 60,
+    "decision": "Worthdifferentclip/context scale confirmation with roomremaining; preserveallnegatives, nofull30admission",
+    "physical_UUID": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+    "source_readiness": {
+      "state": "CLOSED conditionalROOTaccepted; allactualruntimeSTOPgates retained",
+      "case": "/private/tmp/pointstream-SVT586-readiness30-FALSE-20261113",
+      "manifest_sha256": "8cca4eca254fbaf0b1c78f3e6340a0d321e48a00ac2e58bcaccd92f49a07dca5",
+      "ROOT_acceptance_sha256": "8b272791944f20ecaead3b04a7effbbeccd10f3488ebeeda7f4b6f94ddf6b372",
+      "CPU_charged": 30,
+      "GPU_charged": 0
+    },
+    "audit_wall_clarification": {
+      "server_whole": 1170,
+      "ONE_SSH": 1180,
+      "local_whole": 1200,
+      "CPU": 120,
+      "scope": "Supersedes original660transport; 910childwalls+240finaltransfer+20setup; unchangedCPU/newoperativekitreviewrequired"
+    }
   }
 }
