@@ -13,9 +13,37 @@ and the legacy 200-GPU-hour study are outside scope. No new computation was run
 for this audit. Costs below are ceilings or historical charges where explicitly
 identified, not forecasts for an unprepared new job.
 
-## Current November13 Ada route and receiver gap (UTC)
+## Current research priorities — November 13, 2026 (UTC)
 
-### Current research decision
+Use [PLAN](../../PLAN.md), the [canonical continuation](../continuation-2026-11-13.md)
+and [live ledger](submission-research-budget-20261104.json) for authority/evidence.
+
+**SVT292 is ROOT accepted and all known events ACK-closed.** Actual
+`20261113T173340Z-64160888`, ROOT 437bc322/independent 603bda5e, passed complete
+physical/native/packet/pixel/CPU-receiver/full+ROI/judge/current-cleanup checks.
+Actual game9/Clip5 source-task qualification is TRUE; historical 10/197 failures
+remain. CRF62 visible10-pixel hits5→229/261 WASB and7→229/261 BallTrack accompany
+**false-on-absent3→5/30 for both judges**. Report both gains and harm. Full-command
+wall 534.0789s/scoped527.046201CPU is shared cost metadata, not whole CPU or speed.
+Full 3000CPU/2390GPU charge remains. The failed direct audit and successful gzip
+repair are preserved; no GPU replay. Archive publication 39715 passed immutable readback (SHA2cf8ef0f,41,820,486B,0444/0555). No 586-frame or 30-clip promotion follows.
+
+First priority is the missing six-point neural-plus-SVT comparison, including
+encoded scoring AFTER preparation. Primary 1270CPU/900GPU remains held; old
+window closed and new metadata 30 prototype unfunded/not clocked. Empty encoded
+metric/judge arrays are required in preparation; they are not encoded-quality
+results. W8 static 10 returned whole-endpoint-fit STOP, with no GPU release.
+Only a new complete cost/value decision could authorize586/cohort work; do not
+replace either missing comparator or fresh decoder evidence with more SVT clips.
+
+Passive a25 finished nine ticks at 18:17:06UTC; a26 is active (backend 63980/PID 91332),18:32:08.890423–19:17:08.890323UTC, every 300s/max 9 ticks,100CPU precharged. No autosubmit or verified model wakeup. Paper/PRESLEY paused.
+
+### Earlier November 13 route and receiver-gap snapshot — history
+
+The following previous status and af6/root-state chronology are preserved as
+history. They do not supersede the current front or authorize a new run.
+
+#### Previous research decision
 
 Read the [canonical continuation](../continuation-2026-11-13.md) and live budget ledger for
 current jobs, releases, balances and watcher handles. Frozen scientific source
