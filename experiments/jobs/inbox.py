@@ -1522,8 +1522,12 @@ def wait_snapshot(state_dir: Path, job_id: str, now: float) -> dict[str, Any]:
     return {**summary, "attention": bool(events), "unacknowledged_event_ids": [e["id"] for e in events], "events": [{"id": e["id"], "kind": e["kind"]} for e in events]}
 
 
-def wait_jobs(state_dir: Path, job_ids: list[str], max_seconds: float, *, poll_seconds: float = POLL_SECONDS, clock: Any = time.monotonic, sleep: Any = time.sleep) -> dict[str, Any]:
-    """Block until a listed job needs attention or the bounded wait ends. Read-only."""
+def wait_jobs(state_dir: Path, job_ids: list[str], max_seconds: float, *, until_running: bool = False, poll_seconds: float = POLL_SECONDS, clock: Any = time.monotonic, sleep: Any = time.sleep) -> dict[str, Any]:
+    """Wait read-only for attention, terminal jobs or the optional admission condition.
+
+    Admission succeeds only with reason ``all_running``; terminal jobs and
+    incomplete event reads cannot establish that condition. No events are acked.
+    """
     limit = min(max_seconds, WAIT_MAX_SECONDS)
     begun = clock()
     while True:
@@ -1532,10 +1536,12 @@ def wait_jobs(state_dir: Path, job_ids: list[str], max_seconds: float, *, poll_s
         elapsed = clock() - begun
         attention = any(job["attention"] for job in jobs)
         settled = all(job["status"] in TERMINAL for job in jobs)
+        admitted = until_running and all(job["status"] == "running" and "events_error" not in job for job in jobs)
+        terminal = until_running and any(job["status"] in TERMINAL for job in jobs)
         # Stop before a further poll would end past the limit.
         remaining = limit - elapsed - (clock() - poll_started)
-        if attention or settled or remaining <= 0:
-            reason = "attention" if attention else "all_terminal" if settled else "timeout"
+        if attention or settled or terminal or admitted or remaining <= 0:
+            reason = "attention" if attention else "all_terminal" if settled else "terminal" if terminal else "all_running" if admitted else "timeout"
             return {"reason": reason, "attention": attention, "waited_seconds": round(elapsed), "max_seconds": limit, "jobs": jobs}
         sleep(min(poll_seconds, remaining))
 
@@ -1589,6 +1595,7 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
     waiting = actions.add_parser("wait", help="block until a listed job needs attention, at most 45 minutes; read-only")
     waiting.add_argument("job_ids", nargs="+")
     waiting.add_argument("--max-seconds", type=float, default=WAIT_MAX_SECONDS, help=f"stop waiting after this many seconds; capped at {WAIT_MAX_SECONDS}")
+    waiting.add_argument("--until-running", action="store_true", help="return when every listed job is running, or any job is terminal or needs attention; read-only")
     ack = actions.add_parser("ack")
     ack.add_argument("event_ids", nargs="+")
     for name in (() if public_only else ("worker", "campaign", "salvage", "rpc")):
@@ -1636,7 +1643,8 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
         elif args.action == "wait":
             if not args.max_seconds > 0:
                 raise fleet.FleetError("--max-seconds must be positive")
-            value = wait_jobs(args.state_dir, args.job_ids, args.max_seconds)
+            value = (wait_jobs(args.state_dir, args.job_ids, args.max_seconds, until_running=True)
+                     if args.until_running else wait_jobs(args.state_dir, args.job_ids, args.max_seconds))
             print(json.dumps(value, indent=2, allow_nan=False))
             return WAIT_ATTENTION_EXIT if value["attention"] else 0
         elif args.action == "ack":

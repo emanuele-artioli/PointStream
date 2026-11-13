@@ -23,6 +23,13 @@ from experiments.tennis import k5d_fleet as fleet, k5d_real_parity as parity
 from experiments.tennis import k5d_source_oracle as oracle
 
 
+FULL_NAMESPACE_SECONDS = 1200
+FULL_STAGE_SECONDS = 1220
+CAMPAIGN_SECONDS = 1800
+VALIDATOR_SECONDS = 30
+REPORT_RESERVE_SECONDS = 100
+
+
 def digest(value: Any) -> bool:
     return isinstance(value, str) and cf.digest_string(value)
 
@@ -171,10 +178,11 @@ def smoke_forecast(stage: Path) -> dict[str, float]:
         raise ValueError('campaign clock missing or invalid')
     estimate = 1.5 * 3 * wall + 50
     remaining = clock['budget_end'] - now
-    if estimate > 580 or remaining < max(600, estimate + 130):
+    required_remaining = FULL_STAGE_SECONDS + VALIDATOR_SECONDS + REPORT_RESERVE_SECONDS
+    if estimate > FULL_NAMESPACE_SECONDS or remaining < required_remaining:
         raise ValueError('complete smoke forecast cannot support 48-frame stage')
     return {'wall_seconds': wall, 'cpu_seconds': cpu, 'full_estimate_seconds': estimate,
-            'remaining_seconds': remaining, 'setup_seconds': clock['phase_started'] - clock['started']}
+            'remaining_seconds': remaining, 'required_remaining_seconds': required_remaining, 'setup_seconds': clock['phase_started'] - clock['started']}
 
 
 def run(args: argparse.Namespace) -> None:
@@ -314,7 +322,7 @@ def spec(base: dict, *, action: str, assets: dict[str, dict[str, str]], deadline
     result['entrypoint'] = ['-m', 'experiments.tennis.k5d_scoped_namespace']
     result['scale']['frames'] = {'smoke': 16, 'full': 48}
     result['scale']['proof_mode'] = {'smoke': 'ada-scale-' + action, 'full': 'ada-scale-' + action}
-    result['scale']['namespace_timeout'] = {'smoke': 280, 'full': 580}
+    result['scale']['namespace_timeout'] = {'smoke': 280, 'full': FULL_NAMESPACE_SECONDS}
     result['arguments'] = ['outer', '--unshare-sha', unshare_sha256, '--timeout', '{namespace_timeout}', '--',
                            '{proof_mode}', *base['arguments'], '--unshare-sha256', unshare_sha256]
     for name, entry in assets.items():
@@ -323,10 +331,10 @@ def spec(base: dict, *, action: str, assets: dict[str, dict[str, str]], deadline
     if action == 'score':
         result['arguments'] += ['--producer16-job', producer16_job, '--producer48-job', producer48_job]
     result.update(hosts=['gpu6'], gpu_models=['RTX 6000 Ada'], gpu_sharing={'mode': 'exclusive'},
-                  single_cpu_campaign=True, budget_seconds=900, validator_seconds=30,
+                  single_cpu_campaign=True, budget_seconds=CAMPAIGN_SECONDS, validator_seconds=VALIDATOR_SECONDS,
                   smoke={'seconds': 300, 'representative_basis':
                          'All six isolated 16-frame producer paths or sealed-pixel full scoring; conditional 48-frame forecast.'},
-                  full={'seconds': 600}, validator=['{python}', '-m', 'experiments.tennis.k5d_ada_scale_worker', 'validate'])
+                  full={'seconds': FULL_STAGE_SECONDS}, validator=['{python}', '-m', 'experiments.tennis.k5d_ada_scale_worker', 'validate'])
     validate_spec(result)
     return result
 

@@ -118,8 +118,10 @@ def test_spec_builder_limits_stages_hosts_and_requires_producer_jobs(tmp_path, m
     inbox.validate_spec(result)
     assert result['hosts'] == ['gpu6'] and result['gpu_sharing'] == {'mode': 'exclusive'}
     assert result['scale']['proof_mode'] == {'smoke': 'ada-scale-score', 'full': 'ada-scale-score'}
-    assert result['budget_seconds'] == 900 and result['validator_seconds'] == 30
-    assert result['smoke']['seconds'] == 300 and result['full']['seconds'] == 600
+    assert result['budget_seconds'] == 1800 and result['validator_seconds'] == 30
+    assert result['smoke']['seconds'] == 300 and result['full']['seconds'] == 1220
+    assert result['scale']['namespace_timeout'] == {'smoke': 280, 'full': 1200}
+    assert sum(result[stage]['seconds'] for stage in ('smoke', 'full')) + result['validator_seconds'] + 100 <= result['budget_seconds']
 
 
 def test_producer_verifies_every_isolation_receipt_against_actual_context(tmp_path, monkeypatch):
@@ -418,3 +420,36 @@ def test_persisted_device_uses_sealed_capability_and_normalizes_uuid(tmp_path):
     (tmp_path / 'source-qualification.json').write_text(json.dumps({'device': source}))
     assert adapter.persisted_device(tmp_path, marker, dispatch_gpu=marker['gpu']) == {
         'name': source['name'], 'uuid': marker['gpu']['uuid'], 'capability': source['capability']}
+
+
+@pytest.mark.parametrize(('wall', 'remaining', 'accepted'), [
+    # The actual witness fails the previous 580-second ceiling and fits 1200.
+    (227.14830708503723, 1400, True),
+    # Reserve the declared 1220-second stage, validator and reporting, even
+    # when the numerical estimate itself is much smaller.
+    (100, 1349.999, False),
+    (100, 1350, True),
+    (227.14830708503723, 1202.168, False),
+    ((1200 - 50) / 4.5, 1350, True),
+    ((1200 - 50) / 4.5 + 0.001, 1500, False),
+])
+def test_smoke_forecast_complete_stage_budget(tmp_path, monkeypatch, wall, remaining, accepted):
+    import json
+    from experiments.tennis import k5d_ada_fresh as fresh
+    from experiments.tennis import k5d_ada_scale_worker as worker
+
+    monkeypatch.setattr(fresh, 'stage_receipt', lambda _: (wall, wall - 1))
+    monkeypatch.setattr(worker.time, 'monotonic', lambda: 400.)
+    (tmp_path / 'dispatch.json').write_text(json.dumps({'campaign_clock': {
+        'started': 100., 'phase_started': 150., 'budget_end': 400. + remaining}}))
+    if not accepted:
+        with pytest.raises(ValueError, match='complete smoke forecast'):
+            worker.smoke_forecast(tmp_path)
+        return
+    result = worker.smoke_forecast(tmp_path)
+    assert result['full_estimate_seconds'] == pytest.approx(1.5 * 3 * wall + 50)
+    assert result['required_remaining_seconds'] == 1220 + 30 + 100
+    assert result['remaining_seconds'] == remaining
+    if wall == 227.14830708503723:
+        assert result['full_estimate_seconds'] > 580
+        assert result['full_estimate_seconds'] == pytest.approx(1072.1673818826675)
