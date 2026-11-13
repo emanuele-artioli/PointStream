@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "status": "conditional workload-proof relevance accepted; candidate control diff/activation/GPUroute not yet qualified",
+  "report_local": "/private/tmp/pointstream-calibration-source-qualification-20261113/control-noninterference-readonly/report.json",
+  "report_sha256": "90970adb83bb1f6f2c2047e2c8b9a32debd23e125d00e36998cb83e987a563bc",
+  "local_CPU_seconds": 0.22139699999999998,
+  "actual_config": {
+    "fleet_release_reference_count": 0,
+    "key_value_strings_examined": 146376,
+    "profile_sha256": "ecf4c1bb0b2694b9b7b4c55e51e2c9bc30822e8a81dc25b412077891ee79100d",
+    "runtime_inventory_sha256": "6034e7ef33a96dfc74dfb8c7ca33e97b1f1c91fd780208e7161ab3a875c1cd07",
+    "sha256": "e478cbf16830b7788f835dc888b87ee119505f767a0ac535fb902f76690505ed",
+    "source_grants": 31,
+    "source_root": "$FROZEN_SOURCE"
+  },
+  "old_control": {
+    "files": {
+      "experiments/__init__.py": "06f003a15341e1a630da290bb9f66f11bd79de593e85aff33fdd1b548db2cba9",
+      "experiments/jobs/__init__.py": "999dfe9ae372c896e01e55010d27a97b0c6bc2fe6ff22183a1dc121ee3d56633",
+      "experiments/jobs/claims.py": "4ce261cc723de1ff2e4497c5f760d997bf6681f0e7ca75019a53280acbc6b1ef",
+      "experiments/jobs/fleet.py": "ecb7b7bbe4b2f8c3c79e39e77da1de1ae00a3d8a67308b33ff0aad29ff729145",
+      "experiments/jobs/inbox.py": "5dbdc52879729157d2073ad717d731fb7af4563f3ca1330930be96edea97266e",
+      "experiments/jobs/monitor.py": "73671c2892127bf2510b98aee75356f50736d8613f769d5b8e5426b4a821268e",
+      "experiments/jobs/staging.py": "f94156c1d5b9a6bf2ac1ec8c3437a82cd6f36a9085a7f68a6122381b7cfd0422"
+    },
+    "root": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261105T031637Z-2503bb20"
+  },
+  "native_proof": "909558234ceca59ff944f29be8a7a1df7313309fa10e281464bb16adf29aab36",
+  "CPU_denial_proof": "7adf5e5dc70d64e0cd84406187db73311fb2d10dbcbcb83f2d84cb0f41a12865",
+  "scope": "Scientific identity/config/source grants/runtime/native unchanged: existing native and CPU workload claims retain old control provenance. Actual control candidate must change only routing/capability/validation; new control metadata and exact GPU joins required. No new-control run or GPU proof is claimed."
+}

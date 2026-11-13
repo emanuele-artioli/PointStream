@@ -5,10 +5,41 @@ The [budget ledger](experiments/submission-research-budget-20261104.json) is the
 accounting authority; [Ball journal](experiments/k5d-ball-benchmark.md) retains
 chronology and raw-result references. Times below are UTC.
 
+## Current scheduling decision (November 13, UTC)
+
+**Hold the new GPU witness and paired calibration.** The later calibration
+requires one physical GPU UUID across two jobs; existing fleet eligibility
+filters model names only. An idle snapshot, post-assignment observer or retry
+cannot guarantee that condition. A control-only UUID/capability design and independent proof-relevance audit
+are complete. Root released 220 local CPU-seconds for its minimal implementation
+and holds 60 CPU-seconds for separately reviewed Linux activation. No deployment
+or GPU release is authorized. See the [routing card](cards/k5d-control-only-uuid-routing-2026-11-13.md). Keep scientific source 2c6d immutable. Old CPU proofs
+retain their original scoped claims; any new-control applicability must be
+reviewed explicitly.
+
+Witness metadata 50 CPU is precharged, but its concrete launcher has NOT run.
+Preserve false and approved prospective bundles. Their scientific spec
+8f29/b290 deadline is 09:41:14 UTC; never submit an expired or unreviewed revision.
+An unrun deadline may be rebound only through a new root-reviewed prospective
+package; no unknown job or finished result is replayed. The paired planning
+package is `/private/tmp/pointstream-calibration-source-qualification-20261113/paired-calibration-plan-UNRUN`.
+Its illustrative 4,000 GPU / 4,400 CPU pair allowance is NOT allocated.
+
+Independent SVT-only LOCAL qualification repair is a draft candidate in
+`/private/tmp/pointstream-k5d-svt-cpu-qualification-repair-20261113`, based on
+582fb64c with 2c6d integrated. The 200 CPU ceiling includes the retained cold
+mypy timeout and a prospectively approved 20 CPU internal stage reallocation;
+no additional overall allocation or scientific compute follows. Draft PR387
+passed 349 local K5d tests/Ruff/mypy; full CI found one 582-origin fixture
+sensitive to BLAS rounding in three-versus-six decode fitting. The builder is
+repairing that test without changing fitting or the exact real-reference gate.
+Root review and
+actual source/CPU/memory/cost gates remain required before its 16-frame oracle.
+
 ## Current source/native-proof phase (November 13, UTC)
 
-Status snapshot: 2026-11-13 09:02:03 UTC. This section stops before an actual CPU-denial
-job ID is returned; no ID is invented or uncertain publication replayed.
+The accepted source/CPU evidence and retained preparation chronology follow.
+The scheduling decision above governs prospective runtime releases.
 
 
 **Root accepted the new source/cache and actual native CPU proof.** Actual
@@ -71,28 +102,37 @@ The full 365 CPU is charged, including preflight 20. Actual ONE publication
 `20261113T090138Z-e039d7c0` completed with original validator PASS: stage
 33.878553s wall / 33.065873 CPU, smoke 39.990443s. Sole wait 16525 ended with
 attention. Root accepted the [actual receiver evidence](experiments/k5d-inputs/calibration-Ada-e039-CPU-denial-acceptance-20261113.json).
-Event `05f54ed1560f5446b855561f790919f2` acknowledgment is authorized only after
-a fresh canonical COMPLETE/gate-true/no-error check; receipt pending. No active
+Event `05f54ed1560f5446b855561f790919f2` is ACKED after a fresh canonical
+COMPLETE/gate-true/no-error check. Approved proof 7adf5e5d is physically
+published at NFS checks/k5d-calibration-Ada-real-CPU-4ef7b5301263acb0317e9aea3716d163/real-CPU-denial.json
+(7,312,495 bytes, file 0444 / directory 0555). Original false candidate is preserved. No active
 fleet wait or GPU release.
 Actual run: `/private/tmp/pointstream-calibration-source-qualification-20261113/CPU-denial365-preflight-UNRELEASED/actual-run`.
 Spec canonical `043bbf10` / raw `a69700c2`, source 2c6d/6f898f75, archive 5ca2d194,
 environment 32e68872; deadline 09:27:46 UTC. Do not replay.
 
-Remaining qualification 900 GPU / 1,130 CPU is held: metadata 50 + administration
-180 + witness 900 CPU (700 campaign + 200 observers). No GPU/calibration/full30
+Witness metadata 50 CPU is prospectively released for exact helper 885c77ca;
+its complete bootstrap/launcher still needs final review before one invocation.
+It starts no observers or job. Remaining qualification 900 GPU / 1,080 CPU is held:
+administration 180 + witness 900 CPU (700 campaign + 200 observers). No GPU/calibration/full30
 release. Preserve the frozen scientific source while client/documentation evolves.
 
-Passive a13 started 08:53:27 UTC: backend 42714 / PID 13657, exact helper 2b931eb5,
-spec f5170928, four hosts every 300s / max 9 ticks, deadline 09:38:27.072274 UTC.
-It was prospectively charged 100 CPU / 0 GPU after checking a12 had ended 9 ticks and
-PID 8649 was absent. The completed tick 1 at 08:58:47.765846 UTC found no eligible
-idle GPU on gpu2/gpu3/gpu5/gpu6. Root supplied this completed tick snapshot; no additional query was made.
-Release/helper/launch/backend/receipt are under
-`/private/tmp/pointstream-resource-watch-20261113-passive-a13`; the Ball journal
-and ledger monitoring field preserve the handle. No autosubmit, cancellation,
-job launch, model timer or verified native model-completion callback.
+Passive a13 ended 09:33:48 UTC, nine ticks / no eligible idle target; its PID
+13657 is absent. Old tool backend42714 is unknown to the current tool, so the
+terminal receipt and PID check establish closure. New passive a14 started
+09:37:12 UTC, backend38838 / PID18482, same helper2b931eb5/specf5170928, four
+hosts every300s/max9ticks. Hard deadline10:22:12.403246 UTC. First completed tick
+09:37:30.215064 found no eligible idle GPU. It is prospectively charged100 CPU/
+zero GPU and lives at `/private/tmp/pointstream-resource-watch-20261113-passive-a14`.
+No autosubmit/cancel/model timer; native model-completion wakeup remains unverified.
 
-Current charges: programme 23,841 GPU / 64,205 CPU; Ball 17,479 GPU / 40,204 CPU, within
+SVT-only readiness proceeds independently in a new checkout. Root released
+200 CPU / zero GPU from its existing 1,800 CPU reservation to repair the actual
+CPU-only qualification path and preserve 2c6d hardening. Remaining 1,600 CPU /
+600 GPU is scientifically UNRELEASED; the real 16-frame oracle has not run.
+No full 48-frame/corpus adapter or complete cost fit is established.
+
+Current charges: programme 23,841 GPU / 64,775 CPU; Ball 17,479 GPU / 40,774 CPU, within
 unchanged 24 GPU-hour / 28 CPU-hour authority. Old ae892/d1bb receipt/pixel PASS and observer
 FAIL remain separately scoped. New-source native proof alone does not qualify
 actual receiver denial, CUDA/GPU, complete cost/span or full scale. Frozen 2c6d

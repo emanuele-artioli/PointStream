@@ -2,15 +2,22 @@
 
 Status (November 13, 09:05 UTC): new 2c6d source/cache and actual native proof
 are accepted. Actual SVT CPU-denial `20261113T090138Z-e039d7c0` completed with
-validator and root evidence review PASS; terminal acknowledgment is being closed. External queue
+validator and root evidence review PASS; terminal acknowledgment is complete and proof 7adf5e5d is published. External queue
 controller Linux qualification is accepted, with both earlier failures retained.
 No new-source GPU witness or later calibration/scale run is released.
 
 The [canonical continuation](../continuation-2026-11-13.md) owns live handles and
 stage state; the ledger owns balances. Current qualification hold is 900 GPU /
-1,130 CPU (metadata 50, administration 180, witness 900 CPU). The administration
+1,080 CPU (administration 180, witness 900 CPU). Metadata 50 CPU is separately
+released; exact bootstrap/launcher review remains required before execution. The administration
 300 ceiling includes 120 already charged, future chain 148 and other reserve 32.
 Frozen source 2c6d never advances; no old-source proof is relabelled.
+
+GPU witness is now held pending a separately reviewed control-only GPU-UUID
+routing design: the existing model-name filter cannot ensure one physical GPU
+across the two calibration jobs. Metadata 50 is precharged but unrun; control-only implementation220CPU is separately released in the routing card;
+no worker/control deployment is authorized by this card. Read the current scheduling
+decision in the continuation before acting on the prospective packages.
 
 ## Original staged scope and retained chronology
 

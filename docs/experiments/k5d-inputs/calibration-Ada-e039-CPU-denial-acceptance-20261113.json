@@ -150,7 +150,15 @@
     "status": "independent actual artifact checks PASS; ROOT approval and ACK UNSET"
   },
   "terminal_event": "05f54ed1560f5446b855561f790919f2",
-  "ACK_state": "authorizedafterfreshcanonicalCOMPLETE/gateTrue/noerror; receiptpending",
+  "ACK_state": "ACKED after freshcanonicalCOMPLETE/gateTrue/noerror",
   "full_CPU_charge": 365,
-  "GPU_seconds": 0
+  "GPU_seconds": 0,
+  "ACK_receipt_sha256": "6700624dd12a5e2893791a91cd65ef3b33ba174e24b32bf5e4b301499100b019",
+  "proof_NFS": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-calibration-Ada-real-CPU-4ef7b5301263acb0317e9aea3716d163/real-CPU-denial.json",
+  "proof_sha256": "7adf5e5dc70d64e0cd84406187db73311fb2d10dbcbcb83f2d84cb0f41a12865",
+  "proof_bytes": 7312495,
+  "proof_permissions": {
+    "file": "0444",
+    "directory": "0555"
+  }
 }
