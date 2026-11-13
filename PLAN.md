@@ -23,42 +23,35 @@ new dependency.
 
 ## Where PointStream stands (2026-11-13, UTC)
 
-### Current research decision (November 13, 11:35 UTC)
+### Current research decision (November 13, 11:58 UTC)
 
-Actual SVT-only CPU receiver job `20261113T111519Z-b40b90d4` is root accepted,
-physically published (proof `c8c3949b`, 7,313,201 bytes, immutable0444/0555)
-and terminal-ACKed (`06e252891c1f5883a1e83541746526ed`). Independent checks
-joined exact source/config/environment, native wire/YUV/RGB, five private-file
-denials, initial-launcher SIGKILL, eighteen absent processes/sixteen captured
-births/four empty groups and the actual empty FQDN CPU claim. The same56c
-worker/control passed the before/after CPU-admission joins. This establishes
-CPU operational readiness; it does not establish GPU routing or general readiness.
-Failed kernel gates and the original publication guard UNKNOWN remain retained;
-actual normalized spec5d425 is accepted solely under deadline_epoch erratum0bf13.
-No resubmission or scientific-source change occurred.
+Shared-SVT16 job `20261113T114623Z-c6b01236` was assigned gpu6 Ada1 ef96,
+then failed the strict `before_models` memory-row check. Diagnostic 79617
+confirmed source admission; zero quality points are accepted. Cleanup 29077
+completed with two captured PIDs absent, one empty group and no owned shared
+GPU/FQDN CPU tokens; root closeout is accepted and terminal ACK is complete. The old
+848 CPU/600 GPU phase remains fully charged and closed to automatic retry.
 
-No GPU stage is released. The primary exclusive-Ada16 witness can retain V5;
-a new purpose-specific GPU authorization/state is being prepared, preserving
-2c6d/source6f and its native9095/receiver7adf proofs. The first real witness must
-itself join the physical UUID through request, claim, dispatch and CUDA/producer.
-For shared SVT16, root prospectively selected correctness/feasibility only with
-full600GPU/535CPU conservative charging, CURRENT cleanup, exact own-Ada parity,
-and no independent live-span, speed, extrapolation or scale claim. This avoids
-building a copied shared observer system. Its complete stock-fleet lifecycle
-forecast and external package still require root review; completion is unproven.
+- **Ball/SVT subitem: qualify CUDA context memory accounting**
+  ([card](docs/cards/k5d-svt-memory-context-repair-2026-11-13.md)). Independent
+  candidate a71dc6e2 (patch-identical to PR393/93ebb351) materializes a tiny CUDA allocation after the cap, then
+  synchronizes/releases it before resetting peaks. Strict memory/PID guards
+  remain. New600 GPU/2000 CPU is reserved, UNRELEASED; local checks 300 CPU are
+  separately precharged. Despite identical 31 receiver grants, fresh native
+  and actual CPU-denial proofs are required for the new source identity.
+  Only CI, exact freeze/CPU qualification and root forecasts can gate one
+  new real16 test. No thresholds, permissions, training or scale claims change.
 
-The receiver phase retains480CPU/0GPU (443 original +20 launcher repair +17
-proof closeout). SVT remaining hold848CPU/600GPU is meta50/admin200/reserve63/
-science535. Programme charges23841GPU/65923CPU; Ball17479GPU/41922CPU.
-All spent-plus-held ceilings pass. Source7a9f/native6bf and source2c6d stay immutable.
+Accepted source 7a9f/native 6bf/receiver c8 remain evidence for their original
+identities. The primary exclusive 2c6d route is separate:1160 CPU/900 GPU held,
+metadata 50 CPU precharged UNRUN, false plan 463f50d0. Failed kernel-readiness
+gates and the earlier publication UNKNOWN/metadata erratum remain preserved.
 
-Passive a16 backend60680/PID27368 checks A6000 and Ada every300s, maxnine ticks,
-with hard deadline11:53:06.240058UTC. Latest inspected tick4 at11:28:26UTC found
-no idle candidate. No automatic submission or verified completion resumption;
-no recurring LLM timer. Manuscript and PRESLEY work remain paused.
-
-See the [canonical continuation](docs/continuation-2026-11-13.md) and
-[accepted receiver evidence](docs/experiments/k5d-inputs/svt-7a9f-b40b90d4-CPU-denial-acceptance-20261113.json).
+Passive a17 backend 10511 / PID 37616 is bounded to 12:39:15UTC, every 300s/max nine
+checks; a16 ended with no idle candidate. No autosubmit, recurring model timer
+or verified completion resumption. Manuscript and PRESLEY work remain paused.
+See the [continuation](docs/continuation-2026-11-13.md) and
+[ledger](docs/experiments/submission-research-budget-20261104.json) for live pins.
 
 ### Historical af6 phase — balances, waits and watch superseded above
 

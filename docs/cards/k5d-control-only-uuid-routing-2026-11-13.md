@@ -1,16 +1,16 @@
 # Control-only physical GPU routing — November 13
 
-Status (November13,11:35UTC): actualCPUreceiverb40b90d4 is root accepted,
-proofc8c3949b physically published and sole terminal event ACKed. Native6bf,
-source7a9f/cache and same56c CPU-admission joins are accepted. Failed kernel
-readiness gates and original UNKNOWN/metadata erratum remain retained.
-No GPU/general-routing pass follows. Receiver480CPU retained; SVThold848CPU/
-600GPU (meta50/admin200/reserve63/science535). Root prospectively narrowed
-sharedSVT16 to correctness/feasibility with full conservative caps, CURRENT
-cleanup and exact own-Ada parity, omitting live-span/speed/scale claims and
-copied observers. Exact lifecycle/package review is pending; no GPU release.
-Primary V5 exclusive route remains separate. The current continuation and
-budget ledger own live state; manuscript/PRESLEY remain paused.
+Status (November 13, 11:58 UTC): CPU operational readiness remains accepted
+under actual receiver proof c8 and the same 56c worker/control. Shared-SVT16 job
+`20261113T114623Z-c6b01236` reached requested Ada1 ef96, then failed before
+models on a missing strict memory row; no complete GPU/quality qualification.
+Cleanup 29077 completed (two captured PIDs/one group clear, owned shared/FQDN
+CPU tokens absent); root closeout/sole terminal ACK complete. Failed kernel gates stay failed.
+The separate [memory-context repair](k5d-svt-memory-context-repair-2026-11-13.md)
+is build-only, with fresh exact-source CPU proofs required before one new real16
+release. Primary exclusive 2c6d/V5 remains false/UNRUN:1160 CPU/900 GPU held plus
+already charged metadata 50 CPU. No source/default/decoder-policy change or general
+client promotion is authorized here. See [continuation](../continuation-2026-11-13.md).
 
 ## Historical implementation and activation protocol
 

@@ -1,0 +1,30 @@
+{
+  "approved": true,
+  "job_id": "20261113T114623Z-c6b01236",
+  "status": "FAILED before_models memoryrowmissing; CURRENT capturedcleanup accepted only",
+  "diagnostic_path": "/private/tmp/pointstream-SVT-first16-stock-FINAL-20261113-ROOT-a40391/actual-failed-smoke-diagnostic/stdout.json",
+  "cleanup_path": "/private/tmp/pointstream-SVT-first16-c6b01236-cleanup-audit-UNRUN-20261113/actual-ROOT-93f5/cleanup.json",
+  "cleanup_sha256": "831b8311133a321ea1f4ce6c46247b568b292f10acabe2bf95581bb31207d811",
+  "aftercontext_sha256": "9abfec289fc120a3cca756158462480590eaf994c375d3d8199a92f7b3b7e5d8",
+  "captured_PIDs": [
+    "1705873",
+    "1705881"
+  ],
+  "empty_group_ids": [
+    "1705881"
+  ],
+  "own_shared_claim_absent": true,
+  "own_FQDN_CPU_claim_absent": true,
+  "full_GPU_precharge": 600,
+  "full_CPU_phase_precharge": 848,
+  "model_usage": "No learned model inference reached according to frozen code path and before_models traceback; actual GPU context usage UNKNOWN",
+  "no_quality_speed_live_span_scale_or_complete_UUID_route_claim": true,
+  "limitations": [
+    "Current cleanup only; two captured supervisor/campaign PIDs and one group; model PID not independently captured in this failed run",
+    "Own NVIDIA-row absence check covers captured PIDs only; foreign processes preserved",
+    "Failedgate/trace retained; no automatic retry or relabeling as paper quality result"
+  ],
+  "next_gate": "New independent source proposal, aftercap1byteCUDAallocation/synchronize beforefirstsnapshot; freshnative/CPUdenial required, then separatelyreleased16.",
+  "terminal_event_ACK": "7c0c1189bc545d2082bd6846b4331f40",
+  "terminal_ACK_backend": 63255
+}
