@@ -551,7 +551,10 @@ def _send_snapshot(
         raise FleetError("snapshot transfer timeout must be positive and finite")
     remote_tar = str(Path(target).with_suffix(".tar"))
     # Coalesce pipe reads before writing NFS; noclobber preserves partial uploads.
-    receive = f"umask 077; set -o noclobber -o pipefail; gzip -dc | dd bs=1M iflag=fullblock status=none > {shlex.quote(remote_tar)}"
+    receive = ("umask 077; set -o noclobber -o pipefail; "
+               "if [[ ! -x /usr/bin/gzip || ! -x /usr/bin/dd ]]; then "
+               "printf 'snapshot receiver tools unavailable\\n' >&2; exit 127; fi; "
+               f"/usr/bin/gzip -dc | /usr/bin/dd bs=1M iflag=fullblock status=none > {shlex.quote(remote_tar)}")
     deadline = time.monotonic() + timeout
     def remaining() -> float:
         left = deadline - time.monotonic()
@@ -568,7 +571,7 @@ def _send_snapshot(
         remaining()
         compressed.seek(0)
         proc = subprocess.run(
-            ["ssh", "-C", "-o", "BatchMode=yes", "-o", "ConnectTimeout=8", host, shlex.join(["bash", "-lc", receive])],
+            ["ssh", "-C", "-o", "BatchMode=yes", "-o", "ConnectTimeout=8", host, shlex.join(["bash", "--noprofile", "--norc", "-c", receive])],
             stdin=compressed,
             capture_output=True,
             timeout=remaining(),

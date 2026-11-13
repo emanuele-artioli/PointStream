@@ -3,6 +3,9 @@ import io
 import gzip
 import json
 import os
+import shlex
+import subprocess
+import sys
 from pathlib import Path
 import stat
 import tarfile
@@ -89,8 +92,11 @@ def test_send_snapshot_without_extraction_keeps_only_the_verified_archive(tmp_pa
     fleet._send_snapshot("gpu2", source, "/inbox/job/source", "a" * 64, timeout=90, extract=False)
     argv, sent, timeout = uploads[0]
     assert argv[:2] == ["ssh", "-C"] and argv[-2] == "gpu2"
+    receiver = shlex.split(argv[-1])
+    assert receiver[:4] == ["bash", "--noprofile", "--norc", "-c"]
+    assert "-x /usr/bin/gzip" in receiver[4] and "-x /usr/bin/dd" in receiver[4]
     assert "iflag=fullblock" in argv[-1] and "noclobber" in argv[-1]
-    assert "pipefail" in argv[-1] and "gzip -dc" in argv[-1]
+    assert "pipefail" in argv[-1] and "/usr/bin/gzip -dc" in argv[-1]
     assert "bs=1M" in argv[-1] and "/inbox/job/source.tar" in argv[-1]
     assert gzip.decompress(sent) == b"archive" and 0 < timeout <= 90
     assert commands == [["sha256sum", "--", "/inbox/job/source.tar"]]
@@ -404,3 +410,59 @@ def test_submit_cache_reuse_keeps_job_spec_and_passes_exact_snapshot_sha(tmp_pat
     assert copies == [(('gpu2', '/usr/bin/python3', config['base'], args.snapshot_cache_archive,
                         '/data/jobs/fleet/inbox/' + result['job_id'] + '/source', 'fixed-sha'), {'timeout': 450})]
     assert result['snapshot_cache_archive'] == args.snapshot_cache_archive
+
+
+@pytest.mark.parametrize('existing', [False, True])
+def test_snapshot_receiver_quotes_target_and_preserves_existing_bytes(tmp_path, monkeypatch, existing):
+    """Run the actual receiver shell with local transport-tool stand-ins."""
+    source = tmp_path / 'source.tar'
+    source.write_bytes(b'new archive bytes')
+    # If shell quoting breaks, command substitution would create this marker.
+    marker = tmp_path / 'injected'
+    target = tmp_path / "source ' $(touch injected)"
+    archive = target.with_suffix('.tar')
+    if existing:
+        archive.write_bytes(b'preserved evidence')
+    tools = []
+    for name, body in [('gzip', 'import gzip; sys.stdout.buffer.write(gzip.decompress(sys.stdin.buffer.read()))'),
+                       ('dd', 'import shutil; shutil.copyfileobj(sys.stdin.buffer, sys.stdout.buffer)')]:
+        tool = tmp_path / name
+        tool.write_text('#!' + sys.executable + '\nimport sys\n' + body + '\n')
+        tool.chmod(0o755)
+        tools.append(tool)
+    real_run = subprocess.run
+    def upload(argv, **kwargs):
+        receiver = shlex.split(argv[-1])
+        assert receiver[:4] == ['bash', '--noprofile', '--norc', '-c']
+        script = receiver[4].replace('/usr/bin/gzip', str(tools[0])).replace('/usr/bin/dd', str(tools[1]))
+        return real_run([*receiver[:4], script], cwd=tmp_path, **kwargs)
+    monkeypatch.setattr(fleet.subprocess, 'run', upload)
+    checks = []
+    monkeypatch.setattr(fleet, '_ssh', lambda host, argv, **kw:
+                        checks.append(argv) or SimpleNamespace(returncode=0, stdout='a' * 64 + ' archive'))
+    if existing:
+        with pytest.raises(fleet.FleetError, match='snapshot transfer failed'):
+            fleet._send_snapshot('unused', source, str(target), 'a' * 64, extract=False)
+        assert archive.read_bytes() == b'preserved evidence'
+        assert not checks
+    else:
+        fleet._send_snapshot('unused', source, str(target), 'a' * 64, extract=False)
+        assert archive.read_bytes() == source.read_bytes()
+        assert checks == [['sha256sum', '--', str(archive)]]
+    assert not marker.exists()
+
+
+def test_snapshot_receiver_missing_absolute_tool_stops_before_writing(tmp_path, monkeypatch):
+    source = tmp_path / 'source.tar'
+    source.write_bytes(b'archive')
+    target = tmp_path / 'target'
+    real_run = subprocess.run
+    def upload(argv, **kwargs):
+        receiver = shlex.split(argv[-1])
+        script = receiver[4].replace('/usr/bin/dd', str(tmp_path / 'missing-dd'))
+        return real_run([*receiver[:4], script], cwd=tmp_path, **kwargs)
+    monkeypatch.setattr(fleet.subprocess, 'run', upload)
+    monkeypatch.setattr(fleet, '_ssh', lambda *a, **kw: pytest.fail('checksum after failed tool preflight'))
+    with pytest.raises(fleet.FleetError, match='receiver tools unavailable'):
+        fleet._send_snapshot('unused', source, str(target), 'a' * 64, extract=False)
+    assert not target.with_suffix('.tar').exists()
