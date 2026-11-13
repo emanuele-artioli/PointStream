@@ -204,6 +204,7 @@ def run(args: list[str]) -> None:
                                            stderr=subprocess.STDOUT, close_fds=True, start_new_session=True)
                 group = None
                 members_before: dict[int, str] = {}
+                kill_receipt = None
                 depth = len(own['namespace_pids'])
                 try:
                     namespace_group = _group(process)
@@ -235,6 +236,9 @@ def run(args: list[str]) -> None:
                             if isolated._proc_identity(launcher['pid'])['birth'] != launcher['birth']:
                                 raise ValueError('launcher birth changed before pidfd signal')
                             adapter.send(fd, signal.SIGKILL)
+                            kill_receipt = {'host_pid': launcher['pid'], 'birth': launcher['birth'],
+                                            'namespace_pid': launcher_pid, 'namespace_depth': depth,
+                                            'signal': int(signal.SIGKILL), 'pidfd_send_succeeded': True}
                         finally:
                             os.close(fd)
                         os.killpg(namespace_group, signal.SIGCONT)
@@ -289,6 +293,7 @@ def run(args: list[str]) -> None:
             shutil.copyfile(log, log_copy)
             results.append({'case': case, 'group': group, 'namespace_group': namespace_group,
                             'namespace_depth': depth, 'leader': leader, 'control': control_identity,
+                            'launcher_kill': kill_receipt,
                             'members_before': members_before, 'members_after': members_after,
                             'launcher': launcher, 'worker': observed,
                             'native_at_barrier': native, 'all_observed_births_absent': gone,
@@ -353,6 +358,14 @@ def validate() -> None:
                     raise ValueError('lifecycle identity or cleanup differs')
             if cases[0]['returncode'] != 0 or cases[1]['returncode'] == 0:
                 raise ValueError('case exit status differs')
+            kill = cases[1]['launcher_kill']
+            if (cases[0]['launcher_kill'] is not None or not isinstance(kill, dict)
+                    or kill.get('pidfd_send_succeeded') is not True or kill.get('signal') != int(signal.SIGKILL)
+                    or kill.get('host_pid') != cases[1]['launcher']['pid']
+                    or kill.get('birth') != cases[1]['launcher']['birth']
+                    or kill.get('namespace_depth') != cases[1]['namespace_depth']
+                    or kill.get('namespace_pid') != cases[1]['launcher']['namespace_pids'][kill['namespace_depth'] - 1]):
+                raise ValueError('launcher pidfd kill evidence differs')
             receipt_path = output / 'normal-receiver.json'
             receipt = json.loads(receipt_path.read_text())
             from src.pointstream import ball_stream
