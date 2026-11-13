@@ -97,12 +97,18 @@ def asset_inputs(args: Any, stage: Path) -> dict[str, Any]:
 
 
 def inputs(args: Any, stage: Path, identity: dict[str, str]) -> dict[str, Any]:
+    from experiments.tennis import k5d_ada_study as ada
+    gpu_profile = getattr(args, 'registered_gpu_profile', ada.A6000)
+    if gpu_profile not in (ada.A6000, ada.ADA):
+        raise ValueError('unknown registered-study GPU profile')
     dispatch = json.loads((stage / 'dispatch.json').read_text())
+    if gpu_profile == ada.ADA:
+        ada.device(json.loads((stage.parent / 'spec.json').read_text()), dispatch)
     if (dispatch['staged_environment']['sha256'] != identity['environment_sha256']
             or dispatch['code']['source_sha256'] != identity['source_sha256']
             or dispatch['code']['snapshot_sha256'] != identity['snapshot_sha256']
-            or 'RTX A6000' not in dispatch['environment']['gpu']['name']
-            or 'Ada' in dispatch['environment']['gpu']['name']):
+            or (gpu_profile == ada.A6000 and ('RTX A6000' not in dispatch['environment']['gpu']['name']
+                or 'Ada' in dispatch['environment']['gpu']['name']))):
         raise ValueError('source, runtime, or A6000 GPU class differs')
     checked = asset_inputs(args, stage)
     source_result = source(Path(args.archive), args.clip, args.frames)

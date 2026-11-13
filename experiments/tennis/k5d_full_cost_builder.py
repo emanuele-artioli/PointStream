@@ -110,7 +110,9 @@ def qualified_remaining_draft(receipt: dict[str, Any], *, identity: dict[str, st
 
     if receipt.get('consumer_execution_identity') != identity:
         raise ValueError('consumer execution identity differs')
-    inventory = wave.inventory(study.checked_json(inventory_path, inventory_sha), identity)
+    from experiments.tennis import k5d_ada_study as ada
+    gpu_profile = ada.profile(receipt)
+    inventory = wave.inventory(study.checked_json(inventory_path, inventory_sha), identity, None, **({'gpu_profile': gpu_profile} if gpu_profile == ada.ADA else {}))
     if any(inventory[clip][phase]['state'] != 'complete'
            for clip in wave.CONFIRMATIONS for phase in ('prepare', 'score')):
         raise ValueError('four verified confirmation stages required')
@@ -172,6 +174,11 @@ def build(inputs: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
     if (set(identity) != {'source_sha256', 'snapshot_sha256', 'environment_sha256'}
             or any(not isinstance(v, str) or not cf.digest_string(v) for v in identity.values())):
         raise ValueError('frozen source identity missing')
+    from experiments.tennis import k5d_ada_study as ada
+    gpu_profile = ada.profile(inputs)
+    if gpu_profile == ada.ADA and inputs.get('profile') != 'readiness':
+        raise ValueError('Ada registered study requires explicit CPU-readiness cost profile')
+    ada_audit = ada.calibration(inputs, identity) if gpu_profile == ada.ADA else None
     actual: dict[str, float] = {}
     archives = inputs['archives']
     for frames in (16, 48):
@@ -181,9 +188,14 @@ def build(inputs: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
             archive = Path(archives[name])
             if oracle.sha(archive) != pub_sha:
                 raise ValueError('fleet publication identity mismatch')
+            if ada_audit is not None:
+                actual[name] = ada_audit['stages'][name]['seconds']
+                continue
             actual[name] = proof.fleet_stage(meta['entry'], meta['expected'], identity,
                                              'prepare' if name == prep else 'score', frames, pub_sha,
                                              metadata_rows[prep][1])
+        if ada_audit is not None:
+            continue
         ref = inputs['reference' + str(frames)]
         proof.parity(Path(archives[score]), metadata_rows[score][1], Path(archives[prep]), metadata_rows[prep][1],
                      Path(ref['local']), ref['sha256'], frames, identity,
@@ -227,6 +239,16 @@ def build(inputs: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
             'historical_source_evidence_sha256': proof.history.HISTORICAL_SHA,
             'historical_task_failures': sorted(proof.history.HISTORICAL_FAILURES),
             'status': 'draft only; cost receipt SHA and approval must be added after independent review'}
+    if ada_audit is not None:
+        from experiments.jobs.inbox import digest
+        evidence.update(registered_gpu_profile=ada.ADA, gpu_model='RTX 6000 Ada', gpu_capability=[8, 9],
+                        calibration_execution_identity=identity, consumer_execution_identity=identity,
+                        calibration_jobs=inputs['calibration_jobs'], ada_calibration=ada_audit,
+                        calibration_audit_sha256=digest(ada_audit),
+                        calibration_archives={k: v['published_sha256'] for k, v in ada_audit['stages'].items()},
+                        calibration_execution_sha256={k: v['sha256']['execution'] for k, v in ada_audit['stages'].items()})
+        gate.update(registered_gpu_profile=ada.ADA, gpu_models=['RTX 6000 Ada'], gpu_capability=[8, 9],
+                    hosts=['gpu6'], purpose='full-retrospective-benchmark-cpu-readiness')
     return evidence, gate
 
 

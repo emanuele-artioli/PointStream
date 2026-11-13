@@ -58,6 +58,9 @@ def admission(gate_path: Path, gate_sha: str, evidence_path: Path, evidence_sha:
         raise ValueError('clip absent from frozen selection')
     gate = checked_json(gate_path, gate_sha)
     evidence = checked_json(evidence_path, evidence_sha)
+    from experiments.tennis import k5d_ada_study as ada
+    if ada.profile(gate) != ada.A6000 or ada.profile(evidence) != ada.A6000:
+        raise ValueError('Ada registered study requires the qualified control profile')
     if (gate.get('schema') != 1 or gate.get('approved') is not True
             or gate.get('purpose') != 'full-retrospective-benchmark'
             or gate.get('selection_sha256') != fleet.SOURCE_SHA
