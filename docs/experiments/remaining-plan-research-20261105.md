@@ -4,7 +4,7 @@
 
 This is a decision inventory, not authority for a job or a change to the
 shared budget. The current rows were refreshed on November 10; use the [current
-continuation](../continuation-2026-11-10.md) and [live ledger](submission-research-budget-20261104.json) for later releases and balances. It reads the current PLAN status, the November 5 continuation,
+continuation](../continuation-2026-11-13.md) and [live ledger](submission-research-budget-20261104.json) for later releases and balances. It reads the current PLAN status, the November 5 continuation,
 the closure scan and the linked experiment records; historical status embedded
 later in PLAN is superseded where those records say so. The user's current
 instruction is to finish worthwhile research before manuscript changes. The
@@ -13,23 +13,40 @@ and the legacy 200-GPU-hour study are outside scope. No new computation was run
 for this audit. Costs below are ceilings or historical charges where explicitly
 identified, not forecasts for an unprepared new job.
 
-## Current November12 Ada route and receiver gap
+## Current November13 Ada route and receiver gap (UTC)
 
-The accepted fresh Ada2c8b calibration reproduces actual six-point packet bytes,
-pixels and scores across fresh executions (126.6/112.5s), not new-clip evidence.
-Source5cb passed full checks and native CPU proof69c7. Actual SVT CPU oracle030d
-passed original16-frame packet/native/YUV/RGB equality, all five real EACCES
-probes, exact GPU-capable policy and process cleanup. This qualifies SVT CPU
-filesystem denial; CUDA/DCVC/GPU and scale remain unproved. Priorb9e0/cda9
-startup failures and37b3 cross-class failure stay recorded. First GPU witness
-13aba806 stopped CONTENDED before points/receivers; own cleanup observed, exact
-release unknown, per-job cap compliance unverified. No automatic retry. Candidate
-PGID source needs renewed CPU/lifecycle/denial proof; independent bounded claim
-observer is the selected alternative to a broad fleet protocol change. Programme
-conservative charges21,141GPU/54,810CPU; current stage4,718GPU/5,518CPU. Passive
-five-minute watcha4 runs at most45minutes to01:28:58UTC or CPUguard.
-[Current handoff](../continuation-2026-11-12.md) and
-[stage card](../cards/k5d-ada-scale-and-denial-2026-11-12.md) are authoritative.
+The failed CPU receiver oracle `20261113T012427Z-c1bededa` is closed and its
+events acknowledged. Strict pidfd validation rejected a signal enum before
+sending it. Normal SVT decoded with exact pixels and five access denials,
+but the combined lifecycle gate failed. Retain the full365CPU charge.
+
+Minimal caller fix `5ebc7831` passed Ruff, mypy520 and1,855 tests (37 skipped).
+Root rehashed its actual source/archive and the two-file delta againstd2db:
+source `abccdf05`, archive `7fd4e0e6`, environment unchanged `32e`. One exact-source
+four-case native CPU proof is prospectively released for250CPU/GPU0 after
+readiness; actual ID must be recorded in the Ball journal. No real receiver
+retry, GPU or scale release follows from this mechanism test. Prior6b proof
+remains valid only for its originald2db source.
+
+Standalone observer canary `cd45a0b3` with collector `8e340a78` passed independent
+hash/journal/CPU/cleanup review:7.112wall/1.068933countedCPU seconds, bounded
+synthetic claim interval4.032s, missing finalUNKNOWN. Retain100CPU debit. This
+proves same-host synthetic fixture behavior only; timeout-expiry/PDEATHSIG
+failure teardown and production/GPU behavior remain untested.
+
+Programme charges: **21,141GPU /55,975CPU seconds**; Ball14,779GPU/31,974CPU.
+Internal stage remaining4,718GPU/4,353CPU. Old held Ball7,920GPU/800CPU and
+W84,550GPU/929CPU are unchanged. All remain inside24GPUh/28CPUh authority.
+Passive watcha5 PID59213 checks gpu2/gpu3 A6000 and gpu5/gpu6 Ada every300s,
+ending by2026-11-13 02:12:37UTC or its CPUguard;100CPU precharged. No autosubmit,
+model timer or verified chat wake. Latest sweeps found no idle eligible card.
+
+Ada's same-GPU repeat `2c8b49a0` supports the same ball benchmark under its
+own reference; failed cross-A6000 comparison `37b3b79b` is retained. Current
+validators require exclusive GPU access. CUDA/DCVC denial, new-clip and full30
+results remain unproved. Paper/PRESLEY edits remain paused.
+
+See [current handoff](../continuation-2026-11-13.md) and [stage card](../cards/k5d-ada-scale-and-denial-2026-11-12.md).
 
 The later repo-only decision audit found no additional independent ready and
 worthwhile experiment beyond active Ball and held W8. W11 requires missing

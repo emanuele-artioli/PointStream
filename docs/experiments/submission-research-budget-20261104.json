@@ -2070,6 +2070,69 @@
       "cpu_seconds": 100,
       "basis": "Prospective100CPU administrative charge: same reviewed passivewatch SHA2b931eb5, fourhosts/300sinterval/45minwallmax/inner80countedCPU+20outer. No autosubmit/models/API/wake guarantee; SSHserver/login aggregate unmetered. Previousa3ended00:36:02UTC18ticks.",
       "release_stage": "research-first24/28-contention-recovery"
+    },
+    {
+      "phase": "ball-pgid-source-rebind-preparation-20261113",
+      "parent_phase": "ball-ada-scale-and-denial-20261112",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "basis": "Prospective50CPU finalreviewedsource/package/config/actualarchivebridge andnativeCPUproofspecpreparation only; no remoteproof/FS/GPUrelease. Earlierintermediatecodechecksnotinference; finalsource/runtime/protected/nativeinputhashesmustrebindexactbeforegates. FitsunchangedBallstage/workstream/programme.",
+      "release_stage": "research-first24/28-PGID-source-preparation"
+    },
+    {
+      "phase": "ball-d2db-native-cpu-proof-20261113",
+      "parent_phase": "ball-ada-scale-and-denial-20261112",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 250,
+      "basis": "Prospective entire250CPU exactd2dbsource nativeCPUproof:100onecorecampaign including70smoke+10validator+5noop+15overhead;150external includingreadiness,submission,onewait,publication/independentaudit/cleanup. Prior5cb actualnormal1.362outerCPU andsameunchangednative4cases; newsourcefull1853tests/Ruff/mypy520pass andsourcebridge reviewed. CPUmechanismonly,noFS/GPU/scale/retry.",
+      "release_stage": "research-first24/28-PGID-nativeCPU-proof"
+    },
+    {
+      "phase": "ball-d2db-real-svt-lifecycle-cpu-oracle-20261113",
+      "parent_phase": "ball-ada-scale-and-denial-20261112",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 365,
+      "basis": "Prospectiveboundedreal2case SVTreceiverpilot:265onecorecampaign incl230smoke/30validator/5noop;100external prep/hash/sourcecache/admission/wait/audit/cleanup. Namespace220:2*measured030d25.558*1.5=76.674 beforeunmeasurednewscans/cache/nativebytepublication,143.326headroom; only conditionalfit estimate, stopiffail. NativeCPU6brootacceptedsourceb1/archive177c;exactGPUprofile3acsource-rebound,originalSVT16native/YUV/RGB/fivefiledenials, initiallauncherpidfdkill+actualscopednamespaceassistedcleanup/controlintact. Notunshare-only/nativeactive/fleetwatchdog/GPU/scale; noautomaticretry.",
+      "release_stage": "research-first24/28-PGID-realCPU-correctness-pilot"
+    },
+    {
+      "phase": "ball-resource-watch-a5-20261113",
+      "parent_phase": "ball-ada-scale-and-denial-20261112",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 100,
+      "basis": "Prospective100CPU same-reviewed passivewatch2b931eb5 every300s/4hosts/45minmax;inner80countedCPU20outer,SSHserver/loginaggregateunmetered. Prior a4 ended01:24:23UTC9ticks/37.963remote+1.069SSH+.297controllerCPU, noidle. NewwatchonlyafterpriorPIDabsent, noautosubmit/models/API/chatwake.",
+      "release_stage": "research-first24/28-native-resource-watch"
+    },
+    {
+      "phase": "ball-claim-observer-byte-canary-20261113",
+      "parent_phase": "ball-ada-scale-and-denial-20261112",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 100,
+      "basis": "Prospective entire100CPU attended synthetic byte-only observer canary, noGPU/productionclaims: helper10+observer40+supervisor2+childlessleader2 hardCPU<=54;26 counted reserve;20external including collector hard10+preflight/transfer/audit. GNUtimeout120s group, helperalarm110, childless separateleader PDEATHSIG+expectedPPID+selfalarm. Source review clear; runtime preflight/root release required. Counters SELF+waitedCHILDREN once only complete on success; interrupted/orphaned UNKNOWN. Same-host syntheticNFS visibility only, no scientific/deployment credit.",
+      "release_stage": "research-first24/28-observer-byte-canary-preparation"
+    },
+    {
+      "phase": "ball-pidfd-signal-source-preparation-20261113",
+      "parent_phase": "ball-ada-scale-and-denial-20261112",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "basis": "Prospective50CPU local finalsourcefreeze/configsourcehashrebind/archivebridge/prospectiveCPUproofspec after c1failed signalenumdiagnosis. Only bothcaller intconversion+behavioralregressions; strictadapter/numerics/defaults unchanged. No remoteproof/FS/GPUrelease; rootreviewnewsource required.",
+      "release_stage": "research-first24/28-pidfd-signal-source-preparation"
+    },
+    {
+      "phase": "ball-5ebc-native-cpu-proof-20261113",
+      "parent_phase": "ball-ada-scale-and-denial-20261112",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 250,
+      "basis": "Prospective entire250CPU exact5ebc/abcc/7fd4 nativeCPUproof:100onecorecampaign (70smoke10validator5noop15overhead),150external readiness/admission/onewait/rawpublication/independentaudit/cleanup. Root rehashed archive/tree/delta, full1855tests37skip/Ruff/mypy520; same native fourcase path and prior23.8s basis. Native mechanism only; no real receiverFS/GPU/scale/retry release.",
+      "release_stage": "research-first24/28-5ebc-nativeCPU-proof"
     }
   ],
   "reservations": [
@@ -2681,8 +2744,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28-denial-and-scale-preparation",
       "gpu_seconds": 4718,
-      "cpu_seconds": 5518,
-      "status": "Remaining_unspent;13aba debited1282GPU1632CPUwithuncertainty;watcha4precharged100CPU;GPUheldpendingPGID/source/CPU/denial/newaccountinggates;noretry/scale"
+      "cpu_seconds": 4353,
+      "status": "Remaining_unspent; c1 CPU oracle failed signal-type harness check;365CPU retained; observer byte-only canary100CPU precharged; GPU held pending corrected source/CPU/denial/accounting gates"
     }
   ],
   "jobs": [
@@ -5114,6 +5177,45 @@
       "terminal_CPU_charge": 1632,
       "original_future_GPU": 900,
       "original_future_CPU": 1050
+    },
+    {
+      "job_id": "20261113T010449Z-6b186df7",
+      "phase": "ball-ada-scale-and-denial-20261112",
+      "state": "complete;rootacceptednativeCPUonly;eventACKed",
+      "revision": "d2db015d4d90094bcd9dde8286f1ef05b9bc164d",
+      "source_sha256": "b1a6b36cc14637db4a390db9a12c615d7ac042eb42b1415821e797b15af6e331",
+      "snapshot_sha256": "177c96760f9429b2fbf7c5756d026b7b009ba292dc885ff727f18457924a5249",
+      "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "source_archive": true,
+      "spec_sha256": "46dda6091deaef848bb8f0c8548304ed8af4d1d0a7dc513bc20c61443b1c5ca4",
+      "gpu_seconds": 0,
+      "cpu_ceiling_precharged": 250,
+      "deadline": "2026-11-13T01:40:51.615155+00:00",
+      "local_batch": "/private/tmp/pointstream-pgid-source-freeze-d2db015d-20261113",
+      "wait_state": "completedbeforefirstcanonicalstatus;no wait started or needed",
+      "recovery_receipt": "docs/experiments/k5d-inputs/ada-pgid-6b186-root-CPU-closeout-20261113.json",
+      "terminal_GPU_charge": 0,
+      "terminal_CPU_charge": 250
+    },
+    {
+      "job_id": "20261113T012427Z-c1bededa",
+      "phase": "ball-ada-scale-and-denial-20261112",
+      "state": "failed;solecanonicalwaitattention;rawdiagnosticpending;noFS/GPU/qualitypromotion",
+      "revision": "d2db015d4d90094bcd9dde8286f1ef05b9bc164d",
+      "source_sha256": "b1a6b36cc14637db4a390db9a12c615d7ac042eb42b1415821e797b15af6e331",
+      "snapshot_sha256": "177c96760f9429b2fbf7c5756d026b7b009ba292dc885ff727f18457924a5249",
+      "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "source_archive": true,
+      "spec_sha256": "3717ea7dc63b423c1207d51df7a6d9837ccc456a11d3d0b108360fa2851817ec",
+      "cpu_ceiling_precharged": 365,
+      "GPU_ceiling": 0,
+      "deadline": "2026-11-13T01:59:26.284491+00:00",
+      "local_batch": "/private/tmp/pointstream-pgid-d2db-real-cpu-prep-20261113",
+      "wait_state": "solewaitended9s backend17491exit10;NOsecondwait/retry",
+      "events_unacknowledged": [
+        "8eb4c52662f0554fa2719493f8efcbe7",
+        "81277000d17a574da21b0983227b2d73"
+      ]
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -5141,20 +5243,20 @@
     "Root20261113:13aba contended beforepoints/receivers;exactclaimreleaseunknown. Conservative1282GPU1632CPUdebit notmeasured use/perjoboverrun evidence; capcomplianceunverified. No newGPU untilPGID/sourcegates+durableindependentobserver. Outer/workstreamcapsunchanged."
   ],
   "monitoring": {
-    "state": "Activea4passive5min45minwatch100CPUprecharged;priora3ended;noautosubmit/modeltimer",
+    "state": "Activea5passive5min45minwatch100CPUprecharged;priora4endedverified;noautosubmit/modeltimer",
     "scope": "gpu2/gpu3 A6000 and gpu5/gpu6 Ada",
-    "path": "/Users/manu/.cache/pointstream-resource-watch-20261113-passive-a4",
+    "path": "/Users/manu/.cache/pointstream-resource-watch-20261113-passive-a5",
     "native_completion_wakeup_verified": false,
     "accounting_limits": "SSHserver/loginaggregateunmetered;inner80countedCPU+20outer",
-    "scientific_jobs": "noneactive;13abacontendednotretry",
+    "scientific_jobs": "c1bededafailed/auditpending;noactiveGPU;noautomaticretry",
     "source_sha256": "2b931eb5a25f7a87cc3594103ee845ec2582cc017309b7d479a99f637f6ee10c",
     "mode": "bounded_passive_native_resource_checks",
-    "pid": 51630,
-    "started_utc": "2026-11-13T00:43:58.431315+00:00",
-    "deadline_utc": "2026-11-13T01:28:58.483483+00:00",
+    "pid": 59213,
+    "started_utc": "2026-11-13T01:27:37.040296+00:00",
+    "deadline_utc": "2026-11-13T02:12:37.040296+00:00",
     "jobs": [],
     "batches": [
-      "/Users/manu/.cache/pointstream-resource-watch-20261113-passive-a4"
+      "/Users/manu/.cache/pointstream-resource-watch-20261113-passive-a5"
     ],
     "native_completion_resume_verified": false,
     "recurring_llm_polling": false,

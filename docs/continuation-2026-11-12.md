@@ -1,6 +1,75 @@
 # Continuation — November 12, restored fleet access
 
-## Current state — November13 contention closed; receiver qualification held
+Superseded by [November13 continuation](continuation-2026-11-13.md).
+
+## Latest November13 — real receiver CPU test failed; raw diagnostic pending
+
+`20261113T012427Z-c1bededa` FAILED, solecanonicalwaitended9s/backend17491exit10.
+No receiverFS/GPU/quality gate promoted; no automaticretry/sourceedit. Raw bounded
+read-only failure audit underway at `/private/tmp/pointstream-pgid-c1bededa-failure-audit-20261113`.
+Actualspec3717ea7d/raw ee26f91c, source d2db/b1a6/177c/env32e; full365CPU/GPU0
+precharged. One wait already ended; use actualjournalID and canonicalstatus before
+acting. UnACKedevents8eb4c52662f0554fa2719493f8efcbe7 /81277000d17a574da21b0983227b2d73.
+Root needs exact failure before source change/narrowing/release. Normal receiver
+partial outputs are not silently full-witness credit. Existing nativeCPU6b proof
+is independently accepted and eventACKed; rawdata/source/scratch preserved.
+
+Programme21,141GPU/55,575CPU; Ball14,779GPU/31,574CPU; stage4,718GPU/4,753CPU.
+OldheldBall7,920GPU/800CPU andW84,550GPU/929CPU unchanged; no new budget/transfer.
+Source d2db unchanged/frozen/pushed. Observer589470b3 code reviewed/hardbounds,
+canary draft cd45a0b3 still independentreview/notrun; no GPU release.
+Watcha4ended01:24:23UTC9ticks/noidle/PIDabsent;100CPUprecharged newa5PID59213
+started01:27:37UTC, fourhosts/5minutes/max45min02:12:37UTC orCPUguard. Same
+reviewedSHA2b931, path `/Users/manu/.cache/pointstream-resource-watch-20261113-passive-a5`.
+Noautosubmit/modeltimer/API/chatwake;SSHserver/loginaggregateCPUunmetered.
+
+## Current November13 — new source CPU proof accepted; receiver pilot preparation
+
+Root branch `codex/ada-cpu-requalification-2026-11-13`; PR373 MERGED/CIgreen.
+Scientific source branch codex/ball-campaign-pgid-oracle-20261113 is pushed;
+source d2db remains frozen and distinct from main production integration.
+
+Final scientific source `d2db015d4d90094bcd9dde8286f1ef05b9bc164d`, tree
+b1a6b36cc14637db4a390db9a12c615d7ac042eb42b1415821e797b15af6e331,
+archive177c96760f9429b2fbf7c5756d026b7b009ba292dc885ff727f18457924a5249,
+MAIN32e. Actual2c8bbridge9added/4modified/0deleted/1388unchanged; root rehashed
+both archives/source and reviewed changed paths. Fullsourcechecks1853pass37skip,
+Ruff/mypy520 pass. No default math/argv/reference relaxation. CPU receiver oracle
+is narrowed BEFORE outcomes: real normal SVT plus initial launcher pidfd SIGKILL,
+with production scoped supervisor allowed to assist teardown, all captured births/
+group absent and unrelated control alive; no external emergency cleanup may be
+credited. No unshare-only/active-native-abort/fleetwatchdog claim.
+
+Freeze `/private/tmp/pointstream-pgid-source-freeze-d2db015d-20261113/` includes
+actual source/archive/identity, CPUrelease/spec, tools/input/readiness and checks.
+New source50CPUprep and250CPU nativeproof precharged. Programme21,141GPU/
+55,110CPU; Ball14,779GPU/31,474CPU; stage4,718GPU/4,853CPU remaining. Old held
+Ball7,920GPU/800CPU and W84,550GPU/929CPU unchanged. CPUproof250 includes100
+campaign/150external; real two-case oracle is NOT released (candidate265campaign+
+100external=365CPU/GPU0), requires accepted raw exact-source proof/config/bridge.
+
+Actual nativeCPUproof `20261113T010449Z-6b186df7` canonical COMPLETE beforefirst
+status, gatepassed/sourceexact; smoke23.7878s/validator.1247. No wait was started
+or needed. ActualID is in Ball journal; status before acting, never replay. Rootaccepted physicalrawproof (builder export at
+`/private/tmp/pointstream-pgid-d2db-native-audit-20261113`). Source-bound nativeCPUgate7148f0d5 is rootwritten after physical8raw/26member
+SHA/birth/CPU/claim review. 19births/group/supervisor/CPUclaim absent; normal
+1.366698inner/1.453698outerCPU. TERM required KILL. 365CPU receiverpilot now
+precharged265campaign+100external; assets/spec preparation only, noactualIDyet.
+
+Separate observer prototype70346da7→8c0e33be is NOT released: independent review
+found final CPU-parent-limit/inherited-child-limit, terminal control rehash and
+explicit boot-record fixes; builder correcting locally. This is a standalone
+observational gate, no live fleet protocol rollout. A later byte-only Linux/NFS
+canary requires prospective cost/identity/visibility review; no real GPU claim.
+Further GPU work remains held. SharedAda audit found current validators require
+exclusive; shared path needs additional memory/numerical qualification and earlier
+sharedAdaDCVC nondeterminism was recorded. Do not simply change spec to shared.
+Prefer current corrected exclusive Ada route, no new shared source/budgetrelease.
+
+Native resource watcha4 remains active (PID51630), every5minutes/all4hosts,
+self-expiring2026-11-13T01:28:58UTC or CPUguard; no autosubmit/chatwake.
+
+## Earlier November13 — contention closeout (balances superseded above)
 
 The first Ada GPU denial witness `20261112T235535Z-13aba806` is **CONTENDED**,
 not queued: another GPU PID was detected before any point or isolated receiver
