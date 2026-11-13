@@ -7,8 +7,8 @@ chronology and raw-result references. Times below are UTC.
 
 ## Current decision and continuation (November 13, UTC)
 
-**55dd is closed; future GPU work is deferred while the registered-study source
-port is built.** Actual job `20261113T043746Z-55dd755d` failed on public
+**55dd is closed; the Ada source port is merged and final-source preparation
+is complete; both CPU gates are accepted. GPU work remains deferred until its bounded witness is released.** Actual job `20261113T043746Z-55dd755d` failed on public
 `torch/_inductor/test_operators.py` through the deterministic setter/lazy Dynamo
 path. Six ordinary native preparations completed; zero receiver receipts,
 end-to-end quality points or scale gates were accepted. Events are acknowledged.
@@ -48,25 +48,55 @@ Raw f9f3a75d / summary efd7ef87 and root recovery approval are preserved under
 branch `codex/ball-ada-registered-study-profile-20261113`. Use the **same final
 source, environment and archive** for the new Ada16/48 calibration, then292/586
 confirmations/full30. Preserve defaults, all six points, complete metrics/judges,
-whole-clip context and fresh restricted receivers for every new stage. A changed
+whole-clip context and fresh restricted receivers for every new stage. PR381 merged CI-green as `ae892df1cbb2b8c28eb413187effc28d70b74326` after
+2241 tests/40 skipped and two independent implementation reviews. A changed
 source needs its own qualification; no earlier gate is relabelled. No GPU stage
-is released while this port/design is being prepared. The separately held
+is released. The separately held
 [SVT-only route](cards/k5d-svt-only-confirmation-2026-11-13.md) is not an equivalent
 replacement for the open dual-codec goal and remains scientifically unreleased.
 
-Current charges: **programme22,941GPU /60,130CPU; Ball16,579GPU /36,129CPU**.
-The new public-Python reservation has900GPU /1,485CPU remaining; old Ada-stage
-funds3,218GPU /288CPU and held SVT600GPU /1,800CPU are unchanged. The closed prior
+Final-source preparation100CPU is COMPLETE; native250CPU job
+`20261113T060019Z-cc884861` is COMPLETE and root accepted, under the
+[final CPU qualification card](cards/k5d-final-Ada-source-qualification-2026-11-13.md).
+Both inclusive allocations are charged. Source `9d3d7b2c6ec0fd99466ae3592345795a4916e982fdee3924a9749b83a81b39da`,
+archive `ad635b0b46428a3fa934081ded5d2b408c453bc5f7e46854dd8b8eb0c6abbea9`,
+final revisionae892 and unchanged environment32e are frozen. Preserve the source
+worktree at that commit even after documentation merges. All1,977 files join
+Git blobs. Config6b3d8c5f changes only execution identity and one W8 source grant
+(exact hostPID patch8c0); all other rights remain identical. Root approved actual
+source bridge0c3c073c for source scope only. The immutable source/config/bridge
+cache is `.../jobs/fleet/checks/k5d-final-Ada-source-cache-23ac26952ec2ca21922f8cf2a1933f59/`.
+Local preparation93319 and cache upload78731 ended0; no job replay. Native submit
+80880 ended0, canonical status COMPLETE, no error; no fleet wait was needed.
+Actual CPU denial365 job`20261113T061438Z-c53fb111` is also COMPLETE and root
+accepted: full proof85a52c4a (7,312,372 bytes) passes frozen positive consumer,
+all31 source/policy/runtime/native/pixel/five EACCES checks and scoped cleanup.
+Current18 PIDs absent/four empty groups/FQDN CPU file exists with zero allocations;
+no historical release-time or GPU claim follows. Sole wait46277 ended attention
+COMPLETE, no active job wait. New proof is immutable at
+`.../checks/k5d-final-Ada-real-CPU-5bdc119c009440c29866617a96306c28/real-CPU-denial.json`.
+Both completion events are acknowledged. The [root closeout](experiments/k5d-inputs/final-Ada-CPU-root-closeout-20261113.json)
+and [actual CPU evidence index](experiments/k5d-inputs/final-Ada-actual-CPU-denial-evidence-cache-20261113.json) preserve exact qualifications and limits.
+GPU witness900/1100 remains UNRELEASED. Operatorv2 helpers e71cbba6/2538e252
+passed independent review and12 tests: latest absent samples must be fresh and
+successful reads must still meet the bind deadline. Frozen observer bytes remain
+unchanged. Actual final normal policy20.15594s is below the retained25.558s term;
+adding three whole12.3986s import diagnostics with1.5 margin gives476.6247s
+namespace forecast<500. This is a prospective estimate, not CUDA qualification.
+
+Current charges: **programme22,941GPU /60,945CPU; Ball16,579GPU /36,944CPU**.
+The new public-Python reservation has900GPU /1,120CPU remaining; old Ada-stage
+funds3,218GPU /188CPU and held SVT600GPU /1,800CPU are unchanged. The closed prior
 repair spent900GPU /1,745CPU, with5CPU held and no further release. Other held
 balances and the user24GPU-hour/28CPU-hour ceiling remain unchanged.
 
-Passive watch **a9** is active: backend46259, PID89739, four hosts every300s,
-maximum nine checks, deadline `2026-11-13T05:55:15.734208Z`;100CPU is charged.
-First05:10UTC snapshot found no available A6000 and three potential idle Ada
-cards (gpu5 index1, gpu6 indices0/1); fresh fleet admission is still mandatory.
-Native completion-triggered model resumption is unverified. No autosubmit,
-recurring LLM/model timer, additional scientific compute, paper/PRESLEY edit or
-submission release.
+Passive watch **a10** is active: backend48064, PID95846, four hosts every300s,
+maximum nine checks, deadline `2026-11-13T06:36:38.523801Z`;100CPU is charged
+from the Ada held reservation. Prior a9 ended0 after nine checks05:50:34UTC,
+PID89739 absent; last snapshot no idle A6000 and potential idle Ada gpu5:1,
+gpu6:0/1. Fresh fleet admission remains mandatory. Native completion-triggered
+model resumption is unverified. No autosubmit, recurring LLM/model timer,
+additional scientific compute, paper/PRESLEY edit or submission release.
 
 ### Historical import-diagnostic attempts and conditional next-stage audit
 

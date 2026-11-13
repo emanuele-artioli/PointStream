@@ -2299,6 +2299,42 @@
       "cpu_seconds": 15,
       "basis": "ONE read-only physical publication/metadata/privateSTAT audit afteroriginalhelperreachedfinalabsoluteCHILDRENcheckandfailed; remote5/local5/SSH5; no replay/configwrites/models/native/denial/GPU/refund",
       "release_stage": "research-first24/28-complete-public-Python-category"
+    },
+    {
+      "phase": "ball-passive-resource-watch-a10-20261113",
+      "parent_phase": "ball-ada-scale-and-denial-20261112",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 100,
+      "basis": "User regularresourcechecking; sameacceptedwatcher2b931eb5/freshnonce root,4hosts300scadence9ticks<=45min;80counted20external,SSHserver substrate unmetered; a9 ended0/ninechecks/PID89739absent; noGPU/models/claims/autosubmit",
+      "release_stage": "research-first24/28-bounded-passive-resource-monitoring"
+    },
+    {
+      "phase": "ball-final-Ada-source-preparation-20261113",
+      "parent_phase": "ball-final-Ada-source-CPU-qualification-20261113",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 100,
+      "basis": "Root+independentreview exact65d0c9d1;14testsPASS. ONE finalae892 localfreeze28parent+10Gitx2+oneTar2<=50CPU; separate remote20CPU120wall+external30; newsourcearchive/config/bridge/cache only; actualnative250 UNRELEASED",
+      "release_stage": "research-first24/28-final-Ada-source-CPU"
+    },
+    {
+      "phase": "ball-final-Ada-native-CPU-qualification-20261113",
+      "parent_phase": "ball-final-Ada-source-CPU-qualification-20261113",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 250,
+      "basis": "Finalae892/archivead635/tree9d3d sourcefreezePASS. Root releases exactnativePIDoracletemplate unchangedfourcases/oneCPU/gpu6,70smoke10validator5noop100campaign+150external includingdoctor/publication/audit; onecanonicalpublicationonly, preserveunknown and no replay",
+      "release_stage": "research-first24/28-final-Ada-source-CPU"
+    },
+    {
+      "phase": "ball-final-Ada-actual-CPU-denial-20261113",
+      "parent_phase": "ball-complete-public-Python-runtime-repair-20261113",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 365,
+      "basis": "RootacceptedNEWnativecc884proof5f89/exactfinalae8929d3dad635env32e/config6b3d/bridge0c3c; ONEactualnormalSVTpixel+fiveerrno13+initiallauncherkill/scopedteardown, unchanged265campaign+100external; no GPU/native-active/fleetwatchdog/scale claim",
+      "release_stage": "research-first24/28-final-Ada-actual-CPU"
     }
   ],
   "reservations": [
@@ -2910,8 +2946,8 @@
       "workstream": "ball",
       "release_stage": "research-first24/28-denial-and-scale-preparation",
       "gpu_seconds": 3218,
-      "cpu_seconds": 288,
-      "status": "Remaining_unspent; passivea9 metadata watcher100CPU released/precharged; no GPU request/scale/newsource release"
+      "cpu_seconds": 188,
+      "status": "Remaining_unspent; passivea10 metadata watcher100CPU released/precharged; no GPU request/scale/newsource release"
     },
     {
       "phase": "ball-svt-only-confirmation-feasibility-20261113",
@@ -2945,9 +2981,18 @@
       "workstream": "ball",
       "release_stage": "research-first24/28-complete-public-Python-category",
       "gpu_seconds": 900,
-      "cpu_seconds": 1485,
-      "status": "Remaining_unspent; metadata65CPU charged/originalprotocolFAILED/recoveryconfigphysicallyverified; actualCPU/GPUqualification DEFERRED untilfinalAda source review",
+      "cpu_seconds": 1120,
+      "status": "Remaining_unspent; finalsourceactualCPU365COMPLETErootaccepted; GPU900/1100CPUheld plus20buffer; no scale release",
       "card": "docs/cards/k5d-public-python-runtime-repair-2026-11-13.md"
+    },
+    {
+      "phase": "ball-final-Ada-source-CPU-qualification-20261113",
+      "workstream": "ball",
+      "release_stage": "research-first24/28-final-Ada-source-CPU",
+      "gpu_seconds": 0,
+      "cpu_seconds": 0,
+      "status": "Closed0; preparation100CPU/native250CPUCOMPLETErootaccepted/chargesretained; no GPU/receiver/scale release",
+      "card": "docs/cards/k5d-final-Ada-source-qualification-2026-11-13.md"
     }
   ],
   "jobs": [
@@ -5611,6 +5656,35 @@
       "summary_sha256": "efd7ef87331bed504510a82c1c6b2f4f2f4e1864f0f6711d21efbb6032e914ff",
       "actual_remote_CPU": 1.003159,
       "actual_child_CPU_delta": 0
+    },
+    {
+      "job_id": "20261113T060019Z-cc884861",
+      "phase": "ball-final-Ada-native-CPU-qualification-20261113",
+      "state": "complete rootacceptednativeonly; evente5d10d8116385155a4cd75ce8a36e909ACKed; no receiver/GPU proof",
+      "revision": "ae892df1cbb2b8c28eb413187effc28d70b74326",
+      "source_sha256": "9d3d7b2c6ec0fd99466ae3592345795a4916e982fdee3924a9749b83a81b39da",
+      "snapshot_sha256": "ad635b0b46428a3fa934081ded5d2b408c453bc5f7e46854dd8b8eb0c6abbea9",
+      "spec_sha256": "4d1b100daf9c52841126760256bbc227641326c77282839216d734c8812ea629",
+      "deadline": "2026-11-13T06:34:29.546526+00:00",
+      "host": "gpu6",
+      "gpu_ceiling_seconds": 0,
+      "cpu_ceiling_seconds": 250,
+      "source_archive": true
+    },
+    {
+      "job_id": "20261113T061438Z-c53fb111",
+      "phase": "ball-final-Ada-actual-CPU-denial-20261113",
+      "state": "complete rootacceptedactualSVTnormalFSdenial+initiallauncherkill/scopedcleanup; eventb60f8a76c4ba5a99a11cb99c59d77506ACKed",
+      "revision": "ae892df1cbb2b8c28eb413187effc28d70b74326",
+      "source_sha256": "9d3d7b2c6ec0fd99466ae3592345795a4916e982fdee3924a9749b83a81b39da",
+      "snapshot_sha256": "ad635b0b46428a3fa934081ded5d2b408c453bc5f7e46854dd8b8eb0c6abbea9",
+      "spec_sha256": "6eb6fda9daebfc7db842d9d19e3f4a51599daea43257586bf73c345d19c85720",
+      "deadline": "2026-11-13T06:50:32.697505+00:00",
+      "host": "gpu6",
+      "gpu_ceiling_seconds": 0,
+      "cpu_ceiling_seconds": 365,
+      "source_archive": true,
+      "root_approval_sha256": "85a52c4abaa369f515f081ffefa784740b555663e160e6659eac376e67ddb5f0"
     }
   ],
   "old_budgets": "closed, not borrowed",

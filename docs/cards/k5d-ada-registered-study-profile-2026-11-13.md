@@ -46,3 +46,17 @@ then a complete30-clip forecast fitting all remaining programme/workstream
 budgets. No calibration success or full run is assumed. Keep all failed gates
 and narrow claims accordingly. No training, paid compute, paper/PRESLEY edits,
 publication or source execution is authorized by this build-only card.
+
+## Reviewed implementation
+
+Candidate62139206, followed by documentation-only integration83891d10, is
+pushed. Focused120 tests, Ruff and mypy593 passed; final full suite2241 passed/
+40 skipped. Both independent final reviews found no remaining blocking issues.
+The actual cost verifier now requires complete PID1 namespace receipts, complete
+descendant wait, zero pauses/contention, log SHA and measured child/init CPU.
+Root-pinned exact calibration and successful qualification jobs are physically
+joined; unknown/failed jobs remain inspection stops. No new-source archive or
+research qualification is released by source review. CI-gated PR merge and
+PR381 merged CI-green as ae892df1. Final archivead635/tree9d3d/env32e
+is frozen under the separate final-source CPU card; native jobcc884861 is
+COMPLETE pending root audit. Actual receiver/GPU/scale gates remain held.

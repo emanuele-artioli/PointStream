@@ -1,8 +1,9 @@
 # K5d: complete public Python runtime category repair
 
-Status: immutable config physically verified by read-only recovery; original
-metadata helper failed after publication. Scientific stages remain UNRELEASED
-while the final Ada registered-study source is built and reviewed.
+Status: final-source native and actual SVT CPU gates are COMPLETE and root
+accepted. The original metadata helper remains failed after publication;
+its separate recovery and all previous failures are retained. Ada GPU witness
+900GPU/1100CPU is held pending exact metadata, forecast and observer review.
 
 ## Authority and fixed scope
 
@@ -88,3 +89,44 @@ new source. Root must review its exact reference bridge, native CPU admission,
 receiver config/source grants, actual CPU oracle, complete forecast and budget
 before releasing source-bound qualification; any needed allocation amendment
 will be recorded before execution. No further stage is released by recovery.
+
+## Final-source amendment (November 13, UTC)
+
+The final registered-study source is now frozen at ae892df1, tree9d3d7b2c,
+archivead635b0b, with unchanged packed environment32e. Preparation/native CPU
+qualification is separately funded under the
+[final-source card](k5d-final-Ada-source-qualification-2026-11-13.md); the actual365CPU gate is separately released below;
+GPU900/1100CPU remains held.
+Native job20261113T060019Z-cc884861 is COMPLETE and root accepted (proof5f89d0c1).
+
+New config6b3d8c5f retains the exact3,407-file public-Python category and every
+other runtime/system/device/executable/import grant. Its only changes from
+ae670 are final execution identity and the hash/size of
+`w8_cuda_system_leaves.py`:30 of31 source grants remain unchanged. Exact
+patch8c0e1e1e joins existing self-proc leaves to verified host PID/PGID/birth
+before restriction. It expands neither numerical code nor retained leaf sets.
+Root approved the actual2c8b-to-final source bridge0c3c073c for source scope
+only. All new-source native/CPU/GPU proofs and later complete metric parity
+remain mandatory; original metadata failure and old-source proofs are retained.
+
+After root accepts the NEW native proof, it may separately release365CPU/0GPU
+for the actual final-config normal SVT, byte-exact YUV/RGB, five errno13 denial
+categories and initial-launcher-kill/scoped teardown. The prospective spec
+6edbecc3 changes only config/bridge bindings and unresolved new native approval/
+fresh deadline from the actual fa824380 template. It cannot yet be submitted.
+The later GPU witness remains held at900GPU/1100CPU with unchanged native,
+isolation, preselected-observer and cost rules; no full48/registered30 release.
+
+Root separately released/precharged365CPU/0GPU for final actual spec6eb6fda9,
+raw0a3ee40f, deadline06:50:32UTC, exact new native proof5f89d0c1. The only changes
+from the original fa824 template are final config/bridge/native bindings and
+fresh deadline. Fresh doctor passed all six hosts/shared visibility; no active
+request. Sole publication backend69014 is in progress; inspect actual client
+journal/ID before any job action, never replay. No GPU or scale release.
+
+Actual job20261113T061438Z-c53fb111 completed; root accepted full proof85a52c4a
+after all physical source/asset/profile/readset/native/pixel joins, five actual
+errno13 denials, initial-launcher interruption and scoped cleanup. All18 captured
+processes are gone, four groups empty, current FQDN claim has zero allocations.
+The frozen positive consumer passed. This is CPU evidence only; retain365CPU.
+No receiver-active/GPU/fleet-watchdog or larger study claim follows.
