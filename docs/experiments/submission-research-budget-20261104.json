@@ -3407,6 +3407,13 @@
       "cpu_seconds": 20,
       "gpu_seconds": 0,
       "basis": "Prospective local readonly source/lifecycle information oracle only, card k5d-targeted-absence-feasibility-2026-11-13.md; no edits/network/models/GPU admission"
+    },
+    {
+      "phase": "ball-targeted-absence80-readiness30-20261114",
+      "workstream": "ball",
+      "cpu_seconds": 30,
+      "gpu_seconds": 0,
+      "basis": "Prospective local-only builder20/independent6/ROOT4, unchangedSVT80 target card; no remoteconstructor or GPU until586actualacceptance and fullgates"
     }
   ],
   "reservations": [
@@ -4181,6 +4188,17 @@
       "archive_recipe_CPU_charged": 3,
       "cache_stat_query_CPU_charged": 10,
       "metadata_CPU_charged": 30
+    },
+    {
+      "phase": "ball-study4282-targeted-absence80-20261114",
+      "workstream": "ball",
+      "cpu_seconds": 1863,
+      "gpu_seconds": 1175,
+      "status": "RESERVED conditional sourceunchanged target80; firstlocal30 onlyreleased. No metadata/runtime/GPU before586acceptance+completefit",
+      "card": "docs/cards/k5d-targeted-absence80-2026-11-14.md",
+      "total_phase_CPU": 1893,
+      "total_phase_GPU": 1175,
+      "already_charged_readiness_CPU": 30
     }
   ],
   "jobs": [
@@ -8438,20 +8456,68 @@
       "events_backend": 94378
     },
     "sole_wait": {
-      "state": "ONE_WAIT_IN_FLIGHT neverstartsecondwait",
+      "state": "CLOSED attention CLI10; fullstage running; no secondwait",
       "backend": 73024,
       "output": "/private/tmp/pointstream-SVT586-runtime-ROOT-20261113/actual-wait330",
       "max_seconds": 2400,
       "outer_seconds": 2480,
       "outer_deadline": "2026-11-14T00:34:00.940776+00:00",
       "CPU_precharged": 330,
-      "completion_model_resume_verified": false
+      "completion_model_resume_verified": false,
+      "wall_seconds": 615.648,
+      "canonical_status_file": "/private/tmp/pointstream-SVT586-runtime-ROOT-20261113/actual-wait330/saved-status-10.json",
+      "event_id": "367b889ffc37555e9447862fdcd359d5"
+    },
+    "postacceptance_failure40_partition": {
+      "state": "Prospective within already fullycharged586 ceiling; actualdigest/analysis require ROOTphysicalacceptance and exact newrelease",
+      "metric_digest_inclusive_CPU": 20,
+      "analysis_inclusive_CPU": 10,
+      "failure_remaining_CPU": 10,
+      "GPU": 0,
+      "no_new_allocation": true,
+      "raw_stays_server_SSD": true
+    },
+    "one_shot_terminal_status": {
+      "backend": 54073,
+      "PID": 31150,
+      "state": "ONE_SLEEP_IN_FLIGHT no RPCbeforetarget; exec samePID tocanonicalstatus6",
+      "target_UTC": "2026-11-14T00:29:00+00:00",
+      "case": "/private/tmp/pointstream-SVT586-efa7-terminal-status6-ROOT-20261113",
+      "CPU_basis": "Existing audit120 terminalstatus6, samePIDexec parent2/SSH2/remote2; no newcost or wait",
+      "model_completion_resume_verified": false
     }
   },
   "targeted_absence_feasibility_current": {
-    "state": "LOCAL_READONLY20CPU_RELEASED",
+    "state": "CLOSED20CPU readonly; no qualified neural80 completefit demonstrated, unchangedSVT80 conditional route identified",
     "card": "docs/cards/k5d-targeted-absence-feasibility-2026-11-13.md",
     "source_judge_failures_retained": true,
-    "runtime_released": false
+    "runtime_released": false,
+    "report": "/private/tmp/pointstream-targeted-absence-feasibility20-v2-20261113/decision.md",
+    "report_sha256": "3153a52a151fea404cf1474b5260810b797e8041ab32d1f2797c08ec9061f10d",
+    "root_decision": "Do not build new neural qualification infrastructure on unproven completefit; prefer prespecified source-unchanged SVT80 absence test if586 accepted. Historical cap1.5 screen is not physical impossibility proof."
+  },
+  "targeted_absence80_current": {
+    "state": "LOCAL_READINESS30_RELEASED,1863CPU1175GPU held; no actualconstructor/GPU",
+    "source_unchanged": true,
+    "frames": 80,
+    "visible": 39,
+    "absent": 41,
+    "dependency": "ROOTaccepted586 then alloriginalqualification/source/cost/runtime gates",
+    "card": "docs/cards/k5d-targeted-absence80-2026-11-14.md",
+    "operative_v1": {
+      "case": "/private/tmp/pointstream-SVT80-absence-local20-FALSE-20261114",
+      "manifest_sha256": "94155e7e0dd5d09e34d4e0380788a1e3310049cec885cd5255097b78f046df40",
+      "state": "STATIC_REVIEW_STOP beforewire: prior586 proof lacked semanticjoins; preservedv1, localv2fix requested withinbuilder20",
+      "independent_review_sha256": "faa621c4d092b7718f2571fe6db171833d6ce846882c14db9c48c440af44d407",
+      "no_execution": true
+    },
+    "operative_v2": {
+      "state": "STATIC_ROOTconditionalGO; actual586proof/deadline/gates/metadata/runtime/GPU unbound",
+      "case": "/private/tmp/pointstream-SVT80-absence-local20-FALSE-v2-20261114",
+      "manifest_sha256": "f12d3e65e45acb316a090484eb1fd2ca64b67ce90e7991ebad476003625e6883",
+      "ROOT_conditional_sha256": "ba7d2347c72c827cc0ba581bcb7e02dd230442dece6fa4cadc941e1aa1929fb0",
+      "independent_review_sha256": "eb85804b7bf366651626be766b3736a580b6ed8dc126e70b0d7b8b22f0c613cf",
+      "source_unchanged": true
+    }
   }
 }

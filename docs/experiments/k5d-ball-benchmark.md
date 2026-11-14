@@ -2260,3 +2260,5 @@ Actual job `20261113T235001Z-efa7e3e5` published once by backend93344 COMPLETE0;
 Canonical status71075 is RUNNING; admissionevents94378 retained. Solewait330 pending; no new request or replay.
 
 Sole canonical completionwait330 backend73024 IN_FLIGHT from23:52:40.940776UTC, outerdeadline2026-11-14T00:34:00.940776UTC/max2400/outer2480. Handle+PID receipt `actual-wait330/runner-backend-handle.json`; rootdelegatedqueue_binding_designownscommand. No secondwait. Nativecompletionmodelresume unverified.
+
+Solewait73024 CLOSED attention CLI10 after615.648s/20SSH. Latest canonical saved-status10 shows fullstage running and smoke gatePASS including originalquality and fresh586wholecost. Genericstall367b889ffc37555e9447862fdcd359d5 after600s without completed-item progress is not terminal or proof of hang; fullcommand cap1750s. No restart or ACK. ONEself-expiring terminalstatus6 backend54073/PID31150 sleeps once to2026-11-14T00:29:00UTC (campaign cap+tail), then execs canonicalstatus in samePID. Existingaudit120 status6 allowance reused, no secondwait/newcost/RPCbeforetarget. Handlecase `/private/tmp/pointstream-SVT586-efa7-terminal-status6-ROOT-20261113`.
