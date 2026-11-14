@@ -12,12 +12,12 @@ def score():
             value = (.05, .15, .3)[i]
             n = (1000, 600, 320)[i]
             n = n if arm == 'native' else int(n * .75)
-            rows.append(dict(arm=arm, crf=rate, packet_bytes=n, bound={'bytes': n - 20}, means={
+            rows.append(dict(arm=arm, crf=rate, packet_bytes=n, native_base_bytes=n, bound={'bytes': n - 20}, means={
                 'weighted_dists': value, 'weighted_lpips': value, 'full_dists': value,
                 'full_lpips': value, 'full_rgb_psnr': 40 - i * 5}))
     for row in rows:
         row['frames'] = {k: [v] * 3 for k, v in row['means'].items()}
-    return dict(rows=rows, domain='tennis', source_group='synthetic', annotation_provenance='synthetic', frames=3)
+    return dict(rows=rows, domain='tennis', source_group='synthetic', annotation_provenance='synthetic', frames=3, available_receiver_frames=3)
 
 
 def test_development_target_and_simpler_roi_explanation():
@@ -44,3 +44,20 @@ def test_missing_or_duplicate_frames_and_nonfinite_metrics_fail():
             data['rows'][-1]['bound']['bytes'] = 999999
         with pytest.raises(ValueError):
             analyse(data)
+
+
+def test_prefix_quality_cannot_promote_full_window_billing():
+    data = score()
+    data['available_receiver_frames'] = 64
+    with pytest.raises(ValueError, match='prefix-only'):
+        analyse(data)
+
+
+def test_primary_native_anchor_excludes_unnecessary_wrapper():
+    data = score()
+    for row in data['rows']:
+        if row['arm'] == 'native':
+            row['native_base_bytes'] = row['packet_bytes'] // 2
+    result = analyse(data)
+    assert result['decisions']['semantic_patch']['native']['development_target_met'] is False
+    assert result['shared_wrapper_secondary']['semantic_patch']['weighted_dists']['bd_rate']['hull_pchip'] < 0

@@ -3,7 +3,7 @@
   "date": "2026-11-14",
   "authority_expires_utc": "2026-11-15T11:07:34Z",
   "metadata_host": "gpu2",
-  "scope": "bounded read-only source/manifest/archive intake; no native encode, model inference or source mutation",
+  "scope": "Bounded read-only source/manifest/archive intake plus separately authorized independent input copy; no native encode, model inference or original-source mutation",
   "budget": {
     "cpu_ceiling_seconds": 3600,
     "gpu_seconds": 0,
@@ -284,6 +284,41 @@
       "VISOR_video_index_labelled_and_drift_alignment",
       "all_frames_retained",
       "published_source_byte_count_mask_shape_and_payload_hashes"
-    ]
+    ],
+    "eligible_visor_video_path": "/home/itec/emanuele/Datasets/pointstream-data/ladder-autonomy-20261114/intake/p09-103-20261114T233342Z-ed1fc777/P09_103.MP4"
+  },
+  "storage_copy": {
+    "authorization": "ROOT explicit independent source-copy instruction under twelve-hour authority",
+    "additional_cpu_ceiling_seconds": 1800,
+    "host": "gpu2",
+    "local_device": 64515,
+    "shared_device": 2097343,
+    "local_free_bytes_before": 1901743312896,
+    "shared_free_bytes_before": 21340288450560,
+    "prior_G1_candidate": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/background/g1-2026-10-08/videos/P09_103.MP4",
+      "sha256_actual": "c94c6cf88542ef08057224f5834b911737fb5e25515af3a705bd8b92a7bb4338",
+      "bytes": 2252549936,
+      "mode": "0644",
+      "same_inode_as_original": true,
+      "disposition": "left unchanged; independent immutable copy created instead"
+    },
+    "published_path": "/home/itec/emanuele/Datasets/pointstream-data/ladder-autonomy-20261114/intake/p09-103-20261114T233342Z-ed1fc777/P09_103.MP4",
+    "receipt_path": "/home/itec/emanuele/Datasets/pointstream-data/ladder-autonomy-20261114/intake/p09-103-20261114T233342Z-ed1fc777/copy-receipt.json",
+    "local_copy": "/local/users/emanuele/pointstream/ladder-intake-p09-103-20261114T233342Z-ed1fc777/P09_103.MP4",
+    "sha256": "c94c6cf88542ef08057224f5834b911737fb5e25515af3a705bd8b92a7bb4338",
+    "bytes": 2252549936,
+    "source_to_SSD_hash": true,
+    "SSD_readback": true,
+    "published_readback": true,
+    "independent_inode": true,
+    "regular_nonsymlink_file": true,
+    "file_mode": "0444",
+    "directory_mode": "0555",
+    "wall_seconds": 44.120199957862496,
+    "scoped_cpu_seconds": 29.374161,
+    "gpu_seconds": 0,
+    "original_mode_unchanged": "0644",
+    "state": "complete_no_live_process"
   }
 }

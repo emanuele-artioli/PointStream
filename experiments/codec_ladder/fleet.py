@@ -74,6 +74,37 @@ def extract_archive(archive: Path, expected: str, output: Path) -> Path:
     return output / "publish"
 
 
+def prepared_inputs(archive: Path, expected: str, output: Path, config: dict[str, Any] | None = None) -> tuple[Path, Path, Path | None, dict[str, Any]]:
+    """Materialize only authenticated prepared payloads on host-local scratch."""
+    if worker.file_sha(archive) != expected:
+        raise ValueError("prepared archive identity mismatch")
+    output.mkdir(parents=True, exist_ok=False)
+    with tarfile.open(archive) as bundle:
+        members = bundle.getmembers()
+        if len(members) != 3 or {m.name for m in members} != {"source.yuv", "masks.npz", "preparation.json"} or any(not m.isfile() for m in members):
+            raise ValueError("unexpected prepared archive members")
+        bundle.extractall(output, filter="data")
+    info = json.loads((output / "preparation.json").read_text())
+    if set(info["outputs"]) != {"source.yuv", "masks.npz"}:
+        raise ValueError("invalid preparation payload inventory")
+    for name, item in info["outputs"].items():
+        path = output / name
+        if path.stat().st_size != item["bytes"] or worker.file_sha(path) != item["sha256"]:
+            raise ValueError("prepared payload identity mismatch")
+    source, masks, manifest = output / "source.yuv", output / "masks.npz", None
+    if config is not None:
+        expected_fps = worker.Fraction(info["fps"])
+        for key, value in (("width", info["width"]), ("height", info["height"]), ("frames", info["frames"]),
+                           ("fps", [expected_fps.numerator, expected_fps.denominator]),
+                           ("full_range", info["source_record"]["full_range"]), ("source_group", info["source_group"]),
+                           ("annotation_provenance", info["mask_record"]["provenance"])):
+            if config[key] != value:
+                raise ValueError("frozen configuration differs from actual preparation")
+        manifest = output / "manifest.json"
+        worker.prepare(config, source, masks, manifest)
+    return source, masks, manifest, {"archive_sha256": expected, "preparation": info}
+
+
 def restore_decoded(root: Path, decoder: str) -> dict[str, bool]:
     record = json.loads((root / "result.json").read_text())
     checks = {}
@@ -104,7 +135,12 @@ def cost_record(*, wall: float, cpu: float, frames: int, target: int, cap: float
 
 def validate_scores(scores: dict[str, Any]) -> dict[str, bool]:
     count = scores["frames"]
-    checks = {"all_rows": len(scores["rows"]) == 12,
+    control = scores["metric_control"]
+    gpu = scores["gpu_execution"]
+    checks = {"metric_self_control": all(type(control[k]) in (int, float) and math.isfinite(control[k]) and abs(control[k]) <= 1e-5 for k in ("source_self_lpips", "source_self_dists")),
+              "cuda_networks": gpu["device_count"] == 1 and gpu["network_parameters_cuda"] is True,
+              "reserved_memory_within_declared8000MiB": 0 < gpu["maximum_reserved_bytes"] <= 8000 * 1024**2,
+              "all_rows": len(scores["rows"]) == 12,
               "matrix": {(row["arm"], row["crf"]) for row in scores["rows"]} == {(arm, crf) for arm in ("native", "roi", "semantic_patch", "error_patch") for crf in scores["config"]["rates"]},
               "coverage": all(len(scores["region_pixels"][name]) == count for name in ("foreground", "background"))}
     for row in scores["rows"]:
@@ -158,6 +194,9 @@ def main() -> int:
     parser.add_argument("--validate", action="store_true")
     parser.add_argument("--mode", choices=["run", "score"], default="run")
     parser.add_argument("--manifest", type=Path)
+    parser.add_argument("--prepared", type=Path)
+    parser.add_argument("--prepared-sha256")
+    parser.add_argument("--config", type=Path)
     parser.add_argument("--source", type=Path)
     parser.add_argument("--masks", type=Path)
     parser.add_argument("--archive", type=Path)
@@ -182,6 +221,13 @@ def main() -> int:
     if args.target_frames is None or args.full_cap_seconds is None:
         parser.error("full target frame count and full-stage cap are required")
     replay: dict[str, bool] = {}
+    preparation_binding = None
+    if args.prepared is not None:
+        if args.prepared_sha256 is None or (args.mode == "run" and args.config is None):
+            parser.error("prepared input requires its SHA256 and run configuration")
+        config = json.loads(args.config.read_text()) if args.config is not None else None
+        args.source, args.masks, args.manifest, preparation_binding = prepared_inputs(
+            args.prepared, args.prepared_sha256, scratch / "prepared-input", config)
     if args.mode == "run":
         if args.manifest is None or args.source is None or args.masks is None or args.frames is None:
             parser.error("run requires manifest/source/masks/frames")
@@ -207,7 +253,7 @@ def main() -> int:
         count = result["frames"]
     cost = cost_record(wall=time.monotonic() - start, cpu=cpu_seconds() - cpu, frames=count, target=args.target_frames,
                        cap=args.full_cap_seconds, overhead=args.publication_overhead_seconds)
-    worker.write_json(stage / "ladder.json", {"mode": args.mode, "archive": publication, "cost": cost, "tools": tools, "receiver_pixel_replay": replay})
+    worker.write_json(stage / "ladder.json", {"mode": args.mode, "archive": publication, "cost": cost, "tools": tools, "receiver_pixel_replay": replay, "preparation_binding": preparation_binding})
     print(json.dumps({"mode": args.mode, "archive_bytes": publication["bytes"], "cost": cost}))
     return 0 if cost["passed"] else 1
 

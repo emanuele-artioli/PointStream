@@ -244,8 +244,22 @@ def score(root: Path, lpips_backbone: Path, dists_backbone: Path, output: Path, 
         raise ValueError("scoring source identity mismatch")
     masks = load_masks(root / "foreground.npz", {**config, "frames": available})[:count]
     originals = raw_frames(source, config, count)
+    if torch.cuda.device_count() != 1:
+        raise ValueError("exactly one fleet-assigned CUDA device required")
+    torch.cuda.reset_peak_memory_stats()
     lpips_net, dists_net = quality.load_lpips(lpips_backbone, device), quality.load_dists(dists_backbone, device)
+    if any(parameter.device.type != "cuda" for model in (lpips_net, dists_net) for parameter in model.parameters()):
+        raise ValueError("metric network silently left the assigned CUDA device")
     width, height = config["width"], config["height"]
+    with torch.inference_mode():
+        control = quality.yuv420_to_rgb(torch.from_numpy(originals[0].copy()[None]).to(device), width, height,
+                                       full_range=config["full_range"]) / 255
+        self_lpips = float(lpips_net(control * 2 - 1, control * 2 - 1).mean().item())
+        self_dists = float(quality.masked_dists(dists_net, control, control,
+                                             torch.ones((1, 1, height, width), device=device)).item())
+    if any(not math.isfinite(value) or abs(value) > 1e-5 for value in (self_lpips, self_dists)):
+        raise ValueError("metric self-reconstruction control failed")
+    metric_control = {"source_self_lpips": self_lpips, "source_self_dists": self_dists, "tolerance": 1e-5}
     rows = []
     for row in record["rates"]:
         reconstructions = raw_frames(root / row["decoded"], config, count)
@@ -299,6 +313,14 @@ def score(root: Path, lpips_backbone: Path, dists_backbone: Path, output: Path, 
               "region_pixels": {"foreground": [int(m.sum()) for m in masks], "background": [int((~m).sum()) for m in masks]},
               "annotation_provenance": record["annotation_provenance"], "device": torch.cuda.get_device_name(),
               "lpips": quality.lpips_record(lpips_backbone), "dists": quality.dists_record(dists_backbone), "rows": rows,
+              "metric_control": metric_control,
+              "gpu_execution": {"torch": torch.__version__, "cuda": torch.version.cuda,
+                                "cudnn": torch.backends.cudnn.version(), "cudnn_enabled": torch.backends.cudnn.enabled,
+                                "compute_capability": list(torch.cuda.get_device_capability()),
+                                "maximum_allocated_bytes": torch.cuda.max_memory_allocated(),
+                                "maximum_reserved_bytes": torch.cuda.max_memory_reserved(),
+                                "device_count": torch.cuda.device_count(), "network_parameters_cuda": True,
+                                "kernels": "torch CUDA LPIPS/VGG16 convolution and tensor/statistic operations; no attention model"},
               "protocol": "all-frame70/30; empty-region weight reallocated; regional component means report available-frame subsets"}
     write_json(output, result)
     return result

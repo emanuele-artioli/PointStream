@@ -81,3 +81,25 @@ candidates reserved from codec outcome inspection; no confirmation cohort or
 success claim is frozen here. Human-reviewed SAM proposals can supply a small
 source-only pixel-reference set, with model-assisted provenance and separate
 blind annotations, without discarding this useful native footage.
+
+### 2026-11-14 — VISOR fleet data-root source repaired by independent copy
+
+ROOT's initial VISOR publication rejected the original dataset video path because
+fleet data-file inputs must live inside the external `pointstream-data` root.
+The historical G1 source path already existed there and its SHA matched, but it
+was a0644 same-inode hardlink to the original. It was preserved unchanged.
+
+Under ROOT's explicit1800CPU/GPU0 storage-preparation allowance, the source was
+copied first to gpu2's separate local SSD, hash-verified and read back, then
+independently copied into a fresh data-root intake directory and read back.
+The eligible immutable source is now
+`pointstream-data/ladder-autonomy-20261114/intake/p09-103-20261114T233342Z-ed1fc777/P09_103.MP4`.
+It is2,252,549,936bytes, SHA256
+`c94c6cf88542ef08057224f5834b911737fb5e25515af3a705bd8b92a7bb4338`,
+regular/nonsymlink, independent inode,0444 inside0555 directory. Adjacent
+`copy-receipt.json` and the retained local SSD copy preserve provenance. Original
+mode0644 and source bytes were unchanged. Copy wall44.1202s and scoped CPU29.374161s
+are not complete remote administrative CPU accounting. No encoding, inference,
+GPU work or source preparation job occurred in this copy. The readback receipt
+permits ROOT to submit its separately identified corrected preparation request;
+it does not relabel the unpublished original request.

@@ -17,6 +17,8 @@ ARMS = ('native', 'roi', 'semantic_patch', 'error_patch')
 def analyse(score: dict[str, Any]) -> dict[str, Any]:
     rows = score['rows']
     count = score['frames']
+    if score.get('available_receiver_frames') != count:
+        raise ValueError('prefix-only scoring is correctness/cost evidence, never a promotion curve')
     if type(count) is not int or count <= 0:
         raise ValueError('invalid registered frame count')
     selected: dict[tuple[str, int], dict[str, Any]] = {}
@@ -24,6 +26,9 @@ def analyse(score: dict[str, Any]) -> dict[str, Any]:
         key = (row['arm'], row['crf'])
         if key in selected or row['arm'] not in ARMS or type(row['packet_bytes']) is not int or row['packet_bytes'] <= 0:
             raise ValueError('invalid/duplicate rate row')
+        native_bytes = row.get('native_base_bytes')
+        if type(native_bytes) is not int or not 0 < native_bytes <= row['packet_bytes']:
+            raise ValueError('missing/invalid actual native stream bytes')
         if any(type(row['means'].get(m)) not in (int, float) or not math.isfinite(row['means'][m]) for m in METRICS):
             raise ValueError('missing/nonfinite complete-frame metric')
         for metric in METRICS:
@@ -45,8 +50,8 @@ def analyse(score: dict[str, Any]) -> dict[str, Any]:
             metrics: dict[str, Any] = {}
             for metric in METRICS:
                 sign = 1 if metric == 'full_rgb_psnr' else -1
-                candidate = [(selected[arm, r]['packet_bytes'], sign * selected[arm, r]['means'][metric]) for r in sorted(rates)]
-                baseline = [(selected[anchor, r]['packet_bytes'], sign * selected[anchor, r]['means'][metric]) for r in sorted(rates)]
+                candidate = [(selected[arm, r]['native_base_bytes' if arm == 'roi' else 'packet_bytes'], sign * selected[arm, r]['means'][metric]) for r in sorted(rates)]
+                baseline = [(selected[anchor, r]['native_base_bytes'], sign * selected[anchor, r]['means'][metric]) for r in sorted(rates)]
                 metrics[metric] = anchor_sensitivity(candidate, baseline)
             by_anchor[anchor] = metrics
         comparisons[arm] = by_anchor
@@ -64,9 +69,17 @@ def analyse(score: dict[str, Any]) -> dict[str, Any]:
                 if type(bound) is not int or not 0 < bound <= row['packet_bytes']:
                     raise ValueError('invalid optimistic finite-family price')
                 candidate.append((bound, sign * row['means'][metric]))
-            baseline = [(selected['native', r]['packet_bytes'], sign * selected['native', r]['means'][metric]) for r in sorted(rates)]
+            baseline = [(selected['native', r]['native_base_bytes'], sign * selected['native', r]['means'][metric]) for r in sorted(rates)]
             metrics[metric] = anchor_sensitivity(candidate, baseline)
         optimistic[arm] = metrics
+    wrapper_sensitivity: dict[str, Any] = {}
+    for arm in ARMS[1:]:
+        wrapper_sensitivity[arm] = {}
+        for metric in METRICS:
+            sign = 1 if metric == 'full_rgb_psnr' else -1
+            wrapper_sensitivity[arm][metric] = anchor_sensitivity(
+                [(selected[arm, r]['packet_bytes'], sign * selected[arm, r]['means'][metric]) for r in sorted(rates)],
+                [(selected['native', r]['packet_bytes'], sign * selected['native', r]['means'][metric]) for r in sorted(rates)])
     decisions: dict[str, Any] = {}
     for arm, anchors in comparisons.items():
         checks: dict[str, Any] = {}
@@ -79,7 +92,7 @@ def analyse(score: dict[str, Any]) -> dict[str, Any]:
     return {'schema': 1, 'scope': 'reference-guided static-rectangle development mechanism oracle; not automatic sender or confirmation',
             'domain': score['domain'], 'source_group': score['source_group'], 'annotation_provenance': score['annotation_provenance'],
             'frames': score['frames'], 'comparisons': comparisons, 'optimistic_same_pixels': optimistic,
-            'decisions': decisions, 'rate_basis': 'complete packet bytes on a single identical-duration window; scale cancels in BD-rate',
+            'decisions': decisions, 'shared_wrapper_secondary': wrapper_sensitivity, 'rate_basis': 'candidate complete packets versus complete native IVF anchors (including ROI signalling); full receiver coverage; same duration so byte scale cancels in BD-rate',
             'promotion_limit': '10percent weightedDISTS plus corroboratingLPIPS is a development screen only; simplerROI/error selection and full/temporal outcomes must be reviewed; no population/neural-anchor claim'}
 
 

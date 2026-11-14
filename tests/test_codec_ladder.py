@@ -147,7 +147,8 @@ def test_scalar_validator_rejects_corruption_and_preserves_empty_regions():
     row = dict(arm='native', crf=35, frames=frames,
                means={name: sum(v for v in values if v is not None) / sum(v is not None for v in values) for name, values in frames.items()},
                temporal=dict(pairs=1, values={'full_residual_mae': [0.], 'foreground_residual_mae': [0.]}))
-    scores = dict(frames=2, config={'rates': [35, 50, 65]}, region_pixels={'foreground': [10, 0], 'background': [10, 20]},
+    scores = dict(frames=2, metric_control={'source_self_lpips': 0., 'source_self_dists': 0.},
+                  gpu_execution={'device_count': 1, 'network_parameters_cuda': True, 'maximum_reserved_bytes': 1000}, config={'rates': [35, 50, 65]}, region_pixels={'foreground': [10, 0], 'background': [10, 20]},
                   rows=[{**copy.deepcopy(row), 'arm': arm, 'crf': crf} for arm in ('native', 'roi', 'semantic_patch', 'error_patch') for crf in (35, 50, 65)])
     assert all(validate_scores(scores).values())
     bad = copy.deepcopy(scores)
@@ -156,3 +157,34 @@ def test_scalar_validator_rejects_corruption_and_preserves_empty_regions():
     bad = copy.deepcopy(scores)
     bad['rows'][0]['frames']['weighted_dists'][0] = .1
     assert not all(validate_scores(bad).values())
+    bad = copy.deepcopy(scores)
+    bad['metric_control']['source_self_dists'] = .1
+    assert not all(validate_scores(bad).values())
+
+
+def test_prepared_archive_binding_and_tamper_guard(tmp_path):
+    import hashlib
+    import tarfile
+    from experiments.codec_ladder.fleet import prepared_inputs
+    source = tmp_path / 'source.yuv'
+    source.write_bytes(bytes(128 * 128 * 3 // 2 * 2))
+    masks = tmp_path / 'masks.npz'
+    np.savez_compressed(masks, foreground=np.zeros((2, 128, 128), bool))
+    cfg = config()
+    info = dict(width=128, height=128, frames=2, fps='25/1', source_group=cfg['source_group'],
+                source_record={'full_range': False}, mask_record={'provenance': cfg['annotation_provenance']},
+                outputs={p.name: {'bytes': p.stat().st_size, 'sha256': hashlib.sha256(p.read_bytes()).hexdigest()} for p in (source, masks)})
+    meta = tmp_path / 'preparation.json'
+    meta.write_text(json.dumps(info))
+    archive = tmp_path / 'prepared.tar'
+    with tarfile.open(archive, 'w') as bundle:
+        for path in (source, masks, meta):
+            bundle.add(path, arcname=path.name)
+    digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+    a, b, manifest, binding = prepared_inputs(archive, digest, tmp_path / 'out', cfg)
+    assert a.read_bytes() == source.read_bytes() and b.exists() and manifest.exists()
+    assert binding['archive_sha256'] == digest
+    with pytest.raises(ValueError, match='identity'):
+        prepared_inputs(archive, '0' * 64, tmp_path / 'bad', cfg)
+    with pytest.raises(ValueError, match='configuration'):
+        prepared_inputs(archive, digest, tmp_path / 'bad-config', {**cfg, 'source_group': 'wrong'})
