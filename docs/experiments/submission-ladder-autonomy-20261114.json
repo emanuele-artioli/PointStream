@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "authority": "user: approve any budget automatically for next12hours; work autonomously; fix FFmpeg and complete dataset/annotation/ROI-patch work",
+  "authorized_at_utc": "2026-11-14T23:07:34Z",
+  "expires_at_utc": "2026-11-15T11:07:34Z",
+  "expires_at_sao_paulo": "2026-11-15T08:07:34-03:00",
+  "resources": "existing local machine and institutional fleet; no paid hosting/provider change assumed",
+  "stage_policy": "root may allocate/amend bounded stages within authority window without asking again; scientific correctness/resource gates remain mandatory",
+  "allocations": [
+    {
+      "id": "readiness-intake",
+      "cpu_seconds": 7200,
+      "gpu_seconds": 0,
+      "state": "released",
+      "parts": {
+        "dataset_intake": 1800,
+        "annotation_preparation": 1800,
+        "root_repair_native_validation_and_orchestration": 3600
+      },
+      "accounting": "conservative phase ceiling; includes remote metadata checks and preparation; exact scientific fleet receipts recorded separately"
+    },
+    {
+      "id": "roi-patch-mechanism-pilot",
+      "cpu_seconds": 21600,
+      "gpu_seconds": 7200,
+      "state": "released_conditional_on_exact_job_preflight",
+      "card": "docs/cards/submission-ladder-roi-patch-pilot-2026-11-14.md",
+      "jobs": []
+    }
+  ],
+  "jobs": [],
+  "decisions": [
+    "Existing datasets sufficient for development. Native RacketVision source/label joins found; no replacement dataset required for first screen. New candidate sources remain unscored pending confirmation eligibility."
+  ],
+  "repair_receipt": {
+    "repair": "expose existing ABI215 library at FFmpeg required opt path; preserve ABI216 defaults",
+    "target": "/opt/homebrew/Cellar/x265/4.2/lib/libx265.215.dylib",
+    "link": "../../4.1/lib/libx265.215.dylib",
+    "resolved": "/opt/homebrew/Cellar/x265/4.1/lib/libx265.215.dylib",
+    "sha256": "cb2b935b7780bcb7c3fdfbb3951124905b523727c0110397a8dea8a303eaa25e",
+    "ffmpeg": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+    "ffprobe": "ffprobe version 8.1 Copyright (c) 2007-2026 the FFmpeg developers"
+  }
+}

@@ -1,0 +1,289 @@
+{
+  "schema": 1,
+  "date": "2026-11-14",
+  "authority_expires_utc": "2026-11-15T11:07:34Z",
+  "metadata_host": "gpu2",
+  "scope": "bounded read-only source/manifest/archive intake; no native encode, model inference or source mutation",
+  "budget": {
+    "cpu_ceiling_seconds": 3600,
+    "gpu_seconds": 0,
+    "measured_partial_remote_cpu_seconds": [
+      2.13124,
+      2.479176
+    ],
+    "complete_cpu_accounting": "not measured across all SSH/metadata lifecycles; ROOT retains conservative allocation ceiling"
+  },
+  "citations": [
+    {
+      "path": "docs/resources.md",
+      "sha256": "df43989f35868b7c59a54897c253dc37a1f4ea7a3aee639f5975557ae0bedcc2"
+    },
+    {
+      "path": "experiments/visor/eval_set.json",
+      "sha256": "0d25301a039dbc801bba01baca4992bf7d05dd471b713ed313a249cc7d6feec2"
+    },
+    {
+      "path": "docs/experiments/k5d-inputs/study-selection-20261104.json",
+      "sha256": "d572e991d89f52264f6017e0d034e93dcfbb9766c7693093a4502e8f144da343"
+    },
+    {
+      "path": "experiments/tennis/w1_roi.py",
+      "sha256": "e98b1965b3b45e665217fbc95f79cdaa81ccaefb86f534137013217659f155ef"
+    },
+    {
+      "path": "experiments/tennis/k4b_features.py",
+      "sha256": "067ffcdab6f4a7d32aed2c39331961e34b84484826cbcb879204e2d82511c453"
+    },
+    {
+      "path": "experiments/codec_ladder_prepare.py",
+      "sha256": "8d67af5bfe2d5ec4d7cff86564be357fe59e3ac4f366f4b0eaea108c18138b6c"
+    }
+  ],
+  "dataset_disposition": {
+    "existing_datasets_sufficient_for_development": true,
+    "replacement_dataset_search": "not required after verifying existing RacketVision native label join; no external new search claimed",
+    "remaining_scientific_limitation": "No single adopted tennis dataset contains native video plus independent dense player/racket masks plus ball visibility; human-reviewed source proposals supplement evaluation."
+  },
+  "development_selection": {
+    "tennis": {
+      "item_id": "alcaraz_hurkacz/031@129",
+      "source_group": "alcaraz_hurkacz",
+      "source": {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/sources/alcaraz_hurkacz__031.mp4",
+        "sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+        "hash_basis": "prior_accepted_native_input_identity; source bytes not newly rehashed by this intake"
+      },
+      "source_first": 9,
+      "mask_first": 0,
+      "frames": 64,
+      "fps": [
+        25,
+        1
+      ],
+      "mask": {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261025T082944Z-29f021a5/full/packets/alcaraz_hurkacz__031@129/exact-rle.matte",
+        "sha256_actual": "5aa4c788e3fa692a843ab99765296f8691c974b063e41cdec1618ed4949a7ea5",
+        "bytes": 57189,
+        "provenance": "source_model_SAM_not_independent_ground_truth"
+      },
+      "exposure": "familiar_development_window_prior_W1_K6_experiments",
+      "choice_basis": "reuse fixed known-development input to test mechanism; not favorable-result selection or confirmation"
+    },
+    "visor_rule": "Filter existing34 to verified50fps source class for endpoint colour compatibility; sort SHA256 of UTF8 pointstream-ladder-dev-v1:<item_id>; select first2. Select64frame subwindow centered on first existing human keyframe, clamped inside240; no new pixels/quality examined.",
+    "visor": [
+      {
+        "item_id": "P09_103_0000017124",
+        "source_group": "P09_103",
+        "source": {
+          "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P09_103.MP4",
+          "bytes": 2252549936,
+          "sha256": "c94c6cf88542ef08057224f5834b911737fb5e25515af3a705bd8b92a7bb4338"
+        },
+        "source_first": 17224,
+        "mask_first": 101,
+        "frames": 64,
+        "fps": [
+          50,
+          1
+        ],
+        "human_sparse_ticks": [
+          32
+        ],
+        "exposure": "existing_B2_and_G1_development_cohort_not_holdout",
+        "remote_path_verified": true
+      },
+      {
+        "item_id": "P07_110_0000006712",
+        "source_group": "P07_110",
+        "source": {
+          "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P07_110.MP4",
+          "bytes": 788471965,
+          "sha256": "28688ccfd50ca92f1418a6797f4e3444efd2b7fa577e74596e8113ce72f7ae04"
+        },
+        "source_first": 6711,
+        "mask_first": 0,
+        "frames": 64,
+        "fps": [
+          50,
+          1
+        ],
+        "human_sparse_ticks": [
+          0
+        ],
+        "exposure": "existing_B2_and_G1_development_cohort_not_holdout",
+        "remote_path_verified": true
+      }
+    ],
+    "visor_primary_mask": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/b1/b1-masks-published.tar",
+      "sha256_actual": "0cf83b8cb4bb4fe62cd94177d1a03ba7855813aa40439fd74ef0f1b25e1937b5",
+      "bytes": 26624000,
+      "member": "publish/masks/P09_103_0000017124/masks.rle",
+      "member_sha256_actual": "7bdd07f0b53c3af91b105dcaeda83e0113783514bee36e2c4455ac124f8efac1",
+      "member_bytes": 1392221,
+      "provenance": "dense_interpolated_aligned_prior_B1_masks; sparse_human_frames_distinct"
+    }
+  },
+  "racketvision": {
+    "archive": "/home/itec/emanuele/Datasets/RacketVision/tennis.tar",
+    "archive_sha256_manifest": "9b1ea8c4ae91ac17b60970031e30cd7b0eb33936df944837a5a924d02d6a3820",
+    "archive_bytes": 2009118720,
+    "manifest_sha256_actual": "9fe8141a087bf865654dd5af4833fee34a0700ac1cd0cc43d3f655fbe1ba6c86",
+    "source_sidecar": "/home/itec/emanuele/Datasets/manifests/RacketVision.members.sha256",
+    "test_split_member": "tennis/info/test.json",
+    "test_split_sha256_actual": "120612c7d0b46e2fc94f6d33535d7be5c86339aec5573585c4b2c8b1d7678781",
+    "test_split_clips": 43,
+    "candidate_rule": "Sort test split pairs by SHA256(UTF8('pointstream-ladder-dev-v1:'+str(pair))) using each original Python [match,rally] list representation; first3; all selected before video pixels or codec outcomes.",
+    "prior_G1_selected_ids": [
+      "match134_000",
+      "match132_000",
+      "match102_000",
+      "match106_000",
+      "match119_000",
+      "match123_000",
+      "match110_000",
+      "match136_000"
+    ],
+    "prior_G1_clips_manifest_sha256_actual": "a8820a14109f0e206d8381cb78575965fc15bea838332dae34c9d08834f11f4c",
+    "licence_record": "MIT dataset card; source-specific footage permissions remain separately unestablished",
+    "candidates": [
+      {
+        "candidate_id": "racketvision/tennis/match11_000",
+        "source_member": "tennis/videos/match11_000.mp4",
+        "source_sha256_actual": "1099dfe9667ff2a7995c07f57830d805e01e8275c473a8c2a7c7da04d7ceaf51",
+        "source_bytes": 2002727,
+        "source_frame_count": 249,
+        "fps": [
+          25,
+          1
+        ],
+        "source_geometry": [
+          1920,
+          1080
+        ],
+        "source_colour": {
+          "range": "tv",
+          "matrix": "bt709",
+          "transfer": "bt709",
+          "primaries": "bt709"
+        },
+        "ball_label_member": "tennis/all/match11/csv/000_ball.csv",
+        "ball_label_sha256_actual": "b7a44e9828cc1240d2d3e32a96c11b62ddb8cdd0f038d57b2d43816a402f58be",
+        "sparse_ball_rows": 50,
+        "racket_annotation_frames": 45,
+        "member_sha_matches_original_sidecar": true,
+        "prior_G1_eight_tennis_selection_overlap": false,
+        "status": "native_label_join_verified_candidate_only_confirmation_not_frozen",
+        "remaining_gates": [
+          "original_broadcast_or_match_deduplication",
+          "prior_exposure_beyond_G1_eight_and_training_exclusion",
+          "source_frame_visual_alignment_of_sparse_labels",
+          "source_judge_qualification_if_task_scores_claimed"
+        ],
+        "label_limits": "Sparse native ball point/visibility and racket boxes/keypoints; no dense independent player/racket masks. Missing rows are unknown, never absent."
+      },
+      {
+        "candidate_id": "racketvision/tennis/match126_000",
+        "source_member": "tennis/videos/match126_000.mp4",
+        "source_sha256_actual": "29fb4ef71a4d2ef68d79166542c51fda4f48108dfd6647bacc8b9869c018ab93",
+        "source_bytes": 2731684,
+        "source_frame_count": 240,
+        "fps": [
+          25,
+          1
+        ],
+        "source_geometry": [
+          1920,
+          1080
+        ],
+        "source_colour": {
+          "range": "tv",
+          "matrix": "bt709",
+          "transfer": "bt709",
+          "primaries": "bt709"
+        },
+        "ball_label_member": "tennis/all/match126/csv/000_ball.csv",
+        "ball_label_sha256_actual": "0531c4d231721d3ca5465d86e21c925698c3cdaac09c050f18f29d3784a560f9",
+        "sparse_ball_rows": 50,
+        "racket_annotation_frames": 16,
+        "member_sha_matches_original_sidecar": true,
+        "prior_G1_eight_tennis_selection_overlap": false,
+        "status": "native_label_join_verified_candidate_only_confirmation_not_frozen",
+        "remaining_gates": [
+          "original_broadcast_or_match_deduplication",
+          "prior_exposure_beyond_G1_eight_and_training_exclusion",
+          "source_frame_visual_alignment_of_sparse_labels",
+          "source_judge_qualification_if_task_scores_claimed"
+        ],
+        "label_limits": "Sparse native ball point/visibility and racket boxes/keypoints; no dense independent player/racket masks. Missing rows are unknown, never absent."
+      },
+      {
+        "candidate_id": "racketvision/tennis/match12_000",
+        "source_member": "tennis/videos/match12_000.mp4",
+        "source_sha256_actual": "1d0f395f924578ec766c313fa8994edd8f500624d1e9343ae552b2e4b1287399",
+        "source_bytes": 1287015,
+        "source_frame_count": 249,
+        "fps": [
+          25,
+          1
+        ],
+        "source_geometry": [
+          1920,
+          1080
+        ],
+        "source_colour": {
+          "range": "tv",
+          "matrix": "bt709",
+          "transfer": "bt709",
+          "primaries": "bt709"
+        },
+        "ball_label_member": "tennis/all/match12/csv/000_ball.csv",
+        "ball_label_sha256_actual": "3a2352e5d0f857a5ecf8db99c027d8ce18105df6b2800386ab8590caa1eb4230",
+        "sparse_ball_rows": 50,
+        "racket_annotation_frames": 4,
+        "member_sha_matches_original_sidecar": true,
+        "prior_G1_eight_tennis_selection_overlap": false,
+        "status": "native_label_join_verified_candidate_only_confirmation_not_frozen",
+        "remaining_gates": [
+          "original_broadcast_or_match_deduplication",
+          "prior_exposure_beyond_G1_eight_and_training_exclusion",
+          "source_frame_visual_alignment_of_sparse_labels",
+          "source_judge_qualification_if_task_scores_claimed"
+        ],
+        "label_limits": "Sparse native ball point/visibility and racket boxes/keypoints; no dense independent player/racket masks. Missing rows are unknown, never absent."
+      }
+    ]
+  },
+  "tracknet": {
+    "status": "usable_for_ball_development_and_retrospective_benchmark",
+    "path_verified": "/home/itec/emanuele/Datasets/TrackNet/Dataset.zip",
+    "bytes": 2564111322,
+    "manifest_sha256_actual": "591351e70097b811d06cd6e6d0c24a88122cc05c0e6726db72fda409238ca87b",
+    "limits": [
+      "JPEG frames not native source video",
+      "all30testclips previously exposed",
+      "no player/racket masks",
+      "release licence not stated"
+    ],
+    "no_new_source_ids_claimed": true
+  },
+  "preparation": {
+    "entrypoint": "experiments.codec_ladder_prepare",
+    "status": "implemented_tested_no_actual_preparation_run_yet_ROOT_CPUfleet_release_next",
+    "output_members": [
+      "source.yuv",
+      "masks.npz",
+      "preparation.json"
+    ],
+    "mask_array": "foreground bool [frames,1080,1920]",
+    "maximum_frames": 64,
+    "checks": [
+      "video_and_mask_input_SHA256",
+      "native_geometry_and_cadence",
+      "mask_member_SHA256",
+      "VISOR_video_index_labelled_and_drift_alignment",
+      "all_frames_retained",
+      "published_source_byte_count_mask_shape_and_payload_hashes"
+    ]
+  }
+}

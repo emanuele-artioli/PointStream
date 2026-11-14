@@ -110,3 +110,9 @@ jobs, GPU usage or new training. Source/exposure inventory, actual annotation
 pilot and real production-path cost measurements remain open. Prepare their
 exact source manifests before asking for that stage's release. Manuscript690cad0
 and all completed raw evidence remain unchanged.
+
+### 2026-11-14 — twelve-hour autonomous research release
+
+The user explicitly instructed repair of FFmpeg, actual footage selection, annotation review preparation and ROI/patch experiments, and authorized autonomous budget approval for twelve hours. The [authority and allocation ledger](submission-ladder-autonomy-20261114.json) expires November15 at11:07:34UTC (08:07:34America/Sao_Paulo). Within this window root may release bounded costed stages without requesting approval again. This supersedes the earlier unreleased-stage language for newly recorded allocations; all scientific/device/input gates and the45-minute stage bound remain. Human annotation decisions still require the human reviewer; an agent cannot approve reference labels on their behalf. No recurring monitoring is created.
+
+FFmpeg8.1 and ffprobe8.1 now start after restoring access to the already installed x265 ABI215 library, preserving the ABI216 default. All twelve native endpoint tests pass locally, including the previously skipped native roundtrip. This qualifies the tested local correctness path, not SVT4.2.0 production/GPU scoring or an empirical codec win.
