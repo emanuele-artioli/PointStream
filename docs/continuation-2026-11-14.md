@@ -6,7 +6,7 @@ Research comes first, manuscript revisions afterward. PRESLEY must not be edited
 
 **A6000 is unnecessary:** qualified RTX 6000 Ada has completed the primary six-point neural/SVT16/48 comparison and SVT16/48/292/586. There is no current resource-only wait or passive watch renewal. Fleet queues perform bounded resource checks; samples are not leases. Native completion-to-model resumption is unverified, and cache lifetime is unknown. Use one canonical wait per batch, ≤45 min, with no recurring model polls. After an interruption, inspect existing IDs; never replay unknown requests.
 
-The current branch is `codex/pointstream-paired-evidence-20261113`. PR411 was OPEN at head f82aa526. CI failed solely because the new research-disposition document lacked the required Experiments header/entry; this was corrected locally, and targeted documentation/ledger checks pass. Prior PR410 merged with full configured CI green. Recheck live Git before push/PR. Preserve the unrelated untracked calibration-controls-spec-20261105.json. Git metadata writes/network require the existing scoped sandbox escalation.
+The current branch is `codex/pointstream-paired-evidence-20261113`. PR411 MERGED as85cda89b after complete configured CI passed at784cac39. The earlier header-only CI failure is corrected. Current80 closeout changes await their next checkpoint/PR; recheck live Git. Preserve the unrelated untracked calibration-controls-spec-20261105.json. Git metadata writes/network require the existing scoped sandbox escalation.
 
 ## Accepted research pieces
 
@@ -20,42 +20,28 @@ Exact terminal11a13fea and stall367b889f are ACK-closed separately. Sole wait730
 
 Preserve the original audit v1 binding collision, the digest's members→physical_members schema fix before execution, and the first analysis's NULL physical-proof binding failure and exact-helper repair.
 
-## Next: complete targeted absence80; no GPU submission yet
+## Targeted absence80 is closed
 
-The [card](cards/k5d-targeted-absence80-2026-11-14.md) specifies source-unchanged SVT4282 on all game10/Clip11 frames: 80 = 39 visible + 41 absent + 0 excluded. Source WASB25/39 fails qualification; retain it beside the original pooled10/197 failure. Raw visibility counts are 41/32/7/0; label SHA is 1f0963a50c0522ffc5f3d05b29eed4e36cbbd03d47cc949309c82ed46cade6fc. WASB10px is primary, 5px secondary; BallTrack is an encoder-related diagnostic. No held-out, population, safety, neural or full30 claim follows.
+Actual job **20261114T010632Z-ae9eb20d** completed on gpu6 Ada1/ef96, source4282/e4d4/f813/env32/config4fa, specff4ba6c4/raw04ee43f5. Complete game10/Clip11: 80 frames,39 visible,41 absent,0 excluded. Source WASB25/39 fails qualification; original pooled10/197 absence failure remains failed. No held-out, population, safety, neural or full30 claim follows.
 
-The parent allocation is 1893 CPU / 1175 GPU within existing programme/Ball caps. Charged96CPU comprises readiness30 + archivebuilder3 + archivereview3 + originalmetadata30 + replacementmetadata30. The remaining hold is 1797 CPU / 1175 GPU. The partition is:
+Physical ROOTca4488bd and independent4f5b65b8 accept native/PSBL/pixel hashes, all full/ROI metrics and both judges, six real CPU receiver contexts/twelve literal pairs and current cleanup. Original strict own-Ada16 gold passes; full80 has NO gold. Digest79967e74/ROOTc95636d0 and analysisROOTfe689c2b/independent3111f113 reconcile all54 tables,960 threshold rows and480 unique frame/point/judge records. Actual paths and complete hashes are in the budget's targeted_absence80_current and thin acceptance index.
 
-- campaign950 / tail95 / readiness30 / metadata60;
-- global10 / before6 / doctor-publication68 / admission18 / ONEwait330;
-- audit120 / ACK6 / archive33 / failure80 / contingency87 = 1893.
+At CRF48/55/62, WASB10 baseline→streak hits are12→24,8→22,1→24 of39: rescues12/14/23 with no harms. Absent false detections0→0,1→1,0→0 of41 for WASB; neither judge introduces or removes absent false detections. This does not erase292's two introduced false detections. Native-SVT common-quality upper-concave/PCHIP BD rates: fullLPIPS−0.014356%, DISTS+0.231468%, RGBPSNR+0.158050%; ROILPIPS−57.423444%, ROIDISTS−30.854779%. Both task BD rates are unsupported. Do not pool these retrospective clips into a held-out cohort.
 
-Archive33 is the original30, including builder3, PLUS independentreview3; contingency was reduced and future verify5 restored. Do not double-charge. Failure80's extraops30 / metric20 / analysis10 / recovery20 are not automatically released.
+The complete1893CPU/1175GPU phase is charged and closed, hold0; no charge refund or retry authority. Partition: campaign950/tail95/readiness30/metadata60/global10/before6/doctor-publication68/admission18/ONEwait330/audit120/ACK6/archive33/failure80/contingency87. Internal digest20 and analysis10 are closed; unused internal reserves do not create automatic new authority.
 
-The frozen operative v2 is `/private/tmp/pointstream-SVT80-absence-local20-FALSE-v2-20261114`, manifestf12d3e65, independenteb85804b/ROOTba7d2347. Preserve the original v1 semantic586 proof-guard failure. Actual586 ROOTproof5114e66c now exists with exact approvedTrue/physicalTrue/job/spec/identity/ef96/accepted_scope586581/5; this is required before wire creation. Source and quality rules are unchanged. Full80 uses stage=study with NO gold; the same16 Clip3 strict gold remains required.
+Preserve originalmetadata35043 (ROOT wrong scratch prefix, stopped before write/constructor/GPU), correctedmetadata69094, global98170, before8856, publication74447 and status59920/events18002. Solewait5072 is CLOSED; CLI10 was expected terminal attention, jobCOMPLETE/gatePASS/exit0. Terminalstatus54358/events68157 and pre-digeststatus48114 closed successfully. Audit62959 and digest79574 closed successfully. Exact terminal86241e2b3cc65247a9d8af823f2acbbc is ACK-closed, receiptSHA d90df2da5010d4ef8e79ea394c19a3dc4d74d99a346086fd7b02b1eca2dc74aa. No running job/watch remains from this batch; inspect existing IDs after interruptions, never replay.
 
-The metadata candidate is `/private/tmp/pointstream-SVT80-actual-metadata-candidate-20261114`, manifest14eed5e2. Its initial complete forecast was wholeforecast1893/archive33/contingency117, before metadata repair. Actual ROOT-approved gates/binding are at `/private/tmp/pointstream-SVT80-ROOT-metadata-20261114`.
-
-**Actual metadata35043 STOPPED** before the first write/constructor at helperline29: ROOT's scratch prefix `svt80-` did not match the required `study4282-spec-`. No model/GPU ran; the original30CPU is charged. Do not replay this case. Replacement30 was prospectively charged from contingency117→87. Agent current_handoff_docs is preparing a corrected binding LOCAL ONLY, with the same helpers, a new case and deadlineNULL until ROOT's last moment. A fresh clock, nonce, materializer and exact approved metadata30 contract are required before ONE replacement call. The original deadline01:46:05UTC is historical, not new authority.
-
-The conditional whole80 proxy is:
-
-`1.5*(80/292)*534.078900099*max(1,fresh16/107.057003736)+50≤450`.
-
-A faster smoke never discounts the forecast. Required remaining campaign time is ≥600; absolute remaining time is ≥695. The campaign is 950, with smoke300/full450 and an operational metadata-to-job clock of 3300s. Set an immutable deadline only after readiness. Publication needs ≥2635 headroom. The actual source constructor and two equal, idempotent normalized RETURNs are required. The external cost guard runs original quality FIRST; no numerical quality rule changes. Six actual CPU contexts and twelve pairs are expected. Actual metadata/header/labels/bytes/cache/source/control/GPU identity, stock doctor, cost and runtime gates remain.
-
-Future execution must bind the accepted actual metadata, then run global10 across all jobs and fresh before6 on the same worker1470412/birth562919381/control7. ONE publication68 must persist the actual ID, followed by canonical status/events/admission18 and ONE ps-fleet wait330. Inspect all eligible resources. The source-qualified pool is currently only gpu6 Ada1/ef96; never assume siblingdbbb equivalence.
-
-Future physicalaudit120 keeps full raw on server SSD and gzip on the Mac. Independent ROOT acceptance, exact ACK6 and immutable archive33 follow. **There is no GPU release yet.** Archive80's recipe is `/private/tmp/pointstream-SVT80-archive30-FALSE-20261114`, manifest0b22e518, independent21d005a0 conditional GO. It requires the exact actual80 proof semantic guard, currently unbound IDs, and all mandatory categories. Actual bytes, forecasts, packing and verification are required before upload; raw is reference-only.
+Immutable archive60425 closed0, readbackPASS/file0444dir0555: **315 members,21,592,295B, SHA dd9ff1bba0fc05dda1238819f93e5d5f9f98c7b4ee34338c2756fe56e32a1cf9**, at `/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-study4282-absence80-dd9ff1bba0fc05dda1238819/qualification.tar.gz`. Local case `/private/tmp/pointstream-SVT80-ae9eb20d-archive-BOUND-ROOT-20261114`; releasef542670b, exact manifestdeb5b507. Pack.49698CPU and publicationlocal.452144/SSH.331397/remote.258472 fit prepaid caps. Raw200023909B/SHA919f4279 stays server SSD; authenticated gzip20022742B/SHA86642346 is archived. Actual audit whole-controller7.986445CPU includes nested collector/decompression/verifier; do not add counters again. Shared timing is contaminated; no speed, full CPU or span claim.
 
 ## Storage, budgets and research closure
 
 No cleanup/migration is needed. One query61022 found all17 SHA cache paths warm, with separate SSD free1,573,293,559,808B and NFS21,411,371,417,600B. Root disks are 100GB: never put datasets, caches, environments or experiment temporary files in remote `/tmp` or `/var/tmp`. Use `/local/users/emanuele/pointstream`. Stock declared96GiB + 50GiB reserve requires ≥146GiB free, plus cache-miss growth and other reservations. The metadata128GiB early threshold is not stock admission. All future staging verifies hashes.
 
-The live [ledger](experiments/submission-research-budget-20261104.json) controls authority. At the replacement reservation snapshot:
+The live [ledger](experiments/submission-research-budget-20261104.json) controls authority. After full80 charge:
 
-- Programme: charged87245CPU/36591GPU; active holds3639CPU/16863GPU; free9916CPU/32946GPU.
-- Ball: charged63234CPU/30229GPU; holds2710CPU12313GPU; free6056CPU22258GPU.
+- Programme: charged89062CPU/37766GPU; active holds1842CPU/15688GPU; free9896CPU/32946GPU.
+- Ball: charged65051CPU/31404GPU; holds913CPU11138GPU; free6036CPU22258GPU.
 
 Exclude reservation statuses starting closed/released/superseded/cancelled when summing. Retain historical amounts. Precharged caps are not measured CPU usage or refund credit.
 
@@ -68,10 +54,14 @@ The [current research disposition](experiments/research-disposition-20261113.md)
 - W11 is blocked by missing truly aligned pixel masks, not a codec negative. The cross-sport judge's 0/85 is an eligibility failure, not a codec negative.
 - The legacy200GPUh study and new training are outside authority.
 
-Do not build a broad new qualification stack seeking a positive result. After targeted absence, decide whether further complete lifecycles materially change the claim and fit; otherwise manuscript revisions come next.
+Do not build a broad new qualification stack seeking a positive result. Final20CPU neural-fit audit defers further neural crossclip work: a legitimate conditional16/48 affine wall screen totals3972.02s for four292/586 prepare/score jobs, but a complete lifecycle CPU/qualification/caller/audit/archive forecast under6036CPU is unqualified. Historical5300cap×1.5 is not proof of impossibility. No standalone pilot or source build is released. Research disposition is closed for this allocation; manuscript revision comes next. Report `/private/tmp/pointstream-neural-second-footage-fit20-20261114/decision.md`.
 
 ## Paper requirements and human prerequisites
 
 Use TOMM format, matching PRESLEY's format only; never count its pages or edit PRESLEY. The limit is 23 main pages, including up to2 reference pages, plus5 appendix pages. Eight main figures are agreed; the ball comparison is the main contribution, with useful negatives retained.
 
 Confirmed authors are Emanuele Artioli, Daniele Lorenzi, Farzad Tashtarian and Christian Timmerer / AAU. The corresponding author is unconfirmed; coauthors have not yet reviewed. The work is nowhere under review and is independent, not an extension of GenStream/PRESLEY. Acknowledge the ATHENA CD lab; cite GenStream/ELVIS organically and PRESLEY/MOQSplat/TIGAS if relevant. AI disclosure: Codex/Claude/Antigravity/Cursor. Tennis YouTube permissions are unclear; do not assume publication of actual frames/clips in a supplement. No submission without a separate instruction.
+
+## Manuscript continuation
+
+Clean recovered Overleaf clone `/private/tmp/pointstream-overleaf-recovery-20261114` is main=origin/main5cf2823ebad3de0faad7b2e0ffb778805f709747, matching the Nov5 reviewed source. Its own AGENTS.md is read and applies. Eight main figures/two appendix figures; preserve historical source/DCVC/disk/streak Fig7 provenance, replace Fig6 with authentic new accepted ball evidence. Native TeX/Biber build tooling is available. Build and inspect both page spans and reviewer-visible limits; update exact-hash marker registry without clearing unresolved evidence gaps. Figure and evaluation integration delegated locally; no further experiment authorized. Saved review PDF at `/Users/manu/Documents/PointStream-review/2026-11-05-5cf2823/PointStream-author-review.pdf` is the baseline. No PRESLEY edits. Recheck dirty files before any clone pull/push; Overleaf accepts main only.

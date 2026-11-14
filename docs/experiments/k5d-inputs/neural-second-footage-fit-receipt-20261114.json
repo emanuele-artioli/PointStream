@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "local_only": true,
+  "declared_whole_audit_CPU_cap_seconds": 20,
+  "GPU_seconds": 0,
+  "method": "Read-only rg/gitshow/JSON/document arithmetic; report files only mutated",
+  "report_materializer_hard_CPU_limit_seconds": 8,
+  "materializer_observed_self_CPU_seconds": 0.0006349999999999984,
+  "materializer_observed_child_CPU_seconds": 0.0,
+  "materializer_wall_seconds": 0.0008938312530517578,
+  "whole_multicall_audit_measured_CPU_seconds": null,
+  "accounting_scope": "20CPU prospectively charged by ROOT, retained in full; per-tool-call agent orchestration aggregate not independently measured. Materializer telemetry is not whole-audit telemetry.",
+  "inputs": [
+    {
+      "path": "docs/experiments/k5d-inputs/primary-41ee26e3-Ada-paired-preparation-root-acceptance-20261113.json",
+      "sha256": "06c7176f6e8feb43e44091613f9a931bded2772ab25e241ebea9735226fa0df9"
+    },
+    {
+      "path": "docs/experiments/k5d-inputs/primary-0cfa5558-Ada-paired-score-root-acceptance-20261113.json",
+      "sha256": "24aae3e5d18bd38b2dda0aa939c4bfdbdb2f70b8595d1028c0213ddb1a3c04a2"
+    },
+    {
+      "path": "docs/experiments/k5d-inputs/source-evidence-reuse-20261104.json",
+      "sha256": "d840b8f1daaf59150a4475967957d70ce1226e1fd647e7d142790cf685f0804f"
+    },
+    {
+      "path": "docs/experiments/k5d-inputs/study-selection-20261104.json",
+      "sha256": "d572e991d89f52264f6017e0d034e93dcfbb9766c7693093a4502e8f144da343"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "/private/tmp/pointstream-neural-second-footage-fit20-20261114/decision.md",
+      "sha256": "055b23af62085b4afd7b04f9ca098e04be3bd227436edebd2f019f5914a3425e"
+    },
+    {
+      "path": "/private/tmp/pointstream-neural-second-footage-fit20-20261114/arithmetic.json",
+      "sha256": "0cbea6265146fe61ec48190ebfa0ccf38562d4807c067a4433b44ff7ea54aa97"
+    }
+  ]
+}
