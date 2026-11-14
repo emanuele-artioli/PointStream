@@ -29,3 +29,5 @@ All four authors must review and approve this revision; corresponding-author des
 ## Continuation
 
 Resume with coauthor feedback or an explicit genuinely new research decision. Do not renew resource watches, replay jobs, spend unused reservations automatically, or restart a qualification stack to seek a favorable outcome. The ledger and [current continuation](../continuation-2026-11-14.md) retain exact budgets, jobs, failed gates, immutable archives and deferred questions. Author review is the next decision; GPU availability is not a blocker.
+
+Hash-verified durable copies of both PDFs, the source ZIP and checkpoint are at `/Users/manu/Documents/PointStream-review/2026-11-14-690cad0`; the folder was created fresh, without overwriting prior reviews.
