@@ -93,14 +93,41 @@
     {
       "job_id": "20261114T233516Z-4223e78c",
       "purpose": "VISOR preparation new independent data-root source copy",
-      "state": "submitted_pending",
+      "state": "complete_preparation_accepted64",
       "cpu_ceiling_seconds": 2400,
       "gpu_ceiling_seconds": 0,
       "code_revision": "11c35c9e6b340d28c61e0e56227968fab69781a6",
       "source_sha256": "91c2d6681f20003c2500a96cd0bf96b97091bbd3f0db4166ac06e672437dd3b9",
       "spec_sha256": "abe103573bca8b07ec7d581125396ad3ebd754e03a5831bf2d86d0b48e5ee04f",
       "deadline": "2026-11-15T00:30:00Z",
-      "predecessor_verified_unpublished": "20261114T232255Z-eb4865c0"
+      "predecessor_verified_unpublished": "20261114T232255Z-eb4865c0",
+      "conservative_cpu_charge_seconds": 2400,
+      "receipt": "/private/tmp/pointstream-ladder-visor-prepared-acceptance-20261114.json",
+      "archive_sha256": "766265d350d67f6ae25d7fe7670f28b2e671d843110306f651037dc92a288b1e"
+    },
+    {
+      "job_id": "20261114T234255Z-4e9c77aa",
+      "purpose": "tennis native/ROI/semantic/errorpatch16-to64 producer",
+      "state": "submitted_pending",
+      "cpu_ceiling_seconds": 4800,
+      "gpu_ceiling_seconds": 0,
+      "code_revision": "c68baf3050be71b31d6e53462462d4956a0fbb78",
+      "source_sha256": "f72e2c18cede73b628ac9de8bc8f182e40e4d2726ac8e84815cd2d0d18730f2a",
+      "spec_sha256": "b9024bfe7112dd72d25535af97918bb1c821d728d84d84399176738e2171c8f9",
+      "deadline": "2026-11-15T01:00:00Z",
+      "continuation": "/private/tmp/pointstream-tennis-native-runner-state.json"
+    },
+    {
+      "job_id": "20261114T234622Z-874978b6",
+      "purpose": "VISOR native/ROI/semantic/errorpatch16-to64 producer",
+      "state": "submitted_pending",
+      "cpu_ceiling_seconds": 4800,
+      "gpu_ceiling_seconds": 0,
+      "code_revision": "c68baf3050be71b31d6e53462462d4956a0fbb78",
+      "source_sha256": "f72e2c18cede73b628ac9de8bc8f182e40e4d2726ac8e84815cd2d0d18730f2a",
+      "spec_sha256": "7b077cdb6d09a59381dc38181d0595db8a18bd2b1a6e38433238d6b03d43058d",
+      "deadline": "2026-11-15T01:00:00Z",
+      "wait_receipt": "/private/tmp/pointstream-ladder-visor-native-wait-20261114.json"
     }
   ],
   "decisions": [
