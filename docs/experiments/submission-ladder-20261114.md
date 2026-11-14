@@ -68,6 +68,8 @@ At cutoff publish the highest supported level per domain and retain all failures
 
 This entry records design and implementation authority, not experiment completion. No fleet job, new source selection, new annotation, native encode or rate–quality result is asserted here. Record new job IDs, exact revisions, inputs, hardware, selected patch identities, budgets and results in a subsequent dated entry before waiting. Previous ledgers and evidence remain read-only.
 
+The [first source/exposure inventory](submission-ladder-source-inventory-20261114.json) audits tracked metadata only, with actual SHA256 identities of cited repository records. It retains all 30 prior-exposed TrackNet label identities and 34 prior-used VISOR windows/source-video hashes, and records RacketVision frame joins and new-video eligibility as unresolved. It selects no new clips, authenticates no remote data, and creates no labels. Existing VISOR exclusions are not an eligible holdout list. The human-reviewed SAM path remains preparation until actual source-only decisions are imported.
+
 ### 2026-11-14 — implementation checkpoint
 
 The initial native fallback profile and `python -m src.pointstream {encode,decode,inspect}`

@@ -42,3 +42,5 @@ No native data experiment is admitted by merely merging this card. Complete exac
 **Stop:** invalid identity, incomplete frame accounting, unexpected source access, missing/nonfinite metric, unsupported comparison, unqualified tool, exhausted allowance or lack of a complete affordable next-stage forecast. Preserve artifacts and report the changed requirement; do not widen the search automatically.
 
 **Continuation:** implementation may proceed now. Scientific stage release is still required, with exact inputs and commands. No wakeup, running process, fleet job or reservation exists for this card.
+
+**Metadata preparation checkpoint:** the [source/exposure inventory](../experiments/submission-ladder-source-inventory-20261114.json) records tracked-file hashes and historical source identities for the existing TrackNet30 and VISOR34 cohorts. RacketVision exact joins, clean new-source eligibility, rights and new human annotations remain unresolved. This is a local tracked-record audit, not a scientific data run, new cohort selection or consumption of the proposed allocation above.
