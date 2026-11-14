@@ -1,0 +1,245 @@
+{
+  "schema": 1,
+  "ROOT_accepted": true,
+  "state": "CLOSED_PHYSICAL_AND_ANALYSIS_ACK_CLOSED_IMMUTABLY_ARCHIVED",
+  "job_id": "20261114T010632Z-ae9eb20d",
+  "source_revision": "4282c96f8aaf7d229f53df4c1c5f8225d8454d6e",
+  "execution_identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "f813e09d2fa0eb51b5ec160dcda0cd230d3dada7be697882f9b657201490e61d",
+    "source_sha256": "e4d4a856a06c5f9a06586056ab4a30f0c73b232e5a3db035ae6eb5546063f80b"
+  },
+  "spec_sha256": "ff4ba6c48fee954b075f21364057e93ca9e839e5f60a3cc47003174dfba25b30",
+  "spec_raw_sha256": "04ee43f5b99edbb0518dec12ffe5c3c9e99a418030466f2e71f608685be2d561",
+  "gpu_uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+  "GPU": "RTX 6000 Ada Generation gpu6/index1 shared",
+  "scope": {
+    "stage": "study",
+    "clip": "tracknet/game10/Clip11",
+    "frames": 80,
+    "visible": 39,
+    "absent": 41,
+    "excluded": 0,
+    "retrospective": true,
+    "heldout": false
+  },
+  "physical_ROOT_proof": {
+    "path": "/private/tmp/pointstream-SVT80-ae9eb20d-audit-binding-PREPARED-20261114/actual-audit120-ROOT-CANDIDATE/actual-ROOT-once/ROOT-accepted-absence80-physical.json",
+    "sha256": "ca4488bd923d79d80824d53e7c966db5c3c1382d763170fae6d4af2ae5a4f62c"
+  },
+  "physical_independent_review_sha256": "4f5b65b8aba23283044fd78777a00d28e8c7731380a804133cc6d2e7de65d656",
+  "critical_inputs": {
+    "archive": {
+      "sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-20261104-inputs/tracknet-dataset.zip"
+    },
+    "ada_reference": {
+      "sha256": "4bfff442081d988039abb308a3e0b8ed22632f5f598858d6eeaf4d0ef6824a1a",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261112T210150Z-2c8b49a0/smoke/published.tar"
+    },
+    "bridge": {
+      "sha256": "849c059a5074851431862955c913731de345a428f2015ad31afe9df409190465",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-SVT-source-cache-71ef32b0c16fdc74e3030075de428061/bridge.json"
+    },
+    "cpu_denial": {
+      "sha256": "a636600b5631b331e40630c4f00839414b99c8863d308dbe90b172ea6b547020",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-SVT-real-CPU-denial-d7a0923c67634137bc90880fe539f95f/real-CPU-denial.json"
+    },
+    "native_cpu_receipt": {
+      "sha256": "b79de31293dee3cf044414db3432de433664e298fe790763fe4811aace174e1b",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-SVT-native-CPU-7121801d23aeac8a5350451a97edd867/native-CPU.json"
+    },
+    "receiver_isolation_config": {
+      "sha256": "4fa67547b1288e46f979040f0de5315288bd8bfc5d6065e3b6abaeeee32bea1c",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-SVT-source-cache-71ef32b0c16fdc74e3030075de428061/config.json"
+    }
+  },
+  "source_judges_exposure_and_selection": {
+    "archive": {
+      "path": "/local/users/emanuele/pointstream/cache/bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18/tracknet-dataset.zip",
+      "sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18"
+    },
+    "balltrack_code": {
+      "path": "/local/users/emanuele/pointstream/cache/5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff/tree",
+      "tree_sha256": "f7a5c1c6284365f84c324d62169186ef1312c4d921bc0df5dbacd16ef5361964"
+    },
+    "balltrack_weight": {
+      "path": "/local/users/emanuele/pointstream/cache/b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec/balltrack_best.state_dict.pt",
+      "sha256": "b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec"
+    },
+    "exposure": {
+      "path": "/local/users/emanuele/pointstream/sources/20261114T010632Z-ae9eb20d/docs/experiments/k5c-inputs/wasb-reported-split-provenance.json",
+      "sha256": "854183164f8120cf869775d8f77acba38ae1e4e89129a05bde09a17e327ede62"
+    },
+    "manifest": {
+      "path": "/local/users/emanuele/pointstream/sources/20261114T010632Z-ae9eb20d/docs/experiments/k5d-inputs/study-selection-20261104.json",
+      "sha256": "d572e991d89f52264f6017e0d034e93dcfbb9766c7693093a4502e8f144da343"
+    },
+    "wasb_code": {
+      "path": "/local/users/emanuele/pointstream/cache/657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55/tree",
+      "tree_sha256": "d456047c70e9dbd3a2f7196e2d1991a069393ab68d7466d0ee7ecfd23360cab0"
+    },
+    "wasb_config": {
+      "path": "/local/users/emanuele/pointstream/cache/6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d/wasb-tennis.yaml",
+      "sha256": "6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d"
+    },
+    "wasb_weights": {
+      "path": "/local/users/emanuele/pointstream/cache/4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6/tree/wasb_tennis_best.pth.tar",
+      "sha256": "9d391239ab10c733f8e5bfadf16ab72838e7a8ebc88e8ae2038501c03d42b4bb"
+    }
+  },
+  "digest": {
+    "path": "/private/tmp/pointstream-SVT80-digest20-BOUND-ROOT-20261114/actual-ROOT-once/metrics.ROOT-UNSET.json",
+    "sha256": "79967e74c75be7d8a037cb8aa9b8aa403b6de11c5935e88235ed38f60b76841c",
+    "ROOT": {
+      "path": "/private/tmp/pointstream-SVT80-digest20-BOUND-ROOT-20261114/actual-ROOT-once/ROOT-accepted-digest.json",
+      "sha256": "c95636d0bd2a86e5125febf4509caac8e936f2ba88eeea7581ace82fa494675e"
+    }
+  },
+  "analysis": {
+    "state": "CLOSED ROOT accepted",
+    "ROOT": {
+      "path": "/private/tmp/pointstream-SVT80-analysis10-ACTUAL-ROOT-20261114/ROOT-accepted-analysis-and-curves.json",
+      "sha256": "fe689c2b727ccd4610c08272cb03e331e7fe3609f61b146ab5bbadc3673dd8ab"
+    },
+    "independent_report_sha256": "3111f1139ee081c5c77390275e4cdbbac9783f912d1ca391dda3127808ba41ec",
+    "case": "/private/tmp/pointstream-SVT80-analysis10-ACTUAL-ROOT-20261114",
+    "tables": 54,
+    "threshold_frame_rows": 960,
+    "unique_frame_point_judge": 480,
+    "BD_rate_percent": {
+      "full_LPIPS": -0.01435550177087415,
+      "full_DISTS": 0.23146778323624795,
+      "ROI_LPIPS": -57.42344430141536,
+      "ROI_DISTS": -30.8547789692044,
+      "pooled_RGB_PSNR": 0.15805014710449194,
+      "WASB_recall10": null,
+      "BallTrack_recall10_diagnostic": null
+    },
+    "WASB10_rescue_harm": [
+      [
+        12,
+        0
+      ],
+      [
+        14,
+        0
+      ],
+      [
+        23,
+        0
+      ]
+    ],
+    "WASB_absent_baseline_streak": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ]
+    ],
+    "BallTrack10_rescue_harm_diagnostic": [
+      [
+        15,
+        0
+      ],
+      [
+        21,
+        0
+      ],
+      [
+        24,
+        0
+      ]
+    ],
+    "BallTrack_absent_baseline_streak_diagnostic": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        2,
+        2
+      ]
+    ],
+    "source_qualified_reported": false,
+    "WASB_source_hit10_visible": [
+      25,
+      39
+    ],
+    "BallTrack_source_hit10_visible": [
+      29,
+      39
+    ]
+  },
+  "ACKs": {
+    "terminal": {
+      "state": "CLOSED",
+      "path": "/private/tmp/pointstream-SVT80-runtime-ROOT-20261114/actual-ack-terminal/stdout.json",
+      "sha256": "d90df2da5010d4ef8e79ea394c19a3dc4d74d99a346086fd7b02b1eca2dc74aa"
+    },
+    "event_ids": [
+      "86241e2b3cc65247a9d8af823f2acbbc"
+    ]
+  },
+  "archive": {
+    "state": "CLOSED0 immutable full readback PASS file0444 dir0555",
+    "backend": 60425,
+    "case": "/private/tmp/pointstream-SVT80-ae9eb20d-archive-BOUND-ROOT-20261114",
+    "release_sha256": "f542670b0bde1fa3cee4c47b0ca7f3a983fc9673d87c41b45988b52eecfd2c96",
+    "archive_sha256": "dd9ff1bba0fc05dda1238819f93e5d5f9f98c7b4ee34338c2756fe56e32a1cf9",
+    "bytes": 21592295,
+    "members": 315,
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-study4282-absence80-dd9ff1bba0fc05dda1238819/qualification.tar.gz",
+    "verified_receipt": {
+      "path": "/private/tmp/pointstream-SVT80-ae9eb20d-archive-BOUND-ROOT-20261114/actual-publication/verified.json",
+      "sha256": "11346eb937c05a421a48dadb7d4ca13ab9a221528c6492db910660ca0feb7e0b"
+    }
+  },
+  "raw_reference_only": {
+    "path": "/local/users/emanuele/pointstream/metadata-prep/svt80-audit-a6d6105776cc4eccb4a9dd1ab375c01f/raw-audit.json",
+    "bytes": 200023909,
+    "sha256": "919f4279a42ff2b2ac0bc845403d3d77df4ef5d07323062d5e02080c3ae3bc77",
+    "gzip_bytes": 20022742,
+    "gzip_sha256": "866423469b9c55694d5bd18705051a879b77996bebab3268f302bac964262bc4"
+  },
+  "physical_checks": [
+    "fullgzipCRC/EOF/rawsha physicalauthenticated",
+    "allsource/spec/input/control/devicejoins andcurrentcleanup verified",
+    "strictownAda16gold23d6/full80NOgold",
+    "sixactualCPUcontexts/twelveliteralnativepacketpairs/allmetricsjudges/pixelSHA verified"
+  ],
+  "cost_scope": {
+    "CPU_phase_charged": 1893,
+    "GPU_phase_charged": 1175,
+    "full_command_wall_seconds": 162.5513277053833,
+    "full_command_CPU_established": false,
+    "speed_claim": false,
+    "audit_controller_tree_CPU_seconds": 7.986445000000001,
+    "audit_nested_counters_not_added": true
+  },
+  "limits": [
+    "Prespecified retrospective Clip11 only; 41 absent frames do not establish100-negative/population/heldout/safety qualification.",
+    "Source WASB25/39 and original pooled10/197 failed gates remain failed; BallTrack is encoder-related diagnostic.",
+    "Native encoded bytes define achievable anchor; zero-ball PSBL remains overhead ablation only.",
+    "WASB task and BallTrack diagnostic BD are unsupported: retained test Pareto has fewer than two distinct quality points; no extrapolation/global dominance claim.",
+    "Small full-DISTS and pooled-PSNR rate penalties retained beside ROI gains and nearly unchanged full-LPIPS.",
+    "No new neural coverage, speed/liveGPUspan/full30 or training claim."
+  ],
+  "failure_provenance": [
+    "Original metadata35043 stopped on scratch-name prefix before write/constructor;30CPU retained; corrected exact-helper metadata69094 passed.",
+    "Attempted write into frozen candidate denied locally before materializer/RPC; new binding outside frozen candidate preserved original.",
+    "Original source/quality gates and all absences retained; actual physical/digest/analysis accepted without model or decoder rerun."
+  ],
+  "research_decision": "No research GPU run planned; further neural coverage deferred because a complete new route fit was not established. Manuscript synthesis is next."
+}

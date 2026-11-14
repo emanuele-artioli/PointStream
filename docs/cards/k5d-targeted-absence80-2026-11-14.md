@@ -1,5 +1,13 @@
 # Prespecified complete Clip11 absence test — staged, source unchanged
 
+## Current status — CLOSED, November14 UTC
+
+Actual `20261114T010632Z-ae9eb20d` is ROOT accepted for physical correctness, digest and analysis; terminal ACK is closed and immutable archive60425 is full-readback verified (315members/21,592,295B, SHA`dd9ff1bba0fc05dda1238819f93e5d5f9f98c7b4ee34338c2756fe56e32a1cf9`, file0444/dir0555). The [thin acceptance index](../experiments/k5d-inputs/svt-study4282-ae9eb20d-absence80-root-acceptance-20261114.json) binds all complete hashes, proofs, source/native/receiver/device identities and limits. Full1893CPU/1175GPU remains charged; hold0, no refund or retry authority.
+
+This is retrospective Clip11 only:39visible/41absent, WASB10 rescues12/14/23 with zero harms, absent false counts unchanged0/1/0 at SVT48/55/62. Source25/39 and pooled10/197 failures remain failed; task BD is unsupported. No heldout/population/safety/neural/full30/speed claim or further research GPU run follows. Manuscript synthesis is next.
+
+## Prospective protocol and readiness history (preserved)
+
 Goal: measure the visible-ball rescue / absent-frame harm tradeoff on all80frames of game10/Clip11 (39visible/41absent), selected before encoded-quality inspection. Source WASB25/39 already fails original qualification; preserve this and the pooled10/197 false-positive failure. Primary WASB10px, secondary5px; BallTrack remains encoder-model-coupled diagnostic. Actual source labels are for evaluation/ROI, not sender coordinates. This retrospective test is not held-out or population confirmation, not a minimum100-negative safety screen, and not neural-codec evidence.
 
 Scope: exact qualified SVT4282/e4d4/f813/env32/config4fa, gpu6Ada1ef96/shared10240MiB+8192margin, three frozen CRFs48/55/62, native and PSBL-streak arms, real restricted CPU decoding, full+ROI metrics and both judges. Original16 Clip3 own-Ada gold smoke precedes full80 without full-output gold. Frozen source already permits study/registeredfull80 and requires accepted16/48/292/586. No scientific source, numerical rule, model, environment, training or proof substitution. New target-specific external operational guard authenticates originalquality FIRST and uses whole-command costs; all missing586 evidence remainsFALSE until actual ROOTphysicalacceptance.

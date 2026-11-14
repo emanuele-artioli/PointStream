@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "authority": "ROOT final LOCALONLY20CPU/GPU0 audit; no runtime/source implementation release",
+  "remaining": {
+    "Ball_CPU": 6036,
+    "Ball_GPU": 22258,
+    "programme_CPU": 9896,
+    "programme_GPU": 32946
+  },
+  "source_revision": "2c6d8581fbd64279dde554ca1402047d27ab7fa2",
+  "observed_walls": {
+    "prepare16": 218.79711413383484,
+    "prepare48": 251.44940614700317,
+    "score16": 41.67872,
+    "score48": 84.439395
+  },
+  "rows": [
+    {
+      "frames": 48,
+      "prepare": {
+        "registered_affine_wall_screen": 427.17410922050476,
+        "no_intercept_full48_wall_screen": 427.17410922050476,
+        "proportional16_wall_screen": 1034.5870136022568
+      },
+      "score": {
+        "registered_affine_wall_screen": 176.65909250000004,
+        "no_intercept_full48_wall_screen": 176.6590925,
+        "proportional16_wall_screen": 237.55424
+      }
+    },
+    {
+      "frames": 80,
+      "prepare": {
+        "registered_affine_wall_screen": 476.15254724025726,
+        "no_intercept_full48_wall_screen": 678.6235153675079,
+        "proportional16_wall_screen": 1690.9783560037613
+      },
+      "score": {
+        "registered_affine_wall_screen": 240.80010500000003,
+        "no_intercept_full48_wall_screen": 261.09848750000003,
+        "proportional16_wall_screen": 362.5904
+      }
+    },
+    {
+      "frames": 292,
+      "prepare": {
+        "registered_affine_wall_screen": 800.6346991211176,
+        "no_intercept_full48_wall_screen": 2344.475831091404,
+        "proportional16_wall_screen": 6039.570999413729
+      },
+      "score": {
+        "registered_affine_wall_screen": 665.7343128125001,
+        "no_intercept_full48_wall_screen": 820.5094793750001,
+        "proportional16_wall_screen": 1190.95496
+      }
+    },
+    {
+      "frames": 586,
+      "prepare": {
+        "registered_affine_wall_screen": 1250.6240984275937,
+        "no_intercept_full48_wall_screen": 4654.667250066996,
+        "proportional16_wall_screen": 12070.166457727551
+      },
+      "score": {
+        "registered_affine_wall_screen": 1255.0298651562503,
+        "no_intercept_full48_wall_screen": 1596.2964209375,
+        "proportional16_wall_screen": 2339.72468
+      }
+    }
+  ],
+  "four_registered_affine_wall_screens_total": 3972.0229755174614,
+  "qualification_historical_source_native_receiver_caps_CPU": 1012,
+  "historical_lifecycle_pair_CPU_cap": 5300,
+  "historical_cap_x_1_5_CPU": 7950,
+  "physical_minimum_claim": false,
+  "complete_affordable_qualified_route_demonstrated": false,
+  "decision": "DEFER new neural research: complete source/cpu/noncommand/qualification/scale forecast is unqualified; not physical impossibility."
+}

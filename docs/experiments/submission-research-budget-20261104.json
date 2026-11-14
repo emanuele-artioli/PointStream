@@ -3442,6 +3442,34 @@
       "cpu_seconds": 30,
       "gpu_seconds": 0,
       "basis": "Prospective30 fromphasecontingency117->87, inclusive1893 unchanged. Original35043 STOP before firstmkdir/helperline29 on ROOTscratchprefix. No inference/GPU. Freshcorrectbinding/nonce/clock, no helper or sourcechange."
+    },
+    {
+      "phase": "ball-targeted-absence80-postacceptance-helper-readiness10-20261114",
+      "workstream": "ball",
+      "cpu_seconds": 10,
+      "gpu_seconds": 0,
+      "basis": "ProspectiveLOCALONLY existing80failure80/additionalops30 releases10 builder5/independent5 for minimal586->80digest20/analysis10 transport and acceptance-schema adaptation. Actual20+10 later separate insidefailure80; no network/inference/GPU. Parent1893 unchanged."
+    },
+    {
+      "phase": "ball-targeted-absence80-global-before16-20261114",
+      "workstream": "ball",
+      "cpu_seconds": 16,
+      "gpu_seconds": 0,
+      "basis": "Prospective global10+currentworker before6 only, actualmetadata69094 acceptedc004e310/specff4ba6c4/runtimee17744f3; noGPUrelease"
+    },
+    {
+      "phase": "ball-targeted-absence80-runtime-remainder1771-20261114",
+      "workstream": "ball",
+      "cpu_seconds": 1771,
+      "gpu_seconds": 1175,
+      "basis": "ROOTprospectivelyreleasesremaining1771CPU1175GPU afteractualmetadata69094acceptedc004/runtimee177/global98170 noactivejobs/currentworker8856control7same; previous122CPUcharged, inclusive1893. Same4282sourceClip11/80. Stockdoctor/currentGPU/memory/storage/originalsmokequality/freshfullcost remainSTOPgates. Allpriorfailuresretained/noautomaticreplay."
+    },
+    {
+      "phase": "ball-crossclip-neural-complete-fit-audit20-20261114",
+      "workstream": "ball",
+      "cpu_seconds": 20,
+      "gpu_seconds": 0,
+      "basis": "ROOTprospectiveLOCALONLY finalcost/valueaudit: earlierneural80deferralused5300allocationx1.5 notphysicalminimum; inspectactualnativeproducer/scorertimers and allnewsourcequalificationcosts beforedecision. No sourcebuild/model/network/GPU/API/runtime. Hard20 inclusive design/run/review; ifcompletequalificationunknown/outofcapSTOPnewroute."
     }
   ],
   "reservations": [
@@ -4175,7 +4203,7 @@
       "workstream": "ball",
       "cpu_seconds": 0,
       "gpu_seconds": 0,
-      "status": "Full3000CPU2390GPU conservativelyprecharged:83prior+2917runtime; ROOTconditionalONEpublication released afterdeadline-onlynormalizers; actualIDpending; nofull30.",
+      "status": "closed fullycharged; ROOTaccepted physical+analysis, exactACKclosed, immutablearchiveverified; no hold/refund/retry",
       "card": "docs/cards/k5d-study4282-confirmation292-2026-11-13.md"
     },
     {
@@ -4206,7 +4234,7 @@
       "workstream": "ball",
       "cpu_seconds": 0,
       "gpu_seconds": 0,
-      "status": "Full3033CPU2420GPU precharged:129prior+2904runtime; ROOT conditional ONE586 publication released; actualID pending, no full30/retry",
+      "status": "closed fullycharged; ROOTaccepted physical+analysis, exactACKclosed, immutablearchiveverified; no hold/refund/retry",
       "card": "docs/cards/k5d-study4282-confirmation586-readiness-2026-11-13.md",
       "total_phase_CPU": 3033,
       "already_charged_design_CPU": 30,
@@ -4220,9 +4248,9 @@
     {
       "phase": "ball-study4282-targeted-absence80-20261114",
       "workstream": "ball",
-      "cpu_seconds": 1797,
-      "gpu_seconds": 1175,
-      "status": "RESERVED conditional target80; local readiness30/archivebuilder3/archivereview3 charged; no metadata/runtime/GPU released",
+      "cpu_seconds": 0,
+      "gpu_seconds": 0,
+      "status": "closed fullycharged1893CPU1175GPU; no hold/refund/retry",
       "card": "docs/cards/k5d-targeted-absence80-2026-11-14.md",
       "total_phase_CPU": 1893,
       "total_phase_GPU": 1175,
@@ -4230,7 +4258,9 @@
       "archive_recipe_CPU_charged": 3,
       "archive_independent_review_CPU_charged": 3,
       "metadata_CPU_charged": 30,
-      "metadata_replacement_CPU_charged": 30
+      "metadata_replacement_CPU_charged": 30,
+      "postacceptance_helper_design_CPU_charged": 10,
+      "state": "CLOSED ROOTaccepted physical+analysis, ACKclosed, immutablyarchived"
     }
   ],
   "jobs": [
@@ -7549,6 +7579,21 @@
       "case": "/private/tmp/pointstream-SVT586-runtime-ROOT-20261113",
       "CPU_phase_charged": 3033,
       "GPU_phase_charged": 2420
+    },
+    {
+      "job_id": "20261114T010632Z-ae9eb20d",
+      "workstream": "ball",
+      "phase": "ball-study4282-targeted-absence80-20261114",
+      "status": "closed fullycharged1893CPU1175GPU; no hold/refund/retry",
+      "source_sha256": "e4d4a856a06c5f9a06586056ab4a30f0c73b232e5a3db035ae6eb5546063f80b",
+      "snapshot_sha256": "f813e09d2fa0eb51b5ec160dcda0cd230d3dada7be697882f9b657201490e61d",
+      "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "spec_sha256": "ff4ba6c48fee954b075f21364057e93ca9e839e5f60a3cc47003174dfba25b30",
+      "deadline": "2026-11-14T01:56:23.363890+00:00",
+      "case": "/private/tmp/pointstream-SVT80-runtime-ROOT-20261114",
+      "CPU_phase_charged": 1893,
+      "GPU_phase_charged": 1175,
+      "state": "CLOSED ROOTaccepted physical+analysis, ACKclosed, immutablyarchived"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -8633,7 +8678,7 @@
     "root_decision": "Do not build new neural qualification infrastructure on unproven completefit; prefer prespecified source-unchanged SVT80 absence test if586 accepted. Historical cap1.5 screen is not physical impossibility proof."
   },
   "targeted_absence80_current": {
-    "state": "FirstmetadataSTOP ROOTscratchprefix beforewrites; replacement30prospectivelycharged/newbindingpending;1797CPU1175GPUheld; GPU NOTreleased",
+    "state": "CLOSED physical+digest+analysis+curves ROOTaccepted; terminalACKclosed; immutablearchiveverified; no furtherGPUplanned",
     "source_unchanged": true,
     "frames": 80,
     "visible": 39,
@@ -8671,7 +8716,7 @@
       "case": "/private/tmp/pointstream-SVT80-archive30-FALSE-20261114",
       "manifest_sha256": "0b22e5186b23e89635f2dd75394bed91118acc319fc792d960cda2cf14556cea",
       "independent_review_sha256": "21d005a012ca76211ca99b3aec0d6ff366f3dc9ff6dbc549e717f57143a56a3c",
-      "state": "Independent conditionalGO; ROOT actualbindings/pack/release future"
+      "state": "CLOSED0 packed/verified/published once and fullreadback0444/0555"
     },
     "actual_metadata": {
       "state": "STOP before writes: ROOTscratchprefix svt80- rejected by required study4282-spec-; no constructor/GPU",
@@ -8684,9 +8729,143 @@
       "contract_sha256": "c02df279b45c451e94ed676f956e1bb4eb1702d71e50e2d219c11188fa39c4e4"
     },
     "metadata_replacement30": {
-      "state": "PROSPECTIVE RELEASE30 fromcontingency117->87, same1893",
+      "state": "CLOSED0 ROOTacceptedc004e310",
       "reason": "exacthelpers unchanged; ROOTbindingprefix corrected, newcase/clock mandatory",
-      "GPU": 0
+      "GPU": 0,
+      "backend": 69094,
+      "case": "/private/tmp/pointstream-SVT80-ROOT-metadata-20261114/case-replacement-d2450579ebbd488d9b53c0521daf039a",
+      "contract_sha256": "19e968da4854332debb016e7b75911867352502aacaffb4aabdf2aacb5a883ea",
+      "deadline": "2026-11-14T01:56:23.363890+00:00"
+    },
+    "postacceptance_helper_readiness": {
+      "CPU_charged": 10,
+      "builder": 5,
+      "independent": 5,
+      "source": "failure80/additionalops30; remainingops20",
+      "GPU": 0,
+      "state": "CLOSED localconditionalGO independentbf4fbc9f; actualbindings/runtime stillunreleased",
+      "digest_manifest_sha256": "a2d9f618080685b80aaebb55fc6d240d6a75e87ae7000b1d05f7c734d3c54192",
+      "analysis_manifest_sha256": "7e444545f65676f01732b4f726d4247ebcc64ad54a1a47e1545ca1708d19bc96",
+      "independent_review_sha256": "bf4fbc9ffb3859cc6bdbfaf4b13fe7429d34b989a86d9e68ea9838bc7578d816"
+    },
+    "remaining_hold_CPU": 0,
+    "runtime": {
+      "case": "/private/tmp/pointstream-SVT80-runtime-ROOT-20261114",
+      "contract_sha256": "e17744f33986989083003d6a6f1e7dc1acffd0bacadcf487a677c35361461fe5",
+      "spec_sha256": "ff4ba6c48fee954b075f21364057e93ca9e839e5f60a3cc47003174dfba25b30",
+      "spec_raw_sha256": "04ee43f5b99edbb0518dec12ffe5c3c9e99a418030466f2e71f608685be2d561",
+      "deadline": "2026-11-14T01:56:23.363890+00:00",
+      "global_backend": 98170,
+      "before_backend": 8856,
+      "global_state": "CLOSED0 1721jobs/noactive",
+      "before_state": "CLOSED0 sameworker1470412/birth562919381/control7/cachePASS",
+      "publication": {
+        "backend": 74447,
+        "state": "CLOSED0 ONEactualjobpublished",
+        "release_sha256": "a53fa8dfa87b0e81e7f3360077202b2a34066d901abeb27768667becad162027",
+        "case": "/private/tmp/pointstream-SVT80-runtime-ROOT-20261114/actual-ONEsubmit-absence80",
+        "job_id": "20261114T010632Z-ae9eb20d"
+      },
+      "status_backend": 59920,
+      "events_backend": 18002
+    },
+    "sole_wait": {
+      "state": "CLOSED COMPLETE0 CLI10 expectedterminalattention; actualjobCOMPLETE gatePASS exit0",
+      "backend": 5072,
+      "CPU_already_charged": 330,
+      "max_seconds": 2400,
+      "outer_seconds": 2480,
+      "outer_deadline": "2026-11-14T01:49:57.941367+00:00",
+      "release_sha256": "e04524a701bc7401db4822a4c46c407ab2a74adfa52f870075bfdd85074a061a",
+      "case": "/private/tmp/pointstream-SVT80-runtime-ROOT-20261114/actual-wait330",
+      "completion_model_resume_verified": false
+    },
+    "terminal_reads": {
+      "status6": "fromphysicalaudit120",
+      "events6": "reassignedunusedoptionalwarning6 fromadmission18 beforecall, noextraCPU",
+      "state": "CLOSED0 complete/gatePASS/exit0",
+      "status_backend": 54358,
+      "events_backend": 68157,
+      "status_sha256": "10098f276db61ca65b66d92995f5b80d7ca464d1a729e21c14dcce19f6b285ac",
+      "terminal_event_id": "86241e2b3cc65247a9d8af823f2acbbc"
+    },
+    "actual_audit": {
+      "state": "CLOSED0 ROOTphysicalaccepted",
+      "case": "/private/tmp/pointstream-SVT80-ae9eb20d-audit-binding-PREPARED-20261114/actual-audit120-ROOT-CANDIDATE",
+      "contract_sha256": "24833ddf8dbc62cd4173561cbd278cfe628fe37e0bfa5655ffb3c533baf4eca4",
+      "release_sha256": "7dd9be35e36c997a35bb472f62519b465a0f5a393600ef15fe464d4f05714e11",
+      "CPU_already_charged": 120,
+      "GPU": 0,
+      "backend": 62959,
+      "ROOT_proof": "/private/tmp/pointstream-SVT80-ae9eb20d-audit-binding-PREPARED-20261114/actual-audit120-ROOT-CANDIDATE/actual-ROOT-once/ROOT-accepted-absence80-physical.json",
+      "ROOT_proof_sha256": "ca4488bd923d79d80824d53e7c966db5c3c1382d763170fae6d4af2ae5a4f62c",
+      "independent_review_sha256": "4f5b65b8aba23283044fd78777a00d28e8c7731380a804133cc6d2e7de65d656",
+      "raw_sha256": "919f4279a42ff2b2ac0bc845403d3d77df4ef5d07323062d5e02080c3ae3bc77",
+      "gzip_sha256": "866423469b9c55694d5bd18705051a879b77996bebab3268f302bac964262bc4"
+    },
+    "postacceptance_releases": {
+      "metric_digest20": {
+        "state": "CLOSED0 ROOTdigestaccepted",
+        "CPU": 20,
+        "GPU": 0,
+        "case": "/private/tmp/pointstream-SVT80-digest20-BOUND-ROOT-20261114",
+        "contract_sha256": "5dcb3dcd590322b2725fef865748d3fc626697e95192e613fd1e2778f634b37e",
+        "release_sha256": "2360049b685b5a5c9720e3461ad9f4d497817604beb9fc81347dca5af4bfd1a6",
+        "backend": 79574,
+        "sha256": "79967e74c75be7d8a037cb8aa9b8aa403b6de11c5935e88235ed38f60b76841c",
+        "ROOT_sha256": "c95636d0bd2a86e5125febf4509caac8e936f2ba88eeea7581ace82fa494675e"
+      },
+      "pre_digest_status6": "audit120unusedafterSSH2+reserve4 reassigned6 beforecall",
+      "analysis10": {
+        "state": "CLOSED0 ROOTanalysisandcurvesaccepted",
+        "CPU": 10,
+        "partition": {
+          "builder": 4,
+          "run": 2,
+          "ROOTreview": 4
+        },
+        "GPU": 0,
+        "case": "/private/tmp/pointstream-SVT80-analysis10-BOUND-ROOT-20261114",
+        "release_sha256": "829f46d1c7209f6d5a89e73ed46652455160034ff56f74af6be95c5e8a7e0e3a",
+        "actual_case": "/private/tmp/pointstream-SVT80-analysis10-ACTUAL-ROOT-20261114",
+        "ROOT_sha256": "fe689c2b727ccd4610c08272cb03e331e7fe3609f61b146ab5bbadc3673dd8ab",
+        "independent_sha256": "3111f1139ee081c5c77390275e4cdbbac9783f912d1ca391dda3127808ba41ec"
+      }
+    },
+    "terminal_ACK": {
+      "state": "CLOSED",
+      "event_id": "86241e2b3cc65247a9d8af823f2acbbc",
+      "path": "/private/tmp/pointstream-SVT80-runtime-ROOT-20261114/actual-ack-terminal/stdout.json",
+      "sha256": "d90df2da5010d4ef8e79ea394c19a3dc4d74d99a346086fd7b02b1eca2dc74aa"
+    },
+    "archive": {
+      "state": "CLOSED0 immutable fullreadback PASS file0444dir0555",
+      "backend": 60425,
+      "case": "/private/tmp/pointstream-SVT80-ae9eb20d-archive-BOUND-ROOT-20261114",
+      "release_sha256": "f542670b0bde1fa3cee4c47b0ca7f3a983fc9673d87c41b45988b52eecfd2c96",
+      "selected_manifest_sha256": "deb5b5079f486f6851dcdf98575a973ae24f3802a8340006f9613504748ecdf9",
+      "archive_sha256": "dd9ff1bba0fc05dda1238819f93e5d5f9f98c7b4ee34338c2756fe56e32a1cf9",
+      "bytes": 21592295,
+      "members": 315,
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-study4282-absence80-dd9ff1bba0fc05dda1238819/qualification.tar.gz",
+      "CPU_phase_already_charged": 33,
+      "actual_local_CPU": 0.452144,
+      "actual_SSH_CPU": 0.331397,
+      "actual_remote_CPU": 0.25847200000000004
     }
+  },
+  "crossclip_neural_fit_audit_current": {
+    "state": "CLOSED20CPU ROOTdecisionDEFER; completecostfitunqualified, not physicallyimpossible; no sourcebuild/GPU/runtime release",
+    "CPU": 20,
+    "GPU": 0,
+    "goal": "Determine whether same-value neural crossclip evidence has complete affordable route under remainingBallcaps usingactualreceipts; otherwiseexplicitdefer",
+    "stop": "Unknownrequiredqualificationcost, source/judge/frameincompatibility or completecostexceeds6036CPU remainingBallfree; no partialpilot/build/model/GPUrelease",
+    "report": "/private/tmp/pointstream-neural-second-footage-fit20-20261114/decision.md",
+    "report_sha256": "055b23af62085b4afd7b04f9ca098e04be3bd227436edebd2f019f5914a3425e",
+    "arithmetic_sha256": "0cbea6265146fe61ec48190ebfa0ccf38562d4807c067a4433b44ff7ea54aa97",
+    "conditional_four_stage_wall_screen_seconds": 3972.022976,
+    "remaining_Ball_CPU": 6036,
+    "remaining_Ball_GPU": 22258,
+    "durable_report": "docs/experiments/k5d-inputs/neural-second-footage-fit-20261114.md"
   }
 }
