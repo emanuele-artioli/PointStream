@@ -30,7 +30,7 @@ def tool(name: str) -> dict[str, Any]:
     path = name if os.path.isabs(name) else shutil.which(name)
     if path is None or not os.path.exists(path):
         raise FileNotFoundError(f"{name} is not on PATH")
-    flag = "-version" if Path(name).name == "ffmpeg" else "--version"
+    flag = "-version" if Path(name).name in {"ffmpeg", "ffprobe"} else "--version"
     out = subprocess.run([path, flag], capture_output=True, text=True, timeout=30)
     first = (out.stdout or out.stderr).strip().splitlines()[0]
     real = os.path.realpath(path)

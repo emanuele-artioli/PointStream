@@ -1,5 +1,11 @@
 # Plan
 
+## Submission contribution ladder — authorized implementation, November 14, 2026
+
+The user requested implementation of the [six-week contribution programme](docs/experiments/submission-ladder-20261114.md), with a research cutoff of **December 19** and submission preparation targeted for **December 26, 2026** (America/Sao_Paulo). Build and evaluate a complete codec in both tennis and egocentric video; each domain retains its independently supported level: narrow benefit, 70% foreground / 30% background benefit, full-frame benefit, then real-time benefit. These are targets, not achieved results or a submission guarantee.
+
+The [frozen prospective protocol](docs/experiments/submission-ladder-protocol-20261114.json) defines evaluation and evidence boundaries. The [first stage card](docs/cards/submission-ladder-stage1-2026-11-14.md) covers local implementation and proposes a separate, at-most-two-CPU-hour/GPU-zero preparation allocation; scientific execution under that proposal is **unreleased**. Later compute receives a measured, complete lifecycle budget before release. No closed budget, historical failed gate, training authority or GPU reservation is reopened by this programme. The research disposition below remains the closeout record for the **previous** bounded programme; the new programme supersedes its instruction to proceed only with manuscript review. PRESLEY remains read-only.
+
 Each workstream is scoped to one session. Items that do not depend on each
 other run in parallel sessions; each item names what it waits for (user,
 2026-10-16). This file is the source of truth: a session card only starts

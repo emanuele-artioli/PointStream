@@ -1,0 +1,1380 @@
+{
+  "schema_version": 1,
+  "inventory_id": "submission-ladder-source-inventory-20261114-v1",
+  "date": "2026-11-14",
+  "timezone": "America/Sao_Paulo",
+  "audit_scope": "Tracked repository records only; no remote access, source video/image/label archive inspection, inference or scientific execution.",
+  "selection_status": "inventory_only_no_new_clips_selected_or_frozen",
+  "untouched_source_ids_established": [],
+  "citations": [
+    {
+      "path": "docs/resources.md",
+      "sha256": "df43989f35868b7c59a54897c253dc37a1f4ea7a3aee639f5975557ae0bedcc2",
+      "identity_basis": "actual_local_tracked_file_bytes"
+    },
+    {
+      "path": "docs/experiments/k5d-inputs/study-selection-20261104.json",
+      "sha256": "d572e991d89f52264f6017e0d034e93dcfbb9766c7693093a4502e8f144da343",
+      "identity_basis": "actual_local_tracked_file_bytes"
+    },
+    {
+      "path": "experiments/visor/eval_set.json",
+      "sha256": "0d25301a039dbc801bba01baca4992bf7d05dd471b713ed313a249cc7d6feec2",
+      "identity_basis": "actual_local_tracked_file_bytes"
+    },
+    {
+      "path": "docs/experiments/b2.md",
+      "sha256": "ee340dc4aeb76c44d1dab60cceb5b65a812b62246a5dd74d1b201609fb22f033",
+      "identity_basis": "actual_local_tracked_file_bytes"
+    },
+    {
+      "path": "docs/experiments/w11-racket.md",
+      "sha256": "a416db1cd7be75047fd660fc4a9b57edb88177054203fc6599a0ba1867b0b012",
+      "identity_basis": "actual_local_tracked_file_bytes"
+    },
+    {
+      "path": "docs/experiments/research-disposition-20261113.md",
+      "sha256": "0be041ae16e0cecbe7717ab26a4fa03c5e954b182f46091778c25fce3ca0d9ff",
+      "identity_basis": "actual_local_tracked_file_bytes"
+    },
+    {
+      "path": "docs/experiments/k4b.md",
+      "sha256": "da60705b204c2093c11989a4287bbb23163f826b051b4e8e46d6155c05bcdafa",
+      "identity_basis": "actual_local_tracked_file_bytes"
+    },
+    {
+      "path": "tools/datasets/k8_review_server.py",
+      "sha256": "4bf87ef31a8124c146eae06c7e9ed365f91a821ecc0acdfe7f195bbf578bbc22",
+      "identity_basis": "actual_local_tracked_file_bytes"
+    }
+  ],
+  "candidates": [
+    {
+      "candidate_id": "tracknet-existing30",
+      "domain": "tennis",
+      "status": "eligible_retrospective_development_candidate_not_untouched_confirmation",
+      "evidence": [
+        {
+          "path": "docs/experiments/k5d-inputs/study-selection-20261104.json",
+          "json_pointer": "/tracknet"
+        },
+        {
+          "path": "docs/resources.md",
+          "section": "Datasets"
+        }
+      ],
+      "licence_record": "No licence stated; third-party mirror; local availability does not establish redistribution rights.",
+      "source_archive": {
+        "path": "/home/itec/emanuele/Datasets/TrackNet/Dataset.zip",
+        "sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18",
+        "verification": "existing manifest; not recomputed"
+      },
+      "dataset_manifest": {
+        "path": "/home/itec/emanuele/Datasets/manifests/TrackNet.json",
+        "sha256": "591351e70097b811d06cd6e6d0c24a88122cc05c0e6726db72fda409238ca87b",
+        "verification": "copied_from_tracked_selection_record_not_rehashed"
+      },
+      "media": "JPEG frames only, 1280x720 at reported 30 fps; not original native video",
+      "exposure": "Retrospective benchmark; all 30 source clips previously scored for tracker selection. No pristine or statistically unseen claim.",
+      "source_group_unit": "game/source match; exact broadcast deduplication must precede new-source claims",
+      "historical_totals": {
+        "clips": 30,
+        "frames": 5675,
+        "visible_easy_hard": 5472,
+        "absent_out_of_frame": 197,
+        "occluded": 6
+      },
+      "label_tiers": {
+        "ball": "native independent point/visibility annotation",
+        "player_mask": "none",
+        "racket_mask": "none",
+        "ball_mask": "not supplied; point-derived crop or SAM proposal is distinct"
+      },
+      "visibility_policy": "Visibility 1 or 2 are visible; 0 explicitly out of frame; 3 occluded, separate from visible and absent.",
+      "historical_clip_identities": [
+        {
+          "clip_id": "tracknet/game10/Clip1",
+          "label_member": "Dataset/game10/Clip1/Label.csv",
+          "label_sha256": "7024bae805e8ca189c9bc0f1e7a93aaf400dba6ebb9b624af3b2d7661b12c0a6",
+          "label_rows": 316,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game10"
+        },
+        {
+          "clip_id": "tracknet/game10/Clip10",
+          "label_member": "Dataset/game10/Clip10/Label.csv",
+          "label_sha256": "23f99b55d68c17ef2accfa933f1776519562f34aa832184c03ac8e752e4b8a2e",
+          "label_rows": 166,
+          "prior_roles": [
+            "full_retrospective_benchmark",
+            "k5b_prior_renderer_development"
+          ],
+          "source_group": "game10"
+        },
+        {
+          "clip_id": "tracknet/game10/Clip11",
+          "label_member": "Dataset/game10/Clip11/Label.csv",
+          "label_sha256": "1f0963a50c0522ffc5f3d05b29eed4e36cbbd03d47cc949309c82ed46cade6fc",
+          "label_rows": 80,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game10"
+        },
+        {
+          "clip_id": "tracknet/game10/Clip12",
+          "label_member": "Dataset/game10/Clip12/Label.csv",
+          "label_sha256": "6bef9b5048eec4f7bfff53725d152deb43e00ee189e48fb006347b99a07d7236",
+          "label_rows": 586,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game10"
+        },
+        {
+          "clip_id": "tracknet/game10/Clip2",
+          "label_member": "Dataset/game10/Clip2/Label.csv",
+          "label_sha256": "dda09f31cb40877fcc8173dcdac36577e1a954924851b360b2ada22fe4fe7fe1",
+          "label_rows": 132,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game10"
+        },
+        {
+          "clip_id": "tracknet/game10/Clip3",
+          "label_member": "Dataset/game10/Clip3/Label.csv",
+          "label_sha256": "247c81967bfb05b53f2b65c0a691a7f14c98802ca93c95a68298b2244b5ba72f",
+          "label_rows": 188,
+          "prior_roles": [
+            "full_retrospective_benchmark",
+            "calibration_cost_and_range_control"
+          ],
+          "source_group": "game10"
+        },
+        {
+          "clip_id": "tracknet/game10/Clip4",
+          "label_member": "Dataset/game10/Clip4/Label.csv",
+          "label_sha256": "16a92bcee1d07e72ee237beac47d9b71ba41b21cad7c748abad272be84789d70",
+          "label_rows": 47,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game10"
+        },
+        {
+          "clip_id": "tracknet/game10/Clip5",
+          "label_member": "Dataset/game10/Clip5/Label.csv",
+          "label_sha256": "1bcc55917cf54ab512e571e3e9b938b61d58f947a016b7cabf5a634345ba3b88",
+          "label_rows": 65,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game10"
+        },
+        {
+          "clip_id": "tracknet/game10/Clip6",
+          "label_member": "Dataset/game10/Clip6/Label.csv",
+          "label_sha256": "80392a96ad0a26e94fe7e46b37c183ccc346fd0bac6eaa163a34d5e0f931411b",
+          "label_rows": 292,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game10"
+        },
+        {
+          "clip_id": "tracknet/game10/Clip7",
+          "label_member": "Dataset/game10/Clip7/Label.csv",
+          "label_sha256": "f1311e9445336612fff4fcbc76a7722bdf51b13d491d49c2940afcad02d6f6ae",
+          "label_rows": 142,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game10"
+        },
+        {
+          "clip_id": "tracknet/game10/Clip8",
+          "label_member": "Dataset/game10/Clip8/Label.csv",
+          "label_sha256": "f4d10e534e71e9ab6092811e92470b6b726a06a4ff244bc3eda8acf6f3844a71",
+          "label_rows": 81,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game10"
+        },
+        {
+          "clip_id": "tracknet/game10/Clip9",
+          "label_member": "Dataset/game10/Clip9/Label.csv",
+          "label_sha256": "18fdff27c5f2923b4e317b6db6e05f35458169bfa8fc7b6711faef660b5161e3",
+          "label_rows": 49,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game10"
+        },
+        {
+          "clip_id": "tracknet/game8/Clip1",
+          "label_member": "Dataset/game8/Clip1/Label.csv",
+          "label_sha256": "e3e0e3fb4531a9b6bab67197db57f2252e6a4a05114f08030f5081675c7a0079",
+          "label_rows": 118,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game8"
+        },
+        {
+          "clip_id": "tracknet/game8/Clip2",
+          "label_member": "Dataset/game8/Clip2/Label.csv",
+          "label_sha256": "e4f8e48ba6e75c71939f47f2391d7dc57a1f7776aa98e9d4318540d7f9d8c419",
+          "label_rows": 97,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game8"
+        },
+        {
+          "clip_id": "tracknet/game8/Clip3",
+          "label_member": "Dataset/game8/Clip3/Label.csv",
+          "label_sha256": "d58cc7c6c5fe8bbe089f6c8b8206b44e719b5435df0e25e2b8c8cd57eca26227",
+          "label_rows": 413,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game8"
+        },
+        {
+          "clip_id": "tracknet/game8/Clip4",
+          "label_member": "Dataset/game8/Clip4/Label.csv",
+          "label_sha256": "ca64094c5800854e358382dd07e408d9276bbefae4b537d7965f00ee64edb7dd",
+          "label_rows": 133,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game8"
+        },
+        {
+          "clip_id": "tracknet/game8/Clip5",
+          "label_member": "Dataset/game8/Clip5/Label.csv",
+          "label_sha256": "5c2e414b233eb8a1db59f3b41dd8242084ac8e2d4e81d60c704dd182d46eb41a",
+          "label_rows": 87,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game8"
+        },
+        {
+          "clip_id": "tracknet/game8/Clip6",
+          "label_member": "Dataset/game8/Clip6/Label.csv",
+          "label_sha256": "c8ec96ec7caf5d26470d3d71faf40e7b572c579505f8114df003dc28b24b82e0",
+          "label_rows": 131,
+          "prior_roles": [
+            "full_retrospective_benchmark",
+            "k5c_prior_48_frame_development"
+          ],
+          "source_group": "game8"
+        },
+        {
+          "clip_id": "tracknet/game8/Clip7",
+          "label_member": "Dataset/game8/Clip7/Label.csv",
+          "label_sha256": "a011ccbba5f1e3dc606e93b041740c135adf8543b2c76602352eb9c5a08c4007",
+          "label_rows": 422,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game8"
+        },
+        {
+          "clip_id": "tracknet/game8/Clip8",
+          "label_member": "Dataset/game8/Clip8/Label.csv",
+          "label_sha256": "b9befae816b4eb8ddbf6e23cfe3079f5475a6d4b846eebb5b8c61ec86088cf24",
+          "label_rows": 319,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game8"
+        },
+        {
+          "clip_id": "tracknet/game8/Clip9",
+          "label_member": "Dataset/game8/Clip9/Label.csv",
+          "label_sha256": "854c326df3e4eca5e44cc5b7422ae5458f0d8763127604fdb6b728f0db27c58a",
+          "label_rows": 238,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game8"
+        },
+        {
+          "clip_id": "tracknet/game9/Clip1",
+          "label_member": "Dataset/game9/Clip1/Label.csv",
+          "label_sha256": "fc1fe57a38f17eeb9c16fb01c9e11ae037fa445014e038c3ffacb07f730f833a",
+          "label_rows": 83,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game9"
+        },
+        {
+          "clip_id": "tracknet/game9/Clip2",
+          "label_member": "Dataset/game9/Clip2/Label.csv",
+          "label_sha256": "d03560ab232440559b4a9cac0e92704819a84266f3ab409493e96a87a122c747",
+          "label_rows": 258,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game9"
+        },
+        {
+          "clip_id": "tracknet/game9/Clip3",
+          "label_member": "Dataset/game9/Clip3/Label.csv",
+          "label_sha256": "263646618611a1bfe0d5be96a4996f7a107490a45c88ac6acdf1405ddad6b7ac",
+          "label_rows": 359,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game9"
+        },
+        {
+          "clip_id": "tracknet/game9/Clip4",
+          "label_member": "Dataset/game9/Clip4/Label.csv",
+          "label_sha256": "3ee66fb07bec17de0ceaa48951342599dba563c043eb330b7f9557c508e04828",
+          "label_rows": 106,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game9"
+        },
+        {
+          "clip_id": "tracknet/game9/Clip5",
+          "label_member": "Dataset/game9/Clip5/Label.csv",
+          "label_sha256": "ba554e5aa090948a0211c98bfbbe8429e6318322328ffaebd1de0bf31d290814",
+          "label_rows": 292,
+          "prior_roles": [
+            "full_retrospective_benchmark",
+            "calibration_cost_and_range_control"
+          ],
+          "source_group": "game9"
+        },
+        {
+          "clip_id": "tracknet/game9/Clip6",
+          "label_member": "Dataset/game9/Clip6/Label.csv",
+          "label_sha256": "50b36a1da5de2b4aa693239b46c0dae30c2e395a0a628f3d39c5b7da1dddb738",
+          "label_rows": 109,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game9"
+        },
+        {
+          "clip_id": "tracknet/game9/Clip7",
+          "label_member": "Dataset/game9/Clip7/Label.csv",
+          "label_sha256": "e7baec147da02086cb4a75e6161bd0a536e5e64a2c81f42bd4d75c63075c5b31",
+          "label_rows": 87,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game9"
+        },
+        {
+          "clip_id": "tracknet/game9/Clip8",
+          "label_member": "Dataset/game9/Clip8/Label.csv",
+          "label_sha256": "5132b22e4b63dbc78bf299d58878aa4411496314da0aff693e8e7a36205e9745",
+          "label_rows": 56,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game9"
+        },
+        {
+          "clip_id": "tracknet/game9/Clip9",
+          "label_member": "Dataset/game9/Clip9/Label.csv",
+          "label_sha256": "4a52bc5fa6b5f7dbbed6b81e9672b4f8b7e141488469ef39c92705e8d9b54b72",
+          "label_rows": 223,
+          "prior_roles": [
+            "full_retrospective_benchmark"
+          ],
+          "source_group": "game9"
+        }
+      ],
+      "remaining_eligibility": [
+        "Authenticate source archive and each selected frame/label identity before native runs.",
+        "Audit exact source-group overlap with development and model training; author-reported judge training games are not independent optimizer-log verification.",
+        "Provide independent player/racket reference annotations for broader foreground claims.",
+        "Treat all existing30 and nested prefixes as retrospective; retain absent/occluded denominators and source-qualification failures.",
+        "Resolve research/reproduction and figure permissions before distribution."
+      ]
+    },
+    {
+      "candidate_id": "racketvision-tennis-native-labels",
+      "domain": "tennis",
+      "status": "candidate_only_exact_source_frame_join_and_prior_exposure_unresolved",
+      "evidence": [
+        {
+          "path": "docs/resources.md",
+          "section": "Datasets / RacketVision"
+        },
+        {
+          "path": "docs/experiments/w11-racket.md",
+          "section": "2026-10-31 — Annotation audit: no eligible pixel mask identified"
+        }
+      ],
+      "licence_record": "MIT reported by tracked inventory; source-specific footage and redistribution rights require verification.",
+      "source_identity": null,
+      "source_manifest_recorded_path": "/home/itec/emanuele/Datasets/manifests/RacketVision.json",
+      "source_manifest_sha256": null,
+      "source_identity_limit": "No complete source/archive or manifest digest is established by this tracked audit; anonymous match/rally identifiers are not joined to current broadcast frames.",
+      "media": "Reported 1920x1080 video clips, 24–60 fps; 1,672 clips/435k frames across all three sports, not tennis-only counts.",
+      "label_tiers": {
+        "ball": "native sparse point annotations on reported 14.3% of tennis frames",
+        "racket": "native sparse boxes plus five keypoints on reported 4.9% of tennis frames, usually one racket per labeled frame",
+        "player_mask": "none",
+        "racket_mask": "none",
+        "interpolated_ball_and_merged_racket_predictions": "model outputs, not ground truth"
+      },
+      "exposure": "Not established for a new cohort; no untouched match IDs selected.",
+      "prior_search_result": "W11 found no exact W6 SHA/name match in a bounded manifest search. This does not exclude re-encoded or trimmed overlap.",
+      "remaining_eligibility": [
+        "Recover archived source/manifest digests and native annotation/video membership.",
+        "Verify frame indexing, cadence, coordinate scaling and sparse labeled/unknown/absent semantics on exact frames.",
+        "Deduplicate matches against TrackNet, tennis_games, model fitting and prior experiments before selection.",
+        "Score only genuine annotated frames for task endpoints; do not substitute interpolation for truth.",
+        "For pixel foreground endpoints find independent masks or use the source-only human-reviewed SAM fallback."
+      ]
+    },
+    {
+      "candidate_id": "visor-existing-eval34",
+      "domain": "egocentric",
+      "status": "aligned_exposed_baseline_cohort_candidate_not_untouched_confirmation",
+      "evidence": [
+        {
+          "path": "experiments/visor/eval_set.json",
+          "json_pointer": "/items"
+        },
+        {
+          "path": "docs/experiments/b2.md",
+          "section": "B2 outcome means over the34 items"
+        },
+        {
+          "path": "docs/resources.md",
+          "section": "VISOR evaluation set v2 / Using VISOR"
+        }
+      ],
+      "licence_record": "CC BY-NC recorded for EPIC-KITCHENS VISOR; retain source-specific terms and permitted redistribution scope.",
+      "source_zip": {
+        "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/2v6cgv1x04ol22qp9rm9x2j6a7.zip",
+        "sha256": "58621abab7fe225b1b2e20d1cbf691dcdf725a8d4f212e00497960fb5ff0f66d",
+        "verification": "copied_from_tracked_record_not_rehashed_source_data"
+      },
+      "dataset_manifest": {
+        "path": "/home/itec/emanuele/Datasets/manifests/EPIC-KITCHENS-VISOR.json",
+        "sha256": "caca34cc6d92c522c256e4a8ff4f8f70e517181fccfaf3cdfc676adb34eb3ef2",
+        "verification": "copied_from_tracked_record_not_rehashed_source_data"
+      },
+      "dense_archive": {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b1-2026-10-06/evalset-v2/visor-val-dense.tar",
+        "sha256": "a2d9e0cb0373fbf89d1c1e257acc2ffa63602b680cfae03a6fdcc804894b4c3c",
+        "verification": "copied_from_tracked_eval_set_not_rehashed_archive"
+      },
+      "cohort_name": "visor-val-b1-v2",
+      "historical_selection_rule": {
+        "split": "val",
+        "length": 240,
+        "seed": "pointstream-b1",
+        "verified_classes": [
+          "h264 1920x1080 59.940",
+          "hevc 1920x1080 50.000"
+        ],
+        "mapping_result": {
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261006T193326Z-64057023/full/mapping.json",
+          "sha256": "b960afb53e9fba9cd660c49793ba53c710c0be8c1fbfb5a8800287165eedf55a"
+        },
+        "summary": "one exactly aligned, hand-complete window per validation video of a verified 1080p one-to-one class, picked content-blind; tools/datasets/visor_b1_inputs.py"
+      },
+      "exposure": "All34 windows already used in B2 codec baseline results. Some later component studies use subsets. This audit does not reconstruct every fitting exposure.",
+      "source_group_unit": "video at minimum; participant grouping is available from video prefix and should be reported where used",
+      "label_tiers": {
+        "sparse": "human polygon annotations with exactly verified sparse-frame mapping",
+        "dense": "interpolated polygons, including dense keyframes; not human tier",
+        "filled": "SAM/model-filled regions separate, not independent human truth"
+      },
+      "known_limits": [
+        "Only active objects annotated; dense labels omit some objects.",
+        "Exactly placed and hand-complete existing windows do not establish completeness for every foreground object.",
+        "Sparse unlabelled frames are unknown, not empty."
+      ],
+      "historical_items": [
+        {
+          "item_id": "P01_107_0000003049",
+          "source_group": "P01_107",
+          "participant": "P01",
+          "split": "val",
+          "first_video_index": 3048,
+          "frames": 240,
+          "fps": 50.0,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P01_107.MP4",
+            "sha256": "4f899b1b0180039ff7d913fa31a1ceec79889bdeb82ec27a0c7dfac9f71f297e",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P01_107_interpolations.zip",
+          "dense_sha256": "616adb21121a3197cf745293e66933c2645e0cc216de7bd7e54588dd602fb3dd",
+          "sparse_jpegs": [
+            "rgb_frames/P01_107_frame_0000003073.jpg",
+            "rgb_frames/P01_107_frame_0000003221.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P02_02_0000006080",
+          "source_group": "P02_02",
+          "participant": "P02",
+          "split": "val",
+          "first_video_index": 6072,
+          "frames": 240,
+          "fps": 59.94005994005994,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P02_02.MP4",
+            "sha256": "580b89c9549c5ff3afe0ab7e111646f135c92871b3408a3e96d24e0dee78a580",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P02_02_interpolations.zip",
+          "dense_sha256": "41b2ec33b4324b83c0054f78fc92922a10d0f13e22d7f5d116e937f0330c9063",
+          "sparse_jpegs": [
+            "rgb_frames/P02_02_frame_0000006090.jpg",
+            "rgb_frames/P02_02_frame_0000006228.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P02_09_0000084627",
+          "source_group": "P02_09",
+          "participant": "P02",
+          "split": "val",
+          "first_video_index": 84542,
+          "frames": 240,
+          "fps": 59.94005994005994,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P02_09.MP4",
+            "sha256": "c91d229954cf13066f0e17c67cec7b3bf5d4a1e0f3a96e0744d6aae88c03934e",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P02_09_interpolations.zip",
+          "dense_sha256": "c1cf6b0ffd6b0994e99873d13c77583039e9c5fd2f18dda7fd4e5e8c4c83ea4e",
+          "sparse_jpegs": [
+            "rgb_frames/P02_09_frame_0000084627.jpg",
+            "rgb_frames/P02_09_frame_0000084797.jpg",
+            "rgb_frames/P02_09_frame_0000084687.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P02_12_0000022073",
+          "source_group": "P02_12",
+          "participant": "P02",
+          "split": "val",
+          "first_video_index": 22050,
+          "frames": 240,
+          "fps": 59.94005994005994,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P02_12.MP4",
+            "sha256": "fdbff19c5b4a742075e2636a1dc93dfdf438efa8a49454ff200f5126a4e19f93",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P02_12_interpolations.zip",
+          "dense_sha256": "a0ea8b89b336d4fb6bd2c9dc47e885b43bd64ca3b390c259365d2d943f2ea86f",
+          "sparse_jpegs": [
+            "rgb_frames/P02_12_frame_0000022202.jpg",
+            "rgb_frames/P02_12_frame_0000022267.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P03_10_0000000616",
+          "source_group": "P03_10",
+          "participant": "P03",
+          "split": "val",
+          "first_video_index": 615,
+          "frames": 240,
+          "fps": 59.94005994005994,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P03_10.MP4",
+            "sha256": "962b37b472e84847078301544982b4da0a9e2e44d15d61ac045ab3fb6878a0f9",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P03_10_interpolations.zip",
+          "dense_sha256": "d194aa35a5c088ded3b72ae1fbcbb2b3404aa81ef63f3a445060e36f11ff0328",
+          "sparse_jpegs": [
+            "rgb_frames/P03_10_frame_0000000616.jpg",
+            "rgb_frames/P03_10_frame_0000000752.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P03_120_0000018627",
+          "source_group": "P03_120",
+          "participant": "P03",
+          "split": "val",
+          "first_video_index": 18626,
+          "frames": 240,
+          "fps": 50.0,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P03_120.MP4",
+            "sha256": "8523e198daeafff3a408ca5ef9e83318c4126ec39db4a8dc44fec7a4fc70644c",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P03_120_interpolations.zip",
+          "dense_sha256": "006bfe9f0885275b6d85be61254dff5f372b2580cc1aeda1bd19753bedcb843b",
+          "sparse_jpegs": [
+            "rgb_frames/P03_120_frame_0000018842.jpg",
+            "rgb_frames/P03_120_frame_0000018692.jpg",
+            "rgb_frames/P03_120_frame_0000018792.jpg",
+            "rgb_frames/P03_120_frame_0000018817.jpg",
+            "rgb_frames/P03_120_frame_0000018717.jpg",
+            "rgb_frames/P03_120_frame_0000018642.jpg",
+            "rgb_frames/P03_120_frame_0000018742.jpg",
+            "rgb_frames/P03_120_frame_0000018767.jpg",
+            "rgb_frames/P03_120_frame_0000018667.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P04_06_0000038498",
+          "source_group": "P04_06",
+          "participant": "P04",
+          "split": "val",
+          "first_video_index": 38459,
+          "frames": 240,
+          "fps": 59.94005994005994,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P04_06.MP4",
+            "sha256": "0cd6b4b1c77977f83dfb69fef138db207fed70caea531d6539c739615107443a",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P04_06_interpolations.zip",
+          "dense_sha256": "eaee9dc765e2c427687e5f14ea4f5bbe3582b6d5bd7a8a6a9bae6085a1799e2a",
+          "sparse_jpegs": [
+            "rgb_frames/P04_06_frame_0000038707.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P04_13_0000004265",
+          "source_group": "P04_13",
+          "participant": "P04",
+          "split": "val",
+          "first_video_index": 4260,
+          "frames": 240,
+          "fps": 59.94005994005994,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P04_13.MP4",
+            "sha256": "df27e76d7a5510c223274e45f0097da872c95153fc9318dc39a17592371ae59f",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P04_13_interpolations.zip",
+          "dense_sha256": "161765a661ded1bc70ec701eee6dd7b6fba7a78d0942e9878ee0aa81ceae34df",
+          "sparse_jpegs": [
+            "rgb_frames/P04_13_frame_0000004377.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P04_24_0000013497",
+          "source_group": "P04_24",
+          "participant": "P04",
+          "split": "val",
+          "first_video_index": 13483,
+          "frames": 240,
+          "fps": 59.94005994005994,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P04_24.MP4",
+            "sha256": "de76103a54bcdaad2d2650e987d75089a988bf819437294207f5cd166d977b8d",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P04_24_interpolations.zip",
+          "dense_sha256": "207b02279bb05c35c42145462edbabd0d48723bb4dd54ee78c7280158f64703f",
+          "sparse_jpegs": [],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P06_03_0000005110",
+          "source_group": "P06_03",
+          "participant": "P06",
+          "split": "val",
+          "first_video_index": 5104,
+          "frames": 240,
+          "fps": 59.94005994005994,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P06_03.MP4",
+            "sha256": "85dc6503764a6b7cd344e6b03f3cb7616d77a58901cc0aa0a5c21c344779298f",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P06_03_interpolations.zip",
+          "dense_sha256": "fa3cb64235a836ecddd523601a41915a4a827bb14345a2a5e9b140a4d1b6e5a4",
+          "sparse_jpegs": [
+            "rgb_frames/P06_03_frame_0000005197.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P06_05_0000047134",
+          "source_group": "P06_05",
+          "participant": "P06",
+          "split": "val",
+          "first_video_index": 47086,
+          "frames": 240,
+          "fps": 59.94005994005994,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P06_05.MP4",
+            "sha256": "f1155f78badc95e7e1b43432ad44057818c05d670e5d0ddb4edbfd3e4469db38",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P06_05_interpolations.zip",
+          "dense_sha256": "543cd57790b6fbc1958ae1ca22874eb48f41fed70700f00a4865451c712a2b71",
+          "sparse_jpegs": [
+            "rgb_frames/P06_05_frame_0000047134.jpg",
+            "rgb_frames/P06_05_frame_0000047328.jpg",
+            "rgb_frames/P06_05_frame_0000047238.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P06_10_0000010361",
+          "source_group": "P06_10",
+          "participant": "P06",
+          "split": "val",
+          "first_video_index": 10350,
+          "frames": 240,
+          "fps": 59.94005994005994,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P06_10.MP4",
+            "sha256": "2abad7c27ca8491dc59e8144e8ff93aa40f2a41d0716f4f0b957535e46e6fda5",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P06_10_interpolations.zip",
+          "dense_sha256": "16717ff9874898a2c5afd9b922960a9809a5b7c584f86e813339c4f972536dc2",
+          "sparse_jpegs": [
+            "rgb_frames/P06_10_frame_0000010361.jpg",
+            "rgb_frames/P06_10_frame_0000010572.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P06_106_0000007118",
+          "source_group": "P06_106",
+          "participant": "P06",
+          "split": "val",
+          "first_video_index": 7117,
+          "frames": 240,
+          "fps": 50.0,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P06_106.MP4",
+            "sha256": "a2d99b3607fb42cada0a69ee8e91a7bdabb88cd571510cd1e94b13cbd89d455e",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P06_106_interpolations.zip",
+          "dense_sha256": "b3330dc0c3024a9dbbd906e42c2c1c4584b21a609bfdafd022f1ef2ab607d2a6",
+          "sparse_jpegs": [
+            "rgb_frames/P06_106_frame_0000007165.jpg",
+            "rgb_frames/P06_106_frame_0000007326.jpg",
+            "rgb_frames/P06_106_frame_0000007118.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P06_108_0000016366",
+          "source_group": "P06_108",
+          "participant": "P06",
+          "split": "val",
+          "first_video_index": 16365,
+          "frames": 240,
+          "fps": 50.0,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P06_108.MP4",
+            "sha256": "041dcbadf1826301038f5c36dc976ae831dd7c6683f2931e0c31e0216bdbf036",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P06_108_interpolations.zip",
+          "dense_sha256": "0f1aaf19c276f64a0fdda1071be0d978a75c78440368905a124a10c0512e9591",
+          "sparse_jpegs": [
+            "rgb_frames/P06_108_frame_0000016376.jpg",
+            "rgb_frames/P06_108_frame_0000016421.jpg",
+            "rgb_frames/P06_108_frame_0000016488.jpg",
+            "rgb_frames/P06_108_frame_0000016523.jpg",
+            "rgb_frames/P06_108_frame_0000016588.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P07_101_0000021842",
+          "source_group": "P07_101",
+          "participant": "P07",
+          "split": "val",
+          "first_video_index": 21841,
+          "frames": 240,
+          "fps": 50.0,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P07_101.MP4",
+            "sha256": "be919e74386c9ae4e7de30da9c83a69aaa3adbe52924601acbbd1ec0d803c36b",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P07_101_interpolations.zip",
+          "dense_sha256": "8b0ebfdf1f53c966d3040ec4a35ba9b0ef6d0006ef24e6a6247c245fa260d15c",
+          "sparse_jpegs": [
+            "rgb_frames/P07_101_frame_0000021842.jpg",
+            "rgb_frames/P07_101_frame_0000021876.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P07_110_0000006712",
+          "source_group": "P07_110",
+          "participant": "P07",
+          "split": "val",
+          "first_video_index": 6711,
+          "frames": 240,
+          "fps": 50.0,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P07_110.MP4",
+            "sha256": "28688ccfd50ca92f1418a6797f4e3444efd2b7fa577e74596e8113ce72f7ae04",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P07_110_interpolations.zip",
+          "dense_sha256": "cfac79da46fd6d030765defb2ca330c4142b7b9abdcbd46525801977e8649954",
+          "sparse_jpegs": [
+            "rgb_frames/P07_110_frame_0000006712.jpg",
+            "rgb_frames/P07_110_frame_0000006792.jpg",
+            "rgb_frames/P07_110_frame_0000006871.jpg",
+            "rgb_frames/P07_110_frame_0000006926.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P08_17_0000004194",
+          "source_group": "P08_17",
+          "participant": "P08",
+          "split": "val",
+          "first_video_index": 4189,
+          "frames": 240,
+          "fps": 59.94005994005994,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P08_17.MP4",
+            "sha256": "5a61491356e4c3ede9933c4f38e200b8490ebb3725d1c1d0a829546e806d85fb",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P08_17_interpolations.zip",
+          "dense_sha256": "da32ffd4f1359d1679cbc76e61d3950b994c9fa7735ceb27fb87140cc3ad07ef",
+          "sparse_jpegs": [
+            "rgb_frames/P08_17_frame_0000004194.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P09_02_0000009646",
+          "source_group": "P09_02",
+          "participant": "P09",
+          "split": "val",
+          "first_video_index": 9636,
+          "frames": 240,
+          "fps": 59.94005994005994,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P09_02.MP4",
+            "sha256": "25df6d30f32e04878457b567704356b68840d279f06df10999dac5f0b8477864",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P09_02_interpolations.zip",
+          "dense_sha256": "6c33ca2fe914932db0077a52e5b71fca6d0a728c6b49b2b63ed2cb57222fc568",
+          "sparse_jpegs": [
+            "rgb_frames/P09_02_frame_0000009646.jpg",
+            "rgb_frames/P09_02_frame_0000009748.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P09_103_0000017124",
+          "source_group": "P09_103",
+          "participant": "P09",
+          "split": "val",
+          "first_video_index": 17123,
+          "frames": 240,
+          "fps": 50.0,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P09_103.MP4",
+            "sha256": "c94c6cf88542ef08057224f5834b911737fb5e25515af3a705bd8b92a7bb4338",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P09_103_interpolations.zip",
+          "dense_sha256": "e12921c9bde6740cb6a771a37bf2cd14d2e1df97c5988fd8e217a1c1eb4e35de",
+          "sparse_jpegs": [
+            "rgb_frames/P09_103_frame_0000017257.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P09_104_0000017863",
+          "source_group": "P09_104",
+          "participant": "P09",
+          "split": "val",
+          "first_video_index": 17862,
+          "frames": 240,
+          "fps": 50.0,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P09_104.MP4",
+            "sha256": "39d515e3b193f3eb9384a7e7f2fe971a6abdf0fe583b20143a28774c525c6906",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P09_104_interpolations.zip",
+          "dense_sha256": "0bd5929ae08060bf7b88864d1fd537562ba3fd2f6b2e941569775662b86cf921",
+          "sparse_jpegs": [
+            "rgb_frames/P09_104_frame_0000017901.jpg",
+            "rgb_frames/P09_104_frame_0000018007.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P09_106_0000006303",
+          "source_group": "P09_106",
+          "participant": "P09",
+          "split": "val",
+          "first_video_index": 6302,
+          "frames": 240,
+          "fps": 50.0,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P09_106.MP4",
+            "sha256": "0a0b741bd243c1187816e9180e8f3a9ed0e5a6d290d76e3621142628145fefb3",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P09_106_interpolations.zip",
+          "dense_sha256": "bbd99dbc7f42e9c52cf611dbc4a4ae38acec1ded777007e2ccb43952a9abf9ba",
+          "sparse_jpegs": [
+            "rgb_frames/P09_106_frame_0000006530.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P18_01_0000008154",
+          "source_group": "P18_01",
+          "participant": "P18",
+          "split": "val",
+          "first_video_index": 8144,
+          "frames": 240,
+          "fps": 59.94005994005994,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P18_01.MP4",
+            "sha256": "77df357c858b462a1e3a7abc7a52cf6c3068e60f0602d88823dc413490f24c2e",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P18_01_interpolations.zip",
+          "dense_sha256": "f0ae0f1e02f5ec2b1e42456910dc621a3f5058ae657401b1d3fe9a9069135c8c",
+          "sparse_jpegs": [
+            "rgb_frames/P18_01_frame_0000008190.jpg",
+            "rgb_frames/P18_01_frame_0000008364.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P21_01_0000031087",
+          "source_group": "P21_01",
+          "participant": "P21",
+          "split": "val",
+          "first_video_index": 31054,
+          "frames": 240,
+          "fps": 59.94005994005994,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P21_01.MP4",
+            "sha256": "3868df8d409ba639151ac2610f0008f7a716646f3a2fc084db17bb4b16b6d773",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P21_01_interpolations.zip",
+          "dense_sha256": "dc14345c3559631cc2f55b35cbd968f6d5be6d21adb782b45103daa35e0edf08",
+          "sparse_jpegs": [
+            "rgb_frames/P21_01_frame_0000031283.jpg",
+            "rgb_frames/P21_01_frame_0000031247.jpg",
+            "rgb_frames/P21_01_frame_0000031087.jpg",
+            "rgb_frames/P21_01_frame_0000031163.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P22_107_0000012402",
+          "source_group": "P22_107",
+          "participant": "P22",
+          "split": "val",
+          "first_video_index": 12401,
+          "frames": 240,
+          "fps": 50.0,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P22_107.MP4",
+            "sha256": "244edaa0fd60f6c51f8fbb345884a2ff455548b0d2532712bdadcc5a038f1c0d",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P22_107_interpolations.zip",
+          "dense_sha256": "766ba3ad992f67489368c2ebebb76d9b973448b28965908dedd9714d4cf0b225",
+          "sparse_jpegs": [
+            "rgb_frames/P22_107_frame_0000012426.jpg",
+            "rgb_frames/P22_107_frame_0000012459.jpg",
+            "rgb_frames/P22_107_frame_0000012526.jpg",
+            "rgb_frames/P22_107_frame_0000012576.jpg",
+            "rgb_frames/P22_107_frame_0000012613.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P24_09_0000108111",
+          "source_group": "P24_09",
+          "participant": "P24",
+          "split": "val",
+          "first_video_index": 108001,
+          "frames": 240,
+          "fps": 59.94005994005994,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P24_09.MP4",
+            "sha256": "4af7a6343db819e308d1c253e71d97836365303ea667e612c9d4d2490a5a99dd",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P24_09_interpolations.zip",
+          "dense_sha256": "dde4c5fd23dfd70e830b98bd010835b2d4c41cc06667af68c4995eb3883bdae9",
+          "sparse_jpegs": [
+            "rgb_frames/P24_09_frame_0000108111.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P25_09_0000021701",
+          "source_group": "P25_09",
+          "participant": "P25",
+          "split": "val",
+          "first_video_index": 21679,
+          "frames": 240,
+          "fps": 59.94005994005994,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P25_09.MP4",
+            "sha256": "342a3374723cfaa19e71ced11c91fecdfeb8c816df43d2414cec56ac938610f6",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P25_09_interpolations.zip",
+          "dense_sha256": "4c53fd7b396d522dabe06e33763c38bd11fa80d6d1f1e3f03c658f2de833b563",
+          "sparse_jpegs": [
+            "rgb_frames/P25_09_frame_0000021773.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P25_101_0000012336",
+          "source_group": "P25_101",
+          "participant": "P25",
+          "split": "val",
+          "first_video_index": 12335,
+          "frames": 240,
+          "fps": 50.0,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P25_101.MP4",
+            "sha256": "d5def7dee9aaba457b56a8dc425094a97ddbefb85a19bc43980dc79b57f4587a",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P25_101_interpolations.zip",
+          "dense_sha256": "09c972ebb4e115f87a74b8b605d305e78f2451836792da06252a33d77f75c2c8",
+          "sparse_jpegs": [
+            "rgb_frames/P25_101_frame_0000012459.jpg",
+            "rgb_frames/P25_101_frame_0000012517.jpg",
+            "rgb_frames/P25_101_frame_0000012336.jpg",
+            "rgb_frames/P25_101_frame_0000012380.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P26_02_0000001071",
+          "source_group": "P26_02",
+          "participant": "P26",
+          "split": "val",
+          "first_video_index": 1069,
+          "frames": 240,
+          "fps": 59.94005994005994,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P26_02.MP4",
+            "sha256": "3c86ea341923898173d30f398135038d10f4b8957bfa0ef25e9c620f19d4811f",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P26_02_interpolations.zip",
+          "dense_sha256": "39f205a068b4d23dfcac8c7754ff34c9bf6a3e279357229b595be3195c1c8e6d",
+          "sparse_jpegs": [
+            "rgb_frames/P26_02_frame_0000001071.jpg",
+            "rgb_frames/P26_02_frame_0000001173.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P26_108_0000000915",
+          "source_group": "P26_108",
+          "participant": "P26",
+          "split": "val",
+          "first_video_index": 914,
+          "frames": 240,
+          "fps": 50.0,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P26_108.MP4",
+            "sha256": "aebceecf841e5705278211cd2e83c5d7e05089792be402bb378f61da060d4cd3",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P26_108_interpolations.zip",
+          "dense_sha256": "ebf04a94d5ffb39749fc910fc632779f28bb09466d055c3dc320a8774295a393",
+          "sparse_jpegs": [
+            "rgb_frames/P26_108_frame_0000001076.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P27_105_0000038676",
+          "source_group": "P27_105",
+          "participant": "P27",
+          "split": "val",
+          "first_video_index": 38675,
+          "frames": 240,
+          "fps": 50.0,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P27_105.MP4",
+            "sha256": "e7c5e63116ee206fed17ffc1e1298dfaa4a704301583826a616163d3da100f1c",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P27_105_interpolations.zip",
+          "dense_sha256": "6ceb9748d93d3a9ecd27beb9318cea0dab5e252c0c019972e874bdf90eb40d08",
+          "sparse_jpegs": [
+            "rgb_frames/P27_105_frame_0000038713.jpg",
+            "rgb_frames/P27_105_frame_0000038759.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P28_05_0000030047",
+          "source_group": "P28_05",
+          "participant": "P28",
+          "split": "val",
+          "first_video_index": 30015,
+          "frames": 240,
+          "fps": 59.94005994005994,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P28_05.MP4",
+            "sha256": "55a1f251fa602e4ebad1c7aae2b9bffa7453799684d556d3d37e6477b7204355",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P28_05_interpolations.zip",
+          "dense_sha256": "15a27df78d7258337f319c13e1262467436cd7c3fd1570ba97d3de9a6b1dc666",
+          "sparse_jpegs": [
+            "rgb_frames/P28_05_frame_0000030078.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P30_07_0000005463",
+          "source_group": "P30_07",
+          "participant": "P30",
+          "split": "val",
+          "first_video_index": 5457,
+          "frames": 240,
+          "fps": 59.94005994005994,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P30_07.MP4",
+            "sha256": "3de0d340a8f0546cb3bcd57e07aff989505cc3d7c20ac02ab45f5cd45c6100a6",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P30_07_interpolations.zip",
+          "dense_sha256": "6d7c211a5ab08ca4a6e847ea4d42942efc54ddbd9a1e3dcee859c4d4392c84d6",
+          "sparse_jpegs": [
+            "rgb_frames/P30_07_frame_0000005555.jpg",
+            "rgb_frames/P30_07_frame_0000005647.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P30_110_0000007526",
+          "source_group": "P30_110",
+          "participant": "P30",
+          "split": "val",
+          "first_video_index": 7525,
+          "frames": 240,
+          "fps": 50.0,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P30_110.MP4",
+            "sha256": "b5818627cd8e44b2c222137ed11615316b3a1587af3143e49fb34287f1470283",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P30_110_interpolations.zip",
+          "dense_sha256": "72fe5ed18bf24c2f52db6734453db0bb9a69aa4309eb92648f92cb76c4f18024",
+          "sparse_jpegs": [
+            "rgb_frames/P30_110_frame_0000007526.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        },
+        {
+          "item_id": "P37_102_0000018801",
+          "source_group": "P37_102",
+          "participant": "P37",
+          "split": "val",
+          "first_video_index": 18800,
+          "frames": 240,
+          "fps": 50.0,
+          "source_video": {
+            "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P37_102.MP4",
+            "sha256": "b519f73e66d721e1f85571e18c7adf73b48ad47c4ad0251e2a6d23f2ecd434ac",
+            "verification": "copied_from_tracked_record_not_rehashed_source_data"
+          },
+          "dense_member": "dense/P37_102_interpolations.zip",
+          "dense_sha256": "fe8688408fc2dc47c0d8a2cddc2c8d44ad696c76f65bd080ef9b2646a0d12540",
+          "sparse_jpegs": [
+            "rgb_frames/P37_102_frame_0000018813.jpg",
+            "rgb_frames/P37_102_frame_0000018930.jpg",
+            "rgb_frames/P37_102_frame_0000018973.jpg"
+          ],
+          "mask_tier": "interpolated",
+          "new_selection": false
+        }
+      ],
+      "remaining_eligibility": [
+        "Use tracked source hashes and verified VISOR adapter/frame mapping before any new run.",
+        "Audit fitting and judge training exposure before claims; do not infer clean training from val split alone.",
+        "Use human sparse annotations as independently grounded sparse endpoint and report interpolated dense endpoint separately.",
+        "Keep current34 as exposed development/retrospective baseline; no held-out claim."
+      ]
+    },
+    {
+      "candidate_id": "visor-new-windows-or-videos",
+      "domain": "egocentric",
+      "status": "unselected_conditional_candidate",
+      "source_identity": null,
+      "evidence": [
+        {
+          "path": "experiments/visor/eval_set.json",
+          "json_pointer": "/excluded"
+        },
+        {
+          "path": "docs/resources.md",
+          "section": "Using VISOR / Frames"
+        }
+      ],
+      "licence_record": "Same applicable EPIC-KITCHENS VISOR terms; verify selected source-specific rights.",
+      "proposed_item_ids": [],
+      "exposure": "New windows from existing34 videos retain source-video exposure; they are not new-video confirmation. No untouched annotated validation video has been established here.",
+      "existing_exclusions": [
+        {
+          "video": "P03_14",
+          "reason": "no exactly aligned, hand-complete window"
+        },
+        {
+          "video": "P03_22",
+          "reason": "no exactly aligned, hand-complete window"
+        },
+        {
+          "video": "P07_103",
+          "reason": "no exactly aligned, hand-complete window"
+        },
+        {
+          "video": "P09_07",
+          "reason": "class h264 1920x1080 29.970 is not verified 1080p one-to-one"
+        },
+        {
+          "video": "P12_04",
+          "reason": "class h264 1280x720 59.940 is not verified 1080p one-to-one"
+        },
+        {
+          "video": "P18_02",
+          "reason": "class h264 1920x1080 29.970 is not verified 1080p one-to-one"
+        },
+        {
+          "video": "P26_01",
+          "reason": "no exactly aligned, hand-complete window"
+        },
+        {
+          "video": "P29_04",
+          "reason": "no exactly aligned, hand-complete window"
+        },
+        {
+          "video": "P32_07",
+          "reason": "no exactly aligned, hand-complete window"
+        }
+      ],
+      "exclusions_policy": "Existing exclusions are not an eligible holdout list; recover required alignment/hand-completeness prerequisites before reconsidering any excluded video.",
+      "remaining_eligibility": [
+        "Inventory independently labeled videos not already used; record source identities and model/fitting exposure.",
+        "If only familiar videos remain, predeclare new window selection and label source reuse explicitly.",
+        "Require verified frame mapping and annotation completeness at selected frames; no arbitrary manual indexing.",
+        "Select windows mechanically within frozen source groups before quality outcomes.",
+        "Do not use unlabeled test videos as annotated confirmation by inference."
+      ]
+    },
+    {
+      "candidate_id": "tennis-human-reviewed-SAM-fallback",
+      "domain": "tennis",
+      "status": "authorized_workflow_preparation_no_reference_labels_created",
+      "evidence": [
+        {
+          "path": "docs/experiments/k4b.md",
+          "section": "48 review frames / user marking"
+        },
+        {
+          "path": "tools/datasets/k8_review_server.py",
+          "section": "read-only loopback review server"
+        },
+        {
+          "path": "docs/experiments/submission-ladder-protocol-20261114.json",
+          "json_pointer": "/annotation"
+        }
+      ],
+      "source_identity": null,
+      "licence_record": "Inherits exact selected source rights; source selection and permissions unresolved.",
+      "label_tiers": {
+        "proposals": "SAM3.1 model output",
+        "accepted_corrected_reference": "human-reviewed, model-assisted",
+        "propagated_unreviewed": "model/interpolated, never promoted by neighboring review"
+      },
+      "prior_review_limit": "Existing K4b/K8 reviews establish workflow precedent for identity/shot decisions, not independently verified pixel silhouettes.",
+      "remaining_eligibility": [
+        "Freeze source groups and review sample without codec outcomes.",
+        "Provide source-only identity, full-boundary, missing-object and uncertainty review/correction.",
+        "Time small batch and include independent no-overlay subset to expose proposal bias.",
+        "Preserve proposal/reference hashes, corrections and rejected/uncertain cases.",
+        "No mask is human-reviewed until a real decision is imported and validated."
+      ]
+    }
+  ],
+  "next_decision": "Authenticate exact source assets and exposure inventory, then preregister actual development and confirmation cohorts; this metadata inventory selects none.",
+  "scientific_compute": {
+    "gpu_seconds": 0,
+    "native_encodes": 0,
+    "model_inference": 0,
+    "source_data_rehashed": false,
+    "new_labels_created": 0
+  }
+}
