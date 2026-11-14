@@ -1,9 +1,13 @@
 # PointStream
 
-PointStream is an object-centric semantic video codec. It splits a video into
-foreground (people, the objects they handle, the ball) and background, and
-encodes each with the best tool for it. It targets racket sports and egocentric
-hand-object video.
+PointStream researches object-centric semantic video coding for racket sports
+and egocentric hand-object video. It provides segmentation, codec and compositing
+components, scoped serialized-ball experiments, and a prospective complete-codec
+programme. Competitive end-to-end gains in both domains remain research goals.
+
+The new [native fallback endpoint](docs/codec-endpoint.md) provides `encode`,
+`decode` and `inspect` commands. The [submission ladder](docs/experiments/submission-ladder-20261114.md)
+records the current milestones and stage-budget requirements.
 
 ## Layout
 

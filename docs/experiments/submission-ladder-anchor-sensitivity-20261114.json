@@ -1,0 +1,1074 @@
+{
+  "schema": 1,
+  "status": "authenticated_saved_scalars",
+  "provenance": {
+    "acceptance_sha256": "24aae3e5d18bd38b2dda0aa939c4bfdbdb2f70b8595d1028c0213ddb1a3c04a2",
+    "accepted_report_sha256": "e431d384a1b019942ce7c880b3e8d8aa4673d5f08086d406cc9df0934f08b539",
+    "job_id": "20261113T220101Z-0cfa5558",
+    "GPU": {
+      "host": "gpu6",
+      "uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+      "class": "RTX6000Ada8.9"
+    },
+    "execution_identity": {
+      "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "snapshot_sha256": "5ca2d194b7e1a6032faf7ef60fe44924649e0a57471c12cda6264f9586260219",
+      "source_sha256": "6f898f753a056981a107f5115a5a36f1310bc9d4a705a1805b75f758a0bc0117"
+    },
+    "acceptance_state": "CLOSED_ROOT_ACCEPTED_ACK_CLOSED_IMMUTABLY_ARCHIVED"
+  },
+  "scope": {
+    "clip": "tracknet/game10/Clip3",
+    "start_frame": 0,
+    "frames": 48,
+    "fps": "30",
+    "size": [
+      1280,
+      720
+    ],
+    "label_counts": {
+      "absent": 0,
+      "excluded": 0,
+      "visible": 48
+    },
+    "source_exposure": {
+      "author_repository": "nttcom/WASB-SBDT",
+      "checkpoint_hash_source": "docs/experiments/k5b-inputs/recovered-20261101/k5b1b.json",
+      "checkpoint_name": "wasb_tennis_best.pth.tar",
+      "checkpoint_sha256_in_original_k5b_run": "9d391239ab10c733f8e5bfadf16ab72838e7a8ebc88e8ae2038501c03d42b4bb",
+      "files": {
+        "GET_STARTED.md": {
+          "bytes": 11728,
+          "primary_url": "https://github.com/nttcom/WASB-SBDT/blob/923462cacdeb3353b84ddebdedb3f4b7a8553b0f/GET_STARTED.md",
+          "sha256": "008b86e4d228054a9a268d499ec17e9fe16ff1978306b3c9393b0d2332837fc5"
+        },
+        "src/configs/dataset/tennis.yaml": {
+          "bytes": 429,
+          "primary_url": "https://github.com/nttcom/WASB-SBDT/blob/923462cacdeb3353b84ddebdedb3f4b7a8553b0f/src/configs/dataset/tennis.yaml",
+          "sha256": "6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d"
+        },
+        "src/datasets/tennis.py": {
+          "bytes": 12859,
+          "primary_url": "https://github.com/nttcom/WASB-SBDT/blob/923462cacdeb3353b84ddebdedb3f4b7a8553b0f/src/datasets/tennis.py",
+          "sha256": "ca9b099d3afe30a0f6719a77c0354996ee167ca3b4038d42e24e924d22a27fc4"
+        }
+      },
+      "limitations": [
+        "No new model download or training",
+        "Checkpoint identity from historical run receipt; local/remote actual pilot input hash must be verified before execution",
+        "game8/Clip6 is historical development footage, not an unseen confirmation sample",
+        "Public configuration is author-reported training provenance, not proof of all historic optimizer inputs"
+      ],
+      "retrieval": "GitHub contents API, pinned revision, 2026-11-01",
+      "revision": "923462cacdeb3353b84ddebdedb3f4b7a8553b0f",
+      "scope": "primary-author documented split and model-name mapping; not independent audit of checkpoint training logs",
+      "test_games": [
+        "game8",
+        "game9",
+        "game10"
+      ],
+      "train_games": [
+        "game1",
+        "game2",
+        "game3",
+        "game4",
+        "game5",
+        "game6",
+        "game7"
+      ]
+    },
+    "source_scope": "development subrange; not an independent clip",
+    "source_qualified": true,
+    "source_judge_scores": {
+      "balltrack": [
+        48,
+        48,
+        0,
+        0,
+        43,
+        47,
+        1,
+        0,
+        0.8958333333333334,
+        0.9791666666666666,
+        null
+      ],
+      "wasb": [
+        48,
+        48,
+        0,
+        0,
+        41,
+        42,
+        6,
+        0,
+        0.8541666666666666,
+        0.875,
+        null
+      ]
+    }
+  },
+  "curves": [
+    {
+      "metric": "full_LPIPS",
+      "candidate": [
+        [
+          47.805,
+          -0.09947797881232368
+        ],
+        [
+          121.15,
+          -0.03967623436892474
+        ],
+        [
+          319.565,
+          -0.01720338980356852
+        ],
+        [
+          456.36,
+          -0.011200667200265108
+        ],
+        [
+          320.885,
+          -0.017675128733670272
+        ],
+        [
+          172.105,
+          -0.035511545914190784
+        ]
+      ],
+      "anchor": [
+        [
+          46.41,
+          -0.10028751302648474
+        ],
+        [
+          119.69,
+          -0.0403518017133077
+        ],
+        [
+          317.93,
+          -0.017505533231629265
+        ],
+        [
+          454.745,
+          -0.011316529843542311
+        ],
+        [
+          319.395,
+          -0.018071918156411914
+        ],
+        [
+          170.73,
+          -0.03625400106112162
+        ]
+      ],
+      "discrete": false,
+      "accepted_hull_pchip_percent": 1.2158967864773622
+    },
+    {
+      "metric": "full_DISTS",
+      "candidate": [
+        [
+          47.805,
+          -0.1313506749769052
+        ],
+        [
+          121.15,
+          -0.06461359560489655
+        ],
+        [
+          319.565,
+          -0.029131857057412464
+        ],
+        [
+          456.36,
+          -0.01644969979921977
+        ],
+        [
+          320.885,
+          -0.024259258061647415
+        ],
+        [
+          172.105,
+          -0.04682602112491926
+        ]
+      ],
+      "anchor": [
+        [
+          46.41,
+          -0.131602231413126
+        ],
+        [
+          119.69,
+          -0.06475201870004337
+        ],
+        [
+          317.93,
+          -0.02918575828274091
+        ],
+        [
+          454.745,
+          -0.016462981700897217
+        ],
+        [
+          319.395,
+          -0.02431834116578102
+        ],
+        [
+          170.73,
+          -0.04694071287910143
+        ]
+      ],
+      "discrete": false,
+      "accepted_hull_pchip_percent": 3.2955660342142803
+    },
+    {
+      "metric": "ROI_LPIPS",
+      "candidate": [
+        [
+          47.805,
+          -0.05981800829370817
+        ],
+        [
+          121.15,
+          -0.038846419930147626
+        ],
+        [
+          319.565,
+          -0.023227279093892623
+        ],
+        [
+          456.36,
+          -0.015685431911454845
+        ],
+        [
+          320.885,
+          -0.023732683272100985
+        ],
+        [
+          172.105,
+          -0.03399983996253771
+        ]
+      ],
+      "anchor": [
+        [
+          46.41,
+          -0.16737684879141548
+        ],
+        [
+          119.69,
+          -0.1302118789559851
+        ],
+        [
+          317.93,
+          -0.06291747533638652
+        ],
+        [
+          454.745,
+          -0.03069898276589811
+        ],
+        [
+          319.395,
+          -0.07717762095853686
+        ],
+        [
+          170.73,
+          -0.12962630220378438
+        ]
+      ],
+      "discrete": false,
+      "accepted_hull_pchip_percent": -76.96525232176282
+    },
+    {
+      "metric": "ROI_DISTS",
+      "candidate": [
+        [
+          47.805,
+          -0.17405345166722933
+        ],
+        [
+          121.15,
+          -0.1414318767686685
+        ],
+        [
+          319.565,
+          -0.09967562183737755
+        ],
+        [
+          456.36,
+          -0.08360189447800319
+        ],
+        [
+          320.885,
+          -0.10048658897479375
+        ],
+        [
+          172.105,
+          -0.12543015430370966
+        ]
+      ],
+      "anchor": [
+        [
+          46.41,
+          -0.20818226163585982
+        ],
+        [
+          119.69,
+          -0.17574815700451532
+        ],
+        [
+          317.93,
+          -0.12021239350239436
+        ],
+        [
+          454.745,
+          -0.09374611700574557
+        ],
+        [
+          319.395,
+          -0.12851850812633833
+        ],
+        [
+          170.73,
+          -0.16389038413763046
+        ]
+      ],
+      "discrete": false,
+      "accepted_hull_pchip_percent": -44.439360050226675
+    },
+    {
+      "metric": "pooled_RGB_PSNR",
+      "candidate": [
+        [
+          47.805,
+          29.26568942910304
+        ],
+        [
+          121.15,
+          33.74934919666186
+        ],
+        [
+          319.565,
+          36.40195880285896
+        ],
+        [
+          456.36,
+          37.477247304678066
+        ],
+        [
+          320.885,
+          36.328831746686824
+        ],
+        [
+          172.105,
+          33.70746348853555
+        ]
+      ],
+      "anchor": [
+        [
+          46.41,
+          29.256190775402942
+        ],
+        [
+          119.69,
+          33.7296206891402
+        ],
+        [
+          317.93,
+          36.391054767337046
+        ],
+        [
+          454.745,
+          37.470961942644344
+        ],
+        [
+          319.395,
+          36.31114357210603
+        ],
+        [
+          170.73,
+          33.6845101556198
+        ]
+      ],
+      "discrete": false,
+      "accepted_hull_pchip_percent": 1.001812150948193
+    },
+    {
+      "metric": "WASB_recall10",
+      "candidate": [
+        [
+          47.805,
+          0.9166666666666666
+        ],
+        [
+          121.15,
+          0.9166666666666666
+        ],
+        [
+          319.565,
+          0.8333333333333334
+        ],
+        [
+          456.36,
+          0.875
+        ],
+        [
+          320.885,
+          0.9375
+        ],
+        [
+          172.105,
+          0.9375
+        ]
+      ],
+      "anchor": [
+        [
+          46.41,
+          0.0
+        ],
+        [
+          119.69,
+          0.14583333333333334
+        ],
+        [
+          317.93,
+          0.5625
+        ],
+        [
+          454.745,
+          0.7916666666666666
+        ],
+        [
+          319.395,
+          0.4375
+        ],
+        [
+          170.73,
+          0.10416666666666667
+        ]
+      ],
+      "discrete": true,
+      "accepted_hull_pchip_percent": null
+    },
+    {
+      "metric": "BallTrack_recall10_diagnostic",
+      "candidate": [
+        [
+          47.805,
+          0.9583333333333334
+        ],
+        [
+          121.15,
+          0.9791666666666666
+        ],
+        [
+          319.565,
+          0.9791666666666666
+        ],
+        [
+          456.36,
+          0.9791666666666666
+        ],
+        [
+          320.885,
+          0.9791666666666666
+        ],
+        [
+          172.105,
+          0.9791666666666666
+        ]
+      ],
+      "anchor": [
+        [
+          46.41,
+          0.0
+        ],
+        [
+          119.69,
+          0.1875
+        ],
+        [
+          317.93,
+          0.75
+        ],
+        [
+          454.745,
+          0.8958333333333334
+        ],
+        [
+          319.395,
+          0.4583333333333333
+        ],
+        [
+          170.73,
+          0.08333333333333333
+        ]
+      ],
+      "discrete": true,
+      "accepted_hull_pchip_percent": null
+    }
+  ],
+  "results": {
+    "full_LPIPS": {
+      "protocol": "anchor-geometry-sensitivity-v1",
+      "quality_orientation": "higher_is_better",
+      "physically_demonstrated_switching": false,
+      "candidate_pareto": [
+        [
+          47.805,
+          -0.09947797881232368
+        ],
+        [
+          121.15,
+          -0.03967623436892474
+        ],
+        [
+          172.105,
+          -0.035511545914190784
+        ],
+        [
+          319.565,
+          -0.01720338980356852
+        ],
+        [
+          456.36,
+          -0.011200667200265108
+        ]
+      ],
+      "anchor_pareto": [
+        [
+          46.41,
+          -0.10028751302648474
+        ],
+        [
+          119.69,
+          -0.0403518017133077
+        ],
+        [
+          170.73,
+          -0.03625400106112162
+        ],
+        [
+          317.93,
+          -0.017505533231629265
+        ],
+        [
+          454.745,
+          -0.011316529843542311
+        ]
+      ],
+      "anchor_linear_rate_hull": [
+        [
+          46.41,
+          -0.10028751302648474
+        ],
+        [
+          119.69,
+          -0.0403518017133077
+        ],
+        [
+          317.93,
+          -0.017505533231629265
+        ],
+        [
+          454.745,
+          -0.011316529843542311
+        ]
+      ],
+      "candidate_rate_support": [
+        47.805,
+        456.36
+      ],
+      "anchor_rate_support": [
+        46.41,
+        454.745
+      ],
+      "bd_rate": {
+        "hull_pchip": 0.012158967864773622,
+        "pareto_pchip": 0.0032016914678919695,
+        "hull_linear_rate": 0.009216813756997141
+      },
+      "status": "supported",
+      "common_quality_interval": [
+        -0.09947797881232368,
+        -0.011316529843542311
+      ]
+    },
+    "full_DISTS": {
+      "protocol": "anchor-geometry-sensitivity-v1",
+      "quality_orientation": "higher_is_better",
+      "physically_demonstrated_switching": false,
+      "candidate_pareto": [
+        [
+          47.805,
+          -0.1313506749769052
+        ],
+        [
+          121.15,
+          -0.06461359560489655
+        ],
+        [
+          172.105,
+          -0.04682602112491926
+        ],
+        [
+          319.565,
+          -0.029131857057412464
+        ],
+        [
+          320.885,
+          -0.024259258061647415
+        ],
+        [
+          456.36,
+          -0.01644969979921977
+        ]
+      ],
+      "anchor_pareto": [
+        [
+          46.41,
+          -0.131602231413126
+        ],
+        [
+          119.69,
+          -0.06475201870004337
+        ],
+        [
+          170.73,
+          -0.04694071287910143
+        ],
+        [
+          317.93,
+          -0.02918575828274091
+        ],
+        [
+          319.395,
+          -0.02431834116578102
+        ],
+        [
+          454.745,
+          -0.016462981700897217
+        ]
+      ],
+      "anchor_linear_rate_hull": [
+        [
+          46.41,
+          -0.131602231413126
+        ],
+        [
+          119.69,
+          -0.06475201870004337
+        ],
+        [
+          170.73,
+          -0.04694071287910143
+        ],
+        [
+          319.395,
+          -0.02431834116578102
+        ],
+        [
+          454.745,
+          -0.016462981700897217
+        ]
+      ],
+      "candidate_rate_support": [
+        47.805,
+        456.36
+      ],
+      "anchor_rate_support": [
+        46.41,
+        454.745
+      ],
+      "bd_rate": {
+        "hull_pchip": 0.032955660342142805,
+        "pareto_pchip": 0.012638580843858617,
+        "hull_linear_rate": 0.022507556357961617
+      },
+      "status": "supported",
+      "common_quality_interval": [
+        -0.1313506749769052,
+        -0.016462981700897217
+      ]
+    },
+    "ROI_LPIPS": {
+      "protocol": "anchor-geometry-sensitivity-v1",
+      "quality_orientation": "higher_is_better",
+      "physically_demonstrated_switching": false,
+      "candidate_pareto": [
+        [
+          47.805,
+          -0.05981800829370817
+        ],
+        [
+          121.15,
+          -0.038846419930147626
+        ],
+        [
+          172.105,
+          -0.03399983996253771
+        ],
+        [
+          319.565,
+          -0.023227279093892623
+        ],
+        [
+          456.36,
+          -0.015685431911454845
+        ]
+      ],
+      "anchor_pareto": [
+        [
+          46.41,
+          -0.16737684879141548
+        ],
+        [
+          119.69,
+          -0.1302118789559851
+        ],
+        [
+          170.73,
+          -0.12962630220378438
+        ],
+        [
+          317.93,
+          -0.06291747533638652
+        ],
+        [
+          454.745,
+          -0.03069898276589811
+        ]
+      ],
+      "anchor_linear_rate_hull": [
+        [
+          46.41,
+          -0.16737684879141548
+        ],
+        [
+          119.69,
+          -0.1302118789559851
+        ],
+        [
+          317.93,
+          -0.06291747533638652
+        ],
+        [
+          454.745,
+          -0.03069898276589811
+        ]
+      ],
+      "candidate_rate_support": [
+        47.805,
+        456.36
+      ],
+      "anchor_rate_support": [
+        46.41,
+        454.745
+      ],
+      "bd_rate": {
+        "hull_pchip": -0.7696525232176281,
+        "pareto_pchip": -0.7670874341957239,
+        "hull_linear_rate": -0.7463151767675382
+      },
+      "status": "supported",
+      "common_quality_interval": [
+        -0.05981800829370817,
+        -0.03069898276589811
+      ]
+    },
+    "ROI_DISTS": {
+      "protocol": "anchor-geometry-sensitivity-v1",
+      "quality_orientation": "higher_is_better",
+      "physically_demonstrated_switching": false,
+      "candidate_pareto": [
+        [
+          47.805,
+          -0.17405345166722933
+        ],
+        [
+          121.15,
+          -0.1414318767686685
+        ],
+        [
+          172.105,
+          -0.12543015430370966
+        ],
+        [
+          319.565,
+          -0.09967562183737755
+        ],
+        [
+          456.36,
+          -0.08360189447800319
+        ]
+      ],
+      "anchor_pareto": [
+        [
+          46.41,
+          -0.20818226163585982
+        ],
+        [
+          119.69,
+          -0.17574815700451532
+        ],
+        [
+          170.73,
+          -0.16389038413763046
+        ],
+        [
+          317.93,
+          -0.12021239350239436
+        ],
+        [
+          454.745,
+          -0.09374611700574557
+        ]
+      ],
+      "anchor_linear_rate_hull": [
+        [
+          46.41,
+          -0.20818226163585982
+        ],
+        [
+          119.69,
+          -0.17574815700451532
+        ],
+        [
+          317.93,
+          -0.12021239350239436
+        ],
+        [
+          454.745,
+          -0.09374611700574557
+        ]
+      ],
+      "candidate_rate_support": [
+        47.805,
+        456.36
+      ],
+      "anchor_rate_support": [
+        46.41,
+        454.745
+      ],
+      "bd_rate": {
+        "hull_pchip": -0.4443936005022668,
+        "pareto_pchip": -0.46625631280824853,
+        "hull_linear_rate": -0.44432291513035865
+      },
+      "status": "supported",
+      "common_quality_interval": [
+        -0.17405345166722933,
+        -0.09374611700574557
+      ]
+    },
+    "pooled_RGB_PSNR": {
+      "protocol": "anchor-geometry-sensitivity-v1",
+      "quality_orientation": "higher_is_better",
+      "physically_demonstrated_switching": false,
+      "candidate_pareto": [
+        [
+          47.805,
+          29.26568942910304
+        ],
+        [
+          121.15,
+          33.74934919666186
+        ],
+        [
+          319.565,
+          36.40195880285896
+        ],
+        [
+          456.36,
+          37.477247304678066
+        ]
+      ],
+      "anchor_pareto": [
+        [
+          46.41,
+          29.256190775402942
+        ],
+        [
+          119.69,
+          33.7296206891402
+        ],
+        [
+          317.93,
+          36.391054767337046
+        ],
+        [
+          454.745,
+          37.470961942644344
+        ]
+      ],
+      "anchor_linear_rate_hull": [
+        [
+          46.41,
+          29.256190775402942
+        ],
+        [
+          119.69,
+          33.7296206891402
+        ],
+        [
+          317.93,
+          36.391054767337046
+        ],
+        [
+          454.745,
+          37.470961942644344
+        ]
+      ],
+      "candidate_rate_support": [
+        47.805,
+        456.36
+      ],
+      "anchor_rate_support": [
+        46.41,
+        454.745
+      ],
+      "bd_rate": {
+        "hull_pchip": 0.01001812150948193,
+        "pareto_pchip": 0.01001812150948193,
+        "hull_linear_rate": 0.009097703436203308
+      },
+      "status": "supported",
+      "common_quality_interval": [
+        29.26568942910304,
+        37.470961942644344
+      ]
+    },
+    "WASB_recall10": {
+      "protocol": "anchor-geometry-sensitivity-v1",
+      "quality_orientation": "higher_is_better",
+      "physically_demonstrated_switching": false,
+      "candidate_pareto": [
+        [
+          47.805,
+          0.9166666666666666
+        ],
+        [
+          172.105,
+          0.9375
+        ]
+      ],
+      "anchor_pareto": [
+        [
+          46.41,
+          0.0
+        ],
+        [
+          119.69,
+          0.14583333333333334
+        ],
+        [
+          317.93,
+          0.5625
+        ],
+        [
+          454.745,
+          0.7916666666666666
+        ]
+      ],
+      "anchor_linear_rate_hull": [
+        [
+          46.41,
+          0.0
+        ],
+        [
+          317.93,
+          0.5625
+        ],
+        [
+          454.745,
+          0.7916666666666666
+        ]
+      ],
+      "candidate_rate_support": [
+        47.805,
+        456.36
+      ],
+      "anchor_rate_support": [
+        46.41,
+        454.745
+      ],
+      "bd_rate": {
+        "hull_pchip": null,
+        "pareto_pchip": null,
+        "hull_linear_rate": null
+      },
+      "status": "discrete_unsupported",
+      "common_quality_interval": null
+    },
+    "BallTrack_recall10_diagnostic": {
+      "protocol": "anchor-geometry-sensitivity-v1",
+      "quality_orientation": "higher_is_better",
+      "physically_demonstrated_switching": false,
+      "candidate_pareto": [
+        [
+          47.805,
+          0.9583333333333334
+        ],
+        [
+          121.15,
+          0.9791666666666666
+        ]
+      ],
+      "anchor_pareto": [
+        [
+          46.41,
+          0.0
+        ],
+        [
+          119.69,
+          0.1875
+        ],
+        [
+          317.93,
+          0.75
+        ],
+        [
+          454.745,
+          0.8958333333333334
+        ]
+      ],
+      "anchor_linear_rate_hull": [
+        [
+          46.41,
+          0.0
+        ],
+        [
+          317.93,
+          0.75
+        ],
+        [
+          454.745,
+          0.8958333333333334
+        ]
+      ],
+      "candidate_rate_support": [
+        47.805,
+        456.36
+      ],
+      "anchor_rate_support": [
+        46.41,
+        454.745
+      ],
+      "bd_rate": {
+        "hull_pchip": null,
+        "pareto_pchip": null,
+        "hull_linear_rate": null
+      },
+      "status": "discrete_unsupported",
+      "common_quality_interval": null
+    }
+  },
+  "software": {
+    "scipy": "1.18.1",
+    "evaluation_sha256": "48048582f377bfc7c4d4e1138aac2664083880e59fdcf50b00075dac005398c2",
+    "cli_sha256": "fbe66b719c5548a2a45924ff860cd259fb2eb940bf9801d5b6a5cc88238bf780"
+  },
+  "new_codec_or_scoring_execution": false,
+  "interpretation": "Constructed reference sensitivity only; not physical switching or new independent footage."
+}
