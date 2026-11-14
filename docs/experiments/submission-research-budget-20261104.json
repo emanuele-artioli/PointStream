@@ -3414,6 +3414,34 @@
       "cpu_seconds": 30,
       "gpu_seconds": 0,
       "basis": "Prospective local-only builder20/independent6/ROOT4, unchangedSVT80 target card; no remoteconstructor or GPU until586actualacceptance and fullgates"
+    },
+    {
+      "phase": "ball-targeted-absence80-archive-recipe3-20261114",
+      "workstream": "ball",
+      "cpu_seconds": 3,
+      "gpu_seconds": 0,
+      "basis": "Prospective local-only archive30 adaptation builder3 fromexisting80 archive30 slot; actualpacking/publication future27; source unchanged no network/model/GPU"
+    },
+    {
+      "phase": "ball-targeted-absence80-archive-review3-20261114",
+      "workstream": "ball",
+      "cpu_seconds": 3,
+      "gpu_seconds": 0,
+      "basis": "ROOT released independent3 fromarchiveverify5 beforelocalreview. Repartition3 fromphase contingency120->117 restores futureverify5. Archive total33, sameparent1893; independent report21d005a0. No network/GPU."
+    },
+    {
+      "phase": "ball-targeted-absence80-metadata30-20261114",
+      "workstream": "ball",
+      "cpu_seconds": 30,
+      "gpu_seconds": 0,
+      "basis": "ROOTprospectiveONE metadataonly source4282 constructor/normalizer, exactactual586proof/gates/full1893fit; no GPUrelease, preserveUNKNOWN state no replay"
+    },
+    {
+      "phase": "ball-targeted-absence80-metadata-binding-replacement30-20261114",
+      "workstream": "ball",
+      "cpu_seconds": 30,
+      "gpu_seconds": 0,
+      "basis": "Prospective30 fromphasecontingency117->87, inclusive1893 unchanged. Original35043 STOP before firstmkdir/helperline29 on ROOTscratchprefix. No inference/GPU. Freshcorrectbinding/nonce/clock, no helper or sourcechange."
     }
   ],
   "reservations": [
@@ -4192,13 +4220,17 @@
     {
       "phase": "ball-study4282-targeted-absence80-20261114",
       "workstream": "ball",
-      "cpu_seconds": 1863,
+      "cpu_seconds": 1797,
       "gpu_seconds": 1175,
-      "status": "RESERVED conditional sourceunchanged target80; firstlocal30 onlyreleased. No metadata/runtime/GPU before586acceptance+completefit",
+      "status": "RESERVED conditional target80; local readiness30/archivebuilder3/archivereview3 charged; no metadata/runtime/GPU released",
       "card": "docs/cards/k5d-targeted-absence80-2026-11-14.md",
       "total_phase_CPU": 1893,
       "total_phase_GPU": 1175,
-      "already_charged_readiness_CPU": 30
+      "already_charged_readiness_CPU": 30,
+      "archive_recipe_CPU_charged": 3,
+      "archive_independent_review_CPU_charged": 3,
+      "metadata_CPU_charged": 30,
+      "metadata_replacement_CPU_charged": 30
     }
   ],
   "jobs": [
@@ -7508,7 +7540,7 @@
       "job_id": "20261113T235001Z-efa7e3e5",
       "workstream": "ball",
       "phase": "ball-study4282-confirmation586-20261113",
-      "status": "PUBLISHED pending canonicalstatus",
+      "status": "COMPLETE gatePASS exit0; ROOTphysicalaccepted5114e66c; terminal+stall ACKclosed; metrics/archivepending",
       "source_sha256": "e4d4a856a06c5f9a06586056ab4a30f0c73b232e5a3db035ae6eb5546063f80b",
       "snapshot_sha256": "f813e09d2fa0eb51b5ec160dcda0cd230d3dada7be697882f9b657201490e61d",
       "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
@@ -8318,7 +8350,7 @@
     "unused_never_released_CPU": 10
   },
   "confirmation586_readiness_current": {
-    "state": "Full3033CPU2420GPU charged; actual20261113T235001Z-efa7e3e5 canonicalRUNNING; admissionevents read; ONEwait notstarted",
+    "state": "CLOSED actual586 physical+scientific ROOTaccepted, terminal+stall ACKclosed, immutablearchiveba818a7c; sourcefailures/harms/limits retained",
     "scope": "game10/Clip12/586=581visible5abs; differentfrom292game9Clip5; source4282e4d4/f813/env32/config4fa; requiresactualcomplete1.5cost/storage/audit/identitygates",
     "prospective_CPU_ceiling": 3033,
     "prospective_GPU_ceiling": 2420,
@@ -8451,12 +8483,12 @@
       "release_sha256": "55a780f656857a0823714d4207c7b1dac8902b19339d8da65acb572d99921f05",
       "deadline": "2026-11-14T00:41:35.619983+00:00",
       "job_id": "20261113T235001Z-efa7e3e5",
-      "canonical_status": "running",
+      "canonical_status": "complete",
       "status_backend": 71075,
       "events_backend": 94378
     },
     "sole_wait": {
-      "state": "CLOSED attention CLI10; fullstage running; no secondwait",
+      "state": "CLOSED CLI10 genericstallattention; later canonicalterminalcomplete/gatePASS/exit0 and ACKclosed",
       "backend": 73024,
       "output": "/private/tmp/pointstream-SVT586-runtime-ROOT-20261113/actual-wait330",
       "max_seconds": 2400,
@@ -8472,19 +8504,123 @@
       "state": "Prospective within already fullycharged586 ceiling; actualdigest/analysis require ROOTphysicalacceptance and exact newrelease",
       "metric_digest_inclusive_CPU": 20,
       "analysis_inclusive_CPU": 10,
-      "failure_remaining_CPU": 10,
+      "failure_remaining_CPU": 0,
       "GPU": 0,
       "no_new_allocation": true,
-      "raw_stays_server_SSD": true
+      "raw_stays_server_SSD": true,
+      "one_shot_local_failure_CPU": 2,
+      "terminal_events_CPU": 6,
+      "analysis_binding_replacement_CPU": 2
     },
     "one_shot_terminal_status": {
       "backend": 54073,
       "PID": 31150,
-      "state": "ONE_SLEEP_IN_FLIGHT no RPCbeforetarget; exec samePID tocanonicalstatus6",
+      "state": "CLOSED localfailure BEFOREanyRPC; post-sleep wall-clockassert failed, status outputabsent; actualstatus6 unconsumed",
       "target_UTC": "2026-11-14T00:29:00+00:00",
       "case": "/private/tmp/pointstream-SVT586-efa7-terminal-status6-ROOT-20261113",
       "CPU_basis": "Existing audit120 terminalstatus6, samePIDexec parent2/SSH2/remote2; no newcost or wait",
-      "model_completion_resume_verified": false
+      "model_completion_resume_verified": false,
+      "root_decision": "Expectedtarget nowpassed; release ONE directcanonicalstatus6 replacement, no sleep/no newwait/no replay",
+      "local_failure_CPU_from_prepaid40": 2
+    },
+    "terminal_status": {
+      "backend": 14865,
+      "status": "complete",
+      "gate_PASS": true,
+      "exit_code": 0,
+      "sha256": "1dab74ba5ae579f87e966d8a012a966bc1fa0bcf1debcd84a7aef5bb9eabb27e"
+    },
+    "actual_audit": {
+      "state": "CLOSED0 ROOTphysicalaccepted/independentPASS",
+      "case": "/private/tmp/pointstream-SVT586-efa7-actual-audit120-ROOT-20261114",
+      "contract_sha256": "7511c82338b688eaf2cf27034f123806d2393c9a363be41b48ee730e0b146afd",
+      "release_sha256": "313f0327be8177c688c3355f04ad8493daf72e54ebf5cf874f9283c822ee1966",
+      "CPU_already_charged": 120,
+      "GPU": 0,
+      "backend": 39229,
+      "ROOT_proof": "/private/tmp/pointstream-SVT586-efa7-actual-audit120-ROOT-20261114/actual-ROOT-once/ROOT-accepted-confirmation586.json",
+      "ROOT_proof_sha256": "5114e66c6cf092c3fb97e19afe5c566ba9d14d76cfdc560c722def3794d81772",
+      "independent_review_sha256": "634317d62b9265ed4f6a5449f8fc15c39a4eea8111bc51fca4fe2267f9f221b7"
+    },
+    "canonical_refresh_before_digest": {
+      "CPU": 6,
+      "source": "Within prepaid audit120 unused execution headroom; complete prior tree17.38614CPU, no increase to3033",
+      "state": "CLOSED0 complete/gatePASS/exit0"
+    },
+    "ACKs": {
+      "terminal": {
+        "state": "CLOSED",
+        "path": "/private/tmp/pointstream-SVT586-runtime-ROOT-20261113/actual-ack-terminal/stdout.json",
+        "sha256": "473b258122194210fa602e0d50f02bd414ad346845a8bcd8739bde986231bfa7"
+      },
+      "stall": {
+        "state": "CLOSED",
+        "path": "/private/tmp/pointstream-SVT586-runtime-ROOT-20261113/actual-ack/stdout.json",
+        "sha256": "d2a22bf882d9023b0bce322e7295d65104d46def9b6cc9ef3361e73dd699d7df"
+      }
+    },
+    "metric_digest": {
+      "state": "CLOSED0 ROOTdigestaccepted85854de7",
+      "backend": 68932,
+      "case": "/private/tmp/pointstream-SVT586-digest20-actual-bound-UNSIGNED-20261114",
+      "release_sha256": "68898d2eb103ec3d7d1b14c06e7195dd7d9e5f0dbc068ad19c4b43d002ab7614",
+      "CPU_already_charged": 20,
+      "GPU": 0,
+      "sha256": "2b24792b15735428e9a1c706d180c6275f6db3749a68055d2b4ca6ac2834e2fa"
+    },
+    "analysis": {
+      "state": "CLOSED ROOTaccepted",
+      "ROOT_sha256": "337ce3a5bde90f8aab5e89bcedb4fdf5b8f29bf0c0b3617681553778b4cbeece",
+      "independent_report_sha256": "8f3488e96e72c80a7bec5dcb61525fedcadd0cead376f92535ae294a156469fe",
+      "case": "/private/tmp/pointstream-SVT586-analysis10-ACTUAL-v2-ROOT-20261114",
+      "tables": 54,
+      "threshold_frame_rows": 7032,
+      "unique_frame_point_judge": 3516,
+      "full_LPIPS_BD_percent": -2.144272419132426,
+      "full_DISTS_BD_percent": 0.8338437180009977,
+      "pooled_RGB_PSNR_BD_percent": 0.440727816507354,
+      "ROI_LPIPS_BD_percent": -65.67371127066734,
+      "ROI_DISTS_BD_percent": -46.13151186697467,
+      "task_BD": null,
+      "WASB10_rescue_harm": [
+        [
+          31,
+          2
+        ],
+        [
+          176,
+          1
+        ],
+        [
+          465,
+          1
+        ]
+      ],
+      "WASB_absent_baseline_streak": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "absent_frames": 5
+    },
+    "actual_archive": {
+      "state": "CLOSED0 immutable fullreadback PASS file0444dir0555",
+      "backend": 47128,
+      "case": "/private/tmp/pointstream-SVT586-efa7-archive-BOUND-ROOT-20261114",
+      "release_sha256": "75aac990e37d7c28375078b87ba09ec9040ce6884afd8cb15837f0881dc7ae2a",
+      "archive_sha256": "ba818a7c985620d0ae0cabf899850a6426c305350ae421dc86743bed8f74cebe",
+      "bytes": 26493775,
+      "members": 299,
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-study4282-confirmation586-ba818a7c985620d0ae0cabf8/qualification.tar.gz"
     }
   },
   "targeted_absence_feasibility_current": {
@@ -8497,7 +8633,7 @@
     "root_decision": "Do not build new neural qualification infrastructure on unproven completefit; prefer prespecified source-unchanged SVT80 absence test if586 accepted. Historical cap1.5 screen is not physical impossibility proof."
   },
   "targeted_absence80_current": {
-    "state": "LOCAL_READINESS30_RELEASED,1863CPU1175GPU held; no actualconstructor/GPU",
+    "state": "FirstmetadataSTOP ROOTscratchprefix beforewrites; replacement30prospectivelycharged/newbindingpending;1797CPU1175GPUheld; GPU NOTreleased",
     "source_unchanged": true,
     "frames": 80,
     "visible": 39,
@@ -8518,6 +8654,39 @@
       "ROOT_conditional_sha256": "ba7d2347c72c827cc0ba581bcb7e02dd230442dece6fa4cadc941e1aa1929fb0",
       "independent_review_sha256": "eb85804b7bf366651626be766b3736a580b6ed8dc126e70b0d7b8b22f0c613cf",
       "source_unchanged": true
+    },
+    "archive33_partition_CPU": {
+      "builder": 3,
+      "independent_recipe_review": 3,
+      "pack": 5,
+      "whole_verify": 5,
+      "upload_local": 3,
+      "SSH": 3,
+      "remote": 6,
+      "ROOT_review": 3,
+      "reserve": 2
+    },
+    "phase_contingency_CPU": 87,
+    "operative_archive": {
+      "case": "/private/tmp/pointstream-SVT80-archive30-FALSE-20261114",
+      "manifest_sha256": "0b22e5186b23e89635f2dd75394bed91118acc319fc792d960cda2cf14556cea",
+      "independent_review_sha256": "21d005a012ca76211ca99b3aec0d6ff366f3dc9ff6dbc549e717f57143a56a3c",
+      "state": "Independent conditionalGO; ROOT actualbindings/pack/release future"
+    },
+    "actual_metadata": {
+      "state": "STOP before writes: ROOTscratchprefix svt80- rejected by required study4282-spec-; no constructor/GPU",
+      "case": "/private/tmp/pointstream-SVT80-ROOT-metadata-20261114",
+      "binding_sha256": "b0d1a63dce672eb0fb583c54f576b8acd8e334dd9c9ba6e2a1f1c99744a8af95",
+      "deadline": "2026-11-14T01:46:05.464449+00:00",
+      "CPU": 30,
+      "GPU": 0,
+      "backend": 35043,
+      "contract_sha256": "c02df279b45c451e94ed676f956e1bb4eb1702d71e50e2d219c11188fa39c4e4"
+    },
+    "metadata_replacement30": {
+      "state": "PROSPECTIVE RELEASE30 fromcontingency117->87, same1893",
+      "reason": "exacthelpers unchanged; ROOTbindingprefix corrected, newcase/clock mandatory",
+      "GPU": 0
     }
   }
 }

@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "ROOT_accepted": true,
+  "state": "CLOSED_PHYSICAL_AND_ANALYSIS_ACK_CLOSED_IMMUTABLY_ARCHIVED",
+  "job_id": "20261113T235001Z-efa7e3e5",
+  "source_revision": "4282c96f8aaf7d229f53df4c1c5f8225d8454d6e",
+  "execution_identity": {
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "snapshot_sha256": "f813e09d2fa0eb51b5ec160dcda0cd230d3dada7be697882f9b657201490e61d",
+    "source_sha256": "e4d4a856a06c5f9a06586056ab4a30f0c73b232e5a3db035ae6eb5546063f80b"
+  },
+  "spec_sha256": "a01aec570db3e54139f92d4dc8248cd5602d0bc2c557dcea2df1348b5d475a32",
+  "gpu_uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+  "GPU": "RTX 6000 Ada Generation gpu6/index1 shared",
+  "scope": {
+    "stage": "confirmation586",
+    "clip": "tracknet/game10/Clip12",
+    "frames": 586,
+    "visible": 581,
+    "absent": 5,
+    "excluded": 0,
+    "retrospective": true,
+    "heldout": false
+  },
+  "physical_ROOT_proof": {
+    "path": "/private/tmp/pointstream-SVT586-efa7-actual-audit120-ROOT-20261114/actual-ROOT-once/ROOT-accepted-confirmation586.json",
+    "sha256": "5114e66c6cf092c3fb97e19afe5c566ba9d14d76cfdc560c722def3794d81772"
+  },
+  "physical_independent_review_sha256": "634317d62b9265ed4f6a5449f8fc15c39a4eea8111bc51fca4fe2267f9f221b7",
+  "digest": {
+    "sha256": "2b24792b15735428e9a1c706d180c6275f6db3749a68055d2b4ca6ac2834e2fa",
+    "ROOT_sha256": "85854de722bd7484f2d59f7e9c84a9fa84c030a284ed49048ab5f8b073230cf2"
+  },
+  "analysis": {
+    "state": "CLOSED ROOTaccepted",
+    "ROOT_sha256": "337ce3a5bde90f8aab5e89bcedb4fdf5b8f29bf0c0b3617681553778b4cbeece",
+    "independent_report_sha256": "8f3488e96e72c80a7bec5dcb61525fedcadd0cead376f92535ae294a156469fe",
+    "case": "/private/tmp/pointstream-SVT586-analysis10-ACTUAL-v2-ROOT-20261114",
+    "tables": 54,
+    "threshold_frame_rows": 7032,
+    "unique_frame_point_judge": 3516,
+    "full_LPIPS_BD_percent": -2.144272419132426,
+    "full_DISTS_BD_percent": 0.8338437180009977,
+    "pooled_RGB_PSNR_BD_percent": 0.440727816507354,
+    "ROI_LPIPS_BD_percent": -65.67371127066734,
+    "ROI_DISTS_BD_percent": -46.13151186697467,
+    "task_BD": null,
+    "WASB10_rescue_harm": [
+      [
+        31,
+        2
+      ],
+      [
+        176,
+        1
+      ],
+      [
+        465,
+        1
+      ]
+    ],
+    "WASB_absent_baseline_streak": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        3,
+        3
+      ]
+    ],
+    "absent_frames": 5
+  },
+  "ACKs": {
+    "terminal": {
+      "state": "CLOSED",
+      "path": "/private/tmp/pointstream-SVT586-runtime-ROOT-20261113/actual-ack-terminal/stdout.json",
+      "sha256": "473b258122194210fa602e0d50f02bd414ad346845a8bcd8739bde986231bfa7"
+    },
+    "stall": {
+      "state": "CLOSED",
+      "path": "/private/tmp/pointstream-SVT586-runtime-ROOT-20261113/actual-ack/stdout.json",
+      "sha256": "d2a22bf882d9023b0bce322e7295d65104d46def9b6cc9ef3361e73dd699d7df"
+    }
+  },
+  "archive": {
+    "state": "CLOSED0 immutable fullreadback PASS file0444dir0555",
+    "backend": 47128,
+    "case": "/private/tmp/pointstream-SVT586-efa7-archive-BOUND-ROOT-20261114",
+    "release_sha256": "75aac990e37d7c28375078b87ba09ec9040ce6884afd8cb15837f0881dc7ae2a",
+    "archive_sha256": "ba818a7c985620d0ae0cabf899850a6426c305350ae421dc86743bed8f74cebe",
+    "bytes": 26493775,
+    "members": 299,
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-study4282-confirmation586-ba818a7c985620d0ae0cabf8/qualification.tar.gz"
+  },
+  "raw_reference_only": {
+    "path": "/local/users/emanuele/pointstream/metadata-prep/svt586-audit-222c9cfffaf64c729e3d1630bb745381/raw-audit.json",
+    "bytes": 205209313,
+    "sha256": "511ae3a1ee517474ef786fe04a67ac9548a19b0eb64a1f7c47b98a0741da6536",
+    "gzip_bytes": 22906928,
+    "gzip_sha256": "47b864120390f2a3402e8aabe4bbbf25bec3a517f7b9dce940ee36372f1987c4"
+  },
+  "physical_checks": [
+    "smoke16strictownAda reference; full586NOgold",
+    "botharms/fullROI/bothjudges/nativePSBL/pixelSHA",
+    "sixactualCPUreceivercontexts/twelveliteralnativepacketpairs",
+    "allsource/control/input/device joins andcurrentcleanup"
+  ],
+  "cost_scope": {
+    "CPU_phase_charged": 3033,
+    "GPU_phase_charged": 2420,
+    "full_command_wall_seconds": 796.4480278491974,
+    "full_command_CPU_established": false,
+    "speed_claim": false,
+    "audit_tree_CPU_seconds": 17.38614,
+    "audit_nested_counters_not_added": true
+  },
+  "limits": [
+    "One retrospective Clip12; only5absent, no absencequalification/population/neural claim.",
+    "Original pooledsource10/197falsealarmgate remainsfailed.",
+    "WASB10rescues coexist with2/1/1harms; lowerthresholdharms retained.",
+    "SmallfullDISTS/PSNRratepenalties retained beside ROIgains.",
+    "Nativebytesdefineachievableanchor; zero-ballPSBLoverheadablationonly.",
+    "Both taskcurves lackvalidBDsupport."
+  ],
+  "failure_provenance": [
+    "auditv1raw/canonicalhashcollisionfixedinpreservedv2",
+    "originaldigestmemberskeycorrectedphysical_membersbeforeactual",
+    "one-shotfailedlocallybeforeRPC; laterdirectcanonicalstatuspassed",
+    "firstanalysisNULLphysicalproofbindingSTOP; exacthelperreboundandpassed; allchargesretained"
+  ]
+}

@@ -2262,3 +2262,30 @@ Canonical status71075 is RUNNING; admissionevents94378 retained. Solewait330 pen
 Sole canonical completionwait330 backend73024 IN_FLIGHT from23:52:40.940776UTC, outerdeadline2026-11-14T00:34:00.940776UTC/max2400/outer2480. Handle+PID receipt `actual-wait330/runner-backend-handle.json`; rootdelegatedqueue_binding_designownscommand. No secondwait. Nativecompletionmodelresume unverified.
 
 Solewait73024 CLOSED attention CLI10 after615.648s/20SSH. Latest canonical saved-status10 shows fullstage running and smoke gatePASS including originalquality and fresh586wholecost. Genericstall367b889ffc37555e9447862fdcd359d5 after600s without completed-item progress is not terminal or proof of hang; fullcommand cap1750s. No restart or ACK. ONEself-expiring terminalstatus6 backend54073/PID31150 sleeps once to2026-11-14T00:29:00UTC (campaign cap+tail), then execs canonicalstatus in samePID. Existingaudit120 status6 allowance reused, no secondwait/newcost/RPCbeforetarget. Handlecase `/private/tmp/pointstream-SVT586-efa7-terminal-status6-ROOT-20261113`.
+
+One-shot54073 failed locally after sleep BEFOREcanonicalhelper exec/RPC: strictwallclockassert failed; actual-status6 absent. Failure receipt preserved. ROOT at00:29:09UTC (targetpassed) releases ONE directcanonicalstatus6 replacement withoutsleep; priorlocal2 conservativelychargedinsideprepaidfailure40 (failure10→8), existingauditstatus6 remains available. No resubmission/newwait/unknownRPC replay.
+
+Fresh directstatus14865 COMPLETE0/gatePASS/remoteexit0; SHA1dab74ba..., no campaignerror. ROOTbinds exactactualterminal/source/spec/control/beforecontext forONEaudit120 at `/private/tmp/pointstream-SVT586-efa7-actual-audit120-ROOT-20261114`. No scientific acceptance yet.
+
+
+### 2026-11-14 — 586 physical acceptance, exact ACKs closed
+
+Actual20261113T235001Z-efa7e3e5 is COMPLETE/gatePASS/exit0 and ROOTphysicalaccepted5114e66c after audit39229/independent634317d6. All586 (581visible5absent) retained metric/judge arrays, real native/PSBL/CPUdecoder pixels, source/identity/control/currentcleanup joins pass. Fullcommandwall796.448028s is scoped metadata, not comparative speed or full CPU. Raw205209313B/511ae3a1 stays serverSSD; gzip22906928B/47b86412 authenticated onMac. Full waited audit tree17.38614CPU includes collector/decompression/verifier; nested counters are not added. Original summary's calibration prose is superseded by ROOT scope: Clip12 differs from saved292 Clip5 but is retrospective, not heldout.
+
+Exact terminal11a13fea5ab3596fa2ef32e0c2c5aebe and prior stall367b889ffc37555e9447862fdcd359d5 ACKs closed once locally, separate canonical receipts under runtime actual-ack-terminal/actual-ack. No secondwait or GPU replay. Before further fleet action ROOT prospectively allocates freshcanonicalstatus6 within unused prepaid audit120 execution headroom; no3033/2420 increase. Metric20 original collector-schema mismatch members->physical_members is fixed in immutableFALSEv2, all other extractor bytes unchanged, actual record fixtures pass; no remote extraction yet.
+
+Target80 archive recipe independent21d005a0 conditionalGO. Review3 was released fromarchiveverify5 before review; ROOT shifts3 fromphasecontingency120->117 to restore futureverify5, archive33 total/parent1893 unchanged. Total local36charged,1857CPU1175GPU held; source/gates/actualmetadata/publication remain unreleased.
+
+Freshcanonicalstatus32628 COMPLETE0 againcomplete/gatePASS/exit0. ONEactualdigest20 backend68932 IN_FLIGHT, exactrelease68898d2e at /private/tmp/pointstream-SVT586-digest20-actual-bound-UNSIGNED-20261114; server12/SSH2/local2, noGPU/models/native or retry. Preservehandle beforewait.
+
+Actualdigest68932 COMPLETE0/allhashesPASS/ROOT85854de7,1361289B SHA2b24792b. Firstlocalanalysis stopped on ROOT binding omission (physical_ROOT_acceptance_sha256 leftNULL); no helper/GPU error, preservedfailure. Exactsamehelper newcontractv2 bindsactual5114proof; ROOTprospectively allocates replacement2CPU fromlastfailure2 inside3033 (failure40 nowfullyassigned), no science/source/rulechange.
+
+ROOT80conditionalwholeforecast1893/1175 accepted; originalquality/source/stock/currentGPU gates retained. ONEactualmetadata30 released prospectively at /private/tmp/pointstream-SVT80-ROOT-metadata-20261114, deadline2026-11-14T01:46:05.464449+00:00,1827CPU1175GPUheld. NoGPU/job release. Actual586proof5114 bound, source25/39/pooled10/197 failure unchanged.
+
+ONE80metadata backend35043 IN_FLIGHT, contractc02df279, sourceconstructor/normalizeronly/30CPU0GPU. Actualcase /private/tmp/pointstream-SVT80-ROOT-metadata-20261114/case/actual-ONE; no replay or GPUrelease.
+
+80metadata35043 STOP beforefirstwrite/constructor/helperline29: ROOTscratchname svt80- mismatched requiredstudy4282-spec-. Original30charged/receipts preserved, no inference/GPU or unknownsubmission. Prospective replacement30 fromphasecontingency117->87 within1893,1797CPU1175GPUheld; exacthelper unchanged/newbinding+clock beforeONEreplacement.
+
+586analysisROOT337ce3a5/independent8f3488e9 accepts all54tables/7032thresholdrows/3516unique and7PCHIPcomparisons: fullLPIPS−2.144272%,DISTS+0.833844%,pooledRGBPSNR+0.440728%; ROILPIPS−65.673711%,ROIDISTS−46.131512%; taskBDnone. WASB10rescue/harm31/2,176/1,465/1; absent0→0,0→0,3→3 of5. Fiveabsent insufficientqualification; allharms/pooled10/197fail retained. Pack+exact299memberverifyPASS,26493775B/ba818a7c; actualsizeuploadforecasts1.076/.671/.536CPU fit3/3/6. ONEimmutablepublication backend47128 IN_FLIGHT/release75aac990, no replay.
+
+586immutablearchive47128 COMPLETE0/fullSHAreadbackPASS0444/0555,299members26493775B SHAba818a7c985620d0ae0cabf899850a6426c305350ae421dc86743bed8f74cebe. [Thinacceptanceindex](k5d-inputs/svt-study4282-efa7e3e5-confirmation586-root-acceptance-20261114.json) joins allphysical/scientific proofs, sixrealCPUcontexts/twelvepairs, bothACKs/fullgzip/rawreference/curves/harms/limits. Complete3033CPU2420GPU charged/closed, no refund or remaining586hold.

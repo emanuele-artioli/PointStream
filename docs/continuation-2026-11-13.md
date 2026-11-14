@@ -1,3 +1,5 @@
+> Superseded current-state handoff: read [November14 continuation](continuation-2026-11-14.md) first. The586 run is complete/accepted/archived; RUNNING and one-shot-pending prose below is historical.
+
 # Continuation — November 13, 2026 (UTC)
 
 This snapshot supersedes the current-status summaries in the November 12 handoff.
