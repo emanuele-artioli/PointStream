@@ -1,0 +1,297 @@
+{
+  "scope": "ONE prelaunch stat-only inventory, conditional warm-storage sizing; not scientific evidence or cache content authentication",
+  "output_sha256": "89877619a6238484bb6ec333a8453ec34f3d09693b482377102e271048def77e",
+  "output": {
+    "NFS": {
+      "available_bytes": 21411371417600,
+      "path": "/home/itec/emanuele/Datasets",
+      "stat": {
+        "bytes": 43,
+        "device": 59,
+        "executable": true,
+        "exists": true,
+        "mode": "0o755",
+        "symlink": false,
+        "type": "directory"
+      }
+    },
+    "SSD": {
+      "available_bytes": 1573293559808,
+      "path": "/local/users/emanuele/pointstream",
+      "stat": {
+        "bytes": 4096,
+        "device": 64514,
+        "executable": true,
+        "exists": true,
+        "mode": "0o700",
+        "symlink": false,
+        "type": "directory"
+      }
+    },
+    "conditional_warm_storage_GO": true,
+    "cryptographic_cache_validation": false,
+    "decision": "CONDITIONAL_WARM_STORAGE_GO",
+    "environment_python": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+      "stat": {
+        "bytes": 31896496,
+        "device": 64514,
+        "executable": true,
+        "exists": true,
+        "mode": "0o555",
+        "symlink": true,
+        "type": "regular"
+      }
+    },
+    "host": "gpu6",
+    "input_sha256": "83ee46ddeba32d7c74813b131f937d4c5b49ed70d05667a28488236cc6f67877",
+    "limitations": [
+      "stat-only; no SHA or recursive size validation",
+      "directory bytes are inode size, not expanded usage",
+      "two NEW small586 gates remain future and covered existing contingency",
+      "additional future reservations require ROOT review; stock doctor remains authoritative"
+    ],
+    "missing_cache_entries": [],
+    "missing_cache_increment_bytes": 0,
+    "remote_self_CPU_scoped_before_serialization": 0.038789,
+    "rows": [
+      {
+        "name": "archive",
+        "path": "/local/users/emanuele/pointstream/cache/bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18/tracknet-dataset.zip",
+        "stat": {
+          "bytes": 2564111322,
+          "device": 64514,
+          "executable": false,
+          "exists": true,
+          "mode": "0o444",
+          "symlink": false,
+          "type": "regular"
+        }
+      },
+      {
+        "name": "balltrack_code",
+        "path": "/local/users/emanuele/pointstream/cache/5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff/tree",
+        "stat": {
+          "bytes": 4096,
+          "device": 64514,
+          "executable": true,
+          "exists": true,
+          "mode": "0o555",
+          "symlink": false,
+          "type": "directory"
+        }
+      },
+      {
+        "name": "balltrack_weight",
+        "path": "/local/users/emanuele/pointstream/cache/b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec/balltrack_best.state_dict.pt",
+        "stat": {
+          "bytes": 45410554,
+          "device": 64514,
+          "executable": false,
+          "exists": true,
+          "mode": "0o444",
+          "symlink": false,
+          "type": "regular"
+        }
+      },
+      {
+        "name": "wasb_code",
+        "path": "/local/users/emanuele/pointstream/cache/657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55/tree",
+        "stat": {
+          "bytes": 4096,
+          "device": 64514,
+          "executable": true,
+          "exists": true,
+          "mode": "0o555",
+          "symlink": false,
+          "type": "directory"
+        }
+      },
+      {
+        "name": "wasb_weights",
+        "path": "/local/users/emanuele/pointstream/cache/4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6/tree",
+        "stat": {
+          "bytes": 4096,
+          "device": 64514,
+          "executable": true,
+          "exists": true,
+          "mode": "0o555",
+          "symlink": false,
+          "type": "directory"
+        }
+      },
+      {
+        "name": "wasb_config",
+        "path": "/local/users/emanuele/pointstream/cache/6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d/wasb-tennis.yaml",
+        "stat": {
+          "bytes": 429,
+          "device": 64514,
+          "executable": false,
+          "exists": true,
+          "mode": "0o444",
+          "symlink": false,
+          "type": "regular"
+        }
+      },
+      {
+        "name": "lpips_backbone",
+        "path": "/local/users/emanuele/pointstream/cache/7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02/alexnet-owt-7be5be79.pth",
+        "stat": {
+          "bytes": 244408911,
+          "device": 64514,
+          "executable": false,
+          "exists": true,
+          "mode": "0o444",
+          "symlink": false,
+          "type": "regular"
+        }
+      },
+      {
+        "name": "dists_backbone",
+        "path": "/local/users/emanuele/pointstream/cache/397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0/vgg16-397923af.pth",
+        "stat": {
+          "bytes": 553433881,
+          "device": 64514,
+          "executable": false,
+          "exists": true,
+          "mode": "0o444",
+          "symlink": false,
+          "type": "regular"
+        }
+      },
+      {
+        "name": "ada_reference",
+        "path": "/local/users/emanuele/pointstream/cache/4bfff442081d988039abb308a3e0b8ed22632f5f598858d6eeaf4d0ef6824a1a/published.tar",
+        "stat": {
+          "bytes": 400291840,
+          "device": 64514,
+          "executable": false,
+          "exists": true,
+          "mode": "0o444",
+          "symlink": false,
+          "type": "regular"
+        }
+      },
+      {
+        "name": "bridge",
+        "path": "/local/users/emanuele/pointstream/cache/849c059a5074851431862955c913731de345a428f2015ad31afe9df409190465/bridge.json",
+        "stat": {
+          "bytes": 271409,
+          "device": 64514,
+          "executable": false,
+          "exists": true,
+          "mode": "0o444",
+          "symlink": false,
+          "type": "regular"
+        }
+      },
+      {
+        "name": "cpu_denial",
+        "path": "/local/users/emanuele/pointstream/cache/a636600b5631b331e40630c4f00839414b99c8863d308dbe90b172ea6b547020/real-CPU-denial.json",
+        "stat": {
+          "bytes": 7312987,
+          "device": 64514,
+          "executable": false,
+          "exists": true,
+          "mode": "0o444",
+          "symlink": false,
+          "type": "regular"
+        }
+      },
+      {
+        "name": "fidelity_gate",
+        "path": "/local/users/emanuele/pointstream/cache/2104eac96fca55bf01047d67aef91a14611eee11dfb5eda67f8291d717082257/fidelity-cost48-gate-20261104.json",
+        "stat": {
+          "bytes": 1550,
+          "device": 64514,
+          "executable": false,
+          "exists": true,
+          "mode": "0o444",
+          "symlink": false,
+          "type": "regular"
+        }
+      },
+      {
+        "name": "native_cpu_receipt",
+        "path": "/local/users/emanuele/pointstream/cache/b79de31293dee3cf044414db3432de433664e298fe790763fe4811aace174e1b/native-CPU.json",
+        "stat": {
+          "bytes": 7907,
+          "device": 64514,
+          "executable": false,
+          "exists": true,
+          "mode": "0o444",
+          "symlink": false,
+          "type": "regular"
+        }
+      },
+      {
+        "name": "receiver_isolation_config",
+        "path": "/local/users/emanuele/pointstream/cache/4fa67547b1288e46f979040f0de5315288bd8bfc5d6065e3b6abaeeee32bea1c/config.json",
+        "stat": {
+          "bytes": 7204015,
+          "device": 64514,
+          "executable": false,
+          "exists": true,
+          "mode": "0o444",
+          "symlink": false,
+          "type": "regular"
+        }
+      },
+      {
+        "name": "study_gate",
+        "path": "/local/users/emanuele/pointstream/cache/0c4f9db834b1993580ac2cd647c241725011acf86efcca33b8254547b55c7ff0/study-gate.json",
+        "stat": {
+          "bytes": 869,
+          "device": 64514,
+          "executable": false,
+          "exists": true,
+          "mode": "0o444",
+          "symlink": false,
+          "type": "regular"
+        }
+      },
+      {
+        "name": "study_fidelity_gate",
+        "path": "/local/users/emanuele/pointstream/cache/c831cf4b79c647426d77dea9426248ffcb0f230e701ed405cacc9e4b726b508a/study-fidelity-gate.json",
+        "stat": {
+          "bytes": 746,
+          "device": 64514,
+          "executable": false,
+          "exists": true,
+          "mode": "0o444",
+          "symlink": false,
+          "type": "regular"
+        }
+      },
+      {
+        "name": "environment",
+        "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree",
+        "stat": {
+          "bytes": 4096,
+          "device": 64514,
+          "executable": true,
+          "exists": true,
+          "mode": "0o555",
+          "symlink": false,
+          "type": "directory"
+        }
+      }
+    ],
+    "scope": "ROOT-authorized-stat-only-no-cryptographic-validation",
+    "separate_filesystems": true,
+    "wall_seconds": 0.3399930680170655
+  },
+  "transport": {
+    "returncode": 0,
+    "wall_seconds": 3.6678946250031004,
+    "self_CPU": 0.06190899999999999,
+    "SSH_CPU": 0.027482,
+    "stdout_sha256": "89877619a6238484bb6ec333a8453ec34f3d09693b482377102e271048def77e",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "CPU_charged": 10,
+  "GPU_charged": 0,
+  "parent_phase_CPU": 3033,
+  "case": "/private/tmp/pointstream-SVT586-cache-query10-ROOT-20261113",
+  "no_cleanup_or_relocation": true
+}

@@ -12,6 +12,8 @@ K5c/W8/W9 balances are not transferred. Unknown submissions are never replayed.
 
 ### Current research decision
 
+Use the [current disposition](../experiments/research-disposition-20261113.md) for item-by-item closure decisions. Ball586 is accepted and archived on qualified Ada; the neural comparison is accepted on48 development frames. Targetedabsence80 is the next bounded stage: firstmetadata stopped before writes on a ROOTpath binding; replacement metadata30 is charged within1893CPU1175GPU, noGPU release. Historical balances and “pending” instructions below are not current authority.
+
 Read the [canonical continuation](../continuation-2026-11-13.md) and live budget ledger for
 current jobs, releases, balances and watcher handles. Frozen scientific source
 2c6d must not advance. The historical phases below retain their original results
@@ -79,7 +81,7 @@ The expired witness provides no GPU qualification. The next route has separate
 source, correctness, resource and budget gates. Paper/PRESLEY
 remain paused; no training, paid hosting or submission is authorized.
 
-See [current handoff](../continuation-2026-11-13.md), [ledger](../experiments/submission-research-budget-20261104.json) and [stage card](k5d-ada-scale-and-denial-2026-11-12.md).
+See [current handoff](../continuation-2026-11-14.md), [ledger](../experiments/submission-research-budget-20261104.json) and [stage card](k5d-ada-scale-and-denial-2026-11-12.md).
 
 Historical execution status, earlier November12: **ALTERNATE-GPU QUALIFICATION QUEUED**.
 User requests regular native resource checks and a non-A6000 path. The new
