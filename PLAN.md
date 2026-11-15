@@ -1,5 +1,11 @@
 # Plan
 
+## Current priorities — user revision, November 15, 2026
+
+The [current work and continuation record](docs/submission-next-actions-2026-11-15.md) supersedes the prospective ordering below. First authenticate the local website player demo and prepare a matched, source-spread human visual pilot; then settle the statistical and annotation design before more expensive research. Future inference reports effect sizes and source-level uncertainty without a 10% scientific usefulness floor. The [prospective v2 protocol](docs/experiments/submission-ladder-protocol-20261115-v2.json) preserves all frozen v1 outcomes and prohibits retroactive confirmation claims. Conventional ROI's 8.53%/5.39% savings remain reportable development observations, with one source per domain and no generalization test yet.
+
+The full192-frame egocentric reference job is conditional on the chosen endpoint, validated editor and active correction effort; the reserved cohort and zero-approved status remain unchanged. The base-suppressed patch proposal is not automatically next and remains unreleased. Expand the paper's scientific explanation toward the verified venue allowance rather than treating18+5 as a desired final length. Previous automatic compute authority has expired; no new scientific job is launched by this revision.
+
 ## Submission contribution ladder — authorized implementation, November 14, 2026
 
 The user requested implementation of the [six-week contribution programme](docs/experiments/submission-ladder-20261114.md), with a research cutoff of **December 19** and submission preparation targeted for **December 26, 2026** (America/Sao_Paulo). Build and evaluate a complete codec in both tennis and egocentric video; each domain retains its independently supported level: narrow benefit, 70% foreground / 30% background benefit, full-frame benefit, then real-time benefit. These are targets, not achieved results or a submission guarantee.

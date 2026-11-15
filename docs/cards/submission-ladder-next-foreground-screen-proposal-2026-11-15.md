@@ -1,5 +1,7 @@
 # Proposed next foreground screen — not released
 
+**Priority/policy amendment, November 15:** the [revised continuation plan](../submission-next-actions-2026-11-15.md) places demo authentication and human visual/metric calibration before this construction. This proposal is parked, not rejected by the new policy. Its original10% promotion sentence below is retained as proposal history and is superseded prospectively by protocol v2; replace it with a concrete source-level inference and visual-review design before any release. No new outcomes or computation were produced under either proposed rule.
+
 This is a costed follow-up to the completed November15 stage, not a new run or permission request. The current automatic authority ends11:07:34UTC. Do not launch work after that deadline without new stage authority. Preserve the opened ball confirmation cohort; it cannot become an unopened holdout again.
 
 ## Scientific decision
