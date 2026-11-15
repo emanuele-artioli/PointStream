@@ -1,6 +1,6 @@
 # PointStream continuation — submission ladder, November 15, 2026
 
-Historical pre-result continuation is preserved [verbatim](experiments/submission-ladder-continuation-before-quality-opening-20261115.md); its pending job states are superseded.
+Historical pre-result continuation is preserved [verbatim](continuation-submission-ladder-before-quality-opening-2026-11-15.md); its pending job states are superseded.
 
 ## Goal, scope and stop conditions
 
