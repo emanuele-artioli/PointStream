@@ -1,0 +1,221 @@
+{
+  "schema": "pointstream.visor.action-policy.v2",
+  "frozen_before_new_SAM_outcomes_utc": "2026-11-15T10:34:03.166074+00:00",
+  "human_feedback_sha256": "9a31519973bbd3984af1a049f3c503d761fc251f75fe8bb908d1228a118da754",
+  "prior_review_sha256": "5d67a28c53714e410dd4ec0d77a765b1a7181575d17abe69a48e9d753fd755b8",
+  "human_status_counts": {
+    "uncertain": 9,
+    "rejected": 9,
+    "approved": 0
+  },
+  "same_frame_ids": [
+    "P35_105/native-175/visor-176",
+    "P35_105/native-184/visor-185",
+    "P35_105/native-193/visor-194",
+    "P35_105/native-212/visor-213",
+    "P35_105/native-225/visor-226",
+    "P35_105/native-238/visor-239",
+    "P12_101/native-217/visor-218",
+    "P12_101/native-238/visor-239",
+    "P12_101/native-249/visor-250",
+    "P12_101/native-260/visor-261",
+    "P12_101/native-271/visor-272",
+    "P12_101/native-280/visor-281",
+    "P11_103/native-229/visor-230",
+    "P11_103/native-241/visor-242",
+    "P11_103/native-254/visor-255",
+    "P11_103/native-266/visor-267",
+    "P11_103/native-279/visor-280",
+    "P11_103/native-292/visor-293"
+  ],
+  "official_keep": {
+    "hands": "all available official left/right hands and visible forearms",
+    "P35_105": [
+      "saucepan"
+    ],
+    "P12_101": [
+      "tap"
+    ],
+    "P11_103": [
+      "pan"
+    ]
+  },
+  "pilot_specific_exclude": {
+    "P35_105": [
+      "cloth"
+    ],
+    "P12_101": [
+      "sink"
+    ],
+    "P11_103": [
+      "oven",
+      "hob/cooktop/stovetop"
+    ]
+  },
+  "SAM_combination": {
+    "actor_prompts": [
+      "person",
+      "hand"
+    ],
+    "actor_instance_policy": "union all returned actor instances using existing backend default output_prob_thresh0.35; preserve every raw model instance",
+    "task_object_prompts": {
+      "P35_105": "saucepan",
+      "P12_101": "faucet",
+      "P11_103": "pan"
+    },
+    "task_object_condition": "only if the allowed official task-object label has no instance on this exact frame",
+    "rough_polygon_use": "tight bounding-box guidance on task-object query ONLY; no pixel gold, no actor clipping, no output IoU selection",
+    "union": "filtered official hands/task-object plus retained SAM actor masks plus conditional task-object masks",
+    "failure": "keep filtered official proposals; explicitly flag missing/unknown actor or task-object coverage; never imply zero truth",
+    "actor_query_guidance": "person and hand TEXT ONLY, no human box constraint",
+    "task_object_query_guidance": "text plus tight rough-human box when available; text only otherwise; no additional query calls",
+    "backend_default_output_prob_thresh": 0.35,
+    "mask_binarization": "preserve binary model output; wrapper _unpack_outputs uses >0 on out_binary_masks, nearest resize if needed; not a new0.5 score threshold",
+    "canonical_task_object_labels": {
+      "P35_105": "saucepan",
+      "P12_101": "tap",
+      "P11_103": "pan"
+    },
+    "alias_note": "ROOT acknowledged before model outcomes: faucet is SAM English query alias of official tap; not an extra query/object"
+  },
+  "coarse_bbox_guidance": [
+    {
+      "id": "P35_105/native-184/visor-185",
+      "status": "rejected",
+      "source_sha256": "2b1deb693c148856f32904855e182ffaab51839f93c23a80bb76c7ce8773e24a",
+      "native_index_0based": 184,
+      "video": "P35_105",
+      "bbox_xyxy": [
+        964.6376811594203,
+        663.3333333333334,
+        1205.7971014492753,
+        1071.4492753623188
+      ],
+      "use": "coarse input guidance only; not reference pixels or automatic acceptance"
+    },
+    {
+      "id": "P35_105/native-225/visor-226",
+      "status": "rejected",
+      "source_sha256": "90542a13b76a07468a1673debb7812133ff772d33ec514327b638a97b05aa69e",
+      "native_index_0based": 225,
+      "video": "P35_105",
+      "bbox_xyxy": [
+        1122.3188405797102,
+        591.4492753623189,
+        1632.463768115942,
+        1069.1304347826087
+      ],
+      "use": "coarse input guidance only; not reference pixels or automatic acceptance"
+    },
+    {
+      "id": "P35_105/native-238/visor-239",
+      "status": "rejected",
+      "source_sha256": "1aab7dd7a42a77fc50e79b6c62094ea22df55d777b04e5053ff5b189ca90cf99",
+      "native_index_0based": 238,
+      "video": "P35_105",
+      "bbox_xyxy": [
+        985.5072463768116,
+        672.6086956521739,
+        1382.0289855072465,
+        1071.4492753623188
+      ],
+      "use": "coarse input guidance only; not reference pixels or automatic acceptance"
+    },
+    {
+      "id": "P12_101/native-238/visor-239",
+      "status": "rejected",
+      "source_sha256": "fffd8a7b8727becff79fb8bd1ad5b81a92944ea1b2a9f6b6e9bc543354df4517",
+      "native_index_0based": 238,
+      "video": "P12_101",
+      "bbox_xyxy": [
+        1351.8840579710145,
+        350.28985507246375,
+        1915.3623188405797,
+        1073.768115942029
+      ],
+      "use": "coarse input guidance only; not reference pixels or automatic acceptance"
+    },
+    {
+      "id": "P11_103/native-241/visor-242",
+      "status": "rejected",
+      "source_sha256": "31e072e54f0dd2f2ae545592fe0524eaa97a0355f7c52c7470879a96c12243c2",
+      "native_index_0based": 241,
+      "video": "P11_103",
+      "bbox_xyxy": [
+        271.30434782608694,
+        241.30434782608697,
+        1525.7971014492753,
+        1071.4492753623188
+      ],
+      "use": "coarse input guidance only; not reference pixels or automatic acceptance"
+    },
+    {
+      "id": "P11_103/native-254/visor-255",
+      "status": "rejected",
+      "source_sha256": "c28f974e1adefe02de8171457d451e3846f4e2acff9d1158c2dbd2fe10b7041e",
+      "native_index_0based": 254,
+      "video": "P11_103",
+      "bbox_xyxy": [
+        255.07246376811594,
+        201.8840579710145,
+        1523.4782608695652,
+        1076.0869565217392
+      ],
+      "use": "coarse input guidance only; not reference pixels or automatic acceptance"
+    },
+    {
+      "id": "P11_103/native-266/visor-267",
+      "status": "rejected",
+      "source_sha256": "51ec818b4a3b5e87398f1d91adcb494ed4b52aea1287f4be0b0de3b79dd55d2e",
+      "native_index_0based": 266,
+      "video": "P11_103",
+      "bbox_xyxy": [
+        326.95652173913044,
+        199.56521739130434,
+        1523.4782608695652,
+        1073.768115942029
+      ],
+      "use": "coarse input guidance only; not reference pixels or automatic acceptance"
+    },
+    {
+      "id": "P11_103/native-279/visor-280",
+      "status": "rejected",
+      "source_sha256": "29a86ed8328fce1ba18d8073047e2bd49c2c274603c7daf575909f741c1c9bfb",
+      "native_index_0based": 279,
+      "video": "P11_103",
+      "bbox_xyxy": [
+        368.69565217391306,
+        255.2173913043478,
+        1491.0144927536232,
+        1078.4057971014493
+      ],
+      "use": "coarse input guidance only; not reference pixels or automatic acceptance"
+    },
+    {
+      "id": "P11_103/native-292/visor-293",
+      "status": "rejected",
+      "source_sha256": "e3b6cfce0dcaa14ab7cbe3b1acb70c27a11d6a4df7041e41a0481d80d19499c6",
+      "native_index_0based": 292,
+      "video": "P11_103",
+      "bbox_xyxy": [
+        405.7971014492754,
+        389.71014492753625,
+        1414.4927536231885,
+        1073.768115942029
+      ],
+      "use": "coarse input guidance only; not reference pixels or automatic acceptance"
+    }
+  ],
+  "review_v2": {
+    "review_id": "visor-action-targets-review18-v2",
+    "available_proposals_visible_on_all18": true,
+    "new_blind_controls": false,
+    "old5_blinds": "retained unchanged as old review history; absence of old overlay is not a model miss",
+    "approval_meaning": "approve FINAL displayed mask and complete correction only; rough polygons remain non-reference until explicitly approved",
+    "publish_gate": "ROOT reviews fixed rule and assets before UI publication",
+    "unknown_failure_caption": "If no valid proposal is produced, show source and explicit incomplete/missing state; never infer empty ground truth or describe hidden controls as model misses"
+  },
+  "scientific_boundary": "proposals only; changes foreground objective prospectively; no old scores relabeled or confirmation outcomes opened; no new approved reference masks",
+  "new_GPU_authority_in_this_CPU_task": 0,
+  "amendment_before_new_SAM_outcomes_utc": "2026-11-15T10:41:00.414998+00:00"
+}

@@ -440,6 +440,21 @@
       },
       "deadline": "2026-11-15T11:07:34Z",
       "basis": "automatic12hbudgetauthority; completedowned6physicaljobs plusrawfailedspatial; noqualitypeek/modelsduplication; secondfinalscoresarchiveafterROOTacceptance"
+    },
+    {
+      "id": "visor-human-review-refinement",
+      "state": "closed_fullsourceonlySAMaccepted_newvisibleUI_published_no_gold",
+      "cpu_seconds": 3960,
+      "gpu_seconds": 960,
+      "deadline": "2026-11-15T11:07:34Z",
+      "parts": {
+        "human_import_audit_CPU": 600,
+        "official_filter_CPU": 900,
+        "SAM_campaign_CPU_GPU": 960,
+        "preparation_publication_CPU": 900,
+        "failure_CPU_noGPUretry": 600
+      },
+      "card": "docs/cards/visor-human-review-refinement-2026-11-15.md"
     }
   ],
   "jobs": [
@@ -1402,6 +1417,44 @@
         "snapshot_sha256": "c31fc29d30878603aa94bac0b61d3f5a7f4cbb0bb400129f7880da096c81804f"
       },
       "events_acknowledged": true
+    },
+    {
+      "job_id": "20261115T104039Z-ed7b904d",
+      "allocation": "visor-human-review-refinement",
+      "state": "canonical_COMPLETE_independent_full_audit_passed",
+      "submit_receipt": "/private/tmp/pointstream-visor-sam-source-proposals-submit-20261115.json",
+      "spec_sha256": "13eca2f7bf29ecde9ee6b7d97f95086d60905493baaf4ca7bdfd6fe79f28f12f",
+      "snapshot": {
+        "git_head": "f417327623f3a7e8060b9fbfb72d35aaec07cde4",
+        "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tracked_changes_included": [],
+        "tracked_changes_excluded": [
+          "tests/test_annotation_review.py",
+          "tools/datasets/annotation_review.py"
+        ],
+        "included_untracked_sha256": {},
+        "untracked_excluded_count": 2,
+        "untracked_excluded_paths_sha256": "9d1bf61b98f39835f5c8eaeb84f392d4f4032b5e46e66457d908ffaca70af48d",
+        "untracked_excluded_sample": [
+          "tests/test_visor_action_proposals.py",
+          "tools/datasets/visor_action_proposals.py"
+        ],
+        "deleted_paths": [],
+        "snapshot_sha256": "24bc18fb528444abd2356ba8718cd408e740439cf00a3fba583906ad54977cc1"
+      },
+      "cpu_ceiling_seconds": 960,
+      "gpu_ceiling_seconds": 960,
+      "wall_ceiling_seconds": 960,
+      "deadline": "2026-11-15T11:07:34Z",
+      "scope": "18sourceonlyreviewproposals_nocodecquality_goldortraining",
+      "actual_full_wall_seconds": 41.276,
+      "full_archive_sha256": "85973c819a09523e91dfc7da30eaddf84e69cd3efb424cbcc92c51963cdbdcf6",
+      "source_frames": 18,
+      "prompt_records": 54,
+      "masks": 62,
+      "missing_records": 4,
+      "reference_approval": false,
+      "monitoring_issue": "nonescalatedclientDNSblocked; escalatedcanonicalinspectionworked; no replay"
     }
   ],
   "decisions": [
@@ -1735,11 +1788,20 @@
   },
   "human_annotation_review_request": {
     "kind": "genuinehumanVISORpilot18sourceframes",
-    "state": "asyncquestion_pending",
+    "state": "human_download_validated18_zeroapproved_9uncertain9rejected",
     "URL": "http://127.0.0.1:17691/visor-confirmation-pilot/index.html",
     "HTTP_verified_200": true,
     "reason": "modelreviewcannotreplaceplanhumanreferencecorrection; allnative/ballworkcontinuesindependently",
-    "no_human_labels_fabricated": true
+    "no_human_labels_fabricated": true,
+    "download_sha256": "9a31519973bbd3984af1a049f3c503d761fc251f75fe8bb908d1228a118da754",
+    "elapsed_seconds": 4739.312,
+    "elapsed_qualification": "4739.312browserelapsed;900to1800secondsuserreportedactive; neitherestablishesfinalboundaryannotationthroughput",
+    "new_policy": "actor/movedordirectlymanipulatedobjects; nohistoricalmetricreinterpretation",
+    "active_review_seconds_user_reported_range": [
+      900,
+      1800
+    ],
+    "active_time_provenance": "direct_user_reply_15to30minutes"
   },
   "manuscript_author_review_v1": {
     "state": "draft_built_28_pages_root_visual_checked_selected_pages_not_authapproved",
@@ -1887,13 +1949,22 @@
     "read_only": "0444/0555_notOSimmutability"
   },
   "current_phase": {
-    "state": "completed_bounded_science_paper_and_artifact_stage",
-    "science_jobs": "allterminal; originalspatialFAILEDpreserved",
-    "new_GPU_work": "nonequeued",
-    "human_annotation_pilot": "pending_genuinehumanexport",
-    "human_server": "selfexpires11:07:34Z",
-    "submission": "notfiled_requiresseparateinstruction",
-    "next_proposal": "notreleased",
-    "budget_authority_expiry": "2026-11-15T11:07:34Z"
+    "state": "humanpilot_import_and_sourceonly_proposal_refinement_complete",
+    "scientific_jobs": "allterminal_noqueuedGPU",
+    "reference_masks_approved": 0,
+    "new_review_SHA": "0e611c39a0c8f1da68ef307eeac8a45a5e4311cd803f301150f7b28a6f46cb29",
+    "review_directory": "/Users/manu/Documents/PointStream-review/annotation-pilot-2026-11-14/review/visor-action-v2",
+    "server_deadline_unchanged": "2026-11-15T11:07:34Z",
+    "offline_standalone_available": true,
+    "new_compute_after_authority": "notauthorizedby12hwindow",
+    "current_code_checks": "Ruff/Mypy658/full2612passed37skip",
+    "paper": "V4ROOTaccepted18plus5nochangedcodecresult",
+    "evidence": "docs/experiments/submission-ladder-visor-human-sam-v4-evidence-20261115.json"
+  },
+  "manuscript_author_review_v4": {
+    "record": "docs/paper/submission-ladder-author-review-v4-2026-11-15.json",
+    "state": "ROOTaccepted18plus5humanreviewstatusupdate_no_codec_result_change",
+    "PDF_sha256": "ce88894bbc4342e973404c5ab378d6831d1972e06a8d2601b1f4d4fc037e7887",
+    "ZIP_sha256": "2f4b38bf07372913a4eab8fda8fec5f322f7d1fe384c1d80d66ae996a06604f5"
   }
 }

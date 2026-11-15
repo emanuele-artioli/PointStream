@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "state": "genuine_human_review_imported_not_reference_approved",
+  "review_sha256": "5d67a28c53714e410dd4ec0d77a765b1a7181575d17abe69a48e9d753fd755b8",
+  "download_sha256": "9a31519973bbd3984af1a049f3c503d761fc251f75fe8bb908d1228a118da754",
+  "annotations_sha256": "a1a4b80ead77bf3f858e219996f0c89fca2047f82d8b151403f7764e7da2c143",
+  "original_private_path": "/home/itec/emanuele/Datasets/pointstream-data/ladder-autonomy-20261114/visor-human-review-20261115T1032/decisions-original.json",
+  "decisions": {
+    "frames": 18,
+    "uncertain": 9,
+    "rejected": 9,
+    "approved": 0,
+    "rough_polygon_frames": 9,
+    "initial_blind_frames": 5,
+    "reference_masks": 0
+  },
+  "validation": "completeunique18/sourceandproposalhashes/validpolygons;originalbytespreserved",
+  "browser_elapsed_seconds": 4739.312,
+  "active_seconds_user_reported_range": [
+    900,
+    1800
+  ],
+  "timing_scope": "userreported15to30minutesactive, notpixelaccurateannotationthroughput",
+  "findings": [
+    "overinclusiveunrelatedcloth/staticsink/oven/hob",
+    "missingactorconcerns",
+    "blindnooverlaybydesignnotmodeldetectionfailure"
+  ],
+  "next_policy": "docs/experiments/visor-action-policy-v2-20261115.json",
+  "old_statuses_unchanged": true,
+  "historical_metrics_unchanged": true
+}

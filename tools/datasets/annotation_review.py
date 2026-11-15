@@ -70,14 +70,16 @@ def asset(value: Any, root: Path) -> tuple[Path, bytes]:
 def prepare(manifest: Path, output: Path) -> dict[str, Any]:
     raw = json.loads(manifest.read_text())
     exact(raw, {"version", "review_id", "frames"}, "manifest")
-    if type(raw["version"]) is not int or raw["version"] != 1:
+    if type(raw["version"]) is not int or raw["version"] not in (1, 2):
         raise ValueError("unsupported manifest version")
     nonempty(raw["review_id"], "review ID")
     if not isinstance(raw["frames"], list) or not raw["frames"]:
         raise ValueError("empty frame selection")
     rows, assets, ids = [], [], set()
     for i, row in enumerate(raw["frames"]):
-        exact(row, {"id", "source_group", "frame_index", "blind", "source", "proposal"}, "frame")
+        exact(row, {"id", "source_group", "frame_index", "blind", "source", "proposal"} | ({"requires_complete_correction"} if raw["version"] == 2 else set()), "frame")
+        if raw["version"] == 2 and (row["blind"] is not False or type(row["requires_complete_correction"]) is not bool):
+            raise ValueError("v2 proposals are visible; missing proposals require explicit correction flag")
         nonempty(row["id"], "frame ID")
         nonempty(row["source_group"], "source group")
         if row["id"] in ids or type(row["frame_index"]) is not int or row["frame_index"] < 0 or type(row["blind"]) is not bool:
@@ -98,8 +100,12 @@ def prepare(manifest: Path, output: Path) -> dict[str, Any]:
             if not (values <= {0, 1} or values <= {0, 255}):
                 raise ValueError("proposal must be binary")
             alpha = (mask != 0).astype(np.uint8) * 100
+        if raw["version"] == 2 and not mask.any() and not row["requires_complete_correction"]:
+            raise ValueError("empty v2 proposal requires complete correction or explicit empty confirmation")
         source_name, overlay_name = f"source-{i}{suffix}", f"overlay-{i}.png"
         public = {k: row[k] for k in ("id", "source_group", "frame_index", "blind")}
+        if raw["version"] == 2:
+            public["requires_complete_correction"] = row["requires_complete_correction"]
         public.update(width=width, height=height, source=source_name,
                       source_sha256=row["source"]["sha256"], proposal_sha256=row["proposal"]["sha256"],
                       overlay=None if row["blind"] else overlay_name)
@@ -113,7 +119,7 @@ def prepare(manifest: Path, output: Path) -> dict[str, Any]:
         public["overlay_sha256"] = digest(overlay_data) if overlay_data is not None else None
         rows.append(public)
         assets.append((source, source_name, overlay_name, overlay_data))
-    record = {"version": 1, "review_id": raw["review_id"], "frames": rows}
+    record = {"version": raw["version"], "review_id": raw["review_id"], "frames": rows}
     record["review_sha256"] = digest(canonical(record))
     output.mkdir(parents=True, exist_ok=False)
     for source, source_name, overlay_name, overlay_data in assets:
@@ -122,7 +128,11 @@ def prepare(manifest: Path, output: Path) -> dict[str, Any]:
             (output / overlay_name).write_bytes(overlay_data)
     (output / "review.json").write_bytes(canonical(record))
     encoded = json.dumps(record).replace("<", "\\u003c")
-    (output / "index.html").write_text(HTML.replace("__REVIEW__", encoded))
+    html = HTML.replace("__REVIEW__", encoded)
+    if raw["version"] == 2:
+        html = html.replace('For a blind frame, draw all foreground or confirm it is empty.', 'All proposals are visible in this revision. Approve only the FINAL mask with complete corrections. Rough polygons are NOT reference masks until explicitly approved. Missing proposals require complete redraw or explicit empty confirmation.')
+        html = html.replace('<option>approved</option>', '<option value="approved">Approve FINAL mask; correction complete</option>')
+    (output / "index.html").write_text(html)
     return record
 
 
@@ -142,7 +152,7 @@ def load_review(root: Path) -> dict[str, Any]:
 
 def validate_decisions(review: dict[str, Any], decisions: Any) -> list[dict[str, Any]]:
     exact(decisions, {"version", "review_sha256", "reviewer", "elapsed_seconds", "frames"}, "decisions")
-    if type(decisions["version"]) is not int or decisions["version"] != 1 or decisions["review_sha256"] != review["review_sha256"]:
+    if type(decisions["version"]) is not int or decisions["version"] != review["version"] or decisions["review_sha256"] != review["review_sha256"]:
         raise ValueError("wrong review identity")
     nonempty(decisions["reviewer"], "reviewer")
     elapsed = decisions["elapsed_seconds"]
@@ -178,7 +188,7 @@ def validate_decisions(review: dict[str, Any], decisions: Any) -> list[dict[str,
                 raise ValueError("degenerate polygon")
         if polygons and row["confirmed_empty"]:
             raise ValueError("nonempty polygons contradict empty foreground")
-        if row["status"] == "approved" and (frame["blind"] or row["missing_object"]) and not (polygons or row["confirmed_empty"]):
+        if row["status"] == "approved" and (frame["blind"] or frame.get("requires_complete_correction", False) or row["missing_object"]) and not (polygons or row["confirmed_empty"]):
             raise ValueError("blind/missing-object approval requires complete correction or confirmed empty")
         provenance = "human_without_proposal" if frame["blind"] else "human_reviewed_model_assisted"
         rows.append({**row, "source_group": frame["source_group"], "frame_index": frame["frame_index"], "provenance": provenance})
@@ -210,7 +220,7 @@ def import_decisions(root: Path, download: Path, output: Path) -> dict[str, Any]
         name = f"reference-{i}.png"
         row["reference_mask"] = name
         masks.append((name, mask))
-    result = {"version": 1, "review_sha256": review["review_sha256"], "decisions_sha256": digest(data),
+    result = {"version": review["version"], "review_sha256": review["review_sha256"], "decisions_sha256": digest(data),
               "reviewer": decisions["reviewer"], "elapsed_seconds": decisions["elapsed_seconds"], "frames": rows}
     output.mkdir(parents=True, exist_ok=False)
     (output / "decisions-original.json").write_bytes(data)
@@ -258,14 +268,15 @@ function persist(){if(draftBlocked)return;try{localStorage.setItem(draftKey,JSON
 function restore(){try{const raw=localStorage.getItem(draftKey);if(raw===null){field('draft-status').textContent='New review. Edits will be saved in this browser.';return;}const d=JSON.parse(raw);if(!validDraft(d))throw Error('invalid draft');d.records.forEach((r,i)=>Object.assign(records[i],r));index=d.index;vertices=d.vertices;field('reviewer').value=d.reviewer;priorSeconds=d.elapsed_seconds;field('draft-status').textContent='Saved draft restored, including unfinished polygons.';}catch(e){draftBlocked=true;field('draft-status').textContent='Draft could not be restored. Existing stored data was preserved; do not edit this tab if recovery is needed.';}}
 function save(){const r=records[index];r.status=field('status').value;r.missing_object=field('missing').checked;r.confirmed_empty=field('empty').checked;r.note=field('note').value;persist();}
 async function picture(path){return new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=path;});}
-async function paint(){const current=++generation,f=review.frames[index],r=records[index];const source=await picture(f.source);if(current!==generation)return;canvas.width=f.width;canvas.height=f.height;ctx.drawImage(source,0,0);if(f.overlay&&show){const overlay=await picture(f.overlay);if(current!==generation)return;ctx.drawImage(overlay,0,0);}ctx.lineWidth=Math.max(1,f.width/500);ctx.strokeStyle='#ff00ff';for(const p of [...r.polygons,vertices]){if(!p.length)continue;ctx.beginPath();p.forEach((v,i)=>i?ctx.lineTo(...v):ctx.moveTo(...v));if(p!==vertices)ctx.closePath();ctx.stroke();}}
-function load(keepVertices=false){const f=review.frames[index],r=records[index];field('info').textContent=`${index+1}/${records.length}: ${f.id} | ${f.source_group} frame ${f.frame_index} | ${f.blind?'BLIND: no proposal available':'proposal review'}`;field('status').value=r.status;field('missing').checked=r.missing_object;field('empty').checked=r.confirmed_empty;field('note').value=r.note;field('toggle').disabled=f.blind;if(!keepVertices)vertices=[];show=true;paint();}
+async function paint(){const current=++generation,f=review.frames[index],r=records[index];const source=await picture(f.source);if(current!==generation)return;canvas.width=f.width;canvas.height=f.height;ctx.drawImage(source,0,0);const corrected=review.version===2&&(r.polygons.length||r.confirmed_empty);if(f.overlay&&show&&!corrected){const overlay=await picture(f.overlay);if(current!==generation)return;ctx.drawImage(overlay,0,0);}if(review.version===2&&show&&!r.confirmed_empty){ctx.fillStyle='rgba(0,255,0,0.28)';for(const p of r.polygons){ctx.beginPath();p.forEach((v,i)=>i?ctx.lineTo(...v):ctx.moveTo(...v));ctx.closePath();ctx.fill();}}ctx.lineWidth=Math.max(1,f.width/500);ctx.strokeStyle='#ff00ff';for(const p of [...r.polygons,vertices]){if(!p.length)continue;ctx.beginPath();p.forEach((v,i)=>i?ctx.lineTo(...v):ctx.moveTo(...v));if(p!==vertices)ctx.closePath();ctx.stroke();}}
+function load(keepVertices=false){const f=review.frames[index],r=records[index];field('info').textContent=`${index+1}/${records.length}: ${f.id} | ${f.source_group} frame ${f.frame_index} | ${f.blind?'BLIND: no proposal available':f.requires_complete_correction?'INCOMPLETE proposal: complete correction or explicit empty required':'visible proposal review'}`;field('status').value=r.status;field('missing').checked=r.missing_object;field('empty').checked=r.confirmed_empty;field('note').value=r.note;field('toggle').disabled=f.blind;if(!keepVertices)vertices=[];show=true;paint();}
 canvas.onclick=e=>{const b=canvas.getBoundingClientRect();vertices.push([Math.max(0,Math.min(canvas.width-1,(e.clientX-b.left)*canvas.width/b.width)),Math.max(0,Math.min(canvas.height-1,(e.clientY-b.top)*canvas.height/b.height))]);save();paint();};
 field('close').onclick=()=>{if(vertices.length<3){alert('At least three vertices required');return;}records[index].polygons.push(vertices);vertices=[];save();paint();};
 field('clear').onclick=()=>{records[index].polygons=[];vertices=[];save();paint();};field('toggle').onclick=()=>{show=!show;paint();};
 field('previous').onclick=()=>{if(vertices.length){alert('Finish or clear the open polygon first');return;}save();index=Math.max(0,index-1);load();persist();};field('next').onclick=()=>{if(vertices.length){alert('Finish or clear the open polygon first');return;}save();index=Math.min(records.length-1,index+1);load();persist();};
-field('download').onclick=()=>{save();if(vertices.length){alert('Finish or clear the open polygon first');return;}if(records.some(r=>!r.status)||!field('reviewer').value.trim()){alert('Review every frame and enter reviewer name');return;}const value={version:1,review_sha256:review.review_sha256,reviewer:field('reviewer').value,elapsed_seconds:elapsed(),frames:records};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'}));a.download='annotation-decisions.json';a.click();URL.revokeObjectURL(a.href);};
+field('download').onclick=()=>{save();if(vertices.length){alert('Finish or clear the open polygon first');return;}if(records.some(r=>!r.status)||!field('reviewer').value.trim()){alert('Review every frame and enter reviewer name');return;}const value={version:review.version,review_sha256:review.review_sha256,reviewer:field('reviewer').value,elapsed_seconds:elapsed(),frames:records};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'}));a.download=review.version===2?'annotation-decisions-v2.json':'annotation-decisions.json';a.click();URL.revokeObjectURL(a.href);};
 for(const id of ['status','missing','empty','note','reviewer'])field(id).addEventListener('input',save);
+field('empty').addEventListener('input',()=>{if(review.version===2)paint();});
 window.addEventListener('beforeunload',save);restore();load(true);
 </script>'''
 

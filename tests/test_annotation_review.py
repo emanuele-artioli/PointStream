@@ -161,3 +161,63 @@ vm.runInContext('save()',d.context);assert.match(d.elements['draft-status'].text
     path = tmp_path / "draft-test.js"
     path.write_text(test)
     subprocess.run([node, str(path)], check=True, capture_output=True, text=True, timeout=15)
+
+
+def test_v2_visible_proposals_require_final_correction_without_blind_controls(tmp_path):
+    path, _, _ = setup_review(tmp_path)
+    manifest = json.loads(path.read_text())
+    manifest['version'] = 2
+    manifest['review_id'] = 'final-mask-v2'
+    for row in manifest['frames']:
+        row.update(blind=False, requires_complete_correction=True)
+    path.write_text(json.dumps(manifest))
+    root = tmp_path / 'v2'
+    review = prepare(path, root)
+    assert review['version'] == 2
+    assert all(f['overlay'] is not None and not f['blind'] for f in review['frames'])
+    assert 'Rough polygons are NOT reference masks' in (root / 'index.html').read_text()
+    value = decisions(review)
+    with pytest.raises(ValueError, match='identity'):
+        validate_decisions(review, value)
+    value['version'] = 2
+    with pytest.raises(ValueError, match='complete correction'):
+        validate_decisions(review, value)
+    for row in value['frames']:
+        row['status'] = 'rejected'
+        row['polygons'] = [[[1, 1], [4, 1], [4, 4], [1, 4]]]
+    assert all(r['status'] == 'rejected' for r in validate_decisions(review, value))
+    download = tmp_path / 'human-v2.json'
+    download.write_text(json.dumps(value))
+    output = tmp_path / 'v2-import'
+    result = import_decisions(root, download, output)
+    assert result['version'] == 2
+    assert not list(output.glob('reference-*'))
+
+
+def test_v2_final_union_preview_replaces_original_overlay(tmp_path):
+    import shutil
+    import subprocess
+    from tools.datasets.annotation_review import HTML
+    node = shutil.which('node')
+    if node is None:
+        pytest.skip('Node unavailable')
+    paint = next(line for line in HTML.splitlines() if line.startswith('async function paint()'))
+    script = '''const assert=require('node:assert/strict');
+let generation=0,index=0,show=true,vertices=[];
+const calls=[];
+const ctx={drawImage(){calls.push('image')},beginPath(){},moveTo(){},lineTo(){},closePath(){},fill(){calls.push('fill')},stroke(){}};
+const canvas={};const picture=async path=>path;
+const review={version:2,frames:[{source:'source',overlay:'old',width:8,height:6}]};
+const records=[{confirmed_empty:false,polygons:[[[1,1],[4,1],[4,4]]]}];
+PAINT
+(async()=>{
+await paint();assert.deepEqual(calls,['image','fill']);
+calls.length=0;records[0].polygons=[];records[0].confirmed_empty=true;
+await paint();assert.deepEqual(calls,['image']);
+calls.length=0;review.version=1;records[0].confirmed_empty=false;
+await paint();assert.deepEqual(calls,['image','image']);
+})().catch(e=>{console.error(e);process.exitCode=1});
+'''.replace('PAINT',paint)
+    path=tmp_path/'preview.js'
+    path.write_text(script)
+    subprocess.run([node,str(path)],check=True,capture_output=True,text=True,timeout=15)

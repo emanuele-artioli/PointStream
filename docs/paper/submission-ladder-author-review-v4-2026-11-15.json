@@ -1,0 +1,42 @@
+{
+  "state": "ROOTaccepted_humanpilotstatus_update_no_new_codec_results",
+  "directory": "/Users/manu/Documents/PointStream-review/2026-11-15-ladder-author-review-v4",
+  "manifest_sha256": "2dbe14a574b85dfa893ce52669932fd01a28ee9b231737c245c8887c38993fee",
+  "pages": [
+    18,
+    5
+  ],
+  "artifacts": [
+    {
+      "path": "pdf/pointstream-ladder-v4-anonymous-author-review-20261115.pdf",
+      "bytes": 653972,
+      "sha256": "ce88894bbc4342e973404c5ab378d6831d1972e06a8d2601b1f4d4fc037e7887"
+    },
+    {
+      "path": "pointstream-ladder-v4-IDENTIFIABLE-author-review-source-20261115.zip",
+      "bytes": 5139912,
+      "sha256": "2f4b38bf07372913a4eab8fda8fec5f322f7d1fe384c1d80d66ae996a06604f5"
+    },
+    {
+      "path": "source-members-sha256.json",
+      "bytes": 36113,
+      "sha256": "6c12b68d99a2612c5202667037daf058d431efdc86cde39f8a30f361c73f3168"
+    },
+    {
+      "path": "FINAL-V4-AUTHOR-REVIEW.md",
+      "bytes": 1766,
+      "sha256": "74dedd55f693f60c344a0346aa35a915818bca345022809899a78f8b5e7130a3"
+    }
+  ],
+  "human_export_sha256": "9a31519973bbd3984af1a049f3c503d761fc251f75fe8bb908d1228a118da754",
+  "approved_references": 0,
+  "primary_tennis_table_and_image_unchanged": true,
+  "V3_preserved": true,
+  "ROOT_visual_pages": [
+    16
+  ],
+  "all23pages_reviewed": true,
+  "evidence_checker": "PASS",
+  "registry_tests": "5passed",
+  "submission": false
+}
