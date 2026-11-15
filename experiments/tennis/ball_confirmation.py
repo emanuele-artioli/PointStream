@@ -262,6 +262,7 @@ def prepare_bases(*, source: np.ndarray, source_yuv: Path, fps: Fraction, work: 
                         'decoded_rgb_sha256': sha(directory / 'decoded.npy'),
                         'yuv_frame_sha256': [hashlib.sha256(f.tobytes()).hexdigest() for f in raw],
                         'rgb_frame_sha256': [hashlib.sha256(f.tobytes()).hexdigest() for f in rgb], **record})
+    args.timer.measure('sender.resource_phase_transition', args.sender_phase)
     sender = args.timer.measure('sender.derive', lambda: fresh_ball_sender.derive(source, decoded_bases, fps, tracker))
     validate_sender(sender, fps, frames)
     write_receipt(work / 'sender.json', sender)
@@ -365,7 +366,7 @@ MODEL_TREE = 'f7a5c1c6284365f84c324d62169186ef1312c4d921bc0df5dbacd16ef5361964'
 MODEL_WEIGHT = 'b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec'
 IMAGE_CKPT = 'b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302'
 VIDEO_CKPT = '934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3'
-GPU_PROFILE = 'ball-confirmation-parent4-child6-v1'
+GPU_PROFILE = 'ball-confirmation-parent4-child6-then-parent8-v2'
 TOOL_SHA = {'ffmpeg': '7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2',
             'encoder': '4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4',
             'decoder': 'e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6'}
@@ -498,6 +499,81 @@ def source_member(archive: Path, expected_archive: str, source_id: str, destinat
         raise ValueError('original video identity mismatch')
 
 
+
+def process_start_if_present(pid: int) -> int | None:
+    """Return /proc start ticks; missing PID means it has exited or was reaped."""
+    try:
+        data = Path(f'/proc/{pid}/stat').read_text()
+    except FileNotFoundError:
+        return None
+    return int(data[data.rfind(')') + 2:].split()[19])
+
+
+def enter_sender_phase(torch: Any, resource_dir: Path, publication: Path, parent: dict[str, Any]) -> dict[str, Any]:
+    """Raise the parent limit only after all six identity-bound workers exit."""
+    files = sorted(resource_dir.glob('child-*.json'))
+    if (len(files) != 6 or parent['profile'] != GPU_PROFILE or parent['budget_mib'] != 4096
+            or parent['host_pid'] != os.getpid() or parent['host_pgid'] != os.getpgrp()
+            or process_start_if_present(parent['host_pid']) != parent['start_ticks']
+            or abs(parent['fraction'] - 4096 * 1024**2 / parent['total_bytes']) > 1e-12):
+        raise ValueError('initial parent or child receipt matrix differs')
+    expected = {(a, f'confirmation-bases/publish/bases/dcvc-{p}/plan.json')
+                for p in (0, 21, 42) for a in ('encode', 'decode')}
+    seen: set[tuple[str, str]] = set()
+    identities: set[tuple[int, int]] = set()
+    exited = []
+    for file in files:
+        child = json.loads(file.read_text())
+        key = (child['action'], child['plan'])
+        identity = (child['host_pid'], child['start_ticks'])
+        if (key not in expected or key in seen or identity in identities or child['profile'] != GPU_PROFILE
+                or child['role'] != 'dcvc' or child['pid'] != child['host_pid'] or child['host_pid'] <= 0
+                or child['start_ticks'] <= 0 or child['budget_mib'] != 6144 or child['allocated_before'] != 0
+                or child['host_pgid'] != parent['host_pgid'] or child['campaign_pgid'] != parent['campaign_pgid']
+                or child['gpu_uuid'] != parent['gpu_uuid'] or child['device_name'] != parent['device_name']
+                or child['capability'] != parent['capability'] or child['total_bytes'] != parent['total_bytes']
+                or abs(child['fraction'] - 6144 * 1024**2 / parent['total_bytes']) > 1e-12):
+            raise ValueError('worker action, identity or allocation mismatch')
+        point = next(p for p in (0, 21, 42) if f'dcvc-{p}/plan.json' in key[1])
+        report_path = publication / f'bases/dcvc-{point}/{key[0]}.json'
+        report = json.loads(report_path.read_text())
+        env = report['environment']
+        expected_variant = 'sm80' if parent['capability'] == [8, 6] else 'sm89'
+        native_path = publication / f'bases/dcvc-{point}/stream.psdc'
+        if (report['operation'] != key[0] or report['container_sha256'] != sha(native_path)
+                or env['device_name'] != parent['device_name'] or env['capability'] != parent['capability']
+                or env['cuda_visible_devices'] != parent['gpu_uuid'] or env['torch'] != '2.10.0+cu128'
+                or env['torch_cuda'] != '12.8' or env['extension']['variant'] != expected_variant
+                or not 0 <= report['peak_allocated_mib'] <= 6144
+                or (key[0] == 'decode' and not report['deterministic'])):
+            raise ValueError('worker report or native stream mismatch')
+        now_ticks = process_start_if_present(child['host_pid'])
+        if now_ticks == child['start_ticks']:
+            raise ValueError('DCVC worker is still alive')
+        seen.add(key)
+        identities.add(identity)
+        exited.append({'action': key[0], 'plan': key[1], 'host_pid': identity[0], 'start_ticks': identity[1],
+                       'observed_current_start_ticks': now_ticks, 'exited': True,
+                       'child_receipt_sha256': sha(file), 'worker_report_sha256': sha(report_path)})
+    if seen != expected:
+        raise ValueError('incomplete six-worker phase')
+    allocated = torch.cuda.memory_allocated(0)
+    reserved = torch.cuda.memory_reserved(0)
+    peak = torch.cuda.max_memory_reserved(0)
+    if not (0 <= allocated <= reserved <= 4096 * 1024**2 and reserved <= peak <= 4096 * 1024**2):
+        raise ValueError('parent exceeded initial allocator budget')
+    fraction = 8000 * 1024**2 / parent['total_bytes']
+    if not 0 < fraction <= 1:
+        raise ValueError('sender allocator fraction invalid')
+    torch.cuda.set_per_process_memory_fraction(fraction, 0)
+    result = {'schema': 1, 'profile': GPU_PROFILE, 'role': 'parent-sender',
+              'host_pid': parent['host_pid'], 'host_pgid': parent['host_pgid'], 'start_ticks': parent['start_ticks'],
+              'initial_budget_mib': 4096, 'sender_budget_mib': 8000, 'total_bytes': parent['total_bytes'],
+              'fraction': fraction, 'allocated_before': allocated, 'reserved_before': reserved,
+              'peak_reserved_before': peak, 'exited_children': exited}
+    write_receipt(resource_dir / 'parent-sender-phase.json', result)
+    return result
+
 def run_bases(args: argparse.Namespace) -> dict[str, Any]:
     import torch
     from experiments.tennis import k5, k5b_trackers, k5d_encoder, k5d_source_oracle
@@ -563,7 +639,8 @@ def run_bases(args: argparse.Namespace) -> dict[str, Any]:
         raise ValueError('BallTrack model is not on CUDA')
     worker_args = argparse.Namespace(timer=timer, encoder=tools['encoder']['path'], decoder=tools['decoder']['path'],
                                      image_ckpt=args.image_ckpt, image_sha256=IMAGE_CKPT,
-                                     video_ckpt=args.video_ckpt, video_sha256=VIDEO_CKPT)
+                                     video_ckpt=args.video_ckpt, video_sha256=VIDEO_CKPT,
+                                     sender_phase=lambda: enter_sender_phase(torch, resource_dir, pub, parent))
     result = prepare_bases(source=source, source_yuv=pub / 'source.yuv', fps=fps, work=pub / 'bases',
                            args=worker_args, tracker=tracker, cpus=cpus)
     shutil.copytree(resource_dir, pub / 'resource-receipts')
@@ -576,7 +653,8 @@ def run_bases(args: argparse.Namespace) -> dict[str, Any]:
                'dispatch': dispatch, 'cpus': cpus, 'cpu_binding': json.loads((stage / 'command-cpu-binding.json').read_text()),
                'wall_seconds': time.monotonic() - start,
                'cuda': {'name': torch.cuda.get_device_name(0), 'torch': torch.__version__, 'cuda': torch.version.cuda,
-                        'parent_allocator_cap_mib': 4096, 'parent_peak_reserved_bytes': torch.cuda.max_memory_reserved(),
+                        'parent_initial_allocator_cap_mib': 4096, 'parent_sender_allocator_cap_mib': 8000,
+                        'parent_peak_reserved_bytes': torch.cuda.max_memory_reserved(),
                         'child_allocator_cap_mib': 6144, 'profile': GPU_PROFILE, 'uuid': uuid}}
     write_receipt(pub / 'receipt.json', receipt)
     binding = publish_tree(pub, stage / 'published.tar')
@@ -678,9 +756,10 @@ def validate_resource_receipts(root: Path, receipt: dict[str, Any]) -> bool:
     """Bind parent and all six actual worker caps to plans, reports and device."""
     directory = root / 'resource-receipts'
     files = list(directory.glob('child-*.json'))
-    if len(files) != 6 or {p.name for p in directory.iterdir()} != {'parent.json', *(p.name for p in files)}:
+    if len(files) != 6 or {p.name for p in directory.iterdir()} != {'parent.json', 'parent-sender-phase.json', *(p.name for p in files)}:
         return False
     parent = json.loads((directory / 'parent.json').read_text())
+    phase = json.loads((directory / 'parent-sender-phase.json').read_text())
     cuda = receipt['cuda']
     uuid = cuda['uuid']
     device = (parent['device_name'], tuple(parent['capability']))
@@ -688,10 +767,21 @@ def validate_resource_receipts(root: Path, receipt: dict[str, Any]) -> bool:
     if (device not in variants or parent['profile'] != GPU_PROFILE or parent['role'] != 'parent'
             or parent['budget_mib'] != 4096 or parent['allocated_before'] != 0
             or parent['gpu_uuid'] != uuid or cuda['name'] != device[0]
-            or cuda['profile'] != GPU_PROFILE or cuda['parent_allocator_cap_mib'] != 4096 or cuda['child_allocator_cap_mib'] != 6144
-            or cuda['parent_peak_reserved_bytes'] > 4096 * 1024**2
+            or cuda['profile'] != GPU_PROFILE or cuda['parent_initial_allocator_cap_mib'] != 4096
+            or cuda['parent_sender_allocator_cap_mib'] != 8000 or cuda['child_allocator_cap_mib'] != 6144
+            or cuda['parent_peak_reserved_bytes'] > 8000 * 1024**2
+            or phase['schema'] != 1 or phase['profile'] != GPU_PROFILE or phase['role'] != 'parent-sender'
+            or phase['host_pid'] != parent['host_pid'] or phase['host_pgid'] != parent['host_pgid']
+            or phase['start_ticks'] != parent['start_ticks'] or phase['initial_budget_mib'] != 4096
+            or phase['sender_budget_mib'] != 8000 or phase['total_bytes'] != parent['total_bytes']
+            or abs(phase['fraction'] - 8000 * 1024**2 / parent['total_bytes']) > 1e-12
+            or not (0 <= phase['allocated_before'] <= phase['reserved_before'] <= phase['peak_reserved_before'] <= 4096 * 1024**2)
+            or len(phase['exited_children']) != 6
             or parent['host_pgid'] != parent['campaign_pgid'] or parent['start_ticks'] <= 0
             or abs(parent['fraction'] - 4096 * 1024**2 / parent['total_bytes']) > 1e-12):
+        return False
+    witnesses = {(w['action'], w['plan']): w for w in phase['exited_children']}
+    if len(witnesses) != 6:
         return False
     expected = {(action, f'confirmation-bases/publish/bases/dcvc-{p}/plan.json')
                 for p in (0, 21, 42) for action in ('encode', 'decode')}
@@ -712,7 +802,15 @@ def validate_resource_receipts(root: Path, receipt: dict[str, Any]) -> bool:
         seen.add(key)
         process_ids.add(process)
         point = next(p for p in (0, 21, 42) if f'dcvc-{p}/plan.json' in key[1])
-        report = json.loads((root / f'bases/dcvc-{point}/{key[0]}.json').read_text())
+        report_path = root / f'bases/dcvc-{point}/{key[0]}.json'
+        report = json.loads(report_path.read_text())
+        witness = witnesses.get(key)
+        if (witness is None or witness['exited'] is not True or witness['host_pid'] != child['host_pid']
+                or witness['start_ticks'] != child['start_ticks']
+                or witness['observed_current_start_ticks'] == child['start_ticks']
+                or witness['child_receipt_sha256'] != sha(path) or witness['worker_report_sha256'] != sha(report_path)
+                or report['operation'] != key[0]):
+            return False
         env = report['environment']
         if (env['device_name'] != device[0] or tuple(env['capability']) != device[1]
                 or env['cuda_visible_devices'] != uuid or env['torch'] != '2.10.0+cu128'
@@ -902,7 +1000,7 @@ def spec(phase: str, source_id: str, deadline: str, *, bases_archive: str = '', 
     }
     if phase == 'bases':
         result['gpu_sharing'] = {'mode': 'shared', 'margin_mib': 8192,
-                                 'basis': 'Parent 4 GiB and single DCVC child 6 GiB allocator caps; no throughput claim.'}
+                                 'basis': 'Parent 4 GiB plus one 6 GiB child, then parent 8000 MiB after child exits; no throughput claim.'}
         result['contention'] = {'policy': 'continue', 'resume_attempts': 0,
                                 'basis': 'Shared GPU correctness with bounded allocator caps; timings are not throughput.'}
     return result

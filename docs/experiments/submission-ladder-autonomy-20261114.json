@@ -348,7 +348,7 @@
       "id": "ball-confirmation-CPU-bootstrap-repair",
       "cpu_seconds": 14400,
       "gpu_seconds": 3600,
-      "state": "released_one_new209_job_after_verified_exact_bootstrap",
+      "state": "closed_parent_cap_failure_preserved",
       "parts": {
         "one_repaired_job_cpu": 10800,
         "one_repaired_job_gpu": 2700,
@@ -357,7 +357,11 @@
       },
       "reason": "GPU4CPUcampaign doesnotautomaticallyrestrictaffinity; standardlibrarywrapperpins4claimedCPUs BEFORENumPy/Torch/threadcreation; nofleetmanagerchange, samefrozencandidate/windows; old3fails retained",
       "gpu_profile": "ProspectivelyqualifiedA6000only pool2/3 from prior shared720positivevsAdashared720negativeevidence; no new-sourceinferenceoutcomes seen",
-      "boot_preflight_measured_child_CPU_seconds": 0.788
+      "boot_preflight_measured_child_CPU_seconds": 0.788,
+      "conservative_cpu_charge_seconds": 10800,
+      "conservative_gpu_charge_seconds": 2700,
+      "unreleased_cpu_seconds": 3600,
+      "unreleased_gpu_seconds": 900
     },
     {
       "id": "ball-confirmation-preflight-evidence-archive",
@@ -370,6 +374,53 @@
       "members": 137,
       "measured_builder_cpu_seconds": 1.888,
       "measurement_limit": "independentreadback/SSH/localoverheaduninstrumented"
+    },
+    {
+      "id": "ball-confirmation-parent-cap-failure-archive",
+      "cpu_seconds": 1200,
+      "gpu_seconds": 0,
+      "state": "closed_independent_readback81members",
+      "archive_sha256": "4f0a372004fa88bcf0f2e6b0275dec2b8b9b144918f3b9b0a95642f93b7c21cd",
+      "archive_bytes": 959426560,
+      "measured_cpu_seconds": 17.397,
+      "scope": "failed32frameactual6nativeprefix infrastructureonly, notquality/fullpromotion; beforeafter/everymemberreadback source/tmp/weightsunchanged"
+    },
+    {
+      "id": "ball-confirmation-sequential-memory-v2",
+      "cpu_seconds": 43200,
+      "gpu_seconds": 10800,
+      "state": "released_first_new209_smoke_then_conditional_other2",
+      "parts": {
+        "three_preparation_jobs_cpu": 32400,
+        "three_preparation_jobs_gpu": 8100,
+        "cpu_failure_preparation_allowance": 10800,
+        "gpu_failure_allowance": 2700
+      },
+      "per_job": {
+        "cpu_threads": 4,
+        "wall_seconds": 2700,
+        "cpu_seconds": 10800,
+        "gpu_seconds": 2700,
+        "smoke_frames": 32,
+        "full_frames": "64/64/154",
+        "smoke_seconds": 600,
+        "full_seconds": 1800
+      },
+      "reason": "Source32all6nativechecks passed; parent4GiBOOM atBallTrack unrelatedtoquality, actualfree19.54GiB. Newexplicitv2 sequentialprofile retainsparent4+child6duringnative; aftersixidentitycheckedexits raisesparentonly8000MiB (previousqualifiedsenderlimit), allunderunchanged12GiBclaim+8margin. No model/window/rate/batch/precisionchange; v1 preserved."
+    },
+    {
+      "id": "ball-spatial-support-control",
+      "cpu_seconds": 4500,
+      "gpu_seconds": 3000,
+      "state": "released_code_preparation_no_model_until_admission",
+      "purpose": "OLD48development paidpixelpatch32 includesbackground; comparefull32,central16,annulusoutside16 usingSAMEactualdecodedtile,positions/fullpaidprice; no newcohort/candidate/modeclaimed; actualoldfullpatchmetric/frameparityrequired",
+      "competing_explanation": "crop64gainmayrestorecourt/context ratherthanballappearance; nonlinearimprovementsnotadditivecausalshares",
+      "per_job_cpu_seconds": 2430,
+      "per_job_gpu_seconds": 2430,
+      "smoke": 450,
+      "full": 1800,
+      "validator": 60,
+      "no_new_training_or_encoder": true
     }
   ],
   "jobs": [
@@ -949,6 +1000,40 @@
       "failure": "GPU fourCPUcampaign default has no enforcedaffinity; stage_contextcorrectlyrejects; env32eexact, video/model untouched",
       "failed_diagnostic_sha256": "4ef612c3f0d376952a571c9912e4f1d173e1e70899eea34f51889678f1d0865e",
       "events_acknowledged": true
+    },
+    {
+      "job_id": "20261115T072203Z-f6fec126",
+      "allocation": "ball-confirmation-CPU-bootstrap-repair",
+      "source_id": "match209_000",
+      "state": "failed_smoke_parent4GiB_OOM_after_all6_native_checks",
+      "cpu_ceiling_seconds": 10800,
+      "gpu_ceiling_seconds": 2700,
+      "wall_ceiling_seconds": 2700,
+      "deadline": "2026-11-15T08:05:00Z",
+      "spec_sha256": "3b4afd9bdc0af1c1ea54578dc2661fe04b890d7f5f25900e8d49a6556e6372c6",
+      "revision": "0162467252176fc107e6e8a2f2adbc0342e48809",
+      "snapshot": {
+        "git_head": "0162467252176fc107e6e8a2f2adbc0342e48809",
+        "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tracked_changes_included": [],
+        "tracked_changes_excluded": [
+          "docs/continuation-submission-ladder-2026-11-15.md"
+        ],
+        "included_untracked_sha256": {},
+        "untracked_excluded_count": 0,
+        "untracked_excluded_paths_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "untracked_excluded_sample": [],
+        "deleted_paths": [],
+        "snapshot_sha256": "d22c21e0463579452de35f6d9745fe69ea3ad4e0dbcbc614ac813ef375b1fa64"
+      },
+      "submit_receipt": "/private/tmp/pointstream-confirmation-repair209-submit-20261115.json",
+      "submit_process_handle": 76687,
+      "actual_command_wall_seconds": 115.60441493988037,
+      "full_executed": false,
+      "gate_passed": false,
+      "source_native_prefix_frames": 32,
+      "perceptual_outcomes_opened": false,
+      "events_acknowledged": true
     }
   ],
   "decisions": [
@@ -1270,5 +1355,36 @@
     "deadline": "2026-11-15T08:00:00Z",
     "state": "batch_terminal_failed_all3; rawcanonicalwaitretained; eventsackpending"
   },
-  "confirmation_bootstrap_repair_index": "docs/experiments/submission-ladder-ball-confirmation-bootstrap-repair-20261115.json"
+  "confirmation_bootstrap_repair_index": "docs/experiments/submission-ladder-ball-confirmation-bootstrap-repair-20261115.json",
+  "confirmation_bootstrap_repair_job": "20261115T072203Z-f6fec126",
+  "confirmation_bootstrap_wait": {
+    "job_id": "20261115T072203Z-f6fec126",
+    "owner": "ROOT",
+    "max_seconds": 2400,
+    "deadline": "2026-11-15T08:05:00Z",
+    "path": "/private/tmp/pointstream-confirmation-repair209-wait-20261115.json",
+    "native_resume_callback": "unverified; attendedrootcontinuesindependentpaperwork; no recurringchecks"
+  },
+  "human_annotation_review_request": {
+    "kind": "genuinehumanVISORpilot18sourceframes",
+    "state": "asyncquestion_pending",
+    "URL": "http://127.0.0.1:17691/visor-confirmation-pilot/index.html",
+    "HTTP_verified_200": true,
+    "reason": "modelreviewcannotreplaceplanhumanreferencecorrection; allnative/ballworkcontinuesindependently",
+    "no_human_labels_fabricated": true
+  },
+  "manuscript_author_review_v1": {
+    "state": "draft_built_28_pages_root_visual_checked_selected_pages_not_authapproved",
+    "PDF": "/private/tmp/pointstream-manuscript-ladder-20261115/output/pdf/pointstream-ladder-author-review-20261115.pdf",
+    "PDF_sha256": "29901df8f76f3e8413544fe209712bcacfe688a65ed04e5fea7cd5b034dcb6f6",
+    "source_zip_sha256": "0b07d5292ccafb2cb888c4e75ab66fe04adb4b449a2309f7d1ae020122ab7a1e",
+    "pages_body_references": 23,
+    "pages_appendix": 5,
+    "confirmation_results": "pending",
+    "original_690cad0_and_Overleaf": "unchanged",
+    "moved_operational_words": 688,
+    "verbatim_reversible_mappings": 18,
+    "live_TOMM_portal": "modernACMauthorpageandManuscriptCentral403on2026-11-15; legacy2015home23+5reconfirmed,notcurrentportalverification"
+  },
+  "confirmation_memory_v2_index": "docs/experiments/submission-ladder-ball-confirmation-memory-v2-20261115.json"
 }
