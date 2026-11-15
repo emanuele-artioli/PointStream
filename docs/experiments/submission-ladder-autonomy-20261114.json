@@ -208,7 +208,7 @@
       "id": "fresh-sender-historical-parity",
       "cpu_seconds": 2400,
       "gpu_seconds": 1800,
-      "state": "released_one_smoke_conditional_full_no_confirmation",
+      "state": "closed_exact_old48_parity_accepted",
       "card": "docs/cards/submission-ladder-ball-confirmation-2026-11-15.md",
       "parts": {
         "one_job_cpu": 1530,
@@ -218,7 +218,11 @@
       },
       "hypothesis": "Generic freshsender preserves old48actual threeSVTBALLbytes andeverypixelhint using originalsixbackgrounds",
       "competing_explanation": "prefixor6\u21923fit/refactor couldchange hints, invalidating transferofdevelopmentcandidate",
-      "promotion": "Exactall3payload/centres/visibility/origins andcorrectness/costchecks only; noquality/confirmationfromoldsource"
+      "promotion": "Exactall3payload/centres/visibility/origins andcorrectness/costchecks only; noquality/confirmationfromoldsource",
+      "conservative_cpu_charge_seconds": 1530,
+      "conservative_gpu_charge_seconds": 1530,
+      "unreleased_cpu_seconds": 870,
+      "unreleased_gpu_seconds": 270
     },
     {
       "id": "tennis-confirmation-source-publication",
@@ -239,6 +243,95 @@
       "gpu_seconds": 0,
       "state": "released_code_only_no_model",
       "purpose": "eighteenrow/allframeandexplicitnullcrop scoring adapter; no dispatch"
+    },
+    {
+      "id": "ball-confirmation-independent-review",
+      "cpu_seconds": 600,
+      "gpu_seconds": 0,
+      "state": "closed_read_only_contract_review",
+      "result": "No physical/metricmathblocker; foundfullcostprovenancejoin, correctedwithnewROOTaccepted-fullclosure; noGPU"
+    },
+    {
+      "id": "ball-confirmation-native-timing-audit",
+      "cpu_seconds": 180,
+      "gpu_seconds": 0,
+      "state": "closed_exact_CFR_pass",
+      "measured_cpu_seconds": 7.295,
+      "measured_wall_seconds": 7.326,
+      "receipt_sha256": "87782d9e1a83b3b21756020e7c332184b0d404435bfff472d633f94e8deaf069",
+      "purpose": "ALLselected64/64/154nativePTS intervals+nextframe exact25/25/60Hz; noresize/model/quality"
+    },
+    {
+      "id": "ball-confirmation-resource-path-preflight",
+      "cpu_seconds": 180,
+      "gpu_seconds": 0,
+      "state": "closed_actual_model_tools_storage_management_verified",
+      "measured_remote_hash_cpu_seconds": 4.3,
+      "measurement_limit": "fleetRPC/localoverheadnotinstrumented"
+    },
+    {
+      "id": "ball-confirmation-six-base-preparation",
+      "cpu_seconds": 32400,
+      "gpu_seconds": 8100,
+      "state": "released_three_fixed_jobs_after_exact_parity_and_checks",
+      "parts": {
+        "three_jobs_cpu": 32400,
+        "three_jobs_gpu": 8100
+      },
+      "per_job": {
+        "cpu_threads": 4,
+        "smoke_seconds": 600,
+        "smoke_frames": 32,
+        "full_seconds": 1800,
+        "validator_seconds": 120,
+        "validators": 2,
+        "lifecycle_seconds": 60,
+        "budget_wall_seconds": 2700
+      },
+      "stop": "failedcorrectness/cost/resourcecontrol stopsfull; noqualityselection/tuning, preservefailedjob",
+      "question": "fresh6actualnative/neuraldecodes+preservedsender forfixed3matches beforecomparison",
+      "gpu_profile": "sharedqualifiedA6000/Ada 12288MiBclaim, parent4096 child6144MiB caps+8192margin; actualNVMLmonitor, no throughputclaim"
+    },
+    {
+      "id": "ball-confirmation-paid-controls",
+      "cpu_seconds": 32400,
+      "gpu_seconds": 0,
+      "state": "allocated_not_released_until_accepted_bases",
+      "parts": {
+        "three_jobs_cpu": 32400
+      },
+      "per_job": {
+        "cpu_threads": 4,
+        "smoke_seconds": 600,
+        "smoke_frames": 32,
+        "full_seconds": 1800,
+        "validator_seconds": 120,
+        "validators": 2,
+        "lifecycle_seconds": 60,
+        "budget_wall_seconds": 2700
+      },
+      "question": "samefittedpositionsfullpaidPTP3/streak3, rawROI3/matchedROI3; nofreeGTsignaling"
+    },
+    {
+      "id": "ball-confirmation-perceptual-scoring",
+      "cpu_seconds": 7290,
+      "gpu_seconds": 7290,
+      "state": "allocated_not_released_until_two_accepted_producers_per_source",
+      "parts": {
+        "three_jobs_cpu": 7290,
+        "three_jobs_gpu": 7290
+      },
+      "per_job": {
+        "cpu_threads": 1,
+        "smoke_seconds": 450,
+        "smoke_frames": 16,
+        "full_seconds": 1800,
+        "validator_seconds": 60,
+        "validators": 2,
+        "lifecycle_seconds": 60,
+        "budget_wall_seconds": 2430
+      },
+      "question": "frozen18rows/source all282fullframe/32visiblecrop endpoints, all3groupconfirmation, no postoutcometuning"
     }
   ],
   "jobs": [
@@ -682,6 +775,43 @@
       "body_cpu_seconds": 195.26010399999998,
       "acceptance_receipt": "/private/tmp/pointstream-ptp-denial-root-acceptance-20261115.json",
       "terminal_event_acknowledged": true
+    },
+    {
+      "job_id": "20261115T063751Z-c639d3b7",
+      "allocation": "fresh-sender-historical-parity",
+      "state": "root_accepted_exact_fresh_full48_sender_parity",
+      "cpu_ceiling_seconds": 1530,
+      "gpu_ceiling_seconds": 1530,
+      "deadline": "2026-11-15T07:15:00Z",
+      "spec_sha256": "915180302c9e43f182b9e3d0235805d37e4d7cca7d56789705573852a7400253",
+      "snapshot": {
+        "git_head": "ae6ce3a1f55d7692a5d3f5c90bb5cdaa03317fd1",
+        "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tracked_changes_included": [],
+        "tracked_changes_excluded": [
+          "src/codecs/dcvc_uf_worker.py"
+        ],
+        "included_untracked_sha256": {},
+        "untracked_excluded_count": 4,
+        "untracked_excluded_paths_sha256": "478ce36f30581288b83f98b76942495619aadfcc0394fe81c6a1cecd536fc171",
+        "untracked_excluded_sample": [
+          "experiments/tennis/ball_confirmation.py",
+          "experiments/tennis/ball_confirmation_score.py",
+          "tests/test_ball_confirmation.py",
+          "tests/test_ball_confirmation_score.py"
+        ],
+        "deleted_paths": [],
+        "snapshot_sha256": "30e1e3bcb31c86e94883112824205acc2a5818daae176ec637ad88dd6280fa8e"
+      },
+      "revision": "ae6ce3a1",
+      "input_scope": "old48historicalparityONLY",
+      "submit_receipt": "/private/tmp/pointstream-fresh-sender-submit-20261115T0638.json",
+      "submit_process_handle": 5210,
+      "publication_sha256": "14e0c6fd9286af5b54240cce4a866e80ad73f6be48707066dc500257bf960127",
+      "stage_sha256": "f59aea32d23384c98ef7eb9e845cb8444068416fdf1aa4032dcc73b5a5d07325",
+      "body_wall_seconds": 29.319776359014213,
+      "body_cpu_seconds": 29.192676999999996,
+      "whole_command_seconds": 31.077396392822266
     }
   ],
   "decisions": [
@@ -964,11 +1094,24 @@
   "fresh_sender_parity_preflight": {
     "spec_path": "/private/tmp/pointstream-fresh-sender-spec-20261115T0635.json",
     "deadline": "2026-11-15T07:15:00Z",
-    "state": "reviewed_ready_not_yet_submitted",
+    "state": "root_accepted_exact_full48_all3payloads_centres_visibility_origins",
     "preflight_receipt_sha256": "b2df4cece9abb424f23b0678797d46f1df11c39fc2397bd7a27c61fc22fe5115",
     "actual_inputs": "all6nativeYUV+3PSBL againstauthenticatedcheckpoint/pilot; modelcode5bec/tree f7a5, weight b052, env32e completefreshhash",
     "local_checks": "configuredRuff/Mypy644 and permissionedfull2567passed37skipped existingforkwarning; scopedfresh5+docs3pass",
     "fleet": "1743publishedjobs inspected inclhistoricalcontended/attention preserved; noactiveownjob; bothAda workersfresh; gpu5sharedheadroom37/39GiB, directgpu6SSHrefuses; workerlocaladmissionstillrequired; uploadedthroughreachablegpu1",
-    "scope": "old48only no newconfirmation quality; prefixsmoke16 cannotpromoteparity"
-  }
+    "scope": "old48only no newconfirmation quality; prefixsmoke16 cannotpromoteparity",
+    "job_id": "20261115T063751Z-c639d3b7",
+    "initial_rejection": "explicituploadhostdoctorrequiredall6SSH;failedbeforejobIDorrequest,line1377before1392; defaultconfigfirsthostgpu1verifiedsamerouteusedsuccessfully,no unknownreplayed",
+    "canonical_status": "running_gpu5_Ada1_UUID7754164a",
+    "wait": "one canonical wait max2400s ownerROOT; processhandle retained; noverifiednative model-resume callback/no recurringcalls",
+    "acceptance_index": "docs/experiments/submission-ladder-fresh-sender-parity-20261115.json"
+  },
+  "confirmation_physical_qualification": {
+    "fresh_sender_parity": "rootacceptedc639d3b7 exactall3payloads,348160B archive14e0c6fd",
+    "native_timing": "allselectedCFR25/25/60 provenexactticks; firstPTS0.04/0/0 normalizedonly",
+    "smoke": "32physframes instead16; old6base16/48 timings showlargefixedoverhead, notnewconfigurationthroughputproof; oneaxisframes, noquality orcandidatechanges",
+    "acceptance": "rawfull-validation enrichedwithphase/source/N/archive/stage/dispatch; ROOTcreatesNEWpostcanonicalcompleteclosure joiningouterexecutionactualbytes, neveroverwritesraw; scorerandcontrolrejectunboundgenericgate",
+    "model_quality_outcomes_opened": false
+  },
+  "ball_confirmation_admission_index": "docs/experiments/submission-ladder-ball-confirmation-admission-20261115.json"
 }

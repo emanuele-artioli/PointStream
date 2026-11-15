@@ -138,16 +138,20 @@ def _apply_optional_shared_parity_limit(torch: Any, environ: Any) -> None:
         return
     profiles = {'k5d-parity16-shared-numerical-v1': (16384, 8192),
                 'k5d-parity16-shared-numerical-low-memory-v1': (6144, 2048),
-                'k5d-parity16-shared-parent8-child2-v1': (10240, 2048)}
+                'k5d-parity16-shared-parent8-child2-v1': (10240, 2048),
+                'ball-confirmation-parent4-child6-v1': (12288, 6144)}
     if profile not in profiles:
         raise RuntimeError('unknown shared DCVC parity profile')
     declared, budget = profiles[profile]
+    allowed_devices = {('NVIDIA RTX A6000', (8, 6))}
+    if profile == 'ball-confirmation-parent4-child6-v1':
+        allowed_devices.add(('NVIDIA RTX 6000 Ada Generation', (8, 9)))
+    device = (torch.cuda.get_device_name(0), tuple(torch.cuda.get_device_capability(0)))
     if (environ.get('PS_GPU_SHARING') != 'shared'
             or environ.get('PS_GPU_MEMORY_LIMIT_MIB') != str(declared)
             or not environ.get('CUDA_VISIBLE_DEVICES', '').startswith('GPU-')
             or environ.get('PS_CLAIMED_GPU_UUID') != environ.get('CUDA_VISIBLE_DEVICES')
-            or torch.cuda.get_device_name(0) != 'NVIDIA RTX A6000'
-            or tuple(torch.cuda.get_device_capability(0)) != (8, 6)
+            or device not in allowed_devices
             or torch.cuda.memory_allocated(0) != 0):
         raise RuntimeError('shared DCVC parity allocator claim or device differs')
     total = torch.cuda.get_device_properties(0).total_memory
@@ -172,7 +176,9 @@ def _apply_optional_shared_parity_limit(torch: Any, environ: Any) -> None:
     if not plan.is_relative_to(scratch):
         raise RuntimeError('shared DCVC plan is outside scratch')
     with (receipts / f'child-{os.getpid()}.json').open('x') as stream:
-        json.dump({'role': 'dcvc', 'pid': os.getpid(), 'pgid': os.getpgrp(), 'budget_mib': budget,
+        extra = {'profile': profile, 'device_name': device[0], 'capability': list(device[1])} if (
+            profile == 'ball-confirmation-parent4-child6-v1') else {}
+        json.dump({**extra, 'role': 'dcvc', 'pid': os.getpid(), 'pgid': os.getpgrp(), 'budget_mib': budget,
                    'total_bytes': total, 'fraction': fraction, 'allocated_before': 0, 'host_pid': host_pid,
                    'host_pgid': host_pgid, 'start_ticks': start_ticks, 'campaign_pgid': group,
                    'action': sys.argv[1], 'plan': str(plan.relative_to(scratch)),
@@ -570,6 +576,8 @@ def decode(plan: dict[str, Any]) -> dict[str, Any]:
         "checkpoints": loaded, "load_seconds": round(load_seconds, 3), "passes": passes,
         "deterministic": passes[0]["frame_sha256"] == passes[1]["frame_sha256"],
         "environment": _environment(extension),
+        **({"peak_allocated_mib": round(torch.cuda.max_memory_allocated() / 2**20, 1)}
+           if os.environ.get('PS_K5D_SHARED_NUMERICAL') == 'ball-confirmation-parent4-child6-v1' else {}),
     }
 
 
