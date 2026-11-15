@@ -1,0 +1,29 @@
+{
+  "accepted": true,
+  "phase": "full",
+  "accepted_at_utc": "2026-11-15T09:23:56.861634+00:00",
+  "authority": "ROOT independently accepted all3 full same-job score artifacts and pinned joint analysis; narrow ball-priority criterion only",
+  "accepted_scores": [
+    {
+      "source_id": "match209_000",
+      "path": "/private/tmp/pointstream-confirmation-final-score-209-20261115.json",
+      "sha256": "f33c52acd671b234e82146e9bb723c9e6467f5e5c2ae3643a816aabab3c40f2a",
+      "accepted_full": true
+    },
+    {
+      "source_id": "match269_000",
+      "path": "/private/tmp/pointstream-confirmation-final-score-269-20261115.json",
+      "sha256": "3879acfb4032fdb512000c2354a7c2380eed06e7dae5f933eef6b00a1ded0039",
+      "accepted_full": true
+    },
+    {
+      "source_id": "match235_000",
+      "path": "/private/tmp/pointstream-confirmation-final-score-235-20261115.json",
+      "sha256": "92faf812e92642d01c5432777e0de04570e280820c3c2a6cbbe1e9130979753d",
+      "accepted_full": true
+    }
+  ],
+  "analysis_sha256": "e60ca013c6518a71f9059d029a3cf5bb90711edf6d262ad1ebb430887680a6d5",
+  "analysis_path": "/private/tmp/pointstream-confirmation-pinned-analysis-20261115.json",
+  "scientific_primary_criterion": true
+}

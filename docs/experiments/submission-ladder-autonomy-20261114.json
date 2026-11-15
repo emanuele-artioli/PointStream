@@ -300,7 +300,7 @@
       "id": "ball-confirmation-paid-controls",
       "cpu_seconds": 32400,
       "gpu_seconds": 0,
-      "state": "released_first209_afteraccepted_bases_other2conditional",
+      "state": "closed_all3_ROOTaccepted_36control_streams",
       "parts": {
         "three_jobs_cpu": 32400
       },
@@ -320,7 +320,7 @@
       "id": "ball-confirmation-perceptual-scoring",
       "cpu_seconds": 7290,
       "gpu_seconds": 7290,
-      "state": "allocated_not_released_until_two_accepted_producers_per_source",
+      "state": "closed_all3_ROOTaccepted_18methods282frames_primary_passed",
       "parts": {
         "three_jobs_cpu": 7290,
         "three_jobs_gpu": 7290
@@ -341,7 +341,7 @@
       "id": "ball-confirmation-manuscript-preparation",
       "cpu_seconds": 900,
       "gpu_seconds": 0,
-      "state": "released_new_isolated_draft_only",
+      "state": "closed_V1V2preserved_V3_ROOTaccepted18plus5",
       "scope": "existingacceptedcontrols+frozennewmethods; nofabricatedresults/Overleafpush/filing; original690zipunchanged"
     },
     {
@@ -389,7 +389,7 @@
       "id": "ball-confirmation-sequential-memory-v2",
       "cpu_seconds": 43200,
       "gpu_seconds": 10800,
-      "state": "released_first_new209_smoke_then_conditional_other2",
+      "state": "closed_all3preparations_ROOTaccepted_noqualitymethodchange",
       "parts": {
         "three_preparation_jobs_cpu": 32400,
         "three_preparation_jobs_gpu": 8100,
@@ -412,7 +412,7 @@
       "id": "ball-spatial-support-control",
       "cpu_seconds": 4500,
       "gpu_seconds": 3000,
-      "state": "released_one2430_old48_control_after_checks",
+      "state": "closed_original_failed_saved_output_CPUrevalidation_accepted",
       "purpose": "OLD48development paidpixelpatch32 includesbackground; comparefull32,central16,annulusoutside16 usingSAMEactualdecodedtile,positions/fullpaidprice; no newcohort/candidate/modeclaimed; actualoldfullpatchmetric/frameparityrequired",
       "competing_explanation": "crop64gainmayrestorecourt/context ratherthanballappearance; nonlinearimprovementsnotadditivecausalshares",
       "per_job_cpu_seconds": 2430,
@@ -426,14 +426,14 @@
       "id": "ball-confirmation-producer-acceptance",
       "cpu_seconds": 1800,
       "gpu_seconds": 0,
-      "state": "released_actual_same_job_full_archive_readback_and_closure",
+      "state": "closed_all3bases_controls_scores_independent_audits",
       "purpose": "acceptfullproduceractualarchives/metadata/commandcost joins beforecontrols/scoring; no modelorquality"
     },
     {
       "id": "confirmation-final-evidence-archiving",
       "cpu_seconds": 1800,
       "gpu_seconds": 0,
-      "state": "released",
+      "state": "closed92member_final_plus296memberpreparation_and27memberaudits",
       "parts": {
         "archive_assembly_verification": 1200,
         "failure_allowance": 600
@@ -1307,7 +1307,7 @@
       "job_id": "20261115T085305Z-80a172af",
       "allocation": "ball-confirmation-perceptual-scoring",
       "source_id": "match209_000",
-      "state": "submitted_quality_sealed",
+      "state": "ROOT_accepted_complete_full18_methods",
       "submit_receipt": "/private/tmp/pointstream-confirmation-score-209-submit-20261115.json",
       "spec_sha256": "ebdf733d2536c2600d66b42cdac393b6c8318f190dba7ed356e4c5c17380bd56",
       "deadline": "2026-11-15T10:15:00Z",
@@ -1333,13 +1333,14 @@
         ],
         "deleted_paths": [],
         "snapshot_sha256": "85fa5cc6cd1ccff0f8baf5ab3ec8eb1f33dd334ffccb8a490dccb340eba38a63"
-      }
+      },
+      "events_acknowledged": true
     },
     {
       "job_id": "20261115T085523Z-c570fa16",
       "allocation": "ball-confirmation-perceptual-scoring",
       "source_id": "match269_000",
-      "state": "submitted_quality_sealed",
+      "state": "ROOT_accepted_complete_full18_methods",
       "submit_receipt": "/private/tmp/pointstream-confirmation-score-269-submit-20261115.json",
       "spec_sha256": "5b0e34a15921740fc72c96f3c6441cb65ed60fca2de603b54f52adf2c062dcca",
       "deadline": "2026-11-15T10:15:00Z",
@@ -1368,13 +1369,14 @@
         ],
         "deleted_paths": [],
         "snapshot_sha256": "85fa5cc6cd1ccff0f8baf5ab3ec8eb1f33dd334ffccb8a490dccb340eba38a63"
-      }
+      },
+      "events_acknowledged": true
     },
     {
       "job_id": "20261115T090115Z-03ace192",
       "allocation": "ball-confirmation-perceptual-scoring",
       "source_id": "match235_000",
-      "state": "submitted_quality_sealed",
+      "state": "ROOT_accepted_complete_full18_methods",
       "submit_receipt": "/private/tmp/pointstream-confirmation-score-235-submit-20261115.json",
       "spec_sha256": "9be95423d4fd8e154cc17ab88688c832ff92af9e3d35190668cd6fa0d5e9021a",
       "deadline": "2026-11-15T10:15:00Z",
@@ -1398,7 +1400,8 @@
         ],
         "deleted_paths": [],
         "snapshot_sha256": "c31fc29d30878603aa94bac0b61d3f5a7f4cbb0bb400129f7880da096c81804f"
-      }
+      },
+      "events_acknowledged": true
     }
   ],
   "decisions": [
@@ -1837,8 +1840,60 @@
       "docs/experiments/submission-ladder-confirmation-235-controls-acceptance-20261115.json"
     ]
   },
-  "new_confirmation_quality_state": "209269ROOTmetadataaccepted_valuessealed;235running",
+  "new_confirmation_quality_state": "ALL3_ROOTaccepted_then_jointly_unsealed_2026-11-15T09:24Z_primary_passed",
   "confirmation_visual_rule": "docs/experiments/submission-ladder-confirmation-visual-freeze-20261115.json",
   "current_preparation_evidence_archive": "docs/experiments/submission-ladder-confirmation-preparation-evidence-20261115.json",
-  "current_live_portal_check": "docs/experiments/submission-ladder-tomm-live-portal-20261115.json"
+  "current_live_portal_check": "docs/experiments/submission-ladder-tomm-live-portal-20261115.json",
+  "ball_confirmation_final": {
+    "analysis": "docs/experiments/submission-ladder-ball-confirmation-analysis-20261115.json",
+    "analysis_sha256": "e60ca013c6518a71f9059d029a3cf5bb90711edf6d262ad1ebb430887680a6d5",
+    "primary_criterion": true,
+    "equal_source_crop_DISTS_BDrate": -0.2627620216520982,
+    "all_frame_full_DISTS_cost": 0.1738828716992123,
+    "all_frame_scalar_LPIPS_cost": 0.24635220016819848,
+    "scope": "3sourcegroups/32visible/282fullframes; TRAIN overlap; level1only; LPIPS269unsupported retained",
+    "no_retuning_opened_cohort": true
+  },
+  "next_foreground_proposal": {
+    "card": "docs/cards/submission-ladder-next-foreground-screen-proposal-2026-11-15.md",
+    "state": "not_released_future_stage",
+    "cpu_ceiling_seconds": 21060,
+    "gpu_ceiling_seconds": 6075,
+    "changed_assumption": "suppressduplicateROIcodinginbase; finite actualcodedoracle",
+    "training": false
+  },
+  "manuscript_author_review_v2": {
+    "state": "complete_readonly_preserved",
+    "directory": "/Users/manu/Documents/PointStream-review/2026-11-15-ladder-author-review-v2",
+    "PDF_sha256": "e766c4393b278ce74163cb1f2c2fc879f140628b85c065437d964b6111395a73",
+    "source_ZIP_sha256": "1635801d28defd5abe29e68f944a546324e3c67445d10f455b84364bb8f0b897",
+    "ROOT_review": "p1p14p21numbersandfigurevalid; mainstilloperationalchronology; NEWv3focusedrewriteauthorized_originalv2preserved"
+  },
+  "manuscript_author_review_v3": {
+    "state": "ROOTaccepted_readonly18plus5_all23reviewed",
+    "record": "docs/paper/submission-ladder-author-review-v3-2026-11-15.json",
+    "PDF_sha256": "98212737760e6beea7b9027ac19274fd0bc5d3120822ecfcdde2d6fb23f0e8c7",
+    "ZIP_sha256": "aac006d849079b25119ecae6fee252922f3fdfe652b183c4bf7b50019eaf4643",
+    "Overleaf_push": false,
+    "submission": false
+  },
+  "final_evidence_archive": {
+    "index": "docs/experiments/submission-ladder-confirmation-final-evidence-20261115.json",
+    "sha256": "67901787a8b73288c0608942f9e87c74426bb838743bfa7e36a82f17eca1f3ac",
+    "bytes": 103936000,
+    "members": 92,
+    "table_recompute": "included",
+    "rescore_reencode": "additionaldeclaredresources/source/fullreconstructionarchives required",
+    "read_only": "0444/0555_notOSimmutability"
+  },
+  "current_phase": {
+    "state": "completed_bounded_science_paper_and_artifact_stage",
+    "science_jobs": "allterminal; originalspatialFAILEDpreserved",
+    "new_GPU_work": "nonequeued",
+    "human_annotation_pilot": "pending_genuinehumanexport",
+    "human_server": "selfexpires11:07:34Z",
+    "submission": "notfiled_requiresseparateinstruction",
+    "next_proposal": "notreleased",
+    "budget_authority_expiry": "2026-11-15T11:07:34Z"
+  }
 }

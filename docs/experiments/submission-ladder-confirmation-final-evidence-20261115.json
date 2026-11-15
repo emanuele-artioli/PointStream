@@ -1,0 +1,97 @@
+{
+  "schema": "pointstream.confirmation.final-evidence.index.v1",
+  "status": "accepted",
+  "archive": {
+    "directory": "/home/itec/emanuele/Datasets/pointstream-data/ladder-autonomy-20261114/evidence-confirmation-final-20261115T100141Z-50168e28",
+    "archive": "/home/itec/emanuele/Datasets/pointstream-data/ladder-autonomy-20261114/evidence-confirmation-final-20261115T100141Z-50168e28/evidence.tar",
+    "sha256": "67901787a8b73288c0608942f9e87c74426bb838743bfa7e36a82f17eca1f3ac",
+    "bytes": 103936000,
+    "member_count": 92,
+    "member_bytes": 103775100,
+    "manifest_sha256": "851f3d26b4e37c81cba1cbd710f3290f9a3aaced3ec046e621a315204f63e6ec",
+    "manifest_bytes": 36490,
+    "modes": {
+      "archive": "0444",
+      "manifest": "0444",
+      "directory": "0555"
+    },
+    "elapsed_seconds": 3.431,
+    "cpu_seconds": 2.55
+  },
+  "manifest": "/home/itec/emanuele/Datasets/pointstream-data/ladder-autonomy-20261114/evidence-confirmation-final-20261115T100141Z-50168e28/manifest.json",
+  "staged_provenance": {
+    "directory": "/home/itec/emanuele/Datasets/pointstream-data/ladder-autonomy-20261114/evidence-confirmation-final-stage-20261115T093034Z-42a25f03",
+    "manifest_sha256": "11a0bb542a6c7b93330120be4fae6b126e0e30cf3f69241b5630ecc0744dbb56",
+    "member_count": 72
+  },
+  "preparation_archive": {
+    "archive": "/home/itec/emanuele/Datasets/pointstream-data/ladder-autonomy-20261114/evidence-confirmation-preparation-20261115T090429Z-dd4f5ff1/evidence.tar",
+    "sha256": "2277d4307a4338196c0d2973a54b5b27e62e7b3d7dd0ba5411815cab6f3edb0f",
+    "bytes": 224716800,
+    "member_count": 296,
+    "manifest_sha256": "ffb5ddb46bfd4a91742e42010c9c5d6fd7c22c93a274164c6b0a21b79d324a63"
+  },
+  "preparation_audits": {
+    "archive": "/home/itec/emanuele/Datasets/pointstream-data/ladder-autonomy-20261114/evidence-confirmation-audits-20261115T090557Z-1c3014fc/evidence.tar",
+    "sha256": "890ad01ab549331bde2730a0ff8159d25afc00221e7b306b699796ffcd8d39a9",
+    "bytes": 2918400,
+    "member_count": 27,
+    "manifest_sha256": "bac10648b5b878ab04d74899c6be521881eab76e359a05fdc638469ee10ab6c9"
+  },
+  "score_jobs": [
+    "20261115T085305Z-80a172af",
+    "20261115T085523Z-c570fa16",
+    "20261115T090115Z-03ace192"
+  ],
+  "figure_sha256": "c1875f29f923ed90fd90df7a9ca9ad9ba4a7dedad933c77c46ecae87848e7081",
+  "paper_v3": {
+    "anonymous_pdf_sha256": "98212737760e6beea7b9027ac19274fd0bc5d3120822ecfcdde2d6fb23f0e8c7",
+    "identifiable_author_review_source_zip_sha256": "aac006d849079b25119ecae6fee252922f3fdfe652b183c4bf7b50019eaf4643",
+    "artifact_manifest_sha256": "81b382e9149472d8a02503948a34a24914e3db36275066b32b490a7218db53a9",
+    "pages": "18 body and references; 5 appendix",
+    "review": "ROOT visual review of pages 1, 11 and 16 and manifest hash readback passed",
+    "scope": "Nine legacy operational blocks moved verbatim; 18 recorded limitations remain unresolved; primary table and authenticated figure unchanged."
+  },
+  "paper_v2_references": [
+    {
+      "path": "/Users/manu/Documents/PointStream-review/2026-11-15-ladder-author-review-v2/pdf/pointstream-ladder-v2-anonymous-author-review-20261115.pdf",
+      "sha256": "e766c4393b278ce74163cb1f2c2fc879f140628b85c065437d964b6111395a73",
+      "bytes": 760528
+    },
+    {
+      "path": "/Users/manu/Documents/PointStream-review/2026-11-15-ladder-author-review-v2/pointstream-ladder-v2-IDENTIFIABLE-author-review-source-20261115.zip",
+      "sha256": "1635801d28defd5abe29e68f944a546324e3c67445d10f455b84364bb8f0b897",
+      "bytes": 5080503
+    },
+    {
+      "path": "/Users/manu/Documents/PointStream-review/2026-11-15-ladder-author-review-v2/artifact-manifest.json",
+      "sha256": "33c1b6f039f6dbb00c453ef1a62fdc511e96a5ed530e4dc6ccdbbe380d00cd16",
+      "bytes": 1549
+    }
+  ],
+  "layers": {
+    "table_recomputation": "Saved scalar scores, pinned analysis and verification are included.",
+    "rescore": "Requires the referenced complete preparation/control archives containing reconstructions, source preparation, and installed pinned metric environments and weights.",
+    "reencode": "Additionally requires referenced original source, configurations, pinned encoder/decoder runtimes and model weights."
+  },
+  "verification": "All staged source files hashed before and after archival; paper sources hashed before and after local packaging; every regular archive member verified by readback; archive SHA read back. No original job artifacts mutated for final archive.",
+  "resource_accounting": {
+    "cpu_ceiling_seconds": 1800,
+    "gpu_seconds": 0,
+    "measured_cpu_seconds": {
+      "preparation_and_audit_archives": 86.584,
+      "figure_failed_then_successful_user_plus_system": 72.32,
+      "score_stage": 1.116,
+      "paper_packaging": 0.094,
+      "final_assembly": 2.55
+    },
+    "measured_cpu_subtotal_seconds": 162.664,
+    "accounting_limit": "Subtotal sums recorded process receipts; small SSH/status, local checks and independent image readback were not individually metered."
+  },
+  "limitations": [
+    "Paper source ZIP is identifiable author-review material, not anonymous.",
+    "V3 moves nine legacy operations blocks verbatim; 18 recorded limitations remain unresolved.",
+    "Tables can be recomputed from saved scalar scores and analysis; rescoring needs referenced source/reconstruction full archives plus metric environments and weights; reencoding additionally needs source, runtimes, encoders and models.",
+    "Read-only modes do not establish OS-level immutability."
+  ]
+}
