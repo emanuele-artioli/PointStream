@@ -1,0 +1,39 @@
+{
+  "state": "released_frozen_three_source_physical_preparation_before_outcomes",
+  "hypothesis_card": "docs/cards/submission-ladder-ball-confirmation-2026-11-15.md",
+  "source_manifest_sha256": "df0dabf48b61ed3a096a9a6b4e54d823ca3b279c86d6a09e69ef0cd9bf2ceeb1",
+  "source_archive_sha256": "e5edc12c857658a119bf6d6cbe029ee64c09d6a860f1b975fe0708952895293d",
+  "code_sha256": {
+    "experiments/tennis/ball_confirmation.py": "69a6af0071abd07514370e8341d77961ad2993d5d23a1444e4dce7b57c189b80",
+    "experiments/tennis/ball_confirmation_score.py": "4b49e1b05f53b47a40c51a7e994ace8925f0ab7e7ea472577d32135613c4fe9e",
+    "experiments/tennis/ball_confirmation_analysis.py": "72e02905c2f6101ecd95af0eef97daaff013dc6af4d347c51c23fccf2bd25b9b",
+    "src/codecs/dcvc_uf_worker.py": "2753d79d0dfb55edfcc75a128cb21d74e7bfc20a7c0fb07134d255ce0801db60"
+  },
+  "fresh_sender_parity_acceptance": "docs/experiments/submission-ladder-fresh-sender-parity-20261115.json",
+  "source_CFR_receipt_sha256": "87782d9e1a83b3b21756020e7c332184b0d404435bfff472d633f94e8deaf069",
+  "resource_preflight_sha256": "dd345ba000ae82b3e1abf04c867df983d4c64c3349dbc786623b98b42ad45975",
+  "device_snapshot_sha256": "f20445bfc7145ada1a9e4354bd08d246760c16abbe7838c2ce99283dfcf888c0",
+  "checks": "configuredRuff/Mypy649 pass; full2580passed37skippedexistingforkwarning; postbudgetfocused18pass; independentphysical/metricmathreview no blocker, producerclosure join corrected before jobs",
+  "new_confirmation_quality_opened": false,
+  "specs": [
+    {
+      "source_id": "match209_000",
+      "path": "/private/tmp/pointstream-confirmation-ROOT-bases-match209_000-20261115.json",
+      "normalized_spec_sha256": "f21cb006c1d1254e48ffbc54aeef58d474c09af7199bbe678367a11aacdd804e",
+      "raw_sha256": "3384539cd1c88c9b4b7a1c7fadac9a93a2bf0bf64b67472264c5c53b5cb41dcd"
+    },
+    {
+      "source_id": "match269_000",
+      "path": "/private/tmp/pointstream-confirmation-ROOT-bases-match269_000-20261115.json",
+      "normalized_spec_sha256": "3817a40f039b3f92a18fc815c0a12c52eb28a91ac427164982ffb5d76ff323f5",
+      "raw_sha256": "bdc76884d6346759f0cef1b32968883c42d780913cc638dcc5151840f6af2a21"
+    },
+    {
+      "source_id": "match235_000",
+      "path": "/private/tmp/pointstream-confirmation-ROOT-bases-match235_000-20261115.json",
+      "normalized_spec_sha256": "eda23313da316cfce9cd94d688922686da611a1e09835d906ec17c93fdf0ff94",
+      "raw_sha256": "e798d04f523800905383fc59e98de30a58d59638b35564532cab65b454be85c9"
+    }
+  ],
+  "stop": "strictcorrectness/cost/fullreceiverchecks; do notretunefromconfirmation or silentlydropgroups"
+}

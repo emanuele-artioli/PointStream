@@ -1,0 +1,90 @@
+{
+  "job_id": "20261115T063751Z-c639d3b7",
+  "state": "root_accepted_exact_fresh_full48_sender_parity",
+  "publication_sha256": "14e0c6fd9286af5b54240cce4a866e80ad73f6be48707066dc500257bf960127",
+  "publication_bytes": 348160,
+  "sender_sha256": "494bae0a2bd7db9c7d71b83e2a8aa12041ff93673dd9b9d0cb4fb955dc8cf69d",
+  "stage_sha256": "f59aea32d23384c98ef7eb9e845cb8444068416fdf1aa4032dcc73b5a5d07325",
+  "retained_records_sha256": "9a92f3325dc364db42b277262b6e16c04f9862aba8082196d811d5965a4baa54",
+  "checks": {
+    "source_identity": true,
+    "producer_identity": true,
+    "checkpoint_identity": true,
+    "model_code": true,
+    "model_weight": true,
+    "gpu": true,
+    "fps": true,
+    "size": true,
+    "track_count": true,
+    "dcvc-0:quantized": true,
+    "dcvc-21:quantized": true,
+    "dcvc-42:quantized": true,
+    "svt-48:quantized": true,
+    "svt-55:quantized": true,
+    "svt-62:quantized": true,
+    "parity": true,
+    "prefix_not_promoted": true,
+    "stage_frame_binding": true,
+    "full_promotable": true,
+    "dispatch_identity": true,
+    "archive_member_hashes": true,
+    "saved_checks_equal": true,
+    "cost": true,
+    "gate": true,
+    "whole_command": true
+  },
+  "parity": {
+    "applicable": true,
+    "checks": {
+      "48": {
+        "historical_centres_visibility": true,
+        "historical_payload": true,
+        "oracle_centres": true,
+        "oracle_quantized_origins": true
+      },
+      "55": {
+        "historical_centres_visibility": true,
+        "historical_payload": true,
+        "oracle_centres": true,
+        "oracle_quantized_origins": true
+      },
+      "62": {
+        "historical_centres_visibility": true,
+        "historical_payload": true,
+        "oracle_centres": true,
+        "oracle_quantized_origins": true
+      }
+    },
+    "passed": true
+  },
+  "identity": {
+    "source_sha256": "3a30c3a683bc6d1c45c83c1b87293944758c40241fdefb58086b0f90e2fe4b1f",
+    "snapshot_sha256": "30e1e3bcb31c86e94883112824205acc2a5818daae176ec637ad88dd6280fa8e",
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "gpu": {
+    "name": "NVIDIA RTX 6000 Ada Generation",
+    "capability": [
+      8,
+      9
+    ],
+    "device_count": 1,
+    "model_on_cuda": true,
+    "torch": "2.10.0+cu128",
+    "cuda": "12.8",
+    "peak_reserved_bytes": 8061452288
+  },
+  "cost": {
+    "frames": 48,
+    "target_frames": 48,
+    "wall_seconds": 29.319776359014213,
+    "cpu_seconds": 29.192676999999996,
+    "forecast_seconds": 73.97966453852132,
+    "full_cap_seconds": 900,
+    "fixed_reserve_seconds": 30,
+    "passed": true,
+    "basis": "entrypoint body wall after imports, including archive and internal replay; smoke 1.5 * wall * 48 / 16 + 30; full uses body wall"
+  },
+  "whole_command_seconds": 31.077396392822266,
+  "scope": "fresh BallTrack +six genuine cached native backgrounds+original fit/guard/BALL; not complete fresh six-base encode speed, confirmation or task judging"
+}
