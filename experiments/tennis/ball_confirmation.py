@@ -445,12 +445,37 @@ def tool_identity() -> dict[str, Any]:
     return result
 
 
+
+def valid_cpu_binding(binding: dict[str, Any], cpus: list[int], *, role: str,
+                      parent: dict[str, Any] | None = None) -> bool:
+    from experiments.tennis import ball_confirmation_entry as entry
+
+    try:
+        allowed, selected = binding['allowed'], binding['selected']
+        valid = (binding['schema'] == 1 and binding['role'] == role and binding['claim'] == 4
+                 and binding['task_count_before'] == 1 and allowed == sorted(set(allowed))
+                 and len(allowed) >= 4 and selected == allowed[:4] == binding['after'] == cpus
+                 and binding['pid'] > 0 and binding['pgid'] > 0 and binding['start_ticks'] > 0
+                 and binding['code_sha256'] == sha(Path(entry.__file__)))
+        if parent is not None:
+            valid = (valid and binding['pid'] == parent['host_pid'] and binding['pgid'] == parent['host_pgid']
+                     and binding['start_ticks'] == parent['start_ticks'])
+        return bool(valid)
+    except (KeyError, TypeError, ValueError):
+        return False
+
 def stage_context() -> tuple[Path, Path, dict[str, Any], list[int]]:
+    from experiments.tennis import ball_confirmation_entry
+
     stage = Path(os.environ['PS_STAGE_DIR'])
     scratch = Path(os.environ['PS_SCRATCH_DIR'])
     dispatch = json.loads((stage / 'dispatch.json').read_text())
     cpus = sorted(os.sched_getaffinity(0))  # type: ignore[attr-defined,unused-ignore]
-    if (len(cpus) != 4 or os.environ.get('PS_CPU_ALLOWANCE') != '4'
+    binding = json.loads((stage / 'command-cpu-binding.json').read_text())
+    if (not valid_cpu_binding(binding, cpus, role='command') or binding['pid'] != os.getpid()
+            or binding['pgid'] != os.getpgrp()
+            or binding['start_ticks'] != ball_confirmation_entry.process_start_ticks()
+            or os.environ.get('PS_CPU_ALLOWANCE') != '4'
             or dispatch['staged_environment']['sha256'] != RUNTIME_SHA):
         raise ValueError('four-CPU affinity or frozen runtime mismatch')
     return stage, scratch, dispatch, cpus
@@ -483,10 +508,9 @@ def run_bases(args: argparse.Namespace) -> dict[str, Any]:
     if args.frames != frames:
         raise ValueError('stage span mismatch')
     device = (torch.cuda.get_device_name(0), tuple(torch.cuda.get_device_capability(0)))
-    if (torch.cuda.device_count() != 1 or device not in {('NVIDIA RTX A6000', (8, 6)),
-                                                         ('NVIDIA RTX 6000 Ada Generation', (8, 9))}
+    if (torch.cuda.device_count() != 1 or device != ('NVIDIA RTX A6000', (8, 6))
             or torch.__version__ != '2.10.0+cu128' or torch.version.cuda != '12.8'):
-        raise ValueError('qualified A6000 or Ada CUDA runtime required')
+        raise ValueError('qualified A6000 CUDA runtime required')
     uuid = os.environ.get('CUDA_VISIBLE_DEVICES', '')
     if (not uuid.startswith('GPU-') or ',' in uuid or os.environ.get('PS_CLAIMED_GPU_UUID') != uuid
             or os.environ.get('PS_GPU_SHARING') != 'shared' or os.environ.get('PS_GPU_MEMORY_LIMIT_MIB') != '12288'
@@ -549,7 +573,8 @@ def run_bases(args: argparse.Namespace) -> dict[str, Any]:
                'conversion_command': convert, 'tools': tools, 'result': result,
                'resources': {'model_tree': MODEL_TREE, 'model_weight': MODEL_WEIGHT,
                              'image_ckpt': IMAGE_CKPT, 'video_ckpt': VIDEO_CKPT},
-               'dispatch': dispatch, 'cpus': cpus, 'wall_seconds': time.monotonic() - start,
+               'dispatch': dispatch, 'cpus': cpus, 'cpu_binding': json.loads((stage / 'command-cpu-binding.json').read_text()),
+               'wall_seconds': time.monotonic() - start,
                'cuda': {'name': torch.cuda.get_device_name(0), 'torch': torch.__version__, 'cuda': torch.version.cuda,
                         'parent_allocator_cap_mib': 4096, 'parent_peak_reserved_bytes': torch.cuda.max_memory_reserved(),
                         'child_allocator_cap_mib': 6144, 'profile': GPU_PROFILE, 'uuid': uuid}}
@@ -639,6 +664,7 @@ def run_controls(args: argparse.Namespace) -> dict[str, Any]:
                'fps': [fps.numerator, fps.denominator], 'base_archive_sha256': binding['archive']['sha256'],
                'base_acceptance_sha256': args.bases_acceptance_sha256,
                'source_yuv_sha256': sha(source), 'tools': tools, 'dispatch': dispatch, 'cpus': cpus,
+               'cpu_binding': json.loads((stage / 'command-cpu-binding.json').read_text()),
                'result': result, 'wall_seconds': time.monotonic() - start}
     write_receipt(pub / 'receipt.json', receipt)
     archive = publish_tree(pub, stage / 'published.tar')
@@ -709,6 +735,9 @@ def validate_publication(root: Path, record: dict[str, Any]) -> dict[str, bool]:
               and receipt['frames'] == frames and receipt['fps'] == [fps.numerator, fps.denominator],
               'runtime': receipt['dispatch']['staged_environment']['sha256'] == RUNTIME_SHA,
               'allocation': len(receipt['cpus']) == 4 and len(set(receipt['cpus'])) == 4}
+    binding = receipt['cpu_binding']
+    parent = json.loads((root / 'resource-receipts/parent.json').read_text()) if record['phase'] == 'bases' else None
+    checks['cpu_binding'] = valid_cpu_binding(binding, receipt['cpus'], role='command', parent=parent)
     if record['phase'] == 'bases':
         checks['gpu_child_allocator_cap'] = validate_resource_receipts(root, receipt)
         source = root / 'source.rgb'
@@ -790,8 +819,15 @@ def validate_publication(root: Path, record: dict[str, Any]) -> dict[str, bool]:
 
 def validate_stage() -> dict[str, Any]:
     import tempfile
+    from experiments.tennis import ball_confirmation_entry
 
     stage = Path(os.environ['PS_STAGE_DIR'])
+    validator_binding = json.loads((stage / 'validator-cpu-binding.json').read_text())
+    validator_cpus = sorted(os.sched_getaffinity(0))  # type: ignore[attr-defined,unused-ignore]
+    if (not valid_cpu_binding(validator_binding, validator_cpus, role='validator')
+            or validator_binding['pid'] != os.getpid() or validator_binding['pgid'] != os.getpgrp()
+            or validator_binding['start_ticks'] != ball_confirmation_entry.process_start_ticks()):
+        raise ValueError('validator CPU binding mismatch')
     record = json.loads((stage / 'confirmation-stage.json').read_text())
     with tempfile.TemporaryDirectory(prefix='confirmation-check-', dir=os.environ['TMPDIR']) as temp:
         root = Path(temp) / 'publish'
@@ -850,17 +886,17 @@ def spec(phase: str, source_id: str, deadline: str, *, bases_archive: str = '', 
     arguments += (['--source-archive-sha256', SOURCE_ARCHIVE_SHA] if phase == 'bases'
                   else ['--bases-binding-sha256', binding_sha, '--bases-acceptance-sha256', acceptance_sha])
     result: dict[str, Any] = {
-        'schema': 1, 'device': 'gpu' if phase == 'bases' else 'cpu', 'hosts': ['gpu2', 'gpu3', 'gpu5', 'gpu6'] if phase == 'bases' else ['gpu1', 'gpu3', 'gpu5'],
-        'gpu_models': ['RTX A6000', 'RTX 6000 Ada'] if phase == 'bases' else [],
+        'schema': 1, 'device': 'gpu' if phase == 'bases' else 'cpu', 'hosts': ['gpu2', 'gpu3'] if phase == 'bases' else ['gpu1', 'gpu3', 'gpu5'],
+        'gpu_models': ['RTX A6000'] if phase == 'bases' else [],
         'gpu_memory_mib': 12288 if phase == 'bases' else 0,
-        'cpu_threads': 4, 'local_storage_gib': 40, 'entrypoint': ['-m', 'experiments.tennis.ball_confirmation'],
+        'cpu_threads': 4, 'local_storage_gib': 40, 'entrypoint': ['-m', 'experiments.tennis.ball_confirmation_entry'],
         'arguments': arguments, 'staged_inputs': staged,
         'inputs': [{'path': p['path'], 'sha256': p['sha256']} for p in staged],
         'environment': {'path': data + '/environments/pointstream-20261009T214002Z.tar.gz', 'sha256': RUNTIME_SHA},
         'verify_staged_inputs': True, 'required_commands': [],
         'scale': {'frames': {'smoke': SMOKE_FRAMES, 'full': SOURCES[source_id][0]}},
         'smoke': {'seconds': 600, 'representative_basis': 'Actual first 32 native frames, six real bases and sender or six controls; full-run forecast gate. Historical 16/48 timings suggest fixed overhead, not new-host throughput evidence.'},
-        'full': {'seconds': 1800}, 'validator': ['{python}', '-m', 'experiments.tennis.ball_confirmation', '--validate'],
+        'full': {'seconds': 1800}, 'validator': ['{python}', '-m', 'experiments.tennis.ball_confirmation_entry', '--validate'],
         'validator_seconds': 120, 'budget_seconds': 2700, 'stall_seconds': 600, 'deadline': deadline,
         'contention': {'policy': 'stop', 'resume_attempts': 0},
     }

@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "scope": "firstCPUbootstrapcorrectnessrepair; no method/cohort/rate/endpointchanges",
+  "new_job_state": "not_yet_submitted",
+  "source_id": "match209_000",
+  "spec_path": "/private/tmp/pointstream-confirmation-repair209-spec-20261115.json",
+  "spec_sha256": "3b4afd9bdc0af1c1ea54578dc2661fe04b890d7f5f25900e8d49a6556e6372c6",
+  "deadline": "2026-11-15T08:05:00Z",
+  "cpu_ceiling_seconds": 10800,
+  "gpu_ceiling_seconds": 2700,
+  "wall_ceiling_seconds": 2700,
+  "entry_sha256": "ede4765d5f3f946c85a6ad0ef2f2c8d902c079ccda293213ba47ce4e288a2351",
+  "physical_sha256": "8f40c0d9b3d62f1fd9500cd5e0f05e496aa2ebfe24b939c568ac79a1a6e12707",
+  "actual_bootstrap_preflights": {
+    "gpu1": {
+      "path": "/private/tmp/pointstream-bootstrap-receipt-gpu1-20261115.json",
+      "sha256": "bffba83b7a08af0777b15bc35d39decc2bdefb49fc6b078bd6760aa7064e9cb0"
+    },
+    "gpu3": {
+      "path": "/private/tmp/pointstream-bootstrap-receipt-gpu3-20261115.json",
+      "sha256": "ebd1f930e5caa593d32f90aee3d790e458aec36235864963618cb62012cbbd71"
+    },
+    "gpu5": {
+      "path": "/private/tmp/pointstream-bootstrap-receipt-gpu5-20261115.json",
+      "sha256": "2456c14e301599c8bc8ce732f2e90b9259b46c543e56035aaecc34efe58c966c"
+    }
+  },
+  "checks": "configuredRuff/Mypy651pass; full2589passed37skippedexistingforkwarning;31focusedpass; exactsame58lineentrycommand/validator/freshchild4CPUinherited on3hosts, noGPU/model",
+  "failure_preservation": "docs/experiments/submission-ladder-confirmation-preflight-evidence-archive-20261115.json archivef159a087/137members",
+  "candidate_frozen": true,
+  "confirmation_perceptual_outcomes_opened": false
+}
