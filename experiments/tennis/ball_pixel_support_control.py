@@ -124,10 +124,12 @@ def analyse(rows: list[dict[str, Any]], historical: list[dict[str, Any]]) -> dic
             comparisons[arm][metric] = {name: {'bd_rate': anchor_sensitivity(candidate, curve),
                                                 'ordinal': paid.ordinal_separation(candidate, curve)}
                                         for name, curve in (('native', native), ('whole32', whole_curve))}
-    return {'points': out, 'annulus_context_support': background, 'central_support': central,
+    # The saved record is JSON: normalize tuple-valued curve points before
+    # comparing a reloaded analysis with a freshly recomputed one.
+    return json.loads(json.dumps({'points': out, 'annulus_context_support': background, 'central_support': central,
             'comparisons': comparisons,
             'outcome': 'mixed' if background == central else 'context_support' if background else 'central_support',
-            'scope': 'descriptive nonlinear reductions; not additive causal shares or object boundaries'}
+            'scope': 'descriptive nonlinear reductions; not additive causal shares or object boundaries'}, allow_nan=False))
 
 
 def decode_streams(packet: Path, root: Path, decoder: str) -> tuple[np.ndarray, np.ndarray, list[Any], dict[str, Any]]:

@@ -56,6 +56,19 @@ def test_ratios_undefined_when_no_quality_improvement():
     assert control.ratio(.1, .1, .2) is None
 
 
+def test_analysis_survives_json_roundtrip_without_weakening_numeric_comparison():
+    saved = json.loads(Path('docs/experiments/submission-ladder-ball-pixel-oracle-scores-20261115.json').read_bytes())
+    rows = [{'crf': row['crf'], 'packet_bytes': row['coded_bytes'],
+             'point_coverage': {'counts': {}},
+             **{arm: {'frames': row['frames']} for arm in ('whole32', 'centre16', 'annulus')}}
+            for row in saved['rows']]
+    analysis = control.analyse(rows, saved['historical_points'])
+    assert json.loads(json.dumps(analysis)) == analysis
+    changed = copy.deepcopy(analysis)
+    changed['points'][0]['retained_reduction']['crop_dists']['annulus'] += .01
+    assert changed != analysis
+
+
 def test_spec_is_frozen_and_full_smoke_control_is_explicit():
     s = inbox.validate_spec(control.spec('2026-11-16T12:00:00+00:00'))
     assert s['scale']['frames'] == {'smoke': 16, 'full': 48}

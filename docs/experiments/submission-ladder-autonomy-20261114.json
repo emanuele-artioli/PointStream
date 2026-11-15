@@ -1158,7 +1158,7 @@
       "job_id": "20261115T082635Z-4c193c5e",
       "allocation": "ball-confirmation-sequential-memory-v2",
       "source_id": "match235_000",
-      "state": "pending",
+      "state": "ROOT_accepted_complete154_six_bases_fresh_sender",
       "cpu_ceiling_seconds": 10800,
       "gpu_ceiling_seconds": 2700,
       "wall_ceiling_seconds": 2700,
@@ -1186,7 +1186,8 @@
         "snapshot_sha256": "4d52820b9a95f0617a211304cc39b90c71fcf481812d7a9b3c9c75ed87849b61"
       },
       "submit_receipt": "/private/tmp/pointstream-confirmation-v2-match235_000-submit-20261115.json",
-      "submit_process_handle": 4847
+      "submit_process_handle": 4847,
+      "acceptance_index": "docs/experiments/submission-ladder-confirmation-235-preparation-acceptance-20261115.json"
     },
     {
       "job_id": "20261115T084024Z-3565c8ec",
@@ -1258,6 +1259,68 @@
         ],
         "deleted_paths": [],
         "snapshot_sha256": "6a1ad69353915bbfbc06854830009f653e23af34c29ca38ac9cc0803f1158382"
+      }
+    },
+    {
+      "job_id": "20261115T085029Z-df0cbf60",
+      "allocation": "ball-confirmation-paid-controls",
+      "source_id": "match235_000",
+      "state": "submitted",
+      "spec_sha256": "c0509d51dc601df84919a0ef512d2aa570539ba0efde5b752ae901864c73236c",
+      "submit_receipt": "/private/tmp/pointstream-confirmation-controls-235-submit-20261115.json",
+      "deadline": "2026-11-15T10:00:00Z",
+      "cpu_ceiling_seconds": 10800,
+      "gpu_ceiling_seconds": 0,
+      "wall_ceiling_seconds": 2700,
+      "snapshot": {
+        "git_head": "6d346dfdb3de96d4c66bd253b186672d46f2d5ab",
+        "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tracked_changes_included": [],
+        "tracked_changes_excluded": [
+          "docs/cards/submission-ladder-ball-pixel-support-control-2026-11-15.md",
+          "experiments/tennis/ball_pixel_support_control.py",
+          "tests/test_ball_pixel_support_control.py"
+        ],
+        "included_untracked_sha256": {},
+        "untracked_excluded_count": 1,
+        "untracked_excluded_paths_sha256": "0dcfdc41762255a6d62db395e034c6a2667f3eed5f7a8ef10b8b45d68ca65467",
+        "untracked_excluded_sample": [
+          "docs/experiments/submission-ladder-confirmation-235-preparation-acceptance-20261115.json"
+        ],
+        "deleted_paths": [],
+        "snapshot_sha256": "85fa5cc6cd1ccff0f8baf5ab3ec8eb1f33dd334ffccb8a490dccb340eba38a63"
+      }
+    },
+    {
+      "job_id": "20261115T085305Z-80a172af",
+      "allocation": "ball-confirmation-perceptual-scoring",
+      "source_id": "match209_000",
+      "state": "submitted_quality_sealed",
+      "submit_receipt": "/private/tmp/pointstream-confirmation-score-209-submit-20261115.json",
+      "spec_sha256": "ebdf733d2536c2600d66b42cdac393b6c8318f190dba7ed356e4c5c17380bd56",
+      "deadline": "2026-11-15T10:15:00Z",
+      "cpu_ceiling_seconds": 2430,
+      "gpu_ceiling_seconds": 2430,
+      "wall_ceiling_seconds": 2430,
+      "snapshot": {
+        "git_head": "6d346dfdb3de96d4c66bd253b186672d46f2d5ab",
+        "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tracked_changes_included": [],
+        "tracked_changes_excluded": [
+          "docs/cards/submission-ladder-ball-pixel-support-control-2026-11-15.md",
+          "docs/experiments/submission-ladder-autonomy-20261114.json",
+          "experiments/tennis/ball_pixel_support_control.py",
+          "tests/test_ball_pixel_support_control.py"
+        ],
+        "included_untracked_sha256": {},
+        "untracked_excluded_count": 2,
+        "untracked_excluded_paths_sha256": "01669eeee0ba9de6188a46efbca06db396af022f0021117f5125d3fc86192631",
+        "untracked_excluded_sample": [
+          "docs/experiments/submission-ladder-confirmation-209-controls-acceptance-20261115.json",
+          "docs/experiments/submission-ladder-confirmation-235-preparation-acceptance-20261115.json"
+        ],
+        "deleted_paths": [],
+        "snapshot_sha256": "85fa5cc6cd1ccff0f8baf5ab3ec8eb1f33dd334ffccb8a490dccb340eba38a63"
       }
     }
   ],
@@ -1661,5 +1724,15 @@
     "spatial_support": 92311
   },
   "controls209_current_job": "20261115T084024Z-3565c8ec",
-  "spatial_support_current_job": "20261115T084021Z-5912cfc2"
+  "spatial_support_current_job": "20261115T084021Z-5912cfc2",
+  "spatial_support_validation_repair": {
+    "original_job": "20261115T084021Z-5912cfc2",
+    "original_state": "failed_full_exit1_analysis_tuple_list_equality",
+    "all_other_scientific_checks": true,
+    "change": "normalize recomputed analysis to JSONtypes; exact numeric equality retained",
+    "GPU_rerun_authorized": false,
+    "CPU_saved_output_revalidation": "pending",
+    "original_evidence_preserved": true,
+    "root_tests": "6focusedpassed/configuredRuffMypy653pass/fullrunning"
+  }
 }
