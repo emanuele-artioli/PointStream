@@ -96,6 +96,28 @@ def test_won_reads_the_envelope_at_the_keypoint_rate():
     assert not k6b.won(anchors, "lpips", 5.5, 0.31)["won"]
 
 
+@pytest.mark.parametrize('rate', [0.5, 20.0])
+def test_won_does_not_award_unsupported_endpoint(rate):
+    anchors = {'low': {'kbps': 1.0, 'lpips': .5}, 'high': {'kbps': 10.0, 'lpips': .1}}
+    # At rate 20 the old cheapest-endpoint fallback falsely awarded .3 a win.
+    # Below rate 1 the cheapest stream is not affordable at all.
+    cell = k6b.won(anchors, 'lpips', rate, .3)
+    assert cell['resolved'] is False and cell['won'] is None
+    assert 'envelope' not in cell
+    row = {'gen-original': {'lpips': cell, 'dists': {'won': True}}}
+    with pytest.raises(ValueError, match='Unresolved'):
+        k6b.score([row], 'gen-original')
+    with pytest.raises(ValueError, match='Unresolved'):
+        k6b.billed_score([{'gen-original': {'billed': row['gen-original']}}], 'gen-original')
+
+
+@pytest.mark.parametrize('rate,bar', [(1.0, .5), (10.0, .1)])
+def test_won_includes_measured_endpoints(rate, bar):
+    anchors = {'low': {'kbps': 1.0, 'lpips': .5}, 'high': {'kbps': 10.0, 'lpips': .1}}
+    assert k6b.won(anchors, 'lpips', rate, bar)['won'] is False
+    assert k6b.won(anchors, 'lpips', rate, bar - .01)['won'] is True
+
+
 def test_score_and_decision():
     def row(o_l, o_d, f_l, f_d):
         return {"gen-original": {"lpips": {"won": o_l}, "dists": {"won": o_d}},

@@ -1,5 +1,12 @@
 # Submission priorities after the November 15 review
 
+**Later scope amendment:** [v4 and the actual-code re-audit](experiments/foreground-scope-and-requalification-20261115.md)
+make racket benefit optional for an explicitly player-and-ball primary claim.
+Older generic-model verdicts require raw-cell/conditioning/profile validation;
+the next small comparison uses existing generic, tennis-only and adapted weights.
+The current RESEARCH/PLAN reflect that change; older equipment-inclusive wording
+below is preserved as same-day planning history, not a mandatory prerequisite.
+
 The [consolidated research brief](../RESEARCH.md) and [short current PLAN](../PLAN.md)
 now give the lead tennis player/racket/ball hypothesis and decision order. This
 continuation preserves the earlier same-day steps and detailed inputs; follow

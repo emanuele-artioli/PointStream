@@ -1,0 +1,293 @@
+{
+  "schema_version": 4,
+  "protocol_id": "submission-tennis-20261115-v4",
+  "state": "prospective_scope_and_requalification_policy_adopted_exact_runs_pending",
+  "implementation_state": "completed_evidence_preserved_next_priorities_revised",
+  "scientific_results": [],
+  "timezone": "America/Sao_Paulo",
+  "research_cutoff": "2026-12-19",
+  "submission_preparation_target": "2026-12-26",
+  "domains": [
+    "tennis",
+    "egocentric"
+  ],
+  "domain_levels_independent": true,
+  "levels": [
+    {
+      "level": 1,
+      "name": "narrow_benefit",
+      "requires": [
+        "predefined_object_condition_objective",
+        "simple_competitors",
+        "complete_transmitted_cost"
+      ]
+    },
+    {
+      "level": 2,
+      "name": "foreground_priority",
+      "requires": [
+        "weighted_regional_dists_benefit",
+        "regional_lpips_corroboration",
+        "foreground_background_and_full_frame_reporting"
+      ]
+    },
+    {
+      "level": 3,
+      "name": "full_frame",
+      "requires": [
+        "standard_full_frame_quality_benefit",
+        "independent_source_coverage",
+        "temporal_and_object_failure_reporting"
+      ]
+    },
+    {
+      "level": 4,
+      "name": "real_time",
+      "requires": [
+        "retained_quality_benefit",
+        "declared_streaming_profile",
+        "end_to_end_throughput_latency_buffering_resources"
+      ]
+    }
+  ],
+  "metric_contract": {
+    "primary_level2": "weighted_regional_dists",
+    "corroborating_level2": "weighted_regional_lpips",
+    "foreground_weight": 0.7,
+    "background_weight": 0.3,
+    "empty_region_policy": "reallocate_all_weight_to_the_nonempty_region",
+    "invalid_score_policy": "fail_required_missing_or_nonfinite_scores_without_dropping_frames",
+    "historical_results": "unchanged_and_separately_labeled",
+    "perceptual_calibration": "custom_objective_not_human_preference_validation",
+    "required_components": [
+      "foreground",
+      "background",
+      "full_frame",
+      "temporal",
+      "applicable_task_with_visible_absent_denominators"
+    ],
+    "initial_rate_points": 3,
+    "additional_rate_point_rule": "only_inadequate_overlap_or_unclear_curve_with_prospective_reason",
+    "confirmation_rule": "prospectively_declared_paired_source_level_effect_and_uncertainty_with_frozen_candidate_cohort_and_primary_contrast; practical_value_and_novelty_separate",
+    "uncertainty_unit": "match_or_source_video_not_frames",
+    "bdrate_support": "measured_common_quality_interval_only",
+    "bdrate_interpolation": "PCHIP_log_rate_over_quality",
+    "discrete_task_bdrate": false,
+    "reference_sensitivity": [
+      "linear_rate_quality_hull",
+      "hull_PCHIP_log_rate",
+      "Pareto_PCHIP_log_rate"
+    ],
+    "reference_claim": "constructed_pooled_envelope_unless_physical_switching_demonstrated",
+    "scientific_usefulness_magnitude_floor": null,
+    "historical_v1_development_promotion_fraction": -0.1,
+    "inference_policy": "docs/experiments/submission-ladder-inference-policy-20261115.md",
+    "primary_endpoint_change": "requires_new_prospective_design_not_posthoc_metric_selection"
+  },
+  "comparisons": {
+    "anchors": [
+      "SVT-AV1",
+      "DCVC-UF",
+      "effective_conventional_ROI_allocation"
+    ],
+    "candidate_family": [
+      "native_full_frame",
+      "native_semantic_ROI",
+      "native_base_plus_generated_players_with_paid_ball_modes"
+    ],
+    "controls": [
+      "semantic_vs_motion_error_patch_selection",
+      "ball_disk_vs_streak_vs_coded_pixels",
+      "base_only",
+      "generated_players_only",
+      "ball_only",
+      "same_generic_enhancement_on_conventional_anchor_when_applicable",
+      "no_session_adapter_vs_paid_session_adapter_when_testing_adaptation_necessity",
+      "combined_players_ball",
+      "optional_separately_labelled_racket_extension"
+    ],
+    "patch_screen": "finite_real_coded_family_with_free_placement_metadata_before_paid_transport",
+    "source_pixel_paste_is_universal_perceptual_bound": false,
+    "historical_candidate_families_not_relaunched": [
+      "native_full_frame",
+      "native_semantic_ROI",
+      "native_base_plus_rectangular_coded_patches",
+      "existing_ball"
+    ],
+    "same_source_cadence_colour_rate_and_state_contract_required": true,
+    "saved_output_screen": "permitted finite real-output screen before paid fresh learned decoding; explicitly not a fresh receiver or universal perceptual bound"
+  },
+  "receiver": {
+    "inputs": [
+      "versioned_packet",
+      "declared_installed_generic_resources"
+    ],
+    "all_frames_required": true,
+    "conventional_fallback_required": true,
+    "source_denied_verification_required": true,
+    "content_specific_state_fully_billed": true,
+    "cold_and_steady_state_separate": true,
+    "implementation_test_is_scientific_evidence": false
+  },
+  "selection": {
+    "freeze_before_outcomes": true,
+    "mechanical_window_selection": true,
+    "prior_exposure_audit_required": true,
+    "new_prefix_is_new_source": false,
+    "candidate_frozen_before_confirmation": true,
+    "confirmation_retuning": false,
+    "failed_items_preserved": true
+  },
+  "annotation": {
+    "existing_independent_annotation_search_first": true,
+    "tennis_fallback": "SAM3.1_proposals_with_source_only_human_review_and_correction",
+    "timed_small_review_pilot_first": true,
+    "include_unprompted_annotation_subset": true,
+    "review_codec_outputs_or_quality_scores": false,
+    "review_scope": [
+      "identity",
+      "boundaries",
+      "missing_objects",
+      "uncertainty"
+    ],
+    "accepted_tier": "human_reviewed_model_assisted",
+    "unreviewed_propagation_tier_separate": true,
+    "preserve_proposals_corrections_rejections_uncertainty": true,
+    "VISOR_human_interpolated_model_filled_tiers_separate": true,
+    "reserved_192_frames": "preserved_candidate_sample; scale_after_endpoint_editor_and_active_labor_pilot; not_fixed_independent_source_power_justification"
+  },
+  "authority": {
+    "local_implementation_and_readonly_audit_authorized": true,
+    "new_scientific_compute_authorized": false,
+    "previous_automatic_window_expired_utc": "2026-11-15T11:07:34Z",
+    "closed_allocations_reopened": false,
+    "new_training_authorized": false,
+    "paid_hosting_authorized": false,
+    "submission_authorized": false,
+    "per_stage_costed_release_required": true,
+    "maximum_stage_wall_seconds": 2700,
+    "automatic_retries_or_recurring_model_polls": false
+  },
+  "reproducibility_levels": [
+    "arithmetic_from_saved_scores",
+    "rescore_saved_reconstructions",
+    "fresh_encode_and_independent_decode"
+  ],
+  "amendment_policy": "new_protocol_revision_with_reason_before_new_outcomes_no_retroactive_contract_change",
+  "record": "PLAN.md",
+  "amends": {
+    "protocol": "submission-tennis-20261115-v3",
+    "reason": "User makes racket benefit optional for an explicitly player-and-ball claim, requests actual historical code re-audit and better contemporary tests, and proposes bounded extra-sport/paper-scope alternatives.",
+    "historical_outcomes_and_registered_rules": "unchanged; new object target cannot rewrite historical headlines",
+    "new_experiment_outcomes_under_v4": []
+  },
+  "human_visual_review": {
+    "before_critical_perceptual_direction_decision": true,
+    "source_spread_and_failure_examples": true,
+    "matched_actual_bytes_or_explicitly_disclosed_rate_difference": true,
+    "randomized_AB_with_ties": true,
+    "native_cadence_and_geometry": true,
+    "development_user_pilot_is_population_evidence": false,
+    "superresolution_control": "same_generic_enhancement_available_to_native_anchor_when_applicable",
+    "separate_from_source_only_reference_annotation": true,
+    "formal_subjective_study": "separately_frozen_blinded_multiviewer_design_and_source_observer_dependence"
+  },
+  "priority": {
+    "lead_domain": "tennis",
+    "egocentric": "preserve and report its independently supported level; dense annotation not prerequisite to tennis decision",
+    "current_plan": "PLAN.md",
+    "science_brief": "RESEARCH.md"
+  },
+  "learned_receiver": {
+    "generic_resources": "frozen predeclared sport/generic models with baseline resource symmetry; storage and cold initialisation separately reported",
+    "content_specific_paid": [
+      "match_or_player_adapter",
+      "trained_guider_updates",
+      "appearance_reference_bank",
+      "poses",
+      "refreshes",
+      "ball_equipment_payloads",
+      "placement_timing_framing",
+      "all_receiver_needed_bootstrap_state"
+    ],
+    "native_cadence_every_frame": "decoder emits every source frame under declared native-cadence claim, with paid fallback as needed",
+    "reduced_cadence_profile": "separately declared output cadence, same-cadence anchors; sampled historical scores do not certify all-frame or temporal behavior",
+    "source_denied": "actual independent learned reconstruction from packet plus declared installed resources, not saved crop replay alone",
+    "fallback": "cuts missing_pose missing_detection uncertain_mask model_resource_failure; complete output and actual costs",
+    "composition_order": "must freeze before outcomes with player_equipment_ball_overlap test",
+    "reference_reuse": "actual validated bank/update behavior; modeled12crop7200s sensitivity stays separately labelled until demonstrated",
+    "first_N_adaptation": "unrun conditional extension; causal data/lookahead/update timeline, all warmup frames and bytes, measured fitting/transmission/load latency; new training authority required"
+  },
+  "object_evaluation": {
+    "primary_foreground_union": [
+      "visible_player_body_and_clothing",
+      "visible_ball"
+    ],
+    "primary_claim_label": "player-and-ball quality, not all-equipment foreground fidelity",
+    "racket_in_primary": false,
+    "racket_background_and_fullframe": "racket pixels remain in complementary region/fullframe metrics and human views; disclose equipment harms",
+    "racket_secondary": "optional fixed independently labelled equipment audit; racket benefit not prerequisite to primary claim",
+    "independent_source_only_reference_review": true,
+    "unknown_is_not_absent": true,
+    "separate_player_ball_temporal_failure_reports": true,
+    "joint_effect": "measure actual combined output and bytes, not sum of separate BD-rates",
+    "weights": "70percent primary player-and-ball,30percent complement regionalDISTS withLPIPScorroboration; historical support definitions separately labelled",
+    "new_reference_policy": "freeze target and region ownership before new outcomes; no posthoc historical mask redefinition"
+  },
+  "model_qualification": {
+    "initial_route": "small paired requalification of releasedgeneric,commontennis-only,existingmatch-adapted profiles; select from validated results",
+    "historical_status": "hypothesis-generating until applicable code,input,resource,coverage and support checks; scrutiny symmetric for positive and negative findings",
+    "known_code_repairs": [
+      "strict_supported_rate_comparisons",
+      "required_profile_tick_coverage_with_explicit_receipted_legacy_mixing",
+      "full_rational_FPS_accounting"
+    ],
+    "pending_checks": [
+      "raw_saved_comparison_cell_support",
+      "checkpoint/base/adapter/profile/sourcejoins",
+      "upstream_preprocessing_parity",
+      "frame/maskcoverage",
+      "native_cadence_temporal_behavior"
+    ],
+    "old_generic_win_share": "not recalculated or certified here; do not use as universal generator gate",
+    "same_input_replay": "paired identicalsource_reference_pose_seed_context and productionquality; changedconditioning recorded asnewcandidate",
+    "new_training_authorized": false,
+    "per_player_or_first_seconds_fitting": "conditional unrun extension"
+  },
+  "audit_sources": [
+    "docs/experiments/submission-player-model-history-audit-20261115.md",
+    "docs/experiments/submission-combined-foreground-gap-audit-20261115.md",
+    "docs/experiments/submission-merged-pr-index-20261115.json",
+    "docs/experiments/generator-code-re-audit-20261115.md",
+    "docs/experiments/evaluation-code-re-audit-20261115.md",
+    "docs/experiments/additional-sport-domain-screen-20261115.md",
+    "docs/experiments/foreground-scope-and-requalification-20261115.md"
+  ],
+  "racket_extension": {
+    "required_for_core": false,
+    "first_candidates": [
+      "paid_small_coded_rectangle",
+      "coded_reference_and_geometry_with_paid_refresh_residuals"
+    ],
+    "keypoint_limit": "existingfivepoint/boxannotations do not specify appearance, blur or occlusion; independent sourcealignment required",
+    "source_pixel_paste": "diagnostic not universal perceptual bound",
+    "new_generator_training_default": false,
+    "paper_reporting": "bounded exploratory result may be appendix if informative and honestly scoped"
+  },
+  "additional_domain": {
+    "at_most_one_initial_pilot": true,
+    "first_choice": "single-skater if existing usable GenStream continuousRGB is recovered",
+    "alternative": "volleyball SportsMOT after verifying RGB/cadence/labels/source permissions",
+    "soccer": "later manyactor/occlusion stress case, not categorically inaccessible",
+    "background": "actual paid nativecoded base; no free preexisting3Dscene or new3D reconstruction bydefault",
+    "initial_scope": "short exposed development sequence,3spreadrates,matchingcadence andpaidstate; oneclip isexploratory",
+    "objective": "declaredforeground70/30 withfullframecostsreported, notfullframewin prerequisite",
+    "admission": "usable source plus commonpipeline correctness and complete costedbudget; source/metadata screen now, noGPU ortrainingreleased",
+    "stopping": "do not displace tennis completion or create openended added-domain search"
+  },
+  "paper_scope": {
+    "working_route": "sports-led journal, egocentric comparativeboundary evidence ifcoherent",
+    "separate_egocentric_paper": "later author decision only withowncontribution/evidence, notbecauseofpastworkvolume",
+    "no_concurrent_second_project_or_submission_authority": true
+  }
+}

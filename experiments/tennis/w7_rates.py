@@ -9,6 +9,7 @@ crops of the same size) over 7200 s, to keep the charge comparable to the old wi
 from __future__ import annotations
 
 import json
+from fractions import Fraction
 from typing import Any
 
 AMORTISED_SECONDS = 7200
@@ -30,7 +31,9 @@ def rates(transport: dict[str, Any], adapter_bytes: dict[str, int] | None = None
         raise ValueError('adapter charges must be positive integer bytes')
     out: dict[str, dict[str, float]] = {}
     for row in transport['rows']:
-        fps = row['keypoints']['contract']['fps'][0]
+        fps = float(Fraction(*row['keypoints']['contract']['fps']))
+        if fps <= 0:
+            raise ValueError('keypoint contract fps must be positive')
         # Each crop has PNG plus JPEG alternatives. Count only the transmitted
         # lossless PNG entries, not the number of encoded alternatives.
         png = [f for f in row['reference_files'] if f['codec'] == 'png']

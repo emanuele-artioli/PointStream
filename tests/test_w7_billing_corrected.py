@@ -42,3 +42,18 @@ def test_refuses_existing_output_directory(tmp_path):
 def test_rejects_invalid_length_before_reading_inputs(tmp_path, length):
     with pytest.raises(ValueError, match='finite and positive'):
         w7_billing_corrected.analyse(tmp_path, tmp_path / 'output', length)
+
+
+@pytest.mark.parametrize('fps', [(25, 1), (50, 1), (30000, 1001)])
+def test_rate_duration_uses_complete_rational_frame_rate(fps):
+    from experiments.tennis import w7_rates
+
+    row = {'window': 'al028', 'match': 'alcaraz_hurkacz',
+           'reference_files': [{'codec': 'png', 'file': 'a', 'bytes': 30}],
+           'references': {'png_bytes': 30},
+           'keypoints': {'bytes': 100, 'contract': {'fps': list(fps)}}}
+    rate = w7_rates.rates({'rows': [row]})['al028']
+    duration = 240 / (fps[0] / fps[1])
+    assert rate['keypoint_kbps'] == w7_rates.kbps(100, duration)
+    assert rate['bank_worst_case_kbps'] == w7_rates.kbps(30, duration)
+    assert rate['match_bank_kbps_7200'] == w7_rates.kbps(360, 7200)

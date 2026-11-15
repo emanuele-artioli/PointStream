@@ -1,0 +1,243 @@
+{
+  "schema": 1,
+  "scope": "saved12cell rate-support check only, not profile/mask/checkpoint/frame replay",
+  "state": "read_only_saved_support_audit",
+  "source_reports": [
+    {
+      "remote": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/report/k6b-report.json",
+      "local": "/private/tmp/pointstream-original-k6b-report-readonly-20261115.json",
+      "sha256": "acd27678226bd3208422b56bbb6ae26bbc60b9828e9152cf36315c37cc42ca43"
+    },
+    {
+      "remote": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6-2026-10-21/oracle/report-2026-10-21/k6-report.json",
+      "local": "/private/tmp/pointstream-original-k6-anchor-report-readonly-20261115.json",
+      "sha256": "22cb71c741d2870dfd3f646ca55f6ffbed16fdc275f86174f5103cd8635ee0ad"
+    }
+  ],
+  "summary": {
+    "resolved_cells": 12,
+    "total_cells": 12,
+    "old_wins": 6,
+    "strict_wins": 6,
+    "changed_labels": 0
+  },
+  "rows": [
+    {
+      "window": "djokovic_federer/038@120",
+      "rate_kbps": 2.740667017374918,
+      "cells": {
+        "lpips": {
+          "old": {
+            "envelope": 0.24437979079239003,
+            "value": 0.21145342932106267,
+            "won": true
+          },
+          "strict": {
+            "resolved": true,
+            "rate": 2.740667017374918,
+            "value": 0.21145342932106267,
+            "envelope": 0.24437979079239003,
+            "won": true
+          }
+        },
+        "dists": {
+          "old": {
+            "envelope": 0.2232641201817384,
+            "value": 0.18886859938502312,
+            "won": true
+          },
+          "strict": {
+            "resolved": true,
+            "rate": 2.740667017374918,
+            "value": 0.18886859938502312,
+            "envelope": 0.2232641201817384,
+            "won": true
+          }
+        }
+      }
+    },
+    {
+      "window": "rublev_auger-aliassime/052@120",
+      "rate_kbps": 9.802702880406198,
+      "cells": {
+        "lpips": {
+          "old": {
+            "envelope": 0.24296909137148956,
+            "value": 0.38148606127417806,
+            "won": false
+          },
+          "strict": {
+            "resolved": true,
+            "rate": 9.802702880406198,
+            "value": 0.38148606127417806,
+            "envelope": 0.24296909137148956,
+            "won": false
+          }
+        },
+        "dists": {
+          "old": {
+            "envelope": 0.1635168790400947,
+            "value": 0.18776828902108328,
+            "won": false
+          },
+          "strict": {
+            "resolved": true,
+            "rate": 9.802702880406198,
+            "value": 0.18776828902108328,
+            "envelope": 0.1635168790400947,
+            "won": false
+          }
+        }
+      }
+    },
+    {
+      "window": "alcaraz_hurkacz/045@120",
+      "rate_kbps": 2.07320376147825,
+      "cells": {
+        "lpips": {
+          "old": {
+            "envelope": 0.28005483586535923,
+            "value": 0.3383585699934911,
+            "won": false
+          },
+          "strict": {
+            "resolved": true,
+            "rate": 2.07320376147825,
+            "value": 0.3383585699934911,
+            "envelope": 0.28005483586535923,
+            "won": false
+          }
+        },
+        "dists": {
+          "old": {
+            "envelope": 0.24949678957110455,
+            "value": 0.2816947464701496,
+            "won": false
+          },
+          "strict": {
+            "resolved": true,
+            "rate": 2.07320376147825,
+            "value": 0.2816947464701496,
+            "envelope": 0.24949678957110455,
+            "won": false
+          }
+        }
+      }
+    },
+    {
+      "window": "djokovic_federer/072@120",
+      "rate_kbps": 2.9157753123760366,
+      "cells": {
+        "lpips": {
+          "old": {
+            "envelope": 0.2552935329518902,
+            "value": 0.25214612875441966,
+            "won": true
+          },
+          "strict": {
+            "resolved": true,
+            "rate": 2.9157753123760366,
+            "value": 0.25214612875441966,
+            "envelope": 0.2552935329518902,
+            "won": true
+          }
+        },
+        "dists": {
+          "old": {
+            "envelope": 0.2244891467063062,
+            "value": 0.19711756855249404,
+            "won": true
+          },
+          "strict": {
+            "resolved": true,
+            "rate": 2.9157753123760366,
+            "value": 0.19711756855249404,
+            "envelope": 0.2244891467063062,
+            "won": true
+          }
+        }
+      }
+    },
+    {
+      "window": "djokovic_zverev/012@120",
+      "rate_kbps": 3.32342533513675,
+      "cells": {
+        "lpips": {
+          "old": {
+            "envelope": 0.3792234891295442,
+            "value": 0.2750189822306742,
+            "won": true
+          },
+          "strict": {
+            "resolved": true,
+            "rate": 3.32342533513675,
+            "value": 0.2750189822306742,
+            "envelope": 0.3792234891295442,
+            "won": true
+          }
+        },
+        "dists": {
+          "old": {
+            "envelope": 0.25188087623557054,
+            "value": 0.15013220793084253,
+            "won": true
+          },
+          "strict": {
+            "resolved": true,
+            "rate": 3.32342533513675,
+            "value": 0.15013220793084253,
+            "envelope": 0.25188087623557054,
+            "won": true
+          }
+        }
+      }
+    },
+    {
+      "window": "alcaraz_hurkacz/036@120",
+      "rate_kbps": 1.9372644766437639,
+      "cells": {
+        "lpips": {
+          "old": {
+            "envelope": 0.2803995230707693,
+            "value": 0.2907810551083765,
+            "won": false
+          },
+          "strict": {
+            "resolved": true,
+            "rate": 1.9372644766437639,
+            "value": 0.2907810551083765,
+            "envelope": 0.2803995230707693,
+            "won": false
+          }
+        },
+        "dists": {
+          "old": {
+            "envelope": 0.2460876999416394,
+            "value": 0.25014550164341925,
+            "won": false
+          },
+          "strict": {
+            "resolved": true,
+            "rate": 1.9372644766437639,
+            "value": 0.25014550164341925,
+            "envelope": 0.2460876999416394,
+            "won": false
+          }
+        }
+      }
+    }
+  ],
+  "raw_reports_unchanged": true,
+  "gpu_seconds": 0,
+  "analysis_provenance": {
+    "code_revision_before_selected_patches": "7f39e87e98934670c83c36c5be43478629aafdc4",
+    "function": "experiments.tennis.k6b_confirm_validate.strict_won",
+    "selected_file_sha256": "0c2ba255887f3636f037a3e4e70d8958520011513dccf01b1584dd2a6ebbd73f",
+    "procedure": "For each of the six original report rows and lpips/dists, strict_won(anchor_report.windows[row.window].anchors,metric,row.kbps,row.gen-original[metric].value); compare resolved and won with the retained original cell.",
+    "original_judge_jobs": [
+      "20261022T182340Z-e773acb4",
+      "20261022T182347Z-c0aac9cc"
+    ],
+    "original_report_code_sha256": "f00075f591fc68f6f7ff3253a1883e510f49f0e63dca3b11b28f076e42f1e4ea"
+  }
+}

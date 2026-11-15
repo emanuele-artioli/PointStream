@@ -3,9 +3,10 @@
 ## Current direction — November 15, 2026
 
 Start with [the research brief](RESEARCH.md). The lead hypothesis is a complete
-low-bitrate tennis codec combining generated players with explicitly preserved
-rackets and a paid ball channel, beating effective ROI/native/neural controls
-on foreground rate–quality. Full-frame quality costs remain explicit. Existing
+low-bitrate tennis codec combining generated players and a paid ball channel,
+beating effective ROI/native/neural controls on player-and-ball rate–quality.
+Rackets are an optional, separately reported extension, not a prerequisite for
+this explicitly scoped primary benefit. Full-frame quality costs remain explicit. Existing
 player and ball positives justify this priority; a combined win is not yet measured.
 Egocentric results remain part of the evidence, at their own supported level;
 the192-frame egocentric annotation task does not block the tennis path.
@@ -15,8 +16,8 @@ Historical scientific contracts, outcomes, budgets and failures are preserved
 in the [lossless previous PLAN](PLAN-history-2026-11-15.md). Current stages must
 still satisfy the [scientific protocol](docs/experiments.md), [prospective v2
 inference policy](docs/experiments/submission-ladder-protocol-20261115-v2.json)
-and [fleet rules](docs/fleet.md). The [tennis combined-family v3 amendment](docs/experiments/submission-tennis-protocol-20261115-v3.json)
-extends that inference policy to the generated-player/equipment/ball family;
+and [fleet rules](docs/fleet.md). The [v4 scope and requalification amendment](docs/experiments/submission-tennis-protocol-20261115-v4.json)
+narrows the prospective primary target and requires contemporary recipe validation;
 stage inputs and budgets still need freezing/release. No10% scientific usefulness floor applies to
 future studies; effects, source-level uncertainty, practical value and novelty
 are distinct. Opened cohorts cannot become confirmation for a changed method.
@@ -27,7 +28,10 @@ are distinct. Opened cohorts cannot become confirmation for a changed method.
   with targeted scientific correction/history review, not revalidation of every
   diff or raw experiment. The [model audit](docs/experiments/submission-player-model-history-audit-20261115.md)
   distinguishes generic, sport, match and own-window fits, their controls and
-  failures. No need to restart that entire ladder.
+  failures. The subsequent [source-code re-audit](docs/experiments/foreground-scope-and-requalification-20261115.md)
+  found comparison/coverage/rational-FPS defects. The saved72-cell rate-support
+  check preserves old labels; profile/mask/checkpoint joins and upstream
+  conditioning remain to be validated before an old share gates a new model.
 - [W7/W9 and later native-IVF correction](docs/experiments/w7-anchor-rate-repair.md):
   Tier1 player gains survive available ROI/native/neural comparisons
   within their modeled-rate scope, conditional on missing med000 DCVC; the
@@ -38,8 +42,9 @@ are distinct. Opened cohorts cannot become confirmation for a changed method.
   narrow crop-DISTS benefit across three sources, with full-frame costs,
   sparse labels and disclosed encoder exposure. Do not add its BD-rate to W7.
 - [Combined foreground audit](docs/experiments/submission-combined-foreground-gap-audit-20261115.md):
-  common source/cadence/object references/receiver/cost contract and racket
-  evidence remain necessary. Sharp players alone do not establish rackets.
+  common source/cadence/player-and-ball references/receiver/cost contract remains
+  necessary. Racket evidence is required only for a racket-inclusive claim;
+  equipment harms remain visible in full-frame metrics and human review.
 - Native/tracked-pixel endpoints and source-denied replay are implemented;
   the complete learned-player receiver is a separate unresolved qualification.
   [Fixed patch negatives](docs/experiments/submission-ladder-20261114.md) remain
@@ -49,10 +54,10 @@ are distinct. Opened cohorts cannot become confirmation for a changed method.
 
 | Stage | Deliverable | Admission/stop decision |
 |---|---|---|
-| A — existing assets and receiver contract | Freeze one development source, cadence, every-frame output/fallback, model/reference/pose identities, source-independent receiver inputs, complete packet/state inventory and cost forecast. A reduced-cadence research profile needs anchors at that same cadence; sampled scoring cannot certify every-frame or temporal behavior. Reuse valid W8 input proofs and saved W7/W6 receipts in their exact scope. | No new model search or infrastructure campaign. If a complete fresh witness cannot fit a costed stage, revise the minimal contract or report the blocker; do not replay old failed jobs. |
-| B — representative human and equipment pilot | Source-only independent player/racket/ball reference review through a qualified dedicated editor; separate randomized output viewing of representative successes/failures at matched or explicitly stated rates. Reuse authenticated saved full-rate W6 outputs where compatible and retain their known flicker failure. | Freeze sample/presentation before new outcomes. Human preference is a development diagnostic; it does not turn rough masks or old sampled frames into all-frame truth. Resolve racket preservation and temporal artifacts before claiming the full foreground. |
-| C — one combined development screen | Native base+players+ball/racket fallback on the same sources, three rates; player-only/ball-only ablations; effective ROI and DCVC controls; all-frame components, temporal/failure metrics and actual paid bytes. A saved-output finite-family screen may precede fresh generation but is labelled as such. | Complete correctness smoke and measured lifecycle forecast first. Reuse coded streams only with exact source/frame/geometry/resource identities. No arbitrary effect-size floor or unsupported BD-rate. Human review precedes a consequential quality decision. |
-| D — minimal complete decoder | Independently regenerate one frozen source-denied bundle, including decoded reference bank, adapter/guider, receiver masks, ball modes and fallback. The witness must cover actual generation, not only CPU conditioning. | Reuse qualified runtime/model/GPU facts. One bounded operational pilot unlocks actual fresh output; do not spend a week requalifying infrastructure without that decision. Full native-cadence behavior remains explicit. |
+| A — code/input requalification and receiver contract | Audit saved rate-support/profile/checkpoint/mask joins, upstream preprocessing and source geometry. Freeze one development source, cadence, every-frame output/fallback, complete packet/state and cost forecast. Requalify the three existing generic/tennis-only/match-adapted recipes on a small paired subset before selecting a model. Reduced-cadence profiles need same-cadence anchors; sampled scores do not certify every-frame behavior. | No automatic acceptance of old positives or negatives; no broad model search/new fitting. Reuse valid W8 and W7/W6 proofs only in their scope. If a fresh witness cannot fit a costed stage, revise the minimal contract or report the blocker; do not replay failed jobs. |
+| B — representative human pilot | Source-only reviewed player-and-ball references through a qualified dedicated editor; separate randomized output viewing of representative successes/failures at matched or explicitly stated rates. Optional equipment audit on a fixed labelled subset. Reuse compatible saved full-rate outputs with explicit trust/temporal qualifications. | Freeze sample/presentation before outcomes. Human judgments are development evidence. Temporal failures and racket harms remain visible, while racket improvement does not gate the narrower claim. |
+| C — one combined development screen | Native base+players+ball on the same sources, three rates; player-only/ball-only ablations; effective ROI and DCVC controls; all-frame components, temporal/failure metrics and actual paid bytes. Racket mode is an optional separate case. A saved-output finite-family screen is labelled as such. | Correctness smoke and complete measured lifecycle first. Reuse exact identities only. No arbitrary effect-size floor or unsupported BD-rate. Human review precedes a consequential quality decision. |
+| D — minimal complete decoder | Independently regenerate one frozen source-denied bundle, including reference bank, adapter/guider, receiver masks, ball modes and fallback; an equipment mode is included only if claimed. The witness covers actual generation, not just CPU conditioning. | Reuse qualified runtime/model/GPU facts. One bounded operational pilot unlocks actual fresh output; avoid a week of qualification without that decision. Full native-cadence behavior remains explicit. |
 | E — confirmation | Freeze the strongest complete candidate, reference policy, primary contrast/metrics, source sampling and power/precision/budget plan; confirm on new physical matches. | Aggregate windows within match. Include small-effect scenarios and uncertainty, all sources and unsupported intervals. No retuning against W7 or opened ball confirmation. |
 | F — manuscript/artifact | Restore supported player positives, methods, controls, informative negatives and temporal/racket limitations; tables from records; author/rights/live venue review. | Expand toward the verified venue allowance. Do not claim a combined win, racket benefit, live adaptation or real time unless actually established. Filing needs separate instruction. |
 
@@ -64,8 +69,9 @@ bound. Proposed stage descriptions are not dispatch authority or runtime forecas
 
 ## Model and scope choices
 
-Use the strongest existing frozen tennis recipe first; generic and tennis-only
-variants answer adaptation necessity as bounded controls. The common sport
+Requalify existing generic, tennis-only and adapted recipes before choosing
+which one to promote. Historical comparisons guide this small replay but do
+not gate out a generic model. The common sport
 model is a declared installed resource, with fair baseline resource accounting,
 footprint and cold initialization reported. Match adapters, guider changes,
 references and refreshes remain content-specific and paid. Preserve training
@@ -81,11 +87,24 @@ receiver/cost/temporal evidence identifies a concrete limiting assumption.
 
 ## Schedule, authority and continuation
 
+Racket synthesis is a possible small appendix pilot after the primary result:
+try paid pixels or coded reference geometry before a new generator. The
+[additional-domain screen](docs/experiments/additional-sport-domain-screen-20261115.md)
+allows read-only source preparation now and at most one separately costed
+inference pilot after common-pipeline correctness. Prefer existing usable
+GenStream skating RGB with an actual coded background; volleyball/SportsMOT is
+an alternative, soccer a larger actor/occlusion stress test. No assumed3D scene,
+new background reconstruction, extra model training or bulk dataset download.
+The [scope decision](docs/experiments/foreground-scope-and-requalification-20261115.md)
+keeps an egocentric comparison if coherent; a separate paper is a later author
+decision requiring its own defensible contribution, not a second project now.
+
 ### Current dispatch ledger
 
 | item | card / evidence | branch | model / review | status |
 |---|---|---|---|---|
-| Tennis contribution and history audit | [research brief](RESEARCH.md); [combined gaps](docs/experiments/submission-combined-foreground-gap-audit-20261115.md) | `codex/tennis-contribution-audit-20261115` | primary plus scoped reviewers; actual tier telemetry unverified | reported2026-11-15: evidence and next decisions consolidated; no new scientific job or training; repository review/CI next |
+| Tennis contribution and history audit | [research brief](RESEARCH.md); [combined gaps](docs/experiments/submission-combined-foreground-gap-audit-20261115.md) | `codex/tennis-contribution-audit-20261115` | primary plus scoped reviewers; actual tier telemetry unverified | complete: PR429 merged with successful CI;423mergedPR metadata indexed and historical plan preserved |
+| Foreground scope and actual-code re-audit | [scope/repair record](docs/experiments/foreground-scope-and-requalification-20261115.md) | `codex/foreground-scope-and-evidence-audit-20261115` | primary plus scoped source reviewers; actual tier telemetry unverified | reported2026-11-15: player-and-ball primary, racket optional, strict support/coverage/rational-FPS fixes; pinnedRuff/Mypy659/full2628passed37skipped; no new scientific GPU/training |
 | Combined receiver/development pilot | stagesA–D above | — | unassigned | unreleased: exact inputs, source-independent contract and complete cost forecast precede budget approval |
 
 ### Dates and authority
