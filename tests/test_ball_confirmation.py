@@ -83,6 +83,12 @@ def test_both_prospective_specs_obey_fleet_limits():
         assert normalized['cpu_threads'] == 4
         assert normalized['budget_seconds'] == 2700
         assert normalized['scale']['frames'] == {'smoke': 32, 'full': 154}
+    assert gpu['entrypoint'] == ['-m', 'experiments.tennis.ball_confirmation_entry']
+    assert gpu['validator'] == ['{python}', '-m', 'experiments.tennis.ball_confirmation_entry', '--validate']
+    assert gpu['hosts'] == ['gpu2', 'gpu3']
+    assert gpu['gpu_models'] == ['RTX A6000']
+    assert cpu['entrypoint'] == gpu['entrypoint']
+    assert cpu['validator'] == gpu['validator']
     assert gpu['gpu_sharing']['mode'] == 'shared'
     assert gpu['gpu_sharing']['margin_mib'] == 8192
     assert gpu['gpu_memory_mib'] == 12288

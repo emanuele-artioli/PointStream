@@ -1,0 +1,201 @@
+{
+  "schema": "pointstream.confirmation.preflight-evidence.index.v1",
+  "purpose": "Read-only preservation of accepted fresh-sender parity and three failed pre-model physical smokes.",
+  "jobs": [
+    {
+      "id": "20261115T063751Z-c639d3b7",
+      "canonical_status": "complete"
+    },
+    {
+      "id": "20261115T070019Z-8521282b",
+      "canonical_status": "failed"
+    },
+    {
+      "id": "20261115T070019Z-5150bdbd",
+      "canonical_status": "failed"
+    },
+    {
+      "id": "20261115T070019Z-806f249b",
+      "canonical_status": "failed"
+    }
+  ],
+  "archive": {
+    "all_input_before_after_match": true,
+    "all_members_readback_match": true,
+    "archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/confirmation-preflight-evidence-20261115-c639-3smokes/evidence.tar",
+    "bytes": 121835520,
+    "cpu_seconds": 1.887787,
+    "gpu_seconds": 0,
+    "local_members": 22,
+    "manifest_sha256": "5463d8a6b43d4d19f9d791490817b0831595b70058180127a0f5572bcdaf45de",
+    "members": 137,
+    "modes": "0444 files / 0555 directory; no immutability claim",
+    "no_symlink_follow": true,
+    "remote_members": 113,
+    "schema": "pointstream.confirmation.preflight-evidence.verification.v1",
+    "sha256": "f159a0871e5b379ae68d9d8132acbcfbe834abe3f364be9e3f6a35d6f372946c",
+    "wall_seconds": 2.4946738705039024
+  },
+  "independent_fresh_process_readback": {
+    "archive_sha256": "f159a0871e5b379ae68d9d8132acbcfbe834abe3f364be9e3f6a35d6f372946c",
+    "fresh_process_all_members_match": true,
+    "members": 137,
+    "file_modes": {
+      "evidence.tar": "0o444",
+      "verification.json": "0o444",
+      "manifest.json": "0o444"
+    },
+    "directory_mode": "0555",
+    "passed": true
+  },
+  "independent_readback_local_receipt_sha256": "03db5e7b69a513b1e65b41d59d565232d3600d72eac6a5a69776bfaa83ff074f",
+  "local_inputs": [
+    {
+      "path": "/private/tmp/pointstream-fresh-sender-retained-records-20261115.tar",
+      "member": "local/pointstream-fresh-sender-retained-records-20261115.tar",
+      "sha256": "9a92f3325dc364db42b277262b6e16c04f9862aba8082196d811d5965a4baa54",
+      "bytes": 378880
+    },
+    {
+      "path": "/private/tmp/fresh-sender-live-preflight-20261115.txt",
+      "member": "local/fresh-sender-live-preflight-20261115.txt",
+      "sha256": "b2df4cece9abb424f23b0678797d46f1df11c39fc2397bd7a27c61fc22fe5115",
+      "bytes": 3030
+    },
+    {
+      "path": "/private/tmp/pointstream-cfr-receipt-20261115.json",
+      "member": "local/pointstream-cfr-receipt-20261115.json",
+      "sha256": "87782d9e1a83b3b21756020e7c332184b0d404435bfff472d633f94e8deaf069",
+      "bytes": 25974
+    },
+    {
+      "path": "/private/tmp/pointstream-confirmation-live-preflight-20261115.json",
+      "member": "local/pointstream-confirmation-live-preflight-20261115.json",
+      "sha256": "dd345ba000ae82b3e1abf04c867df983d4c64c3349dbc786623b98b42ad45975",
+      "bytes": 28551
+    },
+    {
+      "path": "/private/tmp/pointstream-confirmation-device-snapshot-20261115.json",
+      "member": "local/pointstream-confirmation-device-snapshot-20261115.json",
+      "sha256": "f20445bfc7145ada1a9e4354bd08d246760c16abbe7838c2ce99283dfcf888c0",
+      "bytes": 1925
+    },
+    {
+      "path": "/private/tmp/pointstream-confirmation-bases-failure-diagnostics-20261115.json",
+      "member": "local/pointstream-confirmation-bases-failure-diagnostics-20261115.json",
+      "sha256": "4ef612c3f0d376952a571c9912e4f1d173e1e70899eea34f51889678f1d0865e",
+      "bytes": 48268
+    },
+    {
+      "path": "/private/tmp/archive-status-20261115T063751Z-c639d3b7.json",
+      "member": "local/archive-status-20261115T063751Z-c639d3b7.json",
+      "sha256": "6daeb0f3fb2fe53c7abbe19d97a9dfff187d0082afb2a6f031ab3ff45a6cc7fe",
+      "bytes": 4603
+    },
+    {
+      "path": "/private/tmp/archive-status-20261115T070019Z-8521282b.json",
+      "member": "local/archive-status-20261115T070019Z-8521282b.json",
+      "sha256": "3bf3472cf8d6521b100bd800b19ca0fd86a39164ba023861f5e828758b306c67",
+      "bytes": 2170
+    },
+    {
+      "path": "/private/tmp/archive-status-20261115T070019Z-5150bdbd.json",
+      "member": "local/archive-status-20261115T070019Z-5150bdbd.json",
+      "sha256": "b72858563059cd1cab933028211940ca7f6b240c5cd445150939e4377edac1f4",
+      "bytes": 2158
+    },
+    {
+      "path": "/private/tmp/archive-status-20261115T070019Z-806f249b.json",
+      "member": "local/archive-status-20261115T070019Z-806f249b.json",
+      "sha256": "4931ef1efdafd598c75ad0bde4cdccf2c53c8251b0784529051258d07bc9b366",
+      "bytes": 2265
+    },
+    {
+      "path": "/private/tmp/pointstream-confirmation-match209_000-failed-status-20261115.json",
+      "member": "local/pointstream-confirmation-match209_000-failed-status-20261115.json",
+      "sha256": "3bf3472cf8d6521b100bd800b19ca0fd86a39164ba023861f5e828758b306c67",
+      "bytes": 2170
+    },
+    {
+      "path": "/private/tmp/pointstream-confirmation-match269_000-failed-status-20261115.json",
+      "member": "local/pointstream-confirmation-match269_000-failed-status-20261115.json",
+      "sha256": "b72858563059cd1cab933028211940ca7f6b240c5cd445150939e4377edac1f4",
+      "bytes": 2158
+    },
+    {
+      "path": "/private/tmp/pointstream-confirmation-match235_000-failed-status-20261115.json",
+      "member": "local/pointstream-confirmation-match235_000-failed-status-20261115.json",
+      "sha256": "4931ef1efdafd598c75ad0bde4cdccf2c53c8251b0784529051258d07bc9b366",
+      "bytes": 2265
+    },
+    {
+      "path": "/Users/manu/.codex/worktrees/c392/PointStream/docs/cards/submission-ladder-ball-confirmation-2026-11-15.md",
+      "member": "local/submission-ladder-ball-confirmation-2026-11-15.md",
+      "sha256": "4c5bfdb151fa9f12608a63acc55a997f557e48e170c65a7d51dae2b40af647dc",
+      "bytes": 12383
+    },
+    {
+      "path": "/Users/manu/.codex/worktrees/c392/PointStream/docs/experiments/submission-ladder-tennis-confirmation-source-freeze-20261115.json",
+      "member": "local/submission-ladder-tennis-confirmation-source-freeze-20261115.json",
+      "sha256": "df0dabf48b61ed3a096a9a6b4e54d823ca3b279c86d6a09e69ef0cd9bf2ceeb1",
+      "bytes": 27200
+    },
+    {
+      "path": "/Users/manu/.codex/worktrees/c392/PointStream/docs/experiments/submission-ladder-tennis-confirmation-source-freeze-20261115.md",
+      "member": "local/submission-ladder-tennis-confirmation-source-freeze-20261115.md",
+      "sha256": "22b89e7a615ccd9a8b410b00882af683ea5c732420798d029a52f0048cfcb400",
+      "bytes": 5318
+    },
+    {
+      "path": "/Users/manu/.codex/worktrees/c392/PointStream/docs/experiments/submission-ladder-tennis-confirmation-source-publication-20261115.json",
+      "member": "local/submission-ladder-tennis-confirmation-source-publication-20261115.json",
+      "sha256": "071919bc4ab65c24924e826fb1939569f1662b88b10af833b6b4bf7958c4b7e8",
+      "bytes": 7374
+    },
+    {
+      "path": "/Users/manu/.codex/worktrees/c392/PointStream/docs/experiments/submission-ladder-tennis-confirmation-options-20261115.json",
+      "member": "local/submission-ladder-tennis-confirmation-options-20261115.json",
+      "sha256": "4dee1e459883f45d18b908a8bc6f9cbc6d85b7fa312fe387ceaadeb047ebee40",
+      "bytes": 878497
+    },
+    {
+      "path": "/Users/manu/.codex/worktrees/c392/PointStream/docs/experiments/submission-ladder-tennis-confirmation-options-20261115.md",
+      "member": "local/submission-ladder-tennis-confirmation-options-20261115.md",
+      "sha256": "02df8972ac444eba4fa1c3ab30251dd53524676af2861502ebfd6af9ed9416a4",
+      "bytes": 25421
+    },
+    {
+      "path": "/Users/manu/.codex/worktrees/c392/PointStream/docs/experiments/submission-ladder-confirmation-intake-20261115.json",
+      "member": "local/submission-ladder-confirmation-intake-20261115.json",
+      "sha256": "1d448a9bb68956c9dc51a2be0f7111f60d98ed06adf77950b10a2c0e04ba2fd3",
+      "bytes": 79998
+    },
+    {
+      "path": "/Users/manu/.codex/worktrees/c392/PointStream/docs/experiments/submission-ladder-confirmation-intake-20261115.md",
+      "member": "local/submission-ladder-confirmation-intake-20261115.md",
+      "sha256": "8265cd2c88b97691505afca745b3fa23f512d48ccc4cd94d7d5a4e215db70ce0",
+      "bytes": 5070
+    },
+    {
+      "path": "/Users/manu/.codex/worktrees/c392/PointStream/docs/experiments/submission-ladder-fresh-sender-parity-20261115.json",
+      "member": "local/submission-ladder-fresh-sender-parity-20261115.json",
+      "sha256": "86306ed124b655b33a5f967fc039c3517bd004c6d3043ca10e82c1f786bd183d",
+      "bytes": 2971
+    }
+  ],
+  "local_input_tar_sha256": "04aa21948c3c28657db6f7ebf2910249a2938a3f960105bae04407e95b73e55a",
+  "remote_builder_sha256": "e9d79cc5687d15910763ed03d6ba53dd557714332113c80f22693a997f742cc1",
+  "local_builder_sha256": "accbc9d4b93a25b83b0903efa1b495241541dabc09fa930d4a141077575ba724",
+  "accounting": {
+    "allocation_cpu_seconds": 900,
+    "archive_python_cpu_seconds": 1.887787,
+    "archive_python_wall_seconds": 2.4946738705039024,
+    "gpu_seconds": 0,
+    "scope": "Remote archive-builder process only; independent readback, local verification and SSH overhead not measured."
+  },
+  "limitations": [
+    "Modes are read-only permissions, not OS-enforced immutability.",
+    "No source data, model weights, failed scratch, or linked source checkout copied or altered.",
+    "Canonical status read before archive creation; no new job or replay."
+  ]
+}
