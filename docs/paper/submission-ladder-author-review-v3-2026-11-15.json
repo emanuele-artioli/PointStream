@@ -1,0 +1,59 @@
+{
+  "schema": "pointstream.author-review.v3.root-accepted",
+  "state": "ready_for_author_review_not_submission",
+  "title": "PointStream: A Controlled Study of Object-Priority Video Coding",
+  "durable_directory": "/Users/manu/Documents/PointStream-review/2026-11-15-ladder-author-review-v3",
+  "artifacts": [
+    {
+      "path": "pdf/pointstream-ladder-v3-anonymous-author-review-20261115.pdf",
+      "bytes": 653523,
+      "sha256": "98212737760e6beea7b9027ac19274fd0bc5d3120822ecfcdde2d6fb23f0e8c7",
+      "absolute_path": "/Users/manu/Documents/PointStream-review/2026-11-15-ladder-author-review-v3/pdf/pointstream-ladder-v3-anonymous-author-review-20261115.pdf"
+    },
+    {
+      "path": "pointstream-ladder-v3-IDENTIFIABLE-author-review-source-20261115.zip",
+      "bytes": 5184893,
+      "sha256": "aac006d849079b25119ecae6fee252922f3fdfe652b183c4bf7b50019eaf4643",
+      "absolute_path": "/Users/manu/Documents/PointStream-review/2026-11-15-ladder-author-review-v3/pointstream-ladder-v3-IDENTIFIABLE-author-review-source-20261115.zip"
+    },
+    {
+      "path": "source-members-sha256.json",
+      "bytes": 35453,
+      "sha256": "b50eaafe35a20e0c96977e226ebde70ada69a04828761bf6f6367d4bf7f36fcd",
+      "absolute_path": "/Users/manu/Documents/PointStream-review/2026-11-15-ladder-author-review-v3/source-members-sha256.json"
+    },
+    {
+      "path": "FINAL-V3-AUTHOR-REVIEW.md",
+      "bytes": 2972,
+      "sha256": "3bdc4377ea987e439bbfae919e70a662001133f7228b538334e5a297e67a7d92",
+      "absolute_path": "/Users/manu/Documents/PointStream-review/2026-11-15-ladder-author-review-v3/FINAL-V3-AUTHOR-REVIEW.md"
+    }
+  ],
+  "source_artifact_manifest_sha256": "81b382e9149472d8a02503948a34a24914e3db36275066b32b490a7218db53a9",
+  "body_references_pages": 18,
+  "appendix_pages": 5,
+  "ROOT_final_PDF_visual_pages": [
+    1,
+    11,
+    16
+  ],
+  "all_pages_rendered_reviewed": 23,
+  "evidence_checker": "PASS",
+  "registry_tests": "5passed",
+  "TeX": "nooverfullorunresolvedreferences",
+  "anonymity": "Info/XMP/29URIannotations/noembeddedfiles checked; notcompleteunidentifiabilityguarantee",
+  "source_ZIP": "IDENTIFIABLE AUTHOR-REVIEW ONLY; notanonymoussupplement",
+  "historical_preservation": "690/v1/v2 source hashes unchanged;9oldsectionblocks+18unresolvedlimitationdispositions preserved outside build, not resolved",
+  "accepted_analysis_sha256": "e60ca013c6518a71f9059d029a3cf5bb90711edf6d262ad1ebb430887680a6d5",
+  "frozen_figure_sha256": "c1875f29f923ed90fd90df7a9ca9ad9ba4a7dedad933c77c46ecae87848e7081",
+  "unresolved": [
+    "actualallauthorapproval",
+    "correspondingauthor",
+    "footageandfigurerights",
+    "currentTOMMpageformat/supplement/OArequirements",
+    "genuinehumanforegroundreferencecorrection",
+    "distinctivenoveltyforcompetitivecompletecodecclaim"
+  ],
+  "Overleaf_push": false,
+  "submission": false
+}

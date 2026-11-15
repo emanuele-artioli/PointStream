@@ -1,0 +1,630 @@
+{
+  "schema": 1,
+  "sources": [
+    {
+      "source_id": "match209_000",
+      "frames": 64,
+      "placement_hint_presence_by_official_label": {
+        "raw": {
+          "-1": {
+            "frames": 52,
+            "hint_present": 32
+          },
+          "0": {
+            "frames": 3,
+            "hint_present": 0
+          },
+          "1": {
+            "frames": 9,
+            "hint_present": 9
+          }
+        },
+        "48": {
+          "-1": {
+            "frames": 52,
+            "hint_present": 32
+          },
+          "0": {
+            "frames": 3,
+            "hint_present": 0
+          },
+          "1": {
+            "frames": 9,
+            "hint_present": 9
+          }
+        },
+        "55": {
+          "-1": {
+            "frames": 52,
+            "hint_present": 32
+          },
+          "0": {
+            "frames": 3,
+            "hint_present": 0
+          },
+          "1": {
+            "frames": 9,
+            "hint_present": 9
+          }
+        },
+        "62": {
+          "-1": {
+            "frames": 52,
+            "hint_present": 32
+          },
+          "0": {
+            "frames": 3,
+            "hint_present": 0
+          },
+          "1": {
+            "frames": 9,
+            "hint_present": 9
+          }
+        }
+      },
+      "temporal_rows": [
+        {
+          "family": "native_svt",
+          "point": 48,
+          "coded_bytes": 194971,
+          "rate_bps": 609284.375,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 27.658460206082818
+        },
+        {
+          "family": "native_svt",
+          "point": 55,
+          "coded_bytes": 132268,
+          "rate_bps": 413337.5,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 38.465661834950026
+        },
+        {
+          "family": "native_svt",
+          "point": 62,
+          "coded_bytes": 59976,
+          "rate_bps": 187425.0,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 79.53489428897524
+        },
+        {
+          "family": "native_dcvc",
+          "point": 0,
+          "coded_bytes": 12288,
+          "rate_bps": 38400.0,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 263.98824175691686
+        },
+        {
+          "family": "native_dcvc",
+          "point": 21,
+          "coded_bytes": 39762,
+          "rate_bps": 124256.25,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 120.02078631365741
+        },
+        {
+          "family": "native_dcvc",
+          "point": 42,
+          "coded_bytes": 122759,
+          "rate_bps": 383621.875,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 58.04626240079365
+        },
+        {
+          "family": "roi_raw",
+          "point": 35,
+          "coded_bytes": 369138,
+          "rate_bps": 1153556.25,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 18.601407157095093
+        },
+        {
+          "family": "roi_raw",
+          "point": 48,
+          "coded_bytes": 178627,
+          "rate_bps": 558209.375,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 30.95975161669606
+        },
+        {
+          "family": "roi_raw",
+          "point": 62,
+          "coded_bytes": 58640,
+          "rate_bps": 183250.0,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 82.60038208223104
+        },
+        {
+          "family": "roi_fitted",
+          "point": 48,
+          "coded_bytes": 178928,
+          "rate_bps": 559150.0,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 30.963550961520795
+        },
+        {
+          "family": "roi_fitted",
+          "point": 55,
+          "coded_bytes": 124283,
+          "rate_bps": 388384.375,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 42.720589433834874
+        },
+        {
+          "family": "roi_fitted",
+          "point": 62,
+          "coded_bytes": 58641,
+          "rate_bps": 183253.125,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 82.59696275857951
+        },
+        {
+          "family": "ptp",
+          "point": 48,
+          "coded_bytes": 204511,
+          "rate_bps": 639096.875,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 27.53318318613132
+        },
+        {
+          "family": "ptp",
+          "point": 55,
+          "coded_bytes": 141769,
+          "rate_bps": 443028.125,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 38.233101874816285
+        },
+        {
+          "family": "ptp",
+          "point": 62,
+          "coded_bytes": 69500,
+          "rate_bps": 217187.5,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 78.77625973117836
+        },
+        {
+          "family": "streak",
+          "point": 48,
+          "coded_bytes": 195281,
+          "rate_bps": 610253.125,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 27.628813203859863
+        },
+        {
+          "family": "streak",
+          "point": 55,
+          "coded_bytes": 132580,
+          "rate_bps": 414312.5,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 38.40789440264918
+        },
+        {
+          "family": "streak",
+          "point": 62,
+          "coded_bytes": 60288,
+          "rate_bps": 188400.0,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 79.20633863696906
+        }
+      ]
+    },
+    {
+      "source_id": "match269_000",
+      "frames": 64,
+      "placement_hint_presence_by_official_label": {
+        "raw": {
+          "-1": {
+            "frames": 52,
+            "hint_present": 49
+          },
+          "0": {
+            "frames": 0,
+            "hint_present": 0
+          },
+          "1": {
+            "frames": 12,
+            "hint_present": 12
+          }
+        },
+        "48": {
+          "-1": {
+            "frames": 52,
+            "hint_present": 49
+          },
+          "0": {
+            "frames": 0,
+            "hint_present": 0
+          },
+          "1": {
+            "frames": 12,
+            "hint_present": 12
+          }
+        },
+        "55": {
+          "-1": {
+            "frames": 52,
+            "hint_present": 49
+          },
+          "0": {
+            "frames": 0,
+            "hint_present": 0
+          },
+          "1": {
+            "frames": 12,
+            "hint_present": 12
+          }
+        },
+        "62": {
+          "-1": {
+            "frames": 52,
+            "hint_present": 49
+          },
+          "0": {
+            "frames": 0,
+            "hint_present": 0
+          },
+          "1": {
+            "frames": 12,
+            "hint_present": 12
+          }
+        }
+      },
+      "temporal_rows": [
+        {
+          "family": "native_svt",
+          "point": 48,
+          "coded_bytes": 120046,
+          "rate_bps": 375143.75,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 4.728046295148075
+        },
+        {
+          "family": "native_svt",
+          "point": 55,
+          "coded_bytes": 84202,
+          "rate_bps": 263131.25,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 6.407749365033436
+        },
+        {
+          "family": "native_svt",
+          "point": 62,
+          "coded_bytes": 43704,
+          "rate_bps": 136575.0,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 11.513524058687905
+        },
+        {
+          "family": "native_dcvc",
+          "point": 0,
+          "coded_bytes": 10109,
+          "rate_bps": 31590.625,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 20.779672349215534
+        },
+        {
+          "family": "native_dcvc",
+          "point": 21,
+          "coded_bytes": 32009,
+          "rate_bps": 100028.125,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 13.427530640294313
+        },
+        {
+          "family": "native_dcvc",
+          "point": 42,
+          "coded_bytes": 88086,
+          "rate_bps": 275268.75,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 7.915791566771384
+        },
+        {
+          "family": "roi_raw",
+          "point": 35,
+          "coded_bytes": 173420,
+          "rate_bps": 541937.5,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 3.069063590810553
+        },
+        {
+          "family": "roi_raw",
+          "point": 48,
+          "coded_bytes": 99057,
+          "rate_bps": 309553.125,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 5.109214484356628
+        },
+        {
+          "family": "roi_raw",
+          "point": 62,
+          "coded_bytes": 36146,
+          "rate_bps": 112956.25,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 11.737567653218695
+        },
+        {
+          "family": "roi_fitted",
+          "point": 48,
+          "coded_bytes": 99110,
+          "rate_bps": 309718.75,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 5.118633679407334
+        },
+        {
+          "family": "roi_fitted",
+          "point": 55,
+          "coded_bytes": 70929,
+          "rate_bps": 221653.125,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 6.884552647110156
+        },
+        {
+          "family": "roi_fitted",
+          "point": 62,
+          "coded_bytes": 36146,
+          "rate_bps": 112956.25,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 11.737567653218695
+        },
+        {
+          "family": "ptp",
+          "point": 48,
+          "coded_bytes": 129907,
+          "rate_bps": 405959.375,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 4.6401229113848474
+        },
+        {
+          "family": "ptp",
+          "point": 55,
+          "coded_bytes": 94156,
+          "rate_bps": 294237.5,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 6.2093036265432096
+        },
+        {
+          "family": "ptp",
+          "point": 62,
+          "coded_bytes": 53534,
+          "rate_bps": 167293.75,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 11.162460133744856
+        },
+        {
+          "family": "streak",
+          "point": 48,
+          "coded_bytes": 120446,
+          "rate_bps": 376393.75,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 4.674938162523883
+        },
+        {
+          "family": "streak",
+          "point": 55,
+          "coded_bytes": 84588,
+          "rate_bps": 264337.5,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 6.26229938271605
+        },
+        {
+          "family": "streak",
+          "point": 62,
+          "coded_bytes": 44073,
+          "rate_bps": 137728.125,
+          "pairs": 63,
+          "temporal_difference_RGB_MSE": 11.235983302560994
+        }
+      ]
+    },
+    {
+      "source_id": "match235_000",
+      "frames": 154,
+      "placement_hint_presence_by_official_label": {
+        "raw": {
+          "-1": {
+            "frames": 141,
+            "hint_present": 112
+          },
+          "0": {
+            "frames": 2,
+            "hint_present": 1
+          },
+          "1": {
+            "frames": 11,
+            "hint_present": 10
+          }
+        },
+        "48": {
+          "-1": {
+            "frames": 141,
+            "hint_present": 108
+          },
+          "0": {
+            "frames": 2,
+            "hint_present": 1
+          },
+          "1": {
+            "frames": 11,
+            "hint_present": 9
+          }
+        },
+        "55": {
+          "-1": {
+            "frames": 141,
+            "hint_present": 112
+          },
+          "0": {
+            "frames": 2,
+            "hint_present": 1
+          },
+          "1": {
+            "frames": 11,
+            "hint_present": 10
+          }
+        },
+        "62": {
+          "-1": {
+            "frames": 141,
+            "hint_present": 112
+          },
+          "0": {
+            "frames": 2,
+            "hint_present": 1
+          },
+          "1": {
+            "frames": 11,
+            "hint_present": 10
+          }
+        }
+      },
+      "temporal_rows": [
+        {
+          "family": "native_svt",
+          "point": 48,
+          "coded_bytes": 265233,
+          "rate_bps": 826700.2597402597,
+          "pairs": 153,
+          "temporal_difference_RGB_MSE": 10.238302079078158
+        },
+        {
+          "family": "native_svt",
+          "point": 55,
+          "coded_bytes": 192246,
+          "rate_bps": 599208.3116883116,
+          "pairs": 153,
+          "temporal_difference_RGB_MSE": 11.962111084161673
+        },
+        {
+          "family": "native_svt",
+          "point": 62,
+          "coded_bytes": 95493,
+          "rate_bps": 297640.51948051946,
+          "pairs": 153,
+          "temporal_difference_RGB_MSE": 17.054681235437847
+        },
+        {
+          "family": "native_dcvc",
+          "point": 0,
+          "coded_bytes": 17372,
+          "rate_bps": 54146.493506493505,
+          "pairs": 153,
+          "temporal_difference_RGB_MSE": 23.385321239655198
+        },
+        {
+          "family": "native_dcvc",
+          "point": 21,
+          "coded_bytes": 52184,
+          "rate_bps": 162651.42857142858,
+          "pairs": 153,
+          "temporal_difference_RGB_MSE": 15.560303084244886
+        },
+        {
+          "family": "native_dcvc",
+          "point": 42,
+          "coded_bytes": 158006,
+          "rate_bps": 492486.2337662338,
+          "pairs": 153,
+          "temporal_difference_RGB_MSE": 11.374759102763404
+        },
+        {
+          "family": "roi_raw",
+          "point": 35,
+          "coded_bytes": 469439,
+          "rate_bps": 1463186.4935064935,
+          "pairs": 153,
+          "temporal_difference_RGB_MSE": 8.255991755836208
+        },
+        {
+          "family": "roi_raw",
+          "point": 48,
+          "coded_bytes": 245180,
+          "rate_bps": 764197.4025974026,
+          "pairs": 153,
+          "temporal_difference_RGB_MSE": 10.602842409147302
+        },
+        {
+          "family": "roi_raw",
+          "point": 62,
+          "coded_bytes": 95306,
+          "rate_bps": 297057.66233766236,
+          "pairs": 153,
+          "temporal_difference_RGB_MSE": 17.32779635870552
+        },
+        {
+          "family": "roi_fitted",
+          "point": 48,
+          "coded_bytes": 245287,
+          "rate_bps": 764530.9090909091,
+          "pairs": 153,
+          "temporal_difference_RGB_MSE": 10.58781580721602
+        },
+        {
+          "family": "roi_fitted",
+          "point": 55,
+          "coded_bytes": 182715,
+          "rate_bps": 569501.2987012987,
+          "pairs": 153,
+          "temporal_difference_RGB_MSE": 12.391526255370975
+        },
+        {
+          "family": "roi_fitted",
+          "point": 62,
+          "coded_bytes": 95274,
+          "rate_bps": 296957.9220779221,
+          "pairs": 153,
+          "temporal_difference_RGB_MSE": 17.375033114711933
+        },
+        {
+          "family": "ptp",
+          "point": 48,
+          "coded_bytes": 288605,
+          "rate_bps": 899548.0519480519,
+          "pairs": 153,
+          "temporal_difference_RGB_MSE": 10.16170779765417
+        },
+        {
+          "family": "ptp",
+          "point": 55,
+          "coded_bytes": 215784,
+          "rate_bps": 672573.5064935065,
+          "pairs": 153,
+          "temporal_difference_RGB_MSE": 11.828307991406438
+        },
+        {
+          "family": "ptp",
+          "point": 62,
+          "coded_bytes": 119331,
+          "rate_bps": 371940.7792207792,
+          "pairs": 153,
+          "temporal_difference_RGB_MSE": 16.739034945382475
+        },
+        {
+          "family": "streak",
+          "point": 48,
+          "coded_bytes": 265918,
+          "rate_bps": 828835.3246753247,
+          "pairs": 153,
+          "temporal_difference_RGB_MSE": 10.211839488206548
+        },
+        {
+          "family": "streak",
+          "point": 55,
+          "coded_bytes": 192941,
+          "rate_bps": 601374.5454545454,
+          "pairs": 153,
+          "temporal_difference_RGB_MSE": 11.903235703087176
+        },
+        {
+          "family": "streak",
+          "point": 62,
+          "coded_bytes": 96202,
+          "rate_bps": 299850.3896103896,
+          "pairs": 153,
+          "temporal_difference_RGB_MSE": 16.867370307015552
+        }
+      ]
+    }
+  ],
+  "scope": "all N\u22121 adjacent RGB difference errors, descriptive not perceptual flicker; encoder hint presence is not decoded detection or absence accuracy; unknown labels remain separate"
+}
