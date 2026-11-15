@@ -51,8 +51,11 @@ input is **raw planar 8-bit YUV420 only**, with explicit geometry, frame rate,
 range and frame count. The `positions` array supplies one encoder-side centre
 hint `[x, y]` or `null` for every frame. Coordinates are converted to even,
 clamped 32×32 origins; a 64×64 coded tile contains each source crop. Each
-absent frame retains the decoded base. If all positions are `null`, the packet
-contains only the native stream.
+frame without a patch retains the decoded base. A `null` hint means no patch
+is sent; it does not assert that the object or foreground is physically absent.
+If all positions are `null`, the packet contains only the native stream. The
+egocentric correctness test explicitly selects this fallback even when hands
+and objects are present.
 
 For example, a two-frame configuration for a 64×64 input is:
 

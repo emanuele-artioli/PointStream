@@ -251,3 +251,19 @@ def test_archived_base_and_frozen_input_policy_hashes_are_required(tmp_path, mon
     (tmp_path / 'base-policy.json').write_text('{}')
     with pytest.raises(ValueError, match='SHA256 mismatch'):
         bridge.validate_proofs(tmp_path, 1, base_sha)
+
+
+def test_derivative_cost_is_frozen_1800_and_legacy_stays_900():
+    entries = {name: {'path': f'/data/{name}', 'sha256': str(i) * 64}
+               for i, name in enumerate(('tennis_archive', 'tennis_stage', 'ego_archive', 'ego_stage'), 1)}
+    legacy = inbox.validate_spec(bridge.make_spec('2026-11-16T12:00:00+00:00', entries))
+    cpu = inbox.validate_spec(bridge.make_spec('2026-11-16T12:00:00+00:00', entries,
+        {'path': '/data/cpu-policy.json', 'sha256': 'f' * 64, 'hosts': ['gpu1', 'gpu3']}))
+    assert legacy['full']['seconds'] == 900 and legacy['budget_seconds'] == 1530 and legacy['stall_seconds'] == 450
+    assert cpu['full']['seconds'] == 1800 and cpu['budget_seconds'] == 2430 and cpu['stall_seconds'] == 1800
+    assert cpu['arguments'][cpu['arguments'].index('--full-cap-seconds') + 1] == '1800'
+    observed = bridge.cost_record(275.713, 235.0, 1, 1800)
+    assert observed['passed'] and observed['forecast_seconds'] == pytest.approx(1684.278)
+    assert not bridge.cost_record(275.713, 235.0, 1, 900)['passed']
+    with pytest.raises(ValueError):
+        bridge.cost_record(1, 1, 1, 1200)

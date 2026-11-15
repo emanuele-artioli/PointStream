@@ -136,3 +136,48 @@ def test_receipt_rejects_inherited_credential_environment():
     receipt['filesystem_proof']['environment']['API_TOKEN'] = 'unexpected'
     with pytest.raises(ValueError, match='environment'):
         verify(receipt, observer)
+
+
+def policy_fixture():
+    profile = {'system_leaves': [{'path': '/dev/null'}, {'path': '/proc/self/maps'}, {'path': '/proc/self/status'}]}
+    args = {'files': [Path('/runtime/a'), Path('/source/b')], 'execute': [Path('/runtime/python')],
+            'system': [Path('/dev/null'), Path('/proc/42/maps'), Path('/proc/42/status')],
+            'import_directories': [Path('/runtime'), Path('/source')], 'work': Path('/scratch/receiver'),
+            'evidence': {'source_frame': [{'path': '/protected'}]}, 'profile': profile, 'parent_pid': 42}
+    return args, ptp.expected_worker_policy(**args)
+
+
+def test_policy_grants_are_multisets_and_exact_paths():
+    _, expected = policy_fixture()
+    reordered = deepcopy(expected)
+    for key in ('read_files', 'execute_files', 'system_leaves', 'read_directories'):
+        reordered[key].reverse()
+    assert ptp.equal_policy(reordered, expected)
+    for mutation in ('extra', 'missing', 'duplicate', 'wrong_source', 'wrong_pid', 'parent_pid'):
+        changed = deepcopy(expected)
+        if mutation == 'extra':
+            changed['read_files'].append('/new/unapproved')
+        elif mutation == 'missing':
+            changed['read_files'].pop()
+        elif mutation == 'duplicate':
+            changed['read_files'].append(changed['read_files'][0])
+        elif mutation == 'wrong_source':
+            changed['read_files'][1] = '/source/other'
+        elif mutation == 'wrong_pid':
+            changed['system_leaves'][1] = '/proc/2/maps'
+        else:
+            changed['system_leaves'][1] = '/proc/42/maps'
+        assert not ptp.equal_policy(changed, expected)
+
+
+def test_only_exact_reviewed_self_proc_leaves_are_retargeted():
+    args, expected = policy_fixture()
+    assert '/proc/1/maps' in expected['system_leaves'] and '/proc/1/status' in expected['system_leaves']
+    assert '/proc/1' in expected['read_directories'] and '/proc/42' not in expected['read_directories']
+    args['system'][1] = Path('/proc/2/maps')
+    with pytest.raises(ValueError, match='self-proc'):
+        ptp.expected_worker_policy(**args)
+    args, _ = policy_fixture()
+    args['profile']['system_leaves'][1]['path'] = '/proc/2/maps'
+    with pytest.raises(ValueError, match='missing'):
+        ptp.expected_worker_policy(**args)

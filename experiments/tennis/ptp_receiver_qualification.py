@@ -179,6 +179,10 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     common.require_hash(Path(args.ffmpeg), common.TOOLS['ffmpeg'])
     stage = Path(os.environ['PS_STAGE_DIR'])
     scratch = Path(os.environ['PS_SCRATCH_DIR'])
+    spec = json.loads((stage.parent / 'spec.json').read_text())
+    required_cap = 900 if args.policy_sha256 == POLICY else 1800
+    if args.full_cap_seconds != required_cap or spec['full']['seconds'] != required_cap:
+        raise ValueError('full cap differs from frozen policy/spec')
     start, cpu = time.monotonic(), common.cpu_seconds()
     work = scratch / 'ptp-qualification-private'
     work.mkdir(exist_ok=False)
@@ -229,7 +233,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     internal_checks = validate_proofs(replay_root, args.cases, args.policy_sha256)
     if not all(internal_checks.values()):
         raise ValueError('internal qualification proof validation failed')
-    cost = cost_record(time.monotonic() - start, common.cpu_seconds() - cpu, args.cases)
+    cost = cost_record(time.monotonic() - start, common.cpu_seconds() - cpu, args.cases, args.full_cap_seconds)
     result = {'schema': 1, 'cases': args.cases, 'archive': binding, 'cost': cost, 'internal_checks': internal_checks,
               'scope': 'PTP filesystem denial under inherited native restrictions'}
     paid.write_json(stage / 'ptp-qualification-stage.json', result)
@@ -364,13 +368,13 @@ def validate_proofs(root: Path, cases: int, expected_policy_sha: str) -> dict[st
     return checks
 
 
-def cost_record(wall: float, cpu: float, cases: int) -> dict[str, Any]:
-    if wall <= 0 or cpu < 0 or cases not in (1, 4):
+def cost_record(wall: float, cpu: float, cases: int, full_cap: int = 900) -> dict[str, Any]:
+    if wall <= 0 or cpu < 0 or cases not in (1, 4) or type(full_cap) is not int or full_cap not in (900, 1800):
         raise ValueError('invalid qualification cost')
     forecast = 1.5 * wall * 4 / cases + 30
     return {'cases': cases, 'target_cases': 4, 'wall_seconds': wall, 'cpu_seconds': cpu,
-            'forecast_seconds': forecast, 'full_cap_seconds': 900,
-            'passed': forecast <= 900 if cases == 1 else wall <= 900,
+            'forecast_seconds': forecast, 'full_cap_seconds': full_cap,
+            'passed': forecast <= full_cap if cases == 1 else wall <= full_cap,
             'basis': 'body after imports including full actual source preparation and fresh-exec proof; smoke 1.5 * wall * 4 + 30'}
 
 
@@ -382,18 +386,21 @@ def validate_fleet(stage: Path, temp: Path) -> dict[str, Any]:
     if len(policy_items) != 1 or len(base_items) != 1 or base_items[0]['sha256'] != POLICY:
         raise ValueError('spec policy bindings differ')
     expected_policy_sha = policy_items[0]['sha256']
+    full_cap = spec['full']['seconds']
+    if full_cap != (900 if expected_policy_sha == POLICY else 1800):
+        raise ValueError('spec full cap differs from selected policy')
     with tempfile.TemporaryDirectory(prefix='ptp-proof-', dir=temp) as folder:
         root = extract(stage / 'published.tar', record['archive'], record['cases'], Path(folder) / 'archive')
         checks = validate_proofs(root, record['cases'], expected_policy_sha)
         manifest = json.loads((root / 'manifest.json').read_text())
         checks['host_in_frozen_spec'] = manifest['host'] in spec['hosts']
     cost = record['cost']
-    checks['body_cost'] = cost == cost_record(cost['wall_seconds'], cost['cpu_seconds'], record['cases']) and cost['passed']
+    checks['body_cost'] = cost == cost_record(cost['wall_seconds'], cost['cpu_seconds'], record['cases'], full_cap) and cost['passed']
     checks['internal_validation'] = bool(record['internal_checks']) and all(record['internal_checks'].values())
     if (stage / 'execution.json').exists():
         execution = json.loads((stage / 'execution.json').read_text())
         checks['whole_command_cost'] = (execution['exit_code'] == 0
-                                         and cost_record(execution['seconds'], 0, record['cases'])['passed'])
+                                         and cost_record(execution['seconds'], 0, record['cases'], full_cap)['passed'])
     return {'passed': all(checks.values()), 'checks': checks,
             'scope': 'fresh-exec source-denial and exact RGB; no network/MCP isolation or independently observed native births'}
 
@@ -424,7 +431,8 @@ def make_spec(deadline: str, paid_inputs: dict[str, dict[str, str]],
                 or any(c not in '0123456789abcdef' for c in info['sha256'])):
             raise ValueError('paid input requires an absolute path and lowercase SHA256')
         items.append({'name': name, **info, 'extract': False})
-    arguments = ['--fleet', '--cases', '{cases}']
+    full_cap = 900 if policy_descriptor is None else 1800
+    arguments = ['--fleet', '--cases', '{cases}', '--full-cap-seconds', str(full_cap)]
     for item in items:
         arguments += ['--' + item['name'].replace('_', '-'), '{staged:' + item['name'] + '}']
         if item['name'] in paid_inputs or item['name'] == 'policy':
@@ -437,8 +445,9 @@ def make_spec(deadline: str, paid_inputs: dict[str, dict[str, str]],
                             'sha256': isolated.RUNTIME_SHA}, 'verify_staged_inputs': True,
             'required_commands': ['ffmpeg'], 'scale': {'cases': {'smoke': 1, 'full': 4}},
             'smoke': {'seconds': 450, 'representative_basis': 'All actual protected inputs/materialization and one full48 tennis PTP receiver with fresh restricted exec; full repeats for three tennis and one full64 ego packet.'},
-            'full': {'seconds': 900}, 'validator': ['{python}', '-m', 'experiments.tennis.ptp_receiver_qualification', '--validate'],
-            'validator_seconds': 60, 'budget_seconds': 1530, 'stall_seconds': 450, 'deadline': deadline,
+            'full': {'seconds': full_cap}, 'validator': ['{python}', '-m', 'experiments.tennis.ptp_receiver_qualification', '--validate'],
+            'validator_seconds': 60, 'budget_seconds': full_cap + 630,
+            'stall_seconds': 450 if full_cap == 900 else 1800, 'deadline': deadline,
             'contention': {'policy': 'stop', 'resume_attempts': 0}}
 
 
@@ -453,6 +462,7 @@ def main() -> None:
     parser.add_argument('--policy-sha256')
     parser.add_argument('--deadline')
     parser.add_argument('--cases', type=int, choices=(1, 4))
+    parser.add_argument('--full-cap-seconds', type=int, choices=(900, 1800))
     for name in (*FIXED, 'tennis_archive', 'tennis_stage', 'ego_archive', 'ego_stage'):
         parser.add_argument('--' + name.replace('_', '-'))
     for name in ('tennis_archive', 'tennis_stage', 'ego_archive', 'ego_stage'):
@@ -473,8 +483,8 @@ def main() -> None:
         if not result['passed']:
             raise SystemExit(1)
         return
-    if not args.fleet or args.cases is None:
-        parser.error('fleet requires --cases')
+    if not args.fleet or args.cases is None or args.full_cap_seconds is None:
+        parser.error('fleet requires --cases and --full-cap-seconds')
     required = (*FIXED, 'base_policy', 'policy_sha256', 'tennis_archive', 'tennis_stage', 'ego_archive', 'ego_stage',
                 'tennis_archive_sha256', 'tennis_stage_sha256', 'ego_archive_sha256', 'ego_stage_sha256')
     if any(getattr(args, name) is None for name in required):
