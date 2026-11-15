@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "state": "ready_for_first_new_smoke_after_checks",
+  "source_id": "match209_000",
+  "profile": "ball-confirmation-parent4-child6-then-parent8-v2",
+  "spec_path": "/private/tmp/pointstream-confirmation-v2-209-spec-20261115.json",
+  "spec_sha256": "e8027dbe98078a8448847e2c8383e2f5abd9aaf2a7afa0b3de98868f617e8ae3",
+  "deadline": "2026-11-15T08:30:00Z",
+  "code_sha256": {
+    "experiments/tennis/ball_confirmation.py": "4109374e1cd12a7579a9f0aca98b7f03d50726937a28c7c2848a3bb588aa5d9a",
+    "experiments/tennis/ball_confirmation_entry.py": "ede4765d5f3f946c85a6ad0ef2f2c8d902c079ccda293213ba47ce4e288a2351",
+    "src/codecs/dcvc_uf_worker.py": "750f805ff70bded4471bc027212bffea84c12e49024e453693317611ed526a34"
+  },
+  "checks": "configuredRuff/Mypy651pass; full2597passed37skippedexistingforkwarning;39focusedphase/legacytests pass",
+  "phase_contract": "parent4096+onechild6144during6successfulnativeworkers; actual6workeridentityexits+native/reporthashes+parentpeak<=4096verified; thenparentONLY8000, no childlive; combinedclaim12288+margin8192unchanged",
+  "model_parameters_unchanged": true,
+  "batch_precision_windows_rates_unchanged": true,
+  "confirmation_perceptual_outcomes_opened": false,
+  "prior_failure_job": "20261115T072203Z-f6fec126",
+  "prior_failure_archive_sha256": "4f0a372004fa88bcf0f2e6b0275dec2b8b9b144918f3b9b0a95642f93b7c21cd",
+  "cpu_ceiling_seconds": 10800,
+  "gpu_ceiling_seconds": 2700,
+  "wall_ceiling_seconds": 2700
+}

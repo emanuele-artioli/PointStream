@@ -1,0 +1,8 @@
+{
+  "state": "ROOT_accepted_complete64_six_bases_and_fresh_sender",
+  "job_id": "20261115T081356Z-4b32fe68",
+  "archive_sha256": "e9875c1aa522d86d2f0a96df11cec89429800d437964ab5d58d4f0a9de3173a9",
+  "accepted_closure_sha256": "a25465997421112a85192c35e502ea5afcc88078dcf8f088b6ee7b849ac51a91",
+  "review": "actualsmallrecordbytes/36checks/fullclosure/source64/sixbase/resourcephase joins independently reviewed; allarchivebytes/framehashes independentlyreadbackbyaudit",
+  "metrics_opened": false
+}

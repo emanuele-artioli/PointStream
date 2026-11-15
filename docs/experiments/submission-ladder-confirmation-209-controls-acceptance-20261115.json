@@ -1,0 +1,137 @@
+{
+  "accepted_sha256": "790ecc55017c19393912e4fd8d04eb2f893450865607568dda25e1d7be721e62",
+  "archive_bytes": 1863055360,
+  "archive_members": 51,
+  "archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261115T084024Z-3565c8ec/full/published.tar",
+  "archive_sha256": "0d51c1c0715d57947d6a87219de6378b620d673d6472a75dc44ce61679270b86",
+  "audit_cpu_seconds": 63.385628,
+  "audit_script_sha256": "98d93ffc48d710cf48c18ac13fb187bff9aac44e93a28eb58eb103c31f2e68db",
+  "audit_wall_seconds": 66.85214885976166,
+  "check_count": 36,
+  "checks": {
+    "allocation": true,
+    "archive_all_members": true,
+    "canonical_job": true,
+    "command_binding": true,
+    "cpu_binding": true,
+    "phase_and_source": true,
+    "pixel-48-binding": true,
+    "pixel-48-reconstruction": true,
+    "pixel-48:fresh_packet": true,
+    "pixel-55-binding": true,
+    "pixel-55-reconstruction": true,
+    "pixel-55:fresh_packet": true,
+    "pixel-62-binding": true,
+    "pixel-62-reconstruction": true,
+    "pixel-62:fresh_packet": true,
+    "pixel_matrix": true,
+    "receipt_dispatch_binding": true,
+    "roi-fitted-48": true,
+    "roi-fitted-48:fresh_decode": true,
+    "roi-fitted-55": true,
+    "roi-fitted-55:fresh_decode": true,
+    "roi-fitted-62": true,
+    "roi-fitted-62:fresh_decode": true,
+    "roi-raw-35": true,
+    "roi-raw-35:fresh_decode": true,
+    "roi-raw-48": true,
+    "roi-raw-48:fresh_decode": true,
+    "roi-raw-62": true,
+    "roi-raw-62:fresh_decode": true,
+    "roi_matrix": true,
+    "runtime": true,
+    "source_scope": true,
+    "streak-48:fresh_packet": true,
+    "streak-55:fresh_packet": true,
+    "streak-62:fresh_packet": true,
+    "tool_hashes": true
+  },
+  "controls_evidence": {
+    "controls_archive": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261115T084024Z-3565c8ec/full/published.tar",
+      "sha256": "0d51c1c0715d57947d6a87219de6378b620d673d6472a75dc44ce61679270b86"
+    },
+    "controls_execution": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261115T084024Z-3565c8ec/full/execution.json",
+      "sha256": "901b1d7b370693b67127e48e4f20e85d923d4f5052c1998d1430d0628f296c3f"
+    },
+    "controls_stage": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261115T084024Z-3565c8ec/full/confirmation-stage.json",
+      "sha256": "1fdcf3b3fcd66a2e3a580f18b6634e95aeb50b705c01c5fe4ffa880a9d4f33f1"
+    },
+    "controls_validation": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/confirmation209-controls-independent-20261115-6a0e02d4/accepted-full.json",
+      "sha256": "790ecc55017c19393912e4fd8d04eb2f893450865607568dda25e1d7be721e62"
+    },
+    "raw_dispatch": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261115T084024Z-3565c8ec/full/dispatch.json",
+      "sha256": "3df71a20a4097cf6058e2476338823f9b34834ae270cf007b5417abb41647fe9"
+    },
+    "raw_full_validation": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261115T084024Z-3565c8ec/full/full-validation.json",
+      "sha256": "85f41d3f79e726356c0ecda2a9d761fa1a66347cc284fd86292ebc41a7e59b6a"
+    },
+    "raw_small_records": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/confirmation209-controls-independent-20261115-6a0e02d4/raw-small-records.tar",
+      "sha256": "be6ba894ae11bb7a627702db130baa78d8240419e8ddc88f06254f628dca126d"
+    }
+  },
+  "cpu_affinity": [
+    124,
+    125,
+    126,
+    127
+  ],
+  "decoder_sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+  "destination": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/confirmation209-controls-independent-20261115-6a0e02d4",
+  "dispatch_sha256": "3df71a20a4097cf6058e2476338823f9b34834ae270cf007b5417abb41647fe9",
+  "execution_sha256": "901b1d7b370693b67127e48e4f20e85d923d4f5052c1998d1430d0628f296c3f",
+  "full_validation_sha256": "85f41d3f79e726356c0ecda2a9d761fa1a66347cc284fd86292ebc41a7e59b6a",
+  "gpu_seconds_added_by_audit": 0,
+  "job_id": "20261115T084024Z-3565c8ec",
+  "local_raw_small_records": "/private/tmp/pointstream-209-controls-independent-raw-20261115.tar",
+  "passed": true,
+  "quality_evaluated": false,
+  "receiver_frames_each": 64,
+  "receiver_streams": 12,
+  "schema": "pointstream-confirmation-controls-independent-acceptance-v1",
+  "scope": "full physical packet/native replay only; no source-denial or quality claim",
+  "score_inputs": {
+    "bases_archive": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261115T081356Z-4b32fe68/full/published.tar",
+      "sha256": "e9875c1aa522d86d2f0a96df11cec89429800d437964ab5d58d4f0a9de3173a9"
+    },
+    "bases_execution": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261115T081356Z-4b32fe68/full/execution.json",
+      "sha256": "ca22bd04808ed2605fa5144d929c48de7fa8beb6502693a810dbc0c51b3bd319"
+    },
+    "bases_stage": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261115T081356Z-4b32fe68/full/confirmation-stage.json",
+      "sha256": "06c8f41e0bf4fc9fcc1d78640268f44a150cd24a01c95f16f60d1bc974c72e6a"
+    },
+    "bases_validation": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/confirmation209-independent-20261115-a1b9c3d8/accepted-full.json",
+      "sha256": "a25465997421112a85192c35e502ea5afcc88078dcf8f088b6ee7b849ac51a91"
+    },
+    "controls_archive": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261115T084024Z-3565c8ec/full/published.tar",
+      "sha256": "0d51c1c0715d57947d6a87219de6378b620d673d6472a75dc44ce61679270b86"
+    },
+    "controls_execution": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261115T084024Z-3565c8ec/full/execution.json",
+      "sha256": "901b1d7b370693b67127e48e4f20e85d923d4f5052c1998d1430d0628f296c3f"
+    },
+    "controls_stage": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261115T084024Z-3565c8ec/full/confirmation-stage.json",
+      "sha256": "1fdcf3b3fcd66a2e3a580f18b6634e95aeb50b705c01c5fe4ffa880a9d4f33f1"
+    },
+    "controls_validation": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/confirmation209-controls-independent-20261115-6a0e02d4/accepted-full.json",
+      "sha256": "790ecc55017c19393912e4fd8d04eb2f893450865607568dda25e1d7be721e62"
+    }
+  },
+  "scratch": "/local/users/emanuele/pointstream/checks/confirmation209-controls-independent-20261115-6a0e02d4",
+  "source_tar_sha256": "6a1ad69353915bbfbc06854830009f653e23af34c29ca38ac9cc0803f1158382",
+  "stage_sha256": "1fdcf3b3fcd66a2e3a580f18b6634e95aeb50b705c01c5fe4ffa880a9d4f33f1",
+  "status": "ROOT_accepted_complete_controls"
+}
