@@ -60,7 +60,7 @@
     "actor_instance_policy": "union all returned actor instances using existing backend default output_prob_thresh0.35; preserve every raw model instance",
     "task_object_prompts": {
       "P35_105": "saucepan",
-      "P12_101": "tap",
+      "P12_101": "faucet",
       "P11_103": "pan"
     },
     "task_object_condition": "only if the allowed official task-object label has no instance on this exact frame",
@@ -70,7 +70,13 @@
     "actor_query_guidance": "person and hand TEXT ONLY, no human box constraint",
     "task_object_query_guidance": "text plus tight rough-human box when available; text only otherwise; no additional query calls",
     "backend_default_output_prob_thresh": 0.35,
-    "mask_binarization": "preserve binary model output; wrapper _unpack_outputs uses >0 on out_binary_masks, nearest resize if needed; not a new0.5 score threshold"
+    "mask_binarization": "preserve binary model output; wrapper _unpack_outputs uses >0 on out_binary_masks, nearest resize if needed; not a new0.5 score threshold",
+    "canonical_task_object_labels": {
+      "P35_105": "saucepan",
+      "P12_101": "tap",
+      "P11_103": "pan"
+    },
+    "alias_note": "ROOT acknowledged before model outcomes: faucet is SAM English query alias of official tap; not an extra query/object"
   },
   "coarse_bbox_guidance": [
     {
@@ -210,5 +216,6 @@
     "unknown_failure_caption": "If no valid proposal is produced, show source and explicit incomplete/missing state; never infer empty ground truth or describe hidden controls as model misses"
   },
   "scientific_boundary": "proposals only; changes foreground objective prospectively; no old scores relabeled or confirmation outcomes opened; no new approved reference masks",
-  "new_GPU_authority_in_this_CPU_task": 0
+  "new_GPU_authority_in_this_CPU_task": 0,
+  "amendment_before_new_SAM_outcomes_utc": "2026-11-15T10:41:00.414998+00:00"
 }
