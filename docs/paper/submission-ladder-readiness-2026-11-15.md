@@ -1,5 +1,7 @@
 # Submission readiness after development screens and three-source confirmation
 
+**November15 priority amendment:** the [current continuation plan](../submission-next-actions-2026-11-15.md) now puts authenticated player-demo and human visual review first, removes the10% usefulness floor prospectively, conditions the remaining dense-mask work on the endpoint, and calls for useful paper expansion. The numerical evidence and historical registered rules below remain unchanged; the smaller ROI observations are reportable but unreplicated. No previous result is retroactively declared significant.
+
 **Decision: not ready for submission as a competitive complete object-centric codec.** Tennis now passes its predefined narrow ball-priority confirmation criterion. Egocentric video has no confirmed added-representation benefit, and regional allocation alone does not establish novelty. The stronger empirical author-review revision preserves the original Overleaf `690cad0` source; actual author approval, rights and complete venue compliance remain pending.
 
 The [new author-review record](submission-ladder-author-review-v4-2026-11-15.json) binds the completed anonymous PDF and identifiable source ZIP: **18 pages of body/references plus five appendix pages**. All23pages were rendered and inspected; ROOT reviewed the final abstract, primary result/figure and conclusion. The paper now follows the contribution ladder; nine historical section blocks and18 unresolved limitations are preserved externally, not declared resolved. Originals690/v1/v2 remain unchanged.
