@@ -1187,8 +1187,8 @@
   "proposal": {
     "state": "proposal_only_ROOT_decides; no release",
     "initial_points": [
+      35,
       48,
-      55,
       62
     ],
     "preset": 4,
@@ -1200,10 +1200,10 @@
       1280,
       720
     ],
-    "initial_offset_policy": "0inside64x64crop centered on decoded paidSVT PSBL transmittedballcenters atthatpoint, +20outside. NoROIforserializedabsentframes. Repeat +40outside onlyafter +20decisiongate ifunclear; rootmayfreeze bothas smallfinitepolicytest.",
-    "second_offset": "+40outside only if +20curve lacks support or answer remains unclear; log reason before additional outcomes",
-    "geometry": "Framewise64x64box with same round/clamp rules as k5d_encoder.crop64, rasterized then touched64x64blocks via w1_roi.roi_text(...,-20,outside=True)",
-    "first_control": "Same transmittedballcenters as acceptedpaidPSBL, perCRFpoint; nativeAV1allocatesbits tosame inferredobjectlocations. No GTlocationgrant inprimarycontrol.",
+    "initial_offset_policy": "ROOTfrozen0inside sourceGT64crop touching AV1blocks,+40outside",
+    "second_offset": "Nootheroffsetreleased; provisional+20 discardedbeforeROIoutcomes",
+    "geometry": "SourceGT64x64crop exactoldcrop64 round/clamp, thenroi_text(regions,1280,720,-40,outside=True)",
+    "first_control": "ExplicitprivilegedGTlocation conventionalcontrol, not deployableautomaticROI or mathematicalbound",
     "automatic_followup": "Not needed forprimarylocationcontrol: decode existingPSBLballpayload supplies exactsendertransmittedpositions; sourcequalificationBallTrackpositions are diagnostic alternative, not assumed identical to fittedserializedcenters.",
     "encode_interface": "Clone accepted SvtAv1EncApp command exactly, changing onlysource/output paths, CRF, and adding --roi-map-file. Reuse src.codecs.svtav1.encode_command/code plus w1_roi.roi_text. Do not use codec_ladder.run unchanged.",
     "why_not_new_harness_unchanged": [
@@ -1309,5 +1309,37 @@
     "semantic_metric_rows": "point.streak.metrics",
     "frames": 48,
     "control_note": "full48encodingcontext;16-framefeasibility smoke needsseparate16contextgold"
+  },
+  "actual_old_CPU_context": {
+    "spec_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261113T210157Z-41ee26e3/spec.json",
+    "cpu_threads": 1,
+    "single_cpu_campaign": true,
+    "cpu_affinity_index": 0,
+    "smoke_dispatch_cpu_affinity": [
+      0
+    ],
+    "full_dispatch_cpu_affinity": [
+      0
+    ],
+    "encoder_lp_level": 6,
+    "lp_note": "SVTlevel6, not sixCPUthreads; old encoderchild inherits singleCPU[0]",
+    "code_assertion": "k5d_encoder.py313 len(sched_getaffinity)==1 andPS_CPU_ALLOWANCE1"
+  },
+  "nested16_native62_control": {
+    "producer_point_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261113T210157Z-41ee26e3/smoke/published.tar",
+    "producer_point_member": "publish/svt-62/point.json",
+    "producer_point_sha256_actual": "8c81d64e958246b5d4d91439c677a4c6f714cc9a31b84e79f6e288925aa60d0d",
+    "native_sha256": "91a304e1df95d7a7b553615d3b120ae9c1a7f0767f524eedd4bc7af621916504",
+    "decoded_YUV_sha256": "b1439bb4911d4450b559ab95ea4186b7941ebec29de125532a43655fc5a2e409",
+    "score_archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261113T220101Z-0cfa5558/smoke/published.tar",
+    "score_member": "publish/point-svt-62.json",
+    "score_member_sha256_actual": "b141c964eb57da4b41c4e41369b1b27a58cc9d13f42ffc9f913a0e4b9ec66c9d",
+    "baseline_mean_metrics": {
+      "full_lpips": 0.05009708484013876,
+      "full_dists": 0.06022568792104721,
+      "crop_lpips": 0.1668320307508111,
+      "crop_dists": 0.19907967746257782
+    },
+    "scope": "nestedcorrectnessonly, distinct16-frameencodingcontext notfull48prefix"
   }
 }

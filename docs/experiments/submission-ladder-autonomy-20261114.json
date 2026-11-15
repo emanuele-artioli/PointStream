@@ -41,7 +41,7 @@
       "id": "standard-fullframe-metric-contract",
       "cpu_seconds": 3600,
       "gpu_seconds": 3600,
-      "state": "released_conditional_on_frozen_v2_smoke",
+      "state": "closed_measurement_contract_passed_no_promotion",
       "parts": {
         "tennis_v2_score_cpu_gpu_each": 1530,
         "visor_v2_score_cpu_gpu_each": 1530,
@@ -49,7 +49,11 @@
       },
       "purpose": "Same 24 accepted native/patch reconstructions; separately named official scalar full-frame LPIPS plus exact legacy regional invariance check. No method tuning, cohort expansion or revised promotion rule.",
       "cost_basis": "Previous complete score commands170.12s tennis/288.81s VISOR, added sequential AlexNet forward without new model; actual16-frame/full-replay smoke must forecast64 within900s using1.5*wall*4+30. Whole waited stage1530s includes450smoke+900full+60validator+120overhead.",
-      "card": "docs/cards/submission-ladder-standard-metrics-2026-11-15.md"
+      "card": "docs/cards/submission-ladder-standard-metrics-2026-11-15.md",
+      "conservative_cpu_charge_seconds": 3060,
+      "conservative_gpu_charge_seconds": 3060,
+      "unreleased_cpu_seconds": 540,
+      "unreleased_gpu_seconds": 540
     },
     {
       "id": "matched-ball-conventional-roi",
@@ -73,13 +77,24 @@
       "hypothesis": "Compactpaidball advantage may be explained by conventional allocation to the sameobject; add stronger matchedROI before claimingrepresentationbenefit.",
       "competing_explanation": "NativeROI+40 raisesoutsideQP; preserveballpixelsconventionally. ReferenceROIprivileged andnotdeployableautomatic.",
       "parts": {
-        "cpu_native_stage_ceiling": 2400,
+        "cpu_native_stage_ceiling": 1530,
         "cuda_score_stage_cpu_ceiling": 2430,
         "cuda_score_stage_gpu_ceiling": 2430,
-        "cpu_preparation_review_failure_closeout_allowance": 2370,
+        "cpu_preparation_review_failure_closeout_allowance": 3240,
         "gpu_failure_closeout_allowance": 1170
       },
-      "gate": "NoGPU until exactJPEG/YUV/native62gold andfreshdecoderparity pass, metriccontrol/source/modelhashes frozen, representativecost fits stage. Noclosedoldallocation reopened."
+      "gate": "NoGPU until exactJPEG/YUV/native62gold andfreshdecoderparity pass, metriccontrol/source/modelhashes frozen, representativecost fits stage. Noclosedoldallocation reopened.",
+      "native_affinity_contract": {
+        "cpu_threads": 1,
+        "single_cpu_campaign": true,
+        "cpu_affinity_index": 0,
+        "observed_accepted_41ee_affinity": [
+          0
+        ],
+        "parallelism_note": "SVT --lp6 is algorithm level, not six allocatedthreads",
+        "stage_wall_ceiling_seconds": 1530,
+        "full_cost_cap_seconds": 900
+      }
     }
   ],
   "jobs": [
@@ -277,6 +292,50 @@
       "scoped_command_cpu_seconds": 288.164,
       "score_file": "docs/experiments/submission-ladder-visor-scores-20261115.json",
       "analysis_file": "docs/experiments/submission-ladder-visor-analysis-20261115.json"
+    },
+    {
+      "job_id": "20261115T010800Z-1cfef16e",
+      "purpose": "tennis standard full-frame LPIPS v2 sameacceptedpixels",
+      "state": "accepted_v2_all64_legacyexact_no_promotion",
+      "cpu_ceiling_seconds": 1530,
+      "gpu_ceiling_seconds": 1530,
+      "code_revision": "70340ffc",
+      "source_sha256": "9dc45f1ff9a4c48af397380dd25f822df4126ecef415a9a47a479e29a52041d4",
+      "spec_sha256": "00af063f3eb386f89baeb1c1a3324c15f728ab9b44edaf8b6cc7473313b90900",
+      "receipt": "/private/tmp/pointstream-standard-metrics-v2-runner-state.json",
+      "management_route": "PS_FLEET_MANAGEMENT_HOST=gpu6",
+      "deadline": "2026-11-15T02:30:00Z",
+      "conservative_cpu_charge_seconds": 1530,
+      "conservative_gpu_charge_seconds": 1530,
+      "archive_sha256": "847616b2fc8b676b88721cf48c890565c35570252d26913a993a68f86a7a6ff3",
+      "host": "gpu5",
+      "gpu_uuid": "GPU-7754164a-33cd-265c-3696-c20966d228fe",
+      "scoped_command_wall_seconds": 172.392,
+      "scoped_command_cpu_seconds": 171.632,
+      "score_file": "docs/experiments/submission-ladder-tennis-standard-v2-scores-20261115.json",
+      "analysis_file": "docs/experiments/submission-ladder-tennis-standard-v2-analysis-20261115.json"
+    },
+    {
+      "job_id": "20261115T010834Z-13806d69",
+      "purpose": "visor standard full-frame LPIPS v2 sameacceptedpixels",
+      "state": "accepted_v2_all64_legacyexact_no_promotion",
+      "cpu_ceiling_seconds": 1530,
+      "gpu_ceiling_seconds": 1530,
+      "code_revision": "70340ffc",
+      "source_sha256": "9dc45f1ff9a4c48af397380dd25f822df4126ecef415a9a47a479e29a52041d4",
+      "spec_sha256": "82cf159788a77743cf50e08c8e5af2826f095916009b91d53dbe3b820de74a0e",
+      "receipt": "/private/tmp/pointstream-standard-metrics-v2-runner-state.json",
+      "management_route": "PS_FLEET_MANAGEMENT_HOST=gpu6",
+      "deadline": "2026-11-15T02:30:00Z",
+      "conservative_cpu_charge_seconds": 1530,
+      "conservative_gpu_charge_seconds": 1530,
+      "archive_sha256": "2fd2c14f4eafef42590c7ebf6eb60f3e269920b62b758d844f9a5bb868413b53",
+      "host": "gpu6",
+      "gpu_uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+      "scoped_command_wall_seconds": 263.625,
+      "scoped_command_cpu_seconds": 263.024,
+      "score_file": "docs/experiments/submission-ladder-visor-standard-v2-scores-20261115.json",
+      "analysis_file": "docs/experiments/submission-ladder-visor-standard-v2-analysis-20261115.json"
     }
   ],
   "decisions": [
@@ -288,7 +347,8 @@
     "Same-pixels free-framing semanticpatch still loses +16.7589percent weightedDISTS; closes only preregistered static256x256/CRF28 construction on this development window. Narrow semantic-vs-error selection advantage does not establish native codec benefit.",
     "Next test before more outcomes: unchanged preregistered VISOR64-frame arm, fixed protocol/source/3rates; no tennis tuning. Any later narrowed method needs separate hypothesis/budget.",
     "RacketVision all43test rallies already used in K5b tracker selection; no untouched holdout claim. Candidate native codec windows remain exposed development, sourceURL dedup unknown.",
-    "Accepted VISOR64: ROI weightedDISTS -5.3901percent/LPIPS -4.5211percent below10percent. Semanticpatch +18.4685/+23.5456percent versusnative; evenfreeframing+18.2420percent weightedDISTS. Close frozenstaticadditivepatchfamily on both exposeddevelopmentwindows; no parameterfishing/positiveconfirmation. Nextpriority matched-ball-objective conventionalROIcontrol, pending exactdata/price audit."
+    "Accepted VISOR64: ROI weightedDISTS -5.3901percent/LPIPS -4.5211percent below10percent. Semanticpatch +18.4685/+23.5456percent versusnative; evenfreeframing+18.2420percent weightedDISTS. Close frozenstaticadditivepatchfamily on both exposeddevelopmentwindows; no parameterfishing/positiveconfirmation. Nextpriority matched-ball-objective conventionalROIcontrol, pending exactdata/price audit.",
+    "V2 acceptedboth64windows: all11580legacy numericvalues eachdomain EXACT (maxdelta0), standardfullLPIPS maxspatialdelta6.93e-7tennis/1.2815e-6VISOR. Primarynegativeunchanged; standardfullROIvsnative costs+1.15percent tennis/+0.64percentVISOR whileweightedbenefitsbelowtarget. No fullframewin."
   ],
   "repair_receipt": {
     "repair": "expose existing ABI215 library at FFmpeg required opt path; preserve ABI216 defaults",
