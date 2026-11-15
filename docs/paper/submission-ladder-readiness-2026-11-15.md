@@ -1,5 +1,13 @@
 # Submission readiness after development screens and three-source confirmation
 
+**Latest scope/trust amendment:** the [current plan](../../PLAN.md) targets
+player-and-ball quality first, with racket improvement optional and equipment
+harms disclosed. The [historical-source re-audit](../experiments/foreground-scope-and-requalification-20261115.md)
+found and prospectively repaired comparison/profile/FPS defects. Neither old
+generic-model rejection nor a positive historical recipe alone selects the
+next model; a small strict contemporary comparison is required. Historical
+scores, full-frame costs and old reference definitions remain unchanged.
+
 **November15 priority amendment:** the [current continuation plan](../submission-next-actions-2026-11-15.md) now puts authenticated player-demo and human visual review first, removes the10% usefulness floor prospectively, conditions the remaining dense-mask work on the endpoint, and calls for useful paper expansion. The numerical evidence and historical registered rules below remain unchanged; the smaller ROI observations are reportable but unreplicated. No previous result is retroactively declared significant.
 
 **Chapter14 follow-up:** the user's intended demo is now [identified as W7 al028](../experiments/submission-ladder-chapter14-demo-audit-20261115.md), with large player-region LPIPS/DISTS improvements visible in the saved scores and corrected modeled-rate comparison. This historical positive must remain explicit in the paper and design review, alongside full-frame losses, same-match training, two-hour bank/adaptation modeling, sparse temporal sampling and incomplete operational receiver/accounting. It does not change the completed new ball confirmation or establish a complete generative codec. The website's18.46kbps legend predates W9's corrected19.24kbps model.

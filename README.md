@@ -8,9 +8,11 @@ programme. Competitive end-to-end gains in both domains remain research goals.
 The [codec endpoints](docs/codec-endpoint.md) provide `encode`, `decode` and
 `inspect` commands for native fallback and tracked pixel patches. Start with
 the [current research brief](RESEARCH.md) and [current plan](PLAN.md): the lead
-hypothesis is combined tennis player/racket/ball foreground coding, building on
-the saved generative-player and paid-ball positives. The complete combined win,
-racket fidelity and learned receiver remain to be demonstrated. The [submission ladder](docs/experiments/submission-ladder-20261114.md)
+hypothesis is combined tennis player-and-ball foreground coding, building on
+the saved generative-player and paid-ball positives. The complete combined win
+and learned receiver remain to be demonstrated; racket fidelity is an optional
+extension. Older model-selection conclusions undergo code/input requalification.
+The [submission ladder](docs/experiments/submission-ladder-20261114.md)
 records the current milestones and stage-budget requirements. The [current readiness update](docs/paper/submission-ladder-readiness-2026-11-15.md) separates accepted development results from the human-reference and confirmation work still required.
 
 ## Layout

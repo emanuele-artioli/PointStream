@@ -3,8 +3,9 @@
 Current scientific direction and stage order are in the [research brief](../RESEARCH.md)
 and [PLAN](../PLAN.md). The [v2 inference protocol](experiments/submission-ladder-protocol-20261115-v2.json)
 removes the10% usefulness floor and adds source-level inference and human visual
-pilots; the [v3 tennis-family amendment](experiments/submission-tennis-protocol-20261115-v3.json)
-sets the current combined-player/equipment/ball hypothesis. Dated rules/outcomes below remain historical; no old success threshold
+pilots; the [v4 scope/requalification amendment](experiments/submission-tennis-protocol-20261115-v4.json)
+sets the current player-and-ball primary target, optional equipment extension,
+historical code requalification and bounded extra-domain policy. Dated rules/outcomes below remain historical; no old success threshold
 or closed budget silently overrides the current plan or releases a new run.
 
 ## Protocol
