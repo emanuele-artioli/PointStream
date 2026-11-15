@@ -57,7 +57,11 @@ domains).
 `interpolated` (VISOR dense); `model_aided` (OpenTTGames); `rendered` (HOT3D,
 from motion-capture poses); `sam_from_label_prompt` (SAM 3.1 prompted by a
 labelled point, box or keypoint); `sam_text` (SAM 3.1 from a text prompt only).
-Results are reported per tier. No data is labelled by hand.
+Results are reported per tier. The original dataset intake did not add manual
+labels. The November 2026 submission programme adds human review separately;
+follow the [annotation workflow](annotation-workflow.md) for dedicated-editor
+selection and human/model provenance. The first 18-frame VISOR pass approved
+zero final references; rough human guidance is not a reference mask.
 
 **Modelling decisions.**
 - One model per dataset with its native labels (for example VISOR's left and
