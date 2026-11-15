@@ -26,7 +26,7 @@ The egocentric all-null fallback reconstructs all 64 full-range 1080p/50fps fram
 
 PTP1 currently accepts raw YUV420 plus explicit encoder hints and returns raw RGB24. Retained genuine automatic trajectories are content-specific encoder input, and all receiver-needed placement is transmitted. Fresh detector inference, complete sender timing, streaming/cut recovery and real-time performance remain unqualified. The 512 MiB decoded-output cap is not a process-memory bound. See the [endpoint contract](../codec-endpoint.md).
 
-The artifact supports recomputing comparisons from saved scores. Saved packets and source-qualified inputs support reconstruction and rescoring with the declared environment and metric resources. Native/patch re-encoding from the source and retained explicit hints is reproducible; this does not establish fresh end-to-end trajectory generation. Independent OS-enforced source denial is a separate acceptance item, pending the bounded CPU receiver qualification; process separation alone is insufficient.
+The artifact supports recomputing comparisons from saved scores. Saved packets and source-qualified inputs support reconstruction and rescoring with the declared environment and metric resources. Native/patch re-encoding from the source and retained explicit hints is reproducible; this does not establish fresh end-to-end trajectory generation. Independent filesystem-denied reconstruction passes on frozen `f5486a92`: three tennis cases and egocentric fallback, all 208 decoded frame hashes exact,19 actual EACCES probes per case across all seven protected roles. The [archived proof](../experiments/submission-ladder-receiver-evidence-archive-20261115.json) preserves both the initial failed parent comparison and the accepted replacement. It establishes inherited filesystem restrictions, not network/MCP isolation or independent native-child birth observation. Process separation alone was not accepted as proof. Configured Ruff/Mypy (640 files) and 2,557 full tests and LinuxCI pass.
 
 ## References and confirmation
 
@@ -38,7 +38,7 @@ Tennis also needs independent source grouping and references. All 43 RacketVisio
 
 ## Timely research and manuscript decisions
 
-1. Finish the bounded receiver proof and current engineering checks; close accepted archives and job events. Do not spend a week extending infrastructure qualification.
+1. Receiver proof, engineering checks and independent archives now pass; preserve their exact scope. Further qualification should unlock a specific scientific decision.
 2. Finish the timed human-reference pilot, then the fixed confirmation references and tennis source grouping. Freeze the final candidate before opening confirmation outcomes.
 3. Carry at most one added representation per domain. Paid tracked pixels are the strongest current tennis development candidate; egocentric video has no promoted added representation. Reopening a failed patch, mask, background or generative route requires a changed limiting assumption and its own finite screen/budget.
 4. Confirm against the simplest relevant conventional ROI and native/neural methods, grouping uncertainty by source/match. Preserve task, absence and temporal failures; the all-visible ball result cannot establish absence safety.

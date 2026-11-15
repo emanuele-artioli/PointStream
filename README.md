@@ -7,7 +7,7 @@ programme. Competitive end-to-end gains in both domains remain research goals.
 
 The [codec endpoints](docs/codec-endpoint.md) provide `encode`, `decode` and
 `inspect` commands for native fallback and tracked pixel patches. The [submission ladder](docs/experiments/submission-ladder-20261114.md)
-records the current milestones and stage-budget requirements.
+records the current milestones and stage-budget requirements. The [current readiness update](docs/paper/submission-ladder-readiness-2026-11-15.md) separates accepted development results from the human-reference and confirmation work still required.
 
 ## Layout
 

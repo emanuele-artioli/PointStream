@@ -18,7 +18,7 @@ recorded, and must also be applied to scientific comparison sources.
 Example configuration (`config.json`):
 
 ```json
-{"width":1920,"height":1080,"fps":[25,1],"frames":240,"full_range":false,"crf":40,"preset":4,"input_format":"video"}
+{"width":1920,"height":1080,"fps":[25,1],"frames":64,"full_range":false,"crf":40,"preset":4,"input_format":"video"}
 ```
 
 ```bash

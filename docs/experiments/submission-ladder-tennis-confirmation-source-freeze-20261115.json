@@ -1,0 +1,1054 @@
+{
+  "archive_filename": "tennis-confirmation-sources.tar",
+  "authority": "primary agent explicitly admitted3 scoped sourcegroups and authorized900CPU0GPU source-only publication; user12h authority ends2026-11-15T11:07:34Z",
+  "code_profile": {
+    "ffmpeg_sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+    "official_archive_sha256": "5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff",
+    "official_index_contract": [
+      {
+        "excerpt": "    frame_idx = 0\n    while True:\n        ret, frame = cap.read()\n        if not ret:\n            break\n        frame_path = os.path.join(output_dir, f'{frame_idx:04d}.{img_format}')\n        cv2.imwrite(frame_path, frame)\n        frame_idx += 1",
+        "member": "source/DataPreprocess/extract_frames.py",
+        "sha256": "8ac15b056b9a735534bda752fb990e90af0fd58c63713875f9893c5c58e1f4e7",
+        "verified_line_end": 33,
+        "verified_line_start": 26
+      },
+      {
+        "excerpt": "        label_df = pd.read_csv(csv_file, encoding='utf8').sort_values(by='Frame').fillna(0)\n        fids, x, y, v = np.array(label_df['Frame']), np.array(label_df['X']), np.array(label_df['Y']), np.array(label_df['Visibility'])\n\n        id = np.array([], dtype=np.int32).reshape(0, self.seq_len, 2)\n        frame_file = np.array([]).reshape(0, self.seq_len)\n        coor = np.array([], dtype=np.float32).reshape(0, 1, 2)\n        vis = np.array([], dtype=np.float32).reshape(0, 1)\n\n        for i, fid in enumerate(fids):\n            tmp_idx, tmp_frames = [None] * self.seq_len, [None] * self.seq_len\n            tmp_coor, tmp_vis = [], []\n            seq_i = self.seq_len - 1\n            curr_i = fid\n            for _ in range(self.seq_len):\n                curr_i = max(0, curr_i)\n                tmp_idx[seq_i] = (rally_i, curr_i)\n                tmp_frames[seq_i] = os.path.join(rally_dir, f'{curr_i:04d}.{self.img_format}')",
+        "member": "source/BallTrack/dataset/uball.py",
+        "sha256": "6674d128e980eb378994a2797800e1eca6271fa25ac5910f9ebcf286c3c68c2d",
+        "verified_line_end": 127,
+        "verified_line_start": 111
+      },
+      {
+        "excerpt": "def get_video_info(video_path):\n    \"\"\"Get video metadata: frame count, fps, width, height.\"\"\"\n    cap = cv2.VideoCapture(video_path)\n    if not cap.isOpened():\n        raise RuntimeError(f\"Cannot open video: {video_path}\")\n    fps = cap.get(cv2.CAP_PROP_FPS)\n    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))\n    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))\n    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))\n    cap.release()\n    return frame_count, fps, width, height",
+        "member": "source/DataPreprocess/generate_dataset_info.py",
+        "sha256": "6d5bbec5d047799224ac2af9dfe3f8e0041d96ab94031882213b845eefedaa84",
+        "verified_line_end": 28,
+        "verified_line_start": 18
+      }
+    ],
+    "runtime_archive_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "exposure": {
+    "RVD_split": "TRAIN",
+    "encoder_training_overlap": "permittedanddisclosed;authorsBallTrackRVDtrained;notnewtaskjudgeclaim",
+    "human_identity_review": false,
+    "judge_training_overlap": "all4learnedcomponentpre-eventlineagesaudited;exactinstalledheads/alpha-betaGitblobs2020;backboneofficialhistoricalURLs2019/2022",
+    "physical_group_dedup": "separate3pairs/events;all43TESTevent/pairsourceinspectionandoriginalTrackNetREADMEtableexclude3groups;knownbroadcastdevelopmentpairsdisjoint",
+    "relative_to_recorded_PointStream_development_selection": true,
+    "undocumented_exposure_not_excluded": true
+  },
+  "frozen_at_UTC": "2026-11-15T06:21:48Z",
+  "irrevocable_source_window_freeze_before_outcomes": true,
+  "provenance_limits": [
+    "AIeventjoinsandprimaryagentreviewarenothumanannotationvalidation",
+    "originalbroadcastuploadURLsnotrecovered",
+    "TrackNetpublicacquisitionviaDrive mirror;noindependent2019fullZIPpublishedSHA",
+    "backbonehistoricalURLsuse8hexpublishedhashprefix;actualfrozenfullSHArecorded"
+  ],
+  "publication_directory": "/home/itec/emanuele/Datasets/pointstream-data/tennis/confirmation-source-20261115T062148Z-297a05e2",
+  "rights": {
+    "dataset": "RacketVisiondatasetcardMIT;originalprofessionalbroadcastcopyrightnotassignedbydatasetlicense",
+    "usage": "privatescientificsourcepublicationonly;notpublicfootagerepublicationorsubmissionpermission"
+  },
+  "schema": "pointstream.tennis.confirmation.source-freeze.v1",
+  "selection": {
+    "all_frames": 282,
+    "groups": 3,
+    "not_visible_label_times": 5,
+    "outcomes_seen": false,
+    "rule": "firstceil(2.56*nativefps) sequentialnativeframes beginningdecodedindex0; groupidentities admittedbeforewindows and noqualityoutcomes",
+    "sparse_Level": 1,
+    "unknown_frame_times": 245,
+    "visible_label_times": 32
+  },
+  "source_profile": {
+    "colour": "declaredlimited/tvBT709 inputrange/matrix/transfer/primaries; RGBoutput",
+    "crop_metrics": "officialvisible32times only;5nonvisibleundefinedcrop;245unknown retained",
+    "decode": "originalMP4 native sequentialdecodedRGB24 uint8, allnativeframes retained",
+    "full_metrics": "ALL282selectednativeframes aftersameviewtransform",
+    "implementation_status": "methodfrozen; exactfuturedecoder/area-resizeexecutioncodeandtransformhashmustbefrozenbeforeexperiments; noresizeexecutedinthispublication",
+    "native_geometry": [
+      1920,
+      1080
+    ],
+    "packet_rate": "completephysicalpackets/allselectednativeframesanddurations",
+    "temporal_resampling": false,
+    "view": {
+      "GT_coordinate_scale_exact": [
+        2,
+        3
+      ],
+      "crop_only_on_official_visibility1": true,
+      "crop_width_height_in720RGB": [
+        64,
+        64
+      ],
+      "height": 720,
+      "resize": "area interpolation ONnative decodedRGB, notYUVresize",
+      "unknown_means_absent": false,
+      "width": 1280
+    }
+  },
+  "sources": [
+    {
+      "counts": {
+        "all_native_frames": 64,
+        "not_visible": 3,
+        "unknown": 52,
+        "visible": 9
+      },
+      "frozen_window": {
+        "PTS_policy": "normalize first selected decoded PTS to0 only; do notshiftCSVindices/dropframes/resample",
+        "all_native_frame_count": 64,
+        "duration_exact_seconds": [
+          64,
+          25
+        ],
+        "first_native_decoded_index": 0,
+        "fps_exact": [
+          25,
+          1
+        ],
+        "native_start_PTS_seconds": "0.040000",
+        "stop_native_decoded_index_exclusive": 64
+      },
+      "id": "match209_000",
+      "native_header": {
+        "avg_frame_rate": "25/1",
+        "codec_name": "h264",
+        "color_primaries": "bt709",
+        "color_range": "tv",
+        "color_space": "bt709",
+        "color_transfer": "bt709",
+        "duration": "9.960000",
+        "height": 1080,
+        "nb_frames": "249",
+        "pix_fmt": "yuv420p",
+        "r_frame_rate": "25/1",
+        "start_time": "0.040000",
+        "time_base": "1/12800",
+        "width": 1920
+      },
+      "official_window_rows": [
+        {
+          "GT720_X_exact": [
+            2194,
+            3
+          ],
+          "GT720_Y_exact": [
+            634,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1097,
+          "native_Y": 317,
+          "native_frame_index": 9,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": null,
+          "GT720_Y_exact": null,
+          "crop_defined": false,
+          "native_X": 0,
+          "native_Y": 0,
+          "native_frame_index": 13,
+          "visibility": 0
+        },
+        {
+          "GT720_X_exact": [
+            1078,
+            3
+          ],
+          "GT720_Y_exact": [
+            844,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 539,
+          "native_Y": 422,
+          "native_frame_index": 18,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            888,
+            3
+          ],
+          "GT720_Y_exact": [
+            682,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 444,
+          "native_Y": 341,
+          "native_frame_index": 23,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            1620,
+            3
+          ],
+          "GT720_Y_exact": [
+            578,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 810,
+          "native_Y": 289,
+          "native_frame_index": 27,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            2062,
+            3
+          ],
+          "GT720_Y_exact": [
+            568,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1031,
+          "native_Y": 284,
+          "native_frame_index": 32,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            2286,
+            3
+          ],
+          "GT720_Y_exact": [
+            626,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1143,
+          "native_Y": 313,
+          "native_frame_index": 37,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            2346,
+            3
+          ],
+          "GT720_Y_exact": [
+            708,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1173,
+          "native_Y": 354,
+          "native_frame_index": 41,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            2272,
+            3
+          ],
+          "GT720_Y_exact": [
+            848,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1136,
+          "native_Y": 424,
+          "native_frame_index": 46,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            2094,
+            3
+          ],
+          "GT720_Y_exact": [
+            864,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1047,
+          "native_Y": 432,
+          "native_frame_index": 51,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": null,
+          "GT720_Y_exact": null,
+          "crop_defined": false,
+          "native_X": 0,
+          "native_Y": 0,
+          "native_frame_index": 55,
+          "visibility": 0
+        },
+        {
+          "GT720_X_exact": null,
+          "GT720_Y_exact": null,
+          "crop_defined": false,
+          "native_X": 0,
+          "native_Y": 0,
+          "native_frame_index": 60,
+          "visibility": 0
+        }
+      ],
+      "original_CSV": {
+        "published_member": "sources/match209_000/official_ball.csv",
+        "sha256": "0b251fe8ebc3c91cd82810dd359f5e1f54d8e4d7abae48d18762d99bb7e47b95",
+        "source_archive": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/racketvision-tennis.tar",
+        "source_member": "tennis/all/match209/csv/000_ball.csv"
+      },
+      "original_mp4": {
+        "published_member": "sources/match209_000/original.mp4",
+        "sha256": "48eb20bf0353fea6d7663332ec31cadbc89939df596ed801ea128e0a777427d0",
+        "source_archive": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/racketvision-tennis.tar",
+        "source_member": "tennis/videos/match209_000.mp4"
+      },
+      "physical_source_group": {
+        "canonical_group": "Dimitrov / Shevchenko;Rotterdam;2024-02-16",
+        "event": "Rotterdam",
+        "event_date": "2024-02-16",
+        "identity_evidence": "AI native scoreboard/event join and official event records, independently reviewed by primary agent; not human identity certification",
+        "players": "Dimitrov / Shevchenko"
+      },
+      "unlisted_unknown_native_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        10,
+        11,
+        12,
+        14,
+        15,
+        16,
+        17,
+        19,
+        20,
+        21,
+        22,
+        24,
+        25,
+        26,
+        28,
+        29,
+        30,
+        31,
+        33,
+        34,
+        35,
+        36,
+        38,
+        39,
+        40,
+        42,
+        43,
+        44,
+        45,
+        47,
+        48,
+        49,
+        50,
+        52,
+        53,
+        54,
+        56,
+        57,
+        58,
+        59,
+        61,
+        62,
+        63
+      ]
+    },
+    {
+      "counts": {
+        "all_native_frames": 64,
+        "not_visible": 0,
+        "unknown": 52,
+        "visible": 12
+      },
+      "frozen_window": {
+        "PTS_policy": "normalize first selected decoded PTS to0 only; do notshiftCSVindices/dropframes/resample",
+        "all_native_frame_count": 64,
+        "duration_exact_seconds": [
+          64,
+          25
+        ],
+        "first_native_decoded_index": 0,
+        "fps_exact": [
+          25,
+          1
+        ],
+        "native_start_PTS_seconds": "0.000000",
+        "stop_native_decoded_index_exclusive": 64
+      },
+      "id": "match269_000",
+      "native_header": {
+        "avg_frame_rate": "25/1",
+        "codec_name": "h264",
+        "color_primaries": "bt709",
+        "color_range": "tv",
+        "color_space": "bt709",
+        "color_transfer": "bt709",
+        "duration": "10.000000",
+        "height": 1080,
+        "nb_frames": "250",
+        "pix_fmt": "yuv420p",
+        "r_frame_rate": "25/1",
+        "start_time": "0.000000",
+        "time_base": "1/12800",
+        "width": 1920
+      },
+      "official_window_rows": [
+        {
+          "GT720_X_exact": [
+            1846,
+            3
+          ],
+          "GT720_Y_exact": [
+            640,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 923,
+          "native_Y": 320,
+          "native_frame_index": 9,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            1952,
+            3
+          ],
+          "GT720_Y_exact": [
+            604,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 976,
+          "native_Y": 302,
+          "native_frame_index": 13,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            2024,
+            3
+          ],
+          "GT720_Y_exact": [
+            400,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1012,
+          "native_Y": 200,
+          "native_frame_index": 18,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            2052,
+            3
+          ],
+          "GT720_Y_exact": [
+            250,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1026,
+          "native_Y": 125,
+          "native_frame_index": 23,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            2102,
+            3
+          ],
+          "GT720_Y_exact": [
+            284,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1051,
+          "native_Y": 142,
+          "native_frame_index": 27,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            2168,
+            3
+          ],
+          "GT720_Y_exact": [
+            392,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1084,
+          "native_Y": 196,
+          "native_frame_index": 32,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            2240,
+            3
+          ],
+          "GT720_Y_exact": [
+            594,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1120,
+          "native_Y": 297,
+          "native_frame_index": 37,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            2322,
+            3
+          ],
+          "GT720_Y_exact": [
+            898,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1161,
+          "native_Y": 449,
+          "native_frame_index": 42,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            2382,
+            3
+          ],
+          "GT720_Y_exact": [
+            1012,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1191,
+          "native_Y": 506,
+          "native_frame_index": 46,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            2458,
+            3
+          ],
+          "GT720_Y_exact": [
+            1038,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1229,
+          "native_Y": 519,
+          "native_frame_index": 51,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            2536,
+            3
+          ],
+          "GT720_Y_exact": [
+            1168,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1268,
+          "native_Y": 584,
+          "native_frame_index": 56,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            2594,
+            3
+          ],
+          "GT720_Y_exact": [
+            1288,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1297,
+          "native_Y": 644,
+          "native_frame_index": 60,
+          "visibility": 1
+        }
+      ],
+      "original_CSV": {
+        "published_member": "sources/match269_000/official_ball.csv",
+        "sha256": "bf10d2a823a3489c796bb2526f25c4fbd30b13815960ec222dc0086e2ea1eef0",
+        "source_archive": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/racketvision-tennis.tar",
+        "source_member": "tennis/all/match269/csv/000_ball.csv"
+      },
+      "original_mp4": {
+        "published_member": "sources/match269_000/original.mp4",
+        "sha256": "c714c168c5334cc324e6821082c74023a96b2c1478ba3840fbb5c8fb58bdf5ed",
+        "source_archive": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/racketvision-tennis.tar",
+        "source_member": "tennis/videos/match269_000.mp4"
+      },
+      "physical_source_group": {
+        "canonical_group": "Evans / Tiafoe;Washington;2023-08-04",
+        "event": "Washington",
+        "event_date": "2023-08-04",
+        "identity_evidence": "AI native scoreboard/event join and official event records, independently reviewed by primary agent; not human identity certification",
+        "players": "Evans / Tiafoe"
+      },
+      "unlisted_unknown_native_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        10,
+        11,
+        12,
+        14,
+        15,
+        16,
+        17,
+        19,
+        20,
+        21,
+        22,
+        24,
+        25,
+        26,
+        28,
+        29,
+        30,
+        31,
+        33,
+        34,
+        35,
+        36,
+        38,
+        39,
+        40,
+        41,
+        43,
+        44,
+        45,
+        47,
+        48,
+        49,
+        50,
+        52,
+        53,
+        54,
+        55,
+        57,
+        58,
+        59,
+        61,
+        62,
+        63
+      ]
+    },
+    {
+      "counts": {
+        "all_native_frames": 154,
+        "not_visible": 2,
+        "unknown": 141,
+        "visible": 11
+      },
+      "frozen_window": {
+        "PTS_policy": "normalize first selected decoded PTS to0 only; do notshiftCSVindices/dropframes/resample",
+        "all_native_frame_count": 154,
+        "duration_exact_seconds": [
+          154,
+          60
+        ],
+        "first_native_decoded_index": 0,
+        "fps_exact": [
+          60,
+          1
+        ],
+        "native_start_PTS_seconds": "0.000000",
+        "stop_native_decoded_index_exclusive": 154
+      },
+      "id": "match235_000",
+      "native_header": {
+        "avg_frame_rate": "60/1",
+        "codec_name": "h264",
+        "color_primaries": "bt709",
+        "color_range": "tv",
+        "color_space": "bt709",
+        "color_transfer": "bt709",
+        "duration": "9.500000",
+        "height": 1080,
+        "nb_frames": "570",
+        "pix_fmt": "yuv420p",
+        "r_frame_rate": "60/1",
+        "start_time": "0.000000",
+        "time_base": "1/15360",
+        "width": 1920
+      },
+      "official_window_rows": [
+        {
+          "GT720_X_exact": [
+            2144,
+            3
+          ],
+          "GT720_Y_exact": [
+            330,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1072,
+          "native_Y": 165,
+          "native_frame_index": 9,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            2442,
+            3
+          ],
+          "GT720_Y_exact": [
+            712,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1221,
+          "native_Y": 356,
+          "native_frame_index": 20,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": null,
+          "GT720_Y_exact": null,
+          "crop_defined": false,
+          "native_X": 0,
+          "native_Y": 0,
+          "native_frame_index": 31,
+          "visibility": 0
+        },
+        {
+          "GT720_X_exact": [
+            2576,
+            3
+          ],
+          "GT720_Y_exact": [
+            664,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1288,
+          "native_Y": 332,
+          "native_frame_index": 42,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            2590,
+            3
+          ],
+          "GT720_Y_exact": [
+            614,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1295,
+          "native_Y": 307,
+          "native_frame_index": 53,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            2598,
+            3
+          ],
+          "GT720_Y_exact": [
+            554,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1299,
+          "native_Y": 277,
+          "native_frame_index": 65,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            2612,
+            3
+          ],
+          "GT720_Y_exact": [
+            508,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1306,
+          "native_Y": 254,
+          "native_frame_index": 76,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            2640,
+            3
+          ],
+          "GT720_Y_exact": [
+            536,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1320,
+          "native_Y": 268,
+          "native_frame_index": 87,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": null,
+          "GT720_Y_exact": null,
+          "crop_defined": false,
+          "native_X": 0,
+          "native_Y": 0,
+          "native_frame_index": 98,
+          "visibility": 0
+        },
+        {
+          "GT720_X_exact": [
+            2726,
+            3
+          ],
+          "GT720_Y_exact": [
+            986,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1363,
+          "native_Y": 493,
+          "native_frame_index": 110,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            2766,
+            3
+          ],
+          "GT720_Y_exact": [
+            996,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1383,
+          "native_Y": 498,
+          "native_frame_index": 121,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            2796,
+            3
+          ],
+          "GT720_Y_exact": [
+            832,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1398,
+          "native_Y": 416,
+          "native_frame_index": 132,
+          "visibility": 1
+        },
+        {
+          "GT720_X_exact": [
+            2834,
+            3
+          ],
+          "GT720_Y_exact": [
+            798,
+            3
+          ],
+          "crop_defined": true,
+          "native_X": 1417,
+          "native_Y": 399,
+          "native_frame_index": 143,
+          "visibility": 1
+        }
+      ],
+      "original_CSV": {
+        "published_member": "sources/match235_000/official_ball.csv",
+        "sha256": "36714134d1925b7184d3693ebba963f2503019d48c9b2b633bcf0244a68ef01f",
+        "source_archive": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/racketvision-tennis.tar",
+        "source_member": "tennis/all/match235/csv/000_ball.csv"
+      },
+      "original_mp4": {
+        "published_member": "sources/match235_000/original.mp4",
+        "sha256": "d3918629801618f6f6a3cea88302901c577ca1852dc3c786fe0ec2f9cb318fdd",
+        "source_archive": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/racketvision-tennis.tar",
+        "source_member": "tennis/videos/match235_000.mp4"
+      },
+      "physical_source_group": {
+        "canonical_group": "Shelton / Mensik;Indian Wells;2024-03-08",
+        "event": "Indian Wells",
+        "event_date": "2024-03-08",
+        "identity_evidence": "AI native scoreboard/event join and official event records, independently reviewed by primary agent; not human identity certification",
+        "players": "Shelton / Mensik"
+      },
+      "unlisted_unknown_native_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142,
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153
+      ]
+    }
+  ]
+}
