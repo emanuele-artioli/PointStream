@@ -428,6 +428,18 @@
       "gpu_seconds": 0,
       "state": "released_actual_same_job_full_archive_readback_and_closure",
       "purpose": "acceptfullproduceractualarchives/metadata/commandcost joins beforecontrols/scoring; no modelorquality"
+    },
+    {
+      "id": "confirmation-final-evidence-archiving",
+      "cpu_seconds": 1800,
+      "gpu_seconds": 0,
+      "state": "released",
+      "parts": {
+        "archive_assembly_verification": 1200,
+        "failure_allowance": 600
+      },
+      "deadline": "2026-11-15T11:07:34Z",
+      "basis": "automatic12hbudgetauthority; completedowned6physicaljobs plusrawfailedspatial; noqualitypeek/modelsduplication; secondfinalscoresarchiveafterROOTacceptance"
     }
   ],
   "jobs": [
@@ -1192,7 +1204,7 @@
     {
       "job_id": "20261115T084024Z-3565c8ec",
       "allocation": "ball-confirmation-paid-controls",
-      "state": "canonical_complete_independent_audit_pending",
+      "state": "ROOT_accepted_complete12controls64frames",
       "spec_sha256": "06d4cf2dd7e5b3454776f5c28e80a4a5721cac110d8d8f081c743f4e36128130",
       "submit_receipt": "/private/tmp/pointstream-confirmation-controls-209-submit-20261115.json",
       "deadline": "2026-11-15T09:45:00Z",
@@ -1237,7 +1249,7 @@
       "job_id": "20261115T084741Z-6fd19f74",
       "allocation": "ball-confirmation-paid-controls",
       "source_id": "match269_000",
-      "state": "submitted",
+      "state": "ROOT_accepted_complete12controls64frames",
       "spec_sha256": "02401f4aa2e95477ff5ec13e918a7ba7b0eeea026c072867bd828dfde2220cc1",
       "submit_receipt": "/private/tmp/pointstream-confirmation-controls-269-submit-20261115.json",
       "deadline": "2026-11-15T10:00:00Z",
@@ -1265,7 +1277,7 @@
       "job_id": "20261115T085029Z-df0cbf60",
       "allocation": "ball-confirmation-paid-controls",
       "source_id": "match235_000",
-      "state": "submitted",
+      "state": "ROOT_accepted_complete12controls154frames",
       "spec_sha256": "c0509d51dc601df84919a0ef512d2aa570539ba0efde5b752ae901864c73236c",
       "submit_receipt": "/private/tmp/pointstream-confirmation-controls-235-submit-20261115.json",
       "deadline": "2026-11-15T10:00:00Z",
@@ -1321,6 +1333,71 @@
         ],
         "deleted_paths": [],
         "snapshot_sha256": "85fa5cc6cd1ccff0f8baf5ab3ec8eb1f33dd334ffccb8a490dccb340eba38a63"
+      }
+    },
+    {
+      "job_id": "20261115T085523Z-c570fa16",
+      "allocation": "ball-confirmation-perceptual-scoring",
+      "source_id": "match269_000",
+      "state": "submitted_quality_sealed",
+      "submit_receipt": "/private/tmp/pointstream-confirmation-score-269-submit-20261115.json",
+      "spec_sha256": "5b0e34a15921740fc72c96f3c6441cb65ed60fca2de603b54f52adf2c062dcca",
+      "deadline": "2026-11-15T10:15:00Z",
+      "cpu_ceiling_seconds": 2430,
+      "gpu_ceiling_seconds": 2430,
+      "wall_ceiling_seconds": 2430,
+      "snapshot": {
+        "git_head": "6d346dfdb3de96d4c66bd253b186672d46f2d5ab",
+        "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tracked_changes_included": [],
+        "tracked_changes_excluded": [
+          "docs/cards/submission-ladder-ball-pixel-support-control-2026-11-15.md",
+          "docs/experiments/submission-ladder-autonomy-20261114.json",
+          "experiments/tennis/ball_pixel_support_control.py",
+          "tests/test_ball_pixel_support_control.py"
+        ],
+        "included_untracked_sha256": {},
+        "untracked_excluded_count": 5,
+        "untracked_excluded_paths_sha256": "5528e1e4d4e9b03c0dbb5c12ecc954c92249fa816349ce37737aee6abd8e5c3f",
+        "untracked_excluded_sample": [
+          "docs/experiments/submission-ladder-ball-pixel-support-analysis-20261115.json",
+          "docs/experiments/submission-ladder-ball-pixel-support-revalidation-20261115.json",
+          "docs/experiments/submission-ladder-confirmation-209-controls-acceptance-20261115.json",
+          "docs/experiments/submission-ladder-confirmation-235-preparation-acceptance-20261115.json",
+          "docs/experiments/submission-ladder-confirmation-269-controls-acceptance-20261115.json"
+        ],
+        "deleted_paths": [],
+        "snapshot_sha256": "85fa5cc6cd1ccff0f8baf5ab3ec8eb1f33dd334ffccb8a490dccb340eba38a63"
+      }
+    },
+    {
+      "job_id": "20261115T090115Z-03ace192",
+      "allocation": "ball-confirmation-perceptual-scoring",
+      "source_id": "match235_000",
+      "state": "submitted_quality_sealed",
+      "submit_receipt": "/private/tmp/pointstream-confirmation-score-235-submit-20261115.json",
+      "spec_sha256": "9be95423d4fd8e154cc17ab88688c832ff92af9e3d35190668cd6fa0d5e9021a",
+      "deadline": "2026-11-15T10:15:00Z",
+      "cpu_ceiling_seconds": 2430,
+      "gpu_ceiling_seconds": 2430,
+      "wall_ceiling_seconds": 2430,
+      "snapshot": {
+        "git_head": "e18b0636e82d461c6080573ad5b8197e3843f39e",
+        "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tracked_changes_included": [],
+        "tracked_changes_excluded": [
+          "PLAN.md",
+          "docs/experiments/submission-ladder-autonomy-20261114.json",
+          "docs/paper/submission-ladder-readiness-2026-11-15.md"
+        ],
+        "included_untracked_sha256": {},
+        "untracked_excluded_count": 1,
+        "untracked_excluded_paths_sha256": "66c9da483239052dba1ef6f21fe4e2f9e2ca9a171f2083eb6ce715dc28c4a87f",
+        "untracked_excluded_sample": [
+          "docs/experiments/submission-ladder-confirmation-235-controls-acceptance-20261115.json"
+        ],
+        "deleted_paths": [],
+        "snapshot_sha256": "c31fc29d30878603aa94bac0b61d3f5a7f4cbb0bb400129f7880da096c81804f"
       }
     }
   ],
@@ -1731,8 +1808,37 @@
     "all_other_scientific_checks": true,
     "change": "normalize recomputed analysis to JSONtypes; exact numeric equality retained",
     "GPU_rerun_authorized": false,
-    "CPU_saved_output_revalidation": "pending",
+    "CPU_saved_output_revalidation": "ROOTaccepted37scientificchecks_originalproducerFAILED",
     "original_evidence_preserved": true,
-    "root_tests": "6focusedpassed/configuredRuffMypy653pass/fullrunning"
-  }
+    "root_tests": "6focusedpassed/configuredRuffMypy653pass/fullrunning",
+    "root_analysis_points_and_outcome_exact": true,
+    "analysis_index": "docs/experiments/submission-ladder-ball-pixel-support-analysis-20261115.json"
+  },
+  "latest_engineering_verification": {
+    "revision": "e18b0636",
+    "ruff": "configuredpass",
+    "mypy": "configuredpass653files",
+    "pytest": "2603passed37skips",
+    "full_log": "/private/tmp/pointstream-json-fix-full-unrestricted-pytest.log",
+    "qualification": "sandboxedfull2600pass2processvisibilityfail38skip; bothfailurespassoutsideandentirefullrerunpasses",
+    "PR": "https://github.com/emanuele-artioli/PointStream/pull/423",
+    "auto_merge": "merged",
+    "PR_status": "merged_CIchecksSUCCESS"
+  },
+  "confirmation_all_physical_acceptance": {
+    "state": "ROOTaccepted_all3sourcebases_senders_paidcontrols",
+    "frames": 282,
+    "native_base_streams": 18,
+    "paid_control_streams": 36,
+    "quality": "sealed_all3scorers_submitted",
+    "indices": [
+      "docs/experiments/submission-ladder-confirmation-209-controls-acceptance-20261115.json",
+      "docs/experiments/submission-ladder-confirmation-269-controls-acceptance-20261115.json",
+      "docs/experiments/submission-ladder-confirmation-235-controls-acceptance-20261115.json"
+    ]
+  },
+  "new_confirmation_quality_state": "209269ROOTmetadataaccepted_valuessealed;235running",
+  "confirmation_visual_rule": "docs/experiments/submission-ladder-confirmation-visual-freeze-20261115.json",
+  "current_preparation_evidence_archive": "docs/experiments/submission-ladder-confirmation-preparation-evidence-20261115.json",
+  "current_live_portal_check": "docs/experiments/submission-ladder-tomm-live-portal-20261115.json"
 }
