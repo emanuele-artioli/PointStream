@@ -1,0 +1,618 @@
+{
+  "schema": 1,
+  "date": "2026-11-15",
+  "authority_expires_utc": "2026-11-15T11:07:34Z",
+  "scope": "read-only metadata/static-interface intake; no model execution, encoding or source mutation",
+  "metadata_cpu_ceiling_seconds": 1800,
+  "metadata_host": "gpu6",
+  "model_jobs_launched": [],
+  "gpu_seconds": 0,
+  "citations": [
+    {
+      "path": "experiments/tennis/k5b_trackers.py",
+      "sha256": "be78efeca9f0776c623b2ec8aa2f36baf4f1e9e2bfbb20365ee8f4f7da29a89d"
+    },
+    {
+      "path": "experiments/tennis/k5d_encoder.py",
+      "sha256": "59d47e9c4cebf07b565316e7e5d98f02d244d74217754080a27715a770ab4895"
+    },
+    {
+      "path": "experiments/tennis/k5d_source_oracle.py",
+      "sha256": "12a558ec4ae6706a893c5d22a6ed647e822d3056792a35c30f392d77cb72b2d1"
+    },
+    {
+      "path": "docs/experiments/k5b.md",
+      "sha256": "57b2c04336844a4b4493add0ef0f66e3bc85481e3ec2aaf2a429c7876f472a55"
+    },
+    {
+      "path": "docs/experiments/k5c-inputs/wasb-reported-split-provenance.json",
+      "sha256": "854183164f8120cf869775d8f77acba38ae1e4e89129a05bde09a17e327ede62"
+    },
+    {
+      "path": "docs/experiments/k5d-inputs/cost16-48-spec-20261104.json",
+      "sha256": "acd2859c1aff5f2f118e262bf528afa90e4bea7612da68d7b6a5fead94e23a02"
+    }
+  ],
+  "source_provenance": {
+    "global_metadata_member": "annotations/dataset_info.json",
+    "global_metadata_sha256_actual": "c79f8b2575ac6b4d359867030a05b2bf9d6dd7c6dc7ab4145152bfed949cccfa",
+    "per_clip_source_URL_field_present": false,
+    "per_clip_fields": [
+      "clip_uid",
+      "clip_id",
+      "sport",
+      "match_id",
+      "round_id",
+      "video_file_path",
+      "frame_files_path",
+      "frame_number",
+      "video_length",
+      "fps",
+      "width",
+      "height",
+      "ball_annotated_frames",
+      "racket_annotated_frames",
+      "median_path",
+      "median_img_path"
+    ],
+    "clip_UIDs": {
+      "match11_000": 849,
+      "match126_000": 796,
+      "match12_000": 642
+    },
+    "source_URL_dedup_result": "unresolved: no candidate URL/player/tournament/broadcast join found in released dataset_info.json or inspected README; original source identity not inferred from pseudo match ID",
+    "official_paper": "https://arxiv.org/html/2511.17045v1",
+    "official_repository": "https://github.com/OrcustD/RacketVision",
+    "bounded_primary_search_result": "Paper reports YouTube professional-broadcast collection; repository links packaged data, not a candidate-specific URL map. This is not an exhaustive provenance search.",
+    "no_TrackNet_overlap_claim": "unknown, not disjoint",
+    "global_count_warning": "dataset_info.json ball/racket annotated count fields are zero even for these nonempty CSVs; actual native CSV rows determine label counts"
+  },
+  "research_exposure": {
+    "all_RacketVision_tennis_test43_used_for_tracker_selection": true,
+    "successful_jobs": [
+      "20261020T220058Z-fc8980da",
+      "20261020T214901Z-0d339486",
+      "20261020T214907Z-eefaac4b"
+    ],
+    "rallies_per_job": [
+      14,
+      15,
+      14
+    ],
+    "scope": "Source model selection exposure established; no pristine confirmation claim. Novel native codec reconstruction conditions remain testable retrospectively.",
+    "prior_G1_nonoverlap_insufficient_for_holdout": true
+  },
+  "label_contract": {
+    "original_members": "tennis/all/<match>/csv/000_ball.csv",
+    "frame_index_base": 0,
+    "coordinate_geometry": [
+      1920,
+      1080
+    ],
+    "visibility": {
+      "1": "visible",
+      "0": "not visible, not necessarily physically absent/out of frame"
+    },
+    "unlisted_frames": "unknown (-1), excluded from task denominators but retained in full-frame image metrics and output frame accounting",
+    "interpolated_trajectories_used": false,
+    "coordinate_validation": "Unique indices within actual source count; visibility exactly0/1; visible coordinates within1920x1080 checked from actual CSV",
+    "labels_used_for_sender": "not permitted: automatic source tracker seeds sender; labels are evaluation-only"
+  },
+  "selection": {
+    "rule": "For each of the three previously selected candidates, enumerate all contiguous64-frame spans with>=8visible and>=2not-visible native CSV rows, then choose lowest SHA256 UTF8 pointstream-ladder-ball-window-v1:<match>_000:<zero_based_start>. No model/codec outputs inspected for this selection.",
+    "first_candidate_order": [
+      "match11_000",
+      "match126_000",
+      "match12_000"
+    ],
+    "candidate_results": [
+      {
+        "id": "match11_000",
+        "label_member": "tennis/all/match11/csv/000_ball.csv",
+        "label_sha256_actual": "b7a44e9828cc1240d2d3e32a96c11b62ddb8cdd0f038d57b2d43816a402f58be",
+        "source_frames": 249,
+        "all_label_count": 50,
+        "all_visible": 46,
+        "all_not_visible": 4,
+        "eligible_windows": 67,
+        "selection_rank_sha256": "005995d7e5eea77fc71d781bab1f4f7dc8c8e7fb0f18a351bf7e17c62c5eabc0",
+        "first_frame_zero_based": 35,
+        "frames": 64,
+        "selected_visible": 12,
+        "selected_not_visible": 2,
+        "unlabelled_unknown": 50,
+        "selected_native_labels": [
+          {
+            "frame": 37,
+            "visibility": 1,
+            "x": 1376,
+            "y": 478,
+            "selected_tick": 2
+          },
+          {
+            "frame": 41,
+            "visibility": 1,
+            "x": 1375,
+            "y": 600,
+            "selected_tick": 6
+          },
+          {
+            "frame": 46,
+            "visibility": 1,
+            "x": 1369,
+            "y": 764,
+            "selected_tick": 11
+          },
+          {
+            "frame": 51,
+            "visibility": 1,
+            "x": 1362,
+            "y": 765,
+            "selected_tick": 16
+          },
+          {
+            "frame": 55,
+            "visibility": 1,
+            "x": 1314,
+            "y": 614,
+            "selected_tick": 20
+          },
+          {
+            "frame": 60,
+            "visibility": 1,
+            "x": 1219,
+            "y": 334,
+            "selected_tick": 25
+          },
+          {
+            "frame": 65,
+            "visibility": 1,
+            "x": 1134,
+            "y": 152,
+            "selected_tick": 30
+          },
+          {
+            "frame": 70,
+            "visibility": 1,
+            "x": 1054,
+            "y": 41,
+            "selected_tick": 35
+          },
+          {
+            "frame": 74,
+            "visibility": 0,
+            "x": 0,
+            "y": 0,
+            "selected_tick": 39
+          },
+          {
+            "frame": 79,
+            "visibility": 0,
+            "x": 0,
+            "y": 0,
+            "selected_tick": 44
+          },
+          {
+            "frame": 84,
+            "visibility": 1,
+            "x": 875,
+            "y": 8,
+            "selected_tick": 49
+          },
+          {
+            "frame": 88,
+            "visibility": 1,
+            "x": 833,
+            "y": 55,
+            "selected_tick": 53
+          },
+          {
+            "frame": 93,
+            "visibility": 1,
+            "x": 787,
+            "y": 142,
+            "selected_tick": 58
+          },
+          {
+            "frame": 98,
+            "visibility": 1,
+            "x": 746,
+            "y": 249,
+            "selected_tick": 63
+          }
+        ],
+        "source_member": "tennis/videos/match11_000.mp4",
+        "source_sha256_actual_prior_intake": "1099dfe9667ff2a7995c07f57830d805e01e8275c473a8c2a7c7da04d7ceaf51",
+        "source_bytes": 2002727,
+        "fps": [
+          25,
+          1
+        ],
+        "source_geometry": [
+          1920,
+          1080
+        ],
+        "duration_seconds": 9.96,
+        "prior_G1_eight_overlap": false,
+        "prior_tracker_selection_exposed": true,
+        "source_URL": null,
+        "original_broadcast_identity": null,
+        "TrackNet_game_overlap": "unknown",
+        "heldout_claim_allowed": false
+      },
+      {
+        "id": "match126_000",
+        "label_member": "tennis/all/match126/csv/000_ball.csv",
+        "label_sha256_actual": "0531c4d231721d3ca5465d86e21c925698c3cdaac09c050f18f29d3784a560f9",
+        "source_frames": 240,
+        "all_label_count": 50,
+        "all_visible": 39,
+        "all_not_visible": 11,
+        "eligible_windows": 106,
+        "selection_rank_sha256": "04fd6dd6d1903e55493dcda58f52240bffc5a127de8ba3c042d1a84db90f4622",
+        "first_frame_zero_based": 91,
+        "frames": 64,
+        "selected_visible": 11,
+        "selected_not_visible": 3,
+        "unlabelled_unknown": 50,
+        "selected_native_labels": [
+          {
+            "frame": 94,
+            "visibility": 1,
+            "x": 754,
+            "y": 333,
+            "selected_tick": 3
+          },
+          {
+            "frame": 99,
+            "visibility": 1,
+            "x": 748,
+            "y": 328,
+            "selected_tick": 8
+          },
+          {
+            "frame": 103,
+            "visibility": 1,
+            "x": 778,
+            "y": 314,
+            "selected_tick": 12
+          },
+          {
+            "frame": 108,
+            "visibility": 0,
+            "x": 0,
+            "y": 0,
+            "selected_tick": 17
+          },
+          {
+            "frame": 112,
+            "visibility": 1,
+            "x": 898,
+            "y": 342,
+            "selected_tick": 21
+          },
+          {
+            "frame": 117,
+            "visibility": 1,
+            "x": 989,
+            "y": 431,
+            "selected_tick": 26
+          },
+          {
+            "frame": 121,
+            "visibility": 1,
+            "x": 1078,
+            "y": 551,
+            "selected_tick": 30
+          },
+          {
+            "frame": 126,
+            "visibility": 1,
+            "x": 1218,
+            "y": 790,
+            "selected_tick": 35
+          },
+          {
+            "frame": 130,
+            "visibility": 0,
+            "x": 0,
+            "y": 0,
+            "selected_tick": 39
+          },
+          {
+            "frame": 135,
+            "visibility": 0,
+            "x": 0,
+            "y": 0,
+            "selected_tick": 44
+          },
+          {
+            "frame": 139,
+            "visibility": 1,
+            "x": 1346,
+            "y": 574,
+            "selected_tick": 48
+          },
+          {
+            "frame": 144,
+            "visibility": 1,
+            "x": 1264,
+            "y": 423,
+            "selected_tick": 53
+          },
+          {
+            "frame": 148,
+            "visibility": 1,
+            "x": 1223,
+            "y": 372,
+            "selected_tick": 57
+          },
+          {
+            "frame": 153,
+            "visibility": 1,
+            "x": 1187,
+            "y": 361,
+            "selected_tick": 62
+          }
+        ],
+        "source_member": "tennis/videos/match126_000.mp4",
+        "source_sha256_actual_prior_intake": "29fb4ef71a4d2ef68d79166542c51fda4f48108dfd6647bacc8b9869c018ab93",
+        "source_bytes": 2731684,
+        "fps": [
+          25,
+          1
+        ],
+        "source_geometry": [
+          1920,
+          1080
+        ],
+        "duration_seconds": 9.6,
+        "prior_G1_eight_overlap": false,
+        "prior_tracker_selection_exposed": true,
+        "source_URL": null,
+        "original_broadcast_identity": null,
+        "TrackNet_game_overlap": "unknown",
+        "heldout_claim_allowed": false
+      },
+      {
+        "id": "match12_000",
+        "label_member": "tennis/all/match12/csv/000_ball.csv",
+        "label_sha256_actual": "3a2352e5d0f857a5ecf8db99c027d8ce18105df6b2800386ab8590caa1eb4230",
+        "source_frames": 249,
+        "all_label_count": 50,
+        "all_visible": 48,
+        "all_not_visible": 2,
+        "eligible_windows": 50,
+        "selection_rank_sha256": "03c14d97b7072fa8d5e85a774bb8442ccf31a650bdf876c5000f737c07eebb81",
+        "first_frame_zero_based": 11,
+        "frames": 64,
+        "selected_visible": 12,
+        "selected_not_visible": 2,
+        "unlabelled_unknown": 50,
+        "selected_native_labels": [
+          {
+            "frame": 13,
+            "visibility": 1,
+            "x": 877,
+            "y": 593,
+            "selected_tick": 2
+          },
+          {
+            "frame": 18,
+            "visibility": 1,
+            "x": 821,
+            "y": 765,
+            "selected_tick": 7
+          },
+          {
+            "frame": 23,
+            "visibility": 1,
+            "x": 873,
+            "y": 762,
+            "selected_tick": 12
+          },
+          {
+            "frame": 27,
+            "visibility": 1,
+            "x": 994,
+            "y": 531,
+            "selected_tick": 16
+          },
+          {
+            "frame": 32,
+            "visibility": 1,
+            "x": 1082,
+            "y": 393,
+            "selected_tick": 21
+          },
+          {
+            "frame": 37,
+            "visibility": 1,
+            "x": 1140,
+            "y": 333,
+            "selected_tick": 26
+          },
+          {
+            "frame": 41,
+            "visibility": 1,
+            "x": 1173,
+            "y": 320,
+            "selected_tick": 30
+          },
+          {
+            "frame": 46,
+            "visibility": 1,
+            "x": 1197,
+            "y": 292,
+            "selected_tick": 35
+          },
+          {
+            "frame": 51,
+            "visibility": 0,
+            "x": 0,
+            "y": 0,
+            "selected_tick": 40
+          },
+          {
+            "frame": 55,
+            "visibility": 1,
+            "x": 1224,
+            "y": 215,
+            "selected_tick": 44
+          },
+          {
+            "frame": 60,
+            "visibility": 1,
+            "x": 1235,
+            "y": 213,
+            "selected_tick": 49
+          },
+          {
+            "frame": 65,
+            "visibility": 0,
+            "x": 0,
+            "y": 0,
+            "selected_tick": 54
+          },
+          {
+            "frame": 70,
+            "visibility": 1,
+            "x": 1123,
+            "y": 250,
+            "selected_tick": 59
+          },
+          {
+            "frame": 74,
+            "visibility": 1,
+            "x": 1075,
+            "y": 283,
+            "selected_tick": 63
+          }
+        ],
+        "source_member": "tennis/videos/match12_000.mp4",
+        "source_sha256_actual_prior_intake": "1d0f395f924578ec766c313fa8994edd8f500624d1e9343ae552b2e4b1287399",
+        "source_bytes": 1287015,
+        "fps": [
+          25,
+          1
+        ],
+        "source_geometry": [
+          1920,
+          1080
+        ],
+        "duration_seconds": 9.96,
+        "prior_G1_eight_overlap": false,
+        "prior_tracker_selection_exposed": true,
+        "source_URL": null,
+        "original_broadcast_identity": null,
+        "TrackNet_game_overlap": "unknown",
+        "heldout_claim_allowed": false
+      }
+    ],
+    "no_full_clip_fallback_needed": true
+  },
+  "model_resources": {
+    "BallTrack": {
+      "code_archive": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/RacketVision-c44af2a.tar",
+      "code_archive_sha256": "5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff",
+      "code_revision": "c44af2a08524d3cb54d818f19686f4cdea4d2793",
+      "weight": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/balltrack_best.state_dict.pt",
+      "weight_sha256": "b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec",
+      "original_weight_sha256": "00d707b9db7a49561c411e4765956e79bcd7c7e20c7a0a535073440b3e972342",
+      "manifest_path": "/home/itec/emanuele/Models/RacketVision/MANIFEST.json",
+      "manifest_sha256_actual": "81f1316540a16efa7624a848887143f0f1d26a1a790b2c1060166f4f676e089c",
+      "author_reported_training": "RacketVision multi-sport training; historical receipt epoch47; no optimizer-log audit",
+      "independent_judge": false,
+      "reason": "Same model supplies automatic sender positions, so its reconstruction scores are coupled diagnostics"
+    },
+    "WASB": {
+      "code_archive": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/WASB-SBDT-923462c.tar",
+      "code_archive_sha256": "657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55",
+      "code_revision": "923462cacdeb3353b84ddebdedb3f4b7a8553b0f",
+      "weight_archive": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/wasb-tennis-weights.tar",
+      "weight_archive_sha256": "4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6",
+      "weight_member": "wasb_tennis_best.pth.tar",
+      "weight_sha256": "9d391239ab10c733f8e5bfadf16ab72838e7a8ebc88e8ae2038501c03d42b4bb",
+      "config_sha256": "6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d",
+      "manifest_path": "/home/itec/emanuele/Models/WASB/MANIFEST.json",
+      "manifest_sha256_actual": "22fdf0cb6e6c48cc045157922c2f2bbf5acc3f56e3ad5d7290d7fb17a54cdffb",
+      "author_reported_training_games": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "historical_test_games": [
+        8,
+        9,
+        10
+      ],
+      "optimizer_logs_verified": false,
+      "source_broadcast_overlap_with_RacketVision": "unknown"
+    }
+  },
+  "resource_hash_basis": "Models manifests freshly read+hashed; model/code payload hashes copied from accepted staged receipts, must be freshly authenticated by any new fleet job",
+  "interface_findings": [
+    {
+      "path": "experiments/tennis/k5b_trackers.py",
+      "lines": [
+        252,
+        407
+      ],
+      "issue": "WASB affine source transform and BallTrack output scaling use global1280x720 SIZE; arbitrary1080p arrays produce incompatible coordinate geometry."
+    },
+    {
+      "path": "experiments/tennis/k5b_trackers.py",
+      "lines": [
+        110,
+        149
+      ],
+      "reuse": "Existing RacketVision reader explicitly area-downscales native frames to1280x720 and scales labels, retaining unknown=-1."
+    },
+    {
+      "path": "experiments/tennis/k5d_encoder.py",
+      "lines": [
+        360,
+        367
+      ],
+      "issue": "Frozen source path requires TrackNet ZIP and hardcodes30fps; cannot relabel as native RacketVision25fps."
+    },
+    {
+      "path": "experiments/tennis/k5d_source_oracle.py",
+      "lines": [
+        57,
+        82
+      ],
+      "issue": "Qualification assumes registered TrackNet labels, dense rows and1280x720 bounds."
+    },
+    {
+      "path": "experiments/tennis/k5b_trackers.py",
+      "lines": [
+        396,
+        419
+      ],
+      "issue": "BallTrack uses whole selected-window median and sequential context; source path is offline/noncausal, no real-time qualification."
+    }
+  ],
+  "next_stage_proposal": {
+    "state": "proposal_only_ROOT_decides_after_EGO; no run released by this receipt",
+    "purpose": "Test compact existing BALL mechanism on retrospective new codec conditions without a new tracker architecture",
+    "initial_source": "match11_000 first35 frames64 @25fps",
+    "minimal_profile": "Native MP4 source origin; area-downscaled1280x720 evaluation target, native25fps preserved. Common target and conversion for every native/disk/streak/patch arm; explicitly not a native1080p win.",
+    "required_new_adapter": "Thin native MP4 + zero-based sparse CSV selection/fps adapter, retaining every decoded frame and unknown task labels. Keep frozen TrackNet modules unchanged.",
+    "source_only_gate": {
+      "gpu_ceiling_seconds": 600,
+      "cpu_ceiling_seconds": 1200,
+      "smoke_frames": 16,
+      "target_frames": 64,
+      "smoke_max_seconds": 300,
+      "cost_margin": 1.5,
+      "qualification": "Source WASB >=80% visible hit rate at10px in720p, exact denominators and not-visible responses; BallTrack diagnostic only. Qualification not absence safety; unknown broadcast overlap retained."
+    },
+    "later_codec_comparison": "Only after source/device/kernel/coordinate/cost gates: three unchanged low SVT settings plus fully billed PSBL streak,disk,coded-pixel controls and native. PCHIP only on supported continuous-quality overlap; no taskBD. Decoder must use packet+declared resources with source denied. New codec budget based on measured cost, not authorized by this proposal.",
+    "native1080_alternative": "Requires explicit720p judge preprocessing and1.5 coordinate backscale, native15px primary/7.5px secondary thresholds, geometry-aware qualification and declared appearance/crop scaling. More adaptation than minimal720p profile; not proposed as tonight default."
+  }
+}

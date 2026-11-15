@@ -37,6 +37,47 @@ CONFIG = {"domain", "source_group", "annotation_provenance", "width", "height", 
           "rates", "preset", "patch_size", "patch_crf", "roi_outside_offset"}
 
 
+LEGACY_PROTOCOL = "all-frame70/30; empty-region weight reallocated; regional component means report available-frame subsets"
+METRIC_PROTOCOL = "codec-ladder-metrics-v2"
+STANDARD_LPIPS = "full_lpips_standard"
+METRIC_DEFINITIONS = {
+    "full_lpips": "mean of full-resolution bilinearly upsampled LPIPS-Alex spatial map; not standard scalar LPIPS",
+    STANDARD_LPIPS: "standard LPIPS-Alex scalar: sum of feature-layer spatial means (spatial=False), same weights and preprocessing",
+    "weighted_lpips": "all-frame70/30 source-mask regional means of full-resolution LPIPS-Alex spatial map; empty-region weight reallocated",
+    "full_dists": "standard full-frame DISTS with all-ones feature-statistic weights",
+    "weighted_dists": "all-frame70/30 source-mask regional DISTS feature statistics; empty-region weight reallocated",
+}
+
+
+def metric_profile(score: dict[str, Any]) -> bool:
+    """Identify an explicit historical profile or require the complete v2 contract."""
+    if score.get("metric_protocol") == METRIC_PROTOCOL:
+        if score.get("metric_definitions") != METRIC_DEFINITIONS:
+            raise ValueError("metric definitions differ from registered v2 profile")
+        return True
+    if "metric_protocol" not in score and score.get("protocol") == LEGACY_PROTOCOL:
+        if any(STANDARD_LPIPS in row.get("frames", {}) or STANDARD_LPIPS in row.get("means", {}) for row in score["rows"]):
+            raise ValueError("standard LPIPS requires explicit v2 metric profile")
+        return False
+    raise ValueError("unknown or unidentified metric profile")
+
+
+def standard_lpips_scalar(network: Any, x: Any, y: Any) -> float:
+    """Reuse exact loaded weights; caller holds inference_mode; restore on failure.
+
+    One additional sequential AlexNet forward per image pair, no extra model.
+    """
+    spatial = network.spatial
+    try:
+        network.spatial = False
+        value = float(network(x, y).item())
+    finally:
+        network.spatial = spatial
+    if not math.isfinite(value) or value < 0:
+        raise ValueError("invalid standard full-frame LPIPS")
+    return value
+
+
 def file_sha(path: Path) -> str:
     with path.open("rb") as handle:
         return hashlib.file_digest(handle, "sha256").hexdigest()
@@ -255,19 +296,21 @@ def score(root: Path, lpips_backbone: Path, dists_backbone: Path, output: Path, 
         control = quality.yuv420_to_rgb(torch.from_numpy(originals[0].copy()[None]).to(device), width, height,
                                        full_range=config["full_range"]) / 255
         self_lpips = float(lpips_net(control * 2 - 1, control * 2 - 1).mean().item())
+        self_standard_lpips = standard_lpips_scalar(lpips_net, control * 2 - 1, control * 2 - 1)
         self_dists = float(quality.masked_dists(dists_net, control, control,
                                              torch.ones((1, 1, height, width), device=device)).item())
-    if any(not math.isfinite(value) or abs(value) > 1e-5 for value in (self_lpips, self_dists)):
+    if any(not math.isfinite(value) or abs(value) > 1e-5 for value in (self_lpips, self_standard_lpips, self_dists)):
         raise ValueError("metric self-reconstruction control failed")
-    metric_control = {"source_self_lpips": self_lpips, "source_self_dists": self_dists, "tolerance": 1e-5}
+    metric_control = {"source_self_lpips": self_lpips, "source_self_dists": self_dists, "source_self_lpips_standard": self_standard_lpips, "tolerance": 1e-5}
     rows = []
     for row in record["rates"]:
         reconstructions = raw_frames(root / row["decoded"], config, count)
-        values: dict[str, list[Any]] = {k: [] for k in ("full_lpips", "foreground_lpips", "background_lpips", "weighted_lpips", "full_dists", "foreground_dists", "background_dists", "weighted_dists", "full_rgb_psnr")}
+        values: dict[str, list[Any]] = {k: [] for k in ("full_lpips_standard", "full_lpips", "foreground_lpips", "background_lpips", "weighted_lpips", "full_dists", "foreground_dists", "background_dists", "weighted_dists", "full_rgb_psnr")}
         for frame, (original, decoded) in enumerate(zip(originals, reconstructions)):
             with torch.inference_mode():
                 x = quality.yuv420_to_rgb(torch.from_numpy(original.copy()[None]).to(device), width, height, full_range=config["full_range"]) / 255
                 y = quality.yuv420_to_rgb(torch.from_numpy(decoded.copy()[None]).to(device), width, height, full_range=config["full_range"]) / 255
+                values[STANDARD_LPIPS].append(standard_lpips_scalar(lpips_net, x * 2 - 1, y * 2 - 1))
                 spatial = lpips_net(x * 2 - 1, y * 2 - 1)
                 spatial = F.interpolate(spatial, size=(height, width), mode="bilinear", align_corners=False)[0, 0]
                 fg = torch.from_numpy(masks[frame]).to(device)
@@ -321,7 +364,7 @@ def score(root: Path, lpips_backbone: Path, dists_backbone: Path, output: Path, 
                                 "maximum_reserved_bytes": torch.cuda.max_memory_reserved(),
                                 "device_count": torch.cuda.device_count(), "network_parameters_cuda": True,
                                 "kernels": "torch CUDA LPIPS/VGG16 convolution and tensor/statistic operations; no attention model"},
-              "protocol": "all-frame70/30; empty-region weight reallocated; regional component means report available-frame subsets"}
+              "protocol": LEGACY_PROTOCOL, "metric_protocol": METRIC_PROTOCOL, "metric_definitions": METRIC_DEFINITIONS}
     write_json(output, result)
     return result
 

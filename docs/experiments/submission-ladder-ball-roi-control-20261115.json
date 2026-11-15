@@ -1,0 +1,1313 @@
+{
+  "producer_published_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261113T210157Z-41ee26e3/full/published.tar",
+  "producer_published_bytes": 1327800320,
+  "checkpoint_sha256": "1536eb02a9d2bce08c83aa064d0e184cf348a997aa999d8f980a918998aa9d03",
+  "clip": "tracknet/game10/Clip3",
+  "frames": 48,
+  "size": [
+    1280,
+    720
+  ],
+  "fps": "30",
+  "conversion": {
+    "command": [
+      "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "-v",
+      "error",
+      "-nostdin",
+      "-f",
+      "rawvideo",
+      "-pix_fmt",
+      "rgb24",
+      "-s",
+      "1280x720",
+      "-r",
+      "30",
+      "-i",
+      "pipe:0",
+      "-frames:v",
+      "48",
+      "-vf",
+      "scale=in_range=pc:out_range=tv:out_color_matrix=bt709,format=yuv420p",
+      "-f",
+      "rawvideo",
+      "/local/users/emanuele/pointstream/scratch/20261113T210157Z-41ee26e3-full/publish-work/source.yuv"
+    ],
+    "yuv_sha256": "a40b172b7a3e72c0fcf75dff15584564e3d220ffa6f1653439d045387f2d9963",
+    "floor_psnr": 41.36231415302153
+  },
+  "qualification_sha256": "1bd32c3fb0c57255e334173d9be8adda99d424fed2e64ba4c29c541ae5ac14dc",
+  "qualification_row_keys": [
+    "frame",
+    "member",
+    "source_sha256",
+    "label_kind",
+    "label_x",
+    "label_y",
+    "wasb",
+    "balltrack"
+  ],
+  "labels_and_predictions": [
+    {
+      "frame": 0,
+      "member": "Dataset/game10/Clip3/0000.jpg",
+      "source_sha256": "23c699909b21a42efb00704f25b4563809f7d1afc9bb43d20cfdf54b436fcd10",
+      "label_kind": 1,
+      "label_x": 665.0,
+      "label_y": 281.0,
+      "wasb": {
+        "detected": true,
+        "x": 663.3171997070312,
+        "y": 277.14642333984375
+      },
+      "balltrack": {
+        "detected": false,
+        "x": 0.0,
+        "y": 0.0
+      }
+    },
+    {
+      "frame": 1,
+      "member": "Dataset/game10/Clip3/0001.jpg",
+      "source_sha256": "ff7658191ed917edeff71923006c9ba7877c5070224aa6b7b059e9019a217f3a",
+      "label_kind": 1,
+      "label_x": 673.0,
+      "label_y": 308.0,
+      "wasb": {
+        "detected": true,
+        "x": 671.5435791015625,
+        "y": 306.0582580566406
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 671.25,
+        "y": 302.5
+      }
+    },
+    {
+      "frame": 2,
+      "member": "Dataset/game10/Clip3/0002.jpg",
+      "source_sha256": "6e5678e2e30cffc3bb06b863e4b2c0a92c3ca04d450773e5eff436500e050d1c",
+      "label_kind": 1,
+      "label_x": 681.0,
+      "label_y": 338.0,
+      "wasb": {
+        "detected": true,
+        "x": 681.2786865234375,
+        "y": 336.2228698730469
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 680.0,
+        "y": 333.75
+      }
+    },
+    {
+      "frame": 3,
+      "member": "Dataset/game10/Clip3/0003.jpg",
+      "source_sha256": "e94a1daf4333857996c97aaefe4d481e65b69a9559f7f5de9dacaf4afc4ce37a",
+      "label_kind": 1,
+      "label_x": 691.0,
+      "label_y": 369.0,
+      "wasb": {
+        "detected": true,
+        "x": 691.0863647460938,
+        "y": 367.45623779296875
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 690.0,
+        "y": 365.0
+      }
+    },
+    {
+      "frame": 4,
+      "member": "Dataset/game10/Clip3/0004.jpg",
+      "source_sha256": "0bcc36159a611253ea2d2be01a39b92c492453679b10b3af2e481674c7357f21",
+      "label_kind": 1,
+      "label_x": 698.0,
+      "label_y": 388.0,
+      "wasb": {
+        "detected": true,
+        "x": 698.99609375,
+        "y": 387.94732666015625
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 697.5,
+        "y": 387.5
+      }
+    },
+    {
+      "frame": 5,
+      "member": "Dataset/game10/Clip3/0005.jpg",
+      "source_sha256": "f7388c93af20281bd8e2c0c2340521e06906f69832b3758f0d1f59335ad46474",
+      "label_kind": 1,
+      "label_x": 705.0,
+      "label_y": 389.0,
+      "wasb": {
+        "detected": true,
+        "x": 705.1154174804688,
+        "y": 389.6209716796875
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 705.0,
+        "y": 390.0
+      }
+    },
+    {
+      "frame": 6,
+      "member": "Dataset/game10/Clip3/0006.jpg",
+      "source_sha256": "d6a921356747c2d94c54832d7b681cf7789326e8e338ea1329308deec1e19477",
+      "label_kind": 1,
+      "label_x": 711.0,
+      "label_y": 391.0,
+      "wasb": {
+        "detected": true,
+        "x": 711.1276245117188,
+        "y": 391.69659423828125
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 712.5,
+        "y": 392.5
+      }
+    },
+    {
+      "frame": 7,
+      "member": "Dataset/game10/Clip3/0007.jpg",
+      "source_sha256": "e769b359af0153c6d85be7f1c1b76c44c674eee9d20fec99721b4a50c8ce597b",
+      "label_kind": 1,
+      "label_x": 719.0,
+      "label_y": 396.0,
+      "wasb": {
+        "detected": true,
+        "x": 718.8421020507812,
+        "y": 395.18408203125
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 717.5,
+        "y": 395.0
+      }
+    },
+    {
+      "frame": 8,
+      "member": "Dataset/game10/Clip3/0008.jpg",
+      "source_sha256": "2d30421113a80e58f57c719c00b46f8f8c9223bdda6f4c1049df2fb5d049a5eb",
+      "label_kind": 1,
+      "label_x": 728.0,
+      "label_y": 401.0,
+      "wasb": {
+        "detected": true,
+        "x": 725.6179809570312,
+        "y": 400.2023010253906
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 725.0,
+        "y": 400.0
+      }
+    },
+    {
+      "frame": 9,
+      "member": "Dataset/game10/Clip3/0009.jpg",
+      "source_sha256": "f8215c54a1758d23cad13e9ce464303759e0d17bce67c48b8b8cd8d82a88daaa",
+      "label_kind": 1,
+      "label_x": 734.0,
+      "label_y": 406.0,
+      "wasb": {
+        "detected": true,
+        "x": 734.6351318359375,
+        "y": 405.57196044921875
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 732.5,
+        "y": 405.0
+      }
+    },
+    {
+      "frame": 10,
+      "member": "Dataset/game10/Clip3/0010.jpg",
+      "source_sha256": "b5499403d4d15c3fe2793f50da32a83df8bdb039a69bc1a675c71cfe899266d2",
+      "label_kind": 1,
+      "label_x": 742.0,
+      "label_y": 412.0,
+      "wasb": {
+        "detected": true,
+        "x": 742.9940795898438,
+        "y": 412.859130859375
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 742.5,
+        "y": 412.5
+      }
+    },
+    {
+      "frame": 11,
+      "member": "Dataset/game10/Clip3/0011.jpg",
+      "source_sha256": "209a2077429d8116692e53b50fb4e639dd6b9aaffa65b7b22cccc01436bf7261",
+      "label_kind": 1,
+      "label_x": 751.0,
+      "label_y": 419.0,
+      "wasb": {
+        "detected": true,
+        "x": 752.19677734375,
+        "y": 420.9176025390625
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 750.0,
+        "y": 420.0
+      }
+    },
+    {
+      "frame": 12,
+      "member": "Dataset/game10/Clip3/0012.jpg",
+      "source_sha256": "1d63bc240c3d0d38c331d2986cb905dfad882217625c7bf013bd7a6540ce7c10",
+      "label_kind": 1,
+      "label_x": 762.0,
+      "label_y": 431.0,
+      "wasb": {
+        "detected": true,
+        "x": 762.232421875,
+        "y": 430.3080749511719
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 760.0,
+        "y": 430.0
+      }
+    },
+    {
+      "frame": 13,
+      "member": "Dataset/game10/Clip3/0013.jpg",
+      "source_sha256": "0a32857416bffeaab5824ac7795485ffe21b5195cb6dcf9f2e33f300a1d5e52e",
+      "label_kind": 1,
+      "label_x": 770.0,
+      "label_y": 441.0,
+      "wasb": {
+        "detected": true,
+        "x": 771.410400390625,
+        "y": 442.1658630371094
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 770.0,
+        "y": 440.0
+      }
+    },
+    {
+      "frame": 14,
+      "member": "Dataset/game10/Clip3/0014.jpg",
+      "source_sha256": "60015763d3494414b7b4d9dcf7e054d37ad1ec58702466aba95aa8521e5932cc",
+      "label_kind": 1,
+      "label_x": 782.0,
+      "label_y": 453.0,
+      "wasb": {
+        "detected": true,
+        "x": 778.6981811523438,
+        "y": 448.4642028808594
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 780.0,
+        "y": 451.25
+      }
+    },
+    {
+      "frame": 15,
+      "member": "Dataset/game10/Clip3/0015.jpg",
+      "source_sha256": "9f43beddda753359dc79388e73770ce4ced84b25d48d5288e156c6153b9b6986",
+      "label_kind": 1,
+      "label_x": 774.0,
+      "label_y": 425.0,
+      "wasb": {
+        "detected": true,
+        "x": 773.6162109375,
+        "y": 425.1306457519531
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 775.0,
+        "y": 432.5
+      }
+    },
+    {
+      "frame": 16,
+      "member": "Dataset/game10/Clip3/0016.jpg",
+      "source_sha256": "bc45361ec324a9653ade1f067d905599ea06adfd2e4000202f0994a18c7c0ed5",
+      "label_kind": 1,
+      "label_x": 763.0,
+      "label_y": 396.0,
+      "wasb": {
+        "detected": true,
+        "x": 763.679443359375,
+        "y": 393.946044921875
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 765.0,
+        "y": 402.5
+      }
+    },
+    {
+      "frame": 17,
+      "member": "Dataset/game10/Clip3/0017.jpg",
+      "source_sha256": "9470658c5eb039da08e6dc3888205170cf6c4e7a960cbfc63fd1e366a0432066",
+      "label_kind": 1,
+      "label_x": 755.0,
+      "label_y": 369.0,
+      "wasb": {
+        "detected": true,
+        "x": 755.0159912109375,
+        "y": 369.940185546875
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 757.5,
+        "y": 375.0
+      }
+    },
+    {
+      "frame": 18,
+      "member": "Dataset/game10/Clip3/0018.jpg",
+      "source_sha256": "dbddab838f5ef04168fc195faa905045e8ffdd293f073c8a3150648562e97b04",
+      "label_kind": 1,
+      "label_x": 748.0,
+      "label_y": 350.0,
+      "wasb": {
+        "detected": true,
+        "x": 747.72216796875,
+        "y": 347.6513977050781
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 748.75,
+        "y": 352.5
+      }
+    },
+    {
+      "frame": 19,
+      "member": "Dataset/game10/Clip3/0019.jpg",
+      "source_sha256": "3168fdb490228e7b675c3782d327435ef37c7bdb832b39268be48af017121399",
+      "label_kind": 1,
+      "label_x": 741.0,
+      "label_y": 329.0,
+      "wasb": {
+        "detected": true,
+        "x": 740.001220703125,
+        "y": 327.5692443847656
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 741.25,
+        "y": 332.5
+      }
+    },
+    {
+      "frame": 20,
+      "member": "Dataset/game10/Clip3/0020.jpg",
+      "source_sha256": "cb68ed15525a2c8b2cbb5224042b5b8e1df60d25856e60865064d394b15ca81e",
+      "label_kind": 1,
+      "label_x": 734.0,
+      "label_y": 313.0,
+      "wasb": {
+        "detected": true,
+        "x": 734.0673217773438,
+        "y": 311.8916931152344
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 735.0,
+        "y": 315.0
+      }
+    },
+    {
+      "frame": 21,
+      "member": "Dataset/game10/Clip3/0021.jpg",
+      "source_sha256": "d68d4ff6d3d0be947855ffb1ba8a7b70aa7d352e962143bfc05dd0f74c0b24e1",
+      "label_kind": 1,
+      "label_x": 729.0,
+      "label_y": 297.0,
+      "wasb": {
+        "detected": true,
+        "x": 728.7288818359375,
+        "y": 298.6075439453125
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 730.0,
+        "y": 300.0
+      }
+    },
+    {
+      "frame": 22,
+      "member": "Dataset/game10/Clip3/0022.jpg",
+      "source_sha256": "e16268817367632747317a76b66d8f49845c3fef1facbcf45a35c71eb2f26e46",
+      "label_kind": 1,
+      "label_x": 724.0,
+      "label_y": 284.0,
+      "wasb": {
+        "detected": true,
+        "x": 723.0943603515625,
+        "y": 285.0802917480469
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 722.5,
+        "y": 285.0
+      }
+    },
+    {
+      "frame": 23,
+      "member": "Dataset/game10/Clip3/0023.jpg",
+      "source_sha256": "e048af0ff33373ffa4efc7d40dbae8c1df1a0dd1ac2c3cbee544666883915c5a",
+      "label_kind": 1,
+      "label_x": 718.0,
+      "label_y": 274.0,
+      "wasb": {
+        "detected": true,
+        "x": 718.0687866210938,
+        "y": 274.2145080566406
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 717.5,
+        "y": 275.0
+      }
+    },
+    {
+      "frame": 24,
+      "member": "Dataset/game10/Clip3/0024.jpg",
+      "source_sha256": "ac29f2ab3425f99c83bae4ad7180e86359d806cc6d12ba8cc7d681c981cc1b37",
+      "label_kind": 1,
+      "label_x": 713.0,
+      "label_y": 262.0,
+      "wasb": {
+        "detected": true,
+        "x": 713.067138671875,
+        "y": 263.837158203125
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 712.5,
+        "y": 263.75
+      }
+    },
+    {
+      "frame": 25,
+      "member": "Dataset/game10/Clip3/0025.jpg",
+      "source_sha256": "b7c997c3d095d00a5bedd65868acb091205f83502d14c6d68c37dd524bc51c45",
+      "label_kind": 1,
+      "label_x": 708.0,
+      "label_y": 253.0,
+      "wasb": {
+        "detected": true,
+        "x": 708.738037109375,
+        "y": 254.85227966308594
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 707.5,
+        "y": 255.0
+      }
+    },
+    {
+      "frame": 26,
+      "member": "Dataset/game10/Clip3/0026.jpg",
+      "source_sha256": "8f822092dc0b1b0ef24580acb06598240694103915a25ae7652666f4d45c346d",
+      "label_kind": 1,
+      "label_x": 704.0,
+      "label_y": 246.0,
+      "wasb": {
+        "detected": true,
+        "x": 704.308837890625,
+        "y": 246.8248291015625
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 703.75,
+        "y": 246.25
+      }
+    },
+    {
+      "frame": 27,
+      "member": "Dataset/game10/Clip3/0027.jpg",
+      "source_sha256": "4567e2d234781a1700bcdadc7e1218ec2ae4d52dc1c87bce26a1a1738cf12f17",
+      "label_kind": 1,
+      "label_x": 699.0,
+      "label_y": 240.0,
+      "wasb": {
+        "detected": true,
+        "x": 699.8023071289062,
+        "y": 239.93252563476562
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 700.0,
+        "y": 240.0
+      }
+    },
+    {
+      "frame": 28,
+      "member": "Dataset/game10/Clip3/0028.jpg",
+      "source_sha256": "896efc5966992fe492f034c77a81b2cf4a9516e0036b943d266700b55c00784b",
+      "label_kind": 1,
+      "label_x": 695.0,
+      "label_y": 235.0,
+      "wasb": {
+        "detected": true,
+        "x": 695.4047241210938,
+        "y": 234.69158935546875
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 695.0,
+        "y": 235.0
+      }
+    },
+    {
+      "frame": 29,
+      "member": "Dataset/game10/Clip3/0029.jpg",
+      "source_sha256": "019bc52b9e4ad74e69e99592a0e00660434ca15216d0f168fb4383fbf48b4491",
+      "label_kind": 1,
+      "label_x": 691.0,
+      "label_y": 229.0,
+      "wasb": {
+        "detected": true,
+        "x": 692.222412109375,
+        "y": 229.76783752441406
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 692.5,
+        "y": 230.0
+      }
+    },
+    {
+      "frame": 30,
+      "member": "Dataset/game10/Clip3/0030.jpg",
+      "source_sha256": "c569b4f83ac7c5bdde0217cbb7a963c218f1da161dd0cab57e42decf3568fdfb",
+      "label_kind": 1,
+      "label_x": 689.0,
+      "label_y": 226.0,
+      "wasb": {
+        "detected": true,
+        "x": 689.193359375,
+        "y": 225.35238647460938
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 687.5,
+        "y": 225.0
+      }
+    },
+    {
+      "frame": 31,
+      "member": "Dataset/game10/Clip3/0031.jpg",
+      "source_sha256": "2e9960893a3ea17db3dc97bdb3666d64c9659662b5a88f58fdb33a3902220a22",
+      "label_kind": 1,
+      "label_x": 686.0,
+      "label_y": 223.0,
+      "wasb": {
+        "detected": true,
+        "x": 686.055908203125,
+        "y": 222.85421752929688
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 685.0,
+        "y": 222.5
+      }
+    },
+    {
+      "frame": 32,
+      "member": "Dataset/game10/Clip3/0032.jpg",
+      "source_sha256": "762243cac74faed9345210b28971c13d92c8d28b74c3439eff7bb3549e4c041c",
+      "label_kind": 1,
+      "label_x": 683.0,
+      "label_y": 221.0,
+      "wasb": {
+        "detected": true,
+        "x": 682.8167724609375,
+        "y": 220.5439910888672
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 683.75,
+        "y": 220.0
+      }
+    },
+    {
+      "frame": 33,
+      "member": "Dataset/game10/Clip3/0033.jpg",
+      "source_sha256": "058edb28c717faee629b2ddb675629fc29cdf985845359a981a630ab920a26f5",
+      "label_kind": 1,
+      "label_x": 680.0,
+      "label_y": 219.0,
+      "wasb": {
+        "detected": true,
+        "x": 680.10986328125,
+        "y": 217.62210083007812
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 680.0,
+        "y": 217.5
+      }
+    },
+    {
+      "frame": 34,
+      "member": "Dataset/game10/Clip3/0034.jpg",
+      "source_sha256": "32d088f8408359d902ce1bf520f5ae263b5e8b7fd62a4b40800be77ef696f5a8",
+      "label_kind": 1,
+      "label_x": 678.0,
+      "label_y": 209.0,
+      "wasb": {
+        "detected": true,
+        "x": 677.9376831054688,
+        "y": 207.98626708984375
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 677.5,
+        "y": 210.0
+      }
+    },
+    {
+      "frame": 35,
+      "member": "Dataset/game10/Clip3/0035.jpg",
+      "source_sha256": "dfc4daa3d4b72a3678827315c3188e101f1f0d680bed03f1aba76e4f7029d49d",
+      "label_kind": 1,
+      "label_x": 676.0,
+      "label_y": 197.0,
+      "wasb": {
+        "detected": true,
+        "x": 675.662353515625,
+        "y": 195.79530334472656
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 675.0,
+        "y": 197.5
+      }
+    },
+    {
+      "frame": 36,
+      "member": "Dataset/game10/Clip3/0036.jpg",
+      "source_sha256": "7dd8aed2f7d803b8591deff286ba9a119a96e1b4467114fb24d37d48252cc1a0",
+      "label_kind": 1,
+      "label_x": 674.0,
+      "label_y": 186.0,
+      "wasb": {
+        "detected": true,
+        "x": 673.768798828125,
+        "y": 185.6109619140625
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 675.0,
+        "y": 185.0
+      }
+    },
+    {
+      "frame": 37,
+      "member": "Dataset/game10/Clip3/0037.jpg",
+      "source_sha256": "61723fa52575c841553fcd2cfef8361fb3d0befe461716813fd6718af2a0aec3",
+      "label_kind": 1,
+      "label_x": 672.0,
+      "label_y": 177.0,
+      "wasb": {
+        "detected": true,
+        "x": 672.5557861328125,
+        "y": 176.02371215820312
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 672.5,
+        "y": 175.0
+      }
+    },
+    {
+      "frame": 38,
+      "member": "Dataset/game10/Clip3/0038.jpg",
+      "source_sha256": "e2d127f11109720d63b84ffb13233c14fc748b005fe498901a142b34e44d1561",
+      "label_kind": 1,
+      "label_x": 671.0,
+      "label_y": 168.0,
+      "wasb": {
+        "detected": true,
+        "x": 670.2106323242188,
+        "y": 167.42648315429688
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 670.0,
+        "y": 167.5
+      }
+    },
+    {
+      "frame": 39,
+      "member": "Dataset/game10/Clip3/0039.jpg",
+      "source_sha256": "4c566201d41f98afeb3821af628ea23368d3aaa8bc3739b6c624552ea7eea698",
+      "label_kind": 1,
+      "label_x": 669.0,
+      "label_y": 159.0,
+      "wasb": {
+        "detected": true,
+        "x": 667.9244384765625,
+        "y": 159.91995239257812
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 667.5,
+        "y": 160.0
+      }
+    },
+    {
+      "frame": 40,
+      "member": "Dataset/game10/Clip3/0040.jpg",
+      "source_sha256": "c7bbc461c53f22677830c1974ef0eff4b58fda2e886ca6875c79c5248ff86cdc",
+      "label_kind": 1,
+      "label_x": 667.0,
+      "label_y": 153.0,
+      "wasb": {
+        "detected": true,
+        "x": 666.2830810546875,
+        "y": 153.0196990966797
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 666.25,
+        "y": 152.5
+      }
+    },
+    {
+      "frame": 41,
+      "member": "Dataset/game10/Clip3/0041.jpg",
+      "source_sha256": "2d5dbbb28a2d0c7cf1ac96ee3668743e50bb9eda174265dbab5b49f506bfa248",
+      "label_kind": 1,
+      "label_x": 665.0,
+      "label_y": 147.0,
+      "wasb": {
+        "detected": true,
+        "x": 668.7528076171875,
+        "y": 147.49998474121094
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 665.0,
+        "y": 147.5
+      }
+    },
+    {
+      "frame": 42,
+      "member": "Dataset/game10/Clip3/0042.jpg",
+      "source_sha256": "19f8e0d97e63ca23fa2c0fc445b7a6e6bdb569c45a8ccc9e51b5f2adeb2c40ee",
+      "label_kind": 1,
+      "label_x": 663.0,
+      "label_y": 143.0,
+      "wasb": {
+        "detected": false,
+        "x": 0.0,
+        "y": 0.0
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 663.75,
+        "y": 142.5
+      }
+    },
+    {
+      "frame": 43,
+      "member": "Dataset/game10/Clip3/0043.jpg",
+      "source_sha256": "bec0d77618dfb2543e0e9a1677703e8aea99862e375b4aac2545faa9b90f3811",
+      "label_kind": 1,
+      "label_x": 662.0,
+      "label_y": 138.0,
+      "wasb": {
+        "detected": false,
+        "x": 0.0,
+        "y": 0.0
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 662.5,
+        "y": 137.5
+      }
+    },
+    {
+      "frame": 44,
+      "member": "Dataset/game10/Clip3/0044.jpg",
+      "source_sha256": "69a978d978b6fc28190106b1483f0db9dae86034bea7c9475df5489b560bf71d",
+      "label_kind": 1,
+      "label_x": 660.0,
+      "label_y": 138.0,
+      "wasb": {
+        "detected": false,
+        "x": 0.0,
+        "y": 0.0
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 660.0,
+        "y": 137.5
+      }
+    },
+    {
+      "frame": 45,
+      "member": "Dataset/game10/Clip3/0045.jpg",
+      "source_sha256": "1555d58fa809696a8de1a07b0c4397b26453cec5f192203f884a593e5ed70cb7",
+      "label_kind": 1,
+      "label_x": 659.0,
+      "label_y": 137.0,
+      "wasb": {
+        "detected": false,
+        "x": 0.0,
+        "y": 0.0
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 657.5,
+        "y": 137.5
+      }
+    },
+    {
+      "frame": 46,
+      "member": "Dataset/game10/Clip3/0046.jpg",
+      "source_sha256": "e4ef79bdfb6b1ea8fbf09bd8e979ff6afa0d8d8f3fe741868adc17d7a9f6afe0",
+      "label_kind": 1,
+      "label_x": 657.0,
+      "label_y": 139.0,
+      "wasb": {
+        "detected": false,
+        "x": 0.0,
+        "y": 0.0
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 656.25,
+        "y": 140.0
+      }
+    },
+    {
+      "frame": 47,
+      "member": "Dataset/game10/Clip3/0047.jpg",
+      "source_sha256": "24486f61e882a2393dd4491b14adc17a398e6453e69195847c33531fe2a50e9c",
+      "label_kind": 1,
+      "label_x": 655.0,
+      "label_y": 139.0,
+      "wasb": {
+        "detected": false,
+        "x": 0.0,
+        "y": 0.0
+      },
+      "balltrack": {
+        "detected": true,
+        "x": 655.0,
+        "y": 138.75
+      }
+    }
+  ],
+  "point_summaries": [
+    {
+      "codec": "dcvc",
+      "point": 0,
+      "native_sha256": "650f5b629116ed1a60817d1135d96aa73e224dace84da8d8278c9073b6dd1328",
+      "native_file": "dcvc-0/native.bin",
+      "psbl_sha256": "39b653926acf793fc1973968ea853802a843538f4cadced1255d7d21691b1acd",
+      "psbl_file": "dcvc-0/stream.psbl",
+      "native_bytes": 9282,
+      "psbl_bytes": 9561
+    },
+    {
+      "codec": "dcvc",
+      "point": 21,
+      "native_sha256": "d03b9355a35bfb05fd5c18fc94207e1737a9f7471f1971d575ee0fc653547ce3",
+      "native_file": "dcvc-21/native.bin",
+      "psbl_sha256": "1d6480c78c1d87b6414c6cc10800164dac7d5fa3267368de5732900ecc05bbeb",
+      "psbl_file": "dcvc-21/stream.psbl",
+      "native_bytes": 23938,
+      "psbl_bytes": 24230
+    },
+    {
+      "codec": "dcvc",
+      "point": 42,
+      "native_sha256": "21f867c2121391570d31f8e4500c127e938ae29d468576144354b317ffd5a1ec",
+      "native_file": "dcvc-42/native.bin",
+      "psbl_sha256": "ee29d7039cafc9e80d2ecd1a177c921c868e8403714a9738e624f9a35a54e0a7",
+      "psbl_file": "dcvc-42/stream.psbl",
+      "native_bytes": 63586,
+      "psbl_bytes": 63913
+    },
+    {
+      "codec": "svt",
+      "point": 48,
+      "native_sha256": "e85bbd4407c90f7fc633a8e41977f499c0b7d9da671223889f5a16b23f6524ef",
+      "native_file": "svt-48/native.bin",
+      "psbl_sha256": "e01110717a2e9fd04a0c9c80f16209aeaf9466d04da7c316ef53f28420d9d504",
+      "psbl_file": "svt-48/stream.psbl",
+      "native_bytes": 90949,
+      "psbl_bytes": 91272,
+      "native_checkpoint": {
+        "codec": "svt-av1",
+        "param": 48,
+        "kbps": 451.705,
+        "bytes": 90341,
+        "stream_sha256": "e85bbd4407c90f7fc633a8e41977f499c0b7d9da671223889f5a16b23f6524ef",
+        "decoded": "/local/users/emanuele/pointstream/scratch/20261113T210157Z-41ee26e3-full/publish-work/svt-48/decoded.yuv",
+        "command": [
+          "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+          "-i",
+          "/local/users/emanuele/pointstream/scratch/20261113T210157Z-41ee26e3-full/publish-work/source.yuv",
+          "-b",
+          "/local/users/emanuele/pointstream/scratch/20261113T210157Z-41ee26e3-full/publish-work/svt-48/stream.ivf",
+          "-w",
+          "1280",
+          "-h",
+          "720",
+          "--input-depth",
+          "8",
+          "--fps-num",
+          "30",
+          "--fps-denom",
+          "1",
+          "-n",
+          "48",
+          "--color-range",
+          "0",
+          "--rc",
+          "0",
+          "--crf",
+          "48",
+          "--preset",
+          "4",
+          "--keyint",
+          "-1",
+          "--lp",
+          "6",
+          "--progress",
+          "0"
+        ],
+        "decode_command": [
+          "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+          "-i",
+          "/local/users/emanuele/pointstream/scratch/20261113T210157Z-41ee26e3-full/publish-work/svt-48/stream.ivf",
+          "-o",
+          "/local/users/emanuele/pointstream/scratch/20261113T210157Z-41ee26e3-full/publish-work/svt-48/decoded.yuv",
+          "--threads",
+          "1",
+          "--quiet"
+        ],
+        "native_timing": {
+          "encode_seconds": 3.146,
+          "encode_cpu_seconds": 3.11,
+          "decode_seconds": 0.099,
+          "decode_cpu_seconds": 0.082
+        }
+      }
+    },
+    {
+      "codec": "svt",
+      "point": 55,
+      "native_sha256": "2536b9ed986d6ef41733a309ddf86f530b56521d4adf309282705b72f5a810f5",
+      "native_file": "svt-55/native.bin",
+      "psbl_sha256": "b8f8bb9cc97da4b08f5579aba79d988c20b9b9ddefb88c03587cc4c371fe95b8",
+      "psbl_file": "svt-55/stream.psbl",
+      "native_bytes": 63879,
+      "psbl_bytes": 64177,
+      "native_checkpoint": {
+        "codec": "svt-av1",
+        "param": 55,
+        "kbps": 316.355,
+        "bytes": 63271,
+        "stream_sha256": "2536b9ed986d6ef41733a309ddf86f530b56521d4adf309282705b72f5a810f5",
+        "decoded": "/local/users/emanuele/pointstream/scratch/20261113T210157Z-41ee26e3-full/publish-work/svt-55/decoded.yuv",
+        "command": [
+          "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+          "-i",
+          "/local/users/emanuele/pointstream/scratch/20261113T210157Z-41ee26e3-full/publish-work/source.yuv",
+          "-b",
+          "/local/users/emanuele/pointstream/scratch/20261113T210157Z-41ee26e3-full/publish-work/svt-55/stream.ivf",
+          "-w",
+          "1280",
+          "-h",
+          "720",
+          "--input-depth",
+          "8",
+          "--fps-num",
+          "30",
+          "--fps-denom",
+          "1",
+          "-n",
+          "48",
+          "--color-range",
+          "0",
+          "--rc",
+          "0",
+          "--crf",
+          "55",
+          "--preset",
+          "4",
+          "--keyint",
+          "-1",
+          "--lp",
+          "6",
+          "--progress",
+          "0"
+        ],
+        "decode_command": [
+          "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+          "-i",
+          "/local/users/emanuele/pointstream/scratch/20261113T210157Z-41ee26e3-full/publish-work/svt-55/stream.ivf",
+          "-o",
+          "/local/users/emanuele/pointstream/scratch/20261113T210157Z-41ee26e3-full/publish-work/svt-55/decoded.yuv",
+          "--threads",
+          "1",
+          "--quiet"
+        ],
+        "native_timing": {
+          "encode_seconds": 3.127,
+          "encode_cpu_seconds": 3.101,
+          "decode_seconds": 0.094,
+          "decode_cpu_seconds": 0.076
+        }
+      }
+    },
+    {
+      "codec": "svt",
+      "point": 62,
+      "native_sha256": "cd79e3979e00124a8ae201c1b22f69651ae353a90b96da1acd1fbaaff757224b",
+      "native_file": "svt-62/native.bin",
+      "psbl_sha256": "90e8d04c4b1b7a2e35c3d4cd528b8f583543bf872f2eeb44be732cde546a3c95",
+      "psbl_file": "svt-62/stream.psbl",
+      "native_bytes": 34146,
+      "psbl_bytes": 34421,
+      "native_checkpoint": {
+        "codec": "svt-av1",
+        "param": 62,
+        "kbps": 167.69,
+        "bytes": 33538,
+        "stream_sha256": "cd79e3979e00124a8ae201c1b22f69651ae353a90b96da1acd1fbaaff757224b",
+        "decoded": "/local/users/emanuele/pointstream/scratch/20261113T210157Z-41ee26e3-full/publish-work/svt-62/decoded.yuv",
+        "command": [
+          "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+          "-i",
+          "/local/users/emanuele/pointstream/scratch/20261113T210157Z-41ee26e3-full/publish-work/source.yuv",
+          "-b",
+          "/local/users/emanuele/pointstream/scratch/20261113T210157Z-41ee26e3-full/publish-work/svt-62/stream.ivf",
+          "-w",
+          "1280",
+          "-h",
+          "720",
+          "--input-depth",
+          "8",
+          "--fps-num",
+          "30",
+          "--fps-denom",
+          "1",
+          "-n",
+          "48",
+          "--color-range",
+          "0",
+          "--rc",
+          "0",
+          "--crf",
+          "62",
+          "--preset",
+          "4",
+          "--keyint",
+          "-1",
+          "--lp",
+          "6",
+          "--progress",
+          "0"
+        ],
+        "decode_command": [
+          "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+          "-i",
+          "/local/users/emanuele/pointstream/scratch/20261113T210157Z-41ee26e3-full/publish-work/svt-62/stream.ivf",
+          "-o",
+          "/local/users/emanuele/pointstream/scratch/20261113T210157Z-41ee26e3-full/publish-work/svt-62/decoded.yuv",
+          "--threads",
+          "1",
+          "--quiet"
+        ],
+        "native_timing": {
+          "encode_seconds": 3.402,
+          "encode_cpu_seconds": 3.377,
+          "decode_seconds": 0.091,
+          "decode_cpu_seconds": 0.073
+        }
+      }
+    }
+  ],
+  "retained_source_yuv": {
+    "path": "/local/users/emanuele/pointstream/scratch/20261113T210157Z-41ee26e3-full/publish-work/source.yuv",
+    "exists": false
+  },
+  "source_archive": {
+    "path": "/local/users/emanuele/pointstream/cache/bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18/tracknet-dataset.zip",
+    "sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18"
+  },
+  "schema": 1,
+  "date": "2026-11-15",
+  "scope": "read-only ROI-control feasibility and exact-input provenance; no encoding/GPU/jobs",
+  "metadata_cpu_ceiling_seconds": 900,
+  "producer_published_sha256_actual": "9074362c3f62ec18fba75acb3393c6a0803d907ad235a57bce98eb050c30b128",
+  "input_reconstruction": {
+    "raw_YUV_retained": false,
+    "required_raw_YUV_bytes": 66355200,
+    "required_raw_YUV_sha256": "a40b172b7a3e72c0fcf75dff15584564e3d220ffa6f1653439d045387f2d9963",
+    "steps": [
+      "Read exact first48original JPEG members and require all SHA256 identities in source-qualification.json",
+      "Decode originalRGB with frozen source-reader/OpenCV, then k5d_encoder.convert_rgb using frozenFFmpeg",
+      "Require reconstructedrawYUV goldenSHA before nativeROIencoding; fail closed on mismatch"
+    ],
+    "eligible_original_archive": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/tracknet-Dataset.zip",
+    "archive_sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18"
+  },
+  "disk_control": {
+    "job_id": "20261105T021434Z-3ec159d8",
+    "published_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T021434Z-3ec159d8/full/published.tar",
+    "published_sha256_accepted": "8a877a2f8d424dd886b44ed002be606ee29c11607c95ae82fb1ee029f0504e8e",
+    "disk_member": "publish/disk.psbl",
+    "disk_sha256_actual": "ba4fc24aa8f5656453771627c51eb9323fbf2234e8da08bdacedc18bac96a777",
+    "disk_bytes": 34413,
+    "streak_member": "publish/streak.psbl",
+    "streak_sha256_actual": "90e8d04c4b1b7a2e35c3d4cd528b8f583543bf872f2eeb44be732cde546a3c95",
+    "matches_accepted_primary_svt62_streak_packet": true,
+    "controls_json_sha256_actual": "9ac57120e395ad9199b0dac51bee4181559de736082e6de7adfe31fc2bbc032b",
+    "scope": "one matched physical paid disk operatingpoint CRF62, not a3ratecurve; cachedfull/cropmetrics exist but need metric/source identity and numerical paritycheck before reuse"
+  },
+  "proposal": {
+    "state": "proposal_only_ROOT_decides; no release",
+    "initial_points": [
+      48,
+      55,
+      62
+    ],
+    "preset": 4,
+    "fps": [
+      30,
+      1
+    ],
+    "size": [
+      1280,
+      720
+    ],
+    "initial_offset_policy": "0inside64x64crop centered on decoded paidSVT PSBL transmittedballcenters atthatpoint, +20outside. NoROIforserializedabsentframes. Repeat +40outside onlyafter +20decisiongate ifunclear; rootmayfreeze bothas smallfinitepolicytest.",
+    "second_offset": "+40outside only if +20curve lacks support or answer remains unclear; log reason before additional outcomes",
+    "geometry": "Framewise64x64box with same round/clamp rules as k5d_encoder.crop64, rasterized then touched64x64blocks via w1_roi.roi_text(...,-20,outside=True)",
+    "first_control": "Same transmittedballcenters as acceptedpaidPSBL, perCRFpoint; nativeAV1allocatesbits tosame inferredobjectlocations. No GTlocationgrant inprimarycontrol.",
+    "automatic_followup": "Not needed forprimarylocationcontrol: decode existingPSBLballpayload supplies exactsendertransmittedpositions; sourcequalificationBallTrackpositions are diagnostic alternative, not assumed identical to fittedserializedcenters.",
+    "encode_interface": "Clone accepted SvtAv1EncApp command exactly, changing onlysource/output paths, CRF, and adding --roi-map-file. Reuse src.codecs.svtav1.encode_command/code plus w1_roi.roi_text. Do not use codec_ladder.run unchanged.",
+    "why_not_new_harness_unchanged": [
+      "Currentcodec_ladder.encode_native injects colourprimaries/transfer/matrix headers absent fromoldacceptedcommand; must establish controlparity or omit for strictfamily",
+      "NewharnesschargesPSC/patchwrapper andscorescustomfull-featureweightedregionalDISTS; oldprimarynativeanchorpricescompleteIVF andmeasuresnetworks on isolatedsource64crops"
+    ],
+    "control_parity_gate": "Re-encode unchangednativeCRF62 and require originalnativeSHA cd79e3979e00124a8ae201c1b22f69651ae353a90b96da1acd1fbaaff757224b before ROI scientific comparison, plus one savedmetricscontrol parity",
+    "scoring": "Source reference is originalJPEG RGB, not YUVroundtrip. Use windows.rgb_frames limitedBT709/nativeRGB conversion and k5d_encoder.metrics forfull+visible64crop LPIPS/DISTS/PSNR with original pinnedmetricweights. Originalall48frames visible; no newabsenceclaim.",
+    "pricing": "ROIcontrol nativeIVF allbytes includingAV1ROI signalling, noPSBLzeroBALLornewPSC wrapper. Candidate paidPSBL actualallbytes. Encoder-onlyROIfile need not be sent; resultingnativeAV1signalling already counted.",
+    "analysis": "Compare3pointcurves only on commonqualitysupport; no taskBD; retainfullframecosts. Existingprimary6pointstreak+native andonepaidDisk62 are reusable only after exactsource/pixel/metric joins.",
+    "cost_basis": "Accepted48nativeSVTencodewalls3.146/3.127/3.402s per original checkpoint; these are historical CPU timing hints only, not newstagequalification. Measurecurrent complete smoke+publication/metrics cost before budgetscale.",
+    "optional_GT_control": "Separate explicitlyprivilegedGT-label64cropROI only if root predeclares; do not substitute forprimary transmitted-centersROI.",
+    "CPU_encoder_interface": "experiments.tennis.ball_roi_native prepare|encode --producer-published TAR --producer-sha907436... --tracknet ZIP --tracknet-sha bb453... --frames16|48 --rates48,55,62 --offsets20[,40] --output NEW; proposed interface only, module not yet implemented",
+    "GPU_scorer_interface": "experiments.tennis.ball_roi_native score --encoded TAR --producer-published TAR --accepted-score-records HASHBOUND --metricweights PINNED --output NEW; scoreallframes usingoldmetrics andfunctionalnativeCPUreceiver, no newmodel/sourcequalificationstack; proposed interface only",
+    "feasibility_gate": {
+      "CPU_proposed_cap_seconds": 1200,
+      "GPU_score_proposed_cap_seconds": 900,
+      "smoke_frames": 16,
+      "full_frames": 48,
+      "native_control": "sameCPUaffinity1 asoriginal, samefrozenbinaries/runtime; failonbytes/pixelsidentitymismatch",
+      "forecast": "1.5*measured16wholecommandincludingpublication*(48/16)+fixedsetupreserve<=fullstagecap beforefull. KeepCPUencoding/scoringas separately admittedjobs."
+    }
+  },
+  "secondary_292": {
+    "job_id": "20261113T173340Z-64160888",
+    "clip": "tracknet/game9/Clip5",
+    "frames": 292,
+    "acceptance_index": "docs/experiments/k5d-inputs/svt-study4282-64160888-confirmation292-root-acceptance-20261113.json",
+    "role": "Optional later crossclip retrospective replication afterprimary48control; not probed/encoded in this intake"
+  },
+  "proof_archive": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/k5d-primary-paired-41ee26e3-5c1134a8d6447ef754f805aa/preparation.tar.gz",
+    "sha256_actual": "5c1134a8d6447ef754f805aaa840949fff4cfd3f6e4f94ec8c3efe040d683ac0",
+    "contains_checkpoint_payloads": false,
+    "note": "Audit/runtime/source receipts only. Actualbinaryproducerpayloads reside in1.327GBfullpublished.tar."
+  },
+  "citations": [
+    {
+      "path": "experiments/codec_ladder/__main__.py",
+      "sha256": "6d514a452183132f04d429206a824757eb8c0f32366966e1cc6d7fc1eb289d20"
+    },
+    {
+      "path": "experiments/tennis/k5d_encoder.py",
+      "sha256": "59d47e9c4cebf07b565316e7e5d98f02d244d74217754080a27715a770ab4895"
+    },
+    {
+      "path": "experiments/tennis/k5d_checkpoint.py",
+      "sha256": "de3f67118291bff711ba65b8b7db4e683dfb22df5a423718b0034f24f89a5736"
+    },
+    {
+      "path": "experiments/tennis/w1_roi.py",
+      "sha256": "e98b1965b3b45e665217fbc95f79cdaa81ccaefb86f534137013217659f155ef"
+    },
+    {
+      "path": "src/codecs/svtav1.py",
+      "sha256": "0fbfbb30002f2633c72c10aef0ffde80c0e173f749e78ed61e0ad1856d08b8c3"
+    },
+    {
+      "path": "docs/experiments/k5d-inputs/primary-41ee26e3-Ada-paired-preparation-root-acceptance-20261113.json",
+      "sha256": "06c7176f6e8feb43e44091613f9a931bded2772ab25e241ebea9735226fa0df9"
+    }
+  ],
+  "price_basis_check": "docs/experiments/submission-ladder-ball-price-basis-20261115.json",
+  "price_basis_conclusion": "Accepted e431/manuscript already uses completephysicalIVF rates454.745/319.395/170.73. FullLPIPS+1.2158967864773622% reproduced; payload-onlycounterfactual+1.2118184501317277% does not reverse sign.",
+  "pinned_tools_actual_gpu6": {
+    "runtime_archive_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "binary_directory": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin",
+    "ffmpeg_sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+    "SvtAv1EncApp_sha256": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+    "dav1d_sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+    "hash_basis": "fresh read of retained frozen binaryfiles on gpu6; no execution/inference"
+  },
+  "ROOT_freeze": {
+    "status": "ROOT_chosen_before_any_ROI_outcome; execution_release_separate",
+    "rates": [
+      35,
+      48,
+      62
+    ],
+    "outside_offset": 40,
+    "inside_offset": 0,
+    "region": "source_GT64crop_privileged_conventional_control",
+    "supersedes": "provisional automatic/transmitted-center+20 and48/55/62 proposal; oldacceptedcurves remainunchanged",
+    "reason": "Strongerconventionalpriorandwiderqualitysupport chosenbeforemeasurement",
+    "mandatory_controls": [
+      "golden48inputYUVhasha40b172...",
+      "native62bitstreamgoldcd79e397...",
+      "native62YUVgold652302be...",
+      "oldfull/cropmetriccontrolparity"
+    ]
+  },
+  "accepted_scorer": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261113T220101Z-0cfa5558/full/published.tar",
+    "sha256_actual": "fd9c161132525e3d9d143412122f0281a9a5714278643208fd04368dd081d876",
+    "bytes": 179292160,
+    "point62_member": "publish/point-svt-62.json",
+    "point62_sha256_actual": "3d4f29e6446a74d308e19858bead7c65a0ac5a1b784fede76fdd24c91eddda7b",
+    "assembled_point62_member": "publish/assembled/svt-62/point.json",
+    "assembled_point62_sha256_actual": "d90a06f01482c3a45b4ee011ea3b24ff8543da287960c4f4fa5b73575b422831",
+    "native62_YUV_sha256": "652302beac4aeee7b7c749a45cac1a6f421c5e780e6d21721a75a636430e753d",
+    "streak62_rendered_RGB_sha256": "f144f004f68da2d2118a48b62d945371ac8c01d82b28b0cb1d6f0a5c17d82ec7",
+    "baseline_metric_rows": "point.baseline.metrics",
+    "semantic_metric_rows": "point.streak.metrics",
+    "frames": 48,
+    "control_note": "full48encodingcontext;16-framefeasibility smoke needsseparate16contextgold"
+  }
+}

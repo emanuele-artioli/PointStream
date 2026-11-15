@@ -260,5 +260,26 @@
     "browser": "realFirefoxvisualverified; blindframeandnonblindproposalchecked; no human decisionssubmitted",
     "iframe_or_codec_outputs": "none",
     "new_reference_labels": 0
+  },
+  "interactive_helper": {
+    "pid": 19189,
+    "wrapper_pid": 19188,
+    "command": [
+      "python",
+      "tools/datasets/k8_review_server.py",
+      "--root",
+      "/Users/manu/Documents/PointStream-review/annotation-pilot-2026-11-14/review",
+      "--port",
+      "17691"
+    ],
+    "start_utc": "2026-11-15T00:07:09.256715+00:00",
+    "expiry_utc": "2026-11-15T11:07:34+00:00",
+    "url": "http://127.0.0.1:17691/",
+    "durable_offline_index": "/Users/manu/Documents/PointStream-review/annotation-pilot-2026-11-14/review/index.html",
+    "scope": "single extension of interactive task-owned source-only loopback helper; no GPU or recurring model calls",
+    "extension_count": 1,
+    "previous_server_pid": 14388,
+    "draft_origin": "http://127.0.0.1:17691",
+    "offline_storage_limit": "file-origin storage is separate; use same HTTP origin to resume existing browser drafts"
   }
 }

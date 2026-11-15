@@ -1,0 +1,3343 @@
+{
+  "schema": 1,
+  "metric_protocol": "legacy-spatial-map-v1",
+  "metric_definitions": {
+    "full_lpips": "mean of full-resolution bilinearly upsampled LPIPS-Alex spatial map; not standard scalar LPIPS",
+    "weighted_lpips": "all-frame70/30 source-mask regional means of full-resolution LPIPS-Alex spatial map; empty-region weight reallocated",
+    "full_dists": "standard full-frame DISTS with all-ones feature-statistic weights",
+    "weighted_dists": "all-frame70/30 source-mask regional DISTS feature statistics; empty-region weight reallocated"
+  },
+  "scope": "reference-guided static-rectangle development mechanism oracle; not automatic sender or confirmation",
+  "domain": "egocentric",
+  "source_group": "P09_103",
+  "annotation_provenance": "VISOR_dense_interpolated_not_all_human",
+  "frames": 64,
+  "comparisons": {
+    "roi": {
+      "native": {
+        "weighted_dists": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              57051,
+              -0.11476825466379523
+            ],
+            [
+              284312,
+              -0.061488790344446896
+            ],
+            [
+              752532,
+              -0.046701982337981465
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              61445,
+              -0.11248720102012158
+            ],
+            [
+              312623,
+              -0.06083157854154706
+            ],
+            [
+              856857,
+              -0.04560626046732068
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              61445,
+              -0.11248720102012158
+            ],
+            [
+              312623,
+              -0.06083157854154706
+            ],
+            [
+              856857,
+              -0.04560626046732068
+            ]
+          ],
+          "candidate_rate_support": [
+            57051,
+            752532
+          ],
+          "anchor_rate_support": [
+            61445,
+            856857
+          ],
+          "bd_rate": {
+            "hull_pchip": -0.053900792967086,
+            "pareto_pchip": -0.053900792967086,
+            "hull_linear_rate": -0.04433796713705684
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.11248720102012158,
+            -0.046701982337981465
+          ]
+        },
+        "weighted_lpips": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              57051,
+              -0.20774761009961368
+            ],
+            [
+              284312,
+              -0.08683654032065533
+            ],
+            [
+              752532,
+              -0.059117861505365
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              61445,
+              -0.20264093622099608
+            ],
+            [
+              312623,
+              -0.08530286652967334
+            ],
+            [
+              856857,
+              -0.058330698072677475
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              61445,
+              -0.20264093622099608
+            ],
+            [
+              312623,
+              -0.08530286652967334
+            ],
+            [
+              856857,
+              -0.058330698072677475
+            ]
+          ],
+          "candidate_rate_support": [
+            57051,
+            752532
+          ],
+          "anchor_rate_support": [
+            61445,
+            856857
+          ],
+          "bd_rate": {
+            "hull_pchip": -0.045210672917877365,
+            "pareto_pchip": -0.045210672917877365,
+            "hull_linear_rate": -0.046023676909374464
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.20264093622099608,
+            -0.059117861505365
+          ]
+        },
+        "full_dists": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              57051,
+              -0.08826006948947906
+            ],
+            [
+              284312,
+              -0.04422222264111042
+            ],
+            [
+              752532,
+              -0.03292075265198946
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              61445,
+              -0.0829126387834549
+            ],
+            [
+              312623,
+              -0.04335285350680351
+            ],
+            [
+              856857,
+              -0.03156771510839462
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              61445,
+              -0.0829126387834549
+            ],
+            [
+              312623,
+              -0.04335285350680351
+            ],
+            [
+              856857,
+              -0.03156771510839462
+            ]
+          ],
+          "candidate_rate_support": [
+            57051,
+            752532
+          ],
+          "anchor_rate_support": [
+            61445,
+            856857
+          ],
+          "bd_rate": {
+            "hull_pchip": -0.014770408149891825,
+            "pareto_pchip": -0.014770408149891825,
+            "hull_linear_rate": 0.020662637559263487
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.0829126387834549,
+            -0.03292075265198946
+          ]
+        },
+        "full_lpips": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              57051,
+              -0.19793810369446874
+            ],
+            [
+              284312,
+              -0.08002476987894624
+            ],
+            [
+              752532,
+              -0.05477527977200225
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              61445,
+              -0.18611070537008345
+            ],
+            [
+              312623,
+              -0.07692928466713056
+            ],
+            [
+              856857,
+              -0.0530203678063117
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              61445,
+              -0.18611070537008345
+            ],
+            [
+              312623,
+              -0.07692928466713056
+            ],
+            [
+              856857,
+              -0.0530203678063117
+            ]
+          ],
+          "candidate_rate_support": [
+            57051,
+            752532
+          ],
+          "anchor_rate_support": [
+            61445,
+            856857
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.006396098398417411,
+            "pareto_pchip": 0.006396098398417411,
+            "hull_linear_rate": 0.013206199573395723
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.18611070537008345,
+            -0.05477527977200225
+          ]
+        },
+        "full_rgb_psnr": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              57051,
+              31.481119189034015
+            ],
+            [
+              284312,
+              36.36102992160069
+            ],
+            [
+              752532,
+              38.52764377215091
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              61445,
+              31.874085767489326
+            ],
+            [
+              312623,
+              36.60699161201825
+            ],
+            [
+              856857,
+              38.82571899633379
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              61445,
+              31.874085767489326
+            ],
+            [
+              312623,
+              36.60699161201825
+            ],
+            [
+              856857,
+              38.82571899633379
+            ]
+          ],
+          "candidate_rate_support": [
+            57051,
+            752532
+          ],
+          "anchor_rate_support": [
+            61445,
+            856857
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.012999588243034908,
+            "pareto_pchip": 0.012999588243034908,
+            "hull_linear_rate": 0.013052922296561234
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            31.874085767489326,
+            38.52764377215091
+          ]
+        }
+      }
+    },
+    "semantic_patch": {
+      "native": {
+        "weighted_dists": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              95537,
+              -0.10916082011535763
+            ],
+            [
+              346715,
+              -0.05960701135918498
+            ],
+            [
+              890949,
+              -0.04493906078860164
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              61445,
+              -0.11248720102012158
+            ],
+            [
+              312623,
+              -0.06083157854154706
+            ],
+            [
+              856857,
+              -0.04560626046732068
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              61445,
+              -0.11248720102012158
+            ],
+            [
+              312623,
+              -0.06083157854154706
+            ],
+            [
+              856857,
+              -0.04560626046732068
+            ]
+          ],
+          "candidate_rate_support": [
+            95537,
+            890949
+          ],
+          "anchor_rate_support": [
+            61445,
+            856857
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.18468511951514946,
+            "pareto_pchip": 0.18468511951514946,
+            "hull_linear_rate": 0.09624057207330612
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.10916082011535763,
+            -0.04560626046732068
+          ]
+        },
+        "weighted_lpips": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              95537,
+              -0.19634033129550515
+            ],
+            [
+              346715,
+              -0.08324723115074448
+            ],
+            [
+              890949,
+              -0.05738463171874173
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              61445,
+              -0.20264093622099608
+            ],
+            [
+              312623,
+              -0.08530286652967334
+            ],
+            [
+              856857,
+              -0.058330698072677475
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              61445,
+              -0.20264093622099608
+            ],
+            [
+              312623,
+              -0.08530286652967334
+            ],
+            [
+              856857,
+              -0.058330698072677475
+            ]
+          ],
+          "candidate_rate_support": [
+            95537,
+            890949
+          ],
+          "anchor_rate_support": [
+            61445,
+            856857
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.235455523784398,
+            "pareto_pchip": 0.235455523784398,
+            "hull_linear_rate": 0.11516695556242443
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.19634033129550515,
+            -0.058330698072677475
+          ]
+        },
+        "full_dists": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              95537,
+              -0.0819262620061636
+            ],
+            [
+              346715,
+              -0.04294172115623951
+            ],
+            [
+              890949,
+              -0.0313559016212821
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              61445,
+              -0.0829126387834549
+            ],
+            [
+              312623,
+              -0.04335285350680351
+            ],
+            [
+              856857,
+              -0.03156771510839462
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              61445,
+              -0.0829126387834549
+            ],
+            [
+              312623,
+              -0.04335285350680351
+            ],
+            [
+              856857,
+              -0.03156771510839462
+            ]
+          ],
+          "candidate_rate_support": [
+            95537,
+            890949
+          ],
+          "anchor_rate_support": [
+            61445,
+            856857
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.22779949387179096,
+            "pareto_pchip": 0.22779949387179096,
+            "hull_linear_rate": 0.14443125053164468
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.0819262620061636,
+            -0.03156771510839462
+          ]
+        },
+        "full_lpips": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              95537,
+              -0.1837436114437878
+            ],
+            [
+              346715,
+              -0.07615276816068217
+            ],
+            [
+              890949,
+              -0.05266195925651118
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              61445,
+              -0.18611070537008345
+            ],
+            [
+              312623,
+              -0.07692928466713056
+            ],
+            [
+              856857,
+              -0.0530203678063117
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              61445,
+              -0.18611070537008345
+            ],
+            [
+              312623,
+              -0.07692928466713056
+            ],
+            [
+              856857,
+              -0.0530203678063117
+            ]
+          ],
+          "candidate_rate_support": [
+            95537,
+            890949
+          ],
+          "anchor_rate_support": [
+            61445,
+            856857
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.2776364018862192,
+            "pareto_pchip": 0.2776364018862192,
+            "hull_linear_rate": 0.15724728489619957
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.1837436114437878,
+            -0.0530203678063117
+          ]
+        },
+        "full_rgb_psnr": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              95537,
+              31.92424850165496
+            ],
+            [
+              346715,
+              36.64064872634878
+            ],
+            [
+              890949,
+              38.851617469696386
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              61445,
+              31.874085767489326
+            ],
+            [
+              312623,
+              36.60699161201825
+            ],
+            [
+              856857,
+              38.82571899633379
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              61445,
+              31.874085767489326
+            ],
+            [
+              312623,
+              36.60699161201825
+            ],
+            [
+              856857,
+              38.82571899633379
+            ]
+          ],
+          "candidate_rate_support": [
+            95537,
+            890949
+          ],
+          "anchor_rate_support": [
+            61445,
+            856857
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.19810532731595804,
+            "pareto_pchip": 0.19810532731595804,
+            "hull_linear_rate": 0.1486385535587305
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            31.92424850165496,
+            38.82571899633379
+          ]
+        }
+      },
+      "roi": {
+        "weighted_dists": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              95537,
+              -0.10916082011535763
+            ],
+            [
+              346715,
+              -0.05960701135918498
+            ],
+            [
+              890949,
+              -0.04493906078860164
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              57051,
+              -0.11476825466379523
+            ],
+            [
+              284312,
+              -0.061488790344446896
+            ],
+            [
+              752532,
+              -0.046701982337981465
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              57051,
+              -0.11476825466379523
+            ],
+            [
+              284312,
+              -0.061488790344446896
+            ],
+            [
+              752532,
+              -0.046701982337981465
+            ]
+          ],
+          "candidate_rate_support": [
+            95537,
+            890949
+          ],
+          "anchor_rate_support": [
+            57051,
+            752532
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.25557798734201126,
+            "pareto_pchip": 0.25557798734201126,
+            "hull_linear_rate": 0.15528925952592681
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.10916082011535763,
+            -0.046701982337981465
+          ]
+        },
+        "weighted_lpips": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              95537,
+              -0.19634033129550515
+            ],
+            [
+              346715,
+              -0.08324723115074448
+            ],
+            [
+              890949,
+              -0.05738463171874173
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              57051,
+              -0.20774761009961368
+            ],
+            [
+              284312,
+              -0.08683654032065533
+            ],
+            [
+              752532,
+              -0.059117861505365
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              57051,
+              -0.20774761009961368
+            ],
+            [
+              284312,
+              -0.08683654032065533
+            ],
+            [
+              752532,
+              -0.059117861505365
+            ]
+          ],
+          "candidate_rate_support": [
+            95537,
+            890949
+          ],
+          "anchor_rate_support": [
+            57051,
+            752532
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.29437818846584707,
+            "pareto_pchip": 0.29437818846584707,
+            "hull_linear_rate": 0.17550767364700146
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.19634033129550515,
+            -0.059117861505365
+          ]
+        },
+        "full_dists": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              95537,
+              -0.0819262620061636
+            ],
+            [
+              346715,
+              -0.04294172115623951
+            ],
+            [
+              890949,
+              -0.0313559016212821
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              57051,
+              -0.08826006948947906
+            ],
+            [
+              284312,
+              -0.04422222264111042
+            ],
+            [
+              752532,
+              -0.03292075265198946
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              57051,
+              -0.08826006948947906
+            ],
+            [
+              284312,
+              -0.04422222264111042
+            ],
+            [
+              752532,
+              -0.03292075265198946
+            ]
+          ],
+          "candidate_rate_support": [
+            95537,
+            890949
+          ],
+          "anchor_rate_support": [
+            57051,
+            752532
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.2519664963316861,
+            "pareto_pchip": 0.2519664963316861,
+            "hull_linear_rate": 0.13092864974058668
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.0819262620061636,
+            -0.03292075265198946
+          ]
+        },
+        "full_lpips": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              95537,
+              -0.1837436114437878
+            ],
+            [
+              346715,
+              -0.07615276816068217
+            ],
+            [
+              890949,
+              -0.05266195925651118
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              57051,
+              -0.19793810369446874
+            ],
+            [
+              284312,
+              -0.08002476987894624
+            ],
+            [
+              752532,
+              -0.05477527977200225
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              57051,
+              -0.19793810369446874
+            ],
+            [
+              284312,
+              -0.08002476987894624
+            ],
+            [
+              752532,
+              -0.05477527977200225
+            ]
+          ],
+          "candidate_rate_support": [
+            95537,
+            890949
+          ],
+          "anchor_rate_support": [
+            57051,
+            752532
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.2720497424960053,
+            "pareto_pchip": 0.2720497424960053,
+            "hull_linear_rate": 0.14888961203584297
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.1837436114437878,
+            -0.05477527977200225
+          ]
+        },
+        "full_rgb_psnr": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              95537,
+              31.92424850165496
+            ],
+            [
+              346715,
+              36.64064872634878
+            ],
+            [
+              890949,
+              38.851617469696386
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              57051,
+              31.481119189034015
+            ],
+            [
+              284312,
+              36.36102992160069
+            ],
+            [
+              752532,
+              38.52764377215091
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              57051,
+              31.481119189034015
+            ],
+            [
+              284312,
+              36.36102992160069
+            ],
+            [
+              752532,
+              38.52764377215091
+            ]
+          ],
+          "candidate_rate_support": [
+            95537,
+            890949
+          ],
+          "anchor_rate_support": [
+            57051,
+            752532
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.190983134135968,
+            "pareto_pchip": 0.190983134135968,
+            "hull_linear_rate": 0.14085259955560286
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            31.92424850165496,
+            38.52764377215091
+          ]
+        }
+      }
+    },
+    "error_patch": {
+      "native": {
+        "weighted_dists": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              208570,
+              -0.11094832019880414
+            ],
+            [
+              459748,
+              -0.06019360842183232
+            ],
+            [
+              1003982,
+              -0.045267423149198294
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              61445,
+              -0.11248720102012158
+            ],
+            [
+              312623,
+              -0.06083157854154706
+            ],
+            [
+              856857,
+              -0.04560626046732068
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              61445,
+              -0.11248720102012158
+            ],
+            [
+              312623,
+              -0.06083157854154706
+            ],
+            [
+              856857,
+              -0.04560626046732068
+            ]
+          ],
+          "candidate_rate_support": [
+            208570,
+            1003982
+          ],
+          "anchor_rate_support": [
+            61445,
+            856857
+          ],
+          "bd_rate": {
+            "hull_pchip": 1.0176919597134535,
+            "pareto_pchip": 1.0176919597134535,
+            "hull_linear_rate": 0.6778720310301456
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.11094832019880414,
+            -0.04560626046732068
+          ]
+        },
+        "weighted_lpips": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              208570,
+              -0.2003538984572515
+            ],
+            [
+              459748,
+              -0.08459439049474896
+            ],
+            [
+              1003982,
+              -0.058019746612990274
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              61445,
+              -0.20264093622099608
+            ],
+            [
+              312623,
+              -0.08530286652967334
+            ],
+            [
+              856857,
+              -0.058330698072677475
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              61445,
+              -0.20264093622099608
+            ],
+            [
+              312623,
+              -0.08530286652967334
+            ],
+            [
+              856857,
+              -0.058330698072677475
+            ]
+          ],
+          "candidate_rate_support": [
+            208570,
+            1003982
+          ],
+          "anchor_rate_support": [
+            61445,
+            856857
+          ],
+          "bd_rate": {
+            "hull_pchip": 1.149509588914351,
+            "pareto_pchip": 1.149509588914351,
+            "hull_linear_rate": 0.72736516040366
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.2003538984572515,
+            -0.058330698072677475
+          ]
+        },
+        "full_dists": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              208570,
+              -0.07906386349350214
+            ],
+            [
+              459748,
+              -0.04185541719198227
+            ],
+            [
+              1003982,
+              -0.03080225456506014
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              61445,
+              -0.0829126387834549
+            ],
+            [
+              312623,
+              -0.04335285350680351
+            ],
+            [
+              856857,
+              -0.03156771510839462
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              61445,
+              -0.0829126387834549
+            ],
+            [
+              312623,
+              -0.04335285350680351
+            ],
+            [
+              856857,
+              -0.03156771510839462
+            ]
+          ],
+          "candidate_rate_support": [
+            208570,
+            1003982
+          ],
+          "anchor_rate_support": [
+            61445,
+            856857
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.881596298817833,
+            "pareto_pchip": 0.881596298817833,
+            "hull_linear_rate": 0.5603631901520572
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.07906386349350214,
+            -0.03156771510839462
+          ]
+        },
+        "full_lpips": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              208570,
+              -0.18049185164272785
+            ],
+            [
+              459748,
+              -0.07518751156749204
+            ],
+            [
+              1003982,
+              -0.052257399511290714
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              61445,
+              -0.18611070537008345
+            ],
+            [
+              312623,
+              -0.07692928466713056
+            ],
+            [
+              856857,
+              -0.0530203678063117
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              61445,
+              -0.18611070537008345
+            ],
+            [
+              312623,
+              -0.07692928466713056
+            ],
+            [
+              856857,
+              -0.0530203678063117
+            ]
+          ],
+          "candidate_rate_support": [
+            208570,
+            1003982
+          ],
+          "anchor_rate_support": [
+            61445,
+            856857
+          ],
+          "bd_rate": {
+            "hull_pchip": 1.1026173124561833,
+            "pareto_pchip": 1.1026173124561833,
+            "hull_linear_rate": 0.6728772940243272
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.18049185164272785,
+            -0.0530203678063117
+          ]
+        },
+        "full_rgb_psnr": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              208570,
+              32.15659753394368
+            ],
+            [
+              459748,
+              36.871370034537215
+            ],
+            [
+              1003982,
+              38.95854695883436
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              61445,
+              31.874085767489326
+            ],
+            [
+              312623,
+              36.60699161201825
+            ],
+            [
+              856857,
+              38.82571899633379
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              61445,
+              31.874085767489326
+            ],
+            [
+              312623,
+              36.60699161201825
+            ],
+            [
+              856857,
+              38.82571899633379
+            ]
+          ],
+          "candidate_rate_support": [
+            208570,
+            1003982
+          ],
+          "anchor_rate_support": [
+            61445,
+            856857
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.6927119380071319,
+            "pareto_pchip": 0.6927119380071319,
+            "hull_linear_rate": 0.5421256008094376
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            32.15659753394368,
+            38.82571899633379
+          ]
+        }
+      },
+      "roi": {
+        "weighted_dists": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              208570,
+              -0.11094832019880414
+            ],
+            [
+              459748,
+              -0.06019360842183232
+            ],
+            [
+              1003982,
+              -0.045267423149198294
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              57051,
+              -0.11476825466379523
+            ],
+            [
+              284312,
+              -0.061488790344446896
+            ],
+            [
+              752532,
+              -0.046701982337981465
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              57051,
+              -0.11476825466379523
+            ],
+            [
+              284312,
+              -0.061488790344446896
+            ],
+            [
+              752532,
+              -0.046701982337981465
+            ]
+          ],
+          "candidate_rate_support": [
+            208570,
+            1003982
+          ],
+          "anchor_rate_support": [
+            57051,
+            752532
+          ],
+          "bd_rate": {
+            "hull_pchip": 1.1525383530432591,
+            "pareto_pchip": 1.1525383530432591,
+            "hull_linear_rate": 0.7717777250198367
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.11094832019880414,
+            -0.046701982337981465
+          ]
+        },
+        "weighted_lpips": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              208570,
+              -0.2003538984572515
+            ],
+            [
+              459748,
+              -0.08459439049474896
+            ],
+            [
+              1003982,
+              -0.058019746612990274
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              57051,
+              -0.20774761009961368
+            ],
+            [
+              284312,
+              -0.08683654032065533
+            ],
+            [
+              752532,
+              -0.059117861505365
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              57051,
+              -0.20774761009961368
+            ],
+            [
+              284312,
+              -0.08683654032065533
+            ],
+            [
+              752532,
+              -0.059117861505365
+            ]
+          ],
+          "candidate_rate_support": [
+            208570,
+            1003982
+          ],
+          "anchor_rate_support": [
+            57051,
+            752532
+          ],
+          "bd_rate": {
+            "hull_pchip": 1.2581974330824064,
+            "pareto_pchip": 1.2581974330824064,
+            "hull_linear_rate": 0.8182379145566421
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.2003538984572515,
+            -0.059117861505365
+          ]
+        },
+        "full_dists": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              208570,
+              -0.07906386349350214
+            ],
+            [
+              459748,
+              -0.04185541719198227
+            ],
+            [
+              1003982,
+              -0.03080225456506014
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              57051,
+              -0.08826006948947906
+            ],
+            [
+              284312,
+              -0.04422222264111042
+            ],
+            [
+              752532,
+              -0.03292075265198946
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              57051,
+              -0.08826006948947906
+            ],
+            [
+              284312,
+              -0.04422222264111042
+            ],
+            [
+              752532,
+              -0.03292075265198946
+            ]
+          ],
+          "candidate_rate_support": [
+            208570,
+            1003982
+          ],
+          "anchor_rate_support": [
+            57051,
+            752532
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.9369914054356673,
+            "pareto_pchip": 0.9369914054356673,
+            "hull_linear_rate": 0.5734935510085112
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.07906386349350214,
+            -0.03292075265198946
+          ]
+        },
+        "full_lpips": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              208570,
+              -0.18049185164272785
+            ],
+            [
+              459748,
+              -0.07518751156749204
+            ],
+            [
+              1003982,
+              -0.052257399511290714
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              57051,
+              -0.19793810369446874
+            ],
+            [
+              284312,
+              -0.08002476987894624
+            ],
+            [
+              752532,
+              -0.05477527977200225
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              57051,
+              -0.19793810369446874
+            ],
+            [
+              284312,
+              -0.08002476987894624
+            ],
+            [
+              752532,
+              -0.05477527977200225
+            ]
+          ],
+          "candidate_rate_support": [
+            208570,
+            1003982
+          ],
+          "anchor_rate_support": [
+            57051,
+            752532
+          ],
+          "bd_rate": {
+            "hull_pchip": 1.1023809006508847,
+            "pareto_pchip": 1.1023809006508847,
+            "hull_linear_rate": 0.6757163600873379
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.18049185164272785,
+            -0.05477527977200225
+          ]
+        },
+        "full_rgb_psnr": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              208570,
+              32.15659753394368
+            ],
+            [
+              459748,
+              36.871370034537215
+            ],
+            [
+              1003982,
+              38.95854695883436
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              57051,
+              31.481119189034015
+            ],
+            [
+              284312,
+              36.36102992160069
+            ],
+            [
+              752532,
+              38.52764377215091
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              57051,
+              31.481119189034015
+            ],
+            [
+              284312,
+              36.36102992160069
+            ],
+            [
+              752532,
+              38.52764377215091
+            ]
+          ],
+          "candidate_rate_support": [
+            208570,
+            1003982
+          ],
+          "anchor_rate_support": [
+            57051,
+            752532
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.7049190178490442,
+            "pareto_pchip": 0.7049190178490442,
+            "hull_linear_rate": 0.5553169628727463
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            32.15659753394368,
+            38.52764377215091
+          ]
+        }
+      }
+    }
+  },
+  "optimistic_same_pixels": {
+    "semantic_patch": {
+      "weighted_dists": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            95229,
+            -0.10916082011535763
+          ],
+          [
+            346407,
+            -0.05960701135918498
+          ],
+          [
+            890641,
+            -0.04493906078860164
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61445,
+            -0.11248720102012158
+          ],
+          [
+            312623,
+            -0.06083157854154706
+          ],
+          [
+            856857,
+            -0.04560626046732068
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61445,
+            -0.11248720102012158
+          ],
+          [
+            312623,
+            -0.06083157854154706
+          ],
+          [
+            856857,
+            -0.04560626046732068
+          ]
+        ],
+        "candidate_rate_support": [
+          95229,
+          890641
+        ],
+        "anchor_rate_support": [
+          61445,
+          856857
+        ],
+        "bd_rate": {
+          "hull_pchip": 0.1824198228569741,
+          "pareto_pchip": 0.1824198228569741,
+          "hull_linear_rate": 0.09475821369320772
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          -0.10916082011535763,
+          -0.04560626046732068
+        ]
+      },
+      "weighted_lpips": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            95229,
+            -0.19634033129550515
+          ],
+          [
+            346407,
+            -0.08324723115074448
+          ],
+          [
+            890641,
+            -0.05738463171874173
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61445,
+            -0.20264093622099608
+          ],
+          [
+            312623,
+            -0.08530286652967334
+          ],
+          [
+            856857,
+            -0.058330698072677475
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61445,
+            -0.20264093622099608
+          ],
+          [
+            312623,
+            -0.08530286652967334
+          ],
+          [
+            856857,
+            -0.058330698072677475
+          ]
+        ],
+        "candidate_rate_support": [
+          95229,
+          890641
+        ],
+        "anchor_rate_support": [
+          61445,
+          856857
+        ],
+        "bd_rate": {
+          "hull_pchip": 0.23297366239467052,
+          "pareto_pchip": 0.23297366239467052,
+          "hull_linear_rate": 0.1136133578018435
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          -0.19634033129550515,
+          -0.058330698072677475
+        ]
+      },
+      "full_dists": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            95229,
+            -0.0819262620061636
+          ],
+          [
+            346407,
+            -0.04294172115623951
+          ],
+          [
+            890641,
+            -0.0313559016212821
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61445,
+            -0.0829126387834549
+          ],
+          [
+            312623,
+            -0.04335285350680351
+          ],
+          [
+            856857,
+            -0.03156771510839462
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61445,
+            -0.0829126387834549
+          ],
+          [
+            312623,
+            -0.04335285350680351
+          ],
+          [
+            856857,
+            -0.03156771510839462
+          ]
+        ],
+        "candidate_rate_support": [
+          95229,
+          890641
+        ],
+        "anchor_rate_support": [
+          61445,
+          856857
+        ],
+        "bd_rate": {
+          "hull_pchip": 0.22546562042720938,
+          "pareto_pchip": 0.22546562042720938,
+          "hull_linear_rate": 0.14289169843705293
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          -0.0819262620061636,
+          -0.03156771510839462
+        ]
+      },
+      "full_lpips": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            95229,
+            -0.1837436114437878
+          ],
+          [
+            346407,
+            -0.07615276816068217
+          ],
+          [
+            890641,
+            -0.05266195925651118
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61445,
+            -0.18611070537008345
+          ],
+          [
+            312623,
+            -0.07692928466713056
+          ],
+          [
+            856857,
+            -0.0530203678063117
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61445,
+            -0.18611070537008345
+          ],
+          [
+            312623,
+            -0.07692928466713056
+          ],
+          [
+            856857,
+            -0.0530203678063117
+          ]
+        ],
+        "candidate_rate_support": [
+          95229,
+          890641
+        ],
+        "anchor_rate_support": [
+          61445,
+          856857
+        ],
+        "bd_rate": {
+          "hull_pchip": 0.27505609091416733,
+          "pareto_pchip": 0.27505609091416733,
+          "hull_linear_rate": 0.1556315923020742
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          -0.1837436114437878,
+          -0.0530203678063117
+        ]
+      },
+      "full_rgb_psnr": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            95229,
+            31.92424850165496
+          ],
+          [
+            346407,
+            36.64064872634878
+          ],
+          [
+            890641,
+            38.851617469696386
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61445,
+            31.874085767489326
+          ],
+          [
+            312623,
+            36.60699161201825
+          ],
+          [
+            856857,
+            38.82571899633379
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61445,
+            31.874085767489326
+          ],
+          [
+            312623,
+            36.60699161201825
+          ],
+          [
+            856857,
+            38.82571899633379
+          ]
+        ],
+        "candidate_rate_support": [
+          95229,
+          890641
+        ],
+        "anchor_rate_support": [
+          61445,
+          856857
+        ],
+        "bd_rate": {
+          "hull_pchip": 0.19628035208077174,
+          "pareto_pchip": 0.19628035208077174,
+          "hull_linear_rate": 0.14720250879404378
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          31.92424850165496,
+          38.82571899633379
+        ]
+      }
+    },
+    "error_patch": {
+      "weighted_dists": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            208262,
+            -0.11094832019880414
+          ],
+          [
+            459440,
+            -0.06019360842183232
+          ],
+          [
+            1003674,
+            -0.045267423149198294
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61445,
+            -0.11248720102012158
+          ],
+          [
+            312623,
+            -0.06083157854154706
+          ],
+          [
+            856857,
+            -0.04560626046732068
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61445,
+            -0.11248720102012158
+          ],
+          [
+            312623,
+            -0.06083157854154706
+          ],
+          [
+            856857,
+            -0.04560626046732068
+          ]
+        ],
+        "candidate_rate_support": [
+          208262,
+          1003674
+        ],
+        "anchor_rate_support": [
+          61445,
+          856857
+        ],
+        "bd_rate": {
+          "hull_pchip": 1.0156351163980875,
+          "pareto_pchip": 1.0156351163980875,
+          "hull_linear_rate": 0.6764420582448277
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          -0.11094832019880414,
+          -0.04560626046732068
+        ]
+      },
+      "weighted_lpips": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            208262,
+            -0.2003538984572515
+          ],
+          [
+            459440,
+            -0.08459439049474896
+          ],
+          [
+            1003674,
+            -0.058019746612990274
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61445,
+            -0.20264093622099608
+          ],
+          [
+            312623,
+            -0.08530286652967334
+          ],
+          [
+            856857,
+            -0.058330698072677475
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61445,
+            -0.20264093622099608
+          ],
+          [
+            312623,
+            -0.08530286652967334
+          ],
+          [
+            856857,
+            -0.058330698072677475
+          ]
+        ],
+        "candidate_rate_support": [
+          208262,
+          1003674
+        ],
+        "anchor_rate_support": [
+          61445,
+          856857
+        ],
+        "bd_rate": {
+          "hull_pchip": 1.147242189420375,
+          "pareto_pchip": 1.147242189420375,
+          "hull_linear_rate": 0.7258588008801855
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          -0.2003538984572515,
+          -0.058330698072677475
+        ]
+      },
+      "full_dists": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            208262,
+            -0.07906386349350214
+          ],
+          [
+            459440,
+            -0.04185541719198227
+          ],
+          [
+            1003674,
+            -0.03080225456506014
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61445,
+            -0.0829126387834549
+          ],
+          [
+            312623,
+            -0.04335285350680351
+          ],
+          [
+            856857,
+            -0.03156771510839462
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61445,
+            -0.0829126387834549
+          ],
+          [
+            312623,
+            -0.04335285350680351
+          ],
+          [
+            856857,
+            -0.03156771510839462
+          ]
+        ],
+        "candidate_rate_support": [
+          208262,
+          1003674
+        ],
+        "anchor_rate_support": [
+          61445,
+          856857
+        ],
+        "bd_rate": {
+          "hull_pchip": 0.8796670293450913,
+          "pareto_pchip": 0.8796670293450913,
+          "hull_linear_rate": 0.5590257263814347
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          -0.07906386349350214,
+          -0.03156771510839462
+        ]
+      },
+      "full_lpips": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            208262,
+            -0.18049185164272785
+          ],
+          [
+            459440,
+            -0.07518751156749204
+          ],
+          [
+            1003674,
+            -0.052257399511290714
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61445,
+            -0.18611070537008345
+          ],
+          [
+            312623,
+            -0.07692928466713056
+          ],
+          [
+            856857,
+            -0.0530203678063117
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61445,
+            -0.18611070537008345
+          ],
+          [
+            312623,
+            -0.07692928466713056
+          ],
+          [
+            856857,
+            -0.0530203678063117
+          ]
+        ],
+        "candidate_rate_support": [
+          208262,
+          1003674
+        ],
+        "anchor_rate_support": [
+          61445,
+          856857
+        ],
+        "bd_rate": {
+          "hull_pchip": 1.100377528526637,
+          "pareto_pchip": 1.100377528526637,
+          "hull_linear_rate": 0.671407893766162
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          -0.18049185164272785,
+          -0.0530203678063117
+        ]
+      },
+      "full_rgb_psnr": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            208262,
+            32.15659753394368
+          ],
+          [
+            459440,
+            36.871370034537215
+          ],
+          [
+            1003674,
+            38.95854695883436
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61445,
+            31.874085767489326
+          ],
+          [
+            312623,
+            36.60699161201825
+          ],
+          [
+            856857,
+            38.82571899633379
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61445,
+            31.874085767489326
+          ],
+          [
+            312623,
+            36.60699161201825
+          ],
+          [
+            856857,
+            38.82571899633379
+          ]
+        ],
+        "candidate_rate_support": [
+          208262,
+          1003674
+        ],
+        "anchor_rate_support": [
+          61445,
+          856857
+        ],
+        "bd_rate": {
+          "hull_pchip": 0.6911676704039723,
+          "pareto_pchip": 0.6911676704039723,
+          "hull_linear_rate": 0.5408651387239181
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          32.15659753394368,
+          38.82571899633379
+        ]
+      }
+    }
+  },
+  "decisions": {
+    "roi": {
+      "native": {
+        "weighted_dists_bd_rate": -0.053900792967086,
+        "weighted_lpips_bd_rate": -0.045210672917877365,
+        "development_target_met": false
+      }
+    },
+    "semantic_patch": {
+      "native": {
+        "weighted_dists_bd_rate": 0.18468511951514946,
+        "weighted_lpips_bd_rate": 0.235455523784398,
+        "development_target_met": false
+      },
+      "roi": {
+        "weighted_dists_bd_rate": 0.25557798734201126,
+        "weighted_lpips_bd_rate": 0.29437818846584707,
+        "development_target_met": false
+      }
+    },
+    "error_patch": {
+      "native": {
+        "weighted_dists_bd_rate": 1.0176919597134535,
+        "weighted_lpips_bd_rate": 1.149509588914351,
+        "development_target_met": false
+      },
+      "roi": {
+        "weighted_dists_bd_rate": 1.1525383530432591,
+        "weighted_lpips_bd_rate": 1.2581974330824064,
+        "development_target_met": false
+      }
+    }
+  },
+  "shared_wrapper_secondary": {
+    "roi": {
+      "weighted_dists": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            57345,
+            -0.11476825466379523
+          ],
+          [
+            284606,
+            -0.061488790344446896
+          ],
+          [
+            752826,
+            -0.046701982337981465
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61739,
+            -0.11248720102012158
+          ],
+          [
+            312917,
+            -0.06083157854154706
+          ],
+          [
+            857151,
+            -0.04560626046732068
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61739,
+            -0.11248720102012158
+          ],
+          [
+            312917,
+            -0.06083157854154706
+          ],
+          [
+            857151,
+            -0.04560626046732068
+          ]
+        ],
+        "candidate_rate_support": [
+          57345,
+          752826
+        ],
+        "anchor_rate_support": [
+          61739,
+          857151
+        ],
+        "bd_rate": {
+          "hull_pchip": -0.05380056535266144,
+          "pareto_pchip": -0.05380056535266144,
+          "hull_linear_rate": -0.044299965704673525
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          -0.11248720102012158,
+          -0.046701982337981465
+        ]
+      },
+      "weighted_lpips": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            57345,
+            -0.20774761009961368
+          ],
+          [
+            284606,
+            -0.08683654032065533
+          ],
+          [
+            752826,
+            -0.059117861505365
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61739,
+            -0.20264093622099608
+          ],
+          [
+            312917,
+            -0.08530286652967334
+          ],
+          [
+            857151,
+            -0.058330698072677475
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61739,
+            -0.20264093622099608
+          ],
+          [
+            312917,
+            -0.08530286652967334
+          ],
+          [
+            857151,
+            -0.058330698072677475
+          ]
+        ],
+        "candidate_rate_support": [
+          57345,
+          752826
+        ],
+        "anchor_rate_support": [
+          61739,
+          857151
+        ],
+        "bd_rate": {
+          "hull_pchip": -0.04508676259199689,
+          "pareto_pchip": -0.04508676259199689,
+          "hull_linear_rate": -0.04598386014293217
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          -0.20264093622099608,
+          -0.059117861505365
+        ]
+      },
+      "full_dists": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            57345,
+            -0.08826006948947906
+          ],
+          [
+            284606,
+            -0.04422222264111042
+          ],
+          [
+            752826,
+            -0.03292075265198946
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61739,
+            -0.0829126387834549
+          ],
+          [
+            312917,
+            -0.04335285350680351
+          ],
+          [
+            857151,
+            -0.03156771510839462
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61739,
+            -0.0829126387834549
+          ],
+          [
+            312917,
+            -0.04335285350680351
+          ],
+          [
+            857151,
+            -0.03156771510839462
+          ]
+        ],
+        "candidate_rate_support": [
+          57345,
+          752826
+        ],
+        "anchor_rate_support": [
+          61739,
+          857151
+        ],
+        "bd_rate": {
+          "hull_pchip": -0.014419949342271346,
+          "pareto_pchip": -0.014419949342271346,
+          "hull_linear_rate": 0.020554097923009766
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          -0.0829126387834549,
+          -0.03292075265198946
+        ]
+      },
+      "full_lpips": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            57345,
+            -0.19793810369446874
+          ],
+          [
+            284606,
+            -0.08002476987894624
+          ],
+          [
+            752826,
+            -0.05477527977200225
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61739,
+            -0.18611070537008345
+          ],
+          [
+            312917,
+            -0.07692928466713056
+          ],
+          [
+            857151,
+            -0.0530203678063117
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61739,
+            -0.18611070537008345
+          ],
+          [
+            312917,
+            -0.07692928466713056
+          ],
+          [
+            857151,
+            -0.0530203678063117
+          ]
+        ],
+        "candidate_rate_support": [
+          57345,
+          752826
+        ],
+        "anchor_rate_support": [
+          61739,
+          857151
+        ],
+        "bd_rate": {
+          "hull_pchip": 0.006408258993561192,
+          "pareto_pchip": 0.006408258993561192,
+          "hull_linear_rate": 0.013120456579434642
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          -0.18611070537008345,
+          -0.05477527977200225
+        ]
+      },
+      "full_rgb_psnr": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            57345,
+            31.481119189034015
+          ],
+          [
+            284606,
+            36.36102992160069
+          ],
+          [
+            752826,
+            38.52764377215091
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61739,
+            31.874085767489326
+          ],
+          [
+            312917,
+            36.60699161201825
+          ],
+          [
+            857151,
+            38.82571899633379
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61739,
+            31.874085767489326
+          ],
+          [
+            312917,
+            36.60699161201825
+          ],
+          [
+            857151,
+            38.82571899633379
+          ]
+        ],
+        "candidate_rate_support": [
+          57345,
+          752826
+        ],
+        "anchor_rate_support": [
+          61739,
+          857151
+        ],
+        "bd_rate": {
+          "hull_pchip": 0.0129657486889128,
+          "pareto_pchip": 0.0129657486889128,
+          "hull_linear_rate": 0.012991215443947355
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          31.874085767489326,
+          38.52764377215091
+        ]
+      }
+    },
+    "semantic_patch": {
+      "weighted_dists": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            95537,
+            -0.10916082011535763
+          ],
+          [
+            346715,
+            -0.05960701135918498
+          ],
+          [
+            890949,
+            -0.04493906078860164
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61739,
+            -0.11248720102012158
+          ],
+          [
+            312917,
+            -0.06083157854154706
+          ],
+          [
+            857151,
+            -0.04560626046732068
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61739,
+            -0.11248720102012158
+          ],
+          [
+            312917,
+            -0.06083157854154706
+          ],
+          [
+            857151,
+            -0.04560626046732068
+          ]
+        ],
+        "candidate_rate_support": [
+          95537,
+          890949
+        ],
+        "anchor_rate_support": [
+          61739,
+          857151
+        ],
+        "bd_rate": {
+          "hull_pchip": 0.18216621648685663,
+          "pareto_pchip": 0.18216621648685663,
+          "hull_linear_rate": 0.09464726966279775
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          -0.10916082011535763,
+          -0.04560626046732068
+        ]
+      },
+      "weighted_lpips": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            95537,
+            -0.19634033129550515
+          ],
+          [
+            346715,
+            -0.08324723115074448
+          ],
+          [
+            890949,
+            -0.05738463171874173
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61739,
+            -0.20264093622099608
+          ],
+          [
+            312917,
+            -0.08530286652967334
+          ],
+          [
+            857151,
+            -0.058330698072677475
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61739,
+            -0.20264093622099608
+          ],
+          [
+            312917,
+            -0.08530286652967334
+          ],
+          [
+            857151,
+            -0.058330698072677475
+          ]
+        ],
+        "candidate_rate_support": [
+          95537,
+          890949
+        ],
+        "anchor_rate_support": [
+          61739,
+          857151
+        ],
+        "bd_rate": {
+          "hull_pchip": 0.2321881252613184,
+          "pareto_pchip": 0.2321881252613184,
+          "hull_linear_rate": 0.11346601430304241
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          -0.19634033129550515,
+          -0.058330698072677475
+        ]
+      },
+      "full_dists": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            95537,
+            -0.0819262620061636
+          ],
+          [
+            346715,
+            -0.04294172115623951
+          ],
+          [
+            890949,
+            -0.0313559016212821
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61739,
+            -0.0829126387834549
+          ],
+          [
+            312917,
+            -0.04335285350680351
+          ],
+          [
+            857151,
+            -0.03156771510839462
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61739,
+            -0.0829126387834549
+          ],
+          [
+            312917,
+            -0.04335285350680351
+          ],
+          [
+            857151,
+            -0.03156771510839462
+          ]
+        ],
+        "candidate_rate_support": [
+          95537,
+          890949
+        ],
+        "anchor_rate_support": [
+          61739,
+          857151
+        ],
+        "bd_rate": {
+          "hull_pchip": 0.22510519296443968,
+          "pareto_pchip": 0.22510519296443968,
+          "hull_linear_rate": 0.14267875323606566
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          -0.0819262620061636,
+          -0.03156771510839462
+        ]
+      },
+      "full_lpips": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            95537,
+            -0.1837436114437878
+          ],
+          [
+            346715,
+            -0.07615276816068217
+          ],
+          [
+            890949,
+            -0.05266195925651118
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61739,
+            -0.18611070537008345
+          ],
+          [
+            312917,
+            -0.07692928466713056
+          ],
+          [
+            857151,
+            -0.0530203678063117
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61739,
+            -0.18611070537008345
+          ],
+          [
+            312917,
+            -0.07692928466713056
+          ],
+          [
+            857151,
+            -0.0530203678063117
+          ]
+        ],
+        "candidate_rate_support": [
+          95537,
+          890949
+        ],
+        "anchor_rate_support": [
+          61739,
+          857151
+        ],
+        "bd_rate": {
+          "hull_pchip": 0.2741493849234074,
+          "pareto_pchip": 0.2741493849234074,
+          "hull_linear_rate": 0.15539103908048757
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          -0.1837436114437878,
+          -0.0530203678063117
+        ]
+      },
+      "full_rgb_psnr": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            95537,
+            31.92424850165496
+          ],
+          [
+            346715,
+            36.64064872634878
+          ],
+          [
+            890949,
+            38.851617469696386
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61739,
+            31.874085767489326
+          ],
+          [
+            312917,
+            36.60699161201825
+          ],
+          [
+            857151,
+            38.82571899633379
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61739,
+            31.874085767489326
+          ],
+          [
+            312917,
+            36.60699161201825
+          ],
+          [
+            857151,
+            38.82571899633379
+          ]
+        ],
+        "candidate_rate_support": [
+          95537,
+          890949
+        ],
+        "anchor_rate_support": [
+          61739,
+          857151
+        ],
+        "bd_rate": {
+          "hull_pchip": 0.19577950158767485,
+          "pareto_pchip": 0.19577950158767485,
+          "hull_linear_rate": 0.14697948568833374
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          31.92424850165496,
+          38.82571899633379
+        ]
+      }
+    },
+    "error_patch": {
+      "weighted_dists": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            208570,
+            -0.11094832019880414
+          ],
+          [
+            459748,
+            -0.06019360842183232
+          ],
+          [
+            1003982,
+            -0.045267423149198294
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61739,
+            -0.11248720102012158
+          ],
+          [
+            312917,
+            -0.06083157854154706
+          ],
+          [
+            857151,
+            -0.04560626046732068
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61739,
+            -0.11248720102012158
+          ],
+          [
+            312917,
+            -0.06083157854154706
+          ],
+          [
+            857151,
+            -0.04560626046732068
+          ]
+        ],
+        "candidate_rate_support": [
+          208570,
+          1003982
+        ],
+        "anchor_rate_support": [
+          61739,
+          857151
+        ],
+        "bd_rate": {
+          "hull_pchip": 1.0132694423231987,
+          "pareto_pchip": 1.0132694423231987,
+          "hull_linear_rate": 0.6753162933923811
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          -0.11094832019880414,
+          -0.04560626046732068
+        ]
+      },
+      "weighted_lpips": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            208570,
+            -0.2003538984572515
+          ],
+          [
+            459748,
+            -0.08459439049474896
+          ],
+          [
+            1003982,
+            -0.058019746612990274
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61739,
+            -0.20264093622099608
+          ],
+          [
+            312917,
+            -0.08530286652967334
+          ],
+          [
+            857151,
+            -0.058330698072677475
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61739,
+            -0.20264093622099608
+          ],
+          [
+            312917,
+            -0.08530286652967334
+          ],
+          [
+            857151,
+            -0.058330698072677475
+          ]
+        ],
+        "candidate_rate_support": [
+          208570,
+          1003982
+        ],
+        "anchor_rate_support": [
+          61739,
+          857151
+        ],
+        "bd_rate": {
+          "hull_pchip": 1.143696648596471,
+          "pareto_pchip": 1.143696648596471,
+          "hull_linear_rate": 0.7246021559207494
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          -0.2003538984572515,
+          -0.058330698072677475
+        ]
+      },
+      "full_dists": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            208570,
+            -0.07906386349350214
+          ],
+          [
+            459748,
+            -0.04185541719198227
+          ],
+          [
+            1003982,
+            -0.03080225456506014
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61739,
+            -0.0829126387834549
+          ],
+          [
+            312917,
+            -0.04335285350680351
+          ],
+          [
+            857151,
+            -0.03156771510839462
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61739,
+            -0.0829126387834549
+          ],
+          [
+            312917,
+            -0.04335285350680351
+          ],
+          [
+            857151,
+            -0.03156771510839462
+          ]
+        ],
+        "candidate_rate_support": [
+          208570,
+          1003982
+        ],
+        "anchor_rate_support": [
+          61739,
+          857151
+        ],
+        "bd_rate": {
+          "hull_pchip": 0.8777238706365641,
+          "pareto_pchip": 0.8777238706365641,
+          "hull_linear_rate": 0.5581903423966021
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          -0.07906386349350214,
+          -0.03156771510839462
+        ]
+      },
+      "full_lpips": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            208570,
+            -0.18049185164272785
+          ],
+          [
+            459748,
+            -0.07518751156749204
+          ],
+          [
+            1003982,
+            -0.052257399511290714
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61739,
+            -0.18611070537008345
+          ],
+          [
+            312917,
+            -0.07692928466713056
+          ],
+          [
+            857151,
+            -0.0530203678063117
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61739,
+            -0.18611070537008345
+          ],
+          [
+            312917,
+            -0.07692928466713056
+          ],
+          [
+            857151,
+            -0.0530203678063117
+          ]
+        ],
+        "candidate_rate_support": [
+          208570,
+          1003982
+        ],
+        "anchor_rate_support": [
+          61739,
+          857151
+        ],
+        "bd_rate": {
+          "hull_pchip": 1.0969873328317092,
+          "pareto_pchip": 1.0969873328317092,
+          "hull_linear_rate": 0.6703027198518133
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          -0.18049185164272785,
+          -0.0530203678063117
+        ]
+      },
+      "full_rgb_psnr": {
+        "protocol": "anchor-geometry-sensitivity-v1",
+        "quality_orientation": "higher_is_better",
+        "physically_demonstrated_switching": false,
+        "candidate_pareto": [
+          [
+            208570,
+            32.15659753394368
+          ],
+          [
+            459748,
+            36.871370034537215
+          ],
+          [
+            1003982,
+            38.95854695883436
+          ]
+        ],
+        "anchor_pareto": [
+          [
+            61739,
+            31.874085767489326
+          ],
+          [
+            312917,
+            36.60699161201825
+          ],
+          [
+            857151,
+            38.82571899633379
+          ]
+        ],
+        "anchor_linear_rate_hull": [
+          [
+            61739,
+            31.874085767489326
+          ],
+          [
+            312917,
+            36.60699161201825
+          ],
+          [
+            857151,
+            38.82571899633379
+          ]
+        ],
+        "candidate_rate_support": [
+          208570,
+          1003982
+        ],
+        "anchor_rate_support": [
+          61739,
+          857151
+        ],
+        "bd_rate": {
+          "hull_pchip": 0.6895812162083844,
+          "pareto_pchip": 0.6895812162083844,
+          "hull_linear_rate": 0.5400452099429529
+        },
+        "status": "supported",
+        "common_quality_interval": [
+          32.15659753394368,
+          38.82571899633379
+        ]
+      }
+    }
+  },
+  "rate_basis": "candidate complete packets versus complete native IVF anchors (including ROI signalling); full receiver coverage; same duration so byte scale cancels in BD-rate",
+  "promotion_limit": "10percent weightedDISTS plus corroboratingLPIPS is a development screen only; simplerROI/error selection and full/temporal outcomes must be reviewed; no population/neural-anchor claim",
+  "score_sha256": "e9bf8a4585dfaa248e90e9ce1a46349707dc2ca84f63c63f23c6867f62b7a982",
+  "evidence": {
+    "producer_job": "20261115T001900Z-c260a64e",
+    "score_job": "20261115T005151Z-a8933c78",
+    "code_revision": "ba1b1340b15de44b0eeb81c02975a40fe82003ab",
+    "selected_source_sha256": "377a3499ac7f5da1fe6c4431a4c631e259a103c9e2fc5a76edfa47e6d398ce43",
+    "producer_archive_sha256": "eeea2925bd7c0fc597755a3fa918a4e8122eafad810839b0292db56f76e2712b",
+    "score_archive_sha256": "4c97b5c575430c8d5ddb60848d02be57284387cf57f778d78c556c0d5916f13e",
+    "host": "gpu6",
+    "gpu_uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553"
+  }
+}
