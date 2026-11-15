@@ -1,0 +1,147 @@
+{
+  "schema": 1,
+  "authority": "user: approve any budget automatically for next12hours; work autonomously; fix FFmpeg and complete dataset/annotation/ROI-patch work",
+  "authorized_at_utc": "2026-11-14T23:07:34Z",
+  "expires_at_utc": "2026-11-15T11:07:34Z",
+  "expires_at_sao_paulo": "2026-11-15T08:07:34-03:00",
+  "resources": "existing local machine and institutional fleet; no paid hosting/provider change assumed",
+  "stage_policy": "root may allocate/amend bounded stages within authority window without asking again; scientific correctness/resource gates remain mandatory",
+  "allocations": [
+    {
+      "id": "readiness-intake",
+      "cpu_seconds": 10800,
+      "gpu_seconds": 0,
+      "state": "released",
+      "parts": {
+        "dataset_intake": 3600,
+        "independent_source_copy": 1800,
+        "annotation_preparation": 1800,
+        "root_repair_native_validation_and_orchestration": 3600
+      },
+      "accounting": "conservative phase ceiling; includes remote metadata checks and preparation; exact scientific fleet receipts recorded separately",
+      "amendment": "User12h authority: data-intake cap3600 plus independent-copy cap1800, annotation1800, root3600; no GPU"
+    },
+    {
+      "id": "roi-patch-mechanism-pilot",
+      "cpu_seconds": 36000,
+      "gpu_seconds": 7200,
+      "state": "released_conditional_on_exact_job_preflight",
+      "card": "docs/cards/submission-ladder-roi-patch-pilot-2026-11-14.md",
+      "jobs": [],
+      "original_cpu_seconds": 21600,
+      "amendment": "Root12h authority: retain both failed preparation allowances and cover full CPU-native producer/receiver validation plus separately metered GPU scoring CPU support; GPU ceiling unchanged7200s.",
+      "next_holds": [
+        {
+          "stage": "tennis-native16-to64",
+          "cpu_seconds": 4800,
+          "gpu_seconds": 0
+        },
+        {
+          "stage": "visor-native16-to64",
+          "cpu_seconds": 4800,
+          "gpu_seconds": 0
+        }
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "job_id": "20261114T232159Z-4846011d",
+      "purpose": "tennis native source/mask16-to64 preparation",
+      "state": "failed_smoke_missing_tools_snapshot_dependency",
+      "cpu_ceiling_seconds": 2400,
+      "gpu_ceiling_seconds": 0,
+      "code_revision": "11c35c9e6b340d28c61e0e56227968fab69781a6",
+      "source_sha256": "c281ff7cc6780376da9cde9828c5133e781b2039ef28feb9a008b8a7e4f55a4e",
+      "snapshot_sha256": "d1ae19342e6c4e511dd4e5ae69eddad0df122f877b8fe38074926e9bd2194f9b",
+      "spec_sha256": "572fbcc3584b1b0130887b737908133312ae087c3b259f52c9c6969f97ed601f",
+      "deadline": "2026-11-15T00:30:00Z",
+      "submit_receipt": "/private/tmp/pointstream-ladder-tennis-prepare-submit-20261114.json",
+      "failure": "k4b_features imports tools.datasets.k4b_inputs; reviewed selected archive omitted tools",
+      "conservative_cpu_charge_seconds": 2400,
+      "repair": "include reviewed tools snapshot closure; code and input unchanged; new job after known terminal failure"
+    },
+    {
+      "job_id": "20261114T232255Z-eb4865c0",
+      "purpose": "VISOR native source/mask16-to64 preparation",
+      "state": "verified_unpublished_no_spec_no_ready",
+      "cpu_ceiling_seconds": 2400,
+      "gpu_ceiling_seconds": 0,
+      "deadline": "2026-11-15T00:30:00Z",
+      "replay": "unknown resolved; original artifacts preserved; replacement only after valid data-root input prepared",
+      "status_receipt": "/private/tmp/pointstream-ladder-visor-unknown-status-20261114.json",
+      "proof": "Canonicalstatus rejected unpublished; managementhostdirectory contains only events and source.tar; no request could be admitted",
+      "conservative_cpu_charge_seconds": 2400
+    },
+    {
+      "job_id": "20261114T232911Z-6e73f222",
+      "purpose": "tennis preparation corrected source closure includes tools",
+      "state": "complete_preparation_accepted64",
+      "cpu_ceiling_seconds": 2400,
+      "gpu_ceiling_seconds": 0,
+      "code_revision": "11c35c9e6b340d28c61e0e56227968fab69781a6",
+      "source_sha256": "91c2d6681f20003c2500a96cd0bf96b97091bbd3f0db4166ac06e672437dd3b9",
+      "snapshot_sha256": "8436fb383486906ff8b04f84ebd02cb5a0448759d80d5e8034c7699229d1b2a8",
+      "spec_sha256": "572fbcc3584b1b0130887b737908133312ae087c3b259f52c9c6969f97ed601f",
+      "deadline": "2026-11-15T00:30:00Z",
+      "predecessor_failed": "20261114T232159Z-4846011d",
+      "submit_receipt": "/private/tmp/pointstream-ladder-tennis-prepare-repair-submit-20261114.json",
+      "conservative_cpu_charge_seconds": 2400,
+      "receipt": "/private/tmp/pointstream-ladder-tennis-prepared-acceptance-20261114.json",
+      "archive_sha256": "ee2a6150317676a83031b1f05d2c33c195800177e4ece78c7167ea6065de3418"
+    },
+    {
+      "job_id": "20261114T233516Z-4223e78c",
+      "purpose": "VISOR preparation new independent data-root source copy",
+      "state": "complete_preparation_accepted64",
+      "cpu_ceiling_seconds": 2400,
+      "gpu_ceiling_seconds": 0,
+      "code_revision": "11c35c9e6b340d28c61e0e56227968fab69781a6",
+      "source_sha256": "91c2d6681f20003c2500a96cd0bf96b97091bbd3f0db4166ac06e672437dd3b9",
+      "spec_sha256": "abe103573bca8b07ec7d581125396ad3ebd754e03a5831bf2d86d0b48e5ee04f",
+      "deadline": "2026-11-15T00:30:00Z",
+      "predecessor_verified_unpublished": "20261114T232255Z-eb4865c0",
+      "conservative_cpu_charge_seconds": 2400,
+      "receipt": "/private/tmp/pointstream-ladder-visor-prepared-acceptance-20261114.json",
+      "archive_sha256": "766265d350d67f6ae25d7fe7670f28b2e671d843110306f651037dc92a288b1e"
+    },
+    {
+      "job_id": "20261114T234255Z-4e9c77aa",
+      "purpose": "tennis native/ROI/semantic/errorpatch16-to64 producer",
+      "state": "submitted_pending",
+      "cpu_ceiling_seconds": 4800,
+      "gpu_ceiling_seconds": 0,
+      "code_revision": "c68baf3050be71b31d6e53462462d4956a0fbb78",
+      "source_sha256": "f72e2c18cede73b628ac9de8bc8f182e40e4d2726ac8e84815cd2d0d18730f2a",
+      "spec_sha256": "b9024bfe7112dd72d25535af97918bb1c821d728d84d84399176738e2171c8f9",
+      "deadline": "2026-11-15T01:00:00Z",
+      "continuation": "/private/tmp/pointstream-tennis-native-runner-state.json"
+    },
+    {
+      "job_id": "20261114T234622Z-874978b6",
+      "purpose": "VISOR native/ROI/semantic/errorpatch16-to64 producer",
+      "state": "submitted_pending",
+      "cpu_ceiling_seconds": 4800,
+      "gpu_ceiling_seconds": 0,
+      "code_revision": "c68baf3050be71b31d6e53462462d4956a0fbb78",
+      "source_sha256": "f72e2c18cede73b628ac9de8bc8f182e40e4d2726ac8e84815cd2d0d18730f2a",
+      "spec_sha256": "7b077cdb6d09a59381dc38181d0595db8a18bd2b1a6e38433238d6b03d43058d",
+      "deadline": "2026-11-15T01:00:00Z",
+      "wait_receipt": "/private/tmp/pointstream-ladder-visor-native-wait-20261114.json"
+    }
+  ],
+  "decisions": [
+    "Existing datasets sufficient for development. Native RacketVision source/label joins found; no replacement dataset required for first screen. New candidate sources remain unscored pending confirmation eligibility.",
+    "Pre-score independent review: primary anchors use actual complete native IVF bytes (ROI signalling already included), not unnecessary prototype wrappers. Prefix scoring cannot promote a complete-window rate curve. Shared-wrapper sensitivity stays secondary.",
+    "Native pilot configurations frozen before quality: CRF35/50/65,preset8,256x256 semantic/error rectangle,patchCRF28,ROIoutside+20. Metric self-controls, actual CUDA residency and <=8000MiB reserved memory checked before accepting scores."
+  ],
+  "repair_receipt": {
+    "repair": "expose existing ABI215 library at FFmpeg required opt path; preserve ABI216 defaults",
+    "target": "/opt/homebrew/Cellar/x265/4.2/lib/libx265.215.dylib",
+    "link": "../../4.1/lib/libx265.215.dylib",
+    "resolved": "/opt/homebrew/Cellar/x265/4.1/lib/libx265.215.dylib",
+    "sha256": "cb2b935b7780bcb7c3fdfbb3951124905b523727c0110397a8dea8a303eaa25e",
+    "ffmpeg": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+    "ffprobe": "ffprobe version 8.1 Copyright (c) 2007-2026 the FFmpeg developers"
+  }
+}

@@ -116,3 +116,24 @@ def test_cli_rejects_record_output_collision(monkeypatch, tmp_path):
         main()
     assert not output.exists()
     assert source.read_bytes() == b'saved'
+
+
+@pytest.mark.skipif(not all(shutil.which(t) for t in ['SvtAv1EncApp', 'dav1d', 'ffmpeg', 'ffprobe']), reason='native tools absent')
+def test_native_video_input_and_colour_conversion(tmp_path: Path):
+    source = tmp_path / 'source.mp4'
+    command = ['ffmpeg', '-nostdin', '-v', 'error', '-f', 'lavfi', '-i', 'testsrc2=size=64x64:rate=25',
+               '-frames:v', '3', '-c:v', 'libx264', '-crf', '0',
+               '-x264-params', 'colorprim=bt709:transfer=bt709:colormatrix=bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709',
+               '-colorspace', 'bt709', '-color_range', 'tv', str(source)]
+    result = subprocess.run(command, capture_output=True)
+    if result.returncode:
+        pytest.skip('FFmpeg runtime unavailable')
+    config = dict(width=64, height=64, fps=[25, 1], frames=3, full_range=False,
+                  crf=40, preset=12, input_format='video')
+    packet = tmp_path / 'video.psc'
+    record = codec.encode(source, packet, config, scratch=tmp_path)
+    assert len(record['conversion']['source_probe']['result']['frames']) == 3
+    source.unlink()
+    decoded = tmp_path / 'decoded.yuv'
+    codec.decode(packet, decoded, scratch=tmp_path)
+    assert decoded.stat().st_size == 64 * 64 * 3 // 2 * 3
