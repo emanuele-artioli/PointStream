@@ -1,0 +1,54 @@
+{
+  "affinity": [
+    2
+  ],
+  "allocation": {
+    "CPU_seconds": 900,
+    "GPU_seconds": 0,
+    "authority_end_UTC": "2026-11-15T11:07:34Z",
+    "budget_source": "primaryagentnew900CPUsourcepublicationgateunderuser12hauthority",
+    "previousseparateeligibilityaudit_CPU_seconds": 104.423683327
+  },
+  "execution": {
+    "archive_sha256": "e5edc12c857658a119bf6d6cbe029ee64c09d6a860f1b975fe0708952895293d",
+    "exit_code": 0,
+    "handle": 94335,
+    "host": "gpu1",
+    "independent_validator_exit_code": 0,
+    "independent_validator_handle": 51094,
+    "launched_UTC": "2026-11-15T06:26:53.740265+00:00",
+    "measured_remote_CPU_seconds": 4.362921704,
+    "no_fleet_or_GPU_job": true,
+    "preflight_receipt": "/private/tmp/pointstream-tennis-source-freeze-preflight-20261115.json",
+    "publication_index": "docs/experiments/submission-ladder-tennis-confirmation-source-publication-20261115.json",
+    "status": "complete_verified_readonly",
+    "stderr_log": "/private/tmp/pointstream-tennis-source-publication-stderr-20261115.log",
+    "stdout_receipt": "/private/tmp/pointstream-tennis-source-publication-receipt-20261115.json",
+    "timeout_seconds": 850
+  },
+  "execution_code_registered_before_execution": {
+    "CPUlimit_seconds": 850,
+    "independent_checks": [
+      "originalmemberSHA againstoriginalsidecar",
+      "completepublishedarchiveSHAreadback",
+      "everyarchivedmemberstreamedhashandbytes",
+      "archivedCSVwindowrows/countsrecomputed"
+    ],
+    "input_evidence_bundle_sha256": "ac11a4aa30c46624e90ef007cac7038e33aee2c33901840ba5d9f61c8920d58e",
+    "publisher_sha256": "c83ce69281de1bc5b2cd3f60eb76e9f72d02363bdc7b69344ab42a05b3e8c4f7",
+    "wall_deadline_seconds": 850
+  },
+  "freeze_manifest": {
+    "path": "docs/experiments/submission-ladder-tennis-confirmation-source-freeze-20261115.json",
+    "sha256": "df0dabf48b61ed3a096a9a6b4e54d823ca3b279c86d6a09e69ef0cd9bf2ceeb1"
+  },
+  "host": "gpu1",
+  "publication_directory": "/home/itec/emanuele/Datasets/pointstream-data/tennis/confirmation-source-20261115T062148Z-297a05e2",
+  "registered_before_execution_UTC": "2026-11-15T06:23:13.130691+00:00",
+  "schema": 1,
+  "scope": "archiveoriginal3MP4+officialCSV; receipts/nativePNGs/contact/provenance; noresize/codec/model/quality",
+  "scratch": "/local/users/emanuele/pointstream/checks/tennis-source-freeze-20261115T062148Z-297a05e2",
+  "stage": "immutable source-only3groupwindowfreezeandDataRootpublication",
+  "status": "registered_before_execution",
+  "stop": "CPU900/wall900orauthorityend; failclosedonanysource/member/hashmismatch; noreplayuncertainsubmission"
+}

@@ -140,7 +140,7 @@
       "id": "paid-tracked-pixel-profile",
       "cpu_seconds": 7500,
       "gpu_seconds": 0,
-      "state": "released_implementation_and_CPU_physical_then_receiver_denial_conditional",
+      "state": "closed_paid_functionality_and_scoped_benefit_original_receiver_failed_preserved",
       "card": "docs/cards/submission-ladder-paid-tracked-pixel-2026-11-15.md",
       "parts": {
         "tennis_three_paid_points_cpu": 1530,
@@ -151,13 +151,16 @@
       "hypothesis": "The actualcodedpixel oracle may retain its scoped advantage after every placement/profile/nativebyte is paid and a packet-only receiver reconstructs it.",
       "competing_explanation": "Oraclegainmayvanishunderpaidmetadata or hiddenencoder/sourcecache dependencies; exactframeparity+fullcost+source-denial address this.",
       "scoring_policy": "No newGPU if everyTennispaiddecodedRGBframe hashesidentical acceptedpixeloracle. Reuseonlyauthenticatedsamepixelmetricarrays withnewactualpacketprices; otherwise noqualitypromotion andseparatelybudgetrescore.",
-      "scope": "NewPTP1 rawYUV+explicitcontent-specificencoderhints\u2192native+trackedpixelpacket; RGB24receiver; nativefallbackfunctionalEGO. Not freshimagepredictorinference/real-time/unseenconfirmation."
+      "scope": "NewPTP1 rawYUV+explicitcontent-specificencoderhints\u2192native+trackedpixelpacket; RGB24receiver; nativefallbackfunctionalEGO. Not freshimagepredictorinference/real-time/unseenconfirmation.",
+      "conservative_cpu_charge_seconds": 5310,
+      "conservative_gpu_charge_seconds": 0,
+      "unreleased_cpu_seconds": 2190
     },
     {
       "id": "ptp-receiver-policy-comparison-repair",
       "cpu_seconds": 3600,
       "gpu_seconds": 0,
-      "state": "released_code_review_then_one_bounded_replacement",
+      "state": "closed_four_case_source_denial_accepted_archived",
       "parts": {
         "one_receiver_job": 2430,
         "retained_read_only_diagnostic": 180,
@@ -166,7 +169,76 @@
       },
       "reason": "Correct two exact policy representation mismatches without relaxing any actual resource/source/native/frame checks. Keepfailed1530charge. Measured275.713s smoke forecasts1684.278s under unchanged1.5*smoke*4+30; prospective1800fullcapfits, old900cannot. New450smoke/1800full/60validator/120lifecycle=2430s staysbelow45min. Noquality/sourcechange/GPU/training andnoclosedallocationsreopened.",
       "code_fix_constraints": "rawpolicyanddigestretained; sortedgrantMULTISETSpreservedups/extras; expectedworkerPID1onlyfor2explicitapprovedprocselfleaves underexistingprivateproc/PID1proof; no regexreplacement/newgrants",
-      "deadline_bound": "within12hauthority11:07:34Z; nextabsolutejobdeadlineprospective"
+      "deadline_bound": "within12hauthority11:07:34Z; nextabsolutejobdeadlineprospective",
+      "conservative_cpu_charge_seconds": 3600,
+      "conservative_gpu_charge_seconds": 0,
+      "unreleased_cpu_seconds": 0
+    },
+    {
+      "id": "tennis-confirmation-eligibility-options",
+      "cpu_seconds": 600,
+      "gpu_seconds": 0,
+      "state": "closed_source_only_admitted_relative_recorded_exposure",
+      "purpose": "Question whether RVDTRAIN can supply newPointStreamsourcegroups forperceptualonlyLevel1 confirmation despite permittedencodertrainingoverlap; judgesindependent, realmatchdedup+annotationcoverage+allpriorexposurerequired. No inference/codec/scoring/downloads. No holdoutfromclipID/trainlabelalone.",
+      "measured_remote_cpu_seconds": 104.424,
+      "measured_gpu_seconds": 0
+    },
+    {
+      "id": "fresh-sender-contract-audit",
+      "cpu_seconds": 180,
+      "gpu_seconds": 0,
+      "state": "completed_read_only_no_model",
+      "purpose": "Already authorized code/resource audit of exact oldBallTrack+sixbasefit+guard+BALLroundtrip; noGPU/inference/quality"
+    },
+    {
+      "id": "fresh-sender-resource-preflight",
+      "cpu_seconds": 300,
+      "gpu_seconds": 0,
+      "state": "released_metadata_no_dispatch",
+      "purpose": "actual resource paths andfleet schema beforeparity"
+    },
+    {
+      "id": "ball-confirmation-implementation",
+      "cpu_seconds": 600,
+      "gpu_seconds": 0,
+      "state": "released_code_preparation_no_dispatch",
+      "purpose": "threefixedsource sixbase+ROI/PTP physical adapter; no model/quality outcomes"
+    },
+    {
+      "id": "fresh-sender-historical-parity",
+      "cpu_seconds": 2400,
+      "gpu_seconds": 1800,
+      "state": "released_one_smoke_conditional_full_no_confirmation",
+      "card": "docs/cards/submission-ladder-ball-confirmation-2026-11-15.md",
+      "parts": {
+        "one_job_cpu": 1530,
+        "one_job_gpu": 1530,
+        "cpu_preparation_failure": 870,
+        "gpu_failure": 270
+      },
+      "hypothesis": "Generic freshsender preserves old48actual threeSVTBALLbytes andeverypixelhint using originalsixbackgrounds",
+      "competing_explanation": "prefixor6\u21923fit/refactor couldchange hints, invalidating transferofdevelopmentcandidate",
+      "promotion": "Exactall3payload/centres/visibility/origins andcorrectness/costchecks only; noquality/confirmationfromoldsource"
+    },
+    {
+      "id": "tennis-confirmation-source-publication",
+      "cpu_seconds": 900,
+      "gpu_seconds": 0,
+      "state": "closed_independent_readback165_members",
+      "stage_record": "docs/experiments/submission-ladder-tennis-confirmation-source-publication-stage-20261115.json",
+      "source_manifest": "docs/experiments/submission-ladder-tennis-confirmation-source-freeze-20261115.json",
+      "frozen_manifest_sha256": "df0dabf48b61ed3a096a9a6b4e54d823ca3b279c86d6a09e69ef0cd9bf2ceeb1",
+      "scope": "exactoriginal3MP4+CSV+sourceonlyprovenance; no models/resize/quality",
+      "measured_cpu_seconds": 4.363,
+      "measured_gpu_seconds": 0,
+      "archive_sha256": "e5edc12c857658a119bf6d6cbe029ee64c09d6a860f1b975fe0708952895293d"
+    },
+    {
+      "id": "ball-confirmation-score-implementation",
+      "cpu_seconds": 600,
+      "gpu_seconds": 0,
+      "state": "released_code_only_no_model",
+      "purpose": "eighteenrow/allframeandexplicitnullcrop scoring adapter; no dispatch"
     }
   ],
   "jobs": [
@@ -577,6 +649,39 @@
       "diagnostic_receipt_sha256": "4327f275562c4eaf010752f423ff0c16a055fba9f9236faf8f79c7be71f7acd5",
       "diagnostic_scope": "workerreturned0;19EACCES/all7roles/source/runtime/profileexact/native3calls/all48RGBmatch; originalfailedjobnotretroactivelyaccepted",
       "original_failed_charge_retained": true
+    },
+    {
+      "job_id": "20261115T043834Z-4dd0744d",
+      "purpose": "separate corrected filesystem-denied receiver qualification4cases",
+      "state": "root_accepted_filesystem_denial_and_exact_reconstruction_four_cases",
+      "cpu_ceiling_seconds": 2430,
+      "gpu_ceiling_seconds": 0,
+      "conservative_cpu_charge_seconds": 2430,
+      "code_revision": "f5486a9257826f9b362bcda2f5e76153ffa8ab00",
+      "source_sha256": "eb98af0299fdafc52d8d3540fda01c0408acd982aad0bf9fea1c6494baef64b0",
+      "snapshot_sha256": "095f91889332a01c2727830082bd5d57fd668645c317edfc177db013e861e684",
+      "spec_sha256": "96241126d234d9dfab9fd85b05ee63b80eda7ec96d79e4c5481922fb0d21db7b",
+      "deadline": "2026-11-15T06:00:00Z",
+      "submit_receipt": "/private/tmp/ptp-denial-repair-submit-20261115.json",
+      "wait": "runner onecanonicalboundedwait<=2430s, no polling/replay",
+      "predecessor_failed_preserved": "20261115T040632Z-4fe25cda",
+      "resources": "samefrozenpolicy245604/base4fa, inputT/Epaidpackets; noGPU/model/method/qualitychange",
+      "host": "gpu5",
+      "archive_sha256": "279ea8089cbcac9d36c5df54a3186fb49e75c3eab0df9163d4e3068939e9c705",
+      "archive_bytes": 79493120,
+      "stage_sha256": "0a75c44ec2c24e77f7b35304f0fe4836e0e454c2f71515ce8d4327a7380e8e08",
+      "proof_manifest_sha256": "4c8379148a968af0be2199e070180bf2e57e3135e9d0d131751e1c2870ed1c46",
+      "actual_frame_counts": [
+        48,
+        48,
+        48,
+        64
+      ],
+      "actual_EACCES_per_case": 19,
+      "body_wall_seconds": 195.85431468114257,
+      "body_cpu_seconds": 195.26010399999998,
+      "acceptance_receipt": "/private/tmp/pointstream-ptp-denial-root-acceptance-20261115.json",
+      "terminal_event_acknowledged": true
     }
   ],
   "decisions": [
@@ -779,10 +884,91 @@
   },
   "next_receiver_repair_spec": {
     "path": "/private/tmp/ptp-denial-cpu-repair-spec-20261115.json",
-    "state": "prepared_unsubmitted",
+    "state": "complete_root_accepted_4dd0744d",
     "deadline": "2026-11-15T06:00:00Z",
     "cpu_ceiling_seconds": 2430,
     "gpu_ceiling_seconds": 0,
-    "scope": "same4packets/resources/source/rates; parentcomparisonrepairandexplicitlargeroperationalcostbudget; failedoriginalnotreplayed"
+    "scope": "same4packets/resources/source/rates; parentcomparisonrepairandexplicitlargeroperationalcostbudget; failedoriginalnotreplayed",
+    "normalized_sha256": "96241126d234d9dfab9fd85b05ee63b80eda7ec96d79e4c5481922fb0d21db7b",
+    "file_sha256": "b5893ab0bb3f357bddfcaf3b9e7a617d4ba4dbabf03b6756565fb90391894264",
+    "code_revision": "f5486a9257826f9b362bcda2f5e76153ffa8ab00",
+    "preflight": "Exactprior4feconfirmedfailed/no gate/full; all3compatiblehostsavailablefreshindexedCPU119/29/249+pinnedtools. Globalstatus30/60timeouts: preserveuncertainotherjobs, do not claim globalempty. Independentnewrepaircannotduplicateknownterminalprior; normalworkeradmission stillenforcesresourceclaims."
+  },
+  "repair_pull_request": {
+    "url": "https://github.com/emanuele-artioli/PointStream/pull/419",
+    "state": "merged_LinuxCI_green",
+    "source_revision": "f5486a9257826f9b362bcda2f5e76153ffa8ab00",
+    "creation": "FirstGraphQLfailed andRESTTLStimeout; successfulGETverifiednoopenPRbeforeknownsafeRESTcreation; rawreceipt /private/tmp/pointstream-receiver-pr-created-confirmed-20261115.json",
+    "merge_commit": "9b6cccd2e0c180dd3f5912d6a0807136f415b5f4",
+    "ci_run": "https://github.com/emanuele-artioli/PointStream/actions/runs/43677879836"
+  },
+  "receiver_evidence_archive": {
+    "state": "independent_readback_verified",
+    "index": "docs/experiments/submission-ladder-receiver-evidence-archive-20261115.json",
+    "archive_sha256": "796a3a530c77aeca052d7232ec6fab34eeac3cfe4c9cb68305216329439ecd00",
+    "archive_bytes": 255477760,
+    "members": 92,
+    "manifest_sha256": "75586b90bab31b0d64261d9a6eeb24dd472e4284fecd76d3a1f0011704ed3335",
+    "cpu_seconds": 4.37,
+    "wall_seconds": 5.07,
+    "gpu_seconds": 0,
+    "scope": "bothfailed/acceptedjobs+exactretainedfailurerecords+completeCPUcapture/base/tool+diagnostics+tables/rootacceptance; originalsunchanged, beforeafter/fullreadback; modesnotOSimmutability"
+  },
+  "ball_confirmation_freeze": {
+    "at_utc": "2026-11-15T06:24:52Z",
+    "card": "docs/cards/submission-ladder-ball-confirmation-2026-11-15.md",
+    "outcomes_opened": false,
+    "sources": [
+      "match209_000",
+      "match269_000",
+      "match235_000"
+    ],
+    "windows": [
+      {
+        "source": "match209_000",
+        "start": 0,
+        "frames": 64,
+        "fps": [
+          25,
+          1
+        ]
+      },
+      {
+        "source": "match269_000",
+        "start": 0,
+        "frames": 64,
+        "fps": [
+          25,
+          1
+        ]
+      },
+      {
+        "source": "match235_000",
+        "start": 0,
+        "frames": 154,
+        "fps": [
+          60,
+          1
+        ]
+      }
+    ],
+    "official_label_counts": {
+      "visible": 32,
+      "not_visible": 5,
+      "unknown": 245
+    },
+    "frozen_candidate": "preservedfreshhistoricalsixbasefit\u2192paid32pixel/64tile/CRF20preset4+SVT48/55/62; exactold48parityrequired",
+    "scope": "perceptualonly720viewLevel1; possibleencoderTRAINoverlap; noBallTrack/WASBtaskjudging; sourcejoinsAI+primaryrecords, nohumanidentitycertification",
+    "source_manifest_frozen_at_utc": "2026-11-15T06:21:48Z"
+  },
+  "fresh_sender_parity_preflight": {
+    "spec_path": "/private/tmp/pointstream-fresh-sender-spec-20261115T0635.json",
+    "deadline": "2026-11-15T07:15:00Z",
+    "state": "reviewed_ready_not_yet_submitted",
+    "preflight_receipt_sha256": "b2df4cece9abb424f23b0678797d46f1df11c39fc2397bd7a27c61fc22fe5115",
+    "actual_inputs": "all6nativeYUV+3PSBL againstauthenticatedcheckpoint/pilot; modelcode5bec/tree f7a5, weight b052, env32e completefreshhash",
+    "local_checks": "configuredRuff/Mypy644 and permissionedfull2567passed37skipped existingforkwarning; scopedfresh5+docs3pass",
+    "fleet": "1743publishedjobs inspected inclhistoricalcontended/attention preserved; noactiveownjob; bothAda workersfresh; gpu5sharedheadroom37/39GiB, directgpu6SSHrefuses; workerlocaladmissionstillrequired; uploadedthroughreachablegpu1",
+    "scope": "old48only no newconfirmation quality; prefixsmoke16 cannotpromoteparity"
   }
 }
