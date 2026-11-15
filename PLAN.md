@@ -16,6 +16,8 @@ The [confirmation intake](docs/experiments/submission-ladder-confirmation-intake
 
 The [next foreground screen proposal](docs/cards/submission-ladder-next-foreground-screen-proposal-2026-11-15.md) is **not released**. It tests a changed limiting assumption—suppressing duplicated patch pixels in the native base—with exact existing geometry, three fixed rates, actual coded outputs, ROI controls and stop gates. Its total conditional ceiling is5.85CPUh/1.6875GPUh, all stages≤45min; it includes no training and does not claim a neural-baseline result before that matched comparison. Human reference correction remains necessary for whole-foreground confirmation.
 
+The genuine18-frame VISOR review has arrived:9 uncertain and9 rejected, with useful coarse guidance and an overinclusive-target diagnosis; it provides zero approved references. The [human-directed refinement card](docs/cards/visor-human-review-refinement-2026-11-15.md) releases a bounded source-only proposal stage under the existing authority, ending11:07:34UTC. Revised actor/manipulated-object scope is separate from historical metrics; no unscored frame or rejected polygon becomes gold.
+
 Each workstream is scoped to one session. Items that do not depend on each
 other run in parallel sessions; each item names what it waits for (user,
 2026-10-16). This file is the source of truth: a session card only starts

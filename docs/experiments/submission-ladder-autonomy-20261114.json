@@ -440,6 +440,21 @@
       },
       "deadline": "2026-11-15T11:07:34Z",
       "basis": "automatic12hbudgetauthority; completedowned6physicaljobs plusrawfailedspatial; noqualitypeek/modelsduplication; secondfinalscoresarchiveafterROOTacceptance"
+    },
+    {
+      "id": "visor-human-review-refinement",
+      "state": "released_CPUpreparation_GPUconditional_ROOTreview",
+      "cpu_seconds": 3960,
+      "gpu_seconds": 960,
+      "deadline": "2026-11-15T11:07:34Z",
+      "parts": {
+        "human_import_audit_CPU": 600,
+        "official_filter_CPU": 900,
+        "SAM_campaign_CPU_GPU": 960,
+        "preparation_publication_CPU": 900,
+        "failure_CPU_noGPUretry": 600
+      },
+      "card": "docs/cards/visor-human-review-refinement-2026-11-15.md"
     }
   ],
   "jobs": [
@@ -1735,11 +1750,15 @@
   },
   "human_annotation_review_request": {
     "kind": "genuinehumanVISORpilot18sourceframes",
-    "state": "asyncquestion_pending",
+    "state": "human_download_validated18_zeroapproved_9uncertain9rejected",
     "URL": "http://127.0.0.1:17691/visor-confirmation-pilot/index.html",
     "HTTP_verified_200": true,
     "reason": "modelreviewcannotreplaceplanhumanreferencecorrection; allnative/ballworkcontinuesindependently",
-    "no_human_labels_fabricated": true
+    "no_human_labels_fabricated": true,
+    "download_sha256": "9a31519973bbd3984af1a049f3c503d761fc251f75fe8bb908d1228a118da754",
+    "elapsed_seconds": 4739.312,
+    "elapsed_qualification": "browserelapsednotactivehumanlabor",
+    "new_policy": "actor/movedordirectlymanipulatedobjects; nohistoricalmetricreinterpretation"
   },
   "manuscript_author_review_v1": {
     "state": "draft_built_28_pages_root_visual_checked_selected_pages_not_authapproved",
