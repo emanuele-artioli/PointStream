@@ -245,6 +245,54 @@ def _worker(work: Path) -> None:
     write_new(work / 'receiver.json', receipt)
 
 
+
+def expected_worker_policy(*, files: list[Path], execute: list[Path], system: list[Path],
+                           import_directories: list[Path], work: Path, evidence: dict[str, Any],
+                           profile: dict[str, Any], parent_pid: int) -> dict[str, Any]:
+    """Construct the private PID-1 policy after receiver namespace verification.
+
+    Only the two reviewed literal self-proc leaves differ between namespaces;
+    no other PID or resource path is rewritten.
+    """
+    rows = profile['system_leaves']
+    if len(rows) != len(system) or type(parent_pid) is not int or parent_pid <= 1:
+        raise ValueError('invalid parent system-leaf inventory')
+    special = {'/proc/self/maps': 'maps', '/proc/self/status': 'status'}
+    seen: set[str] = set()
+    worker_system = []
+    for declared, resolved in zip(rows, system):
+        name = declared['path']
+        if name in special:
+            if name in seen or resolved != Path('/proc') / str(parent_pid) / special[name]:
+                raise ValueError('unexpected parent self-proc resolution')
+            seen.add(name)
+            worker_system.append(Path('/proc/1') / special[name])
+        else:
+            worker_system.append(resolved)
+    if seen != set(special):
+        raise ValueError('reviewed self-proc leaves missing')
+    packet_files = files + [work / 'packet.ptp']
+    return {'read_files': [str(p) for p in packet_files], 'execute_files': [str(p) for p in execute],
+            'system_leaves': [str(p) for p in worker_system], 'writable_output': str(work),
+            'read_directories': sorted(str(p) for p in kernel._read_directories(
+                packet_files, execute, worker_system, import_directories)), 'denials': evidence}
+
+
+def equal_policy(actual: dict[str, Any], expected: dict[str, Any]) -> bool:
+    """Compare grant lists as multisets; retain exact non-grant fields and duplicates."""
+    grants = {'read_files', 'execute_files', 'system_leaves', 'read_directories'}
+    if set(actual) != set(expected):
+        return False
+    for key in actual:
+        if key in grants:
+            a, b = actual[key], expected[key]
+            if (not isinstance(a, list) or not isinstance(b, list)
+                    or any(not isinstance(v, str) for v in a + b) or sorted(a) != sorted(b)):
+                return False
+        elif actual[key] != expected[key]:
+            return False
+    return True
+
 def replay(packet: Path, work: Path, *, policy_path: Path, policy_sha: str, packet_sha: str,
            protected: dict[str, Any], context: dict[str, Any], expected: dict[str, Any],
            decoder: Path, timeout: int = 900) -> dict[str, Any]:
@@ -310,13 +358,10 @@ def replay(packet: Path, work: Path, *, policy_path: Path, policy_sha: str, pack
     receipt = json.loads((work / 'receiver.json').read_text())
     verify_receipt(receipt, context=context, policy_sha=policy_sha, packet_sha=packet_sha, observer=observer)
     proof = receipt['filesystem_proof']
-    expected_policy = {'read_files': [str(p) for p in files + [work / 'packet.ptp']],
-                       'execute_files': [str(p) for p in execute], 'system_leaves': [str(p) for p in system],
-                       'writable_output': str(work),
-                       'read_directories': sorted(str(p) for p in kernel._read_directories(
-                           files + [work / 'packet.ptp'], execute, system, kernel._import_directories(profile))),
-                       'denials': evidence}
-    if (proof['actual_policy'] != expected_policy or proof['protected_roles'] != protected
+    expected_policy = expected_worker_policy(files=files, execute=execute, system=system,
+        import_directories=kernel._import_directories(profile), work=work, evidence=evidence,
+        profile=profile, parent_pid=launch['outer_pid'])
+    if (not equal_policy(proof['actual_policy'], expected_policy) or proof['protected_roles'] != protected
             or proof['profile_sha256'] != kernel._object_sha(profile)
             or proof['runtime_inventory_sha256'] != kernel._object_sha(profile['runtime_files'])
             or proof['source_inventory_sha256'] != kernel._object_sha(profile['source_files'])):

@@ -152,6 +152,21 @@
       "competing_explanation": "Oraclegainmayvanishunderpaidmetadata or hiddenencoder/sourcecache dependencies; exactframeparity+fullcost+source-denial address this.",
       "scoring_policy": "No newGPU if everyTennispaiddecodedRGBframe hashesidentical acceptedpixeloracle. Reuseonlyauthenticatedsamepixelmetricarrays withnewactualpacketprices; otherwise noqualitypromotion andseparatelybudgetrescore.",
       "scope": "NewPTP1 rawYUV+explicitcontent-specificencoderhints\u2192native+trackedpixelpacket; RGB24receiver; nativefallbackfunctionalEGO. Not freshimagepredictorinference/real-time/unseenconfirmation."
+    },
+    {
+      "id": "ptp-receiver-policy-comparison-repair",
+      "cpu_seconds": 3600,
+      "gpu_seconds": 0,
+      "state": "released_code_review_then_one_bounded_replacement",
+      "parts": {
+        "one_receiver_job": 2430,
+        "retained_read_only_diagnostic": 180,
+        "independent_failure_and_success_archive": 720,
+        "implementation_review_allowance": 270
+      },
+      "reason": "Correct two exact policy representation mismatches without relaxing any actual resource/source/native/frame checks. Keepfailed1530charge. Measured275.713s smoke forecasts1684.278s under unchanged1.5*smoke*4+30; prospective1800fullcapfits, old900cannot. New450smoke/1800full/60validator/120lifecycle=2430s staysbelow45min. Noquality/sourcechange/GPU/training andnoclosedallocationsreopened.",
+      "code_fix_constraints": "rawpolicyanddigestretained; sortedgrantMULTISETSpreservedups/extras; expectedworkerPID1onlyfor2explicitapprovedprocselfleaves underexistingprivateproc/PID1proof; no regexreplacement/newgrants",
+      "deadline_bound": "within12hauthority11:07:34Z; nextabsolutejobdeadlineprospective"
     }
   ],
   "jobs": [
@@ -532,6 +547,36 @@
       "decoded_sha256": "56a5338913540c2ae31accc3e6f39453df56d73a1c63ebbe7f8734ae09f98ad6",
       "physical_acceptance": "Actual originalarchive/stagehash/root64framehashagreement;1080p50/fullrange/allNone/patch0;score_reusefalse;noqualitybenefitclaim",
       "root_status_receipt": "/private/tmp/pointstream-paid-ego-root-status-20261115.json"
+    },
+    {
+      "job_id": "20261115T040632Z-4fe25cda",
+      "purpose": "fresh-exec Landlock PTP filesystem-denied receiver one-to-four complete packet cases",
+      "state": "failed_smoke_parent_policy_bookkeeping_no_full_gate",
+      "cpu_ceiling_seconds": 1530,
+      "gpu_ceiling_seconds": 0,
+      "conservative_cpu_charge_seconds": 1530,
+      "code_revision": "1e08f70bf1b52fb311ae534b6cdf57e1d3c228f9",
+      "source_sha256": "c86829d2d13fb0f11dab31aab4e9bcd856bf9ff21c3918984385a1ff9baa13fc",
+      "snapshot_sha256": "6a4a98193328e16fb2bce7dc94e53dcb63c80ebb4c0b88c3f5becd055bfe98a9",
+      "spec_sha256": "24dd549fba68a0daf91948dbde1c5fe56834f3a230cada130bce4be6e563f6b4",
+      "policy_sha256": "245604b8ed05475cc562d3b819e7e51f5f53b03edf6f91aa9f63ca697e843f4f",
+      "base_policy_sha256": "4fa67547b1288e46f979040f0de5315288bd8bfc5d6065e3b6abaeeee32bea1c",
+      "hosts": [
+        "gpu1",
+        "gpu3",
+        "gpu5"
+      ],
+      "deadline": "2026-11-15T05:00:00Z",
+      "submit_receipt": "/private/tmp/ptp-denial-submit-20261115.json",
+      "wait": "runner single canonical bounded ps-fleet wait<=1530s; preservehandle, no recurringpoll",
+      "scope": "actual forbidden-source read failures+all48/64RGBhashes; no network/MCPisolation/nativebirth/throughputclaim",
+      "host": "gpu3",
+      "command_wall_seconds": 275.713,
+      "root_status_receipt": "/private/tmp/pointstream-ptp-denial-root-terminal-20261115.json",
+      "failure": "samefilegrantmultiset reordered by JSON; twoapproved /proc/self paths resolveparentPIDvsprivatePID1. Parentassertionfails; fullnotrun andnoacceptedqualification.",
+      "diagnostic_receipt_sha256": "4327f275562c4eaf010752f423ff0c16a055fba9f9236faf8f79c7be71f7acd5",
+      "diagnostic_scope": "workerreturned0;19EACCES/all7roles/source/runtime/profileexact/native3calls/all48RGBmatch; originalfailedjobnotretroactivelyaccepted",
+      "original_failed_charge_retained": true
     }
   ],
   "decisions": [
@@ -633,7 +678,7 @@
       }
     },
     "cpu_derivative_capture": {
-      "state": "capture_batch_running_once",
+      "state": "complete_root_generic_profile_accepted_no_namespace_claim",
       "hosts": [
         "gpu1",
         "gpu3",
@@ -649,7 +694,35 @@
       "exec_handle": 67302,
       "remote_parent": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/ptp-cpu-resource-policy-20261115T035837Z-0c5340e4",
       "outer_host_wall_cap_seconds": 150,
-      "resource_note": "captureonly, nojob/no namespacewitness/noGPU; privatehostlocalCPU2/thread1"
+      "resource_note": "captureonly, nojob/no namespacewitness/noGPU; privatehostlocalCPU2/thread1",
+      "policy_sha256": "245604b8ed05475cc562d3b819e7e51f5f53b03edf6f91aa9f63ca697e843f4f",
+      "policy_bytes": 21622239,
+      "metadata_sha256": "ff106016095fb4566dc0c53880f32961185a09d726bb85c48e61d1c0639c3990",
+      "resource_review_sha256": "5196d02a1c4201c608023df9aa75c2ea2b29d8f043af4f010269f227b29ecec0",
+      "capture_costs": {
+        "gpu1": {
+          "cpu_seconds": 0.834715,
+          "wall_seconds": 1.02329,
+          "affinity": [
+            2
+          ]
+        },
+        "gpu3": {
+          "cpu_seconds": 1.017394,
+          "wall_seconds": 3.959224,
+          "affinity": [
+            2
+          ]
+        },
+        "gpu5": {
+          "cpu_seconds": 0.590403,
+          "wall_seconds": 0.665065,
+          "affinity": [
+            2
+          ]
+        }
+      },
+      "root_review": "actual30OSrolesalllogical==resolvedreviewedpaths;3packedexec/loader+unshare9f41bound;runtime36504unchanged;purevalidate_derivation+originalSHA4fa pass; modesnotOSimmutability"
     }
   },
   "paid_pixel_evidence_archival": {
@@ -671,5 +744,45 @@
     "pytest": "2554passed37skipped existingfork/threadwarning",
     "log": "/private/tmp/pointstream-paid-receiver-final-pytest.log",
     "scope": "Includespaidreference/CPUderivation/basepolicy/live-linkvalidation+Linux/binfixturefix; noactualOSwitnessyet"
+  },
+  "next_receiver_spec": {
+    "path": "/private/tmp/ptp-denial-cpu-spec-20261115.json",
+    "normalized_sha256": "24dd549fba68a0daf91948dbde1c5fe56834f3a230cada130bce4be6e563f6b4",
+    "file_sha256": "445c28c508c2c3215bc04cf8c3bcffa1fd29c59341688ead0a509c21cbb3936f",
+    "state": "failed_4fe25cda_preserved",
+    "code_revision": "1e08f70bf1b52fb311ae534b6cdf57e1d3c228f9",
+    "hosts": [
+      "gpu1",
+      "gpu3",
+      "gpu5"
+    ],
+    "cpu_ceiling_seconds": 1530,
+    "gpu_ceiling_seconds": 0,
+    "deadline": "2026-11-15T05:00:00Z",
+    "preflight": "all3availablefreshindexedaffinity CPUheadroom122/30/248 andpinnedffmpeg/dav1d/ABI4; sharednoactivepending; paid2jobscanonicallycompletegatepassed"
+  },
+  "engineering_ci": {
+    "pull_request": "https://github.com/emanuele-artioli/PointStream/pull/418",
+    "state": "merged_linux_ci_green",
+    "merge_commit": "ed8b3cac4466acc29db8b976cb8369de07f385bf",
+    "source_revision": "1e08f70bf1b52fb311ae534b6cdf57e1d3c228f9",
+    "run": "https://github.com/emanuele-artioli/PointStream/actions/runs/43674858165",
+    "scope": "Passingimplementationchecks; actualreceiverproofindependentpending4fe25cda"
+  },
+  "receiver_comparison_repair_verification": {
+    "ruff": "passedconfigured",
+    "mypy": "passedconfigured640files",
+    "pytest": "2557passed37skippedexistingfork/threadwarning",
+    "log": "/private/tmp/pointstream-ptp-repair-final-pytest.log",
+    "independent_review": "noadmissionblocker; narrowlyverifiedPID1procpaths+sortedmultisets, rawdigestpreserved, costcapargs/spec/validatorbound; nosourcegrantsexpanded",
+    "actual_regression": "/private/tmp/ptp-policy-regression-20261115.json all9checks true againstretainedactualreceipt; diagnosticnotqualification"
+  },
+  "next_receiver_repair_spec": {
+    "path": "/private/tmp/ptp-denial-cpu-repair-spec-20261115.json",
+    "state": "prepared_unsubmitted",
+    "deadline": "2026-11-15T06:00:00Z",
+    "cpu_ceiling_seconds": 2430,
+    "gpu_ceiling_seconds": 0,
+    "scope": "same4packets/resources/source/rates; parentcomparisonrepairandexplicitlargeroperationalcostbudget; failedoriginalnotreplayed"
   }
 }
