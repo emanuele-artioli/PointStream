@@ -538,6 +538,58 @@ def load_generated(tars: list[str], scratch: Path) -> dict[tuple[str, str], dict
     return out
 
 
+
+def checked_generated_crops(wid: str, players: list[str], profiles: tuple[str, ...], judged: list[int],
+                            regions: list[dict[str, np.ndarray]], units: dict[str, dict[str, Any]],
+                            generated: dict[tuple[str, str], dict[str, np.ndarray]],
+                            legacy_tennis_fallback: bool = False) -> tuple[dict[tuple[str, str, int], tuple[np.ndarray, np.ndarray]], list[dict[str, Any]]]:
+    """Resolve every nonempty judged player region to its own generated tick and box."""
+    crops: dict[tuple[str, str, int], tuple[np.ndarray, np.ndarray]] = {}
+    fallback: list[dict[str, Any]] = []
+    for player in players:
+        required = [t for t in judged if player in regions[t] and regions[t][player].any()]
+        if not required:
+            continue
+        name = unit_name(wid, player)
+        if name not in units:
+            raise ValueError(f"missing prepared unit {name} for nonempty judged region")
+        unit = units[name]
+        times, boxes = unit["t"], unit["box"]
+        if len(times) != len(boxes) or len(set(times.tolist())) != len(times):
+            raise ValueError(f"{name}: inconsistent or duplicate prepared timestamps")
+        box_by_t = dict(zip(times.tolist(), boxes))
+        indexed: dict[str, dict[int, np.ndarray]] = {}
+        needed_profiles = set(profiles) | ({"original"} if legacy_tennis_fallback and "finetuned_tennis" in profiles else set())
+        for profile in needed_profiles:
+            g = generated.get((name, profile))
+            if g is None:
+                indexed[profile] = {}
+                continue
+            ts, frames = g["t"], g["crops"]
+            if len(ts) != len(frames) or len(set(ts.tolist())) != len(ts):
+                raise ValueError(f"{name}@{profile}: inconsistent or duplicate generated timestamps")
+            indexed[profile] = dict(zip(ts.tolist(), frames))
+        for t in required:
+            if t not in box_by_t:
+                raise ValueError(f"{name}: missing prepared box at t={t}")
+            box = box_by_t[t]
+            x, y, w, h = int_box(box)
+            mask = regions[t][player]
+            if x + w <= 0 or y + h <= 0 or x >= mask.shape[1] or y >= mask.shape[0] or not mask[
+                max(y, 0):min(y + h, mask.shape[0]), max(x, 0):min(x + w, mask.shape[1])
+            ].any():
+                raise ValueError(f"{name}: box misses nonempty player region at t={t}")
+            for profile in profiles:
+                selected = profile
+                if t not in indexed[profile] and legacy_tennis_fallback and profile == "finetuned_tennis":
+                    selected = "original"
+                if t not in indexed[selected]:
+                    raise ValueError(f"{name}@{profile}: missing generated crop at t={t}")
+                if selected != profile:
+                    fallback.append({"unit": name, "t": int(t), "profile": profile, "source_profile": selected})
+                crops[(profile, player, t)] = (indexed[selected][t], box)
+    return crops, fallback
+
 def judge_window(args: argparse.Namespace, wid: str, k6dir: Path, source: Path, units: dict[str, dict[str, Any]],
                  generated: dict[tuple[str, str], dict[str, np.ndarray]], nets: dict[str, Any], scratch: Path,
                  publish: Path, device: str) -> dict[str, Any]:
@@ -574,21 +626,8 @@ def judge_window(args: argparse.Namespace, wid: str, k6dir: Path, source: Path, 
         decoded_all[name] = {(k.rsplit("@", 1)[0], int(k.rsplit("@", 1)[1])): np.asarray(v, np.float64) for k, v in d.items()}
     k6names = k6_variant_names()[len(k6_variant_names()) - 9:]  # K6's 9 oracle variants (S is their union with R)
     gap = max(1, round(REF_GAP_S * float(Fraction(row["fps"]).limit_denominator(1001))))
-    # Generated crops by (profile, player, t), with the unit's box at t.
-    crops: dict[tuple[str, str, int], tuple[np.ndarray, np.ndarray]] = {}
-    for player in players:
-        name = unit_name(wid, player)
-        if name not in units:
-            continue
-        boxes = dict(zip(units[name]["t"].tolist(), units[name]["box"]))
-        for profile in profiles:
-            g = generated.get((name, profile))
-            if g is None:
-                if profile != "finetuned_tennis":
-                    raise ValueError(f"no generated crops for {name}@{profile}")
-                continue  # amendment 1: the fine-tune falls back to gen-original's crops (below)
-            for t, crop in zip(g["t"].tolist(), g["crops"]):
-                crops[(profile, player, t)] = (crop, boxes[t])
+    crops, fallback = checked_generated_crops(wid, players, profiles, judged, regions, units, generated,
+                                               args.legacy_tennis_fallback)
     k6_scores = np.load(k6dir / "scores.npz")
     k6_index = {n: i for i, n in enumerate(row["variants"])}
     n_v = len(variants)
@@ -617,7 +656,7 @@ def judge_window(args: argparse.Namespace, wid: str, k6dir: Path, source: Path, 
             canvas = fill.copy()
             written = np.zeros_like(r_t)
             for p in order:
-                key = (profile, p, t) if (profile, p, t) in crops else ("original", p, t)
+                key = (profile, p, t)
                 if p in regions[t] and key in crops:
                     crop, box = crops[key]
                     written |= paste(canvas, crop, box, regions[t][p])
@@ -647,6 +686,7 @@ def judge_window(args: argparse.Namespace, wid: str, k6dir: Path, source: Path, 
         "id": wid, "match": wid.split("/")[0], "frames": frames, "judged": judged, "players": players, "variants": list(variants),
         "k6_job_files": row["files"], "k6_lpips": k6_lp,
         "scoring_masks": scoring_masks,
+        "legacy_tennis_fallback": args.legacy_tennis_fallback, "fallback_map": fallback,
         "s_masks_match_k6": scoring_masks == {str(t): row.get("scoring_masks", {}).get(str(t)) for t in judged},
         "s_pixels_match_k6": bool(np.array_equal(pixels_s[judged], k6_scores["pixels_s"][judged])),
         "seconds": round(time.time() - began, 2),
@@ -801,19 +841,22 @@ def window_means(a: dict[str, np.ndarray], judged: list[int], variants: tuple[st
 
 
 def won(anchors: dict[str, dict[str, float]], metric: str, kbps: float, value: float) -> dict[str, Any]:
-    """Is ``value`` below K6's envelope at ``kbps``? (`k1.at_rate` on `g5.envelope` of (kbps, -metric).)"""
-    from experiments.background.g5 import envelope
-    from experiments.visor.k1 import at_rate
+    """Compare only on K6's measured rate support; unsupported rates stay unresolved.
 
-    hull = envelope([(p["kbps"], -p[metric]) for p in anchors.values()])
-    q = at_rate(hull, kbps)
-    bar = -(q if q is not None else hull[0][1])
-    return {"value": value, "envelope": bar, "won": bool(value < bar)}
+    Historical reports used the cheapest endpoint at both unsupported ends.
+    This prospective check neither extrapolates nor claims equal-rate quality
+    from an affordable endpoint (a separate possible dominance comparison).
+    """
+    from experiments.tennis.k6b_confirm_validate import strict_won
+
+    return strict_won(anchors, metric, kbps, value)
 
 
 def score(rows: list[dict[str, Any]], variant: str) -> dict[str, Any]:
     if not rows:
         return {"windows": 0}
+    if any(r[variant][m]["won"] is None for r in rows for m in ("lpips", "dists")):
+        raise ValueError("Unresolved anchor comparison cannot support a K6b decision")
     lp = float(np.mean([r[variant]["lpips"]["won"] for r in rows]))
     di = float(np.mean([r[variant]["dists"]["won"] for r in rows]))
     return {"windows": len(rows), "lpips_share": lp, "dists_share": di, "score": (lp + di) / 2, "passes": (lp + di) / 2 >= CRITERION}
@@ -850,6 +893,8 @@ def payback_hours(hull: list[tuple[float, float]], lpips: float, kbps: float, nb
 def billed_score(rows: list[dict[str, Any]], variant: str) -> dict[str, Any]:
     if not rows:
         return {"windows": 0}
+    if any(r[variant]["billed"][m]["won"] is None for r in rows for m in ("lpips", "dists")):
+        raise ValueError("Unresolved anchor comparison cannot support a billed K6b decision")
     lp = float(np.mean([r[variant]["billed"]["lpips"]["won"] for r in rows]))
     di = float(np.mean([r[variant]["billed"]["dists"]["won"] for r in rows]))
     return {"windows": len(rows), "lpips_share": lp, "dists_share": di, "score": (lp + di) / 2, "passes": (lp + di) / 2 >= CRITERION}
@@ -1069,6 +1114,8 @@ def main(argv: list[str] | None = None) -> int:
             p.add_argument("--max-judged", type=int, default=0, help="0 judges every K6 judged frame (the smoke: a few)")
             p.add_argument("--from-t", type=int, default=0, help="judge only frames from here (step 3's held-out frames)")
             p.add_argument("--profiles", default=",".join(PROFILES), help="the generator profiles to composite and score")
+            p.add_argument("--legacy-tennis-fallback", action="store_true",
+                           help="reproduce amendment 1: substitute original for missing finetuned_tennis crops, recorded per tick")
             p.add_argument("--gpu-class", default="RTX")
     pm = sub.add_parser("prepare-match")
     pm.add_argument("--inputs", required=True, help="K6's extracted inputs.tar (K4b.1's windows' features, masks, fits)")
