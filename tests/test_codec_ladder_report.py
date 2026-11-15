@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from experiments.codec_ladder.report import table_rows, verified_record, write_tables
+from experiments.codec_ladder.report import same_analysis, table_rows, verified_record, write_tables
 
 ROOT = Path(__file__).resolve().parents[1]
 RECORD = ROOT / 'docs/experiments/submission-ladder-tennis-standard-v2-analysis-20261115.json'
@@ -37,3 +37,12 @@ def test_paper_cannot_trust_tampered_scores_or_analysis(tmp_path):
     path.write_text(json.dumps(record))
     with pytest.raises(ValueError, match='analysis differs'):
         verified_record(path, destination)
+
+
+def test_analysis_roundoff_tolerance_preserves_decisions_and_support():
+    assert same_analysis({'rate': -0.08528273190099035}, {'rate': -0.08528273190099036})
+    assert not same_analysis({'rate': -0.0852827}, {'rate': -0.0852828})
+    assert not same_analysis(True, 1)
+    assert not same_analysis(None, 0.0)
+    assert not same_analysis([1.0, 2.0], [1.0])
+    assert not same_analysis(float('nan'), float('nan'))

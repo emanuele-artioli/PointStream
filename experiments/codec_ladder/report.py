@@ -9,6 +9,7 @@ import argparse
 import csv
 import hashlib
 import json
+import math
 from pathlib import Path
 from typing import Any
 
@@ -18,14 +19,33 @@ METRICS = ('weighted_dists', 'weighted_lpips', 'full_lpips_standard')
 LABELS = {'roi': 'Conventional ROI', 'semantic_patch': 'Semantic patch', 'error_patch': 'Error patch'}
 
 
+def same_analysis(left: Any, right: Any) -> bool:
+    """Allow numerical interpolation roundoff, never changes to evidence or decisions.
+
+    SciPy/BLAS on different architectures can differ in the last floating-point
+    bits. This tolerance is far below the two-decimal percentage table precision.
+    Hashes, labels, booleans, integers, support decisions and structure stay exact.
+    """
+    if isinstance(left, float) and isinstance(right, float):
+        return math.isfinite(left) and math.isfinite(right) and math.isclose(left, right, rel_tol=1e-10, abs_tol=1e-12)
+    if type(left) is not type(right):
+        return False
+    if isinstance(left, dict):
+        return left.keys() == right.keys() and all(same_analysis(left[key], right[key]) for key in left)
+    if isinstance(left, list):
+        return len(left) == len(right) and all(same_analysis(a, b) for a, b in zip(left, right))
+    return bool(left == right)
+
+
 def verified_record(path: Path, score: Path) -> tuple[dict[str, Any], dict[str, Any]]:
     record = json.loads(path.read_text())
     data = score.read_bytes()
     if hashlib.sha256(data).hexdigest() != record['score_sha256']:
         raise ValueError('saved score hash differs from accepted record')
-    result = analyse(json.loads(data))
+    # Compare the serialized record representation (tuples become JSON arrays).
+    result = json.loads(json.dumps(analyse(json.loads(data)), allow_nan=False))
     for key in ('comparisons', 'decisions', 'domain', 'source_group', 'frames', 'rate_basis'):
-        if json.dumps(result[key], sort_keys=True, allow_nan=False) != json.dumps(record[key], sort_keys=True, allow_nan=False):
+        if not same_analysis(result[key], record[key]):
             raise ValueError(f'saved analysis differs from recomputed score: {key}')
     evidence = record['evidence']
     if not evidence.get('score_job') or not evidence.get('score_archive_sha256'):
@@ -84,6 +104,8 @@ def write_tables(paths: list[tuple[Path, Path]], output: Path) -> dict[str, Any]
     (output / 'table.tex').write_text('\n'.join(lines) + '\n')
     record = {'schema': 1, 'generator_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(), 'scope': 'descriptive source-window development tables, no cross-source pooling',
               'sources': sources, 'rows': rows,
+              'analysis_verification': {'float_relative_tolerance': 1e-10, 'float_absolute_tolerance': 1e-12,
+                                        'non_float_values': 'exact; source score bytes remain SHA256-bound'},
               'outputs': {name: hashlib.sha256((output / name).read_bytes()).hexdigest() for name in ('table.csv', 'table.tex')}}
     (output / 'provenance.json').write_text(json.dumps(record, indent=2, allow_nan=False) + '\n')
     return record

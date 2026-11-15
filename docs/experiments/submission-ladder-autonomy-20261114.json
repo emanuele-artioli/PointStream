@@ -9,17 +9,17 @@
   "allocations": [
     {
       "id": "readiness-intake",
-      "cpu_seconds": 13500,
+      "cpu_seconds": 17700,
       "gpu_seconds": 0,
       "state": "released",
       "parts": {
-        "dataset_intake": 6300,
+        "dataset_intake": 8100,
         "independent_source_copy": 1800,
-        "annotation_preparation": 1800,
+        "annotation_preparation": 4200,
         "root_repair_native_validation_and_orchestration": 3600
       },
       "accounting": "conservative phase ceiling; includes remote metadata checks and preparation; exact scientific fleet receipts recorded separately",
-      "amendment": "Existing3600 intake plus read-only ballmetadata1800 and matchedROI/price audit900; independentcopy1800, annotation1800, root3600 unchanged. All within user12h authority; noGPU.",
+      "amendment": "Previously15300CPU plus2400CPU source-only18-frame VISOR review preparation; intake8100, independentcopy1800, annotation4200, root3600. NoGPU/humanapproval/confirmationoutcomes.",
       "original_cpu_seconds": 10800
     },
     {
@@ -104,7 +104,7 @@
       "id": "ball-coded-pixel-finite-oracle",
       "cpu_seconds": 4500,
       "gpu_seconds": 3000,
-      "state": "released_design_native_then_GPU_conditional",
+      "state": "closed_finite_oracle_success_paid_test_admitted",
       "card": "docs/cards/submission-ladder-ball-pixel-oracle-2026-11-15.md",
       "parts": {
         "native_cpu": 1530,
@@ -130,7 +130,28 @@
       },
       "hypothesis": "Measured coded pixels at the same sendertrajectory may explain a compact-rendered ball advantage; test actualcodedoutputs, never a universal sourcepixel perceptualbound.",
       "promotion": "Atleast10percentcropDISTSsavingvsnative+improvingcropLPIPS admitspossiblepaidcontrol; mustalso becompetitivewithstreak beforebuildingtransport. Otherwisecloseonlythisfiniteconstruction.",
-      "competing_explanation": "compactappearance taskbenefit may beposition signaling; existingdisknull retained; pixelcomparator isolates representation while using sameplacement."
+      "competing_explanation": "compactappearance taskbenefit may beposition signaling; existingdisknull retained; pixelcomparator isolates representation while using sameplacement.",
+      "conservative_cpu_charge_seconds": 3960,
+      "conservative_gpu_charge_seconds": 2430,
+      "unreleased_cpu_seconds": 540,
+      "unreleased_gpu_seconds": 570
+    },
+    {
+      "id": "paid-tracked-pixel-profile",
+      "cpu_seconds": 7500,
+      "gpu_seconds": 0,
+      "state": "released_implementation_and_CPU_physical_then_receiver_denial_conditional",
+      "card": "docs/cards/submission-ladder-paid-tracked-pixel-2026-11-15.md",
+      "parts": {
+        "tennis_three_paid_points_cpu": 1530,
+        "egocentric_native_fallback_cpu": 1530,
+        "independent_source_denied_receiver_cpu": 1530,
+        "implementation_review_publication_failure_cpu": 2910
+      },
+      "hypothesis": "The actualcodedpixel oracle may retain its scoped advantage after every placement/profile/nativebyte is paid and a packet-only receiver reconstructs it.",
+      "competing_explanation": "Oraclegainmayvanishunderpaidmetadata or hiddenencoder/sourcecache dependencies; exactframeparity+fullcost+source-denial address this.",
+      "scoring_policy": "No newGPU if everyTennispaiddecodedRGBframe hashesidentical acceptedpixeloracle. Reuseonlyauthenticatedsamepixelmetricarrays withnewactualpacketprices; otherwise noqualitypromotion andseparatelybudgetrescore.",
+      "scope": "NewPTP1 rawYUV+explicitcontent-specificencoderhints\u2192native+trackedpixelpacket; RGB24receiver; nativefallbackfunctionalEGO. Not freshimagepredictorinference/real-time/unseenconfirmation."
     }
   ],
   "jobs": [
@@ -412,6 +433,44 @@
       "scoped_command_cpu_seconds": 37.408,
       "host": "gpu6",
       "gpu_uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553"
+    },
+    {
+      "job_id": "20261115T020136Z-f5dd76c2",
+      "purpose": "finite32pixelpatch native oracle16to48 samequantizedPSBLtrajectory",
+      "state": "accepted_full48_actualcodedpixels_physical",
+      "cpu_ceiling_seconds": 1530,
+      "gpu_ceiling_seconds": 0,
+      "code_revision": "09b03b4bd053c30171c8970b44e69b71cfeb9ec0",
+      "source_sha256": "3d815ed4b4adc9e9bf7a48a3c1184e596bbff7114472754737167175e211d407",
+      "spec_sha256": "09576da3d8667a6e751d93ca7bca5f50d3e50e15286731a97b24381fb7f52a5a",
+      "receipt": "/private/tmp/pointstream-ball-pixel-native-runner-state.json",
+      "management_route": "PS_FLEET_MANAGEMENT_HOST=gpu6",
+      "deadline": "2026-11-15T03:00:00Z",
+      "conservative_cpu_charge_seconds": 1530,
+      "archive_sha256": "a06f2fca3a2bcad45123d5e06a233a6f2dadbcc91c96060658f759df81452739",
+      "stage_sha256": "5b90815b56bcef79bbf9f77e955ac22ae15aa236f0aa2195b79600d825357259",
+      "scoped_command_wall_seconds": 17.1406579175964,
+      "scoped_command_cpu_seconds": 17.019872000000003
+    },
+    {
+      "job_id": "20261115T020807Z-26806765",
+      "purpose": "finite32pixel coded oracle CUDAquality sameplacement as actualPSBL",
+      "state": "accepted_full48_metric_parity_exact_paid_followup_admitted",
+      "cpu_ceiling_seconds": 2430,
+      "gpu_ceiling_seconds": 2430,
+      "conservative_cpu_charge_seconds": 2430,
+      "conservative_gpu_charge_seconds": 2430,
+      "code_revision": "09b03b4bd053c30171c8970b44e69b71cfeb9ec0",
+      "source_sha256": "3d815ed4b4adc9e9bf7a48a3c1184e596bbff7114472754737167175e211d407",
+      "spec_sha256": "9a4ba5c66fe8d4967106b841affaac9e6265a106c8d206e9e26756d4da729443",
+      "archive_sha256": "c9da533b7c3ca334b170636abcf82efd50f6dfa597b3b0aefcea6c6959a1352e",
+      "score_member_sha256": "00e2885b59bed2a2a497c77a778abec29e0045280b0110e3b2bc23dba492ac16",
+      "receipt": "/private/tmp/pointstream-ball-pixel-score-runner-state.json",
+      "host": "gpu6",
+      "gpu_uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+      "scoped_command_wall_seconds": 38.6644,
+      "scoped_command_cpu_seconds": 38.4958,
+      "deadline": "2026-11-15T03:30:00Z"
     }
   ],
   "decisions": [
@@ -425,7 +484,8 @@
     "RacketVision all43test rallies already used in K5b tracker selection; no untouched holdout claim. Candidate native codec windows remain exposed development, sourceURL dedup unknown.",
     "Accepted VISOR64: ROI weightedDISTS -5.3901percent/LPIPS -4.5211percent below10percent. Semanticpatch +18.4685/+23.5456percent versusnative; evenfreeframing+18.2420percent weightedDISTS. Close frozenstaticadditivepatchfamily on both exposeddevelopmentwindows; no parameterfishing/positiveconfirmation. Nextpriority matched-ball-objective conventionalROIcontrol, pending exactdata/price audit.",
     "V2 acceptedboth64windows: all11580legacy numericvalues eachdomain EXACT (maxdelta0), standardfullLPIPS maxspatialdelta6.93e-7tennis/1.2815e-6VISOR. Primarynegativeunchanged; standardfullROIvsnative costs+1.15percent tennis/+0.64percentVISOR whileweightedbenefitsbelowtarget. No fullframewin.",
-    "Matched48GTROIaccepted: historicalnative62all48metrics EXACTmaxdifference0; realpaidstreakvsROI cropLPIPS -32.2874percent/DISTS -16.4847percent. NarrowregionalbenefitsurvivesoneprivilegedconventionalROIcontrol; noheldout/absence/automaticROI/task/newfullframeclaim. FullLPIPScomparisonvsROI interpolation-sensitive; pooledoldneural/native+newROIanalysisnext."
+    "Matched48GTROIaccepted: historicalnative62all48metrics EXACTmaxdifference0; realpaidstreakvsROI cropLPIPS -32.2874percent/DISTS -16.4847percent. NarrowregionalbenefitsurvivesoneprivilegedconventionalROIcontrol; noheldout/absence/automaticROI/task/newfullframeclaim. FullLPIPScomparisonvsROI interpolation-sensitive; pooledoldneural/native+newROIanalysisnext.",
+    "Pixeloracle full48accepted17checks, all48historicalnative62metrics exact. CropDISTS vsnative -48.2868percent, vsstreak -31.5291percent. CropLPIPSqualityrangesstrictlyseparatedfavorpixels(worst0.0151399<beststreak0.0156854, bestnative0.030699), supportedcommonrateintervals; noLPIPSBD invented. Programnative_gateNone retaineddueBDunsupported; ROOTadmits paidtest under preregistered DISTS+improvingLPIPS criterion using strictqualityseparation corroboration, not a quantifiedLPIPSrateclaim. Fullmetricscost10\u201312percent; freeplacementoracle not a codec."
   ],
   "repair_receipt": {
     "repair": "expose existing ABI215 library at FFmpeg required opt path; preserve ABI216 defaults",
@@ -435,5 +495,30 @@
     "sha256": "cb2b935b7780bcb7c3fdfbb3951124905b523727c0110397a8dea8a303eaa25e",
     "ffmpeg": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
     "ffprobe": "ffprobe version 8.1 Copyright (c) 2007-2026 the FFmpeg developers"
+  },
+  "verification_paid_profile": {
+    "ruff": "passed configured no paths",
+    "mypy": "passed configured 636 files",
+    "pytest": "2505 passed, 37 skipped; existing fork/thread deprecation warning",
+    "log": "/private/tmp/pointstream-paid-configured-pytest.log",
+    "sandbox_failure": "Prior non-escalated full run denied ps in fleet process-control test; rerun with process inspection passed. CI report portability fix normalizes JSON arrays and permits float-only numerical roundoff, preserving exact scores/hashes/decisions."
+  },
+  "next_paid_specs": {
+    "tennis": {
+      "path": "/private/tmp/pointstream-paid-tennis-spec-20261115.json",
+      "sha256": "f67cd32424befd15ff88e4e5eeaa4e4ca36eadd460d0c092ecda866a4a329b83",
+      "cpu_ceiling_seconds": 1530,
+      "gpu_ceiling_seconds": 0,
+      "deadline": "2026-11-15T05:00:00Z",
+      "state": "preflight_passed_not_submitted"
+    },
+    "ego": {
+      "path": "/private/tmp/pointstream-paid-ego-spec-20261115.json",
+      "sha256": "6ba607e0fc3647a264687e6f4d9291eb777818852a9c98099901f18e2f03c982",
+      "cpu_ceiling_seconds": 1530,
+      "gpu_ceiling_seconds": 0,
+      "deadline": "2026-11-15T05:00:00Z",
+      "state": "preflight_passed_not_submitted"
+    }
   }
 }

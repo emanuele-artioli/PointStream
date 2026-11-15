@@ -1,8 +1,10 @@
-# Complete native fallback endpoint
+# Complete codec endpoints
 
 The prospective contribution ladder starts with a functioning native fallback.
 This is infrastructure, not evidence of a semantic compression benefit. PSC1 is
 a new profile; historical PSTM/PSBL packets and measurements are unchanged.
+
+## PSC1 native fallback
 
 Use the project's pinned Python environment and declared native tools. Supply
 scratch on host-local disk (on GPU hosts, `/local/users/emanuele`, never `/tmp`).
@@ -42,10 +44,43 @@ process separation is implemented, but OS-enforced source denial must be
 qualified separately before a scientific receiver claim. Removing the source
 before a test decode checks functional source independence only.
 
-Semantic ROI, pixel-patch and ball profiles must pass their design and budget
-gates before adding their complete decoder contracts. A functioning fallback
-cannot count as a contribution-ladder win. Real-time operation, streaming
-recovery and arbitrary corrupted-stream recovery are not qualified here.
+## PTP1 tracked pixel patches
+
+The same commands also support the `tracked-pixel-v1` profile. Its initial
+input is **raw planar 8-bit YUV420 only**, with explicit geometry, frame rate,
+range and frame count. The `positions` array supplies one encoder-side centre
+hint `[x, y]` or `null` for every frame. Coordinates are converted to even,
+clamped 32×32 origins; a 64×64 coded tile contains each source crop. Each
+absent frame retains the decoded base. If all positions are `null`, the packet
+contains only the native stream.
+
+For example, a two-frame configuration for a 64×64 input is:
+
+```json
+{"profile":"tracked-pixel-v1","width":64,"height":64,"fps":[30,1],"frames":2,"full_range":false,"crf":48,"preset":4,"input_format":"yuv420p","positions":[[30,30],null],"position_provenance":{"kind":"caller-supplied"}}
+```
+
+```bash
+python -m src.pointstream encode input.yuv output.ptp --config config.json --scratch /absolute/local/scratch --record encode.json
+python -m src.pointstream inspect output.ptp
+python -m src.pointstream decode output.ptp decoded.rgb --scratch /absolute/local/scratch --record decode.json
+```
+
+PTP1 decode produces **raw RGB24**, in frame order at the declared geometry,
+not PSC1's planar YUV420. It requires the packet-declared dav1d executable and
+NumPy version; retain the packed runtime manifest to identify the rest of the
+installed software. The packet contains the complete base and optional patch
+IVF streams, all per-frame placements, canonical metadata and a checksum;
+`inspect` counts every byte. The decoder receives no source frames, hints,
+labels or content-specific model. Source-denial claims require a separate
+OS-enforced qualification.
+
+Hints can come from cached automatic BALL positions. Record their source in
+`position_provenance`; the encoder receipt hashes the supplied hints, but does
+not measure their generation cost or establish fresh tracker inference. PTP1
+limits decoded RGB output to 512 MiB; this is not a process-memory limit.
+Neither endpoint establishes streaming recovery or real-time throughput. A
+functioning endpoint alone does not establish a compression benefit.
 
 The source-only annotation reviewer is `python -m tools.datasets.annotation_review`;
 its module documentation defines the hash-bound manifest, prepare and import

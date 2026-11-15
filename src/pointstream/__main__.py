@@ -30,7 +30,13 @@ def main() -> int:
     args = parser.parse_args()
     try:
         if args.operation == "inspect":
-            print(json.dumps(codec.inspect(codec.read_packet(args.packet)), indent=2))
+            data = codec.read_packet(args.packet)
+            if data.startswith(b'PTP1'):
+                from src.pointstream import tracked_patch
+                report = tracked_patch.inspect(data)
+            else:
+                report = codec.inspect(data)
+            print(json.dumps(report, indent=2))
             return 0
         paths = [args.output.resolve(), args.record.resolve()]
         source_path = args.source if args.operation == "encode" else args.packet
@@ -42,10 +48,20 @@ def main() -> int:
         if args.record.exists():
             raise FileExistsError(args.record)
         if args.operation == "encode":
-            record = codec.encode(args.source, args.output, json.loads(args.config.read_text()),
-                                  scratch=args.scratch, encoder=args.encoder, decoder=args.decoder, ffmpeg=args.ffmpeg, ffprobe=args.ffprobe)
+            config = json.loads(args.config.read_text())
+            if config.get('profile') == 'tracked-pixel-v1':
+                from src.pointstream import tracked_patch
+                record = tracked_patch.encode(args.source, args.output, config, scratch=args.scratch, encoder=args.encoder, decoder=args.decoder)
+            else:
+                record = codec.encode(args.source, args.output, config, scratch=args.scratch, encoder=args.encoder, decoder=args.decoder, ffmpeg=args.ffmpeg, ffprobe=args.ffprobe)
         else:
-            record = codec.decode(args.packet, args.output, scratch=args.scratch, decoder=args.decoder, ffprobe=args.ffprobe)
+            with args.packet.open('rb') as handle:
+                magic = handle.read(4)
+            if magic == b'PTP1':
+                from src.pointstream import tracked_patch
+                record = tracked_patch.decode(args.packet, args.output, scratch=args.scratch, decoder=args.decoder)
+            else:
+                record = codec.decode(args.packet, args.output, scratch=args.scratch, decoder=args.decoder, ffprobe=args.ffprobe)
         codec.write_new(args.record, (json.dumps(record, indent=2) + "\n").encode())
         print(json.dumps({"operation": args.operation, "packet_bytes": record["packet_bytes"], "record": str(args.record)}))
     except (ValueError, OSError, RuntimeError) as exc:

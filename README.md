@@ -5,8 +5,8 @@ and egocentric hand-object video. It provides segmentation, codec and compositin
 components, scoped serialized-ball experiments, and a prospective complete-codec
 programme. Competitive end-to-end gains in both domains remain research goals.
 
-The new [native fallback endpoint](docs/codec-endpoint.md) provides `encode`,
-`decode` and `inspect` commands. The [submission ladder](docs/experiments/submission-ladder-20261114.md)
+The [codec endpoints](docs/codec-endpoint.md) provide `encode`, `decode` and
+`inspect` commands for native fallback and tracked pixel patches. The [submission ladder](docs/experiments/submission-ladder-20261114.md)
 records the current milestones and stage-budget requirements.
 
 ## Layout
