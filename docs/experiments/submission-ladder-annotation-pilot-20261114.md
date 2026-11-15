@@ -44,11 +44,24 @@ Open `review/index.html` locally, or serve its `review/` directory with the
 existing loopback server. The verified URL is `http://127.0.0.1:17691/`.
 The source-only package is local and has not been published or redistributed.
 
-At this checkpoint a task-owned server uses PID14388, wrapper session1944,
-with a hard expiry of **2026-11-15 00:12:11 UTC** (**November14,21:12:11
-America/Sao_Paulo**). It stops only its own child. The offline files and browser
-drafts survive expiration. `/private/tmp/pointstream-annotation-pilot-20261114/server-state.json`
-retains the exact command, start and expiry; no periodic model call is scheduled.
+The initial45-minute helper (PID14388/session1944) was verified by its exact
+command and stopped at the user's authorized handoff; its state is preserved in
+`server-state-initial-45min.json`. The helper was extended **once** to the absolute
+12-hour authority deadline. The current source-only HTTP child is **PID19189**,
+wrapper **PID19188**, tool session**33836**, with hard expiry **2026-11-15
+11:07:34 UTC** (**November15,08:07:34 America/Sao_Paulo**). HTTP200 readiness
+was verified on the same `http://127.0.0.1:17691/` origin. It stops only its own
+child; there is no timer chain, GPU job or recurring model call.
+`/private/tmp/pointstream-annotation-pilot-20261114/server-state.json` retains the
+exact command, start and absolute expiry. No source asset, annotation decision
+or reference label changed during the extension.
+
+Browser drafts belong to the HTTP origin and browser profile, not the server.
+Restarting this same origin preserves those drafts. Opening the durable
+`review/index.html` through `file://` uses a different storage origin and does
+**not** automatically recover an HTTP-origin draft; use the same HTTP origin to
+resume or export decisions there. The offline page and its assets survive
+server expiration, but offline access alone is not a transfer of browser drafts.
 
 The review digest is
 `d7aa8d744a938fc71c077c5305fffaf3aa3c9cf239470be1621983b062a6c788`.

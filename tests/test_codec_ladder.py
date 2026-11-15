@@ -188,3 +188,35 @@ def test_prepared_archive_binding_and_tamper_guard(tmp_path):
         prepared_inputs(archive, '0' * 64, tmp_path / 'bad', cfg)
     with pytest.raises(ValueError, match='configuration'):
         prepared_inputs(archive, digest, tmp_path / 'bad-config', {**cfg, 'source_group': 'wrong'})
+
+
+@pytest.mark.skipif(not all(shutil.which(t) for t in ['SvtAv1EncApp', 'dav1d']), reason='native tools absent')
+def test_fleet_publication_lifecycle_keeps_thin_archive(tmp_path, monkeypatch):
+    from experiments.codec_ladder import fleet
+    from experiments.jobs import staging
+    from src.codecs import svtav1
+    source = tmp_path / 'input.yuv'
+    source.write_bytes(np.random.default_rng(31).integers(16, 235, (2, 128 * 128 * 3 // 2), np.uint8).tobytes())
+    masks = tmp_path / 'masks.npz'
+    foreground = np.zeros((2, 128, 128), bool)
+    foreground[:, 32:96, 32:96] = True
+    np.savez_compressed(masks, foreground=foreground)
+    manifest = tmp_path / 'manifest.json'
+    prepare(config(), source, masks, manifest)
+    stage, scratch = tmp_path / 'stage', tmp_path / 'scratch'
+    stage.mkdir()
+    scratch.mkdir()
+    monkeypatch.setenv('PS_STAGE_DIR', str(stage))
+    monkeypatch.setenv('PS_SCRATCH_DIR', str(scratch))
+    # Local native tools are infrastructure only; production version gating
+    # remains separately tested and is not bypassed in any fleet specification.
+    monkeypatch.setattr(fleet, 'qualify_tools', lambda e, d: {'encoder': svtav1.tool(e), 'decoder': svtav1.tool(d)})
+    monkeypatch.setattr('sys.argv', ['fleet', '--mode', 'run', '--manifest', str(manifest), '--source', str(source),
+                                  '--masks', str(masks), '--frames', '2', '--target-frames', '2', '--full-cap-seconds', '60'])
+    assert fleet.main() == 0
+    saved_sha = fleet.worker.file_sha(stage / 'published.tar')
+    assert staging.publish_scratch(scratch, stage) is None
+    staging.release_scratch(scratch, stage)
+    assert not scratch.exists()
+    assert fleet.worker.file_sha(stage / 'published.tar') == saved_sha
+    assert fleet.validate(stage, scratch)['passed']

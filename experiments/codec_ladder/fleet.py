@@ -231,7 +231,7 @@ def main() -> int:
     if args.mode == "run":
         if args.manifest is None or args.source is None or args.masks is None or args.frames is None:
             parser.error("run requires manifest/source/masks/frames")
-        root = scratch / "publish"
+        root = scratch / "native-run"
         result = worker.run(args.manifest, root, prefix=args.frames, source=args.source, masks=args.masks, encoder=args.encoder, decoder=args.decoder)
         physical = worker.validate(root)
         if not physical["passed"]:
