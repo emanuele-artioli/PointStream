@@ -59,7 +59,7 @@
       "id": "matched-ball-conventional-roi",
       "cpu_seconds": 7200,
       "gpu_seconds": 3600,
-      "state": "released_design_and_native_correctness_only_GPU_conditional",
+      "state": "closed_scoped_ball_benefit_survives_GTROI",
       "card": "docs/cards/submission-ladder-ball-roi-2026-11-15.md",
       "frozen_before_outcomes": {
         "source": "tracknet/game10/Clip3 first48; sourceYUVa40b172b7a3e72c0fcf75dff15584564e3d220ffa6f1653439d045387f2d9963",
@@ -94,7 +94,43 @@
         "parallelism_note": "SVT --lp6 is algorithm level, not six allocatedthreads",
         "stage_wall_ceiling_seconds": 1530,
         "full_cost_cap_seconds": 900
-      }
+      },
+      "conservative_cpu_charge_seconds": 3960,
+      "conservative_gpu_charge_seconds": 2430,
+      "unreleased_cpu_seconds": 3240,
+      "unreleased_gpu_seconds": 1170
+    },
+    {
+      "id": "ball-coded-pixel-finite-oracle",
+      "cpu_seconds": 4500,
+      "gpu_seconds": 3000,
+      "state": "released_design_native_then_GPU_conditional",
+      "card": "docs/cards/submission-ladder-ball-pixel-oracle-2026-11-15.md",
+      "parts": {
+        "native_cpu": 1530,
+        "score_cpu": 2430,
+        "score_gpu": 2430,
+        "cpu_preparation_failure_closeout": 540,
+        "gpu_failure_closeout": 570
+      },
+      "frozen_before_outcomes": {
+        "source": "samegoldfirst48game10Clip3",
+        "base_points": [
+          48,
+          55,
+          62
+        ],
+        "placement": "decoded fitted quantized actual PSBL trajectories, not labels",
+        "patch_source_pixels": 32,
+        "coded_tile_pixels": 64,
+        "padding": "limitedBT709 black Y16 U128 V128",
+        "patch_crf": 20,
+        "preset": 4,
+        "placement_cost": "optimistically granted free, not a complete paidcodec"
+      },
+      "hypothesis": "Measured coded pixels at the same sendertrajectory may explain a compact-rendered ball advantage; test actualcodedoutputs, never a universal sourcepixel perceptualbound.",
+      "promotion": "Atleast10percentcropDISTSsavingvsnative+improvingcropLPIPS admitspossiblepaidcontrol; mustalso becompetitivewithstreak beforebuildingtransport. Otherwisecloseonlythisfiniteconstruction.",
+      "competing_explanation": "compactappearance taskbenefit may beposition signaling; existingdisknull retained; pixelcomparator isolates representation while using sameplacement."
     }
   ],
   "jobs": [
@@ -336,6 +372,46 @@
       "scoped_command_cpu_seconds": 263.024,
       "score_file": "docs/experiments/submission-ladder-visor-standard-v2-scores-20261115.json",
       "analysis_file": "docs/experiments/submission-ladder-visor-standard-v2-analysis-20261115.json"
+    },
+    {
+      "job_id": "20261115T012257Z-5055d064",
+      "purpose": "matched ball-objective GTROI nativeCPU16to48 goldcontrol",
+      "state": "accepted_full48_native_and_scored",
+      "cpu_ceiling_seconds": 1530,
+      "gpu_ceiling_seconds": 0,
+      "code_revision": "142b51e34c3d0643930e2750fc6bc9ce740f69d8",
+      "source_sha256": "87d314b36a100432761eff759a489337ae35cb45e0d76704a28826b413616404",
+      "spec_sha256": "64eaa7f1842405b4bdc52a282a94b9f42f6ad8b0d59d5257e27af61ddd6b45c3",
+      "receipt": "/private/tmp/pointstream-ball-roi-native-runner-state.json",
+      "management_route": "PS_FLEET_MANAGEMENT_HOST=gpu6",
+      "deadline": "2026-11-15T02:30:00Z",
+      "conservative_cpu_charge_seconds": 1530,
+      "archive_sha256": "588a928e8405e6193eb3e0878079d4e71d923e8c0fe765743de06272d88ed0f5",
+      "stage_sha256": "7480df6b6fb3905f38ec4632f7e8804a83d22960cb9460e6f96240ab1951175a",
+      "scoped_command_wall_seconds": 17.243506864644587,
+      "scoped_command_cpu_seconds": 17.185302999999998
+    },
+    {
+      "job_id": "20261115T012841Z-7ce10c5b",
+      "purpose": "matched-ball GTROI quality against authenticated historical crop/full scoring",
+      "state": "accepted_full48_historical_metric_parity_exact_scientific_comparison_supported",
+      "cpu_ceiling_seconds": 2430,
+      "gpu_ceiling_seconds": 2430,
+      "code_revision": "142b51e34c3d0643930e2750fc6bc9ce740f69d8",
+      "source_sha256": "87d314b36a100432761eff759a489337ae35cb45e0d76704a28826b413616404",
+      "spec_sha256": "ed576b37c9c5156fb0b97c027835dc1115c484d07e3e65ae712bd668197b5ee5",
+      "receipt": "/private/tmp/pointstream-ball-roi-score-runner-state.json",
+      "management_route": "PS_FLEET_MANAGEMENT_HOST=gpu6",
+      "deadline": "2026-11-15T03:00:00Z",
+      "conservative_cpu_charge_seconds": 2430,
+      "conservative_gpu_charge_seconds": 2430,
+      "archive_sha256": "b05d359dd1d8f0bb2ad40430d51fcc3b12714ebd132c414f2714a5b83a9cba83",
+      "score_file": "docs/experiments/submission-ladder-ball-roi-scores-20261115.json",
+      "analysis_file": "docs/experiments/submission-ladder-ball-roi-analysis-20261115.json",
+      "scoped_command_wall_seconds": 37.565,
+      "scoped_command_cpu_seconds": 37.408,
+      "host": "gpu6",
+      "gpu_uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553"
     }
   ],
   "decisions": [
@@ -348,7 +424,8 @@
     "Next test before more outcomes: unchanged preregistered VISOR64-frame arm, fixed protocol/source/3rates; no tennis tuning. Any later narrowed method needs separate hypothesis/budget.",
     "RacketVision all43test rallies already used in K5b tracker selection; no untouched holdout claim. Candidate native codec windows remain exposed development, sourceURL dedup unknown.",
     "Accepted VISOR64: ROI weightedDISTS -5.3901percent/LPIPS -4.5211percent below10percent. Semanticpatch +18.4685/+23.5456percent versusnative; evenfreeframing+18.2420percent weightedDISTS. Close frozenstaticadditivepatchfamily on both exposeddevelopmentwindows; no parameterfishing/positiveconfirmation. Nextpriority matched-ball-objective conventionalROIcontrol, pending exactdata/price audit.",
-    "V2 acceptedboth64windows: all11580legacy numericvalues eachdomain EXACT (maxdelta0), standardfullLPIPS maxspatialdelta6.93e-7tennis/1.2815e-6VISOR. Primarynegativeunchanged; standardfullROIvsnative costs+1.15percent tennis/+0.64percentVISOR whileweightedbenefitsbelowtarget. No fullframewin."
+    "V2 acceptedboth64windows: all11580legacy numericvalues eachdomain EXACT (maxdelta0), standardfullLPIPS maxspatialdelta6.93e-7tennis/1.2815e-6VISOR. Primarynegativeunchanged; standardfullROIvsnative costs+1.15percent tennis/+0.64percentVISOR whileweightedbenefitsbelowtarget. No fullframewin.",
+    "Matched48GTROIaccepted: historicalnative62all48metrics EXACTmaxdifference0; realpaidstreakvsROI cropLPIPS -32.2874percent/DISTS -16.4847percent. NarrowregionalbenefitsurvivesoneprivilegedconventionalROIcontrol; noheldout/absence/automaticROI/task/newfullframeclaim. FullLPIPScomparisonvsROI interpolation-sensitive; pooledoldneural/native+newROIanalysisnext."
   ],
   "repair_receipt": {
     "repair": "expose existing ABI215 library at FFmpeg required opt path; preserve ABI216 defaults",
