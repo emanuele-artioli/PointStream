@@ -18,6 +18,8 @@ The [next foreground screen proposal](docs/cards/submission-ladder-next-foregrou
 
 The genuine18-frame VISOR review has arrived:9 uncertain and9 rejected, with useful coarse guidance and an overinclusive-target diagnosis; it provides zero approved references. The [human-directed refinement card](docs/cards/visor-human-review-refinement-2026-11-15.md) releases a bounded source-only proposal stage under the existing authority, ending11:07:34UTC. Revised actor/manipulated-object scope is separate from historical metrics; no unscored frame or rejected polygon becomes gold.
 
+For future annotation tasks, the user-linked platform exploration is incorporated in the [annotation workflow](docs/annotation-workflow.md): evaluate CVAT for shared review and X-AnyLabeling for desktop correction before extending the bespoke editor. Reuse saved predictions in a small import/edit/export and recovery trial; preserve source identities, blind controls, uncertainty and human approval. These platforms remain unqualified on our footage. This follow-up authorizes no new compute or external upload.
+
 Each workstream is scoped to one session. Items that do not depend on each
 other run in parallel sessions; each item names what it waits for (user,
 2026-10-16). This file is the source of truth: a session card only starts
