@@ -1,0 +1,178 @@
+{
+  "schema": 1,
+  "state": "public_manifest_joined_to_saved_W7_identity_not_independent_media_byte_audit",
+  "source_url": "https://story-emanueleartioli.emanuartioli.workers.dev/data/tennis-media-v3.json",
+  "retrieved_date": "2026-11-15",
+  "raw_manifest_bytes": 233724,
+  "raw_manifest_sha256": "4769759f48441472619b49990bf595e860eb37914efd160f46197985ab2f4d7a",
+  "raw_manifest_local_path": "/private/tmp/pointstream-chapter14-tennis-media-v3-20261115.json",
+  "source_clip": "alcaraz_hurkacz/028",
+  "source_sha256": "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934",
+  "job": "20261030T185245Z-e51a4dec",
+  "judge_code": "fb4dc43c0bfb62f6c8e6b758822ac3c57126b52a",
+  "gpu": "RTX 6000 Ada, gpu5",
+  "published_archive_sha256": "cbc26962935b3542b0b7cf77f724010de19323fedd6fe02cb822ec6e43e75837",
+  "score_summary_sha256": "6fd201ff8a39c621d324ad8879903b2b670c2fcf6f4413eda7b14363758d9778",
+  "display": {
+    "verified_frame_pairs_claimed_by_exporter": 67,
+    "native_scored_frames": 80,
+    "fps": 8.333333333333334,
+    "duration": 8.04,
+    "resolution": [
+      1280,
+      720
+    ],
+    "sampled_native_indices": [
+      0,
+      3,
+      6,
+      9,
+      12,
+      15,
+      18,
+      21,
+      24,
+      27,
+      30,
+      33,
+      36,
+      39,
+      42,
+      45,
+      48,
+      51,
+      54,
+      57,
+      60,
+      63,
+      66,
+      69,
+      72,
+      75,
+      78,
+      81,
+      84,
+      87,
+      90,
+      93,
+      96,
+      99,
+      102,
+      105,
+      108,
+      111,
+      114,
+      117,
+      120,
+      123,
+      126,
+      129,
+      132,
+      135,
+      138,
+      141,
+      144,
+      147,
+      150,
+      153,
+      156,
+      159,
+      162,
+      165,
+      168,
+      171,
+      174,
+      177,
+      180,
+      183,
+      186,
+      189,
+      192,
+      195,
+      198
+    ],
+    "reassembly_script_sha256": "3b9d48dc4a4bef6a11717136d3a8d64ede157d2a4453fa2ee87f697e313fefc7",
+    "media": {
+      "base": {
+        "url": "/media/pointstream-story-v3/base.mp4",
+        "bytes": 333203,
+        "sha256": "449a47ec3e95f2dcdef9f296075916f599e23a5a7a17dc7aa882bc5f5daf3951",
+        "poster": "/media/pointstream-story-v3/base-poster.png",
+        "posterBytes": 425782,
+        "posterSha256": "cc04b15a9112ac3be8f1801875e7384c5a360c998634f86767175faddd971472"
+      },
+      "hybrid": {
+        "url": "/media/pointstream-story-v3/hybrid.mp4",
+        "bytes": 449064,
+        "sha256": "b39c14265f33b8f2c8362d889b117f8cf00fd0233c8ae8e2f038d52f0dda5c33",
+        "poster": "/media/pointstream-story-v3/hybrid-poster.png",
+        "posterBytes": 434647,
+        "posterSha256": "4bf2f0bafbe3dd65801eb7e1746382a4505978f00f8852127c1d1ae99e74783b"
+      },
+      "mask": {
+        "url": "/media/pointstream-story-v3/mask.mp4",
+        "bytes": 124280,
+        "sha256": "b645a7327c37b43a374b7fef8caadf3dd7028080c478122c0c761474b91b2b3d",
+        "description": "White pixels are receiver-predicted support actually written by the compositing step; black is untouched base.",
+        "poster": "/media/pointstream-story-v3/mask-poster.png",
+        "posterBytes": 17779,
+        "posterSha256": "18ffd455150107dbefb3782c0784b917e4183d14d0719cdc9012965e52c78f9a"
+      },
+      "foreground": {
+        "url": "/media/pointstream-story-v3/foreground.mp4",
+        "bytes": 151172,
+        "sha256": "86274fca6b7d314a94ab0190acc9476e5a1939333437d65d29df5beff90de625",
+        "description": "Generated player pixels on black, limited to the receiver-predicted support actually written.",
+        "poster": "/media/pointstream-story-v3/foreground-poster.png",
+        "posterBytes": 23801,
+        "posterSha256": "da4a4684d048fd5a9be57548987295b3d6d4709d4e1c901395fc461f591445f6"
+      }
+    }
+  },
+  "website_quality_points": [
+    {
+      "id": "base",
+      "rateKbps": 14.120833333333334,
+      "wholeFrame": {
+        "lpips": 0.2936680309154369,
+        "dists": 0.20017235428094865,
+        "psnrDb": 25.838246696745863
+      },
+      "playerRegion": {
+        "lpips": 0.7179598528423504,
+        "dists": 0.49614445492625237
+      }
+    },
+    {
+      "id": "hybrid",
+      "rateKbps": 18.461418333333334,
+      "wholeFrame": {
+        "lpips": 0.2845294694311825,
+        "dists": 0.17501250877976418,
+        "psnrDb": 25.81552930509177
+      },
+      "playerRegion": {
+        "lpips": 0.30418113154134874,
+        "dists": 0.24202542155981063
+      }
+    }
+  ],
+  "website_rate_scope": {
+    "base": "16,945 bytes of native SVT-AV1 IVF over the 9.6-second window, 14.120833 kbps; no model-bank or transport overhead included.",
+    "hybrid": "Paid base plus 2,469-byte KPS2 keypoints, 444-byte research bootstrap, and match-bank and adapter/guider amortized over 7,200 seconds: 18.461418 kbps.",
+    "optimisticFloor": "Full framing and tensor bootstrap unmeasured; no ball update or complete semantic wire claim. Generator model transport excluded. Worst-case bank alternative total 147.93778 kbps.",
+    "referenceBankAmortizationSeconds": 7200,
+    "inputWindowSeconds": 9.6,
+    "displayProxyBytesAreNotRate": true
+  },
+  "website_training_exposure": "Tier 1 uses a generator base and adapter fitted using other footage from the same Alcaraz\u2013Hurkacz broadcast (training clips 002/006/011). This window was selected as untouched; screen found no exact decoded-frame matches or near matches under its specified threshold against screened prior clips, but cannot rule out altered replays or original-source overlap. Generator pretraining exposure is not established. ImageNet metric networks are not trained on the evaluated frames under the W7 protocol.",
+  "corrected_rate_record": "docs/experiments/w9-inputs/w7-repaired-2h.json",
+  "corrected_modeled_2h_rate_kbps": 19.239833333333333,
+  "website_rate_status": "superseded_W7_bank_bill_not_W9_corrected; cold_bank_also_requires_correction",
+  "limitations": [
+    "Served MP4 hashes are manifest claims; no independent download/hash or pre-display frame replay in this audit.",
+    "Website proxy bytes are not codec payload cost.",
+    "Scored80 ticks and displayed67ticks differ; no frame-by-frame full25fps claim.",
+    "Corrected rate still models12cropbank across2hours and excludes fullframing/modeltransport."
+  ]
+}

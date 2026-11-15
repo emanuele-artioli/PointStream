@@ -22,15 +22,17 @@ Research cutoff remains December 19; preparation target remains December 26,
 
 ## Revised order of work
 
+**Chapter14 now identified:** the user supplied the [story website](https://story-emanueleartioli.emanuartioli.workers.dev/#story/representations/neural), and the [actual Chapter14 audit](experiments/submission-ladder-chapter14-demo-audit-20261115.md) joins its public manifest to W7 al028. This is AnimateAnyone with tennis/match adaptation, distinct from the earlier hand-site audit. Saved player LPIPS/DISTS improve strongly, including over bracketed matched anchors under the corrected modeled19.24kbps two-hour rate; full-frame metrics lose to the best matched anchor. The website still displays the superseded18.46kbps bill. This positive generative-player evidence must enter the next design decision and paper explicitly. Its receiver-state, temporal, reference-reuse and complete-cost questions remain; the displayed base and hybrid alone are not equal-rate evidence. No new GPU experiment is needed to establish this saved-metric finding.
+
 | Priority | Next action | Decision it unlocks |
 |---|---|---|
-| P0 | Authenticate the exact local website player demo, source windows, model, preview/decoded relationship and complete transmitted costs. Use the [demo audit](experiments/submission-ladder-player-demo-audit-20261115.md); confirm with the user if this is the intended version. | Establish whether the apparent player benefit is a matched codec result, a perceptual reconstruction benefit, or an unmatched illustration. Do not dismiss it from the patch screen or accept its displayed bitrate as authenticated. |
+| P0 | Finish the [Chapter14 export/receiver audit](experiments/submission-ladder-chapter14-demo-audit-20261115.md): served-video/frame provenance, saved matched anchors and actual bank/adaptation/refresh/framing costs. The unrelated [hand-demo audit](experiments/submission-ladder-player-demo-audit-20261115.md) is preserved separately. | The intended demo and saved metric improvement are now identified. Determine where its conditional player benefit survives complete receiver/accounting/temporal requirements; update the stale website rate legend only through a separate reviewed site change. |
 | P0 | Prepare a small, source-spread human viewing pilot from authenticated saved reconstructions, with randomized A/B order, matched bytes or explicitly disclosed rates, native-cadence playback, crops and source references. Include failures and ties. Compare native coding plus the same enhancement model when applicable. | Check metric/visual agreement before another expensive method decision. User preference is development evidence; population preference needs a separate blinded multi-observer study. If provenance is missing, show the previews only as exploratory and repair accounting first. |
 | P1 | Adopt [source-level inference](experiments/submission-ladder-inference-policy-20261115.md) for future experiments; freeze primary contrast, source sampling, interval/test, multiplicity and sample-size/precision rationale before outcomes. | Report small and large effects with uncertainty. No automatic 10% usefulness floor and no automatic p-value-only usefulness rule. Keep practical effect, uncertainty, cost and novelty distinct. |
 | P1 | Run the small dedicated-editor qualification in [annotation workflow](annotation-workflow.md), reusing saved VISOR proposals; revise the foreground policy and timing pilot before scaling reference correction. | Reduce human burden and verify geometry/provenance survives export. The browser elapsed time and rough guidance cannot forecast final-mask throughput. |
 | P1, conditional | Decide the egocentric endpoint from the visual/method pilot, then cost and freeze the minimum adequate independent-source annotation/confirmation design. | The 192 reserved frames are a preserved candidate sample, not an automatic next labour commitment or independent-source sample-size justification. Dense foreground metrics still need valid masks; a subjective endpoint needs its own blinded viewing design. |
 | P2, conditional | Revisit the [base-suppressed patch proposal](cards/submission-ladder-next-foreground-screen-proposal-2026-11-15.md) only if the demo/visual audit leaves it the best next hypothesis. Recheck its budget and admission rule under the new prospective protocol before launch. | Changes duplicate foreground coding rather than repeating the failed additive construction. At most one added representation per domain; no new training by default. |
-| P2, continuous | Expand the paper using the [length audit](paper/submission-ladder-length-audit-2026-11-15.md): methods, controls, informative negatives, task harms and novelty boundary. | Use the available journal space for scientific explanation. Do not preserve necessary interpretation only outside the build; do not fill pages with operational chronology. Verify current venue format before assigning a final page count. |
+| P2, continuous | Expand the paper using the [length audit](paper/submission-ladder-length-audit-2026-11-15.md): methods, controls, actual W7/W9 player positives and their costs, informative negatives, task harms and novelty boundary. | Use the available journal space for scientific explanation. Do not preserve necessary interpretation only outside the build; do not fill pages with operational chronology. Verify current venue format before assigning a final page count. |
 | Final | Independent reproduction, rights/author review, live venue checks and artifact packaging. | Submit only after actual authors approve and the user separately instructs filing. |
 
 ## Decision and human-review rules
@@ -65,12 +67,10 @@ and ordinary repository checks may continue. Release any new scientific compute
 only with a concrete stage budget and authority; the old 5.85 CPU-hour / 1.6875
 GPU-hour patch proposal is neither launched nor the automatic next experiment.
 
-The discovered local website page depicts egocentric hands, not tennis players;
-no second player comparison was found in the searched local paths. It does not
-identify the demo the user described. The immediate user clarification is its
-URL or local path (or confirmation that the hand demo was intended). Preserve
-that identity gap rather than transferring the hand demo's limitations or model
-to an unlocated player demo.
+The user has resolved the demo identity: Chapter14 of the story website above.
+Do not ask for that URL again or transfer the hand demo's limitations/model to it.
+Saved W7/W9 records and the public manifest now establish the metric finding;
+independent served-media replay and a matched source-spread human pilot remain.
 The user will later provide the actual visual judgments and author priorities.
 No new session is needed to continue. A new session should read this file,
 PLAN's current submission section, protocol v2 and the linked audits, inspect
