@@ -1,0 +1,48 @@
+# Submission readiness after the first contribution-ladder screens
+
+**Decision: not ready for submission.** The implementation and evidence are substantially stronger, but the distinctive research contribution and independent confirmation remain unresolved. The preserved manuscript at Overleaf `690cad0` is a historical author-review revision; this update does not change that source, its 23+5-page package, or author approvals.
+
+## What the new evidence changes
+
+| Question | Measured development result | Consequence for the paper |
+|---|---|---|
+| Does the fixed foreground patch construction beat native coding? | Weighted-DISTS BD-rate +17.10% in tennis and +18.47% in egocentric video. | Close this additive fixed-patch construction; do not present its functionality as a compression result. |
+| Does ordinary ROI allocation explain a foreground-priority gain? | Conventional ROI saves 8.53% and 5.39% weighted-DISTS, respectively, below the registered 10% promotion target. | Preserve the useful trade-offs; neither domain passes the development promotion rule here. |
+| Does the ball side channel survive a stronger conventional reference? | Pooled native/neural plus matched GTROI anchors retain 60.95% crop-LPIPS and 36.23% crop-DISTS savings for the old six paid side-channel points. | State the stronger reference and changed common-quality interval. The old 76.97% number describes another reference/support. |
+| Is compact streak appearance necessary for the ball gain? | Paid coded pixels at the same transmitted positions save 30.42% crop-DISTS versus streak; their measured crop-LPIPS range is strictly better, with overlapping sampled rates but no common-quality interval. Existing disk/streak task hits are equal. | Position and local allocation are strong competing explanations. Do not claim a distinctive streak-appearance benefit. |
+| Is the paid pixel candidate useful against the strongest current reference? | Versus pooled native/neural/ROI, it saves 54.83% crop-LPIPS and 29.28% crop-DISTS, while costing 22.00% full spatial-LPIPS, 12.72% full-DISTS and 30.52% pooled-RGB-PSNR BD-rate. | This is a scoped ball-priority trade-off on one exposed all-visible 48-frame window, not full-frame superiority or a population result. |
+
+The ball and whole-foreground results use different objectives and sources. Historical ball `full_lpips` is a full-resolution spatial-map mean; it is not the official scalar LPIPS. The 64-frame two-domain screen reports the separately named scalar full-frame LPIPS and preserves every legacy regional value exactly. Crop metrics use an independently evaluated 64×64 reference crop. No metric is equated with human preference.
+
+The paid pixel-versus-reference BD-rate and old streak-versus-reference BD-rate cover different quality ranges and cannot rank the representations by their magnitudes. The direct same-position control supplies that comparison. All overlap, Pareto/PCHIP, constructed linear-rate hull/PCHIP and literal chord sensitivities remain in the machine records. A constructed envelope is not physically demonstrated switching.
+
+Source records: [two-domain programme](../experiments/submission-ladder-20261114.md), [paid pixel analysis](../experiments/submission-ladder-paid-tennis-analysis-20261115.json), [stronger reference](../experiments/submission-ladder-paid-tennis-strong-reference-20261115.json), [independent evidence bundle](../experiments/submission-ladder-paid-pixels-evidence-archive-20261115.json).
+
+## Concrete implementation and reproducibility
+
+Public `encode`, `decode` and `inspect` now support native PSC1 and paid PTP1. PTP1 carries complete base/patch streams, timing, geometry, per-frame placement and resource identities. Tennis packets are 98,350 / 71,152 / 41,485 bytes, including 845 framing/metadata bytes each. All decoded frames and both native streams exactly match the authenticated coded-pixel control. A fresh pinned-runtime replay verifies the published paid packets before reusing scores.
+
+The egocentric all-null fallback reconstructs all64 full-range 1080p/50fps frames from a complete313,310-byte packet with no patch stream. It establishes functioning reconstruction, without an egocentric quality benefit. Its RGB conversion differs from historical scores, which are not reused.
+
+PTP1 currently accepts raw YUV420 plus explicit encoder hints and returns raw RGB24. Retained genuine automatic trajectories are content-specific encoder input, and all receiver-needed placement is transmitted. Fresh detector inference, complete sender timing, streaming/cut recovery and real-time performance remain unqualified. The512MiB decoded-output cap is not a process-memory bound. See the [endpoint contract](../codec-endpoint.md).
+
+The artifact supports recomputing comparisons from saved scores. Saved packets and source-qualified inputs support reconstruction and rescoring with the declared environment and metric resources. Native/patch re-encoding from the source and retained explicit hints is reproducible; this does not establish fresh end-to-end trajectory generation. Independent OS-enforced source denial is a separate acceptance item, pending the bounded CPU receiver qualification; process separation alone is insufficient.
+
+## References and confirmation
+
+Existing datasets do not need bulk replacement. The wider VISOR installation already supplies native video and official sparse human proposals. However, the reserved P35/P12/P11 windows have missing or inconsistent dense masks; none is confirmation-eligible yet. Unknown annotations cannot become empty foreground, and the fixed windows will not move after outcomes.
+
+The18-frame [VISOR source-only pilot](../experiments/submission-ladder-visor-annotation-pilot-20261115.md), alongside the earlier12-frame tennis pilot, is ready for genuine human review. It includes unknown frames and blind controls; no model/agent approval is called human ground truth. Time the pilot, correct boundaries and missing objects, retain uncertainty, and finish the required fixed reference sample before confirmation. The full VISOR target is192 frames, not the18-frame pilot alone.
+
+Tennis also needs independent source grouping and references. All43 RacketVision test rallies were previously used for tracker selection; clip IDs do not prove independent matches. More prefixes of familiar footage cannot repair this exposure. Dataset/judge training overlap and retrospective exposure must stay visible.
+
+## Timely research and manuscript decisions
+
+1. Finish the bounded receiver proof and current engineering checks; close accepted archives and job events. Do not spend a week extending infrastructure qualification.
+2. Finish the timed human-reference pilot, then the fixed confirmation references and tennis source grouping. Freeze the final candidate before opening confirmation outcomes.
+3. Carry at most one added representation per domain. Paid tracked pixels are the strongest current tennis development candidate; egocentric video has no promoted added representation. Reopening a failed patch, mask, background or generative route requires a changed limiting assumption and its own finite screen/budget.
+4. Confirm against the simplest relevant conventional ROI and native/neural methods, grouping uncertainty by source/match. Preserve task, absence and temporal failures; the all-visible ball result cannot establish absence safety.
+5. Rewrite the manuscript around the achieved per-domain levels. Replace a general codec-win narrative with the supported object-priority trade-offs and competing explanations. Regional allocation is prior art; complete transport and extensive verification alone do not establish distinctive novelty. If no distinctive result survives simple baselines by December19, reassess venue fit and present the empirical findings honestly.
+6. Freeze research on December19 and use December20–26 for the actual revised paper, authenticated matched visuals, artifact, rights and author review. Recheck live TOMM portal requirements; the legacy guide and an earlier built package do not establish current portal compliance. Filing remains separately authorized.
+
+The twelve-hour autonomous budget window ends2026-11-15T11:07:34Z. It does not authorize later automatic stages, training, a provider change or paper filing. Future compute follows the recorded stage-budget process.

@@ -1,0 +1,945 @@
+{
+  "schema": 1,
+  "scope": "paid PTP1, exact 48-frame pixel parity; no source-denial or tracker throughput claim",
+  "score_sha256": "00e2885b59bed2a2a497c77a778abec29e0045280b0110e3b2bc23dba492ac16",
+  "paid_stage_sha256": "40c13a6df8b352c4c8813ac31d50678fabc3d021b4e810ad95c3945481f10a0b",
+  "paid_archive_sha256": "66df76d85fa37f4228a7b50abaaa75b0e71dcf28639fcdd2b7c584960db0e418",
+  "physical_curves": {
+    "paid": [
+      {
+        "crf": 48,
+        "bytes": 98350,
+        "means": {
+          "full_lpips": 0.011135692154919661,
+          "full_dists": 0.016408347835143406,
+          "crop_lpips": 0.007458682332071476,
+          "crop_dists": 0.0694976734618346,
+          "rgb_psnr": 37.48856954019515
+        },
+        "packet_sha256": "b0bca19f35d050b37466d197b9fe4b1dac898619501d37bc6be3fef38513b00e"
+      },
+      {
+        "crf": 55,
+        "bytes": 71152,
+        "means": {
+          "full_lpips": 0.017561696215912147,
+          "full_dists": 0.02420084923505783,
+          "crop_lpips": 0.009431359872299558,
+          "crop_dists": 0.08241388946771622,
+          "rgb_psnr": 36.340596124263385
+        },
+        "packet_sha256": "eed3b3c5e0b1379122709ecfdfa5eaa167914f24d9323eebcb2db23a4f53c3dc"
+      },
+      {
+        "crf": 62,
+        "bytes": 41485,
+        "means": {
+          "full_lpips": 0.03535986079110039,
+          "full_dists": 0.046705798556407295,
+          "crop_lpips": 0.015139858490632227,
+          "crop_dists": 0.09980576237042744,
+          "rgb_psnr": 33.71669431837268
+        },
+        "packet_sha256": "c8bca89505148c408c15b99c5130906f802f4c2219ea4c6924b0c1083517d72d"
+      }
+    ],
+    "native": [
+      {
+        "crf": 48,
+        "bytes": 90949,
+        "means": {
+          "full_lpips": 0.011316529843542311,
+          "full_dists": 0.016462981700897217,
+          "crop_lpips": 0.03069898276589811,
+          "crop_dists": 0.09374611700574557,
+          "rgb_psnr": 37.470961942644344
+        }
+      },
+      {
+        "crf": 55,
+        "bytes": 63879,
+        "means": {
+          "full_lpips": 0.018071918156411914,
+          "full_dists": 0.02431834116578102,
+          "crop_lpips": 0.07717762095853686,
+          "crop_dists": 0.12851850812633833,
+          "rgb_psnr": 36.31114357210603
+        }
+      },
+      {
+        "crf": 62,
+        "bytes": 34146,
+        "means": {
+          "full_lpips": 0.03625400106112162,
+          "full_dists": 0.04694071287910143,
+          "crop_lpips": 0.12962630220378438,
+          "crop_dists": 0.16389038413763046,
+          "rgb_psnr": 33.6845101556198
+        }
+      }
+    ],
+    "streak": [
+      {
+        "crf": 48,
+        "bytes": 91272,
+        "means": {
+          "full_lpips": 0.011200667200265108,
+          "full_dists": 0.01644969979921977,
+          "crop_lpips": 0.015685431911454845,
+          "crop_dists": 0.08360189447800319,
+          "rgb_psnr": 37.477247304678066
+        }
+      },
+      {
+        "crf": 55,
+        "bytes": 64177,
+        "means": {
+          "full_lpips": 0.017675128733670272,
+          "full_dists": 0.024259258061647415,
+          "crop_lpips": 0.023732683272100985,
+          "crop_dists": 0.10048658897479375,
+          "rgb_psnr": 36.328831746686824
+        }
+      },
+      {
+        "crf": 62,
+        "bytes": 34421,
+        "means": {
+          "full_lpips": 0.035511545914190784,
+          "full_dists": 0.04682602112491926,
+          "crop_lpips": 0.03399983996253771,
+          "crop_dists": 0.12543015430370966,
+          "rgb_psnr": 33.70746348853555
+        }
+      }
+    ]
+  },
+  "comparisons": {
+    "native": {
+      "full_lpips": {
+        "bd_rate": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              41485,
+              -0.03535986079110039
+            ],
+            [
+              71152,
+              -0.017561696215912147
+            ],
+            [
+              98350,
+              -0.011135692154919661
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              34146,
+              -0.03625400106112162
+            ],
+            [
+              63879,
+              -0.018071918156411914
+            ],
+            [
+              90949,
+              -0.011316529843542311
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              34146,
+              -0.03625400106112162
+            ],
+            [
+              63879,
+              -0.018071918156411914
+            ],
+            [
+              90949,
+              -0.011316529843542311
+            ]
+          ],
+          "candidate_rate_support": [
+            41485,
+            98350
+          ],
+          "anchor_rate_support": [
+            34146,
+            90949
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.11810381188394374,
+            "pareto_pchip": 0.11810381188394374,
+            "hull_linear_rate": 0.1122747475941366
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.03535986079110039,
+            -0.011316529843542311
+          ]
+        },
+        "ordinal": {
+          "status": "not_strictly_separated",
+          "common_rate_interval": [
+            41485,
+            90949
+          ],
+          "candidate_quality_range": [
+            -0.03535986079110039,
+            -0.011135692154919661
+          ],
+          "anchor_quality_range": [
+            -0.03625400106112162,
+            -0.011316529843542311
+          ],
+          "scope": "strict observed quality-range separation on common sampled rate support; no BD-rate inferred"
+        }
+      },
+      "full_dists": {
+        "bd_rate": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              41485,
+              -0.046705798556407295
+            ],
+            [
+              71152,
+              -0.02420084923505783
+            ],
+            [
+              98350,
+              -0.016408347835143406
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              34146,
+              -0.04694071287910143
+            ],
+            [
+              63879,
+              -0.02431834116578102
+            ],
+            [
+              90949,
+              -0.016462981700897217
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              34146,
+              -0.04694071287910143
+            ],
+            [
+              63879,
+              -0.02431834116578102
+            ],
+            [
+              90949,
+              -0.016462981700897217
+            ]
+          ],
+          "candidate_rate_support": [
+            41485,
+            98350
+          ],
+          "anchor_rate_support": [
+            34146,
+            90949
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.14100649108956398,
+            "pareto_pchip": 0.14100649108956398,
+            "hull_linear_rate": 0.13312935178937452
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.046705798556407295,
+            -0.016462981700897217
+          ]
+        },
+        "ordinal": {
+          "status": "not_strictly_separated",
+          "common_rate_interval": [
+            41485,
+            90949
+          ],
+          "candidate_quality_range": [
+            -0.046705798556407295,
+            -0.016408347835143406
+          ],
+          "anchor_quality_range": [
+            -0.04694071287910143,
+            -0.016462981700897217
+          ],
+          "scope": "strict observed quality-range separation on common sampled rate support; no BD-rate inferred"
+        }
+      },
+      "crop_lpips": {
+        "bd_rate": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              41485,
+              -0.015139858490632227
+            ],
+            [
+              71152,
+              -0.009431359872299558
+            ],
+            [
+              98350,
+              -0.007458682332071476
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              34146,
+              -0.12962630220378438
+            ],
+            [
+              63879,
+              -0.07717762095853686
+            ],
+            [
+              90949,
+              -0.03069898276589811
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              34146,
+              -0.12962630220378438
+            ],
+            [
+              63879,
+              -0.07717762095853686
+            ],
+            [
+              90949,
+              -0.03069898276589811
+            ]
+          ],
+          "candidate_rate_support": [
+            41485,
+            98350
+          ],
+          "anchor_rate_support": [
+            34146,
+            90949
+          ],
+          "bd_rate": {
+            "hull_pchip": null,
+            "pareto_pchip": null,
+            "hull_linear_rate": null
+          },
+          "status": "unsupported_range",
+          "common_quality_interval": null
+        },
+        "ordinal": {
+          "status": "candidate_strictly_better",
+          "common_rate_interval": [
+            41485,
+            90949
+          ],
+          "candidate_quality_range": [
+            -0.015139858490632227,
+            -0.007458682332071476
+          ],
+          "anchor_quality_range": [
+            -0.12962630220378438,
+            -0.03069898276589811
+          ],
+          "scope": "strict observed quality-range separation on common sampled rate support; no BD-rate inferred"
+        }
+      },
+      "crop_dists": {
+        "bd_rate": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              41485,
+              -0.09980576237042744
+            ],
+            [
+              71152,
+              -0.08241388946771622
+            ],
+            [
+              98350,
+              -0.0694976734618346
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              34146,
+              -0.16389038413763046
+            ],
+            [
+              63879,
+              -0.12851850812633833
+            ],
+            [
+              90949,
+              -0.09374611700574557
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              34146,
+              -0.16389038413763046
+            ],
+            [
+              90949,
+              -0.09374611700574557
+            ]
+          ],
+          "candidate_rate_support": [
+            41485,
+            98350
+          ],
+          "anchor_rate_support": [
+            34146,
+            90949
+          ],
+          "bd_rate": {
+            "hull_pchip": -0.47307991425893914,
+            "pareto_pchip": -0.48415514484161437,
+            "hull_linear_rate": -0.47383110064977674
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.09980576237042744,
+            -0.09374611700574557
+          ]
+        },
+        "ordinal": {
+          "status": "not_strictly_separated",
+          "common_rate_interval": [
+            41485,
+            90949
+          ],
+          "candidate_quality_range": [
+            -0.09980576237042744,
+            -0.0694976734618346
+          ],
+          "anchor_quality_range": [
+            -0.16389038413763046,
+            -0.09374611700574557
+          ],
+          "scope": "strict observed quality-range separation on common sampled rate support; no BD-rate inferred"
+        }
+      },
+      "rgb_psnr": {
+        "bd_rate": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              41485,
+              33.71669431837268
+            ],
+            [
+              71152,
+              36.340596124263385
+            ],
+            [
+              98350,
+              37.48856954019515
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              34146,
+              33.6845101556198
+            ],
+            [
+              63879,
+              36.31114357210603
+            ],
+            [
+              90949,
+              37.470961942644344
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              34146,
+              33.6845101556198
+            ],
+            [
+              63879,
+              36.31114357210603
+            ],
+            [
+              90949,
+              37.470961942644344
+            ]
+          ],
+          "candidate_rate_support": [
+            41485,
+            98350
+          ],
+          "anchor_rate_support": [
+            34146,
+            90949
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.132660184320779,
+            "pareto_pchip": 0.132660184320779,
+            "hull_linear_rate": 0.12760774638650227
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            33.71669431837268,
+            37.470961942644344
+          ]
+        },
+        "ordinal": {
+          "status": "not_strictly_separated",
+          "common_rate_interval": [
+            41485,
+            90949
+          ],
+          "candidate_quality_range": [
+            33.71669431837268,
+            37.48856954019515
+          ],
+          "anchor_quality_range": [
+            33.6845101556198,
+            37.470961942644344
+          ],
+          "scope": "strict observed quality-range separation on common sampled rate support; no BD-rate inferred"
+        }
+      }
+    },
+    "streak": {
+      "full_lpips": {
+        "bd_rate": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              41485,
+              -0.03535986079110039
+            ],
+            [
+              71152,
+              -0.017561696215912147
+            ],
+            [
+              98350,
+              -0.011135692154919661
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              34421,
+              -0.035511545914190784
+            ],
+            [
+              64177,
+              -0.017675128733670272
+            ],
+            [
+              91272,
+              -0.011200667200265108
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              34421,
+              -0.035511545914190784
+            ],
+            [
+              64177,
+              -0.017675128733670272
+            ],
+            [
+              91272,
+              -0.011200667200265108
+            ]
+          ],
+          "candidate_rate_support": [
+            41485,
+            98350
+          ],
+          "anchor_rate_support": [
+            34421,
+            91272
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.1332503473228018,
+            "pareto_pchip": 0.1332503473228018,
+            "hull_linear_rate": 0.12652277358656772
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.03535986079110039,
+            -0.011200667200265108
+          ]
+        },
+        "ordinal": {
+          "status": "not_strictly_separated",
+          "common_rate_interval": [
+            41485,
+            91272
+          ],
+          "candidate_quality_range": [
+            -0.03535986079110039,
+            -0.011135692154919661
+          ],
+          "anchor_quality_range": [
+            -0.035511545914190784,
+            -0.011200667200265108
+          ],
+          "scope": "strict observed quality-range separation on common sampled rate support; no BD-rate inferred"
+        }
+      },
+      "full_dists": {
+        "bd_rate": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              41485,
+              -0.046705798556407295
+            ],
+            [
+              71152,
+              -0.02420084923505783
+            ],
+            [
+              98350,
+              -0.016408347835143406
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              34421,
+              -0.04682602112491926
+            ],
+            [
+              64177,
+              -0.024259258061647415
+            ],
+            [
+              91272,
+              -0.01644969979921977
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              34421,
+              -0.04682602112491926
+            ],
+            [
+              64177,
+              -0.024259258061647415
+            ],
+            [
+              91272,
+              -0.01644969979921977
+            ]
+          ],
+          "candidate_rate_support": [
+            41485,
+            98350
+          ],
+          "anchor_rate_support": [
+            34421,
+            91272
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.13715594414758653,
+            "pareto_pchip": 0.13715594414758653,
+            "hull_linear_rate": 0.1294763050781477
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.046705798556407295,
+            -0.01644969979921977
+          ]
+        },
+        "ordinal": {
+          "status": "not_strictly_separated",
+          "common_rate_interval": [
+            41485,
+            91272
+          ],
+          "candidate_quality_range": [
+            -0.046705798556407295,
+            -0.016408347835143406
+          ],
+          "anchor_quality_range": [
+            -0.04682602112491926,
+            -0.01644969979921977
+          ],
+          "scope": "strict observed quality-range separation on common sampled rate support; no BD-rate inferred"
+        }
+      },
+      "crop_lpips": {
+        "bd_rate": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              41485,
+              -0.015139858490632227
+            ],
+            [
+              71152,
+              -0.009431359872299558
+            ],
+            [
+              98350,
+              -0.007458682332071476
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              34421,
+              -0.03399983996253771
+            ],
+            [
+              64177,
+              -0.023732683272100985
+            ],
+            [
+              91272,
+              -0.015685431911454845
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              34421,
+              -0.03399983996253771
+            ],
+            [
+              64177,
+              -0.023732683272100985
+            ],
+            [
+              91272,
+              -0.015685431911454845
+            ]
+          ],
+          "candidate_rate_support": [
+            41485,
+            98350
+          ],
+          "anchor_rate_support": [
+            34421,
+            91272
+          ],
+          "bd_rate": {
+            "hull_pchip": null,
+            "pareto_pchip": null,
+            "hull_linear_rate": null
+          },
+          "status": "unsupported_range",
+          "common_quality_interval": null
+        },
+        "ordinal": {
+          "status": "candidate_strictly_better",
+          "common_rate_interval": [
+            41485,
+            91272
+          ],
+          "candidate_quality_range": [
+            -0.015139858490632227,
+            -0.007458682332071476
+          ],
+          "anchor_quality_range": [
+            -0.03399983996253771,
+            -0.015685431911454845
+          ],
+          "scope": "strict observed quality-range separation on common sampled rate support; no BD-rate inferred"
+        }
+      },
+      "crop_dists": {
+        "bd_rate": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              41485,
+              -0.09980576237042744
+            ],
+            [
+              71152,
+              -0.08241388946771622
+            ],
+            [
+              98350,
+              -0.0694976734618346
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              34421,
+              -0.12543015430370966
+            ],
+            [
+              64177,
+              -0.10048658897479375
+            ],
+            [
+              91272,
+              -0.08360189447800319
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              34421,
+              -0.12543015430370966
+            ],
+            [
+              64177,
+              -0.10048658897479375
+            ],
+            [
+              91272,
+              -0.08360189447800319
+            ]
+          ],
+          "candidate_rate_support": [
+            41485,
+            98350
+          ],
+          "anchor_rate_support": [
+            34421,
+            91272
+          ],
+          "bd_rate": {
+            "hull_pchip": -0.304162532894845,
+            "pareto_pchip": -0.304162532894845,
+            "hull_linear_rate": -0.2976178752400566
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.09980576237042744,
+            -0.08360189447800319
+          ]
+        },
+        "ordinal": {
+          "status": "not_strictly_separated",
+          "common_rate_interval": [
+            41485,
+            91272
+          ],
+          "candidate_quality_range": [
+            -0.09980576237042744,
+            -0.0694976734618346
+          ],
+          "anchor_quality_range": [
+            -0.12543015430370966,
+            -0.08360189447800319
+          ],
+          "scope": "strict observed quality-range separation on common sampled rate support; no BD-rate inferred"
+        }
+      },
+      "rgb_psnr": {
+        "bd_rate": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              41485,
+              33.71669431837268
+            ],
+            [
+              71152,
+              36.340596124263385
+            ],
+            [
+              98350,
+              37.48856954019515
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              34421,
+              33.70746348853555
+            ],
+            [
+              64177,
+              36.328831746686824
+            ],
+            [
+              91272,
+              37.477247304678066
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              34421,
+              33.70746348853555
+            ],
+            [
+              64177,
+              36.328831746686824
+            ],
+            [
+              91272,
+              37.477247304678066
+            ]
+          ],
+          "candidate_rate_support": [
+            41485,
+            98350
+          ],
+          "anchor_rate_support": [
+            34421,
+            91272
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.13182095017413953,
+            "pareto_pchip": 0.13182095017413953,
+            "hull_linear_rate": 0.12657193102066067
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            33.71669431837268,
+            37.477247304678066
+          ]
+        },
+        "ordinal": {
+          "status": "not_strictly_separated",
+          "common_rate_interval": [
+            41485,
+            91272
+          ],
+          "candidate_quality_range": [
+            33.71669431837268,
+            37.48856954019515
+          ],
+          "anchor_quality_range": [
+            33.70746348853555,
+            37.477247304678066
+          ],
+          "scope": "strict observed quality-range separation on common sampled rate support; no BD-rate inferred"
+        }
+      }
+    }
+  },
+  "basis": "complete paid PTP1 bytes; common-quality PCHIP and anchor hull only",
+  "standard_lpips": "not compared without historical standard scalar scores"
+}

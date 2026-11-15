@@ -1,0 +1,4636 @@
+{
+  "schema": 1,
+  "scope": "finite coded 32px patch, transmitted positions; free placement and framing",
+  "frames": 48,
+  "available_receiver_frames": 48,
+  "packet_duration_seconds": 1.6,
+  "promotable": false,
+  "source_archive_sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18",
+  "producer_sha256": "9074362c3f62ec18fba75acb3393c6a0803d907ad235a57bce98eb050c30b128",
+  "historical_score_archive_sha256": "fd9c161132525e3d9d143412122f0281a9a5714278643208fd04368dd081d876",
+  "cpu_archive_sha256": "a06f2fca3a2bcad45123d5e06a233a6f2dadbcc91c96060658f759df81452739",
+  "metric_control": {
+    "passed": true,
+    "tolerance_absolute": 1e-06,
+    "max_absolute_difference": {
+      "frame_psnr": 0.0,
+      "full_lpips": 0.0,
+      "full_dists": 0.0,
+      "crop_lpips": 0.0,
+      "crop_dists": 0.0
+    },
+    "scope": "48-frame native62 historical full-map/crop metrics and exact RGB SSE"
+  },
+  "self_control": {
+    "lpips": 8.392403808935948e-12,
+    "dists": 5.960464477539063e-08,
+    "standard_lpips": 0.0
+  },
+  "metric_definition": {
+    "full_lpips": "historical full spatial-map mean",
+    "full_lpips_standard": "standard Alex feature-layer mean sum",
+    "crop_lpips": "historical separately cropped 64x64 GT window"
+  },
+  "weights": {
+    "lpips": {
+      "metric": "LPIPS",
+      "net": "alex",
+      "torchmetrics": "1.9.0",
+      "heads": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/torchmetrics/functional/image/lpips_models/alex.pth",
+      "heads_sha256": "df73285e35b22355a2df87cdb6b70b343713b667eddbda73e1977e0c860835c0",
+      "backbone": "/local/users/emanuele/pointstream/cache/7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02/alexnet-owt-7be5be79.pth",
+      "backbone_sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+      "pooling": "spatial map at full resolution (bilinear), mean over the frame or region"
+    },
+    "dists": {
+      "metric": "DISTS",
+      "net": "vgg16",
+      "torchmetrics": "1.9.0",
+      "weights": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/torchmetrics/functional/image/dists_models/weights.pt",
+      "weights_sha256": "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218",
+      "backbone": "/local/users/emanuele/pointstream/cache/397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0/vgg16-397923af.pth",
+      "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)"
+    }
+  },
+  "gpu": {
+    "host": "gpu6",
+    "name": "NVIDIA RTX 6000 Ada Generation",
+    "capability": [
+      8,
+      9
+    ],
+    "uuid": "ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+    "peak_reserved_bytes": 1799356416,
+    "torch": "2.10.0+cu128",
+    "cuda": "12.8",
+    "cudnn": 91002,
+    "device_count": 1,
+    "network_parameters_cuda": true
+  },
+  "code_sha256": "145a4b7c8171136dec0e17665ab6fa53a578d95d3ca61e9efc6d927e0399e63b",
+  "physical_replay": {
+    "source": true,
+    "producer": true,
+    "source_archive": true,
+    "qualification": true,
+    "native62": true,
+    "native62_decode": true,
+    "tools": true,
+    "not_promoted": true,
+    "native62_command": true,
+    "48:accepted_packet": true,
+    "48:positions": true,
+    "48:streams": true,
+    "48:patch_command": true,
+    "48:fresh_decoders_and_composite": true,
+    "55:accepted_packet": true,
+    "55:positions": true,
+    "55:streams": true,
+    "55:patch_command": true,
+    "55:fresh_decoders_and_composite": true,
+    "62:accepted_packet": true,
+    "62:positions": true,
+    "62:streams": true,
+    "62:patch_command": true,
+    "62:fresh_decoders_and_composite": true
+  },
+  "historical_points": [
+    {
+      "crf": 48,
+      "native_bytes": 90949,
+      "wire_bytes": 91272,
+      "baseline": [
+        {
+          "crop_dists": 0.1189681887626648,
+          "crop_lpips": 0.017946353182196617,
+          "frame": 0,
+          "frame_psnr": 36.190934249350796,
+          "full_dists": 0.014118194580078125,
+          "full_lpips": 0.01346748563978407,
+          "pixels": 2764800,
+          "sse": 43216606
+        },
+        {
+          "crop_dists": 0.16465580463409424,
+          "crop_lpips": 0.03311700373888016,
+          "frame": 1,
+          "frame_psnr": 37.02559905186216,
+          "full_dists": 0.013824105262756348,
+          "full_lpips": 0.01076889991760254,
+          "pixels": 2764800,
+          "sse": 35660233
+        },
+        {
+          "crop_dists": 0.13284868001937866,
+          "crop_lpips": 0.03369037061929703,
+          "frame": 2,
+          "frame_psnr": 37.58934364450472,
+          "full_dists": 0.012557923793792725,
+          "full_lpips": 0.009246610005696614,
+          "pixels": 2764800,
+          "sse": 31319132
+        },
+        {
+          "crop_dists": 0.13705885410308838,
+          "crop_lpips": 0.06096857786178589,
+          "frame": 3,
+          "frame_psnr": 37.290027066342624,
+          "full_dists": 0.014777600765228271,
+          "full_lpips": 0.010102896160549588,
+          "pixels": 2764800,
+          "sse": 33553774
+        },
+        {
+          "crop_dists": 0.11066555976867676,
+          "crop_lpips": 0.047181736677885056,
+          "frame": 4,
+          "frame_psnr": 37.81558054188817,
+          "full_dists": 0.016225099563598633,
+          "full_lpips": 0.008919537862141927,
+          "pixels": 2764800,
+          "sse": 29729392
+        },
+        {
+          "crop_dists": 0.11284482479095459,
+          "crop_lpips": 0.06824836879968643,
+          "frame": 5,
+          "frame_psnr": 37.64862503066435,
+          "full_dists": 0.013545036315917969,
+          "full_lpips": 0.009662804073757596,
+          "pixels": 2764800,
+          "sse": 30894529
+        },
+        {
+          "crop_dists": 0.10438501834869385,
+          "crop_lpips": 0.03154832869768143,
+          "frame": 6,
+          "frame_psnr": 37.75359833989815,
+          "full_dists": 0.015616416931152344,
+          "full_lpips": 0.009327420128716363,
+          "pixels": 2764800,
+          "sse": 30156730
+        },
+        {
+          "crop_dists": 0.0890534520149231,
+          "crop_lpips": 0.01695965602993965,
+          "frame": 7,
+          "frame_psnr": 37.7163257272388,
+          "full_dists": 0.013268649578094482,
+          "full_lpips": 0.009412522845798068,
+          "pixels": 2764800,
+          "sse": 30416659
+        },
+        {
+          "crop_dists": 0.08486014604568481,
+          "crop_lpips": 0.019447654485702515,
+          "frame": 8,
+          "frame_psnr": 38.02430873426253,
+          "full_dists": 0.012917041778564453,
+          "full_lpips": 0.00906632317437066,
+          "pixels": 2764800,
+          "sse": 28334347
+        },
+        {
+          "crop_dists": 0.09728580713272095,
+          "crop_lpips": 0.02384149096906185,
+          "frame": 9,
+          "frame_psnr": 37.6163710757289,
+          "full_dists": 0.014419734477996826,
+          "full_lpips": 0.01009219487508138,
+          "pixels": 2764800,
+          "sse": 31124829
+        },
+        {
+          "crop_dists": 0.051436662673950195,
+          "crop_lpips": 0.006997962482273579,
+          "frame": 10,
+          "frame_psnr": 37.847442621807,
+          "full_dists": 0.013512611389160156,
+          "full_lpips": 0.009264279471503364,
+          "pixels": 2764800,
+          "sse": 29512080
+        },
+        {
+          "crop_dists": 0.08739465475082397,
+          "crop_lpips": 0.02540666237473488,
+          "frame": 11,
+          "frame_psnr": 37.596753973931875,
+          "full_dists": 0.018522977828979492,
+          "full_lpips": 0.010307574801974827,
+          "pixels": 2764800,
+          "sse": 31265738
+        },
+        {
+          "crop_dists": 0.08941662311553955,
+          "crop_lpips": 0.01843833178281784,
+          "frame": 12,
+          "frame_psnr": 37.75495428483287,
+          "full_dists": 0.016755282878875732,
+          "full_lpips": 0.010348258548312717,
+          "pixels": 2764800,
+          "sse": 30147316
+        },
+        {
+          "crop_dists": 0.11627197265625,
+          "crop_lpips": 0.12732943892478943,
+          "frame": 13,
+          "frame_psnr": 37.6412083958549,
+          "full_dists": 0.01657557487487793,
+          "full_lpips": 0.010514195760091145,
+          "pixels": 2764800,
+          "sse": 30947334
+        },
+        {
+          "crop_dists": 0.10604721307754517,
+          "crop_lpips": 0.03396240249276161,
+          "frame": 14,
+          "frame_psnr": 37.898733451118474,
+          "full_dists": 0.018904447555541992,
+          "full_lpips": 0.009624428219265409,
+          "pixels": 2764800,
+          "sse": 29165588
+        },
+        {
+          "crop_dists": 0.11872559785842896,
+          "crop_lpips": 0.05611996725201607,
+          "frame": 15,
+          "frame_psnr": 37.64189159261504,
+          "full_dists": 0.020645618438720703,
+          "full_lpips": 0.010552200741238063,
+          "pixels": 2764800,
+          "sse": 30942466
+        },
+        {
+          "crop_dists": 0.13110512495040894,
+          "crop_lpips": 0.0624845027923584,
+          "frame": 16,
+          "frame_psnr": 38.00991679417136,
+          "full_dists": 0.016193270683288574,
+          "full_lpips": 0.010555790795220269,
+          "pixels": 2764800,
+          "sse": 28428399
+        },
+        {
+          "crop_dists": 0.07795637845993042,
+          "crop_lpips": 0.03212432563304901,
+          "frame": 17,
+          "frame_psnr": 37.71293384304775,
+          "full_dists": 0.015587329864501953,
+          "full_lpips": 0.010092263751559787,
+          "pixels": 2764800,
+          "sse": 30440424
+        },
+        {
+          "crop_dists": 0.10006916522979736,
+          "crop_lpips": 0.036687206476926804,
+          "frame": 18,
+          "frame_psnr": 37.792559747047434,
+          "full_dists": 0.01688539981842041,
+          "full_lpips": 0.010979718102349175,
+          "pixels": 2764800,
+          "sse": 29887398
+        },
+        {
+          "crop_dists": 0.08022415637969971,
+          "crop_lpips": 0.03252873569726944,
+          "frame": 19,
+          "frame_psnr": 37.3816220042898,
+          "full_dists": 0.016695082187652588,
+          "full_lpips": 0.011542500389946832,
+          "pixels": 2764800,
+          "sse": 32853518
+        },
+        {
+          "crop_dists": 0.0700041651725769,
+          "crop_lpips": 0.029706500470638275,
+          "frame": 20,
+          "frame_psnr": 37.79796632677503,
+          "full_dists": 0.015291452407836914,
+          "full_lpips": 0.010771173901028103,
+          "pixels": 2764800,
+          "sse": 29850214
+        },
+        {
+          "crop_dists": 0.0983119010925293,
+          "crop_lpips": 0.04783160611987114,
+          "frame": 21,
+          "frame_psnr": 37.57779470145818,
+          "full_dists": 0.015917658805847168,
+          "full_lpips": 0.011209215588039822,
+          "pixels": 2764800,
+          "sse": 31402528
+        },
+        {
+          "crop_dists": 0.06967794895172119,
+          "crop_lpips": 0.018458940088748932,
+          "frame": 22,
+          "frame_psnr": 37.71810743819644,
+          "full_dists": 0.016308307647705078,
+          "full_lpips": 0.010602804819742838,
+          "pixels": 2764800,
+          "sse": 30404183
+        },
+        {
+          "crop_dists": 0.08875995874404907,
+          "crop_lpips": 0.03859054297208786,
+          "frame": 23,
+          "frame_psnr": 37.63085263955102,
+          "full_dists": 0.016065359115600586,
+          "full_lpips": 0.01116771697998047,
+          "pixels": 2764800,
+          "sse": 31021216
+        },
+        {
+          "crop_dists": 0.07699471712112427,
+          "crop_lpips": 0.015937410295009613,
+          "frame": 24,
+          "frame_psnr": 37.87455903318358,
+          "full_dists": 0.015163421630859375,
+          "full_lpips": 0.010856393178304037,
+          "pixels": 2764800,
+          "sse": 29328387
+        },
+        {
+          "crop_dists": 0.09904289245605469,
+          "crop_lpips": 0.029881779104471207,
+          "frame": 25,
+          "frame_psnr": 37.4835930189199,
+          "full_dists": 0.016271471977233887,
+          "full_lpips": 0.011732975641886393,
+          "pixels": 2764800,
+          "sse": 32091113
+        },
+        {
+          "crop_dists": 0.07275205850601196,
+          "crop_lpips": 0.01607128418982029,
+          "frame": 26,
+          "frame_psnr": 37.63357577717653,
+          "full_dists": 0.01653200387954712,
+          "full_lpips": 0.010837749905056423,
+          "pixels": 2764800,
+          "sse": 31001771
+        },
+        {
+          "crop_dists": 0.07576531171798706,
+          "crop_lpips": 0.02368035726249218,
+          "frame": 27,
+          "frame_psnr": 37.38408820180696,
+          "full_dists": 0.018930017948150635,
+          "full_lpips": 0.011755059560139974,
+          "pixels": 2764800,
+          "sse": 32834867
+        },
+        {
+          "crop_dists": 0.06542724370956421,
+          "crop_lpips": 0.02004256844520569,
+          "frame": 28,
+          "frame_psnr": 37.643885238381344,
+          "full_dists": 0.017126798629760742,
+          "full_lpips": 0.011381270090738933,
+          "pixels": 2764800,
+          "sse": 30928265
+        },
+        {
+          "crop_dists": 0.04312855005264282,
+          "crop_lpips": 0.006665470544248819,
+          "frame": 29,
+          "frame_psnr": 37.33956439673554,
+          "full_dists": 0.01842397451400757,
+          "full_lpips": 0.01168333371480306,
+          "pixels": 2764800,
+          "sse": 33173221
+        },
+        {
+          "crop_dists": 0.06971293687820435,
+          "crop_lpips": 0.019430790096521378,
+          "frame": 30,
+          "frame_psnr": 37.605017189214266,
+          "full_dists": 0.017864346504211426,
+          "full_lpips": 0.011344772974650065,
+          "pixels": 2764800,
+          "sse": 31206306
+        },
+        {
+          "crop_dists": 0.03894299268722534,
+          "crop_lpips": 0.007883187383413315,
+          "frame": 31,
+          "frame_psnr": 37.580217411153576,
+          "full_dists": 0.018402516841888428,
+          "full_lpips": 0.011142832438151042,
+          "pixels": 2764800,
+          "sse": 31385015
+        },
+        {
+          "crop_dists": 0.06713289022445679,
+          "crop_lpips": 0.023564578965306282,
+          "frame": 32,
+          "frame_psnr": 37.735713299050275,
+          "full_dists": 0.016700804233551025,
+          "full_lpips": 0.01103380733066135,
+          "pixels": 2764800,
+          "sse": 30281177
+        },
+        {
+          "crop_dists": 0.10479182004928589,
+          "crop_lpips": 0.09047937393188477,
+          "frame": 33,
+          "frame_psnr": 37.43973966885498,
+          "full_dists": 0.01840817928314209,
+          "full_lpips": 0.011957062615288628,
+          "pixels": 2764800,
+          "sse": 32416798
+        },
+        {
+          "crop_dists": 0.06406068801879883,
+          "crop_lpips": 0.021906688809394836,
+          "frame": 34,
+          "frame_psnr": 37.432405804066825,
+          "full_dists": 0.017184793949127197,
+          "full_lpips": 0.011733667585584853,
+          "pixels": 2764800,
+          "sse": 32471586
+        },
+        {
+          "crop_dists": 0.07329815626144409,
+          "crop_lpips": 0.03029760532081127,
+          "frame": 35,
+          "frame_psnr": 37.213894158639235,
+          "full_dists": 0.016092896461486816,
+          "full_lpips": 0.012812164094712999,
+          "pixels": 2764800,
+          "sse": 34147166
+        },
+        {
+          "crop_dists": 0.05667811632156372,
+          "crop_lpips": 0.012288408353924751,
+          "frame": 36,
+          "frame_psnr": 37.43166598419923,
+          "full_dists": 0.0170324444770813,
+          "full_lpips": 0.011772056155734591,
+          "pixels": 2764800,
+          "sse": 32477118
+        },
+        {
+          "crop_dists": 0.1087958812713623,
+          "crop_lpips": 0.09813272953033447,
+          "frame": 37,
+          "frame_psnr": 37.14140024339145,
+          "full_dists": 0.016460895538330078,
+          "full_lpips": 0.013065740797254774,
+          "pixels": 2764800,
+          "sse": 34721946
+        },
+        {
+          "crop_dists": 0.05661243200302124,
+          "crop_lpips": 0.005857266951352358,
+          "frame": 38,
+          "frame_psnr": 37.28122979162776,
+          "full_dists": 0.017322123050689697,
+          "full_lpips": 0.0122763368818495,
+          "pixels": 2764800,
+          "sse": 33621811
+        },
+        {
+          "crop_dists": 0.07507705688476562,
+          "crop_lpips": 0.016500618308782578,
+          "frame": 39,
+          "frame_psnr": 37.14408686994283,
+          "full_dists": 0.01667231321334839,
+          "full_lpips": 0.01278437720404731,
+          "pixels": 2764800,
+          "sse": 34700473
+        },
+        {
+          "crop_dists": 0.05848413705825806,
+          "crop_lpips": 0.009216995909810066,
+          "frame": 40,
+          "frame_psnr": 37.312673772886995,
+          "full_dists": 0.015319645404815674,
+          "full_lpips": 0.012608066134982639,
+          "pixels": 2764800,
+          "sse": 33379260
+        },
+        {
+          "crop_dists": 0.10719144344329834,
+          "crop_lpips": 0.01010095328092575,
+          "frame": 41,
+          "frame_psnr": 37.07023894115604,
+          "full_dists": 0.015471339225769043,
+          "full_lpips": 0.01314319610595703,
+          "pixels": 2764800,
+          "sse": 35295569
+        },
+        {
+          "crop_dists": 0.12473475933074951,
+          "crop_lpips": 0.01556650921702385,
+          "frame": 42,
+          "frame_psnr": 37.161179240396976,
+          "full_dists": 0.016062915325164795,
+          "full_lpips": 0.013077801598442925,
+          "pixels": 2764800,
+          "sse": 34564172
+        },
+        {
+          "crop_dists": 0.10692906379699707,
+          "crop_lpips": 0.016480404883623123,
+          "frame": 43,
+          "frame_psnr": 37.08215446620429,
+          "full_dists": 0.01861971616744995,
+          "full_lpips": 0.013657572004530164,
+          "pixels": 2764800,
+          "sse": 35198863
+        },
+        {
+          "crop_dists": 0.12488514184951782,
+          "crop_lpips": 0.015478773042559624,
+          "frame": 44,
+          "frame_psnr": 37.2572944489306,
+          "full_dists": 0.019210517406463623,
+          "full_lpips": 0.013549124399820964,
+          "pixels": 2764800,
+          "sse": 33807623
+        },
+        {
+          "crop_dists": 0.11904716491699219,
+          "crop_lpips": 0.016603173688054085,
+          "frame": 45,
+          "frame_psnr": 37.191074092865456,
+          "full_dists": 0.01859337091445923,
+          "full_lpips": 0.0135442140367296,
+          "pixels": 2764800,
+          "sse": 34327065
+        },
+        {
+          "crop_dists": 0.13495326042175293,
+          "crop_lpips": 0.012021660804748535,
+          "frame": 46,
+          "frame_psnr": 37.22529416359765,
+          "full_dists": 0.018532991409301758,
+          "full_lpips": 0.013467000325520834,
+          "pixels": 2764800,
+          "sse": 34057649
+        },
+        {
+          "crop_dists": 0.1373470425605774,
+          "crop_lpips": 0.01984591782093048,
+          "frame": 47,
+          "frame_psnr": 36.892725036984004,
+          "full_dists": 0.01869344711303711,
+          "full_lpips": 0.014378041161431206,
+          "pixels": 2764800,
+          "sse": 36768133
+        }
+      ],
+      "streak": [
+        {
+          "crop_dists": 0.1189681887626648,
+          "crop_lpips": 0.017946353182196617,
+          "frame": 0,
+          "frame_psnr": 36.190934249350796,
+          "full_dists": 0.014118194580078125,
+          "full_lpips": 0.01346748563978407,
+          "pixels": 2764800,
+          "sse": 43216606
+        },
+        {
+          "crop_dists": 0.15162301063537598,
+          "crop_lpips": 0.030083436518907547,
+          "frame": 1,
+          "frame_psnr": 37.03173205621009,
+          "full_dists": 0.013874173164367676,
+          "full_lpips": 0.010739487542046441,
+          "pixels": 2764800,
+          "sse": 35609910
+        },
+        {
+          "crop_dists": 0.12452971935272217,
+          "crop_lpips": 0.021096810698509216,
+          "frame": 2,
+          "frame_psnr": 37.590736505246895,
+          "full_dists": 0.01254957914352417,
+          "full_lpips": 0.00919086668226454,
+          "pixels": 2764800,
+          "sse": 31309089
+        },
+        {
+          "crop_dists": 0.10746347904205322,
+          "crop_lpips": 0.0200478695333004,
+          "frame": 3,
+          "frame_psnr": 37.296691473054345,
+          "full_dists": 0.014760315418243408,
+          "full_lpips": 0.009902695549858941,
+          "pixels": 2764800,
+          "sse": 33502324
+        },
+        {
+          "crop_dists": 0.09158021211624146,
+          "crop_lpips": 0.02721726894378662,
+          "frame": 4,
+          "frame_psnr": 37.818846860518896,
+          "full_dists": 0.01619744300842285,
+          "full_lpips": 0.008790366914537218,
+          "pixels": 2764800,
+          "sse": 29707041
+        },
+        {
+          "crop_dists": 0.0916062593460083,
+          "crop_lpips": 0.01998826116323471,
+          "frame": 5,
+          "frame_psnr": 37.670516199423915,
+          "full_dists": 0.013516366481781006,
+          "full_lpips": 0.00936846203274197,
+          "pixels": 2764800,
+          "sse": 30739193
+        },
+        {
+          "crop_dists": 0.07999038696289062,
+          "crop_lpips": 0.017325948923826218,
+          "frame": 6,
+          "frame_psnr": 37.75640475315423,
+          "full_dists": 0.015559911727905273,
+          "full_lpips": 0.009156934950086806,
+          "pixels": 2764800,
+          "sse": 30137249
+        },
+        {
+          "crop_dists": 0.08280515670776367,
+          "crop_lpips": 0.008970161899924278,
+          "frame": 7,
+          "frame_psnr": 37.718702837679686,
+          "full_dists": 0.0132254958152771,
+          "full_lpips": 0.009363958570692275,
+          "pixels": 2764800,
+          "sse": 30400015
+        },
+        {
+          "crop_dists": 0.06999039649963379,
+          "crop_lpips": 0.004740631207823753,
+          "frame": 8,
+          "frame_psnr": 38.03542357482536,
+          "full_dists": 0.012922286987304688,
+          "full_lpips": 0.008928828769259982,
+          "pixels": 2764800,
+          "sse": 28261924
+        },
+        {
+          "crop_dists": 0.09693276882171631,
+          "crop_lpips": 0.013209056109189987,
+          "frame": 9,
+          "frame_psnr": 37.62289230603317,
+          "full_dists": 0.014429986476898193,
+          "full_lpips": 0.009976902008056641,
+          "pixels": 2764800,
+          "sse": 31078128
+        },
+        {
+          "crop_dists": 0.047894954681396484,
+          "crop_lpips": 0.006032301113009453,
+          "frame": 10,
+          "frame_psnr": 37.85056879840663,
+          "full_dists": 0.013520598411560059,
+          "full_lpips": 0.009252341588338216,
+          "pixels": 2764800,
+          "sse": 29490844
+        },
+        {
+          "crop_dists": 0.07717978954315186,
+          "crop_lpips": 0.015345597639679909,
+          "frame": 11,
+          "frame_psnr": 37.60294212123021,
+          "full_dists": 0.0185166597366333,
+          "full_lpips": 0.010137161678738064,
+          "pixels": 2764800,
+          "sse": 31221220
+        },
+        {
+          "crop_dists": 0.0822630524635315,
+          "crop_lpips": 0.015216969884932041,
+          "frame": 12,
+          "frame_psnr": 37.75739155595176,
+          "full_dists": 0.016757667064666748,
+          "full_lpips": 0.010315765804714628,
+          "pixels": 2764800,
+          "sse": 30130402
+        },
+        {
+          "crop_dists": 0.07886207103729248,
+          "crop_lpips": 0.03283793106675148,
+          "frame": 13,
+          "frame_psnr": 37.68268857907778,
+          "full_dists": 0.016622304916381836,
+          "full_lpips": 0.009773038228352864,
+          "pixels": 2764800,
+          "sse": 30653158
+        },
+        {
+          "crop_dists": 0.10454803705215454,
+          "crop_lpips": 0.02443520352244377,
+          "frame": 14,
+          "frame_psnr": 37.904480127417514,
+          "full_dists": 0.01889944076538086,
+          "full_lpips": 0.009554795159233942,
+          "pixels": 2764800,
+          "sse": 29127021
+        },
+        {
+          "crop_dists": 0.1137235164642334,
+          "crop_lpips": 0.04506094008684158,
+          "frame": 15,
+          "frame_psnr": 37.64630647194687,
+          "full_dists": 0.02063751220703125,
+          "full_lpips": 0.010454412036471896,
+          "pixels": 2764800,
+          "sse": 30911027
+        },
+        {
+          "crop_dists": 0.11699795722961426,
+          "crop_lpips": 0.026968911290168762,
+          "frame": 16,
+          "frame_psnr": 38.02389552473155,
+          "full_dists": 0.016171813011169434,
+          "full_lpips": 0.010237704383002387,
+          "pixels": 2764800,
+          "sse": 28337043
+        },
+        {
+          "crop_dists": 0.0753517746925354,
+          "crop_lpips": 0.024742886424064636,
+          "frame": 17,
+          "frame_psnr": 37.71597863859325,
+          "full_dists": 0.01558220386505127,
+          "full_lpips": 0.010005087322658963,
+          "pixels": 2764800,
+          "sse": 30419090
+        },
+        {
+          "crop_dists": 0.09760701656341553,
+          "crop_lpips": 0.02934824302792549,
+          "frame": 18,
+          "frame_psnr": 37.79468688317403,
+          "full_dists": 0.01687997579574585,
+          "full_lpips": 0.010946216583251954,
+          "pixels": 2764800,
+          "sse": 29872763
+        },
+        {
+          "crop_dists": 0.08754098415374756,
+          "crop_lpips": 0.016467498615384102,
+          "frame": 19,
+          "frame_psnr": 37.39180167315759,
+          "full_dists": 0.01664811372756958,
+          "full_lpips": 0.011366426679823134,
+          "pixels": 2764800,
+          "sse": 32776601
+        },
+        {
+          "crop_dists": 0.0665738582611084,
+          "crop_lpips": 0.018297798931598663,
+          "frame": 20,
+          "frame_psnr": 37.79999713184719,
+          "full_dists": 0.015262961387634277,
+          "full_lpips": 0.01065289815266927,
+          "pixels": 2764800,
+          "sse": 29836259
+        },
+        {
+          "crop_dists": 0.07889401912689209,
+          "crop_lpips": 0.01987314596772194,
+          "frame": 21,
+          "frame_psnr": 37.58771973606313,
+          "full_dists": 0.015897512435913086,
+          "full_lpips": 0.01095483144124349,
+          "pixels": 2764800,
+          "sse": 31330845
+        },
+        {
+          "crop_dists": 0.05418694019317627,
+          "crop_lpips": 0.008048280142247677,
+          "frame": 22,
+          "frame_psnr": 37.722720774828254,
+          "full_dists": 0.016288578510284424,
+          "full_lpips": 0.010538342793782553,
+          "pixels": 2764800,
+          "sse": 30371903
+        },
+        {
+          "crop_dists": 0.05943179130554199,
+          "crop_lpips": 0.025966569781303406,
+          "frame": 23,
+          "frame_psnr": 37.63797014706165,
+          "full_dists": 0.015996038913726807,
+          "full_lpips": 0.011008705563015407,
+          "pixels": 2764800,
+          "sse": 30970418
+        },
+        {
+          "crop_dists": 0.07129812240600586,
+          "crop_lpips": 0.011441957205533981,
+          "frame": 24,
+          "frame_psnr": 37.876808357042144,
+          "full_dists": 0.015149891376495361,
+          "full_lpips": 0.010833918253580729,
+          "pixels": 2764800,
+          "sse": 29313201
+        },
+        {
+          "crop_dists": 0.07882726192474365,
+          "crop_lpips": 0.017576858401298523,
+          "frame": 25,
+          "frame_psnr": 37.48955440988714,
+          "full_dists": 0.01614612340927124,
+          "full_lpips": 0.011628954145643446,
+          "pixels": 2764800,
+          "sse": 32047093
+        },
+        {
+          "crop_dists": 0.04551661014556885,
+          "crop_lpips": 0.0050801378674805164,
+          "frame": 26,
+          "frame_psnr": 37.638340086414416,
+          "full_dists": 0.016422510147094727,
+          "full_lpips": 0.010725363625420464,
+          "pixels": 2764800,
+          "sse": 30967780
+        },
+        {
+          "crop_dists": 0.05439072847366333,
+          "crop_lpips": 0.013388944789767265,
+          "frame": 27,
+          "frame_psnr": 37.39033274631914,
+          "full_dists": 0.01880413293838501,
+          "full_lpips": 0.011660071478949654,
+          "pixels": 2764800,
+          "sse": 32787689
+        },
+        {
+          "crop_dists": 0.052507996559143066,
+          "crop_lpips": 0.008250510320067406,
+          "frame": 28,
+          "frame_psnr": 37.647862628197444,
+          "full_dists": 0.017100274562835693,
+          "full_lpips": 0.011254549026489258,
+          "pixels": 2764800,
+          "sse": 30899953
+        },
+        {
+          "crop_dists": 0.05115252733230591,
+          "crop_lpips": 0.00800693966448307,
+          "frame": 29,
+          "frame_psnr": 37.342724053926204,
+          "full_dists": 0.01847749948501587,
+          "full_lpips": 0.011725090874565972,
+          "pixels": 2764800,
+          "sse": 33149095
+        },
+        {
+          "crop_dists": 0.06388580799102783,
+          "crop_lpips": 0.011305680498480797,
+          "frame": 30,
+          "frame_psnr": 37.605406183489876,
+          "full_dists": 0.017844080924987793,
+          "full_lpips": 0.011304614808824328,
+          "pixels": 2764800,
+          "sse": 31203511
+        },
+        {
+          "crop_dists": 0.03463870286941528,
+          "crop_lpips": 0.007660405710339546,
+          "frame": 31,
+          "frame_psnr": 37.58123030600047,
+          "full_dists": 0.018393397331237793,
+          "full_lpips": 0.01114151848687066,
+          "pixels": 2764800,
+          "sse": 31377696
+        },
+        {
+          "crop_dists": 0.04966700077056885,
+          "crop_lpips": 0.0059199221432209015,
+          "frame": 32,
+          "frame_psnr": 37.73975533798759,
+          "full_dists": 0.01665651798248291,
+          "full_lpips": 0.010892315970526801,
+          "pixels": 2764800,
+          "sse": 30253007
+        },
+        {
+          "crop_dists": 0.07963454723358154,
+          "crop_lpips": 0.008800212293863297,
+          "frame": 33,
+          "frame_psnr": 37.47960378453567,
+          "full_dists": 0.01833343505859375,
+          "full_lpips": 0.011444759368896485,
+          "pixels": 2764800,
+          "sse": 32120604
+        },
+        {
+          "crop_dists": 0.0632408857345581,
+          "crop_lpips": 0.014320858754217625,
+          "frame": 34,
+          "frame_psnr": 37.43646488534456,
+          "full_dists": 0.017177581787109375,
+          "full_lpips": 0.011705998314751519,
+          "pixels": 2764800,
+          "sse": 32441251
+        },
+        {
+          "crop_dists": 0.06677240133285522,
+          "crop_lpips": 0.021512215957045555,
+          "frame": 35,
+          "frame_psnr": 37.21757589100068,
+          "full_dists": 0.016149044036865234,
+          "full_lpips": 0.012757639355129666,
+          "pixels": 2764800,
+          "sse": 34118230
+        },
+        {
+          "crop_dists": 0.05571103096008301,
+          "crop_lpips": 0.009216297417879105,
+          "frame": 36,
+          "frame_psnr": 37.432453150409756,
+          "full_dists": 0.01703423261642456,
+          "full_lpips": 0.011753162807888455,
+          "pixels": 2764800,
+          "sse": 32471232
+        },
+        {
+          "crop_dists": 0.06478655338287354,
+          "crop_lpips": 0.007315325550734997,
+          "frame": 37,
+          "frame_psnr": 37.178486613961,
+          "full_dists": 0.01639455556869507,
+          "full_lpips": 0.012442190382215711,
+          "pixels": 2764800,
+          "sse": 34426702
+        },
+        {
+          "crop_dists": 0.05353766679763794,
+          "crop_lpips": 0.00503153633326292,
+          "frame": 38,
+          "frame_psnr": 37.28209493236848,
+          "full_dists": 0.0173189640045166,
+          "full_lpips": 0.012275587717692058,
+          "pixels": 2764800,
+          "sse": 33615114
+        },
+        {
+          "crop_dists": 0.06524264812469482,
+          "crop_lpips": 0.004346162546426058,
+          "frame": 39,
+          "frame_psnr": 37.16342403267081,
+          "full_dists": 0.01669156551361084,
+          "full_lpips": 0.01267910639444987,
+          "pixels": 2764800,
+          "sse": 34546311
+        },
+        {
+          "crop_dists": 0.05767911672592163,
+          "crop_lpips": 0.0047005461528897285,
+          "frame": 40,
+          "frame_psnr": 37.316908936171124,
+          "full_dists": 0.01533043384552002,
+          "full_lpips": 0.01256085925632053,
+          "pixels": 2764800,
+          "sse": 33346725
+        },
+        {
+          "crop_dists": 0.104686439037323,
+          "crop_lpips": 0.008968133479356766,
+          "frame": 41,
+          "frame_psnr": 37.07235312342878,
+          "full_dists": 0.015601933002471924,
+          "full_lpips": 0.013133944405449762,
+          "pixels": 2764800,
+          "sse": 35278391
+        },
+        {
+          "crop_dists": 0.1244242787361145,
+          "crop_lpips": 0.015613550320267677,
+          "frame": 42,
+          "frame_psnr": 37.16158133499314,
+          "full_dists": 0.016062438488006592,
+          "full_lpips": 0.013077306747436523,
+          "pixels": 2764800,
+          "sse": 34560972
+        },
+        {
+          "crop_dists": 0.10342097282409668,
+          "crop_lpips": 0.014598846435546875,
+          "frame": 43,
+          "frame_psnr": 37.09628678615263,
+          "full_dists": 0.018601953983306885,
+          "full_lpips": 0.0136318662431505,
+          "pixels": 2764800,
+          "sse": 35084509
+        },
+        {
+          "crop_dists": 0.12454831600189209,
+          "crop_lpips": 0.016318097710609436,
+          "frame": 44,
+          "frame_psnr": 37.25909301165671,
+          "full_dists": 0.01922607421875,
+          "full_lpips": 0.013558828565809462,
+          "pixels": 2764800,
+          "sse": 33793625
+        },
+        {
+          "crop_dists": 0.11861515045166016,
+          "crop_lpips": 0.013795980252325535,
+          "frame": 45,
+          "frame_psnr": 37.18011829838816,
+          "full_dists": 0.018590450286865234,
+          "full_lpips": 0.013542236751980252,
+          "pixels": 2764800,
+          "sse": 34413770
+        },
+        {
+          "crop_dists": 0.1330115795135498,
+          "crop_lpips": 0.012683066539466381,
+          "frame": 46,
+          "frame_psnr": 37.22652437121697,
+          "full_dists": 0.018528342247009277,
+          "full_lpips": 0.013465692732069228,
+          "pixels": 2764800,
+          "sse": 34048003
+        },
+        {
+          "crop_dists": 0.1391492486000061,
+          "crop_lpips": 0.017780469730496407,
+          "frame": 47,
+          "frame_psnr": 36.871148767004485,
+          "full_dists": 0.0187150239944458,
+          "full_lpips": 0.014352733823988172,
+          "pixels": 2764800,
+          "sse": 36951256
+        }
+      ]
+    },
+    {
+      "crf": 55,
+      "native_bytes": 63879,
+      "wire_bytes": 64177,
+      "baseline": [
+        {
+          "crop_dists": 0.12559878826141357,
+          "crop_lpips": 0.04266262799501419,
+          "frame": 0,
+          "frame_psnr": 35.41568217839162,
+          "full_dists": 0.020420551300048828,
+          "full_lpips": 0.018784217834472657,
+          "pixels": 2764800,
+          "sse": 51662553
+        },
+        {
+          "crop_dists": 0.25163328647613525,
+          "crop_lpips": 0.22461484372615814,
+          "frame": 1,
+          "frame_psnr": 36.12288435368329,
+          "full_dists": 0.020355522632598877,
+          "full_lpips": 0.0172527101304796,
+          "pixels": 2764800,
+          "sse": 43899103
+        },
+        {
+          "crop_dists": 0.2428443431854248,
+          "crop_lpips": 0.212162584066391,
+          "frame": 2,
+          "frame_psnr": 36.58425144510382,
+          "full_dists": 0.01953279972076416,
+          "full_lpips": 0.01606977144877116,
+          "pixels": 2764800,
+          "sse": 39474709
+        },
+        {
+          "crop_dists": 0.25477004051208496,
+          "crop_lpips": 0.21137259900569916,
+          "frame": 3,
+          "frame_psnr": 36.288317925321046,
+          "full_dists": 0.02028679847717285,
+          "full_lpips": 0.01680538707309299,
+          "pixels": 2764800,
+          "sse": 42258326
+        },
+        {
+          "crop_dists": 0.1415877342224121,
+          "crop_lpips": 0.06404872238636017,
+          "frame": 4,
+          "frame_psnr": 36.79051385743472,
+          "full_dists": 0.02199876308441162,
+          "full_lpips": 0.014682226181030274,
+          "pixels": 2764800,
+          "sse": 37643734
+        },
+        {
+          "crop_dists": 0.1514906883239746,
+          "crop_lpips": 0.08380938321352005,
+          "frame": 5,
+          "frame_psnr": 36.516828936116134,
+          "full_dists": 0.020125627517700195,
+          "full_lpips": 0.01580294503106011,
+          "pixels": 2764800,
+          "sse": 40092320
+        },
+        {
+          "crop_dists": 0.12397527694702148,
+          "crop_lpips": 0.06621581315994263,
+          "frame": 6,
+          "frame_psnr": 36.66556361488099,
+          "full_dists": 0.023975133895874023,
+          "full_lpips": 0.015124598609076606,
+          "pixels": 2764800,
+          "sse": 38742507
+        },
+        {
+          "crop_dists": 0.10338926315307617,
+          "crop_lpips": 0.025064175948500633,
+          "frame": 7,
+          "frame_psnr": 36.642949494912436,
+          "full_dists": 0.02213740348815918,
+          "full_lpips": 0.014798881742689344,
+          "pixels": 2764800,
+          "sse": 38944769
+        },
+        {
+          "crop_dists": 0.09557759761810303,
+          "crop_lpips": 0.027431797236204147,
+          "frame": 8,
+          "frame_psnr": 36.83698316834067,
+          "full_dists": 0.020136773586273193,
+          "full_lpips": 0.014976161321004232,
+          "pixels": 2764800,
+          "sse": 37243095
+        },
+        {
+          "crop_dists": 0.09357917308807373,
+          "crop_lpips": 0.031867459416389465,
+          "frame": 9,
+          "frame_psnr": 36.44462217535083,
+          "full_dists": 0.02324354648590088,
+          "full_lpips": 0.016317469278971354,
+          "pixels": 2764800,
+          "sse": 40764476
+        },
+        {
+          "crop_dists": 0.06568509340286255,
+          "crop_lpips": 0.011735916137695312,
+          "frame": 10,
+          "frame_psnr": 36.6414366048336,
+          "full_dists": 0.023566246032714844,
+          "full_lpips": 0.015283144844902886,
+          "pixels": 2764800,
+          "sse": 38958338
+        },
+        {
+          "crop_dists": 0.1335812211036682,
+          "crop_lpips": 0.07956394553184509,
+          "frame": 11,
+          "frame_psnr": 36.381893832103856,
+          "full_dists": 0.024859189987182617,
+          "full_lpips": 0.017344872156778973,
+          "pixels": 2764800,
+          "sse": 41357540
+        },
+        {
+          "crop_dists": 0.10534542798995972,
+          "crop_lpips": 0.05208566039800644,
+          "frame": 12,
+          "frame_psnr": 36.555961128205425,
+          "full_dists": 0.024380087852478027,
+          "full_lpips": 0.01678707546657986,
+          "pixels": 2764800,
+          "sse": 39732690
+        },
+        {
+          "crop_dists": 0.13049918413162231,
+          "crop_lpips": 0.13471703231334686,
+          "frame": 13,
+          "frame_psnr": 36.374681454238896,
+          "full_dists": 0.025959014892578125,
+          "full_lpips": 0.017100454966227214,
+          "pixels": 2764800,
+          "sse": 41426280
+        },
+        {
+          "crop_dists": 0.12735188007354736,
+          "crop_lpips": 0.059377506375312805,
+          "frame": 14,
+          "frame_psnr": 36.668495734373714,
+          "full_dists": 0.023951292037963867,
+          "full_lpips": 0.015450956556532117,
+          "pixels": 2764800,
+          "sse": 38716359
+        },
+        {
+          "crop_dists": 0.14306050539016724,
+          "crop_lpips": 0.09839937090873718,
+          "frame": 15,
+          "frame_psnr": 36.16925703605585,
+          "full_dists": 0.028241991996765137,
+          "full_lpips": 0.01881670422024197,
+          "pixels": 2764800,
+          "sse": 43432855
+        },
+        {
+          "crop_dists": 0.17188549041748047,
+          "crop_lpips": 0.13942250609397888,
+          "frame": 16,
+          "frame_psnr": 36.74052285545954,
+          "full_dists": 0.027082204818725586,
+          "full_lpips": 0.017617568969726563,
+          "pixels": 2764800,
+          "sse": 38079549
+        },
+        {
+          "crop_dists": 0.1559198498725891,
+          "crop_lpips": 0.17696505784988403,
+          "frame": 17,
+          "frame_psnr": 36.30252182534059,
+          "full_dists": 0.024025380611419678,
+          "full_lpips": 0.0187141842312283,
+          "pixels": 2764800,
+          "sse": 42120343
+        },
+        {
+          "crop_dists": 0.16332018375396729,
+          "crop_lpips": 0.20272333920001984,
+          "frame": 18,
+          "frame_psnr": 36.420826390937876,
+          "full_dists": 0.02519857883453369,
+          "full_lpips": 0.018468731774224176,
+          "pixels": 2764800,
+          "sse": 40988445
+        },
+        {
+          "crop_dists": 0.14266037940979004,
+          "crop_lpips": 0.1737862527370453,
+          "frame": 19,
+          "frame_psnr": 36.16412547172536,
+          "full_dists": 0.024995386600494385,
+          "full_lpips": 0.02003761291503906,
+          "pixels": 2764800,
+          "sse": 43484205
+        },
+        {
+          "crop_dists": 0.12569814920425415,
+          "crop_lpips": 0.08568987250328064,
+          "frame": 20,
+          "frame_psnr": 36.62581452955418,
+          "full_dists": 0.022239208221435547,
+          "full_lpips": 0.017814470926920574,
+          "pixels": 2764800,
+          "sse": 39098728
+        },
+        {
+          "crop_dists": 0.1382840871810913,
+          "crop_lpips": 0.0790298730134964,
+          "frame": 21,
+          "frame_psnr": 36.37186302784032,
+          "full_dists": 0.023053407669067383,
+          "full_lpips": 0.017946315341525607,
+          "pixels": 2764800,
+          "sse": 41453173
+        },
+        {
+          "crop_dists": 0.08968007564544678,
+          "crop_lpips": 0.036705583333969116,
+          "frame": 22,
+          "frame_psnr": 36.57292421157024,
+          "full_dists": 0.023916304111480713,
+          "full_lpips": 0.017052620781792534,
+          "pixels": 2764800,
+          "sse": 39577801
+        },
+        {
+          "crop_dists": 0.11759990453720093,
+          "crop_lpips": 0.039115697145462036,
+          "frame": 23,
+          "frame_psnr": 36.37700932129591,
+          "full_dists": 0.02275407314300537,
+          "full_lpips": 0.018069623311360677,
+          "pixels": 2764800,
+          "sse": 41404081
+        },
+        {
+          "crop_dists": 0.09628325700759888,
+          "crop_lpips": 0.02494741417467594,
+          "frame": 24,
+          "frame_psnr": 36.677002877084654,
+          "full_dists": 0.022791385650634766,
+          "full_lpips": 0.01725062476264106,
+          "pixels": 2764800,
+          "sse": 38640594
+        },
+        {
+          "crop_dists": 0.13849914073944092,
+          "crop_lpips": 0.05600704252719879,
+          "frame": 25,
+          "frame_psnr": 36.26443409222397,
+          "full_dists": 0.023161649703979492,
+          "full_lpips": 0.01859257804022895,
+          "pixels": 2764800,
+          "sse": 42491364
+        },
+        {
+          "crop_dists": 0.1133386492729187,
+          "crop_lpips": 0.04857683181762695,
+          "frame": 26,
+          "frame_psnr": 36.42699482762175,
+          "full_dists": 0.02582693099975586,
+          "full_lpips": 0.017473623487684463,
+          "pixels": 2764800,
+          "sse": 40930269
+        },
+        {
+          "crop_dists": 0.10595440864562988,
+          "crop_lpips": 0.03992703557014465,
+          "frame": 27,
+          "frame_psnr": 36.14629972626123,
+          "full_dists": 0.026704370975494385,
+          "full_lpips": 0.01868289311726888,
+          "pixels": 2764800,
+          "sse": 43663054
+        },
+        {
+          "crop_dists": 0.09929060935974121,
+          "crop_lpips": 0.032858528196811676,
+          "frame": 28,
+          "frame_psnr": 36.2959631304806,
+          "full_dists": 0.02662724256515503,
+          "full_lpips": 0.018298859066433377,
+          "pixels": 2764800,
+          "sse": 42184001
+        },
+        {
+          "crop_dists": 0.08490514755249023,
+          "crop_lpips": 0.020348956808447838,
+          "frame": 29,
+          "frame_psnr": 36.12006299101815,
+          "full_dists": 0.02702939510345459,
+          "full_lpips": 0.018243675231933595,
+          "pixels": 2764800,
+          "sse": 43927631
+        },
+        {
+          "crop_dists": 0.07690948247909546,
+          "crop_lpips": 0.06289639323949814,
+          "frame": 30,
+          "frame_psnr": 36.469197220877625,
+          "full_dists": 0.028647005558013916,
+          "full_lpips": 0.017362456851535372,
+          "pixels": 2764800,
+          "sse": 40534457
+        },
+        {
+          "crop_dists": 0.07915788888931274,
+          "crop_lpips": 0.09014347195625305,
+          "frame": 31,
+          "frame_psnr": 36.41229646768427,
+          "full_dists": 0.027743399143218994,
+          "full_lpips": 0.01776265992058648,
+          "pixels": 2764800,
+          "sse": 41069029
+        },
+        {
+          "crop_dists": 0.07700037956237793,
+          "crop_lpips": 0.03011345863342285,
+          "frame": 32,
+          "frame_psnr": 36.628374705762674,
+          "full_dists": 0.0257720947265625,
+          "full_lpips": 0.017270474963717992,
+          "pixels": 2764800,
+          "sse": 39075686
+        },
+        {
+          "crop_dists": 0.113800048828125,
+          "crop_lpips": 0.10242149978876114,
+          "frame": 33,
+          "frame_psnr": 36.32785859877756,
+          "full_dists": 0.02754199504852295,
+          "full_lpips": 0.01855494817097982,
+          "pixels": 2764800,
+          "sse": 41875328
+        },
+        {
+          "crop_dists": 0.11812341213226318,
+          "crop_lpips": 0.12065409868955612,
+          "frame": 34,
+          "frame_psnr": 36.269444443390526,
+          "full_dists": 0.02642977237701416,
+          "full_lpips": 0.01906198289659288,
+          "pixels": 2764800,
+          "sse": 42442371
+        },
+        {
+          "crop_dists": 0.12161046266555786,
+          "crop_lpips": 0.1654244065284729,
+          "frame": 35,
+          "frame_psnr": 36.077346773923345,
+          "full_dists": 0.02413487434387207,
+          "full_lpips": 0.020637554592556423,
+          "pixels": 2764800,
+          "sse": 44361825
+        },
+        {
+          "crop_dists": 0.11937439441680908,
+          "crop_lpips": 0.11678281426429749,
+          "frame": 36,
+          "frame_psnr": 36.203917470777284,
+          "full_dists": 0.025947272777557373,
+          "full_lpips": 0.018867365519205728,
+          "pixels": 2764800,
+          "sse": 43087603
+        },
+        {
+          "crop_dists": 0.11278915405273438,
+          "crop_lpips": 0.09791792184114456,
+          "frame": 37,
+          "frame_psnr": 36.06394591475041,
+          "full_dists": 0.02562427520751953,
+          "full_lpips": 0.020137142605251734,
+          "pixels": 2764800,
+          "sse": 44498922
+        },
+        {
+          "crop_dists": 0.06506705284118652,
+          "crop_lpips": 0.008341612294316292,
+          "frame": 38,
+          "frame_psnr": 36.115728007044645,
+          "full_dists": 0.0238339900970459,
+          "full_lpips": 0.019351942274305554,
+          "pixels": 2764800,
+          "sse": 43971500
+        },
+        {
+          "crop_dists": 0.0973196029663086,
+          "crop_lpips": 0.047218792140483856,
+          "frame": 39,
+          "frame_psnr": 35.963643113942354,
+          "full_dists": 0.0254095196723938,
+          "full_lpips": 0.019978809356689452,
+          "pixels": 2764800,
+          "sse": 45538610
+        },
+        {
+          "crop_dists": 0.1056830883026123,
+          "crop_lpips": 0.04321834444999695,
+          "frame": 40,
+          "frame_psnr": 36.16939072762636,
+          "full_dists": 0.024776935577392578,
+          "full_lpips": 0.019493961334228517,
+          "pixels": 2764800,
+          "sse": 43431518
+        },
+        {
+          "crop_dists": 0.14118897914886475,
+          "crop_lpips": 0.04025139659643173,
+          "frame": 41,
+          "frame_psnr": 35.95463185744774,
+          "full_dists": 0.022373735904693604,
+          "full_lpips": 0.02004161834716797,
+          "pixels": 2764800,
+          "sse": 45633197
+        },
+        {
+          "crop_dists": 0.14982426166534424,
+          "crop_lpips": 0.04024161770939827,
+          "frame": 42,
+          "frame_psnr": 35.994624973951865,
+          "full_dists": 0.02395695447921753,
+          "full_lpips": 0.019571336110432942,
+          "pixels": 2764800,
+          "sse": 45214901
+        },
+        {
+          "crop_dists": 0.13595730066299438,
+          "crop_lpips": 0.030527863651514053,
+          "frame": 43,
+          "frame_psnr": 35.947600533268584,
+          "full_dists": 0.02681708335876465,
+          "full_lpips": 0.02049520280626085,
+          "pixels": 2764800,
+          "sse": 45707138
+        },
+        {
+          "crop_dists": 0.14960289001464844,
+          "crop_lpips": 0.034668050706386566,
+          "frame": 44,
+          "frame_psnr": 36.21724302176417,
+          "full_dists": 0.025113165378570557,
+          "full_lpips": 0.020530465443929037,
+          "pixels": 2764800,
+          "sse": 42955599
+        },
+        {
+          "crop_dists": 0.14616018533706665,
+          "crop_lpips": 0.026233483105897903,
+          "frame": 45,
+          "frame_psnr": 36.0369220201412,
+          "full_dists": 0.025524616241455078,
+          "full_lpips": 0.020771704779730903,
+          "pixels": 2764800,
+          "sse": 44776679
+        },
+        {
+          "crop_dists": 0.16516166925430298,
+          "crop_lpips": 0.02994687855243683,
+          "frame": 46,
+          "frame_psnr": 36.11334165551342,
+          "full_dists": 0.025204777717590332,
+          "full_lpips": 0.020320468478732638,
+          "pixels": 2764800,
+          "sse": 43995668
+        },
+        {
+          "crop_dists": 0.160869300365448,
+          "crop_lpips": 0.03629027307033539,
+          "frame": 47,
+          "frame_psnr": 35.80766844041437,
+          "full_dists": 0.023852646350860596,
+          "full_lpips": 0.02158101823594835,
+          "pixels": 2764800,
+          "sse": 47203830
+        }
+      ],
+      "streak": [
+        {
+          "crop_dists": 0.12559878826141357,
+          "crop_lpips": 0.04266262799501419,
+          "frame": 0,
+          "frame_psnr": 35.41568217839162,
+          "full_dists": 0.020420551300048828,
+          "full_lpips": 0.018784217834472657,
+          "pixels": 2764800,
+          "sse": 51662553
+        },
+        {
+          "crop_dists": 0.17621684074401855,
+          "crop_lpips": 0.02326754853129387,
+          "frame": 1,
+          "frame_psnr": 36.15882270034209,
+          "full_dists": 0.020196259021759033,
+          "full_lpips": 0.01625834888882107,
+          "pixels": 2764800,
+          "sse": 43537332
+        },
+        {
+          "crop_dists": 0.08443558216094971,
+          "crop_lpips": 0.013189412653446198,
+          "frame": 2,
+          "frame_psnr": 36.61611352096375,
+          "full_dists": 0.01943594217300415,
+          "full_lpips": 0.014649327596028645,
+          "pixels": 2764800,
+          "sse": 39186162
+        },
+        {
+          "crop_dists": 0.11645132303237915,
+          "crop_lpips": 0.013265370391309261,
+          "frame": 3,
+          "frame_psnr": 36.315218424532844,
+          "full_dists": 0.020191550254821777,
+          "full_lpips": 0.015425227483113606,
+          "pixels": 2764800,
+          "sse": 41997384
+        },
+        {
+          "crop_dists": 0.11494767665863037,
+          "crop_lpips": 0.030517712235450745,
+          "frame": 4,
+          "frame_psnr": 36.79631251418441,
+          "full_dists": 0.02196323871612549,
+          "full_lpips": 0.01444758309258355,
+          "pixels": 2764800,
+          "sse": 37593506
+        },
+        {
+          "crop_dists": 0.12803560495376587,
+          "crop_lpips": 0.03939410671591759,
+          "frame": 5,
+          "frame_psnr": 36.542490638854744,
+          "full_dists": 0.020101845264434814,
+          "full_lpips": 0.015413907368977865,
+          "pixels": 2764800,
+          "sse": 39856120
+        },
+        {
+          "crop_dists": 0.09713077545166016,
+          "crop_lpips": 0.03304256498813629,
+          "frame": 6,
+          "frame_psnr": 36.6719037767479,
+          "full_dists": 0.023881077766418457,
+          "full_lpips": 0.014642533196343316,
+          "pixels": 2764800,
+          "sse": 38685989
+        },
+        {
+          "crop_dists": 0.09142804145812988,
+          "crop_lpips": 0.01399101223796606,
+          "frame": 7,
+          "frame_psnr": 36.647964229479136,
+          "full_dists": 0.022048771381378174,
+          "full_lpips": 0.014713783264160157,
+          "pixels": 2764800,
+          "sse": 38899826
+        },
+        {
+          "crop_dists": 0.08559596538543701,
+          "crop_lpips": 0.017388740554451942,
+          "frame": 8,
+          "frame_psnr": 36.845308754240996,
+          "full_dists": 0.020110726356506348,
+          "full_lpips": 0.014872858259412978,
+          "pixels": 2764800,
+          "sse": 37171767
+        },
+        {
+          "crop_dists": 0.0926637053489685,
+          "crop_lpips": 0.02620198205113411,
+          "frame": 9,
+          "frame_psnr": 36.4597234543803,
+          "full_dists": 0.023257315158843994,
+          "full_lpips": 0.016278746922810873,
+          "pixels": 2764800,
+          "sse": 40622976
+        },
+        {
+          "crop_dists": 0.06549304723739624,
+          "crop_lpips": 0.009203648194670677,
+          "frame": 10,
+          "frame_psnr": 36.64607126597416,
+          "full_dists": 0.02356189489364624,
+          "full_lpips": 0.01525157928466797,
+          "pixels": 2764800,
+          "sse": 38916785
+        },
+        {
+          "crop_dists": 0.11297518014907837,
+          "crop_lpips": 0.04036624729633331,
+          "frame": 11,
+          "frame_psnr": 36.39255468462197,
+          "full_dists": 0.02480340003967285,
+          "full_lpips": 0.016858783298068575,
+          "pixels": 2764800,
+          "sse": 41256142
+        },
+        {
+          "crop_dists": 0.09763228893280029,
+          "crop_lpips": 0.03577038645744324,
+          "frame": 12,
+          "frame_psnr": 36.560301465673035,
+          "full_dists": 0.02440565824508667,
+          "full_lpips": 0.016563819249471028,
+          "pixels": 2764800,
+          "sse": 39693001
+        },
+        {
+          "crop_dists": 0.090981125831604,
+          "crop_lpips": 0.040270574390888214,
+          "frame": 13,
+          "frame_psnr": 36.405803566290224,
+          "full_dists": 0.025907278060913086,
+          "full_lpips": 0.016269211239284938,
+          "pixels": 2764800,
+          "sse": 41130475
+        },
+        {
+          "crop_dists": 0.12278592586517334,
+          "crop_lpips": 0.03459448739886284,
+          "frame": 14,
+          "frame_psnr": 36.67559683943733,
+          "full_dists": 0.023949146270751953,
+          "full_lpips": 0.01527627944946289,
+          "pixels": 2764800,
+          "sse": 38653106
+        },
+        {
+          "crop_dists": 0.1305750012397766,
+          "crop_lpips": 0.04491937905550003,
+          "frame": 15,
+          "frame_psnr": 36.19778902407085,
+          "full_dists": 0.028241336345672607,
+          "full_lpips": 0.01831017812093099,
+          "pixels": 2764800,
+          "sse": 43148448
+        },
+        {
+          "crop_dists": 0.1317393183708191,
+          "crop_lpips": 0.045232877135276794,
+          "frame": 16,
+          "frame_psnr": 36.773971167620346,
+          "full_dists": 0.02703458070755005,
+          "full_lpips": 0.017051395840115016,
+          "pixels": 2764800,
+          "sse": 37787396
+        },
+        {
+          "crop_dists": 0.10440278053283691,
+          "crop_lpips": 0.06936180591583252,
+          "frame": 17,
+          "frame_psnr": 36.32729123130273,
+          "full_dists": 0.02390950918197632,
+          "full_lpips": 0.017770989735921224,
+          "pixels": 2764800,
+          "sse": 41880799
+        },
+        {
+          "crop_dists": 0.11163926124572754,
+          "crop_lpips": 0.06064809858798981,
+          "frame": 18,
+          "frame_psnr": 36.447283764496355,
+          "full_dists": 0.02504783868789673,
+          "full_lpips": 0.017566197713216145,
+          "pixels": 2764800,
+          "sse": 40739501
+        },
+        {
+          "crop_dists": 0.09499931335449219,
+          "crop_lpips": 0.033634815365076065,
+          "frame": 19,
+          "frame_psnr": 36.19789692354108,
+          "full_dists": 0.02472376823425293,
+          "full_lpips": 0.018572510613335504,
+          "pixels": 2764800,
+          "sse": 43147376
+        },
+        {
+          "crop_dists": 0.11005538702011108,
+          "crop_lpips": 0.04448999837040901,
+          "frame": 20,
+          "frame_psnr": 36.63852102025841,
+          "full_dists": 0.022170841693878174,
+          "full_lpips": 0.017310824924045138,
+          "pixels": 2764800,
+          "sse": 38984501
+        },
+        {
+          "crop_dists": 0.09985816478729248,
+          "crop_lpips": 0.025265827775001526,
+          "frame": 21,
+          "frame_psnr": 36.38325476161968,
+          "full_dists": 0.022925853729248047,
+          "full_lpips": 0.017482994927300346,
+          "pixels": 2764800,
+          "sse": 41344582
+        },
+        {
+          "crop_dists": 0.08032643795013428,
+          "crop_lpips": 0.02521364390850067,
+          "frame": 22,
+          "frame_psnr": 36.57678168149316,
+          "full_dists": 0.023906826972961426,
+          "full_lpips": 0.01694472418891059,
+          "pixels": 2764800,
+          "sse": 39542663
+        },
+        {
+          "crop_dists": 0.0785834789276123,
+          "crop_lpips": 0.021866895258426666,
+          "frame": 23,
+          "frame_psnr": 36.39517748772436,
+          "full_dists": 0.022612929344177246,
+          "full_lpips": 0.017804516686333552,
+          "pixels": 2764800,
+          "sse": 41231234
+        },
+        {
+          "crop_dists": 0.08231347799301147,
+          "crop_lpips": 0.015988415107131004,
+          "frame": 24,
+          "frame_psnr": 36.68087306685579,
+          "full_dists": 0.022762835025787354,
+          "full_lpips": 0.017190618515014647,
+          "pixels": 2764800,
+          "sse": 38606175
+        },
+        {
+          "crop_dists": 0.09772199392318726,
+          "crop_lpips": 0.028312789276242256,
+          "frame": 25,
+          "frame_psnr": 36.31238591746734,
+          "full_dists": 0.02299422025680542,
+          "full_lpips": 0.018262608846028646,
+          "pixels": 2764800,
+          "sse": 42024784
+        },
+        {
+          "crop_dists": 0.08118534088134766,
+          "crop_lpips": 0.019048206508159637,
+          "frame": 26,
+          "frame_psnr": 36.43964120917563,
+          "full_dists": 0.025650620460510254,
+          "full_lpips": 0.017204721238878038,
+          "pixels": 2764800,
+          "sse": 40811256
+        },
+        {
+          "crop_dists": 0.09669220447540283,
+          "crop_lpips": 0.024731144309043884,
+          "frame": 27,
+          "frame_psnr": 36.15213736846347,
+          "full_dists": 0.026676535606384277,
+          "full_lpips": 0.018522154490152994,
+          "pixels": 2764800,
+          "sse": 43604403
+        },
+        {
+          "crop_dists": 0.07584404945373535,
+          "crop_lpips": 0.010689092800021172,
+          "frame": 28,
+          "frame_psnr": 36.3055186623624,
+          "full_dists": 0.026540398597717285,
+          "full_lpips": 0.01805624008178711,
+          "pixels": 2764800,
+          "sse": 42091288
+        },
+        {
+          "crop_dists": 0.07509607076644897,
+          "crop_lpips": 0.012471962720155716,
+          "frame": 29,
+          "frame_psnr": 36.1265304705072,
+          "full_dists": 0.026979804039001465,
+          "full_lpips": 0.018173573811848958,
+          "pixels": 2764800,
+          "sse": 43862263
+        },
+        {
+          "crop_dists": 0.06597363948822021,
+          "crop_lpips": 0.029599735513329506,
+          "frame": 30,
+          "frame_psnr": 36.475193813777345,
+          "full_dists": 0.028642237186431885,
+          "full_lpips": 0.01718071831597222,
+          "pixels": 2764800,
+          "sse": 40478527
+        },
+        {
+          "crop_dists": 0.04219472408294678,
+          "crop_lpips": 0.006585031747817993,
+          "frame": 31,
+          "frame_psnr": 36.46000110484658,
+          "full_dists": 0.02770000696182251,
+          "full_lpips": 0.017430246141221788,
+          "pixels": 2764800,
+          "sse": 40620379
+        },
+        {
+          "crop_dists": 0.05291545391082764,
+          "crop_lpips": 0.005233399569988251,
+          "frame": 32,
+          "frame_psnr": 36.63378701825205,
+          "full_dists": 0.02570861577987671,
+          "full_lpips": 0.017076843049791124,
+          "pixels": 2764800,
+          "sse": 39027019
+        },
+        {
+          "crop_dists": 0.07809615135192871,
+          "crop_lpips": 0.007853965274989605,
+          "frame": 33,
+          "frame_psnr": 36.36143923868377,
+          "full_dists": 0.02742069959640503,
+          "full_lpips": 0.01797835879855686,
+          "pixels": 2764800,
+          "sse": 41552787
+        },
+        {
+          "crop_dists": 0.06935828924179077,
+          "crop_lpips": 0.015409448184072971,
+          "frame": 34,
+          "frame_psnr": 36.29330921053596,
+          "full_dists": 0.02635645866394043,
+          "full_lpips": 0.01847744411892361,
+          "pixels": 2764800,
+          "sse": 42209787
+        },
+        {
+          "crop_dists": 0.07354956865310669,
+          "crop_lpips": 0.015096827410161495,
+          "frame": 35,
+          "frame_psnr": 36.10316945512762,
+          "full_dists": 0.024050414562225342,
+          "full_lpips": 0.01976014455159505,
+          "pixels": 2764800,
+          "sse": 44098837
+        },
+        {
+          "crop_dists": 0.06291043758392334,
+          "crop_lpips": 0.009120343253016472,
+          "frame": 36,
+          "frame_psnr": 36.22934806784639,
+          "full_dists": 0.025839924812316895,
+          "full_lpips": 0.018025283813476563,
+          "pixels": 2764800,
+          "sse": 42836036
+        },
+        {
+          "crop_dists": 0.06544053554534912,
+          "crop_lpips": 0.005533333867788315,
+          "frame": 37,
+          "frame_psnr": 36.090531634333345,
+          "full_dists": 0.025478005409240723,
+          "full_lpips": 0.01952206505669488,
+          "pixels": 2764800,
+          "sse": 44227350
+        },
+        {
+          "crop_dists": 0.06897348165512085,
+          "crop_lpips": 0.00602912250906229,
+          "frame": 38,
+          "frame_psnr": 36.118114089398865,
+          "full_dists": 0.023826539516448975,
+          "full_lpips": 0.019339447021484376,
+          "pixels": 2764800,
+          "sse": 43947348
+        },
+        {
+          "crop_dists": 0.0668478012084961,
+          "crop_lpips": 0.005065350793302059,
+          "frame": 39,
+          "frame_psnr": 35.98472704507502,
+          "full_dists": 0.025431394577026367,
+          "full_lpips": 0.01976081000434028,
+          "pixels": 2764800,
+          "sse": 45318067
+        },
+        {
+          "crop_dists": 0.07760757207870483,
+          "crop_lpips": 0.004178750328719616,
+          "frame": 40,
+          "frame_psnr": 36.18862604763549,
+          "full_dists": 0.024729549884796143,
+          "full_lpips": 0.019199695587158203,
+          "pixels": 2764800,
+          "sse": 43239581
+        },
+        {
+          "crop_dists": 0.13906794786453247,
+          "crop_lpips": 0.012989489361643791,
+          "frame": 41,
+          "frame_psnr": 35.97462014570148,
+          "full_dists": 0.022349298000335693,
+          "full_lpips": 0.019806779225667318,
+          "pixels": 2764800,
+          "sse": 45423654
+        },
+        {
+          "crop_dists": 0.1544753909111023,
+          "crop_lpips": 0.022042766213417053,
+          "frame": 42,
+          "frame_psnr": 36.014189361602014,
+          "full_dists": 0.023941993713378906,
+          "full_lpips": 0.019519456227620444,
+          "pixels": 2764800,
+          "sse": 45011672
+        },
+        {
+          "crop_dists": 0.1389913558959961,
+          "crop_lpips": 0.02251213788986206,
+          "frame": 43,
+          "frame_psnr": 35.96261182704636,
+          "full_dists": 0.026851654052734375,
+          "full_lpips": 0.020457801818847657,
+          "pixels": 2764800,
+          "sse": 45549425
+        },
+        {
+          "crop_dists": 0.1511695384979248,
+          "crop_lpips": 0.02225295454263687,
+          "frame": 44,
+          "frame_psnr": 36.23370810051788,
+          "full_dists": 0.025104761123657227,
+          "full_lpips": 0.020454735226101344,
+          "pixels": 2764800,
+          "sse": 42793053
+        },
+        {
+          "crop_dists": 0.1450207233428955,
+          "crop_lpips": 0.017950288951396942,
+          "frame": 45,
+          "frame_psnr": 36.05535040514421,
+          "full_dists": 0.025476038455963135,
+          "full_lpips": 0.020691494411892362,
+          "pixels": 2764800,
+          "sse": 44587081
+        },
+        {
+          "crop_dists": 0.15839248895645142,
+          "crop_lpips": 0.014900973066687584,
+          "frame": 46,
+          "frame_psnr": 36.13148385728844,
+          "full_dists": 0.02522331476211548,
+          "full_lpips": 0.020266668531629773,
+          "pixels": 2764800,
+          "sse": 43812264
+        },
+        {
+          "crop_dists": 0.1589670181274414,
+          "crop_lpips": 0.02181350439786911,
+          "frame": 47,
+          "frame_psnr": 35.81145062638826,
+          "full_dists": 0.023900926113128662,
+          "full_lpips": 0.021527731153700085,
+          "pixels": 2764800,
+          "sse": 47162739
+        }
+      ]
+    },
+    {
+      "crf": 62,
+      "native_bytes": 34146,
+      "wire_bytes": 34421,
+      "baseline": [
+        {
+          "crop_dists": 0.15906816720962524,
+          "crop_lpips": 0.09237080812454224,
+          "frame": 0,
+          "frame_psnr": 33.63046388301396,
+          "full_dists": 0.03895139694213867,
+          "full_lpips": 0.03333341810438368,
+          "pixels": 2764800,
+          "sse": 77928747
+        },
+        {
+          "crop_dists": 0.26497483253479004,
+          "crop_lpips": 0.23932228982448578,
+          "frame": 1,
+          "frame_psnr": 33.82321956346277,
+          "full_dists": 0.03806495666503906,
+          "full_lpips": 0.032933553059895836,
+          "pixels": 2764800,
+          "sse": 74545619
+        },
+        {
+          "crop_dists": 0.26175642013549805,
+          "crop_lpips": 0.2123010754585266,
+          "frame": 2,
+          "frame_psnr": 34.12813232925358,
+          "full_dists": 0.040897369384765625,
+          "full_lpips": 0.03191239674886068,
+          "pixels": 2764800,
+          "sse": 69491366
+        },
+        {
+          "crop_dists": 0.2526741027832031,
+          "crop_lpips": 0.20697474479675293,
+          "frame": 3,
+          "frame_psnr": 33.75769976592781,
+          "full_dists": 0.042810261249542236,
+          "full_lpips": 0.03442536248101129,
+          "pixels": 2764800,
+          "sse": 75678777
+        },
+        {
+          "crop_dists": 0.23162049055099487,
+          "crop_lpips": 0.2595871090888977,
+          "frame": 4,
+          "frame_psnr": 34.12747454429465,
+          "full_dists": 0.04586958885192871,
+          "full_lpips": 0.033415819803873696,
+          "pixels": 2764800,
+          "sse": 69501892
+        },
+        {
+          "crop_dists": 0.16789764165878296,
+          "crop_lpips": 0.14889442920684814,
+          "frame": 5,
+          "frame_psnr": 33.80412269323717,
+          "full_dists": 0.04320728778839111,
+          "full_lpips": 0.03422170639038086,
+          "pixels": 2764800,
+          "sse": 74874134
+        },
+        {
+          "crop_dists": 0.15779787302017212,
+          "crop_lpips": 0.11595822870731354,
+          "frame": 6,
+          "frame_psnr": 33.98054998402077,
+          "full_dists": 0.047083497047424316,
+          "full_lpips": 0.032907786899142796,
+          "pixels": 2764800,
+          "sse": 71893410
+        },
+        {
+          "crop_dists": 0.17578673362731934,
+          "crop_lpips": 0.19765469431877136,
+          "frame": 7,
+          "frame_psnr": 33.732667092122135,
+          "full_dists": 0.044020116329193115,
+          "full_lpips": 0.03485024770100911,
+          "pixels": 2764800,
+          "sse": 76116248
+        },
+        {
+          "crop_dists": 0.1815604567527771,
+          "crop_lpips": 0.16274085640907288,
+          "frame": 8,
+          "frame_psnr": 33.94549709547443,
+          "full_dists": 0.04320269823074341,
+          "full_lpips": 0.03394775390625,
+          "pixels": 2764800,
+          "sse": 72476026
+        },
+        {
+          "crop_dists": 0.17132961750030518,
+          "crop_lpips": 0.13182517886161804,
+          "frame": 9,
+          "frame_psnr": 33.58450180157004,
+          "full_dists": 0.046663880348205566,
+          "full_lpips": 0.035585077073838976,
+          "pixels": 2764800,
+          "sse": 78757859
+        },
+        {
+          "crop_dists": 0.14309293031692505,
+          "crop_lpips": 0.12016332894563675,
+          "frame": 10,
+          "frame_psnr": 33.90693638493294,
+          "full_dists": 0.04529464244842529,
+          "full_lpips": 0.03381039937337239,
+          "pixels": 2764800,
+          "sse": 73122401
+        },
+        {
+          "crop_dists": 0.16095346212387085,
+          "crop_lpips": 0.10780754685401917,
+          "frame": 11,
+          "frame_psnr": 33.60213184990365,
+          "full_dists": 0.04610240459442139,
+          "full_lpips": 0.03544792599148221,
+          "pixels": 2764800,
+          "sse": 78438792
+        },
+        {
+          "crop_dists": 0.16028738021850586,
+          "crop_lpips": 0.12778422236442566,
+          "frame": 12,
+          "frame_psnr": 33.77406501489528,
+          "full_dists": 0.043299734592437744,
+          "full_lpips": 0.0347018305460612,
+          "pixels": 2764800,
+          "sse": 75394138
+        },
+        {
+          "crop_dists": 0.15805280208587646,
+          "crop_lpips": 0.143679678440094,
+          "frame": 13,
+          "frame_psnr": 33.48828789431808,
+          "full_dists": 0.04542684555053711,
+          "full_lpips": 0.03480596330430773,
+          "pixels": 2764800,
+          "sse": 80522137
+        },
+        {
+          "crop_dists": 0.22279012203216553,
+          "crop_lpips": 0.24684259295463562,
+          "frame": 14,
+          "frame_psnr": 33.914592923982966,
+          "full_dists": 0.04554605484008789,
+          "full_lpips": 0.034180857340494794,
+          "pixels": 2764800,
+          "sse": 72993601
+        },
+        {
+          "crop_dists": 0.16915923357009888,
+          "crop_lpips": 0.10565515607595444,
+          "frame": 15,
+          "frame_psnr": 33.568635133480505,
+          "full_dists": 0.04912787675857544,
+          "full_lpips": 0.03580697801378038,
+          "pixels": 2764800,
+          "sse": 79046122
+        },
+        {
+          "crop_dists": 0.17776399850845337,
+          "crop_lpips": 0.1545562446117401,
+          "frame": 16,
+          "frame_psnr": 34.231886290044635,
+          "full_dists": 0.04774367809295654,
+          "full_lpips": 0.03410385979546441,
+          "pixels": 2764800,
+          "sse": 67850875
+        },
+        {
+          "crop_dists": 0.16327178478240967,
+          "crop_lpips": 0.207905113697052,
+          "frame": 17,
+          "frame_psnr": 33.6762652991096,
+          "full_dists": 0.048184871673583984,
+          "full_lpips": 0.03583089192708333,
+          "pixels": 2764800,
+          "sse": 77111216
+        },
+        {
+          "crop_dists": 0.18194520473480225,
+          "crop_lpips": 0.23117931187152863,
+          "frame": 18,
+          "frame_psnr": 33.81752162215976,
+          "full_dists": 0.047576308250427246,
+          "full_lpips": 0.035592447916666665,
+          "pixels": 2764800,
+          "sse": 74643487
+        },
+        {
+          "crop_dists": 0.17494654655456543,
+          "crop_lpips": 0.17338818311691284,
+          "frame": 19,
+          "frame_psnr": 33.45371666228646,
+          "full_dists": 0.04795682430267334,
+          "full_lpips": 0.03865071614583333,
+          "pixels": 2764800,
+          "sse": 81165677
+        },
+        {
+          "crop_dists": 0.16072678565979004,
+          "crop_lpips": 0.12463976442813873,
+          "frame": 20,
+          "frame_psnr": 33.97677816956606,
+          "full_dists": 0.048248291015625,
+          "full_lpips": 0.03578922271728516,
+          "pixels": 2764800,
+          "sse": 71955876
+        },
+        {
+          "crop_dists": 0.2050940990447998,
+          "crop_lpips": 0.21531075239181519,
+          "frame": 21,
+          "frame_psnr": 33.59191482247129,
+          "full_dists": 0.046414971351623535,
+          "full_lpips": 0.03840655856662326,
+          "pixels": 2764800,
+          "sse": 78623541
+        },
+        {
+          "crop_dists": 0.1670864224433899,
+          "crop_lpips": 0.20777714252471924,
+          "frame": 22,
+          "frame_psnr": 33.85073441660805,
+          "full_dists": 0.04709780216217041,
+          "full_lpips": 0.03576727125379774,
+          "pixels": 2764800,
+          "sse": 74074826
+        },
+        {
+          "crop_dists": 0.14531099796295166,
+          "crop_lpips": 0.08489231765270233,
+          "frame": 23,
+          "frame_psnr": 33.636611482825366,
+          "full_dists": 0.044735491275787354,
+          "full_lpips": 0.036519648234049476,
+          "pixels": 2764800,
+          "sse": 77818514
+        },
+        {
+          "crop_dists": 0.12015068531036377,
+          "crop_lpips": 0.04763013869524002,
+          "frame": 24,
+          "frame_psnr": 33.97377970937072,
+          "full_dists": 0.045480310916900635,
+          "full_lpips": 0.03569686041937934,
+          "pixels": 2764800,
+          "sse": 72005573
+        },
+        {
+          "crop_dists": 0.17878681421279907,
+          "crop_lpips": 0.12431037425994873,
+          "frame": 25,
+          "frame_psnr": 33.48254941157264,
+          "full_dists": 0.044153451919555664,
+          "full_lpips": 0.03765557183159722,
+          "pixels": 2764800,
+          "sse": 80628604
+        },
+        {
+          "crop_dists": 0.14580440521240234,
+          "crop_lpips": 0.17849445343017578,
+          "frame": 26,
+          "frame_psnr": 33.72990904656569,
+          "full_dists": 0.046694159507751465,
+          "full_lpips": 0.0356315188937717,
+          "pixels": 2764800,
+          "sse": 76164602
+        },
+        {
+          "crop_dists": 0.1312207579612732,
+          "crop_lpips": 0.1826508492231369,
+          "frame": 27,
+          "frame_psnr": 33.43759527125112,
+          "full_dists": 0.04669922590255737,
+          "full_lpips": 0.037348412407769094,
+          "pixels": 2764800,
+          "sse": 81467531
+        },
+        {
+          "crop_dists": 0.1459915041923523,
+          "crop_lpips": 0.15576326847076416,
+          "frame": 28,
+          "frame_psnr": 33.763391477831995,
+          "full_dists": 0.04632461071014404,
+          "full_lpips": 0.03631230672200521,
+          "pixels": 2764800,
+          "sse": 75579660
+        },
+        {
+          "crop_dists": 0.13153690099716187,
+          "crop_lpips": 0.13598063588142395,
+          "frame": 29,
+          "frame_psnr": 33.48862311199558,
+          "full_dists": 0.04725712537765503,
+          "full_lpips": 0.03763909657796224,
+          "pixels": 2764800,
+          "sse": 80515922
+        },
+        {
+          "crop_dists": 0.11501419544219971,
+          "crop_lpips": 0.11096951365470886,
+          "frame": 30,
+          "frame_psnr": 33.801642427627776,
+          "full_dists": 0.049360692501068115,
+          "full_lpips": 0.03539639578925239,
+          "pixels": 2764800,
+          "sse": 74916907
+        },
+        {
+          "crop_dists": 0.0967947244644165,
+          "crop_lpips": 0.10299994796514511,
+          "frame": 31,
+          "frame_psnr": 33.74463690182929,
+          "full_dists": 0.04835700988769531,
+          "full_lpips": 0.03542902840508355,
+          "pixels": 2764800,
+          "sse": 75906749
+        },
+        {
+          "crop_dists": 0.0984610915184021,
+          "crop_lpips": 0.047201089560985565,
+          "frame": 32,
+          "frame_psnr": 34.01687000245876,
+          "full_dists": 0.04891747236251831,
+          "full_lpips": 0.03482718997531467,
+          "pixels": 2764800,
+          "sse": 71294673
+        },
+        {
+          "crop_dists": 0.12696105241775513,
+          "crop_lpips": 0.11218344420194626,
+          "frame": 33,
+          "frame_psnr": 33.80648319777236,
+          "full_dists": 0.04940438270568848,
+          "full_lpips": 0.036703686184353296,
+          "pixels": 2764800,
+          "sse": 74833449
+        },
+        {
+          "crop_dists": 0.13042062520980835,
+          "crop_lpips": 0.11572682857513428,
+          "frame": 34,
+          "frame_psnr": 33.74012910298734,
+          "full_dists": 0.04953765869140625,
+          "full_lpips": 0.036708492702907984,
+          "pixels": 2764800,
+          "sse": 75985578
+        },
+        {
+          "crop_dists": 0.13030213117599487,
+          "crop_lpips": 0.16652017831802368,
+          "frame": 35,
+          "frame_psnr": 33.48737180060992,
+          "full_dists": 0.049036622047424316,
+          "full_lpips": 0.03931019253200955,
+          "pixels": 2764800,
+          "sse": 80539124
+        },
+        {
+          "crop_dists": 0.13504981994628906,
+          "crop_lpips": 0.11679260432720184,
+          "frame": 36,
+          "frame_psnr": 33.63884691471825,
+          "full_dists": 0.05094492435455322,
+          "full_lpips": 0.037503814697265624,
+          "pixels": 2764800,
+          "sse": 77778469
+        },
+        {
+          "crop_dists": 0.12247830629348755,
+          "crop_lpips": 0.09604233503341675,
+          "frame": 37,
+          "frame_psnr": 33.44702865752904,
+          "full_dists": 0.04846084117889404,
+          "full_lpips": 0.03858199225531684,
+          "pixels": 2764800,
+          "sse": 81290766
+        },
+        {
+          "crop_dists": 0.12355935573577881,
+          "crop_lpips": 0.08004111051559448,
+          "frame": 38,
+          "frame_psnr": 33.51228504676787,
+          "full_dists": 0.04816204309463501,
+          "full_lpips": 0.03883054097493489,
+          "pixels": 2764800,
+          "sse": 80078435
+        },
+        {
+          "crop_dists": 0.11209464073181152,
+          "crop_lpips": 0.04375544935464859,
+          "frame": 39,
+          "frame_psnr": 33.223892416794506,
+          "full_dists": 0.050508081912994385,
+          "full_lpips": 0.03878011491563585,
+          "pixels": 2764800,
+          "sse": 85576563
+        },
+        {
+          "crop_dists": 0.11504518985748291,
+          "crop_lpips": 0.043501224368810654,
+          "frame": 40,
+          "frame_psnr": 33.67379116710726,
+          "full_dists": 0.05088907480239868,
+          "full_lpips": 0.03776375664605035,
+          "pixels": 2764800,
+          "sse": 77155158
+        },
+        {
+          "crop_dists": 0.17619961500167847,
+          "crop_lpips": 0.04664691165089607,
+          "frame": 41,
+          "frame_psnr": 33.3057241573634,
+          "full_dists": 0.047532737255096436,
+          "full_lpips": 0.03911575317382812,
+          "pixels": 2764800,
+          "sse": 83979187
+        },
+        {
+          "crop_dists": 0.16562288999557495,
+          "crop_lpips": 0.0504688061773777,
+          "frame": 42,
+          "frame_psnr": 33.483277654290355,
+          "full_dists": 0.049595534801483154,
+          "full_lpips": 0.03777858310275608,
+          "pixels": 2764800,
+          "sse": 80615085
+        },
+        {
+          "crop_dists": 0.1796884536743164,
+          "crop_lpips": 0.03469166159629822,
+          "frame": 43,
+          "frame_psnr": 33.37105279394458,
+          "full_dists": 0.052472472190856934,
+          "full_lpips": 0.039444673326280384,
+          "pixels": 2764800,
+          "sse": 82725386
+        },
+        {
+          "crop_dists": 0.18600177764892578,
+          "crop_lpips": 0.044258542358875275,
+          "frame": 44,
+          "frame_psnr": 33.6702211322312,
+          "full_dists": 0.05191910266876221,
+          "full_lpips": 0.03867910597059462,
+          "pixels": 2764800,
+          "sse": 77218608
+        },
+        {
+          "crop_dists": 0.18099570274353027,
+          "crop_lpips": 0.04480041190981865,
+          "frame": 45,
+          "frame_psnr": 33.51525508259199,
+          "full_dists": 0.05019533634185791,
+          "full_lpips": 0.039351382785373264,
+          "pixels": 2764800,
+          "sse": 80023690
+        },
+        {
+          "crop_dists": 0.1944788694381714,
+          "crop_lpips": 0.05679521709680557,
+          "frame": 46,
+          "frame_psnr": 33.61624457263564,
+          "full_dists": 0.0497971773147583,
+          "full_lpips": 0.03878435346815321,
+          "pixels": 2764800,
+          "sse": 78184313
+        },
+        {
+          "crop_dists": 0.20913082361221313,
+          "crop_lpips": 0.06462673842906952,
+          "frame": 47,
+          "frame_psnr": 33.211104288492464,
+          "full_dists": 0.04792732000350952,
+          "full_lpips": 0.0399715338812934,
+          "pixels": 2764800,
+          "sse": 85828921
+        }
+      ],
+      "streak": [
+        {
+          "crop_dists": 0.15906816720962524,
+          "crop_lpips": 0.09237080812454224,
+          "frame": 0,
+          "frame_psnr": 33.63046388301396,
+          "full_dists": 0.03895139694213867,
+          "full_lpips": 0.03333341810438368,
+          "pixels": 2764800,
+          "sse": 77928747
+        },
+        {
+          "crop_dists": 0.14408385753631592,
+          "crop_lpips": 0.024752728641033173,
+          "frame": 1,
+          "frame_psnr": 33.842075319733404,
+          "full_dists": 0.03793835639953613,
+          "full_lpips": 0.03192474789089627,
+          "pixels": 2764800,
+          "sse": 74222666
+        },
+        {
+          "crop_dists": 0.1169096827507019,
+          "crop_lpips": 0.014428526163101196,
+          "frame": 2,
+          "frame_psnr": 34.146521333906605,
+          "full_dists": 0.04081296920776367,
+          "full_lpips": 0.030590718587239583,
+          "pixels": 2764800,
+          "sse": 69197746
+        },
+        {
+          "crop_dists": 0.12498009204864502,
+          "crop_lpips": 0.012062689289450645,
+          "frame": 3,
+          "frame_psnr": 33.77232632189149,
+          "full_dists": 0.04266023635864258,
+          "full_lpips": 0.033065961201985676,
+          "pixels": 2764800,
+          "sse": 75424328
+        },
+        {
+          "crop_dists": 0.14018845558166504,
+          "crop_lpips": 0.021345505490899086,
+          "frame": 4,
+          "frame_psnr": 34.15313444742421,
+          "full_dists": 0.045741498470306396,
+          "full_lpips": 0.031732069651285805,
+          "pixels": 2764800,
+          "sse": 69092457
+        },
+        {
+          "crop_dists": 0.13865411281585693,
+          "crop_lpips": 0.029782097786664963,
+          "frame": 5,
+          "frame_psnr": 33.8323358627831,
+          "full_dists": 0.04312354326248169,
+          "full_lpips": 0.03330036375257704,
+          "pixels": 2764800,
+          "sse": 74389304
+        },
+        {
+          "crop_dists": 0.1340395212173462,
+          "crop_lpips": 0.045224059373140335,
+          "frame": 6,
+          "frame_psnr": 33.988663843527384,
+          "full_dists": 0.04697650671005249,
+          "full_lpips": 0.03225686391194661,
+          "pixels": 2764800,
+          "sse": 71759218
+        },
+        {
+          "crop_dists": 0.14829325675964355,
+          "crop_lpips": 0.046466171741485596,
+          "frame": 7,
+          "frame_psnr": 33.807391711637386,
+          "full_dists": 0.04373610019683838,
+          "full_lpips": 0.033466885884602865,
+          "pixels": 2764800,
+          "sse": 74817796
+        },
+        {
+          "crop_dists": 0.12713289260864258,
+          "crop_lpips": 0.027184924110770226,
+          "frame": 8,
+          "frame_psnr": 33.99897409581224,
+          "full_dists": 0.04241293668746948,
+          "full_lpips": 0.032675912645128036,
+          "pixels": 2764800,
+          "sse": 71589062
+        },
+        {
+          "crop_dists": 0.11802101135253906,
+          "crop_lpips": 0.02693813666701317,
+          "frame": 9,
+          "frame_psnr": 33.60466913345768,
+          "full_dists": 0.046041011810302734,
+          "full_lpips": 0.034446815914577905,
+          "pixels": 2764800,
+          "sse": 78392979
+        },
+        {
+          "crop_dists": 0.09521526098251343,
+          "crop_lpips": 0.017454365268349648,
+          "frame": 10,
+          "frame_psnr": 33.924822963811955,
+          "full_dists": 0.044898271560668945,
+          "full_lpips": 0.03276141908433702,
+          "pixels": 2764800,
+          "sse": 72821863
+        },
+        {
+          "crop_dists": 0.13269388675689697,
+          "crop_lpips": 0.0344989113509655,
+          "frame": 11,
+          "frame_psnr": 33.63364855312686,
+          "full_dists": 0.04606211185455322,
+          "full_lpips": 0.03453059726291233,
+          "pixels": 2764800,
+          "sse": 77871623
+        },
+        {
+          "crop_dists": 0.13620775938034058,
+          "crop_lpips": 0.04781605303287506,
+          "frame": 12,
+          "frame_psnr": 33.793398321544565,
+          "full_dists": 0.0432887077331543,
+          "full_lpips": 0.03399786207411024,
+          "pixels": 2764800,
+          "sse": 75059255
+        },
+        {
+          "crop_dists": 0.116047203540802,
+          "crop_lpips": 0.05368146300315857,
+          "frame": 13,
+          "frame_psnr": 33.503565769197465,
+          "full_dists": 0.04533153772354126,
+          "full_lpips": 0.03387597190009223,
+          "pixels": 2764800,
+          "sse": 80239369
+        },
+        {
+          "crop_dists": 0.16395318508148193,
+          "crop_lpips": 0.07915739715099335,
+          "frame": 14,
+          "frame_psnr": 33.93370730132925,
+          "full_dists": 0.04550933837890625,
+          "full_lpips": 0.032934708065456814,
+          "pixels": 2764800,
+          "sse": 72673044
+        },
+        {
+          "crop_dists": 0.1458580493927002,
+          "crop_lpips": 0.05186184123158455,
+          "frame": 15,
+          "frame_psnr": 33.584783095135535,
+          "full_dists": 0.049076080322265625,
+          "full_lpips": 0.03529407501220703,
+          "pixels": 2764800,
+          "sse": 78752758
+        },
+        {
+          "crop_dists": 0.1528039574623108,
+          "crop_lpips": 0.052290551364421844,
+          "frame": 16,
+          "frame_psnr": 34.249227067570935,
+          "full_dists": 0.04767376184463501,
+          "full_lpips": 0.03350617938571506,
+          "pixels": 2764800,
+          "sse": 67580496
+        },
+        {
+          "crop_dists": 0.13255929946899414,
+          "crop_lpips": 0.07644002884626389,
+          "frame": 17,
+          "frame_psnr": 33.689546537422295,
+          "full_dists": 0.04799896478652954,
+          "full_lpips": 0.03471722496880425,
+          "pixels": 2764800,
+          "sse": 76875761
+        },
+        {
+          "crop_dists": 0.13838672637939453,
+          "crop_lpips": 0.07283000648021698,
+          "frame": 18,
+          "frame_psnr": 33.831528232495785,
+          "full_dists": 0.04743671417236328,
+          "full_lpips": 0.03465997907850477,
+          "pixels": 2764800,
+          "sse": 74403139
+        },
+        {
+          "crop_dists": 0.13698410987854004,
+          "crop_lpips": 0.041183024644851685,
+          "frame": 19,
+          "frame_psnr": 33.47203687952189,
+          "full_dists": 0.047734975814819336,
+          "full_lpips": 0.03711739857991536,
+          "pixels": 2764800,
+          "sse": 80824010
+        },
+        {
+          "crop_dists": 0.14017248153686523,
+          "crop_lpips": 0.045153576880693436,
+          "frame": 20,
+          "frame_psnr": 33.994170817256716,
+          "full_dists": 0.04821115732192993,
+          "full_lpips": 0.03490942425198025,
+          "pixels": 2764800,
+          "sse": 71668283
+        },
+        {
+          "crop_dists": 0.14602148532867432,
+          "crop_lpips": 0.09163524955511093,
+          "frame": 21,
+          "frame_psnr": 33.63062856736674,
+          "full_dists": 0.046235501766204834,
+          "full_lpips": 0.03731385972764757,
+          "pixels": 2764800,
+          "sse": 77925792
+        },
+        {
+          "crop_dists": 0.11329352855682373,
+          "crop_lpips": 0.061431776732206345,
+          "frame": 22,
+          "frame_psnr": 33.88387668663779,
+          "full_dists": 0.04702138900756836,
+          "full_lpips": 0.03483081817626953,
+          "pixels": 2764800,
+          "sse": 73511691
+        },
+        {
+          "crop_dists": 0.10997152328491211,
+          "crop_lpips": 0.02915208786725998,
+          "frame": 23,
+          "frame_psnr": 33.67167737456762,
+          "full_dists": 0.04473680257797241,
+          "full_lpips": 0.03576250288221571,
+          "pixels": 2764800,
+          "sse": 77192720
+        },
+        {
+          "crop_dists": 0.1147342324256897,
+          "crop_lpips": 0.03393203765153885,
+          "frame": 24,
+          "frame_psnr": 33.97689628721067,
+          "full_dists": 0.04541510343551636,
+          "full_lpips": 0.035587471856011285,
+          "pixels": 2764800,
+          "sse": 71953919
+        },
+        {
+          "crop_dists": 0.13320541381835938,
+          "crop_lpips": 0.03750567138195038,
+          "frame": 25,
+          "frame_psnr": 33.551250861110866,
+          "full_dists": 0.043722569942474365,
+          "full_lpips": 0.0370285881890191,
+          "pixels": 2764800,
+          "sse": 79363168
+        },
+        {
+          "crop_dists": 0.08401334285736084,
+          "crop_lpips": 0.03125955909490585,
+          "frame": 26,
+          "frame_psnr": 33.79444803273983,
+          "full_dists": 0.04654991626739502,
+          "full_lpips": 0.03455177519056532,
+          "pixels": 2764800,
+          "sse": 75041115
+        },
+        {
+          "crop_dists": 0.08133459091186523,
+          "crop_lpips": 0.03387047350406647,
+          "frame": 27,
+          "frame_psnr": 33.49690551025886,
+          "full_dists": 0.04666757583618164,
+          "full_lpips": 0.03601038191053602,
+          "pixels": 2764800,
+          "sse": 80362517
+        },
+        {
+          "crop_dists": 0.10989362001419067,
+          "crop_lpips": 0.027287103235721588,
+          "frame": 28,
+          "frame_psnr": 33.8155684675582,
+          "full_dists": 0.04631662368774414,
+          "full_lpips": 0.035055351257324216,
+          "pixels": 2764800,
+          "sse": 74677064
+        },
+        {
+          "crop_dists": 0.08784657716751099,
+          "crop_lpips": 0.012833395972847939,
+          "frame": 29,
+          "frame_psnr": 33.532964461169776,
+          "full_dists": 0.04723775386810303,
+          "full_lpips": 0.03670090569390191,
+          "pixels": 2764800,
+          "sse": 79698039
+        },
+        {
+          "crop_dists": 0.0849459171295166,
+          "crop_lpips": 0.014048265293240547,
+          "frame": 30,
+          "frame_psnr": 33.83131191698966,
+          "full_dists": 0.04937601089477539,
+          "full_lpips": 0.03467425028483073,
+          "pixels": 2764800,
+          "sse": 74406845
+        },
+        {
+          "crop_dists": 0.06358015537261963,
+          "crop_lpips": 0.007158590480685234,
+          "frame": 31,
+          "frame_psnr": 33.7698097617516,
+          "full_dists": 0.048373639583587646,
+          "full_lpips": 0.035023557874891496,
+          "pixels": 2764800,
+          "sse": 75468046
+        },
+        {
+          "crop_dists": 0.07278263568878174,
+          "crop_lpips": 0.007551431655883789,
+          "frame": 32,
+          "frame_psnr": 34.02389746624776,
+          "full_dists": 0.048878610134124756,
+          "full_lpips": 0.0345856687757704,
+          "pixels": 2764800,
+          "sse": 71179402
+        },
+        {
+          "crop_dists": 0.09475505352020264,
+          "crop_lpips": 0.009796464815735817,
+          "frame": 33,
+          "frame_psnr": 33.82620536718276,
+          "full_dists": 0.04931527376174927,
+          "full_lpips": 0.03610997094048394,
+          "pixels": 2764800,
+          "sse": 74494386
+        },
+        {
+          "crop_dists": 0.07977235317230225,
+          "crop_lpips": 0.014494555070996284,
+          "frame": 34,
+          "frame_psnr": 33.754065045240466,
+          "full_dists": 0.04945343732833862,
+          "full_lpips": 0.036096526251898874,
+          "pixels": 2764800,
+          "sse": 75742141
+        },
+        {
+          "crop_dists": 0.08769923448562622,
+          "crop_lpips": 0.016224537044763565,
+          "frame": 35,
+          "frame_psnr": 33.50153012314629,
+          "full_dists": 0.04896223545074463,
+          "full_lpips": 0.0384368642171224,
+          "pixels": 2764800,
+          "sse": 80276988
+        },
+        {
+          "crop_dists": 0.08367729187011719,
+          "crop_lpips": 0.01237146370112896,
+          "frame": 36,
+          "frame_psnr": 33.653107322360526,
+          "full_dists": 0.05083400011062622,
+          "full_lpips": 0.036704499986436635,
+          "pixels": 2764800,
+          "sse": 77523496
+        },
+        {
+          "crop_dists": 0.07917970418930054,
+          "crop_lpips": 0.008604340255260468,
+          "frame": 37,
+          "frame_psnr": 33.46166455342895,
+          "full_dists": 0.048361778259277344,
+          "full_lpips": 0.038036151462131074,
+          "pixels": 2764800,
+          "sse": 81017274
+        },
+        {
+          "crop_dists": 0.08071368932723999,
+          "crop_lpips": 0.008429436013102531,
+          "frame": 38,
+          "frame_psnr": 33.5307284470113,
+          "full_dists": 0.04809606075286865,
+          "full_lpips": 0.03836395263671875,
+          "pixels": 2764800,
+          "sse": 79739083
+        },
+        {
+          "crop_dists": 0.08955836296081543,
+          "crop_lpips": 0.007553006988018751,
+          "frame": 39,
+          "frame_psnr": 33.23546474059234,
+          "full_dists": 0.05044209957122803,
+          "full_lpips": 0.03854005601671007,
+          "pixels": 2764800,
+          "sse": 85348837
+        },
+        {
+          "crop_dists": 0.0912705659866333,
+          "crop_lpips": 0.006953264586627483,
+          "frame": 40,
+          "frame_psnr": 33.68516883976439,
+          "full_dists": 0.05086493492126465,
+          "full_lpips": 0.037465379503038194,
+          "pixels": 2764800,
+          "sse": 76953291
+        },
+        {
+          "crop_dists": 0.1751105785369873,
+          "crop_lpips": 0.023812713101506233,
+          "frame": 41,
+          "frame_psnr": 33.31682411709937,
+          "full_dists": 0.04744577407836914,
+          "full_lpips": 0.03887367672390408,
+          "pixels": 2764800,
+          "sse": 83764822
+        },
+        {
+          "crop_dists": 0.16150367259979248,
+          "crop_lpips": 0.036020901054143906,
+          "frame": 42,
+          "frame_psnr": 33.49460544676028,
+          "full_dists": 0.04958951473236084,
+          "full_lpips": 0.037718243069118924,
+          "pixels": 2764800,
+          "sse": 80405089
+        },
+        {
+          "crop_dists": 0.17768406867980957,
+          "crop_lpips": 0.03019157610833645,
+          "frame": 43,
+          "frame_psnr": 33.3797202497228,
+          "full_dists": 0.05251353979110718,
+          "full_lpips": 0.039433852301703556,
+          "pixels": 2764800,
+          "sse": 82560451
+        },
+        {
+          "crop_dists": 0.18763917684555054,
+          "crop_lpips": 0.03263242915272713,
+          "frame": 44,
+          "frame_psnr": 33.680025984568246,
+          "full_dists": 0.05187731981277466,
+          "full_lpips": 0.038631778293185766,
+          "pixels": 2764800,
+          "sse": 77044472
+        },
+        {
+          "crop_dists": 0.1809903383255005,
+          "crop_lpips": 0.03314507007598877,
+          "frame": 45,
+          "frame_psnr": 33.52601416791273,
+          "full_dists": 0.05009865760803223,
+          "full_lpips": 0.039287228054470484,
+          "pixels": 2764800,
+          "sse": 79825687
+        },
+        {
+          "crop_dists": 0.19850051403045654,
+          "crop_lpips": 0.039326831698417664,
+          "frame": 46,
+          "frame_psnr": 33.62664573755736,
+          "full_dists": 0.04974555969238281,
+          "full_lpips": 0.0387127685546875,
+          "pixels": 2764800,
+          "sse": 77997289
+        },
+        {
+          "crop_dists": 0.20871680974960327,
+          "crop_lpips": 0.051847219467163086,
+          "frame": 47,
+          "frame_psnr": 33.21322595935276,
+          "full_dists": 0.047901153564453125,
+          "full_lpips": 0.03991952684190538,
+          "pixels": 2764800,
+          "sse": 85787001
+        }
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "crf": 48,
+      "base_bytes": 90949,
+      "patch_bytes": 6556,
+      "coded_bytes": 97505,
+      "free_patch_ivf_framing_bytes": 96897,
+      "base_sha256": "e85bbd4407c90f7fc633a8e41977f499c0b7d9da671223889f5a16b23f6524ef",
+      "patch_sha256": "0268d42e2a5a5742a7ba835573c6a83bbbd7272423f9081703316af9343b4eed",
+      "composite_sha256": "267a02819d24c7e1531cafd4b35613e44b52fb347905ea68e390c9c290615c3a",
+      "frames": [
+        {
+          "frame": 0,
+          "sse": 43216606,
+          "pixels": 2764800,
+          "frame_psnr": 36.190934249350796,
+          "full_lpips": 0.01346748563978407,
+          "full_dists": 0.014118194580078125,
+          "crop_lpips": 0.017946353182196617,
+          "crop_dists": 0.1189681887626648
+        },
+        {
+          "frame": 1,
+          "sse": 35524107,
+          "pixels": 2764800,
+          "frame_psnr": 37.042209121635246,
+          "full_lpips": 0.010622088114420574,
+          "full_dists": 0.013780355453491211,
+          "crop_lpips": 0.009977711364626884,
+          "crop_dists": 0.11683160066604614
+        },
+        {
+          "frame": 2,
+          "sse": 31270478,
+          "pixels": 2764800,
+          "frame_psnr": 37.59609561754901,
+          "full_lpips": 0.009124353196885851,
+          "full_dists": 0.012542009353637695,
+          "crop_lpips": 0.007309543900191784,
+          "crop_dists": 0.11194658279418945
+        },
+        {
+          "frame": 3,
+          "sse": 33459377,
+          "pixels": 2764800,
+          "frame_psnr": 37.30226231351784,
+          "full_lpips": 0.009854991700914171,
+          "full_dists": 0.014739513397216797,
+          "crop_lpips": 0.01706257462501526,
+          "crop_dists": 0.10774928331375122
+        },
+        {
+          "frame": 4,
+          "sse": 29656428,
+          "pixels": 2764800,
+          "frame_psnr": 37.82625240884987,
+          "full_lpips": 0.00859487639533149,
+          "full_dists": 0.01619786024093628,
+          "crop_lpips": 0.003228355897590518,
+          "crop_dists": 0.06455260515213013
+        },
+        {
+          "frame": 5,
+          "sse": 30708749,
+          "pixels": 2764800,
+          "frame_psnr": 37.674819569678,
+          "full_lpips": 0.009257294336954753,
+          "full_dists": 0.01348423957824707,
+          "crop_lpips": 0.0065878937020897865,
+          "crop_dists": 0.06758934259414673
+        },
+        {
+          "frame": 6,
+          "sse": 30047003,
+          "pixels": 2764800,
+          "frame_psnr": 37.76942921317048,
+          "full_lpips": 0.009021506839328342,
+          "full_dists": 0.015521883964538574,
+          "crop_lpips": 0.0033294609747827053,
+          "crop_dists": 0.05866318941116333
+        },
+        {
+          "frame": 7,
+          "sse": 30257337,
+          "pixels": 2764800,
+          "frame_psnr": 37.7391337929804,
+          "full_lpips": 0.00930851936340332,
+          "full_dists": 0.013185977935791016,
+          "crop_lpips": 0.003929720725864172,
+          "crop_dists": 0.05785495042800903
+        },
+        {
+          "frame": 8,
+          "sse": 28217016,
+          "pixels": 2764800,
+          "frame_psnr": 38.04232997239709,
+          "full_lpips": 0.008887668185763888,
+          "full_dists": 0.012886404991149902,
+          "crop_lpips": 0.0024971002712845802,
+          "crop_dists": 0.055122971534729004
+        },
+        {
+          "frame": 9,
+          "sse": 30924944,
+          "pixels": 2764800,
+          "frame_psnr": 37.64435159800895,
+          "full_lpips": 0.009896581437852648,
+          "full_dists": 0.014344215393066406,
+          "crop_lpips": 0.0028492803685367107,
+          "crop_dists": 0.05026179552078247
+        },
+        {
+          "frame": 10,
+          "sse": 29435590,
+          "pixels": 2764800,
+          "frame_psnr": 37.85871336535462,
+          "full_lpips": 0.009224282370673286,
+          "full_dists": 0.013566672801971436,
+          "crop_lpips": 0.003941723611205816,
+          "crop_dists": 0.04790759086608887
+        },
+        {
+          "frame": 11,
+          "sse": 31143727,
+          "pixels": 2764800,
+          "frame_psnr": 37.61373497882921,
+          "full_lpips": 0.01005685912238227,
+          "full_dists": 0.018504023551940918,
+          "crop_lpips": 0.007607368752360344,
+          "crop_dists": 0.05715489387512207
+        },
+        {
+          "frame": 12,
+          "sse": 30093436,
+          "pixels": 2764800,
+          "frame_psnr": 37.76272304340503,
+          "full_lpips": 0.010273924933539496,
+          "full_dists": 0.016735553741455078,
+          "crop_lpips": 0.007854458875954151,
+          "crop_dists": 0.06795883178710938
+        },
+        {
+          "frame": 13,
+          "sse": 30625426,
+          "pixels": 2764800,
+          "frame_psnr": 37.68661943211262,
+          "full_lpips": 0.009654875861273872,
+          "full_dists": 0.016527652740478516,
+          "crop_lpips": 0.014911767095327377,
+          "crop_dists": 0.05143505334854126
+        },
+        {
+          "frame": 14,
+          "sse": 29048566,
+          "pixels": 2764800,
+          "frame_psnr": 37.916193836205224,
+          "full_lpips": 0.009558563232421874,
+          "full_dists": 0.018866419792175293,
+          "crop_lpips": 0.016875945031642914,
+          "crop_dists": 0.0763048529624939
+        },
+        {
+          "frame": 15,
+          "sse": 30822576,
+          "pixels": 2764800,
+          "frame_psnr": 37.658751495609295,
+          "full_lpips": 0.010211639404296875,
+          "full_dists": 0.020535588264465332,
+          "crop_lpips": 0.014187458902597427,
+          "crop_dists": 0.0982784628868103
+        },
+        {
+          "frame": 16,
+          "sse": 28293834,
+          "pixels": 2764800,
+          "frame_psnr": 38.03052280472584,
+          "full_lpips": 0.010029532114664714,
+          "full_dists": 0.01613825559616089,
+          "crop_lpips": 0.008436850272119045,
+          "crop_dists": 0.0648336410522461
+        },
+        {
+          "frame": 17,
+          "sse": 30384830,
+          "pixels": 2764800,
+          "frame_psnr": 37.72087270809554,
+          "full_lpips": 0.009931725396050348,
+          "full_dists": 0.015590786933898926,
+          "crop_lpips": 0.01205624919384718,
+          "crop_dists": 0.06501197814941406
+        },
+        {
+          "frame": 18,
+          "sse": 29850554,
+          "pixels": 2764800,
+          "frame_psnr": 37.79791686003322,
+          "full_lpips": 0.010719655354817708,
+          "full_dists": 0.016867518424987793,
+          "crop_lpips": 0.00716349296271801,
+          "crop_dists": 0.06500458717346191
+        },
+        {
+          "frame": 19,
+          "sse": 32746246,
+          "pixels": 2764800,
+          "frame_psnr": 37.39582561611638,
+          "full_lpips": 0.01128320058186849,
+          "full_dists": 0.01669025421142578,
+          "crop_lpips": 0.013157861307263374,
+          "crop_dists": 0.060773491859436035
+        },
+        {
+          "frame": 20,
+          "sse": 29802195,
+          "pixels": 2764800,
+          "frame_psnr": 37.80495829627991,
+          "full_lpips": 0.010587020450168187,
+          "full_dists": 0.01523447036743164,
+          "crop_lpips": 0.008476666174829006,
+          "crop_dists": 0.056004881858825684
+        },
+        {
+          "frame": 21,
+          "sse": 31258654,
+          "pixels": 2764800,
+          "frame_psnr": 37.59773808334088,
+          "full_lpips": 0.010879461500379774,
+          "full_dists": 0.01584446430206299,
+          "crop_lpips": 0.009968173690140247,
+          "crop_dists": 0.05734586715698242
+        },
+        {
+          "frame": 22,
+          "sse": 30327272,
+          "pixels": 2764800,
+          "frame_psnr": 37.729107352739696,
+          "full_lpips": 0.010524691475762262,
+          "full_dists": 0.016269922256469727,
+          "crop_lpips": 0.004091997630894184,
+          "crop_dists": 0.05087476968765259
+        },
+        {
+          "frame": 23,
+          "sse": 30837877,
+          "pixels": 2764800,
+          "frame_psnr": 37.65659609788492,
+          "full_lpips": 0.010842608345879448,
+          "full_dists": 0.015900075435638428,
+          "crop_lpips": 0.005828237161040306,
+          "crop_dists": 0.05677986145019531
+        },
+        {
+          "frame": 24,
+          "sse": 29220697,
+          "pixels": 2764800,
+          "frame_psnr": 37.890535107377104,
+          "full_lpips": 0.010767332712809245,
+          "full_dists": 0.015111923217773438,
+          "crop_lpips": 0.004334218800067902,
+          "crop_dists": 0.054036855697631836
+        },
+        {
+          "frame": 25,
+          "sse": 31905080,
+          "pixels": 2764800,
+          "frame_psnr": 37.50884243740583,
+          "full_lpips": 0.011542074415418838,
+          "full_dists": 0.016030192375183105,
+          "crop_lpips": 0.006153029389679432,
+          "crop_dists": 0.05306309461593628
+        },
+        {
+          "frame": 26,
+          "sse": 30855086,
+          "pixels": 2764800,
+          "frame_psnr": 37.65417320439124,
+          "full_lpips": 0.010717703501383463,
+          "full_dists": 0.016427338123321533,
+          "crop_lpips": 0.0033041415736079216,
+          "crop_dists": 0.040552496910095215
+        },
+        {
+          "frame": 27,
+          "sse": 32592722,
+          "pixels": 2764800,
+          "frame_psnr": 37.41623449332452,
+          "full_lpips": 0.01161580933464898,
+          "full_dists": 0.018741905689239502,
+          "crop_lpips": 0.0014637159183621407,
+          "crop_dists": 0.034887850284576416
+        },
+        {
+          "frame": 28,
+          "sse": 30803154,
+          "pixels": 2764800,
+          "frame_psnr": 37.661488945601945,
+          "full_lpips": 0.011233579847547743,
+          "full_dists": 0.017110049724578857,
+          "crop_lpips": 0.003655135165899992,
+          "crop_dists": 0.03587299585342407
+        },
+        {
+          "frame": 29,
+          "sse": 33050912,
+          "pixels": 2764800,
+          "frame_psnr": 37.35560633847991,
+          "full_lpips": 0.011632390552096897,
+          "full_dists": 0.018297195434570312,
+          "crop_lpips": 0.0024907998740673065,
+          "crop_dists": 0.05991041660308838
+        },
+        {
+          "frame": 30,
+          "sse": 31126488,
+          "pixels": 2764800,
+          "frame_psnr": 37.61613959643485,
+          "full_lpips": 0.011255118052164713,
+          "full_dists": 0.0178067684173584,
+          "crop_lpips": 0.0043456414714455605,
+          "crop_dists": 0.03958803415298462
+        },
+        {
+          "frame": 31,
+          "sse": 31334210,
+          "pixels": 2764800,
+          "frame_psnr": 37.5872533195147,
+          "full_lpips": 0.011115215089586046,
+          "full_dists": 0.018383026123046875,
+          "crop_lpips": 0.0016507315449416637,
+          "crop_dists": 0.039636313915252686
+        },
+        {
+          "frame": 32,
+          "sse": 30223328,
+          "pixels": 2764800,
+          "frame_psnr": 37.74401797293833,
+          "full_lpips": 0.010859154595269097,
+          "full_dists": 0.01664102077484131,
+          "crop_lpips": 0.0020078832749277353,
+          "crop_dists": 0.038129210472106934
+        },
+        {
+          "frame": 33,
+          "sse": 32038473,
+          "pixels": 2764800,
+          "frame_psnr": 37.490722728649146,
+          "full_lpips": 0.011407734553019206,
+          "full_dists": 0.018292784690856934,
+          "crop_lpips": 0.003870548214763403,
+          "crop_dists": 0.05725449323654175
+        },
+        {
+          "frame": 34,
+          "sse": 32410784,
+          "pixels": 2764800,
+          "frame_psnr": 37.44054545149906,
+          "full_lpips": 0.011683997048272027,
+          "full_dists": 0.017213642597198486,
+          "crop_lpips": 0.006585726514458656,
+          "crop_dists": 0.059244751930236816
+        },
+        {
+          "frame": 35,
+          "sse": 34058160,
+          "pixels": 2764800,
+          "frame_psnr": 37.22522900266556,
+          "full_lpips": 0.012622700797186958,
+          "full_dists": 0.016047358512878418,
+          "crop_lpips": 0.004916541278362274,
+          "crop_dists": 0.05260235071182251
+        },
+        {
+          "frame": 36,
+          "sse": 32452278,
+          "pixels": 2764800,
+          "frame_psnr": 37.43498893993927,
+          "full_lpips": 0.011725329293145074,
+          "full_dists": 0.017017483711242676,
+          "crop_lpips": 0.005094779655337334,
+          "crop_dists": 0.05863898992538452
+        },
+        {
+          "frame": 37,
+          "sse": 34396653,
+          "pixels": 2764800,
+          "frame_psnr": 37.1822789648907,
+          "full_lpips": 0.012418994903564453,
+          "full_dists": 0.01632511615753174,
+          "crop_lpips": 0.0058294665068387985,
+          "crop_dists": 0.05026829242706299
+        },
+        {
+          "frame": 38,
+          "sse": 33588094,
+          "pixels": 2764800,
+          "frame_psnr": 37.28558721730028,
+          "full_lpips": 0.012277764214409723,
+          "full_dists": 0.017325282096862793,
+          "crop_lpips": 0.005152851343154907,
+          "crop_dists": 0.05478709936141968
+        },
+        {
+          "frame": 39,
+          "sse": 34517274,
+          "pixels": 2764800,
+          "frame_psnr": 37.16707591654393,
+          "full_lpips": 0.012683945761786566,
+          "full_dists": 0.016652703285217285,
+          "crop_lpips": 0.0025483258068561554,
+          "crop_dists": 0.0558626651763916
+        },
+        {
+          "frame": 40,
+          "sse": 33322188,
+          "pixels": 2764800,
+          "frame_psnr": 37.32010571371079,
+          "full_lpips": 0.012536129421657986,
+          "full_dists": 0.015304028987884521,
+          "crop_lpips": 0.0033884604927152395,
+          "crop_dists": 0.05162531137466431
+        },
+        {
+          "frame": 41,
+          "sse": 35247675,
+          "pixels": 2764800,
+          "frame_psnr": 37.07613606239197,
+          "full_lpips": 0.013113365173339844,
+          "full_dists": 0.015666425228118896,
+          "crop_lpips": 0.007727869786322117,
+          "crop_dists": 0.10703915357589722
+        },
+        {
+          "frame": 42,
+          "sse": 34388644,
+          "pixels": 2764800,
+          "frame_psnr": 37.18329030442777,
+          "full_lpips": 0.013042060004340278,
+          "full_dists": 0.0160294771194458,
+          "crop_lpips": 0.013543912209570408,
+          "crop_dists": 0.11314886808395386
+        },
+        {
+          "frame": 43,
+          "sse": 34881363,
+          "pixels": 2764800,
+          "frame_psnr": 37.121506348840036,
+          "full_lpips": 0.013611075083414713,
+          "full_dists": 0.01851421594619751,
+          "crop_lpips": 0.012830405496060848,
+          "crop_dists": 0.11155873537063599
+        },
+        {
+          "frame": 44,
+          "sse": 33658929,
+          "pixels": 2764800,
+          "frame_psnr": 37.27643788707536,
+          "full_lpips": 0.013534713321261936,
+          "full_dists": 0.018872559070587158,
+          "crop_lpips": 0.013486566953361034,
+          "crop_dists": 0.10574930906295776
+        },
+        {
+          "frame": 45,
+          "sse": 34178460,
+          "pixels": 2764800,
+          "frame_psnr": 37.2099159111609,
+          "full_lpips": 0.01351769659254286,
+          "full_dists": 0.01853346824645996,
+          "crop_lpips": 0.010380912572145462,
+          "crop_dists": 0.1138983964920044
+        },
+        {
+          "frame": 46,
+          "sse": 33983317,
+          "pixels": 2764800,
+          "frame_psnr": 37.23478315006247,
+          "full_lpips": 0.01345209969414605,
+          "full_dists": 0.01848888397216797,
+          "crop_lpips": 0.008333506062626839,
+          "crop_dists": 0.13156455755233765
+        },
+        {
+          "frame": 47,
+          "sse": 36422545,
+          "pixels": 2764800,
+          "frame_psnr": 36.933737931226844,
+          "full_lpips": 0.01433383411831326,
+          "full_dists": 0.018695533275604248,
+          "crop_lpips": 0.015645336359739304,
+          "crop_dists": 0.13175880908966064
+        }
+      ],
+      "full_lpips_standard": [
+        0.013467466458678246,
+        0.010622070170938969,
+        0.00912437867373228,
+        0.00985497236251831,
+        0.008594910614192486,
+        0.009257262572646141,
+        0.009021520614624023,
+        0.009308543987572193,
+        0.008887743577361107,
+        0.009896516799926758,
+        0.009224256500601768,
+        0.010056892409920692,
+        0.010273873805999756,
+        0.009654815308749676,
+        0.009558584541082382,
+        0.010211710818111897,
+        0.010029600001871586,
+        0.009931745938956738,
+        0.010719633661210537,
+        0.011283221654593945,
+        0.010586980730295181,
+        0.010879429057240486,
+        0.010524670593440533,
+        0.010842656716704369,
+        0.010767366737127304,
+        0.011542113497853279,
+        0.010717704892158508,
+        0.011615846306085587,
+        0.011233663186430931,
+        0.011632430367171764,
+        0.011255152523517609,
+        0.011115258559584618,
+        0.010859156027436256,
+        0.011407716199755669,
+        0.011683984659612179,
+        0.012622695416212082,
+        0.011725368909537792,
+        0.012419052422046661,
+        0.012277782894670963,
+        0.01268397644162178,
+        0.012536155991256237,
+        0.013113453052937984,
+        0.01304207369685173,
+        0.013611148111522198,
+        0.013534799218177795,
+        0.013517789542675018,
+        0.013452192768454552,
+        0.01433397177606821
+      ]
+    },
+    {
+      "crf": 55,
+      "base_bytes": 63879,
+      "patch_bytes": 6428,
+      "coded_bytes": 70307,
+      "free_patch_ivf_framing_bytes": 69699,
+      "base_sha256": "2536b9ed986d6ef41733a309ddf86f530b56521d4adf309282705b72f5a810f5",
+      "patch_sha256": "7c46ad0b92bf218cfffb1663964f7fdfe2f7d2993dc24c86b78ca0181badc8f4",
+      "composite_sha256": "f0a3fa2fa15868627779572bd91de7ce4eb8f91d2fa737620d50ad87119f8983",
+      "frames": [
+        {
+          "frame": 0,
+          "sse": 51662553,
+          "pixels": 2764800,
+          "frame_psnr": 35.41568217839162,
+          "full_lpips": 0.018784217834472657,
+          "full_dists": 0.020420551300048828,
+          "crop_lpips": 0.04266262799501419,
+          "crop_dists": 0.12559878826141357
+        },
+        {
+          "frame": 1,
+          "sse": 43491567,
+          "pixels": 2764800,
+          "frame_psnr": 36.16339026100866,
+          "full_lpips": 0.016157217025756836,
+          "full_dists": 0.019980788230895996,
+          "crop_lpips": 0.012304220348596573,
+          "crop_dists": 0.1262291669845581
+        },
+        {
+          "frame": 2,
+          "sse": 39125317,
+          "pixels": 2764800,
+          "frame_psnr": 36.62286212369891,
+          "full_lpips": 0.01456179724799262,
+          "full_dists": 0.019416391849517822,
+          "crop_lpips": 0.005896910559386015,
+          "crop_dists": 0.10094559192657471
+        },
+        {
+          "frame": 3,
+          "sse": 41969676,
+          "pixels": 2764800,
+          "frame_psnr": 36.3180846513464,
+          "full_lpips": 0.015373632642957899,
+          "full_dists": 0.020161688327789307,
+          "crop_lpips": 0.00555845070630312,
+          "crop_dists": 0.09867644309997559
+        },
+        {
+          "frame": 4,
+          "sse": 37504380,
+          "pixels": 2764800,
+          "frame_psnr": 36.806620913056484,
+          "full_lpips": 0.01424587673611111,
+          "full_dists": 0.021904587745666504,
+          "crop_lpips": 0.004041556268930435,
+          "crop_dists": 0.08298105001449585
+        },
+        {
+          "frame": 5,
+          "sse": 39729151,
+          "pixels": 2764800,
+          "frame_psnr": 36.55634797254558,
+          "full_lpips": 0.015178762012057834,
+          "full_dists": 0.020058274269104004,
+          "crop_lpips": 0.006679981481283903,
+          "crop_dists": 0.09071284532546997
+        },
+        {
+          "frame": 6,
+          "sse": 38507925,
+          "pixels": 2764800,
+          "frame_psnr": 36.69193964376854,
+          "full_lpips": 0.014429390165540908,
+          "full_dists": 0.02380770444869995,
+          "crop_lpips": 0.0031750407069921494,
+          "crop_dists": 0.06402963399887085
+        },
+        {
+          "frame": 7,
+          "sse": 38716735,
+          "pixels": 2764800,
+          "frame_psnr": 36.66845355738794,
+          "full_lpips": 0.014611226187811957,
+          "full_dists": 0.021950125694274902,
+          "crop_lpips": 0.0037005264312028885,
+          "crop_dists": 0.06976073980331421
+        },
+        {
+          "frame": 8,
+          "sse": 37062389,
+          "pixels": 2764800,
+          "frame_psnr": 36.8581067164666,
+          "full_lpips": 0.0147393798828125,
+          "full_dists": 0.02007424831390381,
+          "crop_lpips": 0.003988759592175484,
+          "crop_dists": 0.08052992820739746
+        },
+        {
+          "frame": 9,
+          "sse": 40376272,
+          "pixels": 2764800,
+          "frame_psnr": 36.48617864250046,
+          "full_lpips": 0.016076250076293944,
+          "full_dists": 0.022971808910369873,
+          "crop_lpips": 0.002324648667126894,
+          "crop_dists": 0.05567741394042969
+        },
+        {
+          "frame": 10,
+          "sse": 38847289,
+          "pixels": 2764800,
+          "frame_psnr": 36.653833651815546,
+          "full_lpips": 0.015152020984225804,
+          "full_dists": 0.02354496717453003,
+          "crop_lpips": 0.002876279642805457,
+          "crop_dists": 0.052423954010009766
+        },
+        {
+          "frame": 11,
+          "sse": 41071650,
+          "pixels": 2764800,
+          "frame_psnr": 36.412019312479,
+          "full_lpips": 0.01662403318617079,
+          "full_dists": 0.024726688861846924,
+          "crop_lpips": 0.008144648745656013,
+          "crop_dists": 0.07646137475967407
+        },
+        {
+          "frame": 12,
+          "sse": 39628974,
+          "pixels": 2764800,
+          "frame_psnr": 36.56731253135359,
+          "full_lpips": 0.01643106248643663,
+          "full_dists": 0.02440345287322998,
+          "crop_lpips": 0.013551730662584305,
+          "crop_dists": 0.08286356925964355
+        },
+        {
+          "frame": 13,
+          "sse": 41088010,
+          "pixels": 2764800,
+          "frame_psnr": 36.41028973915364,
+          "full_lpips": 0.0161549006568061,
+          "full_dists": 0.025860249996185303,
+          "crop_lpips": 0.021548621356487274,
+          "crop_dists": 0.07074975967407227
+        },
+        {
+          "frame": 14,
+          "sse": 38574599,
+          "pixels": 2764800,
+          "frame_psnr": 36.68442661591081,
+          "full_lpips": 0.01530246310763889,
+          "full_dists": 0.02399522066116333,
+          "crop_lpips": 0.03394843637943268,
+          "crop_dists": 0.11407160758972168
+        },
+        {
+          "frame": 15,
+          "sse": 43029479,
+          "pixels": 2764800,
+          "frame_psnr": 36.209779939805024,
+          "full_lpips": 0.018142577277289497,
+          "full_dists": 0.028215110301971436,
+          "crop_lpips": 0.01970803551375866,
+          "crop_dists": 0.10721385478973389
+        },
+        {
+          "frame": 16,
+          "sse": 37702593,
+          "pixels": 2764800,
+          "frame_psnr": 36.78372861782774,
+          "full_lpips": 0.016690696080525716,
+          "full_dists": 0.02695298194885254,
+          "crop_lpips": 0.01020961906760931,
+          "crop_dists": 0.06979382038116455
+        },
+        {
+          "frame": 17,
+          "sse": 41815277,
+          "pixels": 2764800,
+          "frame_psnr": 36.33409103607648,
+          "full_lpips": 0.01733824412027995,
+          "full_dists": 0.023829519748687744,
+          "crop_lpips": 0.021295299753546715,
+          "crop_dists": 0.07863819599151611
+        },
+        {
+          "frame": 18,
+          "sse": 40669420,
+          "pixels": 2764800,
+          "frame_psnr": 36.454761028346724,
+          "full_lpips": 0.01720911661783854,
+          "full_dists": 0.02501922845840454,
+          "crop_lpips": 0.01388286892324686,
+          "crop_dists": 0.08951842784881592
+        },
+        {
+          "frame": 19,
+          "sse": 43079180,
+          "pixels": 2764800,
+          "frame_psnr": 36.20476653634648,
+          "full_lpips": 0.018355255126953126,
+          "full_dists": 0.0246812105178833,
+          "crop_lpips": 0.013951137661933899,
+          "crop_dists": 0.07927864789962769
+        },
+        {
+          "frame": 20,
+          "sse": 38885385,
+          "pixels": 2764800,
+          "frame_psnr": 36.64957678451488,
+          "full_lpips": 0.017032882902357313,
+          "full_dists": 0.022145211696624756,
+          "crop_lpips": 0.006431477144360542,
+          "crop_dists": 0.07258588075637817
+        },
+        {
+          "frame": 21,
+          "sse": 41190198,
+          "pixels": 2764800,
+          "frame_psnr": 36.39950202065214,
+          "full_lpips": 0.017383768293592665,
+          "full_dists": 0.02281630039215088,
+          "crop_lpips": 0.009243743494153023,
+          "crop_dists": 0.07531964778900146
+        },
+        {
+          "frame": 22,
+          "sse": 39446023,
+          "pixels": 2764800,
+          "frame_psnr": 36.5874085805588,
+          "full_lpips": 0.016869049072265625,
+          "full_dists": 0.02389085292816162,
+          "crop_lpips": 0.007444504648447037,
+          "crop_dists": 0.053927481174468994
+        },
+        {
+          "frame": 23,
+          "sse": 41027288,
+          "pixels": 2764800,
+          "frame_psnr": 36.41671271635258,
+          "full_lpips": 0.017622948752509224,
+          "full_dists": 0.022603154182434082,
+          "crop_lpips": 0.006446672137826681,
+          "crop_dists": 0.06657922267913818
+        },
+        {
+          "frame": 24,
+          "sse": 38466266,
+          "pixels": 2764800,
+          "frame_psnr": 36.69664051177456,
+          "full_lpips": 0.01712734646267361,
+          "full_dists": 0.02266174554824829,
+          "crop_lpips": 0.0035921037197113037,
+          "crop_dists": 0.06915479898452759
+        },
+        {
+          "frame": 25,
+          "sse": 41731305,
+          "pixels": 2764800,
+          "frame_psnr": 36.342821157080046,
+          "full_lpips": 0.0181597900390625,
+          "full_dists": 0.022890031337738037,
+          "crop_lpips": 0.006356679834425449,
+          "crop_dists": 0.06186342239379883
+        },
+        {
+          "frame": 26,
+          "sse": 40538553,
+          "pixels": 2764800,
+          "frame_psnr": 36.46875838921234,
+          "full_lpips": 0.017075429492526585,
+          "full_dists": 0.025571763515472412,
+          "crop_lpips": 0.0026908519212156534,
+          "crop_dists": 0.05293363332748413
+        },
+        {
+          "frame": 27,
+          "sse": 43316801,
+          "pixels": 2764800,
+          "frame_psnr": 36.18087705720524,
+          "full_lpips": 0.01829390207926432,
+          "full_dists": 0.02652508020401001,
+          "crop_lpips": 0.003011097200214863,
+          "crop_dists": 0.05880790948867798
+        },
+        {
+          "frame": 28,
+          "sse": 41883118,
+          "pixels": 2764800,
+          "frame_psnr": 36.32705076286719,
+          "full_lpips": 0.018006583319769964,
+          "full_dists": 0.02639317512512207,
+          "crop_lpips": 0.0029469807632267475,
+          "crop_dists": 0.060886383056640625
+        },
+        {
+          "frame": 29,
+          "sse": 43679970,
+          "pixels": 2764800,
+          "frame_psnr": 36.144617502493084,
+          "full_lpips": 0.0180267333984375,
+          "full_dists": 0.02683788537979126,
+          "crop_lpips": 0.0026021683588624,
+          "crop_dists": 0.03466904163360596
+        },
+        {
+          "frame": 30,
+          "sse": 40329958,
+          "pixels": 2764800,
+          "frame_psnr": 36.4911631193724,
+          "full_lpips": 0.016982159084743924,
+          "full_dists": 0.028588831424713135,
+          "crop_lpips": 0.0024630450643599033,
+          "crop_dists": 0.044976115226745605
+        },
+        {
+          "frame": 31,
+          "sse": 40564144,
+          "pixels": 2764800,
+          "frame_psnr": 36.46601765903533,
+          "full_lpips": 0.017404757605658638,
+          "full_dists": 0.02772998809814453,
+          "crop_lpips": 0.0025895265862345695,
+          "crop_dists": 0.040570974349975586
+        },
+        {
+          "frame": 32,
+          "sse": 38997598,
+          "pixels": 2764800,
+          "frame_psnr": 36.63706223549731,
+          "full_lpips": 0.017059834798177083,
+          "full_dists": 0.02569490671157837,
+          "crop_lpips": 0.002599392319098115,
+          "crop_dists": 0.04688215255737305
+        },
+        {
+          "frame": 33,
+          "sse": 41506911,
+          "pixels": 2764800,
+          "frame_psnr": 36.3662366786354,
+          "full_lpips": 0.017939631144205728,
+          "full_dists": 0.02736043930053711,
+          "crop_lpips": 0.0035863248631358147,
+          "crop_dists": 0.072701096534729
+        },
+        {
+          "frame": 34,
+          "sse": 42107484,
+          "pixels": 2764800,
+          "frame_psnr": 36.30384789369237,
+          "full_lpips": 0.018417010837131077,
+          "full_dists": 0.026351511478424072,
+          "crop_lpips": 0.006429575849324465,
+          "crop_dists": 0.06921976804733276
+        },
+        {
+          "frame": 35,
+          "sse": 44055987,
+          "pixels": 2764800,
+          "frame_psnr": 36.107391463446795,
+          "full_lpips": 0.019676136440700955,
+          "full_dists": 0.023953020572662354,
+          "crop_lpips": 0.00645377766340971,
+          "crop_dists": 0.05798220634460449
+        },
+        {
+          "frame": 36,
+          "sse": 42800327,
+          "pixels": 2764800,
+          "frame_psnr": 36.23296994575195,
+          "full_lpips": 0.018003934224446613,
+          "full_dists": 0.025885820388793945,
+          "crop_lpips": 0.004097006283700466,
+          "crop_dists": 0.06227517127990723
+        },
+        {
+          "frame": 37,
+          "sse": 44191851,
+          "pixels": 2764800,
+          "frame_psnr": 36.09401889060055,
+          "full_lpips": 0.019502792358398437,
+          "full_dists": 0.025477826595306396,
+          "crop_lpips": 0.006275667808949947,
+          "crop_dists": 0.06962978839874268
+        },
+        {
+          "frame": 38,
+          "sse": 43893805,
+          "pixels": 2764800,
+          "frame_psnr": 36.123408517245096,
+          "full_lpips": 0.019320721096462674,
+          "full_dists": 0.023779094219207764,
+          "crop_lpips": 0.004219449125230312,
+          "crop_dists": 0.06765937805175781
+        },
+        {
+          "frame": 39,
+          "sse": 45285068,
+          "pixels": 2764800,
+          "frame_psnr": 35.98789057451404,
+          "full_lpips": 0.019718405405680338,
+          "full_dists": 0.025376737117767334,
+          "crop_lpips": 0.003006445011124015,
+          "crop_dists": 0.05576372146606445
+        },
+        {
+          "frame": 40,
+          "sse": 43199931,
+          "pixels": 2764800,
+          "frame_psnr": 36.19261028517149,
+          "full_lpips": 0.019191949632432724,
+          "full_dists": 0.024714410305023193,
+          "crop_lpips": 0.0032807914540171623,
+          "crop_dists": 0.06945139169692993
+        },
+        {
+          "frame": 41,
+          "sse": 45396529,
+          "pixels": 2764800,
+          "frame_psnr": 35.977214335182886,
+          "full_lpips": 0.019801144070095485,
+          "full_dists": 0.02232372760772705,
+          "crop_lpips": 0.011436744593083858,
+          "crop_dists": 0.13015872240066528
+        },
+        {
+          "frame": 42,
+          "sse": 44701874,
+          "pixels": 2764800,
+          "frame_psnr": 36.04418351581769,
+          "full_lpips": 0.019488082461886935,
+          "full_dists": 0.023731648921966553,
+          "crop_lpips": 0.018701016902923584,
+          "crop_dists": 0.14161068201065063
+        },
+        {
+          "frame": 43,
+          "sse": 45374533,
+          "pixels": 2764800,
+          "frame_psnr": 35.979319134091355,
+          "full_lpips": 0.020414115058051217,
+          "full_dists": 0.02662789821624756,
+          "crop_lpips": 0.018478866666555405,
+          "crop_dists": 0.12235510349273682
+        },
+        {
+          "frame": 44,
+          "sse": 42670318,
+          "pixels": 2764800,
+          "frame_psnr": 36.246182022212565,
+          "full_lpips": 0.02040326648288303,
+          "full_dists": 0.02508312463760376,
+          "crop_lpips": 0.012198196724057198,
+          "crop_dists": 0.13090771436691284
+        },
+        {
+          "frame": 45,
+          "sse": 44536744,
+          "pixels": 2764800,
+          "frame_psnr": 36.06025618284397,
+          "full_lpips": 0.020691492292616104,
+          "full_dists": 0.02544569969177246,
+          "crop_lpips": 0.013974588364362717,
+          "crop_dists": 0.14085280895233154
+        },
+        {
+          "frame": 46,
+          "sse": 43771315,
+          "pixels": 2764800,
+          "frame_psnr": 36.13554487562962,
+          "full_lpips": 0.020272572835286457,
+          "full_dists": 0.02526801824569702,
+          "crop_lpips": 0.014120114967226982,
+          "crop_dists": 0.15300047397613525
+        },
+        {
+          "frame": 47,
+          "sse": 46927438,
+          "pixels": 2764800,
+          "frame_psnr": 35.83317237082064,
+          "full_lpips": 0.021516859266493056,
+          "full_dists": 0.02393805980682373,
+          "crop_lpips": 0.018579063937067986,
+          "crop_dists": 0.15698719024658203
+        }
+      ],
+      "full_lpips_standard": [
+        0.018784191459417343,
+        0.01615719683468342,
+        0.014561799354851246,
+        0.01537358295172453,
+        0.014245899394154549,
+        0.015178697183728218,
+        0.014429384842514992,
+        0.01461127121001482,
+        0.014739422127604485,
+        0.016076210886240005,
+        0.015152018517255783,
+        0.01662406697869301,
+        0.01643097773194313,
+        0.01615474931895733,
+        0.015302413143217564,
+        0.0181427001953125,
+        0.01669078692793846,
+        0.017338288947939873,
+        0.017209092155098915,
+        0.01835528016090393,
+        0.017032912001013756,
+        0.017383668571710587,
+        0.016868961974978447,
+        0.0176229290664196,
+        0.01712735928595066,
+        0.018159829080104828,
+        0.01707540825009346,
+        0.01829393021762371,
+        0.0180066991597414,
+        0.01802678592503071,
+        0.016982167959213257,
+        0.017404792830348015,
+        0.017059845849871635,
+        0.017939571291208267,
+        0.018416929990053177,
+        0.019676141440868378,
+        0.018004003912210464,
+        0.01950286142528057,
+        0.019320711493492126,
+        0.01971847377717495,
+        0.019191976636648178,
+        0.019801251590251923,
+        0.01948816142976284,
+        0.020414216443896294,
+        0.02040337212383747,
+        0.020691601559519768,
+        0.02027268521487713,
+        0.021517014130949974
+      ]
+    },
+    {
+      "crf": 62,
+      "base_bytes": 34146,
+      "patch_bytes": 6494,
+      "coded_bytes": 40640,
+      "free_patch_ivf_framing_bytes": 40032,
+      "base_sha256": "cd79e3979e00124a8ae201c1b22f69651ae353a90b96da1acd1fbaaff757224b",
+      "patch_sha256": "6b907526acb8fb7091ad5714dcf1d32aa03f968754718fdbc0bef3bf31721cad",
+      "composite_sha256": "b41beec14a38acf66e1ee005bf78bf74fef1975690321e4cfa4d3bf59630ed99",
+      "frames": [
+        {
+          "frame": 0,
+          "sse": 77928747,
+          "pixels": 2764800,
+          "frame_psnr": 33.63046388301396,
+          "full_lpips": 0.03333341810438368,
+          "full_dists": 0.03895139694213867,
+          "crop_lpips": 0.09237080812454224,
+          "crop_dists": 0.15906816720962524
+        },
+        {
+          "frame": 1,
+          "sse": 74141267,
+          "pixels": 2764800,
+          "frame_psnr": 33.84684078252003,
+          "full_lpips": 0.03183222028944228,
+          "full_dists": 0.037798523902893066,
+          "crop_lpips": 0.010076181031763554,
+          "crop_dists": 0.10671442747116089
+        },
+        {
+          "frame": 2,
+          "sse": 69133455,
+          "pixels": 2764800,
+          "frame_psnr": 34.1505582002599,
+          "full_lpips": 0.0304850345187717,
+          "full_dists": 0.04081064462661743,
+          "crop_lpips": 0.008341007865965366,
+          "crop_dists": 0.11162161827087402
+        },
+        {
+          "frame": 3,
+          "sse": 75401237,
+          "pixels": 2764800,
+          "frame_psnr": 33.773656108915326,
+          "full_lpips": 0.03299579832288954,
+          "full_dists": 0.042607784271240234,
+          "crop_lpips": 0.007756737060844898,
+          "crop_dists": 0.10392230749130249
+        },
+        {
+          "frame": 4,
+          "sse": 69026135,
+          "pixels": 2764800,
+          "frame_psnr": 34.15730525172006,
+          "full_lpips": 0.03159022013346354,
+          "full_dists": 0.04564023017883301,
+          "crop_lpips": 0.005218024365603924,
+          "crop_dists": 0.09992825984954834
+        },
+        {
+          "frame": 5,
+          "sse": 74205594,
+          "pixels": 2764800,
+          "frame_psnr": 33.84307435797959,
+          "full_lpips": 0.03310898251003689,
+          "full_dists": 0.04305410385131836,
+          "crop_lpips": 0.006947389803826809,
+          "crop_dists": 0.0987086296081543
+        },
+        {
+          "frame": 6,
+          "sse": 71403109,
+          "pixels": 2764800,
+          "frame_psnr": 34.01026959636355,
+          "full_lpips": 0.03189831415812174,
+          "full_dists": 0.04678928852081299,
+          "crop_lpips": 0.0039999838918447495,
+          "crop_dists": 0.07983827590942383
+        },
+        {
+          "frame": 7,
+          "sse": 74122255,
+          "pixels": 2764800,
+          "frame_psnr": 33.847954584030184,
+          "full_lpips": 0.03305555555555555,
+          "full_dists": 0.04345923662185669,
+          "crop_lpips": 0.003932484891265631,
+          "crop_dists": 0.07352226972579956
+        },
+        {
+          "frame": 8,
+          "sse": 71106629,
+          "pixels": 2764800,
+          "frame_psnr": 34.02833991430331,
+          "full_lpips": 0.03236479017469618,
+          "full_dists": 0.042285025119781494,
+          "crop_lpips": 0.0032446333207190037,
+          "crop_dists": 0.08911585807800293
+        },
+        {
+          "frame": 9,
+          "sse": 77813584,
+          "pixels": 2764800,
+          "frame_psnr": 33.63688662809732,
+          "full_lpips": 0.03423649681939019,
+          "full_dists": 0.04571419954299927,
+          "crop_lpips": 0.003015215741470456,
+          "crop_dists": 0.06318062543869019
+        },
+        {
+          "frame": 10,
+          "sse": 72536987,
+          "pixels": 2764800,
+          "frame_psnr": 33.941845695241696,
+          "full_lpips": 0.03258158153957791,
+          "full_dists": 0.044829368591308594,
+          "crop_lpips": 0.005216915160417557,
+          "crop_dists": 0.07364630699157715
+        },
+        {
+          "frame": 11,
+          "sse": 77716125,
+          "pixels": 2764800,
+          "frame_psnr": 33.64232943535568,
+          "full_lpips": 0.03425438774956597,
+          "full_dists": 0.045833587646484375,
+          "crop_lpips": 0.01034134067595005,
+          "crop_dists": 0.08872359991073608
+        },
+        {
+          "frame": 12,
+          "sse": 74964071,
+          "pixels": 2764800,
+          "frame_psnr": 33.798909183437104,
+          "full_lpips": 0.03381487316555447,
+          "full_dists": 0.04313170909881592,
+          "crop_lpips": 0.017848601564764977,
+          "crop_dists": 0.11292898654937744
+        },
+        {
+          "frame": 13,
+          "sse": 80180934,
+          "pixels": 2764800,
+          "frame_psnr": 33.506729707763576,
+          "full_lpips": 0.033666585286458335,
+          "full_dists": 0.04523921012878418,
+          "crop_lpips": 0.026277096942067146,
+          "crop_dists": 0.08466535806655884
+        },
+        {
+          "frame": 14,
+          "sse": 72567810,
+          "pixels": 2764800,
+          "frame_psnr": 33.940000648173125,
+          "full_lpips": 0.03285559548272027,
+          "full_dists": 0.04550457000732422,
+          "crop_lpips": 0.06451241672039032,
+          "crop_dists": 0.1479293704032898
+        },
+        {
+          "frame": 15,
+          "sse": 78631935,
+          "pixels": 2764800,
+          "frame_psnr": 33.591451186103605,
+          "full_lpips": 0.03510617362128364,
+          "full_dists": 0.04912978410720825,
+          "crop_lpips": 0.025242749601602554,
+          "crop_dists": 0.12784254550933838
+        },
+        {
+          "frame": 16,
+          "sse": 67489833,
+          "pixels": 2764800,
+          "frame_psnr": 34.25505728162574,
+          "full_lpips": 0.03316334618462457,
+          "full_dists": 0.04753762483596802,
+          "crop_lpips": 0.01728980243206024,
+          "crop_dists": 0.09433281421661377
+        },
+        {
+          "frame": 17,
+          "sse": 76802430,
+          "pixels": 2764800,
+          "frame_psnr": 33.69369120503744,
+          "full_lpips": 0.03435478422376845,
+          "full_dists": 0.047861576080322266,
+          "crop_lpips": 0.01956792362034321,
+          "crop_dists": 0.09586280584335327
+        },
+        {
+          "frame": 18,
+          "sse": 74327993,
+          "pixels": 2764800,
+          "frame_psnr": 33.8359167549894,
+          "full_lpips": 0.03428367614746094,
+          "full_dists": 0.04733073711395264,
+          "crop_lpips": 0.016853049397468567,
+          "crop_dists": 0.106789231300354
+        },
+        {
+          "frame": 19,
+          "sse": 80732630,
+          "pixels": 2764800,
+          "frame_psnr": 33.47694981086144,
+          "full_lpips": 0.03689979553222656,
+          "full_dists": 0.04768204689025879,
+          "crop_lpips": 0.014036720618605614,
+          "crop_dists": 0.11849856376647949
+        },
+        {
+          "frame": 20,
+          "sse": 71543638,
+          "pixels": 2764800,
+          "frame_psnr": 34.00173061381382,
+          "full_lpips": 0.03469617207845052,
+          "full_dists": 0.0479435920715332,
+          "crop_lpips": 0.017251446843147278,
+          "crop_dists": 0.08860844373703003
+        },
+        {
+          "frame": 21,
+          "sse": 77655706,
+          "pixels": 2764800,
+          "frame_psnr": 33.645707092612575,
+          "full_lpips": 0.03676093207465278,
+          "full_dists": 0.04605752229690552,
+          "crop_lpips": 0.019449494779109955,
+          "crop_dists": 0.09508669376373291
+        },
+        {
+          "frame": 22,
+          "sse": 73280249,
+          "pixels": 2764800,
+          "frame_psnr": 33.89757145309014,
+          "full_lpips": 0.03459498511420356,
+          "full_dists": 0.04694491624832153,
+          "crop_lpips": 0.015446413308382034,
+          "crop_dists": 0.08324116468429565
+        },
+        {
+          "frame": 23,
+          "sse": 76994915,
+          "pixels": 2764800,
+          "frame_psnr": 33.6828203779765,
+          "full_lpips": 0.035521074930826825,
+          "full_dists": 0.04457980394363403,
+          "crop_lpips": 0.016542401164770126,
+          "crop_dists": 0.08096051216125488
+        },
+        {
+          "frame": 24,
+          "sse": 71707908,
+          "pixels": 2764800,
+          "frame_psnr": 33.99177029047977,
+          "full_lpips": 0.03539908727010091,
+          "full_dists": 0.045201778411865234,
+          "crop_lpips": 0.005981173366308212,
+          "crop_dists": 0.0729171633720398
+        },
+        {
+          "frame": 25,
+          "sse": 79077752,
+          "pixels": 2764800,
+          "frame_psnr": 33.56689766850468,
+          "full_lpips": 0.036772537231445315,
+          "full_dists": 0.04334759712219238,
+          "crop_lpips": 0.009073438122868538,
+          "crop_dists": 0.08488231897354126
+        },
+        {
+          "frame": 26,
+          "sse": 74739936,
+          "pixels": 2764800,
+          "frame_psnr": 33.81191360040417,
+          "full_lpips": 0.03439613342285156,
+          "full_dists": 0.046422719955444336,
+          "crop_lpips": 0.003561929566785693,
+          "crop_dists": 0.06560719013214111
+        },
+        {
+          "frame": 27,
+          "sse": 80073342,
+          "pixels": 2764800,
+          "frame_psnr": 33.512561267467824,
+          "full_lpips": 0.035828259785970054,
+          "full_dists": 0.04642397165298462,
+          "crop_lpips": 0.0030522996094077826,
+          "crop_dists": 0.0626840591430664
+        },
+        {
+          "frame": 28,
+          "sse": 74485630,
+          "pixels": 2764800,
+          "frame_psnr": 33.82671586283043,
+          "full_lpips": 0.03485743840535482,
+          "full_dists": 0.0461353063583374,
+          "crop_lpips": 0.0037440320011228323,
+          "crop_dists": 0.07537686824798584
+        },
+        {
+          "frame": 29,
+          "sse": 79563444,
+          "pixels": 2764800,
+          "frame_psnr": 33.54030507844988,
+          "full_lpips": 0.03658290015326606,
+          "full_dists": 0.04697561264038086,
+          "crop_lpips": 0.004172745160758495,
+          "crop_dists": 0.05427193641662598
+        },
+        {
+          "frame": 30,
+          "sse": 74323808,
+          "pixels": 2764800,
+          "frame_psnr": 33.83616128918206,
+          "full_lpips": 0.03463027954101563,
+          "full_dists": 0.04924488067626953,
+          "crop_lpips": 0.0033978885039687157,
+          "crop_dists": 0.06386899948120117
+        },
+        {
+          "frame": 31,
+          "sse": 75420870,
+          "pixels": 2764800,
+          "frame_psnr": 33.77252543864677,
+          "full_lpips": 0.03501392152574327,
+          "full_dists": 0.0483555793762207,
+          "crop_lpips": 0.003627755679190159,
+          "crop_dists": 0.06153583526611328
+        },
+        {
+          "frame": 32,
+          "sse": 71139874,
+          "pixels": 2764800,
+          "frame_psnr": 34.026309900206755,
+          "full_lpips": 0.03455369737413194,
+          "full_dists": 0.048857688903808594,
+          "crop_lpips": 0.003446705173701048,
+          "crop_dists": 0.05865448713302612
+        },
+        {
+          "frame": 33,
+          "sse": 74430693,
+          "pixels": 2764800,
+          "frame_psnr": 33.82992019081195,
+          "full_lpips": 0.03604820675320095,
+          "full_dists": 0.04926168918609619,
+          "crop_lpips": 0.0048836758360266685,
+          "crop_dists": 0.08030825853347778
+        },
+        {
+          "frame": 34,
+          "sse": 75629613,
+          "pixels": 2764800,
+          "frame_psnr": 33.76052203568558,
+          "full_lpips": 0.036039229498969184,
+          "full_dists": 0.049443066120147705,
+          "crop_lpips": 0.005570579320192337,
+          "crop_dists": 0.07672739028930664
+        },
+        {
+          "frame": 35,
+          "sse": 80228285,
+          "pixels": 2764800,
+          "frame_psnr": 33.50416573061337,
+          "full_lpips": 0.038360222710503475,
+          "full_dists": 0.04880392551422119,
+          "crop_lpips": 0.007325504906475544,
+          "crop_dists": 0.06312710046768188
+        },
+        {
+          "frame": 36,
+          "sse": 77491382,
+          "pixels": 2764800,
+          "frame_psnr": 33.654906753921075,
+          "full_lpips": 0.036719627380371093,
+          "full_dists": 0.05092233419418335,
+          "crop_lpips": 0.008685735054314137,
+          "crop_dists": 0.07678401470184326
+        },
+        {
+          "frame": 37,
+          "sse": 80947647,
+          "pixels": 2764800,
+          "frame_psnr": 33.465398525398626,
+          "full_lpips": 0.037989908854166664,
+          "full_dists": 0.04822051525115967,
+          "crop_lpips": 0.00444475281983614,
+          "crop_dists": 0.06234705448150635
+        },
+        {
+          "frame": 38,
+          "sse": 79684645,
+          "pixels": 2764800,
+          "frame_psnr": 33.5336943949566,
+          "full_lpips": 0.0383414798312717,
+          "full_dists": 0.048036158084869385,
+          "crop_lpips": 0.004933671094477177,
+          "crop_dists": 0.0640144944190979
+        },
+        {
+          "frame": 39,
+          "sse": 85299418,
+          "pixels": 2764800,
+          "frame_psnr": 33.23798013690872,
+          "full_lpips": 0.03848323822021484,
+          "full_dists": 0.0504148006439209,
+          "crop_lpips": 0.005734577775001526,
+          "crop_dists": 0.06675541400909424
+        },
+        {
+          "frame": 40,
+          "sse": 76888330,
+          "pixels": 2764800,
+          "frame_psnr": 33.68883653454455,
+          "full_lpips": 0.03744347890218099,
+          "full_dists": 0.05075192451477051,
+          "crop_lpips": 0.005988250486552715,
+          "crop_dists": 0.08517462015151978
+        },
+        {
+          "frame": 41,
+          "sse": 83724965,
+          "pixels": 2764800,
+          "frame_psnr": 33.31889107005239,
+          "full_lpips": 0.038853636847602,
+          "full_dists": 0.047323763370513916,
+          "crop_lpips": 0.023463211953639984,
+          "crop_dists": 0.16200190782546997
+        },
+        {
+          "frame": 42,
+          "sse": 80044472,
+          "pixels": 2764800,
+          "frame_psnr": 33.51412737451302,
+          "full_lpips": 0.03766695658365885,
+          "full_dists": 0.04932904243469238,
+          "crop_lpips": 0.02971198409795761,
+          "crop_dists": 0.15836280584335327
+        },
+        {
+          "frame": 43,
+          "sse": 82382487,
+          "pixels": 2764800,
+          "frame_psnr": 33.38909183168996,
+          "full_lpips": 0.0393790774875217,
+          "full_dists": 0.052530109882354736,
+          "crop_lpips": 0.022809859365224838,
+          "crop_dists": 0.17214536666870117
+        },
+        {
+          "frame": 44,
+          "sse": 76897097,
+          "pixels": 2764800,
+          "frame_psnr": 33.6883413693262,
+          "full_lpips": 0.03856780158148872,
+          "full_dists": 0.051947951316833496,
+          "crop_lpips": 0.02335318922996521,
+          "crop_dists": 0.1777561902999878
+        },
+        {
+          "frame": 45,
+          "sse": 79746559,
+          "pixels": 2764800,
+          "frame_psnr": 33.53032128991447,
+          "full_lpips": 0.03929577297634548,
+          "full_dists": 0.049874722957611084,
+          "crop_lpips": 0.028206609189510345,
+          "crop_dists": 0.1708441972732544
+        },
+        {
+          "frame": 46,
+          "sse": 77908059,
+          "pixels": 2764800,
+          "frame_psnr": 33.63161697187981,
+          "full_lpips": 0.03872791714138455,
+          "full_dists": 0.04958510398864746,
+          "crop_lpips": 0.033828578889369965,
+          "crop_dists": 0.19460046291351318
+        },
+        {
+          "frame": 47,
+          "sse": 85498542,
+          "pixels": 2764800,
+          "frame_psnr": 33.22785372865479,
+          "full_lpips": 0.03986771477593316,
+          "full_dists": 0.04775160551071167,
+          "crop_lpips": 0.04693622142076492,
+          "crop_dists": 0.1951916217803955
+        }
+      ],
+      "full_lpips_standard": [
+        0.03333316743373871,
+        0.031831882894039154,
+        0.030484750866889954,
+        0.03299543261528015,
+        0.03158995136618614,
+        0.0331086590886116,
+        0.03189805895090103,
+        0.03305517137050629,
+        0.032364703714847565,
+        0.034236203879117966,
+        0.032581306993961334,
+        0.03425420820713043,
+        0.033814627677202225,
+        0.03366626426577568,
+        0.03285548835992813,
+        0.035106148570775986,
+        0.033163368701934814,
+        0.03435468301177025,
+        0.034283533692359924,
+        0.03689960390329361,
+        0.03469596058130264,
+        0.03676067292690277,
+        0.034594736993312836,
+        0.03552083671092987,
+        0.03539888188242912,
+        0.036772470921278,
+        0.03439590707421303,
+        0.03582807630300522,
+        0.03485741838812828,
+        0.03658285737037659,
+        0.0346301905810833,
+        0.0350138284265995,
+        0.0345536470413208,
+        0.03604806959629059,
+        0.036039095371961594,
+        0.03836008161306381,
+        0.03671959415078163,
+        0.03798998147249222,
+        0.03834141418337822,
+        0.03848329558968544,
+        0.03744348883628845,
+        0.038853686302900314,
+        0.03766699880361557,
+        0.03937924653291702,
+        0.03856788948178291,
+        0.03929584100842476,
+        0.03872805833816528,
+        0.03986784443259239
+      ]
+    }
+  ],
+  "wall_seconds": 37.817951281555
+}
