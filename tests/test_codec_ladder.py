@@ -147,7 +147,7 @@ def test_scalar_validator_rejects_corruption_and_preserves_empty_regions():
     row = dict(arm='native', crf=35, frames=frames,
                means={name: sum(v for v in values if v is not None) / sum(v is not None for v in values) for name, values in frames.items()},
                temporal=dict(pairs=1, values={'full_residual_mae': [0.], 'foreground_residual_mae': [0.]}))
-    scores = dict(frames=2, metric_control={'source_self_lpips': 0., 'source_self_dists': 0.},
+    scores = dict(protocol='all-frame70/30; empty-region weight reallocated; regional component means report available-frame subsets', frames=2, metric_control={'source_self_lpips': 0., 'source_self_dists': 0.},
                   gpu_execution={'device_count': 1, 'network_parameters_cuda': True, 'maximum_reserved_bytes': 1000}, config={'rates': [35, 50, 65]}, region_pixels={'foreground': [10, 0], 'background': [10, 20]},
                   rows=[{**copy.deepcopy(row), 'arm': arm, 'crf': crf} for arm in ('native', 'roi', 'semantic_patch', 'error_patch') for crf in (35, 50, 65)])
     assert all(validate_scores(scores).values())

@@ -9,39 +9,77 @@
   "allocations": [
     {
       "id": "readiness-intake",
-      "cpu_seconds": 10800,
+      "cpu_seconds": 13500,
       "gpu_seconds": 0,
       "state": "released",
       "parts": {
-        "dataset_intake": 3600,
+        "dataset_intake": 6300,
         "independent_source_copy": 1800,
         "annotation_preparation": 1800,
         "root_repair_native_validation_and_orchestration": 3600
       },
       "accounting": "conservative phase ceiling; includes remote metadata checks and preparation; exact scientific fleet receipts recorded separately",
-      "amendment": "User12h authority: data-intake cap3600 plus independent-copy cap1800, annotation1800, root3600; no GPU"
+      "amendment": "Existing3600 intake plus read-only ballmetadata1800 and matchedROI/price audit900; independentcopy1800, annotation1800, root3600 unchanged. All within user12h authority; noGPU.",
+      "original_cpu_seconds": 10800
     },
     {
       "id": "roi-patch-mechanism-pilot",
       "cpu_seconds": 36000,
       "gpu_seconds": 7200,
-      "state": "released_conditional_on_exact_job_preflight",
+      "state": "closed_scoped_negative_both_domains",
       "card": "docs/cards/submission-ladder-roi-patch-pilot-2026-11-14.md",
       "jobs": [],
       "original_cpu_seconds": 21600,
       "amendment": "Root12h authority: retain both failed preparation allowances and cover full CPU-native producer/receiver validation plus separately metered GPU scoring CPU support; GPU ceiling unchanged7200s.",
-      "next_holds": [
-        {
-          "stage": "tennis-native16-to64",
-          "cpu_seconds": 4800,
-          "gpu_seconds": 0
-        },
-        {
-          "stage": "visor-native16-to64",
-          "cpu_seconds": 4800,
-          "gpu_seconds": 0
-        }
-      ]
+      "next_holds": [],
+      "conservative_cpu_charge_seconds": 33660,
+      "conservative_gpu_charge_seconds": 4860,
+      "unreleased_cpu_seconds": 2340,
+      "unreleased_gpu_seconds": 2340
+    },
+    {
+      "id": "standard-fullframe-metric-contract",
+      "cpu_seconds": 3600,
+      "gpu_seconds": 3600,
+      "state": "released_conditional_on_frozen_v2_smoke",
+      "parts": {
+        "tennis_v2_score_cpu_gpu_each": 1530,
+        "visor_v2_score_cpu_gpu_each": 1530,
+        "failure_and_closeout_cpu_gpu_each": 540
+      },
+      "purpose": "Same 24 accepted native/patch reconstructions; separately named official scalar full-frame LPIPS plus exact legacy regional invariance check. No method tuning, cohort expansion or revised promotion rule.",
+      "cost_basis": "Previous complete score commands170.12s tennis/288.81s VISOR, added sequential AlexNet forward without new model; actual16-frame/full-replay smoke must forecast64 within900s using1.5*wall*4+30. Whole waited stage1530s includes450smoke+900full+60validator+120overhead.",
+      "card": "docs/cards/submission-ladder-standard-metrics-2026-11-15.md"
+    },
+    {
+      "id": "matched-ball-conventional-roi",
+      "cpu_seconds": 7200,
+      "gpu_seconds": 3600,
+      "state": "released_design_and_native_correctness_only_GPU_conditional",
+      "card": "docs/cards/submission-ladder-ball-roi-2026-11-15.md",
+      "frozen_before_outcomes": {
+        "source": "tracknet/game10/Clip3 first48; sourceYUVa40b172b7a3e72c0fcf75dff15584564e3d220ffa6f1653439d045387f2d9963",
+        "crfs": [
+          35,
+          48,
+          62
+        ],
+        "preset": 4,
+        "roi_outside_offset": 40,
+        "inside_offset": 0,
+        "location": "privileged reference-label 64x64 crop touched64blocks",
+        "metrics": "original JPEG reference; historical isolated64crop/full metrics, standardfull namedseparately ifmeasured"
+      },
+      "hypothesis": "Compactpaidball advantage may be explained by conventional allocation to the sameobject; add stronger matchedROI before claimingrepresentationbenefit.",
+      "competing_explanation": "NativeROI+40 raisesoutsideQP; preserveballpixelsconventionally. ReferenceROIprivileged andnotdeployableautomatic.",
+      "parts": {
+        "cpu_native_stage_ceiling": 2400,
+        "cuda_score_stage_cpu_ceiling": 2430,
+        "cuda_score_stage_gpu_ceiling": 2430,
+        "cpu_preparation_review_failure_closeout_allowance": 2370,
+        "gpu_failure_closeout_allowance": 1170
+      },
+      "gate": "NoGPU until exactJPEG/YUV/native62gold andfreshdecoderparity pass, metriccontrol/source/modelhashes frozen, representativecost fits stage. Noclosedoldallocation reopened."
     }
   ],
   "jobs": [
@@ -108,32 +146,149 @@
     {
       "job_id": "20261114T234255Z-4e9c77aa",
       "purpose": "tennis native/ROI/semantic/errorpatch16-to64 producer",
-      "state": "submitted_pending",
+      "state": "cancelled_known_pending_no_host_no_execution",
       "cpu_ceiling_seconds": 4800,
       "gpu_ceiling_seconds": 0,
       "code_revision": "c68baf3050be71b31d6e53462462d4956a0fbb78",
       "source_sha256": "f72e2c18cede73b628ac9de8bc8f182e40e4d2726ac8e84815cd2d0d18730f2a",
       "spec_sha256": "b9024bfe7112dd72d25535af97918bb1c821d728d84d84399176738e2171c8f9",
       "deadline": "2026-11-15T01:00:00Z",
-      "continuation": "/private/tmp/pointstream-tennis-native-runner-state.json"
+      "continuation": "/private/tmp/pointstream-tennis-native-runner-state.json",
+      "unspent_cpu_hold_returned_seconds": 4800,
+      "workload_cpu_seconds": 0,
+      "gpu_seconds": 0,
+      "reason": "dav1d exists only insidepackedruntime; oldrequired_commands checked workerPATH beforeenv; corrected hostbootstrap prerequisite retainsstrictworkloadtoolgate"
     },
     {
       "job_id": "20261114T234622Z-874978b6",
       "purpose": "VISOR native/ROI/semantic/errorpatch16-to64 producer",
-      "state": "submitted_pending",
+      "state": "cancelled_known_pending_no_host_no_execution",
       "cpu_ceiling_seconds": 4800,
       "gpu_ceiling_seconds": 0,
       "code_revision": "c68baf3050be71b31d6e53462462d4956a0fbb78",
       "source_sha256": "f72e2c18cede73b628ac9de8bc8f182e40e4d2726ac8e84815cd2d0d18730f2a",
       "spec_sha256": "7b077cdb6d09a59381dc38181d0595db8a18bd2b1a6e38433238d6b03d43058d",
       "deadline": "2026-11-15T01:00:00Z",
-      "wait_receipt": "/private/tmp/pointstream-ladder-visor-native-wait-20261114.json"
+      "wait_receipt": "/private/tmp/pointstream-ladder-visor-native-wait-20261114.json",
+      "unspent_cpu_hold_returned_seconds": 4800,
+      "workload_cpu_seconds": 0,
+      "gpu_seconds": 0,
+      "reason": "dav1d exists only insidepackedruntime; oldrequired_commands checked workerPATH beforeenv; corrected hostbootstrap prerequisite retainsstrictworkloadtoolgate"
+    },
+    {
+      "job_id": "20261115T000304Z-56cba37f",
+      "purpose": "tennis nativeproducer corrected hostadmission prerequisites",
+      "state": "failed_smoke_archive_integrity_after_real16_native_command",
+      "cpu_ceiling_seconds": 4800,
+      "gpu_ceiling_seconds": 0,
+      "code_revision": "e8fc9ba1031fa9e4946d84bbeded7777ca9da0e1",
+      "source_sha256": "f72e2c18cede73b628ac9de8bc8f182e40e4d2726ac8e84815cd2d0d18730f2a",
+      "spec_sha256": "5315b7afd247bca525f6022eeadec2ca57e221855706c3b73046044baf3620b5",
+      "deadline": "2026-11-15T01:30:00Z",
+      "receipt": "/private/tmp/pointstream-tennis-native-runner-state.json",
+      "conservative_cpu_charge_seconds": 4800,
+      "reason": "fleet automatically republished scratch/publish over customthinarchive; not a codecqualitynegative; repaired privateworkspace/lifecycle regression"
+    },
+    {
+      "job_id": "20261115T000301Z-2c3ec7a1",
+      "purpose": "visor nativeproducer corrected hostadmission prerequisites",
+      "state": "failed_smoke_archive_integrity_after_real16_native_command",
+      "cpu_ceiling_seconds": 4800,
+      "gpu_ceiling_seconds": 0,
+      "code_revision": "e8fc9ba1031fa9e4946d84bbeded7777ca9da0e1",
+      "source_sha256": "f72e2c18cede73b628ac9de8bc8f182e40e4d2726ac8e84815cd2d0d18730f2a",
+      "spec_sha256": "4123b3687b6f2cd832ee71a0092d49d90428ffe478930ab7ae06102edf5df372",
+      "deadline": "2026-11-15T01:30:00Z",
+      "receipt": "/private/tmp/pointstream-ladder-visor-native-admission-corrected-submit-20261115.json",
+      "conservative_cpu_charge_seconds": 4800,
+      "reason": "fleet automatically republished scratch/publish over customthinarchive; not a codecqualitynegative; repaired privateworkspace/lifecycle regression"
+    },
+    {
+      "job_id": "20261115T001337Z-3ea86d31",
+      "purpose": "tennis lifecycle-corrected complete native producer",
+      "state": "accepted_full64_physical_and_scored",
+      "cpu_ceiling_seconds": 4800,
+      "gpu_ceiling_seconds": 0,
+      "source_sha256": "377a3499ac7f5da1fe6c4431a4c631e259a103c9e2fc5a76edfa47e6d398ce43",
+      "code_revision": "ba1b1340b15de44b0eeb81c02975a40fe82003ab",
+      "spec_sha256": "5315b7afd247bca525f6022eeadec2ca57e221855706c3b73046044baf3620b5",
+      "receipt": "/private/tmp/pointstream-ladder-tennis-native-accepted-20261115.json",
+      "management_route": "PS_FLEET_MANAGEMENT_HOST=gpu6",
+      "conservative_cpu_charge_seconds": 4800,
+      "archive_sha256": "62dfc7c538a1770d6b2753624a99f12ca81b2a1f5c5f23ff1301f4659d39528e",
+      "scoped_command_cpu_seconds": 69.620916,
+      "scoped_command_wall_seconds": 56.640340774320066
+    },
+    {
+      "job_id": "20261115T001900Z-c260a64e",
+      "purpose": "VISOR lifecycle-corrected native producer",
+      "state": "accepted_full64_physical_and_scored",
+      "cpu_ceiling_seconds": 4800,
+      "gpu_ceiling_seconds": 0,
+      "source_sha256": "377a3499ac7f5da1fe6c4431a4c631e259a103c9e2fc5a76edfa47e6d398ce43",
+      "code_revision": "ba1b1340b15de44b0eeb81c02975a40fe82003ab",
+      "spec_sha256": "4123b3687b6f2cd832ee71a0092d49d90428ffe478930ab7ae06102edf5df372",
+      "receipt": "/private/tmp/pointstream-ladder-visor-native-lifecycle-corrected-submit-20261115.json",
+      "management_route": "PS_FLEET_MANAGEMENT_HOST=gpu6",
+      "archive_sha256": "eeea2925bd7c0fc597755a3fa918a4e8122eafad810839b0292db56f76e2712b",
+      "conservative_cpu_charge_seconds": 4800,
+      "scoped_command_wall_seconds": 41.5911,
+      "scoped_command_cpu_seconds": 55.98109
+    },
+    {
+      "job_id": "20261115T002959Z-92d68496",
+      "purpose": "tennis actual full/FG/BG/allframe/temporal CUDAquality scorer",
+      "state": "accepted_full64_quality_development_target_NOT_MET",
+      "cpu_ceiling_seconds": 2430,
+      "gpu_ceiling_seconds": 2430,
+      "source_sha256": "377a3499ac7f5da1fe6c4431a4c631e259a103c9e2fc5a76edfa47e6d398ce43",
+      "code_revision": "ba1b1340b15de44b0eeb81c02975a40fe82003ab",
+      "spec_sha256": "5d69f1908fa2aa29e5b2547c4d62c6b8f13c7185170e938ed21878cc1d1a9c7f",
+      "receipt": "/private/tmp/pointstream-ladder-tennis-score-submit-20261115.json",
+      "management_route": "PS_FLEET_MANAGEMENT_HOST=gpu6",
+      "archive_sha256": "b51d9991a958fc26132ef67b3e008aa0eafafdeed552151b280a381762570482",
+      "conservative_cpu_charge_seconds": 2430,
+      "conservative_gpu_charge_seconds": 2430,
+      "host": "gpu5",
+      "gpu_uuid": "GPU-7754164a-33cd-265c-3696-c20966d228fe",
+      "score_file": "docs/experiments/submission-ladder-tennis-scores-20261115.json",
+      "analysis_file": "docs/experiments/submission-ladder-tennis-analysis-20261115.json",
+      "scoped_command_wall_seconds": 170.115998,
+      "scoped_command_cpu_seconds": 169.379006
+    },
+    {
+      "job_id": "20261115T005151Z-a8933c78",
+      "purpose": "VISOR unmodified full64 CUDAquality scorer",
+      "state": "accepted_full64_quality_development_target_NOT_MET",
+      "cpu_ceiling_seconds": 2430,
+      "gpu_ceiling_seconds": 2430,
+      "source_sha256": "377a3499ac7f5da1fe6c4431a4c631e259a103c9e2fc5a76edfa47e6d398ce43",
+      "code_revision": "ba1b1340b15de44b0eeb81c02975a40fe82003ab",
+      "spec_sha256": "f93738b34125c295ff83e957778e8938c751ab1e447a93475fcaaa48fd20fbe9",
+      "receipt": "/private/tmp/pointstream-visor-score-runner-state.json",
+      "management_route": "PS_FLEET_MANAGEMENT_HOST=gpu6",
+      "deadline": "2026-11-15T02:00:00Z",
+      "conservative_cpu_charge_seconds": 2430,
+      "conservative_gpu_charge_seconds": 2430,
+      "archive_sha256": "4c97b5c575430c8d5ddb60848d02be57284387cf57f778d78c556c0d5916f13e",
+      "host": "gpu6",
+      "gpu_uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+      "scoped_command_wall_seconds": 288.808,
+      "scoped_command_cpu_seconds": 288.164,
+      "score_file": "docs/experiments/submission-ladder-visor-scores-20261115.json",
+      "analysis_file": "docs/experiments/submission-ladder-visor-analysis-20261115.json"
     }
   ],
   "decisions": [
     "Existing datasets sufficient for development. Native RacketVision source/label joins found; no replacement dataset required for first screen. New candidate sources remain unscored pending confirmation eligibility.",
     "Pre-score independent review: primary anchors use actual complete native IVF bytes (ROI signalling already included), not unnecessary prototype wrappers. Prefix scoring cannot promote a complete-window rate curve. Shared-wrapper sensitivity stays secondary.",
-    "Native pilot configurations frozen before quality: CRF35/50/65,preset8,256x256 semantic/error rectangle,patchCRF28,ROIoutside+20. Metric self-controls, actual CUDA residency and <=8000MiB reserved memory checked before accepting scores."
+    "Native pilot configurations frozen before quality: CRF35/50/65,preset8,256x256 semantic/error rectangle,patchCRF28,ROIoutside+20. Metric self-controls, actual CUDA residency and <=8000MiB reserved memory checked before accepting scores.",
+    "GPU2 SSHmanagementrefused; inspected preserved sharedinbox through verifiedgpu6 using supportedmanagementhostoverride. Allsixworkersfresh. Nojob replay orworkerrestart. Firstqualityscore2430GPU/2430CPU holdreleased under12hauthority afterliteral12packet64frame tennisacceptance.",
+    "First accepted tennis64-frame outcome: ROI weightedDISTS -8.5283percent, LPIPS -7.1856percent, below10percentDISTS threshold. Semantic pixel patch +17.0966percent/+27.9352percent vsnative, +28.5281percent/+37.6132percent vsROI. No promotion.",
+    "Same-pixels free-framing semanticpatch still loses +16.7589percent weightedDISTS; closes only preregistered static256x256/CRF28 construction on this development window. Narrow semantic-vs-error selection advantage does not establish native codec benefit.",
+    "Next test before more outcomes: unchanged preregistered VISOR64-frame arm, fixed protocol/source/3rates; no tennis tuning. Any later narrowed method needs separate hypothesis/budget.",
+    "RacketVision all43test rallies already used in K5b tracker selection; no untouched holdout claim. Candidate native codec windows remain exposed development, sourceURL dedup unknown.",
+    "Accepted VISOR64: ROI weightedDISTS -5.3901percent/LPIPS -4.5211percent below10percent. Semanticpatch +18.4685/+23.5456percent versusnative; evenfreeframing+18.2420percent weightedDISTS. Close frozenstaticadditivepatchfamily on both exposeddevelopmentwindows; no parameterfishing/positiveconfirmation. Nextpriority matched-ball-objective conventionalROIcontrol, pending exactdata/price audit."
   ],
   "repair_receipt": {
     "repair": "expose existing ABI215 library at FFmpeg required opt path; preserve ABI216 defaults",

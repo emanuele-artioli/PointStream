@@ -9,12 +9,15 @@ from pathlib import Path
 from typing import Any
 
 from src.pointstream.evaluation import anchor_sensitivity
+from experiments.codec_ladder.__main__ import METRIC_DEFINITIONS, STANDARD_LPIPS, metric_profile
 
 METRICS = ('weighted_dists', 'weighted_lpips', 'full_dists', 'full_lpips', 'full_rgb_psnr')
 ARMS = ('native', 'roi', 'semantic_patch', 'error_patch')
 
 
 def analyse(score: dict[str, Any]) -> dict[str, Any]:
+    has_standard = metric_profile(score)
+    metrics_to_score = (*METRICS, STANDARD_LPIPS) if has_standard else METRICS
     rows = score['rows']
     count = score['frames']
     if score.get('available_receiver_frames') != count:
@@ -29,12 +32,12 @@ def analyse(score: dict[str, Any]) -> dict[str, Any]:
         native_bytes = row.get('native_base_bytes')
         if type(native_bytes) is not int or not 0 < native_bytes <= row['packet_bytes']:
             raise ValueError('missing/invalid actual native stream bytes')
-        if any(type(row['means'].get(m)) not in (int, float) or not math.isfinite(row['means'][m]) for m in METRICS):
+        if any(type(row['means'].get(m)) not in (int, float) or not math.isfinite(row['means'][m]) for m in metrics_to_score):
             raise ValueError('missing/nonfinite complete-frame metric')
-        for metric in METRICS:
+        for metric in metrics_to_score:
             values = row['frames'].get(metric)
             if (not isinstance(values, list) or len(values) != count
-                    or any(type(v) not in (int, float) or not math.isfinite(v) for v in values)
+                    or any(type(v) not in (int, float) or not math.isfinite(v) or (metric == STANDARD_LPIPS and v < 0) for v in values)
                     or not math.isclose(math.fsum(values) / count, row['means'][metric], rel_tol=1e-9, abs_tol=1e-12)):
                 raise ValueError('complete-frame values/mean do not match registered frames')
         selected[key] = row
@@ -48,7 +51,7 @@ def analyse(score: dict[str, Any]) -> dict[str, Any]:
             if arm == anchor:
                 continue
             metrics: dict[str, Any] = {}
-            for metric in METRICS:
+            for metric in metrics_to_score:
                 sign = 1 if metric == 'full_rgb_psnr' else -1
                 candidate = [(selected[arm, r]['native_base_bytes' if arm == 'roi' else 'packet_bytes'], sign * selected[arm, r]['means'][metric]) for r in sorted(rates)]
                 baseline = [(selected[anchor, r]['native_base_bytes'], sign * selected[anchor, r]['means'][metric]) for r in sorted(rates)]
@@ -60,7 +63,7 @@ def analyse(score: dict[str, Any]) -> dict[str, Any]:
     optimistic: dict[str, Any] = {}
     for arm in ('semantic_patch', 'error_patch'):
         metrics = {}
-        for metric in METRICS:
+        for metric in metrics_to_score:
             sign = 1 if metric == 'full_rgb_psnr' else -1
             candidate = []
             for r in sorted(rates):
@@ -75,7 +78,7 @@ def analyse(score: dict[str, Any]) -> dict[str, Any]:
     wrapper_sensitivity: dict[str, Any] = {}
     for arm in ARMS[1:]:
         wrapper_sensitivity[arm] = {}
-        for metric in METRICS:
+        for metric in metrics_to_score:
             sign = 1 if metric == 'full_rgb_psnr' else -1
             wrapper_sensitivity[arm][metric] = anchor_sensitivity(
                 [(selected[arm, r]['packet_bytes'], sign * selected[arm, r]['means'][metric]) for r in sorted(rates)],
@@ -89,7 +92,9 @@ def analyse(score: dict[str, Any]) -> dict[str, Any]:
             checks[anchor] = {'weighted_dists_bd_rate': dists, 'weighted_lpips_bd_rate': lpips,
                               'development_target_met': None if dists is None or lpips is None else dists <= -.10 and lpips < 0}
         decisions[arm] = checks
-    return {'schema': 1, 'scope': 'reference-guided static-rectangle development mechanism oracle; not automatic sender or confirmation',
+    return {'schema': 1, 'metric_protocol': score.get('metric_protocol', 'legacy-spatial-map-v1'),
+            'metric_definitions': {k: v for k, v in METRIC_DEFINITIONS.items() if has_standard or k != STANDARD_LPIPS},
+            'scope': 'reference-guided static-rectangle development mechanism oracle; not automatic sender or confirmation',
             'domain': score['domain'], 'source_group': score['source_group'], 'annotation_provenance': score['annotation_provenance'],
             'frames': score['frames'], 'comparisons': comparisons, 'optimistic_same_pixels': optimistic,
             'decisions': decisions, 'shared_wrapper_secondary': wrapper_sensitivity, 'rate_basis': 'candidate complete packets versus complete native IVF anchors (including ROI signalling); full receiver coverage; same duration so byte scale cancels in BD-rate',

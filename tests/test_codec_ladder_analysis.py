@@ -17,7 +17,7 @@ def score():
                 'full_lpips': value, 'full_rgb_psnr': 40 - i * 5}))
     for row in rows:
         row['frames'] = {k: [v] * 3 for k, v in row['means'].items()}
-    return dict(rows=rows, domain='tennis', source_group='synthetic', annotation_provenance='synthetic', frames=3, available_receiver_frames=3)
+    return dict(protocol='all-frame70/30; empty-region weight reallocated; regional component means report available-frame subsets', rows=rows, domain='tennis', source_group='synthetic', annotation_provenance='synthetic', frames=3, available_receiver_frames=3)
 
 
 def test_development_target_and_simpler_roi_explanation():

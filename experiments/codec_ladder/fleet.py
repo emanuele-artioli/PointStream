@@ -134,10 +134,15 @@ def cost_record(*, wall: float, cpu: float, frames: int, target: int, cap: float
 
 
 def validate_scores(scores: dict[str, Any]) -> dict[str, bool]:
+    has_standard = worker.metric_profile(scores)
     count = scores["frames"]
     control = scores["metric_control"]
     gpu = scores["gpu_execution"]
-    checks = {"metric_self_control": all(type(control[k]) in (int, float) and math.isfinite(control[k]) and abs(control[k]) <= 1e-5 for k in ("source_self_lpips", "source_self_dists")),
+    control_names: tuple[str, ...] = ("source_self_lpips", "source_self_dists")
+    if has_standard:
+        control_names += ("source_self_lpips_standard",)
+    control_values = [control.get(name) for name in control_names]
+    checks = {"metric_self_control": all(type(value) in (int, float) and math.isfinite(value) and abs(value) <= 1e-5 for value in control_values),
               "cuda_networks": gpu["device_count"] == 1 and gpu["network_parameters_cuda"] is True,
               "reserved_memory_within_declared8000MiB": 0 < gpu["maximum_reserved_bytes"] <= 8000 * 1024**2,
               "all_rows": len(scores["rows"]) == 12,
@@ -146,6 +151,14 @@ def validate_scores(scores: dict[str, Any]) -> dict[str, bool]:
     for row in scores["rows"]:
         key = f'{row["arm"]}-{row["crf"]}'
         values = row["frames"]
+        if has_standard:
+            array = values.get(worker.STANDARD_LPIPS)
+            mean = row["means"].get(worker.STANDARD_LPIPS)
+            checks[key + ":standard_lpips"] = (
+                isinstance(array, list) and len(array) == count
+                and all(type(v) in (int, float) and math.isfinite(v) and v >= 0 for v in array)
+                and type(mean) in (int, float) and math.isfinite(mean)
+                and math.isclose(mean, math.fsum(array) / count, abs_tol=1e-12, rel_tol=1e-10))
         checks[key + ":frame_count"] = all(len(array) == count for array in values.values())
         checks[key + ":required_finite"] = all(type(value) in (int, float) and math.isfinite(value)
             for name in ("full_lpips", "weighted_lpips", "full_dists", "weighted_dists", "full_rgb_psnr") for value in values[name])
