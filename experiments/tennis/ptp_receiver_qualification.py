@@ -152,13 +152,29 @@ def expected_case(root: Path, label: str, domain: str) -> dict[str, Any]:
                          'rgb_frame_sha256': info['decode']['rgb_frame_sha256']}}
 
 
+
+def verify_policy(policy: dict[str, Any], base_bytes: bytes, policy_sha: str, host: str) -> None:
+    if common.digest(base_bytes) != POLICY:
+        raise ValueError('reviewed base policy identity mismatch')
+    if policy_sha == POLICY:
+        if policy != json.loads(base_bytes) or host not in policy.get('profiles', {}):
+            raise ValueError('legacy policy differs from authenticated base or host')
+        return
+    from experiments.tennis import ptp_cpu_policy_capture as capture
+
+    capture.validate_derivation(policy, base_bytes)
+    capture.verify_links(policy, host)
+
 def run(args: argparse.Namespace) -> dict[str, Any]:
     if os.sched_getaffinity(0) != {0} or os.environ.get('PS_CPU_ALLOWANCE') != '1':
         raise ValueError('requires one CPU at affinity index 0')
     if args.cases not in (1, 4):
         raise ValueError('only one or four complete packet cases are registered')
     for name, sha in FIXED.items():
-        common.require_hash(Path(getattr(args, name)), sha)
+        if name != 'policy':
+            common.require_hash(Path(getattr(args, name)), sha)
+    common.require_hash(Path(args.base_policy), POLICY)
+    common.require_hash(Path(args.policy), args.policy_sha256)
     common.require_hash(Path(args.decoder), common.TOOLS['decoder'])
     common.require_hash(Path(args.ffmpeg), common.TOOLS['ffmpeg'])
     stage = Path(os.environ['PS_STAGE_DIR'])
@@ -171,7 +187,10 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     ego, _ = bind_input(Path(args.ego_archive), Path(args.ego_stage), args.ego_archive_sha256,
                         args.ego_stage_sha256, 'ego', work / 'ego')
     run_context = context(stage)
+    base_bytes = Path(args.base_policy).read_bytes()
     old_policy = json.loads(Path(args.policy).read_text())
+    host = os.uname().nodename.split('.')[0]
+    verify_policy(old_policy, base_bytes, args.policy_sha256, host)
     source_root = Path(__file__).resolve().parents[2]
     amended = isolated.amend_policy(old_policy, source_root, run_context['execution_identity'])
     # Verify every existing reviewed generic-runtime and system entry before forking.
@@ -187,6 +206,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     publication.mkdir()
     shutil.copyfile(policy_file, publication / 'policy.json')
     shutil.copyfile(args.policy, publication / 'old-policy.json')
+    shutil.copyfile(args.base_policy, publication / 'base-policy.json')
     results = []
     for index, case in enumerate(selected):
         result = isolated.replay(Path(case['packet']), work / f'receiver-{index}', policy_path=policy_file,
@@ -196,7 +216,8 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         paid.write_json(result_path, result)
         results.append({k: v for k, v in case.items() if k != 'packet'})
     body = {'schema': 1, 'host': os.uname().nodename.split('.')[0], 'cases': args.cases, 'context': run_context, 'policy_sha256': policy_sha,
-            'original_policy_sha256': POLICY, 'runtime_sha256': isolated.RUNTIME_SHA,
+            'original_policy_sha256': args.policy_sha256, 'input_policy_sha256': args.policy_sha256,
+            'base_policy_sha256': POLICY, 'runtime_sha256': isolated.RUNTIME_SHA,
             'source_inputs': {name: FIXED[name] for name in FIXED if name != 'policy'},
             'paid_tennis_archive_sha256': args.tennis_archive_sha256, 'paid_tennis_stage_sha256': args.tennis_stage_sha256,
             'paid_ego_archive_sha256': args.ego_archive_sha256, 'paid_ego_stage_sha256': args.ego_stage_sha256,
@@ -205,7 +226,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     paid.write_json(publication / 'manifest.json', body)
     binding = publish(publication, stage / 'published.tar', args.cases)
     replay_root = extract(stage / 'published.tar', binding, args.cases, work / 'internal-archive')
-    internal_checks = validate_proofs(replay_root, args.cases)
+    internal_checks = validate_proofs(replay_root, args.cases, args.policy_sha256)
     if not all(internal_checks.values()):
         raise ValueError('internal qualification proof validation failed')
     cost = cost_record(time.monotonic() - start, common.cpu_seconds() - cpu, args.cases)
@@ -218,7 +239,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
 def names(cases: int) -> list[str]:
     if cases not in (1, 4):
         raise ValueError('invalid case count')
-    return ['manifest.json', 'policy.json', 'old-policy.json', *[f'proof-{i}.json' for i in range(cases)]]
+    return ['manifest.json', 'policy.json', 'old-policy.json', 'base-policy.json', *[f'proof-{i}.json' for i in range(cases)]]
 
 
 def publish(root: Path, archive: Path, count: int) -> dict[str, Any]:
@@ -306,18 +327,23 @@ def proof_bindings(proof: dict[str, Any], manifest: dict[str, Any], policy: dict
     return checks
 
 
-def validate_proofs(root: Path, cases: int) -> dict[str, bool]:
+def validate_proofs(root: Path, cases: int, expected_policy_sha: str) -> dict[str, bool]:
     manifest = json.loads((root / 'manifest.json').read_text())
     if manifest['cases'] != cases or len(manifest['records']) != cases:
         raise ValueError('case count mismatch')
     common.require_hash(root / 'policy.json', manifest['policy_sha256'])
-    common.require_hash(root / 'old-policy.json', POLICY)
+    common.require_hash(root / 'base-policy.json', POLICY)
+    common.require_hash(root / 'old-policy.json', expected_policy_sha)
     old_policy = json.loads((root / 'old-policy.json').read_text())
+    verify_policy(old_policy, (root / 'base-policy.json').read_bytes(), expected_policy_sha, manifest['host'])
     actual_policy = json.loads((root / 'policy.json').read_text())
     reconstructed = isolated.amend_policy(old_policy, Path(__file__).resolve().parents[2],
                                          manifest['context']['execution_identity'])
-    checks = {'policy_amendment': reconstructed == actual_policy,
-              'original_policy': manifest['original_policy_sha256'] == POLICY,
+    checks = {'actual_host': manifest['host'] == os.uname().nodename.split('.')[0],
+              'policy_amendment': reconstructed == actual_policy,
+              'original_policy': (manifest['original_policy_sha256'] == expected_policy_sha
+                                  and manifest['input_policy_sha256'] == expected_policy_sha
+                                  and manifest['base_policy_sha256'] == POLICY),
               'runtime': manifest['runtime_sha256'] == isolated.RUNTIME_SHA,
               'fixed_inputs': manifest['source_inputs'] == {name: FIXED[name] for name in FIXED if name != 'policy'}}
     expected_cases = [('tennis', '48'), ('tennis', '55'), ('tennis', '62'), ('ego', 'fallback')]
@@ -350,9 +376,17 @@ def cost_record(wall: float, cpu: float, cases: int) -> dict[str, Any]:
 
 def validate_fleet(stage: Path, temp: Path) -> dict[str, Any]:
     record = json.loads((stage / 'ptp-qualification-stage.json').read_text())
+    spec = json.loads((stage.parent / 'spec.json').read_text())
+    policy_items = [item for item in spec['staged_inputs'] if item['name'] == 'policy']
+    base_items = [item for item in spec['staged_inputs'] if item['name'] == 'base_policy']
+    if len(policy_items) != 1 or len(base_items) != 1 or base_items[0]['sha256'] != POLICY:
+        raise ValueError('spec policy bindings differ')
+    expected_policy_sha = policy_items[0]['sha256']
     with tempfile.TemporaryDirectory(prefix='ptp-proof-', dir=temp) as folder:
         root = extract(stage / 'published.tar', record['archive'], record['cases'], Path(folder) / 'archive')
-        checks = validate_proofs(root, record['cases'])
+        checks = validate_proofs(root, record['cases'], expected_policy_sha)
+        manifest = json.loads((root / 'manifest.json').read_text())
+        checks['host_in_frozen_spec'] = manifest['host'] in spec['hosts']
     cost = record['cost']
     checks['body_cost'] = cost == cost_record(cost['wall_seconds'], cost['cpu_seconds'], record['cases']) and cost['passed']
     checks['internal_validation'] = bool(record['internal_checks']) and all(record['internal_checks'].values())
@@ -364,10 +398,27 @@ def validate_fleet(stage: Path, temp: Path) -> dict[str, Any]:
             'scope': 'fresh-exec source-denial and exact RGB; no network/MCP isolation or independently observed native births'}
 
 
-def make_spec(deadline: str, paid_inputs: dict[str, dict[str, str]]) -> dict[str, Any]:
+def make_spec(deadline: str, paid_inputs: dict[str, dict[str, str]],
+              policy_descriptor: dict[str, Any] | None = None) -> dict[str, Any]:
     if set(paid_inputs) != {'tennis_archive', 'tennis_stage', 'ego_archive', 'ego_stage'}:
         raise ValueError('four exact paid full-stage paths and hashes required')
-    items: list[dict[str, Any]] = [{'name': name, 'path': ORIGINAL[name], 'sha256': sha, 'extract': False} for name, sha in FIXED.items()]
+    if policy_descriptor is None:
+        selected_policy = {'path': ORIGINAL['policy'], 'sha256': POLICY, 'hosts': ['gpu6']}
+    else:
+        selected_policy = policy_descriptor
+        if (set(selected_policy) != {'path', 'sha256', 'hosts'}
+                or not isinstance(selected_policy['path'], str) or not Path(selected_policy['path']).is_absolute()
+                or not isinstance(selected_policy['sha256'], str) or len(selected_policy['sha256']) != 64
+                or any(c not in '0123456789abcdef' for c in selected_policy['sha256'])
+                or selected_policy['sha256'] == POLICY or not isinstance(selected_policy['hosts'], list)
+                or not selected_policy['hosts']
+                or any(not isinstance(host, str) or host not in {'gpu1', 'gpu3', 'gpu5'} for host in selected_policy['hosts'])
+                or len(set(selected_policy['hosts'])) != len(selected_policy['hosts'])):
+            raise ValueError('invalid frozen CPU policy descriptor')
+    items: list[dict[str, Any]] = [{'name': name, 'path': ORIGINAL[name], 'sha256': sha, 'extract': False}
+                                   for name, sha in FIXED.items() if name != 'policy']
+    items.extend([{'name': 'policy', 'path': selected_policy['path'], 'sha256': selected_policy['sha256'], 'extract': False},
+                  {'name': 'base_policy', 'path': ORIGINAL['policy'], 'sha256': POLICY, 'extract': False}])
     for name, info in paid_inputs.items():
         if (set(info) != {'path', 'sha256'} or not Path(info['path']).is_absolute() or len(info['sha256']) != 64
                 or any(c not in '0123456789abcdef' for c in info['sha256'])):
@@ -376,9 +427,9 @@ def make_spec(deadline: str, paid_inputs: dict[str, dict[str, str]]) -> dict[str
     arguments = ['--fleet', '--cases', '{cases}']
     for item in items:
         arguments += ['--' + item['name'].replace('_', '-'), '{staged:' + item['name'] + '}']
-        if item['name'] in paid_inputs:
+        if item['name'] in paid_inputs or item['name'] == 'policy':
             arguments += ['--' + item['name'].replace('_', '-') + '-sha256', item['sha256']]
-    return {'schema': 1, 'device': 'cpu', 'hosts': ['gpu6'], 'gpu_models': [], 'gpu_memory_mib': 0,
+    return {'schema': 1, 'device': 'cpu', 'hosts': selected_policy['hosts'], 'gpu_models': [], 'gpu_memory_mib': 0,
             'cpu_threads': 1, 'single_cpu_campaign': True, 'cpu_affinity_index': 0, 'local_storage_gib': 20,
             'entrypoint': ['-m', 'experiments.tennis.ptp_receiver_qualification'], 'arguments': arguments,
             'staged_inputs': items, 'inputs': [{'path': p['path'], 'sha256': p['sha256']} for p in items],
@@ -397,6 +448,9 @@ def main() -> None:
     parser.add_argument('--validate', action='store_true')
     parser.add_argument('--spec', type=Path)
     parser.add_argument('--paid-inputs', type=Path)
+    parser.add_argument('--policy-descriptor', type=Path)
+    parser.add_argument('--base-policy')
+    parser.add_argument('--policy-sha256')
     parser.add_argument('--deadline')
     parser.add_argument('--cases', type=int, choices=(1, 4))
     for name in (*FIXED, 'tennis_archive', 'tennis_stage', 'ego_archive', 'ego_stage'):
@@ -409,7 +463,8 @@ def main() -> None:
     if args.spec:
         if args.paid_inputs is None or args.deadline is None:
             parser.error('spec requires --paid-inputs JSON and --deadline')
-        paid.write_json(args.spec, make_spec(args.deadline, json.loads(args.paid_inputs.read_text())))
+        descriptor = json.loads(args.policy_descriptor.read_text()) if args.policy_descriptor else None
+        paid.write_json(args.spec, make_spec(args.deadline, json.loads(args.paid_inputs.read_text()), descriptor))
         return
     if args.validate:
         result = validate_fleet(Path(os.environ['PS_STAGE_DIR']), Path(os.environ['TMPDIR']))
@@ -420,7 +475,7 @@ def main() -> None:
         return
     if not args.fleet or args.cases is None:
         parser.error('fleet requires --cases')
-    required = (*FIXED, 'tennis_archive', 'tennis_stage', 'ego_archive', 'ego_stage',
+    required = (*FIXED, 'base_policy', 'policy_sha256', 'tennis_archive', 'tennis_stage', 'ego_archive', 'ego_stage',
                 'tennis_archive_sha256', 'tennis_stage_sha256', 'ego_archive_sha256', 'ego_stage_sha256')
     if any(getattr(args, name) is None for name in required):
         parser.error('fleet requires all authenticated staged inputs and paid hashes')

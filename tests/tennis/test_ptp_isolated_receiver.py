@@ -2,6 +2,7 @@
 from copy import deepcopy
 import errno
 import inspect
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -19,7 +20,9 @@ def proof(patch=True):
         denied[groups.get(role, role)].append({**rows[0], 'inode': len(denied) + 1, 'errno': errno.EACCES})
     actual_policy = {'denials': {k: [{a: b for a, b in row.items() if a != 'errno'} for row in rows] for k, rows in denied.items()}}
     calls = []
-    for argv in (['/bin/dav1d', '--version'], ['/bin/dav1d', '-i', 'base.ivf'], *([['/bin/dav1d', '-i', 'patch.ivf']] if patch else [])):
+    # Linux commonly aliases /bin to /usr/bin; production receipts are canonical.
+    decoder = str(Path('/bin/dav1d').resolve())
+    for argv in ([decoder, '--version'], [decoder, '-i', 'base.ivf'], *([[decoder, '-i', 'patch.ivf']] if patch else [])):
         calls.append({'index': len(calls), 'argv': argv, 'argv_sha256': ptp.kernel._object_sha(argv), 'returncode': 0,
                       'restriction_scope': 'inherits restricted worker Landlock and namespaces'})
     details = {'context': {}, 'policy_sha256': 'b' * 64, 'worker_observer': observer, 'pid': 1, 'birth': '100',
@@ -33,7 +36,7 @@ def proof(patch=True):
                'runtime_archive_sha256': ptp.RUNTIME_SHA, 'network_isolation': False, 'mcp_isolation': False,
                'native_scope': 'inherited restrictions; no independent native birth observation',
                'actual_policy': actual_policy, 'actual_policy_sha256': ptp.kernel._object_sha(actual_policy),
-               'denials': denied, 'protected_roles': roles, 'native_calls': calls, 'decoder_path': '/bin/dav1d',
+               'denials': denied, 'protected_roles': roles, 'native_calls': calls, 'decoder_path': decoder,
                'profile_sha256': 'e' * 64, 'runtime_inventory_sha256': 'e' * 64, 'source_inventory_sha256': 'e' * 64}
     return {'schema': ptp.SCHEMA, 'scope': ptp.SCOPE, 'filesystem_proof': details,
             'decode': {'packet_sha256': 'c' * 64, 'decoded_frames': 2, 'rgb_frame_sha256': ['d' * 64] * 2,

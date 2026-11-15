@@ -9,17 +9,17 @@
   "allocations": [
     {
       "id": "readiness-intake",
-      "cpu_seconds": 17700,
+      "cpu_seconds": 18600,
       "gpu_seconds": 0,
       "state": "released",
       "parts": {
         "dataset_intake": 8100,
         "independent_source_copy": 1800,
         "annotation_preparation": 4200,
-        "root_repair_native_validation_and_orchestration": 3600
+        "root_repair_native_validation_and_orchestration": 4500
       },
       "accounting": "conservative phase ceiling; includes remote metadata checks and preparation; exact scientific fleet receipts recorded separately",
-      "amendment": "Previously15300CPU plus2400CPU source-only18-frame VISOR review preparation; intake8100, independentcopy1800, annotation4200, root3600. NoGPU/humanapproval/confirmationoutcomes.",
+      "amendment": "Previously15300CPU plus2400CPU source-only18-frame VISOR review preparation; intake8100, independentcopy1800, annotation4200, root3600. NoGPU/humanapproval/confirmationoutcomes. Rootpublicationallowance+900CPU prospectively for accepted4-job independent read-only archive cap720CPU; totalreadiness18600CPU/0GPU, same12hauthority.",
       "original_cpu_seconds": 10800
     },
     {
@@ -471,6 +471,67 @@
       "scoped_command_wall_seconds": 38.6644,
       "scoped_command_cpu_seconds": 38.4958,
       "deadline": "2026-11-15T03:30:00Z"
+    },
+    {
+      "job_id": "20261115T032830Z-e14124b6",
+      "purpose": "paid PTP1 tennis three-point native encode and full48 RGB parity",
+      "state": "complete_paid_tennis_accepted_full48_exact_oracle_pixels",
+      "cpu_ceiling_seconds": 1530,
+      "gpu_ceiling_seconds": 0,
+      "conservative_cpu_charge_seconds": 1530,
+      "code_revision": "b85b632c6c6efff598b50232d0d288dd004f3140",
+      "source_sha256": "17fdbb793eb154d7accadb339e3b0461ab0bd3b9883638e0f3c349d472bf37bf",
+      "snapshot_sha256": "909a771ba8f993e9ed9bf84150849ad4fcef3a4380d2f6f70b9b27c2c7d40f94",
+      "spec_sha256": "6df106f284276a1ea6b2d004e4bb3d307f2c36df8fb39580d310adcb3b38bcbc",
+      "deadline": "2026-11-15T05:00:00Z",
+      "submit_receipt": "/private/tmp/paid-tennis-submit-20261115.json",
+      "wait": "runner one canonical bounded ps-fleet wait <=1530s; no recurring polling",
+      "prior_unsubmitted_attempt": "gpu6 optional upload route rejected before job creation; verified default gpu1 transfer route used, no replay",
+      "archive_sha256": "66df76d85fa37f4228a7b50abaaa75b0e71dcf28639fcdd2b7c584960db0e418",
+      "stage_sha256": "40c13a6df8b352c4c8813ac31d50678fabc3d021b4e810ad95c3945481f10a0b",
+      "archive_bytes": 450560,
+      "packet_bytes": [
+        98350,
+        71152,
+        41485
+      ],
+      "placement_and_framing_bytes_each": 845,
+      "body_wall_seconds": 27.330308413133025,
+      "body_cpu_seconds": 27.234798,
+      "root_status_receipt": "/private/tmp/pointstream-paid-tennis-root-status-20261115.json",
+      "physical_acceptance": "Exact actual archive readback and all3 base/patch/aggregate/all48frame hashes; 18 substantive validator checks; OSqualification separate"
+    },
+    {
+      "job_id": "20261115T033551Z-4e33e029",
+      "purpose": "paid PTP1 egocentric full-range native fallback16to64 functional qualification",
+      "state": "complete_ego_fallback_accepted_full64_functional",
+      "cpu_ceiling_seconds": 1530,
+      "gpu_ceiling_seconds": 0,
+      "conservative_cpu_charge_seconds": 1530,
+      "code_revision": "b85b632c6c6efff598b50232d0d288dd004f3140",
+      "source_sha256": "17fdbb793eb154d7accadb339e3b0461ab0bd3b9883638e0f3c349d472bf37bf",
+      "snapshot_sha256": "909a771ba8f993e9ed9bf84150849ad4fcef3a4380d2f6f70b9b27c2c7d40f94",
+      "spec_sha256": "f173f556d696b767cab03b291f83d8aee303d1d6004eaaa8924b6ecbd381e0f6",
+      "hosts": [
+        "gpu1",
+        "gpu3",
+        "gpu5"
+      ],
+      "deadline": "2026-11-15T05:00:00Z",
+      "submit_receipt": "/private/tmp/paid-ego-compatible-submit-20261115.json",
+      "scope": "functional full-range64 fallback, no metric reuse or quality benefit claim",
+      "host": "gpu3",
+      "archive_sha256": "843917e89691e4149e9b24b3677d7c1e08f7dbbdc6ee845162aef99dd8be3684",
+      "stage_sha256": "c019de5c4607610ad3f8142593820d586c8dabe11ff30660b2f8f1f35159d276",
+      "archive_bytes": 358400,
+      "packet_bytes": 313310,
+      "native_base_bytes": 312620,
+      "patch_bytes": 0,
+      "body_wall_seconds": 33.68228209670633,
+      "body_cpu_seconds": 31.241673000000002,
+      "decoded_sha256": "56a5338913540c2ae31accc3e6f39453df56d73a1c63ebbe7f8734ae09f98ad6",
+      "physical_acceptance": "Actual originalarchive/stagehash/root64framehashagreement;1080p50/fullrange/allNone/patch0;score_reusefalse;noqualitybenefitclaim",
+      "root_status_receipt": "/private/tmp/pointstream-paid-ego-root-status-20261115.json"
     }
   ],
   "decisions": [
@@ -510,7 +571,7 @@
       "cpu_ceiling_seconds": 1530,
       "gpu_ceiling_seconds": 0,
       "deadline": "2026-11-15T05:00:00Z",
-      "state": "preflight_passed_not_submitted"
+      "state": "submitted_20261115T032830Z-e14124b6"
     },
     "ego": {
       "path": "/private/tmp/pointstream-paid-ego-spec-20261115.json",
@@ -518,7 +579,97 @@
       "cpu_ceiling_seconds": 1530,
       "gpu_ceiling_seconds": 0,
       "deadline": "2026-11-15T05:00:00Z",
-      "state": "preflight_passed_not_submitted"
+      "state": "unsubmitted_known_pre_ID_failure_gpu6_SSH_refused",
+      "amendment": "Prospectively widen to all verified compatible CPU hosts; EGO is functional and has no historical bitstream parity requirement. Same b85 algorithm/input/tool/affinity/budget. Preserve original spec and failed pre-ID receipt; no replay."
+    },
+    "ego_compatible": {
+      "path": "/private/tmp/pointstream-paid-ego-compatible-spec-20261115.json",
+      "spec_sha256": "f173f556d696b767cab03b291f83d8aee303d1d6004eaaa8924b6ecbd381e0f6",
+      "file_sha256": "4d748739edffd3085ee32f2532ee986dd36f9f051082cab42d11399a5554a93f",
+      "hosts": [
+        "gpu1",
+        "gpu3",
+        "gpu5"
+      ],
+      "state": "submitted_20261115T033551Z-4e33e029",
+      "cpu_ceiling_seconds": 1530,
+      "gpu_ceiling_seconds": 0,
+      "deadline": "2026-11-15T05:00:00Z",
+      "host_preflight": "All3 fresh indexed-affinity workers, native3tool hashesmatch32e, CPUheadroom122/29/251; gpu6 excluded unverified SSHrefused; noactive/pending sharedrequests",
+      "reason": "functional native fallback does not require historical tennis native bitstream parity; only host pool changes from known unsubmitted spec"
     }
+  },
+  "paid_tennis_postprocessing": {
+    "state": "accepted_exact_parity_score_reuse",
+    "reprice_sha256": "b8adeea366b7c12586b41d06e4998f32801bddf9b77df3d09cacafe146d8abc7",
+    "remote_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/ptp-reprice-e14124b6-20261115/analysis.json",
+    "host": "gpu1",
+    "cpu_affinity": 1,
+    "body_wall_seconds": 9.68,
+    "body_cpu_seconds": 9.45,
+    "strong_reference_sha256": "7f0b23002bc7d1d56cd1c60305326d5cf9497093d9de444690c77e89eccab16f",
+    "scope": "No new GPU; fresh original pinned32e public decode/physical parity on all3 paidpackets, then authenticated arrays with paidprices; rawexactfilesretained"
+  },
+  "receiver_policy_preflight": {
+    "state": "existing_gpu6_policy_not_portable_to_gpu1",
+    "receipt": "/private/tmp/pointstream-ptp-gpu1-policy-leaves-preflight-20261115.json",
+    "old_policy_sha256": "4fa67547b1288e46f979040f0de5315288bd8bfc5d6065e3b6abaeeee32bea1c",
+    "finding": "gpu6-only reviewed profile; gpu1 systemlibc hashes differ and off-runtime legacybuild/HTLmodelcaches absent. No denialjob submitted/no policy relaxed. Narrow CPU-only exact-path derivative under review, same Landlock mechanism, no new discovery/readpaths/models/GPU.",
+    "landlock_hosts": {
+      "gpu1": {
+        "kernel": "6.8.0-138-generic",
+        "landlock_abi": 4,
+        "errno": 0
+      },
+      "gpu3": {
+        "kernel": "6.8.0-138-generic",
+        "landlock_abi": 4,
+        "errno": 0
+      },
+      "gpu5": {
+        "kernel": "6.8.0-138-generic",
+        "landlock_abi": 4,
+        "errno": 0
+      }
+    },
+    "cpu_derivative_capture": {
+      "state": "capture_batch_running_once",
+      "hosts": [
+        "gpu1",
+        "gpu3",
+        "gpu5"
+      ],
+      "per_host_cpu_ceiling_seconds": 180,
+      "tool_internal_wall_and_cpu_caps_seconds": 120,
+      "source_tool": "experiments/tennis/ptp_cpu_policy_capture.py",
+      "scope": "Only explicitknownOSlogicalpathroles, actualhostresolvedpaths/hash/size; identical32eruntimeinventory, no discovery,newmodel,GPUor namespacewitness. Nineunusedexternalmodel/legacy/NVIDIAfiles and13GPUleaves dropped. Namespaceutilityhosthashrecaptured. Rootreviewactualcapturesrequired beforequalification.",
+      "capture_id": "20261115T035837Z-0c5340e4",
+      "tool_sha256": "f6b7950539b337bf3e053a602a19eebf204acd03d2a56156132bb3d7f57ad212",
+      "plan": "/private/tmp/pointstream-ptp-cpu-policy-20261115T035837Z-0c5340e4/plan.json",
+      "exec_handle": 67302,
+      "remote_parent": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/ptp-cpu-resource-policy-20261115T035837Z-0c5340e4",
+      "outer_host_wall_cap_seconds": 150,
+      "resource_note": "captureonly, nojob/no namespacewitness/noGPU; privatehostlocalCPU2/thread1"
+    }
+  },
+  "paid_pixel_evidence_archival": {
+    "state": "complete_independent_readback_verified",
+    "scope": "acceptedpixeloracle2jobs+paid2jobs+exactreprice raw evidence, originalsource/specs/runtime identities; priorballbundle72b24 supplieslargeoriginalsource inputs",
+    "new_publication_required": true,
+    "archive_sha256": "680bd79d5b55e6ed7469b266d8b69728ce5835463a8e70abd77cc2eaee92f434",
+    "archive_bytes": 34191360,
+    "members": 136,
+    "manifest_sha256": "aaa91ced3b56f4c729359c2497d93f010ce170d1ef717a19a1afca9d40e1ca73",
+    "body_wall_seconds": 1.45,
+    "body_cpu_seconds": 1.08,
+    "index": "docs/experiments/submission-ladder-paid-pixels-evidence-archive-20261115.json",
+    "permissions": "0444 files/0555newdirectory; not OSimmutability"
+  },
+  "verification_receiver_profile": {
+    "ruff": "configuredpassed",
+    "mypy": "configuredpassed640files",
+    "pytest": "2554passed37skipped existingfork/threadwarning",
+    "log": "/private/tmp/pointstream-paid-receiver-final-pytest.log",
+    "scope": "Includespaidreference/CPUderivation/basepolicy/live-linkvalidation+Linux/binfixturefix; noactualOSwitnessyet"
   }
 }
