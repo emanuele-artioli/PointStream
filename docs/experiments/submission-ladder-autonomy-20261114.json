@@ -1118,6 +1118,147 @@
       "accepted_closure_sha256": "a25465997421112a85192c35e502ea5afcc88078dcf8f088b6ee7b849ac51a91",
       "full_command_seconds": 204.3215310573578,
       "full_body_seconds": 158.90404001343995
+    },
+    {
+      "job_id": "20261115T082631Z-8331f54a",
+      "allocation": "ball-confirmation-sequential-memory-v2",
+      "source_id": "match269_000",
+      "state": "ROOT_accepted_complete64_six_bases_fresh_sender",
+      "cpu_ceiling_seconds": 10800,
+      "gpu_ceiling_seconds": 2700,
+      "wall_ceiling_seconds": 2700,
+      "deadline": "2026-11-15T09:30:00Z",
+      "spec_sha256": "b75aedd9a082d08c1c018b38cc74d2ac7a75d0f2d6f78179061a3919d7a4ee22",
+      "revision": "d5a544c49fe722d29504d46a741ee61a8bcd7be9",
+      "snapshot": {
+        "git_head": "d5a544c49fe722d29504d46a741ee61a8bcd7be9",
+        "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tracked_changes_included": [],
+        "tracked_changes_excluded": [
+          "docs/continuation-submission-ladder-2026-11-15.md",
+          "docs/experiments/submission-ladder-20261114.md",
+          "docs/experiments/submission-ladder-autonomy-20261114.json"
+        ],
+        "included_untracked_sha256": {},
+        "untracked_excluded_count": 3,
+        "untracked_excluded_paths_sha256": "7bdd523333e0b2a7f521fd97cde041a4af039bd6e6e6679d349f3ea6b84b8bf8",
+        "untracked_excluded_sample": [
+          "docs/cards/submission-ladder-ball-pixel-support-control-2026-11-15.md",
+          "experiments/tennis/ball_pixel_support_control.py",
+          "tests/test_ball_pixel_support_control.py"
+        ],
+        "deleted_paths": [],
+        "snapshot_sha256": "4d52820b9a95f0617a211304cc39b90c71fcf481812d7a9b3c9c75ed87849b61"
+      },
+      "submit_receipt": "/private/tmp/pointstream-confirmation-v2-match269_000-submit-20261115.json",
+      "submit_process_handle": 85002,
+      "acceptance_index": "docs/experiments/submission-ladder-confirmation-269-preparation-acceptance-20261115.json"
+    },
+    {
+      "job_id": "20261115T082635Z-4c193c5e",
+      "allocation": "ball-confirmation-sequential-memory-v2",
+      "source_id": "match235_000",
+      "state": "pending",
+      "cpu_ceiling_seconds": 10800,
+      "gpu_ceiling_seconds": 2700,
+      "wall_ceiling_seconds": 2700,
+      "deadline": "2026-11-15T09:30:00Z",
+      "spec_sha256": "103f08efe87eaa0decd7ebf88ae82ea009cc2182c288da327224a6c0ab8051d1",
+      "revision": "d5a544c49fe722d29504d46a741ee61a8bcd7be9",
+      "snapshot": {
+        "git_head": "d5a544c49fe722d29504d46a741ee61a8bcd7be9",
+        "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tracked_changes_included": [],
+        "tracked_changes_excluded": [
+          "docs/continuation-submission-ladder-2026-11-15.md",
+          "docs/experiments/submission-ladder-20261114.md",
+          "docs/experiments/submission-ladder-autonomy-20261114.json"
+        ],
+        "included_untracked_sha256": {},
+        "untracked_excluded_count": 3,
+        "untracked_excluded_paths_sha256": "7bdd523333e0b2a7f521fd97cde041a4af039bd6e6e6679d349f3ea6b84b8bf8",
+        "untracked_excluded_sample": [
+          "docs/cards/submission-ladder-ball-pixel-support-control-2026-11-15.md",
+          "experiments/tennis/ball_pixel_support_control.py",
+          "tests/test_ball_pixel_support_control.py"
+        ],
+        "deleted_paths": [],
+        "snapshot_sha256": "4d52820b9a95f0617a211304cc39b90c71fcf481812d7a9b3c9c75ed87849b61"
+      },
+      "submit_receipt": "/private/tmp/pointstream-confirmation-v2-match235_000-submit-20261115.json",
+      "submit_process_handle": 4847
+    },
+    {
+      "job_id": "20261115T084024Z-3565c8ec",
+      "allocation": "ball-confirmation-paid-controls",
+      "state": "canonical_complete_independent_audit_pending",
+      "spec_sha256": "06d4cf2dd7e5b3454776f5c28e80a4a5721cac110d8d8f081c743f4e36128130",
+      "submit_receipt": "/private/tmp/pointstream-confirmation-controls-209-submit-20261115.json",
+      "deadline": "2026-11-15T09:45:00Z",
+      "cpu_ceiling_seconds": 10800,
+      "gpu_ceiling_seconds": 0,
+      "snapshot": {
+        "git_head": "36d655b33900cd3f8ad51bb99dd18839d474f903",
+        "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tracked_changes_included": [],
+        "tracked_changes_excluded": [],
+        "included_untracked_sha256": {},
+        "untracked_excluded_count": 0,
+        "untracked_excluded_paths_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "untracked_excluded_sample": [],
+        "deleted_paths": [],
+        "snapshot_sha256": "6a1ad69353915bbfbc06854830009f653e23af34c29ca38ac9cc0803f1158382"
+      }
+    },
+    {
+      "job_id": "20261115T084021Z-5912cfc2",
+      "allocation": "ball-pixel-spatial-support",
+      "state": "smoke_passed_full_failed_inspection_pending",
+      "spec_sha256": "91c19eec4cee994f77b61232153fbc9646a19fe70f3c6b976aa5ca3a8e385093",
+      "submit_receipt": "/private/tmp/pointstream-spatial-support-submit-20261115.json",
+      "deadline": "2026-11-15T09:45:00Z",
+      "cpu_ceiling_seconds": 2430,
+      "gpu_ceiling_seconds": 2430,
+      "snapshot": {
+        "git_head": "36d655b33900cd3f8ad51bb99dd18839d474f903",
+        "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tracked_changes_included": [],
+        "tracked_changes_excluded": [],
+        "included_untracked_sha256": {},
+        "untracked_excluded_count": 0,
+        "untracked_excluded_paths_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "untracked_excluded_sample": [],
+        "deleted_paths": [],
+        "snapshot_sha256": "6a1ad69353915bbfbc06854830009f653e23af34c29ca38ac9cc0803f1158382"
+      }
+    },
+    {
+      "job_id": "20261115T084741Z-6fd19f74",
+      "allocation": "ball-confirmation-paid-controls",
+      "source_id": "match269_000",
+      "state": "submitted",
+      "spec_sha256": "02401f4aa2e95477ff5ec13e918a7ba7b0eeea026c072867bd828dfde2220cc1",
+      "submit_receipt": "/private/tmp/pointstream-confirmation-controls-269-submit-20261115.json",
+      "deadline": "2026-11-15T10:00:00Z",
+      "cpu_ceiling_seconds": 10800,
+      "gpu_ceiling_seconds": 0,
+      "wall_ceiling_seconds": 2700,
+      "snapshot": {
+        "git_head": "36d655b33900cd3f8ad51bb99dd18839d474f903",
+        "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tracked_changes_included": [],
+        "tracked_changes_excluded": [
+          "docs/experiments/submission-ladder-autonomy-20261114.json"
+        ],
+        "included_untracked_sha256": {},
+        "untracked_excluded_count": 1,
+        "untracked_excluded_paths_sha256": "1445795439869afac32c5b0e3dec8137f9b6eb14ac0e8fd3394d56deac80309f",
+        "untracked_excluded_sample": [
+          "docs/experiments/submission-ladder-confirmation-269-preparation-acceptance-20261115.json"
+        ],
+        "deleted_paths": [],
+        "snapshot_sha256": "6a1ad69353915bbfbc06854830009f653e23af34c29ca38ac9cc0803f1158382"
+      }
     }
   ],
   "decisions": [
@@ -1514,5 +1655,11 @@
     "gpu_ceiling_seconds": 2430,
     "qualifications": "same8.9metricclass/frozenweights/nativefull48paidreceiver andmetricparity BEFOREablations; actualannulus/centreframehash replay; GTpointcoverage diagnosticonly; sourcecohortcandidateunchanged",
     "checks": "configuredRuff/Mypy653andfull2602passed37skips,5focusedcontrols; no GPUyet"
-  }
+  },
+  "confirmation_new_stage_submit_handles": {
+    "controls209": 58804,
+    "spatial_support": 92311
+  },
+  "controls209_current_job": "20261115T084024Z-3565c8ec",
+  "spatial_support_current_job": "20261115T084021Z-5912cfc2"
 }
