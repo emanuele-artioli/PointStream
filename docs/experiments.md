@@ -1,5 +1,12 @@
 # Experiments
 
+Current scientific direction and stage order are in the [research brief](../RESEARCH.md)
+and [PLAN](../PLAN.md). The [v2 inference protocol](experiments/submission-ladder-protocol-20261115-v2.json)
+removes the10% usefulness floor and adds source-level inference and human visual
+pilots; the [v3 tennis-family amendment](experiments/submission-tennis-protocol-20261115-v3.json)
+sets the current combined-player/equipment/ball hypothesis. Dated rules/outcomes below remain historical; no old success threshold
+or closed budget silently overrides the current plan or releases a new run.
+
 ## Protocol
 
 GPU time and training are the constraint; code is cheap. Rank work by value to
@@ -35,9 +42,9 @@ the paper first and the demo second.
 6. **Stop when the decision is made.** Record the outcome below, including
    negative results.
 
-**Waiting time.** The agent's context stays cheap to resume for about an
-hour. Every stage the agent waits on is therefore sized to end within 45
-minutes. Smokes meet this already (fleet caps them at 600 s), and oracles and
+**Waiting time.** Cache lifetime is unknown unless the active client exposes it.
+The45-minute stage bound is an operational recovery rule, not a cache guarantee.
+Smokes meet this already (fleet caps them at600s), and oracles and
 pilots are scoped to it. A full run that needs longer is split into parts of
 at most 45 minutes: shards of its items, one job each, with the same
 specification apart from the item selection. Each part saves every finished
