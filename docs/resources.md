@@ -19,8 +19,9 @@ The fleet's own data root, holding `jobs/` and packed environments, is
 ## Datasets
 
 Two domains with real labels: **egocentric hand-object video** (hands, arms,
-the object in hand), worked on first, and **racket sports** (players, rackets,
-ball), worked on second ([PLAN.md](../PLAN.md)). Every dataset lives in
+the object in hand) and **racket sports** (players, rackets, ball). The original
+work began with egocentric video; the current scientific critical path is
+tennis foreground coding ([research brief](../RESEARCH.md), [PLAN](../PLAN.md)). Every dataset lives in
 `Datasets/<name>` as downloaded archives, never extracted onto the NFS home.
 Every dataset has an immutable manifest in `Datasets/manifests/` with each
 file's sha256, the source, licence, label format, counts, resolution, fps,

@@ -69,6 +69,14 @@ The older egocentric paid-mask analysis retains a narrow positive on small-foreg
 
 ## Timely research and manuscript decisions
 
+The numbered ordering in this section predates the user's tennis foreground
+priority and the full player-history audit. Use [RESEARCH](../../RESEARCH.md)
+and the [current PLAN](../../PLAN.md) for present decisions. In particular,
+paid ball pixels are the strongest established ball control, not a reason to
+discard or subordinate the existing generative-player positive. The historical
+negative for a whole-frame/ideal-background construction does not close the
+foreground-priority question. Numerical outcomes below remain unchanged.
+
 1. Receiver proof, engineering checks and independent archives now pass; preserve their exact scope. Further qualification should unlock a specific scientific decision.
 2. Finish the timed human-reference pilot and the fixed egocentric/whole-foreground reference sample. The three-match ball cohort is already frozen, scored and opened; use a new prospective cohort for any changed candidate.
 3. Carry at most one added representation per domain. Paid tracked pixels are the strongest current tennis development candidate; egocentric video has no promoted added representation. Reopening a failed patch, mask, background or generative route requires a changed limiting assumption and its own finite screen/budget.

@@ -1,5 +1,11 @@
 # Submission priorities after the November 15 review
 
+The [consolidated research brief](../RESEARCH.md) and [short current PLAN](../PLAN.md)
+now give the lead tennis player/racket/ball hypothesis and decision order. This
+continuation preserves the earlier same-day steps and detailed inputs; follow
+the current plan where its order differs. The former long PLAN is preserved
+losslessly with compatible section links, not silently deleted or reinterpreted.
+
 This is the current continuation record for the submission programme. It
 supersedes the ordering and usefulness threshold in earlier prospective plans,
 not their frozen experiment contracts or saved outcomes. The user requested

@@ -1,5 +1,12 @@
 # Experiments: current research disposition
 
+**Scope update, November15:** the closure below governs the preceding bounded
+allocation and its fixed experiments. The user's later player/racket/ball
+direction is now in [RESEARCH](../../RESEARCH.md) and [PLAN](../../PLAN.md).
+It supersedes the instruction to proceed only to manuscript revision, while
+preserving every old result and closed budget. No unused allocation, failed
+gate, training authority or automatic retry is reopened.
+
 ### 2026-11-14 — research decisions and remaining scope
 
 This decision map supersedes historical “pending” prose in PLAN. It distinguishes completed experiments from unresolved scientific questions. The bounded research decision is now closed: no further GPU experiment is needed or planned; the accepted80 archival closeout is complete; revise the manuscript. This does not complete the historical PLAN. The live budget ledger and current continuation govern closeout. User direction: finish worthwhile research before revising the manuscript; PRESLEY stays read-only. The approved programme remains24GPUh/28CPUh; no training, paid hosting or legacy200GPUh sweep.

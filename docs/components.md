@@ -1,5 +1,10 @@
 # Components
 
+This is architecture background, not the current qualification/status table.
+Use the [research brief](../RESEARCH.md) and [PLAN](../PLAN.md) for current
+successes, limits and priorities. Historical “to design” rows below do not
+override implemented codec endpoints or current experimental evidence.
+
 PointStream splits a video into **foreground** (people, the objects they handle,
 the ball) and **background**, and encodes each with the best tool for it. The
 components below are high level beyond segmentation. Background and foreground
