@@ -1,0 +1,36 @@
+{
+  "accounted_role_bytes": {
+    "frame": 23876,
+    "match": 1897395,
+    "reference": 366161,
+    "window": 2404
+  },
+  "cold_full_packet_kbps": 3816.3933333333334,
+  "declared_7200s_reuse_sensitivity_kbps": 46.31506222222222,
+  "decoder_source_sha256": "9629bc596923540cf9eb3e17ebcc6b1c2b3000de15cf5019c33e083153a69a64",
+  "duration_seconds": 4.8,
+  "match_plus_references_bytes": 2263556,
+  "native_fps": [
+    50,
+    1
+  ],
+  "native_frames": 240,
+  "packet_bytes": 2289836,
+  "packet_sha256": "eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4",
+  "procedure": "w8_payload.unpack_window(blob,hash_verified_profile); count returned sections and roles; scalar arithmetic only",
+  "profile_sha256": "bec98d67280e9f777a0d3cc110baa51ae2bf2c876aefe6b247d9691432f61107",
+  "python": "3.12.7",
+  "remaining_window_bytes": 26280,
+  "reuse_sensitivity_is_demonstrated_deployment": false,
+  "role_bytes_sum": 2289836,
+  "scope": "Exact retained W8 packet accounting; no new codec quality result or claim for the24framepairedtest",
+  "section_bytes": {
+    "ivf": 21963,
+    "judged": 30,
+    "kps": 1913,
+    "match": 1897395,
+    "ref0": 277749,
+    "ref1": 88412
+  },
+  "warning": "Do not assign this4.8secondpacket bill to a24framecontext, combine it with W7al028rates, or infer codec gains. A shorter valid packet and actual reference/update policy remain future work."
+}

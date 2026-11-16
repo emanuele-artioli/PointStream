@@ -1,5 +1,11 @@
 # Submission priorities after the November 15 review
 
+**November16 continuation:** [the implemented requalification and next release](experiments/player-requalification-20261116.md)
+now records actual input/checkpoint authentication, CPU tensor checks, a
+future-fit preprocessing correction and the prepared paired production worker.
+No new GPU quality or combined-codec result is reported. RESEARCH and PLAN
+remain the current front doors; the historical observations below are retained.
+
 **Later scope amendment:** [v4 and the actual-code re-audit](experiments/foreground-scope-and-requalification-20261115.md)
 make racket benefit optional for an explicitly player-and-ball primary claim.
 Older generic-model verdicts require raw-cell/conditioning/profile validation;

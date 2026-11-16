@@ -1,6 +1,6 @@
 # PointStream: current research direction
 
-Updated November 15, 2026. Start here for the scientific goal and evidence;
+Updated November 16, 2026. Start here for the scientific goal and evidence;
 [PLAN](PLAN.md) gives the next decisions. Dated experiment records retain their
 original protocols, failures and permissions. A closed allocation or failed
 fixed recipe does not close every version of the research question.
@@ -52,6 +52,16 @@ label changes across72 generic/adaptation cells; that bug does not explain the
 reported generic50%. Profile/coverage/resource joins and upstream preprocessing
 still need validation. Audit positive and negative recipes before a consequential
 decision; do not invent a corrected win share or invalidate all W7 quality.
+
+The [November16 implementation](docs/experiments/player-requalification-20261116.md)
+now authenticates the selected W8 source, conditioning and checkpoint bytes,
+joins12 saved adaptation receipts, and checks actual processor tensors on CPU.
+It fixes a pre-CLIP reference resize mismatch for future fitting; existing weights
+and results remain unchanged. Three paired production profiles and their fleet
+controller/specs are implemented with frozen inputs. The next short GPU replay
+needs a new bounded1.5GPU-hour/2CPU-hour release; none was launched. W8's later
+isolated1/3step execution passed, so do not restart from its older CUDA failure.
+Production30step learned decoding and a combined quality win remain unproved.
 
 After that check, use a small paired development replay of three existing
 profiles: released generic, common tennis-only and existing match-adapted

@@ -57,6 +57,13 @@ PROBE_T = 500  # the smoke's x0 check: one timestep, fixed noise, the same frame
 QUANT_MIN_VALUES = 1024  # g5c's: smaller tensors go as fp16
 
 
+def clip_reference_images(images: np.ndarray) -> list[Any]:
+    """Apply the pinned long-video pipeline's PIL resize before CLIP processing."""
+    from PIL import Image
+
+    return [Image.fromarray(image).resize((224, 224)) for image in images]
+
+
 def lora_config(targets: str, rank: int = LORA_RANK) -> Any:
     from peft import LoraConfig
 
@@ -268,7 +275,11 @@ class Trainer:
                 dist = self.vae.encode(x).latent_dist
                 means.append(dist.mean)
                 stds.append(dist.std)
-                clip = processor(images=list(images[first:first + 8]), return_tensors="pt").pixel_values
+                # Match pose2vid_long: its PIL RGB reference is resized to 224 square
+                # before CLIP preprocessing. Passing the tall crop directly instead
+                # causes CLIP's default centre crop to discard its top and bottom.
+                clip_images = clip_reference_images(images[first:first + 8])
+                clip = processor(images=clip_images, return_tensors="pt").pixel_values
                 embeds.append(self.encoder(clip.to(self.device, dtype=self.dtype)).image_embeds.float())
         return torch.cat(means), torch.cat(stds), torch.cat(embeds)
 
@@ -496,7 +507,8 @@ def command_fit(args: argparse.Namespace) -> int:
         "gpu_memory_limit_mib": limit, "settings": {"lora_rank": args.rank, "lora_alpha": args.rank, "quantize": args.quantize,
         "pose_guider_frozen": args.freeze_guider, "lora_lr": LORA_LR,
         "guider_lr": GUIDER_LR, "batch": BATCH, "accumulate": ACCUMULATE, "uncond": UNCOND_RATIO, "noise_offset": NOISE_OFFSET,
-        "snr_gamma": SNR_GAMMA, "scheduler": TRAIN_SCHEDULER, "size": [GEN_W, GEN_H]},
+        "snr_gamma": SNR_GAMMA, "scheduler": TRAIN_SCHEDULER, "size": [GEN_W, GEN_H],
+        "clip_reference_preprocess": "PIL RGB resize 224x224 default bicubic, then CLIPImageProcessor"},
         "inputs": {"fit_data": [sha256(Path(t)) for t in args.fit_data], "weights": {k: sha256(v) for k, v in sorted(weights.items())}},
         "seconds": round(time.time() - began, 2)})
     with tarfile.open(stage_dir() / "published.tar", "w") as tar:

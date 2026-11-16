@@ -1,0 +1,45 @@
+{
+  "source": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__000.mp4",
+    "size": 78396317,
+    "sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d"
+  },
+  "archives": [
+    {
+      "archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261023T194934Z-b0dcbb19/full/published.tar",
+      "archive_bytes": 48885760,
+      "archive_sha256": "075b001a3ae9dcc9fdda9fb81e4240aaf3a9da228d707ac58733db094d983285",
+      "member": "publish/tennis-base@fit-100.pt",
+      "member_bytes": 48878567,
+      "member_sha256": "85e3c65c9777b799f9ed0df3a5c8da567fe8a92e4ac83d115719527acb739eb4",
+      "candidate_unpacked_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261023T194934Z-b0dcbb19/full/publish/tennis-base@fit-100.pt",
+      "candidate_unpacked_exists": false
+    },
+    {
+      "archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T150848Z-a582ecc0/full/published.tar",
+      "archive_bytes": 15134720,
+      "archive_sha256": "cceb49b3d593c770e5b0d8dcd5d69b5b358bf88d76030cef8034674417907584",
+      "member": "publish/nk-C@fit-100-fp16.pt",
+      "member_bytes": 7562875,
+      "member_sha256": "525830aa39c14f3549084a422cda6cfc61cf1ad76b07b531dd899034e6f57570",
+      "candidate_unpacked_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T150848Z-a582ecc0/full/publish/nk-C@fit-100-fp16.pt",
+      "candidate_unpacked_exists": false
+    }
+  ],
+  "scope": "Remote CPU-only SHA256 of existing source, whole archives and exact tar members, read-only; no checkpoint tensor loading, extraction, local weights transfer, or GPU work.",
+  "limits": "Each source or archive <=100 MiB; archive plus selected member bytes <=100 MiB; sizes checked before reads.",
+  "job_status": {
+    "20261023T194934Z-b0dcbb19": {
+      "status": "complete",
+      "exit_code": 0,
+      "host": "gpu6"
+    },
+    "20261031T150848Z-a582ecc0": {
+      "status": "complete",
+      "exit_code": 0,
+      "host": "gpu5"
+    }
+  },
+  "original_model_weights": "Normal paths and declared SHA256 values are in asset-manifest.json installed_generic_generator_assets; not independently rehashed in this audit.",
+  "unpacked_path_scope": "Only full/publish/<member basename> was checked; absence there does not rule out other copies."
+}
