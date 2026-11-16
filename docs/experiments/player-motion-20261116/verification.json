@@ -1,0 +1,37 @@
+{
+  "base_revision": "d974e697f7f1aba0dbec66c30429f638d12e8039",
+  "checks": {
+    "actual_motion_inputs": "cpu-input-audit-labels.json",
+    "actual_source_conversion": "source-audit.json",
+    "focused": "controller/specs/preview/document contract tests pass",
+    "full_local_pytest": {
+      "passed": 2664,
+      "scope": "Final worker/player-label changes; later changes only derived records/documentation",
+      "seconds": 132.48,
+      "skipped": 39,
+      "warnings": 1
+    },
+    "independent_review": "Singleton player-label misattribution corrected; cost/length/dispatch contract reviewed",
+    "mypy": "configured pass,670 source files in pinned CI environment",
+    "ruff": "configured pass",
+    "schema1_plan": "Actual frozen plan digest unchanged"
+  },
+  "environment": "/private/tmp/pointstream-ci-env/bin/python",
+  "limits": [
+    "No real44/240frame model sampling or GPU cost qualification in this revision",
+    "No full generated-media viewer export",
+    "No fresh LPIPS/DISTS scores, paired conventional control or codec gain",
+    "No source-denied learned decoder or source-spread confirmation"
+  ],
+  "logs": [
+    "/private/tmp/player-replay-readiness-20261116/human-review-motion-labeled-full-pytest.log",
+    "/private/tmp/player-replay-readiness-20261116/human-review-motion-final-mypy.log"
+  ],
+  "schema": 1,
+  "selected_code_sha256": {
+    "experiments/tennis/player_requalification.py": "ab94371560e74c2159293ee494b73d32c7ab6bbd51a403f42a3631c97a51ad93",
+    "experiments/tennis/player_requalification_preview.py": "3954ac378079c2863e6f517f6a3520ff404e23d9c8218d6bdf6f34d0f6fba2da",
+    "experiments/tennis/player_requalification_specs.py": "3eafc14418489df5c8fd49dbda4fccad753dcd3ae3563e42848518ff3f982c17"
+  },
+  "status": "CPU_preparation_pass_GPU_unreleased"
+}

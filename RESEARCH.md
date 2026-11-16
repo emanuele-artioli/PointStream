@@ -61,18 +61,34 @@ and results remain unchanged. The subsequently approved **three-profile replay
 passed**: both players,24native ticks/profile, exact common conditioning, and
 bit-exact within-job smoke/full repeats. Conservative charges total1,203GPU/
 3,003CPUseconds; all jobs/claims are closed. The source-aligned blind human
-pilot is ready, with exact reference/source pixel checks and native/slowed
-views. Human review is pending. This qualifies the short renderer construction;
-it does not choose a model, establish longer temporal behavior, complete
-source-denied learned decoding, or demonstrate a combined codec win. W8's later
+pilot passed exact reference/source pixel checks and native/slowed viewing.
+The [user review](docs/experiments/player-replay-20261116/human-review-import.json)
+is now imported: Player 1 uncertain (common tennis and match adapted similar),
+Player 2 prefers common tennis; stock has reported over-sharpening and a
+torso-facing hallucination. **Common tennis is the provisional next candidate**;
+this is one author's development judgment on one match, not population preference
+or equivalence of the adapted profiles. The short pilot establishes neither
+longer temporal behavior, complete source-denied learned decoding nor a combined
+codec win. W8's later
 isolated1/3step execution also passed; do not restart from its older CUDA failure.
 
-After that check, use a small paired development replay of three existing
-profiles: released generic, common tennis-only and existing match-adapted
-weights. No new training is required to establish this comparison. Select the
-cheapest reliable profile from valid measured outputs, rather than automatically
-preferring the historically strongest fit. Per-player fitting, newer generators
-and live first-seconds adaptation remain conditional extensions.
+The stock failure is conditional on PointStream's paid body-only pose maps.
+The retained upstream DWPose drawer also renders dense face/hand cues and uses
+a different detector/visibility convention. Exact packet/tensor parity does
+not validate those cues against the source. Actual Player2 head/left-right
+accuracy and the cause of the failure remain unresolved; do not conclude that
+stock weights are intrinsically inferior. Fresh-pilot LPIPS/DISTS have not
+been computed, so metric disagreement is also unestablished.
+
+Next use the prepared [whole-run motion pilot](docs/experiments/player-motion-20261116.md):
+shared tennis, one continuous 240-frame call per player, with a real 44-frame
+smoke and a cost gate. Player 2 runs first because of the structural failure
+seen in the stock control. This proposed 70-GPU-minute/2-CPU-hour allocation
+is unreleased. It tests motion on the same opened source; the Al036 development
+source still needs source/frame/PTS and conditioning authentication before a
+separate source-spread test. Preserve stock failures and historical controls;
+do not repeat the three-profile grid without a new hypothesis. Per-player
+fitting, newer generators and live adaptation remain conditional extensions.
 
 The48.9MB common tennis LoRA was prospectively designed as a shipped decoder
 resource. It can be declared installed and frozen, with native/neural decoder
@@ -110,6 +126,10 @@ not already demonstrate that system. No new training is authorized by this brief
 - Show representative randomized, rate-labeled human pilots before crucial
   perceptual decisions. User development judgments do not establish population
   preference; source-only reference annotation must remain blind to codec outputs.
+- Report human-observed structural failures, including wrong torso orientation,
+  beside perceptual scores. Sharpness and aggregate metrics alone do not establish
+  correct anatomy or action. Preserve uncertain judgments rather than counting
+  them as wins, losses or ties.
 
 ## What not to repeat
 

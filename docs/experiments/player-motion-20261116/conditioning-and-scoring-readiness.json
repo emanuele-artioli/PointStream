@@ -1,0 +1,21 @@
+{
+  "conditioning": "Known body-only deviation from the retained fork whole-body drawing. Historical fork/checkpoint training relationship not independently requalified; actual source-cue accuracy unverified.",
+  "metric_readiness": {
+    "alexnet_sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+    "cpu_functions": [
+      "experiments.visor.h3b.lpips_reduce",
+      "experiments.visor.h3b.dists_crops",
+      "src.codecs.quality.load_lpips",
+      "src.codecs.quality.load_dists"
+    ],
+    "limits": "Historical identities only; availability, packaged heads, direct scorer and same-mask geometry not qualified. No inference, score or CPU-throughput forecast produced.",
+    "recorded_environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "vgg16_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
+  },
+  "selected_source_sha256": {
+    "/private/tmp/pointstream-aa-audit/animate_anyone/dwpose/__init__.py": "b73bde9edd1db5b2b6fc0eabc929242ca2dea16d2174d6bad76c58490a72d8f2",
+    "experiments/tennis/k6b.py": "e6439c80094ceb9b9c38d3a9482601115ffc2ed7df7f7ae5aa54714fb6ad54d1",
+    "experiments/tennis/w8_inputs.py": "6a90df71b2183147dd3880ba4001919f0aed5b36b7f0f427db529b4027bcad03"
+  },
+  "status": "read_only_followup_not_new_quality_measurement"
+}

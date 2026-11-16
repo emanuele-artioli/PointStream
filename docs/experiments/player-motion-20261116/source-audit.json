@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "status": "actual240frame_source_conversion_CPU_pass",
+  "source_sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d",
+  "records": [
+    {
+      "player": 2,
+      "source_crop_shape": [
+        240,
+        784,
+        512,
+        3
+      ],
+      "reference_max_rgb_deltas": [
+        0
+      ],
+      "source_crop_rgb_sha256": "5bc5c3144ef17cb2851f511b16f4337627d0063c85c11333107e7d061b2697e9"
+    },
+    {
+      "player": 1,
+      "source_crop_shape": [
+        240,
+        784,
+        512,
+        3
+      ],
+      "reference_max_rgb_deltas": [
+        0
+      ],
+      "source_crop_rgb_sha256": "f546c03d1881f7881056fa25f5806099f3a83e6239789514319fdbd9e144d17c"
+    }
+  ],
+  "wall_seconds": 21.835752292001416,
+  "process_cpu_seconds": 20.679952,
+  "process_peak_rss_bytes": 2693922816,
+  "scope": "Actual source-only cropping/colour/reference alignment; no generated240frame outputs or full display export have run"
+}

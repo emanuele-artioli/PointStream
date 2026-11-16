@@ -296,3 +296,157 @@ def test_staged_paths_are_portable_and_reject_missing_extra_or_escape(sample):
     (p.Path(bindings_a[0][1]) / "escape").symlink_to(tmp / "root-a" / "base")
     with pytest.raises(ValueError, match="escapes root"):
         p.load_config(*write(bad), bindings_a)
+
+
+def test_motion_lengths_and_contiguous_runs(sample, monkeypatch):
+    cfg, write, _ = sample
+    monkeypatch.setattr(p, 'GEN_H', 4)
+    monkeypatch.setattr(p, 'GEN_W', 3)
+    cfg.update(schema=2, scope='player-motion-development', native_frames={'smoke': 44, 'full': 240})
+    cfg.pop('match_checkpoint')
+    cfg['units'][0]['review_label'] = 'Player 2'
+    unit = cfg['units'][0]
+    arrays = {'reference': np.zeros((4, 3, 3), np.uint8), 'pose': np.ones((240, 4, 3, 3), np.uint8),
+              't': np.arange(240), 'run': np.zeros(240, np.int64), 'box': np.tile([0, 0, 3, 4], (240, 1))}
+
+    def save():
+        np.savez_compressed(unit['path'], **arrays)
+        unit['sha256'] = p.sha256(p.Path(unit['path']))
+
+    save()
+    loaded = p.load_config(*write(cfg))
+    for length in (44, 240):
+        plan, data = p.make_plan(loaded, 'a' * 64, 1, length)
+        assert plan['native_frames'] == length and len(data[0]['pose']) == length
+    assert p.make_plan(loaded, 'a' * 64, 1)[0]['native_frames'] == 240
+    assert p.make_plan(loaded, 'a' * 64, 1, 44)[0]['units'][0]['review_label'] == 'Player 2'
+    for label in (None, '', '  ', 'x' * 81, 'bad\nlabel', 5):
+        bad = copy.deepcopy(loaded)
+        if label is None:
+            bad['units'][0].pop('review_label')
+        else:
+            bad['units'][0]['review_label'] = label
+        with pytest.raises(ValueError, match='review label'):
+            p.make_plan(bad, 'a' * 64, 1, 44)
+    for length in (None, 24, 45):
+        with pytest.raises(ValueError):
+            p.selected_frames(loaded, length, required=True)
+    with pytest.raises(ValueError):
+        p.selected_frames({'schema': 1}, 44, required=True)
+    with pytest.raises(ValueError):
+        p.require_profile(loaded, 'original')
+    p.require_profile(loaded, 'tennis_only')
+    arrays['t'][20:] += 1
+    save()
+    with pytest.raises(ValueError, match='consecutive'):
+        p.make_plan(cfg, 'a' * 64, 1, 44)
+    arrays['t'] = np.arange(240)
+    arrays['run'][20:] = 1
+    save()
+    with pytest.raises(ValueError, match='one run'):
+        p.make_plan(cfg, 'a' * 64, 1, 44)
+
+
+def test_motion_crop_coverage_and_cli():
+    rng = np.random.default_rng(7)
+    crops = rng.integers(0, 256, (44, p.GEN_H, p.GEN_W, 3), dtype=np.uint8)
+    assert p.complete_crops(crops, 44)
+    assert not p.complete_crops(crops[:-1], 44)
+    assert not p.complete_crops(crops, 240)
+    args = p.argument_parser().parse_args(['run', '--config', '/a', '--config-sha256', 'x', '--profile',
+                                           'tennis_only', '--max-units', '2', '--native-frames', '44'])
+    assert args.native_frames == 44
+
+
+def test_motion_single_render_and_receipt(sample, monkeypatch):
+    import sys
+    import types
+
+    from experiments.audit import env_smoke
+
+    cfg, write, tmp = sample
+    monkeypatch.setattr(p, 'GEN_H', 4)
+    monkeypatch.setattr(p, 'GEN_W', 4)
+    cfg.update(schema=2, scope='player-motion-development', native_frames={'smoke': 44, 'full': 240})
+    cfg.pop('match_checkpoint')
+    cfg['units'][0]['review_label'] = 'Player 2'
+    unit = cfg['units'][0]
+    np.savez_compressed(unit['path'], reference=np.zeros((4, 4, 3), np.uint8),
+                        pose=np.ones((44, 4, 4, 3), np.uint8), t=np.arange(44),
+                        run=np.zeros(44, np.int64), box=np.tile([0, 0, 4, 4], (44, 1)))
+    unit['sha256'] = p.sha256(p.Path(unit['path']))
+    path, digest = write(cfg)
+    stage, scratch = tmp / 'stage2', tmp / 'scratch2'
+    stage.mkdir()
+    scratch.mkdir()
+    monkeypatch.setenv('PS_STAGE_DIR', str(stage))
+    monkeypatch.setenv('PS_SCRATCH_DIR', str(scratch))
+    monkeypatch.setenv('PS_GPU_MEMORY_LIMIT_MIB', '100')
+    cuda = types.SimpleNamespace(is_available=lambda: True,
+        get_device_properties=lambda _: types.SimpleNamespace(name='fake', major=8, minor=9, total_memory=1000 * 2**20),
+        set_per_process_memory_fraction=lambda _: None, max_memory_allocated=lambda: 20 * 2**20)
+    monkeypatch.setitem(sys.modules, 'torch', types.SimpleNamespace(cuda=cuda, __version__='fake',
+                        version=types.SimpleNamespace(cuda='fake'), set_num_threads=lambda _: None))
+    monkeypatch.setattr(env_smoke, 'model_on_cuda', lambda _: True)
+    monkeypatch.setattr(env_smoke, 'profile_cuda', lambda fn: (fn(), {'kernel_launches': 1}))
+    calls = []
+
+    class FakeRenderer:
+        def __init__(self, weights, profile, device, scratch_dir, fit=None, base=None, bits=0, cfg=None):
+            self.modules = {name: object() for name in ('vae', 'image_encoder', 'reference_unet', 'denoising_unet', 'pose_guider')}
+            self.record = {name: {'missing': 0, 'unexpected': 0} for name in self.modules}
+            self.record.update(profile='original', cfg=cfg, motion_module_keys=101,
+                               fit={'checkpoint_sha256': p.sha256(fit), 'base': None})
+            assert base is None and bits == 0
+
+        def render(self, reference, pose, steps, seed):
+            calls.append(len(pose))
+            result = np.zeros((len(pose), 4, 4, 3), np.uint8)
+            result[:, :, :2, 0] = 255
+            return result
+
+    monkeypatch.setattr(p, 'Renderer', FakeRenderer)
+    args = argparse.Namespace(config=path, config_sha256=digest, profile='tennis_only', max_units=1, native_frames=44)
+    p.run(args)
+    assert calls == [44]
+    receipt = json.loads((scratch / 'publish' / 'receipt.json').read_text())
+    assert (receipt['schema'], receipt['scope'], receipt['native_frames']) == (2, 'player-motion-development', 44)
+    p.validate_output(scratch / 'publish', cfg, digest, 'tennis_only', 1, 44)
+    receipt['native_frames'] = 240
+    (scratch / 'publish' / 'receipt.json').write_text(json.dumps(receipt))
+    with pytest.raises(ValueError, match='receipt'):
+        p.validate_output(scratch / 'publish', cfg, digest, 'tennis_only', 1, 44)
+
+
+def test_motion_smoke_cost_gate():
+    cfg = {'schema': 2, 'units': [{}]}
+    receipt = {'native_frames': 44, 'load_seconds': 20.0}
+    timing = {'worker_wall_seconds': 100.0}
+    dispatch = {'campaign_clock': {'budget_end': 2000.0}}
+    result = p.smoke_cost_gate(cfg, receipt, timing, dispatch, 100.0)
+    assert result['forecast_seconds'] == pytest.approx(1.25 * (20 + 80 * 240 / 44) + 90)
+    assert result['campaign_remaining_seconds'] == 1900
+    assert result['available_after_validator_reserve_seconds'] == 1840
+    for bad_cfg, bad_receipt, bad_timing, bad_dispatch, now in (
+        ({'schema': 2, 'units': [{}, {}]}, receipt, timing, dispatch, 100.0),
+        (cfg, {'native_frames': 240, 'load_seconds': 20}, timing, dispatch, 100.0),
+        (cfg, {'native_frames': 44, 'load_seconds': float('nan')}, timing, dispatch, 100.0),
+        (cfg, {'native_frames': 44, 'load_seconds': 101}, timing, dispatch, 100.0),
+        (cfg, receipt, {'worker_wall_seconds': float('inf')}, dispatch, 100.0),
+        (cfg, receipt, {'worker_wall_seconds': 300}, dispatch, 100.0),
+        (cfg, receipt, timing, {}, 100.0),
+        (cfg, receipt, timing, {'campaign_clock': {'budget_end': float('nan')}}, 100.0),
+        (cfg, receipt, timing, {'campaign_clock': {'budget_end': 140}}, 100.0),
+        (cfg, receipt, timing, {'campaign_clock': {'budget_end': 500}}, 100.0),
+    ):
+        with pytest.raises(ValueError):
+            p.smoke_cost_gate(bad_cfg, bad_receipt, bad_timing, bad_dispatch, now)
+
+
+def test_motion_config_requires_one_unit(sample):
+    cfg, write, _ = sample
+    cfg.update(schema=2, scope='player-motion-development', native_frames={'smoke': 44, 'full': 240})
+    cfg.pop('match_checkpoint')
+    cfg['units'].append(dict(cfg['units'][0], unit='other'))
+    with pytest.raises(ValueError, match='exactly one'):
+        p.load_config(*write(cfg))

@@ -1,8 +1,11 @@
 # Experiments: player requalification implementation and release
 
 **Current status:** all three approved GPU replays and independent audits pass.
-The source-aligned blind viewing pilot is ready; human review is pending.
-See the final entry and [live ledger](player-replay-20261116/release.json).
+The source-aligned [user review](player-replay-20261116/human-review-import.json)
+is imported: Player1 uncertain; Player2 prefers common tennis and reports a
+stock torso-facing hallucination. Common tennis is the provisional next
+candidate. See the [motion proposal](player-motion-20261116.md) and
+[live ledger](player-replay-20261116/release.json); the new allocation is unreleased.
 
 ### 2026-11-16 — CPU audit complete; paired GPU replay awaiting release
 

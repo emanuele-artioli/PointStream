@@ -1,0 +1,82 @@
+{
+  "authority": {
+    "approved": false,
+    "automatic_retries": false,
+    "max_cpu_seconds": 7200,
+    "max_gpu_seconds": 4200,
+    "new_models": false,
+    "training": false
+  },
+  "bounds": {
+    "external_cpu_seconds_per_request": 1500,
+    "full_seconds": 1500,
+    "request_budget_seconds": 2100,
+    "smoke_forecast_campaign_close_reserve_seconds": 60,
+    "smoke_forecast_multiplier": 1.25,
+    "smoke_forecast_next_stage_reserve_seconds": 90,
+    "smoke_seconds": 450,
+    "validator_seconds": 60
+  },
+  "hypothesis": "Shared-tennis reconstruction preserves player structure and useful motion across a full240-native-frame run on the opened nad000 development source.",
+  "next_input": "Budget approval after code preparation and checks; later source-aligned human full-run acceptability review.",
+  "not_claimed": [
+    "generalization",
+    "statistical superiority",
+    "codec rate-distortion gain",
+    "source-denied learned decoding",
+    "racket fidelity",
+    "real-time throughput"
+  ],
+  "release_gates": [
+    "User approves this concrete budget.",
+    "Freeze code revision after required checks and publish/read back immutable configs.",
+    "Inspect existing jobs and all eligible fleet hosts; use qualified Ada pool.",
+    "First request passes real44frame smoke output/device/kernel/cost gate before full240; accepted complete publication and remaining budget before request2.",
+    "Stop on correctness/cost/authority failure; never replay an uncertain submission."
+  ],
+  "requests": [
+    {
+      "cpu_lifecycle_cap_seconds": 2100,
+      "external_cpu_cap_seconds": 1500,
+      "gpu_cap_seconds": 2100,
+      "job_id": null,
+      "path": "docs/experiments/player-motion-20261116/player-2.json",
+      "player": 2,
+      "sha256": "e1d01c99f2b17718bf6aa4735761682e95801f4ee43d4f44f1e7d51567337e8a",
+      "status": "proposed_not_released",
+      "unit": "nadal_kyrgios__000_at120__person_000000000001"
+    },
+    {
+      "cpu_lifecycle_cap_seconds": 2100,
+      "external_cpu_cap_seconds": 1500,
+      "gpu_cap_seconds": 2100,
+      "job_id": null,
+      "path": "docs/experiments/player-motion-20261116/player-1.json",
+      "player": 1,
+      "sha256": "002c7cb6035a93e5d9567dd59fb070d8237c72c8ad2638c2dc1ffbfe9d45e92c",
+      "status": "proposed_not_released",
+      "unit": "nadal_kyrgios__000_at120__person_000000000000"
+    }
+  ],
+  "schema": 1,
+  "second_source": {
+    "candidate": "alcaraz_hurkacz/036@120",
+    "qualification_required": "Authenticate source-video bytes and exact source/window/PTS, prepared members and contiguous native ticks, training/duplicate exposure before a separate source-spread release.",
+    "status": "not_released_not_part_of_this_budget"
+  },
+  "status": "proposed_not_released",
+  "workload": {
+    "full_duration_per_player_seconds": 4.8,
+    "full_frames_per_request": 240,
+    "native_fps": [
+      50,
+      1
+    ],
+    "profiles": [
+      "tennis_only"
+    ],
+    "smoke_frames_per_request": 44,
+    "source_groups": 1,
+    "total_generated_crop_frames_including_smokes": 568
+  }
+}
