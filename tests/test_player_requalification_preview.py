@@ -33,6 +33,15 @@ def fixture(tmp_path, monkeypatch):
 
 def test_incomplete_preview_and_existing_output(tmp_path, monkeypatch):
     config, digest, folders = fixture(tmp_path, monkeypatch)
+    # This tests the review contract; native media are qualified separately.
+    def encode_stub(crops, path, fps):
+        assert crops.shape == (24, 16, 16, 3)
+        assert fps == 50
+        path.write_bytes(b'test display proxy')
+
+    monkeypatch.setattr(preview, 'encode', encode_stub)
+    monkeypatch.setattr(preview.shutil, 'which', lambda name: None)
+    monkeypatch.setattr(preview.subprocess, 'run', lambda *a, **k: pytest.fail('unexpected native executable'))
     output = tmp_path / 'preview'
     preview.build(config, digest, [], folders[:1], output, 1)
     page = (output / 'index.html').read_text()

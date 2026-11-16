@@ -1,5 +1,10 @@
 {
   "checks": {
+    "ci_first_attempt": {
+      "run": 43878106165,
+      "result": "2649passed,43skipped,1failed: review-contract unit test invoked optional ffmpeg, which is absent on CI",
+      "correction": "Review-contract test now stubs media encoding and forbids native subprocesses; actual16video ffprobe and browser qualification remain unchanged"
+    },
     "actual_source_alignment": "reference_max_RGB_deltas[0,0]",
     "browser": "all16readyState4; source andgenerated playback verified; preferencesblank; labels hidden",
     "final_focused": "7passed: experiment docs and preview contract tests",
