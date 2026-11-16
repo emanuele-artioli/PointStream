@@ -1,0 +1,16 @@
+{
+  "pid": 23979,
+  "root": "/Users/manu/Documents/PointStream-review/2026-11-16-player-replay/review",
+  "url": "http://127.0.0.1:54465/",
+  "started_utc": "2026-11-16T13:17:34.528447+00:00",
+  "expires_utc": "2026-11-16T14:02:34.528447+00:00",
+  "max_wall_seconds": 2700,
+  "cpu_soft_limit_seconds": 60,
+  "cpu_hard_limit_seconds": 65,
+  "read_only": true,
+  "recurring_model_calls": false,
+  "session_id": 24318,
+  "persistent_html": "/Users/manu/Documents/PointStream-review/2026-11-16-player-replay/review/index.html",
+  "browser_deliverable": "IAB tab1; labels hidden; preferences unanswered; source and generated playback verified",
+  "screenshot": "/Users/manu/.codex/visualizations/2026/11/14/01a1dabc-7ba6-7a92-a0a7-ef80ec33cddc/pointstream-player-replay-review-20261116.jpg"
+}

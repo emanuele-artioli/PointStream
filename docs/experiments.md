@@ -9,8 +9,9 @@ historical code requalification and bounded extra-domain policy. Dated rules/out
 or closed budget silently overrides the current plan or releases a new run.
 The [November16 implementation and exact next release](experiments/player-requalification-20261116.md)
 records authenticated W8 inputs/checkpoints, the corrected future-fit CLIP path,
-CPU tensor checks and the prepared three-profile GPU replay. It reports no new
-learned quality result and does not reopen expired compute allocations.
+CPU tensor checks and the completed approved three-profile GPU replay. All
+source/output/cost gates and within-job repeats pass; human viewing is pending.
+It reports no new compression-quality result and reopens no expired allocation.
 
 ## Protocol
 

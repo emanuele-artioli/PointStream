@@ -57,11 +57,15 @@ The [November16 implementation](docs/experiments/player-requalification-20261116
 now authenticates the selected W8 source, conditioning and checkpoint bytes,
 joins12 saved adaptation receipts, and checks actual processor tensors on CPU.
 It fixes a pre-CLIP reference resize mismatch for future fitting; existing weights
-and results remain unchanged. Three paired production profiles and their fleet
-controller/specs are implemented with frozen inputs. The next short GPU replay
-needs a new bounded1.5GPU-hour/2CPU-hour release; none was launched. W8's later
-isolated1/3step execution passed, so do not restart from its older CUDA failure.
-Production30step learned decoding and a combined quality win remain unproved.
+and results remain unchanged. The subsequently approved **three-profile replay
+passed**: both players,24native ticks/profile, exact common conditioning, and
+bit-exact within-job smoke/full repeats. Conservative charges total1,203GPU/
+3,003CPUseconds; all jobs/claims are closed. The source-aligned blind human
+pilot is ready, with exact reference/source pixel checks and native/slowed
+views. Human review is pending. This qualifies the short renderer construction;
+it does not choose a model, establish longer temporal behavior, complete
+source-denied learned decoding, or demonstrate a combined codec win. W8's later
+isolated1/3step execution also passed; do not restart from its older CUDA failure.
 
 After that check, use a small paired development replay of three existing
 profiles: released generic, common tennis-only and existing match-adapted

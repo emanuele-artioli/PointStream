@@ -54,10 +54,11 @@ are distinct. Opened cohorts cannot become confirmation for a changed method.
 
 **Stage A implementation:** [November16 requalification](docs/experiments/player-requalification-20261116.md)
 authenticates the selected source/conditioning/checkpoints, checks CPU processor
-tensors, corrects future-fit CLIP resizing and implements the three-profile
-production replay with frozen inputs. Its1.5GPU-hour/2CPU-hour release is pending;
-no new GPU/training or model-choice decision has occurred. The24frame context
-pilot admits longer viewing/testing, not a whole-codec or confirmation claim.
+tensors and corrects future-fit CLIP resizing. The approved three-profile GPU
+replay now passes all source/output/cost checks and within-job exact repeats,
+charged1,203GPU/3,003CPUseconds. The source-aligned blind viewing pilot is ready;
+human review and model choice remain pending. The24frame context pilot admits
+longer viewing/testing, not a whole-codec or confirmation claim. No training ran.
 
 | Stage | Deliverable | Admission/stop decision |
 |---|---|---|
@@ -112,7 +113,8 @@ decision requiring its own defensible contribution, not a second project now.
 |---|---|---|---|---|
 | Tennis contribution and history audit | [research brief](RESEARCH.md); [combined gaps](docs/experiments/submission-combined-foreground-gap-audit-20261115.md) | `codex/tennis-contribution-audit-20261115` | primary plus scoped reviewers; actual tier telemetry unverified | complete: PR429 merged with successful CI;423mergedPR metadata indexed and historical plan preserved |
 | Foreground scope and actual-code re-audit | [scope/repair record](docs/experiments/foreground-scope-and-requalification-20261115.md) | `codex/foreground-scope-and-evidence-audit-20261115` | primary plus scoped source reviewers; actual tier telemetry unverified | complete: PR430 merged28377fb5 with successfulCI; player-and-ball primary, racket optional, strict support/coverage/rational-FPS fixes |
-| Player requalification implementation | [exact inputs, code and release](docs/experiments/player-requalification-20261116.md); [PR431](https://github.com/emanuele-artioli/PointStream/pull/431) | `codex/player-requalification-20261116` | primary plus scoped builders/reviewer; actual tier telemetry unverified | CPU source/receipt/processor checks complete; future-fit correction and paired worker/specs implemented; configuredRuff/Mypy668/full2650passed39skipped;1.5GPU/2CPU-hour release pending |
+| Player requalification implementation | [exact inputs, code and release](docs/experiments/player-requalification-20261116.md); [PR431](https://github.com/emanuele-artioli/PointStream/pull/431) | `codex/player-requalification-20261116` | primary plus scoped builders/reviewer; actual tier telemetry unverified | CPU source/receipt/processor checks complete; future-fit correction and paired worker/specs implemented; configuredRuff/Mypy668/full2650passed39skipped; PR431 merged with successfulCI; subsequent replay recorded below |
+| Approved three-profile player replay and human pilot | [actual jobs and audits](docs/experiments/player-replay-20261116/release.json); [viewing delivery](docs/experiments/player-replay-20261116/review-delivery.json) | `codex/player-replay-release-20261116` | primary plus scoped audit/preview builders; actual tier telemetry unverified | all three complete/PASS;1,203GPU/3,003CPUseconds including conservativeexternalCPU; same conditioning and exact within-job repeats; source-reference RGBdelta0; human viewing pending; no codec win/model selection/new training |
 | Combined receiver/development pilot | stagesA–D above | — | unassigned | unreleased: exact inputs, source-independent contract and complete cost forecast precede budget approval |
 
 ### Dates and authority
@@ -129,8 +131,10 @@ schedule for a favorable sign. Preserve the empirical fallback paper.
 The automatic twelve-hour compute authority expired **November15,12:07:34CET
 /11:07:34UTC**. Its scientific jobs are closed; unused allocations
 are not reopened. No new GPU/training/paid hosting or filing is released by
-this audit. Local implementation, read-only audits and repository checks may
-continue. Check exact experiment IDs/status before acting; never replay unknown
+the earlier audit. The separately approved bounded replay is now complete;
+unused GPU/CPU allocations were not transferred to another experiment. Local
+implementation, read-only audits and repository checks may continue. Check
+exact experiment IDs/status before acting; never replay unknown
 submissions. [Original authority ledger](docs/experiments/submission-ladder-autonomy-20261114.json).
 
 A new session reads RESEARCH.md, this file and only the linked evidence needed
