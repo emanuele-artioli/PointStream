@@ -209,6 +209,8 @@ and the complete suite rerun. [Verification hashes and versions](player-requalif
 bind these checks to the actual implementation. No local CPU test certifies a
 GPU result.
 
+Implementation review: [PR431](https://github.com/emanuele-artioli/PointStream/pull/431).
+
 No model-choice, human-review, complete-codec or submission gate is passed by
 this implementation. The immediate external input needed after code review is
 the **new bounded compute release above**. Human viewing follows actual outputs.
