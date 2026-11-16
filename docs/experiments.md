@@ -7,6 +7,10 @@ pilots; the [v4 scope/requalification amendment](experiments/submission-tennis-p
 sets the current player-and-ball primary target, optional equipment extension,
 historical code requalification and bounded extra-domain policy. Dated rules/outcomes below remain historical; no old success threshold
 or closed budget silently overrides the current plan or releases a new run.
+The [November16 implementation and exact next release](experiments/player-requalification-20261116.md)
+records authenticated W8 inputs/checkpoints, the corrected future-fit CLIP path,
+CPU tensor checks and the prepared three-profile GPU replay. It reports no new
+learned quality result and does not reopen expired compute allocations.
 
 ## Protocol
 

@@ -1,6 +1,6 @@
 # Plan
 
-## Current direction — November 15, 2026
+## Current direction — November 16, 2026
 
 Start with [the research brief](RESEARCH.md). The lead hypothesis is a complete
 low-bitrate tennis codec combining generated players and a paid ball channel,
@@ -51,6 +51,13 @@ are distinct. Opened cohorts cannot become confirmation for a changed method.
   scoped negatives, not a rejection of generative players.
 
 ## Next work, in decision order
+
+**Stage A implementation:** [November16 requalification](docs/experiments/player-requalification-20261116.md)
+authenticates the selected source/conditioning/checkpoints, checks CPU processor
+tensors, corrects future-fit CLIP resizing and implements the three-profile
+production replay with frozen inputs. Its1.5GPU-hour/2CPU-hour release is pending;
+no new GPU/training or model-choice decision has occurred. The24frame context
+pilot admits longer viewing/testing, not a whole-codec or confirmation claim.
 
 | Stage | Deliverable | Admission/stop decision |
 |---|---|---|
@@ -104,7 +111,8 @@ decision requiring its own defensible contribution, not a second project now.
 | item | card / evidence | branch | model / review | status |
 |---|---|---|---|---|
 | Tennis contribution and history audit | [research brief](RESEARCH.md); [combined gaps](docs/experiments/submission-combined-foreground-gap-audit-20261115.md) | `codex/tennis-contribution-audit-20261115` | primary plus scoped reviewers; actual tier telemetry unverified | complete: PR429 merged with successful CI;423mergedPR metadata indexed and historical plan preserved |
-| Foreground scope and actual-code re-audit | [scope/repair record](docs/experiments/foreground-scope-and-requalification-20261115.md) | `codex/foreground-scope-and-evidence-audit-20261115` | primary plus scoped source reviewers; actual tier telemetry unverified | reported2026-11-15: player-and-ball primary, racket optional, strict support/coverage/rational-FPS fixes; pinnedRuff/Mypy659/full2628passed37skipped; no new scientific GPU/training |
+| Foreground scope and actual-code re-audit | [scope/repair record](docs/experiments/foreground-scope-and-requalification-20261115.md) | `codex/foreground-scope-and-evidence-audit-20261115` | primary plus scoped source reviewers; actual tier telemetry unverified | complete: PR430 merged28377fb5 with successfulCI; player-and-ball primary, racket optional, strict support/coverage/rational-FPS fixes |
+| Player requalification implementation | [exact inputs, code and release](docs/experiments/player-requalification-20261116.md) | `codex/player-requalification-20261116` | primary plus scoped builders/reviewer; actual tier telemetry unverified | CPU source/receipt/processor checks complete; future-fit correction and paired worker/specs implemented; configuredRuff/Mypy668/full2650passed39skipped;1.5GPU/2CPU-hour release pending |
 | Combined receiver/development pilot | stagesA–D above | — | unassigned | unreleased: exact inputs, source-independent contract and complete cost forecast precede budget approval |
 
 ### Dates and authority
@@ -118,8 +126,8 @@ result and reproducibility. Use December20–26 for final paper/artifact review.
 If a stage slips or fails, narrow the supported claim instead of extending the
 schedule for a favorable sign. Preserve the empirical fallback paper.
 
-The automatic twelve-hour compute authority expired **November15,08:07:34
-SãoPaulo /11:07:34UTC**. Its scientific jobs are closed; unused allocations
+The automatic twelve-hour compute authority expired **November15,12:07:34CET
+/11:07:34UTC**. Its scientific jobs are closed; unused allocations
 are not reopened. No new GPU/training/paid hosting or filing is released by
 this audit. Local implementation, read-only audits and repository checks may
 continue. Check exact experiment IDs/status before acting; never replay unknown

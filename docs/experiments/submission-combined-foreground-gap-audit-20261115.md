@@ -70,8 +70,12 @@ Exact records: `w9-inputs/w7-repaired-2h.json:6–185`, native means in
   ball rectangle in RGB; it cannot accept an arbitrary generated-player frame
   as its native base stream. W7's saved crops/composites and W8's exact CPU
   conditioning proof do not establish fresh isolated learned decoding. The
-  last W8 learned-runtime attempt failed at CUDA initialization before model
-  construction or sampling, not on observed fidelity. A combined container,
+  early November1 W8 learned-runtime attempt failed at CUDA initialization,
+  not on observed fidelity. **November16 correction:** later
+  `20261106T005057Z-77c276fa` passed real isolated1/3step model sampling with
+  kernel/tensor/denial receipts; no production30step quality witness followed.
+  See the [current receiver reuse audit](player-receiver-witness-design-20261116.md).
+  A combined container,
   generative resource contract and actual learned reconstruction remain work.
 - **Nonadditivity:** ball and player BD-rates use different sources, reference
   envelopes and common-quality intervals. They cannot be added, multiplied,
