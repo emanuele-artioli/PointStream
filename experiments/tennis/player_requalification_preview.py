@@ -15,7 +15,7 @@ import numpy as np
 from PIL import Image
 
 from experiments.tennis.player_requalification import (
-    PROFILES, SAFE, compare_receipts, digest_json, make_plan,
+    BASE_SHA, PROFILES, SAFE, compare_receipts, digest_json, make_plan,
     sha256,
 )
 
@@ -61,19 +61,36 @@ def authenticate(config_path: Path, config_hash: str, bindings: list[list[str]],
     config = resolve_units(json.loads(config_path.read_text()), bindings)
     receipts = [json.loads((p / "receipt.json").read_text()) for p in folders]
     profiles = [r.get("profile") for r in receipts]
+    motion = config.get("schema") == 2
+    if motion and (config.get("scope") != "player-motion-development" or config.get("native_frames") != {"smoke": 44, "full": 240}
+                   or len(folders) != 1 or profiles != ["tennis_only"]):
+        raise ValueError("motion preview requires one common-tennis publication")
     if len(folders) not in (1, 3) or len(set(profiles)) != len(profiles) or any(p not in PROFILES for p in profiles):
         raise ValueError("provide one profile or all three distinct profiles")
+    if motion:
+        receipt = receipts[0]
+        if (config.get("tennis_checkpoint", {}).get("sha256") != BASE_SHA
+                or receipt.get("fit_sha256") != BASE_SHA or receipt.get("base_sha256") is not None
+                or receipt.get("model_record", {}).get("fit", {}).get("checkpoint_sha256") != BASE_SHA
+                or receipt.get("model_record", {}).get("fit", {}).get("base") is not None):
+            raise ValueError("motion profile checkpoint lineage mismatch")
     if len(receipts) == 3:
         compare_receipts(receipts)
     units = receipts[0].get("plan", {}).get("units", [])
     if not units or len(units) != len(config.get("units", [])):
         raise ValueError("full ordered unit coverage required")
-    plan, arrays = make_plan(config, config_hash, len(units))
+    frames = receipts[0].get("native_frames") if motion else 24
+    if motion and frames not in (44, 240):
+        raise ValueError("invalid motion receipt length")
+    plan, arrays = (make_plan(config, config_hash, len(units), frames) if motion
+                    else make_plan(config, config_hash, len(units)))
     if plan["source"].get("native_fps") != [50, 1]:
         raise ValueError("preview requires the declared native 50 Hz")
     for folder, receipt in zip(folders, receipts):
         profile = receipt["profile"]
-        if (receipt.get("schema") != 1 or receipt.get("scope") != "24-native-frame-context-only"
+        if (receipt.get("schema") != (2 if motion else 1)
+                or receipt.get("scope") != ("player-motion-development" if motion else "24-native-frame-context-only")
+                or (motion and receipt.get("native_frames") != frames)
                 or receipt.get("plan") != plan or receipt.get("plan_sha256") != digest_json(plan)):
             raise ValueError("receipt plan mismatch")
         records = receipt.get("outputs")
@@ -95,7 +112,7 @@ def authenticate(config_path: Path, config_hash: str, bindings: list[list[str]],
                 if (set(result.files) != {"t", "box", "crops"}
                         or not np.array_equal(result["t"], data["t"])
                         or not np.array_equal(result["box"], data["box"])
-                        or result["crops"].shape != (24, *data["reference"].shape)
+                        or result["crops"].shape != (frames, *data["reference"].shape)
                         or result["crops"].dtype != np.uint8):
                     raise ValueError("output ticks, boxes or crops mismatch")
     return plan, arrays, receipts
@@ -120,9 +137,12 @@ def source_crops(source: Path, plan: dict[str, Any], arrays: list[dict[str, Any]
     info = plan["source"]
     if sha256(source) != info.get("source_video_sha256"):
         raise ValueError("source hash mismatch")
+    frames = len(plan["units"][0]["t"]) if plan["units"] else 0
+    if frames not in (24, 44, 240):
+        raise ValueError("unsupported source length")
     if (info.get("window") != "nadal_kyrgios/000@120" or info.get("width") != 1920
             or info.get("height") != 1080 or info.get("native_fps") != [50, 1]
-            or any(entry["t"] != list(range(24)) for entry in plan["units"])):
+            or any(entry["t"] != list(range(frames)) for entry in plan["units"])):
         raise ValueError("unsupported source window, geometry or tick offset")
     probe = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
                             "stream=width,height,r_frame_rate,avg_frame_rate,nb_frames",
@@ -142,16 +162,16 @@ def source_crops(source: Path, plan: dict[str, Any], arrays: list[dict[str, Any]
             references.append(box.copy())
     # Same K4 select/area/limited YUV420 conversion; no temporal resampling.
     raw = subprocess.run(["ffmpeg", "-v", "error", "-nostdin", "-threads", "1", "-i", str(source),
-                          "-frames:v", "24", "-vf", "select=between(n\\,0\\,23),scale=1920:1080:flags=area:out_range=tv,format=yuv420p",
+                          "-frames:v", str(frames), "-vf", f"select=between(n\\,0\\,{frames - 1}),scale=1920:1080:flags=area:out_range=tv,format=yuv420p",
                           "-filter_threads", "1", "-fps_mode", "passthrough", "-threads", "1", "-f", "rawvideo",
-                          "-pix_fmt", "yuv420p", "pipe:1"], capture_output=True, check=True, timeout=30).stdout
+                          "-pix_fmt", "yuv420p", "pipe:1"], capture_output=True, check=True, timeout=120 if frames > 24 else 30).stdout
     w, h = 1920, 1080
     size = w * h * 3 // 2
-    if len(raw) != size * 24:
+    if len(raw) != size * frames:
         raise ValueError("incomplete decoded source")
     source_arrays: list[list[np.ndarray]] = [[] for _ in arrays]
     deltas = []
-    for t in range(24):
+    for t in range(frames):
         frame = np.frombuffer(raw, dtype=np.uint8, count=size, offset=t * size)
         y = frame[:w*h].reshape(h, w).astype(np.float32)
         u = frame[w*h:w*h+w*h//4].reshape(h//2, w//2).astype(np.float32)
@@ -178,6 +198,9 @@ def source_crops(source: Path, plan: dict[str, Any], arrays: list[dict[str, Any]
 def build(config: Path, config_hash: str, bindings: list[list[str]], folders: list[Path],
           output: Path, seed: int, slow: int | None = None, source: Path | None = None) -> None:
     plan, arrays, receipts = authenticate(config, config_hash, bindings, folders)
+    motion = receipts[0].get("schema") == 2
+    if motion and source is None:
+        raise ValueError("motion preview requires authenticated source")
     if slow is not None and not 1 <= slow < 50:
         raise ValueError("slowed cadence must be 1–49 frames per second")
     if output.resolve().is_relative_to(Path(__file__).resolve().parents[2]):
@@ -220,18 +243,24 @@ def build(config: Path, config_hash: str, bindings: list[list[str]], folders: li
                 source_video += f'<p>Slowed playback: {slow} fps (changed cadence)</p><video controls loop preload="metadata" src="{unit}-source-{slow}.mp4"></video>'
             panels.insert(0, f'<div><b>Source player crop, native 50 Hz</b><p>Same per-tick boxes; preparation RGB conversion. Reference max RGB delta: {deltas[unit_index]}.</p>{source_video}<p>Exact source crop RGB still, tick 12</p><img src="{unit}-source-tick12.png"></div>')
         options = ''.join(f'<option>{chr(65+i)}</option>' for i in range(len(order))) if paired else ''
-        sections.append(f'<section><h2>Player {unit_index + 1} — ticks {entry["t"][0]}–{entry["t"][-1]}</h2>'
+        choices = ("<option>Acceptable</option><option>Not acceptable</option>" if motion else
+                   options + ("<option>Tie</option><option>None acceptable</option>" if paired else ""))
+        question = "Acceptability" if motion else "Preference"
+        heading = html.escape(entry["review_label"]) if motion else f"Player {unit_index + 1}"
+        sections.append(f'<section><h2>{heading} — ticks {entry["t"][0]}–{entry["t"][-1]}</h2>'
                         f'<div class="grid"><div><b>Reference crop, tick 0</b><p>Conditioning reference; not source-ground-truth video.</p><img src="{html.escape(unit)}-reference.png"></div>{"".join(panels)}</div>'
-                        f'<label>Preference <select data-unit="{html.escape(unit)}"><option value="">Unanswered</option>{options}{'<option>Tie</option><option>None acceptable</option>' if paired else ''}<option>Uncertain</option></select></label> '
+                        f'<label>{question} <select data-unit="{html.escape(unit)}"><option value="">Unanswered</option>{choices}<option>Uncertain</option></select></label> '
                         f'<label>Notes <input data-note="{html.escape(unit)}"></label></section>')
     # Reveal data remains local in the page; it is hidden, not cryptographically secret.
     reveal = json.dumps(mappings, ensure_ascii=True).replace("<", "\\u003c")
-    status = "Paired three-profile preview" if paired else "INCOMPLETE: one profile only; no paired comparison or ranking"
+    status = ("Unpaired common-tennis motion review" if motion else
+              "Paired three-profile preview" if paired else "INCOMPLETE: one profile only; no paired comparison or ranking")
+    frame_count = len(plan["units"][0]["t"])
     source_description = ("Source bytes authenticated; window starts at source frame 0; reference crops match exactly." if source else "Source video bytes are not checked by this preview; the source identity is a frozen-plan declaration.")
     page = f'''<!doctype html><meta charset="utf-8"><title>Player context review</title>
 <style>body{{font:16px sans-serif;margin:2em}}.grid{{display:flex;gap:1em;align-items:start}}.grid>div{{flex:1;min-width:0}}video,img{{width:100%}}section{{border-top:1px solid #aaa;padding:1em 0}}input{{width:20em}}</style>
-<h1>{status}</h1><p>Development evidence only. Model-context qualification; no codec or bitrate comparison. Each clip contains 24 native ticks (0.48 s at 50 Hz). Reference is a still crop, not source video. {source_description} The clips are individually controlled and may not play synchronously. The loop joins the last frame back to the first; that seam is not a temporal measurement. Videos are BT.709 display proxies; PNG stills retain exact generated RGB.</p>
-<p>Judge player body/clothing, pose, missing parts and stability. These are crops before foreground compositing; court texture is not the final coded background. Racket improvement is optional. Full-screen playback helps inspect detail.</p>
+<h1>{status}</h1><p>Development evidence only. Model-context qualification; no codec or bitrate comparison. Each clip contains {frame_count} native ticks ({frame_count / 50:g} s at 50 Hz). Reference is a still crop, not source video. {source_description} The clips are individually controlled and may not play synchronously. The loop joins the last frame back to the first; that seam is not a temporal measurement. Videos are BT.709 display proxies; PNG stills retain exact generated RGB.</p>
+<p>Judge facing direction and anatomy, player body/clothing, pose, missing parts and stability. These are crops before foreground compositing; court texture is not the final coded background. Racket improvement is optional. Full-screen playback helps inspect detail.</p>
 {''.join(sections)}<button id="reveal">Reveal profile labels</button><pre id="labels" hidden></pre><button id="export">Export review decisions</button>
 <script>const mapping={reveal};const status={json.dumps(status)};document.querySelector('#reveal').onclick=()=>{{document.querySelector('#labels').hidden=false;document.querySelector('#labels').textContent=JSON.stringify(mapping,null,2)}};document.querySelector('#export').onclick=()=>{{let units={{}};document.querySelectorAll('select[data-unit]').forEach(x=>units[x.dataset.unit]={{preference:x.value,notes:document.querySelector('input[data-note="'+x.dataset.unit+'"]').value}});let data={{scope:'user development review',status,plan_sha256:{json.dumps(digest_json(plan))},labels_revealed:!document.querySelector('#labels').hidden,units}};let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{{type:'application/json'}}));a.download='review-decisions.json';a.click();URL.revokeObjectURL(a.href)}};</script>'''
     (output / "index.html").write_text(page)

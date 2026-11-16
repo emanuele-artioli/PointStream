@@ -63,7 +63,9 @@ def resolve_staged(config: dict[str, Any], bindings: list[list[str]]) -> dict[st
         roots[name] = Path(raw_root).resolve(strict=True)
     result = copy.deepcopy(config)
     items = [*result.get("units", []), *result.get("weights", {}).values(),
-             result.get("tennis_checkpoint", {}), result.get("match_checkpoint", {})]
+             result.get("tennis_checkpoint", {})]
+    if "match_checkpoint" in result:
+        items.append(result["match_checkpoint"])
     used: set[str] = set()
     for item in items:
         value = item.get("path")
@@ -100,8 +102,11 @@ def load_config(path: Path, expected_sha: str, bindings: list[list[str]] | None 
     if not SHA.fullmatch(expected_sha) or not path.is_file() or sha256(path) != expected_sha:
         raise ValueError("config hash mismatch")
     config = resolve_staged(json.loads(path.read_text()), bindings or [])
-    if config.get("schema") != 1 or config.get("scope") != "paired-player-context-development":
+    if (config.get("schema"), config.get("scope")) not in ((1, "paired-player-context-development"), (2, "player-motion-development")):
         raise ValueError("invalid config schema or scope")
+    if config["schema"] == 2 and (config.get("native_frames") != {"smoke": 44, "full": 240}
+                                   or "match_checkpoint" in config):
+        raise ValueError("invalid motion lengths or unexpected match checkpoint")
     if config.get("settings") != SETTINGS or not math.isfinite(float(config["settings"]["cfg"])):
         raise ValueError("invalid rendering settings")
     source = config.get("source", {})
@@ -120,6 +125,8 @@ def load_config(path: Path, expected_sha: str, bindings: list[list[str]] | None 
     units = config.get("units")
     if not isinstance(units, list) or not units:
         raise ValueError("ordered units required")
+    if config["schema"] == 2 and len(units) != 1:
+        raise ValueError("motion development requires exactly one configured unit")
     names = [u.get("unit") for u in units]
     if len(set(names)) != len(names) or any(not isinstance(n, str) or not SAFE.fullmatch(n) for n in names):
         raise ValueError("unit names must be unique and file-safe")
@@ -128,14 +135,15 @@ def load_config(path: Path, expected_sha: str, bindings: list[list[str]] | None 
     for name, digest in PINNED_WEIGHTS.items():
         pinned_file(config["weights"][name], name, digest)
     pinned_file(config.get("tennis_checkpoint"), "tennis checkpoint", BASE_SHA)
-    match = config.get("match_checkpoint", {})
-    pinned_file(match, "match checkpoint")
-    if match.get("base_sha256") != BASE_SHA or match.get("match") != source["group"] or match.get("bits") != 4:
-        raise ValueError("match checkpoint base lineage and match required")
+    if config["schema"] == 1:
+        match = config.get("match_checkpoint", {})
+        pinned_file(match, "match checkpoint")
+        if match.get("base_sha256") != BASE_SHA or match.get("match") != source["group"] or match.get("bits") != 4:
+            raise ValueError("match checkpoint base lineage and match required")
     return config
 
 
-def context(unit: dict[str, Any]) -> dict[str, Any]:
+def context(unit: dict[str, Any], native_frames: int = CONTEXT_FRAMES) -> dict[str, Any]:
     path = pinned_file(unit, f"unit {unit['unit']}")
     if type(unit.get("run")) is not int or type(unit.get("start_t")) is not int or unit["run"] < 0 or unit["start_t"] < 0:
         raise ValueError("integer run and start_t required")
@@ -146,38 +154,47 @@ def context(unit: dict[str, Any]) -> dict[str, Any]:
     t, runs, boxes = data["t"], data["run"], data["box"]
     n = len(t)
     if (t.ndim != 1 or t.dtype.kind not in "iu" or runs.shape != (n,) or runs.dtype.kind not in "iu"
-            or n < CONTEXT_FRAMES or np.any(np.diff(t) <= 0) or np.any(runs < 0)
+            or n < native_frames or np.any(np.diff(t) <= 0) or np.any(runs < 0)
             or boxes.shape != (n, 4) or boxes.dtype.kind not in "fiu" or not np.isfinite(boxes).all()
             or np.any(boxes[:, 2:] <= 0)
             or data["reference"].shape != (GEN_H, GEN_W, 3) or data["reference"].dtype != np.uint8
             or data["pose"].shape != (n, GEN_H, GEN_W, 3) or data["pose"].dtype != np.uint8):
         raise ValueError("invalid unit array shape, dtype, ticks, or boxes")
-    rows = np.flatnonzero((t >= unit["start_t"]) & (t < unit["start_t"] + CONTEXT_FRAMES))
-    if (len(rows) != CONTEXT_FRAMES or not np.array_equal(t[rows], np.arange(unit["start_t"], unit["start_t"] + CONTEXT_FRAMES))
+    rows = np.flatnonzero((t >= unit["start_t"]) & (t < unit["start_t"] + native_frames))
+    if (len(rows) != native_frames or not np.array_equal(t[rows], np.arange(unit["start_t"], unit["start_t"] + native_frames))
             or not np.all(runs[rows] == unit["run"])):
-        raise ValueError("selected context must be 24 consecutive native ticks in one run")
+        raise ValueError("selected context must be consecutive native ticks in one run")
     return {"reference": data["reference"], "pose": data["pose"][rows], "t": t[rows], "box": boxes[rows]}
 
 
-def make_plan(config: dict[str, Any], config_sha: str, max_units: int) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+def make_plan(config: dict[str, Any], config_sha: str, max_units: int, native_frames: int | None = None) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     if type(max_units) is not int or max_units < 1 or max_units > len(config["units"]):
         raise ValueError("max-units must select an available ordered prefix")
-    all_arrays = [context(unit) for unit in config["units"]]
+    frames = selected_frames(config, native_frames)
+    all_arrays = [context(unit, frames) for unit in config["units"]]
     arrays = all_arrays[:max_units]
     units = []
     for unit, data in zip(config["units"], arrays):
         seed = int(hashlib.sha256(unit["unit"].encode()).hexdigest()[:7], 16) * 1009 + unit["run"]
-        units.append({"unit": unit["unit"], "npz_sha256": unit["sha256"], "run": unit["run"], "seed": seed,
-                      "t": data["t"].tolist(), "reference_sha256": array_sha(data["reference"]),
-                      "pose_sha256": array_sha(data["pose"]), "box_sha256": array_sha(data["box"])})
+        entry = {"unit": unit["unit"], "npz_sha256": unit["sha256"], "run": unit["run"], "seed": seed,
+                 "t": data["t"].tolist(), "reference_sha256": array_sha(data["reference"]),
+                 "pose_sha256": array_sha(data["pose"]), "box_sha256": array_sha(data["box"])}
+        if config.get("schema") == 2:
+            label = unit.get("review_label")
+            if not isinstance(label, str) or not label.strip() or len(label) > 80 or not label.isprintable():
+                raise ValueError("invalid motion review label")
+            entry["review_label"] = label
+        units.append(entry)
     plan = {"config_sha256": config_sha, "scope": config["scope"], "source": config["source"],
             "conditioning": config["conditioning"], "settings": SETTINGS, "units": units}
+    if config.get("schema") == 2:
+        plan["native_frames"] = frames
     return plan, arrays
 
 
-def complete_crops(crops: np.ndarray) -> bool:
+def complete_crops(crops: np.ndarray, native_frames: int = 24) -> bool:
     """Reject incomplete or flat crops; repeated static frames remain valid."""
-    return (crops.shape == (24, GEN_H, GEN_W, 3) and crops.dtype == np.uint8
+    return (crops.shape == (native_frames, GEN_H, GEN_W, 3) and crops.dtype == np.uint8
             and all(float(c.std()) > 5 for c in crops))
 
 
@@ -191,10 +208,33 @@ def profile_inputs(config: dict[str, Any], profile: str) -> tuple[Path | None, P
     raise ValueError("unknown profile")
 
 
+def selected_frames(config: dict[str, Any], native_frames: int | None, *, required: bool = False) -> int:
+    if config.get("schema") == 1:
+        if native_frames is not None:
+            raise ValueError("schema 1 forbids --native-frames")
+        return 24
+    if config.get("schema") != 2 or config.get("scope") != "player-motion-development" or config.get("native_frames") != {"smoke": 44, "full": 240}:
+        raise ValueError("invalid motion schema or lengths")
+    if native_frames is None:
+        if required:
+            raise ValueError("schema 2 requires --native-frames")
+        return 240
+    if type(native_frames) is not int or native_frames not in config["native_frames"].values():
+        raise ValueError("native frames must be a declared length")
+    return native_frames
+
+
+def require_profile(config: dict[str, Any], profile: str) -> None:
+    if config.get("schema") == 2 and profile != "tennis_only":
+        raise ValueError("motion development permits only tennis_only")
+
+
 def run(args: argparse.Namespace) -> None:
     worker_start, cpu_start = time.monotonic(), time.process_time()
     config = load_config(args.config, args.config_sha256, getattr(args, "staged", None))
-    plan, arrays = make_plan(config, args.config_sha256, args.max_units)
+    frames = selected_frames(config, getattr(args, "native_frames", None), required=True)
+    require_profile(config, args.profile)
+    plan, arrays = make_plan(config, args.config_sha256, args.max_units, frames if config["schema"] == 2 else None)
     fit, base = profile_inputs(config, args.profile)
     memory = int(os.environ.get("PS_GPU_MEMORY_LIMIT_MIB", "0"))
     if memory <= 0:
@@ -235,7 +275,7 @@ def run(args: argparse.Namespace) -> None:
         started = time.monotonic()
         crops, kernels = profile_cuda(lambda: renderer.render(data["reference"], data["pose"], 30, entry["seed"]))
         elapsed = time.monotonic() - started
-        if not complete_crops(crops):
+        if not complete_crops(crops, frames):
             raise ValueError("renderer output incomplete, invalid or flat")
         path = output / f"{entry['unit']}@{args.profile}.npz"
         temporary = output / f".{path.name}.tmp"
@@ -258,8 +298,11 @@ def run(args: argparse.Namespace) -> None:
                           "torch": str(torch.__version__), "cuda": str(torch.version.cuda)},
                "on_cuda": on_cuda, "model_record": renderer.record, "gpu_memory_limit_mib": memory,
                "gpu_peak_mib": torch.cuda.max_memory_allocated() / 2**20, "load_seconds": load_seconds, "outputs": records}
+    if config["schema"] == 2:
+        receipt.update({"schema": 2, "scope": "player-motion-development", "native_frames": frames,
+                        "base_role": "installed common tennis checkpoint", "match_lineage": None})
     (output / "receipt.json").write_text(json.dumps(receipt, sort_keys=True, default=str) + "\n")
-    validate_output(output, config, args.config_sha256, args.profile, args.max_units)
+    validate_output(output, config, args.config_sha256, args.profile, args.max_units, getattr(args, "native_frames", None))
     temporary_archive = stage / ".published.tar.tmp"
     with tarfile.open(temporary_archive, "w") as archive:
         archive.add(output, arcname="publish")
@@ -310,11 +353,14 @@ def check_model_record(model: dict[str, Any], profile: str, fit: Path | None) ->
         raise ValueError("tennis profile unexpectedly loaded a base twice")
 
 
-def validate_output(output: Path, config: dict[str, Any], config_sha: str, profile: str, max_units: int) -> dict[str, Any]:
-    plan, arrays = make_plan(config, config_sha, max_units)
+def validate_output(output: Path, config: dict[str, Any], config_sha: str, profile: str, max_units: int, native_frames: int | None = None) -> dict[str, Any]:
+    frames = selected_frames(config, native_frames, required=True)
+    require_profile(config, profile)
+    plan, arrays = make_plan(config, config_sha, max_units, native_frames)
     receipt = json.loads((output / "receipt.json").read_text())
     fit, base = profile_inputs(config, profile)
-    if (receipt.get("schema") != 1 or receipt.get("scope") != "24-native-frame-context-only"
+    if (receipt.get("schema") != config["schema"] or receipt.get("scope") != ("24-native-frame-context-only" if config["schema"] == 1 else "player-motion-development")
+            or (config["schema"] == 2 and receipt.get("native_frames") != frames)
             or receipt.get("profile") != profile or receipt.get("plan") != plan or receipt.get("plan_sha256") != digest_json(plan)
             or receipt.get("fit_sha256") != (sha256(fit) if fit else None)
             or receipt.get("base_sha256") != (sha256(base) if base else None)):
@@ -346,13 +392,42 @@ def validate_output(output: Path, config: dict[str, Any], config_sha: str, profi
             raise ValueError("output sidecar identity or kernel evidence mismatch")
         with np.load(path, allow_pickle=False) as result:
             if (set(result.files) != {"t", "box", "crops"} or not np.array_equal(result["t"], data["t"])
-                    or not np.array_equal(result["box"], data["box"]) or result["crops"].shape != (24, GEN_H, GEN_W, 3)
-                    or not complete_crops(result["crops"])
+                    or not np.array_equal(result["box"], data["box"]) or result["crops"].shape != (frames, GEN_H, GEN_W, 3)
+                    or not complete_crops(result["crops"], frames)
                     or sidecar.get("distinct_frame_count") != len({array_sha(c) for c in result["crops"]})):
                 raise ValueError("output ticks, boxes, crops or coverage mismatch")
     if {p.name for p in output.iterdir()} != expected_names:
         raise ValueError("unexpected or stale output files")
     return receipt
+
+
+def smoke_cost_gate(config: dict[str, Any], receipt: dict[str, Any], timing: dict[str, Any],
+                    dispatch: dict[str, Any], now: float) -> dict[str, Any]:
+    """Conservative admission heuristic; hard fleet timeouts remain authoritative."""
+    if config.get("schema") != 2 or len(config.get("units", [])) != 1 or receipt.get("native_frames") != 44:
+        raise ValueError("cost gate requires one-unit schema 2 smoke")
+    def positive(value: Any) -> float:
+        if type(value) not in (int, float) or not math.isfinite(value) or value <= 0:
+            raise ValueError("missing or invalid cost timing or campaign clock")
+        return float(value)
+
+    load = positive(receipt.get("load_seconds"))
+    wall = positive(timing.get("worker_wall_seconds"))
+    clock = dispatch.get("campaign_clock")
+    end = positive(clock.get("budget_end") if isinstance(clock, dict) else None)
+    now = positive(now)
+    if wall < load:
+        raise ValueError("worker wall shorter than model load")
+    remaining = end - now
+    available = remaining - 60
+    if available <= 0:
+        raise ValueError("campaign clock expired or lacks validator reserve")
+    forecast = 1.25 * (load + max(0, wall - load) * (240 / 44)) + 90
+    if not math.isfinite(forecast) or forecast > 1500 or forecast > available:
+        raise ValueError("full-stage forecast exceeds cap or remaining campaign time")
+    return {"forecast_seconds": forecast, "campaign_remaining_seconds": remaining,
+            "available_after_validator_reserve_seconds": available, "full_stage_cap_seconds": 1500,
+            "basis": "1.25*(load + (worker wall - load)*(240/44)) + 90 seconds; admission heuristic, not a completion guarantee"}
 
 
 def argument_parser() -> argparse.ArgumentParser:
@@ -364,7 +439,14 @@ def argument_parser() -> argparse.ArgumentParser:
         p.add_argument("--config-sha256", required=True)
         p.add_argument("--profile", choices=PROFILES, required=True)
         p.add_argument("--max-units", type=int, required=True)
+        p.add_argument("--native-frames", type=int)
         p.add_argument("--staged", nargs=2, action="append", default=[], metavar=("NAME", "PATH"))
+    plan = subs.add_parser("plan")
+    plan.add_argument("--config", type=Path, required=True)
+    plan.add_argument("--config-sha256", required=True)
+    plan.add_argument("--max-units", type=int, required=True)
+    plan.add_argument("--native-frames", type=int)
+    plan.add_argument("--staged", nargs=2, action="append", default=[], metavar=("NAME", "PATH"))
     subs.add_parser("validate-stage")
     return parser
 
@@ -372,7 +454,8 @@ def argument_parser() -> argparse.ArgumentParser:
 def main() -> None:
     parser = argument_parser()
     args = parser.parse_args()
-    if args.command == "validate-stage":
+    stage_validation = args.command == "validate-stage"
+    if stage_validation:
         dispatch = json.loads((Path(os.environ["PS_STAGE_DIR"]) / "dispatch.json").read_text())
         command = dispatch.get("command")
         if not isinstance(command, list) or len(command) < 4 or command[1:4] != ["-m", "experiments.tennis.player_requalification", "run"]:
@@ -380,6 +463,10 @@ def main() -> None:
         args = parser.parse_args(["validate", *command[4:]])
     if args.command == "run":
         run(args)
+    elif args.command == "plan":
+        config = load_config(args.config, args.config_sha256, args.staged)
+        plan, _ = make_plan(config, args.config_sha256, args.max_units, args.native_frames)
+        print(json.dumps(plan, sort_keys=True))
     else:
         config = load_config(args.config, args.config_sha256, getattr(args, "staged", None))
         scratch = Path(os.environ["PS_SCRATCH_DIR"])
@@ -393,9 +480,17 @@ def main() -> None:
         with tempfile.TemporaryDirectory(prefix="player-validate-", dir=scratch) as tmp:
             with tarfile.open(stage / "published.tar") as archive:
                 archive.extractall(tmp, filter="data")
-            validate_output(Path(tmp) / "publish", config, args.config_sha256, args.profile, args.max_units)
-        report = {"passed": True, "checks": {"complete_conditioning_and_ticks": True, "profile_lineage_and_cuda": True,
+            receipt = validate_output(Path(tmp) / "publish", config, args.config_sha256, args.profile, args.max_units, args.native_frames)
+        report: dict[str, Any] = {"passed": True, "checks": {"complete_conditioning_and_ticks": True, "profile_lineage_and_cuda": True,
                                              "output_hash_shape_and_nonflat": True}}
+        if stage_validation and config["schema"] == 2:
+            stage_name = os.environ.get("PS_STAGE", "")
+            expected_frames = {"smoke": 44, "full": 240}.get(stage_name)
+            if expected_frames is None or args.native_frames != expected_frames:
+                raise ValueError("motion stage and native frame count mismatch")
+            if stage_name == "smoke":
+                report["smoke_cost_gate"] = smoke_cost_gate(config, receipt, timing, dispatch, time.monotonic())
+                report["checks"]["smoke_cost_admission"] = True
         Path(os.environ["PS_VALIDATION_PATH"]).write_text(json.dumps(report) + "\n")
         print("validated complete paired-context profile output")
 

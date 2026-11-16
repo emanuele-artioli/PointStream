@@ -19,6 +19,7 @@
     "qualification_limit": "LoRA load/merge overhead not separately measured; its own production smoke remains mandatory"
   },
   "frozen_code_revision": "e9d0d000d0e7470d7b5d9b1edc878d7a835d9cdb",
+  "human_review": "human-review-import.json",
   "monitoring": {
     "active_jobs": [],
     "handles": [],
@@ -28,7 +29,7 @@
     "wait_max_seconds": 2700
   },
   "new_quality_or_rate_result": false,
-  "next_input": "Human source-aligned development viewing before model choice; no preference inferred byagent",
+  "next_input": "Approval of the new bounded shared-tennis whole-run motion allocation; no final confirmation model selected",
   "paired_plan_audit": "aggregate-paired-audit.json",
   "preflight_notes": [
     "Sandbox-only SSH DNS failed without dispatch; escalated probes reached hosts.",
@@ -107,7 +108,7 @@
   "review_delivery": "review-delivery.json",
   "schema": 1,
   "source_checkout": "/private/tmp/pointstream-player-replay-source-e9d0d000",
-  "status": "compute_complete_human_review_pending",
+  "status": "compute_complete_human_review_imported",
   "totals": {
     "cpu_cap_seconds": 7200,
     "cpu_conservative_seconds": 3003,

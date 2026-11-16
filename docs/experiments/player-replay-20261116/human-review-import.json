@@ -1,0 +1,58 @@
+{
+  "all_viewer_asset_hashes_pass": true,
+  "decision": {
+    "next": "Longer contiguous motion qualification of shared tennis; then source-spread and complete paid player-and-ball matched-baseline experiment.",
+    "provisional_lead": "tennis_only",
+    "reason": "Player2 explicitly preferred shared tennis; Player1 uncertain with tennis and match similar. No demonstrated marginal benefit of paid match adaptation in this pilot.",
+    "stock": "Retain observed over-sharpening and torso-facing error as human-reported failure; no universal rejection or guidance search."
+  },
+  "interpretation_limits": {
+    "agent_unblinded_check": "Source/stock/common exact tick12 PNGs viewed after import; supports the reported stock torso/arm-front-back inconsistency at that tick, not an additional independent human vote.",
+    "fresh_metrics": "LPIPS/DISTS not scored; no metric-disagreement claim.",
+    "stock_cause": "No intrinsic stock-weight verdict; no explicit inference RGB swap found by code inspection.",
+    "stock_input_scope": "Retained paid body-only COCO17-to-OpenPose18 maps, not the upstream dense face/hand DWPose rendering. Actual Player2 cue visibility/left-right correctness and causal explanation unverified."
+  },
+  "labels_revealed_in_export": false,
+  "original_private_path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/player-human-review-20261116-ae6858db9874/decisions-original.json",
+  "plan_sha256": "79b8b2913afbb3c7e47efa68b748ed6b2c78962d0f4763cf7a40571fe070d541",
+  "raw_export_bytes": 659,
+  "raw_export_sha256": "ae6858db9874ded9ddc66338fec28e6014ecfdf6e39d713f814177a0b54af161",
+  "review_artifact": "review-manifest.json",
+  "reviewer": "user; one author development judgment",
+  "rows": [
+    {
+      "labels": {
+        "A": "tennis_only",
+        "B": "match_adapted",
+        "C": "original"
+      },
+      "notes": "C sharpens a lot, more than real video. A and B are very similar.",
+      "player": 1,
+      "preference": "Uncertain",
+      "preferred_profile": null,
+      "unit": "nadal_kyrgios__000_at120__person_000000000000"
+    },
+    {
+      "labels": {
+        "A": "original",
+        "B": "tennis_only",
+        "C": "match_adapted"
+      },
+      "notes": "A sharpens a lot, but more problematically, does not understand the player is facing the camera, and instead renderes its back with the head turned to the camera.",
+      "player": 2,
+      "preference": "B",
+      "preferred_profile": "tennis_only",
+      "unit": "nadal_kyrgios__000_at120__person_000000000001"
+    }
+  ],
+  "schema": 1,
+  "scientific_scope": {
+    "duration_seconds": 0.48,
+    "native_frames_per_player": 24,
+    "players": 2,
+    "population_preference_test": false,
+    "source_groups": 1,
+    "source_reference_annotation": false
+  },
+  "state": "genuine_user_development_review_imported"
+}

@@ -56,9 +56,13 @@ are distinct. Opened cohorts cannot become confirmation for a changed method.
 authenticates the selected source/conditioning/checkpoints, checks CPU processor
 tensors and corrects future-fit CLIP resizing. The approved three-profile GPU
 replay now passes all source/output/cost checks and within-job exact repeats,
-charged1,203GPU/3,003CPUseconds. The source-aligned blind viewing pilot is ready;
-human review and model choice remain pending. The24frame context pilot admits
-longer viewing/testing, not a whole-codec or confirmation claim. No training ran.
+charged1,203GPU/3,003CPUseconds. The [source-aligned user review](docs/experiments/player-replay-20261116/human-review-import.json)
+is imported: Player1 uncertain; Player2 prefers common tennis and reports a
+stock torso-facing hallucination. Common tennis is the provisional development
+lead. The [next motion pilot](docs/experiments/player-motion-20261116.md) is
+implemented/prepared but unreleased: 44-frame smoke then one whole240-frame run
+per player, Player2 first, at most70GPUminutes/2CPUhours. The24frame pilot and
+author review establish neither a whole-codec nor confirmation result. No training ran.
 
 | Stage | Deliverable | Admission/stop decision |
 |---|---|---|
@@ -77,14 +81,25 @@ bound. Proposed stage descriptions are not dispatch authority or runtime forecas
 
 ## Model and scope choices
 
-Requalify existing generic, tennis-only and adapted recipes before choosing
-which one to promote. Historical comparisons guide this small replay but do
-not gate out a generic model. The common sport
+The generic, common-tennis and adapted short recipes are requalified and viewed.
+Prioritize common tennis for longer motion, without claiming a final method
+selection from two short player crops. The user found no clear need for paid
+match state in this pilot; stock's facing error is a retained diagnostic,
+not a universal rejection or permission for a new parameter sweep. Source-spread
+and complete paid codec comparisons still precede the confirmation freeze. The common sport
 model is a declared installed resource, with fair baseline resource accounting,
 footprint and cold initialization reported. Match adapters, guider changes,
 references and refreshes remain content-specific and paid. Preserve training
 overlap and the historical base-charged sensitivity. No model is reclassified
 as generic merely to erase a session cost.
+
+Preserve the stock conditioning qualification: retained body-only COCO/OpenPose
+maps omit dense face/hand cues drawn by the upstream DWPose path. Transport
+parity is not physical cue correctness, and the torso-facing cause is unresolved.
+A code audit finds no explicit reference RGB swap. The fresh24-frame outputs
+remain unscored by LPIPS/DISTS; a CPU scorer would need explicit judge-resource
+staging, a bounded cost pilot and source-aligned crop/mask semantics. No metric
+failure or inherent stock-weight failure is inferred from the human review.
 
 New fitting, per-player fitting, newer backbones and first-N-second adaptation
 are conditional extensions. A causal warm-up study must encode all initial
@@ -114,7 +129,8 @@ decision requiring its own defensible contribution, not a second project now.
 | Tennis contribution and history audit | [research brief](RESEARCH.md); [combined gaps](docs/experiments/submission-combined-foreground-gap-audit-20261115.md) | `codex/tennis-contribution-audit-20261115` | primary plus scoped reviewers; actual tier telemetry unverified | complete: PR429 merged with successful CI;423mergedPR metadata indexed and historical plan preserved |
 | Foreground scope and actual-code re-audit | [scope/repair record](docs/experiments/foreground-scope-and-requalification-20261115.md) | `codex/foreground-scope-and-evidence-audit-20261115` | primary plus scoped source reviewers; actual tier telemetry unverified | complete: PR430 merged28377fb5 with successfulCI; player-and-ball primary, racket optional, strict support/coverage/rational-FPS fixes |
 | Player requalification implementation | [exact inputs, code and release](docs/experiments/player-requalification-20261116.md); [PR431](https://github.com/emanuele-artioli/PointStream/pull/431) | `codex/player-requalification-20261116` | primary plus scoped builders/reviewer; actual tier telemetry unverified | CPU source/receipt/processor checks complete; future-fit correction and paired worker/specs implemented; configuredRuff/Mypy668/full2650passed39skipped; PR431 merged with successfulCI; subsequent replay recorded below |
-| Approved three-profile player replay and human pilot | [actual jobs and audits](docs/experiments/player-replay-20261116/release.json); [viewing delivery](docs/experiments/player-replay-20261116/review-delivery.json) | `codex/player-replay-release-20261116` | primary plus scoped audit/preview builders; actual tier telemetry unverified | all three complete/PASS;1,203GPU/3,003CPUseconds including conservativeexternalCPU; same conditioning and exact within-job repeats; source-reference RGBdelta0; human viewing pending; no codec win/model selection/new training |
+| Approved three-profile player replay and human pilot | [actual jobs and audits](docs/experiments/player-replay-20261116/release.json); [human review](docs/experiments/player-replay-20261116/human-review-import.json); [PR432](https://github.com/emanuele-artioli/PointStream/pull/432) | `codex/player-replay-release-20261116` | primary plus scoped audit/preview builders; actual tier telemetry unverified | all three complete/PASS;1,203GPU/3,003CPUseconds; PR432 merged with successfulCI. Human review imported: Player1 uncertain, Player2 common tennis preferred; stock torso-facing failure. Common tennis provisional, no codec win/new training |
+| Human-informed shared-tennis motion pilot | [decision and allocation](docs/experiments/player-motion-20261116.md); [exact proposal](docs/experiments/player-motion-20261116/proposal.json) | `codex/player-review-motion-20261116` | primary plus scoped builder/readiness audit; actual tier telemetry unverified | prepared, not released: two singleton44/240-frame requests on nad000, Player2 first; max4,200GPU/7,200CPUseconds; source-spread and complete learned receiver still subsequent |
 | Combined receiver/development pilot | stagesA–D above | — | unassigned | unreleased: exact inputs, source-independent contract and complete cost forecast precede budget approval |
 
 ### Dates and authority
@@ -132,7 +148,9 @@ The automatic twelve-hour compute authority expired **November15,12:07:34CET
 /11:07:34UTC**. Its scientific jobs are closed; unused allocations
 are not reopened. No new GPU/training/paid hosting or filing is released by
 the earlier audit. The separately approved bounded replay is now complete;
-unused GPU/CPU allocations were not transferred to another experiment. Local
+unused GPU/CPU allocations were not transferred to another experiment. The
+human-review import authorizes no computation; the new motion allocation needs
+its own approval. Local
 implementation, read-only audits and repository checks may continue. Check
 exact experiment IDs/status before acting; never replay unknown
 submissions. [Original authority ledger](docs/experiments/submission-ladder-autonomy-20261114.json).
