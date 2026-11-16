@@ -1,0 +1,90 @@
+{
+  "job_id": "20261116T124347Z-407d92df",
+  "gate": "PASS",
+  "status": "complete",
+  "source_revision": "e9d0d000d0e7470d7b5d9b1edc878d7a835d9cdb",
+  "source_sha256": "3a02487149f5b03a57fc2b2c9b26b2c20f8fac90e464dfa35c690d2e02351ba0",
+  "config_sha256": "eb67e4a972cde36895addef8db306c963423f814a31be7273a31c696ce5e98c6",
+  "host": "gpu5",
+  "gpu_uuid": "GPU-7754164a-33cd-265c-3696-c20966d228fe",
+  "timing_contaminated": true,
+  "whole_monitor_start_epoch": 1794833048.6756525,
+  "terminal_state_updated_epoch": 1794833469.2728963,
+  "whole_wall_seconds": 420.59724378585815,
+  "gpu_conservative_charge_seconds": 421,
+  "job_cpu_one_core_upper_seconds": 421,
+  "external_cpu_conservative_charge_seconds": 600,
+  "total_cpu_conservative_charge_seconds": 1021,
+  "phase_execution_seconds": {
+    "smoke": 127.93674659729004,
+    "full": 200.44051814079285
+  },
+  "phase_worker_timing": {
+    "smoke": {
+      "archive_sha256": "ba1c6b8f2e4c33ce55697301a21b178a1e0b56ba023bbb0b8ea7ab53b1fd621d",
+      "process_peak_rss": 14480572,
+      "scope": "run entry through archive hash; excludes interpreter startup and timing receipt write",
+      "worker_cpu_seconds": 122.01304188,
+      "worker_wall_seconds": 123.5511995125562
+    },
+    "full": {
+      "archive_sha256": "04518b719632329c1164263c9231f77740838cfef9f6dccfe6d5bfe34c409a21",
+      "process_peak_rss": 14509572,
+      "scope": "run entry through archive hash; excludes interpreter startup and timing receipt write",
+      "worker_cpu_seconds": 192.22858204,
+      "worker_wall_seconds": 195.63503661565483
+    }
+  },
+  "phase_cpu_affinity": {
+    "smoke": [
+      0
+    ],
+    "full": [
+      0
+    ]
+  },
+  "smoke_gate_seconds": 155.23881244659424,
+  "smoke_validator_seconds": 9.32125210762024,
+  "archive": {
+    "path": "/private/tmp/pointstream-player-replay-results-20261116/tennis_only/published.tar",
+    "bytes": 36147200,
+    "sha256": "04518b719632329c1164263c9231f77740838cfef9f6dccfe6d5bfe34c409a21"
+  },
+  "files": {
+    "nadal_kyrgios__000_at120__person_000000000000@tennis_only.json": {
+      "bytes": 4427,
+      "sha256": "a074285545b0265f5b896188391eaa1db6d825040e135b42f49a315cf8cbce46"
+    },
+    "nadal_kyrgios__000_at120__person_000000000000@tennis_only.npz": {
+      "bytes": 18321239,
+      "sha256": "d064a933380d480706ed6aa4de887795fad00179cbd6ea9202d54e6a48e3e8b8"
+    },
+    "nadal_kyrgios__000_at120__person_000000000001@tennis_only.json": {
+      "bytes": 4427,
+      "sha256": "f373e876726666e47a8dfaab49f0de81a0ec6e060e8c04b483d1ffc47d15cdb8"
+    },
+    "nadal_kyrgios__000_at120__person_000000000001@tennis_only.npz": {
+      "bytes": 17786148,
+      "sha256": "7843f4add0621b334ac52ba77ab05d7bff9d401507edddfdec4e6e5ab9dcdc57"
+    },
+    "receipt.json": {
+      "bytes": 12777,
+      "sha256": "fdb6155adc50582c434836c4e6ec8be2152a32c364f4de41ad11ab181564fcc4"
+    }
+  },
+  "local_output_validation": "PASS: frozen validate_output with physical conditioning and authenticated base checkpoint bindings; two units, 24 ticks, exact plan, boxes, crop coverage, receipt and hashes",
+  "fit_checkpoint_sha256": "85e3c65c9777b799f9ed0df3a5c8da567fe8a92e4ac83d115719527acb739eb4",
+  "base_loaded_twice": false,
+  "fit_pose_guider": "frozen (the profile's)",
+  "base_archive_sha256": "075b001a3ae9dcc9fdda9fb81e4240aaf3a9da228d707ac58733db094d983285",
+  "base_archive_path": "/private/tmp/pointstream-player-replay-results-20261116/resources/base-published.tar",
+  "base_member_path": "/private/tmp/pointstream-player-replay-results-20261116/resources/tennis-base@fit-100.pt",
+  "weights_environment": "Both staging records match frozen weights and spec environment hashes; no independent local model-weight rehash",
+  "cleanup": "recorded supervisor and process group absent; no task claim tokens found",
+  "metadata_path": "/private/tmp/pointstream-player-replay-results-20261116/tennis_only",
+  "limits": [
+    "Local validation uses frozen validator; no independent execution-host full validate-stage witness.",
+    "Shared GPU timing contaminated; not throughput evidence.",
+    "Output validation does not judge visual quality."
+  ]
+}

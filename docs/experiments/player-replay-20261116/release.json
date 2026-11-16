@@ -1,0 +1,121 @@
+{
+  "authority": {
+    "auto_retry": false,
+    "max_cpu_seconds": 7200,
+    "max_gpu_seconds": 5400,
+    "reply": "Approve the bounded replay",
+    "scope": "Existing original, tennis_only and match_adapted profiles; identical24nativeframecontexts, no new fitting or codec confirmation",
+    "training": false
+  },
+  "closed_compute_utc": "2026-11-16T13:31:02.447750+00:00",
+  "config_sha256": "eb67e4a972cde36895addef8db306c963423f814a31be7273a31c696ce5e98c6",
+  "created_utc": "2026-11-16T12:26:11.056359+00:00",
+  "date": "2026-11-16",
+  "first_gate": {
+    "decision": "PASS, release next existing profile",
+    "next_profile_gpu_cap_seconds": 1800,
+    "observed_whole_gpu_seconds": 421,
+    "one_point_cost_sensitivity_1_5_margin_seconds": 631.5,
+    "qualification_limit": "LoRA load/merge overhead not separately measured; its own production smoke remains mandatory"
+  },
+  "frozen_code_revision": "e9d0d000d0e7470d7b5d9b1edc878d7a835d9cdb",
+  "monitoring": {
+    "active_jobs": [],
+    "handles": [],
+    "mode": "attended; one canonical fleet wait per submitted job, max2700s; no recurring model timer",
+    "native_model_resume_verified": false,
+    "wait_job_id": "20261116T122900Z-2a9a4035",
+    "wait_max_seconds": 2700
+  },
+  "new_quality_or_rate_result": false,
+  "next_input": "Human source-aligned development viewing before model choice; no preference inferred byagent",
+  "paired_plan_audit": "aggregate-paired-audit.json",
+  "preflight_notes": [
+    "Sandbox-only SSH DNS failed without dispatch; escalated probes reached hosts.",
+    "agentctl gpu5 command preflight available; gpu6 not enrolled for agentctl. PointStream uses its independently verified native fleet workers on both hosts, with no remote agent session.",
+    "All six fleet hosts inspected; both compatible Ada hosts have fresh source_archive workers; existing job states read before submission."
+  ],
+  "profiles": {
+    "match_adapted": {
+      "audit": "match_adapted-audit.json",
+      "cpu_actual_charge_seconds": 961,
+      "cpu_cap_seconds": 2400,
+      "deadline": "2026-11-16T13:40:43.724043+00:00",
+      "external_cpu_cap_seconds": 600,
+      "external_cpu_conservative_charge_seconds": 600,
+      "gpu_actual_charge_seconds": 361,
+      "gpu_cap_seconds": 1800,
+      "job_id": "20261116T125758Z-5dd33301",
+      "result_directory": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261116T125758Z-5dd33301",
+      "source_sha256": "3a02487149f5b03a57fc2b2c9b26b2c20f8fac90e464dfa35c690d2e02351ba0",
+      "spec_path": "docs/experiments/player-replay-20261116/match_adapted.spec.json",
+      "spec_sha256": "13bbe1dc008460e5d8d1502bb7604edd87b363a06af4457c94722493b93f3a0d",
+      "status": "accepted_complete"
+    },
+    "original": {
+      "audit": "original-audit.json",
+      "cpu_actual_charge_seconds": 1021,
+      "cpu_cap_seconds": 2400,
+      "deadline": "2026-11-16T13:10:51.533592+00:00",
+      "external_cpu_cap_seconds": 600,
+      "external_cpu_conservative_charge_seconds": 600,
+      "gpu_actual_charge_seconds": 421,
+      "gpu_cap_seconds": 1800,
+      "host": "gpu6",
+      "job_id": "20261116T122900Z-2a9a4035",
+      "reported_event_ids": [
+        "60d5d3a28fcd5f4abbc777d5cd7bdec0",
+        "d4831616bd4756b1a45f42b40b3e1cef"
+      ],
+      "result_directory": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261116T122900Z-2a9a4035",
+      "shared_gpu_timing_contaminated": true,
+      "source_archive": true,
+      "source_sha256": "3a02487149f5b03a57fc2b2c9b26b2c20f8fac90e464dfa35c690d2e02351ba0",
+      "source_snapshot": {
+        "deleted_paths": [],
+        "git_head": "e9d0d000d0e7470d7b5d9b1edc878d7a835d9cdb",
+        "included_untracked_sha256": {},
+        "snapshot_sha256": "7542d51081c693c2873faf76cd9a6fefaef4b4670b09316d4feb217b85095903",
+        "tracked_changes_excluded": [],
+        "tracked_changes_included": [],
+        "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "untracked_excluded_count": 0,
+        "untracked_excluded_paths_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "untracked_excluded_sample": []
+      },
+      "spec_path": "docs/experiments/player-replay-20261116/original.spec.json",
+      "spec_sha256": "a1bd3b3c7ad4a31f5a0bddb26550f08d140358521984f6444b33e4c5009832a3",
+      "status": "accepted_complete"
+    },
+    "tennis_only": {
+      "audit": "tennis_only-audit.json",
+      "cpu_actual_charge_seconds": 1021,
+      "cpu_cap_seconds": 2400,
+      "deadline": "2026-11-16T13:26:30.385840+00:00",
+      "external_cpu_cap_seconds": 600,
+      "external_cpu_conservative_charge_seconds": 600,
+      "gpu_actual_charge_seconds": 421,
+      "gpu_cap_seconds": 1800,
+      "job_id": "20261116T124347Z-407d92df",
+      "result_directory": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261116T124347Z-407d92df",
+      "source_sha256": "3a02487149f5b03a57fc2b2c9b26b2c20f8fac90e464dfa35c690d2e02351ba0",
+      "spec_path": "docs/experiments/player-replay-20261116/tennis_only.spec.json",
+      "spec_sha256": "33c6dd30b810f619270c5dc0ce584cd7327bc7d27bb96ec1f12faef6a22618b6",
+      "status": "accepted_complete"
+    }
+  },
+  "review_delivery": "review-delivery.json",
+  "schema": 1,
+  "source_checkout": "/private/tmp/pointstream-player-replay-source-e9d0d000",
+  "status": "compute_complete_human_review_pending",
+  "totals": {
+    "cpu_cap_seconds": 7200,
+    "cpu_conservative_seconds": 3003,
+    "gpu_cap_seconds": 5400,
+    "gpu_conservative_seconds": 1203,
+    "unused_authority_reassigned": false,
+    "unused_cpu_seconds": 4197,
+    "unused_gpu_seconds": 4197
+  },
+  "within_job_repeat_audit": "duplicate-context-replay-audit.json"
+}

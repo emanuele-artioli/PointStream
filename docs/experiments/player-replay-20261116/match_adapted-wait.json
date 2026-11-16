@@ -1,0 +1,26 @@
+{
+  "reason": "attention",
+  "attention": true,
+  "waited_seconds": 186,
+  "max_seconds": 2700.0,
+  "jobs": [
+    {
+      "job_id": "20261116T125758Z-5dd33301",
+      "status": "complete",
+      "host": "gpu6",
+      "stage": "full",
+      "minutes_since_start": 5.7,
+      "minutes_since_progress": 1.7,
+      "attention": true,
+      "unacknowledged_event_ids": [
+        "fbf6fae6664a53bfb93a617a2d9d7096"
+      ],
+      "events": [
+        {
+          "id": "fbf6fae6664a53bfb93a617a2d9d7096",
+          "kind": "terminal:complete"
+        }
+      ]
+    }
+  ]
+}

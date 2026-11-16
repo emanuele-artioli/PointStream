@@ -1,0 +1,84 @@
+{
+  "job_id": "20261116T122900Z-2a9a4035",
+  "gate": "PASS",
+  "status": "complete",
+  "source_revision": "e9d0d000d0e7470d7b5d9b1edc878d7a835d9cdb",
+  "source_sha256": "3a02487149f5b03a57fc2b2c9b26b2c20f8fac90e464dfa35c690d2e02351ba0",
+  "config_sha256": "eb67e4a972cde36895addef8db306c963423f814a31be7273a31c696ce5e98c6",
+  "host": "gpu6",
+  "gpu_uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+  "timing_contaminated": true,
+  "whole_monitor_start_epoch": 1794832205.2185795,
+  "terminal_state_updated_epoch": 1794832626.095327,
+  "whole_wall_seconds": 420.87674736976624,
+  "gpu_conservative_charge_seconds": 421,
+  "job_cpu_one_core_upper_seconds": 421,
+  "external_cpu_conservative_charge_seconds": 600,
+  "total_cpu_conservative_charge_seconds": 1021,
+  "phase_execution_seconds": {
+    "smoke": 133.79888129234314,
+    "full": 195.24413681030273
+  },
+  "phase_worker_timing": {
+    "smoke": {
+      "archive_sha256": "c0c84287382bdadc4c1aa7d7e5e943405aee1c4f87ed4cfa0577e914cc43ba23",
+      "process_peak_rss": 14480972,
+      "scope": "run entry through archive hash; excludes interpreter startup and timing receipt write",
+      "worker_cpu_seconds": 127.66269131,
+      "worker_wall_seconds": 129.10867145471275
+    },
+    "full": {
+      "archive_sha256": "77dd9340b5b76ed3991d27ed1a1d773eea38e1970fd31b8270c3119e2effc214",
+      "process_peak_rss": 14510304,
+      "scope": "run entry through archive hash; excludes interpreter startup and timing receipt write",
+      "worker_cpu_seconds": 190.439460468,
+      "worker_wall_seconds": 190.93510046601295
+    }
+  },
+  "phase_cpu_affinity": {
+    "smoke": [
+      0
+    ],
+    "full": [
+      0
+    ]
+  },
+  "smoke_gate_seconds": 157.63551092147827,
+  "smoke_validator_seconds": 8.972919225692749,
+  "archive": {
+    "path": "/private/tmp/pointstream-player-replay-results-20261116/original/published.tar",
+    "bytes": 41799680,
+    "sha256": "77dd9340b5b76ed3991d27ed1a1d773eea38e1970fd31b8270c3119e2effc214"
+  },
+  "files": {
+    "nadal_kyrgios__000_at120__person_000000000000@original.json": {
+      "bytes": 4425,
+      "sha256": "f564891a334a52edf8d2b1b877f6abe0bdb5203a56d399064acfe6befed2bd7a"
+    },
+    "nadal_kyrgios__000_at120__person_000000000000@original.npz": {
+      "bytes": 21021658,
+      "sha256": "d1bb99b316c451d0b7ffd703f4079e1f9e1d458de2ab9d01b9e33d19c4768770"
+    },
+    "nadal_kyrgios__000_at120__person_000000000001@original.json": {
+      "bytes": 4425,
+      "sha256": "ff1e48e08987991ccd0b16a79fbe7ea14529b9b3f1a2077c06ca1d9ebb249ad0"
+    },
+    "nadal_kyrgios__000_at120__person_000000000001@original.npz": {
+      "bytes": 20744542,
+      "sha256": "df7fd66e12b6eb54e4a964977c64b7fb732fe82db3dc79f8d1aea8fb688106c1"
+    },
+    "receipt.json": {
+      "bytes": 12435,
+      "sha256": "2cf19595c64d2c12ab05237b5f0b8614187de911eb956d0e3551079f19d53562"
+    }
+  },
+  "local_output_validation": "PASS: frozen validate_output with physical conditioning bindings; two units, 24 ticks, exact plan, boxes, crop coverage, receipt and hashes",
+  "weights_environment": "Both staging records match frozen weights and spec environment hashes; no independent local model-weight rehash",
+  "cleanup": "recorded supervisor and process group absent; no task claim tokens found",
+  "metadata_path": "/private/tmp/pointstream-player-replay-results-20261116/original",
+  "limits": [
+    "Local validation uses frozen validator; no independent execution-host full validate-stage witness.",
+    "Shared GPU timing contaminated; not throughput evidence.",
+    "Conditioning and output validation does not judge visual quality."
+  ]
+}

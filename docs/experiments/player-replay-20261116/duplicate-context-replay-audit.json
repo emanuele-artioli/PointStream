@@ -1,0 +1,51 @@
+{
+  "scope": "Repeated first-unit archived smoke versus full within each job; actual ticks, boxes and RGB arrays. No model or GPU calls. Same complete 24-frame context, seed and device within each job.",
+  "profiles": {
+    "original": {
+      "job_id": "20261116T122900Z-2a9a4035",
+      "smoke_archive_bytes": 21043200,
+      "smoke_archive_sha256": "c0c84287382bdadc4c1aa7d7e5e943405aee1c4f87ed4cfa0577e914cc43ba23",
+      "smoke_npz_sha256": "d1bb99b316c451d0b7ffd703f4079e1f9e1d458de2ab9d01b9e33d19c4768770",
+      "full_npz_sha256": "d1bb99b316c451d0b7ffd703f4079e1f9e1d458de2ab9d01b9e33d19c4768770",
+      "seed": 258705821133,
+      "ticks_equal": true,
+      "boxes_equal": true,
+      "max_abs_rgb_difference": 0,
+      "differing_rgb_values": 0,
+      "rgb_value_count": 28901376,
+      "bit_exact": true
+    },
+    "tennis_only": {
+      "job_id": "20261116T124347Z-407d92df",
+      "smoke_archive_bytes": 18350080,
+      "smoke_archive_sha256": "ba1c6b8f2e4c33ce55697301a21b178a1e0b56ba023bbb0b8ea7ab53b1fd621d",
+      "smoke_npz_sha256": "d064a933380d480706ed6aa4de887795fad00179cbd6ea9202d54e6a48e3e8b8",
+      "full_npz_sha256": "d064a933380d480706ed6aa4de887795fad00179cbd6ea9202d54e6a48e3e8b8",
+      "seed": 258705821133,
+      "ticks_equal": true,
+      "boxes_equal": true,
+      "max_abs_rgb_difference": 0,
+      "differing_rgb_values": 0,
+      "rgb_value_count": 28901376,
+      "bit_exact": true
+    },
+    "match_adapted": {
+      "job_id": "20261116T125758Z-5dd33301",
+      "smoke_archive_bytes": 18493440,
+      "smoke_archive_sha256": "8e3a3c63dc753ae1ea4cde25da5483e01cbb3df2a531cbe487b1335ba9e2da4b",
+      "smoke_npz_sha256": "2773106abf93c51cfe3b637e9a346b4440ea160435214448ddbf871bf2910496",
+      "full_npz_sha256": "2773106abf93c51cfe3b637e9a346b4440ea160435214448ddbf871bf2910496",
+      "seed": 258705821133,
+      "ticks_equal": true,
+      "boxes_equal": true,
+      "max_abs_rgb_difference": 0,
+      "differing_rgb_values": 0,
+      "rgb_value_count": 28901376,
+      "bit_exact": true
+    }
+  },
+  "limitations": [
+    "No cross-device comparison or quality ranking.",
+    "Not source-denied decoding or a full 240-frame prefix comparison."
+  ]
+}

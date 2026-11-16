@@ -1,0 +1,88 @@
+{
+  "job_id": "20261116T122900Z-2a9a4035",
+  "status": "running",
+  "events": [
+    {
+      "id": "60d5d3a28fcd5f4abbc777d5cd7bdec0",
+      "kind": "contention:1794832437.0162606",
+      "timestamp": 1794832437.0162606,
+      "status": {
+        "status": "running",
+        "started": 1794832205.2185795,
+        "last_progress": 1794832376.614342,
+        "emitted": [
+          "contention:1794832205.3882744"
+        ],
+        "gpu_sharing": {
+          "mode": "shared",
+          "basis": "Model/conditioning correctness only; wall times are contaminated and cannot establish speed.",
+          "margin_mib": 8192
+        },
+        "timing_contaminated": true,
+        "pid": 3710131,
+        "proc_start_time": 1794832205.34,
+        "process_group_id": 3710131,
+        "contention": [
+          {
+            "detected": 1794832205.3882744,
+            "action": "continue",
+            "foreign_gpu_pids": [
+              3604313
+            ],
+            "cleared": 1794832396.749326
+          },
+          {
+            "detected": 1794832437.0162606,
+            "action": "continue",
+            "foreign_gpu_pids": [
+              3788730
+            ]
+          }
+        ],
+        "foreign_gpu_pids": [
+          3788730
+        ],
+        "progress": {
+          "stage": "full",
+          "completed": 0,
+          "updated": 1794832372.8515317,
+          "decision": null
+        }
+      },
+      "one_shot": true
+    },
+    {
+      "id": "d4831616bd4756b1a45f42b40b3e1cef",
+      "kind": "contention:1794832205.3882744",
+      "timestamp": 1794832205.3882744,
+      "status": {
+        "status": "running",
+        "started": 1794832205.2185795,
+        "last_progress": 1794832205.2185798,
+        "emitted": [],
+        "gpu_sharing": {
+          "mode": "shared",
+          "basis": "Model/conditioning correctness only; wall times are contaminated and cannot establish speed.",
+          "margin_mib": 8192
+        },
+        "timing_contaminated": true,
+        "pid": 3710131,
+        "proc_start_time": 1794832205.34,
+        "process_group_id": 3710131,
+        "contention": [
+          {
+            "detected": 1794832205.3882744,
+            "action": "continue",
+            "foreign_gpu_pids": [
+              3604313
+            ]
+          }
+        ],
+        "foreign_gpu_pids": [
+          3604313
+        ]
+      },
+      "one_shot": true
+    }
+  ]
+}

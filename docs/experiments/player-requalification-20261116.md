@@ -1,5 +1,9 @@
 # Experiments: player requalification implementation and release
 
+**Current status:** all three approved GPU replays and independent audits pass.
+The source-aligned blind viewing pilot is ready; human review is pending.
+See the final entry and [live ledger](player-replay-20261116/release.json).
+
 ### 2026-11-16 — CPU audit complete; paired GPU replay awaiting release
 
 The next research action is a **paired comparison of three existing player
@@ -214,3 +218,82 @@ Implementation review: [PR431](https://github.com/emanuele-artioli/PointStream/p
 No model-choice, human-review, complete-codec or submission gate is passed by
 this implementation. The immediate external input needed after code review is
 the **new bounded compute release above**. Human viewing follows actual outputs.
+
+### 2026-11-16 — user released the bounded replay
+
+The user approved at most5,400GPUseconds and7,200CPUseconds, no training, no
+automatic retries, with subsequent profiles gated on the first result. The
+[authoritative release ledger](player-replay-20261116/release.json) records
+per-profile reservations, conservative externalCPU charges and actual job states.
+The immutable config was published/readback with its original eb67e4a9 hash.
+All six fleet hosts were inspected, both compatible Ada workers are fresh, and
+there were no nonterminal existing requests; large input/runtime caches remain
+present on both hosts. This is metadata qualification, not byte verification.
+
+First request: **20261116T122900Z-2a9a4035**, profile`original`, frozen code
+`e9d0d000d0e7470d7b5d9b1edc878d7a835d9cdb`, sourceSHA
+3a02487149f5b03a57fc2b2c9b26b2c20f8fac90e464dfa35c690d2e02351ba0. GPU campaign cap1,800s, one-core plus externalCPU
+cap2,400s, deadline2026-11-16T13:10:51.533592Z; result directory
+`/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261116T122900Z-2a9a4035`. Submission returned pending; no duplicate was
+created. One canonical wait of at most2,700s follows. This client has no verified
+model-resuming callback, so monitoring remains attended with no recurringLLM
+timer. The other profiles remain held until the first correctness/cost audit.
+
+The first source/output/cost gate passed after local frozen validation of both
+actual24frame outputs. Whole-monitor conservative charge421GPUseconds and
+1,021CPUseconds(including the full600externalCPU reservation); no phase
+sampling counter was added again. The next tennis-only request is **20261116T124347Z-407d92df**, same sourceSHA/code/config, GPUcap1,800s/CPUcap2,400s,
+deadline2026-11-16T13:26:30.385840+00:00. Its result directory is `/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261116T124347Z-407d92df`. The match-adapted profile remains held.
+
+The tennis-only source/output/cost gate also passed, charged421GPUseconds and
+1,021CPUseconds. Both completed profiles total842GPU/2,042CPUseconds. Final
+match-adapted request: **20261116T125758Z-5dd33301**, same frozen code/config/sourceSHA,
+GPUcap1,800s/CPUcap2,400s, deadline2026-11-16T13:40:43.724043+00:00; result directory
+`/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261116T125758Z-5dd33301`. No training or extra candidate was released.
+
+### 2026-11-16 — all three fresh replays pass; human pilot ready
+
+| Profile | Job | Conservative GPU-s | Conservative CPU-s including600external | Source/output/cost gate |
+|---|---|---:|---:|---|
+| Released stock | 20261116T122900Z-2a9a4035 | 421 | 1,021 | PASS |
+| Common tennis-only | 20261116T124347Z-407d92df | 421 | 1,021 | PASS |
+| Existing match-adapted | 20261116T125758Z-5dd33301 | 361 | 961 | PASS |
+| **Total** | Three completed requests | **1,203** | **3,003** | Within5,400GPU/7,200CPUmaximum |
+
+All full outputs contain both players at each of24native ticks. Exact paired
+plan equality passes for source, references, poses, boxes, seeds, config and
+settings. Each job's repeated first-player smoke/full crops are also bit-exact
+across28,901,376RGBvalues. This is repeatability within the same job/device,
+not a cross-device test, source-denied reconstruction or240frame prefix proof.
+The three jobs used different physical Ada GPUs; shared wall timing remains
+contaminated and supports cost bounding only. No training, retries, new cohort,
+extra model, subsequent codec experiment or unused-allocation transfer occurred.
+
+See the [paired audit](player-replay-20261116/aggregate-paired-audit.json),
+[repeat audit](player-replay-20261116/duplicate-context-replay-audit.json), and
+per-profile audits in that directory. Raw publications remain immutable under
+the fleet's data root; local viewing copies are separate. Task processes and
+claims are released, and reported terminal events are acknowledged.
+
+The private viewing tool authenticates all three sealed plans and outputs. It
+also hashes the actual source video, checks native geometry/cadence/offset,
+reproduces the original limited-YUV420→BT.709 RGB conversion and confirms both
+frame0reference crops exactly(maxRGBdelta0). Source and generated videos have
+identical24frame timelines at50Hz and optional labelled10Hz playback; PNGs
+preserve exact tick12RGB. All16videos passed ffprobe checks and loaded in the
+browser; source and generated playback were exercised with preferences blank
+and labels hidden. There is no human decision or annotation approval yet.
+
+The [delivery record](player-replay-20261116/review-delivery.json) names the
+durable private HTML, bounded45minute loopback server, screenshot and exact
+asset hashes. The server is read-only, has a65CPU-second hard cap, and has no
+recurring model callback. Its cost is covered by the conservative externalCPU
+reservation; browser elapsed time is not active human labour.
+
+**Decision:** implementation/input/repeatability qualification is complete for
+this24frame construction. Preserve all three profiles until human inspection
+and a longer motion/source-spread test justify selection. No new rate–quality
+curve, ball result, population preference, complete combined codec or submission
+readiness follows. The next scientific test must resolve longer-context temporal
+behavior and paid references/refreshes/session costs against native/ROI/DCVC
+under the common player-and-ball contract. No new GPU stage is released here.
