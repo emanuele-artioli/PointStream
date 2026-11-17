@@ -1,0 +1,18 @@
+{
+  "actual_GPU_smoke_full_audit": "notyetexecuted; requiredafterrelease",
+  "configured_mypy": "pass675sourcefilesaftermerge",
+  "configured_ruff": "pass",
+  "dataset_raw_files_overwritten_or_deleted": false,
+  "doc_convention_and_reference_tests_passed": 6,
+  "focused_reference_and_qualification_tests_passed": 21,
+  "independent_scientific_and_code_review": "final-review.json",
+  "local_full_suite_before_disjoint_common_packet_merge": {
+    "passed": 2669,
+    "seconds": 138.41,
+    "skipped": 39,
+    "warnings": 1
+  },
+  "publication": "unknown; existingattemptmustbeinspectedafterconnectivityrestored",
+  "real_CPU_artifact_checks": "All4NPZnon-reference arrays exact tolossless; actualREF1decodingexacttoreplacement references; configs/inventory/templates/archiveSHAsmatched",
+  "scope": "Unreleased referencepilot code/input readiness; no actualJPEGgeneration"
+}

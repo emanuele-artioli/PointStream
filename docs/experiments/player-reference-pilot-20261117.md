@@ -30,3 +30,25 @@ The matched lossless control is the common-tennis full publication from job `202
 Use `q70/spec-template.json` and `q40/spec-template.json` in the local preparation directory as prospective specs. Their deliberately invalid `REPLACE_AFTER_RELEASE` deadline prevents dispatch; after release set a fresh timezone-aware deadline and rerun fleet schema validation and normal live admission. Earlier `spec-unreleased.json` files with a far-future placeholder are superseded and must not be submitted. Templates stage the same exact recipe, conditioning archive, base, match and eight pinned weight resources as the existing schema-1 worker, with the specified 300/450/60/900-second caps and smoke cost gate. The code revision is the final committed branch revision; record its SHA and source archive SHA when preparing the actual submission. The smoke validator cannot check future full output; the independent audit above is mandatory after each completed request.
 
 The GPU worker consumes locally decoded Mac/OpenCV RGB arrays from the prepared NPZs; it does not decode REF1 itself. Linux receiver REF1 decoding parity is unproven and is not required for this appearance pilot, but must be established before any codec claim. The v2 manifest records OpenCV version, platform and a SHA256 of the complete OpenCV build information alongside each transform and its inputs; v2 configs preserve the original tick-0 reference and offline lookahead provenance. The v2 `spec-template.json` files have invalid deadlines, and their exact paths and hashes are in the v2 manifest. Earlier local preparation directories and their manifests are preserved historical artifacts and are superseded.
+
+### Local readiness and campus access
+
+The [independent final review](player-reference-pilot-20261117/final-review.json)
+passes the corrected actual inputs and scientific protocol. Configured Ruff,
+Mypy and focused tests pass; the reference branch's full suite passed2,669tests
+with39skips before the disjoint packet implementation was merged. Final CI
+checks the combined branch. No GPU work has started.
+
+The [frozen v2 manifest](player-reference-pilot-20261117/prepared-manifest.json)
+and [verification](player-reference-pilot-20261117/verification.json) retain exact
+hashes. A verified durable copy is at
+`/Users/manu/Documents/PointStream-prepared/2026-11-17-reference-pilot-v2`.
+
+An input publication attempt timed out; subsequent fresh SSH connections to
+gpu1, gpu5 and gpu6 timed out too. Its
+[unknown state](player-reference-pilot-20261117/input-publication-attempt.json)
+must be inspected after restored connectivity against the
+[expected files](player-reference-pilot-20261117/input-publication-expected.json).
+Do not replay the unknown write, delete or overwrite any partial dataset file,
+or dispatch while inputs are unverified. The failed connection does not show
+a GPU computation failure or establish whether remote writes completed.

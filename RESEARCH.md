@@ -123,6 +123,11 @@ This is not yet a source-denied learned receiver. Its saved lossless references
 dominate the391,981B carrier (653.30kbps over4.8s): next resolve cheaper
 reference coding or demonstrate actual reuse/refreshes before another expensive
 matched-quality study. Do not infer a codec win from exact conditioning alone.
+The [unreleased reference pilot](docs/experiments/player-reference-pilot-20261117.md)
+has prepared qualities70/40 at65,120/41,075REF1bytes. Generated quality is
+unknown; the pilot uses matched24-tick controls and requires both players to
+be acceptable before uniform promotion. Campus connectivity and a separate
+30GPU-minute/45CPU-minute release remain prerequisites.
 
 A causal warm-up system is a possible later scope: encode the initial frames
 conventionally while adaptation uses only arrived data, then switch after

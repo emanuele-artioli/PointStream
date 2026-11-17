@@ -1,0 +1,96 @@
+{
+  "40": {
+    "archive_bytes": 2877440,
+    "archive_sha256": "85a386688be9b672aa5410c3d6489febee57cf5493f6c239976ccc655c685962",
+    "config_sha256": "f16652b45484313ca613dbb6b0812a27da4410be841cc9ced553e6e4d8a520c8",
+    "decoder": {
+      "build_information_sha256": "bade1ed132afc491c4cadda9ea0590a3d0745e16807f765450d3d3d4152a780b",
+      "decoder": "cv2.imdecode IMREAD_COLOR; BGR to RGB8",
+      "encoder": "cv2.imencode JPEG",
+      "library": "OpenCV",
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "version": "4.10.0"
+    },
+    "inventory_sha256": "0c5a3b23acc063159754dafe56f376d86d0647e986ae0c22f86d1196efe858e1",
+    "packet_sha256": "eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4",
+    "profile_sha256": "bec98d67280e9f777a0d3cc110baa51ae2bf2c876aefe6b247d9691432f61107",
+    "quality": 40,
+    "spec_template_path": "/private/tmp/pointstream-reference-pilot-inputs-20261117-v2/q40/spec-template.json",
+    "spec_template_sha256": "0beaeabf99ba322c4dfa72ea643026e74f99a539971ced94db7e869ce046d0df",
+    "units": [
+      {
+        "decoded_rgb_sha256": "57b047dfa19b86a053092ebfc5b557fbe8432bba1f9ba8fc774d39864fb05a12",
+        "encoded_ref1_bytes": 20517,
+        "encoded_ref1_sha256": "8eef2128dcd12f9ac00a663349e876fb53a73479b8b419e3c11b719e96baa027",
+        "new_npz_bytes": 1525483,
+        "new_npz_sha256": "28e799a94d2712e071f2fd2768f2f677de93133a20600b6a9a44dda03e70a173",
+        "old_ref1_bytes": 88412,
+        "old_ref1_sha256": "c8a4d5355f06d72281751a0d936d5e28c1d80d189021b20000ccfc1dc62e7d6a",
+        "review_label": "Player 2",
+        "source_npz_sha256": "74be8c9e2f8eb65ca67e6339ef9a2a2f8238df36c60a4b5a07a45fc68d3712a7",
+        "source_rgb_sha256": "df807a3b9a6c8cd73015544e9b607300690d83a63a26f878e80d914f721e592b",
+        "unit": "nadal_kyrgios__000_at120__person_000000000001"
+      },
+      {
+        "decoded_rgb_sha256": "c9dd2b70e679b682bd9cce1ddab6e7a1b44517d02a94780f74e89400dc32e20c",
+        "encoded_ref1_bytes": 20558,
+        "encoded_ref1_sha256": "475baa9a590b544f10cc42da66a115c0282bbd242619bce954e7fdbd4c6e82bb",
+        "new_npz_bytes": 1343448,
+        "new_npz_sha256": "6eddfa52af521fdb0039b38656b6d791f2d2908f41147db57ff024b02bd7754f",
+        "old_ref1_bytes": 277749,
+        "old_ref1_sha256": "63d214f5631fd5557d86a9c8c7c2936e2ef45afe539e882001d60e6115896559",
+        "review_label": "Player 1",
+        "source_npz_sha256": "387544a3fc344685f7c07632879affbdafcfd54fd6e1c00e0d9d6c06ca98995d",
+        "source_rgb_sha256": "330cd728d60c72bb10807543050e3c8ce6e54b93e3445e7fca6c289526dec3e0",
+        "unit": "nadal_kyrgios__000_at120__person_000000000000"
+      }
+    ]
+  },
+  "70": {
+    "archive_bytes": 3031040,
+    "archive_sha256": "136f9cec13d47186881025ac72e4bdec55ea3ac8c72640fb9659c1ad8c4ed43a",
+    "config_sha256": "3f70aaec483d62f69ded89de821ebf6673828f19df31d59fbdd3cb42abde6344",
+    "decoder": {
+      "build_information_sha256": "bade1ed132afc491c4cadda9ea0590a3d0745e16807f765450d3d3d4152a780b",
+      "decoder": "cv2.imdecode IMREAD_COLOR; BGR to RGB8",
+      "encoder": "cv2.imencode JPEG",
+      "library": "OpenCV",
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "version": "4.10.0"
+    },
+    "inventory_sha256": "9eda93ca0b8bd86435fe0efbe3ff803eb34237ed43a0b4977c7d618ab385ac0c",
+    "packet_sha256": "eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4",
+    "profile_sha256": "bec98d67280e9f777a0d3cc110baa51ae2bf2c876aefe6b247d9691432f61107",
+    "quality": 70,
+    "spec_template_path": "/private/tmp/pointstream-reference-pilot-inputs-20261117-v2/q70/spec-template.json",
+    "spec_template_sha256": "1208843c1402b27fb9c1c1ce499c2bc372a5064b652f8eff9d0f57f6366e9e44",
+    "units": [
+      {
+        "decoded_rgb_sha256": "ef9a944ceb550c2f105a06c907d52640c6883ed80c989d8183337a3a1215284e",
+        "encoded_ref1_bytes": 31595,
+        "encoded_ref1_sha256": "34a38de614b70e54c83c8acc217b78bd03cc64bb15c55f638ff6b76eb01ca4dc",
+        "new_npz_bytes": 1602323,
+        "new_npz_sha256": "362bc5ff2798d262e9fa3477a15323477560cc9c0fc4b866d7a6eca7909836e2",
+        "old_ref1_bytes": 88412,
+        "old_ref1_sha256": "c8a4d5355f06d72281751a0d936d5e28c1d80d189021b20000ccfc1dc62e7d6a",
+        "review_label": "Player 2",
+        "source_npz_sha256": "74be8c9e2f8eb65ca67e6339ef9a2a2f8238df36c60a4b5a07a45fc68d3712a7",
+        "source_rgb_sha256": "df807a3b9a6c8cd73015544e9b607300690d83a63a26f878e80d914f721e592b",
+        "unit": "nadal_kyrgios__000_at120__person_000000000001"
+      },
+      {
+        "decoded_rgb_sha256": "631221d4f327aadc3056847166dcbb177193245988d1bc4e019a6de5c23c04ca",
+        "encoded_ref1_bytes": 33525,
+        "encoded_ref1_sha256": "883169970a6dde99637dbae16b5f9dc2bea9608978dc3cb1fc1df60771afb933",
+        "new_npz_bytes": 1423768,
+        "new_npz_sha256": "3a9797873b204c52957d727b2b4e4e605012159a2381fab0c3f5b994e658e8d1",
+        "old_ref1_bytes": 277749,
+        "old_ref1_sha256": "63d214f5631fd5557d86a9c8c7c2936e2ef45afe539e882001d60e6115896559",
+        "review_label": "Player 1",
+        "source_npz_sha256": "387544a3fc344685f7c07632879affbdafcfd54fd6e1c00e0d9d6c06ca98995d",
+        "source_rgb_sha256": "330cd728d60c72bb10807543050e3c8ce6e54b93e3445e7fca6c289526dec3e0",
+        "unit": "nadal_kyrgios__000_at120__person_000000000000"
+      }
+    ]
+  }
+}

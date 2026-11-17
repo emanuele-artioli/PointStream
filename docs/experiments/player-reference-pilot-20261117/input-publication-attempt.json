@@ -1,0 +1,34 @@
+{
+  "attempted_root": "/home/itec/emanuele/Datasets/pointstream-data/tennis/player-reference-pilot-20261117",
+  "dataset_deletion_or_overwrite": false,
+  "durable_local_staging": "/Users/manu/Documents/PointStream-prepared/2026-11-17-reference-pilot-v2",
+  "expected_file_hashes": "input-publication-expected.json",
+  "fresh_connection_evidence": "/private/tmp/player-motion-readiness-20261117/reference-publication-fresh.jsonl",
+  "fresh_connectivity": [
+    {
+      "host": "gpu1",
+      "ip": "143.205.173.64",
+      "status": "freshSSHport22timeout"
+    },
+    {
+      "host": "gpu5",
+      "ip": "143.205.173.73",
+      "status": "freshSSHport22timeout"
+    },
+    {
+      "host": "gpu6",
+      "ip": "143.205.173.74",
+      "status": "freshSSHport22timeout"
+    }
+  ],
+  "fresh_gpu6_error": "Connection to143.205.173.74 port22timedout",
+  "local_os_vpn_inventory": "scutil--nclist returned no registered services; cause not established",
+  "next_action": "After restored connectivity, inspect existing namespace and any task-owned writer before mutations; compare each file against expected hashes. Never overwrite/delete partial dataset files or replay an unknown publication. Native fleet preflight and budget release still required.",
+  "no_gpu_job_submitted": true,
+  "original_local_staging": "/private/tmp/pointstream-reference-pilot-inputs-20261117-v2",
+  "owned_stalled_readers_closed": "/private/tmp/player-motion-readiness-20261117/reference-publication-readers-closed.json",
+  "publication_bundle": "/private/tmp/player-motion-readiness-20261117/reference-publication.tar",
+  "raw_reference_and_common_packet_evidence_bundle": "/private/tmp/player-motion-readiness-20261117/reference-preparation-evidence.tar",
+  "status": "unknown-publication-do-not-replay",
+  "upload_local_timeout_seconds": 60
+}

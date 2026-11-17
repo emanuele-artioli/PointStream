@@ -30,6 +30,16 @@
   "sequential_admission": {
     "initial_quality": 70,
     "conditional_quality": 40,
-    "condition": "Accepted first full output and closed actual accounting leaves GPU>=900CPU>=1350; both external450CPU reservations fully charged, no new budget envelope. Otherwise stop."
-  }
+    "condition": "Accepted first full output and closed actual accounting leaves GPU>=900CPU>=1350; both external450CPU reservations fully charged, no new budget envelope. Otherwise stop.",
+    "remaining_required_seconds": {
+      "gpu": 900,
+      "cpu": 1350
+    }
+  },
+  "dispatch_prerequisites": [
+    "Explicit new stage release",
+    "Restore campus connectivity and inspect prior unknown input publication; verify all remoteinput hashes without overwrite/replay",
+    "Fresh fleet admission and replaced/validated deadline",
+    "Final frozen code/source identities"
+  ]
 }
