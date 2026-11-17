@@ -35,6 +35,10 @@ def _profile(profile: dict[str, Any]) -> None:
     native = profile['mode'] == 'native_only'
     if wire.canonical(profile['recipe']) != wire.canonical(NATIVE_RECIPE if native else RECIPE):
         raise ValueError('unsupported recipe')
+    if not native and ([k6b.GEN_W, k6b.GEN_H] != RECIPE['generation_size'] or
+                       [k6b.CROP_MARGIN, k6b.SIZE_PERCENTILE, k6b.CENTRE_SMOOTH] != RECIPE['crop_rule'] or
+                       k6b.k4.KP_CONF != 0.5):
+        raise ValueError('installed geometry helper differs from v1 recipe')
     resources = profile['resources']
     if not isinstance(resources, dict) or set(resources) != ({'native_decoder'} if native else RESOURCES) or any(
         not isinstance(v, str) or wire.HASH.fullmatch(v) is None for v in resources.values()

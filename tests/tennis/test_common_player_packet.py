@@ -162,3 +162,18 @@ def test_coded_size_and_output_canvas_are_independent():
     mismatch['canvas_size'] = [1280, 720]
     with pytest.raises(ValueError, match='profile identity'):
         packet.unpack(blob, mismatch)
+
+
+@pytest.mark.parametrize('name', ['GEN_W', 'GEN_H', 'CROP_MARGIN', 'SIZE_PERCENTILE', 'CENTRE_SMOOTH'])
+def test_geometry_helper_drift_rejected(monkeypatch, name):
+    profile, base, keypoints, refs = fixture()
+    monkeypatch.setattr(packet.k6b, name, getattr(packet.k6b, name) + 1)
+    with pytest.raises(ValueError, match='geometry helper'):
+        packet.build(profile, base, keypoints, refs)
+
+
+def test_confidence_threshold_drift_rejected(monkeypatch):
+    profile, base, keypoints, refs = fixture()
+    monkeypatch.setattr(packet.k6b.k4, 'KP_CONF', 0.6)
+    with pytest.raises(ValueError, match='geometry helper'):
+        packet.build(profile, base, keypoints, refs)
