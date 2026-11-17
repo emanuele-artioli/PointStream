@@ -1,0 +1,25 @@
+{
+  "reviewed_revision": "88e08fb5000fe780494b32ddd3844ecb9a115d1f",
+  "review_scope": "Independent code/scientific recheck of four readiness fixes and actual v2 CPU input joins; no GPU, model execution, scoring, network, submission, or budget release.",
+  "verdict": "PASS: prior readiness findings resolved; suitable for the primary agent budget-release decision.",
+  "blocking_findings": [],
+  "manifest_path": "/private/tmp/pointstream-reference-pilot-inputs-20261117-v2/manifest.json",
+  "manifest_sha256": "245df61dbb17f398ffb599252536abf38c89e8650107cac7247aada7f1f02426",
+  "verified": [
+    "Both actual config, inventory, conditioning archive and named template SHA256 values match the v2 manifest.",
+    "Both templates fail schema validation on the intentionally invalid deadline; a copied template with a valid date passes schema validation. No template was modified.",
+    "Recipe and conditioning hashes join config/inventory/template; all other staged inputs match the original inventory; stage caps are 300/450/60/900 seconds with one CPU core.",
+    "Archive members match actual NPZ hashes; all four actual REF1 hashes and byte counts match; local OpenCV decoding exactly reproduces each NPZ reference and recorded decoded RGB identity.",
+    "All non-reference NPZ arrays equal cached lossless inputs; source and renderer settings match original config.",
+    "Configs preserve the complete original tick-0 source-reference/offline-geometry provenance and append the JPEG transformation and identities.",
+    "Actual local OpenCV 4.10.0 and build-information hash match recorded decoder metadata; Mac-predecoded-RGB scope and unproven Linux receiver parity are explicit.",
+    "Card and proposal require both players acceptable, uncertainty ineligible, smallest eligible total REF1 bytes; single-player success is narrowed scope only. No unsupported full-240, codec, rate-quality or significance claim is introduced."
+  ],
+  "execution_conditions_already_required": [
+    "Budget remains unreleased: proposed 1800 GPU-seconds and 2700 CPU-seconds.",
+    "After release, use a fresh deadline, final committed code/source identity and normal fleet admission.",
+    "Real smoke/full publications must pass substantive validation and the bit-exact repeated-player audit before durable blind review and promotion.",
+    "Linux REF1 decode parity must be established before a receiver or codec claim."
+  ],
+  "validation_limits": "CPU artifact and code review only. Full CI and publication handling remain with the primary agent; no new generated-quality evidence exists."
+}

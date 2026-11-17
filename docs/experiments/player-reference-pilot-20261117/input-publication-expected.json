@@ -1,0 +1,27 @@
+{
+  "preparation-evidence.tar": {
+    "bytes": 6502400,
+    "local_path": "/private/tmp/player-motion-readiness-20261117/reference-preparation-evidence.tar",
+    "sha256": "71a549dd9b9da54deff932bd1daf013ea34f8a763e989cfe92ab767174b308e6"
+  },
+  "q40/conditioning.tar": {
+    "bytes": 2877440,
+    "local_path": "/private/tmp/pointstream-reference-pilot-inputs-20261117-v2/q40/conditioning.tar",
+    "sha256": "85a386688be9b672aa5410c3d6489febee57cf5493f6c239976ccc655c685962"
+  },
+  "q40/config.json": {
+    "bytes": 5890,
+    "local_path": "/private/tmp/pointstream-reference-pilot-inputs-20261117-v2/q40/config.json",
+    "sha256": "f16652b45484313ca613dbb6b0812a27da4410be841cc9ced553e6e4d8a520c8"
+  },
+  "q70/conditioning.tar": {
+    "bytes": 3031040,
+    "local_path": "/private/tmp/pointstream-reference-pilot-inputs-20261117-v2/q70/conditioning.tar",
+    "sha256": "136f9cec13d47186881025ac72e4bdec55ea3ac8c72640fb9659c1ad8c4ed43a"
+  },
+  "q70/config.json": {
+    "bytes": 5890,
+    "local_path": "/private/tmp/pointstream-reference-pilot-inputs-20261117-v2/q70/config.json",
+    "sha256": "3f70aaec483d62f69ded89de821ebf6673828f19df31d59fbdd3cb42abde6344"
+  }
+}
