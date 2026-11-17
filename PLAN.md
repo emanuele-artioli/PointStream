@@ -52,6 +52,17 @@ are distinct. Opened cohorts cannot become confirmation for a changed method.
 
 ## Next work, in decision order
 
+**Campus-outage ordering, November 17:** prioritize manuscript integration and
+saved-result analysis for the next one to two working days; see the
+[outage writing plan](docs/paper/outage-writing-plan-2026-11-17.md). V4 source/PDF
+are locally available and hash-verified. First integrate the player/ball narrative
+and claim map, then saved-score tables/uncertainty, paid-cost figures and matched
+visuals. Prepare source-only references and the smallest remaining scientific
+witness as resources allow. This preserves the main hypothesis and approved
+campus JPEG pilot; it is not a final research stop. No cloud purchase is released.
+Reassess a proposed $10 total cloud ceiling only when a specific necessary result
+and materializable inputs justify setup, qualification and control checks.
+
 **Stage A implementation:** [November16 requalification](docs/experiments/player-requalification-20261116.md)
 authenticates the selected source/conditioning/checkpoints, checks CPU processor
 tensors and corrects future-fit CLIP resizing. The approved three-profile GPU
@@ -183,6 +194,7 @@ decision requiring its own defensible contribution, not a second project now.
 | Common-player packet contract | [implementation and real-input audit](docs/experiments/common-player-packet-20261117.md); [receiver design](docs/experiments/player-common-receiver-design-20261117.md) | `codex/common-player-packet-20261117` | primary plus scoped builder; actual tier telemetry unverified | CPU contract complete:33focused tests/full2699passed39skip; configured Ruff/Mypy672pass; independent code review and exact both-player240tick conditioning/native240frame decode pass.391,981B lossless-reference carrier; no RQ/complete-learned-decoder claim. Source-denied generation/masks and cheaper-reference/reuse test remain unreleased |
 | JPEG reference appearance pilot | [protocol and inputs](docs/experiments/player-reference-pilot-20261117.md); [approved release](docs/experiments/player-reference-pilot-20261117/release.json) | `codex/reference-local-readiness-20261117`; frozen GPU producer55ba0629 | primary, scoped builders and independent reviewers; actual tier telemetry unverified | approved30GPU-min/45CPU-min; Q70first/Q40conditional. Local work only per user; no GPU started. Durable v2 inputs verified; existing campus publication unknown. Inspect publication and refresh fleet admission after connectivity returns; no repeat budget request |
 | Combined receiver/development pilot | stagesA–D above | — | unassigned | unreleased: exact inputs, source-independent contract and complete cost forecast precede budget approval |
+| Outage paper-first work | [claim map, local assets and priorities](docs/paper/outage-writing-plan-2026-11-17.md) | `codex/outage-paper-first-20261117` | primary with scoped paper assessment and inventory; actual tier telemetry unverified | V4 source/PDF verified; claim map and paper structure prepared. Manuscript/saved-score work takes priority while campus is down; no permanent research stop or cloud purchase |
 
 ### Dates and authority
 

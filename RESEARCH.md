@@ -5,6 +5,11 @@ Updated November 17, 2026. Start here for the scientific goal and evidence;
 original protocols, failures and permissions. A closed allocation or failed
 fixed recipe does not close every version of the research question.
 
+While campus access is unavailable, prioritize manuscript integration and
+analysis of saved results under the [outage writing plan](docs/paper/outage-writing-plan-2026-11-17.md).
+The latest V4 source/PDF are local. This changes the work order, preserves the
+stronger player-and-ball hypothesis and releases no cloud spending or new runs.
+
 ## Main hypothesis
 
 At low tennis bitrates, a native base plus reconstructed players and a paid
