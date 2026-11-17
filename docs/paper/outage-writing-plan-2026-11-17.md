@@ -1,5 +1,10 @@
 # PointStream during the campus outage
 
+**Implemented:** the [November17 author-review revision](player-ball-author-review-2026-11-17.json)
+and [integration record](manuscript-integration-2026-11-17.md) complete the initial
+writing/saved-analysis priorities. V4 below describes the preserved starting
+point; the current Overleaf draft is2069a39, anonymous21+5/named22+5.
+
 Updated November 17, 2026. Prioritize manuscript integration and analysis of
 saved results for the next one to two working days. This is a reversible work
 ordering, not a final research cutoff, cloud purchase or submission authority.
