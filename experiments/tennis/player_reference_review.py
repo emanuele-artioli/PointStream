@@ -52,8 +52,8 @@ def build(control_config: Path, control_hash: str, control_conditioning: Path, b
           control: Path, variants: list[tuple[Path, str, Path, Path, Path]],
           source: Path, output: Path, seed: int) -> None:
     """Produce local HTML/media and a separately opened reveal key; no server."""
-    if len(variants) != 2 or output.resolve().is_relative_to(Path(__file__).resolve().parents[2]):
-        raise ValueError("two variants and an output outside the checkout required")
+    if not 1 <= len(variants) <= 2 or output.resolve().is_relative_to(Path(__file__).resolve().parents[2]):
+        raise ValueError("one or two completed variants and an output outside the checkout required")
     cc = resolved(control_config, control_hash, control_conditioning, base)
     cr = validate_output(control, cc, control_hash, "tennis_only", 2)
     from experiments.tennis.player_requalification import make_plan
@@ -91,21 +91,22 @@ def build(control_config: Path, control_hash: str, control_conditioning: Path, b
         candidate_paths[name] = full
         costs[name] = sum(x["encoded_ref1_bytes"] for x in vc["reference_pilot"]["units"])
         checks.append(checked)
-    if set(candidate_paths) != {"lossless", "quality-70", "quality-40"}:
-        raise ValueError("both frozen qualities required")
     output.mkdir(parents=True, exist_ok=False)
     rng = random.Random(seed)
     key: dict[str, Any] = {"seed": seed, "mappings": {}, "reference_bytes": {"lossless": 366161, **costs},
                            "source_sha256": sha256(source), "lossless_receipt_sha256": sha256(control / "receipt.json"),
-                           "source_reference_max_rgb_deltas": deltas, "audits": checks}
+                           "source_reference_max_rgb_deltas": deltas, "audits": checks,
+                           "completed_qualities": [check["quality"] for check in checks],
+                           "complete_candidate_family": len(variants) == 2}
     sections = []
     for unit in UNITS:
         order = list(candidate_paths)
         rng.shuffle(order)
-        key["mappings"][unit] = dict(zip("ABC", order))
+        labels = "ABC"[:len(order)]
+        key["mappings"][unit] = dict(zip(labels, order))
         _, src = by_unit[unit]
         panels = []
-        for label, name in zip("ABC", order):
+        for label, name in zip(labels, order):
             with np.load(candidate_paths[name] / f"{unit}@tennis_only.npz", allow_pickle=False) as f:
                 crops = f["crops"]
                 for fps in (50, 10):
@@ -119,11 +120,15 @@ def build(control_config: Path, control_hash: str, control_conditioning: Path, b
         sections.append(f'<h2>{html.escape(LABELS[unit])}</h2><div class="grid"><div><b>Source</b>'
                         f'<video controls loop src="{unit}-source-50.mp4"></video><p>Slowed to 10 fps</p>'
                         f'<video controls loop src="{unit}-source-10.mp4"></video></div>{"".join(panels)}</div>')
+    completion_note = ("" if len(variants) == 2 else
+                       '<p>Partial candidate family: review covers completed outputs only. '
+                       'The absent setting remains untested.</p>')
     (output / "review.html").write_text('<!doctype html><meta charset="utf-8"><title>Player appearance review</title>'
-        '<style>.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1em}video,img{width:100%}</style>'
+        f'<style>.grid{{display:grid;grid-template-columns:repeat({len(candidate_paths) + 1},1fr);gap:1em}}video,img{{width:100%}}</style>'
         '<h1>Player appearance review</h1><p>24 native ticks: 0.48 s at 50 fps. The 10 fps clips are slowed. '
         'Assess body/clothing and pose against source, and record judgments before opening reveal.json. '
-        'Clips need not play synchronously. This is not longer-motion or codec evidence.</p>' + "".join(sections))
+        'Clips need not play synchronously. This is not longer-motion or codec evidence.</p>'
+        + completion_note + "".join(sections))
     (output / "reveal.json").write_text(json.dumps(key, indent=2, sort_keys=True) + "\n")
 
 

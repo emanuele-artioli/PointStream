@@ -1,0 +1,43 @@
+{
+  "check_logs": "/private/tmp/player-motion-readiness-20261117/local-reference-{ruff,mypy,focused,full-pytest}.log",
+  "checks": {
+    "focused_packet_pilot_document_tests": {
+      "passed": 46,
+      "status": "PASS"
+    },
+    "mypy --config-file pyproject.toml": {
+      "source_files": 675,
+      "status": "PASS"
+    },
+    "python -m pytest": {
+      "passed": 2709,
+      "skipped": 39,
+      "status": "PASS",
+      "wall_seconds": 136.25,
+      "warning": "existing multiprocessing fork-from-multithreaded process DeprecationWarning",
+      "warnings": 1
+    },
+    "ruff check": {
+      "status": "PASS"
+    }
+  },
+  "code_revision": "eaad597a4c8b451f89f01a60c6b5468198beb6c4",
+  "environment": "/private/tmp/pointstream-ci-env",
+  "independent_review": {
+    "actual_model_effort_telemetry": "unverified",
+    "agent": "/root/jpeg_packet_review",
+    "issues_resolved": [
+      "OpenCV salvages entropy-truncated JPEG: independently pinned decoded RGB hash now enforced",
+      "build-information hash described as configuration fingerprint, not binary identity",
+      "hash format matches frozen dtype/shape/pixel array_sha values",
+      "audit refuses output inside checkout or either input root"
+    ],
+    "requested_effort": "medium",
+    "requested_model": "gpt-6.1-terra",
+    "status": "scoped PASS after corrections"
+  },
+  "linux_decoder_parity_and_generated_quality": "unproven",
+  "no_campus_probes_or_gpu_jobs": true,
+  "raw_evidence": "packet-durable-manifest.json",
+  "scope": "local reference pilot readiness only"
+}

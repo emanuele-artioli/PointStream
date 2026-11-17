@@ -72,3 +72,49 @@ native-to-canvas reconstruction/compositing, resource-failure behavior, a joint
 paid ball path and matched-rate evaluation. Header validation in the library
 does not establish AV1 decodability; the separate real decode check establishes
 only the tested native stream. No complete-decoder or rate-quality claim follows.
+
+### JPEG packet compatibility (local CPU)
+
+The separate `common-tennis-player-jpeg-v1` recipe accepts only nominal sender
+qualities 70 and 40. The quality field is encoder metadata; it does not prove
+which quantization tables are present. Exact REF1 payload hashes identify the
+experimental inputs. The profile declares a `reference_decoder` resource: the
+SHA256 of the UTF-8 OpenCV build information measured at decode time, a
+configuration fingerprint rather than a binary or runtime identity. The
+preparation build was Mac OpenCV 4.10.0 with hash
+`bade1ed132afc491c4cadda9ea0590a3d0745e16807f765450d3d3d4152a780b`.
+This identifies the reported build configuration, not Linux pixel parity. Before OpenCV allocation the
+transport checks a bounded, single-scan baseline 8-bit three-component JPEG
+header and 512×784 dimensions; this structural check does not prove full
+entropy validity. The JPEG profile also binds each reference name to the
+expected decoded RGB SHA256, checked against the actual decoded bytes. For
+the pilot these expected hashes must come from the independently frozen prepared
+manifest. The recipe declares `sha256-numpy-dtype-shape-bytes-v1`: SHA256 over
+UTF-8 `dtype.str:shape:` followed by contiguous RGB bytes, matching the existing
+preparation manifest's `array_sha` convention. A self-declared hash does not
+authenticate the sender or payload.
+PNG v1 and native-only profiles remain separate.
+This is byte accounting and conditioning transport only; it does not establish
+a learned receiver or a rate–quality result.
+
+The [actual-input audit](player-reference-pilot-20261117/packet-audit.json), at
+revision `eaad597a4c8b451f89f01a60c6b5468198beb6c4`, verifies both frozen REF1
+sets and their decoded RGB against the independently preserved preparation
+manifest. Both players' references, reference boxes,240poses, placement boxes,
+ticks, run IDs and seeds match the prepared NPZs; all non-reference arrays remain
+unchanged. The native stream decodes240frames and the PNG packet remains
+byte-identical (`f91ce341…7836`). Paid decoded-pixel hash metadata is included.
+
+| Carrier | Native + ongoing geometry | References | Framing | Total bytes |
+|---|---:|---:|---:|---:|
+| PNG v1 |23,547|366,161|2,273|391,981|
+| JPEG70 v1 |23,547|65,120|2,616|91,283|
+| JPEG40 v1 |23,547|41,075|2,616|67,238|
+
+These are4.8-second accounting diagnostics, not matched-quality results. The
+JPEG carriers correspond to152.14/112.06kbps over that window. Cheaper reference
+bytes do not establish useful generated quality; actual reference reuse and
+refresh behavior still require measurement. The approved24-tick appearance
+pilot uses only a prefix of the verified conditioning, not these full-duration
+JPEG-generated players. [Durable raw evidence](player-reference-pilot-20261117/packet-durable-manifest.json)
+is retained read-only outside the checkout while campus storage is unavailable.

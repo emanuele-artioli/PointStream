@@ -24,6 +24,11 @@ RECIPE = {'profile': PROFILE, 'guidance': 3.5, 'steps': 30, 'context': [24, 4],
           'crop_rule': [1.4, 90, 9], 'generation_size': [512, 784],
           'fallback': 'native-base', 'output': 'all-240', 'reference_codec': 'png',
           'base_to_canvas': 'RGB8-cv2-INTER_CUBIC'}
+# JPEG quality is sender metadata, not a proof of the quantization tables.
+JPEG_RECIPES = {q: {**RECIPE, 'profile': 'common-tennis-player-jpeg-v1',
+                    'reference_codec': 'jpeg', 'nominal_quality': q,
+                    'reference_rgb_hash': 'sha256-numpy-dtype-shape-bytes-v1'}
+                for q in (70, 40)}
 NATIVE_RECIPE = {'profile': 'common-tennis-native-only-v1', 'native_frames': 240,
                  'fps': [50, 1], 'output': 'all-240', 'fallback': 'native-base',
                  'base_to_canvas': 'RGB8-cv2-INTER_CUBIC'}
@@ -33,17 +38,22 @@ RESOURCES = frozenset({'vae_config', 'vae_weights', 'image_encoder_config', 'ima
 
 
 def _profile(profile: dict[str, Any]) -> None:
-    if set(profile) != {'mode', 'recipe', 'resources', 'coded_size', 'canvas_size', 'cuts', 'runs', 'order'} or profile['mode'] not in ('players', 'native_only'):
+    keys = {'mode', 'recipe', 'resources', 'coded_size', 'canvas_size', 'cuts', 'runs', 'order'}
+    if not keys <= set(profile) or profile['mode'] not in ('players', 'native_only'):
         raise ValueError('unsupported profile')
     native = profile['mode'] == 'native_only'
-    if wire.canonical(profile['recipe']) != wire.canonical(NATIVE_RECIPE if native else RECIPE):
+    recipe = profile['recipe']
+    jpeg = not native and any(wire.canonical(recipe) == wire.canonical(r) for r in JPEG_RECIPES.values())
+    if not jpeg and wire.canonical(recipe) != wire.canonical(NATIVE_RECIPE if native else RECIPE):
         raise ValueError('unsupported recipe')
+    if set(profile) != keys | ({'reference_rgb_sha256'} if jpeg else set()):
+        raise ValueError('unsupported profile')
     if not native and ([k6b.GEN_W, k6b.GEN_H] != RECIPE['generation_size'] or
                        [k6b.CROP_MARGIN, k6b.SIZE_PERCENTILE, k6b.CENTRE_SMOOTH] != RECIPE['crop_rule'] or
                        k6b.k4.KP_CONF != 0.5):
         raise ValueError('installed geometry helper differs from v1 recipe')
     resources = profile['resources']
-    if not isinstance(resources, dict) or set(resources) != ({'native_decoder'} if native else RESOURCES) or any(
+    if not isinstance(resources, dict) or set(resources) != ({'native_decoder'} if native else RESOURCES | ({'reference_decoder'} if jpeg else set())) or any(
         not isinstance(v, str) or wire.HASH.fullmatch(v) is None for v in resources.values()
     ):
         raise ValueError('invalid installed resource identities')
@@ -56,6 +66,14 @@ def _profile(profile: dict[str, Any]) -> None:
         raise ValueError('invalid cuts')
     if not isinstance(profile['runs'], list) or len(profile['runs']) > 480:
         raise ValueError('invalid runs')
+    if jpeg:
+        hashes = profile['reference_rgb_sha256']
+        refs = [r.get('reference') for r in profile['runs'] if isinstance(r, dict)]
+        if (not isinstance(hashes, dict) or len(refs) != len(profile['runs']) or
+                any(not wire._valid_name(ref) for ref in refs) or len(set(refs)) != len(refs) or
+                set(hashes) != set(refs) or any(not isinstance(v, str) or wire.HASH.fullmatch(v) is None
+                                                  for v in hashes.values())):
+            raise ValueError('invalid reference RGB hash bindings')
     order = profile['order']
     if not isinstance(order, list) or len(order) > 16 or any(not wire._valid_name(x) for x in order) or len(set(order)) != len(order):
         raise ValueError('invalid compositing order')
@@ -209,17 +227,74 @@ def _bounded_keypoints(blob: bytes, order: list[str]) -> tuple[dict[str, Any], l
     return meta, [{'name': name, 't': u['t'], 'kp': u['kp']} for name, u in zip(order, decoded)]
 
 
-def _bounded_reference(blob: bytes) -> tuple[dict[str, Any], np.ndarray]:
+def _jpeg_header(raw: bytes) -> None:
+    """Accept one bounded baseline sequential scan before allocating pixels."""
+    if not raw.startswith(b'\xff\xd8'):
+        raise ValueError('invalid JPEG SOI')
+    pos, sof, scan = 2, False, False
+    while pos < len(raw):
+        if raw[pos] != 0xff:
+            raise ValueError('invalid JPEG marker')
+        while pos < len(raw) and raw[pos] == 0xff:
+            pos += 1
+        if pos >= len(raw):
+            raise ValueError('truncated JPEG marker')
+        marker = raw[pos]
+        pos += 1
+        if marker == 0xd9:
+            if not scan or pos != len(raw):
+                raise ValueError('invalid JPEG end')
+            return
+        if scan:
+            raise ValueError('unsupported JPEG marker after scan')
+        if marker not in (0xc0, 0xc4, 0xdb, 0xdd, 0xda, 0xfe, *range(0xe0, 0xf0)):
+            raise ValueError('unsupported JPEG marker')
+        if pos + 2 > len(raw):
+            raise ValueError('truncated JPEG length')
+        size = int.from_bytes(raw[pos:pos + 2], 'big')
+        if size < 2 or pos + size > len(raw):
+            raise ValueError('invalid JPEG segment length')
+        segment = raw[pos + 2:pos + size]
+        pos += size
+        if marker == 0xc0:
+            if sof or scan or len(segment) != 15 or segment[:6] != b'\x08\x03\x10\x02\x00\x03':
+                raise ValueError('invalid JPEG SOF dimensions or components')
+            sof = True
+        elif marker == 0xda:
+            if not sof or scan or len(segment) != 10 or segment[0] != 3 or segment[-3:] != b'\x00\x3f\x00':
+                raise ValueError('unsupported JPEG scan')
+            scan = True
+            # Entropy bytes permit stuffing and restart markers only. The next
+            # marker must be EOI; multi-scan and trailing forms are unsupported.
+            while pos < len(raw):
+                if raw[pos] != 0xff:
+                    pos += 1
+                    continue
+                if pos + 1 >= len(raw):
+                    raise ValueError('truncated JPEG scan')
+                if raw[pos + 1] == 0x00 or 0xd0 <= raw[pos + 1] <= 0xd7:
+                    pos += 2
+                    continue
+                break
+    raise ValueError('truncated JPEG')
+
+
+def _bounded_reference(blob: bytes, jpeg: bool = False, decoder_hash: str = '') -> tuple[dict[str, Any], np.ndarray]:
     import cv2
 
     meta, raw = _bounded_transport(blob, b'REF1', MAX_REF)
-    if (len(raw) < 33 or raw[:8] != b'\x89PNG\r\n\x1a\n' or raw[8:12] != b'\x00\x00\x00\x0d' or
+    if jpeg:
+        _jpeg_header(raw)
+        measured = hashlib.sha256(cv2.getBuildInformation().encode('utf-8')).hexdigest()
+        if measured != decoder_hash:
+            raise ValueError('reference decoder build identity mismatch')
+    elif (len(raw) < 33 or raw[:8] != b'\x89PNG\r\n\x1a\n' or raw[8:12] != b'\x00\x00\x00\x0d' or
             raw[12:16] != b'IHDR' or struct.unpack_from('>II', raw, 16) != (512, 784) or
             raw[24:29] != b'\x08\x02\x00\x00\x00'):
         raise ValueError('invalid RGB8 reference PNG header')
     image = cv2.imdecode(np.frombuffer(raw, np.uint8), cv2.IMREAD_COLOR)
     if image is None:
-        raise ValueError('invalid reference PNG')
+        raise ValueError('invalid reference image')
     return meta, image[:, :, ::-1]
 
 
@@ -241,6 +316,7 @@ def _decode(profile: dict[str, Any], sections: dict[str, bytes]) -> dict[str, An
         raise ValueError('keypoint profile mismatch')
     if [u['name'] for u in units] != profile['order']:
         raise ValueError('track order mismatch')
+    jpeg = profile['recipe'].get('profile') == 'common-tennis-player-jpeg-v1'
     output: dict[str, Any] = {}
     expected_names = {'base', 'keypoints'}
     for unit in units:
@@ -268,12 +344,18 @@ def _decode(profile: dict[str, Any], sections: dict[str, bytes]) -> dict[str, An
             if not wire._valid_name(refname) or refname in expected_names or refname not in sections:
                 raise ValueError('invalid reference binding')
             expected_names.add(refname)
-            rm, image = _bounded_reference(sections[refname])
-            if set(rm) != {'unit', 'reference_frame', 'reference_box', 'pixels', 'codec', 'quality', 'color'} or rm['unit'] != name or rm['codec'] != '.png' or rm['quality'] is not None or rm['color'] != 'RGB8' or rm['pixels'] != 'full_prepared_conditioning_crop' or type(rm['reference_frame']) is not int or not run['start'] <= rm['reference_frame'] < run['end']:
+            rm, image = _bounded_reference(sections[refname], jpeg, profile['resources'].get('reference_decoder', ''))
+            if set(rm) != {'unit', 'reference_frame', 'reference_box', 'pixels', 'codec', 'quality', 'color'} or rm['unit'] != name or rm['codec'] != ('.jpg' if jpeg else '.png') or rm['quality'] != (profile['recipe']['nominal_quality'] if jpeg else None) or rm['color'] != 'RGB8' or rm['pixels'] != 'full_prepared_conditioning_crop' or type(rm['reference_frame']) is not int or not run['start'] <= rm['reference_frame'] < run['end']:
                 raise ValueError('invalid paid reference')
             box = np.asarray(rm['reference_box'], dtype=float)
             if box.shape != (4,) or not np.isfinite(box).all() or np.any(box[2:] <= 0) or image.shape != (784, 512, 3):
                 raise ValueError('invalid reference geometry')
+            if jpeg:
+                # Match the already frozen preparation manifest's array hash.
+                image_hash = hashlib.sha256(f'{image.dtype.str}:{image.shape}:'.encode())
+                image_hash.update(image.tobytes())
+                if image_hash.hexdigest() != profile['reference_rgb_sha256'][refname]:
+                    raise ValueError('reference RGB hash mismatch')
             boxes = k6b.run_boxes(list(kp[a:b]))
             decoded_runs.append({'start': run['start'], 'end': run['end'], 't': t[a:b], 'kp': kp[a:b],
                                  'boxes': boxes, 'reference': image, 'reference_box': box,
