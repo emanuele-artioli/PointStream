@@ -447,6 +447,31 @@ def test_motion_config_requires_one_unit(sample):
     cfg, write, _ = sample
     cfg.update(schema=2, scope='player-motion-development', native_frames={'smoke': 44, 'full': 240})
     cfg.pop('match_checkpoint')
+    cfg['motion_admission_policy'] = 'unknown'
+    with pytest.raises(ValueError, match='unknown motion'):
+        p.load_config(*write(cfg))
+    cfg.pop('motion_admission_policy')
     cfg['units'].append(dict(cfg['units'][0], unit='other'))
     with pytest.raises(ValueError, match='exactly one'):
         p.load_config(*write(cfg))
+
+
+def test_motion_admission_policy_observed_cost_regression():
+    cfg = {'schema': 2, 'units': [{}]}
+    receipt = {'native_frames': 44, 'load_seconds': 22.933354850}
+    timing = {'worker_wall_seconds': 255.548335404}
+    dispatch = {'campaign_clock': {'budget_end': 3000.0}}
+    with pytest.raises(ValueError, match='forecast'):
+        p.smoke_cost_gate(cfg, receipt, timing, dispatch, 100.0)
+    cfg['motion_admission_policy'] = 'extended-1800-v1'
+    result = p.smoke_cost_gate(cfg, receipt, timing, dispatch, 100.0)
+    assert result['forecast_seconds'] == pytest.approx(1704.6779246)
+    assert result['full_stage_cap_seconds'] == 1800 and result['policy'] == 'extended-1800-v1'
+    with pytest.raises(ValueError, match='campaign'):
+        p.smoke_cost_gate(cfg, receipt, timing, {'campaign_clock': {'budget_end': 150.0}}, 100.0)
+    cfg['motion_admission_policy'] = 'unknown'
+    with pytest.raises(ValueError, match='unknown motion'):
+        p.smoke_cost_gate(cfg, receipt, timing, dispatch, 100.0)
+    with pytest.raises(ValueError, match='unknown motion'):
+        p.selected_frames({**cfg, 'scope': 'player-motion-development',
+                           'native_frames': {'smoke': 44, 'full': 240}}, 44)

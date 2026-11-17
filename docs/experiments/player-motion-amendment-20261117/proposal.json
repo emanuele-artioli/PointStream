@@ -1,0 +1,66 @@
+{
+  "amendment_approved": false,
+  "initial_release": "../player-motion-20261117/release.json",
+  "no_new_gpu_authority": true,
+  "overall_budget_unchanged": {
+    "max_cpu_seconds": 7200,
+    "max_gpu_seconds": 4200
+  },
+  "prior_conservative_charge": {
+    "cpu_seconds": 1828,
+    "gpu_seconds": 328
+  },
+  "prior_job_id": "20261117T083755Z-de05930d",
+  "prior_stop": "Cost forecast1704.6779246sec exceeded1500sec full-stage cap; real44frame renderer and independent correctness validate. No240frames generated.",
+  "proposed_per_request": {
+    "external_cpu_seconds": 750,
+    "forecast_multiplier_unchanged": 1.25,
+    "full_seconds": 1800,
+    "lifecycle_seconds": 2400,
+    "policy": "extended-1800-v1",
+    "smoke_seconds": 450,
+    "startup_publication_reserve_unchanged_seconds": 90,
+    "validator_seconds": 60
+  },
+  "remaining_before_amendment": {
+    "cpu_seconds": 5372,
+    "gpu_seconds": 3872
+  },
+  "request2_not_reserved_or_guaranteed": true,
+  "requests": [
+    {
+      "config": "docs/experiments/player-motion-amendment-20261117/player-2.json",
+      "config_sha256": "b570e19b1b7ef38a348dd7029b3267d015ba7645f2b7bbdcd2e32359a1069d17",
+      "cpu_lifecycle_cap_seconds": 2400,
+      "cpu_total_cap_seconds": 3150,
+      "external_cpu_cap_seconds": 750,
+      "gpu_lifecycle_cap_seconds": 2400,
+      "job_id": null,
+      "player": 2,
+      "release_condition": "Explicit amendment approval overriding the original cost-gate stop; no failed amended request; remaining aggregate GPU>=2400 and CPU>=3150, including all original charges.",
+      "status": "proposed_not_authorized"
+    },
+    {
+      "config": "docs/experiments/player-motion-amendment-20261117/player-1.json",
+      "config_sha256": "a6c8b47b1bf23a4cf1b36e0dceb1519021b7826eb64155e5b1efc0a64452f27a",
+      "cpu_lifecycle_cap_seconds": 2400,
+      "cpu_total_cap_seconds": 3150,
+      "external_cpu_cap_seconds": 750,
+      "gpu_lifecycle_cap_seconds": 2400,
+      "job_id": null,
+      "player": 1,
+      "release_condition": "Explicit amendment approval; accepted full240-frame publication from amended Player2; no failed amended request; actual aggregate accounting leaves GPU>=2400 and CPU>=3150, including the original failed smoke.",
+      "status": "proposed_not_authorized"
+    }
+  ],
+  "requires_user_approval_because": "The approved initial card required stop on failed cost gate and no automatic retry. This changes per-request limits and permits a repeated smoke; it is not a new overall budget.",
+  "schema": 1,
+  "scope": "Same source, shared tennis weights, CFG3.5,30steps,44smoke/240full, no training or new source; explicit authorization of repeated smoke under a different admission cap.",
+  "sequential_admission": "Only Player2 initially. Release Player1 only after accepted Player2 full publication and actual accounting leaves GPU>=2400 and CPU>=3150. Otherwise stop without another request.",
+  "status": "proposed_plan_amendment_not_authorized",
+  "stop_conditions": [
+    "Any amended request correctness or cost gate fails: stop; no further automatic retry.",
+    "Any aggregate budget deficit or uncertain submission: inspect and stop; never replay.",
+    "No outcome-driven method/seed/CFG/source changes."
+  ]
+}

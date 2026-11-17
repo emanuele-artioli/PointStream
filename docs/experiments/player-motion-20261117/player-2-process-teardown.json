@@ -1,0 +1,11 @@
+{
+  "host": "gpu5",
+  "job_id": "20261117T083755Z-de05930d",
+  "known_pids": {
+    "3251358": false,
+    "3251381": false
+  },
+  "process_group_id": 3251381,
+  "process_group_members": [],
+  "unreadable_proc_stats": 0
+}

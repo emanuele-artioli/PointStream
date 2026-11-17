@@ -9,7 +9,7 @@ from typing import Any
 
 from experiments.jobs.inbox import validate_spec
 from experiments.tennis.k6b_generate import sha256
-from experiments.tennis.player_requalification import PROFILES
+from experiments.tennis.player_requalification import PROFILES, motion_policy
 
 MODULE = "experiments.tennis.player_requalification"
 REMOTE_RECIPE = "/home/itec/emanuele/Datasets/pointstream-data/tennis/player-requalification-20261116/config.json"
@@ -60,6 +60,7 @@ def build_motion_spec(config: Path, inventory: Path, remote_recipe: str, deadlin
             or recipe_data.get("source", {}).get("window") != "nadal_kyrgios/000@120"
             or recipe_data.get("source", {}).get("native_fps") != [50, 1]):
         raise ValueError("motion request requires one frozen nad000 player and declared lengths")
+    policy = motion_policy(recipe_data)
     inputs = json.loads(inventory.read_text())
     files = copy.deepcopy(inputs["inputs"])
     if len(files) != 10 or {x["name"] for x in files} != {"conditioning", "base", *(f"w{i}" for i in range(8))}:
@@ -80,9 +81,9 @@ def build_motion_spec(config: Path, inventory: Path, remote_recipe: str, deadlin
         "inputs": [{"path": x["path"], "sha256": x["sha256"]} for x in staged],
         "staged_inputs": staged, "verify_staged_inputs": True,
         "environment": inputs["environment"], "local_storage_gib": 48,
-        "smoke": {"seconds": 450, "representative_basis": "One continuous44-native-frame run of the same player, production512x784/30steps/CFG3.5/context24/overlap4 and resources; native campaign cost gate before the whole240-frame run."},
-        "full": {"seconds": 1500}, "budget_seconds": 2100, "deadline": deadline,
-        "validator": ["{python}", "-m", MODULE, "validate-stage"], "validator_seconds": 60,
+        "smoke": {"seconds": policy["smoke"], "representative_basis": "One continuous44-native-frame run of the same player, production512x784/30steps/CFG3.5/context24/overlap4 and resources; native campaign cost gate before the whole240-frame run."},
+        "full": {"seconds": policy["full"]}, "budget_seconds": policy["job"], "deadline": deadline,
+        "validator": ["{python}", "-m", MODULE, "validate-stage"], "validator_seconds": policy["validator"],
         "required_commands": [], "contention": {"policy": "continue", "resume_attempts": 0,
             "basis": "Hard budget and smoke forecast bound spending; shared timing is not scientific speed evidence."},
     }

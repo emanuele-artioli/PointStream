@@ -1,0 +1,25 @@
+{
+  "scope": "Aggregate budget arithmetic, not runtime predictions or authority",
+  "original_charge_gpu": 328,
+  "original_charge_cpu": 1828,
+  "first_new_request_fundable": true,
+  "both_new_maxima_cannot_be_reserved": true,
+  "conditional_boundary_cases": [
+    {
+      "hypothetical_first_amended_lifecycle_seconds": 1472,
+      "remaining_gpu": 2400,
+      "remaining_cpu": 3150,
+      "second_request_admitted": true
+    },
+    {
+      "hypothetical_first_amended_lifecycle_seconds": 1473,
+      "remaining_gpu": 2399,
+      "remaining_cpu": 3149,
+      "second_request_admitted": false
+    }
+  ],
+  "caps": {
+    "gpu": 4200,
+    "cpu": 7200
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "checks": {
+    "aggregate_budget": "budget-audit.json",
+    "full_local_pytest": {
+      "passed": 2666,
+      "seconds": 130.88,
+      "skipped": 39,
+      "warnings": 1
+    },
+    "independent_review": "Clarified no FURTHER amended failure and accepted Player2 full publication before Player1",
+    "mypy": "configured pass,670 files in pinned environment",
+    "numeric_candidate": "numeric-invariance.json",
+    "observed_gate_regression": "Actual original smoke times reject original1500 and pass extended1800 only with sufficient clock",
+    "original_policy_preserved": "Default450/1500/2100/60 remains; schema1 unchanged",
+    "ruff": "configured pass"
+  },
+  "logs": [
+    "/private/tmp/player-motion-readiness-20261117/amendment-full-pytest.log",
+    "/private/tmp/player-motion-readiness-20261117/amendment-mypy.log"
+  ],
+  "no_new_gpu_job": true,
+  "selected_code_sha256": {
+    "experiments/tennis/player_requalification.py": "376c5b06c3cad8fa0d254135b0960996e7e499fc221942aab9e76f0184c1e06a",
+    "experiments/tennis/player_requalification_specs.py": "e3ccaae9b154c5274bf7fd6ddd470e90e9ef61138dae000b4dd4357697531b2c"
+  },
+  "status": "prepared_not_authorized"
+}

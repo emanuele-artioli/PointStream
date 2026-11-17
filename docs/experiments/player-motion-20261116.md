@@ -1,5 +1,13 @@
 # Experiments: shared-tennis player motion pilot
 
+**Current status, November 17:** the approved Player2 request produced a valid
+44-frame smoke, then correctly stopped at the cost gate: forecast1,704.68 s
+exceeded the1,500 s full-stage cap. No240-frame run or Player1 request started.
+The [release ledger](player-motion-20261117/release.json) records closure and
+conservative328GPU/1,828CPUseconds. The [prepared amendment](player-motion-amendment-20261117.md)
+requires explicit approval; no retry or unspent allocation was silently released.
+The November16 proposal below retains the original scope and stopping rules.
+
 ### 2026-11-16 — human review imported; motion pilot prepared
 
 **Prepared, not released. No new GPU work or training.**

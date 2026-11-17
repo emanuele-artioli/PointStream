@@ -104,6 +104,8 @@ def load_config(path: Path, expected_sha: str, bindings: list[list[str]] | None 
     config = resolve_staged(json.loads(path.read_text()), bindings or [])
     if (config.get("schema"), config.get("scope")) not in ((1, "paired-player-context-development"), (2, "player-motion-development")):
         raise ValueError("invalid config schema or scope")
+    if config["schema"] == 2:
+        motion_policy(config)
     if config["schema"] == 2 and (config.get("native_frames") != {"smoke": 44, "full": 240}
                                    or "match_checkpoint" in config):
         raise ValueError("invalid motion lengths or unexpected match checkpoint")
@@ -208,6 +210,18 @@ def profile_inputs(config: dict[str, Any], profile: str) -> tuple[Path | None, P
     raise ValueError("unknown profile")
 
 
+def motion_policy(config: dict[str, Any]) -> dict[str, Any]:
+    """Resolve a frozen admission policy; selection does not authorize compute."""
+    name = config.get("motion_admission_policy", "original-1500-v1")
+    policies = {
+        "original-1500-v1": {"smoke": 450, "full": 1500, "job": 2100, "validator": 60},
+        "extended-1800-v1": {"smoke": 450, "full": 1800, "job": 2400, "validator": 60},
+    }
+    if not isinstance(name, str) or name not in policies:
+        raise ValueError("unknown motion admission policy")
+    return {"name": name, **policies[name]}
+
+
 def selected_frames(config: dict[str, Any], native_frames: int | None, *, required: bool = False) -> int:
     if config.get("schema") == 1:
         if native_frames is not None:
@@ -215,6 +229,7 @@ def selected_frames(config: dict[str, Any], native_frames: int | None, *, requir
         return 24
     if config.get("schema") != 2 or config.get("scope") != "player-motion-development" or config.get("native_frames") != {"smoke": 44, "full": 240}:
         raise ValueError("invalid motion schema or lengths")
+    motion_policy(config)
     if native_frames is None:
         if required:
             raise ValueError("schema 2 requires --native-frames")
@@ -411,6 +426,7 @@ def smoke_cost_gate(config: dict[str, Any], receipt: dict[str, Any], timing: dic
             raise ValueError("missing or invalid cost timing or campaign clock")
         return float(value)
 
+    policy = motion_policy(config)
     load = positive(receipt.get("load_seconds"))
     wall = positive(timing.get("worker_wall_seconds"))
     clock = dispatch.get("campaign_clock")
@@ -419,14 +435,15 @@ def smoke_cost_gate(config: dict[str, Any], receipt: dict[str, Any], timing: dic
     if wall < load:
         raise ValueError("worker wall shorter than model load")
     remaining = end - now
-    available = remaining - 60
+    available = remaining - policy["validator"]
     if available <= 0:
         raise ValueError("campaign clock expired or lacks validator reserve")
     forecast = 1.25 * (load + max(0, wall - load) * (240 / 44)) + 90
-    if not math.isfinite(forecast) or forecast > 1500 or forecast > available:
+    if not math.isfinite(forecast) or forecast > policy["full"] or forecast > available:
         raise ValueError("full-stage forecast exceeds cap or remaining campaign time")
     return {"forecast_seconds": forecast, "campaign_remaining_seconds": remaining,
-            "available_after_validator_reserve_seconds": available, "full_stage_cap_seconds": 1500,
+            "available_after_validator_reserve_seconds": available, "full_stage_cap_seconds": policy["full"],
+            "policy": policy["name"],
             "basis": "1.25*(load + (worker wall - load)*(240/44)) + 90 seconds; admission heuristic, not a completion guarantee"}
 
 
