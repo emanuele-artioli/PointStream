@@ -447,6 +447,29 @@ def smoke_cost_gate(config: dict[str, Any], receipt: dict[str, Any], timing: dic
             "basis": "1.25*(load + (worker wall - load)*(240/44)) + 90 seconds; admission heuristic, not a completion guarantee"}
 
 
+def reference_smoke_cost_gate(receipt: dict[str, Any], timing: dict[str, Any],
+                              dispatch: dict[str, Any], now: float) -> dict[str, Any]:
+    """Bound two 24-tick contexts using the real one-context worker clock."""
+    def positive(value: Any) -> float:
+        if type(value) not in (int, float) or not math.isfinite(value) or value <= 0:
+            raise ValueError("invalid timing or campaign clock")
+        return float(value)
+
+    clock = dispatch.get("campaign_clock")
+    load = positive(receipt.get("load_seconds"))
+    wall = positive(timing.get("worker_wall_seconds"))
+    current = positive(now)
+    end = positive(clock.get("budget_end") if isinstance(clock, dict) else None)
+    if wall < load:
+        raise ValueError("worker wall shorter than load")
+    remaining = end - current
+    forecast = 1.25 * (load + 2 * (wall - load)) + 90
+    if forecast > 450 or forecast > remaining - 60:
+        raise ValueError("reference pilot forecast exceeds cap or remaining time")
+    return {"forecast_seconds": forecast, "campaign_remaining_seconds": remaining,
+            "full_stage_cap_seconds": 450, "validator_reserve_seconds": 60}
+
+
 def argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     subs = parser.add_subparsers(dest="command", required=True)
@@ -507,6 +530,14 @@ def main() -> None:
                 raise ValueError("motion stage and native frame count mismatch")
             if stage_name == "smoke":
                 report["smoke_cost_gate"] = smoke_cost_gate(config, receipt, timing, dispatch, time.monotonic())
+                report["checks"]["smoke_cost_admission"] = True
+        if stage_validation and config.get("reference_pilot"):
+            stage_name = os.environ.get("PS_STAGE", "")
+            if (config["schema"] != 1 or args.profile != "tennis_only"
+                    or args.max_units != {"smoke": 1, "full": 2}.get(stage_name)):
+                raise ValueError("invalid reference pilot stage")
+            if stage_name == "smoke":
+                report["smoke_cost_gate"] = reference_smoke_cost_gate(receipt, timing, dispatch, time.monotonic())
                 report["checks"]["smoke_cost_admission"] = True
         Path(os.environ["PS_VALIDATION_PATH"]).write_text(json.dumps(report) + "\n")
         print("validated complete paired-context profile output")
