@@ -177,3 +177,46 @@ def test_confidence_threshold_drift_rejected(monkeypatch):
     monkeypatch.setattr(packet.k6b.k4, 'KP_CONF', 0.6)
     with pytest.raises(ValueError, match='geometry helper'):
         packet.build(profile, base, keypoints, refs)
+
+
+def test_embedded_profile_and_inspection():
+    profile, base, keypoints, refs = fixture()
+    blob = packet.build(profile, base, keypoints, refs)
+    sections, accounting, decoded = packet.unpack(blob)
+    assert sections['base'] == base and len(decoded['player']) == 2
+    report = packet.inspect(blob, profile['resources'])
+    assert report['profile'] == profile and report['required_resources'] == profile['resources']
+    assert report['total_bytes'] == sum(accounting.values()) == len(blob)
+    assert report['component_bytes']['keypoints'] == len(keypoints)
+    assert report['role_bytes'] == accounting
+    assert report['coverage']['ticks'] == 240 and report['coverage']['base_only_ticks'] == 234
+    assert report['native_validity'] == 'container_only' and report['learned_receiver'] is False
+    with pytest.raises(ValueError, match='installed resource'):
+        packet.inspect(blob, {})
+    changed = copy.deepcopy(profile)
+    changed['canvas_size'] = [1280, 720]
+    with pytest.raises(ValueError, match='profile identity'):
+        packet.unpack(blob, changed)
+
+
+def test_native_only_embedded_profile():
+    _, base, _, _ = fixture()
+    profile = {'mode': 'native_only', 'recipe': copy.deepcopy(packet.NATIVE_RECIPE),
+               'resources': {'native_decoder': 'a' * 64}, 'coded_size': [640, 480],
+               'canvas_size': [1920, 1080], 'cuts': [], 'runs': [], 'order': []}
+    blob = packet.build(profile, base, None, {})
+    assert packet.unpack(blob)[2] == {}
+    assert packet.inspect(blob)['coverage']['base_only_ticks'] == 240
+
+
+def test_embedded_header_rejection():
+    profile, base, keypoints, refs = fixture()
+    blob = packet.build(profile, base, keypoints, refs)
+    size = struct.unpack_from('>I', blob, 5)[0]
+    raw = blob[9:9 + size]
+    # Whitespace makes JSON valid but noncanonical; oversized lengths are bounded.
+    noncanonical = blob[:5] + struct.pack('>I', size + 1) + b' ' + raw + blob[9 + size:]
+    for bad in (noncanonical, blob[:5] + struct.pack('>I', wire.MAX_HEADER + 1),
+                b'bad!!' + blob[5:], blob[:9 + size - 1]):
+        with pytest.raises(ValueError):
+            packet.unpack(bad)

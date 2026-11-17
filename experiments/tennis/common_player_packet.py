@@ -8,6 +8,7 @@ The declared RGB resize is a receiver policy; this module does not decode video.
 from __future__ import annotations
 
 import hashlib
+import json
 import struct
 from typing import Any
 
@@ -180,12 +181,48 @@ def build(profile: dict[str, Any], base: bytes, keypoints: bytes | None, referen
     return wire.pack(profile, entries + [(name, 'reference', references[name]) for name in sorted(references)])
 
 
-def unpack(blob: bytes, profile: dict[str, Any]) -> tuple[dict[str, bytes], dict[str, int], dict[str, Any]]:
-    _profile(profile)
-    sections, accounting = wire.unpack(blob, profile)
-    decoded = _decode(profile, sections)
+def _embedded_profile(blob: bytes) -> dict[str, Any]:
+    """Read only the bounded canonical header of this profile's envelope."""
+    if len(blob) < 9 or len(blob) > wire.MAX_BODY + wire.MAX_HEADER + 1024 or blob[:5] != wire.MAGIC:
+        raise ValueError('invalid common packet envelope')
+    size = struct.unpack_from('>I', blob, 5)[0]
+    if size > wire.MAX_HEADER or 9 + size > len(blob):
+        raise ValueError('invalid header length')
+    raw = blob[9:9 + size]
+    try:
+        header = json.loads(raw)
+        if (not isinstance(header, dict) or set(header) != {'version', 'profile', 'sections'} or
+                type(header['version']) is not int or header['version'] != 1 or
+                not isinstance(header['profile'], dict) or wire.canonical(header) != raw):
+            raise ValueError('invalid canonical header')
+    except (UnicodeDecodeError, json.JSONDecodeError, TypeError, RecursionError) as exc:
+        raise ValueError('invalid canonical header') from exc
+    return header['profile']
+
+
+def unpack(blob: bytes, profile: dict[str, Any] | None = None) -> tuple[dict[str, bytes], dict[str, int], dict[str, Any]]:
+    embedded = _embedded_profile(blob)
+    if profile is not None and wire.canonical(profile) != wire.canonical(embedded):
+        raise ValueError('profile identity mismatch')
+    _profile(embedded)
+    sections, accounting = wire.unpack(blob, embedded)
+    decoded = _decode(embedded, sections)
     # Repacking verifies roles, canonical ordering, and the single supported envelope.
     refs = {n: v for n, v in sections.items() if n not in ('base', 'keypoints')}
-    if build(profile, sections['base'], sections.get('keypoints'), refs) != blob:
+    if build(embedded, sections['base'], sections.get('keypoints'), refs) != blob:
         raise ValueError('noncanonical sections or accounting roles')
     return sections, accounting, decoded
+
+
+def inspect(blob: bytes, installed: dict[str, str] | None = None) -> dict[str, Any]:
+    """Report paid bytes and coverage, with no claim of native or learned decode."""
+    profile = _embedded_profile(blob)
+    sections, accounting, decoded = unpack(blob, profile)
+    if installed is not None:
+        verify_resources(profile, installed)
+    ticks = coverage(decoded, profile['order'])
+    return {'profile': profile, 'component_bytes': {name: len(data) for name, data in sections.items()},
+            'role_bytes': accounting, 'total_bytes': len(blob), 'required_resources': profile['resources'],
+            'coverage': {'ticks': len(ticks), 'active_unit_ticks': sum(map(len, ticks)),
+                         'base_only_ticks': sum(not tick for tick in ticks), 'units_by_tick': ticks},
+            'native_validity': 'container_only', 'learned_receiver': False}
