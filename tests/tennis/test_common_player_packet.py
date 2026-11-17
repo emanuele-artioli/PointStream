@@ -13,7 +13,7 @@ from experiments.tennis import w8_payload as wire
 
 def fixture():
     profile = {'mode': 'players', 'recipe': copy.deepcopy(packet.RECIPE), 'resources': {k: 'a' * 64 for k in packet.RESOURCES},
-               'width': 640, 'height': 480, 'cuts': [6], 'order': ['player'],
+               'coded_size': [640, 480], 'canvas_size': [1920, 1080], 'cuts': [6], 'order': ['player'],
                'runs': [{'unit': 'player', 'start': 0, 'end': 4, 'reference': 'ref0'},
                         {'unit': 'player', 'start': 6, 'end': 8, 'reference': 'ref1'}]}
     base = struct.pack('<4sHH4sHHIIII', b'DKIF', 0, 32, b'AV01', 640, 480, 50, 1, 240, 0)
@@ -92,7 +92,7 @@ def test_cuts_gaps_and_ivf_checks():
 def test_native_only_and_profile_rejection():
     _, base, keypoints, refs = fixture()
     profile = {'mode': 'native_only', 'recipe': copy.deepcopy(packet.NATIVE_RECIPE),
-               'resources': {'native_decoder': 'a' * 64}, 'width': 640, 'height': 480,
+               'resources': {'native_decoder': 'a' * 64}, 'coded_size': [640, 480], 'canvas_size': [1920, 1080],
                'cuts': [2], 'runs': [], 'order': []}
     blob = packet.build(profile, base, None, {})
     _, accounting, decoded = packet.unpack(blob, profile)
@@ -135,3 +135,30 @@ def test_empty_individual_track_rejected(monkeypatch):
     monkeypatch.setattr(rates, 'decode_keypoints', lambda _: (meta, units))
     with pytest.raises(ValueError, match='invalid track'):
         packet.build(profile, base, keypoints, refs)
+
+
+def test_coded_size_and_output_canvas_are_independent():
+    profile, base, keypoints, refs = fixture()
+    # IVF header only: synthetic frame payloads do not establish AV1 decodability.
+    base = bytearray(base)
+    struct.pack_into('<HH', base, 12, 480, 272)
+    profile['coded_size'] = [480, 272]
+    profile['canvas_size'] = [1920, 1080]
+    blob = packet.build(profile, bytes(base), keypoints, refs)
+    packet.unpack(blob, profile)
+    mismatch = copy.deepcopy(profile)
+    mismatch['coded_size'] = [1920, 1080]
+    with pytest.raises(ValueError, match='IVF header'):
+        packet.build(mismatch, bytes(base), keypoints, refs)
+    mismatch = copy.deepcopy(profile)
+    mismatch['canvas_size'] = [1920, 0]
+    with pytest.raises(ValueError, match='dimensions'):
+        packet.build(mismatch, bytes(base), keypoints, refs)
+    mismatch = copy.deepcopy(profile)
+    mismatch['recipe']['base_to_canvas'] = 'nearest'
+    with pytest.raises(ValueError, match='recipe'):
+        packet.build(mismatch, bytes(base), keypoints, refs)
+    mismatch = copy.deepcopy(profile)
+    mismatch['canvas_size'] = [1280, 720]
+    with pytest.raises(ValueError, match='profile identity'):
+        packet.unpack(blob, mismatch)

@@ -2,6 +2,8 @@
 
 The caller pins the complete profile and installed resources. Each contiguous run
 has its own paid reference; gaps and cut boundaries reset temporal context.
+Coordinates and output boxes use the declared canvas, not the coded IVF size.
+The declared RGB resize is a receiver policy; this module does not decode video.
 """
 from __future__ import annotations
 
@@ -17,16 +19,18 @@ PROFILE = 'common-tennis-player-v1'
 RECIPE = {'profile': PROFILE, 'guidance': 3.5, 'steps': 30, 'context': [24, 4],
           'native_frames': 240, 'fps': [50, 1], 'seed_rule': 'sha256(unit)[:7]*1009+run',
           'crop_rule': [1.4, 90, 9], 'generation_size': [512, 784],
-          'fallback': 'native-base', 'output': 'all-240', 'reference_codec': 'png'}
+          'fallback': 'native-base', 'output': 'all-240', 'reference_codec': 'png',
+          'base_to_canvas': 'RGB8-cv2-INTER_CUBIC'}
 NATIVE_RECIPE = {'profile': 'common-tennis-native-only-v1', 'native_frames': 240,
-                 'fps': [50, 1], 'output': 'all-240', 'fallback': 'native-base'}
+                 'fps': [50, 1], 'output': 'all-240', 'fallback': 'native-base',
+                 'base_to_canvas': 'RGB8-cv2-INTER_CUBIC'}
 RESOURCES = frozenset({'vae_config', 'vae_weights', 'image_encoder_config', 'image_encoder_weights',
                        'denoising_unet', 'reference_unet', 'pose_guider', 'motion_module',
                        'common_lora', 'generator_code', 'generator_env', 'native_decoder'})
 
 
 def _profile(profile: dict[str, Any]) -> None:
-    if set(profile) != {'mode', 'recipe', 'resources', 'width', 'height', 'cuts', 'runs', 'order'} or profile['mode'] not in ('players', 'native_only'):
+    if set(profile) != {'mode', 'recipe', 'resources', 'coded_size', 'canvas_size', 'cuts', 'runs', 'order'} or profile['mode'] not in ('players', 'native_only'):
         raise ValueError('unsupported profile')
     native = profile['mode'] == 'native_only'
     if wire.canonical(profile['recipe']) != wire.canonical(NATIVE_RECIPE if native else RECIPE):
@@ -36,8 +40,10 @@ def _profile(profile: dict[str, Any]) -> None:
         not isinstance(v, str) or wire.HASH.fullmatch(v) is None for v in resources.values()
     ):
         raise ValueError('invalid installed resource identities')
-    if any(type(profile[k]) is not int or not 1 <= profile[k] <= 8192 for k in ('width', 'height')):
-        raise ValueError('invalid dimensions')
+    for key in ('coded_size', 'canvas_size'):
+        size = profile[key]
+        if not isinstance(size, list) or len(size) != 2 or any(type(x) is not int or not 1 <= x <= 8192 for x in size):
+            raise ValueError('invalid dimensions')
     cuts = profile['cuts']
     if not isinstance(cuts, list) or any(type(x) is not int or not 0 < x < 240 for x in cuts) or cuts != sorted(set(cuts)):
         raise ValueError('invalid cuts')
@@ -81,7 +87,7 @@ def _decode(profile: dict[str, Any], sections: dict[str, bytes]) -> dict[str, An
     _profile(profile)
     if 'base' not in sections:
         raise ValueError('missing required section')
-    _ivf(sections['base'], profile['width'], profile['height'])
+    _ivf(sections['base'], *profile['coded_size'])
     if profile['mode'] == 'native_only':
         if set(sections) != {'base'}:
             raise ValueError('native-only packet has extra sections')
