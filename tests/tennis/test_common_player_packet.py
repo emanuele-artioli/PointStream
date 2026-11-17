@@ -327,7 +327,8 @@ def test_jpeg_roundtrip_identity_and_accounting(quality):
     refs = {r['reference']: rates.encode_reference(image, {'unit': 'player',
             'reference_frame': r['start'], 'reference_box': [0, 0, 100, 100],
             'pixels': 'full_prepared_conditioning_crop'}, quality) for r in profile['runs']}
-    profile['reference_rgb_sha256'] = {name: hashlib.sha256(rates.decode_reference(ref)[1].tobytes()).hexdigest()
+    from experiments.tennis.player_requalification import array_sha
+    profile['reference_rgb_sha256'] = {name: array_sha(rates.decode_reference(ref)[1])
                                        for name, ref in refs.items()}
     blob = packet.build(profile, base, keypoints, refs)
     sections, accounting, decoded = packet.unpack(blob)
@@ -389,7 +390,8 @@ def test_jpeg_reference_hash_bindings_and_salvaged_entropy():
     refs = {r['reference']: rates.encode_reference(image, {'unit': 'player',
             'reference_frame': r['start'], 'reference_box': [0, 0, 100, 100],
             'pixels': 'full_prepared_conditioning_crop'}, 70) for r in profile['runs']}
-    profile['reference_rgb_sha256'] = {name: hashlib.sha256(rates.decode_reference(ref)[1].tobytes()).hexdigest()
+    from experiments.tennis.player_requalification import array_sha
+    profile['reference_rgb_sha256'] = {name: array_sha(rates.decode_reference(ref)[1])
                                        for name, ref in refs.items()}
     packet.build(profile, base, keypoints, refs)
     missing = copy.deepcopy(profile)
@@ -410,6 +412,8 @@ def test_jpeg_reference_hash_bindings_and_salvaged_entropy():
     scan_start = sos + 2 + int.from_bytes(raw[sos + 2:sos + 4], 'big')
     truncated = raw[:scan_start] + b'\xff\xd9'
     # OpenCV may return a full-sized image even when the scan has no entropy.
-    assert cv2.imdecode(np.frombuffer(truncated, np.uint8), cv2.IMREAD_COLOR).shape == (784, 512, 3)
-    with pytest.raises(ValueError, match='reference RGB hash mismatch'):
+    # A stricter installed decoder may reject it before the hash comparison.
+    salvaged = cv2.imdecode(np.frombuffer(truncated, np.uint8), cv2.IMREAD_COLOR)
+    assert salvaged is None or salvaged.shape == (784, 512, 3)
+    with pytest.raises(ValueError, match='reference RGB hash mismatch|invalid reference image'):
         packet.build(profile, base, keypoints, {**refs, 'ref0': rates.seal(b'REF1', meta, truncated)})

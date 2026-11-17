@@ -26,7 +26,8 @@ RECIPE = {'profile': PROFILE, 'guidance': 3.5, 'steps': 30, 'context': [24, 4],
           'base_to_canvas': 'RGB8-cv2-INTER_CUBIC'}
 # JPEG quality is sender metadata, not a proof of the quantization tables.
 JPEG_RECIPES = {q: {**RECIPE, 'profile': 'common-tennis-player-jpeg-v1',
-                    'reference_codec': 'jpeg', 'nominal_quality': q}
+                    'reference_codec': 'jpeg', 'nominal_quality': q,
+                    'reference_rgb_hash': 'sha256-numpy-dtype-shape-bytes-v1'}
                 for q in (70, 40)}
 NATIVE_RECIPE = {'profile': 'common-tennis-native-only-v1', 'native_frames': 240,
                  'fps': [50, 1], 'output': 'all-240', 'fallback': 'native-base',
@@ -349,8 +350,12 @@ def _decode(profile: dict[str, Any], sections: dict[str, bytes]) -> dict[str, An
             box = np.asarray(rm['reference_box'], dtype=float)
             if box.shape != (4,) or not np.isfinite(box).all() or np.any(box[2:] <= 0) or image.shape != (784, 512, 3):
                 raise ValueError('invalid reference geometry')
-            if jpeg and hashlib.sha256(image.tobytes()).hexdigest() != profile['reference_rgb_sha256'][refname]:
-                raise ValueError('reference RGB hash mismatch')
+            if jpeg:
+                # Match the already frozen preparation manifest's array hash.
+                image_hash = hashlib.sha256(f'{image.dtype.str}:{image.shape}:'.encode())
+                image_hash.update(image.tobytes())
+                if image_hash.hexdigest() != profile['reference_rgb_sha256'][refname]:
+                    raise ValueError('reference RGB hash mismatch')
             boxes = k6b.run_boxes(list(kp[a:b]))
             decoded_runs.append({'start': run['start'], 'end': run['end'], 't': t[a:b], 'kp': kp[a:b],
                                  'boxes': boxes, 'reference': image, 'reference_box': box,

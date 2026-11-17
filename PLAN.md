@@ -87,17 +87,20 @@ Its lossless-reference carrier costs391,981B,
 653.30kbps over4.8s. Prioritize a bounded cheaper-reference/reuse decision before
 another long same-reference generation run; actual source-denied generation,
 receiver masks, matched controls and full-frame composition remain unfinished.
-New GPU/scoring/training stages remain unreleased. Both author motion reviews
+New scoring/training stages remain unreleased. Both author motion reviews
 are acceptable; this changes no historical rate or quality result.
 
 The [prepared JPEG appearance pilot](docs/experiments/player-reference-pilot-20261117.md)
 freezes qualities70/40 at65,120/41,075reference bytes versus366,161lossless.
-Code, actual CPU inputs and independent review are ready locally. Its new
-proposed cap is30GPU-min/45CPU-min; quality40 is conditional on accepted
+Code, actual CPU inputs and independent review are ready locally. The user
+approved its30GPU-min/45CPU-min cap; quality40 is conditional on accepted
 quality70 output and enough remaining reservation. This is a24-tick appearance
 test with matched lossless controls, not a longer-motion or codec comparison.
 Campus SSH became unreachable during input publication; verify the unknown
-write after connectivity returns. No new GPU stage is released.
+write after connectivity returns. The [live release](docs/experiments/player-reference-pilot-20261117/release.json)
+records the user's instruction to continue locally. No campus probe, write,
+retry or GPU job is scheduled in this phase. Preserve the approved GPU producer
+at55ba0629; local packet/viewer changes do not alter its frozen inputs.
 
 | Stage | Deliverable | Admission/stop decision |
 |---|---|---|
@@ -167,7 +170,7 @@ decision requiring its own defensible contribution, not a second project now.
 | Approved three-profile player replay and human pilot | [actual jobs and audits](docs/experiments/player-replay-20261116/release.json); [human review](docs/experiments/player-replay-20261116/human-review-import.json); [PR432](https://github.com/emanuele-artioli/PointStream/pull/432) | `codex/player-replay-release-20261116` | primary plus scoped audit/preview builders; actual tier telemetry unverified | all three complete/PASS;1,203GPU/3,003CPUseconds; PR432 merged with successfulCI. Human review imported: Player1 uncertain, Player2 common tennis preferred; stock torso-facing failure. Common tennis provisional, no codec win/new training |
 | Human-informed shared-tennis motion pilot | [closed original release](docs/experiments/player-motion-20261117/release.json); [approved amendment and cumulative ledger](docs/experiments/player-motion-amendment-20261117/release.json) | `codex/player-motion-amended-run-20261117` | primary plus scoped runner/independent audit; actual tier telemetry unverified | both amended44/240-frame requests complete and independently integrity-accepted; no active claims. Conservative3,318GPU/6,318CPU includes original stop and both externalCPU caps; within original4,200/7,200. Both full-run author reviews acceptable; no codec/preference/generalization claim |
 | Common-player packet contract | [implementation and real-input audit](docs/experiments/common-player-packet-20261117.md); [receiver design](docs/experiments/player-common-receiver-design-20261117.md) | `codex/common-player-packet-20261117` | primary plus scoped builder; actual tier telemetry unverified | CPU contract complete:33focused tests/full2699passed39skip; configured Ruff/Mypy672pass; independent code review and exact both-player240tick conditioning/native240frame decode pass.391,981B lossless-reference carrier; no RQ/complete-learned-decoder claim. Source-denied generation/masks and cheaper-reference/reuse test remain unreleased |
-| JPEG reference appearance pilot | [prepared protocol and inputs](docs/experiments/player-reference-pilot-20261117.md) | `codex/player-reference-pilot-20261117` | primary, scoped builder and independent designer; actual tier telemetry unverified | prepared/reviewed, unreleased30GPU-min/45CPU-min; Q70first/Q40conditional. Durable local v2 inputs verified; campus publication unknown after connectivity loss. Fresh remotehash/admission checks and explicit budget release required |
+| JPEG reference appearance pilot | [protocol and inputs](docs/experiments/player-reference-pilot-20261117.md); [approved release](docs/experiments/player-reference-pilot-20261117/release.json) | `codex/reference-local-readiness-20261117`; frozen GPU producer55ba0629 | primary, scoped builders and independent reviewers; actual tier telemetry unverified | approved30GPU-min/45CPU-min; Q70first/Q40conditional. Local work only per user; no GPU started. Durable v2 inputs verified; existing campus publication unknown. Inspect publication and refresh fleet admission after connectivity returns; no repeat budget request |
 | Combined receiver/development pilot | stagesA–D above | — | unassigned | unreleased: exact inputs, source-independent contract and complete cost forecast precede budget approval |
 
 ### Dates and authority
@@ -190,7 +193,9 @@ human-review import itself authorized no computation. The November17 motion
 approval stopped at its cost gate; its unused envelope is not automatically
 reopened. The specific amendment was separately approved; no further retry or
 scope expansion is released. Its live ledger must count the original charge
-before every sequential admission. Local
+before every sequential admission. A separate30GPU-minute/45CPU-minute JPEG
+reference pilot is now approved; it does not reopen the motion allocation.
+Campus execution remains gated while the user requests local work. Local
 implementation, read-only audits and repository checks may continue. Check
 exact experiment IDs/status before acting; never replay unknown
 submissions. [Original authority ledger](docs/experiments/submission-ladder-autonomy-20261114.json).

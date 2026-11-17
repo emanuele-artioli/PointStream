@@ -38,7 +38,8 @@ def test_full_audit_rejects_changed_repeat(tmp_path, monkeypatch) -> None:
         review.audit(*args)
 
 
-def test_review_hides_variants_and_preserves_labels(tmp_path, monkeypatch) -> None:
+@pytest.mark.parametrize("qualities", [(70,), (70, 40)])
+def test_review_hides_variants_and_preserves_labels(tmp_path, monkeypatch, qualities) -> None:
     import json
 
     import numpy as np
@@ -50,7 +51,7 @@ def test_review_hides_variants_and_preserves_labels(tmp_path, monkeypatch) -> No
     plan = {"units": entries, "source": {"window": "s"}, "settings": {"steps": 30}}
     configs = {}
     variants = []
-    for name in ("lossless", "70", "40"):
+    for name in ("lossless", *(str(q) for q in qualities)):
         folder = tmp_path / name
         folder.mkdir()
         config_path = folder / "config.json"
@@ -80,5 +81,21 @@ def test_review_hides_variants_and_preserves_labels(tmp_path, monkeypatch) -> No
     page = (output / "review.html").read_text()
     assert "Player 1" in page and "Player 2" in page
     assert "quality-70" not in page and "quality-40" not in page and "366161" not in page
-    assert '"quality-70"' in (output / "reveal.json").read_text()
+    key = json.loads((output / "reveal.json").read_text())
+    assert key["completed_qualities"] == list(qualities)
+    assert key["complete_candidate_family"] == (len(qualities) == 2)
+    for unit in units:
+        assert set(key["mappings"][unit].values()) == {"lossless", *(f"quality-{q}" for q in qualities)}
+    assert ("Partial candidate family" in page) == (len(qualities) == 1)
+    assert f"repeat({len(qualities) + 2},1fr)" in page
     assert "Slowed to 10 fps" in page
+
+
+@pytest.mark.parametrize("count", [0, 3])
+def test_review_rejects_unsupported_candidate_count(tmp_path, count) -> None:
+    from experiments.tennis import player_reference_review as review
+
+    variants = [(tmp_path, "hash", tmp_path, tmp_path, tmp_path)] * count
+    with pytest.raises(ValueError, match="one or two completed"):
+        review.build(tmp_path, "hash", tmp_path, tmp_path, tmp_path,
+                     variants, tmp_path, tmp_path / "output", 42)
