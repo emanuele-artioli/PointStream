@@ -1,4 +1,6 @@
-# JPEG reference appearance pilot — proposed, unreleased
+# Experiments: JPEG reference appearance pilot
+
+### 2026-11-17 — proposed, unreleased
 
 The previous motion allocation is closed at 3,318 GPU-s and 6,318 CPU-s; its unused balance is not transferable. Both full 240-tick common-tennis players received author judgments of Acceptable. The next hypothesis is that the same common model tolerates cheaper JPEG references while maintaining acceptable source-aligned body and pose. The competing explanation is that reference damage destroys that fidelity. This is an appearance/reference pilot, not a complete paid codec or rate–quality test.
 
@@ -6,7 +8,14 @@ Freeze exactly JPEG quality 70 and 40 before any GPU result, on the already open
 
 Each quality is a separate proposed 900-second request with one CPU core: real smoke 300 s, full 450 s, validator 60 s. Proposed aggregate maximum is **1,800 GPU-s and 2,700 CPU-s**, including 900 external CPU-s. No budget is released. Each smoke must pass substantive existing input/output and CUDA/model checks and the measured admission forecast `1.25*(load + 2*(worker_wall-load)) + 90`, at most 450 s and at most remaining native campaign time minus 60 s. Historical shared 24-tick renders of 74.17/83.15 s plus about 24 s loading support a bounded proposal, not a completion guarantee. Stop on failed validation, cost gate, ambiguity or exhausted budget; no automatic retry. Stages are at most 45 minutes, each request 15 minutes. Refresh deadline and perform normal fleet admission only after explicit release.
 
-Promotion requires a durable randomized source-aligned human comparison of source, lossless and JPEG outputs, including body/pose and actual reference bytes. A uniform JPEG quality is eligible only if **both players** are judged acceptable; uncertainty is not automatic acceptance. Choose the eligible quality with the smallest actual total REF1 byte count. A single-player success is a narrowed scope and a possible future variant, not pooled promotion or authorization for tuning. There is no arbitrary 10% floor and no codec-win inference. A failed setting narrows the claim and does not authorize new tuning. A durable viewer remains to be built; the old generic preview may renumber ordered units and must not be used for identity labels. Native encoder/decoder versions and all input, output, job, GPU and code identities must be recorded at execution. Offline target-frame references and geometry remain disclosed.
+Promotion requires a durable randomized source-aligned human comparison of source, lossless and JPEG outputs, including body/pose and actual reference bytes. A uniform JPEG quality is eligible only if **both players** are judged acceptable; uncertainty is not automatic acceptance. Choose the eligible quality with the smallest actual total REF1 byte count. A single-player success is a narrowed scope and a possible future variant, not pooled promotion or authorization for tuning. There is no arbitrary 10% floor and no codec-win inference. A failed setting narrows the claim and does not authorize new tuning. The prepared viewer below must pass actual-publication checks before delivery; the old generic preview may renumber ordered units and must not be used for identity labels. Native encoder/decoder versions and all input, output, job, GPU and code identities must be recorded at execution. Offline target-frame references and geometry remain disclosed.
+
+Admit quality70 first. Admit quality40 only after accepted full output and
+closed actual accounting from the first request, with at least900GPU-s and
+1,350CPU-s remaining for its whole reservation, including450externalCPU-s.
+Charge each externalCPU reservation in full; include setup, failures and final
+task teardown conservatively. If the second reservation no longer fits, retain
+the first result and stop. Two settings are not guaranteed by the budget cap.
 
 The [proposal](player-reference-pilot-20261117/proposal.json) is not authority to execute. Local CPU preparation authenticates the original packet/profile and conditioning NPZs, encodes actual REF1 JPEGs, decodes them into new NPZ references and preserves other arrays. Its manifest records source, old/new reference, decoded RGB, NPZ and archive hashes and bytes. The archive and configs are local pending review; remote paths in prospective specs are destinations, not claims of publication.
 

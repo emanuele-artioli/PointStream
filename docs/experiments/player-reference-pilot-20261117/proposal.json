@@ -26,5 +26,10 @@
   "decision": "A quality is eligible only when both players are source-aligned acceptable; uncertainty is not acceptance. Choose the eligible quality with smallest actual total REF1 bytes. Single-player success is narrowed scope for a possible future variant, not pooled promotion or new tuning.",
   "stop": "Failed correctness/cost gate, ambiguous submission, or budget exhaustion; no automatic retry",
   "controls": "Existing lossless 24-native-frame outputs in matched contexts",
-  "prior_allocation": "Closed 3318 GPU-s / 6318 CPU-s; unused balance not transferable"
+  "prior_allocation": "Closed 3318 GPU-s / 6318 CPU-s; unused balance not transferable",
+  "sequential_admission": {
+    "initial_quality": 70,
+    "conditional_quality": 40,
+    "condition": "Accepted first full output and closed actual accounting leaves GPU>=900CPU>=1350; both external450CPU reservations fully charged, no new budget envelope. Otherwise stop."
+  }
 }
