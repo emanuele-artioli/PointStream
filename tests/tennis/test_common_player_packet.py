@@ -285,3 +285,31 @@ def test_zstd_forged_expansion_is_rejected():
     blob = rates.HEADER.pack(b'KPS2', 20, len(coded), hashlib.sha256(raw).digest()) + coded
     with pytest.raises(ValueError, match='content size'):
         packet._bounded_transport(blob, b'KPS2', packet.MAX_KPS)
+
+
+def test_zstd_window_bounded_before_decompression(monkeypatch):
+    import zstandard
+
+    _, _, keypoints, _ = fixture()
+    if not keypoints[rates.HEADER.size:].startswith(b'\x28\xb5\x2f\xfd'):
+        pytest.skip('fixture compressor is not zstd')
+    class Parameters:
+        window_size = packet.MAX_KPS + 1
+    monkeypatch.setattr(zstandard, 'get_frame_parameters', lambda _: Parameters())
+    with pytest.raises(ValueError, match='window'):
+        packet._bounded_transport(keypoints, b'KPS2', packet.MAX_KPS)
+
+
+def test_adjacent_w2_runs_rejected_before_decode(monkeypatch):
+    profile, base, keypoints, refs = fixture()
+    meta, raw = rates.unseal(keypoints, b'KPS2')
+    raw = bytearray(raw)
+    # One unit: two runs (0, 4) and (6, 2); mutate second start to 4.
+    assert list(raw[5:10]) == [2, 0, 4, 6, 2]
+    raw[8] = 4
+    bad = rates.seal(b'KPS2', meta, bytes(raw))
+    def forbidden(*_):
+        raise AssertionError('decoder invoked')
+    monkeypatch.setattr(packet, '_decode_window', forbidden)
+    with pytest.raises(ValueError, match='run geometry'):
+        packet.build(profile, base, bad, refs)

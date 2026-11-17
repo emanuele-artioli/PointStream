@@ -109,8 +109,10 @@ def _bounded_transport(blob: bytes, magic: bytes, limit: int) -> tuple[dict[str,
             # Existing encoder writes a content size; unknown-size frames are unsupported.
             if zstd.frame_content_size(coded) != raw_size:
                 raise ValueError('invalid zstd content size')
+            if zstd.get_frame_parameters(coded).window_size > limit:
+                raise ValueError('zstd window exceeds limit')
             try:
-                raw = zstd.ZstdDecompressor(max_window_size=limit).decompress(
+                raw = zstd.ZstdDecompressor(max_window_size=limit // 1024).decompress(
                     coded, max_output_size=limit, allow_extra_data=False)
             except zstd.ZstdError as exc:
                 raise ValueError('invalid zstd stream') from exc
@@ -195,7 +197,7 @@ def _bounded_keypoints(blob: bytes, order: list[str]) -> tuple[dict[str, Any], l
         last_end = total = 0
         for _ in range(count):
             start, length = varint(), varint()
-            if not 0 < length <= 240 or start < last_end or start + length > 240:
+            if not 0 < length <= 240 or (runs and start <= last_end) or start + length > 240:
                 raise ValueError('invalid run geometry')
             last_end = start + length
             runs.append((start, length))
