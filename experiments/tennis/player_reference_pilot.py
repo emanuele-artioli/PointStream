@@ -3,11 +3,14 @@ from __future__ import annotations
 
 import argparse
 import copy
+import hashlib
 import json
+import platform
 import tarfile
 from pathlib import Path
 from typing import Any
 
+import cv2
 import numpy as np
 
 from experiments.jobs.inbox import validate_spec
@@ -70,7 +73,7 @@ def prepare(source: Path, output: Path) -> dict[str, Any]:
             config["units"].append(unit)
             rows.append({"unit": name, "review_label": unit["review_label"],
                          "source_npz_sha256": sha256(source_npz), "source_rgb_sha256": array_sha(image),
-                         "old_ref1_sha256": __import__("hashlib").sha256(old_ref).hexdigest(),
+                         "old_ref1_sha256": hashlib.sha256(old_ref).hexdigest(),
                          "old_ref1_bytes": len(old_ref), "encoded_ref1_sha256": sha256(ref_path),
                          "encoded_ref1_bytes": len(encoded), "decoded_rgb_sha256": array_sha(decoded),
                          "new_npz_sha256": unit["sha256"], "new_npz_bytes": target.stat().st_size})
@@ -78,9 +81,18 @@ def prepare(source: Path, output: Path) -> dict[str, Any]:
         with tarfile.open(archive, "w") as tar:
             for path in sorted(publish.iterdir()):
                 tar.add(path, arcname=f"publish/{path.name}")
-        provenance = {"quality": quality, "packet_sha256": PACKET, "profile_sha256": PROFILE, "units": rows}
+        decoder = {"library": "OpenCV", "version": cv2.__version__,
+                   "build_information_sha256": hashlib.sha256(cv2.getBuildInformation().encode()).hexdigest(),
+                   "platform": platform.platform(), "decoder": "cv2.imdecode IMREAD_COLOR; BGR to RGB8",
+                   "encoder": "cv2.imencode JPEG"}
+        provenance = {"quality": quality, "packet_sha256": PACKET, "profile_sha256": PROFILE,
+                      "decoder": decoder, "units": rows}
         config["reference_pilot"] = provenance
-        config["conditioning"]["provenance"] = "Authenticated packet references JPEG encoded and decoded; all other conditioning retained. Appearance pilot, not complete codec."
+        config["conditioning"]["provenance"] += (
+            " Authenticated original packet REF1 RGB is re-encoded as JPEG REF1 and decoded on "
+            "the preparation host; decoded RGB replaces only the NPZ reference. "
+            "Packet/profile, source NPZ and encoded/decoded identities and decoder build are in reference_pilot."
+        )
         config_path = folder / "config.json"
         config_path.write_text(json.dumps(config, indent=2, sort_keys=True) + "\n")
         inventory = json.loads((ROOT / "inputs.json").read_text())
@@ -100,7 +112,8 @@ def prepare(source: Path, output: Path) -> dict[str, Any]:
         spec_path.write_text(json.dumps(spec, indent=2, sort_keys=True) + "\n")
         summaries[str(quality)] = {**provenance, "archive_sha256": sha256(archive),
                                    "archive_bytes": archive.stat().st_size,
-                                   "config_sha256": sha256(config_path), "spec_sha256": sha256(spec_path)}
+                                   "config_sha256": sha256(config_path), "inventory_sha256": sha256(inventory_path),
+                                   "spec_template_path": str(spec_path), "spec_template_sha256": sha256(spec_path)}
     (output / "manifest.json").write_text(json.dumps(summaries, indent=2, sort_keys=True) + "\n")
     return summaries
 

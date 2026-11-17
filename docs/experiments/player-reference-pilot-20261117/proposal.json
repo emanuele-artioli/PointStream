@@ -1,13 +1,29 @@
 {
   "status": "unreleased-no-active-budget",
-  "qualities": [70, 40],
+  "qualities": [
+    70,
+    40
+  ],
   "source": "nadal_kyrgios/000@120",
   "scope": "24-native-frame reference appearance development; one opened source, not a codec or longer-motion result",
-  "order": ["Player 2", "Player 1"],
-  "per_request": {"smoke_seconds": 300, "full_seconds": 450, "validator_seconds": 60, "job_seconds": 900, "cpu_cores": 1, "external_cpu_seconds": 450},
-  "aggregate": {"gpu_seconds": 1800, "cpu_seconds": 2700},
+  "order": [
+    "Player 2",
+    "Player 1"
+  ],
+  "per_request": {
+    "smoke_seconds": 300,
+    "full_seconds": 450,
+    "validator_seconds": 60,
+    "job_seconds": 900,
+    "cpu_cores": 1,
+    "external_cpu_seconds": 450
+  },
+  "aggregate": {
+    "gpu_seconds": 1800,
+    "cpu_seconds": 2700
+  },
   "forecast": "1.25*(load + 2*(worker_wall-load)) + 90 <= 450 and <= native_campaign_remaining - 60",
-  "decision": "Source-aligned human acceptability and actual reference cost; no fixed percentage floor or codec-win inference",
+  "decision": "A quality is eligible only when both players are source-aligned acceptable; uncertainty is not acceptance. Choose the eligible quality with smallest actual total REF1 bytes. Single-player success is narrowed scope for a possible future variant, not pooled promotion or new tuning.",
   "stop": "Failed correctness/cost gate, ambiguous submission, or budget exhaustion; no automatic retry",
   "controls": "Existing lossless 24-native-frame outputs in matched contexts",
   "prior_allocation": "Closed 3318 GPU-s / 6318 CPU-s; unused balance not transferable"
