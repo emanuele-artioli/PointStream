@@ -1,6 +1,8 @@
-# Draft: paid common-tennis player receiver — UNRELEASED
+# Experiments: paid common-tennis player receiver design
 
 **Design only. No code, additional compute, model fitting, evaluation, or budget is authorized by this draft.** Player 2's one-author, unpaired acceptance of 240 generated crop frames on the opened Nadal–Kyrgios development source motivates a player-only receiver witness. It does not establish a codec gain, a complete receiver, a ball result, or source-level generalization. Player 1's outcome is independent and remains pending at drafting.
+
+### 2026-11-17 — unreleased receiver contract draft
 
 ## Hypothesis and decision boundary
 

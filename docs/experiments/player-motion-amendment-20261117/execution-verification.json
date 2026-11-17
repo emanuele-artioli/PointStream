@@ -1,5 +1,12 @@
 {
   "checked_utc": "2026-11-17T10:36:51.631884+00:00",
+  "ci_attempts": [
+    {
+      "conclusion": "failure",
+      "reason": "Unreleased design doc missed the required experiment header; corrected and all3documentation tests pass.",
+      "run_id": 44070951311
+    }
+  ],
   "execution_scope": "Both amended requests complete, integrity accepted; one monitoring timeout preserved; no extra computation retried.",
   "full_suite_basis": {
     "prior_local_result": "2666passed39skipped; no implementation changes since",
@@ -14,6 +21,10 @@
     "final-bundle-audit.json"
   ],
   "local": {
+    "experiment_documentation_tests": {
+      "command": "python -m pytest tests/test_experiments_docs.py -q",
+      "passed": 3
+    },
     "git diff --check": {
       "exit_code": 0
     },
