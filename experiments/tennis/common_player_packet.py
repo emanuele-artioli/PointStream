@@ -37,13 +37,16 @@ RESOURCES = frozenset({'vae_config', 'vae_weights', 'image_encoder_config', 'ima
 
 
 def _profile(profile: dict[str, Any]) -> None:
-    if set(profile) != {'mode', 'recipe', 'resources', 'coded_size', 'canvas_size', 'cuts', 'runs', 'order'} or profile['mode'] not in ('players', 'native_only'):
+    keys = {'mode', 'recipe', 'resources', 'coded_size', 'canvas_size', 'cuts', 'runs', 'order'}
+    if not keys <= set(profile) or profile['mode'] not in ('players', 'native_only'):
         raise ValueError('unsupported profile')
     native = profile['mode'] == 'native_only'
     recipe = profile['recipe']
     jpeg = not native and any(wire.canonical(recipe) == wire.canonical(r) for r in JPEG_RECIPES.values())
     if not jpeg and wire.canonical(recipe) != wire.canonical(NATIVE_RECIPE if native else RECIPE):
         raise ValueError('unsupported recipe')
+    if set(profile) != keys | ({'reference_rgb_sha256'} if jpeg else set()):
+        raise ValueError('unsupported profile')
     if not native and ([k6b.GEN_W, k6b.GEN_H] != RECIPE['generation_size'] or
                        [k6b.CROP_MARGIN, k6b.SIZE_PERCENTILE, k6b.CENTRE_SMOOTH] != RECIPE['crop_rule'] or
                        k6b.k4.KP_CONF != 0.5):
@@ -62,6 +65,14 @@ def _profile(profile: dict[str, Any]) -> None:
         raise ValueError('invalid cuts')
     if not isinstance(profile['runs'], list) or len(profile['runs']) > 480:
         raise ValueError('invalid runs')
+    if jpeg:
+        hashes = profile['reference_rgb_sha256']
+        refs = [r.get('reference') for r in profile['runs'] if isinstance(r, dict)]
+        if (not isinstance(hashes, dict) or len(refs) != len(profile['runs']) or
+                any(not wire._valid_name(ref) for ref in refs) or len(set(refs)) != len(refs) or
+                set(hashes) != set(refs) or any(not isinstance(v, str) or wire.HASH.fullmatch(v) is None
+                                                  for v in hashes.values())):
+            raise ValueError('invalid reference RGB hash bindings')
     order = profile['order']
     if not isinstance(order, list) or len(order) > 16 or any(not wire._valid_name(x) for x in order) or len(set(order)) != len(order):
         raise ValueError('invalid compositing order')
@@ -338,6 +349,8 @@ def _decode(profile: dict[str, Any], sections: dict[str, bytes]) -> dict[str, An
             box = np.asarray(rm['reference_box'], dtype=float)
             if box.shape != (4,) or not np.isfinite(box).all() or np.any(box[2:] <= 0) or image.shape != (784, 512, 3):
                 raise ValueError('invalid reference geometry')
+            if jpeg and hashlib.sha256(image.tobytes()).hexdigest() != profile['reference_rgb_sha256'][refname]:
+                raise ValueError('reference RGB hash mismatch')
             boxes = k6b.run_boxes(list(kp[a:b]))
             decoded_runs.append({'start': run['start'], 'end': run['end'], 't': t[a:b], 'kp': kp[a:b],
                                  'boxes': boxes, 'reference': image, 'reference_box': box,

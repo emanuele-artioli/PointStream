@@ -327,6 +327,8 @@ def test_jpeg_roundtrip_identity_and_accounting(quality):
     refs = {r['reference']: rates.encode_reference(image, {'unit': 'player',
             'reference_frame': r['start'], 'reference_box': [0, 0, 100, 100],
             'pixels': 'full_prepared_conditioning_crop'}, quality) for r in profile['runs']}
+    profile['reference_rgb_sha256'] = {name: hashlib.sha256(rates.decode_reference(ref)[1].tobytes()).hexdigest()
+                                       for name, ref in refs.items()}
     blob = packet.build(profile, base, keypoints, refs)
     sections, accounting, decoded = packet.unpack(blob)
     assert accounting['frame'] == len(base) + len(keypoints)
@@ -373,3 +375,41 @@ def test_jpeg_header_rejects_before_decoder(monkeypatch):
     for bad in (bytes(wrong_size), bytes(progressive), raw[:-1], raw + b'x', raw[:sof + 3]):
         with pytest.raises(ValueError):
             packet._bounded_reference(rates.seal(b'REF1', meta, bad), True, profile['resources']['reference_decoder'])
+
+
+def test_jpeg_reference_hash_bindings_and_salvaged_entropy():
+    import cv2
+    import hashlib
+
+    profile, base, keypoints, _ = fixture()
+    profile['recipe'] = copy.deepcopy(packet.JPEG_RECIPES[70])
+    profile['resources']['reference_decoder'] = hashlib.sha256(cv2.getBuildInformation().encode()).hexdigest()
+    rng = np.random.default_rng(123)
+    image = rng.integers(0, 256, (784, 512, 3), dtype=np.uint8)
+    refs = {r['reference']: rates.encode_reference(image, {'unit': 'player',
+            'reference_frame': r['start'], 'reference_box': [0, 0, 100, 100],
+            'pixels': 'full_prepared_conditioning_crop'}, 70) for r in profile['runs']}
+    profile['reference_rgb_sha256'] = {name: hashlib.sha256(rates.decode_reference(ref)[1].tobytes()).hexdigest()
+                                       for name, ref in refs.items()}
+    packet.build(profile, base, keypoints, refs)
+    missing = copy.deepcopy(profile)
+    del missing['reference_rgb_sha256']
+    with pytest.raises(ValueError, match='profile'):
+        packet.build(missing, base, keypoints, refs)
+    for hashes in ({'ref0': '0' * 64, 'ref1': profile['reference_rgb_sha256']['ref1']},
+                   {'ref0': profile['reference_rgb_sha256']['ref0']},
+                   {**profile['reference_rgb_sha256'], 'extra': '0' * 64},
+                   {'wrong': profile['reference_rgb_sha256']['ref0'],
+                    'ref1': profile['reference_rgb_sha256']['ref1']}):
+        bad = copy.deepcopy(profile)
+        bad['reference_rgb_sha256'] = hashes
+        with pytest.raises(ValueError, match='reference RGB hash'):
+            packet.build(bad, base, keypoints, refs)
+    meta, raw = rates.unseal(refs['ref0'], b'REF1')
+    sos = raw.index(b'\xff\xda')
+    scan_start = sos + 2 + int.from_bytes(raw[sos + 2:sos + 4], 'big')
+    truncated = raw[:scan_start] + b'\xff\xd9'
+    # OpenCV may return a full-sized image even when the scan has no entropy.
+    assert cv2.imdecode(np.frombuffer(truncated, np.uint8), cv2.IMREAD_COLOR).shape == (784, 512, 3)
+    with pytest.raises(ValueError, match='reference RGB hash mismatch'):
+        packet.build(profile, base, keypoints, {**refs, 'ref0': rates.seal(b'REF1', meta, truncated)})

@@ -79,11 +79,17 @@ The separate `common-tennis-player-jpeg-v1` recipe accepts only nominal sender
 qualities 70 and 40. The quality field is encoder metadata; it does not prove
 which quantization tables are present. Exact REF1 payload hashes identify the
 experimental inputs. The profile declares a `reference_decoder` resource: the
-SHA256 of the UTF-8 OpenCV build information measured at decode time. The
+SHA256 of the UTF-8 OpenCV build information measured at decode time, a
+configuration fingerprint rather than a binary or runtime identity. The
 preparation build was Mac OpenCV 4.10.0 with hash
 `bade1ed132afc491c4cadda9ea0590a3d0745e16807f765450d3d3d4152a780b`.
 This pins that build, not Linux pixel parity. Before OpenCV allocation the
 transport checks a bounded, single-scan baseline 8-bit three-component JPEG
-header and 512×784 dimensions. PNG v1 and native-only profiles remain separate.
+header and 512×784 dimensions; this structural check does not prove full
+entropy validity. The JPEG profile also binds each reference name to the
+expected decoded RGB SHA256, checked against the actual decoded bytes. For
+the pilot these expected hashes must come from the independently frozen prepared
+manifest. A self-declared hash does not authenticate the sender or payload.
+PNG v1 and native-only profiles remain separate.
 This is byte accounting and conditioning transport only; it does not establish
 a learned receiver or a rate–quality result.
