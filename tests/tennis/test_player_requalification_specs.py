@@ -93,3 +93,18 @@ def test_motion_requests_reject_extra_players_or_match_resources(tmp_path):
     with pytest.raises(ValueError, match='ten-input'):
         build_motion_spec(folder / 'player-2.json', FROZEN / 'inputs.json',
                           '/home/itec/emanuele/Datasets/test.json', deadline)
+
+
+def test_motion_extended_policy_drives_matching_caps_and_rejects_unknown(tmp_path):
+    folder = ROOT / 'docs/experiments/player-motion-20261116'
+    config = json.loads((folder / 'player-2.json').read_text())
+    config['motion_admission_policy'] = 'extended-1800-v1'
+    path = tmp_path / 'extended.json'
+    path.write_text(json.dumps(config))
+    deadline = (datetime.now(timezone.utc) + timedelta(hours=12)).isoformat()
+    spec = build_motion_spec(path, folder / 'inputs.json', '/home/itec/emanuele/Datasets/test.json', deadline)
+    assert (spec['smoke']['seconds'], spec['full']['seconds'], spec['budget_seconds'], spec['validator_seconds']) == (450, 1800, 2400, 60)
+    config['motion_admission_policy'] = 'unknown'
+    path.write_text(json.dumps(config))
+    with pytest.raises(ValueError, match='unknown motion'):
+        build_motion_spec(path, folder / 'inputs.json', '/home/itec/emanuele/Datasets/test.json', deadline)

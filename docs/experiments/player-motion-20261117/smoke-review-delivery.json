@@ -1,0 +1,103 @@
+{
+  "scope": "Preserved44frame smoke only; full240notrun; display proxies not scored",
+  "source_left_candidate_right": "/Users/manu/Documents/PointStream-review/2026-11-17-player-motion-smoke/source-left-common-right-smoke-10fps.mp4",
+  "no_expiring_server": true,
+  "scientific_source_revision": "040500fcb0c36cbacb688bab0944d86ee9952df8",
+  "config_sha256": "e1d01c99f2b17718bf6aa4735761682e95801f4ee43d4f44f1e7d51567337e8a",
+  "manifest": {
+    "config_sha256": "e1d01c99f2b17718bf6aa4735761682e95801f4ee43d4f44f1e7d51567337e8a",
+    "display_encoder": {
+      "path": "/opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg",
+      "sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be",
+      "version": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "video_color": "BT.709 limited-range YUV420 display proxy; not scored reconstruction"
+    },
+    "input_receipts": {
+      "tennis_only": "d4357fbe0fbef8dfc46d0951008e4ff9e3ef8480775c39a541bb6b9d0667f5a7"
+    },
+    "outputs": {
+      "index.html": "10d002a2af20badab4fc5791fd9e9b19b4dc200ce1a97869f89f56cf8a9bbdd3",
+      "nadal_kyrgios__000_at120__person_000000000001-A-10.mp4": "d475f627b871b102618e2349a7c4d43c77542f14dc9a79f8523534b6830b0400",
+      "nadal_kyrgios__000_at120__person_000000000001-A-50.mp4": "7c5e68f47e38cdc52ec17f9b348444235e0825a72d3e8da8b819aae2346dc7ca",
+      "nadal_kyrgios__000_at120__person_000000000001-A-tick12.png": "85fedd6c742db502c124ebbd2e59ad2cf89b87328479a3e90f12507b2ae3b9fa",
+      "nadal_kyrgios__000_at120__person_000000000001-reference.png": "681f60f85115d249894b6f177828598b44dd9eea8eaf42154911a92b09c0678e",
+      "nadal_kyrgios__000_at120__person_000000000001-source-10.mp4": "790c78ba59a85333220550b8bfbeb06310a44d56127cc33da149575bb87a9da5",
+      "nadal_kyrgios__000_at120__person_000000000001-source-50.mp4": "5a78f000065a6a25187a901f579ffcb89e6365e10e9a3fa22380a557a14ac600",
+      "nadal_kyrgios__000_at120__person_000000000001-source-tick12.png": "a714fedfa073038d153a6fb0ad7222dbfe4f94fccd5ca923e5a128f759bf2f21"
+    },
+    "plan_sha256": "4eba78ccb04eaa0156e3c329fa8a65a42100940c7f66129324ebc7b906c66bec",
+    "reference_max_rgb_deltas": [
+      0
+    ],
+    "scope": "Unpaired common-tennis motion review",
+    "seed": 20261116,
+    "source_sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d"
+  },
+  "media": [
+    {
+      "path": "/Users/manu/Documents/PointStream-review/2026-11-17-player-motion-smoke/review/nadal_kyrgios__000_at120__person_000000000001-source-10.mp4",
+      "sha256": "790c78ba59a85333220550b8bfbeb06310a44d56127cc33da149575bb87a9da5",
+      "probe": {
+        "width": 512,
+        "height": 784,
+        "color_range": "tv",
+        "color_space": "bt709",
+        "avg_frame_rate": "10/1",
+        "duration": "4.400000",
+        "nb_read_frames": "44"
+      }
+    },
+    {
+      "path": "/Users/manu/Documents/PointStream-review/2026-11-17-player-motion-smoke/review/nadal_kyrgios__000_at120__person_000000000001-A-10.mp4",
+      "sha256": "d475f627b871b102618e2349a7c4d43c77542f14dc9a79f8523534b6830b0400",
+      "probe": {
+        "width": 512,
+        "height": 784,
+        "color_range": "tv",
+        "color_space": "bt709",
+        "avg_frame_rate": "10/1",
+        "duration": "4.400000",
+        "nb_read_frames": "44"
+      }
+    },
+    {
+      "path": "/Users/manu/Documents/PointStream-review/2026-11-17-player-motion-smoke/review/nadal_kyrgios__000_at120__person_000000000001-A-50.mp4",
+      "sha256": "7c5e68f47e38cdc52ec17f9b348444235e0825a72d3e8da8b819aae2346dc7ca",
+      "probe": {
+        "width": 512,
+        "height": 784,
+        "color_range": "tv",
+        "color_space": "bt709",
+        "avg_frame_rate": "50/1",
+        "duration": "0.880000",
+        "nb_read_frames": "44"
+      }
+    },
+    {
+      "path": "/Users/manu/Documents/PointStream-review/2026-11-17-player-motion-smoke/review/nadal_kyrgios__000_at120__person_000000000001-source-50.mp4",
+      "sha256": "5a78f000065a6a25187a901f579ffcb89e6365e10e9a3fa22380a557a14ac600",
+      "probe": {
+        "width": 512,
+        "height": 784,
+        "color_range": "tv",
+        "color_space": "bt709",
+        "avg_frame_rate": "50/1",
+        "duration": "0.880000",
+        "nb_read_frames": "44"
+      }
+    },
+    {
+      "path": "/Users/manu/Documents/PointStream-review/2026-11-17-player-motion-smoke/source-left-common-right-smoke-10fps.mp4",
+      "sha256": "2a6ac76a8ee7ebe62b0d9feebf7b9e519faaa8d3ec9a33c5e04a744b39c282d8",
+      "probe": {
+        "width": 1024,
+        "height": 784,
+        "color_range": "tv",
+        "color_space": "bt709",
+        "avg_frame_rate": "10/1",
+        "duration": "4.400000",
+        "nb_read_frames": "44"
+      }
+    }
+  ]
+}

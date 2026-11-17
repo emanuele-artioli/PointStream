@@ -1,6 +1,6 @@
 # PointStream: current research direction
 
-Updated November 16, 2026. Start here for the scientific goal and evidence;
+Updated November 17, 2026. Start here for the scientific goal and evidence;
 [PLAN](PLAN.md) gives the next decisions. Dated experiment records retain their
 original protocols, failures and permissions. A closed allocation or failed
 fixed recipe does not close every version of the research question.
@@ -82,9 +82,14 @@ been computed, so metric disagreement is also unestablished.
 
 Next use the prepared [whole-run motion pilot](docs/experiments/player-motion-20261116.md):
 shared tennis, one continuous 240-frame call per player, with a real 44-frame
-smoke and a cost gate. Player 2 runs first because of the structural failure
-seen in the stock control. This proposed 70-GPU-minute/2-CPU-hour allocation
-is unreleased. It tests motion on the same opened source; the Al036 development
+smoke and a cost gate. The approved November17 Player2 smoke passes independent
+correctness checks, but its1,704.68 s full forecast exceeded the1,500 s cap;
+neither full run started. The [closed release](docs/experiments/player-motion-20261117/release.json)
+charges328GPU/1,828CPUseconds. A [prepared amendment](docs/experiments/player-motion-amendment-20261117.md)
+raises the explicit full cap to1,800 s/request cap2,400 s, with conditional
+sequential admission inside the same70-GPU-minute/2-CPU-hour envelope. It is
+not authorized by the original no-retry release. This still tests motion on
+the same opened source; the Al036 development
 source still needs source/frame/PTS and conditioning authentication before a
 separate source-spread test. Preserve stock failures and historical controls;
 do not repeat the three-profile grid without a new hypothesis. Per-player
