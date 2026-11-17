@@ -37,9 +37,10 @@ def test_roundtrip_accounting_and_runs():
     blob = packet.build(profile, base, keypoints, refs)
     sections, accounting, decoded = packet.unpack(blob, profile)
     assert sum(accounting.values()) == len(blob)
-    assert accounting['frame'] == len(base)
+    assert accounting['frame'] == len(base) + len(keypoints)
     assert accounting['reference'] == sum(map(len, refs.values()))
     assert accounting['match'] == 0
+    assert accounting['window'] == len(blob) - len(base) - len(keypoints) - sum(map(len, refs.values()))
     assert sections['keypoints'] == keypoints
     runs = decoded['player']
     assert [(r['start'], r['end']) for r in runs] == [(0, 4), (6, 8)]
@@ -64,7 +65,7 @@ def test_corruption_and_closure():
         packet.build(profile, base, keypoints, {**refs, 'extra': b'x'})
     with pytest.raises(ValueError):
         packet.build(profile, base, keypoints, {k: v for k, v in refs.items() if k != 'ref0'})
-    wrong_roles = wire.pack(profile, [('base', 'match', base), ('keypoints', 'window', keypoints)] +
+    wrong_roles = wire.pack(profile, [('base', 'match', base), ('keypoints', 'frame', keypoints)] +
                             [(n, 'reference', refs[n]) for n in sorted(refs)])
     with pytest.raises(ValueError):
         packet.unpack(wrong_roles, profile)
@@ -102,3 +103,35 @@ def test_native_only_and_profile_rejection():
     profile['recipe']['native_frames'] = 239
     with pytest.raises(ValueError):
         packet.build(profile, base, None, {})
+
+
+def test_cut_coverage_with_separate_units():
+    profile, base, _, _ = fixture()
+    profile['cuts'] = [4]
+    profile['order'] = ['before', 'after']
+    profile['runs'] = [{'unit': 'before', 'start': 0, 'end': 4, 'reference': 'before_ref'},
+                       {'unit': 'after', 'start': 4, 'end': 8, 'reference': 'after_ref'}]
+    kp = np.zeros((4, 17, 3))
+    kp[:, :, :2] = 64
+    kp[:, :, 2] = 1
+    keypoints = rates.encode_keypoints_kps2({'native_frames': 240}, [
+        {'name': 'before', 't': np.arange(4), 'kp': kp},
+        {'name': 'after', 't': np.arange(4, 8), 'kp': kp},
+    ])
+    image = np.zeros((784, 512, 3), dtype=np.uint8)
+    refs = {r['reference']: rates.encode_reference(image, {'unit': r['unit'],
+            'reference_frame': r['start'], 'reference_box': [0, 0, 100, 100],
+            'pixels': 'full_prepared_conditioning_crop'}) for r in profile['runs']}
+    _, _, decoded = packet.unpack(packet.build(profile, base, keypoints, refs), profile)
+    active = packet.coverage(decoded, profile['order'])
+    assert active[3] == ['before'] and active[4] == ['after']
+
+
+def test_empty_individual_track_rejected(monkeypatch):
+    profile, base, keypoints, refs = fixture()
+    meta, units = rates.decode_keypoints(keypoints)
+    units[0]['t'] = np.array([], dtype=np.int64)
+    units[0]['kp'] = np.empty((0, 17, 3))
+    monkeypatch.setattr(rates, 'decode_keypoints', lambda _: (meta, units))
+    with pytest.raises(ValueError, match='invalid track'):
+        packet.build(profile, base, keypoints, refs)

@@ -22,7 +22,7 @@ NATIVE_RECIPE = {'profile': 'common-tennis-native-only-v1', 'native_frames': 240
                  'fps': [50, 1], 'output': 'all-240', 'fallback': 'native-base'}
 RESOURCES = frozenset({'vae_config', 'vae_weights', 'image_encoder_config', 'image_encoder_weights',
                        'denoising_unet', 'reference_unet', 'pose_guider', 'motion_module',
-                       'tennis_base', 'common_lora', 'generator_code', 'generator_env', 'native_decoder'})
+                       'common_lora', 'generator_code', 'generator_env', 'native_decoder'})
 
 
 def _profile(profile: dict[str, Any]) -> None:
@@ -101,7 +101,7 @@ def _decode(profile: dict[str, Any], sections: dict[str, bytes]) -> dict[str, An
         name = unit['name']
         t = np.asarray(unit['t'])
         kp = np.asarray(unit['kp'])
-        if t.ndim != 1 or kp.shape != (len(t), 17, 3) or not np.isfinite(kp).all() or np.any(np.diff(t) <= 0) or np.any(t < 0) or np.any(t >= 240):
+        if t.ndim != 1 or not len(t) or kp.shape != (len(t), 17, 3) or not np.isfinite(kp).all() or np.any(np.diff(t) <= 0) or np.any(t < 0) or np.any(t >= 240):
             raise ValueError('invalid track')
         if np.any((kp[:, :, 2] != 0) & (kp[:, :, 2] != 1)):
             raise ValueError('invalid visibility')
@@ -166,7 +166,7 @@ def build(profile: dict[str, Any], base: bytes, keypoints: bytes | None, referen
     _decode(profile, sections)
     entries = [('base', 'frame', base)]
     if keypoints is not None:
-        entries.append(('keypoints', 'window', keypoints))
+        entries.append(('keypoints', 'frame', keypoints))
     return wire.pack(profile, entries + [(name, 'reference', references[name]) for name in sorted(references)])
 
 
