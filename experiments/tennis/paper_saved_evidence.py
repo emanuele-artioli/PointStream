@@ -6,10 +6,10 @@ be written outside the checkout. Run from the repository root.
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import math
-import sys
 from pathlib import Path
 
 import matplotlib
@@ -190,5 +190,75 @@ def main(out: Path) -> None:
     )
 
 
+def player_figure(out: Path, report: Path) -> None:
+    expected = "d09b054369e2c435d2347e0455a0b244af52f2af03d599becdb48110cbb1156b"
+    if sha(report) != expected:
+        raise ValueError("corrected player report SHA256 differs")
+    data = json.loads(report.read_text())
+    windows = data["primary_ivf"]["scenarios"]["7200:+0.000:primary"]["windows"]
+    names = ("al028", "al034", "al043", "med000", "med024", "med019")
+    if set(windows) != set(names) or not windows["med000"]["dcvc_table_absent"]:
+        raise ValueError("unexpected frozen windows or anchor coverage")
+    rows = {
+        name: {metric: windows[name]["metrics"][metric]["delta"] for metric in ("lpips", "dists")}
+        for name in names
+    }
+    means = {
+        group: {
+            metric: math.fsum(rows[n][metric] for n in subset) / len(subset)
+            for metric in ("lpips", "dists")
+        }
+        for group, subset in (("al", names[:3]), ("med", names[3:]))
+    }
+    out.mkdir(parents=True, exist_ok=True)
+    result = {
+        "report_sha256": expected,
+        "generator_sha256": sha(Path(__file__)),
+        "scenario": "7200:+0.000:primary",
+        "window_delta_anchor_minus_hybrid": rows,
+        "within_match_means": means,
+        "scope": "Corrected modeled two-hour reuse; historical saved player scores; best available anchors. med000 DCVC absent; no complete codec or window-based inferential CI.",
+    }
+    (out / "player-effects.json").write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
+    plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 9, "pdf.fonttype": 42})
+    fig, axes = plt.subplots(1, 2, figsize=(8, 4), sharey=True, layout="constrained")
+    for ax, metric in zip(axes, ("lpips", "dists")):
+        ax.axvline(0, color="0.5", lw=0.8)
+        ax.axhline(2.5, color="0.8", lw=0.7)
+        for y, name in enumerate(names):
+            ax.scatter(rows[name][metric], y, s=36, color="#30769a", zorder=3)
+        for y, group in ((1, "al"), (4, "med")):
+            ax.scatter(means[group][metric], y, marker="D", s=30, color="#db9b39", zorder=4)
+        ax.set_title(metric.upper(), weight="bold")
+        ax.set_xlabel("Player gap: anchor − hybrid")
+        ax.set_yticks(range(6), names)
+        ax.invert_yaxis()
+        ax.grid(axis="x", color="0.9", lw=0.6)
+        ax.spines[["top", "right"]].set_visible(False)
+    axes[0].set_ylabel("Window (two physical matches)")
+    fig.suptitle("Historical player gaps: corrected modeled two-hour reuse", weight="bold")
+    fig.text(
+        0.05,
+        -0.12,
+        "Dots: windows  ·  Diamonds: within-match means  ·  Best available anchors\nmed000: DCVC missing; SVT anchor. No complete codec; no inferential intervals.",
+        fontsize=8,
+    )
+    fig.savefig(out / "player-effects.png", dpi=220, bbox_inches="tight")
+    fig.savefig(
+        out / "player-effects.pdf",
+        bbox_inches="tight",
+        metadata={"CreationDate": None, "ModDate": None},
+    )
+    plt.close(fig)
+    print(json.dumps(result))
+
+
 if __name__ == "__main__":
-    main(Path(sys.argv[1]))
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("output", type=Path)
+    parser.add_argument("--player-report", type=Path)
+    args = parser.parse_args()
+    if args.player_report:
+        player_figure(args.output, args.player_report)
+    else:
+        main(args.output)
