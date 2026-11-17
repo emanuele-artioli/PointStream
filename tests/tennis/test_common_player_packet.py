@@ -129,10 +129,10 @@ def test_cut_coverage_with_separate_units():
 
 def test_empty_individual_track_rejected(monkeypatch):
     profile, base, keypoints, refs = fixture()
-    meta, units = rates.decode_keypoints(keypoints)
+    _, units = rates.decode_keypoints(keypoints)
     units[0]['t'] = np.array([], dtype=np.int64)
     units[0]['kp'] = np.empty((0, 17, 3))
-    monkeypatch.setattr(rates, 'decode_keypoints', lambda _: (meta, units))
+    monkeypatch.setattr(packet, '_decode_window', lambda *_: units)
     with pytest.raises(ValueError, match='invalid track'):
         packet.build(profile, base, keypoints, refs)
 
@@ -220,3 +220,68 @@ def test_embedded_header_rejection():
                 b'bad!!' + blob[5:], blob[:9 + size - 1]):
         with pytest.raises(ValueError):
             packet.unpack(bad)
+
+
+@pytest.mark.parametrize('index,value', [(1, 1), (1, 2), (1, 4), (2, 8), (3, 3), (4, 17),
+                                         (5, 0), (5, 241), (6, 241), (7, 0), (7, 241)])
+def test_inner_w2_rejected_before_decoder(monkeypatch, index, value):
+    profile, base, keypoints, refs = fixture()
+    meta, raw = rates.unseal(keypoints, b'KPS2')
+    raw = bytearray(raw)
+    raw[index] = value
+    bad = rates.seal(b'KPS2', meta, bytes(raw))
+    def forbidden(*_):
+        raise AssertionError('unbounded decoder invoked')
+    monkeypatch.setattr(packet, '_decode_window', forbidden)
+    with pytest.raises(ValueError):
+        packet.build(profile, base, bad, refs)
+
+
+def test_transport_caps_before_decode(monkeypatch):
+    profile, base, keypoints, refs = fixture()
+    def forbidden(*_):
+        raise AssertionError('decoder invoked')
+    monkeypatch.setattr(packet, '_decode_window', forbidden)
+    bad = bytearray(keypoints)
+    struct.pack_into('>I', bad, 4, packet.MAX_KPS + 1)
+    with pytest.raises(ValueError, match='size'):
+        packet.build(profile, base, bytes(bad), refs)
+    # Actual expansion exceeds a forged small declared length.
+    import hashlib
+    import zlib
+    raw = b'x' * 10000
+    coded = zlib.compress(raw)
+    bad = rates.HEADER.pack(b'KPS2', 20, len(coded), hashlib.sha256(raw).digest()) + coded
+    with pytest.raises(ValueError):
+        packet.build(profile, base, bad, refs)
+
+
+def test_reference_cap_and_png_dimensions():
+    profile, base, keypoints, refs = fixture()
+    bad = bytearray(refs['ref0'])
+    struct.pack_into('>I', bad, 4, packet.MAX_REF + 1)
+    with pytest.raises(ValueError, match='size'):
+        packet.build(profile, base, keypoints, {**refs, 'ref0': bytes(bad)})
+    meta, raw = rates.unseal(refs['ref0'], b'REF1')
+    raw = bytearray(raw)
+    struct.pack_into('>I', raw, 16, 8192)
+    with pytest.raises(ValueError, match='PNG header'):
+        packet.build(profile, base, keypoints, {**refs, 'ref0': rates.seal(b'REF1', meta, bytes(raw))})
+
+
+def test_exp_golomb_prefix_is_bounded(monkeypatch):
+    monkeypatch.setattr(packet.w2.Decoder, 'bit', lambda *_: 1)
+    decoder = packet._BoundedDecoder(b'')
+    with pytest.raises(ValueError, match='Exp-Golomb'):
+        packet.w2._exp_golomb(decoder, None)
+
+
+def test_zstd_forged_expansion_is_rejected():
+    import hashlib
+    import zstandard
+
+    raw = b'x' * 10000
+    coded = zstandard.ZstdCompressor().compress(raw)
+    blob = rates.HEADER.pack(b'KPS2', 20, len(coded), hashlib.sha256(raw).digest()) + coded
+    with pytest.raises(ValueError, match='content size'):
+        packet._bounded_transport(blob, b'KPS2', packet.MAX_KPS)
