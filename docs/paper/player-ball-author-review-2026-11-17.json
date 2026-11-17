@@ -1,0 +1,76 @@
+{
+  "anonymous_pages": [
+    21,
+    5
+  ],
+  "artifacts": [
+    {
+      "bytes": 744200,
+      "file": "PointStream-player-ball-author-review.pdf",
+      "sha256": "4823454288e3d736004268170cd5b9918c3c8b8caf4db183e77601f3bd1fd780"
+    },
+    {
+      "bytes": 736368,
+      "file": "PointStream-player-ball-anonymous-review.pdf",
+      "sha256": "97076af5840ccfa6cc4d730c5b2f719c5887691d19291a524d19b31d45f8d888"
+    },
+    {
+      "bytes": 5236669,
+      "file": "PointStream-player-ball-IDENTIFIABLE-source-2069a39.zip",
+      "sha256": "c86176347fe602970bcc66955607ebb2a1a40e961f5e175ae578b386c5f8735f"
+    },
+    {
+      "bytes": 1204,
+      "file": "review-manifest.json",
+      "sha256": "fa1efff6aed3505df7a17852862b10219767c647de8183db1fada09ba2e779b7"
+    },
+    {
+      "bytes": 618,
+      "file": "pdf-checks.json",
+      "sha256": "cebd8c6d2d962e5e57f923f5755d1dcd36b298c99e3bf68e7abd19f09984313b"
+    },
+    {
+      "bytes": 1393,
+      "file": "qa-record.json",
+      "sha256": "fa3dc20cf882e6d91b27fd1fa10e8c437985888a4521f0869360c36ab3284052"
+    },
+    {
+      "bytes": 1472,
+      "file": "source-evidence-check.log",
+      "sha256": "93a316ded7bc544f947a9db6ca78c74e2bb035cb63e6cd8d03202db00bbec61c"
+    },
+    {
+      "bytes": 216,
+      "file": "integration-evidence-check.log",
+      "sha256": "080ce9dc41326f4afde3706a098c50cfa3fc8639aad2de2fcb5130dcfdb4b2a1"
+    },
+    {
+      "bytes": 2886,
+      "file": "AUTHOR-REVIEW-20261117.md",
+      "sha256": "1ad319c0b0770358e10ce2a8458ac93fa090ff2b6dfdeb0b4c7340b472bd1847"
+    },
+    {
+      "bytes": 6503,
+      "file": "minimum-remaining-experiments-2026-11-17.md",
+      "sha256": "ae0bd69e320a6513621cc41310199269d330f258a3f3b52679bce372d688fabe"
+    }
+  ],
+  "directory": "/Users/manu/Documents/PointStream-review/2026-11-17-player-ball-integration",
+  "evidence_checks": "PASS",
+  "human_author_approval": "pending",
+  "manuscript_revision": "2069a3966928f1c298d1bd6005a60c7808cb643b",
+  "named_pages": [
+    22,
+    5
+  ],
+  "new_gpu_jobs": 0,
+  "new_quality_metrics": false,
+  "overleaf_main_verified": true,
+  "source_zip_identifiable": true,
+  "submission": false,
+  "visual_pages_checked": {
+    "anonymous": 26,
+    "named": 27
+  },
+  "write_bits_cleared": true
+}

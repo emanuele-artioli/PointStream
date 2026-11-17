@@ -206,9 +206,12 @@ scientific documentation/correction review. This was not revalidation of every
 historical diff or experiment. Older apparent wins, including pre-reset GateB,
 must follow their later invalidations; see the [documentation audit](docs/paper/submission-documentation-audit-2026-11-15.md).
 
-The current paper is V4,18body/reference+5appendix pages. Expand supported
-methods, player positives, controls and negatives toward the verified journal
-allowance; the smaller draft is not a desired final length. Research cutoff is
+The current [author-review revision](docs/paper/player-ball-author-review-2026-11-17.json)
+is Overleaf `2069a39`: anonymous21body/reference+5appendix, named22+5. It restores
+substantive player positives and adds authenticated player/source/cost figures,
+all108saved-point comparison checks and a concrete minimum-test brief. This
+replaces V4's18+5 as the current draft; original reviews remain preserved.
+The combined codec benefit remains unmeasured. Research cutoff is
 December19; submission preparation target December26,2026. Author/rights and
 current venue-format checks remain; the [November17 public-access recheck](docs/paper/tomm-public-access-recheck-2026-11-17.json)
 retains the legacy23+5 planning allowance but cannot verify the live portal.

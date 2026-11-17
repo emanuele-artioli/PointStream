@@ -63,6 +63,15 @@ campus JPEG pilot; it is not a final research stop. No cloud purchase is release
 Reassess a proposed $10 total cloud ceiling only when a specific necessary result
 and materializable inputs justify setup, qualification and control checks.
 
+The first writing pass is now complete: [revised author review](docs/paper/player-ball-author-review-2026-11-17.json),
+Overleaf `2069a39`, restores the player positive and adds three authenticated
+figures, distinct evidence classes and concrete remaining tests. Anonymous
+body/references are21pages+5appendix; named22+5. Both builds, evidence checks and
+all53rendered pages pass review. All108saved-point comparisons reproduce.
+Next local work is author feedback, rights/artifact/venue review and any needed
+source-only reference preparation; further experiments follow the
+[minimum-test brief](docs/paper/minimum-remaining-experiments-2026-11-17.md).
+
 **Stage A implementation:** [November16 requalification](docs/experiments/player-requalification-20261116.md)
 authenticates the selected source/conditioning/checkpoints, checks CPU processor
 tensors and corrects future-fit CLIP resizing. The approved three-profile GPU
@@ -195,6 +204,7 @@ decision requiring its own defensible contribution, not a second project now.
 | JPEG reference appearance pilot | [protocol and inputs](docs/experiments/player-reference-pilot-20261117.md); [approved release](docs/experiments/player-reference-pilot-20261117/release.json) | `codex/reference-local-readiness-20261117`; frozen GPU producer55ba0629 | primary, scoped builders and independent reviewers; actual tier telemetry unverified | approved30GPU-min/45CPU-min; Q70first/Q40conditional. Local work only per user; no GPU started. Durable v2 inputs verified; existing campus publication unknown. Inspect publication and refresh fleet admission after connectivity returns; no repeat budget request |
 | Combined receiver/development pilot | stagesA–D above | — | unassigned | unreleased: exact inputs, source-independent contract and complete cost forecast precede budget approval |
 | Outage paper-first work | [claim map, local assets and priorities](docs/paper/outage-writing-plan-2026-11-17.md) | `codex/outage-paper-first-20261117` | primary with scoped paper assessment and inventory; actual tier telemetry unverified | V4 source/PDF verified; claim map and paper structure prepared. Manuscript/saved-score work takes priority while campus is down; no permanent research stop or cloud purchase |
+| Integrated player/ball author-review revision | [completed record](docs/paper/manuscript-integration-2026-11-17.md); [review package](docs/paper/player-ball-author-review-2026-11-17.json) | `codex/paper-integration-20261117`; Overleaf2069a39 | primary plus scoped saved-evidence/scientific/registry/visual reviewers; actual tier telemetry unverified | complete: restored player evidence, three new figures, all108 saved comparisons, minimum-test brief; anonymous21+5/named22+5, all53pages checked, both evidence validators pass. No GPU/new metrics/cloud/submission; author approval/rights/venue checks remain |
 
 ### Dates and authority
 
