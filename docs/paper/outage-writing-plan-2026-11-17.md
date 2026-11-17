@@ -12,6 +12,12 @@ Use V4 as the draft, selectively restoring scientific detail from the older
 690cad0 package after checking later corrections. Campus access and an Overleaf
 push are unnecessary for this writing work.
 
+Read-only inspection of that ZIP finds a concrete writing gap: active
+`sections/evaluation.tex` reduces generated-player evidence to a qualification
+row and limitations paragraph; the abstract/introduction have no substantive
+player-positive result. Restore the corrected science with its qualifications,
+rather than treating this omission as absence of evidence.
+
 ## Current claim map
 
 | Result | Support now | Boundary |
@@ -105,6 +111,25 @@ not cloud spending/migration. Its unknown campus publication must be inspected
 before any future write; a cloud run cannot establish whether that write finished.
 
 ## Working paper structure
+
+First edits to the hash-verified V4 source, whose originals remain unchanged:
+
+- Restore a substantive `subsec:w7` in `sections/evaluation.tex`, using
+  `supporting-material/v3-research-restructure/evaluation-v2-verbatim.tex`
+  selectively. Verify `figures/w7-repaired.pdf` and its corrected caption/data;
+  keep the temporal failure beside the player positive. Window-level intervals
+  must not become match-level inference.
+- Add an evidence table separating historical W7/W9 quality, November16
+  three-profile review, November17 full-run acceptability and CPU conditioning.
+  State measured versus modeled cost, exposure and unresolved boundary per row.
+- Expand `subsec:object-stream` in `sections/system_design.tex` with installed
+  versus content-specific state and the actual common-profile section costs.
+  The archived match-adapted W8/W9 accounting figure describes another profile
+  and must not be copied as the new common-player bill.
+- Update `main.tex`'s abstract, `sections/introduction.tex` and
+  `sections/conclusion.tex` consistently. Put decisive positives, controls and
+  failures in the main text, detailed historical grids/provenance in supporting
+  material, and update the manuscript's CLAIM/disposition registry with edits.
 
 Working title: **PointStream: Rate–Quality Trade-offs in Object-Centric Video Coding**.
 This is an editorial starting point, not a final author-approved title or scope.
