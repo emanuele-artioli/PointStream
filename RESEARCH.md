@@ -97,8 +97,9 @@ independent integrity PASS. Total conservative charges, including the original
 stop, are3,318GPU/6,318CPUseconds within4,200/7,200; both jobs and claims are closed.
 The user's
 [full-run Player2 review](docs/experiments/player-motion-amendment-20261117/player-2-human-review.json)
-is **acceptable** for body/clothing, facing, pose and stability; Player1's review
-remains pending. This is author development judgment, not matched-codec
+is **acceptable** for body/clothing, facing, pose and stability; the
+[Player1 reply](docs/experiments/player-motion-amendment-20261117/player-1-human-review.json)
+is also **acceptable**. This is author development judgment, not matched-codec
 preference or population evidence. This still tests motion on
 the same opened source; the Al036 development
 source still needs source/frame/PTS and conditioning authentication before a
@@ -113,6 +114,15 @@ separately. This does not erase its training overlap. A model fitted or chosen
 specifically for the test session, match adapters, guider updates, appearance
 banks, refreshes and metadata remain content-specific. Keep historical
 base-charged deployment sensitivities beside the installed-resource profile.
+
+The [common-player packet contract](docs/experiments/common-player-packet-20261117.md)
+now passes CPU tests and exact retained-input checks for both players across
+all240ticks. It separates coded480x272 from the1920x1080 coordinate canvas,
+charges ongoing KPS2 geometry, and supports native-only empty foreground.
+This is not yet a source-denied learned receiver. Its saved lossless references
+dominate the391,981B carrier (653.30kbps over4.8s): next resolve cheaper
+reference coding or demonstrate actual reuse/refreshes before another expensive
+matched-quality study. Do not infer a codec win from exact conditioning alone.
 
 A causal warm-up system is a possible later scope: encode the initial frames
 conventionally while adaptation uses only arrived data, then switch after
