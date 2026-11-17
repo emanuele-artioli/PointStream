@@ -1,0 +1,66 @@
+{
+  "observed_before_dispatch": true,
+  "eligible_hosts": [
+    {
+      "host": "gpu5",
+      "gpus": [
+        {
+          "index": 0,
+          "uuid": "GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162",
+          "name": "NVIDIA RTX 6000 Ada Generation",
+          "memory_used_mib": 1,
+          "memory_total_mib": 49140,
+          "memory_free_mib": 48645,
+          "utilization_pct": 0,
+          "compute_processes": [],
+          "pointstream_claimed": false,
+          "pointstream_shared_claims": []
+        },
+        {
+          "index": 1,
+          "uuid": "GPU-7754164a-33cd-265c-3696-c20966d228fe",
+          "name": "NVIDIA RTX 6000 Ada Generation",
+          "memory_used_mib": 1,
+          "memory_total_mib": 49140,
+          "memory_free_mib": 48645,
+          "utilization_pct": 0,
+          "compute_processes": [],
+          "pointstream_claimed": false,
+          "pointstream_shared_claims": []
+        }
+      ],
+      "available": true
+    },
+    {
+      "host": "gpu6",
+      "gpus": [
+        {
+          "index": 0,
+          "uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+          "name": "NVIDIA RTX 6000 Ada Generation",
+          "memory_used_mib": 1,
+          "memory_total_mib": 49140,
+          "memory_free_mib": 48645,
+          "utilization_pct": 0,
+          "compute_processes": [],
+          "pointstream_claimed": false,
+          "pointstream_shared_claims": []
+        },
+        {
+          "index": 1,
+          "uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+          "name": "NVIDIA RTX 6000 Ada Generation",
+          "memory_used_mib": 1,
+          "memory_total_mib": 49140,
+          "memory_free_mib": 48645,
+          "utilization_pct": 0,
+          "compute_processes": [],
+          "pointstream_claimed": false,
+          "pointstream_shared_claims": []
+        }
+      ],
+      "available": true
+    }
+  ],
+  "logs": "/private/tmp/player-motion-readiness-20261117/player1-admission-{status,inspect,workers}.log"
+}

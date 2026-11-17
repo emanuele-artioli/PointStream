@@ -1,0 +1,14 @@
+{
+  "job_id": "20261117T094919Z-5a0cc722",
+  "host": "gpu6",
+  "observed_epoch": 1794910869.5535598,
+  "known_pids": {
+    "2866447": false,
+    "2866452": false
+  },
+  "process_group_id": 2866452,
+  "process_group_members": [],
+  "unreadable_proc_stats": 0,
+  "passed": true,
+  "action": "read-only /proc; no signals"
+}
