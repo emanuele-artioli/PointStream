@@ -1,0 +1,181 @@
+"""Versioned paid common-player conditioning; this is not a learned receiver.
+
+The caller pins the complete profile and installed resources. Each contiguous run
+has its own paid reference; gaps and cut boundaries reset temporal context.
+"""
+from __future__ import annotations
+
+import hashlib
+import struct
+from typing import Any
+
+import numpy as np
+
+from experiments.tennis import k6b, k6b_rate_streams as rates, w8_payload as wire
+
+PROFILE = 'common-tennis-player-v1'
+RECIPE = {'profile': PROFILE, 'guidance': 3.5, 'steps': 30, 'context': [24, 4],
+          'native_frames': 240, 'fps': [50, 1], 'seed_rule': 'sha256(unit)[:7]*1009+run',
+          'crop_rule': [1.4, 90, 9], 'generation_size': [512, 784],
+          'fallback': 'native-base', 'output': 'all-240', 'reference_codec': 'png'}
+NATIVE_RECIPE = {'profile': 'common-tennis-native-only-v1', 'native_frames': 240,
+                 'fps': [50, 1], 'output': 'all-240', 'fallback': 'native-base'}
+RESOURCES = frozenset({'vae_config', 'vae_weights', 'image_encoder_config', 'image_encoder_weights',
+                       'denoising_unet', 'reference_unet', 'pose_guider', 'motion_module',
+                       'tennis_base', 'common_lora', 'generator_code', 'generator_env', 'native_decoder'})
+
+
+def _profile(profile: dict[str, Any]) -> None:
+    if set(profile) != {'mode', 'recipe', 'resources', 'width', 'height', 'cuts', 'runs', 'order'} or profile['mode'] not in ('players', 'native_only'):
+        raise ValueError('unsupported profile')
+    native = profile['mode'] == 'native_only'
+    if wire.canonical(profile['recipe']) != wire.canonical(NATIVE_RECIPE if native else RECIPE):
+        raise ValueError('unsupported recipe')
+    resources = profile['resources']
+    if not isinstance(resources, dict) or set(resources) != ({'native_decoder'} if native else RESOURCES) or any(
+        not isinstance(v, str) or wire.HASH.fullmatch(v) is None for v in resources.values()
+    ):
+        raise ValueError('invalid installed resource identities')
+    if any(type(profile[k]) is not int or not 1 <= profile[k] <= 8192 for k in ('width', 'height')):
+        raise ValueError('invalid dimensions')
+    cuts = profile['cuts']
+    if not isinstance(cuts, list) or any(type(x) is not int or not 0 < x < 240 for x in cuts) or cuts != sorted(set(cuts)):
+        raise ValueError('invalid cuts')
+    if not isinstance(profile['runs'], list) or len(profile['runs']) > 480:
+        raise ValueError('invalid runs')
+    order = profile['order']
+    if not isinstance(order, list) or len(order) > 16 or any(not wire._valid_name(x) for x in order) or len(set(order)) != len(order):
+        raise ValueError('invalid compositing order')
+    if (native and (order or profile['runs'])) or (not native and not order):
+        raise ValueError('invalid mode coverage')
+
+
+def verify_resources(profile: dict[str, Any], installed: dict[str, str]) -> None:
+    """Compare locally measured hashes against the caller-pinned identities."""
+    _profile(profile)
+    if installed != profile['resources']:
+        raise ValueError('installed resource identity mismatch')
+
+
+def _ivf(blob: bytes, width: int, height: int) -> None:
+    """Validate IVF structure, not AV1 decoding or decoded pixels."""
+    if len(blob) < 32:
+        raise ValueError('truncated IVF')
+    magic, version, header, codec, w, h, rate, scale, count, reserved = struct.unpack_from('<4sHH4sHHIIII', blob)
+    if (magic, version, header, codec, w, h, rate, scale, count, reserved) != (b'DKIF', 0, 32, b'AV01', width, height, 50, 1, 240, 0):
+        raise ValueError('invalid native IVF header')
+    pos = 32
+    for tick in range(240):
+        if pos + 12 > len(blob):
+            raise ValueError('truncated IVF frame')
+        size, timestamp = struct.unpack_from('<IQ', blob, pos)
+        pos += 12
+        if not size or size > len(blob) - pos or timestamp != tick:
+            raise ValueError('invalid IVF frame/timestamp')
+        pos += size
+    if pos != len(blob):
+        raise ValueError('trailing IVF data')
+
+
+def _decode(profile: dict[str, Any], sections: dict[str, bytes]) -> dict[str, Any]:
+    _profile(profile)
+    if 'base' not in sections:
+        raise ValueError('missing required section')
+    _ivf(sections['base'], profile['width'], profile['height'])
+    if profile['mode'] == 'native_only':
+        if set(sections) != {'base'}:
+            raise ValueError('native-only packet has extra sections')
+        return {}
+    if 'keypoints' not in sections:
+        raise ValueError('missing required section')
+    if sections['keypoints'][:4] != b'KPS2':
+        raise ValueError('expected KPS2')
+    meta, units = rates.decode_keypoints(sections['keypoints'])
+    if meta != {'native_frames': 240, 'names': profile['order'], 'profile': rates.KPS2_PROFILE}:
+        raise ValueError('keypoint profile mismatch')
+    if [u['name'] for u in units] != profile['order']:
+        raise ValueError('track order mismatch')
+    output: dict[str, Any] = {}
+    expected_names = {'base', 'keypoints'}
+    for unit in units:
+        name = unit['name']
+        t = np.asarray(unit['t'])
+        kp = np.asarray(unit['kp'])
+        if t.ndim != 1 or kp.shape != (len(t), 17, 3) or not np.isfinite(kp).all() or np.any(np.diff(t) <= 0) or np.any(t < 0) or np.any(t >= 240):
+            raise ValueError('invalid track')
+        if np.any((kp[:, :, 2] != 0) & (kp[:, :, 2] != 1)):
+            raise ValueError('invalid visibility')
+        # KPS2 interpolates across contiguous samples, including cuts. Require
+        # a gap so no coordinate can depend on a sample from another shot.
+        if any(int(t[i]) in profile['cuts'] and t[i] == t[i-1] + 1 for i in range(1, len(t))):
+            raise ValueError('KPS2 track crosses a cut without a gap')
+        boundaries = [0] + [i for i in range(1, len(t)) if t[i] != t[i-1] + 1] + [len(t)]
+        decoded_runs = []
+        declared = [r for r in profile['runs'] if isinstance(r, dict) and r.get('unit') == name]
+        nonempty = [(a, b) for a, b in zip(boundaries, boundaries[1:]) if a < b]
+        if len(declared) != len(nonempty):
+            raise ValueError('run coverage mismatch')
+        for run_id, ((a, b), run) in enumerate(zip(nonempty, declared)):
+            if set(run) != {'unit', 'start', 'end', 'reference'} or type(run['start']) is not int or type(run['end']) is not int or (run['start'], run['end']) != (int(t[a]), int(t[b-1]) + 1):
+                raise ValueError('invalid run binding')
+            refname = run['reference']
+            if not wire._valid_name(refname) or refname in expected_names or refname not in sections:
+                raise ValueError('invalid reference binding')
+            expected_names.add(refname)
+            rm, image = rates.decode_reference(sections[refname])
+            if set(rm) != {'unit', 'reference_frame', 'reference_box', 'pixels', 'codec', 'quality', 'color'} or rm['unit'] != name or rm['codec'] != '.png' or rm['quality'] is not None or rm['color'] != 'RGB8' or rm['pixels'] != 'full_prepared_conditioning_crop' or type(rm['reference_frame']) is not int or not run['start'] <= rm['reference_frame'] < run['end']:
+                raise ValueError('invalid paid reference')
+            box = np.asarray(rm['reference_box'], dtype=float)
+            if box.shape != (4,) or not np.isfinite(box).all() or np.any(box[2:] <= 0) or image.shape != (784, 512, 3):
+                raise ValueError('invalid reference geometry')
+            boxes = k6b.run_boxes(list(kp[a:b]))
+            decoded_runs.append({'start': run['start'], 'end': run['end'], 't': t[a:b], 'kp': kp[a:b],
+                                 'boxes': boxes, 'reference': image, 'reference_box': box,
+                                 'seed': int(hashlib.sha256(name.encode()).hexdigest()[:7], 16) * 1009 + run_id})
+        output[name] = decoded_runs
+    if len(profile['runs']) != sum(len(v) for v in output.values()) or set(sections) != expected_names:
+        raise ValueError('unbound run or section')
+    return output
+
+
+def coverage(decoded: dict[str, Any], order: list[str]) -> list[list[str]]:
+    """Per-tick far-to-near active units; an empty list means base only."""
+    if set(decoded) != set(order) or len(order) != len(set(order)):
+        raise ValueError('coverage order mismatch')
+    result: list[list[str]] = [[] for _ in range(240)]
+    for name in order:
+        for run in decoded[name]:
+            for tick in run['t']:
+                result[int(tick)].append(name)
+    return result
+
+
+def pose_for_tick(run: dict[str, Any], index: int) -> np.ndarray:
+    """Render one conditioning pose on demand from paid geometry."""
+    if type(index) is not int or not 0 <= index < len(run['t']):
+        raise ValueError('tick outside run')
+    return k6b.pose_map(k6b.to_crop(run['kp'][index], run['boxes'][index]))
+
+
+def build(profile: dict[str, Any], base: bytes, keypoints: bytes | None, references: dict[str, bytes]) -> bytes:
+    if {'base', 'keypoints'} & set(references):
+        raise ValueError('reserved reference name')
+    sections = {'base': base, **references}
+    if keypoints is not None:
+        sections['keypoints'] = keypoints
+    _decode(profile, sections)
+    entries = [('base', 'frame', base)]
+    if keypoints is not None:
+        entries.append(('keypoints', 'window', keypoints))
+    return wire.pack(profile, entries + [(name, 'reference', references[name]) for name in sorted(references)])
+
+
+def unpack(blob: bytes, profile: dict[str, Any]) -> tuple[dict[str, bytes], dict[str, int], dict[str, Any]]:
+    _profile(profile)
+    sections, accounting = wire.unpack(blob, profile)
+    decoded = _decode(profile, sections)
+    # Repacking verifies roles, canonical ordering, and the single supported envelope.
+    refs = {n: v for n, v in sections.items() if n not in ('base', 'keypoints')}
+    if build(profile, sections['base'], sections.get('keypoints'), refs) != blob:
+        raise ValueError('noncanonical sections or accounting roles')
+    return sections, accounting, decoded
