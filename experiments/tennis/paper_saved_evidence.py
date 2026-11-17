@@ -13,11 +13,6 @@ import math
 from pathlib import Path
 from typing import Any
 
-import matplotlib
-
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-
 from experiments.tennis.ball_confirmation_analysis import METRICS, REFERENCE, source_summary
 from src.pointstream.evaluation import anchor_sensitivity
 
@@ -65,6 +60,11 @@ def check(actual: object, expected: object, path: str = "") -> None:
 
 
 def main(out: Path) -> None:
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
     data = authenticated_json(ANALYSIS, ANALYSIS_SHA256)
     audit = authenticated_json(AUDIT, AUDIT_SHA256)
     fresh_output(out)
@@ -220,6 +220,11 @@ def main(out: Path) -> None:
 
 
 def player_figure(out: Path, report: Path) -> None:
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
     expected = "d09b054369e2c435d2347e0455a0b244af52f2af03d599becdb48110cbb1156b"
     data = authenticated_json(report, expected)
     windows = data["primary_ivf"]["scenarios"]["7200:+0.000:primary"]["windows"]
