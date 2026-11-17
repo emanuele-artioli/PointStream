@@ -96,6 +96,8 @@ def main():
             original = args.inputs / f'{name}.npz'
             assert digest(original.read_bytes()) == rows[name]['source_npz_sha256']
             with np.load(target, allow_pickle=False) as golden, np.load(original, allow_pickle=False) as source:
+                # NpzFile expands an entire member on each access; cache poses.
+                expected_pose = golden['pose']
                 same = {'reference': np.array_equal(run['reference'], golden['reference']),
                         'reference_rgb_sha256': array_sha(run['reference']) == rows[name]['decoded_rgb_sha256'],
                         'reference_box': np.array_equal(run['reference_box'], golden['reference_box']),
@@ -103,9 +105,11 @@ def main():
                         'boxes': np.array_equal(np.asarray(run['boxes']), golden['box']),
                         'run_ids': np.array_equal(np.zeros(240, np.int64), golden['run']),
                         'seed': run['seed'] == int(hashlib.sha256(name.encode()).hexdigest()[:7], 16) * 1009,
-                        'poses': all(np.array_equal(packet.pose_for_tick(run, i), golden['pose'][i]) for i in range(240)),
+                        'poses': all(np.array_equal(packet.pose_for_tick(run, i), expected_pose[i]) for i in range(240)),
                         'non_reference_npz_arrays': set(source.files) == set(golden.files) and all(
-                            np.array_equal(source[k], golden[k]) for k in source.files if k != 'reference')}
+                            np.array_equal(source[k], expected_pose if k == 'pose' else golden[k])
+                            for k in source.files if k != 'reference')}
+                del expected_pose
             assert all(same.values()), (quality, name, same)
             checks.append({'unit': name, 'golden_npz_sha256': rows[name]['new_npz_sha256'], 'checks': same})
         report = packet.inspect(blob, jpeg_profile['resources'])
