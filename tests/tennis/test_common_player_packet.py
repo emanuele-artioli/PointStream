@@ -313,3 +313,63 @@ def test_adjacent_w2_runs_rejected_before_decode(monkeypatch):
     monkeypatch.setattr(packet, '_decode_window', forbidden)
     with pytest.raises(ValueError, match='run geometry'):
         packet.build(profile, base, bad, refs)
+
+
+@pytest.mark.parametrize('quality', [70, 40])
+def test_jpeg_roundtrip_identity_and_accounting(quality):
+    import cv2
+    import hashlib
+
+    profile, base, keypoints, _ = fixture()
+    profile['recipe'] = copy.deepcopy(packet.JPEG_RECIPES[quality])
+    profile['resources']['reference_decoder'] = hashlib.sha256(cv2.getBuildInformation().encode()).hexdigest()
+    image = np.arange(784 * 512 * 3, dtype=np.uint8).reshape(784, 512, 3)
+    refs = {r['reference']: rates.encode_reference(image, {'unit': 'player',
+            'reference_frame': r['start'], 'reference_box': [0, 0, 100, 100],
+            'pixels': 'full_prepared_conditioning_crop'}, quality) for r in profile['runs']}
+    blob = packet.build(profile, base, keypoints, refs)
+    sections, accounting, decoded = packet.unpack(blob)
+    assert accounting['frame'] == len(base) + len(keypoints)
+    assert accounting['reference'] == sum(map(len, refs.values()))
+    assert sum(accounting.values()) == len(blob)
+    assert sections['ref0'] == refs['ref0']
+    np.testing.assert_array_equal(decoded['player'][0]['reference'], rates.decode_reference(refs['ref0'])[1])
+    report = packet.inspect(blob, profile['resources'])
+    assert report['native_validity'] == 'container_only' and not report['learned_receiver']
+    assert report['required_resources']['reference_decoder'] == profile['resources']['reference_decoder']
+    bad = copy.deepcopy(profile)
+    bad['resources']['reference_decoder'] = '0' * 64
+    with pytest.raises(ValueError, match='decoder build'):
+        packet.build(bad, base, keypoints, refs)
+    bad = copy.deepcopy(profile)
+    bad['recipe']['nominal_quality'] = 90
+    with pytest.raises(ValueError, match='recipe'):
+        packet.build(bad, base, keypoints, refs)
+    bad = copy.deepcopy(profile)
+    bad['recipe'] = copy.deepcopy(packet.JPEG_RECIPES[40 if quality == 70 else 70])
+    with pytest.raises(ValueError, match='paid reference'):
+        packet.build(bad, base, keypoints, refs)
+
+
+def test_jpeg_header_rejects_before_decoder(monkeypatch):
+    import cv2
+    import hashlib
+
+    profile, base, keypoints, _ = fixture()
+    profile['recipe'] = copy.deepcopy(packet.JPEG_RECIPES[70])
+    profile['resources']['reference_decoder'] = hashlib.sha256(cv2.getBuildInformation().encode()).hexdigest()
+    image = np.zeros((784, 512, 3), np.uint8)
+    ref = rates.encode_reference(image, {'unit': 'player', 'reference_frame': 0,
+          'reference_box': [0, 0, 100, 100], 'pixels': 'full_prepared_conditioning_crop'}, 70)
+    meta, raw = rates.unseal(ref, b'REF1')
+    sof = raw.index(b'\xff\xc0')
+    wrong_size = bytearray(raw)
+    wrong_size[sof + 5] ^= 1
+    progressive = bytearray(raw)
+    progressive[sof + 1] = 0xc2
+    def forbidden(*_):
+        raise AssertionError('image decoder invoked')
+    monkeypatch.setattr(cv2, 'imdecode', forbidden)
+    for bad in (bytes(wrong_size), bytes(progressive), raw[:-1], raw + b'x', raw[:sof + 3]):
+        with pytest.raises(ValueError):
+            packet._bounded_reference(rates.seal(b'REF1', meta, bad), True, profile['resources']['reference_decoder'])

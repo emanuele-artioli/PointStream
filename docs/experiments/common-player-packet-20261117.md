@@ -72,3 +72,18 @@ native-to-canvas reconstruction/compositing, resource-failure behavior, a joint
 paid ball path and matched-rate evaluation. Header validation in the library
 does not establish AV1 decodability; the separate real decode check establishes
 only the tested native stream. No complete-decoder or rate-quality claim follows.
+
+### JPEG packet compatibility (local CPU)
+
+The separate `common-tennis-player-jpeg-v1` recipe accepts only nominal sender
+qualities 70 and 40. The quality field is encoder metadata; it does not prove
+which quantization tables are present. Exact REF1 payload hashes identify the
+experimental inputs. The profile declares a `reference_decoder` resource: the
+SHA256 of the UTF-8 OpenCV build information measured at decode time. The
+preparation build was Mac OpenCV 4.10.0 with hash
+`bade1ed132afc491c4cadda9ea0590a3d0745e16807f765450d3d3d4152a780b`.
+This pins that build, not Linux pixel parity. Before OpenCV allocation the
+transport checks a bounded, single-scan baseline 8-bit three-component JPEG
+header and 512×784 dimensions. PNG v1 and native-only profiles remain separate.
+This is byte accounting and conditioning transport only; it does not establish
+a learned receiver or a rate–quality result.
