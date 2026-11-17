@@ -83,7 +83,7 @@
           "sha256": "0a50d1ad5aed337b03bfc18693f6ee03090abce6ef376798000fd53d9a263475"
         }
       },
-      "author_review_status": "asked_pending",
+      "author_review_status": "acceptable_author_development",
       "config_sha256": "a6c8b47b1bf23a4cf1b36e0dceb1519021b7826eb64155e5b1efc0a64452f27a",
       "cpu_charge_seconds": 2399,
       "full_crop_files": {

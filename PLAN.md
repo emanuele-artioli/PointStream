@@ -74,10 +74,21 @@ has now completed and passed independent44/240-frame integrity checks. Both
 jobs/claims are closed; total conservative3,318GPU/6,318CPUseconds includes
 the original stop and both full externalCPU reservations, within4,200/7,200.
 The user's [full-run Player2 review](docs/experiments/player-motion-amendment-20261117/player-2-human-review.json)
-is acceptable; Player1 review remains pending. Integrity and one-author
+is acceptable; Player1's full-run review is also acceptable. Integrity and one-author
 acceptability establish neither matched-codec preference nor population benefit.
 The24frame pilot and
 author review establish neither a whole-codec nor confirmation result. No training ran.
+
+The [common-player CPU packet contract](docs/experiments/common-player-packet-20261117.md)
+is now implemented and checked against the real retained inputs: both players'
+240poses, references, boxes, ticks and seeds match. Thirty-three focused tests,
+configured Ruff/Mypy and the final full suite (2699passed/39skipped) pass.
+Its lossless-reference carrier costs391,981B,
+653.30kbps over4.8s. Prioritize a bounded cheaper-reference/reuse decision before
+another long same-reference generation run; actual source-denied generation,
+receiver masks, matched controls and full-frame composition remain unfinished.
+New GPU/scoring/training stages remain unreleased. Both author motion reviews
+are acceptable; this changes no historical rate or quality result.
 
 | Stage | Deliverable | Admission/stop decision |
 |---|---|---|
@@ -145,8 +156,8 @@ decision requiring its own defensible contribution, not a second project now.
 | Foreground scope and actual-code re-audit | [scope/repair record](docs/experiments/foreground-scope-and-requalification-20261115.md) | `codex/foreground-scope-and-evidence-audit-20261115` | primary plus scoped source reviewers; actual tier telemetry unverified | complete: PR430 merged28377fb5 with successfulCI; player-and-ball primary, racket optional, strict support/coverage/rational-FPS fixes |
 | Player requalification implementation | [exact inputs, code and release](docs/experiments/player-requalification-20261116.md); [PR431](https://github.com/emanuele-artioli/PointStream/pull/431) | `codex/player-requalification-20261116` | primary plus scoped builders/reviewer; actual tier telemetry unverified | CPU source/receipt/processor checks complete; future-fit correction and paired worker/specs implemented; configuredRuff/Mypy668/full2650passed39skipped; PR431 merged with successfulCI; subsequent replay recorded below |
 | Approved three-profile player replay and human pilot | [actual jobs and audits](docs/experiments/player-replay-20261116/release.json); [human review](docs/experiments/player-replay-20261116/human-review-import.json); [PR432](https://github.com/emanuele-artioli/PointStream/pull/432) | `codex/player-replay-release-20261116` | primary plus scoped audit/preview builders; actual tier telemetry unverified | all three complete/PASS;1,203GPU/3,003CPUseconds; PR432 merged with successfulCI. Human review imported: Player1 uncertain, Player2 common tennis preferred; stock torso-facing failure. Common tennis provisional, no codec win/new training |
-| Human-informed shared-tennis motion pilot | [closed original release](docs/experiments/player-motion-20261117/release.json); [approved amendment and cumulative ledger](docs/experiments/player-motion-amendment-20261117/release.json) | `codex/player-motion-amended-run-20261117` | primary plus scoped runner/independent audit; actual tier telemetry unverified | both amended44/240-frame requests complete and independently integrity-accepted; no active claims. Conservative3,318GPU/6,318CPU includes original stop and both externalCPU caps; within original4,200/7,200. Player2 author review acceptable; Player1 review pending |
-| Common-player packet contract | [unreleased receiver design](docs/experiments/player-common-receiver-design-20261117.md) | `codex/common-player-packet-20261117` | primary plus scoped builder; actual tier telemetry unverified | local CPU implementation/review in an isolated checkout: explicit common-model and native-only modes, paid references/geometry and every-tick coverage. No GPU/model/scoring release; actual source-denied generation/masks and retained-input equivalence remain gates |
+| Human-informed shared-tennis motion pilot | [closed original release](docs/experiments/player-motion-20261117/release.json); [approved amendment and cumulative ledger](docs/experiments/player-motion-amendment-20261117/release.json) | `codex/player-motion-amended-run-20261117` | primary plus scoped runner/independent audit; actual tier telemetry unverified | both amended44/240-frame requests complete and independently integrity-accepted; no active claims. Conservative3,318GPU/6,318CPU includes original stop and both externalCPU caps; within original4,200/7,200. Both full-run author reviews acceptable; no codec/preference/generalization claim |
+| Common-player packet contract | [implementation and real-input audit](docs/experiments/common-player-packet-20261117.md); [receiver design](docs/experiments/player-common-receiver-design-20261117.md) | `codex/common-player-packet-20261117` | primary plus scoped builder; actual tier telemetry unverified | CPU contract complete:33focused tests/full2699passed39skip; configured Ruff/Mypy672pass; independent code review and exact both-player240tick conditioning/native240frame decode pass.391,981B lossless-reference carrier; no RQ/complete-learned-decoder claim. Source-denied generation/masks and cheaper-reference/reuse test remain unreleased |
 | Combined receiver/development pilot | stagesA–D above | — | unassigned | unreleased: exact inputs, source-independent contract and complete cost forecast precede budget approval |
 
 ### Dates and authority

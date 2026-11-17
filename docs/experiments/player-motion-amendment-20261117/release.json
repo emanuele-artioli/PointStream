@@ -37,7 +37,7 @@
     "wait_max_seconds": 2700,
     "wait_owner": null
   },
-  "next_input": "Player1 full source-aligned human acceptability reply requested. Player2 acceptable. Local common-model packet preparation proceeds separately; no additional GPU/scoring/training release.",
+  "next_input": "No further input for the closed motion allocation. Prepare cheaper-reference pilot and complete learned receiver locally; any new GPU/scoring/training needs a separate concrete released stage.",
   "preflight": "Fresh amended-status/inspect/workers logs: no active/pending; both Ada hosts fresh and free; native clock and model runtime reused with unchanged identities.",
   "prior_conservative_charge": {
     "cpu_seconds": 1828,
@@ -119,7 +119,8 @@
       "forecast_seconds": 1710.7932003648866,
       "gpu_actual_charge_seconds": 1649,
       "gpu_lifecycle_cap_seconds": 2400,
-      "human_review_status": "asked_pending",
+      "human_review": "player-1-human-review.json",
+      "human_review_status": "acceptable_author_development",
       "independent_integrity": "player-1-audit.json",
       "job_id": "20261117T102252Z-ccb04da2",
       "native_gate": "player-1-stage-admission-status.json",
@@ -146,7 +147,7 @@
   "schema": 1,
   "sequential_admission": "Only Player2 initially. Release Player1 only after accepted Player2 full publication and actual accounting leaves GPU>=2400 and CPU>=3150. Otherwise stop without another request.",
   "source_checkout": "/private/tmp/pointstream-player-motion-source-9af6514b",
-  "status": "compute_closed_both_integrity_accepted_player1_human_review_pending",
+  "status": "closed_both_integrity_and_author_motion_accepted",
   "totals": {
     "accounting_note": "Original328GPU/1828CPU; amendedPlayer2 1341GPU/2091CPU; amendedPlayer1 conservative creation-through-observed-teardown1649GPU/2399CPU. Both750 externalCPU reservations fully charged; no active lifecycle uncharged.",
     "cpu_conservative_seconds": 6318,
@@ -154,5 +155,5 @@
     "max_cpu_seconds": 7200,
     "max_gpu_seconds": 4200
   },
-  "updated_utc": "2026-11-17T10:59:23.678400+00:00"
+  "updated_utc": "2026-11-17T11:31:57.521540+00:00"
 }
