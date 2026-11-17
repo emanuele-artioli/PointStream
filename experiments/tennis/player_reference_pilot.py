@@ -94,7 +94,9 @@ def prepare(source: Path, output: Path) -> dict[str, Any]:
         spec["full"]["seconds"] = 450
         spec["budget_seconds"] = 900
         validate_spec(spec)
-        spec_path = folder / "spec-unreleased.json"
+        # An invalid placeholder prevents dispatch until an actual release deadline is set.
+        spec["deadline"] = "REPLACE_AFTER_RELEASE"
+        spec_path = folder / "spec-template.json"
         spec_path.write_text(json.dumps(spec, indent=2, sort_keys=True) + "\n")
         summaries[str(quality)] = {**provenance, "archive_sha256": sha256(archive),
                                    "archive_bytes": archive.stat().st_size,
