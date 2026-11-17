@@ -20,8 +20,8 @@ its live ledger counts the initial charge. Amended Player2 completed44/240
 frames with independent integrity PASS; actual remaining budget admitted the
 conditional Player1 request, now also complete with independent integrity PASS.
 Both jobs/claims are closed; total3,318GPU/6,318CPUseconds stays within the
-original4,200/7,200. The user accepts Player2's full motion pilot; Player1's
-human review remains pending.
+original4,200/7,200. The user accepts both players' full motion pilots; these
+are one-author development judgments on one opened physical match.
 These records report no new compression-quality
 result and reopen no expired allocation.
 

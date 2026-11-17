@@ -46,7 +46,8 @@ publication archives are retained read-only.
 Integrity acceptance is not visual acceptance. The full human review uses
 all240native ticks (4.8s at50Hz), with explicitly slowed playback if useful.
 The user's [Player2 reply](player-motion-amendment-20261117/player-2-human-review.json)
-is **"Acceptable"**; Player1's review remains pending. No detailed failure notes
+is **"Acceptable"**; [Player1's reply](player-motion-amendment-20261117/player-1-human-review.json)
+is also **"Acceptable"**. No detailed failure notes
 were supplied. This tests source-aligned body/clothing, pose and stability
 before compositing and supplies no matched-rate codec, independent-source or
 combined-ball result. Preserve this author development judgment separately
