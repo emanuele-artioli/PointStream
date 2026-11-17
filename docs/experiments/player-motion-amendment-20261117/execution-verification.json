@@ -1,5 +1,6 @@
 {
   "checked_utc": "2026-11-17T10:36:51.631884+00:00",
+  "execution_scope": "Both amended requests complete, integrity accepted; one monitoring timeout preserved; no extra computation retried.",
   "full_suite_basis": {
     "prior_local_result": "2666passed39skipped; no implementation changes since",
     "rerun_note": "Full suite not repeated for records-only changes; next PR runs configured CI.",
@@ -9,13 +10,15 @@
   "historical_preparation_verification": "verification.json",
   "independent_reviews": [
     "player-2-audit.json",
-    "Read-only current evidence/docs/budget review: no material findings; Player1 terminal evidence pending."
+    "player-1-audit.json",
+    "final-bundle-audit.json"
   ],
   "local": {
     "git diff --check": {
       "exit_code": 0
     },
     "json_parse_and_frozen_identity_checks": {
+      "amendment_json_records_parsed": 40,
       "config_and_spec_file_sha256": true,
       "lifecycle_budget_fit": true,
       "passed": true

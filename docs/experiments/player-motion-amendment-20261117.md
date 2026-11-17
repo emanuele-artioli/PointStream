@@ -2,9 +2,10 @@
 
 **Current status:** the user explicitly approved this amendment within the
 original aggregate budget. [Live execution and cumulative accounting](player-motion-amendment-20261117/release.json)
-include the initial stopped smoke. Amended Player2 completed and passed
-independent integrity checks; its accepted publication and actual accounting
-admitted Player1. The prepared proposal below is retained as its original
+include the initial stopped smoke. Both amended44/240-frame requests completed
+and passed independent integrity checks; Player2's accepted publication and
+actual accounting admitted Player1. Both jobs and GPU claims are closed. The
+prepared proposal below is retained as its original
 permission request, not a second budget envelope.
 
 ## Approved execution — November 17
@@ -15,7 +16,7 @@ new source, scoring stage or further automatic retry is released.
 | Request | Recorded state | Evidence |
 |---|---|---|
 | Player2 `20261117T094919Z-5a0cc722`, gpu6 | Complete:44-frame smoke and one contiguous240-frame run; independent integrity PASS | [Audit](player-motion-amendment-20261117/player-2-audit.json), [native/publication identities](player-motion-amendment-20261117/player-2-publication-evidence.json) |
-| Player1 `20261117T102252Z-ccb04da2` | Conditionally admitted after accepted Player2 publication and actual budget reconciliation | [Release ledger](player-motion-amendment-20261117/release.json), [fresh readiness](player-motion-amendment-20261117/player-1-admission-readiness.json) |
+| Player1 `20261117T102252Z-ccb04da2`, gpu5 | Complete:44-frame smoke and one contiguous240-frame run; independent integrity PASS | [Audit](player-motion-amendment-20261117/player-1-audit.json), [native/publication identities](player-motion-amendment-20261117/player-1-publication-evidence.json) |
 
 Player2's repeated smoke forecast1,686.45s, below the amended1,800s full cap.
 The full run retained240frames, with932.75s measured render and12,538.76MiB
@@ -27,6 +28,20 @@ That covers Player1's whole2,400GPU-s /3,150CPU-s reservation with131s margin
 in each aggregate. [Teardown/accounting](player-motion-amendment-20261117/player-2-teardown-accounting.json)
 records absent task processes and GPU claims; both publications are preserved
 read-only and the delivered terminal event is acknowledged.
+
+Player1's repeated smoke forecast1,710.79s, also under1,800s. Its full
+publication retained240frames. A management-host RPC timeout interrupted the
+first read-only wait; inspection confirmed the same live job and passed gate,
+and one bounded recovery wait observed completion. No computation was retried.
+The top-level status update remained older than the remote terminal timestamp;
+accounting therefore uses request creation through observed absent task
+processes/group/GPU claims, an intentionally conservative1,649s lifecycle bound.
+The [closure record](player-motion-amendment-20261117/player-1-teardown-accounting.json)
+records this basis and the entire750externalCPU-s reservation. Total charges
+are **3,318GPU-s /6,318CPU-s (55.3GPU-min /105.3CPU-min)** within4,200/7,200.
+The remaining882s in each envelope is unspent and not transferred to another
+experiment. Both terminal events are acknowledged and all four amended
+publication archives are retained read-only.
 
 Integrity acceptance is not visual acceptance. The full human review uses
 all240native ticks (4.8s at50Hz), with explicitly slowed playback if useful.

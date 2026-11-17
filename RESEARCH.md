@@ -92,7 +92,10 @@ explicitly approved this amendment; the [amended live ledger](docs/experiments/p
 counts the prior charge. Amended Player2 job `20261117T094919Z-5a0cc722`
 completed44/240 frames and passed independent integrity validation. Its closure
 left2,531GPU/3,281CPUseconds, covering the conditional Player1 reservation;
-Player1 job `20261117T102252Z-ccb04da2` is now admitted. The user's
+Player1 job `20261117T102252Z-ccb04da2` also completed44/240 frames with
+independent integrity PASS. Total conservative charges, including the original
+stop, are3,318GPU/6,318CPUseconds within4,200/7,200; both jobs and claims are closed.
+The user's
 [full-run Player2 review](docs/experiments/player-motion-amendment-20261117/player-2-human-review.json)
 is **acceptable** for body/clothing, facing, pose and stability; Player1's review
 remains pending. This is author development judgment, not matched-codec
@@ -176,5 +179,7 @@ The current paper is V4,18body/reference+5appendix pages. Expand supported
 methods, player positives, controls and negatives toward the verified journal
 allowance; the smaller draft is not a desired final length. Research cutoff is
 December19; submission preparation target December26,2026. Author/rights and
-current venue-format checks remain. No submission is authorized. The previous
+current venue-format checks remain; the [November17 public-access recheck](docs/paper/tomm-public-access-recheck-2026-11-17.json)
+retains the legacy23+5 planning allowance but cannot verify the live portal.
+No submission is authorized. The previous
 automatic compute window expired; new stages need concrete released budgets.
