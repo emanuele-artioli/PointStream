@@ -134,6 +134,11 @@ unavailable: no network retry or GPU job is scheduled. Inspect the unknown
 input publication and perform fresh fleet admission only after access returns;
 the same budget does not need another approval. The GPU producer remains frozen
 at55ba0629 independently of subsequent local packet/viewer changes.
+The [local JPEG packet audit](docs/experiments/player-reference-pilot-20261117/packet-audit.json)
+now reproduces both prepared reference tensors and all240conditioning ticks
+from paid packets. The65,120/41,075B references yield91,283/67,238B total
+carriers. These short-window totals include framing and ongoing geometry;
+they do not demonstrate generated fidelity or amortized low-rate performance.
 
 A causal warm-up system is a possible later scope: encode the initial frames
 conventionally while adaptation uses only arrived data, then switch after

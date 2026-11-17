@@ -60,3 +60,32 @@ must be inspected after restored connectivity against the
 Do not replay the unknown write, delete or overwrite any partial dataset file,
 or dispatch while inputs are unverified. The failed connection does not show
 a GPU computation failure or establish whether remote writes completed.
+
+### Local continuation — complete
+
+The [CPU packet audit](player-reference-pilot-20261117/packet-audit.json) checks
+the exact frozen JPEG payloads, decoded references and both players'240ticks of
+conditioning. The JPEG packet recipe explicitly declares the manifest's
+dtype/shape/pixel hash convention; the decoder enforces those expected pixels.
+The full carrier totals are91,283B for quality70 and67,238B for quality40,
+including paid metadata, native base and geometry. The PNG carrier remains
+byte-identical. This is a transport/conditioning check and changes no quality
+result; the actual GPU appearance pilot remains unstarted.
+
+The [local verification](player-reference-pilot-20261117/local-readiness-verification.json)
+records configured Ruff/Mypy passes,46focused tests and2709full-suite passes
+with39skips. Independent review caught OpenCV's permissive truncated-JPEG
+decode, corrected with expected-pixel binding, and clarified that its build
+information is only a configuration fingerprint. The audit output cannot be
+placed inside its input roots. An inefficient repeated NPZ expansion was
+stopped with its incomplete directory preserved; the corrected audit caches
+poses and completed at a fresh path in6.4s. The450externalCPU-second reservation
+is charged in full; no GPU time is charged.
+
+[Durable raw packet evidence](player-reference-pilot-20261117/packet-durable-manifest.json)
+has seven verified read-only files. The viewer now accepts either the completed
+quality70 family or both qualities and labels a partial family explicitly.
+Real-publication validation and human review still follow the approved GPU run.
+Next: await restored campus access, inspect the existing unknown publication
+before any write, verify hashes, then refresh source/fleet/deadline admission.
+No further budget question is needed for this unchanged pilot.

@@ -11,6 +11,22 @@
   },
   "durable_input_root": "/Users/manu/Documents/PointStream-prepared/2026-11-17-reference-pilot-v2",
   "frozen_gpu_code_revision": "55ba06290978bb5e25347031a1b64c1c66107981",
+  "local_readiness": {
+    "configured_mypy": "PASS,675files",
+    "configured_ruff": "PASS",
+    "durable_packet_evidence": "packet-durable-manifest.json",
+    "focused_tests": "46passed",
+    "full_suite": "2709passed,39skipped,1existingforkwarning",
+    "gpu_execution": "not_started",
+    "packet_audit": "packet-audit.json",
+    "partial_candidate_viewer": "tested for one or two completed qualities, actual JPEG publications pending",
+    "prior_local_audit_attempts": [
+      "import-only failure without PYTHONPATH; no output directory created",
+      "task-owned CPU audit PID29217 stopped after repeated compressed pose expansion was detected; observed50.09CPU-s at inspection; incomplete output directory retained",
+      "corrected audit at newv2 path passed in6.395wall-s and6.627CPU-s; no source inputs altered"
+    ],
+    "status": "complete"
+  },
   "monitoring": {
     "active_jobs": [],
     "network_retry_scheduled": false,

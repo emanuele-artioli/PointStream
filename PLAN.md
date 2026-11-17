@@ -102,6 +102,17 @@ records the user's instruction to continue locally. No campus probe, write,
 retry or GPU job is scheduled in this phase. Preserve the approved GPU producer
 at55ba0629; local packet/viewer changes do not alter its frozen inputs.
 
+Local continuation is complete: the JPEG packet profile carries both actual
+prepared reference sets with independently pinned decoded-pixel hashes.
+The [real-input audit](docs/experiments/player-reference-pilot-20261117/packet-audit.json)
+matches every240-tick conditioning array and decodes the native240-frame base;
+the original PNG carrier is byte-identical. JPEG70/40 carriers total91,283/
+67,238B, including metadata and geometry. This is accounting, not an equal-quality
+result. Configured lint/types and the full suite pass (2709passed/39skipped).
+The review viewer supports quality70 alone if quality40 cannot be admitted.
+No further local implementation is needed before the approved appearance test;
+campus publication inspection and live admission remain the next execution gates.
+
 | Stage | Deliverable | Admission/stop decision |
 |---|---|---|
 | A — code/input requalification and receiver contract | Audit saved rate-support/profile/checkpoint/mask joins, upstream preprocessing and source geometry. Freeze one development source, cadence, every-frame output/fallback, complete packet/state and cost forecast. Requalify the three existing generic/tennis-only/match-adapted recipes on a small paired subset before selecting a model. Reduced-cadence profiles need same-cadence anchors; sampled scores do not certify every-frame behavior. | No automatic acceptance of old positives or negatives; no broad model search/new fitting. Reuse valid W8 and W7/W6 proofs only in their scope. If a fresh witness cannot fit a costed stage, revise the minimal contract or report the blocker; do not replay failed jobs. |

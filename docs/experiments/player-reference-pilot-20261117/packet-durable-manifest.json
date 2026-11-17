@@ -1,0 +1,42 @@
+{
+  "durable_root": "/Users/manu/Documents/PointStream-prepared/2026-11-17-common-jpeg-packet-proof",
+  "source_root": "/private/tmp/pointstream-common-jpeg-packet-proof-20261117-v2",
+  "verified_files": [
+    {
+      "bytes": 5884,
+      "path": "audit.json",
+      "sha256": "202672cc26fe6f0256b97a8af7920080d891949320c7d74ad3a0158beb5ce636"
+    },
+    {
+      "bytes": 19415,
+      "path": "base-decoded.framemd5",
+      "sha256": "4cf9801abfe32f1f512f22937a244dfcf14493498dd49440e11766fe60d02195"
+    },
+    {
+      "bytes": 21963,
+      "path": "base.ivf",
+      "sha256": "f9622b6af4cddea3d70226c0b22e12374f4c77aadf2120e54d5d21ba55bfbbb8"
+    },
+    {
+      "bytes": 67238,
+      "path": "q40/packet.pscp",
+      "sha256": "be27d15fbda67845727b02562a780f379573e67df4dc6047a0aca2e5081ad371"
+    },
+    {
+      "bytes": 2506,
+      "path": "q40/profile.json",
+      "sha256": "19d3c6cf10250382f15a4162a83cf8af75b74f30335b21e3827b6e30e0339ac8"
+    },
+    {
+      "bytes": 91283,
+      "path": "q70/packet.pscp",
+      "sha256": "df2214dcc052bfc5d80305c0c26e5745b00ad344877de22f3a53ec3c9d5d4717"
+    },
+    {
+      "bytes": 2506,
+      "path": "q70/profile.json",
+      "sha256": "a60f7ebfe448da581b6efa015dc61ce9f0af7705556beea980d70b279c449199"
+    }
+  ],
+  "write_bits_cleared": true
+}

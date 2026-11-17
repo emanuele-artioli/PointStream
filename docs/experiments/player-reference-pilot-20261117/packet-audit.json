@@ -1,0 +1,154 @@
+{
+  "audit_script_sha256": "177f10320871ce7222e5c27e9ece01132d6ab4a99d0cb5a204c0dd3c6cd61b71",
+  "child_cpu_seconds": 0.156943,
+  "code_revision": "eaad597a4c8b451f89f01a60c6b5468198beb6c4",
+  "implementation_sha256": "6acb11f5d0e8a6eec91e6df12cddfb7f2125a8905ae8409448d1e74ace37b380",
+  "limitations": [
+    "This does not execute a learned receiver, masks, full-canvas composition or ball coding.",
+    "JPEG quality and longer-motion behavior remain untested. No GPU job or new quality metric is included.",
+    "All240conditioning ticks are checked; the approved appearance pilot renders only24ticks per player.",
+    "OpenCV build information is a configuration fingerprint, not a binary/runtime identity. Linux parity is unproven.",
+    "Pinned hashes authenticate this comparison to frozen inputs; self-declared packet hashes do not establish source truth.",
+    "Model resource hashes are reused declarations, not newly loaded or rehashed model weights.",
+    "Reportedkbps is short-window accounting only, not matched-quality compression evidence."
+  ],
+  "native_decode": {
+    "binary_sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be",
+    "command": [
+      "/opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg",
+      "-v",
+      "error",
+      "-nostdin",
+      "-threads",
+      "1",
+      "-i",
+      "/private/tmp/pointstream-common-jpeg-packet-proof-20261117-v2/base.ivf",
+      "-map",
+      "0:v:0",
+      "-f",
+      "framemd5",
+      "/private/tmp/pointstream-common-jpeg-packet-proof-20261117-v2/base-decoded.framemd5"
+    ],
+    "framemd5_sha256": "4cf9801abfe32f1f512f22937a244dfcf14493498dd49440e11766fe60d02195",
+    "frames": 240
+  },
+  "old_packet_sha256": "eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4",
+  "old_profile_sha256": "bec98d67280e9f777a0d3cc110baa51ae2bf2c876aefe6b247d9691432f61107",
+  "opencv": {
+    "build_configuration_sha256": "bade1ed132afc491c4cadda9ea0590a3d0745e16807f765450d3d3d4152a780b",
+    "version": "4.10.0"
+  },
+  "parent_cpu_seconds": 6.469904,
+  "png_packet_unchanged_bytes": 391981,
+  "png_packet_unchanged_sha256": "f91ce34198771e924a39a5bbf1255cfaedb9207a2f2b91869f342892df3f7836",
+  "prepared_manifest_sha256": "245df61dbb17f398ffb599252536abf38c89e8650107cac7247aada7f1f02426",
+  "scope": "CPU packet/conditioning byte audit, no learned generation or quality scoring",
+  "status": "PASS",
+  "variants": [
+    {
+      "comparisons": [
+        {
+          "checks": {
+            "boxes": true,
+            "non_reference_npz_arrays": true,
+            "poses": true,
+            "reference": true,
+            "reference_box": true,
+            "reference_rgb_sha256": true,
+            "run_ids": true,
+            "seed": true,
+            "ticks": true
+          },
+          "golden_npz_sha256": "362bc5ff2798d262e9fa3477a15323477560cc9c0fc4b866d7a6eca7909836e2",
+          "unit": "nadal_kyrgios__000_at120__person_000000000001"
+        },
+        {
+          "checks": {
+            "boxes": true,
+            "non_reference_npz_arrays": true,
+            "poses": true,
+            "reference": true,
+            "reference_box": true,
+            "reference_rgb_sha256": true,
+            "run_ids": true,
+            "seed": true,
+            "ticks": true
+          },
+          "golden_npz_sha256": "3a9797873b204c52957d727b2b4e4e605012159a2381fab0c3f5b994e658e8d1",
+          "unit": "nadal_kyrgios__000_at120__person_000000000000"
+        }
+      ],
+      "component_bytes": {
+        "base": 21963,
+        "keypoints": 1584,
+        "ref0": 33525,
+        "ref1": 31595
+      },
+      "diagnostic_kbps_over_4_8_seconds": 152.13833333333335,
+      "packet_bytes": 91283,
+      "packet_path": "/private/tmp/pointstream-common-jpeg-packet-proof-20261117-v2/q70/packet.pscp",
+      "packet_sha256": "df2214dcc052bfc5d80305c0c26e5745b00ad344877de22f3a53ec3c9d5d4717",
+      "profile_sha256": "a60f7ebfe448da581b6efa015dc61ce9f0af7705556beea980d70b279c449199",
+      "quality": 70,
+      "role_bytes": {
+        "frame": 23547,
+        "match": 0,
+        "reference": 65120,
+        "window": 2616
+      }
+    },
+    {
+      "comparisons": [
+        {
+          "checks": {
+            "boxes": true,
+            "non_reference_npz_arrays": true,
+            "poses": true,
+            "reference": true,
+            "reference_box": true,
+            "reference_rgb_sha256": true,
+            "run_ids": true,
+            "seed": true,
+            "ticks": true
+          },
+          "golden_npz_sha256": "28e799a94d2712e071f2fd2768f2f677de93133a20600b6a9a44dda03e70a173",
+          "unit": "nadal_kyrgios__000_at120__person_000000000001"
+        },
+        {
+          "checks": {
+            "boxes": true,
+            "non_reference_npz_arrays": true,
+            "poses": true,
+            "reference": true,
+            "reference_box": true,
+            "reference_rgb_sha256": true,
+            "run_ids": true,
+            "seed": true,
+            "ticks": true
+          },
+          "golden_npz_sha256": "6eddfa52af521fdb0039b38656b6d791f2d2908f41147db57ff024b02bd7754f",
+          "unit": "nadal_kyrgios__000_at120__person_000000000000"
+        }
+      ],
+      "component_bytes": {
+        "base": 21963,
+        "keypoints": 1584,
+        "ref0": 20558,
+        "ref1": 20517
+      },
+      "diagnostic_kbps_over_4_8_seconds": 112.06333333333335,
+      "packet_bytes": 67238,
+      "packet_path": "/private/tmp/pointstream-common-jpeg-packet-proof-20261117-v2/q40/packet.pscp",
+      "packet_sha256": "be27d15fbda67845727b02562a780f379573e67df4dc6047a0aca2e5081ad371",
+      "profile_sha256": "19d3c6cf10250382f15a4162a83cf8af75b74f30335b21e3827b6e30e0339ac8",
+      "quality": 40,
+      "role_bytes": {
+        "frame": 23547,
+        "match": 0,
+        "reference": 41075,
+        "window": 2616
+      }
+    }
+  ],
+  "wall_seconds": 6.395354874999612
+}

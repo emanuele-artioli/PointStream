@@ -96,3 +96,25 @@ authenticate the sender or payload.
 PNG v1 and native-only profiles remain separate.
 This is byte accounting and conditioning transport only; it does not establish
 a learned receiver or a rate–quality result.
+
+The [actual-input audit](player-reference-pilot-20261117/packet-audit.json), at
+revision `eaad597a4c8b451f89f01a60c6b5468198beb6c4`, verifies both frozen REF1
+sets and their decoded RGB against the independently preserved preparation
+manifest. Both players' references, reference boxes,240poses, placement boxes,
+ticks, run IDs and seeds match the prepared NPZs; all non-reference arrays remain
+unchanged. The native stream decodes240frames and the PNG packet remains
+byte-identical (`f91ce341…7836`). Paid decoded-pixel hash metadata is included.
+
+| Carrier | Native + ongoing geometry | References | Framing | Total bytes |
+|---|---:|---:|---:|---:|
+| PNG v1 |23,547|366,161|2,273|391,981|
+| JPEG70 v1 |23,547|65,120|2,616|91,283|
+| JPEG40 v1 |23,547|41,075|2,616|67,238|
+
+These are4.8-second accounting diagnostics, not matched-quality results. The
+JPEG carriers correspond to152.14/112.06kbps over that window. Cheaper reference
+bytes do not establish useful generated quality; actual reference reuse and
+refresh behavior still require measurement. The approved24-tick appearance
+pilot uses only a prefix of the verified conditioning, not these full-duration
+JPEG-generated players. [Durable raw evidence](player-reference-pilot-20261117/packet-durable-manifest.json)
+is retained read-only outside the checkout while campus storage is unavailable.
