@@ -1,0 +1,35 @@
+{
+  "checked_utc": "2026-11-17T10:36:51.631884+00:00",
+  "full_suite_basis": {
+    "prior_local_result": "2666passed39skipped; no implementation changes since",
+    "rerun_note": "Full suite not repeated for records-only changes; next PR runs configured CI.",
+    "revision": "9af6514b572e90c5995dfa0bb95d50937cd996e4",
+    "successful_ci": "https://github.com/emanuele-artioli/PointStream/actions/runs/44056797005"
+  },
+  "historical_preparation_verification": "verification.json",
+  "independent_reviews": [
+    "player-2-audit.json",
+    "Read-only current evidence/docs/budget review: no material findings; Player1 terminal evidence pending."
+  ],
+  "local": {
+    "git diff --check": {
+      "exit_code": 0
+    },
+    "json_parse_and_frozen_identity_checks": {
+      "config_and_spec_file_sha256": true,
+      "lifecycle_budget_fit": true,
+      "passed": true
+    },
+    "mypy --config-file pyproject.toml": {
+      "checked_source_files": 670,
+      "exit_code": 0,
+      "log": "/private/tmp/player-motion-readiness-20261117/amended-results-mypy.log"
+    },
+    "ruff check": {
+      "exit_code": 0,
+      "log": "/private/tmp/player-motion-readiness-20261117/amended-results-ruff.log"
+    }
+  },
+  "no_new_metric_scoring": true,
+  "scope": "Execution records and documentation; no implementation changes after frozen9af6514b"
+}

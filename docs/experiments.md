@@ -15,7 +15,12 @@ now favors common tennis as a provisional lead, with an uncertain first player
 and a stock torso-facing failure on the second. The [whole-run motion pilot](experiments/player-motion-20261116.md)
 was approved November17 and stopped after a valid44-frame Player2 smoke exceeded
 its full-stage cost forecast cap; no240-frame run started. The [amendment](experiments/player-motion-amendment-20261117.md)
-is prepared, not authorized. These records report no new compression-quality
+was subsequently explicitly approved within the original aggregate budget;
+its live ledger counts the initial charge. Amended Player2 completed44/240
+frames with independent integrity PASS; actual remaining budget admitted the
+conditional Player1 request. The user accepts Player2's full motion pilot;
+Player1's full output and human review remain pending.
+These records report no new compression-quality
 result and reopen no expired allocation.
 
 ## Protocol

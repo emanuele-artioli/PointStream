@@ -1,0 +1,24 @@
+{
+  "checked_utc": "2026-11-17T10:32:55.721590+00:00",
+  "current_attempts": [
+    {
+      "result": "Not accessible through web tool",
+      "url": "https://tomm.acm.org/authors.cfm"
+    },
+    {
+      "result": "HTTP403 through web tool",
+      "url": "https://dl.acm.org/journal/tomm/author-guidelines"
+    },
+    {
+      "result": "HTTP403 through web tool",
+      "url": "https://mc.manuscriptcentral.com/tomm"
+    }
+  ],
+  "decision": "Keep23+5 as legacy-supported planning allowance; live portal/template requirements remain unverified. Do not mark venue acceptance check complete.",
+  "exclusions": "No contact messages, authenticated portal actions, formatting edits, or filing.",
+  "official_legacy_support": {
+    "observed": "Searchable official legacy guide still states23pages including text/figures/references plus5pages online appendix in same PDF. Its old-format provenance does not verify current portal instructions.",
+    "url": "https://tomccap.hosting.acm.org/guide.html"
+  },
+  "scope": "Public read-only venue-instruction access recheck; no submission or account action"
+}
