@@ -11,6 +11,7 @@ import hashlib
 import json
 import math
 from pathlib import Path
+from typing import Any
 
 import matplotlib
 
@@ -27,6 +28,23 @@ AUDIT = ROOT / "docs/experiments/player-reference-pilot-20261117/packet-audit.js
 
 def sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+ANALYSIS_SHA256 = "e60ca013c6518a71f9059d029a3cf5bb90711edf6d262ad1ebb430887680a6d5"
+AUDIT_SHA256 = "202672cc26fe6f0256b97a8af7920080d891949320c7d74ad3a0158beb5ce636"
+
+
+def authenticated_json(path: Path, expected: str) -> dict:
+    raw = path.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != expected:
+        raise ValueError(f"input SHA256 differs: {path}")
+    return json.loads(raw)
+
+
+def fresh_output(out: Path) -> None:
+    if out.resolve().is_relative_to(ROOT.resolve()):
+        raise ValueError("output must be outside the checkout")
+    out.mkdir(parents=True, exist_ok=False)
 
 
 def check(actual: object, expected: object, path: str = "") -> None:
@@ -47,8 +65,9 @@ def check(actual: object, expected: object, path: str = "") -> None:
 
 
 def main(out: Path) -> None:
-    out.mkdir(parents=True, exist_ok=True)
-    data, audit = json.loads(ANALYSIS.read_text()), json.loads(AUDIT.read_text())
+    data = authenticated_json(ANALYSIS, ANALYSIS_SHA256)
+    audit = authenticated_json(AUDIT, AUDIT_SHA256)
+    fresh_output(out)
     groups = [
         ("reference", REFERENCE),
         ("native_svt", {"native_svt"}),
@@ -60,7 +79,7 @@ def main(out: Path) -> None:
     rebuilt = []
     for source in data["sources"]:
         rows = source["physical_curves"]
-        comparisons = {}
+        comparisons: dict[str, Any] = {}
         for name, families in groups:
             comparisons[name] = {}
             for metric in METRICS:
@@ -83,7 +102,9 @@ def main(out: Path) -> None:
     )
     assert audit["status"] == "PASS"
     variants = {v["quality"]: v for v in audit["variants"]}
-    costs = [{"label": "PNG", "frame": 23547, "reference": 366161, "window": 2273}]
+    costs: list[dict[str, Any]] = [
+        {"label": "PNG", "frame": 23547, "reference": 366161, "window": 2273}
+    ]
     for quality in (70, 40):
         roles = variants[quality]["role_bytes"]
         assert (
@@ -136,11 +157,19 @@ def main(out: Path) -> None:
     ]
     for y, metric in enumerate(metrics):
         s = summary[metric]
-        if s["status"] != "supported":
-            ax.text(0.02, y, "unsupported overlap", transform=ax.get_yaxis_transform(), va="center")
-            continue
         for j, value in enumerate(s["source_bd_rate"]):
-            ax.scatter(100 * value, y + (j - 1) * 0.12, s=25, color="#30769a", zorder=3)
+            if value is not None:
+                ax.scatter(100 * value, y + (j - 1) * 0.12, s=25, color="#30769a", zorder=3)
+        if s["status"] != "supported":
+            ax.text(
+                0.38,
+                y,
+                "Pooled interval unsupported",
+                transform=ax.get_yaxis_transform(),
+                va="center",
+                fontsize=8,
+            )
+            continue
         lo, hi = s["bootstrap_95_interval"]
         mean = s["mean_bd_rate"]
         ax.plot([100 * lo, 100 * hi], [y, y], color="#172e40", lw=2)
@@ -153,7 +182,7 @@ def main(out: Path) -> None:
     ax.text(
         0,
         -0.2,
-        "Dots: 3 matches  ·  Diamond: equal-match log mean  ·  Line: 27-resample percentile interval\nSaved score points; intervals describe only these matches.",
+        "Dots: available matches  ·  Diamond: equal-match log mean  ·  Line: 27-resample percentile interval\nSaved score points; intervals describe only these matches.",
         transform=ax.transAxes,
         fontsize=8,
         va="top",
@@ -163,7 +192,7 @@ def main(out: Path) -> None:
     fig.savefig(out / "source-effects.pdf", bbox_inches="tight")
     plt.close(fig)
     fig, ax = plt.subplots(figsize=(8, 3.8), layout="constrained")
-    left = [0] * 3
+    left = [0.0] * 3
     for key, label, color in [
         ("frame", "Ongoing frame data", "#397b9e"),
         ("reference", "Reference images", "#db9b39"),
@@ -192,9 +221,7 @@ def main(out: Path) -> None:
 
 def player_figure(out: Path, report: Path) -> None:
     expected = "d09b054369e2c435d2347e0455a0b244af52f2af03d599becdb48110cbb1156b"
-    if sha(report) != expected:
-        raise ValueError("corrected player report SHA256 differs")
-    data = json.loads(report.read_text())
+    data = authenticated_json(report, expected)
     windows = data["primary_ivf"]["scenarios"]["7200:+0.000:primary"]["windows"]
     names = ("al028", "al034", "al043", "med000", "med024", "med019")
     if set(windows) != set(names) or not windows["med000"]["dcvc_table_absent"]:
@@ -210,7 +237,7 @@ def player_figure(out: Path, report: Path) -> None:
         }
         for group, subset in (("al", names[:3]), ("med", names[3:]))
     }
-    out.mkdir(parents=True, exist_ok=True)
+    fresh_output(out)
     result = {
         "report_sha256": expected,
         "generator_sha256": sha(Path(__file__)),
