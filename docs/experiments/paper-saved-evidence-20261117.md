@@ -1,0 +1,15 @@
+# Experiments: paper saved-evidence refresh
+
+### 2026-11-17
+
+Goal: reproduce paper tables and figures from saved score points only. Budget: at most 120 CPU-seconds for arithmetic and plotting, zero GPU. No LPIPS/DISTS inference, encoding, downloads, campus/SSH, or model work. Recompute saved points; do not rescore reconstructions. Verify recorded summaries and support before using results. The role-cost comparison uses the frozen packet audit and its actual 4.8-second window.
+
+The archived analysis SHA256 is `e60ca013c6518a71f9059d029a3cf5bb90711edf6d262ad1ebb430887680a6d5`; the packet audit SHA256 is `202672cc26fe6f0256b97a8af7920080d891949320c7d74ad3a0158beb5ce636`. These hashes identify the saved files, not the truth of their upstream provenance. The code recomputed all 108 source/anchor/metric combinations, including support and all three geometries, and all six source summaries at relative tolerance 1e-11 and absolute tolerance 1e-12. It uses the existing historical linear-rate hull followed by PCHIP in log-rate; the Pareto/PCHIP and literal linear-rate sensitivities remain distinct. There is no assertion of physical switching.
+
+Command: `MPLCONFIGDIR=/private/tmp/ps-mpl-cache XDG_CACHE_HOME=/private/tmp/ps-cache python -m experiments.tennis.paper_saved_evidence /private/tmp/pointstream-paper-saved-evidence-20261117/verified`. The final run used 1.58 CPU seconds, plus earlier font-cache and verification runs within the 120-second cap. Its authenticated summary SHA256 is `aa3d679aad17d9922b81b0f61f9f02e8ad8447181aa0455629946c4eb7d3c633`. Generator SHA256 is `71025a2aa8796189c9ad2640a613df16676f195e83af8175ec418a71264b1043`. Outputs are outside the checkout under the command's directory.
+
+Crop DISTS per-match BD-rates are -28.568%, -8.948%, -38.392%; their equal-match log mean is -26.276%, with descriptive 27-ordered-resample percentile interval [-36.367%, -13.547%]. Crop LPIPS has no common-quality support for one match, so its pooled estimate and interval are unsupported. Full DISTS mean is +17.388% [8.372%, 30.264%]; standard full LPIPS +24.635% [7.551%, 50.402%]; full RGB PSNR +30.480% [11.037%, 57.371%]. Historical full LPIPS spatial-map mean is a different metric: +24.635% [7.551%, 50.402%]. Intervals describe only these three matches, not population significance.
+
+Actual frozen PNG/JPEG 70/JPEG 40 packet totals are 391981/91283/67238 bytes over 4.8 seconds. Ongoing frame bytes are 23547 each, references 366161/65120/41075, and window framing 2273/2616/2616. These are short-window role costs, not matched-quality evidence or a reference-reuse experiment. No cross-profile bitrate conclusion is supported.
+
+Focused verification: `ruff check experiments/tennis/paper_saved_evidence.py` and `python -m pytest -q tests/test_ball_confirmation_analysis.py` passed (3 tests). Model telemetry was not verified.
