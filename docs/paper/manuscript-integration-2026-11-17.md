@@ -1,0 +1,61 @@
+# Player and ball manuscript integration — November 17, 2026
+
+User authority: implement the three immediate priorities in the outage plan:
+integrate a balanced manuscript, regenerate tables/figures and source-level
+uncertainty from saved scores, and identify the smallest remaining experiments.
+No new GPU/model/quality scoring, cloud purchase, training or submission.
+
+## Working state
+
+- Code branch: `codex/paper-integration-20261117`.
+- Independent manuscript checkout:
+  `/private/tmp/pointstream-overleaf-paper-integration-20261117`.
+- Read current Overleaf main: `690cad0aa535eacdb34363c48b430ddf7a3ff750`.
+  No newer author changes existed at admission. Preserve its git history.
+- Overlay authenticated V4 ZIP, SHA256
+  `2f4b38bf07372913a4eab8fda8fec5f322f7d1fe384c1d80d66ae996a06604f5`.
+  Preserve its original read-only package and `CLAUDE.md` symlink. V4 baseline
+  source/evidence checker passes. Native baseline build is separate from final QA.
+- Output staging: `/private/tmp/pointstream-paper-integration-20261117`.
+- Saved-score work: scoped branch `codex/paper-evidence-refresh-20261117`,
+  output `/private/tmp/pointstream-paper-saved-evidence-20261117`.
+
+## Required result
+
+Restore substantial corrected generated-player evidence, including exposed-match
+and cost/temporal limits; preserve confirmed ball results and conventional/pixel
+controls. Separate historical quality, new author development review and CPU
+conditioning evidence. Report actual paid packet costs without transferring
+historical modeled quality to a new packet. Keep the combined codec unmeasured.
+
+Recompute saved-point comparisons and exact source-resampling summaries; label
+three-match intervals descriptive and historical window intervals non-independent.
+Figures must use authenticated inputs and separate objectives/cohorts. No fresh
+LPIPS/DISTS inference or reconstruction scoring.
+
+Deliver named and anonymous native author-review PDFs, checked source package,
+reproducible figures/data, a claim/evidence update and a short remaining-test
+decision table. Check evidence/marker registry, bibliography, page spans and
+rendered layout. Current legacy planning budget is 23 body/reference plus five
+appendix pages; live submission requirements remain unverified. Recheck current
+Overleaf head before any authorized final push; never overwrite newer work.
+
+## Progress
+
+Source integration is complete; final PDF visual review and publication are in
+progress. Three new figures and authenticated companion data restore player
+positives, expose paid state, and display source-level uncertainty. All 108
+saved-point comparisons and six summaries reproduce; crop-LPIPS pooling remains
+unsupported. The code generator uses lazy plotting imports so the pinned check
+environment does not gain a new plotting dependency. Configured Ruff/Mypy
+(677 files) pass; full code suite passes 2,711 tests with 39 skips and one existing
+fork warning. The manuscript's original checker and a new narrow integration
+checker pass after registry rebinding; rendering remains separately required.
+
+The [minimum remaining experiment brief](minimum-remaining-experiments-2026-11-17.md)
+separates the achieved-scope empirical paper from a complete learned receiver,
+combined development comparison and independent-match confirmation. Only the
+previous unchanged campus JPEG pilot is approved.
+
+All original evidence, closed allocations and unknown input publication remain
+unchanged. Requested delegate tier identities are not verified telemetry.
