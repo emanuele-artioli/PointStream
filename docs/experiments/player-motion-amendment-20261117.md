@@ -1,6 +1,79 @@
 # Experiments: motion admission amendment
 
-### 2026-11-17 — prepared after the original cost gate stopped promotion
+**Current status:** the user explicitly approved this amendment within the
+original aggregate budget. [Live execution and cumulative accounting](player-motion-amendment-20261117/release.json)
+include the initial stopped smoke. Both amended44/240-frame requests completed
+and passed independent integrity checks; Player2's accepted publication and
+actual accounting admitted Player1. Both jobs and GPU claims are closed. The
+prepared proposal below is retained as its original
+permission request, not a second budget envelope.
+
+## Approved execution — November 17
+
+The user's explicit reply was **"Approve within original budget"**. No training,
+new source, scoring stage or further automatic retry is released.
+
+| Request | Recorded state | Evidence |
+|---|---|---|
+| Player2 `20261117T094919Z-5a0cc722`, gpu6 | Complete:44-frame smoke and one contiguous240-frame run; independent integrity PASS | [Audit](player-motion-amendment-20261117/player-2-audit.json), [native/publication identities](player-motion-amendment-20261117/player-2-publication-evidence.json) |
+| Player1 `20261117T102252Z-ccb04da2`, gpu5 | Complete:44-frame smoke and one contiguous240-frame run; independent integrity PASS | [Audit](player-motion-amendment-20261117/player-1-audit.json), [native/publication identities](player-motion-amendment-20261117/player-1-publication-evidence.json) |
+
+Player2's repeated smoke forecast1,686.45s, below the amended1,800s full cap.
+The full run retained240frames, with932.75s measured render and12,538.76MiB
+peak GPU memory. Shared-GPU timing supports cost admission, not throughput.
+Its conservative lifecycle charge is1,341GPU-s plus1,341CPU-s and the entire
+750externalCPU-s reservation. Including the original stopped run, this is
+**1,669GPU-s /3,919CPU-s**, leaving2,531GPU-s /3,281CPU-s before Player1.
+That covers Player1's whole2,400GPU-s /3,150CPU-s reservation with131s margin
+in each aggregate. [Teardown/accounting](player-motion-amendment-20261117/player-2-teardown-accounting.json)
+records absent task processes and GPU claims; both publications are preserved
+read-only and the delivered terminal event is acknowledged.
+
+Player1's repeated smoke forecast1,710.79s, also under1,800s. Its full
+publication retained240frames. A management-host RPC timeout interrupted the
+first read-only wait; inspection confirmed the same live job and passed gate,
+and one bounded recovery wait observed completion. No computation was retried.
+The top-level status update remained older than the remote terminal timestamp;
+accounting therefore uses request creation through observed absent task
+processes/group/GPU claims, an intentionally conservative1,649s lifecycle bound.
+The [closure record](player-motion-amendment-20261117/player-1-teardown-accounting.json)
+records this basis and the entire750externalCPU-s reservation. Total charges
+are **3,318GPU-s /6,318CPU-s (55.3GPU-min /105.3CPU-min)** within4,200/7,200.
+The remaining882s in each envelope is unspent and not transferred to another
+experiment. Both terminal events are acknowledged and all four amended
+publication archives are retained read-only.
+
+Integrity acceptance is not visual acceptance. The full human review uses
+all240native ticks (4.8s at50Hz), with explicitly slowed playback if useful.
+The user's [Player2 reply](player-motion-amendment-20261117/player-2-human-review.json)
+is **"Acceptable"**; Player1's review remains pending. No detailed failure notes
+were supplied. This tests source-aligned body/clothing, pose and stability
+before compositing and supplies no matched-rate codec, independent-source or
+combined-ball result. Preserve this author development judgment separately
+from source-only annotations and any future population preference study.
+
+### Next contract, conditional on the viewing result
+
+Do not relabel the old W8 receiver as this candidate. A fresh source-code
+check finds `w8_payload.unpack_window` fixes match5/CFG2, required match state
+and every-third saved ticks; `w8_receiver_generate` also validates the fitted
+guider and match checkpoint. This pilot instead uses the installed common
+tennis model, CFG3.5 and every native tick. Reuse its isolation and transport
+primitives through an explicit new profile, with paid references/geometry,
+receiver-generated silhouettes, a native full-frame fallback and actual
+every-frame output. Preserve the old format and evidence unchanged.
+
+If the human motion review supports continuing, first cost that minimal
+player receiver and matched player-only comparison. The same-source ball
+stream and source-only player/ball references still need authentication before
+a combined claim. Avoid another model grid. A failed viewing result instead
+requires identifying the conditioning/context failure before a narrow repair;
+neither new generation nor training follows automatically from this budget.
+The [unreleased receiver design](player-common-receiver-design-20261117.md)
+identifies reusable functions and the remaining input/cost checks; it is not
+a compute proposal or an additional permission gate for local preparation.
+
+## Historical proposal — prepared after the original cost gate stopped promotion
 
 **Not authorized. No further GPU work.** This proposes an explicit change to
 the [approved original stopping rule](player-motion-20261116.md), within its

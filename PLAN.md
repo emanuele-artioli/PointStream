@@ -63,9 +63,20 @@ lead. The [next motion pilot](docs/experiments/player-motion-20261116.md) is
 approved and stopped at its original cost gate: the real Player2 44-frame
 smoke validates, but forecast1,704.68 s exceeds the1,500 s full cap. No full run
 or Player1 request started; conservative charge328GPU/1,828CPUseconds. The
-[prepared amendment](docs/experiments/player-motion-amendment-20261117.md) needs
-explicit permission for a repeated smoke and larger per-request cap inside
-the unchanged70GPUminutes/2CPUhours overall envelope. The24frame pilot and
+[amendment](docs/experiments/player-motion-amendment-20261117.md) was explicitly
+approved for a repeated smoke and larger per-request cap inside the unchanged
+70GPUminutes/2CPUhours overall envelope; [live cumulative accounting](docs/experiments/player-motion-amendment-20261117/release.json)
+includes the original charge. Player2 job `20261117T094919Z-5a0cc722` completed
+and passed independent44/240-frame integrity checks. Its actual closure left
+2,531GPU/3,281CPUseconds, enough to admit Player1 job
+`20261117T102252Z-ccb04da2` with its full2,400GPU/3,150CPU reservation. Player1
+has now completed and passed independent44/240-frame integrity checks. Both
+jobs/claims are closed; total conservative3,318GPU/6,318CPUseconds includes
+the original stop and both full externalCPU reservations, within4,200/7,200.
+The user's [full-run Player2 review](docs/experiments/player-motion-amendment-20261117/player-2-human-review.json)
+is acceptable; Player1 review remains pending. Integrity and one-author
+acceptability establish neither matched-codec preference nor population benefit.
+The24frame pilot and
 author review establish neither a whole-codec nor confirmation result. No training ran.
 
 | Stage | Deliverable | Admission/stop decision |
@@ -134,7 +145,8 @@ decision requiring its own defensible contribution, not a second project now.
 | Foreground scope and actual-code re-audit | [scope/repair record](docs/experiments/foreground-scope-and-requalification-20261115.md) | `codex/foreground-scope-and-evidence-audit-20261115` | primary plus scoped source reviewers; actual tier telemetry unverified | complete: PR430 merged28377fb5 with successfulCI; player-and-ball primary, racket optional, strict support/coverage/rational-FPS fixes |
 | Player requalification implementation | [exact inputs, code and release](docs/experiments/player-requalification-20261116.md); [PR431](https://github.com/emanuele-artioli/PointStream/pull/431) | `codex/player-requalification-20261116` | primary plus scoped builders/reviewer; actual tier telemetry unverified | CPU source/receipt/processor checks complete; future-fit correction and paired worker/specs implemented; configuredRuff/Mypy668/full2650passed39skipped; PR431 merged with successfulCI; subsequent replay recorded below |
 | Approved three-profile player replay and human pilot | [actual jobs and audits](docs/experiments/player-replay-20261116/release.json); [human review](docs/experiments/player-replay-20261116/human-review-import.json); [PR432](https://github.com/emanuele-artioli/PointStream/pull/432) | `codex/player-replay-release-20261116` | primary plus scoped audit/preview builders; actual tier telemetry unverified | all three complete/PASS;1,203GPU/3,003CPUseconds; PR432 merged with successfulCI. Human review imported: Player1 uncertain, Player2 common tennis preferred; stock torso-facing failure. Common tennis provisional, no codec win/new training |
-| Human-informed shared-tennis motion pilot | [closed release](docs/experiments/player-motion-20261117/release.json); [prepared amendment](docs/experiments/player-motion-amendment-20261117.md) | `codex/player-motion-release-20261117` | primary plus scoped runner/builder/independent audit; actual tier telemetry unverified | original request stopped at cost gate after valid44frame Player2 output; no full/Player1. Charge328GPU/1,828CPU. Amended1,800s full/2,400s request policy prepared, not authorized; second request conditional on remaining original4,200GPU/7,200CPU envelope |
+| Human-informed shared-tennis motion pilot | [closed original release](docs/experiments/player-motion-20261117/release.json); [approved amendment and cumulative ledger](docs/experiments/player-motion-amendment-20261117/release.json) | `codex/player-motion-amended-run-20261117` | primary plus scoped runner/independent audit; actual tier telemetry unverified | both amended44/240-frame requests complete and independently integrity-accepted; no active claims. Conservative3,318GPU/6,318CPU includes original stop and both externalCPU caps; within original4,200/7,200. Player2 author review acceptable; Player1 review pending |
+| Common-player packet contract | [unreleased receiver design](docs/experiments/player-common-receiver-design-20261117.md) | `codex/common-player-packet-20261117` | primary plus scoped builder; actual tier telemetry unverified | local CPU implementation/review in an isolated checkout: explicit common-model and native-only modes, paid references/geometry and every-tick coverage. No GPU/model/scoring release; actual source-denied generation/masks and retained-input equivalence remain gates |
 | Combined receiver/development pilot | stagesA–D above | — | unassigned | unreleased: exact inputs, source-independent contract and complete cost forecast precede budget approval |
 
 ### Dates and authority
@@ -155,8 +167,9 @@ the earlier audit. The separately approved bounded replay is now complete;
 unused GPU/CPU allocations were not transferred to another experiment. The
 human-review import itself authorized no computation. The November17 motion
 approval stopped at its cost gate; its unused envelope is not automatically
-reopened. The specific amendment needs permission under the accepted stop/no-retry
-rule. Local
+reopened. The specific amendment was separately approved; no further retry or
+scope expansion is released. Its live ledger must count the original charge
+before every sequential admission. Local
 implementation, read-only audits and repository checks may continue. Check
 exact experiment IDs/status before acting; never replay unknown
 submissions. [Original authority ledger](docs/experiments/submission-ladder-autonomy-20261114.json).

@@ -1,0 +1,139 @@
+{
+  "scope": "Player 1 unpaired full 240-frame common-tennis development review; source left candidate right",
+  "review_path": "/Users/manu/Documents/PointStream-review/2026-11-17-player-motion-full/player-1/review",
+  "index": "/Users/manu/Documents/PointStream-review/2026-11-17-player-motion-full/player-1/review/index.html",
+  "source_left_candidate_right": {
+    "50": "/Users/manu/Documents/PointStream-review/2026-11-17-player-motion-full/player-1/review/player-1-source-left-candidate-right-50.mp4",
+    "10": "/Users/manu/Documents/PointStream-review/2026-11-17-player-motion-full/player-1/review/player-1-source-left-candidate-right-10.mp4"
+  },
+  "source_sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d",
+  "config_sha256": "a6c8b47b1bf23a4cf1b36e0dceb1519021b7826eb64155e5b1efc0a64452f27a",
+  "plan_sha256": "0a4668b0959fe5474baa21a64d88991e592ba384de426fdfba10cdeb69ce03ab",
+  "reference_max_rgb_delta": 0,
+  "raw_publication": "/private/tmp/pointstream-player-motion-results-20261117/amended-player1/full/publish",
+  "review_manifest_sha256": "0115a241fe8981fd23e332a785d011ce5a00ba888e818ba21faa0c0ed31f3080",
+  "videos": {
+    "nadal_kyrgios__000_at120__person_000000000000-A-10.mp4": {
+      "sha256": "ba17752781d85d5a029502eaa96616241bf1c56e5df739f8719a62bb4e7e970f",
+      "bytes": 18327818,
+      "ffprobe": {
+        "width": 512,
+        "height": 784,
+        "pix_fmt": "yuv420p",
+        "color_range": "tv",
+        "color_space": "bt709",
+        "r_frame_rate": "10/1",
+        "avg_frame_rate": "10/1",
+        "duration": "24.000000",
+        "nb_read_frames": "240"
+      }
+    },
+    "nadal_kyrgios__000_at120__person_000000000000-A-50.mp4": {
+      "sha256": "f20c219453048e63f0885e197bcd029e426a5f82833e0b2027f16d56a493a80c",
+      "bytes": 7723437,
+      "ffprobe": {
+        "width": 512,
+        "height": 784,
+        "pix_fmt": "yuv420p",
+        "color_range": "tv",
+        "color_space": "bt709",
+        "r_frame_rate": "50/1",
+        "avg_frame_rate": "50/1",
+        "duration": "4.800000",
+        "nb_read_frames": "240"
+      }
+    },
+    "nadal_kyrgios__000_at120__person_000000000000-source-10.mp4": {
+      "sha256": "5fd2f10f8ad1de5d907277e74b295318a718a6b208a0a034826d5eb5eb6558e2",
+      "bytes": 9086170,
+      "ffprobe": {
+        "width": 512,
+        "height": 784,
+        "pix_fmt": "yuv420p",
+        "color_range": "tv",
+        "color_space": "bt709",
+        "r_frame_rate": "10/1",
+        "avg_frame_rate": "10/1",
+        "duration": "24.000000",
+        "nb_read_frames": "240"
+      }
+    },
+    "nadal_kyrgios__000_at120__person_000000000000-source-50.mp4": {
+      "sha256": "5e6801f250b10055e84a9105c0589e3af1fe631e5d1bfc1cc3398166f9260ba0",
+      "bytes": 4204181,
+      "ffprobe": {
+        "width": 512,
+        "height": 784,
+        "pix_fmt": "yuv420p",
+        "color_range": "tv",
+        "color_space": "bt709",
+        "r_frame_rate": "50/1",
+        "avg_frame_rate": "50/1",
+        "duration": "4.800000",
+        "nb_read_frames": "240"
+      }
+    },
+    "player-1-source-left-candidate-right-10.mp4": {
+      "sha256": "bb8195eb31ae994f085526bb4739ac05da67b98f7c33a3f677f09ad904f3b67c",
+      "bytes": 27366065,
+      "ffprobe": {
+        "width": 1024,
+        "height": 784,
+        "pix_fmt": "yuv420p",
+        "color_range": "tv",
+        "color_space": "bt709",
+        "r_frame_rate": "10/1",
+        "avg_frame_rate": "10/1",
+        "duration": "24.000000",
+        "nb_read_frames": "240"
+      }
+    },
+    "player-1-source-left-candidate-right-50.mp4": {
+      "sha256": "0305beed148db7069b52782cc11ee35ad327d3720a46bd7d98b0c960236b79e0",
+      "bytes": 11582998,
+      "ffprobe": {
+        "width": 1024,
+        "height": 784,
+        "pix_fmt": "yuv420p",
+        "color_range": "tv",
+        "color_space": "bt709",
+        "r_frame_rate": "50/1",
+        "avg_frame_rate": "50/1",
+        "duration": "4.800000",
+        "nb_read_frames": "240"
+      }
+    }
+  },
+  "cpu_seconds": {
+    "independent_output_audit": 7.306171,
+    "preview_build_user": 46.93,
+    "preview_build_system": 5.76,
+    "stack_encode_user": 35.61,
+    "stack_encode_system": 0.27,
+    "verification_python": 0.069996,
+    "verification_children": 6.7371870000000005,
+    "note": "Build/stack CPU measured by /usr/bin/time; SCP CPU/wall omitted. External cap 750 seconds."
+  },
+  "wall_seconds": {
+    "preview_build": 50.85,
+    "stack_encode": 32.85,
+    "verification": 6.822179875001893
+  },
+  "max_rss_bytes": {
+    "preview_build": 2483617792,
+    "stack_encode": 187678720
+  },
+  "encoder": {
+    "path": "/opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg",
+    "sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be",
+    "version": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+    "video_color": "BT.709 limited-range YUV420 display proxy; not scored reconstruction"
+  },
+  "limits": [
+    "Display proxies re-encode source and candidate; no metric scoring.",
+    "10 fps playback is deliberately slowed, not native temporal cadence.",
+    "ffprobe reports BT.709 matrix and limited range but omits color primaries and transfer fields despite encoding flags; those tags were not verified.",
+    "The source and candidate videos in index.html have separate controls; side-by-side files are synchronized display proxies.",
+    "Loop seam is not a temporal measurement."
+  ]
+}
