@@ -86,5 +86,10 @@
     "question_reference": "call_c137ccb5bb484268bababd3a2425b66d",
     "remote_actions_this_phase": false,
     "reply": "Continue locally for now"
+  },
+  "human_selection": {
+    "selected": "lossless",
+    "record": "../appearance-resume-20261118/selected-reference.json",
+    "common_eligible_jpeg": false
   }
 }

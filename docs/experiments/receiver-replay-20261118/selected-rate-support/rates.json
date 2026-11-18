@@ -1,0 +1,178 @@
+{
+  "source_sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d",
+  "selected_carrier_sha256": "3dd4aa753dfa3d15a6fdbd1b368d6b48929b4eb8c933e2217a33bed87f735bfd",
+  "seconds": 4.8,
+  "frames": 240,
+  "policy": "Linux lossless PNG, Linux FFmpeg and Linux dav1d sidecar, one cold receiver manifest per carrier",
+  "linux_native_ffmpeg_sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+  "linux_tile_dav1d_sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+  "numpy": "1.26.4",
+  "code_sha256": "3fe8f931ad5093a52f4077f16a2df6c4dcd6382a4c1d42be3050757de44f22e4",
+  "rows": [
+    {
+      "crf": 36,
+      "base_ivf_bytes": 382466,
+      "base_ivf_sha256": "2df35b86f53f0c5ffbba380b9e3a020fed23723041d5161f8ce609cb6f1f61a2",
+      "role_bytes": {
+        "frame": 384089,
+        "window": 2274,
+        "match": 0,
+        "reference": 365939
+      },
+      "sections": {
+        "base": {
+          "bytes": 382466,
+          "sha256": "2df35b86f53f0c5ffbba380b9e3a020fed23723041d5161f8ce609cb6f1f61a2"
+        },
+        "keypoints": {
+          "bytes": 1623,
+          "sha256": "510950f12a26b6bc3f562f666f1e13d08bd040e9c423d5ae756a8da8e56e2ad8"
+        },
+        "ref0": {
+          "bytes": 277732,
+          "sha256": "4fa64c85b8d53f15da49bffd4d6ee0ac8c4f0f303b6feb023c1e43e971fa30c1"
+        },
+        "ref1": {
+          "bytes": 88207,
+          "sha256": "35c5bdb713f29e8c7033048d576692b7994e70a9cdf2d0178a39f1371d086bfc"
+        }
+      },
+      "player_carrier_bytes": 752302,
+      "manifest_bytes": 625,
+      "sidecar": {
+        "canvas_size": [
+          1920,
+          1080
+        ],
+        "ticks": 240,
+        "present_ticks": 195,
+        "carrier_bytes": 752302,
+        "tile_ivf_bytes": 17620,
+        "positions_bytes": 960,
+        "sidecar_framing_bytes": 534,
+        "sidecar_bytes": 19114,
+        "total_bytes": 771416
+      },
+      "player_total_bytes": 752927,
+      "joint_total_bytes": 772041,
+      "player_kbps": 1254.8783333333333,
+      "joint_kbps": 1286.735,
+      "sha256": {
+        "players.pscp": "244f64e29e0e86bf3c2db76291309c0d976fbe53a0d7e9a40859033ea9780348",
+        "ball.sidecar": "2b6b9de91ff7e216f3f27e92329434d4a1cf4715c9fec726b3533c1c142dd537",
+        "receiver.manifest": "f3d857096f3a41944d9e689a9011ee128fb7b4da7e667f2aee80bcfac04ef9d5"
+      },
+      "ball_tile_sha256": "cfa40919ce0bdb64b8b98ae5ed3b0425b19cd0c020ce9c0e7ff08dec3f8e95a8"
+    },
+    {
+      "crf": 48,
+      "base_ivf_bytes": 182055,
+      "base_ivf_sha256": "41578d340fcf41622d365497e3d105291468d44e038bf97caed5db9f0b3cc029",
+      "role_bytes": {
+        "frame": 183678,
+        "window": 2274,
+        "match": 0,
+        "reference": 365939
+      },
+      "sections": {
+        "base": {
+          "bytes": 182055,
+          "sha256": "41578d340fcf41622d365497e3d105291468d44e038bf97caed5db9f0b3cc029"
+        },
+        "keypoints": {
+          "bytes": 1623,
+          "sha256": "510950f12a26b6bc3f562f666f1e13d08bd040e9c423d5ae756a8da8e56e2ad8"
+        },
+        "ref0": {
+          "bytes": 277732,
+          "sha256": "4fa64c85b8d53f15da49bffd4d6ee0ac8c4f0f303b6feb023c1e43e971fa30c1"
+        },
+        "ref1": {
+          "bytes": 88207,
+          "sha256": "35c5bdb713f29e8c7033048d576692b7994e70a9cdf2d0178a39f1371d086bfc"
+        }
+      },
+      "player_carrier_bytes": 551891,
+      "manifest_bytes": 625,
+      "sidecar": {
+        "canvas_size": [
+          1920,
+          1080
+        ],
+        "ticks": 240,
+        "present_ticks": 195,
+        "carrier_bytes": 551891,
+        "tile_ivf_bytes": 17620,
+        "positions_bytes": 960,
+        "sidecar_framing_bytes": 534,
+        "sidecar_bytes": 19114,
+        "total_bytes": 571005
+      },
+      "player_total_bytes": 552516,
+      "joint_total_bytes": 571630,
+      "player_kbps": 920.86,
+      "joint_kbps": 952.7166666666667,
+      "sha256": {
+        "players.pscp": "144bd0870dd37b6b586663473d12a50bdb78015626661eccaa7a427fb60c9b87",
+        "ball.sidecar": "616f63b0f3f2ca84e3eb87645d1a0877d29a6aa7130d986c31a3a4f0a7b3b2d2",
+        "receiver.manifest": "eaead07c00e8e839b174f12ac943574f9c774b0c8fb6b21c3bdfb7a6f4a78368"
+      },
+      "ball_tile_sha256": "cfa40919ce0bdb64b8b98ae5ed3b0425b19cd0c020ce9c0e7ff08dec3f8e95a8"
+    },
+    {
+      "crf": 60,
+      "base_ivf_bytes": 75592,
+      "base_ivf_sha256": "8837ad460cda0236e3658e9509ece852991a5491e6c9769c7d66437672c020c2",
+      "role_bytes": {
+        "frame": 77215,
+        "window": 2273,
+        "match": 0,
+        "reference": 365939
+      },
+      "sections": {
+        "base": {
+          "bytes": 75592,
+          "sha256": "8837ad460cda0236e3658e9509ece852991a5491e6c9769c7d66437672c020c2"
+        },
+        "keypoints": {
+          "bytes": 1623,
+          "sha256": "510950f12a26b6bc3f562f666f1e13d08bd040e9c423d5ae756a8da8e56e2ad8"
+        },
+        "ref0": {
+          "bytes": 277732,
+          "sha256": "4fa64c85b8d53f15da49bffd4d6ee0ac8c4f0f303b6feb023c1e43e971fa30c1"
+        },
+        "ref1": {
+          "bytes": 88207,
+          "sha256": "35c5bdb713f29e8c7033048d576692b7994e70a9cdf2d0178a39f1371d086bfc"
+        }
+      },
+      "player_carrier_bytes": 445427,
+      "manifest_bytes": 625,
+      "sidecar": {
+        "canvas_size": [
+          1920,
+          1080
+        ],
+        "ticks": 240,
+        "present_ticks": 195,
+        "carrier_bytes": 445427,
+        "tile_ivf_bytes": 17620,
+        "positions_bytes": 960,
+        "sidecar_framing_bytes": 534,
+        "sidecar_bytes": 19114,
+        "total_bytes": 464541
+      },
+      "player_total_bytes": 446052,
+      "joint_total_bytes": 465166,
+      "player_kbps": 743.42,
+      "joint_kbps": 775.2766666666666,
+      "sha256": {
+        "players.pscp": "0afb05c2b24ee7cfde0d1d26d4df550f6e372395ed107e5befc315126af80ba5",
+        "ball.sidecar": "1be9463eb24a749fe11a259282f52cc780d7e388fabec6d025ee1c0e7f6370ae",
+        "receiver.manifest": "cc1753ec4fcce38b30c79b279c29a9c260752ca8b82755a5efb3781360a24f85"
+      },
+      "ball_tile_sha256": "cfa40919ce0bdb64b8b98ae5ed3b0425b19cd0c020ce9c0e7ff08dec3f8e95a8"
+    }
+  ]
+}

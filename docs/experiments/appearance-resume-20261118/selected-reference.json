@@ -1,0 +1,47 @@
+{
+  "blinded_response_sha256": "8eebea005eefa528c3a17e7d8f932a9eb0743d48eb88f56db23c5dbdba449b78",
+  "reveal_sha256": "004db2c9af1ffbe4d25865bc9e57283a014ef66fc78b6aff6399b5b999f6ead5",
+  "blinded_label_to_reference": {
+    "nadal_kyrgios__000_at120__person_000000000000": {
+      "A": "quality-40",
+      "B": "lossless",
+      "C": "quality-70"
+    },
+    "nadal_kyrgios__000_at120__person_000000000001": {
+      "A": "quality-70",
+      "B": "lossless",
+      "C": "quality-40"
+    }
+  },
+  "eligible_by_player": {
+    "Player 1": {
+      "quality-40": true,
+      "lossless": true,
+      "quality-70": false
+    },
+    "Player 2": {
+      "quality-70": false,
+      "lossless": true,
+      "quality-40": false
+    }
+  },
+  "eligible_for_both": [
+    "lossless"
+  ],
+  "selected": "lossless",
+  "pilot_ref1_bytes": 366161,
+  "linux_carrier_and_manifest_bytes": 392423,
+  "files": [
+    {
+      "bytes": 391798,
+      "sha256": "3dd4aa753dfa3d15a6fdbd1b368d6b48929b4eb8c933e2217a33bed87f735bfd",
+      "path": "/Users/manu/Documents/PointStream-prepared/2026-11-18-receiver-replay-zlib/qpng.pscp"
+    },
+    {
+      "bytes": 625,
+      "sha256": "b9eae3cef99a5139cf8db4745809db40345ec2aaebc5d82f3164c18d46f020a8",
+      "path": "/Users/manu/Documents/PointStream-prepared/2026-11-18-receiver-replay-zlib/qpng.manifest"
+    }
+  ],
+  "scope": "One author, two 24-frame samples on one exposed tennis rally. Setting selected for the authorized functional replay."
+}
