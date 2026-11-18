@@ -1,0 +1,11 @@
+{
+  "unit": "nadal_kyrgios__000_at120__person_000000000000",
+  "passed": true,
+  "frames": 240,
+  "carrier_sha256": "3dd4aa753dfa3d15a6fdbd1b368d6b48929b4eb8c933e2217a33bed87f735bfd",
+  "receipt_sha256": "b7171218c35457fea909cd0b63b4bd308963e34bfdfb8f23402ad67fcf476a96",
+  "archive_sha256": "fc0e4a380c47116332bdcd6dfedc268c2a34f4d4b3eca7608d764acfb912d664",
+  "job_id": "20261118T162820Z-841078f9",
+  "independent_audit": "player1-full.json",
+  "output_pixels_equal_to_prior": false
+}

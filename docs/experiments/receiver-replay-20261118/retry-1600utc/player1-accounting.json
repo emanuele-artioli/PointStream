@@ -1,0 +1,10 @@
+{
+  "job_id": "20261118T162820Z-841078f9",
+  "allocation_started": 1795019326.3156981,
+  "worker_ended": 1795020644.447326,
+  "terminal_updated": 1795020648.2180467,
+  "conservative_gpu_seconds": 1322,
+  "cumulative_seconds_including_previous": 3139,
+  "remaining_seconds": 2561,
+  "basis": "Round up from supervisor start through observed terminal update, including shutdown margin."
+}

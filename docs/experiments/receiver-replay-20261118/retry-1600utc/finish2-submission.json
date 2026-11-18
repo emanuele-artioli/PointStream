@@ -1,0 +1,6 @@
+{
+  "job_id": "20261118T165743Z-e05211c8",
+  "status": "unpublished_transfer_timeout",
+  "source_sha256": null,
+  "note": "Source upload timed out before publish. The original error reported an unknown outcome. Subsequent official status reported unpublished or unknown, and gpu6 inspection showed only a partial source.tar and no ready.json or active upload process. The partial archive was preserved. No GPU job was launched for this ID."
+}

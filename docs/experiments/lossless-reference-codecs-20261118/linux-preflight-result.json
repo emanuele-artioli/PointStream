@@ -1,0 +1,42 @@
+{
+  "python": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/bin/python",
+  "opencv": "4.11.0",
+  "numpy": "2.5.4",
+  "opencv_extension": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/lib/python3.12/site-packages/cv2/__init__.py",
+  "opencv_build_sha256": "9ab83ff35436756434918aba371ddde3c7fef67822791a25c473d7e374802667",
+  "opencv_build_webp": [
+    "WEBP:                        build (ver decoder: 0x0209, encoder: 0x020f, demux: 0x0107)"
+  ],
+  "results": [
+    {
+      "unit": "nadal_kyrgios__000_at120__person_000000000000",
+      "png_sha256": "f0c9a49a7e9a83eb3a3f1b976748b9205607137710d7ea19564122efd1541f14",
+      "webp_sha256": "669cecbd1eecabc5cdbd1f641006b69586b28e00f145441d6b9b0fd2fc47baf8",
+      "rgb_sha256": "8d19a1d9ecad2ae423a4c8db9139aae85385a241bd2005418f5ce36fe2f03e3b",
+      "equal": true,
+      "shape": [
+        784,
+        512,
+        3
+      ]
+    },
+    {
+      "unit": "nadal_kyrgios__000_at120__person_000000000001",
+      "png_sha256": "d6646ba8ae1662177673d93239f2b4646c5c455ebeb531c98010e931d358efd2",
+      "webp_sha256": "0185ad6a479b07f3d065beaa5bea8dd936c306c1a3b60fdbc6878725da038ffd",
+      "rgb_sha256": "b45905ae6f2dd32cdfaee5280125a197bb9d1b66b0f213bb0105764d5df09cce",
+      "equal": true,
+      "shape": [
+        784,
+        512,
+        3
+      ]
+    }
+  ],
+  "cpu_seconds": 0.32227583,
+  "cuda_visible": "",
+  "same_python": true,
+  "same_opencv_build": true,
+  "controller_elapsed_seconds": 59.61573291600007,
+  "scope": "installed library parity; not a serialized WebP packet or isolated receiver"
+}

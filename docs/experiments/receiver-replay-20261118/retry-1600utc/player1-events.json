@@ -1,0 +1,32 @@
+{
+  "job_id": "20261118T162820Z-841078f9",
+  "status": "complete",
+  "events": [
+    {
+      "id": "0defd1fc3dbb527db8bbc153db4501e2",
+      "kind": "terminal:complete",
+      "timestamp": 1795020644.447326,
+      "status": {
+        "status": "complete",
+        "started": 1795019326.3156981,
+        "last_progress": 1795020644.447326,
+        "emitted": [],
+        "gpu_sharing": {
+          "mode": "exclusive"
+        },
+        "pid": 1425297,
+        "proc_start_time": 1795019326.49,
+        "process_group_id": 1425297,
+        "progress": {
+          "stage": "full",
+          "completed": 1,
+          "updated": 1795020642.1045403,
+          "decision": null
+        },
+        "exit_code": 0,
+        "ended": 1795020644.447326
+      },
+      "one_shot": true
+    }
+  ]
+}
