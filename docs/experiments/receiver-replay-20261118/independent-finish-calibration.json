@@ -1,0 +1,18 @@
+{
+  "scope": "Calibration of independent BT.709 base and compositor arithmetic against earlier saved output using old masks from a different generator. No new generation or mask inference.",
+  "ticks": 240,
+  "observed_composite_sha256": "e840765d3edd7fa0c335a418c4def14c0233f8748056281376998aff34dbc9f6",
+  "prior_composite_sha256": "e840765d3edd7fa0c335a418c4def14c0233f8748056281376998aff34dbc9f6",
+  "exact_identity": true,
+  "opencv": "5.0.0",
+  "numpy": "2.0.0",
+  "cpu_seconds": 5.090802,
+  "native_yuv_sha256": "7490edf9b678db805c23baae49a2a3b5e9d7b037b18dd216320aad47a061beff",
+  "archived_masks_sha256": "a60cd08a254945a7f0f180b7ba783dda1b127814ba9f4c0ac04d1333758d4ba7",
+  "old_crops": {
+    "nadal_kyrgios__000_at120__person_000000000001": "04b6ede0a5d3d3f62bec2554e2ee1ad6bfb14a8c53218913d60dd071b7240003",
+    "nadal_kyrgios__000_at120__person_000000000000": "946318059b3e451e7152d1dc70b3f0517cbae147e961d70f72ffa1e45935732d"
+  },
+  "comparison_script_sha256": "019060e48b1f065d096dbec3f4bd2932df0fbd45702b0f1d2e2eeb7204e25209",
+  "calibration_script_sha256": "a30c7304397413454cfd8220a0d8a2b7af2248914126eb862c75799d6c806771"
+}

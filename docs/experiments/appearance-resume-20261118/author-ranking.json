@@ -1,0 +1,31 @@
+{
+  "window": "nadal_kyrgios/000@120",
+  "review_frames": 24,
+  "reviewer": "author",
+  "blinded_feedback": "Player 2 B is the best one. Player 1 A and B are almost identical, C is worse.",
+  "player_2": {
+    "preferred": "B",
+    "ordering_between_A_and_C": null
+  },
+  "player_1": {
+    "nearly_identical": [
+      "A",
+      "B"
+    ],
+    "ranked_lower": "C"
+  },
+  "acceptability_by_candidate": {
+    "Player 2": {
+      "A": false,
+      "B": true,
+      "C": false
+    },
+    "Player 1": {
+      "A": true,
+      "B": true,
+      "C": false
+    }
+  },
+  "reference_selected": null,
+  "confirmation_verbatim": "Only Player 2 B and Player 1 A/B are acceptable"
+}

@@ -10,11 +10,28 @@ from typing import Any
 import numpy as np
 
 from experiments.tennis import common_player_packet as packet
+from experiments.tennis import k6b_fit
 from experiments.tennis import k6b_generate as generator
 from experiments.tennis import player_requalification as replay
 from experiments.tennis import w8_cuda_system_leaves as system
 from experiments.tennis import w8_public_folder_materialize as folders
-from experiments.tennis.w8_receiver_generate import FIT_CODE_SHA, GENERATOR_CODE_SHA
+from experiments.tennis.w8_receiver_generate import GENERATOR_CODE_SHA
+
+# The common-tennis reference replay at 55ba0629 used this fit implementation.
+# W8 has a separate frozen fit implementation and still checks its own digest.
+COMMON_FIT_CODE_SHA = '8f4a78fd7f443de0f9e7454a31c4900e56f73dc737d1be03684932d654f74dc7'
+
+
+def producer_sources() -> dict[str, str]:
+    sources = {'generator': (Path(generator.__file__), GENERATOR_CODE_SHA),
+               'common_fit': (Path(k6b_fit.__file__), COMMON_FIT_CODE_SHA)}
+    hashes = {}
+    for name, (path, expected) in sources.items():
+        actual = generator.sha256(path)
+        if actual != expected:
+            raise ValueError(f'{name} implementation hash {actual} differs from {expected}')
+        hashes[name] = actual
+    return hashes
 
 
 def conditioning(carrier: Path, expected_sha256: str, frames: int, units: list[str]):
@@ -67,7 +84,6 @@ def run(carrier: Path, expected_sha256: str, weights: dict[str, Path], fit: Path
     if not conditioning_only:
         import torch
         from experiments.audit.env_smoke import model_on_cuda, profile_cuda
-        from experiments.tennis import k6b_fit
 
         if not torch.cuda.is_available() or torch.cuda.device_count() != 1:
             raise RuntimeError('exactly one CUDA GPU required')
@@ -81,9 +97,11 @@ def run(carrier: Path, expected_sha256: str, weights: dict[str, Path], fit: Path
             raise ValueError('missing memory budget')
         torch.set_num_threads(1)
         torch.cuda.set_per_process_memory_fraction(min(1., limit * 2**20 / props.total_memory))
-        if (fit is None or generator.sha256(fit) != replay.BASE_SHA or set(weights) != set(replay.PINNED_WEIGHTS)
-                or generator.sha256(Path(generator.__file__)) != GENERATOR_CODE_SHA or generator.sha256(Path(k6b_fit.__file__)) != FIT_CODE_SHA):
-            raise ValueError('common model or renderer identity')
+        record['producer_sources'] = producer_sources()
+        if fit is None or generator.sha256(fit) != replay.BASE_SHA:
+            raise ValueError('common tennis checkpoint identity')
+        if set(weights) != set(replay.PINNED_WEIGHTS):
+            raise ValueError('original model weight names differ')
         file_records = {f'weight:{k}': {'path': str(v), 'sha256': generator.sha256(v)} for k,v in weights.items()}
         if any(file_records['weight:'+k]['sha256'] != v for k,v in replay.PINNED_WEIGHTS.items()):
             raise ValueError('original model weights differ')

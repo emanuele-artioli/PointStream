@@ -93,3 +93,5 @@ No further budget question is needed for this unchanged pilot.
 ### 2026-11-18 — campus execution complete
 
 Both JPEG settings produced the registered two-player outputs and passed independent validation, including Player 2 smoke/full bit identity. See the [run records](appearance-resume-20261118/continuation.md) and [blind review package](/Users/manu/Documents/PointStream-review/2026-11-18-reference-appearance/q70-q40/review.html). Conservative combined cost was 857 GPU-seconds and 1,757 CPU-seconds. Human judgments on body, clothing and pose are pending.
+
+The completed [author review and unblinding](appearance-resume-20261118/selected-reference.json) selected the lossless reference for both players. Q40 was also acceptable for Player 1. Only the common lossless setting advances to the registered 240-tick functional replay.

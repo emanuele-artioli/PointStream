@@ -1,0 +1,63 @@
+{
+  "job_id": "20261118T114149Z-4c13b0b4",
+  "created": 1795002116.130038,
+  "status": "failed",
+  "updated": 1795002234.7219157,
+  "host_alias": "gpu5",
+  "gpu": {
+    "index": 0,
+    "uuid": "GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162",
+    "name": "NVIDIA RTX 6000 Ada Generation",
+    "memory_used_mib": 1,
+    "memory_total_mib": 49140,
+    "memory_free_mib": 48645,
+    "utilization_pct": 0,
+    "compute_processes": [],
+    "pointstream_claimed": false,
+    "pointstream_shared_claims": []
+  },
+  "gpu_sharing": {
+    "mode": "shared",
+    "basis": "Model/conditioning correctness only; wall times are contaminated and cannot establish speed.",
+    "margin_mib": 8192
+  },
+  "supervisor_pid": 3759387,
+  "remote_status": {
+    "status": "failed",
+    "started": 1795002174.706642,
+    "last_progress": 1795002195.0761766,
+    "emitted": [
+      "terminal:failed",
+      "decision:63688ea731b159c1be9aa89b8e1154cc"
+    ],
+    "gpu_sharing": {
+      "mode": "shared",
+      "basis": "Model/conditioning correctness only; wall times are contaminated and cannot establish speed.",
+      "margin_mib": 8192
+    },
+    "timing_contaminated": true,
+    "pid": 3759392,
+    "proc_start_time": 1795002174.74,
+    "process_group_id": 3759392,
+    "exit_code": 1,
+    "ended": 1795002195.0761766,
+    "salvage": {
+      "exit_code": 0,
+      "reason": "failed",
+      "started": 1795002195.1572387,
+      "seconds": 0.1161956787109375
+    },
+    "progress": {
+      "stage": "attention",
+      "completed": 0,
+      "updated": 1795002189.3436677,
+      "decision": "smoke failed with exit code 1"
+    }
+  },
+  "directory": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261118T114149Z-4c13b0b4",
+  "gate": null,
+  "campaign_error": {
+    "error": "smoke failed with exit code 1",
+    "updated": 1795002189.3395011
+  }
+}
