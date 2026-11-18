@@ -10,6 +10,7 @@
     "reply": "Approve bounded reference pilot"
   },
   "durable_input_root": "/Users/manu/Documents/PointStream-prepared/2026-11-17-reference-pilot-v2",
+  "execution_evidence": "../appearance-resume-20261118/continuation.md",
   "frozen_gpu_code_revision": "55ba06290978bb5e25347031a1b64c1c66107981",
   "local_readiness": {
     "configured_mypy": "PASS,675files",
@@ -32,51 +33,54 @@
     "network_retry_scheduled": false,
     "recurring_model_calls": false
   },
-  "next_action": "Continue local code/input readiness. Await restored campus access before inspecting the existing publication and live fleet; do not request the same GPU permission again.",
+  "next_action": "Authors record source-aligned blinded body/clothing and pose judgments for both players. Select the lowest-byte quality acceptable on both players; otherwise retain the lossless baseline or the supported narrower result.",
   "prior_motion_allocation": "../player-motion-amendment-20261117/release.json; closed, no balance transferred",
   "proposal": "proposal.json",
-  "publication_state": "unknown; input-publication-attempt.json; inspect before any retry/mutation",
-  "recorded_utc": "2026-11-17T13:58:28.800828+00:00",
+  "publication_state": "Verified all five remote input hashes, generated archives, matched controls and randomized review exports.",
+  "recorded_utc": "2026-11-18T11:07:59.406150+00:00",
   "requests": [
     {
       "conditioning_archive_sha256": "136f9cec13d47186881025ac72e4bdec55ea3ac8c72640fb9659c1ad8c4ed43a",
       "config_sha256": "3f70aaec483d62f69ded89de821ebf6673828f19df31d59fbdd3cb42abde6344",
-      "cpu_actual_charge_seconds": null,
+      "cpu_actual_charge_seconds": 870,
       "cpu_lifecycle_cap_seconds": 900,
-      "deadline": null,
+      "deadline": "2026-11-18T11:13:35.579183+00:00",
+      "evidence": "../appearance-resume-20261118/q70-audit.json",
       "external_cpu_cap_seconds": 450,
       "external_cpu_conservative_charge_seconds": 450,
-      "gpu_actual_charge_seconds": null,
+      "gpu_actual_charge_seconds": 420,
       "gpu_lifecycle_cap_seconds": 900,
-      "job_id": null,
+      "job_id": "20261118T105102Z-4c8cf5bb",
       "quality": 70,
       "release_condition": "Verified campus access, existing publication inspected and hashes matched, fresh fleet/source/deadline admission",
       "spec_template_sha256": "1208843c1402b27fb9c1c1ce499c2bc372a5064b652f8eff9d0f57f6366e9e44",
-      "status": "approved_local_preparation_remote_gates_pending"
+      "status": "compute_complete_integrity_passed_author_review_pending"
     },
     {
       "conditioning_archive_sha256": "85a386688be9b672aa5410c3d6489febee57cf5493f6c239976ccc655c685962",
       "config_sha256": "f16652b45484313ca613dbb6b0812a27da4410be841cc9ced553e6e4d8a520c8",
-      "cpu_actual_charge_seconds": null,
+      "cpu_actual_charge_seconds": 887,
       "cpu_lifecycle_cap_seconds": 900,
-      "deadline": null,
+      "deadline": "2026-11-18T11:22:47.671174+00:00",
+      "evidence": "../appearance-resume-20261118/q40-audit.json",
       "external_cpu_cap_seconds": 450,
-      "external_cpu_conservative_charge_seconds": 0,
-      "gpu_actual_charge_seconds": null,
+      "external_cpu_conservative_charge_seconds": 450,
+      "gpu_actual_charge_seconds": 437,
       "gpu_lifecycle_cap_seconds": 900,
-      "job_id": null,
+      "job_id": "20261118T105900Z-07f1b885",
       "quality": 40,
       "release_condition": "Independent accepted Q70 full publication including Player2 smoke/full bit equality, closed teardown/accounting and remainingGPU>=900CPU>=1350; no failed scientific/cost gate",
       "spec_template_sha256": "0beaeabf99ba322c4dfa72ea643026e74f99a539971ced94db7e869ce046d0df",
-      "status": "conditional_not_admitted"
+      "status": "compute_complete_integrity_passed_author_review_pending"
     }
   ],
+  "review": "/Users/manu/Documents/PointStream-review/2026-11-18-reference-appearance/q70-q40/review.html",
   "schema": 1,
-  "status": "approved_local_preparation_campus_execution_gated",
+  "status": "compute_complete_appearance_judgment_pending",
   "totals": {
-    "accounting_note": "Reserve/charge Q70 externalCPU450 in full for local readiness/preparation; no campus/GPU job or active lifecycle. Q40 external450 only upon conditional admission. All local work remains within declared scope.",
-    "cpu_conservative_seconds": 450,
-    "gpu_conservative_seconds": 0
+    "accounting_note": "Both lifecycles charged from published creation through observed task process and GPU claim clearance. Both external 450 CPU-second reservations are charged in full. An initial failed prepare was confirmed absent on the shared filesystem and incurred no GPU time.",
+    "cpu_conservative_seconds": 1757,
+    "gpu_conservative_seconds": 857
   },
   "user_steering": {
     "question_reference": "call_c137ccb5bb484268bababd3a2425b66d",

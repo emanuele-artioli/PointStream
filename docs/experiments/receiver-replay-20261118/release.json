@@ -1,0 +1,23 @@
+{
+  "stage": "one complete two-player receiver replay",
+  "source": "nadal_kyrgios/000@120",
+  "source_sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d",
+  "stage_authority": "Approve the bounded receiver replay",
+  "approval_reference": "call_16318b690f7d4904a17b1f4eb1ca5be4",
+  "maximum_campus_gpu_seconds": 4200,
+  "maximum_cpu_seconds": 7200,
+  "maximum_single_stage_wall_seconds": 2700,
+  "hypothesis": "Two players can be generated, masked and composited at every native timestamp using only the paid packet and declared installed resources.",
+  "competing_explanation": "A hidden conditioning input, receiver mask failure, loss of deterministic timing or uncharged state may preclude a functional reconstruction.",
+  "promotion": "After source-aligned visual reference selection, freeze exact carrier, generator, native decoder and mask runtime. Run the substantive source-denied smoke, then use measured remaining lifecycle cost and budget before attempting the full replay.",
+  "stops": ["failed isolation or input integrity", "incomplete timeline or component validation", "measured forecast exceeds available balance", "ambiguous existing job state"],
+  "baseline_cost_evidence_seconds": {
+    "two_previous_240_frame_full_renderers": [1001.58, 932.75],
+    "two_previous_full_workers_and_44_frame_smokes_total": 2535.6,
+    "old_80_tick_sam_worker_smoke_and_full": [77.19, 229.07]
+  },
+  "planning_estimate": "About 55 GPU-min including smoke checks, extrapolating historical mask and raster work from sampled to all 240 ticks. The first new smoke determines feasibility.",
+  "permitted_scope": "Functional replay only; no new training, paid compute, three-rate perceptual comparison, or confirmation charged to this allocation.",
+  "dispatch_state_at_approval": "not submitted; appearance selection and complete implementation pending",
+  "expenditure_at_approval": {"gpu_seconds": 0, "cpu_seconds": 0}
+}

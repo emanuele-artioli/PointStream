@@ -312,7 +312,7 @@ class BallTrack:
     SEQ = 4
     WH = (512, 288)
 
-    def __init__(self, code: Path, weights: Path):
+    def __init__(self, code: Path, weights: Path, *, device: str = "cuda"):
         import importlib.util
 
         import torch
@@ -338,7 +338,10 @@ class BallTrack:
         net = sys.modules["model.tracknet_v3"].TrackNet(in_dim=15, out_dim=4, last_only=True)
         state = torch.load(weights, map_location="cpu", weights_only=True)
         net.load_state_dict({(k[7:] if k.startswith("module.") else k): v for k, v in state["state_dict"].items()})
-        self.net = net.cuda().eval()
+        if device not in ("cpu", "cuda"):
+            raise ValueError("BallTrack supports CPU or CUDA execution")
+        self.device = torch.device(device)
+        self.net = net.to(self.device).eval()
         self.meta = {"epoch": state["meta"]["epoch"], "iter": state["meta"]["iter"]}
 
     def run_gpu(self, frames: Any) -> list[Prediction]:
@@ -406,14 +409,15 @@ class BallTrack:
         med = np.moveaxis(cv2.resize(np.ascontiguousarray(median[:, :, ::-1]), self.WH).astype(np.float32) / 255.0, -1, 0)
         sx, sy = SIZE[0] / self.WH[0], SIZE[1] / self.WH[1]
         out: list[Prediction] = []
+        batch_size = BATCH if self.device.type == "cuda" else 2
         with torch.no_grad():
-            for b in range(0, n, BATCH):
+            for b in range(0, n, batch_size):
                 batch = []
-                for t in range(b, min(n, b + BATCH)):
+                for t in range(b, min(n, b + batch_size)):
                     seq = [np.moveaxis(small[max(0, j)], -1, 0) for j in range(t - self.SEQ + 1, t + 1)]
                     batch.append(np.concatenate([med, *seq], 0))
-                with torch.autocast("cuda"):
-                    hm, _, _ = self.net(frames=torch.from_numpy(np.stack(batch)).cuda())
+                with torch.autocast(self.device.type, enabled=self.device.type == "cuda"):
+                    hm, _, _ = self.net(frames=torch.from_numpy(np.stack(batch)).to(self.device))
                 out.extend(self.blobs(hm.float().cpu().numpy()[:, 0], sx, sy))
         return out
 

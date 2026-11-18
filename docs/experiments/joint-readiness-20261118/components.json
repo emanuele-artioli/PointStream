@@ -1,0 +1,76 @@
+{
+  "status": "passed",
+  "scope": "CPU carrier prompt and missing-player fallback diagnostic",
+  "source_window": "nadal_kyrgios/000@120",
+  "carriers_sha256": {
+    "PNG": "f91ce34198771e924a39a5bbf1255cfaedb9207a2f2b91869f342892df3f7836",
+    "Q70": "df2214dcc052bfc5d80305c0c26e5745b00ad344877de22f3a53ec3c9d5d4717",
+    "Q40": "be27d15fbda67845727b02562a780f379573e67df4dc6047a0aca2e5081ad371"
+  },
+  "players": [
+    {
+      "unit": "nadal_kyrgios__000_at120__person_000000000000",
+      "archive_sha256": "946318059b3e451e7152d1dc70b3f0517cbae147e961d70f72ffa1e45935732d",
+      "generation_job": "20261117T102252Z-ccb04da2",
+      "matching_boxes_ticks": 240,
+      "positive_points_min_max": [
+        4,
+        4
+      ],
+      "prompt_sequence_sha256": "c9ed0e1765c0313c976eb3cca6c55c95a622be93b22f14cfc11d2726baf41c2d"
+    },
+    {
+      "unit": "nadal_kyrgios__000_at120__person_000000000001",
+      "archive_sha256": "04b6ede0a5d3d3f62bec2554e2ee1ad6bfb14a8c53218913d60dd071b7240003",
+      "generation_job": "20261117T094919Z-5a0cc722",
+      "matching_boxes_ticks": 240,
+      "positive_points_min_max": [
+        4,
+        4
+      ],
+      "prompt_sequence_sha256": "b18887255cbdc19b85fc940a9d1b0334609476b59fc60e6dba14e764075a0805"
+    }
+  ],
+  "native": {
+    "argv": [
+      "/opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg",
+      "-nostdin",
+      "-v",
+      "error",
+      "-threads",
+      "1",
+      "-c:v",
+      "libdav1d",
+      "-f",
+      "ivf",
+      "-i",
+      "pipe:0",
+      "-map",
+      "0:v:0",
+      "-pix_fmt",
+      "yuv420p",
+      "-f",
+      "rawvideo",
+      "pipe:1"
+    ],
+    "ffmpeg_sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be",
+    "ivf_sha256": "f9622b6af4cddea3d70226c0b22e12374f4c77aadf2120e54d5d21ba55bfbbb8",
+    "reference_framemd5_sha256": "4cf9801abfe32f1f512f22937a244dfcf14493498dd49440e11766fe60d02195",
+    "frames": 240,
+    "fps": [
+      50,
+      1
+    ],
+    "fallback_pixels_all_equal": true,
+    "canvas_rgb24_sha256": "83fa785e83743f4b68a0a796c3cdbf62d1a34e8c777e88621e70b4c1cfdea035",
+    "color_path": "tracked_patch.yuv_to_rgb BT709 limited then INTER_CUBIC"
+  },
+  "numpy": "1.26.4",
+  "cv2": "4.10.0",
+  "opencv_build_sha256": "bade1ed132afc491c4cadda9ea0590a3d0745e16807f765450d3d3d4152a780b",
+  "revision": "f4556c3d55a330b8e964d80782b3ea9a36552af1",
+  "script_sha256": "a0089edb98efbd5c0259b686c695235b26b86d253c3c65eedaf412c031ab808c",
+  "wall_seconds": 18.021029666997492,
+  "parent_cpu_seconds": 17.668485999999998,
+  "child_cpu_seconds": 0.09079499999999999
+}

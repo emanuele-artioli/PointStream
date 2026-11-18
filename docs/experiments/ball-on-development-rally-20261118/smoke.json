@@ -1,0 +1,41 @@
+{
+  "window": "nadal_kyrgios/000@120",
+  "source_sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d",
+  "canvas_size": [
+    1920,
+    1080
+  ],
+  "fps": [
+    50,
+    1
+  ],
+  "centers": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+  ],
+  "prediction_scope": "unreviewed automatic sender positions",
+  "code_archive_sha256": "5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff",
+  "weights_sha256": "b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec",
+  "torch": "2.7.0",
+  "device": "cpu",
+  "cv2": "4.10.0",
+  "numpy": "1.26.4",
+  "checkpoint": {
+    "epoch": 47,
+    "iter": 15228
+  },
+  "runner_sha256": "564be069ea42d9597268fe1aafe1100f2d8359ceaae363a1dd6443c775b9c341",
+  "tracker_module_sha256": "e5fec685ad7ca0b40d834c35d1091cb6ac3f42d267bab38f43f65596f8dfed50",
+  "rgb_input_sha256": "affafb94c7bbd16569659a2e1c90c3564dcb434684aab7c8036577a62e998b66",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "smoke_repeat_checked": true,
+  "cpu_seconds": 28.248969,
+  "elapsed_seconds": 15.523420999990776,
+  "max_rss_bytes": 3218751488
+}
