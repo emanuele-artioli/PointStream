@@ -8,7 +8,6 @@ import math
 import os
 import sys
 import tarfile
-import tempfile
 import time
 from pathlib import Path
 
@@ -19,7 +18,7 @@ from experiments.tennis import common_player_finish as finish
 from experiments.tennis import common_receiver_isolation as isolation
 from experiments.tennis import common_receiver_manifest as manifest
 from experiments.tennis import player_requalification as replay
-from experiments.tennis.common_receiver_job import actual_full_cost
+from experiments.tennis.common_receiver_job import actual_full_cost, validation_workspace
 from experiments.tennis.player_reference_review import UNITS
 
 MODULE = "experiments.tennis.common_finish_job"
@@ -234,7 +233,7 @@ def validate(parser: argparse.ArgumentParser) -> None:
     archive = stage / "published.tar"
     if replay.sha256(archive) != timing["archive_sha256"]:
         raise ValueError("finisher archive identity")
-    with tempfile.TemporaryDirectory(dir=os.environ["PS_SCRATCH_DIR"]) as tmp:
+    with validation_workspace() as tmp:
         with tarfile.open(archive) as tar:
             names = ["finish.json", "frames.npy", "base.yuv", *(u + "-masks.npz" for u in UNITS)]
             if [m.name for m in tar.getmembers()] != ["publish/" + n for n in names] or not all(

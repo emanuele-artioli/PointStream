@@ -172,6 +172,13 @@ def execute(args: argparse.Namespace) -> None:
     (stage / "worker_timing.json").write_text(json.dumps(timing) + "\n")
 
 
+def validation_workspace() -> tempfile.TemporaryDirectory:
+    # The fleet releases stage-local scratch after the producer process exits.
+    scratch = Path(os.environ["PS_SCRATCH_DIR"])
+    scratch.mkdir(parents=True, exist_ok=True)
+    return tempfile.TemporaryDirectory(prefix="receiver-validate-", dir=scratch)
+
+
 def validate(parser: argparse.ArgumentParser) -> None:
     stage = Path(os.environ["PS_STAGE_DIR"])
     dispatch = json.loads((stage / "dispatch.json").read_text())
@@ -184,7 +191,7 @@ def validate(parser: argparse.ArgumentParser) -> None:
     timing = json.loads((stage / "worker_timing.json").read_text())
     if timing["archive_sha256"] != replay.sha256(archive):
         raise ValueError("published archive differs")
-    with tempfile.TemporaryDirectory(dir=os.environ["PS_SCRATCH_DIR"]) as tmp:
+    with validation_workspace() as tmp:
         with tarfile.open(archive) as tar:
             members = tar.getmembers()
             if [m.name for m in members] != [
