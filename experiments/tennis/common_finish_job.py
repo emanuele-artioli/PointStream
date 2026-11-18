@@ -18,7 +18,7 @@ from experiments.tennis import common_player_finish as finish
 from experiments.tennis import common_receiver_isolation as isolation
 from experiments.tennis import common_receiver_manifest as manifest
 from experiments.tennis import player_requalification as replay
-from experiments.tennis.common_receiver_job import actual_full_cost, validation_workspace
+from experiments.tennis.common_receiver_job import actual_full_cost, bind_allocation, validation_workspace
 from experiments.tennis.player_reference_review import UNITS
 
 MODULE = "experiments.tennis.common_finish_job"
@@ -189,6 +189,7 @@ def execute(args: argparse.Namespace) -> None:
     config, inputs = configure(args)
     out = Path(os.environ["PS_SCRATCH_DIR"]) / "completed-receiver"
     stage = Path(os.environ["PS_STAGE_DIR"])
+    bind_allocation(stage)
     isolation.launch(
         source_root=Path(__file__).resolve().parents[2],
         output=out,
