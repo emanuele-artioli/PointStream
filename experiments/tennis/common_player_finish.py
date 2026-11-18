@@ -260,7 +260,7 @@ def run(config: dict, isolation: dict) -> dict:
     limit = int(os.environ["PS_GPU_MEMORY_LIMIT_MIB"])
     if limit <= 0:
         raise ValueError("missing assigned SAM memory budget")
-    torch.set_per_process_memory_fraction(
+    torch.cuda.set_per_process_memory_fraction(
         min(1.0, limit * 2**20 / torch.cuda.get_device_properties(0).total_memory)
     )
     tracker = Sam31MaskTracker(
