@@ -417,3 +417,80 @@ def test_jpeg_reference_hash_bindings_and_salvaged_entropy():
     assert salvaged is None or salvaged.shape == (784, 512, 3)
     with pytest.raises(ValueError, match='reference RGB hash mismatch|invalid reference image'):
         packet.build(profile, base, keypoints, {**refs, 'ref0': rates.seal(b'REF1', meta, truncated)})
+
+
+def test_lossless_reference_packet_roundtrip_and_binding(monkeypatch):
+    import cv2
+    import hashlib
+
+    from experiments.tennis.player_requalification import array_sha
+
+    profile, base, keypoints, _ = fixture()
+    profile['recipe'] = copy.deepcopy(packet.LOSSLESS_RECIPE)
+    profile['resources']['reference_decoder'] = hashlib.sha256(cv2.getBuildInformation().encode()).hexdigest()
+    image = np.random.default_rng(7).integers(0, 16, (784, 512, 3), dtype=np.uint8)
+    refs = {r['reference']: rates.encode_reference(image, {'unit': 'player',
+            'reference_frame': r['start'], 'reference_box': [0, 0, 100, 100],
+            'pixels': 'full_prepared_conditioning_crop'}, lossless_auto=True) for r in profile['runs']}
+    profile['reference_rgb_sha256'] = {name: array_sha(image) for name in refs}
+    result = packet.build(profile, base, keypoints, refs)
+    _, _, decoded = packet.unpack(result, profile)
+    np.testing.assert_array_equal(decoded['player'][0]['reference'], image)
+    for name, ref in refs.items():
+        meta, raw = rates.unseal(ref, b'REF1')
+        assert meta['codec'] in ('.png', '.webp')
+        if meta['codec'] == '.webp':
+            packet._webp_header(raw)
+        png = rates.encode_reference(image, {k: v for k, v in meta.items() if k not in ('codec', 'quality', 'color')})
+        assert len(ref) <= len(png)
+    altered = copy.deepcopy(profile)
+    altered['reference_rgb_sha256']['ref0'] = '0' * 64
+    with pytest.raises(ValueError, match='reference RGB hash mismatch'):
+        packet.build(altered, base, keypoints, refs)
+    altered = copy.deepcopy(profile)
+    altered['resources']['reference_decoder'] = '0' * 64
+    with pytest.raises(ValueError, match='decoder build'):
+        packet.build(altered, base, keypoints, refs)
+
+
+def test_webp_header_rejects_invalid_payload_before_decoder(monkeypatch):
+    import cv2
+
+    image = np.zeros((784, 512, 3), dtype=np.uint8)
+    ok, encoded = cv2.imencode('.webp', image)
+    assert ok
+    raw = encoded.tobytes()
+    packet._webp_header(raw)
+    bad_size = bytearray(raw)
+    bad_size[21] ^= 1
+    bad_flags = bytearray(raw)
+    bad_flags[24] |= 0x10
+    def forbidden(*_):
+        raise AssertionError('image decoder invoked')
+    monkeypatch.setattr(cv2, 'imdecode', forbidden)
+    for bad in (raw[:-1], raw + b'x', bytes(bad_size), bytes(bad_flags), raw[:20],
+                raw[:12] + b'VP8 ' + raw[16:]):
+        ref = rates.seal(b'REF1', {'codec': '.webp'}, bad)
+        with pytest.raises(ValueError):
+            packet._bounded_reference(ref, lossless=True)
+
+
+def test_optimize_lossless_carrier_preserves_pixels_and_accounts_full_packet(monkeypatch):
+    profile, base, keypoints, refs = fixture()
+    image = np.random.default_rng(7).integers(0, 16, (784, 512, 3), dtype=np.uint8)
+    refs = {r['reference']: rates.encode_reference(image, {'unit': 'player',
+            'reference_frame': r['start'], 'reference_box': [0, 0, 100, 100],
+            'pixels': 'full_prepared_conditioning_crop'}) for r in profile['runs']}
+    original = packet.build(profile, base, keypoints, refs)
+    optimized = packet.optimize_lossless_carrier(original)
+    assert len(optimized) < len(original)
+    sections, accounting, decoded = packet.unpack(optimized)
+    assert sum(accounting.values()) == len(optimized)
+    assert sections['base'] == base and sections['keypoints'] == keypoints
+    for run in decoded['player']:
+        np.testing.assert_array_equal(run['reference'], image)
+
+    # No conversion is worthwhile when every candidate is larger than its
+    # already paid original and the new profile adds header bytes.
+    monkeypatch.setattr(rates, 'encode_reference', lambda *args, **kwargs: b'x' * (len(original) + 1))
+    assert packet.optimize_lossless_carrier(original) == original

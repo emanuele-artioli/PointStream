@@ -11,6 +11,7 @@ import hashlib
 import json
 import struct
 import zlib
+from copy import deepcopy
 from typing import Any
 
 import numpy as np
@@ -29,6 +30,9 @@ JPEG_RECIPES = {q: {**RECIPE, 'profile': 'common-tennis-player-jpeg-v1',
                     'reference_codec': 'jpeg', 'nominal_quality': q,
                     'reference_rgb_hash': 'sha256-numpy-dtype-shape-bytes-v1'}
                 for q in (70, 40)}
+LOSSLESS_RECIPE = {**RECIPE, 'profile': 'common-tennis-player-lossless-v1',
+                   'reference_codec': 'png-or-webp-lossless',
+                   'reference_rgb_hash': 'sha256-numpy-dtype-shape-bytes-v1'}
 NATIVE_RECIPE = {'profile': 'common-tennis-native-only-v1', 'native_frames': 240,
                  'fps': [50, 1], 'output': 'all-240', 'fallback': 'native-base',
                  'base_to_canvas': 'RGB8-cv2-INTER_CUBIC'}
@@ -44,16 +48,18 @@ def _profile(profile: dict[str, Any]) -> None:
     native = profile['mode'] == 'native_only'
     recipe = profile['recipe']
     jpeg = not native and any(wire.canonical(recipe) == wire.canonical(r) for r in JPEG_RECIPES.values())
-    if not jpeg and wire.canonical(recipe) != wire.canonical(NATIVE_RECIPE if native else RECIPE):
+    lossless = not native and wire.canonical(recipe) == wire.canonical(LOSSLESS_RECIPE)
+    bound_reference = jpeg or lossless
+    if not bound_reference and wire.canonical(recipe) != wire.canonical(NATIVE_RECIPE if native else RECIPE):
         raise ValueError('unsupported recipe')
-    if set(profile) != keys | ({'reference_rgb_sha256'} if jpeg else set()):
+    if set(profile) != keys | ({'reference_rgb_sha256'} if bound_reference else set()):
         raise ValueError('unsupported profile')
     if not native and ([k6b.GEN_W, k6b.GEN_H] != RECIPE['generation_size'] or
                        [k6b.CROP_MARGIN, k6b.SIZE_PERCENTILE, k6b.CENTRE_SMOOTH] != RECIPE['crop_rule'] or
                        k6b.k4.KP_CONF != 0.5):
         raise ValueError('installed geometry helper differs from v1 recipe')
     resources = profile['resources']
-    if not isinstance(resources, dict) or set(resources) != ({'native_decoder'} if native else RESOURCES | ({'reference_decoder'} if jpeg else set())) or any(
+    if not isinstance(resources, dict) or set(resources) != ({'native_decoder'} if native else RESOURCES | ({'reference_decoder'} if bound_reference else set())) or any(
         not isinstance(v, str) or wire.HASH.fullmatch(v) is None for v in resources.values()
     ):
         raise ValueError('invalid installed resource identities')
@@ -66,7 +72,7 @@ def _profile(profile: dict[str, Any]) -> None:
         raise ValueError('invalid cuts')
     if not isinstance(profile['runs'], list) or len(profile['runs']) > 480:
         raise ValueError('invalid runs')
-    if jpeg:
+    if bound_reference:
         hashes = profile['reference_rgb_sha256']
         refs = [r.get('reference') for r in profile['runs'] if isinstance(r, dict)]
         if (not isinstance(hashes, dict) or len(refs) != len(profile['runs']) or
@@ -279,19 +285,28 @@ def _jpeg_header(raw: bytes) -> None:
     raise ValueError('truncated JPEG')
 
 
-def _bounded_reference(blob: bytes, jpeg: bool = False, decoder_hash: str = '') -> tuple[dict[str, Any], np.ndarray]:
+def _webp_header(raw: bytes) -> None:
+    """Accept one bounded, lossless RGB WebP image without optional chunks."""
+    rates.validate_lossless_webp(raw, 512, 784)
+
+
+def _bounded_reference(blob: bytes, jpeg: bool = False, decoder_hash: str = '',
+                       lossless: bool = False) -> tuple[dict[str, Any], np.ndarray]:
     import cv2
 
     meta, raw = _bounded_transport(blob, b'REF1', MAX_REF)
     if jpeg:
         _jpeg_header(raw)
-        measured = hashlib.sha256(cv2.getBuildInformation().encode('utf-8')).hexdigest()
-        if measured != decoder_hash:
-            raise ValueError('reference decoder build identity mismatch')
+    elif lossless and meta.get('codec') == '.webp':
+        _webp_header(raw)
     elif (len(raw) < 33 or raw[:8] != b'\x89PNG\r\n\x1a\n' or raw[8:12] != b'\x00\x00\x00\x0d' or
             raw[12:16] != b'IHDR' or struct.unpack_from('>II', raw, 16) != (512, 784) or
             raw[24:29] != b'\x08\x02\x00\x00\x00'):
         raise ValueError('invalid RGB8 reference PNG header')
+    if jpeg or lossless:
+        measured = hashlib.sha256(cv2.getBuildInformation().encode('utf-8')).hexdigest()
+        if measured != decoder_hash:
+            raise ValueError('reference decoder build identity mismatch')
     image = cv2.imdecode(np.frombuffer(raw, np.uint8), cv2.IMREAD_COLOR)
     if image is None:
         raise ValueError('invalid reference image')
@@ -317,6 +332,7 @@ def _decode(profile: dict[str, Any], sections: dict[str, bytes]) -> dict[str, An
     if [u['name'] for u in units] != profile['order']:
         raise ValueError('track order mismatch')
     jpeg = profile['recipe'].get('profile') == 'common-tennis-player-jpeg-v1'
+    lossless = profile['recipe'].get('profile') == 'common-tennis-player-lossless-v1'
     output: dict[str, Any] = {}
     expected_names = {'base', 'keypoints'}
     for unit in units:
@@ -344,13 +360,14 @@ def _decode(profile: dict[str, Any], sections: dict[str, bytes]) -> dict[str, An
             if not wire._valid_name(refname) or refname in expected_names or refname not in sections:
                 raise ValueError('invalid reference binding')
             expected_names.add(refname)
-            rm, image = _bounded_reference(sections[refname], jpeg, profile['resources'].get('reference_decoder', ''))
-            if set(rm) != {'unit', 'reference_frame', 'reference_box', 'pixels', 'codec', 'quality', 'color'} or rm['unit'] != name or rm['codec'] != ('.jpg' if jpeg else '.png') or rm['quality'] != (profile['recipe']['nominal_quality'] if jpeg else None) or rm['color'] != 'RGB8' or rm['pixels'] != 'full_prepared_conditioning_crop' or type(rm['reference_frame']) is not int or not run['start'] <= rm['reference_frame'] < run['end']:
+            rm, image = _bounded_reference(sections[refname], jpeg, profile['resources'].get('reference_decoder', ''), lossless)
+            accepted_codecs = ('.jpg',) if jpeg else (('.png', '.webp') if lossless else ('.png',))
+            if set(rm) != {'unit', 'reference_frame', 'reference_box', 'pixels', 'codec', 'quality', 'color'} or rm['unit'] != name or rm['codec'] not in accepted_codecs or rm['quality'] != (profile['recipe']['nominal_quality'] if jpeg else None) or rm['color'] != 'RGB8' or rm['pixels'] != 'full_prepared_conditioning_crop' or type(rm['reference_frame']) is not int or not run['start'] <= rm['reference_frame'] < run['end']:
                 raise ValueError('invalid paid reference')
             box = np.asarray(rm['reference_box'], dtype=float)
             if box.shape != (4,) or not np.isfinite(box).all() or np.any(box[2:] <= 0) or image.shape != (784, 512, 3):
                 raise ValueError('invalid reference geometry')
-            if jpeg:
+            if jpeg or lossless:
                 # Match the already frozen preparation manifest's array hash.
                 image_hash = hashlib.sha256(f'{image.dtype.str}:{image.shape}:'.encode())
                 image_hash.update(image.tobytes())
@@ -429,6 +446,37 @@ def unpack(blob: bytes, profile: dict[str, Any] | None = None) -> tuple[dict[str
     if build(embedded, sections['base'], sections.get('keypoints'), refs) != blob:
         raise ValueError('noncanonical sections or accounting roles')
     return sections, accounting, decoded
+
+
+def optimize_lossless_carrier(blob: bytes) -> bytes:
+    """Convert a PNG carrier when an exactly equivalent complete packet is smaller."""
+    import cv2
+
+    profile = _embedded_profile(blob)
+    sections, _, decoded = unpack(blob, profile)
+    if profile['mode'] != 'players' or wire.canonical(profile['recipe']) != wire.canonical(RECIPE):
+        raise ValueError('expected PNG player carrier')
+    optimized = deepcopy(profile)
+    optimized['recipe'] = deepcopy(LOSSLESS_RECIPE)
+    optimized['resources']['reference_decoder'] = hashlib.sha256(cv2.getBuildInformation().encode()).hexdigest()
+    optimized['reference_rgb_sha256'] = {}
+    refs = {}
+    run_indices: dict[str, int] = {}
+    for run in profile['runs']:
+        name = run['reference']
+        unit = run['unit']
+        index = run_indices.get(unit, 0)
+        image = decoded[unit][index]['reference']
+        run_indices[unit] = index + 1
+        digest = hashlib.sha256(f'{image.dtype.str}:{image.shape}:'.encode())
+        digest.update(image.tobytes())
+        optimized['reference_rgb_sha256'][name] = digest.hexdigest()
+        metadata, _ = rates.unseal(sections[name], b'REF1')
+        clean = {k: v for k, v in metadata.items() if k not in ('codec', 'quality', 'color')}
+        candidate = rates.encode_reference(image, clean, lossless_auto=True)
+        refs[name] = min((sections[name], candidate), key=len)
+    candidate = build(optimized, sections['base'], sections['keypoints'], refs)
+    return candidate if len(candidate) < len(blob) else blob
 
 
 def inspect(blob: bytes, installed: dict[str, str] | None = None) -> dict[str, Any]:
