@@ -1,0 +1,49 @@
+{
+  "carriers": {
+    "70": {
+      "receiver_manifest_sha256": "ee18976fb6b0a083238258551739c41390702cc81423c2b082e85d15d53fe36e",
+      "receiver_manifest_bytes": 625,
+      "total_player_receiver_bytes": 91908,
+      "sha256": "c9615f83ba1cda202b6a8a815dfb1a1c063b0cc072138a58ab06b5658ba7d1a1",
+      "original_sha256": "df2214dcc052bfc5d80305c0c26e5745b00ad344877de22f3a53ec3c9d5d4717",
+      "bytes": 91283,
+      "role_bytes": {
+        "frame": 23547,
+        "window": 2616,
+        "match": 0,
+        "reference": 65120
+      },
+      "path": "/private/tmp/pointstream-linux-receiver-manifests-20261118/q70.pscp",
+      "sections": {
+        "base": "f9622b6af4cddea3d70226c0b22e12374f4c77aadf2120e54d5d21ba55bfbbb8",
+        "keypoints": "3da5c97b876642f2db4f719313b67f7238130ceb66be6521941fcf4f93f91381",
+        "ref0": "883169970a6dde99637dbae16b5f9dc2bea9608978dc3cb1fc1df60771afb933",
+        "ref1": "34a38de614b70e54c83c8acc217b78bd03cc64bb15c55f638ff6b76eb01ca4dc"
+      }
+    },
+    "40": {
+      "receiver_manifest_sha256": "2d063cc52de4a09f4c6ed793cd59a8e43d86f3fcf15cbe3414a6f3ab111894d3",
+      "receiver_manifest_bytes": 625,
+      "total_player_receiver_bytes": 67863,
+      "sha256": "135fa3c9fea4a5cbbfc50d3bb64ecbe38573eecfb7b6ff55842b4563afdbdcdd",
+      "original_sha256": "be27d15fbda67845727b02562a780f379573e67df4dc6047a0aca2e5081ad371",
+      "bytes": 67238,
+      "role_bytes": {
+        "frame": 23547,
+        "window": 2616,
+        "match": 0,
+        "reference": 41075
+      },
+      "path": "/private/tmp/pointstream-linux-receiver-manifests-20261118/q40.pscp",
+      "sections": {
+        "base": "f9622b6af4cddea3d70226c0b22e12374f4c77aadf2120e54d5d21ba55bfbbb8",
+        "keypoints": "3da5c97b876642f2db4f719313b67f7238130ceb66be6521941fcf4f93f91381",
+        "ref0": "475baa9a590b544f10cc42da66a115c0282bbd242619bce954e7fdbd4c6e82bb",
+        "ref1": "8eef2128dcd12f9ac00a663349e876fb53a73479b8b419e3c11b719e96baa027"
+      }
+    }
+  },
+  "linux_opencv": "9ab83ff35436756434918aba371ddde3c7fef67822791a25c473d7e374802667",
+  "linux_native_ffmpeg": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+  "parity_input_sha256": "a1c5073daaaa243e7b9544a47c36499a31b78003ac029e69506d7e89723027f8"
+}

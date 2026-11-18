@@ -1,0 +1,91 @@
+{
+  "worker": {
+    "carrier_sha256": "3dd4aa753dfa3d15a6fdbd1b368d6b48929b4eb8c933e2217a33bed87f735bfd",
+    "conditioning_only": true,
+    "frames": 240,
+    "isolation": {
+      "allowed": [
+        "/local/users/emanuele/pointstream/joint-native-finish-20261118-a/receiver-control-mp_sf4ec/code",
+        "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree",
+        "/local/users/emanuele/pointstream/joint-native-finish-20261118-a/receiver-control-mp_sf4ec/private",
+        "/local/users/emanuele/pointstream/joint-native-finish-20261118-a/qpng.pscp",
+        "/local/users/emanuele/pointstream/joint-native-finish-20261118-a/qpng.manifest",
+        "/usr/lib",
+        "/usr/lib",
+        "/usr/lib64",
+        "/dev/null",
+        "/dev/urandom",
+        "/etc/ld.so.cache",
+        "/proc/cpuinfo",
+        "/proc/devices",
+        "/proc/3727839/maps",
+        "/proc/3727839/status",
+        "/proc/stat",
+        "/proc/sys/vm/mmap_min_addr",
+        "/sys/devices/system/cpu/online",
+        "/sys/devices/system/memory/block_size_bytes"
+      ],
+      "code_manifest_sha256": "deff340db0be67b1dbfc40168542493d74229ce5a642861e6c596765158ad220",
+      "denials": {
+        "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T150848Z-a582ecc0/full/published.tar": 13,
+        "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T162058Z-c9b2c47b/full/published.tar": 13,
+        "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T163512Z-1d0712ad/full/published.tar": 13,
+        "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T173108Z-0782499a/full/published.tar": 13,
+        "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261101T093351Z-24914a4d/full/published.tar": 13,
+        "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__000.mp4": 13
+      },
+      "executables": [],
+      "extra_fds": false,
+      "handled_rights": 32767,
+      "interfaces": [
+        "lo"
+      ],
+      "landlock_abi": 4,
+      "manifest_bytes": 625,
+      "manifest_sha256": "b9eae3cef99a5139cf8db4745809db40345ec2aaebc5d82f3164c18d46f020a8",
+      "mutation_denied": true,
+      "namespaces": {
+        "net": "net:[4026537868]",
+        "user": "user:[4026537867]"
+      },
+      "pre_sandbox_threads": 1,
+      "runtime_archive_sha256": "bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e"
+    },
+    "outputs": [
+      {
+        "array_sha256": {
+          "box": "0a794f262200b1afea1d2bd06f15e0a73d9bed6982bb04d7d6efd9b721e055ed",
+          "pose": "eac33992553faf2701f269125d34ecabdde2e50084bb5080aa1bef536586018a",
+          "reference": "df807a3b9a6c8cd73015544e9b607300690d83a63a26f878e80d914f721e592b",
+          "t": "1aa53cff742acc7b82349c29558ccf50c9af15c48f018c446652dbe208b329f7"
+        },
+        "seed": 57787946446,
+        "unit": "nadal_kyrgios__000_at120__person_000000000001"
+      },
+      {
+        "array_sha256": {
+          "box": "faf9b624313f79d891a909344fef14ee89d54bb7d6b645031035d9bb4aef3ab6",
+          "pose": "e84f7d120af5c056761635e8f50215afcd0b8a2ab2fe658b83b015da2f4ae0da",
+          "reference": "330cd728d60c72bb10807543050e3c8ce6e54b93e3445e7fca6c289526dec3e0",
+          "t": "1aa53cff742acc7b82349c29558ccf50c9af15c48f018c446652dbe208b329f7"
+        },
+        "seed": 258705821133,
+        "unit": "nadal_kyrgios__000_at120__person_000000000000"
+      }
+    ]
+  },
+  "checks": {
+    "nadal_kyrgios__000_at120__person_000000000001": {
+      "box": true,
+      "pose": true,
+      "reference": true,
+      "t": true
+    },
+    "nadal_kyrgios__000_at120__person_000000000000": {
+      "box": true,
+      "pose": true,
+      "reference": true,
+      "t": true
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "host": "gpu5",
+  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+  "python": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/bin/python",
+  "numpy": "2.5.4",
+  "opencv": "4.11.0",
+  "opencv_extension": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/lib/python3.12/site-packages/cv2/cv2.abi3.so",
+  "opencv_extension_sha256": "68fee49d266a95e730c1cb17d913a39a93ab5c50bee1581600f453026f9c7b8d",
+  "opencv_build_sha256": "9ab83ff35436756434918aba371ddde3c7fef67822791a25c473d7e374802667",
+  "jpeg_build_line": [
+    "JPEG:                        build-libjpeg-turbo (ver 3.0.3-70)"
+  ],
+  "mac_build_sha256": "bade1ed132afc491c4cadda9ea0590a3d0745e16807f765450d3d3d4152a780b",
+  "carrier_hashes": {
+    "70": "df2214dcc052bfc5d80305c0c26e5745b00ad344877de22f3a53ec3c9d5d4717",
+    "40": "be27d15fbda67845727b02562a780f379573e67df4dc6047a0aca2e5081ad371"
+  },
+  "pilot_archive_hashes": {
+    "70": "136f9cec13d47186881025ac72e4bdec55ea3ac8c72640fb9659c1ad8c4ed43a",
+    "40": "85a386688be9b672aa5410c3d6489febee57cf5493f6c239976ccc655c685962"
+  },
+  "references": [
+    {
+      "quality": 70,
+      "unit": "nadal_kyrgios__000_at120__person_000000000000",
+      "jpeg_sha256": "a824099ddcd60fb9519354159d1e1970209c6a37e4dbea4469c21af91e77cff0",
+      "ref1_sha256": "883169970a6dde99637dbae16b5f9dc2bea9608978dc3cb1fc1df60771afb933",
+      "expected_npz_sha256": "3a9797873b204c52957d727b2b4e4e605012159a2381fab0c3f5b994e658e8d1",
+      "expected_rgb_sha256": "631221d4f327aadc3056847166dcbb177193245988d1bc4e019a6de5c23c04ca",
+      "linux_rgb_sha256": "631221d4f327aadc3056847166dcbb177193245988d1bc4e019a6de5c23c04ca",
+      "pixel_equality": true,
+      "different_rgb_channels": 0,
+      "channels": 1204224,
+      "max_abs_delta": 0,
+      "mean_abs_delta": 0.0
+    },
+    {
+      "quality": 70,
+      "unit": "nadal_kyrgios__000_at120__person_000000000001",
+      "jpeg_sha256": "ab7ba90f2d62c8d4b018f0f120f5ade0f0e566c69470139c8f8529735ddb7b89",
+      "ref1_sha256": "34a38de614b70e54c83c8acc217b78bd03cc64bb15c55f638ff6b76eb01ca4dc",
+      "expected_npz_sha256": "362bc5ff2798d262e9fa3477a15323477560cc9c0fc4b866d7a6eca7909836e2",
+      "expected_rgb_sha256": "ef9a944ceb550c2f105a06c907d52640c6883ed80c989d8183337a3a1215284e",
+      "linux_rgb_sha256": "ef9a944ceb550c2f105a06c907d52640c6883ed80c989d8183337a3a1215284e",
+      "pixel_equality": true,
+      "different_rgb_channels": 0,
+      "channels": 1204224,
+      "max_abs_delta": 0,
+      "mean_abs_delta": 0.0
+    },
+    {
+      "quality": 40,
+      "unit": "nadal_kyrgios__000_at120__person_000000000000",
+      "jpeg_sha256": "72686f9078606481d08c7fbb520f7451d2e74f6f11621faf3398f75769790322",
+      "ref1_sha256": "475baa9a590b544f10cc42da66a115c0282bbd242619bce954e7fdbd4c6e82bb",
+      "expected_npz_sha256": "6eddfa52af521fdb0039b38656b6d791f2d2908f41147db57ff024b02bd7754f",
+      "expected_rgb_sha256": "c9dd2b70e679b682bd9cce1ddab6e7a1b44517d02a94780f74e89400dc32e20c",
+      "linux_rgb_sha256": "c9dd2b70e679b682bd9cce1ddab6e7a1b44517d02a94780f74e89400dc32e20c",
+      "pixel_equality": true,
+      "different_rgb_channels": 0,
+      "channels": 1204224,
+      "max_abs_delta": 0,
+      "mean_abs_delta": 0.0
+    },
+    {
+      "quality": 40,
+      "unit": "nadal_kyrgios__000_at120__person_000000000001",
+      "jpeg_sha256": "f14550a61087190cbebf1abddd388396f119380327427ae1dc8e72d517069e76",
+      "ref1_sha256": "8eef2128dcd12f9ac00a663349e876fb53a73479b8b419e3c11b719e96baa027",
+      "expected_npz_sha256": "28e799a94d2712e071f2fd2768f2f677de93133a20600b6a9a44dda03e70a173",
+      "expected_rgb_sha256": "57b047dfa19b86a053092ebfc5b557fbe8432bba1f9ba8fc774d39864fb05a12",
+      "linux_rgb_sha256": "57b047dfa19b86a053092ebfc5b557fbe8432bba1f9ba8fc774d39864fb05a12",
+      "pixel_equality": true,
+      "different_rgb_channels": 0,
+      "channels": 1204224,
+      "max_abs_delta": 0,
+      "mean_abs_delta": 0.0
+    }
+  ],
+  "mac_build_gate_satisfied": false,
+  "worker_cpu_seconds": 0.23892011000000002,
+  "gpu_visibility": "",
+  "environment_archive_sha256": "bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e",
+  "local_total_wall_seconds": 1.7312355839821976,
+  "script_sha256": "c8057215cbc91d8867343446ed4abd2d8d28db67aa50c569838abb6f56f015cc",
+  "revision": "f4556c3d55a330b8e964d80782b3ea9a36552af1"
+}

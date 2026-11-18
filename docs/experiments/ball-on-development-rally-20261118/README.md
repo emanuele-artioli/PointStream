@@ -23,3 +23,15 @@ Use the exact three plain SVT-AV1 IVF streams from the 960×544 development cont
 | 60 | 126.88 | 158.74 | 22.00 | 30.98 |
 
 All three complete receivers matched the independent reconstruction on all 240 frames. Adding the real tracked tiles costs 31.86 kbps on this 4.8-second shot. Even the lowest-rate ball output preserved the pixels at the predicted locations better than the highest-rate plain output by this diagnostic. The ball PSNR stays constant because the sender pays the same independently coded tile at every base rate. Equal-quality interpolation is unsupported between these measured PSNR ranges. Occluded balls, missed positions and false detections require source-only reference labels. The result measures source-pixel fidelity at the sender’s positions. [Full ablation](three-rate.json)
+
+### Matched ablation byte budget
+
+Rebind each archived Mac player packet to the same three verified native IVF base streams used by the ball-only ablation. Hold both references and all keypoints fixed at each quality. Rebuild the complete wire encoding and bind the identical paid tile/placement stream to each carrier. This yields actual rate targets for the native, player-only, ball-only and joint arms before rendering their player pixels. The selected Linux carrier, its runtime manifest and receiver decoding must be used for the eventual quality comparison.
+
+| Base CRF | Q40 joint kbps | Q70 joint kbps |
+|---|---:|---:|
+| 60 | 233.30 | 273.38 |
+| 48 | 410.74 | 450.82 |
+| 36 | 744.76 | 784.84 |
+
+The real serializations use each base once. Changes in the tile stream are unnecessary when the tracker, source and placement policy are identical. The original same-window neural anchor points (36.83 and 49.78 kbps) cannot bracket these cold-start rates. The new native and ROI curves cover the first two combined operating points; the [additional upper control](../native-control-20261118/full-upper.json) subsequently bracketed the third. [All four byte counts, per rate and setting](joint-bytes.json)

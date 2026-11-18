@@ -33,3 +33,9 @@ All three matched-placement ROI streams decoded at 240/240 frames. The complete 
 | 60 | 125.99 / 124.74 | 31.40 / 31.35 | 38.79 / 38.25 |
 
 Both plain and matched-placement ROI bracket the 184.00 kbps paid player-input and ball carrier. Further comparison needs reconstructed players, quality support and a neural-codec curve in this rate range. [Full matched-placement record](full-player-ball.json) · [Smoke](smoke-player-ball.json)
+
+### Upper anchor for the actual joint bit budget
+
+Cold-packet accounting at the highest base quality yielded 744.76–784.84 kbps for the two registered reference options. The highest measured plain/ROI rates were 637.44/564.37 kbps. Freeze one additional operating point, CRF 28, same 960×544 encoder, source and player-plus-ball map, to determine whether both controls bracket the full range. This extension changes the achievable control envelope. No additional semantic setting is selected. Use the remaining local CPU budget and the same smoke and byte/coverage checks. Stop after this one additional point.
+
+The new CRF 28 upper point was **1114.29 kbps plain** and **909.73 kbps matched-placement ROI** over all 240 decoded frames. Both conventional families now bracket the full cold player-and-ball transport range of 233.30–784.84 kbps across the two reference options. This establishes rate overlap; primary foreground-quality overlap still requires the combined decodes. [Upper support measurements](full-upper.json)

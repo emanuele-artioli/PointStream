@@ -92,4 +92,4 @@ No further budget question is needed for this unchanged pilot.
 
 ### 2026-11-18 — campus execution complete
 
-Both JPEG settings produced the registered two-player outputs and passed independent validation, including Player 2 smoke/full bit identity. See the [run records](appearance-resume-20261118/continuation.md) and [blind review package](</Users/manu/Documents/PointStream-review/2026-11-18-reference-appearance/q70-q40/review.html>). Conservative combined cost was 857 GPU-seconds and 1,757 CPU-seconds. Human judgments on body, clothing and pose are pending.
+Both JPEG settings produced the registered two-player outputs and passed independent validation, including Player 2 smoke/full bit identity. See the [run records](appearance-resume-20261118/continuation.md) and [blind review package](/Users/manu/Documents/PointStream-review/2026-11-18-reference-appearance/q70-q40/review.html). Conservative combined cost was 857 GPU-seconds and 1,757 CPU-seconds. Human judgments on body, clothing and pose are pending.

@@ -44,9 +44,12 @@ def main():
     parser.add_argument("--ball-track", type=Path, help="Optional authenticated same-rally automatic centers")
     parser.add_argument("--ball-sha256")
     parser.add_argument("--reuse-plain", type=Path, help="Existing matching plain encode report")
+    parser.add_argument("--upper-support", action="store_true", help="Run the registered upper-rate control at CRF 28")
     a = parser.parse_args()
-    if any((a.ball_track, a.ball_sha256, a.reuse_plain)) and not all((a.ball_track, a.ball_sha256, a.reuse_plain)):
-        parser.error("Pass the ball track, its hash and the matching plain report together")
+    if bool(a.ball_track) != bool(a.ball_sha256) or (a.reuse_plain and not a.ball_track):
+        parser.error("A ball track and its hash must be supplied together; plain reuse requires a track")
+    if a.upper_support and (not a.ball_track or a.reuse_plain):
+        parser.error("The new upper anchor requires the matched-placement map and a fresh plain encode")
     n = a.frames
     a.output.mkdir(exist_ok=False, parents=True)
     begin = time.monotonic()
@@ -100,7 +103,8 @@ def main():
         raise ValueError("Source decode incomplete")
     source = np.memmap(raw, dtype=np.uint8, mode="r", shape=shape)
     rows = []
-    for crf in ([48] if n == 24 else [36, 48, 60]):
+    crfs = [28] if a.upper_support else ([48] if n == 24 else [36, 48, 60])
+    for crf in crfs:
         for mode in ("plain", "roi"):
             work = a.output / f"{mode}-{crf}"
             work.mkdir()
@@ -151,7 +155,7 @@ def main():
                       ["git", "rev-parse", "HEAD"], text=True).strip(), config_sha256=sha(a.config),
                   elapsed_seconds=time.monotonic()-begin, cpu_seconds=cpu()-cpu_start, rows=rows)
     if a.ball_track:
-        report.update(ball_track_sha256=a.ball_sha256, plain_report_sha256=sha(a.reuse_plain),
+        report.update(ball_track_sha256=a.ball_sha256, plain_report_sha256=sha(a.reuse_plain) if a.reuse_plain else None,
                       luma_region="union of both player boxes and automatic ball patch footprints")
     (a.output / "report.json").write_text(json.dumps(report, indent=2) + "\n")
     print(f"{n} frames, {len(rows)} streams, {report['elapsed_seconds']:.2f}s wall, {report['cpu_seconds']:.2f}s CPU")

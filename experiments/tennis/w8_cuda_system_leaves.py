@@ -206,7 +206,12 @@ def allowed_rights(path: Path, output: Path, abi: int) -> int:
     return rights
 
 
-def restrict(paths: list[Path], output: Path) -> tuple[int, int]:
+def restrict(paths: list[Path], output: Path, *, executables: tuple[Path, ...] = (),
+             listing_only: tuple[Path, ...] = ()) -> tuple[int, int]:
+    if any(path not in paths or not path.is_dir() for path in listing_only):
+        raise ValueError('directory listing requires an explicitly allowed directory')
+    if any(path not in paths or not path.is_file() for path in executables):
+        raise ValueError('executable grant requires an explicitly allowed regular file')
     lib = ctypes.CDLL(None, use_errno=True)
     abi = int(lib.syscall(444, 0, 0, 1))
     mask = handled_rights(abi)
@@ -221,7 +226,8 @@ def restrict(paths: list[Path], output: Path) -> tuple[int, int]:
         for path in paths:
             opened = os.open(path, os.O_PATH | os.O_CLOEXEC)
             try:
-                rule = Rule(allowed_rights(path, output, abi), opened)
+                rights = allowed_rights(path, output, abi) | (EXECUTE if path in executables else 0)
+                rule = Rule(READ_DIR if path in listing_only else rights, opened)
                 if lib.syscall(445, fd, 1, ctypes.byref(rule), 0):
                     raise OSError(ctypes.get_errno(), 'landlock_add_rule')
             finally:
