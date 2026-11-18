@@ -1,0 +1,140 @@
+{
+  "arguments": [
+    "run",
+    "--carrier",
+    "{staged:carrier}",
+    "--carrier-sha256",
+    "3dd4aa753dfa3d15a6fdbd1b368d6b48929b4eb8c933e2217a33bed87f735bfd",
+    "--manifest",
+    "{staged:manifest}",
+    "--sam",
+    "{staged:sam}",
+    "--ticks",
+    "{ticks}",
+    "--generation",
+    "nadal_kyrgios__000_at120__person_000000000001",
+    "{staged:player1}",
+    "c9bccddcfab9a3d75355cec9ffa128ba4b2605630d304ebff7958c3ca35ad4bc",
+    "--generation",
+    "nadal_kyrgios__000_at120__person_000000000000",
+    "{staged:player2}",
+    "b7171218c35457fea909cd0b63b4bd308963e34bfdfb8f23402ad67fcf476a96",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__000.mp4",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T162058Z-c9b2c47b/full/published.tar",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T163512Z-1d0712ad/full/published.tar",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T173108Z-0782499a/full/published.tar",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T150848Z-a582ecc0/full/published.tar",
+    "--full-cap",
+    "2050"
+  ],
+  "budget_seconds": 2450,
+  "contention": {
+    "policy": "stop",
+    "resume_attempts": 0
+  },
+  "cpu_threads": 1,
+  "deadline": "2026-11-18T18:14:16.588899+00:00",
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.common_finish_job"
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "full": {
+    "seconds": 2050
+  },
+  "gpu_memory_mib": 18000,
+  "gpu_models": [
+    "RTX 6000 Ada"
+  ],
+  "gpu_sharing": {
+    "mode": "exclusive"
+  },
+  "hosts": [
+    "gpu5",
+    "gpu6"
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/background/g1-2026-10-08/inputs/sam3.1_multiplex.pt",
+      "sha256": "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/receiver-replay-20261118-3dd4aa753dfa/qpng.pscp",
+      "sha256": "3dd4aa753dfa3d15a6fdbd1b368d6b48929b4eb8c933e2217a33bed87f735bfd"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/receiver-replay-20261118-3dd4aa753dfa/qpng.manifest",
+      "sha256": "b9eae3cef99a5139cf8db4745809db40345ec2aaebc5d82f3164c18d46f020a8"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261118T160156Z-9fdf17fb/full/published.tar",
+      "sha256": "4894f619d171db28d63356ac6b1ae45acf4e49e3550f80ee26b7f329ee04d411"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261118T162820Z-841078f9/full/published.tar",
+      "sha256": "fc0e4a380c47116332bdcd6dfedc268c2a34f4d4b3eca7608d764acfb912d664"
+    }
+  ],
+  "local_storage_gib": 64,
+  "required_commands": [],
+  "scale": {
+    "ticks": {
+      "smoke": 4,
+      "full": 240
+    }
+  },
+  "schema": 1,
+  "single_cpu_campaign": true,
+  "smoke": {
+    "seconds": 400,
+    "representative_basis": "Both authentic 240-tick generations, decoded native base, and per-tick SAM at 0, 11, 23 and 43."
+  },
+  "staged_inputs": [
+    {
+      "name": "sam",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/background/g1-2026-10-08/inputs/sam3.1_multiplex.pt",
+      "sha256": "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6",
+      "extract": false
+    },
+    {
+      "name": "carrier",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/receiver-replay-20261118-3dd4aa753dfa/qpng.pscp",
+      "sha256": "3dd4aa753dfa3d15a6fdbd1b368d6b48929b4eb8c933e2217a33bed87f735bfd",
+      "extract": false
+    },
+    {
+      "name": "manifest",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/receiver-replay-20261118-3dd4aa753dfa/qpng.manifest",
+      "sha256": "b9eae3cef99a5139cf8db4745809db40345ec2aaebc5d82f3164c18d46f020a8",
+      "extract": false
+    },
+    {
+      "name": "player1",
+      "extract": true,
+      "sha256": "4894f619d171db28d63356ac6b1ae45acf4e49e3550f80ee26b7f329ee04d411",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261118T160156Z-9fdf17fb/full/published.tar"
+    },
+    {
+      "name": "player2",
+      "extract": true,
+      "sha256": "fc0e4a380c47116332bdcd6dfedc268c2a34f4d4b3eca7608d764acfb912d664",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261118T162820Z-841078f9/full/published.tar"
+    }
+  ],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.common_finish_job",
+    "validate-stage"
+  ],
+  "validator_seconds": 90,
+  "verify_staged_inputs": true
+}

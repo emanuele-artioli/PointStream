@@ -1,0 +1,10 @@
+{
+  "job_id": "20261118T165404Z-7ce9e103",
+  "started": 1795020890.1455472,
+  "ended": 1795020910.4674015,
+  "terminal_updated": 1795020890.0406566,
+  "conservative_gpu_seconds": 81,
+  "cumulative_seconds": 3220,
+  "remaining_seconds": 2480,
+  "basis": "Round up supervisor duration, plus 60 seconds to bound release and teardown."
+}
