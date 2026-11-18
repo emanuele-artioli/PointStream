@@ -252,10 +252,44 @@ def decode_masks(blob: bytes) -> tuple[dict[str, Any], np.ndarray]:
     return meta, masks
 
 
+def validate_lossless_webp(raw: bytes, width: int, height: int) -> None:
+    """Validate a single RGB VP8L chunk before allocating its decoded image."""
+    if (len(raw) < 25 or raw[:4] != b"RIFF" or raw[8:16] != b"WEBPVP8L" or
+            struct.unpack_from("<I", raw, 4)[0] != len(raw) - 8):
+        raise ValueError("invalid lossless WebP container")
+    size = struct.unpack_from("<I", raw, 16)[0]
+    if size < 5 or len(raw) != 20 + size + (size & 1) or (size & 1 and raw[-1] != 0):
+        raise ValueError("invalid lossless WebP chunk length")
+    if raw[20] != 0x2f:
+        raise ValueError("invalid lossless WebP signature")
+    bits = struct.unpack_from("<I", raw, 21)[0]
+    if ((bits & 0x3fff) + 1, ((bits >> 14) & 0x3fff) + 1) != (width, height) or bits >> 28:
+        raise ValueError("invalid lossless RGB WebP dimensions or flags")
+
+
 def encode_reference(
-    image: np.ndarray, metadata: dict[str, Any], quality: int | None = None
+    image: np.ndarray, metadata: dict[str, Any], quality: int | None = None,
+    *, lossless_auto: bool = False,
 ) -> bytes:
     import cv2
+
+    if lossless_auto:
+        if quality is not None:
+            raise ValueError("Lossless selection cannot use JPEG quality")
+        png = encode_reference(image, metadata)
+        try:
+            ok, coded = cv2.imencode(".webp", image[:, :, ::-1])
+            if not ok:
+                return png
+            raw = coded.tobytes()
+            validate_lossless_webp(raw, image.shape[1], image.shape[0])
+            decoded = cv2.imdecode(np.frombuffer(raw, np.uint8), cv2.IMREAD_COLOR)
+            if decoded is None or not np.array_equal(decoded[:, :, ::-1], image):
+                return png
+            webp = seal(b"REF1", {**metadata, "codec": ".webp", "quality": None, "color": "RGB8"}, raw)
+            return min((png, webp), key=len)
+        except (cv2.error, ValueError):
+            return png
 
     extension = ".png" if quality is None else ".jpg"
     parameters = (
