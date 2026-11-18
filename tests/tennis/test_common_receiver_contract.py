@@ -84,3 +84,18 @@ def test_manifest_rejects_different_peer_or_resource(tmp_path):
         policy.restrict([tmp_path], tmp_path, executables=(tmp_path,))
     with pytest.raises(ValueError):
         policy.restrict([tmp_path], tmp_path, listing_only=(path,))
+
+
+def test_receiver_checks_the_common_replay_fit_and_preserves_w8_pin(tmp_path, monkeypatch):
+    from experiments.tennis import w8_receiver_generate as legacy
+
+    assert generator.producer_sources() == {
+        "generator": legacy.GENERATOR_CODE_SHA,
+        "common_fit": "8f4a78fd7f443de0f9e7454a31c4900e56f73dc737d1be03684932d654f74dc7",
+    }
+    assert legacy.FIT_CODE_SHA == "5e76dd363174d370572b3bab73e2d5a533f274371ebdc612cc764a947f2a9c69"
+    altered = tmp_path / "k6b_fit.py"
+    altered.write_bytes(b"other implementation")
+    monkeypatch.setattr(generator.k6b_fit, "__file__", str(altered))
+    with pytest.raises(ValueError, match="common_fit implementation hash"):
+        generator.producer_sources()
