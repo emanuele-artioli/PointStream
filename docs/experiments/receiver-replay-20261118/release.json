@@ -42,9 +42,87 @@
     "compositor": "saved-compositor.json",
     "operational_inputs": "One paid Linux player carrier plus its 625-byte receiver manifest. Final Q40 and Q70 alternatives both verified.",
     "actual_gpu_jobs": [],
-    "human_selection": "Pending blinded per-player A/B/C decisions in the November 18 review.",
+    "human_selection": "Lossless PNG is the only common eligible setting after the author reviewed Player 2 and Player 1.",
     "gpu_conservative_seconds": 0,
     "external_cpu_reservation_seconds": 3000,
     "job_cpu_cap_seconds": 4200
-  }
+  },
+  "execution": {
+    "selected": "png",
+    "basis": "Only Player 2 B and Player 1 A/B acceptable; both B are lossless",
+    "campus_directory": "/home/itec/emanuele/Datasets/pointstream-data/tennis/receiver-replay-20261118-3dd4aa753dfa",
+    "frozen_revision": "76b836d59c6de7cd054f7d493a177c79bd0795ff",
+    "gpu_seconds_used": 435,
+    "campus_cpu_lifecycle_seconds_used": 435,
+    "external_cpu_seconds_reserved": 3000,
+    "requests": [
+      {
+        "stage": "player2",
+        "job": "20261118T114149Z-4c13b0b4",
+        "budget_seconds": 2500,
+        "deadline": "2026-11-18T12:25:36.497508+00:00",
+        "wait": "single native ps-fleet wait capped at 2640s",
+        "state": "failed",
+        "spec": "player2.spec.json",
+        "source_sha256": "d776bf9f36e9442570fc2a386a2cff297f18c6cb03da8ab65e6d0d380759cc8c",
+        "gpu_seconds": 21,
+        "job_cpu_bound_seconds": 21
+      },
+      {
+        "stage": "player2r",
+        "job": "20261118T114806Z-2726ad2a",
+        "budget_seconds": 2500,
+        "deadline": "2026-11-18T12:31:56.159856+00:00",
+        "wait": "single native ps-fleet wait capped at 2640s",
+        "state": "failed",
+        "spec": "player2r.spec.json",
+        "source_sha256": "9d50c7cfa63b4201ceb047cb879f45bb5b08256ee6222db0f6bebdd87baa23c2",
+        "wait_handle": 23262,
+        "wait_max_seconds": 2580,
+        "wait_recovery": {
+          "event": "785945ab4987549c839bdeadc2193de8",
+          "action": "continued same already running job; shared resource policy",
+          "wait_handle": 52447,
+          "max_seconds": 2400
+        },
+        "gpu_seconds": 414,
+        "job_cpu_bound_seconds": 414
+      }
+    ],
+    "common_pin_repair": {
+      "revised_source": "d707a1e426d298d47575265cd0f77d41371b89ba",
+      "old_id": "20261118T114149Z-4c13b0b4",
+      "real_inputs": "common-pin-preflight.json",
+      "spent_gpu_seconds": 21,
+      "remaining_gpu_seconds_at_admission": 4179,
+      "remaining_in_job_cpu_seconds": 4179,
+      "defect": "New receiver imported an obsolete W8 fit-source pin. Accepted replay source, weights, carrier and inference implementation are preserved.",
+      "checks": "clean ruff, five focused unit tests and configured mypy"
+    },
+    "status": "closed_at_shared_smoke_cost_gate",
+    "remaining_gpu_seconds": 3765,
+    "job_cpu_bound_seconds": 435,
+    "external_cpu_instrumented_subset_seconds": 26.95658598,
+    "external_cpu_instrumented_subset": {
+      "original-smoke-p1.json": 0.868709,
+      "original-smoke-p2.json": 0.9663320000000001,
+      "original-full-p1.json": 2.186547,
+      "original-full-p2.json": 2.6853339999999997,
+      "independent-finish-calibration.json": 5.090802,
+      "independent-player2r-smoke.json": 0.655288,
+      "common-pin-preflight.json": 8.39831298,
+      "corrected-validator-on-preserved-smoke.json": 1.517992,
+      "independent-player2r-review.json": 4.587269
+    },
+    "combined_cpu_conservative_bound_seconds": 3435,
+    "remaining_cpu_seconds_after_full_external_reservation": 3765,
+    "queue_and_author_wait_charged_seconds": 0,
+    "validator_fix_revision": "d0281806",
+    "offline_gate": "corrected-validator-on-preserved-smoke.json",
+    "scientific_stop": "2,431.08s from the real 44-tick shared smoke exceeded the frozen 1,800s full limit. No full generation, other player or finisher ran.",
+    "pending_gpu_jobs": [],
+    "exclusive_feasibility": "exclusive-feasibility.json",
+    "recorded_utc": "2026-11-18T12:01:51.357104+00:00"
+  },
+  "selection_record": "../appearance-resume-20261118/selected-reference.json"
 }

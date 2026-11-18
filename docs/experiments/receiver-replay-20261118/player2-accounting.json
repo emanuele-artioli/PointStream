@@ -1,0 +1,31 @@
+{
+  "job_id": "20261118T114149Z-4c13b0b4",
+  "gpu": {
+    "index": 0,
+    "uuid": "GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162",
+    "name": "NVIDIA RTX 6000 Ada Generation",
+    "memory_used_mib": 1,
+    "memory_total_mib": 49140,
+    "memory_free_mib": 48645,
+    "utilization_pct": 0,
+    "compute_processes": [],
+    "pointstream_claimed": false,
+    "pointstream_shared_claims": []
+  },
+  "host": "gpu5",
+  "process_teardown": {
+    "epoch": 1795002258.1099045,
+    "known_alive": {
+      "3759387": false,
+      "3759392": false
+    },
+    "group": [],
+    "unreadable": 0
+  },
+  "native_active_start": 1795002174.706642,
+  "native_active_end": 1795002195.0761766,
+  "gpu_seconds": 21,
+  "one_core_cpu_reservation_used_seconds": 21,
+  "queue_seconds_excluded": 58.57660388946533,
+  "basis": "Ceiling of active supervisor start-to-terminal native lifecycle. Verified task PIDs, group and GPU claims cleared. Excludes awaiting author input, queue and post-terminal observation."
+}
