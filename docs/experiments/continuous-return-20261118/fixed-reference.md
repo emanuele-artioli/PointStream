@@ -1,0 +1,17 @@
+# Fixed-reference return • 18 November 2026
+
+Freeze the previously transmitted CRF38 initial OBU and SVT-AV1 cutaway IVF exactly. Their combined 616,643 bytes and decoded pixels are immutable. Sweep only the return plate. The historical transmitter exposes one CRF per prediction chain, so a different CRF normally changes its first packet. Test a separate native libaom policy using one-pass per-frame return quantizer 20, 36, 52 for both refresh and inter updates, with unchanged target plates, chroma and geometry. Initialize the inter encoder with a deterministic lossless copy of the exact decoded reference; verify its reconstruction pixel-for-pixel. Check whether appending the emitted P-frame directly to the historical keyframe produces the very same receiver pixels. If it does not, declare deterministic lossless re-initialization from the already paid receiver pixels as a separate receiver policy and count any new signaling. Never splice unverified streams or count their distortion. Require 245 scored display frames per packet and identical reference/fallback hashes and quality on every arm. Compare marginal and complete bytes over overlapping return PSNR using the project hull and PCHIP rule. Two bounds may be added only if support is inadequate. No GPU. Up to 15 minutes local wall time for the measurement.
+
+**Result.** Against fresh reference coding, predictive return saved **24.19% of return bytes** and **2.24% of total background-only packet bytes** at matched return-plate luma PSNR over **35.18–43.62 dB**. At QP 20 the fresh reference was smaller and slightly higher quality. This single development transition establishes that the sender’s return-quality policy can change the outcome substantially.
+
+| Return QP | Fresh bytes | Predictive bytes | Fresh return PSNR | Predictive return PSNR |
+|---:|---:|---:|---:|---:|
+| 20 | 238,044 | 273,491 | 43.72 dB | 43.62 dB |
+| 36 | 100,629 | 82,221 | 38.68 dB | 39.10 dB |
+| 52 | 33,261 | 20,926 | 33.67 dB | 35.18 dB |
+
+All six packets contain the same 250,263-byte initial reference (44.92 dB relative to the initial plate) and the same 366,380-byte SVT-AV1 cutaway (44.61 dB over 45 displayed frames). Holding that first plate during its 100 display ticks gives 21.31 dB against the moving source. Every receiver replay consumed exactly 245 ordered ticks and counted all signaling. Whole-passage PSNR ranged from 22.13 to 22.21 dB with static court plates and absent players. The matched-quality comparison above targets returned plate fidelity.
+
+The pilot uses libaom 3.14.1 `AV1E_SET_QUANTIZER_ONE_PASS` and error-resilient inter pictures. At the encoder, a lossless keyframe of the decoded CRF38 pixels initializes the predictor. Its decoded pixels exactly match the historical receiver state. At every QP, the emitted P-frame appended directly to the **original transmitted OBU** produced exactly the same two decoded RGB frames as the encoder chain. Only that P-frame was sent on return. The lossless bootstrap is internal to the encoder. Counting it at the receiver would describe a different system. The historical transmitter uses a single CRF for its entire ffmpeg/libaom chain, so its results remain in the parent report.
+
+[All operating points, decoded hashes, native commands and build provenance](fixed-reference.json) · [Private packet and native-driver archive](/Users/manu/Documents/PointStream-review/2026-11-18-continuous-return/fixed-reference-evidence.tar.gz)

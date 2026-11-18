@@ -1,6 +1,6 @@
 # Plan
 
-## Current direction — November 17, 2026
+## Current direction — November 18, 2026
 
 Start with [the research brief](RESEARCH.md). The lead hypothesis is a complete
 low-bitrate tennis codec combining generated players and a paid ball channel,
@@ -52,7 +52,23 @@ are distinct. Opened cohorts cannot become confirmation for a changed method.
 
 ## Next work, in decision order
 
-**Campus-outage ordering, November 17:** prioritize manuscript integration and
+### Campus experiments resumed November 18
+
+The server is available again. The paper’s most consequential open question is the quality of an actual player-and-ball reconstruction at the same total bitrate as a strong conventional or neural codec. The priorities below put the cheapest decisions first.
+
+| Priority | Experiment | Decision |
+|---|---|---|
+| 1 | [Cheaper appearance references](docs/experiments/player-reference-pilot-20261117.md). Generate the same two players with JPEG quality 70, then 40 if the first run validates and the remaining budget covers it. Compare to the lossless reference at the same 24 timestamps. | Select a reference setting using the registered blinded development review. The existing campus limit is 30 GPU-minutes and 45 CPU-minutes. |
+| 2, in parallel on CPU | Continuous rally, cutaway and return. Run the shot router and court-view predicate on source-labelled shots. On the return, compare a fresh cleaned court with a prediction from the last decoded court. | Measure wrongly routed time and missed play where independent labels exist. Compare background correction bytes at matched quality and verify playback continuity separately. |
+| 3 | Complete one learned receiver replay on the opened Nadal–Kyrgios window. With only the packet and installed resources, reconstruct both players, generate receiver masks, composite on the native base and emit every timestamp. | Verify content-specific bytes, source denial, output coverage, fallback and an end-to-end resource estimate before a larger run. |
+| 4 | One rally at three spread rates. Compare combined, player-only and ball-only streams with plain SVT-AV1, effective ROI and DCVC-UF at the same cadence. [Native control pilot](docs/experiments/native-control-20261118/README.md). | Report the equal-total-rate player-and-ball improvement, 70/30 weighted DISTS, corroborating LPIPS, full-frame and temporal costs. Keep unsupported comparisons visible. |
+| 5 | Confirm a frozen candidate on new physical matches. | Choose the cohort and precision target from development variability before opening any outcomes. Report paired match-level results. |
+
+**Results from the resumed runs.** Both JPEG settings completed on the campus RTX 6000 Ada GPUs, consuming 857 GPU-seconds and 1,757 CPU-seconds in total. The [development review](/Users/manu/Documents/PointStream-review/2026-11-18-reference-appearance/q70-q40/review.html) determines which settings reproduce both players acceptably. The [continuous passage](docs/experiments/continuous-return-20261118/README.md) contains 245 ordered frames and both cuts. The [real-track ball-only comparison](docs/experiments/ball-on-development-rally-20261118/README.md) and [conventional controls covering every priced rate](docs/experiments/native-control-20261118/README.md) now run on the same player window. The [complete receiver allocation](docs/experiments/receiver-replay-20261118/release.json) is approved at 70 campus GPU-minutes and 120 CPU-minutes, with a smoke-based cost decision. [Receiver component checks](docs/experiments/joint-readiness-20261118/README.md) cover both players' geometry, Linux JPEG pixels, and real ball placement. The controlled background-return test held the initial court and fallback bytes fixed. Prediction saved 24.19% on the update and 2.24% on the background-only passage at equal return-plate PSNR. Joint foreground quality awaits actual generated-player composition, [source-only foreground review](docs/experiments/foreground-references-20261118/README.md) and matched neural controls.
+
+### Earlier outage ordering, November 17
+
+The temporary priority was manuscript integration and
 saved-result analysis for the next one to two working days; see the
 [outage writing plan](docs/paper/outage-writing-plan-2026-11-17.md). V4 source/PDF
 are locally available and hash-verified. First integrate the player/ball narrative

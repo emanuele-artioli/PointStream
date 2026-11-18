@@ -1,0 +1,118 @@
+{
+  "scope": "actual native fallback and source tiles at synthetic test placements; component correctness only",
+  "source_sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d",
+  "source_yuv_sha256": "5a26ceb4c08fdfac2726805bb37c5cefe29ff18b9a3c733690fd4e263d3d972d",
+  "carrier_sha256": "df2214dcc052bfc5d80305c0c26e5745b00ad344877de22f3a53ec3c9d5d4717",
+  "encoder": {
+    "path": "/opt/homebrew/bin/SvtAv1EncApp",
+    "real_path": "/opt/homebrew/Cellar/svt-av1/4.0.1/bin/SvtAv1EncApp",
+    "sha256": "db044194faf94d553c2509c8e033ecd05a373ba54d919d0fb49a3a13149d1687",
+    "version": "SVT-AV1 v4.0.1 (release)"
+  },
+  "decoder": {
+    "path": "/opt/homebrew/bin/dav1d",
+    "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+    "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+    "version": "1.5.4"
+  },
+  "ffmpeg": {
+    "path": "/opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg",
+    "sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be"
+  },
+  "positions_cycle": [
+    null,
+    [
+      0,
+      0
+    ],
+    [
+      1888,
+      1048
+    ],
+    [
+      944,
+      524
+    ]
+  ],
+  "frames_equal_to_offline_reference": 240,
+  "visible_test_frames_with_changed_pixels": 180,
+  "decoded_rgb_sha256": "84b938399756591415040ec0da810cda072e6acbcd69bec75059f43e5b95f084",
+  "tile_sha256": "df8aab79c7e0bd4913043dc5d247cc735944b12de69e59670a24be04352d1fe5",
+  "sidecar_sha256": "611b4d8b3ad9d85989261be84806745e19a3e5b10754423f41f8bc18ff5267c5",
+  "stored_sidecar": "/private/tmp/pointstream-240-canvas-ball-20261118/development-placement.sidecar",
+  "components": {
+    "canvas_size": [
+      1920,
+      1080
+    ],
+    "ticks": 240,
+    "present_ticks": 180,
+    "carrier_bytes": 91283,
+    "tile_ivf_bytes": 17161,
+    "positions_bytes": 960,
+    "sidecar_framing_bytes": 534,
+    "sidecar_bytes": 18655,
+    "total_bytes": 109938
+  },
+  "source_conversion": [
+    "/opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg",
+    "-v",
+    "error",
+    "-nostdin",
+    "-i",
+    "/private/tmp/pointstream-player-replay-results-20261116/source.mp4",
+    "-frames:v",
+    "240",
+    "-vf",
+    "select=between(n\\,0\\,239),scale=1920:1080:flags=area:out_range=tv,format=yuv420p",
+    "-fps_mode",
+    "passthrough",
+    "-f",
+    "rawvideo",
+    "-pix_fmt",
+    "yuv420p",
+    "-y",
+    "/private/tmp/pointstream-240-canvas-ball-20261118/source-exkectn_/source.yuv"
+  ],
+  "encode_command": [
+    "/opt/homebrew/Cellar/svt-av1/4.0.1/bin/SvtAv1EncApp",
+    "-i",
+    "/private/tmp/pointstream-240-canvas-ball-20261118/source-exkectn_/patch.yuv",
+    "-b",
+    "/private/tmp/pointstream-240-canvas-ball-20261118/source-exkectn_/tile.ivf",
+    "-w",
+    "64",
+    "-h",
+    "64",
+    "--input-depth",
+    "8",
+    "--fps-num",
+    "50",
+    "--fps-denom",
+    "1",
+    "-n",
+    "240",
+    "--color-range",
+    "0",
+    "--rc",
+    "0",
+    "--crf",
+    "36",
+    "--preset",
+    "6",
+    "--keyint",
+    "-1",
+    "--lp",
+    "6",
+    "--progress",
+    "0"
+  ],
+  "numpy": "1.26.4",
+  "cv2": "4.10.0",
+  "wall_seconds": 5.558031500026118,
+  "revision": "f4556c3d55a330b8e964d80782b3ea9a36552af1",
+  "source_files_sha256": {
+    "/Users/manu/.codex/worktrees/af77/PointStream/docs/experiments/joint-readiness-20261118/check_sidecar.py": "73f005874bc69c772a86a9d2b41840d8e931d0b7d976bb59d235592cef05136a",
+    "/Users/manu/.codex/worktrees/af77/PointStream/experiments/tennis/common_player_ball.py": "ca177aee9c864155880f9f3d0168fccb2f95f847f74884dcd03cb504a145c125"
+  }
+}

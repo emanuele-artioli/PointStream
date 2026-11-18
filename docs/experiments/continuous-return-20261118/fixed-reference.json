@@ -1,0 +1,198 @@
+{
+  "initial_bytes": 250263,
+  "fallback_bytes": 366380,
+  "libaom": "Homebrew 3.14.1",
+  "rows": [
+    {
+      "qp": 20,
+      "mode": "fresh",
+      "return_bytes": 238044,
+      "total_bytes": 854810,
+      "header_bytes": 123,
+      "return_psnr": 43.719512942052376,
+      "whole_psnr": 22.13443271939866,
+      "initial_reference_psnr": 44.91774552553589,
+      "initial_display_psnr": 21.30970834375804,
+      "cutaway_display_psnr": 44.60645959152956,
+      "sha256": "5e8e9c1246d15ee6a719e1a6dea50e678b113077ff93092c566e57c2bcff7591",
+      "init_sha256": "f5a4ac620d72af493ab45c1662a76a8b530950f6e24209d6f1be711779a22dce",
+      "cutaway_sha256": "6b628888033b30b2354a5a3a90e4d8904633525f76227b77b7865372d0be49df",
+      "output_luma_sha256": "be5a23a73adaeedddca56dd2ea4a52c8d997f87bd0b573dddaeb69a32d239f56",
+      "ticks": 245
+    },
+    {
+      "qp": 20,
+      "mode": "pred",
+      "return_bytes": 273491,
+      "total_bytes": 890258,
+      "header_bytes": 124,
+      "return_psnr": 43.616519307335324,
+      "whole_psnr": 22.13508564642681,
+      "initial_reference_psnr": 44.91774552553589,
+      "initial_display_psnr": 21.30970834375804,
+      "cutaway_display_psnr": 44.60645959152956,
+      "sha256": "a6d719a28a0fd211f6daec03af2694e3ecbbc471dde3451dc376e1a8a21870b2",
+      "init_sha256": "f5a4ac620d72af493ab45c1662a76a8b530950f6e24209d6f1be711779a22dce",
+      "cutaway_sha256": "6b628888033b30b2354a5a3a90e4d8904633525f76227b77b7865372d0be49df",
+      "output_luma_sha256": "2fc2020247e7beb8db90c4bd3171cf34008c50dd9648a97a6104fa8b27c30240",
+      "ticks": 245
+    },
+    {
+      "qp": 36,
+      "mode": "fresh",
+      "return_bytes": 100629,
+      "total_bytes": 717395,
+      "header_bytes": 123,
+      "return_psnr": 38.68498878281785,
+      "whole_psnr": 22.155802126426515,
+      "initial_reference_psnr": 44.91774552553589,
+      "initial_display_psnr": 21.30970834375804,
+      "cutaway_display_psnr": 44.60645959152956,
+      "sha256": "8121948b2841100415f9416f703c71f9c187bb9acf11cd2868b010ad65a5dade",
+      "init_sha256": "f5a4ac620d72af493ab45c1662a76a8b530950f6e24209d6f1be711779a22dce",
+      "cutaway_sha256": "6b628888033b30b2354a5a3a90e4d8904633525f76227b77b7865372d0be49df",
+      "output_luma_sha256": "6b8e9cdedabb0a9cf5d09fe611d78feb535f1698182d0988885da73faa8d51f7",
+      "ticks": 245
+    },
+    {
+      "qp": 36,
+      "mode": "pred",
+      "return_bytes": 82221,
+      "total_bytes": 698987,
+      "header_bytes": 123,
+      "return_psnr": 39.1010786452225,
+      "whole_psnr": 22.15044282283682,
+      "initial_reference_psnr": 44.91774552553589,
+      "initial_display_psnr": 21.30970834375804,
+      "cutaway_display_psnr": 44.60645959152956,
+      "sha256": "0ff0a5e18e7ac6588e2d22e35cf95412b4cfa627c3c17da01019da7589394ffd",
+      "init_sha256": "f5a4ac620d72af493ab45c1662a76a8b530950f6e24209d6f1be711779a22dce",
+      "cutaway_sha256": "6b628888033b30b2354a5a3a90e4d8904633525f76227b77b7865372d0be49df",
+      "output_luma_sha256": "72b17d38b963c05388d9d32b9be278c7f8551a60f5ab17113986d8ea970c6184",
+      "ticks": 245
+    },
+    {
+      "qp": 52,
+      "mode": "fresh",
+      "return_bytes": 33261,
+      "total_bytes": 650026,
+      "header_bytes": 122,
+      "return_psnr": 33.67396566846421,
+      "whole_psnr": 22.20750737774109,
+      "initial_reference_psnr": 44.91774552553589,
+      "initial_display_psnr": 21.30970834375804,
+      "cutaway_display_psnr": 44.60645959152956,
+      "sha256": "8b5b71f50b2ba42dd763a2e70a03e860f17d14cc8339c7363008d2f78623aeef",
+      "init_sha256": "f5a4ac620d72af493ab45c1662a76a8b530950f6e24209d6f1be711779a22dce",
+      "cutaway_sha256": "6b628888033b30b2354a5a3a90e4d8904633525f76227b77b7865372d0be49df",
+      "output_luma_sha256": "a546da1d4b489cb4d5c072beb2d18292990707b8e890eaa03f05ed11d1a86c44",
+      "ticks": 245
+    },
+    {
+      "qp": 52,
+      "mode": "pred",
+      "return_bytes": 20926,
+      "total_bytes": 637692,
+      "header_bytes": 123,
+      "return_psnr": 35.17782443850883,
+      "whole_psnr": 22.173840157433716,
+      "initial_reference_psnr": 44.91774552553589,
+      "initial_display_psnr": 21.30970834375804,
+      "cutaway_display_psnr": 44.60645959152956,
+      "sha256": "b2c3a471eb359fd0e7859022122c6e5966131178648c3f05e729936045e2b99b",
+      "init_sha256": "f5a4ac620d72af493ab45c1662a76a8b530950f6e24209d6f1be711779a22dce",
+      "cutaway_sha256": "6b628888033b30b2354a5a3a90e4d8904633525f76227b77b7865372d0be49df",
+      "output_luma_sha256": "42905b909a0c4f0cb7a0caee1a6669e6f710841be4cdbd84ab9965d85f374cb6",
+      "ticks": 245
+    }
+  ],
+  "curves": {
+    "return_bytes": {
+      "bd_rate_percent": -24.19469036863903,
+      "overlap_db": [
+        35.17782443850883,
+        43.616519307335324
+      ],
+      "test_pareto": [
+        [
+          20926,
+          35.17782443850883
+        ],
+        [
+          82221,
+          39.1010786452225
+        ],
+        [
+          273491,
+          43.616519307335324
+        ]
+      ],
+      "fresh_hull": [
+        [
+          33261,
+          33.67396566846421
+        ],
+        [
+          100629,
+          38.68498878281785
+        ],
+        [
+          238044,
+          43.719512942052376
+        ]
+      ]
+    },
+    "total_bytes": {
+      "bd_rate_percent": -2.242529271367043,
+      "overlap_db": [
+        35.17782443850883,
+        43.616519307335324
+      ],
+      "test_pareto": [
+        [
+          637692,
+          35.17782443850883
+        ],
+        [
+          698987,
+          39.1010786452225
+        ],
+        [
+          890258,
+          43.616519307335324
+        ]
+      ],
+      "fresh_hull": [
+        [
+          650026,
+          33.67396566846421
+        ],
+        [
+          717395,
+          38.68498878281785
+        ],
+        [
+          854810,
+          43.719512942052376
+        ]
+      ]
+    }
+  },
+  "code_revision_for_bdrate": "d64da1f6d200e66b866dff7cb456144bcc36cc5f",
+  "run": "continuous-return-20261118/fixed",
+  "source": "same native source, frames and erasure rectangles as results.json",
+  "resource": "local attended arm64 CPU",
+  "commands": [
+    "clang -O2 -Wall -Wextra -Werror -I/opt/homebrew/opt/aom/include return_encoder.c -L/opt/homebrew/opt/aom/lib -laom -o return_encoder",
+    "return_encoder seed 0 seed.gbr target.gbr > seed.obu",
+    "python run.py"
+  ],
+  "sha256": {
+    "/private/tmp/ps-continuous-20261118/fixed/return_encoder.c": "473ff647830061d8c14dcadf8a4986cfe5223508e60c9fb9de533ab5a5a6a954",
+    "/private/tmp/ps-continuous-20261118/fixed/return_encoder": "78c696d59004f7a07573da186a38b87f641dd70bd7d25aa2bb5d797504cd4e6e",
+    "/private/tmp/ps-continuous-20261118/fixed/run.py": "59e9c9a63b56436c4dd2ff6b60ea3bb299ea2dfb395c3c5800003ccd12d2dd52",
+    "/opt/homebrew/opt/aom/lib/libaom.3.14.1.dylib": "346c1f6666ca367d12f66e971ca2703f1383b8a9dacd4cefddabe46fb99a23bc",
+    "/private/tmp/ps-continuous-20261118/fixed/../code/native/ffmpeg": "591260c945d0eef150e3bf82b0ef988bd36a9cecc18ff05d6679617159f0a95e",
+    "/private/tmp/ps-continuous-20261118/fixed/../Datasets/nadal_kyrgios.mp4": "676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66"
+  }
+}
