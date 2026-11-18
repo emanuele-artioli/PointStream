@@ -1,0 +1,45 @@
+{
+  "export_sha256": "9918c87fa6a309052bbac8ef0be21429885e6579fd632754ed9aeb343c912d8a",
+  "bundle_sha256": "5c402652ea7e2b471d870fb211f263ba1f7975afaf4b9b8a55be814d25ae45eb",
+  "frames": 12,
+  "decisions": {
+    "person:000000000000": {
+      "visible": 12
+    },
+    "person:000000000001": {
+      "visible": 12
+    },
+    "ball": {
+      "visible": 12
+    }
+  },
+  "source_sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d",
+  "exported_utc": "2026-11-18T16:21:46.894Z",
+  "private_archive": "/Users/manu/Datasets/pointstream-submission-20261118/foreground-human-reviewed-20261118/9918c87fa6a309052bbac8ef0be21429885e6579fd632754ed9aeb343c912d8a.json",
+  "ticks": [
+    10,
+    30,
+    50,
+    70,
+    90,
+    110,
+    130,
+    150,
+    170,
+    190,
+    210,
+    230
+  ],
+  "unprompted_ticks": [
+    10,
+    90,
+    170
+  ],
+  "player_decision_methods": {
+    "human_drawn_or_corrected": 6,
+    "human_accepted_proposal": 18
+  },
+  "ball_frames_with_prior_center": 8,
+  "ball_frames_without_prior_center": 4,
+  "scope": "Source-only human references for one opened 240-frame development rally. Nine frames had proposals. Three were unprompted."
+}
