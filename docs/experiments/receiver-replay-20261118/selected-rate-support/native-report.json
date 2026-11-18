@@ -1,0 +1,247 @@
+{
+  "source_sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d",
+  "private_remote": "/local/users/emanuele/pointstream/selected-rate-native-check-20261118",
+  "host": "gpu5",
+  "runtime": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "ffmpeg": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+  "ffmpeg_sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+  "ffmpeg_version": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers",
+  "numpy": "1.26.4",
+  "opencv": "4.10.0",
+  "script_sha256": "3001c0f4ec2cafcd04f380b81b65e67f7625d9eb6cf39931fbc95eb04959e7e8",
+  "sam_env_source": "/local/users/emanuele/pointstream/joint-native-finish-20261118-a/source",
+  "conversion_code_sha256": "d55dd90d353d9f6b3b4b08c8c35aef28c90a74f7cbf21218fb5e501a537744bd",
+  "historical_report_sha256": "2f485d63a604dea891f918700610aa4dee7e3695accd25c7ec6d2ba4f87d4533",
+  "rates_sha256": "d654122aca8153277d1420b6fe432b9d038b66f3721ae41fe221c9cc40e1de54",
+  "rows": [
+    {
+      "crf": 36,
+      "players_and_joint_wire_sha256": {
+        "players.pscp": "244f64e29e0e86bf3c2db76291309c0d976fbe53a0d7e9a40859033ea9780348",
+        "ball.sidecar": "2b6b9de91ff7e216f3f27e92329434d4a1cf4715c9fec726b3533c1c142dd537",
+        "receiver.manifest": "f3d857096f3a41944d9e689a9011ee128fb7b4da7e667f2aee80bcfac04ef9d5"
+      },
+      "player_kbps": 1254.8783333333333,
+      "joint_kbps": 1286.735,
+      "native_ivf_sha256": "2df35b86f53f0c5ffbba380b9e3a020fed23723041d5161f8ce609cb6f1f61a2",
+      "command": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+        "-nostdin",
+        "-v",
+        "error",
+        "-threads",
+        "1",
+        "-c:v",
+        "libdav1d",
+        "-i",
+        "/local/users/emanuele/pointstream/selected-rate-native-check-20261118/36/paid.ivf",
+        "-pix_fmt",
+        "yuv420p",
+        "-f",
+        "rawvideo",
+        "-n",
+        "/local/users/emanuele/pointstream/selected-rate-native-check-20261118/36/base.yuv"
+      ],
+      "pts": {
+        "first": 0,
+        "last": 239,
+        "count": 240,
+        "step": 1,
+        "timebase": "1/50"
+      },
+      "yuv420p_bytes": 188006400,
+      "yuv420p_sha256": "dd8acda561d7b2b4bbad848eb295fb7b5f97416f7b1df839cb8010bd7b989af5",
+      "historical_orig_match": true,
+      "plane_sha256": {
+        "Y": "207a86bf5f1e7cb7ca9a9a571d5cc4df652f357638c6551c73a1f59ab87b416c",
+        "U": "758d8591d940becf78c07b35cae6dd85ea72eacefaf7a9763cbb8c1aa9841b70",
+        "V": "f3dfca7267c0d92ae114722d0197fbb86254b59f968d18265bca60e804293985"
+      },
+      "plane_shapes": [
+        [
+          544,
+          960
+        ],
+        [
+          272,
+          480
+        ],
+        [
+          272,
+          480
+        ]
+      ],
+      "rgb24_shape": [
+        240,
+        1080,
+        1920,
+        3
+      ],
+      "rgb24_sha256": "3a1ab0d1bc93e43f7228679f531bd28202fd4bfd7cdd2f0a480d17799c48c066",
+      "native_frame_details_sha256": "ba188cf208a5fe75af2a863eb1b630fc80281946aa8b82e876c2dab7560a286d",
+      "repeated_rgb_ticks": [
+        0,
+        11,
+        120,
+        239
+      ]
+    },
+    {
+      "crf": 48,
+      "players_and_joint_wire_sha256": {
+        "players.pscp": "144bd0870dd37b6b586663473d12a50bdb78015626661eccaa7a427fb60c9b87",
+        "ball.sidecar": "616f63b0f3f2ca84e3eb87645d1a0877d29a6aa7130d986c31a3a4f0a7b3b2d2",
+        "receiver.manifest": "eaead07c00e8e839b174f12ac943574f9c774b0c8fb6b21c3bdfb7a6f4a78368"
+      },
+      "player_kbps": 920.86,
+      "joint_kbps": 952.7166666666667,
+      "native_ivf_sha256": "41578d340fcf41622d365497e3d105291468d44e038bf97caed5db9f0b3cc029",
+      "command": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+        "-nostdin",
+        "-v",
+        "error",
+        "-threads",
+        "1",
+        "-c:v",
+        "libdav1d",
+        "-i",
+        "/local/users/emanuele/pointstream/selected-rate-native-check-20261118/48/paid.ivf",
+        "-pix_fmt",
+        "yuv420p",
+        "-f",
+        "rawvideo",
+        "-n",
+        "/local/users/emanuele/pointstream/selected-rate-native-check-20261118/48/base.yuv"
+      ],
+      "pts": {
+        "first": 0,
+        "last": 239,
+        "count": 240,
+        "step": 1,
+        "timebase": "1/50"
+      },
+      "yuv420p_bytes": 188006400,
+      "yuv420p_sha256": "4f549befc1445ae4baca3a8da55c822261a78b08f98a8b212fc702f81998499b",
+      "historical_orig_match": true,
+      "plane_sha256": {
+        "Y": "bc49680052697263604f414404cfe3e115b38e7470517825132af06f82a49923",
+        "U": "bf36590f0e330c00fb6f5f5f778f069fdc42827930979fd1a33b61c18c23804f",
+        "V": "5cbf06dbec3e3062da1c43a09b5c328beaa0613e1e913d8f65da5eab191037f2"
+      },
+      "plane_shapes": [
+        [
+          544,
+          960
+        ],
+        [
+          272,
+          480
+        ],
+        [
+          272,
+          480
+        ]
+      ],
+      "rgb24_shape": [
+        240,
+        1080,
+        1920,
+        3
+      ],
+      "rgb24_sha256": "23715f8e04721180e3072fa7b1423645d8f8ff98cc93f7094c3e442b25270b90",
+      "native_frame_details_sha256": "9a962332512f47e05c4c903ebb214db7082e04ff9f3b6a0a1bde1a37ee1a0d6a",
+      "repeated_rgb_ticks": [
+        0,
+        11,
+        120,
+        239
+      ]
+    },
+    {
+      "crf": 60,
+      "players_and_joint_wire_sha256": {
+        "players.pscp": "0afb05c2b24ee7cfde0d1d26d4df550f6e372395ed107e5befc315126af80ba5",
+        "ball.sidecar": "1be9463eb24a749fe11a259282f52cc780d7e388fabec6d025ee1c0e7f6370ae",
+        "receiver.manifest": "cc1753ec4fcce38b30c79b279c29a9c260752ca8b82755a5efb3781360a24f85"
+      },
+      "player_kbps": 743.42,
+      "joint_kbps": 775.2766666666666,
+      "native_ivf_sha256": "8837ad460cda0236e3658e9509ece852991a5491e6c9769c7d66437672c020c2",
+      "command": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+        "-nostdin",
+        "-v",
+        "error",
+        "-threads",
+        "1",
+        "-c:v",
+        "libdav1d",
+        "-i",
+        "/local/users/emanuele/pointstream/selected-rate-native-check-20261118/60/paid.ivf",
+        "-pix_fmt",
+        "yuv420p",
+        "-f",
+        "rawvideo",
+        "-n",
+        "/local/users/emanuele/pointstream/selected-rate-native-check-20261118/60/base.yuv"
+      ],
+      "pts": {
+        "first": 0,
+        "last": 239,
+        "count": 240,
+        "step": 1,
+        "timebase": "1/50"
+      },
+      "yuv420p_bytes": 188006400,
+      "yuv420p_sha256": "ee5354e6edcef59ae5d9ca70045adcea60929a356be4eb9d1ce68946a25e49a3",
+      "historical_orig_match": true,
+      "plane_sha256": {
+        "Y": "e35e203f752f3325aa60170aba74e83d4891b6acc8faf3136eef89fc64e6c827",
+        "U": "561785b7e43b1a369f6ec1095881fe9a0729bdbd2c4edbe6ab0045387fda9c13",
+        "V": "c6b4889f513640ee37f73a5a5e8ab4f56ded8f86982f5eec264043245efe7c79"
+      },
+      "plane_shapes": [
+        [
+          544,
+          960
+        ],
+        [
+          272,
+          480
+        ],
+        [
+          272,
+          480
+        ]
+      ],
+      "rgb24_shape": [
+        240,
+        1080,
+        1920,
+        3
+      ],
+      "rgb24_sha256": "4363c4ba383a99e76121e9f6a767ada7fcb1fd2e47ebf94e85e41fca0fe0e968",
+      "native_frame_details_sha256": "e3adad3e14246231a4ee4e2d261852f948c7b954ef33917efccaac860bdb170c",
+      "repeated_rgb_ticks": [
+        0,
+        11,
+        120,
+        239
+      ]
+    }
+  ],
+  "smoke": {
+    "ticks": [
+      0,
+      11,
+      120,
+      239
+    ],
+    "canvas_cpu_seconds": 0.10358299999999998,
+    "three_rate_conversion_cpu_forecast": 18.64494
+  },
+  "cpu_seconds": 22.263427,
+  "wall_seconds": 21.567113768309355,
+  "gpu": null
+}

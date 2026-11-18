@@ -126,6 +126,34 @@ def validate_args(args: argparse.Namespace) -> None:
         raise ValueError("invalid receiver stage contract")
 
 
+def bind_allocation(stage: Path) -> None:
+    """Carry the exclusive fleet claim's memory contract into the receiver sandbox."""
+    dispatch = json.loads((stage / "dispatch.json").read_text())
+    if dispatch["gpu_sharing"]["mode"] == "shared":
+        return  # The fleet already binds the memory ceiling for shared claims.
+    spec = json.loads((stage.parent / "spec.json").read_text())
+    gpu = dispatch["environment"]["gpu"]
+    uuid = gpu["uuid"]
+    if (
+        dispatch["gpu_sharing"] != {"mode": "exclusive"}
+        or spec["gpu_sharing"] != {"mode": "exclusive"}
+        or dispatch["contention_policy"] != {"policy": "stop", "resume_attempts": 0}
+        or spec["gpu_memory_mib"] != 18000
+        or gpu["name"] != "NVIDIA RTX 6000 Ada Generation"
+        or not uuid.startswith("GPU-")
+        or uuid != os.environ.get("PS_CLAIMED_GPU_UUID")
+        or uuid != os.environ.get("CUDA_VISIBLE_DEVICES")
+        or gpu["pointstream_claimed"]
+        or gpu["pointstream_shared_claims"] != []
+        or gpu["compute_processes"] != []
+        or not 0 <= gpu["memory_used_mib"] <= 256
+        or not 0 <= gpu["utilization_pct"] <= 5
+        or gpu["memory_free_mib"] < 18000 + 4096
+    ):
+        raise ValueError("exclusive idle GPU admission or memory contract mismatch")
+    os.environ["PS_GPU_MEMORY_LIMIT_MIB"] = str(spec["gpu_memory_mib"])
+
+
 def execute(args: argparse.Namespace) -> None:
     from experiments.tennis import common_receiver_isolation
 
@@ -134,6 +162,7 @@ def execute(args: argparse.Namespace) -> None:
     manifest.verify(args.manifest, args.carrier_sha256)
     stage = Path(os.environ["PS_STAGE_DIR"])
     scratch = Path(os.environ["PS_SCRATCH_DIR"])
+    bind_allocation(stage)
     # Publish only explicit output files; exclude temporary public model copies.
     output = scratch / "common-generation"
     fit = args.base / "publish" / "tennis-base@fit-100.pt"

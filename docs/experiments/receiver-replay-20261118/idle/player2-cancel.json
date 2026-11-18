@@ -1,0 +1,10 @@
+{
+  "job_id": "20261118T121311Z-be1943b2",
+  "created": 1795003999.5835476,
+  "status": "pending",
+  "updated": 1795003999.5838153,
+  "cancellation_requested": true,
+  "directory": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261118T121311Z-be1943b2",
+  "gate": null,
+  "campaign_error": null
+}
