@@ -1,0 +1,291 @@
+{
+  "source_sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d",
+  "label_export_sha256": "9918c87fa6a309052bbac8ef0be21429885e6579fd632754ed9aeb343c912d8a",
+  "ledger_sha256": "bbcb237ba347ff1dc4b1ecefc9d4ca4380450ae7ff022e9a1b324889d400fcb3",
+  "anchor_sha256": "2f485d63a604dea891f918700610aa4dee7e3695accd25c7ec6d2ba4f87d4533",
+  "decoder": {
+    "path": "/opt/homebrew/bin/dav1d",
+    "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+    "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+    "version": "1.5.4"
+  },
+  "opencv": "4.10.0",
+  "numpy": "1.26.4",
+  "rows": [
+    {
+      "crf": 36,
+      "native_sha256": "4a196fcfa272fab825684034e96a7daa0dc5c692705acc532006b14d68cfa377",
+      "sidecar_sha256": "3372a56257be3bf55ae8ef1f061a989b3fb6c5ad6a31392b53e191342b241666",
+      "base_yuv_sha256": "dd8acda561d7b2b4bbad848eb295fb7b5f97416f7b1df839cb8010bd7b989af5",
+      "stream_rgb_sha256": "2aa01b2904d24d433b47a173e710eba216a4386e9a6421d031f07c8ba5e845c6",
+      "total_bytes": 402118,
+      "total_kbps": 670.1966666666667,
+      "fps": 50,
+      "seconds": 4.8,
+      "saved": {
+        "10": {
+          "sha256": "998b2ebb62a7bc8cb392122044299733d5c7433687f24ff7045edbaa74b36720",
+          "ball_origin": null
+        },
+        "30": {
+          "sha256": "b8e8434ce5ec1f09284bacffdec1f0a3f5fd5d170d72b90ea7dc27b431d9ef49",
+          "ball_origin": null
+        },
+        "50": {
+          "sha256": "b89e3cc11079b7831c9af604e5fbbf573518e125c805d7ee103be70143b05b29",
+          "ball_origin": [
+            1024,
+            592
+          ]
+        },
+        "70": {
+          "sha256": "d692a08c74222d2bcd9d879f0b2ff33a9ed3c47b8185bdd082780404200cbb60",
+          "ball_origin": [
+            1028,
+            458
+          ]
+        },
+        "90": {
+          "sha256": "f3522978771248564d4636843cd7fb5626d52a550052413b7e04cc30ac52b5f2",
+          "ball_origin": [
+            932,
+            462
+          ]
+        },
+        "110": {
+          "sha256": "b0b76d636d3431682ab64ae4a01b060c52e2242235485a27e3cf49ad3cc32a1c",
+          "ball_origin": [
+            786,
+            444
+          ]
+        },
+        "130": {
+          "sha256": "54c0cdcde9ceec291b1d29361eed29fd42016418d0b6f8d7fd810fb174ba995d",
+          "ball_origin": [
+            766,
+            256
+          ]
+        },
+        "150": {
+          "sha256": "a9f1048e1c2c35868119ddc80520c11ece70970e226fac4cb928794e52cce10e",
+          "ball_origin": [
+            924,
+            480
+          ]
+        },
+        "170": {
+          "sha256": "1641f6cf4611c898f36753c8c86253130c9f16ae20048f975ddc51b12871fb1e",
+          "ball_origin": [
+            1076,
+            664
+          ]
+        },
+        "190": {
+          "sha256": "22709536b4e6b89c05886167d42581ef29217f74e2d4935265fcab469b60ee29",
+          "ball_origin": [
+            1168,
+            642
+          ]
+        },
+        "210": {
+          "sha256": "2bc1945d88bedd0d15da12cde751c1965be5276b0009347fa61c63fc77f442d1",
+          "ball_origin": [
+            1132,
+            416
+          ]
+        },
+        "230": {
+          "sha256": "42cb4009852b71f46238e4beec9652aff6fcfc5872c08ae079f12c8d7df7d10d",
+          "ball_origin": [
+            1132,
+            368
+          ]
+        }
+      }
+    },
+    {
+      "crf": 48,
+      "native_sha256": "b60466f988bdd4cc852134371f208d77bf7a53adc5d153551c761d64612da6eb",
+      "sidecar_sha256": "205faa1fa276a8a43f431bc28636483673258e0a0797d445c01efa72b0bec233",
+      "base_yuv_sha256": "4f549befc1445ae4baca3a8da55c822261a78b08f98a8b212fc702f81998499b",
+      "stream_rgb_sha256": "c6b849c736cdaa4bf679fe47e5c8122ca18cadc7aa163b63ed4e5b26c47012c0",
+      "total_bytes": 201707,
+      "total_kbps": 336.17833333333334,
+      "fps": 50,
+      "seconds": 4.8,
+      "saved": {
+        "10": {
+          "sha256": "3357f03ceca3f9fbea492c734d2b323a81b175bbf6c341ac4390a04c776a3430",
+          "ball_origin": null
+        },
+        "30": {
+          "sha256": "ff175ee10a73172c884361888a487264e2141d0a17804d31ff85947f10d7606a",
+          "ball_origin": null
+        },
+        "50": {
+          "sha256": "6c003b7fbf7785626e69407a336fc0046f5db2e9b4a59ce575bd36d47dce750e",
+          "ball_origin": [
+            1024,
+            592
+          ]
+        },
+        "70": {
+          "sha256": "4ee8931107f33caf76c2dbf5e059fd5f17d737f280d6fa64eb56a9d36c1862d1",
+          "ball_origin": [
+            1028,
+            458
+          ]
+        },
+        "90": {
+          "sha256": "2ca4eacf9a2a72d36d5f104989fc6710ec3b74a59fe8d87bf3e721b7bcb0284d",
+          "ball_origin": [
+            932,
+            462
+          ]
+        },
+        "110": {
+          "sha256": "03e8971946422e07fe6185f8292da4d71c089e16c249d0cda9812095ac13da3f",
+          "ball_origin": [
+            786,
+            444
+          ]
+        },
+        "130": {
+          "sha256": "c8f6d7c8867184f8096a30b5a61997b06dcd48695ae2b73f7d49366f51e4041f",
+          "ball_origin": [
+            766,
+            256
+          ]
+        },
+        "150": {
+          "sha256": "65c9b5d4dbe3628c5ee8f9aa21f339abf2ca4e266c8f49ed41ef7117c35c9644",
+          "ball_origin": [
+            924,
+            480
+          ]
+        },
+        "170": {
+          "sha256": "f0feac1da8671af0c665ac9b548889fc22caa98265af842717e10f68bee50f34",
+          "ball_origin": [
+            1076,
+            664
+          ]
+        },
+        "190": {
+          "sha256": "134f972a89c3864e549a397d5068f37728d4d3cfa169f005c29008d5a0ac737f",
+          "ball_origin": [
+            1168,
+            642
+          ]
+        },
+        "210": {
+          "sha256": "b9866269da54ba81f0b27d11a2fc0e73ebc04657120536e5a54b3bf7ee17dbbd",
+          "ball_origin": [
+            1132,
+            416
+          ]
+        },
+        "230": {
+          "sha256": "320a7a23b4617ed2db3a8922ffcd9fc37bf53259c822ab9bd9e16bf3b3fac475",
+          "ball_origin": [
+            1132,
+            368
+          ]
+        }
+      }
+    },
+    {
+      "crf": 60,
+      "native_sha256": "3d3d8b7551c413dad6befb7e6e4439b02c10e97d5a2bfe70362132da3883c8f1",
+      "sidecar_sha256": "1e0936c796c9fa58f6bfe4e40340df65d28aa484e9d9b9a0785e0137479deddd",
+      "base_yuv_sha256": "ee5354e6edcef59ae5d9ca70045adcea60929a356be4eb9d1ce68946a25e49a3",
+      "stream_rgb_sha256": "f1dafa5b1fb5547d26dcdc3474e232409c7df262f5fcd26e1fa2da5c15364a9d",
+      "total_bytes": 95243,
+      "total_kbps": 158.73833333333334,
+      "fps": 50,
+      "seconds": 4.8,
+      "saved": {
+        "10": {
+          "sha256": "f470ca31a676ef2851359c0e6da211127eeb0b26cd0d2a2dd0c7961e70b1678a",
+          "ball_origin": null
+        },
+        "30": {
+          "sha256": "e18adb083e7730a6767a6e9e2f222df6246773d8f39394c3e4ab76b99b4388a8",
+          "ball_origin": null
+        },
+        "50": {
+          "sha256": "9784826aaa24fdf8c5f0143e568ce90bbf3006dafe9af65d2a0b195cd19b081b",
+          "ball_origin": [
+            1024,
+            592
+          ]
+        },
+        "70": {
+          "sha256": "cade888b882b96a20423f03af7b4bc82e4a077937a9d1a3ec504aa80f0bd74d9",
+          "ball_origin": [
+            1028,
+            458
+          ]
+        },
+        "90": {
+          "sha256": "214fc52fd4c9f5bb51bc2c3e04447525070408c51f7aadb96524bff9e6746933",
+          "ball_origin": [
+            932,
+            462
+          ]
+        },
+        "110": {
+          "sha256": "052a6f3afbd95906e0d822f0c43ba1a9d05d0293dcc8aa81cf5d7ce11b50dc72",
+          "ball_origin": [
+            786,
+            444
+          ]
+        },
+        "130": {
+          "sha256": "a78517b1743939542126baac24a3f9789dd89d96150006587b362ba3cee66522",
+          "ball_origin": [
+            766,
+            256
+          ]
+        },
+        "150": {
+          "sha256": "2deedc96b87f83fb3805f9b0bdf6dba9bc3cbf9bb5effd89d66c22b41e6247f6",
+          "ball_origin": [
+            924,
+            480
+          ]
+        },
+        "170": {
+          "sha256": "4923e4fb47a7f6d5cb1dbf50aed3dc5561cd73c933c9497714576af3b22c6820",
+          "ball_origin": [
+            1076,
+            664
+          ]
+        },
+        "190": {
+          "sha256": "74ddec6790b6f548b5eb0eef4f40ec86b7d2d86c62e94a3aec76dafb855f2ecb",
+          "ball_origin": [
+            1168,
+            642
+          ]
+        },
+        "210": {
+          "sha256": "9e5f3ec02e646d43e18dd5edcfd26b93e8db4dbdf90cfe111a12ee77dfec9ee7",
+          "ball_origin": [
+            1132,
+            416
+          ]
+        },
+        "230": {
+          "sha256": "f370af2ae96e394ebf65c4026c23e5c83ac3a2e4d6c977d3aa01186f6c280666",
+          "ball_origin": [
+            1132,
+            368
+          ]
+        }
+      }
+    }
+  ],
+  "cpu_seconds": 18.157971000000003,
+  "wall_seconds": 19.847652417000063
+}

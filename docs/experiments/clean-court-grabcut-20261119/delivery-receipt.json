@@ -1,0 +1,226 @@
+{
+  "input_carrier_sha256": "144bd0870dd37b6b586663473d12a50bdb78015626661eccaa7a427fb60c9b87",
+  "input_sidecar_sha256": "616f63b0f3f2ca84e3eb87645d1a0877d29a6aa7130d986c31a3a4f0a7b3b2d2",
+  "input_manifest_sha256": "eaead07c00e8e839b174f12ac943574f9c774b0c8fb6b21c3bdfb7a6f4a78368",
+  "input_linux_native_decoder": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+  "input_linux_ball_decoder": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+  "local_cpu_profile": {
+    "platform": "macOS",
+    "numpy": "1.26.4",
+    "opencv": "4.10.0",
+    "opencv_build_sha256": "bade1ed132afc491c4cadda9ea0590a3d0745e16807f765450d3d3d4152a780b",
+    "native_ffmpeg": {
+      "path": "/opt/homebrew/bin/ffmpeg",
+      "real_path": "/opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg",
+      "sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be",
+      "version": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    "tile_dav1d": {
+      "path": "/opt/homebrew/bin/dav1d",
+      "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+      "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+      "version": "1.5.4"
+    }
+  },
+  "rows": [
+    {
+      "name": "original",
+      "base_path": "/private/tmp/ps-clean-court-grabcut-20261119/full/plain/stream.ivf",
+      "base_bytes": 182055,
+      "base_sha256": "41578d340fcf41622d365497e3d105291468d44e038bf97caed5db9f0b3cc029",
+      "carrier_bytes": 428612,
+      "manifest_bytes": 726,
+      "sidecar_bytes": 19114,
+      "total_bytes": 448452,
+      "kbps": 747.42,
+      "role_bytes": {
+        "frame": 183678,
+        "window": 2617,
+        "match": 0,
+        "reference": 242317
+      },
+      "components": {
+        "base": {
+          "bytes": 182055,
+          "sha256": "41578d340fcf41622d365497e3d105291468d44e038bf97caed5db9f0b3cc029"
+        },
+        "keypoints": {
+          "bytes": 1623,
+          "sha256": "510950f12a26b6bc3f562f666f1e13d08bd040e9c423d5ae756a8da8e56e2ad8"
+        },
+        "ref0": {
+          "bytes": 181095,
+          "sha256": "4cda98323c89ebab702c7f5ae6cb41b53fd14faffc2ea39ddf173ac45ffbf8c3"
+        },
+        "ref1": {
+          "bytes": 61222,
+          "sha256": "9f68a690972be6caa805d939d0f834307cf2878c347c6ec2bea901844bb8e90c"
+        }
+      },
+      "conditioning": {
+        "nadal_kyrgios__000_at120__person_000000000001": {
+          "reference": "df807a3b9a6c8cd73015544e9b607300690d83a63a26f878e80d914f721e592b",
+          "boxes": "0a794f262200b1afea1d2bd06f15e0a73d9bed6982bb04d7d6efd9b721e055ed",
+          "kp": "da0064679daceb41d111bc8ae5d391be91b9772d56413b1a83cb6ac8f91a422e",
+          "t": "1aa53cff742acc7b82349c29558ccf50c9af15c48f018c446652dbe208b329f7"
+        },
+        "nadal_kyrgios__000_at120__person_000000000000": {
+          "reference": "330cd728d60c72bb10807543050e3c8ce6e54b93e3445e7fca6c289526dec3e0",
+          "boxes": "faf9b624313f79d891a909344fef14ee89d54bb7d6b645031035d9bb4aef3ab6",
+          "kp": "2b0dae55083f6bf28b8e73dd53fcf4d2d2b3b458ffb55ea9cbee6c6cfd7c9d61",
+          "t": "1aa53cff742acc7b82349c29558ccf50c9af15c48f018c446652dbe208b329f7"
+        }
+      },
+      "files": {
+        "players.pscp": {
+          "bytes": 428612,
+          "sha256": "2421abab0daecded66424c0ea196a4784d80fc99b95b3c5614545b01681517bf"
+        },
+        "receiver.manifest": {
+          "bytes": 726,
+          "sha256": "64b13b6d63bbaba86ca69aec0b373d1c80d603542ae18fbed21479dcad3580d1"
+        },
+        "ball.sidecar": {
+          "bytes": 19114,
+          "sha256": "d7a69ba6536257fb8b5ee836729a5b9658980fdb34bede77690d09ca72b6b359"
+        }
+      }
+    },
+    {
+      "name": "broad",
+      "base_path": "/private/tmp/ps-clean-court-rally-20261118/full/clean/stream.ivf",
+      "base_bytes": 144383,
+      "base_sha256": "a30ff9e9d74dfd741e33ce9bbc95785144e7dea7e12a71c1b712efec12da68cf",
+      "carrier_bytes": 390940,
+      "manifest_bytes": 726,
+      "sidecar_bytes": 19114,
+      "total_bytes": 410780,
+      "kbps": 684.6333333333333,
+      "role_bytes": {
+        "frame": 146006,
+        "window": 2617,
+        "match": 0,
+        "reference": 242317
+      },
+      "components": {
+        "base": {
+          "bytes": 144383,
+          "sha256": "a30ff9e9d74dfd741e33ce9bbc95785144e7dea7e12a71c1b712efec12da68cf"
+        },
+        "keypoints": {
+          "bytes": 1623,
+          "sha256": "510950f12a26b6bc3f562f666f1e13d08bd040e9c423d5ae756a8da8e56e2ad8"
+        },
+        "ref0": {
+          "bytes": 181095,
+          "sha256": "4cda98323c89ebab702c7f5ae6cb41b53fd14faffc2ea39ddf173ac45ffbf8c3"
+        },
+        "ref1": {
+          "bytes": 61222,
+          "sha256": "9f68a690972be6caa805d939d0f834307cf2878c347c6ec2bea901844bb8e90c"
+        }
+      },
+      "conditioning": {
+        "nadal_kyrgios__000_at120__person_000000000001": {
+          "reference": "df807a3b9a6c8cd73015544e9b607300690d83a63a26f878e80d914f721e592b",
+          "boxes": "0a794f262200b1afea1d2bd06f15e0a73d9bed6982bb04d7d6efd9b721e055ed",
+          "kp": "da0064679daceb41d111bc8ae5d391be91b9772d56413b1a83cb6ac8f91a422e",
+          "t": "1aa53cff742acc7b82349c29558ccf50c9af15c48f018c446652dbe208b329f7"
+        },
+        "nadal_kyrgios__000_at120__person_000000000000": {
+          "reference": "330cd728d60c72bb10807543050e3c8ce6e54b93e3445e7fca6c289526dec3e0",
+          "boxes": "faf9b624313f79d891a909344fef14ee89d54bb7d6b645031035d9bb4aef3ab6",
+          "kp": "2b0dae55083f6bf28b8e73dd53fcf4d2d2b3b458ffb55ea9cbee6c6cfd7c9d61",
+          "t": "1aa53cff742acc7b82349c29558ccf50c9af15c48f018c446652dbe208b329f7"
+        }
+      },
+      "files": {
+        "players.pscp": {
+          "bytes": 390940,
+          "sha256": "19fbba72c107d240c84ad1d301e2b014e3557884bac551fe02aa9995dc54b883"
+        },
+        "receiver.manifest": {
+          "bytes": 726,
+          "sha256": "93558d9c0b60193cc569b702f804fb1bd9afc10d1853afd15f3a03c549bc25b5"
+        },
+        "ball.sidecar": {
+          "bytes": 19114,
+          "sha256": "2180b649737af80968e04fd76b62199a89516aba095574573623e6eed33e6ee5"
+        }
+      }
+    },
+    {
+      "name": "grabcut",
+      "base_path": "/private/tmp/ps-clean-court-grabcut-20261119/full/clean/stream.ivf",
+      "base_bytes": 147684,
+      "base_sha256": "e977962fbcbf45649af2a409007f3c2f55c4052f55520d7888ea5113fce1c297",
+      "carrier_bytes": 394241,
+      "manifest_bytes": 726,
+      "sidecar_bytes": 19114,
+      "total_bytes": 414081,
+      "kbps": 690.135,
+      "role_bytes": {
+        "frame": 149307,
+        "window": 2617,
+        "match": 0,
+        "reference": 242317
+      },
+      "components": {
+        "base": {
+          "bytes": 147684,
+          "sha256": "e977962fbcbf45649af2a409007f3c2f55c4052f55520d7888ea5113fce1c297"
+        },
+        "keypoints": {
+          "bytes": 1623,
+          "sha256": "510950f12a26b6bc3f562f666f1e13d08bd040e9c423d5ae756a8da8e56e2ad8"
+        },
+        "ref0": {
+          "bytes": 181095,
+          "sha256": "4cda98323c89ebab702c7f5ae6cb41b53fd14faffc2ea39ddf173ac45ffbf8c3"
+        },
+        "ref1": {
+          "bytes": 61222,
+          "sha256": "9f68a690972be6caa805d939d0f834307cf2878c347c6ec2bea901844bb8e90c"
+        }
+      },
+      "conditioning": {
+        "nadal_kyrgios__000_at120__person_000000000001": {
+          "reference": "df807a3b9a6c8cd73015544e9b607300690d83a63a26f878e80d914f721e592b",
+          "boxes": "0a794f262200b1afea1d2bd06f15e0a73d9bed6982bb04d7d6efd9b721e055ed",
+          "kp": "da0064679daceb41d111bc8ae5d391be91b9772d56413b1a83cb6ac8f91a422e",
+          "t": "1aa53cff742acc7b82349c29558ccf50c9af15c48f018c446652dbe208b329f7"
+        },
+        "nadal_kyrgios__000_at120__person_000000000000": {
+          "reference": "330cd728d60c72bb10807543050e3c8ce6e54b93e3445e7fca6c289526dec3e0",
+          "boxes": "faf9b624313f79d891a909344fef14ee89d54bb7d6b645031035d9bb4aef3ab6",
+          "kp": "2b0dae55083f6bf28b8e73dd53fcf4d2d2b3b458ffb55ea9cbee6c6cfd7c9d61",
+          "t": "1aa53cff742acc7b82349c29558ccf50c9af15c48f018c446652dbe208b329f7"
+        }
+      },
+      "files": {
+        "players.pscp": {
+          "bytes": 394241,
+          "sha256": "25242f4db9c081a75472762db8b409c827c7f84626d073e7838d40bef724910c"
+        },
+        "receiver.manifest": {
+          "bytes": 726,
+          "sha256": "742f7e691f23f16425b8d4325ff7d9492f821696c17183d749621ab4536e47ab"
+        },
+        "ball.sidecar": {
+          "bytes": 19114,
+          "sha256": "bdf8280e62e2285898868e9a04101abe9c5af891e66a9364220f4403a207de40"
+        }
+      }
+    }
+  ],
+  "shared_positions_sha256": "a67a4c51b9f9d76bbe412f1821721c6aa196e57cc8b0871805e40d0d5115c037",
+  "shared_tile_sha256": "cfa40919ce0bdb64b8b98ae5ed3b0425b19cd0c020ce9c0e7ff08dec3f8e95a8",
+  "placements": 195,
+  "frames": 240,
+  "seconds": 4.8,
+  "script_sha256": "3ec371996d724bf3e5ae213708ed6232082d04cc05dfd1e5122ccf26d5161c13",
+  "cpu_seconds": 4.332852,
+  "wall_seconds": 3.826111750000564,
+  "scope": "complete serialized local CPU profile and exact reference/geometry bindings; no new learned rendering or source-denied full decoder",
+  "private_verified_publication": "/Users/manu/.codex/visualizations/2026/11/18/01a1edc1-dd4e-7ab3-b819-fbd88da8db05/clean-court-deliveries-20261119"
+}
