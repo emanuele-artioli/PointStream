@@ -1,0 +1,78 @@
+{
+  "archive_sha256": "7a2cedd010fcb941ed37990461ccbd12e84bec130b28d7917a0521a1523c5d8f",
+  "config_sha256": "bac3d7b1dff8108babea02b643ffae0c869cee970a0bc40f5f5564ea155b5e06",
+  "cpu_seconds": 7.291505,
+  "inputs_sha256": "33987ed62335e5ab6ab7a6aab853e6f24a86fcf328c143cf9fc49e141ac7db04",
+  "output": "/private/tmp/ps-avif-appearance-20261118",
+  "rows": [
+    {
+      "avif_bytes": 20007,
+      "avif_sha256": "9ea1123ada33763e55b95946ce5c86805bb08eac5b4aea380da83aaf75277248",
+      "decoded_rgb_sha256": "c97bf35961390aaf917e9c13bc57ccc722cd83ac91657d8c86bbc9ecb87b97b7",
+      "encoder": [
+        "/opt/homebrew/bin/avifenc",
+        "-q",
+        "65",
+        "--speed",
+        "8",
+        "--jobs"
+      ],
+      "jpeg_q40_bytes": 20206,
+      "npz_sha256": "089ea68bc86e28dc78548bb583f97cb1054c625378f196cb9a9e8553883bf4b8",
+      "original_rgb_sha256": "df807a3b9a6c8cd73015544e9b607300690d83a63a26f878e80d914f721e592b",
+      "quality": 65,
+      "reference_frame": 0,
+      "reference_label": "Player 2",
+      "unchanged_arrays": {
+        "box": "0a794f262200b1afea1d2bd06f15e0a73d9bed6982bb04d7d6efd9b721e055ed",
+        "judged": "4d9525d49a2102f99d50d7a8f82dde1c9f9d6b27336001bf37a2a87f4dd2e790",
+        "pose": "eac33992553faf2701f269125d34ecabdde2e50084bb5080aa1bef536586018a",
+        "reference_box": "ca169ab46f2e60f85d938b71da3611e7a5aded839a57244824035b4cb0a61c6a",
+        "run": "ae51d539a51caade4ea6229005eaf2b5fad8d1f6fc80b0713b3bbc7249c5d777",
+        "t": "1aa53cff742acc7b82349c29558ccf50c9af15c48f018c446652dbe208b329f7"
+      },
+      "unit": "nadal_kyrgios__000_at120__person_000000000001"
+    },
+    {
+      "avif_bytes": 20300,
+      "avif_sha256": "ece9bed88eceae607743d7d08e6d3a15ba17101c604f5fe900a1bd4ebfc66744",
+      "decoded_rgb_sha256": "ac60c77423d88c5ca423f6ccbddd04e96c8fa942a9dc688f7c62d16678dbe390",
+      "encoder": [
+        "/opt/homebrew/bin/avifenc",
+        "-q",
+        "58",
+        "--speed",
+        "8",
+        "--jobs"
+      ],
+      "jpeg_q40_bytes": 20913,
+      "npz_sha256": "9ff2e95691253621687d5e8027b2b5ec5e00dd079a13d9bedb18e85a6c950bd9",
+      "original_rgb_sha256": "330cd728d60c72bb10807543050e3c8ce6e54b93e3445e7fca6c289526dec3e0",
+      "quality": 58,
+      "reference_frame": 0,
+      "reference_label": "Player 1",
+      "unchanged_arrays": {
+        "box": "faf9b624313f79d891a909344fef14ee89d54bb7d6b645031035d9bb4aef3ab6",
+        "judged": "4d9525d49a2102f99d50d7a8f82dde1c9f9d6b27336001bf37a2a87f4dd2e790",
+        "pose": "e84f7d120af5c056761635e8f50215afcd0b8a2ab2fe658b83b015da2f4ae0da",
+        "reference_box": "129454c3fc60df5beaaaa7c254a8ef8c3b9d595f3d0fee9be0e157f9280d9bcc",
+        "run": "ae51d539a51caade4ea6229005eaf2b5fad8d1f6fc80b0713b3bbc7249c5d777",
+        "t": "1aa53cff742acc7b82349c29558ccf50c9af15c48f018c446652dbe208b329f7"
+      },
+      "unit": "nadal_kyrgios__000_at120__person_000000000000"
+    }
+  ],
+  "status": "Campus publication verified, but no job submitted. All six hosts timed out at SSH banner on 2026-11-19 06:05 UTC. Refresh fleet admission and deadline before submitting.",
+  "wall_seconds": 5.7648419170000125,
+  "prior_q40_job": "20261118T105900Z-07f1b885",
+  "gpu_authority": "User approved 900 campus GPU-seconds and 1350 CPU-seconds for this one AVIF setting on 2026-11-18.",
+  "published_config_sha256": "bac3d7b1dff8108babea02b643ffae0c869cee970a0bc40f5f5564ea155b5e06",
+  "published_conditioning_sha256": "7a2cedd010fcb941ed37990461ccbd12e84bec130b28d7917a0521a1523c5d8f",
+  "frozen_revision": "55ba06290978bb5e25347031a1b64c1c66107981",
+  "durable_local_root": "/Users/manu/.codex/visualizations/2026/11/18/01a1edc1-dd4e-7ab3-b819-fbd88da8db05/avif-prepared-20261118",
+  "published_root": "/home/itec/emanuele/Datasets/pointstream-data/tennis/player-reference-avif-20261118",
+  "expired_deadline_utc": "2026-11-19T06:29:25.655500+00:00",
+  "spent_gpu_seconds": 0,
+  "spec_template_sha256": "fbce5932afb16f8256d0e39679f3c5b4310b136020d50099bfd04d5a55297304",
+  "expired_spec_sha256": "61a0cbd130e1178d9506ffd8bb612d0d8805dfc3e127d004559c6178862e401f"
+}

@@ -1,0 +1,729 @@
+{
+  "host": "Emanueles-MacBook-Pro.local",
+  "device": "cpu",
+  "python": "/Users/manu/.codex/visualizations/2026/11/01/01a196fe-ab4d-70f0-a4b4-6843ca289667/atlas-metrics-env/bin/python",
+  "torch": "2.8.0",
+  "opencv": "4.10.0",
+  "scope": "matched human body masks and centered 64px ball crop; 12 frames, one rally",
+  "metric": {
+    "metric": "DISTS",
+    "net": "vgg16",
+    "torchmetrics": "1.9.0",
+    "weights": "/private/tmp/ps-20261119-scorer-addon/torchmetrics/functional/image/dists_models/weights.pt",
+    "weights_sha256": "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218",
+    "backbone": "/Users/manu/.codex/visualizations/2026/11/01/01a196fe-ab4d-70f0-a4b4-6843ca289667/atlas-metric-models/checkpoints/vgg16-397923af.pth",
+    "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+    "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)"
+  },
+  "quality_file_sha256": "bb330efdcf49694e86edca8311fcfdb4e08eb1db3316d81a112f6b808e9b8b46",
+  "scorer_sha256": "16b52ff86df8975ef291126011add3c41a95d323f2c178102c8d7c781fb82041",
+  "crops_sha256": "127a2b6d642af88b6bdb9139669cb19bc56ba0319d3c0b4fe57b016e0138d963",
+  "smoke": [
+    {
+      "t": 10,
+      "region": "p1",
+      "arm": "source",
+      "dists": 1.1920928955078125e-07
+    },
+    {
+      "t": 10,
+      "region": "p1",
+      "arm": "ball36",
+      "dists": 0.17475688457489014
+    },
+    {
+      "t": 10,
+      "region": "p2",
+      "arm": "source",
+      "dists": 1.7881393432617188e-07
+    },
+    {
+      "t": 10,
+      "region": "p2",
+      "arm": "ball36",
+      "dists": 0.16109216213226318
+    },
+    {
+      "t": 10,
+      "region": "ball",
+      "arm": "source",
+      "dists": 1.7881393432617188e-07
+    },
+    {
+      "t": 10,
+      "region": "ball",
+      "arm": "ball36",
+      "dists": 0.1824796199798584
+    }
+  ],
+  "forecast_cpu_seconds": 53.97451200000002,
+  "smoke_cpu_seconds": 1.6658800000000005,
+  "inference_cpu_seconds": 30.411683000000004,
+  "means": {
+    "ball36": {
+      "p1": 0.18619781732559204,
+      "p2": 0.18757776419321695,
+      "ball": 0.14040802915891012
+    },
+    "ball48": {
+      "p1": 0.22893470525741577,
+      "p2": 0.22543272376060486,
+      "ball": 0.1597835123538971
+    },
+    "ball60": {
+      "p1": 0.28328775862852734,
+      "p2": 0.27071833113829297,
+      "ball": 0.20019972821076712
+    }
+  },
+  "rows": [
+    {
+      "t": 10,
+      "region": "p1",
+      "arm": "ball36",
+      "dists": 0.17475688457489014
+    },
+    {
+      "t": 10,
+      "region": "p1",
+      "arm": "ball48",
+      "dists": 0.1941990852355957
+    },
+    {
+      "t": 10,
+      "region": "p1",
+      "arm": "ball60",
+      "dists": 0.22829145193099976
+    },
+    {
+      "t": 10,
+      "region": "p2",
+      "arm": "ball36",
+      "dists": 0.16109216213226318
+    },
+    {
+      "t": 10,
+      "region": "p2",
+      "arm": "ball48",
+      "dists": 0.19963383674621582
+    },
+    {
+      "t": 10,
+      "region": "p2",
+      "arm": "ball60",
+      "dists": 0.21974366903305054
+    },
+    {
+      "t": 10,
+      "region": "ball",
+      "arm": "ball36",
+      "dists": 0.1824796199798584
+    },
+    {
+      "t": 10,
+      "region": "ball",
+      "arm": "ball48",
+      "dists": 0.22915226221084595
+    },
+    {
+      "t": 10,
+      "region": "ball",
+      "arm": "ball60",
+      "dists": 0.2767173647880554
+    },
+    {
+      "t": 30,
+      "region": "p1",
+      "arm": "ball36",
+      "dists": 0.16285955905914307
+    },
+    {
+      "t": 30,
+      "region": "p1",
+      "arm": "ball48",
+      "dists": 0.18236082792282104
+    },
+    {
+      "t": 30,
+      "region": "p1",
+      "arm": "ball60",
+      "dists": 0.24876827001571655
+    },
+    {
+      "t": 30,
+      "region": "p2",
+      "arm": "ball36",
+      "dists": 0.16837114095687866
+    },
+    {
+      "t": 30,
+      "region": "p2",
+      "arm": "ball48",
+      "dists": 0.17995703220367432
+    },
+    {
+      "t": 30,
+      "region": "p2",
+      "arm": "ball60",
+      "dists": 0.2147793173789978
+    },
+    {
+      "t": 30,
+      "region": "ball",
+      "arm": "ball36",
+      "dists": 0.21258580684661865
+    },
+    {
+      "t": 30,
+      "region": "ball",
+      "arm": "ball48",
+      "dists": 0.2675837278366089
+    },
+    {
+      "t": 30,
+      "region": "ball",
+      "arm": "ball60",
+      "dists": 0.3427879810333252
+    },
+    {
+      "t": 50,
+      "region": "p1",
+      "arm": "ball36",
+      "dists": 0.18227416276931763
+    },
+    {
+      "t": 50,
+      "region": "p1",
+      "arm": "ball48",
+      "dists": 0.24160510301589966
+    },
+    {
+      "t": 50,
+      "region": "p1",
+      "arm": "ball60",
+      "dists": 0.28046250343322754
+    },
+    {
+      "t": 50,
+      "region": "p2",
+      "arm": "ball36",
+      "dists": 0.17773288488388062
+    },
+    {
+      "t": 50,
+      "region": "p2",
+      "arm": "ball48",
+      "dists": 0.23903238773345947
+    },
+    {
+      "t": 50,
+      "region": "p2",
+      "arm": "ball60",
+      "dists": 0.24472284317016602
+    },
+    {
+      "t": 50,
+      "region": "ball",
+      "arm": "ball36",
+      "dists": 0.14972174167633057
+    },
+    {
+      "t": 50,
+      "region": "ball",
+      "arm": "ball48",
+      "dists": 0.15053945779800415
+    },
+    {
+      "t": 50,
+      "region": "ball",
+      "arm": "ball60",
+      "dists": 0.1986905336380005
+    },
+    {
+      "t": 70,
+      "region": "p1",
+      "arm": "ball36",
+      "dists": 0.20357221364974976
+    },
+    {
+      "t": 70,
+      "region": "p1",
+      "arm": "ball48",
+      "dists": 0.2420911192893982
+    },
+    {
+      "t": 70,
+      "region": "p1",
+      "arm": "ball60",
+      "dists": 0.282829225063324
+    },
+    {
+      "t": 70,
+      "region": "p2",
+      "arm": "ball36",
+      "dists": 0.1797228455543518
+    },
+    {
+      "t": 70,
+      "region": "p2",
+      "arm": "ball48",
+      "dists": 0.21362990140914917
+    },
+    {
+      "t": 70,
+      "region": "p2",
+      "arm": "ball60",
+      "dists": 0.2504216432571411
+    },
+    {
+      "t": 70,
+      "region": "ball",
+      "arm": "ball36",
+      "dists": 0.1398909091949463
+    },
+    {
+      "t": 70,
+      "region": "ball",
+      "arm": "ball48",
+      "dists": 0.1535332202911377
+    },
+    {
+      "t": 70,
+      "region": "ball",
+      "arm": "ball60",
+      "dists": 0.16664087772369385
+    },
+    {
+      "t": 90,
+      "region": "p1",
+      "arm": "ball36",
+      "dists": 0.17892837524414062
+    },
+    {
+      "t": 90,
+      "region": "p1",
+      "arm": "ball48",
+      "dists": 0.23696869611740112
+    },
+    {
+      "t": 90,
+      "region": "p1",
+      "arm": "ball60",
+      "dists": 0.2744118571281433
+    },
+    {
+      "t": 90,
+      "region": "p2",
+      "arm": "ball36",
+      "dists": 0.17106294631958008
+    },
+    {
+      "t": 90,
+      "region": "p2",
+      "arm": "ball48",
+      "dists": 0.19838333129882812
+    },
+    {
+      "t": 90,
+      "region": "p2",
+      "arm": "ball60",
+      "dists": 0.26079481840133667
+    },
+    {
+      "t": 90,
+      "region": "ball",
+      "arm": "ball36",
+      "dists": 0.10825300216674805
+    },
+    {
+      "t": 90,
+      "region": "ball",
+      "arm": "ball48",
+      "dists": 0.11211711168289185
+    },
+    {
+      "t": 90,
+      "region": "ball",
+      "arm": "ball60",
+      "dists": 0.14881479740142822
+    },
+    {
+      "t": 110,
+      "region": "p1",
+      "arm": "ball36",
+      "dists": 0.1793123483657837
+    },
+    {
+      "t": 110,
+      "region": "p1",
+      "arm": "ball48",
+      "dists": 0.22720998525619507
+    },
+    {
+      "t": 110,
+      "region": "p1",
+      "arm": "ball60",
+      "dists": 0.287036657333374
+    },
+    {
+      "t": 110,
+      "region": "p2",
+      "arm": "ball36",
+      "dists": 0.20028984546661377
+    },
+    {
+      "t": 110,
+      "region": "p2",
+      "arm": "ball48",
+      "dists": 0.24916791915893555
+    },
+    {
+      "t": 110,
+      "region": "p2",
+      "arm": "ball60",
+      "dists": 0.3065081238746643
+    },
+    {
+      "t": 110,
+      "region": "ball",
+      "arm": "ball36",
+      "dists": 0.13046520948410034
+    },
+    {
+      "t": 110,
+      "region": "ball",
+      "arm": "ball48",
+      "dists": 0.14865529537200928
+    },
+    {
+      "t": 110,
+      "region": "ball",
+      "arm": "ball60",
+      "dists": 0.1608251929283142
+    },
+    {
+      "t": 130,
+      "region": "p1",
+      "arm": "ball36",
+      "dists": 0.20147275924682617
+    },
+    {
+      "t": 130,
+      "region": "p1",
+      "arm": "ball48",
+      "dists": 0.24532055854797363
+    },
+    {
+      "t": 130,
+      "region": "p1",
+      "arm": "ball60",
+      "dists": 0.28473687171936035
+    },
+    {
+      "t": 130,
+      "region": "p2",
+      "arm": "ball36",
+      "dists": 0.2064332365989685
+    },
+    {
+      "t": 130,
+      "region": "p2",
+      "arm": "ball48",
+      "dists": 0.23491358757019043
+    },
+    {
+      "t": 130,
+      "region": "p2",
+      "arm": "ball60",
+      "dists": 0.2994846701622009
+    },
+    {
+      "t": 130,
+      "region": "ball",
+      "arm": "ball36",
+      "dists": 0.12977385520935059
+    },
+    {
+      "t": 130,
+      "region": "ball",
+      "arm": "ball48",
+      "dists": 0.13562536239624023
+    },
+    {
+      "t": 130,
+      "region": "ball",
+      "arm": "ball60",
+      "dists": 0.1729527711868286
+    },
+    {
+      "t": 150,
+      "region": "p1",
+      "arm": "ball36",
+      "dists": 0.19324755668640137
+    },
+    {
+      "t": 150,
+      "region": "p1",
+      "arm": "ball48",
+      "dists": 0.24401378631591797
+    },
+    {
+      "t": 150,
+      "region": "p1",
+      "arm": "ball60",
+      "dists": 0.28350555896759033
+    },
+    {
+      "t": 150,
+      "region": "p2",
+      "arm": "ball36",
+      "dists": 0.20735961198806763
+    },
+    {
+      "t": 150,
+      "region": "p2",
+      "arm": "ball48",
+      "dists": 0.21550559997558594
+    },
+    {
+      "t": 150,
+      "region": "p2",
+      "arm": "ball60",
+      "dists": 0.2695710062980652
+    },
+    {
+      "t": 150,
+      "region": "ball",
+      "arm": "ball36",
+      "dists": 0.15481328964233398
+    },
+    {
+      "t": 150,
+      "region": "ball",
+      "arm": "ball48",
+      "dists": 0.14604151248931885
+    },
+    {
+      "t": 150,
+      "region": "ball",
+      "arm": "ball60",
+      "dists": 0.2019837498664856
+    },
+    {
+      "t": 170,
+      "region": "p1",
+      "arm": "ball36",
+      "dists": 0.19283324480056763
+    },
+    {
+      "t": 170,
+      "region": "p1",
+      "arm": "ball48",
+      "dists": 0.2394106388092041
+    },
+    {
+      "t": 170,
+      "region": "p1",
+      "arm": "ball60",
+      "dists": 0.2995767593383789
+    },
+    {
+      "t": 170,
+      "region": "p2",
+      "arm": "ball36",
+      "dists": 0.16505885124206543
+    },
+    {
+      "t": 170,
+      "region": "p2",
+      "arm": "ball48",
+      "dists": 0.2114572525024414
+    },
+    {
+      "t": 170,
+      "region": "p2",
+      "arm": "ball60",
+      "dists": 0.25695300102233887
+    },
+    {
+      "t": 170,
+      "region": "ball",
+      "arm": "ball36",
+      "dists": 0.12928396463394165
+    },
+    {
+      "t": 170,
+      "region": "ball",
+      "arm": "ball48",
+      "dists": 0.15479803085327148
+    },
+    {
+      "t": 170,
+      "region": "ball",
+      "arm": "ball60",
+      "dists": 0.20553100109100342
+    },
+    {
+      "t": 190,
+      "region": "p1",
+      "arm": "ball36",
+      "dists": 0.1859506368637085
+    },
+    {
+      "t": 190,
+      "region": "p1",
+      "arm": "ball48",
+      "dists": 0.2315986156463623
+    },
+    {
+      "t": 190,
+      "region": "p1",
+      "arm": "ball60",
+      "dists": 0.31885826587677
+    },
+    {
+      "t": 190,
+      "region": "p2",
+      "arm": "ball36",
+      "dists": 0.1860550045967102
+    },
+    {
+      "t": 190,
+      "region": "p2",
+      "arm": "ball48",
+      "dists": 0.2531350255012512
+    },
+    {
+      "t": 190,
+      "region": "p2",
+      "arm": "ball60",
+      "dists": 0.3065875768661499
+    },
+    {
+      "t": 190,
+      "region": "ball",
+      "arm": "ball36",
+      "dists": 0.10916495323181152
+    },
+    {
+      "t": 190,
+      "region": "ball",
+      "arm": "ball48",
+      "dists": 0.14871680736541748
+    },
+    {
+      "t": 190,
+      "region": "ball",
+      "arm": "ball60",
+      "dists": 0.1889057159423828
+    },
+    {
+      "t": 210,
+      "region": "p1",
+      "arm": "ball36",
+      "dists": 0.18095815181732178
+    },
+    {
+      "t": 210,
+      "region": "p1",
+      "arm": "ball48",
+      "dists": 0.22075307369232178
+    },
+    {
+      "t": 210,
+      "region": "p1",
+      "arm": "ball60",
+      "dists": 0.3021841049194336
+    },
+    {
+      "t": 210,
+      "region": "p2",
+      "arm": "ball36",
+      "dists": 0.22722172737121582
+    },
+    {
+      "t": 210,
+      "region": "p2",
+      "arm": "ball48",
+      "dists": 0.2686046361923218
+    },
+    {
+      "t": 210,
+      "region": "p2",
+      "arm": "ball60",
+      "dists": 0.3039356470108032
+    },
+    {
+      "t": 210,
+      "region": "ball",
+      "arm": "ball36",
+      "dists": 0.11397600173950195
+    },
+    {
+      "t": 210,
+      "region": "ball",
+      "arm": "ball48",
+      "dists": 0.13038796186447144
+    },
+    {
+      "t": 210,
+      "region": "ball",
+      "arm": "ball60",
+      "dists": 0.15683764219284058
+    },
+    {
+      "t": 230,
+      "region": "p1",
+      "arm": "ball36",
+      "dists": 0.19820791482925415
+    },
+    {
+      "t": 230,
+      "region": "p1",
+      "arm": "ball48",
+      "dists": 0.24168497323989868
+    },
+    {
+      "t": 230,
+      "region": "p1",
+      "arm": "ball60",
+      "dists": 0.3087915778160095
+    },
+    {
+      "t": 230,
+      "region": "p2",
+      "arm": "ball36",
+      "dists": 0.2005329132080078
+    },
+    {
+      "t": 230,
+      "region": "p2",
+      "arm": "ball48",
+      "dists": 0.24177217483520508
+    },
+    {
+      "t": 230,
+      "region": "p2",
+      "arm": "ball60",
+      "dists": 0.31511765718460083
+    },
+    {
+      "t": 230,
+      "region": "ball",
+      "arm": "ball36",
+      "dists": 0.1244879961013794
+    },
+    {
+      "t": 230,
+      "region": "ball",
+      "arm": "ball48",
+      "dists": 0.14025139808654785
+    },
+    {
+      "t": 230,
+      "region": "ball",
+      "arm": "ball60",
+      "dists": 0.18170911073684692
+    }
+  ]
+}

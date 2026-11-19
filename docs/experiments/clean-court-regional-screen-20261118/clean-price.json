@@ -1,0 +1,15 @@
+{
+  "source_carrier_sha256": "7dcb2dbb45b3595c66c2d7e018fe7c8cf49ca2b7e1bae972ae59b450ec4afe84",
+  "source_sidecar_sha256": "81bf192ad5c668d7094eabb91d5cfa1ec86ed25fbc9cbdb3f810f14cd339cca6",
+  "coded_base_sha256": "a30ff9e9d74dfd741e33ce9bbc95785144e7dea7e12a71c1b712efec12da68cf",
+  "files": {
+    "players.pscp": {"sha256":"c49266f2018f127e848148d29e4f40d47ce653172becc20fed566d8f49a85d46","bytes":390966},
+    "receiver.manifest": {"sha256":"437f0343f32f7889b10ad901ae7147ee1e79811e6213838fffcf9b8442eda2b5","bytes":625},
+    "ball.sidecar": {"sha256":"001549bcc916b8c04dad6bed66859de4446086b1c409d8d41a01deefac62b56f","bytes":19113}
+  },
+  "total_bytes":410704,
+  "kbps":684.5066666666667,
+  "placements":195,
+  "coded_base_bytes":144383,
+  "reference_bytes":242343
+}

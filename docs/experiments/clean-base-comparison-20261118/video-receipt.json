@@ -1,0 +1,15 @@
+{
+  "video_sha256": "b13a772e7f9a481e72ee7968754aeecd0498e767cb4c5932d5e2fdc0a738be4b",
+  "stream": {
+    "width": 1920,
+    "height": 604,
+    "r_frame_rate": "50/1",
+    "nb_read_frames": "240"
+  },
+  "composition_sha256": "3acd7cc7ad08923fe7f4ec35e0ad4be8aeb1651f58af72f4b9fb4a2e4c61ad33",
+  "base_sha256": [
+    "4f549befc1445ae4baca3a8da55c822261a78b08f98a8b212fc702f81998499b",
+    "2e1bdb7b792eb38a5bca7c9e52b0b88e7e64d7627ae51c296d495522c9399517"
+  ],
+  "scored_ticks_checked": 12
+}

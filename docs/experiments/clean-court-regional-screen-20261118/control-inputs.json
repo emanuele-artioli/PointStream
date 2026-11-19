@@ -1,0 +1,468 @@
+{
+  "source": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d",
+  "labels": "9918c87fa6a309052bbac8ef0be21429885e6579fd632754ed9aeb343c912d8a",
+  "opencv": "4.10.0",
+  "arms": {
+    "plain-36": {
+      "file_bytes": 382466,
+      "complete_kbps": 637.4433333333334,
+      "stream_sha256": "2df35b86f53f0c5ffbba380b9e3a020fed23723041d5161f8ce609cb6f1f61a2",
+      "decoded_sha256": "dd8acda561d7b2b4bbad848eb295fb7b5f97416f7b1df839cb8010bd7b989af5"
+    },
+    "plain-48": {
+      "file_bytes": 182055,
+      "complete_kbps": 303.425,
+      "stream_sha256": "41578d340fcf41622d365497e3d105291468d44e038bf97caed5db9f0b3cc029",
+      "decoded_sha256": "4f549befc1445ae4baca3a8da55c822261a78b08f98a8b212fc702f81998499b"
+    },
+    "plain-60": {
+      "file_bytes": 75592,
+      "complete_kbps": 125.98666666666666,
+      "stream_sha256": "8837ad460cda0236e3658e9509ece852991a5491e6c9769c7d66437672c020c2",
+      "decoded_sha256": "ee5354e6edcef59ae5d9ca70045adcea60929a356be4eb9d1ce68946a25e49a3"
+    },
+    "roi-36": {
+      "file_bytes": 338622,
+      "complete_kbps": 564.37,
+      "stream_sha256": "1350e9ad94715f030d12458d0d448143478b32b19803460046d7982a88ebaf00",
+      "decoded_sha256": "77040dc371aed50312586800a7c2ef1ad721f1483198c559954f97e71a2e36fd"
+    },
+    "roi-48": {
+      "file_bytes": 172926,
+      "complete_kbps": 288.21,
+      "stream_sha256": "a4afce8e08cbd2cc0ee5e7b650a92e9e1c6e760e7e12859f0befa130cf59e1cb",
+      "decoded_sha256": "64d9d4be1ffb10792dcfa081733354e4e4c5d1b33364d096a68ab9ea52e5a510"
+    },
+    "roi-60": {
+      "file_bytes": 74846,
+      "complete_kbps": 124.74333333333333,
+      "stream_sha256": "83d87cac92dce71c6211a8d86b1b990bdd612501c7fd07d66210c9bc4ecdcfe5",
+      "decoded_sha256": "0a6e6e44b9f24cf27496c7f889849824c53be94e0209215d3fa16e1c830252c8"
+    },
+    "plain-28": {
+      "file_bytes": 668571,
+      "complete_kbps": 1114.285,
+      "stream_sha256": "60427c9aee864dfeabac87440343c7c389110072e0a303a072e2ff4ab0254c31",
+      "decoded_sha256": "0150e13206d5a016ba9207c23a57d8d08afeecde9896b67d0da4939b30ba1bd8"
+    },
+    "roi-28": {
+      "file_bytes": 545836,
+      "complete_kbps": 909.7266666666666,
+      "stream_sha256": "02e092f3b671e4a6a5f6e98eea3fff39ed1080383107a4f5a3db4d30cfb91419",
+      "decoded_sha256": "c102547096763250ae70797d3eb6ca6f08eb278e918a80fa315f6b8b62476bde"
+    },
+    "original": {
+      "10": "badd499b532196aa2ec467d9aa7f716330f80517e3b3cb5da292be2ab92bd6ef",
+      "30": "6e62b83b182d1c5ee7fdd6ae9b58781dee1cd9aeedb98e7c1c9fa03e3d2a581c",
+      "50": "26c25d835a55330f7a80454f442966e02c2ab55a991d94360f8afbb9d8fe6787",
+      "70": "19b854c722c485e5a1d6b9555707e158a33b952b14cfa6de9ab9ac11a9551c80",
+      "90": "c8841ba1e425fdf8ac6bb6bab43074ee6b512b7b5851b7a1d9be70ab450367a3",
+      "110": "2db4755b06830ccbe8b57e000378756b50f3aaf031186a7dc19a66c28ff2183d",
+      "130": "02afba79cd54e08ea7dcc877fe90b94f150ec61cfa26e031485beb9132b613da",
+      "150": "c26879268497966fd6839842824d81536143687208efb9d7c936968c5a0a48cd",
+      "170": "934ea1477f9ac05805b9bfa266d2095139f8ae2b27e082e89fbed7bcf7e88514",
+      "190": "789a9cc513d14792b52e4c668d2dbebba9f878c183af308f2b094b4b76842328",
+      "210": "0c644012435560030f1f775652db3498377a5aa30ef550203c929990eedb4084",
+      "230": "c19ae77d6fd5a5b7abd66a15e73c4c4c02991d5d49c5f1001258912c8ae5f7ec"
+    }
+  },
+  "regions": [
+    {
+      "tick": 10,
+      "region": "p1",
+      "bounds": [
+        1011,
+        664,
+        1191,
+        995
+      ],
+      "mask_area": 14548
+    },
+    {
+      "tick": 10,
+      "region": "p2",
+      "bounds": [
+        617,
+        198,
+        757,
+        401
+      ],
+      "mask_area": 5386
+    },
+    {
+      "tick": 10,
+      "region": "ball",
+      "bounds": [
+        1035,
+        746,
+        1099,
+        810
+      ],
+      "mask_area": 4096
+    },
+    {
+      "tick": 30,
+      "region": "p1",
+      "bounds": [
+        1026,
+        664,
+        1190,
+        994
+      ],
+      "mask_area": 12124
+    },
+    {
+      "tick": 30,
+      "region": "p2",
+      "bounds": [
+        624,
+        198,
+        756,
+        402
+      ],
+      "mask_area": 4272
+    },
+    {
+      "tick": 30,
+      "region": "ball",
+      "bounds": [
+        1033,
+        739,
+        1097,
+        803
+      ],
+      "mask_area": 4096
+    },
+    {
+      "tick": 50,
+      "region": "p1",
+      "bounds": [
+        1016,
+        616,
+        1190,
+        992
+      ],
+      "mask_area": 13876
+    },
+    {
+      "tick": 50,
+      "region": "p2",
+      "bounds": [
+        624,
+        196,
+        760,
+        402
+      ],
+      "mask_area": 4488
+    },
+    {
+      "tick": 50,
+      "region": "ball",
+      "bounds": [
+        1007,
+        576,
+        1071,
+        640
+      ],
+      "mask_area": 4096
+    },
+    {
+      "tick": 70,
+      "region": "p1",
+      "bounds": [
+        984,
+        610,
+        1144,
+        978
+      ],
+      "mask_area": 12012
+    },
+    {
+      "tick": 70,
+      "region": "p2",
+      "bounds": [
+        626,
+        210,
+        780,
+        410
+      ],
+      "mask_area": 4372
+    },
+    {
+      "tick": 70,
+      "region": "ball",
+      "bounds": [
+        1012,
+        442,
+        1076,
+        506
+      ],
+      "mask_area": 4096
+    },
+    {
+      "tick": 90,
+      "region": "p1",
+      "bounds": [
+        896,
+        620,
+        1122,
+        935
+      ],
+      "mask_area": 16011
+    },
+    {
+      "tick": 90,
+      "region": "p2",
+      "bounds": [
+        669,
+        190,
+        806,
+        409
+      ],
+      "mask_area": 6030
+    },
+    {
+      "tick": 90,
+      "region": "ball",
+      "bounds": [
+        913,
+        445,
+        977,
+        509
+      ],
+      "mask_area": 4096
+    },
+    {
+      "tick": 110,
+      "region": "p1",
+      "bounds": [
+        960,
+        646,
+        1112,
+        940
+      ],
+      "mask_area": 10344
+    },
+    {
+      "tick": 110,
+      "region": "p2",
+      "bounds": [
+        716,
+        210,
+        854,
+        414
+      ],
+      "mask_area": 4292
+    },
+    {
+      "tick": 110,
+      "region": "ball",
+      "bounds": [
+        770,
+        427,
+        834,
+        491
+      ],
+      "mask_area": 4096
+    },
+    {
+      "tick": 130,
+      "region": "p1",
+      "bounds": [
+        974,
+        638,
+        1142,
+        924
+      ],
+      "mask_area": 11140
+    },
+    {
+      "tick": 130,
+      "region": "p2",
+      "bounds": [
+        780,
+        186,
+        918,
+        406
+      ],
+      "mask_area": 5180
+    },
+    {
+      "tick": 130,
+      "region": "ball",
+      "bounds": [
+        750,
+        240,
+        814,
+        304
+      ],
+      "mask_area": 4096
+    },
+    {
+      "tick": 150,
+      "region": "p1",
+      "bounds": [
+        1000,
+        664,
+        1222,
+        952
+      ],
+      "mask_area": 11832
+    },
+    {
+      "tick": 150,
+      "region": "p2",
+      "bounds": [
+        824,
+        194,
+        962,
+        408
+      ],
+      "mask_area": 4508
+    },
+    {
+      "tick": 150,
+      "region": "ball",
+      "bounds": [
+        909,
+        463,
+        973,
+        527
+      ],
+      "mask_area": 4096
+    },
+    {
+      "tick": 170,
+      "region": "p1",
+      "bounds": [
+        1023,
+        664,
+        1216,
+        976
+      ],
+      "mask_area": 11755
+    },
+    {
+      "tick": 170,
+      "region": "p2",
+      "bounds": [
+        860,
+        200,
+        992,
+        410
+      ],
+      "mask_area": 4716
+    },
+    {
+      "tick": 170,
+      "region": "ball",
+      "bounds": [
+        1057,
+        645,
+        1121,
+        709
+      ],
+      "mask_area": 4096
+    },
+    {
+      "tick": 190,
+      "region": "p1",
+      "bounds": [
+        958,
+        702,
+        1138,
+        968
+      ],
+      "mask_area": 9940
+    },
+    {
+      "tick": 190,
+      "region": "p2",
+      "bounds": [
+        868,
+        198,
+        1006,
+        396
+      ],
+      "mask_area": 4520
+    },
+    {
+      "tick": 190,
+      "region": "ball",
+      "bounds": [
+        1153,
+        626,
+        1217,
+        690
+      ],
+      "mask_area": 4096
+    },
+    {
+      "tick": 210,
+      "region": "p1",
+      "bounds": [
+        920,
+        678,
+        1086,
+        976
+      ],
+      "mask_area": 11864
+    },
+    {
+      "tick": 210,
+      "region": "p2",
+      "bounds": [
+        910,
+        208,
+        1046,
+        396
+      ],
+      "mask_area": 4300
+    },
+    {
+      "tick": 210,
+      "region": "ball",
+      "bounds": [
+        1116,
+        399,
+        1180,
+        463
+      ],
+      "mask_area": 4096
+    },
+    {
+      "tick": 230,
+      "region": "p1",
+      "bounds": [
+        898,
+        680,
+        1044,
+        1014
+      ],
+      "mask_area": 13056
+    },
+    {
+      "tick": 230,
+      "region": "p2",
+      "bounds": [
+        1004,
+        216,
+        1164,
+        402
+      ],
+      "mask_area": 4368
+    },
+    {
+      "tick": 230,
+      "region": "ball",
+      "bounds": [
+        1117,
+        352,
+        1181,
+        416
+      ],
+      "mask_area": 4096
+    }
+  ],
+  "zip_sha256": "07b3dc67630b4a5ff11a9a324e6b2848c1fc6d07dc004f99194b6e9c9df899ef"
+}

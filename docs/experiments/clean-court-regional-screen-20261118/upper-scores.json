@@ -1,0 +1,508 @@
+{
+  "host": "Emanueles-MacBook-Pro.local",
+  "device": "cpu",
+  "python": "/Users/manu/.codex/visualizations/2026/11/01/01a196fe-ab4d-70f0-a4b4-6843ca289667/atlas-metrics-env/bin/python",
+  "torch": "2.8.0",
+  "opencv": "4.10.0",
+  "scope": "matched human body masks and centered 64px ball crop; 12 frames, one rally",
+  "metric": {
+    "metric": "DISTS",
+    "net": "vgg16",
+    "torchmetrics": "1.9.0",
+    "weights": "/private/tmp/ps-20261119-scorer-addon/torchmetrics/functional/image/dists_models/weights.pt",
+    "weights_sha256": "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218",
+    "backbone": "/Users/manu/.codex/visualizations/2026/11/01/01a196fe-ab4d-70f0-a4b4-6843ca289667/atlas-metric-models/checkpoints/vgg16-397923af.pth",
+    "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+    "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)"
+  },
+  "quality_file_sha256": "bb330efdcf49694e86edca8311fcfdb4e08eb1db3316d81a112f6b808e9b8b46",
+  "scorer_sha256": "16b52ff86df8975ef291126011add3c41a95d323f2c178102c8d7c781fb82041",
+  "crops_sha256": "a9d8bc604313911efb76a53bcfc1508df7c3af53d32cf5c33272c2f5ad40a82a",
+  "smoke": [
+    {
+      "t": 10,
+      "region": "p1",
+      "arm": "source",
+      "dists": 1.1920928955078125e-07
+    },
+    {
+      "t": 10,
+      "region": "p1",
+      "arm": "plain-18",
+      "dists": 0.13063299655914307
+    },
+    {
+      "t": 10,
+      "region": "p2",
+      "arm": "source",
+      "dists": 1.7881393432617188e-07
+    },
+    {
+      "t": 10,
+      "region": "p2",
+      "arm": "plain-18",
+      "dists": 0.13584238290786743
+    },
+    {
+      "t": 10,
+      "region": "ball",
+      "arm": "source",
+      "dists": 1.7881393432617188e-07
+    },
+    {
+      "t": 10,
+      "region": "ball",
+      "arm": "plain-18",
+      "dists": 0.15242809057235718
+    }
+  ],
+  "forecast_cpu_seconds": 31.627843200000004,
+  "smoke_cpu_seconds": 1.464252,
+  "inference_cpu_seconds": 18.758717,
+  "means": {
+    "plain-18": {
+      "p1": 0.14861136674880981,
+      "p2": 0.1488668421904246,
+      "ball": 0.1383038411537806
+    },
+    "roi-18": {
+      "p1": 0.15073755383491516,
+      "p2": 0.1508468637863795,
+      "ball": 0.13329536219437918
+    }
+  },
+  "rows": [
+    {
+      "t": 10,
+      "region": "p1",
+      "arm": "plain-18",
+      "dists": 0.13063299655914307
+    },
+    {
+      "t": 10,
+      "region": "p1",
+      "arm": "roi-18",
+      "dists": 0.12965160608291626
+    },
+    {
+      "t": 10,
+      "region": "p2",
+      "arm": "plain-18",
+      "dists": 0.13584238290786743
+    },
+    {
+      "t": 10,
+      "region": "p2",
+      "arm": "roi-18",
+      "dists": 0.13331180810928345
+    },
+    {
+      "t": 10,
+      "region": "ball",
+      "arm": "plain-18",
+      "dists": 0.15242809057235718
+    },
+    {
+      "t": 10,
+      "region": "ball",
+      "arm": "roi-18",
+      "dists": 0.14773261547088623
+    },
+    {
+      "t": 30,
+      "region": "p1",
+      "arm": "plain-18",
+      "dists": 0.1334262490272522
+    },
+    {
+      "t": 30,
+      "region": "p1",
+      "arm": "roi-18",
+      "dists": 0.13488227128982544
+    },
+    {
+      "t": 30,
+      "region": "p2",
+      "arm": "plain-18",
+      "dists": 0.14667463302612305
+    },
+    {
+      "t": 30,
+      "region": "p2",
+      "arm": "roi-18",
+      "dists": 0.14706510305404663
+    },
+    {
+      "t": 30,
+      "region": "ball",
+      "arm": "plain-18",
+      "dists": 0.15636074542999268
+    },
+    {
+      "t": 30,
+      "region": "ball",
+      "arm": "roi-18",
+      "dists": 0.1564335823059082
+    },
+    {
+      "t": 50,
+      "region": "p1",
+      "arm": "plain-18",
+      "dists": 0.14053118228912354
+    },
+    {
+      "t": 50,
+      "region": "p1",
+      "arm": "roi-18",
+      "dists": 0.1475394368171692
+    },
+    {
+      "t": 50,
+      "region": "p2",
+      "arm": "plain-18",
+      "dists": 0.14572685956954956
+    },
+    {
+      "t": 50,
+      "region": "p2",
+      "arm": "roi-18",
+      "dists": 0.15276199579238892
+    },
+    {
+      "t": 50,
+      "region": "ball",
+      "arm": "plain-18",
+      "dists": 0.1203603744506836
+    },
+    {
+      "t": 50,
+      "region": "ball",
+      "arm": "roi-18",
+      "dists": 0.12183701992034912
+    },
+    {
+      "t": 70,
+      "region": "p1",
+      "arm": "plain-18",
+      "dists": 0.15676510334014893
+    },
+    {
+      "t": 70,
+      "region": "p1",
+      "arm": "roi-18",
+      "dists": 0.15622657537460327
+    },
+    {
+      "t": 70,
+      "region": "p2",
+      "arm": "plain-18",
+      "dists": 0.14078444242477417
+    },
+    {
+      "t": 70,
+      "region": "p2",
+      "arm": "roi-18",
+      "dists": 0.13495033979415894
+    },
+    {
+      "t": 70,
+      "region": "ball",
+      "arm": "plain-18",
+      "dists": 0.16043943166732788
+    },
+    {
+      "t": 70,
+      "region": "ball",
+      "arm": "roi-18",
+      "dists": 0.15777689218521118
+    },
+    {
+      "t": 90,
+      "region": "p1",
+      "arm": "plain-18",
+      "dists": 0.14660412073135376
+    },
+    {
+      "t": 90,
+      "region": "p1",
+      "arm": "roi-18",
+      "dists": 0.14592742919921875
+    },
+    {
+      "t": 90,
+      "region": "p2",
+      "arm": "plain-18",
+      "dists": 0.14542508125305176
+    },
+    {
+      "t": 90,
+      "region": "p2",
+      "arm": "roi-18",
+      "dists": 0.14761781692504883
+    },
+    {
+      "t": 90,
+      "region": "ball",
+      "arm": "plain-18",
+      "dists": 0.1270197033882141
+    },
+    {
+      "t": 90,
+      "region": "ball",
+      "arm": "roi-18",
+      "dists": 0.1254807710647583
+    },
+    {
+      "t": 110,
+      "region": "p1",
+      "arm": "plain-18",
+      "dists": 0.15605515241622925
+    },
+    {
+      "t": 110,
+      "region": "p1",
+      "arm": "roi-18",
+      "dists": 0.16071003675460815
+    },
+    {
+      "t": 110,
+      "region": "p2",
+      "arm": "plain-18",
+      "dists": 0.14887452125549316
+    },
+    {
+      "t": 110,
+      "region": "p2",
+      "arm": "roi-18",
+      "dists": 0.15682601928710938
+    },
+    {
+      "t": 110,
+      "region": "ball",
+      "arm": "plain-18",
+      "dists": 0.11280685663223267
+    },
+    {
+      "t": 110,
+      "region": "ball",
+      "arm": "roi-18",
+      "dists": 0.11474770307540894
+    },
+    {
+      "t": 130,
+      "region": "p1",
+      "arm": "plain-18",
+      "dists": 0.1558435559272766
+    },
+    {
+      "t": 130,
+      "region": "p1",
+      "arm": "roi-18",
+      "dists": 0.15843510627746582
+    },
+    {
+      "t": 130,
+      "region": "p2",
+      "arm": "plain-18",
+      "dists": 0.16125094890594482
+    },
+    {
+      "t": 130,
+      "region": "p2",
+      "arm": "roi-18",
+      "dists": 0.15713346004486084
+    },
+    {
+      "t": 130,
+      "region": "ball",
+      "arm": "plain-18",
+      "dists": 0.13328438997268677
+    },
+    {
+      "t": 130,
+      "region": "ball",
+      "arm": "roi-18",
+      "dists": 0.11805367469787598
+    },
+    {
+      "t": 150,
+      "region": "p1",
+      "arm": "plain-18",
+      "dists": 0.16241204738616943
+    },
+    {
+      "t": 150,
+      "region": "p1",
+      "arm": "roi-18",
+      "dists": 0.15955442190170288
+    },
+    {
+      "t": 150,
+      "region": "p2",
+      "arm": "plain-18",
+      "dists": 0.14332550764083862
+    },
+    {
+      "t": 150,
+      "region": "p2",
+      "arm": "roi-18",
+      "dists": 0.15248262882232666
+    },
+    {
+      "t": 150,
+      "region": "ball",
+      "arm": "plain-18",
+      "dists": 0.17730367183685303
+    },
+    {
+      "t": 150,
+      "region": "ball",
+      "arm": "roi-18",
+      "dists": 0.17523133754730225
+    },
+    {
+      "t": 170,
+      "region": "p1",
+      "arm": "plain-18",
+      "dists": 0.16135990619659424
+    },
+    {
+      "t": 170,
+      "region": "p1",
+      "arm": "roi-18",
+      "dists": 0.1647205352783203
+    },
+    {
+      "t": 170,
+      "region": "p2",
+      "arm": "plain-18",
+      "dists": 0.1314125657081604
+    },
+    {
+      "t": 170,
+      "region": "p2",
+      "arm": "roi-18",
+      "dists": 0.1385006308555603
+    },
+    {
+      "t": 170,
+      "region": "ball",
+      "arm": "plain-18",
+      "dists": 0.14735889434814453
+    },
+    {
+      "t": 170,
+      "region": "ball",
+      "arm": "roi-18",
+      "dists": 0.1220083236694336
+    },
+    {
+      "t": 190,
+      "region": "p1",
+      "arm": "plain-18",
+      "dists": 0.13994503021240234
+    },
+    {
+      "t": 190,
+      "region": "p1",
+      "arm": "roi-18",
+      "dists": 0.1439151167869568
+    },
+    {
+      "t": 190,
+      "region": "p2",
+      "arm": "plain-18",
+      "dists": 0.15482425689697266
+    },
+    {
+      "t": 190,
+      "region": "p2",
+      "arm": "roi-18",
+      "dists": 0.14768344163894653
+    },
+    {
+      "t": 190,
+      "region": "ball",
+      "arm": "plain-18",
+      "dists": 0.1208006739616394
+    },
+    {
+      "t": 190,
+      "region": "ball",
+      "arm": "roi-18",
+      "dists": 0.10866779088973999
+    },
+    {
+      "t": 210,
+      "region": "p1",
+      "arm": "plain-18",
+      "dists": 0.13488245010375977
+    },
+    {
+      "t": 210,
+      "region": "p1",
+      "arm": "roi-18",
+      "dists": 0.14854663610458374
+    },
+    {
+      "t": 210,
+      "region": "p2",
+      "arm": "plain-18",
+      "dists": 0.174108624458313
+    },
+    {
+      "t": 210,
+      "region": "p2",
+      "arm": "roi-18",
+      "dists": 0.1768144965171814
+    },
+    {
+      "t": 210,
+      "region": "ball",
+      "arm": "plain-18",
+      "dists": 0.12972497940063477
+    },
+    {
+      "t": 210,
+      "region": "ball",
+      "arm": "roi-18",
+      "dists": 0.12527048587799072
+    },
+    {
+      "t": 230,
+      "region": "p1",
+      "arm": "plain-18",
+      "dists": 0.16487860679626465
+    },
+    {
+      "t": 230,
+      "region": "p1",
+      "arm": "roi-18",
+      "dists": 0.15874147415161133
+    },
+    {
+      "t": 230,
+      "region": "p2",
+      "arm": "plain-18",
+      "dists": 0.1581522822380066
+    },
+    {
+      "t": 230,
+      "region": "p2",
+      "arm": "roi-18",
+      "dists": 0.1650146245956421
+    },
+    {
+      "t": 230,
+      "region": "ball",
+      "arm": "plain-18",
+      "dists": 0.12175828218460083
+    },
+    {
+      "t": 230,
+      "region": "ball",
+      "arm": "roi-18",
+      "dists": 0.12630414962768555
+    }
+  ]
+}
