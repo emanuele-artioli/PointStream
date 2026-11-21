@@ -1,0 +1,1000 @@
+{
+  "predictions_sha256": "022aec64eed6faa299720463ca3cadd446a48554269166b428dcf8cdd690969b",
+  "key_sha256": "c5c79d2b01ea4e2bfc70d53bef1b050f46fe1838cd9af27cad0bcda0cc4f8040",
+  "label_sha256": "9918c87fa6a309052bbac8ef0be21429885e6579fd632754ed9aeb343c912d8a",
+  "inference": {
+    "weight": "92b3de0065766a17180d6219858717dc9d03cdce8a3ca9576c97fd75aabb64f3",
+    "frames": "4c891777b33b10ba92fd94fa1a59ba360aacf175e7bfd67c382206058d59550a",
+    "ultralytics": "8.4.6",
+    "torch": "2.10.0+cu128",
+    "setup_seconds": 5.034594683005707,
+    "scoring_seconds": 421.8824668430025
+  },
+  "means": {
+    "plain": {
+      "all": {
+        "n": 24,
+        "mean": 0.760991029429371,
+        "recall_iou50": 1.0
+      },
+      "unprompted": {
+        "n": 6,
+        "mean": 0.7564506652153375,
+        "recall_iou50": 1.0
+      },
+      "assisted": {
+        "n": 18,
+        "mean": 0.7625044841673821,
+        "recall_iou50": 1.0
+      }
+    },
+    "pointstream": {
+      "all": {
+        "n": 24,
+        "mean": 0.7799963771259734,
+        "recall_iou50": 1.0
+      },
+      "unprompted": {
+        "n": 6,
+        "mean": 0.6700528319647999,
+        "recall_iou50": 1.0
+      },
+      "assisted": {
+        "n": 18,
+        "mean": 0.8166442255130312,
+        "recall_iou50": 1.0
+      }
+    },
+    "receiver_mask": {
+      "all": {
+        "n": 24,
+        "mean": 0.7617684550529576,
+        "recall_iou50": 1.0
+      },
+      "unprompted": {
+        "n": 6,
+        "mean": 0.6431279605051813,
+        "recall_iou50": 1.0
+      },
+      "assisted": {
+        "n": 18,
+        "mean": 0.8013152865688832,
+        "recall_iou50": 1.0
+      }
+    },
+    "roi": {
+      "all": {
+        "n": 24,
+        "mean": 0.7603214326662181,
+        "recall_iou50": 1.0
+      },
+      "unprompted": {
+        "n": 6,
+        "mean": 0.7524190139965273,
+        "recall_iou50": 1.0
+      },
+      "assisted": {
+        "n": 18,
+        "mean": 0.7629555722227815,
+        "recall_iou50": 1.0
+      }
+    },
+    "source": {
+      "all": {
+        "n": 24,
+        "mean": 0.8684929288737339,
+        "recall_iou50": 1.0
+      },
+      "unprompted": {
+        "n": 6,
+        "mean": 0.7703840036100119,
+        "recall_iou50": 1.0
+      },
+      "assisted": {
+        "n": 18,
+        "mean": 0.9011959039616413,
+        "recall_iou50": 1.0
+      }
+    }
+  },
+  "extras": {
+    "source": {
+      "10": 21,
+      "30": 22,
+      "50": 22,
+      "70": 22,
+      "90": 22,
+      "110": 22,
+      "130": 21,
+      "150": 24,
+      "170": 22,
+      "190": 22,
+      "210": 24,
+      "230": 25
+    },
+    "plain": {
+      "10": 8,
+      "30": 8,
+      "50": 8,
+      "70": 10,
+      "90": 8,
+      "110": 9,
+      "130": 9,
+      "150": 11,
+      "170": 10,
+      "190": 12,
+      "210": 11,
+      "230": 10
+    },
+    "roi": {
+      "10": 8,
+      "30": 8,
+      "50": 10,
+      "70": 9,
+      "90": 9,
+      "110": 9,
+      "130": 9,
+      "150": 12,
+      "170": 12,
+      "190": 12,
+      "210": 12,
+      "230": 11
+    },
+    "pointstream": {
+      "10": 9,
+      "30": 9,
+      "50": 9,
+      "70": 9,
+      "90": 9,
+      "110": 10,
+      "130": 10,
+      "150": 10,
+      "170": 8,
+      "190": 8,
+      "210": 9,
+      "230": 10
+    }
+  },
+  "rows": [
+    {
+      "arm": "source",
+      "tick": 10,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.7888011774150389
+    },
+    {
+      "arm": "source",
+      "tick": 10,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.7834996436208126
+    },
+    {
+      "arm": "plain",
+      "tick": 10,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.793077021330949
+    },
+    {
+      "arm": "plain",
+      "tick": 10,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.8086882453151618
+    },
+    {
+      "arm": "roi",
+      "tick": 10,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.8009191293802259
+    },
+    {
+      "arm": "roi",
+      "tick": 10,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.8023668639053254
+    },
+    {
+      "arm": "pointstream",
+      "tick": 10,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.674923006356071
+    },
+    {
+      "arm": "pointstream",
+      "tick": 10,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.6660170092133239
+    },
+    {
+      "arm": "source",
+      "tick": 30,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.9208594586328185
+    },
+    {
+      "arm": "source",
+      "tick": 30,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8711329645564434
+    },
+    {
+      "arm": "plain",
+      "tick": 30,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8361530361530362
+    },
+    {
+      "arm": "plain",
+      "tick": 30,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7815187557182067
+    },
+    {
+      "arm": "roi",
+      "tick": 30,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8041079730761224
+    },
+    {
+      "arm": "roi",
+      "tick": 30,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7923162583518931
+    },
+    {
+      "arm": "pointstream",
+      "tick": 30,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.770565749235474
+    },
+    {
+      "arm": "pointstream",
+      "tick": 30,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8491436100131752
+    },
+    {
+      "arm": "source",
+      "tick": 50,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.9308316430020284
+    },
+    {
+      "arm": "source",
+      "tick": 50,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8915470494417863
+    },
+    {
+      "arm": "plain",
+      "tick": 50,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7573090602206282
+    },
+    {
+      "arm": "plain",
+      "tick": 50,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.776774865474744
+    },
+    {
+      "arm": "roi",
+      "tick": 50,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.773047454275828
+    },
+    {
+      "arm": "roi",
+      "tick": 50,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.769098712446352
+    },
+    {
+      "arm": "pointstream",
+      "tick": 50,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7751928712397584
+    },
+    {
+      "arm": "pointstream",
+      "tick": 50,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8146430012101654
+    },
+    {
+      "arm": "source",
+      "tick": 70,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8809431474443497
+    },
+    {
+      "arm": "source",
+      "tick": 70,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8700062098944318
+    },
+    {
+      "arm": "plain",
+      "tick": 70,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7228882458316108
+    },
+    {
+      "arm": "plain",
+      "tick": 70,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7516396272005523
+    },
+    {
+      "arm": "roi",
+      "tick": 70,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7033368458025993
+    },
+    {
+      "arm": "roi",
+      "tick": 70,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7546320346320347
+    },
+    {
+      "arm": "pointstream",
+      "tick": 70,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8157343471176972
+    },
+    {
+      "arm": "pointstream",
+      "tick": 70,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8444776757103183
+    },
+    {
+      "arm": "source",
+      "tick": 90,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.5983870967741935
+    },
+    {
+      "arm": "source",
+      "tick": 90,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.7708689569407742
+    },
+    {
+      "arm": "plain",
+      "tick": 90,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.5332733307082185
+    },
+    {
+      "arm": "plain",
+      "tick": 90,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.8001978239366964
+    },
+    {
+      "arm": "roi",
+      "tick": 90,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.5225956594685285
+    },
+    {
+      "arm": "roi",
+      "tick": 90,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.7978798586572439
+    },
+    {
+      "arm": "pointstream",
+      "tick": 90,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.5231352568280111
+    },
+    {
+      "arm": "pointstream",
+      "tick": 90,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.6883297313985798
+    },
+    {
+      "arm": "source",
+      "tick": 110,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.9456511692393013
+    },
+    {
+      "arm": "source",
+      "tick": 110,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8643031784841075
+    },
+    {
+      "arm": "plain",
+      "tick": 110,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7981316003249391
+    },
+    {
+      "arm": "plain",
+      "tick": 110,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.621159898096808
+    },
+    {
+      "arm": "roi",
+      "tick": 110,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7966573816155988
+    },
+    {
+      "arm": "roi",
+      "tick": 110,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.6381406803139911
+    },
+    {
+      "arm": "pointstream",
+      "tick": 110,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8429634881247784
+    },
+    {
+      "arm": "pointstream",
+      "tick": 110,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7952724358974359
+    },
+    {
+      "arm": "source",
+      "tick": 130,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.9174516608824987
+    },
+    {
+      "arm": "source",
+      "tick": 130,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.9127552848441419
+    },
+    {
+      "arm": "plain",
+      "tick": 130,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.827176284703935
+    },
+    {
+      "arm": "plain",
+      "tick": 130,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7554844606946983
+    },
+    {
+      "arm": "roi",
+      "tick": 130,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7945503297340387
+    },
+    {
+      "arm": "roi",
+      "tick": 130,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7884765930796931
+    },
+    {
+      "arm": "pointstream",
+      "tick": 130,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8538527397260274
+    },
+    {
+      "arm": "pointstream",
+      "tick": 130,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7853649701141098
+    },
+    {
+      "arm": "source",
+      "tick": 150,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.9295963418479974
+    },
+    {
+      "arm": "source",
+      "tick": 150,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8946201894015716
+    },
+    {
+      "arm": "plain",
+      "tick": 150,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8321597930737175
+    },
+    {
+      "arm": "plain",
+      "tick": 150,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7221233209257162
+    },
+    {
+      "arm": "roi",
+      "tick": 150,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8387397064088793
+    },
+    {
+      "arm": "roi",
+      "tick": 150,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.6980668414154653
+    },
+    {
+      "arm": "pointstream",
+      "tick": 150,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8344983089064262
+    },
+    {
+      "arm": "pointstream",
+      "tick": 150,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7438048780487805
+    },
+    {
+      "arm": "source",
+      "tick": 170,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.8800127054712936
+    },
+    {
+      "arm": "source",
+      "tick": 170,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.800734441437959
+    },
+    {
+      "arm": "plain",
+      "tick": 170,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.8015994183933115
+    },
+    {
+      "arm": "plain",
+      "tick": 170,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.8018681516076882
+    },
+    {
+      "arm": "roi",
+      "tick": 170,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.7773197367469444
+    },
+    {
+      "arm": "roi",
+      "tick": 170,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.8134328358208955
+    },
+    {
+      "arm": "pointstream",
+      "tick": 170,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.7542702788591403
+    },
+    {
+      "arm": "pointstream",
+      "tick": 170,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.7136417091336731
+    },
+    {
+      "arm": "source",
+      "tick": 190,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.9225411764705882
+    },
+    {
+      "arm": "source",
+      "tick": 190,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8628255074841091
+    },
+    {
+      "arm": "plain",
+      "tick": 190,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7910532276330691
+    },
+    {
+      "arm": "plain",
+      "tick": 190,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7143326758711374
+    },
+    {
+      "arm": "roi",
+      "tick": 190,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8319836255228263
+    },
+    {
+      "arm": "roi",
+      "tick": 190,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7263480787859219
+    },
+    {
+      "arm": "pointstream",
+      "tick": 190,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.787213657346921
+    },
+    {
+      "arm": "pointstream",
+      "tick": 190,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8454433497536946
+    },
+    {
+      "arm": "source",
+      "tick": 210,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.9286288378074264
+    },
+    {
+      "arm": "source",
+      "tick": 210,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8863343360550064
+    },
+    {
+      "arm": "plain",
+      "tick": 210,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7959915148855241
+    },
+    {
+      "arm": "plain",
+      "tick": 210,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7934949961508853
+    },
+    {
+      "arm": "roi",
+      "tick": 210,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7775666737034691
+    },
+    {
+      "arm": "roi",
+      "tick": 210,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7763975155279503
+    },
+    {
+      "arm": "pointstream",
+      "tick": 210,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7887334767906548
+    },
+    {
+      "arm": "pointstream",
+      "tick": 210,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.810866433422515
+    },
+    {
+      "arm": "source",
+      "tick": 230,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.9131169471238471
+    },
+    {
+      "arm": "source",
+      "tick": 230,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8783811686970886
+    },
+    {
+      "arm": "plain",
+      "tick": 230,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7542461005199307
+    },
+    {
+      "arm": "plain",
+      "tick": 230,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.6934432515337423
+    },
+    {
+      "arm": "roi",
+      "tick": 230,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7849305934412317
+    },
+    {
+      "arm": "roi",
+      "tick": 230,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.6848030018761726
+    },
+    {
+      "arm": "pointstream",
+      "tick": 230,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.9091377280753384
+    },
+    {
+      "arm": "pointstream",
+      "tick": 230,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.832687338501292
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 10,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.6515580736543909
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 10,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.639557695737471
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 30,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7624377155998466
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 30,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8416169648774022
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 50,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7815279793072992
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 50,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8105436573311368
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 70,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8024347549331636
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 70,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8320363164721142
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 90,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.5046717848003333
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 90,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.6706689536878216
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 110,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7971274685816876
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 110,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7748330550918197
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 130,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8168561756791946
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 130,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7761517615176152
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 150,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8208192467961317
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 150,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7429814155792803
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 170,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.6969180859691808
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 170,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.6953931691818904
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 190,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.772093023255814
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 190,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8522560335781741
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 210,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7462408928848241
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 210,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7934182590233546
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 230,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8854376163873371
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 230,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8148628213437027
+    }
+  ]
+}
