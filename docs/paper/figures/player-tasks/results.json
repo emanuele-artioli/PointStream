@@ -1,0 +1,337 @@
+{
+  "mask": {
+    "scope": "one opened match, 12 reviewed frames; source-mask and receiver projection IoU",
+    "inputs": {
+      "docs/experiments/receiver-replay-20261118/independent-idle-20261118/finish-full-audit.json": "4919ea0d5cd3c3b212d36f4d789808ae1435a92a1647f1b99f1c69d4688e0f02",
+      "docs/experiments/clean-base-comparison-20261118/mask-coverage.json": "6adb7740e5d279465aa057264bd73ace9010ae6de54755b964f9928dcf51cc6d",
+      "docs/experiments/foreground-references-20261118/finished-review-1621utc.json": "eae872f331138c903588b6e03199625cb98b0dd86cef46505fc98f288206fa9d"
+    },
+    "rows": [
+      {
+        "tick": 10,
+        "player": 1,
+        "proposed": false,
+        "body_pixels": 14548,
+        "projected_pixels": 10521,
+        "intersection_pixels": 9890,
+        "union_pixels": 15179,
+        "iou": 0.6515580736543909
+      },
+      {
+        "tick": 10,
+        "player": 2,
+        "proposed": false,
+        "body_pixels": 5386,
+        "projected_pixels": 3807,
+        "intersection_pixels": 3586,
+        "union_pixels": 5607,
+        "iou": 0.639557695737471
+      },
+      {
+        "tick": 30,
+        "player": 1,
+        "proposed": true,
+        "body_pixels": 12124,
+        "projected_pixels": 10867,
+        "intersection_pixels": 9946,
+        "union_pixels": 13045,
+        "iou": 0.7624377155998466
+      },
+      {
+        "tick": 30,
+        "player": 2,
+        "proposed": true,
+        "body_pixels": 4272,
+        "projected_pixels": 4065,
+        "intersection_pixels": 3810,
+        "union_pixels": 4527,
+        "iou": 0.8416169648774022
+      },
+      {
+        "tick": 50,
+        "player": 1,
+        "proposed": true,
+        "body_pixels": 13876,
+        "projected_pixels": 14363,
+        "intersection_pixels": 12388,
+        "union_pixels": 15851,
+        "iou": 0.7815279793072992
+      },
+      {
+        "tick": 50,
+        "player": 2,
+        "proposed": true,
+        "body_pixels": 4488,
+        "projected_pixels": 4304,
+        "intersection_pixels": 3936,
+        "union_pixels": 4856,
+        "iou": 0.8105436573311368
+      },
+      {
+        "tick": 70,
+        "player": 1,
+        "proposed": true,
+        "body_pixels": 12012,
+        "projected_pixels": 10641,
+        "intersection_pixels": 10085,
+        "union_pixels": 12568,
+        "iou": 0.8024347549331636
+      },
+      {
+        "tick": 70,
+        "player": 2,
+        "proposed": true,
+        "body_pixels": 4372,
+        "projected_pixels": 4103,
+        "intersection_pixels": 3849,
+        "union_pixels": 4626,
+        "iou": 0.8320363164721142
+      },
+      {
+        "tick": 90,
+        "player": 1,
+        "proposed": false,
+        "body_pixels": 16011,
+        "projected_pixels": 9272,
+        "intersection_pixels": 8480,
+        "union_pixels": 16803,
+        "iou": 0.5046717848003333
+      },
+      {
+        "tick": 90,
+        "player": 2,
+        "proposed": false,
+        "body_pixels": 6030,
+        "projected_pixels": 4684,
+        "intersection_pixels": 4301,
+        "union_pixels": 6413,
+        "iou": 0.6706689536878216
+      },
+      {
+        "tick": 110,
+        "player": 1,
+        "proposed": true,
+        "body_pixels": 10344,
+        "projected_pixels": 9676,
+        "intersection_pixels": 8880,
+        "union_pixels": 11140,
+        "iou": 0.7971274685816876
+      },
+      {
+        "tick": 110,
+        "player": 2,
+        "proposed": true,
+        "body_pixels": 4292,
+        "projected_pixels": 4213,
+        "intersection_pixels": 3713,
+        "union_pixels": 4792,
+        "iou": 0.7748330550918197
+      },
+      {
+        "tick": 130,
+        "player": 1,
+        "proposed": true,
+        "body_pixels": 11140,
+        "projected_pixels": 9792,
+        "intersection_pixels": 9411,
+        "union_pixels": 11521,
+        "iou": 0.8168561756791946
+      },
+      {
+        "tick": 130,
+        "player": 2,
+        "proposed": true,
+        "body_pixels": 5180,
+        "projected_pixels": 4651,
+        "intersection_pixels": 4296,
+        "union_pixels": 5535,
+        "iou": 0.7761517615176152
+      },
+      {
+        "tick": 150,
+        "player": 1,
+        "proposed": true,
+        "body_pixels": 11832,
+        "projected_pixels": 11327,
+        "intersection_pixels": 10440,
+        "union_pixels": 12719,
+        "iou": 0.8208192467961317
+      },
+      {
+        "tick": 150,
+        "player": 2,
+        "proposed": true,
+        "body_pixels": 4508,
+        "projected_pixels": 4308,
+        "intersection_pixels": 3758,
+        "union_pixels": 5058,
+        "iou": 0.7429814155792803
+      },
+      {
+        "tick": 170,
+        "player": 1,
+        "proposed": false,
+        "body_pixels": 11755,
+        "projected_pixels": 9168,
+        "intersection_pixels": 8593,
+        "union_pixels": 12330,
+        "iou": 0.6969180859691808
+      },
+      {
+        "tick": 170,
+        "player": 2,
+        "proposed": false,
+        "body_pixels": 4716,
+        "projected_pixels": 3822,
+        "intersection_pixels": 3502,
+        "union_pixels": 5036,
+        "iou": 0.6953931691818904
+      },
+      {
+        "tick": 190,
+        "player": 1,
+        "proposed": true,
+        "body_pixels": 9940,
+        "projected_pixels": 9872,
+        "intersection_pixels": 8632,
+        "union_pixels": 11180,
+        "iou": 0.772093023255814
+      },
+      {
+        "tick": 190,
+        "player": 2,
+        "proposed": true,
+        "body_pixels": 4520,
+        "projected_pixels": 4306,
+        "intersection_pixels": 4061,
+        "union_pixels": 4765,
+        "iou": 0.8522560335781741
+      },
+      {
+        "tick": 210,
+        "player": 1,
+        "proposed": true,
+        "body_pixels": 11864,
+        "projected_pixels": 10666,
+        "intersection_pixels": 9628,
+        "union_pixels": 12902,
+        "iou": 0.7462408928848241
+      },
+      {
+        "tick": 210,
+        "player": 2,
+        "proposed": true,
+        "body_pixels": 4300,
+        "projected_pixels": 4147,
+        "intersection_pixels": 3737,
+        "union_pixels": 4710,
+        "iou": 0.7934182590233546
+      },
+      {
+        "tick": 230,
+        "player": 1,
+        "proposed": true,
+        "body_pixels": 13056,
+        "projected_pixels": 12256,
+        "intersection_pixels": 11887,
+        "union_pixels": 13425,
+        "iou": 0.8854376163873371
+      },
+      {
+        "tick": 230,
+        "player": 2,
+        "proposed": true,
+        "body_pixels": 4368,
+        "projected_pixels": 4033,
+        "intersection_pixels": 3772,
+        "union_pixels": 4629,
+        "iou": 0.8148628213437027
+      }
+    ],
+    "means": {
+      "1": {
+        "all": {
+          "count": 12,
+          "mean_iou": 0.7531769014874338
+        },
+        "assisted": {
+          "count": 9,
+          "mean_iou": 0.7983305414916999
+        },
+        "unprompted": {
+          "count": 3,
+          "mean_iou": 0.617715981474635
+        }
+      },
+      "2": {
+        "all": {
+          "count": 12,
+          "mean_iou": 0.7703600086184818
+        },
+        "assisted": {
+          "count": 9,
+          "mean_iou": 0.8043000316460668
+        },
+        "unprompted": {
+          "count": 3,
+          "mean_iou": 0.6685399395357278
+        }
+      }
+    }
+  },
+  "pose": {
+    "scope": "K4b.3 six reported examples; no human keypoint ground truth",
+    "source": "docs/experiments/k4b.md",
+    "source_sha256": "da60705b204c2093c11989a4287bbb23163f826b051b4e8e46d6155c05bcdafa",
+    "records": [
+      {
+        "code": "q 1, previous, every frame (K4's kind)",
+        "rate": 15.0,
+        "far_oks": 0.998,
+        "near_oks": 1.0,
+        "median_px": 0.4,
+        "p95_px": 0.6
+      },
+      {
+        "code": "q 2, velocity, every frame",
+        "rate": 11.7,
+        "far_oks": 0.991,
+        "near_oks": 0.999,
+        "median_px": 0.8,
+        "p95_px": 1.2
+      },
+      {
+        "code": "q 4, velocity, every frame",
+        "rate": 9.5,
+        "far_oks": 0.963,
+        "near_oks": 0.994,
+        "median_px": 1.59,
+        "p95_px": 2.4
+      },
+      {
+        "code": "q 2, velocity, every 2nd",
+        "rate": 6.6,
+        "far_oks": 0.989,
+        "near_oks": 0.998,
+        "median_px": 0.9,
+        "p95_px": 4.39
+      },
+      {
+        "code": "q 4, velocity, every 4th",
+        "rate": 3.3,
+        "far_oks": 0.958,
+        "near_oks": 0.988,
+        "median_px": 1.79,
+        "p95_px": 8.07
+      },
+      {
+        "code": "q 8, velocity, every 4th",
+        "rate": 2.6,
+        "far_oks": 0.891,
+        "near_oks": 0.974,
+        "median_px": 3.03,
+        "p95_px": 8.56
+      }
+    ]
+  }
+}
