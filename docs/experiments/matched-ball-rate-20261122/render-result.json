@@ -1,0 +1,114 @@
+{
+  "candidate_total_bytes": 182226,
+  "baseline_total_bytes": 182055,
+  "candidate_kbps": 303.71,
+  "baseline_kbps": 303.425,
+  "rgb_psnr_12_reviewed": [
+    32.16900109583084,
+    32.0651841015371
+  ],
+  "native_luma_psnr_240": [
+    41.33168864815691,
+    40.92593618538103
+  ],
+  "order": [
+    "plain48",
+    "matched50_plus_tiles"
+  ],
+  "all_frames_rgb_sha256": "3b336c3b9a7f89f8e3dc196d8d7f27966abeb954b3e941e8880cfb8a2c9877e6",
+  "placements": 195,
+  "saved": [
+    {
+      "tick": 10,
+      "sha256": "c2f650ede10a86aa1f23461c01a8e483ec0446d284a44d50238e82c50f0a897a",
+      "ball_origin": null
+    },
+    {
+      "tick": 30,
+      "sha256": "74a90397d5e9f276fee1d6ca830413fc800070e2a96a3a98db64283fc9de784e",
+      "ball_origin": null
+    },
+    {
+      "tick": 50,
+      "sha256": "43d8a8301ba115a9f274cb901d08c1fc4b8640f7146e9032ed8fdde2ee266d9f",
+      "ball_origin": [
+        1024,
+        592
+      ]
+    },
+    {
+      "tick": 70,
+      "sha256": "a5aed10b7e933d1054c7afc95b86329add95635f1b0c68c0c7888fb3b7d8a6f5",
+      "ball_origin": [
+        1028,
+        458
+      ]
+    },
+    {
+      "tick": 90,
+      "sha256": "8a303b945f1513d46433fbc782907cb4b167039099f757a05ef43e3cdd366c3e",
+      "ball_origin": [
+        932,
+        462
+      ]
+    },
+    {
+      "tick": 110,
+      "sha256": "8f148080951fb6c8c1680fb227121ff5dd7bce95eec816afb06f03254b7add5c",
+      "ball_origin": [
+        786,
+        444
+      ]
+    },
+    {
+      "tick": 130,
+      "sha256": "250fa5dc112ecd36c2a490e51f22df6fc07f2c13d000971382f41813ce5fe615",
+      "ball_origin": [
+        766,
+        256
+      ]
+    },
+    {
+      "tick": 150,
+      "sha256": "39496ca4a67c80a12e2232087dd33404dd243133bb186af471ab581fe2a951fb",
+      "ball_origin": [
+        924,
+        480
+      ]
+    },
+    {
+      "tick": 170,
+      "sha256": "6553504ae6a5ffda2468a662966add8e39f4a76191ace53f7dc05b856cb40e0f",
+      "ball_origin": [
+        1076,
+        664
+      ]
+    },
+    {
+      "tick": 190,
+      "sha256": "79c3c73707a1f9f1c3a5394fc1d20a0885287cdb6acbc009bb6208271ebe916a",
+      "ball_origin": [
+        1168,
+        642
+      ]
+    },
+    {
+      "tick": 210,
+      "sha256": "cab0933b94be1716ad4d7b61d16140d415ccbd80279ca7a7dd60f80fef542e0a",
+      "ball_origin": [
+        1132,
+        416
+      ]
+    },
+    {
+      "tick": 230,
+      "sha256": "9c18412c13ca4ca05741a20c69b04be54a57f63d3b9ef64ba4632b66da5d0e0c",
+      "ball_origin": [
+        1132,
+        368
+      ]
+    }
+  ],
+  "scope": "one opened 240-frame development rally",
+  "source_bundle_sha256": "5c402652ea7e2b471d870fb211f263ba1f7975afaf4b9b8a55be814d25ae45eb"
+}

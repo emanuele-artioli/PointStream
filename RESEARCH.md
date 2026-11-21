@@ -1,14 +1,8 @@
 # PointStream: current research direction
 
-Updated November 17, 2026. Start here for the scientific goal and evidence;
-[PLAN](PLAN.md) gives the next decisions. Dated experiment records retain their
-original protocols, failures and permissions. A closed allocation or failed
-fixed recipe does not close every version of the research question.
+Updated November 22, 2026. The [experiment priority list](PLAN.md#november-22-experiment-priorities) links the current protocols, independent measurements and remaining decisions. Each paper claim should name its object, metric, source, operating rate and reference reuse. Record whether that rate came from a complete packet or an amortization model.
 
-While campus access is unavailable, prioritize manuscript integration and
-analysis of saved results under the [outage writing plan](docs/paper/outage-writing-plan-2026-11-17.md).
-The latest V4 source/PDF are local. This changes the work order, preserves the
-stronger player-and-ball hypothesis and releases no cloud spending or new runs.
+The old 19.24 kbps player comparison, the low-rate rendered-ball detection result, the matched-rate tracked-pixel experiment and the complete cold-start joint playback answer different questions. The first experiment to settle the combined claim uses the historical 25-fps source at starved rates. The November 19 cold-start comparison motivates changing the background and component costs; it does not resolve that low-rate experiment. [Starved-rate study](docs/experiments/starved-joint-20261122/README.md) · [Ball fidelity and detection](docs/experiments/matched-ball-rate-20261122/README.md)
 
 ## Main hypothesis
 
@@ -37,7 +31,7 @@ testing the tennis hypothesis.
 | Tracked ball pixels | Three-source confirmation: equal-source crop-DISTS BD-rate−26.28%; complete ball packets and fresh sender/control evidence. | Full-DISTS+17.39% and full-LPIPS+24.64% costs; sparse visible point crops, encoder overlap and three-source uncertainty. Not racket or whole-foreground evidence. |
 | Rackets | Optional extension after the player-and-ball result; existing5-landmark labels can guide an explicit equipment test. | Racket improvement is unestablished, not a gate for the narrower primary claim. Prior source-mask proxy is not annotated racket recall; baseline weakness does not establish harmless omission. |
 | Static additive256px patch | Actual two-domain screen loses weighted DISTS17.10%/18.47%, even with free placement. Conventional ROI saves8.53%/5.39% on the development sources. | Stops that fixed design; not a rejection of generative players or all patch designs. One source/domain cannot establish population inference. |
-| Complete decoder | Native/tracked-pixel endpoints and208-frame source-denied filesystem reconstruction pass. | That proof does not cover learned-player generation. Fresh source-independent generative reconstruction and a combined packet remain unfinished. |
+| Complete decoder | Native/tracked-pixel endpoints and208-frame source-denied filesystem reconstruction pass. | A subsequent source-denied two-player receiver replay reconstructed 240 frames and an independent composition matched every pixel. The cleaned joint score uses those audited generated layers. [Receiver replay](docs/experiments/receiver-replay-20261118/retry-1600utc/README.md) |
 | Temporal quality | Full-rate player pose has a positive diagnostic; source of excess flicker was traced to generated pixels. | Tested full-rate generation and two smoothing profiles fail the historical temporal rule. A slowed/sampled website preview cannot resolve this. |
 
 Primary sources: [player native-IVF correction](docs/experiments/w7-anchor-rate-repair.md),
@@ -46,6 +40,8 @@ Primary sources: [player native-IVF correction](docs/experiments/w7-anchor-rate-
 [ball confirmation](docs/experiments/submission-ladder-ball-confirmation-analysis-20261115.json),
 [model history](docs/experiments/submission-player-model-history-audit-20261115.md),
 [combined gaps](docs/experiments/submission-combined-foreground-gap-audit-20261115.md).
+
+The modeled player finding has more support than a single illustration. In the three Alcaraz–Hurkacz windows, at 18.65–19.24 kbps with two-hour asset reuse, the player DISTS advantages over the strongest available interpolated anchor were 0.061, 0.085 and 0.075 (Al028, Al034 and Al043). These are three windows from one familiar match. On Al028, assigning the same reference bank and adapter to only 30 minutes increased the modeled rate to 27.31 kbps. DCVC then reached 0.2752 player DISTS against the same PointStream pictures at 0.2420. This quantifies the reliance on reuse without asserting that the references stayed usable for that duration. [Corrected two-hour comparisons](docs/experiments/w9-inputs/w7-repaired-2h.json) · [30-minute DCVC sensitivity](docs/experiments/w9-inputs/w7-tier1-all-assets-1800s.json)
 
 ## Model and adaptation choices
 
