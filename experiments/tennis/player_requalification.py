@@ -251,7 +251,8 @@ def run(args: argparse.Namespace) -> None:
     require_profile(config, args.profile)
     plan, arrays = make_plan(config, args.config_sha256, args.max_units, frames if config["schema"] == 2 else None)
     fit, base = profile_inputs(config, args.profile)
-    memory = int(os.environ.get("PS_GPU_MEMORY_LIMIT_MIB", "0"))
+    exclusive_limit = "18000" if os.environ.get("PS_CLAIMED_GPU_UUID") and "PS_GPU_SHARING" not in os.environ else "0"
+    memory = int(os.environ.get("PS_GPU_MEMORY_LIMIT_MIB", exclusive_limit))
     if memory <= 0:
         raise ValueError("positive PS_GPU_MEMORY_LIMIT_MIB required")
     stage = Path(os.environ["PS_STAGE_DIR"])
