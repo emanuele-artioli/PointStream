@@ -71,7 +71,7 @@ def run(args):
     work.mkdir()
     started = time.monotonic()
     raw = work / "input.yuv"
-    conversion = [tools["ffmpeg"]["path"], "-v", "error", "-nostdin", "-ss", f"{START / FPS - 0.000001:.6f}",
+    conversion = [tools["ffmpeg"]["path"], "-v", "error", "-nostdin", "-ss", f"{(START + 1) / FPS:.6f}",
                   "-i", str(args.source), "-frames:v", str(args.frames),
                   "-vf", f"scale={WIDTH}:{HEIGHT}:flags=area:out_range=tv,format=yuv420p",
                   "-filter_threads", "1", "-fps_mode", "passthrough", "-threads", "1",
@@ -85,7 +85,7 @@ def run(args):
         def boundary(source, target, count, seek=None, select=None):
             command = [tools["ffmpeg"]["path"], "-v", "error", "-nostdin"]
             if seek is not None:
-                command += ["-ss", f"{seek / FPS - 0.000001:.6f}"]
+                command += ["-ss", f"{(seek + 1) / FPS:.6f}"]
             command += ["-i", str(source)]
             prefix = f"select=eq(n\\,{select})," if select is not None else ""
             command += ["-vf", prefix + f"scale={WIDTH}:{HEIGHT}:flags=area:out_range=tv,format=yuv420p",
