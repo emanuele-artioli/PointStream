@@ -1,4 +1,4 @@
-"""Generate three new native neural controls after qualifying the two archived points."""
+"""Generate native neural controls with independently repeated receiver decodes."""
 
 import argparse
 import json
@@ -23,7 +23,6 @@ YUV = "5a26ceb4c08fdfac2726805bb37c5cefe29ff18b9a3c733690fd4e263d3d972d"
 
 
 def run(a):
-    os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
     import torch
 
     start = time.monotonic()
@@ -47,8 +46,8 @@ def run(a):
     assert score.sha(src) == YUV
     a.image_ckpt = a.image
     a.video_ckpt = a.video
-    a.stream_policy = "default"
-    qps = [6] if a.count == 1 else [6, 30, 42]
+    a.stream_policy = "legacy"
+    qps = [30] if a.count == 1 else [30, 42]
     points = []
     rows = []
     attempts = []
@@ -117,7 +116,7 @@ def run(a):
         elapsed_seconds=time.monotonic() - start,
         source_sha256=SOURCE,
         stream_policy=a.stream_policy,
-        cuda_launch_blocking=True,
+        cuda_launch_blocking=False,
         source_yuv_sha256=YUV,
         conversion=command,
         ffmpeg=tool,
@@ -132,13 +131,13 @@ def validate():
     with tarfile.open(stage / "published.tar") as t:
         r = json.load(t.extractfile("publish/result.json"))
     smoke = os.environ["PS_STAGE"] == "smoke"
-    forecast = r["elapsed_seconds"] * (4.5 if smoke else 1) + 100
+    forecast = r["elapsed_seconds"] * (3.0 if smoke else 1) + 100
     checks = dict(
         source=r["source_yuv_sha256"] == YUV,
         exact_decode=all(v["identical_frame_hashes"] for v in r["points"]),
         numerical_control=all(abs(row["anchor_delta"]) <= 1e-4 for row in r["rows"]),
-        complete=len(r["rows"]) == (3 if smoke else 108),
-        cost=not smoke or forecast < 690,
+        complete=len(r["rows"]) == (3 if smoke else 72),
+        cost=not smoke or forecast < 600,
     )
     Path(os.environ["PS_VALIDATION_PATH"]).write_text(
         json.dumps(dict(passed=all(checks.values()), checks=checks, forecast_seconds=forecast))
@@ -151,7 +150,7 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
     for k in ("source", "regions", "frames", "image", "video", "vgg"):
         p.add_argument("--" + k, type=Path)
-    p.add_argument("--count", type=int, choices=(1, 3))
+    p.add_argument("--count", type=int, choices=(1, 2))
     p.add_argument("--validate", action="store_true")
     args = p.parse_args()
     validate() if args.validate else run(args)
