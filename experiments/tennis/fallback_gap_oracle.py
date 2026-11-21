@@ -152,6 +152,7 @@ def validate():
     checks["stream"] = hashlib.sha256(data).hexdigest() == report["stream_sha256"] and len(data) == report["bytes"]
     checks["ivf"] = len(svtav1.ivf_frames(data)) == frames
     if smoke:
+        Path(os.environ["PS_SCRATCH_DIR"]).mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(prefix="gap-validator-", dir=os.environ["PS_SCRATCH_DIR"]) as temp:
             path = Path(temp) / "stream.ivf"
             decoded = Path(temp) / "decoded.yuv"
