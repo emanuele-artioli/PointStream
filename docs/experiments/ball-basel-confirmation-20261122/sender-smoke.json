@@ -1,0 +1,18 @@
+{
+  "job_id": "20261121T232103Z-6c913321",
+  "validation_stdout": {
+    "passed": true,
+    "checks": {
+      "source": true,
+      "coder": true,
+      "sender": true,
+      "allocation": true,
+      "length": true,
+      "fits": true
+    },
+    "forecast_seconds": 764.8237508480088
+  },
+  "seconds": 114.13729180800146,
+  "native_codec": "6a9560a8053bc72ffede2d694dcfb0bebe1716e19b7312461dd3cc36e085a8d1",
+  "rgb": "829a9ed06882dcdfc78d21f672ad53df82a47ac95531b245b287292725672f8c"
+}

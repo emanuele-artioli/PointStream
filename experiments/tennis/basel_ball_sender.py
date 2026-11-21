@@ -1,4 +1,5 @@
 """Run the frozen SVT62 ball-placement sender on an outcome-unopened match."""
+
 import argparse
 import hashlib
 import json
@@ -29,7 +30,12 @@ def source_frames(path, n):
         raise ValueError("Wrong original video")
     cap = cv2.VideoCapture(str(path), cv2.CAP_FFMPEG)
     try:
-        props = [cv2.CAP_PROP_FRAME_WIDTH, cv2.CAP_PROP_FRAME_HEIGHT, cv2.CAP_PROP_FPS, cv2.CAP_PROP_FRAME_COUNT]
+        props = [
+            cv2.CAP_PROP_FRAME_WIDTH,
+            cv2.CAP_PROP_FRAME_HEIGHT,
+            cv2.CAP_PROP_FPS,
+            cv2.CAP_PROP_FRAME_COUNT,
+        ]
         if [cap.get(k) for k in props] != [1920, 1080, 25, 250]:
             raise ValueError("Unexpected original stream geometry or cadence")
         frames = np.empty((n, 720, 1280, 3), np.uint8)
@@ -37,7 +43,9 @@ def source_frames(path, n):
             ok, frame = cap.read()
             if not ok:
                 raise ValueError("Source ended early")
-            frames[i] = cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), SIZE, interpolation=cv2.INTER_AREA)
+            frames[i] = cv2.resize(
+                cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), SIZE, interpolation=cv2.INTER_AREA
+            )
         return frames
     finally:
         cap.release()
@@ -46,7 +54,11 @@ def source_frames(path, n):
 def run(a):
     start = time.monotonic()
     cpus = os.sched_getaffinity(0)
-    if len(cpus) != 1 or prior.sha(a.archive) != fresh_ball_sender.MODEL_CODE or prior.sha(a.weights) != fresh_ball_sender.MODEL_WEIGHT:
+    if (
+        len(cpus) != 1
+        or prior.sha(a.archive) != fresh_ball_sender.MODEL_CODE
+        or prior.sha(a.weights) != fresh_ball_sender.MODEL_WEIGHT
+    ):
         raise ValueError("CPU allocation or tracker inputs differ")
     work = Path(os.environ["PS_SCRATCH_DIR"]) / "basel-sender"
     work.mkdir()
@@ -68,27 +80,55 @@ def run(a):
     convert = k5d_encoder.convert_rgb(tools["ffmpeg"]["path"], source, work / "source.yuv", FPS)
     native = work / "native"
     native.mkdir()
-    rec = svtav1.code(work / "source.yuv", native, width=1280, height=720, fps=FPS, frames=a.frames,
-                      crf=62, preset=4, threads=1, full_range=False,
-                      encoder=tools["SvtAv1EncApp"]["path"], decoder=tools["dav1d"]["path"], timeout=300)
+    rec = svtav1.code(
+        work / "source.yuv",
+        native,
+        width=1280,
+        height=720,
+        fps=FPS,
+        frames=a.frames,
+        crf=62,
+        preset=4,
+        threads=1,
+        full_range=False,
+        encoder=tools["SvtAv1EncApp"]["path"],
+        decoder=tools["dav1d"]["path"],
+        timeout=300,
+    )
     decoded = windows.rgb_frames(Path(rec["decoded"]), 1280, 720, a.frames, work / "base.npy")
     pred = tracker.run(source)
     if a.frames == 16 and pred != tracker.run(source):
         raise ValueError("Repeated smoke tracker changed")
     initial = k5b1b.track_of(pred, (720, 1280))
-    fit, = k5c_independent_ball.fit_streak(initial, source, [decoded], (720, 1280))
+    (fit,) = k5c_independent_ball.fit_streak(initial, source, [decoded], (720, 1280))
     positions, appearance = fit["track"], fit["appearances"]
-    guard = k5d_encoder.pooled_psnr(source, k5c_independent_ball.render_frames(decoded, positions, appearance)) < k5d_encoder.pooled_psnr(source, decoded)
+    guard = k5d_encoder.pooled_psnr(
+        source, k5c_independent_ball.render_frames(decoded, positions, appearance)
+    ) < k5d_encoder.pooled_psnr(source, decoded)
     if guard:
         positions, appearance = [None] * a.frames, [None] * a.frames
     payload = ball.encode_frames(positions, appearance, 1280, 720)
     if ball.decode_frames(payload, a.frames, 1280, 720) != (positions, appearance):
         raise ValueError("Sender quantization did not round trip")
-    result = dict(positions=positions, source_sha256=SOURCE, native=rec, tools=tools, convert=convert,
-                  native_sha256=prior.sha(Path(rec["stream"])), model=tracker.meta, code=fresh_ball_sender.MODEL_CODE,
-                  weight=fresh_ball_sender.MODEL_WEIGHT, guard=guard, rgb_sha256=hashlib.sha256(source).hexdigest(),
-                  frames=a.frames, cpus=sorted(cpus), seconds=time.monotonic()-start)
-    (Path(os.environ["PS_STAGE_DIR"]) / "sender.json").write_text(json.dumps(result, indent=2)+"\n")
+    result = dict(
+        positions=positions,
+        source_sha256=SOURCE,
+        native=rec,
+        tools=tools,
+        convert=convert,
+        native_sha256=prior.sha(Path(rec["stream"])),
+        model=tracker.meta,
+        code=fresh_ball_sender.MODEL_CODE,
+        weight=fresh_ball_sender.MODEL_WEIGHT,
+        guard=guard,
+        rgb_sha256=hashlib.sha256(source).hexdigest(),
+        frames=a.frames,
+        cpus=sorted(cpus),
+        seconds=time.monotonic() - start,
+    )
+    (Path(os.environ["PS_STAGE_DIR"]) / "sender.json").write_text(
+        json.dumps(result, indent=2) + "\n"
+    )
 
 
 def validate():
@@ -96,12 +136,20 @@ def validate():
     r = json.loads((stage / "sender.json").read_text())
     n = 16 if os.environ["PS_STAGE"] == "smoke" else 64
     prior.checked_track(r["positions"], n)
-    checks = dict(source=r["source_sha256"] == SOURCE, coder=r["native"]["decoded_frames"] == n,
-                  sender=r["weight"] == fresh_ball_sender.MODEL_WEIGHT and r["code"] == fresh_ball_sender.MODEL_CODE,
-                  allocation=len(r["cpus"]) == 1, length=r["frames"] == len(r["positions"]) == n)
+    checks = dict(
+        source=r["source_sha256"] == SOURCE,
+        coder=r["native"]["decoded_frames"] == n,
+        sender=r["weight"] == fresh_ball_sender.MODEL_WEIGHT
+        and r["code"] == fresh_ball_sender.MODEL_CODE,
+        allocation=len(r["cpus"]) == 1,
+        length=r["frames"] == len(r["positions"]) == n,
+    )
     forecast = 1.5 * r["seconds"] * 64 / n + 80
-    checks["fits"] = n != 16 or forecast <= 1550
-    print(json.dumps(dict(passed=all(checks.values()), checks=checks, forecast_seconds=forecast)))
+    checks["fits"] = n != 16 or forecast <= 1400
+    Path(os.environ["PS_VALIDATION_PATH"]).write_text(
+        json.dumps(dict(passed=all(checks.values()), checks=checks, forecast_seconds=forecast))
+        + "\n"
+    )
     if not all(checks.values()):
         raise SystemExit(1)
 
@@ -109,7 +157,7 @@ def validate():
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
     for field in ("source", "archive", "weights"):
-        p.add_argument("--"+field, type=Path)
+        p.add_argument("--" + field, type=Path)
     p.add_argument("--frames", type=int, choices=(16, 64))
     p.add_argument("--validate", action="store_true")
     args = p.parse_args()
