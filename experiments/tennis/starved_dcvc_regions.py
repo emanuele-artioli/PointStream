@@ -83,6 +83,34 @@ def image(blob,gray=False):
     return a if gray else a[:,:,::-1].copy()
 
 
+def measure(net, native, meta, qp, ticks, records, regions, frames):
+    import torch
+    rows=[]
+    def score(rgb,source,mask):
+        def tensor(im):
+            return torch.from_numpy(np.ascontiguousarray(im)).permute(2,0,1)[None].to('cuda').float()/255
+        return float(quality.masked_dists(net,tensor(rgb),tensor(source),torch.from_numpy(mask>0)[None,None].to('cuda')).item())
+    squared=[]
+    for tick in ticks:
+        canvas=cv2.resize(yuv_to_rgb(native[tick],960,544,False),(1920,1080),interpolation=cv2.INTER_CUBIC)
+        source=image(frames.read(SOURCES[tick]+'.png'))
+        squared.append(float(np.mean((source.astype(np.float32)-canvas)**2,dtype=np.float64)))
+        for r in (r for r in records if r['t']==tick):
+            prefix=f'{tick:03d}/{r["region"]}/'
+            ref=image(regions.read(prefix+'source.png'))
+            mask=image(regions.read(prefix+'mask.png'),True)
+            x,y,right,bot=r['rect']
+            assert np.array_equal(ref,source[y:bot,x:right])
+            av1=score(image(regions.read(prefix+'plain_match.png')),ref,mask)
+            assert abs(av1-r['av1_dists'])<=1e-4
+            value=score(canvas[y:bot,x:right],ref,mask)
+            assert np.isfinite(value)
+            rows.append(dict(t=tick,region=r['region'],qp=qp,dists=value,anchor_delta=av1-r['av1_dists']))
+    meta['whole_rgb_psnr']=float(10*np.log10(255**2/np.mean(squared)))
+    meta['mean']={region:float(np.mean([r['dists'] for r in rows if r['qp']==qp and r['region']==region])) for region in ('p1','p2','ball')}
+    return rows
+
+
 def run(a):
     import torch
     start=time.monotonic()
@@ -95,10 +123,6 @@ def run(a):
     scratch=Path(os.environ['PS_SCRATCH_DIR'])
     publish=scratch/'publish'
     publish.mkdir()
-    def score(rgb,source,mask):
-        def tensor(im):
-            return torch.from_numpy(np.ascontiguousarray(im)).permute(2,0,1)[None].to('cuda').float()/255
-        return float(quality.masked_dists(net,tensor(rgb),tensor(source),torch.from_numpy(mask>0)[None,None].to('cuda')).item())
     rows=[]
     summary=[]
     attempts=[]
@@ -120,24 +144,7 @@ def run(a):
                 break
             else:
                 continue
-            squared=[]
-            for tick in ticks:
-                canvas=cv2.resize(yuv_to_rgb(native[tick],960,544,False),(1920,1080),interpolation=cv2.INTER_CUBIC)
-                source=image(frames.read(SOURCES[tick]+'.png'))
-                squared.append(float(np.mean((source.astype(np.float32)-canvas)**2,dtype=np.float64)))
-                for r in (r for r in records if r['t']==tick):
-                    prefix=f'{tick:03d}/{r["region"]}/'
-                    ref=image(regions.read(prefix+'source.png'))
-                    mask=image(regions.read(prefix+'mask.png'),True)
-                    x,y,right,bot=r['rect']
-                    assert np.array_equal(ref,source[y:bot,x:right])
-                    av1=score(image(regions.read(prefix+'plain_match.png')),ref,mask)
-                    assert abs(av1-r['av1_dists'])<=1e-4
-                    value=score(canvas[y:bot,x:right],ref,mask)
-                    assert np.isfinite(value)
-                    rows.append(dict(t=tick,region=r['region'],qp=qp,dists=value,anchor_delta=av1-r['av1_dists']))
-            meta['whole_rgb_psnr']=float(10*np.log10(255**2/np.mean(squared)))
-            meta['mean']={region:float(np.mean([r['dists'] for r in rows if r['qp']==qp and r['region']==region])) for region in ('p1','p2','ball')}
+            rows.extend(measure(net,native,meta,qp,ticks,records,regions,frames))
             summary.append(meta)
     result=dict(rows=rows,points=summary,ticks=ticks,attempts=attempts,elapsed_seconds=time.monotonic()-start,
                 raw_input_sha256=ARCHIVE,metric=quality.dists_record(a.vgg),gpu=torch.cuda.get_device_name(0))
