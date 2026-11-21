@@ -1,0 +1,413 @@
+{
+  "source_sha256": "676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66",
+  "fps": 50,
+  "provenance": {
+    "whole-motion-spans.json": "8ff92a71c08de43c57535c120fa4521ef99d5aba7bdbf7f91fe8c8e5b0c6e131",
+    "k8-shot-bounds.json": "868447a85968913d8716317b14c13b2ae840f2977953bbd9f0da126c5382f9f3",
+    "k8-marks-fb6cfe8a81f9a440.json": "eeba025bc68e3489f5eadfcad885b32418c4b0391e3f3f66a49e6d39c17cb4a2"
+  },
+  "motion_revision": "9cf3012458888d4118c8becc03098f8e1e62ac99",
+  "phases": {
+    "first": {
+      "frames": 240,
+      "motion": {
+        "point": 240
+      },
+      "human_court_class": {
+        "unreviewed": 240
+      },
+      "overlap": {
+        "point / unreviewed": 240
+      }
+    },
+    "gap": {
+      "frames": 10825,
+      "motion": {
+        "point": 3392,
+        "interlude": 4409,
+        "other": 3024
+      },
+      "human_court_class": {
+        "unreviewed": 7607,
+        "court": 2640,
+        "crowd": 578
+      },
+      "overlap": {
+        "point / unreviewed": 1460,
+        "interlude / unreviewed": 4275,
+        "other / unreviewed": 1872,
+        "point / court": 1488,
+        "point / crowd": 444,
+        "interlude / crowd": 134,
+        "other / court": 1152
+      }
+    },
+    "return": {
+      "frames": 240,
+      "motion": {
+        "point": 240
+      },
+      "human_court_class": {
+        "unreviewed": 240
+      },
+      "overlap": {
+        "point / unreviewed": 240
+      }
+    }
+  },
+  "motion": [
+    {
+      "start": 76626,
+      "end": 77318,
+      "route": "point"
+    },
+    {
+      "start": 77318,
+      "end": 77486,
+      "route": "interlude"
+    },
+    {
+      "start": 77486,
+      "end": 77582,
+      "route": "interlude"
+    },
+    {
+      "start": 77582,
+      "end": 77696,
+      "route": "interlude"
+    },
+    {
+      "start": 77696,
+      "end": 77900,
+      "route": "interlude"
+    },
+    {
+      "start": 77900,
+      "end": 78569,
+      "route": "other"
+    },
+    {
+      "start": 78569,
+      "end": 78823,
+      "route": "interlude"
+    },
+    {
+      "start": 78823,
+      "end": 79761,
+      "route": "point"
+    },
+    {
+      "start": 79761,
+      "end": 79915,
+      "route": "interlude"
+    },
+    {
+      "start": 79915,
+      "end": 80442,
+      "route": "interlude"
+    },
+    {
+      "start": 80442,
+      "end": 80581,
+      "route": "interlude"
+    },
+    {
+      "start": 80581,
+      "end": 80921,
+      "route": "interlude"
+    },
+    {
+      "start": 80921,
+      "end": 81471,
+      "route": "point"
+    },
+    {
+      "start": 81471,
+      "end": 81848,
+      "route": "other"
+    },
+    {
+      "start": 81848,
+      "end": 82292,
+      "route": "point"
+    },
+    {
+      "start": 82292,
+      "end": 82453,
+      "route": "interlude"
+    },
+    {
+      "start": 82453,
+      "end": 82503,
+      "route": "interlude"
+    },
+    {
+      "start": 82503,
+      "end": 82663,
+      "route": "interlude"
+    },
+    {
+      "start": 82663,
+      "end": 83181,
+      "route": "other"
+    },
+    {
+      "start": 83181,
+      "end": 83479,
+      "route": "interlude"
+    },
+    {
+      "start": 83479,
+      "end": 84043,
+      "route": "point"
+    },
+    {
+      "start": 84043,
+      "end": 84351,
+      "route": "other"
+    },
+    {
+      "start": 84351,
+      "end": 84485,
+      "route": "interlude"
+    },
+    {
+      "start": 84485,
+      "end": 84753,
+      "route": "interlude"
+    },
+    {
+      "start": 84753,
+      "end": 85657,
+      "route": "interlude"
+    },
+    {
+      "start": 85657,
+      "end": 86809,
+      "route": "other"
+    },
+    {
+      "start": 86809,
+      "end": 86931,
+      "route": "interlude"
+    },
+    {
+      "start": 86931,
+      "end": 87023,
+      "route": "interlude"
+    },
+    {
+      "start": 87023,
+      "end": 87097,
+      "route": "interlude"
+    },
+    {
+      "start": 87097,
+      "end": 87541,
+      "route": "point"
+    },
+    {
+      "start": 87541,
+      "end": 87600,
+      "route": "interlude"
+    },
+    {
+      "start": 87600,
+      "end": 87691,
+      "route": "interlude"
+    },
+    {
+      "start": 87691,
+      "end": 87931,
+      "route": "point"
+    }
+  ],
+  "human": [
+    {
+      "start": 76626,
+      "end": 77318,
+      "id": "shot-0236",
+      "label": "unreviewed"
+    },
+    {
+      "start": 77318,
+      "end": 77486,
+      "id": "shot-0237",
+      "label": "unreviewed"
+    },
+    {
+      "start": 77486,
+      "end": 77582,
+      "id": "shot-0238",
+      "label": "unreviewed"
+    },
+    {
+      "start": 77582,
+      "end": 77696,
+      "id": "shot-0239",
+      "label": "unreviewed"
+    },
+    {
+      "start": 77696,
+      "end": 77900,
+      "id": "shot-0240",
+      "label": "unreviewed"
+    },
+    {
+      "start": 77900,
+      "end": 78569,
+      "id": "shot-0241",
+      "label": "unreviewed"
+    },
+    {
+      "start": 78569,
+      "end": 78823,
+      "id": "shot-0242",
+      "label": "unreviewed"
+    },
+    {
+      "start": 78823,
+      "end": 79761,
+      "id": "shot-0243",
+      "label": "court"
+    },
+    {
+      "start": 79761,
+      "end": 79915,
+      "id": "shot-0244",
+      "label": "unreviewed"
+    },
+    {
+      "start": 79915,
+      "end": 80581,
+      "id": "shot-0245",
+      "label": "unreviewed"
+    },
+    {
+      "start": 80581,
+      "end": 80921,
+      "id": "shot-0246",
+      "label": "unreviewed"
+    },
+    {
+      "start": 80921,
+      "end": 81471,
+      "id": "shot-0247",
+      "label": "court"
+    },
+    {
+      "start": 81471,
+      "end": 81848,
+      "id": "shot-0248",
+      "label": "unreviewed"
+    },
+    {
+      "start": 81848,
+      "end": 82292,
+      "id": "shot-0249",
+      "label": "crowd"
+    },
+    {
+      "start": 82292,
+      "end": 82503,
+      "id": "shot-0250",
+      "label": "unreviewed"
+    },
+    {
+      "start": 82503,
+      "end": 82663,
+      "id": "shot-0251",
+      "label": "unreviewed"
+    },
+    {
+      "start": 82663,
+      "end": 83181,
+      "id": "shot-0252",
+      "label": "unreviewed"
+    },
+    {
+      "start": 83181,
+      "end": 83479,
+      "id": "shot-0253",
+      "label": "unreviewed"
+    },
+    {
+      "start": 83479,
+      "end": 84043,
+      "id": "shot-0254",
+      "label": "unreviewed"
+    },
+    {
+      "start": 84043,
+      "end": 84351,
+      "id": "shot-0255",
+      "label": "unreviewed"
+    },
+    {
+      "start": 84351,
+      "end": 84485,
+      "id": "shot-0256",
+      "label": "crowd"
+    },
+    {
+      "start": 84485,
+      "end": 84753,
+      "id": "shot-0257",
+      "label": "unreviewed"
+    },
+    {
+      "start": 84753,
+      "end": 85657,
+      "id": "shot-0258",
+      "label": "unreviewed"
+    },
+    {
+      "start": 85657,
+      "end": 86809,
+      "id": "shot-0259",
+      "label": "court"
+    },
+    {
+      "start": 86809,
+      "end": 86931,
+      "id": "shot-0260",
+      "label": "unreviewed"
+    },
+    {
+      "start": 86931,
+      "end": 87023,
+      "id": "shot-0261",
+      "label": "unreviewed"
+    },
+    {
+      "start": 87023,
+      "end": 87097,
+      "id": "shot-0262",
+      "label": "unreviewed"
+    },
+    {
+      "start": 87097,
+      "end": 87541,
+      "id": "shot-0263",
+      "label": "unreviewed"
+    },
+    {
+      "start": 87541,
+      "end": 87600,
+      "id": "shot-0264",
+      "label": "unreviewed"
+    },
+    {
+      "start": 87600,
+      "end": 87691,
+      "id": "shot-0265",
+      "label": "unreviewed"
+    },
+    {
+      "start": 87691,
+      "end": 87931,
+      "id": "shot-0266",
+      "label": "unreviewed"
+    }
+  ]
+}
