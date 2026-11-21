@@ -11,9 +11,12 @@ from fractions import Fraction
 
 import numpy as np
 
+from experiments.tennis.ball_starved_scaled import (
+    copy_member as copy_member,
+    score_frame as score_frame,
+)
 from experiments.tennis import ball_confirmation as prior
 from experiments.tennis import ball_confirmation_score as scorer
-from experiments.tennis.k5d_encoder import crop64
 from experiments.visor.h3b import dists_crops
 from src.codecs import quality, svtav1
 from src.pointstream import tracked_patch
@@ -25,29 +28,6 @@ VGG = "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
 FPS = Fraction(25)
 W, H = 1280, 720
 FRAME_BYTES = W * H * 3 // 2
-
-
-def copy_member(archive, name, output):
-    with tarfile.open(archive) as tar:
-        member = tar.extractfile(name)
-        if member is None:
-            raise ValueError(f"Missing archive member {name}")
-        with output.open("xb") as stream:
-            shutil.copyfileobj(member, stream)
-
-
-def score_frame(net, source, decoded, labels):
-    values = []
-    for index, (visible, x, y) in enumerate(labels):
-        if visible != 1:
-            continue
-        target = crop64(source[index], x, y)
-        candidate = crop64(decoded[index], x, y)
-        value = dists_crops(net, [candidate], target, np.ones((64, 64), bool), "cpu")[0]
-        if not np.isfinite(value) or value < 0:
-            raise ValueError("Non-finite ball crop DISTS")
-        values.append({"tick": index, "dists": float(value)})
-    return values
 
 
 def run(args):

@@ -14,13 +14,19 @@ from fractions import Fraction
 import numpy as np
 import cv2
 
+from experiments.tennis.ball_starved_scaled import (
+    copy_member as copy_member,
+    pack_scaled as pack_scaled,
+    unpack_scaled as unpack_scaled,
+    render_scaled as render_scaled,
+    scaled_roi as scaled_roi,
+    score_frame as score_frame,
+)
 from experiments.tennis import ball_confirmation as prior
 from experiments.tennis import ball_confirmation_score as scorer
-from experiments.tennis.k5d_encoder import crop64
-from experiments.tennis import w1_roi
 from experiments.visor.h3b import dists_crops
 from src.codecs import quality, svtav1
-from src.pointstream import tracked_patch, codec
+from src.pointstream import tracked_patch
 
 SOURCE = "match209_000"
 ARCHIVE = "e9875c1aa522d86d2f0a96df11cec89429800d437964ab5d58d4f0a9de3173a9"
@@ -31,102 +37,6 @@ W, H = 1280, 720
 FRAME_BYTES = W * H * 3 // 2
 LOW_W, LOW_H = 320, 180
 HEADER = struct.Struct(">4sIII")
-
-
-def copy_member(archive, name, output):
-    with tarfile.open(archive) as tar:
-        member = tar.extractfile(name)
-        if member is None:
-            raise ValueError(f"Missing archive member {name}")
-        with output.open("xb") as stream:
-            shutil.copyfileobj(member, stream)
-
-
-def pack_scaled(meta, base, tile):
-    if set(meta) != {"native", "canvas", "positions"}:
-        raise ValueError("unsupported scaled metadata")
-    native = meta["native"]
-    codec.check_native(native, base)
-    codec.check_native({**native, "width": 64, "height": 64}, tile)
-    if native["width"] != LOW_W or native["height"] != LOW_H or meta["canvas"] != [W, H]:
-        raise ValueError("invalid scaling geometry")
-    positions = meta["positions"]
-    if len(positions) != native["frames"]:
-        raise ValueError("invalid positions")
-    for pos in positions:
-        if pos is not None and (len(pos) != 2 or any(type(v) is not int for v in pos)
-                                or pos[0] < 0 or pos[1] < 0 or pos[0] % 2 or pos[1] % 2
-                                or pos[0] + 32 > W or pos[1] + 32 > H):
-            raise ValueError("invalid patch position")
-    meta_bytes = json.dumps(meta, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
-    body = HEADER.pack(b"PTP2", len(meta_bytes), len(base), len(tile)) + meta_bytes + base + tile
-    return body + hashlib.sha256(body).digest()
-
-
-def unpack_scaled(packet):
-    if len(packet) < HEADER.size + 32 or hashlib.sha256(packet[:-32]).digest() != packet[-32:]:
-        raise ValueError("invalid packet checksum")
-    magic, msize, bsize, tsize = HEADER.unpack_from(packet)
-    if magic != b"PTP2" or HEADER.size + msize + bsize + tsize + 32 != len(packet):
-        raise ValueError("invalid scaled header")
-    offset = HEADER.size
-    meta = json.loads(packet[offset:offset+msize])
-    offset += msize
-    base = packet[offset:offset+bsize]
-    tile = packet[offset+bsize:-32]
-    if pack_scaled(meta, base, tile) != packet:
-        raise ValueError("noncanonical packet")
-    return meta, base, tile
-
-
-def render_scaled(packet, work, decoder):
-    meta, base, tile = unpack_scaled(packet)
-    if svtav1.tool(decoder)["sha256"] != meta["native"]["decoder_sha256"]:
-        raise ValueError("native decoder identity mismatch")
-    raw_base = work / "base.yuv"
-    raw_tile = work / "tile.yuv"
-    tracked_patch.decode_native(base, raw_base, meta["native"], decoder)
-    tracked_patch.decode_native(tile, raw_tile, {**meta["native"], "width": 64, "height": 64}, decoder)
-    count = meta["native"]["frames"]
-    frames = np.memmap(raw_base, np.uint8, "r", shape=(count, LOW_H * 3 // 2, LOW_W))
-    patches = np.memmap(raw_tile, np.uint8, "r", shape=(count, 96, 64))
-    result = []
-    for tick, position in enumerate(meta["positions"]):
-        image = cv2.resize(tracked_patch.yuv_to_rgb(frames[tick], LOW_W, LOW_H, False),
-                           (W, H), interpolation=cv2.INTER_CUBIC)
-        if position is not None:
-            x, y = position
-            image[y:y+32,x:x+32] = tracked_patch.yuv_to_rgb(patches[tick],64,64,False)[16:48,16:48]
-        result.append(image)
-    return np.stack(result)
-
-
-def scaled_roi(track, frames):
-    masks = np.zeros((frames, LOW_H, LOW_W), dtype=bool)
-    for index, point in enumerate(track):
-        if point is None:
-            continue
-        x, y = point[0] // 4, point[1] // 4
-        masks[index, max(0,y-8):min(LOW_H,y+8), max(0,x-8):min(LOW_W,x+8)] = True
-    rows = w1_roi.roi_text(masks, LOW_W, LOW_H, -40, outside=True).splitlines()
-    for index, point in enumerate(track):
-        if point is None:
-            rows[index] = str(index) + ' ' + ' '.join(['0'] * (((LOW_H+63)//64)*((LOW_W+63)//64)))
-    return "\n".join(rows) + "\n"
-
-
-def score_frame(net, source, decoded, labels):
-    values = []
-    for index, (visible, x, y) in enumerate(labels):
-        if visible != 1:
-            continue
-        target = crop64(source[index], x, y)
-        candidate = crop64(decoded[index], x, y)
-        value = dists_crops(net, [candidate], target, np.ones((64, 64), bool), "cpu")[0]
-        if not np.isfinite(value) or value < 0:
-            raise ValueError("Non-finite ball crop DISTS")
-        values.append({"tick": index, "dists": float(value)})
-    return values
 
 
 def run(args):
