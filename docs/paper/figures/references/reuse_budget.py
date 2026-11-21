@@ -26,12 +26,14 @@ def main():
         for r in ladder["probes"]
         if r["codec"] == "avif" and r["quality"] in (46, 65, 78)
     ]
+    q90 = load(EXP / "common-reference-q90-20261122/image-preflight.json")
+    options.append(("AVIF Q90", sum(r["image_bytes"] for r in q90["rows"])))
     options.sort(key=lambda r: r[1])
     options.append(("Lossless pair", pair["reference_bytes"]))
     fig, ax = plt.subplots(figsize=(8.1, 4.45))
     durations = np.geomspace(4.8, 300, 250)
     for (label, n), color, style in zip(
-        options, ("#775399", "#b77328", "#0d817b", "#203e63"), (":", "-.", "--", "-"), strict=True
+        options, ("#775399", "#b77328", "#0d817b", "#bc403d", "#203e63"), (":", "-.", "--", (0, (4, 1, 1, 1)), "-"), strict=True
     ):
         ax.plot(
             durations,

@@ -1,4 +1,5 @@
 """Measure registered 24-frame RGB crop fidelity from source and original render tensors."""
+import argparse
 import json
 import math
 import os
@@ -40,7 +41,16 @@ CASES = {
 }
 
 
-def main():
+def main(include_q90=False):
+    if include_q90:
+        staging = json.loads(Path("/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261121T225211Z-d22b94ba/full/staging.json").read_text())
+        inputs = {v["name"]: v["path"] for v in staging["inputs"]}
+        CASES["avif_q90"] = {
+            "config": inputs["recipe"], "hash": "6d2327a4f3a61414202dc5de90ff517161a489ffecee9ac7ea359f18a0c4f976",
+            "conditioning": Path(inputs["conditioning"]), "full": Path("/local/users/emanuele/pointstream/q90-paired-review-20261122/full"),
+            "archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261121T225211Z-d22b94ba/full/published.tar",
+            "archive_sha256": "c3121bb56227374c20a2de9274bd096b745947a6f77cc82895919073e9918c01",
+        }
     if os.environ.get("CUDA_VISIBLE_DEVICES") != "":
         raise ValueError("This is a CPU-only audit")
     assert sha256(SOURCE) == "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d"
@@ -51,7 +61,7 @@ def main():
         receipts[name] = validate_output(case["full"], configs[name], case["hash"], "tennis_only", 2)
         plans[name], arrays[name] = make_plan(configs[name], case["hash"], 2)
     control = plans["lossless"]
-    for name in ("avif_q65", "avif_q78"):
+    for name in (name for name in CASES if name != "lossless"):
         assert plans[name]["settings"] == control["settings"]
         assert plans[name]["source"]["source_video_sha256"] == control["source"]["source_video_sha256"]
         by_unit = {unit["unit"]: unit for unit in plans[name]["units"]}
@@ -92,4 +102,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--q90", action="store_true")
+    main(parser.parse_args().q90)

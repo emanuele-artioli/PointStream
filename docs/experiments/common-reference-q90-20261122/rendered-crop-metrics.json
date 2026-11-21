@@ -1,0 +1,82 @@
+{
+  "source_sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d",
+  "reference_alignment_max_rgb_delta": [
+    0,
+    0
+  ],
+  "support": "all RGB pixels of each 512x784 source-aligned crop, 24 ticks",
+  "metrics": {
+    "nadal_kyrgios__000_at120__person_000000000000": {
+      "lossless": {
+        "rgb_mae": 14.327105636769682,
+        "rgb_mse": 631.5030872232519,
+        "rgb_psnr_db": 20.127048828399886,
+        "samples": 28901376,
+        "render_sha256": "d064a933380d480706ed6aa4de887795fad00179cbd6ea9202d54e6a48e3e8b8"
+      },
+      "avif_q65": {
+        "rgb_mae": 14.563639184514951,
+        "rgb_mse": 655.4105295886258,
+        "rgb_psnr_db": 19.96566946547365,
+        "samples": 28901376,
+        "render_sha256": "c7488b9cea005c661af1faa5c020705fe2d61b3f76831a415ba5b073f17d54bf"
+      },
+      "avif_q78": {
+        "rgb_mae": 14.726752387152779,
+        "rgb_mse": 657.299415917083,
+        "rgb_psnr_db": 19.953171145058455,
+        "samples": 28901376,
+        "render_sha256": "296a93a1b0d1c577d138e6a048dc6489e02cb50ac3f997e9d14f7b4d1b23edc4"
+      },
+      "avif_q90": {
+        "rgb_mae": 14.581300108340862,
+        "rgb_mse": 642.1567435751156,
+        "rgb_psnr_db": 20.054393132334162,
+        "samples": 28901376,
+        "render_sha256": "e521f90c1f9de18ee34a0f8042f15b060711e08f173d1e0a669c63a39bb70037"
+      }
+    },
+    "nadal_kyrgios__000_at120__person_000000000001": {
+      "lossless": {
+        "rgb_mae": 17.49470395457988,
+        "rgb_mse": 833.4485327965008,
+        "rgb_psnr_db": 18.922015744754564,
+        "samples": 28901376,
+        "render_sha256": "7843f4add0621b334ac52ba77ab05d7bff9d401507edddfdec4e6e5ab9dcdc57"
+      },
+      "avif_q65": {
+        "rgb_mae": 17.872148786272323,
+        "rgb_mse": 863.7288362325725,
+        "rgb_psnr_db": 18.767029417823448,
+        "samples": 28901376,
+        "render_sha256": "18175380d572e37c6abdb126dcb1762ea7ad9cf84385b3e107c2b560a27394eb"
+      },
+      "avif_q78": {
+        "rgb_mae": 17.659093013426073,
+        "rgb_mse": 845.5737361086199,
+        "rgb_psnr_db": 18.85928875736279,
+        "samples": 28901376,
+        "render_sha256": "f83de7cc57f5a72e37dab6e46f212f994ec6e6a7a8cac9fd34b7290a9f8e72bc"
+      },
+      "avif_q90": {
+        "rgb_mae": 17.679040714186065,
+        "rgb_mse": 855.0369201452554,
+        "rgb_psnr_db": 18.81095493076375,
+        "samples": 28901376,
+        "render_sha256": "0b6ae86bcd856dbece70fd96345b22e46ac3eebaf02fc71eef675f1f607c513d"
+      }
+    }
+  },
+  "archives": {
+    "lossless": "04518b719632329c1164263c9231f77740838cfef9f6dccfe6d5bfe34c409a21",
+    "avif_q65": "94fc07b916792b8c3e7c50b1745d45e3050a04fbd02c8928407cdbe27a027ec0",
+    "avif_q78": "9b26151cd2e92f233ececb3f7f3a1c2627f1cbd65841be0ed3ca4ecaf0c39b9b",
+    "avif_q90": "c3121bb56227374c20a2de9274bd096b745947a6f77cc82895919073e9918c01"
+  },
+  "config_sha256": {
+    "lossless": "eb67e4a972cde36895addef8db306c963423f814a31be7273a31c696ce5e98c6",
+    "avif_q65": "0cd63fe70ce618be8ee9457ed69c266e19a50fa9ade751fbcdd7d74995c33869",
+    "avif_q78": "ad389004d8f08e3428afa317c3e32aeaeb00fbd9955d333be501619b60df7768",
+    "avif_q90": "6d2327a4f3a61414202dc5de90ff517161a489ffecee9ac7ea359f18a0c4f976"
+  }
+}

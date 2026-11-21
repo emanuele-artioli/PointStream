@@ -1,0 +1,70 @@
+{
+  "stage": "full",
+  "dcvc": {
+    "qp": 24,
+    "kbps": 49.778333333333336,
+    "bytes": 29867,
+    "packet_sha256": "a021ab92d217700a65046af5932c80f7cbb4f67819c2d2133b3193a1162efa39",
+    "passes": 2,
+    "historical_frame_hashes_matched": 240,
+    "decoder_environment": {
+      "capability": [
+        8,
+        9
+      ],
+      "cuda_visible_devices": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+      "cwd": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/opt/DCVC",
+      "device_name": "NVIDIA RTX 6000 Ada Generation",
+      "extension": {
+        "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/opt/dcvc-extensions/sm89/inference_extensions_cuda.cpython-312-x86_64-linux-gnu.so",
+        "sha256": "0bc03d4064794f9e846fdf11fc3f7a197b7608b658718c71c8d6e66444629131",
+        "variant": "sm89"
+      },
+      "python": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+      "torch": "2.10.0+cu128",
+      "torch_cuda": "12.8"
+    },
+    "raw_sha256": "641b543f964e8377a3b81524e81f9d99f517b04e78dc309d3790773f8ee4aad0",
+    "decode_seconds": 19.466913109004963
+  },
+  "attempts": [
+    {
+      "attempt": 0,
+      "passed": true
+    }
+  ],
+  "frames": {
+    "78": {
+      "filename": "q24-stroke-078.png",
+      "native_yuv_sha256": "87ff16b8e78a854f22a0f49ae58eaf1601222fcee6d54bb87b0fdb1bf6857e79",
+      "png_sha256": "274c2dd30b8d2c4593ecd74e9f360271e2321b87c2f1655a80eb9f9b424063c3",
+      "size": [
+        960,
+        544
+      ]
+    },
+    "86": {
+      "filename": "q24-stroke-086.png",
+      "native_yuv_sha256": "8f06caa16e738170dbafc89fb8306d986fb72e1eea4f011d1c19988c934f4b80",
+      "png_sha256": "be2856db802233d8d2bd26e19917a8e0b1dcf5478663ca63a23ad7964dbdfdb6",
+      "size": [
+        960,
+        544
+      ]
+    },
+    "94": {
+      "filename": "q24-stroke-094.png",
+      "native_yuv_sha256": "5b8abe5d2a79f7bda244500d7bbaa41f231e0327dfc3bc1e2783d5e690a95844",
+      "png_sha256": "85d055f79f437273929d179608e38f055fe8791c525c5bbe6da50cb173692d3b",
+      "size": [
+        960,
+        544
+      ]
+    }
+  },
+  "device": "NVIDIA RTX 6000 Ada Generation",
+  "capability": [
+    8,
+    9
+  ]
+}

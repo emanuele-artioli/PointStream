@@ -27,6 +27,8 @@ def main():
     rungs = [r for r in ladder["probes"] if r["codec"] == "avif" and r["quality"] in [46, 65, 78]]
     rungs.sort(key=lambda r: r["quality"])
     assert [r["total_bytes"] for r in rungs] == [24463, 44179, 63915]
+    q90 = json.loads((EXP / "common-reference-q90-20261122/image-preflight.json").read_text())
+    rungs.append({"quality": 90, "total_bytes": sum(row["image_bytes"] for row in q90["rows"])})
     # Delivered bytes per 4.8-second clip convert to decimal kbps by division by 600.
     common = [clean["file_bytes"], tile, keypoints, misc]
     rows = [
