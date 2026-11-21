@@ -1,5 +1,7 @@
 # Experiments
 
+The [November 22 priority list](../PLAN.md#november-22-experiment-priorities) links the starved-rate joint study, the matched-rate ball and detection tests, the common reference codec and the player-mask repair bound. Use it for the next submission experiments. Historical jobs below keep their original settings, outcomes and budgets.
+
 Current scientific direction and stage order are in the [research brief](../RESEARCH.md)
 and [PLAN](../PLAN.md). The [v2 inference protocol](experiments/submission-ladder-protocol-20261115-v2.json)
 removes the10% usefulness floor and adds source-level inference and human visual

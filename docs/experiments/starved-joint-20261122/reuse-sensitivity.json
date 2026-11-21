@@ -1,0 +1,47 @@
+{
+  "receipt_sha256": "347f0cc2080c3c02dbd01b8744ae24889bd95a4433dcb9dbf0c78d033d3405cb",
+  "historical_sha256": "62376a4f3dcbe406d2065e54c12ebcbc0d2579aeb97c243cbf843bdf15a66e1f",
+  "rally_total_bytes": 414081,
+  "rally_reference_bytes": 242317,
+  "rally_remaining_bytes": 171764,
+  "rally_duration_seconds": 4.8,
+  "historical_bank_bytes": 934098,
+  "historical_adapter_and_guider_bytes": 1488252,
+  "sensitivity": [
+    {
+      "reuse_seconds": 4.8,
+      "rally_kbps": 690.135,
+      "historical_modeled_kbps": 4053.7983333333336
+    },
+    {
+      "reuse_seconds": 30,
+      "rally_kbps": 350.89119999999997,
+      "historical_modeled_kbps": 662.5083333333332
+    },
+    {
+      "reuse_seconds": 60,
+      "rally_kbps": 318.58226666666667,
+      "historical_modeled_kbps": 339.52833333333325
+    },
+    {
+      "reuse_seconds": 600,
+      "rally_kbps": 289.5042266666666,
+      "historical_modeled_kbps": 48.846333333333334
+    },
+    {
+      "reuse_seconds": 1800,
+      "rally_kbps": 287.35029777777777,
+      "historical_modeled_kbps": 27.31433333333333
+    },
+    {
+      "reuse_seconds": 3600,
+      "rally_kbps": 286.81181555555554,
+      "historical_modeled_kbps": 21.931333333333335
+    },
+    {
+      "reuse_seconds": 7200,
+      "rally_kbps": 286.5425744444444,
+      "historical_modeled_kbps": 19.239833333333333
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "status": "verified",
+  "host": "gpu1",
+  "method": "independent ssh sha256sum after exclusive file creation",
+  "files": {
+    "config.json": {
+      "sha256": "0cd63fe70ce618be8ee9457ed69c266e19a50fa9ade751fbcdd7d74995c33869",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/player-reference-common-avif-q65-20261122/config.json"
+    },
+    "conditioning.tar": {
+      "sha256": "3dae077b83b77eb2211438de02596bd42677aa8c372073f0c2e0586706a4076f",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/player-reference-common-avif-q65-20261122/conditioning.tar"
+    }
+  },
+  "first_transfer": "empty directory created; unexpected macOS AppleDouble entry rejected",
+  "second_transfer": "both stream hashes matched; final Python file_digest helper unavailable on host",
+  "separate_sha256sum": "both verified",
+  "submitted": false
+}

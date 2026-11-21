@@ -1,0 +1,97 @@
+{
+  "frames": 240,
+  "crf": 50,
+  "source_yuv_sha256": "6cae4bd7a46bfa4bd2a7a7ec5c926647ea43d9e7a5366eb96e464eaffe1e603c",
+  "tools": {
+    "SvtAv1EncApp": {
+      "path": "/opt/homebrew/bin/SvtAv1EncApp",
+      "real_path": "/opt/homebrew/Cellar/svt-av1/4.0.1/bin/SvtAv1EncApp",
+      "sha256": "db044194faf94d553c2509c8e033ecd05a373ba54d919d0fb49a3a13149d1687",
+      "version": "SVT-AV1 v4.0.1 (release)"
+    },
+    "dav1d": {
+      "path": "/opt/homebrew/bin/dav1d",
+      "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+      "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+      "version": "1.5.4"
+    },
+    "ffmpeg": {
+      "path": "/opt/homebrew/bin/ffmpeg",
+      "real_path": "/opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg",
+      "sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be",
+      "version": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+    }
+  },
+  "script_sha256": "1fe4a024b4bb42fcaf12b687a6d47fa9f61c88da5c15af1378812314b4fe8ff9",
+  "elapsed_seconds": 12.24354874999699,
+  "cpu_seconds_including_children": 59.775501,
+  "row": {
+    "stream": "/private/tmp/ps-matched-ball-20261122-crf50/stream.ivf",
+    "decoded": "/private/tmp/ps-matched-ball-20261122-crf50/decoded.yuv",
+    "stream_sha256": "1db78d363adab75a3095756efd86868953033a40532af04c2d3f48d40930889f",
+    "file_bytes": 162574,
+    "payload_bytes": 159662,
+    "temporal_units": 240,
+    "decoded_frames": 240.0,
+    "encode_command": [
+      "/opt/homebrew/bin/SvtAv1EncApp",
+      "-i",
+      "/Users/manu/Datasets/pointstream-submission-20261118/ps-native-ctl-20261118-full/source.yuv",
+      "-b",
+      "/private/tmp/ps-matched-ball-20261122-crf50/stream.ivf",
+      "-w",
+      "960",
+      "-h",
+      "544",
+      "--input-depth",
+      "8",
+      "--fps-num",
+      "50",
+      "--fps-denom",
+      "1",
+      "-n",
+      "240",
+      "--color-range",
+      "0",
+      "--rc",
+      "0",
+      "--crf",
+      "50",
+      "--preset",
+      "4",
+      "--keyint",
+      "-1",
+      "--lp",
+      "6",
+      "--progress",
+      "0"
+    ],
+    "decode_command": [
+      "/opt/homebrew/bin/dav1d",
+      "-i",
+      "/private/tmp/ps-matched-ball-20261122-crf50/stream.ivf",
+      "-o",
+      "/private/tmp/ps-matched-ball-20261122-crf50/decoded.yuv",
+      "--threads",
+      "2",
+      "--quiet"
+    ],
+    "encode_seconds": 11.672,
+    "encode_cpu_seconds": 58.181,
+    "decode_seconds": 0.288,
+    "decode_cpu_seconds": 0.393,
+    "cpus": null,
+    "host_load_before": [
+      4.77,
+      3.85,
+      4.78
+    ],
+    "decoded_sha256": "81c06cce2132adccacf67cf2c9f8d7300f7d727956f6dbf92a0b604044b725c1",
+    "carrier_bytes": 163112,
+    "sidecar_bytes": 19114,
+    "total_bytes": 182226,
+    "total_kbps": 303.71,
+    "carrier_sha256": "20616f25350a0bb71d21a19c71fcad249d1236d2c44b6d0f8122b2b74afcbb18",
+    "sidecar_sha256": "15a2efa633ffd1b6c21eb79c2a6ce6a6950b5ee5cb5acc30e7a4936c7f588bdb"
+  }
+}
