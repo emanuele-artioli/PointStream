@@ -46,7 +46,7 @@ def run(a):
     assert score.sha(src) == YUV
     a.image_ckpt = a.image
     a.video_ckpt = a.video
-    a.stream_policy = "legacy"
+    a.stream_policy = "default"
     qps = [30] if a.count == 1 else [30, 42]
     points = []
     rows = []
@@ -137,7 +137,7 @@ def validate():
         exact_decode=all(v["identical_frame_hashes"] for v in r["points"]),
         numerical_control=all(abs(row["anchor_delta"]) <= 1e-4 for row in r["rows"]),
         complete=len(r["rows"]) == (3 if smoke else 72),
-        cost=not smoke or forecast < 600,
+        cost=not smoke or forecast < 500,
     )
     Path(os.environ["PS_VALIDATION_PATH"]).write_text(
         json.dumps(dict(passed=all(checks.values()), checks=checks, forecast_seconds=forecast))
