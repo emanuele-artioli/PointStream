@@ -1,0 +1,38 @@
+{
+  "config_sha256": "ad389004d8f08e3428afa317c3e32aeaeb00fbd9955d333be501619b60df7768",
+  "smoke_receipt_sha256": "78bb9d2bd7a842df071a29fead742550b224b12f449baf5475eb4253e10c5e4e",
+  "full_receipt_sha256": "e15868fa8ba8d56da986e9e01ea3dc97a1aa570bb17b9fb7e0d15a5e175e782e",
+  "repeated_player_equal": true,
+  "units": {
+    "nadal_kyrgios__000_at120__person_000000000001": {
+      "nadal_kyrgios__000_at120__person_000000000001.png": {
+        "sha256": "ed805e0857a67cd6a3e3958778907e1acc91266c42db988fd93d280f5cb51c58",
+        "bytes": 411457
+      },
+      "nadal_kyrgios__000_at120__person_000000000001-10.mp4": {
+        "sha256": "877c6de9a83bc7bf06378f91a05b4eb1375e632840fbacbb82282f51fb02ff49",
+        "bytes": 1535592
+      },
+      "nadal_kyrgios__000_at120__person_000000000001-50.mp4": {
+        "sha256": "f03e6a428d3efe984123ff652caca287636ddd601bcaa64319dac5c2deb05f39",
+        "bytes": 696597
+      }
+    },
+    "nadal_kyrgios__000_at120__person_000000000000": {
+      "nadal_kyrgios__000_at120__person_000000000000-50.mp4": {
+        "sha256": "2d802055605ff999e37b0b0b9fd5e7e577b975a70d7190dd582789098c8e4dc8",
+        "bytes": 815382
+      },
+      "nadal_kyrgios__000_at120__person_000000000000-10.mp4": {
+        "sha256": "781ba1d7f512ace3c916bfff3a790af3eb4cb476dda1318576a2f1aac632b5ea",
+        "bytes": 1789949
+      },
+      "nadal_kyrgios__000_at120__person_000000000000.png": {
+        "sha256": "d3b407f5d878bbc6f9663b182caaa9d4dd471fac91c345ebc17d62ae6b72fe87",
+        "bytes": 450779
+      }
+    }
+  },
+  "source": "AVIF-conditioned production worker, 24 ticks",
+  "script_sha256": "aa5862b24f1756aa66faf280a871ac742b696de7df58931cd5a95695296c2ec5"
+}

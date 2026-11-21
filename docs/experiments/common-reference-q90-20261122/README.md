@@ -1,0 +1,10 @@
+# Last common lossy appearance rung for the opened player pair
+
+Player 2 accepted Q65/Q78 and the lossless control. Player 1 accepted only the lossless control in the Q78 blinded test, with both lossy rungs close. The next prespecified integer rung is Q90 for both players, admitted if its two encoded images save at least 30% against the accepted 242,317-byte lossless pair. The CPU check produced 107,276 bytes and validated both decoded RGB arrays, clearing that gate. Generate the identical 24-tick, two-person context with the same renderer, weights, poses, boxes and seeds. Smoke on one complete track and compare its repeated full output exactly. Hold all encoder settings shared. Include the two source-aligned renders in a fresh blind review with lossless; success requires the author to accept Q90 for both bodies. This is one author on a development pair. The racket-grip observation is separate. Either outcome closes the single-rung pilot. Do not rank 240-frame output or a new match from this review.
+
+Allocate 1,500 campus GPU-seconds and 3,000 core-seconds. Each stage is under 15 minutes; one complete unit smoke has up to 350 seconds. The production reference-pilot validator must pass its 1.25× paired full-stage prediction (with fixed publication reserve) within a 900-second full allowance. Two fresh units, source checks, native output identity and an independently verified publication are required. No training or paid cloud.
+
+The Q90 job is `20261121T224937Z-0eeca135`, revision `0ab17a598105b2137ae7e7280addb3f63fa9e80a`, deadline 01:00 UTC. [Inputs and stage caps](spec.json) · [Preparation](prepared.json) · [CPU image oracle](image-preflight.json)
+
+The first preparation bound the new staged files but retained the prior config digest as a command argument. The production hash check stopped before generation. Use the exact generated arguments, including the new verified digest, and reserve 100 seconds for that lifecycle. The corrected request has a 1,400-second cumulative remainder.
+Corrected campus request `20261121T225211Z-d22b94ba` uses the verified argument and staged config identities. Its deadline is 01:00 UTC.

@@ -133,3 +133,47 @@ on campus. Before submission, inspect existing jobs and all eligible hosts,
 verify workers support CPU-only single-affinity jobs, freeze and review the
 source revision, establish the per-job budget and refresh the deadline. No
 job was submitted as part of this preparation.
+
+### Authorized November 22 CPU anchor
+
+The user requested a 12-hour sequence of prioritized studies. The assigned limit for this CPU-only anchor is 1,700 aggregate campus CPU-seconds and zero GPU. The sole permitted configuration uses the existing exact al028 source, 240 native-cadence frames, 480×272 YUV, SVT-AV1 preset 4, CRF 36, 48 and 60. Its figure target is the starved-rate AV1 anchor. The hypothesis is that these three points bracket at least one 20/50/125 kbps candidate. A competing outcome is that they miss the region and require a later specifically chosen point. Full promotion requires the same native pipeline on 24 frames at CRF48, complete 25-fps outputs, independently verified decoded hashes, matching source and binary hashes, valid rate accounting and a 1.5× smoke-time forecast within the full-stage budget. No source imagery leaves campus.
+
+The earlier native job `20261030T142923Z-f6699fe5` completed with CRF63 at three scales, including scale 4. Its settings and saved bundle are different from this three-CRF range; its output may supply a fourth anchor only after matching the exact geometry and conversion. No same-entrypoint request appeared among the 1,777 fleet records. All six hosts were inspected and the fleet doctor passed. The one-core design avoids GPU use. Frozen revision `9373b00deb31a653ebe0e3044f3e1b3ceaa73438` fixes the worker checksum implementation to support Python 3.10 without changing the checksum.
+
+The single submission's local preparation record is **20261121T212825Z-8fd22dec**. Deadline is 2026-11-21 22:10 UTC. Use fleet status on that exact ID before any recovery. The input source SHA-256 is `c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934`, packed environment SHA-256 `32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661`, and output is the corresponding campus fleet job directory. The job has no GPU allocation. Publication was in progress when this ID was first recorded.
+
+The initial request remained pending because the workers inspect `required_commands` on their own host PATH before staging the packed environment. All four CPU hosts reported `required executable unavailable: dav1d`. The packed environment is where this worker expects the pinned decoder, and the smoke independently hashes and exercises it. A cancellation was requested only for the task-owned pending request. Await its terminal state before submitting a corrected, separately identified request. The corrected admission rule will retain the actual staged tool SHA-256 checks and decode validator.
+
+The original request reached `cancelled` without a host, supervisor, stage, gate or GPU allocation. Its terminal event `bbe423990724564a9b5afb54c5ce53ca` was acknowledged. No CPU execution occurred. The replacement changes only the premature host-PATH list to empty; the worker still requires the pinned tools to exist and match all hashes, and the smoke validator still performs an independent decode. All other inputs, entrypoint, controls, stages and budget are unchanged.
+
+The corrected replacement was created as **20261121T214446Z-71ae48cd** with deadline 2026-11-21 22:27 UTC, source revision `10e8036b`, and the same source/environment identities and 1,700-second CPU-only ceiling. Its preparation was in progress when this ID was recorded. Inspect this exact ID before any recovery.
+
+The corrected request completed on gpu4 with exit code 0. Its 24-frame smoke passed source, tool, geometry, single-core, independent-decode and full-forecast gates. The forecast was 166.90 seconds including the 1.5× scaling margin. A read-only separate audit of the full archive verified its SHA-256, all three IVF hashes, 240 frame timestamps and payload counts. [Full audit](al028-native-full-audit.json)
+
+| CRF | IVF bytes | Complete IVF kbps |
+|---:|---:|---:|
+| 60 | 24,752 | 20.627 |
+| 48 | 49,962 | 41.635 |
+| 36 | 94,396 | 78.663 |
+
+These actual rates bracket 50 kbps. They do not bracket 20 or 125 kbps. The lifecycle occupied 212.3 seconds of the 1,700-second one-core budget, a conservative upper bound for CPU time. The smoke and full reported 1.48 and 14.82 child CPU-seconds, respectively, excluding the separate validator and staging. GPU usage was zero. These streams have not yet been scored for foreground or full-frame quality. Historical scale-4 CRF63 and CRF60 results used plane-based downscaling, while this new worker uses FFmpeg area scaling. Keep their coding configurations identifiable.
+
+### Foreground and full-frame scoring of the three streams
+
+Use the original Al028 W7 window, 80 native 25-fps ticks, the same paid source video, historical fixed player masks, lossless source conversion, LPIPS/DISTS weights, native decoder and metric functions. Compute foreground and whole-frame LPIPS/DISTS for all three actual streams. Include the historical scale-4 CRF63 control and require its four per-tick series to reproduce the corresponding saved W7 scores within the historical 1e-3 GPU-class tolerance before accepting the new outputs. Freeze all mask, source, hybrid, weights, encoder and video archive SHA-256s in the fleet spec. This tests whether the native anchor curves enter the historical player-win region; the three streams alone do not establish a joint player-and-ball result.
+
+The hypothesis is that the matched historical player comparison can be extended to these actual rates. A competing explanation is that the prior result depends on old downscaling, interpolation, whole-frame costs or different masks. A result remains conditional on the original same-match adaptation and modeled two-hour reference lifetime. Four streams at three smoke ticks must pass identity, CUDA, correct source frame and pixel support, control reproduction, complete finite scores and a conservative time projection before 80-tick full scoring. The assigned ceiling is 900 GPU-seconds including smoke, full and validation, with a separate four-core CPU allocation. Both eligible GPU classes and existing jobs must be inspected before submission. Code and spec are being prepared.
+
+The scoring pilot is **20261121T215432Z-c35b82f6**, initially preparing, deadline 2026-11-21 22:35 UTC. Its frozen revision is `72a2aacd9dd84b92530fae1abddff471b228d737` and the spec digest is `844b5b06532828533d90f51214b237306d14d3099b7da4a816406e46c44dd20d`. It stages nine SHA-256-identified inputs, including the exact three-stream archive and existing W7 control. The scorer and validator were reviewed locally. A synthetic validator fixture passed and a changed historical-control value was rejected. This fixture is an infrastructure check, not a quality result. Inspect this exact job before any recovery.
+
+The scorer completed on gpu3 RTX A6000 with 80 ticks for every stream. The smoke passed all identity, CUDA, time, score and control checks, with a 256.18-second full forecast. A separate CPU process independently opened the completed scores archive and historical hybrid archive, verified all finite 4×80 arrays, recomputed every mean and reproduced the historical scale-four control. The maximum absolute per-tick deviation was 0.000117 against the 0.001 threshold. [Independent score audit](historical-score-independent-audit.json)
+
+| Plain AV1 rate (kbps) | Player DISTS | Whole-frame DISTS | Player LPIPS | Whole-frame LPIPS |
+|---:|---:|---:|---:|---:|
+| 20.627 | 0.4157 | 0.1848 | 0.6215 | 0.2694 |
+| 41.635 | 0.3268 | 0.1661 | 0.4832 | 0.2474 |
+| 78.663 | 0.2710 | 0.1537 | 0.3817 | 0.2358 |
+
+The historical generated-player result used the same source, masks and ticks, with player DISTS **0.2420** at a modeled **19.2398 kbps** under two-hour reuse. Its whole-frame DISTS was **0.1750**. At 20.627 kbps the newly scored full-IVF AV1 point has a higher player-region DISTS. The two rates are close rather than identical, and the historical rate remains modeled rather than a delivered complete mixed codec. The control confirms matched metric behavior, not a shared bitstream or reference protocol.
+
+From creation to terminal state, the scoring request's conservative GPU occupancy was 215.66 seconds of the 900-second allocation. The full stage took 164.70 seconds under recorded GPU contention, so its timing is not a standalone speed measurement. The source and per-frame metric arrays remain on campus. The completion event was acknowledged.

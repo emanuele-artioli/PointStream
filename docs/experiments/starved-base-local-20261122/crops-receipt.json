@@ -1,0 +1,86 @@
+{
+  "ticks": [
+    {
+      "tick": 10,
+      "ball_placement": null
+    },
+    {
+      "tick": 30,
+      "ball_placement": null
+    },
+    {
+      "tick": 50,
+      "ball_placement": [
+        1024,
+        592
+      ]
+    },
+    {
+      "tick": 70,
+      "ball_placement": [
+        1028,
+        458
+      ]
+    },
+    {
+      "tick": 90,
+      "ball_placement": [
+        932,
+        462
+      ]
+    },
+    {
+      "tick": 110,
+      "ball_placement": [
+        786,
+        444
+      ]
+    },
+    {
+      "tick": 130,
+      "ball_placement": [
+        766,
+        256
+      ]
+    },
+    {
+      "tick": 150,
+      "ball_placement": [
+        924,
+        480
+      ]
+    },
+    {
+      "tick": 170,
+      "ball_placement": [
+        1076,
+        664
+      ]
+    },
+    {
+      "tick": 190,
+      "ball_placement": [
+        1168,
+        642
+      ]
+    },
+    {
+      "tick": 210,
+      "ball_placement": [
+        1132,
+        416
+      ]
+    },
+    {
+      "tick": 230,
+      "ball_placement": [
+        1132,
+        368
+      ]
+    }
+  ],
+  "input_report_sha256": "5c9a318544cf59f757e6b4cfee319b8f3b8f39643313296e7c5534e4e421b13a",
+  "crops_sha256": "48b63a48eee6006acaba547eedd71f074634941e9d6481783048c9a1ac6861e4",
+  "cpu_seconds": 6.388303,
+  "scope": "native source matched regions, six paid decoded streams"
+}

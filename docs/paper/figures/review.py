@@ -1,4 +1,5 @@
 """Collect paper panels for author review; private image inputs are optional."""
+
 import argparse
 from io import BytesIO
 from pathlib import Path
@@ -12,19 +13,121 @@ from reportlab.pdfgen.canvas import Canvas
 HERE = Path(__file__).resolve().parent
 SIZE = (792, 612)
 PANELS = [
-    ("system/architecture.pdf", "Scene-selective coding", "The architecture shows both paths to playback and the state retained by the receiver. The object-coded route supplies signals to an analysis application and frames to a viewer. Adaptive selection is schematic."),
-    ("system/algorithms.pdf", "Two procedures used by the tennis implementation", "Court eligibility uses source-side frame registration. The separate active-play rule can route an eligible court shot to fallback. Tracked tiles update the displayed video only at valid placements."),
-    ("selection/rate-quality.pdf", "Rate and foreground fidelity", "One 4.8-second cold start. All 17 points use comparable object scoring. Completing the main figure requires the same foreground objective for DCVC-UF and PointStream at overlapping low rates."),
-    ("ball/matched-rate-ball-fidelity.pdf", "Ball fidelity at essentially equal bandwidth", "On 12 reviewed ticks, allocating bytes to source-pixel tiles improved ball-crop fidelity while whole-frame RGB PSNR fell by 0.104 dB."),
-    ("ball/three-match-ball-bd-rate.pdf", "Tracked ball pixels across matches", "The 26.28% equal-match saving concerns ball-crop DISTS at labeled visible instants. The complete stream pays for both the native video and ball channel."),
-    ("ball/ball-detection.pdf", "Can a machine locate the ball?", "The independent judge recovered 224 additional visible frames with a rendered streak. False detections increased on two absent frames. A matched-rate rerun is needed for this particular machine-task comparison."),
-    ("player-tasks/receiver-masks.pdf", "How closely do receiver silhouettes follow the people?", "Mean frame IoU compares the receiver's own masks against 12 human-reviewed source frames. An RGB segmentation judge on the same matched-rate decodes is the next comparison."),
-    ("system/byte-budget.pdf", "Why cold start is expensive", "Over 4.8 seconds the same two lossless images cost 242,317 bytes. Removing the players before coding the base shrank the complete cold packet from 448,452 to 414,081 bytes. Measured warm reuse belongs beside this result."),
-    ("selection/bandwidth-choice.pdf", "Appendix · Best stored decode under each bandwidth cap", "Each strip picks the best measured stream under its bandwidth ceiling for one object. A deployed selector must choose before seeing the reconstructed score and must pay for switches."),
-    ("selection/historical-low-rate.pdf", "Supporting result · The historical low-rate player comparison", "The historical 25-fps Alcaraz window uses sampled frames and modeled two-hour reference and adapter reuse. Its points have their own comparison panel."),
-    ("player-tasks/pose-coding.pdf", "Appendix · How accurately are the sender's joints conveyed?", "The reference consists of the sender's uncoded YOLO estimates. Human joint labels and an independent judge on decoded video would measure player pose accuracy."),
-    ("background/court-reconstruction.pdf", "Appendix · Reconstructing court behind an occluder", "Four frames have artificial masks over known court pixels. Temporal donors help where they observe the court. Naturally hidden pixels lack this same-frame ground truth."),
-    ("references/reference-ladder.pdf", "Appendix · Reference codec and image budget", "At all three two-image budgets AVIF led both development references on RGB PSNR. The rendering study checks whether that still-image advantage preserves generated player appearance."),
+    (
+        "system/architecture.pdf",
+        "How the receiver reconstructs a broadcast",
+        "At each eligible shot the object path supplies signals for an application and frames for playback. The conventional path handles other shots.",
+    ),
+    (
+        "system/algorithms.pdf",
+        "Implemented procedures",
+        "The tennis sender tests court eligibility. The receiver renders players from paid appearance and keypoints and composites generated masks. It applies a paid ball update where a valid location exists.",
+    ),
+    (
+        "players-starved/players-starved.pdf",
+        "Player fidelity across three matches",
+        "Eight paired historical windows use a same-match adaptation and a modeled two-hour asset lifetime. Each player-region comparison uses the actual competing DCVC-UF rates for that window.",
+    ),
+    (
+        "starved-choice/players-rate-quality.pdf",
+        "Player fidelity at the available bandwidth",
+        "One rally with common scoring. Solid red charges the full startup. Open red prices already valid player references. All people have equal weight.",
+    ),
+    (
+        "starved-choice/ball-rate-quality.pdf",
+        "Ball fidelity at the available bandwidth",
+        "Source-fitted trajectory, native video, tracked-pixel and joint modes share the same 12 source-reviewed instants. The lower-left star represents a complete 19.965 kbps stream.",
+    ),
+    (
+        "selection/65kbps-regional-dists.pdf",
+        "Where the joint reconstruction gains and loses quality",
+        "Twelve shared instants, with a fixed 70% weight on both bodies and 30% on their complement. The joint stream charges 469.335 kbps cold and 65.473 kbps with ideal reference reuse.",
+    ),
+    (
+        "ball/starved-display.pdf",
+        "What a ball channel buys at 61 kbps",
+        "One 240-tick rally. Twelve independently reviewed instants. The tile and plain-video pair differ by 28 bytes. The larger-resolution plain and ROI streams bracket that budget.",
+    ),
+    (
+        "ball/ball-three-match-rates.pdf",
+        "Ball fidelity by total delivered bitrate",
+        "The earlier three-match study supports a common-rate average only across the overlap indicated in the plot. Each point includes the base stream and any object payload.",
+    ),
+    (
+        "ball-starved/ball-starved.pdf",
+        "Ball fidelity near 61 kbps in three broadcasts",
+        "Nine, twelve and eleven independently labeled instants. Each match includes its best measured affordable plain or ROI AV1 control. The 60-fps match favors conventional AV1.",
+    ),
+    (
+        "ball/matched-low-detection.pdf",
+        "Can a machine locate the ball?",
+        "On the 292-frame clip, 261 visible and 30 absent frames have definite labels. Direct paid refit locations score 240/261 and 2/30. The same protocol also measures a detector running on every decoded RGB arm.",
+    ),
+    (
+        "system/starved-budget.pdf",
+        "What the sender pays at startup and during play",
+        "Actual native and joint packets, with image payloads itemized. The cache row assumes both references are already valid. The AVIF startup prices hold the other packet components fixed.",
+    ),
+    (
+        "references/reuse-budget.pdf",
+        "How much play pays for the first player references?",
+        "The duration is active encoded play. At a 52.293 kbps ongoing price the lossless pair takes 26.7 seconds to average 125 kbps. Lossy costs are scenarios until their rendered output passes review.",
+    ),
+    (
+        "system/crossshot-reference.pdf",
+        "What the receiver actually paid when the players returned",
+        "A 354-byte mapping reused both player images on the return 221.3 seconds later. The author judged reuse barely acceptable and preferred it to refresh for both tracks. This comparison prices appearance only.",
+    ),
+    (
+        "references/rendered-reference-quality.pdf",
+        "Which appearance references passed the motion review?",
+        "One author viewed two 24-frame player tracks. Both shared lossy rungs passed for Player 2. Player 1 accepted the lossless control and judged Q78 almost acceptable. The plotted objective metric includes crop background.",
+    ),
+    (
+        "player-tasks/decoded-masks.pdf",
+        "Player segmentation on ordinary and reconstructed video",
+        "Direct receiver masks and ordinary AV1 had similar mean IoU on 24 bodies. All arms localized both players. Six unprompted labels favored ordinary AV1 over the receiver masks.",
+    ),
+    (
+        "ball/three-match-ball-bd-rate.pdf",
+        "Supporting result · Equal-quality ball rate",
+        "Per-match comparisons over common ball-crop DISTS support. The arithmetic mean of the three bitrate savings is 26.28%.",
+    ),
+    (
+        "selection/65kbps-regional-lpips.pdf",
+        "Appendix · Regional sensitivity to the perceptual metric",
+        "The same fixed 70/30 weights evaluated with spatial LPIPS on the same twelve instants.",
+    ),
+    (
+        "selection/rate-quality.pdf",
+        "Appendix · Cold start over 4.8 seconds",
+        "The native-scale comparison measures foreground fidelity on two players and the ball with full reference cost.",
+    ),
+    (
+        "ball/matched-rate-ball-fidelity.pdf",
+        "Appendix · Higher-rate ball fidelity",
+        "At 303 kbps, 12 reviewed instants show a ball-crop improvement alongside a 0.104 dB whole-frame RGB PSNR cost.",
+    ),
+    (
+        "selection/bandwidth-choice.pdf",
+        "Appendix · Best stored stream under each cap",
+        "This retrospective comparison selects by reconstructed quality and excludes switching overhead.",
+    ),
+    (
+        "player-tasks/pose-coding.pdf",
+        "Appendix · Distortion of transmitted joints",
+        "Comparison with the original sender detections measures coding error. Human source joint labels are needed to measure pose accuracy.",
+    ),
+    (
+        "background/court-reconstruction.pdf",
+        "Appendix · How to restore court behind a player",
+        "Artificial masks over known court pixels permit scoring aligned temporal donors and spatial inpainting. Inpainting supplies pixels where donors do not observe the court.",
+    ),
+    (
+        "references/reference-ladder.pdf",
+        "Appendix · Still-image reference ladder",
+        "The image curves measure two appearance references. The highest-PSNR still image does not guarantee acceptable generated motion.",
+    ),
 ]
 
 
@@ -36,49 +139,119 @@ def page(title, caption, index, raster=None):
     canvas.setFont("Helvetica", 9)
     canvas.drawRightString(760, 580, f"PointStream  |  Author review  |  {index}")
     if raster:
-        labels = ("Original court", "Artificial occlusion", "Spatial inpainting", "Aligned donors with hole filling")
+        labels = (
+            "Original court",
+            "Artificial occlusion",
+            "Spatial inpainting",
+            "Aligned donors with hole filling",
+        )
         with Image.open(raster) as strip:
             if strip.size != (1920, 140):
-                raise ValueError("Expected four 480 by 140 court crops from the registered comparison")
+                raise ValueError(
+                    "Expected four 480 by 140 court crops from the registered comparison"
+                )
             for i, label in enumerate(labels):
                 x, y = 31 + 375 * (i % 2), 326 - 164 * (i // 2)
-                crop = strip.crop((480*i, 0, 480*(i+1), 140))
-                canvas.drawImage(ImageReader(crop), x, y, 355, 355*140/480)
+                crop = strip.crop((480 * i, 0, 480 * (i + 1), 140))
+                canvas.drawImage(ImageReader(crop), x, y, 355, 355 * 140 / 480)
                 canvas.setFont("Helvetica-Bold", 12)
                 canvas.drawString(x, y + 114, label)
     canvas.setFont("Helvetica", 10)
     for i, line in enumerate(wrap(caption, width=145)):
-        canvas.drawString(32, 45 - i*13, line)
+        canvas.drawString(32, 45 - i * 13, line)
     canvas.save()
     return PdfReader(buffer).pages[0]
 
 
-def build(output, timeline, court, rally):
+def build(output, timeline=None, court=None, rally=None, stroke=None, starved_ball=None, main_only=False):
     panels = [(HERE / name, title, caption) for name, title, caption in PANELS]
-    if rally:
-        panels.insert(3, (rally, "Where the extra ball bits went", "Private review imagery. Three prespecified source-aligned instants show the exact 64-pixel ball crops. The tile covers the ball on two of the three instants."))
+
+    def after(target, entry):
+        i = next(i for i, (path, _, _) in enumerate(panels) if path.name == target)
+        panels.insert(i + 1, entry)
+
     if timeline:
-        panels.insert(0, (timeline, "Court, cutaway and return", "Private broadcast imagery for author review. The two cut times are measured; coding paths are schematic. Publication rights need verification."))
+        panels.insert(
+            0,
+            (
+                timeline,
+                "Court, cutaway and return",
+                "Private broadcast imagery. Cut times are measured. Coding paths are schematic. Publication rights need verification.",
+            ),
+        )
+    if stroke:
+        after(
+            "players-starved.pdf",
+            (
+                stroke,
+                "A serve at constrained bandwidth",
+                "Three source-selected instants. Ordinary AV1 costs 66.105 kbps. The joint decode costs 469.335 kbps cold with a 65.473 kbps ideal running cost. Racket grip remains an open equipment question.",
+            ),
+        )
+    if starved_ball:
+        after(
+            "starved-display.pdf",
+            (
+                starved_ball,
+                "The ball at 61 kbps",
+                "Source, baseline and tiled reconstructions at identical instants from the 60.623 and 60.670 kbps comparison. Private imagery.",
+            ),
+        )
+    if rally:
+        after(
+            "matched-rate-ball-fidelity.pdf",
+            (
+                rally,
+                "Appendix · Ball pixels at 303 kbps",
+                "Three source-aligned instants from the higher-rate ablation. The tile covers the ball on two of the three instants. Private imagery.",
+            ),
+        )
     if court:
-        panels.insert(-1, (court, "Appendix · Court reconstruction examples", "Private review imagery. The artificial test masks cover the two marked court regions. The visible player is outside the test. Known source pixels give a reference for both reconstruction methods."))
+        after(
+            "court-reconstruction.pdf",
+            (
+                court,
+                "Appendix · Court reconstruction examples",
+                "The same artificial test masks cover two marked court regions. The source supplies ground truth for both methods. Private imagery.",
+            ),
+        )
+    if main_only:
+        selected = {
+            "architecture.pdf", "players-starved.pdf", "players-rate-quality.pdf",
+            "ball-rate-quality.pdf", "ball-starved.pdf", "matched-low-detection.pdf",
+            "starved-budget.pdf", "crossshot-reference.pdf",
+        }
+        selected.update(path.name for path in (timeline, stroke, starved_ball) if path)
+        panels = [entry for entry in panels if entry[0].name in selected]
     writer = PdfWriter()
-    for index, (source, title, caption) in enumerate(panels, start=1):
-        canvas = page(title, caption, index, source if source.suffix == ".png" else None)
-        if source.suffix == ".pdf":
-            pdf = PdfReader(source)
-            assert len(pdf.pages) == 1
-            panel = pdf.pages[0]
-            width, height = float(panel.mediabox.width), float(panel.mediabox.height)
-            scale = min(724 / width, 471 / height)
-            translate = Transformation().translate(-float(panel.mediabox.left), -float(panel.mediabox.bottom))
-            matrix = translate.scale(scale).translate((792-width*scale)/2, 71+(471-height*scale)/2)
-            canvas.merge_transformed_page(panel, matrix)
-        writer.add_page(canvas)
-        writer.add_outline_item(title, index - 1)
-    writer.add_metadata({"/Title": "PointStream figure review", "/Subject": "Development figures for author review"})
+    for source, title, caption in panels:
+        pages = PdfReader(source).pages if source.suffix == ".pdf" else [None]
+        for j, panel in enumerate(pages):
+            index = len(writer.pages) + 1
+            current_title = (
+                title
+                if len(pages) == 1
+                else title + (" · court and players" if j == 0 else " · tracked ball")
+            )
+            canvas = page(current_title, caption, index, source if panel is None else None)
+            if panel is not None:
+                width, height = float(panel.mediabox.width), float(panel.mediabox.height)
+                scale = min(724 / width, 471 / height)
+                translate = Transformation().translate(
+                    -float(panel.mediabox.left), -float(panel.mediabox.bottom)
+                )
+                matrix = translate.scale(scale).translate(
+                    (792 - width * scale) / 2, 71 + (471 - height * scale) / 2
+                )
+                canvas.merge_transformed_page(panel, matrix)
+            writer.add_page(canvas)
+            writer.add_outline_item(current_title, index - 1)
+    writer.add_metadata(
+        {"/Title": "PointStream figure review", "/Subject": "Development figures for author review"}
+    )
     with output.open("xb") as stream:
         writer.write(stream)
-    assert len(PdfReader(output).pages) == len(panels)
+    assert len(PdfReader(output).pages) == len(writer.pages)
 
 
 if __name__ == "__main__":
@@ -87,5 +260,8 @@ if __name__ == "__main__":
     cli.add_argument("--timeline", type=Path)
     cli.add_argument("--court", type=Path)
     cli.add_argument("--rally", type=Path)
+    cli.add_argument("--stroke", type=Path)
+    cli.add_argument("--starved-ball", type=Path)
+    cli.add_argument("--main-only", action="store_true", help="Select the proposed manuscript figures")
     args = cli.parse_args()
-    build(args.output, args.timeline, args.court, args.rally)
+    build(args.output, args.timeline, args.court, args.rally, args.stroke, args.starved_ball, args.main_only)

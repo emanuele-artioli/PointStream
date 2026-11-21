@@ -1,0 +1,50 @@
+[
+  {
+    "match": "209",
+    "visible_labels": 9,
+    "anchor": {
+      "mode": "roi",
+      "crf": 57.5,
+      "kbps": 60.7625,
+      "dists": 0.33988266521030003,
+      "receipt": "match209-final-result.json"
+    },
+    "tracked": {
+      "kbps": 61.775,
+      "dists": 0.28107842471864486,
+      "receipt": "match209-final-result.json"
+    }
+  },
+  {
+    "match": "269",
+    "visible_labels": 12,
+    "anchor": {
+      "mode": "plain",
+      "crf": 70,
+      "kbps": 49.478125,
+      "dists": 0.27287107706069946,
+      "receipt": "match269-native-control-result.json"
+    },
+    "tracked": {
+      "kbps": 60.83125,
+      "dists": 0.22860865791638693,
+      "receipt": "match269-final-result.json"
+    }
+  },
+  {
+    "match": "235",
+    "visible_labels": 11,
+    "anchor": {
+      "mode": "plain",
+      "crf": 62.0,
+      "kbps": 58.846753246753245,
+      "dists": 0.32525818998163397,
+      "receipt": "match235-target-result.json"
+    },
+    "tracked": {
+      "kbps": 60.57974025974026,
+      "dists": 0.3271110274574973,
+      "receipt": "match235-target-result.json"
+    }
+  }
+]

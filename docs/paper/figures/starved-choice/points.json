@@ -1,0 +1,415 @@
+[
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 1114.285,
+    "players": 0.16701844334602356,
+    "ball": 0.14822889864444733,
+    "source": "selection/data.json#plain-28"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 637.4433333333334,
+    "players": 0.1869843726356824,
+    "ball": 0.15869414309660593,
+    "source": "selection/data.json#plain-36"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 303.425,
+    "players": 0.22744188457727432,
+    "ball": 0.19688981771469116,
+    "source": "selection/data.json#plain-48"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 125.98666666666666,
+    "players": 0.27714794377485913,
+    "ball": 0.26754535734653473,
+    "source": "selection/data.json#plain-60"
+  },
+  {
+    "mode": "AV1 with ROI",
+    "kbps": 909.7266666666667,
+    "players": 0.16634872555732727,
+    "ball": 0.1513981968164444,
+    "source": "selection/data.json#roi-28"
+  },
+  {
+    "mode": "AV1 with ROI",
+    "kbps": 564.37,
+    "players": 0.18432379017273587,
+    "ball": 0.16252668698628744,
+    "source": "selection/data.json#roi-36"
+  },
+  {
+    "mode": "AV1 with ROI",
+    "kbps": 288.21,
+    "players": 0.2262166092793147,
+    "ball": 0.19963241120179495,
+    "source": "selection/data.json#roi-48"
+  },
+  {
+    "mode": "AV1 with ROI",
+    "kbps": 124.74333333333334,
+    "players": 0.28224802762269974,
+    "ball": 0.2727610369523366,
+    "source": "selection/data.json#roi-60"
+  },
+  {
+    "mode": "AV1 + ball tiles",
+    "kbps": 670.1966666666667,
+    "players": 0.18688779075940448,
+    "ball": 0.14040802915891012,
+    "source": "selection/data.json#ball36"
+  },
+  {
+    "mode": "AV1 + ball tiles",
+    "kbps": 336.17833333333334,
+    "players": 0.22718371450901031,
+    "ball": 0.1597835123538971,
+    "source": "selection/data.json#ball48"
+  },
+  {
+    "mode": "AV1 + ball tiles",
+    "kbps": 158.73833333333334,
+    "players": 0.27700304488341015,
+    "ball": 0.20019972821076712,
+    "source": "selection/data.json#ball60"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 2097.3116666666665,
+    "players": 0.1487391044696172,
+    "ball": 0.1383038411537806,
+    "source": "selection/data.json#plain-18"
+  },
+  {
+    "mode": "AV1 with ROI",
+    "kbps": 1592.6566666666668,
+    "players": 0.1507922088106473,
+    "ball": 0.13329536219437918,
+    "source": "selection/data.json#roi-18"
+  },
+  {
+    "mode": "AV1 + ball tiles",
+    "kbps": 303.71,
+    "players": 0.23619920760393143,
+    "ball": 0.16140712797641754,
+    "source": "selection/data.json#ball-matched50"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 77.89166666666667,
+    "players": 0.44031528383493423,
+    "ball": 0.3718193421761195,
+    "source": "starved-base-local-20261122#original-36"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 46.391666666666666,
+    "players": 0.45647379507621133,
+    "ball": 0.3808160722255707,
+    "source": "starved-base-local-20261122#original-48"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 27.918333333333333,
+    "players": 0.49112704396247864,
+    "ball": 0.3930750439564387,
+    "source": "starved-base-local-20261122#original-60"
+  },
+  {
+    "mode": "Joint PointStream \u00b7 cold start",
+    "kbps": 507.20666666666665,
+    "players": 0.2601407890518507,
+    "ball": 0.267572542031606,
+    "source": "starved-base-local-20261122#clean-36"
+  },
+  {
+    "mode": "Joint PointStream \u00b7 valid-cache scenario",
+    "kbps": 103.345,
+    "players": 0.2601407890518507,
+    "ball": 0.267572542031606,
+    "source": "starved-base-local-20261122#clean-36"
+  },
+  {
+    "mode": "Joint PointStream \u00b7 cold start",
+    "kbps": 483.79833333333335,
+    "players": 0.2597966492176056,
+    "ball": 0.2726576526959737,
+    "source": "starved-base-local-20261122#clean-48"
+  },
+  {
+    "mode": "Joint PointStream \u00b7 valid-cache scenario",
+    "kbps": 79.93666666666667,
+    "players": 0.2597966492176056,
+    "ball": 0.2726576526959737,
+    "source": "starved-base-local-20261122#clean-48"
+  },
+  {
+    "mode": "Joint PointStream \u00b7 cold start",
+    "kbps": 469.335,
+    "players": 0.25932610283295315,
+    "ball": 0.2761533707380295,
+    "source": "starved-base-local-20261122#clean-60"
+  },
+  {
+    "mode": "Joint PointStream \u00b7 valid-cache scenario",
+    "kbps": 65.47333333333333,
+    "players": 0.25932610283295315,
+    "ball": 0.2761533707380295,
+    "source": "starved-base-local-20261122#clean-60"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 54.681666666666665,
+    "players": 0.45022308329741156,
+    "ball": 0.3793427248795827,
+    "source": "starved-rally-tiles-20261122#plain50"
+  },
+  {
+    "mode": "AV1 + ball tiles",
+    "kbps": 54.375,
+    "players": 0.5113515282670656,
+    "ball": 0.3036884516477585,
+    "source": "starved-rally-tiles-20261122#tile50"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 60.623333333333335,
+    "players": 0.4437839463353157,
+    "ball": 0.3784806728363037,
+    "source": "starved-rally-tiles-20261122#plain63"
+  },
+  {
+    "mode": "AV1 + ball tiles",
+    "kbps": 60.67,
+    "players": 0.4912068620324135,
+    "ball": 0.29325083394845325,
+    "source": "starved-rally-tiles-20261122#tile63"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 122.12166666666667,
+    "players": 0.4207106977701187,
+    "ball": 0.3612070282300313,
+    "source": "starved-rally-tiles-20261122#plain125"
+  },
+  {
+    "mode": "AV1 + ball tiles",
+    "kbps": 122.855,
+    "players": 0.43190324306488037,
+    "ball": 0.2732234100500743,
+    "source": "starved-rally-tiles-20261122#tile125"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 59.88333333333333,
+    "players": 0.39313853035370505,
+    "ball": 0.33641211191813153,
+    "source": "starved-rally-tiles-20261122#plainunder"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 61.42333333333334,
+    "players": 0.38874611258506775,
+    "ball": 0.3405796488126119,
+    "source": "starved-rally-tiles-20261122#plainover"
+  },
+  {
+    "mode": "AV1 with ROI",
+    "kbps": 60.12166666666667,
+    "players": 0.3935687243938446,
+    "ball": 0.3401625454425812,
+    "source": "starved-rally-tiles-20261122#roiunder"
+  },
+  {
+    "mode": "AV1 with ROI",
+    "kbps": 62.01666666666667,
+    "players": 0.3884579663475355,
+    "ball": 0.3396450827519099,
+    "source": "starved-rally-tiles-20261122#roiover"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 66.105,
+    "players": 0.38331085691849387,
+    "ball": 0.3347807824611664,
+    "source": "starved-stroke-20261122#plain"
+  },
+  {
+    "mode": "AV1 with ROI",
+    "kbps": 64.85333333333334,
+    "players": 0.3849968910217285,
+    "ball": 0.33859139184157055,
+    "source": "starved-stroke-20261122#roi"
+  },
+  {
+    "mode": "Joint PointStream \u00b7 cold start",
+    "kbps": 467.365,
+    "players": 0.2593704089522362,
+    "ball": 0.2787269701560338,
+    "source": "starved-tile-budget-20261122#jointQ36"
+  },
+  {
+    "mode": "Joint PointStream \u00b7 valid-cache scenario",
+    "kbps": 63.50333333333333,
+    "players": 0.2593704089522362,
+    "ball": 0.2787269701560338,
+    "source": "starved-tile-budget-20261122#jointQ36"
+  },
+  {
+    "mode": "Joint PointStream \u00b7 cold start",
+    "kbps": 460.20666666666665,
+    "players": 0.25920188426971436,
+    "ball": 0.28700124224026996,
+    "source": "starved-tile-budget-20261122#jointQ48"
+  },
+  {
+    "mode": "Joint PointStream \u00b7 valid-cache scenario",
+    "kbps": 56.345,
+    "players": 0.25920188426971436,
+    "ball": 0.28700124224026996,
+    "source": "starved-tile-budget-20261122#jointQ48"
+  },
+  {
+    "mode": "Joint PointStream \u00b7 cold start",
+    "kbps": 456.155,
+    "players": 0.25927138328552246,
+    "ball": 0.2955813705921173,
+    "source": "starved-tile-budget-20261122#jointQ60"
+  },
+  {
+    "mode": "Joint PointStream \u00b7 valid-cache scenario",
+    "kbps": 52.29333333333334,
+    "players": 0.25927138328552246,
+    "ball": 0.2955813705921173,
+    "source": "starved-tile-budget-20261122#jointQ60"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 52.11333333333334,
+    "players": 0.3975382397572199,
+    "ball": 0.3431248466173808,
+    "source": "starved-tile-budget-20261122#plain_match"
+  },
+  {
+    "mode": "AV1 with ROI",
+    "kbps": 51.84,
+    "players": 0.41045847038427985,
+    "ball": 0.3472782125075658,
+    "source": "starved-tile-budget-20261122#roi_under"
+  },
+  {
+    "mode": "AV1 with ROI",
+    "kbps": 53.001666666666665,
+    "players": 0.40823022524515784,
+    "ball": 0.34905413289864856,
+    "source": "starved-tile-budget-20261122#roi_over"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 52.07666666666667,
+    "players": 0.44963390876849496,
+    "ball": 0.3784768283367157,
+    "source": "starved-tile-budget-20261122#plain240_match"
+  },
+  {
+    "mode": "AV1 + rendered trajectory",
+    "kbps": 19.965,
+    "players": 0.5459733605384827,
+    "ball": 0.3643117348353068,
+    "source": "starved-ball-twenty-20261122/#pointstream"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 20.063333333333336,
+    "players": 0.5416030635436376,
+    "ball": 0.4269787420829137,
+    "source": "starved-ball-twenty-20261122/#plain160Q61"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 21.623333333333335,
+    "players": 0.5115252509713173,
+    "ball": 0.4133229007323583,
+    "source": "starved-ball-twenty-20261122/#plain240Q63"
+  },
+  {
+    "mode": "AV1 with ROI",
+    "kbps": 27.45,
+    "players": 0.516310508052508,
+    "ball": 0.41327237089474994,
+    "source": "starved-ball-twenty-20261122/#roi240Q63"
+  },
+  {
+    "mode": "AV1 + rendered trajectory",
+    "kbps": 60.14,
+    "players": 0.4418201545874278,
+    "ball": 0.31596024334430695,
+    "source": "starved-ball-twenty-20261122/mid-#pointstream"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 45.888333333333335,
+    "players": 0.5007641365130742,
+    "ball": 0.40989959239959717,
+    "source": "starved-ball-twenty-20261122/mid-#plain160Q36"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 59.858333333333334,
+    "players": 0.445098415017128,
+    "ball": 0.37879370152950287,
+    "source": "starved-ball-twenty-20261122/mid-#plain240Q41.75"
+  },
+  {
+    "mode": "AV1 with ROI",
+    "kbps": 60.17333333333334,
+    "players": 0.44661365201075875,
+    "ball": 0.3795503576596578,
+    "source": "starved-ball-twenty-20261122/mid-#roi240Q42.25"
+  },
+  {
+    "mode": "AV1 + rendered trajectory",
+    "kbps": 122.59166666666667,
+    "players": 0.4132843563954035,
+    "ball": 0.3103484759728114,
+    "source": "starved-ball-twenty-20261122/upper-#pointstream"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 84.94333333333334,
+    "players": 0.4863877221941948,
+    "ball": 0.39634724458058673,
+    "source": "starved-ball-twenty-20261122/upper-#plain160Q20"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 122.12166666666667,
+    "players": 0.4207106977701187,
+    "ball": 0.3612070282300313,
+    "source": "starved-ball-twenty-20261122/upper-#plain240Q26.75"
+  },
+  {
+    "mode": "AV1 with ROI",
+    "kbps": 122.755,
+    "players": 0.4179057603081068,
+    "ball": 0.3596315135558446,
+    "source": "starved-ball-twenty-20261122/upper-#roi240Q24.5"
+  },
+  {
+    "mode": "DCVC-UF",
+    "kbps": 36.825,
+    "players": 0.33479494601488113,
+    "ball": 0.3230050305525462,
+    "source": "starved-dcvc-regions-20261122#QP18"
+  },
+  {
+    "mode": "DCVC-UF",
+    "kbps": 49.778333333333336,
+    "players": 0.3087771957119306,
+    "ball": 0.3057214121023814,
+    "source": "starved-dcvc-regions-20261122#QP24"
+  }
+]

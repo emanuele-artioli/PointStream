@@ -1,4 +1,4 @@
-# Two procedures used in the tennis implementation
+# Three procedures used in the tennis implementation
 
 ## 1. Find camera views eligible for object coding
 
@@ -19,7 +19,27 @@ For each resulting shot:
 
 For equal lengths the implementation picks the earlier run or neighbor. Durations round to native frame ticks. A court-eligible shot can still be a replay or between points. On the recorded court / close-up / court passage, the separate historical active-play selector classified the three spans as other / interlude / point. Report active-play labels and actual routing when making a switching claim. [Shot splitting and interval scoring](../../../../experiments/tennis/k8b.py) · [Court registration](../../../../experiments/tennis/court.py) · [Continuous passage](../../../experiments/continuous-return-20261118/README.md)
 
-## 2. Deliver tracked ball pixels at native cadence
+## 2. Reconstruct players from appearance and keypoints
+
+The evaluated common-player mode covers one continuous 240-frame track per player. On the server, the player packet carries the base video, appearance reference per run, compressed keypoints and the information needed to recover the crop placement and timing. A pinned common renderer is installed at the receiver. This procedure uses the conditioning parsed from the delivered packet.
+
+```text
+For each player track, code its appearance reference and keypoint sequence.
+Pack these with the base, track timing, geometry and declared player order.
+For each admitted track, decode its reference, keypoints, boxes and seed.
+    For each native tick, rasterize its decoded pose in the player crop.
+    Render the sequence conditioned on that reference and the pose sequence.
+For each tick, initialize the display canvas from the decoded base.
+    Visit visible players in the packet's far-to-near order.
+    Prompt the segmenter on each generated crop using paid pose geometry.
+    If support or the predicted mask is empty, retain the underlying pixels.
+    Otherwise project the mask and composite in-frame pixels at the crop box.
+Emit the composed frame; an optional paid ball update follows the players.
+```
+
+Keep model installation, appearance transmission, refresh and reuse assumptions visible beside the achieved rate. The renderer does not receive source target RGB or human masks. The fallback above applies to missing support; a corrupt packet, missing scheduled crop or mismatched model is an error. The historical sampled-window comparison has a different adaptation and rate contract. [Conditioning and native generation](../../../../experiments/tennis/common_receiver_generate.py) · [Compositor and fallback](../../../../experiments/tennis/common_player_finish.py) · [Audited 240-frame replay](../../../experiments/receiver-replay-20261118/independent-idle-20261118/README.md)
+
+## 3. Deliver tracked ball pixels at native cadence
 
 Input is the native video and an optional sender track location at each tick. Output is a complete native base stream and, when used, an aligned tile stream with in-frame placements. This is the tracked-pixel mode. The trajectory-rendering experiment uses a different representation.
 

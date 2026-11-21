@@ -1,4 +1,5 @@
 """Independent person-mask inference on blinded full-frame source and decoder outputs."""
+
 import argparse
 import base64
 import hashlib
@@ -63,25 +64,50 @@ def run(args):
             assert identity + ".png" == name
             frame = cv2.imdecode(np.frombuffer(data, np.uint8), cv2.IMREAD_COLOR)
             assert frame.shape == (1080, 1920, 3)
-            result, = model.predict(frame, imgsz=1280, conf=.25, iou=.7, classes=[0],
-                                    retina_masks=True, device="cpu", verbose=False)
+            (result,) = model.predict(
+                frame,
+                imgsz=1280,
+                conf=0.25,
+                iou=0.7,
+                classes=[0],
+                retina_masks=True,
+                device="cpu",
+                verbose=False,
+            )
             persons = []
             if len(result.boxes):
-                assert result.masks is not None and result.masks.data.shape == (len(result.boxes), 1080, 1920)
+                assert result.masks is not None and result.masks.data.shape == (
+                    len(result.boxes),
+                    1080,
+                    1920,
+                )
                 for box, mask in zip(result.boxes, result.masks.data):
                     assert int(box.cls.item()) == 0 and mask.device.type == "cpu"
-                    arr = (mask.numpy() > .5).astype(np.uint8)
+                    arr = (mask.numpy() > 0.5).astype(np.uint8)
                     x, y, w, h = cv2.boundingRect(arr)
                     if not w or not h:
                         continue
-                    ok, png = cv2.imencode(".png", arr[y:y+h, x:x+w]*255)
+                    ok, png = cv2.imencode(".png", arr[y : y + h, x : x + w] * 255)
                     assert ok
-                    persons.append(dict(rect=[x, y, w, h], score=float(box.conf.item()),
-                                        pixels=int(arr.sum()), png=base64.b64encode(png).decode()))
+                    persons.append(
+                        dict(
+                            rect=[x, y, w, h],
+                            score=float(box.conf.item()),
+                            pixels=int(arr.sum()),
+                            png=base64.b64encode(png).decode(),
+                        )
+                    )
             rows[identity] = persons
     end = time.monotonic()
-    report = dict(rows=rows, weight=WEIGHT, frames=FRAMES, ultralytics=ultralytics.__version__,
-                  torch=str(torch.__version__), setup_seconds=started-start, scoring_seconds=end-started)
+    report = dict(
+        rows=rows,
+        weight=WEIGHT,
+        frames=FRAMES,
+        ultralytics=ultralytics.__version__,
+        torch=str(torch.__version__),
+        setup_seconds=started - start,
+        scoring_seconds=end - started,
+    )
     publish = scratch / "publish"
     publish.mkdir()
     (publish / "predictions.json").write_text(json.dumps(report))
@@ -95,23 +121,33 @@ def validate():
     with tarfile.open(stage / "published.tar") as archive:
         r = json.load(archive.extractfile("publish/predictions.json"))
     smoke = os.environ["PS_STAGE"] == "smoke"
-    assert r["weight"] == WEIGHT and r["frames"] == FRAMES and len(r["rows"]) == (4 if smoke else 48)
+    assert (
+        r["weight"] == WEIGHT and r["frames"] == FRAMES and len(r["rows"]) == (4 if smoke else 48)
+    )
     assert SMOKE <= r["rows"].keys()
     for preds in r["rows"].values():
         for p in preds:
             x, y, w, h = p["rect"]
             im = cv2.imdecode(np.frombuffer(base64.b64decode(p["png"], validate=True), np.uint8), 0)
-            assert 0 <= x < x+w <= 1920 and 0 <= y < y+h <= 1080 and .25 <= p["score"] <= 1
+            assert 0 <= x < x + w <= 1920 and 0 <= y < y + h <= 1080 and 0.25 <= p["score"] <= 1
             assert im.shape == (h, w) and np.count_nonzero(im) == p["pixels"] > 0
             assert np.all((im == 0) | (im == 255))
     assert r["rows"]["0360ccc4ec8eea097f872285551080d36de520b8ec84ab4f0ccf30b5e9284a7a"]
-    forecast = r["setup_seconds"] + 18*r["scoring_seconds"] + 65 if smoke else None
-    checks = dict(authenticated_inputs=r["weight"] == WEIGHT and r["frames"] == FRAMES,
-                  complete_records=len(r["rows"]) == (4 if smoke else 48),
-                  source_persons=len(r["rows"]["0360ccc4ec8eea097f872285551080d36de520b8ec84ab4f0ccf30b5e9284a7a"]) > 0,
-                  geometry_and_masks=True, time_budget=forecast is None or forecast < 1150)
+    forecast = r["setup_seconds"] + 18 * r["scoring_seconds"] + 65 if smoke else None
+    checks = dict(
+        authenticated_inputs=r["weight"] == WEIGHT and r["frames"] == FRAMES,
+        complete_records=len(r["rows"]) == (4 if smoke else 48),
+        source_persons=len(
+            r["rows"]["0360ccc4ec8eea097f872285551080d36de520b8ec84ab4f0ccf30b5e9284a7a"]
+        )
+        > 0,
+        geometry_and_masks=True,
+        time_budget=forecast is None or forecast < 1150,
+    )
     passed = all(checks.values())
-    Path(os.environ["PS_VALIDATION_PATH"]).write_text(json.dumps(dict(passed=passed, checks=checks, smoke_forecast_s=forecast)))
+    Path(os.environ["PS_VALIDATION_PATH"]).write_text(
+        json.dumps(dict(passed=passed, checks=checks, smoke_forecast_s=forecast))
+    )
     if not passed:
         raise ValueError("Smoke forecast exceeds the full scoring cap")
 

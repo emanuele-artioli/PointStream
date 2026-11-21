@@ -1,4 +1,4 @@
-"""Typeset the two implemented algorithms from their shared, auditable paper text."""
+"""Typeset the implemented algorithms from their shared, auditable paper text."""
 from pathlib import Path
 
 from reportlab.pdfgen.canvas import Canvas
@@ -11,7 +11,10 @@ def main():
     canvas = Canvas(str(HERE / "algorithms.pdf"), pagesize=(650, 520), invariant=1)
     canvas.setTitle("PointStream tennis procedures")
     y = 492
-    for section in text.split("\n## ")[1:]:
+    for index, section in enumerate(text.split("\n## ")[1:]):
+        if index == 2:
+            canvas.showPage()
+            y = 492
         title = section.splitlines()[0]
         canvas.setFont("Helvetica-Bold", 14)
         canvas.drawString(21, y, title)
