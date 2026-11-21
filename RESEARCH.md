@@ -1,6 +1,6 @@
 # Research brief
 
-Can sending points and appearance improve the parts of a video that matter at a given total bitrate? A conventional stream, ROI coding, tracked pixels, rendered trajectories and pose-conditioned synthesis are all credible choices. The [paper figure plan](PLAN.md) defines how to choose between them.
+Can one transmitted representation preserve the action for viewers at constrained rates and expose its motion to a machine? The first question is perceptual and the second asks what an application can read, how accurately, and at what processing cost. A conventional stream, ROI coding, tracked pixels, rendered trajectories and pose-conditioned synthesis are all credible choices. The [paper figure plan](PLAN.md) defines how to choose between them.
 
 ## Evidence we should build on
 
