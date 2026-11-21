@@ -21,6 +21,8 @@ TOOLS = {
     "dav1d": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
     "ffmpeg": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
 }
+PRIOR_SHA = "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d"
+NEXT_SHA = "f0551443eaff4e4b3539f21cd0c6ac66f55601d480ad099a571e8626db735e4a"
 START, COUNT, FPS = 76866, 10825, 50
 WIDTH, HEIGHT = 240, 136
 
@@ -52,8 +54,8 @@ def validate_ivf(path, frames):
 def run(args):
     if len(os.sched_getaffinity(0)) != 1 or os.environ.get("CUDA_VISIBLE_DEVICES") != "":
         raise ValueError("One-core CPU-only isolation required")
-    if sha(args.source) != SOURCE_SHA:
-        raise ValueError("Broadcast source identity differs")
+    if sha(args.source) != SOURCE_SHA or sha(args.prior) != PRIOR_SHA or sha(args.next) != NEXT_SHA:
+        raise ValueError("Broadcast or boundary clip identity differs")
     tools = {name: svtav1.tool(name) for name in (*TOOLS, "ffprobe")}
     if any(tools[name]["sha256"] != expected for name, expected in TOOLS.items()):
         raise ValueError("Pinned native tools differ")
@@ -80,15 +82,28 @@ def run(args):
     if raw.stat().st_size != frame_size * args.frames:
         raise ValueError("Gap conversion has incomplete frames")
     if args.frames == 240:
-        selected = work / "boundary.yuv"
-        exact = [tools["ffmpeg"]["path"], "-v", "error", "-nostdin", "-i", str(args.source),
-                 "-vf", f"select=eq(n\\,{START}),scale={WIDTH}:{HEIGHT}:flags=area:out_range=tv,format=yuv420p",
-                 "-frames:v", "1", "-filter_threads", "1", "-fps_mode", "passthrough", "-threads", "1",
-                 "-f", "rawvideo", "-pix_fmt", "yuv420p", str(selected)]
-        subprocess.run(exact, check=True, timeout=180)
+        def boundary(source, target, count, seek=None, select=None):
+            command = [tools["ffmpeg"]["path"], "-v", "error", "-nostdin"]
+            if seek is not None:
+                command += ["-ss", str(seek / FPS)]
+            command += ["-i", str(source)]
+            prefix = f"select=eq(n\\,{select})," if select is not None else ""
+            command += ["-vf", prefix + f"scale={WIDTH}:{HEIGHT}:flags=area:out_range=tv,format=yuv420p",
+                        "-frames:v", str(count), "-filter_threads", "1", "-fps_mode", "passthrough",
+                        "-threads", "1", "-f", "rawvideo", "-pix_fmt", "yuv420p", str(target)]
+            subprocess.run(command, check=True, timeout=90)
+            result = target.read_bytes()
+            if len(result) != frame_size * count:
+                raise ValueError("Incomplete source boundary")
+            return result
+        before = boundary(args.source, work / "prior-source.yuv", 2, seek=START - 1)
+        previous = boundary(args.prior, work / "prior-clip.yuv", 1, select=239)
+        after = boundary(args.source, work / "next-source.yuv", 1, seek=START + COUNT)
+        following = boundary(args.next, work / "next-clip.yuv", 1, select=0)
         with raw.open("rb") as handle:
-            if handle.read(frame_size) != selected.read_bytes():
-                raise ValueError("Fast seek differs from exact frame index")
+            first = handle.read(frame_size)
+        if before[:frame_size] != previous or before[frame_size:] != first or after != following:
+            raise ValueError("Fast seek differs from the verified /000 or /002 boundary")
     codec = svtav1.code(raw, work, width=WIDTH, height=HEIGHT, fps=Fraction(FPS), frames=args.frames,
                         crf=70, preset=8, threads=1, full_range=False,
                         encoder=tools["SvtAv1EncApp"]["path"], decoder=tools["dav1d"]["path"], timeout=1500)
@@ -158,12 +173,14 @@ def validate():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path)
+    parser.add_argument("--prior", type=Path)
+    parser.add_argument("--next", type=Path)
     parser.add_argument("--frames", type=int, choices=(240, COUNT))
     parser.add_argument("--validate", action="store_true")
     args = parser.parse_args()
     if args.validate:
         validate()
-    elif args.source is not None and args.frames is not None:
+    elif args.source is not None and args.prior is not None and args.next is not None and args.frames is not None:
         run(args)
     else:
         parser.error("source and frames are required")
