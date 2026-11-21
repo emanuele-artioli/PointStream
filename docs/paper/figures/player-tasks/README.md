@@ -1,0 +1,30 @@
+# Player machine-task diagnostics
+
+These two figures use saved measurements. The figure code reproduces each number and writes source hashes and per-frame values to [results.json](results.json). No detector is run by this plotting step.
+
+**[Receiver masks](receiver-masks.pdf).** For each of the 12 source-reviewed ticks in the opened Nadal–Kyrgios rally, intersect the source human-reviewed player-body mask with that player's projected receiver mask. Compute union as human body area plus the independently audited projected area minus the intersection. Average frame IoUs separately for the two players.
+
+| Reviewed frames | Player 1 | Player 2 |
+|---|---:|---:|
+| All 12 | 0.753 | 0.770 |
+| Nine reviewed model proposals | 0.798 | 0.804 |
+| Three unprompted source-only labels | 0.618 | 0.669 |
+
+These labels were reviewed by one person on one previously opened match. Nine frames began with model proposals and the remaining three were drawn without proposals. Each category contains different frames, so the difference cannot be attributed to the annotation process. The receiver mask comes from the existing generated-player compositing path. Its direct transmission or prediction cost and the quality of a segmentation machine operating on the final decoded RGB require separate measurement. This figure is a preliminary diagnostic of mask overlap with source body labels and provides no comparison with segmenting ordinary decoded video. It excludes rackets. [Reviewed label inventory](../../../experiments/foreground-references-20261118/finished-review-1621utc.json) · [Mask intersections](../../../experiments/clean-base-comparison-20261118/mask-coverage.json) · [Projected areas](../../../experiments/receiver-replay-20261118/independent-idle-20261118/finish-full-audit.json)
+
+**[Keypoint coding](pose-coding.pdf).** Six example operating points reported in K4b.3 compare compressed and reconstructed COCO keypoints with the original YOLO11x-pose output on source crops. The x-axis is pooled symbol entropy plus absolute track starts, an optimistic estimate for approximately 1.82 players per frame. It is not a measured full packet rate. At the selected 3.3 kbps code, median object-keypoint similarity is 0.958 for far players and 0.988 for near players, with 8.07 pixels as the pooled 95th percentile displacement. The reference itself is the original detector output, so the plot measures coding distortion only. This is neither human-ground-truth pose accuracy nor a comparison of independent pose estimators run on decoded videos. The six points represent different quantizers, prediction modes and frame subsampling, so they should not be joined as one smooth rate curve. [K4b.3 methods, full table and exposure](../../../experiments/k4b.md#2026-10-21--k4b3-keypoint-rate-against-keypoint-error)
+
+## Role in the paper
+
+A single received stream can serve a viewer and a sports-analysis application. The display figures evaluate the reconstructed play. The machine panels ask whether an application can locate the ball or recover a player's pose or silhouette. A receiver can read transmitted points directly; a conventional video receiver can run a task model on its decoded pictures. Include a PointStream RGB-only arm to isolate what survives rendering, and a separate direct-output arm to show what the syntax exposes. Use the same independent human reference and full delivery rate for the two uses. A machine-only mode that discards the display video would have a different byte bill and warrants a separate study only if claimed. This framing follows the human- and machine-consumption use cases described by [MPEG Video Coding for Machines](https://www.mpeg.org/standards/MPEG-AI/2/).
+
+## Smallest paired test that would support a machine-task claim
+
+1. Freeze one development rally and use the 12 source-only body masks already reviewed. Annotate 17 keypoints and visibility on those same native frames, blind to all decoded outputs and sender tracks. Preserve uncertain and invisible joints as distinct labels. Add examples containing an absent or heavily occluded player before estimating false positives or missing-player behavior.
+2. At the same total-rate points as the main comparison, decode plain AV1, ROI AV1, DCVC-UF and the complete PointStream stream. Count every transmitted byte and retain every frame. Apply the same independent segmentation and pose checkpoints to decoded RGB only, with hashes, thresholds and preprocessing frozen before scoring. Keep the decoded results blind to the annotator and do not pass PointStream's tracks or masks to the judges. Report absent-player false positives, missed players and missed or hallucinated joints. Review judge and sender training exposure.
+3. Score per-player segmentation IoU and joint error or OKS against the human source labels, including misses in the denominators. Separately score the direct receiver mask and decoded transmitted keypoints where the packet actually supplies them. The direct-channel test asks what a downstream application can read from PointStream. The decoded-RGB test asks how all codecs support the same independently run machine task. These are complementary outputs with different processing requirements.
+4. Use the opened rally as a low-cost feasibility screen, then freeze models, metrics, rate choices and correspondence rules before repeating on source-labeled unseen physical matches. Aggregate at match level and show uncertainty rather than treating frames as independent sequences. Report the original uncompressed source alongside the codec outputs to characterize the judges' error ceiling.
+
+The small existing annotation sample does not support a general machine-task performance claim. More source-only labels are necessary for confirmation. The 20/50/125 kbps joint study and the 303 kbps matched ball streams can supply decoded candidates where all compared methods have genuine rate support. Rate selection must be fixed from delivered bytes and never extrapolated.
+
+Run `MPLBACKEND=Agg python docs/paper/figures/player-tasks/plot.py` to rebuild both vector PDFs, PNG previews and the data receipt.

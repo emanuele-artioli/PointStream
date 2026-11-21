@@ -5,21 +5,7 @@ and egocentric hand-object video. It provides segmentation, codec and compositin
 components, scoped serialized-ball experiments, and a prospective complete-codec
 programme. Competitive end-to-end gains in both domains remain research goals.
 
-The [codec endpoints](docs/codec-endpoint.md) provide `encode`, `decode` and
-`inspect` commands for native fallback and tracked pixel patches. Start with
-the [current research brief](RESEARCH.md) and [current plan](PLAN.md): the lead
-hypothesis is combined tennis player-and-ball foreground coding, building on
-the saved generative-player and paid-ball positives. The learned two-player
-receiver has replayed a complete 240-frame rally. The [low-rate study](docs/experiments/starved-joint-20261122/README.md)
-tests joint foreground quality at comparable total rates. Racket-inclusive
-claims require separate evidence. Older model-selection conclusions undergo
-code/input requalification.
-The [submission ladder](docs/experiments/submission-ladder-20261114.md)
-records the current milestones and stage-budget requirements. The [current readiness update](docs/paper/submission-ladder-readiness-2026-11-15.md) separates accepted development results from the human-reference and confirmation work still required.
-
-The [November17 author-review revision](docs/paper/manuscript-integration-2026-11-17.md)
-restores the player positives, adds reproducible source/cost figures and records
-the minimum remaining tests; a complete combined codec win remains unproven.
+Start with the [paper figure plan](PLAN.md) for measured figures, gaps and the next experiments. The [research brief](RESEARCH.md) summarizes the claims. The [codec endpoints](docs/codec-endpoint.md) describe encoding, decoding and inspection.
 
 ## Layout
 

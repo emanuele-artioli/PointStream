@@ -76,6 +76,11 @@ Later runs read the table instead of re-checking, and pick `gpu_models` from it.
 
 ## Experiments
 
+Start paper work from the [figure plan](PLAN.md). Before proposing a paper run,
+identify the figure, the exact missing comparison and the decision it changes.
+Reuse compatible measurements first. Keep the live queue in PLAN and the
+detailed methods, budgets and outcomes in the linked experiment record.
+
 GPU time and training are the constraint; code is cheap. Before a run, write its
 decision rule, hypothesis, competing explanation and budget in the item's
 file under [docs/experiments/](docs/experiments.md#runs), one file per PLAN

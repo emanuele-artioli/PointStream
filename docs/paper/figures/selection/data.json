@@ -1,0 +1,499 @@
+{
+  "scope": "One opened cold-start rally, 12 reviewed native RGB instants, three object metrics.",
+  "protocol": {
+    "frames": 240,
+    "fps": 50,
+    "seconds": 4.8,
+    "review_ticks": [
+      10,
+      30,
+      50,
+      70,
+      90,
+      110,
+      130,
+      150,
+      170,
+      190,
+      210,
+      230
+    ],
+    "player_support": "reviewed body mask, bbox plus 32 pixels context",
+    "ball_support": "64px crop around source-reviewed center",
+    "rate": "complete stored delivery, cold reference images paid once"
+  },
+  "source_files": [
+    {
+      "path": "docs/experiments/clean-court-regional-screen-20261118/summary.json",
+      "sha256": "7db7261be072a2af25a3bbd15b1ec3375095d6426c27e538d12b4821d34b0815"
+    },
+    {
+      "path": "docs/experiments/clean-court-regional-screen-20261118/control-scores.json",
+      "sha256": "ac71bae2c8ed549988240803c2abdb1aa588597eacad12f2d78379040a261d84"
+    },
+    {
+      "path": "docs/experiments/matched-ball-rate-20261122/scores.json",
+      "sha256": "977bb0c983ab01e81c37d5b9e87f793e54178e4fdcb705855d0a452a0901bd44"
+    },
+    {
+      "path": "docs/experiments/matched-ball-rate-20261122/render-result.json",
+      "sha256": "5cfc4d79e67e9c0c67afd7037415237cb44dafe116dedaebb746cbabc54b0819"
+    },
+    {
+      "path": "docs/experiments/clean-court-regional-screen-20261118/control-inputs.json",
+      "sha256": "7ad19fb2559c842a85edc6151bdde999d483ac2670f8a6f6fa09406dea66700e"
+    },
+    {
+      "path": "docs/experiments/matched-ball-rate-20261122/crop-inputs.json",
+      "sha256": "e28aae5a84a1fbffb0e310e56a89731c98ef86e5afbbfe5c900ef876ab7d3bf4"
+    },
+    {
+      "path": "docs/experiments/receiver-replay-20261118/selected-rate-support/prior-dcvc.json",
+      "sha256": "93c320757e97caa24cdf9265aaff025d8226b6d0b8e8fb071ca99a3e27cdc348"
+    },
+    {
+      "path": "docs/experiments/w7-specs/dcvc-points-al028-scale2.json",
+      "sha256": "e5d05fe54feedf186bc83b44b153bd2e6ae3247d60648859ef69e73f154408f1"
+    },
+    {
+      "path": "docs/experiments/w9-inputs/w7-repaired-2h.json",
+      "sha256": "5245d83df6f8ee16ade28174f6f3c46a94b42ae4d32520c2165fa602e83e9d86"
+    }
+  ],
+  "rows": [
+    {
+      "arm": "original",
+      "total_kbps": 747.42,
+      "dists": {
+        "p1": 0.22597368558247885,
+        "p2": 0.23466196656227112,
+        "ball": 0.15676546096801758
+      }
+    },
+    {
+      "arm": "plain-28",
+      "total_kbps": 1114.285,
+      "dists": {
+        "p1": 0.16619656483332315,
+        "p2": 0.16784032185872397,
+        "ball": 0.14822889864444733
+      }
+    },
+    {
+      "arm": "plain-36",
+      "total_kbps": 637.4433333333334,
+      "dists": {
+        "p1": 0.18632973233858743,
+        "p2": 0.1876390129327774,
+        "ball": 0.15869414309660593
+      }
+    },
+    {
+      "arm": "plain-48",
+      "total_kbps": 303.425,
+      "dists": {
+        "p1": 0.22943217058976492,
+        "p2": 0.22545159856478372,
+        "ball": 0.19688981771469116
+      }
+    },
+    {
+      "arm": "plain-60",
+      "total_kbps": 125.98666666666666,
+      "dists": {
+        "p1": 0.2835321972767512,
+        "p2": 0.27076369027296704,
+        "ball": 0.26754535734653473
+      }
+    },
+    {
+      "arm": "roi-28",
+      "total_kbps": 909.7266666666667,
+      "dists": {
+        "p1": 0.16617311537265778,
+        "p2": 0.16652433574199677,
+        "ball": 0.1513981968164444
+      }
+    },
+    {
+      "arm": "roi-36",
+      "total_kbps": 564.37,
+      "dists": {
+        "p1": 0.18144680559635162,
+        "p2": 0.18720077474912009,
+        "ball": 0.16252668698628744
+      }
+    },
+    {
+      "arm": "roi-48",
+      "total_kbps": 288.21,
+      "dists": {
+        "p1": 0.22792289157708487,
+        "p2": 0.2245103269815445,
+        "ball": 0.19963241120179495
+      }
+    },
+    {
+      "arm": "roi-60",
+      "total_kbps": 124.74333333333334,
+      "dists": {
+        "p1": 0.2832442869742711,
+        "p2": 0.28125176827112836,
+        "ball": 0.2727610369523366
+      }
+    },
+    {
+      "arm": "clean",
+      "total_kbps": 684.6333333333333,
+      "dists": {
+        "p1": 0.25104766090710956,
+        "p2": 0.24596939980983734,
+        "ball": 0.20878336330254874
+      }
+    },
+    {
+      "arm": "refined",
+      "total_kbps": 690.135,
+      "dists": {
+        "p1": 0.24028837184111276,
+        "p2": 0.24440228939056396,
+        "ball": 0.19128753244876862
+      }
+    },
+    {
+      "arm": "ball36",
+      "total_kbps": 670.1966666666667,
+      "dists": {
+        "p1": 0.18619781732559204,
+        "p2": 0.18757776419321695,
+        "ball": 0.14040802915891012
+      }
+    },
+    {
+      "arm": "ball48",
+      "total_kbps": 336.17833333333334,
+      "dists": {
+        "p1": 0.22893470525741577,
+        "p2": 0.22543272376060486,
+        "ball": 0.1597835123538971
+      }
+    },
+    {
+      "arm": "ball60",
+      "total_kbps": 158.73833333333334,
+      "dists": {
+        "p1": 0.28328775862852734,
+        "p2": 0.27071833113829297,
+        "ball": 0.20019972821076712
+      }
+    },
+    {
+      "arm": "plain-18",
+      "total_kbps": 2097.3116666666665,
+      "dists": {
+        "p1": 0.14861136674880981,
+        "p2": 0.1488668421904246,
+        "ball": 0.1383038411537806
+      }
+    },
+    {
+      "arm": "roi-18",
+      "total_kbps": 1592.6566666666668,
+      "dists": {
+        "p1": 0.15073755383491516,
+        "p2": 0.1508468637863795,
+        "ball": 0.13329536219437918
+      }
+    },
+    {
+      "arm": "ball-matched50",
+      "total_kbps": 303.71,
+      "dists": {
+        "p1": 0.23413211603959402,
+        "p2": 0.23826629916826883,
+        "ball": 0.16140712797641754
+      }
+    }
+  ],
+  "budget_choices": {
+    "p1": [
+      {
+        "minimum_budget_kbps": 124.74333333333334,
+        "arm": "roi-60",
+        "dists": 0.2832442869742711,
+        "family": "roi"
+      },
+      {
+        "minimum_budget_kbps": 288.21,
+        "arm": "roi-48",
+        "dists": 0.22792289157708487,
+        "family": "roi"
+      },
+      {
+        "minimum_budget_kbps": 564.37,
+        "arm": "roi-36",
+        "dists": 0.18144680559635162,
+        "family": "roi"
+      },
+      {
+        "minimum_budget_kbps": 909.7266666666667,
+        "arm": "roi-28",
+        "dists": 0.16617311537265778,
+        "family": "roi"
+      },
+      {
+        "minimum_budget_kbps": 1592.6566666666668,
+        "arm": "roi-18",
+        "dists": 0.15073755383491516,
+        "family": "roi"
+      },
+      {
+        "minimum_budget_kbps": 2097.3116666666665,
+        "arm": "plain-18",
+        "dists": 0.14861136674880981,
+        "family": "plain"
+      }
+    ],
+    "p2": [
+      {
+        "minimum_budget_kbps": 124.74333333333334,
+        "arm": "roi-60",
+        "dists": 0.28125176827112836,
+        "family": "roi"
+      },
+      {
+        "minimum_budget_kbps": 125.98666666666666,
+        "arm": "plain-60",
+        "dists": 0.27076369027296704,
+        "family": "plain"
+      },
+      {
+        "minimum_budget_kbps": 158.73833333333334,
+        "arm": "ball60",
+        "dists": 0.27071833113829297,
+        "family": "ball"
+      },
+      {
+        "minimum_budget_kbps": 288.21,
+        "arm": "roi-48",
+        "dists": 0.2245103269815445,
+        "family": "roi"
+      },
+      {
+        "minimum_budget_kbps": 564.37,
+        "arm": "roi-36",
+        "dists": 0.18720077474912009,
+        "family": "roi"
+      },
+      {
+        "minimum_budget_kbps": 909.7266666666667,
+        "arm": "roi-28",
+        "dists": 0.16652433574199677,
+        "family": "roi"
+      },
+      {
+        "minimum_budget_kbps": 1592.6566666666668,
+        "arm": "roi-18",
+        "dists": 0.1508468637863795,
+        "family": "roi"
+      },
+      {
+        "minimum_budget_kbps": 2097.3116666666665,
+        "arm": "plain-18",
+        "dists": 0.1488668421904246,
+        "family": "plain"
+      }
+    ],
+    "ball": [
+      {
+        "minimum_budget_kbps": 124.74333333333334,
+        "arm": "roi-60",
+        "dists": 0.2727610369523366,
+        "family": "roi"
+      },
+      {
+        "minimum_budget_kbps": 125.98666666666666,
+        "arm": "plain-60",
+        "dists": 0.26754535734653473,
+        "family": "plain"
+      },
+      {
+        "minimum_budget_kbps": 158.73833333333334,
+        "arm": "ball60",
+        "dists": 0.20019972821076712,
+        "family": "ball"
+      },
+      {
+        "minimum_budget_kbps": 288.21,
+        "arm": "roi-48",
+        "dists": 0.19963241120179495,
+        "family": "roi"
+      },
+      {
+        "minimum_budget_kbps": 303.425,
+        "arm": "plain-48",
+        "dists": 0.19688981771469116,
+        "family": "plain"
+      },
+      {
+        "minimum_budget_kbps": 303.71,
+        "arm": "ball-matched50",
+        "dists": 0.16140712797641754,
+        "family": "ball"
+      },
+      {
+        "minimum_budget_kbps": 336.17833333333334,
+        "arm": "ball48",
+        "dists": 0.1597835123538971,
+        "family": "ball"
+      },
+      {
+        "minimum_budget_kbps": 637.4433333333334,
+        "arm": "plain-36",
+        "dists": 0.15869414309660593,
+        "family": "plain"
+      },
+      {
+        "minimum_budget_kbps": 670.1966666666667,
+        "arm": "ball36",
+        "dists": 0.14040802915891012,
+        "family": "ball"
+      },
+      {
+        "minimum_budget_kbps": 1592.6566666666668,
+        "arm": "roi-18",
+        "dists": 0.13329536219437918,
+        "family": "roi"
+      }
+    ]
+  },
+  "cold_dcvc_excluded": {
+    "job": "20261031T181055Z-28301343",
+    "reason": "Earlier foreground definition and 80 scoring ticks. Comparability evidence only.",
+    "scored_ticks": [
+      0,
+      3,
+      6,
+      9,
+      12,
+      15,
+      18,
+      21,
+      24,
+      27,
+      30,
+      33,
+      36,
+      39,
+      42,
+      45,
+      48,
+      51,
+      54,
+      57,
+      60,
+      63,
+      66,
+      69,
+      72,
+      75,
+      78,
+      81,
+      84,
+      87,
+      90,
+      93,
+      96,
+      99,
+      102,
+      105,
+      108,
+      111,
+      114,
+      117,
+      120,
+      123,
+      126,
+      129,
+      132,
+      135,
+      138,
+      141,
+      144,
+      147,
+      150,
+      153,
+      156,
+      159,
+      162,
+      165,
+      168,
+      171,
+      174,
+      177,
+      180,
+      183,
+      186,
+      189,
+      192,
+      195,
+      198,
+      201,
+      204,
+      207,
+      210,
+      213,
+      216,
+      219,
+      222,
+      225,
+      228,
+      231,
+      234,
+      237
+    ]
+  },
+  "historical": {
+    "source": "alcaraz_hurkacz/028",
+    "frames": 240,
+    "fps": 25,
+    "scored_frames": 80,
+    "modeled_kbps": 19.239833333333333,
+    "dcvc_points": [
+      [
+        6,
+        7.654166666666667,
+        0.2126950907766083,
+        0.18453151881694793,
+        0.5946132595299871,
+        0.4291407875716686
+      ],
+      [
+        18,
+        14.571666666666665,
+        0.1668881487434293,
+        0.14189233258366585,
+        0.4435467873708201,
+        0.3324119679629803
+      ],
+      [
+        24,
+        20.41166666666667,
+        0.1414015951274354,
+        0.11617572605609894,
+        0.37139389169089004,
+        0.2967290930449963
+      ],
+      [
+        30,
+        28.82916666666667,
+        0.12367776121916593,
+        0.10049958601593971,
+        0.3259883427515868,
+        0.2711604982614517
+      ]
+    ],
+    "player_dists": 0.24202542155981063,
+    "whole_dists": 0.17501250877976418
+  }
+}

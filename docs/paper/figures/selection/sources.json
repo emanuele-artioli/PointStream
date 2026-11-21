@@ -1,0 +1,38 @@
+[
+  {
+    "path": "docs/experiments/clean-court-regional-screen-20261118/summary.json",
+    "sha256": "7db7261be072a2af25a3bbd15b1ec3375095d6426c27e538d12b4821d34b0815"
+  },
+  {
+    "path": "docs/experiments/clean-court-regional-screen-20261118/control-scores.json",
+    "sha256": "ac71bae2c8ed549988240803c2abdb1aa588597eacad12f2d78379040a261d84"
+  },
+  {
+    "path": "docs/experiments/matched-ball-rate-20261122/scores.json",
+    "sha256": "977bb0c983ab01e81c37d5b9e87f793e54178e4fdcb705855d0a452a0901bd44"
+  },
+  {
+    "path": "docs/experiments/matched-ball-rate-20261122/render-result.json",
+    "sha256": "5cfc4d79e67e9c0c67afd7037415237cb44dafe116dedaebb746cbabc54b0819"
+  },
+  {
+    "path": "docs/experiments/clean-court-regional-screen-20261118/control-inputs.json",
+    "sha256": "7ad19fb2559c842a85edc6151bdde999d483ac2670f8a6f6fa09406dea66700e"
+  },
+  {
+    "path": "docs/experiments/matched-ball-rate-20261122/crop-inputs.json",
+    "sha256": "e28aae5a84a1fbffb0e310e56a89731c98ef86e5afbbfe5c900ef876ab7d3bf4"
+  },
+  {
+    "path": "docs/experiments/receiver-replay-20261118/selected-rate-support/prior-dcvc.json",
+    "sha256": "93c320757e97caa24cdf9265aaff025d8226b6d0b8e8fb071ca99a3e27cdc348"
+  },
+  {
+    "path": "docs/experiments/w7-specs/dcvc-points-al028-scale2.json",
+    "sha256": "e5d05fe54feedf186bc83b44b153bd2e6ae3247d60648859ef69e73f154408f1"
+  },
+  {
+    "path": "docs/experiments/w9-inputs/w7-repaired-2h.json",
+    "sha256": "5245d83df6f8ee16ade28174f6f3c46a94b42ae4d32520c2165fa602e83e9d86"
+  }
+]

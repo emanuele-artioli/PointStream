@@ -1,31 +1,6 @@
 # Experiments
 
-The [November 22 priority list](../PLAN.md#november-22-experiment-priorities) links the starved-rate joint study, the matched-rate ball and detection tests, the common reference codec and the player-mask repair bound. Use it for the next submission experiments. Historical jobs below keep their original settings, outcomes and budgets.
-
-Current scientific direction and stage order are in the [research brief](../RESEARCH.md)
-and [PLAN](../PLAN.md). The [v2 inference protocol](experiments/submission-ladder-protocol-20261115-v2.json)
-removes the10% usefulness floor and adds source-level inference and human visual
-pilots; the [v4 scope/requalification amendment](experiments/submission-tennis-protocol-20261115-v4.json)
-sets the current player-and-ball primary target, optional equipment extension,
-historical code requalification and bounded extra-domain policy. Dated rules/outcomes below remain historical; no old success threshold
-or closed budget silently overrides the current plan or releases a new run.
-The [November16 implementation and exact next release](experiments/player-requalification-20261116.md)
-records authenticated W8 inputs/checkpoints, the corrected future-fit CLIP path,
-CPU tensor checks and the completed approved three-profile GPU replay. All
-source/output/cost gates and within-job repeats pass. The [user review](experiments/player-replay-20261116/human-review-import.json)
-now favors common tennis as a provisional lead, with an uncertain first player
-and a stock torso-facing failure on the second. The [whole-run motion pilot](experiments/player-motion-20261116.md)
-was approved November17 and stopped after a valid44-frame Player2 smoke exceeded
-its full-stage cost forecast cap; no240-frame run started. The [amendment](experiments/player-motion-amendment-20261117.md)
-was subsequently explicitly approved within the original aggregate budget;
-its live ledger counts the initial charge. Amended Player2 completed44/240
-frames with independent integrity PASS; actual remaining budget admitted the
-conditional Player1 request, now also complete with independent integrity PASS.
-Both jobs/claims are closed; total3,318GPU/6,318CPUseconds stays within the
-original4,200/7,200. The user accepts both players' full motion pilots; these
-are one-author development judgments on one opened physical match.
-These records report no new compression-quality
-result and reopen no expired allocation.
+The [paper figure plan](../PLAN.md) is the active queue. Each figure links to its measured points and source records. Historical decisions below retain their original scope.
 
 ## Protocol
 
@@ -134,21 +109,12 @@ and each object's representation is judged on both:
 
 ```markdown
 ### YYYY-MM-DD — <short name>
-- Decision rule:
-- Hypothesis:
-- Competing explanation:
-- Budget:
-- Jobs: the 16 listed in the [model–GPU table](fleet.md#modelgpu-table)
-  (environment `pointstream-20261006T113321Z`), plus pre-checks on an earlier
-  build (`20261006T105407Z-800aeeb2` contended, `20261006T105506Z-13aa98b2`,
-  `20261006T112304Z-ea395e8f`) that found the missing `clip` and `dill`.
-- Outcome: one environment adopted. Every component passes on Ada and A6000.
-  The hand models and YOLOE pass on all four classes. DCVC-UF passes on the RTX
-  8000, not on the GV100 (upstream assertion). SAM 3.1 falls back to math
-  attention on the RTX 8000 (39.5 GiB, 2.2× slower) and runs out of memory on
-  the GV100, so SAM jobs use Ada and A6000. No component needed a second
-  environment. Wall time about 1.5 h of queue and run, mostly staging and
-  waiting for GPUs other users held.
+- Figure and draft caption:
+- Missing point or comparison, metric and denominator:
+- Existing data, matched controls, source exposure and rate accounting:
+- Hypothesis, competing explanation and decision rule:
+- Input hashes, code, environment, budget and job IDs:
+- Observed outcome, limits and plotted receipt:
 ```
 
 ## Decisions
