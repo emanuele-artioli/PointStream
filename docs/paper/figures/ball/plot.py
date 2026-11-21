@@ -8,7 +8,7 @@ from matplotlib.ticker import MaxNLocator
 ROOT = Path(__file__).resolve().parents[4]
 OUT = Path(__file__).resolve().parent
 EXP = ROOT / "docs/experiments"
-PLAIN, TILE = "#4a6072", "#00796d"
+PLAIN, TILE = "#0072B2", "#D55E00"
 
 
 def read(path):
@@ -44,7 +44,8 @@ def draw_pairs(ax, values, labels, decimals, label, bounds):
     for i, (a, b) in enumerate(values):
         y = len(values) - 1 - i
         ax.plot([a, b], [y, y], color="#bbc4ca", linewidth=2, zorder=1)
-        ax.scatter([a, b], [y, y], color=[PLAIN, TILE], s=36, zorder=2)
+        ax.scatter([a], [y], color=PLAIN, marker="o", s=40, zorder=2)
+        ax.scatter([b], [y], color=TILE, marker="s", s=40, zorder=2)
         ax.annotate(f"{a:.{decimals}f}", (a, y), (0, 10), textcoords="offset points",
                     ha="center", color=PLAIN, fontsize=8)
         ax.annotate(f"{b:.{decimals}f}", (b, y), (0, -13), textcoords="offset points",
@@ -65,20 +66,18 @@ def matched_fidelity():
     assert runs["baseline_total_bytes"] == 182055 and runs["candidate_total_bytes"] == 182226
     psnr = runs["rgb_psnr_12_reviewed"]
 
-    fig, ax = plt.subplots(1, 2, figsize=(8.0, 3.45), gridspec_kw={"width_ratios": [1.45, 1]})
-    draw_pairs(ax[0], [(plain[k], scores[k]) for k in ("ball", "p1", "p2")],
+    fig, ax = plt.subplots(figsize=(7.0, 3.8))
+    draw_pairs(ax, [(plain[k], scores[k]) for k in ("ball", "p1", "p2")],
                ["Ball crop", "Player 1", "Player 2"], 4, "DISTS   ↓", (.145, .26))
-    draw_pairs(ax[1], [(psnr[0], psnr[1])], ["Whole frame"], 3, "RGB PSNR (dB)   ↑", (31.8, 32.45))
-    ax[0].set_title("Object fidelity", loc="left", fontweight="bold", pad=9)
-    ax[1].set_title("Full-frame fidelity", loc="left", fontweight="bold", pad=9)
-    fig.text(.13, .97, "Ball tiles at nearly equal total rate", fontsize=13, fontweight="bold", va="top")
-    fig.text(.13, .885, "One tennis rally · 12 source-reviewed frames · DISTS on body masks and a 64×64 ball crop",
+    fig.text(.18, .97, "Ball tiles at nearly equal total rate", fontsize=13, fontweight="bold", va="top")
+    fig.text(.18, .885, "One tennis rally · 12 source-reviewed frames · body masks and a 64×64 ball crop",
              fontsize=8.5, va="top")
-    fig.text(.13, .08, "●", color=PLAIN, fontsize=11)
-    fig.text(.15, .08, f"Plain AV1  {runs['baseline_kbps']:.3f} kbps", fontsize=8.5)
-    fig.text(.49, .08, "●", color=TILE, fontsize=11)
-    fig.text(.51, .08, f"AV1 + tracked tiles  {runs['candidate_kbps']:.3f} kbps", fontsize=8.5)
-    fig.subplots_adjust(left=.13, right=.98, top=.70, bottom=.26, wspace=.65)
+    fig.text(.18, .16, f"Whole-frame RGB PSNR: {psnr[0]:.3f} → {psnr[1]:.3f} dB (higher is better)", fontsize=8.5)
+    fig.text(.18, .06, "●", color=PLAIN, fontsize=11)
+    fig.text(.205, .06, f"Plain AV1  {runs['baseline_kbps']:.3f} kbps", fontsize=8.5)
+    fig.text(.55, .06, "■", color=TILE, fontsize=11)
+    fig.text(.575, .06, f"AV1 + tracked tiles  {runs['candidate_kbps']:.3f} kbps", fontsize=8.5)
+    fig.subplots_adjust(left=.18, right=.96, top=.74, bottom=.30)
     save(fig, "matched-rate-ball-fidelity")
 
 

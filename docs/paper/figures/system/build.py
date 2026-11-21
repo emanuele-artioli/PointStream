@@ -71,103 +71,36 @@ def save(fig, folder, name):
 
 
 def architecture(output):
-    fig, ax = plt.subplots(figsize=(14.6, 5.5))
-    ax.set_xlim(-0.1, 15.2)
-    ax.set_ylim(-0.1, 5.1)
+    fig, ax = plt.subplots(figsize=(13.4, 5))
+    ax.set_xlim(-0.1, 14.1)
+    ax.set_ylim(-0.1, 5.2)
     ax.axis("off")
-    ax.text(
-        0.05,
-        4.85,
-        "PointStream selects a representation for each shot",
-        fontsize=18,
-        fontweight="bold",
-        color=DARK,
-    )
-    ax.text(
-        0.05,
-        4.43,
-        "System architecture · coding choices depend on scene content, receiver state and available bitrate",
-        fontsize=11,
-        color=GRAY,
-    )
-    ax.text(0.05, 3.95, "SERVER", fontsize=10, fontweight="bold", color=GRAY)
-    ax.text(10.35, 3.95, "RECEIVER", fontsize=10, fontweight="bold", color=GRAY)
-    box(ax, 0.05, 2.05, 1.25, 0.75, "Broadcast\nframes")
-    box(ax, 1.65, 2.05, 1.25, 0.75, "Detect\nshot cuts")
-    box(ax, 3.25, 2.05, 1.65, 0.75, "Scene and\nrate decision", TEAL, "#edf7f6")
-    box(
-        ax,
-        5.45,
-        2.85,
-        2.45,
-        0.95,
-        "Foreground representation\nBackground recovery\nReference / update coding",
-        TEAL,
-        "#edf7f6",
-        10,
-    )
-    box(ax, 5.45, 0.9, 2.45, 0.8, "Conventional\nfull-frame encoder")
-    box(ax, 8.5, 2.05, 1.45, 0.75, "Timed\nbitstream")
-    box(
-        ax,
-        10.5,
-        2.85,
-        2.45,
-        0.95,
-        "Decode points and pixels\nRender foreground layers\nUpdate background state",
-        TEAL,
-        "#edf7f6",
-        10,
-    )
-    box(ax, 10.5, 0.9, 2.45, 0.8, "Conventional\nfull-frame decoder")
-    box(ax, 13.5, 2.05, 1.45, 0.75, "Compose and\npresent frames", TEAL, "#edf7f6")
-    for a, b in [((1.3, 2.425), (1.65, 2.425)), ((2.9, 2.425), (3.25, 2.425))]:
-        arrow(ax, a, b)
-    arrow(ax, (4.9, 2.62), (5.45, 3.3), TEAL)
-    arrow(ax, (4.9, 2.22), (5.45, 1.3))
-    ax.text(4.1, 3.42, "Eligible shot", fontsize=9.5, color=TEAL, ha="center")
-    ax.text(4.15, 1.13, "Other or uncertain", fontsize=9.5, color=GRAY, ha="center")
-    arrow(ax, (7.9, 3.3), (8.5, 2.63), TEAL)
-    arrow(ax, (7.9, 1.3), (8.5, 2.22))
-    arrow(ax, (9.95, 2.62), (10.5, 3.3), TEAL)
-    arrow(ax, (9.95, 2.22), (10.5, 1.3))
-    arrow(ax, (12.95, 3.3), (13.5, 2.62), TEAL)
-    arrow(ax, (12.95, 1.3), (13.5, 2.22))
-    ax.text(
-        6.67,
-        2.52,
-        "Poses · appearance · ball locations\nOptional object pixels · background updates",
-        ha="center",
-        va="top",
-        fontsize=8.5,
-        color=TEAL,
-        linespacing=1.5,
-    )
-    ax.text(
-        11.72,
-        2.52,
-        "Retain valid appearance and court state\nacross conventional-coded shots",
-        ha="center",
-        va="top",
-        fontsize=8.5,
-        color=TEAL,
-        linespacing=1.5,
-    )
-    ax.text(0.05, 0.28, "Tennis example", fontsize=10, fontweight="bold", color=DARK)
-    ax.text(
-        1.45,
-        0.28,
-        "Point views may use object coding. Close-ups, crowd shots and interludes follow the conventional path.",
-        fontsize=10,
-        color=DARK,
-    )
-    ax.text(
-        0.05,
-        -0.03,
-        "All initialization, refresh, model updates and switching payloads contribute to the transmitted rate.",
-        fontsize=9.5,
-        color=GRAY,
-    )
+    ax.text(0, 4.95, "How one broadcast serves a viewer and an analysis application",
+            fontsize=19, fontweight="bold", color=DARK)
+    for x, label in [(0, "SERVER"), (6.25, "TRANSPORT"), (8.3, "RECEIVER")]:
+        ax.text(x, 4.32, label, fontsize=10, fontweight="bold", color=GRAY)
+    box(ax, 0, 2.0, 1.65, 1.0, "Detect cuts\nAssess each shot")
+    box(ax, 2.35, 3.05, 3.05, 0.95, "Eligible object-coded shot\nPoints, appearance, recovered base", TEAL, "#edf7f6")
+    box(ax, 2.35, 1.1, 3.05, 0.85, "Other or uncertain shot\nConventional video")
+    box(ax, 6.15, 2.0, 1.35, 1.0, "Timed\npackets")
+    box(ax, 8.25, 3.05, 2.25, 0.95, "Read object signals\nUpdate receiver state", TEAL, "#edf7f6")
+    box(ax, 8.25, 1.1, 2.25, 0.85, "Decode conventional\nframes")
+    box(ax, 11.32, 3.05, 2.45, 0.95, "Analysis application\nRead pose or track data", TEAL, "#edf7f6")
+    box(ax, 11.32, 1.1, 2.45, 0.85, "Viewer\nDisplay ordered frames")
+    for start, end, color in [
+        ((1.65, 2.7), (2.35, 3.53), TEAL), ((1.65, 2.3), (2.35, 1.52), GRAY),
+        ((5.4, 3.53), (6.15, 2.7), TEAL), ((5.4, 1.52), (6.15, 2.3), GRAY),
+        ((7.5, 2.7), (8.25, 3.53), TEAL), ((7.5, 2.3), (8.25, 1.52), GRAY),
+        ((10.5, 3.53), (11.32, 3.53), TEAL), ((10.5, 1.52), (11.32, 1.52), GRAY),
+        ((10.5, 3.25), (11.32, 1.78), TEAL),
+    ]:
+        arrow(ax, start, end, color)
+    ax.text(8.33, 2.64, "Render foreground", fontsize=9.5, color=TEAL)
+    ax.text(8.33, 2.38, "on decoded base", fontsize=9.5, color=TEAL)
+    ax.text(0, 0.56, "At a cut", fontsize=11, color=DARK, fontweight="bold")
+    ax.text(1.13, 0.56, "Reassess eligibility. Retain valid appearance and background state through a cutaway.", fontsize=11, color=DARK)
+    ax.text(0, 0.12, "Design schematic. Direct signals depend on the selected object mode. Conventional shots expose decoded frames to a vision model.",
+            fontsize=9.5, color=GRAY)
     fig.subplots_adjust(left=0.02, right=0.99, top=0.99, bottom=0.03)
     save(fig, output, "architecture")
 

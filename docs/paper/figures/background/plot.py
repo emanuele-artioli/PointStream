@@ -4,7 +4,6 @@ import json
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import numpy as np
 
 
 def aggregate(rows, key):
@@ -16,63 +15,45 @@ def plot(source, destination):
     data = json.loads(source.read_text())
     rows = data['rows']
     assert len(rows) == 8
-    conditions = ('available', 'half-withheld')
-    groups = [[row for row in rows if row['condition'] == condition] for condition in conditions]
-    assert all(len(group) == 4 for group in groups)
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4.4))
-    x = np.arange(2)
-    labels = ('Observed donors', 'Half withheld')
-    colors = ('#466379', '#1b8077', '#bd7442')
-    for i, (key, label, color) in enumerate([
-        ('spatial_all', 'Spatial inpaint', colors[0]),
-        ('hybrid_all', 'Aligned donors + hole fill', colors[1]),
-    ]):
-        values = [aggregate(group, key) for group in groups]
-        bars = axes[0].bar(x + (i-.5)*.29, values, .29, label=label, color=color)
-        for bar, value in zip(bars, values, strict=True):
-            axes[0].text(bar.get_x()+bar.get_width()/2, value+5, f'{value:.1f}',
-                         ha='center', va='bottom', fontsize=9)
-    axes[0].set_title('Entire hidden region', loc='left', fontweight='bold')
-    axes[0].set_ylabel('RGB mean squared error')
-    axes[0].set_ylim(0, 225)
-    axes[0].set_xticks(x, labels)
-    axes[0].legend(frameon=False, loc='upper right', fontsize=8)
-    for i, (key, label, color) in enumerate([
-        ('spatial_seen', 'Spatial inpaint', colors[0]),
-        ('temporal_seen', 'Aligned donors only', colors[2]),
-        ('hybrid_seen', 'Aligned donors + hole fill', colors[1]),
-    ]):
-        values = [aggregate(group, key) for group in groups]
-        bars = axes[1].bar(x + (i-1)*.22, values, .22, label=label, color=color)
-        for bar, value in zip(bars, values, strict=True):
-            axes[1].text(bar.get_x()+bar.get_width()/2, value+5, f'{value:.1f}',
-                         ha='center', va='bottom', fontsize=9)
-    coverage = [100 * sum(r['covered_pixels'] for r in group)/sum(r['mask_pixels'] for r in group)
-                for group in groups]
-    axes[1].set_title('Pixels observed in donor frames', loc='left', fontweight='bold')
-    axes[1].set_xticks(x, [f'{s}\n{v:.1f}% coverage' for s, v in zip(labels, coverage, strict=True)])
-    axes[1].set_ylim(0, 275)
-    axes[1].legend(frameon=False, loc='upper left', fontsize=8)
-    for ax in axes:
-        ax.spines[['top', 'right']].set_visible(False)
-        ax.grid(axis='y', color='#d8dfe2', zorder=0, linewidth=.7)
-        ax.set_axisbelow(True)
-        ax.tick_params(labelsize=9)
-    fig.suptitle('Reconstructing known court pixels', x=.08, y=.99, ha='left',
+    available = [row for row in rows if row['condition'] == 'available']
+    withheld = [row for row in rows if row['condition'] == 'half-withheld']
+    assert len(available) == len(withheld) == 4
+    baseline = aggregate(available, 'spatial_all')
+    assert baseline == aggregate(withheld, 'spatial_all')
+    values = [baseline, aggregate(available, 'hybrid_all'), aggregate(withheld, 'hybrid_all')]
+    coverage = [100 * sum(r['covered_pixels'] for r in group) / sum(r['mask_pixels'] for r in group)
+                for group in (available, withheld)]
+
+    fig, ax = plt.subplots(figsize=(9, 3.9))
+    y = [2, 1, 0]
+    labels = ['Spatial inpainting', 'Donors + hole filling\nObserved donors',
+              'Donors + hole filling\nHalf of observations withheld']
+    colors = ['#6e6e6e', '#0072b2', '#56b4e9']
+    bars = ax.barh(y, values, color=colors, height=.57)
+    for i, (bar, value) in enumerate(zip(bars, values, strict=True)):
+        extra = '' if i == 0 else f'   ({coverage[i-1]:.1f}% donor coverage)'
+        ax.text(value + 3, bar.get_y() + bar.get_height()/2, f'{value:.1f}{extra}',
+                va='center', fontsize=10)
+    ax.set_yticks(y, labels)
+    ax.set_xlabel('RGB mean squared error over the entire hidden region (lower is better)')
+    ax.set_xlim(0, 220)
+    ax.grid(axis='x', color='#d8dfe2', linewidth=.7)
+    ax.set_axisbelow(True)
+    ax.spines[['top', 'right', 'left']].set_visible(False)
+    ax.tick_params(axis='y', length=0, labelsize=10)
+    fig.suptitle('Recovering artificially hidden court pixels', x=.03, y=.98, ha='left',
                  fontweight='bold', fontsize=14)
-    fig.text(.08, .91, 'Artificial occlusions on four frames of one development rally',
-             ha='left', fontsize=10)
-    fig.text(.08, .025, 'Right condition simulates missing donor coverage by withholding half the test region.',
-             fontsize=9)
-    fig.subplots_adjust(left=.08, right=.98, bottom=.20, top=.80, wspace=.25)
+    fig.text(.03, .87, 'Four frames from one development rally; same hidden pixels in every row', fontsize=10)
+    fig.text(.03, .025, 'The last row simulates missing coverage. Spatial inpainting fills donor gaps.', fontsize=9)
+    fig.subplots_adjust(left=.34, right=.97, bottom=.22, top=.76)
     for ext in ('pdf', 'png'):
-        fig.savefig(destination.with_suffix('.'+ext), dpi=180)
+        fig.savefig(destination.with_suffix('.' + ext), dpi=180)
     plt.close(fig)
 
 
 if __name__ == '__main__':
-    p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('source', type=Path)
-    p.add_argument('destination', type=Path)
-    a = p.parse_args()
-    plot(a.source, a.destination)
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('source', type=Path)
+    parser.add_argument('destination', type=Path)
+    args = parser.parse_args()
+    plot(args.source, args.destination)

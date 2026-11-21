@@ -13,8 +13,8 @@ ROOT = Path(__file__).resolve().parents[4]
 ITEM = Path(__file__).resolve().parent
 REGIONS = ('p1', 'p2', 'ball')
 TITLES = ('Player 1 body', 'Player 2 body', 'Ball crop')
-COLORS = {'plain': '#536474', 'roi': '#8b65a1', 'ball': '#007e80', 'original': '#d27e25',
-          'clean': '#bb5663', 'refined': '#ca3b41'}
+COLORS = {'plain': '#0072B2', 'roi': '#D55E00', 'ball': '#009E73', 'original': '#7B3294',
+          'clean': '#333333', 'refined': '#CC79A7'}
 NAMES = {'plain': 'SVT-AV1', 'roi': 'Player-and-ball ROI AV1', 'ball': 'AV1 + tracked ball tiles',
          'original': 'Generated players + ball, original base', 'clean': 'Generated players + ball, broad cleanup',
          'refined': 'Generated players + ball, tighter cleanup'}
@@ -62,27 +62,22 @@ def save(fig, output, name):
     plt.close(fig)
 
 
-def cold_plot(rows, selected, output):
+def cold_plot(rows, output):
     fig, axes = plt.subplots(1, 3, figsize=(11.7, 4.7), sharex=True, sharey=True)
     for ax, region, title in zip(axes, REGIONS, TITLES, strict=True):
-        for name in ('plain', 'roi', 'ball'):
+        for name, marker, line in [('plain', 'o', '-'), ('roi', 's', '--'), ('ball', '^', '-.')]:
             points = sorted((r for r in rows if family(r['arm']) == name), key=lambda r: r['total_kbps'])
             ax.plot([r['total_kbps'] for r in points], [r['dists'][region] for r in points],
-                    color=COLORS[name], marker='o', markersize=4, lw=1.3, label=NAMES[name])
+                    color=COLORS[name], marker=marker, linestyle=line, markersize=4.5, lw=1.5, label=NAMES[name])
         for name, marker in [('original', 'D'), ('clean', 'x'), ('refined', 'P')]:
             row, = [r for r in rows if r['arm'] == name]
             ax.scatter(row['total_kbps'], row['dists'][region], color=COLORS[name], marker=marker,
                        s=50, zorder=5, label=NAMES[name])
-        picked = selected[region]
-        xs = [v['minimum_budget_kbps'] for v in picked] + [2200]
-        ys = [v['dists'] for v in picked] + [picked[-1]['dists']]
-        ax.step(xs, ys, where='post', color='#24292d', alpha=.6, linestyle=':', linewidth=1.2,
-                label='Best stored decode within budget')
         style(ax)
         ax.set_title(title, fontsize=12, pad=10)
     axes[0].set_ylabel('DISTS (lower is better)')
-    fig.suptitle('Measured codec choices across the bitrate range', x=.075, ha='left', fontsize=16, fontweight='bold')
-    fig.text(.075, .875, 'Nadal–Kyrgios development rally · 240 frames at 50 fps · full 4.8-second cold-start delivery', fontsize=10)
+    fig.suptitle('Object fidelity versus total bitrate', x=.075, ha='left', fontsize=16, fontweight='bold')
+    fig.text(.075, .875, 'Nadal–Kyrgios development rally · 4.8-second cold start · quality on 12 reviewed frames', fontsize=10)
     fig.text(.5, .285, 'Complete delivery bitrate (kbps, log scale)', ha='center', fontsize=10)
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc='lower center', ncol=2, frameon=False, fontsize=8.5,
@@ -174,7 +169,7 @@ def main():
                               modeled_kbps=historical['rate_kbps'],dcvc_points=dcvc,
                               player_dists=historical['hybrid']['dists']['foreground'],whole_dists=historical['hybrid']['dists']['whole']))
     (args.output/'data.json').write_text(json.dumps(data,indent=2)+'\n')
-    cold_plot(rows,selected,args.output)
+    cold_plot(rows,args.output)
     policy_plot(selected,args.output)
     low_plot(dcvc,historical,args.output)
     print(json.dumps(dict(points=len(rows),cold_dcvc_compatible=False,budget_choice_counts={r:len(selected[r]) for r in REGIONS},output=str(args.output))))
