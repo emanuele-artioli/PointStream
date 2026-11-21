@@ -10,6 +10,7 @@ def sha(raw):return hashlib.sha256(raw).hexdigest()
 def member(tar,name):
  with tarfile.open(tar) as f:return f.extractfile(name).read()
 def run(a):
+ assert a.ticks == 240
  assert len(os.sched_getaffinity(0))==1 and os.environ['CUDA_VISIBLE_DEVICES']==''
  assert sha(a.base.read_bytes())=='776b1ad6f7558ad26b21de26f4d885b24013cd00785ebbe665276239886860d9'
  assert sha(a.tiles.read_bytes())=='a9e0a5e837a7d04bad4a7a0e73fd3e76d14174ceaf3c6977476a5391ba19480b'
@@ -34,4 +35,4 @@ def run(a):
 def validate():
  s=Path(os.environ['PS_STAGE_DIR']);j=json.loads((s/'binding.json').read_text());checks={'frames':j['frames']==240 and len(j['rendered_hashes'])==240,'placements':j['placements']==231,'carrier':sha((s/'native.pscp').read_bytes())==j['carrier_sha256'],'sidecar':sha((s/'ball.sidecar').read_bytes())==j['sidecar_sha256'],'forecast':os.environ['PS_STAGE']!='smoke' or 2*j['elapsed_seconds']+60<=500};r={'passed':all(checks.values()),'checks':checks};Path(os.environ['PS_VALIDATION_PATH']).write_text(json.dumps(r));assert r['passed']
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--base',type=Path);p.add_argument('--tiles',type=Path);p.add_argument('--validate',action='store_true');a=p.parse_args();validate() if a.validate else run(a)
+ p=argparse.ArgumentParser();p.add_argument('--base',type=Path);p.add_argument('--tiles',type=Path);p.add_argument('--ticks',type=int);p.add_argument('--validate',action='store_true');a=p.parse_args();validate() if a.validate else run(a)
