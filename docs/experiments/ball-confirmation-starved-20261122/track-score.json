@@ -1,0 +1,219 @@
+{
+  "source_manifest_sha256": "df0dabf48b61ed3a096a9a6b4e54d823ca3b279c86d6a09e69ef0cd9bf2ceeb1",
+  "threshold_native_px": 10,
+  "canvas_to_native": 1.5,
+  "scope": "Official sparse labels, paid tile origins; not-visible is not proven absent.",
+  "sources": [
+    {
+      "source": "match209_000",
+      "job": "20261121T220316Z-7cbf21fc",
+      "packet_sha256": "953f3e8282ec446feb1a7ac10b61d048131fb317d19dccfbccbb0de7aacc7693",
+      "frames": 64,
+      "fps": 25,
+      "labeled_visible": 9,
+      "visible_with_placement": 9,
+      "hits_10_native_px": 8,
+      "labeled_not_visible": 3,
+      "placements_when_not_visible": 0,
+      "unlabeled": 52,
+      "placements_all_frames": 41,
+      "clipped_edge_centers": 0,
+      "visible_rows": [
+        {
+          "frame": 9,
+          "distance_native_px": 5.385164807134504,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 18,
+          "distance_native_px": 4.123105625617661,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 23,
+          "distance_native_px": 15.811388300841896,
+          "hit_10_native_px": false
+        },
+        {
+          "frame": 27,
+          "distance_native_px": 6.082762530298219,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 32,
+          "distance_native_px": 1.4142135623730951,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 37,
+          "distance_native_px": 1.0,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 41,
+          "distance_native_px": 4.242640687119285,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 46,
+          "distance_native_px": 4.123105625617661,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 51,
+          "distance_native_px": 4.242640687119285,
+          "hit_10_native_px": true
+        }
+      ]
+    },
+    {
+      "source": "match269_000",
+      "job": "20261121T221317Z-fa6e8d74",
+      "packet_sha256": "0568b520ce53e7e949ef07325050eeea96c827d805acdbc131ed5e6e07d32ecc",
+      "frames": 64,
+      "fps": 25,
+      "labeled_visible": 12,
+      "visible_with_placement": 12,
+      "hits_10_native_px": 12,
+      "labeled_not_visible": 0,
+      "placements_when_not_visible": 0,
+      "unlabeled": 52,
+      "placements_all_frames": 61,
+      "clipped_edge_centers": 0,
+      "visible_rows": [
+        {
+          "frame": 9,
+          "distance_native_px": 2.23606797749979,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 13,
+          "distance_native_px": 2.23606797749979,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 18,
+          "distance_native_px": 2.23606797749979,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 23,
+          "distance_native_px": 5.0,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 27,
+          "distance_native_px": 1.4142135623730951,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 32,
+          "distance_native_px": 2.23606797749979,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 37,
+          "distance_native_px": 3.605551275463989,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 42,
+          "distance_native_px": 4.0,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 46,
+          "distance_native_px": 3.605551275463989,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 51,
+          "distance_native_px": 3.605551275463989,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 56,
+          "distance_native_px": 1.4142135623730951,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 60,
+          "distance_native_px": 4.123105625617661,
+          "hit_10_native_px": true
+        }
+      ]
+    },
+    {
+      "source": "match235_000",
+      "job": "20261121T221746Z-7f377ae9",
+      "packet_sha256": "902ff087faf832711684ed8bb48e0e5a2ca20c09e2540d67d4bddab2944031c7",
+      "frames": 154,
+      "fps": 60,
+      "labeled_visible": 11,
+      "visible_with_placement": 10,
+      "hits_10_native_px": 10,
+      "labeled_not_visible": 2,
+      "placements_when_not_visible": 1,
+      "unlabeled": 141,
+      "placements_all_frames": 123,
+      "clipped_edge_centers": 2,
+      "visible_rows": [
+        {
+          "frame": 9,
+          "distance_native_px": 9.848857801796104,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 20,
+          "distance_native_px": 3.605551275463989,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 42,
+          "distance_native_px": 2.23606797749979,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 53,
+          "distance_native_px": 2.23606797749979,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 65,
+          "distance_native_px": 3.1622776601683795,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 76,
+          "distance_native_px": 2.8284271247461903,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 87,
+          "distance_native_px": 2.0,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 110,
+          "distance_native_px": 1.4142135623730951,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 121,
+          "distance_native_px": 3.0,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 132,
+          "distance_native_px": 2.0,
+          "hit_10_native_px": true
+        },
+        {
+          "frame": 143,
+          "distance_native_px": null,
+          "hit_10_native_px": false
+        }
+      ]
+    }
+  ]
+}

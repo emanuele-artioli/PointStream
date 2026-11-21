@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "device": "cpu",
+  "hosts": [
+    "gpu1",
+    "gpu2",
+    "gpu3",
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [],
+  "gpu_memory_mib": 0,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "local_storage_gib": 30,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.ball_starved_269"
+  ],
+  "arguments": [
+    "--bases",
+    "{staged:bases}",
+    "--sources",
+    "{staged:sources}",
+    "--weights",
+    "{staged:weights}",
+    "--frames",
+    "{frames}"
+  ],
+  "staged_inputs": [
+    {
+      "name": "bases",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261115T082631Z-8331f54a/full/published.tar",
+      "sha256": "a7e1ca9f15e9cba300e2cbeed976f30499211018b441d11aa5b8c6c2cadb5aab",
+      "extract": false
+    },
+    {
+      "name": "sources",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/confirmation-source-20261115T062148Z-297a05e2/tennis-confirmation-sources.tar",
+      "sha256": "e5edc12c857658a119bf6d6cbe029ee64c09d6a860f1b975fe0708952895293d",
+      "extract": false
+    },
+    {
+      "name": "weights",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261115T082631Z-8331f54a/full/published.tar",
+      "sha256": "a7e1ca9f15e9cba300e2cbeed976f30499211018b441d11aa5b8c6c2cadb5aab"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/confirmation-source-20261115T062148Z-297a05e2/tennis-confirmation-sources.tar",
+      "sha256": "e5edc12c857658a119bf6d6cbe029ee64c09d6a860f1b975fe0708952895293d"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "verify_staged_inputs": true,
+  "required_commands": [],
+  "scale": {
+    "frames": {
+      "smoke": 16,
+      "full": 64
+    }
+  },
+  "smoke": {
+    "seconds": 250,
+    "representative_basis": "16 real source frames, 320x180 base, scaled ROI, native 64x64 tiles, actual PTP2 decoder, DISTS, bounded forecast"
+  },
+  "full": {
+    "seconds": 1000
+  },
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.ball_starved_269",
+    "--validate"
+  ],
+  "validator_seconds": 90,
+  "budget_seconds": 1400,
+  "stall_seconds": 1500,
+  "deadline": "2026-11-21T23:50:00Z",
+  "contention": {
+    "policy": "stop",
+    "resume_attempts": 0
+  }
+}

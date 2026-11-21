@@ -1,0 +1,34 @@
+{
+  "counts": {
+    "visible": 261,
+    "absent": 30,
+    "uncertain": 1
+  },
+  "detections": {
+    "baseline": {
+      "10": 5,
+      "5": 5,
+      "false": 3
+    },
+    "candidate": {
+      "10": 239,
+      "5": 229,
+      "false": 11
+    }
+  },
+  "baseline_historical_parity": {
+    "equal_detection": 292,
+    "equal_coordinate_when_detected": 64,
+    "detected_both": 64
+  },
+  "baseline_bytes": 76720,
+  "candidate_bytes": 77081,
+  "judged_rgb_hashes": {
+    "baseline": "ffcb50519c6385f48f11cbe02b3f949cdaaec5a4ff0ed51f32b47e89f99f64ff",
+    "candidate": "e85d8a3a8f59bd16378fdfb6b58198f258ed783c94c62543304d3093bf7bb481"
+  },
+  "source_archive_sha256": "e3ae88ccbab68a19aa0a34a9ad12328352d00a69ae44901edfd7cbe01220aa12",
+  "source_label_csv_sha256": "e50089b4659ad8c84d84f1794347ad08445b8552784d607cb1af3b68ad9cdfba",
+  "checkpoint_sha256": "9d391239ab10c733f8e5bfadf16ab72838e7a8ebc88e8ae2038501c03d42b4bb",
+  "scope": "one retrospective game9/Clip5; fixed original sender symbols"
+}
