@@ -54,6 +54,11 @@ def run(a):
     start = time.monotonic()
     if len(os.sched_getaffinity(0)) != 1 or torch.cuda.device_count() != 1:
         raise ValueError("Judge allocation")
+    if os.environ.get("PS_GPU_SHARING") == "shared":
+        limit = int(os.environ["PS_GPU_MEMORY_LIMIT_MIB"])
+        if limit != 8000:
+            raise ValueError("Unexpected shared GPU memory allocation")
+        torch.cuda.set_per_process_memory_fraction(limit * 1024**2 / torch.cuda.get_device_properties(0).total_memory, 0)
     cv2.setNumThreads(1)
     torch.set_num_threads(1)
     root = Path(os.environ["PS_SCRATCH_DIR"])
