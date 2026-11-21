@@ -2,6 +2,8 @@
 
 The codec uses one globally fixed image-format and quality configuration for every player in an evaluation. Image sizes can differ by image content. Calibrate the setting on development footage, freeze it before opening held-out matches, and report each player's results and transmitted bytes. Do not pick a quality based on an individual player's outcome.
 
+The common-Q65 [fleet render and blind-review record](figure-run/README.md) supersedes the preparation status below. Both 24-frame player renders have now completed. The original registration is retained for provenance.
+
 ## Registered CPU pilot
 
 Use the exact two 512 × 784 PNG references from the selected authenticated development-rally packet. Compare three fixed configurations per format, applied unchanged to both images. JPEG uses OpenCV RGB8/BGR8 conversion with quality 40, 70 and 90. WebP uses cwebp 1.6.0 quality 65, 80 and 90, method 6 and no metadata. AVIF uses avifenc 1.4.2 quality 45, 65 and 75, speed 8 and one job. Quality numbers are codec-specific and are not treated as matched perceptual quality. Report image bytes, hash, decoded RGB hash and full-crop RGB PSNR per image. Count the actual JPEG-Q40 carrier bytes and compare modeled REF1 framing for alternatives, without implying these models are deployed packet bytes. Bound the CPU experiment to two CPU minutes and four elapsed minutes, no GPU. The exact tool identities, source and decoded images must be recorded. These two subjects are a development check, not a general claim about a codec.

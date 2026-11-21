@@ -1,0 +1,69 @@
+{
+  "job_id": "20261121T183911Z-a992fc53",
+  "status": "complete",
+  "exit_code": 0,
+  "source_revision": "55ba06290978bb5e25347031a1b64c1c66107981",
+  "source_archive_sha256": "330ae2fcbf8c9800cbc3a68a93440419a57b2753b59bf12097a54f76d0ac6958",
+  "normalized_spec_sha256": "d9f10dd1fcc75b995a7873b3c7fd4f31ac6f74c474caa56a557b5fea1e4eba0f",
+  "configuration_sha256": "0cd63fe70ce618be8ee9457ed69c266e19a50fa9ade751fbcdd7d74995c33869",
+  "conditioning_sha256": "3dae077b83b77eb2211438de02596bd42677aa8c372073f0c2e0586706a4076f",
+  "gpu_model": "NVIDIA RTX 6000 Ada Generation",
+  "gpu_sharing": "shared",
+  "smoke_validation": {
+    "passed": true,
+    "checks": {
+      "complete_conditioning_and_ticks": true,
+      "profile_lineage_and_cuda": true,
+      "output_hash_shape_and_nonflat": true,
+      "smoke_cost_admission": true
+    },
+    "smoke_cost_gate": {
+      "forecast_seconds": 422.15220558749934,
+      "campaign_remaining_seconds": 717.9479047780624,
+      "full_stage_cap_seconds": 450,
+      "validator_reserve_seconds": 60
+    }
+  },
+  "author_budget_gpu_seconds": 900,
+  "author_budget_cpu_seconds": 1350,
+  "conservative_gpu_seconds_creation_to_teardown": 483.86315417289734,
+  "conservative_cpu_seconds_including_450_seconds_external_reserve": 933.8631541728973,
+  "smoke_receipt_sha256": "5610aba2ad35d8cb032cedd20fc5de8214f0c59a13b9bb156f3b3ba998481e11",
+  "full_receipt_sha256": "f3d7f55d4cd5b734b4cc6c955630ce0a5be3b691263472585ce37de8c283dc58",
+  "repeated_player_exact": true,
+  "unit_review_artifacts": {
+    "nadal_kyrgios__000_at120__person_000000000001": {
+      "nadal_kyrgios__000_at120__person_000000000001-50.mp4": {
+        "sha256": "95eb2362e71975e1e773bbd374b577c7d20c4f0d23bcd68b45164bf95b3c53a8",
+        "bytes": 687241
+      },
+      "nadal_kyrgios__000_at120__person_000000000001.png": {
+        "sha256": "75be3f8937e6fa53a9d8e5ff8413ae2521bf657d5896c183da2cf0cc9e21ea56",
+        "bytes": 411319
+      },
+      "nadal_kyrgios__000_at120__person_000000000001-10.mp4": {
+        "sha256": "cc50084e498b8086e9cc5bfa55ecddc004493e2ee58e76952226f92036d7f559",
+        "bytes": 1506878
+      }
+    },
+    "nadal_kyrgios__000_at120__person_000000000000": {
+      "nadal_kyrgios__000_at120__person_000000000000-50.mp4": {
+        "sha256": "2c541cab2cecdcf7d9a5e69548ee7570e2a52383bbbe8000eb1f3651e0d94dff",
+        "bytes": 739083
+      },
+      "nadal_kyrgios__000_at120__person_000000000000.png": {
+        "sha256": "cbd7e56f66bcce31ff87162b4c2470b4c790f748faf2b98f04eede01cb391f13",
+        "bytes": 444873
+      },
+      "nadal_kyrgios__000_at120__person_000000000000-10.mp4": {
+        "sha256": "1e10a7575f176a4906f34d8602fabce8cc8ffcf6cb7055f98da7d0cde21b9f8d",
+        "bytes": 1621190
+      }
+    }
+  },
+  "review_path": "/Users/manu/Documents/PointStream-review/2026-11-18-reference-appearance/common-q65-review/review.html",
+  "review_clip_count": 4,
+  "frame_count_per_clip": 24,
+  "author_review": "pending",
+  "source_archive_campus": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261121T183911Z-a992fc53"
+}

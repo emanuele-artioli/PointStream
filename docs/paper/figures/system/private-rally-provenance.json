@@ -1,0 +1,101 @@
+{
+  "role": "Private source-aligned qualitative illustration from fixed reviewed ticks",
+  "source_bundle_sha256": "5c402652ea7e2b471d870fb211f263ba1f7975afaf4b9b8a55be814d25ae45eb",
+  "labels_sha256": "9918c87fa6a309052bbac8ef0be21429885e6579fd632754ed9aeb343c912d8a",
+  "plain_decoded_yuv_sha256": "4f549befc1445ae4baca3a8da55c822261a78b08f98a8b212fc702f81998499b",
+  "candidate_receipt_sha256": "5cfc4d79e67e9c0c67afd7037415237cb44dafe116dedaebb746cbabc54b0819",
+  "crop_inventory_sha256": "e28aae5a84a1fbffb0e310e56a89731c98ef86e5afbbfe5c900ef876ab7d3bf4",
+  "script_sha256": "a7a361dd5e5329536dc95325d8ba7e9b4493c9cb8c61869bc4100f51341c2f2f",
+  "plain_kbps": 303.425,
+  "candidate_kbps": 303.71,
+  "source_ticks": [
+    10,
+    90,
+    170
+  ],
+  "images": [
+    {
+      "tick": 10,
+      "source_frame_png_sha256": "0360ccc4ec8eea097f872285551080d36de520b8ec84ab4f0ccf30b5e9284a7a",
+      "plain_rgb_sha256": "4ccdcbde2ef9c332555e90b702db2dff489558e610a80f246724929f8fe587a1",
+      "candidate_png_sha256": "c2f650ede10a86aa1f23461c01a8e483ec0446d284a44d50238e82c50f0a897a",
+      "candidate_rgb_sha256": "845f33f4f056365700ac1e60dfc4af1fe48e42b825b0f2b501e5f0d1efe2f7e3",
+      "crop_bounds": [
+        1035,
+        746,
+        1099,
+        810
+      ],
+      "ball_center": [
+        1067,
+        778
+      ],
+      "tile_origin": null,
+      "reviewed_ball_center_covered": false,
+      "crop_rgb_sha256": [
+        "12385e95086835be0aac4793b186eba8468b44228c0d2caa553464b73f9f49ff",
+        "6551fc913b45361ea8c0e0aa4fda5eca048e5ce1efc32cbfeb5d9baebe7887f3",
+        "867e95b50d7e83fb04ba6607dd40b54c3c74426a9dd7d252f37b97f6601c16b7"
+      ]
+    },
+    {
+      "tick": 90,
+      "source_frame_png_sha256": "bdfe0b6899eee9c7f14c0fe7a6de7e0758ee7b6e4f04dcefe5bd90d01e4c3128",
+      "plain_rgb_sha256": "cdaf3414ea5a0257388a53891fb0307732b2d7b49554624fbdaa05213b40ea87",
+      "candidate_png_sha256": "8a303b945f1513d46433fbc782907cb4b167039099f757a05ef43e3cdd366c3e",
+      "candidate_rgb_sha256": "1d422f18e3e45ea437508b2c9c7bfb6ae81ee3b010ebaa21c0dc844178f834e9",
+      "crop_bounds": [
+        913,
+        445,
+        977,
+        509
+      ],
+      "ball_center": [
+        945,
+        477
+      ],
+      "tile_origin": [
+        932,
+        462
+      ],
+      "reviewed_ball_center_covered": true,
+      "crop_rgb_sha256": [
+        "9b28d6e771dd279cfe334b1f6e9feaf76be422c190b73141b686334a38c60ac0",
+        "060ebadfded757767b4c09ffcbdbc763f74c94b96115d80835e57417a2deb1b4",
+        "16621e8a66d1bdcd7e358fdb537cc720125ce56e1919bead93e1e83b33b58d42"
+      ]
+    },
+    {
+      "tick": 170,
+      "source_frame_png_sha256": "708ee6708f0841b2a691b541a39ac08a0139512a2128bd274105ae9260dd3b94",
+      "plain_rgb_sha256": "03acbd9fa0a5c773ac008d63b97a4408be9d7fe81a56d3a19969ba9784f8602f",
+      "candidate_png_sha256": "6553504ae6a5ffda2468a662966add8e39f4a76191ace53f7dc05b856cb40e0f",
+      "candidate_rgb_sha256": "b70f03e1148be7fadc5ebca974fd855ff520fd3e24c41508625da27df62a8191",
+      "crop_bounds": [
+        1057,
+        645,
+        1121,
+        709
+      ],
+      "ball_center": [
+        1089,
+        677
+      ],
+      "tile_origin": [
+        1076,
+        664
+      ],
+      "reviewed_ball_center_covered": true,
+      "crop_rgb_sha256": [
+        "69e133f30bd5e7ad1ef7172a9ebf2b0ea156f79c9f6b48c6a4eac1b9135771e3",
+        "9bfe51774757681e287b4bcf3ac1e72f0944cb5004db31964216a4aa730f2a2e",
+        "978fd59830a60c9fa0ae74f4c80e772e84fdef5e903ff8a5f04c16f592273ca4"
+      ]
+    }
+  ],
+  "opencv": "5.0.0",
+  "numpy": "2.0.0",
+  "player_boxes": "bounding boxes of reviewed body masks expanded by 10 native pixels",
+  "ball_support": "64px centered crop from human-reviewed source coordinates",
+  "figure_states": "source views and measured decodes; player regions outlined; no synthetic keypoints"
+}

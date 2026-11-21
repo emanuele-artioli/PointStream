@@ -51,8 +51,10 @@ def page(title, caption, index, raster=None):
     return PdfReader(buffer).pages[0]
 
 
-def build(output, timeline, court):
+def build(output, timeline, court, rally):
     panels = [(HERE / name, title, caption) for name, title, caption in PANELS]
+    if rally:
+        panels.insert(4, (rally, "Where the extra ball bits went", "Private review imagery. Three prespecified source-aligned instants show the exact 64-pixel ball crops. The tile covers the ball on two of the three instants."))
     if timeline:
         panels.insert(0, (timeline, "Court, cutaway and return", "Private broadcast imagery for author review. The two cut times are measured; coding paths are schematic. Publication rights need verification."))
     if court:
@@ -82,5 +84,6 @@ if __name__ == "__main__":
     cli.add_argument("output", type=Path)
     cli.add_argument("--timeline", type=Path)
     cli.add_argument("--court", type=Path)
+    cli.add_argument("--rally", type=Path)
     args = cli.parse_args()
-    build(args.output, args.timeline, args.court)
+    build(args.output, args.timeline, args.court, args.rally)
