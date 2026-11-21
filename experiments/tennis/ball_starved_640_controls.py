@@ -33,6 +33,8 @@ def run(args):
     started = time.monotonic()
     full, fps, targets = CONFIG[args.source]
     n = args.frames
+    if args.source == 'match235_000' and args.refine:
+        targets=[44.428051948051944]
     if n != (16 if os.environ['PS_STAGE'] == 'smoke' else full) or len(os.sched_getaffinity(0)) != 1:
         raise ValueError('Wrong stage or CPU allocation')
     work = Path(os.environ['PS_SCRATCH_DIR']) / 'controls640'
@@ -56,6 +58,29 @@ def run(args):
     tools = {k:svtav1.tool(k) for k in BINARIES}
     if any(tools[k]['sha256'] != v for k,v in BINARIES.items()):
         raise ValueError('native binary identity')
+    # Reproduce one archived 320×180 decoded crop on the identical native source.
+    copy_member(args.control, 'publish/result.json', work/'old-result.json')
+    old=json.loads((work/'old-result.json').read_text())
+    if old['source'] != args.source or old['frames'] != full:
+        raise ValueError('control source')
+    oldrow=next(x for x in old['results'] if x['mode']=='plain')
+    oldcrop=next(x for x in oldrow['crop'] if x['tick']==9)
+    copy_member(args.control, 'publish/'+oldrow['file'], work/'old.ivf')
+    if prior.sha(work/'old.ivf') != oldrow['sha256']:
+        raise ValueError('control packet hash')
+    subprocess.run(svtav1.decode_command(tools['dav1d']['path'],work/'old.ivf',work/'old.yuv',threads=1),check=True,timeout=300)
+    if prior.sha(work/'old.yuv') != oldrow['decoded_sha256']:
+        raise ValueError('control decoded hash')
+    oldnative=np.memmap(work/'old.yuv',np.uint8,'r',shape=(full,270,320))
+    oldrgb=cv2.resize(tracked_patch.yuv_to_rgb(oldnative[9],320,180,False),(1280,720),interpolation=cv2.INTER_CUBIC)
+    from experiments.tennis.k5d_encoder import crop64
+    from experiments.visor.h3b import dists_crops
+    visible,x,y=labels[9]
+    if visible != 1:
+        raise ValueError('missing control tick')
+    actual=dists_crops(net,[crop64(oldrgb,x,y)],crop64(source[9],x,y),np.ones((64,64),bool),'cpu')[0]
+    if abs(float(actual)-oldcrop['dists'])>1e-4:
+        raise ValueError('control metric differs')
     masks = np.zeros((n,360,640),bool)
     for i,p in enumerate(track):
         if p is not None:
@@ -85,22 +110,24 @@ def run(args):
         data=Path(r['stream']).read_bytes()
         packed=zlib.compress(data,6)
         wire=(b'\x01'+packed) if len(packed)<len(data) else (b'\x00'+data)
-        recovered=zlib.decompress(wire[1:]) if wire[0] else wire[1:]
+        receiver="import sys,zlib; d=sys.stdin.buffer.read(); sys.stdout.buffer.write(zlib.decompress(d[1:]) if d[0] else d[1:])"
+        recovered=subprocess.check_output([os.sys.executable,'-c',receiver],input=wire)
         if recovered != data or len(svtav1.ivf_frames(data)) != n or r['decoded_frames'] != n:
             raise ValueError('transport or native count')
-        row={'mode':mode,'crf':key[1],'kbps':len(wire)*8*fps/n/1000,'bytes':len(wire),'raw_sha256':hashlib.sha256(data).hexdigest(),'wire_sha256':hashlib.sha256(wire).hexdigest(),'decoded_sha256':prior.sha(Path(r['decoded'])),'decoded':r['decoded'],'stream':r['stream']}
+        row={'mode':mode,'crf':key[1],'kbps':len(wire)*8*fps/n/1000,'bytes':len(wire),'raw_sha256':hashlib.sha256(data).hexdigest(),'wire_sha256':hashlib.sha256(wire).hexdigest(),'decoded_sha256':prior.sha(Path(r['decoded'])),'codec_seconds':r['encode_seconds']+r['decode_seconds'],'decoded':r['decoded'],'stream':r['stream']}
         cached[key]=row
         trials.append(row)
         return row
     for mode in ['plain','roi']:
         if n==16:
-            encode(mode,54)
+            for q in (30,54,70):
+                encode(mode,q)
             continue
         for target in targets:
-            lo,hi=30.0,76.0
+            lo,hi=(67.5,70.0) if args.refine else (30.0,70.0)
             for q in [lo,hi]:
                 encode(mode,q)
-            for _ in range(8):
+            for _ in range(4 if args.source == 'match235_000' else 8):
                 q=round((lo+hi)*2)/4
                 if q in (lo,hi):
                     break
@@ -127,9 +154,11 @@ def run(args):
         dest=publish/f'candidate-{i}.ivf'
         shutil.copyfile(row['stream'],dest)
         row['file']=dest.name
+    if n == 16 and cached[('plain',54)]['raw_sha256'] == cached[('roi',54)]['raw_sha256']:
+        raise ValueError('ROI is ineffective at the shared smoke CRF')
     for row in trials:
         del row['decoded'],row['stream']
-    report={'source':args.source,'frames':n,'fps':fps,'targets':targets,'source_sha256':receipt['source']['rgb_sha256'],'manifest_sha256':MANIFEST,'visible_labels':sum(x[0]==1 for x in labels),'tools':tools,'trials':trials,'selected':selected,'wall_seconds':time.monotonic()-started}
+    report={'source':args.source,'frames':n,'fps':fps,'targets':targets,'source_sha256':receipt['source']['rgb_sha256'],'manifest_sha256':MANIFEST,'refine':args.refine,'control_tick9_dists':float(actual),'control_expected':oldcrop['dists'],'visible_labels':sum(x[0]==1 for x in labels),'tools':tools,'trials':trials,'selected':selected,'wall_seconds':time.monotonic()-started}
     data=json.dumps(report,indent=2)+'\n'
     (publish/'result.json').write_text(data)
     (Path(os.environ['PS_STAGE_DIR'])/'result.json').write_text(data)
@@ -145,9 +174,11 @@ def validate():
             data=tar.extractfile('publish/'+r['file']).read()
             checks[str(i)]=(hashlib.sha256(data).hexdigest()==r['raw_sha256'] and len(svtav1.ivf_frames(data))==n and len(r['native_frame_sha256'])==n and len(r['crop'])==report['visible_labels'])
     # Smoke extrapolation includes a conservative allowance for 16 encodes per mode.
-    projection=report['wall_seconds']*(CONFIG[report['source']][0]/16)*16*1.5 if n==16 else None
+    codec_seconds=sum(x['codec_seconds'] for x in report['trials'])
+    max_trials_per_mode=6 if report['refine'] else (14 if report['source']=='match235_000' else 26)
+    projection=1.5*(max(0,report['wall_seconds']-codec_seconds)+codec_seconds*(max_trials_per_mode/3)*(CONFIG[report['source']][0]/16)) if n==16 else None
     if n==16:
-        checks['forecast']=projection<1400
+        checks['forecast']=projection<(1200 if report['refine'] else (2400 if report['source']=='match235_000' else 1400))
     result={'passed':all(checks.values()),'checks':checks,'projected_full_seconds':projection}
     Path(os.environ['PS_VALIDATION_PATH']).write_text(json.dumps(result,indent=2)+'\n')
     if not result['passed']:
@@ -158,9 +189,11 @@ def main():
     p=argparse.ArgumentParser()
     p.add_argument('--bases',type=Path)
     p.add_argument('--sources',type=Path)
+    p.add_argument('--control',type=Path)
     p.add_argument('--weights',type=Path)
     p.add_argument('--source',choices=CONFIG)
     p.add_argument('--frames',type=int)
+    p.add_argument('--refine',action='store_true')
     p.add_argument('--validate',action='store_true')
     a=p.parse_args()
     if a.validate:

@@ -1,0 +1,51 @@
+{
+  "wasb_authors_repo": "nttcom/WASB-SBDT",
+  "revision": "923462cacdeb3353b84ddebdedb3f4b7a8553b0f",
+  "verified_checkpoint_sha256": "9d391239ab10c733f8e5bfadf16ab72838e7a8ebc88e8ae2038501c03d42b4bb",
+  "reported_training_games": [
+    [
+      "game1",
+      "Federer / Djokovic",
+      "Shanghai2014 semifinal"
+    ],
+    [
+      "game2",
+      "Djokovic / Monfils",
+      "Eastbourne2017 final"
+    ],
+    [
+      "game3",
+      "Murray / Djokovic",
+      "Doha2017 final"
+    ],
+    [
+      "game4",
+      "unknown pair",
+      "ITF Future CIT2014 final"
+    ],
+    [
+      "game5",
+      "Checa / Rumenov",
+      "event/year unspecified"
+    ],
+    [
+      "game6",
+      "Ferrer / Fognini",
+      "Buenos Aires2014 final"
+    ],
+    [
+      "game7",
+      "Federer / Kyrgios",
+      "LaverCup2017"
+    ]
+  ],
+  "test_broadcasts": {
+    "209": "Dimitrov / Shevchenko, Rotterdam 2024",
+    "269": "Evans / Tiafoe, Washington 2023",
+    "235": "Shelton / Mensik, Indian Wells 2024",
+    "99": "Rune / Etcheverry, Basel 2023"
+  },
+  "training_documentation": "https://github.com/nttcom/WASB-SBDT/blob/923462cacdeb3353b84ddebdedb3f4b7a8553b0f/src/configs/dataset/tennis.yaml",
+  "original_dataset_paper": "https://arxiv.org/abs/1907.03698",
+  "scope": "Physical event exclusion from the documented TrackNet tennis split. Original training logs, other pretraining and undocumented optimizer inputs unavailable."
+}

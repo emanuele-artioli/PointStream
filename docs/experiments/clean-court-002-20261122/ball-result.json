@@ -1,0 +1,149 @@
+{
+  "stage": "full",
+  "frames": 240,
+  "fps": 50,
+  "source_mp4_sha256": "f0551443eaff4e4b3539f21cd0c6ac66f55601d480ad099a571e8626db735e4a",
+  "source_yuv_sha256": "361eba9469b0a49cf65417466ab59dfece4288c079f71918eb4f913cda4d5979",
+  "keypoints_sha256": "c6b0d0d8cbf188495e64acc6907f6ef3face49a89b6aa93ffc641992609a351b",
+  "box_hashes": {
+    "nadal_kyrgios__002_at120__person_000000000000": "562fc155839b75f7746392c3611fa6f53179fd801a564bbf025f50b4ba2da75a",
+    "nadal_kyrgios__002_at120__person_000000000002": "396a29f77bb9b20bd74ec2740ee91cffcc8d393fe38031a5e9e8d9f68d810015"
+  },
+  "mask_policy": "paid player poses and boxes, source yellow cue and sender ball-track windows",
+  "ball_track_sha256": "43a816146a72daebfab62db5a87dcb651d431aa408feb859f7df9b7dc60f0859",
+  "ball_track_present": 231,
+  "mask_pixels": 13837517,
+  "donors": [
+    {
+      "tick": 0,
+      "matches": 5925,
+      "inliers": 5925
+    },
+    {
+      "tick": 15,
+      "matches": 3658,
+      "inliers": 3098
+    },
+    {
+      "tick": 30,
+      "matches": 2904,
+      "inliers": 2602
+    },
+    {
+      "tick": 45,
+      "matches": 2622,
+      "inliers": 2023
+    },
+    {
+      "tick": 60,
+      "matches": 2435,
+      "inliers": 2242
+    },
+    {
+      "tick": 75,
+      "matches": 2244,
+      "inliers": 2063
+    },
+    {
+      "tick": 90,
+      "matches": 2354,
+      "inliers": 2108
+    },
+    {
+      "tick": 105,
+      "matches": 2268,
+      "inliers": 1781
+    },
+    {
+      "tick": 120,
+      "matches": 2275,
+      "inliers": 2081
+    },
+    {
+      "tick": 134,
+      "matches": 2176,
+      "inliers": 1929
+    },
+    {
+      "tick": 149,
+      "matches": 2171,
+      "inliers": 1510
+    },
+    {
+      "tick": 164,
+      "matches": 2132,
+      "inliers": 1893
+    },
+    {
+      "tick": 179,
+      "matches": 2047,
+      "inliers": 1512
+    },
+    {
+      "tick": 194,
+      "matches": 2060,
+      "inliers": 1509
+    },
+    {
+      "tick": 209,
+      "matches": 2124,
+      "inliers": 1859
+    },
+    {
+      "tick": 224,
+      "matches": 2188,
+      "inliers": 1791
+    },
+    {
+      "tick": 239,
+      "matches": 2198,
+      "inliers": 1606
+    }
+  ],
+  "holes_yuv": [
+    11944,
+    2889,
+    2889
+  ],
+  "outside_support_changed": 0,
+  "clean_yuv_sha256": "d53673afd93e2740ea9f0cfc544a8129e803d2c3a4e6b843dcbaa04f254b0182",
+  "clean_yuv_bytes": 188006400,
+  "outputs": [
+    {
+      "mode": "original",
+      "bytes": 19878,
+      "kbps": 33.13,
+      "stream_sha256": "84ed428236cb8a8328699609813321fad643105b651958063dba00d1c65e1588",
+      "decoded_sha256": "b63a10aa04e514525e5ca5f8651f9235fa2a67be53365b3a15b506af611e03f1",
+      "low_source_sha256": "b487649d87962c71421174dc1c588eecfd7b36f7802d8007c366aeefa0cfd142"
+    },
+    {
+      "mode": "clean",
+      "bytes": 18576,
+      "kbps": 30.96,
+      "stream_sha256": "2fa1f8d752b527707a5e0c1e1be6e070ef34efb91a37aa8ae20ca66215ec2ab9",
+      "decoded_sha256": "ab8d5890ae3d0365e5dab07e9ee8f2eba934feb165b4cc1a20e35b20be2a5b5c",
+      "low_source_sha256": "ecf3ee795953f427827a767f3616fa9671b024175e14c775b5af4866aef9468c"
+    }
+  ],
+  "encoder": {
+    "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+    "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+    "sha256": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+    "version": "SVT-AV1 v4.2.0 (release)"
+  },
+  "decoder": {
+    "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+    "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+    "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+    "version": "1.5.4"
+  },
+  "ffmpeg": {
+    "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+    "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+    "sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+    "version": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers"
+  },
+  "opencv": "4.10.0",
+  "wall_seconds": 84.08033105300274
+}

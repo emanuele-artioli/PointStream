@@ -1,0 +1,32 @@
+{
+  "initial": {
+    "bytes": 274027,
+    "sse": 46067018,
+    "luma_psnr": 46.457116434809265,
+    "kbps": 456.7116666666667,
+    "crf": 41.0,
+    "width": 960,
+    "stream_sha256": "fb380d283ef8dbe977cf963fa702d6d625f9dd40505e53690b07bd292607ac7f"
+  },
+  "return": {
+    "bytes": 44007,
+    "sse": 404224406,
+    "luma_psnr": 37.024792124667776,
+    "kbps": 73.345,
+    "crf": 63.5,
+    "width": 960,
+    "stream_sha256": "66d3af87818b76c12435a9b2b4f5e9797a219a3d32faf4aface4568af74b8bf8"
+  },
+  "gap": {
+    "sse": 338007860711,
+    "luma_psnr": 24.343916069552836,
+    "gap_stream_sha256": "0b4960e92ce07db9dabee33daa98a705c215191ba042c6291b1c546a6a87c1d3",
+    "bytes": 540921
+  },
+  "full": {
+    "bytes": 858955,
+    "kbps": 30.392038920831492,
+    "luma_psnr": 24.52656089941935,
+    "sse": 338458152135
+  }
+}
