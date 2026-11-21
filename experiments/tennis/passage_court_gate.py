@@ -20,6 +20,13 @@ INTERVALS = {
 }
 
 
+GROUPS = {
+    "rallies": ("first", "return"),
+    "crowd_point": ("crowd_point",),
+    "crowd_interlude": ("crowd_interlude",),
+}
+
+
 def run(a):
     if (
         len(os.sched_getaffinity(0)) != 1
@@ -33,14 +40,12 @@ def run(a):
     cv2.setNumThreads(1)
     work = Path(os.environ["PS_SCRATCH_DIR"])
     records = {}
-    spans = (
-        list(INTERVALS.items())
-        if a.frames == 1058
-        else [(k, INTERVALS[k]) for k in ("first", "crowd_point")]
-    )
+    smoke = os.environ["PS_STAGE"] == "smoke"
+    keys = GROUPS[a.part][:1] if smoke else GROUPS[a.part]
+    spans = [(key, INTERVALS[key]) for key in keys]
     for key, (lo, hi) in spans:
         clock = time.monotonic()
-        n = hi - lo if a.frames == 1058 else 24
+        n = 24 if smoke else hi - lo
         seek = [
             ff["path"],
             "-v",
@@ -50,6 +55,8 @@ def run(a):
             "1",
             "-ss",
             f"{(lo + 1) / 50:.6f}",
+            "-t",
+            f"{(n + 1) / 50:.6f}",
             "-i",
             str(a.source),
         ]
@@ -121,15 +128,17 @@ def run(a):
     (Path(os.environ["PS_STAGE_DIR"]) / "result.json").write_text(json.dumps(r, indent=2) + "\n")
 
 
-def validate():
+def validate(a):
     r = json.loads((Path(os.environ["PS_STAGE_DIR"]) / "result.json").read_text())
     smoke = os.environ["PS_STAGE"] == "smoke"
-    expected = 48 if smoke else 1058
+    keys = GROUPS[a.part]
+    total = sum(INTERVALS[k][1] - INTERVALS[k][0] for k in keys)
+    expected = 24 if smoke else total
     tests = dict(
         source=r["source"] == passage_native.gap.SOURCE_SHA,
         frames=sum(x["frames"] for x in r["records"].values()) == expected,
         settings=r["decisions"] == k8b.DECISION,
-        cases=set(r["records"]) == ({"first", "crowd_point"} if smoke else set(INTERVALS)),
+        cases=set(r["records"]) == set(keys[:1] if smoke else keys),
     )
     for k, x in r["records"].items():
         tests[k] = (
@@ -139,15 +148,8 @@ def validate():
         )
     estimate = None
     if smoke:
-        estimate = (
-            1.5
-            * (
-                480 * r["records"]["first"]["seconds"] / 24
-                + 578 * r["records"]["crowd_point"]["seconds"] / 24
-            )
-            + 90
-        )
-        tests["fits"] = estimate < 1550
+        estimate = 1.5 * total * r["records"][keys[0]]["seconds"] / 24 + 75
+        tests["fits"] = estimate < a.limit
     result = dict(passed=all(tests.values()), checks=tests, forecast=estimate)
     Path(os.environ["PS_VALIDATION_PATH"]).write_text(json.dumps(result) + "\n")
     if not result["passed"]:
@@ -157,7 +159,9 @@ def validate():
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--source", type=Path)
-    p.add_argument("--frames", type=int, choices=(48, 1058))
+    p.add_argument("--frames", type=int, choices=(24, 134, 444, 480))
+    p.add_argument("--part", choices=GROUPS, required=True)
+    p.add_argument("--limit", type=int, required=True)
     p.add_argument("--validate", action="store_true")
     args = p.parse_args()
-    validate() if args.validate else run(args)
+    validate(args) if args.validate else run(args)
