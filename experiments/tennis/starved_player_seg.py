@@ -106,8 +106,12 @@ def validate():
             assert np.all((im == 0) | (im == 255))
     assert r["rows"]["0360ccc4ec8eea097f872285551080d36de520b8ec84ab4f0ccf30b5e9284a7a"]
     forecast = r["setup_seconds"] + 18*r["scoring_seconds"] + 65 if smoke else None
-    passed = forecast is None or forecast < 1150
-    Path(os.environ["PS_VALIDATION_PATH"]).write_text(json.dumps(dict(passed=passed, smoke_forecast_s=forecast)))
+    checks = dict(authenticated_inputs=r["weight"] == WEIGHT and r["frames"] == FRAMES,
+                  complete_records=len(r["rows"]) == (4 if smoke else 48),
+                  source_persons=len(r["rows"]["0360ccc4ec8eea097f872285551080d36de520b8ec84ab4f0ccf30b5e9284a7a"]) > 0,
+                  geometry_and_masks=True, time_budget=forecast is None or forecast < 1150)
+    passed = all(checks.values())
+    Path(os.environ["PS_VALIDATION_PATH"]).write_text(json.dumps(dict(passed=passed, checks=checks, smoke_forecast_s=forecast)))
     if not passed:
         raise ValueError("Smoke forecast exceeds the full scoring cap")
 
