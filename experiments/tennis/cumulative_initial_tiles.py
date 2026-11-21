@@ -131,7 +131,7 @@ def run(a):
         "elapsed_seconds": time.monotonic() - beg,
         "encoder": enc,
         "decoder": dec,
-        "settings": {"tile": [64, 64], "patch": [32, 32], "fps": [50, 1], "crf": 20, "preset": 4},
+        "settings": {"tile": [64, 64], "patch": [32, 32], "fps": [50, 1], "crf": 60, "preset": 4},
         "positions": positions,
     }
     (pub / "receipt.json").write_text(json.dumps(report, indent=2) + "\n")
@@ -156,7 +156,7 @@ def validate():
         "tile": hashlib.sha256(tile).hexdigest() == j["tile_sha256"]
         and len(svtav1.ivf_frames(tile)) == n,
         "positions": len(positions) == 4 * n,
-        "settings": j["settings"]["crf"] == 20,
+        "settings": j["settings"]["crf"] == 60,
         "forecast": not smoke or 1.5 * j["elapsed_seconds"] * 10 + 60 <= 600,
     }
     result = {"passed": all(checks.values()), "checks": checks}
