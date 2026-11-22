@@ -42,7 +42,7 @@ def run(args):
         2048 * 2**20 / torch.cuda.get_device_properties(0).total_memory
     )
     root = Path(os.environ["PS_SCRATCH_DIR"])
-    receipts = root / "child-resources"
+    receipts = root / "shared-resource-receipts"
     receipts.mkdir()
     os.environ["PS_K5D_SHARED_NUMERICAL"] = "pointstream-parent2-child6-v1"
     os.environ["PS_K5D_RESOURCE_RECEIPTS"] = str(receipts)

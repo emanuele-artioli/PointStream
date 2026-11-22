@@ -20,3 +20,7 @@ First qualified-host retry `20261122T044455Z-888af996` targets gpu1.
 The unchanged first chunk passed on gpu1, including its 236.5-second smoke and all 120 source ticks. Second qualified-host job `20261122T045930Z-c411982d` was submitted on gpu2. Both use revision 311777a9 and 09:24 UTC deadline.
 
 For a descriptive neural control on the same prospective Shanghai source, freeze DCVC-UF at 960×544 QP24, the setting that yielded 20.412 kbps on Alcaraz–Hurkacz. Source, training weights, quantizer, display geometry and 25 fps are fixed before evaluating pixels or official labels. This tests whether a stronger codec preserves the ball at a similar price. If price differs, report actual rate and use the control only under its achieved ceiling. Require four byte-identical receiver passes, an encoder intra-frame check and actual container bytes. A 48-frame smoke and 1.5× cost forecast precede 240 frames. The qualified shared Ada profile limits the total GPU allocation to 8 GiB and runtime to 2,150 seconds. The original AV1 comparison and prospective labels stay frozen. [Specification](neural-control-spec.json)
+
+The Shanghai neural-control job is `20261122T050326Z-e090ba12`, revision 353577d5, deadline 09:24 UTC.
+
+The initial Q24 smoke exited before inference because its child-resource directory did not match the path enforced by the qualified allocator. Restore the established shared-resource-receipts directory and retry the same frozen source, operating point and validators.
