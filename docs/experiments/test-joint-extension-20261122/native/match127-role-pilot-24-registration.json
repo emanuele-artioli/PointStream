@@ -1,0 +1,30 @@
+{
+  "job": "20261122T203445Z-fbcdc728",
+  "state_at_registration": "pending",
+  "revision": "b44691bba163f9778b93dfce29f2725ba5802b5b",
+  "spec_sha256": "9ea6808e9833a4579f3f8dfd74116866467be953dc8ae12ca2c3e9aa419e2bcd",
+  "snapshot_sha256": "32f19b8a4dfe3aaf1c209f8e4f202bd7bf8a35ec12ea7128972cb7fede242517",
+  "host_pool": [
+    "gpu5",
+    "gpu6"
+  ],
+  "required_exclusive_ada": true,
+  "source_sha256": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+  "role_order": [
+    "near:8",
+    "far:13"
+  ],
+  "native_fps": [
+    60,
+    1
+  ],
+  "ticks": [
+    0,
+    23
+  ],
+  "total_budget_seconds": 1100,
+  "latest_start_utc": "2026-11-22T20:40:40Z",
+  "deadline_utc": "2026-11-22T20:59:00Z",
+  "results_root": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T203445Z-fbcdc728",
+  "full_rally_eligible": false
+}
