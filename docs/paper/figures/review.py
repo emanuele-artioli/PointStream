@@ -29,6 +29,11 @@ PANELS = [
         "Eight paired historical windows use a same-match adaptation and a modeled two-hour asset lifetime. Each player-region comparison uses the actual competing DCVC-UF rates for that window.",
     ),
     (
+        "player-rd-historical/pooled-curve.pdf",
+        "Player fidelity at the same rate across three matches",
+        "Seven windows use all three methods and equal match weights. At 33 kbps player-region DISTS is 0.248 for pose-conditioned PointStream, 0.402 for ordinary AV1 and 0.318 for DCVC-UF. Interpolation stays inside measured support. The reference bank and same-match adaptation use a two-hour lifetime.",
+    ),
+    (
         "player-rd-historical/player-rd-nine.pdf",
         "Player fidelity across three background rates and nine rallies",
         "Each panel holds the rendered players fixed and changes the transmitted background. Eight windows have a paired historical neural control. Rates use the corrected two-hour appearance and adaptation model. The nine windows span three physical matches.",
@@ -77,6 +82,11 @@ PANELS = [
         "ball/adelaide-prospective-machine.pdf",
         "What a machine can read from the same video",
         "The next source-ranked singles match used a rate-selection rule frozen before opening the outcome. Adding 130 bytes preserved all 64 decoded frames. Paid centers localized 5/5 visible balls, versus 0/5 for the detector on the same video. On seven not-visible labels the corresponding presence counts were 1 and 0.",
+    ),
+    (
+        "ball/joint-localization.pdf",
+        "What can a machine read from the 21.5 kbps serve?",
+        "On the same twelve visible labels, the frozen detector found zero balls within ten pixels on AV1 and DCVC-UF, and eight on the joint PointStream display. Reading the joint trajectory gave ten. All ordinary detections reproduced the earlier test. This sample has no absent labels.",
     ),
     (
         "ball/matched-low-detection.pdf",
@@ -300,13 +310,14 @@ def build(
         selected = {
             "architecture.pdf",
             "algorithms.pdf",
-            "player-rd-nine.pdf",
+            "pooled-curve.pdf",
             "players-rate-quality.pdf",
             "ball-rate-quality.pdf",
             "ball-starved-640-controls.pdf",
             "ball-three-match-rates.pdf",
             "matched-low-detection.pdf",
             "starved-masks.pdf",
+            "joint-localization.pdf",
             "adelaide-prospective-machine.pdf",
             "joint-price.pdf",
             "passage-bill.pdf",
