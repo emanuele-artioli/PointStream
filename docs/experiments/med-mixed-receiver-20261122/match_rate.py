@@ -1,10 +1,13 @@
 """Select a physical ordinary encode at each width using bytes only."""
 
 import argparse
+from contextlib import nullcontext
 from fractions import Fraction
 import json
 from pathlib import Path
 import subprocess
+import shutil
+from tempfile import TemporaryDirectory
 
 from experiments.tennis import common_player_packet as packet
 
@@ -82,32 +85,37 @@ def main(a):
                         return b
                 d = a.out / f"w{w}-q4{q4}"
                 d.mkdir()
-                r = svtav1.code(
-                    raw,
-                    d,
-                    width=w,
-                    height=h,
-                    fps=Fraction(50),
-                    frames=240,
-                    crf=q4 / 4,
-                    preset=4,
-                    threads=1,
-                    full_range=False,
-                    encoder=tools["SvtAv1EncApp"]["path"],
-                    decoder=tools["dav1d"]["path"],
-                    timeout=180,
-                )
-                assert r["decoded_frames"] == r["temporal_units"] == 240
-                known[q4] = dict(
-                    width=w,
-                    height=h,
-                    crf=q4 / 4,
-                    bytes=r["file_bytes"],
-                    kbps=r["file_bytes"] / 600,
-                    stream_sha256=sha(Path(r["stream"])),
-                    decoded_sha256=sha(Path(r["decoded"])),
-                    path=r["decoded"],
-                )
+                transient = TemporaryDirectory(dir=d) if a.compact_trials else nullcontext(str(d))
+                with transient as scratch:
+                    r = svtav1.code(
+                        raw,
+                        Path(scratch),
+                        width=w,
+                        height=h,
+                        fps=Fraction(50),
+                        frames=240,
+                        crf=q4 / 4,
+                        preset=4,
+                        threads=1,
+                        full_range=False,
+                        encoder=tools["SvtAv1EncApp"]["path"],
+                        decoder=tools["dav1d"]["path"],
+                        timeout=180,
+                    )
+                    assert r["decoded_frames"] == r["temporal_units"] == 240
+                    known[q4] = dict(
+                        width=w,
+                        height=h,
+                        crf=q4 / 4,
+                        bytes=r["file_bytes"],
+                        kbps=r["file_bytes"] / 600,
+                        stream_sha256=sha(Path(r["stream"])),
+                        decoded_sha256=sha(Path(r["decoded"])),
+                        path=str(d / "decoded.yuv"),
+                    )
+                    if a.compact_trials:
+                        shutil.copyfile(r["stream"], d / "stream.ivf")
+                        assert sha(d / "stream.ivf") == known[q4]["stream_sha256"]
             return known[q4]["bytes"]
 
         lo, hi = 40 * 4, 70 * 4
@@ -126,6 +134,17 @@ def main(a):
             measurement(q)
         admissible = [r for r in known.values() if r["bytes"] <= cap]
         pick = max(admissible, key=lambda r: r["bytes"])
+        selected_yuv = Path(pick["path"])
+        if a.compact_trials and not selected_yuv.exists():
+            retained = selected_yuv.parent / "stream.ivf"
+            assert sha(retained) == pick["stream_sha256"]
+            subprocess.run(
+                svtav1.decode_command(tools["dav1d"]["path"], retained, selected_yuv, threads=1),
+                check=True,
+                capture_output=True,
+                timeout=180,
+            )
+            assert sha(selected_yuv) == pick["decoded_sha256"]
         arms.append(
             dict(
                 name=f"ordinary-w{w}-near-{cap}B",
@@ -154,4 +173,9 @@ if __name__ == "__main__":
     p.add_argument("--out", type=Path, required=True)
     p.add_argument("--kbps", type=float, required=True)
     p.add_argument("--prior", type=Path)
+    p.add_argument(
+        "--compact-trials",
+        action="store_true",
+        help="Retain all physical IVF encodes and decoded hashes; materialize only selected native outputs.",
+    )
     main(p.parse_args())

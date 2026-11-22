@@ -1,0 +1,140 @@
+{
+  "source_yuv_sha256": "7c412d98c5a66df56c909cfd938f9939b981f0a39ae9e9b3702c71a50d80d604",
+  "ticks": 240,
+  "fps": 50,
+  "tools": {
+    "ffmpeg": {
+      "path": "/opt/homebrew/bin/ffmpeg",
+      "real_path": "/opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg",
+      "sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be",
+      "version": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    "SvtAv1EncApp": {
+      "path": "/opt/homebrew/bin/SvtAv1EncApp",
+      "real_path": "/opt/homebrew/Cellar/svt-av1/4.0.1/bin/SvtAv1EncApp",
+      "sha256": "db044194faf94d553c2509c8e033ecd05a373ba54d919d0fb49a3a13149d1687",
+      "version": "SVT-AV1 v4.0.1 (release)"
+    },
+    "dav1d": {
+      "path": "/opt/homebrew/bin/dav1d",
+      "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+      "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+      "version": "1.5.4"
+    }
+  },
+  "original_source_sha256": "4d602291ebea0fcb9698d86d3f93ce4c3076a13005e33079a82975b8b64605f2",
+  "grid": [
+    {
+      "width": 160,
+      "height": 96,
+      "crf": 40,
+      "bytes": 17179,
+      "kbps": 28.631666666666668,
+      "stream_sha256": "dc50c896eb8050104590ceed13fd35c22c1b22205c4e4dd5681a1306854dcfd9",
+      "decoded_sha256": "7c8f75f3be7473fe7ced86db3045280b1b2280375778195d83c75823bfa96a98"
+    },
+    {
+      "width": 160,
+      "height": 96,
+      "crf": 50,
+      "bytes": 13925,
+      "kbps": 23.208333333333332,
+      "stream_sha256": "2c610a52a5a2ef231777e111d21278cd85c82e343861653be03a0456458f7492",
+      "decoded_sha256": "a19b4178c4ee0a0aaa87ce1b22313ecce6716c45f75afeec289d785fd87f83d3"
+    },
+    {
+      "width": 160,
+      "height": 96,
+      "crf": 60,
+      "bytes": 11329,
+      "kbps": 18.881666666666668,
+      "stream_sha256": "81a61c512bb27227b08ee56fe55249977fee541b67ae8ebaf231497a7fc22389",
+      "decoded_sha256": "95377ac4390b09e5e10666f4c828b7591e1f75d1b02e5df53928e770f21c987c"
+    },
+    {
+      "width": 160,
+      "height": 96,
+      "crf": 70,
+      "bytes": 8915,
+      "kbps": 14.858333333333333,
+      "stream_sha256": "8dd0050485d45a9ebe3505f35da73e19f1026e5252c4220956ff9818b89e2ca1",
+      "decoded_sha256": "452d8c717182028c197ad7e27ae95745b3665c97cbcfef9d1bc8cd9b8895b34a"
+    },
+    {
+      "width": 320,
+      "height": 192,
+      "crf": 40,
+      "bytes": 39536,
+      "kbps": 65.89333333333333,
+      "stream_sha256": "8f22078270a3e763153af86d27e8df1e8d5615150c12fb6dc69531bac2bae0e8",
+      "decoded_sha256": "526f7bff4fc895e5962e63ecf04b2e287d046849a8a21fd183b9a44f9fdce2db"
+    },
+    {
+      "width": 320,
+      "height": 192,
+      "crf": 50,
+      "bytes": 26390,
+      "kbps": 43.983333333333334,
+      "stream_sha256": "3fe959f3a18ed18413ec16bf7e1908e62947fb064001f02147bf7b00348bd1b9",
+      "decoded_sha256": "7da651a996dd1b58965bc3f2441a6888dabb8bf269365eb6528349336410b549"
+    },
+    {
+      "width": 320,
+      "height": 192,
+      "crf": 60,
+      "bytes": 18051,
+      "kbps": 30.085,
+      "stream_sha256": "fb2b71910b85acfc8a1066adeb6a69418fa015a8d6036130a2be2bd78017a707",
+      "decoded_sha256": "6e5b4e019746773e9171a43060c95541751fa0a710650c8c23c52deca66248dd"
+    },
+    {
+      "width": 320,
+      "height": 192,
+      "crf": 70,
+      "bytes": 10281,
+      "kbps": 17.135,
+      "stream_sha256": "c6ab652944d43784e6dccbb1e9487cdbd42aa148afdf5b5b72a1a0a19bb71268",
+      "decoded_sha256": "51834fd4c5eb844bb49f21ad63a82b1106d41e63f9b2334726c4bf730b0582d0"
+    },
+    {
+      "width": 640,
+      "height": 384,
+      "crf": 40,
+      "bytes": 126485,
+      "kbps": 210.80833333333334,
+      "stream_sha256": "be3199adc303ceb2db3077e36c13f43216b6023e2a2f6909ca48da8c1e225b40",
+      "decoded_sha256": "33e50b4b86bf12d84bcf6265480fa9f4965a75062c71fcfc84332c1d7fec53e6"
+    },
+    {
+      "width": 640,
+      "height": 384,
+      "crf": 50,
+      "bytes": 71508,
+      "kbps": 119.18,
+      "stream_sha256": "77b70f8e733529a5b79c61ae1e126fca8925fe5d24698ff24bcdba06f22b346a",
+      "decoded_sha256": "b1bfee1af6c0461433f0f9a7f4d912bbb9189ac0d3f951c41dee2c430adb4347"
+    },
+    {
+      "width": 640,
+      "height": 384,
+      "crf": 60,
+      "bytes": 39654,
+      "kbps": 66.09,
+      "stream_sha256": "328942ba48635a0694b8f27642cac27ab5526312cd3c87d9763cfcb0de61388c",
+      "decoded_sha256": "d9070dff2e4eaef2e5946c729c9b5658f1e1f3f76a4df3b12377c48c0e2cf6bc"
+    },
+    {
+      "width": 640,
+      "height": 384,
+      "crf": 70,
+      "bytes": 14809,
+      "kbps": 24.68166666666667,
+      "stream_sha256": "fc9b5b5aa30dc78e061c9c2990446c0cd903b9d65fb849c0c6ebcc1e6bf55312",
+      "decoded_sha256": "a520d9cbc674f93cf10c485eb0d034c94c354ac502e8b495d3c05d08211fad45"
+    }
+  ],
+  "smoke_cpu": 2.7516620000000005,
+  "forecast_cpu": 559.642617,
+  "total_cpu": 122.37505900000001,
+  "scope": "Native ordinary SVT-AV1 bytes only; quality and selection at final PointStream rate remain unmeasured."
+}
