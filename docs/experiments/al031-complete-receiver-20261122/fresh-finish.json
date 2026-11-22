@@ -1,0 +1,169 @@
+{
+  "arguments": [
+    "run",
+    "--carrier",
+    "{staged:carrier}",
+    "--manifest",
+    "{staged:manifest}",
+    "--carrier-sha256",
+    "95e2fa1a014cf8b7d45deae3d3fcce1fd36251f735d56fb29fa21dff2e7c2530",
+    "--sam",
+    "{staged:sam}",
+    "--full-cap",
+    "1400",
+    "--ticks",
+    "{ticks}",
+    "--joint",
+    "{staged:joint}",
+    "--cache",
+    "{staged:cache}",
+    "--expected-yuv",
+    "03766c040512e8276552889cc769eff3fe006bef328c34f5f6d9112733f7beaf",
+    "--generation",
+    "alcaraz_hurkacz__028_at120__person_000000000004",
+    "{staged:g0}",
+    "ca3d6e46d9d8cf3b2e16347dfdf1e771aca8ff5e8c55c1193307f3d3d8195266",
+    "--generation",
+    "alcaraz_hurkacz__028_at120__person_000000000006",
+    "{staged:g1}",
+    "3ac0c2c4720cacf3826b59d48b05276abc4f3f43785d6a7a58e4ca8118571db9",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/tennis/six-match-source-panel-20261122/alcaraz031-054e4535638d.mp4",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T105056Z-7795a6cf/full/published.tar",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/tennis/k4-2026-10-13/inputs/yolo/yolo11x-pose.pt",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T110952Z-4513f702/full/published.tar",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T114430Z-534f6704/full/ball.payload"
+  ],
+  "budget_seconds": 1800,
+  "contention": {
+    "policy": "stop",
+    "resume_attempts": 0
+  },
+  "cpu_threads": 1,
+  "deadline": "2026-11-22T21:01:00Z",
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.common_finish_al028_job"
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "full": {
+    "seconds": 1400
+  },
+  "gpu_memory_mib": 18000,
+  "gpu_models": [
+    "RTX A6000",
+    "RTX 6000 Ada"
+  ],
+  "gpu_sharing": {
+    "mode": "exclusive"
+  },
+  "hosts": [
+    "gpu2",
+    "gpu3",
+    "gpu5",
+    "gpu6"
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/background/g1-2026-10-08/inputs/sam3.1_multiplex.pt",
+      "sha256": "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al031-paid-066028a0ea56e7c5/players.pscp",
+      "sha256": "95e2fa1a014cf8b7d45deae3d3fcce1fd36251f735d56fb29fa21dff2e7c2530"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al031-paid-066028a0ea56e7c5/players.manifest",
+      "sha256": "62dd51435e9183170f57a4e9dc57a24ce223c88d4826295014208e8c6805d914"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al031-paid-066028a0ea56e7c5/rally.psj",
+      "sha256": "066028a0ea56e7c57494adf6d08062d71067db62f98e01bad8347653e2e82cdc"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al031-paid-066028a0ea56e7c5/initial.psr",
+      "sha256": "da9d8565361eb290a5711fc69b909106a3b2874bc4d24dff156826abe600d635"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T115204Z-c485c799/full/published.tar",
+      "sha256": "84ffc721815780690492e05bba0af4480ba39d39793c2f70b22da8d9f477532c"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T115242Z-68bcc806/full/published.tar",
+      "sha256": "354aae6a19b8416382492019c2b1233956983402b98cefc262903a484866bc52"
+    }
+  ],
+  "local_storage_gib": 64,
+  "required_commands": [],
+  "scale": {
+    "ticks": {
+      "smoke": 4,
+      "full": 240
+    }
+  },
+  "schema": 1,
+  "single_cpu_campaign": true,
+  "smoke": {
+    "seconds": 330,
+    "representative_basis": "Three real active ticks, one conventional fallback, and both authenticated 120-tick learned player banks; complete native decode, exact mixed remux, independent raster and per-frame validation."
+  },
+  "staged_inputs": [
+    {
+      "name": "sam",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/background/g1-2026-10-08/inputs/sam3.1_multiplex.pt",
+      "sha256": "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6",
+      "extract": false
+    },
+    {
+      "name": "carrier",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al031-paid-066028a0ea56e7c5/players.pscp",
+      "sha256": "95e2fa1a014cf8b7d45deae3d3fcce1fd36251f735d56fb29fa21dff2e7c2530",
+      "extract": false
+    },
+    {
+      "name": "manifest",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al031-paid-066028a0ea56e7c5/players.manifest",
+      "sha256": "62dd51435e9183170f57a4e9dc57a24ce223c88d4826295014208e8c6805d914",
+      "extract": false
+    },
+    {
+      "name": "joint",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al031-paid-066028a0ea56e7c5/rally.psj",
+      "sha256": "066028a0ea56e7c57494adf6d08062d71067db62f98e01bad8347653e2e82cdc",
+      "extract": false
+    },
+    {
+      "name": "cache",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al031-paid-066028a0ea56e7c5/initial.psr",
+      "sha256": "da9d8565361eb290a5711fc69b909106a3b2874bc4d24dff156826abe600d635",
+      "extract": false
+    },
+    {
+      "name": "g0",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T115204Z-c485c799/full/published.tar",
+      "sha256": "84ffc721815780690492e05bba0af4480ba39d39793c2f70b22da8d9f477532c",
+      "extract": true
+    },
+    {
+      "name": "g1",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T115242Z-68bcc806/full/published.tar",
+      "sha256": "354aae6a19b8416382492019c2b1233956983402b98cefc262903a484866bc52",
+      "extract": true
+    }
+  ],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.common_finish_al028_job",
+    "validate-stage"
+  ],
+  "validator_seconds": 90,
+  "verify_staged_inputs": true
+}
