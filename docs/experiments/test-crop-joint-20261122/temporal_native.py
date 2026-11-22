@@ -33,6 +33,7 @@ def main(a):
     assert abs(cap.get(cv2.CAP_PROP_FPS) - float(FPS)) < 0.001
     rows = {r["name"]: [] for r in arms}
     prev = {}
+    prev_gray = None
     prev_masks = []
     cpu0 = time.process_time()
     with ExitStack() as scope:
@@ -59,6 +60,7 @@ def main(a):
                     )
                 values[name] = luma(cv2.resize(fr, (960, 544), interpolation=cv2.INTER_AREA))
             if t:
+                assert prev_gray is not None
                 flow = dis_flow(g, prev_gray)
                 x, y = xx + flow[:, :, 0], yy + flow[:, :, 1]
                 inside = (x >= 0) & (y >= 0) & (x < 959) & (y < 543)
