@@ -237,11 +237,11 @@ def run(config: dict, isolation: dict) -> dict:
     if "joint" in config:
         channel = mixed.decode(Path(config["joint"]), Path(config["cache"]), carrier, expected)
         profile, base, geom = channel["profile"], channel["base"], channel["geometry"]
-        start, stop = channel["start"], channel["stop"]
-        smoke = mixed.smoke_ticks(start)
+        run_start, run_stop = channel["start"], channel["stop"]
+        smoke = mixed.smoke_ticks(run_start)
     else:
         profile, base, geom = geometry(carrier.read_bytes(), expected)
-        start, stop, smoke = 0, 240, SMOKE
+        run_start, run_stop, smoke = 0, 240, SMOKE
     if ticks not in (smoke, FULL) or any(type(t) is not int for t in ticks):
         raise ValueError("unsupported SAM receiver stage")
     order = profile["order"]
@@ -309,7 +309,7 @@ def run(config: dict, isolation: dict) -> dict:
     ):
         raise RuntimeError("SAM source, weights or device changed")
     model_seconds = time.monotonic() - model_start
-    local_ticks = [t - start for t in ticks if start <= t < stop]
+    local_ticks = [t - run_start for t in ticks if run_start <= t < run_stop]
     crops = {name: generated_input(name, config, geom[name], local_ticks) for name in order}
     dest = np.lib.format.open_memmap(
         output / "frames.npy", mode="w+", dtype=np.uint8, shape=(len(ticks), 1080, 1920, 3)
@@ -324,10 +324,10 @@ def run(config: dict, isolation: dict) -> dict:
         canvas = mixed.canvas(native[tick], tick, channel)
         active, masks = {}, {}
         for name in order:
-            if not start <= tick < stop:
+            if not run_start <= tick < run_stop:
                 mask_arrays[name].append(np.zeros((784, 512), bool))
                 continue
-            local = tick - start
+            local = tick - run_start
             _, kp, boxes = geom[name]
             box = boxes[local]
             crop = crops[name][local]
