@@ -1,0 +1,65 @@
+{
+  "event": "match108",
+  "source_sha256": "23b6a757e8f01d2366282fb32e2282a76a77f39cfc96c8125069826d7f458fb7",
+  "feature_sha256": "5c47af4a44d6d4afc2b7f81a14125178e5e875e277ebda7f0083accc5364da17",
+  "labels": {
+    "tennis/all/match108/racket/000/0182.json": "54845f51e1d4e0a1f9a30a8ff107f536d62e7d5b87db0c6ddd9c23cead5a8d05"
+  },
+  "selected_players": [
+    "person:000000000008",
+    "person:000000000006"
+  ],
+  "summary": {
+    "head": {
+      "visible": 4,
+      "all_landmarks": 4
+    },
+    "handle": {
+      "visible": 1,
+      "within_five": 1,
+      "all_landmarks": 1
+    }
+  },
+  "rows": [
+    {
+      "tick": 182,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 182,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 182,
+      "object_index": 0,
+      "part": "handle",
+      "visible": true,
+      "exact": false,
+      "within_five": true
+    },
+    {
+      "tick": 182,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 182,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    }
+  ]
+}

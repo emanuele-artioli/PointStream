@@ -65,11 +65,11 @@ def run(args):
     (Path(os.environ["PS_STAGE_DIR"]) / "result.json").write_text(data)
 
 
-def validate():
+def validate(expected_events):
     r = json.loads((Path(os.environ["PS_STAGE_DIR"]) / "result.json").read_text())
     n = r["frames"]
     checks = dict(
-        events=list(r["events"]) == ["match108", "match102", "match120"],
+        events=list(r["events"]) == expected_events,
         coverage=all(
             len(x["rows"]) == n and 0 <= x["fit_count"] <= n for x in r["events"].values()
         ),
@@ -96,4 +96,4 @@ if __name__ == "__main__":
     p.add_argument("--frames", type=int)
     p.add_argument("--validate", action="store_true")
     a = p.parse_args()
-    validate() if a.validate else run(a)
+    validate(a.event or ["match108", "match102", "match120"]) if a.validate else run(a)
