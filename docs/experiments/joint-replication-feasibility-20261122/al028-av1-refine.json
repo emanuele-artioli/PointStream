@@ -1,0 +1,43 @@
+{
+  "parent_sha256": "4f5933f409ae85ebbeb5ce0224df77ecd0a542068658eaf9b588ae1c54f09c67",
+  "grid": [
+    {
+      "width": 320,
+      "height": 192,
+      "crf": 51,
+      "bytes": 26263,
+      "kbps": 21.885833333333334,
+      "stream_sha256": "5a3b9e0822ca48c864fe2c329dfe267ba3a3053e8c33caea2bc1a90fb9487e05",
+      "decoded_sha256": "b5ae9130cfc61713f6af0108989485c39e4c17fa6980716389954d89b43a2a9d"
+    },
+    {
+      "width": 320,
+      "height": 192,
+      "crf": 53,
+      "bytes": 24308,
+      "kbps": 20.256666666666668,
+      "stream_sha256": "db3fe98d1c982180eef228af5497124347109c6ca29d6d7261a179b39253d18b",
+      "decoded_sha256": "b7ac07c14c3a74c07f3da1c44835227bbda5c5190759b029b0c442fa8807d9e0"
+    },
+    {
+      "width": 640,
+      "height": 384,
+      "crf": 62,
+      "bytes": 24718,
+      "kbps": 20.598333333333333,
+      "stream_sha256": "00948ce449ee4774bd7a3317228b390684daa36549c8d9c7b34e1f1f44147b8a",
+      "decoded_sha256": "c3545779ac5588b9bf65d2cc6429e36180b06c741fd4d62a556e30efa58b4cc9"
+    },
+    {
+      "width": 640,
+      "height": 384,
+      "crf": 65,
+      "bytes": 16455,
+      "kbps": 13.7125,
+      "stream_sha256": "932b8c0b10ab25c51bd81892f4dcb88cb5baffe1d450b92865aac072f51146d0",
+      "decoded_sha256": "ad55d28b5ac7b8e318fec08ae8aa4f123f70662d3558bca52147c9403b40061c"
+    }
+  ],
+  "cpu_user_seconds": 55.951539999999994,
+  "scope": "Rate-only baseline refinement; no quality selection."
+}

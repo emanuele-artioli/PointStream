@@ -1,0 +1,18 @@
+{
+  "alcaraz_hurkacz__028_at120__person_000000000004": {
+    "t": true,
+    "kp": true,
+    "reference": true,
+    "boxes": true,
+    "seed": true,
+    "all_240_pose_rasters": true
+  },
+  "alcaraz_hurkacz__028_at120__person_000000000006": {
+    "t": true,
+    "kp": true,
+    "reference": true,
+    "boxes": true,
+    "seed": true,
+    "all_240_pose_rasters": true
+  }
+}

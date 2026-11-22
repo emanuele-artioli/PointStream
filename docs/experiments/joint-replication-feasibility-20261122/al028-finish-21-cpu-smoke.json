@@ -1,0 +1,27 @@
+{
+  "scope": "CPU compatibility smoke only: real paid carrier/native base/ball, synthetic player and mask. No model output or quality result.",
+  "carrier_sha256": "b430f7304390cd8986444e2c9c4bfc1c2269b40601990a8f5b94419e17601dc9",
+  "native_sha256": "0474cc789810859513295a1bc41c357fb286ad60414864ba6e31b27d1f22e965",
+  "frames": 240,
+  "fps": 25,
+  "tested_ticks": [
+    0,
+    11,
+    23,
+    43
+  ],
+  "order": "decoded base -> fitted ball -> synthetic player",
+  "roles": {
+    "frame": 23201,
+    "window": 2287,
+    "match": 0,
+    "reference": 155683
+  },
+  "manifest_bytes": 625,
+  "ball_bytes": 996,
+  "units": [
+    "alcaraz_hurkacz__028_at120__person_000000000004",
+    "alcaraz_hurkacz__028_at120__person_000000000006"
+  ],
+  "smoke": "pass"
+}

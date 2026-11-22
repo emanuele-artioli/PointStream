@@ -1,0 +1,28 @@
+{
+  "scope": "Source-free zstd-to-zlib local normalization; paid joint/cache bytes unchanged, internal carrier not transmitted. Requires a preinstalled zstd-capable front end.",
+  "joint_sha256": "fb69663af77820efc3d84c65ec314a15948805ab1f3bc70571fcab0ee2d1e1bd",
+  "cache_sha256": "91bd3a3fd9b18db301348c98e5af1536b859f2e51dde71e7de56c3beee1c1af2",
+  "original_carrier_sha256": "3aa0bbd4bfc7cd2c479dc2ce8128144a24c96770c01ed9f19f55c77f0f0f525f",
+  "internal_carrier_sha256": "731cc34e1fcb7c0874cd5722ab63241a123d31fbcd699e199cee4163cdcbc0dc",
+  "internal_manifest_sha256": "b228735a1ea5f7533383637f609119e6ec0a527d5ced5a94dcb8a65d42650702",
+  "internal_bytes": 168267,
+  "kps_sha256": "0a81274aaaaa272dddb61fc131f43e3a551976c01230f93514e7bfa0647546ce",
+  "checks": {
+    "alcaraz_hurkacz__028_at120__person_000000000004": {
+      "t": true,
+      "kp": true,
+      "reference": true,
+      "boxes": true,
+      "seed": true,
+      "all_240_pose_rasters": true
+    },
+    "alcaraz_hurkacz__028_at120__person_000000000006": {
+      "t": true,
+      "kp": true,
+      "reference": true,
+      "boxes": true,
+      "seed": true,
+      "all_240_pose_rasters": true
+    }
+  }
+}

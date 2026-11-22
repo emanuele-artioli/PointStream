@@ -1,0 +1,25 @@
+{
+  "parent_sha256": "4f5933f409ae85ebbeb5ce0224df77ecd0a542068658eaf9b588ae1c54f09c67",
+  "grid": [
+    {
+      "width": 320,
+      "height": 192,
+      "crf": 52,
+      "bytes": 25210,
+      "kbps": 21.008333333333333,
+      "stream_sha256": "dbe2c84721d430e48d885cab2ea65772da55b896d1dbcb726b4fa1fe974c7e6b",
+      "decoded_sha256": "dec4ea4740491d2eec30b6b94e67a154485bf8dc8bb390d0a1abb310e548194e"
+    },
+    {
+      "width": 640,
+      "height": 384,
+      "crf": 61,
+      "bytes": 29148,
+      "kbps": 24.29,
+      "stream_sha256": "f3f464ab5565bf363900f3bcca36762ca1f5b9c15b37c119dcd55ac390dee8cc",
+      "decoded_sha256": "a61b419f8da9440e1db9ec10d04abe2193befb22f66b5a5a7650cf094854c164"
+    }
+  ],
+  "cpu_user_seconds": 32.036711,
+  "scope": "Rate-only baseline refinement; no quality selection."
+}

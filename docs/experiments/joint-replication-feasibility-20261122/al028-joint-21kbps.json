@@ -1,0 +1,27 @@
+{
+  "scope": "Exact packet accounting and source-independent input reconstruction, before learned replay. No generated masks are transmitted; masks are receiver-computed. The common model is preinstalled.",
+  "ticks": 240,
+  "fps": 25,
+  "initial_bytes": 157517,
+  "joint_bytes": 25558,
+  "cold_bytes": 183075,
+  "ideal_prewarmed_bytes": 25558,
+  "cold_kbps": 152.5625,
+  "ideal_prewarmed_kbps": 21.298333333333332,
+  "cache_sha256": "91bd3a3fd9b18db301348c98e5af1536b859f2e51dde71e7de56c3beee1c1af2",
+  "joint_sha256": "4a53f55b07b8a2371ee54e8d57c4834888e1f46761b8ea53a9871cab3adcec9b",
+  "receiver_carrier_sha256": "b430f7304390cd8986444e2c9c4bfc1c2269b40601990a8f5b94419e17601dc9",
+  "paid_parts_bytes": {
+    "base": 21054,
+    "poses": 2147,
+    "ball": 996,
+    "reference_blobs": 155683
+  },
+  "framing_bytes": 3195,
+  "order": [
+    "clean_base",
+    "ball",
+    "far_player",
+    "near_player"
+  ]
+}

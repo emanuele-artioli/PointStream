@@ -1,0 +1,93 @@
+{
+  "source_sha256": "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934",
+  "transport_sha256": "8b0871ab633edcf4c77cb810cf2d3617a2a9593f0aa51af451c2a2ec21e30607",
+  "frames": 240,
+  "fps": 25,
+  "width": 160,
+  "height": 96,
+  "reference_bytes": {
+    "publish/packets/alcaraz_hurkacz__028@120/alcaraz_hurkacz__028_at120__person_000000000004.png.ref": 40296,
+    "publish/packets/alcaraz_hurkacz__028@120/alcaraz_hurkacz__028_at120__person_000000000006.png.ref": 115387
+  },
+  "reference_total_bytes": 155683,
+  "keypoint_bytes": 2469,
+  "keypoints_sha256": "acaa2ba1ba0a322d57e2dff6f33ef55e20fca028da9c7aa1a62999c6779e0263",
+  "source_yuv_sha256": "806080a0d4253dc47c489900da493078d6e6f0fc2f52d440c3297d1cb2ed6609",
+  "inpaint_yuv_sha256": "5adda177b8b3667e0239e7a8a8b0f450a8d4506440c20dc7bb79e100b9a276ba",
+  "mask_matte_sha256": "59ffe0fb3174fcac82dae8281a08bc3efe8a9d819ed919d6f9be1c4e4782282b",
+  "smoke_seconds_cpu": 0.289145,
+  "full_forecast_seconds_cpu": 78.965239,
+  "cpu_seconds": 6.961466000000001,
+  "wall_seconds": 1795308765.295754,
+  "tools": {
+    "ffmpeg": {
+      "path": "/opt/homebrew/bin/ffmpeg",
+      "real_path": "/opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg",
+      "sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be",
+      "version": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    "SvtAv1EncApp": {
+      "path": "/opt/homebrew/bin/SvtAv1EncApp",
+      "real_path": "/opt/homebrew/Cellar/svt-av1/4.0.1/bin/SvtAv1EncApp",
+      "sha256": "db044194faf94d553c2509c8e033ecd05a373ba54d919d0fb49a3a13149d1687",
+      "version": "SVT-AV1 v4.0.1 (release)"
+    },
+    "dav1d": {
+      "path": "/opt/homebrew/bin/dav1d",
+      "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+      "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+      "version": "1.5.4"
+    }
+  },
+  "results": [
+    {
+      "mode": "ordinary",
+      "crf": 70,
+      "ivf_bytes": 8942,
+      "ivf_kbps": 7.451666666666667,
+      "warm_lower_bound_bytes": 11411,
+      "warm_lower_bound_kbps": 9.509166666666667,
+      "cold_lower_bound_bytes": 167094,
+      "cold_lower_bound_kbps": 139.245,
+      "decoded_sha256": "ee9f6ff924fe1cc194fdf960ad6472ed2cfda764178e271f351953b5c11a88e5",
+      "stream_sha256": "6df97613a69727758f214532158205939e087434eade0a223341d2d18447f211"
+    },
+    {
+      "mode": "ordinary",
+      "crf": 50,
+      "ivf_bytes": 13759,
+      "ivf_kbps": 11.465833333333334,
+      "warm_lower_bound_bytes": 16228,
+      "warm_lower_bound_kbps": 13.523333333333333,
+      "cold_lower_bound_bytes": 171911,
+      "cold_lower_bound_kbps": 143.25916666666666,
+      "decoded_sha256": "ec0eb962fa356722eb7a32a233a4b8d5d6893ffce4a7ee0ffe2176c4076620c4",
+      "stream_sha256": "3e43283fd3aabb74e2aea141cd96af78258a7e395827a463f04a3d9721cffbed"
+    },
+    {
+      "mode": "spatial_inpaint",
+      "crf": 70,
+      "ivf_bytes": 8896,
+      "ivf_kbps": 7.413333333333333,
+      "warm_lower_bound_bytes": 11365,
+      "warm_lower_bound_kbps": 9.470833333333333,
+      "cold_lower_bound_bytes": 167048,
+      "cold_lower_bound_kbps": 139.20666666666668,
+      "decoded_sha256": "0bbb523440fe3d88385aba00e763e1942b24fdad1ab0058c247893ab6bd69ce3",
+      "stream_sha256": "f952a52d654ec5713e321c002e6e5d5f8e889e8755a4e33e0365dd44ec1b264e"
+    },
+    {
+      "mode": "spatial_inpaint",
+      "crf": 50,
+      "ivf_bytes": 12726,
+      "ivf_kbps": 10.605,
+      "warm_lower_bound_bytes": 15195,
+      "warm_lower_bound_kbps": 12.6625,
+      "cold_lower_bound_bytes": 170878,
+      "cold_lower_bound_kbps": 142.39833333333334,
+      "decoded_sha256": "1abbeb1b8225e6460c173989a524a76e8564d77e443c3c874096aafd0d02c7f2",
+      "stream_sha256": "4a760c53ce8a3aaa11eefec221aef82688fe8b95a53b886b767da4c2de90fd22"
+    }
+  ],
+  "scope": "Source-only byte screen. Spatial inpainting is unvalidated and not the donor-cleaned receiver. Warm lower bound omits ball, operational framing and other costs; cold adds only two reference blobs."
+}

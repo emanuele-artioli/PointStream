@@ -494,3 +494,23 @@ def test_optimize_lossless_carrier_preserves_pixels_and_accounts_full_packet(mon
     # already paid original and the new profile adds header bytes.
     monkeypatch.setattr(rates, 'encode_reference', lambda *args, **kwargs: b'x' * (len(original) + 1))
     assert packet.optimize_lossless_carrier(original) == original
+
+
+def test_separate_native_25fps_profile_and_mismatched_headers():
+    profile, base50, keypoints, refs = fixture()
+    profile25 = copy.deepcopy(profile)
+    profile25['recipe'] = copy.deepcopy(packet.RECIPE_25)
+    base25 = bytearray(base50)
+    struct.pack_into('<II', base25, 16, 25, 1)
+    encoded = packet.build(profile25, bytes(base25), keypoints, refs)
+    sections, _, decoded = packet.unpack(encoded, profile25)
+    assert sections['base'] == bytes(base25)
+    assert len(decoded['player'][0]['t']) == 4
+    with pytest.raises(ValueError, match='invalid native IVF header'):
+        packet.build(profile25, base50, keypoints, refs)
+    with pytest.raises(ValueError, match='invalid native IVF header'):
+        packet.build(profile, bytes(base25), keypoints, refs)
+    with pytest.raises(ValueError, match='unsupported recipe'):
+        invalid = copy.deepcopy(profile25)
+        invalid['recipe']['fps'] = [30, 1]
+        packet.build(invalid, bytes(base25), keypoints, refs)
