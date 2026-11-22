@@ -1,0 +1,780 @@
+{
+  "scope": "Full common 960x544 display, no foreground annotations",
+  "delivery_receipt_sha256": "c3594ccb34dc4d9066fd2038f1e5a73b5b324a0f783ed1dd4ef5662c5bac77b8",
+  "scorer_sha256": "1dcebf6b415fc78278b6088bb0fa3a0f1c94ed0c8d5afa634710a8d01b98bdcb",
+  "dav1d": {
+    "path": "/opt/homebrew/bin/dav1d",
+    "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+    "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+    "version": "1.5.4"
+  },
+  "opencv": "4.10.0",
+  "psnr": "arithmetic mean of per-frame RGB PSNR",
+  "ssim": "arithmetic mean of spatial and frame means of 11x11 Gaussian luma SSIM",
+  "gpu_seconds": 0,
+  "rows": [
+    {
+      "rally": "v006_p0014",
+      "native_frames": 106,
+      "route_sha256": "ff42a0359ac43e93129ea25078525ef0c9225f15be4a3ca78c787825114c4206",
+      "metrics": {
+        "20400": {
+          "coded_size": [
+            640,
+            360
+          ],
+          "actual_bytes": {
+            "av1": 9467,
+            "exact_base": 9467,
+            "ball": 9778
+          },
+          "ball_packet_sha256": "f043b72952184ca0187dfe5fa3645f51ced635e7ff461391b5028233b7752b9f",
+          "native_av1_sha256": "976598c4a30c1a34e3f68efd065c46186afc14aef4d13955b9f23fe4e1d4bb10",
+          "ball_display_sha256": "683f6a2ec077521858d4adf8e331db5ced552c6e801019f3c98a40accb7d1399",
+          "changed_frames": 46,
+          "scores": {
+            "av1": {
+              "all": {
+                "rgb_psnr": 25.216736321622964,
+                "luma_ssim": 0.7274358501530815,
+                "frames": 106
+              },
+              "court": {
+                "rgb_psnr": 25.216736321622964,
+                "luma_ssim": 0.7274358501530815,
+                "frames": 106
+              },
+              "fallback": null
+            },
+            "exact_base": {
+              "all": {
+                "rgb_psnr": 25.216736321622964,
+                "luma_ssim": 0.7274358501530815,
+                "frames": 106
+              },
+              "court": {
+                "rgb_psnr": 25.216736321622964,
+                "luma_ssim": 0.7274358501530815,
+                "frames": 106
+              },
+              "fallback": null
+            },
+            "ball": {
+              "all": {
+                "rgb_psnr": 25.2184480915453,
+                "luma_ssim": 0.7274897975550587,
+                "frames": 106
+              },
+              "court": {
+                "rgb_psnr": 25.2184480915453,
+                "luma_ssim": 0.7274897975550587,
+                "frames": 106
+              },
+              "fallback": null
+            }
+          }
+        },
+        "33000": {
+          "coded_size": [
+            640,
+            360
+          ],
+          "actual_bytes": {
+            "av1": 12583,
+            "exact_base": 12583,
+            "ball": 12894
+          },
+          "ball_packet_sha256": "58e93599012f1d2ccdbd6a4a51c3333a2b9520bc0848959154f4ee856efd5697",
+          "native_av1_sha256": "0426c5ea2b5e358231d0f46d0fc131f1559d3deb21fc3dff983ccf6c87422027",
+          "ball_display_sha256": "2fffcc39cddc71e2467bdb0e9bfee8845945f7643d804ffc5e86667c79f7e6b0",
+          "changed_frames": 46,
+          "scores": {
+            "av1": {
+              "all": {
+                "rgb_psnr": 26.665673547937356,
+                "luma_ssim": 0.7670499834361,
+                "frames": 106
+              },
+              "court": {
+                "rgb_psnr": 26.665673547937356,
+                "luma_ssim": 0.7670499834361,
+                "frames": 106
+              },
+              "fallback": null
+            },
+            "exact_base": {
+              "all": {
+                "rgb_psnr": 26.665673547937356,
+                "luma_ssim": 0.7670499834361,
+                "frames": 106
+              },
+              "court": {
+                "rgb_psnr": 26.665673547937356,
+                "luma_ssim": 0.7670499834361,
+                "frames": 106
+              },
+              "fallback": null
+            },
+            "ball": {
+              "all": {
+                "rgb_psnr": 26.66813858071089,
+                "luma_ssim": 0.7671036487503011,
+                "frames": 106
+              },
+              "court": {
+                "rgb_psnr": 26.66813858071089,
+                "luma_ssim": 0.7671036487503011,
+                "frames": 106
+              },
+              "fallback": null
+            }
+          }
+        }
+      }
+    },
+    {
+      "rally": "v006_p0041",
+      "native_frames": 132,
+      "route_sha256": "7b481361c078fcf47ccd96305106947e0fd9dab439d2cc1c70833c0e9d0fffa8",
+      "metrics": {
+        "20400": {
+          "coded_size": [
+            640,
+            360
+          ],
+          "actual_bytes": {
+            "av1": 11153,
+            "exact_base": 11153,
+            "ball": 11497
+          },
+          "ball_packet_sha256": "8769d346e83ca0eec8a918c0a3891737bb218279a87018fd11afe57877875e8c",
+          "native_av1_sha256": "48820e76142cad7cbca13f08c3db065b39e96c7b02b5e2cd6109a24dabe246d4",
+          "ball_display_sha256": "0f6fad716ae88190ded494b6b02a002461ff2e2a6a7dff498ad56a5e6ed86cbf",
+          "changed_frames": 48,
+          "scores": {
+            "av1": {
+              "all": {
+                "rgb_psnr": 28.0505460551614,
+                "luma_ssim": 0.8000056933984826,
+                "frames": 132
+              },
+              "court": {
+                "rgb_psnr": 28.0505460551614,
+                "luma_ssim": 0.8000056933984826,
+                "frames": 132
+              },
+              "fallback": null
+            },
+            "exact_base": {
+              "all": {
+                "rgb_psnr": 28.0505460551614,
+                "luma_ssim": 0.8000056933984826,
+                "frames": 132
+              },
+              "court": {
+                "rgb_psnr": 28.0505460551614,
+                "luma_ssim": 0.8000056933984826,
+                "frames": 132
+              },
+              "fallback": null
+            },
+            "ball": {
+              "all": {
+                "rgb_psnr": 28.053086963956467,
+                "luma_ssim": 0.8000490777450702,
+                "frames": 132
+              },
+              "court": {
+                "rgb_psnr": 28.053086963956467,
+                "luma_ssim": 0.8000490777450702,
+                "frames": 132
+              },
+              "fallback": null
+            }
+          }
+        },
+        "33000": {
+          "coded_size": [
+            640,
+            360
+          ],
+          "actual_bytes": {
+            "av1": 11153,
+            "exact_base": 11153,
+            "ball": 11497
+          },
+          "ball_packet_sha256": "8769d346e83ca0eec8a918c0a3891737bb218279a87018fd11afe57877875e8c",
+          "native_av1_sha256": "48820e76142cad7cbca13f08c3db065b39e96c7b02b5e2cd6109a24dabe246d4",
+          "ball_display_sha256": "0f6fad716ae88190ded494b6b02a002461ff2e2a6a7dff498ad56a5e6ed86cbf",
+          "changed_frames": 48,
+          "scores": {
+            "av1": {
+              "all": {
+                "rgb_psnr": 28.0505460551614,
+                "luma_ssim": 0.8000056933984826,
+                "frames": 132
+              },
+              "court": {
+                "rgb_psnr": 28.0505460551614,
+                "luma_ssim": 0.8000056933984826,
+                "frames": 132
+              },
+              "fallback": null
+            },
+            "exact_base": {
+              "all": {
+                "rgb_psnr": 28.0505460551614,
+                "luma_ssim": 0.8000056933984826,
+                "frames": 132
+              },
+              "court": {
+                "rgb_psnr": 28.0505460551614,
+                "luma_ssim": 0.8000056933984826,
+                "frames": 132
+              },
+              "fallback": null
+            },
+            "ball": {
+              "all": {
+                "rgb_psnr": 28.053086963956467,
+                "luma_ssim": 0.8000490777450702,
+                "frames": 132
+              },
+              "court": {
+                "rgb_psnr": 28.053086963956467,
+                "luma_ssim": 0.8000490777450702,
+                "frames": 132
+              },
+              "fallback": null
+            }
+          }
+        }
+      }
+    },
+    {
+      "rally": "v006_p0068",
+      "native_frames": 144,
+      "route_sha256": "560a67dcea8a896b25465b4fab277719b222e4e1cdb7f48909c77f95079c9c15",
+      "metrics": {
+        "20400": {
+          "coded_size": [
+            640,
+            360
+          ],
+          "actual_bytes": {
+            "av1": 11673,
+            "exact_base": 11673,
+            "ball": 12253
+          },
+          "ball_packet_sha256": "d4c40b15cbb0b2eed70963ad106bdb8caec88f6a802e306d0aec36a554ef8e12",
+          "native_av1_sha256": "f08821f48e49336c76de9c85936648cc032fec8d190d65c832e4a1e4b29bf91d",
+          "ball_display_sha256": "002680e98875d8297623c3d7b86adcbc6a55b86b586352a763753d663e7d35a9",
+          "changed_frames": 99,
+          "scores": {
+            "av1": {
+              "all": {
+                "rgb_psnr": 25.35324556819943,
+                "luma_ssim": 0.7859575675557504,
+                "frames": 144
+              },
+              "court": {
+                "rgb_psnr": 25.35324556819943,
+                "luma_ssim": 0.7859575675557504,
+                "frames": 144
+              },
+              "fallback": null
+            },
+            "exact_base": {
+              "all": {
+                "rgb_psnr": 25.35324556819943,
+                "luma_ssim": 0.7859575675557504,
+                "frames": 144
+              },
+              "court": {
+                "rgb_psnr": 25.35324556819943,
+                "luma_ssim": 0.7859575675557504,
+                "frames": 144
+              },
+              "fallback": null
+            },
+            "ball": {
+              "all": {
+                "rgb_psnr": 25.354689540687165,
+                "luma_ssim": 0.7860291214595658,
+                "frames": 144
+              },
+              "court": {
+                "rgb_psnr": 25.354689540687165,
+                "luma_ssim": 0.7860291214595658,
+                "frames": 144
+              },
+              "fallback": null
+            }
+          }
+        },
+        "33000": {
+          "coded_size": [
+            640,
+            360
+          ],
+          "actual_bytes": {
+            "av1": 15657,
+            "exact_base": 15657,
+            "ball": 16237
+          },
+          "ball_packet_sha256": "1f1812481663931a0cc541ee1cb6942a7eb78eb42d23942b7e226c93e4b55a43",
+          "native_av1_sha256": "74ebaa6f7d14cf2102f7363fbfa4a3d0a3a4235e19154bc4f5b2494f539eb994",
+          "ball_display_sha256": "3553ba565464a6970274bf7e5b4ca07d302dff85dd24a691db5b4eabfb36c868",
+          "changed_frames": 99,
+          "scores": {
+            "av1": {
+              "all": {
+                "rgb_psnr": 26.993578259197495,
+                "luma_ssim": 0.8252897636351207,
+                "frames": 144
+              },
+              "court": {
+                "rgb_psnr": 26.993578259197495,
+                "luma_ssim": 0.8252897636351207,
+                "frames": 144
+              },
+              "fallback": null
+            },
+            "exact_base": {
+              "all": {
+                "rgb_psnr": 26.993578259197495,
+                "luma_ssim": 0.8252897636351207,
+                "frames": 144
+              },
+              "court": {
+                "rgb_psnr": 26.993578259197495,
+                "luma_ssim": 0.8252897636351207,
+                "frames": 144
+              },
+              "fallback": null
+            },
+            "ball": {
+              "all": {
+                "rgb_psnr": 26.995621467207364,
+                "luma_ssim": 0.825360673102216,
+                "frames": 144
+              },
+              "court": {
+                "rgb_psnr": 26.995621467207364,
+                "luma_ssim": 0.825360673102216,
+                "frames": 144
+              },
+              "fallback": null
+            }
+          }
+        }
+      }
+    },
+    {
+      "rally": "v007_p0022",
+      "native_frames": 120,
+      "route_sha256": "9a78399b226305aee7f4d2ea96584bf7180c8687a8ba3f5c26da24ee1ef6c2a0",
+      "metrics": {
+        "20400": {
+          "coded_size": [
+            320,
+            180
+          ],
+          "actual_bytes": {
+            "av1": 9293,
+            "exact_base": 9293,
+            "ball": 9696
+          },
+          "ball_packet_sha256": "17d207c5b81b4162d4c647d9b48dd1cb68b1ba7024206983b37f3ae13aa63c0d",
+          "native_av1_sha256": "b5d4025d7359448b9da4984b58c2bdcd6b32eb021acd6f88282c34e83ff11485",
+          "ball_display_sha256": "39ceece72c04228e6f4eae819cd0541eeeb30a9363653058fcc32cf53c4d7bed",
+          "changed_frames": 56,
+          "scores": {
+            "av1": {
+              "all": {
+                "rgb_psnr": 23.366845052690557,
+                "luma_ssim": 0.7202729983725075,
+                "frames": 120
+              },
+              "court": {
+                "rgb_psnr": 24.122869411747487,
+                "luma_ssim": 0.7679422709399021,
+                "frames": 83
+              },
+              "fallback": {
+                "rgb_psnr": 21.670898517508792,
+                "luma_ssim": 0.6133392247753789,
+                "frames": 37
+              }
+            },
+            "exact_base": {
+              "all": {
+                "rgb_psnr": 23.366845052690557,
+                "luma_ssim": 0.7202729983725075,
+                "frames": 120
+              },
+              "court": {
+                "rgb_psnr": 24.122869411747487,
+                "luma_ssim": 0.7679422709399021,
+                "frames": 83
+              },
+              "fallback": {
+                "rgb_psnr": 21.670898517508792,
+                "luma_ssim": 0.6133392247753789,
+                "frames": 37
+              }
+            },
+            "ball": {
+              "all": {
+                "rgb_psnr": 23.368401957694065,
+                "luma_ssim": 0.7203320406711076,
+                "frames": 120
+              },
+              "court": {
+                "rgb_psnr": 24.125120358740514,
+                "luma_ssim": 0.768027633299324,
+                "frames": 83
+              },
+              "fallback": {
+                "rgb_psnr": 21.670898517508792,
+                "luma_ssim": 0.6133392247753789,
+                "frames": 37
+              }
+            }
+          }
+        },
+        "33000": {
+          "coded_size": [
+            640,
+            360
+          ],
+          "actual_bytes": {
+            "av1": 19576,
+            "exact_base": 14057,
+            "ball": 14460
+          },
+          "ball_packet_sha256": "0ebb4edde8ab2e158ad336fa1cb53c2b8e2834da26587913ecc8918f42178221",
+          "native_av1_sha256": "0411d9bbe4c09fbb4d4b10bec59185936ac602423d08e05c983d37724d777989",
+          "ball_display_sha256": "f9a9e181545e57ac2cf579e2395118df6276fabe0381b2013de368f677b10089",
+          "changed_frames": 56,
+          "scores": {
+            "av1": {
+              "all": {
+                "rgb_psnr": 26.576995765165787,
+                "luma_ssim": 0.815700157158594,
+                "frames": 120
+              },
+              "court": {
+                "rgb_psnr": 27.406107743919172,
+                "luma_ssim": 0.8480119306740451,
+                "frames": 83
+              },
+              "fallback": {
+                "rgb_psnr": 24.71709592093522,
+                "luma_ssim": 0.7432169895428524,
+                "frames": 37
+              }
+            },
+            "exact_base": {
+              "all": {
+                "rgb_psnr": 25.297184348415897,
+                "luma_ssim": 0.7779495205036813,
+                "frames": 120
+              },
+              "court": {
+                "rgb_psnr": 26.150391524071065,
+                "luma_ssim": 0.819715243178835,
+                "frames": 83
+              },
+              "fallback": {
+                "rgb_psnr": 23.383233116540797,
+                "luma_ssim": 0.6842588453134714,
+                "frames": 37
+              }
+            },
+            "ball": {
+              "all": {
+                "rgb_psnr": 25.299690036892358,
+                "luma_ssim": 0.7780088777742009,
+                "frames": 120
+              },
+              "court": {
+                "rgb_psnr": 26.154014206205705,
+                "luma_ssim": 0.8198010609193455,
+                "frames": 83
+              },
+              "fallback": {
+                "rgb_psnr": 23.383233116540797,
+                "luma_ssim": 0.6842588453134714,
+                "frames": 37
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "rally": "v007_p0065",
+      "native_frames": 138,
+      "route_sha256": "73e43e19bef5d5995993cbc0e7e6a986f5cb830cc6393e76493287e66d31b4f0",
+      "metrics": {
+        "20400": {
+          "coded_size": [
+            640,
+            360
+          ],
+          "actual_bytes": {
+            "av1": 13476,
+            "exact_base": 13476,
+            "ball": 13735
+          },
+          "ball_packet_sha256": "8d5e72a10b923e4a3acf1a1fa7db285830748d47317b04e96dd71331c3761d05",
+          "native_av1_sha256": "8f72a330764be54143184ed1c9f6bd753d62271264587070fb5da9c966729d4c",
+          "ball_display_sha256": "7945432a5660e9a4496bce104862913a67a82b4f7703f2ceb2a5bfe342350e1b",
+          "changed_frames": 33,
+          "scores": {
+            "av1": {
+              "all": {
+                "rgb_psnr": 25.329364869481907,
+                "luma_ssim": 0.8726978287377382,
+                "frames": 138
+              },
+              "court": {
+                "rgb_psnr": 25.37551409211977,
+                "luma_ssim": 0.813126450516383,
+                "frames": 37
+              },
+              "fallback": {
+                "rgb_psnr": 25.31245871861457,
+                "luma_ssim": 0.8945210068980367,
+                "frames": 101
+              }
+            },
+            "exact_base": {
+              "all": {
+                "rgb_psnr": 25.329364869481907,
+                "luma_ssim": 0.8726978287377382,
+                "frames": 138
+              },
+              "court": {
+                "rgb_psnr": 25.37551409211977,
+                "luma_ssim": 0.813126450516383,
+                "frames": 37
+              },
+              "fallback": {
+                "rgb_psnr": 25.31245871861457,
+                "luma_ssim": 0.8945210068980367,
+                "frames": 101
+              }
+            },
+            "ball": {
+              "all": {
+                "rgb_psnr": 25.330101830007916,
+                "luma_ssim": 0.872728822616403,
+                "frames": 138
+              },
+              "court": {
+                "rgb_psnr": 25.37826275570325,
+                "luma_ssim": 0.813242049307079,
+                "frames": 37
+              },
+              "fallback": {
+                "rgb_psnr": 25.31245871861457,
+                "luma_ssim": 0.8945210068980367,
+                "frames": 101
+              }
+            }
+          }
+        },
+        "33000": {
+          "coded_size": [
+            640,
+            360
+          ],
+          "actual_bytes": {
+            "av1": 17542,
+            "exact_base": 17542,
+            "ball": 17801
+          },
+          "ball_packet_sha256": "26a26b47e7fe852a1cbc5b98c1ee7b4ae23ceff6d1849804589516cd1a8b1ce8",
+          "native_av1_sha256": "68f0b1b907430d4df1de7f87eb433dccc802fc0b2515a88714e22b4aeaea0b9c",
+          "ball_display_sha256": "46e474c475e0284e12223cf86c316990a8b7dfb2225d99581ad8486995fce5f7",
+          "changed_frames": 33,
+          "scores": {
+            "av1": {
+              "all": {
+                "rgb_psnr": 26.34517997342941,
+                "luma_ssim": 0.8945593856973035,
+                "frames": 138
+              },
+              "court": {
+                "rgb_psnr": 26.832080431911784,
+                "luma_ssim": 0.8521803067374688,
+                "frames": 37
+              },
+              "fallback": {
+                "rgb_psnr": 26.166810498539828,
+                "luma_ssim": 0.9100843948212034,
+                "frames": 101
+              }
+            },
+            "exact_base": {
+              "all": {
+                "rgb_psnr": 26.34517997342941,
+                "luma_ssim": 0.8945593856973035,
+                "frames": 138
+              },
+              "court": {
+                "rgb_psnr": 26.832080431911784,
+                "luma_ssim": 0.8521803067374688,
+                "frames": 37
+              },
+              "fallback": {
+                "rgb_psnr": 26.166810498539828,
+                "luma_ssim": 0.9100843948212034,
+                "frames": 101
+              }
+            },
+            "ball": {
+              "all": {
+                "rgb_psnr": 26.346148632012536,
+                "luma_ssim": 0.8945885203006293,
+                "frames": 138
+              },
+              "court": {
+                "rgb_psnr": 26.835693266627217,
+                "luma_ssim": 0.8522889709336566,
+                "frames": 37
+              },
+              "fallback": {
+                "rgb_psnr": 26.166810498539828,
+                "luma_ssim": 0.9100843948212034,
+                "frames": 101
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "rally": "v007_p0108",
+      "native_frames": 264,
+      "route_sha256": "00068a97da2566ce63091def90e472f00cf4fe41572e467c5d0efa02f96f7d71",
+      "metrics": {
+        "20400": {
+          "coded_size": [
+            640,
+            360
+          ],
+          "actual_bytes": {
+            "av1": 25945,
+            "exact_base": 20601,
+            "ball": 21762
+          },
+          "ball_packet_sha256": "bf41e5f26c8e4166bd74dc1cea79cfd5e438189c417255eafa70d8e9d54a91c7",
+          "native_av1_sha256": "084ed8e3fd663a20fcbfe5db49deafb49c0733fee9674965213d054ac59ace75",
+          "ball_display_sha256": "7066f31d698d99a7d1f4ddd747ad0bd097c5217f546fa92f76bfa003d2dc21bf",
+          "changed_frames": 215,
+          "scores": {
+            "av1": {
+              "all": {
+                "rgb_psnr": 27.510981614053357,
+                "luma_ssim": 0.8574420004957171,
+                "frames": 264
+              },
+              "court": {
+                "rgb_psnr": 27.510981614053357,
+                "luma_ssim": 0.8574420004957171,
+                "frames": 264
+              },
+              "fallback": null
+            },
+            "exact_base": {
+              "all": {
+                "rgb_psnr": 26.160798172654673,
+                "luma_ssim": 0.8239617114667327,
+                "frames": 264
+              },
+              "court": {
+                "rgb_psnr": 26.160798172654673,
+                "luma_ssim": 0.8239617114667327,
+                "frames": 264
+              },
+              "fallback": null
+            },
+            "ball": {
+              "all": {
+                "rgb_psnr": 26.162345733573325,
+                "luma_ssim": 0.8240411768453075,
+                "frames": 264
+              },
+              "court": {
+                "rgb_psnr": 26.162345733573325,
+                "luma_ssim": 0.8240411768453075,
+                "frames": 264
+              },
+              "fallback": null
+            }
+          }
+        },
+        "33000": {
+          "coded_size": [
+            640,
+            360
+          ],
+          "actual_bytes": {
+            "av1": 25945,
+            "exact_base": 25945,
+            "ball": 27106
+          },
+          "ball_packet_sha256": "f9a122356856cbac4ef8c4b6b90fd8d47215a3488b82382905c5fa9fdb8343b6",
+          "native_av1_sha256": "084ed8e3fd663a20fcbfe5db49deafb49c0733fee9674965213d054ac59ace75",
+          "ball_display_sha256": "c19d0a85dbc6d49680c8a44daa2be7a19748bdaaab0a3b6fb0c753448b93cc3f",
+          "changed_frames": 215,
+          "scores": {
+            "av1": {
+              "all": {
+                "rgb_psnr": 27.510981614053357,
+                "luma_ssim": 0.8574420004957171,
+                "frames": 264
+              },
+              "court": {
+                "rgb_psnr": 27.510981614053357,
+                "luma_ssim": 0.8574420004957171,
+                "frames": 264
+              },
+              "fallback": null
+            },
+            "exact_base": {
+              "all": {
+                "rgb_psnr": 27.510981614053357,
+                "luma_ssim": 0.8574420004957171,
+                "frames": 264
+              },
+              "court": {
+                "rgb_psnr": 27.510981614053357,
+                "luma_ssim": 0.8574420004957171,
+                "frames": 264
+              },
+              "fallback": null
+            },
+            "ball": {
+              "all": {
+                "rgb_psnr": 27.513106948666927,
+                "luma_ssim": 0.8575204797813923,
+                "frames": 264
+              },
+              "court": {
+                "rgb_psnr": 27.513106948666927,
+                "luma_ssim": 0.8575204797813923,
+                "frames": 264
+              },
+              "fallback": null
+            }
+          }
+        }
+      }
+    }
+  ],
+  "cpu_seconds": 172.075196
+}
