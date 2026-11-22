@@ -1,0 +1,140 @@
+{
+  "arms": {
+    "20": {
+      "wire_sha256": "26b35756f5b038dbf509115d38eda8606913726109aaba3dcf20b6e79372e6d0",
+      "symbols_sha256": "144c45fee61b78715310f5ede3b1d31178b7ddaba0831ce7499b9127c8c95415",
+      "native_errors": [
+        {
+          "tick": 10,
+          "native_pixel_error": null
+        },
+        {
+          "tick": 30,
+          "native_pixel_error": null
+        },
+        {
+          "tick": 50,
+          "native_pixel_error": 1.118033988749895
+        },
+        {
+          "tick": 70,
+          "native_pixel_error": 0.4852941176470722
+        },
+        {
+          "tick": 90,
+          "native_pixel_error": 5.207647590381428
+        },
+        {
+          "tick": 110,
+          "native_pixel_error": 2.0390330329208854
+        },
+        {
+          "tick": 130,
+          "native_pixel_error": 0.014705882352927802
+        },
+        {
+          "tick": 150,
+          "native_pixel_error": 5.043603129306626
+        },
+        {
+          "tick": 170,
+          "native_pixel_error": 5.374310931931618
+        },
+        {
+          "tick": 190,
+          "native_pixel_error": 1.3239378454765665
+        },
+        {
+          "tick": 210,
+          "native_pixel_error": 2.0091163338409683
+        },
+        {
+          "tick": 230,
+          "native_pixel_error": 3.114905842606556
+        }
+      ],
+      "hits_10px": 10,
+      "hits_5px": 7,
+      "missing_symbols_over_240": 45
+    },
+    "33": {
+      "wire_sha256": "693147d20cfe093f9fe96b3ef76ea97b965ac3539ca9c0788b4fea2d124c0b15",
+      "symbols_sha256": "144c45fee61b78715310f5ede3b1d31178b7ddaba0831ce7499b9127c8c95415",
+      "native_errors": [
+        {
+          "tick": 10,
+          "native_pixel_error": null
+        },
+        {
+          "tick": 30,
+          "native_pixel_error": null
+        },
+        {
+          "tick": 50,
+          "native_pixel_error": 1.118033988749895
+        },
+        {
+          "tick": 70,
+          "native_pixel_error": 0.4852941176470722
+        },
+        {
+          "tick": 90,
+          "native_pixel_error": 5.207647590381428
+        },
+        {
+          "tick": 110,
+          "native_pixel_error": 2.0390330329208854
+        },
+        {
+          "tick": 130,
+          "native_pixel_error": 0.014705882352927802
+        },
+        {
+          "tick": 150,
+          "native_pixel_error": 5.043603129306626
+        },
+        {
+          "tick": 170,
+          "native_pixel_error": 5.374310931931618
+        },
+        {
+          "tick": 190,
+          "native_pixel_error": 1.3239378454765665
+        },
+        {
+          "tick": 210,
+          "native_pixel_error": 2.0091163338409683
+        },
+        {
+          "tick": 230,
+          "native_pixel_error": 3.114905842606556
+        }
+      ],
+      "hits_10px": 10,
+      "hits_5px": 7,
+      "missing_symbols_over_240": 45
+    }
+  },
+  "matched_ordinary": {
+    "bitstream_sha256": "40ac346602fc01a02433a2ff0c90e32a3448fad25c6fbe436d2dd9b606d8c757",
+    "frame_sha256": "bdb4dac5c91c8013ed49cce6e3244fc5b7a93f48446011822133f43247882bd4",
+    "bytes": 12974,
+    "kbps": 21.623333333333335,
+    "judge_input_rgb_sha256": "ac9cd54f1f28e5215ef578f75341950372bb150ead443d20c0740b642ade67fb",
+    "hits_10px": 0,
+    "hits_5px": 0,
+    "record": "../ball-machine-twenty-20261122/result.json#plain240Q63"
+  },
+  "labels_sha256": "9918c87fa6a309052bbac8ef0be21429885e6579fd632754ed9aeb343c912d8a",
+  "native_size": [
+    1920,
+    1080
+  ],
+  "canvas": [
+    960,
+    544
+  ],
+  "visible": 12,
+  "not_visible": 0,
+  "scope": "directly decoded positions on the two combined deliveries; no new detector inference on these displays"
+}

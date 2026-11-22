@@ -1,0 +1,120 @@
+"""Compare canonical paid KPS reconstruction and pack actual target conditioning."""
+
+import hashlib
+import io
+import json
+import tarfile
+import zipfile
+from pathlib import Path
+import numpy as np
+from experiments.tennis import k6b
+from experiments.tennis.k6b_rate_streams import decode_keypoints
+
+root = Path("/home/itec/emanuele/Datasets/pointstream-data")
+conditioning = root / "tennis/cross-shot-reference-20261122/reuse/conditioning.tar"
+transport = root / "jobs/fleet/inbox/20261031T171359Z-aba3845f/full/published.tar"
+out = Path("/local/users/emanuele/pointstream/audits/return-conditioning-20261122")
+out.mkdir(parents=True, exist_ok=False)
+
+
+def sha(x):
+    return hashlib.sha256(x).hexdigest()
+
+
+assert (
+    sha(conditioning.read_bytes())
+    == "98371eee5cee2ff1eaf2baf066bde3cd6a8b8ef4db9a0d0c87bcb05869484ca4"
+)
+
+
+def mem(t, name):
+    return t.extractfile(name).read()
+
+
+with tarfile.open(transport) as t:
+    payload = mem(t, "publish/packets/nadal_kyrgios__002@120/keypoints.kps")
+meta, tracks = decode_keypoints(payload)
+byname = {r["name"]: r for r in tracks}
+units = {}
+with tarfile.open(conditioning) as tar:
+    for name in [
+        "nadal_kyrgios__002_at120__person_000000000000",
+        "nadal_kyrgios__002_at120__person_000000000002",
+    ]:
+        b = mem(tar, "publish/" + name + ".npz")
+        d = np.load(io.BytesIO(b), allow_pickle=False)
+        fields = {k: d[k] for k in ("pose", "box", "t", "run")}
+        tr = byname[name]
+        boxes = []
+        poses = []
+        runs = []
+        cursor = 0
+        for rid, seq in enumerate(k6b.runs(tr["t"].tolist())):
+            kp = list(tr["kp"][cursor : cursor + len(seq)])
+            bxs = k6b.run_boxes(kp)
+            boxes.extend(bxs)
+            poses.extend(k6b.pose_map(k6b.to_crop(k, b)) for k, b in zip(kp, bxs))
+            runs.extend([rid] * len(seq))
+            cursor += len(seq)
+        reconstructed = {
+            "box": np.asarray(boxes, np.float64),
+            "pose": np.stack(poses),
+            "t": tr["t"],
+            "run": np.asarray(runs, np.int64),
+        }
+        comparisons = {k: bool(np.array_equal(fields[k], reconstructed[k])) for k in fields}
+        buf = io.BytesIO()
+        np.savez_compressed(buf, **fields)
+        data = buf.getvalue()
+        units[name] = {
+            "payload": data,
+            "original": fields,
+            "compare": comparisons,
+            "hash": sha(data),
+            "seed": int(hashlib.sha256(name.encode()).hexdigest()[:7], 16) * 1009,
+        }
+manifest = {
+    "version": 1,
+    "window": "nadal_kyrgios/002@120",
+    "fps": [50, 1],
+    "source_sha256": "f0551443eaff4e4b3539f21cd0c6ac66f55601d480ad099a571e8626db735e4a",
+    "common_checkpoint_sha256": "85e3c65c9777b799f9ed0df3a5c8da567fe8a92e4ac83d115719527acb739eb4",
+    "reference_channel": "separately paid PSR1 cache",
+    "units": [
+        {
+            "unit": n,
+            "member": f"{i}.npz",
+            "bytes": len(u["payload"]),
+            "sha256": u["hash"],
+            "seed": u["seed"],
+            "canonical_keypoint_exact": u["compare"],
+        }
+        for i, (n, u) in enumerate(units.items())
+    ],
+}
+p = out / "conditioning.zip"
+with zipfile.ZipFile(p, "x", compression=zipfile.ZIP_STORED) as z:
+    z.writestr("manifest.json", json.dumps(manifest, sort_keys=True, separators=(",", ":")))
+    for i, u in enumerate(units.values()):
+        z.writestr(f"{i}.npz", u["payload"])
+with zipfile.ZipFile(p) as z:
+    m = json.loads(z.read("manifest.json"))
+    assert len(m["units"]) == 2
+    for row, (name, u) in zip(m["units"], units.items()):
+        raw = z.read(row["member"])
+        assert sha(raw) == row["sha256"]
+        a = np.load(io.BytesIO(raw), allow_pickle=False)
+        assert set(a.files) == set(u["original"]) and all(
+            np.array_equal(a[k], v) for k, v in u["original"].items()
+        )
+result = {
+    "passed": True,
+    "packet_bytes": p.stat().st_size,
+    "packet_sha256": sha(p.read_bytes()),
+    "keypoints_bytes": len(payload),
+    "units": manifest["units"],
+    "source_free_roundtrip": True,
+    "mask_state": "not included; generated-player masks remain untested",
+}
+(out / "audit.json").write_text(json.dumps(result, indent=2))
+print(json.dumps(result))

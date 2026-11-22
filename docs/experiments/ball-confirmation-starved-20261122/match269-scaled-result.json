@@ -1,0 +1,584 @@
+{
+  "source": "match269_000",
+  "frames": 64,
+  "fps": 25,
+  "phase": "full",
+  "track": "accepted fitted svt62",
+  "source_archive": "a7e1ca9f15e9cba300e2cbeed976f30499211018b441d11aa5b8c6c2cadb5aab",
+  "manifest_sha256": "df0dabf48b61ed3a096a9a6b4e54d823ca3b279c86d6a09e69ef0cd9bf2ceeb1",
+  "visible_labels": 12,
+  "tile_bytes": 8844,
+  "positions": 61,
+  "self_dists": 0.0,
+  "encoder": {
+    "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+    "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+    "sha256": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+    "version": "SVT-AV1 v4.2.0 (release)"
+  },
+  "decoder": {
+    "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+    "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+    "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+    "version": "1.5.4"
+  },
+  "ffmpeg": {
+    "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+    "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+    "sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+    "version": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers"
+  },
+  "metric": {
+    "metric": "DISTS",
+    "net": "vgg16",
+    "torchmetrics": "1.9.0",
+    "weights": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/torchmetrics/functional/image/dists_models/weights.pt",
+    "weights_sha256": "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218",
+    "backbone": "/local/users/emanuele/pointstream/cache/397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0/vgg16-397923af.pth",
+    "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+    "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)"
+  },
+  "results": [
+    {
+      "mode": "plain",
+      "crf": 48,
+      "bytes": 15008,
+      "kbps": 46.9,
+      "sha256": "c15a5895f1949a4dc17ddc6762dca2e281cad0a1a2d70f1c3a2a98f4968ba212",
+      "decoded_sha256": "01aa3cb8f3f1da538487a34847481705984d26a0f914439a549aac5479632ae3",
+      "crop": [
+        {
+          "tick": 9,
+          "dists": 0.27564775943756104
+        },
+        {
+          "tick": 13,
+          "dists": 0.2879842519760132
+        },
+        {
+          "tick": 18,
+          "dists": 0.2561056613922119
+        },
+        {
+          "tick": 23,
+          "dists": 0.25834590196609497
+        },
+        {
+          "tick": 27,
+          "dists": 0.3792811632156372
+        },
+        {
+          "tick": 32,
+          "dists": 0.25787824392318726
+        },
+        {
+          "tick": 37,
+          "dists": 0.32692593336105347
+        },
+        {
+          "tick": 42,
+          "dists": 0.2504538297653198
+        },
+        {
+          "tick": 46,
+          "dists": 0.3535454273223877
+        },
+        {
+          "tick": 51,
+          "dists": 0.3660779595375061
+        },
+        {
+          "tick": 56,
+          "dists": 0.35062307119369507
+        },
+        {
+          "tick": 60,
+          "dists": 0.37204450368881226
+        }
+      ],
+      "mean_dists": 0.31124280889829,
+      "file": "plain-48.ivf"
+    },
+    {
+      "mode": "roi",
+      "crf": 48,
+      "bytes": 14277,
+      "kbps": 44.615625,
+      "sha256": "24b45d73ea943cd30c238d3b5258ccf577cdc239e56e2d596c5f9686d77fd931",
+      "decoded_sha256": "2fa620b6c737853355f694b149cb5130165c2bfbf59055d88d398d613e799be6",
+      "crop": [
+        {
+          "tick": 9,
+          "dists": 0.2779175043106079
+        },
+        {
+          "tick": 13,
+          "dists": 0.2895677089691162
+        },
+        {
+          "tick": 18,
+          "dists": 0.261177659034729
+        },
+        {
+          "tick": 23,
+          "dists": 0.2414138913154602
+        },
+        {
+          "tick": 27,
+          "dists": 0.38244181871414185
+        },
+        {
+          "tick": 32,
+          "dists": 0.2549029588699341
+        },
+        {
+          "tick": 37,
+          "dists": 0.3276069164276123
+        },
+        {
+          "tick": 42,
+          "dists": 0.2515754699707031
+        },
+        {
+          "tick": 46,
+          "dists": 0.3651031255722046
+        },
+        {
+          "tick": 51,
+          "dists": 0.3735587000846863
+        },
+        {
+          "tick": 56,
+          "dists": 0.3618019223213196
+        },
+        {
+          "tick": 60,
+          "dists": 0.3683704137802124
+        }
+      ],
+      "mean_dists": 0.3129531741142273,
+      "file": "roi-48.ivf"
+    },
+    {
+      "mode": "tracked",
+      "crf": 48,
+      "bytes": 24750,
+      "kbps": 77.34375,
+      "sha256": "fd90b81034ca0a8b9e66cee7105c1eb81b44f8fc5df1b9e4589bbcfe9a112b71",
+      "rendered_sha256": "7f02dfb7db28a991777fd8e571f67b2447f462f26c5542f8722b12b64ce2e8b8",
+      "crop": [
+        {
+          "tick": 9,
+          "dists": 0.2361208200454712
+        },
+        {
+          "tick": 13,
+          "dists": 0.227763831615448
+        },
+        {
+          "tick": 18,
+          "dists": 0.19060838222503662
+        },
+        {
+          "tick": 23,
+          "dists": 0.17549610137939453
+        },
+        {
+          "tick": 27,
+          "dists": 0.2677856683731079
+        },
+        {
+          "tick": 32,
+          "dists": 0.20222830772399902
+        },
+        {
+          "tick": 37,
+          "dists": 0.2541770935058594
+        },
+        {
+          "tick": 42,
+          "dists": 0.1553936004638672
+        },
+        {
+          "tick": 46,
+          "dists": 0.19112181663513184
+        },
+        {
+          "tick": 51,
+          "dists": 0.2188786268234253
+        },
+        {
+          "tick": 56,
+          "dists": 0.2063910961151123
+        },
+        {
+          "tick": 60,
+          "dists": 0.1962796449661255
+        }
+      ],
+      "mean_dists": 0.21018708248933157,
+      "file": "tracked-48.ptp2"
+    },
+    {
+      "mode": "plain",
+      "crf": 60,
+      "bytes": 8847,
+      "kbps": 27.646875,
+      "sha256": "06bcd8057d05bab5529c7526bae39c95109ead208d16441620f3c2c80d26ef80",
+      "decoded_sha256": "1cf3cc5129cb1913545f18e2f04a38d032a1817be8be39cd0d0c7ec540a53cfb",
+      "crop": [
+        {
+          "tick": 9,
+          "dists": 0.2957989573478699
+        },
+        {
+          "tick": 13,
+          "dists": 0.2906975746154785
+        },
+        {
+          "tick": 18,
+          "dists": 0.263763427734375
+        },
+        {
+          "tick": 23,
+          "dists": 0.2511030435562134
+        },
+        {
+          "tick": 27,
+          "dists": 0.41119635105133057
+        },
+        {
+          "tick": 32,
+          "dists": 0.3164348602294922
+        },
+        {
+          "tick": 37,
+          "dists": 0.32833659648895264
+        },
+        {
+          "tick": 42,
+          "dists": 0.3086364269256592
+        },
+        {
+          "tick": 46,
+          "dists": 0.42149847745895386
+        },
+        {
+          "tick": 51,
+          "dists": 0.39131325483322144
+        },
+        {
+          "tick": 56,
+          "dists": 0.36640673875808716
+        },
+        {
+          "tick": 60,
+          "dists": 0.3983784317970276
+        }
+      ],
+      "mean_dists": 0.3369636783997218,
+      "file": "plain-60.ivf"
+    },
+    {
+      "mode": "roi",
+      "crf": 60,
+      "bytes": 8848,
+      "kbps": 27.65,
+      "sha256": "ae11ae4e566d6b9a6bed76fcf464d241a984a1c6b7504a8a7d89573943ad3ce4",
+      "decoded_sha256": "fce2d3d2eaa2d889bdf5a1855a9c92f7417548fd185e24f163dbd7633eb47e8a",
+      "crop": [
+        {
+          "tick": 9,
+          "dists": 0.2889617085456848
+        },
+        {
+          "tick": 13,
+          "dists": 0.2976025342941284
+        },
+        {
+          "tick": 18,
+          "dists": 0.26851803064346313
+        },
+        {
+          "tick": 23,
+          "dists": 0.24438261985778809
+        },
+        {
+          "tick": 27,
+          "dists": 0.41695117950439453
+        },
+        {
+          "tick": 32,
+          "dists": 0.3296090364456177
+        },
+        {
+          "tick": 37,
+          "dists": 0.3248080611228943
+        },
+        {
+          "tick": 42,
+          "dists": 0.3230665922164917
+        },
+        {
+          "tick": 46,
+          "dists": 0.4207233786582947
+        },
+        {
+          "tick": 51,
+          "dists": 0.3888716697692871
+        },
+        {
+          "tick": 56,
+          "dists": 0.3669555187225342
+        },
+        {
+          "tick": 60,
+          "dists": 0.3948190212249756
+        }
+      ],
+      "mean_dists": 0.3387724459171295,
+      "file": "roi-60.ivf"
+    },
+    {
+      "mode": "tracked",
+      "crf": 60,
+      "bytes": 18589,
+      "kbps": 58.090625,
+      "sha256": "0568b520ce53e7e949ef07325050eeea96c827d805acdbc131ed5e6e07d32ecc",
+      "rendered_sha256": "80ef95b49b4f1e80eb725300c64067e23465a7e708000eaced01eb00079f7726",
+      "crop": [
+        {
+          "tick": 9,
+          "dists": 0.24449372291564941
+        },
+        {
+          "tick": 13,
+          "dists": 0.23249149322509766
+        },
+        {
+          "tick": 18,
+          "dists": 0.19457614421844482
+        },
+        {
+          "tick": 23,
+          "dists": 0.16499221324920654
+        },
+        {
+          "tick": 27,
+          "dists": 0.2766903042793274
+        },
+        {
+          "tick": 32,
+          "dists": 0.2614315152168274
+        },
+        {
+          "tick": 37,
+          "dists": 0.2647479772567749
+        },
+        {
+          "tick": 42,
+          "dists": 0.17624646425247192
+        },
+        {
+          "tick": 46,
+          "dists": 0.2388738989830017
+        },
+        {
+          "tick": 51,
+          "dists": 0.24660104513168335
+        },
+        {
+          "tick": 56,
+          "dists": 0.22162741422653198
+        },
+        {
+          "tick": 60,
+          "dists": 0.20207160711288452
+        }
+      ],
+      "mean_dists": 0.22707031667232513,
+      "file": "tracked-60.ptp2"
+    },
+    {
+      "mode": "plain",
+      "crf": 70,
+      "bytes": 3673,
+      "kbps": 11.478125,
+      "sha256": "145a5beb3e38871e213370835ce048e00717691be5bae33c0132d86c719f2dc2",
+      "decoded_sha256": "59f017c08480136b0d13eaf277e0521f314a18b7a6749268bb6679a4a8613fc8",
+      "crop": [
+        {
+          "tick": 9,
+          "dists": 0.3263264298439026
+        },
+        {
+          "tick": 13,
+          "dists": 0.29021692276000977
+        },
+        {
+          "tick": 18,
+          "dists": 0.3448759913444519
+        },
+        {
+          "tick": 23,
+          "dists": 0.34061360359191895
+        },
+        {
+          "tick": 27,
+          "dists": 0.4840134382247925
+        },
+        {
+          "tick": 32,
+          "dists": 0.3611685633659363
+        },
+        {
+          "tick": 37,
+          "dists": 0.34632766246795654
+        },
+        {
+          "tick": 42,
+          "dists": 0.3005346655845642
+        },
+        {
+          "tick": 46,
+          "dists": 0.4004216194152832
+        },
+        {
+          "tick": 51,
+          "dists": 0.3936125636100769
+        },
+        {
+          "tick": 56,
+          "dists": 0.3965100049972534
+        },
+        {
+          "tick": 60,
+          "dists": 0.37853461503982544
+        }
+      ],
+      "mean_dists": 0.3635963400204976,
+      "file": "plain-70.ivf"
+    },
+    {
+      "mode": "roi",
+      "crf": 70,
+      "bytes": 4165,
+      "kbps": 13.015625,
+      "sha256": "184a46c795e1110ace8bdc4553427920844155c3020554f067d962478b5d65fa",
+      "decoded_sha256": "df15a86ab136bb88f6c7b06f439175201d5af0567299df2ec5345ccb61010f31",
+      "crop": [
+        {
+          "tick": 9,
+          "dists": 0.32231807708740234
+        },
+        {
+          "tick": 13,
+          "dists": 0.3050978183746338
+        },
+        {
+          "tick": 18,
+          "dists": 0.3680247664451599
+        },
+        {
+          "tick": 23,
+          "dists": 0.3605206608772278
+        },
+        {
+          "tick": 27,
+          "dists": 0.4930880069732666
+        },
+        {
+          "tick": 32,
+          "dists": 0.4032275080680847
+        },
+        {
+          "tick": 37,
+          "dists": 0.3585086464881897
+        },
+        {
+          "tick": 42,
+          "dists": 0.3238191604614258
+        },
+        {
+          "tick": 46,
+          "dists": 0.39918053150177
+        },
+        {
+          "tick": 51,
+          "dists": 0.3985385298728943
+        },
+        {
+          "tick": 56,
+          "dists": 0.39877110719680786
+        },
+        {
+          "tick": 60,
+          "dists": 0.39324575662612915
+        }
+      ],
+      "mean_dists": 0.37702838083108264,
+      "file": "roi-70.ivf"
+    },
+    {
+      "mode": "tracked",
+      "crf": 70,
+      "bytes": 13415,
+      "kbps": 41.921875,
+      "sha256": "e3c91c03e162ae303e1fa78735b4e13aebca353ec213eba497b1d61e3bb7aaec",
+      "rendered_sha256": "1f5c2aa9aafcc4ee295bb76a622ea7528ed863df4652dcd9f93a2dde6596edf9",
+      "crop": [
+        {
+          "tick": 9,
+          "dists": 0.2750602960586548
+        },
+        {
+          "tick": 13,
+          "dists": 0.24495357275009155
+        },
+        {
+          "tick": 18,
+          "dists": 0.21259009838104248
+        },
+        {
+          "tick": 23,
+          "dists": 0.24127066135406494
+        },
+        {
+          "tick": 27,
+          "dists": 0.3263993263244629
+        },
+        {
+          "tick": 32,
+          "dists": 0.2629556655883789
+        },
+        {
+          "tick": 37,
+          "dists": 0.28441083431243896
+        },
+        {
+          "tick": 42,
+          "dists": 0.17655646800994873
+        },
+        {
+          "tick": 46,
+          "dists": 0.22578644752502441
+        },
+        {
+          "tick": 51,
+          "dists": 0.23794490098953247
+        },
+        {
+          "tick": 56,
+          "dists": 0.2153468132019043
+        },
+        {
+          "tick": 60,
+          "dists": 0.20554429292678833
+        }
+      ],
+      "mean_dists": 0.2424016147851944,
+      "file": "tracked-70.ptp2"
+    }
+  ],
+  "wall_seconds": 36.58162341100979
+}

@@ -1,0 +1,35 @@
+{
+  "acceptance_rule": "almost acceptable fails; barely acceptable passes",
+  "mappings": {
+    "nadal_kyrgios__000_at120__person_000000000000": {
+      "A": "q65",
+      "B": "q78",
+      "C": "lossless"
+    },
+    "nadal_kyrgios__000_at120__person_000000000001": {
+      "A": "q78",
+      "B": "lossless",
+      "C": "q65"
+    }
+  },
+  "ratings": {
+    "player_1": {
+      "accept": {
+        "A": false,
+        "B": false,
+        "C": true
+      },
+      "verbatim": "C better, A/B almost acceptable"
+    },
+    "player_2": {
+      "accept": {
+        "A": true,
+        "B": true,
+        "C": true
+      },
+      "verbatim": "B slightly better, all acceptable"
+    }
+  },
+  "reveal_sha256": "800236763c830099f6d22ec63173321e3e3ab0b1944797730bbce748fee61809",
+  "review": "single author; 24-frame development clip"
+}

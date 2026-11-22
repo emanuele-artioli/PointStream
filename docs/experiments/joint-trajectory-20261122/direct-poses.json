@@ -1,0 +1,87 @@
+{
+  "streams": {
+    "20": {
+      "wire_sha256": "26b35756f5b038dbf509115d38eda8606913726109aaba3dcf20b6e79372e6d0",
+      "pose_section_sha256": "510950f12a26b6bc3f562f666f1e13d08bd040e9c423d5ae756a8da8e56e2ad8",
+      "pose_bytes": 1623,
+      "running_kbps": 21.545,
+      "cold_kbps": 428.77666666666664,
+      "units": {
+        "nadal_kyrgios__000_at120__person_000000000001": {
+          "coordinates_and_visibility_sha256": "da0064679daceb41d111bc8ae5d391be91b9772d56413b1a83cb6ac8f91a422e",
+          "visible_joint_ticks": 4065,
+          "renderer_pose_sha256": "eac33992553faf2701f269125d34ecabdde2e50084bb5080aa1bef536586018a"
+        },
+        "nadal_kyrgios__000_at120__person_000000000000": {
+          "coordinates_and_visibility_sha256": "2b0dae55083f6bf28b8e73dd53fcf4d2d2b3b458ffb55ea9cbee6c6cfd7c9d61",
+          "visible_joint_ticks": 3301,
+          "renderer_pose_sha256": "e84f7d120af5c056761635e8f50215afcd0b8a2ab2fe658b83b015da2f4ae0da"
+        }
+      },
+      "parse_ns": [
+        38024750,
+        38102291,
+        38054958,
+        38211667,
+        37961125,
+        37826917,
+        37848833,
+        37902791,
+        37670583,
+        37826375,
+        37873459
+      ],
+      "median_ns": 37902791
+    },
+    "33": {
+      "wire_sha256": "693147d20cfe093f9fe96b3ef76ea97b965ac3539ca9c0788b4fea2d124c0b15",
+      "pose_section_sha256": "510950f12a26b6bc3f562f666f1e13d08bd040e9c423d5ae756a8da8e56e2ad8",
+      "pose_bytes": 1623,
+      "running_kbps": 32.515,
+      "cold_kbps": 439.74666666666667,
+      "units": {
+        "nadal_kyrgios__000_at120__person_000000000001": {
+          "coordinates_and_visibility_sha256": "da0064679daceb41d111bc8ae5d391be91b9772d56413b1a83cb6ac8f91a422e",
+          "visible_joint_ticks": 4065,
+          "renderer_pose_sha256": "eac33992553faf2701f269125d34ecabdde2e50084bb5080aa1bef536586018a"
+        },
+        "nadal_kyrgios__000_at120__person_000000000000": {
+          "coordinates_and_visibility_sha256": "2b0dae55083f6bf28b8e73dd53fcf4d2d2b3b458ffb55ea9cbee6c6cfd7c9d61",
+          "visible_joint_ticks": 3301,
+          "renderer_pose_sha256": "e84f7d120af5c056761635e8f50215afcd0b8a2ab2fe658b83b015da2f4ae0da"
+        }
+      },
+      "parse_ns": [
+        38008667,
+        37952584,
+        37945167,
+        37825000,
+        37952458,
+        37790459,
+        37990375,
+        37804667,
+        37868208,
+        37679417,
+        37692375
+      ],
+      "median_ns": 37868208
+    }
+  },
+  "image_size": [
+    1920,
+    1080
+  ],
+  "shape_per_person": [
+    240,
+    17,
+    3
+  ],
+  "ticks": 240,
+  "model_inference": false,
+  "full_raster_hashes_verified": true,
+  "python": "3.12.7",
+  "cpu": "arm",
+  "opencv": "4.10.0",
+  "numpy": "1.26.4",
+  "script_sha256": "d1ff9de655d782b27e44aa6cd0e5bba4cd1c5760c951d34d77070a062254a07d"
+}

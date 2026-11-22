@@ -1,0 +1,372 @@
+{
+  "source_review_sha256": "fb41c943575b35e6ecec36916b8cfab41b8023744614a98681b7cce884681eee",
+  "q36_review12_sha256": "8f0b8062f206ed6cf5fa477575e3c1d8cd94e635abff2c99c3b9b6fe12739b0d",
+  "q24_yuv_sha256": "bac9b77792126c748a7640eee2ce80649f54c2509d5973623d06e1ed35b931bb",
+  "ticks": [
+    10,
+    30,
+    50,
+    70,
+    90,
+    110,
+    130,
+    150,
+    170,
+    190,
+    210,
+    230
+  ],
+  "rows": [
+    {
+      "tick": 10,
+      "person": "archived-track-0",
+      "arm": "q24",
+      "dists": 0.3371722102165222,
+      "mask_pixels": 8480
+    },
+    {
+      "tick": 10,
+      "person": "archived-track-0",
+      "arm": "q36",
+      "dists": 0.29474127292633057,
+      "mask_pixels": 8480
+    },
+    {
+      "tick": 10,
+      "person": "archived-track-1",
+      "arm": "q24",
+      "dists": 0.30455201864242554,
+      "mask_pixels": 2788
+    },
+    {
+      "tick": 10,
+      "person": "archived-track-1",
+      "arm": "q36",
+      "dists": 0.2683566212654114,
+      "mask_pixels": 2788
+    },
+    {
+      "tick": 30,
+      "person": "archived-track-0",
+      "arm": "q24",
+      "dists": 0.3117980360984802,
+      "mask_pixels": 7548
+    },
+    {
+      "tick": 30,
+      "person": "archived-track-0",
+      "arm": "q36",
+      "dists": 0.28871655464172363,
+      "mask_pixels": 7548
+    },
+    {
+      "tick": 30,
+      "person": "archived-track-1",
+      "arm": "q24",
+      "dists": 0.38223326206207275,
+      "mask_pixels": 3300
+    },
+    {
+      "tick": 30,
+      "person": "archived-track-1",
+      "arm": "q36",
+      "dists": 0.31897056102752686,
+      "mask_pixels": 3300
+    },
+    {
+      "tick": 50,
+      "person": "archived-track-0",
+      "arm": "q24",
+      "dists": 0.3343520760536194,
+      "mask_pixels": 7300
+    },
+    {
+      "tick": 50,
+      "person": "archived-track-0",
+      "arm": "q36",
+      "dists": 0.2900022864341736,
+      "mask_pixels": 7300
+    },
+    {
+      "tick": 50,
+      "person": "archived-track-1",
+      "arm": "q24",
+      "dists": 0.3575476408004761,
+      "mask_pixels": 3252
+    },
+    {
+      "tick": 50,
+      "person": "archived-track-1",
+      "arm": "q36",
+      "dists": 0.3097051978111267,
+      "mask_pixels": 3252
+    },
+    {
+      "tick": 70,
+      "person": "archived-track-0",
+      "arm": "q24",
+      "dists": 0.336483895778656,
+      "mask_pixels": 9956
+    },
+    {
+      "tick": 70,
+      "person": "archived-track-0",
+      "arm": "q36",
+      "dists": 0.27901506423950195,
+      "mask_pixels": 9956
+    },
+    {
+      "tick": 70,
+      "person": "archived-track-1",
+      "arm": "q24",
+      "dists": 0.37110579013824463,
+      "mask_pixels": 3084
+    },
+    {
+      "tick": 70,
+      "person": "archived-track-1",
+      "arm": "q36",
+      "dists": 0.32025259733200073,
+      "mask_pixels": 3084
+    },
+    {
+      "tick": 90,
+      "person": "archived-track-0",
+      "arm": "q24",
+      "dists": 0.2936932444572449,
+      "mask_pixels": 9228
+    },
+    {
+      "tick": 90,
+      "person": "archived-track-0",
+      "arm": "q36",
+      "dists": 0.25069350004196167,
+      "mask_pixels": 9228
+    },
+    {
+      "tick": 90,
+      "person": "archived-track-1",
+      "arm": "q24",
+      "dists": 0.34326040744781494,
+      "mask_pixels": 3120
+    },
+    {
+      "tick": 90,
+      "person": "archived-track-1",
+      "arm": "q36",
+      "dists": 0.29631614685058594,
+      "mask_pixels": 3120
+    },
+    {
+      "tick": 110,
+      "person": "archived-track-0",
+      "arm": "q24",
+      "dists": 0.32731932401657104,
+      "mask_pixels": 9540
+    },
+    {
+      "tick": 110,
+      "person": "archived-track-0",
+      "arm": "q36",
+      "dists": 0.24330145120620728,
+      "mask_pixels": 9540
+    },
+    {
+      "tick": 110,
+      "person": "archived-track-1",
+      "arm": "q24",
+      "dists": 0.3667325973510742,
+      "mask_pixels": 3512
+    },
+    {
+      "tick": 110,
+      "person": "archived-track-1",
+      "arm": "q36",
+      "dists": 0.3039346933364868,
+      "mask_pixels": 3512
+    },
+    {
+      "tick": 130,
+      "person": "archived-track-0",
+      "arm": "q24",
+      "dists": 0.3253546357154846,
+      "mask_pixels": 10400
+    },
+    {
+      "tick": 130,
+      "person": "archived-track-0",
+      "arm": "q36",
+      "dists": 0.27113980054855347,
+      "mask_pixels": 10400
+    },
+    {
+      "tick": 130,
+      "person": "archived-track-1",
+      "arm": "q24",
+      "dists": 0.3584712743759155,
+      "mask_pixels": 3212
+    },
+    {
+      "tick": 130,
+      "person": "archived-track-1",
+      "arm": "q36",
+      "dists": 0.31537216901779175,
+      "mask_pixels": 3212
+    },
+    {
+      "tick": 150,
+      "person": "archived-track-0",
+      "arm": "q24",
+      "dists": 0.34537774324417114,
+      "mask_pixels": 8040
+    },
+    {
+      "tick": 150,
+      "person": "archived-track-0",
+      "arm": "q36",
+      "dists": 0.2745020389556885,
+      "mask_pixels": 8040
+    },
+    {
+      "tick": 150,
+      "person": "archived-track-1",
+      "arm": "q24",
+      "dists": 0.381614089012146,
+      "mask_pixels": 3352
+    },
+    {
+      "tick": 150,
+      "person": "archived-track-1",
+      "arm": "q36",
+      "dists": 0.33320921659469604,
+      "mask_pixels": 3352
+    },
+    {
+      "tick": 170,
+      "person": "archived-track-0",
+      "arm": "q24",
+      "dists": 0.3118661642074585,
+      "mask_pixels": 8868
+    },
+    {
+      "tick": 170,
+      "person": "archived-track-0",
+      "arm": "q36",
+      "dists": 0.2502504587173462,
+      "mask_pixels": 8868
+    },
+    {
+      "tick": 170,
+      "person": "archived-track-1",
+      "arm": "q24",
+      "dists": 0.43162739276885986,
+      "mask_pixels": 3136
+    },
+    {
+      "tick": 170,
+      "person": "archived-track-1",
+      "arm": "q36",
+      "dists": 0.32517367601394653,
+      "mask_pixels": 3136
+    },
+    {
+      "tick": 190,
+      "person": "archived-track-0",
+      "arm": "q24",
+      "dists": 0.29664838314056396,
+      "mask_pixels": 9872
+    },
+    {
+      "tick": 190,
+      "person": "archived-track-0",
+      "arm": "q36",
+      "dists": 0.24072027206420898,
+      "mask_pixels": 9872
+    },
+    {
+      "tick": 190,
+      "person": "archived-track-1",
+      "arm": "q24",
+      "dists": 0.43082863092422485,
+      "mask_pixels": 4200
+    },
+    {
+      "tick": 190,
+      "person": "archived-track-1",
+      "arm": "q36",
+      "dists": 0.3490149974822998,
+      "mask_pixels": 4200
+    },
+    {
+      "tick": 210,
+      "person": "archived-track-0",
+      "arm": "q24",
+      "dists": 0.32399439811706543,
+      "mask_pixels": 9148
+    },
+    {
+      "tick": 210,
+      "person": "archived-track-0",
+      "arm": "q36",
+      "dists": 0.2573266625404358,
+      "mask_pixels": 9148
+    },
+    {
+      "tick": 210,
+      "person": "archived-track-1",
+      "arm": "q24",
+      "dists": 0.39801108837127686,
+      "mask_pixels": 4112
+    },
+    {
+      "tick": 210,
+      "person": "archived-track-1",
+      "arm": "q36",
+      "dists": 0.2808772325515747,
+      "mask_pixels": 4112
+    },
+    {
+      "tick": 230,
+      "person": "archived-track-0",
+      "arm": "q24",
+      "dists": 0.37032169103622437,
+      "mask_pixels": 9968
+    },
+    {
+      "tick": 230,
+      "person": "archived-track-0",
+      "arm": "q36",
+      "dists": 0.30607640743255615,
+      "mask_pixels": 9968
+    },
+    {
+      "tick": 230,
+      "person": "archived-track-1",
+      "arm": "q24",
+      "dists": 0.4028714895248413,
+      "mask_pixels": 3600
+    },
+    {
+      "tick": 230,
+      "person": "archived-track-1",
+      "arm": "q36",
+      "dists": 0.3546079397201538,
+      "mask_pixels": 3600
+    }
+  ],
+  "mean_dists": {
+    "q24": 0.3518015618125598,
+    "q36": 0.29259486744801205
+  },
+  "q24_control_max_abs_error": 0.0,
+  "full_frame_rgb_psnr": {
+    "q24": 29.897718313118453,
+    "q36": 30.63402779074933
+  },
+  "rates_kbps": {
+    "q24": 20.411666666666665,
+    "q36": 39.770833333333336
+  },
+  "scope": "12 source ticks, two source-model proposal masks per tick; 32-source-pixel crop padding; no human body labels",
+  "cpu_seconds": 28.126255
+}

@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.joint_ball_machine"
+  ],
+  "arguments": [
+    "--packets",
+    "{staged:packets}",
+    "--wire",
+    "{staged:wire}",
+    "--neural",
+    "{staged:neural}",
+    "--wasb-code",
+    "{staged:wasb_code}",
+    "--wasb-weights",
+    "{staged:wasb_weights}",
+    "--frames",
+    "{frames}"
+  ],
+  "staged_inputs": [
+    {
+      "name": "packets",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/joint-machine-native-20261122/inputs-77327c52.tar",
+      "sha256": "77327c52ec67596b3e84db5a1f99a5642dbd793fb1185ec20912ed80c4f9a159",
+      "extract": false
+    },
+    {
+      "name": "wire",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/joint-machine-native-20261122/joint-26b35756.psw",
+      "sha256": "26b35756f5b038dbf509115d38eda8606913726109aaba3dcf20b6e79372e6d0",
+      "extract": false
+    },
+    {
+      "name": "neural",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T031034Z-91671786/smoke/published.tar",
+      "sha256": "cefc3d1d6addcf6c1274c75264b8edb9e32667b60758a347b4e3d3ac119f22ad",
+      "extract": false
+    },
+    {
+      "name": "wasb_code",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/WASB-SBDT-923462c.tar",
+      "sha256": "657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55",
+      "extract": true
+    },
+    {
+      "name": "wasb_weights",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/wasb-tennis-weights.tar",
+      "sha256": "4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6",
+      "extract": true
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/joint-machine-native-20261122/inputs-77327c52.tar",
+      "sha256": "77327c52ec67596b3e84db5a1f99a5642dbd793fb1185ec20912ed80c4f9a159"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/joint-machine-native-20261122/joint-26b35756.psw",
+      "sha256": "26b35756f5b038dbf509115d38eda8606913726109aaba3dcf20b6e79372e6d0"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T031034Z-91671786/smoke/published.tar",
+      "sha256": "cefc3d1d6addcf6c1274c75264b8edb9e32667b60758a347b4e3d3ac119f22ad"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/WASB-SBDT-923462c.tar",
+      "sha256": "657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/wasb-tennis-weights.tar",
+      "sha256": "4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "required_commands": [],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.joint_ball_machine",
+    "--validate"
+  ],
+  "deadline": "2026-11-22T07:15:00Z",
+  "verify_staged_inputs": true,
+  "stall_seconds": 600,
+  "hosts": [
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [
+    "RTX 6000 Ada"
+  ],
+  "gpu_memory_mib": 8000,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "local_storage_gib": 30,
+  "contention": {
+    "policy": "continue",
+    "resume_attempts": 0,
+    "basis": "Accuracy is the endpoint; the cost smoke and hard time limit apply even if load changes."
+  },
+  "smoke": {
+    "seconds": 165,
+    "representative_basis": "24 native frames of ordinary AV1, the verified joint display and authentic DCVC-UF, plus true coordinate readout. Verified RGB, receiver packets, CUDA judge, fixed labels and 1.5x forecast."
+  },
+  "full": {
+    "seconds": 570
+  },
+  "validator_seconds": 60,
+  "budget_seconds": 900,
+  "scale": {
+    "frames": {
+      "smoke": 24,
+      "full": 240
+    }
+  },
+  "gpu_sharing": {
+    "mode": "shared",
+    "margin_mib": 8192,
+    "basis": "Fixed accuracy only; working detector fits the 8000 MiB enforced allocator cap. All production stage and time forecasts remain bounded."
+  }
+}

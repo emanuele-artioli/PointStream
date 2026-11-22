@@ -1,0 +1,213 @@
+{
+  "reconstruction_sha256": "4d503313894037398c543a8f80b1deb8c12d00d52103bf599fabc4c6e2edace6",
+  "source_review_sha256": "fb41c943575b35e6ecec36916b8cfab41b8023744614a98681b7cce884681eee",
+  "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+  "forecast_cpu_seconds": 54.20779,
+  "cpu_seconds": 14.384661,
+  "rows": [
+    {
+      "tick": 10,
+      "arm": "joint-39",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 8480,
+          "dists": 0.2998202443122864
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 2788,
+          "dists": 0.2338443398475647
+        }
+      ],
+      "rgb_sse": 1564650807
+    },
+    {
+      "tick": 30,
+      "arm": "joint-39",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 7548,
+          "dists": 0.3037731647491455
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3300,
+          "dists": 0.30808836221694946
+        }
+      ],
+      "rgb_sse": 1533329060
+    },
+    {
+      "tick": 50,
+      "arm": "joint-39",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 7300,
+          "dists": 0.3398263454437256
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3252,
+          "dists": 0.2716870903968811
+        }
+      ],
+      "rgb_sse": 1523923028
+    },
+    {
+      "tick": 70,
+      "arm": "joint-39",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9956,
+          "dists": 0.2990296483039856
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3084,
+          "dists": 0.2684452533721924
+        }
+      ],
+      "rgb_sse": 1577630421
+    },
+    {
+      "tick": 90,
+      "arm": "joint-39",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9228,
+          "dists": 0.30210554599761963
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3120,
+          "dists": 0.30300039052963257
+        }
+      ],
+      "rgb_sse": 1568101045
+    },
+    {
+      "tick": 110,
+      "arm": "joint-39",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9540,
+          "dists": 0.2739669680595398
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3512,
+          "dists": 0.30947673320770264
+        }
+      ],
+      "rgb_sse": 1575910353
+    },
+    {
+      "tick": 130,
+      "arm": "joint-39",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 10400,
+          "dists": 0.29513412714004517
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3212,
+          "dists": 0.29545068740844727
+        }
+      ],
+      "rgb_sse": 1617144858
+    },
+    {
+      "tick": 150,
+      "arm": "joint-39",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 8040,
+          "dists": 0.29504966735839844
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3352,
+          "dists": 0.284917950630188
+        }
+      ],
+      "rgb_sse": 1605130039
+    },
+    {
+      "tick": 170,
+      "arm": "joint-39",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 8868,
+          "dists": 0.29328036308288574
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3136,
+          "dists": 0.31612998247146606
+        }
+      ],
+      "rgb_sse": 1586360941
+    },
+    {
+      "tick": 190,
+      "arm": "joint-39",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9872,
+          "dists": 0.3027808666229248
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 4200,
+          "dists": 0.35428595542907715
+        }
+      ],
+      "rgb_sse": 1609589953
+    },
+    {
+      "tick": 210,
+      "arm": "joint-39",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9148,
+          "dists": 0.35278111696243286
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 4112,
+          "dists": 0.29986506700515747
+        }
+      ],
+      "rgb_sse": 1592450322
+    },
+    {
+      "tick": 230,
+      "arm": "joint-39",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9968,
+          "dists": 0.3241557478904724
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3600,
+          "dists": 0.3426171541213989
+        }
+      ],
+      "rgb_sse": 1589305145
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "sources": {
+    "w7-tier1-billing-corrected.json": "62376a4f3dcbe406d2065e54c12ebcbc0d2579aeb97c243cbf843bdf15a66e1f",
+    "w7-tier2-billing-corrected.json": "a60ea553077203bd3bbf894843bbe826d613c7c1effdab371ddad0b7b539d979"
+  },
+  "scope": "Fixed historical bank and match-adaptation cost; active seconds at the archived running rate. Each comparator is the highest tested DCVC rate on the same window.",
+  "rows": [
+    {
+      "window": "al028",
+      "running_kbps": 16.548333333333336,
+      "fixed_model_and_image_bytes": 2422350,
+      "highest_scored_neural_kbps": 28.82916666666667,
+      "seconds_to_fit_that_rate": 1577.9710931668587,
+      "dists_advantage_over_best_scored_neural": 0.02913507670164109
+    },
+    {
+      "window": "al034",
+      "running_kbps": 15.907499999999999,
+      "fixed_model_and_image_bytes": 2472726,
+      "highest_scored_neural_kbps": 19.36916666666667,
+      "seconds_to_fit_that_rate": 5714.532883967256,
+      "dists_advantage_over_best_scored_neural": 0.08102150782942774
+    },
+    {
+      "window": "al043",
+      "running_kbps": 16.186666666666667,
+      "fixed_model_and_image_bytes": 2404236,
+      "highest_scored_neural_kbps": 20.02583333333333,
+      "seconds_to_fit_that_rate": 5009.912220533974,
+      "dists_advantage_over_best_scored_neural": 0.06803737878799437
+    },
+    {
+      "window": "med024",
+      "running_kbps": 38.94166666666667,
+      "fixed_model_and_image_bytes": 2631170,
+      "highest_scored_neural_kbps": 45.91833333333334,
+      "seconds_to_fit_that_rate": 3017.108456760631,
+      "dists_advantage_over_best_scored_neural": 0.060215590894222265
+    },
+    {
+      "window": "med019",
+      "running_kbps": 39.05333333333333,
+      "fixed_model_and_image_bytes": 2665994,
+      "highest_scored_neural_kbps": 48.99333333333333,
+      "seconds_to_fit_that_rate": 2145.6692152917494,
+      "dists_advantage_over_best_scored_neural": 0.04519715234637256
+    },
+    {
+      "window": "nad000",
+      "running_kbps": 40.52166666666667,
+      "fixed_model_and_image_bytes": 3686842,
+      "highest_scored_neural_kbps": 49.778333333333336,
+      "seconds_to_fit_that_rate": 3186.3236586244147,
+      "dists_advantage_over_best_scored_neural": 0.05302607193589212
+    },
+    {
+      "window": "nad001",
+      "running_kbps": 41.165000000000006,
+      "fixed_model_and_image_bytes": 3062986,
+      "highest_scored_neural_kbps": 56.74166666666667,
+      "seconds_to_fit_that_rate": 1573.1150010699769,
+      "dists_advantage_over_best_scored_neural": 0.057524048537015926
+    },
+    {
+      "window": "nad002",
+      "running_kbps": 47.43,
+      "fixed_model_and_image_bytes": 3405118,
+      "highest_scored_neural_kbps": 52.39333333333334,
+      "seconds_to_fit_that_rate": 5488.437340496972,
+      "dists_advantage_over_best_scored_neural": 0.05801181495189667
+    }
+  ]
+}

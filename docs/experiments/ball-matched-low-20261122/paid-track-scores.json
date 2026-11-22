@@ -1,0 +1,29 @@
+{
+  "scope": "positions decoded directly from the already-paid fitted-streak payload",
+  "historical_archive_sha256": "e3ae88ccbab68a19aa0a34a9ad12328352d00a69ae44901edfd7cbe01220aa12",
+  "label_csv_sha256": "e50089b4659ad8c84d84f1794347ad08445b8552784d607cb1af3b68ad9cdfba",
+  "arms": {
+    "fixed": {
+      "visible": 261,
+      "absent": 30,
+      "uncertain": 1,
+      "visible_hit10": 239,
+      "visible_hit5": 205,
+      "absent_false": 2,
+      "positions_present": 249,
+      "packet_bytes": 77081,
+      "packet_sha256": "6ee2108f9c2f486bac8f86ae83a7f9120a4cffd4473d5c3ce24383eb32ea39ec"
+    },
+    "refitted": {
+      "visible": 261,
+      "absent": 30,
+      "uncertain": 1,
+      "visible_hit10": 240,
+      "visible_hit5": 205,
+      "absent_false": 2,
+      "positions_present": 249,
+      "packet_bytes": 77093,
+      "packet_sha256": "0aa98172f7154d45221fa8b056859808001976d018428cfd07095f3694780c38"
+    }
+  }
+}

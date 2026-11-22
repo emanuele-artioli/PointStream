@@ -1,0 +1,137 @@
+{
+  "target": 65,
+  "geometry": [
+    480,
+    272
+  ],
+  "source_sha256": "676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66",
+  "raw_source_sha256": "0c85ace57542cf4b5aa42463880840ee4d55ff5614a0861fc1f5a19f3eea1178",
+  "stream_sha256": "c6e38574b3ca4947a122ff7bf2846ffa9793a543fb794e33224083d59ba3ea4e",
+  "decoded_sha256": "26f58f1f17f012dc8e5f4b0503178caece0c8c991ab6c971cec341f39f04d75d",
+  "frame_hashes": {
+    "0": "bb02bcc164b6b93d879aec1c3e944420e9385d42e98a0f3e356ae8594d39a7a7",
+    "119": "5a8773120a0d76189f930d846abc3bea6f94d7e9f76ea2186c13006a2258edb0",
+    "239": "21fe364ec924d764c1d19e992e299643fba0f7c16f8b09f75bcb7869294b8dc4",
+    "11065": "af2eb947eebc3fd724a6f32fd0411884ec1bdfbea0fbdec747396b50fd2600c4",
+    "11304": "1458e202b0f811f776f788f1ec4a9eb93255a7cb644ea37b3a2993cd3ba0dc36"
+  },
+  "metrics": {
+    "full": {
+      "frames": 11305,
+      "bytes": 1876253,
+      "kbps": 66.386660769571,
+      "luma_psnr": 31.205833668208307,
+      "sse": 72707247232
+    },
+    "initial": {
+      "frames": 240,
+      "bytes": 42453,
+      "kbps": 70.75500000000001,
+      "luma_psnr": 37.35676387471465,
+      "sse": 374477179
+    },
+    "interlude": {
+      "frames": 10825,
+      "bytes": 1796484,
+      "kbps": 66.3827806004619,
+      "luma_psnr": 31.12272253224917,
+      "sse": 70965318142
+    },
+    "return": {
+      "frames": 240,
+      "bytes": 37316,
+      "kbps": 62.19333333333334,
+      "luma_psnr": 31.731896814917405,
+      "sse": 1367451911
+    }
+  },
+  "tools": {
+    "SvtAv1EncApp": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "sha256": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+      "version": "SVT-AV1 v4.2.0 (release)"
+    },
+    "dav1d": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+      "version": "1.5.4"
+    },
+    "ffmpeg": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+      "version": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers"
+    }
+  },
+  "commands": [
+    [
+      "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "-v",
+      "error",
+      "-nostdin",
+      "-ss",
+      "1532.540000",
+      "-i",
+      "/local/users/emanuele/pointstream/cache/676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66/nadal-kyrgios-broadcast.mp4",
+      "-frames:v",
+      "11305",
+      "-vf",
+      "scale=480:272:flags=area:out_range=tv,format=yuv420p",
+      "-filter_threads",
+      "1",
+      "-fps_mode",
+      "passthrough",
+      "-threads",
+      "1",
+      "-f",
+      "rawvideo",
+      "/local/users/emanuele/pointstream/scratch/20261121T231049Z-333e7cc4-full/truth.yuv"
+    ],
+    [
+      "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "-i",
+      "/local/users/emanuele/pointstream/scratch/20261121T231049Z-333e7cc4-full/truth.yuv",
+      "-b",
+      "/local/users/emanuele/pointstream/scratch/20261121T231049Z-333e7cc4-full/publish/anchor.ivf",
+      "-w",
+      "480",
+      "-h",
+      "272",
+      "--input-depth",
+      "8",
+      "--fps-num",
+      "50",
+      "--fps-denom",
+      "1",
+      "-n",
+      "11305",
+      "--color-range",
+      "0",
+      "--rc",
+      "1",
+      "--tbr",
+      "60",
+      "--preset",
+      "4",
+      "--keyint",
+      "250",
+      "--lp",
+      "6",
+      "--progress",
+      "0"
+    ],
+    [
+      "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "-i",
+      "/local/users/emanuele/pointstream/scratch/20261121T231049Z-333e7cc4-full/publish/anchor.ivf",
+      "-o",
+      "/local/users/emanuele/pointstream/scratch/20261121T231049Z-333e7cc4-full/received.yuv",
+      "--threads",
+      "1",
+      "--quiet"
+    ]
+  ],
+  "seconds": 529.686027350006
+}

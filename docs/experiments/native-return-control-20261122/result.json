@@ -1,0 +1,244 @@
+{
+  "rows": [
+    {
+      "q": 45,
+      "extra_golden": false,
+      "bytes": 71471,
+      "return_bytes": 19603,
+      "total_kbps": 116.6873469387755,
+      "first_return_bytes": 2100,
+      "whole_y_psnr": 31.42498374822675,
+      "return_y_psnr": 30.76162836639613,
+      "prefix_sha256": "67a30b6b2211c58029f003c4a5388ffb2b959391463bb6375ef097e967295586",
+      "ivf_sha256": "41db5b65ac6e740598cbb1a5169b422e12070240d829f85862cc481cd9fe0cee",
+      "decode_sha256": "554a7ca9e1d3d974ac62c4e385cdffd07651837607b5c6331c4aa2c8aaf47acc"
+    },
+    {
+      "q": 45,
+      "extra_golden": true,
+      "bytes": 69889,
+      "return_bytes": 18021,
+      "total_kbps": 114.10448979591835,
+      "first_return_bytes": 1376,
+      "whole_y_psnr": 31.58819585311237,
+      "return_y_psnr": 31.112268748251598,
+      "prefix_sha256": "67a30b6b2211c58029f003c4a5388ffb2b959391463bb6375ef097e967295586",
+      "ivf_sha256": "e777e48b582d210b907170463f5345631e335c41c96058dc1e566273d6a0a919",
+      "decode_sha256": "cf70fc0896900a5904804f7dddba274f55efcc38d3dbf20c8c966a26affbeec9"
+    },
+    {
+      "q": 35,
+      "extra_golden": false,
+      "bytes": 146652,
+      "return_bytes": 44910,
+      "total_kbps": 239.43183673469386,
+      "first_return_bytes": 4191,
+      "whole_y_psnr": 35.096495426642555,
+      "return_y_psnr": 34.47173210764556,
+      "prefix_sha256": "248ed524e6897aa4029c8bef3a7afec70396e421863b0ae6baa01c910a7e1c90",
+      "ivf_sha256": "51faebae7bece9aa55f918555719f8a97d213e29d7407b677027b8c549b27817",
+      "decode_sha256": "99e8f171bd53167cc72d32e5111e14981587ac4361ea08277c131591b6ffa236"
+    },
+    {
+      "q": 35,
+      "extra_golden": true,
+      "bytes": 144919,
+      "return_bytes": 43177,
+      "total_kbps": 236.6024489795918,
+      "first_return_bytes": 3100,
+      "whole_y_psnr": 35.192574832469845,
+      "return_y_psnr": 34.678178051892296,
+      "prefix_sha256": "248ed524e6897aa4029c8bef3a7afec70396e421863b0ae6baa01c910a7e1c90",
+      "ivf_sha256": "32b86233568f21a2859da68c19ca7e193615292169abf45929d04e074a17b33a",
+      "decode_sha256": "cdf03bdec8aaebbb0cc9c5aff5b5c28776a069476a693ca9fbc43a0bb7188f59"
+    },
+    {
+      "q": 55,
+      "extra_golden": false,
+      "bytes": 36100,
+      "return_bytes": 8812,
+      "total_kbps": 58.938775510204074,
+      "first_return_bytes": 854,
+      "whole_y_psnr": 27.889996047000736,
+      "return_y_psnr": 27.27493393580921,
+      "prefix_sha256": "48707b7835cb6fa5df18501ad9da2b1aa742297beb65a650bcd0aef73530368d",
+      "ivf_sha256": "391a937e0181830e8aabcf21f2f76797d4ca5019d135db0d445dabf546415740",
+      "decode_sha256": "6e6ead58d072ba36ba728c696d00c59557ad06edf46b3a0a9dd0ef873c54b428"
+    },
+    {
+      "q": 55,
+      "extra_golden": true,
+      "bytes": 35689,
+      "return_bytes": 8401,
+      "total_kbps": 58.267755102040816,
+      "first_return_bytes": 598,
+      "whole_y_psnr": 28.086311940350157,
+      "return_y_psnr": 27.70357347690971,
+      "prefix_sha256": "48707b7835cb6fa5df18501ad9da2b1aa742297beb65a650bcd0aef73530368d",
+      "ivf_sha256": "cc38ff81d7965980c8ec631b4c8912fac822a83f0de82fff903ddf198dc8a0a0",
+      "decode_sha256": "eb26dd7b126be30b15d2cf1e7e050c19aba1e49f1beac04f2763167b474421fa"
+    }
+  ],
+  "libaom": "3.14.1",
+  "library_sha256": "346c1f6666ca367d12f66e971ca2703f1383b8a9dacd4cefddabe46fb99a23bc",
+  "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+  "tools": {
+    "ffmpeg": {
+      "path": "/opt/homebrew/bin/ffmpeg",
+      "real_path": "/opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg",
+      "sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be",
+      "version": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    "dav1d": {
+      "path": "/opt/homebrew/bin/dav1d",
+      "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+      "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+      "version": "1.5.4"
+    }
+  },
+  "host": "macOS-26.6.2-arm64-arm-64bit",
+  "device": "CPU",
+  "source_sha256": "0d20d883430ecfea33c474f7e7c7f42df6052437898d390af254148def687b50",
+  "scaled_yuv_sha256": "fbf1305a5edd1c3c109ea21e8885563b5d982f22e98e78c7b3bfdf1ca03b2eae",
+  "driver_sha256": "bcd4ab54366693786c673662ecb61261c68fe6f7d9a28d4d4e08bdafe1b27ead",
+  "code_sha256": "ee239a5606c0e94fde5e9e014616e0381fade04c1cafa36fa98cc5ed3ad3d99a",
+  "binary_sha256": "1a45dc7447e54d7a65eeafd36bec213e2926eab7bcead95088fd608f0ce78ebf",
+  "commands": [
+    [
+      "cc",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "/Users/manu/.codex/worktrees/af77/PointStream/docs/experiments/native-return-control-20261122/ref.c",
+      "-o",
+      "/private/tmp/ps-native-long-return-20261122/ref",
+      "-I/opt/homebrew/Cellar/aom/3.14.1/include",
+      "-I/opt/homebrew/Cellar/libvmaf/3.2.0/include",
+      "-I/opt/homebrew/Cellar/libvmaf/3.2.0/include/libvmaf",
+      "-L/opt/homebrew/Cellar/aom/3.14.1/lib",
+      "-laom",
+      "-L/opt/homebrew/Cellar/libvmaf/3.2.0/lib",
+      "-lvmaf"
+    ],
+    [
+      "/opt/homebrew/bin/ffmpeg",
+      "-v",
+      "error",
+      "-threads",
+      "1",
+      "-i",
+      "/Users/manu/Documents/PointStream-review/2026-11-18-continuous-return/source-only-review.mp4",
+      "-vf",
+      "scale=320:180:flags=area",
+      "-pix_fmt",
+      "yuv420p",
+      "-f",
+      "rawvideo",
+      "/private/tmp/ps-native-long-return-20261122/source.yuv"
+    ],
+    [
+      "/private/tmp/ps-native-long-return-20261122/ref",
+      "/private/tmp/ps-native-long-return-20261122/source.yuv",
+      "/private/tmp/ps-native-long-return-20261122/q45-golden0.ivf",
+      "45",
+      "0"
+    ],
+    [
+      "/opt/homebrew/bin/dav1d",
+      "-i",
+      "/private/tmp/ps-native-long-return-20261122/q45-golden0.ivf",
+      "-o",
+      "/private/tmp/ps-native-long-return-20261122/q45-golden0.yuv",
+      "--threads",
+      "1",
+      "--quiet"
+    ],
+    [
+      "/private/tmp/ps-native-long-return-20261122/ref",
+      "/private/tmp/ps-native-long-return-20261122/source.yuv",
+      "/private/tmp/ps-native-long-return-20261122/q45-golden1.ivf",
+      "45",
+      "1"
+    ],
+    [
+      "/opt/homebrew/bin/dav1d",
+      "-i",
+      "/private/tmp/ps-native-long-return-20261122/q45-golden1.ivf",
+      "-o",
+      "/private/tmp/ps-native-long-return-20261122/q45-golden1.yuv",
+      "--threads",
+      "1",
+      "--quiet"
+    ],
+    [
+      "/private/tmp/ps-native-long-return-20261122/ref",
+      "/private/tmp/ps-native-long-return-20261122/source.yuv",
+      "/private/tmp/ps-native-long-return-20261122/q35-golden0.ivf",
+      "35",
+      "0"
+    ],
+    [
+      "/opt/homebrew/bin/dav1d",
+      "-i",
+      "/private/tmp/ps-native-long-return-20261122/q35-golden0.ivf",
+      "-o",
+      "/private/tmp/ps-native-long-return-20261122/q35-golden0.yuv",
+      "--threads",
+      "1",
+      "--quiet"
+    ],
+    [
+      "/private/tmp/ps-native-long-return-20261122/ref",
+      "/private/tmp/ps-native-long-return-20261122/source.yuv",
+      "/private/tmp/ps-native-long-return-20261122/q35-golden1.ivf",
+      "35",
+      "1"
+    ],
+    [
+      "/opt/homebrew/bin/dav1d",
+      "-i",
+      "/private/tmp/ps-native-long-return-20261122/q35-golden1.ivf",
+      "-o",
+      "/private/tmp/ps-native-long-return-20261122/q35-golden1.yuv",
+      "--threads",
+      "1",
+      "--quiet"
+    ],
+    [
+      "/private/tmp/ps-native-long-return-20261122/ref",
+      "/private/tmp/ps-native-long-return-20261122/source.yuv",
+      "/private/tmp/ps-native-long-return-20261122/q55-golden0.ivf",
+      "55",
+      "0"
+    ],
+    [
+      "/opt/homebrew/bin/dav1d",
+      "-i",
+      "/private/tmp/ps-native-long-return-20261122/q55-golden0.ivf",
+      "-o",
+      "/private/tmp/ps-native-long-return-20261122/q55-golden0.yuv",
+      "--threads",
+      "1",
+      "--quiet"
+    ],
+    [
+      "/private/tmp/ps-native-long-return-20261122/ref",
+      "/private/tmp/ps-native-long-return-20261122/source.yuv",
+      "/private/tmp/ps-native-long-return-20261122/q55-golden1.ivf",
+      "55",
+      "1"
+    ],
+    [
+      "/opt/homebrew/bin/dav1d",
+      "-i",
+      "/private/tmp/ps-native-long-return-20261122/q55-golden1.ivf",
+      "-o",
+      "/private/tmp/ps-native-long-return-20261122/q55-golden1.yuv",
+      "--threads",
+      "1",
+      "--quiet"
+    ]
+  ],
+  "elapsed_seconds": 6.806324750003114,
+  "cpu_seconds": 5.043505
+}

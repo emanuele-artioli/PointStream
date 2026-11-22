@@ -1,0 +1,277 @@
+{
+  "count": 1,
+  "ticks": [
+    10
+  ],
+  "rows": [
+    {
+      "tick": 10,
+      "arm": "plain",
+      "frame_sha256": "ddcc3a5181f1c4737dcfe75dd50269c05d3fb41c9840d2fd198b811bb132cb3c",
+      "source_sha256": "0360ccc4ec8eea097f872285551080d36de520b8ec84ab4f0ccf30b5e9284a7a",
+      "region_pixels": {
+        "full": 2073600,
+        "player1": 14548,
+        "player2": 5386,
+        "body": 19934,
+        "nonbody": 2053666,
+        "body_disk4": 19934,
+        "rest_disk4": 2053666,
+        "body_disk8": 19934,
+        "rest_disk8": 2053666
+      },
+      "lpips_standard": 0.43216443061828613,
+      "lpips": {
+        "full": 0.43216514587402344,
+        "player1": 0.5940999984741211,
+        "player2": 0.4570208489894867,
+        "body": 0.5570623278617859,
+        "nonbody": 0.430952787399292,
+        "body_disk4": 0.5570623278617859,
+        "rest_disk4": 0.430952787399292,
+        "body_disk8": 0.5570623278617859,
+        "rest_disk8": 0.430952787399292,
+        "weighted_body": 0.5192294657230377,
+        "weighted_disk4": 0.5192294657230377,
+        "weighted_disk8": 0.5192294657230377
+      },
+      "dists": {
+        "full": 0.190717875957489,
+        "player1": 0.35149115324020386,
+        "player2": 0.34183216094970703,
+        "body": 0.3398944139480591,
+        "nonbody": 0.18978458642959595,
+        "body_disk4": 0.3398944139480591,
+        "rest_disk4": 0.18978458642959595,
+        "body_disk8": 0.3398944139480591,
+        "rest_disk8": 0.18978458642959595,
+        "weighted_body": 0.29486146569252014,
+        "weighted_disk4": 0.29486146569252014,
+        "weighted_disk8": 0.29486146569252014
+      }
+    },
+    {
+      "tick": 10,
+      "arm": "roi",
+      "frame_sha256": "9c7d70f367d0f814e2c6fc5aeffc7d903d256b186d194a7d6bd6270d0fad593e",
+      "source_sha256": "0360ccc4ec8eea097f872285551080d36de520b8ec84ab4f0ccf30b5e9284a7a",
+      "region_pixels": {
+        "full": 2073600,
+        "player1": 14548,
+        "player2": 5386,
+        "body": 19934,
+        "nonbody": 2053666,
+        "body_disk4": 19934,
+        "rest_disk4": 2053666,
+        "body_disk8": 19934,
+        "rest_disk8": 2053666
+      },
+      "lpips_standard": 0.44007357954978943,
+      "lpips": {
+        "full": 0.44007423520088196,
+        "player1": 0.5819851756095886,
+        "player2": 0.47187840938568115,
+        "body": 0.5522351861000061,
+        "nonbody": 0.43898552656173706,
+        "body_disk4": 0.5522351861000061,
+        "rest_disk4": 0.43898552656173706,
+        "body_disk8": 0.5522351861000061,
+        "rest_disk8": 0.43898552656173706,
+        "weighted_body": 0.5182602882385254,
+        "weighted_disk4": 0.5182602882385254,
+        "weighted_disk8": 0.5182602882385254
+      },
+      "dists": {
+        "full": 0.19789469242095947,
+        "player1": 0.3550279140472412,
+        "player2": 0.3473631739616394,
+        "body": 0.3414536714553833,
+        "nonbody": 0.1974746584892273,
+        "body_disk4": 0.3414536714553833,
+        "rest_disk4": 0.1974746584892273,
+        "body_disk8": 0.3414536714553833,
+        "rest_disk8": 0.1974746584892273,
+        "weighted_body": 0.2982599675655365,
+        "weighted_disk4": 0.2982599675655365,
+        "weighted_disk8": 0.2982599675655365
+      }
+    },
+    {
+      "tick": 10,
+      "arm": "pointstream",
+      "frame_sha256": "d21b2720b957c8dfbfc7954a20038a54af5affa04f021c66a6c63627b2117bfc",
+      "source_sha256": "0360ccc4ec8eea097f872285551080d36de520b8ec84ab4f0ccf30b5e9284a7a",
+      "region_pixels": {
+        "full": 2073600,
+        "player1": 14548,
+        "player2": 5386,
+        "body": 19934,
+        "nonbody": 2053666,
+        "body_disk4": 19934,
+        "rest_disk4": 2053666,
+        "body_disk8": 19934,
+        "rest_disk8": 2053666
+      },
+      "lpips_standard": 0.6070942878723145,
+      "lpips": {
+        "full": 0.6070953011512756,
+        "player1": 0.224853053689003,
+        "player2": 0.2346470057964325,
+        "body": 0.22749927639961243,
+        "nonbody": 0.6107799410820007,
+        "body_disk4": 0.22749927639961243,
+        "rest_disk4": 0.6107799410820007,
+        "body_disk8": 0.22749927639961243,
+        "rest_disk8": 0.6107799410820007,
+        "weighted_body": 0.3424834758043289,
+        "weighted_disk4": 0.3424834758043289,
+        "weighted_disk8": 0.3424834758043289
+      },
+      "dists": {
+        "full": 0.2760400176048279,
+        "player1": 0.2181987166404724,
+        "player2": 0.2726595401763916,
+        "body": 0.2223021388053894,
+        "nonbody": 0.2891688346862793,
+        "body_disk4": 0.2223021388053894,
+        "rest_disk4": 0.2891688346862793,
+        "body_disk8": 0.2223021388053894,
+        "rest_disk8": 0.2891688346862793,
+        "weighted_body": 0.24236214756965635,
+        "weighted_disk4": 0.24236214756965635,
+        "weighted_disk8": 0.24236214756965635
+      }
+    }
+  ],
+  "means": {
+    "plain": {
+      "lpips": {
+        "full": 0.43216514587402344,
+        "player1": 0.5940999984741211,
+        "player2": 0.4570208489894867,
+        "body": 0.5570623278617859,
+        "nonbody": 0.430952787399292,
+        "body_disk4": 0.5570623278617859,
+        "rest_disk4": 0.430952787399292,
+        "body_disk8": 0.5570623278617859,
+        "rest_disk8": 0.430952787399292,
+        "weighted_body": 0.5192294657230377,
+        "weighted_disk4": 0.5192294657230377,
+        "weighted_disk8": 0.5192294657230377
+      },
+      "dists": {
+        "full": 0.190717875957489,
+        "player1": 0.35149115324020386,
+        "player2": 0.34183216094970703,
+        "body": 0.3398944139480591,
+        "nonbody": 0.18978458642959595,
+        "body_disk4": 0.3398944139480591,
+        "rest_disk4": 0.18978458642959595,
+        "body_disk8": 0.3398944139480591,
+        "rest_disk8": 0.18978458642959595,
+        "weighted_body": 0.29486146569252014,
+        "weighted_disk4": 0.29486146569252014,
+        "weighted_disk8": 0.29486146569252014
+      },
+      "lpips_standard": 0.43216443061828613
+    },
+    "roi": {
+      "lpips": {
+        "full": 0.44007423520088196,
+        "player1": 0.5819851756095886,
+        "player2": 0.47187840938568115,
+        "body": 0.5522351861000061,
+        "nonbody": 0.43898552656173706,
+        "body_disk4": 0.5522351861000061,
+        "rest_disk4": 0.43898552656173706,
+        "body_disk8": 0.5522351861000061,
+        "rest_disk8": 0.43898552656173706,
+        "weighted_body": 0.5182602882385254,
+        "weighted_disk4": 0.5182602882385254,
+        "weighted_disk8": 0.5182602882385254
+      },
+      "dists": {
+        "full": 0.19789469242095947,
+        "player1": 0.3550279140472412,
+        "player2": 0.3473631739616394,
+        "body": 0.3414536714553833,
+        "nonbody": 0.1974746584892273,
+        "body_disk4": 0.3414536714553833,
+        "rest_disk4": 0.1974746584892273,
+        "body_disk8": 0.3414536714553833,
+        "rest_disk8": 0.1974746584892273,
+        "weighted_body": 0.2982599675655365,
+        "weighted_disk4": 0.2982599675655365,
+        "weighted_disk8": 0.2982599675655365
+      },
+      "lpips_standard": 0.44007357954978943
+    },
+    "pointstream": {
+      "lpips": {
+        "full": 0.6070953011512756,
+        "player1": 0.224853053689003,
+        "player2": 0.2346470057964325,
+        "body": 0.22749927639961243,
+        "nonbody": 0.6107799410820007,
+        "body_disk4": 0.22749927639961243,
+        "rest_disk4": 0.6107799410820007,
+        "body_disk8": 0.22749927639961243,
+        "rest_disk8": 0.6107799410820007,
+        "weighted_body": 0.3424834758043289,
+        "weighted_disk4": 0.3424834758043289,
+        "weighted_disk8": 0.3424834758043289
+      },
+      "dists": {
+        "full": 0.2760400176048279,
+        "player1": 0.2181987166404724,
+        "player2": 0.2726595401763916,
+        "body": 0.2223021388053894,
+        "nonbody": 0.2891688346862793,
+        "body_disk4": 0.2223021388053894,
+        "rest_disk4": 0.2891688346862793,
+        "body_disk8": 0.2223021388053894,
+        "rest_disk8": 0.2891688346862793,
+        "weighted_body": 0.24236214756965635,
+        "weighted_disk4": 0.24236214756965635,
+        "weighted_disk8": 0.24236214756965635
+      },
+      "lpips_standard": 0.6070942878723145
+    }
+  },
+  "fixed_seconds": 3.6979338050005026,
+  "score_seconds": 1.684228614991298,
+  "elapsed_seconds": 5.382684910000535,
+  "self_check": {
+    "dists": 5.960464477539063e-08,
+    "lpips_spatial": 0.0
+  },
+  "cuda_device": "NVIDIA RTX 6000 Ada Generation",
+  "capability": [
+    8,
+    9
+  ],
+  "max_reserved_bytes": 3521118208,
+  "lpips_model": {
+    "metric": "LPIPS",
+    "net": "alex",
+    "torchmetrics": "1.9.0",
+    "heads": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/torchmetrics/functional/image/lpips_models/alex.pth",
+    "heads_sha256": "df73285e35b22355a2df87cdb6b70b343713b667eddbda73e1977e0c860835c0",
+    "backbone": "/local/users/emanuele/pointstream/cache/7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02/alexnet-owt-7be5be79.pth",
+    "backbone_sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+    "pooling": "spatial map at full resolution (bilinear), mean over the frame or region"
+  },
+  "dists_model": {
+    "metric": "DISTS",
+    "net": "vgg16",
+    "torchmetrics": "1.9.0",
+    "weights": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/torchmetrics/functional/image/dists_models/weights.pt",
+    "weights_sha256": "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218",
+    "backbone": "/local/users/emanuele/pointstream/cache/397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0/vgg16-397923af.pth",
+    "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+    "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)"
+  },
+  "frames_sha256": "4c891777b33b10ba92fd94fa1a59ba360aacf175e7bfd67c382206058d59550a",
+  "supports_sha256": "16b4d488b41cd1f53434a258d37ea9baf5ba00e1e1c52465585393658fce7d11",
+  "key_sha256": "c5c79d2b01ea4e2bfc70d53bef1b050f46fe1838cd9af27cad0bcda0cc4f8040"
+}

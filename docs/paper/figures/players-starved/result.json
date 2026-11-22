@@ -1,0 +1,46 @@
+{
+  "input": "docs/experiments/w9-inputs/w7-repaired-2h.json",
+  "input_sha256": "5245d83df6f8ee16ade28174f6f3c46a94b42ae4d32520c2165fa602e83e9d86",
+  "metric": "player-region DISTS; lower is better",
+  "rate": "2-hour modeled asset reuse; not operational lifetime",
+  "aggregation": "equal windows within each match; equal means across 3 physical matches",
+  "excluded": "med000 has no DCVC data",
+  "matches": [
+    {
+      "match": "Alcaraz\u2013Hurkacz",
+      "windows": [
+        "al028",
+        "al034",
+        "al043"
+      ],
+      "mean_modeled_kbps": 18.917615555555557,
+      "pointstream": 0.23961757769187292,
+      "dcvc_interpolated": 0.3130579983814672,
+      "difference": 0.07344042068959428
+    },
+    {
+      "match": "Medvedev\u2013Struff",
+      "windows": [
+        "med024",
+        "med019"
+      ],
+      "mean_modeled_kbps": 41.940368888888884,
+      "pointstream": 0.2505075465887785,
+      "dcvc_interpolated": 0.31703166219323264,
+      "difference": 0.06652411560445415
+    },
+    {
+      "match": "Nadal\u2013Kyrgios",
+      "windows": [
+        "nad000",
+        "nad001",
+        "nad002"
+      ],
+      "mean_modeled_kbps": 46.79998,
+      "pointstream": 0.24827303985754648,
+      "dcvc_interpolated": 0.31495709202866556,
+      "difference": 0.06668405217111908
+    }
+  ],
+  "equal_match_mean_difference": 0.0688828628217225
+}

@@ -1,0 +1,328 @@
+{
+  "mode": "full",
+  "device": "cpu",
+  "model_sha256": "7bc158aa95c0ebfdd87f70f01653c1131b93e92522dbe15c228bcd742e773a24",
+  "labels_sha256": "6f4037988ccfb6799943385dfcd9a6d056690f5ef6ed0494a6720462dc60bfac",
+  "elapsed_seconds": 81.19297837500926,
+  "inference_seconds": 33.26280096301343,
+  "rows": [
+    {
+      "source": "match209",
+      "tick": 13,
+      "truth_boxes": [
+        [
+          364,
+          187,
+          487,
+          293
+        ]
+      ],
+      "predicted_boxes": [],
+      "confidence": [],
+      "assigned_prediction_indices": [
+        -1
+      ],
+      "assigned_iou": [
+        0.0
+      ]
+    },
+    {
+      "source": "match209",
+      "tick": 18,
+      "truth_boxes": [
+        [
+          305,
+          171,
+          483,
+          235
+        ]
+      ],
+      "predicted_boxes": [],
+      "confidence": [],
+      "assigned_prediction_indices": [
+        -1
+      ],
+      "assigned_iou": [
+        0.0
+      ]
+    },
+    {
+      "source": "match209",
+      "tick": 37,
+      "truth_boxes": [
+        [
+          260,
+          347,
+          356,
+          382
+        ],
+        [
+          811,
+          196,
+          832,
+          233
+        ]
+      ],
+      "predicted_boxes": [],
+      "confidence": [],
+      "assigned_prediction_indices": [
+        -1,
+        -1
+      ],
+      "assigned_iou": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "source": "match209",
+      "tick": 41,
+      "truth_boxes": [
+        [
+          807,
+          196,
+          828,
+          234
+        ]
+      ],
+      "predicted_boxes": [],
+      "confidence": [],
+      "assigned_prediction_indices": [
+        -1
+      ],
+      "assigned_iou": [
+        0.0
+      ]
+    },
+    {
+      "source": "match209",
+      "tick": 46,
+      "truth_boxes": [
+        [
+          762,
+          206,
+          789,
+          244
+        ]
+      ],
+      "predicted_boxes": [],
+      "confidence": [],
+      "assigned_prediction_indices": [
+        -1
+      ],
+      "assigned_iou": [
+        0.0
+      ]
+    },
+    {
+      "source": "match235",
+      "tick": 42,
+      "truth_boxes": [
+        [
+          715,
+          325,
+          730,
+          375
+        ]
+      ],
+      "predicted_boxes": [],
+      "confidence": [],
+      "assigned_prediction_indices": [
+        -1
+      ],
+      "assigned_iou": [
+        0.0
+      ]
+    },
+    {
+      "source": "match235",
+      "tick": 98,
+      "truth_boxes": [
+        [
+          667,
+          181,
+          700,
+          252
+        ]
+      ],
+      "predicted_boxes": [],
+      "confidence": [],
+      "assigned_prediction_indices": [
+        -1
+      ],
+      "assigned_iou": [
+        0.0
+      ]
+    },
+    {
+      "source": "match235",
+      "tick": 110,
+      "truth_boxes": [
+        [
+          712,
+          188,
+          732,
+          250
+        ]
+      ],
+      "predicted_boxes": [],
+      "confidence": [],
+      "assigned_prediction_indices": [
+        -1
+      ],
+      "assigned_iou": [
+        0.0
+      ]
+    },
+    {
+      "source": "match235",
+      "tick": 132,
+      "truth_boxes": [
+        [
+          701,
+          348,
+          822,
+          385
+        ]
+      ],
+      "predicted_boxes": [],
+      "confidence": [],
+      "assigned_prediction_indices": [
+        -1
+      ],
+      "assigned_iou": [
+        0.0
+      ]
+    },
+    {
+      "source": "match269",
+      "tick": 23,
+      "truth_boxes": [
+        [
+          677,
+          74,
+          711,
+          88
+        ]
+      ],
+      "predicted_boxes": [],
+      "confidence": [],
+      "assigned_prediction_indices": [
+        -1
+      ],
+      "assigned_iou": [
+        0.0
+      ]
+    },
+    {
+      "source": "match269",
+      "tick": 27,
+      "truth_boxes": [
+        [
+          698,
+          52,
+          722,
+          64
+        ]
+      ],
+      "predicted_boxes": [],
+      "confidence": [],
+      "assigned_prediction_indices": [
+        -1
+      ],
+      "assigned_iou": [
+        0.0
+      ]
+    },
+    {
+      "source": "match269",
+      "tick": 37,
+      "truth_boxes": [
+        [
+          564,
+          403,
+          590,
+          443
+        ]
+      ],
+      "predicted_boxes": [],
+      "confidence": [],
+      "assigned_prediction_indices": [
+        -1
+      ],
+      "assigned_iou": [
+        0.0
+      ]
+    },
+    {
+      "source": "match269",
+      "tick": 42,
+      "truth_boxes": [
+        [
+          616,
+          385,
+          639,
+          431
+        ]
+      ],
+      "predicted_boxes": [],
+      "confidence": [],
+      "assigned_prediction_indices": [
+        -1
+      ],
+      "assigned_iou": [
+        0.0
+      ]
+    },
+    {
+      "source": "match269",
+      "tick": 46,
+      "truth_boxes": [
+        [
+          663,
+          378,
+          679,
+          416
+        ]
+      ],
+      "predicted_boxes": [],
+      "confidence": [],
+      "assigned_prediction_indices": [
+        -1
+      ],
+      "assigned_iou": [
+        0.0
+      ]
+    },
+    {
+      "source": "match269",
+      "tick": 51,
+      "truth_boxes": [
+        [
+          715,
+          383,
+          745,
+          411
+        ]
+      ],
+      "predicted_boxes": [
+        [
+          722.68359375,
+          410.7508544921875,
+          741.1793212890625,
+          429.4346923828125
+        ]
+      ],
+      "confidence": [
+        0.30225351452827454
+      ],
+      "assigned_prediction_indices": [
+        0
+      ],
+      "assigned_iou": [
+        0.0039020081445633706
+      ]
+    }
+  ],
+  "gate": true
+}

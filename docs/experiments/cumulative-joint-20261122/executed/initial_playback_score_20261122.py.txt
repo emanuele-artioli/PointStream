@@ -1,0 +1,43 @@
+"""Replay original and cached /000 inputs, and score same-support luma."""
+import hashlib,io,json,math,os,subprocess,tarfile,time
+from pathlib import Path
+import cv2,numpy as np
+from experiments.tennis import common_player_packet as p,common_player_ball as b,w8_payload as w
+from src.codecs import svtav1
+from src.pointstream import tracked_patch
+root=Path('/home/itec/emanuele/Datasets/pointstream-data');job=root/'jobs/fleet/inbox';oldroot=root/'tennis/cumulative-joint-20261122/initial-frozen-52-293';newroot=Path('/local/users/emanuele/pointstream/audits/initial-cached-player-v3-20261122');out=Path('/local/users/emanuele/pointstream/audits/initial-playback-score-20261122');out.mkdir(parents=True,exist_ok=False);start=time.monotonic()
+def sha(x):return hashlib.sha256(x).hexdigest()
+def member(j,name):
+ with tarfile.open(job/j/'full/published.tar') as t:return t.extractfile('publish/'+name).read()
+oldwire=(oldroot/'players.pscp').read_bytes();newwire=(newroot/'receiver.pscp').read_bytes();oldprofile=p._embedded_profile(oldwire); oldsections,_=w.unpack(oldwire,oldprofile);newsections,_,new=p.unpack(newwire); profile=p._embedded_profile(newwire);old=p._decode(profile,oldsections)
+assert oldsections['base']==newsections['base'] and oldsections['keypoints']==newsections['keypoints'];names=profile['order'];assert all(np.array_equal(old[n][0][k],new[n][0][k]) for n in names for k in ['reference','boxes','kp','t'])
+oldside=(oldroot/'ball.sidecar').read_bytes();oldsp=p._embedded_profile(oldside);raw,_=w.unpack(oldside,oldsp);dec=svtav1.tool('dav1d');positions,tile,_=b._open(newwire,(newroot/'ball.sidecar').read_bytes(),dec['sha256']);assert raw['tile']==tile
+svtav1_decode=lambda blob,path,wi,he:tracked_patch.decode_native(blob,path,{'width':wi,'height':he,'fps':[50,1],'frames':240},dec['real_path'])
+svtav1_decode(newsections['base'],out/'base.yuv',240,136);svtav1_decode(tile,out/'tile.yuv',64,64)
+base=np.memmap(out/'base.yuv',np.uint8,'r',shape=(240,204,240));patch=np.memmap(out/'tile.yuv',np.uint8,'r',shape=(240,96,64))
+gjobs={'nadal_kyrgios__000_at120__person_000000000000':'20261118T162820Z-841078f9','nadal_kyrgios__000_at120__person_000000000001':'20261118T160156Z-9fdf17fb'};crops={};masks={}
+for n in names:
+ a=np.load(io.BytesIO(member(gjobs[n],n+'.npz')),allow_pickle=False);crops[n]=a['crops'];assert np.array_equal(a['box'],new[n][0]['boxes']) and np.array_equal(a['t'],new[n][0]['t'])
+ a=np.load(io.BytesIO(member('20261118T171044Z-cb2e385d',n+'-masks.npz')),allow_pickle=False);masks[n]=a['masks'];assert np.array_equal(a['t'],np.arange(240))
+# Decode a fixed immutable source-Y reference with the same settings as the conventional anchors.
+ff=svtav1.tool('ffmpeg')['path'];src=root/'tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__000.mp4';truth=out/'source.yuv';subprocess.run([ff,'-v','error','-nostdin','-i',str(src),'-frames:v','240','-vf','scale=480:272:flags=area:out_range=tv,format=yuv420p','-filter_threads','1','-fps_mode','passthrough','-threads','1','-f','rawvideo',str(truth)],check=True,timeout=120);ref=np.memmap(truth,np.uint8,'r',shape=(240,408,480))
+with tarfile.open(job/'20261121T233540Z-28906074'/'full/published.tar') as tar:control=tar.extractfile('publish/960-q41.0.ivf').read()
+assert sha(control)=='fb380d283ef8dbe977cf963fa702d6d625f9dd40505e53690b07bd292607ac7f';svtav1_decode(control,out/'control.yuv',960,544);ctrl=np.memmap(out/'control.yuv',np.uint8,'r',shape=(240,816,960))
+def canvas(frame,wi,he):return cv2.resize(tracked_patch.yuv_to_rgb(frame,wi,he,False),(1920,1080),interpolation=cv2.INTER_CUBIC)
+def paste(image,crop,box,mask):
+ x,y,ww,hh=(round(float(z)) for z in box);ww=max(1,ww);hh=max(1,hh);x0=max(0,x);y0=max(0,y);x1=min(1920,x+ww);y1=min(1080,y+hh)
+ if x0<x1 and y0<y1 and mask.any():
+  inside=np.s_[y0-y:y1-y,x0-x:x1-x];region=np.s_[y0:y1,x0:x1];keep=cv2.resize(mask.astype(np.uint8),(ww,hh),interpolation=cv2.INTER_NEAREST)[inside].astype(bool);pixels=cv2.resize(crop,(ww,hh),interpolation=cv2.INTER_LANCZOS4)[inside];np.copyto(image[region],pixels,where=keep[:,:,None])
+def ysse(rgb,t):
+ small=cv2.resize(rgb,(480,272),interpolation=cv2.INTER_AREA).astype(np.float64);y=np.clip(np.rint(16+219*(.2126*small[:,:,0]+.7152*small[:,:,1]+.0722*small[:,:,2])/255),0,255).astype(np.int32);d=ref[t,:272].astype(np.int32)-y;return int(np.square(d).sum(dtype=np.int64))
+sse=0;control_sse=0;exact=0;hashes=[]
+for t in range(240):
+ x=canvas(base[t],240,136);y=x.copy()
+ for n in names:
+  paste(x,crops[n][t],new[n][0]['boxes'][t],masks[n][t]);paste(y,crops[n][t],old[n][0]['boxes'][t],masks[n][t])
+ if positions[t] is not None:
+  px,py=positions[t];tile_rgb=tracked_patch.yuv_to_rgb(patch[t],64,64,False)[16:48,16:48];x[py:py+32,px:px+32]=tile_rgb;y[py:py+32,px:px+32]=tile_rgb
+ exact+=int(np.array_equal(x,y));hashes.append(sha(x.tobytes()));sse+=ysse(x,t);control_sse+=ysse(canvas(ctrl[t],960,544),t)
+assert exact==240
+psnr=lambda e:10*math.log10(255**2*480*272*240/e)
+r={'frames':240,'original_and_cached_pixel_exact':exact,'joint_sse':sse,'joint_luma_psnr':psnr(sse),'control_display_sse':control_sse,'control_display_luma_psnr':psnr(control_sse),'control_native_y_reference_psnr':46.457116434809265,'elapsed_seconds':time.monotonic()-start,'source_sha256':'b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d','frame_hashes':hashes,'scope':'opened development initial shot; previously generated crops and SAM masks, real cached transport; CPU replay only'};(out/'receipt.json').write_text(json.dumps(r,indent=2));print(json.dumps({k:v for k,v in r.items() if k!='frame_hashes'}))

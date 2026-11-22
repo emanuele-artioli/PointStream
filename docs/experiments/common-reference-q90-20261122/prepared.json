@@ -1,0 +1,70 @@
+{
+  "archive_sha256": "0bccd0e2631395c4c88d2dc3cd4a866c1744b53b8f95e0db6be270baf8615c0c",
+  "config_sha256": "6d2327a4f3a61414202dc5de90ff517161a489ffecee9ac7ea359f18a0c4f976",
+  "cpu_seconds": 9.034854999999999,
+  "inputs_sha256": "bf86402c398e85377eb94625388e83a3e77e91f1d335684f5b2b30f7fea51984",
+  "output": "/private/tmp/ps-common-avif-q90-verified-20261122",
+  "rows": [
+    {
+      "avif_bytes": 45978,
+      "avif_sha256": "1e3be5b9c22bbb2097d932274024a0418e0d6ebbfc30d0d4f4ab5a3f8b9e550c",
+      "decoded_rgb_sha256": "4bcfdc3f75885503e005b56aa22255f98f296aae0b59f54e4e1ad478f6c328bc",
+      "encoder": [
+        "/opt/homebrew/bin/avifenc",
+        "-q",
+        "90",
+        "--speed",
+        "8",
+        "--jobs",
+        "1"
+      ],
+      "jpeg_q40_bytes": 20206,
+      "npz_sha256": "c4ccb9abb0386a268a3ed0a20380742a7b6fdb3940d71b8f1211e69e695aea63",
+      "original_rgb_sha256": "df807a3b9a6c8cd73015544e9b607300690d83a63a26f878e80d914f721e592b",
+      "quality": 90,
+      "reference_frame": 0,
+      "reference_label": "Player 2",
+      "unchanged_arrays": {
+        "box": "0a794f262200b1afea1d2bd06f15e0a73d9bed6982bb04d7d6efd9b721e055ed",
+        "judged": "4d9525d49a2102f99d50d7a8f82dde1c9f9d6b27336001bf37a2a87f4dd2e790",
+        "pose": "eac33992553faf2701f269125d34ecabdde2e50084bb5080aa1bef536586018a",
+        "reference_box": "ca169ab46f2e60f85d938b71da3611e7a5aded839a57244824035b4cb0a61c6a",
+        "run": "ae51d539a51caade4ea6229005eaf2b5fad8d1f6fc80b0713b3bbc7249c5d777",
+        "t": "1aa53cff742acc7b82349c29558ccf50c9af15c48f018c446652dbe208b329f7"
+      },
+      "unit": "nadal_kyrgios__000_at120__person_000000000001"
+    },
+    {
+      "avif_bytes": 61298,
+      "avif_sha256": "f2730e80ac3043dacbc2ccedd57b5a892cf0daa3fc60e5a4c057e12234d45193",
+      "decoded_rgb_sha256": "19e63d4fea6a08d30705cc9390e78ddf3acf544ea102b0e6b880c68ee39323b6",
+      "encoder": [
+        "/opt/homebrew/bin/avifenc",
+        "-q",
+        "90",
+        "--speed",
+        "8",
+        "--jobs",
+        "1"
+      ],
+      "jpeg_q40_bytes": 20913,
+      "npz_sha256": "e282c0cbd5985225f2f1d1bc6e17a9df08b01d73498bf1f056676888d9ea0d3b",
+      "original_rgb_sha256": "330cd728d60c72bb10807543050e3c8ce6e54b93e3445e7fca6c289526dec3e0",
+      "quality": 90,
+      "reference_frame": 0,
+      "reference_label": "Player 1",
+      "unchanged_arrays": {
+        "box": "faf9b624313f79d891a909344fef14ee89d54bb7d6b645031035d9bb4aef3ab6",
+        "judged": "4d9525d49a2102f99d50d7a8f82dde1c9f9d6b27336001bf37a2a87f4dd2e790",
+        "pose": "e84f7d120af5c056761635e8f50215afcd0b8a2ab2fe658b83b015da2f4ae0da",
+        "reference_box": "129454c3fc60df5beaaaa7c254a8ef8c3b9d595f3d0fee9be0e157f9280d9bcc",
+        "run": "ae51d539a51caade4ea6229005eaf2b5fad8d1f6fc80b0713b3bbc7249c5d777",
+        "t": "1aa53cff742acc7b82349c29558ccf50c9af15c48f018c446652dbe208b329f7"
+      },
+      "unit": "nadal_kyrgios__000_at120__person_000000000000"
+    }
+  ],
+  "spec_sha256": "00a4f11b7a4404ea5ffd647b98e37ae1779501c1a2f0e239a32fe16d2fba77b2",
+  "status": "prepared_no_gpu",
+  "wall_seconds": 7.253889874999004
+}

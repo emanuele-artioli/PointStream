@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.adelaide_metadata_machine"
+  ],
+  "arguments": [
+    "--packets",
+    "{staged:packets}",
+    "--source",
+    "{staged:source}",
+    "--sender",
+    "{staged:sender}",
+    "--labels",
+    "{staged:labels}",
+    "--wasb-code",
+    "{staged:wasb_code}",
+    "--wasb-weights",
+    "{staged:wasb_weights}",
+    "--frames",
+    "{frames}"
+  ],
+  "staged_inputs": [
+    {
+      "name": "packets",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T002400Z-03f60d36/full/published.tar",
+      "sha256": "dd0269e819953dffa78bfddf7b1a9589b53837ddc5ff3844177ef245191525bc",
+      "extract": false
+    },
+    {
+      "name": "source",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/adelaide410-prospective-20261122/original.mp4",
+      "sha256": "5a81a835c16a1b511f4b581748254b809c3a5d96105113974f6a49b7c8e2182b",
+      "extract": false
+    },
+    {
+      "name": "sender",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T001405Z-f4c93f8f/full/sender.json",
+      "sha256": "ae767062d519b849c8f0769b5d090ec54a84869b81e7832e5c169c12daa867be",
+      "extract": false
+    },
+    {
+      "name": "labels",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/adelaide410-prospective-20261122/official.csv",
+      "sha256": "6bbf0e3bb81a586aa3981edc40f4ea5eab0a0b36542f626d61fe12614cf14f1d",
+      "extract": false
+    },
+    {
+      "name": "wasb_code",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/WASB-SBDT-923462c.tar",
+      "sha256": "657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55",
+      "extract": true
+    },
+    {
+      "name": "wasb_weights",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/wasb-tennis-weights.tar",
+      "sha256": "4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6",
+      "extract": true
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T002400Z-03f60d36/full/published.tar",
+      "sha256": "dd0269e819953dffa78bfddf7b1a9589b53837ddc5ff3844177ef245191525bc"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/adelaide410-prospective-20261122/original.mp4",
+      "sha256": "5a81a835c16a1b511f4b581748254b809c3a5d96105113974f6a49b7c8e2182b"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T001405Z-f4c93f8f/full/sender.json",
+      "sha256": "ae767062d519b849c8f0769b5d090ec54a84869b81e7832e5c169c12daa867be"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/adelaide410-prospective-20261122/official.csv",
+      "sha256": "6bbf0e3bb81a586aa3981edc40f4ea5eab0a0b36542f626d61fe12614cf14f1d"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/WASB-SBDT-923462c.tar",
+      "sha256": "657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/wasb-tennis-weights.tar",
+      "sha256": "4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "required_commands": [],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.adelaide_metadata_machine",
+    "--validate"
+  ],
+  "deadline": "2026-11-22T04:30:00Z",
+  "verify_staged_inputs": true,
+  "stall_seconds": 750,
+  "hosts": [
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [
+    "RTX 6000 Ada"
+  ],
+  "gpu_memory_mib": 8000,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "local_storage_gib": 30,
+  "contention": {
+    "policy": "continue",
+    "basis": "Frozen WASB scores and decoded output hashes are independent of wall time; this job does not measure latency."
+  },
+  "smoke": {
+    "seconds": 240,
+    "representative_basis": "Sixteen authentic Adelaide frames, same frozen source and selected AV1/metadata receiver paths, original WASB checkpoint and thresholds, source-native coordinates and projected full cost."
+  },
+  "full": {
+    "seconds": 650
+  },
+  "validator_seconds": 60,
+  "budget_seconds": 1050,
+  "scale": {
+    "frames": {
+      "smoke": 16,
+      "full": 64
+    }
+  },
+  "gpu_sharing": {
+    "mode": "shared",
+    "basis": "Frozen WASB scores and decoded output hashes are independent of wall time; this job does not measure latency.",
+    "margin_mib": 8192
+  }
+}

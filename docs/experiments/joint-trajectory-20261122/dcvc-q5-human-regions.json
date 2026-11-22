@@ -1,0 +1,315 @@
+{
+  "qp": 5,
+  "kbps": 19.135,
+  "bytes": 11481,
+  "mean": {
+    "ball": 0.3459121783574422,
+    "p1": 0.4126999229192734,
+    "p2": 0.3796807924906413
+  },
+  "players": 0.39619035770495736,
+  "packet_sha256": "1de8bbb5bc12552a23d488239d36efb0625a3a4e1b55541757332f4884da418c",
+  "producer_report_sha256": "b889666c61024b44dfbea37fff74d2e37c515da6702438ed3ec327413ca042a7",
+  "frame_slice_sha256": "b98d786f90f8f7adc7c6213654d4ddef2944d0a6c3986ad35046af7649c4f157",
+  "four_passes_match": true,
+  "full_rgb_sse": 8882953508,
+  "reviewed_full_rgb_psnr": 27.375504567407013,
+  "rows": [
+    {
+      "t": 10,
+      "region": "p1",
+      "arm": "neural",
+      "dists": 0.33189821243286133
+    },
+    {
+      "t": 10,
+      "region": "p2",
+      "arm": "neural",
+      "dists": 0.3064132332801819
+    },
+    {
+      "t": 10,
+      "region": "ball",
+      "arm": "neural",
+      "dists": 0.33281439542770386
+    },
+    {
+      "t": 30,
+      "region": "p1",
+      "arm": "neural",
+      "dists": 0.34536492824554443
+    },
+    {
+      "t": 30,
+      "region": "p2",
+      "arm": "neural",
+      "dists": 0.3059074878692627
+    },
+    {
+      "t": 30,
+      "region": "ball",
+      "arm": "neural",
+      "dists": 0.4147968292236328
+    },
+    {
+      "t": 50,
+      "region": "p1",
+      "arm": "neural",
+      "dists": 0.359752357006073
+    },
+    {
+      "t": 50,
+      "region": "p2",
+      "arm": "neural",
+      "dists": 0.3499525189399719
+    },
+    {
+      "t": 50,
+      "region": "ball",
+      "arm": "neural",
+      "dists": 0.3723900318145752
+    },
+    {
+      "t": 70,
+      "region": "p1",
+      "arm": "neural",
+      "dists": 0.3974897861480713
+    },
+    {
+      "t": 70,
+      "region": "p2",
+      "arm": "neural",
+      "dists": 0.3709339499473572
+    },
+    {
+      "t": 70,
+      "region": "ball",
+      "arm": "neural",
+      "dists": 0.3273633122444153
+    },
+    {
+      "t": 90,
+      "region": "p1",
+      "arm": "neural",
+      "dists": 0.3816412091255188
+    },
+    {
+      "t": 90,
+      "region": "p2",
+      "arm": "neural",
+      "dists": 0.35501086711883545
+    },
+    {
+      "t": 90,
+      "region": "ball",
+      "arm": "neural",
+      "dists": 0.293509840965271
+    },
+    {
+      "t": 110,
+      "region": "p1",
+      "arm": "neural",
+      "dists": 0.40889573097229004
+    },
+    {
+      "t": 110,
+      "region": "p2",
+      "arm": "neural",
+      "dists": 0.36972105503082275
+    },
+    {
+      "t": 110,
+      "region": "ball",
+      "arm": "neural",
+      "dists": 0.2947520613670349
+    },
+    {
+      "t": 130,
+      "region": "p1",
+      "arm": "neural",
+      "dists": 0.42949163913726807
+    },
+    {
+      "t": 130,
+      "region": "p2",
+      "arm": "neural",
+      "dists": 0.39372771978378296
+    },
+    {
+      "t": 130,
+      "region": "ball",
+      "arm": "neural",
+      "dists": 0.3445807695388794
+    },
+    {
+      "t": 150,
+      "region": "p1",
+      "arm": "neural",
+      "dists": 0.44410157203674316
+    },
+    {
+      "t": 150,
+      "region": "p2",
+      "arm": "neural",
+      "dists": 0.37837064266204834
+    },
+    {
+      "t": 150,
+      "region": "ball",
+      "arm": "neural",
+      "dists": 0.3365488052368164
+    },
+    {
+      "t": 170,
+      "region": "p1",
+      "arm": "neural",
+      "dists": 0.4769633412361145
+    },
+    {
+      "t": 170,
+      "region": "p2",
+      "arm": "neural",
+      "dists": 0.38450801372528076
+    },
+    {
+      "t": 170,
+      "region": "ball",
+      "arm": "neural",
+      "dists": 0.37328171730041504
+    },
+    {
+      "t": 190,
+      "region": "p1",
+      "arm": "neural",
+      "dists": 0.4736618399620056
+    },
+    {
+      "t": 190,
+      "region": "p2",
+      "arm": "neural",
+      "dists": 0.42603063583374023
+    },
+    {
+      "t": 190,
+      "region": "ball",
+      "arm": "neural",
+      "dists": 0.35065722465515137
+    },
+    {
+      "t": 210,
+      "region": "p1",
+      "arm": "neural",
+      "dists": 0.45562827587127686
+    },
+    {
+      "t": 210,
+      "region": "p2",
+      "arm": "neural",
+      "dists": 0.4732198715209961
+    },
+    {
+      "t": 210,
+      "region": "ball",
+      "arm": "neural",
+      "dists": 0.3367634415626526
+    },
+    {
+      "t": 230,
+      "region": "p1",
+      "arm": "neural",
+      "dists": 0.4475101828575134
+    },
+    {
+      "t": 230,
+      "region": "p2",
+      "arm": "neural",
+      "dists": 0.44237351417541504
+    },
+    {
+      "t": 230,
+      "region": "ball",
+      "arm": "neural",
+      "dists": 0.3734877109527588
+    }
+  ],
+  "metric": {
+    "metric": "DISTS",
+    "net": "vgg16",
+    "torchmetrics": "1.9.0",
+    "weights": "/private/tmp/ps-20261119-scorer-addon/torchmetrics/functional/image/dists_models/weights.pt",
+    "weights_sha256": "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218",
+    "backbone": "/Users/manu/.codex/visualizations/2026/11/01/01a196fe-ab4d-70f0-a4b4-6843ca289667/atlas-metric-models/checkpoints/vgg16-397923af.pth",
+    "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+    "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)"
+  },
+  "script_sha256": "94e7a97479b54e0c9c448fcc197ed069c2e4aca1689c4f0dcd69d4bcac4d0c11",
+  "producer_twelve": {
+    "frames": 240,
+    "qp": 5,
+    "ticks": [
+      {
+        "tick": 10,
+        "sha256": "794043abfe2810bf396e8f186f9c20ae72e0c944242177dd693ca1a9ecf0bec8"
+      },
+      {
+        "tick": 30,
+        "sha256": "bfddb208b2d8425c4f77bf4322aa957665c2cd9e1ccb090b857dbeddec033f3e"
+      },
+      {
+        "tick": 50,
+        "sha256": "e01835e04a7f6efb022e4777fe09ad9467ffd7ed27aebb1b8ea330d90a4a3bef"
+      },
+      {
+        "tick": 70,
+        "sha256": "b4218819f2b5d4b65b1e4d65f671e0514af066d88f664b28141205c178b883a6"
+      },
+      {
+        "tick": 90,
+        "sha256": "6331340fd3e790e0d83634466277d9ca23c71009ead18045e6057c01a40e70ac"
+      },
+      {
+        "tick": 110,
+        "sha256": "6224206da014061ac6680b9846cd81769169904fed2e8121d8f68e246136a014"
+      },
+      {
+        "tick": 130,
+        "sha256": "0940693b1bd0f944f01c70472aed1269822511663deb9f38db5e93b7ca4a0771"
+      },
+      {
+        "tick": 150,
+        "sha256": "77e2eed456dfd45e6088d7463d75dfc7336533efc5eed1f4a1bad58fc99a5328"
+      },
+      {
+        "tick": 170,
+        "sha256": "e8529b710fd4f5e65a0d9f798e6567fb6e64b0d249dc745cdfa04a18d1f77c60"
+      },
+      {
+        "tick": 190,
+        "sha256": "3ee7c5e8bd25a792b85ca243505893573ab13bddd905cffcff9499f78d790f11"
+      },
+      {
+        "tick": 210,
+        "sha256": "f01de6690184ef47129a5f643fec587451f6aff37e042c381dbe07994c0791f4"
+      },
+      {
+        "tick": 230,
+        "sha256": "4db431137da3d54f8adee142b53757b5cc2eca08635662e0a1b93d4f2dbbeff7"
+      }
+    ],
+    "container_sha256": "1de8bbb5bc12552a23d488239d36efb0625a3a4e1b55541757332f4884da418c"
+  },
+  "ticks": [
+    10,
+    30,
+    50,
+    70,
+    90,
+    110,
+    130,
+    150,
+    170,
+    190,
+    210,
+    230
+  ]
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "window": "med024",
+    "kbps": 29.779999999999998,
+    "id": "20261122T013630Z-b4fdca30",
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T013630Z-b4fdca30/full/published.tar",
+    "sha256": "e0dc0df147b1be4175dee99b8cac4b3217cc15decfa8df0dcbead35f0448f49a"
+  },
+  {
+    "window": "nad000",
+    "kbps": 30.746666666666666,
+    "id": "20261122T013655Z-fb4f785b",
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T013655Z-fb4f785b/full/published.tar",
+    "sha256": "8c6879924aedbc5c3866a75c92488408a1525c992b3c0f5419c90464ac3bf35a"
+  },
+  {
+    "window": "nad001",
+    "kbps": 30.566666666666666,
+    "id": "20261122T013721Z-84ecaad4",
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T013721Z-84ecaad4/full/published.tar",
+    "sha256": "ff661b53e9af95464f16899547a05addca46b8178f18f74259e4f361bb927a92"
+  },
+  {
+    "window": "nad002",
+    "kbps": 30.243333333333332,
+    "id": "20261122T013746Z-88b55622",
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T013746Z-88b55622/full/published.tar",
+    "sha256": "5930f09780eb306f7e84678562bec29419ace8d7f61127599749a81faabe664c"
+  }
+]

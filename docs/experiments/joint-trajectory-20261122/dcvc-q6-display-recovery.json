@@ -1,0 +1,14 @@
+{
+  "original_packet_sha256": "1d5c6f5e19e360b038e73ad8018075854ecea98c0a9ed05d3801f492bf02a30b",
+  "original_report_sha256": "f246a11a7be7ff3514e6905744d533f2d49cc68d2e3c5f225c9a8acaf87faee9",
+  "carrier_archive_sha256": "cefc3d1d6addcf6c1274c75264b8edb9e32667b60758a347b4e3d3ac119f22ad",
+  "full_yuv_sha256": "48f7dd5973fc376f6fabe736e37cdfc0f79588479d29ceb4e9e14943e48e2dbf",
+  "original_decode_processes": 2,
+  "passes_per_process": 2,
+  "verified_frames": 240,
+  "all_four_historical_frame_lists_agree": true,
+  "source_job": "20261122T002701Z-8c1fc0b4",
+  "recovery_job": "20261122T031034Z-91671786",
+  "recovery_stage": "smoke",
+  "scope": "Exact recovery of the original accepted four-pass native display. A later repeat on the recovery job produced different hashes and was rejected."
+}

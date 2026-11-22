@@ -1,0 +1,170 @@
+{
+  "neural_bytes": 24494,
+  "selection": "nearest complete bytes; smaller packet breaks ties",
+  "cache_sha256": "91bd3a3fd9b18db301348c98e5af1536b859f2e51dde71e7de56c3beee1c1af2",
+  "cache_bytes": 157517,
+  "all_pose_and_ball_bytes_identical_to_21_298": true,
+  "reference_rate_kbps": 20.411666666666665,
+  "max_pairwise_percent": 0.24966234191461378,
+  "within_half_percent_of_neural": true,
+  "selected": {
+    "ordinary": {
+      "crf": 52.75,
+      "bytes": 24433,
+      "kbps": 20.360833333333332,
+      "percent_from_neural": -0.24904058136686613,
+      "stream_sha256": "32e9379693742bf3ddd2324c14e31dfafdf8f7c7fd52230ca8b317d197cf76bf",
+      "ivf_sha256": "32e9379693742bf3ddd2324c14e31dfafdf8f7c7fd52230ca8b317d197cf76bf",
+      "ivf_bytes": 24433,
+      "raw_sha256": "c60215a513435b726bf9c3dd398b651b1c9add176245a354eb1076ee21445bf1",
+      "path": "/private/tmp/ps-nov22-al028-exact-budget/ordinary-52.75"
+    },
+    "joint": {
+      "crf": 53.5,
+      "bytes": 24489,
+      "kbps": 20.4075,
+      "percent_from_neural": -0.02041316240711799,
+      "stream_sha256": "ab12294fec2bba5bb5b21bf373a3a31c620b80cf9463cd92ab0383647d1a8aa9",
+      "ivf_sha256": "8d96056a21002279b05e9817e411d960e96b76610da6e932acb12a55093db845",
+      "ivf_bytes": 19985,
+      "raw_sha256": "0831a58cfe5b5b491235486f52bf220886f2ad9e3f4ff3914e30b90d8a9f278d",
+      "path": "/private/tmp/ps-nov22-al028-exact-budget/joint-53.5"
+    }
+  },
+  "rows": {
+    "ordinary": [
+      {
+        "crf": 52,
+        "bytes": 25210,
+        "kbps": 21.008333333333333,
+        "percent_from_neural": 2.9231648566995894,
+        "stream_sha256": "dbe2c84721d430e48d885cab2ea65772da55b896d1dbcb726b4fa1fe974c7e6b",
+        "ivf_sha256": "dbe2c84721d430e48d885cab2ea65772da55b896d1dbcb726b4fa1fe974c7e6b",
+        "ivf_bytes": 25210,
+        "raw_sha256": "dec4ea4740491d2eec30b6b94e67a154485bf8dc8bb390d0a1abb310e548194e",
+        "path": "/private/tmp/ps-nov22-al028-exact-budget/ordinary-52"
+      },
+      {
+        "crf": 53,
+        "bytes": 24308,
+        "kbps": 20.256666666666668,
+        "percent_from_neural": -0.7593696415448714,
+        "stream_sha256": "db3fe98d1c982180eef228af5497124347109c6ca29d6d7261a179b39253d18b",
+        "ivf_sha256": "db3fe98d1c982180eef228af5497124347109c6ca29d6d7261a179b39253d18b",
+        "ivf_bytes": 24308,
+        "raw_sha256": "b7ac07c14c3a74c07f3da1c44835227bbda5c5190759b029b0c442fa8807d9e0",
+        "path": "/private/tmp/ps-nov22-al028-exact-budget/ordinary-53"
+      },
+      {
+        "crf": 53.5,
+        "bytes": 23763,
+        "kbps": 19.8025,
+        "percent_from_neural": -2.9844043439209655,
+        "stream_sha256": "21d4169f87775ed45dbf6a050d061cf5d92eab5258e4e4a71a7a279484fe7d77",
+        "ivf_sha256": "21d4169f87775ed45dbf6a050d061cf5d92eab5258e4e4a71a7a279484fe7d77",
+        "ivf_bytes": 23763,
+        "raw_sha256": "5945e82a6be12f5d129153c906468b7161b9a66710ec62f85c400ef7c8ed7afd",
+        "path": "/private/tmp/ps-nov22-al028-exact-budget/ordinary-53.5"
+      },
+      {
+        "crf": 54,
+        "bytes": 23194,
+        "kbps": 19.328333333333333,
+        "percent_from_neural": -5.307422225851233,
+        "stream_sha256": "b46dff01b63216aba5b6a0bb7857f02b42c6f14eaf9e7741468674fe4d26b9c6",
+        "ivf_sha256": "b46dff01b63216aba5b6a0bb7857f02b42c6f14eaf9e7741468674fe4d26b9c6",
+        "ivf_bytes": 23194,
+        "raw_sha256": "a050aee715e6ea0d3227d528ca504984a783f805c06dae6bd7b18a20fd2bb672",
+        "path": "/private/tmp/ps-nov22-al028-exact-budget/ordinary-54"
+      },
+      {
+        "crf": 52.5,
+        "bytes": 24873,
+        "kbps": 20.7275,
+        "percent_from_neural": 1.5473177104597058,
+        "stream_sha256": "c77933d23755962f9f08b71987988c41474651a1ea630aa1564f2ddbe49f6aea",
+        "ivf_sha256": "c77933d23755962f9f08b71987988c41474651a1ea630aa1564f2ddbe49f6aea",
+        "ivf_bytes": 24873,
+        "raw_sha256": "fa38f25a352a90040073c3f26211b98ef7c872beab3de5c1aca889c5ca2bd633",
+        "path": "/private/tmp/ps-nov22-al028-exact-budget/ordinary-52.5"
+      },
+      {
+        "crf": 52.75,
+        "bytes": 24433,
+        "kbps": 20.360833333333332,
+        "percent_from_neural": -0.24904058136686613,
+        "stream_sha256": "32e9379693742bf3ddd2324c14e31dfafdf8f7c7fd52230ca8b317d197cf76bf",
+        "ivf_sha256": "32e9379693742bf3ddd2324c14e31dfafdf8f7c7fd52230ca8b317d197cf76bf",
+        "ivf_bytes": 24433,
+        "raw_sha256": "c60215a513435b726bf9c3dd398b651b1c9add176245a354eb1076ee21445bf1",
+        "path": "/private/tmp/ps-nov22-al028-exact-budget/ordinary-52.75"
+      }
+    ],
+    "joint": [
+      {
+        "crf": 52,
+        "bytes": 25558,
+        "kbps": 21.298333333333332,
+        "percent_from_neural": 4.34392096023517,
+        "stream_sha256": "4a53f55b07b8a2371ee54e8d57c4834888e1f46761b8ea53a9871cab3adcec9b",
+        "ivf_sha256": "b2805612994e7f29aacffcacc939461c573ec4b59d94290a775fd21914b11088",
+        "ivf_bytes": 21054,
+        "raw_sha256": "0474cc789810859513295a1bc41c357fb286ad60414864ba6e31b27d1f22e965",
+        "path": "/private/tmp/ps-nov22-al028-exact-budget/joint-52"
+      },
+      {
+        "crf": 53,
+        "bytes": 24815,
+        "kbps": 20.679166666666667,
+        "percent_from_neural": 1.3105250265371016,
+        "stream_sha256": "034222b811d183ecd39da3bfc08fad3efb0db98a416bd022dba22a4528e46716",
+        "ivf_sha256": "fc1d81fba94cc3b871922bc0aba220a994f90b8a0e32f0e4431ee4b20bd55b1e",
+        "ivf_bytes": 20311,
+        "raw_sha256": "820a10a372f9ec2c6130447803b34f9adb384a681bb4c54f068b0efd5f6e8f55",
+        "path": "/private/tmp/ps-nov22-al028-exact-budget/joint-53"
+      },
+      {
+        "crf": 53.5,
+        "bytes": 24489,
+        "kbps": 20.4075,
+        "percent_from_neural": -0.02041316240711799,
+        "stream_sha256": "ab12294fec2bba5bb5b21bf373a3a31c620b80cf9463cd92ab0383647d1a8aa9",
+        "ivf_sha256": "8d96056a21002279b05e9817e411d960e96b76610da6e932acb12a55093db845",
+        "ivf_bytes": 19985,
+        "raw_sha256": "0831a58cfe5b5b491235486f52bf220886f2ad9e3f4ff3914e30b90d8a9f278d",
+        "path": "/private/tmp/ps-nov22-al028-exact-budget/joint-53.5"
+      },
+      {
+        "crf": 54,
+        "bytes": 24257,
+        "kbps": 20.214166666666667,
+        "percent_from_neural": -0.9675838980974905,
+        "stream_sha256": "1093859b4bcf14d0ebe1f1abe08fdf518acd21b763ed2b23327b2826c9f47020",
+        "ivf_sha256": "d190d55ff0b24a052baa3ae46d08d4f968418d93ff24d472870befaa6c7823b7",
+        "ivf_bytes": 19753,
+        "raw_sha256": "ebbe171ef7a763abe276e5b2f62d1ebccbf2ea0af7aeb053b66e4e84960b9218",
+        "path": "/private/tmp/ps-nov22-al028-exact-budget/joint-54"
+      }
+    ]
+  },
+  "native_tools": {
+    "SvtAv1EncApp": {
+      "path": "/opt/homebrew/bin/SvtAv1EncApp",
+      "real_path": "/opt/homebrew/Cellar/svt-av1/4.0.1/bin/SvtAv1EncApp",
+      "sha256": "db044194faf94d553c2509c8e033ecd05a373ba54d919d0fb49a3a13149d1687",
+      "version": "SVT-AV1 v4.0.1 (release)"
+    },
+    "dav1d": {
+      "path": "/opt/homebrew/bin/dav1d",
+      "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+      "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+      "version": "1.5.4"
+    }
+  },
+  "cpu_seconds": 51.217023,
+  "forecast_cpu": 157.386836,
+  "input_sha256": {
+    "ordinary": "74b15efb18b9c286d4117dfddef066d0f0a66d071a761c69ecc64871b4dff948",
+    "joint": "dfdbb2446a9c70ad6e9a3767eb0f8900a23c4cd5ca610cb8e675819846118b80"
+  }
+}

@@ -25,7 +25,9 @@ def main():
         "staged_inputs": [{"name": "source", "path": SOURCE, "sha256": SOURCE_SHA, "extract": False}],
         "inputs": [{"path": SOURCE, "sha256": SOURCE_SHA}],
         "environment": {"path": ENV, "sha256": ENV_SHA},
-        "required_commands": ["ffmpeg", "ffprobe", "SvtAv1EncApp", "dav1d"],
+        # The pinned executables are in the staged environment. The worker and
+        # validator verify their identities after staging.
+        "required_commands": [],
         "validator": ["{python}", "-m", "experiments.tennis.starved_native_fleet", "--validate"],
         "deadline": args.deadline,
         "verify_staged_inputs": True,

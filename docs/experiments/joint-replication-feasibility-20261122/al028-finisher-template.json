@@ -1,0 +1,143 @@
+{
+  "arguments": [
+    "run",
+    "--carrier",
+    "{staged:carrier}",
+    "--carrier-sha256",
+    "731cc34e1fcb7c0874cd5722ab63241a123d31fbcd699e199cee4163cdcbc0dc",
+    "--manifest",
+    "{staged:manifest}",
+    "--sam",
+    "{staged:sam}",
+    "--ticks",
+    "{ticks}",
+    "--generation",
+    "alcaraz_hurkacz__028_at120__person_000000000004",
+    "{staged:player1}",
+    "SEAL4",
+    "--generation",
+    "alcaraz_hurkacz__028_at120__person_000000000006",
+    "{staged:player2}",
+    "SEAL6",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/sources/alcaraz_hurkacz__028.mp4",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T150213Z-99604e48/full/published.tar",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T150651Z-a58b2ce2/full/published.tar",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T162058Z-c9b2c47b/full/published.tar",
+    "--full-cap",
+    "1000"
+  ],
+  "budget_seconds": 1500,
+  "contention": {
+    "policy": "continue",
+    "resume_attempts": 0,
+    "basis": "Correctness and pixel identity only; shared timings are not performance evidence."
+  },
+  "cpu_threads": 1,
+  "deadline": "2026-11-22T09:24:00Z",
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.common_finish_al028_job"
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "full": {
+    "seconds": 1000
+  },
+  "gpu_memory_mib": 18000,
+  "gpu_models": [
+    "RTX A6000",
+    "RTX 6000 Ada"
+  ],
+  "gpu_sharing": {
+    "mode": "shared",
+    "margin_mib": 8192,
+    "basis": "Correctness-only source-denied finish; timings may be contended."
+  },
+  "hosts": [
+    "gpu3",
+    "gpu5",
+    "gpu6"
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/background/g1-2026-10-08/inputs/sam3.1_multiplex.pt",
+      "sha256": "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al028-donor25-portable-20261122-731cc34e/players.pscp",
+      "sha256": "731cc34e1fcb7c0874cd5722ab63241a123d31fbcd699e199cee4163cdcbc0dc"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al028-donor25-portable-20261122-731cc34e/players.manifest",
+      "sha256": "b228735a1ea5f7533383637f609119e6ec0a527d5ced5a94dcb8a65d42650702"
+    },
+    {
+      "path": "PLAYER1_ARCHIVE",
+      "sha256": "PLAYER1_SHA"
+    },
+    {
+      "path": "PLAYER2_ARCHIVE",
+      "sha256": "PLAYER2_SHA"
+    }
+  ],
+  "local_storage_gib": 64,
+  "required_commands": [],
+  "scale": {
+    "ticks": {
+      "smoke": 4,
+      "full": 240
+    }
+  },
+  "schema": 1,
+  "single_cpu_campaign": true,
+  "smoke": {
+    "seconds": 300,
+    "representative_basis": "Four authentic receiver frames and masks using both sealed return tracks."
+  },
+  "staged_inputs": [
+    {
+      "name": "sam",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/background/g1-2026-10-08/inputs/sam3.1_multiplex.pt",
+      "sha256": "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6",
+      "extract": false
+    },
+    {
+      "name": "carrier",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al028-donor25-portable-20261122-731cc34e/players.pscp",
+      "sha256": "731cc34e1fcb7c0874cd5722ab63241a123d31fbcd699e199cee4163cdcbc0dc",
+      "extract": false
+    },
+    {
+      "name": "manifest",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al028-donor25-portable-20261122-731cc34e/players.manifest",
+      "sha256": "b228735a1ea5f7533383637f609119e6ec0a527d5ced5a94dcb8a65d42650702",
+      "extract": false
+    },
+    {
+      "name": "player1",
+      "extract": true,
+      "sha256": "PLAYER1_SHA",
+      "path": "PLAYER1_ARCHIVE"
+    },
+    {
+      "name": "player2",
+      "extract": true,
+      "sha256": "PLAYER2_SHA",
+      "path": "PLAYER2_ARCHIVE"
+    }
+  ],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.common_finish_al028_job",
+    "validate-stage"
+  ],
+  "validator_seconds": 90,
+  "verify_staged_inputs": true
+}

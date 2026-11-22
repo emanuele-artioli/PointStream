@@ -1,0 +1,102 @@
+{
+  "full_frame_rgb_psnr": {
+    "original-36": 24.26471887706377,
+    "original-48": 24.11504114818724,
+    "original-60": 23.72679914107831,
+    "clean-36": 23.97852146898943,
+    "clean-48": 23.88925221234694,
+    "clean-60": 23.603135161544625
+  },
+  "full_frame_squared_errors": {
+    "original-36": 18181761564,
+    "original-48": 18819311508,
+    "original-60": 20579173645,
+    "clean-36": 19420289466,
+    "clean-48": 19823604503,
+    "clean-60": 21173581732
+  },
+  "ticks": [
+    {
+      "tick": 10,
+      "ball_placement": null
+    },
+    {
+      "tick": 30,
+      "ball_placement": null
+    },
+    {
+      "tick": 50,
+      "ball_placement": [
+        1024,
+        592
+      ]
+    },
+    {
+      "tick": 70,
+      "ball_placement": [
+        1028,
+        458
+      ]
+    },
+    {
+      "tick": 90,
+      "ball_placement": [
+        932,
+        462
+      ]
+    },
+    {
+      "tick": 110,
+      "ball_placement": [
+        786,
+        444
+      ]
+    },
+    {
+      "tick": 130,
+      "ball_placement": [
+        766,
+        256
+      ]
+    },
+    {
+      "tick": 150,
+      "ball_placement": [
+        924,
+        480
+      ]
+    },
+    {
+      "tick": 170,
+      "ball_placement": [
+        1076,
+        664
+      ]
+    },
+    {
+      "tick": 190,
+      "ball_placement": [
+        1168,
+        642
+      ]
+    },
+    {
+      "tick": 210,
+      "ball_placement": [
+        1132,
+        416
+      ]
+    },
+    {
+      "tick": 230,
+      "ball_placement": [
+        1132,
+        368
+      ]
+    }
+  ],
+  "input_report_sha256": "5c9a318544cf59f757e6b4cfee319b8f3b8f39643313296e7c5534e4e421b13a",
+  "crops_sha256": "db93ec16b0f86283a14718b4acc9f2c793173b128ff2775c7701de59f8c3fb0e",
+  "cpu_seconds": 8.320208999999998,
+  "scope": "native source matched regions, six paid decoded streams"
+}

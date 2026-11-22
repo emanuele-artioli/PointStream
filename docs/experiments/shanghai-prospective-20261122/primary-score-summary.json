@@ -1,0 +1,56 @@
+{
+  "source_group": "match284_000 / Shanghai, outcome-unopened selection from an existing training-distribution clip; no inference of training disjointness",
+  "frame_count": 240,
+  "visible": 26,
+  "not_visible": 23,
+  "unlabeled": 191,
+  "source_wasb_qualified_80pct": false,
+  "candidate_kbps": 20.323333333333334,
+  "ordinary_kbps": 20.248333333333335,
+  "pair_gap_percent": 0.370400856037534,
+  "detector_threshold": 0.5,
+  "crop_canvas": [
+    960,
+    544
+  ],
+  "crop_pixels": [
+    64,
+    64
+  ],
+  "results": {
+    "source": {
+      "wasb_hit10": 5,
+      "wasb_hit5": 3,
+      "wasb_present_not_visible": 16,
+      "direct_hit10": null,
+      "direct_hit5": null,
+      "direct_present_not_visible": null,
+      "ball_crop_dists_mean": null,
+      "full_rgb_psnr_db": null,
+      "wasb_inference_seconds": 315.6838809970068
+    },
+    "ordinary": {
+      "wasb_hit10": 0,
+      "wasb_hit5": 0,
+      "wasb_present_not_visible": 19,
+      "direct_hit10": null,
+      "direct_hit5": null,
+      "direct_present_not_visible": null,
+      "ball_crop_dists_mean": 0.23358614628131574,
+      "full_rgb_psnr_db": 25.239747821129384,
+      "wasb_inference_seconds": 316.53579600702506
+    },
+    "candidate": {
+      "wasb_hit10": 1,
+      "wasb_hit5": 1,
+      "wasb_present_not_visible": 22,
+      "direct_hit10": 18,
+      "direct_hit5": 15,
+      "direct_present_not_visible": 2,
+      "ball_crop_dists_mean": 0.2022343873977661,
+      "full_rgb_psnr_db": 25.159062545484137,
+      "wasb_inference_seconds": 315.42271699599223
+    }
+  },
+  "archive_sha256": "b59acca03385bda5ce7cc12a30ec05a12ddccf37b46e8de696e206f90a59b78f"
+}

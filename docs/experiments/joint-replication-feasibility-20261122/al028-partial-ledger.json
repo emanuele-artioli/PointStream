@@ -1,0 +1,24 @@
+{
+  "scope": "Already verified source-independent byte bill; no mask or outer joint framing and no claim of completed playback. Warm excludes both player references only; no hidden amortization.",
+  "ticks": 240,
+  "fps": 25,
+  "components_bytes": {
+    "frame": 11005,
+    "window": 2285,
+    "match": 0,
+    "reference": 155683,
+    "manifest": 625,
+    "ball_payload": 996
+  },
+  "cold_partial_bytes": 170594,
+  "cold_partial_kbps": 142.16166666666666,
+  "ideal_prewarmed_partial_bytes": 14911,
+  "ideal_prewarmed_partial_kbps": 12.425833333333333,
+  "missing": [
+    "generated-player mask encoding",
+    "any external joint/ball framing",
+    "actual receiver output and timing"
+  ],
+  "carrier_sha256": "3aa0bbd4bfc7cd2c479dc2ce8128144a24c96770c01ed9f19f55c77f0f0f525f",
+  "manifest_sha256": "d158ebbaa697aa502dd7f7e459e2daf7e3be93f8985d1d383dc410848621fa0f"
+}

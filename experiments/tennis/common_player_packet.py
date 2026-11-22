@@ -25,6 +25,8 @@ RECIPE = {'profile': PROFILE, 'guidance': 3.5, 'steps': 30, 'context': [24, 4],
           'crop_rule': [1.4, 90, 9], 'generation_size': [512, 784],
           'fallback': 'native-base', 'output': 'all-240', 'reference_codec': 'png',
           'base_to_canvas': 'RGB8-cv2-INTER_CUBIC'}
+# Separately identified native-cadence profile for 25 fps sources.
+RECIPE_25 = {**RECIPE, 'profile': 'common-tennis-player-25fps-v1', 'fps': [25, 1]}
 # JPEG quality is sender metadata, not a proof of the quantization tables.
 JPEG_RECIPES = {q: {**RECIPE, 'profile': 'common-tennis-player-jpeg-v1',
                     'reference_codec': 'jpeg', 'nominal_quality': q,
@@ -50,7 +52,8 @@ def _profile(profile: dict[str, Any]) -> None:
     jpeg = not native and any(wire.canonical(recipe) == wire.canonical(r) for r in JPEG_RECIPES.values())
     lossless = not native and wire.canonical(recipe) == wire.canonical(LOSSLESS_RECIPE)
     bound_reference = jpeg or lossless
-    if not bound_reference and wire.canonical(recipe) != wire.canonical(NATIVE_RECIPE if native else RECIPE):
+    allowed = (NATIVE_RECIPE,) if native else (RECIPE, RECIPE_25)
+    if not bound_reference and not any(wire.canonical(recipe) == wire.canonical(r) for r in allowed):
         raise ValueError('unsupported recipe')
     if set(profile) != keys | ({'reference_rgb_sha256'} if bound_reference else set()):
         raise ValueError('unsupported profile')
@@ -94,12 +97,12 @@ def verify_resources(profile: dict[str, Any], installed: dict[str, str]) -> None
         raise ValueError('installed resource identity mismatch')
 
 
-def _ivf(blob: bytes, width: int, height: int) -> None:
+def _ivf(blob: bytes, width: int, height: int, fps: tuple[int, int] = (50, 1)) -> None:
     """Validate IVF structure, not AV1 decoding or decoded pixels."""
     if len(blob) < 32:
         raise ValueError('truncated IVF')
     magic, version, header, codec, w, h, rate, scale, count, reserved = struct.unpack_from('<4sHH4sHHIIII', blob)
-    if (magic, version, header, codec, w, h, rate, scale, count, reserved) != (b'DKIF', 0, 32, b'AV01', width, height, 50, 1, 240, 0):
+    if (magic, version, header, codec, w, h, rate, scale, count, reserved) != (b'DKIF', 0, 32, b'AV01', width, height, *fps, 240, 0):
         raise ValueError('invalid native IVF header')
     pos = 32
     for tick in range(240):
@@ -317,7 +320,9 @@ def _decode(profile: dict[str, Any], sections: dict[str, bytes]) -> dict[str, An
     _profile(profile)
     if 'base' not in sections:
         raise ValueError('missing required section')
-    _ivf(sections['base'], *profile['coded_size'])
+    size = profile['coded_size']
+    fps = profile['recipe']['fps']
+    _ivf(sections['base'], size[0], size[1], (fps[0], fps[1]))
     if profile['mode'] == 'native_only':
         if set(sections) != {'base'}:
             raise ValueError('native-only packet has extra sections')

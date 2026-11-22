@@ -1,0 +1,5845 @@
+{
+  "means": {
+    "source": {
+      "whole": {
+        "energy": 0.5094135961335573,
+        "error": 0.0
+      },
+      "ball": {
+        "energy": 4.5857794632514315,
+        "error": 0.0
+      },
+      "p1": {
+        "energy": 8.086486836274466,
+        "error": 0.0
+      },
+      "p2": {
+        "energy": 8.954675475756327,
+        "error": 0.0
+      }
+    },
+    "plain": {
+      "whole": {
+        "energy": 0.155674366303817,
+        "error": 0.5701037861687369
+      },
+      "ball": {
+        "energy": 0.7272857522281507,
+        "error": 4.721857205033302
+      },
+      "p1": {
+        "energy": 3.0276150852441788,
+        "error": 8.915970305601755
+      },
+      "p2": {
+        "energy": 3.49209962785244,
+        "error": 10.18458741903305
+      }
+    },
+    "joint": {
+      "whole": {
+        "energy": 0.17031743199755456,
+        "error": 0.5988854528346321
+      },
+      "ball": {
+        "energy": 2.1078763008117676,
+        "error": 4.503366842865944
+      },
+      "p1": {
+        "energy": 9.721008062362671,
+        "error": 13.392207940419516
+      },
+      "p2": {
+        "energy": 12.37958006064097,
+        "error": 14.379078348477682
+      }
+    }
+  },
+  "rows": [
+    {
+      "tick": 1,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.4618665874004364
+    },
+    {
+      "tick": 1,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.5066244602203369,
+      "energy": 0.13368184864521027
+    },
+    {
+      "tick": 1,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.5282792448997498,
+      "energy": 0.11066232621669769
+    },
+    {
+      "tick": 2,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.318177729845047
+    },
+    {
+      "tick": 2,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.3382223844528198,
+      "energy": 0.059208448976278305
+    },
+    {
+      "tick": 2,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3788794279098511,
+      "energy": 0.0921299085021019
+    },
+    {
+      "tick": 3,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.30700716376304626
+    },
+    {
+      "tick": 3,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.32040131092071533,
+      "energy": 0.04875040054321289
+    },
+    {
+      "tick": 3,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3535338044166565,
+      "energy": 0.07637900859117508
+    },
+    {
+      "tick": 4,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.12074217200279236
+    },
+    {
+      "tick": 4,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.1321658045053482,
+      "energy": 0.027247728779911995
+    },
+    {
+      "tick": 4,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.1994384527206421,
+      "energy": 0.10397622734308243
+    },
+    {
+      "tick": 5,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2938250005245209
+    },
+    {
+      "tick": 5,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.3075435161590576,
+      "energy": 0.04962464049458504
+    },
+    {
+      "tick": 5,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3287992775440216,
+      "energy": 0.0621279738843441
+    },
+    {
+      "tick": 6,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.06134631484746933
+    },
+    {
+      "tick": 6,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.06759046763181686,
+      "energy": 0.017155664041638374
+    },
+    {
+      "tick": 6,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.09607456624507904,
+      "energy": 0.05443260446190834
+    },
+    {
+      "tick": 7,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.08150123804807663
+    },
+    {
+      "tick": 7,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.08739360421895981,
+      "energy": 0.018628107383847237
+    },
+    {
+      "tick": 7,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.1087656170129776,
+      "energy": 0.04727082699537277
+    },
+    {
+      "tick": 8,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2852117419242859
+    },
+    {
+      "tick": 8,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.3097509443759918,
+      "energy": 0.06492367386817932
+    },
+    {
+      "tick": 8,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3204999268054962,
+      "energy": 0.05885176733136177
+    },
+    {
+      "tick": 9,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3913222551345825
+    },
+    {
+      "tick": 9,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.41700491309165955,
+      "energy": 0.07736845314502716
+    },
+    {
+      "tick": 9,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.4250493347644806,
+      "energy": 0.05914422124624252
+    },
+    {
+      "tick": 10,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.21558117866516113
+    },
+    {
+      "tick": 10,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.22326193749904633,
+      "energy": 0.029763977974653244
+    },
+    {
+      "tick": 10,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.2516975998878479,
+      "energy": 0.05933438986539841
+    },
+    {
+      "tick": 10,
+      "region": "p1",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 3.9121510982513428
+    },
+    {
+      "tick": 10,
+      "region": "p1",
+      "arm": "plain",
+      "error": 4.096185207366943,
+      "energy": 0.8322581648826599
+    },
+    {
+      "tick": 10,
+      "region": "p1",
+      "arm": "joint",
+      "error": 6.290346145629883,
+      "energy": 4.070133686065674
+    },
+    {
+      "tick": 10,
+      "region": "p2",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 2.772615909576416
+    },
+    {
+      "tick": 10,
+      "region": "p2",
+      "arm": "plain",
+      "error": 3.1145286560058594,
+      "energy": 1.0061514377593994
+    },
+    {
+      "tick": 10,
+      "region": "p2",
+      "arm": "joint",
+      "error": 7.179747104644775,
+      "energy": 6.7277727127075195
+    },
+    {
+      "tick": 10,
+      "region": "ball",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 4.552669525146484
+    },
+    {
+      "tick": 10,
+      "region": "ball",
+      "arm": "plain",
+      "error": 4.6196675300598145,
+      "energy": 0.32552072405815125
+    },
+    {
+      "tick": 10,
+      "region": "ball",
+      "arm": "joint",
+      "error": 5.207853317260742,
+      "energy": 1.8839678764343262
+    },
+    {
+      "tick": 11,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.17844253778457642
+    },
+    {
+      "tick": 11,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.18545468151569366,
+      "energy": 0.02597629465162754
+    },
+    {
+      "tick": 11,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.22024179995059967,
+      "energy": 0.06320906430482864
+    },
+    {
+      "tick": 12,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.1342252790927887
+    },
+    {
+      "tick": 12,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.14441123604774475,
+      "energy": 0.02388588897883892
+    },
+    {
+      "tick": 12,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.16558118164539337,
+      "energy": 0.04583511874079704
+    },
+    {
+      "tick": 13,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3499560058116913
+    },
+    {
+      "tick": 13,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.3631093204021454,
+      "energy": 0.043008316308259964
+    },
+    {
+      "tick": 13,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3878077268600464,
+      "energy": 0.05842668563127518
+    },
+    {
+      "tick": 14,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.13590407371520996
+    },
+    {
+      "tick": 14,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.14204229414463043,
+      "energy": 0.02170678600668907
+    },
+    {
+      "tick": 14,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.17522934079170227,
+      "energy": 0.05657321587204933
+    },
+    {
+      "tick": 15,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3712315559387207
+    },
+    {
+      "tick": 15,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.3809221088886261,
+      "energy": 0.04343869164586067
+    },
+    {
+      "tick": 15,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.4118093252182007,
+      "energy": 0.061241697520017624
+    },
+    {
+      "tick": 16,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.11005483567714691
+    },
+    {
+      "tick": 16,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.139588862657547,
+      "energy": 0.04329311102628708
+    },
+    {
+      "tick": 16,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.15099671483039856,
+      "energy": 0.05147842317819595
+    },
+    {
+      "tick": 17,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3153988718986511
+    },
+    {
+      "tick": 17,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.34515929222106934,
+      "energy": 0.0670546442270279
+    },
+    {
+      "tick": 17,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3506905734539032,
+      "energy": 0.054787781089544296
+    },
+    {
+      "tick": 18,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.06685979664325714
+    },
+    {
+      "tick": 18,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.07839959859848022,
+      "energy": 0.021145271137356758
+    },
+    {
+      "tick": 18,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.10423128306865692,
+      "energy": 0.05013381317257881
+    },
+    {
+      "tick": 19,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.11995153874158859
+    },
+    {
+      "tick": 19,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.13373681902885437,
+      "energy": 0.027744099497795105
+    },
+    {
+      "tick": 19,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.1737959235906601,
+      "energy": 0.06828033179044724
+    },
+    {
+      "tick": 20,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.24929875135421753
+    },
+    {
+      "tick": 20,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.2693782150745392,
+      "energy": 0.04075712710618973
+    },
+    {
+      "tick": 20,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.32789871096611023,
+      "energy": 0.08951813727617264
+    },
+    {
+      "tick": 21,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.32444143295288086
+    },
+    {
+      "tick": 21,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.3347330689430237,
+      "energy": 0.03448434919118881
+    },
+    {
+      "tick": 21,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3749343156814575,
+      "energy": 0.06229476258158684
+    },
+    {
+      "tick": 22,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.255095899105072
+    },
+    {
+      "tick": 22,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.2604323625564575,
+      "energy": 0.02298830635845661
+    },
+    {
+      "tick": 22,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.30668896436691284,
+      "energy": 0.06361383944749832
+    },
+    {
+      "tick": 23,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3083895742893219
+    },
+    {
+      "tick": 23,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.31541910767555237,
+      "energy": 0.033070169389247894
+    },
+    {
+      "tick": 23,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3660354018211365,
+      "energy": 0.0724726989865303
+    },
+    {
+      "tick": 24,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2611612379550934
+    },
+    {
+      "tick": 24,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.275490939617157,
+      "energy": 0.04833165928721428
+    },
+    {
+      "tick": 24,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3379402458667755,
+      "energy": 0.09338455647230148
+    },
+    {
+      "tick": 25,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9260101914405823
+    },
+    {
+      "tick": 25,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.9479706883430481,
+      "energy": 0.11189521849155426
+    },
+    {
+      "tick": 25,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.0165761709213257,
+      "energy": 0.13109321892261505
+    },
+    {
+      "tick": 26,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.38116908073425293
+    },
+    {
+      "tick": 26,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.39344945549964905,
+      "energy": 0.06438405066728592
+    },
+    {
+      "tick": 26,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.4701206088066101,
+      "energy": 0.11398356407880783
+    },
+    {
+      "tick": 27,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.4119408428668976
+    },
+    {
+      "tick": 27,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.42735549807548523,
+      "energy": 0.0713658481836319
+    },
+    {
+      "tick": 27,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.48327457904815674,
+      "energy": 0.09554614871740341
+    },
+    {
+      "tick": 28,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2885845899581909
+    },
+    {
+      "tick": 28,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.3044039309024811,
+      "energy": 0.0524316281080246
+    },
+    {
+      "tick": 28,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.33832064270973206,
+      "energy": 0.06657576560974121
+    },
+    {
+      "tick": 29,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.23909710347652435
+    },
+    {
+      "tick": 29,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.25256651639938354,
+      "energy": 0.04487001895904541
+    },
+    {
+      "tick": 29,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.31401094794273376,
+      "energy": 0.09620121121406555
+    },
+    {
+      "tick": 30,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.27185216546058655
+    },
+    {
+      "tick": 30,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.2837326228618622,
+      "energy": 0.044383008033037186
+    },
+    {
+      "tick": 30,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3067006766796112,
+      "energy": 0.05628271773457527
+    },
+    {
+      "tick": 30,
+      "region": "p1",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 3.1608500480651855
+    },
+    {
+      "tick": 30,
+      "region": "p1",
+      "arm": "plain",
+      "error": 3.3946540355682373,
+      "energy": 1.042098045349121
+    },
+    {
+      "tick": 30,
+      "region": "p1",
+      "arm": "joint",
+      "error": 6.042397499084473,
+      "energy": 4.647899150848389
+    },
+    {
+      "tick": 30,
+      "region": "p2",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 2.9887661933898926
+    },
+    {
+      "tick": 30,
+      "region": "p2",
+      "arm": "plain",
+      "error": 3.2339255809783936,
+      "energy": 0.7876086831092834
+    },
+    {
+      "tick": 30,
+      "region": "p2",
+      "arm": "joint",
+      "error": 7.72739839553833,
+      "energy": 6.918622970581055
+    },
+    {
+      "tick": 30,
+      "region": "ball",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 8.796419143676758
+    },
+    {
+      "tick": 30,
+      "region": "ball",
+      "arm": "plain",
+      "error": 8.943660736083984,
+      "energy": 0.7990119457244873
+    },
+    {
+      "tick": 30,
+      "region": "ball",
+      "arm": "joint",
+      "error": 10.233424186706543,
+      "energy": 1.9638125896453857
+    },
+    {
+      "tick": 31,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3406904339790344
+    },
+    {
+      "tick": 31,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.35367900133132935,
+      "energy": 0.05143236368894577
+    },
+    {
+      "tick": 31,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.4197283387184143,
+      "energy": 0.10579711198806763
+    },
+    {
+      "tick": 32,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.1343734860420227
+    },
+    {
+      "tick": 32,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.1801661103963852,
+      "energy": 0.06696604937314987
+    },
+    {
+      "tick": 32,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.20226523280143738,
+      "energy": 0.0866902694106102
+    },
+    {
+      "tick": 33,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.38299310207366943
+    },
+    {
+      "tick": 33,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.41948357224464417,
+      "energy": 0.0937468484044075
+    },
+    {
+      "tick": 33,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.44292157888412476,
+      "energy": 0.09112027287483215
+    },
+    {
+      "tick": 34,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3863580822944641
+    },
+    {
+      "tick": 34,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.4054557979106903,
+      "energy": 0.06294060498476028
+    },
+    {
+      "tick": 34,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.4339911937713623,
+      "energy": 0.07328275591135025
+    },
+    {
+      "tick": 35,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.37408536672592163
+    },
+    {
+      "tick": 35,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.3930279016494751,
+      "energy": 0.06488873809576035
+    },
+    {
+      "tick": 35,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.41923344135284424,
+      "energy": 0.07382699847221375
+    },
+    {
+      "tick": 36,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.25651270151138306
+    },
+    {
+      "tick": 36,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.2717663049697876,
+      "energy": 0.04463904723525047
+    },
+    {
+      "tick": 36,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.2993045449256897,
+      "energy": 0.07031398266553879
+    },
+    {
+      "tick": 37,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.23931582272052765
+    },
+    {
+      "tick": 37,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.2530536353588104,
+      "energy": 0.03770490363240242
+    },
+    {
+      "tick": 37,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.27854785323143005,
+      "energy": 0.07210472226142883
+    },
+    {
+      "tick": 38,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2575797438621521
+    },
+    {
+      "tick": 38,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.2702782452106476,
+      "energy": 0.038877297192811966
+    },
+    {
+      "tick": 38,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.31010329723358154,
+      "energy": 0.08993270248174667
+    },
+    {
+      "tick": 39,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.21061654388904572
+    },
+    {
+      "tick": 39,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.21950727701187134,
+      "energy": 0.03199104592204094
+    },
+    {
+      "tick": 39,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.2504035532474518,
+      "energy": 0.0796918198466301
+    },
+    {
+      "tick": 40,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.1496647745370865
+    },
+    {
+      "tick": 40,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.15914051234722137,
+      "energy": 0.03224709630012512
+    },
+    {
+      "tick": 40,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.20724473893642426,
+      "energy": 0.09232160449028015
+    },
+    {
+      "tick": 41,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2726902961730957
+    },
+    {
+      "tick": 41,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.282753586769104,
+      "energy": 0.038356997072696686
+    },
+    {
+      "tick": 41,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.32549071311950684,
+      "energy": 0.09948442131280899
+    },
+    {
+      "tick": 42,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.16699859499931335
+    },
+    {
+      "tick": 42,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.17407600581645966,
+      "energy": 0.030069217085838318
+    },
+    {
+      "tick": 42,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.21932044625282288,
+      "energy": 0.10287515819072723
+    },
+    {
+      "tick": 43,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.21356581151485443
+    },
+    {
+      "tick": 43,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.22115735709667206,
+      "energy": 0.033784087747335434
+    },
+    {
+      "tick": 43,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.28086966276168823,
+      "energy": 0.115451380610466
+    },
+    {
+      "tick": 44,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.1767268031835556
+    },
+    {
+      "tick": 44,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.18344543874263763,
+      "energy": 0.028628887608647346
+    },
+    {
+      "tick": 44,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.2701473832130432,
+      "energy": 0.1392313688993454
+    },
+    {
+      "tick": 45,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2691648602485657
+    },
+    {
+      "tick": 45,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.2750481963157654,
+      "energy": 0.03553173691034317
+    },
+    {
+      "tick": 45,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.35509464144706726,
+      "energy": 0.1380033940076828
+    },
+    {
+      "tick": 46,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.21536941826343536
+    },
+    {
+      "tick": 46,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.22340455651283264,
+      "energy": 0.03314720094203949
+    },
+    {
+      "tick": 46,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.2825164794921875,
+      "energy": 0.11395606398582458
+    },
+    {
+      "tick": 47,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.23711605370044708
+    },
+    {
+      "tick": 47,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.24954846501350403,
+      "energy": 0.036113619804382324
+    },
+    {
+      "tick": 47,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3001866340637207,
+      "energy": 0.1094118282198906
+    },
+    {
+      "tick": 48,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.14176985621452332
+    },
+    {
+      "tick": 48,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.16474515199661255,
+      "energy": 0.04767607897520065
+    },
+    {
+      "tick": 48,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.2106594294309616,
+      "energy": 0.1156170517206192
+    },
+    {
+      "tick": 49,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.7354534864425659
+    },
+    {
+      "tick": 49,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.7667611837387085,
+      "energy": 0.09360015392303467
+    },
+    {
+      "tick": 49,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.7997053265571594,
+      "energy": 0.11084561049938202
+    },
+    {
+      "tick": 50,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.495564341545105
+    },
+    {
+      "tick": 50,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.5125477910041809,
+      "energy": 0.06318525224924088
+    },
+    {
+      "tick": 50,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.5458400249481201,
+      "energy": 0.10123782604932785
+    },
+    {
+      "tick": 50,
+      "region": "p1",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 6.522109031677246
+    },
+    {
+      "tick": 50,
+      "region": "p1",
+      "arm": "plain",
+      "error": 7.337064743041992,
+      "energy": 2.6370530128479004
+    },
+    {
+      "tick": 50,
+      "region": "p1",
+      "arm": "joint",
+      "error": 11.344865798950195,
+      "energy": 8.857654571533203
+    },
+    {
+      "tick": 50,
+      "region": "p2",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 4.9928178787231445
+    },
+    {
+      "tick": 50,
+      "region": "p2",
+      "arm": "plain",
+      "error": 5.427745342254639,
+      "energy": 1.3641877174377441
+    },
+    {
+      "tick": 50,
+      "region": "p2",
+      "arm": "joint",
+      "error": 7.72881555557251,
+      "energy": 5.753876209259033
+    },
+    {
+      "tick": 50,
+      "region": "ball",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 4.191929817199707
+    },
+    {
+      "tick": 50,
+      "region": "ball",
+      "arm": "plain",
+      "error": 4.370488166809082,
+      "energy": 0.9801095724105835
+    },
+    {
+      "tick": 50,
+      "region": "ball",
+      "arm": "joint",
+      "error": 2.8432765007019043,
+      "energy": 3.54374361038208
+    },
+    {
+      "tick": 51,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.20781362056732178
+    },
+    {
+      "tick": 51,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.22519885003566742,
+      "energy": 0.05399535968899727
+    },
+    {
+      "tick": 51,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.2763926088809967,
+      "energy": 0.11890771985054016
+    },
+    {
+      "tick": 52,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.14887376129627228
+    },
+    {
+      "tick": 52,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.17024220526218414,
+      "energy": 0.053120844066143036
+    },
+    {
+      "tick": 52,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.2141600102186203,
+      "energy": 0.11740365624427795
+    },
+    {
+      "tick": 53,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.16586996614933014
+    },
+    {
+      "tick": 53,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.1868169605731964,
+      "energy": 0.05114886909723282
+    },
+    {
+      "tick": 53,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.21278667449951172,
+      "energy": 0.09558949619531631
+    },
+    {
+      "tick": 54,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2632102370262146
+    },
+    {
+      "tick": 54,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.2763510048389435,
+      "energy": 0.04976018890738487
+    },
+    {
+      "tick": 54,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3288845419883728,
+      "energy": 0.12334075570106506
+    },
+    {
+      "tick": 55,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2833974063396454
+    },
+    {
+      "tick": 55,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.29672685265541077,
+      "energy": 0.054369471967220306
+    },
+    {
+      "tick": 55,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3252916634082794,
+      "energy": 0.09998954832553864
+    },
+    {
+      "tick": 56,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.21102088689804077
+    },
+    {
+      "tick": 56,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.23216262459754944,
+      "energy": 0.05888416990637779
+    },
+    {
+      "tick": 56,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.24417829513549805,
+      "energy": 0.08654505014419556
+    },
+    {
+      "tick": 57,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2223871797323227
+    },
+    {
+      "tick": 57,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.2539491057395935,
+      "energy": 0.07527922093868256
+    },
+    {
+      "tick": 57,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.2687809467315674,
+      "energy": 0.11026684939861298
+    },
+    {
+      "tick": 58,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.20133887231349945
+    },
+    {
+      "tick": 58,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.2178913652896881,
+      "energy": 0.05896047130227089
+    },
+    {
+      "tick": 58,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.268343448638916,
+      "energy": 0.13788184523582458
+    },
+    {
+      "tick": 59,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.20200122892856598
+    },
+    {
+      "tick": 59,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.21784260869026184,
+      "energy": 0.06010323390364647
+    },
+    {
+      "tick": 59,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.2684084475040436,
+      "energy": 0.12784400582313538
+    },
+    {
+      "tick": 60,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2057553231716156
+    },
+    {
+      "tick": 60,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.22493642568588257,
+      "energy": 0.0633421465754509
+    },
+    {
+      "tick": 60,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.272207647562027,
+      "energy": 0.12348585575819016
+    },
+    {
+      "tick": 61,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3052191734313965
+    },
+    {
+      "tick": 61,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.3239823281764984,
+      "energy": 0.07254453003406525
+    },
+    {
+      "tick": 61,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3770376443862915,
+      "energy": 0.131638303399086
+    },
+    {
+      "tick": 62,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2652735114097595
+    },
+    {
+      "tick": 62,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.2871628701686859,
+      "energy": 0.06993721425533295
+    },
+    {
+      "tick": 62,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3164222836494446,
+      "energy": 0.10920876264572144
+    },
+    {
+      "tick": 63,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3690130114555359
+    },
+    {
+      "tick": 63,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.39787188172340393,
+      "energy": 0.09099803119897842
+    },
+    {
+      "tick": 63,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.4252663850784302,
+      "energy": 0.11310065537691116
+    },
+    {
+      "tick": 64,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2420652061700821
+    },
+    {
+      "tick": 64,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.2940290570259094,
+      "energy": 0.09524117410182953
+    },
+    {
+      "tick": 64,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.34164857864379883,
+      "energy": 0.15787996351718903
+    },
+    {
+      "tick": 65,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.5162507891654968
+    },
+    {
+      "tick": 65,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.5805936455726624,
+      "energy": 0.1468634009361267
+    },
+    {
+      "tick": 65,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.573548436164856,
+      "energy": 0.11411948502063751
+    },
+    {
+      "tick": 66,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.38778841495513916
+    },
+    {
+      "tick": 66,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.41750603914260864,
+      "energy": 0.08248776942491531
+    },
+    {
+      "tick": 66,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.44990429282188416,
+      "energy": 0.10460866242647171
+    },
+    {
+      "tick": 67,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.37502628564834595
+    },
+    {
+      "tick": 67,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.40287280082702637,
+      "energy": 0.07854776829481125
+    },
+    {
+      "tick": 67,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.41568174958229065,
+      "energy": 0.08439266681671143
+    },
+    {
+      "tick": 68,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.4303044378757477
+    },
+    {
+      "tick": 68,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.46432653069496155,
+      "energy": 0.10759197920560837
+    },
+    {
+      "tick": 68,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.4701288640499115,
+      "energy": 0.08567877858877182
+    },
+    {
+      "tick": 69,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.5321474671363831
+    },
+    {
+      "tick": 69,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.5663365125656128,
+      "energy": 0.12008649110794067
+    },
+    {
+      "tick": 69,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.5842574834823608,
+      "energy": 0.10566159337759018
+    },
+    {
+      "tick": 70,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.33915749192237854
+    },
+    {
+      "tick": 70,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.3597896695137024,
+      "energy": 0.07653699815273285
+    },
+    {
+      "tick": 70,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3976461589336395,
+      "energy": 0.11403774470090866
+    },
+    {
+      "tick": 70,
+      "region": "p1",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 11.57990550994873
+    },
+    {
+      "tick": 70,
+      "region": "p1",
+      "arm": "plain",
+      "error": 11.77082347869873,
+      "energy": 2.303704261779785
+    },
+    {
+      "tick": 70,
+      "region": "p1",
+      "arm": "joint",
+      "error": 18.07814598083496,
+      "energy": 11.812190055847168
+    },
+    {
+      "tick": 70,
+      "region": "p2",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 8.16753101348877
+    },
+    {
+      "tick": 70,
+      "region": "p2",
+      "arm": "plain",
+      "error": 8.430468559265137,
+      "energy": 3.5705082416534424
+    },
+    {
+      "tick": 70,
+      "region": "p2",
+      "arm": "joint",
+      "error": 11.371171951293945,
+      "energy": 9.644974708557129
+    },
+    {
+      "tick": 70,
+      "region": "ball",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9968850016593933
+    },
+    {
+      "tick": 70,
+      "region": "ball",
+      "arm": "plain",
+      "error": 0.9967700839042664,
+      "energy": 0.0005745887756347656
+    },
+    {
+      "tick": 70,
+      "region": "ball",
+      "arm": "joint",
+      "error": 0.9013686776161194,
+      "energy": 0.3100038468837738
+    },
+    {
+      "tick": 71,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.4157944321632385
+    },
+    {
+      "tick": 71,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.43902668356895447,
+      "energy": 0.08481541275978088
+    },
+    {
+      "tick": 71,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.4844095706939697,
+      "energy": 0.12650786340236664
+    },
+    {
+      "tick": 72,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.26022475957870483
+    },
+    {
+      "tick": 72,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.29476991295814514,
+      "energy": 0.07742905616760254
+    },
+    {
+      "tick": 72,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.32511135935783386,
+      "energy": 0.11411340534687042
+    },
+    {
+      "tick": 73,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3359019160270691
+    },
+    {
+      "tick": 73,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.3866787552833557,
+      "energy": 0.1042991653084755
+    },
+    {
+      "tick": 73,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.4244070053100586,
+      "energy": 0.1434551179409027
+    },
+    {
+      "tick": 74,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2990511953830719
+    },
+    {
+      "tick": 74,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.34502214193344116,
+      "energy": 0.09935833513736725
+    },
+    {
+      "tick": 74,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.36602672934532166,
+      "energy": 0.11873845010995865
+    },
+    {
+      "tick": 75,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.4571465253829956
+    },
+    {
+      "tick": 75,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.509553074836731,
+      "energy": 0.14064106345176697
+    },
+    {
+      "tick": 75,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.529135525226593,
+      "energy": 0.13270758092403412
+    },
+    {
+      "tick": 76,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3372006416320801
+    },
+    {
+      "tick": 76,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.3989558517932892,
+      "energy": 0.13928939402103424
+    },
+    {
+      "tick": 76,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.4117516577243805,
+      "energy": 0.13970595598220825
+    },
+    {
+      "tick": 77,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.4339195489883423
+    },
+    {
+      "tick": 77,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.4660062789916992,
+      "energy": 0.09380021691322327
+    },
+    {
+      "tick": 77,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.5292682647705078,
+      "energy": 0.16420504450798035
+    },
+    {
+      "tick": 78,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.4641246497631073
+    },
+    {
+      "tick": 78,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.5090134739875793,
+      "energy": 0.12351680546998978
+    },
+    {
+      "tick": 78,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.5876076221466064,
+      "energy": 0.19647686183452606
+    },
+    {
+      "tick": 79,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.4527204930782318
+    },
+    {
+      "tick": 79,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.5059038400650024,
+      "energy": 0.13289575278759003
+    },
+    {
+      "tick": 79,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.5361271500587463,
+      "energy": 0.1550251543521881
+    },
+    {
+      "tick": 80,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.27740663290023804
+    },
+    {
+      "tick": 80,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.3514992892742157,
+      "energy": 0.13051855564117432
+    },
+    {
+      "tick": 80,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3943145275115967,
+      "energy": 0.18800361454486847
+    },
+    {
+      "tick": 81,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3923596739768982
+    },
+    {
+      "tick": 81,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.4481346905231476,
+      "energy": 0.12636630237102509
+    },
+    {
+      "tick": 81,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.5026264786720276,
+      "energy": 0.18100371956825256
+    },
+    {
+      "tick": 82,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.33253213763237
+    },
+    {
+      "tick": 82,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.35812026262283325,
+      "energy": 0.0883607491850853
+    },
+    {
+      "tick": 82,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.4328248202800751,
+      "energy": 0.1839117407798767
+    },
+    {
+      "tick": 83,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3693264424800873
+    },
+    {
+      "tick": 83,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.39411208033561707,
+      "energy": 0.10087310522794724
+    },
+    {
+      "tick": 83,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.4743407666683197,
+      "energy": 0.18939241766929626
+    },
+    {
+      "tick": 84,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3882094621658325
+    },
+    {
+      "tick": 84,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.41316792368888855,
+      "energy": 0.10534733533859253
+    },
+    {
+      "tick": 84,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.48774996399879456,
+      "energy": 0.1711120456457138
+    },
+    {
+      "tick": 85,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.46704375743865967
+    },
+    {
+      "tick": 85,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.5062891840934753,
+      "energy": 0.13397400081157684
+    },
+    {
+      "tick": 85,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.562621533870697,
+      "energy": 0.15699632465839386
+    },
+    {
+      "tick": 86,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3958722949028015
+    },
+    {
+      "tick": 86,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.4329674541950226,
+      "energy": 0.12290321290493011
+    },
+    {
+      "tick": 86,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.47733819484710693,
+      "energy": 0.14417105913162231
+    },
+    {
+      "tick": 87,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.29262858629226685
+    },
+    {
+      "tick": 87,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.32881754636764526,
+      "energy": 0.09356482326984406
+    },
+    {
+      "tick": 87,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3529869019985199,
+      "energy": 0.11694502085447311
+    },
+    {
+      "tick": 88,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2128019779920578
+    },
+    {
+      "tick": 88,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.27096813917160034,
+      "energy": 0.11227033287286758
+    },
+    {
+      "tick": 88,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.29826271533966064,
+      "energy": 0.14123086631298065
+    },
+    {
+      "tick": 89,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.41271787881851196
+    },
+    {
+      "tick": 89,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.44848793745040894,
+      "energy": 0.09315292537212372
+    },
+    {
+      "tick": 89,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.5174689292907715,
+      "energy": 0.1623779833316803
+    },
+    {
+      "tick": 90,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.29162847995758057
+    },
+    {
+      "tick": 90,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.31188303232192993,
+      "energy": 0.05676793307065964
+    },
+    {
+      "tick": 90,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.38941240310668945,
+      "energy": 0.15092721581459045
+    },
+    {
+      "tick": 90,
+      "region": "p1",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 6.865218639373779
+    },
+    {
+      "tick": 90,
+      "region": "p1",
+      "arm": "plain",
+      "error": 7.885023593902588,
+      "energy": 2.4735403060913086
+    },
+    {
+      "tick": 90,
+      "region": "p1",
+      "arm": "joint",
+      "error": 14.659160614013672,
+      "energy": 11.00106430053711
+    },
+    {
+      "tick": 90,
+      "region": "p2",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 7.95912504196167
+    },
+    {
+      "tick": 90,
+      "region": "p2",
+      "arm": "plain",
+      "error": 9.009126663208008,
+      "energy": 3.37239146232605
+    },
+    {
+      "tick": 90,
+      "region": "p2",
+      "arm": "joint",
+      "error": 14.270588874816895,
+      "energy": 11.27750015258789
+    },
+    {
+      "tick": 90,
+      "region": "ball",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 2.7012734413146973
+    },
+    {
+      "tick": 90,
+      "region": "ball",
+      "arm": "plain",
+      "error": 2.7449746131896973,
+      "energy": 0.25510334968566895
+    },
+    {
+      "tick": 90,
+      "region": "ball",
+      "arm": "joint",
+      "error": 3.048671007156372,
+      "energy": 1.652262806892395
+    },
+    {
+      "tick": 91,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2961139976978302
+    },
+    {
+      "tick": 91,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.3110738694667816,
+      "energy": 0.052333083003759384
+    },
+    {
+      "tick": 91,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3988192081451416,
+      "energy": 0.1666058748960495
+    },
+    {
+      "tick": 92,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3425474166870117
+    },
+    {
+      "tick": 92,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.36203765869140625,
+      "energy": 0.06493348628282547
+    },
+    {
+      "tick": 92,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.4212281107902527,
+      "energy": 0.13697832822799683
+    },
+    {
+      "tick": 93,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3838707208633423
+    },
+    {
+      "tick": 93,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.39646416902542114,
+      "energy": 0.05627697333693504
+    },
+    {
+      "tick": 93,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.45493608713150024,
+      "energy": 0.13918687403202057
+    },
+    {
+      "tick": 94,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.29554998874664307
+    },
+    {
+      "tick": 94,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.30872195959091187,
+      "energy": 0.05513930693268776
+    },
+    {
+      "tick": 94,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.34438827633857727,
+      "energy": 0.11585021764039993
+    },
+    {
+      "tick": 95,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.21123479306697845
+    },
+    {
+      "tick": 95,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.22758814692497253,
+      "energy": 0.05628439411520958
+    },
+    {
+      "tick": 95,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.28463563323020935,
+      "energy": 0.14834195375442505
+    },
+    {
+      "tick": 96,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.17481106519699097
+    },
+    {
+      "tick": 96,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.2449028342962265,
+      "energy": 0.10851617157459259
+    },
+    {
+      "tick": 96,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.23187188804149628,
+      "energy": 0.11989089101552963
+    },
+    {
+      "tick": 97,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.4175775349140167
+    },
+    {
+      "tick": 97,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.4939247667789459,
+      "energy": 0.13292354345321655
+    },
+    {
+      "tick": 97,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.5486754775047302,
+      "energy": 0.20844945311546326
+    },
+    {
+      "tick": 98,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2651396095752716
+    },
+    {
+      "tick": 98,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.295215368270874,
+      "energy": 0.07108781486749649
+    },
+    {
+      "tick": 98,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.30930498242378235,
+      "energy": 0.10777158290147781
+    },
+    {
+      "tick": 99,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2471417486667633
+    },
+    {
+      "tick": 99,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.2733416259288788,
+      "energy": 0.06979654729366302
+    },
+    {
+      "tick": 99,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3063911199569702,
+      "energy": 0.1163845807313919
+    },
+    {
+      "tick": 100,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.22112463414669037
+    },
+    {
+      "tick": 100,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.2476915866136551,
+      "energy": 0.0685487613081932
+    },
+    {
+      "tick": 100,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.29981765151023865,
+      "energy": 0.13515421748161316
+    },
+    {
+      "tick": 101,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.21654358506202698
+    },
+    {
+      "tick": 101,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.24479913711547852,
+      "energy": 0.06984062492847443
+    },
+    {
+      "tick": 101,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.30277708172798157,
+      "energy": 0.13461482524871826
+    },
+    {
+      "tick": 102,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.20679305493831635
+    },
+    {
+      "tick": 102,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.23042002320289612,
+      "energy": 0.060001492500305176
+    },
+    {
+      "tick": 102,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.2674678862094879,
+      "energy": 0.10486999899148941
+    },
+    {
+      "tick": 103,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.1933853030204773
+    },
+    {
+      "tick": 103,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.21843890845775604,
+      "energy": 0.05806492641568184
+    },
+    {
+      "tick": 103,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.262192964553833,
+      "energy": 0.11453647911548615
+    },
+    {
+      "tick": 104,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.13747109472751617
+    },
+    {
+      "tick": 104,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.17304667830467224,
+      "energy": 0.06824027001857758
+    },
+    {
+      "tick": 104,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.25237539410591125,
+      "energy": 0.1609162986278534
+    },
+    {
+      "tick": 105,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.20301216840744019
+    },
+    {
+      "tick": 105,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.23472177982330322,
+      "energy": 0.07284010946750641
+    },
+    {
+      "tick": 105,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.32075464725494385,
+      "energy": 0.16886268556118011
+    },
+    {
+      "tick": 106,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.16260504722595215
+    },
+    {
+      "tick": 106,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.18428176641464233,
+      "energy": 0.05912436544895172
+    },
+    {
+      "tick": 106,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.2256021499633789,
+      "energy": 0.1183829978108406
+    },
+    {
+      "tick": 107,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.159942165017128
+    },
+    {
+      "tick": 107,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.1811131089925766,
+      "energy": 0.061810754239559174
+    },
+    {
+      "tick": 107,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.2274027168750763,
+      "energy": 0.11523561924695969
+    },
+    {
+      "tick": 108,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.14536821842193604
+    },
+    {
+      "tick": 108,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.17073257267475128,
+      "energy": 0.06863117963075638
+    },
+    {
+      "tick": 108,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.2096034735441208,
+      "energy": 0.11119422316551208
+    },
+    {
+      "tick": 109,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.24986782670021057
+    },
+    {
+      "tick": 109,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.27311038970947266,
+      "energy": 0.07709896564483643
+    },
+    {
+      "tick": 109,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.299204021692276,
+      "energy": 0.10086631774902344
+    },
+    {
+      "tick": 110,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2521928548812866
+    },
+    {
+      "tick": 110,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.2715984880924225,
+      "energy": 0.07330368459224701
+    },
+    {
+      "tick": 110,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3004920184612274,
+      "energy": 0.10892748832702637
+    },
+    {
+      "tick": 110,
+      "region": "p1",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 13.928346633911133
+    },
+    {
+      "tick": 110,
+      "region": "p1",
+      "arm": "plain",
+      "error": 13.168414115905762,
+      "energy": 4.052387714385986
+    },
+    {
+      "tick": 110,
+      "region": "p1",
+      "arm": "joint",
+      "error": 18.62531089782715,
+      "energy": 10.795036315917969
+    },
+    {
+      "tick": 110,
+      "region": "p2",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 10.481749534606934
+    },
+    {
+      "tick": 110,
+      "region": "p2",
+      "arm": "plain",
+      "error": 12.838637351989746,
+      "energy": 5.544510364532471
+    },
+    {
+      "tick": 110,
+      "region": "p2",
+      "arm": "joint",
+      "error": 15.913187026977539,
+      "energy": 12.967314720153809
+    },
+    {
+      "tick": 110,
+      "region": "ball",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 2.1531996726989746
+    },
+    {
+      "tick": 110,
+      "region": "ball",
+      "arm": "plain",
+      "error": 2.166369915008545,
+      "energy": 0.1394789069890976
+    },
+    {
+      "tick": 110,
+      "region": "ball",
+      "arm": "joint",
+      "error": 2.47330641746521,
+      "energy": 2.2918202877044678
+    },
+    {
+      "tick": 111,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.25479987263679504
+    },
+    {
+      "tick": 111,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.2763476073741913,
+      "energy": 0.07112646847963333
+    },
+    {
+      "tick": 111,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.2923263609409332,
+      "energy": 0.135368213057518
+    },
+    {
+      "tick": 112,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.17497903108596802
+    },
+    {
+      "tick": 112,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.23196247220039368,
+      "energy": 0.09703277051448822
+    },
+    {
+      "tick": 112,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.26135775446891785,
+      "energy": 0.15790854394435883
+    },
+    {
+      "tick": 113,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9078541994094849
+    },
+    {
+      "tick": 113,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.9520484209060669,
+      "energy": 0.1313282996416092
+    },
+    {
+      "tick": 113,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.97394859790802,
+      "energy": 0.19354163110256195
+    },
+    {
+      "tick": 114,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.5690606832504272
+    },
+    {
+      "tick": 114,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.6026806235313416,
+      "energy": 0.10764556378126144
+    },
+    {
+      "tick": 114,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.6039941906929016,
+      "energy": 0.10738074034452438
+    },
+    {
+      "tick": 115,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.5723257064819336
+    },
+    {
+      "tick": 115,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.6073001027107239,
+      "energy": 0.11564028263092041
+    },
+    {
+      "tick": 115,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.6316782236099243,
+      "energy": 0.12951044738292694
+    },
+    {
+      "tick": 116,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.7010071873664856
+    },
+    {
+      "tick": 116,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.7482234835624695,
+      "energy": 0.15490692853927612
+    },
+    {
+      "tick": 116,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.7626076340675354,
+      "energy": 0.14299646019935608
+    },
+    {
+      "tick": 117,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.5717245936393738
+    },
+    {
+      "tick": 117,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.6201827526092529,
+      "energy": 0.15381450951099396
+    },
+    {
+      "tick": 117,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.6483573317527771,
+      "energy": 0.15248088538646698
+    },
+    {
+      "tick": 118,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.6535290479660034
+    },
+    {
+      "tick": 118,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.7043660283088684,
+      "energy": 0.16015365719795227
+    },
+    {
+      "tick": 118,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.7182402610778809,
+      "energy": 0.14895613491535187
+    },
+    {
+      "tick": 119,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.4905487596988678
+    },
+    {
+      "tick": 119,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.5365856289863586,
+      "energy": 0.1299094408750534
+    },
+    {
+      "tick": 119,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.5517734885215759,
+      "energy": 0.13906079530715942
+    },
+    {
+      "tick": 120,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.21966992318630219
+    },
+    {
+      "tick": 120,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.2677063047885895,
+      "energy": 0.09337475150823593
+    },
+    {
+      "tick": 120,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3185543715953827,
+      "energy": 0.15262015163898468
+    },
+    {
+      "tick": 121,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3108917772769928
+    },
+    {
+      "tick": 121,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.38015323877334595,
+      "energy": 0.12662994861602783
+    },
+    {
+      "tick": 121,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.4051060378551483,
+      "energy": 0.15471383929252625
+    },
+    {
+      "tick": 122,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2795954644680023
+    },
+    {
+      "tick": 122,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.3119172155857086,
+      "energy": 0.07496225833892822
+    },
+    {
+      "tick": 122,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.35069069266319275,
+      "energy": 0.13048073649406433
+    },
+    {
+      "tick": 123,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2588246762752533
+    },
+    {
+      "tick": 123,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.28598716855049133,
+      "energy": 0.07050368189811707
+    },
+    {
+      "tick": 123,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3061540722846985,
+      "energy": 0.1161867156624794
+    },
+    {
+      "tick": 124,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.271820604801178
+    },
+    {
+      "tick": 124,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.3031204044818878,
+      "energy": 0.0829726830124855
+    },
+    {
+      "tick": 124,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3609296381473541,
+      "energy": 0.15547429025173187
+    },
+    {
+      "tick": 125,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3042851388454437
+    },
+    {
+      "tick": 125,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.34247249364852905,
+      "energy": 0.0937102735042572
+    },
+    {
+      "tick": 125,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3644736409187317,
+      "energy": 0.12043828517198563
+    },
+    {
+      "tick": 126,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2766183018684387
+    },
+    {
+      "tick": 126,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.31498438119888306,
+      "energy": 0.08716917783021927
+    },
+    {
+      "tick": 126,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3318767547607422,
+      "energy": 0.12519830465316772
+    },
+    {
+      "tick": 127,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3328186571598053
+    },
+    {
+      "tick": 127,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.381144642829895,
+      "energy": 0.10263516753911972
+    },
+    {
+      "tick": 127,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3915470838546753,
+      "energy": 0.11943545192480087
+    },
+    {
+      "tick": 128,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.23044081032276154
+    },
+    {
+      "tick": 128,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.3254697620868683,
+      "energy": 0.15083570778369904
+    },
+    {
+      "tick": 128,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.350143164396286,
+      "energy": 0.1746578961610794
+    },
+    {
+      "tick": 129,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.7231651544570923
+    },
+    {
+      "tick": 129,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.8541581630706787,
+      "energy": 0.28515422344207764
+    },
+    {
+      "tick": 129,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.9157466292381287,
+      "energy": 0.36161208152770996
+    },
+    {
+      "tick": 130,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.6519334316253662
+    },
+    {
+      "tick": 130,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.7274055480957031,
+      "energy": 0.17951224744319916
+    },
+    {
+      "tick": 130,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.7127952575683594,
+      "energy": 0.147832453250885
+    },
+    {
+      "tick": 130,
+      "region": "p1",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 6.799233913421631
+    },
+    {
+      "tick": 130,
+      "region": "p1",
+      "arm": "plain",
+      "error": 9.59535026550293,
+      "energy": 4.939616680145264
+    },
+    {
+      "tick": 130,
+      "region": "p1",
+      "arm": "joint",
+      "error": 11.594039916992188,
+      "energy": 9.200209617614746
+    },
+    {
+      "tick": 130,
+      "region": "p2",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 10.795955657958984
+    },
+    {
+      "tick": 130,
+      "region": "p2",
+      "arm": "plain",
+      "error": 15.837591171264648,
+      "energy": 7.556490898132324
+    },
+    {
+      "tick": 130,
+      "region": "p2",
+      "arm": "joint",
+      "error": 18.10553741455078,
+      "energy": 15.005036354064941
+    },
+    {
+      "tick": 130,
+      "region": "ball",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 14.325868606567383
+    },
+    {
+      "tick": 130,
+      "region": "ball",
+      "arm": "plain",
+      "error": 15.181640625,
+      "energy": 4.059917449951172
+    },
+    {
+      "tick": 130,
+      "region": "ball",
+      "arm": "joint",
+      "error": 12.40489673614502,
+      "energy": 4.4419450759887695
+    },
+    {
+      "tick": 131,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.6006370782852173
+    },
+    {
+      "tick": 131,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.6616464853286743,
+      "energy": 0.17762629687786102
+    },
+    {
+      "tick": 131,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.6745961904525757,
+      "energy": 0.1683262586593628
+    },
+    {
+      "tick": 132,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3694800138473511
+    },
+    {
+      "tick": 132,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.41437894105911255,
+      "energy": 0.12269800901412964
+    },
+    {
+      "tick": 132,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.46404850482940674,
+      "energy": 0.158194437623024
+    },
+    {
+      "tick": 133,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.43408799171447754
+    },
+    {
+      "tick": 133,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.4808025360107422,
+      "energy": 0.13473819196224213
+    },
+    {
+      "tick": 133,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.52958744764328,
+      "energy": 0.16447126865386963
+    },
+    {
+      "tick": 134,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.6703776717185974
+    },
+    {
+      "tick": 134,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.7240267395973206,
+      "energy": 0.1862841546535492
+    },
+    {
+      "tick": 134,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.7530071139335632,
+      "energy": 0.1652156561613083
+    },
+    {
+      "tick": 135,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.6428925395011902
+    },
+    {
+      "tick": 135,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.722669780254364,
+      "energy": 0.20892766118049622
+    },
+    {
+      "tick": 135,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.7466078400611877,
+      "energy": 0.18382279574871063
+    },
+    {
+      "tick": 136,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.34787410497665405
+    },
+    {
+      "tick": 136,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.4412561058998108,
+      "energy": 0.16267907619476318
+    },
+    {
+      "tick": 136,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.4618924558162689,
+      "energy": 0.18321305513381958
+    },
+    {
+      "tick": 137,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.7325219511985779
+    },
+    {
+      "tick": 137,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.8293470740318298,
+      "energy": 0.2412484586238861
+    },
+    {
+      "tick": 137,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.823060154914856,
+      "energy": 0.19614477455615997
+    },
+    {
+      "tick": 138,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.5722835659980774
+    },
+    {
+      "tick": 138,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.6424593329429626,
+      "energy": 0.17627587914466858
+    },
+    {
+      "tick": 138,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.6388118863105774,
+      "energy": 0.1436752825975418
+    },
+    {
+      "tick": 139,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.5812259316444397
+    },
+    {
+      "tick": 139,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.6478270292282104,
+      "energy": 0.1916632205247879
+    },
+    {
+      "tick": 139,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.6624822616577148,
+      "energy": 0.17332269251346588
+    },
+    {
+      "tick": 140,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.5049393177032471
+    },
+    {
+      "tick": 140,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.5729411244392395,
+      "energy": 0.16906510293483734
+    },
+    {
+      "tick": 140,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.5889250040054321,
+      "energy": 0.15839695930480957
+    },
+    {
+      "tick": 141,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.5404449105262756
+    },
+    {
+      "tick": 141,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.6069343686103821,
+      "energy": 0.18897995352745056
+    },
+    {
+      "tick": 141,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.6035795211791992,
+      "energy": 0.14087682962417603
+    },
+    {
+      "tick": 142,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.587522566318512
+    },
+    {
+      "tick": 142,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.6504839658737183,
+      "energy": 0.19087690114974976
+    },
+    {
+      "tick": 142,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.6357665061950684,
+      "energy": 0.1239347979426384
+    },
+    {
+      "tick": 143,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.6934441328048706
+    },
+    {
+      "tick": 143,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.7708293795585632,
+      "energy": 0.21812687814235687
+    },
+    {
+      "tick": 143,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.75745689868927,
+      "energy": 0.13868635892868042
+    },
+    {
+      "tick": 144,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.4393604099750519
+    },
+    {
+      "tick": 144,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.5652653574943542,
+      "energy": 0.23334570229053497
+    },
+    {
+      "tick": 144,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.5991114377975464,
+      "energy": 0.23885715007781982
+    },
+    {
+      "tick": 145,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.743328332901001
+    },
+    {
+      "tick": 145,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.0351942777633667,
+      "energy": 0.5721257925033569
+    },
+    {
+      "tick": 145,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.8606191277503967,
+      "energy": 0.21989576518535614
+    },
+    {
+      "tick": 146,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.6604808568954468
+    },
+    {
+      "tick": 146,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.7490975856781006,
+      "energy": 0.20937365293502808
+    },
+    {
+      "tick": 146,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.7119349837303162,
+      "energy": 0.11608175188302994
+    },
+    {
+      "tick": 147,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.7780760526657104
+    },
+    {
+      "tick": 147,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.880046546459198,
+      "energy": 0.24138286709785461
+    },
+    {
+      "tick": 147,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.846538245677948,
+      "energy": 0.14028486609458923
+    },
+    {
+      "tick": 148,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.6536861062049866
+    },
+    {
+      "tick": 148,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.7536858320236206,
+      "energy": 0.2270497828722
+    },
+    {
+      "tick": 148,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.7132737636566162,
+      "energy": 0.11911904066801071
+    },
+    {
+      "tick": 149,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.6936684846878052
+    },
+    {
+      "tick": 149,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.8166612386703491,
+      "energy": 0.2921726405620575
+    },
+    {
+      "tick": 149,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.7715467810630798,
+      "energy": 0.1621202677488327
+    },
+    {
+      "tick": 150,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.8582139611244202
+    },
+    {
+      "tick": 150,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.9344841837882996,
+      "energy": 0.21825392544269562
+    },
+    {
+      "tick": 150,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.9330248832702637,
+      "energy": 0.1559571474790573
+    },
+    {
+      "tick": 150,
+      "region": "p1",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 7.904683589935303
+    },
+    {
+      "tick": 150,
+      "region": "p1",
+      "arm": "plain",
+      "error": 9.040437698364258,
+      "energy": 2.7027065753936768
+    },
+    {
+      "tick": 150,
+      "region": "p1",
+      "arm": "joint",
+      "error": 12.585209846496582,
+      "energy": 8.839654922485352
+    },
+    {
+      "tick": 150,
+      "region": "p2",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 11.7109375
+    },
+    {
+      "tick": 150,
+      "region": "p2",
+      "arm": "plain",
+      "error": 13.43068790435791,
+      "energy": 4.207767486572266
+    },
+    {
+      "tick": 150,
+      "region": "p2",
+      "arm": "joint",
+      "error": 18.765378952026367,
+      "energy": 15.078278541564941
+    },
+    {
+      "tick": 150,
+      "region": "ball",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 4.794002056121826
+    },
+    {
+      "tick": 150,
+      "region": "ball",
+      "arm": "plain",
+      "error": 4.839293479919434,
+      "energy": 0.6432456970214844
+    },
+    {
+      "tick": 150,
+      "region": "ball",
+      "arm": "joint",
+      "error": 4.878868103027344,
+      "energy": 0.4426739513874054
+    },
+    {
+      "tick": 151,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.7173733115196228
+    },
+    {
+      "tick": 151,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.7959510087966919,
+      "energy": 0.18787787854671478
+    },
+    {
+      "tick": 151,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.7895313501358032,
+      "energy": 0.14125825464725494
+    },
+    {
+      "tick": 152,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.6431230306625366
+    },
+    {
+      "tick": 152,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.8329262137413025,
+      "energy": 0.3525142967700958
+    },
+    {
+      "tick": 152,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.7400981187820435,
+      "energy": 0.18249158561229706
+    },
+    {
+      "tick": 153,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.8178675174713135
+    },
+    {
+      "tick": 153,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.9794137477874756,
+      "energy": 0.369913250207901
+    },
+    {
+      "tick": 153,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.8869429230690002,
+      "energy": 0.16258902847766876
+    },
+    {
+      "tick": 154,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.8295735120773315
+    },
+    {
+      "tick": 154,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.8915385603904724,
+      "energy": 0.18033336102962494
+    },
+    {
+      "tick": 154,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.8828660845756531,
+      "energy": 0.13777336478233337
+    },
+    {
+      "tick": 155,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.8991622924804688
+    },
+    {
+      "tick": 155,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.9565631151199341,
+      "energy": 0.19022105634212494
+    },
+    {
+      "tick": 155,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.9696493148803711,
+      "energy": 0.1553891897201538
+    },
+    {
+      "tick": 156,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.8396285772323608
+    },
+    {
+      "tick": 156,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.9255104064941406,
+      "energy": 0.24026280641555786
+    },
+    {
+      "tick": 156,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.9011358618736267,
+      "energy": 0.13843390345573425
+    },
+    {
+      "tick": 157,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9885455369949341
+    },
+    {
+      "tick": 157,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.0568639039993286,
+      "energy": 0.24482272565364838
+    },
+    {
+      "tick": 157,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.0486892461776733,
+      "energy": 0.15834304690361023
+    },
+    {
+      "tick": 158,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9815869927406311
+    },
+    {
+      "tick": 158,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.047421932220459,
+      "energy": 0.22350268065929413
+    },
+    {
+      "tick": 158,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.0453842878341675,
+      "energy": 0.16574837267398834
+    },
+    {
+      "tick": 159,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 1.049977421760559
+    },
+    {
+      "tick": 159,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.112303376197815,
+      "energy": 0.22215789556503296
+    },
+    {
+      "tick": 159,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.1194610595703125,
+      "energy": 0.17016878724098206
+    },
+    {
+      "tick": 160,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 1.0694019794464111
+    },
+    {
+      "tick": 160,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.3187531232833862,
+      "energy": 0.5463363528251648
+    },
+    {
+      "tick": 160,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.2490184307098389,
+      "energy": 0.37687739729881287
+    },
+    {
+      "tick": 161,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 1.1391017436981201
+    },
+    {
+      "tick": 161,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.3665004968643188,
+      "energy": 0.5976057648658752
+    },
+    {
+      "tick": 161,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.4539275169372559,
+      "energy": 0.7259618639945984
+    },
+    {
+      "tick": 162,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 1.1534769535064697
+    },
+    {
+      "tick": 162,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.2433152198791504,
+      "energy": 0.28971537947654724
+    },
+    {
+      "tick": 162,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.2856663465499878,
+      "energy": 0.3191969692707062
+    },
+    {
+      "tick": 163,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 1.2622331380844116
+    },
+    {
+      "tick": 163,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.3578284978866577,
+      "energy": 0.31735554337501526
+    },
+    {
+      "tick": 163,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.407495379447937,
+      "energy": 0.35456839203834534
+    },
+    {
+      "tick": 164,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 1.1175963878631592
+    },
+    {
+      "tick": 164,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.2170178890228271,
+      "energy": 0.32876649498939514
+    },
+    {
+      "tick": 164,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.3064122200012207,
+      "energy": 0.4098237156867981
+    },
+    {
+      "tick": 165,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 1.003182291984558
+    },
+    {
+      "tick": 165,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.0999979972839355,
+      "energy": 0.32092323899269104
+    },
+    {
+      "tick": 165,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.1909359693527222,
+      "energy": 0.41891515254974365
+    },
+    {
+      "tick": 166,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9736512899398804
+    },
+    {
+      "tick": 166,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.0426558256149292,
+      "energy": 0.2468077391386032
+    },
+    {
+      "tick": 166,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.149084210395813,
+      "energy": 0.3489536941051483
+    },
+    {
+      "tick": 167,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 1.1378952264785767
+    },
+    {
+      "tick": 167,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.2147421836853027,
+      "energy": 0.2827654182910919
+    },
+    {
+      "tick": 167,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.27772855758667,
+      "energy": 0.3180049955844879
+    },
+    {
+      "tick": 168,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.7815477848052979
+    },
+    {
+      "tick": 168,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.9778814911842346,
+      "energy": 0.41478589177131653
+    },
+    {
+      "tick": 168,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.0636177062988281,
+      "energy": 0.4988689422607422
+    },
+    {
+      "tick": 169,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9422712326049805
+    },
+    {
+      "tick": 169,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.0931880474090576,
+      "energy": 0.4296751320362091
+    },
+    {
+      "tick": 169,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.1061897277832031,
+      "energy": 0.4111606776714325
+    },
+    {
+      "tick": 170,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9161853194236755
+    },
+    {
+      "tick": 170,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.995934009552002,
+      "energy": 0.2372410148382187
+    },
+    {
+      "tick": 170,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.0106948614120483,
+      "energy": 0.21384696662425995
+    },
+    {
+      "tick": 170,
+      "region": "p1",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 8.2861909866333
+    },
+    {
+      "tick": 170,
+      "region": "p1",
+      "arm": "plain",
+      "error": 9.919824600219727,
+      "energy": 3.9983692169189453
+    },
+    {
+      "tick": 170,
+      "region": "p1",
+      "arm": "joint",
+      "error": 14.446810722351074,
+      "energy": 10.879426956176758
+    },
+    {
+      "tick": 170,
+      "region": "p2",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 8.479323387145996
+    },
+    {
+      "tick": 170,
+      "region": "p2",
+      "arm": "plain",
+      "error": 8.599916458129883,
+      "energy": 2.691182851791382
+    },
+    {
+      "tick": 170,
+      "region": "p2",
+      "arm": "joint",
+      "error": 13.30951976776123,
+      "energy": 10.330693244934082
+    },
+    {
+      "tick": 170,
+      "region": "ball",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 2.8960084915161133
+    },
+    {
+      "tick": 170,
+      "region": "ball",
+      "arm": "plain",
+      "error": 3.1385891437530518,
+      "energy": 0.5481052398681641
+    },
+    {
+      "tick": 170,
+      "region": "ball",
+      "arm": "joint",
+      "error": 3.8038222789764404,
+      "energy": 3.838040590286255
+    },
+    {
+      "tick": 171,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9517254829406738
+    },
+    {
+      "tick": 171,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.0307821035385132,
+      "energy": 0.24374881386756897
+    },
+    {
+      "tick": 171,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.050126314163208,
+      "energy": 0.22747106850147247
+    },
+    {
+      "tick": 172,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.7691001892089844
+    },
+    {
+      "tick": 172,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.9026143550872803,
+      "energy": 0.2958287000656128
+    },
+    {
+      "tick": 172,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.923054039478302,
+      "energy": 0.2866031527519226
+    },
+    {
+      "tick": 173,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.8715202808380127
+    },
+    {
+      "tick": 173,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.9667925834655762,
+      "energy": 0.27737894654273987
+    },
+    {
+      "tick": 173,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.9866241812705994,
+      "energy": 0.2590484023094177
+    },
+    {
+      "tick": 174,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9955517649650574
+    },
+    {
+      "tick": 174,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.0762789249420166,
+      "energy": 0.263698548078537
+    },
+    {
+      "tick": 174,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.0878314971923828,
+      "energy": 0.2198852300643921
+    },
+    {
+      "tick": 175,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9900637269020081
+    },
+    {
+      "tick": 175,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.0701899528503418,
+      "energy": 0.2501642405986786
+    },
+    {
+      "tick": 175,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.097509741783142,
+      "energy": 0.23648099601268768
+    },
+    {
+      "tick": 176,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.7460451126098633
+    },
+    {
+      "tick": 176,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.0645101070404053,
+      "energy": 0.5716666579246521
+    },
+    {
+      "tick": 176,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.0279386043548584,
+      "energy": 0.4990059733390808
+    },
+    {
+      "tick": 177,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.896579384803772
+    },
+    {
+      "tick": 177,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.059753656387329,
+      "energy": 0.4170131981372833
+    },
+    {
+      "tick": 177,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.052870512008667,
+      "energy": 0.35281863808631897
+    },
+    {
+      "tick": 178,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9324288964271545
+    },
+    {
+      "tick": 178,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.0104799270629883,
+      "energy": 0.24393640458583832
+    },
+    {
+      "tick": 178,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.0132099390029907,
+      "energy": 0.1929524689912796
+    },
+    {
+      "tick": 179,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 1.0458334684371948
+    },
+    {
+      "tick": 179,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.1250988245010376,
+      "energy": 0.26903969049453735
+    },
+    {
+      "tick": 179,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.1408910751342773,
+      "energy": 0.21700669825077057
+    },
+    {
+      "tick": 180,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.6959220170974731
+    },
+    {
+      "tick": 180,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.8084160089492798,
+      "energy": 0.27501344680786133
+    },
+    {
+      "tick": 180,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.8275085687637329,
+      "energy": 0.23331277072429657
+    },
+    {
+      "tick": 181,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9140557646751404
+    },
+    {
+      "tick": 181,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.9905857443809509,
+      "energy": 0.26968348026275635
+    },
+    {
+      "tick": 181,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.0265802145004272,
+      "energy": 0.23283210396766663
+    },
+    {
+      "tick": 182,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.7713313698768616
+    },
+    {
+      "tick": 182,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.8497986197471619,
+      "energy": 0.23525570333003998
+    },
+    {
+      "tick": 182,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.8529464602470398,
+      "energy": 0.19358254969120026
+    },
+    {
+      "tick": 183,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9389216303825378
+    },
+    {
+      "tick": 183,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.0144507884979248,
+      "energy": 0.235388845205307
+    },
+    {
+      "tick": 183,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.04015052318573,
+      "energy": 0.20491252839565277
+    },
+    {
+      "tick": 184,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.5626164078712463
+    },
+    {
+      "tick": 184,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.8359227180480957,
+      "energy": 0.44937992095947266
+    },
+    {
+      "tick": 184,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.7699799537658691,
+      "energy": 0.31249672174453735
+    },
+    {
+      "tick": 185,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3664758503437042
+    },
+    {
+      "tick": 185,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.43765944242477417,
+      "energy": 0.14571914076805115
+    },
+    {
+      "tick": 185,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.531501054763794,
+      "energy": 0.25785592198371887
+    },
+    {
+      "tick": 186,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.38682806491851807
+    },
+    {
+      "tick": 186,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.4275294542312622,
+      "energy": 0.11294236779212952
+    },
+    {
+      "tick": 186,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.48009422421455383,
+      "energy": 0.16953875124454498
+    },
+    {
+      "tick": 187,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3059522211551666
+    },
+    {
+      "tick": 187,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.34202641248703003,
+      "energy": 0.09894367307424545
+    },
+    {
+      "tick": 187,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.3991245627403259,
+      "energy": 0.1689227670431137
+    },
+    {
+      "tick": 188,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.25891515612602234
+    },
+    {
+      "tick": 188,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.30394360423088074,
+      "energy": 0.10874421894550323
+    },
+    {
+      "tick": 188,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.40606001019477844,
+      "energy": 0.2284730225801468
+    },
+    {
+      "tick": 189,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.41609838604927063
+    },
+    {
+      "tick": 189,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.45235201716423035,
+      "energy": 0.11136136949062347
+    },
+    {
+      "tick": 189,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.5268412828445435,
+      "energy": 0.19148847460746765
+    },
+    {
+      "tick": 190,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.33158740401268005
+    },
+    {
+      "tick": 190,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.36342501640319824,
+      "energy": 0.10000577569007874
+    },
+    {
+      "tick": 190,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.44646957516670227,
+      "energy": 0.19925764203071594
+    },
+    {
+      "tick": 190,
+      "region": "p1",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 11.480287551879883
+    },
+    {
+      "tick": 190,
+      "region": "p1",
+      "arm": "plain",
+      "error": 12.781037330627441,
+      "energy": 5.87294864654541
+    },
+    {
+      "tick": 190,
+      "region": "p1",
+      "arm": "joint",
+      "error": 19.463010787963867,
+      "energy": 15.277423858642578
+    },
+    {
+      "tick": 190,
+      "region": "p2",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 11.093798637390137
+    },
+    {
+      "tick": 190,
+      "region": "p2",
+      "arm": "plain",
+      "error": 11.150774002075195,
+      "energy": 2.2772181034088135
+    },
+    {
+      "tick": 190,
+      "region": "p2",
+      "arm": "joint",
+      "error": 18.524080276489258,
+      "energy": 15.944026947021484
+    },
+    {
+      "tick": 190,
+      "region": "ball",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 4.324835777282715
+    },
+    {
+      "tick": 190,
+      "region": "ball",
+      "arm": "plain",
+      "error": 4.321338653564453,
+      "energy": 0.4232276678085327
+    },
+    {
+      "tick": 190,
+      "region": "ball",
+      "arm": "joint",
+      "error": 3.608020305633545,
+      "energy": 1.5823771953582764
+    },
+    {
+      "tick": 191,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.39665931463241577
+    },
+    {
+      "tick": 191,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.43361926078796387,
+      "energy": 0.1094944104552269
+    },
+    {
+      "tick": 191,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.47130411863327026,
+      "energy": 0.16248485445976257
+    },
+    {
+      "tick": 192,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3592802584171295
+    },
+    {
+      "tick": 192,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.4841354787349701,
+      "energy": 0.2082088440656662
+    },
+    {
+      "tick": 192,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.6711488962173462,
+      "energy": 0.4272395968437195
+    },
+    {
+      "tick": 193,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.6079544425010681
+    },
+    {
+      "tick": 193,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.7122441530227661,
+      "energy": 0.24007971584796906
+    },
+    {
+      "tick": 193,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.8645166754722595,
+      "energy": 0.4541374742984772
+    },
+    {
+      "tick": 194,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.5512813329696655
+    },
+    {
+      "tick": 194,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.6005992293357849,
+      "energy": 0.14229676127433777
+    },
+    {
+      "tick": 194,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.6449537873268127,
+      "energy": 0.1755416989326477
+    },
+    {
+      "tick": 195,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.35587894916534424
+    },
+    {
+      "tick": 195,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.3938884139060974,
+      "energy": 0.09673726558685303
+    },
+    {
+      "tick": 195,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.48717424273490906,
+      "energy": 0.22273069620132446
+    },
+    {
+      "tick": 196,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2683672308921814
+    },
+    {
+      "tick": 196,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.3132162094116211,
+      "energy": 0.09299598634243011
+    },
+    {
+      "tick": 196,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.4104136526584625,
+      "energy": 0.22234295308589935
+    },
+    {
+      "tick": 197,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.676277756690979
+    },
+    {
+      "tick": 197,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.7190561890602112,
+      "energy": 0.1412428766489029
+    },
+    {
+      "tick": 197,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.8167693018913269,
+      "energy": 0.230828657746315
+    },
+    {
+      "tick": 198,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.5677714943885803
+    },
+    {
+      "tick": 198,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.617735743522644,
+      "energy": 0.15149027109146118
+    },
+    {
+      "tick": 198,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.674537718296051,
+      "energy": 0.19427992403507233
+    },
+    {
+      "tick": 199,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.8025151491165161
+    },
+    {
+      "tick": 199,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.8550181984901428,
+      "energy": 0.1877308338880539
+    },
+    {
+      "tick": 199,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.902831494808197,
+      "energy": 0.19420619308948517
+    },
+    {
+      "tick": 200,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.4868260622024536
+    },
+    {
+      "tick": 200,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.5684610605239868,
+      "energy": 0.1789504736661911
+    },
+    {
+      "tick": 200,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.610714316368103,
+      "energy": 0.19833359122276306
+    },
+    {
+      "tick": 201,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.2841712236404419
+    },
+    {
+      "tick": 201,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.35551917552948,
+      "energy": 0.13129355013370514
+    },
+    {
+      "tick": 201,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.4223271608352661,
+      "energy": 0.21324874460697174
+    },
+    {
+      "tick": 202,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.3086954653263092
+    },
+    {
+      "tick": 202,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.3369884788990021,
+      "energy": 0.07819601148366928
+    },
+    {
+      "tick": 202,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.37786155939102173,
+      "energy": 0.14982928335666656
+    },
+    {
+      "tick": 203,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.5138673186302185
+    },
+    {
+      "tick": 203,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.559180498123169,
+      "energy": 0.1386587768793106
+    },
+    {
+      "tick": 203,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.5781563520431519,
+      "energy": 0.1652088314294815
+    },
+    {
+      "tick": 204,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.5515795350074768
+    },
+    {
+      "tick": 204,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.6048733592033386,
+      "energy": 0.15371693670749664
+    },
+    {
+      "tick": 204,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.6292099356651306,
+      "energy": 0.18927711248397827
+    },
+    {
+      "tick": 205,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.6276652216911316
+    },
+    {
+      "tick": 205,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.6783190965652466,
+      "energy": 0.15980146825313568
+    },
+    {
+      "tick": 205,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.7204789519309998,
+      "energy": 0.1986970603466034
+    },
+    {
+      "tick": 206,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.5892897844314575
+    },
+    {
+      "tick": 206,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.6387386322021484,
+      "energy": 0.1555112898349762
+    },
+    {
+      "tick": 206,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.6734632849693298,
+      "energy": 0.1958690881729126
+    },
+    {
+      "tick": 207,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.8013759851455688
+    },
+    {
+      "tick": 207,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.854538083076477,
+      "energy": 0.17702898383140564
+    },
+    {
+      "tick": 207,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.868971049785614,
+      "energy": 0.19087855517864227
+    },
+    {
+      "tick": 208,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.44892069697380066
+    },
+    {
+      "tick": 208,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.5533111095428467,
+      "energy": 0.19813452661037445
+    },
+    {
+      "tick": 208,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.6024904251098633,
+      "energy": 0.2809116244316101
+    },
+    {
+      "tick": 209,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9227487444877625
+    },
+    {
+      "tick": 209,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.1303911209106445,
+      "energy": 0.5003494024276733
+    },
+    {
+      "tick": 209,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.1599160432815552,
+      "energy": 0.5311872363090515
+    },
+    {
+      "tick": 210,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.7667269110679626
+    },
+    {
+      "tick": 210,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.8381507992744446,
+      "energy": 0.20822490751743317
+    },
+    {
+      "tick": 210,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.8653066754341125,
+      "energy": 0.22059457004070282
+    },
+    {
+      "tick": 210,
+      "region": "p1",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 9.103072166442871
+    },
+    {
+      "tick": 210,
+      "region": "p1",
+      "arm": "plain",
+      "error": 9.861343383789062,
+      "energy": 3.101454734802246
+    },
+    {
+      "tick": 210,
+      "region": "p1",
+      "arm": "joint",
+      "error": 15.449511528015137,
+      "energy": 10.880598068237305
+    },
+    {
+      "tick": 210,
+      "region": "p2",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 15.745012283325195
+    },
+    {
+      "tick": 210,
+      "region": "p2",
+      "arm": "plain",
+      "error": 17.452594757080078,
+      "energy": 5.430212497711182
+    },
+    {
+      "tick": 210,
+      "region": "p2",
+      "arm": "joint",
+      "error": 23.59661102294922,
+      "energy": 22.737520217895508
+    },
+    {
+      "tick": 210,
+      "region": "ball",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 2.253939628601074
+    },
+    {
+      "tick": 210,
+      "region": "ball",
+      "arm": "plain",
+      "error": 2.2472338676452637,
+      "energy": 0.009073296561837196
+    },
+    {
+      "tick": 210,
+      "region": "ball",
+      "arm": "joint",
+      "error": 1.3125818967819214,
+      "energy": 1.5175845623016357
+    },
+    {
+      "tick": 211,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9903379678726196
+    },
+    {
+      "tick": 211,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.06212317943573,
+      "energy": 0.22682185471057892
+    },
+    {
+      "tick": 211,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.0985124111175537,
+      "energy": 0.23933866620063782
+    },
+    {
+      "tick": 212,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.7349568009376526
+    },
+    {
+      "tick": 212,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.8285380005836487,
+      "energy": 0.23465348780155182
+    },
+    {
+      "tick": 212,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.8525080680847168,
+      "energy": 0.22692209482192993
+    },
+    {
+      "tick": 213,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.6719382405281067
+    },
+    {
+      "tick": 213,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.7685530185699463,
+      "energy": 0.2438494861125946
+    },
+    {
+      "tick": 213,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.7942907810211182,
+      "energy": 0.23723441362380981
+    },
+    {
+      "tick": 214,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.7355513572692871
+    },
+    {
+      "tick": 214,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.8057353496551514,
+      "energy": 0.19257858395576477
+    },
+    {
+      "tick": 214,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.8232028484344482,
+      "energy": 0.1908482164144516
+    },
+    {
+      "tick": 215,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.8871123790740967
+    },
+    {
+      "tick": 215,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.9466664791107178,
+      "energy": 0.19767852127552032
+    },
+    {
+      "tick": 215,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.9737489223480225,
+      "energy": 0.19354677200317383
+    },
+    {
+      "tick": 216,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.844472348690033
+    },
+    {
+      "tick": 216,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.0083799362182617,
+      "energy": 0.3702656030654907
+    },
+    {
+      "tick": 216,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.0015867948532104,
+      "energy": 0.31314516067504883
+    },
+    {
+      "tick": 217,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.8576192855834961
+    },
+    {
+      "tick": 217,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.0831471681594849,
+      "energy": 0.44766128063201904
+    },
+    {
+      "tick": 217,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.9943146705627441,
+      "energy": 0.27820682525634766
+    },
+    {
+      "tick": 218,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9749909043312073
+    },
+    {
+      "tick": 218,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.048452377319336,
+      "energy": 0.21356338262557983
+    },
+    {
+      "tick": 218,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.0636872053146362,
+      "energy": 0.18214444816112518
+    },
+    {
+      "tick": 219,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9786626100540161
+    },
+    {
+      "tick": 219,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.0532125234603882,
+      "energy": 0.22969195246696472
+    },
+    {
+      "tick": 219,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.0850129127502441,
+      "energy": 0.21049684286117554
+    },
+    {
+      "tick": 220,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.8011789917945862
+    },
+    {
+      "tick": 220,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.9220877289772034,
+      "energy": 0.2885492444038391
+    },
+    {
+      "tick": 220,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.9771503210067749,
+      "energy": 0.29755526781082153
+    },
+    {
+      "tick": 221,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9608489871025085
+    },
+    {
+      "tick": 221,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.0613375902175903,
+      "energy": 0.2793356776237488
+    },
+    {
+      "tick": 221,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.053411602973938,
+      "energy": 0.19042466580867767
+    },
+    {
+      "tick": 222,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9753754734992981
+    },
+    {
+      "tick": 222,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.0650429725646973,
+      "energy": 0.2556364834308624
+    },
+    {
+      "tick": 222,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.0613499879837036,
+      "energy": 0.17949284613132477
+    },
+    {
+      "tick": 223,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.993695855140686
+    },
+    {
+      "tick": 223,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.0686687231063843,
+      "energy": 0.22949904203414917
+    },
+    {
+      "tick": 223,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.0990915298461914,
+      "energy": 0.21235470473766327
+    },
+    {
+      "tick": 224,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.7538042664527893
+    },
+    {
+      "tick": 224,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.0525660514831543,
+      "energy": 0.5475848913192749
+    },
+    {
+      "tick": 224,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.0705558061599731,
+      "energy": 0.544688880443573
+    },
+    {
+      "tick": 225,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.946079671382904
+    },
+    {
+      "tick": 225,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.1598095893859863,
+      "energy": 0.4874548614025116
+    },
+    {
+      "tick": 225,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.094736933708191,
+      "energy": 0.3509760797023773
+    },
+    {
+      "tick": 226,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9678536057472229
+    },
+    {
+      "tick": 226,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.063537836074829,
+      "energy": 0.2576700448989868
+    },
+    {
+      "tick": 226,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.0399633646011353,
+      "energy": 0.20017769932746887
+    },
+    {
+      "tick": 227,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 1.0101743936538696
+    },
+    {
+      "tick": 227,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.1058586835861206,
+      "energy": 0.25824159383773804
+    },
+    {
+      "tick": 227,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.0755600929260254,
+      "energy": 0.19244052469730377
+    },
+    {
+      "tick": 228,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9150993227958679
+    },
+    {
+      "tick": 228,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.0405082702636719,
+      "energy": 0.30799779295921326
+    },
+    {
+      "tick": 228,
+      "region": "whole",
+      "arm": "joint",
+      "error": 1.003445029258728,
+      "energy": 0.21479816734790802
+    },
+    {
+      "tick": 229,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.8537939190864563
+    },
+    {
+      "tick": 229,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.973960816860199,
+      "energy": 0.3136428892612457
+    },
+    {
+      "tick": 229,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.9557167291641235,
+      "energy": 0.23872800171375275
+    },
+    {
+      "tick": 230,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.927269458770752
+    },
+    {
+      "tick": 230,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.01025390625,
+      "energy": 0.24748845398426056
+    },
+    {
+      "tick": 230,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.9964796900749207,
+      "energy": 0.1931479424238205
+    },
+    {
+      "tick": 230,
+      "region": "p1",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 7.495792865753174
+    },
+    {
+      "tick": 230,
+      "region": "p1",
+      "arm": "plain",
+      "error": 8.141485214233398,
+      "energy": 2.375243663787842
+    },
+    {
+      "tick": 230,
+      "region": "p1",
+      "arm": "joint",
+      "error": 12.127685546875,
+      "energy": 10.3908052444458
+    },
+    {
+      "tick": 230,
+      "region": "p2",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 12.268472671508789
+    },
+    {
+      "tick": 230,
+      "region": "p2",
+      "arm": "plain",
+      "error": 13.68905258178711,
+      "energy": 4.096965789794922
+    },
+    {
+      "tick": 230,
+      "region": "p2",
+      "arm": "joint",
+      "error": 16.056903839111328,
+      "energy": 16.169343948364258
+    },
+    {
+      "tick": 230,
+      "region": "ball",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 3.0423223972320557
+    },
+    {
+      "tick": 230,
+      "region": "ball",
+      "arm": "plain",
+      "error": 3.092259645462036,
+      "energy": 0.5440605878829956
+    },
+    {
+      "tick": 230,
+      "region": "ball",
+      "arm": "joint",
+      "error": 3.324312686920166,
+      "energy": 1.8262832164764404
+    },
+    {
+      "tick": 231,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.8861144781112671
+    },
+    {
+      "tick": 231,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.9717755317687988,
+      "energy": 0.2383154034614563
+    },
+    {
+      "tick": 231,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.9577112793922424,
+      "energy": 0.19140022993087769
+    },
+    {
+      "tick": 232,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.7022539973258972
+    },
+    {
+      "tick": 232,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.9370913505554199,
+      "energy": 0.44826313853263855
+    },
+    {
+      "tick": 232,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.8383533358573914,
+      "energy": 0.2798675000667572
+    },
+    {
+      "tick": 233,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9287399649620056
+    },
+    {
+      "tick": 233,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.0768646001815796,
+      "energy": 0.373401015996933
+    },
+    {
+      "tick": 233,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.9952782988548279,
+      "energy": 0.17579123377799988
+    },
+    {
+      "tick": 234,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.8639062643051147
+    },
+    {
+      "tick": 234,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.9516146183013916,
+      "energy": 0.2550508379936218
+    },
+    {
+      "tick": 234,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.9338805079460144,
+      "energy": 0.18139709532260895
+    },
+    {
+      "tick": 235,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.9276629090309143
+    },
+    {
+      "tick": 235,
+      "region": "whole",
+      "arm": "plain",
+      "error": 1.0185320377349854,
+      "energy": 0.25570985674858093
+    },
+    {
+      "tick": 235,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.994160532951355,
+      "energy": 0.16517244279384613
+    },
+    {
+      "tick": 236,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.5701361894607544
+    },
+    {
+      "tick": 236,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.7509377002716064,
+      "energy": 0.3043217957019806
+    },
+    {
+      "tick": 236,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.6307157874107361,
+      "energy": 0.1268848478794098
+    },
+    {
+      "tick": 237,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.7973904013633728
+    },
+    {
+      "tick": 237,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.8802928924560547,
+      "energy": 0.2112731784582138
+    },
+    {
+      "tick": 237,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.9372194409370422,
+      "energy": 0.21703800559043884
+    },
+    {
+      "tick": 238,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.5160247683525085
+    },
+    {
+      "tick": 238,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.5756120681762695,
+      "energy": 0.1509200632572174
+    },
+    {
+      "tick": 238,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.6930656433105469,
+      "energy": 0.2476099282503128
+    },
+    {
+      "tick": 239,
+      "region": "whole",
+      "arm": "source",
+      "error": 0.0,
+      "energy": 0.7805037498474121
+    },
+    {
+      "tick": 239,
+      "region": "whole",
+      "arm": "plain",
+      "error": 0.8565341830253601,
+      "energy": 0.1956656575202942
+    },
+    {
+      "tick": 239,
+      "region": "whole",
+      "arm": "joint",
+      "error": 0.9761673808097839,
+      "energy": 0.27938950061798096
+    }
+  ],
+  "joint_rgb_sha256": "45bd0cec2f2c2b1b3169ffe313d73a89d9a9632fee839f641c8089c24a1ff392",
+  "ordinary_native_sha256": "bdb4dac5c91c8013ed49cce6e3244fc5b7a93f48446011822133f43247882bd4",
+  "cpu_seconds": 46.630930000000006,
+  "script_sha256": "d3b32fc263e2ff8a63a2da1dce206c5993fd58c43fe6d0ff51be79a896941c3a",
+  "equal_previous_source": true,
+  "opencv": "4.10.0",
+  "kbps": {
+    "joint_cached": 21.545,
+    "plain": 21.623333333333335
+  }
+}

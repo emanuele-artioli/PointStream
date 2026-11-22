@@ -1,0 +1,515 @@
+{
+  "ticks": [
+    10,
+    30,
+    50,
+    70,
+    90,
+    110,
+    130,
+    150,
+    170,
+    190,
+    210,
+    230
+  ],
+  "runner_sha256": "02db29473ce2108942e99d75635c7a7c6e3c4367b8f37362f7efb302256fb71a",
+  "finish_archive_sha256": "c2154724af02655196976545f2b50160f322340b69d5c64734b9a4eccd6ba20f",
+  "preview_sha256": "46db4c10799be3db103ee0c3475f81f82ab14970d2d4ca0e87b11a3f3331d5eb",
+  "preview_ticks": [
+    30,
+    110,
+    190
+  ],
+  "opencv": "4.10.0",
+  "torch": "2.10.0+cu128",
+  "support": "paid expanded player boxes, clipped to source, 256x256 RGB",
+  "weights": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+  "dists_network_record": {
+    "metric": "DISTS",
+    "net": "vgg16",
+    "torchmetrics": "1.9.0",
+    "weights": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/torchmetrics/functional/image/dists_models/weights.pt",
+    "weights_sha256": "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218",
+    "backbone": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+    "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+    "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)"
+  },
+  "per_player_equal": true,
+  "all_frame_luma_sse": {
+    "ordinary": 415193395,
+    "pointstream": 3187126762
+  },
+  "all_frame_luma_psnr": {
+    "ordinary": 36.90851307958798,
+    "pointstream": 28.05702406922126
+  },
+  "rows": [
+    {
+      "tick": 10,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "box": [
+        804,
+        813,
+        1012,
+        1080
+      ],
+      "ordinary": {
+        "dists": 0.3264715075492859,
+        "rgb_psnr": 24.19491654292644
+      },
+      "pointstream": {
+        "dists": 0.2934567928314209,
+        "rgb_psnr": 18.655576947866827
+      }
+    },
+    {
+      "tick": 10,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "box": [
+        1032,
+        233,
+        1148,
+        411
+      ],
+      "ordinary": {
+        "dists": 0.27521228790283203,
+        "rgb_psnr": 22.78893736172173
+      },
+      "pointstream": {
+        "dists": 0.2256748080253601,
+        "rgb_psnr": 18.177278257692237
+      }
+    },
+    {
+      "tick": 30,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "box": [
+        931,
+        811,
+        1139,
+        1080
+      ],
+      "ordinary": {
+        "dists": 0.3310238718986511,
+        "rgb_psnr": 25.216428400717366
+      },
+      "pointstream": {
+        "dists": 0.27309417724609375,
+        "rgb_psnr": 19.611218774257132
+      }
+    },
+    {
+      "tick": 30,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "box": [
+        1066,
+        230,
+        1182,
+        408
+      ],
+      "ordinary": {
+        "dists": 0.29908287525177,
+        "rgb_psnr": 24.639387412876452
+      },
+      "pointstream": {
+        "dists": 0.2460452914237976,
+        "rgb_psnr": 18.01750758058207
+      }
+    },
+    {
+      "tick": 50,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "box": [
+        930,
+        799,
+        1138,
+        1080
+      ],
+      "ordinary": {
+        "dists": 0.31952136754989624,
+        "rgb_psnr": 25.63013311209623
+      },
+      "pointstream": {
+        "dists": 0.2529478669166565,
+        "rgb_psnr": 19.18912877357307
+      }
+    },
+    {
+      "tick": 50,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "box": [
+        1112,
+        237,
+        1228,
+        415
+      ],
+      "ordinary": {
+        "dists": 0.29197829961776733,
+        "rgb_psnr": 23.47334215797577
+      },
+      "pointstream": {
+        "dists": 0.22695720195770264,
+        "rgb_psnr": 17.97994693805973
+      }
+    },
+    {
+      "tick": 70,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "box": [
+        870,
+        781,
+        1078,
+        1080
+      ],
+      "ordinary": {
+        "dists": 0.34330564737319946,
+        "rgb_psnr": 24.39819860274075
+      },
+      "pointstream": {
+        "dists": 0.2755318284034729,
+        "rgb_psnr": 21.193713118488926
+      }
+    },
+    {
+      "tick": 70,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "box": [
+        1159,
+        238,
+        1275,
+        416
+      ],
+      "ordinary": {
+        "dists": 0.28979456424713135,
+        "rgb_psnr": 21.621546720415687
+      },
+      "pointstream": {
+        "dists": 0.2405511736869812,
+        "rgb_psnr": 18.330084667887995
+      }
+    },
+    {
+      "tick": 90,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "box": [
+        822,
+        736,
+        1030,
+        1055
+      ],
+      "ordinary": {
+        "dists": 0.2989237904548645,
+        "rgb_psnr": 26.0564397185885
+      },
+      "pointstream": {
+        "dists": 0.24902260303497314,
+        "rgb_psnr": 21.50321391105603
+      }
+    },
+    {
+      "tick": 90,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "box": [
+        1180,
+        248,
+        1296,
+        426
+      ],
+      "ordinary": {
+        "dists": 0.2912564277648926,
+        "rgb_psnr": 22.540798024964577
+      },
+      "pointstream": {
+        "dists": 0.2243117094039917,
+        "rgb_psnr": 19.016375027960642
+      }
+    },
+    {
+      "tick": 110,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "box": [
+        933,
+        695,
+        1141,
+        1014
+      ],
+      "ordinary": {
+        "dists": 0.3075764775276184,
+        "rgb_psnr": 24.889250269765903
+      },
+      "pointstream": {
+        "dists": 0.2645875811576843,
+        "rgb_psnr": 20.65911445784117
+      }
+    },
+    {
+      "tick": 110,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "box": [
+        1091,
+        237,
+        1207,
+        415
+      ],
+      "ordinary": {
+        "dists": 0.2968108057975769,
+        "rgb_psnr": 23.076046245707843
+      },
+      "pointstream": {
+        "dists": 0.2326105237007141,
+        "rgb_psnr": 18.7424806415369
+      }
+    },
+    {
+      "tick": 130,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "box": [
+        1019,
+        687,
+        1227,
+        1006
+      ],
+      "ordinary": {
+        "dists": 0.3023231625556946,
+        "rgb_psnr": 25.52015397304176
+      },
+      "pointstream": {
+        "dists": 0.28059136867523193,
+        "rgb_psnr": 20.835043680677465
+      }
+    },
+    {
+      "tick": 130,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "box": [
+        1003,
+        229,
+        1119,
+        407
+      ],
+      "ordinary": {
+        "dists": 0.2886928915977478,
+        "rgb_psnr": 23.97551184147771
+      },
+      "pointstream": {
+        "dists": 0.22385722398757935,
+        "rgb_psnr": 18.79883815314842
+      }
+    },
+    {
+      "tick": 150,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "box": [
+        1058,
+        662,
+        1266,
+        981
+      ],
+      "ordinary": {
+        "dists": 0.3065636157989502,
+        "rgb_psnr": 25.236033935900004
+      },
+      "pointstream": {
+        "dists": 0.27253836393356323,
+        "rgb_psnr": 21.006807862315476
+      }
+    },
+    {
+      "tick": 150,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "box": [
+        935,
+        231,
+        1051,
+        409
+      ],
+      "ordinary": {
+        "dists": 0.28275007009506226,
+        "rgb_psnr": 22.022983335871196
+      },
+      "pointstream": {
+        "dists": 0.2524870038032532,
+        "rgb_psnr": 18.348901883629637
+      }
+    },
+    {
+      "tick": 170,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "box": [
+        1035,
+        662,
+        1243,
+        981
+      ],
+      "ordinary": {
+        "dists": 0.30638986825942993,
+        "rgb_psnr": 26.607665366892952
+      },
+      "pointstream": {
+        "dists": 0.24656641483306885,
+        "rgb_psnr": 22.098383212941208
+      }
+    },
+    {
+      "tick": 170,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "box": [
+        837,
+        228,
+        953,
+        406
+      ],
+      "ordinary": {
+        "dists": 0.28302448987960815,
+        "rgb_psnr": 22.38416102512619
+      },
+      "pointstream": {
+        "dists": 0.25253182649612427,
+        "rgb_psnr": 17.821560137320354
+      }
+    },
+    {
+      "tick": 190,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "box": [
+        988,
+        691,
+        1196,
+        1010
+      ],
+      "ordinary": {
+        "dists": 0.31374669075012207,
+        "rgb_psnr": 25.811874444623058
+      },
+      "pointstream": {
+        "dists": 0.2337774634361267,
+        "rgb_psnr": 22.140077472250198
+      }
+    },
+    {
+      "tick": 190,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "box": [
+        778,
+        221,
+        894,
+        399
+      ],
+      "ordinary": {
+        "dists": 0.28968197107315063,
+        "rgb_psnr": 22.731021215715362
+      },
+      "pointstream": {
+        "dists": 0.24323499202728271,
+        "rgb_psnr": 17.944656256257986
+      }
+    },
+    {
+      "tick": 210,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "box": [
+        982,
+        728,
+        1190,
+        1047
+      ],
+      "ordinary": {
+        "dists": 0.3037649989128113,
+        "rgb_psnr": 25.71780710333161
+      },
+      "pointstream": {
+        "dists": 0.24871736764907837,
+        "rgb_psnr": 21.191324761813778
+      }
+    },
+    {
+      "tick": 210,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "box": [
+        763,
+        207,
+        879,
+        385
+      ],
+      "ordinary": {
+        "dists": 0.27760690450668335,
+        "rgb_psnr": 23.79266732826013
+      },
+      "pointstream": {
+        "dists": 0.2180466651916504,
+        "rgb_psnr": 20.19157176217833
+      }
+    },
+    {
+      "tick": 230,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "box": [
+        1051,
+        743,
+        1259,
+        1062
+      ],
+      "ordinary": {
+        "dists": 0.30514800548553467,
+        "rgb_psnr": 24.846140472008294
+      },
+      "pointstream": {
+        "dists": 0.27573060989379883,
+        "rgb_psnr": 20.430428583460994
+      }
+    },
+    {
+      "tick": 230,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "box": [
+        753,
+        212,
+        869,
+        390
+      ],
+      "ordinary": {
+        "dists": 0.3020235300064087,
+        "rgb_psnr": 23.629144951127678
+      },
+      "pointstream": {
+        "dists": 0.22581231594085693,
+        "rgb_psnr": 20.275370973224682
+      }
+    }
+  ],
+  "means": {
+    "ordinary": {
+      "dists": 0.30136142174402875,
+      "rgb_psnr": 24.200024565161385
+    },
+    "pointstream": {
+      "dists": 0.24911179890235266,
+      "rgb_psnr": 19.67327515983422
+    }
+  },
+  "by_unit": {
+    "nadal_kyrgios__002_at120__person_000000000000": {
+      "ordinary": {
+        "dists": 0.3137299170096715,
+        "rgb_psnr": 25.343753495219406
+      },
+      "pointstream": {
+        "dists": 0.26388020316759747,
+        "rgb_psnr": 20.709502629711853
+      }
+    },
+    "nadal_kyrgios__002_at120__person_000000000002": {
+      "ordinary": {
+        "dists": 0.2889929264783859,
+        "rgb_psnr": 23.056295635103364
+      },
+      "pointstream": {
+        "dists": 0.23434339463710785,
+        "rgb_psnr": 18.63704768995658
+      }
+    }
+  },
+  "elapsed_seconds": 132.10124971100595,
+  "scope": "opened development return, sender-derived rectangles, no independent labels"
+}

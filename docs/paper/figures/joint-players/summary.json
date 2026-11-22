@@ -1,0 +1,42 @@
+[
+  {
+    "match": "Nadal\u2013Kyrgios",
+    "source": "12 human-reviewed instants",
+    "fps": 50,
+    "cold_kbps": 428.77666666666664,
+    "modes": {
+      "joint": {
+        "rate": 21.545,
+        "dists": 0.26169424255688983
+      },
+      "ordinary": {
+        "rate": 21.623333333333335,
+        "dists": 0.5115252509713173
+      },
+      "neural": {
+        "rate": 20.45,
+        "dists": 0.3924354538321495
+      }
+    }
+  },
+  {
+    "match": "Alcaraz\u2013Hurkacz",
+    "source": "12 source-model mask instants",
+    "fps": 25,
+    "cold_kbps": 151.67166666666665,
+    "modes": {
+      "joint": {
+        "rate": 20.4075,
+        "dists": 0.3027506445844968
+      },
+      "ordinary": {
+        "rate": 19.93,
+        "dists": 0.46083854387203854
+      },
+      "neural": {
+        "rate": 20.411666666666665,
+        "dists": 0.35179554174343747
+      }
+    }
+  }
+]

@@ -1,0 +1,22 @@
+{
+  "sha256": "731cc34e1fcb7c0874cd5722ab63241a123d31fbcd699e199cee4163cdcbc0dc",
+  "frames": 44,
+  "zstd_available": false,
+  "units": [
+    {
+      "name": "alcaraz_hurkacz__028_at120__person_000000000004",
+      "seed": 112609222011,
+      "count": 44,
+      "reference_sha256": "4efc900c9e414bd768d06545bd70d5c5d2a0299eab1d2f7e044df85839ad9e60",
+      "pose_sha256": "bb9bb8864ab8b290a86a6f796fc0946424f5ed5d8a36bea930284c70dd0d3977"
+    },
+    {
+      "name": "alcaraz_hurkacz__028_at120__person_000000000006",
+      "seed": 131685460767,
+      "count": 44,
+      "reference_sha256": "34f19a1b0c83306a069ecf1c6384f06f1115c62dac2490d9053f0050b57e4cdc",
+      "pose_sha256": "2cdf0aca2774db00990aa95339de067f066094811850edefd9f37f10f3319f5e"
+    }
+  ],
+  "scope": "CPU environment compatibility; no GPU inference or quality result."
+}

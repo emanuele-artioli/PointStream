@@ -1,0 +1,535 @@
+{
+  "scope": "Source-model mask proposals, no human labels. Each person and tick is equally weighted.",
+  "review_sha256": "fb41c943575b35e6ecec36916b8cfab41b8023744614a98681b7cce884681eee",
+  "mean_dists": {
+    "joint": 0.30224044620990753,
+    "ordinary": 0.5024108539024988,
+    "neural": 0.3511497775713603
+  },
+  "rows": [
+    {
+      "tick": 10,
+      "person": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.30794477462768555,
+      "mask_pixels": 8480
+    },
+    {
+      "tick": 10,
+      "person": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.4672185182571411,
+      "mask_pixels": 8480
+    },
+    {
+      "tick": 10,
+      "person": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.3377864956855774,
+      "mask_pixels": 8480
+    },
+    {
+      "tick": 10,
+      "person": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.2329627275466919,
+      "mask_pixels": 2788
+    },
+    {
+      "tick": 10,
+      "person": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.46779125928878784,
+      "mask_pixels": 2788
+    },
+    {
+      "tick": 10,
+      "person": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.30343884229660034,
+      "mask_pixels": 2788
+    },
+    {
+      "tick": 30,
+      "person": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.29586607217788696,
+      "mask_pixels": 7548
+    },
+    {
+      "tick": 30,
+      "person": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.49018335342407227,
+      "mask_pixels": 7548
+    },
+    {
+      "tick": 30,
+      "person": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.3102230429649353,
+      "mask_pixels": 7548
+    },
+    {
+      "tick": 30,
+      "person": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.30589646100997925,
+      "mask_pixels": 3300
+    },
+    {
+      "tick": 30,
+      "person": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.559987485408783,
+      "mask_pixels": 3300
+    },
+    {
+      "tick": 30,
+      "person": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.3809007406234741,
+      "mask_pixels": 3300
+    },
+    {
+      "tick": 50,
+      "person": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.3384934663772583,
+      "mask_pixels": 7300
+    },
+    {
+      "tick": 50,
+      "person": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.48066961765289307,
+      "mask_pixels": 7300
+    },
+    {
+      "tick": 50,
+      "person": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.3332045078277588,
+      "mask_pixels": 7300
+    },
+    {
+      "tick": 50,
+      "person": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.2724551558494568,
+      "mask_pixels": 3252
+    },
+    {
+      "tick": 50,
+      "person": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.5130558013916016,
+      "mask_pixels": 3252
+    },
+    {
+      "tick": 50,
+      "person": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.35446619987487793,
+      "mask_pixels": 3252
+    },
+    {
+      "tick": 70,
+      "person": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.30404847860336304,
+      "mask_pixels": 9956
+    },
+    {
+      "tick": 70,
+      "person": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.45244789123535156,
+      "mask_pixels": 9956
+    },
+    {
+      "tick": 70,
+      "person": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.33573317527770996,
+      "mask_pixels": 9956
+    },
+    {
+      "tick": 70,
+      "person": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.2715708017349243,
+      "mask_pixels": 3084
+    },
+    {
+      "tick": 70,
+      "person": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.5416876077651978,
+      "mask_pixels": 3084
+    },
+    {
+      "tick": 70,
+      "person": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.36892151832580566,
+      "mask_pixels": 3084
+    },
+    {
+      "tick": 90,
+      "person": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.30122649669647217,
+      "mask_pixels": 9228
+    },
+    {
+      "tick": 90,
+      "person": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.4553682208061218,
+      "mask_pixels": 9228
+    },
+    {
+      "tick": 90,
+      "person": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.293911337852478,
+      "mask_pixels": 9228
+    },
+    {
+      "tick": 90,
+      "person": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.2960405945777893,
+      "mask_pixels": 3120
+    },
+    {
+      "tick": 90,
+      "person": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.5826199650764465,
+      "mask_pixels": 3120
+    },
+    {
+      "tick": 90,
+      "person": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.3418300151824951,
+      "mask_pixels": 3120
+    },
+    {
+      "tick": 110,
+      "person": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.27538466453552246,
+      "mask_pixels": 9540
+    },
+    {
+      "tick": 110,
+      "person": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.44530200958251953,
+      "mask_pixels": 9540
+    },
+    {
+      "tick": 110,
+      "person": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.3268240690231323,
+      "mask_pixels": 9540
+    },
+    {
+      "tick": 110,
+      "person": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.3081507086753845,
+      "mask_pixels": 3512
+    },
+    {
+      "tick": 110,
+      "person": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.5798444747924805,
+      "mask_pixels": 3512
+    },
+    {
+      "tick": 110,
+      "person": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.3666118383407593,
+      "mask_pixels": 3512
+    },
+    {
+      "tick": 130,
+      "person": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.29401224851608276,
+      "mask_pixels": 10400
+    },
+    {
+      "tick": 130,
+      "person": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.4438731074333191,
+      "mask_pixels": 10400
+    },
+    {
+      "tick": 130,
+      "person": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.325051486492157,
+      "mask_pixels": 10400
+    },
+    {
+      "tick": 130,
+      "person": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.29636716842651367,
+      "mask_pixels": 3212
+    },
+    {
+      "tick": 130,
+      "person": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.5522973537445068,
+      "mask_pixels": 3212
+    },
+    {
+      "tick": 130,
+      "person": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.3609928488731384,
+      "mask_pixels": 3212
+    },
+    {
+      "tick": 150,
+      "person": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.29484111070632935,
+      "mask_pixels": 8040
+    },
+    {
+      "tick": 150,
+      "person": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.4367028474807739,
+      "mask_pixels": 8040
+    },
+    {
+      "tick": 150,
+      "person": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.34398066997528076,
+      "mask_pixels": 8040
+    },
+    {
+      "tick": 150,
+      "person": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.2856549024581909,
+      "mask_pixels": 3352
+    },
+    {
+      "tick": 150,
+      "person": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.5469479560852051,
+      "mask_pixels": 3352
+    },
+    {
+      "tick": 150,
+      "person": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.3823888301849365,
+      "mask_pixels": 3352
+    },
+    {
+      "tick": 170,
+      "person": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.29631394147872925,
+      "mask_pixels": 8868
+    },
+    {
+      "tick": 170,
+      "person": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.43603914976119995,
+      "mask_pixels": 8868
+    },
+    {
+      "tick": 170,
+      "person": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.31271642446517944,
+      "mask_pixels": 8868
+    },
+    {
+      "tick": 170,
+      "person": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.3144568204879761,
+      "mask_pixels": 3136
+    },
+    {
+      "tick": 170,
+      "person": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.6251363754272461,
+      "mask_pixels": 3136
+    },
+    {
+      "tick": 170,
+      "person": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.4296650290489197,
+      "mask_pixels": 3136
+    },
+    {
+      "tick": 190,
+      "person": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.30199313163757324,
+      "mask_pixels": 9872
+    },
+    {
+      "tick": 190,
+      "person": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.4194689989089966,
+      "mask_pixels": 9872
+    },
+    {
+      "tick": 190,
+      "person": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.2964513301849365,
+      "mask_pixels": 9872
+    },
+    {
+      "tick": 190,
+      "person": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.3460577130317688,
+      "mask_pixels": 4200
+    },
+    {
+      "tick": 190,
+      "person": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.5955957174301147,
+      "mask_pixels": 4200
+    },
+    {
+      "tick": 190,
+      "person": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.42845189571380615,
+      "mask_pixels": 4200
+    },
+    {
+      "tick": 210,
+      "person": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.34925955533981323,
+      "mask_pixels": 9148
+    },
+    {
+      "tick": 210,
+      "person": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.41660642623901367,
+      "mask_pixels": 9148
+    },
+    {
+      "tick": 210,
+      "person": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.32306355237960815,
+      "mask_pixels": 9148
+    },
+    {
+      "tick": 210,
+      "person": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.2965471148490906,
+      "mask_pixels": 4112
+    },
+    {
+      "tick": 210,
+      "person": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.4901219606399536,
+      "mask_pixels": 4112
+    },
+    {
+      "tick": 210,
+      "person": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.397216796875,
+      "mask_pixels": 4112
+    },
+    {
+      "tick": 230,
+      "person": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.3266204595565796,
+      "mask_pixels": 9968
+    },
+    {
+      "tick": 230,
+      "person": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.44763684272766113,
+      "mask_pixels": 9968
+    },
+    {
+      "tick": 230,
+      "person": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.36914992332458496,
+      "mask_pixels": 9968
+    },
+    {
+      "tick": 230,
+      "person": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.34160614013671875,
+      "mask_pixels": 3600
+    },
+    {
+      "tick": 230,
+      "person": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.6112575531005859,
+      "mask_pixels": 3600
+    },
+    {
+      "tick": 230,
+      "person": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.40461409091949463,
+      "mask_pixels": 3600
+    }
+  ],
+  "forecast_cpu": 124.031526,
+  "cpu": 53.273332,
+  "native_rates": {
+    "ordinary": 20.360833333333332,
+    "neural": 20.411666666666665,
+    "joint": 20.4075
+  },
+  "weights_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+  "metric": {
+    "metric": "DISTS",
+    "net": "vgg16",
+    "torchmetrics": "1.9.0",
+    "weights": "/private/tmp/ps-20261119-scorer-addon/torchmetrics/functional/image/dists_models/weights.pt",
+    "weights_sha256": "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218",
+    "backbone": "/Users/manu/.codex/visualizations/2026/11/01/01a196fe-ab4d-70f0-a4b4-6843ca289667/atlas-metric-models/checkpoints/vgg16-397923af.pth",
+    "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+    "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)"
+  },
+  "reconstruction_sha256": "2eb230df276f52780fd34a11331743c2895c3fe94bde05c6645dc0165ee33559",
+  "source_space": "receiver"
+}

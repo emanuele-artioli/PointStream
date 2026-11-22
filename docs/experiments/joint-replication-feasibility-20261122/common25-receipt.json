@@ -1,0 +1,41 @@
+{
+  "packet_sha256": "85d7e48e33718522d39b9f4719f6376a6e470a6b4a5b8bb9bb31304bb84c39e3",
+  "packet_bytes": 169011,
+  "fps": [
+    25,
+    1
+  ],
+  "frames": 240,
+  "coded_size": [
+    160,
+    96
+  ],
+  "source_sha256": "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934",
+  "base_sha256": "f952a52d654ec5713e321c002e6e5d5f8e889e8755a4e33e0365dd44ec1b264e",
+  "base_bytes": 8896,
+  "keypoints_bytes": 2147,
+  "original_keypoints_bytes": 2469,
+  "accounting": {
+    "frame": 11043,
+    "window": 2285,
+    "match": 0,
+    "reference": 155683
+  },
+  "checks": {
+    "alcaraz_hurkacz__028_at120__person_000000000004": {
+      "ticks": 240,
+      "pose_mismatches": 0,
+      "max_abs_box_error": 4.547473508864641e-13,
+      "seed": 112609222011,
+      "reference_exact": true
+    },
+    "alcaraz_hurkacz__028_at120__person_000000000006": {
+      "ticks": 240,
+      "pose_mismatches": 0,
+      "max_abs_box_error": 2.2737367544323206e-13,
+      "seed": 131685460767,
+      "reference_exact": true
+    }
+  },
+  "scope": "CPU packet and source-conditioning parity only; no new common model rendering, source denial, ball or donor-clean quality validation."
+}

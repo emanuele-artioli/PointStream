@@ -1,0 +1,15 @@
+{
+  "stage": "full",
+  "frames": 292,
+  "fit_seconds": 105.95258374500554,
+  "elapsed_seconds": 233.6772056119953,
+  "source_track_positions": 249,
+  "historic_payload_reproduced": true,
+  "fixed_payload_sha256": "7ba15d06e816db68da9e8e3a6d9c18d8dcf9e1132cffd8e7ca6c2f9215bfa338",
+  "refitted_payload_sha256": "0a3e21b2c30296dfedef944be1a4034ddaa92c2d774ad4455246f12ae0908225",
+  "refitted_bytes": 77093,
+  "fixed_bytes": 77081,
+  "target_bytes": 76720,
+  "refitted_sha256": "0aa98172f7154d45221fa8b056859808001976d018428cfd07095f3694780c38",
+  "within_half_percent": true
+}

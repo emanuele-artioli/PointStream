@@ -1,0 +1,2075 @@
+{
+  "source": "676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66",
+  "frames": 480,
+  "decisions": {
+    "shot_fit_share": 0.8,
+    "fit_px": 6.0,
+    "precision": 0.95,
+    "duration_recall": 0.9,
+    "median_px": 2.0,
+    "p95_px": 6.0,
+    "scene_threshold": 0.25,
+    "min_state_seconds": 1.0
+  },
+  "ff": {
+    "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+    "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+    "sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+    "version": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers"
+  },
+  "records": {
+    "first": {
+      "frames": 240,
+      "seconds": 358.72345089200826,
+      "cuts": [],
+      "parts": [
+        {
+          "start": 76626,
+          "end": 76866,
+          "predicted": "court",
+          "fit_share": 1.0
+        }
+      ],
+      "rows": [
+        {
+          "fits": true,
+          "error": 0.8158577680587769
+        },
+        {
+          "fits": true,
+          "error": 0.6482412815093994
+        },
+        {
+          "fits": true,
+          "error": 0.5209084153175354
+        },
+        {
+          "fits": true,
+          "error": 0.518654465675354
+        },
+        {
+          "fits": true,
+          "error": 0.4488581717014313
+        },
+        {
+          "fits": true,
+          "error": 0.43535926938056946
+        },
+        {
+          "fits": true,
+          "error": 0.36070236563682556
+        },
+        {
+          "fits": true,
+          "error": 0.3658633828163147
+        },
+        {
+          "fits": true,
+          "error": 0.39623868465423584
+        },
+        {
+          "fits": true,
+          "error": 0.2883826792240143
+        },
+        {
+          "fits": true,
+          "error": 0.37736380100250244
+        },
+        {
+          "fits": true,
+          "error": 0.39223673939704895
+        },
+        {
+          "fits": true,
+          "error": 0.38187283277511597
+        },
+        {
+          "fits": true,
+          "error": 0.3867270350456238
+        },
+        {
+          "fits": true,
+          "error": 0.4194985330104828
+        },
+        {
+          "fits": true,
+          "error": 0.36638763546943665
+        },
+        {
+          "fits": true,
+          "error": 0.3718976676464081
+        },
+        {
+          "fits": true,
+          "error": 0.4311842620372772
+        },
+        {
+          "fits": true,
+          "error": 0.32903146743774414
+        },
+        {
+          "fits": true,
+          "error": 0.30335724353790283
+        },
+        {
+          "fits": true,
+          "error": 0.3006948232650757
+        },
+        {
+          "fits": true,
+          "error": 0.3249090611934662
+        },
+        {
+          "fits": true,
+          "error": 0.3738023340702057
+        },
+        {
+          "fits": true,
+          "error": 0.3419363796710968
+        },
+        {
+          "fits": true,
+          "error": 0.35499095916748047
+        },
+        {
+          "fits": true,
+          "error": 0.3262260854244232
+        },
+        {
+          "fits": true,
+          "error": 0.30385613441467285
+        },
+        {
+          "fits": true,
+          "error": 0.39437466859817505
+        },
+        {
+          "fits": true,
+          "error": 0.3606874346733093
+        },
+        {
+          "fits": true,
+          "error": 0.2855116128921509
+        },
+        {
+          "fits": true,
+          "error": 0.2856431007385254
+        },
+        {
+          "fits": true,
+          "error": 0.3534846603870392
+        },
+        {
+          "fits": true,
+          "error": 0.34543606638908386
+        },
+        {
+          "fits": true,
+          "error": 0.198969304561615
+        },
+        {
+          "fits": true,
+          "error": 0.387456476688385
+        },
+        {
+          "fits": true,
+          "error": 0.22567306458950043
+        },
+        {
+          "fits": true,
+          "error": 0.20391884446144104
+        },
+        {
+          "fits": true,
+          "error": 0.2963756322860718
+        },
+        {
+          "fits": true,
+          "error": 0.21560925245285034
+        },
+        {
+          "fits": true,
+          "error": 0.22180041670799255
+        },
+        {
+          "fits": true,
+          "error": 0.3131440579891205
+        },
+        {
+          "fits": true,
+          "error": 0.3139551281929016
+        },
+        {
+          "fits": true,
+          "error": 0.27823179960250854
+        },
+        {
+          "fits": true,
+          "error": 0.3604738712310791
+        },
+        {
+          "fits": true,
+          "error": 0.2712565064430237
+        },
+        {
+          "fits": true,
+          "error": 0.21680626273155212
+        },
+        {
+          "fits": true,
+          "error": 0.3778887689113617
+        },
+        {
+          "fits": true,
+          "error": 0.3636227250099182
+        },
+        {
+          "fits": true,
+          "error": 0.26947176456451416
+        },
+        {
+          "fits": true,
+          "error": 0.2359980195760727
+        },
+        {
+          "fits": true,
+          "error": 0.40959569811820984
+        },
+        {
+          "fits": true,
+          "error": 0.28669536113739014
+        },
+        {
+          "fits": true,
+          "error": 0.26447662711143494
+        },
+        {
+          "fits": true,
+          "error": 0.35561999678611755
+        },
+        {
+          "fits": true,
+          "error": 0.29588979482650757
+        },
+        {
+          "fits": true,
+          "error": 0.2649373710155487
+        },
+        {
+          "fits": true,
+          "error": 0.330451637506485
+        },
+        {
+          "fits": true,
+          "error": 0.2939832806587219
+        },
+        {
+          "fits": true,
+          "error": 0.3547229766845703
+        },
+        {
+          "fits": true,
+          "error": 0.27895641326904297
+        },
+        {
+          "fits": true,
+          "error": 0.35086166858673096
+        },
+        {
+          "fits": true,
+          "error": 0.37815436720848083
+        },
+        {
+          "fits": true,
+          "error": 0.22579321265220642
+        },
+        {
+          "fits": true,
+          "error": 0.26935476064682007
+        },
+        {
+          "fits": true,
+          "error": 0.3045617938041687
+        },
+        {
+          "fits": true,
+          "error": 0.3090982735157013
+        },
+        {
+          "fits": true,
+          "error": 0.2566671371459961
+        },
+        {
+          "fits": true,
+          "error": 0.22784706950187683
+        },
+        {
+          "fits": true,
+          "error": 0.2797245979309082
+        },
+        {
+          "fits": true,
+          "error": 0.227412611246109
+        },
+        {
+          "fits": true,
+          "error": 0.3147309422492981
+        },
+        {
+          "fits": true,
+          "error": 0.296832412481308
+        },
+        {
+          "fits": true,
+          "error": 0.23249198496341705
+        },
+        {
+          "fits": true,
+          "error": 0.3196991980075836
+        },
+        {
+          "fits": true,
+          "error": 0.2675415575504303
+        },
+        {
+          "fits": true,
+          "error": 0.24950645864009857
+        },
+        {
+          "fits": true,
+          "error": 0.4008730947971344
+        },
+        {
+          "fits": true,
+          "error": 0.2966940999031067
+        },
+        {
+          "fits": true,
+          "error": 0.33753564953804016
+        },
+        {
+          "fits": true,
+          "error": 0.33645719289779663
+        },
+        {
+          "fits": true,
+          "error": 0.3168320059776306
+        },
+        {
+          "fits": true,
+          "error": 0.384082168340683
+        },
+        {
+          "fits": true,
+          "error": 0.4404962360858917
+        },
+        {
+          "fits": true,
+          "error": 0.4613250195980072
+        },
+        {
+          "fits": true,
+          "error": 0.34712451696395874
+        },
+        {
+          "fits": true,
+          "error": 0.3605680465698242
+        },
+        {
+          "fits": true,
+          "error": 0.32045507431030273
+        },
+        {
+          "fits": true,
+          "error": 0.3338598906993866
+        },
+        {
+          "fits": true,
+          "error": 0.16832919418811798
+        },
+        {
+          "fits": true,
+          "error": 0.3873324990272522
+        },
+        {
+          "fits": true,
+          "error": 0.3144766688346863
+        },
+        {
+          "fits": true,
+          "error": 0.2766314446926117
+        },
+        {
+          "fits": true,
+          "error": 0.36176708340644836
+        },
+        {
+          "fits": true,
+          "error": 0.24293938279151917
+        },
+        {
+          "fits": true,
+          "error": 0.32084089517593384
+        },
+        {
+          "fits": true,
+          "error": 0.34498897194862366
+        },
+        {
+          "fits": true,
+          "error": 0.41114819049835205
+        },
+        {
+          "fits": true,
+          "error": 0.23845641314983368
+        },
+        {
+          "fits": true,
+          "error": 0.4188535213470459
+        },
+        {
+          "fits": true,
+          "error": 0.3449699282646179
+        },
+        {
+          "fits": true,
+          "error": 0.4320644736289978
+        },
+        {
+          "fits": true,
+          "error": 0.4324784278869629
+        },
+        {
+          "fits": true,
+          "error": 0.28580349683761597
+        },
+        {
+          "fits": true,
+          "error": 0.393245667219162
+        },
+        {
+          "fits": true,
+          "error": 0.32585930824279785
+        },
+        {
+          "fits": true,
+          "error": 0.3643506169319153
+        },
+        {
+          "fits": true,
+          "error": 0.39864444732666016
+        },
+        {
+          "fits": true,
+          "error": 0.410803884267807
+        },
+        {
+          "fits": true,
+          "error": 0.40540120005607605
+        },
+        {
+          "fits": true,
+          "error": 0.35531964898109436
+        },
+        {
+          "fits": true,
+          "error": 0.4162083566188812
+        },
+        {
+          "fits": true,
+          "error": 0.409715473651886
+        },
+        {
+          "fits": true,
+          "error": 0.33454981446266174
+        },
+        {
+          "fits": true,
+          "error": 0.36623311042785645
+        },
+        {
+          "fits": true,
+          "error": 0.39054182171821594
+        },
+        {
+          "fits": true,
+          "error": 0.4055997431278229
+        },
+        {
+          "fits": true,
+          "error": 0.4280083477497101
+        },
+        {
+          "fits": true,
+          "error": 0.3652418851852417
+        },
+        {
+          "fits": true,
+          "error": 0.43027636408805847
+        },
+        {
+          "fits": true,
+          "error": 0.5130710601806641
+        },
+        {
+          "fits": true,
+          "error": 0.48836463689804077
+        },
+        {
+          "fits": true,
+          "error": 0.36695462465286255
+        },
+        {
+          "fits": true,
+          "error": 0.4647618532180786
+        },
+        {
+          "fits": true,
+          "error": 0.29352301359176636
+        },
+        {
+          "fits": true,
+          "error": 0.40848860144615173
+        },
+        {
+          "fits": true,
+          "error": 0.35682210326194763
+        },
+        {
+          "fits": true,
+          "error": 0.44551149010658264
+        },
+        {
+          "fits": true,
+          "error": 0.5310072302818298
+        },
+        {
+          "fits": true,
+          "error": 0.44158869981765747
+        },
+        {
+          "fits": true,
+          "error": 0.455599844455719
+        },
+        {
+          "fits": true,
+          "error": 0.3961428701877594
+        },
+        {
+          "fits": true,
+          "error": 0.4064966142177582
+        },
+        {
+          "fits": true,
+          "error": 0.4517996311187744
+        },
+        {
+          "fits": true,
+          "error": 0.4585866630077362
+        },
+        {
+          "fits": true,
+          "error": 0.5203414559364319
+        },
+        {
+          "fits": true,
+          "error": 0.4402667284011841
+        },
+        {
+          "fits": true,
+          "error": 0.5109559893608093
+        },
+        {
+          "fits": true,
+          "error": 0.471002459526062
+        },
+        {
+          "fits": true,
+          "error": 0.44364187121391296
+        },
+        {
+          "fits": true,
+          "error": 0.4176361858844757
+        },
+        {
+          "fits": true,
+          "error": 0.42821401357650757
+        },
+        {
+          "fits": true,
+          "error": 0.3046441376209259
+        },
+        {
+          "fits": true,
+          "error": 0.34651291370391846
+        },
+        {
+          "fits": true,
+          "error": 0.45662733912467957
+        },
+        {
+          "fits": true,
+          "error": 0.3578886389732361
+        },
+        {
+          "fits": true,
+          "error": 0.32045653462409973
+        },
+        {
+          "fits": true,
+          "error": 0.24569164216518402
+        },
+        {
+          "fits": true,
+          "error": 0.33638501167297363
+        },
+        {
+          "fits": true,
+          "error": 0.27138689160346985
+        },
+        {
+          "fits": true,
+          "error": 0.38776731491088867
+        },
+        {
+          "fits": true,
+          "error": 0.28649935126304626
+        },
+        {
+          "fits": true,
+          "error": 0.4788541793823242
+        },
+        {
+          "fits": true,
+          "error": 0.4062255918979645
+        },
+        {
+          "fits": true,
+          "error": 0.38648808002471924
+        },
+        {
+          "fits": true,
+          "error": 0.44306880235671997
+        },
+        {
+          "fits": true,
+          "error": 0.4191586971282959
+        },
+        {
+          "fits": true,
+          "error": 0.29870057106018066
+        },
+        {
+          "fits": true,
+          "error": 0.4422917068004608
+        },
+        {
+          "fits": true,
+          "error": 0.377664178609848
+        },
+        {
+          "fits": true,
+          "error": 0.3722151815891266
+        },
+        {
+          "fits": true,
+          "error": 0.3433688282966614
+        },
+        {
+          "fits": true,
+          "error": 0.34493958950042725
+        },
+        {
+          "fits": true,
+          "error": 0.4161042273044586
+        },
+        {
+          "fits": true,
+          "error": 0.3315492868423462
+        },
+        {
+          "fits": true,
+          "error": 0.281539648771286
+        },
+        {
+          "fits": true,
+          "error": 0.38741305470466614
+        },
+        {
+          "fits": true,
+          "error": 0.29642045497894287
+        },
+        {
+          "fits": true,
+          "error": 0.3785814046859741
+        },
+        {
+          "fits": true,
+          "error": 0.32679134607315063
+        },
+        {
+          "fits": true,
+          "error": 0.3747631013393402
+        },
+        {
+          "fits": true,
+          "error": 0.264479398727417
+        },
+        {
+          "fits": true,
+          "error": 0.344336599111557
+        },
+        {
+          "fits": true,
+          "error": 0.26457518339157104
+        },
+        {
+          "fits": true,
+          "error": 0.36596405506134033
+        },
+        {
+          "fits": true,
+          "error": 0.19606322050094604
+        },
+        {
+          "fits": true,
+          "error": 0.34228813648223877
+        },
+        {
+          "fits": true,
+          "error": 0.2814834415912628
+        },
+        {
+          "fits": true,
+          "error": 0.3699877858161926
+        },
+        {
+          "fits": true,
+          "error": 0.3769787549972534
+        },
+        {
+          "fits": true,
+          "error": 0.3765319287776947
+        },
+        {
+          "fits": true,
+          "error": 0.35038042068481445
+        },
+        {
+          "fits": true,
+          "error": 0.3968771994113922
+        },
+        {
+          "fits": true,
+          "error": 0.37178826332092285
+        },
+        {
+          "fits": true,
+          "error": 0.30285435914993286
+        },
+        {
+          "fits": true,
+          "error": 0.372529000043869
+        },
+        {
+          "fits": true,
+          "error": 0.3297532796859741
+        },
+        {
+          "fits": true,
+          "error": 0.44122302532196045
+        },
+        {
+          "fits": true,
+          "error": 0.2779455780982971
+        },
+        {
+          "fits": true,
+          "error": 0.3591252565383911
+        },
+        {
+          "fits": true,
+          "error": 0.3515786826610565
+        },
+        {
+          "fits": true,
+          "error": 0.3700213134288788
+        },
+        {
+          "fits": true,
+          "error": 0.3188008666038513
+        },
+        {
+          "fits": true,
+          "error": 0.26114144921302795
+        },
+        {
+          "fits": true,
+          "error": 0.2288544923067093
+        },
+        {
+          "fits": true,
+          "error": 0.31357577443122864
+        },
+        {
+          "fits": true,
+          "error": 0.3436610698699951
+        },
+        {
+          "fits": true,
+          "error": 0.38372451066970825
+        },
+        {
+          "fits": true,
+          "error": 0.3226531147956848
+        },
+        {
+          "fits": true,
+          "error": 0.347707599401474
+        },
+        {
+          "fits": true,
+          "error": 0.33005788922309875
+        },
+        {
+          "fits": true,
+          "error": 0.2841925621032715
+        },
+        {
+          "fits": true,
+          "error": 0.3494906723499298
+        },
+        {
+          "fits": true,
+          "error": 0.3122256100177765
+        },
+        {
+          "fits": true,
+          "error": 0.2835701107978821
+        },
+        {
+          "fits": true,
+          "error": 0.2990822196006775
+        },
+        {
+          "fits": true,
+          "error": 0.32167425751686096
+        },
+        {
+          "fits": true,
+          "error": 0.24679189920425415
+        },
+        {
+          "fits": true,
+          "error": 0.38025736808776855
+        },
+        {
+          "fits": true,
+          "error": 0.1680612713098526
+        },
+        {
+          "fits": true,
+          "error": 0.3022172749042511
+        },
+        {
+          "fits": true,
+          "error": 0.35113784670829773
+        },
+        {
+          "fits": true,
+          "error": 0.2773056924343109
+        },
+        {
+          "fits": true,
+          "error": 0.2525617480278015
+        },
+        {
+          "fits": true,
+          "error": 0.3037860691547394
+        },
+        {
+          "fits": true,
+          "error": 0.3443218469619751
+        },
+        {
+          "fits": true,
+          "error": 0.2543427646160126
+        },
+        {
+          "fits": true,
+          "error": 0.32051411271095276
+        },
+        {
+          "fits": true,
+          "error": 0.24657763540744781
+        },
+        {
+          "fits": true,
+          "error": 0.35965365171432495
+        },
+        {
+          "fits": true,
+          "error": 0.40478190779685974
+        },
+        {
+          "fits": true,
+          "error": 0.4685007631778717
+        },
+        {
+          "fits": true,
+          "error": 0.39777427911758423
+        },
+        {
+          "fits": true,
+          "error": 0.37181639671325684
+        },
+        {
+          "fits": true,
+          "error": 0.2798474431037903
+        },
+        {
+          "fits": true,
+          "error": 0.36174705624580383
+        },
+        {
+          "fits": true,
+          "error": 0.49515119194984436
+        },
+        {
+          "fits": true,
+          "error": 0.4115810692310333
+        },
+        {
+          "fits": true,
+          "error": 0.42858046293258667
+        },
+        {
+          "fits": true,
+          "error": 0.4975491166114807
+        },
+        {
+          "fits": true,
+          "error": 0.45323118567466736
+        },
+        {
+          "fits": true,
+          "error": 0.43495824933052063
+        },
+        {
+          "fits": true,
+          "error": 0.44851818680763245
+        },
+        {
+          "fits": true,
+          "error": 0.7289057374000549
+        },
+        {
+          "fits": true,
+          "error": 0.8436958193778992
+        },
+        {
+          "fits": true,
+          "error": 0.7172865271568298
+        },
+        {
+          "fits": true,
+          "error": 0.5607662796974182
+        },
+        {
+          "fits": true,
+          "error": 0.7782068252563477
+        },
+        {
+          "fits": true,
+          "error": 0.7919104099273682
+        },
+        {
+          "fits": true,
+          "error": 0.8579652905464172
+        },
+        {
+          "fits": true,
+          "error": 0.6240127682685852
+        }
+      ],
+      "cmd": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+        "-v",
+        "error",
+        "-nostdin",
+        "-threads",
+        "1",
+        "-ss",
+        "1532.540000",
+        "-t",
+        "4.820000",
+        "-i",
+        "/local/users/emanuele/pointstream/cache/676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66/nadal-kyrgios-broadcast.mp4",
+        "-frames:v",
+        "240",
+        "-filter_threads",
+        "1",
+        "-vf",
+        "scale=1920:1080:flags=area:out_range=tv,format=yuv420p",
+        "-fps_mode",
+        "passthrough",
+        "-f",
+        "rawvideo",
+        "-pix_fmt",
+        "yuv420p",
+        "pipe:1"
+      ],
+      "cut_cmd": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+        "-v",
+        "error",
+        "-nostdin",
+        "-threads",
+        "1",
+        "-ss",
+        "1532.540000",
+        "-t",
+        "4.820000",
+        "-i",
+        "/local/users/emanuele/pointstream/cache/676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66/nadal-kyrgios-broadcast.mp4",
+        "-an",
+        "-filter_threads",
+        "1",
+        "-vf",
+        "trim=end_frame=240,setpts=PTS-STARTPTS,select='gte(scene,0.10)',metadata=print:file=/local/users/emanuele/pointstream/scratch/20261121T235335Z-717dca52-full/first.log",
+        "-t",
+        "4.8",
+        "-f",
+        "null",
+        "-"
+      ]
+    },
+    "return": {
+      "frames": 240,
+      "seconds": 356.80075683101313,
+      "cuts": [],
+      "parts": [
+        {
+          "start": 87691,
+          "end": 87931,
+          "predicted": "court",
+          "fit_share": 1.0
+        }
+      ],
+      "rows": [
+        {
+          "fits": true,
+          "error": 0.6652746200561523
+        },
+        {
+          "fits": true,
+          "error": 0.5398216247558594
+        },
+        {
+          "fits": true,
+          "error": 0.6512922048568726
+        },
+        {
+          "fits": true,
+          "error": 0.4765082597732544
+        },
+        {
+          "fits": true,
+          "error": 0.4982295632362366
+        },
+        {
+          "fits": true,
+          "error": 0.7111701369285583
+        },
+        {
+          "fits": true,
+          "error": 0.4144330620765686
+        },
+        {
+          "fits": true,
+          "error": 0.4315366744995117
+        },
+        {
+          "fits": true,
+          "error": 0.38895460963249207
+        },
+        {
+          "fits": true,
+          "error": 0.455773264169693
+        },
+        {
+          "fits": true,
+          "error": 0.4626103639602661
+        },
+        {
+          "fits": true,
+          "error": 0.45132914185523987
+        },
+        {
+          "fits": true,
+          "error": 0.778578519821167
+        },
+        {
+          "fits": true,
+          "error": 0.40526849031448364
+        },
+        {
+          "fits": true,
+          "error": 0.6025147438049316
+        },
+        {
+          "fits": true,
+          "error": 0.4494195580482483
+        },
+        {
+          "fits": true,
+          "error": 0.6656614542007446
+        },
+        {
+          "fits": true,
+          "error": 0.6408302187919617
+        },
+        {
+          "fits": true,
+          "error": 0.4824274778366089
+        },
+        {
+          "fits": true,
+          "error": 0.559343695640564
+        },
+        {
+          "fits": true,
+          "error": 0.53945392370224
+        },
+        {
+          "fits": true,
+          "error": 0.7160333395004272
+        },
+        {
+          "fits": true,
+          "error": 0.8147357106208801
+        },
+        {
+          "fits": true,
+          "error": 0.7754855155944824
+        },
+        {
+          "fits": true,
+          "error": 0.8371954560279846
+        },
+        {
+          "fits": true,
+          "error": 1.0474895238876343
+        },
+        {
+          "fits": true,
+          "error": 1.1016587018966675
+        },
+        {
+          "fits": true,
+          "error": 1.4022912979125977
+        },
+        {
+          "fits": true,
+          "error": 1.5037888288497925
+        },
+        {
+          "fits": true,
+          "error": 1.8697434663772583
+        },
+        {
+          "fits": true,
+          "error": 0.560555100440979
+        },
+        {
+          "fits": true,
+          "error": 0.4225183129310608
+        },
+        {
+          "fits": true,
+          "error": 0.5806466341018677
+        },
+        {
+          "fits": true,
+          "error": 0.663442850112915
+        },
+        {
+          "fits": true,
+          "error": 0.751518964767456
+        },
+        {
+          "fits": true,
+          "error": 0.91779625415802
+        },
+        {
+          "fits": true,
+          "error": 1.0919561386108398
+        },
+        {
+          "fits": true,
+          "error": 1.1985183954238892
+        },
+        {
+          "fits": true,
+          "error": 1.2434293031692505
+        },
+        {
+          "fits": true,
+          "error": 1.2803782224655151
+        },
+        {
+          "fits": true,
+          "error": 1.5518676042556763
+        },
+        {
+          "fits": true,
+          "error": 1.807473063468933
+        },
+        {
+          "fits": true,
+          "error": 1.9019078016281128
+        },
+        {
+          "fits": true,
+          "error": 0.4742303192615509
+        },
+        {
+          "fits": true,
+          "error": 0.5725365281105042
+        },
+        {
+          "fits": true,
+          "error": 0.5166052579879761
+        },
+        {
+          "fits": true,
+          "error": 0.7555944919586182
+        },
+        {
+          "fits": true,
+          "error": 0.7733633518218994
+        },
+        {
+          "fits": true,
+          "error": 0.9040389060974121
+        },
+        {
+          "fits": true,
+          "error": 0.9567344784736633
+        },
+        {
+          "fits": true,
+          "error": 1.0784226655960083
+        },
+        {
+          "fits": true,
+          "error": 1.5548675060272217
+        },
+        {
+          "fits": true,
+          "error": 1.19548499584198
+        },
+        {
+          "fits": true,
+          "error": 1.1493500471115112
+        },
+        {
+          "fits": true,
+          "error": 1.1905231475830078
+        },
+        {
+          "fits": true,
+          "error": 1.3041421175003052
+        },
+        {
+          "fits": true,
+          "error": 1.3481749296188354
+        },
+        {
+          "fits": true,
+          "error": 1.4340455532073975
+        },
+        {
+          "fits": true,
+          "error": 1.4143729209899902
+        },
+        {
+          "fits": true,
+          "error": 1.4669593572616577
+        },
+        {
+          "fits": true,
+          "error": 1.740310549736023
+        },
+        {
+          "fits": true,
+          "error": 1.473232388496399
+        },
+        {
+          "fits": true,
+          "error": 1.5164319276809692
+        },
+        {
+          "fits": true,
+          "error": 1.5404292345046997
+        },
+        {
+          "fits": true,
+          "error": 1.3966273069381714
+        },
+        {
+          "fits": true,
+          "error": 1.316084384918213
+        },
+        {
+          "fits": true,
+          "error": 1.3626434803009033
+        },
+        {
+          "fits": true,
+          "error": 1.328555941581726
+        },
+        {
+          "fits": true,
+          "error": 1.334158182144165
+        },
+        {
+          "fits": true,
+          "error": 1.2924753427505493
+        },
+        {
+          "fits": true,
+          "error": 1.7245118618011475
+        },
+        {
+          "fits": true,
+          "error": 1.6816729307174683
+        },
+        {
+          "fits": true,
+          "error": 1.2192414999008179
+        },
+        {
+          "fits": true,
+          "error": 1.1964683532714844
+        },
+        {
+          "fits": true,
+          "error": 1.1197079420089722
+        },
+        {
+          "fits": true,
+          "error": 1.1389919519424438
+        },
+        {
+          "fits": true,
+          "error": 1.044895052909851
+        },
+        {
+          "fits": true,
+          "error": 1.1148945093154907
+        },
+        {
+          "fits": true,
+          "error": 1.1014807224273682
+        },
+        {
+          "fits": true,
+          "error": 1.0601705312728882
+        },
+        {
+          "fits": true,
+          "error": 1.1416819095611572
+        },
+        {
+          "fits": true,
+          "error": 1.135496973991394
+        },
+        {
+          "fits": true,
+          "error": 1.1302096843719482
+        },
+        {
+          "fits": true,
+          "error": 1.325463891029358
+        },
+        {
+          "fits": true,
+          "error": 1.1539852619171143
+        },
+        {
+          "fits": true,
+          "error": 1.0815852880477905
+        },
+        {
+          "fits": true,
+          "error": 1.1268010139465332
+        },
+        {
+          "fits": true,
+          "error": 1.1387813091278076
+        },
+        {
+          "fits": true,
+          "error": 1.447299599647522
+        },
+        {
+          "fits": true,
+          "error": 1.4172379970550537
+        },
+        {
+          "fits": true,
+          "error": 1.3653534650802612
+        },
+        {
+          "fits": true,
+          "error": 1.389056921005249
+        },
+        {
+          "fits": true,
+          "error": 1.188419222831726
+        },
+        {
+          "fits": true,
+          "error": 0.9731897115707397
+        },
+        {
+          "fits": true,
+          "error": 0.9853308796882629
+        },
+        {
+          "fits": true,
+          "error": 0.8544418811798096
+        },
+        {
+          "fits": true,
+          "error": 0.9008163809776306
+        },
+        {
+          "fits": true,
+          "error": 0.9274955987930298
+        },
+        {
+          "fits": true,
+          "error": 0.4422867000102997
+        },
+        {
+          "fits": true,
+          "error": 0.5304850339889526
+        },
+        {
+          "fits": true,
+          "error": 0.5841699838638306
+        },
+        {
+          "fits": true,
+          "error": 0.5706361532211304
+        },
+        {
+          "fits": true,
+          "error": 0.4737493693828583
+        },
+        {
+          "fits": true,
+          "error": 0.553377091884613
+        },
+        {
+          "fits": true,
+          "error": 0.4138214588165283
+        },
+        {
+          "fits": true,
+          "error": 0.4837622046470642
+        },
+        {
+          "fits": true,
+          "error": 0.4626922011375427
+        },
+        {
+          "fits": true,
+          "error": 0.46782001852989197
+        },
+        {
+          "fits": true,
+          "error": 0.8197433352470398
+        },
+        {
+          "fits": true,
+          "error": 0.4275161325931549
+        },
+        {
+          "fits": true,
+          "error": 0.42095473408699036
+        },
+        {
+          "fits": true,
+          "error": 0.3736899495124817
+        },
+        {
+          "fits": true,
+          "error": 0.366074800491333
+        },
+        {
+          "fits": true,
+          "error": 0.4967726767063141
+        },
+        {
+          "fits": true,
+          "error": 0.49581649899482727
+        },
+        {
+          "fits": true,
+          "error": 0.5325726270675659
+        },
+        {
+          "fits": true,
+          "error": 0.8977870345115662
+        },
+        {
+          "fits": true,
+          "error": 0.4286654591560364
+        },
+        {
+          "fits": true,
+          "error": 0.5348691344261169
+        },
+        {
+          "fits": true,
+          "error": 0.36221423745155334
+        },
+        {
+          "fits": true,
+          "error": 0.75359708070755
+        },
+        {
+          "fits": true,
+          "error": 0.40823426842689514
+        },
+        {
+          "fits": true,
+          "error": 0.35466766357421875
+        },
+        {
+          "fits": true,
+          "error": 0.39825254678726196
+        },
+        {
+          "fits": true,
+          "error": 0.38556110858917236
+        },
+        {
+          "fits": true,
+          "error": 0.3984561860561371
+        },
+        {
+          "fits": true,
+          "error": 0.37213021516799927
+        },
+        {
+          "fits": true,
+          "error": 0.40819790959358215
+        },
+        {
+          "fits": true,
+          "error": 0.2657371163368225
+        },
+        {
+          "fits": true,
+          "error": 0.4093360900878906
+        },
+        {
+          "fits": true,
+          "error": 0.38822171092033386
+        },
+        {
+          "fits": true,
+          "error": 0.39858654141426086
+        },
+        {
+          "fits": true,
+          "error": 0.38139668107032776
+        },
+        {
+          "fits": true,
+          "error": 0.3999824523925781
+        },
+        {
+          "fits": true,
+          "error": 0.39273616671562195
+        },
+        {
+          "fits": true,
+          "error": 0.4219949245452881
+        },
+        {
+          "fits": true,
+          "error": 0.416913777589798
+        },
+        {
+          "fits": true,
+          "error": 0.454405814409256
+        },
+        {
+          "fits": true,
+          "error": 0.2990477383136749
+        },
+        {
+          "fits": true,
+          "error": 0.40350964665412903
+        },
+        {
+          "fits": true,
+          "error": 0.3854047954082489
+        },
+        {
+          "fits": true,
+          "error": 0.3517323434352875
+        },
+        {
+          "fits": true,
+          "error": 0.4364885687828064
+        },
+        {
+          "fits": true,
+          "error": 0.446393221616745
+        },
+        {
+          "fits": true,
+          "error": 0.39523690938949585
+        },
+        {
+          "fits": true,
+          "error": 0.5328109860420227
+        },
+        {
+          "fits": true,
+          "error": 0.4720589816570282
+        },
+        {
+          "fits": true,
+          "error": 0.3890906572341919
+        },
+        {
+          "fits": true,
+          "error": 0.4637719392776489
+        },
+        {
+          "fits": true,
+          "error": 0.2856329083442688
+        },
+        {
+          "fits": true,
+          "error": 0.4708901047706604
+        },
+        {
+          "fits": true,
+          "error": 0.33301424980163574
+        },
+        {
+          "fits": true,
+          "error": 0.528843879699707
+        },
+        {
+          "fits": true,
+          "error": 0.4912080764770508
+        },
+        {
+          "fits": true,
+          "error": 0.356332927942276
+        },
+        {
+          "fits": true,
+          "error": 0.3634704351425171
+        },
+        {
+          "fits": true,
+          "error": 0.42959287762641907
+        },
+        {
+          "fits": true,
+          "error": 0.4671138525009155
+        },
+        {
+          "fits": true,
+          "error": 0.36485785245895386
+        },
+        {
+          "fits": true,
+          "error": 0.3220003545284271
+        },
+        {
+          "fits": true,
+          "error": 0.32783377170562744
+        },
+        {
+          "fits": true,
+          "error": 0.259473979473114
+        },
+        {
+          "fits": true,
+          "error": 0.3401830196380615
+        },
+        {
+          "fits": true,
+          "error": 0.30952534079551697
+        },
+        {
+          "fits": true,
+          "error": 0.39715710282325745
+        },
+        {
+          "fits": true,
+          "error": 0.3370124399662018
+        },
+        {
+          "fits": true,
+          "error": 0.3392164409160614
+        },
+        {
+          "fits": true,
+          "error": 0.3977168798446655
+        },
+        {
+          "fits": true,
+          "error": 0.45665624737739563
+        },
+        {
+          "fits": true,
+          "error": 0.46052294969558716
+        },
+        {
+          "fits": true,
+          "error": 0.40172988176345825
+        },
+        {
+          "fits": true,
+          "error": 0.28911104798316956
+        },
+        {
+          "fits": true,
+          "error": 0.34607601165771484
+        },
+        {
+          "fits": true,
+          "error": 0.4844854474067688
+        },
+        {
+          "fits": true,
+          "error": 0.40327075123786926
+        },
+        {
+          "fits": true,
+          "error": 0.3460525572299957
+        },
+        {
+          "fits": true,
+          "error": 0.36411815881729126
+        },
+        {
+          "fits": true,
+          "error": 0.3926391303539276
+        },
+        {
+          "fits": true,
+          "error": 0.3811880350112915
+        },
+        {
+          "fits": true,
+          "error": 0.3927275538444519
+        },
+        {
+          "fits": true,
+          "error": 0.49386027455329895
+        },
+        {
+          "fits": true,
+          "error": 0.3718056082725525
+        },
+        {
+          "fits": true,
+          "error": 0.4599559009075165
+        },
+        {
+          "fits": true,
+          "error": 0.4260990619659424
+        },
+        {
+          "fits": true,
+          "error": 0.4502994418144226
+        },
+        {
+          "fits": true,
+          "error": 0.44660061597824097
+        },
+        {
+          "fits": true,
+          "error": 0.40783244371414185
+        },
+        {
+          "fits": true,
+          "error": 0.38463538885116577
+        },
+        {
+          "fits": true,
+          "error": 0.404838889837265
+        },
+        {
+          "fits": true,
+          "error": 0.4488435387611389
+        },
+        {
+          "fits": true,
+          "error": 0.32014596462249756
+        },
+        {
+          "fits": true,
+          "error": 0.41171690821647644
+        },
+        {
+          "fits": true,
+          "error": 0.3504784107208252
+        },
+        {
+          "fits": true,
+          "error": 0.5116302967071533
+        },
+        {
+          "fits": true,
+          "error": 0.4535490870475769
+        },
+        {
+          "fits": true,
+          "error": 0.39554134011268616
+        },
+        {
+          "fits": true,
+          "error": 0.2896516025066376
+        },
+        {
+          "fits": true,
+          "error": 0.31057560443878174
+        },
+        {
+          "fits": true,
+          "error": 0.43547242879867554
+        },
+        {
+          "fits": true,
+          "error": 0.43321722745895386
+        },
+        {
+          "fits": true,
+          "error": 0.3666560649871826
+        },
+        {
+          "fits": true,
+          "error": 0.38397184014320374
+        },
+        {
+          "fits": true,
+          "error": 0.25164473056793213
+        },
+        {
+          "fits": true,
+          "error": 0.3220688998699188
+        },
+        {
+          "fits": true,
+          "error": 0.41632986068725586
+        },
+        {
+          "fits": true,
+          "error": 0.48518088459968567
+        },
+        {
+          "fits": true,
+          "error": 0.3789568245410919
+        },
+        {
+          "fits": true,
+          "error": 0.4954245090484619
+        },
+        {
+          "fits": true,
+          "error": 0.27833545207977295
+        },
+        {
+          "fits": true,
+          "error": 0.44704994559288025
+        },
+        {
+          "fits": true,
+          "error": 0.39860931038856506
+        },
+        {
+          "fits": true,
+          "error": 0.26671749353408813
+        },
+        {
+          "fits": true,
+          "error": 0.3937050700187683
+        },
+        {
+          "fits": true,
+          "error": 0.3011062443256378
+        },
+        {
+          "fits": true,
+          "error": 0.2783571779727936
+        },
+        {
+          "fits": true,
+          "error": 0.4498264193534851
+        },
+        {
+          "fits": true,
+          "error": 0.8568059206008911
+        },
+        {
+          "fits": true,
+          "error": 0.7773394584655762
+        },
+        {
+          "fits": true,
+          "error": 0.7729408144950867
+        },
+        {
+          "fits": true,
+          "error": 0.41959866881370544
+        },
+        {
+          "fits": true,
+          "error": 0.4246927499771118
+        },
+        {
+          "fits": true,
+          "error": 0.4190782308578491
+        },
+        {
+          "fits": true,
+          "error": 0.46274787187576294
+        },
+        {
+          "fits": true,
+          "error": 0.5725266337394714
+        },
+        {
+          "fits": true,
+          "error": 0.35718315839767456
+        },
+        {
+          "fits": true,
+          "error": 0.3254947364330292
+        },
+        {
+          "fits": true,
+          "error": 0.26308801770210266
+        },
+        {
+          "fits": true,
+          "error": 0.2922903001308441
+        },
+        {
+          "fits": true,
+          "error": 0.36901745200157166
+        },
+        {
+          "fits": true,
+          "error": 0.4295475482940674
+        },
+        {
+          "fits": true,
+          "error": 0.44829320907592773
+        },
+        {
+          "fits": true,
+          "error": 0.3239436447620392
+        },
+        {
+          "fits": true,
+          "error": 0.33555880188941956
+        },
+        {
+          "fits": true,
+          "error": 0.34638428688049316
+        },
+        {
+          "fits": true,
+          "error": 0.3734387755393982
+        },
+        {
+          "fits": true,
+          "error": 0.39883020520210266
+        },
+        {
+          "fits": true,
+          "error": 0.4013737142086029
+        },
+        {
+          "fits": true,
+          "error": 0.4199528396129608
+        },
+        {
+          "fits": true,
+          "error": 0.36583930253982544
+        },
+        {
+          "fits": true,
+          "error": 0.2996595501899719
+        }
+      ],
+      "cmd": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+        "-v",
+        "error",
+        "-nostdin",
+        "-threads",
+        "1",
+        "-ss",
+        "1753.840000",
+        "-t",
+        "4.820000",
+        "-i",
+        "/local/users/emanuele/pointstream/cache/676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66/nadal-kyrgios-broadcast.mp4",
+        "-frames:v",
+        "240",
+        "-filter_threads",
+        "1",
+        "-vf",
+        "scale=1920:1080:flags=area:out_range=tv,format=yuv420p",
+        "-fps_mode",
+        "passthrough",
+        "-f",
+        "rawvideo",
+        "-pix_fmt",
+        "yuv420p",
+        "pipe:1"
+      ],
+      "cut_cmd": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+        "-v",
+        "error",
+        "-nostdin",
+        "-threads",
+        "1",
+        "-ss",
+        "1753.840000",
+        "-t",
+        "4.820000",
+        "-i",
+        "/local/users/emanuele/pointstream/cache/676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66/nadal-kyrgios-broadcast.mp4",
+        "-an",
+        "-filter_threads",
+        "1",
+        "-vf",
+        "trim=end_frame=240,setpts=PTS-STARTPTS,select='gte(scene,0.10)',metadata=print:file=/local/users/emanuele/pointstream/scratch/20261121T235335Z-717dca52-full/return.log",
+        "-t",
+        "4.8",
+        "-f",
+        "null",
+        "-"
+      ]
+    }
+  },
+  "seconds": 715.5689495069964
+}

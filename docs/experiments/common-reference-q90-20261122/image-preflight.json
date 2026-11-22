@@ -1,0 +1,33 @@
+{
+  "quality": 90,
+  "rows": [
+    {
+      "image_bytes": 61298,
+      "payload_sha256": "f2730e80ac3043dacbc2ccedd57b5a892cf0daa3fc60e5a4c057e12234d45193",
+      "decoded_size": [
+        512,
+        784
+      ],
+      "unit": "nadal_kyrgios__000_at120__person_000000000000",
+      "source_rgb_sha256": "330cd728d60c72bb10807543050e3c8ce6e54b93e3445e7fca6c289526dec3e0",
+      "decoded_rgb_sha256": "19e63d4fea6a08d30705cc9390e78ddf3acf544ea102b0e6b880c68ee39323b6"
+    },
+    {
+      "image_bytes": 45978,
+      "payload_sha256": "1e3be5b9c22bbb2097d932274024a0418e0d6ebbfc30d0d4f4ab5a3f8b9e550c",
+      "decoded_size": [
+        512,
+        784
+      ],
+      "unit": "nadal_kyrgios__000_at120__person_000000000001",
+      "source_rgb_sha256": "df807a3b9a6c8cd73015544e9b607300690d83a63a26f878e80d914f721e592b",
+      "decoded_rgb_sha256": "4bcfdc3f75885503e005b56aa22255f98f296aae0b59f54e4e1ad478f6c328bc"
+    }
+  ],
+  "total_image_bytes": 107276,
+  "lossless_reference_bytes": 242317,
+  "savings_fraction": 0.5572906564541489,
+  "passes_30_percent": true,
+  "avifenc_sha256": "f9cd38ec2804b56174344fd178ea919f9bff41ec7fc4a471f0ff9065b1b5d076",
+  "avifdec_sha256": "635e3acc8cc93212ca5cf1cc867b9bb6f3b738574e92107ed24be48a4a75e6bd"
+}

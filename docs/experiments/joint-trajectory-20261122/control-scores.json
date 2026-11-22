@@ -1,0 +1,5240 @@
+{
+  "points": [
+    {
+      "cap": 20,
+      "mode": "plain",
+      "crf": 59.25,
+      "width": 160,
+      "kbps": 21.311666666666667,
+      "bytes": 12787,
+      "decoded_sha256": "755f233de4d68f8c359be278bb807b96dbf2c93e93d76bea8cf744426ac42174",
+      "players": 0.535861184199651,
+      "ball": 0.4281265437602997,
+      "p1": 0.5259455591440201,
+      "p2": 0.545776809255282
+    },
+    {
+      "cap": 20,
+      "mode": "plain",
+      "crf": 59.0,
+      "width": 160,
+      "kbps": 21.685,
+      "bytes": 13011,
+      "decoded_sha256": "f89cd9af4b7316ab84f824cae1ec873315abcace253fd62e992c006ea7094025",
+      "players": 0.5346439555287361,
+      "ball": 0.42308544119199115,
+      "p1": 0.5263840109109879,
+      "p2": 0.5429039001464844
+    },
+    {
+      "cap": 20,
+      "mode": "roi",
+      "crf": 70.0,
+      "width": 160,
+      "kbps": 21.808333333333337,
+      "bytes": 13085,
+      "decoded_sha256": "16c3ae29d77e96b442938884a49d35a0671cd3e7484ad0fa7230f14ea1c1711f",
+      "players": 0.6166362538933754,
+      "ball": 0.459799587726593,
+      "p1": 0.6171838144461314,
+      "p2": 0.6160886933406194
+    },
+    {
+      "cap": 20,
+      "mode": "plain",
+      "crf": 63.0,
+      "width": 240,
+      "kbps": 21.623333333333335,
+      "bytes": 12974,
+      "decoded_sha256": "bdb4dac5c91c8013ed49cce6e3244fc5b7a93f48446011822133f43247882bd4",
+      "players": 0.5115252509713173,
+      "ball": 0.4133229007323583,
+      "p1": 0.5116553356250128,
+      "p2": 0.5113951663176218
+    },
+    {
+      "cap": 20,
+      "mode": "roi",
+      "crf": 70.0,
+      "width": 240,
+      "kbps": 22.988333333333337,
+      "bytes": 13793,
+      "decoded_sha256": "d344bc20531fd549141ec54c7d716c0901064b90eccc747462d171626b0d3607",
+      "players": 0.5888842393954594,
+      "ball": 0.43567630151907605,
+      "p1": 0.619346484541893,
+      "p2": 0.5584219942490259
+    },
+    {
+      "cap": 20,
+      "mode": "plain",
+      "crf": 70.0,
+      "width": 480,
+      "kbps": 22.358333333333334,
+      "bytes": 13415,
+      "decoded_sha256": "3d9bcad2fecb9feffe350f4d4445018c613c3ec5aed8af0b77990fc0687cc519",
+      "players": 0.513247234125932,
+      "ball": 0.3907717565695445,
+      "p1": 0.5181496441364288,
+      "p2": 0.5083448241154352
+    },
+    {
+      "cap": 20,
+      "mode": "roi",
+      "crf": 70.0,
+      "width": 480,
+      "kbps": 28.221666666666668,
+      "bytes": 16933,
+      "decoded_sha256": "ccc86ec63091b2a95efbc27e8e9ec62f87f609e05c9c1da989d5e2749a9b1edf",
+      "players": 0.5076996733744938,
+      "ball": 0.39878982305526733,
+      "p1": 0.5145546346902847,
+      "p2": 0.5008447120587031
+    },
+    {
+      "cap": 33,
+      "mode": "plain",
+      "crf": 45.5,
+      "width": 160,
+      "kbps": 32.556666666666665,
+      "bytes": 19534,
+      "decoded_sha256": "1126c2c002cec69b2c6e8c4dab6a28e67c366549db937d7b10a145dd2a51fcce",
+      "players": 0.5107284188270569,
+      "ball": 0.41190577546755475,
+      "p1": 0.504493460059166,
+      "p2": 0.5169633775949478
+    },
+    {
+      "cap": 33,
+      "mode": "roi",
+      "crf": 53.0,
+      "width": 160,
+      "kbps": 32.42166666666667,
+      "bytes": 19453,
+      "decoded_sha256": "4fc8344aff7dd07478ea77126a5e9dcde47f5afa0b2f7b11bc632eb24aafa20a",
+      "players": 0.520737998187542,
+      "ball": 0.4169584810733795,
+      "p1": 0.5126125365495682,
+      "p2": 0.5288634598255157
+    },
+    {
+      "cap": 33,
+      "mode": "plain",
+      "crf": 57.25,
+      "width": 240,
+      "kbps": 32.53,
+      "bytes": 19518,
+      "decoded_sha256": "73ca3d8703a507fb31b7970428b925782ff7132c1e7f621a632ffd63cdb822da",
+      "players": 0.4762258604168892,
+      "ball": 0.3917588343222936,
+      "p1": 0.4779943972826004,
+      "p2": 0.474457323551178
+    },
+    {
+      "cap": 33,
+      "mode": "roi",
+      "crf": 61.0,
+      "width": 240,
+      "kbps": 32.413333333333334,
+      "bytes": 19448,
+      "decoded_sha256": "f69359db8e23df785aeace3ac3ec7563777881c0947c9fd93b5a40ef1935b964",
+      "players": 0.49285549173752463,
+      "ball": 0.39591150482495624,
+      "p1": 0.48625996708869934,
+      "p2": 0.49945101638635
+    },
+    {
+      "cap": 33,
+      "mode": "plain",
+      "crf": 64.25,
+      "width": 480,
+      "kbps": 32.21,
+      "bytes": 19326,
+      "decoded_sha256": "8bce20ad4eab84f8edbfa78678b858b479c28f4bf575d2d05ee1c1150020c357",
+      "players": 0.4506993070244789,
+      "ball": 0.362650786836942,
+      "p1": 0.44740883509318036,
+      "p2": 0.45398977895577747
+    },
+    {
+      "cap": 33,
+      "mode": "plain",
+      "crf": 64.0,
+      "width": 480,
+      "kbps": 33.03,
+      "bytes": 19818,
+      "decoded_sha256": "ae858e5224a321105fbc1d71563adf2a0ac025b0762e8f0dba4d4ce4f3e3de1d",
+      "players": 0.44666904459396994,
+      "ball": 0.3654652386903763,
+      "p1": 0.4501084436972936,
+      "p2": 0.44322964549064636
+    },
+    {
+      "cap": 33,
+      "mode": "roi",
+      "crf": 66.5,
+      "width": 480,
+      "kbps": 32.64333333333334,
+      "bytes": 19586,
+      "decoded_sha256": "e06e12c2a42f3fd5c6aac8279ca10333dcba26621570ee0f5982f2e8641eb4d6",
+      "players": 0.48432938754558563,
+      "ball": 0.3706728368997574,
+      "p1": 0.4890269339084625,
+      "p2": 0.47963184118270874
+    }
+  ],
+  "receipts": [
+    {
+      "cap": "20",
+      "width": 160,
+      "source": "6cae4bd7a46bfa4bd2a7a7ec5c926647ea43d9e7a5366eb96e464eaffe1e603c",
+      "roi_map": "cd77c9a9a036a5c0e235e280bd283f7889182a64df4bf7e33ecd654372949377",
+      "driver_sha256": "7cd69a7bce86974cd9f4c74ae86013406115a9f80bf91dbf60a6d08a995a4d59",
+      "stream_report_sha256": "fecad6d6fc96553302aef8edc7e71afbc020b89b608541a4cfee35c410b65f4f",
+      "complete_encodes": [
+        {
+          "mode": "plain",
+          "n": 24,
+          "q": 60,
+          "file_bytes": 2739,
+          "rate": 45.65,
+          "decoded_sha256": "d6b45f77ad352f408bbd450222955b53b25e09d1ea36dc06ae64207f1d4f433f"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 36,
+          "file_bytes": 27533,
+          "rate": 45.888333333333335,
+          "decoded_sha256": "da22335171b888527337d2f084576f5239f0bebced5d3cab8f20d027ea075338"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 70.0,
+          "file_bytes": 9102,
+          "rate": 15.17,
+          "decoded_sha256": "8668197e147a8c3906564106c4a2d4981c139ff7449735e5ff471daef6675220"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 53.0,
+          "file_bytes": 15621,
+          "rate": 26.035,
+          "decoded_sha256": "3265e4cc83968ee7ff0eac60f792c0c89f4b92f3ba7289ebb0270f94e18c7e6e"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 61.5,
+          "file_bytes": 11765,
+          "rate": 19.608333333333334,
+          "decoded_sha256": "4fed11d9ac39a86a3bfdfc169f92375fa93f97a4b09211f4f3c68dc23e7dd0c3"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 57.25,
+          "file_bytes": 13815,
+          "rate": 23.025,
+          "decoded_sha256": "a569817b655791150e3b4345ddcbf83ccdfd168c1af6b491c121618459c306bc"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 59.5,
+          "file_bytes": 12744,
+          "rate": 21.24,
+          "decoded_sha256": "98e1c081c7ee9d176e6b03e40c32e8a642ec59704d879abda86459a54b053fce"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 58.5,
+          "file_bytes": 13232,
+          "rate": 22.053333333333335,
+          "decoded_sha256": "cb55771033c43d42c97a55246055e88e3416a5171564bf4e8b88db0e73dad030"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 59.0,
+          "file_bytes": 13011,
+          "rate": 21.685,
+          "decoded_sha256": "f89cd9af4b7316ab84f824cae1ec873315abcace253fd62e992c006ea7094025"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 59.25,
+          "file_bytes": 12787,
+          "rate": 21.311666666666667,
+          "decoded_sha256": "755f233de4d68f8c359be278bb807b96dbf2c93e93d76bea8cf744426ac42174"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 36.0,
+          "file_bytes": 30240,
+          "rate": 50.4,
+          "decoded_sha256": "d2121a7cde8cf5a6b7abe783733d8563cf0a3df10bf91c90cc85986570956fe4"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 70.0,
+          "file_bytes": 13085,
+          "rate": 21.808333333333337,
+          "decoded_sha256": "16c3ae29d77e96b442938884a49d35a0671cd3e7484ad0fa7230f14ea1c1711f"
+        }
+      ],
+      "selected": {
+        "plainunder": {
+          "stream": "/private/tmp/ps-joint-trajectory-controls-20261122/20-160/plain-59.25-240/stream.ivf",
+          "decoded": "/private/tmp/ps-joint-trajectory-controls-20261122/20-160/plain-59.25-240/decoded.yuv",
+          "stream_sha256": "44b83b7602d8aa31c74c45c4622f37279bf50d4725330d79f7669c7808771955",
+          "file_bytes": 12787,
+          "payload_bytes": 9875,
+          "temporal_units": 240,
+          "decoded_frames": 240.0,
+          "encode_command": [
+            "/opt/homebrew/bin/SvtAv1EncApp",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-160/160.yuv",
+            "-b",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-160/plain-59.25-240/stream.ivf",
+            "-w",
+            "160",
+            "-h",
+            "96",
+            "--input-depth",
+            "8",
+            "--fps-num",
+            "50",
+            "--fps-denom",
+            "1",
+            "-n",
+            "240",
+            "--color-range",
+            "0",
+            "--rc",
+            "0",
+            "--crf",
+            "59.25",
+            "--preset",
+            "4",
+            "--keyint",
+            "-1",
+            "--lp",
+            "6",
+            "--progress",
+            "0"
+          ],
+          "decode_command": [
+            "/opt/homebrew/bin/dav1d",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-160/plain-59.25-240/stream.ivf",
+            "-o",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-160/plain-59.25-240/decoded.yuv",
+            "--threads",
+            "2",
+            "--quiet"
+          ],
+          "encode_seconds": 0.861,
+          "encode_cpu_seconds": 1.762,
+          "decode_seconds": 0.019,
+          "decode_cpu_seconds": 0.022,
+          "cpus": null,
+          "host_load_before": [
+            4.25,
+            3.7,
+            3.52
+          ],
+          "mode": "plain",
+          "q": 59.25,
+          "n": 240,
+          "decoded_sha256": "755f233de4d68f8c359be278bb807b96dbf2c93e93d76bea8cf744426ac42174",
+          "rate": 21.311666666666667
+        },
+        "plainover": {
+          "stream": "/private/tmp/ps-joint-trajectory-controls-20261122/20-160/plain-59-240/stream.ivf",
+          "decoded": "/private/tmp/ps-joint-trajectory-controls-20261122/20-160/plain-59-240/decoded.yuv",
+          "stream_sha256": "fd004417573c7edb857d8c2f1c2a787f0c3aaa3d8ca5234290826e1aec3fe58d",
+          "file_bytes": 13011,
+          "payload_bytes": 10099,
+          "temporal_units": 240,
+          "decoded_frames": 240.0,
+          "encode_command": [
+            "/opt/homebrew/bin/SvtAv1EncApp",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-160/160.yuv",
+            "-b",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-160/plain-59-240/stream.ivf",
+            "-w",
+            "160",
+            "-h",
+            "96",
+            "--input-depth",
+            "8",
+            "--fps-num",
+            "50",
+            "--fps-denom",
+            "1",
+            "-n",
+            "240",
+            "--color-range",
+            "0",
+            "--rc",
+            "0",
+            "--crf",
+            "59",
+            "--preset",
+            "4",
+            "--keyint",
+            "-1",
+            "--lp",
+            "6",
+            "--progress",
+            "0"
+          ],
+          "decode_command": [
+            "/opt/homebrew/bin/dav1d",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-160/plain-59-240/stream.ivf",
+            "-o",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-160/plain-59-240/decoded.yuv",
+            "--threads",
+            "2",
+            "--quiet"
+          ],
+          "encode_seconds": 0.885,
+          "encode_cpu_seconds": 1.812,
+          "decode_seconds": 0.024,
+          "decode_cpu_seconds": 0.025,
+          "cpus": null,
+          "host_load_before": [
+            4.25,
+            3.7,
+            3.52
+          ],
+          "mode": "plain",
+          "q": 59.0,
+          "n": 240,
+          "decoded_sha256": "f89cd9af4b7316ab84f824cae1ec873315abcace253fd62e992c006ea7094025",
+          "rate": 21.685
+        },
+        "roiover": {
+          "stream": "/private/tmp/ps-joint-trajectory-controls-20261122/20-160/roi-70-240/stream.ivf",
+          "decoded": "/private/tmp/ps-joint-trajectory-controls-20261122/20-160/roi-70-240/decoded.yuv",
+          "stream_sha256": "00646323570a5f7b02f770961db57258d958b4f39b545360baa458b1b8996e30",
+          "file_bytes": 13085,
+          "payload_bytes": 10173,
+          "temporal_units": 240,
+          "decoded_frames": 240.0,
+          "encode_command": [
+            "/opt/homebrew/bin/SvtAv1EncApp",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-160/160.yuv",
+            "-b",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-160/roi-70-240/stream.ivf",
+            "-w",
+            "160",
+            "-h",
+            "96",
+            "--input-depth",
+            "8",
+            "--fps-num",
+            "50",
+            "--fps-denom",
+            "1",
+            "-n",
+            "240",
+            "--color-range",
+            "0",
+            "--rc",
+            "0",
+            "--crf",
+            "70",
+            "--preset",
+            "4",
+            "--keyint",
+            "-1",
+            "--lp",
+            "6",
+            "--progress",
+            "0",
+            "--roi-map-file",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-160/roi.txt"
+          ],
+          "decode_command": [
+            "/opt/homebrew/bin/dav1d",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-160/roi-70-240/stream.ivf",
+            "-o",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-160/roi-70-240/decoded.yuv",
+            "--threads",
+            "2",
+            "--quiet"
+          ],
+          "encode_seconds": 0.591,
+          "encode_cpu_seconds": 1.292,
+          "decode_seconds": 0.024,
+          "decode_cpu_seconds": 0.022,
+          "cpus": null,
+          "host_load_before": [
+            4.25,
+            3.7,
+            3.52
+          ],
+          "mode": "roi",
+          "q": 70.0,
+          "n": 240,
+          "decoded_sha256": "16c3ae29d77e96b442938884a49d35a0671cd3e7484ad0fa7230f14ea1c1711f",
+          "rate": 21.808333333333337
+        }
+      },
+      "per_tick": [
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.527414858341217
+        },
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.5071970224380493
+        },
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.5963253974914551
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.5216078758239746
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.5135753154754639
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.5726750493049622
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.5605599284172058
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.530719518661499
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.5610070824623108
+        },
+        {
+          "t": 30,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.49133455753326416
+        },
+        {
+          "t": 30,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.498665452003479
+        },
+        {
+          "t": 30,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.5964801907539368
+        },
+        {
+          "t": 30,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.5246288776397705
+        },
+        {
+          "t": 30,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.5230708718299866
+        },
+        {
+          "t": 30,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.5815467834472656
+        },
+        {
+          "t": 30,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.537032961845398
+        },
+        {
+          "t": 30,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.5303106307983398
+        },
+        {
+          "t": 30,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.5890732407569885
+        },
+        {
+          "t": 50,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.5567807555198669
+        },
+        {
+          "t": 50,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.5532789826393127
+        },
+        {
+          "t": 50,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.6371418833732605
+        },
+        {
+          "t": 50,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.5305545330047607
+        },
+        {
+          "t": 50,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.5256433486938477
+        },
+        {
+          "t": 50,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.5880785584449768
+        },
+        {
+          "t": 50,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.38277316093444824
+        },
+        {
+          "t": 50,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.3756595849990845
+        },
+        {
+          "t": 50,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.40343570709228516
+        },
+        {
+          "t": 70,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.5384547114372253
+        },
+        {
+          "t": 70,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.5432280898094177
+        },
+        {
+          "t": 70,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.6252244114875793
+        },
+        {
+          "t": 70,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.5480377674102783
+        },
+        {
+          "t": 70,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.5712671279907227
+        },
+        {
+          "t": 70,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.6045414805412292
+        },
+        {
+          "t": 70,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.4548499584197998
+        },
+        {
+          "t": 70,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.4543231129646301
+        },
+        {
+          "t": 70,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.4717329144477844
+        },
+        {
+          "t": 90,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.4973681569099426
+        },
+        {
+          "t": 90,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.5061795711517334
+        },
+        {
+          "t": 90,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.581477165222168
+        },
+        {
+          "t": 90,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.5485156178474426
+        },
+        {
+          "t": 90,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.5582982897758484
+        },
+        {
+          "t": 90,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.592098593711853
+        },
+        {
+          "t": 90,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.39153122901916504
+        },
+        {
+          "t": 90,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.39874082803726196
+        },
+        {
+          "t": 90,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.43932318687438965
+        },
+        {
+          "t": 110,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.5307471752166748
+        },
+        {
+          "t": 110,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.5405022501945496
+        },
+        {
+          "t": 110,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.5723628997802734
+        },
+        {
+          "t": 110,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.5365825891494751
+        },
+        {
+          "t": 110,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.5225343704223633
+        },
+        {
+          "t": 110,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.6394491195678711
+        },
+        {
+          "t": 110,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.3834134340286255
+        },
+        {
+          "t": 110,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.3923411965370178
+        },
+        {
+          "t": 110,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.42563581466674805
+        },
+        {
+          "t": 130,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.5333337187767029
+        },
+        {
+          "t": 130,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.5269065499305725
+        },
+        {
+          "t": 130,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.5668074488639832
+        },
+        {
+          "t": 130,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.5442678928375244
+        },
+        {
+          "t": 130,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.5437359809875488
+        },
+        {
+          "t": 130,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.6899529695510864
+        },
+        {
+          "t": 130,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.3932495713233948
+        },
+        {
+          "t": 130,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.3688519597053528
+        },
+        {
+          "t": 130,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.44013136625289917
+        },
+        {
+          "t": 150,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.5088245868682861
+        },
+        {
+          "t": 150,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.5136150121688843
+        },
+        {
+          "t": 150,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.5955300331115723
+        },
+        {
+          "t": 150,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.5749919414520264
+        },
+        {
+          "t": 150,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.5586212873458862
+        },
+        {
+          "t": 150,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.6404930353164673
+        },
+        {
+          "t": 150,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.400282621383667
+        },
+        {
+          "t": 150,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.40299320220947266
+        },
+        {
+          "t": 150,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.4345737099647522
+        },
+        {
+          "t": 170,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.5462929606437683
+        },
+        {
+          "t": 170,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.5425868034362793
+        },
+        {
+          "t": 170,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.651802659034729
+        },
+        {
+          "t": 170,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.5266048908233643
+        },
+        {
+          "t": 170,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.5273641347885132
+        },
+        {
+          "t": 170,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.6322342157363892
+        },
+        {
+          "t": 170,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.44269442558288574
+        },
+        {
+          "t": 170,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.4438507556915283
+        },
+        {
+          "t": 170,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.4518245458602905
+        },
+        {
+          "t": 190,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.5418629050254822
+        },
+        {
+          "t": 190,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.5470725297927856
+        },
+        {
+          "t": 190,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.6971515417098999
+        },
+        {
+          "t": 190,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.5319429636001587
+        },
+        {
+          "t": 190,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.5331845283508301
+        },
+        {
+          "t": 190,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.5881692171096802
+        },
+        {
+          "t": 190,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.37832820415496826
+        },
+        {
+          "t": 190,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.37214887142181396
+        },
+        {
+          "t": 190,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.39989709854125977
+        },
+        {
+          "t": 210,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.5194672346115112
+        },
+        {
+          "t": 210,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.5150893330574036
+        },
+        {
+          "t": 210,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.645916759967804
+        },
+        {
+          "t": 210,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.574828028678894
+        },
+        {
+          "t": 210,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.5734715461730957
+        },
+        {
+          "t": 210,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.6072715520858765
+        },
+        {
+          "t": 210,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.3799024820327759
+        },
+        {
+          "t": 210,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.3748272657394409
+        },
+        {
+          "t": 210,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.44296449422836304
+        },
+        {
+          "t": 230,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.5194650888442993
+        },
+        {
+          "t": 230,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.5222865343093872
+        },
+        {
+          "t": 230,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.6399853825569153
+        },
+        {
+          "t": 230,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.5867587327957153
+        },
+        {
+          "t": 230,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.564079999923706
+        },
+        {
+          "t": 230,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.6565537452697754
+        },
+        {
+          "t": 230,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.4329005479812622
+        },
+        {
+          "t": 230,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.43225836753845215
+        },
+        {
+          "t": 230,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.4579958915710449
+        }
+      ],
+      "smoke": [
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "source",
+          "dists": 1.1920928955078125e-07
+        },
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.527414858341217
+        },
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.5071970224380493
+        },
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.5963253974914551
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "source",
+          "dists": 1.7881393432617188e-07
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.5216078758239746
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.5135753154754639
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.5726750493049622
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "source",
+          "dists": 1.7881393432617188e-07
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.5605599284172058
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.530719518661499
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.5610070824623108
+        }
+      ],
+      "cpu": 21.015569999999997
+    },
+    {
+      "cap": "20",
+      "width": 240,
+      "source": "6cae4bd7a46bfa4bd2a7a7ec5c926647ea43d9e7a5366eb96e464eaffe1e603c",
+      "roi_map": "7fac68b384b791225989ffc0598a9b9c7a9cb9f1c9fd4b4fdf52a549be952aea",
+      "driver_sha256": "7cd69a7bce86974cd9f4c74ae86013406115a9f80bf91dbf60a6d08a995a4d59",
+      "stream_report_sha256": "0dee524a11aaffcf95ce945dc079b5a2853ce30c9de019fa807a72c9a7f4b4a1",
+      "complete_encodes": [
+        {
+          "mode": "plain",
+          "n": 24,
+          "q": 60,
+          "file_bytes": 4266,
+          "rate": 71.1,
+          "decoded_sha256": "bac37eb126bb98c372bf5299e4b0450ab387604dc09e496a2afd3d9c25d1e75d"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 36,
+          "file_bytes": 46735,
+          "rate": 77.89166666666667,
+          "decoded_sha256": "37fc25e3d8a51bfa862c2462e31ced65d8751e7e80a03647e80b379dd7a10e31"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 70.0,
+          "file_bytes": 9832,
+          "rate": 16.386666666666667,
+          "decoded_sha256": "2ddced3994b69f98a4fcee925630d0b2eb52be855412b98e6d1d322e0693fb44"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 53.0,
+          "file_bytes": 23283,
+          "rate": 38.805,
+          "decoded_sha256": "78dc3be89cc7f17e80e6e31028288344cd04299b6d7a46ef71ec9e3394634a0b"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 61.5,
+          "file_bytes": 15207,
+          "rate": 25.345,
+          "decoded_sha256": "3260a2183fcdff4d06c7a9431560fc4bae3af1d44b1a12cc8e9051444e6f5ef3"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 65.75,
+          "file_bytes": 11314,
+          "rate": 18.85666666666667,
+          "decoded_sha256": "c937d5aa533fad94d0de0e70ab556a21cd99a86f419a1fc3aa3b6875892a976d"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 63.5,
+          "file_bytes": 12635,
+          "rate": 21.058333333333337,
+          "decoded_sha256": "e36c1fd5d4d01c85780737ee3fed829996f0c5ae52cecc1953c737ba5cc8869a"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 62.5,
+          "file_bytes": 13987,
+          "rate": 23.311666666666667,
+          "decoded_sha256": "3721aaf794514918446d647c40fc28d328a27e69da2b6f4c34c2c442e5f7cd99"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 63.0,
+          "file_bytes": 12974,
+          "rate": 21.623333333333335,
+          "decoded_sha256": "bdb4dac5c91c8013ed49cce6e3244fc5b7a93f48446011822133f43247882bd4"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 36.0,
+          "file_bytes": 47283,
+          "rate": 78.805,
+          "decoded_sha256": "bf5b17fe562bbf7c6e7c5dfe10aec13b9add95033e1558851803320852061d4a"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 70.0,
+          "file_bytes": 13793,
+          "rate": 22.988333333333337,
+          "decoded_sha256": "d344bc20531fd549141ec54c7d716c0901064b90eccc747462d171626b0d3607"
+        }
+      ],
+      "selected": {
+        "plain": {
+          "stream": "/private/tmp/ps-joint-trajectory-controls-20261122/20-240/plain-63-240/stream.ivf",
+          "decoded": "/private/tmp/ps-joint-trajectory-controls-20261122/20-240/plain-63-240/decoded.yuv",
+          "stream_sha256": "40ac346602fc01a02433a2ff0c90e32a3448fad25c6fbe436d2dd9b606d8c757",
+          "file_bytes": 12974,
+          "payload_bytes": 10062,
+          "temporal_units": 240,
+          "decoded_frames": 240.0,
+          "encode_command": [
+            "/opt/homebrew/bin/SvtAv1EncApp",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-240/240.yuv",
+            "-b",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-240/plain-63-240/stream.ivf",
+            "-w",
+            "240",
+            "-h",
+            "136",
+            "--input-depth",
+            "8",
+            "--fps-num",
+            "50",
+            "--fps-denom",
+            "1",
+            "-n",
+            "240",
+            "--color-range",
+            "0",
+            "--rc",
+            "0",
+            "--crf",
+            "63",
+            "--preset",
+            "4",
+            "--keyint",
+            "-1",
+            "--lp",
+            "6",
+            "--progress",
+            "0"
+          ],
+          "decode_command": [
+            "/opt/homebrew/bin/dav1d",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-240/plain-63-240/stream.ivf",
+            "-o",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-240/plain-63-240/decoded.yuv",
+            "--threads",
+            "2",
+            "--quiet"
+          ],
+          "encode_seconds": 1.596,
+          "encode_cpu_seconds": 3.275,
+          "decode_seconds": 0.039,
+          "decode_cpu_seconds": 0.039,
+          "cpus": null,
+          "host_load_before": [
+            4.31,
+            3.72,
+            3.53
+          ],
+          "mode": "plain",
+          "q": 63.0,
+          "n": 240,
+          "decoded_sha256": "bdb4dac5c91c8013ed49cce6e3244fc5b7a93f48446011822133f43247882bd4",
+          "rate": 21.623333333333335
+        },
+        "roiover": {
+          "stream": "/private/tmp/ps-joint-trajectory-controls-20261122/20-240/roi-70-240/stream.ivf",
+          "decoded": "/private/tmp/ps-joint-trajectory-controls-20261122/20-240/roi-70-240/decoded.yuv",
+          "stream_sha256": "91a310904e65eeb57a8fdc64b5203df08e0983e9eb9923abc587699a5c2effac",
+          "file_bytes": 13793,
+          "payload_bytes": 10881,
+          "temporal_units": 240,
+          "decoded_frames": 240.0,
+          "encode_command": [
+            "/opt/homebrew/bin/SvtAv1EncApp",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-240/240.yuv",
+            "-b",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-240/roi-70-240/stream.ivf",
+            "-w",
+            "240",
+            "-h",
+            "136",
+            "--input-depth",
+            "8",
+            "--fps-num",
+            "50",
+            "--fps-denom",
+            "1",
+            "-n",
+            "240",
+            "--color-range",
+            "0",
+            "--rc",
+            "0",
+            "--crf",
+            "70",
+            "--preset",
+            "4",
+            "--keyint",
+            "-1",
+            "--lp",
+            "6",
+            "--progress",
+            "0",
+            "--roi-map-file",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-240/roi.txt"
+          ],
+          "decode_command": [
+            "/opt/homebrew/bin/dav1d",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-240/roi-70-240/stream.ivf",
+            "-o",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-240/roi-70-240/decoded.yuv",
+            "--threads",
+            "2",
+            "--quiet"
+          ],
+          "encode_seconds": 1.257,
+          "encode_cpu_seconds": 2.937,
+          "decode_seconds": 0.039,
+          "decode_cpu_seconds": 0.042,
+          "cpus": null,
+          "host_load_before": [
+            4.31,
+            3.72,
+            3.53
+          ],
+          "mode": "roi",
+          "q": 70.0,
+          "n": 240,
+          "decoded_sha256": "d344bc20531fd549141ec54c7d716c0901064b90eccc747462d171626b0d3607",
+          "rate": 22.988333333333337
+        }
+      },
+      "per_tick": [
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.4906073212623596
+        },
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.6208256483078003
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.46859097480773926
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.5317752361297607
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.526647686958313
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.5657123327255249
+        },
+        {
+          "t": 30,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.48020797967910767
+        },
+        {
+          "t": 30,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.6214044094085693
+        },
+        {
+          "t": 30,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.47775620222091675
+        },
+        {
+          "t": 30,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.5341936945915222
+        },
+        {
+          "t": 30,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.5361714363098145
+        },
+        {
+          "t": 30,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.5889672040939331
+        },
+        {
+          "t": 50,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.5276312828063965
+        },
+        {
+          "t": 50,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.6549250483512878
+        },
+        {
+          "t": 50,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.49115562438964844
+        },
+        {
+          "t": 50,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.5344005227088928
+        },
+        {
+          "t": 50,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.4022892713546753
+        },
+        {
+          "t": 50,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.43500465154647827
+        },
+        {
+          "t": 70,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.5573126077651978
+        },
+        {
+          "t": 70,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.5973054766654968
+        },
+        {
+          "t": 70,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.5499807596206665
+        },
+        {
+          "t": 70,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.5519614815711975
+        },
+        {
+          "t": 70,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.41197097301483154
+        },
+        {
+          "t": 70,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.4315077066421509
+        },
+        {
+          "t": 90,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.4804811477661133
+        },
+        {
+          "t": 90,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.5713766813278198
+        },
+        {
+          "t": 90,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.5109115839004517
+        },
+        {
+          "t": 90,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.5317164659500122
+        },
+        {
+          "t": 90,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.39415156841278076
+        },
+        {
+          "t": 90,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.3887637257575989
+        },
+        {
+          "t": 110,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.5052576065063477
+        },
+        {
+          "t": 110,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.608383059501648
+        },
+        {
+          "t": 110,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.5170403718948364
+        },
+        {
+          "t": 110,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.5657075643539429
+        },
+        {
+          "t": 110,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.35314667224884033
+        },
+        {
+          "t": 110,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.39177006483078003
+        },
+        {
+          "t": 130,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.49916958808898926
+        },
+        {
+          "t": 130,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.6168045997619629
+        },
+        {
+          "t": 130,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.501676082611084
+        },
+        {
+          "t": 130,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.5524548888206482
+        },
+        {
+          "t": 130,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.3544975519180298
+        },
+        {
+          "t": 130,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.3734389543533325
+        },
+        {
+          "t": 150,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.5042730569839478
+        },
+        {
+          "t": 150,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.5827338695526123
+        },
+        {
+          "t": 150,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.5168743133544922
+        },
+        {
+          "t": 150,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.5456280708312988
+        },
+        {
+          "t": 150,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.4058303236961365
+        },
+        {
+          "t": 150,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.40034979581832886
+        },
+        {
+          "t": 170,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.5365995168685913
+        },
+        {
+          "t": 170,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.6295164227485657
+        },
+        {
+          "t": 170,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.5043262243270874
+        },
+        {
+          "t": 170,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.5649176836013794
+        },
+        {
+          "t": 170,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.3866645097732544
+        },
+        {
+          "t": 170,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.4367610812187195
+        },
+        {
+          "t": 190,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.5334906578063965
+        },
+        {
+          "t": 190,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.6730480194091797
+        },
+        {
+          "t": 190,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.48731619119644165
+        },
+        {
+          "t": 190,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.5584937334060669
+        },
+        {
+          "t": 190,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.3734029531478882
+        },
+        {
+          "t": 190,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.384039044380188
+        },
+        {
+          "t": 210,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.48925894498825073
+        },
+        {
+          "t": 210,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.6193382740020752
+        },
+        {
+          "t": 210,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.5445762872695923
+        },
+        {
+          "t": 210,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.5895968079566956
+        },
+        {
+          "t": 210,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.37249577045440674
+        },
+        {
+          "t": 210,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.39354264736175537
+        },
+        {
+          "t": 230,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.5355743169784546
+        },
+        {
+          "t": 230,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.6364963054656982
+        },
+        {
+          "t": 230,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.5665373802185059
+        },
+        {
+          "t": 230,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.6402177810668945
+        },
+        {
+          "t": 230,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.4426060914993286
+        },
+        {
+          "t": 230,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.43825840950012207
+        }
+      ],
+      "smoke": [
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "source",
+          "dists": 1.1920928955078125e-07
+        },
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.4906073212623596
+        },
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.6208256483078003
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "source",
+          "dists": 1.7881393432617188e-07
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.46859097480773926
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.5317752361297607
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "source",
+          "dists": 1.7881393432617188e-07
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.526647686958313
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.5657123327255249
+        }
+      ],
+      "cpu": 35.259871
+    },
+    {
+      "cap": "20",
+      "width": 480,
+      "source": "6cae4bd7a46bfa4bd2a7a7ec5c926647ea43d9e7a5366eb96e464eaffe1e603c",
+      "roi_map": "98bc2a47aa8c93cbdc2b518da0618ce9a8201e4b03eda2d925feca792a471560",
+      "driver_sha256": "7cd69a7bce86974cd9f4c74ae86013406115a9f80bf91dbf60a6d08a995a4d59",
+      "stream_report_sha256": "0a26ddc080eaa0f1647a3c0d60992dc6afc890006a8cf5e72906066a1793ef5e",
+      "complete_encodes": [
+        {
+          "mode": "plain",
+          "n": 24,
+          "q": 60,
+          "file_bytes": 10392,
+          "rate": 173.2,
+          "decoded_sha256": "4d3c137aa535403e0e8b7cd92c2d21235e1675c058c96285ac4ee408a30537fb"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 36,
+          "file_bytes": 131547,
+          "rate": 219.245,
+          "decoded_sha256": "8652d2d20ce8e0b426aded662257bf800e48fad3bfb9f44f1487205b249f8417"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 70.0,
+          "file_bytes": 13415,
+          "rate": 22.358333333333334,
+          "decoded_sha256": "3d9bcad2fecb9feffe350f4d4445018c613c3ec5aed8af0b77990fc0687cc519"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 36.0,
+          "file_bytes": 122431,
+          "rate": 204.05166666666668,
+          "decoded_sha256": "415288e5647fcb8887d9f00a0639bc916f31f324dcf8587590ee30699bfaf95f"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 70.0,
+          "file_bytes": 16933,
+          "rate": 28.221666666666668,
+          "decoded_sha256": "ccc86ec63091b2a95efbc27e8e9ec62f87f609e05c9c1da989d5e2749a9b1edf"
+        }
+      ],
+      "selected": {
+        "plainover": {
+          "stream": "/private/tmp/ps-joint-trajectory-controls-20261122/20-480/plain-70-240/stream.ivf",
+          "decoded": "/private/tmp/ps-joint-trajectory-controls-20261122/20-480/plain-70-240/decoded.yuv",
+          "stream_sha256": "c44aaa2ceb9a0a963733f814a403e3fbacd201b670f69dff1f7d8e355a9839f3",
+          "file_bytes": 13415,
+          "payload_bytes": 10503,
+          "temporal_units": 240,
+          "decoded_frames": 240.0,
+          "encode_command": [
+            "/opt/homebrew/bin/SvtAv1EncApp",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-480/480.yuv",
+            "-b",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-480/plain-70-240/stream.ivf",
+            "-w",
+            "480",
+            "-h",
+            "272",
+            "--input-depth",
+            "8",
+            "--fps-num",
+            "50",
+            "--fps-denom",
+            "1",
+            "-n",
+            "240",
+            "--color-range",
+            "0",
+            "--rc",
+            "0",
+            "--crf",
+            "70",
+            "--preset",
+            "4",
+            "--keyint",
+            "-1",
+            "--lp",
+            "6",
+            "--progress",
+            "0"
+          ],
+          "decode_command": [
+            "/opt/homebrew/bin/dav1d",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-480/plain-70-240/stream.ivf",
+            "-o",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-480/plain-70-240/decoded.yuv",
+            "--threads",
+            "2",
+            "--quiet"
+          ],
+          "encode_seconds": 3.6,
+          "encode_cpu_seconds": 10.202,
+          "decode_seconds": 0.113,
+          "decode_cpu_seconds": 0.111,
+          "cpus": null,
+          "host_load_before": [
+            4.6,
+            3.79,
+            3.56
+          ],
+          "mode": "plain",
+          "q": 70.0,
+          "n": 240,
+          "decoded_sha256": "3d9bcad2fecb9feffe350f4d4445018c613c3ec5aed8af0b77990fc0687cc519",
+          "rate": 22.358333333333334
+        },
+        "roiover": {
+          "stream": "/private/tmp/ps-joint-trajectory-controls-20261122/20-480/roi-70-240/stream.ivf",
+          "decoded": "/private/tmp/ps-joint-trajectory-controls-20261122/20-480/roi-70-240/decoded.yuv",
+          "stream_sha256": "9df703595265d8438d174f7876e8e0ac59d6100c35c5ef72084367f313132319",
+          "file_bytes": 16933,
+          "payload_bytes": 14021,
+          "temporal_units": 240,
+          "decoded_frames": 240.0,
+          "encode_command": [
+            "/opt/homebrew/bin/SvtAv1EncApp",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-480/480.yuv",
+            "-b",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-480/roi-70-240/stream.ivf",
+            "-w",
+            "480",
+            "-h",
+            "272",
+            "--input-depth",
+            "8",
+            "--fps-num",
+            "50",
+            "--fps-denom",
+            "1",
+            "-n",
+            "240",
+            "--color-range",
+            "0",
+            "--rc",
+            "0",
+            "--crf",
+            "70",
+            "--preset",
+            "4",
+            "--keyint",
+            "-1",
+            "--lp",
+            "6",
+            "--progress",
+            "0",
+            "--roi-map-file",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-480/roi.txt"
+          ],
+          "decode_command": [
+            "/opt/homebrew/bin/dav1d",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-480/roi-70-240/stream.ivf",
+            "-o",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/20-480/roi-70-240/decoded.yuv",
+            "--threads",
+            "2",
+            "--quiet"
+          ],
+          "encode_seconds": 3.851,
+          "encode_cpu_seconds": 10.734,
+          "decode_seconds": 0.113,
+          "decode_cpu_seconds": 0.108,
+          "cpus": null,
+          "host_load_before": [
+            4.87,
+            3.88,
+            3.59
+          ],
+          "mode": "roi",
+          "q": 70.0,
+          "n": 240,
+          "decoded_sha256": "ccc86ec63091b2a95efbc27e8e9ec62f87f609e05c9c1da989d5e2749a9b1edf",
+          "rate": 28.221666666666668
+        }
+      },
+      "per_tick": [
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.5426105856895447
+        },
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.5374428629875183
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.46905744075775146
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.4598765969276428
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.5415613055229187
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.5164390802383423
+        },
+        {
+          "t": 30,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.5257008075714111
+        },
+        {
+          "t": 30,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.5256142616271973
+        },
+        {
+          "t": 30,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.47375595569610596
+        },
+        {
+          "t": 30,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.47495388984680176
+        },
+        {
+          "t": 30,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.5490509271621704
+        },
+        {
+          "t": 30,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.5482644438743591
+        },
+        {
+          "t": 50,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.5514999032020569
+        },
+        {
+          "t": 50,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.55201655626297
+        },
+        {
+          "t": 50,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.48279905319213867
+        },
+        {
+          "t": 50,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.4664316177368164
+        },
+        {
+          "t": 50,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.3881465196609497
+        },
+        {
+          "t": 50,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.40054064989089966
+        },
+        {
+          "t": 70,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.5308624505996704
+        },
+        {
+          "t": 70,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.5299257040023804
+        },
+        {
+          "t": 70,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.5284378528594971
+        },
+        {
+          "t": 70,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.526104211807251
+        },
+        {
+          "t": 70,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.38155192136764526
+        },
+        {
+          "t": 70,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.3882944583892822
+        },
+        {
+          "t": 90,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.4618656635284424
+        },
+        {
+          "t": 90,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.48339134454727173
+        },
+        {
+          "t": 90,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.517044186592102
+        },
+        {
+          "t": 90,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.5035649538040161
+        },
+        {
+          "t": 90,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.3003774881362915
+        },
+        {
+          "t": 90,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.3471888303756714
+        },
+        {
+          "t": 110,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.5210575461387634
+        },
+        {
+          "t": 110,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.5019853115081787
+        },
+        {
+          "t": 110,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.4995918273925781
+        },
+        {
+          "t": 110,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.48007732629776
+        },
+        {
+          "t": 110,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.3240154981613159
+        },
+        {
+          "t": 110,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.3338114023208618
+        },
+        {
+          "t": 130,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.48475533723831177
+        },
+        {
+          "t": 130,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.49380016326904297
+        },
+        {
+          "t": 130,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.5261229276657104
+        },
+        {
+          "t": 130,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.5061600208282471
+        },
+        {
+          "t": 130,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.3405223488807678
+        },
+        {
+          "t": 130,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.33391422033309937
+        },
+        {
+          "t": 150,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.48228204250335693
+        },
+        {
+          "t": 150,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.46556079387664795
+        },
+        {
+          "t": 150,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.49549925327301025
+        },
+        {
+          "t": 150,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.48354142904281616
+        },
+        {
+          "t": 150,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.34249812364578247
+        },
+        {
+          "t": 150,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.36100077629089355
+        },
+        {
+          "t": 170,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.538689374923706
+        },
+        {
+          "t": 170,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.5295456647872925
+        },
+        {
+          "t": 170,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.502021074295044
+        },
+        {
+          "t": 170,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.5067348480224609
+        },
+        {
+          "t": 170,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.3894803524017334
+        },
+        {
+          "t": 170,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.4029476046562195
+        },
+        {
+          "t": 190,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.5452993512153625
+        },
+        {
+          "t": 190,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.5348448753356934
+        },
+        {
+          "t": 190,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.5288282036781311
+        },
+        {
+          "t": 190,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.5283501744270325
+        },
+        {
+          "t": 190,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.36490577459335327
+        },
+        {
+          "t": 190,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.37054455280303955
+        },
+        {
+          "t": 210,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.5136900544166565
+        },
+        {
+          "t": 210,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.5155940055847168
+        },
+        {
+          "t": 210,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.535396933555603
+        },
+        {
+          "t": 210,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.5206224918365479
+        },
+        {
+          "t": 210,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.3714370131492615
+        },
+        {
+          "t": 210,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.3494983911514282
+        },
+        {
+          "t": 230,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.5194826126098633
+        },
+        {
+          "t": 230,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.5049340724945068
+        },
+        {
+          "t": 230,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.5415831804275513
+        },
+        {
+          "t": 230,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.5537189841270447
+        },
+        {
+          "t": 230,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.39571380615234375
+        },
+        {
+          "t": 230,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.43303346633911133
+        }
+      ],
+      "smoke": [
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "source",
+          "dists": 1.1920928955078125e-07
+        },
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.5426105856895447
+        },
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "roiover",
+          "dists": 0.5374428629875183
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "source",
+          "dists": 1.7881393432617188e-07
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.46905744075775146
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "roiover",
+          "dists": 0.4598765969276428
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "source",
+          "dists": 1.7881393432617188e-07
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.5415613055229187
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "roiover",
+          "dists": 0.5164390802383423
+        }
+      ],
+      "cpu": 52.270078000000005
+    },
+    {
+      "cap": "33",
+      "width": 160,
+      "source": "6cae4bd7a46bfa4bd2a7a7ec5c926647ea43d9e7a5366eb96e464eaffe1e603c",
+      "roi_map": "cd77c9a9a036a5c0e235e280bd283f7889182a64df4bf7e33ecd654372949377",
+      "driver_sha256": "7cd69a7bce86974cd9f4c74ae86013406115a9f80bf91dbf60a6d08a995a4d59",
+      "stream_report_sha256": "d62ea001c7dc90ab19941fd0860e4c5fde767a7d72c09aeffe0a9a26f07e9a2e",
+      "complete_encodes": [
+        {
+          "mode": "plain",
+          "n": 24,
+          "q": 60,
+          "file_bytes": 2739,
+          "rate": 45.65,
+          "decoded_sha256": "d6b45f77ad352f408bbd450222955b53b25e09d1ea36dc06ae64207f1d4f433f"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 36,
+          "file_bytes": 27533,
+          "rate": 45.888333333333335,
+          "decoded_sha256": "da22335171b888527337d2f084576f5239f0bebced5d3cab8f20d027ea075338"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 70.0,
+          "file_bytes": 9102,
+          "rate": 15.17,
+          "decoded_sha256": "8668197e147a8c3906564106c4a2d4981c139ff7449735e5ff471daef6675220"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 53.0,
+          "file_bytes": 15621,
+          "rate": 26.035,
+          "decoded_sha256": "3265e4cc83968ee7ff0eac60f792c0c89f4b92f3ba7289ebb0270f94e18c7e6e"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 44.5,
+          "file_bytes": 20279,
+          "rate": 33.79833333333334,
+          "decoded_sha256": "8fad1cb56d867b59b1fabe61cbd52931e66988c16c265b53e8f6ff8bfa474670"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 48.75,
+          "file_bytes": 17654,
+          "rate": 29.423333333333336,
+          "decoded_sha256": "dee5cc894a84b1c61497e00aff19edfeb0c2bcab92bda1b0648f45b12c608ede"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 46.5,
+          "file_bytes": 18981,
+          "rate": 31.635,
+          "decoded_sha256": "64ef6875a3767eb10feb6c2f2372d636715403c9f1aa8ccb24583eaa91d96936"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 45.5,
+          "file_bytes": 19534,
+          "rate": 32.556666666666665,
+          "decoded_sha256": "1126c2c002cec69b2c6e8c4dab6a28e67c366549db937d7b10a145dd2a51fcce"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 36.0,
+          "file_bytes": 30240,
+          "rate": 50.4,
+          "decoded_sha256": "d2121a7cde8cf5a6b7abe783733d8563cf0a3df10bf91c90cc85986570956fe4"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 70.0,
+          "file_bytes": 13085,
+          "rate": 21.808333333333337,
+          "decoded_sha256": "16c3ae29d77e96b442938884a49d35a0671cd3e7484ad0fa7230f14ea1c1711f"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 53.0,
+          "file_bytes": 19453,
+          "rate": 32.42166666666667,
+          "decoded_sha256": "4fc8344aff7dd07478ea77126a5e9dcde47f5afa0b2f7b11bc632eb24aafa20a"
+        }
+      ],
+      "selected": {
+        "plain": {
+          "stream": "/private/tmp/ps-joint-trajectory-controls-20261122/33-160/plain-45.5-240/stream.ivf",
+          "decoded": "/private/tmp/ps-joint-trajectory-controls-20261122/33-160/plain-45.5-240/decoded.yuv",
+          "stream_sha256": "517b8246f14ed9f3998918c647bbcfd2803d180725cb75f6900e9dd1e787ebac",
+          "file_bytes": 19534,
+          "payload_bytes": 16622,
+          "temporal_units": 240,
+          "decoded_frames": 240.0,
+          "encode_command": [
+            "/opt/homebrew/bin/SvtAv1EncApp",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-160/160.yuv",
+            "-b",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-160/plain-45.5-240/stream.ivf",
+            "-w",
+            "160",
+            "-h",
+            "96",
+            "--input-depth",
+            "8",
+            "--fps-num",
+            "50",
+            "--fps-denom",
+            "1",
+            "-n",
+            "240",
+            "--color-range",
+            "0",
+            "--rc",
+            "0",
+            "--crf",
+            "45.5",
+            "--preset",
+            "4",
+            "--keyint",
+            "-1",
+            "--lp",
+            "6",
+            "--progress",
+            "0"
+          ],
+          "decode_command": [
+            "/opt/homebrew/bin/dav1d",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-160/plain-45.5-240/stream.ivf",
+            "-o",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-160/plain-45.5-240/decoded.yuv",
+            "--threads",
+            "2",
+            "--quiet"
+          ],
+          "encode_seconds": 0.766,
+          "encode_cpu_seconds": 1.669,
+          "decode_seconds": 0.024,
+          "decode_cpu_seconds": 0.028,
+          "cpus": null,
+          "host_load_before": [
+            5.04,
+            3.9,
+            3.6
+          ],
+          "mode": "plain",
+          "q": 45.5,
+          "n": 240,
+          "decoded_sha256": "1126c2c002cec69b2c6e8c4dab6a28e67c366549db937d7b10a145dd2a51fcce",
+          "rate": 32.556666666666665
+        },
+        "roi": {
+          "stream": "/private/tmp/ps-joint-trajectory-controls-20261122/33-160/roi-53-240/stream.ivf",
+          "decoded": "/private/tmp/ps-joint-trajectory-controls-20261122/33-160/roi-53-240/decoded.yuv",
+          "stream_sha256": "05b4590ff8cf3d1721cf2c75d62f7881cb0a802781d96e3e96b25b8e67b3cbfd",
+          "file_bytes": 19453,
+          "payload_bytes": 16541,
+          "temporal_units": 240,
+          "decoded_frames": 240.0,
+          "encode_command": [
+            "/opt/homebrew/bin/SvtAv1EncApp",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-160/160.yuv",
+            "-b",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-160/roi-53-240/stream.ivf",
+            "-w",
+            "160",
+            "-h",
+            "96",
+            "--input-depth",
+            "8",
+            "--fps-num",
+            "50",
+            "--fps-denom",
+            "1",
+            "-n",
+            "240",
+            "--color-range",
+            "0",
+            "--rc",
+            "0",
+            "--crf",
+            "53",
+            "--preset",
+            "4",
+            "--keyint",
+            "-1",
+            "--lp",
+            "6",
+            "--progress",
+            "0",
+            "--roi-map-file",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-160/roi.txt"
+          ],
+          "decode_command": [
+            "/opt/homebrew/bin/dav1d",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-160/roi-53-240/stream.ivf",
+            "-o",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-160/roi-53-240/decoded.yuv",
+            "--threads",
+            "2",
+            "--quiet"
+          ],
+          "encode_seconds": 0.817,
+          "encode_cpu_seconds": 1.756,
+          "decode_seconds": 0.023,
+          "decode_cpu_seconds": 0.022,
+          "cpus": null,
+          "host_load_before": [
+            5.04,
+            3.9,
+            3.6
+          ],
+          "mode": "roi",
+          "q": 53.0,
+          "n": 240,
+          "decoded_sha256": "4fc8344aff7dd07478ea77126a5e9dcde47f5afa0b2f7b11bc632eb24aafa20a",
+          "rate": 32.42166666666667
+        }
+      },
+      "per_tick": [
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.4980911612510681
+        },
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.5079482793807983
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.5037427544593811
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.512418806552887
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.522611141204834
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.5164546966552734
+        },
+        {
+          "t": 30,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.49726712703704834
+        },
+        {
+          "t": 30,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.4942553639411926
+        },
+        {
+          "t": 30,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.5003980398178101
+        },
+        {
+          "t": 30,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.5156487822532654
+        },
+        {
+          "t": 30,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.524713933467865
+        },
+        {
+          "t": 30,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.5242262482643127
+        },
+        {
+          "t": 50,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.5311925411224365
+        },
+        {
+          "t": 50,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.5462833642959595
+        },
+        {
+          "t": 50,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.5027468204498291
+        },
+        {
+          "t": 50,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.5102556943893433
+        },
+        {
+          "t": 50,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.38188469409942627
+        },
+        {
+          "t": 50,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.3720574975013733
+        },
+        {
+          "t": 70,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.518702507019043
+        },
+        {
+          "t": 70,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.5297181606292725
+        },
+        {
+          "t": 70,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.5350630879402161
+        },
+        {
+          "t": 70,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.5371105074882507
+        },
+        {
+          "t": 70,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.446929931640625
+        },
+        {
+          "t": 70,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.4516335725784302
+        },
+        {
+          "t": 90,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.48154592514038086
+        },
+        {
+          "t": 90,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.47156715393066406
+        },
+        {
+          "t": 90,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.5253751277923584
+        },
+        {
+          "t": 90,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.5407695174217224
+        },
+        {
+          "t": 90,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.4056708812713623
+        },
+        {
+          "t": 90,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.39566928148269653
+        },
+        {
+          "t": 110,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.4824947714805603
+        },
+        {
+          "t": 110,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.49364352226257324
+        },
+        {
+          "t": 110,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.5018486976623535
+        },
+        {
+          "t": 110,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.4995501637458801
+        },
+        {
+          "t": 110,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.3832434415817261
+        },
+        {
+          "t": 110,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.3802492022514343
+        },
+        {
+          "t": 130,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.5074985027313232
+        },
+        {
+          "t": 130,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.5200903415679932
+        },
+        {
+          "t": 130,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.5062299966812134
+        },
+        {
+          "t": 130,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.5142847299575806
+        },
+        {
+          "t": 130,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.3711526393890381
+        },
+        {
+          "t": 130,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.38804876804351807
+        },
+        {
+          "t": 150,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.4969767928123474
+        },
+        {
+          "t": 150,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.5050594806671143
+        },
+        {
+          "t": 150,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.5208835601806641
+        },
+        {
+          "t": 150,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.5392818450927734
+        },
+        {
+          "t": 150,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.39733296632766724
+        },
+        {
+          "t": 150,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.39677029848098755
+        },
+        {
+          "t": 170,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.5076755881309509
+        },
+        {
+          "t": 170,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.5308685898780823
+        },
+        {
+          "t": 170,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.49915802478790283
+        },
+        {
+          "t": 170,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.5324375629425049
+        },
+        {
+          "t": 170,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.37632036209106445
+        },
+        {
+          "t": 170,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.4012485146522522
+        },
+        {
+          "t": 190,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.5283845663070679
+        },
+        {
+          "t": 190,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.5386881828308105
+        },
+        {
+          "t": 190,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.5096250176429749
+        },
+        {
+          "t": 190,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.5273019075393677
+        },
+        {
+          "t": 190,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.35493004322052
+        },
+        {
+          "t": 190,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.363455593585968
+        },
+        {
+          "t": 210,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.4791080355644226
+        },
+        {
+          "t": 210,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.49182039499282837
+        },
+        {
+          "t": 210,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.5476998090744019
+        },
+        {
+          "t": 210,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.5554599165916443
+        },
+        {
+          "t": 210,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.37089937925338745
+        },
+        {
+          "t": 210,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.3776664733886719
+        },
+        {
+          "t": 230,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.5249840021133423
+        },
+        {
+          "t": 230,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.5214076042175293
+        },
+        {
+          "t": 230,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.5507895946502686
+        },
+        {
+          "t": 230,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.5618420839309692
+        },
+        {
+          "t": 230,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.40717989206314087
+        },
+        {
+          "t": 230,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.436021625995636
+        }
+      ],
+      "smoke": [
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "source",
+          "dists": 1.1920928955078125e-07
+        },
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.4980911612510681
+        },
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.5079482793807983
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "source",
+          "dists": 1.7881393432617188e-07
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.5037427544593811
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.512418806552887
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "source",
+          "dists": 1.7881393432617188e-07
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.522611141204834
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.5164546966552734
+        }
+      ],
+      "cpu": 18.95731
+    },
+    {
+      "cap": "33",
+      "width": 240,
+      "source": "6cae4bd7a46bfa4bd2a7a7ec5c926647ea43d9e7a5366eb96e464eaffe1e603c",
+      "roi_map": "7fac68b384b791225989ffc0598a9b9c7a9cb9f1c9fd4b4fdf52a549be952aea",
+      "driver_sha256": "7cd69a7bce86974cd9f4c74ae86013406115a9f80bf91dbf60a6d08a995a4d59",
+      "stream_report_sha256": "05cfa34bf11b12383ffa0e3c96c6be72ee9ae435462f1873f0caa5d4530dee12",
+      "complete_encodes": [
+        {
+          "mode": "plain",
+          "n": 24,
+          "q": 60,
+          "file_bytes": 4266,
+          "rate": 71.1,
+          "decoded_sha256": "bac37eb126bb98c372bf5299e4b0450ab387604dc09e496a2afd3d9c25d1e75d"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 36,
+          "file_bytes": 46735,
+          "rate": 77.89166666666667,
+          "decoded_sha256": "37fc25e3d8a51bfa862c2462e31ced65d8751e7e80a03647e80b379dd7a10e31"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 70.0,
+          "file_bytes": 9832,
+          "rate": 16.386666666666667,
+          "decoded_sha256": "2ddced3994b69f98a4fcee925630d0b2eb52be855412b98e6d1d322e0693fb44"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 53.0,
+          "file_bytes": 23283,
+          "rate": 38.805,
+          "decoded_sha256": "78dc3be89cc7f17e80e6e31028288344cd04299b6d7a46ef71ec9e3394634a0b"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 61.5,
+          "file_bytes": 15207,
+          "rate": 25.345,
+          "decoded_sha256": "3260a2183fcdff4d06c7a9431560fc4bae3af1d44b1a12cc8e9051444e6f5ef3"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 57.25,
+          "file_bytes": 19518,
+          "rate": 32.53,
+          "decoded_sha256": "73ca3d8703a507fb31b7970428b925782ff7132c1e7f621a632ffd63cdb822da"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 36.0,
+          "file_bytes": 47283,
+          "rate": 78.805,
+          "decoded_sha256": "bf5b17fe562bbf7c6e7c5dfe10aec13b9add95033e1558851803320852061d4a"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 70.0,
+          "file_bytes": 13793,
+          "rate": 22.988333333333337,
+          "decoded_sha256": "d344bc20531fd549141ec54c7d716c0901064b90eccc747462d171626b0d3607"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 53.0,
+          "file_bytes": 26663,
+          "rate": 44.43833333333333,
+          "decoded_sha256": "64751a5ab7c28eab47b891660853b114bd1a74cd6d5ffda5afa5cda45a61841d"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 61.5,
+          "file_bytes": 18942,
+          "rate": 31.57,
+          "decoded_sha256": "60589068965daf988827b2094d1eabb921e8e9268d53c9e36eab3bb2db247fda"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 57.25,
+          "file_bytes": 23208,
+          "rate": 38.68,
+          "decoded_sha256": "cac097998fd06f57f615b4da7787e9f719421d348447678ffd121158487ed800"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 59.5,
+          "file_bytes": 20783,
+          "rate": 34.638333333333335,
+          "decoded_sha256": "6a01b4c5934d93d379e30c7bae2f9f74e18537fd806c664ec6491a6f12007758"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 60.5,
+          "file_bytes": 19979,
+          "rate": 33.29833333333334,
+          "decoded_sha256": "8e419b8287f2892ca247dc29098ac99b03ef1c98a872b49d9dc1f69176aa6891"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 61.0,
+          "file_bytes": 19448,
+          "rate": 32.413333333333334,
+          "decoded_sha256": "f69359db8e23df785aeace3ac3ec7563777881c0947c9fd93b5a40ef1935b964"
+        }
+      ],
+      "selected": {
+        "plain": {
+          "stream": "/private/tmp/ps-joint-trajectory-controls-20261122/33-240/plain-57.25-240/stream.ivf",
+          "decoded": "/private/tmp/ps-joint-trajectory-controls-20261122/33-240/plain-57.25-240/decoded.yuv",
+          "stream_sha256": "56a93d968bd4d65ea6efff208aed70a10aea2c00e833a3c3a9d202282ab5b1da",
+          "file_bytes": 19518,
+          "payload_bytes": 16606,
+          "temporal_units": 240,
+          "decoded_frames": 240.0,
+          "encode_command": [
+            "/opt/homebrew/bin/SvtAv1EncApp",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-240/240.yuv",
+            "-b",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-240/plain-57.25-240/stream.ivf",
+            "-w",
+            "240",
+            "-h",
+            "136",
+            "--input-depth",
+            "8",
+            "--fps-num",
+            "50",
+            "--fps-denom",
+            "1",
+            "-n",
+            "240",
+            "--color-range",
+            "0",
+            "--rc",
+            "0",
+            "--crf",
+            "57.25",
+            "--preset",
+            "4",
+            "--keyint",
+            "-1",
+            "--lp",
+            "6",
+            "--progress",
+            "0"
+          ],
+          "decode_command": [
+            "/opt/homebrew/bin/dav1d",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-240/plain-57.25-240/stream.ivf",
+            "-o",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-240/plain-57.25-240/decoded.yuv",
+            "--threads",
+            "2",
+            "--quiet"
+          ],
+          "encode_seconds": 1.675,
+          "encode_cpu_seconds": 3.492,
+          "decode_seconds": 0.045,
+          "decode_cpu_seconds": 0.039,
+          "cpus": null,
+          "host_load_before": [
+            4.88,
+            3.9,
+            3.6
+          ],
+          "mode": "plain",
+          "q": 57.25,
+          "n": 240,
+          "decoded_sha256": "73ca3d8703a507fb31b7970428b925782ff7132c1e7f621a632ffd63cdb822da",
+          "rate": 32.53
+        },
+        "roi": {
+          "stream": "/private/tmp/ps-joint-trajectory-controls-20261122/33-240/roi-61-240/stream.ivf",
+          "decoded": "/private/tmp/ps-joint-trajectory-controls-20261122/33-240/roi-61-240/decoded.yuv",
+          "stream_sha256": "bbefc320b2caea67296c6b307353aabe73c99440da50e43c3bb4d287b331954e",
+          "file_bytes": 19448,
+          "payload_bytes": 16536,
+          "temporal_units": 240,
+          "decoded_frames": 240.0,
+          "encode_command": [
+            "/opt/homebrew/bin/SvtAv1EncApp",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-240/240.yuv",
+            "-b",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-240/roi-61-240/stream.ivf",
+            "-w",
+            "240",
+            "-h",
+            "136",
+            "--input-depth",
+            "8",
+            "--fps-num",
+            "50",
+            "--fps-denom",
+            "1",
+            "-n",
+            "240",
+            "--color-range",
+            "0",
+            "--rc",
+            "0",
+            "--crf",
+            "61",
+            "--preset",
+            "4",
+            "--keyint",
+            "-1",
+            "--lp",
+            "6",
+            "--progress",
+            "0",
+            "--roi-map-file",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-240/roi.txt"
+          ],
+          "decode_command": [
+            "/opt/homebrew/bin/dav1d",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-240/roi-61-240/stream.ivf",
+            "-o",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-240/roi-61-240/decoded.yuv",
+            "--threads",
+            "2",
+            "--quiet"
+          ],
+          "encode_seconds": 1.737,
+          "encode_cpu_seconds": 3.58,
+          "decode_seconds": 0.035,
+          "decode_cpu_seconds": 0.038,
+          "cpus": null,
+          "host_load_before": [
+            4.54,
+            3.87,
+            3.59
+          ],
+          "mode": "roi",
+          "q": 61.0,
+          "n": 240,
+          "decoded_sha256": "f69359db8e23df785aeace3ac3ec7563777881c0947c9fd93b5a40ef1935b964",
+          "rate": 32.413333333333334
+        }
+      },
+      "per_tick": [
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.45289260149002075
+        },
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.4689182639122009
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.4282410740852356
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.4730926752090454
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.4752599000930786
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.49572545289993286
+        },
+        {
+          "t": 30,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.4572402834892273
+        },
+        {
+          "t": 30,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.4566407799720764
+        },
+        {
+          "t": 30,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.43093347549438477
+        },
+        {
+          "t": 30,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.4833313226699829
+        },
+        {
+          "t": 30,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.5080376863479614
+        },
+        {
+          "t": 30,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.5062349438667297
+        },
+        {
+          "t": 50,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.5017080903053284
+        },
+        {
+          "t": 50,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.502514660358429
+        },
+        {
+          "t": 50,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.4559236764907837
+        },
+        {
+          "t": 50,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.48627614974975586
+        },
+        {
+          "t": 50,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.3833651542663574
+        },
+        {
+          "t": 50,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.3761628270149231
+        },
+        {
+          "t": 70,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.4934690594673157
+        },
+        {
+          "t": 70,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.5114727020263672
+        },
+        {
+          "t": 70,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.498149037361145
+        },
+        {
+          "t": 70,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.5238730907440186
+        },
+        {
+          "t": 70,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.4185475707054138
+        },
+        {
+          "t": 70,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.4139833450317383
+        },
+        {
+          "t": 90,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.44190096855163574
+        },
+        {
+          "t": 90,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.4462980031967163
+        },
+        {
+          "t": 90,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.47469210624694824
+        },
+        {
+          "t": 90,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.47618985176086426
+        },
+        {
+          "t": 90,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.3713749647140503
+        },
+        {
+          "t": 90,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.36636650562286377
+        },
+        {
+          "t": 110,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.47308290004730225
+        },
+        {
+          "t": 110,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.4748467803001404
+        },
+        {
+          "t": 110,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.48414039611816406
+        },
+        {
+          "t": 110,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.47363752126693726
+        },
+        {
+          "t": 110,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.3573102355003357
+        },
+        {
+          "t": 110,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.3561418652534485
+        },
+        {
+          "t": 130,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.48225831985473633
+        },
+        {
+          "t": 130,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.49358469247817993
+        },
+        {
+          "t": 130,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.4744393229484558
+        },
+        {
+          "t": 130,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.5248885154724121
+        },
+        {
+          "t": 130,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.34840428829193115
+        },
+        {
+          "t": 130,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.34049439430236816
+        },
+        {
+          "t": 150,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.46716904640197754
+        },
+        {
+          "t": 150,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.47407007217407227
+        },
+        {
+          "t": 150,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.4972460865974426
+        },
+        {
+          "t": 150,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.4904435873031616
+        },
+        {
+          "t": 150,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.3814913034439087
+        },
+        {
+          "t": 150,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.36705732345581055
+        },
+        {
+          "t": 170,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.48986905813217163
+        },
+        {
+          "t": 170,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.511430025100708
+        },
+        {
+          "t": 170,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.4712578058242798
+        },
+        {
+          "t": 170,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.5171710252761841
+        },
+        {
+          "t": 170,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.36214691400527954
+        },
+        {
+          "t": 170,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.3960803747177124
+        },
+        {
+          "t": 190,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.5369325876235962
+        },
+        {
+          "t": 190,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.5280381441116333
+        },
+        {
+          "t": 190,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.4833396077156067
+        },
+        {
+          "t": 190,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.4835621118545532
+        },
+        {
+          "t": 190,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.36276400089263916
+        },
+        {
+          "t": 190,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.3762512803077698
+        },
+        {
+          "t": 210,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.45144855976104736
+        },
+        {
+          "t": 210,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.4596604108810425
+        },
+        {
+          "t": 210,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.5128986835479736
+        },
+        {
+          "t": 210,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.5223702192306519
+        },
+        {
+          "t": 210,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.3787846565246582
+        },
+        {
+          "t": 210,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.3732985258102417
+        },
+        {
+          "t": 230,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.4879612922668457
+        },
+        {
+          "t": 230,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.5076450705528259
+        },
+        {
+          "t": 230,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.4822266101837158
+        },
+        {
+          "t": 230,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.5385761260986328
+        },
+        {
+          "t": 230,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.3536193370819092
+        },
+        {
+          "t": 230,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.3831412196159363
+        }
+      ],
+      "smoke": [
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "source",
+          "dists": 1.1920928955078125e-07
+        },
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "plain",
+          "dists": 0.45289260149002075
+        },
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.4689182639122009
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "source",
+          "dists": 1.7881393432617188e-07
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "plain",
+          "dists": 0.4282410740852356
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.4730926752090454
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "source",
+          "dists": 1.7881393432617188e-07
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "plain",
+          "dists": 0.4752599000930786
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.49572545289993286
+        }
+      ],
+      "cpu": 47.842853999999996
+    },
+    {
+      "cap": "33",
+      "width": 480,
+      "source": "6cae4bd7a46bfa4bd2a7a7ec5c926647ea43d9e7a5366eb96e464eaffe1e603c",
+      "roi_map": "98bc2a47aa8c93cbdc2b518da0618ce9a8201e4b03eda2d925feca792a471560",
+      "driver_sha256": "7cd69a7bce86974cd9f4c74ae86013406115a9f80bf91dbf60a6d08a995a4d59",
+      "stream_report_sha256": "c61ccfd20b9da234a0b8b1e454622c0dcc7c4f04f42627dfce06174600452902",
+      "complete_encodes": [
+        {
+          "mode": "plain",
+          "n": 24,
+          "q": 60,
+          "file_bytes": 10392,
+          "rate": 173.2,
+          "decoded_sha256": "4d3c137aa535403e0e8b7cd92c2d21235e1675c058c96285ac4ee408a30537fb"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 36,
+          "file_bytes": 131547,
+          "rate": 219.245,
+          "decoded_sha256": "8652d2d20ce8e0b426aded662257bf800e48fad3bfb9f44f1487205b249f8417"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 70.0,
+          "file_bytes": 13415,
+          "rate": 22.358333333333334,
+          "decoded_sha256": "3d9bcad2fecb9feffe350f4d4445018c613c3ec5aed8af0b77990fc0687cc519"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 53.0,
+          "file_bytes": 53381,
+          "rate": 88.96833333333335,
+          "decoded_sha256": "b481b7fcb685ed66a4a195a18d0fae7da83cc4c7a17b142f79864d65accbe090"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 61.5,
+          "file_bytes": 28369,
+          "rate": 47.28166666666667,
+          "decoded_sha256": "fec72d8463fd62fb1caac7672267114cf234d50bbea5c676a27909553e6777d2"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 65.75,
+          "file_bytes": 17270,
+          "rate": 28.783333333333335,
+          "decoded_sha256": "552848d786bb411f4f213b98f438c07767b959949b6887f9c3532de6894e1d38"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 63.5,
+          "file_bytes": 20773,
+          "rate": 34.62166666666667,
+          "decoded_sha256": "4fc5b3d0568d0c68456d765fa0ad81dab31eb06fa29e0670774126bc3390bbff"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 64.5,
+          "file_bytes": 18955,
+          "rate": 31.59166666666667,
+          "decoded_sha256": "f78286245ead3bb5f8948c57bfa8f3488ae8924cbd3060739f99087f96ee9f11"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 64.0,
+          "file_bytes": 19818,
+          "rate": 33.03,
+          "decoded_sha256": "ae858e5224a321105fbc1d71563adf2a0ac025b0762e8f0dba4d4ce4f3e3de1d"
+        },
+        {
+          "mode": "plain",
+          "n": 240,
+          "q": 64.25,
+          "file_bytes": 19326,
+          "rate": 32.21,
+          "decoded_sha256": "8bce20ad4eab84f8edbfa78678b858b479c28f4bf575d2d05ee1c1150020c357"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 36.0,
+          "file_bytes": 122431,
+          "rate": 204.05166666666668,
+          "decoded_sha256": "415288e5647fcb8887d9f00a0639bc916f31f324dcf8587590ee30699bfaf95f"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 70.0,
+          "file_bytes": 16933,
+          "rate": 28.221666666666668,
+          "decoded_sha256": "ccc86ec63091b2a95efbc27e8e9ec62f87f609e05c9c1da989d5e2749a9b1edf"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 53.0,
+          "file_bytes": 54305,
+          "rate": 90.50833333333334,
+          "decoded_sha256": "470cea51e655cbc8c2fe5a53d3bc4070838426bd41dde83d021aa7458e1973d3"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 61.5,
+          "file_bytes": 31104,
+          "rate": 51.84,
+          "decoded_sha256": "0324381a4a16319fc7f64501397d1193d878183446c367556f5180d7ab5384dc"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 65.75,
+          "file_bytes": 20547,
+          "rate": 34.245,
+          "decoded_sha256": "9d0f240f80eda2b7c22b2dacce47ddf0d6ebc0efc5c573f1733910e7ce0e6c9a"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 68.0,
+          "file_bytes": 18287,
+          "rate": 30.478333333333335,
+          "decoded_sha256": "fe0f9548f2428f0269bc7e20640e769a0aeede49a1980812925d7347111ca73e"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 67.0,
+          "file_bytes": 19130,
+          "rate": 31.883333333333336,
+          "decoded_sha256": "a0d479eb672787a031adc2d1758b010f819f78a348a64f13f495bec12491e8af"
+        },
+        {
+          "mode": "roi",
+          "n": 240,
+          "q": 66.5,
+          "file_bytes": 19586,
+          "rate": 32.64333333333334,
+          "decoded_sha256": "e06e12c2a42f3fd5c6aac8279ca10333dcba26621570ee0f5982f2e8641eb4d6"
+        }
+      ],
+      "selected": {
+        "plainunder": {
+          "stream": "/private/tmp/ps-joint-trajectory-controls-20261122/33-480/plain-64.25-240/stream.ivf",
+          "decoded": "/private/tmp/ps-joint-trajectory-controls-20261122/33-480/plain-64.25-240/decoded.yuv",
+          "stream_sha256": "4e9ff6f351b9d2867896f5678d6878eaf369a2cd1773ad5b7c532437084fac3f",
+          "file_bytes": 19326,
+          "payload_bytes": 16414,
+          "temporal_units": 240,
+          "decoded_frames": 240.0,
+          "encode_command": [
+            "/opt/homebrew/bin/SvtAv1EncApp",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-480/480.yuv",
+            "-b",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-480/plain-64.25-240/stream.ivf",
+            "-w",
+            "480",
+            "-h",
+            "272",
+            "--input-depth",
+            "8",
+            "--fps-num",
+            "50",
+            "--fps-denom",
+            "1",
+            "-n",
+            "240",
+            "--color-range",
+            "0",
+            "--rc",
+            "0",
+            "--crf",
+            "64.25",
+            "--preset",
+            "4",
+            "--keyint",
+            "-1",
+            "--lp",
+            "6",
+            "--progress",
+            "0"
+          ],
+          "decode_command": [
+            "/opt/homebrew/bin/dav1d",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-480/plain-64.25-240/stream.ivf",
+            "-o",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-480/plain-64.25-240/decoded.yuv",
+            "--threads",
+            "2",
+            "--quiet"
+          ],
+          "encode_seconds": 4.384,
+          "encode_cpu_seconds": 11.38,
+          "decode_seconds": 0.115,
+          "decode_cpu_seconds": 0.101,
+          "cpus": null,
+          "host_load_before": [
+            4.2,
+            3.84,
+            3.59
+          ],
+          "mode": "plain",
+          "q": 64.25,
+          "n": 240,
+          "decoded_sha256": "8bce20ad4eab84f8edbfa78678b858b479c28f4bf575d2d05ee1c1150020c357",
+          "rate": 32.21
+        },
+        "plainover": {
+          "stream": "/private/tmp/ps-joint-trajectory-controls-20261122/33-480/plain-64-240/stream.ivf",
+          "decoded": "/private/tmp/ps-joint-trajectory-controls-20261122/33-480/plain-64-240/decoded.yuv",
+          "stream_sha256": "4de2ffe2d889c2c4a52ecf8d4b6fed8e87db5d8c2e6cac388e9afce6f02a4312",
+          "file_bytes": 19818,
+          "payload_bytes": 16906,
+          "temporal_units": 240,
+          "decoded_frames": 240.0,
+          "encode_command": [
+            "/opt/homebrew/bin/SvtAv1EncApp",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-480/480.yuv",
+            "-b",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-480/plain-64-240/stream.ivf",
+            "-w",
+            "480",
+            "-h",
+            "272",
+            "--input-depth",
+            "8",
+            "--fps-num",
+            "50",
+            "--fps-denom",
+            "1",
+            "-n",
+            "240",
+            "--color-range",
+            "0",
+            "--rc",
+            "0",
+            "--crf",
+            "64",
+            "--preset",
+            "4",
+            "--keyint",
+            "-1",
+            "--lp",
+            "6",
+            "--progress",
+            "0"
+          ],
+          "decode_command": [
+            "/opt/homebrew/bin/dav1d",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-480/plain-64-240/stream.ivf",
+            "-o",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-480/plain-64-240/decoded.yuv",
+            "--threads",
+            "2",
+            "--quiet"
+          ],
+          "encode_seconds": 4.487,
+          "encode_cpu_seconds": 11.569,
+          "decode_seconds": 0.103,
+          "decode_cpu_seconds": 0.103,
+          "cpus": null,
+          "host_load_before": [
+            4.2,
+            3.84,
+            3.59
+          ],
+          "mode": "plain",
+          "q": 64.0,
+          "n": 240,
+          "decoded_sha256": "ae858e5224a321105fbc1d71563adf2a0ac025b0762e8f0dba4d4ce4f3e3de1d",
+          "rate": 33.03
+        },
+        "roi": {
+          "stream": "/private/tmp/ps-joint-trajectory-controls-20261122/33-480/roi-66.5-240/stream.ivf",
+          "decoded": "/private/tmp/ps-joint-trajectory-controls-20261122/33-480/roi-66.5-240/decoded.yuv",
+          "stream_sha256": "241f49531647743bdd4062f9dfe13e7af00bb31eb855683b67d8b7e6813a1493",
+          "file_bytes": 19586,
+          "payload_bytes": 16674,
+          "temporal_units": 240,
+          "decoded_frames": 240.0,
+          "encode_command": [
+            "/opt/homebrew/bin/SvtAv1EncApp",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-480/480.yuv",
+            "-b",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-480/roi-66.5-240/stream.ivf",
+            "-w",
+            "480",
+            "-h",
+            "272",
+            "--input-depth",
+            "8",
+            "--fps-num",
+            "50",
+            "--fps-denom",
+            "1",
+            "-n",
+            "240",
+            "--color-range",
+            "0",
+            "--rc",
+            "0",
+            "--crf",
+            "66.5",
+            "--preset",
+            "4",
+            "--keyint",
+            "-1",
+            "--lp",
+            "6",
+            "--progress",
+            "0",
+            "--roi-map-file",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-480/roi.txt"
+          ],
+          "decode_command": [
+            "/opt/homebrew/bin/dav1d",
+            "-i",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-480/roi-66.5-240/stream.ivf",
+            "-o",
+            "/private/tmp/ps-joint-trajectory-controls-20261122/33-480/roi-66.5-240/decoded.yuv",
+            "--threads",
+            "2",
+            "--quiet"
+          ],
+          "encode_seconds": 4.117,
+          "encode_cpu_seconds": 10.884,
+          "decode_seconds": 0.114,
+          "decode_cpu_seconds": 0.102,
+          "cpus": null,
+          "host_load_before": [
+            4.19,
+            3.88,
+            3.61
+          ],
+          "mode": "roi",
+          "q": 66.5,
+          "n": 240,
+          "decoded_sha256": "e06e12c2a42f3fd5c6aac8279ca10333dcba26621570ee0f5982f2e8641eb4d6",
+          "rate": 32.64333333333334
+        }
+      },
+      "per_tick": [
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.4109976291656494
+        },
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.41855746507644653
+        },
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.47344517707824707
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.3898002505302429
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.37491273880004883
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.4296271800994873
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.4601830840110779
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.4654754400253296
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.4994433522224426
+        },
+        {
+          "t": 30,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.4079693555831909
+        },
+        {
+          "t": 30,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.3993702530860901
+        },
+        {
+          "t": 30,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.45427078008651733
+        },
+        {
+          "t": 30,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.37936389446258545
+        },
+        {
+          "t": 30,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.3746475577354431
+        },
+        {
+          "t": 30,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.4120049476623535
+        },
+        {
+          "t": 30,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.48143333196640015
+        },
+        {
+          "t": 30,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.501569390296936
+        },
+        {
+          "t": 30,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.4977685213088989
+        },
+        {
+          "t": 50,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.4958227872848511
+        },
+        {
+          "t": 50,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.46316438913345337
+        },
+        {
+          "t": 50,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.5440609455108643
+        },
+        {
+          "t": 50,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.4060746431350708
+        },
+        {
+          "t": 50,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.4052804708480835
+        },
+        {
+          "t": 50,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.44447213411331177
+        },
+        {
+          "t": 50,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.3751640319824219
+        },
+        {
+          "t": 50,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.3694080114364624
+        },
+        {
+          "t": 50,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.3644298315048218
+        },
+        {
+          "t": 70,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.4676879048347473
+        },
+        {
+          "t": 70,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.46905630826950073
+        },
+        {
+          "t": 70,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.516065239906311
+        },
+        {
+          "t": 70,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.469973087310791
+        },
+        {
+          "t": 70,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.45418018102645874
+        },
+        {
+          "t": 70,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.496746301651001
+        },
+        {
+          "t": 70,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.3560631275177002
+        },
+        {
+          "t": 70,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.3623577952384949
+        },
+        {
+          "t": 70,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.3432345986366272
+        },
+        {
+          "t": 90,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.4242970943450928
+        },
+        {
+          "t": 90,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.4351358413696289
+        },
+        {
+          "t": 90,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.44271320104599
+        },
+        {
+          "t": 90,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.44320207834243774
+        },
+        {
+          "t": 90,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.4296931028366089
+        },
+        {
+          "t": 90,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.49895787239074707
+        },
+        {
+          "t": 90,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.28853893280029297
+        },
+        {
+          "t": 90,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.2975195646286011
+        },
+        {
+          "t": 90,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.2951924800872803
+        },
+        {
+          "t": 110,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.4412540793418884
+        },
+        {
+          "t": 110,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.45464766025543213
+        },
+        {
+          "t": 110,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.4824744462966919
+        },
+        {
+          "t": 110,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.4688601493835449
+        },
+        {
+          "t": 110,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.4520784616470337
+        },
+        {
+          "t": 110,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.47996968030929565
+        },
+        {
+          "t": 110,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.3027949333190918
+        },
+        {
+          "t": 110,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.31180858612060547
+        },
+        {
+          "t": 110,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.3146067261695862
+        },
+        {
+          "t": 130,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.4327239394187927
+        },
+        {
+          "t": 130,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.4545999765396118
+        },
+        {
+          "t": 130,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.46356672048568726
+        },
+        {
+          "t": 130,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.48018044233322144
+        },
+        {
+          "t": 130,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.4862678050994873
+        },
+        {
+          "t": 130,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.5195682644844055
+        },
+        {
+          "t": 130,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.32427412271499634
+        },
+        {
+          "t": 130,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.31644952297210693
+        },
+        {
+          "t": 130,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.3180612325668335
+        },
+        {
+          "t": 150,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.4462904930114746
+        },
+        {
+          "t": 150,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.4414963126182556
+        },
+        {
+          "t": 150,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.4865875840187073
+        },
+        {
+          "t": 150,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.4402531385421753
+        },
+        {
+          "t": 150,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.4717848300933838
+        },
+        {
+          "t": 150,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.4828287363052368
+        },
+        {
+          "t": 150,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.3262026906013489
+        },
+        {
+          "t": 150,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.33198046684265137
+        },
+        {
+          "t": 150,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.32878637313842773
+        },
+        {
+          "t": 170,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.4592673182487488
+        },
+        {
+          "t": 170,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.46917134523391724
+        },
+        {
+          "t": 170,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.525277853012085
+        },
+        {
+          "t": 170,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.48913490772247314
+        },
+        {
+          "t": 170,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.4542718529701233
+        },
+        {
+          "t": 170,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.44905751943588257
+        },
+        {
+          "t": 170,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.37834328413009644
+        },
+        {
+          "t": 170,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.3792038559913635
+        },
+        {
+          "t": 170,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.40293359756469727
+        },
+        {
+          "t": 190,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.4862361550331116
+        },
+        {
+          "t": 190,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.48529863357543945
+        },
+        {
+          "t": 190,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.5105510354042053
+        },
+        {
+          "t": 190,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.46021437644958496
+        },
+        {
+          "t": 190,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.43697482347488403
+        },
+        {
+          "t": 190,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.5214163064956665
+        },
+        {
+          "t": 190,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.35647428035736084
+        },
+        {
+          "t": 190,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.36353635787963867
+        },
+        {
+          "t": 190,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.37428194284439087
+        },
+        {
+          "t": 210,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.4305937886238098
+        },
+        {
+          "t": 210,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.45026588439941406
+        },
+        {
+          "t": 210,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.482668399810791
+        },
+        {
+          "t": 210,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.49462389945983887
+        },
+        {
+          "t": 210,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.4731036424636841
+        },
+        {
+          "t": 210,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.5115131139755249
+        },
+        {
+          "t": 210,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.3310368061065674
+        },
+        {
+          "t": 210,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.33805012702941895
+        },
+        {
+          "t": 210,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.34655946493148804
+        },
+        {
+          "t": 230,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.46576547622680664
+        },
+        {
+          "t": 230,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.46053725481033325
+        },
+        {
+          "t": 230,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.4866418242454529
+        },
+        {
+          "t": 230,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.5261964797973633
+        },
+        {
+          "t": 230,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.5055602788925171
+        },
+        {
+          "t": 230,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.5094200372695923
+        },
+        {
+          "t": 230,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.3713008165359497
+        },
+        {
+          "t": 230,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.3482237458229065
+        },
+        {
+          "t": 230,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.36277592182159424
+        }
+      ],
+      "smoke": [
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "source",
+          "dists": 1.1920928955078125e-07
+        },
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "plainunder",
+          "dists": 0.4109976291656494
+        },
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "plainover",
+          "dists": 0.41855746507644653
+        },
+        {
+          "t": 10,
+          "region": "p1",
+          "arm": "roi",
+          "dists": 0.47344517707824707
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "source",
+          "dists": 1.7881393432617188e-07
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "plainunder",
+          "dists": 0.3898002505302429
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "plainover",
+          "dists": 0.37491273880004883
+        },
+        {
+          "t": 10,
+          "region": "p2",
+          "arm": "roi",
+          "dists": 0.4296271800994873
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "source",
+          "dists": 1.7881393432617188e-07
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "plainunder",
+          "dists": 0.4601830840110779
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "plainover",
+          "dists": 0.4654754400253296
+        },
+        {
+          "t": 10,
+          "region": "ball",
+          "arm": "roi",
+          "dists": 0.4994433522224426
+        }
+      ],
+      "cpu": 207.518158
+    }
+  ],
+  "metric": {
+    "metric": "DISTS",
+    "net": "vgg16",
+    "torchmetrics": "1.9.0",
+    "weights": "/private/tmp/ps-20261119-scorer-addon/torchmetrics/functional/image/dists_models/weights.pt",
+    "weights_sha256": "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218",
+    "backbone": "/Users/manu/.codex/visualizations/2026/11/01/01a196fe-ab4d-70f0-a4b4-6843ca289667/atlas-metric-models/checkpoints/vgg16-397923af.pth",
+    "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+    "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)"
+  },
+  "torch": "2.8.0",
+  "opencv": "4.10.0",
+  "tools": {
+    "ffmpeg": {
+      "path": "/opt/homebrew/bin/ffmpeg",
+      "real_path": "/opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg",
+      "sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be",
+      "version": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    "SvtAv1EncApp": {
+      "path": "/opt/homebrew/bin/SvtAv1EncApp",
+      "real_path": "/opt/homebrew/Cellar/svt-av1/4.0.1/bin/SvtAv1EncApp",
+      "sha256": "db044194faf94d553c2509c8e033ecd05a373ba54d919d0fb49a3a13149d1687",
+      "version": "SVT-AV1 v4.0.1 (release)"
+    },
+    "dav1d": {
+      "path": "/opt/homebrew/bin/dav1d",
+      "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+      "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+      "version": "1.5.4"
+    }
+  },
+  "script_sha256": "47d69ebef3527ac4c3f3f050a1366ea567fc5156a349bed86ee7440a5eda2a3a",
+  "python": "/Users/manu/.codex/visualizations/2026/11/01/01a196fe-ab4d-70f0-a4b4-6843ca289667/atlas-metrics-env/bin/python",
+  "reviewed_ticks": [
+    10,
+    30,
+    50,
+    70,
+    90,
+    110,
+    130,
+    150,
+    170,
+    190,
+    210,
+    230
+  ]
+}

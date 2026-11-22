@@ -1,0 +1,51 @@
+{
+  "rate_kbps": 33.0,
+  "per_window": {
+    "al028": {
+      "PointStream": 0.23239757507158046,
+      "ordinary AV1": 0.33012073243750145,
+      "DCVC-UF": 0.25972133338703024
+    },
+    "al034": {
+      "PointStream": 0.22056828547816432,
+      "ordinary AV1": 0.3191551263431433,
+      "DCVC-UF": 0.26780164185422045
+    },
+    "al043": {
+      "PointStream": 0.23024228415321202,
+      "ordinary AV1": 0.33725287120316916,
+      "DCVC-UF": 0.2680834251034697
+    },
+    "med019": {
+      "PointStream": 0.27036755683769387,
+      "ordinary AV1": 0.44707622080410936,
+      "DCVC-UF": 0.3477631619655319
+    },
+    "med024": {
+      "PointStream": 0.2536231028213022,
+      "ordinary AV1": 0.4331321880730627,
+      "DCVC-UF": 0.3442390867941941
+    },
+    "nad000": {
+      "PointStream": 0.2460695004532416,
+      "ordinary AV1": 0.41581833033704396,
+      "DCVC-UF": 0.3300893391987651
+    },
+    "nad001": {
+      "PointStream": 0.2639042181899883,
+      "ordinary AV1": 0.4236364731590291,
+      "DCVC-UF": null
+    },
+    "nad002": {
+      "PointStream": 0.2631668143370267,
+      "ordinary AV1": 0.4596897112155921,
+      "DCVC-UF": 0.3576310036057707
+    }
+  },
+  "missing": {
+    "nad001": [
+      "DCVC-UF"
+    ]
+  },
+  "method": "linear quality interpolation in log rate within each measured scale family; lowest supported ordinary AV1 family; no extrapolation; average windows within each match, then equal-weight matches"
+}

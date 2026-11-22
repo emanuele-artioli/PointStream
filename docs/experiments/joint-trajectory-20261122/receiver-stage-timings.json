@@ -1,0 +1,44 @@
+{
+  "playback_seconds": 4.8,
+  "frames": 240,
+  "players": [
+    {
+      "player": 1,
+      "unit": "nadal_kyrgios__000_at120__person_000000000000",
+      "job": "20261118T162820Z-841078f9",
+      "archive_sha256": "fc0e4a380c47116332bdcd6dfedc268c2a34f4d4b3eca7608d764acfb912d664",
+      "device": "NVIDIA RTX 6000 Ada Generation",
+      "model_load_seconds": 21.47323101386428,
+      "render_and_save_seconds": 942.1509905094281
+    },
+    {
+      "player": 2,
+      "unit": "nadal_kyrgios__000_at120__person_000000000001",
+      "job": "20261118T160156Z-9fdf17fb",
+      "archive_sha256": "4894f619d171db28d63356ac6b1ae45acf4e49e3550f80ee26b7f329ee04d411",
+      "device": "NVIDIA RTX 6000 Ada Generation",
+      "model_load_seconds": 21.328253713436425,
+      "render_and_save_seconds": 947.5334932385013
+    }
+  ],
+  "finish": {
+    "job": "20261118T171044Z-cb2e385d",
+    "sha256": "645d719da006b9df133849753ed45b2da00a821958b716c1b4debf5e625ce131",
+    "total_seconds": 72.92751315236092,
+    "loop_seconds": 57.22307599987835,
+    "initialization_seconds": 13.679568218067288
+  },
+  "neural": {
+    "qp": 6,
+    "device": "NVIDIA RTX 6000 Ada Generation",
+    "producer_sha256": "f246a11a7be7ff3514e6905744d533f2d49cc68d2e3c5f225c9a8acaf87faee9",
+    "four_decode_pass_seconds": [
+      0.89,
+      0.885,
+      0.862,
+      0.634
+    ]
+  },
+  "scope": "Recorded stage intervals on the original allocations. Player saving, model initialization and control decoder scopes differ. No timing for an integrated live application.",
+  "script_sha256": "b7b3fa196b59c2dd3356274dc2da3752476eeaa7280029de1f8bc7cfd510873a"
+}

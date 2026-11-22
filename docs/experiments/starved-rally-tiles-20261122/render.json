@@ -1,0 +1,297 @@
+{
+  "pairs": [
+    {
+      "target": 50,
+      "plain_crf": 44.0,
+      "tile_crf": 63,
+      "plain_kbps": 54.681666666666665,
+      "tile_kbps": 54.375,
+      "matched": false,
+      "feasible": true,
+      "plain_rgb_psnr_12": 24.176227434496194,
+      "tile_rgb_psnr_12": 23.206314638846234
+    },
+    {
+      "target": 63,
+      "plain_crf": 41.5,
+      "tile_crf": 60,
+      "plain_kbps": 60.623333333333335,
+      "tile_kbps": 60.67,
+      "matched": true,
+      "feasible": true,
+      "plain_rgb_psnr_12": 24.21369875622245,
+      "tile_rgb_psnr_12": 23.731206370229376
+    },
+    {
+      "target": 125,
+      "plain_crf": 26.75,
+      "tile_crf": 33.0,
+      "plain_kbps": 122.12166666666667,
+      "tile_kbps": 122.855,
+      "matched": false,
+      "feasible": true,
+      "plain_rgb_psnr_12": 24.32709480960319,
+      "tile_rgb_psnr_12": 24.294707341279334
+    }
+  ],
+  "rows": [
+    {
+      "crf": 36,
+      "stream": "/private/tmp/agentctl-artifacts/Emanueles-MacBook-Pro.local/9897d39530594990a4b5cc4ab12ceaf9/output/full-quarter/original-36/stream.ivf",
+      "base_sha256": "7d88e49f667e9b216570e2c5d25c8b23939a242b4c3b766af7abfb8f9810e225",
+      "plain_bytes": 46735,
+      "tile_bytes": 66386,
+      "carrier_bytes": 47272,
+      "sidecar_bytes": 19114,
+      "carrier_sha256": "6cc93127507ffe8576ea8444e49b7abfbed9551970d28510ed7d77a84bace037",
+      "sidecar_sha256": "d1e2251cbb225ae84f74f24b811c2868846530942bd2544360eab220c5cc6b95"
+    },
+    {
+      "crf": 48,
+      "stream": "/private/tmp/agentctl-artifacts/Emanueles-MacBook-Pro.local/9897d39530594990a4b5cc4ab12ceaf9/output/full-quarter/original-48/stream.ivf",
+      "base_sha256": "23c4d606768700293832171cf8b20c7d148ecdfd95da75c09551705409a2f738",
+      "plain_bytes": 27835,
+      "tile_bytes": 47486,
+      "carrier_bytes": 28372,
+      "sidecar_bytes": 19114,
+      "carrier_sha256": "3382dcecffb69ad3cf11a1d54e171a0a942087b5240245ab2a4e4412bce0a8a1",
+      "sidecar_sha256": "325e84e62a237c4da3db3280e19815666836df66cd51c96ceb4d427751bbd443"
+    },
+    {
+      "crf": 60,
+      "stream": "/private/tmp/agentctl-artifacts/Emanueles-MacBook-Pro.local/9897d39530594990a4b5cc4ab12ceaf9/output/full-quarter/original-60/stream.ivf",
+      "base_sha256": "572c0caf44fa16b7cef87c12bf620349b652be6c261f77d831f5784bda9ca5ba",
+      "plain_bytes": 16751,
+      "tile_bytes": 36402,
+      "carrier_bytes": 17288,
+      "sidecar_bytes": 19114,
+      "carrier_sha256": "11d2b56f7e4e61ad99dd71bcb715ff8d1cf4a818a800ff2fbe1df27c39d5fb5d",
+      "sidecar_sha256": "e6c557408a3b5b29a9ffb97c3fb1cb59f97607859d3c6effae8b4c8888f6c9f5"
+    },
+    {
+      "crf": 63,
+      "stream": "/private/tmp/ps-starved-rally-tiles-20261122/q63/stream.ivf",
+      "base_sha256": "40ac346602fc01a02433a2ff0c90e32a3448fad25c6fbe436d2dd9b606d8c757",
+      "plain_bytes": 12974,
+      "tile_bytes": 32625,
+      "carrier_bytes": 13511,
+      "sidecar_bytes": 19114,
+      "carrier_sha256": "69dfa90e0404378d593bbf9745205d87026fd45b66393932b806aab570f56689",
+      "sidecar_sha256": "c0770b5ba45875dd9c785d631fce1b546494cecc4ea08fc439bb6ff0614681ed"
+    },
+    {
+      "crf": 42.0,
+      "stream": "/private/tmp/ps-starved-rally-tiles-20261122/q42/stream.ivf",
+      "base_sha256": "e65345177a9099c11abaec9ea6c33b1b101dac40f6d1fdc8c43c273c2c0554eb",
+      "plain_bytes": 35838,
+      "tile_bytes": 55489,
+      "carrier_bytes": 36375,
+      "sidecar_bytes": 19114,
+      "carrier_sha256": "d83aa1ba406659d3910a64c04b69aaba6769b242f678001d391e36054c428848",
+      "sidecar_sha256": "f6391234180cbc341e8d2e34779a433621308d6809686c231b82d93ec1f590b1"
+    },
+    {
+      "crf": 45.0,
+      "stream": "/private/tmp/ps-starved-rally-tiles-20261122/q45/stream.ivf",
+      "base_sha256": "05028b6e52c8cd1ddc28c8e3dbecd71f90d66570f3ac2a9f70493181cfb1c017",
+      "plain_bytes": 31246,
+      "tile_bytes": 50897,
+      "carrier_bytes": 31783,
+      "sidecar_bytes": 19114,
+      "carrier_sha256": "a40a6f9858290322c53b9a77d28fd3b714d032184c24e9fa4f39eca3a2f3b8ce",
+      "sidecar_sha256": "c10ec24c90291a63faf2c1f6b37412d3635e2db897b4afc88ed17a199d530dc6"
+    },
+    {
+      "crf": 43.5,
+      "stream": "/private/tmp/ps-starved-rally-tiles-20261122/q43.5/stream.ivf",
+      "base_sha256": "9647044332685dd6384e86df1f239e9c67b217d6d3f49b59fa4df5d1576b7cbc",
+      "plain_bytes": 33318,
+      "tile_bytes": 52969,
+      "carrier_bytes": 33855,
+      "sidecar_bytes": 19114,
+      "carrier_sha256": "869fb6bd73c812032f7dc83692c661f1a84d4f6c1ac06b03d27016a6dfa7e1fe",
+      "sidecar_sha256": "58debf02002886f13c29f03be630a89af0e40ad6841067c9eddcca4d9dbd1e74"
+    },
+    {
+      "crf": 44.25,
+      "stream": "/private/tmp/ps-starved-rally-tiles-20261122/q44.25/stream.ivf",
+      "base_sha256": "ddd4e11fddbed5da999c6de9303a28e1c0afc717f4194f0434ebc7e61235120e",
+      "plain_bytes": 32399,
+      "tile_bytes": 52050,
+      "carrier_bytes": 32936,
+      "sidecar_bytes": 19114,
+      "carrier_sha256": "ec9db9a8e3322597a077156f9b8e566ee52dbf35a3fc7673dab26c1f39656ca3",
+      "sidecar_sha256": "0f9df5b863903ecc07102b106d22a0640c7b771965d4c7a7a95928f63a385984"
+    },
+    {
+      "crf": 44.0,
+      "stream": "/private/tmp/ps-starved-rally-tiles-20261122/q44/stream.ivf",
+      "base_sha256": "c801d490118110fc10b52d6f03c743fe93b8227f75a4d08c7e0c16f3768799d1",
+      "plain_bytes": 32809,
+      "tile_bytes": 52460,
+      "carrier_bytes": 33346,
+      "sidecar_bytes": 19114,
+      "carrier_sha256": "7a7833dce912355ce799e909ecf441d9dbdbb9c442318423b2751a0d02f7b560",
+      "sidecar_sha256": "4abb54f2c12e5326bf300cffac72d0366ea0b42f0fbc0e3ce593eeae71f0d69e"
+    },
+    {
+      "crf": 39.0,
+      "stream": "/private/tmp/ps-starved-rally-tiles-20261122/q39/stream.ivf",
+      "base_sha256": "f4007fdba038eaab99affe03cee465103047fdff2160c9933e6dcde2481e0b3d",
+      "plain_bytes": 40665,
+      "tile_bytes": 60316,
+      "carrier_bytes": 41202,
+      "sidecar_bytes": 19114,
+      "carrier_sha256": "e9bdafa92a3a5e2c62cb32ba4552e4970dddaadd295f73d564d4ea26f4497ff8",
+      "sidecar_sha256": "e4d14ab4e1d464f1946bfdc53e00dead7fe7150dceffbd8230df41f0e09cc0e2"
+    },
+    {
+      "crf": 40.5,
+      "stream": "/private/tmp/ps-starved-rally-tiles-20261122/q40.5/stream.ivf",
+      "base_sha256": "89095f99fe2b606eef6f8e2684fc85f77df655c8d5ed7e4336d5f23648081d31",
+      "plain_bytes": 38101,
+      "tile_bytes": 57752,
+      "carrier_bytes": 38638,
+      "sidecar_bytes": 19114,
+      "carrier_sha256": "6ef063af52e84b6657d10dc1773d2eca7ed73a0ab15710363aefe7661868dc53",
+      "sidecar_sha256": "d4be8fc156ff712d877821c9f5b56901404acd26ae92f2a605887194b1506cb8"
+    },
+    {
+      "crf": 41.25,
+      "stream": "/private/tmp/ps-starved-rally-tiles-20261122/q41.25/stream.ivf",
+      "base_sha256": "1f86fed9bc773423847fdb81fdda3da747e6faa33dd75a16137c5987d34f0ea1",
+      "plain_bytes": 36927,
+      "tile_bytes": 56578,
+      "carrier_bytes": 37464,
+      "sidecar_bytes": 19114,
+      "carrier_sha256": "e7281300f10f6658b344254da66f6555ecf29d76abe49396384ddb2d109ed418",
+      "sidecar_sha256": "ce0a41d30ee4a6aa41375e6da169d816bd230fccf5a8c9de7396ff0c84b3c4c9"
+    },
+    {
+      "crf": 41.5,
+      "stream": "/private/tmp/ps-starved-rally-tiles-20261122/q41.5/stream.ivf",
+      "base_sha256": "e3cc582efda3bbed137cc19c6afe0b910316ab33fcdfd5ae09c6682e3445a3a9",
+      "plain_bytes": 36374,
+      "tile_bytes": 56025,
+      "carrier_bytes": 36911,
+      "sidecar_bytes": 19114,
+      "carrier_sha256": "05267c242972ea09add68c120cb60c513b07465c669fc40364fff76088f6be0e",
+      "sidecar_sha256": "32bf39005a8b219f30ff0ad8ef2a9e0dc213f28d859086b48c65821fd97426c5"
+    },
+    {
+      "crf": 24,
+      "stream": "/private/tmp/ps-starved-rally-tiles-20261122/q24/stream.ivf",
+      "base_sha256": "5af4e0e70c88eb00a402f01343f10c7d7a186025416616897fd9467adb751955",
+      "plain_bytes": 86636,
+      "tile_bytes": 106287,
+      "carrier_bytes": 87173,
+      "sidecar_bytes": 19114,
+      "carrier_sha256": "7a7629990e5ef24a1ea4dee562b93c7dcfa5ac4c283b7d35a142f4a70b6e8ef3",
+      "sidecar_sha256": "91640f4383d1551f2cfe09038a79c98a27dc47776bad6b0e62336d75e830c7f9"
+    },
+    {
+      "crf": 30.0,
+      "stream": "/private/tmp/ps-starved-rally-tiles-20261122/q30/stream.ivf",
+      "base_sha256": "af4b14cb1849c3eee344f12195438912db656e65eb916d562f3e50d6e9cd6afd",
+      "plain_bytes": 63249,
+      "tile_bytes": 82900,
+      "carrier_bytes": 63786,
+      "sidecar_bytes": 19114,
+      "carrier_sha256": "8d2e2e36242c181c4ad7f4b7b6aa175f3f8a8065935c5c00e392ef4e47964f93",
+      "sidecar_sha256": "fcaba62473135caed952113790b890ff6d686e2da5a52352e03fb8afc7f490e5"
+    },
+    {
+      "crf": 33.0,
+      "stream": "/private/tmp/ps-starved-rally-tiles-20261122/q33/stream.ivf",
+      "base_sha256": "39a496e5ff0a680c92c4fb367fc0fe18e53ec532e9ee1d37965bc946472a45f6",
+      "plain_bytes": 54062,
+      "tile_bytes": 73713,
+      "carrier_bytes": 54599,
+      "sidecar_bytes": 19114,
+      "carrier_sha256": "36ca5fe116dbfc8f19d162cf7ff30eb76eb2e2a70661c76ed85a592c5db8c9e6",
+      "sidecar_sha256": "c2113aa27393745a5cf97b570854409614bd46482c83a0356799b19a51a918a2"
+    },
+    {
+      "crf": 27.0,
+      "stream": "/private/tmp/ps-starved-rally-tiles-20261122/q27/stream.ivf",
+      "base_sha256": "7e3c97755479d786d04c56d25fb268144cd3e617732fd35a23901fe0c48f4a36",
+      "plain_bytes": 72607,
+      "tile_bytes": 92258,
+      "carrier_bytes": 73144,
+      "sidecar_bytes": 19114,
+      "carrier_sha256": "351001b1b5a4ba08e61eb0865f17fba8c9e0bee4317723c642c2056e8a1a121b",
+      "sidecar_sha256": "06d8e48875ec17cbae971c42c2cad00c1af801c7da24b5dea998118d43808388"
+    },
+    {
+      "crf": 25.5,
+      "stream": "/private/tmp/ps-starved-rally-tiles-20261122/q25.5/stream.ivf",
+      "base_sha256": "ca2ed7fb8603f09e0692e205f13fdcff0a3e4f3db162778a7943e53b1019e33f",
+      "plain_bytes": 78812,
+      "tile_bytes": 98463,
+      "carrier_bytes": 79349,
+      "sidecar_bytes": 19114,
+      "carrier_sha256": "2f05185de978f1903de5b88e1fe2b4ebda3eb76dd94901a537e2030fd4cb37fe",
+      "sidecar_sha256": "e8360b8093877a503e13c964652040a21a05a779b6c53cee78f745c31a95ad88"
+    },
+    {
+      "crf": 26.25,
+      "stream": "/private/tmp/ps-starved-rally-tiles-20261122/q26.25/stream.ivf",
+      "base_sha256": "223ee9efe049803179b4db02835d3bf57cd46cef8f4b9bd332936ee3d377437b",
+      "plain_bytes": 74737,
+      "tile_bytes": 94388,
+      "carrier_bytes": 75274,
+      "sidecar_bytes": 19114,
+      "carrier_sha256": "de9d5aa84ffb7b910ac5a20f1b9e824a47f5b13d4398962abd8b282da945520f",
+      "sidecar_sha256": "eff249813cce3286083c43795aa5174c618c45bbed6e0a23c61ea3e39cc483a9"
+    },
+    {
+      "crf": 26.5,
+      "stream": "/private/tmp/ps-starved-rally-tiles-20261122/q26.5/stream.ivf",
+      "base_sha256": "d161ba28b09ac69728aac42dbe26d9425c91e3f801b4053a06ee23779cc7b984",
+      "plain_bytes": 74680,
+      "tile_bytes": 94331,
+      "carrier_bytes": 75217,
+      "sidecar_bytes": 19114,
+      "carrier_sha256": "85590372de5bd832100d48376eac18d0664b8122a1099709988cbc71d6124d7c",
+      "sidecar_sha256": "b547d5895d25105c878d40ec1725f960e8f1a75cdfb04c9ceef72f9da8feef93"
+    },
+    {
+      "crf": 26.75,
+      "stream": "/private/tmp/ps-starved-rally-tiles-20261122/q26.75/stream.ivf",
+      "base_sha256": "05e813777e12e919234140fa1ceba24cfd5e8ad6411ab291df4ae980dfcb0ba7",
+      "plain_bytes": 73273,
+      "tile_bytes": 92924,
+      "carrier_bytes": 73810,
+      "sidecar_bytes": 19114,
+      "carrier_sha256": "0d35e88e57a79ae0997f5358e8326a4f45bd98c5964d825ddea36e8d321309d6",
+      "sidecar_sha256": "3d4ad52a870087e66a9a865d95abec2aca06e87991052363088daa2b8c78d708"
+    }
+  ],
+  "tools": {
+    "ffmpeg": {
+      "path": "/opt/homebrew/bin/ffmpeg",
+      "real_path": "/opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg",
+      "sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be",
+      "version": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    "SvtAv1EncApp": {
+      "path": "/opt/homebrew/bin/SvtAv1EncApp",
+      "real_path": "/opt/homebrew/Cellar/svt-av1/4.0.1/bin/SvtAv1EncApp",
+      "sha256": "db044194faf94d553c2509c8e033ecd05a373ba54d919d0fb49a3a13149d1687",
+      "version": "SVT-AV1 v4.0.1 (release)"
+    },
+    "dav1d": {
+      "path": "/opt/homebrew/bin/dav1d",
+      "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+      "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+      "version": "1.5.4"
+    }
+  },
+  "source_yuv_sha256": "2336414ab149bfba57691fe0a2ce40b2fc9793f458b945d5abb223253352a3e0",
+  "script_sha256": "1ba1385a799020bab1c499567632f104b338b66f3cc0312da8164f85007d2248",
+  "repo_revision": "9373b00deb31a653ebe0e3044f3e1b3ceaa73438",
+  "placements": 195,
+  "source_zip_sha256": "5c402652ea7e2b471d870fb211f263ba1f7975afaf4b9b8a55be814d25ae45eb",
+  "labels_sha256": "9918c87fa6a309052bbac8ef0be21429885e6579fd632754ed9aeb343c912d8a",
+  "crops_sha256": "8800ac1598365a82a8a733fefd6a300d949050b899659b7ff9137c0a09d5714c"
+}

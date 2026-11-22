@@ -1,0 +1,146 @@
+{
+  "frames": 240,
+  "labels_sha256": "9918c87fa6a309052bbac8ef0be21429885e6579fd632754ed9aeb343c912d8a",
+  "marks": {
+    "10": [
+      1067,
+      778
+    ],
+    "30": [
+      1065,
+      771
+    ],
+    "50": [
+      1039,
+      608
+    ],
+    "70": [
+      1044,
+      474
+    ],
+    "90": [
+      945,
+      477
+    ],
+    "110": [
+      802,
+      459
+    ],
+    "130": [
+      782,
+      272
+    ],
+    "150": [
+      941,
+      495
+    ],
+    "170": [
+      1089,
+      677
+    ],
+    "190": [
+      1185,
+      658
+    ],
+    "210": [
+      1148,
+      431
+    ],
+    "230": [
+      1149,
+      384
+    ]
+  },
+  "joint_display": {
+    "full": "45bd0cec2f2c2b1b3169ffe313d73a89d9a9632fee839f641c8089c24a1ff392",
+    "smoke": "c8a6e473c42e4a47244be1a6d8a3762b69bdd424e54221e373092b1144e37a63",
+    "file": "677b0cc5d169ce3348da02cb1148a9fb7ee28614ce2b53e70288befa44d866dc"
+  },
+  "ordinary": {
+    "stream": "40ac346602fc01a02433a2ff0c90e32a3448fad25c6fbe436d2dd9b606d8c757",
+    "yuv": "bdb4dac5c91c8013ed49cce6e3244fc5b7a93f48446011822133f43247882bd4",
+    "prior_judge_input": "ac9cd54f1f28e5215ef578f75341950372bb150ead443d20c0740b642ade67fb"
+  },
+  "ordinary_prior": [
+    {
+      "tick": 10,
+      "error": null,
+      "hit5": false,
+      "hit10": false
+    },
+    {
+      "tick": 30,
+      "error": null,
+      "hit5": false,
+      "hit10": false
+    },
+    {
+      "tick": 50,
+      "error": null,
+      "hit5": false,
+      "hit10": false
+    },
+    {
+      "tick": 70,
+      "error": null,
+      "hit5": false,
+      "hit10": false
+    },
+    {
+      "tick": 90,
+      "error": null,
+      "hit5": false,
+      "hit10": false
+    },
+    {
+      "tick": 110,
+      "error": null,
+      "hit5": false,
+      "hit10": false
+    },
+    {
+      "tick": 130,
+      "error": null,
+      "hit5": false,
+      "hit10": false
+    },
+    {
+      "tick": 150,
+      "error": null,
+      "hit5": false,
+      "hit10": false
+    },
+    {
+      "tick": 170,
+      "error": null,
+      "hit5": false,
+      "hit10": false
+    },
+    {
+      "tick": 190,
+      "error": null,
+      "hit5": false,
+      "hit10": false
+    },
+    {
+      "tick": 210,
+      "error": null,
+      "hit5": false,
+      "hit10": false
+    },
+    {
+      "tick": 230,
+      "error": null,
+      "hit5": false,
+      "hit10": false
+    }
+  ],
+  "joint_wire_sha256": "26b35756f5b038dbf509115d38eda8606913726109aaba3dcf20b6e79372e6d0",
+  "native_neural_sha256": "1d5c6f5e19e360b038e73ad8018075854ecea98c0a9ed05d3801f492bf02a30b",
+  "costs_bytes": {
+    "ordinary": 12974,
+    "joint": 12927,
+    "joint_cold": 257266,
+    "neural": 12270
+  }
+}

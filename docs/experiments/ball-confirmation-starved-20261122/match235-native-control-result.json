@@ -1,0 +1,262 @@
+{
+  "source": "match235_000",
+  "frames": 154,
+  "fps": 60,
+  "phase": "full",
+  "track": "accepted fitted svt62",
+  "source_archive": "506485f5c85ef7ec4ecacecf920a0c0039174db5d1717bab41b0aff2a4de5311",
+  "manifest_sha256": "df0dabf48b61ed3a096a9a6b4e54d823ca3b279c86d6a09e69ef0cd9bf2ceeb1",
+  "visible_labels": 11,
+  "positions": 123,
+  "self_dists": -1.1920928955078125e-07,
+  "encoder": {
+    "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+    "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+    "sha256": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+    "version": "SVT-AV1 v4.2.0 (release)"
+  },
+  "decoder": {
+    "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+    "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+    "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+    "version": "1.5.4"
+  },
+  "metric": {
+    "metric": "DISTS",
+    "net": "vgg16",
+    "torchmetrics": "1.9.0",
+    "weights": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/torchmetrics/functional/image/dists_models/weights.pt",
+    "weights_sha256": "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218",
+    "backbone": "/local/users/emanuele/pointstream/cache/397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0/vgg16-397923af.pth",
+    "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+    "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)"
+  },
+  "results": [
+    {
+      "mode": "plain",
+      "crf": 68,
+      "bytes": 41511,
+      "kbps": 129.38493506493506,
+      "sha256": "ca97bcbdbbe88de8274aef2aca9aaeffeebed2c0ab5bb87ec1d648ddf63cce27",
+      "decoded_sha256": "cc54afa965a1b7914b5ce6a1590b13a2b7e9d9e484ae6f32cfabe503883d2959",
+      "crop": [
+        {
+          "tick": 9,
+          "dists": 0.26394861936569214
+        },
+        {
+          "tick": 20,
+          "dists": 0.148162841796875
+        },
+        {
+          "tick": 42,
+          "dists": 0.14501738548278809
+        },
+        {
+          "tick": 53,
+          "dists": 0.1504347324371338
+        },
+        {
+          "tick": 65,
+          "dists": 0.25117021799087524
+        },
+        {
+          "tick": 76,
+          "dists": 0.2388075590133667
+        },
+        {
+          "tick": 87,
+          "dists": 0.22663360834121704
+        },
+        {
+          "tick": 110,
+          "dists": 0.25932788848876953
+        },
+        {
+          "tick": 121,
+          "dists": 0.2738323211669922
+        },
+        {
+          "tick": 132,
+          "dists": 0.24307942390441895
+        },
+        {
+          "tick": 143,
+          "dists": 0.26088958978652954
+        }
+      ],
+      "mean_dists": 0.22375492616133255,
+      "file": "plain-68.ivf"
+    },
+    {
+      "mode": "roi",
+      "crf": 68,
+      "bytes": 42188,
+      "kbps": 131.49506493506493,
+      "sha256": "212b043d17d96ad88fb4d4b638d1a20886326479282003ce4d07b50d04601746",
+      "decoded_sha256": "ccda518dd804aae42a4b52fa7e8bfb7d277977fe882941c98ccd73e07e844970",
+      "crop": [
+        {
+          "tick": 9,
+          "dists": 0.25469106435775757
+        },
+        {
+          "tick": 20,
+          "dists": 0.17580640316009521
+        },
+        {
+          "tick": 42,
+          "dists": 0.14433234930038452
+        },
+        {
+          "tick": 53,
+          "dists": 0.15245020389556885
+        },
+        {
+          "tick": 65,
+          "dists": 0.2609519958496094
+        },
+        {
+          "tick": 76,
+          "dists": 0.23107010126113892
+        },
+        {
+          "tick": 87,
+          "dists": 0.21571964025497437
+        },
+        {
+          "tick": 110,
+          "dists": 0.2671889662742615
+        },
+        {
+          "tick": 121,
+          "dists": 0.2760906219482422
+        },
+        {
+          "tick": 132,
+          "dists": 0.251556932926178
+        },
+        {
+          "tick": 143,
+          "dists": 0.23534667491912842
+        }
+      ],
+      "mean_dists": 0.2241095412861217,
+      "file": "roi-68.ivf"
+    },
+    {
+      "mode": "plain",
+      "crf": 70,
+      "bytes": 33833,
+      "kbps": 105.45350649350648,
+      "sha256": "9992929d33de823541f32a6f28fc6c28dd7ed9a18ab3be4f7771904a0a5b1b44",
+      "decoded_sha256": "52149d614ff76744e9dd3df4791292f9d179b54f5fad65c430bede3177c2f060",
+      "crop": [
+        {
+          "tick": 9,
+          "dists": 0.2725335359573364
+        },
+        {
+          "tick": 20,
+          "dists": 0.1977671980857849
+        },
+        {
+          "tick": 42,
+          "dists": 0.16165101528167725
+        },
+        {
+          "tick": 53,
+          "dists": 0.17084002494812012
+        },
+        {
+          "tick": 65,
+          "dists": 0.25391244888305664
+        },
+        {
+          "tick": 76,
+          "dists": 0.2357165813446045
+        },
+        {
+          "tick": 87,
+          "dists": 0.2475661039352417
+        },
+        {
+          "tick": 110,
+          "dists": 0.2744520902633667
+        },
+        {
+          "tick": 121,
+          "dists": 0.29756230115890503
+        },
+        {
+          "tick": 132,
+          "dists": 0.231403648853302
+        },
+        {
+          "tick": 143,
+          "dists": 0.26914191246032715
+        }
+      ],
+      "mean_dists": 0.23750426010652023,
+      "file": "plain-70.ivf"
+    },
+    {
+      "mode": "roi",
+      "crf": 70,
+      "bytes": 34888,
+      "kbps": 108.74181818181818,
+      "sha256": "2fc5ef1ef76be2ddd43cf45d7a20f59f9a5fbef78c33d02538e41ea9db6d97f0",
+      "decoded_sha256": "ce095a71045fb46078b950908268a003a49846d646d7650eafd445fe6cf3b48b",
+      "crop": [
+        {
+          "tick": 9,
+          "dists": 0.26843583583831787
+        },
+        {
+          "tick": 20,
+          "dists": 0.20223039388656616
+        },
+        {
+          "tick": 42,
+          "dists": 0.1630144715309143
+        },
+        {
+          "tick": 53,
+          "dists": 0.18269944190979004
+        },
+        {
+          "tick": 65,
+          "dists": 0.2754455804824829
+        },
+        {
+          "tick": 76,
+          "dists": 0.22283941507339478
+        },
+        {
+          "tick": 87,
+          "dists": 0.24278968572616577
+        },
+        {
+          "tick": 110,
+          "dists": 0.28014075756073
+        },
+        {
+          "tick": 121,
+          "dists": 0.29710936546325684
+        },
+        {
+          "tick": 132,
+          "dists": 0.25443577766418457
+        },
+        {
+          "tick": 143,
+          "dists": 0.26542967557907104
+        }
+      ],
+      "mean_dists": 0.24132458188317038,
+      "file": "roi-70.ivf"
+    }
+  ],
+  "setup_seconds": 18.394823284994345,
+  "wall_seconds": 119.3008406089939
+}

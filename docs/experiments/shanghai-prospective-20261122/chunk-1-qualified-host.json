@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.al028_ball_chunked"
+  ],
+  "arguments": [
+    "--source",
+    "{staged:source}",
+    "--archive",
+    "{staged:archive}",
+    "--weights",
+    "{staged:weights}",
+    "--frames",
+    "{frames}",
+    "--start",
+    "120",
+    "--scene",
+    "shanghai"
+  ],
+  "staged_inputs": [
+    {
+      "name": "source",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/match284-source-20261122/match284_000.mp4",
+      "sha256": "0afb0fb191881def1235285b58fe54814556c83fed7815cd99a00b92d26bc86c",
+      "extract": false
+    },
+    {
+      "name": "archive",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/RacketVision-c44af2a.tar",
+      "sha256": "5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff",
+      "extract": false
+    },
+    {
+      "name": "weights",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/balltrack_best.state_dict.pt",
+      "sha256": "b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/match284-source-20261122/match284_000.mp4",
+      "sha256": "0afb0fb191881def1235285b58fe54814556c83fed7815cd99a00b92d26bc86c"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/RacketVision-c44af2a.tar",
+      "sha256": "5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/balltrack_best.state_dict.pt",
+      "sha256": "b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "required_commands": [],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.al028_ball_chunked",
+    "--validate",
+    "--scene",
+    "shanghai"
+  ],
+  "deadline": "2026-11-22T09:24:00Z",
+  "verify_staged_inputs": true,
+  "stall_seconds": 1500,
+  "contention": {
+    "policy": "stop",
+    "resume_attempts": 0
+  },
+  "device": "cpu",
+  "hosts": [
+    "gpu2"
+  ],
+  "gpu_models": [],
+  "gpu_memory_mib": 0,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "local_storage_gib": 30,
+  "smoke": {
+    "seconds": 500,
+    "representative_basis": "Same 24 source ticks: exact original tracker versus split 0:12/12:24; full 240-frame median and three-frame context at the 120 boundary; finite CPU model and real timing forecast."
+  },
+  "full": {
+    "seconds": 1300
+  },
+  "validator_seconds": 60,
+  "budget_seconds": 1900,
+  "scale": {
+    "frames": {
+      "smoke": 24,
+      "full": 120
+    }
+  }
+}

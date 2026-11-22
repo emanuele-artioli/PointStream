@@ -1,0 +1,7251 @@
+{
+  "scope": "Twelve source ticks, 24 unreviewed source-model body masks. All authentic ordinary AV1 anchors on the Al028 size and price grid. Whole RGB PSNR uses the same twelve frames.",
+  "selection_controls": [
+    {
+      "width": 160,
+      "input_sha256": "11c3d19a71a79fec6c336cd1403394258045bbfcc65d6b5e96d37321d4072889",
+      "selection": {
+        "13360": {
+          "nearest": {
+            "crf": 51.25,
+            "width": 160,
+            "height": 96,
+            "bytes": 13394,
+            "kbps": 11.161666666666667,
+            "sha256": "0598fff91b4e0b3ff0726b610533caa1baf64d2b49243710771e933e6bbb88b1",
+            "raw_sha256": "8f1c170b7e8d86e5cb3662f154337224aa6feba5c5bef3358ca7348fc790062f",
+            "path": "/private/tmp/ps-nov22-al028-ordinary-three-budgets-160/q51.25"
+          },
+          "affordable": {
+            "crf": 51.5,
+            "width": 160,
+            "height": 96,
+            "bytes": 13197,
+            "kbps": 10.9975,
+            "sha256": "c0af798886daa7e20f9d2e599fc0645c91cfaf957a84a0e5c1571e85dda3c478",
+            "raw_sha256": "9cf139c005b0dd7bbcdc6b4f6283190f8dcaf54f641ba39c02d0e51beb2134a9",
+            "path": "/private/tmp/ps-nov22-al028-ordinary-three-budgets-160/q51.5"
+          }
+        },
+        "24494": {
+          "nearest": {
+            "crf": 31.0,
+            "width": 160,
+            "height": 96,
+            "bytes": 24463,
+            "kbps": 20.385833333333334,
+            "sha256": "ee21630220971f11b42e4885a5e1ba20f8528f2ec0ba81df15c2c5d082ff2121",
+            "raw_sha256": "b0592715ee185cd1b8ac292cede91b407212e35aaf2ec811d1e40a3e4114d87c",
+            "path": "/private/tmp/ps-nov22-al028-ordinary-three-budgets-160/q31"
+          },
+          "affordable": {
+            "crf": 31.0,
+            "width": 160,
+            "height": 96,
+            "bytes": 24463,
+            "kbps": 20.385833333333334,
+            "sha256": "ee21630220971f11b42e4885a5e1ba20f8528f2ec0ba81df15c2c5d082ff2121",
+            "raw_sha256": "b0592715ee185cd1b8ac292cede91b407212e35aaf2ec811d1e40a3e4114d87c",
+            "path": "/private/tmp/ps-nov22-al028-ordinary-three-budgets-160/q31"
+          }
+        },
+        "47725": {
+          "nearest": {
+            "crf": 20,
+            "width": 160,
+            "height": 96,
+            "bytes": 39082,
+            "kbps": 32.568333333333335,
+            "sha256": "99948bb7a6e78a004f6616e0fe676fe1bf05f56b06335c62c8875207fb021d99",
+            "raw_sha256": "7d9888b71f697761fabfb2fd8c51cb93a197ab79827a9cdecdd7bc79d378950a",
+            "path": "/private/tmp/ps-nov22-al028-ordinary-three-budgets-160/q20"
+          },
+          "affordable": {
+            "crf": 20,
+            "width": 160,
+            "height": 96,
+            "bytes": 39082,
+            "kbps": 32.568333333333335,
+            "sha256": "99948bb7a6e78a004f6616e0fe676fe1bf05f56b06335c62c8875207fb021d99",
+            "raw_sha256": "7d9888b71f697761fabfb2fd8c51cb93a197ab79827a9cdecdd7bc79d378950a",
+            "path": "/private/tmp/ps-nov22-al028-ordinary-three-budgets-160/q20"
+          }
+        }
+      },
+      "receipted_by": "15df39535c67caafc574a2cb6dc0e47d04412a066fe4157695beb472995241f6",
+      "cpu_seconds": 23.772297
+    },
+    {
+      "width": 320,
+      "input_sha256": "74b15efb18b9c286d4117dfddef066d0f0a66d071a761c69ecc64871b4dff948",
+      "selection": {
+        "13360": {
+          "nearest": {
+            "crf": 63.0,
+            "width": 320,
+            "height": 192,
+            "bytes": 13128,
+            "kbps": 10.94,
+            "sha256": "37fc9dfe5138e46efbef25ec745c4dc1af0e091bc1190ac463b046bd115115ef",
+            "raw_sha256": "48655cb85978f4de900f53c09c24f0826e81673fa7ac03383e0b34e0843d0f93",
+            "path": "/private/tmp/ps-nov22-al028-ordinary-three-budgets-320/q63"
+          },
+          "affordable": {
+            "crf": 63.0,
+            "width": 320,
+            "height": 192,
+            "bytes": 13128,
+            "kbps": 10.94,
+            "sha256": "37fc9dfe5138e46efbef25ec745c4dc1af0e091bc1190ac463b046bd115115ef",
+            "raw_sha256": "48655cb85978f4de900f53c09c24f0826e81673fa7ac03383e0b34e0843d0f93",
+            "path": "/private/tmp/ps-nov22-al028-ordinary-three-budgets-320/q63"
+          }
+        },
+        "24494": {
+          "nearest": {
+            "crf": 52.75,
+            "width": 320,
+            "height": 192,
+            "bytes": 24433,
+            "kbps": 20.360833333333332,
+            "sha256": "32e9379693742bf3ddd2324c14e31dfafdf8f7c7fd52230ca8b317d197cf76bf",
+            "raw_sha256": "c60215a513435b726bf9c3dd398b651b1c9add176245a354eb1076ee21445bf1",
+            "path": "/private/tmp/ps-nov22-al028-exact-budget/ordinary-52.75"
+          },
+          "affordable": {
+            "crf": 52.75,
+            "width": 320,
+            "height": 192,
+            "bytes": 24433,
+            "kbps": 20.360833333333332,
+            "sha256": "32e9379693742bf3ddd2324c14e31dfafdf8f7c7fd52230ca8b317d197cf76bf",
+            "raw_sha256": "c60215a513435b726bf9c3dd398b651b1c9add176245a354eb1076ee21445bf1",
+            "path": "/private/tmp/ps-nov22-al028-exact-budget/ordinary-52.75"
+          }
+        },
+        "47725": {
+          "nearest": {
+            "crf": 37.75,
+            "width": 320,
+            "height": 192,
+            "bytes": 48297,
+            "kbps": 40.2475,
+            "sha256": "bac24432bcec62bd5a491839c18c4b162dba369f84827ed055e2cbe01716abd4",
+            "raw_sha256": "6223ebe351ea60873971e1ff379ac40ec7ed638770db22ec60eeaeedcdce0766",
+            "path": "/private/tmp/ps-nov22-al028-matched-39771/ordinary-37.75"
+          },
+          "affordable": {
+            "crf": 38.0,
+            "width": 320,
+            "height": 192,
+            "bytes": 46837,
+            "kbps": 39.030833333333334,
+            "sha256": "7caeb5f0cdd4d2f0345caf63936b28e9d1ed627e628c72d9b60df78bbd446084",
+            "raw_sha256": "5ff0e63b88ea70aa0fcfe253dd91aeadc4d2223bbc604b47c88d68aa0ab93932",
+            "path": "/private/tmp/ps-nov22-al028-matched-39771/ordinary-38"
+          }
+        }
+      },
+      "receipted_by": "49678065a8f6f89a83a185d4f115565fb8c7745b957d0d92aa7856a62ebdfeac",
+      "cpu_seconds": 35.151508
+    },
+    {
+      "width": 640,
+      "input_sha256": "d885fdd89709fe6c74733a7a1681118ad06f8dfcd4af1b7559537b49b61fd888",
+      "selection": {
+        "13360": {
+          "nearest": {
+            "crf": 68.75,
+            "width": 640,
+            "height": 384,
+            "bytes": 13302,
+            "kbps": 11.085,
+            "sha256": "8708414c738fe7cf541ef1f4bf1e26cd330ffdb25327a25e3ad5e21133026906",
+            "raw_sha256": "c54663db916b70d3d6c55a77eb6aa5da800e0e0f0ebf1e45cafdfc5aa554f6f1",
+            "path": "/private/tmp/ps-nov22-al028-640-bill-13360/q68.75"
+          },
+          "affordable": {
+            "crf": 68.75,
+            "width": 640,
+            "height": 384,
+            "bytes": 13302,
+            "kbps": 11.085,
+            "sha256": "8708414c738fe7cf541ef1f4bf1e26cd330ffdb25327a25e3ad5e21133026906",
+            "raw_sha256": "c54663db916b70d3d6c55a77eb6aa5da800e0e0f0ebf1e45cafdfc5aa554f6f1",
+            "path": "/private/tmp/ps-nov22-al028-640-bill-13360/q68.75"
+          }
+        }
+      },
+      "receipted_by": "b37ddb89d799da799286eb05e7f42cf9966876697e07d0ba91dba2dda62dc9ab",
+      "cpu_seconds": 79.688143
+    },
+    {
+      "width": 640,
+      "input_sha256": "d885fdd89709fe6c74733a7a1681118ad06f8dfcd4af1b7559537b49b61fd888",
+      "selection": {
+        "24494": {
+          "nearest": {
+            "crf": 62,
+            "width": 640,
+            "height": 384,
+            "bytes": 24718,
+            "kbps": 20.598333333333333,
+            "sha256": "00948ce449ee4774bd7a3317228b390684daa36549c8d9c7b34e1f1f44147b8a",
+            "raw_sha256": "c3545779ac5588b9bf65d2cc6429e36180b06c741fd4d62a556e30efa58b4cc9",
+            "path": "/private/tmp/ps-al028-av1-refine-20261122/640-crf62"
+          },
+          "affordable": {
+            "crf": 62.25,
+            "width": 640,
+            "height": 384,
+            "bytes": 23916,
+            "kbps": 19.93,
+            "sha256": "21d9285d7331b41a4d438366df15ac4e0f842faf48b3db59b2c297a3fd9b9c0e",
+            "raw_sha256": "5506f33f8543a07cdf1bf75305209320f6a6bf8cd5d46b8b08da5fe8d675719e",
+            "path": "/private/tmp/ps-nov22-al028-640-bill-24494/q62.25"
+          }
+        }
+      },
+      "receipted_by": "383addc9ffc32a5afe7f3a7aca7ae9a59269dd382e8519214fad69c5ec0d0542",
+      "cpu_seconds": 93.595565
+    },
+    {
+      "width": 640,
+      "input_sha256": "d885fdd89709fe6c74733a7a1681118ad06f8dfcd4af1b7559537b49b61fd888",
+      "selection": {
+        "47725": {
+          "nearest": {
+            "crf": 55.0,
+            "width": 640,
+            "height": 384,
+            "bytes": 47719,
+            "kbps": 39.76583333333333,
+            "sha256": "c8d5dea39e2e63579c33b691acb6506064916394d5644a2ef6d7acd4cb6b2aab",
+            "raw_sha256": "7062f3d4c11b0bfda9b9fb34e845825538f3fde5b3c53d67b32969aaa6feaa8f",
+            "path": "/private/tmp/ps-nov22-al028-640-bill-47725/q55"
+          },
+          "affordable": {
+            "crf": 55.0,
+            "width": 640,
+            "height": 384,
+            "bytes": 47719,
+            "kbps": 39.76583333333333,
+            "sha256": "c8d5dea39e2e63579c33b691acb6506064916394d5644a2ef6d7acd4cb6b2aab",
+            "raw_sha256": "7062f3d4c11b0bfda9b9fb34e845825538f3fde5b3c53d67b32969aaa6feaa8f",
+            "path": "/private/tmp/ps-nov22-al028-640-bill-47725/q55"
+          }
+        }
+      },
+      "receipted_by": "abc5d9b5ae5fd6e675878b74cf2be70b10ec168a1ca74d51ceaf3e42a674d3ac",
+      "cpu_seconds": 41.915869
+    }
+  ],
+  "native_tools": {
+    "SvtAv1EncApp": {
+      "path": "/opt/homebrew/bin/SvtAv1EncApp",
+      "real_path": "/opt/homebrew/Cellar/svt-av1/4.0.1/bin/SvtAv1EncApp",
+      "sha256": "db044194faf94d553c2509c8e033ecd05a373ba54d919d0fb49a3a13149d1687",
+      "version": "SVT-AV1 v4.0.1 (release)"
+    },
+    "dav1d": {
+      "path": "/opt/homebrew/bin/dav1d",
+      "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+      "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+      "version": "1.5.4"
+    }
+  },
+  "scoring_runs": [
+    {
+      "proposal_sha256": "fb41c943575b35e6ecec36916b8cfab41b8023744614a98681b7cce884681eee",
+      "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "receipts": [
+        "15df39535c67caafc574a2cb6dc0e47d04412a066fe4157695beb472995241f6"
+      ],
+      "forecast_cpu_seconds": 179.449632,
+      "cpu_seconds": 113.775329,
+      "receipt_sha256": "8cc3289e0795564b94c09c5fe4a1628f6e83a557d13cb6a2bc6cb714ba5b635e"
+    },
+    {
+      "proposal_sha256": "fb41c943575b35e6ecec36916b8cfab41b8023744614a98681b7cce884681eee",
+      "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "receipts": [
+        "15df39535c67caafc574a2cb6dc0e47d04412a066fe4157695beb472995241f6"
+      ],
+      "forecast_cpu_seconds": 218.33545199999998,
+      "cpu_seconds": 119.52988799999999,
+      "receipt_sha256": "cfde66a902c23ef65987054593ee68ebd942f415ae0fd07ba4d101eea95ee838"
+    },
+    {
+      "proposal_sha256": "fb41c943575b35e6ecec36916b8cfab41b8023744614a98681b7cce884681eee",
+      "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "receipts": [
+        "49678065a8f6f89a83a185d4f115565fb8c7745b957d0d92aa7856a62ebdfeac"
+      ],
+      "forecast_cpu_seconds": 180.584364,
+      "cpu_seconds": 113.95385399999999,
+      "receipt_sha256": "67c37d3b990d91e7a0179f33e366f9d6d4caeab379f4ef26fc59c29ff70fa9aa"
+    },
+    {
+      "proposal_sha256": "fb41c943575b35e6ecec36916b8cfab41b8023744614a98681b7cce884681eee",
+      "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "receipts": [
+        "49678065a8f6f89a83a185d4f115565fb8c7745b957d0d92aa7856a62ebdfeac"
+      ],
+      "forecast_cpu_seconds": 137.04698100000002,
+      "cpu_seconds": 76.22355400000001,
+      "receipt_sha256": "0b9518d319b67f2a5a71ec36de9442daa3554ffbfcf7cfc9f81e112fdaa89bc3"
+    },
+    {
+      "proposal_sha256": "fb41c943575b35e6ecec36916b8cfab41b8023744614a98681b7cce884681eee",
+      "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "receipts": [
+        "49678065a8f6f89a83a185d4f115565fb8c7745b957d0d92aa7856a62ebdfeac"
+      ],
+      "forecast_cpu_seconds": 218.95453199999997,
+      "cpu_seconds": 120.037361,
+      "receipt_sha256": "c297524369b66b17e24d5385a6231f5a106a5bac08f11f9366870cc5718b3378"
+    },
+    {
+      "proposal_sha256": "fb41c943575b35e6ecec36916b8cfab41b8023744614a98681b7cce884681eee",
+      "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "receipts": [
+        "b37ddb89d799da799286eb05e7f42cf9966876697e07d0ba91dba2dda62dc9ab",
+        "383addc9ffc32a5afe7f3a7aca7ae9a59269dd382e8519214fad69c5ec0d0542",
+        "abc5d9b5ae5fd6e675878b74cf2be70b10ec168a1ca74d51ceaf3e42a674d3ac"
+      ],
+      "forecast_cpu_seconds": 184.87993050000003,
+      "cpu_seconds": 103.77374,
+      "receipt_sha256": "e9cb054b1c5150d4d380eb7bfc58e4c93cb8f4ded96527d5b6b61bb281336b8f"
+    },
+    {
+      "proposal_sha256": "fb41c943575b35e6ecec36916b8cfab41b8023744614a98681b7cce884681eee",
+      "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "receipts": [
+        "b37ddb89d799da799286eb05e7f42cf9966876697e07d0ba91dba2dda62dc9ab",
+        "383addc9ffc32a5afe7f3a7aca7ae9a59269dd382e8519214fad69c5ec0d0542",
+        "abc5d9b5ae5fd6e675878b74cf2be70b10ec168a1ca74d51ceaf3e42a674d3ac"
+      ],
+      "forecast_cpu_seconds": 162.59532000000004,
+      "cpu_seconds": 87.521142,
+      "receipt_sha256": "c30f4ad210148d6c60f377cc2cfa3b7c4c8743a03f848cae72ca87f8c439538a"
+    }
+  ],
+  "points": [
+    {
+      "stream_sha256": "29dfaf626f24fd411b0c55823d555887cf05f3a5b763a3b43f794caaa303731e",
+      "raw_sha256": "e8d98fad9cc0846c54aeec4ee491c55bf0716c9e8824c53d8dff15eb448232fa",
+      "width": 320,
+      "height": 192,
+      "bytes": 9975,
+      "crf": 70,
+      "kbps": 8.3125,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.7089843153953552
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.6281470060348511
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.7200208306312561
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.6718207597732544
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.7474725246429443
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.682568371295929
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.6761817932128906
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.6853570938110352
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.6610394716262817
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.634855329990387
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.6688638925552368
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.6631615161895752
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.6897408366203308
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.6369900703430176
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.6893970966339111
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.6461954116821289
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.6875165104866028
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6429943442344666
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.7396528124809265
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.720079779624939
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.739399790763855
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.6707978248596191
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.6955512166023254
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.6737972497940063
+        }
+      ],
+      "player_dists": 0.6825244103868803,
+      "whole_rgb_psnr": 22.45248957177271
+    },
+    {
+      "stream_sha256": "2cc47c641acae952b84d8012277e654b9b03b59a177cef423f053c8d96f9b309",
+      "raw_sha256": "a102faedc9c0e073208c110d87821bb792ba92c0e100019843f6c0887a9f7af6",
+      "width": 160,
+      "height": 96,
+      "bytes": 10866,
+      "crf": 60,
+      "kbps": 9.055,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.6717517375946045
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.5884405374526978
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.6387144327163696
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.6560672521591187
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.7263715267181396
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5844703912734985
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.7001265287399292
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.6339234113693237
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.6253873109817505
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.6484743356704712
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.595400333404541
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.6358162760734558
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.6840212345123291
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5893129706382751
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.6472059488296509
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.6767519116401672
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.7070168256759644
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6470586061477661
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.6491929888725281
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.6823335886001587
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.7260313034057617
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.6739801168441772
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.6876354813575745
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.6690487861633301
+        }
+      ],
+      "player_dists": 0.6560222432017326,
+      "whole_rgb_psnr": 21.907572792104254
+    },
+    {
+      "stream_sha256": "52757bb0060d488f6464142fadb74fda28714979561d881d3a5bc2f42c06e784",
+      "raw_sha256": "5fbe567aa31090e84e81e977061e414859d506e3fd8669b3348049de85c2c9cf",
+      "width": 320,
+      "height": 192,
+      "bytes": 11591,
+      "crf": 65.0,
+      "kbps": 9.659166666666666,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.6076368093490601
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.6036330461502075
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.5879910588264465
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.6575764417648315
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.7513783574104309
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5675264000892639
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.6202826499938965
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.6200451850891113
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.5728152990341187
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.6474392414093018
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.5446622371673584
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.6673781871795654
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.5768373012542725
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.6341429948806763
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.5918625593185425
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.6635124683380127
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.7011438608169556
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6528598070144653
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.6012212038040161
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.7189578413963318
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.6753835082054138
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.6811089515686035
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.5889057517051697
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.6692838668823242
+        }
+      ],
+      "player_dists": 0.6334827095270157,
+      "whole_rgb_psnr": 23.42476939698361
+    },
+    {
+      "stream_sha256": "c2370deaddac62ebdb8fd1d8766013eab57996b675ee5a20f6c22e2bd56465f7",
+      "raw_sha256": "a91e067d346546ef0288739e66c493bc1f5cadb825a5b0e121d7948c1a9bef4f",
+      "width": 160,
+      "height": 96,
+      "bytes": 12331,
+      "crf": 55.0,
+      "kbps": 10.275833333333333,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.6311049461364746
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.5752171874046326
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.6074594855308533
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.6562658548355103
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.7089544534683228
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5838832855224609
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.6049911975860596
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.6518068909645081
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.566306471824646
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.644940972328186
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.6072531342506409
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.6083678007125854
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.6392121911048889
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5753774046897888
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.5964299440383911
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.6619099378585815
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.556297242641449
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6437970995903015
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.5768823027610779
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.6648807525634766
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.6019338369369507
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.6675975322723389
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.6432029008865356
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.6595614552497864
+        }
+      ],
+      "player_dists": 0.6222347617149353,
+      "whole_rgb_psnr": 22.02227743212902
+    },
+    {
+      "stream_sha256": "d4b704f41eb23ac3891a3419eb97ae6b69b87f74b95bc1b02a458b546250a40b",
+      "raw_sha256": "e0ca0d7cdc12b2a6da7d5d68e728350fb5a279e1f80898d3bdcc882dc28de635",
+      "width": 320,
+      "height": 192,
+      "bytes": 12463,
+      "crf": 63.75,
+      "kbps": 10.385833333333334,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.5745077729225159
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.5578012466430664
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.5841447114944458
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.6386940479278564
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.7281708717346191
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5921754240989685
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.6053669452667236
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.6085003614425659
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.5581455230712891
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.6429780721664429
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.5437510013580322
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.6843916773796082
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.5622289180755615
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.6567097902297974
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.5596468448638916
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.6615535616874695
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.5668236017227173
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6467388272285461
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.5690500736236572
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.7038479447364807
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.6580389142036438
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.6756455898284912
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.6115900278091431
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.6656114459037781
+        }
+      ],
+      "player_dists": 0.6190047164758047,
+      "whole_rgb_psnr": 23.59522104139943
+    },
+    {
+      "stream_sha256": "0aa9b217e9de353180d4133a02417f6a5e5f7429baf6fe8528370b36a92187ef",
+      "raw_sha256": "dc76dc5c284842df7ad912bc07647f899f167ba74ee88b5b162426b2001a050c",
+      "width": 640,
+      "height": 384,
+      "bytes": 12696,
+      "crf": 70,
+      "kbps": 10.58,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.574622392654419
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.5320756435394287
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.5973291397094727
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.6436993479728699
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.6936702728271484
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.6771726608276367
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.560722291469574
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.6683589816093445
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.5804411172866821
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.6399049758911133
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.5629830956459045
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.6736798286437988
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.5643317699432373
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.6430847644805908
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.5171065330505371
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.6474547386169434
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.5748655796051025
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6409331560134888
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.580988883972168
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.6491074562072754
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.5970048904418945
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.6388611793518066
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.562798798084259
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.6280884742736816
+        }
+      ],
+      "player_dists": 0.6103869155049324,
+      "whole_rgb_psnr": 25.090982051273073
+    },
+    {
+      "stream_sha256": "847a7da290f4b26125d219db460bb44ccdcdfaf1e9cc7d27963f078cac9960b4",
+      "raw_sha256": "8899a4a5a8b3e48c4ce036614877ae43bd526f303c486cd5b6bd31a2703ea02e",
+      "width": 160,
+      "height": 96,
+      "bytes": 12982,
+      "crf": 52.5,
+      "kbps": 10.818333333333333,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.5859023332595825
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.5835467576980591
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.595210611820221
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.6405516862869263
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.7005029916763306
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5880495309829712
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.5802384614944458
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.6536092758178711
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.5773972272872925
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.6402198076248169
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.5938307046890259
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.6241563558578491
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.6595742106437683
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5710157752037048
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.5873974561691284
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.6688427925109863
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.5526728630065918
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.642465353012085
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.5496886968612671
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.6589942574501038
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.5978865623474121
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.6693273782730103
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.5626211166381836
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.6619876623153687
+        }
+      ],
+      "player_dists": 0.6144037445386251,
+      "whole_rgb_psnr": 22.05036833012484
+    },
+    {
+      "stream_sha256": "cde79d754f4ea03c355d96b58f486505c7c5d13c5f5e74fb8d0d8eb258779ec6",
+      "raw_sha256": "314f4f5965f08ef2cf2ed9d51ec2ca151ae654d50131470d31fe50ebe9a7e09d",
+      "width": 160,
+      "height": 96,
+      "bytes": 13121,
+      "crf": 51.75,
+      "kbps": 10.934166666666666,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.6039521098136902
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.5712368488311768
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.588828444480896
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.6172284483909607
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.6530624032020569
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5745362043380737
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.5762356519699097
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.6558388471603394
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.5674015283584595
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.65336012840271
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.5948787927627563
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.6249496936798096
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.6513948440551758
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5868351459503174
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.5887642502784729
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.6687555909156799
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.546190083026886
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6440438032150269
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.5618380308151245
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.667539119720459
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.5852164030075073
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.6733261942863464
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.5879889726638794
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.66617751121521
+        }
+      ],
+      "player_dists": 0.6128991271058718,
+      "whole_rgb_psnr": 22.05030172441548
+    },
+    {
+      "stream_sha256": "37fc9dfe5138e46efbef25ec745c4dc1af0e091bc1190ac463b046bd115115ef",
+      "raw_sha256": "48655cb85978f4de900f53c09c24f0826e81673fa7ac03383e0b34e0843d0f93",
+      "width": 320,
+      "height": 192,
+      "bytes": 13128,
+      "crf": 63.0,
+      "kbps": 10.94,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.5607115030288696
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.5511679649353027
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.5282752513885498
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.6328606605529785
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.6879295110702515
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5973138809204102
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.5962244272232056
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.6057988405227661
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.534589946269989
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.6360830068588257
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.5363339185714722
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.6691975593566895
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.5767614841461182
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.6273378133773804
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.5471816062927246
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.6615735292434692
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.5569652318954468
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6440089344978333
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.539913535118103
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.6609029769897461
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.6073411703109741
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.6690264940261841
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.5683358311653137
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.6619305610656738
+        }
+      ],
+      "player_dists": 0.6024069016178449,
+      "whole_rgb_psnr": 23.709479037058028
+    },
+    {
+      "stream_sha256": "c0af798886daa7e20f9d2e599fc0645c91cfaf957a84a0e5c1571e85dda3c478",
+      "raw_sha256": "9cf139c005b0dd7bbcdc6b4f6283190f8dcaf54f641ba39c02d0e51beb2134a9",
+      "width": 160,
+      "height": 96,
+      "bytes": 13197,
+      "crf": 51.5,
+      "kbps": 10.9975,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.5823028087615967
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.5634568929672241
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.578674852848053
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.6283104419708252
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.66275954246521
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5797476768493652
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.5987420082092285
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.6604468822479248
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.5641860961914062
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.6490740776062012
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.5954957008361816
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.6174405813217163
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.6506764888763428
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5754518508911133
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.5866128206253052
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.670783519744873
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.564482569694519
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6421486139297485
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.5478418469429016
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.6657094955444336
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.5886109471321106
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.6744861602783203
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.5437814593315125
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.6688702702522278
+        }
+      ],
+      "player_dists": 0.6108372335632642,
+      "whole_rgb_psnr": 22.058201765485627
+    },
+    {
+      "stream_sha256": "8708414c738fe7cf541ef1f4bf1e26cd330ffdb25327a25e3ad5e21133026906",
+      "raw_sha256": "c54663db916b70d3d6c55a77eb6aa5da800e0e0f0ebf1e45cafdfc5aa554f6f1",
+      "width": 640,
+      "height": 384,
+      "bytes": 13302,
+      "crf": 68.75,
+      "kbps": 11.085,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.5418976545333862
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.4943382740020752
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.5372005701065063
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.6392159461975098
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.6764309406280518
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.6753591895103455
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.5558590888977051
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.6689319610595703
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.5504719018936157
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.6545831561088562
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.5402284860610962
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.6216503381729126
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.5615817904472351
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5864379405975342
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.5100716948509216
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.6648080348968506
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.5668386220932007
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6521686315536499
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.5579870939254761
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.6965084075927734
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.593372642993927
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.6699111461639404
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.5384436249732971
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.650148868560791
+        }
+      ],
+      "player_dists": 0.6001852502425512,
+      "whole_rgb_psnr": 25.49317195313155
+    },
+    {
+      "stream_sha256": "0598fff91b4e0b3ff0726b610533caa1baf64d2b49243710771e933e6bbb88b1",
+      "raw_sha256": "8f1c170b7e8d86e5cb3662f154337224aa6feba5c5bef3358ca7348fc790062f",
+      "width": 160,
+      "height": 96,
+      "bytes": 13394,
+      "crf": 51.25,
+      "kbps": 11.161666666666667,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.5965081453323364
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.5677554607391357
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.5924147367477417
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.6269686222076416
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.6469616293907166
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5701042413711548
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.6037335395812988
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.6557180285453796
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.5547081232070923
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.6478979587554932
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.606581449508667
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.6368148922920227
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.6514976620674133
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.572149395942688
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.5785708427429199
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.6589077711105347
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.5581868886947632
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6427087187767029
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.5310861468315125
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.6423433423042297
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.5777895450592041
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.5809121131896973
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.5668243169784546
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.6670768857002258
+        }
+      ],
+      "player_dists": 0.6055925190448761,
+      "whole_rgb_psnr": 22.061497529883283
+    },
+    {
+      "stream_sha256": "732a78c4a7dfb34d9edd61ae54c16e5cf22882557b5dee15b9c0a5864f05f75e",
+      "raw_sha256": "b066fcee1fb57b72fa9682bc0455560edcfc0d5e324a3121e22164cd16f7a296",
+      "width": 160,
+      "height": 96,
+      "bytes": 13641,
+      "crf": 50,
+      "kbps": 11.3675,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.5901773571968079
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.5798366665840149
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.5846558213233948
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.6004171967506409
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.6626230478286743
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5885781049728394
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.5891363024711609
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.651448667049408
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.5634475946426392
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.640382707118988
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.6038267016410828
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5893200635910034
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.6393237709999084
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5705550909042358
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.5655653476715088
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.668213963508606
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.5687726140022278
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6469293832778931
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.5593469142913818
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.6206798553466797
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.5666015148162842
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.5823191404342651
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.5592402219772339
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.6677655577659607
+        }
+      ],
+      "player_dists": 0.6024651502569517,
+      "whole_rgb_psnr": 22.068151678695966
+    },
+    {
+      "stream_sha256": "e3ef72962ca2fd768b528dfa2fbbe10e95222cf8d8f4e9d88773dcf0671c4baa",
+      "raw_sha256": "907abb139d330303957fc79b17451bacdf60be157a855517a86ccb0d2d30e5b1",
+      "width": 320,
+      "height": 192,
+      "bytes": 13848,
+      "crf": 62.75,
+      "kbps": 11.54,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.5470062494277954
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.5365998148918152
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.5298148393630981
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.6350304484367371
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.682915449142456
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5828240513801575
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.543480634689331
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.5867980122566223
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.5147289037704468
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.6347900629043579
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.5414181351661682
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.6534531116485596
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.5740441679954529
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.6238269805908203
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.5327398777008057
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.6633169651031494
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.5808737277984619
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6304142475128174
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.5609889626502991
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.6515210866928101
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.5296001434326172
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.675247073173523
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.5661607980728149
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.6684482097625732
+        }
+      ],
+      "player_dists": 0.5935850813984871,
+      "whole_rgb_psnr": 23.811849535509715
+    },
+    {
+      "stream_sha256": "8a7a59ffeb6478aa774d44f1530a2c12a055d0f89a1c49839c842f80f282b4b5",
+      "raw_sha256": "b39b2a153c2faa983060e117f4f7082965b95d7d904ddafd03738f53110d9f90",
+      "width": 320,
+      "height": 192,
+      "bytes": 14099,
+      "crf": 62.5,
+      "kbps": 11.749166666666667,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.5271273255348206
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.5346709489822388
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.5414788722991943
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.614194393157959
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.6951389312744141
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5673679709434509
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.5539567470550537
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.5848121643066406
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.5448315143585205
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.6427124738693237
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.5417850613594055
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.6199553608894348
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.5805526971817017
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5780316591262817
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.5537981390953064
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.6525900363922119
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.5828670859336853
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6397866010665894
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.48161405324935913
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.6561571359634399
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.5096169710159302
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.6648798584938049
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.5298903584480286
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.6689685583114624
+        }
+      ],
+      "player_dists": 0.5861160382628441,
+      "whole_rgb_psnr": 23.826755133912997
+    },
+    {
+      "stream_sha256": "2341a65d9815845df2c64c70f5328c67a6eb030f39a3e7bc5421fc1d0aef1f3e",
+      "raw_sha256": "64ff51f36a62791ba9f690e924ef3bddc4a3dc8fe8baa6ff4ee629d15890cfba",
+      "width": 640,
+      "height": 384,
+      "bytes": 14203,
+      "crf": 67.5,
+      "kbps": 11.835833333333333,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.49660223722457886
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.4945531487464905
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.5423436164855957
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.5800909996032715
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.5866411924362183
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5756675601005554
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.5567991733551025
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.6128321886062622
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.5355550050735474
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.63489830493927
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.5209938883781433
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5989524722099304
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.5647438764572144
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5285109281539917
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.525371789932251
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.6558234691619873
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.5485544204711914
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6507906913757324
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.49655187129974365
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.657770037651062
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.5681318640708923
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.6403661370277405
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.5436823964118958
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.6487107872962952
+        }
+      ],
+      "player_dists": 0.5735390856862068,
+      "whole_rgb_psnr": 25.832208856607693
+    },
+    {
+      "stream_sha256": "932b8c0b10ab25c51bd81892f4dcb88cb5baffe1d450b92865aac072f51146d0",
+      "raw_sha256": "ad55d28b5ac7b8e318fec08ae8aa4f123f70662d3558bca52147c9403b40061c",
+      "width": 640,
+      "height": 384,
+      "bytes": 16455,
+      "crf": 65,
+      "kbps": 13.7125,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.4571385979652405
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.47738754749298096
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.5031702518463135
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.5819907784461975
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.5784667134284973
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5320833921432495
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.5355526208877563
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.617737889289856
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.5112236142158508
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.6414563059806824
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.5099071264266968
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5956372022628784
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.5597186088562012
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5224291086196899
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.5072081685066223
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.667015552520752
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.5452499389648438
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6481307744979858
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.46353089809417725
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.6497822403907776
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.47368311882019043
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.5556473135948181
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.5060150623321533
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.6488423347473145
+        }
+      ],
+      "player_dists": 0.5537085483471552,
+      "whole_rgb_psnr": 26.370725403093157
+    },
+    {
+      "stream_sha256": "657bf4426f7683a893274afea9080bb675be60cf55406fd85848d7e24d3d67fd",
+      "raw_sha256": "a9051e1df508524659099223da719988ebb1a33a785b2afa30d1c5177cdb4f8c",
+      "width": 320,
+      "height": 192,
+      "bytes": 17101,
+      "crf": 60,
+      "kbps": 14.250833333333333,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.5175752639770508
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.5075384378433228
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.5312234163284302
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.5853533744812012
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.5773454904556274
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5407899618148804
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.5369409322738647
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.5477926135063171
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.5043454170227051
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.6444801092147827
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.48028451204299927
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5765624642372131
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.4861026406288147
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5555232763290405
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.49990683794021606
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.6511861681938171
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.4608692526817322
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6451855897903442
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.4521765112876892
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.649449348449707
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.4930422902107239
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.5759589672088623
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.5034772157669067
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.6631032228469849
+        }
+      ],
+      "player_dists": 0.5494255547722181,
+      "whole_rgb_psnr": 24.04230249799893
+    },
+    {
+      "stream_sha256": "2e023b88f9cca7c6ec48cec085b55bd9aff380df1768085bfc1b0ed1408ae3a8",
+      "raw_sha256": "f00d0b85f1852e830ed964efe8ff5887dbb81f98ec8d8ab9387933f2c6cc4057",
+      "width": 160,
+      "height": 96,
+      "bytes": 17614,
+      "crf": 40,
+      "kbps": 14.678333333333333,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.5402705073356628
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.5613318681716919
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.5844826698303223
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.5800807476043701
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.5593321323394775
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5775473117828369
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.5455414056777954
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.6523247957229614
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.5674593448638916
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.5983071327209473
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.550899088382721
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5741628408432007
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.5696154832839966
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5474861860275269
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.5495228171348572
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.5508455634117126
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.5414542555809021
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6476621627807617
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.5277139544487
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.6367176175117493
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.568720817565918
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.5519193410873413
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.5284548997879028
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.6354079842567444
+        }
+      ],
+      "player_dists": 0.572802538673083,
+      "whole_rgb_psnr": 22.1312477784777
+    },
+    {
+      "stream_sha256": "ef659eb5a6dc42324cf75e86c20f2bcc42523d52984f9c5b60d6852a3025c058",
+      "raw_sha256": "8c5e8691f6c805db291f84e764dd87da6661d69ef5ddf09c88bdce0220726ca1",
+      "width": 640,
+      "height": 384,
+      "bytes": 18979,
+      "crf": 63.5,
+      "kbps": 15.815833333333334,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.4600703716278076
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.43447595834732056
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.46922117471694946
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.5664088129997253
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.5284290313720703
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5197848677635193
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.5010860562324524
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.591602087020874
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.46788203716278076
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.6428452730178833
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.4443749189376831
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5557702779769897
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.44587773084640503
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5314751863479614
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.48427945375442505
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.6542770266532898
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.44432443380355835
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.5882495641708374
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.43254929780960083
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.5864459276199341
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.47310107946395874
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.5351445078849792
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.41712892055511475
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.5626019835472107
+        }
+      ],
+      "player_dists": 0.5140585824847221,
+      "whole_rgb_psnr": 26.812115872228745
+    },
+    {
+      "stream_sha256": "9fa702ad7b56c33ff0ac1e242590f645002ab5f9af25d80fb47ed0c0585a971d",
+      "raw_sha256": "5e7f142404bc98a214af595d09085d1bb4b7c7cf49d91260495d336e451255ca",
+      "width": 160,
+      "height": 96,
+      "bytes": 21006,
+      "crf": 35.0,
+      "kbps": 17.505,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.5284935832023621
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.5566135048866272
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.555189311504364
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.5989835262298584
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.5258263349533081
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5612072944641113
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.5337931513786316
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.5969443917274475
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.5699425935745239
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.5449494123458862
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.5456856489181519
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5821207761764526
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.5520366430282593
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5577366948127747
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.5319492220878601
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.5536925792694092
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.5214273929595947
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.5220422148704529
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.5104846954345703
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.5766086578369141
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.5275579690933228
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.5285688638687134
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.5173348188400269
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.6138519048690796
+        }
+      ],
+      "player_dists": 0.5505433827638626,
+      "whole_rgb_psnr": 22.16315604964295
+    },
+    {
+      "stream_sha256": "0d206ef8f278e9172e2fc63cab5a3ffe3de451d7e31c5f39c0516f197beacc17",
+      "raw_sha256": "a6a6a24e32efa7a65b1a9fda83e56ee5584e72cddece02203f276dcb1c256c27",
+      "width": 640,
+      "height": 384,
+      "bytes": 22610,
+      "crf": 62.75,
+      "kbps": 18.841666666666665,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.4699676036834717
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.4281546473503113
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.4512242078781128
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.5262913107872009
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.4509884715080261
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.48934823274612427
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.4519360065460205
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.5065656900405884
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.40857481956481934
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.5588005185127258
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.4201206564903259
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.514590322971344
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.41494256258010864
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.4858531355857849
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.4506450891494751
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.6264646649360657
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.4032491445541382
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.5195503234863281
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.3960339426994324
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.5491096377372742
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.4308505654335022
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.5172690153121948
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.4149576425552368
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.5037509202957153
+        }
+      ],
+      "player_dists": 0.47455163051684696,
+      "whole_rgb_psnr": 27.137713193106737
+    },
+    {
+      "stream_sha256": "03873e43176166ff87a4dcd935d4b1eda28da41f07a74d9ce8e1727350c31909",
+      "raw_sha256": "5cce0edeaaab74fad949ecea513af68dde776fcb5c7acd4583179312b09b6bea",
+      "width": 160,
+      "height": 96,
+      "bytes": 23006,
+      "crf": 32.5,
+      "kbps": 19.171666666666667,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.5230872631072998
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.5531208515167236
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.5320500731468201
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.6142043471336365
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.5127272605895996
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5592496395111084
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.5109561085700989
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.5958641767501831
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.5586870908737183
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.5428813099861145
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.5272660255432129
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.571803629398346
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.5336822867393494
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5640869140625
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.5254814624786377
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.5508508682250977
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.5106940865516663
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.5317195653915405
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.5004515051841736
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.569944441318512
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.5290656089782715
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.5339220762252808
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.5127829313278198
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.5929982662200928
+        }
+      ],
+      "player_dists": 0.5440657412012418,
+      "whole_rgb_psnr": 22.169702199359275
+    },
+    {
+      "stream_sha256": "b46dff01b63216aba5b6a0bb7857f02b42c6f14eaf9e7741468674fe4d26b9c6",
+      "raw_sha256": "a050aee715e6ea0d3227d528ca504984a783f805c06dae6bd7b18a20fd2bb672",
+      "width": 320,
+      "height": 192,
+      "bytes": 23194,
+      "crf": 54,
+      "kbps": 19.328333333333333,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.474689781665802
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.4674273729324341
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.5209877490997314
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.5321907997131348
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.467032253742218
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5182516574859619
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.4590573310852051
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.5345247983932495
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.47184455394744873
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.5968759059906006
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.4364517331123352
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5823705792427063
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.47150909900665283
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5625815391540527
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.45839571952819824
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.5588394403457642
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.44105446338653564
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6362319588661194
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.43358176946640015
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.6060945987701416
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.46432971954345703
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.48579418659210205
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.4461919069290161
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.6200721263885498
+        }
+      ],
+      "player_dists": 0.5102658768494924,
+      "whole_rgb_psnr": 24.20488491363233
+    },
+    {
+      "stream_sha256": "21d4169f87775ed45dbf6a050d061cf5d92eab5258e4e4a71a7a279484fe7d77",
+      "raw_sha256": "5945e82a6be12f5d129153c906468b7161b9a66710ec62f85c400ef7c8ed7afd",
+      "width": 320,
+      "height": 192,
+      "bytes": 23763,
+      "crf": 53.5,
+      "kbps": 19.8025,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.46230602264404297
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.4749850034713745
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.506758451461792
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.5364105701446533
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.4960784912109375
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5094366073608398
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.44844210147857666
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.5323854088783264
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.4498752951622009
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.5668141841888428
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.4453517198562622
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5743768215179443
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.45470982789993286
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5524914264678955
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.47813475131988525
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.5565363764762878
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.3918420076370239
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6159646511077881
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.41348081827163696
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.6011083126068115
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.4595687985420227
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.4910220503807068
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.4341728687286377
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.6418458819389343
+        }
+      ],
+      "player_dists": 0.5039207686980566,
+      "whole_rgb_psnr": 24.216585967269456
+    },
+    {
+      "stream_sha256": "21d9285d7331b41a4d438366df15ac4e0f842faf48b3db59b2c297a3fd9b9c0e",
+      "raw_sha256": "5506f33f8543a07cdf1bf75305209320f6a6bf8cd5d46b8b08da5fe8d675719e",
+      "width": 640,
+      "height": 384,
+      "bytes": 23916,
+      "crf": 62.25,
+      "kbps": 19.93,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.4132540225982666
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.411831796169281
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.4363533854484558
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.4989197254180908
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.4577594995498657
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.49222445487976074
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.43186354637145996
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.4934720993041992
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.4247772693634033
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.5532956123352051
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.4170078635215759
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5559492111206055
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.4307042360305786
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.488084077835083
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.4262298345565796
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.5588008761405945
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.38308441638946533
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.5033477544784546
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.375393807888031
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.51827472448349
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.4103084206581116
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.4850040674209595
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.42417240142822266
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.47001194953918457
+        }
+      ],
+      "player_dists": 0.46083854387203854,
+      "whole_rgb_psnr": 27.229568731880992
+    },
+    {
+      "stream_sha256": "c6055426540fe796538e52c4e62b7c1fb514bcc8b09fd377ee94fae810bd0d60",
+      "raw_sha256": "c5f54857981da566d92a2031288e71d6c62bc7ebaa12ff6b83b086f019737819",
+      "width": 160,
+      "height": 96,
+      "bytes": 24185,
+      "crf": 31.25,
+      "kbps": 20.154166666666665,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.5182754993438721
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.5463274717330933
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.5370031595230103
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.6012410521507263
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.5291244387626648
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5624933242797852
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.5253094434738159
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.5889685750007629
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.5557348728179932
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.5411393642425537
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.5509191751480103
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5473272204399109
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.517288088798523
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5506871938705444
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.5273336172103882
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.553317666053772
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.5064302682876587
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.5403950810432434
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.5179852247238159
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.5907230377197266
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.5256703495979309
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.5158149600028992
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.5182008743286133
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.5877105593681335
+        }
+      ],
+      "player_dists": 0.5439758549133936,
+      "whole_rgb_psnr": 22.173831363718207
+    },
+    {
+      "stream_sha256": "db3fe98d1c982180eef228af5497124347109c6ca29d6d7261a179b39253d18b",
+      "raw_sha256": "b7ac07c14c3a74c07f3da1c44835227bbda5c5190759b029b0c442fa8807d9e0",
+      "width": 320,
+      "height": 192,
+      "bytes": 24308,
+      "crf": 53,
+      "kbps": 20.256666666666668,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.4633435010910034
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.4816155433654785
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.49291765689849854
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.5379036068916321
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.5034118294715881
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5237959623336792
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.44167619943618774
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.5320911407470703
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.4491983652114868
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.5752438306808472
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.46395450830459595
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5673171281814575
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.45932745933532715
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5548039078712463
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.4626120328903198
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.5507479906082153
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.4410480260848999
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6184478998184204
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.42330610752105713
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.5155417919158936
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.4382338523864746
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.4781333804130554
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.44929420948028564
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.6061439514160156
+        }
+      ],
+      "player_dists": 0.5012545784314474,
+      "whole_rgb_psnr": 24.230967926440094
+    },
+    {
+      "stream_sha256": "32e9379693742bf3ddd2324c14e31dfafdf8f7c7fd52230ca8b317d197cf76bf",
+      "raw_sha256": "c60215a513435b726bf9c3dd398b651b1c9add176245a354eb1076ee21445bf1",
+      "width": 320,
+      "height": 192,
+      "bytes": 24433,
+      "crf": 52.75,
+      "kbps": 20.360833333333332,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.46796536445617676
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.4683021903038025
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.4912535548210144
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.5623348951339722
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.4794987440109253
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5147103667259216
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.45353567600250244
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.54166179895401
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.4545724391937256
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.5812027454376221
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.44740015268325806
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5801249742507935
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.4429241418838501
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5518214702606201
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.43583327531814575
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.5455357432365417
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.43522971868515015
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6214989423751831
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.4207015037536621
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.5974622964859009
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.4163930416107178
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.4917149543762207
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.4471985101699829
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.6084914207458496
+        }
+      ],
+      "player_dists": 0.5023903300364813,
+      "whole_rgb_psnr": 24.225255101257567
+    },
+    {
+      "stream_sha256": "ee21630220971f11b42e4885a5e1ba20f8528f2ec0ba81df15c2c5d082ff2121",
+      "raw_sha256": "b0592715ee185cd1b8ac292cede91b407212e35aaf2ec811d1e40a3e4114d87c",
+      "width": 160,
+      "height": 96,
+      "bytes": 24463,
+      "crf": 31.0,
+      "kbps": 20.385833333333334,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.5175269842147827
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.5481032729148865
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.5472583174705505
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.5989708304405212
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.5335898995399475
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5495137572288513
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.5094899535179138
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.5904061794281006
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.5525465607643127
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.5468165278434753
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.5332191586494446
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5488557815551758
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.5183892250061035
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5511986017227173
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.5271247625350952
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.5542047023773193
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.485576868057251
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.5144504308700562
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.5020990371704102
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.5928180813789368
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.5231583714485168
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.5248699188232422
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.5104088187217712
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.5842198729515076
+        }
+      ],
+      "player_dists": 0.5402006631096204,
+      "whole_rgb_psnr": 22.173034700193057
+    },
+    {
+      "stream_sha256": "00948ce449ee4774bd7a3317228b390684daa36549c8d9c7b34e1f1f44147b8a",
+      "raw_sha256": "c3545779ac5588b9bf65d2cc6429e36180b06c741fd4d62a556e30efa58b4cc9",
+      "width": 640,
+      "height": 384,
+      "bytes": 24718,
+      "crf": 62,
+      "kbps": 20.598333333333333,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.40461450815200806
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.3993922472000122
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.4292956590652466
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.4981421232223511
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.4243999719619751
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.48113197088241577
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.4210386276245117
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.4919499158859253
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.4087318181991577
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.5643162131309509
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.39720356464385986
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5224878191947937
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.41346120834350586
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.4838595986366272
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.4326058626174927
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.5580499172210693
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.3731876015663147
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.46979230642318726
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.3743901252746582
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.5124229192733765
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.39656388759613037
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.472493052482605
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.41350042819976807
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.486530601978302
+        }
+      ],
+      "player_dists": 0.4512317478656769,
+      "whole_rgb_psnr": 27.25551122878102
+    },
+    {
+      "stream_sha256": "2ce538a8edf24eb2aa0ec0ad3c18179d70f0f4d7a830abe50536f5d051ca467b",
+      "raw_sha256": "249d9171ed70a1bb003706179d5f4faa2d417f8029c5fa8513fb53bef2a8087c",
+      "width": 160,
+      "height": 96,
+      "bytes": 24747,
+      "crf": 30.75,
+      "kbps": 20.6225,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.5371783971786499
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.543026328086853
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.5587787628173828
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.5906310081481934
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.5080969333648682
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5554170608520508
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.5252885222434998
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.5929887294769287
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.5588846802711487
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.524685263633728
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.5422019958496094
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5339727401733398
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.5313535928726196
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5548318028450012
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.5280510187149048
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.5586965084075928
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.5042212009429932
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.5280818343162537
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.5031554102897644
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.5832849144935608
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.527306318283081
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.5372748374938965
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.5279895067214966
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.5230165719985962
+        }
+      ],
+      "player_dists": 0.5407672474781672,
+      "whole_rgb_psnr": 22.174810698768162
+    },
+    {
+      "stream_sha256": "c77933d23755962f9f08b71987988c41474651a1ea630aa1564f2ddbe49f6aea",
+      "raw_sha256": "fa38f25a352a90040073c3f26211b98ef7c872beab3de5c1aca889c5ca2bd633",
+      "width": 320,
+      "height": 192,
+      "bytes": 24873,
+      "crf": 52.5,
+      "kbps": 20.7275,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.45721572637557983
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.4584701657295227
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.4640812873840332
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.5335012674331665
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.47032493352890015
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5058368444442749
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.4331594705581665
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.5560733079910278
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.4391545057296753
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.5418443083763123
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.44032108783721924
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5846399068832397
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.44977980852127075
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5581881999969482
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.44920098781585693
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.5576833486557007
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.4071916341781616
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6212321519851685
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.4228062629699707
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.5993099212646484
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.45984137058258057
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.4829455018043518
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.4449363946914673
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.6081065535545349
+        }
+      ],
+      "player_dists": 0.49774353951215744,
+      "whole_rgb_psnr": 24.232124413803533
+    },
+    {
+      "stream_sha256": "0873b747a1865695b45bf4bc33280f72a9b3b5b4235027bbee92889ed14480fb",
+      "raw_sha256": "2ef2fef06da4ff6697539e1bd5c2c5da0f7ebcb422a956d9e963656ad149c57a",
+      "width": 160,
+      "height": 96,
+      "bytes": 25065,
+      "crf": 30.5,
+      "kbps": 20.8875,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.5355297327041626
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.5476857423782349
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.5544477105140686
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.5849376320838928
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.5283502340316772
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5595797300338745
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.5267365574836731
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.5881036520004272
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.5391793251037598
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.5316373109817505
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.5152702331542969
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5460092425346375
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.5154836177825928
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5543172359466553
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.5237338542938232
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.5498640537261963
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.5006033778190613
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.5268800854682922
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.5100231766700745
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.5780493021011353
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.5318406224250793
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.512816309928894
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.5143029689788818
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.5241391658782959
+        }
+      ],
+      "player_dists": 0.5374800364176432,
+      "whole_rgb_psnr": 22.17551821153289
+    },
+    {
+      "stream_sha256": "dbe2c84721d430e48d885cab2ea65772da55b896d1dbcb726b4fa1fe974c7e6b",
+      "raw_sha256": "dec4ea4740491d2eec30b6b94e67a154485bf8dc8bb390d0a1abb310e548194e",
+      "width": 320,
+      "height": 192,
+      "bytes": 25210,
+      "crf": 52,
+      "kbps": 21.008333333333333,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.45460063219070435
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.46104949712753296
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.47393369674682617
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.5391087532043457
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.4687509536743164
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.49649500846862793
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.43376225233078003
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.5494917035102844
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.4522533416748047
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.54527348279953
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.45852160453796387
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5615248680114746
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.4643438458442688
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5506922006607056
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.45055508613586426
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.5472714304924011
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.4021724462509155
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.6187998056411743
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.43520426750183105
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.5015498995780945
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.44911736249923706
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.47597140073776245
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.4384574890136719
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.60411137342453
+        }
+      ],
+      "player_dists": 0.49304218341906864,
+      "whole_rgb_psnr": 24.239053331100024
+    },
+    {
+      "stream_sha256": "6e097950eeac91c0567d1f7748249ec5c30a6ac0becbbac8f05a028f823831e7",
+      "raw_sha256": "7998f2e6db3729bdbfcb8269ab3ecce3bd427b2acaad5677fa2626114ab2b31b",
+      "width": 160,
+      "height": 96,
+      "bytes": 25683,
+      "crf": 30.0,
+      "kbps": 21.4025,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.5460978150367737
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.542068362236023
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.5400944948196411
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.5948538780212402
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.525644063949585
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5624803304672241
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.5104959607124329
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.5859338641166687
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.5451045632362366
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.5343735218048096
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.5282657742500305
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5520675182342529
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.5204129815101624
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5454965233802795
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.517277181148529
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.5506792068481445
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.49859410524368286
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.5346190929412842
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.507948637008667
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.58128422498703
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.5283465385437012
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.5072659254074097
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.4922029972076416
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.5302920937538147
+        }
+      ],
+      "player_dists": 0.5367458189527193,
+      "whole_rgb_psnr": 22.17794370977699
+    },
+    {
+      "stream_sha256": "5a3b9e0822ca48c864fe2c329dfe267ba3a3053e8c33caea2bc1a90fb9487e05",
+      "raw_sha256": "b5ae9130cfc61713f6af0108989485c39e4c17fa6980716389954d89b43a2a9d",
+      "width": 320,
+      "height": 192,
+      "bytes": 26263,
+      "crf": 51,
+      "kbps": 21.885833333333334,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.4403027892112732
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.46145302057266235
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.45624011754989624
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.4969891905784607
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.4579213261604309
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5082880854606628
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.43473273515701294
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.5481690168380737
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.4302971363067627
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.5551691055297852
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.445392370223999
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5656504034996033
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.44068801403045654
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5290766358375549
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.44988834857940674
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.5595088005065918
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.4116472005844116
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.5811218023300171
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.4062526226043701
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.5197360515594482
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.44544273614883423
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.4863567352294922
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.43478333950042725
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.611661434173584
+        }
+      ],
+      "player_dists": 0.4865320424238841,
+      "whole_rgb_psnr": 24.252885066615725
+    },
+    {
+      "stream_sha256": "8a2bf2b6131cba4f952f3cb82552780fe07511e21606c90b38ffddf0acce332b",
+      "raw_sha256": "3d11e4c56dd64bbc05c1c4cdc41db3a90b1803798d34dbad7d1fcbf429f546a9",
+      "width": 320,
+      "height": 192,
+      "bytes": 27489,
+      "crf": 50,
+      "kbps": 22.9075,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.4589570164680481
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.4410966634750366
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.4431644082069397
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.49910032749176025
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.44948428869247437
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.4882371425628662
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.4417005181312561
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.5092194080352783
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.4505964517593384
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.5647848844528198
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.4290173649787903
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5579969882965088
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.44138336181640625
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5363194942474365
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.45652085542678833
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.5461354851722717
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.4260551333427429
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.5553073287010193
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.3866792917251587
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.5158665180206299
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.4397321939468384
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.48045051097869873
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.453008770942688
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.5638731718063354
+        }
+      ],
+      "player_dists": 0.48061198244492215,
+      "whole_rgb_psnr": 24.269869110264743
+    },
+    {
+      "stream_sha256": "f3f464ab5565bf363900f3bcca36762ca1f5b9c15b37c119dcd55ac390dee8cc",
+      "raw_sha256": "a61b419f8da9440e1db9ec10d04abe2193befb22f66b5a5a7650cf094854c164",
+      "width": 640,
+      "height": 384,
+      "bytes": 29148,
+      "crf": 61,
+      "kbps": 24.29,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.38094907999038696
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.37855565547943115
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.4126597046852112
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.4737701416015625
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.409984290599823
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.4272332787513733
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.37511152029037476
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.41906672716140747
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.3871603012084961
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.504602313041687
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.3861083984375
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.4647715091705322
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.38845551013946533
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.442080020904541
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.41011714935302734
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.4977415204048157
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.34675532579421997
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.45139992237091064
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.34027087688446045
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.45829319953918457
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.3864908814430237
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.47297483682632446
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.3757191300392151
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.48176640272140503
+        }
+      ],
+      "player_dists": 0.4196682373682658,
+      "whole_rgb_psnr": 27.47821050653429
+    },
+    {
+      "stream_sha256": "2234237c62489ca1b24073acdfa074a2da283cfd015d92976f033d92ce8a8d91",
+      "raw_sha256": "4ebf74363b1f3cd2c73597e2ecf8f9f100f0b14e329410a71a3fd2577291bd70",
+      "width": 640,
+      "height": 384,
+      "bytes": 32322,
+      "crf": 60,
+      "kbps": 26.935,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.3971220850944519
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.3594745397567749
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.3970162868499756
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.4399367570877075
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.38645070791244507
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.4230995178222656
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.3819419741630554
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.4308542013168335
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.40954917669296265
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.4740449786186218
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.38054579496383667
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.4479597806930542
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.37992942333221436
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.4529743194580078
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.37475746870040894
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.47417527437210083
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.36052095890045166
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.44720327854156494
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.3522745966911316
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.45320117473602295
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.37512636184692383
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.4497414231300354
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.3806615471839905
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.46878182888031006
+        }
+      ],
+      "player_dists": 0.4123893106977145,
+      "whole_rgb_psnr": 27.57688611128006
+    },
+    {
+      "stream_sha256": "0c668a67e751ec425234c856fd30407686ec80549b1606d3c32385c188001bd8",
+      "raw_sha256": "3bb43b6e43635ad39fda9c0121be64f9771e7450e6d4475258f5849c67edb796",
+      "width": 320,
+      "height": 192,
+      "bytes": 33889,
+      "crf": 45,
+      "kbps": 28.240833333333335,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.42252641916275024
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.4244745969772339
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.4236932396888733
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.44333553314208984
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.3963305950164795
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.4574216604232788
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.41857218742370605
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.45030027627944946
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.4024747610092163
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.4430541396141052
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.40175318717956543
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5463660955429077
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.415860652923584
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5373396873474121
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.41485095024108887
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.4869176745414734
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.39990508556365967
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.4765198826789856
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.3766794800758362
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.4850819706916809
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.4190369248390198
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.47427910566329956
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.4245341420173645
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.4945405125617981
+        }
+      ],
+      "player_dists": 0.44316036502520245,
+      "whole_rgb_psnr": 24.33375596124381
+    },
+    {
+      "stream_sha256": "99948bb7a6e78a004f6616e0fe676fe1bf05f56b06335c62c8875207fb021d99",
+      "raw_sha256": "7d9888b71f697761fabfb2fd8c51cb93a197ab79827a9cdecdd7bc79d378950a",
+      "width": 160,
+      "height": 96,
+      "bytes": 39082,
+      "crf": 20,
+      "kbps": 32.568333333333335,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.5063198208808899
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.5191972255706787
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.5128821730613708
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.508076012134552
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.48134535551071167
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.5467196106910706
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.4804386496543884
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.5527982711791992
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.515350878238678
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.522437334060669
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.5138412117958069
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.5478134155273438
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.49301642179489136
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.5218644142150879
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.4973239302635193
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.5122034549713135
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.46247076988220215
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.49792736768722534
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.4545665383338928
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.5732648968696594
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.49475157260894775
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.5144104957580566
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.45897746086120605
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.5249539017677307
+        }
+      ],
+      "player_dists": 0.5088729659716288,
+      "whole_rgb_psnr": 22.20124927695851
+    },
+    {
+      "stream_sha256": "93623028709bfb7772184056f653aad648e47de4832c1644528a1ff2e17ee684",
+      "raw_sha256": "e7c233449964971e81efdc302951d2ea1fee55a74e03464ea914fb35d9b18648",
+      "width": 320,
+      "height": 192,
+      "bytes": 42655,
+      "crf": 40.0,
+      "kbps": 35.545833333333334,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.39088112115859985
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.40993356704711914
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.3995378017425537
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.47745245695114136
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.3912994861602783
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.45296210050582886
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.398595929145813
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.4453425407409668
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.4228634834289551
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.4412556290626526
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.41793787479400635
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.4335991144180298
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.38987207412719727
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.4789224863052368
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.3811655044555664
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.47907865047454834
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.38235586881637573
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.4029356837272644
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.3602328896522522
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.462665855884552
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.4018009901046753
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.4624018669128418
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.37749600410461426
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.4671440124511719
+        }
+      ],
+      "player_dists": 0.4219888746738434,
+      "whole_rgb_psnr": 24.380446081691247
+    },
+    {
+      "stream_sha256": "47426afd90602e3b96a3cb9acdf5e48a75443c8f3bb3bf90e5c88447f189c2e1",
+      "raw_sha256": "e6ad44ec4ffcf4a00277bc59f886a2daa4180fc13d0504d0958cb088b52e5c03",
+      "width": 320,
+      "height": 192,
+      "bytes": 45232,
+      "crf": 38.75,
+      "kbps": 37.693333333333335,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.41769635677337646
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.3955429792404175
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.4120801091194153
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.4234306812286377
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.3934175968170166
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.41864728927612305
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.3906785249710083
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.4462771415710449
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.3935452699661255
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.4215981364250183
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.4049491882324219
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.43346482515335083
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.37639641761779785
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.4786189794540405
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.38959604501724243
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.4663820266723633
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.35777968168258667
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.4153498411178589
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.354086697101593
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.43556922674179077
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.39485031366348267
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.44786131381988525
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.3475223183631897
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.46857017278671265
+        }
+      ],
+      "player_dists": 0.4118296305338542,
+      "whole_rgb_psnr": 24.39172023380192
+    },
+    {
+      "stream_sha256": "7caeb5f0cdd4d2f0345caf63936b28e9d1ed627e628c72d9b60df78bbd446084",
+      "raw_sha256": "5ff0e63b88ea70aa0fcfe253dd91aeadc4d2223bbc604b47c88d68aa0ab93932",
+      "width": 320,
+      "height": 192,
+      "bytes": 46837,
+      "crf": 38.0,
+      "kbps": 39.030833333333334,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.4042266011238098
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.40654635429382324
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.40867680311203003
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.4111400246620178
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.3708271384239197
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.43000638484954834
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.38746482133865356
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.4328480362892151
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.3957695960998535
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.433565616607666
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.41260695457458496
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.3966805934906006
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.3771423101425171
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.4543039798736572
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.3804178237915039
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.4559202790260315
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.3408222198486328
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.4005810618400574
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.3585595488548279
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.4269505739212036
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.39304107427597046
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.42769575119018555
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.356097936630249
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.4623061418533325
+        }
+      ],
+      "player_dists": 0.4051749010880788,
+      "whole_rgb_psnr": 24.396498475106604
+    },
+    {
+      "stream_sha256": "c8d5dea39e2e63579c33b691acb6506064916394d5644a2ef6d7acd4cb6b2aab",
+      "raw_sha256": "7062f3d4c11b0bfda9b9fb34e845825538f3fde5b3c53d67b32969aaa6feaa8f",
+      "width": 640,
+      "height": 384,
+      "bytes": 47719,
+      "crf": 55.0,
+      "kbps": 39.76583333333333,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.3394300937652588
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.3238063454627991
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.35781705379486084
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.3789413571357727
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.3294844627380371
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.35317039489746094
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.33570194244384766
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.42063355445861816
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.32479578256607056
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.35947996377944946
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.31655609607696533
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.353329062461853
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.3134784698486328
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.4433600902557373
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.3437540531158447
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.4253813624382019
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.2992100715637207
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.35666078329086304
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.3191435933113098
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.40981388092041016
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.3438990116119385
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.38201868534088135
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.3523152470588684
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.4281754493713379
+        }
+      ],
+      "player_dists": 0.3587648669878642,
+      "whole_rgb_psnr": 27.887546050357752
+    },
+    {
+      "stream_sha256": "bac24432bcec62bd5a491839c18c4b162dba369f84827ed055e2cbe01716abd4",
+      "raw_sha256": "6223ebe351ea60873971e1ff379ac40ec7ed638770db22ec60eeaeedcdce0766",
+      "width": 320,
+      "height": 192,
+      "bytes": 48297,
+      "crf": 37.75,
+      "kbps": 40.2475,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.41695326566696167
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.4054587483406067
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.3810737133026123
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.42997509241104126
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.35461270809173584
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.4221996068954468
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.36830639839172363
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.42395997047424316
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.39668798446655273
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.44490236043930054
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.39384931325912476
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.4569392800331116
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.3918309211730957
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.4646502137184143
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.3942962884902954
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.457566499710083
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.3512979745864868
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.38828742504119873
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.35607314109802246
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.4387718439102173
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.3821049928665161
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.4153398871421814
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.3967815637588501
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.4560543894767761
+        }
+      ],
+      "player_dists": 0.40783223261435825,
+      "whole_rgb_psnr": 24.396625422711296
+    },
+    {
+      "stream_sha256": "8f18fe9c73233ef576af9a196f28a083fffa1fe25f10cb78e1e6fed3daf3c784",
+      "raw_sha256": "dcb1eeb705cfcb80123a35407e62c75d01fb80420a3cf94f4a56ee86349b5d25",
+      "width": 320,
+      "height": 192,
+      "bytes": 48496,
+      "crf": 37.5,
+      "kbps": 40.413333333333334,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.4023857116699219
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.3991405963897705
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.39866864681243896
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.4198070764541626
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.36968111991882324
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.4398221969604492
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.3798895478248596
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.4307782053947449
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.3800026774406433
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.4395153522491455
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.40084517002105713
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.43135857582092285
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.38902848958969116
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.43953871726989746
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.378964900970459
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.433699369430542
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.35609757900238037
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.40480154752731323
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.3537974953651428
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.4283375144004822
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.3787640929222107
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.4310518503189087
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.37111490964889526
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.4617413878440857
+        }
+      ],
+      "player_dists": 0.4049513638019562,
+      "whole_rgb_psnr": 24.399555481082196
+    },
+    {
+      "stream_sha256": "55fd6d9641d324e1aa223bd87d97252ec9995351f58a1054f9cded7f2544a53c",
+      "raw_sha256": "c2f62303def43c337fd7b0b96fa7e0107f6eb52e7d4afdc023e32ed546fbdfee",
+      "width": 320,
+      "height": 192,
+      "bytes": 55801,
+      "crf": 35,
+      "kbps": 46.50083333333333,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.37676894664764404
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.4014020562171936
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.36894941329956055
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.3841923475265503
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.35815662145614624
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.4265623688697815
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.36365967988967896
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.4228959083557129
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.3867760896682739
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.4157496690750122
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.386832058429718
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.4039391875267029
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.3730321526527405
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.4348662495613098
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.35647493600845337
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.40254461765289307
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.35300588607788086
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.37414276599884033
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.33075225353240967
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.41039860248565674
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.3868336081504822
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.39742398262023926
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.36161667108535767
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.44098323583602905
+        }
+      ],
+      "player_dists": 0.38824830452601117,
+      "whole_rgb_psnr": 24.415090507784495
+    },
+    {
+      "stream_sha256": "82a17c8c816b4d817dc3e180606cb57e1d35ae922003e221e1f9e5712471dc01",
+      "raw_sha256": "c0b4fd0fbfe16a22ee169aba097881ebb701c8912a1ed3cd92d9b45974c3e7a4",
+      "width": 640,
+      "height": 384,
+      "bytes": 62760,
+      "crf": 50,
+      "kbps": 52.3,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.2974050045013428
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.29877257347106934
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.32387852668762207
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.3418717384338379
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.31140774488449097
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.3234238028526306
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.31514811515808105
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.37213629484176636
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.30633413791656494
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.3438218832015991
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.3056918978691101
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.3404172658920288
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.30006831884384155
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.38732796907424927
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.31301021575927734
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.40893644094467163
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.2858213782310486
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.34141647815704346
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.2545585632324219
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.3297315239906311
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.31212037801742554
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.3392842411994934
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.3172023296356201
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.36873507499694824
+        }
+      ],
+      "player_dists": 0.32660507907470065,
+      "whole_rgb_psnr": 28.03822180134018
+    },
+    {
+      "stream_sha256": "ccfc0486df8892e31671b9817058fe1551089cec316f651d102e66aa299f651a",
+      "raw_sha256": "90a89ef59e553d6051ce7447b2d9ddc2ac2b6e513f478f17827f0cced8d97da7",
+      "width": 320,
+      "height": 192,
+      "bytes": 95437,
+      "crf": 25,
+      "kbps": 79.53083333333333,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.33637648820877075
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.3817290663719177
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.32724452018737793
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.372734010219574
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.32912778854370117
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.3826752305030823
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.3408079147338867
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.3826940655708313
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.3630300760269165
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.3947526812553406
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.3545535206794739
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.38034629821777344
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.31085115671157837
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.36375027894973755
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.33662742376327515
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.37516218423843384
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.29452604055404663
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.35431337356567383
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.31481993198394775
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.39033615589141846
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.3300531506538391
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.3742198944091797
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.3242787718772888
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.36769580841064453
+        }
+      ],
+      "player_dists": 0.3534460763136546,
+      "whole_rgb_psnr": 24.458954909514308
+    },
+    {
+      "stream_sha256": "91617b79bbe2c22beb657069e059a417aa7cb9571e98395303078217ce75226e",
+      "raw_sha256": "56e971472bff91801806d51401ea3733edaea9de59ebc6ebd01c4a915cd41c3d",
+      "width": 640,
+      "height": 384,
+      "bytes": 107620,
+      "crf": 40,
+      "kbps": 89.68333333333334,
+      "rows": [
+        {
+          "tick": 10,
+          "person": "archived-track-0",
+          "dists": 0.2698051333427429
+        },
+        {
+          "tick": 10,
+          "person": "archived-track-1",
+          "dists": 0.29863542318344116
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-0",
+          "dists": 0.28533852100372314
+        },
+        {
+          "tick": 30,
+          "person": "archived-track-1",
+          "dists": 0.28523576259613037
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-0",
+          "dists": 0.26614415645599365
+        },
+        {
+          "tick": 50,
+          "person": "archived-track-1",
+          "dists": 0.3039308786392212
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-0",
+          "dists": 0.26438647508621216
+        },
+        {
+          "tick": 70,
+          "person": "archived-track-1",
+          "dists": 0.30282050371170044
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-0",
+          "dists": 0.27093714475631714
+        },
+        {
+          "tick": 90,
+          "person": "archived-track-1",
+          "dists": 0.2880741357803345
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-0",
+          "dists": 0.24609196186065674
+        },
+        {
+          "tick": 110,
+          "person": "archived-track-1",
+          "dists": 0.3108253479003906
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-0",
+          "dists": 0.25489580631256104
+        },
+        {
+          "tick": 130,
+          "person": "archived-track-1",
+          "dists": 0.3311206102371216
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-0",
+          "dists": 0.25804412364959717
+        },
+        {
+          "tick": 150,
+          "person": "archived-track-1",
+          "dists": 0.3104819059371948
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-0",
+          "dists": 0.20924663543701172
+        },
+        {
+          "tick": 170,
+          "person": "archived-track-1",
+          "dists": 0.2637088894844055
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-0",
+          "dists": 0.21369802951812744
+        },
+        {
+          "tick": 190,
+          "person": "archived-track-1",
+          "dists": 0.28994953632354736
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-0",
+          "dists": 0.24565213918685913
+        },
+        {
+          "tick": 210,
+          "person": "archived-track-1",
+          "dists": 0.30831074714660645
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-0",
+          "dists": 0.27941375970840454
+        },
+        {
+          "tick": 230,
+          "person": "archived-track-1",
+          "dists": 0.3098001480102539
+        }
+      ],
+      "player_dists": 0.27777282396952313,
+      "whole_rgb_psnr": 28.237048254164637
+    }
+  ]
+}

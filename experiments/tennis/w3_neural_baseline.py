@@ -170,7 +170,7 @@ def base_plan(a: argparse.Namespace, width: int, height: int, frames: int, sourc
     return {'structure': 'htl', 'frame_count': frames, 'width': width, 'height': height, 'src_type': 'yuv420',
             'frames_file': str(source.resolve()), 'image_ckpt': str(a.image_ckpt.resolve()),
             'image_sha256': INPUTS['image_ckpt'], 'video_ckpt': str(a.video_ckpt.resolve()),
-            'video_sha256': INPUTS['video_ckpt'], 'profile': False, 'deterministic': True, 'stream_policy': 'legacy'}
+            'video_sha256': INPUTS['video_ckpt'], 'profile': False, 'deterministic': True, 'stream_policy': getattr(a, 'stream_policy', 'legacy')}
 
 
 def calibrate_candidates(a: argparse.Namespace, full_yuv: Path, work: Path, fps: int) -> tuple[list[dict[str, Any]], float]:

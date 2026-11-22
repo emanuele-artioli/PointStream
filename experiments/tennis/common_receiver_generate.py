@@ -89,9 +89,11 @@ def run(carrier: Path, expected_sha256: str, weights: dict[str, Path], fit: Path
             raise RuntimeError('exactly one CUDA GPU required')
         props = torch.cuda.get_device_properties(0)
         visible = os.environ['CUDA_VISIBLE_DEVICES']
-        if (system.canonical_gpu_uuid(str(props.uuid)) != system.canonical_gpu_uuid(visible)
-                or (props.major, props.minor) != (8, 9) or 'RTX 6000 Ada' not in props.name):
-            raise RuntimeError('assigned GPU differs from qualified Ada')
+        device_class = ((props.major, props.minor), props.name)
+        ada = device_class[0] == (8, 9) and 'RTX 6000 Ada' in device_class[1]
+        a6000 = device_class[0] == (8, 6) and 'RTX A6000' in device_class[1]
+        if system.canonical_gpu_uuid(str(props.uuid)) != system.canonical_gpu_uuid(visible) or not (ada or a6000):
+            raise RuntimeError('assigned GPU is neither the Ada nor A6000 profile')
         limit = int(os.environ['PS_GPU_MEMORY_LIMIT_MIB'])
         if limit <= 0:
             raise ValueError('missing memory budget')
@@ -118,10 +120,18 @@ def run(carrier: Path, expected_sha256: str, weights: dict[str, Path], fit: Path
     for name, seed, data in conditioning(carrier, expected_sha256, frames, units):
         row = {'unit': name, 'seed': seed, 'array_sha256': {k: replay.array_sha(a) for k,a in data.items()}}
         if renderer is not None:
+            if a6000 and frames == 44:
+                first = renderer.render(data['reference'], data['pose'][:8], 30, seed)
+                second = renderer.render(data['reference'], data['pose'][:8], 30, seed)
+                if not np.array_equal(first, second):
+                    raise RuntimeError('A6000 fixed-seed eight-tick repeatability failed')
+                row['repeat_8_sha256'] = replay.array_sha(first)
             start = time.monotonic()
             crops, kernels = profile_cuda(lambda: renderer.render(data['reference'], data['pose'], 30, seed))
             if not replay.complete_crops(crops, frames) or kernels['kernel_launches'] <= 0:
                 raise RuntimeError('incomplete, degenerate or non-CUDA generation')
+            if a6000 and ('flash' not in kernels['attention_family'] or not set(kernels['tensor_core_like']).intersection({'cutlass', 'xmma', 's16816', 'hmma'})):
+                raise RuntimeError('A6000 first-class profile lacks flash or tensor-op kernels')
             path = output / f'{name}.npz'
             np.savez_compressed(path, t=data['t'], box=data['box'], crops=crops)
             row.update(render_and_save_seconds=time.monotonic()-start, kernels=kernels, crops_file=path.name,

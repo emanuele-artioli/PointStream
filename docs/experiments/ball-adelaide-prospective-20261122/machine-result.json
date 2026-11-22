@@ -1,0 +1,397 @@
+{
+  "frames": 64,
+  "labels": [
+    {
+      "tick": 9,
+      "visibility": 1,
+      "x": 1194,
+      "y": 304
+    },
+    {
+      "tick": 13,
+      "visibility": 1,
+      "x": 1302,
+      "y": 292
+    },
+    {
+      "tick": 18,
+      "visibility": 1,
+      "x": 1395,
+      "y": 192
+    },
+    {
+      "tick": 23,
+      "visibility": 1,
+      "x": 1465,
+      "y": 154
+    },
+    {
+      "tick": 28,
+      "visibility": 1,
+      "x": 1513,
+      "y": 122
+    },
+    {
+      "tick": 33,
+      "visibility": 0,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "tick": 37,
+      "visibility": 0,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "tick": 42,
+      "visibility": 0,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "tick": 47,
+      "visibility": 0,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "tick": 52,
+      "visibility": 0,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "tick": 57,
+      "visibility": 0,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "tick": 61,
+      "visibility": 0,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "results": [
+    {
+      "mode": "source",
+      "rows": [
+        {
+          "tick": 9,
+          "visibility": 1,
+          "detected": true,
+          "native_error": 1.6798942194749737,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 13,
+          "visibility": 1,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 18,
+          "visibility": 1,
+          "detected": true,
+          "native_error": 1.7662985319985782,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 23,
+          "visibility": 1,
+          "detected": true,
+          "native_error": 0.5494529410858672,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 28,
+          "visibility": 1,
+          "detected": true,
+          "native_error": 2.169991108419071,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 33,
+          "visibility": 0,
+          "detected": true,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 37,
+          "visibility": 0,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 42,
+          "visibility": 0,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 47,
+          "visibility": 0,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 52,
+          "visibility": 0,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 57,
+          "visibility": 0,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 61,
+          "visibility": 0,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        }
+      ],
+      "rgb_sha256": "1346d00232ad6079de53404661c58530875a324551acd19baa13dd11fe6011d4",
+      "wire_kbps": null
+    },
+    {
+      "mode": "ordinary",
+      "rows": [
+        {
+          "tick": 9,
+          "visibility": 1,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 13,
+          "visibility": 1,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 18,
+          "visibility": 1,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 23,
+          "visibility": 1,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 28,
+          "visibility": 1,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 33,
+          "visibility": 0,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 37,
+          "visibility": 0,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 42,
+          "visibility": 0,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 47,
+          "visibility": 0,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 52,
+          "visibility": 0,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 57,
+          "visibility": 0,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 61,
+          "visibility": 0,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        }
+      ],
+      "rgb_sha256": "41fa58c95a2fa055b69cec064bc1e3ec096f3f04702d1f538ccc4db46953d68c",
+      "wire_kbps": 40.80625
+    },
+    {
+      "mode": "metadata",
+      "rows": [
+        {
+          "tick": 9,
+          "visibility": 1,
+          "detected": false,
+          "native_error": null,
+          "direct_present": true,
+          "direct_native_error": 1.0
+        },
+        {
+          "tick": 13,
+          "visibility": 1,
+          "detected": false,
+          "native_error": null,
+          "direct_present": true,
+          "direct_native_error": 2.0
+        },
+        {
+          "tick": 18,
+          "visibility": 1,
+          "detected": false,
+          "native_error": null,
+          "direct_present": true,
+          "direct_native_error": 3.0
+        },
+        {
+          "tick": 23,
+          "visibility": 1,
+          "detected": false,
+          "native_error": null,
+          "direct_present": true,
+          "direct_native_error": 1.4142135623730951
+        },
+        {
+          "tick": 28,
+          "visibility": 1,
+          "detected": false,
+          "native_error": null,
+          "direct_present": true,
+          "direct_native_error": 2.23606797749979
+        },
+        {
+          "tick": 33,
+          "visibility": 0,
+          "detected": false,
+          "native_error": null,
+          "direct_present": true,
+          "direct_native_error": null
+        },
+        {
+          "tick": 37,
+          "visibility": 0,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 42,
+          "visibility": 0,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 47,
+          "visibility": 0,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 52,
+          "visibility": 0,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 57,
+          "visibility": 0,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        },
+        {
+          "tick": 61,
+          "visibility": 0,
+          "detected": false,
+          "native_error": null,
+          "direct_present": false,
+          "direct_native_error": null
+        }
+      ],
+      "rgb_sha256": "41fa58c95a2fa055b69cec064bc1e3ec096f3f04702d1f538ccc4db46953d68c",
+      "wire_kbps": 41.2125
+    }
+  ],
+  "gpu": "NVIDIA RTX 6000 Ada Generation",
+  "checkpoint_sha256": "9d391239ab10c733f8e5bfadf16ab72838e7a8ebc88e8ae2038501c03d42b4bb",
+  "settings": {
+    "frames_in": 3,
+    "frames_out": 3,
+    "step": 1,
+    "threshold": 0.5
+  },
+  "seconds": 10.272348926009727
+}

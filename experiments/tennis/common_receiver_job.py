@@ -17,7 +17,6 @@ import numpy as np
 from experiments.tennis import common_player_packet as packet
 from experiments.tennis import common_receiver_manifest as manifest
 from experiments.tennis import player_requalification as replay
-from experiments.tennis.player_reference_review import UNITS
 
 MODULE = "experiments.tennis.common_receiver_job"
 WEIGHT_PATHS = (
@@ -33,7 +32,7 @@ WEIGHT_PATHS = (
 
 
 def generation_forecast(
-    timing: dict, render_seconds: float, available: float, full_cap: int
+    timing: dict, render_seconds: float, available: float, full_cap: int, margin: float = 1.25
 ) -> dict:
     """Scale the actual 44-tick render, keeping measured initialization and isolation fixed."""
     wall = timing["worker_wall_seconds"]
@@ -42,14 +41,16 @@ def generation_forecast(
         or render_seconds > wall
     ):
         raise ValueError("invalid generation smoke clock")
-    estimate = 1.25 * (wall - render_seconds + render_seconds * 240 / 44) + 90
+    if not math.isfinite(margin) or margin < 1.25:
+        raise ValueError("invalid forecast margin")
+    estimate = margin * (wall - render_seconds + render_seconds * 240 / 44) + 90
     if estimate > min(full_cap, available - 60):
         raise ValueError(f"forecast {estimate:.1f}s exceeds full cap or remaining lifecycle")
     return {
         "forecast_seconds": estimate,
         "remaining_seconds": available,
         "full_cap_seconds": full_cap,
-        "basis": "1.25*(44-tick wall minus render-and-save + 240/44 times render-and-save) + 90; reserve 60s teardown",
+        "basis": f"{margin}*(44-tick wall minus render-and-save + 240/44 times render-and-save) + 90; reserve 60s teardown",
     }
 
 
@@ -94,6 +95,14 @@ def check_generated(args: argparse.Namespace, output: Path) -> tuple[dict, list[
         or not 0 < row["render_and_save_seconds"] < 2700
     ):
         raise ValueError("crop identity or CUDA kernel evidence")
+    if "RTX A6000" in receipt["device"]:
+        kernels = row["kernels"]
+        if (
+            "flash" not in kernels.get("attention_family", [])
+            or not set(kernels.get("tensor_core_like", [])).intersection({"cutlass", "xmma", "s16816", "hmma"})
+            or (args.frames == 44 and len(row.get("repeat_8_sha256", "")) != 64)
+        ):
+            raise ValueError("A6000 qualification or repeatability proof missing")
     _, roles, units = packet.unpack(args.carrier.read_bytes())
     (unit,) = units[args.unit]
     if (
@@ -124,6 +133,12 @@ def validate_args(args: argparse.Namespace) -> None:
         or not 1 <= args.full_cap <= 2700
     ):
         raise ValueError("invalid receiver stage contract")
+    if replay.sha256(args.carrier) != args.carrier_sha256:
+        raise ValueError("carrier identity")
+    profile = packet._embedded_profile(args.carrier.read_bytes())
+    packet._profile(profile)
+    if args.unit not in profile["order"]:
+        raise ValueError("requested unit is absent from the paid carrier")
 
 
 def bind_allocation(stage: Path) -> None:
@@ -139,7 +154,7 @@ def bind_allocation(stage: Path) -> None:
         or spec["gpu_sharing"] != {"mode": "exclusive"}
         or dispatch["contention_policy"] != {"policy": "stop", "resume_attempts": 0}
         or spec["gpu_memory_mib"] != 18000
-        or gpu["name"] != "NVIDIA RTX 6000 Ada Generation"
+        or gpu["name"] not in {"NVIDIA RTX 6000 Ada Generation", "NVIDIA RTX A6000"}
         or not uuid.startswith("GPU-")
         or uuid != os.environ.get("PS_CLAIMED_GPU_UUID")
         or uuid != os.environ.get("CUDA_VISIBLE_DEVICES")
@@ -233,7 +248,9 @@ def validate(parser: argparse.ArgumentParser) -> None:
     (row,) = receipt["outputs"]
     if args.frames == 44:
         available = dispatch["campaign_clock"]["budget_end"] - time.monotonic()
-        cost = generation_forecast(timing, row["render_and_save_seconds"], available, args.full_cap)
+        profile = packet._embedded_profile(args.carrier.read_bytes())
+        margin = 1.5 if profile["recipe"]["fps"] == [25, 1] else 1.25
+        cost = generation_forecast(timing, row["render_and_save_seconds"], available, args.full_cap, margin)
     else:
         cost = actual_full_cost(timing, args.full_cap)
     report = {
@@ -258,7 +275,7 @@ def main() -> None:
     run.add_argument("--weight", type=Path, required=True, action="append")
     run.add_argument("--deny", type=Path, required=True, action="append")
     run.add_argument("--carrier-sha256", required=True)
-    run.add_argument("--unit", choices=UNITS, required=True)
+    run.add_argument("--unit", required=True)
     run.add_argument("--frames", type=int, choices=(44, 240), required=True)
     run.add_argument("--full-cap", required=True, type=int)
     sub.add_parser("validate-stage")

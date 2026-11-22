@@ -1,0 +1,73 @@
+{
+  "producer": "20261030T221148Z-4973d2f4",
+  "recovery": "20261122T035934Z-8f78ba52",
+  "producer_archive_sha256": "63104b7832ab9d8f8e6125bc2acf852feffd4954ff3950ce33d08f6523270e49",
+  "recovery_full_archive_sha256": "25bac621337a9eae0d023f876aa3eaf96a18961c52a6071acc9b17792df24394",
+  "packet_sha256": "08ca4898595d5e78c5f634559acd1fc13af369e2d07c3d4170c1cc764633d214",
+  "complete_bytes": 24494,
+  "native_size": [
+    960,
+    544
+  ],
+  "fps": 25,
+  "frames": 240,
+  "kbps": 20.411666666666665,
+  "raw_sha256": "bac9b77792126c748a7640eee2ce80649f54c2509d5973623d06e1ed35b931bb",
+  "original_decoder_processes": 2,
+  "original_passes_per_process": 2,
+  "original_hashes_reproduced": true,
+  "recovery_report": {
+    "ticks": [
+      10,
+      110,
+      230
+    ],
+    "window": "al028",
+    "historical_passes_verified": 4,
+    "frames_verified": 240,
+    "fps": 25,
+    "size": [
+      960,
+      544
+    ],
+    "kbps": 20.411666666666665,
+    "packet_sha256": "08ca4898595d5e78c5f634559acd1fc13af369e2d07c3d4170c1cc764633d214",
+    "hashes": [
+      "4bd782c0f2a4b5dffe60887318a15808535d9961fee6ed1821fdfcc76abf7058",
+      "30340dfd9f1a6379ab9d69f166d9983f89d5b7472bbbab381e6fdd2053950904",
+      "9c9275fc8b9fa516a8cd3d9ce0d5edba603cc798c9cb130c33ccc8702f2c1ead"
+    ],
+    "stroke_sha256": "a37d5e878120ca5431d37eb11ec985d793d72161273ec70ec6b8f98385ce1a6a",
+    "full_yuv_sha256": "bac9b77792126c748a7640eee2ce80649f54c2509d5973623d06e1ed35b931bb",
+    "replay": {
+      "qp": 24,
+      "kbps": 20.411666666666665,
+      "bytes": 24494,
+      "packet_sha256": "08ca4898595d5e78c5f634559acd1fc13af369e2d07c3d4170c1cc764633d214",
+      "passes": 2,
+      "historical_frame_hashes_matched": 240,
+      "decoder_environment": {
+        "capability": [
+          8,
+          9
+        ],
+        "cuda_visible_devices": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+        "cwd": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/opt/DCVC",
+        "device_name": "NVIDIA RTX 6000 Ada Generation",
+        "extension": {
+          "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/opt/dcvc-extensions/sm89/inference_extensions_cuda.cpython-312-x86_64-linux-gnu.so",
+          "sha256": "0bc03d4064794f9e846fdf11fc3f7a197b7608b658718c71c8d6e66444629131",
+          "variant": "sm89"
+        },
+        "python": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+        "torch": "2.10.0+cu128",
+        "torch_cuda": "12.8"
+      },
+      "raw_sha256": "bac9b77792126c748a7640eee2ce80649f54c2509d5973623d06e1ed35b931bb",
+      "decode_seconds": 9.225819488987327
+    },
+    "shared_allocator": true,
+    "stage": "full",
+    "elapsed_seconds": 9.560430337995058
+  }
+}

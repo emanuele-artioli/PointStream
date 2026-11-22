@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.adelaide_metadata_ladder"
+  ],
+  "arguments": [
+    "--source",
+    "{staged:source}",
+    "--sender",
+    "{staged:sender}",
+    "--labels",
+    "{staged:labels}",
+    "--weights",
+    "{staged:weights}",
+    "--frames",
+    "{frames}"
+  ],
+  "staged_inputs": [
+    {
+      "name": "source",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/adelaide410-prospective-20261122/original.mp4",
+      "sha256": "5a81a835c16a1b511f4b581748254b809c3a5d96105113974f6a49b7c8e2182b",
+      "extract": false
+    },
+    {
+      "name": "sender",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T001405Z-f4c93f8f/full/sender.json",
+      "sha256": "ae767062d519b849c8f0769b5d090ec54a84869b81e7832e5c169c12daa867be",
+      "extract": false
+    },
+    {
+      "name": "labels",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/adelaide410-prospective-20261122/official.csv",
+      "sha256": "6bbf0e3bb81a586aa3981edc40f4ea5eab0a0b36542f626d61fe12614cf14f1d",
+      "extract": false
+    },
+    {
+      "name": "weights",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/adelaide410-prospective-20261122/original.mp4",
+      "sha256": "5a81a835c16a1b511f4b581748254b809c3a5d96105113974f6a49b7c8e2182b"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T001405Z-f4c93f8f/full/sender.json",
+      "sha256": "ae767062d519b849c8f0769b5d090ec54a84869b81e7832e5c169c12daa867be"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/adelaide410-prospective-20261122/official.csv",
+      "sha256": "6bbf0e3bb81a586aa3981edc40f4ea5eab0a0b36542f626d61fe12614cf14f1d"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "required_commands": [],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.adelaide_metadata_ladder",
+    "--validate"
+  ],
+  "deadline": "2026-11-22T04:30:00Z",
+  "verify_staged_inputs": true,
+  "stall_seconds": 1600,
+  "contention": {
+    "policy": "stop",
+    "resume_attempts": 0
+  },
+  "device": "cpu",
+  "hosts": [
+    "gpu1",
+    "gpu2",
+    "gpu3",
+    "gpu4",
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [],
+  "gpu_memory_mib": 0,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "local_storage_gib": 30,
+  "smoke": {
+    "seconds": 350,
+    "representative_basis": "16 real source frames through the complete fixed plain AV1 and PSBL metadata rate ladder, verified native decode, and post-decision quality; 1.5\u00d7 forecast gates full."
+  },
+  "full": {
+    "seconds": 1350
+  },
+  "validator_seconds": 60,
+  "budget_seconds": 1800,
+  "scale": {
+    "frames": {
+      "smoke": 16,
+      "full": 64
+    }
+  }
+}

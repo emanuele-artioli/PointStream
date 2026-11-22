@@ -1,0 +1,299 @@
+{
+  "frames": 240,
+  "direct_errors": {
+    "10": null,
+    "30": null,
+    "50": 1.118033988749895,
+    "70": 0.4852941176470722,
+    "90": 5.207647590381428,
+    "110": 2.0390330329208854,
+    "130": 0.014705882352927802,
+    "150": 5.043603129306626,
+    "170": 5.374310931931618,
+    "190": 1.3239378454765665,
+    "210": 2.0091163338409683,
+    "230": 3.114905842606556
+  },
+  "direct_parse_median_ns": 1433714,
+  "parse_samples_ns": [
+    1718363,
+    1449099,
+    1433714,
+    1410041,
+    1422035,
+    2292239,
+    1469430,
+    1397272,
+    1446484,
+    1370057,
+    1424428
+  ],
+  "results": {
+    "ordinary": {
+      "rows": [
+        {
+          "tick": 10,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 30,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 50,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 70,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 90,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 110,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 130,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 150,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 170,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 190,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 210,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 230,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        }
+      ],
+      "hits5": 0,
+      "hits10": 0,
+      "input_sha256": "ac9cd54f1f28e5215ef578f75341950372bb150ead443d20c0740b642ade67fb",
+      "inference_seconds": 4.600663074001204
+    },
+    "joint": {
+      "rows": [
+        {
+          "tick": 10,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 30,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 50,
+          "error": 1.3392106682678533,
+          "hit5": true,
+          "hit10": true
+        },
+        {
+          "tick": 70,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 90,
+          "error": 3.3950961510804194,
+          "hit5": true,
+          "hit10": true
+        },
+        {
+          "tick": 110,
+          "error": 2.409543325269278,
+          "hit5": true,
+          "hit10": true
+        },
+        {
+          "tick": 130,
+          "error": 2.5623510487518395,
+          "hit5": true,
+          "hit10": true
+        },
+        {
+          "tick": 150,
+          "error": 10.543201499836528,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 170,
+          "error": 2.7651035149217775,
+          "hit5": true,
+          "hit10": true
+        },
+        {
+          "tick": 190,
+          "error": 4.524005807353025,
+          "hit5": true,
+          "hit10": true
+        },
+        {
+          "tick": 210,
+          "error": 2.7569387598233557,
+          "hit5": true,
+          "hit10": true
+        },
+        {
+          "tick": 230,
+          "error": 6.238565876866367,
+          "hit5": false,
+          "hit10": true
+        }
+      ],
+      "hits5": 7,
+      "hits10": 8,
+      "input_sha256": "a25046c6caa5367d6858394031a63b9fe3c761e856addd8c2b23dda56d179cff",
+      "inference_seconds": 4.695478373992955
+    },
+    "neural": {
+      "rows": [
+        {
+          "tick": 10,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 30,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 50,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 70,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 90,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 110,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 130,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 150,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 170,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 190,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 210,
+          "error": null,
+          "hit5": false,
+          "hit10": false
+        },
+        {
+          "tick": 230,
+          "error": 1016.1594978151805,
+          "hit5": false,
+          "hit10": false
+        }
+      ],
+      "hits5": 0,
+      "hits10": 0,
+      "input_sha256": "327d613e04ce3abc61b960e7d3a9e0adc3bab3ec9b7d855e41081a7fb43d850f",
+      "inference_seconds": 4.417553540988592
+    }
+  },
+  "costs_bytes": {
+    "ordinary": 12974,
+    "joint": 12927,
+    "joint_cold": 257266,
+    "neural": 12270
+  },
+  "gpu": "NVIDIA RTX 6000 Ada Generation",
+  "capability": [
+    8,
+    9
+  ],
+  "model_seconds": 0.4849986490153242,
+  "elapsed_seconds": 40.40934736598865,
+  "settings": [
+    3,
+    3,
+    1,
+    0.5
+  ],
+  "weights": "9d391239ab10c733f8e5bfadf16ab72838e7a8ebc88e8ae2038501c03d42b4bb",
+  "config": "6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d",
+  "neural_full_yuv_sha256": "48f7dd5973fc376f6fabe736e37cdfc0f79588479d29ceb4e9e14943e48e2dbf",
+  "neural_packet_sha256": "1d5c6f5e19e360b038e73ad8018075854ecea98c0a9ed05d3801f492bf02a30b",
+  "joint_wire_sha256": "26b35756f5b038dbf509115d38eda8606913726109aaba3dcf20b6e79372e6d0",
+  "label_sha256": "9918c87fa6a309052bbac8ef0be21429885e6579fd632754ed9aeb343c912d8a",
+  "ordinary_prior_agreement": true
+}
