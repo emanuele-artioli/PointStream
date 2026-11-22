@@ -1,4 +1,5 @@
 """Bind the independent source labels to the original four displays without revealing modes to inference."""
+
 import argparse
 import hashlib
 import json
@@ -16,7 +17,10 @@ def digest(raw):
 
 def prepare(review, truths, display, destination):
     destination.mkdir()
-    assert digest(truths.read_bytes()) == TRUTHS and digest((display / "result.json").read_bytes()) == DISPLAY
+    assert (
+        digest(truths.read_bytes()) == TRUTHS
+        and digest((display / "result.json").read_bytes()) == DISPLAY
+    )
     labels = json.loads(truths.read_text())["frames"]
     packet = json.loads((review / "review.json").read_text())
     shots = {r["frame_index"]: r for r in packet["frames"]}
@@ -42,17 +46,27 @@ def prepare(review, truths, display, destination):
             direct[tick] = []
             for i in (1, 2):
                 key = f"{tick:03d}/receiver-mask-{i}"
-                assert digest((display / "private-review" / (key + ".png")).read_bytes()) == original[key]
+                assert (
+                    digest((display / "private-review" / (key + ".png")).read_bytes())
+                    == original[key]
+                )
                 direct[tick].append(original[key])
     assert len(keys) == 48 and len(direct) == 12
     smoke = {arm: key for key, (arm, t) in keys.items() if t == 10}
-    report = dict(display_sha256=DISPLAY, normalized_labels_sha256=TRUTHS, archive_sha256=digest((destination / "frames.zip").read_bytes()), smoke=smoke, keys=keys, receiver_masks=direct)
-    (destination / "binding.json").write_text(json.dumps(report,indent=2)+"\n")
+    report = dict(
+        display_sha256=DISPLAY,
+        normalized_labels_sha256=TRUTHS,
+        archive_sha256=digest((destination / "frames.zip").read_bytes()),
+        smoke=smoke,
+        keys=keys,
+        receiver_masks=direct,
+    )
+    (destination / "binding.json").write_text(json.dumps(report, indent=2) + "\n")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("review", "truths", "display", "destination"):
-        parser.add_argument(name,type=Path)
-    a=parser.parse_args()
-    prepare(a.review,a.truths,a.display,a.destination)
+        parser.add_argument(name, type=Path)
+    a = parser.parse_args()
+    prepare(a.review, a.truths, a.display, a.destination)

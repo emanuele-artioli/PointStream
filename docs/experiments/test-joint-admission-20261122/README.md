@@ -7,3 +7,11 @@ Run the same K8b court registration (6-pixel criterion, ≥80% original ticks). 
 Court screening request `20261122T091903Z-459c0b1b` uses the three actual clips, revision 113b8f49, one campus CPU, full-stage cap 2,300 seconds and deadline 15:01 UTC. Inspect this ID before any retry.
 
 Court screening passed after testing all 720 original frames. It fit 239/240 on match108 and all 240 on each of match102 and match120. The six fixed source thumbnails of each show a two-player rally and no sampled cutaway. The scoreboard identifies three distinct pairings: Fritz–Draper (outdoor BMW Open), Sinner–Shelton (Shanghai) and Gaston–Thiem (Gstaad). The lower player at the edge in the first match and the briefly appearing scoreboard on the third remain in the stream. These are sampled visual identifications and do not establish full training-set independence. All three proceed to the same production-player eligibility test. Its per-clip 1,500 GPU-second cap ensures an aggregate bound of 75 GPU-minutes. [Source-only screen](court-summary.json)
+
+First native feature job for match108: `20261122T095000Z-7a5c577c`, code befcafe5a4d7, deadline 15:01 UTC. First-stage artifact and runtime gate the two remaining identical feature requests.
+
+The match108 smoke and full-stage rechecks both passed, with full paired ticks [240, 0]. The technical/computational validator passed independently of whether both people met the 240-tick admission condition. Continue the two already registered TEST cases. [Fritz–Draper coverage](match108-outcome.json)
+
+match102 frozen feature request `20261122T095722Z-14da4d11`, source `dd737cab3edf`, deadline 15:01 UTC.
+
+match120 frozen feature request `20261122T095721Z-38270ee7`, source `dd737cab3edf`, deadline 15:01 UTC.
