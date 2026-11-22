@@ -16,6 +16,7 @@ from experiments.tennis import cohort_ball_score as cohort
 from experiments.tennis import k5d_source_oracle as oracle
 from experiments.tennis import shanghai_ball_frozen_score as prior
 from experiments.tennis.k5b_monotrack_cpu import CpuZoo
+from experiments.tennis.k5b_trackers import Zoo
 from src.codecs import svtav1
 from src.pointstream import ball
 
@@ -53,7 +54,16 @@ def run(a):
     start = time.monotonic()
     n = a.frames
     assert n == {"smoke": 24, "full": 240}[os.environ["PS_STAGE"]]
-    assert len(os.sched_getaffinity(0)) == 1 and os.environ.get("CUDA_VISIBLE_DEVICES") == ""
+    assert len(os.sched_getaffinity(0)) == 1
+    if a.cuda:
+        assert torch.cuda.device_count() == 1 and list(torch.cuda.get_device_capability(0)) == [
+            8,
+            9,
+        ]
+        assert "6000 Ada" in torch.cuda.get_device_name(0)
+        torch.backends.cudnn.benchmark = False
+    else:
+        assert os.environ.get("CUDA_VISIBLE_DEVICES") == ""
     cv2.setNumThreads(1)
     torch.set_num_threads(1)
     meta = json.loads(a.metadata.read_text())
@@ -89,9 +99,13 @@ def run(a):
     labels = cohort.marks(a.labels, a.labels_sha, n)
     oracle.bind_config(a.wasb_code, prior.CONFIG)
     assert cohort.sha(a.wasb_weights / "wasb_tennis_best.pth.tar") == prior.WEIGHT
-    net = CpuZoo(a.wasb_code, a.wasb_weights, names=("wasb-step1",))
+    init_started = time.monotonic()
+    net = (Zoo if a.cuda else CpuZoo)(a.wasb_code, a.wasb_weights, names=("wasb-step1",))
+    init_seconds = time.monotonic() - init_started
     config = net.settings["wasb-step1"]["cfg"]
-    assert next(net.settings["wasb-step1"]["net"].parameters()).device.type == "cpu"
+    assert next(net.settings["wasb-step1"]["net"].parameters()).device.type == (
+        "cuda" if a.cuda else "cpu"
+    )
     assert (
         config["model"]["frames_in"],
         config["model"]["frames_out"],
@@ -121,6 +135,8 @@ def run(a):
         judge_checkpoint_sha256=prior.WEIGHT,
         rgb_sha256={name: hashlib.sha256(arr).hexdigest() for name, arr in display.items()},
         judge_config_sha256=prior.CONFIG,
+        device=torch.cuda.get_device_name(0) if a.cuda else "cpu",
+        model_init_seconds=init_seconds,
         elapsed=time.monotonic() - start,
     )
     (Path(os.environ["PS_STAGE_DIR"]) / "judge.json").write_text(
@@ -147,7 +163,10 @@ def validate():
         and all(len(h) == 64 for h in r["rgb_sha256"].values()),
     )
     if r["frames"] == 24:
-        checks["forecast"] = 1.5 * r["elapsed"] * 10 + 80 < 2300
+        setup = r.get("model_init_seconds", 0.0)
+        checks["forecast"] = 1.5 * (setup + (r["elapsed"] - setup) * 10) + (
+            20 if r.get("device", "cpu") != "cpu" else 80
+        ) < (310 if r.get("device", "cpu") != "cpu" else 2300)
     passed = all(checks.values())
     Path(os.environ["PS_VALIDATION_PATH"]).write_text(
         json.dumps(dict(passed=passed, checks=checks)) + "\n"
@@ -173,5 +192,6 @@ if __name__ == "__main__":
         p.add_argument("--" + key)
     p.add_argument("--frames", type=int)
     p.add_argument("--validate", action="store_true")
+    p.add_argument("--cuda", action="store_true")
     args = p.parse_args()
     validate() if args.validate else run(args)

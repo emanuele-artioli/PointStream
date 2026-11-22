@@ -81,6 +81,29 @@ def create(a):
         budget_seconds=full_seconds + 600,
         stall_seconds=full_seconds + 15,
     )
+    if getattr(a, "cuda", False):
+        assert a.kind == "judge"
+        gpu = json.loads(
+            (HERE.parent / "ball-matched-low-20261122/refit-judge-spec.json").read_text()
+        )
+        r.pop("single_cpu_campaign", None)
+        r.update(
+            device="gpu",
+            hosts=gpu["hosts"],
+            gpu_models=gpu["gpu_models"],
+            gpu_memory_mib=gpu["gpu_memory_mib"],
+            gpu_sharing={"mode": "exclusive"},
+            smoke=dict(
+                seconds=115,
+                representative_basis="Real full-pixel identities, previously validated WASB CUDA model, all three arms on the first 24 source ticks and conservative cost check.",
+            ),
+            full=dict(seconds=310),
+            stall_seconds=320,
+            validator_seconds=35,
+            budget_seconds=510,
+        )
+        r["arguments"] += ["--cuda"]
+        r["validator"] += ["--cuda"]
     with a.out.open("x") as f:
         json.dump(r, f, indent=2)
         f.write("\n")
@@ -94,4 +117,5 @@ if __name__ == "__main__":
         p.add_argument("--" + k, type=Path, required=True)
     for k in ("neural-status", "neural-archive-sha"):
         p.add_argument("--" + k, type=Path)
+    p.add_argument("--cuda", action="store_true")
     create(p.parse_args())
