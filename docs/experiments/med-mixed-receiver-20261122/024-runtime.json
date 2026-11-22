@@ -1,0 +1,49 @@
+{
+  "tracks": [
+    {
+      "name": "medvedev_struff__024_at120__person_000000000002",
+      "active_ticks": 120,
+      "render_and_save_sec": 588.6034105120052,
+      "frames_per_sec": 0.203872417075559,
+      "device": "NVIDIA RTX A6000",
+      "job": "20261122T113408Z-c5b3bc3d",
+      "archive_sha256": "068a6406f6867b1bee57868067a50319964f0c6bed661c39ed99834deb3366eb",
+      "active_status": {
+        "composed": 120
+      },
+      "nonempty": 120
+    },
+    {
+      "name": "medvedev_struff__024_at120__person_000000000004",
+      "active_ticks": 120,
+      "render_and_save_sec": 958.0802963280003,
+      "frames_per_sec": 0.1252504622628392,
+      "device": "NVIDIA RTX A6000",
+      "job": "20261122T113519Z-b4358ef0",
+      "archive_sha256": "48e2da8d38819ddbb418055bbac92f62557e4d66837ff8c9db5be6638efda2ef",
+      "active_status": {
+        "composed": 120
+      },
+      "nonempty": 120
+    }
+  ],
+  "finish_job": "20261122T131301Z-aebb0fec",
+  "finish_gpu": {
+    "major": 8,
+    "minor": 9,
+    "uuid": "dbbb295f-6156-1133-8658-841f3f5b17d0",
+    "visible_uuid": "dbbb295f-6156-1133-8658-841f3f5b17d0"
+  },
+  "native_decode_sec": 0.08288467998499982,
+  "sam_model_load_sec": 11.951790368999355,
+  "sam_per_frame_sum_sec": 18.238261627149768,
+  "composite_loop_sec": 39.00452546699671,
+  "other_loop_work_sec": 20.766263839846943,
+  "isolated_finish_sec": 54.30998014000943,
+  "archive_sec": 7.745560573996045,
+  "phase_cpu_verification_sec": 5.870434879994718,
+  "frames": 240,
+  "active_ticks": 120,
+  "fallback_ticks": 120,
+  "measured_scope": "Cumulative render-and-save per individual with actual device; full-image native decode, model load and per-tick SAM/loop times at receiver. Offline verification and archive assembly reported separately. Benchmarked stages may overlap when running different players on independent devices."
+}
