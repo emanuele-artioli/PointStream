@@ -27,12 +27,12 @@ def region_map(features, payload, n, width, height, work):
         f = json.load(tar.extractfile(prefix + "features.json"))
         rle = tar.extractfile(prefix + "sam-masks.rle").read()
     if mask_format.zstd is None and rle.startswith(b"\x28\xb5\x2f\xfd"):
-        rle = subprocess.run(
+        raw = subprocess.run(
             ["zstd", "-q", "-d", "-c"], input=rle, check=True, capture_output=True
         ).stdout
-    path = work / "source-masks.rle"
-    path.write_bytes(rle)
-    clip = ClipMasks.load(path)
+    else:
+        raw = mask_format.decompress(rle)
+    clip = ClipMasks.from_doc(json.loads(raw))
     assert len(clip.frames) == 240
     pos, _ = ball.decode_frames(payload.read_bytes(), 240, 960, 544)
     regions = np.zeros((n, 540, 960), bool)
