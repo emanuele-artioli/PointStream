@@ -1,0 +1,39 @@
+{
+  "source_sha256": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+  "source_grid_sha256": "7d706c8d9ff2f45ac1c5dc810afa7361a5a390681ea4d7067a72d2673c7063d0",
+  "source_body_support": "88e0b197dd16d18a7c1989601637f045859de1d18ac3756d3eb1f280c3d2eb64",
+  "matched_person_transitions": 478,
+  "each_source_support_and_motion_match": true,
+  "arms": {
+    "ordinary-320-warm": {
+      "n": 478,
+      "error": 10.292875626229653,
+      "source_delta": 8.565914759220005,
+      "decoded_delta": 3.569916979242194,
+      "job": "20261122T141106Z-e1d3e349",
+      "bytes": 12862,
+      "kbps": 25.724,
+      "motion_sha256": "1dc49d19a347e004686ef508b45ca58709e096af811b7937a9f40e8b1ecc342e"
+    },
+    "dcvc-480-q26": {
+      "n": 478,
+      "error": 10.036945688175855,
+      "source_delta": 8.565914759220005,
+      "decoded_delta": 4.459379762909901,
+      "job": "20261122T141901Z-a490196a",
+      "bytes": 12305,
+      "kbps": 24.61,
+      "motion_sha256": "ae5b083f1eb76e4aeecc33372b009600ff7ac1dd670833cfa7d68721e5e59bae"
+    },
+    "joint-crf70": {
+      "n": 478,
+      "error": 16.526048317115176,
+      "source_delta": 8.565914759220005,
+      "decoded_delta": 12.31169177099252,
+      "job": "20261122T225842Z-00543e57",
+      "bytes": 12890,
+      "kbps": 25.78,
+      "motion_sha256": "68070f0813866ec23c186e18fcff6def8564271162d451c78de3a4180365fd60"
+    }
+  }
+}
