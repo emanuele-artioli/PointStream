@@ -1,0 +1,46 @@
+{
+  "priorities": [
+    "complete native 60 fps joint receiver on the first eligible independent event",
+    "degraded source-matched ordinary and neural controls",
+    "two additional paid operating points after exact native self-replay if resources allow"
+  ],
+  "deadline_utc": "2026-11-22T21:01:00Z",
+  "gpu_seconds_cap": 10800,
+  "cpu_seconds_cap": 14400,
+  "event": "match127",
+  "source_sha256": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+  "gpu_seconds_used_so_far": 0,
+  "jobs": {
+    "sender": {
+      "id": "20261122T132643Z-4f79b8f4",
+      "revision": "bdb98f5e7da626d1e781061912ceed4ced1a8609",
+      "source_archive_sha256": "5021e646a1a7e30a23e796a510973144a1880a4b4b1b2f36aad462e94087358c",
+      "spec_sha256": "448d1498ebe2c498ab3def7d3b65681146de6dc8e2783edb40161217e261a508",
+      "state_at_registration": "pending",
+      "terminal_reason": "No host allocated. Legacy bare PATH qualification expected dav1d outside the packed environment. The recorded cancellation incurred no compute."
+    },
+    "sender_packed": {
+      "id": "20261122T134208Z-0e12634b",
+      "revision": "846d5a7c7047b00f42d558e446a1e3f12ecbcd71",
+      "source_archive_sha256": "5f8d9aad2682dceb1d9d9a5d9e1da01a52f182552d665542ea486ddd942dd7ee",
+      "spec_sha256": "862ac08e6df50f50b20f20e0aa9e1e73c4098dfeb07ace689533b07dee45bef4",
+      "state_at_registration": "pending",
+      "outcome": "Complete, 240 native ticks, CRF70 picked by bytes; 12,890 warm/162,340 cold.",
+      "terminal": "complete"
+    },
+    "generator_far": {
+      "id": "20261122T134803Z-0408c86a",
+      "revision": "f7d47b8f1553dec20886c971c6f3f3da83cc0144",
+      "source_archive_sha256": "cec689704a7d4658a8983f29c3bed5afdfb9081c0d4f679e94cf38153be5ab16",
+      "spec_sha256": "5d4397421992a544c75e12f083533b94f5072b804340e48220ed665ff248ddbc",
+      "state_at_registration": "pending"
+    },
+    "generator_near": {
+      "id": "20261122T134804Z-ff2bc372",
+      "revision": "f7d47b8f1553dec20886c971c6f3f3da83cc0144",
+      "source_archive_sha256": "cec689704a7d4658a8983f29c3bed5afdfb9081c0d4f679e94cf38153be5ab16",
+      "spec_sha256": "54c26ede4a37fac7e87a1491dfd74e7d297b6543921d44ab2f9501854454b30f",
+      "state_at_registration": "pending"
+    }
+  }
+}
