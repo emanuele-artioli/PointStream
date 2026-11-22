@@ -24,7 +24,8 @@ def restrict_box(x, y, w, h, width, height):
 
 
 def panel(frames, source, mark, inputs, tick):
-    font = "/System/Library/Fonts/Supplemental/Arial.ttf"
+    installed = Path("/System/Library/Fonts/Supplemental/Arial.ttf")
+    font = str(installed) if installed.is_file() else "DejaVuSans.ttf"
     head = ImageFont.truetype(font, 32)
     sub = ImageFont.truetype(font, 21)
     small = ImageFont.truetype(font, 18)
