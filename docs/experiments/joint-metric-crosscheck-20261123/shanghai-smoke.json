@@ -1,0 +1,362 @@
+{
+  "scope": "The four fixed physical Shanghai CRF50 comparison arms, at the original twelve prespecified instants",
+  "source_sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+  "review_sha256": "d664a3ac14f0b273dc5224455468a0ad5bdbdcb3665dc4930adef0e487ca499a",
+  "official_ball_sha256": "0858ae153e5bfa3e9d58a519c24a2f02e61df56f672f95c239302145adcfa6a5",
+  "source_ticks": 240,
+  "sampled_ticks": 1,
+  "source_fps": [
+    30000,
+    1001
+  ],
+  "lpips_model": {
+    "metric": "LPIPS",
+    "net": "alex",
+    "torchmetrics": "1.9.0",
+    "heads": "/private/tmp/ps-20261119-scorer-addon/torchmetrics/functional/image/lpips_models/alex.pth",
+    "heads_sha256": "df73285e35b22355a2df87cdb6b70b343713b667eddbda73e1977e0c860835c0",
+    "backbone": "/Users/manu/.codex/visualizations/2026/11/01/01a196fe-ab4d-70f0-a4b4-6843ca289667/atlas-metric-models/checkpoints/alexnet-owt-7be5be79.pth",
+    "backbone_sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+    "pooling": "crop spatial map, bilinear to native crop, mean over source mask"
+  },
+  "dists_backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+  "runner_sha256": "51b2c4b3bf3ab608be643687e4697c4329a27b52dc05b73e39799eefa39c553f",
+  "torch": "2.8.0",
+  "opencv": "4.10.0",
+  "self_control": {
+    "dists": 0.0,
+    "lpips": 0.0,
+    "luma_ssim": 0.999999999999996,
+    "rgb_psnr": "infinite",
+    "rgb_ms_ssim": 0.9999999999999994,
+    "ms_ssim_implementation_difference": 1.5931163610316545e-05
+  },
+  "forecast_seconds": 120.302275,
+  "cpu_seconds": 15.200725,
+  "arms": {
+    "joint-crf50": {
+      "bytes": 17794,
+      "kbps": 17.776223776223773,
+      "bitstream_sha256": "fdc8fcbb39599348e966f07666a0472cf4cbb9211e8baf7ada44ba59161b7780",
+      "rescore_manifest_sha256": "6230ef5494d9c85cacdee200068775a673740e25055d6c29c17be6f23ba0e321",
+      "means": {
+        "player": {
+          "dists": 0.3195284903049469,
+          "lpips": 0.2818019986152649,
+          "luma_ssim": 0.258665787878696,
+          "rgb_psnr": 12.659583887573252
+        },
+        "ball": {
+          "dists": 0.3468441963195801,
+          "lpips": 0.3679393231868744,
+          "luma_ssim": 0.5625550313246641,
+          "rgb_psnr": 20.389040092382263
+        },
+        "foreground": {
+          "dists": 0.3331863433122635,
+          "lpips": 0.32487066090106964,
+          "luma_ssim": 0.41061040960168005,
+          "rgb_psnr": 16.524311989977758
+        },
+        "whole": {
+          "luma_ssim": 0.790520166666119,
+          "rgb_psnr": 21.376847205251764,
+          "rgb_ms_ssim": 0.8241818714483393
+        }
+      },
+      "rows": [
+        {
+          "tick": 9,
+          "source_png_sha256": "b0204616dbb310d3ad3db5eaa7123a3870109079f077c8837ae94b2bbf369256",
+          "decoded_rgb_sha256": "4a51a4e21d151c91cd7b8ad2d77a713b8561de3234d16759186042a9d387b4b3",
+          "regions": {
+            "person:000000000000": {
+              "dists": 0.3071085214614868,
+              "lpips": 0.32689058780670166,
+              "luma_ssim": 0.24818364569237422,
+              "rgb_psnr": 11.760996287715228
+            },
+            "person:000000000001": {
+              "dists": 0.331948459148407,
+              "lpips": 0.23671340942382812,
+              "luma_ssim": 0.2691479300650178,
+              "rgb_psnr": 13.558171487431277
+            },
+            "ball": {
+              "dists": 0.3468441963195801,
+              "lpips": 0.3679393231868744,
+              "luma_ssim": 0.5625550313246641,
+              "rgb_psnr": 20.389040092382263
+            }
+          },
+          "foreground": {
+            "dists": 0.3331863433122635,
+            "lpips": 0.32487066090106964,
+            "luma_ssim": 0.41061040960168005,
+            "rgb_psnr": 16.524311989977758
+          },
+          "player": {
+            "dists": 0.3195284903049469,
+            "lpips": 0.2818019986152649,
+            "luma_ssim": 0.258665787878696,
+            "rgb_psnr": 12.659583887573252
+          },
+          "ball": {
+            "dists": 0.3468441963195801,
+            "lpips": 0.3679393231868744,
+            "luma_ssim": 0.5625550313246641,
+            "rgb_psnr": 20.389040092382263
+          },
+          "whole": {
+            "luma_ssim": 0.790520166666119,
+            "rgb_psnr": 21.376847205251764,
+            "rgb_ms_ssim": 0.8241818714483393
+          }
+        }
+      ]
+    },
+    "ordinary-640-warm": {
+      "bytes": 17731,
+      "kbps": 17.713286713286713,
+      "bitstream_sha256": "841dc70c6276193b8a3cca8d554576af7b30143228cc0a4e1215e3b84c901360",
+      "rescore_manifest_sha256": "6c711e83c74f5b47c16ee032c71da811a3ad7609b45f06c672c90d4ac523e13c",
+      "means": {
+        "player": {
+          "dists": 0.5136404931545258,
+          "lpips": 0.6617664992809296,
+          "luma_ssim": 0.1894528863809667,
+          "rgb_psnr": 13.280965798987154
+        },
+        "ball": {
+          "dists": 0.2382909059524536,
+          "lpips": 0.2194545567035675,
+          "luma_ssim": 0.779464445744533,
+          "rgb_psnr": 25.339067536984633
+        },
+        "foreground": {
+          "dists": 0.3759656995534897,
+          "lpips": 0.44061052799224854,
+          "luma_ssim": 0.48445866606274984,
+          "rgb_psnr": 19.31001666798589
+        },
+        "whole": {
+          "luma_ssim": 0.8928644551479052,
+          "rgb_psnr": 26.374470180898225,
+          "rgb_ms_ssim": 0.9369184972048396
+        }
+      },
+      "rows": [
+        {
+          "tick": 9,
+          "source_png_sha256": "b0204616dbb310d3ad3db5eaa7123a3870109079f077c8837ae94b2bbf369256",
+          "decoded_rgb_sha256": "934790f9511ad02b946b373a896fc20c5f726e26397147429bf3fd07c815d7fd",
+          "regions": {
+            "person:000000000000": {
+              "dists": 0.4843774437904358,
+              "lpips": 0.7492077350616455,
+              "luma_ssim": 0.29557302431323745,
+              "rgb_psnr": 13.787921983244068
+            },
+            "person:000000000001": {
+              "dists": 0.5429035425186157,
+              "lpips": 0.5743252635002136,
+              "luma_ssim": 0.08333274844869595,
+              "rgb_psnr": 12.774009614730238
+            },
+            "ball": {
+              "dists": 0.2382909059524536,
+              "lpips": 0.2194545567035675,
+              "luma_ssim": 0.779464445744533,
+              "rgb_psnr": 25.339067536984633
+            }
+          },
+          "foreground": {
+            "dists": 0.3759656995534897,
+            "lpips": 0.44061052799224854,
+            "luma_ssim": 0.48445866606274984,
+            "rgb_psnr": 19.31001666798589
+          },
+          "player": {
+            "dists": 0.5136404931545258,
+            "lpips": 0.6617664992809296,
+            "luma_ssim": 0.1894528863809667,
+            "rgb_psnr": 13.280965798987154
+          },
+          "ball": {
+            "dists": 0.2382909059524536,
+            "lpips": 0.2194545567035675,
+            "luma_ssim": 0.779464445744533,
+            "rgb_psnr": 25.339067536984633
+          },
+          "whole": {
+            "luma_ssim": 0.8928644551479052,
+            "rgb_psnr": 26.374470180898225,
+            "rgb_ms_ssim": 0.9369184972048396
+          }
+        }
+      ]
+    },
+    "roi-640-warm": {
+      "bytes": 17736,
+      "kbps": 17.71828171828172,
+      "bitstream_sha256": "9d62dae129c3f7222337257c4673be25e48e66b56ba535d60f6b34192a3339d2",
+      "rescore_manifest_sha256": "73715e6a042db101828c8e1a48d77377e5f786fa1c9631010da2fee8a4fa1a94",
+      "means": {
+        "player": {
+          "dists": 0.5255270600318909,
+          "lpips": 0.6941568553447723,
+          "luma_ssim": 0.18987345871720965,
+          "rgb_psnr": 13.010057115782715
+        },
+        "ball": {
+          "dists": 0.28099822998046875,
+          "lpips": 0.2759098708629608,
+          "luma_ssim": 0.697870568363857,
+          "rgb_psnr": 23.938881808408638
+        },
+        "foreground": {
+          "dists": 0.4032626450061798,
+          "lpips": 0.4850333631038666,
+          "luma_ssim": 0.4438720135405333,
+          "rgb_psnr": 18.474469462095676
+        },
+        "whole": {
+          "luma_ssim": 0.8520654534381755,
+          "rgb_psnr": 24.32317698330675,
+          "rgb_ms_ssim": 0.8944809990973025
+        }
+      },
+      "rows": [
+        {
+          "tick": 9,
+          "source_png_sha256": "b0204616dbb310d3ad3db5eaa7123a3870109079f077c8837ae94b2bbf369256",
+          "decoded_rgb_sha256": "83fda87634a1db12521823fb9a44e5f0e603feca0d0819c77f8e2def69507c60",
+          "regions": {
+            "person:000000000000": {
+              "dists": 0.5233997106552124,
+              "lpips": 0.7557561993598938,
+              "luma_ssim": 0.27273336547985455,
+              "rgb_psnr": 13.328354363041939
+            },
+            "person:000000000001": {
+              "dists": 0.5276544094085693,
+              "lpips": 0.6325575113296509,
+              "luma_ssim": 0.10701355195456476,
+              "rgb_psnr": 12.691759868523489
+            },
+            "ball": {
+              "dists": 0.28099822998046875,
+              "lpips": 0.2759098708629608,
+              "luma_ssim": 0.697870568363857,
+              "rgb_psnr": 23.938881808408638
+            }
+          },
+          "foreground": {
+            "dists": 0.4032626450061798,
+            "lpips": 0.4850333631038666,
+            "luma_ssim": 0.4438720135405333,
+            "rgb_psnr": 18.474469462095676
+          },
+          "player": {
+            "dists": 0.5255270600318909,
+            "lpips": 0.6941568553447723,
+            "luma_ssim": 0.18987345871720965,
+            "rgb_psnr": 13.010057115782715
+          },
+          "ball": {
+            "dists": 0.28099822998046875,
+            "lpips": 0.2759098708629608,
+            "luma_ssim": 0.697870568363857,
+            "rgb_psnr": 23.938881808408638
+          },
+          "whole": {
+            "luma_ssim": 0.8520654534381755,
+            "rgb_psnr": 24.32317698330675,
+            "rgb_ms_ssim": 0.8944809990973025
+          }
+        }
+      ]
+    },
+    "dcvc-480-q34": {
+      "bytes": 17432,
+      "kbps": 17.414585414585414,
+      "bitstream_sha256": "e6c1ab762b0f585d04beaa02d2e3e647ab2ee0084322cbaebe7ea9952a57bf6b",
+      "rescore_manifest_sha256": "e5cb2a62e6471524ac2626ee6197bb4cc34dd86fb4664b0efab8182399514cf3",
+      "means": {
+        "player": {
+          "dists": 0.43421950936317444,
+          "lpips": 0.6722314655780792,
+          "luma_ssim": 0.3832066710699254,
+          "rgb_psnr": 16.535642929068096
+        },
+        "ball": {
+          "dists": 0.2590556740760803,
+          "lpips": 0.2621191740036011,
+          "luma_ssim": 0.7047990874371375,
+          "rgb_psnr": 23.71810955581218
+        },
+        "foreground": {
+          "dists": 0.3466375917196274,
+          "lpips": 0.46717531979084015,
+          "luma_ssim": 0.5440028792535314,
+          "rgb_psnr": 20.12687624244014
+        },
+        "whole": {
+          "luma_ssim": 0.8773411410344673,
+          "rgb_psnr": 25.781684739454903,
+          "rgb_ms_ssim": 0.946017359251057
+        }
+      },
+      "rows": [
+        {
+          "tick": 9,
+          "source_png_sha256": "b0204616dbb310d3ad3db5eaa7123a3870109079f077c8837ae94b2bbf369256",
+          "decoded_rgb_sha256": "b443f0ec6ccb019df77469fc36332f21124013e045e59890710ffa1a8b43a215",
+          "regions": {
+            "person:000000000000": {
+              "dists": 0.4358294606208801,
+              "lpips": 0.7103419899940491,
+              "luma_ssim": 0.43148622201040826,
+              "rgb_psnr": 16.38203358121802
+            },
+            "person:000000000001": {
+              "dists": 0.43260955810546875,
+              "lpips": 0.6341209411621094,
+              "luma_ssim": 0.33492712012944253,
+              "rgb_psnr": 16.689252276918168
+            },
+            "ball": {
+              "dists": 0.2590556740760803,
+              "lpips": 0.2621191740036011,
+              "luma_ssim": 0.7047990874371375,
+              "rgb_psnr": 23.71810955581218
+            }
+          },
+          "foreground": {
+            "dists": 0.3466375917196274,
+            "lpips": 0.46717531979084015,
+            "luma_ssim": 0.5440028792535314,
+            "rgb_psnr": 20.12687624244014
+          },
+          "player": {
+            "dists": 0.43421950936317444,
+            "lpips": 0.6722314655780792,
+            "luma_ssim": 0.3832066710699254,
+            "rgb_psnr": 16.535642929068096
+          },
+          "ball": {
+            "dists": 0.2590556740760803,
+            "lpips": 0.2621191740036011,
+            "luma_ssim": 0.7047990874371375,
+            "rgb_psnr": 23.71810955581218
+          },
+          "whole": {
+            "luma_ssim": 0.8773411410344673,
+            "rgb_psnr": 25.781684739454903,
+            "rgb_ms_ssim": 0.946017359251057
+          }
+        }
+      ]
+    }
+  }
+}
