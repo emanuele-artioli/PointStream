@@ -49,6 +49,20 @@ def source(path, meta, n):
         cap.release()
 
 
+def model(a, work):
+    with tarfile.open(a.archive) as tar:
+        tar.extractall(work / "model", filter="data")
+    tracker = k5b_trackers.BallTrack(work / "model", a.weights, device="cpu")
+    assert not tracker.net.training and next(tracker.net.parameters()).device.type == "cpu"
+
+    def finite(_module, _inputs, out):
+        if not torch.isfinite(out[0]).all():
+            raise ValueError("nonfinite model output")
+
+    tracker.net.register_forward_hook(finite)
+    return tracker
+
+
 def run(a):
     start = time.monotonic()
     assert len(os.sched_getaffinity(0)) == 1 and os.environ.get("CUDA_VISIBLE_DEVICES") == ""
@@ -60,31 +74,45 @@ def run(a):
     cv2.setNumThreads(1)
     work = Path(os.environ["PS_SCRATCH_DIR"]) / "sender"
     work.mkdir()
-    with tarfile.open(a.archive) as tar:
-        tar.extractall(work / "model", filter="data")
-    tracker = k5b_trackers.BallTrack(work / "model", a.weights, device="cpu")
-    assert not tracker.net.training and next(tracker.net.parameters()).device.type == "cpu"
-
-    def finite(_module, _inputs, out):
-        if not torch.isfinite(out[0]).all():
-            raise ValueError("nonfinite model output")
-
-    tracker.net.register_forward_hook(finite)
-    setup_seconds = time.monotonic() - start
     meta = json.loads(a.metadata.read_text())
     n = a.frames
     assert n in (24, 240)
-    frames, fps = source(a.source, meta, n)
-    context = chunks.prepare_context(frames)
-    raw = chunks.predict(tracker, context, 0, n)
-    audit_seconds = 0.0
     prior = json.loads(a.verified_prefix.read_text()) if a.verified_prefix else None
-    if n == 24 and prior is None:
-        audit_started = time.monotonic()
-        assert raw == tracker.run(frames) and raw == chunks.predict(
-            tracker, context, 0, 12
-        ) + chunks.predict(tracker, context, 12, n)
-        audit_seconds = time.monotonic() - audit_started
+    audit_seconds = 0.0
+    part_shas = []
+    if a.part_a is not None or a.part_b is not None:
+        assert a.part_a and a.part_b and prior is None
+        all_frames, fps = source(a.source, meta, 240)
+        frames = all_frames[:n]
+        full_sha = hashlib.sha256(all_frames).hexdigest()
+        raw = []
+        for path, first in ((a.part_a, 0), (a.part_b, 120)):
+            part = json.loads(path.read_text())
+            assert (
+                part["start"] == first and part["stop"] == first + 120 and len(part["raw"]) == 120
+            )
+            assert (
+                part["source_sha256"] == meta["source"]["sha256"]
+                and part["source_rgb_sha256"] == full_sha
+            )
+            assert part["model_sha256"] == sha(a.weights) and part["code_sha256"] == sha(a.archive)
+            assert part["match"] == meta["match"] and part["fps"] == str(fps)
+            raw.extend(part["raw"])
+            part_shas.append(sha(path))
+        raw = raw[:n]
+        setup_seconds = 0.0
+    else:
+        tracker = model(a, work)
+        setup_seconds = time.monotonic() - start
+        frames, fps = source(a.source, meta, n)
+        context = chunks.prepare_context(frames)
+        raw = chunks.predict(tracker, context, 0, n)
+        if n == 24 and prior is None:
+            audit_started = time.monotonic()
+            assert raw == tracker.run(frames) and raw == chunks.predict(
+                tracker, context, 0, 12
+            ) + chunks.predict(tracker, context, 12, n)
+            audit_seconds = time.monotonic() - audit_started
     predictions = [(v, x * 960 / 1280, y * 544 / 720) for v, x, y in raw]
     tools = {k: svtav1.tool(k) for k in ("ffmpeg", "SvtAv1EncApp", "dav1d")}
     convert = k5d_encoder.convert_rgb(tools["ffmpeg"]["path"], frames, work / "source.yuv", fps)
@@ -141,6 +169,7 @@ def run(a):
         seconds=time.monotonic() - start,
         equivalence_audit_seconds=audit_seconds,
         setup_seconds=setup_seconds,
+        source_inference_parts_sha256=part_shas,
         prior_equivalence_receipt_sha256=sha(a.verified_prefix) if a.verified_prefix else None,
     )
     (stage / "sender.json").write_text(json.dumps(result, indent=2) + "\n")
@@ -177,6 +206,8 @@ if __name__ == "__main__":
     for name in ("metadata", "source", "archive", "weights"):
         p.add_argument("--" + name, type=Path)
     p.add_argument("--verified-prefix", type=Path)
+    p.add_argument("--part-a", type=Path)
+    p.add_argument("--part-b", type=Path)
     p.add_argument("--frames", type=int)
     p.add_argument("--validate", action="store_true")
     args = p.parse_args()
