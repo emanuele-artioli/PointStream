@@ -34,14 +34,14 @@
   "staged_inputs": [
     {
       "name": "original",
-      "path": "/home/itec/emanuele/Datasets/archive/pre-reset-2026-10-05/tennis_games/djokovic_zverev/010.mp4",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/frozen-4k-native-courts-20261122/djokovic_zverev-010-10b3c9c9797e.mp4",
       "sha256": "10b3c9c9797e01b540cb1141b8bbfe2ca5eafdd40d80aca889a57d9e74d52e0d",
       "extract": false
     }
   ],
   "inputs": [
     {
-      "path": "/home/itec/emanuele/Datasets/archive/pre-reset-2026-10-05/tennis_games/djokovic_zverev/010.mp4",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/frozen-4k-native-courts-20261122/djokovic_zverev-010-10b3c9c9797e.mp4",
       "sha256": "10b3c9c9797e01b540cb1141b8bbfe2ca5eafdd40d80aca889a57d9e74d52e0d"
     }
   ],

@@ -34,14 +34,14 @@
   "staged_inputs": [
     {
       "name": "original",
-      "path": "/home/itec/emanuele/Datasets/archive/pre-reset-2026-10-05/tennis_games/djokovic_federer/videos/021.mp4",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/frozen-4k-native-courts-20261122/djokovic_federer-021-6423a4073556.mp4",
       "sha256": "6423a40735568eb8fd6b190cfb4e7d636d1fa99cc84e953f760b9ce0f09f6e0b",
       "extract": false
     }
   ],
   "inputs": [
     {
-      "path": "/home/itec/emanuele/Datasets/archive/pre-reset-2026-10-05/tennis_games/djokovic_federer/videos/021.mp4",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/frozen-4k-native-courts-20261122/djokovic_federer-021-6423a4073556.mp4",
       "sha256": "6423a40735568eb8fd6b190cfb4e7d636d1fa99cc84e953f760b9ce0f09f6e0b"
     }
   ],

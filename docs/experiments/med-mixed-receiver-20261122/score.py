@@ -38,10 +38,12 @@ def tensor(image):
 
 
 def main(a):
-    torch.set_num_threads(2)
+    torch.set_num_threads(getattr(a, "threads", 2))
     torch.set_num_interop_threads(1)
     cv2.setNumThreads(1)
     assert sha(a.weights) == WEIGHT and sha(a.source) == SOURCE[a.clip]
+    frame_count = getattr(a, "frame_count", 240)
+    assert frame_count in (24, 240)
     start = {"000": 0, "019": 92, "024": 69, "al031": 0}[a.clip]
     native_fps, active_frames = (25, 240) if a.clip == "al031" else (50, 120)
     schema = json.loads(a.supports.read_text())
@@ -97,18 +99,31 @@ def main(a):
         else:
             assert arm["kind"] == "native_yuv420p" and path.stat().st_size == h * w * 240 * 3 // 2
             vid = np.memmap(path, np.uint8, "r", shape=(240, h * 3 // 2, w))
-        cap = cv2.VideoCapture(str(a.source), cv2.CAP_FFMPEG)
+        video = getattr(a, "canonical", None)
+        canonical = None
+        if video:
+            canonical = json.loads(a.canonical_receipt.read_text())
+            assert (
+                sha(video) == canonical["canonical_sha256"]
+                and canonical["source_sha256"] == SOURCE[a.clip]
+            )
+            assert (
+                canonical["supports_sha256"] == sha(a.supports) and canonical["fps"] == native_fps
+            )
+        cap = cv2.VideoCapture(str(video or a.source), cv2.CAP_FFMPEG)
         assert cap.isOpened() and cap.get(cv2.CAP_PROP_FPS) == native_fps
         accumulated = [0.0, 0.0]
         scores = []
         ball_rows = []
         cpu0 = time.process_time()
         max_source_self = 0.0
-        for t in range(240):
+        for t in range(frame_count):
             ok, bgr = cap.read()
             assert ok
             src = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
             assert src.shape == (1080, 1920, 3)
+            if canonical:
+                assert array_sha(src) == canonical["source_rgb_hashes"][t]
             if "source_rgb_hashes" in schema:
                 assert array_sha(src) == schema["source_rgb_hashes"][t]
             if seq is not None:
@@ -169,17 +184,19 @@ def main(a):
                     )
         cap.release()
         if seq is not None:
-            assert not seq.read(1) and sequence_hash.hexdigest() == arm["sha256"]
+            if frame_count == 240:
+                assert not seq.read(1) and sequence_hash.hexdigest() == arm["sha256"]
             if not streamed:
                 seq.close()
-        assert len(scores) == schema["nonempty"]
+        assert len(scores) == sum(t < frame_count for t, _ in supports)
 
         def mean(rows):
-            return sum(r["dists"] for r in rows) / len(rows)
+            return sum(r["dists"] for r in rows) / len(rows) if rows else None
 
         def psnr(sse, n):
-            return 10 * math.log10(255**2 * (n * 1920 * 1080 * 3) / sse)
+            return 10 * math.log10(255**2 * (n * 1920 * 1080 * 3) / sse) if n else None
 
+        active_observed = sum(start <= t < start + active_frames for t in range(frame_count))
         result = dict(
             arm=arm,
             source_sha256=SOURCE[a.clip],
@@ -190,19 +207,19 @@ def main(a):
                 else "Original W7 source-SAM masks on 12 fixed ticks, native RGB, tight support plus 32-pixel margin, masked DISTS; all-frame native RGB PSNR"
             ),
             native_fps=native_fps,
-            frames=240,
+            frames=frame_count,
             active_start=start,
-            active_frames=active_frames,
-            fallback_frames=240 - active_frames,
+            active_frames=active_observed,
+            fallback_frames=frame_count - active_observed,
             body_rows=scores,
             mean_dists=mean(scores),
             active_dists=mean([r for r in scores if r["active"]]),
             fallback_dists=mean([r for r in scores if not r["active"]])
             if active_frames < 240
             else None,
-            rgb_psnr=psnr(sum(accumulated), 240),
-            active_rgb_psnr=psnr(accumulated[0], active_frames),
-            fallback_rgb_psnr=psnr(accumulated[1], 240 - active_frames)
+            rgb_psnr=psnr(sum(accumulated), frame_count),
+            active_rgb_psnr=psnr(accumulated[0], active_observed),
+            fallback_rgb_psnr=psnr(accumulated[1], frame_count - active_observed)
             if active_frames < 240
             else None,
             source_self_abs=max_source_self,
@@ -214,11 +231,11 @@ def main(a):
             forecast_cpu_seconds=forecast,
         )
         if ball_positions is not None:
-            assert len(ball_rows) == br["present"]
+            assert len(ball_rows) == sum(p is not None for p in ball_positions[:frame_count])
             result["ball"] = dict(
                 method="64x64 native RGB crop at every transmitted source-fitted center",
                 payload_sha256=br["payload_sha256"],
-                total_ticks=240,
+                total_ticks=frame_count,
                 present=len(ball_rows),
                 rows=ball_rows,
                 dists=mean(ball_rows) if ball_rows else None,
@@ -249,5 +266,9 @@ if __name__ == "__main__":
         p.add_argument("--" + key, type=Path, required=True)
     for key in ("ball-payload", "ball-receipt"):
         p.add_argument("--" + key, type=Path)
+    p.add_argument("--canonical", type=Path)
+    p.add_argument("--canonical-receipt", type=Path)
+    p.add_argument("--threads", type=int, default=2)
+    p.add_argument("--frame-count", type=int, choices=(24, 240), default=240)
     p.add_argument("--clip", choices=SOURCE, required=True)
     main(p.parse_args())

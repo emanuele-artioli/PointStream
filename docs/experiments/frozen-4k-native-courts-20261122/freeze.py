@@ -27,6 +27,10 @@ def main():
         )
         tag = r["event"] + "-" + row["shot"]
         path = str(Path(frozen["archive"]) / r["path"])
+        stage_dir = Path(
+            "/home/itec/emanuele/Datasets/pointstream-data/tennis/frozen-4k-native-courts-20261122"
+        )
+        staged_path = str(stage_dir / (tag + "-" + r["sha256"][:12] + ".mp4"))
         spec = {
             **template,
             "entrypoint": ["-m", "experiments.tennis.native_4k_court"],
@@ -59,8 +63,10 @@ def main():
                 "--frames",
                 "{frames}",
             ],
-            "staged_inputs": [dict(name="original", path=path, sha256=r["sha256"], extract=False)],
-            "inputs": [dict(path=path, sha256=r["sha256"])],
+            "staged_inputs": [
+                dict(name="original", path=staged_path, sha256=r["sha256"], extract=False)
+            ],
+            "inputs": [dict(path=staged_path, sha256=r["sha256"])],
         }
         (ROOT / (tag + ".json")).write_text(json.dumps(spec, indent=2) + "\n")
         cases.append(

@@ -111,7 +111,12 @@ def main():
         assert v["passed"], v
     else:
         assert a.frames == {"smoke": 12, "full": 240}[os.environ["PS_STAGE"]]
-        measure(a, a.frames, Path(os.environ["PS_STAGE_DIR"]))
+        target = Path(os.environ["PS_STAGE_DIR"])
+        record = measure(a, a.frames, target)
+        if os.environ["PS_STAGE"] == "full":
+            verified = validate(record, "full", target.parent, a.full_seconds)
+            (target / "full_validation.json").write_text(json.dumps(verified) + "\n")
+            assert verified["passed"], verified
 
 
 if __name__ == "__main__":

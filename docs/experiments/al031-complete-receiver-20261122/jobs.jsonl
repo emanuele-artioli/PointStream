@@ -8,3 +8,6 @@
 {"stage": "prefix-pair-1", "job": "20261122T115306Z-7fb628cb", "code": "3cf2971106937358590f2b557e2a2b0d9c5a05d3"}
 {"stage": "neural-near", "job": "20261122T115317Z-fa0ec927", "code": "3cf2971106937358590f2b557e2a2b0d9c5a05d3"}
 {"stage": "neural-near-validator", "job": "20261122T115802Z-111cede9", "code": "938eeaae17bec713a2be97246a803f3f1eb44932"}
+{"stage": "neural-q36-unpublished-transfer", "job": "20261122T120351Z-f8f60d58", "status": "unpublished partial 36,104,624-byte archive, no ready.json/spec.json/state.json/owner or supervisor, original sender exited 2 before publish call", "code": "5d0a63db7af362b83622a77b19afb6b25ffee82d"}
+{"stage": "neural-q36-published", "job": "20261122T120847Z-28acd80b", "code": "37bfe3a63d5f567c89bb93cb670402ac061c4510"}
+{"stage": "neural-q36-complete-snapshot", "job": "20261122T121405Z-d2d356f7", "code": "938eeaae17bec713a2be97246a803f3f1eb44932"}

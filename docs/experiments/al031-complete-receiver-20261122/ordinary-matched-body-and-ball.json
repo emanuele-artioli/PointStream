@@ -1,0 +1,94 @@
+[
+  {
+    "arm": {
+      "name": "ordinary-w160-near-19810B",
+      "kind": "native_yuv420p",
+      "width": 160,
+      "height": 96,
+      "sha256": "cf699e9c60ecd384a57e7f07a9850f5248cf6ca88c9c8a8fbe658964bebcad28",
+      "path": "/private/tmp/ps-al031-primary-matched-native/w160-q4177/decoded.yuv",
+      "bytes": 19618,
+      "kbps": 16.348333333333333,
+      "crf": 44.25,
+      "stream_sha256": "34cbb8c209bb245b5833033a616a1fe2057bb313df704e3bc35ae7cf595d5197",
+      "price_cap_bytes": 19810
+    },
+    "frames": 240,
+    "source_sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "supports_sha256": "bc921c6d249dce12657ad7c94fa1fcc7400714d0f07b692ee969acd4beeaed5b",
+    "mean_dists": 0.5590859262893597,
+    "ball_dists": 0.4044275316786259,
+    "ball_present": 235,
+    "ball_payload_sha256": "aa3119d822edcead9f1e486973e975e31b7b74da2a5b7ee9be372bbb2c4b22c0",
+    "rgb_psnr": 22.33069830522577
+  },
+  {
+    "arm": {
+      "name": "ordinary-w320-near-19810B",
+      "kind": "native_yuv420p",
+      "width": 320,
+      "height": 192,
+      "sha256": "65226772f2373ffea8019fdfa24df8dc2f7bdf894ea883bd9224adec525fef88",
+      "path": "/private/tmp/ps-al031-primary-matched-native/w320-q4242/decoded.yuv",
+      "bytes": 19762,
+      "kbps": 16.468333333333334,
+      "crf": 60.5,
+      "stream_sha256": "dc3840f9a410e6067ef15f38f167298f582ad2f259f287d3b522803f9b4dcee8",
+      "price_cap_bytes": 19810
+    },
+    "frames": 240,
+    "source_sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "supports_sha256": "bc921c6d249dce12657ad7c94fa1fcc7400714d0f07b692ee969acd4beeaed5b",
+    "mean_dists": 0.5439312691489856,
+    "ball_dists": 0.37493756806596795,
+    "ball_present": 235,
+    "ball_payload_sha256": "aa3119d822edcead9f1e486973e975e31b7b74da2a5b7ee9be372bbb2c4b22c0",
+    "rgb_psnr": 24.20540549001415
+  },
+  {
+    "arm": {
+      "name": "ordinary-w480-near-19810B",
+      "kind": "native_yuv420p",
+      "width": 480,
+      "height": 272,
+      "sha256": "ddb2005725afe11922352ba74f75973c2df9188950a7ffd6cce9b811706e4256",
+      "path": "/private/tmp/ps-al031-primary-matched-native/w480-q4254/decoded.yuv",
+      "bytes": 19066,
+      "kbps": 15.888333333333334,
+      "crf": 63.5,
+      "stream_sha256": "acab29b35851cf3d110e74633def42dfa91672c27855f18bc5e5d9c0a559ebd6",
+      "price_cap_bytes": 19810
+    },
+    "frames": 240,
+    "source_sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "supports_sha256": "bc921c6d249dce12657ad7c94fa1fcc7400714d0f07b692ee969acd4beeaed5b",
+    "mean_dists": 0.5601792787512143,
+    "ball_dists": 0.3697412521281141,
+    "ball_present": 235,
+    "ball_payload_sha256": "aa3119d822edcead9f1e486973e975e31b7b74da2a5b7ee9be372bbb2c4b22c0",
+    "rgb_psnr": 25.73301406106647
+  },
+  {
+    "arm": {
+      "name": "ordinary-w640-near-19810B",
+      "kind": "native_yuv420p",
+      "width": 640,
+      "height": 384,
+      "sha256": "f673e5833ccb44f56c97916e06233bd049716398b605ce44521350776bed5945",
+      "path": "/private/tmp/ps-al031-primary-matched-native/w640-q4259/decoded.yuv",
+      "bytes": 19687,
+      "kbps": 16.405833333333334,
+      "crf": 64.75,
+      "stream_sha256": "6b607b8288c950a006e619663266361f349b5b870cacc308137e89c354542129",
+      "price_cap_bytes": 19810
+    },
+    "frames": 240,
+    "source_sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "supports_sha256": "bc921c6d249dce12657ad7c94fa1fcc7400714d0f07b692ee969acd4beeaed5b",
+    "mean_dists": 0.5172755205382903,
+    "ball_dists": 0.35877885793117764,
+    "ball_present": 235,
+    "ball_payload_sha256": "aa3119d822edcead9f1e486973e975e31b7b74da2a5b7ee9be372bbb2c4b22c0",
+    "rgb_psnr": 26.87976013280196
+  }
+]
