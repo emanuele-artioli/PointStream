@@ -86,7 +86,7 @@ def run(a):
     score = import_module("docs.experiments.reference-body-rd-20261122.score")
     start = time.monotonic()
     assert not torch.cuda.is_available() and a.frames in (2, 24)
-    torch.set_num_threads(2)
+    torch.set_num_threads(1)
     torch.set_num_interop_threads(1)
     cv2.setNumThreads(1)
     assert (

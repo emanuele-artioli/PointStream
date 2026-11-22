@@ -10,7 +10,7 @@
   ],
   "gpu_models": [],
   "gpu_memory_mib": 0,
-  "cpu_threads": 2,
+  "cpu_threads": 1,
   "single_cpu_campaign": true,
   "local_storage_gib": 30,
   "entrypoint": [
