@@ -1,0 +1,38 @@
+{
+  "source_path": "/private/tmp/ps-al028-review-source-20261122.mp4",
+  "source_file_sha256": "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934",
+  "selection": "Three even phases chosen as 40, 120 and 200 before viewing any reconstructed frames; no stroke or contact is claimed.",
+  "fps": [
+    25,
+    1
+  ],
+  "frames": 240,
+  "display_working_shape": [
+    960,
+    540
+  ],
+  "fixed_near_player_crop_xyxy": [
+    300,
+    295,
+    560,
+    510
+  ],
+  "crop_reason": "Source-only review of all three selected frames showed this fixed box contains the near player; the same box applies to every method and tick.",
+  "ticks": [
+    {
+      "tick": 40,
+      "seconds": 1.6,
+      "source_native_rgb_sha256": "7b93b2b392fa569a6946a42f332665ea80154ed0c237b0a16a32214808db950c"
+    },
+    {
+      "tick": 120,
+      "seconds": 4.8,
+      "source_native_rgb_sha256": "525c93f4cbe5e391eafbcfadba218fc36d3d7b10a9182599e4715e4ba73fcd34"
+    },
+    {
+      "tick": 200,
+      "seconds": 8.0,
+      "source_native_rgb_sha256": "f4dec14f86f0124c7076b0f279341f91a23ee4d0f7ee868d07d6142ebd1e9b3d"
+    }
+  ]
+}
