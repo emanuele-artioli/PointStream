@@ -1,0 +1,242 @@
+[
+  {
+    "arm": {
+      "name": "ordinary-w160-q40",
+      "kind": "native_yuv420p",
+      "width": 160,
+      "height": 96,
+      "path": "/private/tmp/ps-al031-native-ordinary-starved/160-crf40/decoded.yuv",
+      "sha256": "4fda630fad7692625ee86486817478cd493d77a6a6494530f6f2e376edff0637",
+      "kbps": 19.3425,
+      "bytes": 23211,
+      "stream_sha256": "7fc249fc9f23d78f9914ed3bcc4d5ad8b92c886d3b44e9b308bce993fc63083c"
+    },
+    "mean_dists": 0.5463009964674711,
+    "active_dists": 0.5463009964674711,
+    "fallback_dists": null,
+    "rgb_psnr": 22.36120058534899,
+    "active_rgb_psnr": 22.36120058534899,
+    "fallback_rgb_psnr": null,
+    "cpu_seconds": 158.935319
+  },
+  {
+    "arm": {
+      "name": "ordinary-w160-q50",
+      "kind": "native_yuv420p",
+      "width": 160,
+      "height": 96,
+      "path": "/private/tmp/ps-al031-native-ordinary-starved/160-crf50/decoded.yuv",
+      "sha256": "4a5d4b364edb2dd1d6063a86cfb1b27ff7f294a43422102bb9e6f9b20fa04dd5",
+      "kbps": 13.5875,
+      "bytes": 16305,
+      "stream_sha256": "72fe787e8ef6df346b88edae253d28fad953b03676bbd82fc3b6324dc9fd0d61"
+    },
+    "mean_dists": 0.5788133213917415,
+    "active_dists": 0.5788133213917415,
+    "fallback_dists": null,
+    "rgb_psnr": 22.28306674118922,
+    "active_rgb_psnr": 22.28306674118922,
+    "fallback_rgb_psnr": null,
+    "cpu_seconds": 151.220131
+  },
+  {
+    "arm": {
+      "name": "ordinary-w160-q60",
+      "kind": "native_yuv420p",
+      "width": 160,
+      "height": 96,
+      "path": "/private/tmp/ps-al031-native-ordinary-starved/160-crf60/decoded.yuv",
+      "sha256": "13e926293b57e4b5ae06038fdb3b2faf36c5127b5a8a1eecbae9e5b6a2202d49",
+      "kbps": 9.6625,
+      "bytes": 11595,
+      "stream_sha256": "bd6270630237d3eb23f6ea33e6f739dbb26d17e9ccf888938bc70310784bc739"
+    },
+    "mean_dists": 0.6441762990007798,
+    "active_dists": 0.6441762990007798,
+    "fallback_dists": null,
+    "rgb_psnr": 22.093340411497877,
+    "active_rgb_psnr": 22.093340411497877,
+    "fallback_rgb_psnr": null,
+    "cpu_seconds": 148.98521899999997
+  },
+  {
+    "arm": {
+      "name": "ordinary-w160-q70",
+      "kind": "native_yuv420p",
+      "width": 160,
+      "height": 96,
+      "path": "/private/tmp/ps-al031-native-ordinary-starved/160-crf70/decoded.yuv",
+      "sha256": "00e756c7cdf3b51da0e171691d517a68a4645095f26da1594387e1111d96ff28",
+      "kbps": 7.4375,
+      "bytes": 8925,
+      "stream_sha256": "d2fe6dcd3c9135bf2fdfe7dbdb20ac180ad6f265bb4726fe8dd5daa6ff7494e3"
+    },
+    "mean_dists": 0.7080229981491963,
+    "active_dists": 0.7080229981491963,
+    "fallback_dists": null,
+    "rgb_psnr": 20.739060724614045,
+    "active_rgb_psnr": 20.739060724614045,
+    "fallback_rgb_psnr": null,
+    "cpu_seconds": 146.910147
+  },
+  {
+    "arm": {
+      "name": "ordinary-w320-q40",
+      "kind": "native_yuv420p",
+      "width": 320,
+      "height": 192,
+      "path": "/private/tmp/ps-al031-native-ordinary-starved/320-crf40/decoded.yuv",
+      "sha256": "75ca0776421a5c86cd6ff96ca8c52efaaf0b768f23013e51569f81c92fdf069b",
+      "kbps": 54.72083333333333,
+      "bytes": 65665,
+      "stream_sha256": "105b23c4eef852d93fea3f131c2efb9d3a2d77df166e911ee52742d869c376b9"
+    },
+    "mean_dists": 0.4127407210568587,
+    "active_dists": 0.4127407210568587,
+    "fallback_dists": null,
+    "rgb_psnr": 24.646865053755942,
+    "active_rgb_psnr": 24.646865053755942,
+    "fallback_rgb_psnr": null,
+    "cpu_seconds": 147.98492299999998
+  },
+  {
+    "arm": {
+      "name": "ordinary-w320-q50",
+      "kind": "native_yuv420p",
+      "width": 320,
+      "height": 192,
+      "path": "/private/tmp/ps-al031-native-ordinary-starved/320-crf50/decoded.yuv",
+      "sha256": "ab1d775ff48da4a48f7705846663c4a17f94fc3671bfa97d13ab177725b982a3",
+      "kbps": 33.06166666666667,
+      "bytes": 39674,
+      "stream_sha256": "c298aa4b1c26ae279e122b00bd3b3beb15bfcdd55ebb77f2ef6b73b894c5277a"
+    },
+    "mean_dists": 0.4541925858706236,
+    "active_dists": 0.4541925858706236,
+    "fallback_dists": null,
+    "rgb_psnr": 24.53040440819065,
+    "active_rgb_psnr": 24.53040440819065,
+    "fallback_rgb_psnr": null,
+    "cpu_seconds": 140.09724599999993
+  },
+  {
+    "arm": {
+      "name": "ordinary-w320-q60",
+      "kind": "native_yuv420p",
+      "width": 320,
+      "height": 192,
+      "path": "/private/tmp/ps-al031-native-ordinary-starved/320-crf60/decoded.yuv",
+      "sha256": "114f1392765e548bbbcd1c90eea8a2dbcb7f9d3a48a9eae388ee4cff0067b5a5",
+      "kbps": 17.359166666666667,
+      "bytes": 20831,
+      "stream_sha256": "a645776e7268f1ea93fb4a38a40a7f414c8fbefdea56baaf5921b1ccb32282df"
+    },
+    "mean_dists": 0.539059100051721,
+    "active_dists": 0.539059100051721,
+    "fallback_dists": null,
+    "rgb_psnr": 24.241415457268292,
+    "active_rgb_psnr": 24.241415457268292,
+    "fallback_rgb_psnr": null,
+    "cpu_seconds": 140.23927099999992
+  },
+  {
+    "arm": {
+      "name": "ordinary-w320-q70",
+      "kind": "native_yuv420p",
+      "width": 320,
+      "height": 192,
+      "path": "/private/tmp/ps-al031-native-ordinary-starved/320-crf70/decoded.yuv",
+      "sha256": "6c72d60c0ff2f9ca860b89cb3d449e2d95b052425133a4b67ad7c86b0aada9d5",
+      "kbps": 8.72,
+      "bytes": 10464,
+      "stream_sha256": "c1c725a14efd6c515b3422fb1f301c9258c1f9f76a57be82d1aca576f4368379"
+    },
+    "mean_dists": 0.678240368142724,
+    "active_dists": 0.678240368142724,
+    "fallback_dists": null,
+    "rgb_psnr": 22.631168726485416,
+    "active_rgb_psnr": 22.631168726485416,
+    "fallback_rgb_psnr": null,
+    "cpu_seconds": 140.56743400000005
+  },
+  {
+    "arm": {
+      "name": "ordinary-w640-q40",
+      "kind": "native_yuv420p",
+      "width": 640,
+      "height": 384,
+      "path": "/private/tmp/ps-al031-native-ordinary-starved/640-crf40/decoded.yuv",
+      "sha256": "7009ec3ddf1f4e40feaad4dfbaf013d4568d58d4638f5862a28fec94405657ef",
+      "kbps": 117.92083333333333,
+      "bytes": 141505,
+      "stream_sha256": "484609e295f9de7542c29f7c5c612053c8b2d719b00d1df81b7657590fa02efd"
+    },
+    "mean_dists": 0.29460753637055553,
+    "active_dists": 0.29460753637055553,
+    "fallback_dists": null,
+    "rgb_psnr": 28.736083790363665,
+    "active_rgb_psnr": 28.736083790363665,
+    "fallback_rgb_psnr": null,
+    "cpu_seconds": 141.35467800000015
+  },
+  {
+    "arm": {
+      "name": "ordinary-w640-q50",
+      "kind": "native_yuv420p",
+      "width": 640,
+      "height": 384,
+      "path": "/private/tmp/ps-al031-native-ordinary-starved/640-crf50/decoded.yuv",
+      "sha256": "be14b8d4bb489ce66dfb7b9ad8fbe3567c31c3afe600990c88bf6d8382f953c9",
+      "kbps": 69.98916666666666,
+      "bytes": 83987,
+      "stream_sha256": "eca15d19272716c93129b8c21f8cc41cc5f74ab43edbfdf695352b792a9a43bc"
+    },
+    "mean_dists": 0.3400106487174829,
+    "active_dists": 0.3400106487174829,
+    "fallback_dists": null,
+    "rgb_psnr": 28.532197279280016,
+    "active_rgb_psnr": 28.532197279280016,
+    "fallback_rgb_psnr": null,
+    "cpu_seconds": 150.99853200000007
+  },
+  {
+    "arm": {
+      "name": "ordinary-w640-q60",
+      "kind": "native_yuv420p",
+      "width": 640,
+      "height": 384,
+      "path": "/private/tmp/ps-al031-native-ordinary-starved/640-crf60/decoded.yuv",
+      "sha256": "7cff7a792678775f49e1305cfa00aa591780c13d889d25e340740352e950b92b",
+      "kbps": 33.7325,
+      "bytes": 40479,
+      "stream_sha256": "5f3583b219161dde92bb4dc8b7052165d15fdcf8f6774d7f64261a8cd4532357"
+    },
+    "mean_dists": 0.4057077462474505,
+    "active_dists": 0.4057077462474505,
+    "fallback_dists": null,
+    "rgb_psnr": 28.036574329900308,
+    "active_rgb_psnr": 28.036574329900308,
+    "fallback_rgb_psnr": null,
+    "cpu_seconds": 148.00194899999997
+  },
+  {
+    "arm": {
+      "name": "ordinary-w640-q70",
+      "kind": "native_yuv420p",
+      "width": 640,
+      "height": 384,
+      "path": "/private/tmp/ps-al031-native-ordinary-starved/640-crf70/decoded.yuv",
+      "sha256": "adb90274575c5dadb30a5e32f6593b11b8abec2389b16000aa6a793fcfe31a5e",
+      "kbps": 11.5225,
+      "bytes": 13827,
+      "stream_sha256": "2fa22f5d3165373945d90db16cdc2f3c84959a9eeef64bda8c92c555b09e45e4"
+    },
+    "mean_dists": 0.5966509660085042,
+    "active_dists": 0.5966509660085042,
+    "fallback_dists": null,
+    "rgb_psnr": 25.38380445915857,
+    "active_rgb_psnr": 25.38380445915857,
+    "fallback_rgb_psnr": null,
+    "cpu_seconds": 148.6163419999998
+  }
+]

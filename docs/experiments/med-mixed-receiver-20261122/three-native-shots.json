@@ -1,0 +1,1198 @@
+{
+  "denominator": "One development match, three prespecified shots, each 240 native 50-fps frames with earliest 120-tick jointly supported interval and 120 conventional fallback ticks",
+  "cases": [
+    {
+      "modeled_reuse": {
+        "ordinary": {
+          "anchor_hull": [
+            [
+              14.955,
+              -0.6671651353438696
+            ],
+            [
+              17.168333333333333,
+              -0.5989186416069666
+            ],
+            [
+              18.986666666666668,
+              -0.5545646523435911
+            ],
+            [
+              20.908333333333335,
+              -0.5362082918485006
+            ],
+            [
+              26.311666666666667,
+              -0.4931442216038704
+            ],
+            [
+              30.213333333333335,
+              -0.48030968258778256
+            ],
+            [
+              46.151666666666664,
+              -0.43153999994198483
+            ],
+            [
+              69.085,
+              -0.3733915090560913
+            ],
+            [
+              117.41666666666667,
+              -0.3289197236299515
+            ],
+            [
+              358.62333333333333,
+              -0.2126602828502655
+            ]
+          ],
+          "target_dists": 0.4328770538171132,
+          "state": "modeled equal-quality threshold",
+          "anchor_kbps": 45.67526576400096,
+          "seconds": 72.3459980559125,
+          "init_bytes": 202948
+        },
+        "neural": {
+          "anchor_hull": [
+            [
+              21.173333333333332,
+              -0.4436450352271398
+            ],
+            [
+              23.398333333333333,
+              -0.4324774344762166
+            ]
+          ],
+          "target_dists": 0.4328770538171132,
+          "state": "modeled equal-quality threshold",
+          "anchor_kbps": 23.314819653613984,
+          "seconds": 19924.62040755008,
+          "init_bytes": 202948
+        }
+      },
+      "clip": "000",
+      "joint": [
+        {
+          "arm": {
+            "kind": "rgb_zseq_stdin",
+            "name": "joint-q70",
+            "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T103915Z-89383f19/full/frames.zseq",
+            "height": 1080,
+            "width": 1920,
+            "receipt": "/private/tmp/ps-med000-verified-q70/rung.json",
+            "receipt_sha256": "6768d9ca442d2d0cb4bc3550d0d35bc824190dc4dc3a4a891a94741b2bbff7fa",
+            "sha256": "89aaa143411f6fe1bd7dc2eb8a978ff94c5221cd5ce8f7f1022576ee8cb46e2c",
+            "kbps": 19.616666666666667,
+            "bytes": 11770,
+            "cold_kbps": 357.86333333333334,
+            "joint_sha256": "1da8c481ee87a1615328945a01b7089fe9a3fc83999af35e3a758f1001a1a572",
+            "receiver_job": "20261122T103915Z-89383f19"
+          },
+          "mean_dists": 0.48818187415599823,
+          "active_dists": 0.3165001670519511,
+          "fallback_dists": 0.6598635812600454,
+          "rgb_psnr": 18.305654742273717
+        },
+        {
+          "arm": {
+            "name": "joint-q60",
+            "kind": "rgb_npy",
+            "width": 1920,
+            "height": 1080,
+            "path": "/private/tmp/ps-med000-authoritative-240.npy",
+            "sha256": "24df3470d86e9eafcca89c6f9c77f64304677f56f5ef8bfcd1a33c9e84f50db2",
+            "kbps": 23.233333333333334,
+            "bytes": 13940,
+            "cold_kbps": 361.48,
+            "receiver_job": "20261122T102430Z-fd241a73",
+            "joint_sha256": "615596d2f78d08ebd07fc9dd66136bf586d5c1f2d2921b71aea4dfc437df2b8b"
+          },
+          "mean_dists": 0.4328770538171132,
+          "active_dists": 0.3127464602390925,
+          "fallback_dists": 0.553007647395134,
+          "rgb_psnr": 19.4153450194505
+        },
+        {
+          "arm": {
+            "kind": "rgb_zseq_stdin",
+            "name": "joint-q50",
+            "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T104019Z-67588e81/full/frames.zseq",
+            "height": 1080,
+            "width": 1920,
+            "receipt": "/private/tmp/ps-med000-verified-q50/rung.json",
+            "receipt_sha256": "466a59522b5e796f4746d9667d13e45d7bd8558b90cb43187f1eddc445439914",
+            "sha256": "8e075c388a89da472509a0946190d3c719e0ee223e90a054bd7365776bc24c1b",
+            "kbps": 27.06,
+            "bytes": 16236,
+            "cold_kbps": 365.3066666666667,
+            "joint_sha256": "9e70d19c048f580a6d80eee709892f01cf900e0fd159b4b53a22c657c33fb090",
+            "receiver_job": "20261122T104019Z-67588e81"
+          },
+          "mean_dists": 0.42249466230471927,
+          "active_dists": 0.31198059519131977,
+          "fallback_dists": 0.5330087294181188,
+          "rgb_psnr": 19.511914637106873
+        }
+      ],
+      "primary": {
+        "arm": {
+          "name": "joint-q60",
+          "kind": "rgb_npy",
+          "width": 1920,
+          "height": 1080,
+          "path": "/private/tmp/ps-med000-authoritative-240.npy",
+          "sha256": "24df3470d86e9eafcca89c6f9c77f64304677f56f5ef8bfcd1a33c9e84f50db2",
+          "kbps": 23.233333333333334,
+          "bytes": 13940,
+          "cold_kbps": 361.48,
+          "receiver_job": "20261122T102430Z-fd241a73",
+          "joint_sha256": "615596d2f78d08ebd07fc9dd66136bf586d5c1f2d2921b71aea4dfc437df2b8b"
+        },
+        "mean_dists": 0.4328770538171132,
+        "active_dists": 0.3127464602390925,
+        "fallback_dists": 0.553007647395134,
+        "rgb_psnr": 19.4153450194505
+      },
+      "anchors": {
+        "ordinary": {
+          "arm": {
+            "name": "ordinary-w320-near-13940B",
+            "kind": "native_yuv420p",
+            "width": 320,
+            "height": 192,
+            "sha256": "d2426cb7fc3de954261a0db3c58a170104c410c90dccc3b75838ede05ba176a1",
+            "path": "/private/tmp/ps-med000-av1-matched-joint13940/w320-q4254/decoded.yuv",
+            "bytes": 13834,
+            "kbps": 23.05666666666667,
+            "crf": 63.5,
+            "stream_sha256": "ef0fdd963707e9a04238a3b2cc897606d5c20842dbfd80f61dc2f2f83e8f4cdd",
+            "price_cap_bytes": 13940
+          },
+          "mean_dists": 0.520285521944364,
+          "active_dists": 0.5130066374937693,
+          "fallback_dists": 0.5275644063949585,
+          "rgb_psnr": 20.609926086529164
+        },
+        "ordinary_nearest": {
+          "arm": {
+            "name": "ordinary-w160-q50",
+            "path": "/private/tmp/ps-med000-ordinary-av1-20261122/160-crf50/decoded.yuv",
+            "sha256": "4f739776b47e20f0024e6aded478a269c33ae705caacc251eea082b8b618d2cd",
+            "kind": "native_yuv420p",
+            "width": 160,
+            "height": 96,
+            "kbps": 23.386666666666667,
+            "bytes": 14032,
+            "stream_sha256": "cb4433300e3fa4a83e30f383eb0806963f32fc4de24a983f4fd32ad8321bcd27"
+          },
+          "mean_dists": 0.5294766624768575,
+          "active_dists": 0.5270357628663381,
+          "fallback_dists": 0.531917562087377,
+          "rgb_psnr": 19.54960253190245
+        },
+        "neural": {
+          "arm": {
+            "name": "dcvc-w480-q24",
+            "kind": "native_yuv420p",
+            "width": 480,
+            "height": 272,
+            "path": "/private/tmp/ps-med000-q24-native50-decoded.yuv",
+            "sha256": "16b71d566969513986aa80c58798bf91034609821497003aaf3b61013b4df312",
+            "kbps": 21.173333333333332,
+            "bytes": 12704,
+            "producer_job": "20261122T093041Z-95b7972b",
+            "producer_archive_sha256": "9c2e736e86fc2bf01c8756cc87688303154bdf49055a381a7af4571636d2a29e"
+          },
+          "mean_dists": 0.4436450352271398,
+          "active_dists": 0.4207710027694702,
+          "fallback_dists": 0.4665190676848094,
+          "rgb_psnr": 21.96585796124202
+        },
+        "neural_nearest": {
+          "arm": {
+            "name": "dcvc-w480-q26",
+            "kind": "native_yuv420p",
+            "width": 480,
+            "height": 272,
+            "path": "/private/tmp/ps-med000-q26-native50-decoded.yuv",
+            "sha256": "72e26a89a725364f07887d14fc476d79955959b86060cbd35c93866651fd0a03",
+            "kbps": 23.398333333333333,
+            "bytes": 14039,
+            "producer_archive_sha256": "efb82089f331abe2639e44eab3ba8040ca5d9c742200fb0b2374a095455bb4dc"
+          },
+          "mean_dists": 0.4324774344762166,
+          "active_dists": 0.40328734119733173,
+          "fallback_dists": 0.4616675277551015,
+          "rgb_psnr": 22.012928478935315
+        }
+      },
+      "bd": {
+        "ordinary": {
+          "common_dists": [
+            0.42249466230471927,
+            0.48818187415599823
+          ],
+          "bd_rate_percent": -43.31629047670735,
+          "anchor_hull": [
+            [
+              14.955,
+              -0.6671651353438696
+            ],
+            [
+              17.168333333333333,
+              -0.5989186416069666
+            ],
+            [
+              18.986666666666668,
+              -0.5545646523435911
+            ],
+            [
+              20.908333333333335,
+              -0.5362082918485006
+            ],
+            [
+              26.311666666666667,
+              -0.4931442216038704
+            ],
+            [
+              30.213333333333335,
+              -0.48030968258778256
+            ],
+            [
+              46.151666666666664,
+              -0.43153999994198483
+            ],
+            [
+              69.085,
+              -0.3733915090560913
+            ],
+            [
+              117.41666666666667,
+              -0.3289197236299515
+            ],
+            [
+              358.62333333333333,
+              -0.2126602828502655
+            ]
+          ],
+          "test_hull": [
+            [
+              19.616666666666667,
+              -0.48818187415599823
+            ],
+            [
+              23.233333333333334,
+              -0.4328770538171132
+            ],
+            [
+              27.06,
+              -0.42249466230471927
+            ]
+          ]
+        },
+        "neural": {
+          "common_dists": [
+            0.4324774344762166,
+            0.4436450352271398
+          ],
+          "bd_rate_percent": 1.3975943873274277,
+          "anchor_hull": [
+            [
+              21.173333333333332,
+              -0.4436450352271398
+            ],
+            [
+              23.398333333333333,
+              -0.4324774344762166
+            ]
+          ],
+          "test_hull": [
+            [
+              19.616666666666667,
+              -0.48818187415599823
+            ],
+            [
+              23.233333333333334,
+              -0.4328770538171132
+            ],
+            [
+              27.06,
+              -0.42249466230471927
+            ]
+          ]
+        }
+      },
+      "cold": {
+        "pointstream_kbps": 361.48,
+        "ordinary": {
+          "arm": {
+            "name": "ordinary-960-cold",
+            "kind": "native_yuv420p",
+            "width": 960,
+            "height": 544,
+            "sha256": "0011f0cc128207472f27e6767a021ce8f2e7bc92bdfcc7a9202baf5165f85259",
+            "path": "/private/tmp/ps-med000-cold-native-price/selected.yuv",
+            "stream_sha256": "03f4a532a4bb86fd0a83bfc2412b6ae0c1a98a84a001d74b04035724e061f8ce",
+            "bytes": 215174,
+            "kbps": 358.62333333333333,
+            "crf": 43.0,
+            "cold_ceiling_bytes": 216888
+          },
+          "mean_dists": 0.2126602828502655,
+          "active_dists": 0.21234354376792908,
+          "fallback_dists": 0.21297702193260193,
+          "rgb_psnr": 27.910595961762866
+        },
+        "player_dists_difference": 0.22021677096684772
+      }
+    },
+    {
+      "modeled_reuse": {
+        "ordinary": {
+          "anchor_hull": [
+            [
+              14.768333333333333,
+              -0.6690590381622314
+            ],
+            [
+              16.961666666666666,
+              -0.6146256526311239
+            ],
+            [
+              18.871666666666666,
+              -0.5709629779060682
+            ],
+            [
+              26.053333333333335,
+              -0.5122980773448944
+            ],
+            [
+              29.813333333333333,
+              -0.49602937201658887
+            ],
+            [
+              44.67,
+              -0.45598436892032623
+            ],
+            [
+              67.25333333333333,
+              -0.39927297085523605
+            ],
+            [
+              115.49,
+              -0.3491193453470866
+            ],
+            [
+              276.005,
+              -0.2426139016946157
+            ]
+          ],
+          "target_dists": 0.46029389401276904,
+          "state": "modeled equal-quality threshold",
+          "anchor_kbps": 42.983454337323145,
+          "seconds": 61.40406657081366,
+          "init_bytes": 153332
+        },
+        "neural": {
+          "anchor_hull": [
+            [
+              20.881666666666668,
+              -0.45853696515162784
+            ],
+            [
+              23.0,
+              -0.4522628163297971
+            ]
+          ],
+          "target_dists": 0.46029389401276904,
+          "state": "outside measured anchor quality range"
+        }
+      },
+      "clip": "019",
+      "joint": [
+        {
+          "arm": {
+            "name": "joint-q70",
+            "kind": "rgb_zseq",
+            "path": "/local/users/emanuele/pointstream/cache/1350879cd96ef0495a48fbbf485275bacf45b79c93f392b40d80590528498053/frames.zseq",
+            "sha256": "1350879cd96ef0495a48fbbf485275bacf45b79c93f392b40d80590528498053",
+            "receipt": "/local/users/emanuele/pointstream/cache/dc9d999cbda353455754c1120619765facdb2259deaac1be7e41a2ce9b467f03/rung.json",
+            "receipt_sha256": "dc9d999cbda353455754c1120619765facdb2259deaac1be7e41a2ce9b467f03",
+            "width": 1920,
+            "height": 1080,
+            "bytes": 11465,
+            "kbps": 19.108333333333334,
+            "cold_kbps": 274.6616666666667,
+            "joint_sha256": "78b0e9281bc06e0f0fda15a07f0d8a7f629c0dbf9c8b6db503c4a14d88219a69",
+            "receiver_job": "20261122T130718Z-2ead0705"
+          },
+          "mean_dists": 0.5105232000350952,
+          "active_dists": 0.35380371908346814,
+          "fallback_dists": 0.6672426809867223,
+          "rgb_psnr": 18.343430581538293
+        },
+        {
+          "arm": {
+            "name": "joint-q60",
+            "kind": "rgb_npy",
+            "path": "/local/users/emanuele/pointstream/cache/ed33201f05fee92b96ca883cfeb94ca4974b473e5682f488d32b688f46d29162/tree/publish/frames.npy",
+            "sha256": "7c3907837b5e3720fc6b1897e087dff9b5ff9f186bbc9448039d955fea6a7594",
+            "receipt": "/local/users/emanuele/pointstream/cache/ed33201f05fee92b96ca883cfeb94ca4974b473e5682f488d32b688f46d29162/tree/publish/finish.json",
+            "receipt_sha256": "9a759f400ea95d7b64cf4fbad5cd3cbdd554e5dff3513480ce2d8ba04cdd636d",
+            "width": 1920,
+            "height": 1080,
+            "bytes": 13804,
+            "kbps": 23.006666666666668,
+            "cold_kbps": 278.56,
+            "joint_sha256": "4b077859fe3d808ff624a81fe33fceb647803052ad8cd3266afb1ef8c1c175d3",
+            "receiver_job": "20261122T115904Z-fd17c8d8"
+          },
+          "mean_dists": 0.46029389401276904,
+          "active_dists": 0.35137761135896045,
+          "fallback_dists": 0.5692101766665777,
+          "rgb_psnr": 19.446695847308117
+        },
+        {
+          "arm": {
+            "name": "joint-q50",
+            "kind": "rgb_zseq",
+            "path": "/local/users/emanuele/pointstream/cache/54c7c51b986edef2e8d790fc8e14ac3293b3255031d39b965613132eced65563/frames.zseq",
+            "sha256": "54c7c51b986edef2e8d790fc8e14ac3293b3255031d39b965613132eced65563",
+            "receipt": "/local/users/emanuele/pointstream/cache/c8d9c8ca15ea39c1da23610a85eb1154251c9cdc340d7d118b1e8a26f414b945/rung.json",
+            "receipt_sha256": "c8d9c8ca15ea39c1da23610a85eb1154251c9cdc340d7d118b1e8a26f414b945",
+            "width": 1920,
+            "height": 1080,
+            "bytes": 16049,
+            "kbps": 26.748333333333335,
+            "cold_kbps": 282.3016666666667,
+            "joint_sha256": "6bdc4f1317d578d6b5ac34bc92cd49a76464852b681ba54255f81381626d7802",
+            "receiver_job": "20261122T130806Z-8c10b0d2"
+          },
+          "mean_dists": 0.44612762828667957,
+          "active_dists": 0.3516457925240199,
+          "fallback_dists": 0.5406094640493393,
+          "rgb_psnr": 19.536728069128543
+        }
+      ],
+      "primary": {
+        "arm": {
+          "name": "joint-q60",
+          "kind": "rgb_npy",
+          "path": "/local/users/emanuele/pointstream/cache/ed33201f05fee92b96ca883cfeb94ca4974b473e5682f488d32b688f46d29162/tree/publish/frames.npy",
+          "sha256": "7c3907837b5e3720fc6b1897e087dff9b5ff9f186bbc9448039d955fea6a7594",
+          "receipt": "/local/users/emanuele/pointstream/cache/ed33201f05fee92b96ca883cfeb94ca4974b473e5682f488d32b688f46d29162/tree/publish/finish.json",
+          "receipt_sha256": "9a759f400ea95d7b64cf4fbad5cd3cbdd554e5dff3513480ce2d8ba04cdd636d",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 13804,
+          "kbps": 23.006666666666668,
+          "cold_kbps": 278.56,
+          "joint_sha256": "4b077859fe3d808ff624a81fe33fceb647803052ad8cd3266afb1ef8c1c175d3",
+          "receiver_job": "20261122T115904Z-fd17c8d8"
+        },
+        "mean_dists": 0.46029389401276904,
+        "active_dists": 0.35137761135896045,
+        "fallback_dists": 0.5692101766665777,
+        "rgb_psnr": 19.446695847308117
+      },
+      "anchors": {
+        "ordinary": {
+          "arm": {
+            "name": "ordinary-w320-near-13804B",
+            "kind": "native_yuv420p",
+            "width": 320,
+            "height": 192,
+            "sha256": "502324658fa64492ff99b9ac1c8520f5e03b14e64ae4a323ba8dec9d9c833c48",
+            "path": "/private/tmp/ps-med019-joint-matched-av1-price-20261122/w320-q4253/decoded.yuv",
+            "bytes": 13789,
+            "kbps": 22.981666666666666,
+            "crf": 63.25,
+            "stream_sha256": "c3c362d4d982c42374c49885df2752b495f21d785c22cb23393a39039d039d0c",
+            "price_cap_bytes": 13804
+          },
+          "mean_dists": 0.541197789212068,
+          "active_dists": 0.5521560907363892,
+          "fallback_dists": 0.5302394876877466,
+          "rgb_psnr": 20.638197697670822
+        },
+        "ordinary_nearest": {
+          "arm": {
+            "name": "ordinary-w320-near-13804B",
+            "kind": "native_yuv420p",
+            "width": 320,
+            "height": 192,
+            "sha256": "502324658fa64492ff99b9ac1c8520f5e03b14e64ae4a323ba8dec9d9c833c48",
+            "path": "/private/tmp/ps-med019-joint-matched-av1-price-20261122/w320-q4253/decoded.yuv",
+            "bytes": 13789,
+            "kbps": 22.981666666666666,
+            "crf": 63.25,
+            "stream_sha256": "c3c362d4d982c42374c49885df2752b495f21d785c22cb23393a39039d039d0c",
+            "price_cap_bytes": 13804
+          },
+          "mean_dists": 0.541197789212068,
+          "active_dists": 0.5521560907363892,
+          "fallback_dists": 0.5302394876877466,
+          "rgb_psnr": 20.638197697670822
+        },
+        "neural": {
+          "arm": {
+            "name": "dcvc-w480-q26",
+            "kind": "native_yuv420p",
+            "width": 480,
+            "height": 272,
+            "path": "/private/tmp/ps-med019-q26-native50-decoded.yuv",
+            "sha256": "d4af6db26a5a349ec1f019c826d7f992138e41cac72433807e23646e1f36974b",
+            "kbps": 23.0,
+            "bytes": 13800,
+            "producer_job": "20261122T111338Z-cc60fc9c",
+            "producer_archive_sha256": "3259553f5e18072fd7d587bd85fb41278187eb891580397ef7f016a353b7493a",
+            "container_sha256": "002f07496ecc4bdb569918dcfe92692811516ef63b4593340c0d8fa0656041b1",
+            "source_sha256": "1c13479eb3b6f8d175eb6f5020c629896e6b01f719014ec995a06b4c6c5a3e9c",
+            "gpu": "NVIDIA RTX 6000 Ada Generation",
+            "validated_native_passes": 4
+          },
+          "mean_dists": 0.4522628163297971,
+          "active_dists": 0.4651781568924586,
+          "fallback_dists": 0.4393474757671356,
+          "rgb_psnr": 21.97369794369898
+        },
+        "neural_nearest": {
+          "arm": {
+            "name": "dcvc-w480-q26",
+            "kind": "native_yuv420p",
+            "width": 480,
+            "height": 272,
+            "path": "/private/tmp/ps-med019-q26-native50-decoded.yuv",
+            "sha256": "d4af6db26a5a349ec1f019c826d7f992138e41cac72433807e23646e1f36974b",
+            "kbps": 23.0,
+            "bytes": 13800,
+            "producer_job": "20261122T111338Z-cc60fc9c",
+            "producer_archive_sha256": "3259553f5e18072fd7d587bd85fb41278187eb891580397ef7f016a353b7493a",
+            "container_sha256": "002f07496ecc4bdb569918dcfe92692811516ef63b4593340c0d8fa0656041b1",
+            "source_sha256": "1c13479eb3b6f8d175eb6f5020c629896e6b01f719014ec995a06b4c6c5a3e9c",
+            "gpu": "NVIDIA RTX 6000 Ada Generation",
+            "validated_native_passes": 4
+          },
+          "mean_dists": 0.4522628163297971,
+          "active_dists": 0.4651781568924586,
+          "fallback_dists": 0.4393474757671356,
+          "rgb_psnr": 21.97369794369898
+        }
+      },
+      "bd": {
+        "ordinary": {
+          "common_dists": [
+            0.44612762828667957,
+            0.5105232000350952
+          ],
+          "bd_rate_percent": -40.35651063068513,
+          "anchor_hull": [
+            [
+              14.768333333333333,
+              -0.6690590381622314
+            ],
+            [
+              16.961666666666666,
+              -0.6146256526311239
+            ],
+            [
+              18.871666666666666,
+              -0.5709629779060682
+            ],
+            [
+              26.053333333333335,
+              -0.5122980773448944
+            ],
+            [
+              29.813333333333333,
+              -0.49602937201658887
+            ],
+            [
+              44.67,
+              -0.45598436892032623
+            ],
+            [
+              67.25333333333333,
+              -0.39927297085523605
+            ],
+            [
+              115.49,
+              -0.3491193453470866
+            ],
+            [
+              191.55333333333334,
+              -0.30945741136868793
+            ]
+          ],
+          "test_hull": [
+            [
+              19.108333333333334,
+              -0.5105232000350952
+            ],
+            [
+              23.006666666666668,
+              -0.46029389401276904
+            ],
+            [
+              26.748333333333335,
+              -0.44612762828667957
+            ]
+          ]
+        },
+        "neural": {
+          "common_dists": [
+            0.4522628163297971,
+            0.45853696515162784
+          ],
+          "bd_rate_percent": 9.456100048116767,
+          "anchor_hull": [
+            [
+              20.881666666666668,
+              -0.45853696515162784
+            ],
+            [
+              23.0,
+              -0.4522628163297971
+            ]
+          ],
+          "test_hull": [
+            [
+              19.108333333333334,
+              -0.5105232000350952
+            ],
+            [
+              23.006666666666668,
+              -0.46029389401276904
+            ],
+            [
+              26.748333333333335,
+              -0.44612762828667957
+            ]
+          ]
+        }
+      },
+      "cold": {
+        "pointstream_kbps": 278.56,
+        "ordinary": {
+          "arm": {
+            "name": "ordinary-960-cold",
+            "kind": "native_yuv420p",
+            "path": "/local/users/emanuele/pointstream/scratch/20261122T124932Z-40d3c16d-full/ordinary-cold.yuv",
+            "sha256": "d624eafbeba3c8fb64ef5903823277a80389182e4491fe8d9a94248b58cbbc36",
+            "width": 960,
+            "height": 544,
+            "bytes": 165603,
+            "kbps": 276.005,
+            "producer_job": "svt-av1-4.0.1-019-3e6d42ed0d7c",
+            "stream_sha256": "3e6d42ed0d7c41855ded5cb55b295f0aff75d70c826d9765210587f670529b46",
+            "decoder": {
+              "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+              "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+              "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+              "version": "1.5.4"
+            }
+          },
+          "mean_dists": 0.2426139016946157,
+          "active_dists": 0.24466901024182638,
+          "fallback_dists": 0.240558793147405,
+          "rgb_psnr": 27.75396807369976
+        },
+        "player_dists_difference": 0.21767999231815335
+      }
+    },
+    {
+      "modeled_reuse": {
+        "ordinary": {
+          "anchor_hull": [
+            [
+              14.858333333333333,
+              -0.7001745998859406
+            ],
+            [
+              17.135,
+              -0.621109259625276
+            ],
+            [
+              18.881666666666668,
+              -0.5975966428716978
+            ],
+            [
+              27.141666666666666,
+              -0.5265666122237841
+            ],
+            [
+              30.085,
+              -0.511940578619639
+            ],
+            [
+              43.983333333333334,
+              -0.4508012955387433
+            ],
+            [
+              66.09,
+              -0.38631561895211536
+            ],
+            [
+              119.18,
+              -0.33994076152642566
+            ],
+            [
+              299.00666666666666,
+              -0.24792961527903876
+            ]
+          ],
+          "target_dists": 0.46073534588019055,
+          "state": "modeled equal-quality threshold",
+          "anchor_kbps": 41.36313767104571,
+          "seconds": 74.23603951850386,
+          "init_bytes": 167153
+        },
+        "neural": {
+          "anchor_hull": [
+            [
+              20.436666666666667,
+              -0.45580432812372845
+            ],
+            [
+              23.215,
+              -0.44006600230932236
+            ]
+          ],
+          "target_dists": 0.46073534588019055,
+          "state": "outside measured anchor quality range"
+        }
+      },
+      "clip": "024",
+      "joint": [
+        {
+          "arm": {
+            "name": "joint-q70",
+            "kind": "rgb_zseq",
+            "path": "/local/users/emanuele/pointstream/cache/a1a7e25595ccb95fd824012ff4955452172b64a1cff6c71ad9a8008328ba026d/frames.zseq",
+            "sha256": "a1a7e25595ccb95fd824012ff4955452172b64a1cff6c71ad9a8008328ba026d",
+            "receipt": "/local/users/emanuele/pointstream/cache/a1a2fdddd3071fdf05723d8e832f7fc2839b417e9c00af432bc91c1e062e0afe/rung.json",
+            "receipt_sha256": "a1a2fdddd3071fdf05723d8e832f7fc2839b417e9c00af432bc91c1e062e0afe",
+            "width": 1920,
+            "height": 1080,
+            "bytes": 11727,
+            "kbps": 19.545,
+            "cold_kbps": 298.1333333333333,
+            "joint_sha256": "8f64e131313cd61bfc6a00c53f0139d2d405aafda88e1e4b1d5f44a9abcd45f8",
+            "receiver_job": "20261122T132301Z-fa1bb05b"
+          },
+          "mean_dists": 0.5082742820183436,
+          "active_dists": 0.320855051279068,
+          "fallback_dists": 0.6956935127576193,
+          "rgb_psnr": 18.338188560683584
+        },
+        {
+          "arm": {
+            "name": "joint-q60",
+            "kind": "rgb_npy",
+            "path": "/local/users/emanuele/pointstream/cache/a833d1b6ca5d329ca1c1ff64c533d6c3a1ec2ce1e4643b18a301416af15302dd/tree/publish/frames.npy",
+            "sha256": "10798a019061aab444d33fddce09651860ac6f70d188451b6286b7dd931f7134",
+            "receipt": "/local/users/emanuele/pointstream/cache/a833d1b6ca5d329ca1c1ff64c533d6c3a1ec2ce1e4643b18a301416af15302dd/tree/publish/finish.json",
+            "receipt_sha256": "4e1422521567f39808bc5284914182da982e922643dbd303ce5a867dca9b2331",
+            "width": 1920,
+            "height": 1080,
+            "bytes": 14010,
+            "kbps": 23.35,
+            "cold_kbps": 301.93833333333333,
+            "joint_sha256": "dbd41008a727bc2878187454a30fde166e79a438c41bb87775ff96bb943c7a0f",
+            "receiver_job": "20261122T131301Z-aebb0fec"
+          },
+          "mean_dists": 0.46073534588019055,
+          "active_dists": 0.3165303021669388,
+          "fallback_dists": 0.6049403895934423,
+          "rgb_psnr": 19.5669433278033
+        },
+        {
+          "arm": {
+            "name": "joint-q50",
+            "kind": "rgb_zseq",
+            "path": "/local/users/emanuele/pointstream/cache/5c984788c8a2bee5f72f94ca6878795a95e6b43a46c1e0a0eb04268119750ffa/frames.zseq",
+            "sha256": "5c984788c8a2bee5f72f94ca6878795a95e6b43a46c1e0a0eb04268119750ffa",
+            "receipt": "/local/users/emanuele/pointstream/cache/2225da150413edff1813384c59b6104207371a65a8000d4fa89f4cf5c6e5ae84/rung.json",
+            "receipt_sha256": "2225da150413edff1813384c59b6104207371a65a8000d4fa89f4cf5c6e5ae84",
+            "width": 1920,
+            "height": 1080,
+            "bytes": 16334,
+            "kbps": 27.223333333333333,
+            "cold_kbps": 305.81166666666667,
+            "joint_sha256": "895765c4dfdc9e9bbb709368663889b90991394ae48b75f869d0115462eda5e2",
+            "receiver_job": "20261122T132345Z-0db86410"
+          },
+          "mean_dists": 0.4396403854091962,
+          "active_dists": 0.31751953562100727,
+          "fallback_dists": 0.5617612351973852,
+          "rgb_psnr": 19.671270027467926
+        }
+      ],
+      "primary": {
+        "arm": {
+          "name": "joint-q60",
+          "kind": "rgb_npy",
+          "path": "/local/users/emanuele/pointstream/cache/a833d1b6ca5d329ca1c1ff64c533d6c3a1ec2ce1e4643b18a301416af15302dd/tree/publish/frames.npy",
+          "sha256": "10798a019061aab444d33fddce09651860ac6f70d188451b6286b7dd931f7134",
+          "receipt": "/local/users/emanuele/pointstream/cache/a833d1b6ca5d329ca1c1ff64c533d6c3a1ec2ce1e4643b18a301416af15302dd/tree/publish/finish.json",
+          "receipt_sha256": "4e1422521567f39808bc5284914182da982e922643dbd303ce5a867dca9b2331",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 14010,
+          "kbps": 23.35,
+          "cold_kbps": 301.93833333333333,
+          "joint_sha256": "dbd41008a727bc2878187454a30fde166e79a438c41bb87775ff96bb943c7a0f",
+          "receiver_job": "20261122T131301Z-aebb0fec"
+        },
+        "mean_dists": 0.46073534588019055,
+        "active_dists": 0.3165303021669388,
+        "fallback_dists": 0.6049403895934423,
+        "rgb_psnr": 19.5669433278033
+      },
+      "anchors": {
+        "ordinary": {
+          "arm": {
+            "name": "ordinary-w320-near-14010B",
+            "kind": "native_yuv420p",
+            "width": 320,
+            "height": 192,
+            "sha256": "377a63a76fec23a656cd14ee11551578b2c4c445ab49fc5d0312fce4920a3101",
+            "path": "/private/tmp/ps-med024-joint-matched-av1-price-20261122/w320-q4253/decoded.yuv",
+            "bytes": 13952,
+            "kbps": 23.253333333333334,
+            "crf": 63.25,
+            "stream_sha256": "c87016993060a843447c6a339f4812c783eb5cf2c68eb473a3fd88cad89b13e0",
+            "price_cap_bytes": 14010
+          },
+          "mean_dists": 0.5609582588076591,
+          "active_dists": 0.5646046102046967,
+          "fallback_dists": 0.5573119074106216,
+          "rgb_psnr": 20.759407205520198
+        },
+        "ordinary_nearest": {
+          "arm": {
+            "name": "ordinary-w160-near-14010B",
+            "kind": "native_yuv420p",
+            "width": 160,
+            "height": 96,
+            "sha256": "ee6e830686fc9c646ba58bf467bc21b3da7e52feabc09c7c94513d883854cccf",
+            "path": "/private/tmp/ps-med024-joint-matched-av1-price-20261122/w160-q4199/decoded.yuv",
+            "bytes": 13987,
+            "kbps": 23.311666666666667,
+            "crf": 49.75,
+            "stream_sha256": "9385fde7c998fc5e9cc06526e3e4479b27f6c4a68ef8ca99b2fe74da47312864",
+            "price_cap_bytes": 14010
+          },
+          "mean_dists": 0.5660140365362167,
+          "active_dists": 0.5696686208248138,
+          "fallback_dists": 0.5623594522476196,
+          "rgb_psnr": 19.690203592225263
+        },
+        "neural": {
+          "arm": {
+            "name": "dcvc-w480-q27",
+            "kind": "native_yuv420p",
+            "width": 480,
+            "height": 272,
+            "path": "/private/tmp/ps-med024-q27-native50-decoded.yuv",
+            "sha256": "d5ad0d6713e5af7136e26b2355b659ecd3e57c1e77b7d3f906e89fcf1430d167",
+            "kbps": 23.215,
+            "bytes": 13929,
+            "producer_job": "20261122T113407Z-e40cac03",
+            "producer_archive_sha256": "c2afaac99f5e7a0fa0b8b6830dbdd720e80ff0f6411cb982af4dd00a673b8f5b",
+            "container_sha256": "0d931927a9cce8a48bb57dfa0fc036fc7c2d4541e95f0d9cb8d28d50100e664b",
+            "source_sha256": "4d602291ebea0fcb9698d86d3f93ce4c3076a13005e33079a82975b8b64605f2",
+            "gpu": "NVIDIA RTX 6000 Ada Generation",
+            "validated_native_passes": 4
+          },
+          "mean_dists": 0.44006600230932236,
+          "active_dists": 0.45136110484600067,
+          "fallback_dists": 0.42877089977264404,
+          "rgb_psnr": 22.164808794047715
+        },
+        "neural_nearest": {
+          "arm": {
+            "name": "dcvc-w480-q27",
+            "kind": "native_yuv420p",
+            "width": 480,
+            "height": 272,
+            "path": "/private/tmp/ps-med024-q27-native50-decoded.yuv",
+            "sha256": "d5ad0d6713e5af7136e26b2355b659ecd3e57c1e77b7d3f906e89fcf1430d167",
+            "kbps": 23.215,
+            "bytes": 13929,
+            "producer_job": "20261122T113407Z-e40cac03",
+            "producer_archive_sha256": "c2afaac99f5e7a0fa0b8b6830dbdd720e80ff0f6411cb982af4dd00a673b8f5b",
+            "container_sha256": "0d931927a9cce8a48bb57dfa0fc036fc7c2d4541e95f0d9cb8d28d50100e664b",
+            "source_sha256": "4d602291ebea0fcb9698d86d3f93ce4c3076a13005e33079a82975b8b64605f2",
+            "gpu": "NVIDIA RTX 6000 Ada Generation",
+            "validated_native_passes": 4
+          },
+          "mean_dists": 0.44006600230932236,
+          "active_dists": 0.45136110484600067,
+          "fallback_dists": 0.42877089977264404,
+          "rgb_psnr": 22.164808794047715
+        }
+      },
+      "bd": {
+        "ordinary": {
+          "common_dists": [
+            0.4396403854091962,
+            0.5082742820183436
+          ],
+          "bd_rate_percent": -41.809040861090494,
+          "anchor_hull": [
+            [
+              14.858333333333333,
+              -0.7001745998859406
+            ],
+            [
+              17.135,
+              -0.621109259625276
+            ],
+            [
+              18.881666666666668,
+              -0.5975966428716978
+            ],
+            [
+              27.141666666666666,
+              -0.5265666122237841
+            ],
+            [
+              30.085,
+              -0.511940578619639
+            ],
+            [
+              43.983333333333334,
+              -0.4508012955387433
+            ],
+            [
+              66.09,
+              -0.38631561895211536
+            ],
+            [
+              119.18,
+              -0.33994076152642566
+            ],
+            [
+              210.80833333333334,
+              -0.30166935672362644
+            ]
+          ],
+          "test_hull": [
+            [
+              19.545,
+              -0.5082742820183436
+            ],
+            [
+              23.35,
+              -0.46073534588019055
+            ],
+            [
+              27.223333333333333,
+              -0.4396403854091962
+            ]
+          ]
+        },
+        "neural": {
+          "common_dists": [
+            0.44006600230932236,
+            0.45580432812372845
+          ],
+          "bd_rate_percent": 16.928207895552315,
+          "anchor_hull": [
+            [
+              20.436666666666667,
+              -0.45580432812372845
+            ],
+            [
+              23.215,
+              -0.44006600230932236
+            ]
+          ],
+          "test_hull": [
+            [
+              19.545,
+              -0.5082742820183436
+            ],
+            [
+              23.35,
+              -0.46073534588019055
+            ],
+            [
+              27.223333333333333,
+              -0.4396403854091962
+            ]
+          ]
+        }
+      },
+      "cold": {
+        "pointstream_kbps": 301.93833333333333,
+        "ordinary": {
+          "arm": {
+            "name": "ordinary-960-cold",
+            "kind": "native_yuv420p",
+            "path": "/local/users/emanuele/pointstream/scratch/20261122T125109Z-e3bffa25-full/ordinary-cold.yuv",
+            "sha256": "c6a8efd219279c7eab6db2214593d1f0c1b62e4400b1372e59411323422513f8",
+            "width": 960,
+            "height": 544,
+            "bytes": 179404,
+            "kbps": 299.00666666666666,
+            "producer_job": "svt-av1-4.0.1-024-a32e458bf225",
+            "stream_sha256": "a32e458bf2257b17e5474ef8f70ba82543054e59ae404b5b5334aa22f1ed8792",
+            "decoder": {
+              "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+              "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+              "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+              "version": "1.5.4"
+            }
+          },
+          "mean_dists": 0.24792961527903876,
+          "active_dists": 0.2531135380268097,
+          "fallback_dists": 0.2427456925312678,
+          "rgb_psnr": 27.94754309982646
+        },
+        "player_dists_difference": 0.2128057306011518
+      }
+    }
+  ],
+  "within_match": {
+    "ordinary": {
+      "mean_dists": {
+        "pointstream_mean": 0.4513020979033576,
+        "anchor_mean": 0.5408138566546971,
+        "difference": -0.08951175875133943,
+        "relative_change": -0.16551306452284853,
+        "by_shot_differences": [
+          -0.08740846812725073,
+          -0.08090389519929891,
+          -0.1002229129274686
+        ]
+      },
+      "active_dists": {
+        "pointstream_mean": 0.32688479125499725,
+        "anchor_mean": 0.5432557794782851,
+        "difference": -0.21637098822328782,
+        "relative_change": -0.398285662843899,
+        "by_shot_differences": [
+          -0.20026017725467676,
+          -0.2007784793774287,
+          -0.24807430803775787
+        ]
+      },
+      "fallback_dists": {
+        "pointstream_mean": 0.575719404551718,
+        "anchor_mean": 0.5383719338311089,
+        "difference": 0.037347470720609066,
+        "relative_change": 0.06937113243411619,
+        "by_shot_differences": [
+          0.025443241000175476,
+          0.03897068897883105,
+          0.047628482182820675
+        ]
+      },
+      "rgb_psnr": {
+        "pointstream_mean": 19.476328064853973,
+        "anchor_mean": 20.669176996573395,
+        "difference": -1.1928489317194213,
+        "relative_change": null,
+        "by_shot_differences": [
+          -1.1945810670786656,
+          -1.1915018503627053,
+          -1.1924638777168965
+        ]
+      }
+    },
+    "neural": {
+      "mean_dists": {
+        "pointstream_mean": 0.4513020979033576,
+        "anchor_mean": 0.4453246179554197,
+        "difference": 0.005977479947937903,
+        "relative_change": 0.013422747602370944,
+        "by_shot_differences": [
+          -0.01076798141002655,
+          0.008031077682971954,
+          0.020669343570868193
+        ]
+      },
+      "active_dists": {
+        "pointstream_mean": 0.32688479125499725,
+        "anchor_mean": 0.44577008816930985,
+        "difference": -0.1188852969143126,
+        "relative_change": -0.26669644300843776,
+        "by_shot_differences": [
+          -0.10802454253037769,
+          -0.11380054553349817,
+          -0.1348308026790619
+        ]
+      },
+      "fallback_dists": {
+        "pointstream_mean": 0.575719404551718,
+        "anchor_mean": 0.4448791477415297,
+        "difference": 0.1308402568101883,
+        "relative_change": 0.2941029209267527,
+        "by_shot_differences": [
+          0.08648857971032459,
+          0.12986270089944207,
+          0.17616948982079828
+        ]
+      },
+      "rgb_psnr": {
+        "pointstream_mean": 19.476328064853973,
+        "anchor_mean": 22.034788232996238,
+        "difference": -2.5584601681422647,
+        "relative_change": null,
+        "by_shot_differences": [
+          -2.5505129417915207,
+          -2.527002096390863,
+          -2.5978654662444143
+        ]
+      }
+    },
+    "neural_nearest": {
+      "mean_dists": {
+        "pointstream_mean": 0.4513020979033576,
+        "anchor_mean": 0.44160208437177867,
+        "difference": 0.009700013531578955,
+        "relative_change": 0.021965506674132218,
+        "by_shot_differences": [
+          0.00039961934089660645,
+          0.008031077682971954,
+          0.020669343570868193
+        ]
+      },
+      "active_dists": {
+        "pointstream_mean": 0.32688479125499725,
+        "anchor_mean": 0.439942200978597,
+        "difference": -0.11305740972359973,
+        "relative_change": -0.25698241603582817,
+        "by_shot_differences": [
+          -0.0905408809582392,
+          -0.11380054553349817,
+          -0.1348308026790619
+        ]
+      },
+      "fallback_dists": {
+        "pointstream_mean": 0.575719404551718,
+        "anchor_mean": 0.4432619677649604,
+        "difference": 0.1324574367867576,
+        "relative_change": 0.29882427643102716,
+        "by_shot_differences": [
+          0.09134011964003247,
+          0.12986270089944207,
+          0.17616948982079828
+        ]
+      },
+      "rgb_psnr": {
+        "pointstream_mean": 19.476328064853973,
+        "anchor_mean": 22.05047840556067,
+        "difference": -2.574150340706698,
+        "relative_change": null,
+        "by_shot_differences": [
+          -2.5975834594848166,
+          -2.527002096390863,
+          -2.5978654662444143
+        ]
+      }
+    }
+  }
+}

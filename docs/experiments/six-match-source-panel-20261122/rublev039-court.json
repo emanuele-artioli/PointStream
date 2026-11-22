@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "device": "cpu",
+  "hosts": [
+    "gpu1",
+    "gpu2",
+    "gpu3",
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [],
+  "gpu_memory_mib": 0,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "local_storage_gib": 30,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.test_joint_courts"
+  ],
+  "arguments": [
+    "--source",
+    "{staged:rublev039}",
+    "--event",
+    "rublev039",
+    "--sha",
+    "2bb0ac4109303a36ab637d5ba986db59a8558240ce88022dd14c17cdfc7330db",
+    "--fps",
+    "50/1",
+    "--length",
+    "337",
+    "--frames",
+    "{frames}"
+  ],
+  "staged_inputs": [
+    {
+      "name": "rublev039",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/six-match-source-panel-20261122/rublev039-2bb0ac410930.mp4",
+      "sha256": "2bb0ac4109303a36ab637d5ba986db59a8558240ce88022dd14c17cdfc7330db",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/six-match-source-panel-20261122/rublev039-2bb0ac410930.mp4",
+      "sha256": "2bb0ac4109303a36ab637d5ba986db59a8558240ce88022dd14c17cdfc7330db"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "verify_staged_inputs": true,
+  "required_commands": [
+    "ffmpeg",
+    "ffprobe"
+  ],
+  "scale": {
+    "frames": {
+      "smoke": 12,
+      "full": 240
+    }
+  },
+  "smoke": {
+    "seconds": 180,
+    "representative_basis": "First 12 native frames of this same source, real detector and preview on the complete chosen host."
+  },
+  "full": {
+    "seconds": 1200
+  },
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.test_joint_courts",
+    "--validate",
+    "--event",
+    "rublev039",
+    "--full-seconds",
+    "1200"
+  ],
+  "validator_seconds": 60,
+  "budget_seconds": 1500,
+  "stall_seconds": 2200,
+  "deadline": "2026-11-22T18:30:00Z",
+  "contention": {
+    "policy": "stop",
+    "resume_attempts": 0
+  }
+}

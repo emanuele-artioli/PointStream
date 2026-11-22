@@ -1,0 +1,1948 @@
+{
+  "source_yuv_sha256": "f80c34e6fb264ec8170a52af5e9368ff58d0ed400f8abb422192280d9eb6d434",
+  "script_sha256": "ca291f424fce5a041d9a4169b5a427a2f3c980ecb2165bcb1880bac6d2fd4f6e",
+  "cpu_seconds": 12.213201000000002,
+  "meaning": "Absolute motion-compensated luma residual error on the intersection of adjacent source-model bodies, both endpoints inside native patches; equal player/transition weighting.",
+  "rows": [
+    {
+      "tick": 1,
+      "person": "person:000000000000",
+      "mode": "q65",
+      "pixels": 10903,
+      "luma_error": 9.360010147094727
+    },
+    {
+      "tick": 1,
+      "person": "person:000000000000",
+      "mode": "q78",
+      "pixels": 10903,
+      "luma_error": 9.92259407043457
+    },
+    {
+      "tick": 1,
+      "person": "person:000000000000",
+      "mode": "q90",
+      "pixels": 10903,
+      "luma_error": 9.118103981018066
+    },
+    {
+      "tick": 1,
+      "person": "person:000000000000",
+      "mode": "lossless",
+      "pixels": 10903,
+      "luma_error": 8.851737022399902
+    },
+    {
+      "tick": 1,
+      "person": "person:000000000000",
+      "mode": "jpeg40",
+      "pixels": 10903,
+      "luma_error": 9.770044326782227
+    },
+    {
+      "tick": 1,
+      "person": "person:000000000000",
+      "mode": "jpeg70",
+      "pixels": 10903,
+      "luma_error": 10.115764617919922
+    },
+    {
+      "tick": 1,
+      "person": "person:000000000001",
+      "mode": "q65",
+      "pixels": 3660,
+      "luma_error": 5.942101955413818
+    },
+    {
+      "tick": 1,
+      "person": "person:000000000001",
+      "mode": "q78",
+      "pixels": 3660,
+      "luma_error": 6.09105920791626
+    },
+    {
+      "tick": 1,
+      "person": "person:000000000001",
+      "mode": "q90",
+      "pixels": 3660,
+      "luma_error": 5.802170753479004
+    },
+    {
+      "tick": 1,
+      "person": "person:000000000001",
+      "mode": "lossless",
+      "pixels": 3660,
+      "luma_error": 5.432528972625732
+    },
+    {
+      "tick": 1,
+      "person": "person:000000000001",
+      "mode": "jpeg40",
+      "pixels": 3660,
+      "luma_error": 7.256505489349365
+    },
+    {
+      "tick": 1,
+      "person": "person:000000000001",
+      "mode": "jpeg70",
+      "pixels": 3660,
+      "luma_error": 6.119365692138672
+    },
+    {
+      "tick": 2,
+      "person": "person:000000000000",
+      "mode": "q65",
+      "pixels": 10914,
+      "luma_error": 7.094052791595459
+    },
+    {
+      "tick": 2,
+      "person": "person:000000000000",
+      "mode": "q78",
+      "pixels": 10914,
+      "luma_error": 7.545821189880371
+    },
+    {
+      "tick": 2,
+      "person": "person:000000000000",
+      "mode": "q90",
+      "pixels": 10914,
+      "luma_error": 7.1500325202941895
+    },
+    {
+      "tick": 2,
+      "person": "person:000000000000",
+      "mode": "lossless",
+      "pixels": 10914,
+      "luma_error": 7.0398054122924805
+    },
+    {
+      "tick": 2,
+      "person": "person:000000000000",
+      "mode": "jpeg40",
+      "pixels": 10914,
+      "luma_error": 6.949991226196289
+    },
+    {
+      "tick": 2,
+      "person": "person:000000000000",
+      "mode": "jpeg70",
+      "pixels": 10914,
+      "luma_error": 7.280165672302246
+    },
+    {
+      "tick": 2,
+      "person": "person:000000000001",
+      "mode": "q65",
+      "pixels": 3667,
+      "luma_error": 7.747269630432129
+    },
+    {
+      "tick": 2,
+      "person": "person:000000000001",
+      "mode": "q78",
+      "pixels": 3667,
+      "luma_error": 7.998096466064453
+    },
+    {
+      "tick": 2,
+      "person": "person:000000000001",
+      "mode": "q90",
+      "pixels": 3667,
+      "luma_error": 8.149961471557617
+    },
+    {
+      "tick": 2,
+      "person": "person:000000000001",
+      "mode": "lossless",
+      "pixels": 3667,
+      "luma_error": 7.577602863311768
+    },
+    {
+      "tick": 2,
+      "person": "person:000000000001",
+      "mode": "jpeg40",
+      "pixels": 3667,
+      "luma_error": 10.787030220031738
+    },
+    {
+      "tick": 2,
+      "person": "person:000000000001",
+      "mode": "jpeg70",
+      "pixels": 3667,
+      "luma_error": 9.321581840515137
+    },
+    {
+      "tick": 3,
+      "person": "person:000000000000",
+      "mode": "q65",
+      "pixels": 10896,
+      "luma_error": 7.421792507171631
+    },
+    {
+      "tick": 3,
+      "person": "person:000000000000",
+      "mode": "q78",
+      "pixels": 10896,
+      "luma_error": 7.694082260131836
+    },
+    {
+      "tick": 3,
+      "person": "person:000000000000",
+      "mode": "q90",
+      "pixels": 10896,
+      "luma_error": 7.64060640335083
+    },
+    {
+      "tick": 3,
+      "person": "person:000000000000",
+      "mode": "lossless",
+      "pixels": 10896,
+      "luma_error": 7.488924980163574
+    },
+    {
+      "tick": 3,
+      "person": "person:000000000000",
+      "mode": "jpeg40",
+      "pixels": 10896,
+      "luma_error": 7.542525768280029
+    },
+    {
+      "tick": 3,
+      "person": "person:000000000000",
+      "mode": "jpeg70",
+      "pixels": 10896,
+      "luma_error": 7.872903347015381
+    },
+    {
+      "tick": 3,
+      "person": "person:000000000001",
+      "mode": "q65",
+      "pixels": 3654,
+      "luma_error": 7.51370096206665
+    },
+    {
+      "tick": 3,
+      "person": "person:000000000001",
+      "mode": "q78",
+      "pixels": 3654,
+      "luma_error": 7.446730136871338
+    },
+    {
+      "tick": 3,
+      "person": "person:000000000001",
+      "mode": "q90",
+      "pixels": 3654,
+      "luma_error": 6.841438293457031
+    },
+    {
+      "tick": 3,
+      "person": "person:000000000001",
+      "mode": "lossless",
+      "pixels": 3654,
+      "luma_error": 7.09257173538208
+    },
+    {
+      "tick": 3,
+      "person": "person:000000000001",
+      "mode": "jpeg40",
+      "pixels": 3654,
+      "luma_error": 8.386733055114746
+    },
+    {
+      "tick": 3,
+      "person": "person:000000000001",
+      "mode": "jpeg70",
+      "pixels": 3654,
+      "luma_error": 8.229334831237793
+    },
+    {
+      "tick": 4,
+      "person": "person:000000000000",
+      "mode": "q65",
+      "pixels": 10832,
+      "luma_error": 8.145941734313965
+    },
+    {
+      "tick": 4,
+      "person": "person:000000000000",
+      "mode": "q78",
+      "pixels": 10832,
+      "luma_error": 8.251134872436523
+    },
+    {
+      "tick": 4,
+      "person": "person:000000000000",
+      "mode": "q90",
+      "pixels": 10832,
+      "luma_error": 7.916260242462158
+    },
+    {
+      "tick": 4,
+      "person": "person:000000000000",
+      "mode": "lossless",
+      "pixels": 10832,
+      "luma_error": 7.680540084838867
+    },
+    {
+      "tick": 4,
+      "person": "person:000000000000",
+      "mode": "jpeg40",
+      "pixels": 10832,
+      "luma_error": 8.292521476745605
+    },
+    {
+      "tick": 4,
+      "person": "person:000000000000",
+      "mode": "jpeg70",
+      "pixels": 10832,
+      "luma_error": 8.341123580932617
+    },
+    {
+      "tick": 4,
+      "person": "person:000000000001",
+      "mode": "q65",
+      "pixels": 3685,
+      "luma_error": 8.051383972167969
+    },
+    {
+      "tick": 4,
+      "person": "person:000000000001",
+      "mode": "q78",
+      "pixels": 3685,
+      "luma_error": 8.399836540222168
+    },
+    {
+      "tick": 4,
+      "person": "person:000000000001",
+      "mode": "q90",
+      "pixels": 3685,
+      "luma_error": 8.53069019317627
+    },
+    {
+      "tick": 4,
+      "person": "person:000000000001",
+      "mode": "lossless",
+      "pixels": 3685,
+      "luma_error": 8.178566932678223
+    },
+    {
+      "tick": 4,
+      "person": "person:000000000001",
+      "mode": "jpeg40",
+      "pixels": 3685,
+      "luma_error": 10.947729110717773
+    },
+    {
+      "tick": 4,
+      "person": "person:000000000001",
+      "mode": "jpeg70",
+      "pixels": 3685,
+      "luma_error": 8.392958641052246
+    },
+    {
+      "tick": 5,
+      "person": "person:000000000000",
+      "mode": "q65",
+      "pixels": 10886,
+      "luma_error": 7.0537309646606445
+    },
+    {
+      "tick": 5,
+      "person": "person:000000000000",
+      "mode": "q78",
+      "pixels": 10886,
+      "luma_error": 7.055848598480225
+    },
+    {
+      "tick": 5,
+      "person": "person:000000000000",
+      "mode": "q90",
+      "pixels": 10886,
+      "luma_error": 6.53147029876709
+    },
+    {
+      "tick": 5,
+      "person": "person:000000000000",
+      "mode": "lossless",
+      "pixels": 10886,
+      "luma_error": 6.568169593811035
+    },
+    {
+      "tick": 5,
+      "person": "person:000000000000",
+      "mode": "jpeg40",
+      "pixels": 10886,
+      "luma_error": 6.463408470153809
+    },
+    {
+      "tick": 5,
+      "person": "person:000000000000",
+      "mode": "jpeg70",
+      "pixels": 10886,
+      "luma_error": 7.18491792678833
+    },
+    {
+      "tick": 5,
+      "person": "person:000000000001",
+      "mode": "q65",
+      "pixels": 3784,
+      "luma_error": 6.80986213684082
+    },
+    {
+      "tick": 5,
+      "person": "person:000000000001",
+      "mode": "q78",
+      "pixels": 3784,
+      "luma_error": 7.123227596282959
+    },
+    {
+      "tick": 5,
+      "person": "person:000000000001",
+      "mode": "q90",
+      "pixels": 3784,
+      "luma_error": 7.056124687194824
+    },
+    {
+      "tick": 5,
+      "person": "person:000000000001",
+      "mode": "lossless",
+      "pixels": 3784,
+      "luma_error": 6.489201068878174
+    },
+    {
+      "tick": 5,
+      "person": "person:000000000001",
+      "mode": "jpeg40",
+      "pixels": 3784,
+      "luma_error": 7.963171482086182
+    },
+    {
+      "tick": 5,
+      "person": "person:000000000001",
+      "mode": "jpeg70",
+      "pixels": 3784,
+      "luma_error": 8.121722221374512
+    },
+    {
+      "tick": 6,
+      "person": "person:000000000000",
+      "mode": "q65",
+      "pixels": 11101,
+      "luma_error": 6.714705467224121
+    },
+    {
+      "tick": 6,
+      "person": "person:000000000000",
+      "mode": "q78",
+      "pixels": 11101,
+      "luma_error": 6.533600807189941
+    },
+    {
+      "tick": 6,
+      "person": "person:000000000000",
+      "mode": "q90",
+      "pixels": 11101,
+      "luma_error": 6.411478042602539
+    },
+    {
+      "tick": 6,
+      "person": "person:000000000000",
+      "mode": "lossless",
+      "pixels": 11101,
+      "luma_error": 6.164142608642578
+    },
+    {
+      "tick": 6,
+      "person": "person:000000000000",
+      "mode": "jpeg40",
+      "pixels": 11101,
+      "luma_error": 6.6715850830078125
+    },
+    {
+      "tick": 6,
+      "person": "person:000000000000",
+      "mode": "jpeg70",
+      "pixels": 11101,
+      "luma_error": 7.472602367401123
+    },
+    {
+      "tick": 6,
+      "person": "person:000000000001",
+      "mode": "q65",
+      "pixels": 3752,
+      "luma_error": 6.5362629890441895
+    },
+    {
+      "tick": 6,
+      "person": "person:000000000001",
+      "mode": "q78",
+      "pixels": 3752,
+      "luma_error": 6.663152694702148
+    },
+    {
+      "tick": 6,
+      "person": "person:000000000001",
+      "mode": "q90",
+      "pixels": 3752,
+      "luma_error": 6.713516712188721
+    },
+    {
+      "tick": 6,
+      "person": "person:000000000001",
+      "mode": "lossless",
+      "pixels": 3752,
+      "luma_error": 6.399981498718262
+    },
+    {
+      "tick": 6,
+      "person": "person:000000000001",
+      "mode": "jpeg40",
+      "pixels": 3752,
+      "luma_error": 8.194449424743652
+    },
+    {
+      "tick": 6,
+      "person": "person:000000000001",
+      "mode": "jpeg70",
+      "pixels": 3752,
+      "luma_error": 7.819441318511963
+    },
+    {
+      "tick": 7,
+      "person": "person:000000000000",
+      "mode": "q65",
+      "pixels": 10919,
+      "luma_error": 7.069233417510986
+    },
+    {
+      "tick": 7,
+      "person": "person:000000000000",
+      "mode": "q78",
+      "pixels": 10919,
+      "luma_error": 7.417783260345459
+    },
+    {
+      "tick": 7,
+      "person": "person:000000000000",
+      "mode": "q90",
+      "pixels": 10919,
+      "luma_error": 7.370668888092041
+    },
+    {
+      "tick": 7,
+      "person": "person:000000000000",
+      "mode": "lossless",
+      "pixels": 10919,
+      "luma_error": 7.00042200088501
+    },
+    {
+      "tick": 7,
+      "person": "person:000000000000",
+      "mode": "jpeg40",
+      "pixels": 10919,
+      "luma_error": 6.907619476318359
+    },
+    {
+      "tick": 7,
+      "person": "person:000000000000",
+      "mode": "jpeg70",
+      "pixels": 10919,
+      "luma_error": 7.2456440925598145
+    },
+    {
+      "tick": 7,
+      "person": "person:000000000001",
+      "mode": "q65",
+      "pixels": 3751,
+      "luma_error": 9.461141586303711
+    },
+    {
+      "tick": 7,
+      "person": "person:000000000001",
+      "mode": "q78",
+      "pixels": 3751,
+      "luma_error": 8.709200859069824
+    },
+    {
+      "tick": 7,
+      "person": "person:000000000001",
+      "mode": "q90",
+      "pixels": 3751,
+      "luma_error": 8.475320816040039
+    },
+    {
+      "tick": 7,
+      "person": "person:000000000001",
+      "mode": "lossless",
+      "pixels": 3751,
+      "luma_error": 8.183157920837402
+    },
+    {
+      "tick": 7,
+      "person": "person:000000000001",
+      "mode": "jpeg40",
+      "pixels": 3751,
+      "luma_error": 8.502408027648926
+    },
+    {
+      "tick": 7,
+      "person": "person:000000000001",
+      "mode": "jpeg70",
+      "pixels": 3751,
+      "luma_error": 9.393784523010254
+    },
+    {
+      "tick": 8,
+      "person": "person:000000000000",
+      "mode": "q65",
+      "pixels": 10741,
+      "luma_error": 6.915795803070068
+    },
+    {
+      "tick": 8,
+      "person": "person:000000000000",
+      "mode": "q78",
+      "pixels": 10741,
+      "luma_error": 6.640374183654785
+    },
+    {
+      "tick": 8,
+      "person": "person:000000000000",
+      "mode": "q90",
+      "pixels": 10741,
+      "luma_error": 6.694556713104248
+    },
+    {
+      "tick": 8,
+      "person": "person:000000000000",
+      "mode": "lossless",
+      "pixels": 10741,
+      "luma_error": 6.509951591491699
+    },
+    {
+      "tick": 8,
+      "person": "person:000000000000",
+      "mode": "jpeg40",
+      "pixels": 10741,
+      "luma_error": 6.228781700134277
+    },
+    {
+      "tick": 8,
+      "person": "person:000000000000",
+      "mode": "jpeg70",
+      "pixels": 10741,
+      "luma_error": 6.628603458404541
+    },
+    {
+      "tick": 8,
+      "person": "person:000000000001",
+      "mode": "q65",
+      "pixels": 3842,
+      "luma_error": 6.405256748199463
+    },
+    {
+      "tick": 8,
+      "person": "person:000000000001",
+      "mode": "q78",
+      "pixels": 3842,
+      "luma_error": 6.79122257232666
+    },
+    {
+      "tick": 8,
+      "person": "person:000000000001",
+      "mode": "q90",
+      "pixels": 3842,
+      "luma_error": 6.3733415603637695
+    },
+    {
+      "tick": 8,
+      "person": "person:000000000001",
+      "mode": "lossless",
+      "pixels": 3842,
+      "luma_error": 6.258420467376709
+    },
+    {
+      "tick": 8,
+      "person": "person:000000000001",
+      "mode": "jpeg40",
+      "pixels": 3842,
+      "luma_error": 8.490882873535156
+    },
+    {
+      "tick": 8,
+      "person": "person:000000000001",
+      "mode": "jpeg70",
+      "pixels": 3842,
+      "luma_error": 7.152538776397705
+    },
+    {
+      "tick": 9,
+      "person": "person:000000000000",
+      "mode": "q65",
+      "pixels": 11045,
+      "luma_error": 6.9737043380737305
+    },
+    {
+      "tick": 9,
+      "person": "person:000000000000",
+      "mode": "q78",
+      "pixels": 11045,
+      "luma_error": 7.022897720336914
+    },
+    {
+      "tick": 9,
+      "person": "person:000000000000",
+      "mode": "q90",
+      "pixels": 11045,
+      "luma_error": 7.072872161865234
+    },
+    {
+      "tick": 9,
+      "person": "person:000000000000",
+      "mode": "lossless",
+      "pixels": 11045,
+      "luma_error": 6.7423906326293945
+    },
+    {
+      "tick": 9,
+      "person": "person:000000000000",
+      "mode": "jpeg40",
+      "pixels": 11045,
+      "luma_error": 6.8290205001831055
+    },
+    {
+      "tick": 9,
+      "person": "person:000000000000",
+      "mode": "jpeg70",
+      "pixels": 11045,
+      "luma_error": 7.247784614562988
+    },
+    {
+      "tick": 9,
+      "person": "person:000000000001",
+      "mode": "q65",
+      "pixels": 3908,
+      "luma_error": 8.862289428710938
+    },
+    {
+      "tick": 9,
+      "person": "person:000000000001",
+      "mode": "q78",
+      "pixels": 3908,
+      "luma_error": 7.9824137687683105
+    },
+    {
+      "tick": 9,
+      "person": "person:000000000001",
+      "mode": "q90",
+      "pixels": 3908,
+      "luma_error": 8.233909606933594
+    },
+    {
+      "tick": 9,
+      "person": "person:000000000001",
+      "mode": "lossless",
+      "pixels": 3908,
+      "luma_error": 7.637021541595459
+    },
+    {
+      "tick": 9,
+      "person": "person:000000000001",
+      "mode": "jpeg40",
+      "pixels": 3908,
+      "luma_error": 9.353645324707031
+    },
+    {
+      "tick": 9,
+      "person": "person:000000000001",
+      "mode": "jpeg70",
+      "pixels": 3908,
+      "luma_error": 8.316006660461426
+    },
+    {
+      "tick": 10,
+      "person": "person:000000000000",
+      "mode": "q65",
+      "pixels": 11039,
+      "luma_error": 7.542874813079834
+    },
+    {
+      "tick": 10,
+      "person": "person:000000000000",
+      "mode": "q78",
+      "pixels": 11039,
+      "luma_error": 8.0626859664917
+    },
+    {
+      "tick": 10,
+      "person": "person:000000000000",
+      "mode": "q90",
+      "pixels": 11039,
+      "luma_error": 8.226888656616211
+    },
+    {
+      "tick": 10,
+      "person": "person:000000000000",
+      "mode": "lossless",
+      "pixels": 11039,
+      "luma_error": 7.758110523223877
+    },
+    {
+      "tick": 10,
+      "person": "person:000000000000",
+      "mode": "jpeg40",
+      "pixels": 11039,
+      "luma_error": 7.205072402954102
+    },
+    {
+      "tick": 10,
+      "person": "person:000000000000",
+      "mode": "jpeg70",
+      "pixels": 11039,
+      "luma_error": 7.4073710441589355
+    },
+    {
+      "tick": 10,
+      "person": "person:000000000001",
+      "mode": "q65",
+      "pixels": 3833,
+      "luma_error": 10.653371810913086
+    },
+    {
+      "tick": 10,
+      "person": "person:000000000001",
+      "mode": "q78",
+      "pixels": 3833,
+      "luma_error": 10.901397705078125
+    },
+    {
+      "tick": 10,
+      "person": "person:000000000001",
+      "mode": "q90",
+      "pixels": 3833,
+      "luma_error": 11.451138496398926
+    },
+    {
+      "tick": 10,
+      "person": "person:000000000001",
+      "mode": "lossless",
+      "pixels": 3833,
+      "luma_error": 11.37914752960205
+    },
+    {
+      "tick": 10,
+      "person": "person:000000000001",
+      "mode": "jpeg40",
+      "pixels": 3833,
+      "luma_error": 12.15618896484375
+    },
+    {
+      "tick": 10,
+      "person": "person:000000000001",
+      "mode": "jpeg70",
+      "pixels": 3833,
+      "luma_error": 10.289328575134277
+    },
+    {
+      "tick": 11,
+      "person": "person:000000000000",
+      "mode": "q65",
+      "pixels": 11124,
+      "luma_error": 8.051738739013672
+    },
+    {
+      "tick": 11,
+      "person": "person:000000000000",
+      "mode": "q78",
+      "pixels": 11124,
+      "luma_error": 8.36090087890625
+    },
+    {
+      "tick": 11,
+      "person": "person:000000000000",
+      "mode": "q90",
+      "pixels": 11124,
+      "luma_error": 8.72882080078125
+    },
+    {
+      "tick": 11,
+      "person": "person:000000000000",
+      "mode": "lossless",
+      "pixels": 11124,
+      "luma_error": 8.062808990478516
+    },
+    {
+      "tick": 11,
+      "person": "person:000000000000",
+      "mode": "jpeg40",
+      "pixels": 11124,
+      "luma_error": 7.252927303314209
+    },
+    {
+      "tick": 11,
+      "person": "person:000000000000",
+      "mode": "jpeg70",
+      "pixels": 11124,
+      "luma_error": 8.247526168823242
+    },
+    {
+      "tick": 11,
+      "person": "person:000000000001",
+      "mode": "q65",
+      "pixels": 3836,
+      "luma_error": 8.172159194946289
+    },
+    {
+      "tick": 11,
+      "person": "person:000000000001",
+      "mode": "q78",
+      "pixels": 3836,
+      "luma_error": 8.160587310791016
+    },
+    {
+      "tick": 11,
+      "person": "person:000000000001",
+      "mode": "q90",
+      "pixels": 3836,
+      "luma_error": 9.194912910461426
+    },
+    {
+      "tick": 11,
+      "person": "person:000000000001",
+      "mode": "lossless",
+      "pixels": 3836,
+      "luma_error": 8.745527267456055
+    },
+    {
+      "tick": 11,
+      "person": "person:000000000001",
+      "mode": "jpeg40",
+      "pixels": 3836,
+      "luma_error": 10.173727035522461
+    },
+    {
+      "tick": 11,
+      "person": "person:000000000001",
+      "mode": "jpeg70",
+      "pixels": 3836,
+      "luma_error": 10.906717300415039
+    },
+    {
+      "tick": 12,
+      "person": "person:000000000000",
+      "mode": "q65",
+      "pixels": 10999,
+      "luma_error": 6.639735698699951
+    },
+    {
+      "tick": 12,
+      "person": "person:000000000000",
+      "mode": "q78",
+      "pixels": 10999,
+      "luma_error": 7.554819107055664
+    },
+    {
+      "tick": 12,
+      "person": "person:000000000000",
+      "mode": "q90",
+      "pixels": 10999,
+      "luma_error": 7.245810508728027
+    },
+    {
+      "tick": 12,
+      "person": "person:000000000000",
+      "mode": "lossless",
+      "pixels": 10999,
+      "luma_error": 6.827758312225342
+    },
+    {
+      "tick": 12,
+      "person": "person:000000000000",
+      "mode": "jpeg40",
+      "pixels": 10999,
+      "luma_error": 6.038642883300781
+    },
+    {
+      "tick": 12,
+      "person": "person:000000000000",
+      "mode": "jpeg70",
+      "pixels": 10999,
+      "luma_error": 6.93773889541626
+    },
+    {
+      "tick": 12,
+      "person": "person:000000000001",
+      "mode": "q65",
+      "pixels": 4011,
+      "luma_error": 7.614485740661621
+    },
+    {
+      "tick": 12,
+      "person": "person:000000000001",
+      "mode": "q78",
+      "pixels": 4011,
+      "luma_error": 7.644011497497559
+    },
+    {
+      "tick": 12,
+      "person": "person:000000000001",
+      "mode": "q90",
+      "pixels": 4011,
+      "luma_error": 7.000756740570068
+    },
+    {
+      "tick": 12,
+      "person": "person:000000000001",
+      "mode": "lossless",
+      "pixels": 4011,
+      "luma_error": 7.7338762283325195
+    },
+    {
+      "tick": 12,
+      "person": "person:000000000001",
+      "mode": "jpeg40",
+      "pixels": 4011,
+      "luma_error": 8.854386329650879
+    },
+    {
+      "tick": 12,
+      "person": "person:000000000001",
+      "mode": "jpeg70",
+      "pixels": 4011,
+      "luma_error": 8.483603477478027
+    },
+    {
+      "tick": 13,
+      "person": "person:000000000000",
+      "mode": "q65",
+      "pixels": 10803,
+      "luma_error": 9.336335182189941
+    },
+    {
+      "tick": 13,
+      "person": "person:000000000000",
+      "mode": "q78",
+      "pixels": 10803,
+      "luma_error": 10.179109573364258
+    },
+    {
+      "tick": 13,
+      "person": "person:000000000000",
+      "mode": "q90",
+      "pixels": 10803,
+      "luma_error": 9.181564331054688
+    },
+    {
+      "tick": 13,
+      "person": "person:000000000000",
+      "mode": "lossless",
+      "pixels": 10803,
+      "luma_error": 8.425359725952148
+    },
+    {
+      "tick": 13,
+      "person": "person:000000000000",
+      "mode": "jpeg40",
+      "pixels": 10803,
+      "luma_error": 7.923916339874268
+    },
+    {
+      "tick": 13,
+      "person": "person:000000000000",
+      "mode": "jpeg70",
+      "pixels": 10803,
+      "luma_error": 10.998364448547363
+    },
+    {
+      "tick": 13,
+      "person": "person:000000000001",
+      "mode": "q65",
+      "pixels": 3994,
+      "luma_error": 11.097151756286621
+    },
+    {
+      "tick": 13,
+      "person": "person:000000000001",
+      "mode": "q78",
+      "pixels": 3994,
+      "luma_error": 10.715731620788574
+    },
+    {
+      "tick": 13,
+      "person": "person:000000000001",
+      "mode": "q90",
+      "pixels": 3994,
+      "luma_error": 8.70927619934082
+    },
+    {
+      "tick": 13,
+      "person": "person:000000000001",
+      "mode": "lossless",
+      "pixels": 3994,
+      "luma_error": 9.856276512145996
+    },
+    {
+      "tick": 13,
+      "person": "person:000000000001",
+      "mode": "jpeg40",
+      "pixels": 3994,
+      "luma_error": 11.205035209655762
+    },
+    {
+      "tick": 13,
+      "person": "person:000000000001",
+      "mode": "jpeg70",
+      "pixels": 3994,
+      "luma_error": 10.560199737548828
+    },
+    {
+      "tick": 14,
+      "person": "person:000000000000",
+      "mode": "q65",
+      "pixels": 10828,
+      "luma_error": 7.875962257385254
+    },
+    {
+      "tick": 14,
+      "person": "person:000000000000",
+      "mode": "q78",
+      "pixels": 10828,
+      "luma_error": 8.129999160766602
+    },
+    {
+      "tick": 14,
+      "person": "person:000000000000",
+      "mode": "q90",
+      "pixels": 10828,
+      "luma_error": 6.869828224182129
+    },
+    {
+      "tick": 14,
+      "person": "person:000000000000",
+      "mode": "lossless",
+      "pixels": 10828,
+      "luma_error": 7.019290447235107
+    },
+    {
+      "tick": 14,
+      "person": "person:000000000000",
+      "mode": "jpeg40",
+      "pixels": 10828,
+      "luma_error": 7.7095866203308105
+    },
+    {
+      "tick": 14,
+      "person": "person:000000000000",
+      "mode": "jpeg70",
+      "pixels": 10828,
+      "luma_error": 7.929742336273193
+    },
+    {
+      "tick": 14,
+      "person": "person:000000000001",
+      "mode": "q65",
+      "pixels": 3954,
+      "luma_error": 13.297778129577637
+    },
+    {
+      "tick": 14,
+      "person": "person:000000000001",
+      "mode": "q78",
+      "pixels": 3954,
+      "luma_error": 13.248453140258789
+    },
+    {
+      "tick": 14,
+      "person": "person:000000000001",
+      "mode": "q90",
+      "pixels": 3954,
+      "luma_error": 13.023035049438477
+    },
+    {
+      "tick": 14,
+      "person": "person:000000000001",
+      "mode": "lossless",
+      "pixels": 3954,
+      "luma_error": 12.44581127166748
+    },
+    {
+      "tick": 14,
+      "person": "person:000000000001",
+      "mode": "jpeg40",
+      "pixels": 3954,
+      "luma_error": 13.508867263793945
+    },
+    {
+      "tick": 14,
+      "person": "person:000000000001",
+      "mode": "jpeg70",
+      "pixels": 3954,
+      "luma_error": 12.654269218444824
+    },
+    {
+      "tick": 15,
+      "person": "person:000000000000",
+      "mode": "q65",
+      "pixels": 10832,
+      "luma_error": 7.6570868492126465
+    },
+    {
+      "tick": 15,
+      "person": "person:000000000000",
+      "mode": "q78",
+      "pixels": 10832,
+      "luma_error": 7.343743324279785
+    },
+    {
+      "tick": 15,
+      "person": "person:000000000000",
+      "mode": "q90",
+      "pixels": 10832,
+      "luma_error": 7.184689998626709
+    },
+    {
+      "tick": 15,
+      "person": "person:000000000000",
+      "mode": "lossless",
+      "pixels": 10832,
+      "luma_error": 7.229397773742676
+    },
+    {
+      "tick": 15,
+      "person": "person:000000000000",
+      "mode": "jpeg40",
+      "pixels": 10832,
+      "luma_error": 7.697103977203369
+    },
+    {
+      "tick": 15,
+      "person": "person:000000000000",
+      "mode": "jpeg70",
+      "pixels": 10832,
+      "luma_error": 7.82658576965332
+    },
+    {
+      "tick": 15,
+      "person": "person:000000000001",
+      "mode": "q65",
+      "pixels": 3806,
+      "luma_error": 11.6196928024292
+    },
+    {
+      "tick": 15,
+      "person": "person:000000000001",
+      "mode": "q78",
+      "pixels": 3806,
+      "luma_error": 11.885562896728516
+    },
+    {
+      "tick": 15,
+      "person": "person:000000000001",
+      "mode": "q90",
+      "pixels": 3806,
+      "luma_error": 11.771846771240234
+    },
+    {
+      "tick": 15,
+      "person": "person:000000000001",
+      "mode": "lossless",
+      "pixels": 3806,
+      "luma_error": 11.630398750305176
+    },
+    {
+      "tick": 15,
+      "person": "person:000000000001",
+      "mode": "jpeg40",
+      "pixels": 3806,
+      "luma_error": 12.37116527557373
+    },
+    {
+      "tick": 15,
+      "person": "person:000000000001",
+      "mode": "jpeg70",
+      "pixels": 3806,
+      "luma_error": 11.154563903808594
+    },
+    {
+      "tick": 16,
+      "person": "person:000000000000",
+      "mode": "q65",
+      "pixels": 10891,
+      "luma_error": 6.842039108276367
+    },
+    {
+      "tick": 16,
+      "person": "person:000000000000",
+      "mode": "q78",
+      "pixels": 10891,
+      "luma_error": 6.4331536293029785
+    },
+    {
+      "tick": 16,
+      "person": "person:000000000000",
+      "mode": "q90",
+      "pixels": 10891,
+      "luma_error": 6.00803279876709
+    },
+    {
+      "tick": 16,
+      "person": "person:000000000000",
+      "mode": "lossless",
+      "pixels": 10891,
+      "luma_error": 5.5215163230896
+    },
+    {
+      "tick": 16,
+      "person": "person:000000000000",
+      "mode": "jpeg40",
+      "pixels": 10891,
+      "luma_error": 6.89866828918457
+    },
+    {
+      "tick": 16,
+      "person": "person:000000000000",
+      "mode": "jpeg70",
+      "pixels": 10891,
+      "luma_error": 7.153696060180664
+    },
+    {
+      "tick": 16,
+      "person": "person:000000000001",
+      "mode": "q65",
+      "pixels": 3940,
+      "luma_error": 7.034176349639893
+    },
+    {
+      "tick": 16,
+      "person": "person:000000000001",
+      "mode": "q78",
+      "pixels": 3940,
+      "luma_error": 7.378218173980713
+    },
+    {
+      "tick": 16,
+      "person": "person:000000000001",
+      "mode": "q90",
+      "pixels": 3940,
+      "luma_error": 7.060187816619873
+    },
+    {
+      "tick": 16,
+      "person": "person:000000000001",
+      "mode": "lossless",
+      "pixels": 3940,
+      "luma_error": 7.634727954864502
+    },
+    {
+      "tick": 16,
+      "person": "person:000000000001",
+      "mode": "jpeg40",
+      "pixels": 3940,
+      "luma_error": 9.60888957977295
+    },
+    {
+      "tick": 16,
+      "person": "person:000000000001",
+      "mode": "jpeg70",
+      "pixels": 3940,
+      "luma_error": 7.597478866577148
+    },
+    {
+      "tick": 17,
+      "person": "person:000000000000",
+      "mode": "q65",
+      "pixels": 10781,
+      "luma_error": 6.10891580581665
+    },
+    {
+      "tick": 17,
+      "person": "person:000000000000",
+      "mode": "q78",
+      "pixels": 10781,
+      "luma_error": 6.29493522644043
+    },
+    {
+      "tick": 17,
+      "person": "person:000000000000",
+      "mode": "q90",
+      "pixels": 10781,
+      "luma_error": 5.770304203033447
+    },
+    {
+      "tick": 17,
+      "person": "person:000000000000",
+      "mode": "lossless",
+      "pixels": 10781,
+      "luma_error": 5.5846381187438965
+    },
+    {
+      "tick": 17,
+      "person": "person:000000000000",
+      "mode": "jpeg40",
+      "pixels": 10781,
+      "luma_error": 5.899853706359863
+    },
+    {
+      "tick": 17,
+      "person": "person:000000000000",
+      "mode": "jpeg70",
+      "pixels": 10781,
+      "luma_error": 6.479101181030273
+    },
+    {
+      "tick": 17,
+      "person": "person:000000000001",
+      "mode": "q65",
+      "pixels": 3989,
+      "luma_error": 6.257327079772949
+    },
+    {
+      "tick": 17,
+      "person": "person:000000000001",
+      "mode": "q78",
+      "pixels": 3989,
+      "luma_error": 6.089171409606934
+    },
+    {
+      "tick": 17,
+      "person": "person:000000000001",
+      "mode": "q90",
+      "pixels": 3989,
+      "luma_error": 6.230213165283203
+    },
+    {
+      "tick": 17,
+      "person": "person:000000000001",
+      "mode": "lossless",
+      "pixels": 3989,
+      "luma_error": 6.435758113861084
+    },
+    {
+      "tick": 17,
+      "person": "person:000000000001",
+      "mode": "jpeg40",
+      "pixels": 3989,
+      "luma_error": 7.223695278167725
+    },
+    {
+      "tick": 17,
+      "person": "person:000000000001",
+      "mode": "jpeg70",
+      "pixels": 3989,
+      "luma_error": 6.470646381378174
+    },
+    {
+      "tick": 18,
+      "person": "person:000000000000",
+      "mode": "q65",
+      "pixels": 10775,
+      "luma_error": 5.436623573303223
+    },
+    {
+      "tick": 18,
+      "person": "person:000000000000",
+      "mode": "q78",
+      "pixels": 10775,
+      "luma_error": 5.190342903137207
+    },
+    {
+      "tick": 18,
+      "person": "person:000000000000",
+      "mode": "q90",
+      "pixels": 10775,
+      "luma_error": 4.9127421379089355
+    },
+    {
+      "tick": 18,
+      "person": "person:000000000000",
+      "mode": "lossless",
+      "pixels": 10775,
+      "luma_error": 4.582167148590088
+    },
+    {
+      "tick": 18,
+      "person": "person:000000000000",
+      "mode": "jpeg40",
+      "pixels": 10775,
+      "luma_error": 5.008316993713379
+    },
+    {
+      "tick": 18,
+      "person": "person:000000000000",
+      "mode": "jpeg70",
+      "pixels": 10775,
+      "luma_error": 6.056417465209961
+    },
+    {
+      "tick": 18,
+      "person": "person:000000000001",
+      "mode": "q65",
+      "pixels": 3962,
+      "luma_error": 7.30344295501709
+    },
+    {
+      "tick": 18,
+      "person": "person:000000000001",
+      "mode": "q78",
+      "pixels": 3962,
+      "luma_error": 7.858642578125
+    },
+    {
+      "tick": 18,
+      "person": "person:000000000001",
+      "mode": "q90",
+      "pixels": 3962,
+      "luma_error": 8.280654907226562
+    },
+    {
+      "tick": 18,
+      "person": "person:000000000001",
+      "mode": "lossless",
+      "pixels": 3962,
+      "luma_error": 8.082581520080566
+    },
+    {
+      "tick": 18,
+      "person": "person:000000000001",
+      "mode": "jpeg40",
+      "pixels": 3962,
+      "luma_error": 7.3134846687316895
+    },
+    {
+      "tick": 18,
+      "person": "person:000000000001",
+      "mode": "jpeg70",
+      "pixels": 3962,
+      "luma_error": 7.020999431610107
+    },
+    {
+      "tick": 19,
+      "person": "person:000000000000",
+      "mode": "q65",
+      "pixels": 10783,
+      "luma_error": 8.213720321655273
+    },
+    {
+      "tick": 19,
+      "person": "person:000000000000",
+      "mode": "q78",
+      "pixels": 10783,
+      "luma_error": 8.29454231262207
+    },
+    {
+      "tick": 19,
+      "person": "person:000000000000",
+      "mode": "q90",
+      "pixels": 10783,
+      "luma_error": 8.268546104431152
+    },
+    {
+      "tick": 19,
+      "person": "person:000000000000",
+      "mode": "lossless",
+      "pixels": 10783,
+      "luma_error": 7.891720294952393
+    },
+    {
+      "tick": 19,
+      "person": "person:000000000000",
+      "mode": "jpeg40",
+      "pixels": 10783,
+      "luma_error": 8.858905792236328
+    },
+    {
+      "tick": 19,
+      "person": "person:000000000000",
+      "mode": "jpeg70",
+      "pixels": 10783,
+      "luma_error": 8.71484088897705
+    },
+    {
+      "tick": 19,
+      "person": "person:000000000001",
+      "mode": "q65",
+      "pixels": 3961,
+      "luma_error": 5.527389049530029
+    },
+    {
+      "tick": 19,
+      "person": "person:000000000001",
+      "mode": "q78",
+      "pixels": 3961,
+      "luma_error": 6.005222797393799
+    },
+    {
+      "tick": 19,
+      "person": "person:000000000001",
+      "mode": "q90",
+      "pixels": 3961,
+      "luma_error": 5.8751606941223145
+    },
+    {
+      "tick": 19,
+      "person": "person:000000000001",
+      "mode": "lossless",
+      "pixels": 3961,
+      "luma_error": 5.840458869934082
+    },
+    {
+      "tick": 19,
+      "person": "person:000000000001",
+      "mode": "jpeg40",
+      "pixels": 3961,
+      "luma_error": 8.891702651977539
+    },
+    {
+      "tick": 19,
+      "person": "person:000000000001",
+      "mode": "jpeg70",
+      "pixels": 3961,
+      "luma_error": 7.625044822692871
+    },
+    {
+      "tick": 20,
+      "person": "person:000000000000",
+      "mode": "q65",
+      "pixels": 10842,
+      "luma_error": 6.018327236175537
+    },
+    {
+      "tick": 20,
+      "person": "person:000000000000",
+      "mode": "q78",
+      "pixels": 10842,
+      "luma_error": 6.067046165466309
+    },
+    {
+      "tick": 20,
+      "person": "person:000000000000",
+      "mode": "q90",
+      "pixels": 10842,
+      "luma_error": 5.784584999084473
+    },
+    {
+      "tick": 20,
+      "person": "person:000000000000",
+      "mode": "lossless",
+      "pixels": 10842,
+      "luma_error": 5.7730207443237305
+    },
+    {
+      "tick": 20,
+      "person": "person:000000000000",
+      "mode": "jpeg40",
+      "pixels": 10842,
+      "luma_error": 5.448980331420898
+    },
+    {
+      "tick": 20,
+      "person": "person:000000000000",
+      "mode": "jpeg70",
+      "pixels": 10842,
+      "luma_error": 5.367238521575928
+    },
+    {
+      "tick": 20,
+      "person": "person:000000000001",
+      "mode": "q65",
+      "pixels": 3993,
+      "luma_error": 7.592587471008301
+    },
+    {
+      "tick": 20,
+      "person": "person:000000000001",
+      "mode": "q78",
+      "pixels": 3993,
+      "luma_error": 8.137165069580078
+    },
+    {
+      "tick": 20,
+      "person": "person:000000000001",
+      "mode": "q90",
+      "pixels": 3993,
+      "luma_error": 7.123554706573486
+    },
+    {
+      "tick": 20,
+      "person": "person:000000000001",
+      "mode": "lossless",
+      "pixels": 3993,
+      "luma_error": 7.283205509185791
+    },
+    {
+      "tick": 20,
+      "person": "person:000000000001",
+      "mode": "jpeg40",
+      "pixels": 3993,
+      "luma_error": 8.233518600463867
+    },
+    {
+      "tick": 20,
+      "person": "person:000000000001",
+      "mode": "jpeg70",
+      "pixels": 3993,
+      "luma_error": 8.624042510986328
+    },
+    {
+      "tick": 21,
+      "person": "person:000000000000",
+      "mode": "q65",
+      "pixels": 10846,
+      "luma_error": 6.4490580558776855
+    },
+    {
+      "tick": 21,
+      "person": "person:000000000000",
+      "mode": "q78",
+      "pixels": 10846,
+      "luma_error": 6.768285274505615
+    },
+    {
+      "tick": 21,
+      "person": "person:000000000000",
+      "mode": "q90",
+      "pixels": 10846,
+      "luma_error": 6.206060886383057
+    },
+    {
+      "tick": 21,
+      "person": "person:000000000000",
+      "mode": "lossless",
+      "pixels": 10846,
+      "luma_error": 6.236462593078613
+    },
+    {
+      "tick": 21,
+      "person": "person:000000000000",
+      "mode": "jpeg40",
+      "pixels": 10846,
+      "luma_error": 6.690884590148926
+    },
+    {
+      "tick": 21,
+      "person": "person:000000000000",
+      "mode": "jpeg70",
+      "pixels": 10846,
+      "luma_error": 6.50370979309082
+    },
+    {
+      "tick": 21,
+      "person": "person:000000000001",
+      "mode": "q65",
+      "pixels": 3997,
+      "luma_error": 5.820769309997559
+    },
+    {
+      "tick": 21,
+      "person": "person:000000000001",
+      "mode": "q78",
+      "pixels": 3997,
+      "luma_error": 6.077611446380615
+    },
+    {
+      "tick": 21,
+      "person": "person:000000000001",
+      "mode": "q90",
+      "pixels": 3997,
+      "luma_error": 5.424496173858643
+    },
+    {
+      "tick": 21,
+      "person": "person:000000000001",
+      "mode": "lossless",
+      "pixels": 3997,
+      "luma_error": 5.530093669891357
+    },
+    {
+      "tick": 21,
+      "person": "person:000000000001",
+      "mode": "jpeg40",
+      "pixels": 3997,
+      "luma_error": 5.375410556793213
+    },
+    {
+      "tick": 21,
+      "person": "person:000000000001",
+      "mode": "jpeg70",
+      "pixels": 3997,
+      "luma_error": 6.366733074188232
+    },
+    {
+      "tick": 22,
+      "person": "person:000000000000",
+      "mode": "q65",
+      "pixels": 10841,
+      "luma_error": 9.729183197021484
+    },
+    {
+      "tick": 22,
+      "person": "person:000000000000",
+      "mode": "q78",
+      "pixels": 10841,
+      "luma_error": 9.338969230651855
+    },
+    {
+      "tick": 22,
+      "person": "person:000000000000",
+      "mode": "q90",
+      "pixels": 10841,
+      "luma_error": 8.991962432861328
+    },
+    {
+      "tick": 22,
+      "person": "person:000000000000",
+      "mode": "lossless",
+      "pixels": 10841,
+      "luma_error": 8.939366340637207
+    },
+    {
+      "tick": 22,
+      "person": "person:000000000000",
+      "mode": "jpeg40",
+      "pixels": 10841,
+      "luma_error": 8.36349868774414
+    },
+    {
+      "tick": 22,
+      "person": "person:000000000000",
+      "mode": "jpeg70",
+      "pixels": 10841,
+      "luma_error": 9.536406517028809
+    },
+    {
+      "tick": 22,
+      "person": "person:000000000001",
+      "mode": "q65",
+      "pixels": 3999,
+      "luma_error": 7.0551323890686035
+    },
+    {
+      "tick": 22,
+      "person": "person:000000000001",
+      "mode": "q78",
+      "pixels": 3999,
+      "luma_error": 6.63145112991333
+    },
+    {
+      "tick": 22,
+      "person": "person:000000000001",
+      "mode": "q90",
+      "pixels": 3999,
+      "luma_error": 7.161165237426758
+    },
+    {
+      "tick": 22,
+      "person": "person:000000000001",
+      "mode": "lossless",
+      "pixels": 3999,
+      "luma_error": 7.2750701904296875
+    },
+    {
+      "tick": 22,
+      "person": "person:000000000001",
+      "mode": "jpeg40",
+      "pixels": 3999,
+      "luma_error": 7.577073097229004
+    },
+    {
+      "tick": 22,
+      "person": "person:000000000001",
+      "mode": "jpeg70",
+      "pixels": 3999,
+      "luma_error": 7.839902400970459
+    },
+    {
+      "tick": 23,
+      "person": "person:000000000000",
+      "mode": "q65",
+      "pixels": 10949,
+      "luma_error": 13.496312141418457
+    },
+    {
+      "tick": 23,
+      "person": "person:000000000000",
+      "mode": "q78",
+      "pixels": 10949,
+      "luma_error": 12.913551330566406
+    },
+    {
+      "tick": 23,
+      "person": "person:000000000000",
+      "mode": "q90",
+      "pixels": 10949,
+      "luma_error": 10.340200424194336
+    },
+    {
+      "tick": 23,
+      "person": "person:000000000000",
+      "mode": "lossless",
+      "pixels": 10949,
+      "luma_error": 10.481396675109863
+    },
+    {
+      "tick": 23,
+      "person": "person:000000000000",
+      "mode": "jpeg40",
+      "pixels": 10949,
+      "luma_error": 10.384437561035156
+    },
+    {
+      "tick": 23,
+      "person": "person:000000000000",
+      "mode": "jpeg70",
+      "pixels": 10949,
+      "luma_error": 16.185306549072266
+    },
+    {
+      "tick": 23,
+      "person": "person:000000000001",
+      "mode": "q65",
+      "pixels": 3975,
+      "luma_error": 6.5070390701293945
+    },
+    {
+      "tick": 23,
+      "person": "person:000000000001",
+      "mode": "q78",
+      "pixels": 3975,
+      "luma_error": 6.9002861976623535
+    },
+    {
+      "tick": 23,
+      "person": "person:000000000001",
+      "mode": "q90",
+      "pixels": 3975,
+      "luma_error": 6.722078323364258
+    },
+    {
+      "tick": 23,
+      "person": "person:000000000001",
+      "mode": "lossless",
+      "pixels": 3975,
+      "luma_error": 6.468396186828613
+    },
+    {
+      "tick": 23,
+      "person": "person:000000000001",
+      "mode": "jpeg40",
+      "pixels": 3975,
+      "luma_error": 7.8656229972839355
+    },
+    {
+      "tick": 23,
+      "person": "person:000000000001",
+      "mode": "jpeg70",
+      "pixels": 3975,
+      "luma_error": 7.382429599761963
+    }
+  ],
+  "summary": {
+    "q65": 7.804970710173897,
+    "q78": 7.909884214401245,
+    "q90": 7.6267616748809814,
+    "lossless": 7.477597402489704,
+    "jpeg40": 8.201687304869942,
+    "jpeg70": 8.27339672005695
+  }
+}

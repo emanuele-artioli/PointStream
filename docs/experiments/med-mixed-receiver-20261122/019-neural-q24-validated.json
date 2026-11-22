@@ -1,0 +1,119 @@
+{
+  "schema": 1,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.shanghai_neural_control"
+  ],
+  "arguments": [
+    "--source",
+    "{staged:source}",
+    "--image-ckpt",
+    "{staged:image}",
+    "--video-ckpt",
+    "{staged:video}",
+    "--frames",
+    "{frames}",
+    "--qp",
+    "24",
+    "--scale",
+    "4",
+    "--source-sha",
+    "1c13479eb3b6f8d175eb6f5020c629896e6b01f719014ec995a06b4c6c5a3e9c",
+    "--fps",
+    "50"
+  ],
+  "staged_inputs": [
+    {
+      "name": "source",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/sources/medvedev_struff__019.mp4",
+      "sha256": "1c13479eb3b6f8d175eb6f5020c629896e6b01f719014ec995a06b4c6c5a3e9c",
+      "extract": false
+    },
+    {
+      "name": "image",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_image.pth.tar",
+      "sha256": "b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302",
+      "extract": false
+    },
+    {
+      "name": "video",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_video_htl.pth.tar",
+      "sha256": "934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/sources/medvedev_struff__019.mp4",
+      "sha256": "1c13479eb3b6f8d175eb6f5020c629896e6b01f719014ec995a06b4c6c5a3e9c"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_image.pth.tar",
+      "sha256": "b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_video_htl.pth.tar",
+      "sha256": "934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "required_commands": [
+    "ffmpeg"
+  ],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.shanghai_neural_control",
+    "--validate",
+    "--qp",
+    "24",
+    "--scale",
+    "4",
+    "--source-sha",
+    "1c13479eb3b6f8d175eb6f5020c629896e6b01f719014ec995a06b4c6c5a3e9c",
+    "--fps",
+    "50"
+  ],
+  "deadline": "2026-11-22T15:00:00Z",
+  "verify_staged_inputs": true,
+  "stall_seconds": 900,
+  "contention": {
+    "policy": "continue",
+    "resume_attempts": 0,
+    "basis": "Frame-hash identity, not execution time, establishes correctness."
+  },
+  "device": "gpu",
+  "hosts": [
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [
+    "RTX 6000 Ada"
+  ],
+  "gpu_memory_mib": 8192,
+  "cpu_threads": 4,
+  "local_storage_gib": 60,
+  "scale": {
+    "frames": {
+      "smoke": 48,
+      "full": 240
+    }
+  },
+  "smoke": {
+    "seconds": 350,
+    "representative_basis": "48 original frames, four native decoder passes, encoder agreement, all timestamps, receiver byte identities, enforced child and parent resource limits and 1.5x measured forecast."
+  },
+  "full": {
+    "seconds": 1650
+  },
+  "validator_seconds": 120,
+  "budget_seconds": 2150,
+  "gpu_sharing": {
+    "mode": "shared",
+    "basis": "Identical historical frame hashes, not shared-device timing, decide correctness.",
+    "margin_mib": 8192
+  }
+}

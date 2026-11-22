@@ -1,0 +1,33 @@
+{
+  "alcaraz031": {
+    "full_native_count": 240,
+    "evaluated": 240,
+    "fitted": 240,
+    "eligible": true,
+    "max_possible_coverage": 1.0,
+    "source_sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "seconds": 254.2399330420012,
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "cv2": "4.10.0"
+  },
+  "rublev023": {
+    "full_native_count": 240,
+    "evaluated": 49,
+    "fitted": 0,
+    "eligible": false,
+    "max_possible_coverage": 0.7958333333333333,
+    "source_sha256": "8c42213af2fd54699cb125f34c705ede1dac048fb44a8dd2fa7faa63f324355c",
+    "seconds": 28.541224291999242,
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "cv2": "4.10.0"
+  },
+  "rublev039": {
+    "full_native_count": 240,
+    "evaluated": 240,
+    "fitted": 0,
+    "eligible": false,
+    "source_sha256": "2bb0ac4109303a36ab637d5ba986db59a8558240ce88022dd14c17cdfc7330db",
+    "job": "20261122T103045Z-36ba9cd5",
+    "archive_sha256": "279ce80606e05fb5571236c29db910ec44a4b03ac462777be467c9eafd69a163"
+  }
+}

@@ -1,0 +1,182 @@
+{
+  "arm": {
+    "name": "ordinary-960-cold",
+    "kind": "native_yuv420p",
+    "width": 960,
+    "height": 544,
+    "sha256": "0011f0cc128207472f27e6767a021ce8f2e7bc92bdfcc7a9202baf5165f85259",
+    "path": "/private/tmp/ps-med000-cold-native-price/selected.yuv",
+    "stream_sha256": "03f4a532a4bb86fd0a83bfc2412b6ae0c1a98a84a001d74b04035724e061f8ce",
+    "bytes": 215174,
+    "kbps": 358.62333333333333,
+    "crf": 43.0,
+    "cold_ceiling_bytes": 216888
+  },
+  "source_sha256": "3bf7ddaae0db5c48b1072fccb15f9f162e41fa5999886b9a5bde58dc0495c630",
+  "supports_sha256": "ed45e6d1ebe722b9f1619c08cfb30f927e1d341a050feae9bd1556c4522f800c",
+  "method": "Original W7 source-SAM masks on 12 fixed ticks, native RGB, tight support plus 32-pixel margin, masked DISTS; all-frame native RGB PSNR",
+  "native_fps": 50,
+  "frames": 240,
+  "active_start": 0,
+  "active_frames": 120,
+  "fallback_frames": 120,
+  "body_rows": [
+    {
+      "tick": 10,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.16689389944076538
+    },
+    {
+      "tick": 10,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.23916643857955933
+    },
+    {
+      "tick": 30,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.1988881230354309
+    },
+    {
+      "tick": 30,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.2540254592895508
+    },
+    {
+      "tick": 50,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.19245916604995728
+    },
+    {
+      "tick": 50,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.24872642755508423
+    },
+    {
+      "tick": 70,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.17544978857040405
+    },
+    {
+      "tick": 70,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.24196666479110718
+    },
+    {
+      "tick": 90,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.17458230257034302
+    },
+    {
+      "tick": 90,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.23908841609954834
+    },
+    {
+      "tick": 110,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.15680915117263794
+    },
+    {
+      "tick": 110,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.2600666880607605
+    },
+    {
+      "tick": 130,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.17353248596191406
+    },
+    {
+      "tick": 130,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.22998493909835815
+    },
+    {
+      "tick": 150,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.17037999629974365
+    },
+    {
+      "tick": 150,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.27733874320983887
+    },
+    {
+      "tick": 170,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.1992276906967163
+    },
+    {
+      "tick": 170,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.2677003741264343
+    },
+    {
+      "tick": 190,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.16363728046417236
+    },
+    {
+      "tick": 190,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.23867064714431763
+    },
+    {
+      "tick": 210,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.17308872938156128
+    },
+    {
+      "tick": 210,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.26794731616973877
+    },
+    {
+      "tick": 230,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.16760361194610596
+    },
+    {
+      "tick": 230,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.22661244869232178
+    }
+  ],
+  "mean_dists": 0.2126602828502655,
+  "active_dists": 0.21234354376792908,
+  "fallback_dists": 0.21297702193260193,
+  "rgb_psnr": 27.910595961762866,
+  "active_rgb_psnr": 27.942122859127455,
+  "fallback_rgb_psnr": 27.879296280305507,
+  "source_self_abs": 1.7881393432617188e-07,
+  "weights_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+  "torch": "2.8.0",
+  "cv2": "4.10.0",
+  "device": "cpu",
+  "cpu_seconds": 12.785484,
+  "forecast_cpu_seconds": 80.19281999999998
+}

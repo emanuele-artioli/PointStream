@@ -1,0 +1,208 @@
+{
+  "source_sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+  "native_fps": "30000/1001",
+  "valid_arms": 39,
+  "persons_per_arm": 480,
+  "source_masks_sha256": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e",
+  "gzip_sha256": "cc9dda9b54813a6cd0d1a6abfa550723578e7db684efc196bfe5d5422427caf7",
+  "uncompressed_sha256": "8a5f0e1ba19759b59f8d2f1f494058bfe56fda7075716627d31e696eab953797",
+  "bytes": 425295,
+  "campus_path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/rv102-original-controls-cc9dda9b54813a6c/scores.jsonl.gz",
+  "arms": [
+    {
+      "name": "av1-1920-cold",
+      "bytes": 152843,
+      "decoded_sha256": "6c676fe4ebf40b4c70502008b871b5211049ed5c294a49068f5d73c7f8d16f64"
+    },
+    {
+      "name": "av1-320-160",
+      "bytes": 48141,
+      "decoded_sha256": "6637ef11915b54de3bd5080b7d19d73a8f3c0e18e7a6c46201bc7cb4f418b1a3"
+    },
+    {
+      "name": "av1-320-220",
+      "bytes": 24629,
+      "decoded_sha256": "e90305ce74021bc0698a00f429ee705311f93f3517546a24e0b89ea4b23954ca"
+    },
+    {
+      "name": "av1-320-227",
+      "bytes": 22748,
+      "decoded_sha256": "d9436fce3fc9b54c93c70de1a5ce5e6527c72bffd852a077565f7b8a9120e7d7"
+    },
+    {
+      "name": "av1-320-231",
+      "bytes": 21376,
+      "decoded_sha256": "47453db7c2007b3a7e175f19a9cdb7bdaf43d19bf313328410a77f687127efc6"
+    },
+    {
+      "name": "av1-320-233",
+      "bytes": 20754,
+      "decoded_sha256": "0f62571072b9ea7278481cf34870289723b4d9ebbf2884f17c1c59e1a6879ff2"
+    },
+    {
+      "name": "av1-320-234",
+      "bytes": 20555,
+      "decoded_sha256": "d6f2211555e9b695e77fff012b89934fa39cedaaded4178209c8ea20e13884fe"
+    },
+    {
+      "name": "av1-320-235",
+      "bytes": 20208,
+      "decoded_sha256": "c9733a81369359f6a84669eddbfaa849c0073bec7fb8087a4f26a0b6a6688984"
+    },
+    {
+      "name": "av1-320-238",
+      "bytes": 19378,
+      "decoded_sha256": "9b17ca80d13745e529b1dc9520977fa18f3119b3847d6e1743f76cba247deebd"
+    },
+    {
+      "name": "av1-320-239",
+      "bytes": 18974,
+      "decoded_sha256": "355d0608f271b1aec6c7447522b4d543a33dc4fd87c7e12ad11066166dbeabf6"
+    },
+    {
+      "name": "av1-320-240",
+      "bytes": 18638,
+      "decoded_sha256": "de106ac30b33f11a22fa2271845bef13e29239c5cd7040a2a6389bc0f34a5231"
+    },
+    {
+      "name": "av1-320-242",
+      "bytes": 17989,
+      "decoded_sha256": "d9ad8734c26751d0f4a1e615d72789c7c4321bc2280876dd25e70200a2232176"
+    },
+    {
+      "name": "av1-320-250",
+      "bytes": 15178,
+      "decoded_sha256": "d56bc886191874d1839b26ab480c26a235a0e77df25476d38d5b6b3fee124682"
+    },
+    {
+      "name": "av1-320-280",
+      "bytes": 10471,
+      "decoded_sha256": "cdf4285bb6e59ab45fcc48746b8b931e0475e0734e419a297631465c7d380dcf"
+    },
+    {
+      "name": "av1-320-cold",
+      "bytes": 152267,
+      "decoded_sha256": "c561f939a363e40168b4359f17e2c03fc00c07c70c1b8c797df9badf4e5a15e6"
+    },
+    {
+      "name": "av1-320-warm",
+      "bytes": 17687,
+      "decoded_sha256": "7e7da08310340da25006d5ac79b28bc90ef5269a40ccc177c567aa1f3aaa55d4"
+    },
+    {
+      "name": "av1-480-cold",
+      "bytes": 154059,
+      "decoded_sha256": "c58a1d42e2a3a8a722095f97e4ea388e7406450618010470d39dcc223ac8ce2c"
+    },
+    {
+      "name": "av1-480-warm",
+      "bytes": 17529,
+      "decoded_sha256": "75efc7a6130fefb50dfeae76092215b5ff673bfe3920b5509b9d2604ed166649"
+    },
+    {
+      "name": "av1-640-160",
+      "bytes": 139111,
+      "decoded_sha256": "1841aa6bd226c08d20f6a7414f3bc9939aab62c8fcf21d228001eeeb0a69f310"
+    },
+    {
+      "name": "av1-640-220",
+      "bytes": 59567,
+      "decoded_sha256": "c865785bfed72c7c3069fac26dec19413441ed15b8920a17b403434b93c11cf2"
+    },
+    {
+      "name": "av1-640-250",
+      "bytes": 29253,
+      "decoded_sha256": "8fc51730d95c413a20172346e43588b298b996300c458624f8772504f80ccb23"
+    },
+    {
+      "name": "av1-640-257",
+      "bytes": 21987,
+      "decoded_sha256": "5defadef3496180552bd237e3678c281c7c42185781bfbf33a99033485dede77"
+    },
+    {
+      "name": "av1-640-259",
+      "bytes": 20956,
+      "decoded_sha256": "5a4a236d74de8fcb08a4c562ac0c9b4d139b09ed20f48433ea3b06a4f3c9d95b"
+    },
+    {
+      "name": "av1-640-260",
+      "bytes": 20577,
+      "decoded_sha256": "faced21a3ce750b8c1c53357bafb3c47d38d29332b10f0ff7c6fb9a38014f030"
+    },
+    {
+      "name": "av1-640-261",
+      "bytes": 20115,
+      "decoded_sha256": "2a80b863265a975bc5412e01fa84bfbd24023df0e7c2f3dd434a08e285b056dd"
+    },
+    {
+      "name": "av1-640-263",
+      "bytes": 19419,
+      "decoded_sha256": "5460b84b24f449b4ddabb12b4094e7e39717c5b5569d0ad1e7f71cc15fd42614"
+    },
+    {
+      "name": "av1-640-264",
+      "bytes": 19066,
+      "decoded_sha256": "031baa22233cb5e75e4b678229b8a8b344e2f2f1527718e61aed8ab4b8812575"
+    },
+    {
+      "name": "av1-640-265",
+      "bytes": 18846,
+      "decoded_sha256": "0f479c34a176b72c74eb524046acf1dc63d5bae5b292f91d975cadc296944035"
+    },
+    {
+      "name": "av1-640-280",
+      "bytes": 14755,
+      "decoded_sha256": "ea3cbaac2a5d31f3addc96924f3a79679f37e6374a2b65e1fc5db943aaf31546"
+    },
+    {
+      "name": "av1-640-cold",
+      "bytes": 153931,
+      "decoded_sha256": "0cfb0100723ae21470b2833c622525ad52113cb6244a313a8019a9e4d0277aa0"
+    },
+    {
+      "name": "av1-640-warm",
+      "bytes": 17731,
+      "decoded_sha256": "8eb1792e8c0fb84825f384691f7f05d631f035b0754fcb8ee80e33ba1481a7a6"
+    },
+    {
+      "name": "av1-960-cold",
+      "bytes": 154312,
+      "decoded_sha256": "1cbbf4c7e435d652b49cd3056af79ebb244065872054daab993108f12152de60"
+    },
+    {
+      "name": "dcvc-480-q24",
+      "bytes": 10548,
+      "decoded_sha256": "87184e9bf7a37c26d5245e30555a9db7732e985942de82ee24b27fb85035dd01"
+    },
+    {
+      "name": "dcvc-480-q34",
+      "bytes": 17432,
+      "decoded_sha256": "c075df28b4d122740a3cadb656509c331f3629c1cca31afa6aa81260ca18f658"
+    },
+    {
+      "name": "dcvc-480-q35",
+      "bytes": 18427,
+      "decoded_sha256": "b5f9c3ce66b9b027487827a3cea6178e0a483187de481b0840d3de522ae90fb5"
+    },
+    {
+      "name": "dcvc-480-q36",
+      "bytes": 19401,
+      "decoded_sha256": "2cb165e33267310f76e233167e167cd105a218630b4be18dc623e6779807d56a"
+    },
+    {
+      "name": "roi-320-warm",
+      "bytes": 17772,
+      "decoded_sha256": "ab62d458c60077747aa8147f9d79e30e51bb310106899148d2a03ec04521a25e"
+    },
+    {
+      "name": "roi-480-warm",
+      "bytes": 17755,
+      "decoded_sha256": "3dd7b10011f0d30f21136536d2007c2d904c1b89582d4807723b60058ddacb4a"
+    },
+    {
+      "name": "roi-640-warm",
+      "bytes": 17736,
+      "decoded_sha256": "5755cc4d605803f68c1149f906d4e6fa7fb9ae915c6d032728a6a66cdbf7ad1e"
+    }
+  ]
+}

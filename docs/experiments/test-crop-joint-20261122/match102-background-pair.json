@@ -1,0 +1,291 @@
+{
+  "source_sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+  "raw_yuv_sha256": "5a84b6074f9cc64c57f0652ce2ba7427eccb1c649b3fe03acf5d4405ed2d2604",
+  "clean_sha256": "81c32749f1cf597e674c036a52966bd2ca941d8cbedd24bc27c9095346bac86a",
+  "source_roi_sha256": "2bc73e43350a9085fc5cfee9fb48f9af4b0684f1c588322142b96d60f7e29148",
+  "fps": "30000/1001",
+  "ticks": 240,
+  "compared_area_fraction": 0.9896247813904208,
+  "original_outside_identical": true,
+  "tools": {
+    "svt": {
+      "path": "/opt/homebrew/bin/SvtAv1EncApp",
+      "real_path": "/opt/homebrew/Cellar/svt-av1/4.0.1/bin/SvtAv1EncApp",
+      "sha256": "db044194faf94d553c2509c8e033ecd05a373ba54d919d0fb49a3a13149d1687",
+      "version": "SVT-AV1 v4.0.1 (release)"
+    },
+    "dav1d": {
+      "path": "/opt/homebrew/bin/dav1d",
+      "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+      "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+      "version": "1.5.4"
+    },
+    "ffmpeg": {
+      "path": "/opt/homebrew/bin/ffmpeg",
+      "real_path": "/opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg",
+      "sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be",
+      "version": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+    }
+  },
+  "rows": [
+    {
+      "crf": 70,
+      "arms": [
+        {
+          "name": "untouched",
+          "bytes": 8956,
+          "decoded_sha256": "0799b8be46d45e37225d5d391d3a59812f8e74a439d5e17b5fa2366ec574e15d",
+          "outside_pixels": 124037195,
+          "outside_luma_psnr": 22.25127087266362,
+          "whole_luma_psnr": 22.10782286678876
+        },
+        {
+          "name": "donor",
+          "bytes": 8954,
+          "decoded_sha256": "d8d3d55a181f9b11e0214cd20b6017b94d202a84610adc6cd852b9f69047d3eb",
+          "outside_pixels": 124037195,
+          "outside_luma_psnr": 22.33240070974807,
+          "whole_luma_psnr": 22.151772131662554
+        }
+      ],
+      "saving_bytes": 2,
+      "saving_percent": 0.022331397945507536,
+      "outside_psnr_delta": 0.08112983708445043,
+      "unmodified_encoder": {
+        "stream": "/private/tmp/ps-reference-body-20261122-0901/test102-bg-pair/raw-crf70/stream.ivf",
+        "decoded": "/private/tmp/ps-reference-body-20261122-0901/test102-bg-pair/raw-crf70/decoded.yuv",
+        "stream_sha256": "4442467c1daf2f24b86658b879e6aa035746d56753224a000fbe1ac34e570100",
+        "file_bytes": 8956,
+        "payload_bytes": 6044,
+        "temporal_units": 240,
+        "decoded_frames": 240.0,
+        "encode_command": [
+          "/opt/homebrew/bin/SvtAv1EncApp",
+          "-i",
+          "/private/tmp/ps-reference-body-20261122-0901/test102-bg-pair/original-low.yuv",
+          "-b",
+          "/private/tmp/ps-reference-body-20261122-0901/test102-bg-pair/raw-crf70/stream.ivf",
+          "-w",
+          "160",
+          "-h",
+          "96",
+          "--input-depth",
+          "8",
+          "--fps-num",
+          "30000",
+          "--fps-denom",
+          "1001",
+          "-n",
+          "240",
+          "--color-range",
+          "0",
+          "--rc",
+          "0",
+          "--crf",
+          "70",
+          "--preset",
+          "4",
+          "--keyint",
+          "-1",
+          "--lp",
+          "6",
+          "--progress",
+          "0"
+        ],
+        "decode_command": [
+          "/opt/homebrew/bin/dav1d",
+          "-i",
+          "/private/tmp/ps-reference-body-20261122-0901/test102-bg-pair/raw-crf70/stream.ivf",
+          "-o",
+          "/private/tmp/ps-reference-body-20261122-0901/test102-bg-pair/raw-crf70/decoded.yuv",
+          "--threads",
+          "1",
+          "--quiet"
+        ],
+        "encode_seconds": 0.617,
+        "encode_cpu_seconds": 1.296,
+        "decode_seconds": 0.055,
+        "decode_cpu_seconds": 0.049,
+        "cpus": null,
+        "host_load_before": [
+          4.27,
+          5.65,
+          4.93
+        ]
+      }
+    },
+    {
+      "crf": 60,
+      "arms": [
+        {
+          "name": "untouched",
+          "bytes": 11457,
+          "decoded_sha256": "24045c448ba78228278eea5f1f2f676f446a61b3a752c8255f849dc1cd1fea08",
+          "outside_pixels": 124037195,
+          "outside_luma_psnr": 23.71883476768086,
+          "whole_luma_psnr": 23.573557935285372
+        },
+        {
+          "name": "donor",
+          "bytes": 10953,
+          "decoded_sha256": "aeadbb4eec33715f74bfe7bcccd8d683c951bd14856b35c7816700bb0bc9f21a",
+          "outside_pixels": 124037195,
+          "outside_luma_psnr": 23.73815495334263,
+          "whole_luma_psnr": 23.473349167430282
+        }
+      ],
+      "saving_bytes": 504,
+      "saving_percent": 4.399057344854674,
+      "outside_psnr_delta": 0.019320185661769074,
+      "unmodified_encoder": {
+        "stream": "/private/tmp/ps-reference-body-20261122-0901/test102-bg-pair/raw-crf60/stream.ivf",
+        "decoded": "/private/tmp/ps-reference-body-20261122-0901/test102-bg-pair/raw-crf60/decoded.yuv",
+        "stream_sha256": "5fdd7ed60b378a7692fc5e1d6195edafe361b021239366ec4cc987df0c07f334",
+        "file_bytes": 11457,
+        "payload_bytes": 8545,
+        "temporal_units": 240,
+        "decoded_frames": 240.0,
+        "encode_command": [
+          "/opt/homebrew/bin/SvtAv1EncApp",
+          "-i",
+          "/private/tmp/ps-reference-body-20261122-0901/test102-bg-pair/original-low.yuv",
+          "-b",
+          "/private/tmp/ps-reference-body-20261122-0901/test102-bg-pair/raw-crf60/stream.ivf",
+          "-w",
+          "160",
+          "-h",
+          "96",
+          "--input-depth",
+          "8",
+          "--fps-num",
+          "30000",
+          "--fps-denom",
+          "1001",
+          "-n",
+          "240",
+          "--color-range",
+          "0",
+          "--rc",
+          "0",
+          "--crf",
+          "60",
+          "--preset",
+          "4",
+          "--keyint",
+          "-1",
+          "--lp",
+          "6",
+          "--progress",
+          "0"
+        ],
+        "decode_command": [
+          "/opt/homebrew/bin/dav1d",
+          "-i",
+          "/private/tmp/ps-reference-body-20261122-0901/test102-bg-pair/raw-crf60/stream.ivf",
+          "-o",
+          "/private/tmp/ps-reference-body-20261122-0901/test102-bg-pair/raw-crf60/decoded.yuv",
+          "--threads",
+          "1",
+          "--quiet"
+        ],
+        "encode_seconds": 0.819,
+        "encode_cpu_seconds": 1.692,
+        "decode_seconds": 0.052,
+        "decode_cpu_seconds": 0.045,
+        "cpus": null,
+        "host_load_before": [
+          4.27,
+          5.65,
+          4.93
+        ]
+      }
+    },
+    {
+      "crf": 50,
+      "arms": [
+        {
+          "name": "untouched",
+          "bytes": 14707,
+          "decoded_sha256": "514e78841f58dda71c01998e9bbd0232cfde0bf74c2aee102792283f39f839e0",
+          "outside_pixels": 124037195,
+          "outside_luma_psnr": 23.807237907677283,
+          "whole_luma_psnr": 23.71348932278686
+        },
+        {
+          "name": "donor",
+          "bytes": 13192,
+          "decoded_sha256": "62da1fdd02d63a092357567eceeb5958a11e9899571e4fd5f4dfa7f6e44fdaf8",
+          "outside_pixels": 124037195,
+          "outside_luma_psnr": 23.82009932424799,
+          "whole_luma_psnr": 23.550297217046726
+        }
+      ],
+      "saving_bytes": 1515,
+      "saving_percent": 10.301217107499827,
+      "outside_psnr_delta": 0.012861416570707718,
+      "unmodified_encoder": {
+        "stream": "/private/tmp/ps-reference-body-20261122-0901/test102-bg-pair/raw-crf50/stream.ivf",
+        "decoded": "/private/tmp/ps-reference-body-20261122-0901/test102-bg-pair/raw-crf50/decoded.yuv",
+        "stream_sha256": "1cad60699fa58ec8dbf8e9e7b061581c64f413cefd3aba9ef8006e7de9dcd594",
+        "file_bytes": 14707,
+        "payload_bytes": 11795,
+        "temporal_units": 240,
+        "decoded_frames": 240.0,
+        "encode_command": [
+          "/opt/homebrew/bin/SvtAv1EncApp",
+          "-i",
+          "/private/tmp/ps-reference-body-20261122-0901/test102-bg-pair/original-low.yuv",
+          "-b",
+          "/private/tmp/ps-reference-body-20261122-0901/test102-bg-pair/raw-crf50/stream.ivf",
+          "-w",
+          "160",
+          "-h",
+          "96",
+          "--input-depth",
+          "8",
+          "--fps-num",
+          "30000",
+          "--fps-denom",
+          "1001",
+          "-n",
+          "240",
+          "--color-range",
+          "0",
+          "--rc",
+          "0",
+          "--crf",
+          "50",
+          "--preset",
+          "4",
+          "--keyint",
+          "-1",
+          "--lp",
+          "6",
+          "--progress",
+          "0"
+        ],
+        "decode_command": [
+          "/opt/homebrew/bin/dav1d",
+          "-i",
+          "/private/tmp/ps-reference-body-20261122-0901/test102-bg-pair/raw-crf50/stream.ivf",
+          "-o",
+          "/private/tmp/ps-reference-body-20261122-0901/test102-bg-pair/raw-crf50/decoded.yuv",
+          "--threads",
+          "1",
+          "--quiet"
+        ],
+        "encode_seconds": 0.784,
+        "encode_cpu_seconds": 1.653,
+        "decode_seconds": 0.05,
+        "decode_cpu_seconds": 0.042,
+        "cpus": null,
+        "host_load_before": [
+          4.27,
+          5.65,
+          4.93
+        ]
+      }
+    }
+  ],
+  "cpu_seconds": 4.457409
+}

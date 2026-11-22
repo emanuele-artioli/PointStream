@@ -1,0 +1,17 @@
+{
+  "match102_near": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T103801Z-024e65ea/full/published.tar",
+    "archive_sha256": "1d756e9a4d3ed687173ef682a3f4163439d980027a56c794e09ed80692335c4f",
+    "receipt_sha256": "a008b62d26dea84f1c4dfef26289121967909140cf0cb556c8dcbc3f7fd3f95a",
+    "shape": [
+      240,
+      784,
+      512,
+      3
+    ],
+    "crops_sha256": "cabef44ec1daf02b0c8849e23ee74d28af5a55041e41d8cdec550fb60ca7dc73",
+    "producer": "20261122T103801Z-024e65ea",
+    "render_seconds": 1328.7420376600057,
+    "worker_s": 1443.9567893480125
+  }
+}

@@ -1,0 +1,148 @@
+{
+  "schema": 1,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.med_mixed_rung"
+  ],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.med_mixed_rung",
+    "--validate"
+  ],
+  "arguments": [
+    "--carrier",
+    "{staged:carrier}",
+    "--carrier-sha256",
+    "11105f6a96b73fb8f89791e2c0235fbdd7718cd400f9faf206eccafc589765f8",
+    "--manifest",
+    "{staged:manifest}",
+    "--joint",
+    "{staged:joint}",
+    "--cache",
+    "{staged:cache}",
+    "--original-joint",
+    "{staged:joint}",
+    "--witness",
+    "{staged:witness}",
+    "--native-sha",
+    "2b60128f613effb1f0de226b319320083722197f83596c93feb7bd27c95faa11,5af28f66be52300095fcda709c87d5adc5c37eb5b66ccceadc56c9d5d840826d",
+    "--frames",
+    "{frames}",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/sources/medvedev_struff__000.mp4",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T091038Z-e8d1cefb/full/published.tar",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T091524Z-7d2f62ea/full/published.tar",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/balltrack_best.state_dict.pt",
+    "--split",
+    "{staged:split}"
+  ],
+  "staged_inputs": [
+    {
+      "name": "carrier",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/med000-mixed-20261122-615596d2f78d/players.pscp",
+      "sha256": "11105f6a96b73fb8f89791e2c0235fbdd7718cd400f9faf206eccafc589765f8",
+      "extract": false
+    },
+    {
+      "name": "manifest",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/med000-mixed-20261122-615596d2f78d/players.manifest",
+      "sha256": "9cbef0f27455c83218e20e35181f16e80f670eab8c6317d5780fb05f09eef75c",
+      "extract": false
+    },
+    {
+      "name": "joint",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/med000-mixed-20261122-615596d2f78d/rally.psj",
+      "sha256": "615596d2f78d08ebd07fc9dd66136bf586d5c1f2d2921b71aea4dfc437df2b8b",
+      "extract": false
+    },
+    {
+      "name": "cache",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/med000-mixed-20261122-615596d2f78d/initial.psr",
+      "sha256": "90f5dbc9f5753b2688a828c12362d808e1db197f44b097c0093ba28cef7ea038",
+      "extract": false
+    },
+    {
+      "name": "witness",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T102430Z-fd241a73/full/published.tar",
+      "sha256": "4952d4b8f67cb4b3393d58eff82a18448b97ac8e62f4a0e4609e8fe5410e5b6c",
+      "extract": true
+    },
+    {
+      "name": "split",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/med000-split-18c2081dec07.psj",
+      "sha256": "18c2081dec07cd6fcb1ad9d7eda5379ed5767e5e3242f0d040e28862b548a68f",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/med000-mixed-20261122-615596d2f78d/players.pscp",
+      "sha256": "11105f6a96b73fb8f89791e2c0235fbdd7718cd400f9faf206eccafc589765f8"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/med000-mixed-20261122-615596d2f78d/players.manifest",
+      "sha256": "9cbef0f27455c83218e20e35181f16e80f670eab8c6317d5780fb05f09eef75c"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/med000-mixed-20261122-615596d2f78d/rally.psj",
+      "sha256": "615596d2f78d08ebd07fc9dd66136bf586d5c1f2d2921b71aea4dfc437df2b8b"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/med000-mixed-20261122-615596d2f78d/initial.psr",
+      "sha256": "90f5dbc9f5753b2688a828c12362d808e1db197f44b097c0093ba28cef7ea038"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T102430Z-fd241a73/full/published.tar",
+      "sha256": "4952d4b8f67cb4b3393d58eff82a18448b97ac8e62f4a0e4609e8fe5410e5b6c"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/med000-split-18c2081dec07.psj",
+      "sha256": "18c2081dec07cd6fcb1ad9d7eda5379ed5767e5e3242f0d040e28862b548a68f"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "required_commands": [],
+  "deadline": "2026-11-22T21:01:00Z",
+  "verify_staged_inputs": true,
+  "stall_seconds": 1380,
+  "contention": {
+    "policy": "stop",
+    "resume_attempts": 0
+  },
+  "device": "cpu",
+  "hosts": [
+    "gpu1",
+    "gpu2",
+    "gpu3",
+    "gpu4",
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [],
+  "gpu_memory_mib": 0,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "local_storage_gib": 30,
+  "smoke": {
+    "seconds": 500,
+    "representative_basis": "Original paid/native stream, 3 real active ticks and 1 real fallback observed under source denial, real frame hashes, full working set and timing."
+  },
+  "full": {
+    "seconds": 1320
+  },
+  "validator_seconds": 170,
+  "budget_seconds": 2080,
+  "scale": {
+    "frames": {
+      "smoke": 4,
+      "full": 240
+    }
+  }
+}

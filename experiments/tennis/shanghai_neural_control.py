@@ -2,6 +2,7 @@
 
 import argparse
 from collections import Counter
+from fractions import Fraction
 import hashlib
 import json
 import os
@@ -16,15 +17,19 @@ from experiments.tennis.k4b_features import convert_command
 from experiments.tennis.shanghai_ball_display_freeze import SOURCE, sha
 from src.codecs import svtav1
 
-FRAMES = {"smoke": 48, "full": 240}
+
+def frame_count(args):
+    if args.smoke_frames == 120 and (Fraction(args.fps) != 50 or args.scale != 4):
+        raise ValueError("The extended smoke requires the native 50-fps 480-wide control")
+    return {"smoke": args.smoke_frames, "full": 240}[os.environ["PS_STAGE"]]
 
 
 def run(args):
     import torch
 
     start = time.monotonic()
-    n = FRAMES[os.environ["PS_STAGE"]]
-    if args.frames != n or sha(args.source) != SOURCE:
+    n = frame_count(args)
+    if args.frames != n or sha(args.source) != args.source_sha:
         raise ValueError("Unexpected source or frame range")
     for name in ("image_ckpt", "video_ckpt"):
         if sha(getattr(args, name)) != w3.INPUTS[name]:
@@ -48,6 +53,27 @@ def run(args):
     publish = root / "publish"
     publish.mkdir()
     ffmpeg = svtav1.tool("ffmpeg")
+    fps = Fraction(args.fps)
+    probe = json.loads(
+        subprocess.check_output(
+            [
+                "ffprobe",
+                "-v",
+                "error",
+                "-select_streams",
+                "v:0",
+                "-show_entries",
+                "stream=width,height,avg_frame_rate",
+                "-of",
+                "json",
+                str(args.source),
+            ]
+        )
+    )["streams"][0]
+    if [probe["width"], probe["height"]] != [1920, 1080] or Fraction(
+        probe["avg_frame_rate"]
+    ) != fps:
+        raise ValueError("Unexpected source geometry or cadence")
     source = root / "source.yuv"
     command = convert_command(ffmpeg["path"], args.source, source, 0, n)
     subprocess.run(command, check=True, capture_output=True, timeout=180)
@@ -58,7 +84,7 @@ def run(args):
         args,
         source,
         root,
-        25,
+        float(fps),
         n,
         {"qp": args.qp, "scale": args.scale, "target_kbps": 20.4, "est_kbps": None},
     )
@@ -88,13 +114,14 @@ def run(args):
     summary = dict(
         stage=os.environ["PS_STAGE"],
         frames=n,
-        source_sha256=SOURCE,
+        source_sha256=args.source_sha,
         conversion=command,
         ffmpeg=ffmpeg,
         gpu=model,
         resources=resources,
         native=point,
-        fps=25,
+        fps=int(fps) if fps.denominator == 1 else float(fps),
+        native_fps=[fps.numerator, fps.denominator],
         qp=args.qp,
         scale=args.scale,
         raw_sha256=sha(raw),
@@ -106,7 +133,7 @@ def run(args):
 
 def validate(args):
     stage = Path(os.environ["PS_STAGE_DIR"])
-    n = FRAMES[os.environ["PS_STAGE"]]
+    n = frame_count(args)
     width, height = w3.SCALES[args.scale]
     frame_bytes = width * height * 3 // 2
     with tarfile.open(stage / "published.tar") as tar:
@@ -129,7 +156,8 @@ def validate(args):
         full_reports = json.load(member("reports.json"))
         passes = [p for d in full_reports["decode"].values() for p in d["passes"]]
         checks = dict(
-            source=report["source_sha256"] == SOURCE,
+            source=report["source_sha256"] == args.source_sha,
+            cadence=Fraction(*report.get("native_fps", [25, 1])) == Fraction(args.fps),
             count=report["frames"] == n and not frames.read(1),
             native=point["accepted"]
             and point["qp"] == args.qp
@@ -141,14 +169,14 @@ def validate(args):
             and all(r["budget_mib"] == 6144 for r in report["resources"]),
             packet=len(packet) == point["bytes"]
             and hashlib.sha256(packet).hexdigest() == point["container_sha256"],
-            rate=point["kbps"] == len(packet) * 8 * 25 / n / 1000,
+            rate=abs(point["kbps"] - len(packet) * 8 * float(Fraction(args.fps)) / n / 1000) < 1e-8,
             raw=h.hexdigest() == report["raw_sha256"],
             repeat=len(passes) == 4
             and all(p["frame_sha256"] == p["yuv420_sha256"] == digests for p in passes),
         )
     forecast = 1.5 * report["elapsed_seconds"] * 240 / n + 60
-    if n == 48:
-        checks["forecast"] = forecast < 1650
+    if os.environ["PS_STAGE"] == "smoke":
+        checks["forecast"] = forecast < args.full_limit
     ok = all(checks.values())
     Path(os.environ["PS_VALIDATION_PATH"]).write_text(
         json.dumps(dict(passed=ok, checks=checks, forecast_seconds=forecast)) + "\n"
@@ -162,6 +190,10 @@ if __name__ == "__main__":
     for key in ["source", "image-ckpt", "video-ckpt"]:
         cli.add_argument("--" + key, type=Path)
     cli.add_argument("--frames", type=int)
+    cli.add_argument("--smoke-frames", type=int, choices=(48, 120), default=48)
+    cli.add_argument("--source-sha", default=SOURCE)
+    cli.add_argument("--fps", default="25")
+    cli.add_argument("--full-limit", type=int, default=1650)
     cli.add_argument("--qp", type=int, default=24, choices=range(64))
     cli.add_argument("--scale", type=int, default=2, choices=(2, 4))
     cli.add_argument("--validate", action="store_true")

@@ -1,0 +1,30 @@
+{
+  "total_entries": 106355,
+  "all_video_candidates": 105,
+  "nongenerated_candidates": [
+    "tennis_games/alcaraz_hurkacz/034.mp4",
+    "tennis_games/alcaraz_hurkacz/006.mp4",
+    "tennis_games/alcaraz_hurkacz/008.mp4",
+    "tennis_games/alcaraz_hurkacz/023.mp4",
+    "tennis_games/alcaraz_hurkacz/016.mp4",
+    "tennis_games/alcaraz_hurkacz/011.mp4",
+    "tennis_games/alcaraz_hurkacz/018.mp4",
+    "tennis_games/alcaraz_hurkacz/000.mp4",
+    "tennis_games/alcaraz_hurkacz/049.mp4",
+    "tennis_games/alcaraz_hurkacz/047.mp4",
+    "tennis_games/alcaraz_hurkacz/004.mp4",
+    "tennis_games/alcaraz_hurkacz/036.mp4",
+    "tennis_games/alcaraz_hurkacz/031.mp4",
+    "tennis_games/alcaraz_hurkacz/043.mp4",
+    "tennis_games/alcaraz_hurkacz/020.mp4",
+    "tennis_games/alcaraz_hurkacz/039.mp4",
+    "tennis_games/alcaraz_hurkacz/045.mp4",
+    "tennis_games/alcaraz_hurkacz/002.mp4",
+    "tennis_games/alcaraz_hurkacz/013.mp4",
+    "tennis_games/alcaraz_hurkacz/026.mp4",
+    "tennis_games/alcaraz_hurkacz/028.mp4"
+  ],
+  "total_nongenerated": 21,
+  "source_index": "/home/itec/emanuele/Datasets/archive/pre-reset-2026-10-05/MANIFEST.json",
+  "scope": "Archive filename census for Alcaraz or Hurkacz in the path; exclude generated masked/cropped/pose videos"
+}

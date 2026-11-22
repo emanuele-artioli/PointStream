@@ -1,0 +1,49 @@
+{
+  "registered_before_shanghai_reference_scores": true,
+  "basis": "Same production 24-tick two-arm generative replay on two Al028 source players. Shared timing will not be reported as a speed measurement. Preserve native Sydney exclusive and give the earlier Al031 return first claim.",
+  "completed_safety_oracle": [
+    {
+      "job": "20261122T091924Z-a6caa821",
+      "stage": "smoke",
+      "frames": 24,
+      "peak_mib": 11171.90283203125,
+      "prior_cap_mib": 18000,
+      "kernels": 81897,
+      "device": "NVIDIA RTX A6000"
+    },
+    {
+      "job": "20261122T091924Z-a6caa821",
+      "stage": "full",
+      "frames": 24,
+      "peak_mib": 11168.22314453125,
+      "prior_cap_mib": 18000,
+      "kernels": 81897,
+      "device": "NVIDIA RTX A6000"
+    },
+    {
+      "job": "20261122T092121Z-2178c4b9",
+      "stage": "smoke",
+      "frames": 24,
+      "peak_mib": 11167.43408203125,
+      "prior_cap_mib": 18000,
+      "kernels": 81897,
+      "device": "NVIDIA RTX A6000"
+    },
+    {
+      "job": "20261122T092121Z-2178c4b9",
+      "stage": "full",
+      "frames": 24,
+      "peak_mib": 11168.84814453125,
+      "prior_cap_mib": 18000,
+      "kernels": 81897,
+      "device": "NVIDIA RTX A6000"
+    }
+  ],
+  "proposed_gpu_hard_cap_mib": 15000,
+  "proposed_extra_margin_mib": 4096,
+  "observed_gpu3_free_mib": 19815,
+  "observed_gpu3_external_processes": 1,
+  "cumulative_gpu_seconds_limit": 1800,
+  "cumulative_cpu_seconds_limit": 3600,
+  "full_quality_rule": "At least 30% smaller than lossless WebP with paired mean body DISTS increase at most 0.01, report every role and the temporal score."
+}

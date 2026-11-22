@@ -1,0 +1,11 @@
+{
+  "actual_kbps": 16.508333333333333,
+  "actual_q24_kbps": 7.93,
+  "log_slope_source_kbps": [
+    20.4117,
+    39.771
+  ],
+  "log_slope_qp_delta": 12,
+  "selected_qp": 37,
+  "method": "nearest integer to within-match original prespecified log-rate extrapolation; no target quality read"
+}

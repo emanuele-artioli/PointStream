@@ -1,0 +1,224 @@
+{
+  "prior_cpu_hours": 13.39,
+  "prior_gpu_minutes": 57.67,
+  "prior_basis": "rounded experiment record after all common Q36 and seven common Q12 native controls",
+  "jobs": [
+    {
+      "job": "20261122T141724Z-3fd6694b",
+      "match": "match108",
+      "phase": "neural-q27",
+      "state": "complete",
+      "elapsed_seconds": 70.66214776039124,
+      "cpu_threads": 4,
+      "gpu_minutes": 1.1777024626731873,
+      "gate_passed": true
+    },
+    {
+      "job": "20261122T143441Z-a9ff7d2e",
+      "match": "match131",
+      "phase": "neural-q27",
+      "state": "complete",
+      "elapsed_seconds": 91.13966989517212,
+      "cpu_threads": 4,
+      "gpu_minutes": 1.5189944982528687,
+      "gate_passed": true
+    },
+    {
+      "job": "20261122T201757Z-adea0293",
+      "match": "match130",
+      "phase": "neural-q27",
+      "state": "complete",
+      "elapsed_seconds": 60.71240210533142,
+      "cpu_threads": 4,
+      "gpu_minutes": 1.0118733684221903,
+      "gate_passed": true
+    },
+    {
+      "job": "20261122T141258Z-b4356ec9",
+      "match": "match108",
+      "phase": "neural-q28-buffer4",
+      "state": "complete",
+      "elapsed_seconds": 60.58818745613098,
+      "cpu_threads": 4,
+      "gpu_minutes": 1.0098031242688497,
+      "gate_passed": true
+    },
+    {
+      "job": "20261122T134532Z-90b98999",
+      "match": "match108",
+      "phase": "neural-q28",
+      "state": "cancelled",
+      "elapsed_seconds": 0,
+      "cpu_threads": 4,
+      "gpu_minutes": 0.0,
+      "gate_passed": null
+    },
+    {
+      "job": "20261122T143441Z-adcb3f4e",
+      "match": "match130",
+      "phase": "neural-q28",
+      "state": "complete",
+      "elapsed_seconds": 101.08448648452759,
+      "cpu_threads": 4,
+      "gpu_minutes": 1.6847414414087931,
+      "gate_passed": true
+    },
+    {
+      "job": "20261122T143906Z-f98ad058",
+      "match": "match126",
+      "phase": "neural-q32",
+      "state": "complete",
+      "elapsed_seconds": 70.6500518321991,
+      "cpu_threads": 4,
+      "gpu_minutes": 1.1775008638699849,
+      "gate_passed": true
+    },
+    {
+      "job": "20261122T143441Z-bca7d08a",
+      "match": "match126",
+      "phase": "neural-q33",
+      "state": "complete",
+      "elapsed_seconds": 62.1370313167572,
+      "cpu_threads": 4,
+      "gpu_minutes": 1.03561718861262,
+      "gate_passed": true
+    },
+    {
+      "job": "20261122T142456Z-330fcaec",
+      "match": "match105",
+      "phase": "neural-q34",
+      "state": "complete",
+      "elapsed_seconds": 70.67336559295654,
+      "cpu_threads": 4,
+      "gpu_minutes": 1.1778894265492756,
+      "gate_passed": true
+    },
+    {
+      "job": "20261122T142456Z-8a525697",
+      "match": "match116",
+      "phase": "neural-q34",
+      "state": "complete",
+      "elapsed_seconds": 91.8198549747467,
+      "cpu_threads": 4,
+      "gpu_minutes": 1.5303309162457783,
+      "gate_passed": true
+    },
+    {
+      "job": "20261122T142456Z-9d79a340",
+      "match": "match102",
+      "phase": "neural-q37",
+      "state": "complete",
+      "elapsed_seconds": 70.65824699401855,
+      "cpu_threads": 4,
+      "gpu_minutes": 1.1776374499003093,
+      "gate_passed": true
+    },
+    {
+      "job": "20261122T143401Z-f77c9634",
+      "match": "match108",
+      "phase": "neural-q48-buffer4",
+      "state": "complete",
+      "elapsed_seconds": 70.64644455909729,
+      "cpu_threads": 4,
+      "gpu_minutes": 1.1774407426516216,
+      "gate_passed": true
+    },
+    {
+      "job": "20261122T134229Z-b327b1bd",
+      "match": "match108",
+      "phase": "neural-q48",
+      "state": "cancelled",
+      "elapsed_seconds": 0,
+      "cpu_threads": 4,
+      "gpu_minutes": 0.0,
+      "gate_passed": null
+    },
+    {
+      "job": "20261122T142041Z-3d9780a1",
+      "match": "match108",
+      "phase": "neuroscore-q27",
+      "state": "complete",
+      "elapsed_seconds": 200.60915446281433,
+      "cpu_threads": 1,
+      "gpu_minutes": 0,
+      "gate_passed": true
+    },
+    {
+      "job": "20261122T143758Z-8a06f24b",
+      "match": "match131",
+      "phase": "neuroscore-q27",
+      "state": "complete",
+      "elapsed_seconds": 120.39484190940857,
+      "cpu_threads": 1,
+      "gpu_minutes": 0,
+      "gate_passed": true
+    },
+    {
+      "job": "20261122T202026Z-b8bd64b5",
+      "match": "match130",
+      "phase": "neuroscore-q27",
+      "state": "complete",
+      "elapsed_seconds": 30.116198539733887,
+      "cpu_threads": 1,
+      "gpu_minutes": 0,
+      "gate_passed": true
+    },
+    {
+      "job": "20261122T201806Z-8203d472",
+      "match": "match126",
+      "phase": "neuroscore-q32",
+      "state": "complete",
+      "elapsed_seconds": 40.12846398353577,
+      "cpu_threads": 1,
+      "gpu_minutes": 0,
+      "gate_passed": true
+    },
+    {
+      "job": "20261122T142812Z-cd6387a1",
+      "match": "match105",
+      "phase": "neuroscore-q34",
+      "state": "complete",
+      "elapsed_seconds": 60.178006172180176,
+      "cpu_threads": 1,
+      "gpu_minutes": 0,
+      "gate_passed": true
+    },
+    {
+      "job": "20261122T142922Z-8d0b601e",
+      "match": "match116",
+      "phase": "neuroscore-q34",
+      "state": "complete",
+      "elapsed_seconds": 180.80791187286377,
+      "cpu_threads": 1,
+      "gpu_minutes": 0,
+      "gate_passed": true
+    },
+    {
+      "job": "20261122T142924Z-60d900bb",
+      "match": "match102",
+      "phase": "neuroscore-q37",
+      "state": "complete",
+      "elapsed_seconds": 40.124086141586304,
+      "cpu_threads": 1,
+      "gpu_minutes": 0,
+      "gate_passed": true
+    },
+    {
+      "job": "20261122T143725Z-8053593f",
+      "match": "match108",
+      "phase": "neuroscore-q48",
+      "state": "complete",
+      "elapsed_seconds": 151.66826367378235,
+      "cpu_threads": 1,
+      "gpu_minutes": 0,
+      "gate_passed": true
+    }
+  ],
+  "total_cpu_hours": 14.530865134067007,
+  "total_gpu_minutes": 71.34953148285548,
+  "q48_remaining_matches": 11,
+  "q48_cpu_hours_forecast_factor": 1.5,
+  "q48_remaining_full_grid_forecast_cpu_hours": 1.9903310254216195,
+  "cpu_hour_cap": 16,
+  "gpu_minute_cap": 120
+}

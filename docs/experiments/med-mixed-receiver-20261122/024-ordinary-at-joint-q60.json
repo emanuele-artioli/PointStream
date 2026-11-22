@@ -1,0 +1,68 @@
+[
+  {
+    "arm": {
+      "name": "ordinary-w160-near-14010B",
+      "kind": "native_yuv420p",
+      "width": 160,
+      "height": 96,
+      "sha256": "ee6e830686fc9c646ba58bf467bc21b3da7e52feabc09c7c94513d883854cccf",
+      "path": "/private/tmp/ps-med024-joint-matched-av1-price-20261122/w160-q4199/decoded.yuv",
+      "bytes": 13987,
+      "kbps": 23.311666666666667,
+      "crf": 49.75,
+      "stream_sha256": "9385fde7c998fc5e9cc06526e3e4479b27f6c4a68ef8ca99b2fe74da47312864",
+      "price_cap_bytes": 14010
+    },
+    "mean_dists": 0.5660140365362167,
+    "active_dists": 0.5696686208248138,
+    "fallback_dists": 0.5623594522476196,
+    "rgb_psnr": 19.690203592225263,
+    "active_rgb_psnr": 19.623482258565264,
+    "fallback_rgb_psnr": 19.757965990903436,
+    "cpu_seconds": 12.297172
+  },
+  {
+    "arm": {
+      "name": "ordinary-w320-near-14010B",
+      "kind": "native_yuv420p",
+      "width": 320,
+      "height": 192,
+      "sha256": "377a63a76fec23a656cd14ee11551578b2c4c445ab49fc5d0312fce4920a3101",
+      "path": "/private/tmp/ps-med024-joint-matched-av1-price-20261122/w320-q4253/decoded.yuv",
+      "bytes": 13952,
+      "kbps": 23.253333333333334,
+      "crf": 63.25,
+      "stream_sha256": "c87016993060a843447c6a339f4812c783eb5cf2c68eb473a3fd88cad89b13e0",
+      "price_cap_bytes": 14010
+    },
+    "mean_dists": 0.5609582588076591,
+    "active_dists": 0.5646046102046967,
+    "fallback_dists": 0.5573119074106216,
+    "rgb_psnr": 20.759407205520198,
+    "active_rgb_psnr": 20.67776143568329,
+    "fallback_rgb_psnr": 20.842617342368793,
+    "cpu_seconds": 11.720989
+  },
+  {
+    "arm": {
+      "name": "ordinary-w480-near-14010B",
+      "kind": "native_yuv420p",
+      "width": 480,
+      "height": 272,
+      "sha256": "78ee7605b22a279a36ebfe20e60bfa8ac7f0ae27ad8133a9cf5076a47cf761c4",
+      "path": "/private/tmp/ps-med024-joint-matched-av1-price-20261122/w480-q4278/decoded.yuv",
+      "bytes": 13677,
+      "kbps": 22.795,
+      "crf": 69.5,
+      "stream_sha256": "25df17bf37ac51f079732b1dc7a8576f5a0d2c66c1d6b813d5f8a50ef4df4304",
+      "price_cap_bytes": 14010
+    },
+    "mean_dists": 0.5701937029759089,
+    "active_dists": 0.5707238266865412,
+    "fallback_dists": 0.5696635792652766,
+    "rgb_psnr": 21.053107708071146,
+    "active_rgb_psnr": 20.967981714065683,
+    "fallback_rgb_psnr": 21.139935671214367,
+    "cpu_seconds": 12.599883000000002
+  }
+]

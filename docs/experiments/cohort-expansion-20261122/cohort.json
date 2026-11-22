@@ -1,0 +1,78 @@
+{
+  "population": 43,
+  "sample": 12,
+  "selection": [
+    {
+      "rank": 1,
+      "match": "match108",
+      "rally": "000",
+      "key": "01a583ce9550badcbdf65ecfbec7b09a1ca5156c628a87b198e1aa008c4cf518"
+    },
+    {
+      "rank": 2,
+      "match": "match102",
+      "rally": "000",
+      "key": "29ae2453c5f6118994c4bb4daebf85ec2f8452783641249d63734d3d173f6815"
+    },
+    {
+      "rank": 3,
+      "match": "match120",
+      "rally": "000",
+      "key": "2a812e88adb77bf0cf1531367a1279e592f9ad8bcb36e38186904d3382bf5f4c"
+    },
+    {
+      "rank": 4,
+      "match": "match127",
+      "rally": "000",
+      "key": "2fbbb2172ccda2d113d8766e0645a2af5e4d255b3ecb830c4ffe2e6d26249399"
+    },
+    {
+      "rank": 5,
+      "match": "match105",
+      "rally": "000",
+      "key": "325f2f2a13efc32deeb1ae6ebabf20407e8cfb6a00dd006e29e80b4ff6665e66"
+    },
+    {
+      "rank": 6,
+      "match": "match116",
+      "rally": "000",
+      "key": "327cf70fcc9946f800356eafbc725870fd84fc56bbeb9eba4268ce00cb1687cb"
+    },
+    {
+      "rank": 7,
+      "match": "match107",
+      "rally": "000",
+      "key": "3b69ef7159a58562f3d64b239911da49df958dc9ea0bc72fcb8cc055ee2e315f"
+    },
+    {
+      "rank": 8,
+      "match": "match131",
+      "rally": "000",
+      "key": "575375beb4f3232eb51b67a70dcf42eca89cb326dbbcef50ba2a7b5850e3a911"
+    },
+    {
+      "rank": 9,
+      "match": "match119",
+      "rally": "000",
+      "key": "57b128616ae2633fa6393d94fd5ddfd56196571282f05ce86c71ac466933d48b"
+    },
+    {
+      "rank": 10,
+      "match": "match104",
+      "rally": "000",
+      "key": "5a6269ef13af66fc706aee0255e3e9621098b48b73694022d3d39404ffc6256f"
+    },
+    {
+      "rank": 11,
+      "match": "match130",
+      "rally": "000",
+      "key": "5c2fffd392e5317109a54f5670ac7fdc2c420fb19aaa910958b5c0d16bf5c882"
+    },
+    {
+      "rank": 12,
+      "match": "match126",
+      "rally": "000",
+      "key": "5e70f7eadfe8fb7839fffb6bedb691d3433cef797019eea15555a888f82d34a5"
+    }
+  ]
+}

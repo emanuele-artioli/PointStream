@@ -1,0 +1,89 @@
+{
+  "event": "match127",
+  "source_sha256": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+  "fps": "60",
+  "selection": "Twelve fixed native instants spanning the first original 240 ticks, all officially labeled visible; source-only selection",
+  "ticks": [
+    9,
+    32,
+    44,
+    68,
+    92,
+    115,
+    127,
+    151,
+    175,
+    198,
+    210,
+    234
+  ],
+  "source_rgb": {
+    "9": {
+      "raw_rgb_sha256": "54a5fc901fe70e09c29732b461325a6b842208064fbb9068da7960950aee59a9",
+      "typed_rgb_sha256": "cfe78984bb287192ab5c01a0d1e5fa3db5530b5ea0208d28ec767c0f65539c3f",
+      "png_sha256": "8acccc1adbeba40f8fb62376eba43eabcae8dbf53af695791c8a0e3d8dad6eee"
+    },
+    "32": {
+      "raw_rgb_sha256": "09aeaaafbaf21b36124aa1eb299512e3e9e416c3d87fdaf9473cd86ed06fcf7b",
+      "typed_rgb_sha256": "f365cfab557ce92819aa4b212d0be1d79949e078ad359649b0dd272a357283e5",
+      "png_sha256": "7efcfa645d918a4c0d0879d4a30a9fae853fceb9b3a3d8cc736cf717b90ff5d6"
+    },
+    "44": {
+      "raw_rgb_sha256": "c1cfaa597eb0497945f110ffac709c0cb0d598609b64b43689386c4cd9578e37",
+      "typed_rgb_sha256": "6495ca6306ef9b715ba877ade482d2367dc99e4938b35e33b0cdb9ef7713e74a",
+      "png_sha256": "9b7b24ef8849e2a96d45f2d82a749c9621a153ae4e171b5e76ebaaf1f7b2d1bf"
+    },
+    "68": {
+      "raw_rgb_sha256": "2be837cc6b596489b23a1c6372efb91cbd51e1d3dd5752966fde8ab38b65be77",
+      "typed_rgb_sha256": "bcb1758e2facc9d3fd4ff454ff34c7db0e2dc0e05a127c1d560ec4feef8811b7",
+      "png_sha256": "2a130fe044271e09b1e732638d77fd1dd8ca9e7c5e7ad66b1e0aaee97d5f5342"
+    },
+    "92": {
+      "raw_rgb_sha256": "ea49edab28a721576b6530aa543653d0efaac87d55ac2e150b00aa4f02d27be0",
+      "typed_rgb_sha256": "f7e4c6cd0b0abb3ae659657c4729582816cc0a15daa88185464bcc8d54fdb813",
+      "png_sha256": "40297bda882f43614debd332139f9f9fdaf9f2b6cca31a44cc8a6373e307e694"
+    },
+    "115": {
+      "raw_rgb_sha256": "b7b1d29e40e9c7107ef94a1818c8894a471b508d3f5112d5fc7f4601e755451e",
+      "typed_rgb_sha256": "5b4de1b52051621286c60c74d5f5283c494e04d5ba10fa359ccfb794820a1316",
+      "png_sha256": "74fa28390c615ee958d798d1c504841d50bc0eee5b1343f2a2de689f1eb7fa6c"
+    },
+    "127": {
+      "raw_rgb_sha256": "5604ceb973b535e86d568f44e6ec8ad0aeba1cd5c29d9232c1ceae97bfd92a47",
+      "typed_rgb_sha256": "561482928e5b3dfb0644f06d8bfdafbac5027af4df7bbb9bfe6dea5c647c950f",
+      "png_sha256": "6cf3ebb02d7ef5c1ff228dd6848d64d2b7d879c68e60dcdbe3970f2e2977bb38"
+    },
+    "151": {
+      "raw_rgb_sha256": "269a6d2ca09dbd197241219c904d87943d87030f1fc20da482157ea72a523b47",
+      "typed_rgb_sha256": "d038ab32ed481593465a79ff40a16d8762175ab0b0623bbb0365476514e43e30",
+      "png_sha256": "4536c0b94259ea7343ce85dce804f898431d1f9c5e79b90e16b869fe5e696d2a"
+    },
+    "175": {
+      "raw_rgb_sha256": "a1ffdd125e79cc7faa4cd17dba113a38b93f751a3a992b7f41df2f8922d387e9",
+      "typed_rgb_sha256": "5324a763c6a52f0f50e0e12ae89a2b17682e777a72e3de1d0d2dbebff1d103f4",
+      "png_sha256": "7b66a00fd2a0f6b7b9e472f93f8651023ba79ae161f679f34d92258fd052dcbc"
+    },
+    "198": {
+      "raw_rgb_sha256": "2f5af3fbe1484ccf7320133849f591bbf4ae68ab85801dbcbe32f648729a90d0",
+      "typed_rgb_sha256": "1d6ef40a81db4853bdd1ca58167695235a23e7f8db42637e8435c28cc9b7f151",
+      "png_sha256": "84f24a24b26179af5b227d656ffbcdc395a6b66dc49d61f35553b0db189c7230"
+    },
+    "210": {
+      "raw_rgb_sha256": "76336d5ed280e58702e1469101fa731aed6157bb1c2383bbc77c2b0e7fa78d80",
+      "typed_rgb_sha256": "b6d27d3e8de67dfb1b26b66e47c03f0cd05ce402d89d8a6b9b75447744ab5ec8",
+      "png_sha256": "549191997400f4cb6fc0dc00e3e892228f80dc454f5539680b79247f6b264f91"
+    },
+    "234": {
+      "raw_rgb_sha256": "140421d547e458591da77179bc8e78485f8ebe79b4990bfa39cfe85c3557afc5",
+      "typed_rgb_sha256": "4336431d801fe087faf89a01f607c35b86935b8062efd76b9eac959f13317b09",
+      "png_sha256": "e9bedea2e15f8a152f713cc81b653851cb0c49848047121d9592179c1cf82011"
+    }
+  },
+  "review_source_manifest_sha256": "9ca32ad1a8e70f3c2b74ef064ca271c5f7b811089735314b5fb3e81d12146563",
+  "review_packet_sha256": "4da6f50fda72126756868d67c76cb9570e6190d968d81f559cdf4980bc78fb87",
+  "review_source_decoder": {
+    "opencv": "5.0.0",
+    "method": "VideoCapture CAP_FFMPEG BGR to RGB8"
+  },
+  "official_ball_annotation_csv_sha256": "dd004f20ec88ca03a43f3ce6902cd4ef6565af8c53fed86e5062e248cc57e431"
+}

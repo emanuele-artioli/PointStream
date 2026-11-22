@@ -1,0 +1,56 @@
+[
+  {
+    "tag": "djokovic_federer-026",
+    "rank": 1,
+    "native_fps": "50/1",
+    "length": 1324,
+    "source_sha256": "8aeeba8eab61d1b9f2153fe47fcb16f806fb0ebab30b710b832f8abc846c08f2",
+    "bytes": 26582534,
+    "archive": "/home/itec/emanuele/Datasets/archive/pre-reset-2026-10-05/tennis_games/djokovic_federer/videos/026.mp4"
+  },
+  {
+    "tag": "djokovic_federer-021",
+    "rank": 2,
+    "native_fps": "50/1",
+    "length": 398,
+    "source_sha256": "6423a40735568eb8fd6b190cfb4e7d636d1fa99cc84e953f760b9ce0f09f6e0b",
+    "bytes": 8837646,
+    "archive": "/home/itec/emanuele/Datasets/archive/pre-reset-2026-10-05/tennis_games/djokovic_federer/videos/021.mp4"
+  },
+  {
+    "tag": "djokovic_federer-079",
+    "rank": 3,
+    "native_fps": "50/1",
+    "length": 820,
+    "source_sha256": "a0e505fb26cbd8663e762d78b416a70aa50f80779eae92b8e33a07f7e3a96725",
+    "bytes": 15105777,
+    "archive": "/home/itec/emanuele/Datasets/archive/pre-reset-2026-10-05/tennis_games/djokovic_federer/videos/079.mp4"
+  },
+  {
+    "tag": "djokovic_zverev-008",
+    "rank": 1,
+    "native_fps": "60/1",
+    "length": 2459,
+    "source_sha256": "296d9cc12ecec861d9bd71024bdbf005ea775fe849991118d5d3825f374d8610",
+    "bytes": 487755777,
+    "archive": "/home/itec/emanuele/Datasets/archive/pre-reset-2026-10-05/tennis_games/djokovic_zverev/008.mp4"
+  },
+  {
+    "tag": "djokovic_zverev-006",
+    "rank": 2,
+    "native_fps": "60/1",
+    "length": 2889,
+    "source_sha256": "24023f10d3017d583fbd0dfb5a4dac2f04fb4492485eb0917cdc6acab7413c9c",
+    "bytes": 558624679,
+    "archive": "/home/itec/emanuele/Datasets/archive/pre-reset-2026-10-05/tennis_games/djokovic_zverev/006.mp4"
+  },
+  {
+    "tag": "djokovic_zverev-010",
+    "rank": 3,
+    "native_fps": "60/1",
+    "length": 2585,
+    "source_sha256": "10b3c9c9797e01b540cb1141b8bbfe2ca5eafdd40d80aca889a57d9e74d52e0d",
+    "bytes": 499036338,
+    "archive": "/home/itec/emanuele/Datasets/archive/pre-reset-2026-10-05/tennis_games/djokovic_zverev/010.mp4"
+  }
+]

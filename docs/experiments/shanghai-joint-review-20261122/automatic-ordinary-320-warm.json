@@ -1,0 +1,277 @@
+{
+  "source_sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+  "review_sha256": "d664a3ac14f0b273dc5224455468a0ad5bdbdcb3665dc4930adef0e487ca499a",
+  "annotation_sha256": null,
+  "player_support": "automatic source masks",
+  "official_ball_sha256": "0858ae153e5bfa3e9d58a519c24a2f02e61df56f672f95c239302145adcfa6a5",
+  "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+  "arm": "SVT-AV1 ordinary 320x192 warm",
+  "arm_manifest_sha256": "db20a1dcc8e75536f2c1d56d58cf4da5b7a34df4214884d2b468fbbcb9e24e2f",
+  "bitstream_sha256": "3487fc8fb528ff096a3a5efa63d92e83eb75f8b6847afbdefc482d7317b15621",
+  "bytes": 17687,
+  "kbps": 17.66933066933067,
+  "source_ticks": 240,
+  "qa_only": false,
+  "scores": [
+    {
+      "tick": 9,
+      "region": "person:000000000000",
+      "dists": 0.4967985153198242
+    },
+    {
+      "tick": 9,
+      "region": "person:000000000001",
+      "dists": 0.5170379281044006
+    },
+    {
+      "tick": 9,
+      "region": "ball",
+      "dists": 0.2889944314956665
+    },
+    {
+      "tick": 31,
+      "region": "person:000000000000",
+      "dists": 0.4955677390098572
+    },
+    {
+      "tick": 31,
+      "region": "person:000000000001",
+      "dists": 0.4844149351119995
+    },
+    {
+      "tick": 31,
+      "region": "ball",
+      "dists": 0.367006778717041
+    },
+    {
+      "tick": 49,
+      "region": "person:000000000000",
+      "dists": 0.47683966159820557
+    },
+    {
+      "tick": 49,
+      "region": "person:000000000001",
+      "dists": 0.5807918906211853
+    },
+    {
+      "tick": 49,
+      "region": "ball",
+      "dists": 0.3519640564918518
+    },
+    {
+      "tick": 72,
+      "region": "person:000000000000",
+      "dists": 0.46274250745773315
+    },
+    {
+      "tick": 72,
+      "region": "person:000000000001",
+      "dists": 0.5777091383934021
+    },
+    {
+      "tick": 72,
+      "region": "ball",
+      "dists": 0.21711277961730957
+    },
+    {
+      "tick": 95,
+      "region": "person:000000000000",
+      "dists": 0.4821266531944275
+    },
+    {
+      "tick": 95,
+      "region": "person:000000000001",
+      "dists": 0.5662513375282288
+    },
+    {
+      "tick": 95,
+      "region": "ball",
+      "dists": 0.18523353338241577
+    },
+    {
+      "tick": 112,
+      "region": "person:000000000000",
+      "dists": 0.5737965106964111
+    },
+    {
+      "tick": 112,
+      "region": "person:000000000001",
+      "dists": 0.5511023998260498
+    },
+    {
+      "tick": 112,
+      "region": "ball",
+      "dists": 0.2022910714149475
+    },
+    {
+      "tick": 135,
+      "region": "person:000000000000",
+      "dists": 0.4558833837509155
+    },
+    {
+      "tick": 135,
+      "region": "person:000000000001",
+      "dists": 0.5946090221405029
+    },
+    {
+      "tick": 135,
+      "region": "ball",
+      "dists": 0.38286787271499634
+    },
+    {
+      "tick": 152,
+      "region": "person:000000000000",
+      "dists": 0.44430482387542725
+    },
+    {
+      "tick": 152,
+      "region": "person:000000000001",
+      "dists": 0.6050768494606018
+    },
+    {
+      "tick": 152,
+      "region": "ball",
+      "dists": 0.317521870136261
+    },
+    {
+      "tick": 175,
+      "region": "person:000000000000",
+      "dists": 0.45048046112060547
+    },
+    {
+      "tick": 175,
+      "region": "person:000000000001",
+      "dists": 0.5759555101394653
+    },
+    {
+      "tick": 175,
+      "region": "ball",
+      "dists": 0.20814919471740723
+    },
+    {
+      "tick": 198,
+      "region": "person:000000000000",
+      "dists": 0.4921696186065674
+    },
+    {
+      "tick": 198,
+      "region": "person:000000000001",
+      "dists": 0.5633230209350586
+    },
+    {
+      "tick": 198,
+      "region": "ball",
+      "dists": 0.30327272415161133
+    },
+    {
+      "tick": 215,
+      "region": "person:000000000000",
+      "dists": 0.48977577686309814
+    },
+    {
+      "tick": 215,
+      "region": "person:000000000001",
+      "dists": 0.5574771165847778
+    },
+    {
+      "tick": 215,
+      "region": "ball",
+      "dists": 0.4579443335533142
+    },
+    {
+      "tick": 238,
+      "region": "person:000000000000",
+      "dists": 0.5455397367477417
+    },
+    {
+      "tick": 238,
+      "region": "person:000000000001",
+      "dists": 0.5500882863998413
+    },
+    {
+      "tick": 238,
+      "region": "ball",
+      "dists": 0.20209580659866333
+    }
+  ],
+  "paired_ticks": [
+    {
+      "tick": 9,
+      "players": 0.5069182217121124,
+      "ball": 0.2889944314956665,
+      "foreground": 0.39795632660388947
+    },
+    {
+      "tick": 31,
+      "players": 0.48999133706092834,
+      "ball": 0.367006778717041,
+      "foreground": 0.4284990578889847
+    },
+    {
+      "tick": 49,
+      "players": 0.5288157761096954,
+      "ball": 0.3519640564918518,
+      "foreground": 0.4403899163007736
+    },
+    {
+      "tick": 72,
+      "players": 0.5202258229255676,
+      "ball": 0.21711277961730957,
+      "foreground": 0.3686693012714386
+    },
+    {
+      "tick": 95,
+      "players": 0.5241889953613281,
+      "ball": 0.18523353338241577,
+      "foreground": 0.35471126437187195
+    },
+    {
+      "tick": 112,
+      "players": 0.5624494552612305,
+      "ball": 0.2022910714149475,
+      "foreground": 0.382370263338089
+    },
+    {
+      "tick": 135,
+      "players": 0.5252462029457092,
+      "ball": 0.38286787271499634,
+      "foreground": 0.4540570378303528
+    },
+    {
+      "tick": 152,
+      "players": 0.5246908366680145,
+      "ball": 0.317521870136261,
+      "foreground": 0.42110635340213776
+    },
+    {
+      "tick": 175,
+      "players": 0.5132179856300354,
+      "ball": 0.20814919471740723,
+      "foreground": 0.3606835901737213
+    },
+    {
+      "tick": 198,
+      "players": 0.527746319770813,
+      "ball": 0.30327272415161133,
+      "foreground": 0.41550952196121216
+    },
+    {
+      "tick": 215,
+      "players": 0.523626446723938,
+      "ball": 0.4579443335533142,
+      "foreground": 0.4907853901386261
+    },
+    {
+      "tick": 238,
+      "players": 0.5478140115737915,
+      "ball": 0.20209580659866333,
+      "foreground": 0.3749549090862274
+    }
+  ],
+  "mean_paired": {
+    "players": 0.5245776176452637,
+    "ball": 0.29037120441595715,
+    "foreground": 0.4074744110306104
+  },
+  "cpu_seconds": 14.590654
+}

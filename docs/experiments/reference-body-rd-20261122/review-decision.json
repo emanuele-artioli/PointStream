@@ -1,0 +1,25 @@
+{
+  "source_review_sha256": "0aee7f46e90cec060c03231be2ab80edb323ee7fa362fa8ca352bf6c78812a33",
+  "mappings": {
+    "nadal_kyrgios__000_at120__person_000000000001": {
+      "A": "lossless",
+      "B": "q90"
+    },
+    "nadal_kyrgios__000_at120__person_000000000000": {
+      "A": "lossless",
+      "B": "q90"
+    }
+  },
+  "verbatim": "All are acceptable.",
+  "accepted": {
+    "nadal_kyrgios__000_at120__person_000000000001": {
+      "A": true,
+      "B": true
+    },
+    "nadal_kyrgios__000_at120__person_000000000000": {
+      "A": true,
+      "B": true
+    }
+  },
+  "scope": "One author, 24 development ticks and two players. Racket grip was not separately rated in this review."
+}

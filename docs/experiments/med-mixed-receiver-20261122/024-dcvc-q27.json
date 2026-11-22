@@ -1,0 +1,185 @@
+{
+  "arm": {
+    "name": "dcvc-w480-q27",
+    "kind": "native_yuv420p",
+    "width": 480,
+    "height": 272,
+    "path": "/private/tmp/ps-med024-q27-native50-decoded.yuv",
+    "sha256": "d5ad0d6713e5af7136e26b2355b659ecd3e57c1e77b7d3f906e89fcf1430d167",
+    "kbps": 23.215,
+    "bytes": 13929,
+    "producer_job": "20261122T113407Z-e40cac03",
+    "producer_archive_sha256": "c2afaac99f5e7a0fa0b8b6830dbdd720e80ff0f6411cb982af4dd00a673b8f5b",
+    "container_sha256": "0d931927a9cce8a48bb57dfa0fc036fc7c2d4541e95f0d9cb8d28d50100e664b",
+    "source_sha256": "4d602291ebea0fcb9698d86d3f93ce4c3076a13005e33079a82975b8b64605f2",
+    "gpu": "NVIDIA RTX 6000 Ada Generation",
+    "validated_native_passes": 4
+  },
+  "source_sha256": "4d602291ebea0fcb9698d86d3f93ce4c3076a13005e33079a82975b8b64605f2",
+  "supports_sha256": "1936f145922c8ff35f121fe43a2593f7859be04065254e9a5474eb9e8968e63c",
+  "method": "Original W7 source-SAM masks on 12 fixed ticks, native RGB, tight support plus 32-pixel margin, masked DISTS; all-frame native RGB PSNR",
+  "native_fps": 50,
+  "frames": 240,
+  "active_start": 69,
+  "active_frames": 120,
+  "fallback_frames": 120,
+  "body_rows": [
+    {
+      "tick": 10,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.4261541962623596
+    },
+    {
+      "tick": 10,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.36430954933166504
+    },
+    {
+      "tick": 30,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.43405812978744507
+    },
+    {
+      "tick": 30,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.40123045444488525
+    },
+    {
+      "tick": 50,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.4887729287147522
+    },
+    {
+      "tick": 50,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.3777526021003723
+    },
+    {
+      "tick": 70,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.4884227514266968
+    },
+    {
+      "tick": 70,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.3978270888328552
+    },
+    {
+      "tick": 90,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5130754113197327
+    },
+    {
+      "tick": 90,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.399216890335083
+    },
+    {
+      "tick": 110,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5027536153793335
+    },
+    {
+      "tick": 110,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.4193424582481384
+    },
+    {
+      "tick": 130,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5041742920875549
+    },
+    {
+      "tick": 130,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.3678460121154785
+    },
+    {
+      "tick": 150,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5136154890060425
+    },
+    {
+      "tick": 150,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.39097821712493896
+    },
+    {
+      "tick": 170,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.493552565574646
+    },
+    {
+      "tick": 170,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.42552846670150757
+    },
+    {
+      "tick": 190,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.48395830392837524
+    },
+    {
+      "tick": 190,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.39140063524246216
+    },
+    {
+      "tick": 210,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.47304368019104004
+    },
+    {
+      "tick": 210,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.39485347270965576
+    },
+    {
+      "tick": 230,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.4938390851020813
+    },
+    {
+      "tick": 230,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.4158777594566345
+    }
+  ],
+  "mean_dists": 0.44006600230932236,
+  "active_dists": 0.45136110484600067,
+  "fallback_dists": 0.42877089977264404,
+  "rgb_psnr": 22.164808794047715,
+  "active_rgb_psnr": 22.087033677764527,
+  "fallback_rgb_psnr": 22.244002174257048,
+  "source_self_abs": 1.1920928955078125e-07,
+  "weights_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+  "torch": "2.8.0",
+  "cv2": "4.10.0",
+  "device": "cpu",
+  "cpu_seconds": 12.713611999999998,
+  "forecast_cpu_seconds": 73.32186
+}

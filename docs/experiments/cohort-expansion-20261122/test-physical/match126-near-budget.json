@@ -1,0 +1,39 @@
+{
+  "match": "match126",
+  "available_kbps": 20.4,
+  "initial_q": [
+    12,
+    24,
+    36
+  ],
+  "probes": [
+    {
+      "qp": 12,
+      "kbps": 6.1525,
+      "packet_sha256": "813049f20f6510d6b1b1e6fa3647c5f7f45333d635a3e146d58bdc6ee1dc8483"
+    },
+    {
+      "qp": 24,
+      "kbps": 12.890833333333333,
+      "packet_sha256": "75fd34bcda37b28b7fdcc0e9de95d0f23d40fff98727313184c3407835e717ff"
+    },
+    {
+      "qp": 36,
+      "kbps": 24.241666666666667,
+      "packet_sha256": "1096a99c1d68f61bbbf57f66a07a0a3929d617a57427758e26bedbe288121e55"
+    },
+    {
+      "qp": 33,
+      "kbps": 20.7675,
+      "packet_sha256": "b56e01a3ab76a9c238d63b532aaa36b36382c11d3b0ba7280d411dbbbc5e9be9"
+    },
+    {
+      "qp": 32,
+      "kbps": 19.7225,
+      "packet_sha256": "5cebe2ec175a360de434215109c085b52c813b8e9ce73610fb0dd993fec1d43c"
+    }
+  ],
+  "closest_affordable_qp": 32,
+  "closest_affordable_rate": 19.7225,
+  "shortfall_percent": 3.321078431372537
+}

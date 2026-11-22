@@ -24,6 +24,24 @@ SMOKE = {
 SOURCE_SMOKE = "0360ccc4ec8eea097f872285551080d36de520b8ec84ab4f0ccf30b5e9284a7a"
 PROFILES = {
     "initial": (FRAMES, SMOKE),
+    "al028": (
+        "bcf6890e697db931fc913c3774b207071c626512c485cc22a6b98ebfcb32c8cd",
+        {
+            "2dc4956942547f38bcf0c1e52b254167f712659645a6d0906173537c8fe8baf4",
+            "f538688364a9db549bce1add1ba9f76e1de346da6d73f3ca641ef122dd60a0c2",
+            "f06f0e35176c92734c53f44e245dd3f06cc60709cf9abbb0bfce0edd50f8ec8e",
+            "4e947401bbe491330d262cce66e108e70f1b9c534ac7e589975a58dcd66d81ed",
+        },
+    ),
+    "al028-scales": (
+        "8a44e56cfa782a3467ff08430f14ce2abf0d703e8a7f6e89fead618726a5af7d",
+        {
+            "2dc4956942547f38bcf0c1e52b254167f712659645a6d0906173537c8fe8baf4",
+            "64d44cf9df3b41e44bf2fd06d939640b3e34e5473064158d9f7eacdda1431473",
+            "672c6412ec3d1ef0e154380f5c4ab048b21c182feaaa2ede7e7908cb461f07b3",
+            "f538688364a9db549bce1add1ba9f76e1de346da6d73f3ca641ef122dd60a0c2",
+        },
+    ),
     "joint21": (
         "f6936efec14c18624bccf16dcb3c0189f386fbb5a769f92d4366fe9f7e57a2d0",
         {
@@ -152,12 +170,13 @@ def validate(profile):
             assert 0 <= x < x + w <= 1920 and 0 <= y < y + h <= 1080 and 0.25 <= p["score"] <= 1
             assert im.shape == (h, w) and np.count_nonzero(im) == p["pixels"] > 0
             assert np.all((im == 0) | (im == 255))
-    assert r["rows"][SOURCE_SMOKE]
+    source_smoke = "2dc4956942547f38bcf0c1e52b254167f712659645a6d0906173537c8fe8baf4" if profile in {"al028","al028-scales"} else SOURCE_SMOKE
+    assert r["rows"][source_smoke]
     forecast = r["setup_seconds"] + 18 * r["scoring_seconds"] + 65 if smoke else None
     checks = dict(
         authenticated_inputs=r["weight"] == WEIGHT and r["frames"] == frame_hash,
         complete_records=len(r["rows"]) == (4 if smoke else 48),
-        source_persons=len(r["rows"][SOURCE_SMOKE]) > 0,
+        source_persons=len(r["rows"][source_smoke]) > 0,
         geometry_and_masks=True,
         time_budget=forecast is None or forecast < 1150,
     )

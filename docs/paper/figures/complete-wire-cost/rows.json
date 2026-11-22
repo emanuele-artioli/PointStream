@@ -1,0 +1,58 @@
+[
+  {
+    "shot": "Nadal serve",
+    "seconds": 4.8,
+    "changing_bytes": 12927,
+    "initialization_bytes": 244339,
+    "parts": {
+      "Coded video": 8909,
+      "Player poses": 1623,
+      "Ball": 794,
+      "Framing": 1601
+    },
+    "warm_kbps": 21.545,
+    "cold_kbps": 428.7766666666667
+  },
+  {
+    "shot": "Alcaraz rally",
+    "seconds": 9.6,
+    "changing_bytes": 24489,
+    "initialization_bytes": 157517,
+    "parts": {
+      "Coded video": 19985,
+      "Player poses": 2147,
+      "Ball": 996,
+      "Framing": 1361
+    },
+    "warm_kbps": 20.4075,
+    "cold_kbps": 151.67166666666668
+  },
+  {
+    "shot": "Medvedev rally",
+    "seconds": 4.8,
+    "changing_bytes": 13940,
+    "initialization_bytes": 202948,
+    "parts": {
+      "Coded video": 11063,
+      "Player poses": 1016,
+      "Ball": 507,
+      "Framing": 1354
+    },
+    "warm_kbps": 23.233333333333334,
+    "cold_kbps": 361.48
+  },
+  {
+    "shot": "Shanghai 2023",
+    "seconds": 8.008,
+    "changing_bytes": 17794,
+    "initialization_bytes": 137480,
+    "parts": {
+      "Coded video": 13192,
+      "Player poses": 2301,
+      "Ball": 1064,
+      "Framing": 1237
+    },
+    "warm_kbps": 17.776223776223777,
+    "cold_kbps": 155.11888111888115
+  }
+]

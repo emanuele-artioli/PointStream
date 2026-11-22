@@ -1,0 +1,94 @@
+{
+  "conditioning": {
+    "fps": [
+      60,
+      1
+    ],
+    "observed_local_runtime": {
+      "numpy": "1.26.4",
+      "opencv": "4.10.0",
+      "python": "3.12.7"
+    },
+    "producer_hashes": {
+      "common_fit": "8f4a78fd7f443de0f9e7454a31c4900e56f73dc737d1be03684932d654f74dc7",
+      "generator": "00248aa4fdd47e634f82b37a7a33c99f1794440d65cbfe9395255a4225735542"
+    },
+    "required_modules": [
+      "experiments.visor.b1",
+      "experiments.tennis.common_receiver_job",
+      "experiments.tennis.common_receiver_generate",
+      "experiments.tennis.common_receiver_isolation",
+      "experiments.tennis.reference_pair_validation"
+    ],
+    "roles": {
+      "match127_far": {
+        "24": {
+          "box": "a620135fdd18c5e329bdb3f52f09d4c5b7692f023d7c6b66dbb82abbfda53223",
+          "pose": "13dcb7002de109ed6015170faaa74bc8637e2572cdceaa06ee01ece99f07a488",
+          "reference": "6bc10e583e04284beee83c45086914488bdf9e04ec9d3563d9e1b4bc1bf27281",
+          "seed": 51360440880,
+          "t": "088889b8071756d3559dc2172e525644f0be09d4b3fb26a697070bddcb805338"
+        },
+        "240": {
+          "box": "2d880302e2798bcf03e3dc9c2bf3d8c3b5668a8d5ed21ff9942c2449a499d1b0",
+          "pose": "f0ec47874bd714d30cd6d38a4c022cb4a97a16034743abc853f02011cdbf2ee1",
+          "reference": "6bc10e583e04284beee83c45086914488bdf9e04ec9d3563d9e1b4bc1bf27281",
+          "seed": 51360440880,
+          "t": "7665d96fa931a4044c006494c2416185a206d7745973f0051b0fc94522a9068e"
+        },
+        "64": {
+          "box": "30fdd31618e46e3c964d54bcdbea3db4b9b33c4902bd9502aa3336e81be57caf",
+          "pose": "8f1ec1edaf52125ec6e5f93d66d07839a9a3f16619636411905ff0ec8af50c55",
+          "reference": "6bc10e583e04284beee83c45086914488bdf9e04ec9d3563d9e1b4bc1bf27281",
+          "seed": 51360440880,
+          "t": "7a4644928f3a08db905254fd7e5e53ef19a46d932a2ecd372b45462413a82619"
+        }
+      },
+      "match127_near": {
+        "24": {
+          "box": "3a516f1eda255c2d0ce415a3ae9c5ef85b3c9031eaa6b36d8883a7ba3c42db4f",
+          "pose": "ae79b5e72afca4650c06d61dee58662af38477ca074dbdb5843b16e1a8d659ea",
+          "reference": "996d08db5e54fda5915d93514ef260b67694c3764fa4ab73b302f2998e1535e7",
+          "seed": 185970436688,
+          "t": "088889b8071756d3559dc2172e525644f0be09d4b3fb26a697070bddcb805338"
+        },
+        "240": {
+          "box": "ae95351d0bab588d6cece96ef67e99cb788f6405d6ea8888702c8657b60561cf",
+          "pose": "995d4a6dca22d4b8c7007fb08701a262d55533860a720e0ee3f25c20505d80da",
+          "reference": "996d08db5e54fda5915d93514ef260b67694c3764fa4ab73b302f2998e1535e7",
+          "seed": 185970436688,
+          "t": "7665d96fa931a4044c006494c2416185a206d7745973f0051b0fc94522a9068e"
+        },
+        "64": {
+          "box": "8a418e6f95dd1968333cf0350d925ea579afc94fd7fd74b95c14e896ea7c2a2d",
+          "pose": "307253125edbbfddf27a43388aad3884a2ee7dbde2ba7435219fc80b44f910d9",
+          "reference": "996d08db5e54fda5915d93514ef260b67694c3764fa4ab73b302f2998e1535e7",
+          "seed": 185970436688,
+          "t": "7a4644928f3a08db905254fd7e5e53ef19a46d932a2ecd372b45462413a82619"
+        }
+      }
+    }
+  },
+  "extracted_source_identity": "a2a95aa43a9e269d55679cfd4351401d584dacb0eb290cb0d9fcd685590087ed",
+  "gpu_seconds": 0,
+  "original_failure": {
+    "missing_module": "experiments.visor",
+    "source_tar_sha256": "9d607cd2aa65ce46c295c5136e7ad536a2a156db91755646d6d7dd6e85ae55a9"
+  },
+  "pair_spec_sha256": "96d72011a25e4dcdfd0083c66a9b4c0479d173b81560bdaba6f6048796888a92",
+  "registered_jobs": 0,
+  "source_revision": "b44691bba163f9778b93dfce29f2725ba5802b5b",
+  "source_tar_sha256": "32f19b8a4dfe3aaf1c209f8e4f202bd7bf8a35ec12ea7128972cb7fede242517",
+  "template_sha256": {
+    "match127-generate-far.json": "5bed60d248eca817778e6fd67e3cb5001043d657d6cd75a22b4c6804570b9183",
+    "match127-generate-near.json": "1ffeb9f373f12ad0cd8914dd7ff399bbd4b9a3e5a7cdbcdf485fb2e6cb836883"
+  },
+  "tracked_paths": [
+    "experiments",
+    "src",
+    "scripts",
+    "tools"
+  ],
+  "worker_python_file_count": 554,
+  "worker_python_manifest_sha256": "fafd06b0923f6809c8b4241ecca2dcaa23dd8988cdc2bb08ef6cecac5ff681fe"
+}

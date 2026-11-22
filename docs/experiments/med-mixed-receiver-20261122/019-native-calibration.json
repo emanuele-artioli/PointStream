@@ -1,0 +1,187 @@
+{
+  "arm": {
+    "name": "calibration-q26",
+    "kind": "native_yuv420p",
+    "path": "/local/users/emanuele/pointstream/cache/3259553f5e18072fd7d587bd85fb41278187eb891580397ef7f016a353b7493a/tree/publish/decoded.yuv",
+    "sha256": "d4af6db26a5a349ec1f019c826d7f992138e41cac72433807e23646e1f36974b",
+    "width": 480,
+    "height": 272,
+    "bytes": 13800,
+    "kbps": 23.0,
+    "container_sha256": "002f07496ecc4bdb569918dcfe92692811516ef63b4593340c0d8fa0656041b1",
+    "receipt_sha256": "87f8e458932de869ec6e6efa16eca210c2ffbc8cdc92fed4bd8de0294b6af693",
+    "producer_job": "20261122T111338Z-cc60fc9c",
+    "validated_native_passes": 4
+  },
+  "source_sha256": "1c13479eb3b6f8d175eb6f5020c629896e6b01f719014ec995a06b4c6c5a3e9c",
+  "supports_sha256": "c5efefbaaa99b7fb0b6f1fa28a222b56760f8dd074b2181131e2d643b658c76b",
+  "method": "Original W7 source-SAM masks on 12 fixed ticks, native RGB, tight support plus 32-pixel margin, masked DISTS; all-frame native RGB PSNR",
+  "native_fps": 50,
+  "frames": 240,
+  "active_start": 92,
+  "active_frames": 120,
+  "fallback_frames": 120,
+  "body_rows": [
+    {
+      "tick": 10,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.3752450942993164
+    },
+    {
+      "tick": 10,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.47712618112564087
+    },
+    {
+      "tick": 30,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.4158759117126465
+    },
+    {
+      "tick": 30,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.43823742866516113
+    },
+    {
+      "tick": 50,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.39437180757522583
+    },
+    {
+      "tick": 50,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.4967808723449707
+    },
+    {
+      "tick": 70,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.4095187783241272
+    },
+    {
+      "tick": 70,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.44708240032196045
+    },
+    {
+      "tick": 90,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.3738032579421997
+    },
+    {
+      "tick": 90,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.5041601657867432
+    },
+    {
+      "tick": 110,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.40712130069732666
+    },
+    {
+      "tick": 110,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.4693513512611389
+    },
+    {
+      "tick": 130,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.43986976146698
+    },
+    {
+      "tick": 130,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.4755876064300537
+    },
+    {
+      "tick": 150,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.453682541847229
+    },
+    {
+      "tick": 150,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.46189773082733154
+    },
+    {
+      "tick": 170,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.4451258182525635
+    },
+    {
+      "tick": 170,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.497461199760437
+    },
+    {
+      "tick": 190,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.45192885398864746
+    },
+    {
+      "tick": 190,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.4911762475967407
+    },
+    {
+      "tick": 210,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.44356703758239746
+    },
+    {
+      "tick": 210,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5466878414154053
+    },
+    {
+      "tick": 230,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.4294542670249939
+    },
+    {
+      "tick": 230,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.5099993348121643
+    }
+  ],
+  "mean_dists": 0.45229636629422504,
+  "active_dists": 0.46528810759385425,
+  "fallback_dists": 0.4393046249945958,
+  "rgb_psnr": 21.973699692397247,
+  "active_rgb_psnr": 21.929376154138176,
+  "fallback_rgb_psnr": 22.018480259392167,
+  "source_self_abs": 1.1920928955078125e-07,
+  "weights_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+  "torch": "2.10.0+cu128",
+  "cv2": "4.10.0",
+  "device": "cpu",
+  "cpu_seconds": 46.256037764999995,
+  "forecast_cpu_seconds": 171.471050364,
+  "metric_producer_job": "20261122T123127Z-736122b6",
+  "campus_worker_seconds": 198.84137887100223,
+  "canonical_pixels_sha256": "ce7c736a9181a1303d8fae215f4d5a404bfeb68c4c09eaadaf80e23203dcf118",
+  "supports_tar_sha256": "59768c1a1a224d9a91992f01683db0a57356841cc699c60854b36dcd4fc78739"
+}

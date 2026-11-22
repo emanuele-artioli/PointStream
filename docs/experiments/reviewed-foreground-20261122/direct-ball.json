@@ -1,0 +1,90 @@
+{
+  "packet_sha256": "ab12294fec2bba5bb5b21bf373a3a31c620b80cf9463cd92ab0383647d1a8aa9",
+  "labels_sha256": "098fc0b387cbc895fb64c543670023f87a26da155a68383a0b80d540ce6ab3f9",
+  "kbps": 20.4075,
+  "bytes": 24489,
+  "trajectory_sha256": "16214ff3ac718e6b28ae3cb21778c8440057c1e68f030e5ac904f20528f18883",
+  "trajectory_bytes": 996,
+  "frames": 240,
+  "rows": [
+    {
+      "tick": 10,
+      "mark": "visible",
+      "present": true,
+      "error_native_pixels": 3.3541019662496847
+    },
+    {
+      "tick": 30,
+      "mark": "visible",
+      "present": true,
+      "error_native_pixels": 2.0105689600838335
+    },
+    {
+      "tick": 50,
+      "mark": "visible",
+      "present": true,
+      "error_native_pixels": 2.298308765895259
+    },
+    {
+      "tick": 70,
+      "mark": "visible",
+      "present": true,
+      "error_native_pixels": 3.728803995754453
+    },
+    {
+      "tick": 90,
+      "mark": "visible",
+      "present": true,
+      "error_native_pixels": 1.8768301333580943
+    },
+    {
+      "tick": 110,
+      "mark": "visible",
+      "present": true,
+      "error_native_pixels": 4.906390155690999
+    },
+    {
+      "tick": 130,
+      "mark": "visible",
+      "present": true,
+      "error_native_pixels": 0.2352941176470722
+    },
+    {
+      "tick": 150,
+      "mark": "missing",
+      "present": true,
+      "error_native_pixels": null
+    },
+    {
+      "tick": 170,
+      "mark": "visible",
+      "present": true,
+      "error_native_pixels": 3.081926328806993
+    },
+    {
+      "tick": 190,
+      "mark": "visible",
+      "present": true,
+      "error_native_pixels": 0.1323529411764639
+    },
+    {
+      "tick": 210,
+      "mark": "visible",
+      "present": true,
+      "error_native_pixels": 2.06516879342312
+    },
+    {
+      "tick": 230,
+      "mark": "visible",
+      "present": true,
+      "error_native_pixels": 0.5
+    }
+  ],
+  "visible": 11,
+  "missing": 1,
+  "present_on_missing": 1,
+  "hits": {
+    "5": 11,
+    "10": 11
+  }
+}

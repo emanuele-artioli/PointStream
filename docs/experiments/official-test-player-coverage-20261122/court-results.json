@@ -1,0 +1,180 @@
+{
+  "archive_sha256": "aed2bb7790886715d1954b6f889124b44d9d86fdd17fa5d62981d4c48cc46eb6",
+  "events": {
+    "match107": {
+      "event": "match107",
+      "source_sha256": "9b2197018f90a8e8873595101d4c72651efad33c7e60d506e6718e78d073ba2e",
+      "native": {
+        "codec_name": "h264",
+        "width": 1920,
+        "height": 1080,
+        "pix_fmt": "yuv420p",
+        "color_range": "tv",
+        "color_space": "bt709",
+        "r_frame_rate": "60/1",
+        "avg_frame_rate": "60/1",
+        "start_time": "0.000000",
+        "nb_read_packets": "600",
+        "fps": 60.0,
+        "frames": 600
+      },
+      "fit_count": 240,
+      "frames": 240,
+      "court_eligible": true,
+      "seconds": 352.52246079200995,
+      "cv2": "4.13.0",
+      "code_sha256": "a60a84fd9524d5ff7eb34050eee027d7909547514c055d605fb198a6840ac9d7",
+      "selector_sha256": "1867047e29e73192fdde752ab984e01963ade0b41458be0dff5041fc1ddc7dd1",
+      "ffmpeg": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "preview_ticks": [
+        0,
+        47,
+        95,
+        143,
+        191,
+        239
+      ],
+      "preview_sha256": "148fb64dff02a680e677bab0434e7380637a72d3ff5830e1ce886fb1c7f4c50a"
+    },
+    "match131": {
+      "event": "match131",
+      "source_sha256": "ac89229d3608e6247b706251d7d0fc6c8f2018229ce302d7491c49f2b56a7207",
+      "native": {
+        "codec_name": "h264",
+        "width": 1920,
+        "height": 1080,
+        "pix_fmt": "yuv420p",
+        "color_range": "tv",
+        "color_space": "bt709",
+        "r_frame_rate": "25/1",
+        "avg_frame_rate": "25/1",
+        "start_time": "0.000000",
+        "nb_read_packets": "250",
+        "fps": 25.0,
+        "frames": 250
+      },
+      "fit_count": 230,
+      "frames": 240,
+      "court_eligible": true,
+      "seconds": 263.10134587500943,
+      "cv2": "4.13.0",
+      "code_sha256": "a60a84fd9524d5ff7eb34050eee027d7909547514c055d605fb198a6840ac9d7",
+      "selector_sha256": "1867047e29e73192fdde752ab984e01963ade0b41458be0dff5041fc1ddc7dd1",
+      "ffmpeg": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "preview_ticks": [
+        0,
+        47,
+        95,
+        143,
+        191,
+        239
+      ],
+      "preview_sha256": "fd6c19ea18abd1d09db5a985d6c8ea342af35fdd97a2ed709a0eeba6e735c984"
+    },
+    "match104": {
+      "event": "match104",
+      "source_sha256": "aa0eea258179ed5be7b166dbedb3e8001b823c5caac6630f89f480f6bec30a10",
+      "native": {
+        "codec_name": "h264",
+        "width": 1920,
+        "height": 1080,
+        "pix_fmt": "yuv420p",
+        "color_range": "tv",
+        "color_space": "bt709",
+        "r_frame_rate": "60/1",
+        "avg_frame_rate": "60/1",
+        "start_time": "0.000000",
+        "nb_read_packets": "576",
+        "fps": 60.0,
+        "frames": 576
+      },
+      "fit_count": 240,
+      "frames": 240,
+      "court_eligible": true,
+      "seconds": 268.1579270420043,
+      "cv2": "4.13.0",
+      "code_sha256": "a60a84fd9524d5ff7eb34050eee027d7909547514c055d605fb198a6840ac9d7",
+      "selector_sha256": "1867047e29e73192fdde752ab984e01963ade0b41458be0dff5041fc1ddc7dd1",
+      "ffmpeg": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "preview_ticks": [
+        0,
+        47,
+        95,
+        143,
+        191,
+        239
+      ],
+      "preview_sha256": "281010a3f3b7bc23675264edd19dc0fc50bd64ea0d88f724beb624fda438b34f"
+    },
+    "match130": {
+      "event": "match130",
+      "source_sha256": "f3702a7e885cb7b6fcad37bafe362391d314d5f08640015a80ab0625c4bbdd16",
+      "native": {
+        "codec_name": "h264",
+        "width": 1920,
+        "height": 1080,
+        "pix_fmt": "yuv420p",
+        "color_range": "tv",
+        "color_space": "bt709",
+        "r_frame_rate": "25/1",
+        "avg_frame_rate": "25/1",
+        "start_time": "0.000000",
+        "nb_read_packets": "250",
+        "fps": 25.0,
+        "frames": 250
+      },
+      "fit_count": 240,
+      "frames": 240,
+      "court_eligible": true,
+      "seconds": 391.3846362089971,
+      "cv2": "4.13.0",
+      "code_sha256": "a60a84fd9524d5ff7eb34050eee027d7909547514c055d605fb198a6840ac9d7",
+      "selector_sha256": "1867047e29e73192fdde752ab984e01963ade0b41458be0dff5041fc1ddc7dd1",
+      "ffmpeg": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "preview_ticks": [
+        0,
+        47,
+        95,
+        143,
+        191,
+        239
+      ],
+      "preview_sha256": "ed700faad1abd901b18a241d4593c450e43809ff5ca7c07080ea638e151bb16d"
+    },
+    "match126": {
+      "event": "match126",
+      "source_sha256": "29fb4ef71a4d2ef68d79166542c51fda4f48108dfd6647bacc8b9869c018ab93",
+      "native": {
+        "codec_name": "h264",
+        "width": 1920,
+        "height": 1080,
+        "pix_fmt": "yuv420p",
+        "color_range": "tv",
+        "color_space": "bt709",
+        "r_frame_rate": "25/1",
+        "avg_frame_rate": "25/1",
+        "start_time": "0.000000",
+        "nb_read_packets": "240",
+        "fps": 25.0,
+        "frames": 240
+      },
+      "fit_count": 213,
+      "frames": 240,
+      "court_eligible": true,
+      "seconds": 338.9333731660008,
+      "cv2": "4.13.0",
+      "code_sha256": "a60a84fd9524d5ff7eb34050eee027d7909547514c055d605fb198a6840ac9d7",
+      "selector_sha256": "1867047e29e73192fdde752ab984e01963ade0b41458be0dff5041fc1ddc7dd1",
+      "ffmpeg": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "preview_ticks": [
+        0,
+        47,
+        95,
+        143,
+        191,
+        239
+      ],
+      "preview_sha256": "09c052d01df8eb8d67a5990916b7abe194f525e5cf813dfa34a8d3168ecbe0a4"
+    }
+  }
+}

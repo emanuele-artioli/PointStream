@@ -1,0 +1,1342 @@
+{
+  "source_yuv_sha256": "f80c34e6fb264ec8170a52af5e9368ff58d0ed400f8abb422192280d9eb6d434",
+  "source_controls_exact": true,
+  "init": {
+    "jpeg40": {
+      "producer_job": "20261118T105900Z-07f1b885",
+      "producer_revision": "55ba06290978bb5e25347031a1b64c1c66107981",
+      "archive_sha256": "a4d940dba9231c1b13f93f54a997181329f0486a9cf81559205938badec4ca0c",
+      "units": {
+        "person:000000000000": {
+          "unit": "nadal_kyrgios__000_at120__person_000000000000",
+          "seed": 258705821133,
+          "pose_sha256": "76af6d7b540b0e6fb7cff7d12077bcf6e1173e3ad6ea3eedae8cee19d2c1a96a",
+          "image_bytes": 20913,
+          "image_sha256": "72686f9078606481d08c7fbb520f7451d2e74f6f11621faf3398f75769790322",
+          "wrapped_ref1_bytes": 20558,
+          "output_sha256": "cc342ef94fda6a9b2e4ed606dcb723aca9ea627ec927faddb7e4a265e5fdc74a",
+          "decoded_reference_sha256": "c9dd2b70e679b682bd9cce1ddab6e7a1b44517d02a94780f74e89400dc32e20c",
+          "full_crop_rgb_psnr": 20.09486883900592
+        },
+        "person:000000000001": {
+          "unit": "nadal_kyrgios__000_at120__person_000000000001",
+          "seed": 57787946446,
+          "pose_sha256": "0a2fb5373effffdffb2632f9d9fa42d5549051e27323d2a2f3dbe5034299bbc7",
+          "image_bytes": 20206,
+          "image_sha256": "f14550a61087190cbebf1abddd388396f119380327427ae1dc8e72d517069e76",
+          "wrapped_ref1_bytes": 20517,
+          "output_sha256": "f9ea8736596a7c963dc681c0a46c7824c1009e9c289f9f5314e730750fa67588",
+          "decoded_reference_sha256": "57b047dfa19b86a053092ebfc5b557fbe8432bba1f9ba8fc774d39864fb05a12",
+          "full_crop_rgb_psnr": 19.06828495940441
+        }
+      },
+      "total_image_bytes": 41119,
+      "total_ref1_bytes": 41075
+    },
+    "jpeg70": {
+      "producer_job": "20261118T105102Z-4c8cf5bb",
+      "producer_revision": "55ba06290978bb5e25347031a1b64c1c66107981",
+      "archive_sha256": "d77d1d44dedf28ca39ed560bb546084967d51a70691fed1a21c0a692c7b59916",
+      "units": {
+        "person:000000000000": {
+          "unit": "nadal_kyrgios__000_at120__person_000000000000",
+          "seed": 258705821133,
+          "pose_sha256": "76af6d7b540b0e6fb7cff7d12077bcf6e1173e3ad6ea3eedae8cee19d2c1a96a",
+          "image_bytes": 33214,
+          "image_sha256": "a824099ddcd60fb9519354159d1e1970209c6a37e4dbea4469c21af91e77cff0",
+          "wrapped_ref1_bytes": 33525,
+          "output_sha256": "fc615e92d6306ef1f75e10ba7270db18e3cd7a0f7fe44be2cdd325e95f2d8a4c",
+          "decoded_reference_sha256": "631221d4f327aadc3056847166dcbb177193245988d1bc4e019a6de5c23c04ca",
+          "full_crop_rgb_psnr": 19.789620451377555
+        },
+        "person:000000000001": {
+          "unit": "nadal_kyrgios__000_at120__person_000000000001",
+          "seed": 57787946446,
+          "pose_sha256": "0a2fb5373effffdffb2632f9d9fa42d5549051e27323d2a2f3dbe5034299bbc7",
+          "image_bytes": 31284,
+          "image_sha256": "ab7ba90f2d62c8d4b018f0f120f5ade0f0e566c69470139c8f8529735ddb7b89",
+          "wrapped_ref1_bytes": 31595,
+          "output_sha256": "77ff1d4bf5d4747dae8a6a6b84613c979bc8283c6a2db785abaeb86893ebe4c9",
+          "decoded_reference_sha256": "ef9a944ceb550c2f105a06c907d52640c6883ed80c989d8183337a3a1215284e",
+          "full_crop_rgb_psnr": 19.221574517223225
+        }
+      },
+      "total_image_bytes": 64498,
+      "total_ref1_bytes": 65120
+    }
+  },
+  "summary": {
+    "source_model": {
+      "jpeg40": {
+        "per_player": {
+          "person:000000000000": {
+            "dists": 0.17106343060731888,
+            "rgb_psnr": 14.987535871423754,
+            "ticks": 24
+          },
+          "person:000000000001": {
+            "dists": 0.16305583963791528,
+            "rgb_psnr": 17.1406966839294,
+            "ticks": 24
+          }
+        },
+        "dists": 0.16705963512261707,
+        "rgb_psnr": 16.064116277676575
+      },
+      "jpeg70": {
+        "per_player": {
+          "person:000000000000": {
+            "dists": 0.18182210375865301,
+            "rgb_psnr": 14.685926219135489,
+            "ticks": 24
+          },
+          "person:000000000001": {
+            "dists": 0.16371967146794,
+            "rgb_psnr": 17.570330434997658,
+            "ticks": 24
+          }
+        },
+        "dists": 0.1727708876132965,
+        "rgb_psnr": 16.128128327066573
+      }
+    },
+    "human": {
+      "jpeg40": {
+        "per_player": {
+          "person:000000000000": {
+            "dists": 0.1815570592880249,
+            "rgb_psnr": 14.800211254280448,
+            "ticks": 1
+          },
+          "person:000000000001": {
+            "dists": 0.15444445610046387,
+            "rgb_psnr": 18.47109286009475,
+            "ticks": 1
+          }
+        },
+        "dists": 0.16800075769424438,
+        "rgb_psnr": 16.6356520571876
+      },
+      "jpeg70": {
+        "per_player": {
+          "person:000000000000": {
+            "dists": 0.18982505798339844,
+            "rgb_psnr": 14.495438803861678,
+            "ticks": 1
+          },
+          "person:000000000001": {
+            "dists": 0.1538061499595642,
+            "rgb_psnr": 19.36033133269589,
+            "ticks": 1
+          }
+        },
+        "dists": 0.17181560397148132,
+        "rgb_psnr": 16.927885068278783
+      }
+    }
+  },
+  "rows": [
+    {
+      "tick": 0,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11636,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.14300662279129028,
+          "sum_squared_rgb": 46146768,
+          "samples": 34908
+        },
+        "jpeg70": {
+          "dists": 0.15387779474258423,
+          "sum_squared_rgb": 55305736,
+          "samples": 34908
+        },
+        "lossless": {
+          "dists": 0.1329248547554016,
+          "sum_squared_rgb": 55622007,
+          "samples": 34908
+        }
+      }
+    },
+    {
+      "tick": 0,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 3988,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.1455022096633911,
+          "sum_squared_rgb": 11897063,
+          "samples": 11964
+        },
+        "jpeg70": {
+          "dists": 0.14659273624420166,
+          "sum_squared_rgb": 11503312,
+          "samples": 11964
+        },
+        "lossless": {
+          "dists": 0.17302119731903076,
+          "sum_squared_rgb": 14521693,
+          "samples": 11964
+        }
+      }
+    },
+    {
+      "tick": 1,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11492,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.1611795425415039,
+          "sum_squared_rgb": 57214092,
+          "samples": 34476
+        },
+        "jpeg70": {
+          "dists": 0.17665457725524902,
+          "sum_squared_rgb": 65457195,
+          "samples": 34476
+        },
+        "lossless": {
+          "dists": 0.14983707666397095,
+          "sum_squared_rgb": 63155943,
+          "samples": 34476
+        }
+      }
+    },
+    {
+      "tick": 1,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 3884,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.15709519386291504,
+          "sum_squared_rgb": 12900982,
+          "samples": 11652
+        },
+        "jpeg70": {
+          "dists": 0.1633608341217041,
+          "sum_squared_rgb": 12715718,
+          "samples": 11652
+        },
+        "lossless": {
+          "dists": 0.17889922857284546,
+          "sum_squared_rgb": 14681000,
+          "samples": 11652
+        }
+      }
+    },
+    {
+      "tick": 2,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11512,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.15096044540405273,
+          "sum_squared_rgb": 58375693,
+          "samples": 34536
+        },
+        "jpeg70": {
+          "dists": 0.1726124882698059,
+          "sum_squared_rgb": 65014179,
+          "samples": 34536
+        },
+        "lossless": {
+          "dists": 0.15966439247131348,
+          "sum_squared_rgb": 61918057,
+          "samples": 34536
+        }
+      }
+    },
+    {
+      "tick": 2,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 3896,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.1662735939025879,
+          "sum_squared_rgb": 14562539,
+          "samples": 11688
+        },
+        "jpeg70": {
+          "dists": 0.1509873867034912,
+          "sum_squared_rgb": 12712271,
+          "samples": 11688
+        },
+        "lossless": {
+          "dists": 0.16634505987167358,
+          "sum_squared_rgb": 14303543,
+          "samples": 11688
+        }
+      }
+    },
+    {
+      "tick": 3,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11440,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.15751731395721436,
+          "sum_squared_rgb": 64452614,
+          "samples": 34320
+        },
+        "jpeg70": {
+          "dists": 0.19292336702346802,
+          "sum_squared_rgb": 69271638,
+          "samples": 34320
+        },
+        "lossless": {
+          "dists": 0.15593558549880981,
+          "sum_squared_rgb": 68010550,
+          "samples": 34320
+        }
+      }
+    },
+    {
+      "tick": 3,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 3904,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.16702038049697876,
+          "sum_squared_rgb": 14464121,
+          "samples": 11712
+        },
+        "jpeg70": {
+          "dists": 0.151391863822937,
+          "sum_squared_rgb": 12018333,
+          "samples": 11712
+        },
+        "lossless": {
+          "dists": 0.175115168094635,
+          "sum_squared_rgb": 14129261,
+          "samples": 11712
+        }
+      }
+    },
+    {
+      "tick": 4,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11468,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.165530264377594,
+          "sum_squared_rgb": 64965167,
+          "samples": 34404
+        },
+        "jpeg70": {
+          "dists": 0.17300546169281006,
+          "sum_squared_rgb": 68636008,
+          "samples": 34404
+        },
+        "lossless": {
+          "dists": 0.15055805444717407,
+          "sum_squared_rgb": 67055514,
+          "samples": 34404
+        }
+      }
+    },
+    {
+      "tick": 4,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 4104,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.15980887413024902,
+          "sum_squared_rgb": 13220257,
+          "samples": 12312
+        },
+        "jpeg70": {
+          "dists": 0.16601794958114624,
+          "sum_squared_rgb": 11713659,
+          "samples": 12312
+        },
+        "lossless": {
+          "dists": 0.16134315729141235,
+          "sum_squared_rgb": 13205996,
+          "samples": 12312
+        }
+      }
+    },
+    {
+      "tick": 5,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11668,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.17882120609283447,
+          "sum_squared_rgb": 68050667,
+          "samples": 35004
+        },
+        "jpeg70": {
+          "dists": 0.19017452001571655,
+          "sum_squared_rgb": 73473232,
+          "samples": 35004
+        },
+        "lossless": {
+          "dists": 0.1619061827659607,
+          "sum_squared_rgb": 71343663,
+          "samples": 35004
+        }
+      }
+    },
+    {
+      "tick": 5,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 3968,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.16358983516693115,
+          "sum_squared_rgb": 12650922,
+          "samples": 11904
+        },
+        "jpeg70": {
+          "dists": 0.15579754114151,
+          "sum_squared_rgb": 11703386,
+          "samples": 11904
+        },
+        "lossless": {
+          "dists": 0.1739470362663269,
+          "sum_squared_rgb": 12858433,
+          "samples": 11904
+        }
+      }
+    },
+    {
+      "tick": 6,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11668,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.1654418706893921,
+          "sum_squared_rgb": 73854198,
+          "samples": 35004
+        },
+        "jpeg70": {
+          "dists": 0.1768903136253357,
+          "sum_squared_rgb": 79468953,
+          "samples": 35004
+        },
+        "lossless": {
+          "dists": 0.16157865524291992,
+          "sum_squared_rgb": 75624010,
+          "samples": 35004
+        }
+      }
+    },
+    {
+      "tick": 6,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 3964,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.16756713390350342,
+          "sum_squared_rgb": 12185641,
+          "samples": 11892
+        },
+        "jpeg70": {
+          "dists": 0.162142813205719,
+          "sum_squared_rgb": 11540890,
+          "samples": 11892
+        },
+        "lossless": {
+          "dists": 0.18334227800369263,
+          "sum_squared_rgb": 13051191,
+          "samples": 11892
+        }
+      }
+    },
+    {
+      "tick": 7,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11288,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.16804885864257812,
+          "sum_squared_rgb": 70780212,
+          "samples": 33864
+        },
+        "jpeg70": {
+          "dists": 0.17493492364883423,
+          "sum_squared_rgb": 76501107,
+          "samples": 33864
+        },
+        "lossless": {
+          "dists": 0.16085189580917358,
+          "sum_squared_rgb": 71575798,
+          "samples": 33864
+        }
+      }
+    },
+    {
+      "tick": 7,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 4096,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.17090189456939697,
+          "sum_squared_rgb": 13348886,
+          "samples": 12288
+        },
+        "jpeg70": {
+          "dists": 0.1632629632949829,
+          "sum_squared_rgb": 12762777,
+          "samples": 12288
+        },
+        "lossless": {
+          "dists": 0.18566596508026123,
+          "sum_squared_rgb": 13763770,
+          "samples": 12288
+        }
+      }
+    },
+    {
+      "tick": 8,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11612,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.17513054609298706,
+          "sum_squared_rgb": 79249164,
+          "samples": 34836
+        },
+        "jpeg70": {
+          "dists": 0.17619812488555908,
+          "sum_squared_rgb": 85237077,
+          "samples": 34836
+        },
+        "lossless": {
+          "dists": 0.16137689352035522,
+          "sum_squared_rgb": 78808108,
+          "samples": 34836
+        }
+      }
+    },
+    {
+      "tick": 8,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 4136,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.16723161935806274,
+          "sum_squared_rgb": 14007323,
+          "samples": 12408
+        },
+        "jpeg70": {
+          "dists": 0.16240090131759644,
+          "sum_squared_rgb": 13224412,
+          "samples": 12408
+        },
+        "lossless": {
+          "dists": 0.17938262224197388,
+          "sum_squared_rgb": 13586275,
+          "samples": 12408
+        }
+      }
+    },
+    {
+      "tick": 9,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11636,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.1932438611984253,
+          "sum_squared_rgb": 81508124,
+          "samples": 34908
+        },
+        "jpeg70": {
+          "dists": 0.20112788677215576,
+          "sum_squared_rgb": 87228457,
+          "samples": 34908
+        },
+        "lossless": {
+          "dists": 0.16836601495742798,
+          "sum_squared_rgb": 80315339,
+          "samples": 34908
+        }
+      }
+    },
+    {
+      "tick": 9,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 4152,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.16769033670425415,
+          "sum_squared_rgb": 12995773,
+          "samples": 12456
+        },
+        "jpeg70": {
+          "dists": 0.1656973958015442,
+          "sum_squared_rgb": 11884397,
+          "samples": 12456
+        },
+        "lossless": {
+          "dists": 0.1758819818496704,
+          "sum_squared_rgb": 12813504,
+          "samples": 12456
+        }
+      }
+    },
+    {
+      "tick": 10,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11644,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.18389999866485596,
+          "sum_squared_rgb": 84069743,
+          "samples": 34932
+        },
+        "jpeg70": {
+          "dists": 0.19050747156143188,
+          "sum_squared_rgb": 90594331,
+          "samples": 34932
+        },
+        "lossless": {
+          "dists": 0.17749905586242676,
+          "sum_squared_rgb": 78773824,
+          "samples": 34932
+        }
+      }
+    },
+    {
+      "tick": 10,
+      "person": "person:000000000000",
+      "support": "human",
+      "pixels": 14548,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.1815570592880249,
+          "sum_squared_rgb": 93968822,
+          "samples": 43644
+        },
+        "jpeg70": {
+          "dists": 0.18982505798339844,
+          "sum_squared_rgb": 100800115,
+          "samples": 43644
+        },
+        "lossless": {
+          "dists": 0.17431461811065674,
+          "sum_squared_rgb": 88803377,
+          "samples": 43644
+        }
+      }
+    },
+    {
+      "tick": 10,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 4004,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.16371315717697144,
+          "sum_squared_rgb": 14250930,
+          "samples": 12012
+        },
+        "jpeg70": {
+          "dists": 0.1648721694946289,
+          "sum_squared_rgb": 11494621,
+          "samples": 12012
+        },
+        "lossless": {
+          "dists": 0.18520700931549072,
+          "sum_squared_rgb": 12674459,
+          "samples": 12012
+        }
+      }
+    },
+    {
+      "tick": 10,
+      "person": "person:000000000001",
+      "support": "human",
+      "pixels": 5386,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.15444445610046387,
+          "sum_squared_rgb": 14940278,
+          "samples": 16158
+        },
+        "jpeg70": {
+          "dists": 0.1538061499595642,
+          "sum_squared_rgb": 12174043,
+          "samples": 16158
+        },
+        "lossless": {
+          "dists": 0.17817825078964233,
+          "sum_squared_rgb": 13475504,
+          "samples": 16158
+        }
+      }
+    },
+    {
+      "tick": 11,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11584,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.18611621856689453,
+          "sum_squared_rgb": 83322192,
+          "samples": 34752
+        },
+        "jpeg70": {
+          "dists": 0.19428861141204834,
+          "sum_squared_rgb": 91799530,
+          "samples": 34752
+        },
+        "lossless": {
+          "dists": 0.17628365755081177,
+          "sum_squared_rgb": 77469815,
+          "samples": 34752
+        }
+      }
+    },
+    {
+      "tick": 11,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 4232,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.17702066898345947,
+          "sum_squared_rgb": 16905553,
+          "samples": 12696
+        },
+        "jpeg70": {
+          "dists": 0.15394973754882812,
+          "sum_squared_rgb": 13729051,
+          "samples": 12696
+        },
+        "lossless": {
+          "dists": 0.18389558792114258,
+          "sum_squared_rgb": 14816233,
+          "samples": 12696
+        }
+      }
+    },
+    {
+      "tick": 12,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11312,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.1656097173690796,
+          "sum_squared_rgb": 74930658,
+          "samples": 33936
+        },
+        "jpeg70": {
+          "dists": 0.18647098541259766,
+          "sum_squared_rgb": 85183545,
+          "samples": 33936
+        },
+        "lossless": {
+          "dists": 0.1731024980545044,
+          "sum_squared_rgb": 71315939,
+          "samples": 33936
+        }
+      }
+    },
+    {
+      "tick": 12,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 4284,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.17465972900390625,
+          "sum_squared_rgb": 20456824,
+          "samples": 12852
+        },
+        "jpeg70": {
+          "dists": 0.17029035091400146,
+          "sum_squared_rgb": 15201573,
+          "samples": 12852
+        },
+        "lossless": {
+          "dists": 0.18331199884414673,
+          "sum_squared_rgb": 16219871,
+          "samples": 12852
+        }
+      }
+    },
+    {
+      "tick": 13,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11300,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.1697779893875122,
+          "sum_squared_rgb": 65450684,
+          "samples": 33900
+        },
+        "jpeg70": {
+          "dists": 0.17609930038452148,
+          "sum_squared_rgb": 69318392,
+          "samples": 33900
+        },
+        "lossless": {
+          "dists": 0.17256343364715576,
+          "sum_squared_rgb": 64900451,
+          "samples": 33900
+        }
+      }
+    },
+    {
+      "tick": 13,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 4280,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.17249161005020142,
+          "sum_squared_rgb": 22345122,
+          "samples": 12840
+        },
+        "jpeg70": {
+          "dists": 0.17722487449645996,
+          "sum_squared_rgb": 18438900,
+          "samples": 12840
+        },
+        "lossless": {
+          "dists": 0.17781919240951538,
+          "sum_squared_rgb": 16936278,
+          "samples": 12840
+        }
+      }
+    },
+    {
+      "tick": 14,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11308,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.16541820764541626,
+          "sum_squared_rgb": 64357024,
+          "samples": 33924
+        },
+        "jpeg70": {
+          "dists": 0.176008939743042,
+          "sum_squared_rgb": 65529641,
+          "samples": 33924
+        },
+        "lossless": {
+          "dists": 0.17304587364196777,
+          "sum_squared_rgb": 65695216,
+          "samples": 33924
+        }
+      }
+    },
+    {
+      "tick": 14,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 4088,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.1718234419822693,
+          "sum_squared_rgb": 18734787,
+          "samples": 12264
+        },
+        "jpeg70": {
+          "dists": 0.16793817281723022,
+          "sum_squared_rgb": 15284216,
+          "samples": 12264
+        },
+        "lossless": {
+          "dists": 0.17724770307540894,
+          "sum_squared_rgb": 17352853,
+          "samples": 12264
+        }
+      }
+    },
+    {
+      "tick": 15,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11284,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.16621673107147217,
+          "sum_squared_rgb": 67759154,
+          "samples": 33852
+        },
+        "jpeg70": {
+          "dists": 0.1814866065979004,
+          "sum_squared_rgb": 69589713,
+          "samples": 33852
+        },
+        "lossless": {
+          "dists": 0.17651695013046265,
+          "sum_squared_rgb": 71319108,
+          "samples": 33852
+        }
+      }
+    },
+    {
+      "tick": 15,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 4100,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.15630286931991577,
+          "sum_squared_rgb": 15335471,
+          "samples": 12300
+        },
+        "jpeg70": {
+          "dists": 0.16539126634597778,
+          "sum_squared_rgb": 14471061,
+          "samples": 12300
+        },
+        "lossless": {
+          "dists": 0.1753556728363037,
+          "sum_squared_rgb": 17057975,
+          "samples": 12300
+        }
+      }
+    },
+    {
+      "tick": 16,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11292,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.158738911151886,
+          "sum_squared_rgb": 66802594,
+          "samples": 33876
+        },
+        "jpeg70": {
+          "dists": 0.16610360145568848,
+          "sum_squared_rgb": 68990093,
+          "samples": 33876
+        },
+        "lossless": {
+          "dists": 0.16490775346755981,
+          "sum_squared_rgb": 69848001,
+          "samples": 33876
+        }
+      }
+    },
+    {
+      "tick": 16,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 4308,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.16101205348968506,
+          "sum_squared_rgb": 14869386,
+          "samples": 12924
+        },
+        "jpeg70": {
+          "dists": 0.16102832555770874,
+          "sum_squared_rgb": 13630684,
+          "samples": 12924
+        },
+        "lossless": {
+          "dists": 0.17854052782058716,
+          "sum_squared_rgb": 15839266,
+          "samples": 12924
+        }
+      }
+    },
+    {
+      "tick": 17,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11180,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.1662299633026123,
+          "sum_squared_rgb": 66447609,
+          "samples": 33540
+        },
+        "jpeg70": {
+          "dists": 0.17193031311035156,
+          "sum_squared_rgb": 68919037,
+          "samples": 33540
+        },
+        "lossless": {
+          "dists": 0.1676030158996582,
+          "sum_squared_rgb": 67658602,
+          "samples": 33540
+        }
+      }
+    },
+    {
+      "tick": 17,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 4124,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.14876776933670044,
+          "sum_squared_rgb": 14890263,
+          "samples": 12372
+        },
+        "jpeg70": {
+          "dists": 0.16392529010772705,
+          "sum_squared_rgb": 13124469,
+          "samples": 12372
+        },
+        "lossless": {
+          "dists": 0.18026161193847656,
+          "sum_squared_rgb": 14643480,
+          "samples": 12372
+        }
+      }
+    },
+    {
+      "tick": 18,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11240,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.15856462717056274,
+          "sum_squared_rgb": 68644706,
+          "samples": 33720
+        },
+        "jpeg70": {
+          "dists": 0.1756223440170288,
+          "sum_squared_rgb": 71514858,
+          "samples": 33720
+        },
+        "lossless": {
+          "dists": 0.1707911491394043,
+          "sum_squared_rgb": 68472837,
+          "samples": 33720
+        }
+      }
+    },
+    {
+      "tick": 18,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 4144,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.16173231601715088,
+          "sum_squared_rgb": 16598028,
+          "samples": 12432
+        },
+        "jpeg70": {
+          "dists": 0.16848111152648926,
+          "sum_squared_rgb": 14585034,
+          "samples": 12432
+        },
+        "lossless": {
+          "dists": 0.19063591957092285,
+          "sum_squared_rgb": 15953959,
+          "samples": 12432
+        }
+      }
+    },
+    {
+      "tick": 19,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11280,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.1840733289718628,
+          "sum_squared_rgb": 74317808,
+          "samples": 33840
+        },
+        "jpeg70": {
+          "dists": 0.1821776032447815,
+          "sum_squared_rgb": 72961630,
+          "samples": 33840
+        },
+        "lossless": {
+          "dists": 0.17334723472595215,
+          "sum_squared_rgb": 71481058,
+          "samples": 33840
+        }
+      }
+    },
+    {
+      "tick": 19,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 4216,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.15516847372055054,
+          "sum_squared_rgb": 15491557,
+          "samples": 12648
+        },
+        "jpeg70": {
+          "dists": 0.17390143871307373,
+          "sum_squared_rgb": 15016967,
+          "samples": 12648
+        },
+        "lossless": {
+          "dists": 0.1774815320968628,
+          "sum_squared_rgb": 15925419,
+          "samples": 12648
+        }
+      }
+    },
+    {
+      "tick": 20,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11296,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.17287170886993408,
+          "sum_squared_rgb": 74964510,
+          "samples": 33888
+        },
+        "jpeg70": {
+          "dists": 0.18145418167114258,
+          "sum_squared_rgb": 74863319,
+          "samples": 33888
+        },
+        "lossless": {
+          "dists": 0.17875516414642334,
+          "sum_squared_rgb": 73251445,
+          "samples": 33888
+        }
+      }
+    },
+    {
+      "tick": 20,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 4204,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.1648036241531372,
+          "sum_squared_rgb": 17498353,
+          "samples": 12612
+        },
+        "jpeg70": {
+          "dists": 0.17366260290145874,
+          "sum_squared_rgb": 17206984,
+          "samples": 12612
+        },
+        "lossless": {
+          "dists": 0.18225711584091187,
+          "sum_squared_rgb": 18297134,
+          "samples": 12612
+        }
+      }
+    },
+    {
+      "tick": 21,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11308,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.18002444505691528,
+          "sum_squared_rgb": 76285645,
+          "samples": 33924
+        },
+        "jpeg70": {
+          "dists": 0.18071401119232178,
+          "sum_squared_rgb": 77716345,
+          "samples": 33924
+        },
+        "lossless": {
+          "dists": 0.18793416023254395,
+          "sum_squared_rgb": 74825199,
+          "samples": 33924
+        }
+      }
+    },
+    {
+      "tick": 21,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 4212,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.16429632902145386,
+          "sum_squared_rgb": 17522560,
+          "samples": 12636
+        },
+        "jpeg70": {
+          "dists": 0.16353780031204224,
+          "sum_squared_rgb": 17280177,
+          "samples": 12636
+        },
+        "lossless": {
+          "dists": 0.17687439918518066,
+          "sum_squared_rgb": 18040652,
+          "samples": 12636
+        }
+      }
+    },
+    {
+      "tick": 22,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11372,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.1879095435142517,
+          "sum_squared_rgb": 79079403,
+          "samples": 34116
+        },
+        "jpeg70": {
+          "dists": 0.20112621784210205,
+          "sum_squared_rgb": 82594471,
+          "samples": 34116
+        },
+        "lossless": {
+          "dists": 0.20246469974517822,
+          "sum_squared_rgb": 78586129,
+          "samples": 34116
+        }
+      }
+    },
+    {
+      "tick": 22,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 4236,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.15674519538879395,
+          "sum_squared_rgb": 18360311,
+          "samples": 12708
+        },
+        "jpeg70": {
+          "dists": 0.1685103178024292,
+          "sum_squared_rgb": 18764805,
+          "samples": 12708
+        },
+        "lossless": {
+          "dists": 0.1759798526763916,
+          "sum_squared_rgb": 20080404,
+          "samples": 12708
+        }
+      }
+    },
+    {
+      "tick": 23,
+      "person": "person:000000000000",
+      "support": "source_model",
+      "pixels": 11832,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.20119041204452515,
+          "sum_squared_rgb": 88117950,
+          "samples": 35496
+        },
+        "jpeg70": {
+          "dists": 0.21134084463119507,
+          "sum_squared_rgb": 106174591,
+          "samples": 35496
+        },
+        "lossless": {
+          "dists": 0.2109605073928833,
+          "sum_squared_rgb": 90279999,
+          "samples": 35496
+        }
+      }
+    },
+    {
+      "tick": 23,
+      "person": "person:000000000001",
+      "support": "source_model",
+      "pixels": 4160,
+      "coverage": 1.0,
+      "scores": {
+        "jpeg40": {
+          "dists": 0.15212184190750122,
+          "sum_squared_rgb": 16366686,
+          "samples": 12480
+        },
+        "jpeg70": {
+          "dists": 0.16890627145767212,
+          "sum_squared_rgb": 16825833,
+          "samples": 12480
+        },
+        "lossless": {
+          "dists": 0.18413913249969482,
+          "sum_squared_rgb": 18743042,
+          "samples": 12480
+        }
+      }
+    }
+  ],
+  "cpu_seconds": 66.462808,
+  "script_sha256": "cbb55d133719190638c271ad2b34ce06dcd25ae3bc646945b391192f12713beb"
+}

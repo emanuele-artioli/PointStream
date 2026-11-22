@@ -1,0 +1,4306 @@
+{
+  "job_id": "20261122T102430Z-fd241a73",
+  "archive_sha256": "4952d4b8f67cb4b3393d58eff82a18448b97ac8e62f4a0e4609e8fe5410e5b6c",
+  "archive_bytes": 1499627520,
+  "timing": {
+    "worker_wall_seconds": 224.10646678801277,
+    "archive_seconds": 17.241044894995866,
+    "verify_seconds": 29.5745304840093,
+    "archive_bytes": 1499627520,
+    "archive_sha256": "4952d4b8f67cb4b3393d58eff82a18448b97ac8e62f4a0e4609e8fe5410e5b6c"
+  },
+  "validation": {
+    "passed": true,
+    "checks": {
+      "source_denied": true,
+      "both_players_composed": true,
+      "decoded_frame_and_mask_identities": true,
+      "native_cuda_kernels": true
+    },
+    "cost": {
+      "forecast_seconds": 875.2213847105753,
+      "remaining_seconds": 1689.752031716489,
+      "full_cap_seconds": 1400
+    }
+  },
+  "receipt": {
+    "carrier_bytes": 215473,
+    "carrier_sha256": "11105f6a96b73fb8f89791e2c0235fbdd7718cd400f9faf206eccafc589765f8",
+    "elapsed_seconds": 168.41902863699943,
+    "finalization_seconds": 9.477298145997338,
+    "frames_file_sha256": "24df3470d86e9eafcca89c6f9c77f64304677f56f5ef8bfcd1a33c9e84f50db2",
+    "generated": {
+      "medvedev_struff__000_at120__person_000000000002": {
+        "path": "/local/users/emanuele/pointstream/cache/92d94ab60973c9585af2bfe0a8bc7d838460ba6f0427c668e2e427f1ec38f286/tree/publish/medvedev_struff__000_at120__person_000000000002.npz",
+        "sha256": "dddd138ce0f82de6e6a75734de37af1d7872d86d577067995e397a3c0ad96a62"
+      },
+      "medvedev_struff__000_at120__person_000000000005": {
+        "path": "/local/users/emanuele/pointstream/cache/2cf6cd6d949a5fa0ce17577f1aedff8bedf36e68f3bd23158a70615c477e15cc/tree/publish/medvedev_struff__000_at120__person_000000000005.npz",
+        "sha256": "a1da95ba361079892ea4a78ac1d45592ed584a969f7c5fd030ca32eff2513a67"
+      }
+    },
+    "generation_receipts": {
+      "medvedev_struff__000_at120__person_000000000002": {
+        "path": "/local/users/emanuele/pointstream/cache/92d94ab60973c9585af2bfe0a8bc7d838460ba6f0427c668e2e427f1ec38f286/tree/publish/generation.json",
+        "sha256": "eac1eb7f4d823b3adba4aa3832b07005bf13f98a5ce30d9dfd9c17c8b340b55a"
+      },
+      "medvedev_struff__000_at120__person_000000000005": {
+        "path": "/local/users/emanuele/pointstream/cache/2cf6cd6d949a5fa0ce17577f1aedff8bedf36e68f3bd23158a70615c477e15cc/tree/publish/generation.json",
+        "sha256": "3a6e87961c7f4b0b8dd2aa1cf9ca255dd7a5dffdf38945e77baf134c1ef6d6f7"
+      }
+    },
+    "gpu": {
+      "major": 8,
+      "minor": 6,
+      "uuid": "6f70a27e-4171-22d7-3ffd-647e7f186a49",
+      "visible_uuid": "6f70a27e-4171-22d7-3ffd-647e7f186a49"
+    },
+    "initialization_seconds": 44.375594862998696,
+    "isolation": {
+      "allowed": [
+        "/local/users/emanuele/pointstream/scratch/20261122T102430Z-fd241a73-full/receiver-control-x55zhap0/code",
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree",
+        "/local/users/emanuele/pointstream/scratch/20261122T102430Z-fd241a73-full/receiver-control-x55zhap0/private",
+        "/local/users/emanuele/pointstream/cache/11105f6a96b73fb8f89791e2c0235fbdd7718cd400f9faf206eccafc589765f8/players.pscp",
+        "/local/users/emanuele/pointstream/cache/9cbef0f27455c83218e20e35181f16e80f670eab8c6317d5780fb05f09eef75c/players.manifest",
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+        "/local/users/emanuele/pointstream/cache/0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6/sam3.1_multiplex.pt",
+        "/local/users/emanuele/pointstream/cache/615596d2f78d08ebd07fc9dd66136bf586d5c1f2d2921b71aea4dfc437df2b8b/rally.psj",
+        "/local/users/emanuele/pointstream/cache/90f5dbc9f5753b2688a828c12362d808e1db197f44b097c0093ba28cef7ea038/initial.psr",
+        "/local/users/emanuele/pointstream/cache/92d94ab60973c9585af2bfe0a8bc7d838460ba6f0427c668e2e427f1ec38f286/tree/publish/medvedev_struff__000_at120__person_000000000002.npz",
+        "/local/users/emanuele/pointstream/cache/92d94ab60973c9585af2bfe0a8bc7d838460ba6f0427c668e2e427f1ec38f286/tree/publish/generation.json",
+        "/local/users/emanuele/pointstream/cache/2cf6cd6d949a5fa0ce17577f1aedff8bedf36e68f3bd23158a70615c477e15cc/tree/publish/medvedev_struff__000_at120__person_000000000005.npz",
+        "/local/users/emanuele/pointstream/cache/2cf6cd6d949a5fa0ce17577f1aedff8bedf36e68f3bd23158a70615c477e15cc/tree/publish/generation.json",
+        "/usr/lib",
+        "/usr/lib",
+        "/usr/lib64",
+        "/dev/nvidia-modeset",
+        "/dev/nvidia-uvm",
+        "/dev/nvidia-uvm-tools",
+        "/dev/nvidia0",
+        "/dev/nvidiactl",
+        "/dev/nvidia-caps/nvidia-cap1",
+        "/dev/nvidia-caps/nvidia-cap2",
+        "/dev/null",
+        "/dev/urandom",
+        "/proc/driver/nvidia/version",
+        "/etc/ld.so.cache",
+        "/proc/cpuinfo",
+        "/proc/devices",
+        "/proc/driver/nvidia/capabilities/mig/config",
+        "/proc/driver/nvidia/capabilities/mig/monitor",
+        "/proc/driver/nvidia/params",
+        "/proc/113318/maps",
+        "/proc/113318/status",
+        "/proc/stat",
+        "/proc/sys/vm/mmap_min_addr",
+        "/sys/devices/system/cpu/online",
+        "/sys/devices/system/memory/block_size_bytes",
+        "/sys/devices/system/clocksource",
+        "/sys/devices/system/clocksource/clocksource0/current_clocksource",
+        "/sys/devices/system/clocksource/clocksource0/available_clocksource",
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+        "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2"
+      ],
+      "code_manifest_sha256": "d670acbaedc8f426798d85eeb332d960f7571b2c0477c40bb1a53f3427d6475f",
+      "cpu_bootstrap_hash": "23b2b3ca0600a2394d27dd6e9692c9aec33e2d854670975a04e7d9234cdf6a83",
+      "denials": {
+        "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T091038Z-e8d1cefb/full/published.tar": 13,
+        "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T091524Z-7d2f62ea/full/published.tar": 13,
+        "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/balltrack_best.state_dict.pt": 13,
+        "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/sources/medvedev_struff__000.mp4": 13
+      },
+      "executables": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+        "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2"
+      ],
+      "extra_fds": false,
+      "handled_rights": 32767,
+      "interfaces": [
+        "lo"
+      ],
+      "landlock_abi": 4,
+      "listing_only": [
+        "/sys/devices/system/clocksource"
+      ],
+      "manifest_bytes": 625,
+      "manifest_sha256": "9cbef0f27455c83218e20e35181f16e80f670eab8c6317d5780fb05f09eef75c",
+      "mutation_denied": true,
+      "namespaces": {
+        "net": "net:[4026535216]",
+        "user": "user:[4026535215]"
+      },
+      "pre_sandbox_threads": 1,
+      "runtime_archive_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+    },
+    "kernels": [
+      "aten::_flash_attention_forward",
+      "aten::_scaled_dot_product_flash_attention",
+      "void pytorch_flash::flash_fwd_kernel<Flash_fwd_kernel_traits<32, 128, 128, 4, false, false, cutlass::bfloat16_t, Flash_kernel_traits<32, 128, 128, 4, cutlass::bfloat16_t> >, false, false, false, false, false, false, false, false>(pytorch_flash::Flash_fwd_params)",
+      "void pytorch_flash::flash_fwd_kernel<Flash_fwd_kernel_traits<32, 128, 128, 4, false, false, cutlass::bfloat16_t, Flash_kernel_traits<32, 128, 128, 4, cutlass::bfloat16_t> >, false, false, false, false, false, true, false, false>(pytorch_flash::Flash_fwd_params)",
+      "void pytorch_flash::flash_fwd_kernel<Flash_fwd_kernel_traits<64, 128, 128, 4, false, false, cutlass::bfloat16_t, Flash_kernel_traits<64, 128, 128, 4, cutlass::bfloat16_t> >, false, false, false, false, false, true, false, false>(pytorch_flash::Flash_fwd_params)",
+      "void pytorch_flash::flash_fwd_splitkv_combine_kernel<Flash_fwd_kernel_traits<32, 64, 256, 4, false, false, cutlass::bfloat16_t, Flash_kernel_traits<32, 64, 256, 4, cutlass::bfloat16_t> >, 16, 5, false>(pytorch_flash::Flash_fwd_params)",
+      "void pytorch_flash::flash_fwd_splitkv_kernel<Flash_fwd_kernel_traits<32, 64, 256, 4, false, false, cutlass::bfloat16_t, Flash_kernel_traits<32, 64, 256, 4, cutlass::bfloat16_t> >, false, false, false, false, false, false, true, false>(pytorch_flash::Flash_fwd_params)"
+    ],
+    "loop_seconds": 114.56613491199096,
+    "manifest_bytes": 625,
+    "manifest_sha256": "9cbef0f27455c83218e20e35181f16e80f670eab8c6317d5780fb05f09eef75c",
+    "mask_files": {
+      "medvedev_struff__000_at120__person_000000000002": "e279550598341e35f0b171167e9957b4dae493b1bc888c2c33eb3ad541986ba8",
+      "medvedev_struff__000_at120__person_000000000005": "005f6afdad113decfa537278b216d7e08a25e3ec8195051ba979736f9ae9d332"
+    },
+    "native_decode_seconds": 0.13565552097861655,
+    "native_sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+    "order": [
+      "medvedev_struff__000_at120__person_000000000002",
+      "medvedev_struff__000_at120__person_000000000005"
+    ],
+    "rows": [
+      {
+        "base_sha256": "5fee2b58badff095a0369da48e0a267b3f00c677c4ad6189be58abf7ddc0beae",
+        "coverage_pixels": 12123,
+        "frame_sha256": "fe12bf2f94a6b9d33c863ba4a82e893a6e6f0f009a2521ea5711fda476e33063",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1796,
+          "medvedev_struff__000_at120__person_000000000005": 10327
+        },
+        "sam_seconds": 5.016174248012248,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 0,
+        "tick_seconds": 5.267778561013984
+      },
+      {
+        "base_sha256": "c7fe2b6bc5353fe65d5d56cc6755120c5d9e3d805a912b8bfdbbdea6115918c8",
+        "coverage_pixels": 11920,
+        "frame_sha256": "304b6414f3e5ea9accef0b0c1b9226a54fd5546914e0fce964b63838ef443fba",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1817,
+          "medvedev_struff__000_at120__person_000000000005": 10103
+        },
+        "sam_seconds": 0.3396372149873059,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 1,
+        "tick_seconds": 0.5723302559927106
+      },
+      {
+        "base_sha256": "f402982ffc7902fbd2451dd93929ae888ab9962f5ddecc79f8bfc8898b7d7271",
+        "coverage_pixels": 11906,
+        "frame_sha256": "9f155485775ded469e0dc5790b68d8db5f27be02e6bf4ac6e5ad3deff96835d1",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1952,
+          "medvedev_struff__000_at120__person_000000000005": 9954
+        },
+        "sam_seconds": 0.32712656099465676,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 2,
+        "tick_seconds": 0.5702503270003945
+      },
+      {
+        "base_sha256": "ade5b2383dce7ed67cf92b6122d812be95c80c40c6fb5422cbfd70d814e842e0",
+        "coverage_pixels": 12158,
+        "frame_sha256": "38273c4eff3d9c5ee573009cf3e817be6b0d560be01e45dfb3b0be8e2b7fa22b",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1973,
+          "medvedev_struff__000_at120__person_000000000005": 10185
+        },
+        "sam_seconds": 0.334755473973928,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 3,
+        "tick_seconds": 0.5748731560015585
+      },
+      {
+        "base_sha256": "45a0338c5bc15da59f18caebe3b46eb9b708ce2719d229ab9ff2108088d9a8a7",
+        "coverage_pixels": 11997,
+        "frame_sha256": "a1959b05b064da4ce0bfca4fb98d2efe56020be02557394b34ef60f56e250adb",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1888,
+          "medvedev_struff__000_at120__person_000000000005": 10109
+        },
+        "sam_seconds": 0.332468100998085,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 4,
+        "tick_seconds": 0.5717328600003384
+      },
+      {
+        "base_sha256": "26f59749722d59cd5b06bf859a4501bd3d343f0260baeda7afa396de92dc8491",
+        "coverage_pixels": 11819,
+        "frame_sha256": "b8f70b889fda4b40b8943027933750489ffa5972b4fd27639511ef1c5bec4381",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 2005,
+          "medvedev_struff__000_at120__person_000000000005": 9814
+        },
+        "sam_seconds": 0.33376841101562604,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 5,
+        "tick_seconds": 0.574030669988133
+      },
+      {
+        "base_sha256": "0a4d293a2b45e31987e3bbd13ab150db2219e79074fbdeae562c557981ab3616",
+        "coverage_pixels": 12524,
+        "frame_sha256": "c16bd688463196240bea23745c836b5c5315da896e2f74fe1710d9537bdb2c79",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1952,
+          "medvedev_struff__000_at120__person_000000000005": 10572
+        },
+        "sam_seconds": 0.3345011020137463,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 6,
+        "tick_seconds": 0.5708896809956059
+      },
+      {
+        "base_sha256": "ce6fd3b56157c07e3cd200048b0265ea498bbf6b272e703fb4223a10e3db2e70",
+        "coverage_pixels": 13459,
+        "frame_sha256": "28c4f88289c01fe64528e73b57de805ed79a43d3bde179768cef376ddd8afbf4",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1854,
+          "medvedev_struff__000_at120__person_000000000005": 11605
+        },
+        "sam_seconds": 0.3316192179918289,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 7,
+        "tick_seconds": 0.569129396986682
+      },
+      {
+        "base_sha256": "2c6a8c1efc7cb62d8997f9d70adb3b3dc33ab080732b9088d11a5f59f359da8d",
+        "coverage_pixels": 13956,
+        "frame_sha256": "985a530549bcd889e79ed56b1020cf9fb0e8df711aa26adb147a0f3cca6af22a",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1933,
+          "medvedev_struff__000_at120__person_000000000005": 12023
+        },
+        "sam_seconds": 0.33133447996806353,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 8,
+        "tick_seconds": 0.5852815380203538
+      },
+      {
+        "base_sha256": "671acbaf54f9df557683eff1848b3ce18bf95633d7e99d0824612f8a565d2cea",
+        "coverage_pixels": 13736,
+        "frame_sha256": "af69b3daab1314949150742339b77427ff437a38950df892a42a1d1157642565",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1925,
+          "medvedev_struff__000_at120__person_000000000005": 11811
+        },
+        "sam_seconds": 0.3280621239973698,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 9,
+        "tick_seconds": 0.5597631910059135
+      },
+      {
+        "base_sha256": "afaecedb9af85acb56779a3d1926d18858d3081cc40df3cd8495c9a40ab2ac94",
+        "coverage_pixels": 13644,
+        "frame_sha256": "fa057dd23c75d0f606af6603f22f10527d7da911c087b59004036769cbf1f818",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1826,
+          "medvedev_struff__000_at120__person_000000000005": 11818
+        },
+        "sam_seconds": 0.32647813102812506,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 10,
+        "tick_seconds": 0.5613592780136969
+      },
+      {
+        "base_sha256": "e3060a23af0520fc9dc0ad0ff53b5ecdd9f4b06990796e6448c4d4e2728523b4",
+        "coverage_pixels": 13380,
+        "frame_sha256": "ee03d06c2e78a5a7b41540eb6e680332f74afca4cca7984fb3948df8a4e525a8",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1776,
+          "medvedev_struff__000_at120__person_000000000005": 11604
+        },
+        "sam_seconds": 0.3306132329744287,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 11,
+        "tick_seconds": 0.5672987060097512
+      },
+      {
+        "base_sha256": "40a0b5ed0195977a8ba282d98c00196c2d9a524f07547e8eacad040c72205af0",
+        "coverage_pixels": 13505,
+        "frame_sha256": "c9514fb55d0a840bff7ae7be30d4a5f6889cf72ef5a5e4a157757b5c825ba09a",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1765,
+          "medvedev_struff__000_at120__person_000000000005": 11740
+        },
+        "sam_seconds": 0.33174589899135754,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 12,
+        "tick_seconds": 0.5666938359790947
+      },
+      {
+        "base_sha256": "6d603ee7ba088fda91a6192fb687a85c9f1239eb6d5b0e771b7fffe98cd0f395",
+        "coverage_pixels": 13747,
+        "frame_sha256": "f76ec63af6e1aa9f36e0859d0b18fc4d4b5b04c9c258b1716a04b586c5341912",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1738,
+          "medvedev_struff__000_at120__person_000000000005": 12009
+        },
+        "sam_seconds": 0.32954188802978024,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 13,
+        "tick_seconds": 0.5729896529810503
+      },
+      {
+        "base_sha256": "840ad69956b23e82cfa0c76651045720350b6c97ae100ba1ff83cd2e0fc3dd40",
+        "coverage_pixels": 13527,
+        "frame_sha256": "fbed38c33fca96fd5ff95bb07710eb6876caf8a9f282de1813f128c18ab6639b",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1759,
+          "medvedev_struff__000_at120__person_000000000005": 11768
+        },
+        "sam_seconds": 0.32723904197337106,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 14,
+        "tick_seconds": 0.5640527450013906
+      },
+      {
+        "base_sha256": "72778d9f41a9ccaa829a424380cde95a17705204a15b69366f468aac5f19ca07",
+        "coverage_pixels": 13037,
+        "frame_sha256": "a58eb69d9b1b89d2206955ff22bb40832ebe409a1d7573a7573e3a695446f58e",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1638,
+          "medvedev_struff__000_at120__person_000000000005": 11399
+        },
+        "sam_seconds": 0.32763895197422244,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 15,
+        "tick_seconds": 0.560897480987478
+      },
+      {
+        "base_sha256": "099fd6fd28c157b663c0f1b957350740c1307058f2ae87dd1cf92863b3170b02",
+        "coverage_pixels": 12701,
+        "frame_sha256": "db7b5318204987a52a1fc5dd41aea8a5d2fe150c66fdcdd5b2ee054210682803",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1673,
+          "medvedev_struff__000_at120__person_000000000005": 11028
+        },
+        "sam_seconds": 0.33347764596692286,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 16,
+        "tick_seconds": 0.5738778430095408
+      },
+      {
+        "base_sha256": "0aa719dab06e6b079da1eb1a6fce31207a72aa4204c279cb6430d462ecddb9fd",
+        "coverage_pixels": 12844,
+        "frame_sha256": "e31116dd580ccdd93d37dc2220dbc37d018e5fdb224dc4d87747869abe9a417b",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1709,
+          "medvedev_struff__000_at120__person_000000000005": 11135
+        },
+        "sam_seconds": 0.3353430809802376,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 17,
+        "tick_seconds": 0.5756669789843727
+      },
+      {
+        "base_sha256": "6cf63b778f5b76723461e1d6c0963dab170d4bb5413f89d6814beba7432ad91a",
+        "coverage_pixels": 11595,
+        "frame_sha256": "c201526faf09feff5d51f38270bf065af2a711eb109ced2e940702a419bd7993",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1687,
+          "medvedev_struff__000_at120__person_000000000005": 9908
+        },
+        "sam_seconds": 0.33415420301025733,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 18,
+        "tick_seconds": 0.5710684979858343
+      },
+      {
+        "base_sha256": "aa96567a058e374e9d3b29e31a48ebf21c138685e1d79a2a68306b63a4bd38ed",
+        "coverage_pixels": 11655,
+        "frame_sha256": "17cb68d98b4032657cd97da6eb30410abe772222ef4ef1277f8aeecc53914e4c",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1799,
+          "medvedev_struff__000_at120__person_000000000005": 9856
+        },
+        "sam_seconds": 0.3317521710123401,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 19,
+        "tick_seconds": 0.5635738490091171
+      },
+      {
+        "base_sha256": "f14e2ffdad39a233eb0ab1ef17a26ba3b7df0b29adea2aa83a8e7fd400a8703f",
+        "coverage_pixels": 4961,
+        "frame_sha256": "a22ac175391584bf87f8ad19f206cb40012a3d0b3487bbb603af9888fa544e02",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1756,
+          "medvedev_struff__000_at120__person_000000000005": 3205
+        },
+        "sam_seconds": 0.33294804199249484,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 20,
+        "tick_seconds": 0.5699641999963205
+      },
+      {
+        "base_sha256": "3d6249cfde08ccacdd8fa093c67b4b6d157aade50b13bfcc2489e78d7cb1e8bb",
+        "coverage_pixels": 11313,
+        "frame_sha256": "a30de776dfeb3cb31eded6deb1dd30c9e1ca41846ce54b3e9b2ed9618d013587",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1594,
+          "medvedev_struff__000_at120__person_000000000005": 9719
+        },
+        "sam_seconds": 0.3307830860139802,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 21,
+        "tick_seconds": 0.5700451149896253
+      },
+      {
+        "base_sha256": "9e9419682ba723c7337a1fc66e284e494486022eaa0a0275aca936cc743419e3",
+        "coverage_pixels": 10671,
+        "frame_sha256": "77f22238722aa73c5a5013cdc6d1d9149dadfac906fb32ccd206f6c399728de1",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1697,
+          "medvedev_struff__000_at120__person_000000000005": 8974
+        },
+        "sam_seconds": 0.32911641101236455,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 22,
+        "tick_seconds": 0.5716113590169698
+      },
+      {
+        "base_sha256": "16ba0d47e10d46a483b7c45e83732ddb5174baf9413d874c160e7d0161a69abf",
+        "coverage_pixels": 10255,
+        "frame_sha256": "25d0f4009dc0e3f9f111862194b73710a79c8cf8d85fd4c95c22010b51582341",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1700,
+          "medvedev_struff__000_at120__person_000000000005": 8555
+        },
+        "sam_seconds": 0.3348550579685252,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 23,
+        "tick_seconds": 0.5773538549838122
+      },
+      {
+        "base_sha256": "5ad5024f7076480c06b1301fb329f096bbfe995b81012ae2cfcaa2452d7f8f8e",
+        "coverage_pixels": 10637,
+        "frame_sha256": "bd09848679e46af295a4f6fda5aa48262d2ee3371f7bc8517585061283d2b668",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1720,
+          "medvedev_struff__000_at120__person_000000000005": 8917
+        },
+        "sam_seconds": 0.33422131297993474,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 24,
+        "tick_seconds": 0.5689352049957961
+      },
+      {
+        "base_sha256": "1f374c5098eac6ea5d15b2d2d8d5dd13b08bddb3d604fef5ec8c58de389cee82",
+        "coverage_pixels": 11002,
+        "frame_sha256": "0ffe984fd324f7413f926478eab7f34333d0d10c397f2eb7cab39f716f0b7827",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1753,
+          "medvedev_struff__000_at120__person_000000000005": 9249
+        },
+        "sam_seconds": 0.3371763310278766,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 25,
+        "tick_seconds": 0.5768994379905052
+      },
+      {
+        "base_sha256": "bb1a0c95cfc86af0bd23b03d0926ff627a5e6d4d3d417a008a18ba963d35dc7f",
+        "coverage_pixels": 11485,
+        "frame_sha256": "10913a8087d38f02030fe328d121910b8245a62ce791b3cd3dde8879e65d4d8f",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1884,
+          "medvedev_struff__000_at120__person_000000000005": 9601
+        },
+        "sam_seconds": 0.3338490010064561,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 26,
+        "tick_seconds": 0.5693671379995067
+      },
+      {
+        "base_sha256": "662c35d5d2d02f69772071618e1833ae1e21fee3a672dc9f678e9f24bdd27f89",
+        "coverage_pixels": 10534,
+        "frame_sha256": "8e220e9ce6a0052a518f2950e48d64ddf6c18565673eb73ee5ebc82ef0372866",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1861,
+          "medvedev_struff__000_at120__person_000000000005": 8673
+        },
+        "sam_seconds": 0.33283028996083885,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 27,
+        "tick_seconds": 0.5681232640054077
+      },
+      {
+        "base_sha256": "cf6b8674e22f41704fb3cd875a2fab4afe65fe783574dda55f34b3d876397922",
+        "coverage_pixels": 10577,
+        "frame_sha256": "b14bf811801fa1ffc54fdcc6624d41cff92b4982aea1d2c4f4004ed36593ea3f",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1665,
+          "medvedev_struff__000_at120__person_000000000005": 8912
+        },
+        "sam_seconds": 0.3315088320232462,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 28,
+        "tick_seconds": 0.568951900000684
+      },
+      {
+        "base_sha256": "af252b8135a5d1bb398b243ed87cd4106dc286a85a0918e8ed2ab409bea40b70",
+        "coverage_pixels": 10855,
+        "frame_sha256": "bd7666f37d7fb7c858aefd883bf49c2eaa2a1ac3a97edf78bed1c59f6e7691f2",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1813,
+          "medvedev_struff__000_at120__person_000000000005": 9042
+        },
+        "sam_seconds": 0.3305763480020687,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 29,
+        "tick_seconds": 0.5636488390155137
+      },
+      {
+        "base_sha256": "ba2a04721e123c947f9ac5078450308f794de32974c7bddd317a2c6730c9b077",
+        "coverage_pixels": 11406,
+        "frame_sha256": "fd373271b6bd001083831a32cfebff20809ab2fa98a86a0c1abacc6e96415279",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1798,
+          "medvedev_struff__000_at120__person_000000000005": 9608
+        },
+        "sam_seconds": 0.33460378798190504,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 30,
+        "tick_seconds": 0.5737115610099863
+      },
+      {
+        "base_sha256": "29052dc49977cc0d5ad1ce37c189ad5158d524251c0a00ead2fdae5cf4df2790",
+        "coverage_pixels": 11081,
+        "frame_sha256": "ccc7150345336c470b89c01d46e3599ecac256eae435afa72a306ce33788a9cc",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1619,
+          "medvedev_struff__000_at120__person_000000000005": 9462
+        },
+        "sam_seconds": 0.3353567190351896,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 31,
+        "tick_seconds": 0.5718971700116526
+      },
+      {
+        "base_sha256": "ae789f61a776c2966fc0c3de07e4b4eb0b5e33dd9d4563a85a5365802ffc500f",
+        "coverage_pixels": 10696,
+        "frame_sha256": "9e5f3efaab2f1115a430b1c2f6f6dafe3a752d806d215bcf18d450a1cfdb8a52",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1618,
+          "medvedev_struff__000_at120__person_000000000005": 9078
+        },
+        "sam_seconds": 0.3288231909973547,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 32,
+        "tick_seconds": 0.5696208430163097
+      },
+      {
+        "base_sha256": "910a72b1f490b77ca6a68771ed50d3c5077bb9f31f155e2400e6be2bc1c22382",
+        "coverage_pixels": 10700,
+        "frame_sha256": "3a15a78988b66b5d880a6fbabdb1cb179749282a8641a1bd2cb2b9ac0f140d51",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1768,
+          "medvedev_struff__000_at120__person_000000000005": 8932
+        },
+        "sam_seconds": 0.3310924480028916,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 33,
+        "tick_seconds": 0.5740302269987296
+      },
+      {
+        "base_sha256": "b892b85ec516ef6f6ec38d33cb129e5d86b5b7afa4f2cc864949994ee42c4023",
+        "coverage_pixels": 10544,
+        "frame_sha256": "82e03d6f332ec06500e2b98955ebf3ff38ff317c56645261512e7f024483b0f8",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1642,
+          "medvedev_struff__000_at120__person_000000000005": 8902
+        },
+        "sam_seconds": 0.33067018998553976,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 34,
+        "tick_seconds": 0.5702630690066144
+      },
+      {
+        "base_sha256": "6c4956b566530e383b1c75beb71cc722c719c81f368071f66b2071492c630ed3",
+        "coverage_pixels": 10428,
+        "frame_sha256": "0006e6b815716cb5a28aea67543563fd2507d05838f36cc9ec76d0530c402615",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1763,
+          "medvedev_struff__000_at120__person_000000000005": 8665
+        },
+        "sam_seconds": 0.333019258978311,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 35,
+        "tick_seconds": 0.5742177700158209
+      },
+      {
+        "base_sha256": "f9f9ebcdada85ae6a497ef19f9dac96fee138c4b2b2ff22d007eac6541175ba2",
+        "coverage_pixels": 9738,
+        "frame_sha256": "da6b7496afa7aaebb6802ac3e93df66a91b0e82bdc1297138986e4b00a1809ee",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1671,
+          "medvedev_struff__000_at120__person_000000000005": 8067
+        },
+        "sam_seconds": 0.33577126302407123,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 36,
+        "tick_seconds": 0.5712118789961096
+      },
+      {
+        "base_sha256": "769ae9cd8e2d1258dbc6a2811248082fe67d70b9acb845002dc55a6b7e3c0942",
+        "coverage_pixels": 9343,
+        "frame_sha256": "0d5cc5d18482fcd507cbcdb996c23d8b2be6b10217a6dc5eb80f862fad7e5590",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1723,
+          "medvedev_struff__000_at120__person_000000000005": 7620
+        },
+        "sam_seconds": 0.3317147359775845,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 37,
+        "tick_seconds": 0.5700414390012156
+      },
+      {
+        "base_sha256": "b2c13d67fb7b416e3096f42b0d58ac8526effa887d74c0ae0fa4181ca9f1f036",
+        "coverage_pixels": 8847,
+        "frame_sha256": "345dfcb5dd20a4faf1812c29549b5e0966f5760a6a4e5af5dc7c8a37959fc931",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1658,
+          "medvedev_struff__000_at120__person_000000000005": 7189
+        },
+        "sam_seconds": 0.326723498001229,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 38,
+        "tick_seconds": 0.5692763080005534
+      },
+      {
+        "base_sha256": "033c22bb912442b77f6c22c85d714f745485f62ed45efd5caf68bb0ad0788625",
+        "coverage_pixels": 8475,
+        "frame_sha256": "16599b26bc6ed676194262cbe9f80fcaaa1b1140f3ba1e2cdb66ef8a68660baa",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1665,
+          "medvedev_struff__000_at120__person_000000000005": 6810
+        },
+        "sam_seconds": 0.3326446839782875,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 39,
+        "tick_seconds": 0.5661253969883546
+      },
+      {
+        "base_sha256": "7f7d3c5a5420237923442179281fd16a76765ef02a116244b8dbe6a49b8e4e2a",
+        "coverage_pixels": 7940,
+        "frame_sha256": "67eec470cd072bb29ab28a0b9d49ee62daf2f38da5cbb93eabe8fa2571b0f7f5",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1728,
+          "medvedev_struff__000_at120__person_000000000005": 6212
+        },
+        "sam_seconds": 0.3364058790029958,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 40,
+        "tick_seconds": 0.576983282022411
+      },
+      {
+        "base_sha256": "c6b83e24256cb48e5b64b4f78eb9df1a35d75edc9452a44ec6487ae940d9ef55",
+        "coverage_pixels": 7730,
+        "frame_sha256": "60bf06ee3de1d90a6e5dfb4c50103e5fcef5a3b43e55d0acd1d05917d879409a",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1611,
+          "medvedev_struff__000_at120__person_000000000005": 6119
+        },
+        "sam_seconds": 0.33744108499377035,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 41,
+        "tick_seconds": 0.5685174070240464
+      },
+      {
+        "base_sha256": "f2220a91a12f83678aee8f7ee1383001c98b3e2032855bd4aa75e270e7da4996",
+        "coverage_pixels": 7674,
+        "frame_sha256": "8a0ccd04272ca2c0260ad6fb2a472985e62d3c1f11ac351c58840705765a1d7b",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1677,
+          "medvedev_struff__000_at120__person_000000000005": 5997
+        },
+        "sam_seconds": 0.32782054200652055,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 42,
+        "tick_seconds": 0.5716243280039635
+      },
+      {
+        "base_sha256": "66b05460add2182d2738343ba980ce7414e0b97940217e703c58705619d07c44",
+        "coverage_pixels": 7690,
+        "frame_sha256": "ec5e7eb8c12f462787b1eab7bd88c1c1689b3dc027c35249e8e1589d0cf3d576",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1683,
+          "medvedev_struff__000_at120__person_000000000005": 6007
+        },
+        "sam_seconds": 0.3332916109939106,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 43,
+        "tick_seconds": 0.5776040719938464
+      },
+      {
+        "base_sha256": "9a9e2bea4ae3d1ce2ec9ebfd5799cf4f7617beacf239a1b5093d0bb7d6949782",
+        "coverage_pixels": 7805,
+        "frame_sha256": "bdb7a53dec757718c4adb7b0824f053f24712222e43ca8df56f4b011e0e496d1",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1666,
+          "medvedev_struff__000_at120__person_000000000005": 6139
+        },
+        "sam_seconds": 0.3324583070061635,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 44,
+        "tick_seconds": 0.5714345830201637
+      },
+      {
+        "base_sha256": "e411d7ade93f3b83c25f0a0b46847c201f582d315ebe6432d4c413591befe683",
+        "coverage_pixels": 7870,
+        "frame_sha256": "0cb295abf02ce99a802bf350e4873a9538c4e3bfde3a04722a364377bc5c972f",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1737,
+          "medvedev_struff__000_at120__person_000000000005": 6133
+        },
+        "sam_seconds": 0.32888714599539526,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 45,
+        "tick_seconds": 0.566399198025465
+      },
+      {
+        "base_sha256": "596f1528ce0875c7cc6e2a86d470bbb7726f9a66c5b15697f7aba76f4ac1aaa4",
+        "coverage_pixels": 7854,
+        "frame_sha256": "fe9024e9b62ac90c1354338b9acf47d605df0251c3a4a5947b6b83e7bde9f856",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1749,
+          "medvedev_struff__000_at120__person_000000000005": 6105
+        },
+        "sam_seconds": 0.3312691469909623,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 46,
+        "tick_seconds": 0.5644388289947528
+      },
+      {
+        "base_sha256": "c15b05456efe3a9167bd6649a75c8a9de9faad931f76390b131dc8c4c7b33c30",
+        "coverage_pixels": 8146,
+        "frame_sha256": "d8dedf89cbc0322e51383ed179b8bc27c0d317e0b6be3413d81f3d5afbaf7dff",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1792,
+          "medvedev_struff__000_at120__person_000000000005": 6354
+        },
+        "sam_seconds": 0.3337580820370931,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 47,
+        "tick_seconds": 0.5645890479790978
+      },
+      {
+        "base_sha256": "aa4d3e6870d0bf1a95579367512c3fe57a270120832c322be4ee469c0ca4639c",
+        "coverage_pixels": 8509,
+        "frame_sha256": "1b70010ce13e9c8ef5ed5c41737d9cf4eb9494824e29dbfebc434bf20a8f6667",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1956,
+          "medvedev_struff__000_at120__person_000000000005": 6553
+        },
+        "sam_seconds": 0.33040813700063154,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 48,
+        "tick_seconds": 0.5651863949897233
+      },
+      {
+        "base_sha256": "607bdda0888d001696439f5880ca2c414d363b37c19a53b0a98d8256cef3424a",
+        "coverage_pixels": 8468,
+        "frame_sha256": "bb0dbeb151be26a0ba872fd26f0262490c98222a54153038f214c094b5d457ef",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1770,
+          "medvedev_struff__000_at120__person_000000000005": 6698
+        },
+        "sam_seconds": 0.32994855497963727,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 49,
+        "tick_seconds": 0.5974951180105563
+      },
+      {
+        "base_sha256": "5f5121cec11d58ae50d0a6af7f8ad1d86d67da1a50986f34ba54ebaaf4c8a6b7",
+        "coverage_pixels": 8624,
+        "frame_sha256": "fdf131cc94e5054bbfb3bc31295a653c5ea5c1edaee4d03716ee2c96c39f3872",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1829,
+          "medvedev_struff__000_at120__person_000000000005": 6795
+        },
+        "sam_seconds": 0.33381924699642695,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 50,
+        "tick_seconds": 0.5762534080131445
+      },
+      {
+        "base_sha256": "0521bb575aa8485a753ab5943fa90998fc5495cef52876c2dcf5cba973815da3",
+        "coverage_pixels": 8987,
+        "frame_sha256": "4a19b8aa8c759d024ec94177b4905223fdf9f712d709f6204df48c0ff4d61f9f",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 2041,
+          "medvedev_struff__000_at120__person_000000000005": 6946
+        },
+        "sam_seconds": 0.3320915930089541,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 51,
+        "tick_seconds": 0.5724852850253228
+      },
+      {
+        "base_sha256": "563982f45b7624fe25e74f655d9d45cffc03f04e439db8893680b113ef1e66d1",
+        "coverage_pixels": 9244,
+        "frame_sha256": "407463dc2c58e83adaa72ec9d6f9f91f50b714f357d922ae36a62b9c6fbe77c1",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 2027,
+          "medvedev_struff__000_at120__person_000000000005": 7217
+        },
+        "sam_seconds": 0.33312727499287575,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 52,
+        "tick_seconds": 0.5721689839847386
+      },
+      {
+        "base_sha256": "6dd87bcdd6b1f9fd9d91ed11a1048498f06f3284b009b8b9ce947e09e39a03e7",
+        "coverage_pixels": 9416,
+        "frame_sha256": "be48e0bab3050e0b1f8b40a02e4790b30d27a1d4df8e57298c3a601700a5fb0b",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1824,
+          "medvedev_struff__000_at120__person_000000000005": 7592
+        },
+        "sam_seconds": 0.33703256997978315,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 53,
+        "tick_seconds": 0.5768894140201155
+      },
+      {
+        "base_sha256": "c02907f89d00ec7a5ad3ef4ae12909fadf084fa6e5bcb28996b90486dea8ce1a",
+        "coverage_pixels": 9050,
+        "frame_sha256": "6fea823fd27f3d17dd948b464ca7e60873e13975851cac3de5036c2c35efde93",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1856,
+          "medvedev_struff__000_at120__person_000000000005": 7194
+        },
+        "sam_seconds": 0.33075568001368083,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 54,
+        "tick_seconds": 0.5778485169867054
+      },
+      {
+        "base_sha256": "4c5394a73830c551abef0ae758150e58e06554c0ee9ae12b7f668622117b5453",
+        "coverage_pixels": 9474,
+        "frame_sha256": "7bfd2ed969ef31e27887e2d9af6de1bd90cd7879c0d742f18c52a2b0500fbe23",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1803,
+          "medvedev_struff__000_at120__person_000000000005": 7671
+        },
+        "sam_seconds": 0.34032882101018913,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 55,
+        "tick_seconds": 0.5786503450071905
+      },
+      {
+        "base_sha256": "c4d712cdeb3e374e21419a8367d88687847c52e8fa4ea86ed0d0510bb509fbba",
+        "coverage_pixels": 9836,
+        "frame_sha256": "948115bcd28094dbe5e6442e18bf8bbff858eef1f20e38823a7a04d96874be23",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1830,
+          "medvedev_struff__000_at120__person_000000000005": 8006
+        },
+        "sam_seconds": 0.3358499009918887,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 56,
+        "tick_seconds": 0.5688591799989808
+      },
+      {
+        "base_sha256": "bbdaa1bdc7ad386b86e12ccf5d5375cce46ae146aedf0657d156218e4e5bbd7e",
+        "coverage_pixels": 9923,
+        "frame_sha256": "22a98144d52d68cdff4f0f6e5ca033aac6879a2fa47dcfdff6127a27cf280e7f",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1834,
+          "medvedev_struff__000_at120__person_000000000005": 8089
+        },
+        "sam_seconds": 0.3338166790199466,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 57,
+        "tick_seconds": 0.5685372099978849
+      },
+      {
+        "base_sha256": "609d19866d2dd292ae6da164db52e77f8afde601eb0db1a54540d6d5c6af8111",
+        "coverage_pixels": 10074,
+        "frame_sha256": "5a02d0594b69be09fe33ba80a7fc1b9574de2ae98b94504bd5e6092c9549e706",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1812,
+          "medvedev_struff__000_at120__person_000000000005": 8262
+        },
+        "sam_seconds": 0.32978803201694973,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 58,
+        "tick_seconds": 0.57848037299118
+      },
+      {
+        "base_sha256": "27a76ea40ae1c4827d01db37d7ca7f89b35d98dd35e76e1f8cdfbc6819e36e5f",
+        "coverage_pixels": 10017,
+        "frame_sha256": "6874412f841a8b1026a63e4684db45959ed45bfe763effe02a5fca14f4b28d53",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1813,
+          "medvedev_struff__000_at120__person_000000000005": 8204
+        },
+        "sam_seconds": 0.3325621669937391,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 59,
+        "tick_seconds": 0.5719112110091373
+      },
+      {
+        "base_sha256": "19646404c5e113263cff1f8840777571400898f3e9f2f3055555bff6f4c23e31",
+        "coverage_pixels": 10155,
+        "frame_sha256": "e515a816815cb69d14e1c6bda8f7abf750c88df4d6d0daaed85f32300379f377",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1860,
+          "medvedev_struff__000_at120__person_000000000005": 8295
+        },
+        "sam_seconds": 0.3346179459767882,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 60,
+        "tick_seconds": 0.5752054120239336
+      },
+      {
+        "base_sha256": "7202b2b5757b4d9b9ef7e22d36a4b53e19b987ad9ec6c8d0ae685fccca4b4d5f",
+        "coverage_pixels": 10137,
+        "frame_sha256": "7ebcba49bae83796c22694e3b1a62427ada45d4aaa296c1f427b5bd415191859",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1760,
+          "medvedev_struff__000_at120__person_000000000005": 8377
+        },
+        "sam_seconds": 0.33298184600425884,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 61,
+        "tick_seconds": 0.5667835759813897
+      },
+      {
+        "base_sha256": "2da11e1f5ef55ae6a3c3bcf3c58878f0040673f8fed8e1e22a44f3b3ce6ebfad",
+        "coverage_pixels": 10276,
+        "frame_sha256": "c7e5b06155376499faf2842a81916d66620e826f066b741815eebd112c4255ba",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1708,
+          "medvedev_struff__000_at120__person_000000000005": 8568
+        },
+        "sam_seconds": 0.33001695497659966,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 62,
+        "tick_seconds": 0.5739974530006293
+      },
+      {
+        "base_sha256": "43f042b34d86e37aafc4dea93279ff096733b479ab6c7961465b7a3403d12bd2",
+        "coverage_pixels": 10308,
+        "frame_sha256": "06fe1613a583d0b2d658b6623b23348ab7f1e70dde91e23a5e478dc69fbc7eed",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1613,
+          "medvedev_struff__000_at120__person_000000000005": 8695
+        },
+        "sam_seconds": 0.3371970719890669,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 63,
+        "tick_seconds": 0.5763764969888143
+      },
+      {
+        "base_sha256": "96f7fb9d2deb365e470afa74c7a7e2ae0bf56957ffe041f33897b59d71530cb6",
+        "coverage_pixels": 10612,
+        "frame_sha256": "5dede034390e83dfb7934effac49717e9da054ccfebd4bb359e7227e967113ce",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1694,
+          "medvedev_struff__000_at120__person_000000000005": 8918
+        },
+        "sam_seconds": 0.3336493030365091,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 64,
+        "tick_seconds": 0.5650427770160604
+      },
+      {
+        "base_sha256": "0422c475ad0d79fe839d314f63948e56a8e8a48f9339920828dec5a591b127a5",
+        "coverage_pixels": 10830,
+        "frame_sha256": "96c26b0c73acd057bdea1f35ab59f20204c933f71165cd601ad856f6e4b014ed",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1704,
+          "medvedev_struff__000_at120__person_000000000005": 9126
+        },
+        "sam_seconds": 0.33346383197931573,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 65,
+        "tick_seconds": 0.5700664980104193
+      },
+      {
+        "base_sha256": "62fa1f9dfeac11154d7051448fe781d73db92db7f54aa06147f6e3d0572c0882",
+        "coverage_pixels": 11067,
+        "frame_sha256": "26895d7f36de4d70fd8cef130a6d9521053b16d39fadfa03a2253e5f942cc9af",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1850,
+          "medvedev_struff__000_at120__person_000000000005": 9217
+        },
+        "sam_seconds": 0.3316082780365832,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 66,
+        "tick_seconds": 0.5652058120176662
+      },
+      {
+        "base_sha256": "32df5a2f6d993a36b965931b460e530f1c62395fb1ebf5e1e8b73ea5c45a59c5",
+        "coverage_pixels": 11203,
+        "frame_sha256": "41d7575e63da7bfac2d95bfb3edeca3f93e639e6d37c1df2070613739ac7ec23",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1949,
+          "medvedev_struff__000_at120__person_000000000005": 9254
+        },
+        "sam_seconds": 0.3284866379981395,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 67,
+        "tick_seconds": 0.5677271210006438
+      },
+      {
+        "base_sha256": "106beb57da206e9897d21daf2f808a5604777d29620cf2f712e290308a6076fb",
+        "coverage_pixels": 11397,
+        "frame_sha256": "6259f4669e29594f8ff4c8ebfb341476564aea0c38c756d26811d82b81a897c1",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1968,
+          "medvedev_struff__000_at120__person_000000000005": 9429
+        },
+        "sam_seconds": 0.3345460170239676,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 68,
+        "tick_seconds": 0.5685947120073251
+      },
+      {
+        "base_sha256": "01892f0bf337b08bb1d675e65c8f747f9edd07c406836219566075d0f8e546d0",
+        "coverage_pixels": 11367,
+        "frame_sha256": "1ccfd6002087a9094d8ccfb38cc1c5309ea04e7ac117c04e660944c889290ab9",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1917,
+          "medvedev_struff__000_at120__person_000000000005": 9450
+        },
+        "sam_seconds": 0.33050925499992445,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 69,
+        "tick_seconds": 0.5659757639805321
+      },
+      {
+        "base_sha256": "ed64599e7720b649074294395ee7beae6a3cd8a90895ce71119b381f9cdb41c2",
+        "coverage_pixels": 11475,
+        "frame_sha256": "8d8a244092d58b6e2ab38343889b6d0637a12c879999596bf192553cbb64c541",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1925,
+          "medvedev_struff__000_at120__person_000000000005": 9550
+        },
+        "sam_seconds": 0.33058112699654885,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 70,
+        "tick_seconds": 0.5722423300030641
+      },
+      {
+        "base_sha256": "31c9f1f6a7fc6af57f32072b0a935558dd9bbf9068e1b124932ef438a66819d9",
+        "coverage_pixels": 11576,
+        "frame_sha256": "f35e22313af67a6c0796b3025ed3bb92dbf7e1277f81fe105526f5b7b1fdb2cc",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1956,
+          "medvedev_struff__000_at120__person_000000000005": 9620
+        },
+        "sam_seconds": 0.32613856400712393,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 71,
+        "tick_seconds": 0.5675318030116614
+      },
+      {
+        "base_sha256": "9ed1001d6843956ab232e6e79cc584c66cb04558ace1c7503ecd838e7d9b2605",
+        "coverage_pixels": 11590,
+        "frame_sha256": "7a573b31d787adfcb5bd5e8cada05c5c0e295eb04c2987abfabc5d4eb8e539b2",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1929,
+          "medvedev_struff__000_at120__person_000000000005": 9661
+        },
+        "sam_seconds": 0.3379355139913969,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 72,
+        "tick_seconds": 0.5739086359972134
+      },
+      {
+        "base_sha256": "6b3e3e59d719f692f4dcd53fd0125e9129c776fb81acb823311f500eed4ad237",
+        "coverage_pixels": 11854,
+        "frame_sha256": "581a8544e586d28bab263fd58b24d749281f1e1cfa5bb5aa56f6e704d7400a37",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1928,
+          "medvedev_struff__000_at120__person_000000000005": 9926
+        },
+        "sam_seconds": 0.33255615099915303,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 73,
+        "tick_seconds": 0.5691172980004922
+      },
+      {
+        "base_sha256": "ee13c1a7b14f3e37b3a70ef9b73dea54f2d65c01f850f55e62a2a2005effa92d",
+        "coverage_pixels": 12328,
+        "frame_sha256": "f5d47e53a642c80e6c9f006a65f1f41a3f9c48bd9157fc9d2cb30ac59ac500a0",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1950,
+          "medvedev_struff__000_at120__person_000000000005": 10378
+        },
+        "sam_seconds": 0.33214357201359235,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 74,
+        "tick_seconds": 0.5691233859979548
+      },
+      {
+        "base_sha256": "5f288b34537fe9a4ab920b4fa03f8d8e57c07d2cd1aec0f054a3486238eb4d38",
+        "coverage_pixels": 11492,
+        "frame_sha256": "60aa35f5306bfac1bf39e2f1ffba3bf1981eb9a389c289d198df7e2851ecaa90",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1905,
+          "medvedev_struff__000_at120__person_000000000005": 9587
+        },
+        "sam_seconds": 0.3324612029828131,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 75,
+        "tick_seconds": 0.5764904899988323
+      },
+      {
+        "base_sha256": "1e2e442ad369732f5368bf2e5f2ff728f550c43121f9902c718de5eb0b1d23d6",
+        "coverage_pixels": 11691,
+        "frame_sha256": "d31e9fb9a4d8c4ef2f5ad6c1d0c975995e424114eef0f15a36de9138bea42c8a",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1870,
+          "medvedev_struff__000_at120__person_000000000005": 9821
+        },
+        "sam_seconds": 0.33558831800473854,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 76,
+        "tick_seconds": 0.5712062279926613
+      },
+      {
+        "base_sha256": "2fdfbd5f8ac0796a0d48f63f850f02d1a7cb225004fd100a1ed43cf724bc02d7",
+        "coverage_pixels": 11480,
+        "frame_sha256": "0e3756bfa9a50b5fef13f6642f3820e1df4f82d4ef2da878857da62aed8e846e",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1713,
+          "medvedev_struff__000_at120__person_000000000005": 9767
+        },
+        "sam_seconds": 0.3328818070003763,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 77,
+        "tick_seconds": 0.5755853909940924
+      },
+      {
+        "base_sha256": "8c54c7c3589d412c5fc1109c3cd2e645d3916dac1c7880d44747402e7f9a4cd8",
+        "coverage_pixels": 11384,
+        "frame_sha256": "d8e44a7603f854ca4d001cc171277acd06ca87e7f5099bd1f4dc4c6312e108d1",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1612,
+          "medvedev_struff__000_at120__person_000000000005": 9772
+        },
+        "sam_seconds": 0.32878642599098384,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 78,
+        "tick_seconds": 0.5711673309851903
+      },
+      {
+        "base_sha256": "a3ce31dedd93d3d53cdbc6a07fe2d494694c2f11d38d0dae3cf25b29cd8dbb97",
+        "coverage_pixels": 11582,
+        "frame_sha256": "b7e9e5b0b26e9cd8769bd15b908efbd664157f8155ab0c0ae49ee8cf3dee3986",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1704,
+          "medvedev_struff__000_at120__person_000000000005": 9878
+        },
+        "sam_seconds": 0.33022601800621487,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 79,
+        "tick_seconds": 0.5706400870112702
+      },
+      {
+        "base_sha256": "223382d0be290572362454cfadbc7c42aa0be9d3197211c946a21636585a1925",
+        "coverage_pixels": 11379,
+        "frame_sha256": "e78689d2e9e4688c70577fca8ab6132d577e6b1c6dbd36ca057d9465f701035a",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1547,
+          "medvedev_struff__000_at120__person_000000000005": 9832
+        },
+        "sam_seconds": 0.3333496069535613,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 80,
+        "tick_seconds": 0.5646865080052521
+      },
+      {
+        "base_sha256": "8a6c7d110bf237cb1a86ded7718b5ee5ad7d0f30bf481efdaaa830576feb72f7",
+        "coverage_pixels": 11629,
+        "frame_sha256": "adce982a05defa382f03b9c7f83a2bce80e15d85b2b1e833ef874b42148da20f",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1720,
+          "medvedev_struff__000_at120__person_000000000005": 9909
+        },
+        "sam_seconds": 0.3298117129888851,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 81,
+        "tick_seconds": 0.5613316200033296
+      },
+      {
+        "base_sha256": "ed5be98630b062677204f9f097d7e646f9fc47f1605a12845a395bc421362768",
+        "coverage_pixels": 12263,
+        "frame_sha256": "683d4e0496998ad004809cb2fec1f6fc1042dcad76b2d5f8ed0cf98046aa3dfb",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1888,
+          "medvedev_struff__000_at120__person_000000000005": 10375
+        },
+        "sam_seconds": 0.32825760598643683,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 82,
+        "tick_seconds": 0.5718434200098272
+      },
+      {
+        "base_sha256": "283c1d1280bbcf1115c89f9e6bdfb873baf020d3d56e4cc7805f5a8914e972a7",
+        "coverage_pixels": 12296,
+        "frame_sha256": "0e834f0232182d1699214d09db4ce16e863ab447b58cc2de5ed85d90e30405dd",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1896,
+          "medvedev_struff__000_at120__person_000000000005": 10400
+        },
+        "sam_seconds": 0.3322399979806505,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 83,
+        "tick_seconds": 0.5738907829800155
+      },
+      {
+        "base_sha256": "5ea9ff23b74bbfc06270f73d20e77701cb0da55d78fc59663f0721c3ee3a1f89",
+        "coverage_pixels": 12073,
+        "frame_sha256": "145acd1d9f335e7feb578e6916f26f9a5ed2a329f2c098b3fa394e60c4cc40fc",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1890,
+          "medvedev_struff__000_at120__person_000000000005": 10183
+        },
+        "sam_seconds": 0.3309799069829751,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 84,
+        "tick_seconds": 0.5652290270081721
+      },
+      {
+        "base_sha256": "cad88a84ceacdb71c6a05ffc5f9be6a42479eff5cba2272dee4e37a966623267",
+        "coverage_pixels": 12064,
+        "frame_sha256": "a9463983a39ffc12465a89cd21c2995b3c5c7f0679424e21dde6665c89963c4a",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1915,
+          "medvedev_struff__000_at120__person_000000000005": 10149
+        },
+        "sam_seconds": 0.33331156498752534,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 85,
+        "tick_seconds": 0.569220695993863
+      },
+      {
+        "base_sha256": "10136d47545e45f4c1f43cfc2c4f365cb7930f2f2533e9694543ffb75ec47dec",
+        "coverage_pixels": 11969,
+        "frame_sha256": "7adceddf32d108d774eeed649a9672a5e77852a87813fca1507d3adb0dbe367a",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1876,
+          "medvedev_struff__000_at120__person_000000000005": 10093
+        },
+        "sam_seconds": 0.3292223940079566,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 86,
+        "tick_seconds": 0.5629410950059537
+      },
+      {
+        "base_sha256": "10136d47545e45f4c1f43cfc2c4f365cb7930f2f2533e9694543ffb75ec47dec",
+        "coverage_pixels": 12015,
+        "frame_sha256": "632fc904caa8657f954b89e4b6980d4ac3425505e1bfe31ed44f2f0ba33d0769",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1832,
+          "medvedev_struff__000_at120__person_000000000005": 10183
+        },
+        "sam_seconds": 0.3334529910061974,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 87,
+        "tick_seconds": 0.5712482789822388
+      },
+      {
+        "base_sha256": "b0176608d427dc5b8078c4fe77f9a56dd46c9ac483cc3a6d25a3b54e65146114",
+        "coverage_pixels": 11823,
+        "frame_sha256": "c9b953e0808dc38f73b6d10e2dea3edd6706b56e052b21fca4e5345736ca942b",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1778,
+          "medvedev_struff__000_at120__person_000000000005": 10045
+        },
+        "sam_seconds": 0.3380754480022006,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 88,
+        "tick_seconds": 0.5699932949792128
+      },
+      {
+        "base_sha256": "72bd4e3212302c43881d213d4f20ffce6c91da5bce02100140d9b31f39829953",
+        "coverage_pixels": 12011,
+        "frame_sha256": "25b90c76f89b5cdeed30e0ec80c9c97c2898878d6e410f8e94085b3fa29a9413",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1878,
+          "medvedev_struff__000_at120__person_000000000005": 10133
+        },
+        "sam_seconds": 0.33286168897757307,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 89,
+        "tick_seconds": 0.5658339560031891
+      },
+      {
+        "base_sha256": "72bd4e3212302c43881d213d4f20ffce6c91da5bce02100140d9b31f39829953",
+        "coverage_pixels": 12184,
+        "frame_sha256": "b35523dbca15c8e78dea2f17a82a9ab741370f208cabf115a9a663b84d0ce1b9",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1859,
+          "medvedev_struff__000_at120__person_000000000005": 10325
+        },
+        "sam_seconds": 0.33016016098554246,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 90,
+        "tick_seconds": 0.5654666729969904
+      },
+      {
+        "base_sha256": "72bd4e3212302c43881d213d4f20ffce6c91da5bce02100140d9b31f39829953",
+        "coverage_pixels": 12660,
+        "frame_sha256": "a88bf104da15e1ff9a14a7a7a881372589277aa451bc12008d67ef49310a9e85",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1917,
+          "medvedev_struff__000_at120__person_000000000005": 10743
+        },
+        "sam_seconds": 0.3350750920071732,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 91,
+        "tick_seconds": 0.5706843950028997
+      },
+      {
+        "base_sha256": "1e409f491b5ceabf486212c354e842184105c17c24f7a1285db8ddc56b2d6049",
+        "coverage_pixels": 12487,
+        "frame_sha256": "66aa129286fb4f38e34671d9bdfe17e6635148e41ab9e87a00ab35dd5a726507",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1878,
+          "medvedev_struff__000_at120__person_000000000005": 10609
+        },
+        "sam_seconds": 0.3305426989682019,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 92,
+        "tick_seconds": 0.5690807479841169
+      },
+      {
+        "base_sha256": "7f5e1cf07ae98d109e4657b2303dc2ecc17e430adf422191ef7b6e0f94f6a962",
+        "coverage_pixels": 12484,
+        "frame_sha256": "4cbfb9e6fd754534b01121c985cd4faca7fc36c7a88c678f9bfafc212c4ca82c",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1830,
+          "medvedev_struff__000_at120__person_000000000005": 10654
+        },
+        "sam_seconds": 0.33034810799290426,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 93,
+        "tick_seconds": 0.5689352040062658
+      },
+      {
+        "base_sha256": "40840d5d6c91a755c12cc5c1ce230ff850171e3bd7c140adf6e25bbe5249879d",
+        "coverage_pixels": 12586,
+        "frame_sha256": "461a4f609487d778a87d4dc743103822225b1c43bf609a8fd8e31112eec71c87",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1849,
+          "medvedev_struff__000_at120__person_000000000005": 10737
+        },
+        "sam_seconds": 0.3376505539927166,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 94,
+        "tick_seconds": 0.5757112770224921
+      },
+      {
+        "base_sha256": "5f8e2ca499861afb5435645fa02a6c6a9d0ed1416d994efdba12493722ebbdda",
+        "coverage_pixels": 12807,
+        "frame_sha256": "77a03811c1ad03189826b137ef0eea915fdea7af0aaa9b15ba67c19cafbe8ff1",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1941,
+          "medvedev_struff__000_at120__person_000000000005": 10866
+        },
+        "sam_seconds": 0.3351107439666521,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 95,
+        "tick_seconds": 0.5724449090193957
+      },
+      {
+        "base_sha256": "1b93154d0506d3156ada1e2c9892ee285f0245948e1f7144e4e66e62d516f175",
+        "coverage_pixels": 13041,
+        "frame_sha256": "3a892534fd28be43b96157b75d93c8ab08d61245c4dea53701075b1793936983",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 2021,
+          "medvedev_struff__000_at120__person_000000000005": 11020
+        },
+        "sam_seconds": 0.32900494697969407,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 96,
+        "tick_seconds": 0.5679405739938375
+      },
+      {
+        "base_sha256": "43daf2b5e3e54f51b6fa17e0e93350bb1c642bc6602faa1205b1a9bf5f6fc271",
+        "coverage_pixels": 12716,
+        "frame_sha256": "77b100a8633210a27726501752bf240d43bdb6a2d32709f232bae7ee5e4f1204",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1879,
+          "medvedev_struff__000_at120__person_000000000005": 10837
+        },
+        "sam_seconds": 0.332332738005789,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 97,
+        "tick_seconds": 0.5817379550135229
+      },
+      {
+        "base_sha256": "277065d76e741dcaab09dd781aa6823a6b3e3f2cb37d51e4106f6fe530fb80a3",
+        "coverage_pixels": 12519,
+        "frame_sha256": "6e4a7bb7e5664f968db7e2c2cc6ef76754d3f4beed7b0929a12342ee5ea20ed4",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1757,
+          "medvedev_struff__000_at120__person_000000000005": 10762
+        },
+        "sam_seconds": 0.33159986199461855,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 98,
+        "tick_seconds": 0.5694910100137349
+      },
+      {
+        "base_sha256": "f11c8a62952bd50c7fedf50f31b40a1b1e99649400e8c0d121af978aaed627da",
+        "coverage_pixels": 12065,
+        "frame_sha256": "70a0f6bddf91812ab657dd82b346ad4dcd7f6517e559eac6c530a9d50855e9c4",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1716,
+          "medvedev_struff__000_at120__person_000000000005": 10349
+        },
+        "sam_seconds": 0.3470124269952066,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 99,
+        "tick_seconds": 0.613629517989466
+      },
+      {
+        "base_sha256": "01fb8f666d19375be9ee966a5f97903bac121d1c8775a548c68b60522c5a6ccb",
+        "coverage_pixels": 11962,
+        "frame_sha256": "442962281b6a1f29dc2f6f01ed6834369ab2dca1a47e3c6a6b526408fb96b8fe",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1780,
+          "medvedev_struff__000_at120__person_000000000005": 10182
+        },
+        "sam_seconds": 0.34021062101237476,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 100,
+        "tick_seconds": 0.5799093329987954
+      },
+      {
+        "base_sha256": "26e1d17542df210aff5afdf2dddbe384f2ac5aa78fd6412e9bc02ed5f753d42d",
+        "coverage_pixels": 12124,
+        "frame_sha256": "3c10699d7ac5da163e8f21300d56838ee5ba08e3f503a8b0710d9380a4d5013e",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1692,
+          "medvedev_struff__000_at120__person_000000000005": 10432
+        },
+        "sam_seconds": 0.3356825899682008,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 101,
+        "tick_seconds": 0.5692093049874529
+      },
+      {
+        "base_sha256": "587430b08b73f32e5e48df42445af13c21c253f2012dbd840dada44ba834c2ce",
+        "coverage_pixels": 12425,
+        "frame_sha256": "3e4db8d318e16e54ec2ba8411474483f4e3b4b219ed931f0b83d008866faf48c",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1852,
+          "medvedev_struff__000_at120__person_000000000005": 10573
+        },
+        "sam_seconds": 0.3332446439890191,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 102,
+        "tick_seconds": 0.5718886569957249
+      },
+      {
+        "base_sha256": "8a20dd5e94c8bd5092994be9081f0dc19620404e26d661beeffa787d569f260d",
+        "coverage_pixels": 13191,
+        "frame_sha256": "e022f0308a667dca06768b39a19692e463ea8d5c47789cefc8b716a44c99ed4a",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1878,
+          "medvedev_struff__000_at120__person_000000000005": 11313
+        },
+        "sam_seconds": 0.33389027701923624,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 103,
+        "tick_seconds": 0.5777838089852594
+      },
+      {
+        "base_sha256": "948eb40df3e2e6cfcdb9a65a580d2ecd5a12d2aca16f63e9e2ab3ccb11a4e440",
+        "coverage_pixels": 13291,
+        "frame_sha256": "e9bf47082c77c07210d94aab282828cd401f1177dcd5eac0b1284883cbd11f98",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 2007,
+          "medvedev_struff__000_at120__person_000000000005": 11284
+        },
+        "sam_seconds": 0.33604816801380366,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 104,
+        "tick_seconds": 0.573014816007344
+      },
+      {
+        "base_sha256": "0316e6a514e7748b597e85dcc275f520a0dfc5e7edb71b115bc894f87fe5d5c4",
+        "coverage_pixels": 12977,
+        "frame_sha256": "f961a85d3c5ae11c7418e9711965b03a870ad24b2baa9a9436355ef843cc371b",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1918,
+          "medvedev_struff__000_at120__person_000000000005": 11059
+        },
+        "sam_seconds": 0.33556162600871176,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 105,
+        "tick_seconds": 0.5742775039980188
+      },
+      {
+        "base_sha256": "c4e8bddadc9705184a26411a03f9393ac64aa7f9088bee76c5628de673800e5d",
+        "coverage_pixels": 12905,
+        "frame_sha256": "f5145cc949eb53abfc29ce83578aebc4001d091f30665444b99275e37e6bb1f7",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1711,
+          "medvedev_struff__000_at120__person_000000000005": 11194
+        },
+        "sam_seconds": 0.33616613000049256,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 106,
+        "tick_seconds": 0.5708069079846609
+      },
+      {
+        "base_sha256": "0bc9bd897bb9f0d98ede8d313f9622c664715278fdba9f711b697f7809aefe04",
+        "coverage_pixels": 12638,
+        "frame_sha256": "a122edf52d5a2b63bb80c5fbea2bb4f5c75b1edfeabababd6e7e867860513ef8",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1654,
+          "medvedev_struff__000_at120__person_000000000005": 10984
+        },
+        "sam_seconds": 0.33402562999981456,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 107,
+        "tick_seconds": 0.569036981993122
+      },
+      {
+        "base_sha256": "4a8203ec3cf9bef205e5d0f0be42bcc57c17581a4b0e831f53b2f1aae6e6fdd8",
+        "coverage_pixels": 12532,
+        "frame_sha256": "93a4b91c34cc327765b216277509d22c3d8b3a7cf5242493d7163a085ca47b6f",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1706,
+          "medvedev_struff__000_at120__person_000000000005": 10826
+        },
+        "sam_seconds": 0.33464651100803167,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 108,
+        "tick_seconds": 0.5746400369971525
+      },
+      {
+        "base_sha256": "d76cb42cb74ce84962b47bc23fa68f8a88a1ef3e79de5a9dea68b8e6c67e53b2",
+        "coverage_pixels": 11904,
+        "frame_sha256": "97ba52be1f74b4387c1d4e21dcf6a0c69315e0801dec0138826c1d8e5bf8d02b",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1505,
+          "medvedev_struff__000_at120__person_000000000005": 10399
+        },
+        "sam_seconds": 0.32988149896846153,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 109,
+        "tick_seconds": 0.5659089120163117
+      },
+      {
+        "base_sha256": "b28028b49595008e83825088dc46ebe0a1d56ef1214762cf6fe6ccb0eca20e79",
+        "coverage_pixels": 11886,
+        "frame_sha256": "9a6f16b2dd545dbe8ab046865b38a5d018f7ee37d8c5fe3d9e4007c73f155c96",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1592,
+          "medvedev_struff__000_at120__person_000000000005": 10294
+        },
+        "sam_seconds": 0.3337854150158819,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 110,
+        "tick_seconds": 0.573384999006521
+      },
+      {
+        "base_sha256": "8f207bc9d62163875f1292b1895f4a16f02ca46fa787d0dcdd2a5669e9599e85",
+        "coverage_pixels": 11815,
+        "frame_sha256": "d12084c3059f487239d3955c9a6d51eec828a07ba547f081c2ac1d26c378a69f",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1517,
+          "medvedev_struff__000_at120__person_000000000005": 10298
+        },
+        "sam_seconds": 0.3329321379715111,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 111,
+        "tick_seconds": 0.5736528809939045
+      },
+      {
+        "base_sha256": "559819f878c770896848c3f730572935aab960fc38478d18508551b84cb568ec",
+        "coverage_pixels": 12506,
+        "frame_sha256": "c8b6bb3be49501e9e41a448c9bc7df57dd294e60d6c1fe651d773122792ca0cb",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1543,
+          "medvedev_struff__000_at120__person_000000000005": 10963
+        },
+        "sam_seconds": 0.33472056000027806,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 112,
+        "tick_seconds": 0.5753037569811568
+      },
+      {
+        "base_sha256": "1f212299dd148775908ea75cc068e353ca73cc10a66131160004266b2938ea1f",
+        "coverage_pixels": 12685,
+        "frame_sha256": "67edd02cf1f387480fc27b583c7ed447cd2186c6ba9a82efcc9edd7bbf7c9201",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1578,
+          "medvedev_struff__000_at120__person_000000000005": 11107
+        },
+        "sam_seconds": 0.32955628298805095,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 113,
+        "tick_seconds": 0.5656563950178679
+      },
+      {
+        "base_sha256": "e2f4a4857f36053229d5e6e6e870a6a09c35c5ba7a1aca8d4479f918b1f1652d",
+        "coverage_pixels": 12911,
+        "frame_sha256": "7b981d0077f1a5a1e6976d5ac657166799a9e109d38bfa7938dcc32de84326c1",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1575,
+          "medvedev_struff__000_at120__person_000000000005": 11336
+        },
+        "sam_seconds": 0.337756303983042,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 114,
+        "tick_seconds": 0.5764302989991847
+      },
+      {
+        "base_sha256": "15a4f59c589253a7e559074515c1c9ce0534e3e94556286dce024a538a275cb4",
+        "coverage_pixels": 12743,
+        "frame_sha256": "b12da54eef13f04117292545547f9257d10c68d1af75d4b202a05ee65f936c4d",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1325,
+          "medvedev_struff__000_at120__person_000000000005": 11418
+        },
+        "sam_seconds": 0.3348988550133072,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 115,
+        "tick_seconds": 0.5744065350154415
+      },
+      {
+        "base_sha256": "91474aae4063a77c3a29c6d0e6d665ff48f82413c54de1c0598c793c1939410f",
+        "coverage_pixels": 12612,
+        "frame_sha256": "d20c85a0790bcf32498a98671936edcd00ed08255547bcf259e0874282ea81b4",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1312,
+          "medvedev_struff__000_at120__person_000000000005": 11300
+        },
+        "sam_seconds": 0.33310129400342703,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 116,
+        "tick_seconds": 0.5771614410041366
+      },
+      {
+        "base_sha256": "2046362c39b300596c7797039a02b705d4038c7ffd92a84e00486f9076da7268",
+        "coverage_pixels": 12391,
+        "frame_sha256": "77d7e78aded9b761c43a7f02f7c4fa78077943b5146a6494884e64c63e2f57e3",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1406,
+          "medvedev_struff__000_at120__person_000000000005": 10985
+        },
+        "sam_seconds": 0.32994902902282774,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 117,
+        "tick_seconds": 0.5710266320093069
+      },
+      {
+        "base_sha256": "d90c4fb493fe01b71fd2dd95b2d9b2d641d6883bf2325a087b9c68fe99bbac62",
+        "coverage_pixels": 13343,
+        "frame_sha256": "c8c54e99decdf7b79fe13c1b61f3d6444a4cae9147027be90e78ce3fd5bcf6d1",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1663,
+          "medvedev_struff__000_at120__person_000000000005": 11680
+        },
+        "sam_seconds": 0.32812085599289276,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 118,
+        "tick_seconds": 0.5671573509753216
+      },
+      {
+        "base_sha256": "00b9270b2aa9d1a7d769f5aa1f5a2ab1478b83dd25b95a0ffb1d15c875f4cbfb",
+        "coverage_pixels": 12549,
+        "frame_sha256": "3f118a136af0e6096ee5e496f94b683e163d54654eef42a3e34ee71272622df0",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 1701,
+          "medvedev_struff__000_at120__person_000000000005": 10848
+        },
+        "sam_seconds": 0.3322503129893448,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "composed",
+          "medvedev_struff__000_at120__person_000000000005": "composed"
+        },
+        "tick": 119,
+        "tick_seconds": 0.5722796580230352
+      },
+      {
+        "base_sha256": "f889f9cdea0b9731304b7f995f2fd73ca7c9fce80cfdaa3dfa460ba96295fced",
+        "coverage_pixels": 0,
+        "frame_sha256": "f889f9cdea0b9731304b7f995f2fd73ca7c9fce80cfdaa3dfa460ba96295fced",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 120,
+        "tick_seconds": 0.22836605500197038
+      },
+      {
+        "base_sha256": "ce0c12be6aa4ede642c0a1c485d8411df394199ca6218561da2f007ed40a7b51",
+        "coverage_pixels": 0,
+        "frame_sha256": "ce0c12be6aa4ede642c0a1c485d8411df394199ca6218561da2f007ed40a7b51",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 121,
+        "tick_seconds": 0.2190724329848308
+      },
+      {
+        "base_sha256": "0f15fbb9a0d4a4e637c8a08b9dedcbe5612e13fa8282952128246cf201c5ba2b",
+        "coverage_pixels": 0,
+        "frame_sha256": "0f15fbb9a0d4a4e637c8a08b9dedcbe5612e13fa8282952128246cf201c5ba2b",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 122,
+        "tick_seconds": 0.22092363599222153
+      },
+      {
+        "base_sha256": "c8d872baf511ac52358159ea2756889b28841539ed0789526453b55bed760300",
+        "coverage_pixels": 0,
+        "frame_sha256": "c8d872baf511ac52358159ea2756889b28841539ed0789526453b55bed760300",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 123,
+        "tick_seconds": 0.21509296100703068
+      },
+      {
+        "base_sha256": "2eecbff76e789bc0fc758b5707173c77a4672bf38414d489a6afeb135efcb607",
+        "coverage_pixels": 0,
+        "frame_sha256": "2eecbff76e789bc0fc758b5707173c77a4672bf38414d489a6afeb135efcb607",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 124,
+        "tick_seconds": 0.21077649400103837
+      },
+      {
+        "base_sha256": "40db3f225cd322f424bbaae976e53c72f0d5bdcc4e6dde828a5242d186545d5e",
+        "coverage_pixels": 0,
+        "frame_sha256": "40db3f225cd322f424bbaae976e53c72f0d5bdcc4e6dde828a5242d186545d5e",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 125,
+        "tick_seconds": 0.21791839398792945
+      },
+      {
+        "base_sha256": "961c90038b2434cae23f5162cbb05d3622bac0eb2f0c7381a2ab1a82068afd13",
+        "coverage_pixels": 0,
+        "frame_sha256": "961c90038b2434cae23f5162cbb05d3622bac0eb2f0c7381a2ab1a82068afd13",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 126,
+        "tick_seconds": 0.22166941899922676
+      },
+      {
+        "base_sha256": "1a2bd8d6dc771d963ae8b1ef7289605b50e698531703421d00d786decd0325ad",
+        "coverage_pixels": 0,
+        "frame_sha256": "1a2bd8d6dc771d963ae8b1ef7289605b50e698531703421d00d786decd0325ad",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 127,
+        "tick_seconds": 0.21806915500201285
+      },
+      {
+        "base_sha256": "65e7ec06949f433fd30c939b9cc8869558d6261b95e50570e23994ab84c7f14a",
+        "coverage_pixels": 0,
+        "frame_sha256": "65e7ec06949f433fd30c939b9cc8869558d6261b95e50570e23994ab84c7f14a",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 128,
+        "tick_seconds": 0.21989970200229436
+      },
+      {
+        "base_sha256": "9eb8d38718f32e773dbb90959cd4b5c6b1341ec3858a25abbd3a428a39386553",
+        "coverage_pixels": 0,
+        "frame_sha256": "9eb8d38718f32e773dbb90959cd4b5c6b1341ec3858a25abbd3a428a39386553",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 129,
+        "tick_seconds": 0.22028277601930313
+      },
+      {
+        "base_sha256": "f53c07dcffe31fc808016b182627e4b1dc2c25803ae3e4c42bb42cf05daaa702",
+        "coverage_pixels": 0,
+        "frame_sha256": "f53c07dcffe31fc808016b182627e4b1dc2c25803ae3e4c42bb42cf05daaa702",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 130,
+        "tick_seconds": 0.21435382799245417
+      },
+      {
+        "base_sha256": "9172b8542959b247c3316c562365ee75739c2604798366759e40ec65d3d0c6f7",
+        "coverage_pixels": 0,
+        "frame_sha256": "9172b8542959b247c3316c562365ee75739c2604798366759e40ec65d3d0c6f7",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 131,
+        "tick_seconds": 0.2258200499927625
+      },
+      {
+        "base_sha256": "27446ac21ebaa10a80416ad335b8892dcfac7ff1c38762d1c0649fc22a7b2d9f",
+        "coverage_pixels": 0,
+        "frame_sha256": "27446ac21ebaa10a80416ad335b8892dcfac7ff1c38762d1c0649fc22a7b2d9f",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 132,
+        "tick_seconds": 0.22054438502527773
+      },
+      {
+        "base_sha256": "cab83f540b9319b83b400d0873d3edbab5982358f09719f5eebe55fb49048d0f",
+        "coverage_pixels": 0,
+        "frame_sha256": "cab83f540b9319b83b400d0873d3edbab5982358f09719f5eebe55fb49048d0f",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 133,
+        "tick_seconds": 0.21555221799644642
+      },
+      {
+        "base_sha256": "eaf01c011245ad9633615c879137599316a8ee0c2c25241edede7bc4a03f1475",
+        "coverage_pixels": 0,
+        "frame_sha256": "eaf01c011245ad9633615c879137599316a8ee0c2c25241edede7bc4a03f1475",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 134,
+        "tick_seconds": 0.21861283099860884
+      },
+      {
+        "base_sha256": "4e4c869d07ee286b6f38194a0907dd074d3c0a85c6f38496c61eedb388a4e31b",
+        "coverage_pixels": 0,
+        "frame_sha256": "4e4c869d07ee286b6f38194a0907dd074d3c0a85c6f38496c61eedb388a4e31b",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 135,
+        "tick_seconds": 0.22418307000771165
+      },
+      {
+        "base_sha256": "bdced83b3290b8ed1b288438cd648e7eccce4da26bed6c373e3f890f369da452",
+        "coverage_pixels": 0,
+        "frame_sha256": "bdced83b3290b8ed1b288438cd648e7eccce4da26bed6c373e3f890f369da452",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 136,
+        "tick_seconds": 0.2183200159925036
+      },
+      {
+        "base_sha256": "96c04cb19753deff2603f6eca50ea9214fd246ca093385929980be679da74c02",
+        "coverage_pixels": 0,
+        "frame_sha256": "96c04cb19753deff2603f6eca50ea9214fd246ca093385929980be679da74c02",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 137,
+        "tick_seconds": 0.21441566399880685
+      },
+      {
+        "base_sha256": "647f4fb4ac2883ee91f630ecec38533ce12f392a37d9a669ed75bf7439ce6775",
+        "coverage_pixels": 0,
+        "frame_sha256": "647f4fb4ac2883ee91f630ecec38533ce12f392a37d9a669ed75bf7439ce6775",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 138,
+        "tick_seconds": 0.21853350999299437
+      },
+      {
+        "base_sha256": "fe24fba6056dbfd86d4fe4c36e181e43267ef0733560bc265de32bcb0f0512eb",
+        "coverage_pixels": 0,
+        "frame_sha256": "fe24fba6056dbfd86d4fe4c36e181e43267ef0733560bc265de32bcb0f0512eb",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 139,
+        "tick_seconds": 0.21614376100478694
+      },
+      {
+        "base_sha256": "1b8aeb08c37dfa19e5d39d248eac70fae32bcba59cbcf4c8be7e0444dc757300",
+        "coverage_pixels": 0,
+        "frame_sha256": "1b8aeb08c37dfa19e5d39d248eac70fae32bcba59cbcf4c8be7e0444dc757300",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 140,
+        "tick_seconds": 0.21912998298648745
+      },
+      {
+        "base_sha256": "874219a977dd3d3a270878574aef3c310655f3b9ef277bbdee83b38dda5649b6",
+        "coverage_pixels": 0,
+        "frame_sha256": "874219a977dd3d3a270878574aef3c310655f3b9ef277bbdee83b38dda5649b6",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 141,
+        "tick_seconds": 0.21770299697527662
+      },
+      {
+        "base_sha256": "2075fbd96ef795c4266bb5b3d420010e3578f8f268909f259fda434b5c3faad4",
+        "coverage_pixels": 0,
+        "frame_sha256": "2075fbd96ef795c4266bb5b3d420010e3578f8f268909f259fda434b5c3faad4",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 142,
+        "tick_seconds": 0.2191424329939764
+      },
+      {
+        "base_sha256": "d44ec18497a6f44dd8cb7faf0ab85f92846e87fe47a6bfc8dd1435a87877687f",
+        "coverage_pixels": 0,
+        "frame_sha256": "d44ec18497a6f44dd8cb7faf0ab85f92846e87fe47a6bfc8dd1435a87877687f",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 143,
+        "tick_seconds": 0.21966418201918714
+      },
+      {
+        "base_sha256": "cf8f4294bbd184377b02353f55b4f362ca2b7233f740fc315382266b37e8a91d",
+        "coverage_pixels": 0,
+        "frame_sha256": "cf8f4294bbd184377b02353f55b4f362ca2b7233f740fc315382266b37e8a91d",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 144,
+        "tick_seconds": 0.22058267600368708
+      },
+      {
+        "base_sha256": "6b9011a8ea12fb1374c8cb084c8bdd0388721ca6475dc34d0b896293bb97b716",
+        "coverage_pixels": 0,
+        "frame_sha256": "6b9011a8ea12fb1374c8cb084c8bdd0388721ca6475dc34d0b896293bb97b716",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 145,
+        "tick_seconds": 0.2209003370080609
+      },
+      {
+        "base_sha256": "b6d8e6ef3832222117a4fbf7344d713f245e83df315905766c591964644e7d5d",
+        "coverage_pixels": 0,
+        "frame_sha256": "b6d8e6ef3832222117a4fbf7344d713f245e83df315905766c591964644e7d5d",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 146,
+        "tick_seconds": 0.2172180829802528
+      },
+      {
+        "base_sha256": "d7fed1c493bd05dcd3d2a2155ad1494f6e7a24fd883413ce9e53d58b86bdaa12",
+        "coverage_pixels": 0,
+        "frame_sha256": "d7fed1c493bd05dcd3d2a2155ad1494f6e7a24fd883413ce9e53d58b86bdaa12",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 147,
+        "tick_seconds": 0.2187014039955102
+      },
+      {
+        "base_sha256": "cb5016ba970bdfd561035bd09b039192e43bc5e2f14479c333ac0083677e09e7",
+        "coverage_pixels": 0,
+        "frame_sha256": "cb5016ba970bdfd561035bd09b039192e43bc5e2f14479c333ac0083677e09e7",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 148,
+        "tick_seconds": 0.21808025799691677
+      },
+      {
+        "base_sha256": "9ad1163d7ae6156c986a8a3edb04ce7c980cda39ff6f996e6dbd6f65c6362912",
+        "coverage_pixels": 0,
+        "frame_sha256": "9ad1163d7ae6156c986a8a3edb04ce7c980cda39ff6f996e6dbd6f65c6362912",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 149,
+        "tick_seconds": 0.21953169102198444
+      },
+      {
+        "base_sha256": "d0815919821b8ac1c0c5e69561403dbedcad69a91f9a49aa4878642448ffd713",
+        "coverage_pixels": 0,
+        "frame_sha256": "d0815919821b8ac1c0c5e69561403dbedcad69a91f9a49aa4878642448ffd713",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 150,
+        "tick_seconds": 0.2197448520164471
+      },
+      {
+        "base_sha256": "385d37f0d49ed0de6c65aaf3ee000f943a224b677377f6eae3600692b14d4ee4",
+        "coverage_pixels": 0,
+        "frame_sha256": "385d37f0d49ed0de6c65aaf3ee000f943a224b677377f6eae3600692b14d4ee4",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 151,
+        "tick_seconds": 0.21967064100317657
+      },
+      {
+        "base_sha256": "7e220a8d667f91f3041ddb90e88a4335e14dcd5fd30c59dfc652a1797bb5e783",
+        "coverage_pixels": 0,
+        "frame_sha256": "7e220a8d667f91f3041ddb90e88a4335e14dcd5fd30c59dfc652a1797bb5e783",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 152,
+        "tick_seconds": 0.22139999698265456
+      },
+      {
+        "base_sha256": "d260f88df0e87417e433f248ce278896733592e86634a90190e304352922d328",
+        "coverage_pixels": 0,
+        "frame_sha256": "d260f88df0e87417e433f248ce278896733592e86634a90190e304352922d328",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 153,
+        "tick_seconds": 0.22221752599580213
+      },
+      {
+        "base_sha256": "1fe74416c46183de947ead4028a0f7736e95c284fc59bd5159c2da9c5efbe01a",
+        "coverage_pixels": 0,
+        "frame_sha256": "1fe74416c46183de947ead4028a0f7736e95c284fc59bd5159c2da9c5efbe01a",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 154,
+        "tick_seconds": 0.22251843800768256
+      },
+      {
+        "base_sha256": "02c19d400299261bf25e780740a55fe91f3ef19afb101c6cf1d8b79737a704a0",
+        "coverage_pixels": 0,
+        "frame_sha256": "02c19d400299261bf25e780740a55fe91f3ef19afb101c6cf1d8b79737a704a0",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 155,
+        "tick_seconds": 0.22425963799469173
+      },
+      {
+        "base_sha256": "6e1b5f3d431e05e56e77319d5b7805234903c14d58fdc2401f38a5f006d34a8b",
+        "coverage_pixels": 0,
+        "frame_sha256": "6e1b5f3d431e05e56e77319d5b7805234903c14d58fdc2401f38a5f006d34a8b",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 156,
+        "tick_seconds": 0.22541067597921938
+      },
+      {
+        "base_sha256": "e2ed21bb1a089f953209a2076e41e9d025f17cb742241f77ed902efbff324bfb",
+        "coverage_pixels": 0,
+        "frame_sha256": "e2ed21bb1a089f953209a2076e41e9d025f17cb742241f77ed902efbff324bfb",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 157,
+        "tick_seconds": 0.222641083993949
+      },
+      {
+        "base_sha256": "71937442ff001f07da781e67973a8cba26b530ec84c90e86bb8cb947eea013f3",
+        "coverage_pixels": 0,
+        "frame_sha256": "71937442ff001f07da781e67973a8cba26b530ec84c90e86bb8cb947eea013f3",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 158,
+        "tick_seconds": 0.21919025797978975
+      },
+      {
+        "base_sha256": "f3cb1450df73a1ebbadf12c724bbd97ebc324cf9dcb69a9b5b4cef0fcb0d1636",
+        "coverage_pixels": 0,
+        "frame_sha256": "f3cb1450df73a1ebbadf12c724bbd97ebc324cf9dcb69a9b5b4cef0fcb0d1636",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 159,
+        "tick_seconds": 0.21969512398936786
+      },
+      {
+        "base_sha256": "0968117e9c947b3252b859d4655525396f619842ed3d8241391cee4e78221423",
+        "coverage_pixels": 0,
+        "frame_sha256": "0968117e9c947b3252b859d4655525396f619842ed3d8241391cee4e78221423",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 160,
+        "tick_seconds": 0.21019265599898063
+      },
+      {
+        "base_sha256": "c7dfdb905a03eb482017d38ebe43b6854cb670de6f520a059137b7814f4cc00a",
+        "coverage_pixels": 0,
+        "frame_sha256": "c7dfdb905a03eb482017d38ebe43b6854cb670de6f520a059137b7814f4cc00a",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 161,
+        "tick_seconds": 0.21992089701234363
+      },
+      {
+        "base_sha256": "2b003074658d3e054eb1297f96baea8a6db8ad18868b07c30ee5d15ab45fcf36",
+        "coverage_pixels": 0,
+        "frame_sha256": "2b003074658d3e054eb1297f96baea8a6db8ad18868b07c30ee5d15ab45fcf36",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 162,
+        "tick_seconds": 0.22094308701343834
+      },
+      {
+        "base_sha256": "9f7762701d7e5875a980ed0143bf2aa7bdd9cdec5bedf0d496d52727accf2457",
+        "coverage_pixels": 0,
+        "frame_sha256": "9f7762701d7e5875a980ed0143bf2aa7bdd9cdec5bedf0d496d52727accf2457",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 163,
+        "tick_seconds": 0.2196263679943513
+      },
+      {
+        "base_sha256": "8645fc822432b88ba326cff56ce0fdf7e21480bdabdf1ba0ad4a7925224fd1e5",
+        "coverage_pixels": 0,
+        "frame_sha256": "8645fc822432b88ba326cff56ce0fdf7e21480bdabdf1ba0ad4a7925224fd1e5",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 164,
+        "tick_seconds": 0.2201171990018338
+      },
+      {
+        "base_sha256": "c3c6dbe2a25c4c16caf6b598ffc782aef0df156e7289bdc37126a0042478ad51",
+        "coverage_pixels": 0,
+        "frame_sha256": "c3c6dbe2a25c4c16caf6b598ffc782aef0df156e7289bdc37126a0042478ad51",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 165,
+        "tick_seconds": 0.22058116100379266
+      },
+      {
+        "base_sha256": "be40dad99270b8baf2719924f3a1dca95a3d9532001365208543a6beef2f8433",
+        "coverage_pixels": 0,
+        "frame_sha256": "be40dad99270b8baf2719924f3a1dca95a3d9532001365208543a6beef2f8433",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 166,
+        "tick_seconds": 0.21991518899449147
+      },
+      {
+        "base_sha256": "800aad412aa2275d70e7057ff191e80d952765fc64471d333168b500eca2c384",
+        "coverage_pixels": 0,
+        "frame_sha256": "800aad412aa2275d70e7057ff191e80d952765fc64471d333168b500eca2c384",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 167,
+        "tick_seconds": 0.21757482099928893
+      },
+      {
+        "base_sha256": "00f6e83178675674e007b97746cb06decb7850443becbe58352a18359331c28f",
+        "coverage_pixels": 0,
+        "frame_sha256": "00f6e83178675674e007b97746cb06decb7850443becbe58352a18359331c28f",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 168,
+        "tick_seconds": 0.23767270799726248
+      },
+      {
+        "base_sha256": "6fb23d64c4be71733e525cbe66e74b87729b4cbefa539e5b1a53f73c02ca0e92",
+        "coverage_pixels": 0,
+        "frame_sha256": "6fb23d64c4be71733e525cbe66e74b87729b4cbefa539e5b1a53f73c02ca0e92",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 169,
+        "tick_seconds": 0.21251178300008178
+      },
+      {
+        "base_sha256": "203b08e77722096d04732b1251f9b14851a888b73a2d7674db9fc72888f6b82b",
+        "coverage_pixels": 0,
+        "frame_sha256": "203b08e77722096d04732b1251f9b14851a888b73a2d7674db9fc72888f6b82b",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 170,
+        "tick_seconds": 0.22187317002681084
+      },
+      {
+        "base_sha256": "a9da8ee47d7b919e65a8395efd43715dd8cad84e54e45333ece1b33c5b255486",
+        "coverage_pixels": 0,
+        "frame_sha256": "a9da8ee47d7b919e65a8395efd43715dd8cad84e54e45333ece1b33c5b255486",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 171,
+        "tick_seconds": 0.22066905497922562
+      },
+      {
+        "base_sha256": "8e1cc50f0e66cc80a80a8db69cddf69b2da7275bbd31b27a0b6054f89fe47c51",
+        "coverage_pixels": 0,
+        "frame_sha256": "8e1cc50f0e66cc80a80a8db69cddf69b2da7275bbd31b27a0b6054f89fe47c51",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 172,
+        "tick_seconds": 0.2204774710116908
+      },
+      {
+        "base_sha256": "708fd8f6501b7e1d0eda9eb9690eeacdefc2f1c15eb9193430a5b0148628d449",
+        "coverage_pixels": 0,
+        "frame_sha256": "708fd8f6501b7e1d0eda9eb9690eeacdefc2f1c15eb9193430a5b0148628d449",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 173,
+        "tick_seconds": 0.21983747300691903
+      },
+      {
+        "base_sha256": "dd3159ca31a5fc2317b17e3dfe7e0c01c1c262f8a092d18b073e57053e8f7996",
+        "coverage_pixels": 0,
+        "frame_sha256": "dd3159ca31a5fc2317b17e3dfe7e0c01c1c262f8a092d18b073e57053e8f7996",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 174,
+        "tick_seconds": 0.22036505298456177
+      },
+      {
+        "base_sha256": "94998468e97510a9e72f9a2905128bd54bac740783774f23e08d90d8d4461598",
+        "coverage_pixels": 0,
+        "frame_sha256": "94998468e97510a9e72f9a2905128bd54bac740783774f23e08d90d8d4461598",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 175,
+        "tick_seconds": 0.2168652709806338
+      },
+      {
+        "base_sha256": "24bfaad5c7754b2d1065385744c362834b285daaf4c84e53f21ca57c3ef4ad95",
+        "coverage_pixels": 0,
+        "frame_sha256": "24bfaad5c7754b2d1065385744c362834b285daaf4c84e53f21ca57c3ef4ad95",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 176,
+        "tick_seconds": 0.21719361600116827
+      },
+      {
+        "base_sha256": "5e111f53f46641243a41e21ade1662701d69685d248326358aeaeaa564998308",
+        "coverage_pixels": 0,
+        "frame_sha256": "5e111f53f46641243a41e21ade1662701d69685d248326358aeaeaa564998308",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 177,
+        "tick_seconds": 0.22621943801641464
+      },
+      {
+        "base_sha256": "2f0298bfc9db196b39752848a8ee0e397bee6007b90a86d2a5c0cb0ccd0f1be8",
+        "coverage_pixels": 0,
+        "frame_sha256": "2f0298bfc9db196b39752848a8ee0e397bee6007b90a86d2a5c0cb0ccd0f1be8",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 178,
+        "tick_seconds": 0.2164474080200307
+      },
+      {
+        "base_sha256": "a0ee5f6e5985c5479c0bb36c79db50efe6a521bbe0b8ed4aaa8a3d357e850c20",
+        "coverage_pixels": 0,
+        "frame_sha256": "a0ee5f6e5985c5479c0bb36c79db50efe6a521bbe0b8ed4aaa8a3d357e850c20",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 179,
+        "tick_seconds": 0.22205095397657715
+      },
+      {
+        "base_sha256": "d508016e39ff2693d28902e4a5c074410d9d4ecd75763f7cffede83c31304783",
+        "coverage_pixels": 0,
+        "frame_sha256": "d508016e39ff2693d28902e4a5c074410d9d4ecd75763f7cffede83c31304783",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 180,
+        "tick_seconds": 0.22325075897970237
+      },
+      {
+        "base_sha256": "68fb06c4f25d7f41a1c2c394dcac4e260d3b0a8433e0787d68b360c4305c9f03",
+        "coverage_pixels": 0,
+        "frame_sha256": "68fb06c4f25d7f41a1c2c394dcac4e260d3b0a8433e0787d68b360c4305c9f03",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 181,
+        "tick_seconds": 0.21943394100526348
+      },
+      {
+        "base_sha256": "34b6a0d071bd20f9ef27bc700af2d5fa540a8db2fdd9cc2fea5fd1ff42db22b7",
+        "coverage_pixels": 0,
+        "frame_sha256": "34b6a0d071bd20f9ef27bc700af2d5fa540a8db2fdd9cc2fea5fd1ff42db22b7",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 182,
+        "tick_seconds": 0.21669368399307132
+      },
+      {
+        "base_sha256": "ef4fcad53dbc8410ae0251ba637eb8bccd7eea130310463b0a9b45f2493e5557",
+        "coverage_pixels": 0,
+        "frame_sha256": "ef4fcad53dbc8410ae0251ba637eb8bccd7eea130310463b0a9b45f2493e5557",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 183,
+        "tick_seconds": 0.21946265501901507
+      },
+      {
+        "base_sha256": "c825fdd4d8cb013f85093b415f682e78b7faf9cf592e32b54b31e6be37876251",
+        "coverage_pixels": 0,
+        "frame_sha256": "c825fdd4d8cb013f85093b415f682e78b7faf9cf592e32b54b31e6be37876251",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 184,
+        "tick_seconds": 0.2161759189912118
+      },
+      {
+        "base_sha256": "414e4ea2922b661cef71cd47e41ecf5a368f9b92503712027b64fa25bbcc207c",
+        "coverage_pixels": 0,
+        "frame_sha256": "414e4ea2922b661cef71cd47e41ecf5a368f9b92503712027b64fa25bbcc207c",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 185,
+        "tick_seconds": 0.22051860200008377
+      },
+      {
+        "base_sha256": "7ab76bc46983ca1266300a84829627ced11a03d8d17405330b3f0a96848bc9ae",
+        "coverage_pixels": 0,
+        "frame_sha256": "7ab76bc46983ca1266300a84829627ced11a03d8d17405330b3f0a96848bc9ae",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 186,
+        "tick_seconds": 0.21840699500171468
+      },
+      {
+        "base_sha256": "6f4f699580bc2427493bdaf3b695b4be0e9a2635be34a66d8cc97e2c1ac41b1e",
+        "coverage_pixels": 0,
+        "frame_sha256": "6f4f699580bc2427493bdaf3b695b4be0e9a2635be34a66d8cc97e2c1ac41b1e",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 187,
+        "tick_seconds": 0.2184971570095513
+      },
+      {
+        "base_sha256": "f7eb5fdf4bf8f6890284d3724b5765e1330b3f4e51cbda817bbe0bfb448631cd",
+        "coverage_pixels": 0,
+        "frame_sha256": "f7eb5fdf4bf8f6890284d3724b5765e1330b3f4e51cbda817bbe0bfb448631cd",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 188,
+        "tick_seconds": 0.22890232998179272
+      },
+      {
+        "base_sha256": "d3a7d8bae8b75591ec88bfa5a0700678f96d284f862dc9be9716eac2b01b655a",
+        "coverage_pixels": 0,
+        "frame_sha256": "d3a7d8bae8b75591ec88bfa5a0700678f96d284f862dc9be9716eac2b01b655a",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 189,
+        "tick_seconds": 0.2517812750011217
+      },
+      {
+        "base_sha256": "f3f617a7af4ff51212126224d4a7b93c74ede37cc10276c401a7d3eafa0e371b",
+        "coverage_pixels": 0,
+        "frame_sha256": "f3f617a7af4ff51212126224d4a7b93c74ede37cc10276c401a7d3eafa0e371b",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 190,
+        "tick_seconds": 0.2428221769805532
+      },
+      {
+        "base_sha256": "5c63946d0c273bb903d0b03d21bf969a5bb8d7c53b588446f7faddd3c8167501",
+        "coverage_pixels": 0,
+        "frame_sha256": "5c63946d0c273bb903d0b03d21bf969a5bb8d7c53b588446f7faddd3c8167501",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 191,
+        "tick_seconds": 0.25101213000016287
+      },
+      {
+        "base_sha256": "1785af40932c29671b4fd2f56a9dd328702b4d2c07428597e14b2e0f5ada855c",
+        "coverage_pixels": 0,
+        "frame_sha256": "1785af40932c29671b4fd2f56a9dd328702b4d2c07428597e14b2e0f5ada855c",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 192,
+        "tick_seconds": 0.24786307697650045
+      },
+      {
+        "base_sha256": "e2735b589bebd6a201e5fb2b4a81dee89446decf17a28c546446bce4af6fae3a",
+        "coverage_pixels": 0,
+        "frame_sha256": "e2735b589bebd6a201e5fb2b4a81dee89446decf17a28c546446bce4af6fae3a",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 193,
+        "tick_seconds": 0.23082749801687896
+      },
+      {
+        "base_sha256": "81f68ef2f7a8892549d063588f05958ab5effc443d7a221c1b747731ffcfdfd4",
+        "coverage_pixels": 0,
+        "frame_sha256": "81f68ef2f7a8892549d063588f05958ab5effc443d7a221c1b747731ffcfdfd4",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 194,
+        "tick_seconds": 0.22112539602676407
+      },
+      {
+        "base_sha256": "233e038dd874685f2f6b6ba45b38eeda63448a9d251f7a0c54ad81eba2d56632",
+        "coverage_pixels": 0,
+        "frame_sha256": "233e038dd874685f2f6b6ba45b38eeda63448a9d251f7a0c54ad81eba2d56632",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 195,
+        "tick_seconds": 0.21844552500988357
+      },
+      {
+        "base_sha256": "c4c2616d137d760243a640d33021df1350ccedbe345be43f403604d3559d6409",
+        "coverage_pixels": 0,
+        "frame_sha256": "c4c2616d137d760243a640d33021df1350ccedbe345be43f403604d3559d6409",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 196,
+        "tick_seconds": 0.2234204510168638
+      },
+      {
+        "base_sha256": "3cc81789f336126e0ebe5e033fc8ef3991fe581d00558a38d15a3808ed66b2d4",
+        "coverage_pixels": 0,
+        "frame_sha256": "3cc81789f336126e0ebe5e033fc8ef3991fe581d00558a38d15a3808ed66b2d4",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 197,
+        "tick_seconds": 0.2217255830182694
+      },
+      {
+        "base_sha256": "90bbd6ed956c9cef71c71a0eb090e9e7d2847418f39418972b8bc7651ac66bf1",
+        "coverage_pixels": 0,
+        "frame_sha256": "90bbd6ed956c9cef71c71a0eb090e9e7d2847418f39418972b8bc7651ac66bf1",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 198,
+        "tick_seconds": 0.21925180000835098
+      },
+      {
+        "base_sha256": "dfd26b8eef6a551b81f130450ba900b970be2837e14f51d5bf530f1f09d61f16",
+        "coverage_pixels": 0,
+        "frame_sha256": "dfd26b8eef6a551b81f130450ba900b970be2837e14f51d5bf530f1f09d61f16",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 199,
+        "tick_seconds": 0.21735066201654263
+      },
+      {
+        "base_sha256": "c3f78ed7b482291540effc9d82fc5e41db1a57157d09f7d76a5d6a00075c8c3a",
+        "coverage_pixels": 0,
+        "frame_sha256": "c3f78ed7b482291540effc9d82fc5e41db1a57157d09f7d76a5d6a00075c8c3a",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 200,
+        "tick_seconds": 0.21818276299745776
+      },
+      {
+        "base_sha256": "09420dffcde788b339e60d6707f2e437ee449fe69105c43a3269123dcad6ffe6",
+        "coverage_pixels": 0,
+        "frame_sha256": "09420dffcde788b339e60d6707f2e437ee449fe69105c43a3269123dcad6ffe6",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 201,
+        "tick_seconds": 0.22167477998300456
+      },
+      {
+        "base_sha256": "09420dffcde788b339e60d6707f2e437ee449fe69105c43a3269123dcad6ffe6",
+        "coverage_pixels": 0,
+        "frame_sha256": "09420dffcde788b339e60d6707f2e437ee449fe69105c43a3269123dcad6ffe6",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 202,
+        "tick_seconds": 0.2185713050130289
+      },
+      {
+        "base_sha256": "09420dffcde788b339e60d6707f2e437ee449fe69105c43a3269123dcad6ffe6",
+        "coverage_pixels": 0,
+        "frame_sha256": "09420dffcde788b339e60d6707f2e437ee449fe69105c43a3269123dcad6ffe6",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 203,
+        "tick_seconds": 0.21955437900032848
+      },
+      {
+        "base_sha256": "09420dffcde788b339e60d6707f2e437ee449fe69105c43a3269123dcad6ffe6",
+        "coverage_pixels": 0,
+        "frame_sha256": "09420dffcde788b339e60d6707f2e437ee449fe69105c43a3269123dcad6ffe6",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 204,
+        "tick_seconds": 0.21889169997302815
+      },
+      {
+        "base_sha256": "09420dffcde788b339e60d6707f2e437ee449fe69105c43a3269123dcad6ffe6",
+        "coverage_pixels": 0,
+        "frame_sha256": "09420dffcde788b339e60d6707f2e437ee449fe69105c43a3269123dcad6ffe6",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 205,
+        "tick_seconds": 0.20866443699924275
+      },
+      {
+        "base_sha256": "09420dffcde788b339e60d6707f2e437ee449fe69105c43a3269123dcad6ffe6",
+        "coverage_pixels": 0,
+        "frame_sha256": "09420dffcde788b339e60d6707f2e437ee449fe69105c43a3269123dcad6ffe6",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 206,
+        "tick_seconds": 0.22063286800403148
+      },
+      {
+        "base_sha256": "09420dffcde788b339e60d6707f2e437ee449fe69105c43a3269123dcad6ffe6",
+        "coverage_pixels": 0,
+        "frame_sha256": "09420dffcde788b339e60d6707f2e437ee449fe69105c43a3269123dcad6ffe6",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 207,
+        "tick_seconds": 0.21778739601722918
+      },
+      {
+        "base_sha256": "0cec29b4bff9becf18b2ab304436f981e35a286983ff09423fffa7d2fb394c11",
+        "coverage_pixels": 0,
+        "frame_sha256": "0cec29b4bff9becf18b2ab304436f981e35a286983ff09423fffa7d2fb394c11",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 208,
+        "tick_seconds": 0.216655901982449
+      },
+      {
+        "base_sha256": "6464fbe0079dd08a444f502c4a123b3857ab836d7fa1776c3705e927cc418959",
+        "coverage_pixels": 0,
+        "frame_sha256": "6464fbe0079dd08a444f502c4a123b3857ab836d7fa1776c3705e927cc418959",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 209,
+        "tick_seconds": 0.21939769000164233
+      },
+      {
+        "base_sha256": "12cf80c050e583ac52d12f7f2428672b9f2961863a0a1f95f26fedc59aabc810",
+        "coverage_pixels": 0,
+        "frame_sha256": "12cf80c050e583ac52d12f7f2428672b9f2961863a0a1f95f26fedc59aabc810",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 210,
+        "tick_seconds": 0.21758758899522945
+      },
+      {
+        "base_sha256": "c1130de7ad7c29d73af2e6309a9cc8569cdd588bc9f6a2a1ea03b317f2066eeb",
+        "coverage_pixels": 0,
+        "frame_sha256": "c1130de7ad7c29d73af2e6309a9cc8569cdd588bc9f6a2a1ea03b317f2066eeb",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 211,
+        "tick_seconds": 0.21966917501413263
+      },
+      {
+        "base_sha256": "9c3545fcf281e2f74a6a3596a000601b9678c6dae486cd93723aa0b3f9ab1e4c",
+        "coverage_pixels": 0,
+        "frame_sha256": "9c3545fcf281e2f74a6a3596a000601b9678c6dae486cd93723aa0b3f9ab1e4c",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 212,
+        "tick_seconds": 0.21990198400453664
+      },
+      {
+        "base_sha256": "8fe518696e13e9706c40b84127fd8c8c4dc7bfb6be19580f32f259befec5946b",
+        "coverage_pixels": 0,
+        "frame_sha256": "8fe518696e13e9706c40b84127fd8c8c4dc7bfb6be19580f32f259befec5946b",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 213,
+        "tick_seconds": 0.2107542010198813
+      },
+      {
+        "base_sha256": "744b6006091c8a72846664f7f33f81d8497e6093d977c9c9285a912bb662be0a",
+        "coverage_pixels": 0,
+        "frame_sha256": "744b6006091c8a72846664f7f33f81d8497e6093d977c9c9285a912bb662be0a",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 214,
+        "tick_seconds": 0.20985822600778192
+      },
+      {
+        "base_sha256": "4c6c5595c3efc85b4270c4b68e989ac35c698ca43994c704e2c09adc4af48fa8",
+        "coverage_pixels": 0,
+        "frame_sha256": "4c6c5595c3efc85b4270c4b68e989ac35c698ca43994c704e2c09adc4af48fa8",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 215,
+        "tick_seconds": 0.21773681900231168
+      },
+      {
+        "base_sha256": "bb620d89bb643f472f86be3ec05489276ee7f9756efea4151567a01b1dc9daa0",
+        "coverage_pixels": 0,
+        "frame_sha256": "bb620d89bb643f472f86be3ec05489276ee7f9756efea4151567a01b1dc9daa0",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 216,
+        "tick_seconds": 0.2200622420059517
+      },
+      {
+        "base_sha256": "4aaa50f5c8841777883a140cf82389348cf0ecf1323034c5c4da42419d511b97",
+        "coverage_pixels": 0,
+        "frame_sha256": "4aaa50f5c8841777883a140cf82389348cf0ecf1323034c5c4da42419d511b97",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 217,
+        "tick_seconds": 0.22024200501618907
+      },
+      {
+        "base_sha256": "cfdbbea29cf37f31350788bda63aee058d8251da6efc919955d2de29d6de0987",
+        "coverage_pixels": 0,
+        "frame_sha256": "cfdbbea29cf37f31350788bda63aee058d8251da6efc919955d2de29d6de0987",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 218,
+        "tick_seconds": 0.22124029099359177
+      },
+      {
+        "base_sha256": "8cb2708632386e36d705fe637a806b0c360cd6ed94cc3fcc18b1ff0c90499ffc",
+        "coverage_pixels": 0,
+        "frame_sha256": "8cb2708632386e36d705fe637a806b0c360cd6ed94cc3fcc18b1ff0c90499ffc",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 219,
+        "tick_seconds": 0.2178311049938202
+      },
+      {
+        "base_sha256": "91f5370d409dd8a2ae5a3ad9666279a79d9a67016b0575578d16a8a43c5c5645",
+        "coverage_pixels": 0,
+        "frame_sha256": "91f5370d409dd8a2ae5a3ad9666279a79d9a67016b0575578d16a8a43c5c5645",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 220,
+        "tick_seconds": 0.21494382098899223
+      },
+      {
+        "base_sha256": "3ff26a23c8e8ebbcf0dfa718eaac7bcc1d714693945f9fb406e7ce2006740ad9",
+        "coverage_pixels": 0,
+        "frame_sha256": "3ff26a23c8e8ebbcf0dfa718eaac7bcc1d714693945f9fb406e7ce2006740ad9",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 221,
+        "tick_seconds": 0.22200584100210108
+      },
+      {
+        "base_sha256": "8324b6e35d1b185b8c3f5f24218911d58ffe1ddcac976b11326cc1851987156e",
+        "coverage_pixels": 0,
+        "frame_sha256": "8324b6e35d1b185b8c3f5f24218911d58ffe1ddcac976b11326cc1851987156e",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 222,
+        "tick_seconds": 0.21945353300543502
+      },
+      {
+        "base_sha256": "b464436e58b4ffff9f682bdb033279eb38c3fe837b8eb05ede5439591ea01a5f",
+        "coverage_pixels": 0,
+        "frame_sha256": "b464436e58b4ffff9f682bdb033279eb38c3fe837b8eb05ede5439591ea01a5f",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 223,
+        "tick_seconds": 0.21786056697601452
+      },
+      {
+        "base_sha256": "35d0483c7580a9c4cbfb32435cae3a9480ec2a1436d1559d63a8f6339a8dcc6f",
+        "coverage_pixels": 0,
+        "frame_sha256": "35d0483c7580a9c4cbfb32435cae3a9480ec2a1436d1559d63a8f6339a8dcc6f",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 224,
+        "tick_seconds": 0.21778899600030854
+      },
+      {
+        "base_sha256": "8a2e97f5bc644aacd6c07abe574659677e729a91cccc16887339000c03460d1a",
+        "coverage_pixels": 0,
+        "frame_sha256": "8a2e97f5bc644aacd6c07abe574659677e729a91cccc16887339000c03460d1a",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 225,
+        "tick_seconds": 0.2201438800257165
+      },
+      {
+        "base_sha256": "94c9b71bd598a57c4071dd516a7e8f363fd1d0e3c1356aed7e9ad4949c95d41c",
+        "coverage_pixels": 0,
+        "frame_sha256": "94c9b71bd598a57c4071dd516a7e8f363fd1d0e3c1356aed7e9ad4949c95d41c",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 226,
+        "tick_seconds": 0.21627400899888016
+      },
+      {
+        "base_sha256": "72e68aae9a8642e7c9e5cf0a150dad8936f81618cc646a3ccdb2cea504f976be",
+        "coverage_pixels": 0,
+        "frame_sha256": "72e68aae9a8642e7c9e5cf0a150dad8936f81618cc646a3ccdb2cea504f976be",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 227,
+        "tick_seconds": 0.22347149497363716
+      },
+      {
+        "base_sha256": "5b91d361e5df1bb1744e90f8453f9bd7765a00e90cb0b9947afb101890d48764",
+        "coverage_pixels": 0,
+        "frame_sha256": "5b91d361e5df1bb1744e90f8453f9bd7765a00e90cb0b9947afb101890d48764",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 228,
+        "tick_seconds": 0.22260423502302729
+      },
+      {
+        "base_sha256": "fd160a951ddf9a80fe3b858ea134aaf77ab68a0227cf4591ef7a9d392b07d8ff",
+        "coverage_pixels": 0,
+        "frame_sha256": "fd160a951ddf9a80fe3b858ea134aaf77ab68a0227cf4591ef7a9d392b07d8ff",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 229,
+        "tick_seconds": 0.21479666899540462
+      },
+      {
+        "base_sha256": "31b92d72ed85de41ee6f9c2d9d51a52fffa4ad343eb33bb53464b7d87846f3f8",
+        "coverage_pixels": 0,
+        "frame_sha256": "31b92d72ed85de41ee6f9c2d9d51a52fffa4ad343eb33bb53464b7d87846f3f8",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 230,
+        "tick_seconds": 0.22225409699603915
+      },
+      {
+        "base_sha256": "1f13f256c07a2b87d75ea734f0714c8194acc9d0eb6515eb302625e23af0d37b",
+        "coverage_pixels": 0,
+        "frame_sha256": "1f13f256c07a2b87d75ea734f0714c8194acc9d0eb6515eb302625e23af0d37b",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 231,
+        "tick_seconds": 0.21917341800872236
+      },
+      {
+        "base_sha256": "32365e6665bed0feee14a852263e89666937448ed27c6058bb4735d6826bdc15",
+        "coverage_pixels": 0,
+        "frame_sha256": "32365e6665bed0feee14a852263e89666937448ed27c6058bb4735d6826bdc15",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 232,
+        "tick_seconds": 0.21982808399479836
+      },
+      {
+        "base_sha256": "aec0fbb65cba27923c7443a91f7e0e8c24cbf6a525e65e6eb3444d56a5de11ba",
+        "coverage_pixels": 0,
+        "frame_sha256": "aec0fbb65cba27923c7443a91f7e0e8c24cbf6a525e65e6eb3444d56a5de11ba",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 233,
+        "tick_seconds": 0.21660456398967654
+      },
+      {
+        "base_sha256": "458f6e5efdd079344800c891cf686d849bc3ecbca05188117068219013a1d41a",
+        "coverage_pixels": 0,
+        "frame_sha256": "458f6e5efdd079344800c891cf686d849bc3ecbca05188117068219013a1d41a",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 234,
+        "tick_seconds": 0.21881457697600126
+      },
+      {
+        "base_sha256": "799b92906501279985dd9055bdcdadbdaf5be3b31caee8f19c1cea25b3221d2b",
+        "coverage_pixels": 0,
+        "frame_sha256": "799b92906501279985dd9055bdcdadbdaf5be3b31caee8f19c1cea25b3221d2b",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 235,
+        "tick_seconds": 0.2230405879963655
+      },
+      {
+        "base_sha256": "5bd4f60f1534cf75802d885a97d29b0fb92b7c3ea693335c8312d771b372a496",
+        "coverage_pixels": 0,
+        "frame_sha256": "5bd4f60f1534cf75802d885a97d29b0fb92b7c3ea693335c8312d771b372a496",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 236,
+        "tick_seconds": 0.2205634530109819
+      },
+      {
+        "base_sha256": "b3877f627e7079aaae238cb6e79000077b32f2573089e2b373028e7d0874467a",
+        "coverage_pixels": 0,
+        "frame_sha256": "b3877f627e7079aaae238cb6e79000077b32f2573089e2b373028e7d0874467a",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 237,
+        "tick_seconds": 0.21502604900160804
+      },
+      {
+        "base_sha256": "1fd3fa270fef25b30c406a09e682de8eeb7b57dcb64a025d1f88ab07cc02749c",
+        "coverage_pixels": 0,
+        "frame_sha256": "1fd3fa270fef25b30c406a09e682de8eeb7b57dcb64a025d1f88ab07cc02749c",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 238,
+        "tick_seconds": 0.2207231140055228
+      },
+      {
+        "base_sha256": "1fd3fa270fef25b30c406a09e682de8eeb7b57dcb64a025d1f88ab07cc02749c",
+        "coverage_pixels": 0,
+        "frame_sha256": "1fd3fa270fef25b30c406a09e682de8eeb7b57dcb64a025d1f88ab07cc02749c",
+        "projected_pixels": {
+          "medvedev_struff__000_at120__person_000000000002": 0,
+          "medvedev_struff__000_at120__person_000000000005": 0
+        },
+        "sam_seconds": 0.0,
+        "status": {
+          "medvedev_struff__000_at120__person_000000000002": "missing_pose",
+          "medvedev_struff__000_at120__person_000000000005": "missing_pose"
+        },
+        "tick": 239,
+        "tick_seconds": 0.2245268349943217
+      }
+    ],
+    "sam_load": {
+      "build_options": {
+        "compile": false,
+        "multiplex_count": 16,
+        "use_fa3": false,
+        "use_rope_real": false
+      },
+      "checkpoint_sha256": "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6",
+      "image_size": 1008,
+      "loaded_keys": 931,
+      "max_cond_frames_in_attn": 4,
+      "missing_keys": [],
+      "model_keys": 931,
+      "sdpa_backend_policy": "native_flash",
+      "skipped_checkpoint_prefixes": [
+        "detector.backbone",
+        "detector.dot_prod_scoring",
+        "detector.geometry_encoder",
+        "detector.segmentation_head",
+        "detector.transformer"
+      ],
+      "source_revision": "2345a4ad109ac29c569da749c91d84f10dc08c40",
+      "unexpected_keys": []
+    },
+    "sam_model_load_seconds": 40.60061846199096,
+    "sam_runtime": {
+      "capability": [
+        8,
+        6
+      ],
+      "cuda": "12.8",
+      "cudnn": 91002,
+      "gpu": "NVIDIA RTX A6000",
+      "torch": "2.10.0+cu128",
+      "visible_devices": "GPU-6f70a27e-4171-22d7-3ffd-647e7f186a49"
+    },
+    "sam_weight": "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6",
+    "scope": "common-player receiver",
+    "ticks": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119,
+      120,
+      121,
+      122,
+      123,
+      124,
+      125,
+      126,
+      127,
+      128,
+      129,
+      130,
+      131,
+      132,
+      133,
+      134,
+      135,
+      136,
+      137,
+      138,
+      139,
+      140,
+      141,
+      142,
+      143,
+      144,
+      145,
+      146,
+      147,
+      148,
+      149,
+      150,
+      151,
+      152,
+      153,
+      154,
+      155,
+      156,
+      157,
+      158,
+      159,
+      160,
+      161,
+      162,
+      163,
+      164,
+      165,
+      166,
+      167,
+      168,
+      169,
+      170,
+      171,
+      172,
+      173,
+      174,
+      175,
+      176,
+      177,
+      178,
+      179,
+      180,
+      181,
+      182,
+      183,
+      184,
+      185,
+      186,
+      187,
+      188,
+      189,
+      190,
+      191,
+      192,
+      193,
+      194,
+      195,
+      196,
+      197,
+      198,
+      199,
+      200,
+      201,
+      202,
+      203,
+      204,
+      205,
+      206,
+      207,
+      208,
+      209,
+      210,
+      211,
+      212,
+      213,
+      214,
+      215,
+      216,
+      217,
+      218,
+      219,
+      220,
+      221,
+      222,
+      223,
+      224,
+      225,
+      226,
+      227,
+      228,
+      229,
+      230,
+      231,
+      232,
+      233,
+      234,
+      235,
+      236,
+      237,
+      238,
+      239
+    ],
+    "total_receiver_bytes": 216098,
+    "wire": {
+      "active_ticks": [
+        0,
+        120
+      ],
+      "ball_positions": 111,
+      "cache_bytes": 202948,
+      "cache_roles": {
+        "frame": 0,
+        "match": 0,
+        "reference": 201114,
+        "window": 1834
+      },
+      "cache_sha256": "90f5dbc9f5753b2688a828c12362d808e1db197f44b097c0093ba28cef7ea038",
+      "joint_bytes": 13940,
+      "joint_roles": {
+        "frame": 12586,
+        "match": 0,
+        "reference": 0,
+        "window": 1354
+      },
+      "joint_sha256": "615596d2f78d08ebd07fc9dd66136bf586d5c1f2d2921b71aea4dfc437df2b8b"
+    },
+    "yuv_sha256": "8dd8b53abb1480f5a8e99b9578306d382b28f2073ed2fa4d63f55503e3d1e8f5"
+  }
+}

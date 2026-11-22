@@ -1,0 +1,41 @@
+{
+  "source_sha256": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+  "hardware": [
+    "gpu6",
+    "NVIDIA RTX 6000 Ada Generation",
+    "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553"
+  ],
+  "validated": true,
+  "native_sampler_sha256": "cd695bd1833cd8f773288511c5ae96b7a4891aa62caed27cee44585fd4ca8a5c",
+  "physical_receipt_sha256": "b7e5bf513612d5d53cca532d4ae280dd196d1c877e2b07a62758c023b52154e9",
+  "scope": "Baseline-only Sydney control; no valid joint receiver pictures.",
+  "producer": "20261122T143517Z-11d32b04",
+  "source_commit": "7b18a56cccf1a0222911af00ca7820d290804676",
+  "snapshot_sha256": "0a019d9ebdfb5dfd36ec9093daddb14d0039a549b2fbf74f6140817cbf07d2fa",
+  "spec_sha256": "49c12600ce9d42152f18c37909a6660abcde30f0b16d5191cae729c9fc501792",
+  "archive_sha256": "0d976444e3bd4ee7a0adb1f5f0a2d70edfe53c5cc58dcd774d010e6c1b88e296",
+  "archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T143517Z-11d32b04/full/published.tar",
+  "selected_archive_sha256": "7ac0520fef7a21f66d17a3778096ac041ad117f7ea8422a90d5d1fd738fbf4b6",
+  "native_frames_authenticated": 240,
+  "native_display": [
+    960,
+    544
+  ],
+  "stream_bytes": 132738,
+  "bitstream_sha256": "6c9644ab8239cafcb01929554a81715bda2c7c4ede222719c4fd48be6eeb9e94",
+  "decoded_yuv_sha256": "5b303c962a40693919d830170ff6eb0a2b1dbe36795d09e5a5d6ebf847b2cece",
+  "selected_native_yuv_sha256": {
+    "9": "f319d518b16bf2a74c61fea988c13e179ec90fbfde0394dd42ea591074c2a880",
+    "32": "eb79c2a4430ae0677e4e9de94d2b10ace62652917e24494acc34d9cfbe5d1773",
+    "44": "3e1d2eb58ce3c8f6ff2305ee0843dd73e4a3a1c898985b0cd1e2f345c2bc5376",
+    "68": "063a3ca359c2fd03a63b3d89cbeb6e1630dff4b1c3cbe89f1aab141360bbbe50",
+    "92": "26ed176cb802f2c6a5798a19b6ec10d2cd78ae36a558c137bd869e16078ffb03",
+    "115": "b3c8999be548e7db2303957a65b6b09688ee719d38e427b0be70c586ce7891ed",
+    "127": "c01b577e7436d2147c3391a7191d38490f45e982b8ca9837169dd91f93d44900",
+    "151": "9b9042a64e5d7b91dcb4d0c0b86dc1177a02ffbcc07c00a209ac5f1bd689cd57",
+    "175": "53b23468d29d43f184f8f82afc79eb7c2b3020a3d3e5ddcd33a9f41223e61b1c",
+    "198": "d4e1d642489f0dc5f85f82b01621ef6d29b3582233b41844f81234337ce030d8",
+    "210": "ada186ee61a98e4ef132a653f2b0d3809a04c14cb714df865e0e14b4fd331bef",
+    "234": "d6a39666a5bacfab3fbac60cb00535057ff9f6e093a00948dc4209c61853ec27"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "job_id": "20261122T135354Z-7869db91",
+  "initial_state": "submission_unknown",
+  "management_host": "gpu6",
+  "canonical_status": "unpublished or unknown",
+  "shared_inbox_members": ["events/", "source.tar"],
+  "source_tar_bytes": 21084052,
+  "ready_json": false,
+  "spec_json": false,
+  "worker_claim": false,
+  "scientific_compute_seconds": 0,
+  "disposition": "Original upload process exited before the atomic last ready marker. Preserve the original partial archive. The separately named request transfers only the committed runtime, encoder, decoder and their transitive local dependencies."
+}

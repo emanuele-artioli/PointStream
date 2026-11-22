@@ -1,0 +1,37 @@
+{
+  "archive_sha256": "a833d1b6ca5d329ca1c1ff64c533d6c3a1ec2ce1e4643b18a301416af15302dd",
+  "job_id": "20261122T131301Z-aebb0fec",
+  "timing": {
+    "worker_wall_seconds": 73.46419347598567,
+    "archive_seconds": 7.745560573996045,
+    "verify_seconds": 5.870434879994718,
+    "archive_bytes": 1499740160,
+    "archive_sha256": "a833d1b6ca5d329ca1c1ff64c533d6c3a1ec2ce1e4643b18a301416af15302dd"
+  },
+  "wire": {
+    "active_ticks": [
+      69,
+      189
+    ],
+    "ball_positions": 108,
+    "cache_bytes": 167153,
+    "cache_roles": {
+      "frame": 0,
+      "match": 0,
+      "reference": 165319,
+      "window": 1834
+    },
+    "cache_sha256": "4286ee1f22f16ff4c31414352edd838855384ca4c3f5ad9fa5b6aa2e38c6bb9d",
+    "joint_bytes": 14010,
+    "joint_roles": {
+      "frame": 12654,
+      "match": 0,
+      "reference": 0,
+      "window": 1356
+    },
+    "joint_sha256": "dbd41008a727bc2878187454a30fde166e79a438c41bb87775ff96bb943c7a0f"
+  },
+  "ticks": 240,
+  "active_frame_nonempty": 120,
+  "role_coverage": {}
+}

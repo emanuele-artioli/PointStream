@@ -1,0 +1,17 @@
+{
+  "match": "match105",
+  "frames": 240,
+  "source_sha256": "a518fd0850781642b2233cb1a8e0d910f253952f0d9d3d206326ce8d35ad0d0c",
+  "rate_archive_sha256": "874da9840c0cbe49b4ba1d450fbaa2a58b316130b7cbe08bc0f9fad9b641918e",
+  "rgb_sha256": {
+    "source": "f500746b43f021959a12df69ceef1d78683798260c31c8e40c7d2aa95d175b84",
+    "ordinary": "b9bc765b6badf324584031a15942827ca71f5c10bf95e5d00e3efc59a8dadf5c",
+    "candidate": "814fc34e807f6a5951d4f577356174efb7ae10cdbe12c44816fbc5f557b72743"
+  },
+  "bytes": {
+    "source": 242366832,
+    "ordinary": 231023491,
+    "candidate": 228657048
+  },
+  "elapsed": 32.590705382986926
+}

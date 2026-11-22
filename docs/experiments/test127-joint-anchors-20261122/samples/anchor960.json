@@ -1,0 +1,112 @@
+{
+  "job": "20261122T140251Z-ebbc4c2c",
+  "archive_sha256": "2194bc2226f73de1d7abe659535f15dde08cac4997ca24cafa917d419b09a0cb",
+  "selected_yuv_sha256": "a48d16bae811cc09d006104a901f0a1e2d00f7fa097b42a2182606d3481f7967",
+  "source_witness_sha256": "9ca32ad1a8e70f3c2b74ef064ca271c5f7b811089735314b5fb3e81d12146563",
+  "seconds": 10.90930266698706,
+  "arms": [
+    {
+      "subdirectory": "ordinary-960-cold",
+      "mode": "SVT-AV1 ordinary 960x544 cold",
+      "bytes": 161650,
+      "bitstream_sha256": "0f41a5511b1a80af6f191b838490087be6e99f82b3e72f8e2b3943b5c7a32246",
+      "decoded_sha256": "47ad99b552e5ca3e2d5dd1e4511c2e9e212400db3c1f61583263c7ddeb4e9306",
+      "native_archive_sha256": "2194bc2226f73de1d7abe659535f15dde08cac4997ca24cafa917d419b09a0cb",
+      "job": "20261122T140251Z-ebbc4c2c",
+      "frames": [
+        {
+          "tick": 9,
+          "path": "tick-009.png",
+          "png_sha256": "6c5bc2bc7ccbbf1cb11b64f3f5673291ff1a7ce9d16c03ff917e819c02a23cbc",
+          "rgb_sha256": "1a299e1ab8481bddd50734163e9a4e49524e9d8f7e992aaaa5ddfcf1c0258db7",
+          "source_rgb_sha256": "54a5fc901fe70e09c29732b461325a6b842208064fbb9068da7960950aee59a9"
+        },
+        {
+          "tick": 32,
+          "path": "tick-032.png",
+          "png_sha256": "3d4088107591e767c9c4212b67c06c6f44352774f70822012264b1df5a57043a",
+          "rgb_sha256": "97fec06ce305b4c48f43d077d9561c4bde350fb9da9aece625d01b442f12e351",
+          "source_rgb_sha256": "09aeaaafbaf21b36124aa1eb299512e3e9e416c3d87fdaf9473cd86ed06fcf7b"
+        },
+        {
+          "tick": 44,
+          "path": "tick-044.png",
+          "png_sha256": "aefa1e40bc6b93d32f124dfc3f3ef4b3e26a4426156cf0bfe0893a93c95f552c",
+          "rgb_sha256": "d6c228a92a41002f6e64e2697d24b28250af54fb209c6f7d117fea629e842d5c",
+          "source_rgb_sha256": "c1cfaa597eb0497945f110ffac709c0cb0d598609b64b43689386c4cd9578e37"
+        },
+        {
+          "tick": 68,
+          "path": "tick-068.png",
+          "png_sha256": "0d7f5733c95da3529747b1f58e8668504a44717e86c1bb3eb02bfa7acaf886ea",
+          "rgb_sha256": "9344ad6419bfa246200092c0b95dff2f9e634c03d638f274ea46f34d862753d2",
+          "source_rgb_sha256": "2be837cc6b596489b23a1c6372efb91cbd51e1d3dd5752966fde8ab38b65be77"
+        },
+        {
+          "tick": 92,
+          "path": "tick-092.png",
+          "png_sha256": "ca505057e27b2eb7a273d8454cb340b25049fb967576eaa168f4da3a382de791",
+          "rgb_sha256": "24d35174183ebd3cf8ed8bd5b0aae05a8469c867985a5fe51508a7671a7f4b99",
+          "source_rgb_sha256": "ea49edab28a721576b6530aa543653d0efaac87d55ac2e150b00aa4f02d27be0"
+        },
+        {
+          "tick": 115,
+          "path": "tick-115.png",
+          "png_sha256": "76ced0c0e3beb13228283dd70e1a81f94bc847492d2d598002b9c6a47d55b091",
+          "rgb_sha256": "1904ddaa401d3dd76243ee47bc80b2c95b75c2d9cb54f21c2cb46059d559e7dc",
+          "source_rgb_sha256": "b7b1d29e40e9c7107ef94a1818c8894a471b508d3f5112d5fc7f4601e755451e"
+        },
+        {
+          "tick": 127,
+          "path": "tick-127.png",
+          "png_sha256": "dc42248603e8e8180465af50ae9d052e290a27b4a12ff7f63234e2b49fa17fb1",
+          "rgb_sha256": "b6a5c66cf941aeeb53a4698702c38859ab5fe29be6e2af72d51ad33c1eecec59",
+          "source_rgb_sha256": "5604ceb973b535e86d568f44e6ec8ad0aeba1cd5c29d9232c1ceae97bfd92a47"
+        },
+        {
+          "tick": 151,
+          "path": "tick-151.png",
+          "png_sha256": "29b6def84f2c89ebb4fc791b24b74c899c5a4307b1d4be2004d8081c6d42da36",
+          "rgb_sha256": "7c727555351f24958c8f1671b8d6291f7763db083f21ee0bb7e118ebaa34289d",
+          "source_rgb_sha256": "269a6d2ca09dbd197241219c904d87943d87030f1fc20da482157ea72a523b47"
+        },
+        {
+          "tick": 175,
+          "path": "tick-175.png",
+          "png_sha256": "f67df8a53c0d7e0ea491ddb4e87ac50125e5d344dbb54affa73fb7a5d0e6b312",
+          "rgb_sha256": "6ac6d9b905f90371b18715ebe75e569c805d9bffcea407242f351e759bab0257",
+          "source_rgb_sha256": "a1ffdd125e79cc7faa4cd17dba113a38b93f751a3a992b7f41df2f8922d387e9"
+        },
+        {
+          "tick": 198,
+          "path": "tick-198.png",
+          "png_sha256": "bbbad358371b6536a25612df21c38c310c0d3b925d47ecc075370445f5cb6daa",
+          "rgb_sha256": "90829029df32e4e786abd102239908c37ca7ec28bbd1cc89544772d650232558",
+          "source_rgb_sha256": "2f5af3fbe1484ccf7320133849f591bbf4ae68ab85801dbcbe32f648729a90d0"
+        },
+        {
+          "tick": 210,
+          "path": "tick-210.png",
+          "png_sha256": "b294018eccb893a4ced4873faa6a73f135d2a51efe987e7588031869551797c9",
+          "rgb_sha256": "1809923c2e0cfdae7107e43a4df59a12b55a3ba2199fc37ddb945be367564923",
+          "source_rgb_sha256": "76336d5ed280e58702e1469101fa731aed6157bb1c2383bbc77c2b0e7fa78d80"
+        },
+        {
+          "tick": 234,
+          "path": "tick-234.png",
+          "png_sha256": "0020822025bf6fd03e67459e2a714f9f93e8bcedbb2050b665b8523dce008868",
+          "rgb_sha256": "8be73edb448f6850897fe983a0c2804e78fcabe33a78b3d8e39fd56fab11b6a8",
+          "source_rgb_sha256": "140421d547e458591da77179bc8e78485f8ebe79b4990bfa39cfe85c3557afc5"
+        }
+      ],
+      "source_ticks": 240,
+      "source_sha256": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+      "fps": [
+        60,
+        1
+      ],
+      "cv2": "4.13.0",
+      "source_review_sha256": "4da6f50fda72126756868d67c76cb9570e6190d968d81f559cdf4980bc78fb87"
+    }
+  ]
+}

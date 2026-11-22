@@ -1,0 +1,772 @@
+{
+  "jointly_scorable_ticks": [
+    10,
+    30,
+    50,
+    70,
+    90,
+    110,
+    130,
+    170,
+    190,
+    210,
+    230
+  ],
+  "decisions": [
+    {
+      "tick": 10,
+      "ball": "visible",
+      "archived-track-0": "accept",
+      "archived-track-1": "accept"
+    },
+    {
+      "tick": 30,
+      "ball": "visible",
+      "archived-track-0": "accept",
+      "archived-track-1": "accept"
+    },
+    {
+      "tick": 50,
+      "ball": "visible",
+      "archived-track-0": "accept",
+      "archived-track-1": "accept"
+    },
+    {
+      "tick": 70,
+      "ball": "visible",
+      "archived-track-0": "accept",
+      "archived-track-1": "accept"
+    },
+    {
+      "tick": 90,
+      "ball": "visible",
+      "archived-track-0": "accept",
+      "archived-track-1": "accept"
+    },
+    {
+      "tick": 110,
+      "ball": "visible",
+      "archived-track-0": "accept",
+      "archived-track-1": "accept"
+    },
+    {
+      "tick": 130,
+      "ball": "visible",
+      "archived-track-0": "accept",
+      "archived-track-1": "accept"
+    },
+    {
+      "tick": 150,
+      "ball": "missing",
+      "archived-track-0": "accept",
+      "archived-track-1": "accept"
+    },
+    {
+      "tick": 170,
+      "ball": "visible",
+      "archived-track-0": "accept",
+      "archived-track-1": "accept"
+    },
+    {
+      "tick": 190,
+      "ball": "visible",
+      "archived-track-0": "accept",
+      "archived-track-1": "accept"
+    },
+    {
+      "tick": 210,
+      "ball": "visible",
+      "archived-track-0": "accept",
+      "archived-track-1": "accept"
+    },
+    {
+      "tick": 230,
+      "ball": "visible",
+      "archived-track-0": "accept",
+      "archived-track-1": "accept"
+    }
+  ],
+  "arms": {
+    "ordinary": {
+      "body_observations": 24,
+      "body_dists": 0.5023431877295176,
+      "visible_balls": 11,
+      "ball_dists": 0.3444005467674949,
+      "paired_body_dists": 0.5034142380410974,
+      "paired_ball_dists": 0.3444005467674949,
+      "paired_foreground_dists": 0.42390739240429615
+    },
+    "neural": {
+      "body_observations": 24,
+      "body_dists": 0.35179554174343747,
+      "visible_balls": 11,
+      "ball_dists": 0.31280250440944324,
+      "paired_body_dists": 0.3507488803430037,
+      "paired_ball_dists": 0.31280250440944324,
+      "paired_foreground_dists": 0.3317756923762235
+    },
+    "joint": {
+      "body_observations": 24,
+      "body_dists": 0.3027506445844968,
+      "visible_balls": 11,
+      "ball_dists": 0.2476190599528226,
+      "paired_body_dists": 0.30385554920543323,
+      "paired_ball_dists": 0.2476190599528226,
+      "paired_foreground_dists": 0.27573730457912793
+    }
+  },
+  "rows": [
+    {
+      "tick": 10,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.467848539352417
+    },
+    {
+      "tick": 10,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.3368350863456726
+    },
+    {
+      "tick": 10,
+      "region": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.3070003390312195
+    },
+    {
+      "tick": 10,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.4682779312133789
+    },
+    {
+      "tick": 10,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.3045351505279541
+    },
+    {
+      "tick": 10,
+      "region": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.2320190668106079
+    },
+    {
+      "tick": 10,
+      "region": "ball",
+      "arm": "ordinary",
+      "dists": 0.42898499965667725
+    },
+    {
+      "tick": 10,
+      "region": "ball",
+      "arm": "neural",
+      "dists": 0.4030555486679077
+    },
+    {
+      "tick": 10,
+      "region": "ball",
+      "arm": "joint",
+      "dists": 0.33680516481399536
+    },
+    {
+      "tick": 30,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.49124574661254883
+    },
+    {
+      "tick": 30,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.3117073178291321
+    },
+    {
+      "tick": 30,
+      "region": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.29802924394607544
+    },
+    {
+      "tick": 30,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.5622349977493286
+    },
+    {
+      "tick": 30,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.38224542140960693
+    },
+    {
+      "tick": 30,
+      "region": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.3065827488899231
+    },
+    {
+      "tick": 30,
+      "region": "ball",
+      "arm": "ordinary",
+      "dists": 0.2926788330078125
+    },
+    {
+      "tick": 30,
+      "region": "ball",
+      "arm": "neural",
+      "dists": 0.2744016647338867
+    },
+    {
+      "tick": 30,
+      "region": "ball",
+      "arm": "joint",
+      "dists": 0.1911739706993103
+    },
+    {
+      "tick": 50,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.480147123336792
+    },
+    {
+      "tick": 50,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.3345766067504883
+    },
+    {
+      "tick": 50,
+      "region": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.33788466453552246
+    },
+    {
+      "tick": 50,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.5149402618408203
+    },
+    {
+      "tick": 50,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.35766446590423584
+    },
+    {
+      "tick": 50,
+      "region": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.2749330997467041
+    },
+    {
+      "tick": 50,
+      "region": "ball",
+      "arm": "ordinary",
+      "dists": 0.37131398916244507
+    },
+    {
+      "tick": 50,
+      "region": "ball",
+      "arm": "neural",
+      "dists": 0.3359608054161072
+    },
+    {
+      "tick": 50,
+      "region": "ball",
+      "arm": "joint",
+      "dists": 0.30955469608306885
+    },
+    {
+      "tick": 70,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.45256561040878296
+    },
+    {
+      "tick": 70,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.3363279700279236
+    },
+    {
+      "tick": 70,
+      "region": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.30196934938430786
+    },
+    {
+      "tick": 70,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.5415016412734985
+    },
+    {
+      "tick": 70,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.37108874320983887
+    },
+    {
+      "tick": 70,
+      "region": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.2717251181602478
+    },
+    {
+      "tick": 70,
+      "region": "ball",
+      "arm": "ordinary",
+      "dists": 0.30484849214553833
+    },
+    {
+      "tick": 70,
+      "region": "ball",
+      "arm": "neural",
+      "dists": 0.288041889667511
+    },
+    {
+      "tick": 70,
+      "region": "ball",
+      "arm": "joint",
+      "dists": 0.12528234720230103
+    },
+    {
+      "tick": 90,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.45452648401260376
+    },
+    {
+      "tick": 90,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.29362982511520386
+    },
+    {
+      "tick": 90,
+      "region": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.30123090744018555
+    },
+    {
+      "tick": 90,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.5811582803726196
+    },
+    {
+      "tick": 90,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.3431299924850464
+    },
+    {
+      "tick": 90,
+      "region": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.2989189028739929
+    },
+    {
+      "tick": 90,
+      "region": "ball",
+      "arm": "ordinary",
+      "dists": 0.36754387617111206
+    },
+    {
+      "tick": 90,
+      "region": "ball",
+      "arm": "neural",
+      "dists": 0.3007226586341858
+    },
+    {
+      "tick": 90,
+      "region": "ball",
+      "arm": "joint",
+      "dists": 0.2756469249725342
+    },
+    {
+      "tick": 110,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.44713228940963745
+    },
+    {
+      "tick": 110,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.32741010189056396
+    },
+    {
+      "tick": 110,
+      "region": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.2773640751838684
+    },
+    {
+      "tick": 110,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.5802584290504456
+    },
+    {
+      "tick": 110,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.3665459156036377
+    },
+    {
+      "tick": 110,
+      "region": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.3070670962333679
+    },
+    {
+      "tick": 110,
+      "region": "ball",
+      "arm": "ordinary",
+      "dists": 0.2800412178039551
+    },
+    {
+      "tick": 110,
+      "region": "ball",
+      "arm": "neural",
+      "dists": 0.2732691168785095
+    },
+    {
+      "tick": 110,
+      "region": "ball",
+      "arm": "joint",
+      "dists": 0.17865324020385742
+    },
+    {
+      "tick": 130,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.442984402179718
+    },
+    {
+      "tick": 130,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.3254328966140747
+    },
+    {
+      "tick": 130,
+      "region": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.2940824031829834
+    },
+    {
+      "tick": 130,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.5515041351318359
+    },
+    {
+      "tick": 130,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.35850584506988525
+    },
+    {
+      "tick": 130,
+      "region": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.29805612564086914
+    },
+    {
+      "tick": 130,
+      "region": "ball",
+      "arm": "ordinary",
+      "dists": 0.3586200475692749
+    },
+    {
+      "tick": 130,
+      "region": "ball",
+      "arm": "neural",
+      "dists": 0.34963393211364746
+    },
+    {
+      "tick": 130,
+      "region": "ball",
+      "arm": "joint",
+      "dists": 0.3378380537033081
+    },
+    {
+      "tick": 150,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.43579405546188354
+    },
+    {
+      "tick": 150,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.3450360894203186
+    },
+    {
+      "tick": 150,
+      "region": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.2961241602897644
+    },
+    {
+      "tick": 150,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.545329213142395
+    },
+    {
+      "tick": 150,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.38158154487609863
+    },
+    {
+      "tick": 150,
+      "region": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.28506922721862793
+    },
+    {
+      "tick": 170,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.43550556898117065
+    },
+    {
+      "tick": 170,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.31198686361312866
+    },
+    {
+      "tick": 170,
+      "region": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.29643064737319946
+    },
+    {
+      "tick": 170,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.6218199729919434
+    },
+    {
+      "tick": 170,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.4318321943283081
+    },
+    {
+      "tick": 170,
+      "region": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.3143587112426758
+    },
+    {
+      "tick": 170,
+      "region": "ball",
+      "arm": "ordinary",
+      "dists": 0.2780032157897949
+    },
+    {
+      "tick": 170,
+      "region": "ball",
+      "arm": "neural",
+      "dists": 0.21397536993026733
+    },
+    {
+      "tick": 170,
+      "region": "ball",
+      "arm": "joint",
+      "dists": 0.196330726146698
+    },
+    {
+      "tick": 190,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.42082732915878296
+    },
+    {
+      "tick": 190,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.2969626784324646
+    },
+    {
+      "tick": 190,
+      "region": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.3016141653060913
+    },
+    {
+      "tick": 190,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.5969871282577515
+    },
+    {
+      "tick": 190,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.4309859871864319
+    },
+    {
+      "tick": 190,
+      "region": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.3480647802352905
+    },
+    {
+      "tick": 190,
+      "region": "ball",
+      "arm": "ordinary",
+      "dists": 0.28415095806121826
+    },
+    {
+      "tick": 190,
+      "region": "ball",
+      "arm": "neural",
+      "dists": 0.2805459499359131
+    },
+    {
+      "tick": 190,
+      "region": "ball",
+      "arm": "joint",
+      "dists": 0.11894536018371582
+    },
+    {
+      "tick": 210,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.4165424108505249
+    },
+    {
+      "tick": 210,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.32430583238601685
+    },
+    {
+      "tick": 210,
+      "region": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.3500833511352539
+    },
+    {
+      "tick": 210,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.49168717861175537
+    },
+    {
+      "tick": 210,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.398048460483551
+    },
+    {
+      "tick": 210,
+      "region": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.29815059900283813
+    },
+    {
+      "tick": 210,
+      "region": "ball",
+      "arm": "ordinary",
+      "dists": 0.41007018089294434
+    },
+    {
+      "tick": 210,
+      "region": "ball",
+      "arm": "neural",
+      "dists": 0.30563342571258545
+    },
+    {
+      "tick": 210,
+      "region": "ball",
+      "arm": "joint",
+      "dists": 0.39190536737442017
+    },
+    {
+      "tick": 230,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "dists": 0.4474886655807495
+    },
+    {
+      "tick": 230,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "dists": 0.3701578378677368
+    },
+    {
+      "tick": 230,
+      "region": "archived-track-0",
+      "arm": "joint",
+      "dists": 0.3266114592552185
+    },
+    {
+      "tick": 230,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "dists": 0.6079291105270386
+    },
+    {
+      "tick": 230,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "dists": 0.40256017446517944
+    },
+    {
+      "tick": 230,
+      "region": "archived-track-1",
+      "arm": "joint",
+      "dists": 0.34264522790908813
+    },
+    {
+      "tick": 230,
+      "region": "ball",
+      "arm": "ordinary",
+      "dists": 0.41215020418167114
+    },
+    {
+      "tick": 230,
+      "region": "ball",
+      "arm": "neural",
+      "dists": 0.4155871868133545
+    },
+    {
+      "tick": 230,
+      "region": "ball",
+      "arm": "joint",
+      "dists": 0.26167380809783936
+    }
+  ],
+  "review_sha256": "fb41c943575b35e6ecec36916b8cfab41b8023744614a98681b7cce884681eee",
+  "labels_sha256": "098fc0b387cbc895fb64c543670023f87a26da155a68383a0b80d540ce6ab3f9",
+  "reconstruction_sha256": "2eb230df276f52780fd34a11331743c2895c3fe94bde05c6645dc0165ee33559",
+  "model": {
+    "metric": "DISTS",
+    "net": "vgg16",
+    "torchmetrics": "1.9.0",
+    "weights": "/private/tmp/ps-20261119-scorer-addon/torchmetrics/functional/image/dists_models/weights.pt",
+    "weights_sha256": "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218",
+    "backbone": "/Users/manu/.codex/visualizations/2026/11/01/01a196fe-ab4d-70f0-a4b4-6843ca289667/atlas-metric-models/checkpoints/vgg16-397923af.pth",
+    "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+    "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)"
+  },
+  "elapsed_cpu": 45.736024,
+  "forecast_cpu": 113.088786,
+  "actual_kbps": {
+    "ordinary": 20.360833333333332,
+    "joint": 20.4075,
+    "neural": 20.411666666666665
+  },
+  "joint_startup_bytes": 157517,
+  "edge_rule": "Replicate source edge pixels for a marked ball within 32 pixels of the border, identically for all arms."
+}

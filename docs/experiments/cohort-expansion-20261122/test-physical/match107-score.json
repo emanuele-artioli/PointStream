@@ -1,0 +1,612 @@
+{
+  "match": "match107",
+  "rally": "000",
+  "source_sha256": "9b2197018f90a8e8873595101d4c72651efad33c7e60d506e6718e78d073ba2e",
+  "source_rgb_sha256": "ee6cb3c06285ba4bb3a880fa642c3b85e1807abcd608bc21afa657c3e99d0605",
+  "court_segments": [
+    {
+      "first": 0,
+      "stop": 240,
+      "predicted": "court",
+      "fit_share": 1.0
+    }
+  ],
+  "court_ticks": 240,
+  "labels_sha256": "c92dca6049acfca7a52ce892775423ade4e422c602fdf09a13eec8b9e5a58e2f",
+  "rate_archive_sha256": "8c647ea17bb8e8eac1718a0100bd33fb5dd7110f5a7145fcb6c17246e61cdfb5",
+  "fps": "60",
+  "frames": 240,
+  "selection": "other-matched",
+  "gap_fraction": 0.000823248538733834,
+  "target_bytes": 10200,
+  "candidate_bytes": 12157,
+  "candidate_kbps": 24.314,
+  "candidate_sha256": "6684d4213d0d0b071f0603e5e32312080f2a1e70a7979a35032f78fa0bcb5110",
+  "candidate": {
+    "rows": [
+      {
+        "tick": 9,
+        "dists": 0.22346991300582886
+      },
+      {
+        "tick": 20,
+        "dists": 0.2475096583366394
+      },
+      {
+        "tick": 32,
+        "dists": 0.3232266902923584
+      },
+      {
+        "tick": 44,
+        "dists": 0.3590920567512512
+      },
+      {
+        "tick": 56,
+        "dists": 0.31093132495880127
+      },
+      {
+        "tick": 68,
+        "dists": 0.29506850242614746
+      },
+      {
+        "tick": 80,
+        "dists": 0.20947670936584473
+      },
+      {
+        "tick": 92,
+        "dists": 0.3157501816749573
+      },
+      {
+        "tick": 103,
+        "dists": 0.20793747901916504
+      },
+      {
+        "tick": 115,
+        "dists": 0.2705702781677246
+      },
+      {
+        "tick": 127,
+        "dists": 0.21616047620773315
+      },
+      {
+        "tick": 139,
+        "dists": 0.301336407661438
+      },
+      {
+        "tick": 151,
+        "dists": 0.30010032653808594
+      },
+      {
+        "tick": 163,
+        "dists": 0.2873905897140503
+      },
+      {
+        "tick": 175,
+        "dists": 0.2766321897506714
+      },
+      {
+        "tick": 186,
+        "dists": 0.26087647676467896
+      },
+      {
+        "tick": 198,
+        "dists": 0.3366122841835022
+      },
+      {
+        "tick": 210,
+        "dists": 0.37220078706741333
+      },
+      {
+        "tick": 222,
+        "dists": 0.37321311235427856
+      },
+      {
+        "tick": 234,
+        "dists": 0.3953936696052551
+      }
+    ],
+    "ball_dists": 0.2941474556922913,
+    "rgb_sha256": "2f4266adad3947f1ca7cc1e3efaa0a2b3566b161d9a5d6ff3cd4935af73f9bf6",
+    "whole_rgb_psnr": 21.660260932912507
+  },
+  "ordinary_bytes": 12147,
+  "ordinary_kbps": 24.294,
+  "ordinary_sha256": "df7d81f98ed9e8f55001c1d496160eeeeb067cbc88a2805e30b5a572e7d3b0b5",
+  "ordinary": {
+    "rows": [
+      {
+        "tick": 9,
+        "dists": 0.3129822015762329
+      },
+      {
+        "tick": 20,
+        "dists": 0.3045361638069153
+      },
+      {
+        "tick": 32,
+        "dists": 0.3225811719894409
+      },
+      {
+        "tick": 44,
+        "dists": 0.3580787181854248
+      },
+      {
+        "tick": 56,
+        "dists": 0.3105301856994629
+      },
+      {
+        "tick": 68,
+        "dists": 0.33396458625793457
+      },
+      {
+        "tick": 80,
+        "dists": 0.2641867995262146
+      },
+      {
+        "tick": 92,
+        "dists": 0.32655417919158936
+      },
+      {
+        "tick": 103,
+        "dists": 0.3163355588912964
+      },
+      {
+        "tick": 115,
+        "dists": 0.30471134185791016
+      },
+      {
+        "tick": 127,
+        "dists": 0.3034757375717163
+      },
+      {
+        "tick": 139,
+        "dists": 0.384394109249115
+      },
+      {
+        "tick": 151,
+        "dists": 0.3316582441329956
+      },
+      {
+        "tick": 163,
+        "dists": 0.3026086091995239
+      },
+      {
+        "tick": 175,
+        "dists": 0.2875891327857971
+      },
+      {
+        "tick": 186,
+        "dists": 0.2804275155067444
+      },
+      {
+        "tick": 198,
+        "dists": 0.3422958254814148
+      },
+      {
+        "tick": 210,
+        "dists": 0.40063756704330444
+      },
+      {
+        "tick": 222,
+        "dists": 0.3969627618789673
+      },
+      {
+        "tick": 234,
+        "dists": 0.43482112884521484
+      }
+    ],
+    "ball_dists": 0.3309665769338608,
+    "rgb_sha256": "62e3c6b64fb354ccb3c2c2a848b88569b14507165c63f67c5cdf0f3b79716577",
+    "whole_rgb_psnr": 22.216326094019596
+  },
+  "all_affordable": [
+    {
+      "width": 320,
+      "crf": 70.0,
+      "bytes": 11049,
+      "kbps": 22.098,
+      "sha256": "2e8704629fc2e83e3d11bfc8486047828553734fa4060e345f8ea2cb9d2ec6b3",
+      "ball_dists": 0.33769551217556,
+      "rows": [
+        {
+          "tick": 9,
+          "dists": 0.29552608728408813
+        },
+        {
+          "tick": 20,
+          "dists": 0.29765981435775757
+        },
+        {
+          "tick": 32,
+          "dists": 0.34171104431152344
+        },
+        {
+          "tick": 44,
+          "dists": 0.37859398126602173
+        },
+        {
+          "tick": 56,
+          "dists": 0.3239964246749878
+        },
+        {
+          "tick": 68,
+          "dists": 0.3114151954650879
+        },
+        {
+          "tick": 80,
+          "dists": 0.2361035943031311
+        },
+        {
+          "tick": 92,
+          "dists": 0.31436634063720703
+        },
+        {
+          "tick": 103,
+          "dists": 0.35836851596832275
+        },
+        {
+          "tick": 115,
+          "dists": 0.3667339086532593
+        },
+        {
+          "tick": 127,
+          "dists": 0.36075538396835327
+        },
+        {
+          "tick": 139,
+          "dists": 0.3989357352256775
+        },
+        {
+          "tick": 151,
+          "dists": 0.31797724962234497
+        },
+        {
+          "tick": 163,
+          "dists": 0.30942219495773315
+        },
+        {
+          "tick": 175,
+          "dists": 0.2866566777229309
+        },
+        {
+          "tick": 186,
+          "dists": 0.2775113582611084
+        },
+        {
+          "tick": 198,
+          "dists": 0.35529768466949463
+        },
+        {
+          "tick": 210,
+          "dists": 0.39480841159820557
+        },
+        {
+          "tick": 222,
+          "dists": 0.3990442752838135
+        },
+        {
+          "tick": 234,
+          "dists": 0.42902636528015137
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "crf": 68.0,
+      "bytes": 12147,
+      "kbps": 24.294,
+      "sha256": "df7d81f98ed9e8f55001c1d496160eeeeb067cbc88a2805e30b5a572e7d3b0b5",
+      "ball_dists": 0.3309665769338608,
+      "rows": [
+        {
+          "tick": 9,
+          "dists": 0.3129822015762329
+        },
+        {
+          "tick": 20,
+          "dists": 0.3045361638069153
+        },
+        {
+          "tick": 32,
+          "dists": 0.3225811719894409
+        },
+        {
+          "tick": 44,
+          "dists": 0.3580787181854248
+        },
+        {
+          "tick": 56,
+          "dists": 0.3105301856994629
+        },
+        {
+          "tick": 68,
+          "dists": 0.33396458625793457
+        },
+        {
+          "tick": 80,
+          "dists": 0.2641867995262146
+        },
+        {
+          "tick": 92,
+          "dists": 0.32655417919158936
+        },
+        {
+          "tick": 103,
+          "dists": 0.3163355588912964
+        },
+        {
+          "tick": 115,
+          "dists": 0.30471134185791016
+        },
+        {
+          "tick": 127,
+          "dists": 0.3034757375717163
+        },
+        {
+          "tick": 139,
+          "dists": 0.384394109249115
+        },
+        {
+          "tick": 151,
+          "dists": 0.3316582441329956
+        },
+        {
+          "tick": 163,
+          "dists": 0.3026086091995239
+        },
+        {
+          "tick": 175,
+          "dists": 0.2875891327857971
+        },
+        {
+          "tick": 186,
+          "dists": 0.2804275155067444
+        },
+        {
+          "tick": 198,
+          "dists": 0.3422958254814148
+        },
+        {
+          "tick": 210,
+          "dists": 0.40063756704330444
+        },
+        {
+          "tick": 222,
+          "dists": 0.3969627618789673
+        },
+        {
+          "tick": 234,
+          "dists": 0.43482112884521484
+        }
+      ]
+    }
+  ],
+  "best_affordable": {
+    "width": 320,
+    "crf": 68.0,
+    "bytes": 12147,
+    "kbps": 24.294,
+    "sha256": "df7d81f98ed9e8f55001c1d496160eeeeb067cbc88a2805e30b5a572e7d3b0b5",
+    "ball_dists": 0.3309665769338608,
+    "rows": [
+      {
+        "tick": 9,
+        "dists": 0.3129822015762329
+      },
+      {
+        "tick": 20,
+        "dists": 0.3045361638069153
+      },
+      {
+        "tick": 32,
+        "dists": 0.3225811719894409
+      },
+      {
+        "tick": 44,
+        "dists": 0.3580787181854248
+      },
+      {
+        "tick": 56,
+        "dists": 0.3105301856994629
+      },
+      {
+        "tick": 68,
+        "dists": 0.33396458625793457
+      },
+      {
+        "tick": 80,
+        "dists": 0.2641867995262146
+      },
+      {
+        "tick": 92,
+        "dists": 0.32655417919158936
+      },
+      {
+        "tick": 103,
+        "dists": 0.3163355588912964
+      },
+      {
+        "tick": 115,
+        "dists": 0.30471134185791016
+      },
+      {
+        "tick": 127,
+        "dists": 0.3034757375717163
+      },
+      {
+        "tick": 139,
+        "dists": 0.384394109249115
+      },
+      {
+        "tick": 151,
+        "dists": 0.3316582441329956
+      },
+      {
+        "tick": 163,
+        "dists": 0.3026086091995239
+      },
+      {
+        "tick": 175,
+        "dists": 0.2875891327857971
+      },
+      {
+        "tick": 186,
+        "dists": 0.2804275155067444
+      },
+      {
+        "tick": 198,
+        "dists": 0.3422958254814148
+      },
+      {
+        "tick": 210,
+        "dists": 0.40063756704330444
+      },
+      {
+        "tick": 222,
+        "dists": 0.3969627618789673
+      },
+      {
+        "tick": 234,
+        "dists": 0.43482112884521484
+      }
+    ]
+  },
+  "direct": [
+    {
+      "tick": 9,
+      "visibility": 1,
+      "present": true,
+      "error_native_pixels": 4.149274543670781
+    },
+    {
+      "tick": 20,
+      "visibility": 1,
+      "present": true,
+      "error_native_pixels": 0.2794117647058556
+    },
+    {
+      "tick": 32,
+      "visibility": 1,
+      "present": true,
+      "error_native_pixels": 4.643916472936656
+    },
+    {
+      "tick": 44,
+      "visibility": 1,
+      "present": true,
+      "error_native_pixels": 2.298308765895259
+    },
+    {
+      "tick": 56,
+      "visibility": 1,
+      "present": true,
+      "error_native_pixels": 1.0009727103083321
+    },
+    {
+      "tick": 68,
+      "visibility": 1,
+      "present": true,
+      "error_native_pixels": 1.4142135623730951
+    },
+    {
+      "tick": 80,
+      "visibility": 1,
+      "present": true,
+      "error_native_pixels": 3.2849465296138507
+    },
+    {
+      "tick": 92,
+      "visibility": 1,
+      "present": true,
+      "error_native_pixels": 2.275613533756857
+    },
+    {
+      "tick": 103,
+      "visibility": 1,
+      "present": true,
+      "error_native_pixels": 2.191176470588289
+    },
+    {
+      "tick": 115,
+      "visibility": 1,
+      "present": true,
+      "error_native_pixels": 1.0344414938275832
+    },
+    {
+      "tick": 127,
+      "visibility": 1,
+      "present": true,
+      "error_native_pixels": 4.323529411764753
+    },
+    {
+      "tick": 139,
+      "visibility": 1,
+      "present": true,
+      "error_native_pixels": 0.7941176470587834
+    },
+    {
+      "tick": 151,
+      "visibility": 1,
+      "present": true,
+      "error_native_pixels": 3.2443722901500465
+    },
+    {
+      "tick": 163,
+      "visibility": 1,
+      "present": true,
+      "error_native_pixels": 0.6617647058823763
+    },
+    {
+      "tick": 175,
+      "visibility": 1,
+      "present": true,
+      "error_native_pixels": 0.20588235294115975
+    },
+    {
+      "tick": 186,
+      "visibility": 1,
+      "present": true,
+      "error_native_pixels": 0.29411764705884025
+    },
+    {
+      "tick": 198,
+      "visibility": 1,
+      "present": true,
+      "error_native_pixels": 2.0034572195207536
+    },
+    {
+      "tick": 210,
+      "visibility": 1,
+      "present": true,
+      "error_native_pixels": 1.0107553104376237
+    },
+    {
+      "tick": 222,
+      "visibility": 1,
+      "present": true,
+      "error_native_pixels": 1.7180725701789803
+    },
+    {
+      "tick": 234,
+      "visibility": 1,
+      "present": true,
+      "error_native_pixels": 0.4558823529411882
+    }
+  ],
+  "visible": 20,
+  "marked_not_visible": 0,
+  "unknown_codes": 0,
+  "unlisted": 220,
+  "self_score": 2.384185791015625e-07,
+  "score_model": {
+    "metric": "DISTS",
+    "net": "vgg16",
+    "torchmetrics": "1.9.0",
+    "weights": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/torchmetrics/functional/image/dists_models/weights.pt",
+    "weights_sha256": "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218",
+    "backbone": "/local/users/emanuele/pointstream/cache/397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0/vgg16-397923af.pth",
+    "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+    "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)"
+  },
+  "elapsed": 789.4115606060077
+}

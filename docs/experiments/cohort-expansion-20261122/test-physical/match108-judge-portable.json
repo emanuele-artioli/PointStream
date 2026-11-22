@@ -1,0 +1,329 @@
+{
+  "match": "match108",
+  "frames": 240,
+  "visible": 50,
+  "source_hits10": 37,
+  "source_qualified": false,
+  "detections": {
+    "source": {
+      "rows": [
+        {
+          "tick": 9,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 6.5102179541561105
+        },
+        {
+          "tick": 13,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 10.891574642020634
+        },
+        {
+          "tick": 18,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 12.182854917441366
+        },
+        {
+          "tick": 23,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 15.351286518466612
+        },
+        {
+          "tick": 27,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 9.424269472421066
+        },
+        {
+          "tick": 32,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 3.86639098595411
+        },
+        {
+          "tick": 37,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 2.0150803238501727
+        },
+        {
+          "tick": 41,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 1.8127856202308745
+        },
+        {
+          "tick": 46,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 1.825931106485338
+        },
+        {
+          "tick": 51,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 1.2292579110904236
+        },
+        {
+          "tick": 55,
+          "visibility": 1,
+          "present": false,
+          "error_native_pixels": null
+        },
+        {
+          "tick": 60,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 0.8436356418429878
+        },
+        {
+          "tick": 65,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 0.8369079203474853
+        },
+        {
+          "tick": 70,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 1.5517061877920943
+        },
+        {
+          "tick": 74,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 4.4040360014006685
+        },
+        {
+          "tick": 79,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 1.316680908203125
+        },
+        {
+          "tick": 84,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 1.9782973667595078
+        },
+        {
+          "tick": 88,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 5.740896164518205
+        },
+        {
+          "tick": 93,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 11.444253278737413
+        },
+        {
+          "tick": 98,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 2.238235761519754
+        },
+        {
+          "tick": 102,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 0.9375826494037366
+        },
+        {
+          "tick": 107,
+          "visibility": 1,
+          "present": false,
+          "error_native_pixels": null
+        },
+        {
+          "tick": 112,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 1.5865458778986314
+        },
+        {
+          "tick": 116,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 0.7200690501758089
+        },
+        {
+          "tick": 121,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 1.873348789664649
+        },
+        {
+          "tick": 126,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 6.082762530298219
+        },
+        {
+          "tick": 131,
+          "visibility": 1,
+          "present": false,
+          "error_native_pixels": null
+        },
+        {
+          "tick": 135,
+          "visibility": 1,
+          "present": false,
+          "error_native_pixels": null
+        },
+        {
+          "tick": 140,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 37.09369736926532
+        },
+        {
+          "tick": 145,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 104.27990130106741
+        },
+        {
+          "tick": 149,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 4.17277105513994
+        },
+        {
+          "tick": 154,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 6.336612582567344
+        },
+        {
+          "tick": 159,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 9.441409561423376
+        },
+        {
+          "tick": 163,
+          "visibility": 1,
+          "present": false,
+          "error_native_pixels": null
+        },
+        {
+          "tick": 168,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 6.900787731400496
+        },
+        {
+          "tick": 173,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 6.758254447236887
+        },
+        {
+          "tick": 177,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 2.6178280703454093
+        },
+        {
+          "tick": 182,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 1.9171979719512746
+        },
+        {
+          "tick": 187,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 1.7656115283098712
+        },
+        {
+          "tick": 192,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 1.1627009681379958
+        },
+        {
+          "tick": 196,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 1.2249484388482361
+        },
+        {
+          "tick": 201,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 1.0564819653828934
+        },
+        {
+          "tick": 206,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 1.9673055859946702
+        },
+        {
+          "tick": 210,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 0.5908992722453006
+        },
+        {
+          "tick": 215,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 0.4567262924053115
+        },
+        {
+          "tick": 220,
+          "visibility": 1,
+          "present": false,
+          "error_native_pixels": null
+        },
+        {
+          "tick": 224,
+          "visibility": 1,
+          "present": false,
+          "error_native_pixels": null
+        },
+        {
+          "tick": 229,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 1.5619590479260226
+        },
+        {
+          "tick": 234,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 4.5489870396468985
+        },
+        {
+          "tick": 239,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 7.739097626288873
+        }
+      ],
+      "seconds": 6.142910469992785
+    }
+  },
+  "source_sha256": "23b6a757e8f01d2366282fb32e2282a76a77f39cfc96c8125069826d7f458fb7",
+  "labels_sha256": "f7fa05c6bbd90838bb962074f3165dcd74619dee569331789c39b2d8ee3032ef",
+  "rate_archive_sha256": "8067877e15ce3f5ac3705472fa5decb3fdd08fcb55079929912fd5582d62fd60",
+  "judge_checkpoint_sha256": "9d391239ab10c733f8e5bfadf16ab72838e7a8ebc88e8ae2038501c03d42b4bb",
+  "rgb_sha256": {
+    "source": "14909803457a5d30e700ec5c4cda23c19ab75dbe51427e0daa4d1e3f10e7e369",
+    "ordinary": "fb9c237832ca4ed331b785242e624f687dc6b86fd296d8cb2543814d18416de8",
+    "candidate": "987862e19d8175e4895e4a9b09401dcfac1743a114a7dcdac0efeb57b0b13aed"
+  },
+  "judge_config_sha256": "6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d",
+  "device": "NVIDIA RTX 6000 Ada Generation",
+  "model_init_seconds": 0.6532203489914536,
+  "portable_seconds": 14.893090408004355,
+  "frozen_display_sha256": "97c0883d968bba5ed352f921d0c403166b6222aa86c4a3d690cb771e944918a9",
+  "elapsed": 24.38272277501528
+}

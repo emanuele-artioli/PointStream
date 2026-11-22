@@ -1,0 +1,43 @@
+{
+  "job": "20261122T132235Z-4891ef51",
+  "code": "b15479f981877fd28ba745659c0d6fea0ee65e1c",
+  "host": "gpu4",
+  "gate": {
+    "passed": true,
+    "checks": {
+      "cache": true,
+      "native": true,
+      "hashes": true,
+      "cases": true,
+      "malformed": true,
+      "time": true
+    }
+  },
+  "full": {
+    "backend": "installed libzstd 1.5.7",
+    "library_sha256": "b0e2bad8c117a3ad7d344d7924272d12b8e363956efb91b5074e43d4e201a08d",
+    "cache": "91bd3a3fd9b18db301348c98e5af1536b859f2e51dde71e7de56c3beee1c1af2",
+    "prior": "c737ff67788775759ea2b9182924d05c2518f9e508f48572c8764197e6eacabd",
+    "refs": [
+      {
+        "name": "ref0",
+        "raw_rgb_sha256": "4efc900c9e414bd768d06545bd70d5c5d2a0299eab1d2f7e044df85839ad9e60",
+        "typed_rgb_sha256": "d49f6aa1a46c0c5a671618aa4ad5cf2085200da3d5ede43a22090b40b3ce09e6",
+        "ref_sha256": "1f194daffff3b5d3653de12aed6e90ca29854c257a414d9b7ebcd21492bd738e",
+        "bytes": 40296,
+        "expanded_bytes": 42626,
+        "malformed_lengths_rejected": 3
+      },
+      {
+        "name": "ref1",
+        "raw_rgb_sha256": "34f19a1b0c83306a069ecf1c6384f06f1115c62dac2490d9053f0050b57e4cdc",
+        "typed_rgb_sha256": "53c425974b004ff5c78d0ba33de67dbb69d0a126288e74a04caf37aae880f73e",
+        "ref_sha256": "9d37745c644a38717222f67b27c0c1353cefa9019afc5eb6d48fb1f6a9a98dff",
+        "bytes": 115387,
+        "expanded_bytes": 115331,
+        "malformed_lengths_rejected": 3
+      }
+    ],
+    "worker_seconds": 0.49392068397719413
+  }
+}

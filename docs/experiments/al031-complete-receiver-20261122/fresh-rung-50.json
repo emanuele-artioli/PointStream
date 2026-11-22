@@ -1,0 +1,134 @@
+{
+  "schema": 1,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.med_mixed_rung"
+  ],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.med_mixed_rung",
+    "--validate"
+  ],
+  "arguments": [
+    "--carrier",
+    "{staged:carrier}",
+    "--carrier-sha256",
+    "95e2fa1a014cf8b7d45deae3d3fcce1fd36251f735d56fb29fa21dff2e7c2530",
+    "--manifest",
+    "{staged:manifest}",
+    "--joint",
+    "{staged:joint}",
+    "--cache",
+    "{staged:cache}",
+    "--original-joint",
+    "{staged:joint}",
+    "--witness",
+    "{staged:witness}",
+    "--native-sha",
+    "03766c040512e8276552889cc769eff3fe006bef328c34f5f6d9112733f7beaf",
+    "--frames",
+    "{frames}",
+    "--reference",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/tennis/six-match-source-panel-20261122/alcaraz031-054e4535638d.mp4",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T105056Z-7795a6cf/full/published.tar",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/tennis/k4-2026-10-13/inputs/yolo/yolo11x-pose.pt",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T110952Z-4513f702/full/published.tar",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T114430Z-534f6704/full/ball.payload"
+  ],
+  "staged_inputs": [
+    {
+      "name": "carrier",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al031-paid-066028a0ea56e7c5/players.pscp",
+      "sha256": "95e2fa1a014cf8b7d45deae3d3fcce1fd36251f735d56fb29fa21dff2e7c2530",
+      "extract": false
+    },
+    {
+      "name": "manifest",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al031-paid-066028a0ea56e7c5/players.manifest",
+      "sha256": "62dd51435e9183170f57a4e9dc57a24ce223c88d4826295014208e8c6805d914",
+      "extract": false
+    },
+    {
+      "name": "joint",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al031-paid-066028a0ea56e7c5/rally.psj",
+      "sha256": "066028a0ea56e7c57494adf6d08062d71067db62f98e01bad8347653e2e82cdc",
+      "extract": false
+    },
+    {
+      "name": "cache",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al031-paid-066028a0ea56e7c5/initial.psr",
+      "sha256": "da9d8565361eb290a5711fc69b909106a3b2874bc4d24dff156826abe600d635",
+      "extract": false
+    },
+    {
+      "name": "witness",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T125912Z-9361b447/full/published.tar",
+      "sha256": "b342ab4c92020c5f2de52f6e12dcc48248b5b8dba33bcad0ab3c1f1eaee53c97",
+      "extract": true
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al031-paid-066028a0ea56e7c5/players.pscp",
+      "sha256": "95e2fa1a014cf8b7d45deae3d3fcce1fd36251f735d56fb29fa21dff2e7c2530"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al031-paid-066028a0ea56e7c5/players.manifest",
+      "sha256": "62dd51435e9183170f57a4e9dc57a24ce223c88d4826295014208e8c6805d914"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al031-paid-066028a0ea56e7c5/rally.psj",
+      "sha256": "066028a0ea56e7c57494adf6d08062d71067db62f98e01bad8347653e2e82cdc"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al031-paid-066028a0ea56e7c5/initial.psr",
+      "sha256": "da9d8565361eb290a5711fc69b909106a3b2874bc4d24dff156826abe600d635"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T125912Z-9361b447/full/published.tar",
+      "sha256": "b342ab4c92020c5f2de52f6e12dcc48248b5b8dba33bcad0ab3c1f1eaee53c97"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "required_commands": [],
+  "deadline": "2026-11-22T21:01:00Z",
+  "verify_staged_inputs": true,
+  "stall_seconds": 1380,
+  "contention": {
+    "policy": "stop",
+    "resume_attempts": 0
+  },
+  "device": "cpu",
+  "hosts": [
+    "gpu6"
+  ],
+  "gpu_models": [],
+  "gpu_memory_mib": 0,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "local_storage_gib": 30,
+  "smoke": {
+    "seconds": 500,
+    "representative_basis": "Original paid/native stream, 3 real active ticks and 1 real fallback observed under source denial, real frame hashes, full working set and timing."
+  },
+  "full": {
+    "seconds": 1320
+  },
+  "validator_seconds": 170,
+  "budget_seconds": 2080,
+  "scale": {
+    "frames": {
+      "smoke": 4,
+      "full": 240
+    }
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "sources": [
+    {
+      "clip": "000",
+      "fps": [
+        50,
+        1
+      ],
+      "tracks": [
+        {
+          "unit": "medvedev_struff__000_at120__person_000000000002",
+          "real_ticks": 234,
+          "missing": [
+            160,
+            161,
+            162,
+            163,
+            165,
+            173
+          ],
+          "increasing": true,
+          "finite_positive_width_height": true
+        },
+        {
+          "unit": "medvedev_struff__000_at120__person_000000000005",
+          "real_ticks": 240,
+          "missing": [],
+          "increasing": true,
+          "finite_positive_width_height": true
+        }
+      ],
+      "all_contiguous": false,
+      "note": "The source-prepared box representation uses width and height in the last two coordinates. Eligibility uses unmodified paid tick coverage."
+    },
+    {
+      "clip": "019",
+      "fps": [
+        50,
+        1
+      ],
+      "tracks": [
+        {
+          "unit": "medvedev_struff__019_at120__person_000000000002",
+          "real_ticks": 240,
+          "missing": [],
+          "increasing": true,
+          "finite_positive_width_height": true
+        },
+        {
+          "unit": "medvedev_struff__019_at120__person_000000000003",
+          "real_ticks": 232,
+          "missing": [
+            83,
+            84,
+            85,
+            86,
+            87,
+            89,
+            90,
+            91
+          ],
+          "increasing": true,
+          "finite_positive_width_height": true
+        }
+      ],
+      "all_contiguous": false,
+      "note": "The source-prepared box representation uses width and height in the last two coordinates. Eligibility uses unmodified paid tick coverage."
+    },
+    {
+      "clip": "024",
+      "fps": [
+        50,
+        1
+      ],
+      "tracks": [
+        {
+          "unit": "medvedev_struff__024_at120__person_000000000002",
+          "real_ticks": 239,
+          "missing": [
+            68
+          ],
+          "increasing": true,
+          "finite_positive_width_height": true
+        },
+        {
+          "unit": "medvedev_struff__024_at120__person_000000000004",
+          "real_ticks": 240,
+          "missing": [],
+          "increasing": true,
+          "finite_positive_width_height": true
+        }
+      ],
+      "all_contiguous": false,
+      "note": "The source-prepared box representation uses width and height in the last two coordinates. Eligibility uses unmodified paid tick coverage."
+    }
+  ],
+  "transport_sha256": "70cfa5b37cbb579be788202148cf3fa88fafca0c45252ac02b91fd25f44fa0e2",
+  "prepare_sha256": "39ddd9b9942131c9d283ed5be52e53a979406dd6b9c325fd18b1bddb2ceb5f1c"
+}

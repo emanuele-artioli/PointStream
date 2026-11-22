@@ -1,0 +1,46 @@
+{
+  "source": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+  "receipts": {
+    "match102-score.json": "cdbb0d9056499bb17804ba5cd0529e0d8ed3519c6cf32e2398aacd3e6e3c03ad",
+    "match102-judge-portable.json": "85362816e4b1ba0772b28d6de99195fbd8654af222d7ed3961807dace39c01bb",
+    "match102-strongjudge.json": "83cacd838365cfbbacb0266c5b7dc75c262aa5be64fd4b1eab84b57476175dad"
+  },
+  "rows": [
+    {
+      "name": "AV1, best resolution",
+      "distortion": 0.22508566230535507,
+      "kbps": 18.827172827172827,
+      "within10": 0,
+      "visible": 40,
+      "absent_emissions": 0,
+      "absent_labels": 1
+    },
+    {
+      "name": "AV1, same resolution",
+      "distortion": 0.26619485169649126,
+      "kbps": 20.534465534465536,
+      "within10": 0,
+      "visible": 40,
+      "absent_emissions": 0,
+      "absent_labels": 1
+    },
+    {
+      "name": "PointStream, detector",
+      "distortion": 0.24547197073698043,
+      "kbps": 20.51048951048951,
+      "within10": 34,
+      "visible": 40,
+      "absent_emissions": 0,
+      "absent_labels": 1
+    },
+    {
+      "name": "PointStream, direct",
+      "distortion": 0.24547197073698043,
+      "kbps": 20.51048951048951,
+      "within10": 36,
+      "visible": 40,
+      "absent_emissions": 0,
+      "absent_labels": 1
+    }
+  ]
+}

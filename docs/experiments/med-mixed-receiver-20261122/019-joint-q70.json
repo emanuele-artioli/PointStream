@@ -1,0 +1,290 @@
+{
+  "arm": {
+    "name": "joint-q70",
+    "kind": "rgb_zseq",
+    "path": "/local/users/emanuele/pointstream/cache/1350879cd96ef0495a48fbbf485275bacf45b79c93f392b40d80590528498053/frames.zseq",
+    "sha256": "1350879cd96ef0495a48fbbf485275bacf45b79c93f392b40d80590528498053",
+    "receipt": "/local/users/emanuele/pointstream/cache/dc9d999cbda353455754c1120619765facdb2259deaac1be7e41a2ce9b467f03/rung.json",
+    "receipt_sha256": "dc9d999cbda353455754c1120619765facdb2259deaac1be7e41a2ce9b467f03",
+    "width": 1920,
+    "height": 1080,
+    "bytes": 11465,
+    "kbps": 19.108333333333334,
+    "cold_kbps": 274.6616666666667,
+    "joint_sha256": "78b0e9281bc06e0f0fda15a07f0d8a7f629c0dbf9c8b6db503c4a14d88219a69",
+    "receiver_job": "20261122T130718Z-2ead0705"
+  },
+  "source_sha256": "1c13479eb3b6f8d175eb6f5020c629896e6b01f719014ec995a06b4c6c5a3e9c",
+  "supports_sha256": "c5efefbaaa99b7fb0b6f1fa28a222b56760f8dd074b2181131e2d643b658c76b",
+  "method": "Original W7 source-SAM masks on 12 fixed ticks, native RGB, tight support plus 32-pixel margin, masked DISTS; all-frame native RGB PSNR",
+  "native_fps": 50,
+  "frames": 240,
+  "active_start": 92,
+  "active_frames": 120,
+  "fallback_frames": 120,
+  "body_rows": [
+    {
+      "tick": 10,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.6872361898422241
+    },
+    {
+      "tick": 10,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.588502049446106
+    },
+    {
+      "tick": 30,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.7143075466156006
+    },
+    {
+      "tick": 30,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.6164791584014893
+    },
+    {
+      "tick": 50,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.7303962707519531
+    },
+    {
+      "tick": 50,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.618882417678833
+    },
+    {
+      "tick": 70,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.7347697019577026
+    },
+    {
+      "tick": 70,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.6136610507965088
+    },
+    {
+      "tick": 90,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.723516583442688
+    },
+    {
+      "tick": 90,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.5952202081680298
+    },
+    {
+      "tick": 110,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.3115989565849304
+    },
+    {
+      "tick": 110,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.4093201160430908
+    },
+    {
+      "tick": 130,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.3048969507217407
+    },
+    {
+      "tick": 130,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.3591514825820923
+    },
+    {
+      "tick": 150,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.36119651794433594
+    },
+    {
+      "tick": 150,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.38718128204345703
+    },
+    {
+      "tick": 170,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.3181583881378174
+    },
+    {
+      "tick": 170,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.39277219772338867
+    },
+    {
+      "tick": 190,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.3140379786491394
+    },
+    {
+      "tick": 190,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.39558589458465576
+    },
+    {
+      "tick": 210,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.29919952154159546
+    },
+    {
+      "tick": 210,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.39254534244537354
+    },
+    {
+      "tick": 230,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.7737162113189697
+    },
+    {
+      "tick": 230,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.6102247834205627
+    }
+  ],
+  "mean_dists": 0.5105232000350952,
+  "active_dists": 0.35380371908346814,
+  "fallback_dists": 0.6672426809867223,
+  "rgb_psnr": 18.343430581538293,
+  "active_rgb_psnr": 18.356786340319772,
+  "fallback_rgb_psnr": 18.330115769525555,
+  "source_self_abs": 1.1920928955078125e-07,
+  "weights_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+  "torch": "2.10.0+cu128",
+  "cv2": "4.10.0",
+  "device": "cpu",
+  "cpu_seconds": 51.308268767,
+  "forecast_cpu_seconds": 167.98441731600005,
+  "samples": [
+    {
+      "tick": 10,
+      "source_crop_xyxy": {
+        "player-0": [
+          1032,
+          516,
+          1190,
+          860
+        ],
+        "player-1": [
+          688,
+          90,
+          814,
+          250
+        ]
+      },
+      "files_sha256": {
+        "tick010-source-player-0.png": "83e6a1a264c27827f0107333332c1ca93202231b37c25793b9da378da9a9d245",
+        "tick010-source-player-1.png": "406e088f85cab2957bda53d20aa9aecd3241858c39ab38bd212179971aeac7b2",
+        "tick010-source-context.png": "9549b52f403f8e84cf0a0669b194d81696ea3ec656eafc1eb379fe296649c4db",
+        "tick010-display-player-0.png": "6606933ce43559d4096bee0c4c4b5bb921ede8df0f56c192571cb77e37831991",
+        "tick010-display-player-1.png": "a0d18ec69185fc696233cd9a4db217df952a7c71856328916654753612821547",
+        "tick010-display-context.png": "edbe7a273fb80acdbc535fb859b5f3f753a1b33a628b196a4e80bf5719e2a9ed"
+      }
+    },
+    {
+      "tick": 90,
+      "source_crop_xyxy": {
+        "player-0": [
+          918,
+          458,
+          1076,
+          704
+        ],
+        "player-1": [
+          800,
+          116,
+          898,
+          238
+        ]
+      },
+      "files_sha256": {
+        "tick090-source-player-0.png": "41608d005c2b236146ae0a8c30a3535d5fe45650a225224fe3a634da31147bfc",
+        "tick090-source-player-1.png": "6d3f4c80164a8acd28f03c74f2a0305328fe2ef248966876137971fa0124aa0d",
+        "tick090-source-context.png": "75bc2958ebeb8e1a59a88a623c60e1dbb4c5bdb84f47064df20ff90ef853f5ab",
+        "tick090-display-player-0.png": "572a4e75553444617737bc43d029c9bff21ed7357bdc2ab4aa071dbf93f7cadd",
+        "tick090-display-player-1.png": "e815efcd850a8f920488ea2056e0a531c3f425883e49c9d4ec116b4589322416",
+        "tick090-display-context.png": "dac69330c0da6cfe55fadcf6703eb39f9ace66a45e83784ff05f43137c7cc4a0"
+      }
+    },
+    {
+      "tick": 170,
+      "source_crop_xyxy": {
+        "player-0": [
+          1104,
+          428,
+          1272,
+          674
+        ],
+        "player-1": [
+          866,
+          90,
+          994,
+          238
+        ]
+      },
+      "files_sha256": {
+        "tick170-source-player-0.png": "a4a1fea5aede00c0f3a5f51c0200f2c96bba945a6256b61606cac1c72f3eb191",
+        "tick170-source-player-1.png": "03423a8fd6295a2088782123027888dccdb2140753993aaa7b855b975054b7f2",
+        "tick170-source-context.png": "0e41fff959fb2a4388c55782166c3b54a164047d889445b825ea607f0580740d",
+        "tick170-display-player-0.png": "709eb9272a04482b220bbc1eb6fd1569ade2e65a76404c5b17a868b5507ddbba",
+        "tick170-display-player-1.png": "a4287aabe332698bd415445adab82641eab9deb3a1de2b3bc50879323297d7b2",
+        "tick170-display-context.png": "5ab4dc48c21b5c34c3094778e7c4bce3a16ff648faca66651393b16358368b8f"
+      }
+    },
+    {
+      "tick": 230,
+      "source_crop_xyxy": {
+        "player-0": [
+          1188,
+          494,
+          1406,
+          750
+        ],
+        "player-1": [
+          960,
+          92,
+          1070,
+          236
+        ]
+      },
+      "files_sha256": {
+        "tick230-source-player-0.png": "740c6df8f2fd552fef12470a061ccfe6eb227369048adfde080b473331c46bf3",
+        "tick230-source-player-1.png": "a4b246ffb6c4ee5dced72953cb451e8083d8b0360e213ec2a7139bb2f5e9dc82",
+        "tick230-source-context.png": "0ac4f52883870094fba3190dd628043a97d7f902bcd7e65285257cf5148f28f0",
+        "tick230-display-player-0.png": "a847fd4690d6ddd998892f7511cbb621733b85fc2224c03402e313cc27156d44",
+        "tick230-display-player-1.png": "05ceef6e7501c635d3efb72305556a973c80a0838f0ca4e8fc9e6a3dbb22e467",
+        "tick230-display-context.png": "6157ebbdf783ac735316bfca071dead8e9b67f4dcb9f3554883b10506b9868d5"
+      }
+    }
+  ],
+  "metric_producer_job": "20261122T131136Z-136d8526",
+  "campus_worker_seconds": 60.150430559995584,
+  "canonical_pixels_sha256": "ce7c736a9181a1303d8fae215f4d5a404bfeb68c4c09eaadaf80e23203dcf118",
+  "supports_tar_sha256": "59768c1a1a224d9a91992f01683db0a57356841cc699c60854b36dcd4fc78739"
+}

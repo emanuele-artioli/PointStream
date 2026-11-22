@@ -1,0 +1,29 @@
+{
+  "job_id": "20261122T135202Z-44c2ee20",
+  "state": "complete",
+  "mode": "ordinary",
+  "width": 640,
+  "height": 384,
+  "archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T135202Z-44c2ee20/full/published.tar",
+  "archive_sha256": "0ab24a32b832931494d5bdfcfa2bb711db272036dc8301adc6239e519c00ee37",
+  "selected": {
+    "warm": {
+      "affordable": false
+    },
+    "cold": {
+      "ceiling": 151035,
+      "affordable": true,
+      "identical_qp_control": null,
+      "quarter_crf": 155,
+      "bytes": 150633,
+      "file": "publish/q155.ivf",
+      "sha256": "3a2b99b1eca9839e868b1d54ce711382233baa82d4d4af48496181f7f63c66aa",
+      "origin": "new",
+      "elapsed": 5.361579977994552,
+      "decoded_sha256": "27745defdc1efcf9a4445a33c5592b0f9b50c505f709f920d4751bf37eac8874",
+      "decoded_file": "publish/cold.yuv.z",
+      "shortfall": 0.002661634720429018
+    }
+  },
+  "report_sha256": "df5392ba7db1dcf30f80355098dcd1d500fe9fb9c7c3415f81f066c092d0021c"
+}

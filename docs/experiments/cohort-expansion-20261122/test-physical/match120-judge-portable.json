@@ -1,0 +1,149 @@
+{
+  "match": "match120",
+  "frames": 240,
+  "visible": 19,
+  "source_hits10": 15,
+  "source_qualified": false,
+  "detections": {
+    "source": {
+      "rows": [
+        {
+          "tick": 9,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 0.7026352898939077
+        },
+        {
+          "tick": 20,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 1.8171215036061161
+        },
+        {
+          "tick": 32,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 1.458397480747353
+        },
+        {
+          "tick": 44,
+          "visibility": 1,
+          "present": false,
+          "error_native_pixels": null
+        },
+        {
+          "tick": 56,
+          "visibility": 1,
+          "present": false,
+          "error_native_pixels": null
+        },
+        {
+          "tick": 68,
+          "visibility": 1,
+          "present": false,
+          "error_native_pixels": null
+        },
+        {
+          "tick": 80,
+          "visibility": 1,
+          "present": false,
+          "error_native_pixels": null
+        },
+        {
+          "tick": 92,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 1.7293784141408814
+        },
+        {
+          "tick": 103,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 1.9179964756102776
+        },
+        {
+          "tick": 115,
+          "visibility": 0,
+          "present": true,
+          "error_native_pixels": null
+        },
+        {
+          "tick": 127,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 1.361230169750936
+        },
+        {
+          "tick": 139,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 6.047019005032268
+        },
+        {
+          "tick": 151,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 1.3130978860925686
+        },
+        {
+          "tick": 163,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 0.9763537880072874
+        },
+        {
+          "tick": 175,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 0.7591658826259357
+        },
+        {
+          "tick": 186,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 1.6281880197780267
+        },
+        {
+          "tick": 198,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 0.843816452181434
+        },
+        {
+          "tick": 210,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 0.4051762993000844
+        },
+        {
+          "tick": 222,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 1.6240469590679787
+        },
+        {
+          "tick": 234,
+          "visibility": 1,
+          "present": true,
+          "error_native_pixels": 0.9166024897613566
+        }
+      ],
+      "seconds": 12.77336380397901
+    }
+  },
+  "source_sha256": "7d119f25b1922f0dbd7f5ffb6ea5ac34226a8ea93b41e7a37e401f07ee0e5976",
+  "labels_sha256": "3250a9dd74a29e4abf37374776cd89744e2186cbdba97de266442aaf9da6f2e6",
+  "rate_archive_sha256": "5d1d06ac0a1677eb1ba82ed149b80d80a68d6618e34e0dcc9070c8dd92d67439",
+  "judge_checkpoint_sha256": "9d391239ab10c733f8e5bfadf16ab72838e7a8ebc88e8ae2038501c03d42b4bb",
+  "rgb_sha256": {
+    "source": "8e59f70b22a7779641ca3ba567f90e3822d60ea2e0aa2a86ad660e4b21550c9b",
+    "ordinary": "3272e58fd66b7b5bd9a5e1c401979dba10690484029ea269687f0d292f1e7e7a",
+    "candidate": "3de29172333330290645bfbd837d2faa8bd8e5f922d60b26406f9d22e0a33b87"
+  },
+  "judge_config_sha256": "6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d",
+  "device": "NVIDIA RTX 6000 Ada Generation",
+  "model_init_seconds": 1.4111547000065912,
+  "portable_seconds": 23.79218170698732,
+  "frozen_display_sha256": "245845f12a3ae2edf3ae777e94ee89c528c65232269401139fcefbdc4eb2c41a",
+  "elapsed": 44.33896644899505
+}

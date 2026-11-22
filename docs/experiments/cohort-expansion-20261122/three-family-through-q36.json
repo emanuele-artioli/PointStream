@@ -1,0 +1,4196 @@
+{
+  "results": {
+    "pooled": [
+      {
+        "available_kbps": 35,
+        "fixed_population": [
+          "match108",
+          "match102",
+          "match120",
+          "match127",
+          "match105",
+          "match116",
+          "match107",
+          "match131",
+          "match119",
+          "match104",
+          "match130",
+          "match126"
+        ],
+        "missing_neural": [],
+        "families": {
+          "ordinary": {
+            "complete": true,
+            "count": 12,
+            "mean_kbps": 29.510592463092465,
+            "mean_dists": 0.24881810511605276,
+            "dists95": [
+              0.233069030893926,
+              0.264884730364896
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "bytes": 30462,
+                "kbps": 25.385,
+                "dists": 0.2290451407432556,
+                "width": 640,
+                "crf": 66.25,
+                "sha256": "64ee7427e734976f35735ce5170171af7f6a154593cf441a80d3e1bf870470b3"
+              },
+              {
+                "match": "match102",
+                "bytes": 29253,
+                "kbps": 29.223776223776223,
+                "dists": 0.2124578759074211,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "b1fac39eab22081c677328629b51f6ca753d9951ec89012164503272df239fe2"
+              },
+              {
+                "match": "match120",
+                "bytes": 14300,
+                "kbps": 28.6,
+                "dists": 0.3045613734345687,
+                "width": 320,
+                "crf": 66.25,
+                "sha256": "ef0236b41d73d41eb7bf7a68e7923c17c9572f2bcbbff07e053289470382384b"
+              },
+              {
+                "match": "match127",
+                "bytes": 15664,
+                "kbps": 31.328,
+                "dists": 0.2615902841091156,
+                "width": 640,
+                "crf": 69.25,
+                "sha256": "68844f0f5e77ca4ccc68622cebeef7c59616057835208f70c12d3d110fc1b3b4"
+              },
+              {
+                "match": "match105",
+                "bytes": 36112,
+                "kbps": 30.093333333333334,
+                "dists": 0.24265186032470393,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "f53eaeb9b2abc28b0965c17586ab997c0cfeb578aa1d344e0a109667b438593b"
+              },
+              {
+                "match": "match116",
+                "bytes": 29260,
+                "kbps": 24.383333333333333,
+                "dists": 0.22796379526456198,
+                "width": 640,
+                "crf": 64.25,
+                "sha256": "5887fa612f586f55afce215a136d3f314e40a0dbf424dbede40cb4e5272eb74e"
+              },
+              {
+                "match": "match107",
+                "bytes": 17407,
+                "kbps": 34.814,
+                "dists": 0.2627478361129761,
+                "width": 640,
+                "crf": 69.5,
+                "sha256": "140a9a6c09c133ce9b09d1744cc97d93eb74a0b8e6617ce059c4d23c29185b12"
+              },
+              {
+                "match": "match131",
+                "bytes": 31222,
+                "kbps": 26.018333333333334,
+                "dists": 0.2076477565263447,
+                "width": 640,
+                "crf": 66.25,
+                "sha256": "76602a5fc763e16bda1f308eda943d95dc01513c46928620a2e4d6753a1aa466"
+              },
+              {
+                "match": "match119",
+                "bytes": 16575,
+                "kbps": 33.15,
+                "dists": 0.2734130091137356,
+                "width": 640,
+                "crf": 68.0,
+                "sha256": "e21e97d8e140ced816882500238ec868076f211413813d5d33c36bb0a431d9be"
+              },
+              {
+                "match": "match104",
+                "bytes": 17329,
+                "kbps": 34.658,
+                "dists": 0.2747777785573687,
+                "width": 640,
+                "crf": 68.5,
+                "sha256": "9e1e2c9e7377b70f56655980b20e39f8f243c63618978137193365dddc512d4b"
+              },
+              {
+                "match": "match130",
+                "bytes": 26921,
+                "kbps": 22.434166666666666,
+                "dists": 0.26268752813339236,
+                "width": 640,
+                "crf": 67.0,
+                "sha256": "c7638d9cec6f0bc9522af10914a7c1cdaf671dd40c3b0650c1f4bc6dc43a8320"
+              },
+              {
+                "match": "match126",
+                "bytes": 40847,
+                "kbps": 34.03916666666667,
+                "dists": 0.2262730231651893,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "7ea83ac469ad8eeaace77e20793d3e749f80602148254cf79c8b2bd00d154203"
+              }
+            ]
+          },
+          "candidate": {
+            "complete": true,
+            "count": 12,
+            "mean_kbps": 29.758204809079803,
+            "mean_dists": 0.23182223492538068,
+            "dists95": [
+              0.21356490440647544,
+              0.24950983185326
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "bytes": 31569,
+                "kbps": 26.3075,
+                "dists": 0.21970155477523803,
+                "width": 640,
+                "crf": 66.25,
+                "sha256": "e1fd058cd74cb005ae883aa61c58ee4511fbcb18c129fbe2f14f04b885da1064"
+              },
+              {
+                "match": "match102",
+                "bytes": 30406,
+                "kbps": 30.375624375624376,
+                "dists": 0.18969264328479768,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "9a80e49be23621aa3eb5bb2f8c6048b41ddd2574d96f369e0d7c49bf15677cd5"
+              },
+              {
+                "match": "match120",
+                "bytes": 15260,
+                "kbps": 30.52,
+                "dists": 0.2847185762305009,
+                "width": 320,
+                "crf": 66.25,
+                "sha256": "65d6b960302f03fd5a54f0fc47a1610084ab860e03a89484ebeebf0753c9e8aa"
+              },
+              {
+                "match": "match127",
+                "bytes": 16717,
+                "kbps": 33.434,
+                "dists": 0.22078969180583954,
+                "width": 640,
+                "crf": 69.25,
+                "sha256": "69362c0f97ee68dc286573531b0e342b14efcfb2d431eaa96a0b64cfbafba6aa"
+              },
+              {
+                "match": "match105",
+                "bytes": 37242,
+                "kbps": 31.035,
+                "dists": 0.22053837776184082,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "55311b83f843d99248e83fef6f38c8405f84cab21cae749fc085f15962954172"
+              },
+              {
+                "match": "match116",
+                "bytes": 30209,
+                "kbps": 25.174166666666668,
+                "dists": 0.21724560235937437,
+                "width": 640,
+                "crf": 64.25,
+                "sha256": "176e3330289ab67c75339551da2edc66f3115d101f8fdaebcbcad878ee9f4f79"
+              },
+              {
+                "match": "match107",
+                "bytes": 14130,
+                "kbps": 28.26,
+                "dists": 0.2671848714351654,
+                "width": 320,
+                "crf": 66.25,
+                "sha256": "2306844bdae7450e2953c80d86e184d1bab18176223d76ff47ff98fcead35562"
+              },
+              {
+                "match": "match131",
+                "bytes": 32201,
+                "kbps": 26.83416666666667,
+                "dists": 0.17424907809809634,
+                "width": 640,
+                "crf": 66.25,
+                "sha256": "b3204e7edc76a93df661d8ecf1866f716e4a3404c5f429df12e4b54293f2d838"
+              },
+              {
+                "match": "match119",
+                "bytes": 16421,
+                "kbps": 32.842,
+                "dists": 0.25895477996932137,
+                "width": 640,
+                "crf": 69.0,
+                "sha256": "e20b12ee673786c6c538a8c14af3f066d272a3957c2afa00a4aa60b86aceefd6"
+              },
+              {
+                "match": "match104",
+                "bytes": 17108,
+                "kbps": 34.216,
+                "dists": 0.26338162308647517,
+                "width": 320,
+                "crf": 62.5,
+                "sha256": "90decaddb27b2296aa0bfa1d2d8e7b4197d5cd537fee61021ae371f7df94a753"
+              },
+              {
+                "match": "match130",
+                "bytes": 27831,
+                "kbps": 23.1925,
+                "dists": 0.2524893209338188,
+                "width": 640,
+                "crf": 67.0,
+                "sha256": "7a5415237457d1d73485f4e92e9e86eb29ad540a2d61e0cfce1ee410b54ff296"
+              },
+              {
+                "match": "match126",
+                "bytes": 41889,
+                "kbps": 34.9075,
+                "dists": 0.21292069936409974,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "0736eb9d556f7cf66f5c136062a5eb8e97290044182bf02f0325a450e131d1f9"
+              }
+            ]
+          },
+          "neural": {
+            "complete": true,
+            "count": 12,
+            "mean_kbps": 25.090273754023755,
+            "mean_dists": 0.24781354758356344,
+            "dists95": [
+              0.23917748784796897,
+              0.25651737368773647
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "kbps": 32.06666666666667,
+                "bytes": 38480,
+                "dists": 0.22563001036643981,
+                "sha256": "37fd9722f8331b2904220790a42c6ac1753050fe64f9329709f47e9b47a650d1",
+                "qp": 36
+              },
+              {
+                "match": "match102",
+                "kbps": 19.381618381618384,
+                "bytes": 19401,
+                "dists": 0.22192792892456054,
+                "sha256": "ce7df30a776450af3a647fe613dfa5ca1e6b1061397b9ccd989bc7837729c11d",
+                "qp": 36
+              },
+              {
+                "match": "match120",
+                "kbps": 31.834,
+                "bytes": 15917,
+                "dists": 0.2627978701340525,
+                "sha256": "a84815d32033ad6440c815d1374617fb01a91412d10abc50f952d3b32c2c1ec7",
+                "qp": 24
+              },
+              {
+                "match": "match127",
+                "kbps": 22.448,
+                "bytes": 11224,
+                "dists": 0.24358890652656556,
+                "sha256": "fb46b547842d5368273860c106cfa5a6ca58bd3dc7a51af57f026aeadc7acf8c",
+                "qp": 24
+              },
+              {
+                "match": "match105",
+                "kbps": 22.5075,
+                "bytes": 27009,
+                "dists": 0.24968782614688484,
+                "sha256": "21d7c54e0ae9436c61f4e5f821b654a2db32c4f9bcaa045ed14f5af0002facdf",
+                "qp": 36
+              },
+              {
+                "match": "match116",
+                "kbps": 23.104166666666668,
+                "bytes": 27725,
+                "dists": 0.23320704450209936,
+                "sha256": "bad251d8ea83dd059591a497294521b01f554ab1dc7f347cdc88e57afb6e145c",
+                "qp": 36
+              },
+              {
+                "match": "match107",
+                "kbps": 29.382,
+                "bytes": 14691,
+                "dists": 0.24409963488578795,
+                "sha256": "fc30bf53eb27a98b16930bb37d838961e83748e599424459a70f02a3f11a091f",
+                "qp": 24
+              },
+              {
+                "match": "match131",
+                "kbps": 16.52583333333333,
+                "bytes": 19831,
+                "dists": 0.25036218919252096,
+                "sha256": "ba0f0ae7fc42993a5cd4beba9cafc3a7602d29def8d64faa07fe422e63a5f1c8",
+                "qp": 24
+              },
+              {
+                "match": "match119",
+                "kbps": 23.294,
+                "bytes": 11647,
+                "dists": 0.27656083967950607,
+                "sha256": "d9d912ffe3370a47335c3d93f0636fd1736b4528127b6584203e18b72832fbc0",
+                "qp": 24
+              },
+              {
+                "match": "match104",
+                "kbps": 22.382,
+                "bytes": 11191,
+                "dists": 0.26435061011995586,
+                "sha256": "becef5d9ab3aab00aa25b904779658dac2261d47d5df5191da7876e0639a731a",
+                "qp": 24
+              },
+              {
+                "match": "match130",
+                "kbps": 33.91583333333334,
+                "bytes": 40699,
+                "dists": 0.2542515218257904,
+                "sha256": "b80fda5c99355bd5930960b4e26fde2e0cf949a866884a4b1cd3905615d183c0",
+                "qp": 36
+              },
+              {
+                "match": "match126",
+                "kbps": 24.241666666666667,
+                "bytes": 29090,
+                "dists": 0.24729818869859743,
+                "sha256": "1096a99c1d68f61bbbf57f66a07a0a3929d617a57427758e26bedbe288121e55",
+                "qp": 36
+              }
+            ]
+          }
+        },
+        "paired": {
+          "ordinary": {
+            "delta": -0.016995870190672124,
+            "decrease_percent": 6.830640472382399,
+            "difference95": [
+              -0.023542616604449534,
+              -0.010795023984202932
+            ],
+            "wins": 11
+          },
+          "neural": {
+            "delta": -0.01599131265818276,
+            "decrease_percent": 6.452961435770755,
+            "difference95": [
+              -0.0313111428006122,
+              -0.002113729487771581
+            ],
+            "wins": 10
+          }
+        }
+      },
+      {
+        "available_kbps": 60,
+        "fixed_population": [
+          "match108",
+          "match102",
+          "match120",
+          "match127",
+          "match105",
+          "match116",
+          "match107",
+          "match131",
+          "match119",
+          "match104",
+          "match130",
+          "match126"
+        ],
+        "missing_neural": [],
+        "families": {
+          "ordinary": {
+            "complete": true,
+            "count": 12,
+            "mean_kbps": 45.09705493117993,
+            "mean_dists": 0.22059201871319353,
+            "dists95": [
+              0.20693220069874407,
+              0.2340147234961068
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "bytes": 54604,
+                "kbps": 45.50333333333333,
+                "dists": 0.18897242546081544,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "0476d6b72f9031e354e89d4f90d49809306c1851495c0a5540f2182c3e4106e4"
+              },
+              {
+                "match": "match102",
+                "bytes": 59567,
+                "kbps": 59.50749250749251,
+                "dists": 0.18403823375701905,
+                "width": 640,
+                "crf": 55.0,
+                "sha256": "2bdc36e0504c414e7f4e007e96acdc4cfa41dcc32afed6cb02682a0e7cec0ddb"
+              },
+              {
+                "match": "match120",
+                "bytes": 26280,
+                "kbps": 52.56,
+                "dists": 0.2383632691282975,
+                "width": 640,
+                "crf": 66.25,
+                "sha256": "a605dcf0f2622bae4dd65024ead4e6a19022ec398e99cb1cc9057a24dd0ddbea"
+              },
+              {
+                "match": "match127",
+                "bytes": 19159,
+                "kbps": 38.318,
+                "dists": 0.2400129735469818,
+                "width": 640,
+                "crf": 66.25,
+                "sha256": "eebbc6b1fde565908b60d66e919ab76d6360d742a98ae69c6100933a2f1a0cc9"
+              },
+              {
+                "match": "match105",
+                "bytes": 70696,
+                "kbps": 58.913333333333334,
+                "dists": 0.20518074838482603,
+                "width": 640,
+                "crf": 55.0,
+                "sha256": "a05f9daa69c880c5619e384964f562be4611046e3790232e3bae2f924ab747e1"
+              },
+              {
+                "match": "match116",
+                "bytes": 42235,
+                "kbps": 35.19583333333333,
+                "dists": 0.2140056515733401,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "b649b3fcc7df30b64b43885a4ce5cd2020811a7025bc3b13b999a00cf1d18fdc"
+              },
+              {
+                "match": "match107",
+                "bytes": 23068,
+                "kbps": 46.136,
+                "dists": 0.23183155357837676,
+                "width": 640,
+                "crf": 66.25,
+                "sha256": "e6ec30af560a860bc6ba871c1bfdf9e40db4453903602d187438d9307414bc7c"
+              },
+              {
+                "match": "match131",
+                "bytes": 57645,
+                "kbps": 48.0375,
+                "dists": 0.18681905928410983,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "90b7a550a301c6371fe16662c3f0613e3a8bd1b55399c77c7a95dda2653c74eb"
+              },
+              {
+                "match": "match119",
+                "bytes": 19091,
+                "kbps": 38.182,
+                "dists": 0.2602205408944024,
+                "width": 640,
+                "crf": 66.25,
+                "sha256": "6ef80921f694c36c30099429552828e3e0da6a0b1162d1347b6675a8894e8559"
+              },
+              {
+                "match": "match104",
+                "bytes": 20666,
+                "kbps": 41.332,
+                "dists": 0.2449899571282523,
+                "width": 640,
+                "crf": 66.25,
+                "sha256": "1a239074b2b31772df434ec310488a877deaa2554b5d3a084c7aa0b8a057bda1"
+              },
+              {
+                "match": "match130",
+                "bytes": 52128,
+                "kbps": 43.44,
+                "dists": 0.2263967886567116,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "b5bf9a7c78e638da5c611edbe89fc9cbe86b7e6cb6b49067388a2b0531bab63e"
+              },
+              {
+                "match": "match126",
+                "bytes": 40847,
+                "kbps": 34.03916666666667,
+                "dists": 0.2262730231651893,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "7ea83ac469ad8eeaace77e20793d3e749f80602148254cf79c8b2bd00d154203"
+              }
+            ]
+          },
+          "candidate": {
+            "complete": true,
+            "count": 12,
+            "mean_kbps": 43.96069092019092,
+            "mean_dists": 0.20170150997162758,
+            "dists95": [
+              0.18722714616362102,
+              0.21569147866977156
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "bytes": 55711,
+                "kbps": 46.42583333333334,
+                "dists": 0.17899184823036193,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "86b65e3e9b1fac95ea55520dafffbf781086cb052b7ffd8b2845c559f51b8338"
+              },
+              {
+                "match": "match102",
+                "bytes": 30406,
+                "kbps": 30.375624375624376,
+                "dists": 0.18969264328479768,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "9a80e49be23621aa3eb5bb2f8c6048b41ddd2574d96f369e0d7c49bf15677cd5"
+              },
+              {
+                "match": "match120",
+                "bytes": 27240,
+                "kbps": 54.48,
+                "dists": 0.22502881915945755,
+                "width": 640,
+                "crf": 66.25,
+                "sha256": "d667b0df956d9611a705cc898c42e9110529abbbe6fb2a52a4d95636a37e68ed"
+              },
+              {
+                "match": "match127",
+                "bytes": 20212,
+                "kbps": 40.424,
+                "dists": 0.1992875725030899,
+                "width": 640,
+                "crf": 66.25,
+                "sha256": "5a894084ead374afd00489e7622d2864818a0159551a21d4ebbc3ecaeed4c3bc"
+              },
+              {
+                "match": "match105",
+                "bytes": 71826,
+                "kbps": 59.855,
+                "dists": 0.18119328970811804,
+                "width": 640,
+                "crf": 55.0,
+                "sha256": "fa5ccef90e6b743aa7004eedfca0159ff936b6751b7e0e94c2f63a5dcbecbe2e"
+              },
+              {
+                "match": "match116",
+                "bytes": 43184,
+                "kbps": 35.986666666666665,
+                "dists": 0.20281323293844858,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "f58f4b1915f9988a8571d973f59b40ff0be0f53cba22e2b8d19e4204f21ae635"
+              },
+              {
+                "match": "match107",
+                "bytes": 24176,
+                "kbps": 48.352,
+                "dists": 0.1880767673254013,
+                "width": 640,
+                "crf": 66.25,
+                "sha256": "4bda47723db6d6c41bff3dad5b9a02957a3061b5a1658e9813b55606153461a8"
+              },
+              {
+                "match": "match131",
+                "bytes": 58624,
+                "kbps": 48.85333333333333,
+                "dists": 0.1496406730852629,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "19d981dff6c891b28794a8f0cd0ff33a2ef387609c28a997ea27309bf22de48a"
+              },
+              {
+                "match": "match119",
+                "bytes": 20075,
+                "kbps": 40.15,
+                "dists": 0.2487736377451155,
+                "width": 640,
+                "crf": 66.25,
+                "sha256": "b2013992578cacf4c3e793565736f654afb6676ab9fb1d1f9b324b51d27b78aa"
+              },
+              {
+                "match": "match104",
+                "bytes": 21760,
+                "kbps": 43.52,
+                "dists": 0.22589065631230673,
+                "width": 640,
+                "crf": 66.25,
+                "sha256": "b03e1840483f33623eb64ed9a380b488e878fbc11fda0cce5be20c3cca1d3281"
+              },
+              {
+                "match": "match130",
+                "bytes": 53038,
+                "kbps": 44.19833333333333,
+                "dists": 0.21810828000307084,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "dc22ef89bdd66638adb5e83d5d1e6c97a7e9eb73cfe5249ff7a83620dfeb2186"
+              },
+              {
+                "match": "match126",
+                "bytes": 41889,
+                "kbps": 34.9075,
+                "dists": 0.21292069936409974,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "0736eb9d556f7cf66f5c136062a5eb8e97290044182bf02f0325a450e131d1f9"
+              }
+            ]
+          },
+          "neural": {
+            "complete": true,
+            "count": 12,
+            "mean_kbps": 33.933440420690424,
+            "mean_dists": 0.237971710399607,
+            "dists95": [
+              0.2308216583477241,
+              0.24528320528766753
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "kbps": 32.06666666666667,
+                "bytes": 38480,
+                "dists": 0.22563001036643981,
+                "sha256": "37fd9722f8331b2904220790a42c6ac1753050fe64f9329709f47e9b47a650d1",
+                "qp": 36
+              },
+              {
+                "match": "match102",
+                "kbps": 19.381618381618384,
+                "bytes": 19401,
+                "dists": 0.22192792892456054,
+                "sha256": "ce7df30a776450af3a647fe613dfa5ca1e6b1061397b9ccd989bc7837729c11d",
+                "qp": 36
+              },
+              {
+                "match": "match120",
+                "kbps": 31.834,
+                "bytes": 15917,
+                "dists": 0.2627978701340525,
+                "sha256": "a84815d32033ad6440c815d1374617fb01a91412d10abc50f952d3b32c2c1ec7",
+                "qp": 24
+              },
+              {
+                "match": "match127",
+                "kbps": 40.502,
+                "bytes": 20251,
+                "dists": 0.22729552388191224,
+                "sha256": "b4011f4bca94fcd98b2912e78aca8ea4d2773e3926a9566ff0ee7f7bbbe8c9da",
+                "qp": 36
+              },
+              {
+                "match": "match105",
+                "kbps": 22.5075,
+                "bytes": 27009,
+                "dists": 0.24968782614688484,
+                "sha256": "21d7c54e0ae9436c61f4e5f821b654a2db32c4f9bcaa045ed14f5af0002facdf",
+                "qp": 36
+              },
+              {
+                "match": "match116",
+                "kbps": 23.104166666666668,
+                "bytes": 27725,
+                "dists": 0.23320704450209936,
+                "sha256": "bad251d8ea83dd059591a497294521b01f554ab1dc7f347cdc88e57afb6e145c",
+                "qp": 36
+              },
+              {
+                "match": "match107",
+                "kbps": 59.26,
+                "bytes": 29630,
+                "dists": 0.23049124479293823,
+                "sha256": "63c4f7942624f4517cff17bd94ff7f02080d297bd6e188a7198ffc7400175b96",
+                "qp": 36
+              },
+              {
+                "match": "match131",
+                "kbps": 37.87583333333333,
+                "bytes": 45451,
+                "dists": 0.22183617635777123,
+                "sha256": "39805ff5a78758265a39989ed876f12f6c09a247f08d517db8f5f99fccbb8330",
+                "qp": 36
+              },
+              {
+                "match": "match119",
+                "kbps": 41.606,
+                "bytes": 20803,
+                "dists": 0.24456097020043266,
+                "sha256": "8991e51da4ef301623d50ccb1832ea6a897f19f4e743891cb727afe5c55efe13",
+                "qp": 36
+              },
+              {
+                "match": "match104",
+                "kbps": 40.906,
+                "bytes": 20453,
+                "dists": 0.2366762189638047,
+                "sha256": "331fb571f2c9bbf972256be686f564c37a6facf9b7e27d3b4dfb166a638f9dec",
+                "qp": 36
+              },
+              {
+                "match": "match130",
+                "kbps": 33.91583333333334,
+                "bytes": 40699,
+                "dists": 0.2542515218257904,
+                "sha256": "b80fda5c99355bd5930960b4e26fde2e0cf949a866884a4b1cd3905615d183c0",
+                "qp": 36
+              },
+              {
+                "match": "match126",
+                "kbps": 24.241666666666667,
+                "bytes": 29090,
+                "dists": 0.24729818869859743,
+                "sha256": "1096a99c1d68f61bbbf57f66a07a0a3929d617a57427758e26bedbe288121e55",
+                "qp": 36
+              }
+            ]
+          }
+        },
+        "paired": {
+          "ordinary": {
+            "delta": -0.01889050874156595,
+            "decrease_percent": 8.563550418443178,
+            "difference95": [
+              -0.027289266133427963,
+              -0.011265273289081081
+            ],
+            "wins": 11
+          },
+          "neural": {
+            "delta": -0.03627020042797943,
+            "decrease_percent": 15.241391662510528,
+            "difference95": [
+              -0.047784008563570464,
+              -0.024612245921128616
+            ],
+            "wins": 11
+          }
+        }
+      },
+      {
+        "available_kbps": 100,
+        "fixed_population": [
+          "match108",
+          "match102",
+          "match120",
+          "match127",
+          "match105",
+          "match116",
+          "match107",
+          "match131",
+          "match119",
+          "match104",
+          "match130",
+          "match126"
+        ],
+        "missing_neural": [],
+        "families": {
+          "ordinary": {
+            "complete": true,
+            "count": 12,
+            "mean_kbps": 64.68669382006881,
+            "mean_dists": 0.20156742720438767,
+            "dists95": [
+              0.1932504141972415,
+              0.2102026163179458
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "bytes": 54604,
+                "kbps": 45.50333333333333,
+                "dists": 0.18897242546081544,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "0476d6b72f9031e354e89d4f90d49809306c1851495c0a5540f2182c3e4106e4"
+              },
+              {
+                "match": "match102",
+                "bytes": 59567,
+                "kbps": 59.50749250749251,
+                "dists": 0.18403823375701905,
+                "width": 640,
+                "crf": 55.0,
+                "sha256": "2bdc36e0504c414e7f4e007e96acdc4cfa41dcc32afed6cb02682a0e7cec0ddb"
+              },
+              {
+                "match": "match120",
+                "bytes": 49788,
+                "kbps": 99.576,
+                "dists": 0.20479481471212288,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "bc94ec9802faaec0fd57cbcb22c3b829c071b6812104feccc7c77de00ffc1c5d"
+              },
+              {
+                "match": "match127",
+                "bytes": 32244,
+                "kbps": 64.488,
+                "dists": 0.21078900694847108,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "181233789afe8d47e2e92b757c94c148bfd9030009dffb5a6903d5337a315356"
+              },
+              {
+                "match": "match105",
+                "bytes": 70696,
+                "kbps": 58.913333333333334,
+                "dists": 0.20518074838482603,
+                "width": 640,
+                "crf": 55.0,
+                "sha256": "a05f9daa69c880c5619e384964f562be4611046e3790232e3bae2f924ab747e1"
+              },
+              {
+                "match": "match116",
+                "bytes": 96662,
+                "kbps": 80.55166666666666,
+                "dists": 0.18054000909129778,
+                "width": 640,
+                "crf": 55.0,
+                "sha256": "26176be1f61834cd407deea5e7419d858f6593985c3ad237cf2a83c318adb288"
+              },
+              {
+                "match": "match107",
+                "bytes": 39786,
+                "kbps": 79.572,
+                "dists": 0.19920578002929687,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "4d8a4c1a3d46b6a2353671a2b21dd3327d306f993da2c2620ae68a91e37f769d"
+              },
+              {
+                "match": "match131",
+                "bytes": 57645,
+                "kbps": 48.0375,
+                "dists": 0.18681905928410983,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "90b7a550a301c6371fe16662c3f0613e3a8bd1b55399c77c7a95dda2653c74eb"
+              },
+              {
+                "match": "match119",
+                "bytes": 30394,
+                "kbps": 60.788,
+                "dists": 0.22214244140519035,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "4e847b1996c135fa0f9237d88df9fc174c89335e05736d20ec96272dbcf5c2dd"
+              },
+              {
+                "match": "match104",
+                "bytes": 32609,
+                "kbps": 65.218,
+                "dists": 0.2169600242660159,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "6a19b295d388e2c31415a95520bad5dcf05e3ce624720eeaa37455755d369b3f"
+              },
+              {
+                "match": "match130",
+                "bytes": 52128,
+                "kbps": 43.44,
+                "dists": 0.2263967886567116,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "b5bf9a7c78e638da5c611edbe89fc9cbe86b7e6cb6b49067388a2b0531bab63e"
+              },
+              {
+                "match": "match126",
+                "bytes": 84774,
+                "kbps": 70.645,
+                "dists": 0.19296979445677537,
+                "width": 640,
+                "crf": 55.0,
+                "sha256": "cc5f98838fd6c6b1dcb5d028888e71c51ebaf4b0bf447d97e33afa886abd2f16"
+              }
+            ]
+          },
+          "candidate": {
+            "complete": true,
+            "count": 12,
+            "mean_kbps": 62.155972832722846,
+            "mean_dists": 0.1817662665617955,
+            "dists95": [
+              0.16838866615998374,
+              0.1957153345513798
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "bytes": 55711,
+                "kbps": 46.42583333333334,
+                "dists": 0.17899184823036193,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "86b65e3e9b1fac95ea55520dafffbf781086cb052b7ffd8b2845c559f51b8338"
+              },
+              {
+                "match": "match102",
+                "bytes": 60720,
+                "kbps": 60.65934065934066,
+                "dists": 0.162644599378109,
+                "width": 640,
+                "crf": 55.0,
+                "sha256": "275e92bcab4ffed0af5062c0258fdadcf91595f6b5872d33db23a062be3ff965"
+              },
+              {
+                "match": "match120",
+                "bytes": 27240,
+                "kbps": 54.48,
+                "dists": 0.22502881915945755,
+                "width": 640,
+                "crf": 66.25,
+                "sha256": "d667b0df956d9611a705cc898c42e9110529abbbe6fb2a52a4d95636a37e68ed"
+              },
+              {
+                "match": "match127",
+                "bytes": 33297,
+                "kbps": 66.594,
+                "dists": 0.16655343770980835,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "f7d0fc89972d654f9c375978f29969e2c4bba6274bf07214b1f832c84419e342"
+              },
+              {
+                "match": "match105",
+                "bytes": 71826,
+                "kbps": 59.855,
+                "dists": 0.18119328970811804,
+                "width": 640,
+                "crf": 55.0,
+                "sha256": "fa5ccef90e6b743aa7004eedfca0159ff936b6751b7e0e94c2f63a5dcbecbe2e"
+              },
+              {
+                "match": "match116",
+                "bytes": 97611,
+                "kbps": 81.3425,
+                "dists": 0.16878845791021982,
+                "width": 640,
+                "crf": 55.0,
+                "sha256": "29283ce7814efe2151d063ef19e6958ca0e6fe1aca341c866983a21a035153e9"
+              },
+              {
+                "match": "match107",
+                "bytes": 40894,
+                "kbps": 81.788,
+                "dists": 0.14905279278755187,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "b5892194bedc0a26c3ae089d7a81238693701d0b1f8622ed01165fa90f274d16"
+              },
+              {
+                "match": "match131",
+                "bytes": 58624,
+                "kbps": 48.85333333333333,
+                "dists": 0.1496406730852629,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "19d981dff6c891b28794a8f0cd0ff33a2ef387609c28a997ea27309bf22de48a"
+              },
+              {
+                "match": "match119",
+                "bytes": 31378,
+                "kbps": 62.756,
+                "dists": 0.2090866896841261,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "dbe091843b3a2e70cf660b281517d60755c07e98b8a97c91e7dc904696524c9f"
+              },
+              {
+                "match": "match104",
+                "bytes": 33703,
+                "kbps": 67.406,
+                "dists": 0.19316279320489793,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "1f2c698b190da77646c7133d31c08544858e7a92588b883f6a4cbd2016dc1d09"
+              },
+              {
+                "match": "match130",
+                "bytes": 53038,
+                "kbps": 44.19833333333333,
+                "dists": 0.21810828000307084,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "dc22ef89bdd66638adb5e83d5d1e6c97a7e9eb73cfe5249ff7a83620dfeb2186"
+              },
+              {
+                "match": "match126",
+                "bytes": 85816,
+                "kbps": 71.51333333333334,
+                "dists": 0.17894351788056204,
+                "width": 640,
+                "crf": 55.0,
+                "sha256": "d3d14f8e681614cc1be3932c41bf6096f1f87d38cf432c7ef3407476ca627e86"
+              }
+            ]
+          },
+          "neural": {
+            "complete": true,
+            "count": 12,
+            "mean_kbps": 37.02127375402376,
+            "mean_dists": 0.2356729597627366,
+            "dists95": [
+              0.22980680845917922,
+              0.24170570725622628
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "kbps": 32.06666666666667,
+                "bytes": 38480,
+                "dists": 0.22563001036643981,
+                "sha256": "37fd9722f8331b2904220790a42c6ac1753050fe64f9329709f47e9b47a650d1",
+                "qp": 36
+              },
+              {
+                "match": "match102",
+                "kbps": 19.381618381618384,
+                "bytes": 19401,
+                "dists": 0.22192792892456054,
+                "sha256": "ce7df30a776450af3a647fe613dfa5ca1e6b1061397b9ccd989bc7837729c11d",
+                "qp": 36
+              },
+              {
+                "match": "match120",
+                "kbps": 68.888,
+                "bytes": 34444,
+                "dists": 0.23521286249160767,
+                "sha256": "076014e53bce4fff72f9b69e94755b16e84abe81b66ded220105f97e67122cde",
+                "qp": 36
+              },
+              {
+                "match": "match127",
+                "kbps": 40.502,
+                "bytes": 20251,
+                "dists": 0.22729552388191224,
+                "sha256": "b4011f4bca94fcd98b2912e78aca8ea4d2773e3926a9566ff0ee7f7bbbe8c9da",
+                "qp": 36
+              },
+              {
+                "match": "match105",
+                "kbps": 22.5075,
+                "bytes": 27009,
+                "dists": 0.24968782614688484,
+                "sha256": "21d7c54e0ae9436c61f4e5f821b654a2db32c4f9bcaa045ed14f5af0002facdf",
+                "qp": 36
+              },
+              {
+                "match": "match116",
+                "kbps": 23.104166666666668,
+                "bytes": 27725,
+                "dists": 0.23320704450209936,
+                "sha256": "bad251d8ea83dd059591a497294521b01f554ab1dc7f347cdc88e57afb6e145c",
+                "qp": 36
+              },
+              {
+                "match": "match107",
+                "kbps": 59.26,
+                "bytes": 29630,
+                "dists": 0.23049124479293823,
+                "sha256": "63c4f7942624f4517cff17bd94ff7f02080d297bd6e188a7198ffc7400175b96",
+                "qp": 36
+              },
+              {
+                "match": "match131",
+                "kbps": 37.87583333333333,
+                "bytes": 45451,
+                "dists": 0.22183617635777123,
+                "sha256": "39805ff5a78758265a39989ed876f12f6c09a247f08d517db8f5f99fccbb8330",
+                "qp": 36
+              },
+              {
+                "match": "match119",
+                "kbps": 41.606,
+                "bytes": 20803,
+                "dists": 0.24456097020043266,
+                "sha256": "8991e51da4ef301623d50ccb1832ea6a897f19f4e743891cb727afe5c55efe13",
+                "qp": 36
+              },
+              {
+                "match": "match104",
+                "kbps": 40.906,
+                "bytes": 20453,
+                "dists": 0.2366762189638047,
+                "sha256": "331fb571f2c9bbf972256be686f564c37a6facf9b7e27d3b4dfb166a638f9dec",
+                "qp": 36
+              },
+              {
+                "match": "match130",
+                "kbps": 33.91583333333334,
+                "bytes": 40699,
+                "dists": 0.2542515218257904,
+                "sha256": "b80fda5c99355bd5930960b4e26fde2e0cf949a866884a4b1cd3905615d183c0",
+                "qp": 36
+              },
+              {
+                "match": "match126",
+                "kbps": 24.241666666666667,
+                "bytes": 29090,
+                "dists": 0.24729818869859743,
+                "sha256": "1096a99c1d68f61bbbf57f66a07a0a3929d617a57427758e26bedbe288121e55",
+                "qp": 36
+              }
+            ]
+          }
+        },
+        "paired": {
+          "ordinary": {
+            "delta": -0.019801160642592148,
+            "decrease_percent": 9.823591498498384,
+            "difference95": [
+              -0.029829388216939406,
+              -0.009689978317184376
+            ],
+            "wins": 11
+          },
+          "neural": {
+            "delta": -0.053906693200941054,
+            "decrease_percent": 22.873516442111807,
+            "difference95": [
+              -0.0644158563917091,
+              -0.042542714733002474
+            ],
+            "wins": 12
+          }
+        }
+      }
+    ],
+    "starved_cohort": [
+      {
+        "available_kbps": 15.0,
+        "fixed_population": [
+          "match108",
+          "match102",
+          "match105",
+          "match116",
+          "match131",
+          "match130",
+          "match126"
+        ],
+        "missing_neural": [],
+        "families": {
+          "ordinary": {
+            "complete": true,
+            "count": 7,
+            "mean_kbps": 13.168251391465677,
+            "mean_dists": 0.3030955584195037,
+            "dists95": [
+              0.279351638690926,
+              0.3293718761429751
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "bytes": 11627,
+                "kbps": 9.689166666666667,
+                "dists": 0.3606604015827179,
+                "width": 320,
+                "crf": 70.0,
+                "sha256": "c23d411e37ad568b463b1b1f88c4d2596431d0b3ca97010f1913e3f737076503"
+              },
+              {
+                "match": "match102",
+                "bytes": 14755,
+                "kbps": 14.740259740259742,
+                "dists": 0.2574422389268875,
+                "width": 640,
+                "crf": 70.0,
+                "sha256": "8966d07ed585aa501fb4dd932c9bd108f6191fea11a2fae8c70f4d07eaba8536"
+              },
+              {
+                "match": "match105",
+                "bytes": 16439,
+                "kbps": 13.699166666666667,
+                "dists": 0.28915028791038355,
+                "width": 640,
+                "crf": 70.0,
+                "sha256": "f540b1942ec102aec4cc7eed7de208a4dc3de65fa50074f2b6df2168da1e5079"
+              },
+              {
+                "match": "match116",
+                "bytes": 17031,
+                "kbps": 14.1925,
+                "dists": 0.2758818256358306,
+                "width": 640,
+                "crf": 70.0,
+                "sha256": "0efa1bc57b845e767f232b3c2e4fa7a5c2f1a8f8a984deeacf581ed817a0ef96"
+              },
+              {
+                "match": "match131",
+                "bytes": 12053,
+                "kbps": 10.044166666666667,
+                "dists": 0.33907771424243327,
+                "width": 320,
+                "crf": 70.0,
+                "sha256": "f373d9a2eca339bcfee7eeb9eec7c045e69937ce10943d7a215f7ff1ea052acc"
+              },
+              {
+                "match": "match130",
+                "bytes": 17955,
+                "kbps": 14.9625,
+                "dists": 0.31130115389823915,
+                "width": 320,
+                "crf": 64.25,
+                "sha256": "b27d76c0887ee0dacd072158fbe840754adfa3613ce66eac56d446a3ec71751f"
+              },
+              {
+                "match": "match126",
+                "bytes": 17820,
+                "kbps": 14.85,
+                "dists": 0.28815528674003404,
+                "width": 320,
+                "crf": 62.5,
+                "sha256": "162eaf6b7cd0b22c8476ed5f20bdc18202fd9b1b295662afd3b2455d6962c12b"
+              }
+            ]
+          },
+          "candidate": {
+            "complete": true,
+            "count": 7,
+            "mean_kbps": 13.003436325579184,
+            "mean_dists": 0.3000991387936059,
+            "dists95": [
+              0.28075358475449635,
+              0.3207556027343174
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "bytes": 12734,
+                "kbps": 10.611666666666666,
+                "dists": 0.34681477785110476,
+                "width": 320,
+                "crf": 70.0,
+                "sha256": "5cb2ab549a322ed46e5309a9504ad33913640961e1d30ab45b6f00d0c9c6da2a"
+              },
+              {
+                "match": "match102",
+                "bytes": 11624,
+                "kbps": 11.61238761238761,
+                "dists": 0.30964704900979995,
+                "width": 320,
+                "crf": 70.0,
+                "sha256": "59e9b96f9851848603a17b47bde232968fbd056f332f13914534321cee5ad9d4"
+              },
+              {
+                "match": "match105",
+                "bytes": 17912,
+                "kbps": 14.926666666666666,
+                "dists": 0.2683891301252404,
+                "width": 320,
+                "crf": 62.5,
+                "sha256": "9a0bcb80112761d33f83719e287c7fa892a2db4ff31477e4fec688ce61574a38"
+              },
+              {
+                "match": "match116",
+                "bytes": 17980,
+                "kbps": 14.983333333333333,
+                "dists": 0.2679385170340538,
+                "width": 640,
+                "crf": 70.0,
+                "sha256": "d6053f825d5c0216e857d592bd136939fb167103691d3e1364bba104c7559cae"
+              },
+              {
+                "match": "match131",
+                "bytes": 13032,
+                "kbps": 10.86,
+                "dists": 0.3123393215631184,
+                "width": 320,
+                "crf": 70.0,
+                "sha256": "a9df8e6eeebc5697d07f523209f49571cd07a88bc2f3460654e6ca9788ec7435"
+              },
+              {
+                "match": "match130",
+                "bytes": 16288,
+                "kbps": 13.573333333333334,
+                "dists": 0.31306860595941544,
+                "width": 320,
+                "crf": 66.25,
+                "sha256": "b65128bb4585cb4a815e9aaf0f741eebc975c004069e4c341a40890f6ea73a48"
+              },
+              {
+                "match": "match126",
+                "bytes": 17348,
+                "kbps": 14.456666666666667,
+                "dists": 0.2824965700125083,
+                "width": 640,
+                "crf": 70.0,
+                "sha256": "4a00cd8a948a00aac5f8ff56c5a56120a144f01859dd2fd5c8717f32840c1f8f"
+              }
+            ]
+          },
+          "neural": {
+            "complete": true,
+            "count": 7,
+            "mean_kbps": 9.924042267256553,
+            "mean_dists": 0.27577453076359754,
+            "dists95": [
+              0.2613625744668326,
+              0.28950459175658266
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "kbps": 8.145,
+                "bytes": 9774,
+                "dists": 0.2932256352901459,
+                "sha256": "bdd4e5e94bd68f7ca152e583760b716513872898bbd26bce5e4a5a47622c2d03",
+                "qp": 12
+              },
+              {
+                "match": "match102",
+                "kbps": 10.537462537462538,
+                "bytes": 10548,
+                "dists": 0.24254765510559081,
+                "sha256": "4723b91727abacf6a2f292939cb6edb23f2971b983c5be4cf1cb639309ea63e5",
+                "qp": 24
+              },
+              {
+                "match": "match105",
+                "kbps": 12.145,
+                "bytes": 14574,
+                "dists": 0.2807880627865694,
+                "sha256": "813155f468161399328d954d4ed4d0fdbb13900ff3563d2db2f0a038b35c07a5",
+                "qp": 24
+              },
+              {
+                "match": "match116",
+                "kbps": 10.91,
+                "bytes": 13092,
+                "dists": 0.2584257995088895,
+                "sha256": "27430550ef9964156cc56f72e816f69f824ec988587265d72fb2cf31186d1399",
+                "qp": 24
+              },
+              {
+                "match": "match131",
+                "kbps": 7.366666666666667,
+                "bytes": 8840,
+                "dists": 0.27658656710072566,
+                "sha256": "2cedbc765f0e296e88d53696e411bf14e9f27e0e00469c23ae9d62c43c2f402a",
+                "qp": 12
+              },
+              {
+                "match": "match130",
+                "kbps": 7.473333333333333,
+                "bytes": 8968,
+                "dists": 0.30448703467845917,
+                "sha256": "ace0f49f7980c3bd2274b751981d0b43acfa29bafe681fb04b4921cedf7d944d",
+                "qp": 12
+              },
+              {
+                "match": "match126",
+                "kbps": 12.890833333333333,
+                "bytes": 15469,
+                "dists": 0.27436096087480205,
+                "sha256": "75fd34bcda37b28b7fdcc0e9de95d0f23d40fff98727313184c3407835e717ff",
+                "qp": 24
+              }
+            ]
+          }
+        },
+        "paired": {
+          "ordinary": {
+            "delta": -0.0029964196258978537,
+            "decrease_percent": 0.9886055874664401,
+            "difference95": [
+              -0.017492392855690247,
+              0.017080759708594555
+            ],
+            "wins": 5
+          },
+          "neural": {
+            "delta": 0.024324608030008358,
+            "decrease_percent": -8.820469374983775,
+            "difference95": [
+              0.005892162019048646,
+              0.044041200771264215
+            ],
+            "wins": 1
+          }
+        }
+      },
+      {
+        "available_kbps": 20.4,
+        "fixed_population": [
+          "match108",
+          "match102",
+          "match105",
+          "match116",
+          "match131",
+          "match130",
+          "match126"
+        ],
+        "missing_neural": [],
+        "families": {
+          "ordinary": {
+            "complete": true,
+            "count": 7,
+            "mean_kbps": 19.86340564197707,
+            "mean_dists": 0.25158448426446406,
+            "dists95": [
+              0.2383144675296052,
+              0.2642244487944851
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "bytes": 24270,
+                "kbps": 20.225,
+                "dists": 0.24366536021232604,
+                "width": 640,
+                "crf": 68.25,
+                "sha256": "7982170d5d099d0e471e8466ff01efc28f34b371f5674d9dbab873f7564a3b6b"
+              },
+              {
+                "match": "match102",
+                "bytes": 18846,
+                "kbps": 18.827172827172827,
+                "dists": 0.22508567422628403,
+                "width": 640,
+                "crf": 66.25,
+                "sha256": "0d1b476674c7af4e1be9f3a1ccc2bd0d5f2f80e2b1e3088edef550f062488430"
+              },
+              {
+                "match": "match105",
+                "bytes": 23672,
+                "kbps": 19.726666666666667,
+                "dists": 0.2716850881673852,
+                "width": 640,
+                "crf": 65.75,
+                "sha256": "9c4996dd5992f7f31c6c2f2350529f09e48838c9efec3cd9cc0f73ae75e90c4d"
+              },
+              {
+                "match": "match116",
+                "bytes": 24319,
+                "kbps": 20.265833333333333,
+                "dists": 0.23961448296904564,
+                "width": 640,
+                "crf": 66.0,
+                "sha256": "d19bae5a70f8b47bb89c1c8cbb4ca7dc9e61fd172d3887ecd6b5d2e330f35e20"
+              },
+              {
+                "match": "match131",
+                "bytes": 24044,
+                "kbps": 20.036666666666665,
+                "dists": 0.2382779560591045,
+                "width": 640,
+                "crf": 69.0,
+                "sha256": "9a4755bd94ce8bb7651554d6fa68d95974f7fc87cfc76545f404ab466c52ff77"
+              },
+              {
+                "match": "match130",
+                "bytes": 24054,
+                "kbps": 20.045,
+                "dists": 0.274335740506649,
+                "width": 640,
+                "crf": 68.0,
+                "sha256": "ce32e89ecc862a61670b5d910234c99577b6060be9d1502742397a3fc5200e9f"
+              },
+              {
+                "match": "match126",
+                "bytes": 23901,
+                "kbps": 19.9175,
+                "dists": 0.2684270877104539,
+                "width": 640,
+                "crf": 66.25,
+                "sha256": "da53533a549aa5ba6575ef59c274a8f62da35882365ee5d623b4272c21689afa"
+              }
+            ]
+          },
+          "candidate": {
+            "complete": true,
+            "count": 7,
+            "mean_kbps": 19.994026806526808,
+            "mean_dists": 0.23831441464272984,
+            "dists95": [
+              0.2214025335971367,
+              0.25360862461310485
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "bytes": 24319,
+                "kbps": 20.265833333333333,
+                "dists": 0.23878761529922485,
+                "width": 640,
+                "crf": 68.75,
+                "sha256": "cfa2094fc4fd831913a85094f8646fb70bdf1be3016e712a94c0c878ccd0064e"
+              },
+              {
+                "match": "match102",
+                "bytes": 19999,
+                "kbps": 19.979020979020977,
+                "dists": 0.2020906165242195,
+                "width": 640,
+                "crf": 66.25,
+                "sha256": "d45d376462b33275b369547af07ab678561960632cd235389f22bb3c81837b53"
+              },
+              {
+                "match": "match105",
+                "bytes": 24414,
+                "kbps": 20.345,
+                "dists": 0.25310532414183323,
+                "width": 320,
+                "crf": 57.75,
+                "sha256": "6b5ba9b1ca922d679cda5ee12fc4635431cbacfd94ba48a8c24e6b5f0f74d193"
+              },
+              {
+                "match": "match116",
+                "bytes": 23994,
+                "kbps": 19.995,
+                "dists": 0.23332183559735617,
+                "width": 640,
+                "crf": 66.5,
+                "sha256": "04894719bedbaaf0c0b838ad44737041d5beb246daee7270dd8c35b2e64ee5c5"
+              },
+              {
+                "match": "match131",
+                "bytes": 24075,
+                "kbps": 20.0625,
+                "dists": 0.21559983021334597,
+                "width": 640,
+                "crf": 69.25,
+                "sha256": "7cb5dfcf1baa0cf1457e91e70787dae623ba5d38da10521d1df3aeb41b725021"
+              },
+              {
+                "match": "match130",
+                "bytes": 22953,
+                "kbps": 19.1275,
+                "dists": 0.2694590762257576,
+                "width": 640,
+                "crf": 69.0,
+                "sha256": "7940de102cefa182740d9e9054faf9d83ee6cb7213828f81691859b38681f5c9"
+              },
+              {
+                "match": "match126",
+                "bytes": 24220,
+                "kbps": 20.183333333333334,
+                "dists": 0.25583660449737156,
+                "width": 640,
+                "crf": 66.5,
+                "sha256": "08035b263cec79f3833d916fe5258601a7ae710e39a48aa9a972b4df1bf5a776"
+              }
+            ]
+          },
+          "neural": {
+            "complete": true,
+            "count": 7,
+            "mean_kbps": 14.956778816421675,
+            "mean_dists": 0.2592261092731362,
+            "dists95": [
+              0.24359122615240997,
+              0.2724053468141105
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "kbps": 16.78666666666667,
+                "bytes": 20144,
+                "dists": 0.24847990155220032,
+                "sha256": "c9e29c4af5783f2fe8432ebb8dc3a6785a0eb6c6eb347fa31deab73f16426684",
+                "qp": 24
+              },
+              {
+                "match": "match102",
+                "kbps": 19.381618381618384,
+                "bytes": 19401,
+                "dists": 0.22192792892456054,
+                "sha256": "ce7df30a776450af3a647fe613dfa5ca1e6b1061397b9ccd989bc7837729c11d",
+                "qp": 36
+              },
+              {
+                "match": "match105",
+                "kbps": 12.145,
+                "bytes": 14574,
+                "dists": 0.2807880627865694,
+                "sha256": "813155f468161399328d954d4ed4d0fdbb13900ff3563d2db2f0a038b35c07a5",
+                "qp": 24
+              },
+              {
+                "match": "match116",
+                "kbps": 10.91,
+                "bytes": 13092,
+                "dists": 0.2584257995088895,
+                "sha256": "27430550ef9964156cc56f72e816f69f824ec988587265d72fb2cf31186d1399",
+                "qp": 24
+              },
+              {
+                "match": "match131",
+                "kbps": 16.52583333333333,
+                "bytes": 19831,
+                "dists": 0.25036218919252096,
+                "sha256": "ba0f0ae7fc42993a5cd4beba9cafc3a7602d29def8d64faa07fe422e63a5f1c8",
+                "qp": 24
+              },
+              {
+                "match": "match130",
+                "kbps": 16.0575,
+                "bytes": 19269,
+                "dists": 0.2802379220724106,
+                "sha256": "70da9fe7101545cffb247d484dc21e6551053ba675a5501a61c113ca3f40e9ac",
+                "qp": 24
+              },
+              {
+                "match": "match126",
+                "kbps": 12.890833333333333,
+                "bytes": 15469,
+                "dists": 0.27436096087480205,
+                "sha256": "75fd34bcda37b28b7fdcc0e9de95d0f23d40fff98727313184c3407835e717ff",
+                "qp": 24
+              }
+            ]
+          }
+        },
+        "paired": {
+          "ordinary": {
+            "delta": -0.013270069621734206,
+            "decrease_percent": 5.274597779958801,
+            "difference95": [
+              -0.018985693419941163,
+              -0.007687771195347934
+            ],
+            "wins": 7
+          },
+          "neural": {
+            "delta": -0.020911694630406357,
+            "decrease_percent": 8.066970834474297,
+            "difference95": [
+              -0.027181634289301575,
+              -0.014774464715500276
+            ],
+            "wins": 7
+          }
+        }
+      },
+      {
+        "available_kbps": 35,
+        "fixed_population": [
+          "match108",
+          "match102",
+          "match105",
+          "match116",
+          "match131",
+          "match130",
+          "match126"
+        ],
+        "missing_neural": [],
+        "families": {
+          "ordinary": {
+            "complete": true,
+            "count": 7,
+            "mean_kbps": 27.36815850815851,
+            "mean_dists": 0.229818140009267,
+            "dists95": [
+              0.21803790594551495,
+              0.24288303666287422
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "bytes": 30462,
+                "kbps": 25.385,
+                "dists": 0.2290451407432556,
+                "width": 640,
+                "crf": 66.25,
+                "sha256": "64ee7427e734976f35735ce5170171af7f6a154593cf441a80d3e1bf870470b3"
+              },
+              {
+                "match": "match102",
+                "bytes": 29253,
+                "kbps": 29.223776223776223,
+                "dists": 0.2124578759074211,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "b1fac39eab22081c677328629b51f6ca753d9951ec89012164503272df239fe2"
+              },
+              {
+                "match": "match105",
+                "bytes": 36112,
+                "kbps": 30.093333333333334,
+                "dists": 0.24265186032470393,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "f53eaeb9b2abc28b0965c17586ab997c0cfeb578aa1d344e0a109667b438593b"
+              },
+              {
+                "match": "match116",
+                "bytes": 29260,
+                "kbps": 24.383333333333333,
+                "dists": 0.22796379526456198,
+                "width": 640,
+                "crf": 64.25,
+                "sha256": "5887fa612f586f55afce215a136d3f314e40a0dbf424dbede40cb4e5272eb74e"
+              },
+              {
+                "match": "match131",
+                "bytes": 31222,
+                "kbps": 26.018333333333334,
+                "dists": 0.2076477565263447,
+                "width": 640,
+                "crf": 66.25,
+                "sha256": "76602a5fc763e16bda1f308eda943d95dc01513c46928620a2e4d6753a1aa466"
+              },
+              {
+                "match": "match130",
+                "bytes": 26921,
+                "kbps": 22.434166666666666,
+                "dists": 0.26268752813339236,
+                "width": 640,
+                "crf": 67.0,
+                "sha256": "c7638d9cec6f0bc9522af10914a7c1cdaf671dd40c3b0650c1f4bc6dc43a8320"
+              },
+              {
+                "match": "match126",
+                "bytes": 40847,
+                "kbps": 34.03916666666667,
+                "dists": 0.2262730231651893,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "7ea83ac469ad8eeaace77e20793d3e749f80602148254cf79c8b2bd00d154203"
+              }
+            ]
+          },
+          "candidate": {
+            "complete": true,
+            "count": 7,
+            "mean_kbps": 28.260922529851097,
+            "mean_dists": 0.2124053252253237,
+            "dists95": [
+              0.1955840842127053,
+              0.22907727604111036
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "bytes": 31569,
+                "kbps": 26.3075,
+                "dists": 0.21970155477523803,
+                "width": 640,
+                "crf": 66.25,
+                "sha256": "e1fd058cd74cb005ae883aa61c58ee4511fbcb18c129fbe2f14f04b885da1064"
+              },
+              {
+                "match": "match102",
+                "bytes": 30406,
+                "kbps": 30.375624375624376,
+                "dists": 0.18969264328479768,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "9a80e49be23621aa3eb5bb2f8c6048b41ddd2574d96f369e0d7c49bf15677cd5"
+              },
+              {
+                "match": "match105",
+                "bytes": 37242,
+                "kbps": 31.035,
+                "dists": 0.22053837776184082,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "55311b83f843d99248e83fef6f38c8405f84cab21cae749fc085f15962954172"
+              },
+              {
+                "match": "match116",
+                "bytes": 30209,
+                "kbps": 25.174166666666668,
+                "dists": 0.21724560235937437,
+                "width": 640,
+                "crf": 64.25,
+                "sha256": "176e3330289ab67c75339551da2edc66f3115d101f8fdaebcbcad878ee9f4f79"
+              },
+              {
+                "match": "match131",
+                "bytes": 32201,
+                "kbps": 26.83416666666667,
+                "dists": 0.17424907809809634,
+                "width": 640,
+                "crf": 66.25,
+                "sha256": "b3204e7edc76a93df661d8ecf1866f716e4a3404c5f429df12e4b54293f2d838"
+              },
+              {
+                "match": "match130",
+                "bytes": 27831,
+                "kbps": 23.1925,
+                "dists": 0.2524893209338188,
+                "width": 640,
+                "crf": 67.0,
+                "sha256": "7a5415237457d1d73485f4e92e9e86eb29ad540a2d61e0cfce1ee410b54ff296"
+              },
+              {
+                "match": "match126",
+                "bytes": 41889,
+                "kbps": 34.9075,
+                "dists": 0.21292069936409974,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "0736eb9d556f7cf66f5c136062a5eb8e97290044182bf02f0325a450e131d1f9"
+              }
+            ]
+          },
+          "neural": {
+            "complete": true,
+            "count": 7,
+            "mean_kbps": 24.53475500689787,
+            "mean_dists": 0.24033781566527046,
+            "dists95": [
+              0.2312564039812491,
+              0.24883001697607024
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "kbps": 32.06666666666667,
+                "bytes": 38480,
+                "dists": 0.22563001036643981,
+                "sha256": "37fd9722f8331b2904220790a42c6ac1753050fe64f9329709f47e9b47a650d1",
+                "qp": 36
+              },
+              {
+                "match": "match102",
+                "kbps": 19.381618381618384,
+                "bytes": 19401,
+                "dists": 0.22192792892456054,
+                "sha256": "ce7df30a776450af3a647fe613dfa5ca1e6b1061397b9ccd989bc7837729c11d",
+                "qp": 36
+              },
+              {
+                "match": "match105",
+                "kbps": 22.5075,
+                "bytes": 27009,
+                "dists": 0.24968782614688484,
+                "sha256": "21d7c54e0ae9436c61f4e5f821b654a2db32c4f9bcaa045ed14f5af0002facdf",
+                "qp": 36
+              },
+              {
+                "match": "match116",
+                "kbps": 23.104166666666668,
+                "bytes": 27725,
+                "dists": 0.23320704450209936,
+                "sha256": "bad251d8ea83dd059591a497294521b01f554ab1dc7f347cdc88e57afb6e145c",
+                "qp": 36
+              },
+              {
+                "match": "match131",
+                "kbps": 16.52583333333333,
+                "bytes": 19831,
+                "dists": 0.25036218919252096,
+                "sha256": "ba0f0ae7fc42993a5cd4beba9cafc3a7602d29def8d64faa07fe422e63a5f1c8",
+                "qp": 24
+              },
+              {
+                "match": "match130",
+                "kbps": 33.91583333333334,
+                "bytes": 40699,
+                "dists": 0.2542515218257904,
+                "sha256": "b80fda5c99355bd5930960b4e26fde2e0cf949a866884a4b1cd3905615d183c0",
+                "qp": 36
+              },
+              {
+                "match": "match126",
+                "kbps": 24.241666666666667,
+                "bytes": 29090,
+                "dists": 0.24729818869859743,
+                "sha256": "1096a99c1d68f61bbbf57f66a07a0a3929d617a57427758e26bedbe288121e55",
+                "qp": 36
+              }
+            ]
+          }
+        },
+        "paired": {
+          "ordinary": {
+            "delta": -0.017412814783943308,
+            "decrease_percent": 7.5767799631661585,
+            "difference95": [
+              -0.023896140018951056,
+              -0.011823602723223827
+            ],
+            "wins": 7
+          },
+          "neural": {
+            "delta": -0.027932490439946795,
+            "decrease_percent": 11.622178708177,
+            "difference95": [
+              -0.046245936262830745,
+              -0.012651604919235492
+            ],
+            "wins": 7
+          }
+        }
+      },
+      {
+        "available_kbps": 60,
+        "fixed_population": [
+          "match108",
+          "match102",
+          "match105",
+          "match116",
+          "match131",
+          "match130",
+          "match126"
+        ],
+        "missing_neural": [],
+        "families": {
+          "ordinary": {
+            "complete": true,
+            "count": 7,
+            "mean_kbps": 46.37666559630845,
+            "mean_dists": 0.20452656146885875,
+            "dists95": [
+              0.19213417425677756,
+              0.21727934206319405
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "bytes": 54604,
+                "kbps": 45.50333333333333,
+                "dists": 0.18897242546081544,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "0476d6b72f9031e354e89d4f90d49809306c1851495c0a5540f2182c3e4106e4"
+              },
+              {
+                "match": "match102",
+                "bytes": 59567,
+                "kbps": 59.50749250749251,
+                "dists": 0.18403823375701905,
+                "width": 640,
+                "crf": 55.0,
+                "sha256": "2bdc36e0504c414e7f4e007e96acdc4cfa41dcc32afed6cb02682a0e7cec0ddb"
+              },
+              {
+                "match": "match105",
+                "bytes": 70696,
+                "kbps": 58.913333333333334,
+                "dists": 0.20518074838482603,
+                "width": 640,
+                "crf": 55.0,
+                "sha256": "a05f9daa69c880c5619e384964f562be4611046e3790232e3bae2f924ab747e1"
+              },
+              {
+                "match": "match116",
+                "bytes": 42235,
+                "kbps": 35.19583333333333,
+                "dists": 0.2140056515733401,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "b649b3fcc7df30b64b43885a4ce5cd2020811a7025bc3b13b999a00cf1d18fdc"
+              },
+              {
+                "match": "match131",
+                "bytes": 57645,
+                "kbps": 48.0375,
+                "dists": 0.18681905928410983,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "90b7a550a301c6371fe16662c3f0613e3a8bd1b55399c77c7a95dda2653c74eb"
+              },
+              {
+                "match": "match130",
+                "bytes": 52128,
+                "kbps": 43.44,
+                "dists": 0.2263967886567116,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "b5bf9a7c78e638da5c611edbe89fc9cbe86b7e6cb6b49067388a2b0531bab63e"
+              },
+              {
+                "match": "match126",
+                "bytes": 40847,
+                "kbps": 34.03916666666667,
+                "dists": 0.2262730231651893,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "7ea83ac469ad8eeaace77e20793d3e749f80602148254cf79c8b2bd00d154203"
+              }
+            ]
+          },
+          "candidate": {
+            "complete": true,
+            "count": 7,
+            "mean_kbps": 42.94318443461301,
+            "mean_dists": 0.19048009523059425,
+            "dists95": [
+              0.1735333747244523,
+              0.205926956028947
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "bytes": 55711,
+                "kbps": 46.42583333333334,
+                "dists": 0.17899184823036193,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "86b65e3e9b1fac95ea55520dafffbf781086cb052b7ffd8b2845c559f51b8338"
+              },
+              {
+                "match": "match102",
+                "bytes": 30406,
+                "kbps": 30.375624375624376,
+                "dists": 0.18969264328479768,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "9a80e49be23621aa3eb5bb2f8c6048b41ddd2574d96f369e0d7c49bf15677cd5"
+              },
+              {
+                "match": "match105",
+                "bytes": 71826,
+                "kbps": 59.855,
+                "dists": 0.18119328970811804,
+                "width": 640,
+                "crf": 55.0,
+                "sha256": "fa5ccef90e6b743aa7004eedfca0159ff936b6751b7e0e94c2f63a5dcbecbe2e"
+              },
+              {
+                "match": "match116",
+                "bytes": 43184,
+                "kbps": 35.986666666666665,
+                "dists": 0.20281323293844858,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "f58f4b1915f9988a8571d973f59b40ff0be0f53cba22e2b8d19e4204f21ae635"
+              },
+              {
+                "match": "match131",
+                "bytes": 58624,
+                "kbps": 48.85333333333333,
+                "dists": 0.1496406730852629,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "19d981dff6c891b28794a8f0cd0ff33a2ef387609c28a997ea27309bf22de48a"
+              },
+              {
+                "match": "match130",
+                "bytes": 53038,
+                "kbps": 44.19833333333333,
+                "dists": 0.21810828000307084,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "dc22ef89bdd66638adb5e83d5d1e6c97a7e9eb73cfe5249ff7a83620dfeb2186"
+              },
+              {
+                "match": "match126",
+                "bytes": 41889,
+                "kbps": 34.9075,
+                "dists": 0.21292069936409974,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "0736eb9d556f7cf66f5c136062a5eb8e97290044182bf02f0325a450e131d1f9"
+              }
+            ]
+          },
+          "neural": {
+            "complete": true,
+            "count": 7,
+            "mean_kbps": 27.584755006897872,
+            "mean_dists": 0.23626267097459194,
+            "dists95": [
+              0.22704823881163635,
+              0.24563098791678978
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "kbps": 32.06666666666667,
+                "bytes": 38480,
+                "dists": 0.22563001036643981,
+                "sha256": "37fd9722f8331b2904220790a42c6ac1753050fe64f9329709f47e9b47a650d1",
+                "qp": 36
+              },
+              {
+                "match": "match102",
+                "kbps": 19.381618381618384,
+                "bytes": 19401,
+                "dists": 0.22192792892456054,
+                "sha256": "ce7df30a776450af3a647fe613dfa5ca1e6b1061397b9ccd989bc7837729c11d",
+                "qp": 36
+              },
+              {
+                "match": "match105",
+                "kbps": 22.5075,
+                "bytes": 27009,
+                "dists": 0.24968782614688484,
+                "sha256": "21d7c54e0ae9436c61f4e5f821b654a2db32c4f9bcaa045ed14f5af0002facdf",
+                "qp": 36
+              },
+              {
+                "match": "match116",
+                "kbps": 23.104166666666668,
+                "bytes": 27725,
+                "dists": 0.23320704450209936,
+                "sha256": "bad251d8ea83dd059591a497294521b01f554ab1dc7f347cdc88e57afb6e145c",
+                "qp": 36
+              },
+              {
+                "match": "match131",
+                "kbps": 37.87583333333333,
+                "bytes": 45451,
+                "dists": 0.22183617635777123,
+                "sha256": "39805ff5a78758265a39989ed876f12f6c09a247f08d517db8f5f99fccbb8330",
+                "qp": 36
+              },
+              {
+                "match": "match130",
+                "kbps": 33.91583333333334,
+                "bytes": 40699,
+                "dists": 0.2542515218257904,
+                "sha256": "b80fda5c99355bd5930960b4e26fde2e0cf949a866884a4b1cd3905615d183c0",
+                "qp": 36
+              },
+              {
+                "match": "match126",
+                "kbps": 24.241666666666667,
+                "bytes": 29090,
+                "dists": 0.24729818869859743,
+                "sha256": "1096a99c1d68f61bbbf57f66a07a0a3929d617a57427758e26bedbe288121e55",
+                "qp": 36
+              }
+            ]
+          }
+        },
+        "paired": {
+          "ordinary": {
+            "delta": -0.014046466238264515,
+            "decrease_percent": 6.867795623896611,
+            "difference95": [
+              -0.023637764137801325,
+              -0.005373801673315084
+            ],
+            "wins": 6
+          },
+          "neural": {
+            "delta": -0.0457825757439977,
+            "decrease_percent": 19.377828734070825,
+            "difference95": [
+              -0.058685663645346504,
+              -0.03451967073600374
+            ],
+            "wins": 7
+          }
+        }
+      },
+      {
+        "available_kbps": 100,
+        "fixed_population": [
+          "match108",
+          "match102",
+          "match105",
+          "match116",
+          "match131",
+          "match130",
+          "match126"
+        ],
+        "missing_neural": [],
+        "families": {
+          "ordinary": {
+            "complete": true,
+            "count": 7,
+            "mean_kbps": 58.08547512011798,
+            "mean_dists": 0.1949881512987936,
+            "dists95": [
+              0.18552479132412372,
+              0.20671198875634686
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "bytes": 54604,
+                "kbps": 45.50333333333333,
+                "dists": 0.18897242546081544,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "0476d6b72f9031e354e89d4f90d49809306c1851495c0a5540f2182c3e4106e4"
+              },
+              {
+                "match": "match102",
+                "bytes": 59567,
+                "kbps": 59.50749250749251,
+                "dists": 0.18403823375701905,
+                "width": 640,
+                "crf": 55.0,
+                "sha256": "2bdc36e0504c414e7f4e007e96acdc4cfa41dcc32afed6cb02682a0e7cec0ddb"
+              },
+              {
+                "match": "match105",
+                "bytes": 70696,
+                "kbps": 58.913333333333334,
+                "dists": 0.20518074838482603,
+                "width": 640,
+                "crf": 55.0,
+                "sha256": "a05f9daa69c880c5619e384964f562be4611046e3790232e3bae2f924ab747e1"
+              },
+              {
+                "match": "match116",
+                "bytes": 96662,
+                "kbps": 80.55166666666666,
+                "dists": 0.18054000909129778,
+                "width": 640,
+                "crf": 55.0,
+                "sha256": "26176be1f61834cd407deea5e7419d858f6593985c3ad237cf2a83c318adb288"
+              },
+              {
+                "match": "match131",
+                "bytes": 57645,
+                "kbps": 48.0375,
+                "dists": 0.18681905928410983,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "90b7a550a301c6371fe16662c3f0613e3a8bd1b55399c77c7a95dda2653c74eb"
+              },
+              {
+                "match": "match130",
+                "bytes": 52128,
+                "kbps": 43.44,
+                "dists": 0.2263967886567116,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "b5bf9a7c78e638da5c611edbe89fc9cbe86b7e6cb6b49067388a2b0531bab63e"
+              },
+              {
+                "match": "match126",
+                "bytes": 84774,
+                "kbps": 70.645,
+                "dists": 0.19296979445677537,
+                "width": 640,
+                "crf": 55.0,
+                "sha256": "cc5f98838fd6c6b1dcb5d028888e71c51ebaf4b0bf447d97e33afa886abd2f16"
+              }
+            ]
+          },
+          "candidate": {
+            "complete": true,
+            "count": 7,
+            "mean_kbps": 58.97823914181056,
+            "mean_dists": 0.17690152374224352,
+            "dists95": [
+              0.16358602572371098,
+              0.1931552705383046
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "bytes": 55711,
+                "kbps": 46.42583333333334,
+                "dists": 0.17899184823036193,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "86b65e3e9b1fac95ea55520dafffbf781086cb052b7ffd8b2845c559f51b8338"
+              },
+              {
+                "match": "match102",
+                "bytes": 60720,
+                "kbps": 60.65934065934066,
+                "dists": 0.162644599378109,
+                "width": 640,
+                "crf": 55.0,
+                "sha256": "275e92bcab4ffed0af5062c0258fdadcf91595f6b5872d33db23a062be3ff965"
+              },
+              {
+                "match": "match105",
+                "bytes": 71826,
+                "kbps": 59.855,
+                "dists": 0.18119328970811804,
+                "width": 640,
+                "crf": 55.0,
+                "sha256": "fa5ccef90e6b743aa7004eedfca0159ff936b6751b7e0e94c2f63a5dcbecbe2e"
+              },
+              {
+                "match": "match116",
+                "bytes": 97611,
+                "kbps": 81.3425,
+                "dists": 0.16878845791021982,
+                "width": 640,
+                "crf": 55.0,
+                "sha256": "29283ce7814efe2151d063ef19e6958ca0e6fe1aca341c866983a21a035153e9"
+              },
+              {
+                "match": "match131",
+                "bytes": 58624,
+                "kbps": 48.85333333333333,
+                "dists": 0.1496406730852629,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "19d981dff6c891b28794a8f0cd0ff33a2ef387609c28a997ea27309bf22de48a"
+              },
+              {
+                "match": "match130",
+                "bytes": 53038,
+                "kbps": 44.19833333333333,
+                "dists": 0.21810828000307084,
+                "width": 640,
+                "crf": 62.5,
+                "sha256": "dc22ef89bdd66638adb5e83d5d1e6c97a7e9eb73cfe5249ff7a83620dfeb2186"
+              },
+              {
+                "match": "match126",
+                "bytes": 85816,
+                "kbps": 71.51333333333334,
+                "dists": 0.17894351788056204,
+                "width": 640,
+                "crf": 55.0,
+                "sha256": "d3d14f8e681614cc1be3932c41bf6096f1f87d38cf432c7ef3407476ca627e86"
+              }
+            ]
+          },
+          "neural": {
+            "complete": true,
+            "count": 7,
+            "mean_kbps": 27.584755006897872,
+            "mean_dists": 0.23626267097459194,
+            "dists95": [
+              0.22704823881163635,
+              0.24563098791678978
+            ],
+            "selections": [
+              {
+                "match": "match108",
+                "kbps": 32.06666666666667,
+                "bytes": 38480,
+                "dists": 0.22563001036643981,
+                "sha256": "37fd9722f8331b2904220790a42c6ac1753050fe64f9329709f47e9b47a650d1",
+                "qp": 36
+              },
+              {
+                "match": "match102",
+                "kbps": 19.381618381618384,
+                "bytes": 19401,
+                "dists": 0.22192792892456054,
+                "sha256": "ce7df30a776450af3a647fe613dfa5ca1e6b1061397b9ccd989bc7837729c11d",
+                "qp": 36
+              },
+              {
+                "match": "match105",
+                "kbps": 22.5075,
+                "bytes": 27009,
+                "dists": 0.24968782614688484,
+                "sha256": "21d7c54e0ae9436c61f4e5f821b654a2db32c4f9bcaa045ed14f5af0002facdf",
+                "qp": 36
+              },
+              {
+                "match": "match116",
+                "kbps": 23.104166666666668,
+                "bytes": 27725,
+                "dists": 0.23320704450209936,
+                "sha256": "bad251d8ea83dd059591a497294521b01f554ab1dc7f347cdc88e57afb6e145c",
+                "qp": 36
+              },
+              {
+                "match": "match131",
+                "kbps": 37.87583333333333,
+                "bytes": 45451,
+                "dists": 0.22183617635777123,
+                "sha256": "39805ff5a78758265a39989ed876f12f6c09a247f08d517db8f5f99fccbb8330",
+                "qp": 36
+              },
+              {
+                "match": "match130",
+                "kbps": 33.91583333333334,
+                "bytes": 40699,
+                "dists": 0.2542515218257904,
+                "sha256": "b80fda5c99355bd5930960b4e26fde2e0cf949a866884a4b1cd3905615d183c0",
+                "qp": 36
+              },
+              {
+                "match": "match126",
+                "kbps": 24.241666666666667,
+                "bytes": 29090,
+                "dists": 0.24729818869859743,
+                "sha256": "1096a99c1d68f61bbbf57f66a07a0a3929d617a57427758e26bedbe288121e55",
+                "qp": 36
+              }
+            ]
+          }
+        },
+        "paired": {
+          "ordinary": {
+            "delta": -0.018086627556550074,
+            "decrease_percent": 9.275757237594762,
+            "difference95": [
+              -0.025604433840287554,
+              -0.011751108408061138
+            ],
+            "wins": 7
+          },
+          "neural": {
+            "delta": -0.059361147232348435,
+            "decrease_percent": 25.1250639753972,
+            "difference95": [
+              -0.06766739768161871,
+              -0.04938550203207666
+            ],
+            "wins": 7
+          }
+        }
+      }
+    ]
+  },
+  "native_neural": {
+    "match108": [
+      {
+        "kbps": 8.145,
+        "bytes": 9774,
+        "dists": 0.2932256352901459,
+        "sha256": "bdd4e5e94bd68f7ca152e583760b716513872898bbd26bce5e4a5a47622c2d03",
+        "qp": 12
+      },
+      {
+        "kbps": 16.78666666666667,
+        "bytes": 20144,
+        "dists": 0.24847990155220032,
+        "sha256": "c9e29c4af5783f2fe8432ebb8dc3a6785a0eb6c6eb347fa31deab73f16426684",
+        "qp": 24
+      },
+      {
+        "kbps": 32.06666666666667,
+        "bytes": 38480,
+        "dists": 0.22563001036643981,
+        "sha256": "37fd9722f8331b2904220790a42c6ac1753050fe64f9329709f47e9b47a650d1",
+        "qp": 36
+      }
+    ],
+    "match102": [
+      {
+        "kbps": 5.448551448551448,
+        "bytes": 5454,
+        "dists": 0.26320438385009765,
+        "sha256": "9ffde4e2ce20d15be7a9690df8df270ecfac610a5cc3c1a20aeb3e7ec59b1fc3",
+        "qp": 12
+      },
+      {
+        "kbps": 10.537462537462538,
+        "bytes": 10548,
+        "dists": 0.24254765510559081,
+        "sha256": "4723b91727abacf6a2f292939cb6edb23f2971b983c5be4cf1cb639309ea63e5",
+        "qp": 24
+      },
+      {
+        "kbps": 19.381618381618384,
+        "bytes": 19401,
+        "dists": 0.22192792892456054,
+        "sha256": "ce7df30a776450af3a647fe613dfa5ca1e6b1061397b9ccd989bc7837729c11d",
+        "qp": 36
+      }
+    ],
+    "match120": [
+      {
+        "kbps": 31.834,
+        "bytes": 15917,
+        "dists": 0.2627978701340525,
+        "sha256": "a84815d32033ad6440c815d1374617fb01a91412d10abc50f952d3b32c2c1ec7",
+        "qp": 24
+      },
+      {
+        "kbps": 68.888,
+        "bytes": 34444,
+        "dists": 0.23521286249160767,
+        "sha256": "076014e53bce4fff72f9b69e94755b16e84abe81b66ded220105f97e67122cde",
+        "qp": 36
+      }
+    ],
+    "match127": [
+      {
+        "kbps": 22.448,
+        "bytes": 11224,
+        "dists": 0.24358890652656556,
+        "sha256": "fb46b547842d5368273860c106cfa5a6ca58bd3dc7a51af57f026aeadc7acf8c",
+        "qp": 24
+      },
+      {
+        "kbps": 40.502,
+        "bytes": 20251,
+        "dists": 0.22729552388191224,
+        "sha256": "b4011f4bca94fcd98b2912e78aca8ea4d2773e3926a9566ff0ee7f7bbbe8c9da",
+        "qp": 36
+      }
+    ],
+    "match105": [
+      {
+        "kbps": 6.271666666666667,
+        "bytes": 7526,
+        "dists": 0.30475912775312153,
+        "sha256": "255abffd1ce1185b3c34bb98fb3ec0502aa126a7cbfdeab9e26cf8742c9d3565",
+        "qp": 12
+      },
+      {
+        "kbps": 12.145,
+        "bytes": 14574,
+        "dists": 0.2807880627865694,
+        "sha256": "813155f468161399328d954d4ed4d0fdbb13900ff3563d2db2f0a038b35c07a5",
+        "qp": 24
+      },
+      {
+        "kbps": 22.5075,
+        "bytes": 27009,
+        "dists": 0.24968782614688484,
+        "sha256": "21d7c54e0ae9436c61f4e5f821b654a2db32c4f9bcaa045ed14f5af0002facdf",
+        "qp": 36
+      }
+    ],
+    "match116": [
+      {
+        "kbps": 5.030833333333333,
+        "bytes": 6037,
+        "dists": 0.2881290428340435,
+        "sha256": "e8f9dcda229652371318a2c1d069de050e63260cc2905e9cdeb7256b8953b2f5",
+        "qp": 12
+      },
+      {
+        "kbps": 10.91,
+        "bytes": 13092,
+        "dists": 0.2584257995088895,
+        "sha256": "27430550ef9964156cc56f72e816f69f824ec988587265d72fb2cf31186d1399",
+        "qp": 24
+      },
+      {
+        "kbps": 23.104166666666668,
+        "bytes": 27725,
+        "dists": 0.23320704450209936,
+        "sha256": "bad251d8ea83dd059591a497294521b01f554ab1dc7f347cdc88e57afb6e145c",
+        "qp": 36
+      }
+    ],
+    "match107": [
+      {
+        "kbps": 29.382,
+        "bytes": 14691,
+        "dists": 0.24409963488578795,
+        "sha256": "fc30bf53eb27a98b16930bb37d838961e83748e599424459a70f02a3f11a091f",
+        "qp": 24
+      },
+      {
+        "kbps": 59.26,
+        "bytes": 29630,
+        "dists": 0.23049124479293823,
+        "sha256": "63c4f7942624f4517cff17bd94ff7f02080d297bd6e188a7198ffc7400175b96",
+        "qp": 36
+      }
+    ],
+    "match131": [
+      {
+        "kbps": 7.366666666666667,
+        "bytes": 8840,
+        "dists": 0.27658656710072566,
+        "sha256": "2cedbc765f0e296e88d53696e411bf14e9f27e0e00469c23ae9d62c43c2f402a",
+        "qp": 12
+      },
+      {
+        "kbps": 16.52583333333333,
+        "bytes": 19831,
+        "dists": 0.25036218919252096,
+        "sha256": "ba0f0ae7fc42993a5cd4beba9cafc3a7602d29def8d64faa07fe422e63a5f1c8",
+        "qp": 24
+      },
+      {
+        "kbps": 37.87583333333333,
+        "bytes": 45451,
+        "dists": 0.22183617635777123,
+        "sha256": "39805ff5a78758265a39989ed876f12f6c09a247f08d517db8f5f99fccbb8330",
+        "qp": 36
+      }
+    ],
+    "match119": [
+      {
+        "kbps": 23.294,
+        "bytes": 11647,
+        "dists": 0.27656083967950607,
+        "sha256": "d9d912ffe3370a47335c3d93f0636fd1736b4528127b6584203e18b72832fbc0",
+        "qp": 24
+      },
+      {
+        "kbps": 41.606,
+        "bytes": 20803,
+        "dists": 0.24456097020043266,
+        "sha256": "8991e51da4ef301623d50ccb1832ea6a897f19f4e743891cb727afe5c55efe13",
+        "qp": 36
+      }
+    ],
+    "match104": [
+      {
+        "kbps": 22.382,
+        "bytes": 11191,
+        "dists": 0.26435061011995586,
+        "sha256": "becef5d9ab3aab00aa25b904779658dac2261d47d5df5191da7876e0639a731a",
+        "qp": 24
+      },
+      {
+        "kbps": 40.906,
+        "bytes": 20453,
+        "dists": 0.2366762189638047,
+        "sha256": "331fb571f2c9bbf972256be686f564c37a6facf9b7e27d3b4dfb166a638f9dec",
+        "qp": 36
+      }
+    ],
+    "match130": [
+      {
+        "kbps": 7.473333333333333,
+        "bytes": 8968,
+        "dists": 0.30448703467845917,
+        "sha256": "ace0f49f7980c3bd2274b751981d0b43acfa29bafe681fb04b4921cedf7d944d",
+        "qp": 12
+      },
+      {
+        "kbps": 16.0575,
+        "bytes": 19269,
+        "dists": 0.2802379220724106,
+        "sha256": "70da9fe7101545cffb247d484dc21e6551053ba675a5501a61c113ca3f40e9ac",
+        "qp": 24
+      },
+      {
+        "kbps": 33.91583333333334,
+        "bytes": 40699,
+        "dists": 0.2542515218257904,
+        "sha256": "b80fda5c99355bd5930960b4e26fde2e0cf949a866884a4b1cd3905615d183c0",
+        "qp": 36
+      }
+    ],
+    "match126": [
+      {
+        "kbps": 6.1525,
+        "bytes": 7383,
+        "dists": 0.30588321808056956,
+        "sha256": "813049f20f6510d6b1b1e6fa3647c5f7f45333d635a3e146d58bdc6ee1dc8483",
+        "qp": 12
+      },
+      {
+        "kbps": 12.890833333333333,
+        "bytes": 15469,
+        "dists": 0.27436096087480205,
+        "sha256": "75fd34bcda37b28b7fdcc0e9de95d0f23d40fff98727313184c3407835e717ff",
+        "qp": 24
+      },
+      {
+        "kbps": 24.241666666666667,
+        "bytes": 29090,
+        "dists": 0.24729818869859743,
+        "sha256": "1096a99c1d68f61bbbf57f66a07a0a3929d617a57427758e26bedbe288121e55",
+        "qp": 36
+      }
+    ]
+  },
+  "equal_quality_vs_neural": {
+    "pooled": {
+      "neural_indices": [
+        24,
+        36
+      ],
+      "per_match": {
+        "match108": {
+          "test_pareto": [
+            [
+              10.611666666666666,
+              -0.34681477785110476
+            ],
+            [
+              17.795,
+              -0.2530305790901184
+            ],
+            [
+              19.720833333333335,
+              -0.2408460247516632
+            ],
+            [
+              20.265833333333333,
+              -0.23878761529922485
+            ],
+            [
+              21.1475,
+              -0.2345605158805847
+            ],
+            [
+              26.3075,
+              -0.21970155477523803
+            ],
+            [
+              46.42583333333334,
+              -0.17899184823036193
+            ],
+            [
+              105.43666666666667,
+              -0.15019580125808715
+            ],
+            [
+              250.00416666666666,
+              -0.12904651641845702
+            ]
+          ],
+          "anchor_hull": [
+            [
+              16.78666666666667,
+              -0.24847990155220032
+            ],
+            [
+              32.06666666666667,
+              -0.22563001036643981
+            ]
+          ],
+          "quality_overlap_negative_distance": [
+            -0.24847990155220032,
+            -0.22563001036643981
+          ],
+          "bd_rate_percent": -10.739084495406564,
+          "status": "OVERLAP ONLY",
+          "dominance": {
+            "status": "common rate range",
+            "rate_range_kbps": [
+              16.78666666666667,
+              32.06666666666667
+            ],
+            "verdict": "crosses the anchor envelope",
+            "min_quality_gain": -0.015133003116906213,
+            "max_quality_gain": 0.02011681370941601
+          }
+        },
+        "match102": {
+          "test_pareto": [
+            [
+              11.61238761238761,
+              -0.30964704900979995
+            ],
+            [
+              15.892107892107893,
+              -0.23767876029014587
+            ],
+            [
+              19.979020979020977,
+              -0.2020906165242195
+            ],
+            [
+              23.116883116883116,
+              -0.20207314938306808
+            ],
+            [
+              30.375624375624376,
+              -0.18969264328479768
+            ],
+            [
+              60.65934065934066,
+              -0.162644599378109
+            ],
+            [
+              140.12387612387613,
+              -0.1357627496123314
+            ]
+          ],
+          "anchor_hull": [
+            [
+              10.537462537462538,
+              -0.24254765510559081
+            ],
+            [
+              19.381618381618384,
+              -0.22192792892456054
+            ]
+          ],
+          "quality_overlap_negative_distance": [
+            -0.24254765510559081,
+            -0.22192792892456054
+          ],
+          "bd_rate_percent": 13.112636581847623,
+          "status": "OVERLAP ONLY",
+          "dominance": {
+            "status": "common rate range",
+            "rate_range_kbps": [
+              11.61238761238761,
+              19.381618381618384
+            ],
+            "verdict": "crosses the anchor envelope",
+            "min_quality_gain": -0.07038614969788373,
+            "max_quality_gain": 0.01511664419329975
+          }
+        },
+        "match120": {
+          "test_pareto": [
+            [
+              24.494,
+              -0.3129896678422627
+            ],
+            [
+              25.92,
+              -0.31062213370674535
+            ],
+            [
+              26.036,
+              -0.30183058977127075
+            ],
+            [
+              30.52,
+              -0.2847185762305009
+            ],
+            [
+              37.714,
+              -0.25932072652013677
+            ],
+            [
+              40.756,
+              -0.24606764630267494
+            ],
+            [
+              45.286,
+              -0.23743313864657753
+            ],
+            [
+              54.48,
+              -0.22502881915945755
+            ],
+            [
+              101.496,
+              -0.19544273614883423
+            ],
+            [
+              245.872,
+              -0.15904393949006734
+            ],
+            [
+              576.312,
+              -0.1353576057835629
+            ]
+          ],
+          "anchor_hull": [
+            [
+              31.834,
+              -0.2627978701340525
+            ],
+            [
+              68.888,
+              -0.23521286249160767
+            ]
+          ],
+          "quality_overlap_negative_distance": [
+            -0.2627978701340525,
+            -0.23521286249160767
+          ],
+          "bd_rate_percent": -13.460292535403712,
+          "status": "OVERLAP ONLY",
+          "dominance": {
+            "status": "common rate range",
+            "rate_range_kbps": [
+              31.834,
+              68.888
+            ],
+            "verdict": "crosses the anchor envelope",
+            "min_quality_gain": -0.01686239288611585,
+            "max_quality_gain": 0.02134200603160155
+          }
+        },
+        "match127": {
+          "test_pareto": [
+            [
+              23.39,
+              -0.2991101711988449
+            ],
+            [
+              24.68,
+              -0.2666919678449631
+            ],
+            [
+              25.326,
+              -0.2535914838314056
+            ],
+            [
+              31.678,
+              -0.23300696015357972
+            ],
+            [
+              32.834,
+              -0.2299349009990692
+            ],
+            [
+              33.434,
+              -0.22078969180583954
+            ],
+            [
+              40.424,
+              -0.1992875725030899
+            ],
+            [
+              66.594,
+              -0.16655343770980835
+            ],
+            [
+              137.354,
+              -0.14780750274658203
+            ],
+            [
+              291.898,
+              -0.12280946671962738
+            ]
+          ],
+          "anchor_hull": [
+            [
+              22.448,
+              -0.24358890652656556
+            ],
+            [
+              40.502,
+              -0.22729552388191224
+            ]
+          ],
+          "quality_overlap_negative_distance": [
+            -0.24358890652656556,
+            -0.22729552388191224
+          ],
+          "bd_rate_percent": 1.6004244801044323,
+          "status": "OVERLAP ONLY",
+          "dominance": {
+            "status": "common rate range",
+            "rate_range_kbps": [
+              23.39,
+              40.502
+            ],
+            "verdict": "crosses the anchor envelope",
+            "min_quality_gain": -0.05665618495242061,
+            "max_quality_gain": 0.028134358324689968
+          }
+        },
+        "match105": {
+          "test_pareto": [
+            [
+              9.980833333333333,
+              -0.328136928227483
+            ],
+            [
+              14.640833333333333,
+              -0.26986438035964966
+            ],
+            [
+              14.926666666666666,
+              -0.2683891301252404
+            ],
+            [
+              19.311666666666667,
+              -0.25658196210861206
+            ],
+            [
+              19.725,
+              -0.25558363783116245
+            ],
+            [
+              20.054166666666667,
+              -0.253158197111013
+            ],
+            [
+              20.345,
+              -0.25310532414183323
+            ],
+            [
+              20.668333333333333,
+              -0.24870591990801752
+            ],
+            [
+              21.4025,
+              -0.243399871855366
+            ],
+            [
+              21.9875,
+              -0.24311738598103427
+            ],
+            [
+              23.7525,
+              -0.23773018437988905
+            ],
+            [
+              31.035,
+              -0.22053837776184082
+            ],
+            [
+              59.855,
+              -0.18119328970811804
+            ],
+            [
+              124.91833333333334,
+              -0.1428998733053402
+            ]
+          ],
+          "anchor_hull": [
+            [
+              12.145,
+              -0.2807880627865694
+            ],
+            [
+              22.5075,
+              -0.24968782614688484
+            ]
+          ],
+          "quality_overlap_negative_distance": [
+            -0.2807880627865694,
+            -0.24968782614688484
+          ],
+          "bd_rate_percent": -1.5016638661870207,
+          "status": "OVERLAP ONLY",
+          "dominance": {
+            "status": "common rate range",
+            "rate_range_kbps": [
+              12.145,
+              22.5075
+            ],
+            "verdict": "crosses the anchor envelope",
+            "min_quality_gain": -0.01750126324913054,
+            "max_quality_gain": 0.008796210457599901
+          }
+        },
+        "match116": {
+          "test_pareto": [
+            [
+              10.0275,
+              -0.3303610421717167
+            ],
+            [
+              14.983333333333333,
+              -0.2679385170340538
+            ],
+            [
+              17.724166666666665,
+              -0.2439120685060819
+            ],
+            [
+              19.36,
+              -0.23824546486139297
+            ],
+            [
+              19.995,
+              -0.23332183559735617
+            ],
+            [
+              21.05666666666667,
+              -0.22920319437980652
+            ],
+            [
+              21.670833333333334,
+              -0.2285562405983607
+            ],
+            [
+              22.683333333333334,
+              -0.22290943935513496
+            ],
+            [
+              25.174166666666668,
+              -0.21724560235937437
+            ],
+            [
+              35.986666666666665,
+              -0.20281323293844858
+            ],
+            [
+              81.3425,
+              -0.16878845791021982
+            ],
+            [
+              178.95833333333334,
+              -0.1336686077217261
+            ]
+          ],
+          "anchor_hull": [
+            [
+              10.91,
+              -0.2584257995088895
+            ],
+            [
+              23.104166666666668,
+              -0.23320704450209936
+            ]
+          ],
+          "quality_overlap_negative_distance": [
+            -0.2584257995088895,
+            -0.23320704450209936
+          ],
+          "bd_rate_percent": 11.204739291469965,
+          "status": "OVERLAP ONLY",
+          "dominance": {
+            "status": "common rate range",
+            "rate_range_kbps": [
+              10.91,
+              23.104166666666668
+            ],
+            "verdict": "crosses the anchor envelope",
+            "min_quality_gain": -0.05882480590907224,
+            "max_quality_gain": 0.01129691208701003
+          }
+        },
+        "match107": {
+          "test_pareto": [
+            [
+              24.314,
+              -0.29414746463298796
+            ],
+            [
+              26.51,
+              -0.2910191655158997
+            ],
+            [
+              26.622,
+              -0.2799359053373337
+            ],
+            [
+              27.446,
+              -0.2733482986688614
+            ],
+            [
+              28.26,
+              -0.2671848714351654
+            ],
+            [
+              35.406,
+              -0.23044548332691192
+            ],
+            [
+              37.03,
+              -0.22207008600234984
+            ],
+            [
+              41.666,
+              -0.21256338357925414
+            ],
+            [
+              48.352,
+              -0.1880767673254013
+            ],
+            [
+              81.788,
+              -0.14905279278755187
+            ],
+            [
+              176.638,
+              -0.12269387245178223
+            ],
+            [
+              395.348,
+              -0.11583836376667023
+            ]
+          ],
+          "anchor_hull": [
+            [
+              29.382,
+              -0.24409963488578795
+            ],
+            [
+              59.26,
+              -0.23049124479293823
+            ]
+          ],
+          "quality_overlap_negative_distance": [
+            -0.24409963488578795,
+            -0.23049124479293823
+          ],
+          "bd_rate_percent": -18.576779892062152,
+          "status": "OVERLAP ONLY",
+          "dominance": {
+            "status": "common rate range",
+            "rate_range_kbps": [
+              29.382,
+              59.26
+            ],
+            "verdict": "crosses the anchor envelope",
+            "min_quality_gain": -0.016739948739273258,
+            "max_quality_gain": 0.05751756303734995
+          }
+        },
+        "match131": {
+          "test_pareto": [
+            [
+              10.86,
+              -0.3123393215631184
+            ],
+            [
+              18.53,
+              -0.23313400306199727
+            ],
+            [
+              19.711666666666666,
+              -0.22746980817694412
+            ],
+            [
+              20.0625,
+              -0.21559983021334597
+            ],
+            [
+              20.8525,
+              -0.21253642596696554
+            ],
+            [
+              21.616666666666667,
+              -0.2069717410363649
+            ],
+            [
+              22.688333333333333,
+              -0.1976252135477568
+            ],
+            [
+              26.83416666666667,
+              -0.17424907809809634
+            ],
+            [
+              48.85333333333333,
+              -0.1496406730852629
+            ],
+            [
+              107.08083333333333,
+              -0.13388477030553317
+            ],
+            [
+              234.62916666666666,
+              -0.12111155453481172
+            ]
+          ],
+          "anchor_hull": [
+            [
+              16.52583333333333,
+              -0.25036218919252096
+            ],
+            [
+              37.87583333333333,
+              -0.22183617635777123
+            ]
+          ],
+          "quality_overlap_negative_distance": [
+            -0.25036218919252096,
+            -0.22183617635777123
+          ],
+          "bd_rate_percent": -27.83821503331155,
+          "status": "OVERLAP ONLY",
+          "dominance": {
+            "status": "common rate range",
+            "rate_range_kbps": [
+              16.52583333333333,
+              37.87583333333333
+            ],
+            "verdict": "better at every common rate",
+            "min_quality_gain": 0.0002597156222761132,
+            "max_quality_gain": 0.06174218777515514
+          }
+        },
+        "match119": {
+          "test_pareto": [
+            [
+              22.444,
+              -0.32907159792052376
+            ],
+            [
+              24.286,
+              -0.3138059874375661
+            ],
+            [
+              26.054,
+              -0.30280227462450665
+            ],
+            [
+              30.756,
+              -0.2746351857980092
+            ],
+            [
+              32.12,
+              -0.27274439069959855
+            ],
+            [
+              32.842,
+              -0.25895477996932137
+            ],
+            [
+              40.15,
+              -0.2487736377451155
+            ],
+            [
+              62.756,
+              -0.2090866896841261
+            ],
+            [
+              117.356,
+              -0.171673317750295
+            ],
+            [
+              239.83,
+              -0.1421644257174598
+            ]
+          ],
+          "anchor_hull": [
+            [
+              23.294,
+              -0.27656083967950607
+            ],
+            [
+              41.606,
+              -0.24456097020043266
+            ]
+          ],
+          "quality_overlap_negative_distance": [
+            -0.27656083967950607,
+            -0.24456097020043266
+          ],
+          "bd_rate_percent": 10.643381509998823,
+          "status": "OVERLAP ONLY",
+          "dominance": {
+            "status": "common rate range",
+            "rate_range_kbps": [
+              23.294,
+              41.606
+            ],
+            "verdict": "worse at every common rate",
+            "min_quality_gain": -0.04531648366712121,
+            "max_quality_gain": -0.0010473610740802386
+          }
+        },
+        "match104": {
+          "test_pareto": [
+            [
+              23.406,
+              -0.3241200503848848
+            ],
+            [
+              24.812,
+              -0.30874039161772954
+            ],
+            [
+              25.21,
+              -0.3074887565204075
+            ],
+            [
+              25.402,
+              -0.2986839697474525
+            ],
+            [
+              26.332,
+              -0.29827141761779785
+            ],
+            [
+              33.556,
+              -0.2714613250323704
+            ],
+            [
+              34.216,
+              -0.26338162308647517
+            ],
+            [
+              35.65,
+              -0.2597845650854565
+            ],
+            [
+              36.846,
+              -0.2564048852239336
+            ],
+            [
+              38.032,
+              -0.24592635461262294
+            ],
+            [
+              43.52,
+              -0.22589065631230673
+            ],
+            [
+              67.406,
+              -0.19316279320489793
+            ],
+            [
+              135.258,
+              -0.16474386907759167
+            ],
+            [
+              293.05,
+              -0.14726666893277848
+            ]
+          ],
+          "anchor_hull": [
+            [
+              22.382,
+              -0.26435061011995586
+            ],
+            [
+              40.906,
+              -0.2366762189638047
+            ]
+          ],
+          "quality_overlap_negative_distance": [
+            -0.26435061011995586,
+            -0.2366762189638047
+          ],
+          "bd_rate_percent": 23.361926882863777,
+          "status": "OVERLAP ONLY",
+          "dominance": {
+            "status": "common rate range",
+            "rate_range_kbps": [
+              23.406,
+              40.906
+            ],
+            "verdict": "crosses the anchor envelope",
+            "min_quality_gain": -0.061822479652406226,
+            "max_quality_gain": 0.001578176907799017
+          }
+        },
+        "match130": {
+          "test_pareto": [
+            [
+              10.861666666666666,
+              -0.343169829249382
+            ],
+            [
+              13.573333333333334,
+              -0.31306860595941544
+            ],
+            [
+              15.720833333333333,
+              -0.30048191398382185
+            ],
+            [
+              17.3575,
+              -0.29233615696430204
+            ],
+            [
+              17.538333333333334,
+              -0.2838899493217468
+            ],
+            [
+              19.1275,
+              -0.2694590762257576
+            ],
+            [
+              20.4925,
+              -0.268285459280014
+            ],
+            [
+              20.803333333333335,
+              -0.2647775515913963
+            ],
+            [
+              21.433333333333334,
+              -0.2618251159787178
+            ],
+            [
+              23.1925,
+              -0.2524893209338188
+            ],
+            [
+              44.19833333333333,
+              -0.21810828000307084
+            ],
+            [
+              101.58666666666667,
+              -0.17074566334486008
+            ],
+            [
+              239.05583333333334,
+              -0.143123497068882
+            ]
+          ],
+          "anchor_hull": [
+            [
+              16.0575,
+              -0.2802379220724106
+            ],
+            [
+              33.91583333333334,
+              -0.2542515218257904
+            ]
+          ],
+          "quality_overlap_negative_distance": [
+            -0.2802379220724106,
+            -0.2542515218257904
+          ],
+          "bd_rate_percent": -14.285786006764031,
+          "status": "OVERLAP ONLY",
+          "dominance": {
+            "status": "common rate range",
+            "rate_range_kbps": [
+              16.0575,
+              33.91583333333334
+            ],
+            "verdict": "crosses the anchor envelope",
+            "min_quality_gain": -0.0185012009202421,
+            "max_quality_gain": 0.02202498062656902
+          }
+        },
+        "match126": {
+          "test_pareto": [
+            [
+              9.735833333333334,
+              -0.3323022662064968
+            ],
+            [
+              14.456666666666667,
+              -0.2824965700125083
+            ],
+            [
+              15.718333333333334,
+              -0.27489718412741637
+            ],
+            [
+              17.479166666666668,
+              -0.26326584815979004
+            ],
+            [
+              19.149166666666666,
+              -0.2577683253166003
+            ],
+            [
+              20.183333333333334,
+              -0.25583660449737156
+            ],
+            [
+              21.399166666666666,
+              -0.25048992267021764
+            ],
+            [
+              22.011666666666667,
+              -0.24200617502897215
+            ],
+            [
+              22.97,
+              -0.24112820778137597
+            ],
+            [
+              25.426666666666666,
+              -0.2350545204602755
+            ],
+            [
+              34.9075,
+              -0.21292069936409974
+            ],
+            [
+              71.51333333333334,
+              -0.17894351788056204
+            ],
+            [
+              153.67583333333334,
+              -0.15313544945839125
+            ]
+          ],
+          "anchor_hull": [
+            [
+              12.890833333333333,
+              -0.27436096087480205
+            ],
+            [
+              24.241666666666667,
+              -0.24729818869859743
+            ]
+          ],
+          "quality_overlap_negative_distance": [
+            -0.27436096087480205,
+            -0.24729818869859743
+          ],
+          "bd_rate_percent": 4.4610439843618925,
+          "status": "OVERLAP ONLY",
+          "dominance": {
+            "status": "common rate range",
+            "rate_range_kbps": [
+              12.890833333333333,
+              24.241666666666667
+            ],
+            "verdict": "crosses the anchor envelope",
+            "min_quality_gain": -0.022577988544872363,
+            "max_quality_gain": 0.009398420835462606
+          }
+        }
+      },
+      "geomean": {
+        "matches": [
+          "match108",
+          "match102",
+          "match120",
+          "match127",
+          "match105",
+          "match116",
+          "match107",
+          "match131",
+          "match119",
+          "match104",
+          "match130",
+          "match126"
+        ],
+        "fewer_bits": 6,
+        "percent": -2.948911415922063,
+        "interval95": [
+          -11.152111483441612,
+          5.441736052871507
+        ]
+      }
+    },
+    "starved_cohort": {
+      "neural_indices": [
+        12,
+        24,
+        36
+      ],
+      "per_match": {
+        "match108": {
+          "test_pareto": [
+            [
+              10.611666666666666,
+              -0.34681477785110476
+            ],
+            [
+              17.795,
+              -0.2530305790901184
+            ],
+            [
+              19.720833333333335,
+              -0.2408460247516632
+            ],
+            [
+              20.265833333333333,
+              -0.23878761529922485
+            ],
+            [
+              21.1475,
+              -0.2345605158805847
+            ],
+            [
+              26.3075,
+              -0.21970155477523803
+            ],
+            [
+              46.42583333333334,
+              -0.17899184823036193
+            ],
+            [
+              105.43666666666667,
+              -0.15019580125808715
+            ],
+            [
+              250.00416666666666,
+              -0.12904651641845702
+            ]
+          ],
+          "anchor_hull": [
+            [
+              8.145,
+              -0.2932256352901459
+            ],
+            [
+              16.78666666666667,
+              -0.24847990155220032
+            ],
+            [
+              32.06666666666667,
+              -0.22563001036643981
+            ]
+          ],
+          "quality_overlap_negative_distance": [
+            -0.2932256352901459,
+            -0.22563001036643981
+          ],
+          "bd_rate_percent": 21.99688639296867,
+          "status": "OVERLAP ONLY",
+          "dominance": {
+            "status": "common rate range",
+            "rate_range_kbps": [
+              10.611666666666666,
+              32.06666666666667
+            ],
+            "verdict": "crosses the anchor envelope",
+            "min_quality_gain": -0.06995776867598208,
+            "max_quality_gain": 0.02011681370941601
+          }
+        },
+        "match102": {
+          "test_pareto": [
+            [
+              11.61238761238761,
+              -0.30964704900979995
+            ],
+            [
+              15.892107892107893,
+              -0.23767876029014587
+            ],
+            [
+              19.979020979020977,
+              -0.2020906165242195
+            ],
+            [
+              23.116883116883116,
+              -0.20207314938306808
+            ],
+            [
+              30.375624375624376,
+              -0.18969264328479768
+            ],
+            [
+              60.65934065934066,
+              -0.162644599378109
+            ],
+            [
+              140.12387612387613,
+              -0.1357627496123314
+            ]
+          ],
+          "anchor_hull": [
+            [
+              5.448551448551448,
+              -0.26320438385009765
+            ],
+            [
+              10.537462537462538,
+              -0.24254765510559081
+            ],
+            [
+              19.381618381618384,
+              -0.22192792892456054
+            ]
+          ],
+          "quality_overlap_negative_distance": [
+            -0.26320438385009765,
+            -0.22192792892456054
+          ],
+          "bd_rate_percent": 47.53781380357303,
+          "status": "OVERLAP ONLY",
+          "dominance": {
+            "status": "common rate range",
+            "rate_range_kbps": [
+              11.61238761238761,
+              19.381618381618384
+            ],
+            "verdict": "crosses the anchor envelope",
+            "min_quality_gain": -0.07038614969788373,
+            "max_quality_gain": 0.01511664419329975
+          }
+        },
+        "match105": {
+          "test_pareto": [
+            [
+              9.980833333333333,
+              -0.328136928227483
+            ],
+            [
+              14.640833333333333,
+              -0.26986438035964966
+            ],
+            [
+              14.926666666666666,
+              -0.2683891301252404
+            ],
+            [
+              19.311666666666667,
+              -0.25658196210861206
+            ],
+            [
+              19.725,
+              -0.25558363783116245
+            ],
+            [
+              20.054166666666667,
+              -0.253158197111013
+            ],
+            [
+              20.345,
+              -0.25310532414183323
+            ],
+            [
+              20.668333333333333,
+              -0.24870591990801752
+            ],
+            [
+              21.4025,
+              -0.243399871855366
+            ],
+            [
+              21.9875,
+              -0.24311738598103427
+            ],
+            [
+              23.7525,
+              -0.23773018437988905
+            ],
+            [
+              31.035,
+              -0.22053837776184082
+            ],
+            [
+              59.855,
+              -0.18119328970811804
+            ],
+            [
+              124.91833333333334,
+              -0.1428998733053402
+            ]
+          ],
+          "anchor_hull": [
+            [
+              6.271666666666667,
+              -0.30475912775312153
+            ],
+            [
+              12.145,
+              -0.2807880627865694
+            ],
+            [
+              22.5075,
+              -0.24968782614688484
+            ]
+          ],
+          "quality_overlap_negative_distance": [
+            -0.30475912775312153,
+            -0.24968782614688484
+          ],
+          "bd_rate_percent": 11.339709178884702,
+          "status": "OVERLAP ONLY",
+          "dominance": {
+            "status": "common rate range",
+            "rate_range_kbps": [
+              9.980833333333333,
+              22.5075
+            ],
+            "verdict": "crosses the anchor envelope",
+            "min_quality_gain": -0.040230511988040674,
+            "max_quality_gain": 0.008773591108322182
+          }
+        },
+        "match116": {
+          "test_pareto": [
+            [
+              10.0275,
+              -0.3303610421717167
+            ],
+            [
+              14.983333333333333,
+              -0.2679385170340538
+            ],
+            [
+              17.724166666666665,
+              -0.2439120685060819
+            ],
+            [
+              19.36,
+              -0.23824546486139297
+            ],
+            [
+              19.995,
+              -0.23332183559735617
+            ],
+            [
+              21.05666666666667,
+              -0.22920319437980652
+            ],
+            [
+              21.670833333333334,
+              -0.2285562405983607
+            ],
+            [
+              22.683333333333334,
+              -0.22290943935513496
+            ],
+            [
+              25.174166666666668,
+              -0.21724560235937437
+            ],
+            [
+              35.986666666666665,
+              -0.20281323293844858
+            ],
+            [
+              81.3425,
+              -0.16878845791021982
+            ],
+            [
+              178.95833333333334,
+              -0.1336686077217261
+            ]
+          ],
+          "anchor_hull": [
+            [
+              5.030833333333333,
+              -0.2881290428340435
+            ],
+            [
+              10.91,
+              -0.2584257995088895
+            ],
+            [
+              23.104166666666668,
+              -0.23320704450209936
+            ]
+          ],
+          "quality_overlap_negative_distance": [
+            -0.2881290428340435,
+            -0.23320704450209936
+          ],
+          "bd_rate_percent": 51.96628235290374,
+          "status": "OVERLAP ONLY",
+          "dominance": {
+            "status": "common rate range",
+            "rate_range_kbps": [
+              10.0275,
+              23.104166666666668
+            ],
+            "verdict": "crosses the anchor envelope",
+            "min_quality_gain": -0.06869865517719054,
+            "max_quality_gain": 0.01129691208701003
+          }
+        },
+        "match131": {
+          "test_pareto": [
+            [
+              10.86,
+              -0.3123393215631184
+            ],
+            [
+              18.53,
+              -0.23313400306199727
+            ],
+            [
+              19.711666666666666,
+              -0.22746980817694412
+            ],
+            [
+              20.0625,
+              -0.21559983021334597
+            ],
+            [
+              20.8525,
+              -0.21253642596696554
+            ],
+            [
+              21.616666666666667,
+              -0.2069717410363649
+            ],
+            [
+              22.688333333333333,
+              -0.1976252135477568
+            ],
+            [
+              26.83416666666667,
+              -0.17424907809809634
+            ],
+            [
+              48.85333333333333,
+              -0.1496406730852629
+            ],
+            [
+              107.08083333333333,
+              -0.13388477030553317
+            ],
+            [
+              234.62916666666666,
+              -0.12111155453481172
+            ]
+          ],
+          "anchor_hull": [
+            [
+              7.366666666666667,
+              -0.27658656710072566
+            ],
+            [
+              16.52583333333333,
+              -0.25036218919252096
+            ],
+            [
+              37.87583333333333,
+              -0.22183617635777123
+            ]
+          ],
+          "quality_overlap_negative_distance": [
+            -0.27658656710072566,
+            -0.22183617635777123
+          ],
+          "bd_rate_percent": -4.720438622217213,
+          "status": "OVERLAP ONLY",
+          "dominance": {
+            "status": "common rate range",
+            "rate_range_kbps": [
+              10.86,
+              37.87583333333333
+            ],
+            "verdict": "crosses the anchor envelope",
+            "min_quality_gain": -0.04835020733323042,
+            "max_quality_gain": 0.06174218777515514
+          }
+        },
+        "match130": {
+          "test_pareto": [
+            [
+              10.861666666666666,
+              -0.343169829249382
+            ],
+            [
+              13.573333333333334,
+              -0.31306860595941544
+            ],
+            [
+              15.720833333333333,
+              -0.30048191398382185
+            ],
+            [
+              17.3575,
+              -0.29233615696430204
+            ],
+            [
+              17.538333333333334,
+              -0.2838899493217468
+            ],
+            [
+              19.1275,
+              -0.2694590762257576
+            ],
+            [
+              20.4925,
+              -0.268285459280014
+            ],
+            [
+              20.803333333333335,
+              -0.2647775515913963
+            ],
+            [
+              21.433333333333334,
+              -0.2618251159787178
+            ],
+            [
+              23.1925,
+              -0.2524893209338188
+            ],
+            [
+              44.19833333333333,
+              -0.21810828000307084
+            ],
+            [
+              101.58666666666667,
+              -0.17074566334486008
+            ],
+            [
+              239.05583333333334,
+              -0.143123497068882
+            ]
+          ],
+          "anchor_hull": [
+            [
+              7.473333333333333,
+              -0.30448703467845917
+            ],
+            [
+              16.0575,
+              -0.2802379220724106
+            ],
+            [
+              33.91583333333334,
+              -0.2542515218257904
+            ]
+          ],
+          "quality_overlap_negative_distance": [
+            -0.30448703467845917,
+            -0.2542515218257904
+          ],
+          "bd_rate_percent": 12.948271031011302,
+          "status": "OVERLAP ONLY",
+          "dominance": {
+            "status": "common rate range",
+            "rate_range_kbps": [
+              10.861666666666666,
+              33.91583333333334
+            ],
+            "verdict": "crosses the anchor envelope",
+            "min_quality_gain": -0.050537261806392175,
+            "max_quality_gain": 0.02202498062656902
+          }
+        },
+        "match126": {
+          "test_pareto": [
+            [
+              9.735833333333334,
+              -0.3323022662064968
+            ],
+            [
+              14.456666666666667,
+              -0.2824965700125083
+            ],
+            [
+              15.718333333333334,
+              -0.27489718412741637
+            ],
+            [
+              17.479166666666668,
+              -0.26326584815979004
+            ],
+            [
+              19.149166666666666,
+              -0.2577683253166003
+            ],
+            [
+              20.183333333333334,
+              -0.25583660449737156
+            ],
+            [
+              21.399166666666666,
+              -0.25048992267021764
+            ],
+            [
+              22.011666666666667,
+              -0.24200617502897215
+            ],
+            [
+              22.97,
+              -0.24112820778137597
+            ],
+            [
+              25.426666666666666,
+              -0.2350545204602755
+            ],
+            [
+              34.9075,
+              -0.21292069936409974
+            ],
+            [
+              71.51333333333334,
+              -0.17894351788056204
+            ],
+            [
+              153.67583333333334,
+              -0.15313544945839125
+            ]
+          ],
+          "anchor_hull": [
+            [
+              6.1525,
+              -0.30588321808056956
+            ],
+            [
+              12.890833333333333,
+              -0.27436096087480205
+            ],
+            [
+              24.241666666666667,
+              -0.24729818869859743
+            ]
+          ],
+          "quality_overlap_negative_distance": [
+            -0.30588321808056956,
+            -0.24729818869859743
+          ],
+          "bd_rate_percent": 27.551534546838614,
+          "status": "OVERLAP ONLY",
+          "dominance": {
+            "status": "common rate range",
+            "rate_range_kbps": [
+              9.735833333333334,
+              24.241666666666667
+            ],
+            "verdict": "crosses the anchor envelope",
+            "min_quality_gain": -0.045978479538171135,
+            "max_quality_gain": 0.009421984923380283
+          }
+        }
+      },
+      "geomean": {
+        "matches": [
+          "match108",
+          "match102",
+          "match105",
+          "match116",
+          "match131",
+          "match130",
+          "match126"
+        ],
+        "fewer_bits": 1,
+        "percent": 22.6718513176592,
+        "interval95": [
+          9.537337915535119,
+          37.090840938301284
+        ]
+      }
+    }
+  }
+}

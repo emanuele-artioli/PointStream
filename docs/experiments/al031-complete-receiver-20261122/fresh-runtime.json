@@ -1,0 +1,49 @@
+{
+  "tracks": [
+    {
+      "name": "alcaraz_hurkacz__028_at120__person_000000000004",
+      "active_ticks": 240,
+      "render_and_save_sec": 1159.5098582339997,
+      "frames_per_sec": 0.2069840099208245,
+      "device": "NVIDIA RTX 6000 Ada Generation",
+      "job": "20261122T115204Z-c485c799",
+      "archive_sha256": "84ffc721815780690492e05bba0af4480ba39d39793c2f70b22da8d9f477532c",
+      "active_status": {
+        "composed": 240
+      },
+      "nonempty": 240
+    },
+    {
+      "name": "alcaraz_hurkacz__028_at120__person_000000000006",
+      "active_ticks": 240,
+      "render_and_save_sec": 894.8625702779973,
+      "frames_per_sec": 0.26819760706433593,
+      "device": "NVIDIA RTX 6000 Ada Generation",
+      "job": "20261122T115242Z-68bcc806",
+      "archive_sha256": "354aae6a19b8416382492019c2b1233956983402b98cefc262903a484866bc52",
+      "active_status": {
+        "composed": 240
+      },
+      "nonempty": 240
+    }
+  ],
+  "finish_job": "20261122T125912Z-9361b447",
+  "finish_gpu": {
+    "major": 8,
+    "minor": 9,
+    "uuid": "dbbb295f-6156-1133-8658-841f3f5b17d0",
+    "visible_uuid": "dbbb295f-6156-1133-8658-841f3f5b17d0"
+  },
+  "native_decode_sec": 0.04257470299489796,
+  "sam_model_load_sec": 11.06233980198158,
+  "sam_per_frame_sum_sec": 35.33418173715472,
+  "composite_loop_sec": 57.78274025899009,
+  "other_loop_work_sec": 22.448558521835366,
+  "isolated_finish_sec": 73.29184906798764,
+  "archive_sec": 7.755944169999566,
+  "phase_cpu_verification_sec": 7.687041530007264,
+  "frames": 240,
+  "active_ticks": 240,
+  "fallback_ticks": 0,
+  "measured_scope": "Cumulative render-and-save per individual with actual device; full-image native decode, model load and per-tick SAM/loop times at receiver. Offline verification and archive assembly reported separately. Benchmarked stages may overlap when running different players on independent devices."
+}

@@ -1,0 +1,32 @@
+{
+  "match102_near": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T103801Z-024e65ea/full/published.tar",
+    "archive_sha256": "1d756e9a4d3ed687173ef682a3f4163439d980027a56c794e09ed80692335c4f",
+    "receipt_sha256": "a008b62d26dea84f1c4dfef26289121967909140cf0cb556c8dcbc3f7fd3f95a",
+    "shape": [
+      240,
+      784,
+      512,
+      3
+    ],
+    "crops_sha256": "cabef44ec1daf02b0c8849e23ee74d28af5a55041e41d8cdec550fb60ca7dc73",
+    "producer": "20261122T103801Z-024e65ea",
+    "render_seconds": 1328.7420376600057,
+    "worker_s": 1443.9567893480125
+  },
+  "match102_far": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T112930Z-b78072a2/full/published.tar",
+    "archive_sha256": "d62e6995461d701aa7c8c727423544e646eced2f61719a30be74cb4cb25ae542",
+    "receipt_sha256": "b0af1a49e9a2e70e726fbdc3dcd2d3aab64f626a481e166a5089d3867fc5ff75",
+    "shape": [
+      240,
+      784,
+      512,
+      3
+    ],
+    "crops_sha256": "e9f9a4a35de9cb23de55fdb7b12e6b4cfd89699f269471f307af6b90b40f4f7e",
+    "producer": "20261122T112930Z-b78072a2",
+    "render_seconds": 1018.7045291069953,
+    "worker_s": 1133.2256214169902
+  }
+}

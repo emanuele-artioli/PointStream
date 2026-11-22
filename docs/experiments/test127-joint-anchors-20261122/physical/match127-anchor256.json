@@ -1,0 +1,253 @@
+{
+  "match": "match127",
+  "source_sha256": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+  "earlier_sha256": "12df7179c0874b75a23dcb3821259991ee572b735b4bd8e99ec744f772f0ff5e",
+  "mode": "ordinary",
+  "roi_map_sha256": null,
+  "source_masks_sha256": null,
+  "ball_sha256": null,
+  "frames": 240,
+  "fps": "60",
+  "width": 256,
+  "height": 144,
+  "tools": {
+    "SvtAv1EncApp": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "sha256": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+      "version": "SVT-AV1 v4.2.0 (release)"
+    },
+    "dav1d": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+      "version": "1.5.4"
+    },
+    "ffmpeg": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+      "version": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers"
+    }
+  },
+  "convert_command": [
+    "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+    "-v",
+    "error",
+    "-threads",
+    "1",
+    "-nostdin",
+    "-i",
+    "/local/users/emanuele/pointstream/cache/8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50/match127-000-8ebca8b69320.mp4",
+    "-an",
+    "-frames:v",
+    "240",
+    "-vf",
+    "scale=256:144:flags=area,format=yuv420p",
+    "-fps_mode",
+    "passthrough",
+    "-f",
+    "rawvideo",
+    "/local/users/emanuele/pointstream/scratch/20261122T135355Z-12d14b29-full/native/source.yuv"
+  ],
+  "source_yuv_sha256": "56766150ed8ebbfb7864e944325f25ad6a7b7ab4d6238decd76ac7c816b6a8f3",
+  "selected": {
+    "warm": {
+      "ceiling": 12890,
+      "affordable": true,
+      "identical_qp_control": null,
+      "quarter_crf": 252,
+      "bytes": 12663,
+      "file": "q252.ivf",
+      "sha256": "da9c8adfb1701e1c1575cb43e8c541e47df0f02f608da47f98d1a6a35ea0c60a",
+      "origin": "new",
+      "elapsed": 5.132954415021231,
+      "decoded_sha256": "61f7cd6f71141e2dc16c6267e4162879f18d7d606a7e13a822ac252a22d344f6",
+      "decoded_file": "warm.yuv.z",
+      "shortfall": 0.017610550814584958
+    },
+    "r15462": {
+      "ceiling": 15462,
+      "affordable": true,
+      "identical_qp_control": null,
+      "quarter_crf": 244,
+      "bytes": 15196,
+      "file": "q244.ivf",
+      "sha256": "8b4d426698da626376d718b50259179e2892340a25a855a83ffd449400751c7c",
+      "origin": "new",
+      "elapsed": 5.952945003984496,
+      "decoded_sha256": "47b392eff2f48d22e3ddab982d7b7b9de0d108ef786a95595e66b3b901eb0e4c",
+      "decoded_file": "r15462.yuv.z",
+      "shortfall": 0.017203466563187164
+    },
+    "r17827": {
+      "ceiling": 17827,
+      "affordable": true,
+      "identical_qp_control": null,
+      "quarter_crf": 232,
+      "bytes": 17802,
+      "file": "q232.ivf",
+      "sha256": "d7a24d62412ed8e413753f7ae6034faef54074069fc1b15c58b9f2b9b9ea72f3",
+      "origin": "new",
+      "elapsed": 5.441096383990953,
+      "decoded_sha256": "648f22a3ffc673686ab35d697176ee541454d8d5c838547df886574f961eccd9",
+      "decoded_file": "r17827.yuv.z",
+      "shortfall": 0.0014023671958265371
+    }
+  },
+  "bank": [
+    {
+      "quarter_crf": 64,
+      "bytes": 111288,
+      "file": "q64.ivf",
+      "sha256": "28d980d67bdc7fa49a9f39e775af95a10bd1e663fb4215edcd1321c405b3a105",
+      "origin": "new",
+      "elapsed": 3.7941467899945565
+    },
+    {
+      "quarter_crf": 172,
+      "bytes": 30339,
+      "file": "q172.ivf",
+      "sha256": "5554976714c6eb8032a7c52a3199824d89cc51fad06b1af71ab1fa630ae43435",
+      "origin": "new",
+      "elapsed": 4.824778652982786
+    },
+    {
+      "quarter_crf": 226,
+      "bytes": 19050,
+      "file": "q226.ivf",
+      "sha256": "9da195436716f6945b9dd54d2f73c70dc46bec1716978f773a4c2b85ad444585",
+      "origin": "new",
+      "elapsed": 5.3779545439756475
+    },
+    {
+      "quarter_crf": 229,
+      "bytes": 18447,
+      "file": "q229.ivf",
+      "sha256": "a5b413fe4a8ce3fac1ee88e47ac7eb78b32a1851cfc793022e4eca2adda909e1",
+      "origin": "new",
+      "elapsed": 5.267442065000068
+    },
+    {
+      "quarter_crf": 230,
+      "bytes": 18302,
+      "file": "q230.ivf",
+      "sha256": "db6845fe487203604a65ad8ace692dd7f3c413e63a29dad967b816810ce409a0",
+      "origin": "new",
+      "elapsed": 5.077864214981673
+    },
+    {
+      "quarter_crf": 231,
+      "bytes": 17890,
+      "file": "q231.ivf",
+      "sha256": "8e7da7ef54a2f3ad37f93835ad043359a30d941bd0fa30743ee97cb6c7219c8f",
+      "origin": "new",
+      "elapsed": 4.903566942986799
+    },
+    {
+      "quarter_crf": 232,
+      "bytes": 17802,
+      "file": "q232.ivf",
+      "sha256": "d7a24d62412ed8e413753f7ae6034faef54074069fc1b15c58b9f2b9b9ea72f3",
+      "origin": "new",
+      "elapsed": 5.441096383990953
+    },
+    {
+      "quarter_crf": 233,
+      "bytes": 17540,
+      "file": "q233.ivf",
+      "sha256": "4d82cfe33382cd9d4f7b98989b782251400d643e0fc8b1b0c2e6e0043581546c",
+      "origin": "new",
+      "elapsed": 5.481852355005685
+    },
+    {
+      "quarter_crf": 239,
+      "bytes": 16374,
+      "file": "q239.ivf",
+      "sha256": "3892d43e93e551e65abf7e0c7aea58b5074f72b2d8ac0f5bba13be241bff1d03",
+      "origin": "new",
+      "elapsed": 6.1355275599926244
+    },
+    {
+      "quarter_crf": 242,
+      "bytes": 15623,
+      "file": "q242.ivf",
+      "sha256": "bb3d23bd4d8fa87d025b58321d0a6b1fce292d57cc66e46dc4bb8b0fb462dd35",
+      "origin": "new",
+      "elapsed": 6.381063028995413
+    },
+    {
+      "quarter_crf": 243,
+      "bytes": 15465,
+      "file": "q243.ivf",
+      "sha256": "488d1b4aa4b7b08534c34da2560f6c503767b15f228298e8d73f32e4e6738cf4",
+      "origin": "new",
+      "elapsed": 6.134303942992119
+    },
+    {
+      "quarter_crf": 244,
+      "bytes": 15196,
+      "file": "q244.ivf",
+      "sha256": "8b4d426698da626376d718b50259179e2892340a25a855a83ffd449400751c7c",
+      "origin": "new",
+      "elapsed": 5.952945003984496
+    },
+    {
+      "quarter_crf": 245,
+      "bytes": 15013,
+      "file": "q245.ivf",
+      "sha256": "5f8337bfef8cd233d2201c57f069ee3b161ca23ce99b74a88e12c1fb95c0a51a",
+      "origin": "new",
+      "elapsed": 6.112459240015596
+    },
+    {
+      "quarter_crf": 246,
+      "bytes": 14671,
+      "file": "q246.ivf",
+      "sha256": "cc584835c6dc591b2318a7812faa7442d43ea7f24fb9a0b920e9cb47fd0d56e6",
+      "origin": "new",
+      "elapsed": 5.800413557997672
+    },
+    {
+      "quarter_crf": 249,
+      "bytes": 13820,
+      "file": "q249.ivf",
+      "sha256": "d517fcdc7285411d9108ccf725a228155d3217c8d44510d39afc7712f86007b4",
+      "origin": "new",
+      "elapsed": 5.605087429983541
+    },
+    {
+      "quarter_crf": 251,
+      "bytes": 13354,
+      "file": "q251.ivf",
+      "sha256": "3932dbc0c166e5f26ebd189882abf981957534b4db6403cf1b7b41db67cfd005",
+      "origin": "new",
+      "elapsed": 5.391302097006701
+    },
+    {
+      "quarter_crf": 252,
+      "bytes": 12663,
+      "file": "q252.ivf",
+      "sha256": "da9c8adfb1701e1c1575cb43e8c541e47df0f02f608da47f98d1a6a35ea0c60a",
+      "origin": "new",
+      "elapsed": 5.132954415021231
+    },
+    {
+      "quarter_crf": 253,
+      "bytes": 12432,
+      "file": "q253.ivf",
+      "sha256": "bacb57290744b24301265d5b63f64945fd0d0d35a473179809082ccd20597eac",
+      "origin": "new",
+      "elapsed": 4.770409009011928
+    },
+    {
+      "quarter_crf": 280,
+      "bytes": 10116,
+      "file": "q280.ivf",
+      "sha256": "d79ce1e2b4f5c2d17b87e79ddfb0cf68b1533e39081d10d961d7f4b5beb4ecb0",
+      "origin": "new",
+      "elapsed": 2.9139946209907066
+    }
+  ],
+  "elapsed": 111.18180227500852
+}

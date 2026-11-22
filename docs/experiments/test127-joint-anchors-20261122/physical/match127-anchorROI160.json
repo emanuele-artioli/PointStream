@@ -1,0 +1,73 @@
+{
+  "match": "match127",
+  "source_sha256": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+  "earlier_sha256": "12df7179c0874b75a23dcb3821259991ee572b735b4bd8e99ec744f772f0ff5e",
+  "mode": "foreground-roi",
+  "roi_offset": 40,
+  "roi_map_sha256": "c23a10a05ab4316a3832746447d83da625a6c0f993007e96758e7cefa696cfbb",
+  "source_masks_sha256": "7c7b678cf671e22092efe5284a19cd113bca49ee125af558d844c886fc31c19d",
+  "ball_sha256": "d85b4b68e26d93d9b5e477785ed4b58c003aad044d9654aeaf74e52d49255757",
+  "frames": 240,
+  "fps": "60",
+  "width": 160,
+  "height": 96,
+  "tools": {
+    "SvtAv1EncApp": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "sha256": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+      "version": "SVT-AV1 v4.2.0 (release)"
+    },
+    "dav1d": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+      "version": "1.5.4"
+    },
+    "ffmpeg": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+      "version": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers"
+    }
+  },
+  "convert_command": [
+    "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+    "-v",
+    "error",
+    "-threads",
+    "1",
+    "-nostdin",
+    "-i",
+    "/local/users/emanuele/pointstream/cache/8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50/match127-000-8ebca8b69320.mp4",
+    "-an",
+    "-frames:v",
+    "240",
+    "-vf",
+    "scale=160:96:flags=area,format=yuv420p",
+    "-fps_mode",
+    "passthrough",
+    "-f",
+    "rawvideo",
+    "/local/users/emanuele/pointstream/scratch/20261122T141309Z-d292a66a-full/native/source.yuv"
+  ],
+  "source_yuv_sha256": "4ed62ebe2d50bcc553b75b235440411ec4d445489c9208efd2281943e9a1338f",
+  "selected": {
+    "warm": {
+      "ceiling": 12890,
+      "affordable": false,
+      "floor_bytes": 13023
+    }
+  },
+  "bank": [
+    {
+      "quarter_crf": 280,
+      "bytes": 13023,
+      "file": "q280.ivf",
+      "sha256": "ccdb23a11f34723248b70befe24ab50ea1350cfa7920e045c360a1a0996157db",
+      "origin": "new",
+      "elapsed": 0.6965005189995281
+    }
+  ],
+  "elapsed": 4.085157455003355
+}

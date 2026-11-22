@@ -1,0 +1,393 @@
+{
+  "stage": "smoke",
+  "scope": "native body quality within transmitted boxes of two anonymous target tracks",
+  "summary": {
+    "fresh": {
+      "per_player": {
+        "0": {
+          "dists": 0.2907508611679077,
+          "body_psnr": 14.53068061758449,
+          "motion_error": 20.46152114868164
+        },
+        "1": {
+          "dists": 0.19380733370780945,
+          "body_psnr": 16.1616428858775,
+          "motion_error": 17.663928985595703
+        }
+      },
+      "dists": 0.24227909743785858,
+      "body_psnr": 15.346161751730996,
+      "motion_error": 19.062725067138672
+    },
+    "reuse": {
+      "per_player": {
+        "0": {
+          "dists": 0.36049896478652954,
+          "body_psnr": 12.405366454882907,
+          "motion_error": 19.075746536254883
+        },
+        "1": {
+          "dists": 0.25418657064437866,
+          "body_psnr": 13.485454322128511,
+          "motion_error": 16.358518600463867
+        }
+      },
+      "dists": 0.3073427677154541,
+      "body_psnr": 12.94541038850571,
+      "motion_error": 17.717132568359375
+    }
+  },
+  "frames": 2,
+  "body_rows": [
+    {
+      "tick": 0,
+      "person": 0,
+      "visible_box": [
+        702,
+        813,
+        208,
+        267
+      ],
+      "original_box": [
+        702,
+        813,
+        208,
+        319
+      ],
+      "pixels": 14892,
+      "coverage": 0.8934485241180705,
+      "scores": {
+        "fresh": {
+          "dists": 0.2851552963256836,
+          "sum_squared_rgb": 100281074,
+          "samples": 44676
+        },
+        "reuse": {
+          "dists": 0.3532937169075012,
+          "sum_squared_rgb": 171025843,
+          "samples": 44676
+        }
+      }
+    },
+    {
+      "tick": 0,
+      "person": 1,
+      "visible_box": [
+        1021,
+        226,
+        116,
+        178
+      ],
+      "original_box": [
+        1021,
+        226,
+        116,
+        178
+      ],
+      "pixels": 4852,
+      "coverage": 1.0,
+      "scores": {
+        "fresh": {
+          "dists": 0.1855309009552002,
+          "sum_squared_rgb": 22188810,
+          "samples": 14556
+        },
+        "reuse": {
+          "dists": 0.2601850628852844,
+          "sum_squared_rgb": 40458919,
+          "samples": 14556
+        }
+      }
+    },
+    {
+      "tick": 1,
+      "person": 0,
+      "visible_box": [
+        708,
+        814,
+        208,
+        266
+      ],
+      "original_box": [
+        708,
+        814,
+        208,
+        319
+      ],
+      "pixels": 14420,
+      "coverage": 0.877555988315482,
+      "scores": {
+        "fresh": {
+          "dists": 0.29634642601013184,
+          "sum_squared_rgb": 101174369,
+          "samples": 43260
+        },
+        "reuse": {
+          "dists": 0.36770421266555786,
+          "sum_squared_rgb": 157606590,
+          "samples": 43260
+        }
+      }
+    },
+    {
+      "tick": 1,
+      "person": 1,
+      "visible_box": [
+        1022,
+        227,
+        116,
+        178
+      ],
+      "original_box": [
+        1022,
+        227,
+        116,
+        178
+      ],
+      "pixels": 5048,
+      "coverage": 1.0,
+      "scores": {
+        "fresh": {
+          "dists": 0.2020837664604187,
+          "sum_squared_rgb": 24549448,
+          "samples": 15144
+        },
+        "reuse": {
+          "dists": 0.2481880784034729,
+          "sum_squared_rgb": 46095925,
+          "samples": 15144
+        }
+      }
+    }
+  ],
+  "temporal_rows": [
+    {
+      "tick": 1,
+      "person": 0,
+      "pixels": 13642,
+      "errors": {
+        "fresh": 20.46152114868164,
+        "reuse": 19.075746536254883
+      }
+    },
+    {
+      "tick": 1,
+      "person": 1,
+      "pixels": 4534,
+      "errors": {
+        "fresh": 17.663928985595703,
+        "reuse": 16.358518600463867
+      }
+    }
+  ],
+  "mask_indices": {
+    "0": 0,
+    "1": 1
+  },
+  "matte_meta": {
+    "shape": [
+      240,
+      2,
+      540,
+      960
+    ],
+    "mode": "rle",
+    "native_grid_factor": 1,
+    "output_shape": [
+      1080,
+      1920
+    ],
+    "timing": "shared_KPS1_window_header"
+  },
+  "source_yuv_sha256": "40c41302e9497d468013413fbe717bccb6004e4b44fce76e824974ca2c7e6c67",
+  "source_sha256": "f0551443eaff4e4b3539f21cd0c6ac66f55601d480ad099a571e8626db735e4a",
+  "source_mask_sha256": "b8bef3e38afbb3a3bf8b195ad918fd6850690d0b5b7d8e39a8d03f4865902709",
+  "source_mask_carrier_sha256": "d80fac2ab880743e100a90a0dbb46af6173bc2479389a6d8f75663578b9db017",
+  "source_ref_max_rgb_delta": [
+    0,
+    0
+  ],
+  "model": {
+    "fresh": {
+      "model": {
+        "cfg": 3.5,
+        "denoising_unet": {
+          "keys": 1274,
+          "missing": 0,
+          "missing_allowed": [],
+          "unexpected": 0,
+          "unexpected_examples": []
+        },
+        "dtype": "float16",
+        "fit": {
+          "checkpoint_sha256": "85e3c65c9777b799f9ed0df3a5c8da567fe8a92e4ac83d115719527acb739eb4",
+          "denoising_unet": {
+            "lora_layers": 128,
+            "lora_tensors": 256
+          },
+          "pose_guider": "frozen (the profile's)",
+          "rank": 64,
+          "reference_unet": {
+            "lora_layers": 104,
+            "lora_tensors": 208
+          }
+        },
+        "image_encoder": {
+          "mismatched": 0,
+          "missing": 0,
+          "unexpected": 0,
+          "unexpected_examples": []
+        },
+        "motion_module_keys": 588,
+        "pose_guider": {
+          "keys": 16,
+          "missing": 0,
+          "missing_allowed": [],
+          "unexpected": 0,
+          "unexpected_examples": []
+        },
+        "profile": "original",
+        "reference_unet": {
+          "keys": 682,
+          "missing": 0,
+          "missing_allowed": [
+            "conv_norm_out.weight",
+            "conv_norm_out.bias",
+            "conv_out.weight",
+            "conv_out.bias"
+          ],
+          "unexpected": 0,
+          "unexpected_examples": []
+        },
+        "vae": {
+          "mismatched": 0,
+          "missing": 0,
+          "unexpected": 0,
+          "unexpected_examples": []
+        }
+      },
+      "fit": "85e3c65c9777b799f9ed0df3a5c8da567fe8a92e4ac83d115719527acb739eb4",
+      "device": {
+        "capability": [
+          8,
+          9
+        ],
+        "cuda": "12.8",
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "torch": "2.7.0+cu128"
+      },
+      "outputs": [
+        "b3b33d06672777e06f94ec2eb31815caec35954787e59dbd464d6626cdabed5a",
+        "e7b3f28315c23b695dc71cbd69e509cbffce6f1ad3dffd369fa6b2e3ed3ce6f2"
+      ]
+    },
+    "reuse": {
+      "model": {
+        "cfg": 3.5,
+        "denoising_unet": {
+          "keys": 1274,
+          "missing": 0,
+          "missing_allowed": [],
+          "unexpected": 0,
+          "unexpected_examples": []
+        },
+        "dtype": "float16",
+        "fit": {
+          "checkpoint_sha256": "85e3c65c9777b799f9ed0df3a5c8da567fe8a92e4ac83d115719527acb739eb4",
+          "denoising_unet": {
+            "lora_layers": 128,
+            "lora_tensors": 256
+          },
+          "pose_guider": "frozen (the profile's)",
+          "rank": 64,
+          "reference_unet": {
+            "lora_layers": 104,
+            "lora_tensors": 208
+          }
+        },
+        "image_encoder": {
+          "mismatched": 0,
+          "missing": 0,
+          "unexpected": 0,
+          "unexpected_examples": []
+        },
+        "motion_module_keys": 588,
+        "pose_guider": {
+          "keys": 16,
+          "missing": 0,
+          "missing_allowed": [],
+          "unexpected": 0,
+          "unexpected_examples": []
+        },
+        "profile": "original",
+        "reference_unet": {
+          "keys": 682,
+          "missing": 0,
+          "missing_allowed": [
+            "conv_norm_out.weight",
+            "conv_norm_out.bias",
+            "conv_out.weight",
+            "conv_out.bias"
+          ],
+          "unexpected": 0,
+          "unexpected_examples": []
+        },
+        "vae": {
+          "mismatched": 0,
+          "missing": 0,
+          "unexpected": 0,
+          "unexpected_examples": []
+        }
+      },
+      "fit": "85e3c65c9777b799f9ed0df3a5c8da567fe8a92e4ac83d115719527acb739eb4",
+      "device": {
+        "capability": [
+          8,
+          9
+        ],
+        "cuda": "12.8",
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "torch": "2.7.0+cu128"
+      },
+      "outputs": [
+        "a4293afce10b786fa9ed026162d31860cb4998175f7833df34baf74241424a2f",
+        "2c251df4855926e38f7d8d29d9ad706d9d6eac6cfe9e9bf0ccd44f41d2a8a9c2"
+      ]
+    }
+  },
+  "stream_cost": {
+    "codec": "lossless WebP",
+    "passed": true,
+    "initial_bytes": 242646,
+    "return_reuse_bytes": 354,
+    "return_refresh_bytes": 215667,
+    "total_reuse_bytes": 243000,
+    "total_fresh_bytes": 458313,
+    "observed_shot_seconds": 0.96,
+    "reference_only_reuse_kbps": 2025.0,
+    "reference_only_fresh_kbps": 3819.275,
+    "separation_seconds_between_starts": 221.3,
+    "initial_sha256": "668305e941687b0a97ba5c8381036da37840e49179eae07b2517df5c45be8890",
+    "reuse_sha256": "73ceadce532878eb93e158c22e4e87c01b7576544b1d0e3db0018c9e0cef2451",
+    "refresh_sha256": "af9d07a0212f37cad3bb02dcaad48467d9c2deb882d4544a43cc7e48c985f543",
+    "corrupt_mapping_rejected": true,
+    "target_units": [
+      "nadal_kyrgios__002_at120__person_000000000000",
+      "nadal_kyrgios__002_at120__person_000000000002"
+    ],
+    "transport_archive_sha256": "d80fac2ab880743e100a90a0dbb46af6173bc2479389a6d8f75663578b9db017"
+  },
+  "native_crop_sha256": [
+    "b3b33d06672777e06f94ec2eb31815caec35954787e59dbd464d6626cdabed5a",
+    "e7b3f28315c23b695dc71cbd69e509cbffce6f1ad3dffd369fa6b2e3ed3ce6f2",
+    "a4293afce10b786fa9ed026162d31860cb4998175f7833df34baf74241424a2f",
+    "2c251df4855926e38f7d8d29d9ad706d9d6eac6cfe9e9bf0ccd44f41d2a8a9c2"
+  ],
+  "vgg_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+  "scoring_revision": "d6a819476fb576ff3829610397eba37d97f38331b69d083e21a7f04b7788b619",
+  "scoring_lib_sha256": "f803e3389197dc413e0f3360985f97fb48b9ee3d58f18c345defe855af1b65a0",
+  "cv2": "4.10.0",
+  "torch": "2.10.0+cu128",
+  "compute_seconds": 12.266645666008117,
+  "total_seconds": 55.03189598102472
+}

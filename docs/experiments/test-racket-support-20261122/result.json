@@ -1,0 +1,23 @@
+{
+  "cases": [
+    "match108",
+    "match102",
+    "match120"
+  ],
+  "objects": 26,
+  "labeled_ticks": 25,
+  "summary": {
+    "head": {
+      "visible": 104,
+      "exact": 12,
+      "within_five": 16,
+      "all_landmarks": 104
+    },
+    "handle": {
+      "visible": 17,
+      "exact": 8,
+      "within_five": 17,
+      "all_landmarks": 26
+    }
+  }
+}

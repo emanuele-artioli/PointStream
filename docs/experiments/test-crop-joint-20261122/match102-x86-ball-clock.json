@@ -1,0 +1,87 @@
+{
+  "joint_sha256": "fdc8fcbb39599348e966f07666a0472cf4cbb9211e8baf7ada44ba59161b7780",
+  "cache_sha256": "bef67ff7a17cc2dc83fa66f35faa344a91009393e778a7248e0516321038ddfb",
+  "source": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+  "frames": 240,
+  "native_fps": "30000/1001",
+  "cpu": "x86_64",
+  "machine": "x86_64",
+  "platform": "Linux-6.8.0-149-generic-x86_64-with-glibc2.35",
+  "opencv": "4.10.0",
+  "opencv_build_sha256": "48f8ec94132cbcc9234820dc03d1cb766767c898c1239bac89fd1e3fa6e90e9e",
+  "native_decoder": {
+    "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+    "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+    "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+    "version": "1.5.4"
+  },
+  "opencv_threads": 1,
+  "native_decoder_threads": 1,
+  "cache_parse_s": 0.0546891629928723,
+  "passes": [
+    {
+      "native_s": 0.00927260599564761,
+      "order": [
+        "paid",
+        "muted"
+      ],
+      "paid_canvas_s": 0.7891055140062235,
+      "paid_cpu_s": 0.787642003,
+      "muted_canvas_s": 0.6640306419867557,
+      "muted_cpu_s": 0.6624151869999999
+    },
+    {
+      "native_s": 0.008650766016216949,
+      "order": [
+        "muted",
+        "paid"
+      ],
+      "muted_canvas_s": 0.6590236350020859,
+      "muted_cpu_s": 0.6570255699999998,
+      "paid_canvas_s": 0.7734213579969946,
+      "paid_cpu_s": 0.7714896139999996
+    },
+    {
+      "native_s": 0.009334876987850294,
+      "order": [
+        "paid",
+        "muted"
+      ],
+      "paid_canvas_s": 0.8024031749810092,
+      "paid_cpu_s": 0.8012153240000002,
+      "muted_canvas_s": 0.6337223180162255,
+      "muted_cpu_s": 0.631478832
+    }
+  ],
+  "displayed_at": [
+    1920,
+    1080
+  ],
+  "ball_processing_at": [
+    960,
+    544
+  ],
+  "clip_seconds": 8.008,
+  "median_payload_decode_and_canvas_s": 0.7983781200018711,
+  "worst_payload_decode_and_canvas_s": 0.8117380519688595,
+  "median_fps": 300.6094405485931,
+  "meets_native_throughput": true,
+  "sender_present": 217,
+  "pixels_changed_ticks": 217,
+  "price": {
+    "running_bytes": 17794,
+    "cold_cache_bytes": 137480
+  },
+  "wall_s": 7.786109851993388,
+  "cpu_model": "Intel(R) Xeon(R) Gold 6418H",
+  "full_validation": {
+    "passed": true,
+    "checks": {
+      "real_paid_receiver": true,
+      "frames": 240,
+      "rgb_matches": 240,
+      "estimate_s": 26.67916477799008
+    }
+  },
+  "producer": "20261122T134208Z-755dc99e"
+}

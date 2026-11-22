@@ -1,0 +1,34 @@
+{
+  "sha256": "a0d96fa806a7730295bb5bf5533426414cccdd40176de02a44a08a82adb5bf8f",
+  "bytes": 3686400,
+  "encoded_variants": 18,
+  "array_widths": [
+    160,
+    240,
+    320,
+    480,
+    640
+  ],
+  "code_sha256": "dda8a8a0c2b1fabdc803c130f1d68a155b71722cf5a8e0fc37dcbc92ff669188",
+  "cpu_seconds": 1023.409446,
+  "receipt_files": {
+    "native-al028-160-20/result.json": "e1837be54f01ae73008483416ee40ba849396072b37aca4776dee79fe6217056",
+    "native-al028-160-40/result.json": "f08add5689a3cd0f28a45d692ca86f3a05f2f7356a6a011475b10b37a717251f",
+    "native-al028-160-8/result.json": "174b266ba2f11df5c3ef886afe705ee29feb5967be1c4d670761455e201666df",
+    "native-al028-320-20/result.json": "e5ecb0603563a0fd5a5fd9c7399f7d59923d7d1efabfb82e86e98396521cc641",
+    "native-al028-320-40/result.json": "afa2224796e1a13d8315081b4f67192723226fc8821240559bf7ec5243985878",
+    "native-al028-320-8/result.json": "e98b24b97b15d61c4743d0f5da397b5c27b702029d6dc31bd736574e7c80e4ec",
+    "native-al028-640-20/result.json": "dbcd28546c971904917110bdbdb6692eb11b2a1bd856b3a36743b20582aa94ba",
+    "native-al028-640-40/result.json": "822302ef0ba722db80902c2b30365fc9ff64c123d206986c5a12b8a0f21bb4e2",
+    "native-al028-640-8/result.json": "b6332acd697c15aa9ca3c72ba0681afb6096eadbb0f113548e5162bcc1931237",
+    "native-nadal-160-20/result.json": "5180f95d807daca07d982804934518deb9e56403768a2b2e45714ab91ddd97e8",
+    "native-nadal-160-40/result.json": "ecca40d3fbe969f82e4d29795b346361f28672427bee9b39f0a88e2191cd6f9f",
+    "native-nadal-160-8/result.json": "a6051fd65de4cd195ad771c13e793dd7762d4b4a5363b8e1f6e86307cc611bf9",
+    "native-nadal-240-20/result.json": "bd03e2814fcf885c1b1c80d83fba758ba29ae4a3122f43fa188899b4b1b40f72",
+    "native-nadal-240-40/result.json": "94fa564197e1ea95d848b62aa5436a9844ce25f6c80fa6c13a04991cbd2fd7b6",
+    "native-nadal-240-8/result.json": "bc326b31c27b904274555b80616dbee175a5ca8e8c5bd9c3e68ec5ffb1164809",
+    "native-nadal-480-20/result.json": "cc0b6678c47b20b361a86361360b93b09cc487fe7ae8f4e2bd6afe1a6e6d82eb",
+    "native-nadal-480-40/result.json": "2e44f7e72402aa1fb3e2bb62cae4bc5a27f1761bf219b61bcdce5246ac514a1d",
+    "native-nadal-480-8/result.json": "9b5d94b6b8bab26fa01e4d53e77853096c13c40fb40d80ad425b62076dec6da5"
+  }
+}

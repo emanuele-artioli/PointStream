@@ -1,0 +1,149 @@
+{
+  "schema": 1,
+  "device": "cpu",
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.return_native_motion"
+  ],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.return_native_motion",
+    "--validate"
+  ],
+  "arguments": [
+    "--source",
+    "{staged:source}",
+    "--canonical",
+    "{staged:canonical}",
+    "--grid",
+    "{staged:grid}",
+    "--supports",
+    "{staged:supports}",
+    "--witness",
+    "{staged:witness}",
+    "--neural",
+    "{staged:neural}",
+    "--ivf",
+    "{staged:ivf}",
+    "--contract",
+    "{staged:contract}",
+    "--frames",
+    "{frames}"
+  ],
+  "staged_inputs": [
+    {
+      "name": "source",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/six-match-source-panel-20261122/alcaraz031-054e4535638d.mp4",
+      "sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+      "extract": false
+    },
+    {
+      "name": "canonical",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-al031-054e4535638d-20261122T1224/source.mkv",
+      "sha256": "ffc013eacc5dde790a9f6dcccda34f1848aa142f402c0a8b2103948e79cb0742",
+      "extract": false
+    },
+    {
+      "name": "grid",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-al031-054e4535638d-20261122T1224/grid.json",
+      "sha256": "fd7bdfbf5b6a0f25a06a10b13a78de323e8bc636f9df4896d191b973388398f9",
+      "extract": false
+    },
+    {
+      "name": "supports",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-al031-054e4535638d-20261122T1224/supports.tar",
+      "sha256": "52715bd5a1f36d553566fafbb49175255fd4a1d36a89587bba0920b44e4724e6",
+      "extract": true
+    },
+    {
+      "name": "witness",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T125912Z-9361b447/full/published.tar",
+      "sha256": "b342ab4c92020c5f2de52f6e12dcc48248b5b8dba33bcad0ab3c1f1eaee53c97",
+      "extract": true
+    },
+    {
+      "name": "neural",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T121405Z-d2d356f7/full/published.tar",
+      "sha256": "4f630a27173da6991809f892329bfaafb81e75e6ad3f02ffe0ea652c7cb17589",
+      "extract": true
+    },
+    {
+      "name": "ivf",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-al031-054e4535638d-20261122T1224/two-window-continuous-20261122T1410/motion-compared-ordinary.ivf",
+      "sha256": "6b607b8288c950a006e619663266361f349b5b870cacc308137e89c354542129",
+      "extract": false
+    },
+    {
+      "name": "contract",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-al031-054e4535638d-20261122T1224/two-window-continuous-20261122T1410/fresh-motion-contract.json",
+      "sha256": "c380b1beef3d459f4302bc87a2d4c0c614ba79a67258ab51dfabe685615fecdc",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/six-match-source-panel-20261122/alcaraz031-054e4535638d.mp4",
+      "sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-al031-054e4535638d-20261122T1224/source.mkv",
+      "sha256": "ffc013eacc5dde790a9f6dcccda34f1848aa142f402c0a8b2103948e79cb0742"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-al031-054e4535638d-20261122T1224/grid.json",
+      "sha256": "fd7bdfbf5b6a0f25a06a10b13a78de323e8bc636f9df4896d191b973388398f9"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-al031-054e4535638d-20261122T1224/supports.tar",
+      "sha256": "52715bd5a1f36d553566fafbb49175255fd4a1d36a89587bba0920b44e4724e6"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T125912Z-9361b447/full/published.tar",
+      "sha256": "b342ab4c92020c5f2de52f6e12dcc48248b5b8dba33bcad0ab3c1f1eaee53c97"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T121405Z-d2d356f7/full/published.tar",
+      "sha256": "4f630a27173da6991809f892329bfaafb81e75e6ad3f02ffe0ea652c7cb17589"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-al031-054e4535638d-20261122T1224/two-window-continuous-20261122T1410/motion-compared-ordinary.ivf",
+      "sha256": "6b607b8288c950a006e619663266361f349b5b870cacc308137e89c354542129"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-al031-054e4535638d-20261122T1224/two-window-continuous-20261122T1410/fresh-motion-contract.json",
+      "sha256": "c380b1beef3d459f4302bc87a2d4c0c614ba79a67258ab51dfabe685615fecdc"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "required_commands": [],
+  "deadline": "2026-11-22T21:01:00Z",
+  "verify_staged_inputs": true,
+  "hosts": [
+    "gpu6"
+  ],
+  "gpu_models": [],
+  "gpu_memory_mib": 0,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "local_storage_gib": 28,
+  "smoke": {
+    "representative_basis": "Eight original native ticks, fourteen matched body transitions, both independent codecs, source-only DIS and exact canonical source, recorded CPU forecast including one-time setup.",
+    "seconds": 240
+  },
+  "full": {
+    "seconds": 595
+  },
+  "validator_seconds": 30,
+  "budget_seconds": 890,
+  "stall_seconds": 640,
+  "scale": {
+    "frames": {
+      "smoke": 8,
+      "full": 240
+    }
+  }
+}

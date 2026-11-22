@@ -1,0 +1,15 @@
+{
+  "job_id": "20261122T135510Z-8cbdccbb",
+  "state": "complete",
+  "mode": "roi",
+  "width": 320,
+  "height": 192,
+  "archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T135510Z-8cbdccbb/full/published.tar",
+  "archive_sha256": "dadff11c411290319efd72ef657f9d4a9fafc137564e3074e8aa9310a7d33cb7",
+  "selected": {
+    "warm": {
+      "affordable": false
+    }
+  },
+  "report_sha256": "d5faba341183e2941c974e63d1db0d64bbf82b9fd3aa7875626eed9961e56510"
+}

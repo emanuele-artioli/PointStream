@@ -1,0 +1,115 @@
+{
+  "source_files": 6,
+  "decoded_source_ticks": 1440,
+  "input_event_count": 2,
+  "rows": [
+    {
+      "tag": "djokovic_federer-026",
+      "rank": 1,
+      "native_fps": "50/1",
+      "source_sha256": "8aeeba8eab61d1b9f2153fe47fcb16f806fb0ebab30b710b832f8abc846c08f2",
+      "status": "court eligible",
+      "court_fits": 240,
+      "frames": 240,
+      "source_size": [
+        3840,
+        2160
+      ],
+      "output_size": [
+        1920,
+        1080
+      ],
+      "cpu_host_wall_sec": 235.7063884579984
+    },
+    {
+      "tag": "djokovic_federer-021",
+      "rank": 2,
+      "native_fps": "50/1",
+      "source_sha256": "6423a40735568eb8fd6b190cfb4e7d636d1fa99cc84e953f760b9ce0f09f6e0b",
+      "status": "court eligible",
+      "court_fits": 240,
+      "frames": 240,
+      "source_size": [
+        3840,
+        2160
+      ],
+      "output_size": [
+        1920,
+        1080
+      ],
+      "cpu_host_wall_sec": 230.9315055830084
+    },
+    {
+      "tag": "djokovic_federer-079",
+      "rank": 3,
+      "native_fps": "50/1",
+      "source_sha256": "a0e505fb26cbd8663e762d78b416a70aa50f80779eae92b8e33a07f7e3a96725",
+      "status": "court eligible",
+      "court_fits": 240,
+      "frames": 240,
+      "source_size": [
+        3840,
+        2160
+      ],
+      "output_size": [
+        1920,
+        1080
+      ],
+      "cpu_host_wall_sec": 237.95973308300017
+    },
+    {
+      "tag": "djokovic_zverev-008",
+      "rank": 1,
+      "native_fps": "60/1",
+      "source_sha256": "296d9cc12ecec861d9bd71024bdbf005ea775fe849991118d5d3825f374d8610",
+      "status": "court eligible",
+      "court_fits": 240,
+      "frames": 240,
+      "source_size": [
+        3840,
+        2160
+      ],
+      "output_size": [
+        1920,
+        1080
+      ],
+      "cpu_host_wall_sec": 475.37659935298143
+    },
+    {
+      "tag": "djokovic_zverev-006",
+      "rank": 2,
+      "native_fps": "60/1",
+      "source_sha256": "24023f10d3017d583fbd0dfb5a4dac2f04fb4492485eb0917cdc6acab7413c9c",
+      "status": "court eligible",
+      "court_fits": 223,
+      "frames": 240,
+      "source_size": [
+        3840,
+        2160
+      ],
+      "output_size": [
+        1920,
+        1080
+      ],
+      "cpu_host_wall_sec": 457.3876972089929
+    },
+    {
+      "tag": "djokovic_zverev-010",
+      "rank": 3,
+      "native_fps": "60/1",
+      "source_sha256": "10b3c9c9797e01b540cb1141b8bbfe2ca5eafdd40d80aca889a57d9e74d52e0d",
+      "status": "court eligible",
+      "court_fits": 240,
+      "frames": 240,
+      "source_size": [
+        3840,
+        2160
+      ],
+      "output_size": [
+        1920,
+        1080
+      ],
+      "cpu_host_wall_sec": 541.369854582008
+    }
+  ]
+}

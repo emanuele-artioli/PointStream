@@ -1,0 +1,2620 @@
+[
+  {
+    "bytes": 23211,
+    "rate": 19.3425,
+    "stream": "7fc249fc9f23d78f9914ed3bcc4d5ad8b92c886d3b44e9b308bce993fc63083c",
+    "dists": 0.539421466489633,
+    "supports": "bc921c6d249dce12657ad7c94fa1fcc7400714d0f07b692ee969acd4beeaed5b",
+    "source": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "fixed_rows": [
+      {
+        "tick": 10,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.572381317615509
+      },
+      {
+        "tick": 10,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5225118398666382
+      },
+      {
+        "tick": 30,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5215231776237488
+      },
+      {
+        "tick": 30,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5510552525520325
+      },
+      {
+        "tick": 50,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5228987336158752
+      },
+      {
+        "tick": 50,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.48998701572418213
+      },
+      {
+        "tick": 70,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.573512613773346
+      },
+      {
+        "tick": 70,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5239176750183105
+      },
+      {
+        "tick": 90,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5664292573928833
+      },
+      {
+        "tick": 90,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5244783759117126
+      },
+      {
+        "tick": 110,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5199766159057617
+      },
+      {
+        "tick": 110,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5183497071266174
+      },
+      {
+        "tick": 130,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5373088121414185
+      },
+      {
+        "tick": 130,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.519868016242981
+      },
+      {
+        "tick": 150,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5924755334854126
+      },
+      {
+        "tick": 150,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5238821506500244
+      },
+      {
+        "tick": 170,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5388352870941162
+      },
+      {
+        "tick": 170,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5268705487251282
+      },
+      {
+        "tick": 190,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5624849796295166
+      },
+      {
+        "tick": 190,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5598894357681274
+      },
+      {
+        "tick": 210,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5088286399841309
+      },
+      {
+        "tick": 210,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.549721360206604
+      },
+      {
+        "tick": 230,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5414389967918396
+      },
+      {
+        "tick": 230,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5774898529052734
+      }
+    ]
+  },
+  {
+    "bytes": 16305,
+    "rate": 13.5875,
+    "stream": "72fe787e8ef6df346b88edae253d28fad953b03676bbd82fc3b6324dc9fd0d61",
+    "dists": 0.5783879881103834,
+    "supports": "bc921c6d249dce12657ad7c94fa1fcc7400714d0f07b692ee969acd4beeaed5b",
+    "source": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "fixed_rows": [
+      {
+        "tick": 10,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.558012843132019
+      },
+      {
+        "tick": 10,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.535629391670227
+      },
+      {
+        "tick": 30,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5267024040222168
+      },
+      {
+        "tick": 30,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.629217267036438
+      },
+      {
+        "tick": 50,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5428786277770996
+      },
+      {
+        "tick": 50,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5494707822799683
+      },
+      {
+        "tick": 70,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6208144426345825
+      },
+      {
+        "tick": 70,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5770297050476074
+      },
+      {
+        "tick": 90,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5674998164176941
+      },
+      {
+        "tick": 90,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6551380157470703
+      },
+      {
+        "tick": 110,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5494890213012695
+      },
+      {
+        "tick": 110,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5488284826278687
+      },
+      {
+        "tick": 130,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5372509956359863
+      },
+      {
+        "tick": 130,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5578440427780151
+      },
+      {
+        "tick": 150,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6019282937049866
+      },
+      {
+        "tick": 150,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5665905475616455
+      },
+      {
+        "tick": 170,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5841770172119141
+      },
+      {
+        "tick": 170,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6715662479400635
+      },
+      {
+        "tick": 190,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5650203227996826
+      },
+      {
+        "tick": 190,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6005674600601196
+      },
+      {
+        "tick": 210,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5504425168037415
+      },
+      {
+        "tick": 210,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6010911464691162
+      },
+      {
+        "tick": 230,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5547600984573364
+      },
+      {
+        "tick": 230,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6293622255325317
+      }
+    ]
+  },
+  {
+    "bytes": 11595,
+    "rate": 9.6625,
+    "stream": "bd6270630237d3eb23f6ea33e6f739dbb26d17e9ccf888938bc70310784bc739",
+    "dists": 0.6499021649360657,
+    "supports": "bc921c6d249dce12657ad7c94fa1fcc7400714d0f07b692ee969acd4beeaed5b",
+    "source": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "fixed_rows": [
+      {
+        "tick": 10,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6164981126785278
+      },
+      {
+        "tick": 10,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.546863317489624
+      },
+      {
+        "tick": 30,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5674669742584229
+      },
+      {
+        "tick": 30,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6873632669448853
+      },
+      {
+        "tick": 50,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6236099004745483
+      },
+      {
+        "tick": 50,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6992663741111755
+      },
+      {
+        "tick": 70,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6176661252975464
+      },
+      {
+        "tick": 70,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.7104358673095703
+      },
+      {
+        "tick": 90,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6558167934417725
+      },
+      {
+        "tick": 90,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6616350412368774
+      },
+      {
+        "tick": 110,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5900723934173584
+      },
+      {
+        "tick": 110,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.645783007144928
+      },
+      {
+        "tick": 130,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5769027471542358
+      },
+      {
+        "tick": 130,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5696850419044495
+      },
+      {
+        "tick": 150,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6914836764335632
+      },
+      {
+        "tick": 150,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6963269710540771
+      },
+      {
+        "tick": 170,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6706382036209106
+      },
+      {
+        "tick": 170,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.7053022384643555
+      },
+      {
+        "tick": 190,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6510801315307617
+      },
+      {
+        "tick": 190,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6699895858764648
+      },
+      {
+        "tick": 210,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6566041111946106
+      },
+      {
+        "tick": 210,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.7158463597297668
+      },
+      {
+        "tick": 230,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.660936713218689
+      },
+      {
+        "tick": 230,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.7103790044784546
+      }
+    ]
+  },
+  {
+    "bytes": 8925,
+    "rate": 7.4375,
+    "stream": "d2fe6dcd3c9135bf2fdfe7dbdb20ac180ad6f265bb4726fe8dd5daa6ff7494e3",
+    "dists": 0.707039917508761,
+    "supports": "bc921c6d249dce12657ad7c94fa1fcc7400714d0f07b692ee969acd4beeaed5b",
+    "source": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "fixed_rows": [
+      {
+        "tick": 10,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6673890352249146
+      },
+      {
+        "tick": 10,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.7019152045249939
+      },
+      {
+        "tick": 30,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.668248176574707
+      },
+      {
+        "tick": 30,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.7367022633552551
+      },
+      {
+        "tick": 50,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6811702251434326
+      },
+      {
+        "tick": 50,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.7108080387115479
+      },
+      {
+        "tick": 70,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6800460815429688
+      },
+      {
+        "tick": 70,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.726310133934021
+      },
+      {
+        "tick": 90,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.712257981300354
+      },
+      {
+        "tick": 90,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.7084801197052002
+      },
+      {
+        "tick": 110,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6900723576545715
+      },
+      {
+        "tick": 110,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.7117274403572083
+      },
+      {
+        "tick": 130,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6911194920539856
+      },
+      {
+        "tick": 130,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.7152508497238159
+      },
+      {
+        "tick": 150,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.7139056921005249
+      },
+      {
+        "tick": 150,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.745079755783081
+      },
+      {
+        "tick": 170,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.7078709006309509
+      },
+      {
+        "tick": 170,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.7190422415733337
+      },
+      {
+        "tick": 190,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.7034140229225159
+      },
+      {
+        "tick": 190,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.724577784538269
+      },
+      {
+        "tick": 210,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.7092086672782898
+      },
+      {
+        "tick": 210,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.7242901921272278
+      },
+      {
+        "tick": 230,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.7104859352111816
+      },
+      {
+        "tick": 230,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.709585428237915
+      }
+    ]
+  },
+  {
+    "bytes": 65665,
+    "rate": 54.72083333333333,
+    "stream": "105b23c4eef852d93fea3f131c2efb9d3a2d77df166e911ee52742d869c376b9",
+    "dists": 0.39811236411333084,
+    "supports": "bc921c6d249dce12657ad7c94fa1fcc7400714d0f07b692ee969acd4beeaed5b",
+    "source": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "fixed_rows": [
+      {
+        "tick": 10,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.3914199471473694
+      },
+      {
+        "tick": 10,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.36844193935394287
+      },
+      {
+        "tick": 30,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.45829951763153076
+      },
+      {
+        "tick": 30,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.3842143416404724
+      },
+      {
+        "tick": 50,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.4431490898132324
+      },
+      {
+        "tick": 50,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.414669930934906
+      },
+      {
+        "tick": 70,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.4255720376968384
+      },
+      {
+        "tick": 70,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.425487756729126
+      },
+      {
+        "tick": 90,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.410772442817688
+      },
+      {
+        "tick": 90,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.3375917077064514
+      },
+      {
+        "tick": 110,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.4162571430206299
+      },
+      {
+        "tick": 110,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.3692520260810852
+      },
+      {
+        "tick": 130,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.3882230520248413
+      },
+      {
+        "tick": 130,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.35881221294403076
+      },
+      {
+        "tick": 150,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.39273500442504883
+      },
+      {
+        "tick": 150,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.3846297860145569
+      },
+      {
+        "tick": 170,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.4039480686187744
+      },
+      {
+        "tick": 170,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.3498205542564392
+      },
+      {
+        "tick": 190,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.40588968992233276
+      },
+      {
+        "tick": 190,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.39100325107574463
+      },
+      {
+        "tick": 210,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.3933165669441223
+      },
+      {
+        "tick": 210,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.3973954916000366
+      },
+      {
+        "tick": 230,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.41325390338897705
+      },
+      {
+        "tick": 230,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.4305412769317627
+      }
+    ]
+  },
+  {
+    "bytes": 39674,
+    "rate": 33.06166666666667,
+    "stream": "c298aa4b1c26ae279e122b00bd3b3beb15bfcdd55ebb77f2ef6b73b894c5277a",
+    "dists": 0.44069619725147885,
+    "supports": "bc921c6d249dce12657ad7c94fa1fcc7400714d0f07b692ee969acd4beeaed5b",
+    "source": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "fixed_rows": [
+      {
+        "tick": 10,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.44293051958084106
+      },
+      {
+        "tick": 10,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.3912320137023926
+      },
+      {
+        "tick": 30,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.47850555181503296
+      },
+      {
+        "tick": 30,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.45284491777420044
+      },
+      {
+        "tick": 50,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.4912228584289551
+      },
+      {
+        "tick": 50,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.41074538230895996
+      },
+      {
+        "tick": 70,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5064563751220703
+      },
+      {
+        "tick": 70,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.4783198833465576
+      },
+      {
+        "tick": 90,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.42861276865005493
+      },
+      {
+        "tick": 90,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.43263471126556396
+      },
+      {
+        "tick": 110,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.4579179286956787
+      },
+      {
+        "tick": 110,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.3923007845878601
+      },
+      {
+        "tick": 130,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.3991784453392029
+      },
+      {
+        "tick": 130,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.40172070264816284
+      },
+      {
+        "tick": 150,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.41508376598358154
+      },
+      {
+        "tick": 150,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.43712204694747925
+      },
+      {
+        "tick": 170,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.4340015649795532
+      },
+      {
+        "tick": 170,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.42258530855178833
+      },
+      {
+        "tick": 190,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.4325602054595947
+      },
+      {
+        "tick": 190,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.4078124761581421
+      },
+      {
+        "tick": 210,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.4518809914588928
+      },
+      {
+        "tick": 210,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.45040959119796753
+      },
+      {
+        "tick": 230,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.47005361318588257
+      },
+      {
+        "tick": 230,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.4905763268470764
+      }
+    ]
+  },
+  {
+    "bytes": 20831,
+    "rate": 17.359166666666667,
+    "stream": "a645776e7268f1ea93fb4a38a40a7f414c8fbefdea56baaf5921b1ccb32282df",
+    "dists": 0.5486132527391115,
+    "supports": "bc921c6d249dce12657ad7c94fa1fcc7400714d0f07b692ee969acd4beeaed5b",
+    "source": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "fixed_rows": [
+      {
+        "tick": 10,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5545148849487305
+      },
+      {
+        "tick": 10,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.4073517322540283
+      },
+      {
+        "tick": 30,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5164099931716919
+      },
+      {
+        "tick": 30,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.600167453289032
+      },
+      {
+        "tick": 50,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5734835863113403
+      },
+      {
+        "tick": 50,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5427892804145813
+      },
+      {
+        "tick": 70,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5829998850822449
+      },
+      {
+        "tick": 70,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5832556486129761
+      },
+      {
+        "tick": 90,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5411728620529175
+      },
+      {
+        "tick": 90,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5133320689201355
+      },
+      {
+        "tick": 110,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5043392777442932
+      },
+      {
+        "tick": 110,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5092777013778687
+      },
+      {
+        "tick": 130,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.49284130334854126
+      },
+      {
+        "tick": 130,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.47615426778793335
+      },
+      {
+        "tick": 150,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6074060201644897
+      },
+      {
+        "tick": 150,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5601886510848999
+      },
+      {
+        "tick": 170,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5397541522979736
+      },
+      {
+        "tick": 170,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6587202548980713
+      },
+      {
+        "tick": 190,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.4944971203804016
+      },
+      {
+        "tick": 190,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5157090425491333
+      },
+      {
+        "tick": 210,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5969817638397217
+      },
+      {
+        "tick": 210,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6561579704284668
+      },
+      {
+        "tick": 230,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5270655155181885
+      },
+      {
+        "tick": 230,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6121476292610168
+      }
+    ]
+  },
+  {
+    "bytes": 10464,
+    "rate": 8.72,
+    "stream": "c1c725a14efd6c515b3422fb1f301c9258c1f9f76a57be82d1aca576f4368379",
+    "dists": 0.6818255111575127,
+    "supports": "bc921c6d249dce12657ad7c94fa1fcc7400714d0f07b692ee969acd4beeaed5b",
+    "source": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "fixed_rows": [
+      {
+        "tick": 10,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6720489263534546
+      },
+      {
+        "tick": 10,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5216105580329895
+      },
+      {
+        "tick": 30,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6594692468643188
+      },
+      {
+        "tick": 30,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6307467818260193
+      },
+      {
+        "tick": 50,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6681931614875793
+      },
+      {
+        "tick": 50,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6951037645339966
+      },
+      {
+        "tick": 70,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6787449717521667
+      },
+      {
+        "tick": 70,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.7170883417129517
+      },
+      {
+        "tick": 90,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6945478916168213
+      },
+      {
+        "tick": 90,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6835681200027466
+      },
+      {
+        "tick": 110,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6709243059158325
+      },
+      {
+        "tick": 110,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.7146676778793335
+      },
+      {
+        "tick": 130,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6636119484901428
+      },
+      {
+        "tick": 130,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.70936119556427
+      },
+      {
+        "tick": 150,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6947601437568665
+      },
+      {
+        "tick": 150,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.744957685470581
+      },
+      {
+        "tick": 170,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6844645738601685
+      },
+      {
+        "tick": 170,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.7108410596847534
+      },
+      {
+        "tick": 190,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6900690793991089
+      },
+      {
+        "tick": 190,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6947367191314697
+      },
+      {
+        "tick": 210,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6636332869529724
+      },
+      {
+        "tick": 210,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6888978481292725
+      },
+      {
+        "tick": 230,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6987591981887817
+      },
+      {
+        "tick": 230,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.713005781173706
+      }
+    ]
+  },
+  {
+    "bytes": 141505,
+    "rate": 117.92083333333333,
+    "stream": "484609e295f9de7542c29f7c5c612053c8b2d719b00d1df81b7657590fa02efd",
+    "dists": 0.28005874653657276,
+    "supports": "bc921c6d249dce12657ad7c94fa1fcc7400714d0f07b692ee969acd4beeaed5b",
+    "source": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "fixed_rows": [
+      {
+        "tick": 10,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.2778395414352417
+      },
+      {
+        "tick": 10,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.2576410174369812
+      },
+      {
+        "tick": 30,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.28816068172454834
+      },
+      {
+        "tick": 30,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.26641321182250977
+      },
+      {
+        "tick": 50,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.3021233081817627
+      },
+      {
+        "tick": 50,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.2823283076286316
+      },
+      {
+        "tick": 70,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.31146174669265747
+      },
+      {
+        "tick": 70,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.27652686834335327
+      },
+      {
+        "tick": 90,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.29167264699935913
+      },
+      {
+        "tick": 90,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.22044408321380615
+      },
+      {
+        "tick": 110,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.3142261505126953
+      },
+      {
+        "tick": 110,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.26858919858932495
+      },
+      {
+        "tick": 130,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.27993130683898926
+      },
+      {
+        "tick": 130,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.27362316846847534
+      },
+      {
+        "tick": 150,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.2897884249687195
+      },
+      {
+        "tick": 150,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.2773513197898865
+      },
+      {
+        "tick": 170,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.3152347803115845
+      },
+      {
+        "tick": 170,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.24465727806091309
+      },
+      {
+        "tick": 190,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.2717430591583252
+      },
+      {
+        "tick": 190,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.28008103370666504
+      },
+      {
+        "tick": 210,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.2930018901824951
+      },
+      {
+        "tick": 210,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.23804867267608643
+      },
+      {
+        "tick": 230,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.29828113317489624
+      },
+      {
+        "tick": 230,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.30224108695983887
+      }
+    ]
+  },
+  {
+    "bytes": 83987,
+    "rate": 69.98916666666666,
+    "stream": "eca15d19272716c93129b8c21f8cc41cc5f74ab43edbfdf695352b792a9a43bc",
+    "dists": 0.3286394228537877,
+    "supports": "bc921c6d249dce12657ad7c94fa1fcc7400714d0f07b692ee969acd4beeaed5b",
+    "source": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "fixed_rows": [
+      {
+        "tick": 10,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.299666166305542
+      },
+      {
+        "tick": 10,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.27408790588378906
+      },
+      {
+        "tick": 30,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.3548002243041992
+      },
+      {
+        "tick": 30,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.30202925205230713
+      },
+      {
+        "tick": 50,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.35284990072250366
+      },
+      {
+        "tick": 50,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.3271634578704834
+      },
+      {
+        "tick": 70,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.38971853256225586
+      },
+      {
+        "tick": 70,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.36491280794143677
+      },
+      {
+        "tick": 90,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.32558518648147583
+      },
+      {
+        "tick": 90,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.26387131214141846
+      },
+      {
+        "tick": 110,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.34709328413009644
+      },
+      {
+        "tick": 110,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.32100141048431396
+      },
+      {
+        "tick": 130,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.3108785152435303
+      },
+      {
+        "tick": 130,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.3019588589668274
+      },
+      {
+        "tick": 150,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.3525158166885376
+      },
+      {
+        "tick": 150,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.3208058476448059
+      },
+      {
+        "tick": 170,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.3576738238334656
+      },
+      {
+        "tick": 170,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.32698923349380493
+      },
+      {
+        "tick": 190,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.33903706073760986
+      },
+      {
+        "tick": 190,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.27199411392211914
+      },
+      {
+        "tick": 210,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.35170525312423706
+      },
+      {
+        "tick": 210,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.32254165410995483
+      },
+      {
+        "tick": 230,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.3340308666229248
+      },
+      {
+        "tick": 230,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.3744356632232666
+      }
+    ]
+  },
+  {
+    "bytes": 40479,
+    "rate": 33.7325,
+    "stream": "5f3583b219161dde92bb4dc8b7052165d15fdcf8f6774d7f64261a8cd4532357",
+    "dists": 0.40056169778108597,
+    "supports": "bc921c6d249dce12657ad7c94fa1fcc7400714d0f07b692ee969acd4beeaed5b",
+    "source": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "fixed_rows": [
+      {
+        "tick": 10,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.4032551050186157
+      },
+      {
+        "tick": 10,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.29295188188552856
+      },
+      {
+        "tick": 30,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.4519925117492676
+      },
+      {
+        "tick": 30,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.37630653381347656
+      },
+      {
+        "tick": 50,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.4194154143333435
+      },
+      {
+        "tick": 50,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.43735307455062866
+      },
+      {
+        "tick": 70,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.4469785690307617
+      },
+      {
+        "tick": 70,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.42288053035736084
+      },
+      {
+        "tick": 90,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.40907084941864014
+      },
+      {
+        "tick": 90,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.37912464141845703
+      },
+      {
+        "tick": 110,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.40491342544555664
+      },
+      {
+        "tick": 110,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.3634026050567627
+      },
+      {
+        "tick": 130,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.415874719619751
+      },
+      {
+        "tick": 130,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.363400399684906
+      },
+      {
+        "tick": 150,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.37134498357772827
+      },
+      {
+        "tick": 150,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.38579535484313965
+      },
+      {
+        "tick": 170,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.4065500497817993
+      },
+      {
+        "tick": 170,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.38112759590148926
+      },
+      {
+        "tick": 190,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.42474550008773804
+      },
+      {
+        "tick": 190,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.3804047703742981
+      },
+      {
+        "tick": 210,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.41348886489868164
+      },
+      {
+        "tick": 210,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.42156141996383667
+      },
+      {
+        "tick": 230,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.39991700649261475
+      },
+      {
+        "tick": 230,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.4416249394416809
+      }
+    ]
+  },
+  {
+    "bytes": 13827,
+    "rate": 11.5225,
+    "stream": "2fa22f5d3165373945d90db16cdc2f3c84959a9eeef64bda8c92c555b09e45e4",
+    "dists": 0.6047873223821322,
+    "supports": "bc921c6d249dce12657ad7c94fa1fcc7400714d0f07b692ee969acd4beeaed5b",
+    "source": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "fixed_rows": [
+      {
+        "tick": 10,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.578056275844574
+      },
+      {
+        "tick": 10,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.46032339334487915
+      },
+      {
+        "tick": 30,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5383090376853943
+      },
+      {
+        "tick": 30,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5997201204299927
+      },
+      {
+        "tick": 50,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6064952611923218
+      },
+      {
+        "tick": 50,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6818122863769531
+      },
+      {
+        "tick": 70,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6107177138328552
+      },
+      {
+        "tick": 70,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.66753089427948
+      },
+      {
+        "tick": 90,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6050900816917419
+      },
+      {
+        "tick": 90,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.609050989151001
+      },
+      {
+        "tick": 110,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5940230488777161
+      },
+      {
+        "tick": 110,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5554612874984741
+      },
+      {
+        "tick": 130,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5785208344459534
+      },
+      {
+        "tick": 130,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5367657542228699
+      },
+      {
+        "tick": 150,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6366544365882874
+      },
+      {
+        "tick": 150,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6031901240348816
+      },
+      {
+        "tick": 170,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6184617877006531
+      },
+      {
+        "tick": 170,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6652723550796509
+      },
+      {
+        "tick": 190,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5690711140632629
+      },
+      {
+        "tick": 190,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6123013496398926
+      },
+      {
+        "tick": 210,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6315338611602783
+      },
+      {
+        "tick": 210,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6410486698150635
+      },
+      {
+        "tick": 230,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6558350920677185
+      },
+      {
+        "tick": 230,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6596499681472778
+      }
+    ]
+  },
+  {
+    "bytes": 19618,
+    "rate": 16.348333333333333,
+    "stream": "34cbb8c209bb245b5833033a616a1fe2057bb313df704e3bc35ae7cf595d5197",
+    "dists": 0.5543216715256373,
+    "supports": "bc921c6d249dce12657ad7c94fa1fcc7400714d0f07b692ee969acd4beeaed5b",
+    "source": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "fixed_rows": [
+      {
+        "tick": 10,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5681685209274292
+      },
+      {
+        "tick": 10,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5368652939796448
+      },
+      {
+        "tick": 30,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.526552677154541
+      },
+      {
+        "tick": 30,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5645236372947693
+      },
+      {
+        "tick": 50,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5587409138679504
+      },
+      {
+        "tick": 50,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5251260995864868
+      },
+      {
+        "tick": 70,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5853691697120667
+      },
+      {
+        "tick": 70,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5848761796951294
+      },
+      {
+        "tick": 90,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5346966981887817
+      },
+      {
+        "tick": 90,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5141391754150391
+      },
+      {
+        "tick": 110,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5294896960258484
+      },
+      {
+        "tick": 110,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5162385106086731
+      },
+      {
+        "tick": 130,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5131718516349792
+      },
+      {
+        "tick": 130,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5132886171340942
+      },
+      {
+        "tick": 150,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6049675941467285
+      },
+      {
+        "tick": 150,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5572766065597534
+      },
+      {
+        "tick": 170,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5392802357673645
+      },
+      {
+        "tick": 170,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6105397939682007
+      },
+      {
+        "tick": 190,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.565603494644165
+      },
+      {
+        "tick": 190,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5746932029724121
+      },
+      {
+        "tick": 210,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5447299480438232
+      },
+      {
+        "tick": 210,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5887906551361084
+      },
+      {
+        "tick": 230,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5537853240966797
+      },
+      {
+        "tick": 230,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5928062200546265
+      }
+    ]
+  },
+  {
+    "bytes": 19762,
+    "rate": 16.468333333333334,
+    "stream": "dc3840f9a410e6067ef15f38f167298f582ad2f259f287d3b522803f9b4dcee8",
+    "dists": 0.5528282150626183,
+    "supports": "bc921c6d249dce12657ad7c94fa1fcc7400714d0f07b692ee969acd4beeaed5b",
+    "source": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "fixed_rows": [
+      {
+        "tick": 10,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5479758381843567
+      },
+      {
+        "tick": 10,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.41507863998413086
+      },
+      {
+        "tick": 30,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5233902931213379
+      },
+      {
+        "tick": 30,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5926229357719421
+      },
+      {
+        "tick": 50,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5730066299438477
+      },
+      {
+        "tick": 50,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5540109872817993
+      },
+      {
+        "tick": 70,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5872584581375122
+      },
+      {
+        "tick": 70,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5983214378356934
+      },
+      {
+        "tick": 90,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5621330142021179
+      },
+      {
+        "tick": 90,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5399253368377686
+      },
+      {
+        "tick": 110,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5324355363845825
+      },
+      {
+        "tick": 110,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.49633169174194336
+      },
+      {
+        "tick": 130,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5138636827468872
+      },
+      {
+        "tick": 130,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5044307708740234
+      },
+      {
+        "tick": 150,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6713402271270752
+      },
+      {
+        "tick": 150,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5656246542930603
+      },
+      {
+        "tick": 170,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5278524160385132
+      },
+      {
+        "tick": 170,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6056022047996521
+      },
+      {
+        "tick": 190,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.4773498773574829
+      },
+      {
+        "tick": 190,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.4928904175758362
+      },
+      {
+        "tick": 210,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5550504922866821
+      },
+      {
+        "tick": 210,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.661402702331543
+      },
+      {
+        "tick": 230,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5296936631202698
+      },
+      {
+        "tick": 230,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6402852535247803
+      }
+    ]
+  },
+  {
+    "bytes": 19066,
+    "rate": 15.888333333333334,
+    "stream": "acab29b35851cf3d110e74633def42dfa91672c27855f18bc5e5d9c0a559ebd6",
+    "dists": 0.5654367754856745,
+    "supports": "bc921c6d249dce12657ad7c94fa1fcc7400714d0f07b692ee969acd4beeaed5b",
+    "source": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "fixed_rows": [
+      {
+        "tick": 10,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5438884496688843
+      },
+      {
+        "tick": 10,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.3859003782272339
+      },
+      {
+        "tick": 30,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.4945210814476013
+      },
+      {
+        "tick": 30,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5984547138214111
+      },
+      {
+        "tick": 50,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5586466789245605
+      },
+      {
+        "tick": 50,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.7155614495277405
+      },
+      {
+        "tick": 70,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5715810060501099
+      },
+      {
+        "tick": 70,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6372952461242676
+      },
+      {
+        "tick": 90,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5448440313339233
+      },
+      {
+        "tick": 90,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.533976137638092
+      },
+      {
+        "tick": 110,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.47788941860198975
+      },
+      {
+        "tick": 110,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.4937629699707031
+      },
+      {
+        "tick": 130,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.518348753452301
+      },
+      {
+        "tick": 130,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.4664461016654968
+      },
+      {
+        "tick": 150,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6454012989997864
+      },
+      {
+        "tick": 150,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5764421224594116
+      },
+      {
+        "tick": 170,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5691484808921814
+      },
+      {
+        "tick": 170,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6156488656997681
+      },
+      {
+        "tick": 190,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5779305696487427
+      },
+      {
+        "tick": 190,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.49458789825439453
+      },
+      {
+        "tick": 210,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.6239826679229736
+      },
+      {
+        "tick": 210,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6246641278266907
+      },
+      {
+        "tick": 230,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5882474184036255
+      },
+      {
+        "tick": 230,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.7133127450942993
+      }
+    ]
+  },
+  {
+    "bytes": 19687,
+    "rate": 16.405833333333334,
+    "stream": "6b607b8288c950a006e619663266361f349b5b870cacc308137e89c354542129",
+    "dists": 0.5164724091688792,
+    "supports": "bc921c6d249dce12657ad7c94fa1fcc7400714d0f07b692ee969acd4beeaed5b",
+    "source": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "fixed_rows": [
+      {
+        "tick": 10,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5218002200126648
+      },
+      {
+        "tick": 10,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.3851528763771057
+      },
+      {
+        "tick": 30,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5104742646217346
+      },
+      {
+        "tick": 30,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5405925512313843
+      },
+      {
+        "tick": 50,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5119081139564514
+      },
+      {
+        "tick": 50,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.4931368827819824
+      },
+      {
+        "tick": 70,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5438453555107117
+      },
+      {
+        "tick": 70,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5815799236297607
+      },
+      {
+        "tick": 90,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5350534915924072
+      },
+      {
+        "tick": 90,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5381966829299927
+      },
+      {
+        "tick": 110,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.4677692651748657
+      },
+      {
+        "tick": 110,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.4494703412055969
+      },
+      {
+        "tick": 130,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.48007291555404663
+      },
+      {
+        "tick": 130,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.43512028455734253
+      },
+      {
+        "tick": 150,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5874316692352295
+      },
+      {
+        "tick": 150,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.49646055698394775
+      },
+      {
+        "tick": 170,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5367913842201233
+      },
+      {
+        "tick": 170,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.6637316942214966
+      },
+      {
+        "tick": 190,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5012813210487366
+      },
+      {
+        "tick": 190,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.45982974767684937
+      },
+      {
+        "tick": 210,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.5113023519515991
+      },
+      {
+        "tick": 210,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5715892910957336
+      },
+      {
+        "tick": 230,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.4823486804962158
+      },
+      {
+        "tick": 230,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.5903979539871216
+      }
+    ]
+  },
+  {
+    "bytes": 192325,
+    "rate": 160.27083333333334,
+    "stream": "3eb93195b281d2d6d1bf6d38cc8f8c57ced617dac1413d2ea1a06ab4c085ccc9",
+    "dists": 0.2337347020705541,
+    "supports": "bc921c6d249dce12657ad7c94fa1fcc7400714d0f07b692ee969acd4beeaed5b",
+    "source": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "fixed_rows": [
+      {
+        "tick": 10,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.23889529705047607
+      },
+      {
+        "tick": 10,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.17808759212493896
+      },
+      {
+        "tick": 30,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.2246330976486206
+      },
+      {
+        "tick": 30,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.206062912940979
+      },
+      {
+        "tick": 50,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.24260419607162476
+      },
+      {
+        "tick": 50,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.2678449749946594
+      },
+      {
+        "tick": 70,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.2660215497016907
+      },
+      {
+        "tick": 70,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.23367178440093994
+      },
+      {
+        "tick": 90,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.228499174118042
+      },
+      {
+        "tick": 90,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.2061116099357605
+      },
+      {
+        "tick": 110,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.2465381622314453
+      },
+      {
+        "tick": 110,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.20546990633010864
+      },
+      {
+        "tick": 130,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.22945314645767212
+      },
+      {
+        "tick": 130,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.20980769395828247
+      },
+      {
+        "tick": 150,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.21887284517288208
+      },
+      {
+        "tick": 150,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.23650223016738892
+      },
+      {
+        "tick": 170,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.31129521131515503
+      },
+      {
+        "tick": 170,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.22149145603179932
+      },
+      {
+        "tick": 190,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.23868834972381592
+      },
+      {
+        "tick": 190,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.21753519773483276
+      },
+      {
+        "tick": 210,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.24024468660354614
+      },
+      {
+        "tick": 210,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.2172325849533081
+      },
+      {
+        "tick": 230,
+        "player_index": 0,
+        "active": true,
+        "dists": 0.2575012445449829
+      },
+      {
+        "tick": 230,
+        "player_index": 1,
+        "active": true,
+        "dists": 0.2665679454803467
+      }
+    ]
+  }
+]

@@ -1,0 +1,328 @@
+{
+  "match": "match120",
+  "rally": "000",
+  "source_sha256": "7d119f25b1922f0dbd7f5ffb6ea5ac34226a8ea93b41e7a37e401f07ee0e5976",
+  "sender_sha256": "54340838db321ac086aca08699f58ff44e7bef519d55185f42dd8aab33271289",
+  "payload_sha256": "1df24ef919854698f2ed285d930c31dc5692e9095a2945342c5e1ffa7be38976",
+  "frames": 240,
+  "fps": "60",
+  "target_bytes": 10200,
+  "selection": "other-matched",
+  "matched_gap": 0.0021345801992274094,
+  "near_target": false,
+  "candidate": {
+    "width": 640,
+    "height": 384,
+    "crf": 69.5,
+    "bytes": 18758,
+    "ball_bytes": 19718,
+    "native_file": "640-278.ivf",
+    "ball_file": "640-278.psbl",
+    "native_sha256": "730726e3eea13e62fff2d6e8258051ec67fde930d6d9ba1fdace49d2fab9c3f6",
+    "ball_sha256": "fb287d8946ee3e06916c374dfc1ec17a2d4a4938cf87ff09dea4922c96e687ee",
+    "seconds": 4.771966547006741
+  },
+  "ordinary": {
+    "width": 640,
+    "height": 384,
+    "crf": 69.0,
+    "bytes": 19676,
+    "ball_bytes": 20636,
+    "native_file": "640-276.ivf",
+    "ball_file": "640-276.psbl",
+    "native_sha256": "63bcaee1cc5d4bf736981c57ae00515fe3aff5f182e9f95e09d9c1257c1031d8",
+    "ball_sha256": "6a1747ca75fa7ae9ceb919ac5e6af042a82a992e15bcc4fe2a87b757867e78e4",
+    "seconds": 4.8783929479832295
+  },
+  "affordable": [
+    "c811ea0add00149f6d121d54d5fb14b1be0b2e8f0bd54f446273f395d84a7f0f",
+    "ef0236b41d73d41eb7bf7a68e7923c17c9572f2bcbbff07e053289470382384b",
+    "143dcfcc70bba903bc69665632b802b72833f3ad8e7cbcdb3cda4d6cc32c2bfd",
+    "91f3cf5cc82eea2ad1a0f1110be5dafa07a84199b8e57ff899eedde8a6fe721f",
+    "58b3daf0a402f320a7b3e101471dfc972c3c208b20abcc244e06b7b537b0d7f5",
+    "ac63d2e01eb88d6d62e1e89445db51fbce867af8b1a25f0ba4237d0d93715e56",
+    "4c9b791c7b5864b06365e7048378a0e6f9fdc920acd4673cdd76599c05b4f397",
+    "63bcaee1cc5d4bf736981c57ae00515fe3aff5f182e9f95e09d9c1257c1031d8",
+    "730726e3eea13e62fff2d6e8258051ec67fde930d6d9ba1fdace49d2fab9c3f6",
+    "a5f75a94278f0c1855b2a9bdde89c4d3d9de41870ae6161f7e8351ed6e6f945c"
+  ],
+  "probes": [
+    {
+      "width": 320,
+      "candidate_quarters": [
+        160,
+        280
+      ],
+      "ordinary_quarters": [
+        160,
+        280,
+        220,
+        250,
+        265,
+        272,
+        276,
+        274,
+        275
+      ],
+      "ordinary_target_bytes": 12247
+    },
+    {
+      "width": 640,
+      "candidate_quarters": [
+        160,
+        280
+      ],
+      "ordinary_quarters": [
+        160,
+        280,
+        220,
+        250,
+        265,
+        272,
+        276,
+        278,
+        277
+      ],
+      "ordinary_target_bytes": 18857
+    }
+  ],
+  "rows": [
+    {
+      "width": 320,
+      "height": 192,
+      "crf": 40.0,
+      "bytes": 101365,
+      "ball_bytes": 102325,
+      "native_file": "320-160.ivf",
+      "ball_file": "320-160.psbl",
+      "native_sha256": "176f3cc4ace4fd799ee9f1068fdc7762ce50d98dc60ca8d4d13e8e5fa0c8d13f",
+      "ball_sha256": "bfe0ba8d66cdb65a8abb1d17ca1895006bee0c625c085c9c14c12ec90f669258",
+      "seconds": 2.2354475040046964
+    },
+    {
+      "width": 320,
+      "height": 192,
+      "crf": 70.0,
+      "bytes": 11287,
+      "ball_bytes": 12247,
+      "native_file": "320-280.ivf",
+      "ball_file": "320-280.psbl",
+      "native_sha256": "c811ea0add00149f6d121d54d5fb14b1be0b2e8f0bd54f446273f395d84a7f0f",
+      "ball_sha256": "01770925a56dbd46a64e90f0c2e25fd22c1be75fe27dfe2784f29e2670d3fc2c",
+      "seconds": 1.4318631339992862
+    },
+    {
+      "width": 320,
+      "height": 192,
+      "crf": 55.0,
+      "bytes": 48548,
+      "ball_bytes": 49508,
+      "native_file": "320-220.ivf",
+      "ball_file": "320-220.psbl",
+      "native_sha256": "c9da995cbd6a4c1c995bc0bb696f07bf453f590a6408a8ee7b98f9858c940930",
+      "ball_sha256": "6ee628b7b34fcf36d5ef0a127eb9af783124221c180c08fb7c3fbdc44250e300",
+      "seconds": 2.7133995850163046
+    },
+    {
+      "width": 320,
+      "height": 192,
+      "crf": 62.5,
+      "bytes": 23262,
+      "ball_bytes": 24222,
+      "native_file": "320-250.ivf",
+      "ball_file": "320-250.psbl",
+      "native_sha256": "f8a2e38a15842b79d2d3d9008dd462719cf67761e5653b3b46c1391aa3b26abf",
+      "ball_sha256": "9591d2ccfa4345e9337e67a25610b24f59a3809934030e018154aabad931d62a",
+      "seconds": 2.8187414330022875
+    },
+    {
+      "width": 320,
+      "height": 192,
+      "crf": 66.25,
+      "bytes": 14300,
+      "ball_bytes": 15260,
+      "native_file": "320-265.ivf",
+      "ball_file": "320-265.psbl",
+      "native_sha256": "ef0236b41d73d41eb7bf7a68e7923c17c9572f2bcbbff07e053289470382384b",
+      "ball_sha256": "65d6b960302f03fd5a54f0fc47a1610084ab860e03a89484ebeebf0753c9e8aa",
+      "seconds": 2.012008413003059
+    },
+    {
+      "width": 320,
+      "height": 192,
+      "crf": 68.0,
+      "bytes": 12657,
+      "ball_bytes": 13617,
+      "native_file": "320-272.ivf",
+      "ball_file": "320-272.psbl",
+      "native_sha256": "143dcfcc70bba903bc69665632b802b72833f3ad8e7cbcdb3cda4d6cc32c2bfd",
+      "ball_sha256": "61fea6883e142f8b2a3836e9329a0b0408fc610bcb3c1916dafa8aa4bcc881fa",
+      "seconds": 1.5962863090098836
+    },
+    {
+      "width": 320,
+      "height": 192,
+      "crf": 69.0,
+      "bytes": 12000,
+      "ball_bytes": 12960,
+      "native_file": "320-276.ivf",
+      "ball_file": "320-276.psbl",
+      "native_sha256": "91f3cf5cc82eea2ad1a0f1110be5dafa07a84199b8e57ff899eedde8a6fe721f",
+      "ball_sha256": "670a83b5dda45243300a20527a5b83c2a2319efa2d0fbed57fa454d226dfe0d5",
+      "seconds": 1.5012130189861637
+    },
+    {
+      "width": 320,
+      "height": 192,
+      "crf": 68.5,
+      "bytes": 12309,
+      "ball_bytes": 13269,
+      "native_file": "320-274.ivf",
+      "ball_file": "320-274.psbl",
+      "native_sha256": "58b3daf0a402f320a7b3e101471dfc972c3c208b20abcc244e06b7b537b0d7f5",
+      "ball_sha256": "0162d7895e82daa731cae45752157436226bff363760da48857e844f1a08b03c",
+      "seconds": 1.59974166698521
+    },
+    {
+      "width": 320,
+      "height": 192,
+      "crf": 68.75,
+      "bytes": 12058,
+      "ball_bytes": 13018,
+      "native_file": "320-275.ivf",
+      "ball_file": "320-275.psbl",
+      "native_sha256": "ac63d2e01eb88d6d62e1e89445db51fbce867af8b1a25f0ba4237d0d93715e56",
+      "ball_sha256": "881618336dfdf0de286ec9d3b68a97ff9f9393ff4c0845d15d64e49a97510313",
+      "seconds": 1.559839216992259
+    },
+    {
+      "width": 640,
+      "height": 384,
+      "crf": 40.0,
+      "bytes": 287196,
+      "ball_bytes": 288156,
+      "native_file": "640-160.ivf",
+      "ball_file": "640-160.psbl",
+      "native_sha256": "f1c0f10d31034a8258908b80bf7e2066bb96cf30993b36a6819bd9235b28bba5",
+      "ball_sha256": "b2d32753849a01900341808e885c472c3dc4c15d1e6bd1279249913ca001823a",
+      "seconds": 7.013446548982756
+    },
+    {
+      "width": 640,
+      "height": 384,
+      "crf": 70.0,
+      "bytes": 17897,
+      "ball_bytes": 18857,
+      "native_file": "640-280.ivf",
+      "ball_file": "640-280.psbl",
+      "native_sha256": "4c9b791c7b5864b06365e7048378a0e6f9fdc920acd4673cdd76599c05b4f397",
+      "ball_sha256": "220bc68c4a82ceb595b93a835cd6639a74cd15f5104c8508e0f331949c5868e7",
+      "seconds": 4.8439014999894425
+    },
+    {
+      "width": 640,
+      "height": 384,
+      "crf": 55.0,
+      "bytes": 121976,
+      "ball_bytes": 122936,
+      "native_file": "640-220.ivf",
+      "ball_file": "640-220.psbl",
+      "native_sha256": "09e5b635099cafc877ceafdb164cf37a1bd53502146a41da87b89d95b5af349c",
+      "ball_sha256": "7f866dc81a24711594dab01394469b93d8ad7c269996c6d404f5fd57ad93514a",
+      "seconds": 8.593839100998593
+    },
+    {
+      "width": 640,
+      "height": 384,
+      "crf": 62.5,
+      "bytes": 49788,
+      "ball_bytes": 50748,
+      "native_file": "640-250.ivf",
+      "ball_file": "640-250.psbl",
+      "native_sha256": "bc94ec9802faaec0fd57cbcb22c3b829c071b6812104feccc7c77de00ffc1c5d",
+      "ball_sha256": "2b54861cdbbc4de4422b1e952b3cae3116112fd00e9460d2456920d414b24022",
+      "seconds": 8.979478616005508
+    },
+    {
+      "width": 640,
+      "height": 384,
+      "crf": 66.25,
+      "bytes": 26280,
+      "ball_bytes": 27240,
+      "native_file": "640-265.ivf",
+      "ball_file": "640-265.psbl",
+      "native_sha256": "a605dcf0f2622bae4dd65024ead4e6a19022ec398e99cb1cc9057a24dd0ddbea",
+      "ball_sha256": "d667b0df956d9611a705cc898c42e9110529abbbe6fb2a52a4d95636a37e68ed",
+      "seconds": 5.833498203981435
+    },
+    {
+      "width": 640,
+      "height": 384,
+      "crf": 68.0,
+      "bytes": 21683,
+      "ball_bytes": 22643,
+      "native_file": "640-272.ivf",
+      "ball_file": "640-272.psbl",
+      "native_sha256": "932463b65194904a055f06b3f758437ac2454dfff24fdca3971d08818601211f",
+      "ball_sha256": "0a5f845839fe6cc267b008b95c412606b29ce771ddb7fec2703991dd029493dc",
+      "seconds": 5.130299548007315
+    },
+    {
+      "width": 640,
+      "height": 384,
+      "crf": 69.0,
+      "bytes": 19676,
+      "ball_bytes": 20636,
+      "native_file": "640-276.ivf",
+      "ball_file": "640-276.psbl",
+      "native_sha256": "63bcaee1cc5d4bf736981c57ae00515fe3aff5f182e9f95e09d9c1257c1031d8",
+      "ball_sha256": "6a1747ca75fa7ae9ceb919ac5e6af042a82a992e15bcc4fe2a87b757867e78e4",
+      "seconds": 4.8783929479832295
+    },
+    {
+      "width": 640,
+      "height": 384,
+      "crf": 69.5,
+      "bytes": 18758,
+      "ball_bytes": 19718,
+      "native_file": "640-278.ivf",
+      "ball_file": "640-278.psbl",
+      "native_sha256": "730726e3eea13e62fff2d6e8258051ec67fde930d6d9ba1fdace49d2fab9c3f6",
+      "ball_sha256": "fb287d8946ee3e06916c374dfc1ec17a2d4a4938cf87ff09dea4922c96e687ee",
+      "seconds": 4.771966547006741
+    },
+    {
+      "width": 640,
+      "height": 384,
+      "crf": 69.25,
+      "bytes": 19418,
+      "ball_bytes": 20378,
+      "native_file": "640-277.ivf",
+      "ball_file": "640-277.psbl",
+      "native_sha256": "a5f75a94278f0c1855b2a9bdde89c4d3d9de41870ae6161f7e8351ed6e6f945c",
+      "ball_sha256": "04ebb7f6802fcf67f10882db6d14b024edc2f09d48734370d50e45123179cbe0",
+      "seconds": 4.901321628014557
+    }
+  ],
+  "tools": {
+    "SvtAv1EncApp": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "sha256": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+      "version": "SVT-AV1 v4.2.0 (release)"
+    },
+    "dav1d": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+      "version": "1.5.4"
+    },
+    "ffmpeg": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+      "version": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers"
+    }
+  },
+  "elapsed": 76.41865907199099
+}

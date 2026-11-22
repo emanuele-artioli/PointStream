@@ -1,0 +1,19 @@
+{
+  "match": "match127",
+  "frames": 240,
+  "source_sha256": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+  "labels_sha256": "dd004f20ec88ca03a43f3ce6902cd4ef6565af8c53fed86e5062e248cc57e431",
+  "packet_sha256": "68844f0f5e77ca4ccc68622cebeef7c59616057835208f70c12d3d110fc1b3b4",
+  "rate_archive_sha256": "12df7179c0874b75a23dcb3821259991ee572b735b4bd8e99ec744f772f0ff5e",
+  "bytes": 15664,
+  "kbps": 31.328,
+  "width": 640,
+  "height": 384,
+  "crf": 69.25,
+  "witness_rgb_sha256": "8b4e25d16104c438c825e1921cf05a2eae852990828d77a8163526653815d6c6",
+  "rgb_sha256": "7a6674b601138d508928cce9d916d130cbd0e67ceaeac999e9bc120da72c7c1c",
+  "prefix_sha256": "310d60e1b94dfc99f92be2ec35ce94be10c3f0aa0c0872818843c7760625aa5d",
+  "mode": "freeze",
+  "qualification_sha256": "0735f766224c2605bb388979e769ed495e9e123ab38c343db87c0f95450dacf2",
+  "elapsed": 21.04033360001631
+}

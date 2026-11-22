@@ -1,0 +1,598 @@
+{
+  "native_source": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+  "support": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e",
+  "native_fps": "30000/1001",
+  "joint": "joint-crf70",
+  "joint_bytes": 13555,
+  "cache_init_bytes": 137480,
+  "scored_frames": 240,
+  "windows": "Four fixed consecutive 60-tick portions of the same shot, both original athletes separately, strict pooled-best affordable comparator selected once across 480 observations.",
+  "results": {
+    "warm": {
+      "SVT-AV1": {
+        "anchor": "av1-256-low-warm",
+        "anchor_bytes": 13273,
+        "whole_pooled_reference": 0.5719378200670083,
+        "joint_lower_person_ticks": 480,
+        "joint_lower_role_quarters": 8,
+        "role_quarters": [
+          {
+            "first": 0,
+            "stop": 60,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.29742440581321716,
+            "anchor": 0.5563209116458893,
+            "delta": -0.2588965058326721,
+            "relative_percent_lower": 46.53725941502367,
+            "lower_frames": 60
+          },
+          {
+            "first": 0,
+            "stop": 60,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3280787855386734,
+            "anchor": 0.5687114616235097,
+            "delta": -0.2406326760848363,
+            "relative_percent_lower": 42.31190899474724,
+            "lower_frames": 60
+          },
+          {
+            "first": 60,
+            "stop": 120,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.29342546264330543,
+            "anchor": 0.5381238987048467,
+            "delta": -0.24469843606154124,
+            "relative_percent_lower": 45.472508589653785,
+            "lower_frames": 60
+          },
+          {
+            "first": 60,
+            "stop": 120,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3600549906492233,
+            "anchor": 0.5949447174866994,
+            "delta": -0.2348897268374761,
+            "relative_percent_lower": 39.480933258765724,
+            "lower_frames": 60
+          },
+          {
+            "first": 120,
+            "stop": 180,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.29771007200082145,
+            "anchor": 0.5496964186429978,
+            "delta": -0.25198634664217634,
+            "relative_percent_lower": 45.841002068785485,
+            "lower_frames": 60
+          },
+          {
+            "first": 120,
+            "stop": 180,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3654568036397298,
+            "anchor": 0.5967457920312882,
+            "delta": -0.23128898839155837,
+            "relative_percent_lower": 38.758377768239306,
+            "lower_frames": 60
+          },
+          {
+            "first": 180,
+            "stop": 240,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.2980869640906652,
+            "anchor": 0.5793389916419983,
+            "delta": -0.2812520275513331,
+            "relative_percent_lower": 48.54705649177716,
+            "lower_frames": 60
+          },
+          {
+            "first": 180,
+            "stop": 240,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3523322304089864,
+            "anchor": 0.5916203687588374,
+            "delta": -0.23928813834985097,
+            "relative_percent_lower": 40.44623055353122,
+            "lower_frames": 60
+          }
+        ]
+      },
+      "SVT-AV1 ROI": {
+        "anchor": "roi-256-low-warm",
+        "anchor_bytes": 13528,
+        "whole_pooled_reference": 0.6575073705365261,
+        "joint_lower_person_ticks": 480,
+        "joint_lower_role_quarters": 8,
+        "role_quarters": [
+          {
+            "first": 0,
+            "stop": 60,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.29742440581321716,
+            "anchor": 0.700407005349795,
+            "delta": -0.4029825995365779,
+            "relative_percent_lower": 57.53548957371173,
+            "lower_frames": 60
+          },
+          {
+            "first": 0,
+            "stop": 60,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3280787855386734,
+            "anchor": 0.6208084702491761,
+            "delta": -0.29272968471050265,
+            "relative_percent_lower": 47.152978533461166,
+            "lower_frames": 60
+          },
+          {
+            "first": 60,
+            "stop": 120,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.29342546264330543,
+            "anchor": 0.6566522389650344,
+            "delta": -0.363226776321729,
+            "relative_percent_lower": 55.31493761358669,
+            "lower_frames": 60
+          },
+          {
+            "first": 60,
+            "stop": 120,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3600549906492233,
+            "anchor": 0.6393870025873184,
+            "delta": -0.2793320119380951,
+            "relative_percent_lower": 43.68747109462049,
+            "lower_frames": 60
+          },
+          {
+            "first": 120,
+            "stop": 180,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.29771007200082145,
+            "anchor": 0.6562151551246643,
+            "delta": -0.3585050831238429,
+            "relative_percent_lower": 54.632246805658724,
+            "lower_frames": 60
+          },
+          {
+            "first": 120,
+            "stop": 180,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3654568036397298,
+            "anchor": 0.6413510620594025,
+            "delta": -0.2758942584196727,
+            "relative_percent_lower": 43.01766610220707,
+            "lower_frames": 60
+          },
+          {
+            "first": 180,
+            "stop": 240,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.2980869640906652,
+            "anchor": 0.6975764284531275,
+            "delta": -0.3994894643624623,
+            "relative_percent_lower": 57.2682000233764,
+            "lower_frames": 60
+          },
+          {
+            "first": 180,
+            "stop": 240,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3523322304089864,
+            "anchor": 0.6476616015036901,
+            "delta": -0.2953293710947037,
+            "relative_percent_lower": 45.59933310991898,
+            "lower_frames": 60
+          }
+        ]
+      },
+      "DCVC-UF": {
+        "anchor": "dcvc-480-q24",
+        "anchor_bytes": 10548,
+        "whole_pooled_reference": 0.4856815355519454,
+        "joint_lower_person_ticks": 478,
+        "joint_lower_role_quarters": 8,
+        "role_quarters": [
+          {
+            "first": 0,
+            "stop": 60,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.29742440581321716,
+            "anchor": 0.4370298147201538,
+            "delta": -0.13960540890693662,
+            "relative_percent_lower": 31.94413840994603,
+            "lower_frames": 60
+          },
+          {
+            "first": 0,
+            "stop": 60,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3280787855386734,
+            "anchor": 0.4834402789672216,
+            "delta": -0.15536149342854816,
+            "relative_percent_lower": 32.13664648722454,
+            "lower_frames": 60
+          },
+          {
+            "first": 60,
+            "stop": 120,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.29342546264330543,
+            "anchor": 0.44043763279914855,
+            "delta": -0.1470121701558431,
+            "relative_percent_lower": 33.378657773071055,
+            "lower_frames": 60
+          },
+          {
+            "first": 60,
+            "stop": 120,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3600549906492233,
+            "anchor": 0.532494933406512,
+            "delta": -0.1724399427572887,
+            "relative_percent_lower": 32.383395960998996,
+            "lower_frames": 59
+          },
+          {
+            "first": 120,
+            "stop": 180,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.29771007200082145,
+            "anchor": 0.4582361807425817,
+            "delta": -0.16052610874176027,
+            "relative_percent_lower": 35.03130383149235,
+            "lower_frames": 60
+          },
+          {
+            "first": 120,
+            "stop": 180,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3654568036397298,
+            "anchor": 0.5225639273722966,
+            "delta": -0.1571071237325668,
+            "relative_percent_lower": 30.06467065619649,
+            "lower_frames": 59
+          },
+          {
+            "first": 180,
+            "stop": 240,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.2980869640906652,
+            "anchor": 0.4731057534615199,
+            "delta": -0.1750187893708547,
+            "relative_percent_lower": 36.99358718221334,
+            "lower_frames": 60
+          },
+          {
+            "first": 180,
+            "stop": 240,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3523322304089864,
+            "anchor": 0.5381437629461289,
+            "delta": -0.18581153253714244,
+            "relative_percent_lower": 34.52823303570336,
+            "lower_frames": 60
+          }
+        ]
+      }
+    },
+    "cold": {
+      "SVT-AV1": {
+        "anchor": "av1-1920-low-cold",
+        "anchor_bytes": 146960,
+        "whole_pooled_reference": 0.2596379385640224,
+        "joint_lower_person_ticks": 16,
+        "joint_lower_role_quarters": 0,
+        "role_quarters": [
+          {
+            "first": 0,
+            "stop": 60,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.29742440581321716,
+            "anchor": 0.221627343694369,
+            "delta": 0.07579706211884815,
+            "relative_percent_lower": -34.20023037562308,
+            "lower_frames": 1
+          },
+          {
+            "first": 0,
+            "stop": 60,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3280787855386734,
+            "anchor": 0.2778104583422343,
+            "delta": 0.050268327196439144,
+            "relative_percent_lower": -18.094468975863265,
+            "lower_frames": 5
+          },
+          {
+            "first": 60,
+            "stop": 120,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.29342546264330543,
+            "anchor": 0.22307120760281882,
+            "delta": 0.07035425504048662,
+            "relative_percent_lower": -31.538922390088686,
+            "lower_frames": 0
+          },
+          {
+            "first": 60,
+            "stop": 120,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3600549906492233,
+            "anchor": 0.30849218368530273,
+            "delta": 0.05156280696392057,
+            "relative_percent_lower": -16.714461399942792,
+            "lower_frames": 3
+          },
+          {
+            "first": 120,
+            "stop": 180,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.29771007200082145,
+            "anchor": 0.22289404571056365,
+            "delta": 0.0748160262902578,
+            "relative_percent_lower": -33.56573570718404,
+            "lower_frames": 0
+          },
+          {
+            "first": 120,
+            "stop": 180,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3654568036397298,
+            "anchor": 0.3040172398090363,
+            "delta": 0.061439563830693544,
+            "relative_percent_lower": -20.20923677528481,
+            "lower_frames": 5
+          },
+          {
+            "first": 180,
+            "stop": 240,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.2980869640906652,
+            "anchor": 0.22451548477013905,
+            "delta": 0.07357147932052616,
+            "relative_percent_lower": -32.76900005175558,
+            "lower_frames": 0
+          },
+          {
+            "first": 180,
+            "stop": 240,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3523322304089864,
+            "anchor": 0.29467554489771525,
+            "delta": 0.05765668551127118,
+            "relative_percent_lower": -19.566158953327584,
+            "lower_frames": 2
+          }
+        ]
+      },
+      "SVT-AV1 ROI": {
+        "anchor": "roi-640-warm",
+        "anchor_bytes": 17736,
+        "whole_pooled_reference": 0.567203696568807,
+        "joint_lower_person_ticks": 480,
+        "joint_lower_role_quarters": 8,
+        "role_quarters": [
+          {
+            "first": 0,
+            "stop": 60,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.29742440581321716,
+            "anchor": 0.5540473888317744,
+            "delta": -0.25662298301855724,
+            "relative_percent_lower": 46.31787608631358,
+            "lower_frames": 60
+          },
+          {
+            "first": 0,
+            "stop": 60,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3280787855386734,
+            "anchor": 0.546739740173022,
+            "delta": -0.21866095463434854,
+            "relative_percent_lower": 39.993609128385444,
+            "lower_frames": 60
+          },
+          {
+            "first": 60,
+            "stop": 120,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.29342546264330543,
+            "anchor": 0.5965621680021286,
+            "delta": -0.30313670535882314,
+            "relative_percent_lower": 50.8139338392879,
+            "lower_frames": 60
+          },
+          {
+            "first": 60,
+            "stop": 120,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3600549906492233,
+            "anchor": 0.592787558833758,
+            "delta": -0.2327325681845347,
+            "relative_percent_lower": 39.26070389237074,
+            "lower_frames": 60
+          },
+          {
+            "first": 120,
+            "stop": 180,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.29771007200082145,
+            "anchor": 0.5241605450709661,
+            "delta": -0.22645047307014465,
+            "relative_percent_lower": 43.20250259192735,
+            "lower_frames": 60
+          },
+          {
+            "first": 120,
+            "stop": 180,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3654568036397298,
+            "anchor": 0.5909721185763677,
+            "delta": -0.22551531493663785,
+            "relative_percent_lower": 38.1600599838613,
+            "lower_frames": 60
+          },
+          {
+            "first": 180,
+            "stop": 240,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.2980869640906652,
+            "anchor": 0.5421965887149175,
+            "delta": -0.24410962462425229,
+            "relative_percent_lower": 45.02234608351679,
+            "lower_frames": 60
+          },
+          {
+            "first": 180,
+            "stop": 240,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3523322304089864,
+            "anchor": 0.5901634643475214,
+            "delta": -0.237831233938535,
+            "relative_percent_lower": 40.29921340547211,
+            "lower_frames": 60
+          }
+        ]
+      },
+      "DCVC-UF": {
+        "anchor": "dcvc-480-q36",
+        "anchor_bytes": 19401,
+        "whole_pooled_reference": 0.42770484325786434,
+        "joint_lower_person_ticks": 476,
+        "joint_lower_role_quarters": 8,
+        "role_quarters": [
+          {
+            "first": 0,
+            "stop": 60,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.29742440581321716,
+            "anchor": 0.3871520161628723,
+            "delta": -0.08972761034965515,
+            "relative_percent_lower": 23.176325216890348,
+            "lower_frames": 60
+          },
+          {
+            "first": 0,
+            "stop": 60,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3280787855386734,
+            "anchor": 0.4418102582295736,
+            "delta": -0.11373147269090017,
+            "relative_percent_lower": 25.74215301080741,
+            "lower_frames": 60
+          },
+          {
+            "first": 60,
+            "stop": 120,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.29342546264330543,
+            "anchor": 0.384745779633522,
+            "delta": -0.09132031699021659,
+            "relative_percent_lower": 23.735235530640775,
+            "lower_frames": 60
+          },
+          {
+            "first": 60,
+            "stop": 120,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3600549906492233,
+            "anchor": 0.46975396275520326,
+            "delta": -0.10969897210597995,
+            "relative_percent_lower": 23.352431443595066,
+            "lower_frames": 58
+          },
+          {
+            "first": 120,
+            "stop": 180,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.29771007200082145,
+            "anchor": 0.39280648628870646,
+            "delta": -0.09509641428788501,
+            "relative_percent_lower": 24.209481667772327,
+            "lower_frames": 60
+          },
+          {
+            "first": 120,
+            "stop": 180,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3654568036397298,
+            "anchor": 0.4738139162460963,
+            "delta": -0.10835711260636649,
+            "relative_percent_lower": 22.86912834153364,
+            "lower_frames": 58
+          },
+          {
+            "first": 180,
+            "stop": 240,
+            "role": "near",
+            "n": 60,
+            "pointstream": 0.2980869640906652,
+            "anchor": 0.4023532708485921,
+            "delta": -0.10426630675792692,
+            "relative_percent_lower": 25.9141193354839,
+            "lower_frames": 60
+          },
+          {
+            "first": 180,
+            "stop": 240,
+            "role": "far",
+            "n": 60,
+            "pointstream": 0.3523322304089864,
+            "anchor": 0.4692030558983485,
+            "delta": -0.11687082548936206,
+            "relative_percent_lower": 24.90836835356882,
+            "lower_frames": 60
+          }
+        ]
+      }
+    }
+  }
+}

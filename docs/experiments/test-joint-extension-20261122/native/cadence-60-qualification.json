@@ -1,0 +1,54 @@
+{
+  "scope": "interface qualification using a deterministic synthetic 60-fps base and preexisting development conditioning; no independent event result",
+  "fps": [
+    60,
+    1
+  ],
+  "source": "d7b41fad74470dcd6c0c07440894df9126c81bc056b2df99e9000692de2de845",
+  "encoder": {
+    "path": "/opt/homebrew/bin/SvtAv1EncApp",
+    "real_path": "/opt/homebrew/Cellar/svt-av1/4.0.1/bin/SvtAv1EncApp",
+    "sha256": "db044194faf94d553c2509c8e033ecd05a373ba54d919d0fb49a3a13149d1687",
+    "version": "SVT-AV1 v4.0.1 (release)"
+  },
+  "decoder": {
+    "path": "/opt/homebrew/bin/dav1d",
+    "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+    "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+    "version": "1.5.4"
+  },
+  "ivf": "57752e19ba118b625a10bbf42f764551c8cad5c2e98210ad6668d2ec82c59248",
+  "native_decoded": "2a1c5ed5cdcbadd268ff47c9ed890416605d5be67779c99f712c823328afa3dd",
+  "ticks": 240,
+  "duration_seconds": 4,
+  "paid_roles": {
+    "joint_sha256": "44079a9ef385d2ea749462b3292bdabbfec9c15b4c149c3eed270c9db652b8c5",
+    "cache_sha256": "bef67ff7a17cc2dc83fa66f35faa344a91009393e778a7248e0516321038ddfb",
+    "joint_bytes": 14259,
+    "cache_bytes": 137480,
+    "joint_roles": {
+      "frame": 13037,
+      "window": 1222,
+      "match": 0,
+      "reference": 0
+    },
+    "cache_roles": {
+      "frame": 0,
+      "window": 1833,
+      "match": 0,
+      "reference": 135647
+    },
+    "active_ticks": [
+      0,
+      240
+    ],
+    "ball_positions": 217
+  },
+  "decoded_checks": [
+    "e8e273cf1ba5a4d5b4d95649f418691a11049a04089e24463fdac8efc0c28733",
+    "5315b82705d0f8dc57fdc374a80412eec62faee90ac0d2a1020ade3b56433dca",
+    "ff67961bfa0f37289bc3e9d299d8b639b15e5e32db4c7506b259923e2bc15e9e",
+    "dfce87cfb29060b71f3a2b4db79921f9e46dc0534e9db6034b4ff0df5d1d2d3d"
+  ],
+  "wrong_25_fps_rejected": true
+}

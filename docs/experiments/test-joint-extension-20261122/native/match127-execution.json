@@ -1,0 +1,140 @@
+{
+  "priorities": [
+    "complete native 60 fps joint receiver on the first eligible independent event",
+    "degraded source-matched ordinary and neural controls",
+    "two additional paid operating points after exact native self-replay if resources allow"
+  ],
+  "deadline_utc": "2026-11-22T21:01:00Z",
+  "gpu_seconds_cap": 10800,
+  "cpu_seconds_cap": 14400,
+  "event": "match127",
+  "source_sha256": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+  "gpu_seconds_used_so_far": 0,
+  "jobs": {
+    "sender": {
+      "id": "20261122T132643Z-4f79b8f4",
+      "revision": "bdb98f5e7da626d1e781061912ceed4ced1a8609",
+      "source_archive_sha256": "5021e646a1a7e30a23e796a510973144a1880a4b4b1b2f36aad462e94087358c",
+      "spec_sha256": "448d1498ebe2c498ab3def7d3b65681146de6dc8e2783edb40161217e261a508",
+      "state_at_registration": "pending",
+      "terminal_reason": "No host allocated. Legacy bare PATH qualification expected dav1d outside the packed environment. The recorded cancellation incurred no compute."
+    },
+    "sender_packed": {
+      "id": "20261122T134208Z-0e12634b",
+      "revision": "846d5a7c7047b00f42d558e446a1e3f12ecbcd71",
+      "source_archive_sha256": "5f8d9aad2682dceb1d9d9a5d9e1da01a52f182552d665542ea486ddd942dd7ee",
+      "spec_sha256": "862ac08e6df50f50b20f20e0aa9e1e73c4098dfeb07ace689533b07dee45bef4",
+      "state_at_registration": "pending",
+      "outcome": "Complete, 240 native ticks, CRF70 picked by bytes; 12,890 warm/162,340 cold.",
+      "terminal": "complete",
+      "occupied_seconds": 103.27241897583008,
+      "host": "gpu2"
+    },
+    "generator_far": {
+      "id": "20261122T134803Z-0408c86a",
+      "revision": "f7d47b8f1553dec20886c971c6f3f3da83cc0144",
+      "source_archive_sha256": "cec689704a7d4658a8983f29c3bed5afdfb9081c0d4f679e94cf38153be5ab16",
+      "spec_sha256": "5d4397421992a544c75e12f083533b94f5072b804340e48220ed665ff248ddbc",
+      "state_at_registration": "pending"
+    },
+    "generator_near": {
+      "id": "20261122T134804Z-ff2bc372",
+      "revision": "f7d47b8f1553dec20886c971c6f3f3da83cc0144",
+      "source_archive_sha256": "cec689704a7d4658a8983f29c3bed5afdfb9081c0d4f679e94cf38153be5ab16",
+      "spec_sha256": "54c26ede4a37fac7e87a1491dfd74e7d297b6543921d44ab2f9501854454b30f",
+      "state_at_registration": "pending"
+    },
+    "control_av1-320-265": {
+      "id": "20261122T135052Z-42003fe3",
+      "revision": "fd1668998f62a91307c9afda109d357340494832",
+      "source_archive_sha256": "6f8613e55a1c2823da11ab16d1d7459510b0c0031cd952d1ed081770f615ab51",
+      "spec_sha256": "dcb2378b557e987acc4c2368619a11e16e37af09688ec16df6248b2918c57085",
+      "state_at_registration": "pending",
+      "occupied_seconds": 1455.2879440784454,
+      "host": "gpu2",
+      "terminal": "complete",
+      "body_dists": 0.5094091555724541,
+      "running_bytes": 12121
+    },
+    "control_dcvc-480-q24": {
+      "id": "20261122T135053Z-981d1f60",
+      "revision": "fd1668998f62a91307c9afda109d357340494832",
+      "source_archive_sha256": "6f8613e55a1c2823da11ab16d1d7459510b0c0031cd952d1ed081770f615ab51",
+      "spec_sha256": "837a70cc415d4dfcf143b09a3d93883dcee8c811f2a82e8f89f54bcccaab9c29",
+      "state_at_registration": "pending",
+      "terminal": "complete",
+      "source_grid_sha256": "7d706c8d9ff2f45ac1c5dc810afa7361a5a390681ea4d7067a72d2673c7063d0",
+      "body_dists": 0.39249588710566363,
+      "running_bytes": 11224,
+      "occupied_seconds": 704.4155642986298,
+      "host": "gpu4"
+    },
+    "control_ordinary-320-warm": {
+      "id": "20261122T135529Z-6fabe428",
+      "revision": "04bfec247e023ac68c122549b73e8721ee9d6d0c",
+      "source_archive_sha256": "297b1632f391d966d4bd353df3431fc8ee9e54c99cfd53b1df6681fde84549b2",
+      "spec_sha256": "afd4a16bd0cc77d9c8dd8a06a69a8c48b3dca456ffa127e9641a501dcf672a45",
+      "state_at_registration": "pending",
+      "terminal": "smoke timing gate",
+      "scientific_checks": "Actual 12,862 B, 24 source ticks and 48 player scores. Source and decoder passed.",
+      "wall_seconds": 152.33085407799808,
+      "timed_score_s": 125.59046970499912,
+      "forecast_s": 1983.9676221344853,
+      "occupied_seconds": 210.60363793373108,
+      "host": "gpu1"
+    },
+    "control_ordinary-320-warm_gpu4": {
+      "id": "20261122T141106Z-e1d3e349",
+      "revision": "23d5b3a1873df8dab2b14c352bc701ac21a9aaa4",
+      "source_archive_sha256": "53f89db5aba3f7cae3e3f8630b9d522ddc48527753d4e17cebf2b1dcf5ef5b48",
+      "spec_sha256": "8756ba9bec83a51153786126d05c6e36e1de3ad57e1029cabc541d61069ebb85",
+      "state_at_registration": "pending",
+      "occupied_seconds": 374.2850568294525,
+      "host": "gpu4",
+      "terminal": "complete",
+      "body_dists": 0.48364537792901197,
+      "running_bytes": 12862,
+      "source_matched_transitions": 478
+    },
+    "control_dcvc-480-q26": {
+      "id": "20261122T141901Z-a490196a",
+      "revision": "20700459b1d7244f3e5676eabe30261173eb574b",
+      "source_archive_sha256": "0dd44595161a6320cb79bf8138abd2fae7e0e9a87a07821f98b1661b36a73b9c",
+      "spec_sha256": "77b8c322682383041ed1ed24be610deb012c2c74c918d25deacfb3390e7d1bb8",
+      "state_at_registration": "pending",
+      "terminal": "complete",
+      "body_dists": 0.38685691530505817,
+      "running_bytes": 12305,
+      "source_matched_transitions": 478
+    },
+    "control_ordinary-1920-cold": {
+      "id": "20261122T142622Z-be704c69",
+      "revision": "7e5c89cd9a4276cb290cb6c56c242282f22d5e8b",
+      "source_archive_sha256": "610465e949dece9cfe71efb502cad88905222ec73aa0369aafcfc6b8d160fd4f",
+      "spec_sha256": "aeb0b582fbba0f02e755f605e5ad7db487b9884b46d33fc7697577ee372d2f76",
+      "state_at_registration": "pending",
+      "terminal": "complete",
+      "body_dists": 0.18065927426020303,
+      "running_bytes": 156539
+    },
+    "control_roi-640-cold": {
+      "id": "20261122T143106Z-9ad44592",
+      "revision": "5ce37c49f7f3d57cb58f8817ef0532adc3ec12a6",
+      "source_archive_sha256": "76cf7d76e28e164a8c4099d4a7cff9beb2b7af655823fc77acaf771d3c2d71ff",
+      "spec_sha256": "13bd14842de440f0228d6d5b1e24b06496dfa45e95d7f114382b143dcf550df8",
+      "state_at_registration": "pending",
+      "terminal": "24-tick scientific checks passed, stopped on measured prospective full-stage cost 955.2 s over 850 s",
+      "smoke_s": 72.74113792300341,
+      "smoke_native_score_s": 58.228060788998846
+    },
+    "control_roi-640-cold_recovery": {
+      "id": "20261122T143804Z-c1f667b2",
+      "revision": "5c36e6bbf869c6025929c992d1f1b077f63895a3",
+      "source_archive_sha256": "032b652624d9d64e2b68b11c3441bca5d7f0d5ebf5e51e7159e0649f221bd05c",
+      "spec_sha256": "f6f4ca9fbad4aaa1238452fa73f014520da16839d78b17a9aa75b4bcadfb73dd",
+      "state_at_registration": "pending"
+    }
+  },
+  "closed_cpu_seconds_as_of_1413": 1018.2916212081909,
+  "closed_cpu_seconds_as_of_1423": 2847.864622116089
+}

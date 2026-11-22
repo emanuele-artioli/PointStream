@@ -1,0 +1,72 @@
+[
+  {
+    "arm": {
+      "kind": "rgb_zseq_stdin",
+      "name": "joint-q70",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T103915Z-89383f19/full/frames.zseq",
+      "height": 1080,
+      "width": 1920,
+      "receipt": "/private/tmp/ps-med000-verified-q70/rung.json",
+      "receipt_sha256": "6768d9ca442d2d0cb4bc3550d0d35bc824190dc4dc3a4a891a94741b2bbff7fa",
+      "sha256": "89aaa143411f6fe1bd7dc2eb8a978ff94c5221cd5ce8f7f1022576ee8cb46e2c",
+      "kbps": 19.616666666666667,
+      "bytes": 11770,
+      "cold_kbps": 357.86333333333334,
+      "joint_sha256": "1da8c481ee87a1615328945a01b7089fe9a3fc83999af35e3a758f1001a1a572",
+      "receiver_job": "20261122T103915Z-89383f19"
+    },
+    "mean_dists": 0.48818187415599823,
+    "active_dists": 0.3165001670519511,
+    "fallback_dists": 0.6598635812600454,
+    "rgb_psnr": 18.305654742273717,
+    "active_rgb_psnr": 18.32771857291682,
+    "fallback_rgb_psnr": 18.283702438021106,
+    "cpu_seconds": 19.05247
+  },
+  {
+    "arm": {
+      "name": "joint-q60",
+      "kind": "rgb_npy",
+      "width": 1920,
+      "height": 1080,
+      "path": "/private/tmp/ps-med000-authoritative-240.npy",
+      "sha256": "24df3470d86e9eafcca89c6f9c77f64304677f56f5ef8bfcd1a33c9e84f50db2",
+      "kbps": 23.233333333333334,
+      "bytes": 13940,
+      "cold_kbps": 361.48,
+      "receiver_job": "20261122T102430Z-fd241a73",
+      "joint_sha256": "615596d2f78d08ebd07fc9dd66136bf586d5c1f2d2921b71aea4dfc437df2b8b"
+    },
+    "mean_dists": 0.4328770538171132,
+    "active_dists": 0.3127464602390925,
+    "fallback_dists": 0.553007647395134,
+    "rgb_psnr": 19.4153450194505,
+    "active_rgb_psnr": 19.408169424952096,
+    "fallback_rgb_psnr": 19.422532489389106,
+    "cpu_seconds": 10.128781
+  },
+  {
+    "arm": {
+      "kind": "rgb_zseq_stdin",
+      "name": "joint-q50",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T104019Z-67588e81/full/frames.zseq",
+      "height": 1080,
+      "width": 1920,
+      "receipt": "/private/tmp/ps-med000-verified-q50/rung.json",
+      "receipt_sha256": "466a59522b5e796f4746d9667d13e45d7bd8558b90cb43187f1eddc445439914",
+      "sha256": "8e075c388a89da472509a0946190d3c719e0ee223e90a054bd7365776bc24c1b",
+      "kbps": 27.06,
+      "bytes": 16236,
+      "cold_kbps": 365.3066666666667,
+      "joint_sha256": "9e70d19c048f580a6d80eee709892f01cf900e0fd159b4b53a22c657c33fb090",
+      "receiver_job": "20261122T104019Z-67588e81"
+    },
+    "mean_dists": 0.42249466230471927,
+    "active_dists": 0.31198059519131977,
+    "fallback_dists": 0.5330087294181188,
+    "rgb_psnr": 19.511914637106873,
+    "active_rgb_psnr": 19.488220358209823,
+    "fallback_rgb_psnr": 19.535738896947407,
+    "cpu_seconds": 18.984481
+  }
+]

@@ -1,0 +1,1083 @@
+{
+  "PointStream": [
+    {
+      "per_shot_cap_bytes": 11770,
+      "achieved_mean_kbps": 19.423333333333336,
+      "mean_dists": 0.5023264520698123,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "joint-q70",
+          "bytes": 11770,
+          "dists": 0.48818187415599823
+        },
+        {
+          "shot": "019",
+          "arm": "joint-q70",
+          "bytes": 11465,
+          "dists": 0.5105232000350952
+        },
+        {
+          "shot": "024",
+          "arm": "joint-q70",
+          "bytes": 11727,
+          "dists": 0.5082742820183436
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 13804,
+      "achieved_mean_kbps": 20.72277777777778,
+      "mean_dists": 0.4855833500623703,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "joint-q70",
+          "bytes": 11770,
+          "dists": 0.48818187415599823
+        },
+        {
+          "shot": "019",
+          "arm": "joint-q60",
+          "bytes": 13804,
+          "dists": 0.46029389401276904
+        },
+        {
+          "shot": "024",
+          "arm": "joint-q70",
+          "bytes": 11727,
+          "dists": 0.5082742820183436
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 13940,
+      "achieved_mean_kbps": 21.928333333333335,
+      "mean_dists": 0.4671484099494086,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "joint-q60",
+          "bytes": 13940,
+          "dists": 0.4328770538171132
+        },
+        {
+          "shot": "019",
+          "arm": "joint-q60",
+          "bytes": 13804,
+          "dists": 0.46029389401276904
+        },
+        {
+          "shot": "024",
+          "arm": "joint-q70",
+          "bytes": 11727,
+          "dists": 0.5082742820183436
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 14010,
+      "achieved_mean_kbps": 23.19666666666667,
+      "mean_dists": 0.4513020979033576,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "joint-q60",
+          "bytes": 13940,
+          "dists": 0.4328770538171132
+        },
+        {
+          "shot": "019",
+          "arm": "joint-q60",
+          "bytes": 13804,
+          "dists": 0.46029389401276904
+        },
+        {
+          "shot": "024",
+          "arm": "joint-q60",
+          "bytes": 14010,
+          "dists": 0.46073534588019055
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 16049,
+      "achieved_mean_kbps": 24.44388888888889,
+      "mean_dists": 0.44658000932799446,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "joint-q60",
+          "bytes": 13940,
+          "dists": 0.4328770538171132
+        },
+        {
+          "shot": "019",
+          "arm": "joint-q50",
+          "bytes": 16049,
+          "dists": 0.44612762828667957
+        },
+        {
+          "shot": "024",
+          "arm": "joint-q60",
+          "bytes": 14010,
+          "dists": 0.46073534588019055
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 16236,
+      "achieved_mean_kbps": 25.719444444444445,
+      "mean_dists": 0.44311921215719646,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "joint-q50",
+          "bytes": 16236,
+          "dists": 0.42249466230471927
+        },
+        {
+          "shot": "019",
+          "arm": "joint-q50",
+          "bytes": 16049,
+          "dists": 0.44612762828667957
+        },
+        {
+          "shot": "024",
+          "arm": "joint-q60",
+          "bytes": 14010,
+          "dists": 0.46073534588019055
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 16334,
+      "achieved_mean_kbps": 27.010555555555555,
+      "mean_dists": 0.436087558666865,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "joint-q50",
+          "bytes": 16236,
+          "dists": 0.42249466230471927
+        },
+        {
+          "shot": "019",
+          "arm": "joint-q50",
+          "bytes": 16049,
+          "dists": 0.44612762828667957
+        },
+        {
+          "shot": "024",
+          "arm": "joint-q50",
+          "bytes": 16334,
+          "dists": 0.4396403854091962
+        }
+      ]
+    }
+  ],
+  "SVT-AV1": [
+    {
+      "per_shot_cap_bytes": 8973,
+      "achieved_mean_kbps": 14.860555555555555,
+      "mean_dists": 0.6787995911306806,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w160-q70",
+          "bytes": 8973,
+          "dists": 0.6671651353438696
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w160-q70",
+          "bytes": 8861,
+          "dists": 0.6690590381622314
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w160-q70",
+          "bytes": 8915,
+          "dists": 0.7001745998859406
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 10177,
+      "achieved_mean_kbps": 15.591666666666667,
+      "mean_dists": 0.660655129286978,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w160-q70",
+          "bytes": 8973,
+          "dists": 0.6671651353438696
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w320-q70",
+          "bytes": 10177,
+          "dists": 0.6146256526311239
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w160-q70",
+          "bytes": 8915,
+          "dists": 0.7001745998859406
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 10281,
+      "achieved_mean_kbps": 16.350555555555555,
+      "mean_dists": 0.6343000158667564,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w160-q70",
+          "bytes": 8973,
+          "dists": 0.6671651353438696
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w320-q70",
+          "bytes": 10177,
+          "dists": 0.6146256526311239
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w320-q70",
+          "bytes": 10281,
+          "dists": 0.621109259625276
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 10301,
+      "achieved_mean_kbps": 17.088333333333335,
+      "mean_dists": 0.6115511846211221,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w320-q70",
+          "bytes": 10301,
+          "dists": 0.5989186416069666
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w320-q70",
+          "bytes": 10177,
+          "dists": 0.6146256526311239
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w320-q70",
+          "bytes": 10281,
+          "dists": 0.621109259625276
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 11296,
+      "achieved_mean_kbps": 17.71,
+      "mean_dists": 0.6041176145275434,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w320-q70",
+          "bytes": 10301,
+          "dists": 0.5989186416069666
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w320-near-11465B",
+          "bytes": 11296,
+          "dists": 0.5923249423503876
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w320-q70",
+          "bytes": 10281,
+          "dists": 0.621109259625276
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 11323,
+      "achieved_mean_kbps": 17.725,
+      "mean_dists": 0.5969969597127702,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w320-q70",
+          "bytes": 10301,
+          "dists": 0.5989186416069666
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w160-q60",
+          "bytes": 11323,
+          "dists": 0.5709629779060682
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w320-q70",
+          "bytes": 10281,
+          "dists": 0.621109259625276
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 11329,
+      "achieved_mean_kbps": 18.307222222222222,
+      "mean_dists": 0.5891594207949109,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w320-q70",
+          "bytes": 10301,
+          "dists": 0.5989186416069666
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w160-q60",
+          "bytes": 11323,
+          "dists": 0.5709629779060682
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w160-q60",
+          "bytes": 11329,
+          "dists": 0.5975966428716978
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 11392,
+      "achieved_mean_kbps": 18.913333333333334,
+      "mean_dists": 0.574374757707119,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w160-q60",
+          "bytes": 11392,
+          "dists": 0.5545646523435911
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w160-q60",
+          "bytes": 11323,
+          "dists": 0.5709629779060682
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w160-q60",
+          "bytes": 11329,
+          "dists": 0.5975966428716978
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 11688,
+      "achieved_mean_kbps": 19.11277777777778,
+      "mean_dists": 0.5727092880341742,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w160-q60",
+          "bytes": 11392,
+          "dists": 0.5545646523435911
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w160-q60",
+          "bytes": 11323,
+          "dists": 0.5709629779060682
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w160-near-11727B",
+          "bytes": 11688,
+          "dists": 0.5926002338528633
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 11728,
+      "achieved_mean_kbps": 19.299444444444443,
+      "mean_dists": 0.5719262998965051,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w160-near-11770B",
+          "bytes": 11728,
+          "dists": 0.552215687930584
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w160-q60",
+          "bytes": 11323,
+          "dists": 0.5709629779060682
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w160-near-11727B",
+          "bytes": 11688,
+          "dists": 0.5926002338528633
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 12545,
+      "achieved_mean_kbps": 19.753333333333334,
+      "mean_dists": 0.5665905012024773,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w320-near-12704B",
+          "bytes": 12545,
+          "dists": 0.5362082918485006
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w160-q60",
+          "bytes": 11323,
+          "dists": 0.5709629779060682
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w160-near-11727B",
+          "bytes": 11688,
+          "dists": 0.5926002338528633
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 12692,
+      "achieved_mean_kbps": 19.835,
+      "mean_dists": 0.5664343610405922,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w160-near-12704B",
+          "bytes": 12692,
+          "dists": 0.5357398713628451
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w160-q60",
+          "bytes": 11323,
+          "dists": 0.5709629779060682
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w160-near-11727B",
+          "bytes": 11688,
+          "dists": 0.5926002338528633
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 13677,
+      "achieved_mean_kbps": 20.94,
+      "mean_dists": 0.5589655174149407,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w160-near-12704B",
+          "bytes": 12692,
+          "dists": 0.5357398713628451
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w160-q60",
+          "bytes": 11323,
+          "dists": 0.5709629779060682
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w480-near-14010B",
+          "bytes": 13677,
+          "dists": 0.5701937029759089
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 13689,
+      "achieved_mean_kbps": 22.254444444444445,
+      "mean_dists": 0.555593964126375,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w160-near-12704B",
+          "bytes": 12692,
+          "dists": 0.5357398713628451
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w480-near-13804B",
+          "bytes": 13689,
+          "dists": 0.5608483180403709
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w480-near-14010B",
+          "bytes": 13677,
+          "dists": 0.5701937029759089
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 13767,
+      "achieved_mean_kbps": 22.297777777777778,
+      "mean_dists": 0.5525283192594845,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w160-near-12704B",
+          "bytes": 12692,
+          "dists": 0.5357398713628451
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w160-near-13804B",
+          "bytes": 13767,
+          "dists": 0.5516513834396998
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w480-near-14010B",
+          "bytes": 13677,
+          "dists": 0.5701937029759089
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 13789,
+      "achieved_mean_kbps": 22.31,
+      "mean_dists": 0.549043787850274,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w160-near-12704B",
+          "bytes": 12692,
+          "dists": 0.5357398713628451
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w320-near-13804B",
+          "bytes": 13789,
+          "dists": 0.541197789212068
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w480-near-14010B",
+          "bytes": 13677,
+          "dists": 0.5701937029759089
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 13792,
+      "achieved_mean_kbps": 22.921111111111113,
+      "mean_dists": 0.5488508625162972,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w160-near-13940B",
+          "bytes": 13792,
+          "dists": 0.5351610953609148
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w320-near-13804B",
+          "bytes": 13789,
+          "dists": 0.541197789212068
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w480-near-14010B",
+          "bytes": 13677,
+          "dists": 0.5701937029759089
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 13818,
+      "achieved_mean_kbps": 22.935555555555556,
+      "mean_dists": 0.5466045257118013,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w480-near-13940B",
+          "bytes": 13818,
+          "dists": 0.5284220849474272
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w320-near-13804B",
+          "bytes": 13789,
+          "dists": 0.541197789212068
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w480-near-14010B",
+          "bytes": 13677,
+          "dists": 0.5701937029759089
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 13834,
+      "achieved_mean_kbps": 22.944444444444446,
+      "mean_dists": 0.5438923380441136,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w320-near-13940B",
+          "bytes": 13834,
+          "dists": 0.520285521944364
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w320-near-13804B",
+          "bytes": 13789,
+          "dists": 0.541197789212068
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w480-near-14010B",
+          "bytes": 13677,
+          "dists": 0.5701937029759089
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 13925,
+      "achieved_mean_kbps": 23.08222222222222,
+      "mean_dists": 0.5413673395911853,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w320-near-13940B",
+          "bytes": 13834,
+          "dists": 0.520285521944364
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w320-near-13804B",
+          "bytes": 13789,
+          "dists": 0.541197789212068
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w160-q50",
+          "bytes": 13925,
+          "dists": 0.562618707617124
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 13952,
+      "achieved_mean_kbps": 23.09722222222222,
+      "mean_dists": 0.5408138566546971,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w320-near-13940B",
+          "bytes": 13834,
+          "dists": 0.520285521944364
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w320-near-13804B",
+          "bytes": 13789,
+          "dists": 0.541197789212068
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w320-near-14010B",
+          "bytes": 13952,
+          "dists": 0.5609582588076591
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 14713,
+      "achieved_mean_kbps": 23.610555555555557,
+      "mean_dists": 0.5375882246428066,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w320-near-13940B",
+          "bytes": 13834,
+          "dists": 0.520285521944364
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w640-q70",
+          "bytes": 14713,
+          "dists": 0.5315208931763967
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w320-near-14010B",
+          "bytes": 13952,
+          "dists": 0.5609582588076591
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 14809,
+      "achieved_mean_kbps": 24.08666666666667,
+      "mean_dists": 0.5342919023500549,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w320-near-13940B",
+          "bytes": 13834,
+          "dists": 0.520285521944364
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w640-q70",
+          "bytes": 14713,
+          "dists": 0.5315208931763967
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w640-q70",
+          "bytes": 14809,
+          "dists": 0.5510692919294039
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 14883,
+      "achieved_mean_kbps": 24.669444444444444,
+      "mean_dists": 0.5302714374330308,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w640-q70",
+          "bytes": 14883,
+          "dists": 0.508224127193292
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w640-q70",
+          "bytes": 14713,
+          "dists": 0.5315208931763967
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w640-q70",
+          "bytes": 14809,
+          "dists": 0.5510692919294039
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 15632,
+      "achieved_mean_kbps": 25.18,
+      "mean_dists": 0.5238638321558634,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w640-q70",
+          "bytes": 14883,
+          "dists": 0.508224127193292
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w320-near-16049B",
+          "bytes": 15632,
+          "dists": 0.5122980773448944
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w640-q70",
+          "bytes": 14809,
+          "dists": 0.5510692919294039
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 15787,
+      "achieved_mean_kbps": 25.682222222222222,
+      "mean_dists": 0.5188371969593896,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w320-near-16236B",
+          "bytes": 15787,
+          "dists": 0.4931442216038704
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w320-near-16049B",
+          "bytes": 15632,
+          "dists": 0.5122980773448944
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w640-q70",
+          "bytes": 14809,
+          "dists": 0.5510692919294039
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 16089,
+      "achieved_mean_kbps": 26.393333333333334,
+      "mean_dists": 0.5170175681511561,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w320-near-16236B",
+          "bytes": 15787,
+          "dists": 0.4931442216038704
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w320-near-16049B",
+          "bytes": 15632,
+          "dists": 0.5122980773448944
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w640-near-16334B",
+          "bytes": 16089,
+          "dists": 0.5456104055047035
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 16199,
+      "achieved_mean_kbps": 26.454444444444444,
+      "mean_dists": 0.51627550025781,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w320-near-16236B",
+          "bytes": 15787,
+          "dists": 0.4931442216038704
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w320-near-16049B",
+          "bytes": 15632,
+          "dists": 0.5122980773448944
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w480-near-16334B",
+          "bytes": 16199,
+          "dists": 0.5433842018246651
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 16285,
+      "achieved_mean_kbps": 26.502222222222223,
+      "mean_dists": 0.5106696370575163,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w320-near-16236B",
+          "bytes": 15787,
+          "dists": 0.4931442216038704
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w320-near-16049B",
+          "bytes": 15632,
+          "dists": 0.5122980773448944
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w320-near-16334B",
+          "bytes": 16285,
+          "dists": 0.5265666122237841
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 17888,
+      "achieved_mean_kbps": 27.755555555555556,
+      "mean_dists": 0.5052467352814145,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w320-near-16236B",
+          "bytes": 15787,
+          "dists": 0.4931442216038704
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w320-q60",
+          "bytes": 17888,
+          "dists": 0.49602937201658887
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w320-near-16334B",
+          "bytes": 16285,
+          "dists": 0.5265666122237841
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 18051,
+      "achieved_mean_kbps": 28.736666666666668,
+      "mean_dists": 0.5003713907466995,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w320-near-16236B",
+          "bytes": 15787,
+          "dists": 0.4931442216038704
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w320-q60",
+          "bytes": 17888,
+          "dists": 0.49602937201658887
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w320-q60",
+          "bytes": 18051,
+          "dists": 0.511940578619639
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 18128,
+      "achieved_mean_kbps": 30.037222222222223,
+      "mean_dists": 0.49609321107467014,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "ordinary-w320-q60",
+          "bytes": 18128,
+          "dists": 0.48030968258778256
+        },
+        {
+          "shot": "019",
+          "arm": "ordinary-w320-q60",
+          "bytes": 17888,
+          "dists": 0.49602937201658887
+        },
+        {
+          "shot": "024",
+          "arm": "ordinary-w320-q60",
+          "bytes": 18051,
+          "dists": 0.511940578619639
+        }
+      ]
+    }
+  ],
+  "DCVC-UF": [
+    {
+      "per_shot_cap_bytes": 12704,
+      "achieved_mean_kbps": 20.830555555555556,
+      "mean_dists": 0.452662109500832,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "dcvc-w480-q24",
+          "bytes": 12704,
+          "dists": 0.4436450352271398
+        },
+        {
+          "shot": "019",
+          "arm": "dcvc-w480-q24",
+          "bytes": 12529,
+          "dists": 0.45853696515162784
+        },
+        {
+          "shot": "024",
+          "arm": "dcvc-w480-q24",
+          "bytes": 12262,
+          "dists": 0.45580432812372845
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 13800,
+      "achieved_mean_kbps": 21.536666666666665,
+      "mean_dists": 0.4505707265602218,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "dcvc-w480-q24",
+          "bytes": 12704,
+          "dists": 0.4436450352271398
+        },
+        {
+          "shot": "019",
+          "arm": "dcvc-w480-q26",
+          "bytes": 13800,
+          "dists": 0.4522628163297971
+        },
+        {
+          "shot": "024",
+          "arm": "dcvc-w480-q24",
+          "bytes": 12262,
+          "dists": 0.45580432812372845
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 13929,
+      "achieved_mean_kbps": 22.462777777777777,
+      "mean_dists": 0.4453246179554197,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "dcvc-w480-q24",
+          "bytes": 12704,
+          "dists": 0.4436450352271398
+        },
+        {
+          "shot": "019",
+          "arm": "dcvc-w480-q26",
+          "bytes": 13800,
+          "dists": 0.4522628163297971
+        },
+        {
+          "shot": "024",
+          "arm": "dcvc-w480-q27",
+          "bytes": 13929,
+          "dists": 0.44006600230932236
+        }
+      ]
+    },
+    {
+      "per_shot_cap_bytes": 14039,
+      "achieved_mean_kbps": 23.204444444444444,
+      "mean_dists": 0.44160208437177867,
+      "shots": [
+        {
+          "shot": "000",
+          "arm": "dcvc-w480-q26",
+          "bytes": 14039,
+          "dists": 0.4324774344762166
+        },
+        {
+          "shot": "019",
+          "arm": "dcvc-w480-q26",
+          "bytes": 13800,
+          "dists": 0.4522628163297971
+        },
+        {
+          "shot": "024",
+          "arm": "dcvc-w480-q27",
+          "bytes": 13929,
+          "dists": 0.44006600230932236
+        }
+      ]
+    }
+  ]
+}

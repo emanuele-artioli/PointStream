@@ -1,0 +1,37 @@
+{
+  "witness": "20261122T120219Z-f2c299f2",
+  "original_host": "gpu6",
+  "original_host_job": "20261122T130549Z-3aa18d60",
+  "physical_frames": 240,
+  "identical": 240,
+  "wire": {
+    "joint_sha256": "fdc8fcbb39599348e966f07666a0472cf4cbb9211e8baf7ada44ba59161b7780",
+    "cache_sha256": "bef67ff7a17cc2dc83fa66f35faa344a91009393e778a7248e0516321038ddfb",
+    "joint_bytes": 17794,
+    "cache_bytes": 137480,
+    "joint_roles": {
+      "frame": 16557,
+      "window": 1237,
+      "match": 0,
+      "reference": 0
+    },
+    "cache_roles": {
+      "frame": 0,
+      "window": 1833,
+      "match": 0,
+      "reference": 135647
+    },
+    "active_ticks": [
+      0,
+      240
+    ],
+    "ball_positions": 217
+  },
+  "frames_sha256": "a34c831fb5b1ea9bda73b9881860ec4ac354fe77bc2f5e75c0b03981e4c116fc",
+  "native_dav1d_or_ffmpeg_sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+  "native_yuv_sha256": "62da1fdd02d63a092357567eceeb5958a11e9899571e4fd5f4dfa7f6e44fdaf8",
+  "elapsed_s": 19.489698262012098,
+  "alternate_host_job": "20261122T125957Z-5caae720",
+  "alternate_host": "gpu3",
+  "alternate_host_exact_pixel_gate": "stopped at tick 0"
+}

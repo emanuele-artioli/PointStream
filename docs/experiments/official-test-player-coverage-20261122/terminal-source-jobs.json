@@ -1,0 +1,90 @@
+{
+  "match107-features": {
+    "job": "20261122T124915Z-d6c0c405",
+    "state": "complete",
+    "updated_utc": "2026-11-22T13:29:09.070676+00:00",
+    "spec_sha256": "c3bd5bb5e8917c39ee3c2d6aada67c36f6349decabea2b116c88947fa3c9b0c1",
+    "snapshot_sha256": "6d196ba6f8dd730494403d812bc85d82efaffb15b031115a8e678a3894f8bee5",
+    "registered_deadline": "2026-11-22T19:30:00Z",
+    "host": "gpu3",
+    "native_gate_passed": true,
+    "remote_stage_began": true
+  },
+  "match131-features": {
+    "job": "20261122T125009Z-375db2da",
+    "state": "complete",
+    "updated_utc": "2026-11-22T13:38:16.481267+00:00",
+    "spec_sha256": "ec4a8ff645148e3445acd0c4d2f48fab1dce884456df0748ca05fc3ad4fcfecf",
+    "snapshot_sha256": "89a3a560cc19748e3b770b05da8b3c8f8b11c424362758510859efa79b642c11",
+    "registered_deadline": "2026-11-22T19:30:00Z",
+    "host": "gpu3",
+    "native_gate_passed": true,
+    "remote_stage_began": true
+  },
+  "match104-features": {
+    "job": "20261122T125048Z-d94e5ae1",
+    "state": "contended",
+    "updated_utc": "2026-11-22T13:40:19.821544+00:00",
+    "spec_sha256": "2161e9e5f9c5b1fe737cd0bf36757342b393a6743b2903eddd90484d78e5e981",
+    "snapshot_sha256": "5967225cd612bde24c988890767a6f50bb9845f02efa6ab0140ed2d4267a3764",
+    "registered_deadline": "2026-11-22T19:30:00Z",
+    "host": "gpu3",
+    "native_gate_passed": false,
+    "remote_stage_began": true
+  },
+  "match130-features": {
+    "job": "20261122T125130Z-eecab011",
+    "state": "expired",
+    "updated_utc": "2026-11-22T19:30:00.839929+00:00",
+    "spec_sha256": "b4a7a820d617fa392f1a73e20d3fec1e99a858d6549ec48ea32fc4cc13e0b57f",
+    "snapshot_sha256": "5967225cd612bde24c988890767a6f50bb9845f02efa6ab0140ed2d4267a3764",
+    "registered_deadline": "2026-11-22T19:30:00Z",
+    "host": "gpu3",
+    "native_gate_passed": false,
+    "remote_stage_began": false
+  },
+  "match126-features": {
+    "job": "20261122T125217Z-f68c059a",
+    "state": "expired",
+    "updated_utc": "2026-11-22T19:30:00.964788+00:00",
+    "spec_sha256": "7ab3830d323e41ad93c4c9698b2d040c21a761491c2613565c3edb05d5e741eb",
+    "snapshot_sha256": "5697992e867aa0b621dba747b99505ee1c4f79de6e1a2d0fa5da6296fd330ac4",
+    "registered_deadline": "2026-11-22T19:30:00Z",
+    "host": null,
+    "native_gate_passed": false,
+    "remote_stage_began": false
+  },
+  "match107-crop": {
+    "job": "20261122T133308Z-bbb7dc8e",
+    "state": "expired",
+    "updated_utc": "2026-11-22T19:30:01.094871+00:00",
+    "spec_sha256": "877dc785deb15382a9e82dc3c62b4af88a81a601314e95d13d78e6672f8dd5d5",
+    "snapshot_sha256": "d5ad5f5766b62e257b6654c029f6d3b1d9ff461619fb81e139f93027ea1058d4",
+    "registered_deadline": "2026-11-22T19:30:00Z",
+    "host": null,
+    "native_gate_passed": false,
+    "remote_stage_began": false
+  },
+  "match131-crop": {
+    "job": "20261122T134101Z-9e8368c0",
+    "state": "expired",
+    "updated_utc": "2026-11-22T19:30:01.425261+00:00",
+    "spec_sha256": "170531ca641957120ca127d0b74081c794d84ee7a64bbc4831ee878befe1340f",
+    "snapshot_sha256": "c795bbf2e892a4f616c4ce36ceafb0a9d18d9aa250c0aa69fbe4d9802c18d819",
+    "registered_deadline": "2026-11-22T19:30:00Z",
+    "host": null,
+    "native_gate_passed": false,
+    "remote_stage_began": false
+  },
+  "match104-features-retry": {
+    "job": "20261122T135219Z-fa5e69f9",
+    "state": "expired",
+    "updated_utc": "2026-11-22T19:30:01.555480+00:00",
+    "spec_sha256": "2161e9e5f9c5b1fe737cd0bf36757342b393a6743b2903eddd90484d78e5e981",
+    "snapshot_sha256": "225efe8abf5b85e665b26bf1fa6c807e3e5744385111beb17ae78eb1a3bcfb36",
+    "registered_deadline": "2026-11-22T19:30:00Z",
+    "host": null,
+    "native_gate_passed": false,
+    "remote_stage_began": false
+  }
+}

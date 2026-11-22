@@ -1,0 +1,76 @@
+{
+  "source_ticks": [
+    10,
+    30,
+    50,
+    70,
+    90,
+    110,
+    130,
+    150,
+    170,
+    190,
+    210,
+    230
+  ],
+  "people_per_shot": 2,
+  "first_joint_dists": 0.3027506445844968,
+  "first_ordinary_count": 52,
+  "second_ordinary_count": 17,
+  "cases": {
+    "send_new": {
+      "bytes": 375816,
+      "rate": 156.59,
+      "affordable_pairs": 884,
+      "best_ordinary": {
+        "first_bytes": 107620,
+        "second_bytes": 192325,
+        "sum_bytes": 299945,
+        "first_dists": 0.27777282396952313,
+        "second_dists": 0.2337347020705541,
+        "mean_dists": 0.2557537630200386,
+        "first_sha": "91617b79bbe2c22beb657069e059a417aa7cb9571e98395303078217ce75226e",
+        "second_sha": "3eb93195b281d2d6d1bf6d38cc8f8c57ced617dac1413d2ea1a06ab4c085ccc9",
+        "two_shot_kbps": 124.97708333333334
+      },
+      "nearest_ordinary": {
+        "first_bytes": 107620,
+        "second_bytes": 192325,
+        "sum_bytes": 299945,
+        "first_dists": 0.27777282396952313,
+        "second_dists": 0.2337347020705541,
+        "mean_dists": 0.2557537630200386,
+        "first_sha": "91617b79bbe2c22beb657069e059a417aa7cb9571e98395303078217ce75226e",
+        "second_sha": "3eb93195b281d2d6d1bf6d38cc8f8c57ced617dac1413d2ea1a06ab4c085ccc9",
+        "two_shot_kbps": 124.97708333333334
+      }
+    },
+    "reuse": {
+      "bytes": 201816,
+      "rate": 84.09,
+      "affordable_pairs": 829,
+      "best_ordinary": {
+        "first_bytes": 107620,
+        "second_bytes": 83987,
+        "sum_bytes": 191607,
+        "first_dists": 0.27777282396952313,
+        "second_dists": 0.3286394228537877,
+        "mean_dists": 0.3032061234116554,
+        "first_sha": "91617b79bbe2c22beb657069e059a417aa7cb9571e98395303078217ce75226e",
+        "second_sha": "eca15d19272716c93129b8c21f8cc41cc5f74ab43edbfdf695352b792a9a43bc",
+        "two_shot_kbps": 79.83625
+      },
+      "nearest_ordinary": {
+        "first_bytes": 55801,
+        "second_bytes": 141505,
+        "sum_bytes": 197306,
+        "first_dists": 0.38824830452601117,
+        "second_dists": 0.28005874653657276,
+        "mean_dists": 0.33415352553129196,
+        "first_sha": "55fd6d9641d324e1aa223bd87d97252ec9995351f58a1054f9cded7f2544a53c",
+        "second_sha": "484609e295f9de7542c29f7c5c612053c8b2d719b00d1df81b7657590fa02efd",
+        "two_shot_kbps": 82.21083333333333
+      }
+    }
+  }
+}

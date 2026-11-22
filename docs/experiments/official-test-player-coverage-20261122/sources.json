@@ -1,0 +1,104 @@
+[
+  {
+    "rank": 7,
+    "name": "match107",
+    "court_ticks": 240,
+    "source": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match107-000-9b2197018f90.mp4",
+      "sha256": "9b2197018f90a8e8873595101d4c72651efad33c7e60d506e6718e78d073ba2e",
+      "member": "tennis/videos/match107_000.mp4"
+    },
+    "video": {
+      "width": 1920,
+      "height": 1080,
+      "r_frame_rate": "60/1",
+      "avg_frame_rate": "60/1",
+      "nb_frames": "600"
+    }
+  },
+  {
+    "rank": 8,
+    "name": "match131",
+    "court_ticks": 240,
+    "source": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match131-000-ac89229d3608.mp4",
+      "sha256": "ac89229d3608e6247b706251d7d0fc6c8f2018229ce302d7491c49f2b56a7207",
+      "member": "tennis/videos/match131_000.mp4"
+    },
+    "video": {
+      "width": 1920,
+      "height": 1080,
+      "r_frame_rate": "25/1",
+      "avg_frame_rate": "25/1",
+      "nb_frames": "250"
+    }
+  },
+  {
+    "rank": 9,
+    "name": "match119",
+    "court_ticks": 0,
+    "source": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match119-000-47c34ad73275.mp4",
+      "sha256": "47c34ad732752c6f2bd72cb527095dd845f2ff8c99b45015883be23539850864",
+      "member": "tennis/videos/match119_000.mp4"
+    },
+    "video": {
+      "width": 1920,
+      "height": 1080,
+      "r_frame_rate": "60/1",
+      "avg_frame_rate": "60/1",
+      "nb_frames": "600"
+    }
+  },
+  {
+    "rank": 10,
+    "name": "match104",
+    "court_ticks": 240,
+    "source": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match104-000-aa0eea258179.mp4",
+      "sha256": "aa0eea258179ed5be7b166dbedb3e8001b823c5caac6630f89f480f6bec30a10",
+      "member": "tennis/videos/match104_000.mp4"
+    },
+    "video": {
+      "width": 1920,
+      "height": 1080,
+      "r_frame_rate": "60/1",
+      "avg_frame_rate": "60/1",
+      "nb_frames": "576"
+    }
+  },
+  {
+    "rank": 11,
+    "name": "match130",
+    "court_ticks": 240,
+    "source": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match130-000-f3702a7e885c.mp4",
+      "sha256": "f3702a7e885cb7b6fcad37bafe362391d314d5f08640015a80ab0625c4bbdd16",
+      "member": "tennis/videos/match130_000.mp4"
+    },
+    "video": {
+      "width": 1920,
+      "height": 1080,
+      "r_frame_rate": "25/1",
+      "avg_frame_rate": "25/1",
+      "nb_frames": "250"
+    }
+  },
+  {
+    "rank": 12,
+    "name": "match126",
+    "court_ticks": 240,
+    "source": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match126-000-29fb4ef71a4d.mp4",
+      "sha256": "29fb4ef71a4d2ef68d79166542c51fda4f48108dfd6647bacc8b9869c018ab93",
+      "member": "tennis/videos/match126_000.mp4"
+    },
+    "video": {
+      "width": 1920,
+      "height": 1080,
+      "r_frame_rate": "25/1",
+      "avg_frame_rate": "25/1",
+      "nb_frames": "240"
+    }
+  }
+]

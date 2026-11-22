@@ -10,3 +10,5 @@ The first preparation bound the new staged files but retained the prior config d
 Corrected campus request `20261121T225211Z-d22b94ba` uses the verified argument and staged config identities. Its deadline is 01:00 UTC.
 
 The corrected job completed both 24-frame tracks. The repeated track matched the smoke exactly. The shared pair costs 107,276 image bytes, a 55.7% reduction from lossless. Rendered crops include surrounding pixels, so their objective score cannot decide whether clothing, body shape or pose passes the blinded review. [Render identities](render-receipt.json) · [Rendered crop measurements](rendered-crop-metrics.json) · [Private blinded review](/Users/manu/.codex/visualizations/2026/11/18/01a1edc1-dd4e-7ab3-b819-fbd88da8db05/common-q90-review-20261122/review.html)
+
+The author accepted both randomized candidates on both players. The blinded identity mapping and exact judgment appear in the [recorded decision](../reference-body-rd-20261122/review-decision.json). The manuscript uses [objective body and motion measurements](../reference-body-rd-20261122/README.md) for the reference comparison.

@@ -1,0 +1,40 @@
+{
+  "job_id": "20261122T140327Z-21abfae5",
+  "state": "complete",
+  "mode": "roi",
+  "width": 256,
+  "height": 144,
+  "archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T140327Z-21abfae5/full/published.tar",
+  "archive_sha256": "3110955e2c92fe03054a9d1fa744fb8693190e15c83d05d1cf3fe6800327e047",
+  "selected": {
+    "warm": {
+      "ceiling": 13555,
+      "affordable": true,
+      "identical_qp_control": {
+        "twin_file": "plain-twin-q279.ivf",
+        "twin_bytes": 9896,
+        "twin_sha256": "20d529c55a4de86a17c31163e3924b29c0bbbd839ebfb1b8efaca4d1185b122f",
+        "twin_decoded_sha256": "59c528f891fc7f603b7e606b5145cecfe30c7220b5aaaa5e66127d9328733f59",
+        "selected_decoded_sha256": "37f32c973aa16c8ef6ed4296f8a17532d01d18603a368e9a7efa7f32d7a8c90f",
+        "changed_luma_pixels": 7688378,
+        "non_inert": true,
+        "support_pixels": 65754,
+        "outside_pixels": 8781606,
+        "plain_luma_psnr_in": 16.50361099880538,
+        "roi_luma_psnr_in": 16.57230876912423,
+        "plain_luma_psnr_out": 29.04308801969515,
+        "roi_luma_psnr_out": 26.670837159595905
+      },
+      "quarter_crf": 279,
+      "bytes": 13528,
+      "file": "publish/q279.ivf",
+      "sha256": "a6b60458261af3ed22f71701b7430a7fcbe8d24447fef67fb76811a64fd5b056",
+      "origin": "new",
+      "elapsed": 3.7419307740055956,
+      "decoded_sha256": "37f32c973aa16c8ef6ed4296f8a17532d01d18603a368e9a7efa7f32d7a8c90f",
+      "decoded_file": "publish/warm.yuv.z",
+      "shortfall": 0.0019918849133161443
+    }
+  },
+  "report_sha256": "6cc9333f332160ea5f70c5008a4f50cc7c1004162f83bbb9b85715d5a669756e"
+}

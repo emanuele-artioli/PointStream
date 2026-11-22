@@ -1,0 +1,44 @@
+{
+  "event": "match102",
+  "job": "20261122T102553Z-a34de622",
+  "archive_sha256": "e25156d16b6e123c8b5db0103739c83abf4ab2e37ae4abe0c725c2b3e507198d",
+  "source_sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+  "fps": "30000/1001",
+  "total_ticks": 240,
+  "available_both": 240,
+  "longest_both": 240,
+  "eligible_240": true,
+  "eligible_120": true,
+  "runs": [
+    {
+      "start": 0,
+      "end": 239,
+      "count": 240
+    }
+  ],
+  "tracks": [
+    {
+      "track": "person:000000000000",
+      "measured_role": "near",
+      "pose_ticks": 240,
+      "eligible": true,
+      "signal": {
+        "pose_bytes": 1370,
+        "reference_png_bytes": 91232,
+        "pose_sha256": "7ed2e376aecf711a5f0f84248a4a73dc1085ff94f5ec53a66781814605deae70",
+        "reference_section_sha256": "54194b3a9297cd69b5a672735ddd461c569f9f6fdbfbe788ea1d21751e634e8c",
+        "decoded_reference_rgb_sha256": "0a5cac8df060569f803f3912799053ec21237f6a4b4bdad4d3edcf7f781691c0",
+        "pose_only_kbps": 1.3686313686313687,
+        "cold_pose_reference_only_kbps": 92.50949050949052,
+        "note": "Two independently decoded field payloads. Excludes base, ball, model, manifest and packet framing."
+      }
+    },
+    {
+      "track": "person:000000000001",
+      "measured_role": "far",
+      "pose_ticks": 240,
+      "eligible": true
+    }
+  ],
+  "cpu_codec": "OpenCV 4.10.0, portable zlib REF1 and KPS2; dimensions 512\u00d7784."
+}

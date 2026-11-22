@@ -1,0 +1,242 @@
+[
+  {
+    "arm": {
+      "name": "ordinary-w160-q40",
+      "kind": "native_yuv420p",
+      "width": 160,
+      "height": 96,
+      "path": "/private/tmp/ps-med019-ordinary-av1-20261122/160-crf40/decoded.yuv",
+      "sha256": "4b75f14a2981f0086da485a1a2274954be115ffb9a32ee4a76a96b8268187177",
+      "kbps": 28.93,
+      "bytes": 17358,
+      "stream_sha256": "c837fcc45162a591fb248e00f4f92b8e5bfb3153ef71acfa54c1d919884691af"
+    },
+    "mean_dists": 0.5309269403417906,
+    "active_dists": 0.5384333183368047,
+    "fallback_dists": 0.5234205623467764,
+    "rgb_psnr": 19.600750119638516,
+    "active_rgb_psnr": 19.599260930670606,
+    "fallback_rgb_psnr": 19.602239819422152,
+    "cpu_seconds": 10.579373
+  },
+  {
+    "arm": {
+      "name": "ordinary-w160-q50",
+      "kind": "native_yuv420p",
+      "width": 160,
+      "height": 96,
+      "path": "/private/tmp/ps-med019-ordinary-av1-20261122/160-crf50/decoded.yuv",
+      "sha256": "caac6457f11e5d0d70790a6839fe3a74e76bb6e14af91fd1b240a55be904e66a",
+      "kbps": 23.508333333333333,
+      "bytes": 14105,
+      "stream_sha256": "2c64eef8f1110b97d46564a48e2eef44bb2cedd257f796ffa80eff8af5b7bdd6"
+    },
+    "mean_dists": 0.5464192976554235,
+    "active_dists": 0.5522886117299398,
+    "fallback_dists": 0.5405499835809072,
+    "rgb_psnr": 19.56716663268073,
+    "active_rgb_psnr": 19.567357282191416,
+    "fallback_rgb_psnr": 19.566975991538936,
+    "cpu_seconds": 11.009715
+  },
+  {
+    "arm": {
+      "name": "ordinary-w160-q60",
+      "kind": "native_yuv420p",
+      "width": 160,
+      "height": 96,
+      "path": "/private/tmp/ps-med019-ordinary-av1-20261122/160-crf60/decoded.yuv",
+      "sha256": "8b59b0733b1655ebc8c591412f96a7fc1ba8a8fae27670c500025fa4b8b5fef9",
+      "kbps": 18.871666666666666,
+      "bytes": 11323,
+      "stream_sha256": "50d2b2f5a4c8f527284894393d66015048e2b1b47f83023d6cde16aabad43f6e"
+    },
+    "mean_dists": 0.5709629779060682,
+    "active_dists": 0.581013614932696,
+    "fallback_dists": 0.5609123408794403,
+    "rgb_psnr": 19.460282454739406,
+    "active_rgb_psnr": 19.454741384551898,
+    "fallback_rgb_psnr": 19.46583060369218,
+    "cpu_seconds": 11.115203000000001
+  },
+  {
+    "arm": {
+      "name": "ordinary-w160-q70",
+      "kind": "native_yuv420p",
+      "width": 160,
+      "height": 96,
+      "path": "/private/tmp/ps-med019-ordinary-av1-20261122/160-crf70/decoded.yuv",
+      "sha256": "76731337490b5ce849c0ee81adcc8acdbd9b89fb3fbf00a74ead04d4257370b8",
+      "kbps": 14.768333333333333,
+      "bytes": 8861,
+      "stream_sha256": "d5770f5d26e296bb1cd7c856a47f13d137fc7c21d8bd157301134362e8c2b6a4"
+    },
+    "mean_dists": 0.6690590381622314,
+    "active_dists": 0.670895000298818,
+    "fallback_dists": 0.6672230760256449,
+    "rgb_psnr": 18.331687340426384,
+    "active_rgb_psnr": 18.338358678851122,
+    "fallback_rgb_psnr": 18.325026234344797,
+    "cpu_seconds": 11.315205999999996
+  },
+  {
+    "arm": {
+      "name": "ordinary-w320-q40",
+      "kind": "native_yuv420p",
+      "width": 320,
+      "height": 192,
+      "path": "/private/tmp/ps-med019-ordinary-av1-20261122/320-crf40/decoded.yuv",
+      "sha256": "9aab4011f01c0a1dbed20a36a205dfc5696630c5155939597f0f201d7fbd4a1d",
+      "kbps": 65.43166666666667,
+      "bytes": 39259,
+      "stream_sha256": "14068900d809aeb7081c628a85af1a80d3284d83656f556df54f423145b82788"
+    },
+    "mean_dists": 0.43284982939561206,
+    "active_dists": 0.43852558732032776,
+    "fallback_dists": 0.4271740714708964,
+    "rgb_psnr": 21.012124388927973,
+    "active_rgb_psnr": 21.003850941291628,
+    "fallback_rgb_psnr": 21.02041362783214,
+    "cpu_seconds": 11.488411999999997
+  },
+  {
+    "arm": {
+      "name": "ordinary-w320-q50",
+      "kind": "native_yuv420p",
+      "width": 320,
+      "height": 192,
+      "path": "/private/tmp/ps-med019-ordinary-av1-20261122/320-crf50/decoded.yuv",
+      "sha256": "e5392c07407a83a465c92687f2874e63ae041272f4d187817047ef8b62b9f828",
+      "kbps": 44.67,
+      "bytes": 26802,
+      "stream_sha256": "b665afe66eb2b0e6254645784d3ac60a5f388525c518489ea8be829749340e74"
+    },
+    "mean_dists": 0.45598436892032623,
+    "active_dists": 0.4634668529033661,
+    "fallback_dists": 0.4485018849372864,
+    "rgb_psnr": 20.96909088111631,
+    "active_rgb_psnr": 20.961549659820122,
+    "fallback_rgb_psnr": 20.97664521999929,
+    "cpu_seconds": 11.553942999999997
+  },
+  {
+    "arm": {
+      "name": "ordinary-w320-q60",
+      "kind": "native_yuv420p",
+      "width": 320,
+      "height": 192,
+      "path": "/private/tmp/ps-med019-ordinary-av1-20261122/320-crf60/decoded.yuv",
+      "sha256": "887ed492481c5d8556c41c64d41da11ab989ad3d8ab11f380eb0b3dd8af6486d",
+      "kbps": 29.813333333333333,
+      "bytes": 17888,
+      "stream_sha256": "b026f70ddca8321c98a393e3aef51c55e64f530dac4889778e3291e5a72dc437"
+    },
+    "mean_dists": 0.49602937201658887,
+    "active_dists": 0.5063340167204539,
+    "fallback_dists": 0.4857247273127238,
+    "rgb_psnr": 20.849100170231804,
+    "active_rgb_psnr": 20.84260798621781,
+    "fallback_rgb_psnr": 20.855602073817224,
+    "cpu_seconds": 11.709682
+  },
+  {
+    "arm": {
+      "name": "ordinary-w320-q70",
+      "kind": "native_yuv420p",
+      "width": 320,
+      "height": 192,
+      "path": "/private/tmp/ps-med019-ordinary-av1-20261122/320-crf70/decoded.yuv",
+      "sha256": "e7ccd649707ed3bc41d7fe73a5a44d821276f91efdb00a026bc8ebcabb916837",
+      "kbps": 16.961666666666666,
+      "bytes": 10177,
+      "stream_sha256": "f644f3e36990d57c4d392121285950670515cebd238a42de7889e64cd54928cc"
+    },
+    "mean_dists": 0.6146256526311239,
+    "active_dists": 0.6226285000642141,
+    "fallback_dists": 0.6066228051980337,
+    "rgb_psnr": 19.635603293079328,
+    "active_rgb_psnr": 19.64268542511402,
+    "fallback_rgb_psnr": 19.628532691227278,
+    "cpu_seconds": 11.624525000000006
+  },
+  {
+    "arm": {
+      "name": "ordinary-w640-q40",
+      "kind": "native_yuv420p",
+      "width": 640,
+      "height": 384,
+      "path": "/private/tmp/ps-med019-ordinary-av1-20261122/640-crf40/decoded.yuv",
+      "sha256": "8460aded5b612ebdc49e3c22822d79d2ea269a716b7349ec12956d93ef68f0cc",
+      "kbps": 191.55333333333334,
+      "bytes": 114932,
+      "stream_sha256": "e131e8e54d7d8971edee4b40139a9d218ddf44162b4ebc4fcd5630f3eaf29bc7"
+    },
+    "mean_dists": 0.30945741136868793,
+    "active_dists": 0.31094200412432355,
+    "fallback_dists": 0.30797281861305237,
+    "rgb_psnr": 24.115251664945095,
+    "active_rgb_psnr": 24.09793945781069,
+    "fallback_rgb_psnr": 24.132633159728915,
+    "cpu_seconds": 13.618947000000006
+  },
+  {
+    "arm": {
+      "name": "ordinary-w640-q50",
+      "kind": "native_yuv420p",
+      "width": 640,
+      "height": 384,
+      "path": "/private/tmp/ps-med019-ordinary-av1-20261122/640-crf50/decoded.yuv",
+      "sha256": "bab724b57b2ec304420fb1062c08561ef667811816c98121cb83f4b2b79d841a",
+      "kbps": 115.49,
+      "bytes": 69294,
+      "stream_sha256": "b75d9657e57512f35d4287ff1046c7785c0b8208bf71499427d3ebcfd8b031a8"
+    },
+    "mean_dists": 0.3491193453470866,
+    "active_dists": 0.35411224762598675,
+    "fallback_dists": 0.34412644306818646,
+    "rgb_psnr": 24.028740018140425,
+    "active_rgb_psnr": 24.008410133843512,
+    "fallback_rgb_psnr": 24.049165517004816,
+    "cpu_seconds": 13.248945000000006
+  },
+  {
+    "arm": {
+      "name": "ordinary-w640-q60",
+      "kind": "native_yuv420p",
+      "width": 640,
+      "height": 384,
+      "path": "/private/tmp/ps-med019-ordinary-av1-20261122/640-crf60/decoded.yuv",
+      "sha256": "49cac2e92a8ecd80296888bd95e385ba6e83fb41ae4a636cfcb1a81a9eeb2ea6",
+      "kbps": 67.25333333333333,
+      "bytes": 40352,
+      "stream_sha256": "87c24d3d4c0ba9ca3416faba144cbcf301e2cd27c81ef07b06391d9eeb7ae63e"
+    },
+    "mean_dists": 0.39927297085523605,
+    "active_dists": 0.4027821719646454,
+    "fallback_dists": 0.3957637697458267,
+    "rgb_psnr": 23.818222314976264,
+    "active_rgb_psnr": 23.799148059448306,
+    "fallback_rgb_psnr": 23.83738071451562,
+    "cpu_seconds": 12.873980000000003
+  },
+  {
+    "arm": {
+      "name": "ordinary-w640-q70",
+      "kind": "native_yuv420p",
+      "width": 640,
+      "height": 384,
+      "path": "/private/tmp/ps-med019-ordinary-av1-20261122/640-crf70/decoded.yuv",
+      "sha256": "b6ba340ac6841d347fc22545e91494938ea13f390a7e55eeb14ae8eb825a8444",
+      "kbps": 24.52166666666667,
+      "bytes": 14713,
+      "stream_sha256": "79d7668a631ab04c584dfc3f44de486fc70914d6f7391283ec565f0dd623e26e"
+    },
+    "mean_dists": 0.5315208931763967,
+    "active_dists": 0.5393818368514379,
+    "fallback_dists": 0.5236599495013555,
+    "rgb_psnr": 21.820954039773422,
+    "active_rgb_psnr": 21.818172646622628,
+    "fallback_rgb_psnr": 21.823737215379705,
+    "cpu_seconds": 12.654088999999999
+  }
+]

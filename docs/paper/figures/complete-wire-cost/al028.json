@@ -1,0 +1,11 @@
+{
+  "wire_sha256": "ab12294fec2bba5bb5b21bf373a3a31c620b80cf9463cd92ab0383647d1a8aa9",
+  "total": 24489,
+  "parts": {
+    "base": 19985,
+    "poses": 2147,
+    "trajectory": 996
+  },
+  "overhead": 1361,
+  "pricing_source": "docs/experiments/reference-transfer-al028-20261122/wire-price-and-quality.json"
+}

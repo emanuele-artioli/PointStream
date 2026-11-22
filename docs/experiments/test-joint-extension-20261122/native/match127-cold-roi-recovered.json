@@ -1,0 +1,72 @@
+{
+  "job": "20261122T143804Z-c1f667b2",
+  "host": "gpu4",
+  "source": "5c36e6bbf869c6025929c992d1f1b077f63895a3",
+  "source_snapshot": "032b652624d9d64e2b68b11c3441bca5d7f0d5ebf5e51e7159e0649f221bd05c",
+  "score_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T143804Z-c1f667b2/full/score.json",
+  "score_sha256": "a2a256430d86568b4828f2211784ddc105313e081a435438f34697e184e16c01",
+  "validation": {
+    "passed": true,
+    "checks": {
+      "frames": 240,
+      "roles": 2,
+      "forecast_s": 490.9583130989922,
+      "complete": true,
+      "source_grid_sha256": "7d706c8d9ff2f45ac1c5dc810afa7361a5a390681ea4d7067a72d2673c7063d0",
+      "score_sha256": "a2a256430d86568b4828f2211784ddc105313e081a435438f34697e184e16c01"
+    }
+  },
+  "metrics": {
+    "name": "roi-640-cold",
+    "source_sha256": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+    "support_rle_sha256": "88e0b197dd16d18a7c1989601637f045859de1d18ac3756d3eb1f280c3d2eb64",
+    "support_method": "Original frozen SAM31 source supports, per-player DISTS on tight bounds plus 32 pixels; 2x replication of half-resolution binary masks.",
+    "native_fps": "60",
+    "source_grid_sha256": "7d706c8d9ff2f45ac1c5dc810afa7361a5a390681ea4d7067a72d2673c7063d0",
+    "frames": 240,
+    "bytes": 160748,
+    "kbps": 321.496,
+    "width": 640,
+    "height": 384,
+    "kind": "ivf_tar",
+    "sha256": "803e1e91d813728408cc6b6a8c2ae655c0f9d69dc42cc6bc46ebd397ffbf84b3",
+    "decoded_sha256": "f070910ad2b74bab04e4b8ec5e7ade54654ab9fe2e06a18028b5b2978291bd91",
+    "pooled": {
+      "dists": 0.2165123136093219,
+      "rgb_psnr": 23.318254952109847,
+      "ticks": 480
+    },
+    "near": {
+      "dists": 0.19695956086119015,
+      "rgb_psnr": 23.460624484631474,
+      "ticks": 240
+    },
+    "far": {
+      "dists": 0.23606506635745367,
+      "rgb_psnr": 22.58316226291841,
+      "ticks": 240
+    },
+    "optional_review_ticks_on_source_model": {
+      "dists": 0.21329507728417715,
+      "rgb_psnr": 23.492477703919352,
+      "ticks": 24
+    },
+    "whole_rgb_psnr": 28.163242528623257,
+    "source_self_abs": 1.1920928955078125e-07,
+    "cpu_seconds": 279.731935521,
+    "benchmark_forecast": 357.62595918,
+    "elapsed_s": 280.29079938097857,
+    "tool": {
+      "cv2": "4.10.0",
+      "torch": "2.10.0+cu128",
+      "weight_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "device": "cpu"
+    },
+    "event": "match127",
+    "producer": "20261122T140239Z-5b51d2c4",
+    "samples_sha256": null,
+    "score_s": 280.3013494670158,
+    "source_binding_sha256": "d47824f1f0f51a12b853abd6cb455891e12648ab36661c978220dd6d1d1c2de2",
+    "total_s": 287.3055420659948
+  }
+}

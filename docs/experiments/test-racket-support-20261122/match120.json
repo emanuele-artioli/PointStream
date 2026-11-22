@@ -1,0 +1,350 @@
+{
+  "event": "match120",
+  "source_sha256": "7d119f25b1922f0dbd7f5ffb6ea5ac34226a8ea93b41e7a37e401f07ee0e5976",
+  "feature_sha256": "4c015a3f8c53e1a20d07f2c01e9f94d9721aff5abb5c67e60252622645ac368f",
+  "labels": {
+    "tennis/all/match120/racket/000/0092.json": "67d2432bf3c2af9a2e6a4ff504859e2959c39dee9cb0256da928b89834da81af",
+    "tennis/all/match120/racket/000/0103.json": "771ce2ae70266ab92a7fae39e986c24e0ee3ee64556fa01ce9c6fbefde196475",
+    "tennis/all/match120/racket/000/0115.json": "bdba77b13dcf5af89808ae3461702d9253ef4e0f02280234b217937f383df8d3",
+    "tennis/all/match120/racket/000/0127.json": "df2ae82e9bab745525da46f5ecf83bcfb3781ffbd1b1376cbe5a233d23d7432a",
+    "tennis/all/match120/racket/000/0186.json": "a3509f9ae5c5fcb6a3fe85bbd672d3c0b5f1d5ca709e8ac03e4e49d7d6b9764e",
+    "tennis/all/match120/racket/000/0198.json": "3fb182c314610ebae5577a72dbecdc2194fb0de8653ddf8292073c538b82fb6a",
+    "tennis/all/match120/racket/000/0210.json": "58d14fbb74bf118191c51a9af417bf5d36552e33dd8933beccde4909f6e66a6c",
+    "tennis/all/match120/racket/000/0222.json": "3eef860a1e05c474afe2c0d18eb645f4f3463c297895f9da4f661f6579aff252"
+  },
+  "selected_players": [
+    "person:000000000006",
+    "person:000000000007"
+  ],
+  "summary": {
+    "head": {
+      "visible": 32,
+      "within_five": 2,
+      "all_landmarks": 32
+    },
+    "handle": {
+      "visible": 6,
+      "exact": 4,
+      "within_five": 6,
+      "all_landmarks": 8
+    }
+  },
+  "rows": [
+    {
+      "tick": 92,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 92,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 92,
+      "object_index": 0,
+      "part": "handle",
+      "visible": true,
+      "exact": true,
+      "within_five": true
+    },
+    {
+      "tick": 92,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 92,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 103,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 103,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 103,
+      "object_index": 0,
+      "part": "handle",
+      "visible": true,
+      "exact": true,
+      "within_five": true
+    },
+    {
+      "tick": 103,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 103,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 115,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 115,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": false,
+      "within_five": true
+    },
+    {
+      "tick": 115,
+      "object_index": 0,
+      "part": "handle",
+      "visible": true,
+      "exact": true,
+      "within_five": true
+    },
+    {
+      "tick": 115,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 115,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 127,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 127,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": false,
+      "within_five": true
+    },
+    {
+      "tick": 127,
+      "object_index": 0,
+      "part": "handle",
+      "visible": true,
+      "exact": true,
+      "within_five": true
+    },
+    {
+      "tick": 127,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 127,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 186,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 186,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 186,
+      "object_index": 0,
+      "part": "handle",
+      "visible": false
+    },
+    {
+      "tick": 186,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 186,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 198,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 198,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 198,
+      "object_index": 0,
+      "part": "handle",
+      "visible": true,
+      "exact": false,
+      "within_five": true
+    },
+    {
+      "tick": 198,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 198,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 210,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 210,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 210,
+      "object_index": 0,
+      "part": "handle",
+      "visible": true,
+      "exact": false,
+      "within_five": true
+    },
+    {
+      "tick": 210,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 210,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 222,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 222,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 222,
+      "object_index": 0,
+      "part": "handle",
+      "visible": false
+    },
+    {
+      "tick": 222,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 222,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    }
+  ]
+}

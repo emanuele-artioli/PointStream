@@ -4,6 +4,7 @@ Only accepted or replacement player decisions produce masks. Missing/unsure are
 retained as unresolved, and visible ball points must have been explicitly marked.
 """
 import argparse
+import csv
 import base64
 import hashlib
 import io
@@ -43,11 +44,33 @@ def vertices(polygons):
     return polygons
 
 
+def official_positions(review, decisions, csv_path):
+    expected = review.get("official_ball_sha256")
+    if not expected:
+        if csv_path is not None or "official_ball_sha256" in decisions:
+            raise ValueError("unexpected official ball input for this review")
+        return None
+    if csv_path is None or decisions.get("official_ball_sha256") != expected or sha(csv_path.read_bytes()) != expected:
+        raise ValueError("published ball annotation identity mismatch")
+    marks = {}
+    with csv_path.open(encoding="utf-8-sig", newline="") as file:
+        for row in csv.DictReader(file):
+            tick = int(row["Frame"])
+            if tick in marks:
+                raise ValueError("duplicate official ball timestamp")
+            visible = int(row["Visibility"])
+            if visible in (0, 1):
+                marks[tick] = {"status": "visible" if visible else "missing",
+                               "point": [int(row["X"]), int(row["Y"])] if visible else None}
+    return marks
+
+
 def main():
     p=argparse.ArgumentParser()
     p.add_argument('--review',type=Path,required=True)
     p.add_argument('--decisions',type=Path,required=True)
     p.add_argument('--out',type=Path,required=True)
+    p.add_argument('--official-ball',type=Path)
     a=p.parse_args()
     review=read_review(a.review)
     decisions=json.loads(a.decisions.read_text())
@@ -55,6 +78,7 @@ def main():
         raise ValueError('review identity or reviewer missing')
     if not isinstance(decisions.get('frames'),list) or len(decisions['frames'])!=len(review['frames']):
         raise ValueError('incomplete frame decisions')
+    marks=official_positions(review,decisions,a.official_ball)
     out=[]
     for frame,chosen in zip(review['frames'],decisions['frames'],strict=True):
         if (chosen.get('id'),chosen.get('frame_index'),chosen.get('source_sha256'))!=(frame['id'],frame['frame_index'],frame['source_sha256']):
@@ -90,7 +114,9 @@ def main():
                 result['mask']={'png_base64':base64.b64encode(buf.getvalue()).decode(),'foreground_pixels':count,'sha256':sha(buf.getvalue())}
                 result['method']='human_accept_source_model_proposal' if status=='accept' else 'human_replacement_polygons'
             people.append(result)
-        ball=chosen.get('ball')
+        if marks is not None and ('ball' in chosen or frame['frame_index'] not in marks):
+            raise ValueError('an official-only ball tick is missing or has a separate reviewer decision')
+        ball=chosen.get('ball') if marks is None else marks[frame['frame_index']]
         if not isinstance(ball,dict) or ball.get('status') not in ('visible','missing','unsure'):
             raise ValueError('invalid ball status')
         point=ball.get('point')
@@ -103,7 +129,10 @@ def main():
     if a.out.exists():
         raise ValueError('output already exists')
     a.out.mkdir(parents=True)
-    result={'schema':'pointstream-al028-human-review-v1','reviewer':decisions['reviewer'],'source_sha256':review['source_video_sha256'],'review_sha256':review['review_sha256'],'width':1920,'height':1080,'fps':[25,1],'frames':out}
+    result={'schema':'pointstream-al028-human-review-v1','reviewer':decisions['reviewer'],'source_sha256':review['source_video_sha256'],'review_sha256':review['review_sha256'],'width':1920,'height':1080,'fps':review['source_video_fps'],'frames':out}
+    if marks is not None:
+        result.update(schema="pointstream-reviewed-player-official-ball-v1",
+                      ball_source="official dataset",official_ball_sha256=review["official_ball_sha256"])
     (a.out/'annotations.json').write_text(json.dumps(result,indent=2)+'\n')
     print(json.dumps({'frames':len(out),'reviewer':result['reviewer'],'output':str(a.out/'annotations.json')}))
 

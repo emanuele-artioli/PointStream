@@ -1,0 +1,150 @@
+[
+  {
+    "job": "20261122T143723Z-8b0fe232",
+    "source_revision": "5c36e6bbf869c6025929c992d1f1b077f63895a3",
+    "source_sha256": "f3b6b567947db7bb07772e00577788b655c23236d841b2bc497c27b3f081c9bf",
+    "native_archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T143723Z-8b0fe232/full/published.tar",
+    "archive_sha256": "7af870c893ee7d8c62ae1c1c18e4a735d19baf09a12204665a9019369e753ab4",
+    "validation": {
+      "passed": true,
+      "checks": {
+        "complete": true,
+        "source_frames_verified": 240,
+        "full_source_support": true,
+        "producer": "20261122T143042Z-9c4291e9",
+        "scored_person_ticks": 480,
+        "source_self": true,
+        "review_samples": 0,
+        "forecast_s": 571.6415838194807
+      }
+    },
+    "producer": "20261122T143042Z-9c4291e9",
+    "measurements": {
+      "name": "dcvc-480-q29",
+      "source_sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+      "support_rle_sha256": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e",
+      "support_method": "Original frozen SAM31 source supports, per-player DISTS on tight bounds plus 32 pixels; 2x replication of half-resolution binary masks.",
+      "native_fps": "30000/1001",
+      "source_grid_sha256": "8b324515a0d7ccbdf5e2fbb04f9d0141fd6493f8d95c89e51ea39653b4aafdf6",
+      "frames": 240,
+      "bytes": 13602,
+      "kbps": 13.588411588411589,
+      "width": 480,
+      "height": 272,
+      "kind": "yuv_tar",
+      "sha256": "e979a62ea50b95eea9fd103a1278fa0e6e2e8bf13e88be7cd147d79e7133f9a1",
+      "decoded_sha256": "a53e3fa6255a07eed57fa2ffebf83cd57e2c9af056293c665247d67dd9b5832c",
+      "pooled": {
+        "dists": 0.4614403850088517,
+        "rgb_psnr": 17.6134356963637,
+        "ticks": 480
+      },
+      "near": {
+        "dists": 0.42360022887587545,
+        "rgb_psnr": 18.276604365716757,
+        "ticks": 240
+      },
+      "far": {
+        "dists": 0.4992805411418279,
+        "rgb_psnr": 15.463604246606064,
+        "ticks": 240
+      },
+      "optional_review_ticks_on_source_model": {
+        "dists": 0.4561978727579117,
+        "rgb_psnr": 17.981076360172494,
+        "ticks": 24
+      },
+      "whole_rgb_psnr": 25.399064395722313,
+      "source_self_abs": 1.1920928955078125e-07,
+      "cpu_seconds": 334.605621677,
+      "benchmark_forecast": 536.21727414,
+      "elapsed_s": 335.134416203975,
+      "tool": {
+        "cv2": "4.10.0",
+        "torch": "2.10.0+cu128",
+        "weight_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+        "device": "cpu"
+      },
+      "source_raw_rgb_crosschecked": 240,
+      "producer_job": "20261122T143042Z-9c4291e9",
+      "cross_machine_calibration": null,
+      "job_kind": "warm-neural",
+      "score_wall_s": 335.1407523909875,
+      "total_wall_s": 341.0859628659964
+    }
+  },
+  {
+    "job": "20261122T143721Z-e5245c3e",
+    "source_revision": "5c36e6bbf869c6025929c992d1f1b077f63895a3",
+    "source_sha256": "f3b6b567947db7bb07772e00577788b655c23236d841b2bc497c27b3f081c9bf",
+    "native_archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T143721Z-e5245c3e/full/published.tar",
+    "archive_sha256": "b07a2dcff3987b748bc9a59924c0fea2672775d9e09d382aaedf0cbe2598d08b",
+    "validation": {
+      "passed": true,
+      "checks": {
+        "complete": true,
+        "source_frames_verified": 240,
+        "full_source_support": true,
+        "producer": "20261122T142755Z-78b520ea",
+        "scored_person_ticks": 480,
+        "source_self": true,
+        "review_samples": 0,
+        "forecast_s": 587.3743134855176
+      }
+    },
+    "producer": "20261122T142755Z-78b520ea",
+    "measurements": {
+      "name": "dcvc-480-q31",
+      "source_sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+      "support_rle_sha256": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e",
+      "support_method": "Original frozen SAM31 source supports, per-player DISTS on tight bounds plus 32 pixels; 2x replication of half-resolution binary masks.",
+      "native_fps": "30000/1001",
+      "source_grid_sha256": "8b324515a0d7ccbdf5e2fbb04f9d0141fd6493f8d95c89e51ea39653b4aafdf6",
+      "frames": 240,
+      "bytes": 15028,
+      "kbps": 15.012987012987013,
+      "width": 480,
+      "height": 272,
+      "kind": "yuv_tar",
+      "sha256": "5d69533cf9d1b3352be421b2ebebc6a2435b545d892cc70cd6a2521c96eb25e0",
+      "decoded_sha256": "242aa71a64f2d853a5b62660f19e82be903c6ae17db066720f0e2f3af8b4756b",
+      "pooled": {
+        "dists": 0.4512989076475302,
+        "rgb_psnr": 17.832218125753734,
+        "ticks": 480
+      },
+      "near": {
+        "dists": 0.4115525516370932,
+        "rgb_psnr": 18.50880917825373,
+        "ticks": 240
+      },
+      "far": {
+        "dists": 0.49104526365796725,
+        "rgb_psnr": 15.650784910587067,
+        "ticks": 240
+      },
+      "optional_review_ticks_on_source_model": {
+        "dists": 0.4467361445228259,
+        "rgb_psnr": 18.128305025362586,
+        "ticks": 24
+      },
+      "whole_rgb_psnr": 25.4704379995825,
+      "source_self_abs": 1.1920928955078125e-07,
+      "cpu_seconds": 344.289008259,
+      "benchmark_forecast": 562.5486141000001,
+      "elapsed_s": 345.2980771290022,
+      "tool": {
+        "cv2": "4.10.0",
+        "torch": "2.10.0+cu128",
+        "weight_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+        "device": "cpu"
+      },
+      "source_raw_rgb_crosschecked": 240,
+      "producer_job": "20261122T142755Z-78b520ea",
+      "cross_machine_calibration": null,
+      "job_kind": "warm-neural",
+      "score_wall_s": 345.3042101649917,
+      "total_wall_s": 351.5736692879873
+    }
+  }
+]

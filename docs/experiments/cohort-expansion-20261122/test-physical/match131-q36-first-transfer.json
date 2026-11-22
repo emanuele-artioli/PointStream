@@ -1,0 +1,16 @@
+{
+  "job": "20261122T132543Z-37c9934c",
+  "original_status": "submission_unknown",
+  "spec_sha256": "619308ed0ec420ce9040a1dd78bc1d0ba8a8e8fa1e17d96a4f8a277e1094ac68",
+  "snapshot_sha256": "52b1fe1ed7db89e18d6c42f357b84968f0b2ab29ab6648c76d616b329ac1f5cc",
+  "canonical_status": "unpublished or unknown",
+  "shared_state_inspected_via": "gpu6",
+  "directory_files": {
+    "source.tar": 18041389,
+    "events/": 0
+  },
+  "atomic_ready_json": false,
+  "spec_json": false,
+  "claim": false,
+  "decision": "Canonical status plus direct shared-inbox listing show an interrupted transfer before atomic publication. Submission client terminated. No GPU job was published or started. Preserve these files and issue a distinct request via reachable gpu6."
+}

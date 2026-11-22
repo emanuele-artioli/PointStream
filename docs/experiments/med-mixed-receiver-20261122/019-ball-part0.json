@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.cohort_ball_part"
+  ],
+  "arguments": [
+    "--source",
+    "{staged:source}",
+    "--metadata",
+    "{staged:metadata}",
+    "--archive",
+    "{staged:archive}",
+    "--weights",
+    "{staged:weights}",
+    "--first",
+    "0",
+    "--frames",
+    "{frames}"
+  ],
+  "staged_inputs": [
+    {
+      "name": "source",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/sources/medvedev_struff__019.mp4",
+      "sha256": "1c13479eb3b6f8d175eb6f5020c629896e6b01f719014ec995a06b4c6c5a3e9c",
+      "extract": false
+    },
+    {
+      "name": "metadata",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/med-mixed-metadata-20261122/med019.json",
+      "sha256": "ce25c7ae8d2c985a389947c8fecdbbba0b2e2e4605010b6ed888f5b3c6959dc0",
+      "extract": false
+    },
+    {
+      "name": "archive",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/RacketVision-c44af2a.tar",
+      "sha256": "5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff",
+      "extract": false
+    },
+    {
+      "name": "weights",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/balltrack_best.state_dict.pt",
+      "sha256": "b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/sources/medvedev_struff__019.mp4",
+      "sha256": "1c13479eb3b6f8d175eb6f5020c629896e6b01f719014ec995a06b4c6c5a3e9c"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/med-mixed-metadata-20261122/med019.json",
+      "sha256": "ce25c7ae8d2c985a389947c8fecdbbba0b2e2e4605010b6ed888f5b3c6959dc0"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/RacketVision-c44af2a.tar",
+      "sha256": "5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/balltrack_best.state_dict.pt",
+      "sha256": "b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "required_commands": [],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.cohort_ball_part",
+    "--validate"
+  ],
+  "deadline": "2026-11-22T21:01:00Z",
+  "verify_staged_inputs": true,
+  "stall_seconds": 2430,
+  "contention": {
+    "policy": "stop",
+    "resume_attempts": 0
+  },
+  "device": "cpu",
+  "hosts": [
+    "gpu1"
+  ],
+  "gpu_models": [],
+  "gpu_memory_mib": 0,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "local_storage_gib": 30,
+  "smoke": {
+    "seconds": 450,
+    "representative_basis": "Same sender, fixed source/weights; actual 240-frame median and three-frame lookback, repeated split equality for a real 12-tick global interval; complete real 24-tick native fit and pack for assembly."
+  },
+  "full": {
+    "seconds": 2400
+  },
+  "validator_seconds": 60,
+  "budget_seconds": 3000,
+  "scale": {
+    "frames": {
+      "smoke": 12,
+      "full": 120
+    }
+  }
+}

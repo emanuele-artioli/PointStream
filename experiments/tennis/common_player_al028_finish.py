@@ -15,12 +15,13 @@ import numpy as np
 
 from experiments.tennis import common_player_packet as packet
 from experiments.tennis import common_receiver_manifest as manifest
+from experiments.tennis import med_mixed_channel as mixed
 from experiments.tennis import k6b, k6b_receiver_sam as sam
 from experiments.tennis import w8_receiver_finish as w8
 from experiments.tennis.k6b_real_base_compose import compose
 from experiments.tennis.player_requalification import array_sha
 from experiments.tennis.w8_input_job import file_sha
-from src.pointstream.tracked_patch import yuv_to_rgb
+from src.pointstream.tracked_patch import yuv_to_rgb as yuv_to_rgb
 
 YUV_SHA = "f2b9dd6a2370b3a6267a0379339360307bfe7900f58e7a503b8b2a2b1756bafb"
 SMOKE = [0, 11, 23, 43]
@@ -115,7 +116,7 @@ def generated_input(name: str, config: dict, geom: tuple, ticks: list[int]) -> n
     if (
         receipt["carrier_sha256"] != config["carrier_sha256"]
         or receipt["conditioning_only"] is not False
-        or frames not in (44, 240)
+        or frames not in (44, 120, 240)
         or frames <= max(ticks)
     ):
         raise ValueError("generation seal does not cover this carrier and stage")
@@ -227,14 +228,22 @@ def run(config: dict, isolation: dict) -> dict:
     _isolation(isolation)
     start = time.monotonic()
     ticks = config["ticks"]
-    if ticks not in (SMOKE, FULL) or any(type(t) is not int for t in ticks):
-        raise ValueError("unsupported SAM witness stage")
     carrier = Path(config["carrier"])
     expected = config["carrier_sha256"]
     verified = manifest.verify(Path(config["manifest"]), expected)
     if carrier.stat().st_size > 4 * 1024 * 1024:
         raise ValueError("oversized player carrier")
-    profile, base, geom = geometry(carrier.read_bytes(), expected)
+    channel = None
+    if "joint" in config:
+        channel = mixed.decode(Path(config["joint"]), Path(config["cache"]), carrier, expected)
+        profile, base, geom = channel["profile"], channel["base"], channel["geometry"]
+        run_start, run_stop = channel["start"], channel["stop"]
+        smoke = mixed.smoke_ticks(run_start, run_stop)
+    else:
+        profile, base, geom = geometry(carrier.read_bytes(), expected)
+        run_start, run_stop, smoke = 0, 240, SMOKE
+    if ticks not in (smoke, FULL) or any(type(t) is not int for t in ticks):
+        raise ValueError("unsupported SAM receiver stage")
     order = profile["order"]
     if set(config["generated"]) != set(order) or set(config["generation_receipts"]) != set(order):
         raise ValueError("expected both generated player streams and their receipts")
@@ -247,7 +256,7 @@ def run(config: dict, isolation: dict) -> dict:
         not binary.is_absolute()
         or yuv.exists()
         or file_sha(binary) != w8.FFMPEG_SHA
-        or file_sha(ivf) != "8466fe0f097c79a2383351ea9ccce438ea62cd1e0283d25d5c68b08ee4b96c8d"
+        or file_sha(ivf) != hashlib.sha256(base).hexdigest()
     ):
         raise ValueError("native decoder or target IVF identity differs")
     args = [
@@ -270,7 +279,7 @@ def run(config: dict, isolation: dict) -> dict:
     ]
     decode_start = time.monotonic()
     subprocess.run(args, check=True, timeout=120, stdin=subprocess.DEVNULL, capture_output=True)
-    if yuv.stat().st_size != 240 * 160 * 144 or file_sha(yuv) != YUV_SHA:
+    if yuv.stat().st_size != 240 * 160 * 144 or (channel is None and file_sha(yuv) != YUV_SHA):
         raise ValueError("incomplete native decode")
     native = np.memmap(yuv, np.uint8, mode="r", shape=(240, 144, 160))
     native_seconds = time.monotonic() - decode_start
@@ -300,7 +309,8 @@ def run(config: dict, isolation: dict) -> dict:
     ):
         raise RuntimeError("SAM source, weights or device changed")
     model_seconds = time.monotonic() - model_start
-    crops = {name: generated_input(name, config, geom[name], ticks) for name in order}
+    local_ticks = [t - run_start for t in ticks if run_start <= t < run_stop]
+    crops = {name: generated_input(name, config, geom[name], local_ticks) for name in order}
     dest = np.lib.format.open_memmap(
         output / "frames.npy", mode="w+", dtype=np.uint8, shape=(len(ticks), 1080, 1920, 3)
     )
@@ -311,16 +321,18 @@ def run(config: dict, isolation: dict) -> dict:
     for i, tick in enumerate(ticks):
         tick_start = time.monotonic()
         sam_seconds = 0.0
-        canvas = cv2.resize(
-            yuv_to_rgb(native[tick], 160, 96, False), (1920, 1080), interpolation=cv2.INTER_CUBIC
-        )
+        canvas = mixed.canvas(native[tick], tick, channel)
         active, masks = {}, {}
         for name in order:
+            if not run_start <= tick < run_stop:
+                mask_arrays[name].append(np.zeros((784, 512), bool))
+                continue
+            local = tick - run_start
             _, kp, boxes = geom[name]
-            box = boxes[tick]
-            crop = crops[name][tick]
+            box = boxes[local]
+            crop = crops[name][local]
             active[name] = crop, box
-            prompt = crop_prompt(kp[tick], box)
+            prompt = crop_prompt(kp[local], box)
             if prompt is not None:
                 predict_start = time.monotonic()
                 mask, events = _predict(tracker.model, crop, prompt, not kernels)
@@ -363,7 +375,7 @@ def run(config: dict, isolation: dict) -> dict:
         "total_receiver_bytes": carrier.stat().st_size + verified["manifest_bytes"],
         "manifest_sha256": verified["manifest_sha256"],
         "native_sha256": w8.FFMPEG_SHA,
-        "yuv_sha256": YUV_SHA,
+        "yuv_sha256": file_sha(yuv),
         "mask_files": mask_files,
         "frames_file_sha256": file_sha(output / "frames.npy"),
         "sam_weight": verified["sam_weight"],
@@ -381,5 +393,7 @@ def run(config: dict, isolation: dict) -> dict:
         "finalization_seconds": time.monotonic() - loop_start - loop_seconds,
         "elapsed_seconds": time.monotonic() - start,
     }
+    if channel is not None:
+        result["wire"] = channel["wire"]
     (output / "finish.json").write_text(json.dumps(result, sort_keys=True) + "\n")
     return result

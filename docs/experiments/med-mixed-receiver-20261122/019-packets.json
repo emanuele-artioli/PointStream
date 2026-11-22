@@ -1,0 +1,388 @@
+{
+  "source_sha256": "1c13479eb3b6f8d175eb6f5020c629896e6b01f719014ec995a06b4c6c5a3e9c",
+  "clip": "019",
+  "frames": 240,
+  "native_fps": 50,
+  "active": [
+    92,
+    212
+  ],
+  "foreground": [
+    {
+      "unit": "medvedev_struff__019_at120__person_000000000003",
+      "real_ticks": 120,
+      "first": 92,
+      "last": 211,
+      "visible_coordinate_95": 0.0,
+      "visible_coordinate_max": 2.0,
+      "reference_rgb_sha256": "8949658bfdadda100896a5ab73a857e50b2bd87902fdeef553ceacb922ceb38e",
+      "reference_bytes": 30976
+    },
+    {
+      "unit": "medvedev_struff__019_at120__person_000000000002",
+      "real_ticks": 120,
+      "first": 92,
+      "last": 211,
+      "visible_coordinate_95": 0.0,
+      "visible_coordinate_max": 2.23606797749979,
+      "reference_rgb_sha256": "add7f1513fcafc0e809965fa3b3ebfe17ded936185d269404377a11d415e3e5e",
+      "reference_bytes": 121617
+    }
+  ],
+  "donor": {
+    "source_yuv_sha256": "5d074a4f772b1d39cdb2d0555e38589e71a26f99c0816bbf0c1391e3e5d7d6fc",
+    "mixed_yuv_sha256": "52e6c64c67b75d965a8d989d46285736f18c79e1e5a5f521429ee6216460acc6",
+    "sender_fill_mask_sha256": "3836221e9d13f20108a3adb6cb79538e76f9f11ecf11644c170a8babf3878a14",
+    "donors": [
+      {
+        "local_tick": 0,
+        "pairs": 6773,
+        "inliers": 6773
+      },
+      {
+        "local_tick": 7,
+        "pairs": 6501,
+        "inliers": 6493
+      },
+      {
+        "local_tick": 15,
+        "pairs": 6373,
+        "inliers": 6358
+      },
+      {
+        "local_tick": 22,
+        "pairs": 6273,
+        "inliers": 6259
+      },
+      {
+        "local_tick": 30,
+        "pairs": 6120,
+        "inliers": 6104
+      },
+      {
+        "local_tick": 37,
+        "pairs": 6035,
+        "inliers": 6008
+      },
+      {
+        "local_tick": 45,
+        "pairs": 5982,
+        "inliers": 5950
+      },
+      {
+        "local_tick": 52,
+        "pairs": 5950,
+        "inliers": 5921
+      },
+      {
+        "local_tick": 60,
+        "pairs": 5861,
+        "inliers": 5827
+      },
+      {
+        "local_tick": 67,
+        "pairs": 5824,
+        "inliers": 5795
+      },
+      {
+        "local_tick": 74,
+        "pairs": 5770,
+        "inliers": 5740
+      },
+      {
+        "local_tick": 82,
+        "pairs": 5698,
+        "inliers": 5667
+      },
+      {
+        "local_tick": 89,
+        "pairs": 5693,
+        "inliers": 5657
+      },
+      {
+        "local_tick": 97,
+        "pairs": 5605,
+        "inliers": 5573
+      },
+      {
+        "local_tick": 104,
+        "pairs": 5546,
+        "inliers": 5508
+      },
+      {
+        "local_tick": 112,
+        "pairs": 5629,
+        "inliers": 5593
+      },
+      {
+        "local_tick": 119,
+        "pairs": 5674,
+        "inliers": 5635
+      }
+    ],
+    "holes": [
+      1311,
+      344,
+      344
+    ],
+    "forecast_seconds": 151.01187599983678
+  },
+  "rates": [
+    {
+      "crf": 70,
+      "kbps_cached": 19.108333333333334,
+      "kbps_cold": 274.6616666666667,
+      "base_bytes": 8858,
+      "pose_bytes": 1042,
+      "ball_bytes": 210,
+      "init_bytes": 153332,
+      "joint_bytes": 11465,
+      "carrier_sha256": "657b47ef94dbaff2cccea22b3fc9c62c2288d192230484e7b43ff02948c40321",
+      "manifest_sha256": "a5f6b0db08b5ca70e1af5078d891a7414d122c17b974290067e6684f62fc1c4e",
+      "base_sha256": "97dd472ed1727a2217ed8e6158b2d9bc2e9851806a75fdd7a13b11ce2ff2cfc0",
+      "decoded_sha256": "665afa036f43d54dea1093d20771070ec12a49d7149aacfaea9fc5420747bafc",
+      "joint_sha256": "78b0e9281bc06e0f0fda15a07f0d8a7f629c0dbf9c8b6db503c4a14d88219a69",
+      "init_sha256": "6038cd2c5511ee92ba5407b8e8dbad34f43df3144bbf4917d5296863ea007bde",
+      "native": {
+        "stream": "/private/tmp/ps-med019-paid-mixed-donor-20261122/crf70/stream.ivf",
+        "decoded": "/private/tmp/ps-med019-paid-mixed-donor-20261122/crf70/decoded.yuv",
+        "stream_sha256": "97dd472ed1727a2217ed8e6158b2d9bc2e9851806a75fdd7a13b11ce2ff2cfc0",
+        "file_bytes": 8858,
+        "payload_bytes": 5946,
+        "temporal_units": 240,
+        "decoded_frames": 240.0,
+        "encode_command": [
+          "/opt/homebrew/bin/SvtAv1EncApp",
+          "-i",
+          "/private/tmp/ps-med019-paid-mixed-donor-20261122/base.yuv",
+          "-b",
+          "/private/tmp/ps-med019-paid-mixed-donor-20261122/crf70/stream.ivf",
+          "-w",
+          "160",
+          "-h",
+          "96",
+          "--input-depth",
+          "8",
+          "--fps-num",
+          "50",
+          "--fps-denom",
+          "1",
+          "-n",
+          "240",
+          "--color-range",
+          "0",
+          "--rc",
+          "0",
+          "--crf",
+          "70",
+          "--preset",
+          "4",
+          "--keyint",
+          "-1",
+          "--lp",
+          "6",
+          "--progress",
+          "0"
+        ],
+        "decode_command": [
+          "/opt/homebrew/bin/dav1d",
+          "-i",
+          "/private/tmp/ps-med019-paid-mixed-donor-20261122/crf70/stream.ivf",
+          "-o",
+          "/private/tmp/ps-med019-paid-mixed-donor-20261122/crf70/decoded.yuv",
+          "--threads",
+          "1",
+          "--quiet"
+        ],
+        "encode_seconds": 0.215,
+        "encode_cpu_seconds": 0.419,
+        "decode_seconds": 0.065,
+        "decode_cpu_seconds": 0.058,
+        "cpus": null,
+        "host_load_before": [
+          5.95,
+          8.21,
+          7.32
+        ]
+      }
+    },
+    {
+      "crf": 60,
+      "kbps_cached": 23.006666666666668,
+      "kbps_cold": 278.56,
+      "base_bytes": 11196,
+      "pose_bytes": 1042,
+      "ball_bytes": 210,
+      "init_bytes": 153332,
+      "joint_bytes": 13804,
+      "carrier_sha256": "c798ebcd531d70f0924aa24816c090cf92ae0fd963975291ee8bc4024209b0fa",
+      "manifest_sha256": "6b17fb11cf712bbea1aee40dff1e7baba227d2c143fec6897a7816c2caef0dfd",
+      "base_sha256": "830906780940fa754ee156b51cc4b8b3a80e12511ca1da8a3096eb2f33112448",
+      "decoded_sha256": "910eefbeadca72f9b67cffd058264f3cd040bce56705380d6a9e201e865c7add",
+      "joint_sha256": "4b077859fe3d808ff624a81fe33fceb647803052ad8cd3266afb1ef8c1c175d3",
+      "init_sha256": "6038cd2c5511ee92ba5407b8e8dbad34f43df3144bbf4917d5296863ea007bde",
+      "native": {
+        "stream": "/private/tmp/ps-med019-paid-mixed-donor-20261122/crf60/stream.ivf",
+        "decoded": "/private/tmp/ps-med019-paid-mixed-donor-20261122/crf60/decoded.yuv",
+        "stream_sha256": "830906780940fa754ee156b51cc4b8b3a80e12511ca1da8a3096eb2f33112448",
+        "file_bytes": 11196,
+        "payload_bytes": 8284,
+        "temporal_units": 240,
+        "decoded_frames": 240.0,
+        "encode_command": [
+          "/opt/homebrew/bin/SvtAv1EncApp",
+          "-i",
+          "/private/tmp/ps-med019-paid-mixed-donor-20261122/base.yuv",
+          "-b",
+          "/private/tmp/ps-med019-paid-mixed-donor-20261122/crf60/stream.ivf",
+          "-w",
+          "160",
+          "-h",
+          "96",
+          "--input-depth",
+          "8",
+          "--fps-num",
+          "50",
+          "--fps-denom",
+          "1",
+          "-n",
+          "240",
+          "--color-range",
+          "0",
+          "--rc",
+          "0",
+          "--crf",
+          "60",
+          "--preset",
+          "4",
+          "--keyint",
+          "-1",
+          "--lp",
+          "6",
+          "--progress",
+          "0"
+        ],
+        "decode_command": [
+          "/opt/homebrew/bin/dav1d",
+          "-i",
+          "/private/tmp/ps-med019-paid-mixed-donor-20261122/crf60/stream.ivf",
+          "-o",
+          "/private/tmp/ps-med019-paid-mixed-donor-20261122/crf60/decoded.yuv",
+          "--threads",
+          "1",
+          "--quiet"
+        ],
+        "encode_seconds": 0.255,
+        "encode_cpu_seconds": 0.486,
+        "decode_seconds": 0.053,
+        "decode_cpu_seconds": 0.048,
+        "cpus": null,
+        "host_load_before": [
+          5.95,
+          8.21,
+          7.32
+        ]
+      }
+    },
+    {
+      "crf": 50,
+      "kbps_cached": 26.748333333333335,
+      "kbps_cold": 282.3016666666667,
+      "base_bytes": 13441,
+      "pose_bytes": 1042,
+      "ball_bytes": 210,
+      "init_bytes": 153332,
+      "joint_bytes": 16049,
+      "carrier_sha256": "91cd7613a8f1143d8f18163cfcdd4afba779ffe698148e4343d4f54762ad10cd",
+      "manifest_sha256": "2941aebd6585fa94e2733c7c9fb0ff14c80e16843156cc62c851d2e7c943f8e4",
+      "base_sha256": "3991c453e81764e04f8a7aed6e6ff721f8544d6c25fd34a3cc0c90d6abea3148",
+      "decoded_sha256": "5b98a6aa5be0405c3a823ae9d5eff931990eeb6c710b918368fea21501a99ead",
+      "joint_sha256": "6bdc4f1317d578d6b5ac34bc92cd49a76464852b681ba54255f81381626d7802",
+      "init_sha256": "6038cd2c5511ee92ba5407b8e8dbad34f43df3144bbf4917d5296863ea007bde",
+      "native": {
+        "stream": "/private/tmp/ps-med019-paid-mixed-donor-20261122/crf50/stream.ivf",
+        "decoded": "/private/tmp/ps-med019-paid-mixed-donor-20261122/crf50/decoded.yuv",
+        "stream_sha256": "3991c453e81764e04f8a7aed6e6ff721f8544d6c25fd34a3cc0c90d6abea3148",
+        "file_bytes": 13441,
+        "payload_bytes": 10529,
+        "temporal_units": 240,
+        "decoded_frames": 240.0,
+        "encode_command": [
+          "/opt/homebrew/bin/SvtAv1EncApp",
+          "-i",
+          "/private/tmp/ps-med019-paid-mixed-donor-20261122/base.yuv",
+          "-b",
+          "/private/tmp/ps-med019-paid-mixed-donor-20261122/crf50/stream.ivf",
+          "-w",
+          "160",
+          "-h",
+          "96",
+          "--input-depth",
+          "8",
+          "--fps-num",
+          "50",
+          "--fps-denom",
+          "1",
+          "-n",
+          "240",
+          "--color-range",
+          "0",
+          "--rc",
+          "0",
+          "--crf",
+          "50",
+          "--preset",
+          "4",
+          "--keyint",
+          "-1",
+          "--lp",
+          "6",
+          "--progress",
+          "0"
+        ],
+        "decode_command": [
+          "/opt/homebrew/bin/dav1d",
+          "-i",
+          "/private/tmp/ps-med019-paid-mixed-donor-20261122/crf50/stream.ivf",
+          "-o",
+          "/private/tmp/ps-med019-paid-mixed-donor-20261122/crf50/decoded.yuv",
+          "--threads",
+          "1",
+          "--quiet"
+        ],
+        "encode_seconds": 0.225,
+        "encode_cpu_seconds": 0.469,
+        "decode_seconds": 0.046,
+        "decode_cpu_seconds": 0.035,
+        "cpus": null,
+        "host_load_before": [
+          5.95,
+          8.21,
+          7.32
+        ]
+      }
+    }
+  ],
+  "selected_crf": 60,
+  "verified_source_denial_pending": true,
+  "tools": {
+    "svt": {
+      "path": "/opt/homebrew/bin/SvtAv1EncApp",
+      "real_path": "/opt/homebrew/Cellar/svt-av1/4.0.1/bin/SvtAv1EncApp",
+      "sha256": "db044194faf94d553c2509c8e033ecd05a373ba54d919d0fb49a3a13149d1687",
+      "version": "SVT-AV1 v4.0.1 (release)"
+    },
+    "dav1d": {
+      "path": "/opt/homebrew/bin/dav1d",
+      "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+      "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+      "version": "1.5.4"
+    },
+    "ffmpeg": {
+      "path": "/opt/homebrew/bin/ffmpeg",
+      "real_path": "/opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg",
+      "sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be",
+      "version": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+    }
+  }
+}

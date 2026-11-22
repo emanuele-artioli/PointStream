@@ -1,0 +1,268 @@
+"""Calculate equal-source, paired outcomes for every frozen official TEST clip."""
+
+from argparse import ArgumentParser
+import json
+from pathlib import Path
+
+import numpy as np
+
+HERE = Path(__file__).resolve().parent
+SEED = 20261122
+REPLICATES = 10000
+GROUPS = ("target", "other-matched", "sensitivity", "unmatched")
+
+
+def aggregate(rows, key):
+    use = [r for r in rows if r.get("candidate_dists") is not None and r.get(key) is not None]
+    if not use:
+        return None
+    values = np.array([[r["candidate_dists"], r[key]] for r in use])
+    rng = np.random.default_rng(SEED)
+    resampled = values[rng.integers(len(values), size=(REPLICATES, len(values)))].mean(axis=1)
+    means = values.mean(axis=0)
+    return dict(
+        n=len(use),
+        candidate=float(means[0]),
+        ordinary=float(means[1]),
+        difference=float(means[0] - means[1]),
+        gain_percent=float(100 * (1 - means[0] / means[1])),
+        mean_within_clip_gain_percent=float(np.mean(100 * (1 - values[:, 0] / values[:, 1]))),
+        difference_95=np.quantile(resampled[:, 0] - resampled[:, 1], [0.025, 0.975]).tolist()
+        if len(values) > 1
+        else None,
+        gain_percent_95=np.quantile(
+            100 * (1 - resampled[:, 0] / resampled[:, 1]), [0.025, 0.975]
+        ).tolist()
+        if len(values) > 1
+        else None,
+        wins=int((values[:, 0] < values[:, 1]).sum()),
+    )
+
+
+def counts(rows):
+    vis = [r for r in rows if r["visibility"] == 1]
+    absent = [r for r in rows if r["visibility"] == 0]
+    result = dict(
+        visible=len(vis),
+        hit5=sum(
+            r["error_native_pixels"] is not None and r["error_native_pixels"] <= 5 for r in vis
+        ),
+        hit10=sum(
+            r["error_native_pixels"] is not None and r["error_native_pixels"] <= 10 for r in vis
+        ),
+        marked_absent=len(absent),
+        emitted_absent=sum(r["present"] for r in absent),
+        visible_position=sum(r["present"] for r in vis),
+        unknown=sum(r["visibility"] not in (0, 1) for r in rows),
+    )
+    emitted = result["visible_position"] + result["emitted_absent"]
+    hits = result["hit10"]
+    result["false_positive10"] = emitted - hits
+    result["false_negative10"] = result["visible"] - hits
+    result["annotated_precision10"] = hits / emitted if emitted else None
+    denom = emitted + result["visible"]
+    result["annotated_f1_10"] = 2 * hits / denom if denom else None
+    return result
+
+
+def paired_localization(rows):
+    matches = [r for r in rows if r.get("source_qualified") and "strongest" in r["rgb"]]
+    if not matches:
+        return None
+    arms = ("source", "ordinary", "strongest", "candidate", "direct")
+    per_match = []
+    for r in matches:
+        by_arm = {**r["rgb"], "direct": r["direct"]}
+        assert all(by_arm[a]["visible"] == r["direct"]["visible"] > 0 for a in arms)
+        per_match.append([100 * by_arm[a]["hit10"] / by_arm[a]["visible"] for a in arms])
+    rates = np.array(per_match)
+    draws = np.random.default_rng(SEED).integers(len(matches), size=(REPLICATES, len(matches)))
+    gains = {}
+    for i in (3, 4):
+        for j in (1, 2):
+            delta = rates[:, i] - rates[:, j]
+            gains[f"{arms[i]}_minus_{arms[j]}"] = dict(
+                percentage_points=float(delta.mean()),
+                interval95=np.quantile(delta[draws].mean(axis=1), [0.025, 0.975]).tolist(),
+            )
+    return dict(
+        matches=[r["match"] for r in matches],
+        macro_percent=dict(zip(arms, rates.mean(axis=0))),
+        gains=gains,
+    )
+
+
+def summarize(data):
+    stage = json.loads((HERE / "staged.json").read_text())["selection"]
+    events = {}
+    for line in (HERE / "test-events.md").read_text().splitlines():
+        cells = [c.strip() for c in line.split("|")]
+        if len(cells) >= 5 and cells[1].isdigit():
+            events["match" + cells[1]] = {"players": cells[2], "event": cells[3]}
+    assert set(events) == {r["match"] for r in stage}
+    rows = []
+    all_marks = []
+    rgb_rows = {arm: [] for arm in ("source", "ordinary", "candidate")}
+    srctotal = []
+    strong_rows = []
+    qualifying_direct = []
+    comparable_strong = {a: [] for a in ("ordinary", "candidate", "direct")}
+    for m in stage:
+        match = m["match"]
+        dest = data / f"{match}-score.json"
+        row = dict(
+            match=match, rank=len(rows) + 1, fps=m["video"]["avg_frame_rate"], **events[match]
+        )
+        rows.append(row)
+        if not dest.exists():
+            row["missing_primary"] = True
+            continue
+        s = json.loads(dest.read_text())
+        assert (
+            s["source_sha256"] == m["source"]["sha256"]
+            and s["labels_sha256"] == m["labels"]["sha256"]
+        )
+        row.update(
+            selection=s["selection"],
+            cadence=s["fps"],
+            court_ticks=s["court_ticks"],
+            ordinary_kbps=s["ordinary_kbps"],
+            candidate_kbps=s["candidate_kbps"],
+            gap_fraction=s["gap_fraction"],
+            ordinary_dists=s["ordinary"]["ball_dists"],
+            candidate_dists=s["candidate"]["ball_dists"],
+            strongest_dists=None
+            if not s["best_affordable"]
+            else s["best_affordable"]["ball_dists"],
+            strongest_kbps=None if not s["best_affordable"] else s["best_affordable"]["kbps"],
+            ordinary_psnr=s["ordinary"]["whole_rgb_psnr"],
+            candidate_psnr=s["candidate"]["whole_rgb_psnr"],
+            unlisted=s["unlisted"],
+            direct=counts(s["direct"]),
+        )
+        assert row["selection"] in GROUPS
+        all_marks += s["direct"]
+        neural = data / f"{match}-neuroscore.json"
+        if not neural.exists():
+            neural = data / f"{match}-neuroscore-fixed.json"
+        if neural.exists():
+            ns = json.loads(neural.read_text())
+            assert (
+                ns["source_rgb_sha256"] == s["source_rgb_sha256"] and ns["visible"] == s["visible"]
+            )
+            row.update(
+                neural_kbps=ns["kbps"],
+                neural_dists=ns["ball_dists"],
+                neural_psnr=ns["whole_rgb_psnr"],
+                neural_affordable=ns["bytes"] <= max(s["candidate_bytes"], s["ordinary_bytes"]),
+            )
+        judge = data / f"{match}-judge-portable.json"
+        if not judge.exists():
+            judge = data / f"{match}-judge-ada-fixed.json"
+        if not judge.exists():
+            judge = data / f"{match}-judge-ada.json"
+        if not judge.exists():
+            judge = data / f"{match}-judge.json"
+        if judge.exists():
+            j = json.loads(judge.read_text())
+            assert j["rgb_sha256"]["source"] == s["source_rgb_sha256"]
+            row["source_qualified"] = j["source_qualified"]
+            row["rgb"] = {k: counts(v["rows"]) for k, v in j["detections"].items()}
+            srctotal += j["detections"]["source"]["rows"]
+            if j["source_qualified"]:
+                qualifying_direct += s["direct"]
+                for key, vs in j["detections"].items():
+                    rgb_rows[key] += vs["rows"]
+                strong_sha = s["best_affordable"]["sha256"]
+                row["strong_rgb_reused"] = strong_sha == s["ordinary_sha256"]
+                strong = None
+                if row["strong_rgb_reused"]:
+                    strong = j["detections"]["ordinary"]["rows"]
+                elif (data / f"{match}-strongjudge.json").exists():
+                    sr = json.loads((data / f"{match}-strongjudge.json").read_text())
+                    assert (
+                        sr["packet_sha256"] == strong_sha
+                        and sr["source_sha256"] == s["source_sha256"]
+                        and sr["source_visible"] == j["visible"]
+                    )
+                    strong = sr["detector"]["rows"]
+                if strong is not None:
+                    assert [(x["tick"], x["visibility"]) for x in strong] == [
+                        (x["tick"], x["visibility"]) for x in j["detections"]["ordinary"]["rows"]
+                    ]
+                    row["rgb"]["strongest"] = counts(strong)
+                    strong_rows += strong
+                    comparable_strong["direct"] += s["direct"]
+                    for arm in ("ordinary", "candidate"):
+                        comparable_strong[arm] += j["detections"][arm]["rows"]
+    groups = {}
+    for name, gr in [(name, [r for r in rows if r.get("selection") == name]) for name in GROUPS] + [
+        ("matched-actual", [r for r in rows if r.get("selection") in GROUPS[:2]])
+    ]:
+        paired = [r for r in gr if r.get("candidate_dists") is not None]
+        groups[name] = dict(
+            clips=len(gr),
+            same_geometry=aggregate(gr, "ordinary_dists"),
+            strongest_affordable=aggregate(gr, "strongest_dists"),
+            matched_psnr_delta_db=np.mean(
+                [r["candidate_psnr"] - r["ordinary_psnr"] for r in gr]
+            ).item()
+            if gr
+            else None,
+            with_visible=len(paired),
+            affordable_neural=aggregate(
+                [r for r in gr if r.get("neural_affordable")], "neural_dists"
+            ),
+        )
+    visible = [r for r in rows if r.get("direct", {}).get("visible")]
+    return dict(
+        seed=SEED,
+        resamples=REPLICATES,
+        count=len(rows),
+        scored=sum("direct" in r for r in rows),
+        scored_regardless_of_scene_eligibility=True,
+        routing=dict(
+            all_court=[r["match"] for r in rows if r.get("court_ticks") == 240],
+            all_other=[r["match"] for r in rows if r.get("court_ticks") == 0],
+            mixed=[r["match"] for r in rows if 0 < r.get("court_ticks", 0) < 240],
+            full_court_matched_same=aggregate(
+                [r for r in rows if r.get("court_ticks") == 240 and r["selection"] in GROUPS[:2]],
+                "ordinary_dists",
+            ),
+            full_court_matched_strongest=aggregate(
+                [r for r in rows if r.get("court_ticks") == 240 and r["selection"] in GROUPS[:2]],
+                "strongest_dists",
+            ),
+        ),
+        rows=rows,
+        groups=groups,
+        combined_direct=counts(all_marks),
+        macro_hit10=float(np.mean([r["direct"]["hit10"] / r["direct"]["visible"] for r in visible]))
+        if visible
+        else None,
+        source_qualified=sum(bool(r.get("source_qualified")) for r in rows),
+        judge_count=sum("source_qualified" in r for r in rows),
+        rgb_source_all_scored=counts(srctotal),
+        strongest_judge_count=sum("strongest" in r.get("rgb", {}) for r in rows),
+        rgb_strongest_qualified_scored=counts(strong_rows),
+        direct_on_qualified_sources=counts(qualifying_direct),
+        same_sources_as_strongest={a: counts(v) for a, v in comparable_strong.items()},
+        rgb_source_qualified={k: counts(v) for k, v in rgb_rows.items()},
+        paired_localization=paired_localization(rows),
+    )
+
+
+if __name__ == "__main__":
+    p = ArgumentParser(description=__doc__)
+    p.add_argument("--data", type=Path, default=HERE / "test-physical")
+    p.add_argument("--out", type=Path, required=True)
+    a = p.parse_args()
+    result = summarize(a.data)
+    a.out.write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
+    print(
+        result["scored"],
+        "/",
+        result["count"],
+        result["combined_direct"],
+        result["groups"]["target"],
+    )

@@ -1,0 +1,1214 @@
+{
+  "frames": 480,
+  "cadence": [
+    25,
+    1
+  ],
+  "width": 640,
+  "height": 384,
+  "source_files": [
+    "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934",
+    "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76"
+  ],
+  "raw_input_sha256": [
+    "d885fdd89709fe6c74733a7a1681118ad06f8dfcd4af1b7559537b49b61fd888",
+    "c83491a1d590daf5839347051716512cc91cb3816708a4cb343c0ef3714397d6"
+  ],
+  "toolchain": {
+    "SvtAv1EncApp": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "sha256": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+      "version": "SVT-AV1 v4.2.0 (release)"
+    },
+    "dav1d": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+      "version": "1.5.4"
+    },
+    "ffprobe": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffprobe",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffprobe",
+      "sha256": "f4e72e0094397518602881be95f16a1d60ec41b03ecfb0aaa6f8e45ffa14583a",
+      "version": "ffprobe version 8.1.2 Copyright (c) 2007-2026 the FFmpeg developers"
+    }
+  },
+  "weights_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+  "independent_decode": true,
+  "physical_caps": {
+    "send_new": 375816,
+    "reuse": 201816
+  },
+  "points": {
+    "reuse": {
+      "bytes": 200755,
+      "kbps": 83.64791666666666,
+      "stream_sha256": "717dc2d795aef0f1ee016c52d8a08f9d012f1635d84c320f0869272e73e3595b",
+      "raw_sha256": "de7be3abcfe6bcc3563cb23c21020fe2701edc34bdc442f18ac217c589f6f0f8",
+      "crf": 42.75,
+      "keyframes": [
+        0
+      ],
+      "at_return": {
+        "key_frame": 0,
+        "pict_type": "P"
+      },
+      "dists": 0.29329495628674823,
+      "per_shot": [
+        0.28824131935834885,
+        0.2983485932151477
+      ],
+      "rows": [
+        {
+          "shot": 0,
+          "tick": 10,
+          "role": 0,
+          "stream_tick": 10,
+          "dists": 0.2791365385055542,
+          "calibration_error": 5.960464477539063e-08
+        },
+        {
+          "shot": 0,
+          "tick": 10,
+          "role": 1,
+          "stream_tick": 10,
+          "dists": 0.3006317615509033,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 1,
+          "tick": 10,
+          "role": 0,
+          "stream_tick": 250,
+          "dists": 0.30052804946899414,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 1,
+          "tick": 10,
+          "role": 1,
+          "stream_tick": 250,
+          "dists": 0.27851158380508423,
+          "calibration_error": 5.960464477539063e-08
+        },
+        {
+          "shot": 0,
+          "tick": 30,
+          "role": 0,
+          "stream_tick": 30,
+          "dists": 0.2897830009460449,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 0,
+          "tick": 30,
+          "role": 1,
+          "stream_tick": 30,
+          "dists": 0.29382240772247314,
+          "calibration_error": 1.1920928955078125e-07
+        },
+        {
+          "shot": 1,
+          "tick": 30,
+          "role": 0,
+          "stream_tick": 270,
+          "dists": 0.32625526189804077,
+          "calibration_error": 1.7881393432617188e-07
+        },
+        {
+          "shot": 1,
+          "tick": 30,
+          "role": 1,
+          "stream_tick": 270,
+          "dists": 0.2987207770347595,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 0,
+          "tick": 50,
+          "role": 0,
+          "stream_tick": 50,
+          "dists": 0.28774887323379517,
+          "calibration_error": 1.1920928955078125e-07
+        },
+        {
+          "shot": 0,
+          "tick": 50,
+          "role": 1,
+          "stream_tick": 50,
+          "dists": 0.2921907901763916,
+          "calibration_error": 5.960464477539063e-08
+        },
+        {
+          "shot": 1,
+          "tick": 50,
+          "role": 0,
+          "stream_tick": 290,
+          "dists": 0.3204129934310913,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 1,
+          "tick": 50,
+          "role": 1,
+          "stream_tick": 290,
+          "dists": 0.2850092053413391,
+          "calibration_error": 5.960464477539063e-08
+        },
+        {
+          "shot": 0,
+          "tick": 70,
+          "role": 0,
+          "stream_tick": 70,
+          "dists": 0.27937525510787964,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 0,
+          "tick": 70,
+          "role": 1,
+          "stream_tick": 70,
+          "dists": 0.2967793941497803,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 1,
+          "tick": 70,
+          "role": 0,
+          "stream_tick": 310,
+          "dists": 0.3325684070587158,
+          "calibration_error": 5.960464477539063e-08
+        },
+        {
+          "shot": 1,
+          "tick": 70,
+          "role": 1,
+          "stream_tick": 310,
+          "dists": 0.3156587481498718,
+          "calibration_error": 2.980232238769531e-07
+        },
+        {
+          "shot": 0,
+          "tick": 90,
+          "role": 0,
+          "stream_tick": 90,
+          "dists": 0.280051589012146,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 0,
+          "tick": 90,
+          "role": 1,
+          "stream_tick": 90,
+          "dists": 0.2867041230201721,
+          "calibration_error": 1.7881393432617188e-07
+        },
+        {
+          "shot": 1,
+          "tick": 90,
+          "role": 0,
+          "stream_tick": 330,
+          "dists": 0.31348752975463867,
+          "calibration_error": 2.384185791015625e-07
+        },
+        {
+          "shot": 1,
+          "tick": 90,
+          "role": 1,
+          "stream_tick": 330,
+          "dists": 0.2437208890914917,
+          "calibration_error": 1.1920928955078125e-07
+        },
+        {
+          "shot": 0,
+          "tick": 110,
+          "role": 0,
+          "stream_tick": 110,
+          "dists": 0.2720000743865967,
+          "calibration_error": 5.960464477539063e-08
+        },
+        {
+          "shot": 0,
+          "tick": 110,
+          "role": 1,
+          "stream_tick": 110,
+          "dists": 0.2975308299064636,
+          "calibration_error": 5.960464477539063e-08
+        },
+        {
+          "shot": 1,
+          "tick": 110,
+          "role": 0,
+          "stream_tick": 350,
+          "dists": 0.3210177421569824,
+          "calibration_error": 2.384185791015625e-07
+        },
+        {
+          "shot": 1,
+          "tick": 110,
+          "role": 1,
+          "stream_tick": 350,
+          "dists": 0.2405259609222412,
+          "calibration_error": 5.960464477539063e-08
+        },
+        {
+          "shot": 0,
+          "tick": 130,
+          "role": 0,
+          "stream_tick": 130,
+          "dists": 0.27068889141082764,
+          "calibration_error": 1.1920928955078125e-07
+        },
+        {
+          "shot": 0,
+          "tick": 130,
+          "role": 1,
+          "stream_tick": 130,
+          "dists": 0.3101961016654968,
+          "calibration_error": 1.1920928955078125e-07
+        },
+        {
+          "shot": 1,
+          "tick": 130,
+          "role": 0,
+          "stream_tick": 370,
+          "dists": 0.2783178687095642,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 1,
+          "tick": 130,
+          "role": 1,
+          "stream_tick": 370,
+          "dists": 0.25615644454956055,
+          "calibration_error": 2.980232238769531e-07
+        },
+        {
+          "shot": 0,
+          "tick": 150,
+          "role": 0,
+          "stream_tick": 150,
+          "dists": 0.2807583808898926,
+          "calibration_error": 5.960464477539063e-08
+        },
+        {
+          "shot": 0,
+          "tick": 150,
+          "role": 1,
+          "stream_tick": 150,
+          "dists": 0.33710670471191406,
+          "calibration_error": 1.7881393432617188e-07
+        },
+        {
+          "shot": 1,
+          "tick": 150,
+          "role": 0,
+          "stream_tick": 390,
+          "dists": 0.32412683963775635,
+          "calibration_error": 1.1920928955078125e-07
+        },
+        {
+          "shot": 1,
+          "tick": 150,
+          "role": 1,
+          "stream_tick": 390,
+          "dists": 0.29568052291870117,
+          "calibration_error": 2.384185791015625e-07
+        },
+        {
+          "shot": 0,
+          "tick": 170,
+          "role": 0,
+          "stream_tick": 170,
+          "dists": 0.24881088733673096,
+          "calibration_error": 5.960464477539063e-08
+        },
+        {
+          "shot": 0,
+          "tick": 170,
+          "role": 1,
+          "stream_tick": 170,
+          "dists": 0.2804023027420044,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 1,
+          "tick": 170,
+          "role": 0,
+          "stream_tick": 410,
+          "dists": 0.3316461443901062,
+          "calibration_error": 1.7881393432617188e-07
+        },
+        {
+          "shot": 1,
+          "tick": 170,
+          "role": 1,
+          "stream_tick": 410,
+          "dists": 0.25532686710357666,
+          "calibration_error": 2.384185791015625e-07
+        },
+        {
+          "shot": 0,
+          "tick": 190,
+          "role": 0,
+          "stream_tick": 190,
+          "dists": 0.2286001443862915,
+          "calibration_error": 1.1920928955078125e-07
+        },
+        {
+          "shot": 0,
+          "tick": 190,
+          "role": 1,
+          "stream_tick": 190,
+          "dists": 0.299399197101593,
+          "calibration_error": 1.7881393432617188e-07
+        },
+        {
+          "shot": 1,
+          "tick": 190,
+          "role": 0,
+          "stream_tick": 430,
+          "dists": 0.297795832157135,
+          "calibration_error": 1.1920928955078125e-07
+        },
+        {
+          "shot": 1,
+          "tick": 190,
+          "role": 1,
+          "stream_tick": 430,
+          "dists": 0.30485230684280396,
+          "calibration_error": 1.1920928955078125e-07
+        },
+        {
+          "shot": 0,
+          "tick": 210,
+          "role": 0,
+          "stream_tick": 210,
+          "dists": 0.2763746380805969,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 0,
+          "tick": 210,
+          "role": 1,
+          "stream_tick": 210,
+          "dists": 0.322221577167511,
+          "calibration_error": 1.1920928955078125e-07
+        },
+        {
+          "shot": 1,
+          "tick": 210,
+          "role": 0,
+          "stream_tick": 450,
+          "dists": 0.3067534565925598,
+          "calibration_error": 2.384185791015625e-07
+        },
+        {
+          "shot": 1,
+          "tick": 210,
+          "role": 1,
+          "stream_tick": 450,
+          "dists": 0.2779138684272766,
+          "calibration_error": 3.5762786865234375e-07
+        },
+        {
+          "shot": 0,
+          "tick": 230,
+          "role": 0,
+          "stream_tick": 230,
+          "dists": 0.2811235785484314,
+          "calibration_error": 5.960464477539063e-08
+        },
+        {
+          "shot": 0,
+          "tick": 230,
+          "role": 1,
+          "stream_tick": 230,
+          "dists": 0.32635462284088135,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 1,
+          "tick": 230,
+          "role": 0,
+          "stream_tick": 470,
+          "dists": 0.3111060857772827,
+          "calibration_error": 2.384185791015625e-07
+        },
+        {
+          "shot": 1,
+          "tick": 230,
+          "role": 1,
+          "stream_tick": 470,
+          "dists": 0.3442728519439697,
+          "calibration_error": 1.1920928955078125e-07
+        }
+      ]
+    },
+    "send_new": {
+      "bytes": 372184,
+      "kbps": 155.07666666666665,
+      "stream_sha256": "f528d87a3e51d5bb06467d25a7d6c60c54d75ad968ba1574bbbe93a11a11c1a9",
+      "raw_sha256": "ac1fac4c698151308728ac1ee659b7c3300c9e78429ac1333acbcd31d8e2d317",
+      "crf": 32.5,
+      "keyframes": [
+        0
+      ],
+      "at_return": {
+        "key_frame": 0,
+        "pict_type": "P"
+      },
+      "dists": 0.2510397719840209,
+      "per_shot": [
+        0.24684985478719076,
+        0.255229689180851
+      ],
+      "rows": [
+        {
+          "shot": 0,
+          "tick": 10,
+          "role": 0,
+          "stream_tick": 10,
+          "dists": 0.25536543130874634,
+          "calibration_error": 5.960464477539063e-08
+        },
+        {
+          "shot": 0,
+          "tick": 10,
+          "role": 1,
+          "stream_tick": 10,
+          "dists": 0.2668887972831726,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 1,
+          "tick": 10,
+          "role": 0,
+          "stream_tick": 250,
+          "dists": 0.26447105407714844,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 1,
+          "tick": 10,
+          "role": 1,
+          "stream_tick": 250,
+          "dists": 0.2379177212715149,
+          "calibration_error": 5.960464477539063e-08
+        },
+        {
+          "shot": 0,
+          "tick": 30,
+          "role": 0,
+          "stream_tick": 30,
+          "dists": 0.24274760484695435,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 0,
+          "tick": 30,
+          "role": 1,
+          "stream_tick": 30,
+          "dists": 0.260093629360199,
+          "calibration_error": 1.1920928955078125e-07
+        },
+        {
+          "shot": 1,
+          "tick": 30,
+          "role": 0,
+          "stream_tick": 270,
+          "dists": 0.27915632724761963,
+          "calibration_error": 1.7881393432617188e-07
+        },
+        {
+          "shot": 1,
+          "tick": 30,
+          "role": 1,
+          "stream_tick": 270,
+          "dists": 0.237707257270813,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 0,
+          "tick": 50,
+          "role": 0,
+          "stream_tick": 50,
+          "dists": 0.23322057723999023,
+          "calibration_error": 1.1920928955078125e-07
+        },
+        {
+          "shot": 0,
+          "tick": 50,
+          "role": 1,
+          "stream_tick": 50,
+          "dists": 0.2746608257293701,
+          "calibration_error": 5.960464477539063e-08
+        },
+        {
+          "shot": 1,
+          "tick": 50,
+          "role": 0,
+          "stream_tick": 290,
+          "dists": 0.2628771662712097,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 1,
+          "tick": 50,
+          "role": 1,
+          "stream_tick": 290,
+          "dists": 0.24876618385314941,
+          "calibration_error": 5.960464477539063e-08
+        },
+        {
+          "shot": 0,
+          "tick": 70,
+          "role": 0,
+          "stream_tick": 70,
+          "dists": 0.23676061630249023,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 0,
+          "tick": 70,
+          "role": 1,
+          "stream_tick": 70,
+          "dists": 0.2721731662750244,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 1,
+          "tick": 70,
+          "role": 0,
+          "stream_tick": 310,
+          "dists": 0.30371683835983276,
+          "calibration_error": 5.960464477539063e-08
+        },
+        {
+          "shot": 1,
+          "tick": 70,
+          "role": 1,
+          "stream_tick": 310,
+          "dists": 0.24054908752441406,
+          "calibration_error": 2.980232238769531e-07
+        },
+        {
+          "shot": 0,
+          "tick": 90,
+          "role": 0,
+          "stream_tick": 90,
+          "dists": 0.21416747570037842,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 0,
+          "tick": 90,
+          "role": 1,
+          "stream_tick": 90,
+          "dists": 0.26463472843170166,
+          "calibration_error": 1.7881393432617188e-07
+        },
+        {
+          "shot": 1,
+          "tick": 90,
+          "role": 0,
+          "stream_tick": 330,
+          "dists": 0.2883867025375366,
+          "calibration_error": 2.384185791015625e-07
+        },
+        {
+          "shot": 1,
+          "tick": 90,
+          "role": 1,
+          "stream_tick": 330,
+          "dists": 0.19354724884033203,
+          "calibration_error": 1.1920928955078125e-07
+        },
+        {
+          "shot": 0,
+          "tick": 110,
+          "role": 0,
+          "stream_tick": 110,
+          "dists": 0.21975106000900269,
+          "calibration_error": 5.960464477539063e-08
+        },
+        {
+          "shot": 0,
+          "tick": 110,
+          "role": 1,
+          "stream_tick": 110,
+          "dists": 0.2571110725402832,
+          "calibration_error": 5.960464477539063e-08
+        },
+        {
+          "shot": 1,
+          "tick": 110,
+          "role": 0,
+          "stream_tick": 350,
+          "dists": 0.28997063636779785,
+          "calibration_error": 2.384185791015625e-07
+        },
+        {
+          "shot": 1,
+          "tick": 110,
+          "role": 1,
+          "stream_tick": 350,
+          "dists": 0.2173936367034912,
+          "calibration_error": 5.960464477539063e-08
+        },
+        {
+          "shot": 0,
+          "tick": 130,
+          "role": 0,
+          "stream_tick": 130,
+          "dists": 0.21864861249923706,
+          "calibration_error": 1.1920928955078125e-07
+        },
+        {
+          "shot": 0,
+          "tick": 130,
+          "role": 1,
+          "stream_tick": 130,
+          "dists": 0.2887232303619385,
+          "calibration_error": 1.1920928955078125e-07
+        },
+        {
+          "shot": 1,
+          "tick": 130,
+          "role": 0,
+          "stream_tick": 370,
+          "dists": 0.2500114440917969,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 1,
+          "tick": 130,
+          "role": 1,
+          "stream_tick": 370,
+          "dists": 0.23672956228256226,
+          "calibration_error": 2.980232238769531e-07
+        },
+        {
+          "shot": 0,
+          "tick": 150,
+          "role": 0,
+          "stream_tick": 150,
+          "dists": 0.24004322290420532,
+          "calibration_error": 5.960464477539063e-08
+        },
+        {
+          "shot": 0,
+          "tick": 150,
+          "role": 1,
+          "stream_tick": 150,
+          "dists": 0.2742934823036194,
+          "calibration_error": 1.7881393432617188e-07
+        },
+        {
+          "shot": 1,
+          "tick": 150,
+          "role": 0,
+          "stream_tick": 390,
+          "dists": 0.2602030634880066,
+          "calibration_error": 1.1920928955078125e-07
+        },
+        {
+          "shot": 1,
+          "tick": 150,
+          "role": 1,
+          "stream_tick": 390,
+          "dists": 0.2725316286087036,
+          "calibration_error": 2.384185791015625e-07
+        },
+        {
+          "shot": 0,
+          "tick": 170,
+          "role": 0,
+          "stream_tick": 170,
+          "dists": 0.21751487255096436,
+          "calibration_error": 5.960464477539063e-08
+        },
+        {
+          "shot": 0,
+          "tick": 170,
+          "role": 1,
+          "stream_tick": 170,
+          "dists": 0.21921491622924805,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 1,
+          "tick": 170,
+          "role": 0,
+          "stream_tick": 410,
+          "dists": 0.30128616094589233,
+          "calibration_error": 1.7881393432617188e-07
+        },
+        {
+          "shot": 1,
+          "tick": 170,
+          "role": 1,
+          "stream_tick": 410,
+          "dists": 0.20493453741073608,
+          "calibration_error": 2.384185791015625e-07
+        },
+        {
+          "shot": 0,
+          "tick": 190,
+          "role": 0,
+          "stream_tick": 190,
+          "dists": 0.2056604027748108,
+          "calibration_error": 1.1920928955078125e-07
+        },
+        {
+          "shot": 0,
+          "tick": 190,
+          "role": 1,
+          "stream_tick": 190,
+          "dists": 0.26237940788269043,
+          "calibration_error": 1.7881393432617188e-07
+        },
+        {
+          "shot": 1,
+          "tick": 190,
+          "role": 0,
+          "stream_tick": 430,
+          "dists": 0.2611128091812134,
+          "calibration_error": 1.1920928955078125e-07
+        },
+        {
+          "shot": 1,
+          "tick": 190,
+          "role": 1,
+          "stream_tick": 430,
+          "dists": 0.23466497659683228,
+          "calibration_error": 1.1920928955078125e-07
+        },
+        {
+          "shot": 0,
+          "tick": 210,
+          "role": 0,
+          "stream_tick": 210,
+          "dists": 0.21759313344955444,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 0,
+          "tick": 210,
+          "role": 1,
+          "stream_tick": 210,
+          "dists": 0.27683812379837036,
+          "calibration_error": 1.1920928955078125e-07
+        },
+        {
+          "shot": 1,
+          "tick": 210,
+          "role": 0,
+          "stream_tick": 450,
+          "dists": 0.2842118740081787,
+          "calibration_error": 2.384185791015625e-07
+        },
+        {
+          "shot": 1,
+          "tick": 210,
+          "role": 1,
+          "stream_tick": 450,
+          "dists": 0.23186379671096802,
+          "calibration_error": 3.5762786865234375e-07
+        },
+        {
+          "shot": 0,
+          "tick": 230,
+          "role": 0,
+          "stream_tick": 230,
+          "dists": 0.2182292342185974,
+          "calibration_error": 5.960464477539063e-08
+        },
+        {
+          "shot": 0,
+          "tick": 230,
+          "role": 1,
+          "stream_tick": 230,
+          "dists": 0.2876828908920288,
+          "calibration_error": 0.0
+        },
+        {
+          "shot": 1,
+          "tick": 230,
+          "role": 0,
+          "stream_tick": 470,
+          "dists": 0.2633848190307617,
+          "calibration_error": 2.384185791015625e-07
+        },
+        {
+          "shot": 1,
+          "tick": 230,
+          "role": 1,
+          "stream_tick": 470,
+          "dists": 0.2601180076599121,
+          "calibration_error": 1.1920928955078125e-07
+        }
+      ]
+    }
+  },
+  "trials": {
+    "112": {
+      "file_bytes": 494507,
+      "stream_sha256": "5fc5d07ce384fbe3d961fb7681d7fc4ba173b0fbc0b2d29f92164b3623024a88",
+      "encode_command": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+        "-i",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/paired.yuv",
+        "-b",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/q112/stream.ivf",
+        "-w",
+        "640",
+        "-h",
+        "384",
+        "--input-depth",
+        "8",
+        "--fps-num",
+        "25",
+        "--fps-denom",
+        "1",
+        "-n",
+        "480",
+        "--color-range",
+        "0",
+        "--rc",
+        "0",
+        "--crf",
+        "28",
+        "--preset",
+        "4",
+        "--keyint",
+        "-1",
+        "--lp",
+        "6",
+        "--progress",
+        "0"
+      ],
+      "decode_command": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+        "-i",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/q112/stream.ivf",
+        "-o",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/q112/decoded.yuv",
+        "--threads",
+        "1",
+        "--quiet"
+      ],
+      "encode_seconds": 10.132,
+      "encode_cpu_seconds": 8.263,
+      "decode_cpu_seconds": 0.238
+    },
+    "208": {
+      "file_bytes": 120434,
+      "stream_sha256": "510bd7f043751af8695238b2dde022e366b0007553dbb1ef7610d87ff0f67784",
+      "encode_command": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+        "-i",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/paired.yuv",
+        "-b",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/q208/stream.ivf",
+        "-w",
+        "640",
+        "-h",
+        "384",
+        "--input-depth",
+        "8",
+        "--fps-num",
+        "25",
+        "--fps-denom",
+        "1",
+        "-n",
+        "480",
+        "--color-range",
+        "0",
+        "--rc",
+        "0",
+        "--crf",
+        "52",
+        "--preset",
+        "4",
+        "--keyint",
+        "-1",
+        "--lp",
+        "6",
+        "--progress",
+        "0"
+      ],
+      "decode_command": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+        "-i",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/q208/stream.ivf",
+        "-o",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/q208/decoded.yuv",
+        "--threads",
+        "1",
+        "--quiet"
+      ],
+      "encode_seconds": 10.794,
+      "encode_cpu_seconds": 8.74,
+      "decode_cpu_seconds": 0.167
+    },
+    "173": {
+      "file_bytes": 195229,
+      "stream_sha256": "ab1e9093fb594d750c5f2a44bfc9088ea9bcabb137b897030ef877bef45048a5",
+      "encode_command": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+        "-i",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/paired.yuv",
+        "-b",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/q173/stream.ivf",
+        "-w",
+        "640",
+        "-h",
+        "384",
+        "--input-depth",
+        "8",
+        "--fps-num",
+        "25",
+        "--fps-denom",
+        "1",
+        "-n",
+        "480",
+        "--color-range",
+        "0",
+        "--rc",
+        "0",
+        "--crf",
+        "43.25",
+        "--preset",
+        "4",
+        "--keyint",
+        "-1",
+        "--lp",
+        "6",
+        "--progress",
+        "0"
+      ],
+      "decode_command": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+        "-i",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/q173/stream.ivf",
+        "-o",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/q173/decoded.yuv",
+        "--threads",
+        "1",
+        "--quiet"
+      ],
+      "encode_seconds": 10.144,
+      "encode_cpu_seconds": 8.247,
+      "decode_cpu_seconds": 0.197
+    },
+    "171": {
+      "file_bytes": 200755,
+      "stream_sha256": "717dc2d795aef0f1ee016c52d8a08f9d012f1635d84c320f0869272e73e3595b",
+      "encode_command": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+        "-i",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/paired.yuv",
+        "-b",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/q171/stream.ivf",
+        "-w",
+        "640",
+        "-h",
+        "384",
+        "--input-depth",
+        "8",
+        "--fps-num",
+        "25",
+        "--fps-denom",
+        "1",
+        "-n",
+        "480",
+        "--color-range",
+        "0",
+        "--rc",
+        "0",
+        "--crf",
+        "42.75",
+        "--preset",
+        "4",
+        "--keyint",
+        "-1",
+        "--lp",
+        "6",
+        "--progress",
+        "0"
+      ],
+      "decode_command": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+        "-i",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/q171/stream.ivf",
+        "-o",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/q171/decoded.yuv",
+        "--threads",
+        "1",
+        "--quiet"
+      ],
+      "encode_seconds": 10.39,
+      "encode_cpu_seconds": 8.468,
+      "decode_cpu_seconds": 0.183
+    },
+    "170": {
+      "file_bytes": 204821,
+      "stream_sha256": "09215cff36953643d65132091a06d5720eac05206a0a418f19a305121bd4d3a3",
+      "encode_command": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+        "-i",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/paired.yuv",
+        "-b",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/q170/stream.ivf",
+        "-w",
+        "640",
+        "-h",
+        "384",
+        "--input-depth",
+        "8",
+        "--fps-num",
+        "25",
+        "--fps-denom",
+        "1",
+        "-n",
+        "480",
+        "--color-range",
+        "0",
+        "--rc",
+        "0",
+        "--crf",
+        "42.5",
+        "--preset",
+        "4",
+        "--keyint",
+        "-1",
+        "--lp",
+        "6",
+        "--progress",
+        "0"
+      ],
+      "decode_command": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+        "-i",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/q170/stream.ivf",
+        "-o",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/q170/decoded.yuv",
+        "--threads",
+        "1",
+        "--quiet"
+      ],
+      "encode_seconds": 10.108,
+      "encode_cpu_seconds": 8.235,
+      "decode_cpu_seconds": 0.189
+    },
+    "130": {
+      "file_bytes": 372184,
+      "stream_sha256": "f528d87a3e51d5bb06467d25a7d6c60c54d75ad968ba1574bbbe93a11a11c1a9",
+      "encode_command": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+        "-i",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/paired.yuv",
+        "-b",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/q130/stream.ivf",
+        "-w",
+        "640",
+        "-h",
+        "384",
+        "--input-depth",
+        "8",
+        "--fps-num",
+        "25",
+        "--fps-denom",
+        "1",
+        "-n",
+        "480",
+        "--color-range",
+        "0",
+        "--rc",
+        "0",
+        "--crf",
+        "32.5",
+        "--preset",
+        "4",
+        "--keyint",
+        "-1",
+        "--lp",
+        "6",
+        "--progress",
+        "0"
+      ],
+      "decode_command": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+        "-i",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/q130/stream.ivf",
+        "-o",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/q130/decoded.yuv",
+        "--threads",
+        "1",
+        "--quiet"
+      ],
+      "encode_seconds": 9.828,
+      "encode_cpu_seconds": 7.961,
+      "decode_cpu_seconds": 0.217
+    },
+    "129": {
+      "file_bytes": 376667,
+      "stream_sha256": "bc103acb4746c17cdb47f39f6b121823918abcede25d81b90ef8f17cf966e9b3",
+      "encode_command": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+        "-i",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/paired.yuv",
+        "-b",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/q129/stream.ivf",
+        "-w",
+        "640",
+        "-h",
+        "384",
+        "--input-depth",
+        "8",
+        "--fps-num",
+        "25",
+        "--fps-denom",
+        "1",
+        "-n",
+        "480",
+        "--color-range",
+        "0",
+        "--rc",
+        "0",
+        "--crf",
+        "32.25",
+        "--preset",
+        "4",
+        "--keyint",
+        "-1",
+        "--lp",
+        "6",
+        "--progress",
+        "0"
+      ],
+      "decode_command": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+        "-i",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/q129/stream.ivf",
+        "-o",
+        "/local/users/emanuele/pointstream/scratch/20261122T141325Z-60c3e90d-full/q129/decoded.yuv",
+        "--threads",
+        "1",
+        "--quiet"
+      ],
+      "encode_seconds": 10.049,
+      "encode_cpu_seconds": 8.174,
+      "decode_cpu_seconds": 0.213
+    }
+  },
+  "elapsed": 182.93786653297138,
+  "full_forecast_seconds": 879.9000000000001,
+  "stage": "full",
+  "job": "20261122T141325Z-60c3e90d",
+  "smoke_forecast_seconds": 301.42499999999995,
+  "smoke_s": 20.827954356005648,
+  "native_archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T141325Z-60c3e90d/full"
+}

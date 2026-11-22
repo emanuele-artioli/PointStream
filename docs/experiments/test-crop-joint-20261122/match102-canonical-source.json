@@ -1,0 +1,10 @@
+{
+  "source_sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+  "source_grid_sha256": "a84d0a09a8268b1dbf705ad5e0f73c7fc75769821a4dd23def4acf0a560cea4c",
+  "lossless_sha256": "2fd7f48841adb6ecc37e31856f2d616f50af79c988a37f63244826e5509d5b8a",
+  "bytes": 182382671,
+  "native_fps": "30000/1001",
+  "frames": 240,
+  "pixel_format": "FFV1 bgr0",
+  "verified_exact_native_rgb_ticks": 240
+}
