@@ -1,0 +1,21 @@
+{
+  "fps": 50,
+  "intervals": [
+    {
+      "interval": "crowd_point",
+      "frames": 444,
+      "seconds": 8.88,
+      "motion_point": 444,
+      "court": 0
+    },
+    {
+      "interval": "crowd_interlude",
+      "frames": 134,
+      "seconds": 2.68,
+      "motion_point": 0,
+      "court": 0
+    }
+  ],
+  "total_frames": 578,
+  "correctly_non_court": 578
+}

@@ -1,0 +1,625 @@
+{
+  "source": "676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66",
+  "frames": 134,
+  "decisions": {
+    "shot_fit_share": 0.8,
+    "fit_px": 6.0,
+    "precision": 0.95,
+    "duration_recall": 0.9,
+    "median_px": 2.0,
+    "p95_px": 6.0,
+    "scene_threshold": 0.25,
+    "min_state_seconds": 1.0
+  },
+  "ff": {
+    "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+    "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+    "sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+    "version": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers"
+  },
+  "records": {
+    "crowd_interlude": {
+      "frames": 134,
+      "seconds": 145.78264417799073,
+      "cuts": [],
+      "parts": [
+        {
+          "start": 84351,
+          "end": 84485,
+          "predicted": "non_court",
+          "fit_share": 0.0
+        }
+      ],
+      "rows": [
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        }
+      ],
+      "cmd": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+        "-v",
+        "error",
+        "-nostdin",
+        "-threads",
+        "1",
+        "-ss",
+        "1687.040000",
+        "-t",
+        "2.700000",
+        "-i",
+        "/local/users/emanuele/pointstream/cache/676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66/nadal-kyrgios-broadcast.mp4",
+        "-frames:v",
+        "134",
+        "-filter_threads",
+        "1",
+        "-vf",
+        "scale=1920:1080:flags=area:out_range=tv,format=yuv420p",
+        "-fps_mode",
+        "passthrough",
+        "-f",
+        "rawvideo",
+        "-pix_fmt",
+        "yuv420p",
+        "pipe:1"
+      ],
+      "cut_cmd": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+        "-v",
+        "error",
+        "-nostdin",
+        "-threads",
+        "1",
+        "-ss",
+        "1687.040000",
+        "-t",
+        "2.700000",
+        "-i",
+        "/local/users/emanuele/pointstream/cache/676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66/nadal-kyrgios-broadcast.mp4",
+        "-an",
+        "-filter_threads",
+        "1",
+        "-vf",
+        "trim=end_frame=134,setpts=PTS-STARTPTS,select='gte(scene,0.10)',metadata=print:file=/local/users/emanuele/pointstream/scratch/20261122T142144Z-5d689532-full/crowd_interlude.log",
+        "-t",
+        "2.68",
+        "-f",
+        "null",
+        "-"
+      ]
+    }
+  },
+  "seconds": 145.84013353299815
+}

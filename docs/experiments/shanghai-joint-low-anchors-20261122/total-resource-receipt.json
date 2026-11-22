@@ -1,0 +1,102 @@
+{
+  "definition": "stage slot wall, including staging, validation and failed smoke wall; single CPU affinity",
+  "jobs": [
+    {
+      "job": "20261122T135124Z-5a448b6b",
+      "status": "complete",
+      "seconds": 100.71812963485718
+    },
+    {
+      "job": "20261122T135553Z-ee74eb27",
+      "status": "complete",
+      "seconds": 100.35860347747803
+    },
+    {
+      "job": "20261122T134638Z-6e79222b",
+      "status": "complete",
+      "seconds": 130.66376638412476
+    },
+    {
+      "job": "20261122T135510Z-8cbdccbb",
+      "status": "complete",
+      "seconds": 192.7952651977539
+    },
+    {
+      "job": "20261122T135654Z-1290078a",
+      "status": "complete",
+      "seconds": 341.3448781967163
+    },
+    {
+      "job": "20261122T135726Z-16edd3be",
+      "status": "complete",
+      "seconds": 967.6758363246918
+    },
+    {
+      "job": "20261122T135624Z-d475fe1e",
+      "status": "complete",
+      "seconds": 212.2119698524475
+    },
+    {
+      "job": "20261122T135202Z-44c2ee20",
+      "status": "complete",
+      "seconds": 70.18518877029419
+    },
+    {
+      "job": "20261122T140257Z-e46e5b75",
+      "status": "complete",
+      "seconds": 170.7886097431183
+    },
+    {
+      "job": "20261122T140327Z-21abfae5",
+      "status": "complete",
+      "seconds": 270.5567400455475
+    },
+    {
+      "job": "20261122T133558Z-e7c1e11f",
+      "status": "failed",
+      "seconds": 60.157485008239746
+    },
+    {
+      "job": "20261122T133719Z-dd520978",
+      "status": "failed",
+      "seconds": 20.097760915756226
+    },
+    {
+      "job": "20261122T133816Z-0738ada6",
+      "status": "failed",
+      "seconds": 20.122534036636353
+    },
+    {
+      "job": "20261122T133627Z-bbc2147f",
+      "status": "failed",
+      "seconds": 20.101563930511475
+    },
+    {
+      "job": "20261122T133653Z-d9b016cd",
+      "status": "failed",
+      "seconds": 20.085623502731323
+    },
+    {
+      "job": "20261122T133745Z-8a6c26ab",
+      "status": "failed",
+      "seconds": 41.1504123210907
+    },
+    {
+      "job": "20261122T133506Z-e7c23e49",
+      "status": "failed",
+      "seconds": 70.17489337921143
+    },
+    {
+      "job": "20261122T133532Z-ce155e93",
+      "status": "failed",
+      "seconds": 20.126593112945557
+    },
+    {
+      "job": "20261122T134212Z-88058946",
+      "status": "failed",
+      "seconds": 52.74718880653381
+    }
+  ],
+  "total_seconds": 2882.063042640686,
+  "budget_seconds": 5400
+}

@@ -1,0 +1,12 @@
+{
+  "job": "20261122T142144Z-5d689532",
+  "source": "4e8feeeb8c4857a49c7a6319bd2b169678d6f68d263e0cd2262bf233095e49c4",
+  "spec": "f49b0e62621b03ec9a73fe363d6e0edb618ffab4e71ff1bdf7dd96d6e593cbe3",
+  "host": "gpu2",
+  "stored_inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cumulative-joint-20261122/nadal-kyrgios-broadcast.mp4",
+      "sha256": "676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66"
+    }
+  ]
+}
