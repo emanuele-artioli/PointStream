@@ -71,6 +71,8 @@ def run(args):
     if (
         replay["frames_verified"] != 240
         or replay["packet_sha256"] != binding["native_neural_sha256"]
+        or replay["full_yuv_sha256"]
+        != "48f7dd5973fc376f6fabe736e37cdfc0f79588479d29ceb4e9e14943e48e2dbf"
         or earlier.sha(root / "full.yuv") != replay["full_yuv_sha256"]
         or (root / "full.yuv").stat().st_size != 240 * 816 * 960
     ):
