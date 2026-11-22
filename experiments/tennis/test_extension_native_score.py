@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 from fractions import Fraction
 import json
 import os
@@ -28,6 +29,26 @@ import samples  # noqa: E402
 
 
 def select_arm(a, binding, bank):
+    if a.arm.startswith(("ordinary-", "roi-")):
+        mode, width, label = a.arm.split("-")
+        with tarfile.open(a.data) as archive:
+            raw = archive.extractfile("publish/anchors.json").read()
+        assert hashlib.sha256(raw).hexdigest() == a.report_sha256
+        r = json.loads(raw)
+        assert r["match"] == a.event and r["source_sha256"] == binding["source_sha256"]
+        assert r["width"] == int(width) and r["frames"] == 240 and r["fps"] == binding["fps"]
+        assert r["mode"] == {"roi": "foreground-roi", "ordinary": "ordinary"}[mode]
+        chosen = r["selected"][label]
+        assert chosen["affordable"] and chosen["bytes"] <= chosen["ceiling"]
+        if mode == "roi":
+            assert r["source_masks_sha256"] == binding["source_features_sha256"]
+            assert r["ball_sha256"] == binding["ball_sha256"] and r["roi_map_sha256"]
+            assert chosen["identical_qp_control"]["non_inert"]
+        return dict(
+            name=a.arm, kind="ivf_tar", width=r["width"], height=r["height"], bytes=chosen["bytes"],
+            archive=str(a.data), member="publish/" + chosen["file"],
+            sha256=chosen["sha256"], decoded_sha256=chosen["decoded_sha256"],
+        )
     if a.arm.startswith("av1-"):
         filename = a.arm.removeprefix("av1-") + ".ivf"
         r = json.loads((bank / (a.event + "-rate.json")).read_text())
@@ -43,25 +64,30 @@ def select_arm(a, binding, bank):
             member="publish/" + filename,
             sha256=row["native_sha256"],
         )
-    if a.arm.startswith("dcvc-480-q"):
-        qp = int(a.arm.removeprefix("dcvc-480-q"))
+    if a.arm.startswith("dcvc-"):
+        _, width, quality_param = a.arm.split("-")
+        coded_width = int(width)
+        assert coded_width in (480, 960)
+        qp = int(quality_param.removeprefix("q"))
         assert 0 <= qp <= 63
         with tarfile.open(a.data) as z:
-            n = json.load(z.extractfile("publish/result.json"))
+            raw = z.extractfile("publish/result.json").read()
+            n = json.loads(raw)
             report = json.load(z.extractfile("publish/reports.json"))
-        suffix = "-neural.json" if qp == 24 else f"-neural-q{qp}.json"
-        card = json.loads((bank / (a.event + suffix)).read_text())
-        assert (
-            n["source_sha256"] == card["source_sha256"] == binding["source_sha256"]
-            and n["frames"] == 240
-        )
+        if getattr(a, "report_sha256", None):
+            assert hashlib.sha256(raw).hexdigest() == a.report_sha256
+        else:
+            suffix = "-neural.json" if qp == 24 else f"-neural-q{qp}.json"
+            card = json.loads((bank / (a.event + suffix)).read_text())
+            assert card["source_sha256"] == binding["source_sha256"]
+            assert n["native"]["container_sha256"] == card["native"]["container_sha256"]
+        assert n["source_sha256"] == binding["source_sha256"] and n["frames"] == 240
         assert Fraction(*n["native_fps"]) == Fraction(binding["fps"])
         rec = n["native"]
         assert (
             rec["accepted"]
             and rec["qp"] == qp
-            and rec["size"] == [480, 272]
-            and rec["container_sha256"] == card["native"]["container_sha256"]
+            and rec["size"] == [coded_width, {480: 272, 960: 544}[coded_width]]
         )
         passes = [p for group in report["decode"].values() for p in group["passes"]]
         assert len(passes) == 4 and all(
@@ -71,8 +97,8 @@ def select_arm(a, binding, bank):
         return dict(
             name=a.arm,
             kind="yuv_tar",
-            width=480,
-            height=272,
+            width=rec["size"][0],
+            height=rec["size"][1],
             bytes=rec["bytes"],
             archive=str(a.data),
             member="publish/decoded.yuv",
@@ -219,6 +245,7 @@ if __name__ == "__main__":
     p.add_argument("--event", choices=("match127", "match105", "match116"), required=True)
     p.add_argument("--arm", required=True)
     p.add_argument("--producer", required=True)
+    p.add_argument("--report-sha256")
     p.add_argument("--frames", type=int, choices=(24, 240), required=True)
     p.add_argument("--full-cap", type=int, default=1600)
     p.add_argument("--validate", action="store_true")

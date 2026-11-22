@@ -41,6 +41,20 @@
       "source_archive_sha256": "cec689704a7d4658a8983f29c3bed5afdfb9081c0d4f679e94cf38153be5ab16",
       "spec_sha256": "54c26ede4a37fac7e87a1491dfd74e7d297b6543921d44ab2f9501854454b30f",
       "state_at_registration": "pending"
+    },
+    "control_av1-320-265": {
+      "id": "20261122T135052Z-42003fe3",
+      "revision": "fd1668998f62a91307c9afda109d357340494832",
+      "source_archive_sha256": "6f8613e55a1c2823da11ab16d1d7459510b0c0031cd952d1ed081770f615ab51",
+      "spec_sha256": "dcb2378b557e987acc4c2368619a11e16e37af09688ec16df6248b2918c57085",
+      "state_at_registration": "pending"
+    },
+    "control_dcvc-480-q24": {
+      "id": "20261122T135053Z-981d1f60",
+      "revision": "fd1668998f62a91307c9afda109d357340494832",
+      "source_archive_sha256": "6f8613e55a1c2823da11ab16d1d7459510b0c0031cd952d1ed081770f615ab51",
+      "spec_sha256": "837a70cc415d4dfcf143b09a3d93883dcee8c811f2a82e8f89f54bcccaab9c29",
+      "state_at_registration": "pending"
     }
   }
 }

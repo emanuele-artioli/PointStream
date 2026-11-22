@@ -14,7 +14,9 @@
     "original_host_crf70": "20261122T131229Z-b0af23b6",
     "motion_corrected_staging": "20261122T131004Z-176c9734",
     "packed_ball_cpu_clock": "20261122T134208Z-755dc99e",
-    "full_low_480": "20261122T131845Z-44075a19"
+    "full_low_480": "20261122T131845Z-44075a19",
+    "low_neural_q29": "20261122T135109Z-2945bf34",
+    "low_neural_q31": "20261122T135109Z-4af14c47"
   },
   "states_at_registration": {
     "full_far_cuda": "complete at 12:01 UTC, all 240 learned crops bound",
@@ -30,7 +32,9 @@
     "motion_corrected_staging": "The first actual five-frame four-arm smoke passed; 166.5 s staging plus full 455 s ceiling exceed old 600 s total. Registered the same computation with measured setup allowance.",
     "crf60": "Automatic approval review construed \u201cpaid bitrate\u201d as monetary cost and declined the parallel CRF60 request. Original command not repeated. The actual wire was 15,555 B, and the restricted native Mac alternative failed the exact original-display gate. A balance sheet alone does not give native-player distortion.",
     "packed_ball_cpu_clock": "The first one-core request never acquired a host because dav1d was installed only inside the packed environment. The replacement verifies the same executable digest inside the environment.",
-    "full_low_480": "Passed 240 original timestamps, 480 body crops, 13,555 serialized running bytes, mean DISTS 0.324071."
+    "full_low_480": "Passed 240 original timestamps, 480 body crops, 13,555 serialized running bytes, mean DISTS 0.324071.",
+    "low_neural_q29": "Queued for eligible shared campus gpu5 only once the lower direct reconstruction beat Q24 on all-frame player DISTS.",
+    "low_neural_q31": "Queued for eligible shared campus gpu5 only once the lower direct reconstruction beat Q24 on all-frame player DISTS."
   },
   "local_original_q34_metric_sha256": "7846eef60ee09c6c3a35d321c4ca21b40731f2b163b1503aa0f14d7074dd60d3",
   "next": "Validate the main native score, send the 12 exact frames, qualify the priced alternate rungs after the 240/240 self-reread; add lower native neural anchors only if triggered.",
