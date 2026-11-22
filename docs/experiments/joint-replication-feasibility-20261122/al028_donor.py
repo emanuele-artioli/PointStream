@@ -34,12 +34,15 @@ def cpu():
     )
 
 
-def main():
+def main(*, portable=False):
     start = cpu()
     cv2.setNumThreads(1)
-    if (
-        sha(SOURCE) != "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934"
-        or sha(CARRIER) != "85d7e48e33718522d39b9f4719f6376a6e470a6b4a5b8bb9bb31304bb84c39e3"
+    if sha(SOURCE) != "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934" or sha(
+        CARRIER
+    ) != (
+        "731cc34e1fcb7c0874cd5722ab63241a123d31fbcd699e199cee4163cdcbc0dc"
+        if portable
+        else "85d7e48e33718522d39b9f4719f6376a6e470a6b4a5b8bb9bb31304bb84c39e3"
     ):
         raise ValueError("source or carrier identity")
     payload = BALL.read_bytes()
