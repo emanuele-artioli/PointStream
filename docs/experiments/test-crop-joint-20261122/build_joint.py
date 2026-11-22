@@ -255,10 +255,10 @@ def donor_base(a, src, masks):
     )
 
 
-def main(a):
+def main(a, case=None):
     a.out.mkdir(exist_ok=False, parents=True)
     cv2.setNumThreads(1)
-    case = input_config(getattr(a, "event", "match102"))
+    case = case if case is not None else input_config(getattr(a, "event", "match102"))
     fps = case["fps"]
     names, coded, refs, receipt = signal(a, case)
     payload = a.ball.read_bytes()
