@@ -1,0 +1,61 @@
+{
+  "source_review_sha256": "4da6f50fda72126756868d67c76cb9570e6190d968d81f559cdf4980bc78fb87",
+  "official_ball_sha256": "dd004f20ec88ca03a43f3ce6902cd4ef6565af8c53fed86e5062e248cc57e431",
+  "existing_native_control_scores": [
+    {
+      "arm": "DCVC-UF Q24 480x272",
+      "bytes": 11224,
+      "foreground": 0.35188503563404083,
+      "source_masks": "automatic source masks",
+      "score_sha256": "89af26678599baaa436a244670472ab12bfb57f3e32aad4c7ce491747d5bffad"
+    },
+    {
+      "arm": "DCVC-UF Q26 480x272",
+      "bytes": 12305,
+      "foreground": 0.34921082357565564,
+      "source_masks": "automatic source masks",
+      "score_sha256": "d54840a26796895fdfb693d9a994439eb49bc27368a317ca8cbd276523ceb352"
+    },
+    {
+      "arm": "DCVC-UF Q27 480x272",
+      "bytes": 12913,
+      "foreground": 0.3460388258099556,
+      "source_masks": "automatic source masks",
+      "score_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+    },
+    {
+      "arm": "DCVC-UF Q36 480x272",
+      "bytes": 20251,
+      "foreground": 0.3216470206777255,
+      "source_masks": "automatic source masks",
+      "score_sha256": "9ace93de177c4bcf15bc1b1aa9f405f35abf46131e6c055d87eb2526ac5e064d"
+    },
+    {
+      "arm": "DCVC-UF Q63 480x272",
+      "bytes": 75408,
+      "foreground": 0.26868528376022977,
+      "source_masks": "automatic source masks",
+      "score_sha256": "81e0052fbbb6584a0ffe7d258eb7ce1b7a145e76771c85f16b5383b9abdaea88"
+    },
+    {
+      "arm": "DCVC-UF Q48 960x544",
+      "bytes": 95865,
+      "foreground": 0.1894902934630712,
+      "source_masks": "automatic source masks",
+      "score_sha256": "dd79e2b6b8d2c911cd1be4d4eafe902a417f721c169a73f066ec85cee5fc12b1"
+    },
+    {
+      "arm": "DCVC-UF Q54 960x544",
+      "bytes": 132738,
+      "foreground": 0.18083133548498154,
+      "source_masks": "automatic source masks",
+      "score_sha256": "760d1e24ff42915a154160aa2bc4573fd1c5953f5973532884f88d927300ce18"
+    }
+  ],
+  "previous_charged_slot_seconds": {
+    "cpu": 4185.517940998077,
+    "gpu": 288.1092777252197
+  },
+  "event_cpu_seconds_remaining": 10214.482059001923,
+  "event_gpu_seconds_remaining_before_this_run": 10511.89072227478
+}
