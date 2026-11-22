@@ -1,0 +1,10 @@
+{
+  "stage": "full",
+  "frames": 154,
+  "fps": 60,
+  "packet_sha256": "338c8d17c3bbaaedb70a9c82c75bf2567ac0acfb9e0b0289c73ad9151bedd4e5",
+  "rgb_sha256": "45138443a2547750eab06cc0c94912aa7596a34f5f60e3c20bdd711f607f7f25",
+  "npz_sha256": "539ece5c6015d992e1a06f35b08575de3fb236489c179238390ed9bbb319c417",
+  "npz_bytes": 184595486,
+  "elapsed_seconds": 12.293504336004844
+}

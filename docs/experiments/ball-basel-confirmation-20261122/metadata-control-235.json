@@ -1,0 +1,23 @@
+{
+  "status": "post-outcome control",
+  "frames": 154,
+  "fps": 60,
+  "base": "640x360 plain AV1",
+  "base_wire_kbps": 55.150129870129874,
+  "base_dists": 0.28233948620882904,
+  "base_wire_bytes": 17694,
+  "complete_wire_bytes": 17901,
+  "complete_wire_kbps": 55.79532467532468,
+  "complete_sha256": "e7b88987bdbea0dd59c805f428e55a044901f010246fdbbc1cd5179a0ac7973e",
+  "ball_payload_bytes": 220,
+  "base_ivf_unchanged": true,
+  "decoded_bytes_identical": true,
+  "decoded_yuv_sha256": "d03fe53b79be4cc267332498929fda1b0a6d21556898e71fb69659193202e5c7",
+  "paid_centers_exact": true,
+  "paid_missing": 31,
+  "labels": 13,
+  "hits_10": 10,
+  "tile_packet_sha256": "338c8d17c3bbaaedb70a9c82c75bf2567ac0acfb9e0b0289c73ad9151bedd4e5",
+  "base_packet_sha256": "cc803cee9731df2a8fc112c209785794c3d55e9aabb5ff15ee8369cf0c3cd576",
+  "fixed_placeholder": "black zero indices, syntax only; not rendered"
+}

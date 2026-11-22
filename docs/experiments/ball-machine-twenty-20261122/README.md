@@ -7,3 +7,11 @@ The GPU sees only evaluation artifacts and immutable inputs. Reconstruct the pai
 The campus GPU pilot is `20261121T233942Z-faf1bd0f`, revision `0fa29575e93f9078de2fb86dd33cc3470d14ef29`. [Inputs and settings](spec.json)
 
 The exclusive job remained pending after a 15-minute queue wait; status was rechecked before cancellation. Use the project-qualified shared RTX 6000 Ada path instead, limiting the PyTorch allocator to 8,000 MiB and requiring another 8,192 MiB in admission margin. Judge accuracy and image identity remain the endpoints. Inference timing under contention is diagnostic only. The campaign GPU ceiling remains 900 seconds.
+
+The original request reached cancelled with no host. Shared request `20261121T235822Z-f73555e3`, revision `b661a84a54b0d5845efb061a07f76f5f3aee1427`, uses the same authenticated images.
+
+## Outcome on the visual figure's 12 reviewed instants
+
+The full 240-frame judge completed on gpu6 (RTX 6000 Ada). At a 10-native-pixel tolerance, the source detector localized 10/12 balls, ordinary AV1 at 20.063 kbps localized 0/12, and the reconstructed PointStream video at 19.965 kbps localized 8/12. Reading the same PointStream packet’s paid positions directly localized 10/12. The two missing transmitted points count as misses. At five pixels the same arms scored 8/12, 0/12, 8/12 and 7/12, respectively. The higher-rate ordinary and ROI controls (21.623 and 27.450 kbps) also scored 0/12 at either tolerance. All 12 source marks are visible. This experiment measures localization on those instants. The separate 292-frame trial supplies the explicit absence denominator. The extra FFV1 file reproduced the receiver display for staging the judge; the delivered PointStream stream is 11,979 bytes.
+
+The same original frame sequence, packet and decoded image checksums underlie the appearance and machine comparisons. [Frozen stage](shared-spec.json) · [Source, actual packet and frame checks](preparation.json) · [Per-frame results and hashes](result.json)

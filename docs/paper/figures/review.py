@@ -29,6 +29,11 @@ PANELS = [
         "Eight paired historical windows use a same-match adaptation and a modeled two-hour asset lifetime. Each player-region comparison uses the actual competing DCVC-UF rates for that window.",
     ),
     (
+        "player-rd-historical/player-rd-nine.pdf",
+        "Player fidelity across three background rates and nine rallies",
+        "Each panel holds the rendered players fixed and changes the transmitted background. Eight windows have a paired historical neural control. Rates use the corrected two-hour appearance and adaptation model. The nine windows span three physical matches.",
+    ),
+    (
         "starved-choice/players-rate-quality.pdf",
         "Player fidelity at the available bandwidth",
         "One rally with common scoring. Solid red charges the full startup. Open red prices already valid player references. All people have equal weight.",
@@ -56,7 +61,17 @@ PANELS = [
     (
         "ball-starved/ball-starved.pdf",
         "Ball fidelity near 61 kbps in three broadcasts",
-        "Nine, twelve and eleven independently labeled instants. Each match includes its best measured affordable plain or ROI AV1 control. The 60-fps match favors conventional AV1.",
+        "Nine, twelve and eleven independently labeled instants. Each match includes the affordable plain or ROI controls from the original packet experiment. The 60-fps match favors conventional AV1.",
+    ),
+    (
+        "ball/ball-starved-640-controls.pdf",
+        "What a stronger spatial-resolution control changes",
+        "The tracked-pixel mode improves ball DISTS in two of three broadcasts under a common 60.6 kbps transport budget. A 640-pixel-wide ROI stream wins in the third. Points show actual delivered rates.",
+    ),
+    (
+        "ball/basel-holdout-visual-machine.pdf",
+        "When the ordinary video already preserves the ball",
+        "In Basel, full-width AV1 preserved ball appearance better under the frozen 60.6 kbps cap. Direct paid centers located all 12 labeled balls within 10 native pixels. The frozen detector located 9 on tiled video and zero on either AV1 control.",
     ),
     (
         "ball/matched-low-detection.pdf",
@@ -64,9 +79,24 @@ PANELS = [
         "On the 292-frame clip, 261 visible and 30 absent frames have definite labels. Direct paid refit locations score 240/261 and 2/30. The same protocol also measures a detector running on every decoded RGB arm.",
     ),
     (
+        "ball-machine-anchors/ball-machine-anchors.pdf",
+        "Can machines read the ball on other broadcasts?",
+        "Across three opened matches, the frozen detector localized 23/32 labeled balls on the tiled display and 0/32 on the stronger affordable plain and ROI controls. The paid centers scored 30/32, and the source detector scored 19/32. Five additional labels mark the ball as not visible.",
+    ),
+    (
         "system/starved-budget.pdf",
         "What the sender pays at startup and during play",
         "Actual native and joint packets, with image payloads itemized. The cache row assumes both references are already valid. The AVIF startup prices hold the other packet components fixed.",
+    ),
+    (
+        "system/passage-bill.pdf",
+        "What two rallies cost with the full intervening broadcast",
+        "Both cut indexes and all delivered components are charged. The 216.5-second fallback is identical. Even perfect rally frames could not overtake continuous conventional video on whole-passage luma at this allocation.",
+    ),
+    (
+        "system/passage-routing.pdf",
+        "Which camera views enter the object path?",
+        "Align the archived point classifier, the available camera labels, the independently tested geometry and the two-rally experiment. Gaps in the geometry row indicate untested time.",
     ),
     (
         "references/reuse-budget.pdf",
@@ -81,7 +111,7 @@ PANELS = [
     (
         "references/rendered-reference-quality.pdf",
         "Which appearance references passed the motion review?",
-        "One author viewed two 24-frame player tracks. Both shared lossy rungs passed for Player 2. Player 1 accepted the lossless control and judged Q78 almost acceptable. The plotted objective metric includes crop background.",
+        "One author viewed two 24-frame player tracks. The Q65 and Q78 rungs passed for Player 2. Player 1 accepted the lossless control and judged Q78 almost acceptable. Q90 has also been rendered. The plotted objective metric includes crop background.",
     ),
     (
         "player-tasks/decoded-masks.pdf",
@@ -163,7 +193,16 @@ def page(title, caption, index, raster=None):
     return PdfReader(buffer).pages[0]
 
 
-def build(output, timeline=None, court=None, rally=None, stroke=None, starved_ball=None, main_only=False):
+def build(
+    output,
+    timeline=None,
+    court=None,
+    rally=None,
+    stroke=None,
+    starved_ball=None,
+    main_only=False,
+    twenty_ball=None,
+):
     panels = [(HERE / name, title, caption) for name, title, caption in PANELS]
 
     def after(target, entry):
@@ -185,7 +224,16 @@ def build(output, timeline=None, court=None, rally=None, stroke=None, starved_ba
             (
                 stroke,
                 "A serve at constrained bandwidth",
-                "Three source-selected instants. Ordinary AV1 costs 66.105 kbps. The joint decode costs 469.335 kbps cold with a 65.473 kbps ideal running cost. Racket grip remains an open equipment question.",
+                "Three source-selected instants with independently decoded conventional and neural controls. The joint decode costs 469.335 kbps cold or 65.473 kbps with valid references. The racket is missing near contact.",
+            ),
+        )
+    if twenty_ball:
+        after(
+            "ball-rate-quality.pdf",
+            (
+                twenty_ball,
+                "The ball at 20 kbps",
+                "The six evenly spaced crops include the missed ball at 0.2 seconds. The complete trajectory stream costs 19.965 kbps and ordinary AV1 costs 20.063 kbps. On all 12 source marks, a frozen detector found 0 balls on AV1 and 8 on PointStream within 10 native pixels. Paid coordinates located 10 directly.",
             ),
         )
     if starved_ball:
@@ -217,11 +265,20 @@ def build(output, timeline=None, court=None, rally=None, stroke=None, starved_ba
         )
     if main_only:
         selected = {
-            "architecture.pdf", "players-starved.pdf", "players-rate-quality.pdf",
-            "ball-rate-quality.pdf", "ball-starved.pdf", "matched-low-detection.pdf",
-            "starved-budget.pdf", "crossshot-reference.pdf",
+            "architecture.pdf",
+            "player-rd-nine.pdf",
+            "players-rate-quality.pdf",
+            "ball-rate-quality.pdf",
+            "ball-starved-640-controls.pdf",
+            "basel-holdout-visual-machine.pdf",
+            "matched-low-detection.pdf",
+            "ball-machine-anchors.pdf",
+            "starved-budget.pdf",
+            "passage-bill.pdf",
         }
-        selected.update(path.name for path in (timeline, stroke, starved_ball) if path)
+        selected.update(
+            path.name for path in (timeline, stroke, twenty_ball or starved_ball) if path
+        )
         panels = [entry for entry in panels if entry[0].name in selected]
     writer = PdfWriter()
     for source, title, caption in panels:
@@ -262,6 +319,18 @@ if __name__ == "__main__":
     cli.add_argument("--rally", type=Path)
     cli.add_argument("--stroke", type=Path)
     cli.add_argument("--starved-ball", type=Path)
-    cli.add_argument("--main-only", action="store_true", help="Select the proposed manuscript figures")
+    cli.add_argument("--twenty-ball", type=Path)
+    cli.add_argument(
+        "--main-only", action="store_true", help="Select the proposed manuscript figures"
+    )
     args = cli.parse_args()
-    build(args.output, args.timeline, args.court, args.rally, args.stroke, args.starved_ball, args.main_only)
+    build(
+        args.output,
+        args.timeline,
+        args.court,
+        args.rally,
+        args.stroke,
+        args.starved_ball,
+        args.main_only,
+        args.twenty_ball,
+    )

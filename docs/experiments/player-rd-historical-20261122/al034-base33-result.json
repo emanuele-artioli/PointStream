@@ -1,0 +1,58 @@
+{
+  "stage": "full",
+  "frames": 240,
+  "source_sha256": "7db0c143cd416ad17b4bda4eaa191d51da197eccc1143e9eb402f8bb2a7f0ee6",
+  "source_yuv_sha256": "3734897c6b329649ff886c053a9c6fe0bb215a30bec5629934fdc5fd10b0d317",
+  "corrected_side_kbps": 5.167473333333334,
+  "rows": [
+    {
+      "crf": 63,
+      "base_kbps": 25.726666666666667,
+      "modeled_player_kbps": 30.89414,
+      "bytes": 30872,
+      "stream_sha256": "bb9bb58d6101b947cdad32c371f9755d3c635b18ee29e0fccf498861b2be7479",
+      "decoded_sha256": "d764dd1252019456026211c856ffa501312c9dcfe3ad149369adb3d4029695dd",
+      "frames": 240.0
+    },
+    {
+      "crf": 62,
+      "base_kbps": 32.795,
+      "modeled_player_kbps": 37.962473333333335,
+      "bytes": 39354,
+      "stream_sha256": "e637fc71ed00bfaea44d1955840530fe8afcdf1b397564bc7ee842f4b959e973",
+      "decoded_sha256": "02dc616ac4bf1efbbca723c1fa3c07df495c42f8d7741318dae4f8f2d5317590",
+      "frames": 240.0
+    },
+    {
+      "crf": 61,
+      "base_kbps": 38.94583333333333,
+      "modeled_player_kbps": 44.113306666666666,
+      "bytes": 46735,
+      "stream_sha256": "f1dd638f090602baeb6dab1f6f028280c47c10c05205ec706da5327b33c176c6",
+      "decoded_sha256": "caad63514b1115be5301cb77afc793c61d6379c37fdba625744d33177ab5d20d",
+      "frames": 240.0
+    },
+    {
+      "crf": 60,
+      "base_kbps": 43.06916666666667,
+      "modeled_player_kbps": 48.23664,
+      "bytes": 51683,
+      "stream_sha256": "200748f16031c92628631963b38f1e32822ca81b90c6f402fc0635725486cdb3",
+      "decoded_sha256": "68386315dce95d07ef502418bccd1d98fdc7823ccb61acd3b04f964a17a3c5ee",
+      "frames": 240.0
+    }
+  ],
+  "elapsed_seconds": 94.29854334899574,
+  "encoder": {
+    "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+    "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+    "sha256": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+    "version": "SVT-AV1 v4.2.0 (release)"
+  },
+  "decoder": {
+    "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+    "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+    "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+    "version": "1.5.4"
+  }
+}

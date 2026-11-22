@@ -20,6 +20,7 @@ from experiments.tennis import ball_confirmation as prior
 from experiments.tennis import ball_starved_scaled as tiles
 from experiments.tennis import basel_ball_sender as sender
 from experiments.tennis import k5d_encoder, w1_roi
+from experiments.visor.h3b import dists_crops
 from src.codecs import quality, svtav1
 from src.pointstream import tracked_patch
 
@@ -128,7 +129,7 @@ def run(a):
         "canvas": [1280, 720],
         "positions": origins,
     }
-    trials, selected = [], []
+    trials, selected, roi_evidence = [], [], []
     for w in WIDTHS:
         h = w * 9 // 16
         small = yuv
@@ -218,12 +219,37 @@ def run(a):
             if over:
                 selected.append(min(over, key=lambda x: x["kbps"]))
 
+        paired = [
+            q for mode, q in native_cache
+            if mode == "plain" and ("roi", q) in native_cache
+        ]
+        roi_evidence.append({
+            "width": w,
+            "tracked_frames": sum(p is not None for p in track),
+            "comparisons": [
+                {"crf": q, "plain_sha256": prior.sha(Path(native_cache[("plain", q)]["stream"])),
+                 "roi_sha256": prior.sha(Path(native_cache[("roi", q)]["stream"]))}
+                for q in sorted(paired)
+            ],
+        })
+
+    # Persist rate-only selections before labels are opened or metrics computed.
+    rate_decision = [{k: v for k, v in row.items() if k not in ("packet", "decoded")}
+                     for row in selected]
+    (publish / "rate-decision.json").write_text(json.dumps(rate_decision, indent=2) + "\n")
     # Decisions above use bytes only. Official labels first enter here.
     labels = label_rows(a.labels, n)
     net = quality.load_dists(a.weights, "cpu")
-    self_scores = tiles.score_frame(net, source, source, labels)
-    if any(abs(x["dists"]) > 1e-5 for x in self_scores):
-        raise ValueError("Invalid source self score")
+    self_scores = []
+    for tick, (visible, x, y) in enumerate(labels):
+        if visible != 1:
+            continue
+        crop = k5d_encoder.crop64(source[tick], x, y)
+        value = float(dists_crops(net, [crop], crop, np.ones((64, 64), bool), "cpu")[0])
+        self_scores.append({"tick": tick, "dists": value})
+        (publish / "self-check.json").write_text(json.dumps(self_scores, indent=2) + "\n")
+        if not np.isfinite(value) or abs(value) > 1e-5:
+            raise ValueError(f"Invalid source self score at {tick}: {value}")
     rows = []
     for index, row in enumerate(selected):
         packet = row.pop("packet")
@@ -272,6 +298,7 @@ def run(a):
         rows=rows,
         trials=trials,
         source_self=self_scores,
+        roi_evidence=roi_evidence,
         tools=tools,
         metric=quality.dists_record(a.weights),
         seconds=time.monotonic() - start,
@@ -291,6 +318,8 @@ def validate():
         labels=r["labels_sha256"] == sender.LABELS,
         count=r["frames"] == len(r["label_rows"]) == n,
         visible=len(r["source_self"]) > 0,
+        roi_evidence=len(r["roi_evidence"]) == len(WIDTHS)
+        and all(e["comparisons"] for e in r["roi_evidence"]),
         modes={(x["width"], x["mode"]) for x in r["rows"]}
         == {(w, m) for w in WIDTHS for m in ("plain", "roi")} | {(320, "tile")},
     )
@@ -305,7 +334,7 @@ def validate():
                 and len(row["cropped"]) == len(r["source_self"])
             )
     forecast = 1.5 * r["seconds"] * 4 * 1.6 + 85 if n == 16 else None
-    checks["budget"] = forecast is None or forecast <= 1550
+    checks["budget"] = forecast is None or forecast <= 1350
     decision = dict(passed=all(checks.values()), checks=checks, forecast_seconds=forecast)
     Path(os.environ["PS_VALIDATION_PATH"]).write_text(json.dumps(decision) + "\n")
     if not decision["passed"]:
