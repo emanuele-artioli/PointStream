@@ -116,7 +116,7 @@ def make(a):
         arguments=args,
         staged_inputs=inputs,
         inputs=[{k: r[k] for k in ("path", "sha256")} for r in inputs],
-        required_commands=["ffmpeg", "SvtAv1EncApp", "dav1d"],
+        required_commands=[],
         scale={"steps": {"smoke": 3, "full": 240}},
         smoke={
             "seconds": 500,
