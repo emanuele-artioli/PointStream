@@ -106,7 +106,11 @@ def run(a):
     cap.release()
     hashes = {k: v.hexdigest() for k, v in hs.items()}
     expected = report["prefix_rgb_sha256"] if a.frames == 24 else report["rgb_sha256"]
-    assert hashes == expected
+    if hashes != expected:
+        raise ValueError(
+            "frozen display hash mismatch: "
+            + json.dumps({"actual": hashes, "expected": expected}, sort_keys=True)
+        )
     # No official coordinate is opened until all three reconstructed RGB hashes agree.
     with tarfile.open(a.annotations) as tar:
         member = tar.extractfile(LABEL_MEMBER)
