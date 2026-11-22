@@ -1,0 +1,377 @@
+{
+  "measure": "GPU supervisor reservation from remote job launch to completion; queue admission time excluded; where the active supervisor timestamps are unavailable, completed stage command seconds are reported as a lower bound",
+  "rows": [
+    {
+      "job": "20261122T112315Z-b52c37fd",
+      "state": "complete",
+      "device": {
+        "index": 0,
+        "uuid": "GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162",
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "memory_used_mib": 26987,
+        "memory_total_mib": 49140,
+        "memory_free_mib": 21659,
+        "utilization_pct": 87,
+        "compute_processes": [
+          {
+            "pid": 1576024,
+            "memory_mib": 23132
+          },
+          {
+            "pid": 1835700,
+            "memory_mib": 3816
+          }
+        ],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      },
+      "allocated_seconds": 80.9059727191925,
+      "start": 1795346730.8673873,
+      "end": 1795346811.77336,
+      "command": {
+        "smoke": {
+          "command_seconds": 31.97328519821167,
+          "exit_code": 0,
+          "paused_seconds": 0.0
+        },
+        "full": {
+          "command_seconds": 37.97474765777588,
+          "exit_code": 0,
+          "paused_seconds": 0.0
+        }
+      },
+      "stage": "neural-q24"
+    },
+    {
+      "job": "20261122T115204Z-c485c799",
+      "state": "complete",
+      "device": {
+        "index": 0,
+        "uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "memory_used_mib": 1,
+        "memory_total_mib": 49140,
+        "memory_free_mib": 48645,
+        "utilization_pct": 0,
+        "compute_processes": [],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      },
+      "allocated_seconds": 1782.7031230926514,
+      "start": 1795348799.13196,
+      "end": 1795350581.835083,
+      "command": {
+        "smoke": {
+          "command_seconds": 383.23460030555725,
+          "exit_code": 0,
+          "paused_seconds": 0.0
+        },
+        "full": {
+          "command_seconds": 1357.607326745987,
+          "exit_code": 0,
+          "paused_seconds": 0.0
+        }
+      },
+      "stage": "fresh-generate-0"
+    },
+    {
+      "job": "20261122T115226Z-be6dec22",
+      "state": "failed",
+      "device": {
+        "index": 0,
+        "uuid": "GPU-6f70a27e-4171-22d7-3ffd-647e7f186a49",
+        "name": "NVIDIA RTX A6000",
+        "memory_used_mib": 1,
+        "memory_total_mib": 49140,
+        "memory_free_mib": 48675,
+        "utilization_pct": 0,
+        "compute_processes": [],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      },
+      "allocated_seconds": 110.69911551475525,
+      "start": 1795353041.1336668,
+      "end": 1795353151.8327823,
+      "command": {
+        "smoke": {
+          "command_seconds": 1.7688910961151123,
+          "exit_code": 1,
+          "paused_seconds": 0.0
+        }
+      },
+      "stage": "prefix-pair-0"
+    },
+    {
+      "job": "20261122T115242Z-68bcc806",
+      "state": "complete",
+      "device": {
+        "index": 0,
+        "uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "memory_used_mib": 1,
+        "memory_total_mib": 49140,
+        "memory_free_mib": 48645,
+        "utilization_pct": 0,
+        "compute_processes": [],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      },
+      "allocated_seconds": 1318.715524673462,
+      "start": 1795350615.1906347,
+      "end": 1795351933.9061594,
+      "command": {
+        "smoke": {
+          "command_seconds": 288.8115756511688,
+          "exit_code": 0,
+          "paused_seconds": 0.0
+        },
+        "full": {
+          "command_seconds": 999.3142461776733,
+          "exit_code": 0,
+          "paused_seconds": 0.0
+        }
+      },
+      "stage": "fresh-generate-1"
+    },
+    {
+      "job": "20261122T115306Z-7fb628cb",
+      "state": "failed",
+      "device": {
+        "index": 0,
+        "uuid": "GPU-6f70a27e-4171-22d7-3ffd-647e7f186a49",
+        "name": "NVIDIA RTX A6000",
+        "memory_used_mib": 1,
+        "memory_total_mib": 49140,
+        "memory_free_mib": 48675,
+        "utilization_pct": 0,
+        "compute_processes": [],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      },
+      "allocated_seconds": 120.75728225708008,
+      "start": 1795353164.745658,
+      "end": 1795353285.5029402,
+      "command": {
+        "smoke": {
+          "command_seconds": 2.3206043243408203,
+          "exit_code": 1,
+          "paused_seconds": 0.0
+        }
+      },
+      "stage": "prefix-pair-1"
+    },
+    {
+      "job": "20261122T115317Z-fa0ec927",
+      "state": "failed",
+      "device": {
+        "index": 0,
+        "uuid": "GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162",
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "memory_used_mib": 26099,
+        "memory_total_mib": 49140,
+        "memory_free_mib": 22547,
+        "utilization_pct": 98,
+        "compute_processes": [
+          {
+            "pid": 1576024,
+            "memory_mib": 22244
+          },
+          {
+            "pid": 1900769,
+            "memory_mib": 3816
+          }
+        ],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      },
+      "allocated_seconds": 40.43857145309448,
+      "start": 1795348433.2631762,
+      "end": 1795348473.7017477,
+      "command": {
+        "smoke": {
+          "command_seconds": 30.576205253601074,
+          "exit_code": 0,
+          "paused_seconds": 0.0
+        }
+      },
+      "stage": "neural-near"
+    },
+    {
+      "job": "20261122T115802Z-111cede9",
+      "state": "complete",
+      "device": {
+        "index": 0,
+        "uuid": "GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162",
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "memory_used_mib": 26099,
+        "memory_total_mib": 49140,
+        "memory_free_mib": 22547,
+        "utilization_pct": 15,
+        "compute_processes": [
+          {
+            "pid": 1576024,
+            "memory_mib": 22244
+          },
+          {
+            "pid": 1900769,
+            "memory_mib": 3816
+          }
+        ],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      },
+      "allocated_seconds": 84.97504663467407,
+      "start": 1795348738.4504604,
+      "end": 1795348823.425507,
+      "command": {
+        "smoke": {
+          "command_seconds": 31.57289457321167,
+          "exit_code": 0,
+          "paused_seconds": 0.0
+        },
+        "full": {
+          "command_seconds": 38.92321038246155,
+          "exit_code": 0,
+          "paused_seconds": 0.0
+        }
+      },
+      "stage": "neural-near-validator"
+    },
+    {
+      "job": "20261122T120351Z-f8f60d58",
+      "state": "unpublished",
+      "allocated_seconds": 0,
+      "stage": "neural-q36-unpublished-transfer"
+    },
+    {
+      "job": "20261122T120847Z-28acd80b",
+      "state": "failed",
+      "device": {
+        "index": 0,
+        "uuid": "GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162",
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "memory_used_mib": 26935,
+        "memory_total_mib": 49140,
+        "memory_free_mib": 21711,
+        "utilization_pct": 89,
+        "compute_processes": [
+          {
+            "pid": 1576024,
+            "memory_mib": 23080
+          },
+          {
+            "pid": 1900769,
+            "memory_mib": 3816
+          }
+        ],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      },
+      "allocated_seconds": 10.24917459487915,
+      "start": 1795349405.2586038,
+      "end": 1795349415.5077784,
+      "command": {
+        "smoke": {
+          "command_seconds": 0.6666436195373535,
+          "exit_code": 1,
+          "paused_seconds": 0.0
+        }
+      },
+      "stage": "neural-q36-published"
+    },
+    {
+      "job": "20261122T121405Z-d2d356f7",
+      "state": "complete",
+      "device": {
+        "index": 0,
+        "uuid": "GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162",
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "memory_used_mib": 26935,
+        "memory_total_mib": 49140,
+        "memory_free_mib": 21711,
+        "utilization_pct": 100,
+        "compute_processes": [
+          {
+            "pid": 1576024,
+            "memory_mib": 23080
+          },
+          {
+            "pid": 1900769,
+            "memory_mib": 3816
+          }
+        ],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      },
+      "allocated_seconds": 87.44468140602112,
+      "start": 1795349709.3961842,
+      "end": 1795349796.8408656,
+      "command": {
+        "smoke": {
+          "command_seconds": 31.67255926132202,
+          "exit_code": 0,
+          "paused_seconds": 0.0
+        },
+        "full": {
+          "command_seconds": 38.32554793357849,
+          "exit_code": 0,
+          "paused_seconds": 0.0
+        }
+      },
+      "stage": "neural-q36-complete-snapshot"
+    },
+    {
+      "job": "20261122T125912Z-9361b447",
+      "state": "complete",
+      "device": {
+        "index": 0,
+        "uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "memory_used_mib": 1,
+        "memory_total_mib": 49140,
+        "memory_free_mib": 48645,
+        "utilization_pct": 0,
+        "compute_processes": [],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      },
+      "allocated_seconds": 130.85592007637024,
+      "start": 1795352379.2542522,
+      "end": 1795352510.1101723,
+      "command": {
+        "smoke": {
+          "command_seconds": 21.67636203765869,
+          "exit_code": 0,
+          "paused_seconds": 0.0
+        },
+        "full": {
+          "command_seconds": 92.0847692489624,
+          "exit_code": 0,
+          "paused_seconds": 0.0
+        }
+      },
+      "stage": "fresh-finish"
+    },
+    {
+      "job": "20261122T132555Z-d4bc6076",
+      "state": "pending",
+      "device": null,
+      "allocated_seconds": 0,
+      "start": null,
+      "end": null,
+      "command": {},
+      "stage": "prefix-pair-0-legacy-decoder"
+    },
+    {
+      "job": "20261122T132646Z-28a8986d",
+      "state": "pending",
+      "device": null,
+      "allocated_seconds": 0,
+      "start": null,
+      "end": null,
+      "command": {},
+      "stage": "prefix-pair-1-legacy-decoder"
+    }
+  ],
+  "allocated_seconds": 3767.74441242218
+}
