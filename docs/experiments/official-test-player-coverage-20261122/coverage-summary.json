@@ -1,0 +1,358 @@
+{
+  "rows": [
+    {
+      "match": "match108",
+      "event": "Munich 2024",
+      "court_ticks": 240,
+      "status": "measured",
+      "receipt": "test-crop-joint-20261122/match108-result.json",
+      "source_sha256": "23b6a757e8f01d2366282fb32e2282a76a77f39cfc96c8125069826d7f458fb7",
+      "runs": [
+        [
+          0,
+          6
+        ],
+        [
+          12,
+          66
+        ],
+        [
+          67,
+          71
+        ],
+        [
+          73,
+          74
+        ],
+        [
+          75,
+          107
+        ],
+        [
+          108,
+          111
+        ],
+        [
+          121,
+          123
+        ],
+        [
+          124,
+          125
+        ],
+        [
+          126,
+          129
+        ],
+        [
+          130,
+          144
+        ],
+        [
+          145,
+          146
+        ],
+        [
+          155,
+          168
+        ],
+        [
+          169,
+          179
+        ],
+        [
+          181,
+          182
+        ],
+        [
+          183,
+          184
+        ],
+        [
+          187,
+          188
+        ],
+        [
+          192,
+          203
+        ],
+        [
+          204,
+          207
+        ],
+        [
+          208,
+          213
+        ],
+        [
+          214,
+          216
+        ],
+        [
+          218,
+          240
+        ]
+      ],
+      "paired_ticks": 190,
+      "full": false
+    },
+    {
+      "match": "match102",
+      "event": "Shanghai 2023",
+      "court_ticks": 240,
+      "status": "measured",
+      "receipt": "test-crop-joint-20261122/match102-result.json",
+      "source_sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+      "runs": [
+        [
+          0,
+          240
+        ]
+      ],
+      "paired_ticks": 240,
+      "full": true
+    },
+    {
+      "match": "match120",
+      "event": "Gstaad 2022",
+      "court_ticks": 240,
+      "status": "measured",
+      "receipt": "test-crop-joint-20261122/match120-result.json",
+      "source_sha256": "7d119f25b1922f0dbd7f5ffb6ea5ac34226a8ea93b41e7a37e401f07ee0e5976",
+      "runs": [
+        [
+          0,
+          11
+        ],
+        [
+          30,
+          38
+        ],
+        [
+          39,
+          40
+        ],
+        [
+          44,
+          47
+        ],
+        [
+          48,
+          67
+        ],
+        [
+          70,
+          80
+        ],
+        [
+          94,
+          134
+        ],
+        [
+          135,
+          151
+        ],
+        [
+          154,
+          155
+        ],
+        [
+          156,
+          160
+        ],
+        [
+          161,
+          167
+        ],
+        [
+          169,
+          185
+        ],
+        [
+          187,
+          190
+        ],
+        [
+          191,
+          192
+        ],
+        [
+          196,
+          197
+        ],
+        [
+          198,
+          202
+        ],
+        [
+          203,
+          211
+        ],
+        [
+          212,
+          216
+        ],
+        [
+          219,
+          220
+        ],
+        [
+          221,
+          240
+        ]
+      ],
+      "paired_ticks": 176,
+      "full": false
+    },
+    {
+      "match": "match127",
+      "event": "Sydney, ATP Cup 2022",
+      "court_ticks": 240,
+      "status": "measured",
+      "receipt": "test-joint-extension-20261122/match127-crop-result.json",
+      "source_sha256": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+      "runs": [
+        [
+          0,
+          240
+        ]
+      ],
+      "paired_ticks": 240,
+      "full": true
+    },
+    {
+      "match": "match105",
+      "event": "Halle 2024",
+      "court_ticks": 240,
+      "status": "measured",
+      "receipt": "test-joint-extension-20261122/match105-crop-result.json",
+      "source_sha256": "a518fd0850781642b2233cb1a8e0d910f253952f0d9d3d206326ce8d35ad0d0c",
+      "runs": [
+        [
+          0,
+          240
+        ]
+      ],
+      "paired_ticks": 240,
+      "full": true
+    },
+    {
+      "match": "match116",
+      "event": "Geneva 2023",
+      "court_ticks": 240,
+      "status": "measured",
+      "receipt": "test-joint-extension-20261122/match116-crop-result.json",
+      "source_sha256": "39e290951809a969aab505fe590443ed193f1ac7edf96b5bcfb7d9de2776d677",
+      "runs": [
+        [
+          0,
+          31
+        ],
+        [
+          33,
+          92
+        ],
+        [
+          95,
+          97
+        ],
+        [
+          105,
+          113
+        ],
+        [
+          114,
+          150
+        ],
+        [
+          151,
+          152
+        ],
+        [
+          154,
+          240
+        ]
+      ],
+      "paired_ticks": 223,
+      "full": false
+    },
+    {
+      "match": "match107",
+      "event": "Miami 2024",
+      "court_ticks": 240,
+      "status": "unmeasured",
+      "runs": [],
+      "paired_ticks": null,
+      "full": null,
+      "expired_jobs": [
+        "20261122T133308Z-bbb7dc8e"
+      ]
+    },
+    {
+      "match": "match131",
+      "event": "Acapulco 2024",
+      "court_ticks": 240,
+      "status": "unmeasured",
+      "runs": [],
+      "paired_ticks": null,
+      "full": null,
+      "expired_jobs": [
+        "20261122T134101Z-9e8368c0"
+      ]
+    },
+    {
+      "match": "match119",
+      "event": "Monte-Carlo 2024",
+      "court_ticks": 0,
+      "status": "ordinary",
+      "runs": [],
+      "paired_ticks": 0,
+      "full": false
+    },
+    {
+      "match": "match104",
+      "event": "Marseille 2020",
+      "court_ticks": 240,
+      "status": "unmeasured",
+      "runs": [],
+      "paired_ticks": null,
+      "full": null,
+      "expired_jobs": [
+        "20261122T135219Z-fa5e69f9"
+      ]
+    },
+    {
+      "match": "match130",
+      "event": "Queen's Club 2024",
+      "court_ticks": 240,
+      "status": "unmeasured",
+      "runs": [],
+      "paired_ticks": null,
+      "full": null,
+      "expired_jobs": [
+        "20261122T125130Z-eecab011"
+      ]
+    },
+    {
+      "match": "match126",
+      "event": "Lyon 2024",
+      "court_ticks": 240,
+      "status": "unmeasured",
+      "runs": [],
+      "paired_ticks": null,
+      "full": null,
+      "expired_jobs": [
+        "20261122T125217Z-f68c059a"
+      ]
+    }
+  ],
+  "enrolled_matches": 12,
+  "measured_pose_matches": 6,
+  "full_joint_pose_matches": 3,
+  "partial_pose_matches": 3,
+  "ordinary_route_matches": 1,
+  "unmeasured_pose_matches": 5,
+  "paired_ticks_measured": 1309,
+  "ticks_in_measured_pose_tests": 1440,
+  "ticks_enrolled": 2880
+}

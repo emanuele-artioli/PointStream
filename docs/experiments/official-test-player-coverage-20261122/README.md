@@ -12,3 +12,11 @@ All five remaining court-selected shots meet the native geometry prerequisite (M
 Miami’s global features follow the near player (track 1) and far player (track 3) on the six frozen source views. The near box on frame 47 extends to the right sideline. The original near/far pose counts are 240/0. Retain the mask discrepancy in interpreting the crop result. [Source roles](match107-source-roles.json)
 Acapulco’s six source views show track 0 on the near player and track 1 on the far player. The near athlete reaches the lower image boundary in the second half. The original track identities remain fixed in the native crop check. [Source roles](match131-source-roles.json)
 A foreign process entered the A6000 during the Marseille global-feature smoke. The fleet stopped the task before any completed item, after 62 seconds. The original job is terminal and its evidence is retained. Queue one fresh idle-only attempt at the same native inputs and within the original pooled source budget. The eligibility rule and the court fallback denominator remain fixed.
+
+## Closed at the registered deadline
+
+The twelve prespecified matches include eleven court routes and one conventional route. Six court shots have complete native pose test records: both athletes supplied uninterrupted poses for all 240 frames in Shanghai, Sydney and Halle. Munich, Gstaad and Geneva supplied paired poses on 190, 176 and 223 frames. The six measured shots therefore have 1,309 paired frames among 1,440 (90.9%), with three complete tracks through the entire shot for both players.
+
+Five remaining court shots have unmeasured cropped-pose outcomes. On Miami and Acapulco the source extraction completed and the queued crop stage expired. The Marseille global extraction stopped on foreign GPU activity and its idle-only retry expired. The Queen’s Club and Lyon source jobs expired in queue. One other match, Monte-Carlo, routed to ordinary video at the court-selection stage. All twelve remain in the figure; hatching denotes missing pose measurements and amber denotes the observed conventional route. Each output in the completed groups was obtained under the frozen sampling policy.
+
+[Coverage on the twelve scheduled shots](native-player-coverage.pdf) · [Scores and denominators](coverage-summary.json) · [Terminal job receipts](terminal-source-jobs.json)
