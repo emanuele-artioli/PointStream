@@ -36,7 +36,7 @@ def cpu():
     )
 
 
-def run(out):
+def run(out, target=TARGET):
     out.mkdir(exist_ok=False)
     origin = json.loads(
         (HERE.parent / "joint-replication-feasibility-20261122/al028-joint-21kbps.json").read_text()
@@ -114,7 +114,7 @@ def run(out):
             "crf": q,
             "bytes": len(delivered),
             "kbps": len(delivered) / 1200,
-            "percent_from_neural": 100 * (len(delivered) / TARGET - 1),
+            "percent_from_neural": 100 * (len(delivered) / target - 1),
             "stream_sha256": digest(delivered),
             "ivf_sha256": digest(data),
             "ivf_bytes": len(data),
@@ -126,37 +126,39 @@ def run(out):
 
     for arm in SOURCE:
         probe(arm, 52)
-    forecast = (cpu() - start) * (2 + 6) * 1.5 + 35
+    forecast = (cpu() - start) * (8 if target == TARGET else 12) * 1.5 + 35
     if forecast > 600:
         raise RuntimeError(f"full-size controls forecast {forecast:.1f} CPU seconds")
 
     def nearest(rows):
-        return min(rows, key=lambda v: (abs(v["bytes"] - TARGET), v["bytes"]))
+        return min(rows, key=lambda v: (abs(v["bytes"] - target), v["bytes"]))
 
     best = {}
     for arm, rows in records.items():
-        for q in (53, 53.5, 54):
+        for q in (53, 53.5, 54) if target == TARGET else (25, 35, 45):
             probe(arm, q)
-        for _ in range(3):
+        for _ in range(3 if target == TARGET else 8):
             if abs(nearest(rows)["percent_from_neural"]) <= 0.5:
                 break
-            small = [r for r in rows if r["bytes"] < TARGET]
-            big = [r for r in rows if r["bytes"] > TARGET]
+            small = [r for r in rows if r["bytes"] < target]
+            big = [r for r in rows if r["bytes"] > target]
             if not small or not big:
                 break
             q = (nearest(small)["crf"] + nearest(big)["crf"]) / 2
+            if target != TARGET:
+                q = round(4 * q) / 4
             if any(r["crf"] == q for r in rows):
                 break
             probe(arm, q)
         best[arm] = nearest(rows)
-    totals = [r["bytes"] for r in best.values()] + [TARGET]
+    totals = [r["bytes"] for r in best.values()] + [target]
     result = {
-        "neural_bytes": TARGET,
+        "neural_bytes": target,
         "selection": "nearest complete bytes; smaller packet breaks ties",
         "cache_sha256": digest(cache),
         "cache_bytes": len(cache),
         "all_pose_and_ball_bytes_identical_to_21_298": True,
-        "reference_rate_kbps": TARGET / 1200,
+        "reference_rate_kbps": target / 1200,
         "max_pairwise_percent": 100 * (max(totals) / min(totals) - 1),
         "within_half_percent_of_neural": all(
             abs(r["percent_from_neural"]) <= 0.5 for r in best.values()
@@ -176,4 +178,6 @@ def run(out):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("out", type=Path)
-    run(ap.parse_args().out)
+    ap.add_argument("--target-bytes", type=int, choices=(TARGET, 47725), default=TARGET)
+    args = ap.parse_args()
+    run(args.out, args.target_bytes)

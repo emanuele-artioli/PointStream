@@ -1,0 +1,247 @@
+{
+  "neural_bytes": 47725,
+  "selection": "nearest complete bytes; smaller packet breaks ties",
+  "cache_sha256": "91bd3a3fd9b18db301348c98e5af1536b859f2e51dde71e7de56c3beee1c1af2",
+  "cache_bytes": 157517,
+  "all_pose_and_ball_bytes_identical_to_21_298": true,
+  "reference_rate_kbps": 39.770833333333336,
+  "max_pairwise_percent": 1.2473271560940802,
+  "within_half_percent_of_neural": false,
+  "selected": {
+    "ordinary": {
+      "crf": 37.75,
+      "bytes": 48297,
+      "kbps": 40.2475,
+      "percent_from_neural": 1.1985332634887325,
+      "stream_sha256": "bac24432bcec62bd5a491839c18c4b162dba369f84827ed055e2cbe01716abd4",
+      "ivf_sha256": "bac24432bcec62bd5a491839c18c4b162dba369f84827ed055e2cbe01716abd4",
+      "ivf_bytes": 48297,
+      "raw_sha256": "6223ebe351ea60873971e1ff379ac40ec7ed638770db22ec60eeaeedcdce0766",
+      "path": "/private/tmp/ps-nov22-al028-matched-39771/ordinary-37.75"
+    },
+    "joint": {
+      "crf": 30.5,
+      "bytes": 47702,
+      "kbps": 39.751666666666665,
+      "percent_from_neural": -0.048192771084332175,
+      "stream_sha256": "55bdedb1840e343a40acea72c80712a3e5165c15731e5ed039f20d57324e42f9",
+      "ivf_sha256": "85744d7d3c77badb06de7d528b38721725ad09c24928a20bb927766c0105ee4c",
+      "ivf_bytes": 43198,
+      "raw_sha256": "36f5dd4444f90bdd83b26de0ef9da2ce6e4708d6cc5938df83482112f916f160",
+      "path": "/private/tmp/ps-nov22-al028-matched-39771/joint-30.5"
+    }
+  },
+  "rows": {
+    "ordinary": [
+      {
+        "crf": 52,
+        "bytes": 25210,
+        "kbps": 21.008333333333333,
+        "percent_from_neural": -47.1765322158198,
+        "stream_sha256": "dbe2c84721d430e48d885cab2ea65772da55b896d1dbcb726b4fa1fe974c7e6b",
+        "ivf_sha256": "dbe2c84721d430e48d885cab2ea65772da55b896d1dbcb726b4fa1fe974c7e6b",
+        "ivf_bytes": 25210,
+        "raw_sha256": "dec4ea4740491d2eec30b6b94e67a154485bf8dc8bb390d0a1abb310e548194e",
+        "path": "/private/tmp/ps-nov22-al028-matched-39771/ordinary-52"
+      },
+      {
+        "crf": 25,
+        "bytes": 95437,
+        "kbps": 79.53083333333333,
+        "percent_from_neural": 99.972760607648,
+        "stream_sha256": "ccfc0486df8892e31671b9817058fe1551089cec316f651d102e66aa299f651a",
+        "ivf_sha256": "ccfc0486df8892e31671b9817058fe1551089cec316f651d102e66aa299f651a",
+        "ivf_bytes": 95437,
+        "raw_sha256": "90a89ef59e553d6051ce7447b2d9ddc2ac2b6e513f478f17827f0cced8d97da7",
+        "path": "/private/tmp/ps-nov22-al028-matched-39771/ordinary-25"
+      },
+      {
+        "crf": 35,
+        "bytes": 55801,
+        "kbps": 46.50083333333333,
+        "percent_from_neural": 16.921948664222096,
+        "stream_sha256": "55fd6d9641d324e1aa223bd87d97252ec9995351f58a1054f9cded7f2544a53c",
+        "ivf_sha256": "55fd6d9641d324e1aa223bd87d97252ec9995351f58a1054f9cded7f2544a53c",
+        "ivf_bytes": 55801,
+        "raw_sha256": "c2f62303def43c337fd7b0b96fa7e0107f6eb52e7d4afdc023e32ed546fbdfee",
+        "path": "/private/tmp/ps-nov22-al028-matched-39771/ordinary-35"
+      },
+      {
+        "crf": 45,
+        "bytes": 33889,
+        "kbps": 28.240833333333335,
+        "percent_from_neural": -28.991094814038764,
+        "stream_sha256": "0c668a67e751ec425234c856fd30407686ec80549b1606d3c32385c188001bd8",
+        "ivf_sha256": "0c668a67e751ec425234c856fd30407686ec80549b1606d3c32385c188001bd8",
+        "ivf_bytes": 33889,
+        "raw_sha256": "3bb43b6e43635ad39fda9c0121be64f9771e7450e6d4475258f5849c67edb796",
+        "path": "/private/tmp/ps-nov22-al028-matched-39771/ordinary-45"
+      },
+      {
+        "crf": 40.0,
+        "bytes": 42655,
+        "kbps": 35.545833333333334,
+        "percent_from_neural": -10.623363017286536,
+        "stream_sha256": "93623028709bfb7772184056f653aad648e47de4832c1644528a1ff2e17ee684",
+        "ivf_sha256": "93623028709bfb7772184056f653aad648e47de4832c1644528a1ff2e17ee684",
+        "ivf_bytes": 42655,
+        "raw_sha256": "e7c233449964971e81efdc302951d2ea1fee55a74e03464ea914fb35d9b18648",
+        "path": "/private/tmp/ps-nov22-al028-matched-39771/ordinary-40"
+      },
+      {
+        "crf": 37.5,
+        "bytes": 48496,
+        "kbps": 40.413333333333334,
+        "percent_from_neural": 1.6155055002619267,
+        "stream_sha256": "8f18fe9c73233ef576af9a196f28a083fffa1fe25f10cb78e1e6fed3daf3c784",
+        "ivf_sha256": "8f18fe9c73233ef576af9a196f28a083fffa1fe25f10cb78e1e6fed3daf3c784",
+        "ivf_bytes": 48496,
+        "raw_sha256": "dcb1eeb705cfcb80123a35407e62c75d01fb80420a3cf94f4a56ee86349b5d25",
+        "path": "/private/tmp/ps-nov22-al028-matched-39771/ordinary-37.5"
+      },
+      {
+        "crf": 38.75,
+        "bytes": 45232,
+        "kbps": 37.693333333333335,
+        "percent_from_neural": -5.223677317967523,
+        "stream_sha256": "47426afd90602e3b96a3cb9acdf5e48a75443c8f3bb3bf90e5c88447f189c2e1",
+        "ivf_sha256": "47426afd90602e3b96a3cb9acdf5e48a75443c8f3bb3bf90e5c88447f189c2e1",
+        "ivf_bytes": 45232,
+        "raw_sha256": "e6ad44ec4ffcf4a00277bc59f886a2daa4180fc13d0504d0958cb088b52e5c03",
+        "path": "/private/tmp/ps-nov22-al028-matched-39771/ordinary-38.75"
+      },
+      {
+        "crf": 38.0,
+        "bytes": 46837,
+        "kbps": 39.030833333333334,
+        "percent_from_neural": -1.8606600314300725,
+        "stream_sha256": "7caeb5f0cdd4d2f0345caf63936b28e9d1ed627e628c72d9b60df78bbd446084",
+        "ivf_sha256": "7caeb5f0cdd4d2f0345caf63936b28e9d1ed627e628c72d9b60df78bbd446084",
+        "ivf_bytes": 46837,
+        "raw_sha256": "5ff0e63b88ea70aa0fcfe253dd91aeadc4d2223bbc604b47c88d68aa0ab93932",
+        "path": "/private/tmp/ps-nov22-al028-matched-39771/ordinary-38"
+      },
+      {
+        "crf": 37.75,
+        "bytes": 48297,
+        "kbps": 40.2475,
+        "percent_from_neural": 1.1985332634887325,
+        "stream_sha256": "bac24432bcec62bd5a491839c18c4b162dba369f84827ed055e2cbe01716abd4",
+        "ivf_sha256": "bac24432bcec62bd5a491839c18c4b162dba369f84827ed055e2cbe01716abd4",
+        "ivf_bytes": 48297,
+        "raw_sha256": "6223ebe351ea60873971e1ff379ac40ec7ed638770db22ec60eeaeedcdce0766",
+        "path": "/private/tmp/ps-nov22-al028-matched-39771/ordinary-37.75"
+      }
+    ],
+    "joint": [
+      {
+        "crf": 52,
+        "bytes": 25558,
+        "kbps": 21.298333333333332,
+        "percent_from_neural": -46.44735463593504,
+        "stream_sha256": "4a53f55b07b8a2371ee54e8d57c4834888e1f46761b8ea53a9871cab3adcec9b",
+        "ivf_sha256": "b2805612994e7f29aacffcacc939461c573ec4b59d94290a775fd21914b11088",
+        "ivf_bytes": 21054,
+        "raw_sha256": "0474cc789810859513295a1bc41c357fb286ad60414864ba6e31b27d1f22e965",
+        "path": "/private/tmp/ps-nov22-al028-matched-39771/joint-52"
+      },
+      {
+        "crf": 25,
+        "bytes": 58011,
+        "kbps": 48.3425,
+        "percent_from_neural": 21.552645364064958,
+        "stream_sha256": "1ccde16f58346cb030683deb438ee9da366e20afb38bc990772c9fd684363567",
+        "ivf_sha256": "e4b15af5266722c3974f229b7ec986c38dfa991a6b20a4249d91cdd09a9aa6d9",
+        "ivf_bytes": 53507,
+        "raw_sha256": "5a2153366a4ac6db5c3dc5e47786624c6eef8afce28012e284f41db32144ab7c",
+        "path": "/private/tmp/ps-nov22-al028-matched-39771/joint-25"
+      },
+      {
+        "crf": 35,
+        "bytes": 40458,
+        "kbps": 33.715,
+        "percent_from_neural": -15.226820324777368,
+        "stream_sha256": "eecd835fdc0fe7c087662996dae0bc8c43d18fa3d43fbf51a73ac3f5946f8a87",
+        "ivf_sha256": "53b00c33ae572dbd4a83201d11b849801eff33c41f109237e34f142bdf5bc0fa",
+        "ivf_bytes": 35954,
+        "raw_sha256": "998b61f1eef10dbe0cd7ba499a3789071d1f62fe4dfad82ab590eec9247a2b8f",
+        "path": "/private/tmp/ps-nov22-al028-matched-39771/joint-35"
+      },
+      {
+        "crf": 45,
+        "bytes": 30232,
+        "kbps": 25.19333333333333,
+        "percent_from_neural": -36.6537454164484,
+        "stream_sha256": "922bb6d1ea32915cc490cc8b37c864fbd8651b5ea14ce3354c59d85547bb039c",
+        "ivf_sha256": "07f657264fd948b7790b59fec854ecf2ff8bc88479018dd203f30737bdf9dc33",
+        "ivf_bytes": 25728,
+        "raw_sha256": "eef9045fd77d2cc8eff02836d9e233a4aef534e3b84de8722f7c2dad8fc591d8",
+        "path": "/private/tmp/ps-nov22-al028-matched-39771/joint-45"
+      },
+      {
+        "crf": 30.0,
+        "bytes": 48594,
+        "kbps": 40.495,
+        "percent_from_neural": 1.8208486118386658,
+        "stream_sha256": "732dfc86a0271fd873632568f6500a867f11bb6bf9c84d5b0b9ed46c79f78152",
+        "ivf_sha256": "cd0f072a3afbeab90128293ae845daac78206fee311e2d99597bbf0e1501bbe1",
+        "ivf_bytes": 44090,
+        "raw_sha256": "53fbb3c20913268cd3ef38be71217a96a64facf2407470a66077206faa5dfb89",
+        "path": "/private/tmp/ps-nov22-al028-matched-39771/joint-30"
+      },
+      {
+        "crf": 32.5,
+        "bytes": 43708,
+        "kbps": 36.42333333333333,
+        "percent_from_neural": -8.41697223677318,
+        "stream_sha256": "bfa904eef6c6b0fe55a61ea700314ff119f9efaf5744f77348549fef4df8ced6",
+        "ivf_sha256": "1fac53c52a146e4a0e076d3d03c1fba7f2fb6b75ad46e7a1e7e89838de1f1fce",
+        "ivf_bytes": 39204,
+        "raw_sha256": "492905313e2e4e738160fca382583fe3dbf45be414e81557fad0df965f750be0",
+        "path": "/private/tmp/ps-nov22-al028-matched-39771/joint-32.5"
+      },
+      {
+        "crf": 31.25,
+        "bytes": 45684,
+        "kbps": 38.07,
+        "percent_from_neural": -4.276584599266631,
+        "stream_sha256": "fe6468023206e85f165fe53427ad8ec0af877593da62eb4c16480978c2d98620",
+        "ivf_sha256": "fca20a9dc10ec0fb2b629ab16c27576cb80076bbba71668d93e7c64a6206c36c",
+        "ivf_bytes": 41180,
+        "raw_sha256": "47da5f2e0b268c72116c085874c94676d7f835be8edbf68fa64775d5dce772cf",
+        "path": "/private/tmp/ps-nov22-al028-matched-39771/joint-31.25"
+      },
+      {
+        "crf": 30.5,
+        "bytes": 47702,
+        "kbps": 39.751666666666665,
+        "percent_from_neural": -0.048192771084332175,
+        "stream_sha256": "55bdedb1840e343a40acea72c80712a3e5165c15731e5ed039f20d57324e42f9",
+        "ivf_sha256": "85744d7d3c77badb06de7d528b38721725ad09c24928a20bb927766c0105ee4c",
+        "ivf_bytes": 43198,
+        "raw_sha256": "36f5dd4444f90bdd83b26de0ef9da2ce6e4708d6cc5938df83482112f916f160",
+        "path": "/private/tmp/ps-nov22-al028-matched-39771/joint-30.5"
+      }
+    ]
+  },
+  "native_tools": {
+    "SvtAv1EncApp": {
+      "path": "/opt/homebrew/bin/SvtAv1EncApp",
+      "real_path": "/opt/homebrew/Cellar/svt-av1/4.0.1/bin/SvtAv1EncApp",
+      "sha256": "db044194faf94d553c2509c8e033ecd05a373ba54d919d0fb49a3a13149d1687",
+      "version": "SVT-AV1 v4.0.1 (release)"
+    },
+    "dav1d": {
+      "path": "/opt/homebrew/bin/dav1d",
+      "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+      "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+      "version": "1.5.4"
+    }
+  },
+  "cpu_seconds": 92.227621,
+  "forecast_cpu": 220.43335399999998,
+  "input_sha256": {
+    "ordinary": "74b15efb18b9c286d4117dfddef066d0f0a66d071a761c69ecc64871b4dff948",
+    "joint": "dfdbb2446a9c70ad6e9a3767eb0f8900a23c4cd5ca610cb8e675819846118b80"
+  }
+}
