@@ -2,6 +2,8 @@
 
 The paper figure asks which paid delivery a receiver should select for a tennis point at 20.4 and 33 kbps. Freeze point identities before examining new outputs. Compare the display produced by scene-selective PointStream with ordinary SVT-AV1, ROI SVT-AV1 and DCVC-UF. The first two physical controls can establish whether foreground gains survive ordinary allocation of the same bandwidth. A matched neural display tests whether the gain survives a learned codec. The figure needs all 18 original routes, including conventionally coded intervals.
 
+The [existing six-rally rate matrix](legacy-reuse.md) links the priced joint, conventional, ROI and neural controls at both target ceilings, including the [new strict-budget Nadal foreground result](nad000-width.md).
+
 ## Which points are enrolled
 
 The [manifest](manifest.json) fixes six distinct physical fixtures and three point identities per fixture. Twelve belong to four development matches. Six points come from two newly obtained, match-held-out fixtures. The two new fixtures share the London 2012 Olympic tournament, grass surface and venue. The previous Shanghai and Sydney recordings provide additional venue coverage in their original, separately reported cohorts. Record exposure for each trained component and judge. The original TenniSet training/validation labels describe the authors’ own experiments. [TenniSet publication](https://hayden.faulkner.codes/pdfs/DICTA17_Tennis.pdf) · [Study of 12 external sources](../cohort-expansion-20261122/README.md)
