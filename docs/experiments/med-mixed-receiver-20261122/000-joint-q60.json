@@ -1,0 +1,182 @@
+{
+  "arm": {
+    "name": "joint-q60",
+    "kind": "rgb_npy",
+    "width": 1920,
+    "height": 1080,
+    "path": "/private/tmp/ps-med000-authoritative-240.npy",
+    "sha256": "24df3470d86e9eafcca89c6f9c77f64304677f56f5ef8bfcd1a33c9e84f50db2",
+    "kbps": 23.233333333333334,
+    "bytes": 13940,
+    "cold_kbps": 361.48,
+    "receiver_job": "20261122T102430Z-fd241a73",
+    "joint_sha256": "615596d2f78d08ebd07fc9dd66136bf586d5c1f2d2921b71aea4dfc437df2b8b"
+  },
+  "source_sha256": "3bf7ddaae0db5c48b1072fccb15f9f162e41fa5999886b9a5bde58dc0495c630",
+  "supports_sha256": "ed45e6d1ebe722b9f1619c08cfb30f927e1d341a050feae9bd1556c4522f800c",
+  "method": "Original W7 source-SAM masks on 12 fixed ticks, native RGB, tight support plus 32-pixel margin, masked DISTS; all-frame native RGB PSNR",
+  "native_fps": 50,
+  "frames": 240,
+  "active_start": 0,
+  "active_frames": 120,
+  "fallback_frames": 120,
+  "body_rows": [
+    {
+      "tick": 10,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.282892644405365
+    },
+    {
+      "tick": 10,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.31270748376846313
+    },
+    {
+      "tick": 30,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.2910768389701843
+    },
+    {
+      "tick": 30,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.3153245449066162
+    },
+    {
+      "tick": 50,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.3265589475631714
+    },
+    {
+      "tick": 50,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.3253008723258972
+    },
+    {
+      "tick": 70,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.3017229437828064
+    },
+    {
+      "tick": 70,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.3485497832298279
+    },
+    {
+      "tick": 90,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.2897358536720276
+    },
+    {
+      "tick": 90,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.36258625984191895
+    },
+    {
+      "tick": 110,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.27545785903930664
+    },
+    {
+      "tick": 110,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.3210434913635254
+    },
+    {
+      "tick": 130,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.5141775012016296
+    },
+    {
+      "tick": 130,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.545289158821106
+    },
+    {
+      "tick": 150,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.5683028697967529
+    },
+    {
+      "tick": 150,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.5586177110671997
+    },
+    {
+      "tick": 170,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.5468806624412537
+    },
+    {
+      "tick": 170,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.6005775928497314
+    },
+    {
+      "tick": 190,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.5366945266723633
+    },
+    {
+      "tick": 190,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.5662963390350342
+    },
+    {
+      "tick": 210,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.5520292520523071
+    },
+    {
+      "tick": 210,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.5370144844055176
+    },
+    {
+      "tick": 230,
+      "player_index": 0,
+      "active": false,
+      "dists": 0.5767268538475037
+    },
+    {
+      "tick": 230,
+      "player_index": 1,
+      "active": false,
+      "dists": 0.5334848165512085
+    }
+  ],
+  "mean_dists": 0.4328770538171132,
+  "active_dists": 0.3127464602390925,
+  "fallback_dists": 0.553007647395134,
+  "rgb_psnr": 19.4153450194505,
+  "active_rgb_psnr": 19.408169424952096,
+  "fallback_rgb_psnr": 19.422532489389106,
+  "source_self_abs": 1.7881393432617188e-07,
+  "weights_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+  "torch": "2.8.0",
+  "cv2": "4.10.0",
+  "device": "cpu",
+  "cpu_seconds": 10.128781,
+  "forecast_cpu_seconds": 79.21344
+}

@@ -1,0 +1,440 @@
+{
+  "source_sha256": "3bf7ddaae0db5c48b1072fccb15f9f162e41fa5999886b9a5bde58dc0495c630",
+  "original_wire_sha256": "615596d2f78d08ebd07fc9dd66136bf586d5c1f2d2921b71aea4dfc437df2b8b",
+  "price_cap": 13940,
+  "active_interval": [
+    0,
+    120
+  ],
+  "cache_sha256": "90f5dbc9f5753b2688a828c12362d808e1db197f44b097c0093ba28cef7ea038",
+  "cache_bytes": 202948,
+  "parts": [
+    {
+      "name": "v0",
+      "begin": 0,
+      "end": 120,
+      "mode": "objects",
+      "width": 160,
+      "height": 96
+    },
+    {
+      "name": "v1",
+      "begin": 120,
+      "end": 240,
+      "mode": "conventional",
+      "width": 320,
+      "height": 192
+    }
+  ],
+  "smoke_cpu_seconds": 1.0300079999999996,
+  "smoke_forecast_cpu": 145.42577999999997,
+  "cpu_seconds": 26.946956000000004,
+  "tools": {
+    "ffmpeg": {
+      "path": "/opt/homebrew/bin/ffmpeg",
+      "real_path": "/opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg",
+      "sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be",
+      "version": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    "encoder": {
+      "path": "/opt/homebrew/bin/SvtAv1EncApp",
+      "real_path": "/opt/homebrew/Cellar/svt-av1/4.0.1/bin/SvtAv1EncApp",
+      "sha256": "db044194faf94d553c2509c8e033ecd05a373ba54d919d0fb49a3a13149d1687",
+      "version": "SVT-AV1 v4.0.1 (release)"
+    },
+    "decoder": {
+      "path": "/opt/homebrew/bin/dav1d",
+      "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+      "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+      "version": "1.5.4"
+    }
+  },
+  "trials": [
+    {
+      "active_crf": 60.0,
+      "fallback_crf": 70.0,
+      "total_bytes": 15581,
+      "kbps": 25.968333333333334,
+      "wire_sha256": "e49a17b7f815709707c4755f55fadc8d972c364c4ef7aaa5a00b8a74177f428b",
+      "pieces": [
+        {
+          "section": "v0",
+          "frames": 120,
+          "crf": 60.0,
+          "bytes": 6479,
+          "stream": "/private/tmp/ps-med000-split-wire-20261122/v0-n120-q4240/stream.ivf",
+          "stream_sha256": "771fc7cb84e764f696d74a37610a9bc3d24f02780241458e6e4494e37a2933eb",
+          "decoded": "/private/tmp/ps-med000-split-wire-20261122/v0-n120-q4240/decoded.yuv",
+          "native_sha256": "95d4e0056abe3053f58e2ad9fdff4c48b7c1bff2a989f7d722070b44cc92e137"
+        },
+        {
+          "section": "v1",
+          "frames": 120,
+          "crf": 70.0,
+          "bytes": 5935,
+          "stream": "/private/tmp/ps-med000-split-wire-20261122/v1-n120-q4280/stream.ivf",
+          "stream_sha256": "e12718a239221e396438dc2cfb34df987259431da1ff6cc790cd072f67dcc38b",
+          "decoded": "/private/tmp/ps-med000-split-wire-20261122/v1-n120-q4280/decoded.yuv",
+          "native_sha256": "0720f0204d1b6ca69907e6f0a15f59fd2bc32b1a4568181c7335c0d9e54c5afd"
+        }
+      ],
+      "roles": {
+        "frame": 13937,
+        "window": 1644,
+        "match": 0,
+        "reference": 0
+      }
+    },
+    {
+      "active_crf": 70.0,
+      "fallback_crf": 70.0,
+      "total_bytes": 13800,
+      "kbps": 23.0,
+      "wire_sha256": "2e2f5807e3df4f9c07b76cc6f0f0be8d3a942380b71202639d4aa3cc472a7bee",
+      "pieces": [
+        {
+          "section": "v0",
+          "frames": 120,
+          "crf": 70.0,
+          "bytes": 4698,
+          "stream": "/private/tmp/ps-med000-split-wire-20261122/v0-n120-q4280/stream.ivf",
+          "stream_sha256": "a26b021f2af6feea243fa16e79a0675a7877ad05ceb8b1cce96750a98fbec34f",
+          "decoded": "/private/tmp/ps-med000-split-wire-20261122/v0-n120-q4280/decoded.yuv",
+          "native_sha256": "2b60128f613effb1f0de226b319320083722197f83596c93feb7bd27c95faa11"
+        },
+        {
+          "section": "v1",
+          "frames": 120,
+          "crf": 70.0,
+          "bytes": 5935,
+          "stream": "/private/tmp/ps-med000-split-wire-20261122/v1-n120-q4280/stream.ivf",
+          "stream_sha256": "e12718a239221e396438dc2cfb34df987259431da1ff6cc790cd072f67dcc38b",
+          "decoded": "/private/tmp/ps-med000-split-wire-20261122/v1-n120-q4280/decoded.yuv",
+          "native_sha256": "0720f0204d1b6ca69907e6f0a15f59fd2bc32b1a4568181c7335c0d9e54c5afd"
+        }
+      ],
+      "roles": {
+        "frame": 12156,
+        "window": 1644,
+        "match": 0,
+        "reference": 0
+      }
+    },
+    {
+      "active_crf": 70.0,
+      "fallback_crf": 40.0,
+      "total_bytes": 36290,
+      "kbps": 60.483333333333334,
+      "wire_sha256": "551e212f5e186d068356409a2032452810e5bdf3791b45a4bbaf6687b38d56d1",
+      "pieces": [
+        {
+          "section": "v0",
+          "frames": 120,
+          "crf": 70.0,
+          "bytes": 4698,
+          "stream": "/private/tmp/ps-med000-split-wire-20261122/v0-n120-q4280/stream.ivf",
+          "stream_sha256": "a26b021f2af6feea243fa16e79a0675a7877ad05ceb8b1cce96750a98fbec34f",
+          "decoded": "/private/tmp/ps-med000-split-wire-20261122/v0-n120-q4280/decoded.yuv",
+          "native_sha256": "2b60128f613effb1f0de226b319320083722197f83596c93feb7bd27c95faa11"
+        },
+        {
+          "section": "v1",
+          "frames": 120,
+          "crf": 40.0,
+          "bytes": 28424,
+          "stream": "/private/tmp/ps-med000-split-wire-20261122/v1-n120-q4160/stream.ivf",
+          "stream_sha256": "99fdfc33a01e4633a74db88669cefd0a585641be5aeb6ec30dae684514baa2f0",
+          "decoded": "/private/tmp/ps-med000-split-wire-20261122/v1-n120-q4160/decoded.yuv",
+          "native_sha256": "ee874f53f65d28d03ee071d7dd6d0345317ec27151804df51ad6e7dc93cedf1c"
+        }
+      ],
+      "roles": {
+        "frame": 34645,
+        "window": 1645,
+        "match": 0,
+        "reference": 0
+      }
+    },
+    {
+      "active_crf": 70.0,
+      "fallback_crf": 55.0,
+      "total_bytes": 24467,
+      "kbps": 40.778333333333336,
+      "wire_sha256": "43b104be59927e5a015a00561d4fa2948d83f1c2ab20dcb4ee0f96b1c70971fa",
+      "pieces": [
+        {
+          "section": "v0",
+          "frames": 120,
+          "crf": 70.0,
+          "bytes": 4698,
+          "stream": "/private/tmp/ps-med000-split-wire-20261122/v0-n120-q4280/stream.ivf",
+          "stream_sha256": "a26b021f2af6feea243fa16e79a0675a7877ad05ceb8b1cce96750a98fbec34f",
+          "decoded": "/private/tmp/ps-med000-split-wire-20261122/v0-n120-q4280/decoded.yuv",
+          "native_sha256": "2b60128f613effb1f0de226b319320083722197f83596c93feb7bd27c95faa11"
+        },
+        {
+          "section": "v1",
+          "frames": 120,
+          "crf": 55.0,
+          "bytes": 16601,
+          "stream": "/private/tmp/ps-med000-split-wire-20261122/v1-n120-q4220/stream.ivf",
+          "stream_sha256": "0dedffbca332ae0ec134c6125d21144e1b8c46422eaf0e51611e42add97d5970",
+          "decoded": "/private/tmp/ps-med000-split-wire-20261122/v1-n120-q4220/decoded.yuv",
+          "native_sha256": "507a8b6b62d0dd198e8c3d2c82cc4483b99353a310cd367b25e2056bfb96cebf"
+        }
+      ],
+      "roles": {
+        "frame": 22822,
+        "window": 1645,
+        "match": 0,
+        "reference": 0
+      }
+    },
+    {
+      "active_crf": 70.0,
+      "fallback_crf": 62.5,
+      "total_bytes": 18432,
+      "kbps": 30.72,
+      "wire_sha256": "414c0016891ef996a4ec95f043cfd11e6e38df2a396fb9875bc29181a9ee5133",
+      "pieces": [
+        {
+          "section": "v0",
+          "frames": 120,
+          "crf": 70.0,
+          "bytes": 4698,
+          "stream": "/private/tmp/ps-med000-split-wire-20261122/v0-n120-q4280/stream.ivf",
+          "stream_sha256": "a26b021f2af6feea243fa16e79a0675a7877ad05ceb8b1cce96750a98fbec34f",
+          "decoded": "/private/tmp/ps-med000-split-wire-20261122/v0-n120-q4280/decoded.yuv",
+          "native_sha256": "2b60128f613effb1f0de226b319320083722197f83596c93feb7bd27c95faa11"
+        },
+        {
+          "section": "v1",
+          "frames": 120,
+          "crf": 62.5,
+          "bytes": 10566,
+          "stream": "/private/tmp/ps-med000-split-wire-20261122/v1-n120-q4250/stream.ivf",
+          "stream_sha256": "1ca30ecbed9f1a04bfd14a532e417f8530af2ac1c7e7fb4b53c429dadd77c6d5",
+          "decoded": "/private/tmp/ps-med000-split-wire-20261122/v1-n120-q4250/decoded.yuv",
+          "native_sha256": "3461fc256409a60ef58ef195657f2791e02560c1b571e4a56346ea25811849ba"
+        }
+      ],
+      "roles": {
+        "frame": 16787,
+        "window": 1645,
+        "match": 0,
+        "reference": 0
+      }
+    },
+    {
+      "active_crf": 70.0,
+      "fallback_crf": 66.25,
+      "total_bytes": 15333,
+      "kbps": 25.555,
+      "wire_sha256": "51bb66561427d8eacd6cb0212cf136370c96246b5f518837be83b70f794dbfaf",
+      "pieces": [
+        {
+          "section": "v0",
+          "frames": 120,
+          "crf": 70.0,
+          "bytes": 4698,
+          "stream": "/private/tmp/ps-med000-split-wire-20261122/v0-n120-q4280/stream.ivf",
+          "stream_sha256": "a26b021f2af6feea243fa16e79a0675a7877ad05ceb8b1cce96750a98fbec34f",
+          "decoded": "/private/tmp/ps-med000-split-wire-20261122/v0-n120-q4280/decoded.yuv",
+          "native_sha256": "2b60128f613effb1f0de226b319320083722197f83596c93feb7bd27c95faa11"
+        },
+        {
+          "section": "v1",
+          "frames": 120,
+          "crf": 66.25,
+          "bytes": 7468,
+          "stream": "/private/tmp/ps-med000-split-wire-20261122/v1-n120-q4265/stream.ivf",
+          "stream_sha256": "c179b3c14b86aa5675208d3cc37a5de51649e737b4897135f08bb5eab02cead3",
+          "decoded": "/private/tmp/ps-med000-split-wire-20261122/v1-n120-q4265/decoded.yuv",
+          "native_sha256": "1bc50a395e231fafab33857412331392a5856674f5230dca94d98d7ff0484db6"
+        }
+      ],
+      "roles": {
+        "frame": 13689,
+        "window": 1644,
+        "match": 0,
+        "reference": 0
+      }
+    },
+    {
+      "active_crf": 70.0,
+      "fallback_crf": 68.0,
+      "total_bytes": 14633,
+      "kbps": 24.388333333333332,
+      "wire_sha256": "850c9c66720184c1b26dcfedb0300bc001f38f6a1f34b520c7459579bc4f109e",
+      "pieces": [
+        {
+          "section": "v0",
+          "frames": 120,
+          "crf": 70.0,
+          "bytes": 4698,
+          "stream": "/private/tmp/ps-med000-split-wire-20261122/v0-n120-q4280/stream.ivf",
+          "stream_sha256": "a26b021f2af6feea243fa16e79a0675a7877ad05ceb8b1cce96750a98fbec34f",
+          "decoded": "/private/tmp/ps-med000-split-wire-20261122/v0-n120-q4280/decoded.yuv",
+          "native_sha256": "2b60128f613effb1f0de226b319320083722197f83596c93feb7bd27c95faa11"
+        },
+        {
+          "section": "v1",
+          "frames": 120,
+          "crf": 68.0,
+          "bytes": 6768,
+          "stream": "/private/tmp/ps-med000-split-wire-20261122/v1-n120-q4272/stream.ivf",
+          "stream_sha256": "b2a640d0f057f7f8297004939174ef184afb820901b0b9fc723f9da431154017",
+          "decoded": "/private/tmp/ps-med000-split-wire-20261122/v1-n120-q4272/decoded.yuv",
+          "native_sha256": "1f8aedbd3ff81caaa652f71c223007739a684fbed28d118171ae3b0fbadf82fe"
+        }
+      ],
+      "roles": {
+        "frame": 12989,
+        "window": 1644,
+        "match": 0,
+        "reference": 0
+      }
+    },
+    {
+      "active_crf": 70.0,
+      "fallback_crf": 69.0,
+      "total_bytes": 14102,
+      "kbps": 23.503333333333334,
+      "wire_sha256": "b62351b6bcd3afcc0f5b7a263ed892cd8437e914816d11b648048f4616da98ef",
+      "pieces": [
+        {
+          "section": "v0",
+          "frames": 120,
+          "crf": 70.0,
+          "bytes": 4698,
+          "stream": "/private/tmp/ps-med000-split-wire-20261122/v0-n120-q4280/stream.ivf",
+          "stream_sha256": "a26b021f2af6feea243fa16e79a0675a7877ad05ceb8b1cce96750a98fbec34f",
+          "decoded": "/private/tmp/ps-med000-split-wire-20261122/v0-n120-q4280/decoded.yuv",
+          "native_sha256": "2b60128f613effb1f0de226b319320083722197f83596c93feb7bd27c95faa11"
+        },
+        {
+          "section": "v1",
+          "frames": 120,
+          "crf": 69.0,
+          "bytes": 6237,
+          "stream": "/private/tmp/ps-med000-split-wire-20261122/v1-n120-q4276/stream.ivf",
+          "stream_sha256": "ab551bc2f1e51bb58944325223e9fff944e26b417182dac6a20990fcb582bc51",
+          "decoded": "/private/tmp/ps-med000-split-wire-20261122/v1-n120-q4276/decoded.yuv",
+          "native_sha256": "16556e61866f3393ccc50544c5408b4ab4f66eb7edb9e71d0c6b9cbb7e9700d4"
+        }
+      ],
+      "roles": {
+        "frame": 12458,
+        "window": 1644,
+        "match": 0,
+        "reference": 0
+      }
+    },
+    {
+      "active_crf": 70.0,
+      "fallback_crf": 69.5,
+      "total_bytes": 13952,
+      "kbps": 23.253333333333334,
+      "wire_sha256": "5bb92802e47f448340201130f47f32e2d63a848ed4d98110faceac9b401b6a06",
+      "pieces": [
+        {
+          "section": "v0",
+          "frames": 120,
+          "crf": 70.0,
+          "bytes": 4698,
+          "stream": "/private/tmp/ps-med000-split-wire-20261122/v0-n120-q4280/stream.ivf",
+          "stream_sha256": "a26b021f2af6feea243fa16e79a0675a7877ad05ceb8b1cce96750a98fbec34f",
+          "decoded": "/private/tmp/ps-med000-split-wire-20261122/v0-n120-q4280/decoded.yuv",
+          "native_sha256": "2b60128f613effb1f0de226b319320083722197f83596c93feb7bd27c95faa11"
+        },
+        {
+          "section": "v1",
+          "frames": 120,
+          "crf": 69.5,
+          "bytes": 6087,
+          "stream": "/private/tmp/ps-med000-split-wire-20261122/v1-n120-q4278/stream.ivf",
+          "stream_sha256": "e44000593e29902091d15269f7491fc73670497cdbdce8917db333056b49e0ef",
+          "decoded": "/private/tmp/ps-med000-split-wire-20261122/v1-n120-q4278/decoded.yuv",
+          "native_sha256": "1909f868d011c508c271524cb0242fd127b8fec52768eaa57f81da702be15b7a"
+        }
+      ],
+      "roles": {
+        "frame": 12308,
+        "window": 1644,
+        "match": 0,
+        "reference": 0
+      }
+    },
+    {
+      "active_crf": 70.0,
+      "fallback_crf": 69.75,
+      "total_bytes": 13859,
+      "kbps": 23.098333333333333,
+      "wire_sha256": "18c2081dec07cd6fcb1ad9d7eda5379ed5767e5e3242f0d040e28862b548a68f",
+      "pieces": [
+        {
+          "section": "v0",
+          "frames": 120,
+          "crf": 70.0,
+          "bytes": 4698,
+          "stream": "/private/tmp/ps-med000-split-wire-20261122/v0-n120-q4280/stream.ivf",
+          "stream_sha256": "a26b021f2af6feea243fa16e79a0675a7877ad05ceb8b1cce96750a98fbec34f",
+          "decoded": "/private/tmp/ps-med000-split-wire-20261122/v0-n120-q4280/decoded.yuv",
+          "native_sha256": "2b60128f613effb1f0de226b319320083722197f83596c93feb7bd27c95faa11"
+        },
+        {
+          "section": "v1",
+          "frames": 120,
+          "crf": 69.75,
+          "bytes": 5994,
+          "stream": "/private/tmp/ps-med000-split-wire-20261122/v1-n120-q4279/stream.ivf",
+          "stream_sha256": "52bfcb19448f64d39cf823522670b285633c66bc99a1423d24a5705ee15de81a",
+          "decoded": "/private/tmp/ps-med000-split-wire-20261122/v1-n120-q4279/decoded.yuv",
+          "native_sha256": "5af28f66be52300095fcda709c87d5adc5c37eb5b66ccceadc56c9d5d840826d"
+        }
+      ],
+      "roles": {
+        "frame": 12215,
+        "window": 1644,
+        "match": 0,
+        "reference": 0
+      }
+    }
+  ],
+  "feasible": true,
+  "selected": {
+    "active_crf": 70.0,
+    "fallback_crf": 69.75,
+    "total_bytes": 13859,
+    "kbps": 23.098333333333333,
+    "wire_sha256": "18c2081dec07cd6fcb1ad9d7eda5379ed5767e5e3242f0d040e28862b548a68f",
+    "pieces": [
+      {
+        "section": "v0",
+        "frames": 120,
+        "crf": 70.0,
+        "bytes": 4698,
+        "stream": "/private/tmp/ps-med000-split-wire-20261122/v0-n120-q4280/stream.ivf",
+        "stream_sha256": "a26b021f2af6feea243fa16e79a0675a7877ad05ceb8b1cce96750a98fbec34f",
+        "decoded": "/private/tmp/ps-med000-split-wire-20261122/v0-n120-q4280/decoded.yuv",
+        "native_sha256": "2b60128f613effb1f0de226b319320083722197f83596c93feb7bd27c95faa11"
+      },
+      {
+        "section": "v1",
+        "frames": 120,
+        "crf": 69.75,
+        "bytes": 5994,
+        "stream": "/private/tmp/ps-med000-split-wire-20261122/v1-n120-q4279/stream.ivf",
+        "stream_sha256": "52bfcb19448f64d39cf823522670b285633c66bc99a1423d24a5705ee15de81a",
+        "decoded": "/private/tmp/ps-med000-split-wire-20261122/v1-n120-q4279/decoded.yuv",
+        "native_sha256": "5af28f66be52300095fcda709c87d5adc5c37eb5b66ccceadc56c9d5d840826d"
+      }
+    ],
+    "roles": {
+      "frame": 12215,
+      "window": 1644,
+      "match": 0,
+      "reference": 0
+    }
+  }
+}

@@ -1,10 +1,11 @@
 """Measure source-defined player support and full-display RGB errors on authentic decodes."""
 
 import argparse
-from hashlib import file_digest
+from hashlib import file_digest, sha256
 import json
 import math
 import struct
+import sys
 import zlib
 from pathlib import Path
 import time
@@ -61,15 +62,18 @@ def main(a):
     for arm in arms:
         dest = a.out / (arm["name"] + ".json")
         path = Path(arm["path"])
-        assert sha(path) == arm["sha256"]
+        streamed = arm["kind"] == "rgb_zseq_stdin"
+        if not streamed:
+            assert sha(path) == arm["sha256"]
+        sequence_hash = sha256()
         h, w = arm["height"], arm["width"]
         seq = None
         rgb = arm["kind"] == "rgb_npy"
         if rgb:
             vid = np.load(path, mmap_mode="r", allow_pickle=False)
             assert vid.dtype == np.uint8 and vid.shape == (240, 1080, 1920, 3)
-        elif arm["kind"] == "rgb_zseq":
-            seq = path.open("rb")
+        elif arm["kind"] in ("rgb_zseq", "rgb_zseq_stdin"):
+            seq = sys.stdin.buffer if streamed else path.open("rb")
             receipt_path = Path(arm["receipt"])
             assert sha(receipt_path) == arm["receipt_sha256"]
             receipt = json.loads(receipt_path.read_text())
@@ -91,11 +95,14 @@ def main(a):
             src = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
             assert src.shape == (1080, 1920, 3)
             if seq is not None:
-                size = struct.unpack(">I", seq.read(4))[0]
+                header = seq.read(4)
+                size = struct.unpack(">I", header)[0]
                 assert size + 4 == receipt["rows"][t]["wire_bytes"]
-                image = np.frombuffer(zlib.decompress(seq.read(size)), np.uint8).reshape(
-                    1080, 1920, 3
-                )
+                payload = seq.read(size)
+                assert len(payload) == size
+                sequence_hash.update(header)
+                sequence_hash.update(payload)
+                image = np.frombuffer(zlib.decompress(payload), np.uint8).reshape(1080, 1920, 3)
                 assert array_sha(image) == receipt["rows"][t]["frame_sha256"]
             elif rgb:
                 image = vid[t]
@@ -128,8 +135,9 @@ def main(a):
                     )
         cap.release()
         if seq is not None:
-            assert not seq.read(1)
-            seq.close()
+            assert not seq.read(1) and sequence_hash.hexdigest() == arm["sha256"]
+            if not streamed:
+                seq.close()
         assert len(scores) == schema["nonempty"]
 
         def mean(rows):

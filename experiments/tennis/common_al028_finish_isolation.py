@@ -58,7 +58,15 @@ def launch(
         expected |= {"joint", "cache"}
         required += [Path(worker_config["joint"]), Path(worker_config["cache"])]
     if kind == "rung":
-        names = ("joint", "cache", "original_joint", "witness_frames", "witness_receipt")
+        names: tuple[str, ...] = (
+            "joint",
+            "cache",
+            "original_joint",
+            "witness_frames",
+            "witness_receipt",
+        )
+        if "split" in worker_config:
+            names += ("split",)
         expected |= {*names, "masks", "ticks"}
         required += [
             *(Path(worker_config[k]) for k in names),
@@ -240,7 +248,12 @@ def worker(expected_hash: str) -> None:
         native_exec = (binary, loader)
         allowed.extend(native_exec)
         cmd = native.decode_argv(binary, output / "result/base.ivf", output / "result/base.yuv")
-        hook = native._audit_policy(cmd)
+        if config["kind"] == "rung" and "split" in config["settings"]:
+            from experiments.tennis import med_split_native
+
+            hook = med_split_native.audit(binary, output / "result")
+        else:
+            hook = native._audit_policy(cmd)
     else:
         hook = boot._deny_processes
     abi, rights = policy.restrict(

@@ -21,6 +21,7 @@ from experiments.tennis import common_player_al028_finish as finish
 from experiments.tennis import common_player_packet as packet
 from experiments.tennis import common_receiver_manifest as manifest
 from experiments.tennis import med_mixed_channel as mixed
+from experiments.tennis import med_split_native as split
 from experiments.tennis import w8_receiver_native_bootstrap as native
 from experiments.tennis.player_requalification import array_sha, sha256
 
@@ -39,8 +40,12 @@ def config_for(a):
         witness_frames=str(root / "frames.npy"),
         witness_receipt=str(root / "finish.json"),
         masks={n: str(root / (n + "-masks.npz")) for n in channel["profile"]["order"]},
-        ticks=mixed.smoke_ticks(channel["start"]) if a.frames == 4 else list(range(240)),
+        ticks=mixed.smoke_ticks(channel["start"], channel["stop"])
+        if a.frames == 4
+        else list(range(240)),
     )
+    if a.split:
+        options["split"] = str(a.split)
     assert a.frames == {"smoke": 4, "full": 240}[os.environ["PS_STAGE"]]
     inputs = [
         Path(v) for k, v in options.items() if k not in ("carrier_sha256", "masks", "ticks")
@@ -109,27 +114,42 @@ def run(c, proof):
         assert masks[name].shape == (240, 784, 512) and masks[name].dtype == bool
     out = Path(c["output"])
     out.mkdir()
-    ivf, yuv = out / "base.ivf", out / "base.yuv"
-    ivf.write_bytes(revised["base"])
     ff = Path(c["ffmpeg"])
     assert sha256(ff) == manifest.NATIVE
-    subprocess.run(
-        native.decode_argv(ff, ivf, yuv),
-        check=True,
-        capture_output=True,
-        stdin=subprocess.DEVNULL,
-        timeout=120,
-    )
-    raw = np.memmap(yuv, np.uint8, "r", shape=(240, 144, 160))
-    assert yuv.stat().st_size == 240 * 144 * 160
-    ref_rung = new == old
+    pieces = None
+    raw = None
+    if "split" in c:
+        assert new == old
+        pieces, actual_wire = split.decode(Path(c["split"]), old, channel, out, ff)
+        coded_sha = actual_wire["joint_sha256"]
+        native_sha = ",".join(p[2] for p in pieces)
+        ref_rung = False
+    else:
+        ivf, yuv = out / "base.ivf", out / "base.yuv"
+        ivf.write_bytes(revised["base"])
+        subprocess.run(
+            native.decode_argv(ff, ivf, yuv),
+            check=True,
+            capture_output=True,
+            stdin=subprocess.DEVNULL,
+            timeout=120,
+        )
+        assert yuv.stat().st_size == 240 * 144 * 160
+        raw = np.memmap(yuv, np.uint8, "r", shape=(240, 144, 160))
+        actual_wire = channel["wire"]
+        coded_sha, native_sha = sha256(ivf), sha256(yuv)
+        ref_rung = new == old
     rows = []
     ticks = c["ticks"]
-    assert ticks in (mixed.smoke_ticks(channel["start"]), list(range(240)))
+    assert ticks in (mixed.smoke_ticks(channel["start"], channel["stop"]), list(range(240)))
     stage_start = time.monotonic()
     with (out / "frames.zseq").open("xb") as dst:
         for t in ticks:
-            base = mixed.canvas(raw[t], t, channel)
+            if pieces is not None:
+                base = split.canvas(pieces, t, channel)
+            else:
+                assert raw is not None
+                base = mixed.canvas(raw[t], t, channel)
             orig_frame = witness[t]
             ref_row = report["rows"][t]
             assert array_sha(orig_frame) == ref_row["frame_sha256"]
@@ -159,13 +179,13 @@ def run(c, proof):
         ticks=ticks,
         rows=rows,
         carrier_sha256=c["carrier_sha256"],
-        wire=channel["wire"],
+        wire=actual_wire,
         witness_sha256=sha256(Path(c["witness_receipt"])),
         original_rung=ref_rung,
         all_witness_frames_matched=ref_rung,
-        codec_input_sha256=sha256(ivf),
+        codec_input_sha256=coded_sha,
         native_sha256=sha256(ff),
-        yuv_sha256=sha256(yuv),
+        yuv_sha256=native_sha,
         frames_sha256=sha256(out / "frames.zseq"),
         loop_seconds=loop,
         elapsed_seconds=time.monotonic() - started,
@@ -240,6 +260,7 @@ if __name__ == "__main__":
     p.add_argument("--validate", action="store_true")
     for k in ("carrier", "manifest", "joint", "cache", "original-joint", "witness"):
         p.add_argument("--" + k, type=Path)
+    p.add_argument("--split", type=Path)
     p.add_argument("--carrier-sha256")
     p.add_argument("--native-sha")
     p.add_argument("--frames", type=int)
