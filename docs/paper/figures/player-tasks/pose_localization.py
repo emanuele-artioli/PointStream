@@ -1,4 +1,5 @@
 """Plot person-localization scores on the two human-reviewed source rallies."""
+
 import json
 from pathlib import Path
 
@@ -26,16 +27,27 @@ def main():
             ax.scatter(value, y + dy, color=color, marker=marker, s=39, zorder=3)
             ax.text(value + 0.024, y + dy, f"{value:.2f}", va="center", fontsize=8, color=color)
         handles.append(Line2D([], [], color=color, marker=marker, linestyle="none", label=name))
-    ax.set(yticks=range(len(ARMS)), yticklabels=ARMS, xlim=(0, 1), ylim=(2.45,-0.45),
-           xlabel="Mean overlap with reviewed person boxes (IoU)")
-    ax.set_xticks([0, .2, .4, .6, .8, 1])
-    ax.legend(handles=handles, loc="lower center", bbox_to_anchor=(.5,1.01), ncol=2,
-              frameon=False, fontsize=8)
-    ax.grid(axis="x", alpha=.24)
-    for spine in ("top","right","left"):
+    ax.set(
+        yticks=range(len(ARMS)),
+        yticklabels=ARMS,
+        xlim=(0, 1),
+        ylim=(2.45, -0.45),
+        xlabel="Mean overlap with reviewed person boxes (IoU)",
+    )
+    ax.set_xticks([0, 0.2, 0.4, 0.6, 0.8, 1])
+    ax.legend(
+        handles=handles,
+        loc="lower center",
+        bbox_to_anchor=(0.5, 1.01),
+        ncol=2,
+        frameon=False,
+        fontsize=8,
+    )
+    ax.grid(axis="x", alpha=0.24)
+    for spine in ("top", "right", "left"):
         ax.spines[spine].set_visible(False)
     ax.tick_params(axis="y", length=0)
-    fig.savefig(HERE / "pose-localization.pdf", metadata={"CreationDate":None})
+    fig.savefig(HERE / "pose-localization.pdf", metadata={"CreationDate": None})
 
 
 if __name__ == "__main__":

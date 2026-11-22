@@ -40,5 +40,19 @@
     },
     "warm_kbps": 23.233333333333334,
     "cold_kbps": 361.48
+  },
+  {
+    "shot": "Shanghai 2023",
+    "seconds": 8.008,
+    "changing_bytes": 17794,
+    "initialization_bytes": 137480,
+    "parts": {
+      "Coded video": 13192,
+      "Player poses": 2301,
+      "Ball": 1064,
+      "Framing": 1237
+    },
+    "warm_kbps": 17.776223776223777,
+    "cold_kbps": 155.11888111888115
   }
 ]
