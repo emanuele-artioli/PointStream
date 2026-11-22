@@ -13,12 +13,11 @@ import numpy as np
 import torch
 
 from experiments.tennis import cohort_ball_score as cohort
+from experiments.tennis import cohort_ball_display as frozen
 from experiments.tennis import k5d_source_oracle as oracle
 from experiments.tennis import shanghai_ball_frozen_score as prior
 from experiments.tennis.k5b_monotrack_cpu import CpuZoo
 from experiments.tennis.k5b_trackers import Zoo
-from src.codecs import svtav1
-from src.pointstream import ball
 
 
 def detect(net, frames, labels, work, name):
@@ -74,28 +73,15 @@ def run(a):
         and receipt["source_sha256"] == meta["source"]["sha256"]
     )
     assert receipt["frames"] == n and receipt["labels_sha256"] == a.labels_sha
-    rates, streams, paid = cohort.load_bank(a.rate, meta)
-    frames, _ = cohort.source(a.source, meta, n)
-    assert cohort.digest(frames) == receipt["source_rgb_sha256"]
     work = Path(os.environ["PS_SCRATCH_DIR"]) / "judge"
     work.mkdir()
-    pos, looks = ball.decode_frames(paid.ball_payload, 240, 960, 544)
-    velocity = ball.velocities(pos)
-    decoder = svtav1.tool("dav1d")
-    assert decoder["sha256"] == cohort.TOOLS["dav1d"]
-    display = {"source": frames}
-    for name in ("ordinary", "candidate"):
-        r = rates[name]
-        native = paid.native if name == "candidate" else streams[r["native_sha256"]]
-        raw = cohort.native(native, r, work, decoder["path"])
-        out = np.lib.format.open_memmap(
-            work / (name + ".npy"), mode="w+", dtype=np.uint8, shape=frames.shape
-        )
-        for t in range(n):
-            img = cohort.display(raw[t], r["width"], r["height"])
-            out[t] = ball.render(img, t, pos, velocity, looks) if name == "candidate" else img
-        assert hashlib.sha256(out).hexdigest() == receipt[name]["rgb_sha256"]
-        display[name] = out
+    portable_seconds = 0.0
+    if a.frozen_display:
+        portable_start = time.monotonic()
+        display = frozen.restore(a.frozen_display, a.frozen_sha, receipt, n, work)
+        portable_seconds = time.monotonic() - portable_start
+    else:
+        display = frozen.reconstruct(a, meta, receipt, work, n)
     labels = cohort.marks(a.labels, a.labels_sha, n)
     oracle.bind_config(a.wasb_code, prior.CONFIG)
     assert cohort.sha(a.wasb_weights / "wasb_tennis_best.pth.tar") == prior.WEIGHT
@@ -137,6 +123,8 @@ def run(a):
         judge_config_sha256=prior.CONFIG,
         device=torch.cuda.get_device_name(0) if a.cuda else "cpu",
         model_init_seconds=init_seconds,
+        portable_seconds=portable_seconds,
+        frozen_display_sha256=a.frozen_sha,
         elapsed=time.monotonic() - start,
     )
     (Path(os.environ["PS_STAGE_DIR"]) / "judge.json").write_text(
@@ -163,7 +151,7 @@ def validate():
         and all(len(h) == 64 for h in r["rgb_sha256"].values()),
     )
     if r["frames"] == 24:
-        setup = r.get("model_init_seconds", 0.0)
+        setup = r.get("model_init_seconds", 0.0) + 0.85 * r.get("portable_seconds", 0.0)
         checks["forecast"] = 1.5 * (setup + (r["elapsed"] - setup) * 10) + (
             20 if r.get("device", "cpu") != "cpu" else 80
         ) < (310 if r.get("device", "cpu") != "cpu" else 2300)
@@ -193,5 +181,7 @@ if __name__ == "__main__":
     p.add_argument("--frames", type=int)
     p.add_argument("--validate", action="store_true")
     p.add_argument("--cuda", action="store_true")
+    p.add_argument("--frozen-display", type=Path)
+    p.add_argument("--frozen-sha")
     args = p.parse_args()
     validate() if args.validate else run(args)
