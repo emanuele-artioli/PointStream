@@ -40,6 +40,7 @@ def main(a):
         frames_sha256=f["frames_file_sha256"],
         native_yuv_sha256=f["yuv_sha256"],
         frame_sha256=[r["frame_sha256"] for r in f["rows"]],
+        base_frame_sha256=[r["base_sha256"] for r in f["rows"]],
         wire=f["wire"],
         source_denied=True,
         actual_gpu=f["gpu"],

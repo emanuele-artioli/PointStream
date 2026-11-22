@@ -5,14 +5,20 @@
     "full_far_cuda": "20261122T112930Z-b78072a2",
     "native_metric_parity": "20261122T113854Z-5f825f0d",
     "cold_neural_fifth_pilot": "20261122T114042Z-709e9dcc",
-    "native_joint_finish": "20261122T120219Z-f2c299f2"
+    "native_joint_finish": "20261122T120219Z-f2c299f2",
+    "full_body_and_review": "20261122T125955Z-4dfede40",
+    "positive_rung": "20261122T125957Z-5caae720",
+    "source_motion": "20261122T125957Z-b7883259"
   },
   "states_at_registration": {
     "full_far_cuda": "complete at 12:01 UTC, all 240 learned crops bound",
     "native_metric_parity": "complete: all 240 source hashes and 480 body scores, campus-vs-Mac abs. difference 0.00000832",
     "cold_neural_fifth_pilot": "gpu5 exclusive only, four true receiver passes, original source, original cadence",
-    "native_joint_finish": "Both full player banks validated; genuine original cadence joint, paid-only source-denied compositor registered at 12:02 UTC; archive remains on campus."
+    "native_joint_finish": "Completed all 240 native ticks and composited both roles on every tick, paid-only GPU6 Ada, archive SHA 0c1fc468072ad67f2922e7ea7a81abb4aec1725bb916210c15224c407f0ccbda.",
+    "full_body_and_review": "Registered 12:59 UTC for all 480 body-ticks and audited 12 source-aligned lossless samples.",
+    "positive_rung": "Registered 12:59 UTC; require all 240 recreated frame hashes to equal the main original.",
+    "source_motion": "Registered 12:59 UTC; original native and three physical affordable controls."
   },
   "local_original_q34_metric_sha256": "7846eef60ee09c6c3a35d321c4ca21b40731f2b163b1503aa0f14d7074dd60d3",
-  "next": "Bind far and near receipt SHA to source-denied whole-240 SAM finish only after both complete; then self-replay and both extra paid rungs; score and export just twelve native PNGs per output."
+  "next": "Validate the main native score, send the 12 exact frames, qualify the priced alternate rungs after the 240/240 self-reread; add lower native neural anchors only if triggered."
 }

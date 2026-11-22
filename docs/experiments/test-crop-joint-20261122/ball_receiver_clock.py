@@ -27,6 +27,8 @@ def sha(path):
 
 def main(a):
     start = time.perf_counter()
+    frames = getattr(a, "frames", 240)
+    assert frames in (24, 240)
     # GCD reports 10 after setNumThreads(1) on the M1 Pro, while zero disables parallel dispatch.
     cv2.setNumThreads(0)
     assert cv2.getNumThreads() == 1
@@ -72,7 +74,7 @@ def main(a):
                 t = time.perf_counter()
                 c0 = time.process_time()
                 last = 0
-                for idx in range(240):
+                for idx in range(frames):
                     frame = mixed.canvas(raw[idx], idx, c)
                     last += int(frame[0, 0, 0])
                 elapsed = time.perf_counter() - t
@@ -81,16 +83,16 @@ def main(a):
                 pass_times[mode + "_cpu_s"] = time.process_time() - c0
             timings.append(pass_times)
         for mode, c in (("paid", channel), ("muted", muted)):
-            pixels[mode] = [array_sha(mixed.canvas(raw[idx], idx, c)) for idx in range(240)]
-    changed = [i for i in range(240) if pixels["paid"][i] != pixels["muted"][i]]
+            pixels[mode] = [array_sha(mixed.canvas(raw[idx], idx, c)) for idx in range(frames)]
+    changed = [i for i in range(frames) if pixels["paid"][i] != pixels["muted"][i]]
     assert changed and all(channel["pos"][i] is not None for i in changed)
     total = [r["native_s"] + r["paid_canvas_s"] for r in timings]
-    duration = 240 * 1001 / 30000
+    duration = frames * 1001 / 30000
     result = dict(
         joint_sha256=sha(joint),
         cache_sha256=sha(cache),
         source=sender["source_sha256"],
-        frames=240,
+        frames=frames,
         native_fps=sender["native_fps"],
         cpu=platform.processor(),
         machine=platform.machine(),
@@ -107,9 +109,9 @@ def main(a):
         clip_seconds=duration,
         median_payload_decode_and_canvas_s=statistics.median(total),
         worst_payload_decode_and_canvas_s=max(total),
-        median_fps=240 / statistics.median(total),
+        median_fps=frames / statistics.median(total),
         meets_native_throughput=statistics.median(total) <= duration,
-        sender_present=217,
+        sender_present=sum(p is not None for p in channel["pos"][:frames]),
         pixels_changed_ticks=len(changed),
         paid_canvas_sha256=pixels["paid"],
         price=dict(running_bytes=row["joint_bytes"], cold_cache_bytes=row["init_bytes"]),
