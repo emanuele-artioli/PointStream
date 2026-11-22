@@ -1,4 +1,4 @@
-"""Re-score the four fixed Shanghai operating points on the same decoded frames and supports."""
+"""Re-score registered, price-matched receiver outputs on identical source frames and supports."""
 
 import argparse
 import csv
@@ -30,11 +30,28 @@ from score_receivers import (  # noqa: E402
     tensor,
 )
 
-ARMS = {
-    "joint-crf50": "joint-50",
-    "ordinary-640-warm": "ordinary-640-warm",
-    "roi-640-warm": "roi-640-warm",
-    "dcvc-480-q34": "dcvc-q34",
+CASES = {
+    "shanghai": {
+        "directory": "shanghai-joint-review-20261122",
+        "joint": "joint-crf50",
+        "arms": {
+            "joint-crf50": "joint-50",
+            "ordinary-640-warm": "ordinary-640-warm",
+            "roi-640-warm": "roi-640-warm",
+            "dcvc-480-q34": "dcvc-q34",
+        },
+        "scope": "The four fixed physical Shanghai CRF50 comparison arms, at the original twelve prespecified instants",
+    },
+    "sydney": {
+        "directory": "sydney-joint-foreground-20261122",
+        "joint": "joint-crf70",
+        "arms": {
+            "joint-crf70": "joint-70",
+            "ordinary-320-warm": "ordinary-320-warm",
+            "dcvc-480-q26": "dcvc-480-q26",
+        },
+        "scope": "Three physical Sydney receivers at the cached 12,890-byte ceiling on the twelve fixed source ticks. The smallest measured effective ROI stream exceeds the ceiling.",
+    },
 }
 ALEX_SHA256 = "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02"
 
@@ -110,10 +127,10 @@ def aggregate(rows):
     return {k: mean(r[k] for r in rows) for k in rows[0]}
 
 
-def load_arm(root, tag, review):
+def load_arm(root, tag, review, cached_path):
     path = root / tag / "arm.json"
     record = json.loads(path.read_text())
-    cached = json.loads((PRIOR / f"automatic-{ARMS[tag]}.json").read_text())
+    cached = json.loads(cached_path.read_text())
     assert record["source_sha256"] == review["source_video_sha256"] == cached["source_sha256"]
     assert record["fps"] == review["source_video_fps"] and record["source_ticks"] == 240
     assert (
@@ -140,7 +157,12 @@ def run(args):
     assert sha(WEIGHTS) == EXPECTED and sha(args.alex) == ALEX_SHA256
     with args.ball.open(encoding="utf-8-sig") as f:
         ball_rows = {int(row["Frame"]): row for row in csv.DictReader(f)}
-    arms = {tag: load_arm(args.arms, tag, review) for tag in ARMS}
+    case = CASES[args.case]
+    receipt_dir = args.receipts or HERE.parent / case["directory"]
+    arms = {
+        tag: load_arm(args.arms, tag, review, receipt_dir / f"automatic-{receipt}.json")
+        for tag, receipt in case["arms"].items()
+    }
     dists, lpips = quality.load_dists(WEIGHTS, "cpu"), quality.load_lpips(args.alex, "cpu")
     setup_seconds = time.process_time() - started
     results = {tag: [] for tag in arms}
@@ -180,7 +202,7 @@ def run(args):
             players = aggregate([r for name, r in values.items() if name != "ball"])
             whole = whole_scores(original, display)
             assert all(math.isfinite(x) for x in whole.values())
-            if i == 0 and tag == "joint-crf50":
+            if i == 0 and tag == case["joint"]:
                 before = time.process_time()
                 with torch.inference_mode():
                     reference = float(
@@ -217,7 +239,7 @@ def run(args):
         assert consumed < 300
     domains = ("player", "ball", "foreground", "whole")
     record = {
-        "scope": "The four fixed physical Shanghai CRF50 comparison arms, at the original twelve prespecified instants",
+        "scope": case["scope"],
         "source_sha256": review["source_video_sha256"],
         "review_sha256": review["review_sha256"],
         "official_ball_sha256": review["official_ball_sha256"],
@@ -257,5 +279,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     for flag in ("review", "ball", "arms", "alex", "out"):
         parser.add_argument(f"--{flag}", type=Path, required=True)
+    parser.add_argument("--case", choices=tuple(CASES), default="shanghai")
+    parser.add_argument("--receipts", type=Path)
     parser.add_argument("--ticks", type=int, choices=(1, 12), required=True)
     run(parser.parse_args())
