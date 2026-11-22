@@ -15,3 +15,14 @@ The two-pair smoke used 0.93 process CPU seconds and reproduced exactly as the f
 | DCVC-UF, 20.4117 kbps | 0.4843 | 14.9512 | 15.4638 |
 
 Mean absolute source change energies on the same supports are 0.2688 / 16.5964 / 16.6597, ordinary AV1 0.1227 / 8.3256 / 3.4905, and DCVC-UF 0.3990 / 9.2618 / 8.5869. Thus in this sample neural has lower regional residual error while ordinary has lower whole-frame error. These are source-model proposal supports, 12 correlated adjacent pairs, and no human temporal preference result. The joint arm remains pending the independently authenticated receiver.
+
+The genuine common-budget joint sequence passed its all-240-frame RGB digest (`43164345ecc74ea5c2dbb5644e1c0aa2a75bef32c4ce5c344dbab4997f856421`) and the scoring replay reproduced every frozen source/ordinary/neural pair-region row exactly. Its [complete numeric receipt](joint-result.json) adds:
+
+| Display | Whole residual error | Track 0 residual error | Track 1 residual error | Track 0 change energy | Track 1 change energy |
+|---|---:|---:|---:|---:|---:|
+| Source | 0 | 0 | 0 | 16.596 | 16.660 |
+| Ordinary AV1, 20.3608 kbps | 0.308 | 16.850 | 17.246 | 8.326 | 3.490 |
+| DCVC-UF, 20.4117 kbps | 0.484 | 14.951 | 15.464 | 9.262 | 8.587 |
+| PointStream cached, 20.4075 kbps | 0.341 | 25.289 | 25.436 | 16.127 | 20.088 |
+
+The baselines have lower source-flow residual error on both source-model player supports in this sampled shot. This is a 12-pair temporal diagnostic, not a whole-rally temporal average or human rating. PointStream's rate assumes the previously paid appearance cache; its 157,517-byte initialization is separately charged in a cold start. No ball trajectory truth is inferred. The native source is 25 fps, so each measured pair is 40 ms apart.
