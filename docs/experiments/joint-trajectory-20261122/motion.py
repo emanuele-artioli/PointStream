@@ -62,7 +62,21 @@ def main(args, on_frame=None):
     assert receipt["all_frames_exact"] and finish["carrier_sha256"] == receipt["carrier_sha256"]
     ffmpeg = meta["tools"]["ffmpeg"]
     assert crops.file_sha(Path(ffmpeg["path"])) == ffmpeg["sha256"]
-    w, h = 1536, 694
+    neural = None
+    neural_dir = getattr(args, "neural", None)
+    if neural_dir is not None:
+        neural_meta = json.loads((neural_dir / "stroke.json").read_text())
+        producer = json.loads((neural_dir / "reports.json").read_text())
+        assert neural_meta["frames_verified"] == 240
+        assert neural_meta["packet_sha256"] == producer["encode"]["container_sha256"]
+        assert neural_meta["kbps"] == 20.45
+        assert crops.file_sha(neural_dir / "full.yuv") == neural_meta["full_yuv_sha256"]
+        neural = np.memmap(neural_dir / "full.yuv", np.uint8, "r", shape=(240, 816, 960))
+        accepted = producer["decode"]["decode-a"]["passes"][0]["frame_sha256"]
+        assert len(accepted) == 240 and all(
+            hashlib.sha256(f).hexdigest() == h for f, h in zip(neural, accepted, strict=True)
+        )
+    w, h = (2048 if neural is not None else 1536), 694
     video = args.output / "joint-serve-comparison.mp4"
     command = [
         ffmpeg["path"],
@@ -136,25 +150,28 @@ def main(args, on_frame=None):
                         finish["rows"][t]["status"][unit],
                     )
                 digest.update(joint)
+                ordinary_display = view(standard[t], 240, 136)
+                neural_display = view(neural[t], 960, 544) if neural is not None else None
                 if on_frame is not None:
-                    on_frame(
+                    inputs = (
                         t,
                         trial.yuv_to_rgb(source[t], 960, 544, False),
-                        view(standard[t], 240, 136),
+                        ordinary_display,
                         joint,
                     )
+                    if neural_display is None:
+                        on_frame(*inputs)
+                    else:
+                        on_frame(*inputs, neural_display)
                 board = np.full((h, w, 3), 247, np.uint8)
-                for j, (img, title) in enumerate(
-                    zip(
-                        (view(source[t], 960, 544), view(standard[t], 240, 136), joint),
-                        (
-                            "Source | 960 x 544",
-                            "AV1 | 21.623 kbps",
-                            "PointStream | 21.545 kbps cached",
-                        ),
-                        strict=True,
-                    )
-                ):
+                displays = [
+                    (view(source[t], 960, 544), "Source | 960 x 544"),
+                    (ordinary_display, "AV1 | 21.623 kbps"),
+                ]
+                if neural_display is not None:
+                    displays.append((neural_display, "DCVC-UF | 20.450 kbps"))
+                displays.append((joint, "PointStream | 21.545 kbps cached"))
+                for j, (img, title) in enumerate(displays):
                     x = j * 512
                     cv2.putText(
                         board,
@@ -225,6 +242,9 @@ def main(args, on_frame=None):
         "scope": "private review encode; displayed coding rates price the original streams",
         "wall_seconds": time.monotonic() - start,
     }
+    if neural is not None:
+        record["neural_packet_sha256"] = neural_meta["packet_sha256"]
+        record["all_240_neural_frames_verified"] = True
     (args.output / "motion-receipt.json").write_text(json.dumps(record, indent=2) + "\n")
     print(record)
 
@@ -234,4 +254,9 @@ if __name__ == "__main__":
     cli.add_argument("packet", type=Path)
     cli.add_argument("controls", type=Path)
     cli.add_argument("output", type=Path)
+    cli.add_argument(
+        "--neural",
+        type=Path,
+        help="authenticated Q6 full.yuv, stroke.json and producer reports.json",
+    )
     main(cli.parse_args())

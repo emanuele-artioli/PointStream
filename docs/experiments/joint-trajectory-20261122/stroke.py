@@ -76,7 +76,7 @@ def main(args):
         nn = np.memmap(args.neural / "stroke.yuv", np.uint8, "r", shape=(3, 816, 960))
         assert all(
             hashlib.sha256(frame).hexdigest() == digest
-            for frame, digest in zip(nn, n["frame_sha256"], strict=True)
+            for frame, digest in zip(nn, n["hashes"], strict=True)
         )
         arms.append(("DCVC-UF", f"{n['kbps']:.3f} kbps", [crop_yuv(f, 960, 544) for f in nn]))
     arms.append(

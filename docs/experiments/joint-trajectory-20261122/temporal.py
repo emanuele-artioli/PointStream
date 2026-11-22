@@ -35,9 +35,12 @@ def main(args):
     previous = {}
     start = time.process_time()
 
-    def observe(t, source, plain, joint):
+    def observe(t, source, plain, joint, neural=None):
         current = {"source": source}
-        for name, frame in (("plain", plain), ("joint", joint)):
+        displays = {"plain": plain, "joint": joint}
+        if neural is not None:
+            displays["neural"] = neural
+        for name, frame in displays.items():
             current[name] = cv2.resize(frame, (960, 544), interpolation=cv2.INTER_AREA)
         if t:
             flow = dis_flow(
@@ -92,6 +95,11 @@ def main(args):
         opencv=cv2.__version__,
         kbps={"joint_cached": 21.545, "plain": 21.623333333333335},
     )
+    if args.neural is not None:
+        original = json.loads((motion.HERE / "temporal.json").read_text())
+        assert all(summary[k] == original["means"][k] for k in ("source", "joint", "plain"))
+        result["kbps"]["neural"] = 20.45
+        result["neural_full_yuv_sha256"] = motion.crops.file_sha(args.neural / "full.yuv")
     (args.output / "temporal.json").write_text(json.dumps(result, indent=2) + "\n")
     print(summary)
 
@@ -100,4 +108,5 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     for arg in ("packet", "controls", "output"):
         parser.add_argument(arg, type=Path)
+    parser.add_argument("--neural", type=Path)
     main(parser.parse_args())
