@@ -162,7 +162,33 @@ def run(c, proof):
             base[union] = orig_frame[union]
             digest = array_sha(base)
             if ref_rung and digest != ref_row["frame_sha256"]:
-                raise ValueError(f"source-denied original-rung replay differs at {t}")
+                assert raw is not None
+                current_canvas = mixed.canvas(raw[t], t, channel)
+                outside = ~union
+                diffs = np.abs(
+                    base[outside].astype(np.int16) - orig_frame[outside].astype(np.int16)
+                )
+                diagnostic = {
+                    "tick": t,
+                    "native_yuv_sha256": native_sha,
+                    "witness_native_yuv_sha256": report["yuv_sha256"],
+                    "base_sha256": array_sha(current_canvas),
+                    "witness_base_sha256": ref_row["base_sha256"],
+                    "frame_sha256": digest,
+                    "witness_frame_sha256": ref_row["frame_sha256"],
+                    "outside_pixels": int(outside.sum()),
+                    "different_outside_pixels": int(np.any(diffs, axis=1).sum()),
+                    "different_outside_channels": int(np.count_nonzero(diffs)),
+                    "max_outside_channel_change": int(diffs.max(initial=0)),
+                    "opencv_version": cv2.__version__,
+                    "opencv_cpu_features": cv2.getCPUFeaturesLine(),
+                    "opencv_threads": cv2.getNumThreads(),
+                    "opencv_optimized": cv2.useOptimized(),
+                    "opencv_ipp": cv2.ipp.useIPP(),
+                }
+                raise ValueError(
+                    f"source-denied original-rung replay differs at {t}: {json.dumps(diagnostic)}"
+                )
             coded = zlib.compress(base.tobytes(), 1)
             dst.write(struct.pack(">I", len(coded)))
             dst.write(coded)
