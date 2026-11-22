@@ -89,7 +89,7 @@ def main(args):
                 internal=all(
                     v["paired"] + len(v["missing"]) == 240 for v in record["tracks"].values()
                 ),
-                cost=os.environ["PS_STAGE"] != "smoke" or summary["seconds"] * 1.5 + 160 < 1200,
+                cost=os.environ["PS_STAGE"] != "smoke" or summary["seconds"] * 1.5 + 160 < 950,
             )
             ok = all(report["checks"].values())
             report["passed"] = ok
