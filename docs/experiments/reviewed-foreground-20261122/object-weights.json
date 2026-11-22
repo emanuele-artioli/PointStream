@@ -1,0 +1,124 @@
+{
+  "starved": {
+    "intervals": [
+      {
+        "start": 0.0,
+        "stop": 0.008539425393791622,
+        "selections": [
+          {
+            "match": "Nadal\u2013Kyrgios",
+            "mode": "DCVC-UF",
+            "kbps": 20.45,
+            "receipt": "joint-trajectory-20261122#DCVC-QP6"
+          },
+          {
+            "match": "Alcaraz\u2013Hurkacz",
+            "mode": "PointStream",
+            "kbps": 20.4075,
+            "receipt": "ab12294fec2bba5bb5b21bf373a3a31c620b80cf9463cd92ab0383647d1a8aa9"
+          }
+        ]
+      },
+      {
+        "start": 0.008539425393791622,
+        "stop": 1.0,
+        "selections": [
+          {
+            "match": "Nadal\u2013Kyrgios",
+            "mode": "PointStream",
+            "kbps": 21.545,
+            "receipt": "joint-trajectory-20261122#target-20"
+          },
+          {
+            "match": "Alcaraz\u2013Hurkacz",
+            "mode": "PointStream",
+            "kbps": 20.4075,
+            "receipt": "ab12294fec2bba5bb5b21bf373a3a31c620b80cf9463cd92ab0383647d1a8aa9"
+          }
+        ]
+      }
+    ],
+    "pooled": {
+      "0": {
+        "PointStream": 0.2963331924243407,
+        "AV1": 0.372110143078096,
+        "DCVC-UF": 0.3283618792439952
+      },
+      "0.25": {
+        "PointStream": 0.29294361828854587,
+        "AV1": 0.4002681178972125,
+        "DCVC-UF": 0.33916945120489056
+      },
+      "0.5": {
+        "PointStream": 0.2895540441527511,
+        "AV1": 0.42842609271632903,
+        "DCVC-UF": 0.34997702316578594
+      },
+      "0.75": {
+        "PointStream": 0.28616447001695633,
+        "AV1": 0.45658406753544556,
+        "DCVC-UF": 0.36078459512668126
+      },
+      "1": {
+        "PointStream": 0.28277489588116156,
+        "AV1": 0.4847420423545621,
+        "DCVC-UF": 0.3715921670875766
+      }
+    }
+  },
+  "upper": {
+    "intervals": [
+      {
+        "start": 0.0,
+        "stop": 0.6839838137837106,
+        "selections": [
+          {
+            "match": "Alcaraz\u2013Hurkacz",
+            "mode": "PointStream",
+            "kbps": 39.751666666666665,
+            "receipt": "55bdedb1840e343a40acea72c80712a3e5165c15731e5ed039f20d57324e42f9"
+          }
+        ]
+      },
+      {
+        "start": 0.6839838137837106,
+        "stop": 1.0,
+        "selections": [
+          {
+            "match": "Alcaraz\u2013Hurkacz",
+            "mode": "DCVC-UF",
+            "kbps": 39.770833333333336,
+            "receipt": "d4c64ac818c1a340b0ce3384961b63c704c81b3561ef2e708118e415b5ea818e"
+          }
+        ]
+      }
+    ],
+    "pooled": {
+      "0": {
+        "PointStream": 0.2373825420032848,
+        "AV1": 0.3125093254176053,
+        "DCVC-UF": 0.26443547010421753
+      },
+      "0.25": {
+        "PointStream": 0.25405446507714013,
+        "AV1": 0.3234867826104164,
+        "DCVC-UF": 0.2712193930690939
+      },
+      "0.5": {
+        "PointStream": 0.2707263881509954,
+        "AV1": 0.3344642398032275,
+        "DCVC-UF": 0.2780033160339702
+      },
+      "0.75": {
+        "PointStream": 0.2873983112248507,
+        "AV1": 0.3454416969960386,
+        "DCVC-UF": 0.28478723899884656
+      },
+      "1": {
+        "PointStream": 0.30381865122101526,
+        "AV1": 0.35641915418884973,
+        "DCVC-UF": 0.2915711619637229
+      }
+    }
+  }
+}

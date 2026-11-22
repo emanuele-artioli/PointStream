@@ -19,7 +19,7 @@ def run(a):
     cv2.setNumThreads(1)
     record = next(
         r
-        for r in json.loads((HERE / "courts-spec.json").read_text())["staged_inputs"]
+        for r in json.loads(a.spec.read_text())["staged_inputs"]
         if r["name"] == a.event
     )
     assert hashlib.sha256(a.source.read_bytes()).hexdigest() == record["sha256"]
@@ -70,6 +70,7 @@ def run(a):
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument("--spec", type=Path, default=HERE / "courts-spec.json")
     p.add_argument("event")
     p.add_argument("source", type=Path)
     p.add_argument("out", type=Path)
