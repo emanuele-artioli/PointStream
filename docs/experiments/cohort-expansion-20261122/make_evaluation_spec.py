@@ -121,5 +121,5 @@ if __name__ == "__main__":
     for k in ("neural-status", "neural-archive-sha"):
         p.add_argument("--" + k, type=Path)
     p.add_argument("--cuda", action="store_true")
-    p.add_argument("--qp", type=int, choices=(12, 24, 36, 48), default=24)
+    p.add_argument("--qp", type=int, choices=range(64), default=24)
     create(p.parse_args())

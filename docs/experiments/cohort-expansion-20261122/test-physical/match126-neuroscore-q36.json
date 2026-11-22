@@ -1,0 +1,191 @@
+{
+  "rows": [
+    {
+      "tick": 22,
+      "dists": 0.2675776481628418
+    },
+    {
+      "tick": 45,
+      "dists": 0.24986755847930908
+    },
+    {
+      "tick": 49,
+      "dists": 0.22285133600234985
+    },
+    {
+      "tick": 54,
+      "dists": 0.18127894401550293
+    },
+    {
+      "tick": 63,
+      "dists": 0.2398419976234436
+    },
+    {
+      "tick": 67,
+      "dists": 0.2504841089248657
+    },
+    {
+      "tick": 72,
+      "dists": 0.2306169867515564
+    },
+    {
+      "tick": 76,
+      "dists": 0.21661752462387085
+    },
+    {
+      "tick": 81,
+      "dists": 0.22378015518188477
+    },
+    {
+      "tick": 85,
+      "dists": 0.21463346481323242
+    },
+    {
+      "tick": 90,
+      "dists": 0.2874166965484619
+    },
+    {
+      "tick": 94,
+      "dists": 0.27519142627716064
+    },
+    {
+      "tick": 99,
+      "dists": 0.3047868013381958
+    },
+    {
+      "tick": 103,
+      "dists": 0.2992023825645447
+    },
+    {
+      "tick": 112,
+      "dists": 0.23482882976531982
+    },
+    {
+      "tick": 117,
+      "dists": 0.206138014793396
+    },
+    {
+      "tick": 121,
+      "dists": 0.2782400846481323
+    },
+    {
+      "tick": 126,
+      "dists": 0.29879051446914673
+    },
+    {
+      "tick": 139,
+      "dists": 0.20277267694473267
+    },
+    {
+      "tick": 144,
+      "dists": 0.18489015102386475
+    },
+    {
+      "tick": 148,
+      "dists": 0.23363864421844482
+    },
+    {
+      "tick": 153,
+      "dists": 0.2720913887023926
+    },
+    {
+      "tick": 157,
+      "dists": 0.24354612827301025
+    },
+    {
+      "tick": 162,
+      "dists": 0.19972097873687744
+    },
+    {
+      "tick": 166,
+      "dists": 0.2161870002746582
+    },
+    {
+      "tick": 171,
+      "dists": 0.26307201385498047
+    },
+    {
+      "tick": 175,
+      "dists": 0.2707587480545044
+    },
+    {
+      "tick": 180,
+      "dists": 0.2834939956665039
+    },
+    {
+      "tick": 184,
+      "dists": 0.29045069217681885
+    },
+    {
+      "tick": 189,
+      "dists": 0.2654861807823181
+    },
+    {
+      "tick": 193,
+      "dists": 0.21246451139450073
+    },
+    {
+      "tick": 198,
+      "dists": 0.26098740100860596
+    },
+    {
+      "tick": 202,
+      "dists": 0.25800812244415283
+    },
+    {
+      "tick": 207,
+      "dists": 0.21281307935714722
+    },
+    {
+      "tick": 211,
+      "dists": 0.24555706977844238
+    },
+    {
+      "tick": 216,
+      "dists": 0.2513236403465271
+    },
+    {
+      "tick": 220,
+      "dists": 0.2214532494544983
+    },
+    {
+      "tick": 225,
+      "dists": 0.26843833923339844
+    },
+    {
+      "tick": 230,
+      "dists": 0.30533087253570557
+    }
+  ],
+  "ball_dists": 0.24729818869859743,
+  "rgb_sha256": "7e69a23a8d31ece28f3767983f6b5a834791f73fe0608cf17a1a5a97128e3792",
+  "whole_rgb_psnr": 26.332303174289056,
+  "match": "match126",
+  "frames": 240,
+  "qp": 36,
+  "size": [
+    480,
+    272
+  ],
+  "fps": "25",
+  "bytes": 29090,
+  "kbps": 24.241666666666667,
+  "source_sha256": "29fb4ef71a4d2ef68d79166542c51fda4f48108dfd6647bacc8b9869c018ab93",
+  "source_rgb_sha256": "6b9a127bed3cd779991dc4cc1fed36599c67bf12421a2d5ed9966ce01f30fa53",
+  "packet_sha256": "1096a99c1d68f61bbbf57f66a07a0a3929d617a57427758e26bedbe288121e55",
+  "neural_archive_sha256": "68b2b60ce84f864812077b3efef0ea5b0393027f22a82213ecf18f980240f019",
+  "labels_sha256": "0531c4d231721d3ca5465d86e21c925698c3cdaac09c050f18f29d3784a560f9",
+  "neural_raw_sha256": "42d093771923482f559542918eec1bb63e9995e15925124860848fea1fcf001d",
+  "visible": 39,
+  "dists_model": {
+    "metric": "DISTS",
+    "net": "vgg16",
+    "torchmetrics": "1.9.0",
+    "weights": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/torchmetrics/functional/image/dists_models/weights.pt",
+    "weights_sha256": "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218",
+    "backbone": "/local/users/emanuele/pointstream/cache/397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0/vgg16-397923af.pth",
+    "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+    "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)"
+  },
+  "elapsed": 13.39823568999418
+}
