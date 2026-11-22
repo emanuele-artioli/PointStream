@@ -8,7 +8,11 @@
     "native_joint_finish": "20261122T120219Z-f2c299f2",
     "full_body_and_review": "20261122T125955Z-4dfede40",
     "positive_rung": "20261122T125957Z-5caae720",
-    "source_motion": "20261122T125957Z-b7883259"
+    "source_motion": "20261122T125957Z-b7883259",
+    "single_core_exact_ball_receiver": "20261122T130343Z-475e2c3b",
+    "original_host_positive_rung": "20261122T130549Z-3aa18d60",
+    "original_host_crf70": "20261122T131229Z-b0af23b6",
+    "motion_corrected_staging": "20261122T131004Z-176c9734"
   },
   "states_at_registration": {
     "full_far_cuda": "complete at 12:01 UTC, all 240 learned crops bound",
@@ -17,8 +21,14 @@
     "native_joint_finish": "Completed all 240 native ticks and composited both roles on every tick, paid-only GPU6 Ada, archive SHA 0c1fc468072ad67f2922e7ea7a81abb4aec1725bb916210c15224c407f0ccbda.",
     "full_body_and_review": "Registered 12:59 UTC for all 480 body-ticks and audited 12 source-aligned lossless samples.",
     "positive_rung": "Registered 12:59 UTC; require all 240 recreated frame hashes to equal the main original.",
-    "source_motion": "Registered 12:59 UTC; original native and three physical affordable controls."
+    "source_motion": "Registered 12:59 UTC; original native and three physical affordable controls.",
+    "single_core_exact_ball_receiver": "Only original gpu6 x86 CPU and exact sealed joint, require 240/240 full RGB checksums and true changed ball pixels on every sender-present tick.",
+    "original_host_positive_rung": "Passed 240/240 exact frame identities on gpu6.",
+    "original_host_crf70": "Registered on original host for 13,555-byte true stream.",
+    "motion_corrected_staging": "The first actual five-frame four-arm smoke passed; 166.5 s staging plus full 455 s ceiling exceed old 600 s total. Registered the same computation with measured setup allowance.",
+    "crf60": "Automatic approval review construed \u201cpaid bitrate\u201d as monetary cost and declined the parallel CRF60 request. Original command not repeated. The actual wire was 15,555 B, and the restricted native Mac alternative failed the exact original-display gate. A balance sheet alone does not give native-player distortion."
   },
   "local_original_q34_metric_sha256": "7846eef60ee09c6c3a35d321c4ca21b40731f2b163b1503aa0f14d7074dd60d3",
-  "next": "Validate the main native score, send the 12 exact frames, qualify the priced alternate rungs after the 240/240 self-reread; add lower native neural anchors only if triggered."
+  "next": "Validate the main native score, send the 12 exact frames, qualify the priced alternate rungs after the 240/240 self-reread; add lower native neural anchors only if triggered.",
+  "review_packet": "twelve individually hashed original 1080p review PNGs in the hash-checked compact scoring archive 6115fa8e325d9c0c647167f2847e72524127aad87cc7de6ae85f787cbfc3b51f, validated 13:07 UTC, scored at 17,794 B."
 }
