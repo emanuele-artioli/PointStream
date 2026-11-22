@@ -1,0 +1,21 @@
+{
+  "event": "match127",
+  "source_sha256": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+  "fps": "60",
+  "selection": "Twelve fixed native instants spanning the first original 240 ticks, all officially labeled visible; source-only selection",
+  "labels_or_selection_sha256": "dd004f20ec88ca03a43f3ce6902cd4ef6565af8c53fed86e5062e248cc57e431",
+  "ticks": [
+    9,
+    32,
+    44,
+    68,
+    92,
+    115,
+    127,
+    151,
+    175,
+    198,
+    210,
+    234
+  ]
+}

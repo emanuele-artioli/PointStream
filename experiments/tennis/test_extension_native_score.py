@@ -23,6 +23,9 @@ CARD = ROOT / "docs/experiments/test-joint-extension-20261122/native"
 sys.path.insert(0, str(ROOT / "docs/experiments/test-crop-joint-20261122"))
 import score_native as native  # noqa: E402
 
+sys.path.insert(0, str(CARD))
+import samples  # noqa: E402
+
 
 def select_arm(a, binding, bank):
     if a.arm.startswith("av1-"):
@@ -129,6 +132,8 @@ def validate(a, stage, dest):
     assert abs(score["pooled"]["dists"] - np.mean([x["body_dists"] for x in score["rows"]])) < 1e-8
     assert score["name"] == a.arm and score["event"] == a.event and score["producer"] == a.producer
     assert abs(score["kbps"] - score["bytes"] * float(Fraction(score["native_fps"])) / 30000) < 1e-8
+    if score["samples_sha256"] is not None:
+        assert sha256(stage / "samples.tar") == score["samples_sha256"]
     assert score["total_s"] < a.full_cap
     forecast = (
         1.5 * ((score["total_s"] - score["score_s"]) + score["score_s"] * 240 / a.frames) + 60
@@ -176,6 +181,11 @@ def main(a):
     supp, sig = native.get_support(
         a.features, receipt=receipts, tracks=[b["roles"][v] for v in ("near", "far")]
     )
+    cfgfile = CARD / (a.event + "-review-ticks.json")
+    cfg = json.loads(cfgfile.read_text()) if cfgfile.is_file() else None
+    samples_sha = None
+    if arm["kind"] in ("rgb_npy", "rgb_zseq") and cfg is not None:
+        samples_sha = samples.export(a, arm, native, b, cfg, stage / "samples.tar")
     model = quality.load_dists(a.weights, "cpu")
     opts = argparse.Namespace(
         scratch=Path(os.environ["PS_SCRATCH_DIR"]),
@@ -184,11 +194,14 @@ def main(a):
         fps=Fraction(b["fps"]),
         full_cap=a.full_cap,
     )
+    if cfg is not None:
+        opts.review_ticks = set(cfg["ticks"])
     start = time.monotonic()
     result = native.score(opts, arm, model, supp, sig)
     result.update(
         event=a.event,
         producer=a.producer,
+        samples_sha256=samples_sha,
         score_s=time.monotonic() - start,
         source_binding_sha256=sha256(CARD / (a.event + "-binding.json")),
         total_s=time.monotonic() - before,
