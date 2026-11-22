@@ -1,0 +1,89 @@
+{
+  "source_sha256": "0afb0fb191881def1235285b58fe54814556c83fed7815cd99a00b92d26bc86c",
+  "source_rgb_sha256": "1887592882905f4465514aa1dc070910cf7cab346c3ce9ae9bfa953c7638f267",
+  "chunk_sha256": [
+    "439525a033ec540df610c85c0192948062cad2b771fb79d6fff6b85cf97ae7c4",
+    "97e32474eee4a8df005e726a350d2e83f670f7eee63d2d56c460bfde8cbb6847"
+  ],
+  "model_code_sha256": "5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff",
+  "model_weight_sha256": "b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec",
+  "context_median_sha256": "d94fcfebcd5827da5662bf1445cab8856beafe254465184b9ee24f9b74a8868f",
+  "guard": false,
+  "payload_sha256": "15efaa4a569cf899f237da280bdeb448dfbb44b15286be5f29c7614389b6416d",
+  "payload_bytes": 528,
+  "seconds": 70.99711284801015,
+  "frames": 240,
+  "present": 93,
+  "job": "20261122T051428Z-1686a833",
+  "chunk_jobs": [
+    "20261122T044455Z-888af996",
+    "20261122T045930Z-c411982d"
+  ],
+  "sender_json_sha256": "0f23195f9b8a26449bf0dc19e83b8c488a829b6389ba514a3aca6169c31623ba",
+  "codec_tools": {
+    "ffmpeg": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+      "version": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    "SvtAv1EncApp": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "sha256": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+      "version": "SVT-AV1 v4.2.0 (release)"
+    },
+    "dav1d": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+      "version": "1.5.4"
+    }
+  },
+  "native": {
+    "stream_sha256": "6f4121e61840ac503f425da8adda599b6688aa54ce0752d9d6f46690960c75be",
+    "encode_command": [
+      "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "-i",
+      "/local/users/emanuele/pointstream/scratch/20261122T051428Z-1686a833-full/al028-ball-fit/source.yuv",
+      "-b",
+      "/local/users/emanuele/pointstream/scratch/20261122T051428Z-1686a833-full/al028-ball-fit/native/stream.ivf",
+      "-w",
+      "960",
+      "-h",
+      "544",
+      "--input-depth",
+      "8",
+      "--fps-num",
+      "25",
+      "--fps-denom",
+      "1",
+      "-n",
+      "240",
+      "--color-range",
+      "0",
+      "--rc",
+      "0",
+      "--crf",
+      "62",
+      "--preset",
+      "4",
+      "--keyint",
+      "-1",
+      "--lp",
+      "6",
+      "--progress",
+      "0"
+    ],
+    "decode_command": [
+      "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "-i",
+      "/local/users/emanuele/pointstream/scratch/20261122T051428Z-1686a833-full/al028-ball-fit/native/stream.ivf",
+      "-o",
+      "/local/users/emanuele/pointstream/scratch/20261122T051428Z-1686a833-full/al028-ball-fit/native/decoded.yuv",
+      "--threads",
+      "1",
+      "--quiet"
+    ]
+  }
+}

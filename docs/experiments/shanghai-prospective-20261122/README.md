@@ -28,3 +28,21 @@ The initial Q24 smoke exited before inference because its child-resource directo
 Qualified receipt-path retry `20261122T050738Z-5e3fb5b0`, revision 9ac7f671.
 
 The corrected allocator admitted the worker, but the default CUDA stream failed inside the native encoder during graph capture before producing a bitstream. Use the W3 historical legacy CUDA stream that generated the accepted 25-fps Al028 packets. Keep the same Q24, four-pass gate, cost forecast and source. Stop if numerical checks fail; no figure point is inferred from a failed encode.
+
+Historical-stream Q24 attempt `20261122T051035Z-6bea6d8b`, revision d661e27b.
+
+Both qualified Shanghai tracking jobs passed. Their 120+120 ticks have the same complete-source RGB, context and model hashes. The joined trajectory and appearance fit is CPU job `20261122T051428Z-1686a833`. The independent Q24 neural control passed all four decoder identities on 240 ticks. It costs 69,542 B or 57.952 kbps, well above the planned 20.4-kbps ball pair. Keep this point at its true price. Before opening ball scores, freeze one Q0 floor test at 960×544 to determine the feasible rate range. If the floor is above 20.4, one half-resolution Q0 and one rate-only intermediate probe may establish a usable physical anchor. Use the same source, model, validation and whole-clip accounting. Stop when a near-budget point or a bracket is obtained.
+
+The single 960×544 QP0 rate floor is frozen as [neural-q0-floor-spec.json](neural-q0-floor-spec.json); it retains the source, 48→240 frame stages, allocator, decoder identities, 2,150-second cap and no-label/no-quality selection policy. Only after its actual completed bytes are known, if they exceed the 20.4-kbps ceiling, proceed to the already registered half-resolution QP0 floor; at most one byte-guided intermediate may then be added. Existing QP24 defaults remain unchanged.
+
+QP0 floor job `20261122T051719Z-35acb5be` submitted pending.
+
+The fixed 960×544 QP0 floor job `20261122T051719Z-35acb5be` failed its 48-frame smoke: independent native receiver decoding disagreed with a maximum pixel difference of 255. No full stream or valid 240-frame rate was produced. Therefore this is not a bitrate floor, and it does not authorize selecting the conditional half-resolution branch; retain the accepted QP24 57.9517-kbps point and the previously frozen AV1/ball-only comparison. No quality or labels were inspected.
+
+Before inspecting labels or quality, independently test the already accepted QP24 at fixed 480×272 as a spatial-resolution ablation ([spec](neural-q24-half-spec.json)). Its rate is unknown; this is not an inference about failed QP0. Retain its achieved physical price if all four decode passes and the encoder I-frame gate pass; if it fails, close with the accepted 57.9517-kbps QP24 full-resolution stream. No further search.
+
+Half-resolution QP24 job `20261122T052123Z-50c1185e` submitted pending.
+
+The full Shanghai trajectory decoded back to the identical 528-byte payload, with 93 nonmissing positions in 240 ticks. Q24 at half spatial resolution separately passed four native decode passes, costing 22,134 B (18.445 kbps at 480×272). This is an affordable neural control on the same shot. The 960×544 Q0 smoke failed independent decoding and supplies no operating point. The complete 960×544 Q24 stream is the higher-rate control. Compare localization on the same frozen source labels and working geometry after the paid PSBL/AV1 display hash check. [Sender](sender-receipt.json) · [Half-scale neural](neural-q24-half-result.json) · [Full-scale neural](neural-q24-receipt.json)
+
+Following the independently frozen 240-frame PSBL/AV1 displays, score the two accepted DCVC streams at their actual prices. Use identical 26 visible and 23 marked not-visible source ticks, original-pixel tolerances, working RGB, DISTS, WASB and checkpoint identities. Both use a native 24-frame CPU smoke and a 1.5× scaled forecast under a 1,700-second full-stage limit. Compare the 18.445-kbps stream as the affordable neural control; report the 57.952-kbps result separately. [Half-scale scoring](neural-score-half-spec.json) · [Full-scale scoring](neural-score-full-spec.json)
