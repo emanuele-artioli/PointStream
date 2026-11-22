@@ -1,0 +1,10 @@
+{
+  "codec": "zlib level 6 (RFC1950), 8-byte magic and original length",
+  "wire_bytes": 7133,
+  "warm_kbps": 11.888333333333334,
+  "wire_sha256": "d0a312f106642de1af777447690714ee82634314cd7bcf3bef67c5d625e283d6",
+  "restored_bytes": 12927,
+  "restored_sha256": "26b35756f5b038dbf509115d38eda8606913726109aaba3dcf20b6e79372e6d0",
+  "source_display_reproduced": true,
+  "scope": "Separate transport diagnostic. Symmetric wrapping of conventional/neural anchors required before any within-budget quality comparison."
+}

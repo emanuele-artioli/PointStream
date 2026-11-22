@@ -1,0 +1,242 @@
+{
+  "scope": "Six prespecified new London points, genuine CPU BallTrack, exact conventional fallback, no independent object quality yet",
+  "source_frame_rate": [
+    25,
+    1
+  ],
+  "counts": {
+    "frames": 904,
+    "fallback": 138,
+    "positions": 497
+  },
+  "rows": [
+    {
+      "rally_id": "v006_p0014",
+      "frames": 106,
+      "positions": 46,
+      "fallback_ticks": 0,
+      "payload_bytes": 220,
+      "reviewed_position_accuracy": null,
+      "wall_seconds": 146.32857400000012,
+      "selected": {
+        "20400": {
+          "ceiling": 10812,
+          "coded_size": [
+            640,
+            360
+          ],
+          "bytes": 9778,
+          "base_bytes": 9467,
+          "framing_bytes": 91,
+          "sha256": "f043b72952184ca0187dfe5fa3645f51ced635e7ff461391b5028233b7752b9f",
+          "base_sha256": "976598c4a30c1a34e3f68efd065c46186afc14aef4d13955b9f23fe4e1d4bb10",
+          "displayed_sha256": "683f6a2ec077521858d4adf8e331db5ced552c6e801019f3c98a40accb7d1399"
+        },
+        "33000": {
+          "ceiling": 17490,
+          "coded_size": [
+            640,
+            360
+          ],
+          "bytes": 12894,
+          "base_bytes": 12583,
+          "framing_bytes": 91,
+          "sha256": "58e93599012f1d2ccdbd6a4a51c3333a2b9520bc0848959154f4ee856efd5697",
+          "base_sha256": "0426c5ea2b5e358231d0f46d0fc131f1559d3deb21fc3dff983ccf6c87422027",
+          "displayed_sha256": "2fffcc39cddc71e2467bdb0e9bfee8845945f7643d804ffc5e86667c79f7e6b0"
+        }
+      },
+      "receipt_sha256": "1cd25c1e5539064ee56f007626df34ccd14516a28d17dfd070cc85f19fb48ec1"
+    },
+    {
+      "rally_id": "v006_p0041",
+      "frames": 132,
+      "positions": 48,
+      "fallback_ticks": 0,
+      "payload_bytes": 253,
+      "reviewed_position_accuracy": null,
+      "wall_seconds": 206.40813199999957,
+      "selected": {
+        "20400": {
+          "ceiling": 13464,
+          "coded_size": [
+            640,
+            360
+          ],
+          "bytes": 11497,
+          "base_bytes": 11153,
+          "framing_bytes": 91,
+          "sha256": "8769d346e83ca0eec8a918c0a3891737bb218279a87018fd11afe57877875e8c",
+          "base_sha256": "48820e76142cad7cbca13f08c3db065b39e96c7b02b5e2cd6109a24dabe246d4",
+          "displayed_sha256": "0f6fad716ae88190ded494b6b02a002461ff2e2a6a7dff498ad56a5e6ed86cbf"
+        },
+        "33000": {
+          "ceiling": 21780,
+          "coded_size": [
+            640,
+            360
+          ],
+          "bytes": 11497,
+          "base_bytes": 11153,
+          "framing_bytes": 91,
+          "sha256": "8769d346e83ca0eec8a918c0a3891737bb218279a87018fd11afe57877875e8c",
+          "base_sha256": "48820e76142cad7cbca13f08c3db065b39e96c7b02b5e2cd6109a24dabe246d4",
+          "displayed_sha256": "0f6fad716ae88190ded494b6b02a002461ff2e2a6a7dff498ad56a5e6ed86cbf"
+        }
+      },
+      "receipt_sha256": "541ce2423ca64e52c436dc4da92df1cb863aeecc73af34994ca7e370d87ee973"
+    },
+    {
+      "rally_id": "v006_p0068",
+      "frames": 144,
+      "positions": 99,
+      "fallback_ticks": 0,
+      "payload_bytes": 489,
+      "reviewed_position_accuracy": null,
+      "wall_seconds": 237.32825158300057,
+      "selected": {
+        "20400": {
+          "ceiling": 14688,
+          "coded_size": [
+            640,
+            360
+          ],
+          "bytes": 12253,
+          "base_bytes": 11673,
+          "framing_bytes": 91,
+          "sha256": "d4c40b15cbb0b2eed70963ad106bdb8caec88f6a802e306d0aec36a554ef8e12",
+          "base_sha256": "f08821f48e49336c76de9c85936648cc032fec8d190d65c832e4a1e4b29bf91d",
+          "displayed_sha256": "002680e98875d8297623c3d7b86adcbc6a55b86b586352a763753d663e7d35a9"
+        },
+        "33000": {
+          "ceiling": 23760,
+          "coded_size": [
+            640,
+            360
+          ],
+          "bytes": 16237,
+          "base_bytes": 15657,
+          "framing_bytes": 91,
+          "sha256": "1f1812481663931a0cc541ee1cb6942a7eb78eb42d23942b7e226c93e4b55a43",
+          "base_sha256": "74ebaa6f7d14cf2102f7363fbfa4a3d0a3a4235e19154bc4f5b2494f539eb994",
+          "displayed_sha256": "3553ba565464a6970274bf7e5b4ca07d302dff85dd24a691db5b4eabfb36c868"
+        }
+      },
+      "receipt_sha256": "4930a6bd898abaed80014b5d895695970373c166d5593f20526a0707532b13d7"
+    },
+    {
+      "rally_id": "v007_p0022",
+      "frames": 120,
+      "positions": 56,
+      "fallback_ticks": 37,
+      "payload_bytes": 312,
+      "reviewed_position_accuracy": null,
+      "wall_seconds": 119.07854762499937,
+      "selected": {
+        "20400": {
+          "ceiling": 12240,
+          "coded_size": [
+            320,
+            180
+          ],
+          "bytes": 9696,
+          "base_bytes": 9293,
+          "framing_bytes": 91,
+          "sha256": "17d207c5b81b4162d4c647d9b48dd1cb68b1ba7024206983b37f3ae13aa63c0d",
+          "base_sha256": "b5d4025d7359448b9da4984b58c2bdcd6b32eb021acd6f88282c34e83ff11485",
+          "displayed_sha256": "39ceece72c04228e6f4eae819cd0541eeeb30a9363653058fcc32cf53c4d7bed"
+        },
+        "33000": {
+          "ceiling": 19800,
+          "coded_size": [
+            640,
+            360
+          ],
+          "bytes": 14460,
+          "base_bytes": 14057,
+          "framing_bytes": 91,
+          "sha256": "0ebb4edde8ab2e158ad336fa1cb53c2b8e2834da26587913ecc8918f42178221",
+          "base_sha256": "a5bc00c25d82d7033e5519f44c9721fe23645589f88016ed8de8d86d77c58106",
+          "displayed_sha256": "f9a9e181545e57ac2cf579e2395118df6276fabe0381b2013de368f677b10089"
+        }
+      },
+      "receipt_sha256": "6b002456360790c27d7b8423dc10c1ba49a1508b8aee0f8f84e60ae7364f0070"
+    },
+    {
+      "rally_id": "v007_p0065",
+      "frames": 138,
+      "positions": 33,
+      "fallback_ticks": 101,
+      "payload_bytes": 168,
+      "reviewed_position_accuracy": null,
+      "wall_seconds": 82.12145062499985,
+      "selected": {
+        "20400": {
+          "ceiling": 14076,
+          "coded_size": [
+            640,
+            360
+          ],
+          "bytes": 13735,
+          "base_bytes": 13476,
+          "framing_bytes": 91,
+          "sha256": "8d5e72a10b923e4a3acf1a1fa7db285830748d47317b04e96dd71331c3761d05",
+          "base_sha256": "8f72a330764be54143184ed1c9f6bd753d62271264587070fb5da9c966729d4c",
+          "displayed_sha256": "7945432a5660e9a4496bce104862913a67a82b4f7703f2ceb2a5bfe342350e1b"
+        },
+        "33000": {
+          "ceiling": 22770,
+          "coded_size": [
+            640,
+            360
+          ],
+          "bytes": 17801,
+          "base_bytes": 17542,
+          "framing_bytes": 91,
+          "sha256": "26a26b47e7fe852a1cbc5b98c1ee7b4ae23ceff6d1849804589516cd1a8b1ce8",
+          "base_sha256": "68f0b1b907430d4df1de7f87eb433dccc802fc0b2515a88714e22b4aeaea0b9c",
+          "displayed_sha256": "46e474c475e0284e12223cf86c316990a8b7dfb2225d99581ad8486995fce5f7"
+        }
+      },
+      "receipt_sha256": "2501c20b8bfa8cdf083410e4693dfbba104674a80fd784fd73d20003a429622a"
+    },
+    {
+      "rally_id": "v007_p0108",
+      "frames": 264,
+      "positions": 215,
+      "fallback_ticks": 0,
+      "payload_bytes": 1070,
+      "reviewed_position_accuracy": null,
+      "wall_seconds": 364.4672710829991,
+      "selected": {
+        "20400": {
+          "ceiling": 26928,
+          "coded_size": [
+            640,
+            360
+          ],
+          "bytes": 21762,
+          "base_bytes": 20601,
+          "framing_bytes": 91,
+          "sha256": "bf41e5f26c8e4166bd74dc1cea79cfd5e438189c417255eafa70d8e9d54a91c7",
+          "base_sha256": "bf932f1473ade8757557f9f339bb3a35fc1ecc08723aab33111f6c6080b5eda4",
+          "displayed_sha256": "7066f31d698d99a7d1f4ddd747ad0bd097c5217f546fa92f76bfa003d2dc21bf"
+        },
+        "33000": {
+          "ceiling": 43560,
+          "coded_size": [
+            640,
+            360
+          ],
+          "bytes": 27106,
+          "base_bytes": 25945,
+          "framing_bytes": 91,
+          "sha256": "f9a122356856cbac4ef8c4b6b90fd8d47215a3488b82382905c5fa9fdb8343b6",
+          "base_sha256": "084ed8e3fd663a20fcbfe5db49deafb49c0733fee9674965213d054ac59ace75",
+          "displayed_sha256": "c19d0a85dbc6d49680c8a44daa2be7a19748bdaaab0a3b6fb0c753448b93cc3f"
+        }
+      },
+      "receipt_sha256": "c673b0ee40f6542966ba334f03cd188dc2662dc433c2719e506608c8e466c477"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "runner_sha256": "373f2f9bf8474d7c3bb9bbf5cc36bae914dd65e189b07d043ce1c73d0e209503",
+  "rallies": [
+    "v006_p0014",
+    "v006_p0041",
+    "v006_p0068",
+    "v007_p0022",
+    "v007_p0065",
+    "v007_p0108"
+  ],
+  "mode": "production court-view gate only; source-only CPU",
+  "gpu_seconds": 0,
+  "wall_cap_per_rally_s": 600
+}

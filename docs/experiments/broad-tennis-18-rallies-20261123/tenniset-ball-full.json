@@ -1,0 +1,342 @@
+{
+  "source_sha256": "8ab59163aa86f3cb0f26b1981e6e546f148cca916e40731c0cdee5c6621e4b78",
+  "source_frames": 106,
+  "rendered": 106,
+  "fps": [
+    25,
+    1
+  ],
+  "source_context_sha256": "f3cfb9ce1dc725267a618a3793d6c116103db6e156a73d8f9fa575fc9cf36039",
+  "tracker": "RacketVision BallTrack CPU",
+  "code_sha256": "5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff",
+  "weights_sha256": "b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec",
+  "device": "cpu",
+  "torch": "2.8.0",
+  "tools": {
+    "ffmpeg": {
+      "path": "/opt/homebrew/bin/ffmpeg",
+      "real_path": "/opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg",
+      "sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be",
+      "version": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    "SvtAv1EncApp": {
+      "path": "/opt/homebrew/bin/SvtAv1EncApp",
+      "real_path": "/opt/homebrew/Cellar/svt-av1/4.0.1/bin/SvtAv1EncApp",
+      "sha256": "db044194faf94d553c2509c8e033ecd05a373ba54d919d0fb49a3a13149d1687",
+      "version": "SVT-AV1 v4.0.1 (release)"
+    },
+    "dav1d": {
+      "path": "/opt/homebrew/bin/dav1d",
+      "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+      "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+      "version": "1.5.4"
+    }
+  },
+  "raw_present": 48,
+  "guard": false,
+  "ball_positions": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    [
+      591,
+      109
+    ],
+    [
+      590,
+      100
+    ],
+    [
+      591,
+      91
+    ],
+    [
+      592,
+      81
+    ],
+    [
+      592,
+      74
+    ],
+    [
+      593,
+      66
+    ],
+    [
+      593,
+      60
+    ],
+    [
+      594,
+      55
+    ],
+    [
+      595,
+      50
+    ],
+    [
+      595,
+      46
+    ],
+    [
+      595,
+      42
+    ],
+    [
+      596,
+      39
+    ],
+    [
+      596,
+      37
+    ],
+    null,
+    [
+      597,
+      34
+    ],
+    null,
+    [
+      598,
+      34
+    ],
+    [
+      599,
+      36
+    ],
+    [
+      599,
+      38
+    ],
+    [
+      598,
+      41
+    ],
+    [
+      600,
+      43
+    ],
+    [
+      600,
+      47
+    ],
+    [
+      600,
+      52
+    ],
+    [
+      600,
+      57
+    ],
+    [
+      600,
+      63
+    ],
+    null,
+    [
+      563,
+      99
+    ],
+    [
+      540,
+      122
+    ],
+    [
+      518,
+      145
+    ],
+    [
+      493,
+      171
+    ],
+    [
+      469,
+      199
+    ],
+    [
+      444,
+      228
+    ],
+    [
+      419,
+      259
+    ],
+    [
+      395,
+      290
+    ],
+    [
+      368,
+      326
+    ],
+    [
+      344,
+      345
+    ],
+    [
+      322,
+      345
+    ],
+    [
+      301,
+      346
+    ],
+    [
+      280,
+      349
+    ],
+    [
+      257,
+      354
+    ],
+    [
+      231,
+      362
+    ],
+    [
+      211,
+      370
+    ],
+    [
+      187,
+      380
+    ],
+    [
+      162,
+      394
+    ],
+    [
+      136,
+      409
+    ],
+    [
+      110,
+      427
+    ],
+    [
+      82,
+      448
+    ],
+    [
+      54,
+      472
+    ],
+    [
+      24,
+      499
+    ],
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+  ],
+  "payload_bytes": 220,
+  "packet_arms": [
+    {
+      "ceiling": 17490,
+      "coded_size": [
+        320,
+        180
+      ],
+      "bytes": 14923,
+      "base_bytes": 14612,
+      "framing_bytes": 91,
+      "sha256": "905e3a1c8d7beaf2aa6044f6972ddd768e059c53b569381485904ce4b800fb0b",
+      "base_sha256": "16dc36a89e4eb18ab9049fd1ee2f4c6955ff0b675f652411374ae38d423d72bc",
+      "displayed_sha256": "caa4cfdfe98fe8cfb0578d0e86ac4b627db16f75d0c5abbccee1d5f9f90652b2"
+    },
+    {
+      "ceiling": 10812,
+      "coded_size": [
+        320,
+        180
+      ],
+      "bytes": 6746,
+      "base_bytes": 6435,
+      "framing_bytes": 91,
+      "sha256": "c213558a0fc927197507f0b915c5557490e061006700ad774fad88f9b1ab85a8",
+      "base_sha256": "a0376895ca4c175f271dd46a9851d897c1d61ea6b8127535aaa7f1a9aaefd8a3",
+      "displayed_sha256": "98dc9b854b086b8cdd13ef50ce7af1c06947facfb0241f02763f28e456e2152b"
+    },
+    {
+      "ceiling": 17490,
+      "coded_size": [
+        640,
+        360
+      ],
+      "bytes": 12894,
+      "base_bytes": 12583,
+      "framing_bytes": 91,
+      "sha256": "58e93599012f1d2ccdbd6a4a51c3333a2b9520bc0848959154f4ee856efd5697",
+      "base_sha256": "0426c5ea2b5e358231d0f46d0fc131f1559d3deb21fc3dff983ccf6c87422027",
+      "displayed_sha256": "2fffcc39cddc71e2467bdb0e9bfee8845945f7643d804ffc5e86667c79f7e6b0"
+    },
+    {
+      "ceiling": 10812,
+      "coded_size": [
+        640,
+        360
+      ],
+      "bytes": 9778,
+      "base_bytes": 9467,
+      "framing_bytes": 91,
+      "sha256": "f043b72952184ca0187dfe5fa3645f51ced635e7ff461391b5028233b7752b9f",
+      "base_sha256": "976598c4a30c1a34e3f68efd065c46186afc14aef4d13955b9f23fe4e1d4bb10",
+      "displayed_sha256": "683f6a2ec077521858d4adf8e331db5ced552c6e801019f3c98a40accb7d1399"
+    }
+  ],
+  "setup_wall_s": 3.0192540420002842,
+  "inference_wall_s": 115.82344637500046,
+  "wall_s": 146.32857400000012,
+  "worker_sha256": "dd0c8e5dbc6dd4dce86d820339a500a6a5c8477f6f7fb216238ac71bb0f2f50e"
+}

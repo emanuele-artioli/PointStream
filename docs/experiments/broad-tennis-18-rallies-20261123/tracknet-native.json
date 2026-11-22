@@ -1,0 +1,76 @@
+{
+  "input_subset_tar_sha256": "7ccdb654822cf25b25b9faa30794bc810d49228cdd42849c79490cc3eb0dad2b",
+  "parent_zip_sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18",
+  "parent_identity_basis": "Archived original Dataset.zip SHA from curator's manifest. Re-read selected members with ZIP CRC validation; the full ZIP was not rehashed in this transfer.",
+  "cadence": [
+    30,
+    1
+  ],
+  "clock_basis": "Author dataset sequence and reported native display rate. Original broadcast presentation timestamps are unavailable.",
+  "jpeg_decoder": "OpenCV 5.0.0 imdecode(IMREAD_COLOR)",
+  "ffmpeg": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+  "rallies": [
+    {
+      "rally_id": "game9_clip1",
+      "label_sha256": "fc1fe57a38f17eeb9c16fb01c9e11ae037fa445014e038c3ffacb07f730f833a",
+      "native_range": [
+        0,
+        83
+      ],
+      "source_path": "Dataset/game9/Clip1",
+      "clip_filename": "game9_clip1.mkv",
+      "clip_sha256": "553b593fb5b110eac8ba33663c372243bf71f17269637057f7e9abdd02c2b383",
+      "original_jpeg_ordered_sha256": "2d8d9e65bcb4560518265d97ace53ba290082ada4cbae87d97e9772ff12e1626",
+      "original_rgb_ordered_sha256": "7ecfff6e715b7f2e3f5655d49398902f63cd1e73de3fcd3b57a37a3465dec4c7",
+      "original_first_rgb_sha256": "1645af802af9b6829d1016e0c32a2f8cff059347bb7bb445e7ffb813d17e81e5",
+      "original_last_rgb_sha256": "013ce4736d6c2ede35e31711af20d448091c5ebae20a030014be90244348c9a1",
+      "native_rgb_replay_equal_frames": 83,
+      "visibility": {
+        "1": 79,
+        "2": 4
+      }
+    },
+    {
+      "rally_id": "game9_clip2",
+      "label_sha256": "d03560ab232440559b4a9cac0e92704819a84266f3ab409493e96a87a122c747",
+      "native_range": [
+        0,
+        258
+      ],
+      "source_path": "Dataset/game9/Clip2",
+      "clip_filename": "game9_clip2.mkv",
+      "clip_sha256": "b41ccedddaf124dbccad6c941305df199b8abfbd56f44cb8c723b42fc24e24d7",
+      "original_jpeg_ordered_sha256": "04f5385e13bc8aacca9728e691dbf5465a43ad329a3658a270a6fbadb5406002",
+      "original_rgb_ordered_sha256": "9a625419844003764dec7678cf4683da57f8a167362a8594bdbf2b89c213c93d",
+      "original_first_rgb_sha256": "f0a1f9bf9ff8b75ffdf2d1cc9a10cdfa2f2e1314e38ae9704c7aef0b8f2d7c47",
+      "original_last_rgb_sha256": "fc1c00426d3889825206fe13284ce734e371136c4b5637a84c617f3480edeab0",
+      "native_rgb_replay_equal_frames": 258,
+      "visibility": {
+        "1": 241,
+        "2": 17
+      }
+    },
+    {
+      "rally_id": "game9_clip5",
+      "label_sha256": "ba554e5aa090948a0211c98bfbbe8429e6318322328ffaebd1de0bf31d290814",
+      "native_range": [
+        0,
+        292
+      ],
+      "source_path": "Dataset/game9/Clip5",
+      "clip_filename": "game9_clip5.mkv",
+      "clip_sha256": "5c6587aaa15ff7303680585e701a044c9328d41cd55ba89652e0a53b3465a5e5",
+      "original_jpeg_ordered_sha256": "870da32398d6040773b125efdab45d26fee9e8d774d8bb2be89d60a0ad0de63b",
+      "original_rgb_ordered_sha256": "c6d634b567fa96bd0f6667efde17d4913e5250ac502a8f0dd62f07dc09783f90",
+      "original_first_rgb_sha256": "232202941ad88aa1073162b7a764d7b75309564819643c2622c70f97ea656c84",
+      "original_last_rgb_sha256": "3097bf3753b8870f8cfbffa5d74d56d7e855fffdd598b2937c9a1947ba0fb788",
+      "native_rgb_replay_equal_frames": 292,
+      "visibility": {
+        "1": 242,
+        "2": 19,
+        "0": 30,
+        "3": 1
+      }
+    }
+  ]
+}

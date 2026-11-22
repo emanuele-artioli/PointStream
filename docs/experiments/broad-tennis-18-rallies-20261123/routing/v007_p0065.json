@@ -1,0 +1,2306 @@
+{
+  "rally_id": "v007_p0065",
+  "source_sha256": "8d15cd9a62d2dfa88ac809bc3ddb07f70eae4c3e4d4f5a6a1325687cb8603143",
+  "native_range": [
+    0,
+    138
+  ],
+  "evaluated_range": [
+    0,
+    138
+  ],
+  "native_fps": [
+    25,
+    1
+  ],
+  "native_dimensions": [
+    1280,
+    720
+  ],
+  "fits": 37,
+  "shots": [
+    {
+      "start": 0,
+      "stop": 70,
+      "predicted": "non_court",
+      "fit_share": 0.0
+    },
+    {
+      "start": 70,
+      "stop": 107,
+      "predicted": "court",
+      "fit_share": 1.0
+    },
+    {
+      "start": 107,
+      "stop": 138,
+      "predicted": "non_court",
+      "fit_share": 0.0
+    }
+  ],
+  "opencv_version": "4.10.0",
+  "rows": [
+    {
+      "frame": 0,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 1,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 2,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 3,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 4,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 5,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 6,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 7,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 8,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 9,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 10,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 11,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 12,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 13,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 14,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 15,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 16,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 17,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 18,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 19,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 20,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 21,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 22,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 23,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 24,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 25,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 26,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 27,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 28,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 29,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 30,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 31,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 32,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 33,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 34,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 35,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 36,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 37,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 38,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 39,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 40,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 41,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 42,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 43,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 44,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 45,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 46,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 47,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 48,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 49,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 50,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 51,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 52,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 53,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 54,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 55,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 56,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 57,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 58,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 59,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 60,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 61,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 62,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 63,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 64,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 65,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 66,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 67,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 68,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 69,
+      "homography": null,
+      "error_px": null,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 70,
+      "homography": [
+        [
+          77.93116058355099,
+          -23.020146861425562,
+          781.0877912871543
+        ],
+        [
+          -0.04540931613664086,
+          6.857333113136971,
+          346.2546516980319
+        ],
+        [
+          -0.0030637789075681956,
+          -0.01892471561688857,
+          1.0
+        ]
+      ],
+      "error_px": 0.5637584924697876,
+      "segments_supported": 9,
+      "visible_fraction": 0.9292188749666755,
+      "clutter": 0.023145673274456702,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 71,
+      "homography": [
+        [
+          77.87167142620714,
+          -23.013501769946345,
+          781.0054569818344
+        ],
+        [
+          -0.06928010541770689,
+          6.855702248933431,
+          346.39039089238736
+        ],
+        [
+          -0.0030844771888209332,
+          -0.01892270833913349,
+          1.0
+        ]
+      ],
+      "error_px": 0.47456273436546326,
+      "segments_supported": 9,
+      "visible_fraction": 0.9292283086765294,
+      "clutter": 0.02189025270332765,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 72,
+      "homography": [
+        [
+          77.80352330571782,
+          -23.003745565288053,
+          780.8985034934884
+        ],
+        [
+          -0.10363113143988643,
+          6.853493214427938,
+          346.5212577506365
+        ],
+        [
+          -0.003114139358703261,
+          -0.01891915173647375,
+          1.0
+        ]
+      ],
+      "error_px": 0.4581321179866791,
+      "segments_supported": 9,
+      "visible_fraction": 0.9294760698573523,
+      "clutter": 0.02267002890343892,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 73,
+      "homography": [
+        [
+          77.75791777666338,
+          -22.98864366711207,
+          780.7993397482695
+        ],
+        [
+          -0.1404203721818809,
+          6.85991448213504,
+          346.60834861824634
+        ],
+        [
+          -0.0031363843458470705,
+          -0.018909213655012243,
+          1.0
+        ]
+      ],
+      "error_px": 0.3604568541049957,
+      "segments_supported": 9,
+      "visible_fraction": 0.9295812216591091,
+      "clutter": 0.024880197992072653,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 74,
+      "homography": [
+        [
+          77.70239666614776,
+          -22.98957534565247,
+          780.7871805984516
+        ],
+        [
+          -0.17987446978446367,
+          6.857766843602679,
+          346.7171527716879
+        ],
+        [
+          -0.0031587566056079596,
+          -0.01891282071262625,
+          1.0
+        ]
+      ],
+      "error_px": 0.4864404499530792,
+      "segments_supported": 9,
+      "visible_fraction": 0.9296093854152779,
+      "clutter": 0.024780110999318424,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 75,
+      "homography": [
+        [
+          77.76463551538701,
+          -22.98758073747227,
+          780.6348035534943
+        ],
+        [
+          -0.17412718630415963,
+          6.86475072861937,
+          346.70455619923484
+        ],
+        [
+          -0.0031305303008151426,
+          -0.01891206702761828,
+          1.0
+        ]
+      ],
+      "error_px": 0.4319116175174713,
+      "segments_supported": 9,
+      "visible_fraction": 0.9295906120816109,
+      "clutter": 0.024746810430761428,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 76,
+      "homography": [
+        [
+          77.67908655236906,
+          -22.98965902109712,
+          780.7169931007227
+        ],
+        [
+          -0.20264421338776306,
+          6.863288826000048,
+          346.67048738542854
+        ],
+        [
+          -0.003168248679131046,
+          -0.018914728885423154,
+          1.0
+        ]
+      ],
+      "error_px": 0.3987758755683899,
+      "segments_supported": 9,
+      "visible_fraction": 0.9296,
+      "clutter": 0.024479155909489233,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 77,
+      "homography": [
+        [
+          77.65846973549269,
+          -23.003666142440757,
+          780.7562011017973
+        ],
+        [
+          -0.21727614579049995,
+          6.856249849609991,
+          346.70757524382503
+        ],
+        [
+          -0.0031616200206366833,
+          -0.018928580261918817,
+          1.0
+        ]
+      ],
+      "error_px": 0.41391226649284363,
+      "segments_supported": 9,
+      "visible_fraction": 0.9296,
+      "clutter": 0.02516797564113712,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 78,
+      "homography": [
+        [
+          77.63739478671519,
+          -23.00477937755642,
+          780.7982297144939
+        ],
+        [
+          -0.21888582719012822,
+          6.852372415779747,
+          346.71842172578454
+        ],
+        [
+          -0.0031698337818463753,
+          -0.018929773615101158,
+          1.0
+        ]
+      ],
+      "error_px": 0.43752795457839966,
+      "segments_supported": 9,
+      "visible_fraction": 0.9296,
+      "clutter": 0.02336168047145249,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 79,
+      "homography": [
+        [
+          77.58647919773304,
+          -22.997620546851525,
+          780.7284919798215
+        ],
+        [
+          -0.24005388443959857,
+          6.858635563082698,
+          346.6647874105968
+        ],
+        [
+          -0.0032010397836370157,
+          -0.018925443765911196,
+          1.0
+        ]
+      ],
+      "error_px": 0.4223778545856476,
+      "segments_supported": 9,
+      "visible_fraction": 0.9294666666666667,
+      "clutter": 0.022547459026058248,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 80,
+      "homography": [
+        [
+          77.54051404283214,
+          -22.996059210177854,
+          780.7172658193203
+        ],
+        [
+          -0.2549187025035842,
+          6.856922834246512,
+          346.63673205363347
+        ],
+        [
+          -0.0032282823282921724,
+          -0.018923305933998016,
+          1.0
+        ]
+      ],
+      "error_px": 0.3347020447254181,
+      "segments_supported": 9,
+      "visible_fraction": 0.9294666666666667,
+      "clutter": 0.021804692861160935,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 81,
+      "homography": [
+        [
+          77.52828468142053,
+          -23.00456011069748,
+          780.751775968172
+        ],
+        [
+          -0.27004712780409046,
+          6.854354867872243,
+          346.6732997556916
+        ],
+        [
+          -0.0032246822190360406,
+          -0.01893156928149156,
+          1.0
+        ]
+      ],
+      "error_px": 0.40795472264289856,
+      "segments_supported": 9,
+      "visible_fraction": 0.929485470541189,
+      "clutter": 0.02075504482323976,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 82,
+      "homography": [
+        [
+          77.47322345960119,
+          -23.0017590105362,
+          780.7505448717675
+        ],
+        [
+          -0.2915000397461576,
+          6.855703961740577,
+          346.6636916882736
+        ],
+        [
+          -0.003257236441682139,
+          -0.018929369309971897,
+          1.0
+        ]
+      ],
+      "error_px": 0.4989210069179535,
+      "segments_supported": 9,
+      "visible_fraction": 0.9293710021321961,
+      "clutter": 0.020428310386732852,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 83,
+      "homography": [
+        [
+          77.47077857534244,
+          -23.007934022599162,
+          780.7773019266145
+        ],
+        [
+          -0.2947348705400514,
+          6.854149820584134,
+          346.67155734836047
+        ],
+        [
+          -0.0032501243512879437,
+          -0.01893644281421365,
+          1.0
+        ]
+      ],
+      "error_px": 0.41668304800987244,
+      "segments_supported": 9,
+      "visible_fraction": 0.9293804130579614,
+      "clutter": 0.019646148663458752,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 84,
+      "homography": [
+        [
+          77.52491488910084,
+          -23.010444219466848,
+          780.7513635209091
+        ],
+        [
+          -0.28054265097790787,
+          6.85619062746691,
+          346.6621783447076
+        ],
+        [
+          -0.0032129047198260043,
+          -0.018938844471160687,
+          1.0
+        ]
+      ],
+      "error_px": 0.657258927822113,
+      "segments_supported": 9,
+      "visible_fraction": 0.929637526652452,
+      "clutter": 0.019873098427498383,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 85,
+      "homography": [
+        [
+          77.49920627872417,
+          -23.02035827262934,
+          780.8456138548713
+        ],
+        [
+          -0.2769882347419338,
+          6.846453057240031,
+          346.660320282164
+        ],
+        [
+          -0.003220217059809767,
+          -0.018944987057752466,
+          1.0
+        ]
+      ],
+      "error_px": 0.6569527983665466,
+      "segments_supported": 9,
+      "visible_fraction": 0.9296187683284457,
+      "clutter": 0.019786045073367543,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 86,
+      "homography": [
+        [
+          77.477189748098,
+          -23.016776367006972,
+          780.8519384873491
+        ],
+        [
+          -0.29020987860156455,
+          6.852672540833342,
+          346.6201464876425
+        ],
+        [
+          -0.003241954692674544,
+          -0.01893781204200396,
+          1.0
+        ]
+      ],
+      "error_px": 0.650957465171814,
+      "segments_supported": 9,
+      "visible_fraction": 0.929637526652452,
+      "clutter": 0.020628673576730396,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 87,
+      "homography": [
+        [
+          77.48483204041786,
+          -23.022708341631667,
+          780.8840210860778
+        ],
+        [
+          -0.290445193867822,
+          6.848110652037993,
+          346.67167640194424
+        ],
+        [
+          -0.0032332569533809453,
+          -0.018941348649636435,
+          1.0
+        ]
+      ],
+      "error_px": 0.5486236214637756,
+      "segments_supported": 9,
+      "visible_fraction": 0.929637526652452,
+      "clutter": 0.020132083667714597,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 88,
+      "homography": [
+        [
+          77.512752781845,
+          -23.033469463290416,
+          780.9635482003351
+        ],
+        [
+          -0.28650967090904494,
+          6.8464203966656365,
+          346.6939166599394
+        ],
+        [
+          -0.003209757470571534,
+          -0.01894794998717347,
+          1.0
+        ]
+      ],
+      "error_px": 0.6347730159759521,
+      "segments_supported": 9,
+      "visible_fraction": 0.9296281487405038,
+      "clutter": 0.02185616133772724,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 89,
+      "homography": [
+        [
+          77.51473507794486,
+          -23.038835808014746,
+          781.0454882288594
+        ],
+        [
+          -0.2826507900388862,
+          6.847099121327437,
+          346.6649828131112
+        ],
+        [
+          -0.003209225486408665,
+          -0.01894779419709712,
+          1.0
+        ]
+      ],
+      "error_px": 1.2931383848190308,
+      "segments_supported": 9,
+      "visible_fraction": 0.9296281487405038,
+      "clutter": 0.020021439446815153,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 90,
+      "homography": [
+        [
+          77.50578627765735,
+          -23.027655561108922,
+          780.9214249539856
+        ],
+        [
+          -0.30125070580062846,
+          6.857910405591016,
+          346.63520353694463
+        ],
+        [
+          -0.0032240647548756668,
+          -0.018939831809258796,
+          1.0
+        ]
+      ],
+      "error_px": 0.5393900871276855,
+      "segments_supported": 9,
+      "visible_fraction": 0.929637526652452,
+      "clutter": 0.018943577148141277,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 91,
+      "homography": [
+        [
+          77.4871997451073,
+          -23.022533781925375,
+          780.874971856166
+        ],
+        [
+          -0.3143998673152024,
+          6.862832093322254,
+          346.61300895811803
+        ],
+        [
+          -0.00323717189223549,
+          -0.018936097372827206,
+          1.0
+        ]
+      ],
+      "error_px": 0.6911908984184265,
+      "segments_supported": 9,
+      "visible_fraction": 0.929637526652452,
+      "clutter": 0.020227587973883927,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 92,
+      "homography": [
+        [
+          77.50613562934684,
+          -23.029272441816346,
+          780.9299834075608
+        ],
+        [
+          -0.3088053967624818,
+          6.858418351813523,
+          346.68154560249786
+        ],
+        [
+          -0.003219215182337782,
+          -0.01894027887830547,
+          1.0
+        ]
+      ],
+      "error_px": 0.6002805233001709,
+      "segments_supported": 9,
+      "visible_fraction": 0.929637526652452,
+      "clutter": 0.019927200120155142,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 93,
+      "homography": [
+        [
+          77.4875669531805,
+          -23.03245862979001,
+          780.9920803861427
+        ],
+        [
+          -0.31235117277443836,
+          6.8576540251319855,
+          346.6727205691627
+        ],
+        [
+          -0.003227409670936099,
+          -0.018942030698213565,
+          1.0
+        ]
+      ],
+      "error_px": 0.7936285138130188,
+      "segments_supported": 9,
+      "visible_fraction": 0.929637526652452,
+      "clutter": 0.020286487553046434,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 94,
+      "homography": [
+        [
+          77.51600315050072,
+          -23.033053925281123,
+          781.0011624841367
+        ],
+        [
+          -0.3152429049833546,
+          6.85844221331251,
+          346.7611688621161
+        ],
+        [
+          -0.0032121010159443116,
+          -0.0189412855821863,
+          1.0
+        ]
+      ],
+      "error_px": 0.7005777955055237,
+      "segments_supported": 9,
+      "visible_fraction": 0.9296281487405038,
+      "clutter": 0.020831646078476124,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 95,
+      "homography": [
+        [
+          77.51448725728306,
+          -23.01977470432324,
+          780.8339070471818
+        ],
+        [
+          -0.3271052387093563,
+          6.861893501293641,
+          346.7664035300841
+        ],
+        [
+          -0.0032285900555848205,
+          -0.01893149111477567,
+          1.0
+        ]
+      ],
+      "error_px": 1.404767632484436,
+      "segments_supported": 9,
+      "visible_fraction": 0.9296281487405038,
+      "clutter": 0.019869451197335426,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 96,
+      "homography": [
+        [
+          77.52005653656433,
+          -23.014324876934786,
+          780.7528244404529
+        ],
+        [
+          -0.33204096989847637,
+          6.865755762966319,
+          346.7452067263671
+        ],
+        [
+          -0.0032322806254226196,
+          -0.018926855667103015,
+          1.0
+        ]
+      ],
+      "error_px": 0.9699637293815613,
+      "segments_supported": 9,
+      "visible_fraction": 0.9297520661157025,
+      "clutter": 0.019697585514263666,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 97,
+      "homography": [
+        [
+          77.55270215955032,
+          -23.026492742967864,
+          780.8182364690688
+        ],
+        [
+          -0.3214364439359954,
+          6.862165978440987,
+          346.79424662641486
+        ],
+        [
+          -0.003205330237740564,
+          -0.018935233354949642,
+          1.0
+        ]
+      ],
+      "error_px": 0.5544177293777466,
+      "segments_supported": 9,
+      "visible_fraction": 0.9298947087831534,
+      "clutter": 0.02186888389168938,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 98,
+      "homography": [
+        [
+          77.5447353208579,
+          -23.023888001739163,
+          780.8133152771551
+        ],
+        [
+          -0.32763485428502065,
+          6.862579566395392,
+          346.84908257504316
+        ],
+        [
+          -0.003208837741098403,
+          -0.01893415968930662,
+          1.0
+        ]
+      ],
+      "error_px": 0.5999637842178345,
+      "segments_supported": 9,
+      "visible_fraction": 0.9298947087831534,
+      "clutter": 0.021366709520843182,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 99,
+      "homography": [
+        [
+          77.5456256006934,
+          -23.03246542865127,
+          780.8495660008099
+        ],
+        [
+          -0.3332193235490872,
+          6.854847537233921,
+          346.9357811682195
+        ],
+        [
+          -0.0032042579750273413,
+          -0.01894118021963657,
+          1.0
+        ]
+      ],
+      "error_px": 1.1250728368759155,
+      "segments_supported": 9,
+      "visible_fraction": 0.9297614287618287,
+      "clutter": 0.019339740664969164,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 100,
+      "homography": [
+        [
+          77.5463101853249,
+          -23.040999353633325,
+          780.927291983203
+        ],
+        [
+          -0.328886754851498,
+          6.859709537671622,
+          346.94757469070566
+        ],
+        [
+          -0.0031955266765077398,
+          -0.01894740224485271,
+          1.0
+        ]
+      ],
+      "error_px": 0.45887622237205505,
+      "segments_supported": 9,
+      "visible_fraction": 0.929656274980016,
+      "clutter": 0.01844485001610358,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 101,
+      "homography": [
+        [
+          77.52455278907091,
+          -23.0410104252485,
+          781.0081769895454
+        ],
+        [
+          -0.3407494495340753,
+          6.85851298023286,
+          347.12180220036237
+        ],
+        [
+          -0.0032139641305015633,
+          -0.018943719968692124,
+          1.0
+        ]
+      ],
+      "error_px": 0.4599752724170685,
+      "segments_supported": 9,
+      "visible_fraction": 0.9296656453976289,
+      "clutter": 0.016332670635014,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 102,
+      "homography": [
+        [
+          77.47994459026634,
+          -23.030593389782958,
+          780.9726990514961
+        ],
+        [
+          -0.3696049702201085,
+          6.855174776022178,
+          347.3960772406597
+        ],
+        [
+          -0.0032598025946485917,
+          -0.018932690829152336,
+          1.0
+        ]
+      ],
+      "error_px": 0.48514866828918457,
+      "segments_supported": 9,
+      "visible_fraction": 0.9295230482280842,
+      "clutter": 0.016886295319080133,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 103,
+      "homography": [
+        [
+          77.3391656653152,
+          -23.01369664340142,
+          781.0202710337196
+        ],
+        [
+          -0.45305481269465697,
+          6.857661566735136,
+          347.74297952827186
+        ],
+        [
+          -0.0033727422692735576,
+          -0.018912921785199,
+          1.0
+        ]
+      ],
+      "error_px": 0.5263273119926453,
+      "segments_supported": 9,
+      "visible_fraction": 0.9291611185086551,
+      "clutter": 0.014142848950314752,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 104,
+      "homography": [
+        [
+          76.8852550065102,
+          -22.966175225520114,
+          781.8710759018879
+        ],
+        [
+          -0.6873538499858584,
+          6.855673514521965,
+          348.79089306023485
+        ],
+        [
+          -0.003650058510299943,
+          -0.01886107623673562,
+          1.0
+        ]
+      ],
+      "error_px": 0.5895847678184509,
+      "segments_supported": 9,
+      "visible_fraction": 0.9284572342126299,
+      "clutter": 0.016260964557133478,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 105,
+      "homography": [
+        [
+          76.16687090351037,
+          -22.95077313272267,
+          783.9874962492651
+        ],
+        [
+          -1.0756454930982406,
+          6.817135943231743,
+          350.823423316778
+        ],
+        [
+          -0.004012673078062686,
+          -0.018830556795116294,
+          1.0
+        ]
+      ],
+      "error_px": 0.9952713847160339,
+      "segments_supported": 9,
+      "visible_fraction": 0.9274666666666667,
+      "clutter": 0.020328162211883587,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 106,
+      "homography": [
+        [
+          75.42693963544636,
+          -22.88418200808011,
+          785.1398436213739
+        ],
+        [
+          -1.6381463032486188,
+          6.816221360906054,
+          353.10992483052047
+        ],
+        [
+          -0.004673189175852039,
+          -0.018710140002842157,
+          1.0
+        ]
+      ],
+      "error_px": 1.5005974769592285,
+      "segments_supported": 8,
+      "visible_fraction": 0.9248170326014638,
+      "clutter": 0.025349973830287573,
+      "fits": true,
+      "registered": true
+    },
+    {
+      "frame": 107,
+      "homography": [
+        [
+          68.79865978465415,
+          -23.05128022662436,
+          796.9757874800804
+        ],
+        [
+          0.1695020278541982,
+          7.066151946699862,
+          347.38627102604755
+        ],
+        [
+          -0.002422347612143627,
+          -0.018724032934011037,
+          1.0
+        ]
+      ],
+      "error_px": 8.879512786865234,
+      "segments_supported": 6,
+      "visible_fraction": 1.0,
+      "clutter": 0.02704392709998872,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 108,
+      "homography": [
+        [
+          69.29520727687633,
+          -23.111209643065358,
+          801.3573414545864
+        ],
+        [
+          -0.13864679244595599,
+          7.058814039479139,
+          349.5846836793994
+        ],
+        [
+          -0.0023029958974854193,
+          -0.018714966810375686,
+          1.0
+        ]
+      ],
+      "error_px": 8.687644958496094,
+      "segments_supported": 6,
+      "visible_fraction": 1.0,
+      "clutter": 0.025890959451467497,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 109,
+      "homography": [
+        [
+          68.37524541997192,
+          -23.72639307802624,
+          817.0823762649005
+        ],
+        [
+          0.08580892787022498,
+          6.7929998287641045,
+          347.80816589074595
+        ],
+        [
+          -0.002482425394197774,
+          -0.019019212391163283,
+          1.0
+        ]
+      ],
+      "error_px": 8.556978225708008,
+      "segments_supported": 6,
+      "visible_fraction": 0.9964943032427696,
+      "clutter": 0.025995690209912516,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 110,
+      "homography": [
+        [
+          67.70140917417613,
+          -23.756524552814895,
+          818.5718867215331
+        ],
+        [
+          -0.310367339333759,
+          6.714156650491534,
+          349.7388576346324
+        ],
+        [
+          -0.002842954464268803,
+          -0.01903145682314051,
+          1.0
+        ]
+      ],
+      "error_px": 9.642782211303711,
+      "segments_supported": 6,
+      "visible_fraction": 0.9950321449444769,
+      "clutter": 0.02604695640704346,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 111,
+      "homography": [
+        [
+          69.20862993256955,
+          -24.06837900754902,
+          834.9882646665216
+        ],
+        [
+          0.16840796380498976,
+          6.8906454766218355,
+          349.8791448557173
+        ],
+        [
+          -0.0021687945156082973,
+          -0.01887591001533609,
+          1.0
+        ]
+      ],
+      "error_px": 8.930160522460938,
+      "segments_supported": 6,
+      "visible_fraction": 0.9912203687445127,
+      "clutter": 0.025907035761966287,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 112,
+      "homography": [
+        [
+          68.20725808012729,
+          -24.35999009069176,
+          843.4873302323095
+        ],
+        [
+          -0.04373843599731238,
+          6.7765194725062265,
+          349.96626656476144
+        ],
+        [
+          -0.0027353973747288956,
+          -0.018948665810531794,
+          1.0
+        ]
+      ],
+      "error_px": 8.937723159790039,
+      "segments_supported": 6,
+      "visible_fraction": 0.9858538719556658,
+      "clutter": 0.025874352278385943,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 113,
+      "homography": [
+        [
+          67.51920479719982,
+          -24.424615752212535,
+          845.4020383511114
+        ],
+        [
+          -0.28198636898459994,
+          6.680970651057742,
+          351.0750958812806
+        ],
+        [
+          -0.00302819503180181,
+          -0.01899139938607121,
+          1.0
+        ]
+      ],
+      "error_px": 10.326138496398926,
+      "segments_supported": 6,
+      "visible_fraction": 0.9849744711889132,
+      "clutter": 0.030076600569560172,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 114,
+      "homography": [
+        [
+          69.78817944268495,
+          -24.228930922839726,
+          855.6475376936729
+        ],
+        [
+          0.4759578178896237,
+          7.008869125116929,
+          348.11829225562195
+        ],
+        [
+          -0.0021170258462178304,
+          -0.018787460532249885,
+          1.0
+        ]
+      ],
+      "error_px": 8.73059368133545,
+      "segments_supported": 6,
+      "visible_fraction": 0.9753572470107903,
+      "clutter": 0.025801639093212928,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 115,
+      "homography": [
+        [
+          68.06172933926344,
+          -24.247703479019442,
+          863.6733133177498
+        ],
+        [
+          -0.044156570151059754,
+          7.105738875786516,
+          348.33728407708486
+        ],
+        [
+          -0.0033325948327874015,
+          -0.018516350076546666,
+          0.9999999999999999
+        ]
+      ],
+      "error_px": 9.033441543579102,
+      "segments_supported": 6,
+      "visible_fraction": 0.9728783902012248,
+      "clutter": 0.025966563377777193,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 116,
+      "homography": [
+        [
+          67.7450540018207,
+          -24.693290293394,
+          877.0898597950948
+        ],
+        [
+          -0.23203802032067206,
+          7.0117660764616145,
+          350.2391011130882
+        ],
+        [
+          -0.0031999044323533805,
+          -0.01866974267606135,
+          1.0
+        ]
+      ],
+      "error_px": 8.572470664978027,
+      "segments_supported": 6,
+      "visible_fraction": 0.9693743619658743,
+      "clutter": 0.026392594582390544,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 117,
+      "homography": [
+        [
+          67.20101348548889,
+          -24.799096814190186,
+          879.0005405349021
+        ],
+        [
+          -0.4104527577058793,
+          6.813853051431118,
+          352.1406398997536
+        ],
+        [
+          -0.003615473725230707,
+          -0.018736815968802216,
+          0.9999999999999999
+        ]
+      ],
+      "error_px": 9.70569896697998,
+      "segments_supported": 6,
+      "visible_fraction": 0.9646545454545454,
+      "clutter": 0.025310123885010225,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 118,
+      "homography": [
+        [
+          68.9321386451606,
+          -24.728335102170153,
+          883.8062985649325
+        ],
+        [
+          -0.03874905706751988,
+          7.068213542915052,
+          351.2690493134262
+        ],
+        [
+          -0.002803210373500014,
+          -0.01860188887583122,
+          1.0
+        ]
+      ],
+      "error_px": 9.149505615234375,
+      "segments_supported": 6,
+      "visible_fraction": 0.963302752293578,
+      "clutter": 0.025391601709167547,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 119,
+      "homography": [
+        [
+          66.71074820496149,
+          -25.043272056416914,
+          891.253426093391
+        ],
+        [
+          -0.3616001494049532,
+          6.76911944894178,
+          350.1975432630038
+        ],
+        [
+          -0.00362014140168157,
+          -0.01888831295764165,
+          1.0
+        ]
+      ],
+      "error_px": 9.0399169921875,
+      "segments_supported": 6,
+      "visible_fraction": 0.957582800697269,
+      "clutter": 0.02534884907371293,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 120,
+      "homography": [
+        [
+          66.39745498683514,
+          -24.915188231341318,
+          893.4956990418495
+        ],
+        [
+          -0.5450184371135048,
+          6.853382677500006,
+          351.94010428789636
+        ],
+        [
+          -0.00402028949145434,
+          -0.018671470758319188,
+          0.9999999999999999
+        ]
+      ],
+      "error_px": 9.312455177307129,
+      "segments_supported": 6,
+      "visible_fraction": 0.9566545454545454,
+      "clutter": 0.02605258034391386,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 121,
+      "homography": [
+        [
+          66.93806310105393,
+          -25.08230675753306,
+          897.004102076112
+        ],
+        [
+          -0.42613112965426,
+          6.837271457990754,
+          351.98357074521175
+        ],
+        [
+          -0.003732415527867474,
+          -0.018715369860779645,
+          1.0
+        ]
+      ],
+      "error_px": 9.23012638092041,
+      "segments_supported": 6,
+      "visible_fraction": 0.9556492656681692,
+      "clutter": 0.025436220451645595,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 122,
+      "homography": [
+        [
+          67.23182240322075,
+          -25.107547463932555,
+          900.7290265512216
+        ],
+        [
+          0.014998510967027373,
+          6.8761116504939395,
+          349.5476108335017
+        ],
+        [
+          -0.003502239347132068,
+          -0.01874888823357304,
+          1.0
+        ]
+      ],
+      "error_px": 9.096739768981934,
+      "segments_supported": 6,
+      "visible_fraction": 0.9530523255813953,
+      "clutter": 0.02602537602215404,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 123,
+      "homography": [
+        [
+          67.88472602017362,
+          -25.03666012861985,
+          901.1299581902769
+        ],
+        [
+          -0.2275126611016252,
+          6.92009055767766,
+          351.80830782767003
+        ],
+        [
+          -0.0032594316384654373,
+          -0.01871169284787842,
+          1.0
+        ]
+      ],
+      "error_px": 9.16370964050293,
+      "segments_supported": 6,
+      "visible_fraction": 0.9514464311673209,
+      "clutter": 0.026211940609413155,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 124,
+      "homography": [
+        [
+          67.64504104592406,
+          -25.32644332801536,
+          908.1202939634082
+        ],
+        [
+          0.2507427925188877,
+          6.730472706202477,
+          349.8223874171645
+        ],
+        [
+          -0.0032724831739297565,
+          -0.018900821184219395,
+          1.0
+        ]
+      ],
+      "error_px": 9.06722640991211,
+      "segments_supported": 6,
+      "visible_fraction": 0.9460713250217454,
+      "clutter": 0.026038636483841963,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 125,
+      "homography": [
+        [
+          67.15522025846727,
+          -25.230993030436633,
+          909.0101892331269
+        ],
+        [
+          -0.09652385146618264,
+          6.836099606524086,
+          350.30287498429396
+        ],
+        [
+          -0.0035792540067481993,
+          -0.018801585319079453,
+          0.9999999999999999
+        ]
+      ],
+      "error_px": 9.10372543334961,
+      "segments_supported": 6,
+      "visible_fraction": 0.9459185152965057,
+      "clutter": 0.025616598036528625,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 126,
+      "homography": [
+        [
+          69.66540006591862,
+          -25.485498712825656,
+          914.5814265399804
+        ],
+        [
+          0.7398109848108545,
+          6.938426920818518,
+          349.3782397415272
+        ],
+        [
+          -0.0022636211605589927,
+          -0.018809865383140348,
+          1.0
+        ]
+      ],
+      "error_px": 8.967564582824707,
+      "segments_supported": 6,
+      "visible_fraction": 0.9468486784780714,
+      "clutter": 0.02553941141244756,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 127,
+      "homography": [
+        [
+          66.66607162198336,
+          -25.62998843741045,
+          920.9107930918436
+        ],
+        [
+          -0.16117214376206354,
+          6.8243419823764455,
+          350.3062725131949
+        ],
+        [
+          -0.003698071589949021,
+          -0.018809692000521266,
+          1.0
+        ]
+      ],
+      "error_px": 9.070804595947266,
+      "segments_supported": 6,
+      "visible_fraction": 0.9448315911730546,
+      "clutter": 0.02534416210734251,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 128,
+      "homography": [
+        [
+          67.22189828244895,
+          -25.519102065916982,
+          923.2186374561508
+        ],
+        [
+          -0.4131847980676734,
+          7.0161246199770755,
+          352.01157305473066
+        ],
+        [
+          -0.003781360303787052,
+          -0.01857579250318589,
+          1.0
+        ]
+      ],
+      "error_px": 9.431687355041504,
+      "segments_supported": 6,
+      "visible_fraction": 0.9428737132086414,
+      "clutter": 0.025584443706124366,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 129,
+      "homography": [
+        [
+          66.37281303705052,
+          -25.52056311685978,
+          926.0717286090515
+        ],
+        [
+          -0.5295908045779577,
+          6.918201118782544,
+          352.23365107673345
+        ],
+        [
+          -0.004098420506100266,
+          -0.01862512003967689,
+          1.0
+        ]
+      ],
+      "error_px": 9.052321434020996,
+      "segments_supported": 6,
+      "visible_fraction": 0.9405193674742492,
+      "clutter": 0.025161772025883523,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 130,
+      "homography": [
+        [
+          66.31776487110197,
+          -25.534577923647106,
+          926.2133584892935
+        ],
+        [
+          -0.552617216989478,
+          6.894672778215449,
+          352.5702756957799
+        ],
+        [
+          -0.004119355164119941,
+          -0.018636787754645296,
+          1.0
+        ]
+      ],
+      "error_px": 10.051322937011719,
+      "segments_supported": 6,
+      "visible_fraction": 0.9403483309143686,
+      "clutter": 0.02619569549621363,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 131,
+      "homography": [
+        [
+          67.13572173783805,
+          -25.851846251089455,
+          932.0464652113228
+        ],
+        [
+          -0.12183600726514832,
+          6.7988326123056115,
+          352.09460554190446
+        ],
+        [
+          -0.003673416112021049,
+          -0.01878228215564893,
+          1.0
+        ]
+      ],
+      "error_px": 9.348676681518555,
+      "segments_supported": 6,
+      "visible_fraction": 0.9367583212735167,
+      "clutter": 0.026712585310232587,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 132,
+      "homography": [
+        [
+          68.98223475607892,
+          -25.990592813836226,
+          936.7259090953173
+        ],
+        [
+          0.41018920155908667,
+          6.961229775603747,
+          351.07232272360596
+        ],
+        [
+          -0.0028055109264836496,
+          -0.01870465291179369,
+          1.0
+        ]
+      ],
+      "error_px": 9.600935935974121,
+      "segments_supported": 6,
+      "visible_fraction": 0.937255470221707,
+      "clutter": 0.027561869173792206,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 133,
+      "homography": [
+        [
+          68.26559031788506,
+          -25.73343883862741,
+          936.6319924698241
+        ],
+        [
+          0.23120761768669806,
+          6.98476656023764,
+          351.87278877736696
+        ],
+        [
+          -0.0032526360393913666,
+          -0.018613768570507776,
+          1.0
+        ]
+      ],
+      "error_px": 9.647515296936035,
+      "segments_supported": 6,
+      "visible_fraction": 0.9343763581051716,
+      "clutter": 0.027291883563070003,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 134,
+      "homography": [
+        [
+          68.90823496155393,
+          -26.079725235138632,
+          939.1136927623029
+        ],
+        [
+          0.2662765796235745,
+          6.827403302432745,
+          352.04561838729967
+        ],
+        [
+          -0.002721772994251717,
+          -0.01887803383076318,
+          1.0
+        ]
+      ],
+      "error_px": 9.519389152526855,
+      "segments_supported": 6,
+      "visible_fraction": 0.9333333333333333,
+      "clutter": 0.026917020954673857,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 135,
+      "homography": [
+        [
+          66.1976995592834,
+          -25.869525239893612,
+          944.2760392062786
+        ],
+        [
+          -0.31571181820730226,
+          6.87088691845724,
+          352.21690374285265
+        ],
+        [
+          -0.004172113516787027,
+          -0.01865169270940113,
+          1.0
+        ]
+      ],
+      "error_px": 9.551624298095703,
+      "segments_supported": 6,
+      "visible_fraction": 0.9307346761338936,
+      "clutter": 0.02801242847207513,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 136,
+      "homography": [
+        [
+          68.55300399686625,
+          -26.22082433164086,
+          947.472285041328
+        ],
+        [
+          0.2293574197537334,
+          6.90385417594192,
+          351.99297148319584
+        ],
+        [
+          -0.0028721053604549795,
+          -0.01877044479616575,
+          1.0
+        ]
+      ],
+      "error_px": 9.264922142028809,
+      "segments_supported": 6,
+      "visible_fraction": 0.9327243729157605,
+      "clutter": 0.028151482741532615,
+      "fits": false,
+      "registered": false
+    },
+    {
+      "frame": 137,
+      "homography": [
+        [
+          68.02253806881487,
+          -26.21200107556866,
+          948.0888919061882
+        ],
+        [
+          0.1537310835050156,
+          6.885870454463097,
+          351.7985434675411
+        ],
+        [
+          -0.0031402191058162534,
+          -0.018767756477454933,
+          1.0
+        ]
+      ],
+      "error_px": 9.047276496887207,
+      "segments_supported": 6,
+      "visible_fraction": 0.9320289855072463,
+      "clutter": 0.028186652570283202,
+      "fits": false,
+      "registered": false
+    }
+  ],
+  "selector_sha256": "1867047e29e73192fdde752ab984e01963ade0b41458be0dff5041fc1ddc7dd1",
+  "screen_sha256": "373f2f9bf8474d7c3bb9bbf5cc36bae914dd65e189b07d043ce1c73d0e209503",
+  "ffmpeg_version": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+  "wall_seconds": 137.86745412500022
+}

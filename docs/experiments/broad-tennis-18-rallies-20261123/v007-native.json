@@ -1,0 +1,110 @@
+{
+  "source_sha256": "e574e06ac7df160ab1fac2020e62e5e70c56ba33ed6302fc3970e5373063df7e",
+  "source_bytes": 1753252295,
+  "media": {
+    "width": 1280,
+    "height": 720,
+    "pix_fmt": "yuv420p",
+    "avg_frame_rate": "25/1",
+    "time_base": "1/50",
+    "start_pts": 0,
+    "nb_frames": "136795",
+    "disposition": {
+      "default": 1,
+      "dub": 0,
+      "original": 0,
+      "comment": 0,
+      "lyrics": 0,
+      "karaoke": 0,
+      "forced": 0,
+      "hearing_impaired": 0,
+      "visual_impaired": 0,
+      "clean_effects": 0,
+      "attached_pic": 0,
+      "timed_thumbnails": 0,
+      "non_diegetic": 0,
+      "captions": 0,
+      "descriptions": 0,
+      "metadata": 0,
+      "dependent": 0,
+      "still_image": 0,
+      "multilayer": 0
+    },
+    "tags": {
+      "language": "und",
+      "handler_name": "VideoHandler"
+    }
+  },
+  "rallies": [
+    {
+      "rally_id": "v007_p0022",
+      "native_range": [
+        34046,
+        34166
+      ],
+      "clip_sha256": "f9c4cfb91781a53abaa45e29a89aeb5e73c97aed9aebaab0897aab89939aa1b6",
+      "filename": "v007_p0022.mkv",
+      "proof": {
+        "yuv420p": {
+          "count": 120,
+          "first": "9213659bbb6686774b0d89493cf7e34dedde3afc9bf48dcd1e03cf4d71d489d6",
+          "last": "3137c3b2453d86be70201ef970171eeeeb8b7244b290c242d2368e19a10f3339",
+          "ordered_hash_sha256": "2c16f85c7070ac87eae7db433abd5f680a9b9a837cb77733a2d33307dc51c2a5"
+        },
+        "rgb24": {
+          "count": 120,
+          "first": "295ccf79ef9db3afd7c957eb6b62764a02527462d3127fd6df701a5e20d80944",
+          "last": "e91f3f596f6a7d11176aaa4d464e5566b2ed6df5feabb63396a28f5045f3808a",
+          "ordered_hash_sha256": "dc13dbd039db9661fb6a73b2d6c75d5269dbc0d214004d7b8f6402830ff965b3"
+        }
+      }
+    },
+    {
+      "rally_id": "v007_p0065",
+      "native_range": [
+        69737,
+        69875
+      ],
+      "clip_sha256": "8d15cd9a62d2dfa88ac809bc3ddb07f70eae4c3e4d4f5a6a1325687cb8603143",
+      "filename": "v007_p0065.mkv",
+      "proof": {
+        "yuv420p": {
+          "count": 138,
+          "first": "8c3fb405cc59522fd48bfc9a98b2136c74aa815fcd7f20dbc8735c56d5dbc700",
+          "last": "4760a0d3a8efe90fd633ad8272280ec306d8c008646f46541a86f78bd89891bd",
+          "ordered_hash_sha256": "2f375effdfcf38b64a2087b87bdce4806f205e4b543deecfced182e942d19ad2"
+        },
+        "rgb24": {
+          "count": 138,
+          "first": "fac352f03b125add9afbefd4472e8c64892e8f07668f958d5a63e7cddf1899c0",
+          "last": "cff6c5ce20214ca479aca563530aee52bf712ce4061dbd45f3727fc607dae5be",
+          "ordered_hash_sha256": "1504f029fef8db3f55f026875b6e7e86d18c7b535f0fb1300fc8bdc8432b6da0"
+        }
+      }
+    },
+    {
+      "rally_id": "v007_p0108",
+      "native_range": [
+        114187,
+        114451
+      ],
+      "clip_sha256": "961bb2383d3372449383b234440b14793e03af26b115922f686ddf617e06b08a",
+      "filename": "v007_p0108.mkv",
+      "proof": {
+        "yuv420p": {
+          "count": 264,
+          "first": "1dddaf1e4e80d6207a5906126b5625fcc6113e1376510c1ff20d076441d0fba9",
+          "last": "b2d8642b9d27d9ca2ea274c5227e0eabc157cf508766635d14678805391433fe",
+          "ordered_hash_sha256": "73073eab3d50f10b3077833c17e8d120c63cb5b6461567da08756cf6d68d3433"
+        },
+        "rgb24": {
+          "count": 264,
+          "first": "c8101eb8812e9900f142a4768ce86b2fbb7e6be3c2e53c697dcd99588d335e5f",
+          "last": "1394a0f69389f8f06934429a340fb5c40f454b787c9641a7043a28e6f47d41b1",
+          "ordered_hash_sha256": "4e4bad06813a472e99f7f5c04ef32ec61184ffc9cd2c5e86a12bec68422fc661"
+        }
+      }
+    }
+  ],
+  "ffmpeg": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+}

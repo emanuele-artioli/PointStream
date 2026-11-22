@@ -1,0 +1,1599 @@
+{
+  "radius": 6,
+  "crosscheck_sha256": "34e346c5028ce6910ec8aecd52dc36593b3e4c31efc6fe24f2adc5f6f8b4c41e",
+  "script_sha256": "1f2d7ed23bada917bf1ce37ff1743958eeaa5a155658b2927936804a8f1a4e30",
+  "arms": {
+    "joint-crf50": {
+      "rows": [
+        {
+          "tick": 9,
+          "regions": {
+            "ball": {
+              "shift": [
+                2,
+                0
+              ],
+              "pixels": 2048,
+              "rgb_mse": 594.1214192708334,
+              "rgb_mse_shifted": 577.1223958333334
+            },
+            "person:000000000000": {
+              "shift": [
+                -6,
+                -5
+              ],
+              "pixels": 3970,
+              "rgb_mse": 4341.1768261964735,
+              "rgb_mse_shifted": 4120.378841309824
+            },
+            "person:000000000001": {
+              "shift": [
+                1,
+                -1
+              ],
+              "pixels": 1168,
+              "rgb_mse": 2885.066210045662,
+              "rgb_mse_shifted": 2705.01997716895
+            }
+          }
+        },
+        {
+          "tick": 31,
+          "regions": {
+            "ball": {
+              "shift": [
+                -1,
+                2
+              ],
+              "pixels": 2048,
+              "rgb_mse": 1240.45263671875,
+              "rgb_mse_shifted": 873.3777669270834
+            },
+            "person:000000000000": {
+              "shift": [
+                -1,
+                2
+              ],
+              "pixels": 4634,
+              "rgb_mse": 2724.119335347432,
+              "rgb_mse_shifted": 2578.396849374191
+            },
+            "person:000000000001": {
+              "shift": [
+                0,
+                2
+              ],
+              "pixels": 1260,
+              "rgb_mse": 4032.736507936508,
+              "rgb_mse_shifted": 3192.8772486772486
+            }
+          }
+        },
+        {
+          "tick": 49,
+          "regions": {
+            "ball": {
+              "shift": [
+                -1,
+                0
+              ],
+              "pixels": 2048,
+              "rgb_mse": 27.792805989583332,
+              "rgb_mse_shifted": 25.240071614583332
+            },
+            "person:000000000000": {
+              "shift": [
+                1,
+                1
+              ],
+              "pixels": 5050,
+              "rgb_mse": 2977.9826402640265,
+              "rgb_mse_shifted": 2995.6448184818482
+            },
+            "person:000000000001": {
+              "shift": [
+                2,
+                0
+              ],
+              "pixels": 1326,
+              "rgb_mse": 2246.1206636500756,
+              "rgb_mse_shifted": 1844.7629462041227
+            }
+          }
+        },
+        {
+          "tick": 72,
+          "regions": {
+            "ball": {
+              "shift": [
+                0,
+                3
+              ],
+              "pixels": 2048,
+              "rgb_mse": 691.86181640625,
+              "rgb_mse_shifted": 607.2584635416666
+            },
+            "person:000000000000": {
+              "shift": [
+                -3,
+                0
+              ],
+              "pixels": 5658,
+              "rgb_mse": 2320.8955461293745,
+              "rgb_mse_shifted": 2332.5521974784965
+            },
+            "person:000000000001": {
+              "shift": [
+                0,
+                -1
+              ],
+              "pixels": 1130,
+              "rgb_mse": 2415.2073746312685,
+              "rgb_mse_shifted": 2092.868731563422
+            }
+          }
+        },
+        {
+          "tick": 95,
+          "regions": {
+            "ball": {
+              "shift": [
+                2,
+                -1
+              ],
+              "pixels": 2048,
+              "rgb_mse": 31.392740885416668,
+              "rgb_mse_shifted": 20.70703125
+            },
+            "person:000000000000": {
+              "shift": [
+                -3,
+                2
+              ],
+              "pixels": 5700,
+              "rgb_mse": 1881.6157894736841,
+              "rgb_mse_shifted": 1723.7608187134504
+            },
+            "person:000000000001": {
+              "shift": [
+                6,
+                6
+              ],
+              "pixels": 1408,
+              "rgb_mse": 4808.322916666667,
+              "rgb_mse_shifted": 4201.410984848485
+            }
+          }
+        },
+        {
+          "tick": 112,
+          "regions": {
+            "ball": {
+              "shift": [
+                1,
+                -1
+              ],
+              "pixels": 2048,
+              "rgb_mse": 28.2529296875,
+              "rgb_mse_shifted": 25.277018229166668
+            },
+            "person:000000000000": {
+              "shift": [
+                3,
+                2
+              ],
+              "pixels": 5178,
+              "rgb_mse": 3206.054139307326,
+              "rgb_mse_shifted": 3151.0163512295608
+            },
+            "person:000000000001": {
+              "shift": [
+                0,
+                1
+              ],
+              "pixels": 1408,
+              "rgb_mse": 2464.516571969697,
+              "rgb_mse_shifted": 2283.434422348485
+            }
+          }
+        },
+        {
+          "tick": 135,
+          "regions": {
+            "ball": {
+              "shift": [
+                -1,
+                1
+              ],
+              "pixels": 2048,
+              "rgb_mse": 281.9055989583333,
+              "rgb_mse_shifted": 241.95817057291666
+            },
+            "person:000000000000": {
+              "shift": [
+                4,
+                2
+              ],
+              "pixels": 6504,
+              "rgb_mse": 2903.6143911439112,
+              "rgb_mse_shifted": 2909.2907441574416
+            },
+            "person:000000000001": {
+              "shift": [
+                1,
+                -2
+              ],
+              "pixels": 1332,
+              "rgb_mse": 2353.2897897897897,
+              "rgb_mse_shifted": 2078.814814814815
+            }
+          }
+        },
+        {
+          "tick": 152,
+          "regions": {
+            "ball": {
+              "shift": [
+                -1,
+                -1
+              ],
+              "pixels": 2048,
+              "rgb_mse": 1036.44140625,
+              "rgb_mse_shifted": 1017.0183919270834
+            },
+            "person:000000000000": {
+              "shift": [
+                -4,
+                0
+              ],
+              "pixels": 8864,
+              "rgb_mse": 2713.45472322503,
+              "rgb_mse_shifted": 2601.5195171480145
+            },
+            "person:000000000001": {
+              "shift": [
+                0,
+                1
+              ],
+              "pixels": 1196,
+              "rgb_mse": 2424.7904124860647,
+              "rgb_mse_shifted": 2126.930602006689
+            }
+          }
+        },
+        {
+          "tick": 175,
+          "regions": {
+            "ball": {
+              "shift": [
+                0,
+                0
+              ],
+              "pixels": 2048,
+              "rgb_mse": 59.803548177083336,
+              "rgb_mse_shifted": 59.803548177083336
+            },
+            "person:000000000000": {
+              "shift": [
+                -3,
+                -5
+              ],
+              "pixels": 7028,
+              "rgb_mse": 2377.2228229937396,
+              "rgb_mse_shifted": 2142.3048283058242
+            },
+            "person:000000000001": {
+              "shift": [
+                2,
+                3
+              ],
+              "pixels": 1164,
+              "rgb_mse": 3669.611397479954,
+              "rgb_mse_shifted": 2671.876575028637
+            }
+          }
+        },
+        {
+          "tick": 198,
+          "regions": {
+            "ball": {
+              "shift": [
+                1,
+                -1
+              ],
+              "pixels": 2048,
+              "rgb_mse": 256.3312174479167,
+              "rgb_mse_shifted": 255.68001302083334
+            },
+            "person:000000000000": {
+              "shift": [
+                5,
+                6
+              ],
+              "pixels": 6328,
+              "rgb_mse": 2805.1715128529286,
+              "rgb_mse_shifted": 2264.5506215760643
+            },
+            "person:000000000001": {
+              "shift": [
+                1,
+                -2
+              ],
+              "pixels": 1230,
+              "rgb_mse": 2834.5962059620597,
+              "rgb_mse_shifted": 2346.730352303523
+            }
+          }
+        },
+        {
+          "tick": 215,
+          "regions": {
+            "ball": {
+              "shift": [
+                0,
+                2
+              ],
+              "pixels": 2048,
+              "rgb_mse": 885.2067057291666,
+              "rgb_mse_shifted": 842.1437174479166
+            },
+            "person:000000000000": {
+              "shift": [
+                0,
+                -3
+              ],
+              "pixels": 5878,
+              "rgb_mse": 2536.990472949983,
+              "rgb_mse_shifted": 2551.3049223091753
+            },
+            "person:000000000001": {
+              "shift": [
+                6,
+                0
+              ],
+              "pixels": 1274,
+              "rgb_mse": 3551.603872318158,
+              "rgb_mse_shifted": 3237.0808477237047
+            }
+          }
+        },
+        {
+          "tick": 238,
+          "regions": {
+            "ball": {
+              "shift": [
+                -1,
+                1
+              ],
+              "pixels": 2048,
+              "rgb_mse": 374.0270182291667,
+              "rgb_mse_shifted": 363.52490234375
+            },
+            "person:000000000000": {
+              "shift": [
+                0,
+                3
+              ],
+              "pixels": 5116,
+              "rgb_mse": 3728.9779124315874,
+              "rgb_mse_shifted": 3358.945595517331
+            },
+            "person:000000000001": {
+              "shift": [
+                1,
+                -2
+              ],
+              "pixels": 1406,
+              "rgb_mse": 2832.4293504030347,
+              "rgb_mse_shifted": 2516.8224276908486
+            }
+          }
+        }
+      ],
+      "means": {
+        "player": {
+          "rgb_mse": 2959.8153077356014,
+          "rgb_mse_shifted": 2667.8456681658395
+        },
+        "ball": {
+          "rgb_mse": 458.9658203125,
+          "rgb_mse_shifted": 409.0926242404514
+        }
+      }
+    },
+    "ordinary-640-warm": {
+      "rows": [
+        {
+          "tick": 9,
+          "regions": {
+            "ball": {
+              "shift": [
+                0,
+                1
+              ],
+              "pixels": 2048,
+              "rgb_mse": 190.24641927083334,
+              "rgb_mse_shifted": 190.02180989583334
+            },
+            "person:000000000000": {
+              "shift": [
+                0,
+                1
+              ],
+              "pixels": 3970,
+              "rgb_mse": 2718.8774139378675,
+              "rgb_mse_shifted": 2681.166834592779
+            },
+            "person:000000000001": {
+              "shift": [
+                6,
+                -6
+              ],
+              "pixels": 1168,
+              "rgb_mse": 3432.921803652968,
+              "rgb_mse_shifted": 2790.9937214611873
+            }
+          }
+        },
+        {
+          "tick": 31,
+          "regions": {
+            "ball": {
+              "shift": [
+                0,
+                0
+              ],
+              "pixels": 2048,
+              "rgb_mse": 498.9596354166667,
+              "rgb_mse_shifted": 498.9596354166667
+            },
+            "person:000000000000": {
+              "shift": [
+                2,
+                2
+              ],
+              "pixels": 4634,
+              "rgb_mse": 1809.9735289886348,
+              "rgb_mse_shifted": 1706.0032369443245
+            },
+            "person:000000000001": {
+              "shift": [
+                1,
+                3
+              ],
+              "pixels": 1260,
+              "rgb_mse": 2000.0925925925926,
+              "rgb_mse_shifted": 1573.1415343915344
+            }
+          }
+        },
+        {
+          "tick": 49,
+          "regions": {
+            "ball": {
+              "shift": [
+                -6,
+                5
+              ],
+              "pixels": 2048,
+              "rgb_mse": 102.62272135416667,
+              "rgb_mse_shifted": 102.16471354166667
+            },
+            "person:000000000000": {
+              "shift": [
+                0,
+                -2
+              ],
+              "pixels": 5050,
+              "rgb_mse": 1675.8417161716172,
+              "rgb_mse_shifted": 1617.3176897689768
+            },
+            "person:000000000001": {
+              "shift": [
+                0,
+                -5
+              ],
+              "pixels": 1326,
+              "rgb_mse": 2345.826294620412,
+              "rgb_mse_shifted": 1711.183257918552
+            }
+          }
+        },
+        {
+          "tick": 72,
+          "regions": {
+            "ball": {
+              "shift": [
+                0,
+                0
+              ],
+              "pixels": 2048,
+              "rgb_mse": 182.353515625,
+              "rgb_mse_shifted": 182.353515625
+            },
+            "person:000000000000": {
+              "shift": [
+                0,
+                -4
+              ],
+              "pixels": 5658,
+              "rgb_mse": 2383.305879580535,
+              "rgb_mse_shifted": 2341.1577117945094
+            },
+            "person:000000000001": {
+              "shift": [
+                -1,
+                -3
+              ],
+              "pixels": 1130,
+              "rgb_mse": 3383.609439528024,
+              "rgb_mse_shifted": 3236.3961651917402
+            }
+          }
+        },
+        {
+          "tick": 95,
+          "regions": {
+            "ball": {
+              "shift": [
+                1,
+                6
+              ],
+              "pixels": 2048,
+              "rgb_mse": 45.776041666666664,
+              "rgb_mse_shifted": 44.746256510416664
+            },
+            "person:000000000000": {
+              "shift": [
+                1,
+                1
+              ],
+              "pixels": 5700,
+              "rgb_mse": 1432.946081871345,
+              "rgb_mse_shifted": 1429.879590643275
+            },
+            "person:000000000001": {
+              "shift": [
+                1,
+                -4
+              ],
+              "pixels": 1408,
+              "rgb_mse": 3167.366950757576,
+              "rgb_mse_shifted": 2862.555871212121
+            }
+          }
+        },
+        {
+          "tick": 112,
+          "regions": {
+            "ball": {
+              "shift": [
+                0,
+                -6
+              ],
+              "pixels": 2048,
+              "rgb_mse": 44.654947916666664,
+              "rgb_mse_shifted": 44.097330729166664
+            },
+            "person:000000000000": {
+              "shift": [
+                0,
+                -1
+              ],
+              "pixels": 5178,
+              "rgb_mse": 2608.6837260203424,
+              "rgb_mse_shifted": 2612.4786275267156
+            },
+            "person:000000000001": {
+              "shift": [
+                0,
+                1
+              ],
+              "pixels": 1408,
+              "rgb_mse": 2362.8470643939395,
+              "rgb_mse_shifted": 2348.675899621212
+            }
+          }
+        },
+        {
+          "tick": 135,
+          "regions": {
+            "ball": {
+              "shift": [
+                -1,
+                2
+              ],
+              "pixels": 2048,
+              "rgb_mse": 241.61702473958334,
+              "rgb_mse_shifted": 238.40950520833334
+            },
+            "person:000000000000": {
+              "shift": [
+                -1,
+                1
+              ],
+              "pixels": 6504,
+              "rgb_mse": 2179.110291102911,
+              "rgb_mse_shifted": 2178.812064370644
+            },
+            "person:000000000001": {
+              "shift": [
+                6,
+                2
+              ],
+              "pixels": 1332,
+              "rgb_mse": 2980.394894894895,
+              "rgb_mse_shifted": 2701.560810810811
+            }
+          }
+        },
+        {
+          "tick": 152,
+          "regions": {
+            "ball": {
+              "shift": [
+                0,
+                0
+              ],
+              "pixels": 2048,
+              "rgb_mse": 331.5455729166667,
+              "rgb_mse_shifted": 331.5455729166667
+            },
+            "person:000000000000": {
+              "shift": [
+                0,
+                0
+              ],
+              "pixels": 8864,
+              "rgb_mse": 1532.9313703369435,
+              "rgb_mse_shifted": 1532.9313703369435
+            },
+            "person:000000000001": {
+              "shift": [
+                -1,
+                -1
+              ],
+              "pixels": 1196,
+              "rgb_mse": 2196.8634336677815,
+              "rgb_mse_shifted": 2185.9322742474915
+            }
+          }
+        },
+        {
+          "tick": 175,
+          "regions": {
+            "ball": {
+              "shift": [
+                1,
+                4
+              ],
+              "pixels": 2048,
+              "rgb_mse": 38.122233072916664,
+              "rgb_mse_shifted": 31.809895833333332
+            },
+            "person:000000000000": {
+              "shift": [
+                -1,
+                -4
+              ],
+              "pixels": 7028,
+              "rgb_mse": 1584.6649117814457,
+              "rgb_mse_shifted": 1537.7037564029597
+            },
+            "person:000000000001": {
+              "shift": [
+                2,
+                -2
+              ],
+              "pixels": 1164,
+              "rgb_mse": 3819.6111111111113,
+              "rgb_mse_shifted": 3674.7142038946163
+            }
+          }
+        },
+        {
+          "tick": 198,
+          "regions": {
+            "ball": {
+              "shift": [
+                0,
+                0
+              ],
+              "pixels": 2048,
+              "rgb_mse": 178.69384765625,
+              "rgb_mse_shifted": 178.69384765625
+            },
+            "person:000000000000": {
+              "shift": [
+                -2,
+                2
+              ],
+              "pixels": 6328,
+              "rgb_mse": 1861.9857248209019,
+              "rgb_mse_shifted": 1808.1022966708808
+            },
+            "person:000000000001": {
+              "shift": [
+                -1,
+                -1
+              ],
+              "pixels": 1230,
+              "rgb_mse": 2273.0628726287264,
+              "rgb_mse_shifted": 2268.1046070460707
+            }
+          }
+        },
+        {
+          "tick": 215,
+          "regions": {
+            "ball": {
+              "shift": [
+                5,
+                -3
+              ],
+              "pixels": 2048,
+              "rgb_mse": 866.3597005208334,
+              "rgb_mse_shifted": 834.1396484375
+            },
+            "person:000000000000": {
+              "shift": [
+                -6,
+                -1
+              ],
+              "pixels": 5878,
+              "rgb_mse": 2185.195758194397,
+              "rgb_mse_shifted": 2166.659634796416
+            },
+            "person:000000000001": {
+              "shift": [
+                3,
+                1
+              ],
+              "pixels": 1274,
+              "rgb_mse": 2471.8872318158033,
+              "rgb_mse_shifted": 2424.9984301412874
+            }
+          }
+        },
+        {
+          "tick": 238,
+          "regions": {
+            "ball": {
+              "shift": [
+                0,
+                0
+              ],
+              "pixels": 2048,
+              "rgb_mse": 75.32063802083333,
+              "rgb_mse_shifted": 75.32063802083333
+            },
+            "person:000000000000": {
+              "shift": [
+                2,
+                -3
+              ],
+              "pixels": 5116,
+              "rgb_mse": 2154.4741334375813,
+              "rgb_mse_shifted": 2061.347276518113
+            },
+            "person:000000000001": {
+              "shift": [
+                0,
+                6
+              ],
+              "pixels": 1406,
+              "rgb_mse": 3352.60715979137,
+              "rgb_mse_shifted": 3079.0865339023235
+            }
+          }
+        }
+      ],
+      "means": {
+        "player": {
+          "rgb_mse": 2413.1283910708216,
+          "rgb_mse_shifted": 2272.120975008562
+        },
+        "ball": {
+          "rgb_mse": 233.02269151475696,
+          "rgb_mse_shifted": 229.35519748263889
+        }
+      }
+    },
+    "roi-640-warm": {
+      "rows": [
+        {
+          "tick": 9,
+          "regions": {
+            "ball": {
+              "shift": [
+                0,
+                1
+              ],
+              "pixels": 2048,
+              "rgb_mse": 262.5546875,
+              "rgb_mse_shifted": 262.5489908854167
+            },
+            "person:000000000000": {
+              "shift": [
+                -6,
+                3
+              ],
+              "pixels": 3970,
+              "rgb_mse": 3024.0675902602857,
+              "rgb_mse_shifted": 2807.691771620487
+            },
+            "person:000000000001": {
+              "shift": [
+                6,
+                -6
+              ],
+              "pixels": 1168,
+              "rgb_mse": 3498.374714611872,
+              "rgb_mse_shifted": 3117.143264840183
+            }
+          }
+        },
+        {
+          "tick": 31,
+          "regions": {
+            "ball": {
+              "shift": [
+                0,
+                1
+              ],
+              "pixels": 2048,
+              "rgb_mse": 636.11328125,
+              "rgb_mse_shifted": 634.7060546875
+            },
+            "person:000000000000": {
+              "shift": [
+                2,
+                3
+              ],
+              "pixels": 4634,
+              "rgb_mse": 2298.0983311753703,
+              "rgb_mse_shifted": 2199.0480506401955
+            },
+            "person:000000000001": {
+              "shift": [
+                3,
+                2
+              ],
+              "pixels": 1260,
+              "rgb_mse": 2156.9484126984125,
+              "rgb_mse_shifted": 1527.6439153439153
+            }
+          }
+        },
+        {
+          "tick": 49,
+          "regions": {
+            "ball": {
+              "shift": [
+                6,
+                6
+              ],
+              "pixels": 2048,
+              "rgb_mse": 111.896484375,
+              "rgb_mse_shifted": 110.75455729166667
+            },
+            "person:000000000000": {
+              "shift": [
+                0,
+                -3
+              ],
+              "pixels": 5050,
+              "rgb_mse": 2299.325214521452,
+              "rgb_mse_shifted": 2251.13201320132
+            },
+            "person:000000000001": {
+              "shift": [
+                0,
+                -2
+              ],
+              "pixels": 1326,
+              "rgb_mse": 2758.268476621418,
+              "rgb_mse_shifted": 2729.0191050779285
+            }
+          }
+        },
+        {
+          "tick": 72,
+          "regions": {
+            "ball": {
+              "shift": [
+                0,
+                0
+              ],
+              "pixels": 2048,
+              "rgb_mse": 191.94759114583334,
+              "rgb_mse_shifted": 191.94759114583334
+            },
+            "person:000000000000": {
+              "shift": [
+                1,
+                -5
+              ],
+              "pixels": 5658,
+              "rgb_mse": 2461.2069046777424,
+              "rgb_mse_shifted": 2393.2429598209023
+            },
+            "person:000000000001": {
+              "shift": [
+                -1,
+                -4
+              ],
+              "pixels": 1130,
+              "rgb_mse": 2935.353982300885,
+              "rgb_mse_shifted": 2660.2560471976403
+            }
+          }
+        },
+        {
+          "tick": 95,
+          "regions": {
+            "ball": {
+              "shift": [
+                1,
+                6
+              ],
+              "pixels": 2048,
+              "rgb_mse": 61.403157552083336,
+              "rgb_mse_shifted": 61.417643229166664
+            },
+            "person:000000000000": {
+              "shift": [
+                0,
+                2
+              ],
+              "pixels": 5700,
+              "rgb_mse": 2053.9854970760234,
+              "rgb_mse_shifted": 2047.6305847953217
+            },
+            "person:000000000001": {
+              "shift": [
+                6,
+                -6
+              ],
+              "pixels": 1408,
+              "rgb_mse": 3919.869318181818,
+              "rgb_mse_shifted": 3369.8664772727275
+            }
+          }
+        },
+        {
+          "tick": 112,
+          "regions": {
+            "ball": {
+              "shift": [
+                0,
+                0
+              ],
+              "pixels": 2048,
+              "rgb_mse": 38.682942708333336,
+              "rgb_mse_shifted": 38.682942708333336
+            },
+            "person:000000000000": {
+              "shift": [
+                -1,
+                4
+              ],
+              "pixels": 5178,
+              "rgb_mse": 2861.875563280546,
+              "rgb_mse_shifted": 2869.5310930861338
+            },
+            "person:000000000001": {
+              "shift": [
+                6,
+                2
+              ],
+              "pixels": 1408,
+              "rgb_mse": 2345.5094696969695,
+              "rgb_mse_shifted": 2339.9408143939395
+            }
+          }
+        },
+        {
+          "tick": 135,
+          "regions": {
+            "ball": {
+              "shift": [
+                -1,
+                6
+              ],
+              "pixels": 2048,
+              "rgb_mse": 246.56901041666666,
+              "rgb_mse_shifted": 241.71858723958334
+            },
+            "person:000000000000": {
+              "shift": [
+                -1,
+                1
+              ],
+              "pixels": 6504,
+              "rgb_mse": 2432.3087843378435,
+              "rgb_mse_shifted": 2416.677634276343
+            },
+            "person:000000000001": {
+              "shift": [
+                6,
+                3
+              ],
+              "pixels": 1332,
+              "rgb_mse": 4297.739239239239,
+              "rgb_mse_shifted": 3797.8125625625626
+            }
+          }
+        },
+        {
+          "tick": 152,
+          "regions": {
+            "ball": {
+              "shift": [
+                0,
+                0
+              ],
+              "pixels": 2048,
+              "rgb_mse": 486.58740234375,
+              "rgb_mse_shifted": 486.58740234375
+            },
+            "person:000000000000": {
+              "shift": [
+                -1,
+                0
+              ],
+              "pixels": 8864,
+              "rgb_mse": 1742.9063628158844,
+              "rgb_mse_shifted": 1734.2008122743682
+            },
+            "person:000000000001": {
+              "shift": [
+                6,
+                -2
+              ],
+              "pixels": 1196,
+              "rgb_mse": 3832.440078037904,
+              "rgb_mse_shifted": 3744.9751950947602
+            }
+          }
+        },
+        {
+          "tick": 175,
+          "regions": {
+            "ball": {
+              "shift": [
+                0,
+                -3
+              ],
+              "pixels": 2048,
+              "rgb_mse": 53.493001302083336,
+              "rgb_mse_shifted": 53.032877604166664
+            },
+            "person:000000000000": {
+              "shift": [
+                -2,
+                -4
+              ],
+              "pixels": 7028,
+              "rgb_mse": 1692.9349269588313,
+              "rgb_mse_shifted": 1658.9374881426675
+            },
+            "person:000000000001": {
+              "shift": [
+                1,
+                5
+              ],
+              "pixels": 1164,
+              "rgb_mse": 3932.3762886597938,
+              "rgb_mse_shifted": 3816.7388316151205
+            }
+          }
+        },
+        {
+          "tick": 198,
+          "regions": {
+            "ball": {
+              "shift": [
+                0,
+                0
+              ],
+              "pixels": 2048,
+              "rgb_mse": 168.43375651041666,
+              "rgb_mse_shifted": 168.43375651041666
+            },
+            "person:000000000000": {
+              "shift": [
+                -3,
+                5
+              ],
+              "pixels": 6328,
+              "rgb_mse": 1975.1317425200168,
+              "rgb_mse_shifted": 1875.88701011378
+            },
+            "person:000000000001": {
+              "shift": [
+                -2,
+                -3
+              ],
+              "pixels": 1230,
+              "rgb_mse": 2424.589430894309,
+              "rgb_mse_shifted": 2377.2650406504067
+            }
+          }
+        },
+        {
+          "tick": 215,
+          "regions": {
+            "ball": {
+              "shift": [
+                4,
+                -6
+              ],
+              "pixels": 2048,
+              "rgb_mse": 960.6285807291666,
+              "rgb_mse_shifted": 937.69287109375
+            },
+            "person:000000000000": {
+              "shift": [
+                -6,
+                -2
+              ],
+              "pixels": 5878,
+              "rgb_mse": 2772.875354428944,
+              "rgb_mse_shifted": 2664.1938868095726
+            },
+            "person:000000000001": {
+              "shift": [
+                2,
+                -6
+              ],
+              "pixels": 1274,
+              "rgb_mse": 2717.667451596023,
+              "rgb_mse_shifted": 2650.9850863422294
+            }
+          }
+        },
+        {
+          "tick": 238,
+          "regions": {
+            "ball": {
+              "shift": [
+                0,
+                1
+              ],
+              "pixels": 2048,
+              "rgb_mse": 112.87060546875,
+              "rgb_mse_shifted": 111.12239583333333
+            },
+            "person:000000000000": {
+              "shift": [
+                6,
+                -4
+              ],
+              "pixels": 5116,
+              "rgb_mse": 2236.097276518113,
+              "rgb_mse_shifted": 2102.1026192337763
+            },
+            "person:000000000001": {
+              "shift": [
+                -1,
+                0
+              ],
+              "pixels": 1406,
+              "rgb_mse": 2924.373873873874,
+              "rgb_mse_shifted": 2898.573731626363
+            }
+          }
+        }
+      ],
+      "means": {
+        "player": {
+          "rgb_mse": 2733.0968452076486,
+          "rgb_mse_shifted": 2585.4373331680267
+        },
+        "ball": {
+          "rgb_mse": 277.59837510850696,
+          "rgb_mse_shifted": 274.88713921440973
+        }
+      }
+    },
+    "dcvc-480-q34": {
+      "rows": [
+        {
+          "tick": 9,
+          "regions": {
+            "ball": {
+              "shift": [
+                1,
+                6
+              ],
+              "pixels": 2048,
+              "rgb_mse": 276.1481119791667,
+              "rgb_mse_shifted": 251.72347005208334
+            },
+            "person:000000000000": {
+              "shift": [
+                0,
+                -1
+              ],
+              "pixels": 3970,
+              "rgb_mse": 1496.720067170445,
+              "rgb_mse_shifted": 1490.8224181360201
+            },
+            "person:000000000001": {
+              "shift": [
+                1,
+                0
+              ],
+              "pixels": 1168,
+              "rgb_mse": 1391.1629566210045,
+              "rgb_mse_shifted": 1360.8966894977168
+            }
+          }
+        },
+        {
+          "tick": 31,
+          "regions": {
+            "ball": {
+              "shift": [
+                0,
+                0
+              ],
+              "pixels": 2048,
+              "rgb_mse": 396.8665364583333,
+              "rgb_mse_shifted": 396.8665364583333
+            },
+            "person:000000000000": {
+              "shift": [
+                -1,
+                0
+              ],
+              "pixels": 4634,
+              "rgb_mse": 730.6745791972378,
+              "rgb_mse_shifted": 690.9178535462523
+            },
+            "person:000000000001": {
+              "shift": [
+                0,
+                1
+              ],
+              "pixels": 1260,
+              "rgb_mse": 1295.4944444444445,
+              "rgb_mse_shifted": 1229.6478835978835
+            }
+          }
+        },
+        {
+          "tick": 49,
+          "regions": {
+            "ball": {
+              "shift": [
+                -6,
+                -5
+              ],
+              "pixels": 2048,
+              "rgb_mse": 105.41569010416667,
+              "rgb_mse_shifted": 104.58658854166667
+            },
+            "person:000000000000": {
+              "shift": [
+                0,
+                0
+              ],
+              "pixels": 5050,
+              "rgb_mse": 767.0748514851485,
+              "rgb_mse_shifted": 767.0748514851485
+            },
+            "person:000000000001": {
+              "shift": [
+                1,
+                0
+              ],
+              "pixels": 1326,
+              "rgb_mse": 1611.8602312719959,
+              "rgb_mse_shifted": 1598.2732528909
+            }
+          }
+        },
+        {
+          "tick": 72,
+          "regions": {
+            "ball": {
+              "shift": [
+                1,
+                0
+              ],
+              "pixels": 2048,
+              "rgb_mse": 237.50895182291666,
+              "rgb_mse_shifted": 224.94319661458334
+            },
+            "person:000000000000": {
+              "shift": [
+                0,
+                0
+              ],
+              "pixels": 5658,
+              "rgb_mse": 657.3900082479086,
+              "rgb_mse_shifted": 657.3900082479086
+            },
+            "person:000000000001": {
+              "shift": [
+                0,
+                0
+              ],
+              "pixels": 1130,
+              "rgb_mse": 1068.7917404129794,
+              "rgb_mse_shifted": 1068.7917404129794
+            }
+          }
+        },
+        {
+          "tick": 95,
+          "regions": {
+            "ball": {
+              "shift": [
+                0,
+                6
+              ],
+              "pixels": 2048,
+              "rgb_mse": 27.143717447916668,
+              "rgb_mse_shifted": 26.115559895833332
+            },
+            "person:000000000000": {
+              "shift": [
+                -1,
+                1
+              ],
+              "pixels": 5700,
+              "rgb_mse": 618.7890058479533,
+              "rgb_mse_shifted": 541.9979532163743
+            },
+            "person:000000000001": {
+              "shift": [
+                0,
+                1
+              ],
+              "pixels": 1408,
+              "rgb_mse": 1359.8522727272727,
+              "rgb_mse_shifted": 1334.2433712121212
+            }
+          }
+        },
+        {
+          "tick": 112,
+          "regions": {
+            "ball": {
+              "shift": [
+                0,
+                -1
+              ],
+              "pixels": 2048,
+              "rgb_mse": 30.090006510416668,
+              "rgb_mse_shifted": 29.425130208333332
+            },
+            "person:000000000000": {
+              "shift": [
+                0,
+                0
+              ],
+              "pixels": 5178,
+              "rgb_mse": 706.6781897772628,
+              "rgb_mse_shifted": 706.6781897772628
+            },
+            "person:000000000001": {
+              "shift": [
+                0,
+                0
+              ],
+              "pixels": 1408,
+              "rgb_mse": 1313.657196969697,
+              "rgb_mse_shifted": 1313.657196969697
+            }
+          }
+        },
+        {
+          "tick": 135,
+          "regions": {
+            "ball": {
+              "shift": [
+                -4,
+                -6
+              ],
+              "pixels": 2048,
+              "rgb_mse": 251.54231770833334,
+              "rgb_mse_shifted": 242.25960286458334
+            },
+            "person:000000000000": {
+              "shift": [
+                1,
+                -1
+              ],
+              "pixels": 6504,
+              "rgb_mse": 904.3056068060681,
+              "rgb_mse_shifted": 865.6057810578105
+            },
+            "person:000000000001": {
+              "shift": [
+                0,
+                -3
+              ],
+              "pixels": 1332,
+              "rgb_mse": 1641.4882382382382,
+              "rgb_mse_shifted": 1415.9456956956958
+            }
+          }
+        },
+        {
+          "tick": 152,
+          "regions": {
+            "ball": {
+              "shift": [
+                0,
+                0
+              ],
+              "pixels": 2048,
+              "rgb_mse": 447.0185546875,
+              "rgb_mse_shifted": 447.0185546875
+            },
+            "person:000000000000": {
+              "shift": [
+                0,
+                0
+              ],
+              "pixels": 8864,
+              "rgb_mse": 499.29343411552344,
+              "rgb_mse_shifted": 499.29343411552344
+            },
+            "person:000000000001": {
+              "shift": [
+                1,
+                -1
+              ],
+              "pixels": 1196,
+              "rgb_mse": 1365.3266443701227,
+              "rgb_mse_shifted": 1354.5827759197325
+            }
+          }
+        },
+        {
+          "tick": 175,
+          "regions": {
+            "ball": {
+              "shift": [
+                1,
+                -4
+              ],
+              "pixels": 2048,
+              "rgb_mse": 31.837727864583332,
+              "rgb_mse_shifted": 28.956868489583332
+            },
+            "person:000000000000": {
+              "shift": [
+                -1,
+                -3
+              ],
+              "pixels": 7028,
+              "rgb_mse": 877.575317776513,
+              "rgb_mse_shifted": 781.7010055018023
+            },
+            "person:000000000001": {
+              "shift": [
+                0,
+                2
+              ],
+              "pixels": 1164,
+              "rgb_mse": 1882.3490836197022,
+              "rgb_mse_shifted": 1525.922107674685
+            }
+          }
+        },
+        {
+          "tick": 198,
+          "regions": {
+            "ball": {
+              "shift": [
+                1,
+                0
+              ],
+              "pixels": 2048,
+              "rgb_mse": 233.53043619791666,
+              "rgb_mse_shifted": 229.21272786458334
+            },
+            "person:000000000000": {
+              "shift": [
+                -1,
+                1
+              ],
+              "pixels": 6328,
+              "rgb_mse": 634.3083649388959,
+              "rgb_mse_shifted": 622.5403497682258
+            },
+            "person:000000000001": {
+              "shift": [
+                0,
+                -3
+              ],
+              "pixels": 1230,
+              "rgb_mse": 1624.7035230352303,
+              "rgb_mse_shifted": 1546.159620596206
+            }
+          }
+        },
+        {
+          "tick": 215,
+          "regions": {
+            "ball": {
+              "shift": [
+                -2,
+                2
+              ],
+              "pixels": 2048,
+              "rgb_mse": 723.1306966145834,
+              "rgb_mse_shifted": 708.73193359375
+            },
+            "person:000000000000": {
+              "shift": [
+                -1,
+                1
+              ],
+              "pixels": 5878,
+              "rgb_mse": 1085.496881025292,
+              "rgb_mse_shifted": 1074.1189179993196
+            },
+            "person:000000000001": {
+              "shift": [
+                -1,
+                -2
+              ],
+              "pixels": 1274,
+              "rgb_mse": 1629.3354264782836,
+              "rgb_mse_shifted": 1561.73704866562
+            }
+          }
+        },
+        {
+          "tick": 238,
+          "regions": {
+            "ball": {
+              "shift": [
+                0,
+                1
+              ],
+              "pixels": 2048,
+              "rgb_mse": 160.18912760416666,
+              "rgb_mse_shifted": 159.60107421875
+            },
+            "person:000000000000": {
+              "shift": [
+                -1,
+                1
+              ],
+              "pixels": 5116,
+              "rgb_mse": 849.9068934063071,
+              "rgb_mse_shifted": 784.5158326817826
+            },
+            "person:000000000001": {
+              "shift": [
+                0,
+                0
+              ],
+              "pixels": 1406,
+              "rgb_mse": 1369.4943100995733,
+              "rgb_mse_shifted": 1369.4943100995733
+            }
+          }
+        }
+      ],
+      "means": {
+        "player": {
+          "rgb_mse": 1140.905386170129,
+          "rgb_mse_shifted": 1090.0836786985933
+        },
+        "ball": {
+          "rgb_mse": 243.36848958333334,
+          "rgb_mse_shifted": 237.45343695746527
+        }
+      }
+    }
+  }
+}

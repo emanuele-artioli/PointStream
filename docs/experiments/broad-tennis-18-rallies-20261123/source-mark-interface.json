@@ -1,0 +1,33 @@
+{
+  "native_source_frames": 48,
+  "proposal_frames": 48,
+  "person_mask_proposals": 90,
+  "reviewed_human_decisions": 0,
+  "optional_sender_ball_candidates": 24,
+  "source_width": 1280,
+  "source_height": 720,
+  "original_frame_manifest": "3a696c41b74b160d4270376ead8ad693285a9a0b68f244a9828f6ef65e023555",
+  "model": "YOLO26n-seg, original source frames with model proposals filtered for the athletes",
+  "source_proposals_sha256": "0808e948c9245fc6bdffa2c94dbb7de1cc3980efc850013f7866d360fb902dfb",
+  "person_provenance_sha256": "22c93db1a623dded29c0bc82d97ea9bf3737d02bd3b15c9f08dbd587e31d119f",
+  "web_app_sha256": "6114cee05b1ef22e536c6fada83cf28ef02f0c4e973aff2cf82d44c55c2fec8d",
+  "attachments_sha256": "b3498c1492d2168df21ab68183ea0b296e630669ee3f60458be284d2ebd52446",
+  "exact_presentation": "90 selectable source masks, one or two per frame. Geometric boxes are optional; no polygon drawing requested and no IoU ground truth inferred.",
+  "offline_checks": [
+    "48 native source PNGs loaded",
+    "ball visible, absent, unsure and assisted state",
+    "optional rectangle",
+    "isolated storage and import/export round trip",
+    "human can accept/reject/mark unsure about each original-person proposal",
+    "rendered mask interior changed throughout after toggling verified native mask; proposal hidden in ball mode"
+  ],
+  "detector": {
+    "weights_sha256": "361fbfabab285c3237700b6bb91d7ecfa602cd945fffda8dbe1242829b71e73f",
+    "package": "ultralytics 8.4.6",
+    "device": "cpu",
+    "image_size": 960,
+    "class": 0,
+    "conf": 0.18
+  },
+  "verified_first_proposal_interior_fraction_changed": 1.0
+}

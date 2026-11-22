@@ -1,0 +1,64 @@
+{
+  "prior_cpu_seconds": 4185.517940998077,
+  "campus_cpu_stages": [
+    {
+      "phase": "rung-70",
+      "job": "20261122T225847Z-01ec2a3a",
+      "started": 1795388400.1054764,
+      "ended": 1795388481.0914114,
+      "occupied_seconds": 80.98593497276306,
+      "per_stage_limit_seconds": 2080,
+      "status_sha256": "decf7dc4846c67255338b848153ec9e319b25f298459cf6edbfcde3a1e414b56"
+    },
+    {
+      "phase": "rung-60",
+      "job": "20261122T230429Z-48931a32",
+      "started": 1795388701.5302954,
+      "ended": 1795388833.4215114,
+      "occupied_seconds": 131.8912160396576,
+      "per_stage_limit_seconds": 2080,
+      "status_sha256": "0ecfc0f5627fbab274b061e41b46828d291847fd8ece70ae738653a05096f7ab"
+    },
+    {
+      "phase": "rung-50",
+      "job": "20261122T230429Z-708e2537",
+      "started": 1795388701.9546854,
+      "ended": 1795388843.6369214,
+      "occupied_seconds": 141.68223595619202,
+      "per_stage_limit_seconds": 2080,
+      "status_sha256": "625c2a3af2bb593442d15d89266ce1429db1d6e322da1bf0dde15f3ef6cb9ac3"
+    },
+    {
+      "phase": "score-joint-crf70",
+      "job": "20261122T225842Z-00543e57",
+      "started": 1795388352.0449526,
+      "ended": 1795388582.468184,
+      "occupied_seconds": 230.4232313632965,
+      "per_stage_limit_seconds": 2280,
+      "status_sha256": "380fedd3df41e4e0c0f967fdb808b5405ff5bf182f75daed64336a3e2f1f05f0"
+    },
+    {
+      "phase": "score-joint-crf60",
+      "job": "20261122T230941Z-1a17c987",
+      "started": 1795389001.4779475,
+      "ended": 1795389396.1149998,
+      "occupied_seconds": 394.63705229759216,
+      "per_stage_limit_seconds": 2280,
+      "status_sha256": "40d3c64384af4cb1338799792c6203d962eb599e5f7b798a37aeeb5f9bc3e244"
+    },
+    {
+      "phase": "score-joint-crf50",
+      "job": "20261122T230941Z-8c60cb8b",
+      "started": 1795389001.855986,
+      "ended": 1795389526.6303363,
+      "occupied_seconds": 524.7743501663208,
+      "per_stage_limit_seconds": 2280,
+      "status_sha256": "40b254d3447773533a00f5ed521888335e92cd1376e8e7be26973b8dc3addf1f"
+    }
+  ],
+  "campus_cpu_total_seconds": 5689.9119617938995,
+  "campus_cpu_cap_seconds": 14400,
+  "gpu_total_seconds": 4604.706553802491,
+  "gpu_cap_seconds": 10800,
+  "scope": "Slot seconds including smoke, full run and supervisor overhead for the registered event. Earlier interrupted and completed producer jobs are in control-recovery and native-component-timing. Local CPU receipt recovery, DISTS scoring and plotting use no campus slots."
+}

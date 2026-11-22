@@ -1,0 +1,50 @@
+{
+  "old_body_scoring_archive": {
+    "job": "20261122T125955Z-4dfede40",
+    "archive_sha256": "d76768914dfb316ec946d277bbfc3e6d43832444d3aa4100fae01844c82fe371"
+  },
+  "arms": {
+    "dcvc-480-q34": {
+      "job": "20261122T104722Z-2bcfb2b7",
+      "bitstream_sha256": "e6c1ab762b0f585d04beaa02d2e3e647ab2ee0084322cbaebe7ea9952a57bf6b",
+      "native_archive_sha256": "3434fe6a358f1b02399d646e804f9a75caffa45909a334a9c84502dc7710ac53",
+      "decoded_sha256": "c075df28b4d122740a3cadb656509c331f3629c1cca31afa6aa81260ca18f658",
+      "arm_manifest_sha256": "e5cb2a62e6471524ac2626ee6197bb4cc34dd86fb4664b0efab8182399514cf3"
+    },
+    "joint-crf50": {
+      "finish_job": "20261122T120219Z-f2c299f2",
+      "bitstream_sha256": "fdc8fcbb39599348e966f07666a0472cf4cbb9211e8baf7ada44ba59161b7780",
+      "full_receiver_sha256": "077139642774318aa5759a50224f81608407d0874de2942fe112feeeb78bdae3",
+      "native_receipt_sha256": "f7bb9662a9235d2b857e85c2cb18f2ae6b74fac01698d20762c6e2f76cc6a031",
+      "arm_manifest_sha256": "6230ef5494d9c85cacdee200068775a673740e25055d6c29c17be6f23ba0e321"
+    },
+    "ordinary-640-warm": {
+      "job": "20261122T104721Z-74428f3a",
+      "bitstream_sha256": "841dc70c6276193b8a3cca8d554576af7b30143228cc0a4e1215e3b84c901360",
+      "native_archive_sha256": "d8ca99d8afafc6ebe3ce790ee4cd08a67bc050962939559edfc87957423e1659",
+      "decoded_sha256": "8eb1792e8c0fb84825f384691f7f05d631f035b0754fcb8ee80e33ba1481a7a6",
+      "arm_manifest_sha256": "6c711e83c74f5b47c16ee032c71da811a3ad7609b45f06c672c90d4ac523e13c"
+    },
+    "roi-640-warm": {
+      "job": "20261122T105505Z-2e23c905",
+      "bitstream_sha256": "9d62dae129c3f7222337257c4673be25e48e66b56ba535d60f6b34192a3339d2",
+      "native_archive_sha256": "9a2253baef561680420e779ad2d919645a31b63b1d58d5754b9fee8cc17667e1",
+      "decoded_sha256": "5755cc4d605803f68c1149f906d4e6fa7fb9ae915c6d032728a6a66cdbf7ad1e",
+      "arm_manifest_sha256": "73715e6a042db101828c8e1a48d77377e5f786fa1c9631010da2fee8a4fa1a94"
+    }
+  },
+  "local_sample_archives": {
+    "av1-samples.tar": {
+      "sha256": "1c527860439769396ee820daedc41b37477d6e5669b023ec32e3a04582ae9f1d",
+      "bytes": 2734080
+    },
+    "dcvc-samples.tar": {
+      "sha256": "401bb094b95d22a75ec659800725d531c668c7b00d0185bbd1a6bf08138936b2",
+      "bytes": 890880
+    },
+    "pointstream-review-archive.tar": {
+      "sha256": "d76768914dfb316ec946d277bbfc3e6d43832444d3aa4100fae01844c82fe371",
+      "bytes": 10700800
+    }
+  }
+}

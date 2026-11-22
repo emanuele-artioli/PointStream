@@ -1,0 +1,83 @@
+{
+  "source_sha256": "8ab59163aa86f3cb0f26b1981e6e546f148cca916e40731c0cdee5c6621e4b78",
+  "source_frames": 106,
+  "rendered": 24,
+  "fps": [
+    25,
+    1
+  ],
+  "source_context_sha256": "f3cfb9ce1dc725267a618a3793d6c116103db6e156a73d8f9fa575fc9cf36039",
+  "tracker": "RacketVision BallTrack CPU",
+  "code_sha256": "5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff",
+  "weights_sha256": "b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec",
+  "device": "cpu",
+  "torch": "2.8.0",
+  "tools": {
+    "ffmpeg": {
+      "path": "/opt/homebrew/bin/ffmpeg",
+      "real_path": "/opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg",
+      "sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be",
+      "version": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    "SvtAv1EncApp": {
+      "path": "/opt/homebrew/bin/SvtAv1EncApp",
+      "real_path": "/opt/homebrew/Cellar/svt-av1/4.0.1/bin/SvtAv1EncApp",
+      "sha256": "db044194faf94d553c2509c8e033ecd05a373ba54d919d0fb49a3a13149d1687",
+      "version": "SVT-AV1 v4.0.1 (release)"
+    },
+    "dav1d": {
+      "path": "/opt/homebrew/bin/dav1d",
+      "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+      "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+      "version": "1.5.4"
+    }
+  },
+  "raw_present": 0,
+  "guard": false,
+  "ball_positions": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+  ],
+  "payload_bytes": 1,
+  "packet_arms": [
+    {
+      "ceiling": null,
+      "coded_size": [
+        960,
+        544
+      ],
+      "bytes": 18805,
+      "base_bytes": 18713,
+      "framing_bytes": 91,
+      "sha256": "700f293efe6c4b11b252119eb37c2f87380d0700a86a2f93a910fc5392ec8dac",
+      "base_sha256": "1f1c9f0f125fc417726dd878ae629b1870c03d39b4e1ac01d2b5e96ad3b5c925",
+      "displayed_sha256": "68603a8f3445bf3079f85d408b72eef3c3a30a2169e8bce0b003dcfe388cee58"
+    }
+  ],
+  "setup_wall_s": 2.9563944579995223,
+  "inference_wall_s": 26.85981379199984,
+  "wall_s": 60.850124499999765,
+  "worker_sha256": "dd0c8e5dbc6dd4dce86d820339a500a6a5c8477f6f7fb216238ac71bb0f2f50e"
+}

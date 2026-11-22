@@ -1,0 +1,550 @@
+{
+  "schema": 1,
+  "package": "six-fixtures-three-rallies-source-freeze",
+  "ranges": "half-open, native display order, zero-based; absolute original tick where available",
+  "events": [
+    {
+      "event_id": "alcaraz_hurkacz",
+      "exposure": "Generator base and match adapter saw other footage from this match. Retrospective development.",
+      "source": "Pre-reset source archive /home/itec/emanuele/Datasets/archive/pre-reset-2026-10-05, manifest 2bd94e9966fc8b09c5ce5eb9bef79f49ad349e1310a1d445fa6a646e86db8dde",
+      "rallies": [
+        {
+          "rally_id": "al028",
+          "status": "original_source_window",
+          "source_id": "tennis_games/alcaraz_hurkacz/028.mp4",
+          "native_range": [
+            0,
+            240
+          ],
+          "provenance": "Physical 240-frame all-tick joint and native AV1/DCVC controls exist. Source-only reviewed masks available for al028; automated supports for al031.",
+          "previously_measured": true,
+          "source_sha256": "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934",
+          "cadence": [
+            25,
+            1
+          ],
+          "frame_range_scope": "source-selected evaluation excerpt; full point boundaries require original review",
+          "evidence": "reviewed-foreground-20261122/matched-three.json",
+          "whole_point": null,
+          "source_scoreboard_at_local_tick120": "Alcaraz 6 1 40 / Hurkacz 4 2 30"
+        },
+        {
+          "rally_id": "al031",
+          "status": "original_source_window",
+          "source_id": "tennis_games/alcaraz_hurkacz/031.mp4",
+          "native_range": [
+            0,
+            240
+          ],
+          "provenance": "Physical 240-frame all-tick joint and native AV1/DCVC controls exist. Source-only reviewed masks available for al028; automated supports for al031.",
+          "previously_measured": true,
+          "source_sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+          "cadence": [
+            25,
+            1
+          ],
+          "frame_range_scope": "source-selected evaluation excerpt; full point boundaries require original review",
+          "evidence": "al031-complete-receiver-20261122/README.md",
+          "whole_point": null,
+          "source_scoreboard_at_local_tick120": "Alcaraz 6 4 0 / Hurkacz 4 4 15"
+        },
+        {
+          "rally_id": "al034",
+          "status": "original_source_window",
+          "source_id": "tennis_games/alcaraz_hurkacz/034.mp4",
+          "native_range": [
+            0,
+            240
+          ],
+          "provenance": "Legacy W7 judged crops every third tick; native controls reusable after exact price/tick check. No full-cadence joint delivery established.",
+          "previously_measured": true,
+          "source_sha256": "7db0c143cd416ad17b4bda4eaa191d51da197eccc1143e9eb402f8bb2a7f0ee6",
+          "cadence": [
+            25,
+            1
+          ],
+          "frame_range_scope": "source-selected evaluation excerpt; full point boundaries require original review",
+          "evidence": "w7-specs/w7-tier1-result.json",
+          "whole_point": null,
+          "source_scoreboard_at_local_tick120": "Alcaraz 6 5 15 / Hurkacz 4 5 40"
+        }
+      ],
+      "held_out": false
+    },
+    {
+      "event_id": "medvedev_struff",
+      "exposure": "Generator base and match adapter saw other footage from this match. Retrospective development.",
+      "source": "Pre-reset source archive /home/itec/emanuele/Datasets/archive/pre-reset-2026-10-05, manifest 2bd94e9966fc8b09c5ce5eb9bef79f49ad349e1310a1d445fa6a646e86db8dde",
+      "rallies": [
+        {
+          "rally_id": "med000",
+          "status": "original_source_window",
+          "source_id": "tennis_games/medvedev_struff/000.mp4",
+          "native_range": [
+            0,
+            240
+          ],
+          "provenance": "Existing 240-frame complete mixed delivery. Freeze joint interval from recorded receiver and retain 120 conventionally transmitted ticks. Three native physical price rungs.",
+          "previously_measured": true,
+          "source_sha256": "3bf7ddaae0db5c48b1072fccb15f9f162e41fa5999886b9a5bde58dc0495c630",
+          "cadence": [
+            50,
+            1
+          ],
+          "frame_range_scope": "source-selected evaluation excerpt; full point boundaries require original review",
+          "evidence": "med-mixed-receiver-20261122/three-native-shots.json",
+          "whole_point": null,
+          "source_scoreboard_at_local_tick120": "Medvedev 1 AD / Struff 1"
+        },
+        {
+          "rally_id": "med019",
+          "status": "original_source_window",
+          "source_id": "tennis_games/medvedev_struff/019.mp4",
+          "native_range": [
+            0,
+            240
+          ],
+          "provenance": "Existing 240-frame complete mixed delivery. Freeze joint interval from recorded receiver and retain 120 conventionally transmitted ticks. Three native physical price rungs.",
+          "previously_measured": true,
+          "source_sha256": "1c13479eb3b6f8d175eb6f5020c629896e6b01f719014ec995a06b4c6c5a3e9c",
+          "cadence": [
+            50,
+            1
+          ],
+          "frame_range_scope": "source-selected evaluation excerpt; full point boundaries require original review",
+          "evidence": "med-mixed-receiver-20261122/three-native-shots.json",
+          "whole_point": null,
+          "source_scoreboard_at_local_tick120": "Medvedev 6 0 40 / Struff 4 0 40"
+        },
+        {
+          "rally_id": "med024",
+          "status": "original_source_window",
+          "source_id": "tennis_games/medvedev_struff/024.mp4",
+          "native_range": [
+            0,
+            240
+          ],
+          "provenance": "Existing 240-frame complete mixed delivery. Freeze joint interval from recorded receiver and retain 120 conventionally transmitted ticks. Three native physical price rungs.",
+          "previously_measured": true,
+          "source_sha256": "4d602291ebea0fcb9698d86d3f93ce4c3076a13005e33079a82975b8b64605f2",
+          "cadence": [
+            50,
+            1
+          ],
+          "frame_range_scope": "source-selected evaluation excerpt; full point boundaries require original review",
+          "evidence": "med-mixed-receiver-20261122/three-native-shots.json",
+          "whole_point": null,
+          "source_scoreboard_at_local_tick120": "Medvedev 6 2 15 / Struff 4 3 0"
+        }
+      ],
+      "held_out": false
+    },
+    {
+      "event_id": "nadal_kyrgios",
+      "exposure": "Held out of tennis-base training; first-half match adaptation and prior development.",
+      "source": "Continuous archived broadcast with SHA-bound W7 second-half windows.",
+      "rallies": [
+        {
+          "rally_id": "nad000",
+          "status": "original_source_window",
+          "source_id": "tennis_games/raw_1080p/nadal_kyrgios.mp4",
+          "native_range": [
+            76626,
+            76866
+          ],
+          "provenance": "Previously selected second-half broadcast excerpt; full point boundaries require original review.",
+          "previously_measured": true,
+          "source_sha256": "676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66",
+          "clip_sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d",
+          "cadence": [
+            50,
+            1
+          ],
+          "legacy_gen_job": "20261031T163512Z-1d0712ad",
+          "legacy_gen_sha256": "cce89567a57bd202db8dbd6a39599688bce8a52e048d53f2b38fd7fda7da4985",
+          "legacy_score_job": "20261031T192320Z-47fdb78c",
+          "evidence": "w7-specs/w7-tier2-result.json",
+          "reuse": "All-tick joint also exists for nad000. Confirm same native grid before rescoring.",
+          "whole_point": null,
+          "source_scoreboard_at_local_tick120": "Kyrgios 1 6 3 / Nadal 1 6 5"
+        },
+        {
+          "rally_id": "nad001",
+          "status": "original_source_window",
+          "source_id": "tennis_games/raw_1080p/nadal_kyrgios.mp4",
+          "native_range": [
+            96474,
+            96714
+          ],
+          "provenance": "Previously selected second-half broadcast excerpt; full point boundaries require original review.",
+          "previously_measured": true,
+          "source_sha256": "676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66",
+          "clip_sha256": "c86ea9283b68d7a42b4c13c891534b42722ff07e15fffa1847eebc368351760d",
+          "cadence": [
+            50,
+            1
+          ],
+          "legacy_gen_job": "20261031T164328Z-9df5ba81",
+          "legacy_gen_sha256": "18e2bfb0efcb4165ddd94fdc1af44277497b0d7622cf4b10acb6e33f8d13baae",
+          "legacy_score_job": "20261031T182114Z-3bfa1a68",
+          "evidence": "w7-specs/w7-tier2-result.json",
+          "reuse": "Full W7 job generated and saved judged crops. Saved every-third-tick material, original AV1/neural controls and scores are available. Recompose on original indices for secondary legacy endpoint; new all-tick receiver or paid fallback required for primary.",
+          "whole_point": null,
+          "source_scoreboard_at_local_tick120": "Kyrgios 1 2 30 / Nadal 2 2 15"
+        },
+        {
+          "rally_id": "nad002",
+          "status": "original_source_window",
+          "source_id": "tennis_games/raw_1080p/nadal_kyrgios.mp4",
+          "native_range": [
+            87691,
+            87931
+          ],
+          "provenance": "Previously selected second-half broadcast excerpt; full point boundaries require original review.",
+          "previously_measured": true,
+          "source_sha256": "676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66",
+          "clip_sha256": "f0551443eaff4e4b3539f21cd0c6ac66f55601d480ad099a571e8626db735e4a",
+          "cadence": [
+            50,
+            1
+          ],
+          "legacy_gen_job": "20261031T164449Z-fde718e1",
+          "legacy_gen_sha256": "4319e8f9922bb8b5137f46edf4c1a4c966822c9571241a5cb1ed2ef5ab02a069",
+          "legacy_score_job": "20261031T192632Z-002fd19f",
+          "evidence": "w7-specs/w7-tier2-result.json",
+          "reuse": "Full W7 job generated and saved judged crops. Saved every-third-tick material, original AV1/neural controls and scores are available. Recompose on original indices for secondary legacy endpoint; new all-tick receiver or paid fallback required for primary.",
+          "whole_point": null,
+          "source_scoreboard_at_local_tick120": "Kyrgios 1 1 15 / Nadal 2 1 0"
+        }
+      ],
+      "held_out": false
+    },
+    {
+      "event_id": "tracknet_game9",
+      "exposure": "Sharapova–Halep, US Open 2017. PointStream ball development used game9/Clip5. WASB reported games1–7 as training; judge independence must be verified per checkpoint.",
+      "source": "/home/itec/emanuele/Datasets/TrackNet/Dataset.zip",
+      "rallies": [
+        {
+          "rally_id": "game9_clip1",
+          "status": "dataset_author_point",
+          "source_id": "Dataset/game9/Clip1",
+          "native_range": [
+            0,
+            83
+          ],
+          "provenance": "Authors define each directory as one complete serve-to-score rally. Source JPEG frame sequence and authored per-frame visibility/ball coordinates.",
+          "previously_measured": true,
+          "source_archive_sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18",
+          "cadence": [
+            30,
+            1
+          ],
+          "label_sha256": "fc1fe57a38f17eeb9c16fb01c9e11ae037fa445014e038c3ffacb07f730f833a",
+          "evidence": "k5d-inputs/data-inventory-20261104.json",
+          "reuse": "Original frames and original labels. Prior fixture exposure retained.",
+          "whole_point": true,
+          "prior_screening": "PointStream previously compared trackers and conducted a CRF62 probe on all 30 game8–10 clips, jobs 20261020T214833Z-bf224666 and 20261020T220308Z-436c3db3; no TrackNet rally is untouched.",
+          "lossless_extract_sha256": "553b593fb5b110eac8ba33663c372243bf71f17269637057f7e9abdd02c2b383",
+          "extraction_receipt": "tracknet-native.json",
+          "source_jpeg_ordered_sha256": "2d8d9e65bcb4560518265d97ace53ba290082ada4cbae87d97e9772ff12e1626"
+        },
+        {
+          "rally_id": "game9_clip2",
+          "status": "dataset_author_point",
+          "source_id": "Dataset/game9/Clip2",
+          "native_range": [
+            0,
+            258
+          ],
+          "provenance": "Authors define each directory as one complete serve-to-score rally. Source JPEG frame sequence and authored per-frame visibility/ball coordinates.",
+          "previously_measured": true,
+          "source_archive_sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18",
+          "cadence": [
+            30,
+            1
+          ],
+          "label_sha256": "d03560ab232440559b4a9cac0e92704819a84266f3ab409493e96a87a122c747",
+          "evidence": "k5d-inputs/data-inventory-20261104.json",
+          "reuse": "Clip5 has physical 292-frame ball comparison; exact frames/bytes/judge labels must match for reuse. Earlier study assessed this fixture, with Clip2 among historical candidates.",
+          "whole_point": true,
+          "prior_screening": "PointStream previously compared trackers and conducted a CRF62 probe on all 30 game8–10 clips, jobs 20261020T214833Z-bf224666 and 20261020T220308Z-436c3db3; no TrackNet rally is untouched.",
+          "lossless_extract_sha256": "b41ccedddaf124dbccad6c941305df199b8abfbd56f44cb8c723b42fc24e24d7",
+          "extraction_receipt": "tracknet-native.json",
+          "source_jpeg_ordered_sha256": "04f5385e13bc8aacca9728e691dbf5465a43ad329a3658a270a6fbadb5406002"
+        },
+        {
+          "rally_id": "game9_clip5",
+          "status": "dataset_author_point",
+          "source_id": "Dataset/game9/Clip5",
+          "native_range": [
+            0,
+            292
+          ],
+          "provenance": "Authors define each directory as one complete serve-to-score rally. Source JPEG frame sequence and authored per-frame visibility/ball coordinates.",
+          "previously_measured": true,
+          "source_archive_sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18",
+          "cadence": [
+            30,
+            1
+          ],
+          "label_sha256": "ba554e5aa090948a0211c98bfbbe8429e6318322328ffaebd1de0bf31d290814",
+          "evidence": "k5d-inputs/data-inventory-20261104.json",
+          "reuse": "Clip5 has physical 292-frame ball comparison; exact frames/bytes/judge labels must match for reuse. Earlier study assessed this fixture, with Clip2 among historical candidates.",
+          "whole_point": true,
+          "prior_screening": "PointStream previously compared trackers and conducted a CRF62 probe on all 30 game8–10 clips, jobs 20261020T214833Z-bf224666 and 20261020T220308Z-436c3db3; no TrackNet rally is untouched.",
+          "lossless_extract_sha256": "5c6587aaa15ff7303680585e701a044c9328d41cd55ba89652e0a53b3465a5e5",
+          "extraction_receipt": "tracknet-native.json",
+          "source_jpeg_ordered_sha256": "870da32398d6040773b125efdab45d26fee9e8d774d8bb2be89d60a0ad0de63b"
+        }
+      ],
+      "held_out": false
+    },
+    {
+      "event_id": "tenniset_v006",
+      "exposure": "Williams–Sharapova, London 2012 Olympics. New physical fixture relative to project development archive. Both TenniSet fixtures share venue and grass surface. Confirm any third-party model training lists independently.",
+      "source": {
+        "research_release": "https://github.com/HaydenFaulkner/Tennis/blob/master/data/README.md",
+        "media": {
+          "width": 1280,
+          "height": 720,
+          "pix_fmt": "yuv420p",
+          "avg_frame_rate": "25/1",
+          "time_base": "1/25",
+          "start_pts": 0,
+          "nb_frames": "123875",
+          "disposition": {
+            "default": 1,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0,
+            "non_diegetic": 0,
+            "captions": 0,
+            "descriptions": 0,
+            "metadata": 0,
+            "dependent": 0,
+            "still_image": 0,
+            "multilayer": 0
+          },
+          "tags": {
+            "creation_time": "1970-01-01T00:00:00.000000Z",
+            "language": "und",
+            "handler_name": "VideoHandler"
+          }
+        },
+        "annotation": "https://drive.google.com/file/d/1kc7UGmyb97Jzgqkd3rjzlcqafoSOyi-R/view",
+        "annotation_sha256": "215160bc0cb34bdc8fd827fc8b37bb2de18907a25348e0fbe21ffb8f9b58a679",
+        "points_sha256": "a801355cba529c91464ea13a86cd9237af5c6fff5130fb73057b846ed6121a15",
+        "annotated_points": 81,
+        "source_local_path": "/private/tmp/ps-tenniset-V006-source-20261123.mp4",
+        "source_sha256": "76e3fa2d0905555e084b9bfd003add1c855a8fb4e8da49c60d5795f0c2e4e620",
+        "source_bytes": 1691942447
+      },
+      "rallies": [
+        {
+          "rally_id": "v006_p0014",
+          "status": "dataset_author_point",
+          "source_id": "V006.mp4",
+          "native_range": [
+            38754,
+            38860
+          ],
+          "provenance": "Chronological point-rank stratum midpoint in the author annotations, inclusive published end converted to half-open.",
+          "previously_measured": false,
+          "annotation_point_id": "P00000014",
+          "set_id": "0001",
+          "game_id": "0003",
+          "point_score_after": "Game",
+          "cadence": [
+            25,
+            1
+          ],
+          "source_sha256": "76e3fa2d0905555e084b9bfd003add1c855a8fb4e8da49c60d5795f0c2e4e620",
+          "lossless_extract_sha256": "8ab59163aa86f3cb0f26b1981e6e546f148cca916e40731c0cdee5c6621e4b78",
+          "extraction_receipt": "v006-native.json",
+          "source_visual_check": "Original start/middle/end inspected; point identity agrees with timeline and scoreboard.",
+          "whole_point": true
+        },
+        {
+          "rally_id": "v006_p0041",
+          "status": "dataset_author_point",
+          "source_id": "V006.mp4",
+          "native_range": [
+            74554,
+            74686
+          ],
+          "provenance": "Chronological point-rank stratum midpoint in the author annotations, inclusive published end converted to half-open.",
+          "previously_measured": false,
+          "annotation_point_id": "P00000041",
+          "set_id": "0002",
+          "game_id": "0007",
+          "point_score_after": "15-0",
+          "cadence": [
+            25,
+            1
+          ],
+          "source_sha256": "76e3fa2d0905555e084b9bfd003add1c855a8fb4e8da49c60d5795f0c2e4e620",
+          "lossless_extract_sha256": "19dd9edbef46ac8771294802804c52b2e642843430b59e902f269664c6a8c39b",
+          "extraction_receipt": "v006-native.json",
+          "source_visual_check": "Original start/middle/end inspected; point identity agrees with timeline and scoreboard.",
+          "whole_point": true
+        },
+        {
+          "rally_id": "v006_p0068",
+          "status": "dataset_author_point",
+          "source_id": "V006.mp4",
+          "native_range": [
+            103358,
+            103502
+          ],
+          "provenance": "Chronological point-rank stratum midpoint in the author annotations, inclusive published end converted to half-open.",
+          "previously_measured": false,
+          "annotation_point_id": "P00000068",
+          "set_id": "0002",
+          "game_id": "0011",
+          "point_score_after": "40-A",
+          "cadence": [
+            25,
+            1
+          ],
+          "source_sha256": "76e3fa2d0905555e084b9bfd003add1c855a8fb4e8da49c60d5795f0c2e4e620",
+          "lossless_extract_sha256": "c7be37685d69c221c6a881b4e9004c1ce5ae484c2e2fbdda27f6cc7fa2a067d0",
+          "extraction_receipt": "v006-native.json",
+          "source_visual_check": "Original start/middle/end inspected; point identity agrees with timeline and scoreboard.",
+          "whole_point": true
+        }
+      ],
+      "held_out": true
+    },
+    {
+      "event_id": "tenniset_v007",
+      "exposure": "Djokovic–Tsonga, London 2012 Olympics. New physical fixture relative to project development archive. Both TenniSet fixtures share venue and grass surface. Confirm any third-party model training lists independently.",
+      "source": {
+        "research_release": "https://github.com/HaydenFaulkner/Tennis/blob/master/data/README.md",
+        "media": {
+          "width": 1280,
+          "height": 720,
+          "pix_fmt": "yuv420p",
+          "avg_frame_rate": "25/1",
+          "time_base": "1/50",
+          "start_pts": 0,
+          "nb_frames": "136795",
+          "disposition": {
+            "default": 1,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0,
+            "non_diegetic": 0,
+            "captions": 0,
+            "descriptions": 0,
+            "metadata": 0,
+            "dependent": 0,
+            "still_image": 0,
+            "multilayer": 0
+          },
+          "tags": {
+            "language": "und",
+            "handler_name": "VideoHandler"
+          }
+        },
+        "annotation": "https://drive.google.com/file/d/1C6lJSHVyzU_2RoNL4M4JNeQQ9LXBzsz7/view",
+        "annotation_sha256": "bf39823495102a6dee05a03f7fc93f42534054e9ad2cdb3ced347eb1b5e91614",
+        "points_sha256": "a801355cba529c91464ea13a86cd9237af5c6fff5130fb73057b846ed6121a15",
+        "annotated_points": 129,
+        "source_local_path": "/private/tmp/ps-tenniset-V007-source-20261123.mp4",
+        "source_sha256": "e574e06ac7df160ab1fac2020e62e5e70c56ba33ed6302fc3970e5373063df7e",
+        "source_bytes": 1753252295
+      },
+      "rallies": [
+        {
+          "rally_id": "v007_p0022",
+          "status": "dataset_author_point",
+          "source_id": "V007.mp4",
+          "native_range": [
+            34046,
+            34166
+          ],
+          "provenance": "Chronological point-rank stratum midpoint in the author annotations, inclusive published end converted to half-open.",
+          "previously_measured": false,
+          "annotation_point_id": "P00000103",
+          "set_id": "0001",
+          "game_id": "0004",
+          "point_score_after": "15-0",
+          "cadence": [
+            25,
+            1
+          ],
+          "source_sha256": "e574e06ac7df160ab1fac2020e62e5e70c56ba33ed6302fc3970e5373063df7e",
+          "lossless_extract_sha256": "f9c4cfb91781a53abaa45e29a89aeb5e73c97aed9aebaab0897aab89939aa1b6",
+          "extraction_receipt": "v007-native.json",
+          "source_visual_check": "Original start/middle/end inspected; point identity agrees with timeline and scoreboard.",
+          "whole_point": true
+        },
+        {
+          "rally_id": "v007_p0065",
+          "status": "dataset_author_point",
+          "source_id": "V007.mp4",
+          "native_range": [
+            69737,
+            69875
+          ],
+          "provenance": "Chronological point-rank stratum midpoint in the author annotations, inclusive published end converted to half-open.",
+          "previously_measured": false,
+          "annotation_point_id": "P00000146",
+          "set_id": "0002",
+          "game_id": "0008",
+          "point_score_after": "Game",
+          "cadence": [
+            25,
+            1
+          ],
+          "source_sha256": "e574e06ac7df160ab1fac2020e62e5e70c56ba33ed6302fc3970e5373063df7e",
+          "lossless_extract_sha256": "8d15cd9a62d2dfa88ac809bc3ddb07f70eae4c3e4d4f5a6a1325687cb8603143",
+          "extraction_receipt": "v007-native.json",
+          "source_visual_check": "Original start/middle/end inspected; point identity agrees with timeline and scoreboard.",
+          "whole_point": true
+        },
+        {
+          "rally_id": "v007_p0108",
+          "status": "dataset_author_point",
+          "source_id": "V007.mp4",
+          "native_range": [
+            114187,
+            114451
+          ],
+          "provenance": "Chronological point-rank stratum midpoint in the author annotations, inclusive published end converted to half-open.",
+          "previously_measured": false,
+          "annotation_point_id": "P00000189",
+          "set_id": "0002",
+          "game_id": "0015",
+          "point_score_after": "A-40",
+          "cadence": [
+            25,
+            1
+          ],
+          "source_sha256": "e574e06ac7df160ab1fac2020e62e5e70c56ba33ed6302fc3970e5373063df7e",
+          "lossless_extract_sha256": "961bb2383d3372449383b234440b14793e03af26b115922f686ddf617e06b08a",
+          "extraction_receipt": "v007-native.json",
+          "source_visual_check": "Original start/middle/end inspected; point identity agrees with timeline and scoreboard.",
+          "whole_point": true
+        }
+      ],
+      "held_out": true
+    }
+  ]
+}

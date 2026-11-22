@@ -1,0 +1,13 @@
+{
+  "rung_job": "20261122T225847Z-01ec2a3a",
+  "source": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+  "finish_job": "20261122T224251Z-83f3aed8",
+  "native_host": "gpu3",
+  "native_240_frames_identical": true,
+  "decoded_sha256": "bf566f094b28707992759dcf0114821d2938f0e69749725c065a594343e3b46f",
+  "source_receipt_sha256": "b60733179cbdd2b6b3e62a8c348f8279f756447d299c1931051262fb017aeec9",
+  "typed_frame_sequence_sha256": "d24678790577f5367619b732ed142132d41be804b1da880fe4c3de10e7779390",
+  "charged_cpu_slot_seconds": 80.98593497276306,
+  "forecast_previous_and_reserved_cpu_seconds": 10706.505934972763,
+  "scope": "Same native host, original CRF70 carrier. Verified every per-frame digest and transmitted byte field before alternate actual packets."
+}

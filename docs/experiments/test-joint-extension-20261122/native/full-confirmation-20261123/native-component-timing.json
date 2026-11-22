@@ -1,0 +1,48 @@
+{
+  "source_seconds": 4,
+  "native_display_fps": 60,
+  "roles": {
+    "far": {
+      "job": "20261122T212328Z-15c3068e",
+      "device": "NVIDIA RTX 6000 Ada Generation",
+      "receipt_sha256": "957e1e7baf8c5941f80dd1ca628d23f0ed616bdfe6836b856ac60ae0fbe1126a",
+      "native_frames": 240,
+      "render_and_save_seconds": 952.6835460039729,
+      "full_worker_seconds": 1046.1506208580104,
+      "successful_slot_seconds_including_smoke": 1412.0478942394257
+    },
+    "near": {
+      "job": "20261122T221737Z-4e49e5b8",
+      "device": "NVIDIA RTX 6000 Ada Generation",
+      "receipt_sha256": "eabb635c4450c6ad2cc16174cdf021ea77266a472ef8c1c37788432a724e6c37",
+      "native_frames": 240,
+      "render_and_save_seconds": 939.5403619720018,
+      "full_worker_seconds": 1030.3142131349887,
+      "successful_slot_seconds_including_smoke": 1401.1250338554382
+    }
+  },
+  "compositor_job": "20261122T224251Z-83f3aed8",
+  "compositor_gpu": {
+    "major": 8,
+    "minor": 6,
+    "uuid": "6f70a27e-4171-22d7-3ffd-647e7f186a49",
+    "visible_uuid": "6f70a27e-4171-22d7-3ffd-647e7f186a49"
+  },
+  "compositor_receipt_sha256": "b0a310e6ba03acce44739adec4e5dd243faade0bb196aa16e10dad0304699971",
+  "compositor_stage_seconds": {
+    "elapsed_seconds": 129.12737389901304,
+    "finalization_seconds": 5.108103014994413,
+    "initialization_seconds": 22.110893698991276,
+    "loop_seconds": 101.90837641901453,
+    "native_decode_seconds": 0.05976370500866324,
+    "sam_model_load_seconds": 18.989874836988747,
+    "sum_sam_predictions": 67.46330282907002,
+    "sum_composition_ticks": 94.25288066084613
+  },
+  "compositor_worker_seconds": 161.65948259900324,
+  "compositor_slot_seconds_including_smoke": 247.23119854927063,
+  "project_slot_seconds_before_pair": 288.11,
+  "near_interrupted_slot_seconds": 1235.8805079460144,
+  "rejected_admission_seconds": 20.31191921234131,
+  "total_sydney_gpu_seconds": 4604.706553802491
+}

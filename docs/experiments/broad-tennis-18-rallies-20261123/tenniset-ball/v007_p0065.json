@@ -1,0 +1,357 @@
+{
+  "source_sha256": "8d15cd9a62d2dfa88ac809bc3ddb07f70eae4c3e4d4f5a6a1325687cb8603143",
+  "source_frames": 138,
+  "rendered": 138,
+  "fps": [
+    25,
+    1
+  ],
+  "source_context_sha256": "76aa0df76ecfb1a9d0b5e40489d1dd92cd69ebbf27b18cd6b34d1e0763ed56f5",
+  "tracker": "RacketVision BallTrack CPU",
+  "code_sha256": "5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff",
+  "weights_sha256": "b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec",
+  "device": "cpu",
+  "torch": "2.8.0",
+  "tools": {
+    "ffmpeg": {
+      "path": "/opt/homebrew/bin/ffmpeg",
+      "real_path": "/opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg",
+      "sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be",
+      "version": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    "SvtAv1EncApp": {
+      "path": "/opt/homebrew/bin/SvtAv1EncApp",
+      "real_path": "/opt/homebrew/Cellar/svt-av1/4.0.1/bin/SvtAv1EncApp",
+      "sha256": "db044194faf94d553c2509c8e033ecd05a373ba54d919d0fb49a3a13149d1687",
+      "version": "SVT-AV1 v4.0.1 (release)"
+    },
+    "dav1d": {
+      "path": "/opt/homebrew/bin/dav1d",
+      "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+      "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+      "version": "1.5.4"
+    }
+  },
+  "raw_present": 34,
+  "guard": false,
+  "ball_positions": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    [
+      643,
+      62
+    ],
+    [
+      644,
+      58
+    ],
+    [
+      645,
+      54
+    ],
+    [
+      647,
+      50
+    ],
+    [
+      647,
+      49
+    ],
+    [
+      649,
+      46
+    ],
+    [
+      650,
+      44
+    ],
+    null,
+    [
+      651,
+      44
+    ],
+    [
+      652,
+      45
+    ],
+    [
+      653,
+      46
+    ],
+    [
+      654,
+      49
+    ],
+    [
+      655,
+      53
+    ],
+    [
+      655,
+      55
+    ],
+    [
+      657,
+      60
+    ],
+    null,
+    null,
+    [
+      585,
+      123
+    ],
+    [
+      554,
+      150
+    ],
+    [
+      525,
+      180
+    ],
+    [
+      495,
+      208
+    ],
+    [
+      464,
+      241
+    ],
+    [
+      432,
+      276
+    ],
+    [
+      400,
+      313
+    ],
+    [
+      369,
+      338
+    ],
+    [
+      343,
+      340
+    ],
+    [
+      317,
+      342
+    ],
+    [
+      291,
+      347
+    ],
+    [
+      262,
+      354
+    ],
+    [
+      233,
+      363
+    ],
+    [
+      204,
+      374
+    ],
+    [
+      174,
+      388
+    ],
+    [
+      185,
+      382
+    ],
+    [
+      219,
+      366
+    ],
+    [
+      258,
+      349
+    ],
+    [
+      288,
+      337
+    ],
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+  ],
+  "payload_bytes": 168,
+  "intervals": [
+    {
+      "start": 0,
+      "stop": 70,
+      "predicted": "non_court",
+      "fit_share": 0.0
+    },
+    {
+      "start": 70,
+      "stop": 107,
+      "predicted": "court",
+      "fit_share": 1.0
+    },
+    {
+      "start": 107,
+      "stop": 138,
+      "predicted": "non_court",
+      "fit_share": 0.0
+    }
+  ],
+  "fallback_ticks": 101,
+  "fallback_rgb_equals_native_base": true,
+  "packet_arms": [
+    {
+      "ceiling": 14076,
+      "coded_size": [
+        320,
+        180
+      ],
+      "bytes": 9299,
+      "base_bytes": 9040,
+      "framing_bytes": 91,
+      "sha256": "4ca23d07d2efcd99a1c210648f3a44f936236fdf5bd67abd0aa80065604203b9",
+      "base_sha256": "1372f7d4f03e6b23133a5629970e19abc30b00eec02cda791e5baffc720e38f3",
+      "displayed_sha256": "fc536aa7e8bb8bf1e4cb616efdd0d006acef3c407651c83cf2732de646861c76"
+    },
+    {
+      "ceiling": 22770,
+      "coded_size": [
+        320,
+        180
+      ],
+      "bytes": 9299,
+      "base_bytes": 9040,
+      "framing_bytes": 91,
+      "sha256": "4ca23d07d2efcd99a1c210648f3a44f936236fdf5bd67abd0aa80065604203b9",
+      "base_sha256": "1372f7d4f03e6b23133a5629970e19abc30b00eec02cda791e5baffc720e38f3",
+      "displayed_sha256": "fc536aa7e8bb8bf1e4cb616efdd0d006acef3c407651c83cf2732de646861c76"
+    },
+    {
+      "ceiling": 22770,
+      "coded_size": [
+        640,
+        360
+      ],
+      "bytes": 17801,
+      "base_bytes": 17542,
+      "framing_bytes": 91,
+      "sha256": "26a26b47e7fe852a1cbc5b98c1ee7b4ae23ceff6d1849804589516cd1a8b1ce8",
+      "base_sha256": "68f0b1b907430d4df1de7f87eb433dccc802fc0b2515a88714e22b4aeaea0b9c",
+      "displayed_sha256": "46e474c475e0284e12223cf86c316990a8b7dfb2225d99581ad8486995fce5f7"
+    },
+    {
+      "ceiling": 14076,
+      "coded_size": [
+        640,
+        360
+      ],
+      "bytes": 13735,
+      "base_bytes": 13476,
+      "framing_bytes": 91,
+      "sha256": "8d5e72a10b923e4a3acf1a1fa7db285830748d47317b04e96dd71331c3761d05",
+      "base_sha256": "8f72a330764be54143184ed1c9f6bd753d62271264587070fb5da9c966729d4c",
+      "displayed_sha256": "7945432a5660e9a4496bce104862913a67a82b4f7703f2ceb2a5bfe342350e1b"
+    }
+  ],
+  "setup_wall_s": 2.0988815000000614,
+  "inference_wall_s": 45.84104366599968,
+  "wall_s": 82.12145062499985,
+  "worker_sha256": "fc0c3b324c86c66767b780cc6b968160e623ec0a7b75e32f6f1d3681ade409e7"
+}

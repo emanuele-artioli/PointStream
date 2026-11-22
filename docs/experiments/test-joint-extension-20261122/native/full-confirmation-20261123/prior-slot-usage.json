@@ -1,0 +1,93 @@
+{
+  "sender": {
+    "job": "20261122T132643Z-4f79b8f4",
+    "state": "cancelled",
+    "device": "cpu",
+    "cpu_threads": 1,
+    "occupied_seconds": 0
+  },
+  "sender_packed": {
+    "job": "20261122T134208Z-0e12634b",
+    "state": "complete",
+    "device": "cpu",
+    "cpu_threads": 1,
+    "occupied_seconds": 103.27241897583008
+  },
+  "generator_far_init": {
+    "job": "20261122T134803Z-0408c86a",
+    "state": "failed",
+    "device": "gpu",
+    "cpu_threads": 1,
+    "occupied_seconds": 21.01866841316223
+  },
+  "generator_near_init": {
+    "job": "20261122T134804Z-ff2bc372",
+    "state": "failed",
+    "device": "gpu",
+    "cpu_threads": 1,
+    "occupied_seconds": 10.243663787841797
+  },
+  "prior_24_pair": {
+    "job": "20261122T203445Z-fbcdc728",
+    "state": "complete",
+    "device": "gpu",
+    "cpu_threads": 1,
+    "occupied_seconds": 256.8469455242157
+  },
+  "av1_320_265": {
+    "job": "20261122T135052Z-42003fe3",
+    "state": "complete",
+    "device": "cpu",
+    "cpu_threads": 1,
+    "occupied_seconds": 1455.2879440784454
+  },
+  "neural_480_q24": {
+    "job": "20261122T135053Z-981d1f60",
+    "state": "complete",
+    "device": "cpu",
+    "cpu_threads": 1,
+    "occupied_seconds": 704.4155642986298
+  },
+  "ordinary_320_warm": {
+    "job": "20261122T135529Z-6fabe428",
+    "state": "failed",
+    "device": "cpu",
+    "cpu_threads": 1,
+    "occupied_seconds": 210.60363793373108
+  },
+  "ordinary_320_warm_gpu4": {
+    "job": "20261122T141106Z-e1d3e349",
+    "state": "complete",
+    "device": "cpu",
+    "cpu_threads": 1,
+    "occupied_seconds": 374.2850568294525
+  },
+  "neural_480_q26": {
+    "job": "20261122T141901Z-a490196a",
+    "state": "complete",
+    "device": "cpu",
+    "cpu_threads": 1,
+    "occupied_seconds": 381.37752175331116
+  },
+  "ordinary_1920_cold": {
+    "job": "20261122T142622Z-be704c69",
+    "state": "complete",
+    "device": "cpu",
+    "cpu_threads": 1,
+    "occupied_seconds": 431.0687770843506
+  },
+  "roi_640_cold": {
+    "job": "20261122T143106Z-9ad44592",
+    "state": "failed",
+    "device": "cpu",
+    "cpu_threads": 1,
+    "occupied_seconds": 110.26280307769775
+  },
+  "roi_640_cold_recovery": {
+    "job": "20261122T143804Z-c1f667b2",
+    "state": "complete",
+    "device": "cpu",
+    "cpu_threads": 1,
+    "occupied_seconds": 414.944216966629
+  }
+}

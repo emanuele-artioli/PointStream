@@ -1,0 +1,389 @@
+{
+  "source_sha256": "f9c4cfb91781a53abaa45e29a89aeb5e73c97aed9aebaab0897aab89939aa1b6",
+  "source_frames": 120,
+  "rendered": 120,
+  "fps": [
+    25,
+    1
+  ],
+  "source_context_sha256": "eed73212a324ac36909eb6075122b18b897d41e736defffcd7c766740cc497b9",
+  "tracker": "RacketVision BallTrack CPU",
+  "code_sha256": "5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff",
+  "weights_sha256": "b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec",
+  "device": "cpu",
+  "torch": "2.8.0",
+  "tools": {
+    "ffmpeg": {
+      "path": "/opt/homebrew/bin/ffmpeg",
+      "real_path": "/opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg",
+      "sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be",
+      "version": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    "SvtAv1EncApp": {
+      "path": "/opt/homebrew/bin/SvtAv1EncApp",
+      "real_path": "/opt/homebrew/Cellar/svt-av1/4.0.1/bin/SvtAv1EncApp",
+      "sha256": "db044194faf94d553c2509c8e033ecd05a373ba54d919d0fb49a3a13149d1687",
+      "version": "SVT-AV1 v4.0.1 (release)"
+    },
+    "dav1d": {
+      "path": "/opt/homebrew/bin/dav1d",
+      "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+      "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+      "version": "1.5.4"
+    }
+  },
+  "raw_present": 56,
+  "guard": false,
+  "ball_positions": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    [
+      412,
+      142
+    ],
+    [
+      404,
+      141
+    ],
+    [
+      417,
+      100
+    ],
+    [
+      418,
+      93
+    ],
+    [
+      420,
+      85
+    ],
+    [
+      422,
+      78
+    ],
+    [
+      424,
+      74
+    ],
+    [
+      424,
+      68
+    ],
+    [
+      425,
+      62
+    ],
+    [
+      427,
+      59
+    ],
+    [
+      428,
+      55
+    ],
+    [
+      429,
+      53
+    ],
+    [
+      431,
+      50
+    ],
+    [
+      431,
+      49
+    ],
+    [
+      434,
+      48
+    ],
+    [
+      436,
+      48
+    ],
+    [
+      437,
+      49
+    ],
+    [
+      438,
+      50
+    ],
+    [
+      439,
+      53
+    ],
+    [
+      441,
+      55
+    ],
+    [
+      442,
+      58
+    ],
+    [
+      443,
+      61
+    ],
+    [
+      449,
+      71
+    ],
+    [
+      467,
+      93
+    ],
+    [
+      490,
+      121
+    ],
+    [
+      506,
+      141
+    ],
+    [
+      528,
+      168
+    ],
+    [
+      551,
+      196
+    ],
+    [
+      455,
+      161
+    ],
+    [
+      604,
+      262
+    ],
+    [
+      632,
+      298
+    ],
+    [
+      658,
+      333
+    ],
+    [
+      684,
+      343
+    ],
+    [
+      713,
+      345
+    ],
+    [
+      736,
+      347
+    ],
+    [
+      763,
+      351
+    ],
+    [
+      789,
+      356
+    ],
+    [
+      820,
+      364
+    ],
+    [
+      851,
+      375
+    ],
+    [
+      880,
+      382
+    ],
+    [
+      867,
+      344
+    ],
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    [
+      761,
+      123
+    ],
+    [
+      747,
+      102
+    ],
+    [
+      734,
+      85
+    ],
+    [
+      720,
+      68
+    ],
+    [
+      708,
+      54
+    ],
+    [
+      698,
+      43
+    ],
+    [
+      685,
+      31
+    ],
+    [
+      676,
+      22
+    ],
+    [
+      665,
+      12
+    ],
+    [
+      655,
+      4
+    ],
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    [
+      589,
+      2
+    ],
+    [
+      588,
+      6
+    ],
+    [
+      586,
+      10
+    ],
+    [
+      585,
+      17
+    ],
+    [
+      583,
+      24
+    ]
+  ],
+  "payload_bytes": 312,
+  "intervals": [
+    {
+      "start": 0,
+      "stop": 37,
+      "predicted": "non_court",
+      "fit_share": 0.0
+    },
+    {
+      "start": 37,
+      "stop": 120,
+      "predicted": "court",
+      "fit_share": 1.0
+    }
+  ],
+  "fallback_ticks": 37,
+  "fallback_rgb_equals_native_base": true,
+  "packet_arms": [
+    {
+      "ceiling": 12240,
+      "coded_size": [
+        320,
+        180
+      ],
+      "bytes": 9696,
+      "base_bytes": 9293,
+      "framing_bytes": 91,
+      "sha256": "17d207c5b81b4162d4c647d9b48dd1cb68b1ba7024206983b37f3ae13aa63c0d",
+      "base_sha256": "b5d4025d7359448b9da4984b58c2bdcd6b32eb021acd6f88282c34e83ff11485",
+      "displayed_sha256": "39ceece72c04228e6f4eae819cd0541eeeb30a9363653058fcc32cf53c4d7bed"
+    },
+    {
+      "ceiling": 19800,
+      "coded_size": [
+        320,
+        180
+      ],
+      "bytes": 9696,
+      "base_bytes": 9293,
+      "framing_bytes": 91,
+      "sha256": "17d207c5b81b4162d4c647d9b48dd1cb68b1ba7024206983b37f3ae13aa63c0d",
+      "base_sha256": "b5d4025d7359448b9da4984b58c2bdcd6b32eb021acd6f88282c34e83ff11485",
+      "displayed_sha256": "39ceece72c04228e6f4eae819cd0541eeeb30a9363653058fcc32cf53c4d7bed"
+    },
+    {
+      "ceiling": 19800,
+      "coded_size": [
+        640,
+        360
+      ],
+      "bytes": 14460,
+      "base_bytes": 14057,
+      "framing_bytes": 91,
+      "sha256": "0ebb4edde8ab2e158ad336fa1cb53c2b8e2834da26587913ecc8918f42178221",
+      "base_sha256": "a5bc00c25d82d7033e5519f44c9721fe23645589f88016ed8de8d86d77c58106",
+      "displayed_sha256": "f9a9e181545e57ac2cf579e2395118df6276fabe0381b2013de368f677b10089"
+    }
+  ],
+  "setup_wall_s": 1.742281875000117,
+  "inference_wall_s": 85.71262979199946,
+  "wall_s": 119.07854762499937,
+  "worker_sha256": "fc0c3b324c86c66767b780cc6b968160e623ec0a7b75e32f6f1d3681ade409e7"
+}

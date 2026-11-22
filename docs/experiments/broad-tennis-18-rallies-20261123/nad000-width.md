@@ -1,0 +1,22 @@
+# Retune the affordable Nadal base
+
+The lowest previously reconstructed cached Nadal000 joint packet was 687 bytes above the strict 12,240-byte allowance. Recover the exact 240-frame donor-cleaned GrabCut input and the exact paid ball symbols. Rebind the unchanged appearance cache, pose stream and trajectory. First reproduce the existing 160×96 CRF70 packet hash, then try 128×80 at the same CRF. Only if it misses the allowance try 96×64. Select by total physical packet bytes without viewing target quality. At most three full conventional encodes, zero GPU and ten CPU minutes for this size test. Reparse all packet parts, validate 240 independently decoded native base frames and source/receiver dimensions. A verified packet price advances to full receiver composition and scoring on the existing reviewed source instants; packet construction alone supplies no new foreground quality number.
+
+After the frozen grid, 96×64 missed by 180 B. Test one final existing-profile 64×64, CRF70 choice on the identical source and channels, after reproducing the 160×96 control. As a separate transport-format diagnostic, wrap the full original 160×96 wire bytes in zlib level 6 with an eight-byte outer header (PSZ1 magic and little-endian uncompressed byte length). Require exact original packet SHA after bounded decompression, including EOF and trailing-byte rejection. No compression tuning. If it fits, its reconstruction is bit-identical to the old paid packet. Test the same wrapper on ordinary and neural packets before using it for a new comparative headline.
+
+The original 160×96 control reproduced its historical physical stream, 240 native base frames and complete 1080p RGB digest. At 128×80 the total was 12,763 B and at 96×64 it was 12,420 B. The final 64×64 packet took **12,217 B (20.3617 kbps)** and replays all 240 ticks. The base, poses, ball and framing respectively contributed 8,200, 1,623, 794 and 1,600 bytes. The cached initialization was 244,339 bytes. A standalone 4.8-second cold transfer comes to 427.593 kbps. [Encoder receipts](nad000-final-width.json) · [Crop and mask identities](nad000-replay-inputs.json) · [All 240 receiver hashes](nad000-display.json)
+
+Twelve previously reviewed source instants provided the same two body silhouettes and 64-pixel ball crops for every method. DISTS is lower when the picture more closely resembles its source. Equal-class foreground weights the player mean and ball mean equally.
+
+| Paid stream | Warm kbps | Player DISTS | Ball DISTS | Equal-class foreground DISTS |
+|---|---:|---:|---:|---:|
+| PointStream, 64×64 court | 20.362 | 0.2634 | 0.3727 | 0.3181 |
+| Ordinary AV1, 240-wide | 19.892 | 0.5345 | 0.4181 | 0.4763 |
+| DCVC-UF, QP5 | 19.135 | 0.3962 | 0.3459 | 0.3711 |
+| Prior PointStream, 160-wide court | 21.545 | 0.2617 | 0.3450 | 0.3034 |
+
+At the 20.4-kbps ceiling the weighted foreground difference is 33.2% versus ordinary AV1 and 14.3% versus DCVC-UF. The body supports carry most of this advantage. DCVC-UF achieved lower ball DISTS than the 64×64 joint variant. Across the 12 entire source frames the joint produced 19.05 dB RGB PSNR, compared with 20.35 dB for the former, costlier PointStream setting and 27.38 dB for the affordable neural stream. Every repeat of the original DISTS agreed within 0.00000006. This is one seen rally with exact compatible appearance cached. [Individual scores](nad000-scores.json) · [Ordinary streams](../joint-trajectory-20261122/strict-20-ordinary.json) · [Neural stream](../joint-trajectory-20261122/dcvc-q5-human-regions.json)
+
+All reviewed crops, their masks, both physical packets, the exact initialization and the new base are preserved in the private author directory `tennis-18-physical-study-20261123/nad000`. The other methods' original DISTS records remain in the repository. Their two exact decoded controls were not found in the local archive; the next matched LPIPS/SSIM/PSNR comparison requires the certified neural samples or full decode. The AVC/AV1 review movies are presentation assets. The same native source and already measured ordinary stream hashes support a fresh CPU control replay separately.
+
+The eight-byte-header deflate test independently recovered the prior 160-wide wire payload byte for byte. This format changes the transport overhead and needs symmetrically wrapped comparators before supporting a bandwidth claim. [Single diagnostic](nad000-wrapper.json)

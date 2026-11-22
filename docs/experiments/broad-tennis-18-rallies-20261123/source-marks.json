@@ -1,0 +1,620 @@
+{
+  "schema": 1,
+  "selection": "Eight equally spaced bin midpoints per point, then uncovered fallback-shot midpoints separately.",
+  "route_summary_sha256": "55c0c2ff837656812dc860e6ecc016703e825361ce1e60307353530b251fabf5",
+  "reviewed_frames": 0,
+  "pages": [
+    {
+      "rally_id": "v006_p0014",
+      "review_sha256": "0caa6eea3e3205fbca8472efbc0a51df3167360fd9e3585d2f411b1daa871055",
+      "frames": 8
+    },
+    {
+      "rally_id": "v006_p0041",
+      "review_sha256": "f710eeff980cbc3ea90a8ce836e6142ca7acf8e5a5ccf6a6690f61d8cc8aed19",
+      "frames": 8
+    },
+    {
+      "rally_id": "v006_p0068",
+      "review_sha256": "b85137322fd5a05b57a3c6382883ae5779150f8ebbe72d68a69763b7f8b74a98",
+      "frames": 8
+    },
+    {
+      "rally_id": "v007_p0022",
+      "review_sha256": "a9b8a68e5697f967a215275dc58cd2689059f191ea51fe6da3e7355fd1af8fb8",
+      "frames": 8
+    },
+    {
+      "rally_id": "v007_p0065",
+      "review_sha256": "0ee96f3a3ffd0aa75763517ffe8977e5ec4eca89fb440e78a33f4647f87e014d",
+      "frames": 8
+    },
+    {
+      "rally_id": "v007_p0108",
+      "review_sha256": "d544d8e0a2c6c13c5a70c76eaf744d3778b4845f6305d6813445b5292a4d0833",
+      "frames": 8
+    }
+  ],
+  "route_counts": {
+    "court": 40,
+    "non_court": 8
+  },
+  "frames": [
+    {
+      "rally_id": "v006_p0014",
+      "tick": 6,
+      "absolute_tick": 38760,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        106
+      ],
+      "rgb_sha256": "97db90d92435bebdc335d110d00e1930ea74a25c332323f6d2532d4a4b5108f2"
+    },
+    {
+      "rally_id": "v006_p0014",
+      "tick": 19,
+      "absolute_tick": 38773,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        106
+      ],
+      "rgb_sha256": "49cb908f9f97dd68ef1deb7c18f562963f7c22619eef3096477a58c0d8acee0c"
+    },
+    {
+      "rally_id": "v006_p0014",
+      "tick": 33,
+      "absolute_tick": 38787,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        106
+      ],
+      "rgb_sha256": "4beed5091b578ee74bf3a9f6980eefae3517d64afe02517c0ac0519421a80a77"
+    },
+    {
+      "rally_id": "v006_p0014",
+      "tick": 46,
+      "absolute_tick": 38800,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        106
+      ],
+      "rgb_sha256": "459fb11ec76347ee3eaff7163b2e1628d91f6952ba30ad033535c1d16969cb10"
+    },
+    {
+      "rally_id": "v006_p0014",
+      "tick": 59,
+      "absolute_tick": 38813,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        106
+      ],
+      "rgb_sha256": "bdeecd64b692886e3d4e36eeafa24fd72b0032904b5c4bcd5f7ae93c93332d58"
+    },
+    {
+      "rally_id": "v006_p0014",
+      "tick": 72,
+      "absolute_tick": 38826,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        106
+      ],
+      "rgb_sha256": "8c6fddceecc987e1655b63790994764e582cdd471b7163075d8fcdc7aec0112d"
+    },
+    {
+      "rally_id": "v006_p0014",
+      "tick": 86,
+      "absolute_tick": 38840,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        106
+      ],
+      "rgb_sha256": "6f5619a2ae338b11b18177981527832e306bf090b3aaaedbeb9a6ede9949a9cd"
+    },
+    {
+      "rally_id": "v006_p0014",
+      "tick": 99,
+      "absolute_tick": 38853,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        106
+      ],
+      "rgb_sha256": "8fc03fce29e52448c963f5ca3b90a65f0e358555a3220f4e54816791404cf1a5"
+    },
+    {
+      "rally_id": "v006_p0041",
+      "tick": 8,
+      "absolute_tick": 74562,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        132
+      ],
+      "rgb_sha256": "8bb56bfcefdc6f3fd742f0f6c86acd40f8a11ab34e96c2cbb90734793876a4af"
+    },
+    {
+      "rally_id": "v006_p0041",
+      "tick": 24,
+      "absolute_tick": 74578,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        132
+      ],
+      "rgb_sha256": "da7087790d448470ce28ee9f3d79668a4d5f6916fa08bee744f4d0b280c95449"
+    },
+    {
+      "rally_id": "v006_p0041",
+      "tick": 41,
+      "absolute_tick": 74595,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        132
+      ],
+      "rgb_sha256": "b8eeac529cd195adf242db65984673b0ab2d99d38bf4e03797fe5e00b14f3e4a"
+    },
+    {
+      "rally_id": "v006_p0041",
+      "tick": 57,
+      "absolute_tick": 74611,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        132
+      ],
+      "rgb_sha256": "3c3602bd95bd41af5c26e5308ddb9b1d3fa02c663064f4e2d7de52196f921f1c"
+    },
+    {
+      "rally_id": "v006_p0041",
+      "tick": 74,
+      "absolute_tick": 74628,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        132
+      ],
+      "rgb_sha256": "70dfb410dc31d7652c4859fd5e03251c8699c09a6db4b9f4200d2b4d9f7730cf"
+    },
+    {
+      "rally_id": "v006_p0041",
+      "tick": 90,
+      "absolute_tick": 74644,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        132
+      ],
+      "rgb_sha256": "29a30bca4b2219974695dc956a568c6a733bd3710e0fbd2f81cf0d8503180a81"
+    },
+    {
+      "rally_id": "v006_p0041",
+      "tick": 107,
+      "absolute_tick": 74661,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        132
+      ],
+      "rgb_sha256": "c60ced4f8809b2588bda8ac242162238b726dce5c0209d9da6532316a426a704"
+    },
+    {
+      "rally_id": "v006_p0041",
+      "tick": 123,
+      "absolute_tick": 74677,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        132
+      ],
+      "rgb_sha256": "b7e673a7fe4b6286085915845b3ed9f035c6bfae76648dab3700035f0c45f11a"
+    },
+    {
+      "rally_id": "v006_p0068",
+      "tick": 9,
+      "absolute_tick": 103367,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        144
+      ],
+      "rgb_sha256": "3e3d498ddd0b2aadb79c45f4aa4f27319af0483fa77a2fbd0cdebc8f9fb66f18"
+    },
+    {
+      "rally_id": "v006_p0068",
+      "tick": 27,
+      "absolute_tick": 103385,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        144
+      ],
+      "rgb_sha256": "c2b809a4e213f84c2f59b008779a9ecf1031fc44b6fec235f2f4b299c6cc671a"
+    },
+    {
+      "rally_id": "v006_p0068",
+      "tick": 45,
+      "absolute_tick": 103403,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        144
+      ],
+      "rgb_sha256": "2aa915b2e7ebfcfcd7e7df82afbca170915c4474c86ca0620032482fa71aabb3"
+    },
+    {
+      "rally_id": "v006_p0068",
+      "tick": 63,
+      "absolute_tick": 103421,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        144
+      ],
+      "rgb_sha256": "e943e1620fe679b38bd11227d0e039a30a19f59a16c3b0ffbee1f1c6eaab63ba"
+    },
+    {
+      "rally_id": "v006_p0068",
+      "tick": 81,
+      "absolute_tick": 103439,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        144
+      ],
+      "rgb_sha256": "e23404b3a37ffa1107f7ca2e12045e3072741d3932d159dc3e8bdc79d224c7fa"
+    },
+    {
+      "rally_id": "v006_p0068",
+      "tick": 99,
+      "absolute_tick": 103457,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        144
+      ],
+      "rgb_sha256": "37a48ed747e1d1452bb180fcb01286d27f90b71a112c1be6c46b2ba4fb0cde1e"
+    },
+    {
+      "rally_id": "v006_p0068",
+      "tick": 117,
+      "absolute_tick": 103475,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        144
+      ],
+      "rgb_sha256": "a06eafd3521b867639af815a03ad6a49ea1a75a5ae4182cf8297d9c4bd736f71"
+    },
+    {
+      "rally_id": "v006_p0068",
+      "tick": 135,
+      "absolute_tick": 103493,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        144
+      ],
+      "rgb_sha256": "87b36ee570655444be94b200d90fb83cd7e5f742e26edd3c017c179db0f1af81"
+    },
+    {
+      "rally_id": "v007_p0022",
+      "tick": 7,
+      "absolute_tick": 34053,
+      "sample": "primary",
+      "route": "non_court",
+      "shot": [
+        0,
+        37
+      ],
+      "rgb_sha256": "3a8ba13457df276076541b3dcca087e8ac5c34d5e6c7f76317c2754caaa80ad5"
+    },
+    {
+      "rally_id": "v007_p0022",
+      "tick": 22,
+      "absolute_tick": 34068,
+      "sample": "primary",
+      "route": "non_court",
+      "shot": [
+        0,
+        37
+      ],
+      "rgb_sha256": "c6f289e906eb0e53f99d821f1a1483f69921d1138b9b6586bfc57b90713ca43f"
+    },
+    {
+      "rally_id": "v007_p0022",
+      "tick": 37,
+      "absolute_tick": 34083,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        37,
+        120
+      ],
+      "rgb_sha256": "031bfae92d550b243357d98488dc3d198cbc41ac13f6ef5bdb70989058081466"
+    },
+    {
+      "rally_id": "v007_p0022",
+      "tick": 52,
+      "absolute_tick": 34098,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        37,
+        120
+      ],
+      "rgb_sha256": "204b7062931f47625b362913ce80505ad67f8844d8895c8064f1201b5617ce68"
+    },
+    {
+      "rally_id": "v007_p0022",
+      "tick": 67,
+      "absolute_tick": 34113,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        37,
+        120
+      ],
+      "rgb_sha256": "0d6acf567a6c528206eddba83265ee306163918f9b53ebdf95147e1e943f3eed"
+    },
+    {
+      "rally_id": "v007_p0022",
+      "tick": 82,
+      "absolute_tick": 34128,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        37,
+        120
+      ],
+      "rgb_sha256": "e7f2e5734801fe918665ae7783487a87f3d5329b2e6c575eeb23fffdaf7a8009"
+    },
+    {
+      "rally_id": "v007_p0022",
+      "tick": 97,
+      "absolute_tick": 34143,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        37,
+        120
+      ],
+      "rgb_sha256": "c99b4f558ebe9f1fbafc07973232afd907e7634f6ec23b7e5689aae2ae28e7b5"
+    },
+    {
+      "rally_id": "v007_p0022",
+      "tick": 112,
+      "absolute_tick": 34158,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        37,
+        120
+      ],
+      "rgb_sha256": "d07572e7d9f6ea2ee11413e9ebb3d61e9e7c0ff050f38c0a8103d7d561e0d324"
+    },
+    {
+      "rally_id": "v007_p0065",
+      "tick": 8,
+      "absolute_tick": 69745,
+      "sample": "primary",
+      "route": "non_court",
+      "shot": [
+        0,
+        70
+      ],
+      "rgb_sha256": "fe282af7bbeb8255cc5b659bdd97c64635196aa052a0f11b61b7ce95f6f11906"
+    },
+    {
+      "rally_id": "v007_p0065",
+      "tick": 25,
+      "absolute_tick": 69762,
+      "sample": "primary",
+      "route": "non_court",
+      "shot": [
+        0,
+        70
+      ],
+      "rgb_sha256": "5157bfcdb9f0acf6b0f1c362e4016036ec8bfec025563a054dbdf08dc0f49add"
+    },
+    {
+      "rally_id": "v007_p0065",
+      "tick": 43,
+      "absolute_tick": 69780,
+      "sample": "primary",
+      "route": "non_court",
+      "shot": [
+        0,
+        70
+      ],
+      "rgb_sha256": "086ea8241e33f70d9ab7aefe241a7a4511121d43fa3f00af5e14e53f8c6210a4"
+    },
+    {
+      "rally_id": "v007_p0065",
+      "tick": 60,
+      "absolute_tick": 69797,
+      "sample": "primary",
+      "route": "non_court",
+      "shot": [
+        0,
+        70
+      ],
+      "rgb_sha256": "8efd0213ebd7f2d553477c4f885e688e08e2547005e74ff44e5ea0e67c17faf0"
+    },
+    {
+      "rally_id": "v007_p0065",
+      "tick": 77,
+      "absolute_tick": 69814,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        70,
+        107
+      ],
+      "rgb_sha256": "85cb1f497f98f623c50179c6ad55f3755c2e86382de48c21473fcc55665c5673"
+    },
+    {
+      "rally_id": "v007_p0065",
+      "tick": 94,
+      "absolute_tick": 69831,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        70,
+        107
+      ],
+      "rgb_sha256": "549778c25097650cd50c0f5cacaeb8922eba59645f6b9c55d6084312ff890dae"
+    },
+    {
+      "rally_id": "v007_p0065",
+      "tick": 112,
+      "absolute_tick": 69849,
+      "sample": "primary",
+      "route": "non_court",
+      "shot": [
+        107,
+        138
+      ],
+      "rgb_sha256": "9b51d9f6515eca146d48eaed92b03b767ac4669edddffc949150ab55b575dfb5"
+    },
+    {
+      "rally_id": "v007_p0065",
+      "tick": 129,
+      "absolute_tick": 69866,
+      "sample": "primary",
+      "route": "non_court",
+      "shot": [
+        107,
+        138
+      ],
+      "rgb_sha256": "789b63c43a624295bed1800145fd494e504c6ff04444eb09f0fd3524abc4d0be"
+    },
+    {
+      "rally_id": "v007_p0108",
+      "tick": 16,
+      "absolute_tick": 114203,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        264
+      ],
+      "rgb_sha256": "cd11acecf24cb1bfc5aa02fe6544a1d1e1aee676a881d3056803d891018eb3fb"
+    },
+    {
+      "rally_id": "v007_p0108",
+      "tick": 49,
+      "absolute_tick": 114236,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        264
+      ],
+      "rgb_sha256": "73bc9101f0c4f2684a0f2effba110b8bd1ec7312dd401a3d99aa90d1457a0b2f"
+    },
+    {
+      "rally_id": "v007_p0108",
+      "tick": 82,
+      "absolute_tick": 114269,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        264
+      ],
+      "rgb_sha256": "67bead5fea6d70e5404ee1c9f5cb5e571362a323eb4e0189d1d1734f33848bcc"
+    },
+    {
+      "rally_id": "v007_p0108",
+      "tick": 115,
+      "absolute_tick": 114302,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        264
+      ],
+      "rgb_sha256": "ef4ff34d2ee3f7db5a504408c3d8d3c8989c4f5eb57134a1ff24189191c95cf8"
+    },
+    {
+      "rally_id": "v007_p0108",
+      "tick": 148,
+      "absolute_tick": 114335,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        264
+      ],
+      "rgb_sha256": "b8c63960dea0cf9235a21a09a0e9f6e745bc29587aa0a9e7d274486c3e081b0d"
+    },
+    {
+      "rally_id": "v007_p0108",
+      "tick": 181,
+      "absolute_tick": 114368,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        264
+      ],
+      "rgb_sha256": "7b62808da37a981f60df3f2a9d8bb29a3af40bdc350a7525ef73a988184b831b"
+    },
+    {
+      "rally_id": "v007_p0108",
+      "tick": 214,
+      "absolute_tick": 114401,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        264
+      ],
+      "rgb_sha256": "ea8824a41288259e5abc77b2d62e9f32db65a2b12b4e74fbd31aeef2cd8ac901"
+    },
+    {
+      "rally_id": "v007_p0108",
+      "tick": 247,
+      "absolute_tick": 114434,
+      "sample": "primary",
+      "route": "court",
+      "shot": [
+        0,
+        264
+      ],
+      "rgb_sha256": "ab4a38086058fee3c81bcbe81befed33b2fb06ca29382a26bd5158adfa656b87"
+    }
+  ]
+}

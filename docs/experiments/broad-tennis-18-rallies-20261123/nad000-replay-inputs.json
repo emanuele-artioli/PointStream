@@ -1,0 +1,55 @@
+{
+  "input_member_bytes": 337950152,
+  "campus_archives": {
+    "20261118T162820Z-841078f9": {
+      "tar_bytes": 169543680,
+      "selected_members": [
+        {
+          "name": "publish/nadal_kyrgios__000_at120__person_000000000000.npz",
+          "bytes": 169519615,
+          "verified_sha256": "fee29e0a930b33da18be56895fb4d3092680169f68978cfe505ee68077e81b37"
+        }
+      ],
+      "archive_sha256": "fc0e4a380c47116332bdcd6dfedc268c2a34f4d4b3eca7608d764acfb912d664",
+      "evidence": "docs/experiments/receiver-replay-20261118/independent-idle-20261118/player1-full.json"
+    },
+    "20261118T160156Z-9fdf17fb": {
+      "tar_bytes": 166594560,
+      "selected_members": [
+        {
+          "name": "publish/nadal_kyrgios__000_at120__person_000000000001.npz",
+          "bytes": 166576516,
+          "verified_sha256": "04b6ede0a5d3d3f62bec2554e2ee1ad6bfb14a8c53218913d60dd071b7240003"
+        }
+      ],
+      "archive_sha256": "4894f619d171db28d63356ac6b1ae45acf4e49e3550f80ee26b7f329ee04d411",
+      "evidence": "docs/experiments/receiver-replay-20261118/independent-idle-20261118/player2-full.json"
+    },
+    "20261118T171044Z-cb2e385d": {
+      "tar_bytes": 1541867520,
+      "selected_members": [
+        {
+          "name": "publish/finish.json",
+          "bytes": 140966,
+          "verified_sha256": "645d719da006b9df133849753ed45b2da00a821958b716c1b4debf5e625ce131"
+        },
+        {
+          "name": "publish/nadal_kyrgios__000_at120__person_000000000001-masks.npz",
+          "bytes": 994038,
+          "verified_sha256": "7d56e50be968f359fca329f211838170d62480a27d32bd83024cf5728925ecca"
+        },
+        {
+          "name": "publish/nadal_kyrgios__000_at120__person_000000000000-masks.npz",
+          "bytes": 719017,
+          "verified_sha256": "9a929f6e30709ce849ddff1cc063c8ba6718c73d5b7afe9111a929e828346657"
+        }
+      ],
+      "archive_sha256": "48542980357c28e5e2857e2b0ecb52759e6b78ea5da2f343f148cfc771d6be13",
+      "evidence": "docs/experiments/receiver-replay-20261118/independent-idle-20261118/finish-full-audit.json"
+    }
+  },
+  "restored_source": "4f27937bff116d51aab914a1c2e7262b51ef14483a2e2455551c2b786a684dfc",
+  "existing_native_input_recipe": "../clean-court-grabcut-20261119/refine.py",
+  "durable_wire_folder": "/Users/manu/.codex/visualizations/2026/11/18/01a1edc1-dd4e-7ab3-b819-fbd88da8db05/tennis-18-physical-study-20261123/nad000",
+  "verified_ingress_bytes": 337950152
+}

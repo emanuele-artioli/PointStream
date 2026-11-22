@@ -1,0 +1,584 @@
+{
+  "rule": "For each family choose the greatest affordable measured byte count among this named, already scored bank, then setting name for ties. This is a source inventory and deterministic display example, not a quality optimization or an assertion no other physical encodes exist.",
+  "cache": "Installed exact compatible reference/state, warm bytes; cold costs excluded.",
+  "cases": [
+    {
+      "rally_id": "al028",
+      "source_sha256": "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934",
+      "source_native_range": [
+        0,
+        240
+      ],
+      "fps": 25,
+      "caps": [
+        {
+          "ceiling_kbps": 20.4,
+          "ceiling_bytes": 24480,
+          "rows": {
+            "PointStream": {
+              "setting": "joint-320w-CRF54",
+              "bytes": 24257,
+              "receipt": "broad-tennis-18-rallies-20261123/al028-strict-carrier.json",
+              "quality_receipt": "broad-tennis-18-rallies-20261123/al028-strict-scores.json",
+              "identity": {
+                "wire_sha256": "1093859b4bcf14d0ebe1f1abe08fdf518acd21b763ed2b23327b2826c9f47020",
+                "display_sha256": "a52ff85dcbbe12f1a0c6ec7bd2ea25c8bcbc0f882611cf7b7fe9e12ac8b40a36"
+              },
+              "score_scope": "Source-reviewed body and ball DISTS on 11 common instants; both bodies on 12 instants.",
+              "actual_kbps": 20.214166666666667,
+              "affordable_scored_options": 2
+            },
+            "AV1": {
+              "setting": "160w-crf31.0",
+              "bytes": 24463,
+              "receipt": "reviewed-foreground-20261122/figure-data.json",
+              "identity": {
+                "wire_sha256": "ee21630220971f11b42e4885a5e1ba20f8528f2ec0ba81df15c2c5d082ff2121"
+              },
+              "score_scope": "Source-reviewed body and ball DISTS on 11 common instants; both bodies on 12 instants.",
+              "actual_kbps": 20.38583333333333,
+              "affordable_scored_options": 30
+            },
+            "DCVC-UF": {
+              "setting": "Q18",
+              "bytes": 17486,
+              "receipt": "reviewed-foreground-20261122/figure-data.json",
+              "identity": {
+                "wire_sha256": "d3909f4c4bd56d0b3a8b6ef2f5110ed46e8f7ddae1b52cef51fda357367cb7f8"
+              },
+              "score_scope": "Source-reviewed body and ball DISTS on 11 common instants; both bodies on 12 instants. Q18 is archived producer output only.",
+              "actual_kbps": 14.571666666666665,
+              "affordable_scored_options": 1
+            },
+            "ROI-AV1": {
+              "setting": "160w-offset20",
+              "bytes": 24472,
+              "receipt": "two-rally-roi-20261122/foreground-scores.json",
+              "identity": {
+                "wire_sha256": "6ecf894a85c6c0004faf3ec0b68ab3f19d3f99ae91959beef9673bedfdaab111",
+                "display_sha256": "96350c0bd9e878bb39e2b6caf70e50f2ce7204e0c0eb903442f19c3187dab1bb"
+              },
+              "score_scope": "Reviewed bodies and ball DISTS on 11 common instants, both bodies on 12.",
+              "actual_kbps": 20.393333333333334,
+              "affordable_scored_options": 8
+            }
+          }
+        },
+        {
+          "ceiling_kbps": 33,
+          "ceiling_bytes": 39600,
+          "rows": {
+            "PointStream": {
+              "setting": "joint-21",
+              "bytes": 25558,
+              "receipt": "reviewed-foreground-20261122/figure-data.json",
+              "identity": {
+                "wire_sha256": "4a53f55b07b8a2371ee54e8d57c4834888e1f46761b8ea53a9871cab3adcec9b"
+              },
+              "score_scope": "Source-reviewed body and ball DISTS on 11 common instants; both bodies on 12 instants.",
+              "actual_kbps": 21.298333333333332,
+              "affordable_scored_options": 4
+            },
+            "AV1": {
+              "setting": "160w-crf20",
+              "bytes": 39082,
+              "receipt": "reviewed-foreground-20261122/figure-data.json",
+              "identity": {
+                "wire_sha256": "99948bb7a6e78a004f6616e0fe676fe1bf05f56b06335c62c8875207fb021d99"
+              },
+              "score_scope": "Source-reviewed body and ball DISTS on 11 common instants; both bodies on 12 instants.",
+              "actual_kbps": 32.568333333333335,
+              "affordable_scored_options": 42
+            },
+            "DCVC-UF": {
+              "setting": "Q24",
+              "bytes": 24494,
+              "receipt": "reviewed-foreground-20261122/figure-data.json",
+              "identity": {
+                "wire_sha256": "08ca4898595d5e78c5f634559acd1fc13af369e2d07c3d4170c1cc764633d214"
+              },
+              "score_scope": "Source-reviewed body and ball DISTS on 11 common instants; both bodies on 12 instants.",
+              "actual_kbps": 20.41166666666667,
+              "affordable_scored_options": 2
+            },
+            "ROI-AV1": {
+              "setting": "320w-offset20",
+              "bytes": 24490,
+              "receipt": "two-rally-roi-20261122/foreground-scores.json",
+              "identity": {
+                "wire_sha256": "5a276e5e876ce8467b94485e25b8fac8f2bcda0fd3e517e678531681f2536553",
+                "display_sha256": "87ff66df0053d44be05d59c4d63c3efa1f5266f7b5538a0deec0ae09c9a587d5"
+              },
+              "score_scope": "Reviewed bodies and ball DISTS on 11 common instants, both bodies on 12.",
+              "actual_kbps": 20.408333333333335,
+              "affordable_scored_options": 9
+            }
+          }
+        }
+      ]
+    },
+    {
+      "rally_id": "al031",
+      "source_sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+      "source_native_range": [
+        0,
+        240
+      ],
+      "fps": 25,
+      "caps": [
+        {
+          "ceiling_kbps": 20.4,
+          "ceiling_bytes": 24480,
+          "rows": {
+            "PointStream": {
+              "setting": "fresh-joint-q50",
+              "bytes": 19810,
+              "receipt": "al031-complete-receiver-20261122/fresh-three-rate-comparisons.json",
+              "identity": {
+                "wire_sha256": "066028a0ea56e7c57494adf6d08062d71067db62f98e01bad8347653e2e82cdc",
+                "display_sha256": "c3b6346739f397fa40994f60937b17d40d12c0d0b0b7b5bb4b5959aa1e71f9d5"
+              },
+              "score_scope": "All-tick body DISTS and ball-crop DISTS from automatic source supports / transmitted valid centers; new source-independent ball/body labels needed.",
+              "actual_kbps": 16.508333333333333,
+              "affordable_scored_options": 3
+            },
+            "DCVC-UF": {
+              "setting": "dcvc-w480-q37",
+              "bytes": 21034,
+              "receipt": "al031-complete-receiver-20261122/fresh-three-rate-comparisons.json",
+              "identity": {
+                "wire_sha256": "9665ed2a352964f27cca6ab705b90a7ffca90e91750991b6943995a23c070c85",
+                "display_sha256": "856c6913c330bd00913ca25ec06474fbb2077087da5cdf193f3f34bebb9fb743"
+              },
+              "score_scope": "All-tick body DISTS and ball-crop DISTS from automatic source supports / transmitted valid centers; new source-independent ball/body labels needed.",
+              "actual_kbps": 17.528333333333332,
+              "affordable_scored_options": 3
+            },
+            "AV1": {
+              "setting": "ordinary-w160-q40",
+              "bytes": 23211,
+              "receipt": "al031-complete-receiver-20261122/fresh-three-rate-comparisons.json",
+              "identity": {
+                "wire_sha256": "7fc249fc9f23d78f9914ed3bcc4d5ad8b92c886d3b44e9b308bce993fc63083c",
+                "display_sha256": "4fda630fad7692625ee86486817478cd493d77a6a6494530f6f2e376edff0637"
+              },
+              "score_scope": "All-tick body DISTS and ball-crop DISTS from automatic source supports / transmitted valid centers; new source-independent ball/body labels needed.",
+              "actual_kbps": 19.3425,
+              "affordable_scored_options": 15
+            },
+            "ROI-AV1": null
+          }
+        },
+        {
+          "ceiling_kbps": 33,
+          "ceiling_bytes": 39600,
+          "rows": {
+            "PointStream": {
+              "setting": "fresh-joint-q50",
+              "bytes": 19810,
+              "receipt": "al031-complete-receiver-20261122/fresh-three-rate-comparisons.json",
+              "identity": {
+                "wire_sha256": "066028a0ea56e7c57494adf6d08062d71067db62f98e01bad8347653e2e82cdc",
+                "display_sha256": "c3b6346739f397fa40994f60937b17d40d12c0d0b0b7b5bb4b5959aa1e71f9d5"
+              },
+              "score_scope": "All-tick body DISTS and ball-crop DISTS from automatic source supports / transmitted valid centers; new source-independent ball/body labels needed.",
+              "actual_kbps": 16.508333333333333,
+              "affordable_scored_options": 3
+            },
+            "DCVC-UF": {
+              "setting": "dcvc-w480-q37",
+              "bytes": 21034,
+              "receipt": "al031-complete-receiver-20261122/fresh-three-rate-comparisons.json",
+              "identity": {
+                "wire_sha256": "9665ed2a352964f27cca6ab705b90a7ffca90e91750991b6943995a23c070c85",
+                "display_sha256": "856c6913c330bd00913ca25ec06474fbb2077087da5cdf193f3f34bebb9fb743"
+              },
+              "score_scope": "All-tick body DISTS and ball-crop DISTS from automatic source supports / transmitted valid centers; new source-independent ball/body labels needed.",
+              "actual_kbps": 17.528333333333332,
+              "affordable_scored_options": 3
+            },
+            "AV1": {
+              "setting": "ordinary-w160-q40",
+              "bytes": 23211,
+              "receipt": "al031-complete-receiver-20261122/fresh-three-rate-comparisons.json",
+              "identity": {
+                "wire_sha256": "7fc249fc9f23d78f9914ed3bcc4d5ad8b92c886d3b44e9b308bce993fc63083c",
+                "display_sha256": "4fda630fad7692625ee86486817478cd493d77a6a6494530f6f2e376edff0637"
+              },
+              "score_scope": "All-tick body DISTS and ball-crop DISTS from automatic source supports / transmitted valid centers; new source-independent ball/body labels needed.",
+              "actual_kbps": 19.3425,
+              "affordable_scored_options": 15
+            },
+            "ROI-AV1": null
+          }
+        }
+      ]
+    },
+    {
+      "rally_id": "med000",
+      "source_sha256": "3bf7ddaae0db5c48b1072fccb15f9f162e41fa5999886b9a5bde58dc0495c630",
+      "source_native_range": [
+        0,
+        240
+      ],
+      "fps": 50,
+      "caps": [
+        {
+          "ceiling_kbps": 20.4,
+          "ceiling_bytes": 12240,
+          "rows": {
+            "PointStream": {
+              "setting": "joint-q70",
+              "bytes": 11770,
+              "receipt": "med-mixed-receiver-20261122/three-native-shots.json",
+              "identity": {
+                "wire_sha256": "1da8c481ee87a1615328945a01b7089fe9a3fc83999af35e3a758f1001a1a572",
+                "display_sha256": "89aaa143411f6fe1bd7dc2eb8a978ff94c5221cd5ce8f7f1022576ee8cb46e2c"
+              },
+              "score_scope": "Mean body DISTS and full RGB PSNR; automated source supports, full native timeline.",
+              "actual_kbps": 19.616666666666667,
+              "affordable_scored_options": 1
+            },
+            "AV1": {
+              "setting": "ordinary-w320-near-11770B",
+              "bytes": 11769,
+              "receipt": "med-mixed-receiver-20261122/000-control-scores.json",
+              "identity": {
+                "wire_sha256": "5439a324965b7c737068bf4054c2cfe3c789918b504eb1e7dd81eb231e26d33c",
+                "display_sha256": "4396ec332cc543b5a562308c3cd2cdd55d6815315e528700330995c90b8a2aa5"
+              },
+              "score_scope": "Mean body DISTS and full RGB PSNR; automated source supports, full native timeline.",
+              "actual_kbps": 19.615,
+              "affordable_scored_options": 5
+            },
+            "DCVC-UF": null,
+            "ROI-AV1": null
+          }
+        },
+        {
+          "ceiling_kbps": 33,
+          "ceiling_bytes": 19800,
+          "rows": {
+            "PointStream": {
+              "setting": "joint-q50",
+              "bytes": 16236,
+              "receipt": "med-mixed-receiver-20261122/three-native-shots.json",
+              "identity": {
+                "wire_sha256": "9e70d19c048f580a6d80eee709892f01cf900e0fd159b4b53a22c657c33fb090",
+                "display_sha256": "8e075c388a89da472509a0946190d3c719e0ee223e90a054bd7365776bc24c1b"
+              },
+              "score_scope": "Mean body DISTS and full RGB PSNR; automated source supports, full native timeline.",
+              "actual_kbps": 27.06,
+              "affordable_scored_options": 3
+            },
+            "AV1": {
+              "setting": "ordinary-w320-q60",
+              "bytes": 18128,
+              "receipt": "med-mixed-receiver-20261122/000-control-scores.json",
+              "identity": {
+                "wire_sha256": "a8346689865d785c0b6eb4d298f036c057fcaf9d7b2fad2c8a2537f50fef53bc",
+                "display_sha256": "4704f7f953e64e535cf4f9f29a8c535511224a42a02a28f0d1c440e599529329"
+              },
+              "score_scope": "Mean body DISTS and full RGB PSNR; automated source supports, full native timeline.",
+              "actual_kbps": 30.21333333333333,
+              "affordable_scored_options": 18
+            },
+            "DCVC-UF": {
+              "setting": "dcvc-w480-q26",
+              "bytes": 14039,
+              "receipt": "med-mixed-receiver-20261122/000-control-scores.json",
+              "identity": {
+                "wire_sha256": "e4013b0be12f9d9b5b993ea68fa6200f1fd24a8071abd44968dc74aef9bef55d",
+                "display_sha256": "72e26a89a725364f07887d14fc476d79955959b86060cbd35c93866651fd0a03"
+              },
+              "score_scope": "Mean body DISTS and full RGB PSNR; automated source supports, full native timeline.",
+              "actual_kbps": 23.398333333333333,
+              "affordable_scored_options": 2
+            },
+            "ROI-AV1": null
+          }
+        }
+      ]
+    },
+    {
+      "rally_id": "med019",
+      "source_sha256": "1c13479eb3b6f8d175eb6f5020c629896e6b01f719014ec995a06b4c6c5a3e9c",
+      "source_native_range": [
+        0,
+        240
+      ],
+      "fps": 50,
+      "caps": [
+        {
+          "ceiling_kbps": 20.4,
+          "ceiling_bytes": 12240,
+          "rows": {
+            "PointStream": {
+              "setting": "joint-q70",
+              "bytes": 11465,
+              "receipt": "med-mixed-receiver-20261122/three-native-shots.json",
+              "identity": {
+                "wire_sha256": "78b0e9281bc06e0f0fda15a07f0d8a7f629c0dbf9c8b6db503c4a14d88219a69",
+                "display_sha256": "1350879cd96ef0495a48fbbf485275bacf45b79c93f392b40d80590528498053"
+              },
+              "score_scope": "Mean body DISTS and full RGB PSNR; automated source supports, full native timeline.",
+              "actual_kbps": 19.10833333333333,
+              "affordable_scored_options": 1
+            },
+            "AV1": {
+              "setting": "ordinary-w160-near-11465B",
+              "bytes": 11360,
+              "receipt": "med-mixed-receiver-20261122/019-ordinary-at-joint-q70.json",
+              "identity": {
+                "wire_sha256": "85226ce1ca5366452cb795e5ef72bd1b5978b006f350bbd98f9f3bff351b9ab1",
+                "display_sha256": "772bb573fa6cac838534860d0f2f8aee93887f78aa56f9510de575d5e0cdd25e"
+              },
+              "score_scope": "Mean body DISTS and full RGB PSNR; automated source supports, full native timeline.",
+              "actual_kbps": 18.933333333333334,
+              "affordable_scored_options": 5
+            },
+            "DCVC-UF": null,
+            "ROI-AV1": null
+          }
+        },
+        {
+          "ceiling_kbps": 33,
+          "ceiling_bytes": 19800,
+          "rows": {
+            "PointStream": {
+              "setting": "joint-q50",
+              "bytes": 16049,
+              "receipt": "med-mixed-receiver-20261122/three-native-shots.json",
+              "identity": {
+                "wire_sha256": "6bdc4f1317d578d6b5ac34bc92cd49a76464852b681ba54255f81381626d7802",
+                "display_sha256": "54c7c51b986edef2e8d790fc8e14ac3293b3255031d39b965613132eced65563"
+              },
+              "score_scope": "Mean body DISTS and full RGB PSNR; automated source supports, full native timeline.",
+              "actual_kbps": 26.74833333333333,
+              "affordable_scored_options": 3
+            },
+            "AV1": {
+              "setting": "ordinary-w320-q60",
+              "bytes": 17888,
+              "receipt": "med-mixed-receiver-20261122/019-ordinary-source-grid.json",
+              "identity": {
+                "wire_sha256": "b026f70ddca8321c98a393e3aef51c55e64f530dac4889778e3291e5a72dc437",
+                "display_sha256": "887ed492481c5d8556c41c64d41da11ab989ad3d8ab11f380eb0b3dd8af6486d"
+              },
+              "score_scope": "Mean body DISTS and full RGB PSNR; automated source supports, full native timeline.",
+              "actual_kbps": 29.813333333333333,
+              "affordable_scored_options": 16
+            },
+            "DCVC-UF": {
+              "setting": "dcvc-w480-q26",
+              "bytes": 13800,
+              "receipt": "med-mixed-receiver-20261122/019-dcvc-q26.json",
+              "identity": {
+                "wire_sha256": "002f07496ecc4bdb569918dcfe92692811516ef63b4593340c0d8fa0656041b1",
+                "display_sha256": "d4af6db26a5a349ec1f019c826d7f992138e41cac72433807e23646e1f36974b"
+              },
+              "score_scope": "Mean body DISTS and full RGB PSNR; automated source supports, full native timeline.",
+              "actual_kbps": 23.0,
+              "affordable_scored_options": 2
+            },
+            "ROI-AV1": null
+          }
+        }
+      ]
+    },
+    {
+      "rally_id": "med024",
+      "source_sha256": "4d602291ebea0fcb9698d86d3f93ce4c3076a13005e33079a82975b8b64605f2",
+      "source_native_range": [
+        0,
+        240
+      ],
+      "fps": 50,
+      "caps": [
+        {
+          "ceiling_kbps": 20.4,
+          "ceiling_bytes": 12240,
+          "rows": {
+            "PointStream": {
+              "setting": "joint-q70",
+              "bytes": 11727,
+              "receipt": "med-mixed-receiver-20261122/three-native-shots.json",
+              "identity": {
+                "wire_sha256": "8f64e131313cd61bfc6a00c53f0139d2d405aafda88e1e4b1d5f44a9abcd45f8",
+                "display_sha256": "a1a7e25595ccb95fd824012ff4955452172b64a1cff6c71ad9a8008328ba026d"
+              },
+              "score_scope": "Mean body DISTS and full RGB PSNR; automated source supports, full native timeline.",
+              "actual_kbps": 19.545,
+              "affordable_scored_options": 1
+            },
+            "AV1": {
+              "setting": "ordinary-w160-near-11727B",
+              "bytes": 11688,
+              "receipt": "med-mixed-receiver-20261122/024-ordinary-at-joint-q70.json",
+              "identity": {
+                "wire_sha256": "0c368bbdb8abe164c9deb36b3d65eaf9e1fc720266d4b68e81b176a1baaa5dc0",
+                "display_sha256": "858980b1b2c614d4b0a8fee4def40cac6aa9d6ebf70f8cba646010bad1ad5fbe"
+              },
+              "score_scope": "Mean body DISTS and full RGB PSNR; automated source supports, full native timeline.",
+              "actual_kbps": 19.48,
+              "affordable_scored_options": 5
+            },
+            "DCVC-UF": null,
+            "ROI-AV1": null
+          }
+        },
+        {
+          "ceiling_kbps": 33,
+          "ceiling_bytes": 19800,
+          "rows": {
+            "PointStream": {
+              "setting": "joint-q50",
+              "bytes": 16334,
+              "receipt": "med-mixed-receiver-20261122/three-native-shots.json",
+              "identity": {
+                "wire_sha256": "895765c4dfdc9e9bbb709368663889b90991394ae48b75f869d0115462eda5e2",
+                "display_sha256": "5c984788c8a2bee5f72f94ca6878795a95e6b43a46c1e0a0eb04268119750ffa"
+              },
+              "score_scope": "Mean body DISTS and full RGB PSNR; automated source supports, full native timeline.",
+              "actual_kbps": 27.223333333333333,
+              "affordable_scored_options": 3
+            },
+            "AV1": {
+              "setting": "ordinary-w320-q60",
+              "bytes": 18051,
+              "receipt": "med-mixed-receiver-20261122/024-ordinary-source-grid.json",
+              "identity": {
+                "wire_sha256": "fb2b71910b85acfc8a1066adeb6a69418fa015a8d6036130a2be2bd78017a707",
+                "display_sha256": "6e5b4e019746773e9171a43060c95541751fa0a710650c8c23c52deca66248dd"
+              },
+              "score_scope": "Mean body DISTS and full RGB PSNR; automated source supports, full native timeline.",
+              "actual_kbps": 30.085,
+              "affordable_scored_options": 16
+            },
+            "DCVC-UF": {
+              "setting": "dcvc-w480-q27",
+              "bytes": 13929,
+              "receipt": "med-mixed-receiver-20261122/024-dcvc-q27.json",
+              "identity": {
+                "wire_sha256": "0d931927a9cce8a48bb57dfa0fc036fc7c2d4541e95f0d9cb8d28d50100e664b",
+                "display_sha256": "d5ad0d6713e5af7136e26b2355b659ecd3e57c1e77b7d3f906e89fcf1430d167"
+              },
+              "score_scope": "Mean body DISTS and full RGB PSNR; automated source supports, full native timeline.",
+              "actual_kbps": 23.215,
+              "affordable_scored_options": 2
+            },
+            "ROI-AV1": null
+          }
+        }
+      ]
+    },
+    {
+      "rally_id": "nad000",
+      "source_sha256": "676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66",
+      "source_native_range": [
+        76626,
+        76866
+      ],
+      "fps": 50,
+      "caps": [
+        {
+          "ceiling_kbps": 20.4,
+          "ceiling_bytes": 12240,
+          "rows": {
+            "PointStream": {
+              "setting": "64x64-crf70",
+              "bytes": 12217,
+              "receipt": "broad-tennis-18-rallies-20261123/nad000-final-width.json",
+              "quality_receipt": "broad-tennis-18-rallies-20261123/nad000-scores.json",
+              "identity": {
+                "wire_sha256": "f3ad57efa968f5afe890de193602269b850a1c848c201b3a54e13721de9f4188",
+                "display_sha256": "32b259117cb21f489ddcf4a19d40461256a2b537c5920715c75c5fbd67430f7a"
+              },
+              "score_scope": "240 native reconstructed RGB frames; source-reviewed bodies and visible ball at 12 fixed ticks.",
+              "actual_kbps": 20.361666666666668,
+              "affordable_scored_options": 1
+            },
+            "AV1": {
+              "setting": "240w-crf64.5",
+              "bytes": 11935,
+              "receipt": "joint-trajectory-20261122/strict-20-ordinary.json",
+              "identity": {
+                "wire_sha256": "748b3346ba156a1c09b4ddf83dde47b86b5845f43735d527623ba514847a8730",
+                "display_sha256": "f8a30e8c2c8d250fb1fb75f97c9ea79b827c2a6a811935a7aca97e6a7c79c8a6"
+              },
+              "score_scope": "Source-reviewed player and ball DISTS across 12 instants.",
+              "actual_kbps": 19.89166666666667,
+              "affordable_scored_options": 2
+            },
+            "ROI-AV1": null,
+            "DCVC-UF": {
+              "setting": "Q5",
+              "bytes": 11481,
+              "receipt": "joint-trajectory-20261122/dcvc-q5-human-regions.json",
+              "identity": {
+                "wire_sha256": "1de8bbb5bc12552a23d488239d36efb0625a3a4e1b55541757332f4884da418c"
+              },
+              "score_scope": "Source-reviewed body and ball DISTS across 12 instants.",
+              "actual_kbps": 19.135,
+              "affordable_scored_options": 1
+            }
+          }
+        },
+        {
+          "ceiling_kbps": 33,
+          "ceiling_bytes": 19800,
+          "rows": {
+            "PointStream": {
+              "setting": "160w-crf50",
+              "bytes": 19509,
+              "receipt": "joint-trajectory-20261122/result.json",
+              "identity": {
+                "wire_sha256": "693147d20cfe093f9fe96b3ef76ea97b965ac3539ca9c0788b4fea2d124c0b15",
+                "display_sha256": "ebfbc089233a8556c1d09fd301c520c5bfcb6180d03d5cea4184f49bfb550ec4"
+              },
+              "score_scope": "Two source-reviewed silhouettes and ball crop at 12 source instants; complete joint RGB replay.",
+              "actual_kbps": 32.515,
+              "affordable_scored_options": 2
+            },
+            "AV1": {
+              "setting": "160w-crf45.5",
+              "bytes": 19534,
+              "receipt": "joint-trajectory-20261122/control-scores.json",
+              "identity": {
+                "wire_sha256": "517b8246f14ed9f3998918c647bbcfd2803d180725cb75f6900e9dd1e787ebac",
+                "display_sha256": "1126c2c002cec69b2c6e8c4dab6a28e67c366549db937d7b10a145dd2a51fcce"
+              },
+              "score_scope": "Source-reviewed player and ball DISTS across 12 instants.",
+              "actual_kbps": 32.556666666666665,
+              "affordable_scored_options": 9
+            },
+            "ROI-AV1": {
+              "setting": "480w-crf66.5",
+              "bytes": 19586,
+              "receipt": "joint-trajectory-20261122/control-scores.json",
+              "identity": {
+                "wire_sha256": "241f49531647743bdd4062f9dfe13e7af00bb31eb855683b67d8b7e6813a1493",
+                "display_sha256": "e06e12c2a42f3fd5c6aac8279ca10333dcba26621570ee0f5982f2e8641eb4d6"
+              },
+              "score_scope": "Source-reviewed player and ball DISTS across 12 instants.",
+              "actual_kbps": 32.64333333333333,
+              "affordable_scored_options": 6
+            },
+            "DCVC-UF": {
+              "setting": "Q6",
+              "bytes": 12270,
+              "receipt": "joint-trajectory-20261122/dcvc-q6-human-regions.json",
+              "identity": {
+                "wire_sha256": "1d5c6f5e19e360b038e73ad8018075854ecea98c0a9ed05d3801f492bf02a30b"
+              },
+              "score_scope": "Source-reviewed body and ball DISTS across 12 instants.",
+              "actual_kbps": 20.45,
+              "affordable_scored_options": 2
+            }
+          }
+        }
+      ],
+      "native_extract_sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d"
+    }
+  ]
+}

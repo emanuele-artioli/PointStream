@@ -1,0 +1,145 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Review the ball on original tennis frames</title>
+<style>
+*{box-sizing:border-box}body{font:16px/1.4 system-ui,sans-serif;color:#172329;background:#f8faf9;max-width:1180px;margin:auto;padding:16px}h1{font-size:25px;margin:0}p{margin:.4em 0}button,select,input{font:inherit}button,select{padding:.3em .65em}button{cursor:pointer}button:disabled{opacity:.5}.bar{display:flex;align-items:center;flex-wrap:wrap;gap:.5em;margin:.55em 0}#stage{position:relative;aspect-ratio:16/9;background:#142724;max-height:65vh;max-width:min(100%,115.56vh);touch-action:none}#source,#overlay{position:absolute;inset:0;width:100%;height:100%}#overlay{cursor:crosshair}#lens{position:absolute;right:8px;top:8px;width:145px;height:145px;pointer-events:none;display:none;background:black;border:2px solid white}summary{cursor:pointer;font-weight:600}details{border-top:1px solid #a9bbb6;margin-top:10px;padding-top:8px}#state{font-weight:650}#help{font-size:.93em;color:#435851}.pitem{padding:3px 0}small{display:block}
+</style>
+<h1>Locate the ball on original frames</h1>
+<p>Click the centre of the ball. Choose “Absent” if it is out of view or “Unsure” if you cannot tell. These same locations test every codec.</p>
+<div class="bar"><button id="prev">Previous</button><button id="next">Next</button><select id="jump" aria-label="Jump to frame"></select><b id="count"></b><span id="loc"></span></div>
+<div id="stage"><img id="source" alt="Original broadcast frame" draggable="false"><svg id="overlay" viewBox="0 0 1280 720" aria-label="Mark on the source image"></svg><canvas id="lens" width="145" height="145"></canvas></div>
+<div class="bar"><button id="absent">Absent</button><button id="unsure">Unsure</button><button id="clear">Clear ball mark</button><span id="state" role="status"></span></div>
+<button id="quickPeople" hidden></button>
+<details id="extras"><summary>Optional proposals and player regions</summary>
+<p id="ballInfo"></p><div class="bar"><button id="showBall"></button><button id="acceptBall">Use this candidate</button></div>
+<p id="peopleInfo"></p><div id="peopleControls"></div>
+<div class="bar"><button id="actor">Mark a rough player box</button><button id="clearBoxes">Clear boxes</button></div>
+<small>Rough rectangles identify appearance crops. They do not define silhouette boundaries. Verifying an automatic proposal is optional. Ball marks made after displaying a sender prediction are recorded as assisted.</small></details>
+<div class="bar"><button id="export">Export decisions</button><label>Restore export <input type="file" id="import" accept=".json,application/json"></label><span id="saved"></span></div>
+<script src="frames.js"></script><script src="proposals/person-proposals.js"></script>
+<script>
+"use strict";
+const el = id => document.getElementById(id), menu = el('jump'), all = window.FRAME_PACKET.frames, manifest = window.FRAME_PACKET.manifest, key = 'ps-ball-first-v2-' + manifest, ns = 'http://www.w3.org/2000/svg', overlay = el('overlay');
+let stored = {}, idx = 0, draw = false, corner = null, peek = false, people = false;
+try {
+    stored = JSON.parse(localStorage.getItem(key) || '{}');
+}
+catch { }
+const current = () => all[idx], rec = () => stored[current().id] || (stored[current().id] = { ball: null, assisted: false, boxes: [], proposals: {} }), props = () => window.PERSON_PROPOSALS[current().id] || [];
+for (const [i, f] of all.entries()) {
+    const o = document.createElement('option');
+    o.value = i;
+    o.textContent = f.rally + ' · ' + f.absolute_tick;
+    menu.append(o);
+}
+function save() { try {
+    localStorage.setItem(key, JSON.stringify(stored));
+    el('saved').textContent = 'Saved in this browser';
+}
+catch {
+    el('saved').textContent = 'Use Export to save';
+} status(); }
+function status() { const r = rec(); el('state').textContent = draw ? (corner ? 'Click the opposite corner' : 'Click one corner of the player box') : (r.ball ? (r.ball.kind === 'visible' ? 'Ball at ' + r.ball.xy.join(', ') : r.ball.kind) + (r.ball.assisted ? ' · assisted' : '') : 'Awaiting ball mark'); el('count').textContent = all.filter(f => stored[f.id]?.ball).length + ' / ' + all.length + ' marked'; }
+function shape(tag, attrs, parent = overlay) { const e = document.createElementNS(ns, tag); for (const [k, v] of Object.entries(attrs))
+    e.setAttribute(k, v); parent.append(e); return e; }
+function ring(xy, color, dash) { shape('circle', { cx: xy[0], cy: xy[1], r: 12, fill: 'none', stroke: '#111', 'stroke-width': 6 }); shape('circle', { cx: xy[0], cy: xy[1], r: 12, fill: 'none', stroke: color, 'stroke-width': 3, 'stroke-dasharray': dash || 'none' }); }
+function box(b, color) { shape('rect', { x: b[0], y: b[1], width: b[2] - b[0], height: b[3] - b[1], fill: 'none', stroke: color, 'stroke-width': 3 }); }
+function render() {
+    const f = current(), r = rec();
+    overlay.replaceChildren();
+    if (people)
+        props().forEach((p, i) => { const color = ['#40ebff', '#ff9a35', '#fe7bda', '#78f06c'][i % 4]; if (p.mask) {
+            const defs = shape('defs', {}), mask = shape('mask', { id: 'mask' + i, maskUnits: 'userSpaceOnUse', x: 0, y: 0, width: 1280, height: 720 }, defs);
+            shape('image', { href: p.mask, x: 0, y: 0, width: 1280, height: 720 }, mask);
+            shape('rect', { x: 0, y: 0, width: 1280, height: 720, fill: color, opacity: 0.48, mask: 'url(#mask' + i + ')' });
+        }
+        else if (p.polygon) {
+            shape('polygon', { points: p.polygon.map(a => a.join(',')).join(' '), fill: color, 'fill-opacity': 0.45, stroke: color });
+        } if (p.box)
+            box(p.box, color); if (p.box) {
+            const t = shape('text', { x: p.box[0], y: Math.max(20, p.box[1] - 5), fill: color, stroke: 'black', 'paint-order': 'stroke', 'stroke-width': 3, 'font-size': 22 });
+            t.textContent = String(i + 1);
+        } });
+    r.boxes.forEach(b => box(b, 'white'));
+    if (corner)
+        ring(corner, 'white');
+    if (peek && f.ball_candidate)
+        ring(f.ball_candidate, '#ffe642', '4 3');
+    if (r.ball?.xy)
+        ring(r.ball.xy, '#ff5ad7');
+    el('showBall').disabled = !f.ball_candidate;
+    el('showBall').textContent = peek ? 'Hide ball candidate' : 'Show ball candidate';
+    el('acceptBall').disabled = !peek || !f.ball_candidate;
+    el('quickPeople').hidden = !props().length;
+    el('quickPeople').textContent = people ? 'Hide person outlines' : ('Review ' + props().length + ' suggested person outline' + (props().length === 1 ? '' : 's'));
+    el('peopleInfo').textContent = props().length ? props().length + ' person candidate(s) on this frame. Check the outlines without drawing.' : 'No stored person-mask proposals on this frame. You can leave player regions empty.';
+    const pc = el('peopleControls');
+    pc.replaceChildren();
+    if (props().length) {
+        const toggle = document.createElement('button');
+        toggle.id = 'togglePeople';
+        toggle.textContent = people ? 'Hide person proposals' : 'Show person proposals';
+        toggle.onclick = () => { people = !people; render(); };
+        pc.append(toggle);
+        if (people)
+            props().forEach((p, i) => { const l = document.createElement('div'); l.className = 'pitem'; l.append('Person candidate ' + (i + 1) + ' '); const s = document.createElement('select'); s.setAttribute('aria-label', 'Decision for candidate ' + (i + 1)); for (const [v, t] of [['', 'Unreviewed'], ['accept', 'Accept outline'], ['reject', 'Reject outline'], ['unsure', 'Unsure']])
+                s.add(new Option(t, v)); s.value = r.proposals[p.id] || ''; s.onchange = () => { if (s.value)
+                r.proposals[p.id] = s.value;
+            else
+                delete r.proposals[p.id]; save(); }; l.append(s); pc.append(l); });
+    }
+    status();
+}
+function go(i) { idx = Math.max(0, Math.min(all.length - 1, i)); menu.value = idx; corner = null; draw = false; peek = false; people = false; const f = current(); el('source').src = f.src; el('prev').disabled = idx === 0; el('next').disabled = idx === all.length - 1; el('loc').textContent = (idx + 1) + ' of ' + all.length + ' · ' + f.route.replace('_', ' '); el('ballInfo').textContent = f.ball_candidate ? 'An optional marker shows the PointStream sender’s estimate. Keep it hidden to make an independent source mark.' : 'The PointStream sender has no ball candidate on this frame. Mark from the source or leave it unsure.'; render(); }
+function setBall(kind, xy) { const r = rec(); r.ball = { kind, xy: xy || null, assisted: r.assisted }; draw = false; corner = null; save(); render(); }
+function coord(ev) { const b = overlay.getBoundingClientRect(); return [Math.max(0, Math.min(1279, Math.floor((ev.clientX - b.left) * 1280 / b.width))), Math.max(0, Math.min(719, Math.floor((ev.clientY - b.top) * 720 / b.height)))]; }
+overlay.onclick = e => { const xy = coord(e); if (!draw) {
+    setBall('visible', xy);
+    return;
+} if (!corner) {
+    corner = xy;
+    render();
+    return;
+} const b = [Math.min(xy[0], corner[0]), Math.min(xy[1], corner[1]), Math.max(xy[0], corner[0]), Math.max(xy[1], corner[1])]; if (b[0] < b[2] && b[1] < b[3])
+    rec().boxes.push(b); corner = null; draw = false; save(); render(); };
+overlay.onpointermove = e => { const src = el('source'); if (!src.complete || !src.naturalWidth)
+    return; const [x, y] = coord(e), can = el('lens'), c = can.getContext('2d'); can.style.display = 'block'; c.fillStyle = 'black'; c.fillRect(0, 0, 145, 145); c.imageSmoothingEnabled = false; c.drawImage(src, x - 18, y - 18, 36, 36, 0, 0, 145, 145); c.strokeStyle = 'white'; c.strokeRect(71, 71, 3, 3); };
+overlay.onpointerleave = () => el('lens').style.display = 'none';
+el('quickPeople').onclick = () => { el('extras').open = true; people = !people; render(); };
+el('showBall').onclick = () => { peek = !peek; if (peek) {
+    rec().assisted = true;
+    save();
+} render(); };
+el('acceptBall').onclick = () => setBall('visible', current().ball_candidate);
+el('actor').onclick = () => { draw = !draw; corner = null; render(); };
+el('clearBoxes').onclick = () => { rec().boxes = []; draw = false; corner = null; save(); render(); };
+el('clear').onclick = () => { rec().ball = null; save(); render(); };
+el('absent').onclick = () => setBall('absent');
+el('unsure').onclick = () => setBall('unsure');
+el('prev').onclick = () => go(idx - 1);
+el('next').onclick = () => go(idx + 1);
+menu.onchange = () => go(Number(menu.value));
+el('export').onclick = () => { const payload = { schema: 'pointstream-tenniset-source-ball-first-v2', manifest, person_proposal_source: window.PERSON_PROPOSAL_SOURCE || null, frame_size: [1280, 720], frames: all.filter(f => stored[f.id]).map(f => ({ id: f.id, source_sha256: f.source_sha256, person_candidates: (window.PERSON_PROPOSALS[f.id] || []).map(p => ({ id: p.id, mask_sha256: p.mask_sha256 || null, box: p.box || null })), ...stored[f.id] })) }; const a = document.createElement('a'); a.download = 'tenniset-ball-first-decisions.json'; const u = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })); a.href = u; a.click(); setTimeout(() => URL.revokeObjectURL(u), 1000); };
+document.addEventListener('keydown', e => { if (e.altKey || e.ctrlKey || e.metaKey || ['SELECT', 'INPUT', 'TEXTAREA'].includes(e.target.tagName))
+    return; if (e.key === 'ArrowRight')
+    go(idx + 1); if (e.key === 'ArrowLeft')
+    go(idx - 1); });
+el('import').onchange = async (e) => { try {
+    const z = JSON.parse(await e.target.files[0].text());
+    if (z.manifest !== manifest || z.schema !== 'pointstream-tenniset-source-ball-first-v2')
+        throw Error('This export belongs to a different packet');
+    const imported = {};
+    for (const r of z.frames) {
+        const f = all.find(s => s.id === r.id);
+        if (!f || f.source_sha256 !== r.source_sha256 || !Array.isArray(r.boxes) || !r.proposals)
+            throw Error('Frame identity mismatch');
+        imported[r.id] = r;
+    }
+    stored = { ...stored, ...imported };
+    save();
+    go(idx);
+}
+catch (error) {
+    el('saved').textContent = error.message;
+} };
+go(0);
+</script></html>

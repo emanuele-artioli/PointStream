@@ -1,0 +1,137 @@
+{
+  "scope": "Whole picture on two large preflight rate mismatches, no foreground labels",
+  "tools": {
+    "ffmpeg": {
+      "path": "/opt/homebrew/bin/ffmpeg",
+      "real_path": "/opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg",
+      "sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be",
+      "version": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    "SvtAv1EncApp": {
+      "path": "/opt/homebrew/bin/SvtAv1EncApp",
+      "real_path": "/opt/homebrew/Cellar/svt-av1/4.0.1/bin/SvtAv1EncApp",
+      "sha256": "db044194faf94d553c2509c8e033ecd05a373ba54d919d0fb49a3a13149d1687",
+      "version": "SVT-AV1 v4.0.1 (release)"
+    },
+    "dav1d": {
+      "path": "/opt/homebrew/bin/dav1d",
+      "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+      "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+      "version": "1.5.4"
+    }
+  },
+  "scorer_sha256": "1dcebf6b415fc78278b6088bb0fa3a0f1c94ed0c8d5afa634710a8d01b98bdcb",
+  "worker_sha256": "a5e6cbaeb0973c2f87da24efbc11614facbeee422432b24b34e8aaa7096cef95",
+  "gpu_seconds": 0,
+  "wall_seconds": 158.12066891699942,
+  "results": [
+    {
+      "rally": "v007_p0022",
+      "ceiling_bps": 33000,
+      "frames": 120,
+      "ball_delivery_sha256": "0ebb4edde8ab2e158ad336fa1cb53c2b8e2834da26587913ecc8918f42178221",
+      "ball_bytes": 14460,
+      "tested": [
+        {
+          "qp": 68.5,
+          "path": "ordinary-q68.5.ivf",
+          "bytes": 16439,
+          "sha256": "73c56da12d9c6cae01c7ac3d39b35aef0c71ab39d78cbcb39a759cb8b84503a3"
+        },
+        {
+          "qp": 69.25,
+          "path": "ordinary-q69.25.ivf",
+          "bytes": 15249,
+          "sha256": "aac2f7de1aa8734c253cb9170e5b13e44540ea3f59a3fb161a10e9c8faddde28"
+        },
+        {
+          "qp": 69.5,
+          "path": "ordinary-q69.5.ivf",
+          "bytes": 14851,
+          "sha256": "39f5758df252fad48fea68638a4769642000846cb13667353be719c74d6ecc0d"
+        },
+        {
+          "qp": 69.75,
+          "path": "ordinary-q69.75.ivf",
+          "bytes": 14466,
+          "sha256": "f5f8be3c1a85ab5a75c7b3dee9e71023fbaddc19a5df52b053f273bd385afd16"
+        }
+      ],
+      "selected": {
+        "qp": 69.75,
+        "path": "ordinary-q69.75.ivf",
+        "bytes": 14466,
+        "sha256": "f5f8be3c1a85ab5a75c7b3dee9e71023fbaddc19a5df52b053f273bd385afd16"
+      },
+      "selected_fractional_rate_gap": 0.0004149377593360981,
+      "ball": {
+        "rgb_psnr": 25.299690036892358,
+        "luma_ssim": 0.7780088777742009,
+        "frames": 120
+      },
+      "original_coarse_av1": {
+        "rgb_psnr": 26.576995765165787,
+        "luma_ssim": 0.815700157158594,
+        "frames": 120
+      },
+      "tighter_av1": {
+        "rgb_psnr": 25.38917958199182,
+        "luma_ssim": 0.7803798034036629,
+        "frames": 120
+      },
+      "source_sha256": "f9c4cfb91781a53abaa45e29a89aeb5e73c97aed9aebaab0897aab89939aa1b6",
+      "av1_input_sha256": "9a2d71dad9fa81a01999bd8f576ca24a9451422b4669b6774e2c37f0268856c4"
+    },
+    {
+      "rally": "v007_p0108",
+      "ceiling_bps": 20400,
+      "frames": 264,
+      "ball_delivery_sha256": "bf41e5f26c8e4166bd74dc1cea79cfd5e438189c417255eafa70d8e9d54a91c7",
+      "ball_bytes": 21762,
+      "tested": [
+        {
+          "qp": 68.5,
+          "path": "ordinary-q68.5.ivf",
+          "bytes": 23303,
+          "sha256": "6a433af306ecce79aca71d1c53b3e68fa8cc8d00c4d4f1abc864305e8821c9af"
+        },
+        {
+          "qp": 69.25,
+          "path": "ordinary-q69.25.ivf",
+          "bytes": 21898,
+          "sha256": "913785085b4f32fbb55b0da2fa322e9e3d0e730939830b9d13446d0978b3e749"
+        },
+        {
+          "qp": 69.5,
+          "path": "ordinary-q69.5.ivf",
+          "bytes": 21754,
+          "sha256": "b93161b0a825751d20ae93cd0bc4c07aac2d04e9d34a0431f05c76146cb63988"
+        }
+      ],
+      "selected": {
+        "qp": 69.5,
+        "path": "ordinary-q69.5.ivf",
+        "bytes": 21754,
+        "sha256": "b93161b0a825751d20ae93cd0bc4c07aac2d04e9d34a0431f05c76146cb63988"
+      },
+      "selected_fractional_rate_gap": -0.00036761327083911777,
+      "ball": {
+        "rgb_psnr": 26.162345733573325,
+        "luma_ssim": 0.8240411768453075,
+        "frames": 264
+      },
+      "original_coarse_av1": {
+        "rgb_psnr": 27.510981614053357,
+        "luma_ssim": 0.8574420004957171,
+        "frames": 264
+      },
+      "tighter_av1": {
+        "rgb_psnr": 26.435268891104265,
+        "luma_ssim": 0.8314153793581327,
+        "frames": 264
+      },
+      "source_sha256": "961bb2383d3372449383b234440b14793e03af26b115922f686ddf617e06b08a",
+      "av1_input_sha256": "8e0dbff9a45a64ce43453c810c51c1888448d44379ea92ccc20341546427b1ee"
+    }
+  ]
+}
