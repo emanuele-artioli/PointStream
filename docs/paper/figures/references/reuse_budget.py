@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+from matplotlib.ticker import NullFormatter
 import numpy as np
 
 HERE = Path(__file__).resolve().parent
@@ -48,6 +49,8 @@ def main():
     ax.text(6.5, 54.8, "52.29 kbps running floor", fontsize=8, color="#414141")
     ax.set_xscale("log")
     ax.set_yscale("log")
+    ax.yaxis.set_minor_formatter(NullFormatter())
+    ax.xaxis.set_minor_formatter(NullFormatter())
     rates = [50, 65, 100, 125, 200, 300, 450]
     ax.set_ylim(48, 500)
     ax.set_yticks(rates, [str(n) for n in rates])

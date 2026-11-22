@@ -76,7 +76,7 @@ PANELS = [
     (
         "ball/adelaide-prospective-machine.pdf",
         "What a machine can read from the same video",
-        "The next source-ranked singles match used a rate-selection rule frozen before opening the outcome. Adding 130 bytes preserved all 64 decoded frames. Paid centers localized 5/5 visible balls, versus 0/5 for the detector on the same video; on seven not-visible labels the corresponding presence counts were 1 and 0.",
+        "The next source-ranked singles match used a rate-selection rule frozen before opening the outcome. Adding 130 bytes preserved all 64 decoded frames. Paid centers localized 5/5 visible balls, versus 0/5 for the detector on the same video. On seven not-visible labels the corresponding presence counts were 1 and 0.",
     ),
     (
         "ball/matched-low-detection.pdf",
@@ -92,6 +92,11 @@ PANELS = [
         "system/starved-budget.pdf",
         "What the sender pays at startup and during play",
         "Actual native and joint packets, with image payloads itemized. The cache row assumes both references are already valid. The AVIF startup prices hold the other packet components fixed.",
+    ),
+    (
+        "system/joint-price.pdf",
+        "What reference reuse buys at the measured starved rates",
+        "At the lower joint setting the 244,339-byte startup fits a 33 kbps average after 170.6 seconds of active reuse. The chart charges each component from the measured 4.8-second packets. A receiver needs a still-valid reference over the proposed use interval.",
     ),
     (
         "system/passage-bill.pdf",
@@ -207,6 +212,7 @@ def build(
     starved_ball=None,
     main_only=False,
     twenty_ball=None,
+    neural_stroke=None,
 ):
     panels = [(HERE / name, title, caption) for name, title, caption in PANELS]
 
@@ -231,6 +237,15 @@ def build(
             else "Three source-selected instants with independently decoded conventional and neural controls. The joint decode costs 469.335 kbps cold or 65.473 kbps with valid references. The racket is missing near contact."
         )
         after("players-starved.pdf", (stroke, "A serve at constrained bandwidth", caption))
+    if neural_stroke:
+        after(
+            "65kbps-regional-dists.pdf",
+            (
+                neural_stroke,
+                "The same serve with a neural video control",
+                "The three source-selected phases include a verified DCVC-UF decode at 49.778 kbps. Ordinary AV1 costs 66.105 kbps. This tracked-pixel joint mode costs 65.473 kbps with valid references or 469.335 kbps from a cold start.",
+            ),
+        )
     if twenty_ball:
         after(
             "ball-rate-quality.pdf",
@@ -277,7 +292,7 @@ def build(
             "basel-holdout-visual-machine.pdf",
             "matched-low-detection.pdf",
             "adelaide-prospective-machine.pdf",
-            "starved-budget.pdf",
+            "joint-price.pdf",
             "passage-bill.pdf",
         }
         selected.update(
@@ -324,6 +339,7 @@ if __name__ == "__main__":
     cli.add_argument("--stroke", type=Path)
     cli.add_argument("--starved-ball", type=Path)
     cli.add_argument("--twenty-ball", type=Path)
+    cli.add_argument("--neural-stroke", type=Path)
     cli.add_argument(
         "--main-only", action="store_true", help="Select the proposed manuscript figures"
     )
@@ -337,4 +353,5 @@ if __name__ == "__main__":
         args.starved_ball,
         args.main_only,
         args.twenty_ball,
+        args.neural_stroke,
     )
