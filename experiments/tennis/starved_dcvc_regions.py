@@ -55,11 +55,12 @@ def sha(p):
     return digest.hexdigest()
 
 
-def replay(a, archive, qp, work):
+def replay(a, archive, qp, work, *, window="nad000", fps=50, packet_sha=None):
+    expected_packet = PACKETS[qp] if packet_sha is None else packet_sha
     tag = f"dcvc-s2-q{qp}"
-    data = archive.extractfile(f"publish/nad000/{tag}.psdc").read()
-    prior = json.load(archive.extractfile(f"publish/nad000/{tag}-reports.json"))
-    assert hashlib.sha256(data).hexdigest() == PACKETS[qp]
+    data = archive.extractfile(f"publish/{window}/{tag}.psdc").read()
+    prior = json.load(archive.extractfile(f"publish/{window}/{tag}-reports.json"))
+    assert hashlib.sha256(data).hexdigest() == expected_packet
     packet = work / f"{tag}.psdc"
     packet.write_bytes(data)
     raw = work / f"{tag}.yuv"
@@ -98,7 +99,7 @@ def replay(a, archive, qp, work):
         deterministic=r["deterministic"],
         pass_lengths=[len(p["frame_sha256"]) for p in r["passes"]],
         different_frames_by_pass=comparisons,
-        packet_matches=r["container_sha256"] == PACKETS[qp],
+        packet_matches=r["container_sha256"] == expected_packet,
     )
     if not (
         len(expected) == 240
@@ -113,9 +114,9 @@ def replay(a, archive, qp, work):
     assert all(hashlib.sha256(f.tobytes()).hexdigest() == h for f, h in zip(frames, expected))
     return frames, dict(
         qp=qp,
-        kbps=len(data) / 600,
+        kbps=len(data) * 8 * fps / (240 * 1000),
         bytes=len(data),
-        packet_sha256=PACKETS[qp],
+        packet_sha256=expected_packet,
         passes=2,
         historical_frame_hashes_matched=240,
         decoder_environment=r["environment"],

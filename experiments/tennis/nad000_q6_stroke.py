@@ -1,4 +1,4 @@
-"""Same-host full decode-only replay, preserving three verified stroke frames."""
+"""Recover the complete native display and selected ticks of a verified neural stream."""
 
 import argparse
 import hashlib
@@ -12,7 +12,15 @@ import time
 from experiments.tennis import starved_dcvc_regions as prior
 
 PACKET = "1d5c6f5e19e360b038e73ad8018075854ecea98c0a9ed05d3801f492bf02a30b"
-TICKS = (78, 86, 94)
+PROFILES = {
+    "nad000": (6, PACKET, 50, (78, 86, 94)),
+    "al028": (
+        24,
+        "08ca4898595d5e78c5f634559acd1fc13af369e2d07c3d4170c1cc764633d214",
+        25,
+        (10, 110, 230),
+    ),
+}
 SIZE = 960 * 544 * 3 // 2
 
 
@@ -22,7 +30,9 @@ def run(a):
     start = time.monotonic()
     allowed = sorted(os.sched_getaffinity(0))
     if len(allowed) < 4 or torch.cuda.device_count() != 1:
-        raise ValueError(f"insufficient isolation: devices={torch.cuda.device_count()} allowed_cpus={allowed}")
+        raise ValueError(
+            f"insufficient isolation: devices={torch.cuda.device_count()} allowed_cpus={allowed}"
+        )
     os.sched_setaffinity(0, set(allowed[:4]))
     if len(os.sched_getaffinity(0)) != 4:
         raise ValueError("four-CPU affinity was not enforced")
@@ -31,7 +41,9 @@ def run(a):
     if shared:
         if os.environ.get("PS_GPU_MEMORY_LIMIT_MIB") != "8192":
             raise ValueError("shared GPU claim mismatch")
-        torch.cuda.set_per_process_memory_fraction(2048 * 2**20 / torch.cuda.get_device_properties(0).total_memory)
+        torch.cuda.set_per_process_memory_fraction(
+            2048 * 2**20 / torch.cuda.get_device_properties(0).total_memory
+        )
         resource = root / "shared-resource-receipts"
         resource.mkdir()
         os.environ["PS_K5D_SHARED_NUMERICAL"] = "pointstream-parent2-child6-v1"
@@ -40,9 +52,19 @@ def run(a):
     work.mkdir()
     publish = root / "publish"
     publish.mkdir()
-    prior.PACKETS[6] = PACKET
+    qp, packet_sha, fps, ticks = PROFILES[a.window]
     with tarfile.open(a.archive) as archive:
-        frames, receipt = prior.replay(a, archive, 6, work)
+        frames, receipt = prior.replay(
+            a, archive, qp, work, window=a.window, fps=fps, packet_sha=packet_sha
+        )
+        original = json.load(archive.extractfile(f"publish/{a.window}/dcvc-s2-q{qp}-reports.json"))
+        historical = [p for decoder in original["decode"].values() for p in decoder["passes"]]
+        frame_hashes = [hashlib.sha256(frame).hexdigest() for frame in frames]
+        if len(historical) != 4 or any(
+            p["frame_sha256"] != frame_hashes or p["yuv420_sha256"] != frame_hashes
+            for p in historical
+        ):
+            raise ValueError("native pixels differ from historical four-pass frame or YUV digests")
     if shared:
         receipts = list(resource.glob("child-*.json"))
         if len(receipts) != 1:
@@ -51,21 +73,23 @@ def run(a):
         if receipt_data["budget_mib"] != 6144 or receipt_data["action"] != "decode":
             raise ValueError("DCVC child allocator receipt mismatch")
         (publish / "resource-receipt.json").write_text(json.dumps(receipt_data) + "\n")
-    shutil.copyfile(work / "dcvc-s2-q6.yuv", publish / "full.yuv")
+    shutil.copyfile(work / f"dcvc-s2-q{qp}.yuv", publish / "full.yuv")
     if prior.sha(publish / "full.yuv") != receipt["raw_sha256"]:
         raise ValueError("full decoded YUV identity")
-    raw = b"".join(frames[t].tobytes() for t in TICKS)
+    raw = b"".join(frames[t].tobytes() for t in ticks)
     if len(raw) != 3 * SIZE:
         raise ValueError("stroke size")
     (publish / "stroke.yuv").write_bytes(raw)
     result = {
-        "ticks": list(TICKS),
+        "ticks": list(ticks),
+        "window": a.window,
+        "historical_passes_verified": len(historical),
         "frames_verified": 240,
-        "fps": 50,
+        "fps": fps,
         "size": [960, 544],
         "kbps": receipt["kbps"],
-        "packet_sha256": PACKET,
-        "hashes": [hashlib.sha256(frames[t].tobytes()).hexdigest() for t in TICKS],
+        "packet_sha256": packet_sha,
+        "hashes": [hashlib.sha256(frames[t].tobytes()).hexdigest() for t in ticks],
         "stroke_sha256": hashlib.sha256(raw).hexdigest(),
         "full_yuv_sha256": receipt["raw_sha256"],
         "replay": receipt,
@@ -78,14 +102,18 @@ def run(a):
     (Path(os.environ["PS_STAGE_DIR"]) / "result.json").write_text(output)
 
 
-def validate():
+def validate(a):
     stage = Path(os.environ["PS_STAGE_DIR"])
     r = json.loads((stage / "result.json").read_text())
+    _, packet_sha, fps, ticks = PROFILES[a.window]
     checks = {
-        "ticks": r["ticks"] == list(TICKS),
+        "window": r["window"] == a.window
+        and r["fps"] == fps
+        and r["historical_passes_verified"] == 4,
+        "ticks": r["ticks"] == list(ticks),
         "full_decode": r["frames_verified"] == 240
         and r["replay"]["historical_frame_hashes_matched"] == 240,
-        "packet": r["packet_sha256"] == PACKET,
+        "packet": r["packet_sha256"] == packet_sha,
     }
     if r["stage"] == "smoke":
         checks["forecast"] = 1.5 * r["elapsed_seconds"] + 30 < 180
@@ -114,10 +142,11 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     for name in ("archive", "image", "video"):
         p.add_argument("--" + name, type=Path)
+    p.add_argument("--window", choices=PROFILES, default="nad000")
     p.add_argument("--frames", type=int)
     p.add_argument("--validate", action="store_true")
     a = p.parse_args()
-    validate() if a.validate else run(a)
+    validate(a) if a.validate else run(a)
 
 
 if __name__ == "__main__":
