@@ -13,3 +13,11 @@ The original inbox contains only the uploaded source archive and events director
 Corrected three-source court screen `20261122T102330Z-33021b17`, numerical decision unchanged, deadline 18:30 UTC. All three staged input hashes match the original archive.
 
 The three-source job 20261122T102330Z-33021b17 finished its real smoke on gpu3. Source identity and frame coverage passed, but 94.40 s for the combined 36 frames forecast more than the 2,300-second full-stage cap. It did not run the full screen. Preserve unchanged native shots, original cadence, court threshold and consecutive-frame registration. Split by independent source, with a separate 12-tick smoke, 1.5× forecast and a 1,200-second ceiling per case, then compare by source against the original smoke. Under the user's overnight time allocation, reserve a maximum of 75 aggregate campus CPU-minutes for these three independently recoverable checks. This addresses the original stage-length failure without counting its output as a complete result.
+
+alcaraz031 native 240-tick campus request `20261122T102951Z-407a2bbd`, deadline 18:30 UTC, 1,200 s full-stage maximum.
+
+rublev023 native 240-tick campus request `20261122T103019Z-7dbb2320`, deadline 18:30 UTC, 1,200 s full-stage maximum.
+
+rublev039 native 240-tick campus request `20261122T103045Z-36ba9cd5`, deadline 18:30 UTC, 1,200 s full-stage maximum.
+
+The independent smoke for Alcaraz 031 had 12/12 fits in 79.20 s and the Rublev 023 smoke had 0/12 in 37.85 s. Both passed identity and coverage, then stopped at the conservative time gate on their assigned hosts. Rublev 039 passed the time gate at 32.44 s and entered the full stage. For the two stopped sources, copy the immutable original videos to this workstation and time the identical OpenCV single-threaded registration on the first 12 ticks. For a technical local retry require the same 1.5× time forecast within a 1,200-second stage, matching the original first 12 binary fit decisions before any numerical promotion. A lower-cost rejection for Rublev 023 may evaluate the first 49 consecutive ticks: 49 no-fit ticks make ≥80% coverage over 240 mathematically impossible, whatever the remaining frames do. This is a bound, not a measured full fit count.
