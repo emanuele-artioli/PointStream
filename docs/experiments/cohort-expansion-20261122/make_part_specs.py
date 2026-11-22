@@ -1,6 +1,8 @@
 """Build an explicitly checkpointed source retry after the whole-stage cost gate fails."""
 
-import argparse, json, hashlib
+import argparse
+import json
+import hashlib
 from pathlib import Path
 
 

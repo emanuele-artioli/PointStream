@@ -1,6 +1,8 @@
 """Use only frozen prices, source identities and the primary scorer’s native host."""
 
-import argparse, hashlib, json
+import argparse
+import hashlib
+import json
 from pathlib import Path
 
 
