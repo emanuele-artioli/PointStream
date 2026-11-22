@@ -119,12 +119,16 @@ def display(raw, w, h):
 
 def measure(data, row, frames, labels, model, work, decoder, ctx, whole):
     video = native(data, row, work, decoder)
+    return measure_yuv(video, row["width"], row["height"], frames, labels, model, ctx, whole)
+
+
+def measure_yuv(video, width, height, frames, labels, model, ctx=None, whole=True):
     visible = {r["tick"]: r for r in labels if r["visibility"] == 1}
     scores = []
     seen = hashlib.sha256()
     sse = 0
     for t in range(len(frames)) if whole else sorted(visible):
-        rgb = display(video[t], row["width"], row["height"])
+        rgb = display(video[t], width, height)
         if ctx is not None:
             rgb = ball.render(rgb, t, *ctx)
         if whole:
