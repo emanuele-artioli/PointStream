@@ -8,6 +8,10 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+
+plt.rcParams["pdf.fonttype"] = 42
+
+
 HERE = Path(__file__).resolve().parent
 
 
@@ -27,6 +31,17 @@ def draw():
         lw=1.5,
         label="SVT-AV1 achievable packet pairs",
     )
+    if all("one_stream_ordinary" in c for c in cases.values()):
+        points = [c["one_stream_ordinary"] for c in cases.values()]
+        ax.scatter(
+            [p["kbps"] for p in points],
+            [p["dists"] for p in points],
+            marker="s",
+            facecolors="white",
+            edgecolors="#00587a",
+            s=45,
+            label="SVT-AV1, one stream across both windows",
+        )
     for mode, label, marker, color in [
         ("reuse", "PointStream, reuse earlier appearance", "D", "#713493"),
         ("send_new", "PointStream, refresh appearance", "^", "#a54a15"),
@@ -41,10 +56,13 @@ def draw():
             label=label,
             zorder=4,
         )
-        best = case["best_ordinary"]
+        paired = case["best_ordinary"]
+        best = case.get(
+            "best_ordinary_any", {"kbps": paired["two_shot_kbps"], "dists": paired["mean_dists"]}
+        )
         ax.plot(
-            [best["two_shot_kbps"], case["rate"]],
-            [best["mean_dists"], case["mean_pointstream_dists"]],
+            [best["kbps"], case["rate"]],
+            [best["dists"], case["mean_pointstream_dists"]],
             ls=":",
             c=color,
             lw=1.3,

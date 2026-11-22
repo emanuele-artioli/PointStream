@@ -1,0 +1,5756 @@
+{
+  "arm": {
+    "name": "ordinary-retained-w480-q4265",
+    "kind": "native_yuv420p",
+    "path": "/local/users/emanuele/pointstream/scratch/20261122T141140Z-333f49e8-full/ordinary-cold.yuv",
+    "sha256": "c66eadc8f17af5f6bf7906928aa319719d24061446156a8bfbc97d4227346400",
+    "width": 480,
+    "height": 272,
+    "bytes": 15413,
+    "kbps": 12.844166666666666,
+    "producer_job": "al031-original-svt-price-678b6a6526fe",
+    "stream_sha256": "678b6a6526fee31e637b064762cfd4ebe9e42ff699f0faa347af4110d77f226a",
+    "decoder": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+      "version": "1.5.4"
+    }
+  },
+  "source_sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+  "supports_sha256": "bc921c6d249dce12657ad7c94fa1fcc7400714d0f07b692ee969acd4beeaed5b",
+  "method": "Both source-SAM players at every native tick, tight mask plus 32 display pixels; model-derived rather than manually drawn.",
+  "native_fps": 25,
+  "frames": 240,
+  "active_start": 0,
+  "active_frames": 240,
+  "fallback_frames": 0,
+  "body_rows": [
+    {
+      "tick": 0,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5379303097724915
+    },
+    {
+      "tick": 0,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.4098319411277771
+    },
+    {
+      "tick": 1,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5429180860519409
+    },
+    {
+      "tick": 1,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.39796799421310425
+    },
+    {
+      "tick": 2,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5488097667694092
+    },
+    {
+      "tick": 2,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.39978742599487305
+    },
+    {
+      "tick": 3,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5541940927505493
+    },
+    {
+      "tick": 3,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.40481823682785034
+    },
+    {
+      "tick": 4,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5689376592636108
+    },
+    {
+      "tick": 4,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.41027724742889404
+    },
+    {
+      "tick": 5,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5603410601615906
+    },
+    {
+      "tick": 5,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.4076194167137146
+    },
+    {
+      "tick": 6,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5649382472038269
+    },
+    {
+      "tick": 6,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.4134407043457031
+    },
+    {
+      "tick": 7,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5709850192070007
+    },
+    {
+      "tick": 7,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.4143714904785156
+    },
+    {
+      "tick": 8,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.567566990852356
+    },
+    {
+      "tick": 8,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.4213980436325073
+    },
+    {
+      "tick": 9,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5717502236366272
+    },
+    {
+      "tick": 9,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.4228736162185669
+    },
+    {
+      "tick": 10,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.580142617225647
+    },
+    {
+      "tick": 10,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.42346394062042236
+    },
+    {
+      "tick": 11,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5881136655807495
+    },
+    {
+      "tick": 11,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.4165881872177124
+    },
+    {
+      "tick": 12,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6049022674560547
+    },
+    {
+      "tick": 12,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.4217956066131592
+    },
+    {
+      "tick": 13,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6038988828659058
+    },
+    {
+      "tick": 13,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.4219868779182434
+    },
+    {
+      "tick": 14,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6006594896316528
+    },
+    {
+      "tick": 14,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.42283570766448975
+    },
+    {
+      "tick": 15,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5952559113502502
+    },
+    {
+      "tick": 15,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.41899019479751587
+    },
+    {
+      "tick": 16,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6087130308151245
+    },
+    {
+      "tick": 16,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.4172225594520569
+    },
+    {
+      "tick": 17,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6143322587013245
+    },
+    {
+      "tick": 17,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.4445064663887024
+    },
+    {
+      "tick": 18,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6040765047073364
+    },
+    {
+      "tick": 18,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.47761625051498413
+    },
+    {
+      "tick": 19,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5874507427215576
+    },
+    {
+      "tick": 19,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.4437252879142761
+    },
+    {
+      "tick": 20,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6074275970458984
+    },
+    {
+      "tick": 20,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.42033278942108154
+    },
+    {
+      "tick": 21,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6126525402069092
+    },
+    {
+      "tick": 21,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.4482070207595825
+    },
+    {
+      "tick": 22,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6283504962921143
+    },
+    {
+      "tick": 22,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.4839738607406616
+    },
+    {
+      "tick": 23,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6025972366333008
+    },
+    {
+      "tick": 23,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.46094220876693726
+    },
+    {
+      "tick": 24,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6036107540130615
+    },
+    {
+      "tick": 24,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.43693578243255615
+    },
+    {
+      "tick": 25,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5997179746627808
+    },
+    {
+      "tick": 25,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.45252418518066406
+    },
+    {
+      "tick": 26,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6038177013397217
+    },
+    {
+      "tick": 26,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.48189401626586914
+    },
+    {
+      "tick": 27,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6110038757324219
+    },
+    {
+      "tick": 27,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5158990621566772
+    },
+    {
+      "tick": 28,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6039920449256897
+    },
+    {
+      "tick": 28,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5501958131790161
+    },
+    {
+      "tick": 29,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5655844211578369
+    },
+    {
+      "tick": 29,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5946744680404663
+    },
+    {
+      "tick": 30,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5780816674232483
+    },
+    {
+      "tick": 30,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6142234802246094
+    },
+    {
+      "tick": 31,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5963817834854126
+    },
+    {
+      "tick": 31,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5978703498840332
+    },
+    {
+      "tick": 32,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5925472378730774
+    },
+    {
+      "tick": 32,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5826067924499512
+    },
+    {
+      "tick": 33,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5727921724319458
+    },
+    {
+      "tick": 33,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6119186878204346
+    },
+    {
+      "tick": 34,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.597295880317688
+    },
+    {
+      "tick": 34,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.634211540222168
+    },
+    {
+      "tick": 35,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.592639148235321
+    },
+    {
+      "tick": 35,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6101695895195007
+    },
+    {
+      "tick": 36,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5908915996551514
+    },
+    {
+      "tick": 36,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6425316333770752
+    },
+    {
+      "tick": 37,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5825732350349426
+    },
+    {
+      "tick": 37,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.673743724822998
+    },
+    {
+      "tick": 38,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5870519876480103
+    },
+    {
+      "tick": 38,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6872838735580444
+    },
+    {
+      "tick": 39,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5896426439285278
+    },
+    {
+      "tick": 39,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7071141004562378
+    },
+    {
+      "tick": 40,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.591400146484375
+    },
+    {
+      "tick": 40,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7043150663375854
+    },
+    {
+      "tick": 41,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5849998593330383
+    },
+    {
+      "tick": 41,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7132924795150757
+    },
+    {
+      "tick": 42,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5833559036254883
+    },
+    {
+      "tick": 42,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7115471959114075
+    },
+    {
+      "tick": 43,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5754599571228027
+    },
+    {
+      "tick": 43,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7150510549545288
+    },
+    {
+      "tick": 44,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5816833972930908
+    },
+    {
+      "tick": 44,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7038284540176392
+    },
+    {
+      "tick": 45,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5795307159423828
+    },
+    {
+      "tick": 45,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7122427821159363
+    },
+    {
+      "tick": 46,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5862581133842468
+    },
+    {
+      "tick": 46,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7123050689697266
+    },
+    {
+      "tick": 47,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5873812437057495
+    },
+    {
+      "tick": 47,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7000959515571594
+    },
+    {
+      "tick": 48,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.597538411617279
+    },
+    {
+      "tick": 48,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7160786390304565
+    },
+    {
+      "tick": 49,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5897167921066284
+    },
+    {
+      "tick": 49,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7079529762268066
+    },
+    {
+      "tick": 50,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.590019166469574
+    },
+    {
+      "tick": 50,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7210725545883179
+    },
+    {
+      "tick": 51,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5795800089836121
+    },
+    {
+      "tick": 51,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.709363579750061
+    },
+    {
+      "tick": 52,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5953893661499023
+    },
+    {
+      "tick": 52,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7095563411712646
+    },
+    {
+      "tick": 53,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5946532487869263
+    },
+    {
+      "tick": 53,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7149593830108643
+    },
+    {
+      "tick": 54,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5910909175872803
+    },
+    {
+      "tick": 54,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.712460994720459
+    },
+    {
+      "tick": 55,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5940277576446533
+    },
+    {
+      "tick": 55,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7248433828353882
+    },
+    {
+      "tick": 56,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6139240264892578
+    },
+    {
+      "tick": 56,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7306749820709229
+    },
+    {
+      "tick": 57,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6127112507820129
+    },
+    {
+      "tick": 57,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7269234657287598
+    },
+    {
+      "tick": 58,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6287572383880615
+    },
+    {
+      "tick": 58,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6913774013519287
+    },
+    {
+      "tick": 59,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6153929233551025
+    },
+    {
+      "tick": 59,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6847904324531555
+    },
+    {
+      "tick": 60,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6165341138839722
+    },
+    {
+      "tick": 60,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6910392045974731
+    },
+    {
+      "tick": 61,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.620389461517334
+    },
+    {
+      "tick": 61,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6870970726013184
+    },
+    {
+      "tick": 62,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6114702224731445
+    },
+    {
+      "tick": 62,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6884116530418396
+    },
+    {
+      "tick": 63,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6163779497146606
+    },
+    {
+      "tick": 63,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6697087287902832
+    },
+    {
+      "tick": 64,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6030501127243042
+    },
+    {
+      "tick": 64,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6386019587516785
+    },
+    {
+      "tick": 65,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5847145318984985
+    },
+    {
+      "tick": 65,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6443599462509155
+    },
+    {
+      "tick": 66,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5857623219490051
+    },
+    {
+      "tick": 66,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6678839325904846
+    },
+    {
+      "tick": 67,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5726420879364014
+    },
+    {
+      "tick": 67,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6816648244857788
+    },
+    {
+      "tick": 68,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5895852446556091
+    },
+    {
+      "tick": 68,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6998392343521118
+    },
+    {
+      "tick": 69,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6067245006561279
+    },
+    {
+      "tick": 69,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6935396790504456
+    },
+    {
+      "tick": 70,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6165359020233154
+    },
+    {
+      "tick": 70,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6713446378707886
+    },
+    {
+      "tick": 71,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6073455810546875
+    },
+    {
+      "tick": 71,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6623585224151611
+    },
+    {
+      "tick": 72,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6426799297332764
+    },
+    {
+      "tick": 72,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6539961099624634
+    },
+    {
+      "tick": 73,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6142792701721191
+    },
+    {
+      "tick": 73,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6558064222335815
+    },
+    {
+      "tick": 74,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6193643808364868
+    },
+    {
+      "tick": 74,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6643965244293213
+    },
+    {
+      "tick": 75,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6471400260925293
+    },
+    {
+      "tick": 75,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6808643341064453
+    },
+    {
+      "tick": 76,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6433233022689819
+    },
+    {
+      "tick": 76,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6862438917160034
+    },
+    {
+      "tick": 77,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6579628586769104
+    },
+    {
+      "tick": 77,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6685974597930908
+    },
+    {
+      "tick": 78,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6627435684204102
+    },
+    {
+      "tick": 78,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6764848232269287
+    },
+    {
+      "tick": 79,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6750771999359131
+    },
+    {
+      "tick": 79,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6440012454986572
+    },
+    {
+      "tick": 80,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6740966439247131
+    },
+    {
+      "tick": 80,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6195129156112671
+    },
+    {
+      "tick": 81,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6629782915115356
+    },
+    {
+      "tick": 81,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6330076456069946
+    },
+    {
+      "tick": 82,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.663017988204956
+    },
+    {
+      "tick": 82,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6498830318450928
+    },
+    {
+      "tick": 83,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6624464392662048
+    },
+    {
+      "tick": 83,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6239456534385681
+    },
+    {
+      "tick": 84,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6578502655029297
+    },
+    {
+      "tick": 84,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5343264937400818
+    },
+    {
+      "tick": 85,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6374679207801819
+    },
+    {
+      "tick": 85,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5123870372772217
+    },
+    {
+      "tick": 86,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6249500513076782
+    },
+    {
+      "tick": 86,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5492222309112549
+    },
+    {
+      "tick": 87,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5966192483901978
+    },
+    {
+      "tick": 87,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6238518357276917
+    },
+    {
+      "tick": 88,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5886566638946533
+    },
+    {
+      "tick": 88,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.660860538482666
+    },
+    {
+      "tick": 89,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5771663188934326
+    },
+    {
+      "tick": 89,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.653629720211029
+    },
+    {
+      "tick": 90,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5577303171157837
+    },
+    {
+      "tick": 90,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6494030952453613
+    },
+    {
+      "tick": 91,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5402604341506958
+    },
+    {
+      "tick": 91,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5636939406394958
+    },
+    {
+      "tick": 92,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5170274972915649
+    },
+    {
+      "tick": 92,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5734121799468994
+    },
+    {
+      "tick": 93,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5107898712158203
+    },
+    {
+      "tick": 93,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5948915481567383
+    },
+    {
+      "tick": 94,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5112009644508362
+    },
+    {
+      "tick": 94,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5912918448448181
+    },
+    {
+      "tick": 95,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5158700942993164
+    },
+    {
+      "tick": 95,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5720651745796204
+    },
+    {
+      "tick": 96,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5277767777442932
+    },
+    {
+      "tick": 96,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5279296636581421
+    },
+    {
+      "tick": 97,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5345214605331421
+    },
+    {
+      "tick": 97,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5785470008850098
+    },
+    {
+      "tick": 98,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5491611957550049
+    },
+    {
+      "tick": 98,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6167969703674316
+    },
+    {
+      "tick": 99,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5444375276565552
+    },
+    {
+      "tick": 99,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6387505531311035
+    },
+    {
+      "tick": 100,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.537401020526886
+    },
+    {
+      "tick": 100,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6346271634101868
+    },
+    {
+      "tick": 101,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5378547310829163
+    },
+    {
+      "tick": 101,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6343002319335938
+    },
+    {
+      "tick": 102,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5408114194869995
+    },
+    {
+      "tick": 102,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6160897016525269
+    },
+    {
+      "tick": 103,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5390291213989258
+    },
+    {
+      "tick": 103,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6005401611328125
+    },
+    {
+      "tick": 104,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5346232652664185
+    },
+    {
+      "tick": 104,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5951708555221558
+    },
+    {
+      "tick": 105,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5469019412994385
+    },
+    {
+      "tick": 105,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6144744157791138
+    },
+    {
+      "tick": 106,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.557526707649231
+    },
+    {
+      "tick": 106,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6369533538818359
+    },
+    {
+      "tick": 107,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5748157501220703
+    },
+    {
+      "tick": 107,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6207473278045654
+    },
+    {
+      "tick": 108,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5786514282226562
+    },
+    {
+      "tick": 108,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5991806983947754
+    },
+    {
+      "tick": 109,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.587659478187561
+    },
+    {
+      "tick": 109,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6026571989059448
+    },
+    {
+      "tick": 110,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5900259613990784
+    },
+    {
+      "tick": 110,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5966556072235107
+    },
+    {
+      "tick": 111,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5925127267837524
+    },
+    {
+      "tick": 111,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5960655212402344
+    },
+    {
+      "tick": 112,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.595643937587738
+    },
+    {
+      "tick": 112,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5969609022140503
+    },
+    {
+      "tick": 113,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6003338098526001
+    },
+    {
+      "tick": 113,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6330106258392334
+    },
+    {
+      "tick": 114,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6056134700775146
+    },
+    {
+      "tick": 114,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6210037469863892
+    },
+    {
+      "tick": 115,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.612690806388855
+    },
+    {
+      "tick": 115,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.593454122543335
+    },
+    {
+      "tick": 116,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6050068140029907
+    },
+    {
+      "tick": 116,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5423131585121155
+    },
+    {
+      "tick": 117,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6109760999679565
+    },
+    {
+      "tick": 117,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5676407217979431
+    },
+    {
+      "tick": 118,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6084531545639038
+    },
+    {
+      "tick": 118,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5589039325714111
+    },
+    {
+      "tick": 119,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6027833223342896
+    },
+    {
+      "tick": 119,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5385758876800537
+    },
+    {
+      "tick": 120,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5806440114974976
+    },
+    {
+      "tick": 120,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5163465738296509
+    },
+    {
+      "tick": 121,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5643223524093628
+    },
+    {
+      "tick": 121,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5411015748977661
+    },
+    {
+      "tick": 122,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5701401829719543
+    },
+    {
+      "tick": 122,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5756165981292725
+    },
+    {
+      "tick": 123,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5659736394882202
+    },
+    {
+      "tick": 123,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5786800384521484
+    },
+    {
+      "tick": 124,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5685538053512573
+    },
+    {
+      "tick": 124,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5545778274536133
+    },
+    {
+      "tick": 125,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5669923424720764
+    },
+    {
+      "tick": 125,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5966320037841797
+    },
+    {
+      "tick": 126,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.553375244140625
+    },
+    {
+      "tick": 126,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5852055549621582
+    },
+    {
+      "tick": 127,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5694438219070435
+    },
+    {
+      "tick": 127,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5450112819671631
+    },
+    {
+      "tick": 128,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5579153299331665
+    },
+    {
+      "tick": 128,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.4963293671607971
+    },
+    {
+      "tick": 129,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5715517401695251
+    },
+    {
+      "tick": 129,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5296941995620728
+    },
+    {
+      "tick": 130,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5921726822853088
+    },
+    {
+      "tick": 130,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5442445278167725
+    },
+    {
+      "tick": 131,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.588566780090332
+    },
+    {
+      "tick": 131,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5516221523284912
+    },
+    {
+      "tick": 132,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.586238443851471
+    },
+    {
+      "tick": 132,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5523938536643982
+    },
+    {
+      "tick": 133,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.596138060092926
+    },
+    {
+      "tick": 133,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5657910108566284
+    },
+    {
+      "tick": 134,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5891734957695007
+    },
+    {
+      "tick": 134,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5813692808151245
+    },
+    {
+      "tick": 135,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5858907699584961
+    },
+    {
+      "tick": 135,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5885790586471558
+    },
+    {
+      "tick": 136,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5697150230407715
+    },
+    {
+      "tick": 136,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5907777547836304
+    },
+    {
+      "tick": 137,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5604801177978516
+    },
+    {
+      "tick": 137,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5865235328674316
+    },
+    {
+      "tick": 138,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5897970795631409
+    },
+    {
+      "tick": 138,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5555455088615417
+    },
+    {
+      "tick": 139,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6156145334243774
+    },
+    {
+      "tick": 139,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5387686491012573
+    },
+    {
+      "tick": 140,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.642605185508728
+    },
+    {
+      "tick": 140,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5249889492988586
+    },
+    {
+      "tick": 141,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6359473466873169
+    },
+    {
+      "tick": 141,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5438960790634155
+    },
+    {
+      "tick": 142,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.608526349067688
+    },
+    {
+      "tick": 142,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5554710626602173
+    },
+    {
+      "tick": 143,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.619304895401001
+    },
+    {
+      "tick": 143,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5393062829971313
+    },
+    {
+      "tick": 144,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6203757524490356
+    },
+    {
+      "tick": 144,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5366020202636719
+    },
+    {
+      "tick": 145,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6254023909568787
+    },
+    {
+      "tick": 145,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5622979402542114
+    },
+    {
+      "tick": 146,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6218208074569702
+    },
+    {
+      "tick": 146,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.574215829372406
+    },
+    {
+      "tick": 147,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6281859278678894
+    },
+    {
+      "tick": 147,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5759590864181519
+    },
+    {
+      "tick": 148,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6329516172409058
+    },
+    {
+      "tick": 148,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5858529806137085
+    },
+    {
+      "tick": 149,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6623059511184692
+    },
+    {
+      "tick": 149,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6057705879211426
+    },
+    {
+      "tick": 150,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.62562096118927
+    },
+    {
+      "tick": 150,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6361149549484253
+    },
+    {
+      "tick": 151,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6106011867523193
+    },
+    {
+      "tick": 151,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6713276505470276
+    },
+    {
+      "tick": 152,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5930517911911011
+    },
+    {
+      "tick": 152,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7022689580917358
+    },
+    {
+      "tick": 153,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6062844395637512
+    },
+    {
+      "tick": 153,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7023344039916992
+    },
+    {
+      "tick": 154,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6199158430099487
+    },
+    {
+      "tick": 154,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7042992115020752
+    },
+    {
+      "tick": 155,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6114018559455872
+    },
+    {
+      "tick": 155,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7031389474868774
+    },
+    {
+      "tick": 156,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6118698716163635
+    },
+    {
+      "tick": 156,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7009485960006714
+    },
+    {
+      "tick": 157,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6221674680709839
+    },
+    {
+      "tick": 157,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6625744700431824
+    },
+    {
+      "tick": 158,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6018896102905273
+    },
+    {
+      "tick": 158,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5946237444877625
+    },
+    {
+      "tick": 159,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5773584842681885
+    },
+    {
+      "tick": 159,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5433589816093445
+    },
+    {
+      "tick": 160,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5488538146018982
+    },
+    {
+      "tick": 160,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5227630138397217
+    },
+    {
+      "tick": 161,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.560151219367981
+    },
+    {
+      "tick": 161,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5530049800872803
+    },
+    {
+      "tick": 162,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5745338201522827
+    },
+    {
+      "tick": 162,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5950255990028381
+    },
+    {
+      "tick": 163,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5706987380981445
+    },
+    {
+      "tick": 163,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6357864737510681
+    },
+    {
+      "tick": 164,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5822542905807495
+    },
+    {
+      "tick": 164,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7191379070281982
+    },
+    {
+      "tick": 165,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6058794856071472
+    },
+    {
+      "tick": 165,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7028212547302246
+    },
+    {
+      "tick": 166,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6180241703987122
+    },
+    {
+      "tick": 166,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6775602102279663
+    },
+    {
+      "tick": 167,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6271061897277832
+    },
+    {
+      "tick": 167,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6912569999694824
+    },
+    {
+      "tick": 168,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6263360977172852
+    },
+    {
+      "tick": 168,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.716745138168335
+    },
+    {
+      "tick": 169,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6431866884231567
+    },
+    {
+      "tick": 169,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7048137187957764
+    },
+    {
+      "tick": 170,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6438912749290466
+    },
+    {
+      "tick": 170,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7132164239883423
+    },
+    {
+      "tick": 171,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6527925729751587
+    },
+    {
+      "tick": 171,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7167328596115112
+    },
+    {
+      "tick": 172,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6605700254440308
+    },
+    {
+      "tick": 172,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7107307314872742
+    },
+    {
+      "tick": 173,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6512002944946289
+    },
+    {
+      "tick": 173,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7112603187561035
+    },
+    {
+      "tick": 174,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6588963866233826
+    },
+    {
+      "tick": 174,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6866511106491089
+    },
+    {
+      "tick": 175,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6459614038467407
+    },
+    {
+      "tick": 175,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6592163443565369
+    },
+    {
+      "tick": 176,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6455104351043701
+    },
+    {
+      "tick": 176,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6501542329788208
+    },
+    {
+      "tick": 177,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6226991415023804
+    },
+    {
+      "tick": 177,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6366288065910339
+    },
+    {
+      "tick": 178,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6292773485183716
+    },
+    {
+      "tick": 178,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6513253450393677
+    },
+    {
+      "tick": 179,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6426628828048706
+    },
+    {
+      "tick": 179,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.652310848236084
+    },
+    {
+      "tick": 180,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6341826915740967
+    },
+    {
+      "tick": 180,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6861913204193115
+    },
+    {
+      "tick": 181,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6655023097991943
+    },
+    {
+      "tick": 181,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.70859694480896
+    },
+    {
+      "tick": 182,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6635514497756958
+    },
+    {
+      "tick": 182,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7201422452926636
+    },
+    {
+      "tick": 183,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6570422649383545
+    },
+    {
+      "tick": 183,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.721272349357605
+    },
+    {
+      "tick": 184,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6594798564910889
+    },
+    {
+      "tick": 184,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6962481737136841
+    },
+    {
+      "tick": 185,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6738612651824951
+    },
+    {
+      "tick": 185,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.713520348072052
+    },
+    {
+      "tick": 186,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6372761130332947
+    },
+    {
+      "tick": 186,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7221459150314331
+    },
+    {
+      "tick": 187,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5957822799682617
+    },
+    {
+      "tick": 187,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.719119131565094
+    },
+    {
+      "tick": 188,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5802524089813232
+    },
+    {
+      "tick": 188,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7194508910179138
+    },
+    {
+      "tick": 189,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5996636152267456
+    },
+    {
+      "tick": 189,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6632744669914246
+    },
+    {
+      "tick": 190,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.582741379737854
+    },
+    {
+      "tick": 190,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6154158115386963
+    },
+    {
+      "tick": 191,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5447160005569458
+    },
+    {
+      "tick": 191,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5936312675476074
+    },
+    {
+      "tick": 192,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5105906128883362
+    },
+    {
+      "tick": 192,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5492200255393982
+    },
+    {
+      "tick": 193,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.561211347579956
+    },
+    {
+      "tick": 193,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5786134004592896
+    },
+    {
+      "tick": 194,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5730385780334473
+    },
+    {
+      "tick": 194,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.5939158201217651
+    },
+    {
+      "tick": 195,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5496001243591309
+    },
+    {
+      "tick": 195,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6266874074935913
+    },
+    {
+      "tick": 196,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5320005416870117
+    },
+    {
+      "tick": 196,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6231037378311157
+    },
+    {
+      "tick": 197,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5614924430847168
+    },
+    {
+      "tick": 197,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.637332558631897
+    },
+    {
+      "tick": 198,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5790289640426636
+    },
+    {
+      "tick": 198,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.625728964805603
+    },
+    {
+      "tick": 199,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5592917203903198
+    },
+    {
+      "tick": 199,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.67441725730896
+    },
+    {
+      "tick": 200,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5560928583145142
+    },
+    {
+      "tick": 200,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7277568578720093
+    },
+    {
+      "tick": 201,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5848567485809326
+    },
+    {
+      "tick": 201,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7346869111061096
+    },
+    {
+      "tick": 202,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6293445825576782
+    },
+    {
+      "tick": 202,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.758346438407898
+    },
+    {
+      "tick": 203,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6566031575202942
+    },
+    {
+      "tick": 203,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7330263257026672
+    },
+    {
+      "tick": 204,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6789827346801758
+    },
+    {
+      "tick": 204,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7374345660209656
+    },
+    {
+      "tick": 205,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.676950216293335
+    },
+    {
+      "tick": 205,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7488430738449097
+    },
+    {
+      "tick": 206,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6766029000282288
+    },
+    {
+      "tick": 206,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7189323902130127
+    },
+    {
+      "tick": 207,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6576495170593262
+    },
+    {
+      "tick": 207,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.724824070930481
+    },
+    {
+      "tick": 208,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6417002081871033
+    },
+    {
+      "tick": 208,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7270539999008179
+    },
+    {
+      "tick": 209,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6263529062271118
+    },
+    {
+      "tick": 209,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.721062958240509
+    },
+    {
+      "tick": 210,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6370745897293091
+    },
+    {
+      "tick": 210,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7205276489257812
+    },
+    {
+      "tick": 211,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.654404878616333
+    },
+    {
+      "tick": 211,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7034691572189331
+    },
+    {
+      "tick": 212,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6355471611022949
+    },
+    {
+      "tick": 212,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6968792676925659
+    },
+    {
+      "tick": 213,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6224519610404968
+    },
+    {
+      "tick": 213,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7042779922485352
+    },
+    {
+      "tick": 214,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6336126327514648
+    },
+    {
+      "tick": 214,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7002182006835938
+    },
+    {
+      "tick": 215,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6187728643417358
+    },
+    {
+      "tick": 215,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7174184322357178
+    },
+    {
+      "tick": 216,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5775506496429443
+    },
+    {
+      "tick": 216,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6919348239898682
+    },
+    {
+      "tick": 217,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6070199012756348
+    },
+    {
+      "tick": 217,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6827607154846191
+    },
+    {
+      "tick": 218,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6203751564025879
+    },
+    {
+      "tick": 218,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6418139338493347
+    },
+    {
+      "tick": 219,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6423673629760742
+    },
+    {
+      "tick": 219,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6322811841964722
+    },
+    {
+      "tick": 220,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6292067766189575
+    },
+    {
+      "tick": 220,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6333285570144653
+    },
+    {
+      "tick": 221,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6335918307304382
+    },
+    {
+      "tick": 221,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.63604336977005
+    },
+    {
+      "tick": 222,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6352794170379639
+    },
+    {
+      "tick": 222,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6172572374343872
+    },
+    {
+      "tick": 223,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6224498152732849
+    },
+    {
+      "tick": 223,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6051291227340698
+    },
+    {
+      "tick": 224,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6186919212341309
+    },
+    {
+      "tick": 224,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6222543716430664
+    },
+    {
+      "tick": 225,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.5992531776428223
+    },
+    {
+      "tick": 225,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6378612518310547
+    },
+    {
+      "tick": 226,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6366815567016602
+    },
+    {
+      "tick": 226,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6455686688423157
+    },
+    {
+      "tick": 227,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6487467288970947
+    },
+    {
+      "tick": 227,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6521814465522766
+    },
+    {
+      "tick": 228,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6503121852874756
+    },
+    {
+      "tick": 228,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6853694915771484
+    },
+    {
+      "tick": 229,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6349968910217285
+    },
+    {
+      "tick": 229,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7063961029052734
+    },
+    {
+      "tick": 230,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6203562021255493
+    },
+    {
+      "tick": 230,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7191528081893921
+    },
+    {
+      "tick": 231,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6265859007835388
+    },
+    {
+      "tick": 231,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.718778133392334
+    },
+    {
+      "tick": 232,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6104099750518799
+    },
+    {
+      "tick": 232,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7155450582504272
+    },
+    {
+      "tick": 233,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6193490028381348
+    },
+    {
+      "tick": 233,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.712143063545227
+    },
+    {
+      "tick": 234,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6148717999458313
+    },
+    {
+      "tick": 234,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7081501483917236
+    },
+    {
+      "tick": 235,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6360354423522949
+    },
+    {
+      "tick": 235,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.6976396441459656
+    },
+    {
+      "tick": 236,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6531710624694824
+    },
+    {
+      "tick": 236,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7125551700592041
+    },
+    {
+      "tick": 237,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6603748798370361
+    },
+    {
+      "tick": 237,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7205511331558228
+    },
+    {
+      "tick": 238,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6518772840499878
+    },
+    {
+      "tick": 238,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7188475131988525
+    },
+    {
+      "tick": 239,
+      "player_index": 0,
+      "active": true,
+      "dists": 0.6559357047080994
+    },
+    {
+      "tick": 239,
+      "player_index": 1,
+      "active": true,
+      "dists": 0.7374597787857056
+    }
+  ],
+  "mean_dists": 0.6114025462418795,
+  "active_dists": 0.6114025462418795,
+  "fallback_dists": null,
+  "rgb_psnr": 25.160580753044968,
+  "active_rgb_psnr": 25.160580753044968,
+  "fallback_rgb_psnr": null,
+  "source_self_abs": 0.0,
+  "weights_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+  "torch": "2.10.0+cu128",
+  "cv2": "4.10.0",
+  "device": "cpu",
+  "cpu_seconds": 160.903338333,
+  "forecast_cpu_seconds": 338.75056254000003,
+  "ball": {
+    "method": "64x64 native RGB crop at every transmitted source-fitted center",
+    "payload_sha256": "aa3119d822edcead9f1e486973e975e31b7b74da2a5b7ee9be372bbb2c4b22c0",
+    "total_ticks": 240,
+    "present": 235,
+    "rows": [
+      {
+        "tick": 1,
+        "sender_xy": [
+          593,
+          66
+        ],
+        "crop_xy": [
+          1154,
+          100
+        ],
+        "dists": 0.40152764320373535
+      },
+      {
+        "tick": 2,
+        "sender_xy": [
+          595,
+          60
+        ],
+        "crop_xy": [
+          1158,
+          88
+        ],
+        "dists": 0.3787570595741272
+      },
+      {
+        "tick": 3,
+        "sender_xy": [
+          596,
+          58
+        ],
+        "crop_xy": [
+          1160,
+          84
+        ],
+        "dists": 0.3840010166168213
+      },
+      {
+        "tick": 4,
+        "sender_xy": [
+          597,
+          55
+        ],
+        "crop_xy": [
+          1162,
+          78
+        ],
+        "dists": 0.38332319259643555
+      },
+      {
+        "tick": 5,
+        "sender_xy": [
+          598,
+          52
+        ],
+        "crop_xy": [
+          1164,
+          72
+        ],
+        "dists": 0.3978923559188843
+      },
+      {
+        "tick": 6,
+        "sender_xy": [
+          599,
+          50
+        ],
+        "crop_xy": [
+          1166,
+          68
+        ],
+        "dists": 0.3812594413757324
+      },
+      {
+        "tick": 7,
+        "sender_xy": [
+          600,
+          48
+        ],
+        "crop_xy": [
+          1168,
+          64
+        ],
+        "dists": 0.3751477003097534
+      },
+      {
+        "tick": 8,
+        "sender_xy": [
+          602,
+          47
+        ],
+        "crop_xy": [
+          1172,
+          62
+        ],
+        "dists": 0.39534103870391846
+      },
+      {
+        "tick": 9,
+        "sender_xy": [
+          603,
+          47
+        ],
+        "crop_xy": [
+          1174,
+          62
+        ],
+        "dists": 0.40266430377960205
+      },
+      {
+        "tick": 10,
+        "sender_xy": [
+          604,
+          48
+        ],
+        "crop_xy": [
+          1176,
+          64
+        ],
+        "dists": 0.3903690576553345
+      },
+      {
+        "tick": 11,
+        "sender_xy": [
+          605,
+          49
+        ],
+        "crop_xy": [
+          1178,
+          66
+        ],
+        "dists": 0.38422203063964844
+      },
+      {
+        "tick": 12,
+        "sender_xy": [
+          607,
+          50
+        ],
+        "crop_xy": [
+          1182,
+          68
+        ],
+        "dists": 0.38749557733535767
+      },
+      {
+        "tick": 13,
+        "sender_xy": [
+          607,
+          52
+        ],
+        "crop_xy": [
+          1182,
+          72
+        ],
+        "dists": 0.3700753450393677
+      },
+      {
+        "tick": 14,
+        "sender_xy": [
+          608,
+          55
+        ],
+        "crop_xy": [
+          1184,
+          78
+        ],
+        "dists": 0.38007450103759766
+      },
+      {
+        "tick": 15,
+        "sender_xy": [
+          609,
+          58
+        ],
+        "crop_xy": [
+          1186,
+          84
+        ],
+        "dists": 0.3824041485786438
+      },
+      {
+        "tick": 16,
+        "sender_xy": [
+          610,
+          62
+        ],
+        "crop_xy": [
+          1188,
+          92
+        ],
+        "dists": 0.3970123529434204
+      },
+      {
+        "tick": 17,
+        "sender_xy": [
+          611,
+          65
+        ],
+        "crop_xy": [
+          1190,
+          98
+        ],
+        "dists": 0.4166415333747864
+      },
+      {
+        "tick": 18,
+        "sender_xy": [
+          612,
+          71
+        ],
+        "crop_xy": [
+          1192,
+          109
+        ],
+        "dists": 0.32137608528137207
+      },
+      {
+        "tick": 19,
+        "sender_xy": [
+          612,
+          75
+        ],
+        "crop_xy": [
+          1192,
+          117
+        ],
+        "dists": 0.2587931156158447
+      },
+      {
+        "tick": 20,
+        "sender_xy": [
+          609,
+          79
+        ],
+        "crop_xy": [
+          1186,
+          125
+        ],
+        "dists": 0.28033560514450073
+      },
+      {
+        "tick": 23,
+        "sender_xy": [
+          537,
+          129
+        ],
+        "crop_xy": [
+          1042,
+          225
+        ],
+        "dists": 0.3116045594215393
+      },
+      {
+        "tick": 24,
+        "sender_xy": [
+          514,
+          148
+        ],
+        "crop_xy": [
+          996,
+          262
+        ],
+        "dists": 0.28036439418792725
+      },
+      {
+        "tick": 25,
+        "sender_xy": [
+          492,
+          168
+        ],
+        "crop_xy": [
+          952,
+          302
+        ],
+        "dists": 0.32454049587249756
+      },
+      {
+        "tick": 26,
+        "sender_xy": [
+          469,
+          190
+        ],
+        "crop_xy": [
+          906,
+          346
+        ],
+        "dists": 0.3104780912399292
+      },
+      {
+        "tick": 27,
+        "sender_xy": [
+          446,
+          214
+        ],
+        "crop_xy": [
+          860,
+          393
+        ],
+        "dists": 0.34649884700775146
+      },
+      {
+        "tick": 28,
+        "sender_xy": [
+          426,
+          237
+        ],
+        "crop_xy": [
+          820,
+          439
+        ],
+        "dists": 0.3865075707435608
+      },
+      {
+        "tick": 29,
+        "sender_xy": [
+          404,
+          263
+        ],
+        "crop_xy": [
+          776,
+          491
+        ],
+        "dists": 0.33415353298187256
+      },
+      {
+        "tick": 30,
+        "sender_xy": [
+          382,
+          291
+        ],
+        "crop_xy": [
+          732,
+          546
+        ],
+        "dists": 0.27971768379211426
+      },
+      {
+        "tick": 31,
+        "sender_xy": [
+          359,
+          318
+        ],
+        "crop_xy": [
+          686,
+          600
+        ],
+        "dists": 0.29217028617858887
+      },
+      {
+        "tick": 32,
+        "sender_xy": [
+          343,
+          314
+        ],
+        "crop_xy": [
+          654,
+          592
+        ],
+        "dists": 0.38586801290512085
+      },
+      {
+        "tick": 33,
+        "sender_xy": [
+          325,
+          311
+        ],
+        "crop_xy": [
+          618,
+          586
+        ],
+        "dists": 0.3394101858139038
+      },
+      {
+        "tick": 34,
+        "sender_xy": [
+          309,
+          309
+        ],
+        "crop_xy": [
+          586,
+          582
+        ],
+        "dists": 0.26772910356521606
+      },
+      {
+        "tick": 35,
+        "sender_xy": [
+          291,
+          308
+        ],
+        "crop_xy": [
+          550,
+          580
+        ],
+        "dists": 0.29427510499954224
+      },
+      {
+        "tick": 36,
+        "sender_xy": [
+          268,
+          308
+        ],
+        "crop_xy": [
+          504,
+          580
+        ],
+        "dists": 0.350320041179657
+      },
+      {
+        "tick": 37,
+        "sender_xy": [
+          249,
+          310
+        ],
+        "crop_xy": [
+          466,
+          584
+        ],
+        "dists": 0.3369429111480713
+      },
+      {
+        "tick": 38,
+        "sender_xy": [
+          229,
+          313
+        ],
+        "crop_xy": [
+          426,
+          590
+        ],
+        "dists": 0.3311367630958557
+      },
+      {
+        "tick": 39,
+        "sender_xy": [
+          209,
+          316
+        ],
+        "crop_xy": [
+          386,
+          596
+        ],
+        "dists": 0.34502315521240234
+      },
+      {
+        "tick": 40,
+        "sender_xy": [
+          188,
+          322
+        ],
+        "crop_xy": [
+          344,
+          608
+        ],
+        "dists": 0.35266661643981934
+      },
+      {
+        "tick": 41,
+        "sender_xy": [
+          168,
+          328
+        ],
+        "crop_xy": [
+          304,
+          620
+        ],
+        "dists": 0.3608614206314087
+      },
+      {
+        "tick": 42,
+        "sender_xy": [
+          147,
+          336
+        ],
+        "crop_xy": [
+          262,
+          636
+        ],
+        "dists": 0.35506826639175415
+      },
+      {
+        "tick": 43,
+        "sender_xy": [
+          125,
+          345
+        ],
+        "crop_xy": [
+          218,
+          653
+        ],
+        "dists": 0.3560502529144287
+      },
+      {
+        "tick": 44,
+        "sender_xy": [
+          100,
+          357
+        ],
+        "crop_xy": [
+          168,
+          677
+        ],
+        "dists": 0.36398613452911377
+      },
+      {
+        "tick": 45,
+        "sender_xy": [
+          82,
+          368
+        ],
+        "crop_xy": [
+          132,
+          699
+        ],
+        "dists": 0.4280164837837219
+      },
+      {
+        "tick": 46,
+        "sender_xy": [
+          91,
+          357
+        ],
+        "crop_xy": [
+          150,
+          677
+        ],
+        "dists": 0.3715397119522095
+      },
+      {
+        "tick": 47,
+        "sender_xy": [
+          116,
+          336
+        ],
+        "crop_xy": [
+          200,
+          636
+        ],
+        "dists": 0.3576597571372986
+      },
+      {
+        "tick": 48,
+        "sender_xy": [
+          137,
+          320
+        ],
+        "crop_xy": [
+          242,
+          604
+        ],
+        "dists": 0.33870404958724976
+      },
+      {
+        "tick": 49,
+        "sender_xy": [
+          157,
+          305
+        ],
+        "crop_xy": [
+          282,
+          574
+        ],
+        "dists": 0.35835719108581543
+      },
+      {
+        "tick": 50,
+        "sender_xy": [
+          176,
+          292
+        ],
+        "crop_xy": [
+          320,
+          548
+        ],
+        "dists": 0.3370082378387451
+      },
+      {
+        "tick": 51,
+        "sender_xy": [
+          194,
+          280
+        ],
+        "crop_xy": [
+          356,
+          524
+        ],
+        "dists": 0.302165687084198
+      },
+      {
+        "tick": 52,
+        "sender_xy": [
+          210,
+          270
+        ],
+        "crop_xy": [
+          388,
+          505
+        ],
+        "dists": 0.3246043920516968
+      },
+      {
+        "tick": 53,
+        "sender_xy": [
+          227,
+          260
+        ],
+        "crop_xy": [
+          422,
+          485
+        ],
+        "dists": 0.3608446717262268
+      },
+      {
+        "tick": 54,
+        "sender_xy": [
+          244,
+          251
+        ],
+        "crop_xy": [
+          456,
+          467
+        ],
+        "dists": 0.39206039905548096
+      },
+      {
+        "tick": 55,
+        "sender_xy": [
+          256,
+          245
+        ],
+        "crop_xy": [
+          480,
+          455
+        ],
+        "dists": 0.39877378940582275
+      },
+      {
+        "tick": 56,
+        "sender_xy": [
+          270,
+          239
+        ],
+        "crop_xy": [
+          508,
+          443
+        ],
+        "dists": 0.40711528062820435
+      },
+      {
+        "tick": 57,
+        "sender_xy": [
+          284,
+          233
+        ],
+        "crop_xy": [
+          536,
+          431
+        ],
+        "dists": 0.2931247353553772
+      },
+      {
+        "tick": 58,
+        "sender_xy": [
+          297,
+          229
+        ],
+        "crop_xy": [
+          562,
+          423
+        ],
+        "dists": 0.29217445850372314
+      },
+      {
+        "tick": 59,
+        "sender_xy": [
+          310,
+          225
+        ],
+        "crop_xy": [
+          588,
+          415
+        ],
+        "dists": 0.2621484398841858
+      },
+      {
+        "tick": 60,
+        "sender_xy": [
+          323,
+          222
+        ],
+        "crop_xy": [
+          614,
+          409
+        ],
+        "dists": 0.29255998134613037
+      },
+      {
+        "tick": 61,
+        "sender_xy": [
+          335,
+          220
+        ],
+        "crop_xy": [
+          638,
+          405
+        ],
+        "dists": 0.31477922201156616
+      },
+      {
+        "tick": 62,
+        "sender_xy": [
+          345,
+          219
+        ],
+        "crop_xy": [
+          658,
+          403
+        ],
+        "dists": 0.3065589666366577
+      },
+      {
+        "tick": 63,
+        "sender_xy": [
+          357,
+          218
+        ],
+        "crop_xy": [
+          682,
+          401
+        ],
+        "dists": 0.3111974596977234
+      },
+      {
+        "tick": 64,
+        "sender_xy": [
+          366,
+          217
+        ],
+        "crop_xy": [
+          700,
+          399
+        ],
+        "dists": 0.3164861798286438
+      },
+      {
+        "tick": 65,
+        "sender_xy": [
+          376,
+          218
+        ],
+        "crop_xy": [
+          720,
+          401
+        ],
+        "dists": 0.3632476329803467
+      },
+      {
+        "tick": 66,
+        "sender_xy": [
+          386,
+          218
+        ],
+        "crop_xy": [
+          740,
+          401
+        ],
+        "dists": 0.3566128611564636
+      },
+      {
+        "tick": 67,
+        "sender_xy": [
+          396,
+          220
+        ],
+        "crop_xy": [
+          760,
+          405
+        ],
+        "dists": 0.32626640796661377
+      },
+      {
+        "tick": 68,
+        "sender_xy": [
+          407,
+          222
+        ],
+        "crop_xy": [
+          782,
+          409
+        ],
+        "dists": 0.3184780478477478
+      },
+      {
+        "tick": 69,
+        "sender_xy": [
+          415,
+          224
+        ],
+        "crop_xy": [
+          798,
+          413
+        ],
+        "dists": 0.31156980991363525
+      },
+      {
+        "tick": 71,
+        "sender_xy": [
+          431,
+          230
+        ],
+        "crop_xy": [
+          830,
+          425
+        ],
+        "dists": 0.3630301356315613
+      },
+      {
+        "tick": 72,
+        "sender_xy": [
+          440,
+          234
+        ],
+        "crop_xy": [
+          848,
+          433
+        ],
+        "dists": 0.3634275197982788
+      },
+      {
+        "tick": 73,
+        "sender_xy": [
+          447,
+          237
+        ],
+        "crop_xy": [
+          862,
+          439
+        ],
+        "dists": 0.3983040452003479
+      },
+      {
+        "tick": 74,
+        "sender_xy": [
+          451,
+          231
+        ],
+        "crop_xy": [
+          870,
+          427
+        ],
+        "dists": 0.3612869381904602
+      },
+      {
+        "tick": 75,
+        "sender_xy": [
+          455,
+          223
+        ],
+        "crop_xy": [
+          878,
+          411
+        ],
+        "dists": 0.38091760873794556
+      },
+      {
+        "tick": 76,
+        "sender_xy": [
+          460,
+          214
+        ],
+        "crop_xy": [
+          888,
+          393
+        ],
+        "dists": 0.3767966032028198
+      },
+      {
+        "tick": 77,
+        "sender_xy": [
+          463,
+          208
+        ],
+        "crop_xy": [
+          894,
+          381
+        ],
+        "dists": 0.37045353651046753
+      },
+      {
+        "tick": 78,
+        "sender_xy": [
+          469,
+          201
+        ],
+        "crop_xy": [
+          906,
+          368
+        ],
+        "dists": 0.37159305810928345
+      },
+      {
+        "tick": 79,
+        "sender_xy": [
+          471,
+          197
+        ],
+        "crop_xy": [
+          910,
+          360
+        ],
+        "dists": 0.35482126474380493
+      },
+      {
+        "tick": 80,
+        "sender_xy": [
+          475,
+          192
+        ],
+        "crop_xy": [
+          918,
+          350
+        ],
+        "dists": 0.33916425704956055
+      },
+      {
+        "tick": 81,
+        "sender_xy": [
+          478,
+          189
+        ],
+        "crop_xy": [
+          924,
+          344
+        ],
+        "dists": 0.33416253328323364
+      },
+      {
+        "tick": 82,
+        "sender_xy": [
+          483,
+          185
+        ],
+        "crop_xy": [
+          934,
+          336
+        ],
+        "dists": 0.3545565605163574
+      },
+      {
+        "tick": 83,
+        "sender_xy": [
+          486,
+          183
+        ],
+        "crop_xy": [
+          940,
+          332
+        ],
+        "dists": 0.35243433713912964
+      },
+      {
+        "tick": 84,
+        "sender_xy": [
+          489,
+          182
+        ],
+        "crop_xy": [
+          946,
+          330
+        ],
+        "dists": 0.36277902126312256
+      },
+      {
+        "tick": 85,
+        "sender_xy": [
+          493,
+          180
+        ],
+        "crop_xy": [
+          954,
+          326
+        ],
+        "dists": 0.3604887127876282
+      },
+      {
+        "tick": 86,
+        "sender_xy": [
+          497,
+          179
+        ],
+        "crop_xy": [
+          962,
+          324
+        ],
+        "dists": 0.34828197956085205
+      },
+      {
+        "tick": 87,
+        "sender_xy": [
+          499,
+          180
+        ],
+        "crop_xy": [
+          966,
+          326
+        ],
+        "dists": 0.34823691844940186
+      },
+      {
+        "tick": 88,
+        "sender_xy": [
+          502,
+          181
+        ],
+        "crop_xy": [
+          972,
+          328
+        ],
+        "dists": 0.3514999747276306
+      },
+      {
+        "tick": 89,
+        "sender_xy": [
+          505,
+          182
+        ],
+        "crop_xy": [
+          978,
+          330
+        ],
+        "dists": 0.35802125930786133
+      },
+      {
+        "tick": 90,
+        "sender_xy": [
+          508,
+          184
+        ],
+        "crop_xy": [
+          984,
+          334
+        ],
+        "dists": 0.3665018081665039
+      },
+      {
+        "tick": 91,
+        "sender_xy": [
+          512,
+          187
+        ],
+        "crop_xy": [
+          992,
+          340
+        ],
+        "dists": 0.38616782426834106
+      },
+      {
+        "tick": 92,
+        "sender_xy": [
+          512,
+          187
+        ],
+        "crop_xy": [
+          992,
+          340
+        ],
+        "dists": 0.3334622383117676
+      },
+      {
+        "tick": 93,
+        "sender_xy": [
+          508,
+          187
+        ],
+        "crop_xy": [
+          984,
+          340
+        ],
+        "dists": 0.3415674567222595
+      },
+      {
+        "tick": 94,
+        "sender_xy": [
+          504,
+          188
+        ],
+        "crop_xy": [
+          976,
+          342
+        ],
+        "dists": 0.33398890495300293
+      },
+      {
+        "tick": 95,
+        "sender_xy": [
+          501,
+          188
+        ],
+        "crop_xy": [
+          970,
+          342
+        ],
+        "dists": 0.33537328243255615
+      },
+      {
+        "tick": 96,
+        "sender_xy": [
+          497,
+          189
+        ],
+        "crop_xy": [
+          962,
+          344
+        ],
+        "dists": 0.3307713270187378
+      },
+      {
+        "tick": 97,
+        "sender_xy": [
+          493,
+          191
+        ],
+        "crop_xy": [
+          954,
+          348
+        ],
+        "dists": 0.34015220403671265
+      },
+      {
+        "tick": 98,
+        "sender_xy": [
+          489,
+          193
+        ],
+        "crop_xy": [
+          946,
+          352
+        ],
+        "dists": 0.31753695011138916
+      },
+      {
+        "tick": 99,
+        "sender_xy": [
+          484,
+          196
+        ],
+        "crop_xy": [
+          936,
+          358
+        ],
+        "dists": 0.32069671154022217
+      },
+      {
+        "tick": 100,
+        "sender_xy": [
+          479,
+          199
+        ],
+        "crop_xy": [
+          926,
+          364
+        ],
+        "dists": 0.32307374477386475
+      },
+      {
+        "tick": 101,
+        "sender_xy": [
+          474,
+          204
+        ],
+        "crop_xy": [
+          916,
+          373
+        ],
+        "dists": 0.35161668062210083
+      },
+      {
+        "tick": 102,
+        "sender_xy": [
+          469,
+          208
+        ],
+        "crop_xy": [
+          906,
+          381
+        ],
+        "dists": 0.34694015979766846
+      },
+      {
+        "tick": 103,
+        "sender_xy": [
+          465,
+          213
+        ],
+        "crop_xy": [
+          898,
+          391
+        ],
+        "dists": 0.35575467348098755
+      },
+      {
+        "tick": 104,
+        "sender_xy": [
+          459,
+          219
+        ],
+        "crop_xy": [
+          886,
+          403
+        ],
+        "dists": 0.3755428194999695
+      },
+      {
+        "tick": 105,
+        "sender_xy": [
+          454,
+          225
+        ],
+        "crop_xy": [
+          876,
+          415
+        ],
+        "dists": 0.3660629987716675
+      },
+      {
+        "tick": 106,
+        "sender_xy": [
+          449,
+          232
+        ],
+        "crop_xy": [
+          866,
+          429
+        ],
+        "dists": 0.3836516737937927
+      },
+      {
+        "tick": 107,
+        "sender_xy": [
+          444,
+          240
+        ],
+        "crop_xy": [
+          856,
+          445
+        ],
+        "dists": 0.4330175518989563
+      },
+      {
+        "tick": 108,
+        "sender_xy": [
+          438,
+          249
+        ],
+        "crop_xy": [
+          844,
+          463
+        ],
+        "dists": 0.42368990182876587
+      },
+      {
+        "tick": 109,
+        "sender_xy": [
+          433,
+          259
+        ],
+        "crop_xy": [
+          834,
+          483
+        ],
+        "dists": 0.3819480538368225
+      },
+      {
+        "tick": 110,
+        "sender_xy": [
+          428,
+          268
+        ],
+        "crop_xy": [
+          824,
+          501
+        ],
+        "dists": 0.3887280225753784
+      },
+      {
+        "tick": 111,
+        "sender_xy": [
+          423,
+          278
+        ],
+        "crop_xy": [
+          814,
+          520
+        ],
+        "dists": 0.3776560425758362
+      },
+      {
+        "tick": 112,
+        "sender_xy": [
+          417,
+          291
+        ],
+        "crop_xy": [
+          802,
+          546
+        ],
+        "dists": 0.41119784116744995
+      },
+      {
+        "tick": 113,
+        "sender_xy": [
+          413,
+          301
+        ],
+        "crop_xy": [
+          794,
+          566
+        ],
+        "dists": 0.40317291021347046
+      },
+      {
+        "tick": 114,
+        "sender_xy": [
+          407,
+          314
+        ],
+        "crop_xy": [
+          782,
+          592
+        ],
+        "dists": 0.3823174238204956
+      },
+      {
+        "tick": 115,
+        "sender_xy": [
+          401,
+          330
+        ],
+        "crop_xy": [
+          770,
+          624
+        ],
+        "dists": 0.3278846740722656
+      },
+      {
+        "tick": 116,
+        "sender_xy": [
+          395,
+          345
+        ],
+        "crop_xy": [
+          758,
+          653
+        ],
+        "dists": 0.3658268451690674
+      },
+      {
+        "tick": 117,
+        "sender_xy": [
+          390,
+          358
+        ],
+        "crop_xy": [
+          748,
+          679
+        ],
+        "dists": 0.3777714967727661
+      },
+      {
+        "tick": 118,
+        "sender_xy": [
+          384,
+          376
+        ],
+        "crop_xy": [
+          736,
+          715
+        ],
+        "dists": 0.3457721471786499
+      },
+      {
+        "tick": 119,
+        "sender_xy": [
+          378,
+          393
+        ],
+        "crop_xy": [
+          724,
+          749
+        ],
+        "dists": 0.3613048195838928
+      },
+      {
+        "tick": 120,
+        "sender_xy": [
+          373,
+          398
+        ],
+        "crop_xy": [
+          714,
+          759
+        ],
+        "dists": 0.35293710231781006
+      },
+      {
+        "tick": 121,
+        "sender_xy": [
+          368,
+          396
+        ],
+        "crop_xy": [
+          704,
+          755
+        ],
+        "dists": 0.4640313982963562
+      },
+      {
+        "tick": 122,
+        "sender_xy": [
+          362,
+          394
+        ],
+        "crop_xy": [
+          692,
+          751
+        ],
+        "dists": 0.46627211570739746
+      },
+      {
+        "tick": 123,
+        "sender_xy": [
+          358,
+          394
+        ],
+        "crop_xy": [
+          684,
+          751
+        ],
+        "dists": 0.46997785568237305
+      },
+      {
+        "tick": 124,
+        "sender_xy": [
+          352,
+          395
+        ],
+        "crop_xy": [
+          672,
+          753
+        ],
+        "dists": 0.4296621084213257
+      },
+      {
+        "tick": 125,
+        "sender_xy": [
+          348,
+          396
+        ],
+        "crop_xy": [
+          664,
+          755
+        ],
+        "dists": 0.3952123522758484
+      },
+      {
+        "tick": 126,
+        "sender_xy": [
+          341,
+          399
+        ],
+        "crop_xy": [
+          650,
+          761
+        ],
+        "dists": 0.38829928636550903
+      },
+      {
+        "tick": 127,
+        "sender_xy": [
+          336,
+          402
+        ],
+        "crop_xy": [
+          640,
+          767
+        ],
+        "dists": 0.4083820581436157
+      },
+      {
+        "tick": 128,
+        "sender_xy": [
+          330,
+          406
+        ],
+        "crop_xy": [
+          628,
+          775
+        ],
+        "dists": 0.33150190114974976
+      },
+      {
+        "tick": 129,
+        "sender_xy": [
+          324,
+          412
+        ],
+        "crop_xy": [
+          616,
+          786
+        ],
+        "dists": 0.2926119565963745
+      },
+      {
+        "tick": 130,
+        "sender_xy": [
+          331,
+          403
+        ],
+        "crop_xy": [
+          630,
+          769
+        ],
+        "dists": 0.3758854866027832
+      },
+      {
+        "tick": 131,
+        "sender_xy": [
+          351,
+          381
+        ],
+        "crop_xy": [
+          670,
+          725
+        ],
+        "dists": 0.43161541223526
+      },
+      {
+        "tick": 132,
+        "sender_xy": [
+          376,
+          352
+        ],
+        "crop_xy": [
+          720,
+          667
+        ],
+        "dists": 0.3591104745864868
+      },
+      {
+        "tick": 133,
+        "sender_xy": [
+          395,
+          332
+        ],
+        "crop_xy": [
+          758,
+          628
+        ],
+        "dists": 0.3158664107322693
+      },
+      {
+        "tick": 134,
+        "sender_xy": [
+          414,
+          313
+        ],
+        "crop_xy": [
+          796,
+          590
+        ],
+        "dists": 0.4062802195549011
+      },
+      {
+        "tick": 135,
+        "sender_xy": [
+          432,
+          297
+        ],
+        "crop_xy": [
+          832,
+          558
+        ],
+        "dists": 0.3906831741333008
+      },
+      {
+        "tick": 136,
+        "sender_xy": [
+          448,
+          283
+        ],
+        "crop_xy": [
+          864,
+          530
+        ],
+        "dists": 0.3776141405105591
+      },
+      {
+        "tick": 137,
+        "sender_xy": [
+          464,
+          270
+        ],
+        "crop_xy": [
+          896,
+          505
+        ],
+        "dists": 0.3795648217201233
+      },
+      {
+        "tick": 138,
+        "sender_xy": [
+          479,
+          259
+        ],
+        "crop_xy": [
+          926,
+          483
+        ],
+        "dists": 0.38669610023498535
+      },
+      {
+        "tick": 139,
+        "sender_xy": [
+          494,
+          250
+        ],
+        "crop_xy": [
+          956,
+          465
+        ],
+        "dists": 0.44391298294067383
+      },
+      {
+        "tick": 140,
+        "sender_xy": [
+          507,
+          242
+        ],
+        "crop_xy": [
+          982,
+          449
+        ],
+        "dists": 0.47914087772369385
+      },
+      {
+        "tick": 141,
+        "sender_xy": [
+          521,
+          235
+        ],
+        "crop_xy": [
+          1010,
+          435
+        ],
+        "dists": 0.42438971996307373
+      },
+      {
+        "tick": 142,
+        "sender_xy": [
+          535,
+          228
+        ],
+        "crop_xy": [
+          1038,
+          421
+        ],
+        "dists": 0.43774813413619995
+      },
+      {
+        "tick": 143,
+        "sender_xy": [
+          545,
+          226
+        ],
+        "crop_xy": [
+          1058,
+          417
+        ],
+        "dists": 0.4618872404098511
+      },
+      {
+        "tick": 144,
+        "sender_xy": [
+          558,
+          222
+        ],
+        "crop_xy": [
+          1084,
+          409
+        ],
+        "dists": 0.5010233521461487
+      },
+      {
+        "tick": 145,
+        "sender_xy": [
+          567,
+          220
+        ],
+        "crop_xy": [
+          1102,
+          405
+        ],
+        "dists": 0.494106650352478
+      },
+      {
+        "tick": 146,
+        "sender_xy": [
+          578,
+          218
+        ],
+        "crop_xy": [
+          1124,
+          401
+        ],
+        "dists": 0.4836440682411194
+      },
+      {
+        "tick": 147,
+        "sender_xy": [
+          590,
+          218
+        ],
+        "crop_xy": [
+          1148,
+          401
+        ],
+        "dists": 0.387811541557312
+      },
+      {
+        "tick": 148,
+        "sender_xy": [
+          598,
+          218
+        ],
+        "crop_xy": [
+          1164,
+          401
+        ],
+        "dists": 0.39477938413619995
+      },
+      {
+        "tick": 149,
+        "sender_xy": [
+          608,
+          219
+        ],
+        "crop_xy": [
+          1184,
+          403
+        ],
+        "dists": 0.38393741846084595
+      },
+      {
+        "tick": 150,
+        "sender_xy": [
+          616,
+          221
+        ],
+        "crop_xy": [
+          1200,
+          407
+        ],
+        "dists": 0.3826673626899719
+      },
+      {
+        "tick": 151,
+        "sender_xy": [
+          624,
+          223
+        ],
+        "crop_xy": [
+          1216,
+          411
+        ],
+        "dists": 0.3914206624031067
+      },
+      {
+        "tick": 152,
+        "sender_xy": [
+          634,
+          227
+        ],
+        "crop_xy": [
+          1236,
+          419
+        ],
+        "dists": 0.36534756422042847
+      },
+      {
+        "tick": 153,
+        "sender_xy": [
+          641,
+          231
+        ],
+        "crop_xy": [
+          1250,
+          427
+        ],
+        "dists": 0.3691614270210266
+      },
+      {
+        "tick": 154,
+        "sender_xy": [
+          648,
+          235
+        ],
+        "crop_xy": [
+          1264,
+          435
+        ],
+        "dists": 0.35782575607299805
+      },
+      {
+        "tick": 155,
+        "sender_xy": [
+          653,
+          232
+        ],
+        "crop_xy": [
+          1274,
+          429
+        ],
+        "dists": 0.38212108612060547
+      },
+      {
+        "tick": 156,
+        "sender_xy": [
+          654,
+          227
+        ],
+        "crop_xy": [
+          1276,
+          419
+        ],
+        "dists": 0.409729540348053
+      },
+      {
+        "tick": 157,
+        "sender_xy": [
+          654,
+          223
+        ],
+        "crop_xy": [
+          1276,
+          411
+        ],
+        "dists": 0.4030051827430725
+      },
+      {
+        "tick": 158,
+        "sender_xy": [
+          654,
+          222
+        ],
+        "crop_xy": [
+          1276,
+          409
+        ],
+        "dists": 0.3990652561187744
+      },
+      {
+        "tick": 159,
+        "sender_xy": [
+          654,
+          221
+        ],
+        "crop_xy": [
+          1276,
+          407
+        ],
+        "dists": 0.37461400032043457
+      },
+      {
+        "tick": 160,
+        "sender_xy": [
+          654,
+          221
+        ],
+        "crop_xy": [
+          1276,
+          407
+        ],
+        "dists": 0.3882962465286255
+      },
+      {
+        "tick": 161,
+        "sender_xy": [
+          654,
+          221
+        ],
+        "crop_xy": [
+          1276,
+          407
+        ],
+        "dists": 0.3866351842880249
+      },
+      {
+        "tick": 162,
+        "sender_xy": [
+          654,
+          221
+        ],
+        "crop_xy": [
+          1276,
+          407
+        ],
+        "dists": 0.3816092014312744
+      },
+      {
+        "tick": 163,
+        "sender_xy": [
+          653,
+          223
+        ],
+        "crop_xy": [
+          1274,
+          411
+        ],
+        "dists": 0.4346405863761902
+      },
+      {
+        "tick": 164,
+        "sender_xy": [
+          653,
+          225
+        ],
+        "crop_xy": [
+          1274,
+          415
+        ],
+        "dists": 0.44948697090148926
+      },
+      {
+        "tick": 165,
+        "sender_xy": [
+          653,
+          227
+        ],
+        "crop_xy": [
+          1274,
+          419
+        ],
+        "dists": 0.4797598123550415
+      },
+      {
+        "tick": 166,
+        "sender_xy": [
+          653,
+          228
+        ],
+        "crop_xy": [
+          1274,
+          421
+        ],
+        "dists": 0.4869511127471924
+      },
+      {
+        "tick": 167,
+        "sender_xy": [
+          652,
+          230
+        ],
+        "crop_xy": [
+          1272,
+          425
+        ],
+        "dists": 0.49531883001327515
+      },
+      {
+        "tick": 168,
+        "sender_xy": [
+          653,
+          233
+        ],
+        "crop_xy": [
+          1274,
+          431
+        ],
+        "dists": 0.511766791343689
+      },
+      {
+        "tick": 170,
+        "sender_xy": [
+          652,
+          240
+        ],
+        "crop_xy": [
+          1272,
+          445
+        ],
+        "dists": 0.48054999113082886
+      },
+      {
+        "tick": 171,
+        "sender_xy": [
+          651,
+          245
+        ],
+        "crop_xy": [
+          1270,
+          455
+        ],
+        "dists": 0.49773794412612915
+      },
+      {
+        "tick": 172,
+        "sender_xy": [
+          651,
+          249
+        ],
+        "crop_xy": [
+          1270,
+          463
+        ],
+        "dists": 0.5265367031097412
+      },
+      {
+        "tick": 173,
+        "sender_xy": [
+          651,
+          255
+        ],
+        "crop_xy": [
+          1270,
+          475
+        ],
+        "dists": 0.41214799880981445
+      },
+      {
+        "tick": 174,
+        "sender_xy": [
+          650,
+          261
+        ],
+        "crop_xy": [
+          1268,
+          487
+        ],
+        "dists": 0.3855774998664856
+      },
+      {
+        "tick": 175,
+        "sender_xy": [
+          650,
+          268
+        ],
+        "crop_xy": [
+          1268,
+          501
+        ],
+        "dists": 0.40127110481262207
+      },
+      {
+        "tick": 176,
+        "sender_xy": [
+          649,
+          276
+        ],
+        "crop_xy": [
+          1266,
+          516
+        ],
+        "dists": 0.3655012845993042
+      },
+      {
+        "tick": 177,
+        "sender_xy": [
+          649,
+          284
+        ],
+        "crop_xy": [
+          1266,
+          532
+        ],
+        "dists": 0.313928484916687
+      },
+      {
+        "tick": 178,
+        "sender_xy": [
+          648,
+          294
+        ],
+        "crop_xy": [
+          1264,
+          552
+        ],
+        "dists": 0.3531670570373535
+      },
+      {
+        "tick": 179,
+        "sender_xy": [
+          648,
+          302
+        ],
+        "crop_xy": [
+          1264,
+          568
+        ],
+        "dists": 0.3695414662361145
+      },
+      {
+        "tick": 180,
+        "sender_xy": [
+          647,
+          314
+        ],
+        "crop_xy": [
+          1262,
+          592
+        ],
+        "dists": 0.40363335609436035
+      },
+      {
+        "tick": 181,
+        "sender_xy": [
+          648,
+          314
+        ],
+        "crop_xy": [
+          1264,
+          592
+        ],
+        "dists": 0.38822752237319946
+      },
+      {
+        "tick": 182,
+        "sender_xy": [
+          648,
+          310
+        ],
+        "crop_xy": [
+          1264,
+          584
+        ],
+        "dists": 0.3738529086112976
+      },
+      {
+        "tick": 183,
+        "sender_xy": [
+          649,
+          306
+        ],
+        "crop_xy": [
+          1266,
+          576
+        ],
+        "dists": 0.3702694773674011
+      },
+      {
+        "tick": 184,
+        "sender_xy": [
+          650,
+          303
+        ],
+        "crop_xy": [
+          1268,
+          570
+        ],
+        "dists": 0.37800365686416626
+      },
+      {
+        "tick": 185,
+        "sender_xy": [
+          651,
+          300
+        ],
+        "crop_xy": [
+          1270,
+          564
+        ],
+        "dists": 0.36776459217071533
+      },
+      {
+        "tick": 186,
+        "sender_xy": [
+          651,
+          299
+        ],
+        "crop_xy": [
+          1270,
+          562
+        ],
+        "dists": 0.37839412689208984
+      },
+      {
+        "tick": 187,
+        "sender_xy": [
+          652,
+          298
+        ],
+        "crop_xy": [
+          1272,
+          560
+        ],
+        "dists": 0.3752564787864685
+      },
+      {
+        "tick": 188,
+        "sender_xy": [
+          652,
+          298
+        ],
+        "crop_xy": [
+          1272,
+          560
+        ],
+        "dists": 0.3662525415420532
+      },
+      {
+        "tick": 189,
+        "sender_xy": [
+          653,
+          299
+        ],
+        "crop_xy": [
+          1274,
+          562
+        ],
+        "dists": 0.3798806667327881
+      },
+      {
+        "tick": 190,
+        "sender_xy": [
+          654,
+          300
+        ],
+        "crop_xy": [
+          1276,
+          564
+        ],
+        "dists": 0.4114219546318054
+      },
+      {
+        "tick": 191,
+        "sender_xy": [
+          653,
+          301
+        ],
+        "crop_xy": [
+          1274,
+          566
+        ],
+        "dists": 0.40320414304733276
+      },
+      {
+        "tick": 192,
+        "sender_xy": [
+          638,
+          286
+        ],
+        "crop_xy": [
+          1244,
+          536
+        ],
+        "dists": 0.4290972948074341
+      },
+      {
+        "tick": 193,
+        "sender_xy": [
+          641,
+          298
+        ],
+        "crop_xy": [
+          1250,
+          560
+        ],
+        "dists": 0.4832504391670227
+      },
+      {
+        "tick": 194,
+        "sender_xy": [
+          612,
+          262
+        ],
+        "crop_xy": [
+          1192,
+          489
+        ],
+        "dists": 0.37879490852355957
+      },
+      {
+        "tick": 195,
+        "sender_xy": [
+          599,
+          252
+        ],
+        "crop_xy": [
+          1166,
+          469
+        ],
+        "dists": 0.4308117628097534
+      },
+      {
+        "tick": 196,
+        "sender_xy": [
+          587,
+          243
+        ],
+        "crop_xy": [
+          1142,
+          451
+        ],
+        "dists": 0.4424983263015747
+      },
+      {
+        "tick": 197,
+        "sender_xy": [
+          577,
+          236
+        ],
+        "crop_xy": [
+          1122,
+          437
+        ],
+        "dists": 0.4859778881072998
+      },
+      {
+        "tick": 198,
+        "sender_xy": [
+          563,
+          227
+        ],
+        "crop_xy": [
+          1094,
+          419
+        ],
+        "dists": 0.45467114448547363
+      },
+      {
+        "tick": 199,
+        "sender_xy": [
+          552,
+          221
+        ],
+        "crop_xy": [
+          1072,
+          407
+        ],
+        "dists": 0.3906427025794983
+      },
+      {
+        "tick": 200,
+        "sender_xy": [
+          541,
+          215
+        ],
+        "crop_xy": [
+          1050,
+          395
+        ],
+        "dists": 0.3473612070083618
+      },
+      {
+        "tick": 201,
+        "sender_xy": [
+          530,
+          211
+        ],
+        "crop_xy": [
+          1028,
+          387
+        ],
+        "dists": 0.31050819158554077
+      },
+      {
+        "tick": 202,
+        "sender_xy": [
+          519,
+          207
+        ],
+        "crop_xy": [
+          1006,
+          379
+        ],
+        "dists": 0.30063962936401367
+      },
+      {
+        "tick": 203,
+        "sender_xy": [
+          513,
+          206
+        ],
+        "crop_xy": [
+          994,
+          377
+        ],
+        "dists": 0.31331515312194824
+      },
+      {
+        "tick": 204,
+        "sender_xy": [
+          500,
+          203
+        ],
+        "crop_xy": [
+          968,
+          372
+        ],
+        "dists": 0.29862654209136963
+      },
+      {
+        "tick": 205,
+        "sender_xy": [
+          491,
+          202
+        ],
+        "crop_xy": [
+          950,
+          370
+        ],
+        "dists": 0.32725197076797485
+      },
+      {
+        "tick": 206,
+        "sender_xy": [
+          485,
+          204
+        ],
+        "crop_xy": [
+          938,
+          373
+        ],
+        "dists": 0.3275812268257141
+      },
+      {
+        "tick": 207,
+        "sender_xy": [
+          481,
+          208
+        ],
+        "crop_xy": [
+          930,
+          381
+        ],
+        "dists": 0.37803781032562256
+      },
+      {
+        "tick": 208,
+        "sender_xy": [
+          475,
+          213
+        ],
+        "crop_xy": [
+          918,
+          391
+        ],
+        "dists": 0.3715662956237793
+      },
+      {
+        "tick": 209,
+        "sender_xy": [
+          470,
+          218
+        ],
+        "crop_xy": [
+          908,
+          401
+        ],
+        "dists": 0.35100603103637695
+      },
+      {
+        "tick": 210,
+        "sender_xy": [
+          465,
+          225
+        ],
+        "crop_xy": [
+          898,
+          415
+        ],
+        "dists": 0.3604801893234253
+      },
+      {
+        "tick": 211,
+        "sender_xy": [
+          459,
+          232
+        ],
+        "crop_xy": [
+          886,
+          429
+        ],
+        "dists": 0.37891876697540283
+      },
+      {
+        "tick": 212,
+        "sender_xy": [
+          454,
+          240
+        ],
+        "crop_xy": [
+          876,
+          445
+        ],
+        "dists": 0.4207506775856018
+      },
+      {
+        "tick": 213,
+        "sender_xy": [
+          449,
+          248
+        ],
+        "crop_xy": [
+          866,
+          461
+        ],
+        "dists": 0.46152639389038086
+      },
+      {
+        "tick": 214,
+        "sender_xy": [
+          443,
+          258
+        ],
+        "crop_xy": [
+          854,
+          481
+        ],
+        "dists": 0.40278446674346924
+      },
+      {
+        "tick": 215,
+        "sender_xy": [
+          437,
+          269
+        ],
+        "crop_xy": [
+          842,
+          503
+        ],
+        "dists": 0.37697356939315796
+      },
+      {
+        "tick": 216,
+        "sender_xy": [
+          432,
+          279
+        ],
+        "crop_xy": [
+          832,
+          522
+        ],
+        "dists": 0.3745226263999939
+      },
+      {
+        "tick": 217,
+        "sender_xy": [
+          425,
+          294
+        ],
+        "crop_xy": [
+          818,
+          552
+        ],
+        "dists": 0.3823201656341553
+      },
+      {
+        "tick": 218,
+        "sender_xy": [
+          419,
+          306
+        ],
+        "crop_xy": [
+          806,
+          576
+        ],
+        "dists": 0.40262073278427124
+      },
+      {
+        "tick": 219,
+        "sender_xy": [
+          414,
+          318
+        ],
+        "crop_xy": [
+          796,
+          600
+        ],
+        "dists": 0.40131503343582153
+      },
+      {
+        "tick": 220,
+        "sender_xy": [
+          408,
+          333
+        ],
+        "crop_xy": [
+          784,
+          630
+        ],
+        "dists": 0.32004326581954956
+      },
+      {
+        "tick": 221,
+        "sender_xy": [
+          401,
+          350
+        ],
+        "crop_xy": [
+          770,
+          663
+        ],
+        "dists": 0.3331758379936218
+      },
+      {
+        "tick": 222,
+        "sender_xy": [
+          397,
+          356
+        ],
+        "crop_xy": [
+          762,
+          675
+        ],
+        "dists": 0.3722996711730957
+      },
+      {
+        "tick": 223,
+        "sender_xy": [
+          394,
+          354
+        ],
+        "crop_xy": [
+          756,
+          671
+        ],
+        "dists": 0.35181236267089844
+      },
+      {
+        "tick": 224,
+        "sender_xy": [
+          390,
+          353
+        ],
+        "crop_xy": [
+          748,
+          669
+        ],
+        "dists": 0.34917140007019043
+      },
+      {
+        "tick": 225,
+        "sender_xy": [
+          386,
+          353
+        ],
+        "crop_xy": [
+          740,
+          669
+        ],
+        "dists": 0.348006010055542
+      },
+      {
+        "tick": 226,
+        "sender_xy": [
+          383,
+          354
+        ],
+        "crop_xy": [
+          734,
+          671
+        ],
+        "dists": 0.36154037714004517
+      },
+      {
+        "tick": 227,
+        "sender_xy": [
+          380,
+          356
+        ],
+        "crop_xy": [
+          728,
+          675
+        ],
+        "dists": 0.38107848167419434
+      },
+      {
+        "tick": 228,
+        "sender_xy": [
+          376,
+          358
+        ],
+        "crop_xy": [
+          720,
+          679
+        ],
+        "dists": 0.3863767385482788
+      },
+      {
+        "tick": 229,
+        "sender_xy": [
+          372,
+          362
+        ],
+        "crop_xy": [
+          712,
+          687
+        ],
+        "dists": 0.44296014308929443
+      },
+      {
+        "tick": 230,
+        "sender_xy": [
+          369,
+          366
+        ],
+        "crop_xy": [
+          706,
+          695
+        ],
+        "dists": 0.43074291944503784
+      },
+      {
+        "tick": 231,
+        "sender_xy": [
+          365,
+          372
+        ],
+        "crop_xy": [
+          698,
+          707
+        ],
+        "dists": 0.4225271940231323
+      },
+      {
+        "tick": 232,
+        "sender_xy": [
+          361,
+          378
+        ],
+        "crop_xy": [
+          690,
+          719
+        ],
+        "dists": 0.39711618423461914
+      },
+      {
+        "tick": 233,
+        "sender_xy": [
+          357,
+          385
+        ],
+        "crop_xy": [
+          682,
+          733
+        ],
+        "dists": 0.4194070100784302
+      },
+      {
+        "tick": 234,
+        "sender_xy": [
+          353,
+          395
+        ],
+        "crop_xy": [
+          674,
+          753
+        ],
+        "dists": 0.4182220697402954
+      },
+      {
+        "tick": 235,
+        "sender_xy": [
+          349,
+          404
+        ],
+        "crop_xy": [
+          666,
+          771
+        ],
+        "dists": 0.3976404666900635
+      },
+      {
+        "tick": 236,
+        "sender_xy": [
+          345,
+          414
+        ],
+        "crop_xy": [
+          658,
+          790
+        ],
+        "dists": 0.341885507106781
+      },
+      {
+        "tick": 237,
+        "sender_xy": [
+          341,
+          426
+        ],
+        "crop_xy": [
+          650,
+          814
+        ],
+        "dists": 0.2976177930831909
+      },
+      {
+        "tick": 238,
+        "sender_xy": [
+          337,
+          438
+        ],
+        "crop_xy": [
+          642,
+          838
+        ],
+        "dists": 0.3144034743309021
+      },
+      {
+        "tick": 239,
+        "sender_xy": [
+          333,
+          452
+        ],
+        "crop_xy": [
+          634,
+          866
+        ],
+        "dists": 0.36054736375808716
+      }
+    ],
+    "dists": 0.37468978952854237
+  },
+  "metric_producer_job": "20261122T141140Z-333f49e8",
+  "campus_worker_seconds": 286.54074850399047,
+  "canonical_pixels_sha256": "ffc013eacc5dde790a9f6dcccda34f1848aa142f402c0a8b2103948e79cb0742",
+  "supports_tar_sha256": "52715bd5a1f36d553566fafbb49175255fd4a1d36a89587bba0920b44e4724e6"
+}

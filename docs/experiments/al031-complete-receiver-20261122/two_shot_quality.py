@@ -51,7 +51,7 @@ def return_ordinary(folders):
     return list(output.values())
 
 
-def run(extended=False, include_frontier=False, retained=False):
+def run(extended=False, include_frontier=False, retained=False, continuous=False):
     prices = read(ROOT / "two-shot-price.json")
     first = read(FIRST / "player-joint.json")
     assert (
@@ -138,6 +138,33 @@ def run(extended=False, include_frontier=False, retained=False):
                 mean_pointstream_dists=value,
                 percent_lower_than_best_ordinary=100 * (1 - value / best["mean_dists"]),
             )
+        if continuous:
+            stream = read(ROOT / "two-window-continuous-result.json")["points"][name]
+            assert stream["bytes"] <= allowance and len(stream["rows"]) == 48
+            assert abs(stream["dists"] - mean(stream["per_shot"])) < 1e-8
+            case["one_stream_ordinary"] = {
+                "bytes": stream["bytes"],
+                "kbps": stream["kbps"],
+                "dists": stream["dists"],
+                "per_shot": stream["per_shot"],
+                "frame_at_return": stream["at_return"],
+                "stream_sha256": stream["stream_sha256"],
+            }
+            winner = min(
+                [
+                    dict(
+                        coding="independent", kbps=best["two_shot_kbps"], dists=best["mean_dists"]
+                    ),
+                    dict(coding="one_stream", kbps=stream["kbps"], dists=stream["dists"]),
+                ],
+                key=lambda item: (item["dists"], item["kbps"]),
+            )
+            case["best_ordinary_any"] = winner
+            case["break_even_return_dists"] = 2 * winner["dists"] - initial
+            if "mean_pointstream_dists" in case:
+                case["percent_lower_than_best_including_one_stream"] = 100 * (
+                    1 - case["mean_pointstream_dists"] / winner["dists"]
+                )
         result["cases"][name] = case
     return result
 
@@ -148,11 +175,12 @@ if __name__ == "__main__":
     p.add_argument("--extended", action="store_true")
     p.add_argument("--frontier", action="store_true")
     p.add_argument("--retained", action="store_true")
+    p.add_argument("--continuous", action="store_true")
     p.add_argument("--out", required=True, type=Path)
     a = p.parse_args()
     data = (
         return_ordinary(a.ordinary_folders)
         if a.ordinary_folders
-        else run(a.extended, a.frontier, a.retained)
+        else run(a.extended, a.frontier, a.retained, a.continuous)
     )
     a.out.write_text(json.dumps(data, indent=2) + "\n")
