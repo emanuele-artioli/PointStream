@@ -81,6 +81,17 @@ def run(a):
                 ]
                 assert options
                 best = min(options, key=lambda q: q["mean_dists"])
+                if (
+                    state == "cold"
+                    and family == "dcvc"
+                    and max(item["arm"]["kbps"] for item in options) < 0.98 * cap
+                ):
+                    pair[family] = dict(
+                        compared=False,
+                        reason="Measured neural packets do not cover the cold-start bitrate.",
+                        maximum_measured_kbps=max(item["arm"]["kbps"] for item in options),
+                    )
+                    continue
                 pairs = dict(
                     mean_dists=best["mean_dists"],
                     player_control=best["arm"]["name"],

@@ -17,8 +17,7 @@ def compact(r):
     return {k: r[k] for k in ["arm", "mean_dists", "active_dists", "fallback_dists", "rgb_psnr"]}
 
 
-def core(c):
-    joint = [compact(load(f"{c}-joint-q{q}.json")) for q in [70, 60, 50]]
+def controls(c):
     if c == "000":
         anchors = load("000-control-scores.json")
     else:
@@ -31,6 +30,12 @@ def core(c):
         path = ROOT / f"{c}-dcvc-q{q}.json"
         if path.exists():
             anchors[f"neural_q{q}"] = [compact(json.loads(path.read_text()))]
+    return anchors
+
+
+def core(c):
+    joint = [compact(load(f"{c}-joint-q{q}.json")) for q in [70, 60, 50]]
+    anchors = controls(c)
     primary = joint[1]
     cap = primary["arm"]["bytes"]
     best = {}
