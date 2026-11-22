@@ -43,11 +43,14 @@ def select_arm(a, binding, bank):
             member="publish/" + filename,
             sha256=row["native_sha256"],
         )
-    if a.arm == "dcvc-480-q24":
+    if a.arm.startswith("dcvc-480-q"):
+        qp = int(a.arm.removeprefix("dcvc-480-q"))
+        assert 0 <= qp <= 63
         with tarfile.open(a.data) as z:
             n = json.load(z.extractfile("publish/result.json"))
             report = json.load(z.extractfile("publish/reports.json"))
-        card = json.loads((bank / (a.event + "-neural.json")).read_text())
+        suffix = "-neural.json" if qp == 24 else f"-neural-q{qp}.json"
+        card = json.loads((bank / (a.event + suffix)).read_text())
         assert (
             n["source_sha256"] == card["source_sha256"] == binding["source_sha256"]
             and n["frames"] == 240
@@ -56,7 +59,7 @@ def select_arm(a, binding, bank):
         rec = n["native"]
         assert (
             rec["accepted"]
-            and rec["qp"] == 24
+            and rec["qp"] == qp
             and rec["size"] == [480, 272]
             and rec["container_sha256"] == card["native"]["container_sha256"]
         )

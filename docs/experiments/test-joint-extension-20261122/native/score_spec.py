@@ -74,6 +74,15 @@ def write(a):
     selected["dcvc-480-q24"] = dict(
         producer=nnid, sha256=nn["neural_archive_sha256"], file="published.tar"
     )
+    nn36 = BANK / (e + "-neuroscore-q36.json")
+    if nn36.exists():
+        additional = json.loads(nn36.read_text())
+        assert additional["source_sha256"] == b["source_sha256"]
+        selected["dcvc-480-q36"] = dict(
+            producer=registry(e, "neural-q36"),
+            sha256=additional["neural_archive_sha256"],
+            file="published.tar",
+        )
     save(
         HERE / (e + "-price-controls.json"),
         dict(source=b["source_sha256"], prices=priced, selected=selected),
