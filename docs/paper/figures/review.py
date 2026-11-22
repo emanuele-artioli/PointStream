@@ -194,6 +194,11 @@ PANELS = [
         "Artificial masks over known court pixels permit scoring aligned temporal donors and spatial inpainting. Inpainting supplies pixels where donors do not observe the court.",
     ),
     (
+        "equipment/racket-crop-oracle.pdf",
+        "Appendix · Can a source racket crop restore detection?",
+        "Across the full 64-frame clip, 70 source-detected rectangles were copied without distortion onto the compressed display. Three of six official boxes met IoU 0.5. The predeclared threshold was four. This diagnostic has no packet rate or grip measurement.",
+    ),
+    (
         "equipment/racket-detection.pdf",
         "Appendix · Racket localization",
         "A fixed detector found 14 of 16 officially annotated rackets on the source, and zero on ordinary AV1, ROI AV1 and AV1 with ball tiles. The three windows have different achieved rates. The task measures localization, and the ball tiles carry no dedicated racket appearance.",
@@ -331,14 +336,11 @@ def build(
             "algorithms.pdf",
             "pooled-curve.pdf",
             "players-rate-quality.pdf",
-            "body-motion.pdf",
             "ball-rate-quality.pdf",
             "ball-starved-640-controls.pdf",
-            "ball-three-match-rates.pdf",
             "dense-two-judges.pdf",
             "starved-masks.pdf",
             "joint-localization.pdf",
-            "adelaide-prospective-machine.pdf",
             "joint-price.pdf",
             "passage-bill.pdf",
         }
