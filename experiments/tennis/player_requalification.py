@@ -216,6 +216,7 @@ def motion_policy(config: dict[str, Any]) -> dict[str, Any]:
     policies = {
         "original-1500-v1": {"smoke": 450, "full": 1500, "job": 2100, "validator": 60},
         "extended-1800-v1": {"smoke": 450, "full": 1800, "job": 2400, "validator": 60},
+        "extended-2500-v1": {"smoke": 600, "full": 2500, "job": 3200, "validator": 60},
     }
     if not isinstance(name, str) or name not in policies:
         raise ValueError("unknown motion admission policy")
@@ -440,7 +441,8 @@ def smoke_cost_gate(config: dict[str, Any], receipt: dict[str, Any], timing: dic
     if available <= 0:
         raise ValueError("campaign clock expired or lacks validator reserve")
     forecast = 1.25 * (load + max(0, wall - load) * (240 / 44)) + 90
-    if not math.isfinite(forecast) or forecast > policy["full"] or forecast > available:
+    shutdown_reserve = 60 if config.get("motion_admission_policy") == "extended-2500-v1" else 0
+    if not math.isfinite(forecast) or forecast + shutdown_reserve > policy["full"] or forecast + shutdown_reserve > available:
         raise ValueError("full-stage forecast exceeds cap or remaining campaign time")
     return {"forecast_seconds": forecast, "campaign_remaining_seconds": remaining,
             "available_after_validator_reserve_seconds": available, "full_stage_cap_seconds": policy["full"],
