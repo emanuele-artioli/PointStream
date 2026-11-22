@@ -71,6 +71,9 @@ def make(a):
         "--frames",
         "{frames}",
     ]
+    if a.kind == "warm-neural":
+        assert a.qp in (29, 31)
+        options += ["--qp", str(a.qp)]
     if a.kind == "rung":
         assert a.receipt_sha and len(a.receipt_sha) == 64
         inputs.append(
@@ -112,10 +115,11 @@ def make(a):
         scale=dict(frames=dict(smoke=24, full=240)),
     )
     # Validators bind the actual producer program and scale by reading the fleet dispatch receipt.
+    suffix = str(a.qp) if a.kind == "warm-neural" else str(a.crf)
     p = HERE / (
         "match102-campus-score-"
         + a.kind
-        + ("-" + str(a.crf) if a.kind != "calibration" else "-dispatch")
+        + ("-" + suffix if a.kind != "calibration" else "-dispatch")
         + ".json"
     )
     p.write_text(json.dumps(spec, indent=2) + "\n")
@@ -124,7 +128,12 @@ def make(a):
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--kind", choices=("calibration", "cold-neural", "full", "rung"), required=True)
+    p.add_argument(
+        "--kind",
+        choices=("calibration", "warm-neural", "cold-neural", "full", "rung"),
+        required=True,
+    )
+    p.add_argument("--qp", type=int, choices=(29, 31))
     p.add_argument("--crf", type=int, default=50)
     p.add_argument("--producer", required=True)
     p.add_argument("--sha", required=True)

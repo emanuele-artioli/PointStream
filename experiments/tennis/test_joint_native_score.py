@@ -44,12 +44,16 @@ def record(args):
     start = time.monotonic()
     pub = work / "publish"
     pub.mkdir()
-    if args.kind in ("calibration", "cold-neural"):
+    if args.kind in ("calibration", "warm-neural", "cold-neural"):
         with tarfile.open(args.data) as z:
             original = json.load(z.extractfile("publish/result.json"))
             reports = json.load(z.extractfile("publish/reports.json"))
         native = original["native"]
-        expected_q, size = (34, [480, 272]) if args.kind == "calibration" else (42, [960, 544])
+        if args.kind == "cold-neural":
+            expected_q, size = 42, [960, 544]
+        else:
+            expected_q, size = (args.qp if args.kind == "warm-neural" else 34), [480, 272]
+            assert expected_q in (29, 31, 34)
         assert native["qp"] == expected_q and native["accepted"] and native["size"] == size
         assert original["source_sha256"] == grid["source_sha256"] and original["frames"] == 240
         passes = [p for group in reports["decode"].values() for p in group["passes"]]
@@ -171,7 +175,7 @@ def validate(args, output_file=None):
             )
         else:
             assert len(files) == 1 and (
-                args.kind == "cold-neural"
+                args.kind in ("warm-neural", "cold-neural")
                 or args.frames < 240
                 or abs(scores - result["cross_machine_calibration"]) < 0.0002
             )
@@ -208,7 +212,12 @@ if __name__ == "__main__":
     for name in ("source", "weights", "features", "data", "source-pixels"):
         p.add_argument("--" + name, type=Path, required=True)
     p.add_argument("--receipt", type=Path)
-    p.add_argument("--kind", choices=("calibration", "cold-neural", "full", "rung"), required=True)
+    p.add_argument(
+        "--kind",
+        choices=("calibration", "warm-neural", "cold-neural", "full", "rung"),
+        required=True,
+    )
+    p.add_argument("--qp", type=int, choices=(29, 31))
     p.add_argument("--frames", type=int, choices=(24, 240), required=True)
     p.add_argument("--crf", type=int, choices=(50, 60, 70), default=50)
     p.add_argument("--producer-job", required=True)

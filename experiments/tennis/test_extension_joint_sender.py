@@ -58,6 +58,15 @@ def main(a):
     assert cv2.getNumThreads() == 1
     tools = {name: svtav1.tool(name) for name in TOOLS}
     assert {k: r["sha256"] for k, r in tools.items()} == TOOLS
+    if a.event is not None:
+        a.binding = CARD / (a.event + "-binding.json")
+        a.crop = CARD / (a.event + "-crop-receipt.json")
+        a.roles = CARD.parent / (a.event + "-source-roles.json")
+        a.ball_receipt = (
+            CARD.parents[1]
+            / "cohort-expansion-20261122/test-physical"
+            / (a.event + "-sender-retry.json")
+        )
     cfg = bind.case(a)
     a.out = Path(os.environ["PS_SCRATCH_DIR"]) / "sender"
     receipt = dict(
@@ -109,6 +118,7 @@ def main(a):
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--validate", action="store_true")
+    p.add_argument("--event", choices=("match127", "match105", "match116"))
     for key in ("features", "source", "poses", "ball", "ball-receipt", "binding", "crop", "roles"):
         p.add_argument("--" + key, type=Path)
     p.add_argument("--steps", type=int, choices=(3, 240))
