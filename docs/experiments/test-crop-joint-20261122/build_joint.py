@@ -171,7 +171,7 @@ def spatial_masks(a, receipt, pos):
     return dst
 
 
-def donor_base(a, src, masks):
+def donor_base(a, src, masks, *, smoke_only=False):
     spec = importlib.util.spec_from_file_location(
         "donor", HERE.parent / "clean-court-rally-20261118/pilot.py"
     )
@@ -208,6 +208,8 @@ def donor_base(a, src, masks):
     test, _ = pilot.plate_for([pilot.planes(src[t])[0] for t in tick], masks[tick], hs, 1.0)
     forecast = (time.monotonic() - start) * 1.5 * 17 + 90
     assert test.shape == (544, 960) and forecast < 900
+    if smoke_only:
+        return dict(ticks=tick.tolist(), registrations=smoke, forecast_seconds=forecast)
     tick = np.linspace(0, 239, 17).round().astype(int)
     hs, counts = alignment(tick)
     plates, holes = [], []

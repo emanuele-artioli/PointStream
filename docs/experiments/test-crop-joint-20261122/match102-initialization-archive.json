@@ -1,0 +1,15 @@
+{
+  "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/rv102-init-options-3935bc8f85981abe/envelopes.tar",
+  "sha256": "3935bc8f85981abe7dc8022ab9990dffb7f2ffcdac7df5f188b8efa100464f6f",
+  "bytes": 419840,
+  "members": {
+    "png.psr": "bef67ff7a17cc2dc83fa66f35faa344a91009393e778a7248e0516321038ddfb",
+    "webp.psr": "1cfa0135efab9b513239255d92ebf1cc0b9f62086219e99ef5688d8a1d8b94e7",
+    "avif65.psr": "b40ea1cae7c5e877c1d47da9fb70ce120805c669a495678add6c528639c66f1f",
+    "avif78.psr": "61d12743291e4c310781a05fee7a5adda6999917bed771beb84cec2d322e9b6d",
+    "avif90.psr": "d617c12f762be7634ea62462c6fb0d6223fbaada081d024825cd16c1d4dc82eb",
+    "jpeg40.psr": "01396c29078166f044aeec3abcaa8412f1c51b83e1da13d20286c2853eadf8b9",
+    "jpeg70.psr": "07df240fe3d8fbf846e8b11b858f0293ee97b34b0e54d0ddba35f79c3d525009"
+  },
+  "source_sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a"
+}
