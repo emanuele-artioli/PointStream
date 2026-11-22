@@ -18,7 +18,7 @@ STYLE = {
 }
 
 
-def main(output):
+def main(output, rate_ceiling):
     output.mkdir(parents=True, exist_ok=True)
     by_family = {name: [] for name in STYLE}
     common = None
@@ -86,7 +86,7 @@ def main(output):
         selected = {}
         for name, records in by_family.items():
             feasible = sorted(
-                (r for r in records if r["kbps"] <= 42),
+                (r for r in records if r["kbps"] <= rate_ceiling),
                 key=lambda r: (r["bytes"], r[endpoint]),
             )
             by_cost = {}
@@ -114,7 +114,7 @@ def main(output):
                 s=26,
             )
             ax.step(
-                [*prices, 42],
+                [*prices, rate_ceiling],
                 [*fidelity, fidelity[-1]],
                 where="post",
                 color=color,
@@ -123,7 +123,11 @@ def main(output):
                 label=name,
             )
             ax.scatter(prices, fidelity, marker=marker, c=color, s=35, zorder=4)
-        ax.set(xlim=(20, 42), xlabel="Available bitrate (kbps)", ylabel=f"{label} DISTS (lower is better)")
+        ax.set(xlim=(20, rate_ceiling), xlabel="Available bitrate (kbps)", ylabel=f"{label} DISTS (lower is better)")
+        if rate_ceiling > 100:
+            ax.set_xscale("log")
+            ax.set_xticks([v for v in (20, 30, 50, 75, 100, 150, 250, 350) if v <= rate_ceiling])
+            ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
         ax.set_title("Sydney · Shapovalov–Safiullin", loc="left", fontsize=12)
         ax.grid(axis="y", color="#DDE1E5", linewidth=0.7)
         ax.spines[["right", "top"]].set_visible(False)
@@ -136,6 +140,7 @@ def main(output):
         json.dumps(
             {
                 "case": "Sydney, one 4-second shot",
+                "maximum_plotted_kbps": rate_ceiling,
                 "price": "physical complete packets, cached player appearance",
                 "interpretation": "Minimum measured DISTS attainable at or below each budget. Hollow markers show all tested choices. Solid markers and steps show achievable best values below the budget. Curves use the two original automatic player masks and official visible ball on twelve fixed source ticks.",
                 "by_family": by_family,
@@ -152,4 +157,6 @@ def main(output):
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("output", type=Path)
-    main(p.parse_args().output)
+    p.add_argument("--rate-ceiling", type=int, choices=(42, 350), default=42)
+    args = p.parse_args()
+    main(args.output, args.rate_ceiling)
