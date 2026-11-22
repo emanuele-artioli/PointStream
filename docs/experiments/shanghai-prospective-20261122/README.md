@@ -46,3 +46,15 @@ Half-resolution QP24 job `20261122T052123Z-50c1185e` submitted pending.
 The full Shanghai trajectory decoded back to the identical 528-byte payload, with 93 nonmissing positions in 240 ticks. Q24 at half spatial resolution separately passed four native decode passes, costing 22,134 B (18.445 kbps at 480×272). This is an affordable neural control on the same shot. The 960×544 Q0 smoke failed independent decoding and supplies no operating point. The complete 960×544 Q24 stream is the higher-rate control. Compare localization on the same frozen source labels and working geometry after the paid PSBL/AV1 display hash check. [Sender](sender-receipt.json) · [Half-scale neural](neural-q24-half-result.json) · [Full-scale neural](neural-q24-receipt.json)
 
 Following the independently frozen 240-frame PSBL/AV1 displays, score the two accepted DCVC streams at their actual prices. Use identical 26 visible and 23 marked not-visible source ticks, original-pixel tolerances, working RGB, DISTS, WASB and checkpoint identities. Both use a native 24-frame CPU smoke and a 1.5× scaled forecast under a 1,700-second full-stage limit. Compare the 18.445-kbps stream as the affordable neural control; report the 57.952-kbps result separately. [Half-scale scoring](neural-score-half-spec.json) · [Full-scale scoring](neural-score-full-spec.json)
+
+Initial neural scorer dispatches were reported uncertain: `20261122T053016Z-c0134b21` (half) and `20261122T053016Z-00e94c3d` (full). Inspect their existing fleet state before correction. The original archive was outside the fleet’s publishable input root. A byte-identical copy now lives at `tennis/match284-source-20261122/annotations-e4930845.tar` under pointstream-data. The additional secondary byte-only control stays blinded until its pair/display choices close.
+
+Existing-request status reported an unpublished request for each ID. Direct inbox inspection found only the uploaded source and event directory for both, without the terminal publication marker ready.json, spec.json, run state or assigned worker. Neither scorer executed. The optional secondary byte search has closed at a 2.39% mismatch. Run the unchanged scorers with the verified staged annotation archive; no further operating-point selection.
+
+Half-scale CPU scorer `20261122T053508Z-6d6f99f3` uses the verified staged archive.
+
+Full-scale CPU scorer `20261122T053606Z-eddb8677` uses the same staged archive. The three-arm scorer detected that annotations.tar contains generic clip annotations. The exact official ball CSV is a member of RacketVision/tennis.tar. All registered policies require the frozen member SHA d1180a3e…, so the wrong archive cannot yield any scored output. Use the exact named member in a small verified tar and inspect each existing job before retry.
+
+Both earlier staged-archive scorers reached a terminal failure without scores. The exact original member was transferred into a 10,240-byte archive, SHA 9d71055e6309129a182b22d2e5b147d3bc7a36c480d655b9e62c72958d7a12cf. The half-scale scoring retry is `20261122T053815Z-7c1940c1`.
+
+Full-scale scoring retry `20261122T053901Z-a9d7974c` uses the same exact independent member.
