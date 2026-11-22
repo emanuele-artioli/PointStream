@@ -51,7 +51,7 @@ def return_ordinary(folders):
     return list(output.values())
 
 
-def run(extended=False):
+def run(extended=False, include_frontier=False, retained=False):
     prices = read(ROOT / "two-shot-price.json")
     first = read(FIRST / "player-joint.json")
     assert (
@@ -65,6 +65,19 @@ def run(extended=False):
     ]
     two = read(ROOT / "return-fixed12-ordinary-arms.json")
     assert len(one) == 52 and len(two) >= 16 and len({r["stream"] for r in two}) == len(two)
+    if retained:
+        extra_return = sorted(ROOT.glob("ordinary-retained-*-scores.json"))
+        assert len(extra_return) == 4
+        digests = {v["stream"] for v in two}
+        for file in extra_return:
+            score = read(file)
+            a = score["arm"]
+            assert a["stream_sha256"] not in digests
+            assert score["frames"] == 240 and len(score["body_rows"]) == 480
+            two.append(
+                dict(bytes=a["bytes"], stream=a["stream_sha256"], dists=fixed(score["body_rows"]))
+            )
+            digests.add(a["stream_sha256"])
     result = dict(
         source_ticks=sorted(TICKS),
         people_per_shot=2,
@@ -93,6 +106,13 @@ def run(extended=False):
         )
         for a, b in product(one, two)
     ]
+    if include_frontier:
+        frontier = []
+        for row in sorted(paired, key=lambda r: (r["sum_bytes"], r["mean_dists"])):
+            if frontier and row["mean_dists"] >= frontier[-1]["mean_dists"]:
+                continue
+            frontier.append(dict(**row, kbps=row["sum_bytes"] * 8 / 19200))
+        result["ordinary_measured_frontier"] = frontier
     for name, mode in [("send_new", "fresh"), ("reuse", "prior")]:
         allowance = prices[name]["total_bytes"]
         choices = [r for r in paired if r["sum_bytes"] <= allowance]
@@ -126,7 +146,13 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--ordinary-folders", type=Path, nargs="+")
     p.add_argument("--extended", action="store_true")
+    p.add_argument("--frontier", action="store_true")
+    p.add_argument("--retained", action="store_true")
     p.add_argument("--out", required=True, type=Path)
     a = p.parse_args()
-    data = return_ordinary(a.ordinary_folders) if a.ordinary_folders else run(a.extended)
+    data = (
+        return_ordinary(a.ordinary_folders)
+        if a.ordinary_folders
+        else run(a.extended, a.frontier, a.retained)
+    )
     a.out.write_text(json.dumps(data, indent=2) + "\n")

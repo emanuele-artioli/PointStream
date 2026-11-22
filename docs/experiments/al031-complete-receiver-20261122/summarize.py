@@ -66,6 +66,13 @@ def run(a):
             if "body_rows" not in q:
                 continue
             bank[q["arm"]["name"]] = summarize(q)
+    low_grid = ROOT / "original-ordinary-low-grid-body-and-ball.json"
+    if low_grid.exists():
+        for q in read(low_grid):
+            name = q["arm"]["name"]
+            assert q["arm"]["sha256"] == bank[name]["arm"]["sha256"]
+            assert abs(q["mean_dists"] - bank[name]["mean_dists"]) < 1e-7
+            bank[name] = summarize(q)
     comparisons = {}
     for name in ["fresh-joint-q70", "fresh-joint-q60", "fresh-joint-q50", "prior-joint-q50"]:
         if name not in bank:

@@ -23,3 +23,7 @@
 {"stage": "campus-rung-fresh-joint-q60-2100s", "job": "20261122T132434Z-673070eb", "code": "4c27f54bd4b7004f38bb0f42305900250ddc5459"}
 {"stage": "prefix-pair-0-legacy-decoder", "job": "20261122T132555Z-d4bc6076", "code": "39c936e73eb1ac897c1a647a13fc952dbef7e2b4"}
 {"stage": "prefix-pair-1-legacy-decoder", "job": "20261122T132646Z-28a8986d", "code": "bdb98f5e7da626d1e781061912ceed4ced1a8609"}
+{"stage": "ordinary-retained-w320-q4250", "job": "20261122T135238Z-ff8b1332", "code": "cd7932c0726b806e579d880a427ec9b782028d0c"}
+{"stage": "ordinary-retained-w480-q4280", "job": "20261122T135322Z-d3c7e605", "code": "cd7932c0726b806e579d880a427ec9b782028d0c"}
+{"stage": "ordinary-retained-w160-q4220", "job": "20261122T135406Z-9489c40e", "code": "1a32f765d235e17bee8d00505ee32131520924cc"}
+{"stage": "ordinary-retained-w480-q4265", "job": "20261122T135451Z-796a7c80", "code": "1a32f765d235e17bee8d00505ee32131520924cc"}
