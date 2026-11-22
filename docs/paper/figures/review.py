@@ -46,7 +46,12 @@ PANELS = [
     (
         "joint-players/second-rally-rate-quality.pdf",
         "Which codec gives the clearest players at a given rate?",
-        "On the second rally PointStream leads DCVC-UF around 20.4 kbps, while DCVC-UF leads around 39.8 kbps. Fifty-two ordinary AV1 streams establish the conventional curve. All three methods use the same two source-model body masks on twelve instants.",
+        "The same two generated players lead DCVC-UF around 20.4 kbps and trail it around 39.8 kbps as more bits go to the base. The lines connect measured settings. The exact switching rate is unresolved. AV1 spans 52 encodes at three resolutions. All arms use the same two source-model masks on twelve instants.",
+    ),
+    (
+        "joint-players/second-rally-cold-and-warm.pdf",
+        "The second rally with and without a cached appearance",
+        "Four physical joint deliveries charge the same 157,517-byte initialization when starting cold. The ordinary anchor uses the lower envelope of 52 actual encodes. No line extends a neural or joint measurement beyond its observed range.",
     ),
     (
         "starved-choice/players-rate-quality.pdf",

@@ -1,0 +1,367 @@
+{
+  "frames": 240,
+  "stage": "full",
+  "source_sha256": "0afb0fb191881def1235285b58fe54814556c83fed7815cd99a00b92d26bc86c",
+  "neural_archive_sha256": "06a94bd09aaeedd4f59d9d46d8982f85af76cbd046867eba235e59da004ff3f9",
+  "neural_raw_sha256": "73ee728728e7ac9d5f9305fc711e9ab3d97b462536f1ae17ab72e2a8978431e9",
+  "packet_sha256": "700c43b3647f33959cd7e6da2ee2fb3abc6b306dda2c3bd86ce73a7e78975999",
+  "bytes": 69542,
+  "kbps": 57.95166666666666,
+  "qp": 24,
+  "size": [
+    960,
+    544
+  ],
+  "display_archive_sha256": "bf6918b90504fd701a3740b60cb3266308f806e1b4c6268eaee0c16019fb7f31",
+  "judge_checkpoint_sha256": "9d391239ab10c733f8e5bfadf16ab72838e7a8ebc88e8ae2038501c03d42b4bb",
+  "label_sha256": "d1180a3eabfc30db3e034bcf7d2d3017d0bc2686155a892d0880d1fced63df98",
+  "rgb_sha256": "14a918f5c0fc846cfebfa055280f9c6016fb68a290b3e24e05c06d81ca677574",
+  "whole_rgb_psnr": 30.03272662918004,
+  "source_rgb_sha256": "1887592882905f4465514aa1dc070910cf7cab346c3ce9ae9bfa953c7638f267",
+  "rows": [
+    {
+      "tick": 9,
+      "visible": 1,
+      "detected": false,
+      "error_native_px": null,
+      "ball_crop_dists": 0.20766198635101318
+    },
+    {
+      "tick": 13,
+      "visible": 1,
+      "detected": false,
+      "error_native_px": null,
+      "ball_crop_dists": 0.1298201084136963
+    },
+    {
+      "tick": 18,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 621.9090311315251,
+      "ball_crop_dists": 0.12054240703582764
+    },
+    {
+      "tick": 23,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 1447.1740839689478,
+      "ball_crop_dists": 0.1643357276916504
+    },
+    {
+      "tick": 27,
+      "visible": 0,
+      "detected": false,
+      "error_native_px": null,
+      "ball_crop_dists": null
+    },
+    {
+      "tick": 32,
+      "visible": 0,
+      "detected": false,
+      "error_native_px": null,
+      "ball_crop_dists": null
+    },
+    {
+      "tick": 37,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 538.3216781844702,
+      "ball_crop_dists": 0.17999154329299927
+    },
+    {
+      "tick": 42,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 1018.3343261232179,
+      "ball_crop_dists": 0.16046667098999023
+    },
+    {
+      "tick": 46,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 182.0637074959836,
+      "ball_crop_dists": 0.11845338344573975
+    },
+    {
+      "tick": 51,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 176.50742702012707,
+      "ball_crop_dists": 0.1385062336921692
+    },
+    {
+      "tick": 56,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 242.05161394243606,
+      "ball_crop_dists": 0.16844993829727173
+    },
+    {
+      "tick": 60,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 296.86967595770466,
+      "ball_crop_dists": 0.14357036352157593
+    },
+    {
+      "tick": 65,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 362.4098410398119,
+      "ball_crop_dists": 0.19588780403137207
+    },
+    {
+      "tick": 70,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 426.04012393809165,
+      "ball_crop_dists": 0.18768227100372314
+    },
+    {
+      "tick": 75,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 512.5299494258225,
+      "ball_crop_dists": 0.11536866426467896
+    },
+    {
+      "tick": 79,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 621.2273166815154,
+      "ball_crop_dists": 0.19866567850112915
+    },
+    {
+      "tick": 84,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 813.8773681436651,
+      "ball_crop_dists": 0.17768442630767822
+    },
+    {
+      "tick": 89,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 989.3228479772571,
+      "ball_crop_dists": 0.1862039566040039
+    },
+    {
+      "tick": 93,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 1079.2360520599773,
+      "ball_crop_dists": 0.128662109375
+    },
+    {
+      "tick": 98,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 1248.6026710360838,
+      "ball_crop_dists": 0.25041472911834717
+    },
+    {
+      "tick": 103,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 1117.0322238902943,
+      "ball_crop_dists": 0.113125741481781
+    },
+    {
+      "tick": 108,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 549.1420463154514,
+      "ball_crop_dists": 0.09599095582962036
+    },
+    {
+      "tick": 112,
+      "visible": 0,
+      "detected": true,
+      "error_native_px": null,
+      "ball_crop_dists": null
+    },
+    {
+      "tick": 117,
+      "visible": 0,
+      "detected": false,
+      "error_native_px": null,
+      "ball_crop_dists": null
+    },
+    {
+      "tick": 122,
+      "visible": 0,
+      "detected": false,
+      "error_native_px": null,
+      "ball_crop_dists": null
+    },
+    {
+      "tick": 126,
+      "visible": 0,
+      "detected": false,
+      "error_native_px": null,
+      "ball_crop_dists": null
+    },
+    {
+      "tick": 131,
+      "visible": 0,
+      "detected": false,
+      "error_native_px": null,
+      "ball_crop_dists": null
+    },
+    {
+      "tick": 136,
+      "visible": 0,
+      "detected": true,
+      "error_native_px": null,
+      "ball_crop_dists": null
+    },
+    {
+      "tick": 141,
+      "visible": 0,
+      "detected": false,
+      "error_native_px": null,
+      "ball_crop_dists": null
+    },
+    {
+      "tick": 145,
+      "visible": 0,
+      "detected": true,
+      "error_native_px": null,
+      "ball_crop_dists": null
+    },
+    {
+      "tick": 150,
+      "visible": 0,
+      "detected": true,
+      "error_native_px": null,
+      "ball_crop_dists": null
+    },
+    {
+      "tick": 155,
+      "visible": 0,
+      "detected": true,
+      "error_native_px": null,
+      "ball_crop_dists": null
+    },
+    {
+      "tick": 159,
+      "visible": 0,
+      "detected": true,
+      "error_native_px": null,
+      "ball_crop_dists": null
+    },
+    {
+      "tick": 164,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 191.7644061590676,
+      "ball_crop_dists": 0.17448997497558594
+    },
+    {
+      "tick": 169,
+      "visible": 0,
+      "detected": true,
+      "error_native_px": null,
+      "ball_crop_dists": null
+    },
+    {
+      "tick": 174,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 189.66305943542477,
+      "ball_crop_dists": 0.20955073833465576
+    },
+    {
+      "tick": 178,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 914.8132562489393,
+      "ball_crop_dists": 0.16585838794708252
+    },
+    {
+      "tick": 183,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 1006.7071324237663,
+      "ball_crop_dists": 0.16819798946380615
+    },
+    {
+      "tick": 188,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 1160.8273619773738,
+      "ball_crop_dists": 0.18846648931503296
+    },
+    {
+      "tick": 192,
+      "visible": 1,
+      "detected": true,
+      "error_native_px": 1316.6041568877486,
+      "ball_crop_dists": 0.16461682319641113
+    },
+    {
+      "tick": 197,
+      "visible": 0,
+      "detected": false,
+      "error_native_px": null,
+      "ball_crop_dists": null
+    },
+    {
+      "tick": 202,
+      "visible": 0,
+      "detected": false,
+      "error_native_px": null,
+      "ball_crop_dists": null
+    },
+    {
+      "tick": 207,
+      "visible": 0,
+      "detected": true,
+      "error_native_px": null,
+      "ball_crop_dists": null
+    },
+    {
+      "tick": 211,
+      "visible": 0,
+      "detected": true,
+      "error_native_px": null,
+      "ball_crop_dists": null
+    },
+    {
+      "tick": 216,
+      "visible": 0,
+      "detected": false,
+      "error_native_px": null,
+      "ball_crop_dists": null
+    },
+    {
+      "tick": 221,
+      "visible": 0,
+      "detected": false,
+      "error_native_px": null,
+      "ball_crop_dists": null
+    },
+    {
+      "tick": 225,
+      "visible": 0,
+      "detected": true,
+      "error_native_px": null,
+      "ball_crop_dists": null
+    },
+    {
+      "tick": 230,
+      "visible": 0,
+      "detected": true,
+      "error_native_px": null,
+      "ball_crop_dists": null
+    },
+    {
+      "tick": 235,
+      "visible": 0,
+      "detected": true,
+      "error_native_px": null,
+      "ball_crop_dists": null
+    }
+  ],
+  "elapsed_seconds": 462.4733369780006
+}

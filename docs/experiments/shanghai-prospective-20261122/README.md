@@ -58,3 +58,5 @@ Full-scale CPU scorer `20261122T053606Z-eddb8677` uses the same staged archive. 
 Both earlier staged-archive scorers reached a terminal failure without scores. The exact original member was transferred into a 10,240-byte archive, SHA 9d71055e6309129a182b22d2e5b147d3bc7a36c480d655b9e62c72958d7a12cf. The half-scale scoring retry is `20261122T053815Z-7c1940c1`.
 
 Full-scale scoring retry `20261122T053901Z-a9d7974c` uses the same exact independent member.
+
+Both neural scoring jobs completed. The same frozen detector localized 0/26 visible balls within either five or ten native pixels at both resolutions. At 18.445 kbps it emitted on 5/23 marked not-visible frames, with mean ball-crop DISTS 0.2030 and whole-video RGB PSNR 26.01 dB. At 57.952 kbps the respective measures were 12/23, 0.1636 and 30.03 dB. Both runs agree on all label ticks, source RGB and judge identity. [Half-resolution rows](neural-score-half-result.json) · [Full-resolution rows](neural-score-full-result.json)
