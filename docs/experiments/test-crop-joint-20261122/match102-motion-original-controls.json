@@ -1,0 +1,54 @@
+{
+  "source_sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+  "source_mask_rle_sha256": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e",
+  "grid": [
+    960,
+    544
+  ],
+  "fps": "30000/1001",
+  "recorded_ticks": 240,
+  "arms": [
+    {
+      "name": "roi-640-warm",
+      "bytes": 17736
+    },
+    {
+      "name": "av1-320-warm",
+      "bytes": 17687
+    },
+    {
+      "name": "dcvc-480-q34",
+      "bytes": 17432
+    }
+  ],
+  "tool": "OpenCV 4.10.0, source-only backward DIS medium",
+  "summary": {
+    "roi-640-warm": {
+      "n": 478,
+      "error": 20.116416490227607,
+      "source_delta": 17.519729913527996,
+      "decoded_delta": 6.512994952780432
+    },
+    "av1-320-warm": {
+      "n": 478,
+      "error": 19.76527484091755,
+      "source_delta": 17.519729913527996,
+      "decoded_delta": 6.878811493204228
+    },
+    "dcvc-480-q34": {
+      "n": 478,
+      "error": 18.19265029619927,
+      "source_delta": 17.519729913527996,
+      "decoded_delta": 7.867702156928793
+    }
+  },
+  "cpu_seconds": 33.838606,
+  "exact_rows_sha256": "7edf5dc40f0ca5351f4af6c12c226509fe8f60dad8bd4fce449566f177573a9c",
+  "selected_rate_ceiling_bytes": 17794,
+  "selected_by": "Best body DISTS across the affordable original, ROI and neural families before opening joint reconstruction. Each decode independently source bound. Identical original flow, target support and row multiplicity for every arm.",
+  "registered_decoded_controls": {
+    "av1-320-warm": "20261122T105317Z-f1736a83",
+    "roi-640-warm": "20261122T105505Z-2e23c905",
+    "dcvc-480-q34": "20261122T104722Z-2bcfb2b7"
+  }
+}
