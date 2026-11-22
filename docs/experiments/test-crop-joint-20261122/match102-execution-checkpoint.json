@@ -4,12 +4,14 @@
   "jobs": {
     "full_far_cuda": "20261122T112930Z-b78072a2",
     "native_metric_parity": "20261122T113854Z-5f825f0d",
-    "cold_neural_fifth_pilot": "20261122T114042Z-709e9dcc"
+    "cold_neural_fifth_pilot": "20261122T114042Z-709e9dcc",
+    "native_joint_finish": "20261122T120219Z-f2c299f2"
   },
   "states_at_registration": {
-    "full_far_cuda": "one bounded 64-tick Ada qualification then continuous 240 only if existing cost rule passes",
-    "native_metric_parity": "validate all 480 objective athlete instances against previously measured .437958 body DISTS at Q34",
-    "cold_neural_fifth_pilot": "gpu5 exclusive only, four true receiver passes, original source, original cadence"
+    "full_far_cuda": "complete at 12:01 UTC, all 240 learned crops bound",
+    "native_metric_parity": "complete: all 240 source hashes and 480 body scores, campus-vs-Mac abs. difference 0.00000832",
+    "cold_neural_fifth_pilot": "gpu5 exclusive only, four true receiver passes, original source, original cadence",
+    "native_joint_finish": "Both full player banks validated; genuine original cadence joint, paid-only source-denied compositor registered at 12:02 UTC; archive remains on campus."
   },
   "local_original_q34_metric_sha256": "7846eef60ee09c6c3a35d321c4ca21b40731f2b163b1503aa0f14d7074dd60d3",
   "next": "Bind far and near receipt SHA to source-denied whole-240 SAM finish only after both complete; then self-replay and both extra paid rungs; score and export just twelve native PNGs per output."
