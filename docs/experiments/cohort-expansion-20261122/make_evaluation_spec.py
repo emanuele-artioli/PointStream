@@ -30,7 +30,7 @@ def create(a):
 
     add("score", run / "full/scores.json", hashlib.sha256(a.score.read_bytes()).hexdigest())
     add(
-        "smoke-score",
+        "smoke_score",
         run / "smoke/scores.json",
         hashlib.sha256(a.smoke_score.read_bytes()).hexdigest(),
     )
