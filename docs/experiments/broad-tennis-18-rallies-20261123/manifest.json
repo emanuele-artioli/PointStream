@@ -243,7 +243,10 @@
           "evidence": "k5d-inputs/data-inventory-20261104.json",
           "reuse": "Original frames and original labels. Prior fixture exposure retained.",
           "whole_point": true,
-          "prior_screening": "PointStream previously compared trackers and conducted a CRF62 probe on all 30 game8–10 clips, jobs 20261020T214833Z-bf224666 and 20261020T220308Z-436c3db3; no TrackNet rally is untouched."
+          "prior_screening": "PointStream previously compared trackers and conducted a CRF62 probe on all 30 game8–10 clips, jobs 20261020T214833Z-bf224666 and 20261020T220308Z-436c3db3; no TrackNet rally is untouched.",
+          "lossless_extract_sha256": "553b593fb5b110eac8ba33663c372243bf71f17269637057f7e9abdd02c2b383",
+          "extraction_receipt": "tracknet-native.json",
+          "source_jpeg_ordered_sha256": "2d8d9e65bcb4560518265d97ace53ba290082ada4cbae87d97e9772ff12e1626"
         },
         {
           "rally_id": "game9_clip2",
@@ -264,7 +267,10 @@
           "evidence": "k5d-inputs/data-inventory-20261104.json",
           "reuse": "Clip5 has physical 292-frame ball comparison; exact frames/bytes/judge labels must match for reuse. Earlier study assessed this fixture, with Clip2 among historical candidates.",
           "whole_point": true,
-          "prior_screening": "PointStream previously compared trackers and conducted a CRF62 probe on all 30 game8–10 clips, jobs 20261020T214833Z-bf224666 and 20261020T220308Z-436c3db3; no TrackNet rally is untouched."
+          "prior_screening": "PointStream previously compared trackers and conducted a CRF62 probe on all 30 game8–10 clips, jobs 20261020T214833Z-bf224666 and 20261020T220308Z-436c3db3; no TrackNet rally is untouched.",
+          "lossless_extract_sha256": "b41ccedddaf124dbccad6c941305df199b8abfbd56f44cb8c723b42fc24e24d7",
+          "extraction_receipt": "tracknet-native.json",
+          "source_jpeg_ordered_sha256": "04f5385e13bc8aacca9728e691dbf5465a43ad329a3658a270a6fbadb5406002"
         },
         {
           "rally_id": "game9_clip5",
@@ -285,7 +291,10 @@
           "evidence": "k5d-inputs/data-inventory-20261104.json",
           "reuse": "Clip5 has physical 292-frame ball comparison; exact frames/bytes/judge labels must match for reuse. Earlier study assessed this fixture, with Clip2 among historical candidates.",
           "whole_point": true,
-          "prior_screening": "PointStream previously compared trackers and conducted a CRF62 probe on all 30 game8–10 clips, jobs 20261020T214833Z-bf224666 and 20261020T220308Z-436c3db3; no TrackNet rally is untouched."
+          "prior_screening": "PointStream previously compared trackers and conducted a CRF62 probe on all 30 game8–10 clips, jobs 20261020T214833Z-bf224666 and 20261020T220308Z-436c3db3; no TrackNet rally is untouched.",
+          "lossless_extract_sha256": "5c6587aaa15ff7303680585e701a044c9328d41cd55ba89652e0a53b3465a5e5",
+          "extraction_receipt": "tracknet-native.json",
+          "source_jpeg_ordered_sha256": "870da32398d6040773b125efdab45d26fee9e8d774d8bb2be89d60a0ad0de63b"
         }
       ],
       "held_out": false
