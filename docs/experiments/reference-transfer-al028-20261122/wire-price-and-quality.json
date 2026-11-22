@@ -1,0 +1,74 @@
+{
+  "shot": "Alcaraz\u2013Hurkacz/028",
+  "measured_stream_kbps_with_cache": 20.4075,
+  "actual_original_png_init_bytes": 157517,
+  "actual_original_png_image_bytes": 157438,
+  "actual_original_png_cold_9_6s_kbps": 151.67166666666665,
+  "mode_rows": {
+    "jpeg40": {
+      "image_bytes": 29526,
+      "initialization_bytes": 32080,
+      "source_model_dists": 0.27578620364268625,
+      "body_rgb_psnr": 13.845882155067592,
+      "temporal_error": 29.657635543657385,
+      "reviewed_tick_dists": 0.28023070096969604,
+      "beats_lossless_dists_ticks": 15,
+      "active_seconds_at_33_kbps": 20.380385149890806,
+      "equivalent_kbps_by_valid_active_seconds": {
+        "9.6": 47.14083333333333,
+        "30": 28.962166666666665,
+        "120": 22.546166666666664,
+        "300": 21.262966666666667
+      }
+    },
+    "jpeg70": {
+      "image_bytes": 41771,
+      "initialization_bytes": 44325,
+      "source_model_dists": 0.27241702377796173,
+      "body_rgb_psnr": 13.913181566267621,
+      "temporal_error": 28.789212600044582,
+      "reviewed_tick_dists": 0.2707502543926239,
+      "beats_lossless_dists_ticks": 24,
+      "active_seconds_at_33_kbps": 28.159618820726617,
+      "equivalent_kbps_by_valid_active_seconds": {
+        "9.6": 57.345,
+        "30": 32.2275,
+        "120": 23.362499999999997,
+        "300": 21.589499999999997
+      }
+    },
+    "q90": {
+      "image_bytes": 54461,
+      "initialization_bytes": 57017,
+      "source_model_dists": 0.27001706262429553,
+      "body_rgb_psnr": 14.114195380576804,
+      "temporal_error": 27.66784665895545,
+      "reviewed_tick_dists": 0.2747851312160492,
+      "beats_lossless_dists_ticks": 23,
+      "active_seconds_at_33_kbps": 36.22283105022831,
+      "equivalent_kbps_by_valid_active_seconds": {
+        "9.6": 67.92166666666667,
+        "30": 35.61203333333333,
+        "120": 24.20863333333333,
+        "300": 21.92795333333333
+      }
+    },
+    "lossless": {
+      "image_bytes": 95298,
+      "initialization_bytes": 97850,
+      "source_model_dists": 0.2691782700518767,
+      "body_rgb_psnr": 14.14868839627076,
+      "temporal_error": 27.69639015197754,
+      "reviewed_tick_dists": 0.27211081981658936,
+      "beats_lossless_dists_ticks": 0,
+      "active_seconds_at_33_kbps": 62.16398649990072,
+      "equivalent_kbps_by_valid_active_seconds": {
+        "9.6": 101.94916666666667,
+        "30": 46.50083333333333,
+        "120": 26.930833333333332,
+        "300": 23.01683333333333
+      }
+    }
+  },
+  "note": "Physical initializations, identical non-appearance streams. The lossy generator assessment is the first 24 frames only. Combined longer-play prices are scenarios conditional on retaining a valid appearance."
+}

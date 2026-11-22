@@ -9,3 +9,5 @@ The initial descriptor 20261122T094540Z-b2b11902 was rejected before publication
 The corrected, source-verified request is `20261122T094742Z-1de78bb8`, snapshot c094f8c1, package SHA256 8c6786b093edb4103940e79344a8147516778d4b2834fd048cf149cb50c4b302. Deadline 12:30 UTC. The 2-tick smoke must establish zero RGB error in both original appearance references, both archived native repetitions, mask association for both people and source self-DISTS before costing the full target.
 
 The first single-core smoke (20.97 s process wall, no scored outcomes) verified both fresh source RGB crops exactly, then found a paid generator envelope crossing a source-frame boundary. Preserve the original native placement and resize before clipping its offscreen margin. Score shared visible source pixels and record both original and clipped boxes. A two-arm local border example checked the ordering. The remaining cumulative fleet reservation is 810 s, including smoke and rerun; full stage capped at 540 s.
+
+The source-border correction was submitted as `20261122T095119Z-eb4fa57c`, snapshot 05d97d05, with original inputs and both protocol endpoints unchanged.

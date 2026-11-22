@@ -71,7 +71,7 @@ def main():
             point = rows[mode]
             x, y = point["image_bytes"] / 1000, point[key]
             ax.scatter([x], [y], s=25, marker=marker, color=colour, zorder=3)
-            offset = (0, 7) if mode != "lossless" else (0, 8)
+            offset = (21, 2) if mode == "jpeg70" else (0, 7)
             ax.annotate(
                 tag, (x, y), xytext=offset, textcoords="offset points", ha="center", fontsize=7
             )
