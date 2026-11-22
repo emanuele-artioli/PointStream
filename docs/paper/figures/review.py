@@ -194,6 +194,11 @@ PANELS = [
         "Artificial masks over known court pixels permit scoring aligned temporal donors and spatial inpainting. Inpainting supplies pixels where donors do not observe the court.",
     ),
     (
+        "equipment/racket-detection.pdf",
+        "Appendix · Racket localization",
+        "A fixed detector found 14 of 16 officially annotated rackets on the source, and zero on ordinary AV1, ROI AV1 and AV1 with ball tiles. The three windows have different achieved rates. The task measures localization, and the ball tiles carry no dedicated racket appearance.",
+    ),
+    (
         "references/reference-ladder.pdf",
         "Appendix · Still-image reference ladder",
         "The image curves measure two appearance references. The highest-PSNR still image does not guarantee acceptable generated motion.",
