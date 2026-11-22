@@ -60,12 +60,14 @@ for ax, name in zip(axes.flat, ORDER):
     ]
     assert abs(player[1][0] - windows[name]["rate_kbps"]) < 1e-9
     recompose = None
-    if name == "al034":
-        extra = (DATA / "al034-recompose-result.json").read_bytes()
-        assert (
-            hashlib.sha256(extra).hexdigest()
-            == "ff2dac7379f9c3855d65c38a27b2ba1a99a15f1a96475bd7e5375da2c38eba74"
-        )
+    if name in ("al028", "al034", "al043"):
+        extra = (DATA / f"{name}-recompose-result.json").read_bytes()
+        expected = {
+            "al043": "783272146e069a2cd9c0a57ed1674917654dfafccd961e52285a52848e72dfd9",
+            "al028": "bf981c9409039accec159fab42fdfce3675dfe285a0975db15d233008dec537c",
+            "al034": "ff2dac7379f9c3855d65c38a27b2ba1a99a15f1a96475bd7e5375da2c38eba74",
+        }
+        assert hashlib.sha256(extra).hexdigest() == expected[name]
         recompose = json.loads(extra)
         assert len(recompose["records"]) == 80
         player.append(
@@ -86,6 +88,22 @@ for ax, name in zip(axes.flat, ORDER):
                     np.mean([x["plain_dists"] for x in recompose["records"]]),
                 )
             )
+            points.sort()
+        additional = {
+            "al034": ("s2_o0", "83f9d4a7c09b2aaf816b00d15dab8a9b292bb18df446d1093620a93c141c0f80"),
+            "nad001": ("s4_o0", "4019841409fe433ee84a3e0fdf4c9f28e81f6fca5f51a215bcf9eb7aeec38741"),
+            "nad002": ("s4_o0", "f1b535641584c5e8be020bd0c9ba025b3da1c96d60831cce2719fcbbc926ca4e"),
+            "nad000": ("s4_o0", "58a401f8b9ae41dd4f18f18f6e1fed08892d4a798afc0ebf5e1dc672e6557c09"),
+            "med024": ("s4_o0", "2a64a1c38c4ff229b26104b1de885502e1e107cc66b61abb78addb1f7120ee33"),
+            "med019": ("s4_o0", "c32499fcf4141f892e6b3eb7854e6dc2e70ce45acf9567b255044a3ffca06ede"),
+        }
+        if name in additional and policy == additional[name][0]:
+            raw = (DATA / f"{name}-av1-score-result.json").read_bytes()
+            assert hashlib.sha256(raw).hexdigest() == additional[name][1]
+            item = json.loads(raw)
+            assert len(item["ticks"]) == 80 and item["control_max_error"] < 0.001
+            candidate = item["candidate"]
+            points.append((candidate.get("kbps", candidate.get("base_kbps")), item["mean"]))
             points.sort()
         av1[policy] = points
         ax.plot(*zip(*points), color="#326a99", marker="x", ms=3.5, lw=1, ls=style)
@@ -120,6 +138,19 @@ for ax, name in zip(axes.flat, ORDER):
         assert extra["accepted"] and extra["frames"] == 240 and extra["identical_frame_hashes"]
         dcvc.append((extra["kbps"], extra["mean"]["foreground_dists"]))
         dcvc.sort()
+    if name in ("al028", "al043", "med024", "nad002"):
+        expected = {
+            "al028": "c08c8fe717d50607648025b64b1685e4b4493c6fc3d0fa4f80ddc6a36636ce4c",
+            "al043": "4ae75729210ab1c830c97ebe8f25fe2267a6fb4cda4f60d38f56f57b84ed2555",
+            "med024": "b2667c8353c8b1a44b12d30b8bb859a667f65d42eef6baeb41be12a6d5703d8b",
+            "nad002": "fb1a854ce1fc1ebe6ed7efc03464202ea403da3bcfd42acb27a75dadb36b6839",
+        }
+        extra_raw = (DATA / f"{name}-dcvc33-result.json").read_bytes()
+        assert hashlib.sha256(extra_raw).hexdigest() == expected[name]
+        extra = json.loads(extra_raw)["windows"][0]["dcvc"][0]
+        assert extra["accepted"] and extra["frames"] == 240 and extra["identical_frame_hashes"]
+        dcvc.append((extra["kbps"], extra["mean"]["foreground_dists"]))
+        dcvc.sort()
     if dcvc:
         ax.plot(*zip(*dcvc), color="#bd542e", marker="s", ms=3.5, lw=1.1)
         av = av1["s2_o0"] + av1["s4_o0"]
@@ -142,7 +173,6 @@ for ax, name in zip(axes.flat, ORDER):
     )
 assert len(intervals) == 8
 common = [max(x[0] for x in intervals), min(x[1] for x in intervals)]
-assert common[0] > common[1]
 fig.supxlabel("Rate (kbps); PointStream asset cost assumes two-hour reuse", fontsize=10)
 fig.supylabel("Player-region DISTS (lower is better)", fontsize=10)
 fig.legend(

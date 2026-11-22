@@ -1,0 +1,743 @@
+{
+  "window": "alcaraz_hurkacz/034@120",
+  "stage": "full",
+  "ticks": 80,
+  "candidate": {
+    "crf": 62,
+    "base_kbps": 32.795,
+    "modeled_player_kbps": 37.962473333333335,
+    "bytes": 39354,
+    "stream_sha256": "e637fc71ed00bfaea44d1955840530fe8afcdf1b397564bc7ee842f4b959e973",
+    "decoded_sha256": "02dc616ac4bf1efbbca723c1fa3c07df495c42f8d7741318dae4f8f2d5317590",
+    "frames": 240.0
+  },
+  "records": [
+    {
+      "tick": 0,
+      "old_score": 0.17065495252609253,
+      "old_expected": 0.1706540584564209,
+      "plain_dists": 0.2493789792060852,
+      "player_dists": 0.16803109645843506,
+      "new_base_sha256": "47ca22e5551bfd15eb80a639092fe7b510e89e6f77d2e25dd907aa968e5954b4",
+      "new_composite_sha256": "c13249f3c45cf9b036eb1a3a3224b4569e7128cb7689ebc224adb33587d65754"
+    },
+    {
+      "tick": 3,
+      "old_score": 0.17699110507965088,
+      "old_expected": 0.17699933052062988,
+      "plain_dists": 0.2548298239707947,
+      "player_dists": 0.1740957498550415,
+      "new_base_sha256": "9fa6302a34bed05df5b4ca074dba71604844e320c50bd89b7b3cd65a81db7a59",
+      "new_composite_sha256": "393aef890250155a696793efc60ae453ace6ed8aede72a8ffd91184af2470f15"
+    },
+    {
+      "tick": 6,
+      "old_score": 0.19282352924346924,
+      "old_expected": 0.19282281398773193,
+      "plain_dists": 0.25313758850097656,
+      "player_dists": 0.18772631883621216,
+      "new_base_sha256": "cd52b8716218a12d1f232a54720d4066f3707597ab3298039190cbf40719f9ba",
+      "new_composite_sha256": "9d60e05419639641899684b1448585e3a4bdfb7da5b6bf172be3b7cb3579798e"
+    },
+    {
+      "tick": 9,
+      "old_score": 0.18110841512680054,
+      "old_expected": 0.18111073970794678,
+      "plain_dists": 0.26010340452194214,
+      "player_dists": 0.18671119213104248,
+      "new_base_sha256": "c8d252dca550d5b29c88c464f8312c379339a3266d7aacf33a37bce02e228b03",
+      "new_composite_sha256": "4f3de69ac1419cba06c4878a2197e59429994eb6927d06dc2b1ee59cb02ff104"
+    },
+    {
+      "tick": 12,
+      "old_score": 0.2104477882385254,
+      "old_expected": 0.21044319868087769,
+      "plain_dists": 0.2728274464607239,
+      "player_dists": 0.21065330505371094,
+      "new_base_sha256": "f80e9d8ff01da8c11b47cf9531e375c72407d7fa716c7da83e5fd8c3c6b0b683",
+      "new_composite_sha256": "2e9653128d332598875a4ed60746f44c1b6ec0fd3cb555b4b93d9ba2bc648f43"
+    },
+    {
+      "tick": 15,
+      "old_score": 0.24809592962265015,
+      "old_expected": 0.24809587001800537,
+      "plain_dists": 0.32781559228897095,
+      "player_dists": 0.23669850826263428,
+      "new_base_sha256": "a988fa1b5e427637cf80d651171306f797a4f2099697b24a15e8e6f9a0ea08bb",
+      "new_composite_sha256": "722e6a28809aba0e9eae0f2cd1adf2847ef48c74cc458cd8d6f1342afdba5f32"
+    },
+    {
+      "tick": 18,
+      "old_score": 0.23851734399795532,
+      "old_expected": 0.2385106086730957,
+      "plain_dists": 0.31278038024902344,
+      "player_dists": 0.23840296268463135,
+      "new_base_sha256": "f496358434269b8bc1d7d078c98a174ab8d181b19afe3fcd2028e4d464af92dd",
+      "new_composite_sha256": "c77baf82222d0acf3174fd205695a80e4c62a61af483e30276e63bd88959c274"
+    },
+    {
+      "tick": 21,
+      "old_score": 0.20808804035186768,
+      "old_expected": 0.20808947086334229,
+      "plain_dists": 0.30946528911590576,
+      "player_dists": 0.20648479461669922,
+      "new_base_sha256": "f44e05941f37fd70b7cc98c743650e82ae1b0e320f1024e5e6584964869b2766",
+      "new_composite_sha256": "287672699c819b99458562475f456df37dc851f3b7e6f34fe43cfd010fdc0707"
+    },
+    {
+      "tick": 24,
+      "old_score": 0.22899585962295532,
+      "old_expected": 0.22899937629699707,
+      "plain_dists": 0.29887497425079346,
+      "player_dists": 0.22086012363433838,
+      "new_base_sha256": "3c9553b52ee899e10a180f373c7d077f75b92f90aa8a082d18de866bb9c7520d",
+      "new_composite_sha256": "2c9e78709529cb991d8cb9cb07014c6dd1bd109d313ed343924392a25dfbb254"
+    },
+    {
+      "tick": 27,
+      "old_score": 0.23239004611968994,
+      "old_expected": 0.2323918342590332,
+      "plain_dists": 0.32015323638916016,
+      "player_dists": 0.22554081678390503,
+      "new_base_sha256": "1fe411a3c9edbf5a080269a857093321242c1f8aa26e2a65f1fd42e95cef649f",
+      "new_composite_sha256": "2ec0593809720955c8b88aade2b6f461831c52d24c59227545b7f0c158015a33"
+    },
+    {
+      "tick": 30,
+      "old_score": 0.23731505870819092,
+      "old_expected": 0.23731106519699097,
+      "plain_dists": 0.306446373462677,
+      "player_dists": 0.21973061561584473,
+      "new_base_sha256": "f5e80aaf745111f9a4e8338ab8ff2d363f876a13809fe9f396ead66febdd0646",
+      "new_composite_sha256": "6ba49531fe2777ba79cdfb260e9c796d2ccb96bce6187d83c24e51666090a907"
+    },
+    {
+      "tick": 33,
+      "old_score": 0.21784943342208862,
+      "old_expected": 0.21786099672317505,
+      "plain_dists": 0.32601428031921387,
+      "player_dists": 0.2071271538734436,
+      "new_base_sha256": "a95c627be9535ff80a6ba0559bd0ad9beaf4e332bb7f0d34618261e1ce489386",
+      "new_composite_sha256": "bd855fc32cdbe468e9024c987dcdb558c8c23cbe2992990fdb015d6b621accab"
+    },
+    {
+      "tick": 36,
+      "old_score": 0.22441625595092773,
+      "old_expected": 0.22442835569381714,
+      "plain_dists": 0.3343532085418701,
+      "player_dists": 0.23332983255386353,
+      "new_base_sha256": "25a8c353bbdbe7acf2150db872074267fed192822f734bd16ac3da00e35872dd",
+      "new_composite_sha256": "94f8005645481e9815834288474c1f841f62ab0db72395dbf8813294774ffa03"
+    },
+    {
+      "tick": 39,
+      "old_score": 0.2092750072479248,
+      "old_expected": 0.2092856764793396,
+      "plain_dists": 0.3103371262550354,
+      "player_dists": 0.2101709246635437,
+      "new_base_sha256": "cbec59db4a59d6bd7d8db51b15cf11b07efaafaa40fa6430b4aaf732fe2f4147",
+      "new_composite_sha256": "989ac0b49199bf1975ce0544db0ff808c627e8d2f78a17a1675d578edef89567"
+    },
+    {
+      "tick": 42,
+      "old_score": 0.2294696569442749,
+      "old_expected": 0.22947192192077637,
+      "plain_dists": 0.32194066047668457,
+      "player_dists": 0.21294140815734863,
+      "new_base_sha256": "b728f48a3a3dd43c6a3c00871c0850cde70070954ddbfedd28c22c45a04910c7",
+      "new_composite_sha256": "09e6a9eb7d54a3a383d221ad63597c975bab0572b77e2597a7be42922ff84148"
+    },
+    {
+      "tick": 45,
+      "old_score": 0.2279517650604248,
+      "old_expected": 0.2279500961303711,
+      "plain_dists": 0.3294895887374878,
+      "player_dists": 0.2257155179977417,
+      "new_base_sha256": "14fcddbeeddbe108dc74ea0ff0cd5ba4937a52d28f1a5b4dd3a97e509172d672",
+      "new_composite_sha256": "ccf2e7fcdd0f24eda08a91d5467203ce0f9af86e8a84c9f31b87addc9d181e39"
+    },
+    {
+      "tick": 48,
+      "old_score": 0.21673017740249634,
+      "old_expected": 0.21672391891479492,
+      "plain_dists": 0.328191876411438,
+      "player_dists": 0.22104507684707642,
+      "new_base_sha256": "cc33e97669e8aed23f14c884bac6075db9e85ee7303db17e8f2163cf5535211f",
+      "new_composite_sha256": "f60de28c46b1f259f950cf87251ad3a764d6700a848cf5a43421a2718e4d834e"
+    },
+    {
+      "tick": 51,
+      "old_score": 0.22604554891586304,
+      "old_expected": 0.22604817152023315,
+      "plain_dists": 0.33973729610443115,
+      "player_dists": 0.2336505651473999,
+      "new_base_sha256": "589f53d883b7a13c402159d9f871a34634a54527357e22b7ae9dd6b5881dc2a9",
+      "new_composite_sha256": "6a94fb0b1b6931afbcf1d3a8eaa4842a6cd9da7251e256a632b0c301c16fb11f"
+    },
+    {
+      "tick": 54,
+      "old_score": 0.23358839750289917,
+      "old_expected": 0.23358356952667236,
+      "plain_dists": 0.32716333866119385,
+      "player_dists": 0.22705042362213135,
+      "new_base_sha256": "9bcdf66cd41f0b2f2b975624807c7b5194b7ced8b70beea3e3b175aac4329aaa",
+      "new_composite_sha256": "28fe60b6d78b5b15cbba24892bd2a934e8fffe3b0303132332387ec54a9df7bc"
+    },
+    {
+      "tick": 57,
+      "old_score": 0.21820735931396484,
+      "old_expected": 0.21820884943008423,
+      "plain_dists": 0.32158780097961426,
+      "player_dists": 0.20920610427856445,
+      "new_base_sha256": "c0987a6c7ae3873f8df4174884c4775be59615f0ff696994a0f6127c39c572ca",
+      "new_composite_sha256": "0c8c55ce62fd0803c5ab2bf4ecef737ecf44ea3efe2d0f2bd0fa3c9272501442"
+    },
+    {
+      "tick": 60,
+      "old_score": 0.20886731147766113,
+      "old_expected": 0.2088710069656372,
+      "plain_dists": 0.33384913206100464,
+      "player_dists": 0.20507627725601196,
+      "new_base_sha256": "312eb54c7e082ec3bb47df9bbac0685034a8f0053b5472103026c5573ef426f1",
+      "new_composite_sha256": "0870de7c6d9b09be88cb2461e1fcef40ec56331e6d974eb679b8df67c07c7413"
+    },
+    {
+      "tick": 63,
+      "old_score": 0.2107853889465332,
+      "old_expected": 0.21078705787658691,
+      "plain_dists": 0.33442914485931396,
+      "player_dists": 0.20599907636642456,
+      "new_base_sha256": "2b8b4fd595620ad0c635367a25855e622c6fde9f96bbc7f5734ee9d991c42c4d",
+      "new_composite_sha256": "410ff042ce1241f7963b0afbd8e5792dddce7c29406da299e9d1451830104fce"
+    },
+    {
+      "tick": 66,
+      "old_score": 0.21841967105865479,
+      "old_expected": 0.21842598915100098,
+      "plain_dists": 0.3095691204071045,
+      "player_dists": 0.22363406419754028,
+      "new_base_sha256": "3bcfd45e86b88d3de394e4f7cfada2790a9c4f74276eab6ce7fbe23703a823c5",
+      "new_composite_sha256": "24c32489d891f2e8092a4380fafb7e35f1484388ec8c2c5319f32c112e35122d"
+    },
+    {
+      "tick": 69,
+      "old_score": 0.20122122764587402,
+      "old_expected": 0.20120704174041748,
+      "plain_dists": 0.31599003076553345,
+      "player_dists": 0.2016603946685791,
+      "new_base_sha256": "dd3b7c176fcd19e90b489708753e3adf35a5fa2484b618eef3ee97ebd76742e3",
+      "new_composite_sha256": "14bc84a556b421f95512c2ceb83ffa1ee3f4abacaa6444603215cf3eff513bb5"
+    },
+    {
+      "tick": 72,
+      "old_score": 0.20137512683868408,
+      "old_expected": 0.2013755440711975,
+      "plain_dists": 0.3069310188293457,
+      "player_dists": 0.1922367811203003,
+      "new_base_sha256": "34aa8ab0e0dd9867b671d622bac2a7f56110bf8626f2c8cba5b3238431d99cc1",
+      "new_composite_sha256": "5c7eb95d7b0ceae621109b546a7c18c3d5792e0ee4ba519a8d174154f1009bf1"
+    },
+    {
+      "tick": 75,
+      "old_score": 0.19153159856796265,
+      "old_expected": 0.19153368473052979,
+      "plain_dists": 0.30606210231781006,
+      "player_dists": 0.1811065673828125,
+      "new_base_sha256": "4b0d3c26ea0e748a0cbad4d1be5a93129254087a287b2d6f0b6457f09b60d587",
+      "new_composite_sha256": "4834708ff1fbe5a11e4c1454f5db9fcad57c8055ea7f4f08d3869e6af718108e"
+    },
+    {
+      "tick": 78,
+      "old_score": 0.23424559831619263,
+      "old_expected": 0.23425531387329102,
+      "plain_dists": 0.3104366660118103,
+      "player_dists": 0.20996743440628052,
+      "new_base_sha256": "9b9deefac9d9261325dbcfba282e8cc120a368d843e8f07585fc8722a5a8f391",
+      "new_composite_sha256": "941f4dcd8bf7fa92c7c363cf8ebd3b23a22ad02525db288a3b6c8338bdfef727"
+    },
+    {
+      "tick": 81,
+      "old_score": 0.23731040954589844,
+      "old_expected": 0.2372986078262329,
+      "plain_dists": 0.319985032081604,
+      "player_dists": 0.24426496028900146,
+      "new_base_sha256": "d7aee3f08317b0a0836f56171608935a451e4c648cb3de5fd70dcbfe18ac5d02",
+      "new_composite_sha256": "fb83a033f39e12d5bf36406fb565918710736552452f8b62ff6900adeae5297a"
+    },
+    {
+      "tick": 84,
+      "old_score": 0.20981311798095703,
+      "old_expected": 0.20981168746948242,
+      "plain_dists": 0.31241798400878906,
+      "player_dists": 0.21228235960006714,
+      "new_base_sha256": "d67a9158e19a777f383745708085f1fb885e2e0851d9355eb2bc9742dc9d8679",
+      "new_composite_sha256": "2e964a73388b034a57fed79813fa1560b17a6ae174d87dcf856448ddcad439f0"
+    },
+    {
+      "tick": 87,
+      "old_score": 0.22693383693695068,
+      "old_expected": 0.22692734003067017,
+      "plain_dists": 0.3520429730415344,
+      "player_dists": 0.2206052541732788,
+      "new_base_sha256": "234ea885675cfdcd35527f3b1b74618a94db5df3bbd04d5eedce880f89cb36b2",
+      "new_composite_sha256": "9944f965322f3802ae50be9f739c2bfbe367d5a67a5855537fdc03e44318736a"
+    },
+    {
+      "tick": 90,
+      "old_score": 0.24138259887695312,
+      "old_expected": 0.24141919612884521,
+      "plain_dists": 0.34009552001953125,
+      "player_dists": 0.23006922006607056,
+      "new_base_sha256": "9ffa5369a00f82d0607621c925badcb9940cb9d432fde7aaf3be88f7f909f933",
+      "new_composite_sha256": "096093a29d01992f929f73341ae93c2e467c8d90259dd79bea3eeef5e8c1f944"
+    },
+    {
+      "tick": 93,
+      "old_score": 0.2158520221710205,
+      "old_expected": 0.21585619449615479,
+      "plain_dists": 0.33399873971939087,
+      "player_dists": 0.21881043910980225,
+      "new_base_sha256": "4d589aa3a135cf13667eb0cb1ec83018f0915f173b224b7c9e1c6cbaa39ce281",
+      "new_composite_sha256": "ec44daa100bbc26bff94e786455199bb9e9e7163d90a2cdab1ff3efd98a59c50"
+    },
+    {
+      "tick": 96,
+      "old_score": 0.18763458728790283,
+      "old_expected": 0.18763130903244019,
+      "plain_dists": 0.28127026557922363,
+      "player_dists": 0.1915450096130371,
+      "new_base_sha256": "325d3d2a8671a0b6bd513dc50cea1deaa058d1b5ebad0959a4aeedfea2687fa6",
+      "new_composite_sha256": "e5ec779154d051cbc62f6751e9e4c9cc168a0c0e71c8e092914d36ec97e1c23f"
+    },
+    {
+      "tick": 99,
+      "old_score": 0.22740614414215088,
+      "old_expected": 0.2273930311203003,
+      "plain_dists": 0.3224989175796509,
+      "player_dists": 0.21938395500183105,
+      "new_base_sha256": "b7f288bb7513de3dffb775b2b966097d25a9ee4fb4c69714c264f30f458f60ec",
+      "new_composite_sha256": "b4e14d59ff2c1e61aa75e7a75cf47e0fcad9923cb6f0ae7e090d74725d3387a9"
+    },
+    {
+      "tick": 102,
+      "old_score": 0.23311126232147217,
+      "old_expected": 0.23310518264770508,
+      "plain_dists": 0.3250890374183655,
+      "player_dists": 0.22526204586029053,
+      "new_base_sha256": "2a3105bd9970cadd75d05221b11ac349dd923a731e0a3b841ce020ba9544761d",
+      "new_composite_sha256": "227e60ba0b0169a12f529e8e7e271c4ed5df8062b4be41c622e4e4927783ef22"
+    },
+    {
+      "tick": 105,
+      "old_score": 0.21620887517929077,
+      "old_expected": 0.2162100076675415,
+      "plain_dists": 0.3132002353668213,
+      "player_dists": 0.22804665565490723,
+      "new_base_sha256": "ffe952724736ec302e4de101a90cb97d8eefb3bb63fd0516bd18d66e3dc145dd",
+      "new_composite_sha256": "2f5a647f594e12bc45c443c9aeda0d4c4ca3379f6a9b41ac485a5acfe8b5eb6e"
+    },
+    {
+      "tick": 108,
+      "old_score": 0.22028815746307373,
+      "old_expected": 0.22029435634613037,
+      "plain_dists": 0.3057008981704712,
+      "player_dists": 0.20693987607955933,
+      "new_base_sha256": "c1310754865b4c863a54b9de3872c76fc31022e563f4c14404b80a053d1653a4",
+      "new_composite_sha256": "2fc4e3536a22a8d66d9328b796420f6fff358381fe5e5e412c34808c48afc440"
+    },
+    {
+      "tick": 111,
+      "old_score": 0.23015087842941284,
+      "old_expected": 0.23013830184936523,
+      "plain_dists": 0.2863318920135498,
+      "player_dists": 0.22030818462371826,
+      "new_base_sha256": "ecb59a556b8cd199d50d6ccd8e74f1d7679226b3ab8c5667e654af9b08af711a",
+      "new_composite_sha256": "24ffd3e75205e1693f7f750ef20270a05413902c29f3e5cd65223d996b05c315"
+    },
+    {
+      "tick": 114,
+      "old_score": 0.2135412096977234,
+      "old_expected": 0.21353745460510254,
+      "plain_dists": 0.2736004590988159,
+      "player_dists": 0.20884007215499878,
+      "new_base_sha256": "235d96fe8e97e11f83c3cc0a62ea9424c7f1730cc85adf2a53efea2cd80ac699",
+      "new_composite_sha256": "7e56f5e265ddbb9523fe27fee46d9faaee36c83445101f725809a5c6a44d9ae0"
+    },
+    {
+      "tick": 117,
+      "old_score": 0.21272391080856323,
+      "old_expected": 0.21272486448287964,
+      "plain_dists": 0.3294183611869812,
+      "player_dists": 0.20637577772140503,
+      "new_base_sha256": "09c674d1752fa6c2f27c3f1d089bfd178836fe5f229f0205034b4c43deb183e8",
+      "new_composite_sha256": "eee203da157f88bd808fdb544947890b8439025da22f6fad1f6a5f25a8dade16"
+    },
+    {
+      "tick": 120,
+      "old_score": 0.22493284940719604,
+      "old_expected": 0.22492974996566772,
+      "plain_dists": 0.29950374364852905,
+      "player_dists": 0.22692877054214478,
+      "new_base_sha256": "440dc48e12b918671619b3978d4bf4f0556a63d9ef42fc465481955855bcc102",
+      "new_composite_sha256": "e0144a3ef48c9b58ad2138cd4be632a0d62da834e75ad9d839c1eb19930159a2"
+    },
+    {
+      "tick": 123,
+      "old_score": 0.2351035475730896,
+      "old_expected": 0.23510581254959106,
+      "plain_dists": 0.32166916131973267,
+      "player_dists": 0.23155391216278076,
+      "new_base_sha256": "bbd9ddc3045953dd2a03df4290e214b3d1a939260613fcefe3121056795eec17",
+      "new_composite_sha256": "efeb7d3952cee91936b570f62a0150204ccd478666cd724b23bf33a479a81f64"
+    },
+    {
+      "tick": 126,
+      "old_score": 0.22624480724334717,
+      "old_expected": 0.22625184059143066,
+      "plain_dists": 0.2984866499900818,
+      "player_dists": 0.21852779388427734,
+      "new_base_sha256": "fbc34b76ffc7d75b60a1e7ca774d7fc0606b868997d397653bbf05d0063f8de6",
+      "new_composite_sha256": "7b1bc4291a4b4c7eb9d4d7f11a92d88efe02fb1bd3ab72b66674b49a6aab6b45"
+    },
+    {
+      "tick": 129,
+      "old_score": 0.22058886289596558,
+      "old_expected": 0.22055190801620483,
+      "plain_dists": 0.34163016080856323,
+      "player_dists": 0.2102157473564148,
+      "new_base_sha256": "30b9f7fb6ef3454fe81e8004ba6f6e7c9a5dfaecfa44671eba8526189d063a16",
+      "new_composite_sha256": "93ccae03e7ce9ed5167da0fc1897a2a8728b196c08cba8041ad8f4e73b48738a"
+    },
+    {
+      "tick": 132,
+      "old_score": 0.23901832103729248,
+      "old_expected": 0.23901093006134033,
+      "plain_dists": 0.3541259169578552,
+      "player_dists": 0.2233930230140686,
+      "new_base_sha256": "abafa8de02ad4d3d4d6f41ae957bd5a57667bcf6eacdb6e211e172338b4f61e6",
+      "new_composite_sha256": "8d8cc107c7c3c47337d07683af7f821087f961e208367f55e48cb26415a27d10"
+    },
+    {
+      "tick": 135,
+      "old_score": 0.21383923292160034,
+      "old_expected": 0.21384352445602417,
+      "plain_dists": 0.33410173654556274,
+      "player_dists": 0.21501213312149048,
+      "new_base_sha256": "7db1239c615946d7dddb9ee39de07cd12a3998a8ca9d7577d0763d5ec184c217",
+      "new_composite_sha256": "af0d4c7fb783d36fe7bb27bb68acf6f5aa0bf4bc461e3a73db7c56515637086c"
+    },
+    {
+      "tick": 138,
+      "old_score": 0.23552441596984863,
+      "old_expected": 0.23551899194717407,
+      "plain_dists": 0.3609943389892578,
+      "player_dists": 0.22604095935821533,
+      "new_base_sha256": "5aa28f0c97a466124cad1996c10f722056694d351755fc93a4878efd1c09b868",
+      "new_composite_sha256": "18283baf88b26ebd6a0eeb6f7c4612ab92f39f39630db9969afa5dccc24a994f"
+    },
+    {
+      "tick": 141,
+      "old_score": 0.21958321332931519,
+      "old_expected": 0.21957606077194214,
+      "plain_dists": 0.34665703773498535,
+      "player_dists": 0.2121288776397705,
+      "new_base_sha256": "2ff3744a6b29c71593c0c776dbeb925597591679cce8cabd0fc1b72f380131ff",
+      "new_composite_sha256": "40fffaef9b3371b13481e7eaa50a24486e66e90f5b93432fb0e1e95ea7d21419"
+    },
+    {
+      "tick": 144,
+      "old_score": 0.22552448511123657,
+      "old_expected": 0.22553086280822754,
+      "plain_dists": 0.33611780405044556,
+      "player_dists": 0.22626233100891113,
+      "new_base_sha256": "0a2255d56aeed996411f2536fc272bbd9989bf4cdfb10c98ae5b8d31ca53617b",
+      "new_composite_sha256": "a5051df29424d5b6ed000957b2d6b37ad542dc48e3045ce3ae91c18dc9c5c868"
+    },
+    {
+      "tick": 147,
+      "old_score": 0.22542697191238403,
+      "old_expected": 0.22543179988861084,
+      "plain_dists": 0.33965277671813965,
+      "player_dists": 0.2258480191230774,
+      "new_base_sha256": "7cc6b16a526d3d1555070f03299977afff40eff5fec0f2c322f0996418e9ee52",
+      "new_composite_sha256": "d6691cff393ed30b1e90e409ddcdc499e3230e4f7f1e0b98253de74f2bbf70cf"
+    },
+    {
+      "tick": 150,
+      "old_score": 0.21304655075073242,
+      "old_expected": 0.2130492925643921,
+      "plain_dists": 0.31491756439208984,
+      "player_dists": 0.2088983654975891,
+      "new_base_sha256": "5699f691403416541ebe470dd86976b1d69e0084d1ad1c1cd8f40932d137b976",
+      "new_composite_sha256": "1f59873ea2659ae7e2c15ab36097bcf601283d873336e542f646b79f8969d132"
+    },
+    {
+      "tick": 153,
+      "old_score": 0.227192223072052,
+      "old_expected": 0.2272006869316101,
+      "plain_dists": 0.32505011558532715,
+      "player_dists": 0.22625970840454102,
+      "new_base_sha256": "eb7f58f9f2c6c8fa8c170d0c226c2678faec3e09bce41046c8fe3e9bcba38939",
+      "new_composite_sha256": "fdc6d7daa147d00f333cb98895409401d06b767a13cfb06f242e0c2cd575b8f3"
+    },
+    {
+      "tick": 156,
+      "old_score": 0.23113423585891724,
+      "old_expected": 0.23113340139389038,
+      "plain_dists": 0.29894155263900757,
+      "player_dists": 0.21519315242767334,
+      "new_base_sha256": "9bba20b6013e56c72cc446fadcd88d09c81b107babb0431f8d108904b5e79280",
+      "new_composite_sha256": "91faa77f27f916edb38e35f89abf227ae3c96f67081f85cf95228e321af5f5c9"
+    },
+    {
+      "tick": 159,
+      "old_score": 0.23526787757873535,
+      "old_expected": 0.23526829481124878,
+      "plain_dists": 0.34164339303970337,
+      "player_dists": 0.24332475662231445,
+      "new_base_sha256": "d630deedaabfa3484cde102e259f9728c4455546282ccf3dbfed3ff1acef0513",
+      "new_composite_sha256": "5d5b79542e8f84a18ac6571213272f4f552f8ef65b297afe7dbedd67d9543b0b"
+    },
+    {
+      "tick": 162,
+      "old_score": 0.20589327812194824,
+      "old_expected": 0.20589667558670044,
+      "plain_dists": 0.3103112578392029,
+      "player_dists": 0.2056615948677063,
+      "new_base_sha256": "c83bf3a9c55e63c63275a01d4c14dabafd96c47186cb0b3119d77584dff6751e",
+      "new_composite_sha256": "37207221f0b306e6256e29bdae29262d4077a111ce466fb334f994bdfcc0b9bd"
+    },
+    {
+      "tick": 165,
+      "old_score": 0.22912949323654175,
+      "old_expected": 0.22912800312042236,
+      "plain_dists": 0.32461977005004883,
+      "player_dists": 0.23401141166687012,
+      "new_base_sha256": "8f76baff5489f3733c35cb32a6621de619fadd4a70c269bcb077309ab5753694",
+      "new_composite_sha256": "96505b3bd89c3b2aaac57440edc16d6c31f7e32612c31a2842e5f38ccda4a489"
+    },
+    {
+      "tick": 168,
+      "old_score": 0.22892838716506958,
+      "old_expected": 0.22891628742218018,
+      "plain_dists": 0.32469773292541504,
+      "player_dists": 0.23307108879089355,
+      "new_base_sha256": "823dce23d5b638ec696c90ca57ef9ac822001b745b669a836c58a508e22c0394",
+      "new_composite_sha256": "9285893a993881e703c553953db379054b75588a4bbb4a89467416dcf2cc80ba"
+    },
+    {
+      "tick": 171,
+      "old_score": 0.24407124519348145,
+      "old_expected": 0.2440595030784607,
+      "plain_dists": 0.3284168839454651,
+      "player_dists": 0.23603713512420654,
+      "new_base_sha256": "92834dfd32592f0b665c0d8c103df6197eba0eb8f5ed13697f467d21391a474c",
+      "new_composite_sha256": "adb786ff654519eabc88360542d678ff65480aad34e415401dfe5cd62e8719df"
+    },
+    {
+      "tick": 174,
+      "old_score": 0.24733632802963257,
+      "old_expected": 0.2473466992378235,
+      "plain_dists": 0.35062605142593384,
+      "player_dists": 0.23558568954467773,
+      "new_base_sha256": "47fe1e437cc835a88131e708d920401531b0449811bd608172d9cb124bbb58ba",
+      "new_composite_sha256": "d64cb632b1fbfc91d114f2e96b475753a879adedb37c8b9622a75a4c72e33a54"
+    },
+    {
+      "tick": 177,
+      "old_score": 0.25103050470352173,
+      "old_expected": 0.2510249614715576,
+      "plain_dists": 0.3454802632331848,
+      "player_dists": 0.2268032431602478,
+      "new_base_sha256": "4bf53b2c7d90b9152d3deedb3d013262fb41b4b8e8bb28ae15b17d576892bbde",
+      "new_composite_sha256": "4289269101a1425170c9bbc68502d5868ac976439000e52ee05c11258010705a"
+    },
+    {
+      "tick": 180,
+      "old_score": 0.2210019826889038,
+      "old_expected": 0.2209755778312683,
+      "plain_dists": 0.35042810440063477,
+      "player_dists": 0.21947842836380005,
+      "new_base_sha256": "0f1f2eb310222922635b15f89c85b2afadfd79eb1a0a0bc5ea3671ce88358dc9",
+      "new_composite_sha256": "786f79ba4cf86bd7efa4fdaac8e0d305afb6a1e810da5c60545a993378194122"
+    },
+    {
+      "tick": 183,
+      "old_score": 0.19726979732513428,
+      "old_expected": 0.19727057218551636,
+      "plain_dists": 0.34082460403442383,
+      "player_dists": 0.20364046096801758,
+      "new_base_sha256": "726b8b1b8ab02f19d2f452efe17b92ceeeea68df062a0b3658e03c21934fe45f",
+      "new_composite_sha256": "bfa2aec68fcb5d1242440820a505fb21257dd2d19b95ee5061a7b923218ae7e2"
+    },
+    {
+      "tick": 186,
+      "old_score": 0.24406886100769043,
+      "old_expected": 0.24405384063720703,
+      "plain_dists": 0.3263203501701355,
+      "player_dists": 0.2335742712020874,
+      "new_base_sha256": "20cf2bb75a580ee53effefd051f01cc3b81a6b4f572142fc357684f349416ebf",
+      "new_composite_sha256": "4af67d83d8098fe6c91f06e47e3877bd0022acff7d7a08be36f33ecddfff6a28"
+    },
+    {
+      "tick": 189,
+      "old_score": 0.23590338230133057,
+      "old_expected": 0.23589599132537842,
+      "plain_dists": 0.34293609857559204,
+      "player_dists": 0.22812986373901367,
+      "new_base_sha256": "f6e2b9d6e19d610042771fa2ed600d736e3593f6b5a11d13ac2e26c9baa699c6",
+      "new_composite_sha256": "56c8c6c7e7ea8d3349a786d985b55d8a8c4673235833950cfe879b443b54e803"
+    },
+    {
+      "tick": 192,
+      "old_score": 0.2404271364212036,
+      "old_expected": 0.24042201042175293,
+      "plain_dists": 0.2999092936515808,
+      "player_dists": 0.23397207260131836,
+      "new_base_sha256": "021d0a95042eaa78859d67caf51cd2be5a0d627a4b2e9a0c2f6d79fce26cceeb",
+      "new_composite_sha256": "5b3e01e89eff7bd93378bb20599d4dac600461e7687cc963cb3c71e053f8cb08"
+    },
+    {
+      "tick": 195,
+      "old_score": 0.23548638820648193,
+      "old_expected": 0.2354944944381714,
+      "plain_dists": 0.35265302658081055,
+      "player_dists": 0.22827905416488647,
+      "new_base_sha256": "6d824525912716af0d3a2592724484ec94fbebb1006c0cad9d7025277e0c0baa",
+      "new_composite_sha256": "d2e0a78e1e0d613a7ae16afb411ed28abed6b2a65b26fd4d4c612cf945677778"
+    },
+    {
+      "tick": 198,
+      "old_score": 0.21298211812973022,
+      "old_expected": 0.21298402547836304,
+      "plain_dists": 0.31523746252059937,
+      "player_dists": 0.20089632272720337,
+      "new_base_sha256": "b481ae3fc5e3b0db98d279bf9763b9f8a645530d1c79b022825b594269492237",
+      "new_composite_sha256": "bcebf22e85e92c9525d8adf9ad24c2cae7ba78e2b6a00c8fb5511e86292480a7"
+    },
+    {
+      "tick": 201,
+      "old_score": 0.22288596630096436,
+      "old_expected": 0.22281885147094727,
+      "plain_dists": 0.28426259756088257,
+      "player_dists": 0.20659852027893066,
+      "new_base_sha256": "b5c59f35ae98701c03dc705d44adb0e1b73143d9631c96ec2a7582df1a6184b9",
+      "new_composite_sha256": "c48351ea7faae56c4c8124342690b0a16acdb1522e992045b3b96e3e65bd76cc"
+    },
+    {
+      "tick": 204,
+      "old_score": 0.20966500043869019,
+      "old_expected": 0.20966601371765137,
+      "plain_dists": 0.28735148906707764,
+      "player_dists": 0.1965392827987671,
+      "new_base_sha256": "79166404735f507c18c23550a9328994c2bd1eeff6059080969f6508c912f7de",
+      "new_composite_sha256": "3ef62dfb54b95b6ba97d04d184cc81aeed0c22a8a612fda81a605449063d13b0"
+    },
+    {
+      "tick": 207,
+      "old_score": 0.21895670890808105,
+      "old_expected": 0.21901267766952515,
+      "plain_dists": 0.31443601846694946,
+      "player_dists": 0.211309015750885,
+      "new_base_sha256": "b34eb9fe63a7f88f73f0cef549d7eeb94b8fb37238ecc81b960c00a69de237f4",
+      "new_composite_sha256": "31b43f4e837320de1dbf3bb87ee23d8a6908044fdd7407c5352e2584ddd11752"
+    },
+    {
+      "tick": 210,
+      "old_score": 0.23053264617919922,
+      "old_expected": 0.23052942752838135,
+      "plain_dists": 0.30322253704071045,
+      "player_dists": 0.21833598613739014,
+      "new_base_sha256": "3a5b2f63139aced37ce70b5657a356a087a058aa9742312e46717acba0ad5d63",
+      "new_composite_sha256": "ed60266a61b7ffb88a040fc4f3fbdd6ad1eaf490bcc2e85514cd67b55c029125"
+    },
+    {
+      "tick": 213,
+      "old_score": 0.2668057084083557,
+      "old_expected": 0.26680541038513184,
+      "plain_dists": 0.34713053703308105,
+      "player_dists": 0.2626161575317383,
+      "new_base_sha256": "089f35216037c5890c10e4b207212bb544fc42c40db244c375c5fe3b5a34ad04",
+      "new_composite_sha256": "8a3e65ba9c7790f0b47afd50aec705628833c9798f69d926300e8ae2b0d8c6f2"
+    },
+    {
+      "tick": 216,
+      "old_score": 0.23495185375213623,
+      "old_expected": 0.23495936393737793,
+      "plain_dists": 0.3357018232345581,
+      "player_dists": 0.22743743658065796,
+      "new_base_sha256": "05db8d85d4776a7c6ad4661f4e5de243d02a37ddff61579bea94c922dd44660a",
+      "new_composite_sha256": "5a0e7a07f3cf13dd4bd78137a583125f51b4b6ce5b6e3d8037a9c0a0bf11202f"
+    },
+    {
+      "tick": 219,
+      "old_score": 0.2307719588279724,
+      "old_expected": 0.23077040910720825,
+      "plain_dists": 0.36365753412246704,
+      "player_dists": 0.22474884986877441,
+      "new_base_sha256": "1f3f6191623d70032eb6595749d79bc6e3dac1ad0f29eafaa3fe2f1099bc8aa6",
+      "new_composite_sha256": "f0576aceb0cf8283f2f3805ffea41c5bbf2f6583a12a9e5d9c4302b9e856cb23"
+    },
+    {
+      "tick": 222,
+      "old_score": 0.2261064052581787,
+      "old_expected": 0.22609668970108032,
+      "plain_dists": 0.3696334958076477,
+      "player_dists": 0.22065722942352295,
+      "new_base_sha256": "f7396560c12a517ca17e3a55f00da0ec3f8a1fa579e7731a62a00b982a471669",
+      "new_composite_sha256": "6a9f9a3f7f2ab3fd8c61d45e159c84d848a7d73cd8006102cf1c77c5c3701dc9"
+    },
+    {
+      "tick": 225,
+      "old_score": 0.22039824724197388,
+      "old_expected": 0.2203904390335083,
+      "plain_dists": 0.35236942768096924,
+      "player_dists": 0.21969389915466309,
+      "new_base_sha256": "3f422f65c30733ba6480538f69a897c5b1ba90faf407c4360fe3231821969438",
+      "new_composite_sha256": "096c95bf6700b82c72cd060bbde45ff632188dd1ea54798bb364c368188e599b"
+    },
+    {
+      "tick": 228,
+      "old_score": 0.21899783611297607,
+      "old_expected": 0.2190021276473999,
+      "plain_dists": 0.33226507902145386,
+      "player_dists": 0.20759040117263794,
+      "new_base_sha256": "31039620029efb253ff18d082f53f8b9d4b7361f86534bdd377003836ea2bb53",
+      "new_composite_sha256": "0c352ec173c888572ac6db7f61eca1e2d353a3df1b441bcd3258def796866cbe"
+    },
+    {
+      "tick": 231,
+      "old_score": 0.21098017692565918,
+      "old_expected": 0.2109835147857666,
+      "plain_dists": 0.33297479152679443,
+      "player_dists": 0.20413142442703247,
+      "new_base_sha256": "a56dc3b9e5eced91196a734aac03454aa1157f5b2c3060eaf2c61f333844691d",
+      "new_composite_sha256": "515e1e6ae0d0d9b1001796e0dfeb0f4d67a14da3ad9866d86a5cd2c038a37f04"
+    },
+    {
+      "tick": 234,
+      "old_score": 0.22451841831207275,
+      "old_expected": 0.22452044486999512,
+      "plain_dists": 0.3181052803993225,
+      "player_dists": 0.22217541933059692,
+      "new_base_sha256": "da050a498f31e52bcfbbf61a83050f47c4e51cadf2b45055504bee96b648da91",
+      "new_composite_sha256": "cd896c865e0f9e4b1b4522dd809bd4435406a8028eac2bbadbf35e35ef9d8faa"
+    },
+    {
+      "tick": 237,
+      "old_score": 0.22146403789520264,
+      "old_expected": 0.22146916389465332,
+      "plain_dists": 0.31865060329437256,
+      "player_dists": 0.22127246856689453,
+      "new_base_sha256": "e491ce08aee9435a7571b010b70e981f4a9ecbdf4ad153427a6c77cb6498a0ef",
+      "new_composite_sha256": "84569e5fcccc97ecd0cc0788329d754956180ed0b560bcec403082c56aa58e32"
+    }
+  ],
+  "setup_seconds": 12.577626653990592,
+  "elapsed_seconds": 147.97593279799912,
+  "gpu": "NVIDIA RTX 6000 Ada Generation",
+  "capability": [
+    8,
+    9
+  ]
+}

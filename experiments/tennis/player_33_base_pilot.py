@@ -19,6 +19,28 @@ SOURCE_YUV = "3734897c6b329649ff886c053a9c6fe0bb215a30bec5629934fdc5fd10b0d317"
 ORIGINAL = "bb9bb58d6101b947cdad32c371f9755d3c635b18ee29e0fccf498861b2be7479"
 ORIGINAL_DECODE = "d764dd1252019456026211c856ffa501312c9dcfe3ad149369adb3d4029695dd"
 SIDE = 4.347078333333333 + 4.5 * 164079 * 8 / 7_200_000
+WINDOWS = {
+    "al028": (
+        "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934",
+        "5788a0f1b0b2ce3c8d57ea842807a43dda1f9fa3cc06cd90c3aa4b27ff31d22a",
+        "b206613e503f525ec28f6e277d176ea71eff294f31eb898adecac658433da843",
+        "bebf7d41b70351b0df09ab658fdcf5e68b60fe8e197ae57f10bfd7826e970bb6",
+        5.119,
+    ),
+    "al043": (
+        "847cb8272134bd31a5447ff3cce02b28a906fae44559b3e0a58661d8171b6c16",
+        "0d90ad9784493401561e4390ca83d31c9dc40ac1752eb9ee40ef75190d0837d6",
+        "9b58ceabe7cf8f04426da3451b1afeadcd15f8a29a517950e6b99a5e91be3a09",
+        "b0c69928f40e3dd7198ea7d9fe8e9622023aa3425dc1dff04e7c0e54e6d07abd",
+        5.04804,
+    ),
+}
+
+
+def configure(window):
+    global SOURCE, SOURCE_YUV, ORIGINAL, ORIGINAL_DECODE, SIDE
+    if window in WINDOWS:
+        SOURCE, SOURCE_YUV, ORIGINAL, ORIGINAL_DECODE, SIDE = WINDOWS[window]
 
 
 def digest(p):
@@ -126,10 +148,12 @@ def validate(a):
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--source", type=Path)
+    p.add_argument("--window", choices=("al028", "al034", "al043"), default="al034")
     p.add_argument("--frames", type=int)
     p.add_argument("--full-limit", type=int, required=True)
     p.add_argument("--validate", action="store_true")
     a = p.parse_args()
+    configure(a.window)
     validate(a) if a.validate else run(a)
 
 

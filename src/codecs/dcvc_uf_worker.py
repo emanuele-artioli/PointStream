@@ -136,7 +136,9 @@ def _apply_optional_shared_parity_limit(torch: Any, environ: Any) -> None:
     profile = environ.get('PS_K5D_SHARED_NUMERICAL')
     if profile is None:
         return
-    profiles = {'k5d-parity16-shared-numerical-v1': (16384, 8192),
+    profiles = {'pointstream-parent2-child6-v1': (8192, 6144),
+                'pointstream-parent4-child6-v1': (10240, 6144),
+                'k5d-parity16-shared-numerical-v1': (16384, 8192),
                 'k5d-parity16-shared-numerical-low-memory-v1': (6144, 2048),
                 'k5d-parity16-shared-parent8-child2-v1': (10240, 2048),
                 'ball-confirmation-parent4-child6-v1': (12288, 6144),
@@ -145,7 +147,7 @@ def _apply_optional_shared_parity_limit(torch: Any, environ: Any) -> None:
         raise RuntimeError('unknown shared DCVC parity profile')
     declared, budget = profiles[profile]
     allowed_devices = {('NVIDIA RTX A6000', (8, 6))}
-    if profile in ('ball-confirmation-parent4-child6-v1', 'ball-confirmation-parent4-child6-then-parent8-v2'):
+    if profile in ('pointstream-parent2-child6-v1', 'pointstream-parent4-child6-v1', 'ball-confirmation-parent4-child6-v1', 'ball-confirmation-parent4-child6-then-parent8-v2'):
         allowed_devices.add(('NVIDIA RTX 6000 Ada Generation', (8, 9)))
     device = (torch.cuda.get_device_name(0), tuple(torch.cuda.get_device_capability(0)))
     if (environ.get('PS_GPU_SHARING') != 'shared'
@@ -178,7 +180,7 @@ def _apply_optional_shared_parity_limit(torch: Any, environ: Any) -> None:
         raise RuntimeError('shared DCVC plan is outside scratch')
     with (receipts / f'child-{os.getpid()}.json').open('x') as stream:
         extra = {'profile': profile, 'device_name': device[0], 'capability': list(device[1])} if (
-            profile in ('ball-confirmation-parent4-child6-v1', 'ball-confirmation-parent4-child6-then-parent8-v2')) else {}
+            profile in ('pointstream-parent2-child6-v1', 'pointstream-parent4-child6-v1', 'ball-confirmation-parent4-child6-v1', 'ball-confirmation-parent4-child6-then-parent8-v2')) else {}
         json.dump({**extra, 'role': 'dcvc', 'pid': os.getpid(), 'pgid': os.getpgrp(), 'budget_mib': budget,
                    'total_bytes': total, 'fraction': fraction, 'allocated_before': 0, 'host_pid': host_pid,
                    'host_pgid': host_pgid, 'start_ticks': start_ticks, 'campaign_pgid': group,

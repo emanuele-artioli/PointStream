@@ -1,0 +1,193 @@
+{
+  "schema": 1,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.player_33_recompose"
+  ],
+  "arguments": [
+    "--anchor",
+    "{staged:anchor}",
+    "--transport",
+    "{staged:transport}",
+    "--masks",
+    "{staged:masks}",
+    "--generated",
+    "{staged:generated}",
+    "--source",
+    "{staged:source}",
+    "--gpu-base",
+    "{staged:gpu_base}",
+    "--prior",
+    "{staged:prior}",
+    "--dists",
+    "{staged:dists}",
+    "--old-judge",
+    "{staged:old_judge}",
+    "--candidate",
+    "{staged:candidate}",
+    "--ticks",
+    "{ticks}",
+    "--full-limit",
+    "600",
+    "--window",
+    "al043"
+  ],
+  "staged_inputs": [
+    {
+      "name": "anchor",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T084153Z-d0f4e6f0/full/published.tar",
+      "sha256": "4d80831c7c98b7c4f86efd245559ebc36011d65fbb5c83091ccb7294548f970f",
+      "extract": false
+    },
+    {
+      "name": "transport",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T091524Z-7d2f62ea/full/published.tar",
+      "sha256": "70cfa5b37cbb579be788202148cf3fa88fafca0c45252ac02b91fd25f44fa0e2",
+      "extract": false
+    },
+    {
+      "name": "masks",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T102659Z-0ea13d2e/full/published.tar",
+      "sha256": "8d9079399edfd26469caaade13903cc106fc139d0af1de0e9f96c031b291ab34",
+      "extract": false
+    },
+    {
+      "name": "generated",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T092134Z-e6a8696a/full/published.tar",
+      "sha256": "854b886a1c19b4bebbc992b32a37a84ecbffed2000a18930c03b1b976d2a60f7",
+      "extract": false
+    },
+    {
+      "name": "source",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/sources/alcaraz_hurkacz__043.mp4",
+      "sha256": "847cb8272134bd31a5447ff3cce02b28a906fae44559b3e0a58661d8171b6c16",
+      "extract": false
+    },
+    {
+      "name": "gpu_base",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T084251Z-50f81640/full/published.tar",
+      "sha256": "5176ee591512198b88b9567a74df015110121c02e05c26bdb1957a622667c4a2",
+      "extract": false
+    },
+    {
+      "name": "prior",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T102659Z-0ea13d2e/full/receiver.json",
+      "sha256": "eafc4c81776ed74352bbd45483599f344bfc42dffdc42fac4504102f274fdaef",
+      "extract": false
+    },
+    {
+      "name": "dists",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "extract": false
+    },
+    {
+      "name": "old_judge",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T110838Z-ff9d8b4f/full/published.tar",
+      "sha256": "2f01e4df611c1b6c3c08890ec88cc1c6881517c288cbec722eb20699e741cf03",
+      "extract": false
+    },
+    {
+      "name": "candidate",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T002209Z-20a4fbb4/full/published.tar",
+      "sha256": "ef86bee38b61c7c58ef7391aba4e4b1dc3aa8f96d55619df6035cc54bed1330e",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T084153Z-d0f4e6f0/full/published.tar",
+      "sha256": "4d80831c7c98b7c4f86efd245559ebc36011d65fbb5c83091ccb7294548f970f"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T091524Z-7d2f62ea/full/published.tar",
+      "sha256": "70cfa5b37cbb579be788202148cf3fa88fafca0c45252ac02b91fd25f44fa0e2"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T102659Z-0ea13d2e/full/published.tar",
+      "sha256": "8d9079399edfd26469caaade13903cc106fc139d0af1de0e9f96c031b291ab34"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T092134Z-e6a8696a/full/published.tar",
+      "sha256": "854b886a1c19b4bebbc992b32a37a84ecbffed2000a18930c03b1b976d2a60f7"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/sources/alcaraz_hurkacz__043.mp4",
+      "sha256": "847cb8272134bd31a5447ff3cce02b28a906fae44559b3e0a58661d8171b6c16"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T084251Z-50f81640/full/published.tar",
+      "sha256": "5176ee591512198b88b9567a74df015110121c02e05c26bdb1957a622667c4a2"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T102659Z-0ea13d2e/full/receiver.json",
+      "sha256": "eafc4c81776ed74352bbd45483599f344bfc42dffdc42fac4504102f274fdaef"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T110838Z-ff9d8b4f/full/published.tar",
+      "sha256": "2f01e4df611c1b6c3c08890ec88cc1c6881517c288cbec722eb20699e741cf03"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T002209Z-20a4fbb4/full/published.tar",
+      "sha256": "ef86bee38b61c7c58ef7391aba4e4b1dc3aa8f96d55619df6035cc54bed1330e"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "required_commands": [],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.player_33_recompose",
+    "--validate",
+    "--full-limit",
+    "600",
+    "--window",
+    "al043"
+  ],
+  "deadline": "2026-11-22T06:00:00Z",
+  "verify_staged_inputs": true,
+  "stall_seconds": 600,
+  "hosts": [
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [
+    "RTX 6000 Ada"
+  ],
+  "gpu_memory_mib": 20000,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "local_storage_gib": 30,
+  "contention": {
+    "policy": "continue",
+    "basis": "Memory-bounded quality-only job; timing is not used as evidence.",
+    "resume_attempts": 0
+  },
+  "smoke": {
+    "seconds": 250,
+    "representative_basis": "Original exact source, generated crops, receiver masks, base and 3 sampled original DISTS controls; genuine q62 IVF."
+  },
+  "full": {
+    "seconds": 600
+  },
+  "validator_seconds": 60,
+  "budget_seconds": 950,
+  "scale": {
+    "ticks": {
+      "smoke": 3,
+      "full": 80
+    }
+  },
+  "gpu_sharing": {
+    "mode": "shared",
+    "margin_mib": 8192,
+    "basis": "Quality and hash controls only; timings are not performance evidence."
+  }
+}
