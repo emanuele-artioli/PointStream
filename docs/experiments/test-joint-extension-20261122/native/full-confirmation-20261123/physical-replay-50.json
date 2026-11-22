@@ -1,0 +1,99 @@
+{
+  "rung_crf": 50,
+  "job": "20261122T230429Z-708e2537",
+  "source_sha256": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+  "native_fps": "60",
+  "native_frames": 240,
+  "composed_support_identical_on_all_240": true,
+  "changed_display_frames_vs_original": 240,
+  "wire": {
+    "joint_sha256": "11cf8f79869e69912006f0556bb7cbb6f967e0a46b0368881b67fa48ba71ecf0",
+    "cache_sha256": "1f191ca3d078c258c6252003d746b6077c268bb98cff7260c4c960cab5a8d569",
+    "joint_bytes": 17827,
+    "cache_bytes": 149450,
+    "joint_roles": {
+      "frame": 16605,
+      "window": 1222,
+      "match": 0,
+      "reference": 0
+    },
+    "cache_roles": {
+      "frame": 0,
+      "window": 1834,
+      "match": 0,
+      "reference": 147616
+    },
+    "active_ticks": [
+      0,
+      240
+    ],
+    "ball_positions": 215
+  },
+  "frames_archive_sha256": "c70282f60075843f162c79f7988485d594c2dad79499f6313e1c8634b87e4595",
+  "rung_receipt_sha256": "d4969a64c6a7c2f7ba337fd1aabd6fc0df77455166f6a62d08ecc8adc8ff775f",
+  "original_finish_receipt_sha256": "b0a310e6ba03acce44739adec4e5dd243faade0bb196aa16e10dad0304699971",
+  "yuv_sha256": "f5251708cbfa65e7c408afca4190b8067465ea46d3434c983e42cc2fd92c332b",
+  "isolation": {
+    "landlock_abi": 4,
+    "handled_rights": 32767,
+    "denials": {
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match127-000-8ebca8b69320.mp4": 13,
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T113333Z-9f0e3e92/full/published.tar": 13,
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T122745Z-23a40ae1/full/published.tar": 13,
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T102817Z-df6c7026/full/ball.payload": 13,
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/k4-2026-10-13/inputs/yolo/yolo11x-pose.pt": 13
+    },
+    "namespaces": {
+      "user": "user:[4026535302]",
+      "net": "net:[4026535303]"
+    },
+    "interfaces": [
+      "lo"
+    ],
+    "mutation_denied": true,
+    "extra_fds": false,
+    "pre_sandbox_threads": 1,
+    "cpu_bootstrap_hash": null,
+    "listing_only": [],
+    "executables": [
+      "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2"
+    ],
+    "allowed": [
+      "/local/users/emanuele/pointstream/scratch/20261122T230429Z-708e2537-full/receiver-control-b5wb8s8t/code",
+      "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree",
+      "/local/users/emanuele/pointstream/scratch/20261122T230429Z-708e2537-full/receiver-control-b5wb8s8t/private",
+      "/local/users/emanuele/pointstream/cache/22c8b7dd08421312dd6fc64fa6e01ab62096bc24b1be49484a9e23d043c24ccd/crf50-players.pscp",
+      "/local/users/emanuele/pointstream/cache/bb6fbc147a01cf694369694c5a568bbda059f8c1358c2d6aa21959a731a02f37/crf50-players.manifest",
+      "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "/local/users/emanuele/pointstream/cache/11cf8f79869e69912006f0556bb7cbb6f967e0a46b0368881b67fa48ba71ecf0/crf50-rally.psj",
+      "/local/users/emanuele/pointstream/cache/1f191ca3d078c258c6252003d746b6077c268bb98cff7260c4c960cab5a8d569/crf50-initial.psr",
+      "/local/users/emanuele/pointstream/cache/f9ab35e8d3cd6708e726fe57d9d7ba7cc8943285ac4535524491f5cfe0598384/crf70-rally.psj",
+      "/local/users/emanuele/pointstream/cache/4db6e58e761a2b0d118ec2a639dcd9372e4768270b12680b831666c5f5e3972c/tree/publish/frames.npy",
+      "/local/users/emanuele/pointstream/cache/4db6e58e761a2b0d118ec2a639dcd9372e4768270b12680b831666c5f5e3972c/tree/publish/finish.json",
+      "/local/users/emanuele/pointstream/cache/4db6e58e761a2b0d118ec2a639dcd9372e4768270b12680b831666c5f5e3972c/tree/publish/match127_far-masks.npz",
+      "/local/users/emanuele/pointstream/cache/4db6e58e761a2b0d118ec2a639dcd9372e4768270b12680b831666c5f5e3972c/tree/publish/match127_near-masks.npz",
+      "/usr/lib",
+      "/usr/lib",
+      "/usr/lib64",
+      "/dev/null",
+      "/dev/urandom",
+      "/etc/ld.so.cache",
+      "/proc/cpuinfo",
+      "/proc/devices",
+      "/proc/152629/maps",
+      "/proc/152629/status",
+      "/proc/stat",
+      "/proc/sys/vm/mmap_min_addr",
+      "/sys/devices/system/cpu/online",
+      "/sys/devices/system/memory/block_size_bytes",
+      "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2"
+    ],
+    "code_manifest_sha256": "fafd06b0923f6809c8b4241ecca2dcaa23dd8988cdc2bb08ef6cecac5ff681fe",
+    "manifest_sha256": "bb6fbc147a01cf694369694c5a568bbda059f8c1358c2d6aa21959a731a02f37",
+    "manifest_bytes": 625,
+    "runtime_archive_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "resource_seconds": 56.17053110100096
+}

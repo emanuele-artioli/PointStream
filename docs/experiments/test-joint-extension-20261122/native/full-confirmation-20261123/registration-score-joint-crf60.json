@@ -1,0 +1,23 @@
+{
+  "job_id": "20261122T230941Z-1a17c987",
+  "status": "pending",
+  "spec_sha256": "9bebd7e19835d5edc6acbb56bd90802dedcae5fdfac70235394a201a68077587",
+  "source_commit": "b44691bba163f9778b93dfce29f2725ba5802b5b",
+  "source_archive_sha256": "c26d32602f7ef65c46554b816b8b078e1602dd0a846e99416737cedc6e454587",
+  "source_sha256": "35ef7458b86550b0c9a9ee898ca7a0c320bbc4374a5b370c7da9ae20984d7d06",
+  "snapshot_paths": [
+    "experiments",
+    "src",
+    "scripts",
+    "tools",
+    "docs/experiments/test-crop-joint-20261122/score_native.py",
+    "docs/experiments/test-crop-joint-20261122/temporal_native.py",
+    "docs/experiments/test-joint-extension-20261122/native/samples.py",
+    "docs/experiments/test-joint-extension-20261122/native/match127-binding.json",
+    "docs/experiments/test-joint-extension-20261122/native/match127-crop-receipt.json",
+    "docs/experiments/test-joint-extension-20261122/native/match127-review-ticks.json"
+  ],
+  "full_cap_seconds": 1600,
+  "budget_seconds": 2280,
+  "deadline": "2026-11-23T01:21:00Z"
+}
