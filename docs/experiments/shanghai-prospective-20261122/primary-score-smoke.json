@@ -1,0 +1,178 @@
+{
+  "stage": "smoke",
+  "frames": 24,
+  "decision": "primary",
+  "labels_sha256": "d1180a3eabfc30db3e034bcf7d2d3017d0bc2686155a892d0880d1fced63df98",
+  "display_archive_sha256": "bf6918b90504fd701a3740b60cb3266308f806e1b4c6268eaee0c16019fb7f31",
+  "rgb_sha256": {
+    "source": "312e13d63954705e8a2c6fa2e518efea46a6d30348805ef46f47a65f0abb0a5a",
+    "ordinary": "499a25f5f7af128630e5214204d2926eea31dce2552c7278839e90cf1af4e8f7",
+    "candidate": "0b83470f3ac9472495bea1f818a27f6de2ed8b011851914e4c445bed3c226023"
+  },
+  "wasb_checkpoint_sha256": "9d391239ab10c733f8e5bfadf16ab72838e7a8ebc88e8ae2038501c03d42b4bb",
+  "config_sha256": "6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d",
+  "dists_backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+  "device": "cpu",
+  "dists_self_score": -2.384185791015625e-07,
+  "dists_self_seconds": 0.12931073099025525,
+  "label_rows": 4,
+  "results": [
+    {
+      "mode": "source",
+      "rows": [
+        {
+          "tick": 9,
+          "visibility": 1,
+          "detected": true,
+          "x": 762.4971923828125,
+          "y": 222.45672607421875,
+          "error_native_px": 9.595555272555979,
+          "direct_present": false,
+          "direct_error_native_px": null,
+          "ball_crop_dists": null
+        },
+        {
+          "tick": 13,
+          "visibility": 1,
+          "detected": true,
+          "x": 880.4266967773438,
+          "y": 346.0250244140625,
+          "error_native_px": 2.6403120036324506,
+          "direct_present": false,
+          "direct_error_native_px": null,
+          "ball_crop_dists": null
+        },
+        {
+          "tick": 18,
+          "visibility": 1,
+          "detected": true,
+          "x": 1023.6829223632812,
+          "y": 366.9252014160156,
+          "error_native_px": 9.624961124400583,
+          "direct_present": false,
+          "direct_error_native_px": null,
+          "ball_crop_dists": null
+        },
+        {
+          "tick": 23,
+          "visibility": 1,
+          "detected": true,
+          "x": 1173.0784912109375,
+          "y": 429.48876953125,
+          "error_native_px": 16.45277770684353,
+          "direct_present": false,
+          "direct_error_native_px": null,
+          "ball_crop_dists": null
+        }
+      ],
+      "infer_seconds": 29.056422797992127,
+      "rgb_sse": 0,
+      "rgb_psnr": null
+    },
+    {
+      "mode": "ordinary",
+      "rows": [
+        {
+          "tick": 9,
+          "visibility": 1,
+          "detected": false,
+          "x": 0.0,
+          "y": 0.0,
+          "error_native_px": null,
+          "direct_present": false,
+          "direct_error_native_px": null,
+          "ball_crop_dists": 0.23224222660064697
+        },
+        {
+          "tick": 13,
+          "visibility": 1,
+          "detected": false,
+          "x": 0.0,
+          "y": 0.0,
+          "error_native_px": null,
+          "direct_present": false,
+          "direct_error_native_px": null,
+          "ball_crop_dists": 0.22912240028381348
+        },
+        {
+          "tick": 18,
+          "visibility": 1,
+          "detected": true,
+          "x": 729.765869140625,
+          "y": 138.9424285888672,
+          "error_native_px": 549.6025119975609,
+          "direct_present": false,
+          "direct_error_native_px": null,
+          "ball_crop_dists": 0.21469390392303467
+        },
+        {
+          "tick": 23,
+          "visibility": 1,
+          "detected": true,
+          "x": 896.9000244140625,
+          "y": 51.25238800048828,
+          "error_native_px": 687.0370516828274,
+          "direct_present": false,
+          "direct_error_native_px": null,
+          "ball_crop_dists": 0.17994040250778198
+        }
+      ],
+      "infer_seconds": 28.608750774001237,
+      "rgb_sse": 7662107224,
+      "rgb_psnr": 25.03934764803638
+    },
+    {
+      "mode": "candidate",
+      "rows": [
+        {
+          "tick": 9,
+          "visibility": 1,
+          "detected": true,
+          "x": 762.9400024414062,
+          "y": 222.71044921875,
+          "error_native_px": 10.302584202517162,
+          "direct_present": true,
+          "direct_error_native_px": 6.836464033726006,
+          "ball_crop_dists": 0.22185349464416504
+        },
+        {
+          "tick": 13,
+          "visibility": 1,
+          "detected": true,
+          "x": 879.8062744140625,
+          "y": 346.9479064941406,
+          "error_native_px": 2.2234597396865086,
+          "direct_present": true,
+          "direct_error_native_px": 3.7164008056312823,
+          "ball_crop_dists": 0.19847607612609863
+        },
+        {
+          "tick": 18,
+          "visibility": 1,
+          "detected": true,
+          "x": 932.42431640625,
+          "y": 50.03370666503906,
+          "error_native_px": 490.7642400160755,
+          "direct_present": true,
+          "direct_error_native_px": 3.6423415887495647,
+          "ball_crop_dists": 0.22593742609024048
+        },
+        {
+          "tick": 23,
+          "visibility": 1,
+          "detected": true,
+          "x": 896.562744140625,
+          "y": 51.073936462402344,
+          "error_native_px": 687.5495799254624,
+          "direct_present": true,
+          "direct_error_native_px": 723.9140872732034,
+          "ball_crop_dists": 0.1707056760787964
+        }
+      ],
+      "infer_seconds": 28.47672071499983,
+      "rgb_sse": 7746948064,
+      "rgb_psnr": 24.99152345596448
+    }
+  ],
+  "elapsed_seconds": 95.444432416989
+}
