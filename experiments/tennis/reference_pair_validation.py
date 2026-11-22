@@ -31,7 +31,16 @@ DIGESTS = {
 def select(a: argparse.Namespace) -> None:
     stage = os.environ["PS_STAGE"]
     a.frames = 24
-    if a.comparison in ("al031-fresh-prior", "shanghai-lossless-q90"):
+    if a.comparison == "sydney-roles":
+        # The smoke and full stages render the two paid roles from the same packet.
+        if a.unit != "match127_pair" or a.control != a.q90 or a.control_manifest != a.q90_manifest:
+            raise ValueError("Sydney role pilot requires one unchanged receiver packet")
+        a.carrier_sha256 = "a70a444b65f905285830a5fc2561e752708ac24ea0a5e02d538d85ac742dd99c"
+        profile = packet._embedded_profile(a.control.read_bytes())
+        a.unit = {"smoke": "match127_near", "full": "match127_far"}[stage]
+        if profile["recipe"] != packet.RECIPE_60:
+            raise ValueError("Sydney role pilot requires the native 60 fps profile")
+    elif a.comparison in ("al031-fresh-prior", "shanghai-lossless-q90"):
         first, second = a.control.read_bytes(), a.q90.read_bytes()
         if (packet.wire.sha(first), packet.wire.sha(second)) != (
             a.control_sha,
@@ -108,7 +117,7 @@ def run(a: argparse.Namespace) -> None:
     )
 
 
-def validate(parser: argparse.ArgumentParser) -> None:
+def validate(parser: argparse.ArgumentParser, destination: Path | None = None) -> None:
     stage = Path(os.environ["PS_STAGE_DIR"])
     dispatch = json.loads((stage / "dispatch.json").read_text())
     command = dispatch["command"]
@@ -135,7 +144,7 @@ def validate(parser: argparse.ArgumentParser) -> None:
     wall = timing["worker_wall_seconds"]
     if os.environ["PS_STAGE"] == "smoke":
         forecast = 1.5 * wall + 60
-        cap = 505 if a.comparison == "shanghai-lossless-q90" else 720
+        cap = 505 if a.comparison in ("shanghai-lossless-q90", "sydney-roles") else 720
         if not (0 < wall < 550 and forecast < min(cap, remaining - 30)):
             raise ValueError(
                 f"Paired render estimate {forecast:.1f} seconds exceeds the stage or remaining budget"
@@ -159,7 +168,8 @@ def validate(parser: argparse.ArgumentParser) -> None:
         full_forecast_seconds=forecast,
     )
     (stage / "result.json").write_text(json.dumps(checks, indent=2) + "\n")
-    Path(os.environ["PS_VALIDATION_PATH"]).write_text(
+    validation_path = destination or Path(os.environ["PS_VALIDATION_PATH"])
+    validation_path.write_text(
         json.dumps(dict(passed=True, checks=checks)) + "\n"
     )
 
@@ -174,7 +184,7 @@ def main():
         run_command.add_argument("--" + name, required=True, type=Path, action="append")
     run_command.add_argument(
         "--comparison",
-        choices=["lossless-q90", "jpeg40-jpeg70", "al031-fresh-prior", "shanghai-lossless-q90"],
+        choices=["lossless-q90", "jpeg40-jpeg70", "al031-fresh-prior", "shanghai-lossless-q90", "sydney-roles"],
         default="lossless-q90",
     )
     run_command.add_argument("--control-sha")
@@ -187,6 +197,8 @@ def main():
         if a.pair_stage != {"smoke": 1, "full": 2}[os.environ["PS_STAGE"]]:
             raise ValueError("Unexpected comparison arm")
         run(a)
+        if a.comparison == "sydney-roles" and os.environ["PS_STAGE"] == "full":
+            validate(p, Path(os.environ["PS_STAGE_DIR"]) / "full_validation.json")
     else:
         validate(p)
 
