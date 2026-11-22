@@ -1,0 +1,139 @@
+{
+  "source_sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+  "source_review_sha256": "d664a3ac14f0b273dc5224455468a0ad5bdbdcb3665dc4930adef0e487ca499a",
+  "official_ball_sha256": "0858ae153e5bfa3e9d58a519c24a2f02e61df56f672f95c239302145adcfa6a5",
+  "vgg16_backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+  "measurement": "12 frozen original official-coordinate ticks, source SAM body regions. Re-authenticated the entire native archive, packet and 240 raw frames before upsampling and scoring.",
+  "native_sampler_sha256": "cd695bd1833cd8f773288511c5ae96b7a4891aa62caed27cee44585fd4ca8a5c",
+  "display_conversion_sha256": "849a8c4c6838bdf54e0c6eabb3ca2d468be02e68d6caa1312a1f09a26b531733",
+  "scorer_sha256": "8bff6393229c089a70868854d19653d295259b9714c2865d7564da4b0fca1fc4",
+  "source_grid_sha256": "78e7a6a69fbbfbe124211cdecdf2f6f5329d978e6fa7b21f015762d814d9ae81",
+  "source_verification": "Original review PNG files were checked against the review's PNG digests. All 12 decoded RGB pixel hashes matched the campus full-resolution source grid. The native YUV controls used identical display conversion, model and preprocessing.",
+  "metric_package": "torchmetrics==1.9.0",
+  "independent_q29_repeat": {
+    "regions": 36,
+    "all_values_exact": true
+  },
+  "controls": [
+    {
+      "q": 28,
+      "hardware": [
+        "gpu5",
+        "NVIDIA RTX 6000 Ada Generation",
+        "GPU-7754164a-33cd-265c-3696-c20966d228fe"
+      ],
+      "validated": true,
+      "producer": "20261122T143900Z-43bb6a51",
+      "source_commit": "5e4777c6c030d09e44ec775b2f2b40e5dfad1985",
+      "snapshot_sha256": "0a019d9ebdfb5dfd36ec9093daddb14d0039a549b2fbf74f6140817cbf07d2fa",
+      "spec_sha256": "bcb9c9481b909645d2d11ca15349d7fdaaa4382e9d9379ad155af84495e4e6e5",
+      "archive_sha256": "46c6d8b54c4d395f71b50af30858f6c08800342252b74e03baf5143625009a98",
+      "archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T143900Z-43bb6a51/full/published.tar",
+      "selected_archive_sha256": "932ec53e1acfc5f60af3887fe0559d939b395040b8f16a7d7267efcf00d23d19",
+      "native_frames_authenticated": 240,
+      "native_display": [
+        480,
+        272
+      ],
+      "stream_bytes": 12901,
+      "bitstream_sha256": "69c7a751f86c2cd132796bd1d1b0bcf77a376764aabe5af6b96371cced4ea345",
+      "decoded_yuv_sha256": "b787086fceb0cfeebca3dc5f0916d36e2fedab33ab7b43f26925555943af6b11",
+      "selected_native_yuv_sha256": {
+        "9": "364d8143552bca7b24e19c5c34ad8e4214e2539243586eae621a33bae80c264d",
+        "31": "a6be5779d816aac7d1e9fa00859fbaab10d0555f8a53f654f7097f0cdd935bd1",
+        "49": "3ccff0d9e26cc9a3b37a17babc7f612af5ed3722ecfb820c5927036920356798",
+        "72": "d60adb4a0d6e5f3d472219ba367650adafaf9fa2e2dbe42d196bc0e7af55ce8c",
+        "95": "2d7d3b35a2a1e7ba526c7b9910a7f110e85a699da414dcef0e70a9851f0cf9ef",
+        "112": "82a734fcf1f0ecc864d981ae3ed86d873e7c286e4a4383114691df034e8b0159",
+        "135": "367529512c2826e41052901b9409e93c5ce43f64794802e8b019278a96b1ea01",
+        "152": "78d84d57b6c8ba08792f2659aee80ac02ef46029a883ba3330fff5cf081758a9",
+        "175": "62d95c765597bc68c52dfaecf6156a0ea3b29cb782b70047f48e69793b35d11f",
+        "198": "227af6d0f29a8a55c97531a75e72857bd1290ec73a3a64cab05562ff0d925346",
+        "215": "edaca3f8c6a0728cc6bba62847cfe97319e5d74cd2a79df202f7251d3ed43608",
+        "238": "23a050fd87fb219c4646c54d0f8dcf0a403a9598cbeab257e8a4287890504815"
+      },
+      "score_sha256": "905a365dc1a538e40db6aa620bf8e422bad580deb72264faf102cc7ee7b67d7f",
+      "scores": "score-dcvc-480-q28.json"
+    },
+    {
+      "q": 29,
+      "hardware": [
+        "gpu5",
+        "NVIDIA RTX 6000 Ada Generation",
+        "GPU-7754164a-33cd-265c-3696-c20966d228fe"
+      ],
+      "validated": true,
+      "producer": "20261122T143042Z-9c4291e9",
+      "source_commit": "5ce37c49f7f3d57cb58f8817ef0532adc3ec12a6",
+      "snapshot_sha256": "0a019d9ebdfb5dfd36ec9093daddb14d0039a549b2fbf74f6140817cbf07d2fa",
+      "spec_sha256": "f66782966479b6eaa8ebfca265950a0968d264d4f5bab33df670ef8976d7de67",
+      "archive_sha256": "7887ca3a1ad29d18ff52a741e55c18f03665c14f3813c01c04e7366088e68f8d",
+      "archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T143042Z-9c4291e9/full/published.tar",
+      "selected_archive_sha256": "31694a2fb259e731903fce015b22079ab701937693ea994e58fbaf88b3a1767b",
+      "native_frames_authenticated": 240,
+      "native_display": [
+        480,
+        272
+      ],
+      "stream_bytes": 13602,
+      "bitstream_sha256": "e979a62ea50b95eea9fd103a1278fa0e6e2e8bf13e88be7cd147d79e7133f9a1",
+      "decoded_yuv_sha256": "a53e3fa6255a07eed57fa2ffebf83cd57e2c9af056293c665247d67dd9b5832c",
+      "selected_native_yuv_sha256": {
+        "9": "eeb1816ecdaded03b8956753ac284cef2852b6ca088667eeac6cd862f31645c8",
+        "31": "f1d8b84cb49756d8a859b8f49eee2b9c736dfd26482bce21ebe2877cd7e816cc",
+        "49": "be89d404f62df919837bc022e55e639c4453707f4a5677ae835d6af7961dae0b",
+        "72": "919a55749e1bd3a6ad6175d54fe49f87dd3d94e0cbf5eeee40b7cec21639ee60",
+        "95": "5e954e050bebf4e7ec8187bc496923cbfa2b9c583e4e88a150c89138d3c2d759",
+        "112": "4ce365600cfde27767f300b996d37905e079efd5ac5a9d36d6ecb8820abfac13",
+        "135": "aae26d91741b42bc5fce91bb6168505cf751fd8c4df0a5dc42f992f821b49065",
+        "152": "8b704249606d902fe6a546bd89fc7b250de7e0e0ba230d0d4ec95c7d470c098a",
+        "175": "58dee835b2c4745d0d793e10b122e4319f729b91e211506c1852e4e416a7509c",
+        "198": "230d6fbcf2d628700d77d741e53fabc7c4181309a8cdc3cb693e40bdf8d8c32e",
+        "215": "eaf84dda1c9e7696e498da3101c2f7dd60f23634524c3ee60be85d1c253a8d6e",
+        "238": "9654666b4decad5a4f5048ef95e34458f6c9704a88f3f884a3ceccb0c93595bc"
+      },
+      "score_sha256": "7d5df6b2a62f0a8b1380021da53578ab0bd293338bbfb5558461a7624c09dd6a",
+      "scores": "score-dcvc-480-q29.json"
+    },
+    {
+      "q": 31,
+      "hardware": [
+        "gpu5",
+        "NVIDIA RTX 6000 Ada Generation",
+        "GPU-7754164a-33cd-265c-3696-c20966d228fe"
+      ],
+      "validated": true,
+      "producer": "20261122T142755Z-78b520ea",
+      "source_commit": "7e5c89cd9a4276cb290cb6c56c242282f22d5e8b",
+      "snapshot_sha256": "86ecaa422bc13020314ad8848a0502b9b87b8192bc7b40749a47b8272041f876",
+      "spec_sha256": "15d3f9ba52ebd4b0432f851fddca13e6f1ad60d56cfa10a27e35e5a9ef369385",
+      "archive_sha256": "cd098d379bc9cb5e8525dc25ccca9e4cf9339e4ab4a62f63e1bb68d79b6f73f6",
+      "archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T142755Z-78b520ea/full/published.tar",
+      "selected_archive_sha256": "818f75292493cdbe34a3b0c50834d5a329c44d02dd983a0c555d4b5179fdcd00",
+      "native_frames_authenticated": 240,
+      "native_display": [
+        480,
+        272
+      ],
+      "stream_bytes": 15028,
+      "bitstream_sha256": "5d69533cf9d1b3352be421b2ebebc6a2435b545d892cc70cd6a2521c96eb25e0",
+      "decoded_yuv_sha256": "242aa71a64f2d853a5b62660f19e82be903c6ae17db066720f0e2f3af8b4756b",
+      "selected_native_yuv_sha256": {
+        "9": "e3f45f596066adfb51f088fe53d661a4e9a90b3167af4606fe3a52be2effcf98",
+        "31": "83732b918982bd385e5dc39b114450a8f068bcdca567c00ae66fa252ebfb8bbf",
+        "49": "eb577a89955bc3cacb292e532ffd266f824dabd04cd1f0a12745439811bfa22d",
+        "72": "7337cc2b63ee0a38f74e04fa8cf7a23988802c76f9671813b19731e8b0354df6",
+        "95": "d04276c970125d43a15e1eabfcd8ba65c87c72af62b4f0deb33edacd4d882a8c",
+        "112": "450eeac9f283cccb91b28827b003dc44e1d583a56a939393a4a653b9851e807c",
+        "135": "fc7cd35265bb180c67ec0e3ab0a34899155230cd5c498653fc5e33761b0c2956",
+        "152": "2c7ab22a5f62b3c2c8be744c2c5a44b05b6e63910a0bb7359b2e7bed15a19113",
+        "175": "ced09a055b883acc5d493aa6d5bdba87c7fa6f1556a23e6d48c5b2523403267a",
+        "198": "1d22dc8173bb418993a0fc661ff4afa8304ac01167c75713762a25454bdb5180",
+        "215": "20c43ceceeeb5dcd111266a6c9d4c98664543a06c409c58c409e0b95b07f06f2",
+        "238": "981025bed8a2455bad8f36111609d8400db6c15ec72eca22d5b150b23fb96b9f"
+      },
+      "score_sha256": "c7573ecfe2bb466ca55b440c8867393b2fc4d6f7b1f741e477361ffea7bdb5f0",
+      "scores": "score-dcvc-480-q31.json"
+    }
+  ]
+}

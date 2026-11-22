@@ -22,7 +22,8 @@
     "low_neural_q31_measured_retry": "20261122T142755Z-78b520ea",
     "low_neural_q29_measured_retry": "20261122T143042Z-9c4291e9",
     "low_neural_q29_480_scores": "20261122T143723Z-8b0fe232",
-    "low_neural_q31_480_scores": "20261122T143721Z-e5245c3e"
+    "low_neural_q31_480_scores": "20261122T143721Z-e5245c3e",
+    "low_neural_q28_inside": "20261122T143900Z-43bb6a51"
   },
   "states_at_registration": {
     "full_far_cuda": "complete at 12:01 UTC, all 240 learned crops bound",
@@ -44,7 +45,8 @@
     "low_neural_q29_bounded4": "Prior request reached terminal cancellation before allocating GPU time. Source/weights/QP/codec/seed unchanged, 2 GiB coordinator plus serial 6 GiB worker hard caps with 4 GiB extra scheduler margin proven on the paired Sydney tests. Keep gpu6 free for the primary native receiver.",
     "low_neural_q31_bounded4": "Prior request reached terminal cancellation before allocating GPU time. Source/weights/QP/codec/seed unchanged, 2 GiB coordinator plus serial 6 GiB worker hard caps with 4 GiB extra scheduler margin proven on the paired Sydney tests. Keep gpu6 free for the primary native receiver.",
     "low_neural_q31_measured_retry": "Q31 first 48-tick run occupied 40.462 s and passed source, cadence, container, actual four GPU replays, and allocator checks. The measured 301.58-s forecast exceeded the earlier 300-s full cap. New 330-s full cap, 490-s separate lifecycle, cumulative maximum 530.462 < 540 s. No adjustment to pixels, seed, model or hardware. See match102-neural-s4-q31-costed-retry.json. Full four-pass native control complete, 15,028 B.",
-    "low_neural_q29_measured_retry": "Q29 first 48-tick run occupied 50.685 s and passed all scientific checks. The 320.35-s measured forecast exceeded the earlier 300-s full cap; the revised 350-s full cap fits the separate 480-s total and cumulative 530.685 < 540 s. Full four-pass native control complete, 13,602 B, 47 B above the low system (0.347%)."
+    "low_neural_q29_measured_retry": "Q29 first 48-tick run occupied 50.685 s and passed all scientific checks. The 320.35-s measured forecast exceeded the earlier 300-s full cap; the revised 350-s full cap fits the separate 480-s total and cumulative 530.685 < 540 s. Full four-pass native control complete, 13,602 B, 47 B above the low system (0.347%).",
+    "low_neural_q28_inside": "The physical Q29 exceeds 13,555 B by 47. Fix Q28 before inspecting its outputs. The first four occupied runs used 272.8503 of 1080 standing GPU-s; the new request can use at most 490. The completed Q28 passed four-pass native validation at 12,901 B. Its 12-tick foreground DISTS was 0.369216. The raw full-frame score submissions for Q29 and Q31 also completed on all 480 body instances. See ../shanghai-joint-low-anchors-20261122/comparison-final-neural.json and full-rally-neural-480.json in that directory."
   },
   "local_original_q34_metric_sha256": "7846eef60ee09c6c3a35d321c4ca21b40731f2b163b1503aa0f14d7074dd60d3",
   "next": "Validate the main native score, send the 12 exact frames, qualify the priced alternate rungs after the 240/240 self-reread; add lower native neural anchors only if triggered.",

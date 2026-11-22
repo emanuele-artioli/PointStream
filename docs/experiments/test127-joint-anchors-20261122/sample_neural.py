@@ -1,4 +1,4 @@
-"""Extract registered Sydney ticks while authenticating the complete four-pass neural stream."""
+"""Extract registered test-rally ticks while authenticating the complete four-pass neural stream."""
 
 from pathlib import Path
 import hashlib
@@ -25,14 +25,22 @@ def collect(request, sink):
             archive_hash.update(chunk)
     assert archive_hash.hexdigest() == request["archive_sha256"]
     ticks = request["ticks"]
-    assert ticks == [9, 32, 44, 68, 92, 115, 127, 151, 175, 198, 210, 234]
+    profiles = {
+        "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50": (
+            [60, 1],
+            [9, 32, 44, 68, 92, 115, 127, 151, 175, 198, 210, 234],
+        ),
+        "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a": (
+            [30000, 1001],
+            [9, 31, 49, 72, 95, 112, 135, 152, 175, 198, 215, 238],
+        ),
+    }
+    fps, frozen_ticks = profiles[request["source_sha256"]]
+    assert ticks == frozen_ticks
     with tarfile.open(path) as archive, tarfile.open(fileobj=sink, mode="w|") as out:
         report = json.load(archive.extractfile("publish/result.json"))
         r = report["native"]
-        assert report["source_sha256"] == request["source_sha256"] and report["native_fps"] == [
-            60,
-            1,
-        ]
+        assert report["source_sha256"] == request["source_sha256"] and report["native_fps"] == fps
         assert report["frames"] == 240 and r["accepted"] and r["identical_frame_hashes"]
         packet = archive.extractfile("publish/stream.psdc").read()
         assert (
