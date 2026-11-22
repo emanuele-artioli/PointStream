@@ -1,0 +1,686 @@
+{
+  "ticks": [
+    10,
+    30,
+    50,
+    70,
+    90,
+    110,
+    130,
+    150,
+    170,
+    190,
+    210,
+    230
+  ],
+  "body_support": "same expanded paid rectangles, 256x256 RGB",
+  "body_rows": [
+    {
+      "tick": 10,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "ordinary": {
+        "dists": 0.3264715075492859,
+        "rgb_psnr": 24.19491654292644
+      },
+      "tile": {
+        "dists": 0.2934567928314209,
+        "rgb_psnr": 18.655576947866827
+      },
+      "trajectory": {
+        "dists": 0.2915489673614502,
+        "rgb_psnr": 18.65532106045281
+      }
+    },
+    {
+      "tick": 10,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "ordinary": {
+        "dists": 0.27521228790283203,
+        "rgb_psnr": 22.78893736172173
+      },
+      "tile": {
+        "dists": 0.2256748080253601,
+        "rgb_psnr": 18.177278257692237
+      },
+      "trajectory": {
+        "dists": 0.22375363111495972,
+        "rgb_psnr": 18.178459606552565
+      }
+    },
+    {
+      "tick": 30,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "ordinary": {
+        "dists": 0.3310238718986511,
+        "rgb_psnr": 25.216428400717366
+      },
+      "tile": {
+        "dists": 0.27309417724609375,
+        "rgb_psnr": 19.611218774257132
+      },
+      "trajectory": {
+        "dists": 0.27214157581329346,
+        "rgb_psnr": 19.611370979051525
+      }
+    },
+    {
+      "tick": 30,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "ordinary": {
+        "dists": 0.29908287525177,
+        "rgb_psnr": 24.639387412876452
+      },
+      "tile": {
+        "dists": 0.2460452914237976,
+        "rgb_psnr": 18.01750758058207
+      },
+      "trajectory": {
+        "dists": 0.24428516626358032,
+        "rgb_psnr": 18.017609567702827
+      }
+    },
+    {
+      "tick": 50,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "ordinary": {
+        "dists": 0.31952136754989624,
+        "rgb_psnr": 25.63013311209623
+      },
+      "tile": {
+        "dists": 0.2529478669166565,
+        "rgb_psnr": 19.18912877357307
+      },
+      "trajectory": {
+        "dists": 0.2494041919708252,
+        "rgb_psnr": 19.18940657228463
+      }
+    },
+    {
+      "tick": 50,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "ordinary": {
+        "dists": 0.29197829961776733,
+        "rgb_psnr": 23.47334215797577
+      },
+      "tile": {
+        "dists": 0.22695720195770264,
+        "rgb_psnr": 17.97994693805973
+      },
+      "trajectory": {
+        "dists": 0.22730016708374023,
+        "rgb_psnr": 17.978135378317575
+      }
+    },
+    {
+      "tick": 70,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "ordinary": {
+        "dists": 0.34330564737319946,
+        "rgb_psnr": 24.39819860274075
+      },
+      "tile": {
+        "dists": 0.2755318284034729,
+        "rgb_psnr": 21.193713118488926
+      },
+      "trajectory": {
+        "dists": 0.2730485796928406,
+        "rgb_psnr": 21.193568460931044
+      }
+    },
+    {
+      "tick": 70,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "ordinary": {
+        "dists": 0.28979456424713135,
+        "rgb_psnr": 21.621546720415687
+      },
+      "tile": {
+        "dists": 0.2405511736869812,
+        "rgb_psnr": 18.330084667887995
+      },
+      "trajectory": {
+        "dists": 0.23987698554992676,
+        "rgb_psnr": 18.33158565664309
+      }
+    },
+    {
+      "tick": 90,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "ordinary": {
+        "dists": 0.2989237904548645,
+        "rgb_psnr": 26.0564397185885
+      },
+      "tile": {
+        "dists": 0.24902260303497314,
+        "rgb_psnr": 21.50321391105603
+      },
+      "trajectory": {
+        "dists": 0.24818426370620728,
+        "rgb_psnr": 21.50272715735229
+      }
+    },
+    {
+      "tick": 90,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "ordinary": {
+        "dists": 0.2912564277648926,
+        "rgb_psnr": 22.540798024964577
+      },
+      "tile": {
+        "dists": 0.2243117094039917,
+        "rgb_psnr": 19.016375027960642
+      },
+      "trajectory": {
+        "dists": 0.22203129529953003,
+        "rgb_psnr": 19.018237407459715
+      }
+    },
+    {
+      "tick": 110,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "ordinary": {
+        "dists": 0.3075764775276184,
+        "rgb_psnr": 24.889250269765903
+      },
+      "tile": {
+        "dists": 0.2645875811576843,
+        "rgb_psnr": 20.65911445784117
+      },
+      "trajectory": {
+        "dists": 0.262356162071228,
+        "rgb_psnr": 20.65991905069108
+      }
+    },
+    {
+      "tick": 110,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "ordinary": {
+        "dists": 0.2968108057975769,
+        "rgb_psnr": 23.076046245707843
+      },
+      "tile": {
+        "dists": 0.2326105237007141,
+        "rgb_psnr": 18.7424806415369
+      },
+      "trajectory": {
+        "dists": 0.22987473011016846,
+        "rgb_psnr": 18.74176405045476
+      }
+    },
+    {
+      "tick": 130,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "ordinary": {
+        "dists": 0.3023231625556946,
+        "rgb_psnr": 25.52015397304176
+      },
+      "tile": {
+        "dists": 0.28059136867523193,
+        "rgb_psnr": 20.835043680677465
+      },
+      "trajectory": {
+        "dists": 0.28013306856155396,
+        "rgb_psnr": 20.830384549073276
+      }
+    },
+    {
+      "tick": 130,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "ordinary": {
+        "dists": 0.2886928915977478,
+        "rgb_psnr": 23.97551184147771
+      },
+      "tile": {
+        "dists": 0.22385722398757935,
+        "rgb_psnr": 18.79883815314842
+      },
+      "trajectory": {
+        "dists": 0.22156918048858643,
+        "rgb_psnr": 18.79864019925917
+      }
+    },
+    {
+      "tick": 150,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "ordinary": {
+        "dists": 0.3065636157989502,
+        "rgb_psnr": 25.236033935900004
+      },
+      "tile": {
+        "dists": 0.27253836393356323,
+        "rgb_psnr": 21.006807862315476
+      },
+      "trajectory": {
+        "dists": 0.26982933282852173,
+        "rgb_psnr": 21.006250591416734
+      }
+    },
+    {
+      "tick": 150,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "ordinary": {
+        "dists": 0.28275007009506226,
+        "rgb_psnr": 22.022983335871196
+      },
+      "tile": {
+        "dists": 0.2524870038032532,
+        "rgb_psnr": 18.348901883629637
+      },
+      "trajectory": {
+        "dists": 0.25055330991744995,
+        "rgb_psnr": 18.35081923038283
+      }
+    },
+    {
+      "tick": 170,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "ordinary": {
+        "dists": 0.30638986825942993,
+        "rgb_psnr": 26.607665366892952
+      },
+      "tile": {
+        "dists": 0.24656641483306885,
+        "rgb_psnr": 22.098383212941208
+      },
+      "trajectory": {
+        "dists": 0.2440558671951294,
+        "rgb_psnr": 22.098248615886046
+      }
+    },
+    {
+      "tick": 170,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "ordinary": {
+        "dists": 0.28302448987960815,
+        "rgb_psnr": 22.38416102512619
+      },
+      "tile": {
+        "dists": 0.25253182649612427,
+        "rgb_psnr": 17.821560137320354
+      },
+      "trajectory": {
+        "dists": 0.2519577741622925,
+        "rgb_psnr": 17.82497575780368
+      }
+    },
+    {
+      "tick": 190,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "ordinary": {
+        "dists": 0.31374669075012207,
+        "rgb_psnr": 25.811874444623058
+      },
+      "tile": {
+        "dists": 0.2337774634361267,
+        "rgb_psnr": 22.140077472250198
+      },
+      "trajectory": {
+        "dists": 0.23329466581344604,
+        "rgb_psnr": 22.140467110973447
+      }
+    },
+    {
+      "tick": 190,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "ordinary": {
+        "dists": 0.28968197107315063,
+        "rgb_psnr": 22.731021215715362
+      },
+      "tile": {
+        "dists": 0.24323499202728271,
+        "rgb_psnr": 17.944656256257986
+      },
+      "trajectory": {
+        "dists": 0.24352264404296875,
+        "rgb_psnr": 17.943380721595318
+      }
+    },
+    {
+      "tick": 210,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "ordinary": {
+        "dists": 0.3037649989128113,
+        "rgb_psnr": 25.71780710333161
+      },
+      "tile": {
+        "dists": 0.24871736764907837,
+        "rgb_psnr": 21.191324761813778
+      },
+      "trajectory": {
+        "dists": 0.24692600965499878,
+        "rgb_psnr": 21.190431047249977
+      }
+    },
+    {
+      "tick": 210,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "ordinary": {
+        "dists": 0.27760690450668335,
+        "rgb_psnr": 23.79266732826013
+      },
+      "tile": {
+        "dists": 0.2180466651916504,
+        "rgb_psnr": 20.19157176217833
+      },
+      "trajectory": {
+        "dists": 0.23342382907867432,
+        "rgb_psnr": 19.881717196437023
+      }
+    },
+    {
+      "tick": 230,
+      "unit": "nadal_kyrgios__002_at120__person_000000000000",
+      "ordinary": {
+        "dists": 0.30514800548553467,
+        "rgb_psnr": 24.846140472008294
+      },
+      "tile": {
+        "dists": 0.27573060989379883,
+        "rgb_psnr": 20.430428583460994
+      },
+      "trajectory": {
+        "dists": 0.2732599973678589,
+        "rgb_psnr": 20.429359871061976
+      }
+    },
+    {
+      "tick": 230,
+      "unit": "nadal_kyrgios__002_at120__person_000000000002",
+      "ordinary": {
+        "dists": 0.3020235300064087,
+        "rgb_psnr": 23.629144951127678
+      },
+      "tile": {
+        "dists": 0.22581231594085693,
+        "rgb_psnr": 20.275370973224682
+      },
+      "trajectory": {
+        "dists": 0.22468608617782593,
+        "rgb_psnr": 20.275211829920472
+      }
+    }
+  ],
+  "body_means": {
+    "ordinary": {
+      "dists": 0.30136142174402875,
+      "rgb_psnr": 24.200024565161385
+    },
+    "tile": {
+      "dists": 0.24911179890235266,
+      "rgb_psnr": 19.67327515983422
+    },
+    "trajectory": {
+      "dists": 0.2482090617219607,
+      "rgb_psnr": 19.66033298620641
+    }
+  },
+  "ball_support": "64x64 centered on sender prediction, not ground truth",
+  "ball_rows": [
+    {
+      "tick": 10,
+      "sender_center": [
+        1065,
+        544
+      ],
+      "ordinary": {
+        "dists": 0.34201812744140625,
+        "rgb_psnr": 23.766258763375355
+      },
+      "tile": {
+        "dists": 0.2957155108451843,
+        "rgb_psnr": 23.394147524723152
+      },
+      "trajectory": {
+        "dists": 0.3413984775543213,
+        "rgb_psnr": 22.85697301708614
+      }
+    },
+    {
+      "tick": 30,
+      "sender_center": [
+        1116,
+        459
+      ],
+      "ordinary": {
+        "dists": 0.30307602882385254,
+        "rgb_psnr": 25.680440803444725
+      },
+      "tile": {
+        "dists": 0.2744782567024231,
+        "rgb_psnr": 21.026090901873324
+      },
+      "trajectory": {
+        "dists": 0.3370540738105774,
+        "rgb_psnr": 20.556604206151768
+      }
+    },
+    {
+      "tick": 50,
+      "sender_center": [
+        1110,
+        364
+      ],
+      "ordinary": {
+        "dists": 0.3070690631866455,
+        "rgb_psnr": 24.74296986726341
+      },
+      "tile": {
+        "dists": 0.2618475556373596,
+        "rgb_psnr": 20.488083081378
+      },
+      "trajectory": {
+        "dists": 0.30150550603866577,
+        "rgb_psnr": 20.40791729742947
+      }
+    },
+    {
+      "tick": 70,
+      "sender_center": [
+        1134,
+        341
+      ],
+      "ordinary": {
+        "dists": 0.3030186891555786,
+        "rgb_psnr": 28.258020965520995
+      },
+      "tile": {
+        "dists": 0.21577489376068115,
+        "rgb_psnr": 34.001808800546215
+      },
+      "trajectory": {
+        "dists": 0.24870026111602783,
+        "rgb_psnr": 32.74285053684767
+      }
+    },
+    {
+      "tick": 90,
+      "sender_center": [
+        1189,
+        450
+      ],
+      "ordinary": {
+        "dists": 0.3030070662498474,
+        "rgb_psnr": 27.23876065232762
+      },
+      "tile": {
+        "dists": 0.2375369668006897,
+        "rgb_psnr": 25.764822579618762
+      },
+      "trajectory": {
+        "dists": 0.30840378999710083,
+        "rgb_psnr": 24.714254615359632
+      }
+    },
+    {
+      "tick": 110,
+      "sender_center": [
+        1224,
+        705
+      ],
+      "ordinary": {
+        "dists": 0.37045133113861084,
+        "rgb_psnr": 27.105070365864865
+      },
+      "tile": {
+        "dists": 0.22530144453048706,
+        "rgb_psnr": 34.804068926653954
+      },
+      "trajectory": {
+        "dists": 0.2688467502593994,
+        "rgb_psnr": 32.2483784146347
+      }
+    },
+    {
+      "tick": 130,
+      "sender_center": [
+        1224,
+        821
+      ],
+      "ordinary": {
+        "dists": 0.2537001371383667,
+        "rgb_psnr": 29.301740272512774
+      },
+      "tile": {
+        "dists": 0.21179676055908203,
+        "rgb_psnr": 35.31517726749278
+      },
+      "trajectory": {
+        "dists": 0.24652808904647827,
+        "rgb_psnr": 32.36452798768308
+      }
+    },
+    {
+      "tick": 150,
+      "sender_center": [
+        984,
+        465
+      ],
+      "ordinary": {
+        "dists": 0.321846067905426,
+        "rgb_psnr": 26.32175072205133
+      },
+      "tile": {
+        "dists": 0.2558252215385437,
+        "rgb_psnr": 22.730444236186003
+      },
+      "trajectory": {
+        "dists": 0.30838608741760254,
+        "rgb_psnr": 22.030397479271905
+      }
+    },
+    {
+      "tick": 170,
+      "sender_center": [
+        840,
+        429
+      ],
+      "ordinary": {
+        "dists": 0.3680810332298279,
+        "rgb_psnr": 29.363010616484154
+      },
+      "tile": {
+        "dists": 0.22478586435317993,
+        "rgb_psnr": 33.642593486581816
+      },
+      "trajectory": {
+        "dists": 0.2898455858230591,
+        "rgb_psnr": 31.986308244256012
+      }
+    },
+    {
+      "tick": 190,
+      "sender_center": [
+        769,
+        315
+      ],
+      "ordinary": {
+        "dists": 0.2842373251914978,
+        "rgb_psnr": 28.481400390928112
+      },
+      "tile": {
+        "dists": 0.21822822093963623,
+        "rgb_psnr": 27.597602136828463
+      },
+      "trajectory": {
+        "dists": 0.2690853476524353,
+        "rgb_psnr": 26.641501038812457
+      }
+    },
+    {
+      "tick": 210,
+      "sender_center": [
+        868,
+        338
+      ],
+      "ordinary": {
+        "dists": 0.3852454423904419,
+        "rgb_psnr": 23.592289678335977
+      },
+      "tile": {
+        "dists": 0.2048245072364807,
+        "rgb_psnr": 27.48429246945792
+      },
+      "trajectory": {
+        "dists": 0.2765018343925476,
+        "rgb_psnr": 22.4254625681975
+      }
+    },
+    {
+      "tick": 230,
+      "sender_center": [
+        1095,
+        641
+      ],
+      "ordinary": {
+        "dists": 0.34697574377059937,
+        "rgb_psnr": 27.820642986723556
+      },
+      "tile": {
+        "dists": 0.20525366067886353,
+        "rgb_psnr": 34.955158521239944
+      },
+      "trajectory": {
+        "dists": 0.22846847772598267,
+        "rgb_psnr": 32.312572485964004
+      }
+    }
+  ],
+  "ball_means": {
+    "ordinary": {
+      "dists": 0.32406050463517505,
+      "rgb_psnr": 26.806029673736074
+    },
+    "tile": {
+      "dists": 0.23594740529855093,
+      "rgb_psnr": 28.433690827715026
+    },
+    "trajectory": {
+      "dists": 0.2853936900695165,
+      "rgb_psnr": 26.773978990974527
+    }
+  },
+  "return_luma_sse": {
+    "tile": 3187126762,
+    "trajectory": 3180109840
+  },
+  "return_luma_psnr": {
+    "tile": 28.05702406922126,
+    "trajectory": 28.066596233501336
+  },
+  "trajectory_frames": 240,
+  "trajectory_rgb_stream_sha256": "a52a81506b1d37bc5c110861c03c1d35d66361f877010b336b7e4617c8f33f4d",
+  "packet_sha256": "c53685733be3ccfce2673bc49e4ad603c998b9eccd24a5e12d6acb70782ada00",
+  "runner_sha256": "c922c153a05fd0696753c88b08b1593c8c341db91c8e43c0d41f3026a55be8bb",
+  "dists_record": {
+    "metric": "DISTS",
+    "net": "vgg16",
+    "torchmetrics": "1.9.0",
+    "weights": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/torchmetrics/functional/image/dists_models/weights.pt",
+    "weights_sha256": "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218",
+    "backbone": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+    "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+    "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)"
+  },
+  "elapsed_seconds": 240.90369143799762,
+  "scope": "opened development /002, source-fitted streak; no independent ball or body labels"
+}
