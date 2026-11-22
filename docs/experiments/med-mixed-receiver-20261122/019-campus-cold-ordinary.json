@@ -1,0 +1,146 @@
+{
+  "schema": 1,
+  "device": "cpu",
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.foreground_campus_score"
+  ],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.foreground_campus_score",
+    "--validate"
+  ],
+  "arguments": [
+    "--clip",
+    "019",
+    "--label",
+    "ordinary-960-cold",
+    "--kind",
+    "ordinary",
+    "--source",
+    "{staged:source}",
+    "--source-sha",
+    "1c13479eb3b6f8d175eb6f5020c629896e6b01f719014ec995a06b4c6c5a3e9c",
+    "--canonical",
+    "{staged:canonical}",
+    "--canonical-receipt",
+    "{staged:grid}",
+    "--supports",
+    "{staged:supports}",
+    "--weights",
+    "{staged:weights}",
+    "--data",
+    "{staged:data}",
+    "--frames",
+    "{frames}",
+    "--producer",
+    "svt-av1-4.0.1-019-3e6d42ed0d7c",
+    "--fps",
+    "50",
+    "--paid",
+    "165603",
+    "--raw-sha",
+    "d624eafbeba3c8fb64ef5903823277a80389182e4491fe8d9a94248b58cbbc36"
+  ],
+  "staged_inputs": [
+    {
+      "name": "source",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/sources/medvedev_struff__019.mp4",
+      "sha256": "1c13479eb3b6f8d175eb6f5020c629896e6b01f719014ec995a06b4c6c5a3e9c",
+      "extract": false
+    },
+    {
+      "name": "weights",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "extract": false
+    },
+    {
+      "name": "canonical",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-019-1c13479eb3b6-20261122T1224/source.mkv",
+      "sha256": "ce7c736a9181a1303d8fae215f4d5a404bfeb68c4c09eaadaf80e23203dcf118",
+      "extract": false
+    },
+    {
+      "name": "grid",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-019-1c13479eb3b6-20261122T1224/grid.json",
+      "sha256": "882f4db9b34c57fb5b18ed5bea728077ee2d7758f303a7d2eb0aec16688faa88",
+      "extract": false
+    },
+    {
+      "name": "supports",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-019-1c13479eb3b6-20261122T1224/supports.tar",
+      "sha256": "59768c1a1a224d9a91992f01683db0a57356841cc699c60854b36dcd4fc78739",
+      "extract": true
+    },
+    {
+      "name": "data",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-019-1c13479eb3b6-20261122T1224/3e6d42ed0d7c41855ded5cb55b295f0aff75d70c826d9765210587f670529b46.ivf",
+      "sha256": "3e6d42ed0d7c41855ded5cb55b295f0aff75d70c826d9765210587f670529b46",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/sources/medvedev_struff__019.mp4",
+      "sha256": "1c13479eb3b6f8d175eb6f5020c629896e6b01f719014ec995a06b4c6c5a3e9c"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-019-1c13479eb3b6-20261122T1224/source.mkv",
+      "sha256": "ce7c736a9181a1303d8fae215f4d5a404bfeb68c4c09eaadaf80e23203dcf118"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-019-1c13479eb3b6-20261122T1224/grid.json",
+      "sha256": "882f4db9b34c57fb5b18ed5bea728077ee2d7758f303a7d2eb0aec16688faa88"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-019-1c13479eb3b6-20261122T1224/supports.tar",
+      "sha256": "59768c1a1a224d9a91992f01683db0a57356841cc699c60854b36dcd4fc78739"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-019-1c13479eb3b6-20261122T1224/3e6d42ed0d7c41855ded5cb55b295f0aff75d70c826d9765210587f670529b46.ivf",
+      "sha256": "3e6d42ed0d7c41855ded5cb55b295f0aff75d70c826d9765210587f670529b46"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "required_commands": [],
+  "deadline": "2026-11-22T21:01:00Z",
+  "verify_staged_inputs": true,
+  "hosts": [
+    "gpu1",
+    "gpu2",
+    "gpu3",
+    "gpu4",
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [],
+  "gpu_memory_mib": 0,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "local_storage_gib": 28,
+  "smoke": {
+    "seconds": 420,
+    "representative_basis": "24 native frames with two actual player support masks per tick, independent source pixel digest, CPU DISTS and optional audited PNG extraction. Whole-job forecast includes fixed validation costs."
+  },
+  "full": {
+    "seconds": 1600
+  },
+  "validator_seconds": 150,
+  "budget_seconds": 2430,
+  "stall_seconds": 1660,
+  "scale": {
+    "frames": {
+      "smoke": 24,
+      "full": 240
+    }
+  }
+}

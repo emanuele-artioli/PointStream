@@ -1,0 +1,68 @@
+[
+  {
+    "shot": "000",
+    "source": "3bf7ddaae0db5c48b1072fccb15f9f162e41fa5999886b9a5bde58dc0495c630",
+    "wire": "615596d2f78d08ebd07fc9dd66136bf586d5c1f2d2921b71aea4dfc437df2b8b",
+    "base_bytes": 11063,
+    "pose_bytes": 1016,
+    "ball_bytes": 507,
+    "init_bytes": 202948,
+    "joint_bytes": 13940,
+    "joint_header_and_framing_bytes": 1354,
+    "reference_bytes": 201292,
+    "initialization_framing_and_resource_ids": 1656,
+    "native_fps": 50,
+    "frames": 240,
+    "active_frames": 120,
+    "active": [
+      0,
+      120
+    ],
+    "warm_kbps": 23.233333333333334,
+    "cold_kbps": 361.48
+  },
+  {
+    "shot": "019",
+    "source": "1c13479eb3b6f8d175eb6f5020c629896e6b01f719014ec995a06b4c6c5a3e9c",
+    "wire": "4b077859fe3d808ff624a81fe33fceb647803052ad8cd3266afb1ef8c1c175d3",
+    "base_bytes": 11196,
+    "pose_bytes": 1042,
+    "ball_bytes": 210,
+    "init_bytes": 153332,
+    "joint_bytes": 13804,
+    "joint_header_and_framing_bytes": 1356,
+    "reference_bytes": 152593,
+    "initialization_framing_and_resource_ids": 739,
+    "native_fps": 50,
+    "frames": 240,
+    "active_frames": 120,
+    "active": [
+      92,
+      212
+    ],
+    "warm_kbps": 23.006666666666668,
+    "cold_kbps": 278.56
+  },
+  {
+    "shot": "024",
+    "source": "4d602291ebea0fcb9698d86d3f93ce4c3076a13005e33079a82975b8b64605f2",
+    "wire": "dbd41008a727bc2878187454a30fde166e79a438c41bb87775ff96bb943c7a0f",
+    "base_bytes": 11145,
+    "pose_bytes": 1030,
+    "ball_bytes": 479,
+    "init_bytes": 167153,
+    "joint_bytes": 14010,
+    "joint_header_and_framing_bytes": 1356,
+    "reference_bytes": 166312,
+    "initialization_framing_and_resource_ids": 841,
+    "native_fps": 50,
+    "frames": 240,
+    "active_frames": 120,
+    "active": [
+      69,
+      189
+    ],
+    "warm_kbps": 23.35,
+    "cold_kbps": 301.93833333333333
+  }
+]

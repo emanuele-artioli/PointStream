@@ -1,10 +1,14 @@
 """Summarize complete native mixed timelines, keeping the three shots as dependent repeats."""
 
 import json
+import math
 from pathlib import Path
 from statistics import mean
 
 from rate_summary import summarize
+from scipy.interpolate import PchipInterpolator
+
+from experiments.tennis.k6b_side_feasibility import hull
 
 ROOT = Path(__file__).resolve().parent
 
@@ -33,6 +37,28 @@ def controls(c):
     return anchors
 
 
+def reuse_threshold(primary, rows, init_bytes):
+    """Find a modeled horizon only inside the measured anchor quality interval."""
+    anchors = hull([(r["arm"]["kbps"], -r["mean_dists"]) for r in rows])
+    target = -primary["mean_dists"]
+    result = dict(anchor_hull=anchors, target_dists=-target)
+    if len(anchors) < 2 or not anchors[0][1] <= target <= anchors[-1][1]:
+        return dict(**result, state="outside measured anchor quality range")
+    at_quality = math.exp(
+        float(PchipInterpolator([q for _, q in anchors], [math.log(r) for r, _ in anchors])(target))
+    )
+    allowance = at_quality - primary["arm"]["kbps"]
+    if allowance <= 0:
+        return dict(**result, state="no positive warm bitrate advantage", anchor_kbps=at_quality)
+    return dict(
+        **result,
+        state="modeled equal-quality threshold",
+        anchor_kbps=at_quality,
+        seconds=8 * init_bytes / (1000 * allowance),
+        init_bytes=init_bytes,
+    )
+
+
 def core(c):
     joint = [compact(load(f"{c}-joint-q{q}.json")) for q in [70, 60, 50]]
     anchors = controls(c)
@@ -48,7 +74,16 @@ def core(c):
         best[f"{mode}_nearest"] = compact(near)
     cold = compact(load(f"{c}-ordinary-cold-score.json"))
     assert cold["arm"]["kbps"] <= primary["arm"]["cold_kbps"]
+    wire = next(x for x in load("three-native-wire-costs.json") if x["shot"] == c)
+    assert wire["joint_bytes"] == cap
+    horizon = {}
+    for mode in ["ordinary", "neural"]:
+        measured = [r for k, v in anchors.items() if k.startswith(mode) for r in v]
+        if mode == "ordinary":
+            measured.append(cold)
+        horizon[mode] = reuse_threshold(primary, measured, wire["init_bytes"])
     return dict(
+        modeled_reuse=horizon,
         clip=c,
         joint=joint,
         primary=primary,

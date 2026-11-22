@@ -13,3 +13,5 @@
 {"clip": "024", "stage": "gen1", "job": "20261122T113519Z-b4358ef0", "code": "88f0d7b1dbd90e8f21aee1f7a9da617934a6c445"}
 {"clip": "019", "stage": "finish", "job": "20261122T115904Z-fd17c8d8", "code": "938eeaae17bec713a2be97246a803f3f1eb44932"}
 {"stage": "campus-calibration", "job": "20261122T123127Z-736122b6", "code": "5e4e5e3bb7297189aa82796913c0ba33946176bd", "clip": "019"}
+{"stage": "campus-cold-ordinary", "job": "20261122T124932Z-40d3c16d", "code": "d402c8079a14d1fce90d636795916cd505694dc9", "clip": "019"}
+{"stage": "campus-cold-ordinary", "job": "20261122T125109Z-e3bffa25", "code": "c0d876a1029134dd0133efb30d73e1e2911aa0f6", "clip": "024"}
