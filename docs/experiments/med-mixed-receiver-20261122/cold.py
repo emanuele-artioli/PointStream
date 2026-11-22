@@ -2,10 +2,12 @@
 
 import argparse
 from fractions import Fraction
+import hashlib
 import json
 from pathlib import Path
 import shutil
 import tempfile
+import subprocess
 from build import sha
 from av1 import cpu
 from src.codecs import svtav1
@@ -32,6 +34,55 @@ def main(a):
     clock = cpu()
 
     def run(q4, n):
+        if a.stream_only:
+            stream = a.out / f"n{n}q4{q4}.ivf"
+            cmd = svtav1.encode_command(
+                tools["SvtAv1EncApp"]["path"],
+                src,
+                stream,
+                width=960,
+                height=544,
+                fps=Fraction(fps),
+                frames=n,
+                crf=q4 / 4,
+                preset=4,
+                full_range=False,
+            )
+            svtav1.run(cmd, 240, None)
+            data = stream.read_bytes()
+            assert len(svtav1.ivf_frames(data)) == n
+            h = hashlib.sha256()
+            byte_count = 0
+            decode = [
+                tools["dav1d"]["path"],
+                "-i",
+                str(stream),
+                "-o",
+                "-",
+                "--muxer",
+                "yuv",
+                "--threads",
+                "1",
+                "--quiet",
+            ]
+            with subprocess.Popen(decode, stdout=subprocess.PIPE) as decoder_process:
+                assert decoder_process.stdout is not None
+                for chunk in iter(lambda: decoder_process.stdout.read(1 << 20), b""):
+                    h.update(chunk)
+                    byte_count += len(chunk)
+                assert decoder_process.wait(timeout=120) == 0
+            assert byte_count == n * 960 * 544 * 3 // 2
+            return dict(
+                q4=q4,
+                crf=q4 / 4,
+                bytes=len(data),
+                kbps=len(data) * 8 * fps / (n * 1000),
+                stream=str(stream),
+                stream_sha256=sha(stream),
+                decoded_sha256=h.hexdigest(),
+                encode_command=cmd,
+                decode_command=decode,
+            )
         with tempfile.TemporaryDirectory(dir=a.out) as local:
             d = Path(local)
             r = svtav1.code(
@@ -93,33 +144,34 @@ def main(a):
             lo = mid
     pick = max((x for x in rows.values() if x["bytes"] <= target), key=lambda x: x["bytes"])
     path = a.out / "selected.yuv"
-    import subprocess
-
-    subprocess.run(
-        [
-            tools["dav1d"]["path"],
-            "-i",
-            pick["stream"],
-            "-o",
-            str(path),
-            "--muxer",
-            "yuv",
-            "--threads",
-            "1",
-        ],
-        check=True,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.PIPE,
-        timeout=120,
-    )
-    assert sha(path) == pick["decoded_sha256"] and path.stat().st_size == 240 * 960 * 544 * 3 // 2
+    if not a.stream_only:
+        subprocess.run(
+            [
+                tools["dav1d"]["path"],
+                "-i",
+                pick["stream"],
+                "-o",
+                str(path),
+                "--muxer",
+                "yuv",
+                "--threads",
+                "1",
+            ],
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            timeout=120,
+        )
+        assert (
+            sha(path) == pick["decoded_sha256"] and path.stat().st_size == 240 * 960 * 544 * 3 // 2
+        )
     arm = dict(
         name="ordinary-960-cold",
-        kind="native_yuv420p",
+        kind="native_av1_ivf" if a.stream_only else "native_yuv420p",
         width=960,
         height=544,
-        sha256=sha(path),
-        path=str(path),
+        sha256=pick["decoded_sha256"],
+        path=pick["stream"] if a.stream_only else str(path),
         stream_sha256=pick["stream_sha256"],
         bytes=pick["bytes"],
         kbps=pick["kbps"],
@@ -148,4 +200,5 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     for key in ("joint", "ordinary", "out"):
         p.add_argument("--" + key, type=Path, required=True)
+    p.add_argument("--stream-only", action="store_true")
     main(p.parse_args())

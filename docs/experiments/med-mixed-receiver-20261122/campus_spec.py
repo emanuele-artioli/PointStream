@@ -68,12 +68,17 @@ def make(a):
         str(a.paid),
     ]
     root = FLEET / a.producer / "full"
-    add(
-        "data",
-        root / ("frames.zseq" if a.kind == "rung" else "published.tar"),
-        a.sha,
-        a.kind != "rung",
-    )
+    if a.kind == "ordinary":
+        add("data", a.ivf, a.sha)
+        options += ["--raw-sha", a.raw_sha]
+    else:
+        add(
+            "data",
+            root / ("frames.zseq" if a.kind == "rung" else "published.tar"),
+            a.sha,
+            a.kind != "rung",
+        )
+
     if a.kind == "rung":
         add("rung-receipt", root / "rung.json", a.receipt_sha)
         options += ["--receipt", "{staged:rung-receipt}"]
@@ -82,7 +87,7 @@ def make(a):
         wire = next(x for x in r["rates"] if x["crf"] == a.crf)
         assert wire["joint_bytes"] == a.paid
         options += ["--expected-joint", wire["joint_sha256"], "--cache", str(wire["init_bytes"])]
-    else:
+    elif a.kind == "neural":
         options += ["--qp", str(a.qp)]
     if al:
         sender = next(
@@ -113,10 +118,12 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--clip", required=True)
     p.add_argument("--label", required=True)
-    p.add_argument("--kind", choices=["neural", "finish", "rung"], required=True)
+    p.add_argument("--kind", choices=["neural", "finish", "rung", "ordinary"], required=True)
     p.add_argument("--producer", required=True)
     p.add_argument("--sha", required=True)
     p.add_argument("--paid", required=True, type=int)
+    p.add_argument("--ivf", type=Path)
+    p.add_argument("--raw-sha")
     p.add_argument("--receipt-sha")
     p.add_argument("--prefix", choices=["fresh", "prior"])
     p.add_argument("--crf", type=int)

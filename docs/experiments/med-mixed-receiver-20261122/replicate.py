@@ -46,7 +46,20 @@ def core(c):
         best[mode] = compact(min(eligible, key=lambda r: r["mean_dists"]))
         near = min(rows, key=lambda r: (abs(r["arm"]["bytes"] - cap), r["arm"]["bytes"]))
         best[f"{mode}_nearest"] = compact(near)
-    return dict(clip=c, joint=joint, primary=primary, anchors=best, bd=summarize(anchors, joint))
+    cold = compact(load(f"{c}-ordinary-cold-score.json"))
+    assert cold["arm"]["kbps"] <= primary["arm"]["cold_kbps"]
+    return dict(
+        clip=c,
+        joint=joint,
+        primary=primary,
+        anchors=best,
+        bd=summarize(anchors, joint),
+        cold=dict(
+            pointstream_kbps=primary["arm"]["cold_kbps"],
+            ordinary=cold,
+            player_dists_difference=primary["mean_dists"] - cold["mean_dists"],
+        ),
+    )
 
 
 def run():

@@ -5,6 +5,7 @@ from importlib.util import module_from_spec, spec_from_file_location
 import json
 import os
 import sys
+import subprocess
 from pathlib import Path
 import time
 
@@ -19,6 +20,43 @@ def read(p):
 
 
 def arm(a):
+    if a.kind == "ordinary":
+        from src.codecs import svtav1
+
+        decoder = svtav1.tool("dav1d")
+        stream = a.data.read_bytes()
+        assert len(svtav1.ivf_frames(stream)) == 240 and len(stream) == a.paid
+        route = Path(os.environ["PS_SCRATCH_DIR"]) / "ordinary-cold.yuv"
+        subprocess.run(
+            [
+                decoder["path"],
+                "-i",
+                str(a.data),
+                "-o",
+                str(route),
+                "--muxer",
+                "yuv",
+                "--threads",
+                "1",
+                "--quiet",
+            ],
+            check=True,
+            timeout=240,
+        )
+        assert route.stat().st_size == 240 * 960 * 544 * 3 // 2 and sha256(route) == a.raw_sha
+        return dict(
+            name=a.label,
+            kind="native_yuv420p",
+            path=str(route),
+            sha256=a.raw_sha,
+            width=960,
+            height=544,
+            bytes=a.paid,
+            kbps=a.paid * 8 * a.fps / 240000,
+            producer_job=a.producer,
+            stream_sha256=sha256(a.data),
+            decoder=decoder,
+        )
     if a.kind == "neural":
         pub = a.data / "publish"
         native = read(pub / "result.json")
@@ -180,7 +218,8 @@ if __name__ == "__main__":
         p.add_argument("--" + k, required=True)
     for k in ["fps", "frames", "paid"]:
         p.add_argument("--" + k, type=int, required=True)
-    p.add_argument("--kind", choices=["neural", "finish", "rung"], required=True)
+    p.add_argument("--kind", choices=["neural", "finish", "rung", "ordinary"], required=True)
+    p.add_argument("--raw-sha")
     p.add_argument("--expected-joint")
     p.add_argument("--cache", type=int)
     p.add_argument("--qp", type=int)
