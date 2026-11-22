@@ -83,7 +83,9 @@ def run(a):
     budgets = operating_points(a)
     if a.roi_features:
         assert a.ball_payload
-        roi_path, regions = roi.region_map(a.roi_features, a.ball_payload, n, w, h, work, a.match)
+        roi_path, regions = roi.region_map(
+            a.roi_features, a.ball_payload, n, w, h, work, a.match, a.roi_offset
+        )
         budgets = {k: budgets[k] for k in (a.roi_ceiling or ["warm"])}
     rows = {}
     with tarfile.open(a.earlier) as t:
@@ -221,6 +223,7 @@ def run(a):
         source_sha256=meta["source"]["sha256"],
         earlier_sha256=a.earlier_sha,
         mode="foreground-roi" if roi_path else "ordinary",
+        roi_offset=a.roi_offset if roi_path else None,
         roi_map_sha256=sha(roi_path) if roi_path else None,
         source_masks_sha256=roi.SOURCES[a.match][0] if roi_path else None,
         ball_sha256=roi.SOURCES[a.match][1] if roi_path else None,
@@ -247,6 +250,8 @@ def validate(a):
     assert r["match"] == a.match and Fraction(r["fps"]) == a.fps
     expected = set(a.roi_ceiling or ["warm"]) if r["mode"] == "foreground-roi" else set(caps)
     assert set(r["selected"]) == expected
+    if r["mode"] == "foreground-roi":
+        assert r["roi_offset"] == a.roi_offset
     with tarfile.open(stage / "published.tar") as tar:
         assert json.load(tar.extractfile("publish/anchors.json")) == r
         for row in r["bank"]:
@@ -322,6 +327,7 @@ if __name__ == "__main__":
     p.add_argument("--fps", type=Fraction, default=FPS)
     p.add_argument("--ceiling", action="append", metavar="NAME=BYTES")
     p.add_argument("--roi-ceiling", action="append", metavar="NAME")
+    p.add_argument("--roi-offset", type=int, choices=range(1, 41), default=40)
     p.add_argument("--width", type=int, choices=GEOMETRY)
     p.add_argument("--validate", action="store_true")
     args = p.parse_args()

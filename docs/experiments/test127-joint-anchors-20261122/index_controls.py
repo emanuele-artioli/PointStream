@@ -21,6 +21,8 @@ def index(physical, records, caps):
         sha = (records / (key + "-archive-sha.txt")).read_text().strip()
         assert len(sha) == 64
         mode = "roi" if r["mode"] == "foreground-roi" else "ordinary"
+        if mode == "roi" and r.get("roi_offset", 40) != 40:
+            mode = f"roi{r['roi_offset']}"
         selected = {}
         for label, item in r["selected"].items():
             assert item["ceiling"] == caps[label]

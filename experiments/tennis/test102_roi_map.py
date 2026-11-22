@@ -28,7 +28,7 @@ SOURCES = {
 }
 
 
-def region_map(features, payload, n, width, height, work, match="match102"):
+def region_map(features, payload, n, width, height, work, match="match102", outside_offset=40):
     feature_sha, ball_sha, ids = SOURCES[match]
     assert sha(features) == feature_sha and sha(payload) == ball_sha
     with tarfile.open(features) as tar:
@@ -56,9 +56,10 @@ def region_map(features, payload, n, width, height, work, match="match102"):
             x = round(pos[t][0])
             y = round(pos[t][1] * 540 / 544)
             regions[t, max(0, y - 8) : min(540, y + 9), max(0, x - 8) : min(960, x + 9)] = True
-    text = roi_text(regions, width, height, -40, outside=True)
+    text = roi_text(regions, width, height, -outside_offset, outside=True)
     assert len(text.splitlines()) == n and all(
-        "0" in row.split()[1:] and "40" in row.split()[1:] for row in text.splitlines()
+        "0" in row.split()[1:] and str(outside_offset) in row.split()[1:]
+        for row in text.splitlines()
     )
     path = work / "roi.txt"
     path.write_text(text)

@@ -38,6 +38,8 @@ def create(a):
         for name, (path, sha) in PROVENANCE.items():
             inputs.append(dict(name=name, path=str(INBOX / path), sha256=sha, extract=False))
     common = ["--match", "match127", "--fps", "60", *limits]
+    if a.roi_ceiling:
+        common.extend(["--roi-offset", str(a.roi_offset)])
     for k in a.roi_ceiling or []:
         common += ["--roi-ceiling", k]
     module = "experiments.tennis.test102_spatial_anchors"
@@ -84,4 +86,5 @@ if __name__ == "__main__":
     p.add_argument("width", type=int, choices=[192, 256, 320, 480, 640, 960, 1920])
     p.add_argument("ceilings", nargs="+")
     p.add_argument("--roi-ceiling", action="append")
+    p.add_argument("--roi-offset", type=int, choices=range(1, 41), default=40)
     create(p.parse_args())
