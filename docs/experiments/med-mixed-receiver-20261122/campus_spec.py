@@ -70,7 +70,7 @@ def make(a):
     root = FLEET / a.producer / "full"
     if a.kind == "ordinary":
         add("data", a.ivf, a.sha)
-        options += ["--raw-sha", a.raw_sha]
+        options += ["--raw-sha", a.raw_sha, "--ordinary-width", str(a.ordinary_width)]
     else:
         add(
             "data",
@@ -124,6 +124,7 @@ if __name__ == "__main__":
     p.add_argument("--paid", required=True, type=int)
     p.add_argument("--ivf", type=Path)
     p.add_argument("--raw-sha")
+    p.add_argument("--ordinary-width", type=int, default=960, choices=(160, 320, 480, 640, 960))
     p.add_argument("--receipt-sha")
     p.add_argument("--prefix", choices=["fresh", "prior"])
     p.add_argument("--crf", type=int)

@@ -49,6 +49,9 @@ def run(a):
     for p in sorted(ROOT.glob("*joint-q*-scores.json")):
         q = read(p)
         bank[q["arm"]["name"]] = summarize(q)
+    for p in sorted(ROOT.glob("ordinary-retained-*-scores.json")):
+        q = read(p)
+        bank[q["arm"]["name"]] = summarize(q)
     for p in sorted(ROOT.glob("neural-*-body-and-ball.json")):
         q = read(p)
         bank[q["arm"]["name"]] = summarize(q)

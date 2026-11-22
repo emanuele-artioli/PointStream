@@ -1,0 +1,107 @@
+{
+  "w160-q4240": {
+    "caps": [
+      13691
+    ],
+    "grid_already_scored": true,
+    "width": 160,
+    "height": 96,
+    "crf": 60,
+    "bytes": 11595,
+    "kbps": 9.6625,
+    "source_sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "ivf_sha256": "bd6270630237d3eb23f6ea33e6f739dbb26d17e9ccf888938bc70310784bc739",
+    "decoded_sha256": "13e926293b57e4b5ae06038fdb3b2faf36c5127b5a8a1eecbae9e5b6a2202d49",
+    "path": "/private/tmp/ps-al031-native-ordinary-starved/160-crf60/stream.ivf"
+  },
+  "w320-q4280": {
+    "caps": [
+      13691
+    ],
+    "grid_already_scored": true,
+    "width": 320,
+    "height": 192,
+    "crf": 70,
+    "bytes": 10464,
+    "kbps": 8.72,
+    "source_sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "ivf_sha256": "c1c725a14efd6c515b3422fb1f301c9258c1f9f76a57be82d1aca576f4368379",
+    "decoded_sha256": "6c72d60c0ff2f9ca860b89cb3d449e2d95b052425133a4b67ad7c86b0aada9d5",
+    "path": "/private/tmp/ps-al031-native-ordinary-starved/320-crf70/stream.ivf"
+  },
+  "w480-q4280": {
+    "caps": [
+      13691
+    ],
+    "grid_already_scored": false,
+    "width": 480,
+    "height": 272,
+    "crf": 70.0,
+    "bytes": 13022,
+    "kbps": 10.851666666666667,
+    "source_sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "ivf_sha256": "03669e5652c6153d635d2453d80da05eaa84bdbde420e26c74d6176bd69baa09",
+    "decoded_sha256": "72a10a0f0a70403d5eedf8e61de6cb9e31fa7f9a7f203cbb52d6654236fe4a4d",
+    "path": "/private/tmp/ps-al031-primary-matched-native/w480-q4280/stream.ivf"
+  },
+  "w160-q4220": {
+    "caps": [
+      16134
+    ],
+    "grid_already_scored": false,
+    "width": 160,
+    "height": 96,
+    "crf": 55.0,
+    "bytes": 13924,
+    "kbps": 11.603333333333333,
+    "source_sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "ivf_sha256": "1c98119f514e17d399174f3fda88ebd5b1ca7ce8bfd1a40a05fb833c9b645a5d",
+    "decoded_sha256": "dfe53ceb4dec980cc8a54b3ad85fe12edec88ebb153f20cd7744098828ff2950",
+    "path": "/private/tmp/ps-al031-primary-matched-native/w160-q4220/stream.ivf"
+  },
+  "w320-q4250": {
+    "caps": [
+      16134
+    ],
+    "grid_already_scored": false,
+    "width": 320,
+    "height": 192,
+    "crf": 62.5,
+    "bytes": 16132,
+    "kbps": 13.443333333333333,
+    "source_sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "ivf_sha256": "8810d418bdcabf578791e8edcc0031d873ace6582796b56a64fcd94ab21399b7",
+    "decoded_sha256": "431fab091e85ab42c3504a8f93a4b2d00891a4fbde0bf0f60265e0574e12914c",
+    "path": "/private/tmp/ps-al031-primary-matched-native/w320-q4250/stream.ivf"
+  },
+  "w480-q4265": {
+    "caps": [
+      16134
+    ],
+    "grid_already_scored": false,
+    "width": 480,
+    "height": 272,
+    "crf": 66.25,
+    "bytes": 15413,
+    "kbps": 12.844166666666666,
+    "source_sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "ivf_sha256": "678b6a6526fee31e637b064762cfd4ebe9e42ff699f0faa347af4110d77f226a",
+    "decoded_sha256": "c66eadc8f17af5f6bf7906928aa319719d24061446156a8bfbc97d4227346400",
+    "path": "/private/tmp/ps-al031-primary-matched-native/w480-q4265/stream.ivf"
+  },
+  "w640-q4280": {
+    "caps": [
+      16134
+    ],
+    "grid_already_scored": true,
+    "width": 640,
+    "height": 384,
+    "crf": 70,
+    "bytes": 13827,
+    "kbps": 11.5225,
+    "source_sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "ivf_sha256": "2fa22f5d3165373945d90db16cdc2f3c84959a9eeef64bda8c92c555b09e45e4",
+    "decoded_sha256": "adb90274575c5dadb30a5e32f6593b11b8abec2389b16000aa6a793fcfe31a5e",
+    "path": "/private/tmp/ps-al031-native-ordinary-starved/640-crf70/stream.ivf"
+  }
+}

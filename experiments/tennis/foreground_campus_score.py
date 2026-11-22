@@ -21,11 +21,15 @@ def read(p):
 
 def arm(a):
     if a.kind == "ordinary":
+        from experiments.tennis.common_player_packet import _ivf
         from src.codecs import svtav1
 
+        width = a.ordinary_width
+        height = {160: 96, 320: 192, 480: 272, 640: 384, 960: 544}[width]
         decoder = svtav1.tool("dav1d")
         stream = a.data.read_bytes()
-        assert len(svtav1.ivf_frames(stream)) == 240 and len(stream) == a.paid
+        _ivf(stream, width, height, (a.fps, 1))
+        assert len(stream) == a.paid
         route = Path(os.environ["PS_SCRATCH_DIR"]) / "ordinary-cold.yuv"
         subprocess.run(
             [
@@ -43,14 +47,14 @@ def arm(a):
             check=True,
             timeout=240,
         )
-        assert route.stat().st_size == 240 * 960 * 544 * 3 // 2 and sha256(route) == a.raw_sha
+        assert route.stat().st_size == 240 * width * height * 3 // 2 and sha256(route) == a.raw_sha
         return dict(
             name=a.label,
             kind="native_yuv420p",
             path=str(route),
             sha256=a.raw_sha,
-            width=960,
-            height=544,
+            width=width,
+            height=height,
             bytes=a.paid,
             kbps=a.paid * 8 * a.fps / 240000,
             producer_job=a.producer,
@@ -220,6 +224,7 @@ if __name__ == "__main__":
         p.add_argument("--" + k, type=int, required=True)
     p.add_argument("--kind", choices=["neural", "finish", "rung", "ordinary"], required=True)
     p.add_argument("--raw-sha")
+    p.add_argument("--ordinary-width", choices=(160, 320, 480, 640, 960), type=int, default=960)
     p.add_argument("--expected-joint")
     p.add_argument("--cache", type=int)
     p.add_argument("--qp", type=int)
