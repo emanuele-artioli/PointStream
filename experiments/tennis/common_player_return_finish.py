@@ -242,7 +242,32 @@ def run(config: dict, isolation: dict) -> dict:
     output.mkdir(exist_ok=False)
     ivf, yuv = output / "base.ivf", output / "base.yuv"
     ivf.write_bytes(base)
-    args = w8.native_argv(Path(config["ffmpeg"]), ivf, yuv)
+    binary = Path(config["ffmpeg"])
+    if (
+        not binary.is_absolute()
+        or yuv.exists()
+        or file_sha(binary) != w8.FFMPEG_SHA
+        or file_sha(ivf) != "2fa1f8d752b527707a5e0c1e1be6e070ef34efb91a37aa8ae20ca66215ec2ab9"
+    ):
+        raise ValueError("native decoder or target IVF identity differs")
+    args = [
+        str(binary),
+        "-nostdin",
+        "-v",
+        "error",
+        "-threads",
+        "1",
+        "-c:v",
+        "libdav1d",
+        "-i",
+        str(ivf),
+        "-pix_fmt",
+        "yuv420p",
+        "-f",
+        "rawvideo",
+        "-n",
+        str(yuv),
+    ]
     decode_start = time.monotonic()
     subprocess.run(args, check=True, timeout=120, stdin=subprocess.DEVNULL, capture_output=True)
     if yuv.stat().st_size != 240 * 240 * 204 or file_sha(yuv) != YUV_SHA:
