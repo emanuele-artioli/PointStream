@@ -1,0 +1,17 @@
+{
+  "job_id": "20261122T230429Z-708e2537",
+  "status": "pending",
+  "spec_sha256": "f3ebc035c6b75e91335745c95f0871073c53bb04c620c429f33ba158be17f980",
+  "source_commit": "b44691bba163f9778b93dfce29f2725ba5802b5b",
+  "source_archive_sha256": "32f19b8a4dfe3aaf1c209f8e4f202bd7bf8a35ec12ea7128972cb7fede242517",
+  "source_sha256": "a2a95aa43a9e269d55679cfd4351401d584dacb0eb290cb0d9fcd685590087ed",
+  "snapshot_paths": [
+    "experiments",
+    "src",
+    "scripts",
+    "tools"
+  ],
+  "full_cap_seconds": 1320,
+  "budget_seconds": 2080,
+  "deadline": "2026-11-23T01:21:00Z"
+}
