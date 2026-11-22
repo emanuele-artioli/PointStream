@@ -13,7 +13,7 @@ import numpy as np
 from experiments.visor.h3 import dis_flow, warp
 from experiments.visor.h3b import luma
 from src.pointstream.tracked_patch import yuv_to_rgb
-from score_native import FPS, NT, get_support, prep, sha
+from score_native import FPS, NT, StreamingYUV, get_support, prep, sha
 
 
 def source_mask(crop):
@@ -41,6 +41,8 @@ def main(a):
         for r in arms:
             work = Path(scope.enter_context(tempfile.TemporaryDirectory(dir=a.scratch)))
             images[r["name"]] = prep(a, r, work)[0]
+            if isinstance(images[r["name"]], StreamingYUV):
+                scope.callback(images[r["name"]].close)
         for t in range(a.frames):
             ok, bgr = cap.read()
             assert ok

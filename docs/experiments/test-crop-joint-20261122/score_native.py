@@ -133,8 +133,51 @@ class SealedRgbSequence:
         return frame
 
 
+class StreamingYUV:
+    """Keep one native frame in memory and verify the entire SHA as the decoder emits it."""
+
+    def __init__(self, path, arm):
+        self.arm = arm
+        self.pos = 0
+        self.sha = hashlib.sha256()
+        self.finished = False
+        argv = svtav1.decode_command(svtav1.tool("dav1d")["path"], path, Path("-"), threads=1)
+        self.process = subprocess.Popen(
+            argv + ["--muxer", "yuv"],
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+        )
+
+    def __getitem__(self, index):
+        w, h = self.arm["width"], self.arm["height"]
+        assert self.pos == index
+        b = self.process.stdout.read(w * h * 3 // 2)
+        assert len(b) == w * h * 3 // 2
+        self.sha.update(b)
+        self.pos += 1
+        if self.pos == 240:
+            assert not self.process.stdout.read(1) and self.process.wait(timeout=15) == 0
+            assert self.sha.hexdigest() == self.arm["decoded_sha256"]
+            self.finished = True
+            self.process.stdout.close()
+        return np.frombuffer(b, np.uint8).reshape(h * 3 // 2, w)
+
+    def close(self):
+        if not self.finished:
+            self.process.stdout.close()
+            self.process.terminate()
+            self.process.wait(timeout=10)
+            self.finished = True
+
+
 def prep(a, arm, work):
     w, h = arm["width"], arm["height"]
+    if arm["kind"] == "ivf_stream":
+        path = Path(arm["path"])
+        assert path.stat().st_size == arm["bytes"] and sha(path) == arm["sha256"]
+        packet._ivf(path.read_bytes(), w, h, (30000, 1001))
+        return StreamingYUV(path, arm), arm["decoded_sha256"]
     if arm["kind"] == "rgb_zseq":
         path = Path(arm["path"])
         assert sha(path) == arm["sha256"] and sha(Path(arm["receipt"])) == arm["receipt_sha256"]
@@ -203,7 +246,7 @@ def score(a, arm, model, support, support_hash):
     self_abs = 0.0
     with tempfile.TemporaryDirectory(dir=a.scratch) as tmp:
         display, decoded_hash = prep(a, arm, Path(tmp))
-        src = cv2.VideoCapture(str(a.source), cv2.CAP_FFMPEG)
+        src = cv2.VideoCapture(str(getattr(a, "source_pixels", a.source)), cv2.CAP_FFMPEG)
         assert abs(src.get(cv2.CAP_PROP_FPS) - float(FPS)) < 0.001
         for t in range(count):
             ok, picture = src.read()
@@ -247,6 +290,9 @@ def score(a, arm, model, support, support_hash):
         # The registered packet covers the first 240 native ticks of the longer rally file.
         assert int(src.get(cv2.CAP_PROP_POS_FRAMES)) == count
         src.release()
+        if isinstance(display, StreamingYUV):
+            assert display.finished or count < NT
+            display.close()
 
     def group(rows):
         return dict(

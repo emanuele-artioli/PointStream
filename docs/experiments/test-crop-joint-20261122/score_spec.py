@@ -24,6 +24,20 @@ def make(a):
         for r in original["staged_inputs"]
         if r["name"] in ("source", "features")
     ]
+    can = json.loads((HERE / "match102-canonical-source.json").read_text())
+    inputs.append(
+        dict(
+            name="pixels",
+            path=str(
+                INBOX.parent.parent.parent
+                / "tennis"
+                / ("rv102-rgb-" + can["lossless_sha256"][:16])
+                / "source.mkv"
+            ),
+            sha256=can["lossless_sha256"],
+            extract=False,
+        )
+    )
     weights = next(r for r in scored["staged_inputs"] if r["name"] == "backbone")
     inputs.append(dict(weights, name="weights"))
     dest = "frames.zseq" if a.kind == "rung" else "published.tar"
@@ -48,6 +62,8 @@ def make(a):
         "{staged:source}",
         "--features",
         "{staged:features}",
+        "--source-pixels",
+        "{staged:pixels}",
         "--weights",
         "{staged:weights}",
         "--full-cap",
@@ -99,7 +115,7 @@ def make(a):
     p = HERE / (
         "match102-campus-score-"
         + a.kind
-        + ("-" + str(a.crf) if a.kind != "calibration" else "")
+        + ("-" + str(a.crf) if a.kind != "calibration" else "-rgb")
         + ".json"
     )
     p.write_text(json.dumps(spec, indent=2) + "\n")

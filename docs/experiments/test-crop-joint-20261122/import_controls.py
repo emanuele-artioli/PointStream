@@ -57,7 +57,7 @@ def main(a):
             rows.append(
                 dict(
                     name=item,
-                    kind="ivf",
+                    kind="ivf_stream" if rec["width"] >= 960 else "ivf",
                     path=str(p),
                     width=rec["width"],
                     height=rec["height"],

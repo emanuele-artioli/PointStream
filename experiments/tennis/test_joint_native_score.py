@@ -29,6 +29,11 @@ def record(args):
     crf = args.crf
     grid = json.loads((CARD / "match102-source-grid.json").read_text())
     assert sha256(args.source) == grid["source_sha256"] and sha256(args.weights) == study.WEIGHT
+    canonical = json.loads((CARD / "match102-canonical-source.json").read_text())
+    assert (
+        sha256(args.source_pixels) == canonical["lossless_sha256"]
+        and canonical["source_sha256"] == grid["source_sha256"]
+    )
     assert args.frames == {"smoke": 24, "full": 240}[os.environ["PS_STAGE"]]
     assert not torch.cuda.is_available() or os.environ.get("CUDA_VISIBLE_DEVICES") == ""
     assert len(os.sched_getaffinity(0)) == 1
@@ -95,6 +100,7 @@ def record(args):
     opts = argparse.Namespace(
         scratch=work,
         source=args.source,
+        source_pixels=args.source_pixels,
         frames=args.frames,
         source_hashes=grid["native_rgb_typed_sha256"],
         full_cap=args.full_cap,
@@ -185,7 +191,7 @@ def validate(args):
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--validate", action="store_true")
-    for name in ("source", "weights", "features", "data"):
+    for name in ("source", "weights", "features", "data", "source-pixels"):
         p.add_argument("--" + name, type=Path, required=True)
     p.add_argument("--receipt", type=Path)
     p.add_argument("--kind", choices=("calibration", "full", "rung"), required=True)
