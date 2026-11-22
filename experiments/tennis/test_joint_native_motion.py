@@ -89,38 +89,42 @@ def inputs(args):
     return dest
 
 
+def validate_motion(stage, expected, validation_path):
+    r = json.loads((stage / "motion.json").read_text())
+    timing = json.loads((stage / "timing.json").read_text())
+    assert len(r["summary"]) == 4 and r["recorded_ticks"] == expected
+    source_values = None
+    for name, rr in r["rows"].items():
+        assert len(rr) == 2 * (expected - 1) and np.isfinite([i["error"] for i in rr]).all()
+        assert r["summary"][name]["n"] == len(rr)
+        a = [(i["tick"], i["role"], i["pixels"], i["source_delta"]) for i in rr]
+        if source_values is None:
+            source_values = a
+        else:
+            assert source_values == a
+    assert timing["elapsed_s"] < 595
+    validation_path.write_text(
+        json.dumps(
+            dict(
+                passed=True,
+                checks=dict(
+                    arms=4,
+                    source_correspondence=True,
+                    transitions=2 * (expected - 1),
+                    receipt_sha256=sha256(stage / "motion.json"),
+                ),
+            )
+        )
+        + "\n"
+    )
+
+
 def main(args):
     stage = Path(os.environ["PS_STAGE_DIR"])
     expected = {"smoke": 5, "full": 240}[os.environ["PS_STAGE"]]
     assert args.frames == expected
     if args.validate:
-        r = json.loads((stage / "motion.json").read_text())
-        timing = json.loads((stage / "timing.json").read_text())
-        assert len(r["summary"]) == 4 and r["recorded_ticks"] == expected
-        source_values = None
-        for name, rr in r["rows"].items():
-            assert len(rr) == 2 * (expected - 1) and np.isfinite([i["error"] for i in rr]).all()
-            assert r["summary"][name]["n"] == len(rr)
-            a = [(i["tick"], i["role"], i["pixels"], i["source_delta"]) for i in rr]
-            if source_values is None:
-                source_values = a
-            else:
-                assert source_values == a
-        assert timing["elapsed_s"] < 595
-        Path(os.environ["PS_VALIDATION_PATH"]).write_text(
-            json.dumps(
-                dict(
-                    passed=True,
-                    checks=dict(
-                        arms=4,
-                        source_correspondence=True,
-                        transitions=2 * (expected - 1),
-                        receipt_sha256=sha256(stage / "motion.json"),
-                    ),
-                )
-            )
-            + "\n"
-        )
+        validate_motion(stage, expected, Path(os.environ["PS_VALIDATION_PATH"]))
         return
     start = time.monotonic()
     f = inputs(args)
@@ -142,6 +146,8 @@ def main(args):
     )
     temporal.main(p)
     (stage / "timing.json").write_text(json.dumps(dict(elapsed_s=time.monotonic() - start)) + "\n")
+    if args.frames == 240:
+        validate_motion(stage, expected, stage / "full_validation.json")
 
 
 if __name__ == "__main__":

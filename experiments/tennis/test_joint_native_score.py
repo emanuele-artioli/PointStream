@@ -141,9 +141,11 @@ def record(args):
         )
         + "\n"
     )
+    if args.frames == 240:
+        validate(args, stage / "full_validation.json")
 
 
-def validate(args):
+def validate(args, output_file=None):
     stage = Path(os.environ["PS_STAGE_DIR"])
     timing = json.loads((stage / "timing.json").read_text())
     assert sha256(stage / "published.tar") == timing["archive_sha256"]
@@ -179,7 +181,8 @@ def validate(args):
     assert (args.frames == 24 and estimate <= args.full_cap) or (
         args.frames == 240 and timing["total_s"] < args.full_cap
     )
-    Path(os.environ["PS_VALIDATION_PATH"]).write_text(
+    validation_file = output_file or Path(os.environ["PS_VALIDATION_PATH"])
+    validation_file.write_text(
         json.dumps(
             dict(
                 passed=True,
