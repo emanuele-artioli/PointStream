@@ -6,6 +6,8 @@ Suggested caption. **PointStream system architecture.** The server identifies sh
 
 ## Introduction timeline
 
+Use the [measured two-visit timeline](../passage-intro-20261122/README.md) for the paper. Three source frames from the actual indexed 226.1-second broadcast show the first rally, a spectator close-up during fallback and the second rally. The figure charges every component and labels the retrospective routing. The earlier schematic below uses a different 4.9-second passage.
+
 A private [source-view timeline](/Users/manu/.codex/visualizations/2026/11/18/01a1edc1-dd4e-7ab3-b819-fbd88da8db05/system-figures-20261122/introduction-timeline-private.pdf) accompanies the vector architecture. It uses three frames from the archived source-only presentation video and the two measured cut boundaries. The images show court view, player close-up, and return to court at 50 fps. The route labels illustrate the proposed server and receiver behavior. The historical active-play classifier sent the initial court shot to conventional fallback, so a court-view image by itself is insufficient evidence of an active point or a selected object-coded shot. The separate two-visit receiver replay supplies measured switching and byte costs on a longer passage.
 
 Suggested caption. **A broadcast supplies different coding opportunities across shots.** The recorded passage moves from a wide court view through a close-up and back to the court. Shot boundaries define where the server reassesses eligibility and bitrate allocation. During conventional-coded views, the receiver can retain valid object and court state for later use. Coding annotations are schematic, while source images and cuts come from the archived passage.

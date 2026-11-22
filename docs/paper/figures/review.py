@@ -44,6 +44,11 @@ PANELS = [
         "One rally with common scoring. The low-rate joint points use a cleaned base, generated bodies and fitted ball. Solid red charges startup. Open red assumes valid player state. Both people have equal weight. At 20.450 kbps DCVC-UF scored 0.3924, versus 0.2617 at 21.545 kbps for joint cached delivery.",
     ),
     (
+        "starved-choice/body-motion.pdf",
+        "Body motion on the same serve",
+        "On twelve source-marked body pairs, mean motion-residual error was 13.89 luma levels for joint PointStream, 9.55 for AV1 and 8.26 for DCVC-UF. Ball-region errors were 4.50, 4.72 and 4.57 respectively. The metric compares changes in image values using flow estimated from the source.",
+    ),
+    (
         "starved-choice/ball-rate-quality.pdf",
         "Ball fidelity at the available bandwidth",
         "Source-fitted trajectory, native video, tracked-pixel and joint modes share the same 12 source-reviewed instants. The complete 19.965 kbps stream needs no player references. At 20.450 kbps DCVC-UF slightly leads the 21.545 kbps cached joint receiver on ball DISTS (0.3439 versus 0.3450).",
@@ -89,8 +94,13 @@ PANELS = [
         "On the same twelve visible labels, the frozen detector found zero balls within ten pixels on AV1 and DCVC-UF, and eight on the joint PointStream display. Reading the joint trajectory gave ten. All ordinary detections reproduced the earlier test. This sample has no absent labels.",
     ),
     (
+        "ball/dense-two-judges.pdf",
+        "Can two different detectors locate the ball?",
+        "At 63.06 versus 63.36 kbps, WASB recovered 5 versus 235 visible balls and MonoTrack 7 versus 229 out of 261. On 30 absent frames their false detections rose from 3 to 11 and from 0 to 8, respectively. One retrospective clip used a source-fitted ball. The two architectures share model-zoo training provenance. Direct readout recovered 240/261 with 2/30 absent emissions.",
+    ),
+    (
         "ball/matched-low-detection.pdf",
-        "Can a machine locate the ball?",
+        "Details of the first detector comparison",
         "On the 292-frame clip, 261 visible and 30 absent frames have definite labels. Direct paid refit locations score 240/261 and 2/30. The same protocol also measures a detector running on every decoded RGB arm.",
     ),
     (
@@ -141,7 +151,7 @@ PANELS = [
     (
         "player-tasks/starved-masks.pdf",
         "What player masks survive compression?",
-        "At the lower rate, receiver masks reached 0.762 mean IoU across 24 bodies, versus 0.312 from ordinary AV1 and 0.638 from DCVC-UF. On the six bodies drawn without proposals the means were 0.643, 0.431 and 0.606. At about 65 kbps ordinary AV1 reached 0.761.",
+        "Eighteen of the 24 body labels began as model proposals. At the lower rate, receiver masks reached 0.762 mean IoU, versus 0.312 from ordinary AV1 and 0.638 from DCVC-UF. On the six bodies drawn without proposals the means were 0.643, 0.431 and 0.606. At about 65 kbps ordinary AV1 reached 0.761.",
     ),
     (
         "player-tasks/decoded-masks.pdf",
@@ -246,7 +256,11 @@ def build(
             (
                 timeline,
                 "Court, cutaway and return",
-                "Private broadcast imagery. Cut times are measured. Coding paths are schematic. Publication rights need verification.",
+                (
+                    "Three source images from the measured 226.1-second passage show the initial point, a spectator and the return. Routes were selected retrospectively. The receiver paid for both endpoints, their index and the entire intervening interval."
+                    if timeline.stem == "measured-passage-intro"
+                    else "Private source images from a separate 4.9-second passage. Cut times are measured. Coding paths are schematic."
+                ),
             ),
         )
     if stroke:
@@ -312,10 +326,11 @@ def build(
             "algorithms.pdf",
             "pooled-curve.pdf",
             "players-rate-quality.pdf",
+            "body-motion.pdf",
             "ball-rate-quality.pdf",
             "ball-starved-640-controls.pdf",
             "ball-three-match-rates.pdf",
-            "matched-low-detection.pdf",
+            "dense-two-judges.pdf",
             "starved-masks.pdf",
             "joint-localization.pdf",
             "adelaide-prospective-machine.pdf",
@@ -334,7 +349,7 @@ def build(
             current_title = (
                 title
                 if len(pages) == 1
-                else title + (" · court and players" if j == 0 else " · tracked ball")
+                else title + " · " + ("court eligibility", "player generation", "ball delivery")[j]
             )
             canvas = page(current_title, caption, index, source if panel is None else None)
             if panel is not None:

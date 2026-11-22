@@ -1,5 +1,7 @@
 # Player fidelity in sampled low-rate windows
 
+For the main paper use the [pooled common-rate figure](../player-rd-historical/pooled-curve.pdf). Additional baseline encodes support seven common windows from all three matches at 33 kbps. The original window-specific comparison below explains the historical 19.24 kbps example and its reuse assumptions.
+
 [Figure PDF](players-starved.pdf) · [PNG preview](players-starved.png) · [Derived per-match values](result.json)
 
 Each small pair compares the two-player region in one saved window at the PointStream window's modeled rate. Solid markers are scored PointStream renderings. Open markers interpolate the DCVC-UF player score in log bitrate between real measured encodes bracketing that rate; no decoded DCVC exists at the interpolated point. The large pairs average windows within each match. The eight plotted windows cover three matches: 3 Alcaraz–Hurkacz, 2 Medvedev–Struff and 3 Nadal–Kyrgios. The ninth window, med000, has no comparable DCVC data and is excluded from both sides. On the eight paired windows, the mean improvement in DISTS is 0.07344, 0.06652 and 0.06668 for the three matches, respectively. Equal-weighting those three match means gives 0.06888. This is a descriptive equal-match average across different modeled rates, not a win at one common bitrate or a population confidence interval.

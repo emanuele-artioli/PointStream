@@ -103,7 +103,7 @@ def main():
     fig.text(
         0.04,
         0.90,
-        f"PointStream {fitted['kbps']:.3f} kbps   •   AV1 with identical cutaway {native['kbps']:.3f} kbps   •   11,305 frames",
+        f"PointStream {fitted['kbps']:.3f} kbps   •   AV1 with identical intervening video {native['kbps']:.3f} kbps   •   11,305 frames",
         fontsize=11,
     )
     fig.legend(
