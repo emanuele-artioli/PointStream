@@ -182,11 +182,11 @@
     }
   },
   "smoke": {
-    "seconds": 225,
+    "seconds": 160,
     "representative_basis": "Two native target ticks, each source reference crop and both 24-frame generation archives checked; one real motion transition for both people."
   },
   "full": {
-    "seconds": 600
+    "seconds": 540
   },
   "validator": [
     "{python}",
@@ -195,7 +195,7 @@
     "--validate"
   ],
   "validator_seconds": 45,
-  "budget_seconds": 900,
+  "budget_seconds": 810,
   "stall_seconds": 900,
   "deadline": "2026-11-22T12:30:00Z",
   "contention": {

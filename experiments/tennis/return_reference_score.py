@@ -80,6 +80,22 @@ def registered(a, frames):
     return renders, boxes, identities
 
 
+def visible_box(box):
+    x, y, w, h = k6b.int_box(box)
+    left, top = max(0, x), max(0, y)
+    right, bottom = min(1920, x + w), min(1080, y + h)
+    if left >= right or top >= bottom:
+        raise ValueError("No visible native source pixels in paid player envelope")
+    return left, top, right - left, bottom - top
+
+
+def display_crop(rgb, source_box, visible):
+    x, y, w, h = k6b.int_box(source_box)
+    left, top, dw, dh = visible
+    resized = cv2.resize(rgb, (w, h), interpolation=cv2.INTER_LANCZOS4)
+    return resized[top - y : top - y + dh, left - x : left - x + dw]
+
+
 def run(a):
     import torch
 
@@ -95,7 +111,10 @@ def run(a):
         and sha256(a.backbone) == score.WEIGHT_SHA
     )
     src, rawsha, _ = score.source_rgb(a.source)
-    arrays, boxes, producers = registered(a, src)
+    arrays, original_boxes, producers = registered(a, src)
+    boxes = {
+        i: np.asarray([visible_box(box) for box in track]) for i, track in original_boxes.items()
+    }
     with tarfile.open(a.transport) as z:
         member = z.extractfile("publish/packets/" + TARGET + "/exact-rle.matte").read()
     meta, labels = rates.decode_masks(member)
@@ -139,7 +158,7 @@ def run(a):
                 ).astype(bool)
                 assert mask.any()
                 outputs = {
-                    m: cv2.resize(arrays[m, i][t], (w, h), interpolation=cv2.INTER_LANCZOS4)
+                    m: display_crop(arrays[m, i][t], original_boxes[i][t], (x, y, w, h))
                     for m in ARMS
                 }
                 if t == 0 and i == 0:
@@ -151,7 +170,15 @@ def run(a):
                         and abs(ident["scores"]["ident"]["dists"]) < 1e-5
                     )
                 r = score.compare(net, src[t], outputs, mask, arr[t])
-                rows.append(dict(tick=t, person=i, **r))
+                rows.append(
+                    dict(
+                        tick=t,
+                        person=i,
+                        visible_box=arr[t].tolist(),
+                        original_box=list(k6b.int_box(original_boxes[i][t])),
+                        **r,
+                    )
+                )
                 if t:
                     px, py, pw, ph = k6b.int_box(arr[t - 1])
                     sy, sx = slice(y, y + h), slice(x, x + w)
@@ -253,7 +280,7 @@ def validate():
     estimate = (
         1.5 * (r["total_seconds"] - r["compute_seconds"] + r["compute_seconds"] * 24 / n) + 30
     )
-    if n == 2 and estimate >= 600:
+    if n == 2 and estimate >= 540:
         raise ValueError(f"Estimated {estimate:.1f} seconds exceeds the full-stage allowance")
     Path(os.environ["PS_VALIDATION_PATH"]).write_text(
         json.dumps(
