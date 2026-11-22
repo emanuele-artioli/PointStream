@@ -1,0 +1,28 @@
+{
+  "execution": {
+    "smoke": {
+      "seconds": 60.13097548484802,
+      "core_seconds": 30.016672
+    },
+    "full": {
+      "seconds": 170.60007214546204,
+      "core_seconds": 115.36194800000001
+    }
+  },
+  "spec_revision": "05d97d059c4662681aa2647eb23b1a3807979f72",
+  "job_id": "20261122T095119Z-eb4fa57c",
+  "smoke_forecast_seconds": 314.947497460671,
+  "largest_full_stage_allowed": 540,
+  "repeat_body_and_temporal_identical": true,
+  "delta_dists": 0.011845428496599253,
+  "margin": 0.01,
+  "passes": false,
+  "fresh_return_bytes": 215667,
+  "reused_return_bytes": 354,
+  "first_init_bytes": 242646,
+  "mask_coverage_range": [
+    0.8704438383337466,
+    1.0
+  ],
+  "reuse_wins": 19
+}
