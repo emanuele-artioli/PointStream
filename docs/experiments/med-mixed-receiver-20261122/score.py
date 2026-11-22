@@ -37,6 +37,28 @@ def tensor(image):
     return torch.from_numpy(np.ascontiguousarray(image)).permute(2, 0, 1)[None].float() / 255
 
 
+def capture_sample(folder, tick, source, display, supports, ball_rows):
+    """Save preselected native crops and small context images, without resizing metric inputs."""
+    folder.mkdir(exist_ok=True, parents=True)
+    boxes = {}
+    for index, name in enumerate(("player-0", "player-1")):
+        support = supports.get((tick, index))
+        if support:
+            boxes[name] = list(support[0])
+    if ball_rows and ball_rows[-1]["tick"] == tick:
+        x, y = ball_rows[-1]["crop_xy"]
+        boxes["ball"] = [x, y, x + 64, y + 64]
+    recorded = {}
+    for domain, rgb in [("source", source), ("display", display)]:
+        parts = {name: rgb[y0:y1, x0:x1] for name, (x0, y0, x1, y1) in boxes.items()}
+        parts["context"] = cv2.resize(rgb, (480, 270), interpolation=cv2.INTER_AREA)
+        for name, part in parts.items():
+            file = folder / f"tick{tick:03d}-{domain}-{name}.png"
+            assert cv2.imwrite(str(file), cv2.cvtColor(part, cv2.COLOR_RGB2BGR))
+            recorded[file.name] = sha(file)
+    return dict(tick=tick, source_crop_xyxy=boxes, files_sha256=recorded)
+
+
 def main(a):
     torch.set_num_threads(getattr(a, "threads", 2))
     torch.set_num_interop_threads(1)
@@ -115,6 +137,7 @@ def main(a):
         accumulated = [0.0, 0.0]
         scores = []
         ball_rows = []
+        samples = []
         cpu0 = time.process_time()
         max_source_self = 0.0
         for t in range(frame_count):
@@ -176,6 +199,8 @@ def main(a):
                 if not math.isfinite(value):
                     raise ValueError("nonfinite DISTS")
                 scores.append(dict(tick=t, player_index=who, active=not bucket, dists=value))
+            if getattr(a, "sample_dir", None) and t in (10, 90, 170, 230):
+                samples.append(capture_sample(a.sample_dir, t, src, image, supports, ball_rows))
             if t == 10:
                 forecast = (time.process_time() - cpu0) * 24 * 1.5 + 30
                 if forecast > 1500:
@@ -230,6 +255,8 @@ def main(a):
             cpu_seconds=time.process_time() - cpu0,
             forecast_cpu_seconds=forecast,
         )
+        if samples:
+            result["samples"] = samples
         if ball_positions is not None:
             assert len(ball_rows) == sum(p is not None for p in ball_positions[:frame_count])
             result["ball"] = dict(

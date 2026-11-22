@@ -77,7 +77,7 @@ def learn(a, roots):
 
 
 def run(a):
-    torch.set_num_threads(2)
+    torch.set_num_threads(getattr(a, "threads", 2))
     torch.set_num_interop_threads(1)
     cv2.setNumThreads(1)
     strong = [v for v in read(a.anchors) if v["kind"] == "native_yuv420p" and v["kbps"] <= a.budget]
@@ -103,9 +103,9 @@ def run(a):
     assert sha256(a.source) == masks["source_sha256"] and sha256(a.weights) == score.WEIGHT_SHA
     rows, clock = [], time.process_time()
     net = quality.load_dists(a.weights, "cpu")
-    cap = cv2.VideoCapture(str(a.source), cv2.CAP_FFMPEG)
+    cap = cv2.VideoCapture(str(getattr(a, "canonical", None) or a.source), cv2.CAP_FFMPEG)
     assert cap.get(cv2.CAP_PROP_FPS) == 25
-    for t in range(24):
+    for t in range(getattr(a, "frames", 24)):
         ok, bgr = cap.read()
         assert ok
         truth = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
@@ -175,6 +175,9 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     for key in ["source", "supports", "weights", "anchors", "archives", "fresh", "prior", "out"]:
         p.add_argument("--" + key, type=Path, required=True)
+    p.add_argument("--canonical", type=Path)
+    p.add_argument("--threads", type=int, default=2)
+    p.add_argument("--frames", type=int, choices=(3, 24), default=24)
     p.add_argument("--jobs", nargs=2, required=True)
     p.add_argument("--budget", type=float, required=True)
     run(p.parse_args())

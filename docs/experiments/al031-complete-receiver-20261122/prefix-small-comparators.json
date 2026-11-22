@@ -1,0 +1,18 @@
+{
+  "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al031-paid-prefix-comparators-20261122/paid.tar",
+  "sha256": "a70769791a5190eaae11f72f1a804a44ecfbf373a343d542e7cd6a047980c686",
+  "bytes": 563200,
+  "budget": 16.508333333333333,
+  "arms": [
+    "ordinary-w160-q50",
+    "ordinary-w160-q60",
+    "ordinary-w160-q70",
+    "ordinary-w320-q70",
+    "ordinary-w640-q70",
+    "ordinary-w160-near-19810B",
+    "ordinary-w320-near-19810B",
+    "ordinary-w480-near-19810B",
+    "ordinary-w640-near-19810B"
+  ],
+  "method": "All ordinary tested packets within the actual charged 031 price; transmit physical IVF and re-decode with byte-identical native hash"
+}

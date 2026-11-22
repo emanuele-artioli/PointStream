@@ -152,6 +152,9 @@ def run(a):
         ball_receipt=a.ball_receipt,
         frame_count=a.frames,
         threads=1,
+        sample_dir=stage / "sampled-crops"
+        if a.kind in ("finish", "rung") and a.frames == 240
+        else None,
     )
     scorer.main(args)
     report = dict(

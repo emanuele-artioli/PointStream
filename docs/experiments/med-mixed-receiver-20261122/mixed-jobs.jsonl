@@ -12,3 +12,4 @@
 {"clip": "024", "stage": "gen0", "job": "20261122T113408Z-c5b3bc3d", "code": "f895fd93b238ecd23961e875cbac9c6b6aa09954"}
 {"clip": "024", "stage": "gen1", "job": "20261122T113519Z-b4358ef0", "code": "88f0d7b1dbd90e8f21aee1f7a9da617934a6c445"}
 {"clip": "019", "stage": "finish", "job": "20261122T115904Z-fd17c8d8", "code": "938eeaae17bec713a2be97246a803f3f1eb44932"}
+{"stage": "campus-calibration", "job": "20261122T123127Z-736122b6", "code": "5e4e5e3bb7297189aa82796913c0ba33946176bd", "clip": "019"}
