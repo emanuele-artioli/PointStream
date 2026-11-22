@@ -7,6 +7,7 @@ import math
 import os
 from pathlib import Path
 import shutil
+import statistics
 import tarfile
 import time
 
@@ -15,7 +16,8 @@ import numpy as np
 
 from experiments.tennis import ball_machine_three as shared
 from experiments.tennis import ball_machine_twenty as earlier
-from experiments.tennis import k5b_trackers, k5d_source_oracle
+from experiments.tennis import common_player_packet, k5b_trackers, k5d_source_oracle, w8_payload
+from src.pointstream import ball
 from src.codecs import svtav1
 from src.pointstream.tracked_patch import decode_native, yuv_to_rgb
 
@@ -74,6 +76,26 @@ def run(args):
     ):
         raise ValueError("Native neural decoder identity or frame count")
     raw = np.memmap(root / "full.yuv", np.uint8, "r", shape=(240, 816, 960))
+    wire = args.wire.read_bytes()
+    if (
+        hashlib.sha256(wire).hexdigest() != binding["joint_wire_sha256"]
+        or len(wire) != binding["costs_bytes"]["joint"]
+    ):
+        raise ValueError("Joint packet size or identity")
+    parse_ns = []
+    for _ in range(11):
+        start_parse = time.perf_counter_ns()
+        profile = common_player_packet._embedded_profile(wire)
+        parts, _ = w8_payload.unpack(wire, profile)
+        positions, _ = ball.decode_frames(parts["trajectory"], 240, 960, 544)
+        parse_ns.append(time.perf_counter_ns() - start_parse)
+    direct = {}
+    for tick, (x, y) in binding["marks"].items():
+        if int(tick) < args.frames:
+            pos = positions[int(tick)]
+            direct[tick] = (
+                None if pos is None else math.hypot(2 * pos[0] - x, pos[1] * 1080 / 544 - y)
+            )
     k5d_source_oracle.bind_config(args.wasb_code, shared.CONFIG)
     if earlier.sha(args.wasb_weights / "wasb_tennis_best.pth.tar") != shared.WEIGHT:
         raise ValueError("WASB checkpoint")
@@ -118,8 +140,10 @@ def run(args):
             and digest != binding["ordinary"]["prior_judge_input"]
         ):
             raise ValueError("Ordinary 240-frame judge input changed")
+        inference_start = time.monotonic()
         pred = zoo.run("wasb-step1", images)
         torch.cuda.synchronize()
+        inference_seconds = time.monotonic() - inference_start
         rows = []
         for tick_text, (x, y) in binding["marks"].items():
             t = int(tick_text)
@@ -142,10 +166,14 @@ def run(args):
             hits5=sum(r["hit5"] for r in rows),
             hits10=sum(r["hit10"] for r in rows),
             input_sha256=digest,
+            inference_seconds=inference_seconds,
         )
         del images
     record = dict(
         frames=args.frames,
+        direct_errors=direct,
+        direct_parse_median_ns=statistics.median(parse_ns),
+        parse_samples_ns=parse_ns,
         results=results,
         costs_bytes=binding["costs_bytes"],
         gpu=torch.cuda.get_device_name(0),
@@ -188,6 +216,8 @@ def validate():
         costs=record["costs_bytes"]
         == dict(ordinary=12974, joint=12927, joint_cold=257266, neural=12270),
         comparison=smoke or record["ordinary_prior_agreement"],
+        direct=smoke
+        or sum(d is not None and d <= 10 for d in record["direct_errors"].values()) == 10,
         forecast=not smoke or forecast < 570,
     )
     valid = all(checks.values())
@@ -200,7 +230,7 @@ def validate():
 
 if __name__ == "__main__":
     cli = argparse.ArgumentParser(description=__doc__)
-    for name in ("packets", "neural", "wasb-code", "wasb-weights"):
+    for name in ("packets", "wire", "neural", "wasb-code", "wasb-weights"):
         cli.add_argument("--" + name, type=Path)
     cli.add_argument("--frames", type=int, choices=(24, 240))
     cli.add_argument("--validate", action="store_true")
