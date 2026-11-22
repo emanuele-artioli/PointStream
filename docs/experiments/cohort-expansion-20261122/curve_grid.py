@@ -54,6 +54,17 @@ def build(data):
         grid = sorted(set(grid + np.geomspace(lower, upper, 3).tolist()))
     return dict(
         members=members,
+        fixed_budget_support=[
+            dict(
+                budget_kbps=price,
+                matches=[
+                    m["match"]
+                    for m in members
+                    if all(low <= price <= high for low, high in m["ranges"].values())
+                ],
+            )
+            for price in (15.0, 20.4)
+        ],
         excluded=excluded,
         price_interval_kbps=[lower, upper],
         grid_kbps=grid,

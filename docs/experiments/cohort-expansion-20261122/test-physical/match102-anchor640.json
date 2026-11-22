@@ -1,0 +1,270 @@
+{
+  "match": "match102",
+  "source_sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+  "earlier_sha256": "37d21fdac95e0c6818be4f335eff1da308f51ab81344ec250ec6a048d56587d5",
+  "frames": 240,
+  "fps": "30000/1001",
+  "width": 640,
+  "height": 384,
+  "tools": {
+    "SvtAv1EncApp": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "sha256": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+      "version": "SVT-AV1 v4.2.0 (release)"
+    },
+    "dav1d": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+      "version": "1.5.4"
+    },
+    "ffmpeg": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+      "version": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers"
+    }
+  },
+  "convert_command": [
+    "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+    "-v",
+    "error",
+    "-threads",
+    "1",
+    "-nostdin",
+    "-i",
+    "/local/users/emanuele/pointstream/cache/fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a/match102-000-fc5d3ee431f8.mp4",
+    "-an",
+    "-frames:v",
+    "240",
+    "-vf",
+    "scale=640:384:flags=area,format=yuv420p",
+    "-fps_mode",
+    "passthrough",
+    "-f",
+    "rawvideo",
+    "/local/users/emanuele/pointstream/scratch/20261122T104721Z-74428f3a-full/native/source.yuv"
+  ],
+  "source_yuv_sha256": "a5c97caf9317c23187ee0d195519714ebb44d6a6c0991ee6f1ae815f8dd12aaf",
+  "selected": {
+    "warm": {
+      "ceiling": 17794,
+      "affordable": true,
+      "quarter_crf": 268,
+      "bytes": 17731,
+      "file": "q268.ivf",
+      "sha256": "841dc70c6276193b8a3cca8d554576af7b30143228cc0a4e1215e3b84c901360",
+      "origin": "new",
+      "elapsed": 8.907635807001498,
+      "decoded_sha256": "8eb1792e8c0fb84825f384691f7f05d631f035b0754fcb8ee80e33ba1481a7a6",
+      "decoded_file": "warm.yuv.z",
+      "shortfall": 0.003540519276160503
+    },
+    "cold": {
+      "ceiling": 155274,
+      "affordable": true,
+      "quarter_crf": 154,
+      "bytes": 153931,
+      "file": "q154.ivf",
+      "sha256": "c7b73550ce1aec9c45d89b44df787fe2f237da486ab03f1108a145a315653bb7",
+      "origin": "new",
+      "elapsed": 12.969081018993165,
+      "decoded_sha256": "0cfb0100723ae21470b2833c622525ad52113cb6244a313a8019a9e4d0277aa0",
+      "decoded_file": "cold.yuv.z",
+      "shortfall": 0.008649226528588128
+    }
+  },
+  "bank": [
+    {
+      "quarter_crf": 64,
+      "bytes": 664461,
+      "file": "q64.ivf",
+      "sha256": "b4449c52fcdf0b628e4d997b934bc7a95218231eedf9f1d55ceef9fc4a8a51f1",
+      "origin": "new",
+      "elapsed": 10.806602062017191
+    },
+    {
+      "quarter_crf": 112,
+      "bytes": 308184,
+      "file": "q112.ivf",
+      "sha256": "b70bed3c3bf3ac1dfce4039ab44c29ae8b6587ce5bbbf68afa252062355178b9",
+      "origin": "new",
+      "elapsed": 15.356194303982193
+    },
+    {
+      "quarter_crf": 136,
+      "bytes": 206908,
+      "file": "q136.ivf",
+      "sha256": "888e72d957b6aae0de8800bb3938592f4e4413afe3765f45acfabf85b9ec7a86",
+      "origin": "new",
+      "elapsed": 12.799689122999553
+    },
+    {
+      "quarter_crf": 148,
+      "bytes": 169131,
+      "file": "q148.ivf",
+      "sha256": "9bb08b8cabb202e4ecda3903980e2ad66542609654f890f5e8c26dfa444c5db3",
+      "origin": "new",
+      "elapsed": 12.616070899995975
+    },
+    {
+      "quarter_crf": 151,
+      "bytes": 161388,
+      "file": "q151.ivf",
+      "sha256": "5a330e4a93b89740450befec848e9e3c8538ea20d41168d15b1803ad0203cb9d",
+      "origin": "new",
+      "elapsed": 12.882177229010267
+    },
+    {
+      "quarter_crf": 152,
+      "bytes": 158479,
+      "file": "q152.ivf",
+      "sha256": "53bb93a60572f0650b498a02e6256e18b5e8edcaa4e30fbc5d9718cf87efce14",
+      "origin": "new",
+      "elapsed": 12.246042112004943
+    },
+    {
+      "quarter_crf": 153,
+      "bytes": 155381,
+      "file": "q153.ivf",
+      "sha256": "bbc76e89e078081b6b2e34ef799121bc0ab341b61f86ab3c8856ba179ac65a8c",
+      "origin": "new",
+      "elapsed": 6.954916284012143
+    },
+    {
+      "quarter_crf": 154,
+      "bytes": 153931,
+      "file": "q154.ivf",
+      "sha256": "c7b73550ce1aec9c45d89b44df787fe2f237da486ab03f1108a145a315653bb7",
+      "origin": "new",
+      "elapsed": 12.969081018993165
+    },
+    {
+      "quarter_crf": 155,
+      "bytes": 150633,
+      "file": "q155.ivf",
+      "sha256": "3a2b99b1eca9839e868b1d54ce711382233baa82d4d4af48496181f7f63c66aa",
+      "origin": "new",
+      "elapsed": 6.856477016990539
+    },
+    {
+      "quarter_crf": 160,
+      "bytes": 139111,
+      "file": "q160.ivf",
+      "sha256": "0b873d68b32d05f5799fcdb969306e250fef7db1df8039fec84df746e12f5195",
+      "origin": "frozen bank"
+    },
+    {
+      "quarter_crf": 220,
+      "bytes": 59567,
+      "file": "q220.ivf",
+      "sha256": "2bdc36e0504c414e7f4e007e96acdc4cfa41dcc32afed6cb02682a0e7cec0ddb",
+      "origin": "frozen bank"
+    },
+    {
+      "quarter_crf": 250,
+      "bytes": 29253,
+      "file": "q250.ivf",
+      "sha256": "b1fac39eab22081c677328629b51f6ca753d9951ec89012164503272df239fe2",
+      "origin": "frozen bank"
+    },
+    {
+      "quarter_crf": 257,
+      "bytes": 21987,
+      "file": "q257.ivf",
+      "sha256": "1f9329fc0058ba65fcfba41800d784b1de6072ce3bd1cf6d6473a205c1b8567a",
+      "origin": "frozen bank"
+    },
+    {
+      "quarter_crf": 259,
+      "bytes": 20956,
+      "file": "q259.ivf",
+      "sha256": "63ea8c9c8e96ee6175738e9140f94e20fb4700397aeaf4576bd065615fcc1251",
+      "origin": "frozen bank"
+    },
+    {
+      "quarter_crf": 260,
+      "bytes": 20577,
+      "file": "q260.ivf",
+      "sha256": "e69934f68f7cef0c8dc5a3e9ce5f4a1346ae51fe069d9e3d40777a0c7b5515f6",
+      "origin": "frozen bank"
+    },
+    {
+      "quarter_crf": 261,
+      "bytes": 20115,
+      "file": "q261.ivf",
+      "sha256": "749be646297e4abf5194257af72a21ee831184d9c37bdccc06975a75448393a1",
+      "origin": "frozen bank"
+    },
+    {
+      "quarter_crf": 263,
+      "bytes": 19419,
+      "file": "q263.ivf",
+      "sha256": "96533a6ddb3024681ad6b396bc3cf0878a69dfbd817e125fdc683eabe1f822f8",
+      "origin": "frozen bank"
+    },
+    {
+      "quarter_crf": 264,
+      "bytes": 19066,
+      "file": "q264.ivf",
+      "sha256": "41769b51fc42320da80d53fec2c50e86c81b3bb50230dfbf8a4e01a39749b26a",
+      "origin": "frozen bank"
+    },
+    {
+      "quarter_crf": 265,
+      "bytes": 18846,
+      "file": "q265.ivf",
+      "sha256": "0d1b476674c7af4e1be9f3a1ccc2bd0d5f2f80e2b1e3088edef550f062488430",
+      "origin": "frozen bank"
+    },
+    {
+      "quarter_crf": 266,
+      "bytes": 18331,
+      "file": "q266.ivf",
+      "sha256": "4049936351826dd6b606d304ddcbb74079c30e83f416022a9c4746296ea9dcb0",
+      "origin": "new",
+      "elapsed": 8.089630270987982
+    },
+    {
+      "quarter_crf": 267,
+      "bytes": 17893,
+      "file": "q267.ivf",
+      "sha256": "7abc9083cf0dd4a1a2330c699e7f794c6175c497ff9df313b528228029bb9f9d",
+      "origin": "new",
+      "elapsed": 10.38561575001222
+    },
+    {
+      "quarter_crf": 268,
+      "bytes": 17731,
+      "file": "q268.ivf",
+      "sha256": "841dc70c6276193b8a3cca8d554576af7b30143228cc0a4e1215e3b84c901360",
+      "origin": "new",
+      "elapsed": 8.907635807001498
+    },
+    {
+      "quarter_crf": 269,
+      "bytes": 17635,
+      "file": "q269.ivf",
+      "sha256": "21baf390dbeff44e71175ad7f77b154d73a4e65d456ef2caa156bce68643c9eb",
+      "origin": "new",
+      "elapsed": 9.795144798001274
+    },
+    {
+      "quarter_crf": 272,
+      "bytes": 16718,
+      "file": "q272.ivf",
+      "sha256": "c0750220af86ff320cf5ced05fb01517c373c9cc5c8c217f2f5c51c2cdfb8be2",
+      "origin": "new",
+      "elapsed": 7.766786975989817
+    },
+    {
+      "quarter_crf": 280,
+      "bytes": 14755,
+      "file": "q280.ivf",
+      "sha256": "8966d07ed585aa501fb4dd932c9bd108f6191fea11a2fae8c70f4d07eaba8536",
+      "origin": "frozen bank"
+    }
+  ],
+  "elapsed": 153.75149248799426
+}

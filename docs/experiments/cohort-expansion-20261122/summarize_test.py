@@ -59,6 +59,12 @@ def counts(rows):
 
 def summarize(data):
     stage = json.loads((HERE / "staged.json").read_text())["selection"]
+    events = {}
+    for line in (HERE / "test-events.md").read_text().splitlines():
+        cells = [c.strip() for c in line.split("|")]
+        if len(cells) >= 5 and cells[1].isdigit():
+            events["match" + cells[1]] = {"players": cells[2], "event": cells[3]}
+    assert set(events) == {r["match"] for r in stage}
     rows = []
     all_marks = []
     rgb_rows = {arm: [] for arm in ("source", "ordinary", "candidate")}
@@ -66,7 +72,9 @@ def summarize(data):
     for m in stage:
         match = m["match"]
         dest = data / f"{match}-score.json"
-        row = dict(match=match, rank=len(rows) + 1, fps=m["video"]["avg_frame_rate"])
+        row = dict(
+            match=match, rank=len(rows) + 1, fps=m["video"]["avg_frame_rate"], **events[match]
+        )
         rows.append(row)
         if not dest.exists():
             row["missing_primary"] = True
@@ -108,7 +116,9 @@ def summarize(data):
                 neural_psnr=ns["whole_rgb_psnr"],
                 neural_affordable=ns["bytes"] <= max(s["candidate_bytes"], s["ordinary_bytes"]),
             )
-        judge = data / f"{match}-judge-ada-fixed.json"
+        judge = data / f"{match}-judge-portable.json"
+        if not judge.exists():
+            judge = data / f"{match}-judge-ada-fixed.json"
         if not judge.exists():
             judge = data / f"{match}-judge-ada.json"
         if not judge.exists():

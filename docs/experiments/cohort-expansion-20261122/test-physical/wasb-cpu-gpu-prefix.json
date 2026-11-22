@@ -1,0 +1,42 @@
+{
+  "source_sha256": "23b6a757e8f01d2366282fb32e2282a76a77f39cfc96c8125069826d7f458fb7",
+  "rate_archive_sha256": "8067877e15ce3f5ac3705472fa5decb3fdd08fcb55079929912fd5582d62fd60",
+  "rgb": {
+    "source": "d5c02c813364826da09891405bbc99e9a6c19cb6bd19477585fd28874c71beee",
+    "ordinary": "dcb2c52a27f180f89301e854c5d8170401f5b08d4aa78a6f02d1e99af64cd02e",
+    "candidate": "e8f302e3e91ed85eb8e676e329fc021878485a3f966c237d4c2123cf9c357e00"
+  },
+  "checkpoint_sha256": "9d391239ab10c733f8e5bfadf16ab72838e7a8ebc88e8ae2038501c03d42b4bb",
+  "cases": {
+    "source": {
+      "ticks": [
+        9,
+        13,
+        18,
+        23
+      ],
+      "present_5px_10px_identical": true,
+      "max_radial_error_discrepancy_px": 0.0003277763555793456
+    },
+    "ordinary": {
+      "ticks": [
+        9,
+        13,
+        18,
+        23
+      ],
+      "present_5px_10px_identical": true,
+      "max_radial_error_discrepancy_px": 0
+    },
+    "candidate": {
+      "ticks": [
+        9,
+        13,
+        18,
+        23
+      ],
+      "present_5px_10px_identical": true,
+      "max_radial_error_discrepancy_px": 0.0004297225052702913
+    }
+  }
+}

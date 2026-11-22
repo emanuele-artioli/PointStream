@@ -1,0 +1,167 @@
+{
+  "match": "match102",
+  "source_sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+  "earlier_sha256": "37d21fdac95e0c6818be4f335eff1da308f51ab81344ec250ec6a048d56587d5",
+  "mode": "foreground-roi",
+  "roi_map_sha256": "b4ecb5d3cbad4f283dc6ffb0d0bc24c9be85041422976579186ba4079274ed5e",
+  "source_masks_sha256": "994101c8d3466080777c262d92b9f15953c5636cc4addae06f75ad478d3594ee",
+  "ball_sha256": "3ad726835c0e51c11daa80d9b54630a1e52494227680b434254e583950426918",
+  "frames": 240,
+  "fps": "30000/1001",
+  "width": 320,
+  "height": 192,
+  "tools": {
+    "SvtAv1EncApp": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "sha256": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+      "version": "SVT-AV1 v4.2.0 (release)"
+    },
+    "dav1d": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+      "version": "1.5.4"
+    },
+    "ffmpeg": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+      "version": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers"
+    }
+  },
+  "convert_command": [
+    "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+    "-v",
+    "error",
+    "-threads",
+    "1",
+    "-nostdin",
+    "-i",
+    "/local/users/emanuele/pointstream/cache/fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a/match102-000-fc5d3ee431f8.mp4",
+    "-an",
+    "-frames:v",
+    "240",
+    "-vf",
+    "scale=320:192:flags=area,format=yuv420p",
+    "-fps_mode",
+    "passthrough",
+    "-f",
+    "rawvideo",
+    "/local/users/emanuele/pointstream/scratch/20261122T105505Z-b75f762d-full/native/source.yuv"
+  ],
+  "source_yuv_sha256": "c0b7ba88842008cae74f15580405697b7c4045581f2a94d52a60aa2cce8ee776",
+  "selected": {
+    "warm": {
+      "ceiling": 17794,
+      "affordable": true,
+      "identical_qp_control": {
+        "twin_file": "plain-twin-q252.ivf",
+        "twin_bytes": 13926,
+        "twin_sha256": "80e58254ef31b202d0153b83cab54b54a4723a2ad2ff0f8acbf8cacf3b031b90",
+        "twin_decoded_sha256": "43ddfd425baa8e70dfbd6d13c667d6a446632dc0de9b2710215db88810f584c3",
+        "selected_decoded_sha256": "ab62d458c60077747aa8147f9d79e30e51bb310106899148d2a03ec04521a25e",
+        "changed_luma_pixels": 10574798,
+        "non_inert": true,
+        "support_pixels": 109302,
+        "outside_pixels": 14636298,
+        "plain_luma_psnr_in": 18.079154868180837,
+        "roi_luma_psnr_in": 18.00589595641341,
+        "plain_luma_psnr_out": 35.558675514547666,
+        "roi_luma_psnr_out": 34.81076192506505
+      },
+      "quarter_crf": 252,
+      "bytes": 17772,
+      "file": "q252.ivf",
+      "sha256": "2c7cadbaf51676507a4e6c5e7b73915da7593c0f26b688c8a2ffa1b5d206903e",
+      "origin": "new",
+      "elapsed": 1.5524773539800663,
+      "decoded_sha256": "ab62d458c60077747aa8147f9d79e30e51bb310106899148d2a03ec04521a25e",
+      "decoded_file": "warm.yuv.z",
+      "shortfall": 0.0012363718107226696
+    }
+  },
+  "bank": [
+    {
+      "quarter_crf": 64,
+      "bytes": 159597,
+      "file": "q64.ivf",
+      "sha256": "b517c6156832eaa6cf74b64ffff9e2746b3d910942e4468df6f4267e2bfd9aff",
+      "origin": "new",
+      "elapsed": 2.1847830420010723
+    },
+    {
+      "quarter_crf": 172,
+      "bytes": 43053,
+      "file": "q172.ivf",
+      "sha256": "e085c9c8086791da2911a4dca7b75c8bbcd9d84a2cd1cd8eedc2777921e18243",
+      "origin": "new",
+      "elapsed": 2.2316669700085185
+    },
+    {
+      "quarter_crf": 226,
+      "bytes": 26005,
+      "file": "q226.ivf",
+      "sha256": "b7b50db27c4f83b235aea3711d8ff729ac6826fd850f041ce80868a36ad91e37",
+      "origin": "new",
+      "elapsed": 2.1004388589935843
+    },
+    {
+      "quarter_crf": 239,
+      "bytes": 22351,
+      "file": "q239.ivf",
+      "sha256": "d75498e4f11f13d5c1e34b8534b4839105e47bfdc6b6ab1a16df4c2eb62ada11",
+      "origin": "new",
+      "elapsed": 1.942049825011054
+    },
+    {
+      "quarter_crf": 246,
+      "bytes": 20382,
+      "file": "q246.ivf",
+      "sha256": "08969dcd854cf0da6ed4e4dcdf40328b500ea5276bf90d02fdc09ad3e1c5aa13",
+      "origin": "new",
+      "elapsed": 1.8263063569902442
+    },
+    {
+      "quarter_crf": 249,
+      "bytes": 19267,
+      "file": "q249.ivf",
+      "sha256": "ee5aa58ee0b6d12f984f8c556be6c3b2017d328b295f2cae1fa298be4d1b39c7",
+      "origin": "new",
+      "elapsed": 1.7160261730023194
+    },
+    {
+      "quarter_crf": 251,
+      "bytes": 18803,
+      "file": "q251.ivf",
+      "sha256": "9839cf587ce44ad44ac15b6e330a87ca10e1ccac68ca0e37a24929580188b9d1",
+      "origin": "new",
+      "elapsed": 1.6321413870027754
+    },
+    {
+      "quarter_crf": 252,
+      "bytes": 17772,
+      "file": "q252.ivf",
+      "sha256": "2c7cadbaf51676507a4e6c5e7b73915da7593c0f26b688c8a2ffa1b5d206903e",
+      "origin": "new",
+      "elapsed": 1.5524773539800663
+    },
+    {
+      "quarter_crf": 253,
+      "bytes": 17483,
+      "file": "q253.ivf",
+      "sha256": "8567812992556d95db94960529447b44221f26b41545493498759d9c1c032dbe",
+      "origin": "new",
+      "elapsed": 1.5228404789813794
+    },
+    {
+      "quarter_crf": 280,
+      "bytes": 13942,
+      "file": "q280.ivf",
+      "sha256": "f41e106defb956b8900a71c2e1cb414b41b6e279bc70efc5a6e95a948f168160",
+      "origin": "new",
+      "elapsed": 1.2387729650072288
+    }
+  ],
+  "elapsed": 21.915130517998477
+}

@@ -32,9 +32,9 @@ def figures(d, output):
     )
     rows = d["rows"]
     pos = np.arange(len(rows))[::-1]
-    labels = [r["match"].replace("match", "") for r in rows]
-    fig, ax = plt.subplots(figsize=(6.0, 3.24))
-    fig.subplots_adjust(left=0.12, right=0.8, top=0.87, bottom=0.17)
+    labels = [r["event"].replace(", ATP Cup", "") for r in rows]
+    fig, ax = plt.subplots(figsize=(6.4, 3.44))
+    fig.subplots_adjust(left=0.19, right=0.76, top=0.87, bottom=0.17)
     palette = ["#164f72", "#b4511e"]
     ax.axvline(0, color=".55", lw=0.8, zorder=0)
     for idx, (y, r) in enumerate(zip(pos, rows, strict=True)):
@@ -58,7 +58,7 @@ def figures(d, output):
                 zorder=3,
             )
         txt = (
-            f"{r['candidate_kbps']:.1f} / {r['ordinary_kbps']:.1f}"
+            f"{r['candidate_kbps']:.1f} / {r['ordinary_kbps']:.1f} / {r['strongest_kbps']:.1f}"
             if "candidate_kbps" in r
             else "unavailable"
         )
@@ -70,10 +70,17 @@ def figures(d, output):
     ax.set_yticks(pos, labels)
     ax.set_ylim(-0.6, len(rows) - 0.25)
     ax.set_xlabel("Decrease in ball-crop DISTS with PointStream (positive favors PointStream)")
-    ax.set_ylabel("Official test clip")
+    ax.set_ylabel("")
     ax.tick_params(axis="y", length=0, pad=4)
     ax.grid(axis="x", alpha=0.16)
-    ax.text(1.02, 1.02, "Delivered kbps\nPS / AV1", va="bottom", transform=ax.transAxes, fontsize=7)
+    ax.text(
+        1.02,
+        1.02,
+        "Delivered kbps\nPS / AV1 / best AV1",
+        va="bottom",
+        transform=ax.transAxes,
+        fontsize=7,
+    )
     ax.legend(
         handles=[
             Line2D(
@@ -104,8 +111,8 @@ def figures(d, output):
     )
     save(fig, output / "official-test-ball-quality")
 
-    fig, ax = plt.subplots(figsize=(5.7, 3.14))
-    fig.subplots_adjust(left=0.12, right=0.80, top=0.88, bottom=0.15)
+    fig, ax = plt.subplots(figsize=(6.2, 3.34))
+    fig.subplots_adjust(left=0.20, right=0.80, top=0.88, bottom=0.15)
     for idx, (y, r) in enumerate(zip(pos, rows, strict=True)):
         if idx % 2 == 0:
             ax.axhspan(y - 0.48, y + 0.48, color="#f1f3f5", zorder=-2)
@@ -143,7 +150,7 @@ def figures(d, output):
     ax.set_ylim(-0.6, len(rows) - 0.25)
     ax.set_xlim(-3, 103)
     ax.set_xlabel("Visible marks localized within 10 source pixels (%)")
-    ax.set_ylabel("Official test clip")
+    ax.set_ylabel("")
     ax.tick_params(axis="y", length=0, pad=4)
     ax.grid(axis="x", alpha=0.16)
     ax.text(

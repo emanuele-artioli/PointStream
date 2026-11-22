@@ -34,12 +34,20 @@ def analysis(grid, data):
         bd = compare(*family)
         bd["dominance"] = rate_dominance(*family)
         per_event[m["match"]] = dict(visible=m["visible"], bd_rate=bd, points={})
-    n = len(per_event)
-    draws = np.random.default_rng(20261122).integers(n, size=(10000, n))
-    for budget in grid["grid_kbps"]:
+    fixed_budget = []
+    scopes = [(price, list(per_event), plots) for price in grid["grid_kbps"]]
+    scopes.extend(
+        (r["budget_kbps"], r["matches"], fixed_budget) for r in grid["fixed_budget_support"]
+    )
+    for budget, matches, output in scopes:
+        n = len(matches)
+        if n == 0:
+            output.append(dict(budget_kbps=budget, count=0, matches=matches))
+            continue
+        draws = np.random.default_rng(20261122).integers(n, size=(10000, n))
         vals = []
         actuals = []
-        for m in per_event:
+        for m in matches:
             chosen = {}
             for arm in ("ordinary", "candidate"):
                 options = [
@@ -60,9 +68,10 @@ def analysis(grid, data):
         mean = x.mean(axis=0)
         ranges = np.array(actuals)
         bootstrap = x[draws].mean(axis=1)
-        plots.append(
+        output.append(
             dict(
                 budget_kbps=budget,
+                matches=matches,
                 count=n,
                 ordinary=mean[0],
                 candidate=mean[1],
@@ -75,7 +84,7 @@ def analysis(grid, data):
                 actual_candidate_range=[ranges[:, 1].min(), ranges[:, 1].max()],
             )
         )
-    return dict(grid=grid, pooled=plots, per_event=per_event)
+    return dict(grid=grid, pooled=plots, fixed_budget=fixed_budget, per_event=per_event)
 
 
 def plot(result, destination):
