@@ -33,6 +33,12 @@ BASES = {
         96,
         "f2b9dd6a2370b3a6267a0379339360307bfe7900f58e7a503b8b2a2b1756bafb",
     ),
+    20: (
+        Path("/private/tmp/ps-nov22-al028-exact-budget/joint-53.5/decoded.yuv"),
+        320,
+        192,
+        "0831a58cfe5b5b491235486f52bf220886f2ad9e3f4ff3914e30b90d8a9f278d",
+    ),
     21: (
         Path("/private/tmp/ps-al028-native320-pinned.yuv"),
         320,
@@ -41,6 +47,13 @@ BASES = {
     ),
 }
 BASELINES = {
+    "av1_320_q52_75": (
+        Path("/private/tmp/ps-nov22-al028-exact-budget/ordinary-52.75/decoded.yuv"),
+        320,
+        192,
+        20.360833333333332,
+        "c60215a513435b726bf9c3dd398b651b1c9add176245a354eb1076ee21445bf1",
+    ),
     "av1_320_q52": (
         Path("/private/tmp/ps-al028-av1-target-20261122/320-crf52/decoded.yuv"),
         320,
@@ -74,6 +87,25 @@ def main(a):
         or sha(BALL) != "16214ff3ac718e6b28ae3cb21778c8440057c1e68f030e5ac904f20528f18883"
     ):
         raise ValueError("paid input or source identity")
+    paid_joint = {
+        Path(
+            "/private/tmp/ps-al028-joint25-packets-20261122/rally.psj"
+        ): "fb69663af77820efc3d84c65ec314a15948805ab1f3bc70571fcab0ee2d1e1bd",
+        Path(
+            "/private/tmp/ps-nov22-al028-exact-budget/joint-53.5/rally.psj"
+        ): "ab12294fec2bba5bb5b21bf373a3a31c620b80cf9463cd92ab0383647d1a8aa9",
+        Path(
+            "/private/tmp/ps-al028-joint25-crf52-20261122/rally.psj"
+        ): "4a53f55b07b8a2371ee54e8d57c4834888e1f46761b8ea53a9871cab3adcec9b",
+        Path(
+            "/private/tmp/ps-nov22-al028-exact-budget/joint-53.5/stream.ivf"
+        ): "8d96056a21002279b05e9817e411d960e96b76610da6e932acb12a55093db845",
+        Path(
+            "/private/tmp/ps-nov22-al028-exact-budget/ordinary-52.75/stream.ivf"
+        ): "32e9379693742bf3ddd2324c14e31dfafdf8f7c7fd52230ca8b317d197cf76bf",
+    }
+    if any(sha(path) != digest for path, digest in paid_joint.items()):
+        raise ValueError("paid joint or ordinary stream differs")
     if sha(a.finish / "finish.json") != a.finish_sha:
         raise ValueError("finisher receipt identity")
     report = json.loads((a.finish / "finish.json").read_text())
@@ -114,8 +146,13 @@ def main(a):
         if sha(path) != digest or path.stat().st_size != 240 * w * h * 3 // 2:
             raise ValueError("pinned base identity")
         bases[mode] = (np.memmap(path, np.uint8, "r", shape=(240, h * 3 // 2, w)), w, h)
+    if (a.dcvc is None) != (a.dcvc_sha is None):
+        raise ValueError("DCVC path and expected native YUV digest must be supplied together")
+    baselines = dict(BASELINES)
+    if a.dcvc is not None:
+        baselines["dcvc_q24"] = (a.dcvc, 960, 544, 20.411666666666665, a.dcvc_sha)
     controls = {}
-    for name, (path, w, h, rate, digest) in BASELINES.items():
+    for name, (path, w, h, rate, digest) in baselines.items():
         if sha(path) != digest or path.stat().st_size != 240 * w * h * 3 // 2:
             raise ValueError("baseline native decode identity")
         controls[name] = (np.memmap(path, np.uint8, "r", shape=(240, h * 3 // 2, w)), w, h, rate)
@@ -131,7 +168,7 @@ def main(a):
     cap = cv2.VideoCapture(str(SOURCE), cv2.CAP_FFMPEG)
     if not cap.isOpened():
         raise ValueError("source decoder")
-    sse = {k: 0 for k in [*BASES, *BASELINES]}
+    sse = {k: 0 for k in [*BASES, *baselines]}
     hashes = {k: hashlib.sha256() for k in BASES}
     start = time.monotonic()
     review = a.out / "private-review"
@@ -195,14 +232,15 @@ def main(a):
         out.flush()
     samples = 240 * 1080 * 1920 * 3
     result = {
-        "scope": "Single Al028 shot, native 25fps; original 11-kbps source-denied player generation with paired 21-kbps base recomposition. Full-frame RGB PSNR is descriptive. No reviewed foreground masks or ball accuracy used.",
+        "scope": "Single Al028 shot, native 25fps; original 11-kbps source-denied player generation with paired 20- and 21-kbps base recompositions. Full-frame RGB PSNR is descriptive. No reviewed foreground masks or ball accuracy used.",
         "frames": 240,
         "sse": sse,
         "rgb_psnr": {str(k): 10 * math.log10(255**2 * samples / v) for k, v in sse.items()},
         "rgb_stream_sha256": {str(k): v.hexdigest() for k, v in hashes.items()},
         "baseline_kbps": {k: v[3] for k, v in controls.items()},
-        "joint_warm_kbps": {"11": 11.133333333333333, "21": 21.298333333333332},
+        "joint_warm_kbps": {"11": 11.133333333333333, "20": 20.4075, "21": 21.298333333333332},
         "finish_receipt_sha256": a.finish_sha,
+        "paid_stream_sha256": {str(path): digest for path, digest in paid_joint.items()},
         "private_review_ticks": sorted(review_ticks),
         "private_review_png_sha256": review_hashes,
         "elapsed_seconds": time.monotonic() - start,
@@ -218,4 +256,6 @@ if __name__ == "__main__":
     p.add_argument("--gen4", type=Path, required=True)
     p.add_argument("--gen6", type=Path, required=True)
     p.add_argument("--out", type=Path, required=True)
+    p.add_argument("--dcvc", type=Path)
+    p.add_argument("--dcvc-sha")
     main(p.parse_args())
