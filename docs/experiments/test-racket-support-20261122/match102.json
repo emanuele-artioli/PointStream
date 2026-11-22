@@ -1,0 +1,709 @@
+{
+  "event": "match102",
+  "source_sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+  "feature_sha256": "994101c8d3466080777c262d92b9f15953c5636cc4addae06f75ad478d3594ee",
+  "labels": {
+    "tennis/all/match102/racket/000/0043.json": "88eb0d9fbffa906b0ad474b19b036cbf064b8361a079be42d80f2ef6bdd6d632",
+    "tennis/all/match102/racket/000/0049.json": "9aebad79d418ce0d536d6d612430237a9b79eb41d0e8c3a486c7031fa4069b8c",
+    "tennis/all/match102/racket/000/0054.json": "ab14c140ef5af53db7ef6a4acbc0d060bae4c35246c14adf42bfe5ad585ebb9b",
+    "tennis/all/match102/racket/000/0072.json": "ac12df1fefb0cc07579f60f3a4bcbe6afdb03e6012d7b899c9b670a0a336f921",
+    "tennis/all/match102/racket/000/0077.json": "7b461bd55bc2d14256dac34e8c7bbb0becdd934fa1caf7e3cf46017c49e54e57",
+    "tennis/all/match102/racket/000/0083.json": "14b7429d283ea940beedfa4781437aace2eed8df4e684bbfca334e2c17508aed",
+    "tennis/all/match102/racket/000/0089.json": "e79e428561c5ea2bc4b76c12784024a133af1639ef72b7e9dc992fdb70a71741",
+    "tennis/all/match102/racket/000/0112.json": "3437387effc8872dac46a9d4783e27b594ac1a548c04f45ad504cc6f36cc6ff3",
+    "tennis/all/match102/racket/000/0117.json": "58b77490912e28d1023c4e181a21f43918b211c92d9ec546bc6359a459f05df8",
+    "tennis/all/match102/racket/000/0135.json": "1fcda9ee7f5e19865e92f8ce263ecc585fe7f138c40bf65ee96187ef6cfa9a4f",
+    "tennis/all/match102/racket/000/0140.json": "3b2809a68bbbe24cf2d1155de8f677c923b04b762cbbcf1d7c610da197bc10a6",
+    "tennis/all/match102/racket/000/0146.json": "f8a8550622d8a0ba207848aa697dd5c296408540d73fad8d59318c66f0a12397",
+    "tennis/all/match102/racket/000/0152.json": "6acac22ef04398d9303db8747bc62fb509e2f243ea2a1506e2bd96490128dfa0",
+    "tennis/all/match102/racket/000/0198.json": "c4aa386ead17d49714e94c9f0b58c9191b9c98dbc68be84d087e702de5a5c531",
+    "tennis/all/match102/racket/000/0226.json": "93528324750809b14ef829b7e8d98588e986f4ae2f208d004c7fd828ccb4fbbf",
+    "tennis/all/match102/racket/000/0232.json": "d7cb03dfdab563c4b24f5b12879e8955b9f60625c6e08d6242b6b671e942111c"
+  },
+  "selected_players": [
+    "person:000000000000",
+    "person:000000000001"
+  ],
+  "summary": {
+    "head": {
+      "visible": 68,
+      "exact": 12,
+      "within_five": 14,
+      "all_landmarks": 68
+    },
+    "handle": {
+      "visible": 10,
+      "exact": 4,
+      "within_five": 10,
+      "all_landmarks": 17
+    }
+  },
+  "rows": [
+    {
+      "tick": 43,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 43,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 43,
+      "object_index": 0,
+      "part": "handle",
+      "visible": false
+    },
+    {
+      "tick": 43,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 43,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 49,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 49,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 49,
+      "object_index": 0,
+      "part": "handle",
+      "visible": false
+    },
+    {
+      "tick": 49,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 49,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 54,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 54,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 54,
+      "object_index": 0,
+      "part": "handle",
+      "visible": true,
+      "exact": true,
+      "within_five": true
+    },
+    {
+      "tick": 54,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 54,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 72,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": true,
+      "within_five": true
+    },
+    {
+      "tick": 72,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": true,
+      "within_five": true
+    },
+    {
+      "tick": 72,
+      "object_index": 0,
+      "part": "handle",
+      "visible": false
+    },
+    {
+      "tick": 72,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": true,
+      "within_five": true
+    },
+    {
+      "tick": 72,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": true,
+      "within_five": true
+    },
+    {
+      "tick": 77,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": true,
+      "within_five": true
+    },
+    {
+      "tick": 77,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": true,
+      "within_five": true
+    },
+    {
+      "tick": 77,
+      "object_index": 0,
+      "part": "handle",
+      "visible": false
+    },
+    {
+      "tick": 77,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": true,
+      "within_five": true
+    },
+    {
+      "tick": 77,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": true,
+      "within_five": true
+    },
+    {
+      "tick": 83,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 83,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 83,
+      "object_index": 0,
+      "part": "handle",
+      "visible": true,
+      "exact": true,
+      "within_five": true
+    },
+    {
+      "tick": 83,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 83,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 89,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 89,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 89,
+      "object_index": 0,
+      "part": "handle",
+      "visible": true,
+      "exact": false,
+      "within_five": true
+    },
+    {
+      "tick": 89,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 89,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 112,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 112,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 112,
+      "object_index": 0,
+      "part": "handle",
+      "visible": false
+    },
+    {
+      "tick": 112,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 112,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 117,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 117,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": false,
+      "within_five": true
+    },
+    {
+      "tick": 117,
+      "object_index": 0,
+      "part": "handle",
+      "visible": true,
+      "exact": false,
+      "within_five": true
+    },
+    {
+      "tick": 117,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 117,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 117,
+      "object_index": 1,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 117,
+      "object_index": 1,
+      "part": "bottom",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 117,
+      "object_index": 1,
+      "part": "handle",
+      "visible": true,
+      "exact": true,
+      "within_five": true
+    },
+    {
+      "tick": 117,
+      "object_index": 1,
+      "part": "left",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 117,
+      "object_index": 1,
+      "part": "right",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 135,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 135,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": true,
+      "within_five": true
+    },
+    {
+      "tick": 135,
+      "object_index": 0,
+      "part": "handle",
+      "visible": true,
+      "exact": true,
+      "within_five": true
+    },
+    {
+      "tick": 135,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 135,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 140,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 140,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": true,
+      "within_five": true
+    },
+    {
+      "tick": 140,
+      "object_index": 0,
+      "part": "handle",
+      "visible": true,
+      "exact": false,
+      "within_five": true
+    },
+    {
+      "tick": 140,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": true,
+      "within_five": true
+    },
+    {
+      "tick": 140,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": true,
+      "within_five": true
+    },
+    {
+      "tick": 146,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 146,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 146,
+      "object_index": 0,
+      "part": "handle",
+      "visible": true,
+      "exact": false,
+      "within_five": true
+    },
+    {
+      "tick": 146,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 146,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 152,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 152,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 152,
+      "object_index": 0,
+      "part": "handle",
+      "visible": true,
+      "exact": false,
+      "within_five": true
+    },
+    {
+      "tick": 152,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 152,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 198,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 198,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": false,
+      "within_five": true
+    },
+    {
+      "tick": 198,
+      "object_index": 0,
+      "part": "handle",
+      "visible": false
+    },
+    {
+      "tick": 198,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 198,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 226,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 226,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 226,
+      "object_index": 0,
+      "part": "handle",
+      "visible": false
+    },
+    {
+      "tick": 226,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 226,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 232,
+      "object_index": 0,
+      "part": "top",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 232,
+      "object_index": 0,
+      "part": "bottom",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 232,
+      "object_index": 0,
+      "part": "handle",
+      "visible": true,
+      "exact": false,
+      "within_five": true
+    },
+    {
+      "tick": 232,
+      "object_index": 0,
+      "part": "left",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    },
+    {
+      "tick": 232,
+      "object_index": 0,
+      "part": "right",
+      "visible": true,
+      "exact": false,
+      "within_five": false
+    }
+  ]
+}

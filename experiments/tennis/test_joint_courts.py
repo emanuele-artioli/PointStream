@@ -65,7 +65,7 @@ def run(args):
     (Path(os.environ["PS_STAGE_DIR"]) / "result.json").write_text(data)
 
 
-def validate(expected_events):
+def validate(expected_events, full_seconds=2300):
     r = json.loads((Path(os.environ["PS_STAGE_DIR"]) / "result.json").read_text())
     n = r["frames"]
     checks = dict(
@@ -73,7 +73,7 @@ def validate(expected_events):
         coverage=all(
             len(x["rows"]) == n and 0 <= x["fit_count"] <= n for x in r["events"].values()
         ),
-        forecast=r["stage"] != "smoke" or r["seconds"] * 20 * 1.5 + 100 < 2300,
+        forecast=r["stage"] != "smoke" or r["seconds"] * 20 * 1.5 + 100 < full_seconds,
     )
     ok = all(checks.values())
     Path(os.environ["PS_VALIDATION_PATH"]).write_text(
@@ -92,8 +92,9 @@ if __name__ == "__main__":
         ("fps", str),
         ("length", int),
     ):
-        p.add_argument("--" + name, nargs=3, type=typ)
+        p.add_argument("--" + name, nargs="+", type=typ)
     p.add_argument("--frames", type=int)
     p.add_argument("--validate", action="store_true")
+    p.add_argument("--full-seconds", type=int, default=2300)
     a = p.parse_args()
-    validate(a.event or ["match108", "match102", "match120"]) if a.validate else run(a)
+    validate(a.event or ["match108", "match102", "match120"], a.full_seconds) if a.validate else run(a)
