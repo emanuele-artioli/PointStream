@@ -99,6 +99,11 @@ PANELS = [
         "At the lower joint setting the 244,339-byte startup fits a 33 kbps average after 170.6 seconds of active reuse. The chart charges each component from the measured 4.8-second packets. A receiver needs a still-valid reference over the proposed use interval.",
     ),
     (
+        "player-rd-historical/reuse-33.pdf",
+        "How much reuse the multi-match result requires",
+        "Each of eight windows charges the historical twelve-image bank and the trained match assets. To fit 33 kbps, the least expensive tested stream requires 14.9 to 113.7 active minutes across windows. The 4.8-second joint receiver uses a different initialization.",
+    ),
+    (
         "system/passage-bill.pdf",
         "What two rallies cost with the full intervening broadcast",
         "Both cut indexes and all delivered components are charged. The fitted-ball package used 2.15% fewer bytes than AV1 with the same 216.5-second fallback. Return boxes and ball centers came from the sender. Whole-passage luma was 24.45 versus 24.53 dB. Continuous AV1 achieved 26.13 dB at a lower rate.",

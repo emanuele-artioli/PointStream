@@ -1,0 +1,248 @@
+{
+  "budget_kbps": 33,
+  "rows": [
+    {
+      "window": "al028",
+      "reference_pair_bytes": 155683,
+      "modeled_12_reference_bank_bytes": 934098,
+      "adapter_and_guider_bytes": 1488252,
+      "total_asset_bytes": 2422350,
+      "points": [
+        {
+          "two_hour_kbps": 14.457333333333336,
+          "running_kbps": 11.765833333333337,
+          "dists": 0.25046735182404517,
+          "seconds_to_fit_33": 912.6235234095994
+        },
+        {
+          "two_hour_kbps": 19.239833333333333,
+          "running_kbps": 16.548333333333332,
+          "dists": 0.24202542155981063,
+          "seconds_to_fit_33": 1177.9232094012764
+        },
+        {
+          "two_hour_kbps": 32.349833333333336,
+          "running_kbps": 29.658333333333335,
+          "dists": 0.23285770192742347,
+          "seconds_to_fit_33": 5799.1421446384065
+        },
+        {
+          "two_hour_kbps": 39.764833333333335,
+          "running_kbps": 37.07333333333334,
+          "dists": 0.22808561697602273,
+          "seconds_to_fit_33": null
+        }
+      ],
+      "minimum_seconds_to_fit": 912.6235234095994
+    },
+    {
+      "window": "al034",
+      "reference_pair_bytes": 164079,
+      "modeled_12_reference_bank_bytes": 984474,
+      "adapter_and_guider_bytes": 1488252,
+      "total_asset_bytes": 2472726,
+      "points": [
+        {
+          "two_hour_kbps": 14.184140000000001,
+          "running_kbps": 11.436666666666667,
+          "dists": 0.2441043771803379,
+          "seconds_to_fit_33": 917.3817282423868
+        },
+        {
+          "two_hour_kbps": 18.654973333333334,
+          "running_kbps": 15.9075,
+          "dists": 0.23253990709781647,
+          "seconds_to_fit_33": 1157.3384817902588
+        },
+        {
+          "two_hour_kbps": 30.89414,
+          "running_kbps": 28.14666666666667,
+          "dists": 0.22213361784815788,
+          "seconds_to_fit_33": 4075.921978021979
+        },
+        {
+          "two_hour_kbps": 37.962473333333335,
+          "running_kbps": 35.215,
+          "dists": 0.2172427646815777,
+          "seconds_to_fit_33": null
+        }
+      ],
+      "minimum_seconds_to_fit": 917.3817282423868
+    },
+    {
+      "window": "al043",
+      "reference_pair_bytes": 152664,
+      "modeled_12_reference_bank_bytes": 915984,
+      "adapter_and_guider_bytes": 1488252,
+      "total_asset_bytes": 2404236,
+      "points": [
+        {
+          "two_hour_kbps": 14.126373333333333,
+          "running_kbps": 11.455,
+          "dists": 0.2591275632381439,
+          "seconds_to_fit_33": 892.7309352517985
+        },
+        {
+          "two_hour_kbps": 18.858040000000003,
+          "running_kbps": 16.186666666666667,
+          "dists": 0.24428740441799163,
+          "seconds_to_fit_33": 1143.9663758921492
+        },
+        {
+          "two_hour_kbps": 32.729706666666665,
+          "running_kbps": 30.05833333333333,
+          "dists": 0.2303865022957325,
+          "seconds_to_fit_33": 6538.432181303108
+        },
+        {
+          "two_hour_kbps": 40.67970666666667,
+          "running_kbps": 38.00833333333333,
+          "dists": 0.22657351195812225,
+          "seconds_to_fit_33": null
+        }
+      ],
+      "minimum_seconds_to_fit": 892.7309352517985
+    },
+    {
+      "window": "med019",
+      "reference_pair_bytes": 195067,
+      "modeled_12_reference_bank_bytes": 1170402,
+      "adapter_and_guider_bytes": 1495592,
+      "total_asset_bytes": 2665994,
+      "points": [
+        {
+          "two_hour_kbps": 26.87721555555556,
+          "running_kbps": 23.915000000000003,
+          "dists": 0.28150068670511247,
+          "seconds_to_fit_33": 2347.6006604292793
+        },
+        {
+          "two_hour_kbps": 42.01554888888889,
+          "running_kbps": 39.053333333333335,
+          "dists": 0.25726505145430567,
+          "seconds_to_fit_33": null
+        },
+        {
+          "two_hour_kbps": 88.45388222222223,
+          "running_kbps": 85.49166666666667,
+          "dists": 0.22608835101127625,
+          "seconds_to_fit_33": null
+        }
+      ],
+      "minimum_seconds_to_fit": 2347.6006604292793
+    },
+    {
+      "window": "med024",
+      "reference_pair_bytes": 189263,
+      "modeled_12_reference_bank_bytes": 1135578,
+      "adapter_and_guider_bytes": 1495592,
+      "total_asset_bytes": 2631170,
+      "points": [
+        {
+          "two_hour_kbps": 27.176855555555555,
+          "running_kbps": 24.253333333333334,
+          "dists": 0.26167856678366663,
+          "seconds_to_fit_33": 2406.5579268292686
+        },
+        {
+          "two_hour_kbps": 41.86518888888889,
+          "running_kbps": 38.94166666666666,
+          "dists": 0.24375004172325135,
+          "seconds_to_fit_33": null
+        },
+        {
+          "two_hour_kbps": 85.3901888888889,
+          "running_kbps": 82.46666666666668,
+          "dists": 0.22279830053448677,
+          "seconds_to_fit_33": null
+        }
+      ],
+      "minimum_seconds_to_fit": 2406.5579268292686
+    },
+    {
+      "window": "nad000",
+      "reference_pair_bytes": 366161,
+      "modeled_12_reference_bank_bytes": 2196966,
+      "adapter_and_guider_bytes": 1489876,
+      "total_asset_bytes": 3686842,
+      "points": [
+        {
+          "two_hour_kbps": 29.694824444444446,
+          "running_kbps": 25.598333333333336,
+          "dists": 0.24899136424064636,
+          "seconds_to_fit_33": 3984.8776401711343
+        },
+        {
+          "two_hour_kbps": 44.618157777777775,
+          "running_kbps": 40.52166666666666,
+          "dists": 0.2377184011042118,
+          "seconds_to_fit_33": null
+        },
+        {
+          "two_hour_kbps": 81.33482444444445,
+          "running_kbps": 77.23833333333334,
+          "dists": 0.22484254240989685,
+          "seconds_to_fit_33": null
+        }
+      ],
+      "minimum_seconds_to_fit": 3984.8776401711343
+    },
+    {
+      "window": "nad001",
+      "reference_pair_bytes": 262185,
+      "modeled_12_reference_bank_bytes": 1573110,
+      "adapter_and_guider_bytes": 1489876,
+      "total_asset_bytes": 3062986,
+      "points": [
+        {
+          "two_hour_kbps": 28.621651111111113,
+          "running_kbps": 25.218333333333334,
+          "dists": 0.2683809049427509,
+          "seconds_to_fit_33": 3148.9254230027846
+        },
+        {
+          "two_hour_kbps": 44.56831777777778,
+          "running_kbps": 41.165,
+          "dists": 0.25445307418704033,
+          "seconds_to_fit_33": null
+        },
+        {
+          "two_hour_kbps": 87.89498444444445,
+          "running_kbps": 84.49166666666667,
+          "dists": 0.23864018097519873,
+          "seconds_to_fit_33": null
+        }
+      ],
+      "minimum_seconds_to_fit": 3148.9254230027846
+    },
+    {
+      "window": "nad002",
+      "reference_pair_bytes": 319207,
+      "modeled_12_reference_bank_bytes": 1915242,
+      "adapter_and_guider_bytes": 1489876,
+      "total_asset_bytes": 3405118,
+      "points": [
+        {
+          "two_hour_kbps": 32.790131111111116,
+          "running_kbps": 29.00666666666667,
+          "dists": 0.26331951692700384,
+          "seconds_to_fit_33": 6821.60534223707
+        },
+        {
+          "two_hour_kbps": 51.21346444444445,
+          "running_kbps": 47.43000000000001,
+          "dists": 0.2526476442813873,
+          "seconds_to_fit_33": null
+        },
+        {
+          "two_hour_kbps": 88.30846444444445,
+          "running_kbps": 84.525,
+          "dists": 0.2427055209875107,
+          "seconds_to_fit_33": null
+        }
+      ],
+      "minimum_seconds_to_fit": 6821.60534223707
+    }
+  ],
+  "assumption": "The fixed historical 12-crop bank and same-match trained adapter/guider are used over the stated active duration. Each running rate charges actual frame payload, motion and covers its tested operating point. The exercise assumes continuing content at that rate."
+}
