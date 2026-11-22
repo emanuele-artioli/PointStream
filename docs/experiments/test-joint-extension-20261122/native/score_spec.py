@@ -124,6 +124,7 @@ def write(a):
             "1600",
         ]
         if joint:
+            args.append("--with-motion")
             ss = dict(
                 name="sender",
                 path=str(INBOX / a.sender_job / "full/sender-result.json"),

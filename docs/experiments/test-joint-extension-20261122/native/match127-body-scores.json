@@ -1,0 +1,27 @@
+{
+  "event": "match127",
+  "source_sha256": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+  "fps": "60",
+  "frames": 240,
+  "source_grid_sha256": "7d706c8d9ff2f45ac1c5dc810afa7361a5a390681ea4d7067a72d2673c7063d0",
+  "source_support_sha256": "88e0b197dd16d18a7c1989601637f045859de1d18ac3756d3eb1f280c3d2eb64",
+  "measured": [
+    {
+      "name": "dcvc-480-q24",
+      "family": "DCVC-UF",
+      "bytes": 11224,
+      "kbps": 22.448,
+      "source_grid": "7d706c8d9ff2f45ac1c5dc810afa7361a5a390681ea4d7067a72d2673c7063d0",
+      "support": "88e0b197dd16d18a7c1989601637f045859de1d18ac3756d3eb1f280c3d2eb64",
+      "dists": 0.39249588710566363,
+      "near": 0.3712530088921388,
+      "far": 0.41373876531918846,
+      "body_psnr": 17.3613760136371,
+      "full_psnr": 24.89339197975673,
+      "score_job": "20261122T135053Z-981d1f60",
+      "producer": "20261122T093538Z-9285b9a5",
+      "typed_decode_sha256": "e367b6ddb7eff927387ef949df74770ce384bff3c1b1546e54869a09754dffc5"
+    }
+  ],
+  "comparisons": []
+}

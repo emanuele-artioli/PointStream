@@ -18,11 +18,14 @@ def main(a):
     args[args.index("--arm") + 1] = a.arm
     args[args.index("--producer") + 1] = a.job
     args += ["--report-sha256", a.report_sha]
+    if a.motion:
+        args.append("--with-motion")
     save(HERE / (a.event + "-score-" + a.arm + ".json"), base)
 
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument("--motion", action="store_true")
     for k in ("event", "arm", "job", "archive-sha", "report-sha"):
         p.add_argument("--" + k, required=True)
     main(p.parse_args())

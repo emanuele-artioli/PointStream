@@ -2,6 +2,7 @@
 
 import argparse
 from contextlib import ExitStack
+import hashlib
 import json
 from pathlib import Path
 import tempfile
@@ -28,10 +29,15 @@ def main(a):
     cv2.setNumThreads(1)
     arms = json.loads(a.arms.read_text())
     assert len(arms) == len({x["name"] for x in arms})
-    supports, support_hash = get_support(a.features)
+    external_support = getattr(a, "support", None)
+    supports, support_hash = (
+        get_support(a.features) if external_support is None else external_support
+    )
+    fps = getattr(a, "fps", FPS)
+    source_hashes = []
     yy, xx = np.indices((544, 960), dtype=np.float32)
     cap = cv2.VideoCapture(str(getattr(a, "source_pixels", a.source)), cv2.CAP_FFMPEG)
-    assert abs(cap.get(cv2.CAP_PROP_FPS) - float(FPS)) < 0.001
+    assert abs(cap.get(cv2.CAP_PROP_FPS) - float(fps)) < 0.001
     rows = {r["name"]: [] for r in arms}
     prev = {}
     prev_gray = None
@@ -50,8 +56,9 @@ def main(a):
             ok, bgr = cap.read()
             assert ok
             rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
+            source_hashes.append(array_sha(rgb))
             if getattr(a, "source_hashes", None) is not None:
-                assert array_sha(rgb) == a.source_hashes[t]
+                assert source_hashes[-1] == a.source_hashes[t]
             image = cv2.resize(rgb, (960, 544), interpolation=cv2.INTER_AREA)
             g = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
             values = {"source": luma(image)}
@@ -113,7 +120,8 @@ def main(a):
         source_sha256=sha(a.source),
         source_mask_rle_sha256=support_hash,
         grid=[960, 544],
-        fps=str(FPS),
+        fps=str(fps),
+        source_grid_sha256=hashlib.sha256("".join(source_hashes).encode("ascii")).hexdigest(),
         recorded_ticks=a.frames,
         arms=[{"name": r["name"], "bytes": r["bytes"]} for r in arms],
         tool=f"OpenCV {cv2.__version__}, source-only backward DIS medium",

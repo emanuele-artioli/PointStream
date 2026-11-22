@@ -45,9 +45,15 @@ def select_arm(a, binding, bank):
             assert r["ball_sha256"] == binding["ball_sha256"] and r["roi_map_sha256"]
             assert chosen["identical_qp_control"]["non_inert"]
         return dict(
-            name=a.arm, kind="ivf_tar", width=r["width"], height=r["height"], bytes=chosen["bytes"],
-            archive=str(a.data), member="publish/" + chosen["file"],
-            sha256=chosen["sha256"], decoded_sha256=chosen["decoded_sha256"],
+            name=a.arm,
+            kind="ivf_tar",
+            width=r["width"],
+            height=r["height"],
+            bytes=chosen["bytes"],
+            archive=str(a.data),
+            member="publish/" + chosen["file"],
+            sha256=chosen["sha256"],
+            decoded_sha256=chosen["decoded_sha256"],
         )
     if a.arm.startswith("av1-"):
         filename = a.arm.removeprefix("av1-") + ".ivf"
@@ -163,6 +169,15 @@ def validate(a, stage, dest):
     assert abs(score["kbps"] - score["bytes"] * float(Fraction(score["native_fps"])) / 30000) < 1e-8
     if score["samples_sha256"] is not None:
         assert sha256(stage / "samples.tar") == score["samples_sha256"]
+    if getattr(a, "with_motion", False):
+        motion = json.loads((stage / "motion.json").read_text())
+        records = motion["rows"][a.arm]
+        assert motion["source_grid_sha256"] == score["source_grid_sha256"]
+        assert motion["source_mask_rle_sha256"] == score["support_rle_sha256"]
+        assert 0 < len(records) <= 2 * (a.frames - 1)
+        assert all(0 < r["tick"] < a.frames and r["pixels"] > 0 for r in records)
+        assert motion["summary"][a.arm]["n"] == len(records)
+        assert score["motion_sha256"] == sha256(stage / "motion.json")
     assert score["total_s"] < a.full_cap
     forecast = (
         1.5 * ((score["total_s"] - score["score_s"]) + score["score_s"] * 240 / a.frames) + 60
@@ -227,6 +242,23 @@ def main(a):
         opts.review_ticks = set(cfg["ticks"])
     start = time.monotonic()
     result = native.score(opts, arm, model, supp, sig)
+    if getattr(a, "with_motion", False):
+        import temporal_native as motion
+
+        arms_path = opts.scratch / "motion-input.json"
+        arms_path.write_text(json.dumps([arm]) + "\n")
+        motion_args = argparse.Namespace(
+            source=a.source,
+            features=a.features,
+            arms=arms_path,
+            scratch=opts.scratch,
+            out=stage / "motion.json",
+            frames=a.frames,
+            fps=opts.fps,
+            support=(supp, sig),
+        )
+        motion.main(motion_args)
+        result["motion_sha256"] = sha256(stage / "motion.json")
     result.update(
         event=a.event,
         producer=a.producer,
@@ -246,6 +278,7 @@ if __name__ == "__main__":
     p.add_argument("--arm", required=True)
     p.add_argument("--producer", required=True)
     p.add_argument("--report-sha256")
+    p.add_argument("--with-motion", action="store_true")
     p.add_argument("--frames", type=int, choices=(24, 240), required=True)
     p.add_argument("--full-cap", type=int, default=1600)
     p.add_argument("--validate", action="store_true")

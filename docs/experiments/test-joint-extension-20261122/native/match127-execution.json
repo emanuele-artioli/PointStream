@@ -54,6 +54,17 @@
       "revision": "fd1668998f62a91307c9afda109d357340494832",
       "source_archive_sha256": "6f8613e55a1c2823da11ab16d1d7459510b0c0031cd952d1ed081770f615ab51",
       "spec_sha256": "837a70cc415d4dfcf143b09a3d93883dcee8c811f2a82e8f89f54bcccaab9c29",
+      "state_at_registration": "pending",
+      "terminal": "complete",
+      "source_grid_sha256": "7d706c8d9ff2f45ac1c5dc810afa7361a5a390681ea4d7067a72d2673c7063d0",
+      "body_dists": 0.39249588710566363,
+      "running_bytes": 11224
+    },
+    "control_ordinary-320-warm": {
+      "id": "20261122T135529Z-6fabe428",
+      "revision": "04bfec247e023ac68c122549b73e8721ee9d6d0c",
+      "source_archive_sha256": "297b1632f391d966d4bd353df3431fc8ee9e54c99cfd53b1df6681fde84549b2",
+      "spec_sha256": "afd4a16bd0cc77d9c8dd8a06a69a8c48b3dca456ffa127e9641a501dcf672a45",
       "state_at_registration": "pending"
     }
   }
