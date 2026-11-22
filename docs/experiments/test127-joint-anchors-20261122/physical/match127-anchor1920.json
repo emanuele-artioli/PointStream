@@ -1,0 +1,153 @@
+{
+  "match": "match127",
+  "source_sha256": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+  "earlier_sha256": "12df7179c0874b75a23dcb3821259991ee572b735b4bd8e99ec744f772f0ff5e",
+  "mode": "ordinary",
+  "roi_map_sha256": null,
+  "source_masks_sha256": null,
+  "ball_sha256": null,
+  "frames": 240,
+  "fps": "60",
+  "width": 1920,
+  "height": 1080,
+  "tools": {
+    "SvtAv1EncApp": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "sha256": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+      "version": "SVT-AV1 v4.2.0 (release)"
+    },
+    "dav1d": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+      "version": "1.5.4"
+    },
+    "ffmpeg": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+      "version": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers"
+    }
+  },
+  "convert_command": [
+    "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+    "-v",
+    "error",
+    "-threads",
+    "1",
+    "-nostdin",
+    "-i",
+    "/local/users/emanuele/pointstream/cache/8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50/match127-000-8ebca8b69320.mp4",
+    "-an",
+    "-frames:v",
+    "240",
+    "-vf",
+    "scale=1920:1080:flags=area,format=yuv420p",
+    "-fps_mode",
+    "passthrough",
+    "-f",
+    "rawvideo",
+    "/local/users/emanuele/pointstream/scratch/20261122T140310Z-95ed891f-full/native/source.yuv"
+  ],
+  "source_yuv_sha256": "f4ae6fdc200d42582bc009b0c1d9f6aa290eac228bf7f5393be56b886f3bac8c",
+  "selected": {
+    "cold": {
+      "ceiling": 162340,
+      "affordable": true,
+      "identical_qp_control": null,
+      "quarter_crf": 243,
+      "bytes": 156539,
+      "file": "q243.ivf",
+      "sha256": "94f39f3c1093d4ad7eb8d1b414056efdc06837d7c7bd1f92263792c771a853b8",
+      "origin": "new",
+      "elapsed": 36.46604639699217,
+      "decoded_sha256": "3e0d24638bbcac751ccf810ab5f07a1e35cde8afb9c1314815487598f444a2c5",
+      "decoded_file": "cold.yuv.z",
+      "shortfall": 0.03573364543550572
+    }
+  },
+  "bank": [
+    {
+      "quarter_crf": 64,
+      "bytes": 2753293,
+      "file": "q64.ivf",
+      "sha256": "3927bf778ed896c92eada782f25f4d8aef3f9d63a6b2aebfc5fd533a651234b7",
+      "origin": "new",
+      "elapsed": 26.572401091019856
+    },
+    {
+      "quarter_crf": 172,
+      "bytes": 575037,
+      "file": "q172.ivf",
+      "sha256": "fed43106285912a6b8f964baa1800a3bb1aaa2b8c49e4a57edf878608abd8cb0",
+      "origin": "new",
+      "elapsed": 29.590813356015133
+    },
+    {
+      "quarter_crf": 226,
+      "bytes": 253156,
+      "file": "q226.ivf",
+      "sha256": "d1df3a2aa007adf9d70a518b5fee43da30d1f3f61df4effe438eddc633e30f98",
+      "origin": "new",
+      "elapsed": 29.872707165020984
+    },
+    {
+      "quarter_crf": 239,
+      "bytes": 181978,
+      "file": "q239.ivf",
+      "sha256": "bf6c5d067dae40bae416902cbc238b2f2c29babcefac971c77d2bc5bd5ea3161",
+      "origin": "new",
+      "elapsed": 36.31987901701359
+    },
+    {
+      "quarter_crf": 242,
+      "bytes": 162394,
+      "file": "q242.ivf",
+      "sha256": "610b43ab6ab960d7c5171e38e577b2f256528942581e2a085b0be482000b0dfd",
+      "origin": "new",
+      "elapsed": 36.688141029997496
+    },
+    {
+      "quarter_crf": 243,
+      "bytes": 156539,
+      "file": "q243.ivf",
+      "sha256": "94f39f3c1093d4ad7eb8d1b414056efdc06837d7c7bd1f92263792c771a853b8",
+      "origin": "new",
+      "elapsed": 36.46604639699217
+    },
+    {
+      "quarter_crf": 244,
+      "bytes": 151133,
+      "file": "q244.ivf",
+      "sha256": "c90543e2379a0458cd4fd02d9e3735c109ca71382a83f5a99f75ac855a198cb9",
+      "origin": "new",
+      "elapsed": 35.510108308983035
+    },
+    {
+      "quarter_crf": 246,
+      "bytes": 139366,
+      "file": "q246.ivf",
+      "sha256": "303b6fd63078cdf4fe4080d630ccce0002f0f0c4d97a28450e97fedd6ff4828b",
+      "origin": "new",
+      "elapsed": 34.46086105701397
+    },
+    {
+      "quarter_crf": 253,
+      "bytes": 87240,
+      "file": "q253.ivf",
+      "sha256": "6d353366eb7913f1a7ff051806f7e1ce40ca2061b7de0bee8e88691d53cd8e44",
+      "origin": "new",
+      "elapsed": 28.39200487002381
+    },
+    {
+      "quarter_crf": 280,
+      "bytes": 41677,
+      "file": "q280.ivf",
+      "sha256": "86078878304e79be696ce28759d05819518271ae7bdd033f2b26df889ac34268",
+      "origin": "new",
+      "elapsed": 20.735066139983246
+    }
+  ],
+  "elapsed": 329.4404842569784
+}
