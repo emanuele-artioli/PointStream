@@ -1,0 +1,536 @@
+{
+  "points": [
+    {
+      "width": 160,
+      "mode": "plain",
+      "crf": 61.25,
+      "kbps": 19.788333333333334,
+      "bytes": 11873,
+      "stream_sha256": "2fd2addeb86966643702377792b4ab4c28db37a51aa630af7a229ddb8a985b08",
+      "decoded_sha256": "114d26d044f5a161df31b66537f9b695b7566418e1005fa06abc9282093cd1a1",
+      "players": 0.5477589219808578,
+      "p1": 0.5465524842341741,
+      "p2": 0.5489653597275416,
+      "ball": 0.4241466671228409
+    },
+    {
+      "width": 240,
+      "mode": "plain",
+      "crf": 64.5,
+      "kbps": 19.891666666666666,
+      "bytes": 11935,
+      "stream_sha256": "748b3346ba156a1c09b4ddf83dde47b86b5845f43735d527623ba514847a8730",
+      "decoded_sha256": "f8a30e8c2c8d250fb1fb75f97c9ea79b827c2a6a811935a7aca97e6a7c79c8a6",
+      "players": 0.5344626655181248,
+      "p1": 0.537488708893458,
+      "p2": 0.5314366221427917,
+      "ball": 0.4180502047141393
+    }
+  ],
+  "selections": [
+    {
+      "width": 160,
+      "mode": "plain",
+      "trials": {
+        "36": 27533,
+        "53.0": 15621,
+        "57.25": 13815,
+        "58.5": 13232,
+        "59.0": 13011,
+        "59.25": 12787,
+        "59.5": 12744,
+        "60.5": 12222,
+        "61.0": 12038,
+        "61.25": 11873,
+        "61.5": 11765,
+        "70.0": 9102
+      },
+      "selected_q": 61.25
+    },
+    {
+      "width": 160,
+      "mode": "roi",
+      "minimum_tested_bytes": 13085
+    },
+    {
+      "width": 240,
+      "mode": "plain",
+      "trials": {
+        "36": 46735,
+        "53.0": 23283,
+        "61.5": 15207,
+        "62.5": 13987,
+        "63.0": 12974,
+        "63.5": 12635,
+        "64.0": 12206,
+        "64.25": 12080,
+        "64.5": 11935,
+        "65.75": 11314,
+        "70.0": 9832
+      },
+      "selected_q": 64.5
+    },
+    {
+      "width": 240,
+      "mode": "roi",
+      "minimum_tested_bytes": 13793
+    },
+    {
+      "width": 480,
+      "mode": "plain",
+      "minimum_tested_bytes": 13415
+    },
+    {
+      "width": 480,
+      "mode": "roi",
+      "minimum_tested_bytes": 16933
+    }
+  ],
+  "rows": [
+    {
+      "t": 10,
+      "region": "p1",
+      "arm": "plain160",
+      "dists": 0.514277458190918
+    },
+    {
+      "t": 10,
+      "region": "p1",
+      "arm": "plain240",
+      "dists": 0.5111745595932007
+    },
+    {
+      "t": 10,
+      "region": "p2",
+      "arm": "plain160",
+      "dists": 0.5295526385307312
+    },
+    {
+      "t": 10,
+      "region": "p2",
+      "arm": "plain240",
+      "dists": 0.4985021948814392
+    },
+    {
+      "t": 10,
+      "region": "ball",
+      "arm": "plain160",
+      "dists": 0.5437530279159546
+    },
+    {
+      "t": 10,
+      "region": "ball",
+      "arm": "plain240",
+      "dists": 0.5402583479881287
+    },
+    {
+      "t": 30,
+      "region": "p1",
+      "arm": "plain160",
+      "dists": 0.5052318572998047
+    },
+    {
+      "t": 30,
+      "region": "p1",
+      "arm": "plain240",
+      "dists": 0.48038268089294434
+    },
+    {
+      "t": 30,
+      "region": "p2",
+      "arm": "plain160",
+      "dists": 0.5387856364250183
+    },
+    {
+      "t": 30,
+      "region": "p2",
+      "arm": "plain240",
+      "dists": 0.5047284364700317
+    },
+    {
+      "t": 30,
+      "region": "ball",
+      "arm": "plain160",
+      "dists": 0.5455639362335205
+    },
+    {
+      "t": 30,
+      "region": "ball",
+      "arm": "plain240",
+      "dists": 0.5448698997497559
+    },
+    {
+      "t": 50,
+      "region": "p1",
+      "arm": "plain160",
+      "dists": 0.5685838460922241
+    },
+    {
+      "t": 50,
+      "region": "p1",
+      "arm": "plain240",
+      "dists": 0.5957474708557129
+    },
+    {
+      "t": 50,
+      "region": "p2",
+      "arm": "plain160",
+      "dists": 0.5532631874084473
+    },
+    {
+      "t": 50,
+      "region": "p2",
+      "arm": "plain240",
+      "dists": 0.5129626989364624
+    },
+    {
+      "t": 50,
+      "region": "ball",
+      "arm": "plain160",
+      "dists": 0.37839871644973755
+    },
+    {
+      "t": 50,
+      "region": "ball",
+      "arm": "plain240",
+      "dists": 0.4088691473007202
+    },
+    {
+      "t": 70,
+      "region": "p1",
+      "arm": "plain160",
+      "dists": 0.5699429512023926
+    },
+    {
+      "t": 70,
+      "region": "p1",
+      "arm": "plain240",
+      "dists": 0.5650011897087097
+    },
+    {
+      "t": 70,
+      "region": "p2",
+      "arm": "plain160",
+      "dists": 0.5562409162521362
+    },
+    {
+      "t": 70,
+      "region": "p2",
+      "arm": "plain240",
+      "dists": 0.5677188634872437
+    },
+    {
+      "t": 70,
+      "region": "ball",
+      "arm": "plain160",
+      "dists": 0.4476292133331299
+    },
+    {
+      "t": 70,
+      "region": "ball",
+      "arm": "plain240",
+      "dists": 0.4257557988166809
+    },
+    {
+      "t": 90,
+      "region": "p1",
+      "arm": "plain160",
+      "dists": 0.5192227959632874
+    },
+    {
+      "t": 90,
+      "region": "p1",
+      "arm": "plain240",
+      "dists": 0.49636369943618774
+    },
+    {
+      "t": 90,
+      "region": "p2",
+      "arm": "plain160",
+      "dists": 0.5637727975845337
+    },
+    {
+      "t": 90,
+      "region": "p2",
+      "arm": "plain240",
+      "dists": 0.5487815141677856
+    },
+    {
+      "t": 90,
+      "region": "ball",
+      "arm": "plain160",
+      "dists": 0.3925228714942932
+    },
+    {
+      "t": 90,
+      "region": "ball",
+      "arm": "plain240",
+      "dists": 0.3792077302932739
+    },
+    {
+      "t": 110,
+      "region": "p1",
+      "arm": "plain160",
+      "dists": 0.5400143265724182
+    },
+    {
+      "t": 110,
+      "region": "p1",
+      "arm": "plain240",
+      "dists": 0.5409853458404541
+    },
+    {
+      "t": 110,
+      "region": "p2",
+      "arm": "plain160",
+      "dists": 0.5169322490692139
+    },
+    {
+      "t": 110,
+      "region": "p2",
+      "arm": "plain240",
+      "dists": 0.5264663696289062
+    },
+    {
+      "t": 110,
+      "region": "ball",
+      "arm": "plain160",
+      "dists": 0.39228522777557373
+    },
+    {
+      "t": 110,
+      "region": "ball",
+      "arm": "plain240",
+      "dists": 0.3770328164100647
+    },
+    {
+      "t": 130,
+      "region": "p1",
+      "arm": "plain160",
+      "dists": 0.5523688793182373
+    },
+    {
+      "t": 130,
+      "region": "p1",
+      "arm": "plain240",
+      "dists": 0.49895143508911133
+    },
+    {
+      "t": 130,
+      "region": "p2",
+      "arm": "plain160",
+      "dists": 0.5683406591415405
+    },
+    {
+      "t": 130,
+      "region": "p2",
+      "arm": "plain240",
+      "dists": 0.5279141068458557
+    },
+    {
+      "t": 130,
+      "region": "ball",
+      "arm": "plain160",
+      "dists": 0.37229716777801514
+    },
+    {
+      "t": 130,
+      "region": "ball",
+      "arm": "plain240",
+      "dists": 0.3546013832092285
+    },
+    {
+      "t": 150,
+      "region": "p1",
+      "arm": "plain160",
+      "dists": 0.5371180176734924
+    },
+    {
+      "t": 150,
+      "region": "p1",
+      "arm": "plain240",
+      "dists": 0.5403100252151489
+    },
+    {
+      "t": 150,
+      "region": "p2",
+      "arm": "plain160",
+      "dists": 0.5632890462875366
+    },
+    {
+      "t": 150,
+      "region": "p2",
+      "arm": "plain240",
+      "dists": 0.5294334888458252
+    },
+    {
+      "t": 150,
+      "region": "ball",
+      "arm": "plain160",
+      "dists": 0.3917926549911499
+    },
+    {
+      "t": 150,
+      "region": "ball",
+      "arm": "plain240",
+      "dists": 0.39684391021728516
+    },
+    {
+      "t": 170,
+      "region": "p1",
+      "arm": "plain160",
+      "dists": 0.5803905129432678
+    },
+    {
+      "t": 170,
+      "region": "p1",
+      "arm": "plain240",
+      "dists": 0.5437365174293518
+    },
+    {
+      "t": 170,
+      "region": "p2",
+      "arm": "plain160",
+      "dists": 0.5254926681518555
+    },
+    {
+      "t": 170,
+      "region": "p2",
+      "arm": "plain240",
+      "dists": 0.530915379524231
+    },
+    {
+      "t": 170,
+      "region": "ball",
+      "arm": "plain160",
+      "dists": 0.43576300144195557
+    },
+    {
+      "t": 170,
+      "region": "ball",
+      "arm": "plain240",
+      "dists": 0.41502583026885986
+    },
+    {
+      "t": 190,
+      "region": "p1",
+      "arm": "plain160",
+      "dists": 0.5915714502334595
+    },
+    {
+      "t": 190,
+      "region": "p1",
+      "arm": "plain240",
+      "dists": 0.5730428695678711
+    },
+    {
+      "t": 190,
+      "region": "p2",
+      "arm": "plain160",
+      "dists": 0.5369800329208374
+    },
+    {
+      "t": 190,
+      "region": "p2",
+      "arm": "plain240",
+      "dists": 0.5166263580322266
+    },
+    {
+      "t": 190,
+      "region": "ball",
+      "arm": "plain160",
+      "dists": 0.3772509694099426
+    },
+    {
+      "t": 190,
+      "region": "ball",
+      "arm": "plain240",
+      "dists": 0.3790236711502075
+    },
+    {
+      "t": 210,
+      "region": "p1",
+      "arm": "plain160",
+      "dists": 0.5352767109870911
+    },
+    {
+      "t": 210,
+      "region": "p1",
+      "arm": "plain240",
+      "dists": 0.5545467138290405
+    },
+    {
+      "t": 210,
+      "region": "p2",
+      "arm": "plain160",
+      "dists": 0.5776268839836121
+    },
+    {
+      "t": 210,
+      "region": "p2",
+      "arm": "plain240",
+      "dists": 0.537775993347168
+    },
+    {
+      "t": 210,
+      "region": "ball",
+      "arm": "plain160",
+      "dists": 0.3860170841217041
+    },
+    {
+      "t": 210,
+      "region": "ball",
+      "arm": "plain240",
+      "dists": 0.3829072117805481
+    },
+    {
+      "t": 230,
+      "region": "p1",
+      "arm": "plain160",
+      "dists": 0.5446310043334961
+    },
+    {
+      "t": 230,
+      "region": "p1",
+      "arm": "plain240",
+      "dists": 0.5496219992637634
+    },
+    {
+      "t": 230,
+      "region": "p2",
+      "arm": "plain160",
+      "dists": 0.5573076009750366
+    },
+    {
+      "t": 230,
+      "region": "p2",
+      "arm": "plain240",
+      "dists": 0.5754140615463257
+    },
+    {
+      "t": 230,
+      "region": "ball",
+      "arm": "plain160",
+      "dists": 0.42648613452911377
+    },
+    {
+      "t": 230,
+      "region": "ball",
+      "arm": "plain240",
+      "dists": 0.4122067093849182
+    }
+  ],
+  "script_sha256": "68ed9799ca35a935c4679fd656fd41a9eb1ae35e7de6377daa08f549aa9c6d06",
+  "metric": {
+    "metric": "DISTS",
+    "net": "vgg16",
+    "torchmetrics": "1.9.0",
+    "weights": "/private/tmp/ps-20261119-scorer-addon/torchmetrics/functional/image/dists_models/weights.pt",
+    "weights_sha256": "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218",
+    "backbone": "/Users/manu/.codex/visualizations/2026/11/01/01a196fe-ab4d-70f0-a4b4-6843ca289667/atlas-metric-models/checkpoints/vgg16-397923af.pth",
+    "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+    "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)"
+  },
+  "label_sha256": "9918c87fa6a309052bbac8ef0be21429885e6579fd632754ed9aeb343c912d8a",
+  "source_sha256": "5c402652ea7e2b471d870fb211f263ba1f7975afaf4b9b8a55be814d25ae45eb"
+}

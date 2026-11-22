@@ -525,6 +525,20 @@
     "source": "joint-trajectory-20261122#roi-480-Q66.5"
   },
   {
+    "mode": "Ordinary AV1",
+    "kbps": 19.788333333333334,
+    "players": 0.5477589219808578,
+    "ball": 0.4241466671228409,
+    "source": "joint-trajectory-20261122#strict-20-160"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 19.891666666666666,
+    "players": 0.5344626655181248,
+    "ball": 0.4180502047141393,
+    "source": "joint-trajectory-20261122#strict-20-240"
+  },
+  {
     "mode": "DCVC-UF",
     "kbps": 20.45,
     "players": 0.3924354538321495,
