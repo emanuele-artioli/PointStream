@@ -113,6 +113,7 @@ def run(a):
     cap = cv2.VideoCapture(str(a.source), cv2.CAP_FFMPEG)
     assert cap.isOpened()
     hs = {k: hashlib.sha256() for k in ("source", "ordinary", "candidate")}
+    prefix = {k: hashlib.sha256() for k in hs}
     for t in range(a.frames):
         ok, bgr = cap.read()
         assert ok and bgr.shape == (1080, 1920, 3)
@@ -130,6 +131,8 @@ def run(a):
         displays[1] = ball.render(displays[1], t, positions, velocity, looks)
         for name, img in zip(("source", "ordinary", "candidate"), [source, *displays], strict=True):
             hs[name].update(img.tobytes())
+            if t < 24:
+                prefix[name].update(img.tobytes())
     cap.release()
     result = {
         "stage": os.environ["PS_STAGE"],
@@ -145,6 +148,7 @@ def run(a):
         "candidate": b,
         "payload_sha256": digest(packet.ball_payload),
         "rgb_sha256": {k: v.hexdigest() for k, v in hs.items()},
+        "prefix_rgb_sha256": {k: v.hexdigest() for k, v in prefix.items()},
         "positions_present": sum(p is not None for p in positions),
         "decoder_sha256": decoder["sha256"],
         "opencv_version": cv2.__version__,
