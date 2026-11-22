@@ -14,6 +14,12 @@ from src.pointstream.tracked_patch import yuv_to_rgb
 
 
 def render(archive_path, review, output, source_witness=None):
+    if source_witness:
+        assert review["review_sha256"] == source_witness["review_sha256"]
+        assert all(
+            source_witness["ticks"][str(f["frame_index"])]["png_sha256"] == f["source_sha256"]
+            for f in review["frames"]
+        )
     with tarfile.open(archive_path) as archive:
         sampling = json.load(archive.extractfile("sampling.json"))
         assert sampling["ticks"] == [entry["frame_index"] for entry in review["frames"]]

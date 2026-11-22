@@ -41,6 +41,7 @@ def main():
     config = json.load(sys.stdin)
     root = Path("/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox").resolve()
     start = time.monotonic()
+    seen = set()
     with tarfile.open(fileobj=sys.stdout.buffer, mode="w|") as target:
         for row in config["rows"]:
             assert row["state"] == "complete"
@@ -55,6 +56,9 @@ def main():
                 for label, rec in row["selected"].items():
                     if not rec["affordable"]:
                         continue
+                    if config.get("deduplicate") and rec["sha256"] in seen:
+                        continue
+                    seen.add(rec["sha256"])
                     prefix = f"{row['mode']}-{row['width']}-{label}"
                     packet = a.extractfile(rec["file"]).read()
                     assert (
