@@ -1,5 +1,6 @@
 """Plot achieved mean prices and qualities of physically encoded same-match shot choices."""
 
+import argparse
 from itertools import chain
 import json
 from pathlib import Path
@@ -18,10 +19,11 @@ SHOTS = ("000", "019", "024")
 MODES = ("PointStream", "SVT-AV1", "DCVC-UF")
 
 
-def plot():
+def plot(outer=False):
+    suffix = "-expanded-neural" if outer else ""
     candidates = {}
     for shot in SHOTS:
-        one = controls(shot)
+        one = controls(shot, outer=outer)
         candidates[shot] = {
             "PointStream": [load(f"{shot}-joint-q{q}.json") for q in (70, 60, 50)],
             "SVT-AV1": list(
@@ -67,7 +69,9 @@ def plot():
             )
         data[mode] = points
     assert all(len(points) >= 2 for points in data.values())
-    (ROOT / "three-shots-rate-plot-data.json").write_text(json.dumps(data, indent=2) + "\n")
+    (ROOT / f"three-shots-rate-plot-data{suffix}.json").write_text(
+        json.dumps(data, indent=2) + "\n"
+    )
     plt.rcParams.update(
         {"pdf.fonttype": 42, "axes.spines.top": False, "axes.spines.right": False, "font.size": 10}
     )
@@ -94,9 +98,11 @@ def plot():
     ax.set_axisbelow(True)
     ax.legend(frameon=False)
     for ext in ("pdf", "png"):
-        fig.savefig(ROOT / ("three-shots-player-rates." + ext), dpi=190)
+        fig.savefig(ROOT / f"three-shots-player-rates{suffix}.{ext}", dpi=190)
     plt.close(fig)
 
 
 if __name__ == "__main__":
-    plot()
+    cli = argparse.ArgumentParser(description=__doc__)
+    cli.add_argument("--outer", action="store_true")
+    plot(cli.parse_args().outer)

@@ -1,5 +1,6 @@
 """Summarize complete native mixed timelines, keeping the three shots as dependent repeats."""
 
+import argparse
 import json
 import math
 from pathlib import Path
@@ -21,7 +22,7 @@ def compact(r):
     return {k: r[k] for k in ["arm", "mean_dists", "active_dists", "fallback_dists", "rgb_psnr"]}
 
 
-def controls(c):
+def controls(c, *, outer=False):
     if c == "000":
         anchors = load("000-control-scores.json")
     else:
@@ -30,10 +31,11 @@ def controls(c):
             anchors[f"ordinary_at_joint_{q}"] = load(f"{c}-ordinary-at-joint-q{q}.json")
         for q in [24, 26] if c == "019" else [24, 27]:
             anchors[f"neural_q{q}"] = [compact(load(f"{c}-dcvc-q{q}.json"))]
+    if not outer:
+        return anchors
     for q in [22, 29] if c != "024" else [23, 31]:
         path = ROOT / f"{c}-dcvc-q{q}.json"
-        if path.exists():
-            anchors[f"neural_q{q}"] = [compact(json.loads(path.read_text()))]
+        anchors[f"neural_q{q}"] = [compact(json.loads(path.read_text()))]
     return anchors
 
 
@@ -59,9 +61,9 @@ def reuse_threshold(primary, rows, init_bytes):
     )
 
 
-def core(c):
+def core(c, *, outer=False):
     joint = [compact(load(f"{c}-joint-q{q}.json")) for q in [70, 60, 50]]
-    anchors = controls(c)
+    anchors = controls(c, outer=outer)
     primary = joint[1]
     cap = primary["arm"]["bytes"]
     best = {}
@@ -97,8 +99,8 @@ def core(c):
     )
 
 
-def run():
-    cases = [core(c) for c in ["000", "019", "024"]]
+def run(outer=False):
+    cases = [core(c, outer=outer) for c in ["000", "019", "024"]]
     result = dict(
         denominator="One development match, three prespecified shots, each 240 native 50-fps frames with earliest 120-tick jointly supported interval and 120 conventional fallback ticks",
         cases=cases,
@@ -116,8 +118,11 @@ def run():
                 relative_change=(mean(j) / mean(a) - 1) if field != "rgb_psnr" else None,
                 by_shot_differences=[x - y for x, y in zip(j, a, strict=True)],
             )
-    (ROOT / "three-native-shots.json").write_text(json.dumps(result, indent=2) + "\n")
+    stem = "three-native-shots-expanded-neural" if outer else "three-native-shots"
+    (ROOT / (stem + ".json")).write_text(json.dumps(result, indent=2) + "\n")
 
 
 if __name__ == "__main__":
-    run()
+    cli = argparse.ArgumentParser(description=__doc__)
+    cli.add_argument("--outer", action="store_true")
+    run(cli.parse_args().outer)

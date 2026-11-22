@@ -20,7 +20,9 @@
     "--source-sha",
     "3bf7ddaae0db5c48b1072fccb15f9f162e41fa5999886b9a5bde58dc0495c630",
     "--fps",
-    "50"
+    "50",
+    "--smoke-frames",
+    "120"
   ],
   "staged_inputs": [
     {
@@ -75,11 +77,15 @@
     "--source-sha",
     "3bf7ddaae0db5c48b1072fccb15f9f162e41fa5999886b9a5bde58dc0495c630",
     "--fps",
-    "50"
+    "50",
+    "--smoke-frames",
+    "120",
+    "--full-limit",
+    "175"
   ],
-  "deadline": "2026-11-22T15:00:00Z",
+  "deadline": "2026-11-22T21:01:00Z",
   "verify_staged_inputs": true,
-  "stall_seconds": 900,
+  "stall_seconds": 180,
   "contention": {
     "policy": "continue",
     "resume_attempts": 0,
@@ -98,19 +104,19 @@
   "local_storage_gib": 60,
   "scale": {
     "frames": {
-      "smoke": 48,
+      "smoke": 120,
       "full": 240
     }
   },
   "smoke": {
-    "seconds": 350,
-    "representative_basis": "48 original frames, four native decoder passes, encoder agreement, all timestamps, receiver byte identities, enforced child and parent resource limits and 1.5x measured forecast."
+    "seconds": 65,
+    "representative_basis": "120 native 50-fps ticks, 480-wide genuine encode, all four independently checked decodes, exact coded byte and frame hashes. Keep the original 1.5x plus 60s forecast."
   },
   "full": {
-    "seconds": 1650
+    "seconds": 175
   },
-  "validator_seconds": 120,
-  "budget_seconds": 2150,
+  "validator_seconds": 30,
+  "budget_seconds": 250,
   "gpu_sharing": {
     "mode": "shared",
     "basis": "Identical historical frame hashes, not shared-device timing, decide correctness.",

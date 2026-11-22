@@ -64,13 +64,15 @@ def run(a):
                 continue
             bank[q["arm"]["name"]] = summarize(q)
     comparisons = {}
-    for name in ["fresh-joint-q50", "prior-joint-q50"]:
+    for name in ["fresh-joint-q70", "fresh-joint-q60", "fresh-joint-q50", "prior-joint-q50"]:
         if name not in bank:
             continue
         j = bank[name]
         ceilings = (
-            {"warm": warm, "cold": cold} if name.startswith("fresh") else {"observed_hit": warm}
+            {"warm": j["arm"]["kbps"]} if name.startswith("fresh") else {"observed_hit": warm}
         )
+        if name == "fresh-joint-q50":
+            ceilings["cold"] = cold
         for state, cap in ceilings.items():
             pair = {}
             for family in ["ordinary", "dcvc"]:
@@ -79,7 +81,11 @@ def run(a):
                     for k, v in bank.items()
                     if k.startswith(family) and v["arm"]["kbps"] <= cap + 1e-10
                 ]
-                assert options
+                if not options:
+                    pair[family] = dict(
+                        compared=False, reason="No affordable native encode at this rate."
+                    )
+                    continue
                 best = min(options, key=lambda q: q["mean_dists"])
                 if (
                     state == "cold"

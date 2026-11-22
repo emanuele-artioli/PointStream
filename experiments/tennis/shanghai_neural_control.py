@@ -17,14 +17,18 @@ from experiments.tennis.k4b_features import convert_command
 from experiments.tennis.shanghai_ball_display_freeze import SOURCE, sha
 from src.codecs import svtav1
 
-FRAMES = {"smoke": 48, "full": 240}
+
+def frame_count(args):
+    if args.smoke_frames == 120 and (Fraction(args.fps) != 50 or args.scale != 4):
+        raise ValueError("The extended smoke requires the native 50-fps 480-wide control")
+    return {"smoke": args.smoke_frames, "full": 240}[os.environ["PS_STAGE"]]
 
 
 def run(args):
     import torch
 
     start = time.monotonic()
-    n = FRAMES[os.environ["PS_STAGE"]]
+    n = frame_count(args)
     if args.frames != n or sha(args.source) != args.source_sha:
         raise ValueError("Unexpected source or frame range")
     for name in ("image_ckpt", "video_ckpt"):
@@ -129,7 +133,7 @@ def run(args):
 
 def validate(args):
     stage = Path(os.environ["PS_STAGE_DIR"])
-    n = FRAMES[os.environ["PS_STAGE"]]
+    n = frame_count(args)
     width, height = w3.SCALES[args.scale]
     frame_bytes = width * height * 3 // 2
     with tarfile.open(stage / "published.tar") as tar:
@@ -171,7 +175,7 @@ def validate(args):
             and all(p["frame_sha256"] == p["yuv420_sha256"] == digests for p in passes),
         )
     forecast = 1.5 * report["elapsed_seconds"] * 240 / n + 60
-    if n == 48:
+    if os.environ["PS_STAGE"] == "smoke":
         checks["forecast"] = forecast < args.full_limit
     ok = all(checks.values())
     Path(os.environ["PS_VALIDATION_PATH"]).write_text(
@@ -186,6 +190,7 @@ if __name__ == "__main__":
     for key in ["source", "image-ckpt", "video-ckpt"]:
         cli.add_argument("--" + key, type=Path)
     cli.add_argument("--frames", type=int)
+    cli.add_argument("--smoke-frames", type=int, choices=(48, 120), default=48)
     cli.add_argument("--source-sha", default=SOURCE)
     cli.add_argument("--fps", default="25")
     cli.add_argument("--full-limit", type=int, default=1650)
