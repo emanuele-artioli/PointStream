@@ -16,6 +16,7 @@ import torch
 
 from experiments.tennis.player_requalification import array_sha
 from src.codecs import quality
+from src.pointstream import ball
 from src.pointstream.tracked_patch import yuv_to_rgb
 
 WEIGHT = "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
@@ -46,6 +47,16 @@ def main(a):
     schema = json.loads(a.supports.read_text())
     expected_ticks = list(range(240)) if active_frames == 240 else list(range(10, 240, 20))
     assert schema["ticks"] == expected_ticks and schema["source_start"] == 0
+    ball_positions = None
+    if a.ball_payload or a.ball_receipt:
+        assert a.ball_payload and a.ball_receipt and a.clip == "al031"
+        br = json.loads(a.ball_receipt.read_text())
+        assert br["source_sha256"] == SOURCE[a.clip] and br["payload_sha256"] == sha(a.ball_payload)
+        ball_positions, appearance = ball.decode_frames(a.ball_payload.read_bytes(), 240, 960, 544)
+        assert (
+            ball.encode_frames(ball_positions, appearance, 960, 544) == a.ball_payload.read_bytes()
+        )
+        assert sum(p is not None for p in ball_positions) == br["present"]
     supports = {}
     for r in schema["rows"]:
         if not r["area"]:
@@ -90,6 +101,7 @@ def main(a):
         assert cap.isOpened() and cap.get(cv2.CAP_PROP_FPS) == native_fps
         accumulated = [0.0, 0.0]
         scores = []
+        ball_rows = []
         cpu0 = time.process_time()
         max_source_self = 0.0
         for t in range(240):
@@ -117,6 +129,23 @@ def main(a):
                 )
             bucket = int(not start <= t < start + active_frames)
             accumulated[bucket] += cv2.norm(src, image, cv2.NORM_L2SQR)
+            if ball_positions is not None and ball_positions[t] is not None:
+                cx, cy = ball_positions[t]
+                x0 = int(np.clip(round((cx + 0.5) * 1920 / 960 - 0.5) - 32, 0, 1920 - 64))
+                y0 = int(np.clip(round((cy + 0.5) * 1080 / 544 - 0.5) - 32, 0, 1080 - 64))
+                ref_ball = tensor(src[y0 : y0 + 64, x0 : x0 + 64])
+                dec_ball = tensor(image[y0 : y0 + 64, x0 : x0 + 64])
+                with torch.inference_mode():
+                    ones = torch.ones((1, 1, 64, 64), dtype=torch.bool)
+                    if not ball_rows:
+                        assert (
+                            abs(float(quality.masked_dists(model, ref_ball, ref_ball, ones))) < 1e-5
+                        )
+                    value = float(quality.masked_dists(model, dec_ball, ref_ball, ones))
+                assert math.isfinite(value)
+                ball_rows.append(
+                    dict(tick=t, sender_xy=[int(cx), int(cy)], crop_xy=[x0, y0], dists=value)
+                )
             for who in (0, 1):
                 if (t, who) not in supports:
                     continue
@@ -184,6 +213,16 @@ def main(a):
             cpu_seconds=time.process_time() - cpu0,
             forecast_cpu_seconds=forecast,
         )
+        if ball_positions is not None:
+            assert len(ball_rows) == br["present"]
+            result["ball"] = dict(
+                method="64x64 native RGB crop at every transmitted source-fitted center",
+                payload_sha256=br["payload_sha256"],
+                total_ticks=240,
+                present=len(ball_rows),
+                rows=ball_rows,
+                dists=mean(ball_rows) if ball_rows else None,
+            )
         dest.write_text(json.dumps(result, indent=2) + "\n")
         summary.append(
             {
@@ -208,5 +247,7 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     for key in ("source", "weights", "supports", "arms", "out"):
         p.add_argument("--" + key, type=Path, required=True)
+    for key in ("ball-payload", "ball-receipt"):
+        p.add_argument("--" + key, type=Path)
     p.add_argument("--clip", choices=SOURCE, required=True)
     main(p.parse_args())
