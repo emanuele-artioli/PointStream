@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "device": "cpu",
+  "hosts": [
+    "gpu1",
+    "gpu2",
+    "gpu3",
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [],
+  "gpu_memory_mib": 0,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "local_storage_gib": 30,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.test_joint_courts"
+  ],
+  "arguments": [
+    "--source",
+    "{staged:match108}",
+    "{staged:match102}",
+    "{staged:match120}",
+    "--event",
+    "match108",
+    "match102",
+    "match120",
+    "--sha",
+    "23b6a757e8f01d2366282fb32e2282a76a77f39cfc96c8125069826d7f458fb7",
+    "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+    "7d119f25b1922f0dbd7f5ffb6ea5ac34226a8ea93b41e7a37e401f07ee0e5976",
+    "--fps",
+    "25/1",
+    "30000/1001",
+    "60/1",
+    "--length",
+    "249",
+    "300",
+    "600",
+    "--frames",
+    "{frames}"
+  ],
+  "staged_inputs": [
+    {
+      "name": "match108",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match108-000-23b6a757e8f0.mp4",
+      "sha256": "23b6a757e8f01d2366282fb32e2282a76a77f39cfc96c8125069826d7f458fb7",
+      "extract": false
+    },
+    {
+      "name": "match102",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match102-000-fc5d3ee431f8.mp4",
+      "sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+      "extract": false
+    },
+    {
+      "name": "match120",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match120-000-7d119f25b192.mp4",
+      "sha256": "7d119f25b1922f0dbd7f5ffb6ea5ac34226a8ea93b41e7a37e401f07ee0e5976",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match108-000-23b6a757e8f0.mp4",
+      "sha256": "23b6a757e8f01d2366282fb32e2282a76a77f39cfc96c8125069826d7f458fb7"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match102-000-fc5d3ee431f8.mp4",
+      "sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match120-000-7d119f25b192.mp4",
+      "sha256": "7d119f25b1922f0dbd7f5ffb6ea5ac34226a8ea93b41e7a37e401f07ee0e5976"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "verify_staged_inputs": true,
+  "required_commands": [
+    "ffmpeg",
+    "ffprobe"
+  ],
+  "scale": {
+    "frames": {
+      "smoke": 12,
+      "full": 240
+    }
+  },
+  "smoke": {
+    "seconds": 300,
+    "representative_basis": "First 12 native frames of each of three original TEST clips with the same court detector and source preview extraction."
+  },
+  "full": {
+    "seconds": 2300
+  },
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.test_joint_courts",
+    "--validate"
+  ],
+  "validator_seconds": 60,
+  "budget_seconds": 2700,
+  "stall_seconds": 2200,
+  "deadline": "2026-11-22T15:01:00Z",
+  "contention": {
+    "policy": "stop",
+    "resume_attempts": 0
+  }
+}
