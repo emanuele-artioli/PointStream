@@ -28,7 +28,7 @@ def validate(stage, n):
         record["published_frames"] == (1 if n == 24 else 12),
     ]
     if n == 24:
-        checks.append(record["forecast_seconds"] < 500)
+        checks.append(record["forecast_seconds"] < 265)
     else:
         checks.append(sha(stage / "samples.tar") == record["samples_sha256"])
     path = os.getenv("PS_VALIDATION_PATH")
