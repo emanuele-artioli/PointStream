@@ -66,7 +66,7 @@ def main():
     plt.rcParams.update({"pdf.fonttype": 42, "font.size": 8})
     for metric, field, ylabel in [
         ("rd", "body_dists", "Player-body DISTS  ↓"),
-        ("motion", "motion_residual_error", "Motion-compensated body luma error  ↓"),
+        ("motion", "motion_residual_error", "Body motion residual error  ↓"),
     ]:
         fig, ax = plt.subplots(figsize=(4.25, 2.6))
         fig.subplots_adjust(left=0.175, bottom=0.23, right=0.97, top=0.94)

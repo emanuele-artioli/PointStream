@@ -1,0 +1,34 @@
+[
+  {
+    "job_id": "20261122T091924Z-a6caa821",
+    "track": 4,
+    "arms": {
+      "smoke": "lossless",
+      "full": "q90"
+    }
+  },
+  {
+    "job_id": "20261122T092121Z-2178c4b9",
+    "track": 6,
+    "arms": {
+      "smoke": "lossless",
+      "full": "q90"
+    }
+  },
+  {
+    "job_id": "20261122T093101Z-fa0a4d18",
+    "track": 4,
+    "arms": {
+      "smoke": "jpeg40",
+      "full": "jpeg70"
+    }
+  },
+  {
+    "job_id": "20261122T093147Z-2655938e",
+    "track": 6,
+    "arms": {
+      "smoke": "jpeg40",
+      "full": "jpeg70"
+    }
+  }
+]
