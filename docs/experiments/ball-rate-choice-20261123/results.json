@@ -1,0 +1,1566 @@
+{
+  "input_sha256": {
+    "cohort-expansion-20261122/three-family-all-verified.json": "6c8e20e4a7862da7df74b1291c56151295ae26ad04642f3299a35468e1fd15ce",
+    "official-test-route-20261122/result.json": "17be32f0c14bb5dc9e84c37b80e03150e9851446f5fd42e1eb5d7598cecaaf5f",
+    "cohort-expansion-20261122/test-physical/match108-curve.json": "fce6df5ba9da82bc3759cb114e7eaca5e10981a20904aaf4e3b7b3a54af94f0a",
+    "cohort-expansion-20261122/test-physical/match102-curve.json": "39e4f14de9d875b654eaef6e7de9fbc8f4053291c0e382d0a888b13697d55b75",
+    "cohort-expansion-20261122/test-physical/match120-curve.json": "0503d0e6c2404935a5b81a85ea304a80a5e1a18d13535ca422f4a3dd6a1e0fb8",
+    "cohort-expansion-20261122/test-physical/match127-curve.json": "88a2c4939ec67f611cbe8e529fb0cb97b0c75d03df4be98eb51ea0309862ff65",
+    "cohort-expansion-20261122/test-physical/match105-curve.json": "5a4c1ea5759a5abf671a5e17417ec9209ecd281c0689ca7402b993cba2fcf41d",
+    "cohort-expansion-20261122/test-physical/match116-curve.json": "4e484f1c934925e7e859b6c5fa870eb4db00854e0202adb745990abc50f8a548",
+    "cohort-expansion-20261122/test-physical/match107-curve.json": "600274cec4d71702dacd70cd09454eea681de38003b67488cf8a4fec4450f6fb",
+    "cohort-expansion-20261122/test-physical/match131-curve.json": "a165794b1d92beeb08ef1397a78226bcea9c149744cc68779cdd3288199608df",
+    "cohort-expansion-20261122/test-physical/match119-curve.json": "b0fd289fcfec330cc418352a19de7466ec9d4664c20cd05d38b3f793bbff69dd",
+    "cohort-expansion-20261122/test-physical/match104-curve.json": "327f6af27eb3a5c7221adc4dc49cf2b72048dd548cb66c8f724c418b993c4036",
+    "cohort-expansion-20261122/test-physical/match130-curve.json": "2463f1f04fc9b8ac86b524d53f839f09aa9df7bfb3517ffecd9789fd7f709582",
+    "cohort-expansion-20261122/test-physical/match126-curve.json": "d2cbf419d138bb0e722f2a3a2802301954938bee497196574eb527169f38fb58"
+  },
+  "scorer_sha256": "a032fbd9c3de26bab7dc5c833b1f5c274b831ccf3f96f518bfe349201eea2a6a",
+  "outcomes": [
+    {
+      "ceiling": 15,
+      "matches": 7,
+      "choice_counts": {
+        "neural/None": 7
+      },
+      "means": {
+        "chosen": {
+          "kbps": 9.924042267256553,
+          "dists": 0.2757745307635975
+        },
+        "ordinary": {
+          "kbps": 12.988013296227582,
+          "dists": 0.30419877227470216
+        },
+        "neural": {
+          "kbps": 9.924042267256553,
+          "dists": 0.2757745307635975
+        },
+        "oracle": {
+          "kbps": 10.321423219637506,
+          "dists": 0.2740032546691219
+        }
+      },
+      "folds": [
+        {
+          "match": "match108",
+          "route_to_ball": true,
+          "trained_on": [
+            "match102",
+            "match105",
+            "match116",
+            "match131",
+            "match130",
+            "match126"
+          ],
+          "choice": [
+            "neural",
+            null
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 9774,
+              "kbps": 8.145,
+              "sha256": "bdd4e5e94bd68f7ca152e583760b716513872898bbd26bce5e4a5a47622c2d03",
+              "dists": 0.2932256352901459
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 320,
+              "bytes": 11627,
+              "kbps": 9.689166666666667,
+              "sha256": "c23d411e37ad568b463b1b1f88c4d2596431d0b3ca97010f1913e3f737076503",
+              "dists": 0.3606604015827179
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 9774,
+              "kbps": 8.145,
+              "sha256": "bdd4e5e94bd68f7ca152e583760b716513872898bbd26bce5e4a5a47622c2d03",
+              "dists": 0.2932256352901459
+            },
+            "oracle": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 9774,
+              "kbps": 8.145,
+              "sha256": "bdd4e5e94bd68f7ca152e583760b716513872898bbd26bce5e4a5a47622c2d03",
+              "dists": 0.2932256352901459
+            }
+          }
+        },
+        {
+          "match": "match102",
+          "route_to_ball": true,
+          "trained_on": [
+            "match108",
+            "match105",
+            "match116",
+            "match131",
+            "match130",
+            "match126"
+          ],
+          "choice": [
+            "neural",
+            null
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 10548,
+              "kbps": 10.537462537462538,
+              "sha256": "4723b91727abacf6a2f292939cb6edb23f2971b983c5be4cf1cb639309ea63e5",
+              "dists": 0.24254765510559081
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 14755,
+              "kbps": 14.740259740259742,
+              "sha256": "8966d07ed585aa501fb4dd932c9bd108f6191fea11a2fae8c70f4d07eaba8536",
+              "dists": 0.2574422389268875
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 10548,
+              "kbps": 10.537462537462538,
+              "sha256": "4723b91727abacf6a2f292939cb6edb23f2971b983c5be4cf1cb639309ea63e5",
+              "dists": 0.24254765510559081
+            },
+            "oracle": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 10548,
+              "kbps": 10.537462537462538,
+              "sha256": "4723b91727abacf6a2f292939cb6edb23f2971b983c5be4cf1cb639309ea63e5",
+              "dists": 0.24254765510559081
+            }
+          }
+        },
+        {
+          "match": "match105",
+          "route_to_ball": true,
+          "trained_on": [
+            "match108",
+            "match102",
+            "match116",
+            "match131",
+            "match130",
+            "match126"
+          ],
+          "choice": [
+            "neural",
+            null
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 14574,
+              "kbps": 12.145,
+              "sha256": "813155f468161399328d954d4ed4d0fdbb13900ff3563d2db2f0a038b35c07a5",
+              "dists": 0.2807880627865694
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 16439,
+              "kbps": 13.699166666666667,
+              "sha256": "f540b1942ec102aec4cc7eed7de208a4dc3de65fa50074f2b6df2168da1e5079",
+              "dists": 0.28915028791038355
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 14574,
+              "kbps": 12.145,
+              "sha256": "813155f468161399328d954d4ed4d0fdbb13900ff3563d2db2f0a038b35c07a5",
+              "dists": 0.2807880627865694
+            },
+            "oracle": {
+              "arm": "candidate",
+              "width": 320,
+              "bytes": 17912,
+              "kbps": 14.926666666666666,
+              "sha256": "9a0bcb80112761d33f83719e287c7fa892a2db4ff31477e4fec688ce61574a38",
+              "dists": 0.2683891301252404
+            }
+          }
+        },
+        {
+          "match": "match116",
+          "route_to_ball": true,
+          "trained_on": [
+            "match108",
+            "match102",
+            "match105",
+            "match131",
+            "match130",
+            "match126"
+          ],
+          "choice": [
+            "neural",
+            null
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 13092,
+              "kbps": 10.91,
+              "sha256": "27430550ef9964156cc56f72e816f69f824ec988587265d72fb2cf31186d1399",
+              "dists": 0.2584257995088895
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 17031,
+              "kbps": 14.1925,
+              "sha256": "0efa1bc57b845e767f232b3c2e4fa7a5c2f1a8f8a984deeacf581ed817a0ef96",
+              "dists": 0.2758818256358306
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 13092,
+              "kbps": 10.91,
+              "sha256": "27430550ef9964156cc56f72e816f69f824ec988587265d72fb2cf31186d1399",
+              "dists": 0.2584257995088895
+            },
+            "oracle": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 13092,
+              "kbps": 10.91,
+              "sha256": "27430550ef9964156cc56f72e816f69f824ec988587265d72fb2cf31186d1399",
+              "dists": 0.2584257995088895
+            }
+          }
+        },
+        {
+          "match": "match131",
+          "route_to_ball": true,
+          "trained_on": [
+            "match108",
+            "match102",
+            "match105",
+            "match116",
+            "match130",
+            "match126"
+          ],
+          "choice": [
+            "neural",
+            null
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 8840,
+              "kbps": 7.366666666666667,
+              "sha256": "2cedbc765f0e296e88d53696e411bf14e9f27e0e00469c23ae9d62c43c2f402a",
+              "dists": 0.27658656710072566
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 320,
+              "bytes": 12053,
+              "kbps": 10.044166666666667,
+              "sha256": "f373d9a2eca339bcfee7eeb9eec7c045e69937ce10943d7a215f7ff1ea052acc",
+              "dists": 0.33907771424243327
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 8840,
+              "kbps": 7.366666666666667,
+              "sha256": "2cedbc765f0e296e88d53696e411bf14e9f27e0e00469c23ae9d62c43c2f402a",
+              "dists": 0.27658656710072566
+            },
+            "oracle": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 8840,
+              "kbps": 7.366666666666667,
+              "sha256": "2cedbc765f0e296e88d53696e411bf14e9f27e0e00469c23ae9d62c43c2f402a",
+              "dists": 0.27658656710072566
+            }
+          }
+        },
+        {
+          "match": "match130",
+          "route_to_ball": true,
+          "trained_on": [
+            "match108",
+            "match102",
+            "match105",
+            "match116",
+            "match131",
+            "match126"
+          ],
+          "choice": [
+            "neural",
+            null
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 8968,
+              "kbps": 7.473333333333333,
+              "sha256": "ace0f49f7980c3bd2274b751981d0b43acfa29bafe681fb04b4921cedf7d944d",
+              "dists": 0.30448703467845917
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 320,
+              "bytes": 17955,
+              "kbps": 14.9625,
+              "sha256": "b27d76c0887ee0dacd072158fbe840754adfa3613ce66eac56d446a3ec71751f",
+              "dists": 0.31130115389823915
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 8968,
+              "kbps": 7.473333333333333,
+              "sha256": "ace0f49f7980c3bd2274b751981d0b43acfa29bafe681fb04b4921cedf7d944d",
+              "dists": 0.30448703467845917
+            },
+            "oracle": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 8968,
+              "kbps": 7.473333333333333,
+              "sha256": "ace0f49f7980c3bd2274b751981d0b43acfa29bafe681fb04b4921cedf7d944d",
+              "dists": 0.30448703467845917
+            }
+          }
+        },
+        {
+          "match": "match126",
+          "route_to_ball": true,
+          "trained_on": [
+            "match108",
+            "match102",
+            "match105",
+            "match116",
+            "match131",
+            "match130"
+          ],
+          "choice": [
+            "neural",
+            null
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 15469,
+              "kbps": 12.890833333333333,
+              "sha256": "75fd34bcda37b28b7fdcc0e9de95d0f23d40fff98727313184c3407835e717ff",
+              "dists": 0.27436096087480205
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 16306,
+              "kbps": 13.588333333333333,
+              "sha256": "ca8d82f7ac0a4dfe9d4bb9ad26083b01463b8a3f33eeb368550f92363ef5a09f",
+              "dists": 0.2958777837264232
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 15469,
+              "kbps": 12.890833333333333,
+              "sha256": "75fd34bcda37b28b7fdcc0e9de95d0f23d40fff98727313184c3407835e717ff",
+              "dists": 0.27436096087480205
+            },
+            "oracle": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 15469,
+              "kbps": 12.890833333333333,
+              "sha256": "75fd34bcda37b28b7fdcc0e9de95d0f23d40fff98727313184c3407835e717ff",
+              "dists": 0.27436096087480205
+            }
+          }
+        }
+      ]
+    },
+    {
+      "ceiling": 20.4,
+      "matches": 7,
+      "choice_counts": {
+        "candidate/640": 7
+      },
+      "means": {
+        "chosen": {
+          "kbps": 20.12018588554303,
+          "dists": 0.23919002293558614
+        },
+        "ordinary": {
+          "kbps": 20.044510251653108,
+          "dists": 0.2519328976807816
+        },
+        "neural": {
+          "kbps": 19.944077232291516,
+          "dists": 0.24686267776537482
+        },
+        "oracle": {
+          "kbps": 19.96331252081252,
+          "dists": 0.2378061598871822
+        }
+      },
+      "folds": [
+        {
+          "match": "match108",
+          "route_to_ball": true,
+          "trained_on": [
+            "match102",
+            "match105",
+            "match116",
+            "match131",
+            "match130",
+            "match126"
+          ],
+          "choice": [
+            "candidate",
+            640
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 24319,
+              "kbps": 20.265833333333333,
+              "sha256": "cfa2094fc4fd831913a85094f8646fb70bdf1be3016e712a94c0c878ccd0064e",
+              "dists": 0.23878761529922485
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 24270,
+              "kbps": 20.225,
+              "sha256": "7982170d5d099d0e471e8466ff01efc28f34b371f5674d9dbab873f7564a3b6b",
+              "dists": 0.24366536021232604
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 23622,
+              "kbps": 19.685,
+              "sha256": "580786f71d44f14bd00e18b50603ac99fc2104c864b4af4185ac49553ef28f88",
+              "dists": 0.2407187008857727
+            },
+            "oracle": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 24319,
+              "kbps": 20.265833333333333,
+              "sha256": "cfa2094fc4fd831913a85094f8646fb70bdf1be3016e712a94c0c878ccd0064e",
+              "dists": 0.23878761529922485
+            }
+          }
+        },
+        {
+          "match": "match102",
+          "route_to_ball": true,
+          "trained_on": [
+            "match108",
+            "match105",
+            "match116",
+            "match131",
+            "match130",
+            "match126"
+          ],
+          "choice": [
+            "candidate",
+            640
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 20219,
+              "kbps": 20.1988011988012,
+              "sha256": "1180e9c528e4f8a945455b6f3c391df550e888fc12eed3c142fc0c3db6e0ebc3",
+              "dists": 0.20688298791646959
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 20115,
+              "kbps": 20.094905094905094,
+              "sha256": "749be646297e4abf5194257af72a21ee831184d9c37bdccc06975a75448393a1",
+              "dists": 0.22752456814050676
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 20313,
+              "kbps": 20.29270729270729,
+              "sha256": "0ad996a566a961459c9763e578d0c09655c0f543e902516313a75694b5d327d4",
+              "dists": 0.2230594962835312
+            },
+            "oracle": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 19999,
+              "kbps": 19.979020979020977,
+              "sha256": "d45d376462b33275b369547af07ab678561960632cd235389f22bb3c81837b53",
+              "dists": 0.2020906165242195
+            }
+          }
+        },
+        {
+          "match": "match105",
+          "route_to_ball": true,
+          "trained_on": [
+            "match108",
+            "match102",
+            "match116",
+            "match131",
+            "match130",
+            "match126"
+          ],
+          "choice": [
+            "candidate",
+            640
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 24065,
+              "kbps": 20.054166666666667,
+              "sha256": "476033012aefe5efa908001b01cbfac11fe27355b42c068b37b884fa8ea127f0",
+              "dists": 0.253158197111013
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 23672,
+              "kbps": 19.726666666666667,
+              "sha256": "9c4996dd5992f7f31c6c2f2350529f09e48838c9efec3cd9cc0f73ae75e90c4d",
+              "dists": 0.2716850881673852
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 24272,
+              "kbps": 20.226666666666667,
+              "sha256": "efa50c1030810211801495984d1a7ba473bf50e2f1f638a0990e2c83889dba7a",
+              "dists": 0.25645188409454966
+            },
+            "oracle": {
+              "arm": "candidate",
+              "width": 320,
+              "bytes": 24414,
+              "kbps": 20.345,
+              "sha256": "6b5ba9b1ca922d679cda5ee12fc4635431cbacfd94ba48a8c24e6b5f0f74d193",
+              "dists": 0.25310532414183323
+            }
+          }
+        },
+        {
+          "match": "match116",
+          "route_to_ball": true,
+          "trained_on": [
+            "match108",
+            "match102",
+            "match105",
+            "match131",
+            "match130",
+            "match126"
+          ],
+          "choice": [
+            "candidate",
+            640
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 23994,
+              "kbps": 19.995,
+              "sha256": "04894719bedbaaf0c0b838ad44737041d5beb246daee7270dd8c35b2e64ee5c5",
+              "dists": 0.23332183559735617
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 24319,
+              "kbps": 20.265833333333333,
+              "sha256": "d19bae5a70f8b47bb89c1c8cbb4ca7dc9e61fd172d3887ecd6b5d2e330f35e20",
+              "dists": 0.23961448296904564
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 24289,
+              "kbps": 20.24083333333333,
+              "sha256": "9ce471cc0e1ee439e558aa8b08877864818794ca59eb589466dc385b8456b9cf",
+              "dists": 0.2322589010000229
+            },
+            "oracle": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 24289,
+              "kbps": 20.24083333333333,
+              "sha256": "9ce471cc0e1ee439e558aa8b08877864818794ca59eb589466dc385b8456b9cf",
+              "dists": 0.2322589010000229
+            }
+          }
+        },
+        {
+          "match": "match131",
+          "route_to_ball": true,
+          "trained_on": [
+            "match108",
+            "match102",
+            "match105",
+            "match116",
+            "match130",
+            "match126"
+          ],
+          "choice": [
+            "candidate",
+            640
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 24075,
+              "kbps": 20.0625,
+              "sha256": "7cb5dfcf1baa0cf1457e91e70787dae623ba5d38da10521d1df3aeb41b725021",
+              "dists": 0.21559983021334597
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 24044,
+              "kbps": 20.036666666666665,
+              "sha256": "9a4755bd94ce8bb7651554d6fa68d95974f7fc87cfc76545f404ab466c52ff77",
+              "dists": 0.2382779560591045
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 24211,
+              "kbps": 20.175833333333333,
+              "sha256": "0a5f70e5bdad3f15eb3c400ea892f2c459dd14e5a26040618b0467f45e1b88c5",
+              "dists": 0.2474468868029745
+            },
+            "oracle": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 24075,
+              "kbps": 20.0625,
+              "sha256": "7cb5dfcf1baa0cf1457e91e70787dae623ba5d38da10521d1df3aeb41b725021",
+              "dists": 0.21559983021334597
+            }
+          }
+        },
+        {
+          "match": "match130",
+          "route_to_ball": true,
+          "trained_on": [
+            "match108",
+            "match102",
+            "match105",
+            "match116",
+            "match131",
+            "match126"
+          ],
+          "choice": [
+            "candidate",
+            640
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 24098,
+              "kbps": 20.081666666666667,
+              "sha256": "1aeea5b7c37fb6969aba0fabc235588c804251cf9f3a46ddb87bd269dd79717a",
+              "dists": 0.2707430899143219
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 24054,
+              "kbps": 20.045,
+              "sha256": "ce32e89ecc862a61670b5d910234c99577b6060be9d1502742397a3fc5200e9f",
+              "dists": 0.274335740506649
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 23118,
+              "kbps": 19.265,
+              "sha256": "b01b75fecc115fce95cfbeca1ef5f6825a8788e00a24986ebc414c5c1bf93d6e",
+              "dists": 0.27476111948490145
+            },
+            "oracle": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 22953,
+              "kbps": 19.1275,
+              "sha256": "7940de102cefa182740d9e9054faf9d83ee6cb7213828f81691859b38681f5c9",
+              "dists": 0.2694590762257576
+            }
+          }
+        },
+        {
+          "match": "match126",
+          "route_to_ball": true,
+          "trained_on": [
+            "match108",
+            "match102",
+            "match105",
+            "match116",
+            "match131",
+            "match130"
+          ],
+          "choice": [
+            "candidate",
+            640
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 24220,
+              "kbps": 20.183333333333334,
+              "sha256": "08035b263cec79f3833d916fe5258601a7ae710e39a48aa9a972b4df1bf5a776",
+              "dists": 0.25583660449737156
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 23901,
+              "kbps": 19.9175,
+              "sha256": "da53533a549aa5ba6575ef59c274a8f62da35882365ee5d623b4272c21689afa",
+              "dists": 0.2684270877104539
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 23667,
+              "kbps": 19.7225,
+              "sha256": "5cebe2ec175a360de434215109c085b52c813b8e9ce73610fb0dd993fec1d43c",
+              "dists": 0.2533417558058714
+            },
+            "oracle": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 23667,
+              "kbps": 19.7225,
+              "sha256": "5cebe2ec175a360de434215109c085b52c813b8e9ce73610fb0dd993fec1d43c",
+              "dists": 0.2533417558058714
+            }
+          }
+        }
+      ]
+    },
+    {
+      "ceiling": 35,
+      "matches": 12,
+      "choice_counts": {
+        "candidate/640": 12
+      },
+      "means": {
+        "chosen": {
+          "kbps": 29.918927031302033,
+          "dists": 0.23547830678743872
+        },
+        "ordinary": {
+          "kbps": 29.883481351981352,
+          "dists": 0.24991849924580592
+        },
+        "neural": {
+          "kbps": 25.470364496614497,
+          "dists": 0.24766490299768212
+        },
+        "oracle": {
+          "kbps": 29.986871475746476,
+          "dists": 0.22927659213359639
+        }
+      },
+      "folds": [
+        {
+          "match": "match108",
+          "route_to_ball": true,
+          "trained_on": [
+            "match102",
+            "match120",
+            "match127",
+            "match105",
+            "match116",
+            "match107",
+            "match131",
+            "match119",
+            "match104",
+            "match130",
+            "match126"
+          ],
+          "choice": [
+            "candidate",
+            640
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 31569,
+              "kbps": 26.3075,
+              "sha256": "e1fd058cd74cb005ae883aa61c58ee4511fbcb18c129fbe2f14f04b885da1064",
+              "dists": 0.21970155477523803
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 30462,
+              "kbps": 25.385,
+              "sha256": "64ee7427e734976f35735ce5170171af7f6a154593cf441a80d3e1bf870470b3",
+              "dists": 0.2290451407432556
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 38480,
+              "kbps": 32.06666666666667,
+              "sha256": "37fd9722f8331b2904220790a42c6ac1753050fe64f9329709f47e9b47a650d1",
+              "dists": 0.22563001036643981
+            },
+            "oracle": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 31569,
+              "kbps": 26.3075,
+              "sha256": "e1fd058cd74cb005ae883aa61c58ee4511fbcb18c129fbe2f14f04b885da1064",
+              "dists": 0.21970155477523803
+            }
+          }
+        },
+        {
+          "match": "match102",
+          "route_to_ball": true,
+          "trained_on": [
+            "match108",
+            "match120",
+            "match127",
+            "match105",
+            "match116",
+            "match107",
+            "match131",
+            "match119",
+            "match104",
+            "match130",
+            "match126"
+          ],
+          "choice": [
+            "candidate",
+            640
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 30406,
+              "kbps": 30.375624375624376,
+              "sha256": "9a80e49be23621aa3eb5bb2f8c6048b41ddd2574d96f369e0d7c49bf15677cd5",
+              "dists": 0.18969264328479768
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 29253,
+              "kbps": 29.223776223776223,
+              "sha256": "b1fac39eab22081c677328629b51f6ca753d9951ec89012164503272df239fe2",
+              "dists": 0.2124578759074211
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 20313,
+              "kbps": 20.29270729270729,
+              "sha256": "0ad996a566a961459c9763e578d0c09655c0f543e902516313a75694b5d327d4",
+              "dists": 0.2230594962835312
+            },
+            "oracle": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 30406,
+              "kbps": 30.375624375624376,
+              "sha256": "9a80e49be23621aa3eb5bb2f8c6048b41ddd2574d96f369e0d7c49bf15677cd5",
+              "dists": 0.18969264328479768
+            }
+          }
+        },
+        {
+          "match": "match120",
+          "route_to_ball": true,
+          "trained_on": [
+            "match108",
+            "match102",
+            "match127",
+            "match105",
+            "match116",
+            "match107",
+            "match131",
+            "match119",
+            "match104",
+            "match130",
+            "match126"
+          ],
+          "choice": [
+            "candidate",
+            640
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "candidate",
+              "width": 320,
+              "bytes": 15260,
+              "kbps": 30.52,
+              "sha256": "65d6b960302f03fd5a54f0fc47a1610084ab860e03a89484ebeebf0753c9e8aa",
+              "dists": 0.2847185762305009
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 320,
+              "bytes": 14300,
+              "kbps": 28.6,
+              "sha256": "ef0236b41d73d41eb7bf7a68e7923c17c9572f2bcbbff07e053289470382384b",
+              "dists": 0.3045613734345687
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 15917,
+              "kbps": 31.834,
+              "sha256": "a84815d32033ad6440c815d1374617fb01a91412d10abc50f952d3b32c2c1ec7",
+              "dists": 0.2627978701340525
+            },
+            "oracle": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 15917,
+              "kbps": 31.834,
+              "sha256": "a84815d32033ad6440c815d1374617fb01a91412d10abc50f952d3b32c2c1ec7",
+              "dists": 0.2627978701340525
+            }
+          }
+        },
+        {
+          "match": "match127",
+          "route_to_ball": true,
+          "trained_on": [
+            "match108",
+            "match102",
+            "match120",
+            "match105",
+            "match116",
+            "match107",
+            "match131",
+            "match119",
+            "match104",
+            "match130",
+            "match126"
+          ],
+          "choice": [
+            "candidate",
+            640
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 16984,
+              "kbps": 33.968,
+              "sha256": "074793fb9d76a8c951c913d40bf271ec67b285b95d9a1e93e8ec62c7b9fecf59",
+              "dists": 0.23514170646667482
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 17028,
+              "kbps": 34.056,
+              "sha256": "458fb1afe646363149b66f01b6c959772d1c774df0d8845063c3c98fbcc929f5",
+              "dists": 0.26856506764888766
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 11224,
+              "kbps": 22.448,
+              "sha256": "fb46b547842d5368273860c106cfa5a6ca58bd3dc7a51af57f026aeadc7acf8c",
+              "dists": 0.24358890652656556
+            },
+            "oracle": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 16717,
+              "kbps": 33.434,
+              "sha256": "69362c0f97ee68dc286573531b0e342b14efcfb2d431eaa96a0b64cfbafba6aa",
+              "dists": 0.22078969180583954
+            }
+          }
+        },
+        {
+          "match": "match105",
+          "route_to_ball": true,
+          "trained_on": [
+            "match108",
+            "match102",
+            "match120",
+            "match127",
+            "match116",
+            "match107",
+            "match131",
+            "match119",
+            "match104",
+            "match130",
+            "match126"
+          ],
+          "choice": [
+            "candidate",
+            640
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 37242,
+              "kbps": 31.035,
+              "sha256": "55311b83f843d99248e83fef6f38c8405f84cab21cae749fc085f15962954172",
+              "dists": 0.22053837776184082
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 36112,
+              "kbps": 30.093333333333334,
+              "sha256": "f53eaeb9b2abc28b0965c17586ab997c0cfeb578aa1d344e0a109667b438593b",
+              "dists": 0.24265186032470393
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 27009,
+              "kbps": 22.5075,
+              "sha256": "21d7c54e0ae9436c61f4e5f821b654a2db32c4f9bcaa045ed14f5af0002facdf",
+              "dists": 0.24968782614688484
+            },
+            "oracle": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 37242,
+              "kbps": 31.035,
+              "sha256": "55311b83f843d99248e83fef6f38c8405f84cab21cae749fc085f15962954172",
+              "dists": 0.22053837776184082
+            }
+          }
+        },
+        {
+          "match": "match116",
+          "route_to_ball": true,
+          "trained_on": [
+            "match108",
+            "match102",
+            "match120",
+            "match127",
+            "match105",
+            "match107",
+            "match131",
+            "match119",
+            "match104",
+            "match130",
+            "match126"
+          ],
+          "choice": [
+            "candidate",
+            640
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 30209,
+              "kbps": 25.174166666666668,
+              "sha256": "176e3330289ab67c75339551da2edc66f3115d101f8fdaebcbcad878ee9f4f79",
+              "dists": 0.21724560235937437
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 29260,
+              "kbps": 24.383333333333333,
+              "sha256": "5887fa612f586f55afce215a136d3f314e40a0dbf424dbede40cb4e5272eb74e",
+              "dists": 0.22796379526456198
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 27725,
+              "kbps": 23.104166666666668,
+              "sha256": "bad251d8ea83dd059591a497294521b01f554ab1dc7f347cdc88e57afb6e145c",
+              "dists": 0.23320704450209936
+            },
+            "oracle": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 30209,
+              "kbps": 25.174166666666668,
+              "sha256": "176e3330289ab67c75339551da2edc66f3115d101f8fdaebcbcad878ee9f4f79",
+              "dists": 0.21724560235937437
+            }
+          }
+        },
+        {
+          "match": "match107",
+          "route_to_ball": true,
+          "trained_on": [
+            "match108",
+            "match102",
+            "match120",
+            "match127",
+            "match105",
+            "match116",
+            "match131",
+            "match119",
+            "match104",
+            "match130",
+            "match126"
+          ],
+          "choice": [
+            "candidate",
+            640
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "candidate",
+              "width": 320,
+              "bytes": 14130,
+              "kbps": 28.26,
+              "sha256": "2306844bdae7450e2953c80d86e184d1bab18176223d76ff47ff98fcead35562",
+              "dists": 0.2671848714351654
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 17407,
+              "kbps": 34.814,
+              "sha256": "140a9a6c09c133ce9b09d1744cc97d93eb74a0b8e6617ce059c4d23c29185b12",
+              "dists": 0.2627478361129761
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 14691,
+              "kbps": 29.382,
+              "sha256": "fc30bf53eb27a98b16930bb37d838961e83748e599424459a70f02a3f11a091f",
+              "dists": 0.24409963488578795
+            },
+            "oracle": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 14691,
+              "kbps": 29.382,
+              "sha256": "fc30bf53eb27a98b16930bb37d838961e83748e599424459a70f02a3f11a091f",
+              "dists": 0.24409963488578795
+            }
+          }
+        },
+        {
+          "match": "match131",
+          "route_to_ball": true,
+          "trained_on": [
+            "match108",
+            "match102",
+            "match120",
+            "match127",
+            "match105",
+            "match116",
+            "match107",
+            "match119",
+            "match104",
+            "match130",
+            "match126"
+          ],
+          "choice": [
+            "candidate",
+            640
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 32201,
+              "kbps": 26.83416666666667,
+              "sha256": "b3204e7edc76a93df661d8ecf1866f716e4a3404c5f429df12e4b54293f2d838",
+              "dists": 0.17424907809809634
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 31222,
+              "kbps": 26.018333333333334,
+              "sha256": "76602a5fc763e16bda1f308eda943d95dc01513c46928620a2e4d6753a1aa466",
+              "dists": 0.2076477565263447
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 24211,
+              "kbps": 20.175833333333333,
+              "sha256": "0a5f70e5bdad3f15eb3c400ea892f2c459dd14e5a26040618b0467f45e1b88c5",
+              "dists": 0.2474468868029745
+            },
+            "oracle": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 32201,
+              "kbps": 26.83416666666667,
+              "sha256": "b3204e7edc76a93df661d8ecf1866f716e4a3404c5f429df12e4b54293f2d838",
+              "dists": 0.17424907809809634
+            }
+          }
+        },
+        {
+          "match": "match119",
+          "route_to_ball": false,
+          "trained_on": [
+            "match108",
+            "match102",
+            "match120",
+            "match127",
+            "match105",
+            "match116",
+            "match107",
+            "match131",
+            "match104",
+            "match130",
+            "match126"
+          ],
+          "choice": [
+            "candidate",
+            640
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 16575,
+              "kbps": 33.15,
+              "sha256": "e21e97d8e140ced816882500238ec868076f211413813d5d33c36bb0a431d9be",
+              "dists": 0.2734130091137356
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 16575,
+              "kbps": 33.15,
+              "sha256": "e21e97d8e140ced816882500238ec868076f211413813d5d33c36bb0a431d9be",
+              "dists": 0.2734130091137356
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 11647,
+              "kbps": 23.294,
+              "sha256": "d9d912ffe3370a47335c3d93f0636fd1736b4528127b6584203e18b72832fbc0",
+              "dists": 0.27656083967950607
+            },
+            "oracle": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 16575,
+              "kbps": 33.15,
+              "sha256": "e21e97d8e140ced816882500238ec868076f211413813d5d33c36bb0a431d9be",
+              "dists": 0.2734130091137356
+            }
+          }
+        },
+        {
+          "match": "match104",
+          "route_to_ball": true,
+          "trained_on": [
+            "match108",
+            "match102",
+            "match120",
+            "match127",
+            "match105",
+            "match116",
+            "match107",
+            "match131",
+            "match119",
+            "match130",
+            "match126"
+          ],
+          "choice": [
+            "candidate",
+            640
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 16778,
+              "kbps": 33.556,
+              "sha256": "b09d1b3f669f17bdbe02f9ff10d38295ec45f43d8104bde091db7e9ee3f6875a",
+              "dists": 0.2714613250323704
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 17329,
+              "kbps": 34.658,
+              "sha256": "9e1e2c9e7377b70f56655980b20e39f8f243c63618978137193365dddc512d4b",
+              "dists": 0.2747777785573687
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 11191,
+              "kbps": 22.382,
+              "sha256": "becef5d9ab3aab00aa25b904779658dac2261d47d5df5191da7876e0639a731a",
+              "dists": 0.26435061011995586
+            },
+            "oracle": {
+              "arm": "candidate",
+              "width": 320,
+              "bytes": 17108,
+              "kbps": 34.216,
+              "sha256": "90decaddb27b2296aa0bfa1d2d8e7b4197d5cd537fee61021ae371f7df94a753",
+              "dists": 0.26338162308647517
+            }
+          }
+        },
+        {
+          "match": "match130",
+          "route_to_ball": true,
+          "trained_on": [
+            "match108",
+            "match102",
+            "match120",
+            "match127",
+            "match105",
+            "match116",
+            "match107",
+            "match131",
+            "match119",
+            "match104",
+            "match126"
+          ],
+          "choice": [
+            "candidate",
+            640
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 29927,
+              "kbps": 24.939166666666665,
+              "sha256": "1c972f1cc519940719d06ee3fe1916b00e9b12a32ed11bed66e5ae6ca66ea844",
+              "dists": 0.2594722375273705
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 29017,
+              "kbps": 24.180833333333332,
+              "sha256": "9da737eca556f3ea72a585f973bc294b81d6a651f801a801d8b349d0b3d394e0",
+              "dists": 0.26891747415065764
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 40699,
+              "kbps": 33.91583333333334,
+              "sha256": "b80fda5c99355bd5930960b4e26fde2e0cf949a866884a4b1cd3905615d183c0",
+              "dists": 0.2542515218257904
+            },
+            "oracle": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 27831,
+              "kbps": 23.1925,
+              "sha256": "7a5415237457d1d73485f4e92e9e86eb29ad540a2d61e0cfce1ee410b54ff296",
+              "dists": 0.2524893209338188
+            }
+          }
+        },
+        {
+          "match": "match126",
+          "route_to_ball": true,
+          "trained_on": [
+            "match108",
+            "match102",
+            "match120",
+            "match127",
+            "match105",
+            "match116",
+            "match107",
+            "match131",
+            "match119",
+            "match104",
+            "match130"
+          ],
+          "choice": [
+            "candidate",
+            640
+          ],
+          "chosen_ordinary": [
+            "ordinary",
+            640
+          ],
+          "streams": {
+            "chosen": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 41889,
+              "kbps": 34.9075,
+              "sha256": "0736eb9d556f7cf66f5c136062a5eb8e97290044182bf02f0325a450e131d1f9",
+              "dists": 0.21292069936409974
+            },
+            "ordinary": {
+              "arm": "ordinary",
+              "width": 640,
+              "bytes": 40847,
+              "kbps": 34.03916666666667,
+              "sha256": "7ea83ac469ad8eeaace77e20793d3e749f80602148254cf79c8b2bd00d154203",
+              "dists": 0.2262730231651893
+            },
+            "neural": {
+              "arm": "neural",
+              "width": null,
+              "bytes": 29090,
+              "kbps": 24.241666666666667,
+              "sha256": "1096a99c1d68f61bbbf57f66a07a0a3929d617a57427758e26bedbe288121e55",
+              "dists": 0.24729818869859743
+            },
+            "oracle": {
+              "arm": "candidate",
+              "width": 640,
+              "bytes": 41889,
+              "kbps": 34.9075,
+              "sha256": "0736eb9d556f7cf66f5c136062a5eb8e97290044182bf02f0325a450e131d1f9",
+              "dists": 0.21292069936409974
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
