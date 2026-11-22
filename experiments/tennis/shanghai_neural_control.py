@@ -16,7 +16,6 @@ from experiments.tennis.k4b_features import convert_command
 from experiments.tennis.shanghai_ball_display_freeze import SOURCE, sha
 from src.codecs import svtav1
 
-FRAME_BYTES = 960 * 544 * 3 // 2
 FRAMES = {"smoke": 48, "full": 240}
 
 
@@ -56,8 +55,14 @@ def run(args):
         raise ValueError("Incomplete native input")
     args.stream_policy = "legacy"
     point = w3.code_point(
-        args, source, root, 25, n, {"qp": 24, "scale": 2, "target_kbps": 20.4, "est_kbps": None}
+        args,
+        source,
+        root,
+        25,
+        n,
+        {"qp": args.qp, "scale": args.scale, "target_kbps": 20.4, "est_kbps": None},
     )
+    frame_bytes = w3.SCALES[args.scale][0] * w3.SCALES[args.scale][1] * 3 // 2
     if not point["accepted"]:
         raise ValueError(
             f"DCVC independent receiver check failed: {point.get('failure', point.get('max_decode_diff'))}"
@@ -65,8 +70,8 @@ def run(args):
     raw = Path(point["decoded"])
     reports = json.loads((raw.parent / "reports.json").read_text())
     with raw.open("rb") as f:
-        hashes = [hashlib.sha256(f.read(FRAME_BYTES)).hexdigest() for _ in range(n)]
-        if f.read(1) or raw.stat().st_size != FRAME_BYTES * n:
+        hashes = [hashlib.sha256(f.read(frame_bytes)).hexdigest() for _ in range(n)]
+        if f.read(1) or raw.stat().st_size != frame_bytes * n:
             raise ValueError("Decoded YUV size")
     passes = [p for d in reports["decode"].values() for p in d["passes"]]
     if len(passes) != 4 or any(
@@ -90,6 +95,8 @@ def run(args):
         resources=resources,
         native=point,
         fps=25,
+        qp=args.qp,
+        scale=args.scale,
         raw_sha256=sha(raw),
         yuv_frames=hashes,
         elapsed_seconds=time.monotonic() - start,
@@ -97,9 +104,11 @@ def run(args):
     (publish / "result.json").write_text(json.dumps(summary, indent=2) + "\n")
 
 
-def validate():
+def validate(args):
     stage = Path(os.environ["PS_STAGE_DIR"])
     n = FRAMES[os.environ["PS_STAGE"]]
+    width, height = w3.SCALES[args.scale]
+    frame_bytes = width * height * 3 // 2
     with tarfile.open(stage / "published.tar") as tar:
 
         def member(name):
@@ -111,8 +120,8 @@ def validate():
         h = hashlib.sha256()
         digests = []
         for _ in range(n):
-            data = frames.read(FRAME_BYTES)
-            if len(data) != FRAME_BYTES:
+            data = frames.read(frame_bytes)
+            if len(data) != frame_bytes:
                 raise ValueError("Incomplete decoded frame")
             h.update(data)
             digests.append(hashlib.sha256(data).hexdigest())
@@ -122,7 +131,11 @@ def validate():
         checks = dict(
             source=report["source_sha256"] == SOURCE,
             count=report["frames"] == n and not frames.read(1),
-            native=point["accepted"] and point["qp"] == 24 and point["size"] == [960, 544],
+            native=point["accepted"]
+            and point["qp"] == args.qp
+            and point["size"] == [width, height]
+            and report.get("qp", 24) == args.qp
+            and report.get("scale", 2) == args.scale,
             allocator=Counter(r["action"] for r in report["resources"])
             == {"encode": 1, "decode": 2}
             and all(r["budget_mib"] == 6144 for r in report["resources"]),
@@ -149,6 +162,8 @@ if __name__ == "__main__":
     for key in ["source", "image-ckpt", "video-ckpt"]:
         cli.add_argument("--" + key, type=Path)
     cli.add_argument("--frames", type=int)
+    cli.add_argument("--qp", type=int, default=24, choices=range(64))
+    cli.add_argument("--scale", type=int, default=2, choices=(2, 4))
     cli.add_argument("--validate", action="store_true")
     args = cli.parse_args()
-    validate() if args.validate else run(args)
+    validate(args) if args.validate else run(args)
