@@ -540,6 +540,13 @@
   },
   {
     "mode": "DCVC-UF",
+    "kbps": 19.135,
+    "players": 0.39619035770495736,
+    "ball": 0.3459121783574422,
+    "source": "joint-trajectory-20261122#DCVC-QP5"
+  },
+  {
+    "mode": "DCVC-UF",
     "kbps": 20.45,
     "players": 0.3924354538321495,
     "ball": 0.3439212540785472,

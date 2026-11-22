@@ -103,8 +103,9 @@ def points():
         add(ROI if r["mode"] == "roi" else NATIVE, r["kbps"], r, source)
     for r in load(EXP / joint_name / "strict-20-ordinary.json")["points"]:
         add(NATIVE, r["kbps"], r, f"{joint_name}#strict-20-{r['width']}")
-    low_neural = load(EXP / joint_name / "dcvc-q6-human-regions.json")
-    add(NEURAL, low_neural["kbps"], low_neural["mean"], joint_name + "#DCVC-QP6")
+    for qp in (5, 6):
+        low_neural = load(EXP / joint_name / f"dcvc-q{qp}-human-regions.json")
+        add(NEURAL, low_neural["kbps"], low_neural["mean"], joint_name + f"#DCVC-QP{qp}")
     neural = EXP / "starved-dcvc-regions-20261122/result.json"
     if neural.exists():
         for r in load(neural)["points"]:
