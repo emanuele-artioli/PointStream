@@ -1,0 +1,35 @@
+{
+  "reference_rows": {
+    "ref0": {
+      "unit": "alcaraz_hurkacz__028_at120__person_000000000004",
+      "source_bytes": 42366,
+      "source_sha256": "46207b37e7659ef78dfad4d5e215ad04fc686bb071b05c673570d5104d6f3614",
+      "avif_bytes": 25517,
+      "avif_sha256": "3757f9883c0f57f16108872f4ddeb8db690aa24f492e13aca24078de252b9095",
+      "decoded_rgb_sha256": "d74396a6de27403e9e483f2823772e43ce68c8cb4fd320017bc1814017c2e955"
+    },
+    "ref1": {
+      "unit": "alcaraz_hurkacz__028_at120__person_000000000006",
+      "source_bytes": 115072,
+      "source_sha256": "5f7e1820a34879f40f46645c392c6d3fd787d9960f353e5812ec1bd3fddf80fd",
+      "avif_bytes": 28944,
+      "avif_sha256": "3496451fb50f54d2843106b07c1903b81e372d25a68db15ad3e896b1aec9e403",
+      "decoded_rgb_sha256": "0030d671c3878dc6caa17ed2cf7d7b51d42c9d5f30f3471b17bcef2b2cce934d"
+    }
+  },
+  "source_image_bytes": 157438,
+  "avif_image_bytes": 54461,
+  "image_saving": 0.6540797012157167,
+  "passes_image_oracle": true,
+  "source_cache_bytes": 157517,
+  "source_cache_sha256": "91bd3a3fd9b18db301348c98e5af1536b859f2e51dde71e7de56c3beee1c1af2",
+  "avif_cache_bytes": 57017,
+  "avif_cache_sha256": "13b42f69b2ae17adc38ec2092f88f129eb530da20ee3d743aa4a646f082becfc",
+  "source_carrier_sha256": "731cc34e1fcb7c0874cd5722ab63241a123d31fbcd699e199cee4163cdcbc0dc",
+  "avif_carrier_sha256": "6bfc32191f264e9dc98498808a20b2113e77d916ebda4ef16965934c6b871dba",
+  "avif_manifest_sha256": "60526d6aa7839ffe096b2beef73b94499ede18f7acaf145d3d6a3c82e795088f",
+  "all_240_poses_placement_seed_constant": true,
+  "avifenc_sha256": "f9cd38ec2804b56174344fd178ea919f9bff41ec7fc4a471f0ff9065b1b5d076",
+  "avifdec_sha256": "635e3acc8cc93212ca5cf1cc867b9bb6f3b738574e92107ed24be48a4a75e6bd",
+  "preparation_sha256": "555ecceabf4039784f336db809f23e1716ba06ec5d7905c44b345aff20236b5b"
+}
