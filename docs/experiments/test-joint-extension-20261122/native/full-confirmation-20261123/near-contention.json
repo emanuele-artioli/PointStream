@@ -1,0 +1,36 @@
+{
+  "prior_job": "20261122T212328Z-5e8d13ac",
+  "old_state": "contended",
+  "host": "gpu6",
+  "unchanged_paid_carrier": "a70a444b65f905285830a5fc2561e752708ac24ea0a5e02d538d85ac742dd99c",
+  "prior_source_sha256": "a2a95aa43a9e269d55679cfd4351401d584dacb0eb290cb0d9fcd685590087ed",
+  "prior_spec_sha256": "9561bdf8b8890fbbc45f43f46658f0ecc487915585dd2b0fb2e8e100e18ae69f",
+  "retained_smoke_frames": 64,
+  "retained_smoke_bytes": 29726720,
+  "prior_validation": {
+    "passed": true,
+    "checks": {
+      "source_denied": true,
+      "paid_packet_geometry": true,
+      "crop_identity_and_coverage": true,
+      "native_cuda": true,
+      "cost": {
+        "forecast_seconds": 1853.2080675457655,
+        "remaining_seconds": 3085.2159406230203,
+        "full_cap_seconds": 2680,
+        "basis": "1.5*(64-tick wall minus render-and-save + 240/64 times render-and-save) + 90; reserve 60s teardown"
+      }
+    }
+  },
+  "charged_gpu_seconds": 1235.8805079460144,
+  "elapsed_full_seconds": 861.3626735210419,
+  "full_checkpoint_or_generation_available": false,
+  "retained_far_gpu_seconds": 1412.0478942394257,
+  "prior_event_gpu_seconds": 288.11,
+  "retry_gpu_ceiling": 2850,
+  "finish_reserved_gpu_seconds": 1800,
+  "worst_event_gpu_seconds": 7586.038402185441,
+  "event_gpu_cap": 10800,
+  "deadline": "2026-11-23T01:21:00Z",
+  "retry_policy": "One extra near-only attempt. When a foreign process arrives, suspend the owned group up to 120 elapsed seconds. Zero cross-attempt resumes. Paused execution is excluded from clean timing comparisons; all slot time is charged."
+}
