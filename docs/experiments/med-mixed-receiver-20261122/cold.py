@@ -13,6 +13,57 @@ from av1 import cpu
 from src.codecs import svtav1
 
 
+def streamed_trial(src, out, tools, fps, q4, n, width, height):
+    stream = out / f"n{n}q4{q4}.ivf"
+    cmd = svtav1.encode_command(
+        tools["SvtAv1EncApp"]["path"],
+        src,
+        stream,
+        width=width,
+        height=height,
+        fps=Fraction(fps),
+        frames=n,
+        crf=q4 / 4,
+        preset=4,
+        full_range=False,
+    )
+    svtav1.run(cmd, 240, None)
+    data = stream.read_bytes()
+    assert len(svtav1.ivf_frames(data)) == n
+    h = hashlib.sha256()
+    byte_count = 0
+    decode = [
+        tools["dav1d"]["path"],
+        "-i",
+        str(stream),
+        "-o",
+        "-",
+        "--muxer",
+        "yuv",
+        "--threads",
+        "1",
+        "--quiet",
+    ]
+    with subprocess.Popen(decode, stdout=subprocess.PIPE) as decoder_process:
+        assert decoder_process.stdout is not None
+        for chunk in iter(lambda: decoder_process.stdout.read(1 << 20), b""):
+            h.update(chunk)
+            byte_count += len(chunk)
+        assert decoder_process.wait(timeout=120) == 0
+    assert byte_count == n * width * height * 3 // 2
+    return dict(
+        q4=q4,
+        crf=q4 / 4,
+        bytes=len(data),
+        kbps=len(data) * 8 * fps / (n * 1000),
+        stream=str(stream),
+        stream_sha256=sha(stream),
+        decoded_sha256=h.hexdigest(),
+        encode_command=cmd,
+        decode_command=decode,
+    )
+
+
 def main(a):
     receipt = json.loads((a.joint / "result.json").read_text())
     chosen = next(r for r in receipt["rates"] if r["crf"] == receipt["selected_crf"])
@@ -35,54 +86,7 @@ def main(a):
 
     def run(q4, n):
         if a.stream_only:
-            stream = a.out / f"n{n}q4{q4}.ivf"
-            cmd = svtav1.encode_command(
-                tools["SvtAv1EncApp"]["path"],
-                src,
-                stream,
-                width=960,
-                height=544,
-                fps=Fraction(fps),
-                frames=n,
-                crf=q4 / 4,
-                preset=4,
-                full_range=False,
-            )
-            svtav1.run(cmd, 240, None)
-            data = stream.read_bytes()
-            assert len(svtav1.ivf_frames(data)) == n
-            h = hashlib.sha256()
-            byte_count = 0
-            decode = [
-                tools["dav1d"]["path"],
-                "-i",
-                str(stream),
-                "-o",
-                "-",
-                "--muxer",
-                "yuv",
-                "--threads",
-                "1",
-                "--quiet",
-            ]
-            with subprocess.Popen(decode, stdout=subprocess.PIPE) as decoder_process:
-                assert decoder_process.stdout is not None
-                for chunk in iter(lambda: decoder_process.stdout.read(1 << 20), b""):
-                    h.update(chunk)
-                    byte_count += len(chunk)
-                assert decoder_process.wait(timeout=120) == 0
-            assert byte_count == n * 960 * 544 * 3 // 2
-            return dict(
-                q4=q4,
-                crf=q4 / 4,
-                bytes=len(data),
-                kbps=len(data) * 8 * fps / (n * 1000),
-                stream=str(stream),
-                stream_sha256=sha(stream),
-                decoded_sha256=h.hexdigest(),
-                encode_command=cmd,
-                decode_command=decode,
-            )
+            return streamed_trial(src, a.out, tools, fps, q4, n, 960, 544)
         with tempfile.TemporaryDirectory(dir=a.out) as local:
             d = Path(local)
             r = svtav1.code(

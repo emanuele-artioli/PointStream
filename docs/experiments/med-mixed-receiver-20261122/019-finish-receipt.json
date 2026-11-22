@@ -1,0 +1,37 @@
+{
+  "archive_sha256": "ed33201f05fee92b96ca883cfeb94ca4974b473e5682f488d32b688f46d29162",
+  "job_id": "20261122T115904Z-fd17c8d8",
+  "timing": {
+    "worker_wall_seconds": 71.58387753099669,
+    "archive_seconds": 8.786105908977333,
+    "verify_seconds": 5.969599925010698,
+    "archive_bytes": 1499648000,
+    "archive_sha256": "ed33201f05fee92b96ca883cfeb94ca4974b473e5682f488d32b688f46d29162"
+  },
+  "wire": {
+    "active_ticks": [
+      92,
+      212
+    ],
+    "ball_positions": 45,
+    "cache_bytes": 153332,
+    "cache_roles": {
+      "frame": 0,
+      "match": 0,
+      "reference": 151498,
+      "window": 1834
+    },
+    "cache_sha256": "6038cd2c5511ee92ba5407b8e8dbad34f43df3144bbf4917d5296863ea007bde",
+    "joint_bytes": 13804,
+    "joint_roles": {
+      "frame": 12448,
+      "match": 0,
+      "reference": 0,
+      "window": 1356
+    },
+    "joint_sha256": "4b077859fe3d808ff624a81fe33fceb647803052ad8cd3266afb1ef8c1c175d3"
+  },
+  "ticks": 240,
+  "active_frame_nonempty": 120,
+  "role_coverage": {}
+}

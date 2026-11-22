@@ -15,3 +15,7 @@
 {"stage": "campus-calibration", "job": "20261122T123127Z-736122b6", "code": "5e4e5e3bb7297189aa82796913c0ba33946176bd", "clip": "019"}
 {"stage": "campus-cold-ordinary", "job": "20261122T124932Z-40d3c16d", "code": "d402c8079a14d1fce90d636795916cd505694dc9", "clip": "019"}
 {"stage": "campus-cold-ordinary", "job": "20261122T125109Z-e3bffa25", "code": "c0d876a1029134dd0133efb30d73e1e2911aa0f6", "clip": "024"}
+{"stage": "rung-60", "job": "20261122T125720Z-1b9e6aec", "code": "4e5645768f7a33fc0205b78d3e7aa6082dab9e47", "clip": "019"}
+{"stage": "campus-finish-joint-q60", "job": "20261122T125720Z-8a9f38af", "code": "4e5645768f7a33fc0205b78d3e7aa6082dab9e47", "clip": "019"}
+{"stage": "rung-70", "job": "20261122T125804Z-36b7530e", "code": "b574a671729a039d4ee1e9583524b79d28849a7b", "clip": "019"}
+{"stage": "rung-50", "job": "20261122T125851Z-e78f67b3", "code": "7df03336cf7e24e1b14ef9a93bc35e618be02dbf", "clip": "019"}
