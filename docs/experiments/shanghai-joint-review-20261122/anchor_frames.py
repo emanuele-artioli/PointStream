@@ -13,7 +13,7 @@ import numpy as np
 from src.pointstream.tracked_patch import yuv_to_rgb
 
 
-def render(archive_path, review, output):
+def render(archive_path, review, output, source_witness=None):
     with tarfile.open(archive_path) as archive:
         sampling = json.load(archive.extractfile("sampling.json"))
         assert sampling["ticks"] == [entry["frame_index"] for entry in review["frames"]]
@@ -44,10 +44,23 @@ def render(archive_path, review, output):
                         path=path.name,
                         png_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
                         rgb_sha256=hashlib.sha256(rgb).hexdigest(),
+                        **(
+                            {
+                                "source_rgb_sha256": source_witness["ticks"][str(tick)][
+                                    "raw_rgb_sha256"
+                                ]
+                            }
+                            if source_witness
+                            else {}
+                        ),
                     )
                 )
             arm = dict(
-                mode=f"SVT-AV1 {meta['mode']} {width}x{height} {meta['band']}",
+                mode=(
+                    f"DCVC-UF Q{meta['neural_qp']} {width}x{height}"
+                    if "neural_qp" in meta
+                    else f"SVT-AV1 {meta['mode']} {width}x{height} {meta['band']}"
+                ),
                 bytes=meta["bytes"],
                 bitstream_sha256=meta["bitstream_sha256"],
                 decoded_sha256=meta["decoded_sha256"],
@@ -59,6 +72,9 @@ def render(archive_path, review, output):
                 fps=review["source_video_fps"],
                 cv2=cv2.__version__,
             )
+            if source_witness:
+                assert source_witness["source_sha256"] == arm["source_sha256"]
+                arm["source_review_sha256"] = source_witness["review_sha256"]
             (directory / "arm.json").write_text(json.dumps(arm, indent=2) + "\n")
 
 
@@ -66,5 +82,9 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
     for key in ("archive", "review", "output"):
         p.add_argument(key, type=Path)
+    p.add_argument("--source-witness", type=Path)
     args = p.parse_args()
-    render(args.archive, json.loads((args.review / "review.json").read_text()), args.output)
+    witness = json.loads(args.source_witness.read_text()) if args.source_witness else None
+    render(
+        args.archive, json.loads((args.review / "review.json").read_text()), args.output, witness
+    )

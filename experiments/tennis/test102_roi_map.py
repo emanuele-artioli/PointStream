@@ -18,12 +18,21 @@ from src.segmentation.masks import ClipMasks
 FEATURE_SHA = "994101c8d3466080777c262d92b9f15953c5636cc4addae06f75ad478d3594ee"
 BALL_SHA = "3ad726835c0e51c11daa80d9b54630a1e52494227680b434254e583950426918"
 IDS = ["person:000000000000", "person:000000000001"]
+SOURCES = {
+    "match102": (FEATURE_SHA, BALL_SHA, IDS),
+    "match127": (
+        "7c7b678cf671e22092efe5284a19cd113bca49ee125af558d844c886fc31c19d",
+        "d85b4b68e26d93d9b5e477785ed4b58c003aad044d9654aeaf74e52d49255757",
+        ["person:000000000008", "person:000000000013"],
+    ),
+}
 
 
-def region_map(features, payload, n, width, height, work):
-    assert sha(features) == FEATURE_SHA and sha(payload) == BALL_SHA
+def region_map(features, payload, n, width, height, work, match="match102"):
+    feature_sha, ball_sha, ids = SOURCES[match]
+    assert sha(features) == feature_sha and sha(payload) == ball_sha
     with tarfile.open(features) as tar:
-        prefix = "publish/test__match102@120/"
+        prefix = f"publish/test__{match}@120/"
         f = json.load(tar.extractfile(prefix + "features.json"))
         rle = tar.extractfile(prefix + "sam-masks.rle").read()
     if mask_format.zstd is None and rle.startswith(b"\x28\xb5\x2f\xfd"):
@@ -37,9 +46,9 @@ def region_map(features, payload, n, width, height, work):
     pos, _ = ball.decode_frames(payload.read_bytes(), 240, 960, 544)
     regions = np.zeros((n, 540, 960), bool)
     for t in range(n):
-        masks = player_masks(clip.frames[t], f["aliases"], IDS)
-        assert set(masks) == set(IDS)
-        for actor in IDS:
+        masks = player_masks(clip.frames[t], f["aliases"], ids)
+        assert set(masks) == set(ids)
+        for actor in ids:
             m = masks[actor]
             assert m.shape == (540, 960) and m.any()
             regions[t] |= m
