@@ -46,6 +46,11 @@ def build(a):
         spec.pop("gpu_sharing")
     else:
         assert a.action == "judge"
+        spec["contention"] = {
+            "policy": "continue",
+            "basis": "Pixel and localization quality on immutable inputs is independent of runtime.",
+            "resume_attempts": 0,
+        }
         spec["gpu_sharing"] = {
             "mode": "shared",
             "basis": "The fixed-pixel WASB objective and frozen source labels do not depend on wall-clock timing. This GPU model has passed the native CUDA and CPU-pixel verification.",

@@ -157,6 +157,11 @@ def run(a):
         qualified["match"] == receipt["match"] and receipt["frames"] == qualified["frames"] == 240
     )
     assert qualified["rgb_sha256"]["source"] == receipt["source_rgb_sha256"]
+    assert qualified["source_sha256"] == receipt["source_sha256"]
+    assert qualified["labels_sha256"] == receipt["labels_sha256"]
+    assert qualified["rate_archive_sha256"] == receipt["rate_archive_sha256"]
+    assert qualified["judge_config_sha256"] == prior.CONFIG
+    assert qualified["judge_checkpoint_sha256"] == prior.WEIGHT
     result = (freeze if a.mode == "freeze" else detect)(a, n, stage, work, receipt, qualified)
     result.update(
         mode=a.mode,

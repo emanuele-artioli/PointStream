@@ -69,6 +69,7 @@ def summarize(data):
     all_marks = []
     rgb_rows = {arm: [] for arm in ("source", "ordinary", "candidate")}
     srctotal = []
+    strong_rows = []
     for m in stage:
         match = m["match"]
         dest = data / f"{match}-score.json"
@@ -134,6 +135,25 @@ def summarize(data):
             if j["source_qualified"]:
                 for key, vs in j["detections"].items():
                     rgb_rows[key] += vs["rows"]
+                strong_sha = s["best_affordable"]["sha256"]
+                row["strong_rgb_reused"] = strong_sha == s["ordinary_sha256"]
+                strong = None
+                if row["strong_rgb_reused"]:
+                    strong = j["detections"]["ordinary"]["rows"]
+                elif (data / f"{match}-strongjudge.json").exists():
+                    sr = json.loads((data / f"{match}-strongjudge.json").read_text())
+                    assert (
+                        sr["packet_sha256"] == strong_sha
+                        and sr["source_sha256"] == s["source_sha256"]
+                        and sr["source_visible"] == j["visible"]
+                    )
+                    strong = sr["detector"]["rows"]
+                if strong is not None:
+                    assert [(x["tick"], x["visibility"]) for x in strong] == [
+                        (x["tick"], x["visibility"]) for x in j["detections"]["ordinary"]["rows"]
+                    ]
+                    row["rgb"]["strongest"] = counts(strong)
+                    strong_rows += strong
     groups = {}
     for name, gr in [(name, [r for r in rows if r.get("selection") == name]) for name in GROUPS] + [
         ("matched-actual", [r for r in rows if r.get("selection") in GROUPS[:2]])
@@ -160,6 +180,19 @@ def summarize(data):
         count=len(rows),
         scored=sum("direct" in r for r in rows),
         scored_regardless_of_scene_eligibility=True,
+        routing=dict(
+            all_court=[r["match"] for r in rows if r.get("court_ticks") == 240],
+            all_other=[r["match"] for r in rows if r.get("court_ticks") == 0],
+            mixed=[r["match"] for r in rows if 0 < r.get("court_ticks", 0) < 240],
+            full_court_matched_same=aggregate(
+                [r for r in rows if r.get("court_ticks") == 240 and r["selection"] in GROUPS[:2]],
+                "ordinary_dists",
+            ),
+            full_court_matched_strongest=aggregate(
+                [r for r in rows if r.get("court_ticks") == 240 and r["selection"] in GROUPS[:2]],
+                "strongest_dists",
+            ),
+        ),
         rows=rows,
         groups=groups,
         combined_direct=counts(all_marks),
@@ -169,6 +202,8 @@ def summarize(data):
         source_qualified=sum(bool(r.get("source_qualified")) for r in rows),
         judge_count=sum("source_qualified" in r for r in rows),
         rgb_source_all_scored=counts(srctotal),
+        strongest_judge_count=sum("strongest" in r.get("rgb", {}) for r in rows),
+        rgb_strongest_qualified_scored=counts(strong_rows),
         rgb_source_qualified={k: counts(v) for k, v in rgb_rows.items()},
     )
 

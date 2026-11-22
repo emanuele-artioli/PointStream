@@ -53,6 +53,13 @@ def text(summary):
             lines.append(
                 f"| {key}, {name} | {g['n']} | {g['candidate']:.4f} / {g['ordinary']:.4f} | {g['gain_percent']:+.2f}% | {g['wins']} / {g['n']} | {interval} |"
             )
+    route = summary["routing"]
+    lines.extend(
+        [
+            "",
+            f"The source-side selector admitted all 240 ticks on {len(route['all_court'])} matches, none on {len(route['all_other'])}, and a mixture on {len(route['mixed'])}. Full non-court routing occurred on {', '.join(route['all_other']) or 'no match'}. The unconditional object-mode table preserves all frozen sources, including shots the router would send via conventional video.",
+        ]
+    )
     c = summary["combined_direct"]
     lines += [
         "",
@@ -60,7 +67,7 @@ def text(summary):
         "",
         "## Neural video control and receiver-side detector",
         "",
-        "| Match | DCVC-UF kbps / DISTS | Affordable at paired ceiling | Original detector hits / visible | Source qualified | AV1 / PS decoded detector hits |",
+        "| Match | DCVC-UF kbps / DISTS | Affordable at paired ceiling | Original detector hits / visible | Source qualified | AV1 / PS / best spatial AV1 detector hits |",
         "|---|---:|---|---:|---|---:|",
     ]
     for r in summary["rows"]:
@@ -73,7 +80,11 @@ def text(summary):
         q = r.get("source_qualified")
         source = r.get("rgb", {}).get("source", {})
         src = f"{source['hit10']} / {source['visible']}" if source else "—"
-        rgb = f"{r['rgb']['ordinary']['hit10']} / {r['rgb']['candidate']['hit10']}" if q else "—"
+        rgb = (
+            f"{r['rgb']['ordinary']['hit10']} / {r['rgb']['candidate']['hit10']} / {r['rgb'].get('strongest', {}).get('hit10', 'pending')}"
+            if q
+            else "—"
+        )
         lines.append(
             f"| {r['event']} | {neural} | {afford} | {src} | { {True: 'yes', False: 'no', None: 'pending'}[q] } | {rgb} |"
         )

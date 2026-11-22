@@ -135,9 +135,12 @@ def figures(d, output):
             text = f"{direct['hit10']}/{direct['visible']}"
             if r.get("source_qualified"):
                 for offset, name, marker, color in (
-                    (0.18, "ordinary", "s", "#b4511e"),
-                    (-0.18, "candidate", "D", "#41784d"),
+                    (0.22, "ordinary", "s", "#b4511e"),
+                    (-0.22, "candidate", "D", "#41784d"),
+                    (0.02, "strongest", "^", "#835187"),
                 ):
+                    if name not in r["rgb"]:
+                        continue
                     j = r["rgb"][name]
                     ax.scatter(
                         100 * j["hit10"] / j["visible"],
@@ -166,13 +169,14 @@ def figures(d, output):
         ("o", palette[0], "Paid coordinates"),
         ("s", "#b4511e", "AV1 + detector"),
         ("D", "#41784d", "PointStream + detector"),
+        ("^", "#835187", "Best spatial AV1 + detector"),
     ]
     ax.legend(
         handles=[
             Line2D([], [], ls="none", marker=m, color=c, mfc=c if i == 0 else "white", label=label)
             for i, (m, c, label) in enumerate(keys)
         ],
-        ncol=3,
+        ncol=2,
         loc="lower left",
         bbox_to_anchor=(0, 1.00),
         fontsize=7,

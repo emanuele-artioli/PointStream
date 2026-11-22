@@ -41,6 +41,11 @@ def create(a):
             )
         )
         extra = ["--display-sha", sha]
+        spec["contention"] = {
+            "policy": "continue",
+            "basis": "Pixel and localization quality on immutable inputs is independent of runtime.",
+            "resume_attempts": 0,
+        }
         spec["gpu_sharing"] = {
             "mode": "shared",
             "basis": "Frozen objective measurements on the validated Ada judge; wall time is excluded from throughput comparisons.",
