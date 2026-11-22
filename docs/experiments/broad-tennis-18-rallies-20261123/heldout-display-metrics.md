@@ -33,3 +33,10 @@ total bytes are within 0.5% of the ball delivery, using at most seven
 quarter-CRF probes in each existing bracket and no GPU. If the achievable
 granularity is coarser, report the exact gap. This determines how much of the
 apparent whole-picture loss came from the large disparity in spending.
+
+The two ordinary re-encodes matched to within 0.042% of the ball packet's
+total bytes. The remaining whole-picture PSNR losses were 0.089 dB on point
+22 and 0.273 dB on point 108 (luma SSIM differences −0.00237 and −0.00737).
+These are the measured whole-picture tradeoffs on those two deliveries.
+The ball's regional fidelity and localization still require independent
+source labels. [Match-rate recheck and exact bytes](heldout-rate-recheck.json)
