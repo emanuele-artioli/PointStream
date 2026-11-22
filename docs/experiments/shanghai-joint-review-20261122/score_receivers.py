@@ -38,12 +38,14 @@ def automatic_regions(root, source, ball):
 
 def measure(args):
     review = read_review(args.review)
+    fps = review["source_video_fps"]
+    assert len(fps) == 2 and all(v > 0 for v in fps)
     if args.annotation:
         labels = json.loads(args.annotation.read_text())
         assert labels["schema"] == "pointstream-reviewed-player-official-ball-v1"
         assert labels["source_sha256"] == review["source_video_sha256"]
         assert labels["official_ball_sha256"] == review["official_ball_sha256"]
-        assert labels["fps"] == [30000, 1001] and labels["review_sha256"] == review["review_sha256"]
+        assert labels["fps"] == fps and labels["review_sha256"] == review["review_sha256"]
         if not args.qa_only and "QA" in labels["reviewer"].upper():
             raise ValueError("Synthetic reviewer fixture cannot enter the results")
         label_rows = {row["tick"]: row for row in labels["frames"]}
@@ -57,7 +59,7 @@ def measure(args):
     net = quality.load_dists(WEIGHTS, "cpu")
     bank = json.loads(args.arm.read_text())
     assert bank["source_sha256"] == review["source_video_sha256"]
-    assert bank["fps"] == [30000, 1001] and bank["source_ticks"] == 240
+    assert bank["fps"] == fps and bank["source_ticks"] == 240
     assert bank["bytes"] > 0 and len(bank["bitstream_sha256"]) == 64
     frames = {r["tick"]: r for r in bank["frames"]}
     assert sorted(frames) == [r["frame_index"] for r in review["frames"]]
@@ -76,6 +78,8 @@ def measure(args):
         assert sha(refpath) == src["source_sha256"]
         original = load_rgb(refpath)
         arm = frames[tick]
+        if "source_rgb_sha256" in arm:
+            assert hashlib.sha256(original.tobytes()).hexdigest() == arm["source_rgb_sha256"]
         path = args.arm.parent / arm["path"]
         assert sha(path) == arm["png_sha256"]
         display = load_rgb(path)
@@ -117,7 +121,7 @@ def measure(args):
         arm_manifest_sha256=sha(args.arm),
         bitstream_sha256=bank["bitstream_sha256"],
         bytes=bank["bytes"],
-        kbps=bank["bytes"] * 8 * (30000 / 1001) / 240 / 1000,
+        kbps=bank["bytes"] * 8 * (fps[0] / fps[1]) / 240 / 1000,
         source_ticks=240,
         qa_only=args.qa_only,
         scores=scores,

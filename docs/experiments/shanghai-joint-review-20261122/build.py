@@ -21,9 +21,24 @@ def digest(data):
     return hashlib.sha256(data).hexdigest()
 
 
+EVENTS = {
+    "match102": (
+        "sh102",
+        "Sinner–Shelton, Shanghai 2023",
+        "994101c8d3466080777c262d92b9f15953c5636cc4addae06f75ad478d3594ee",
+    ),
+    "match127": (
+        "sy127",
+        "Shapovalov–Safiullin, Sydney 2022",
+        "7c7b678cf671e22092efe5284a19cd113bca49ee125af558d844c886fc31c19d",
+    ),
+}
+
+
 def build(args):
+    short, title, feature_sha = EVENTS[args.event]
     data = json.loads((HERE.parent / "cohort-expansion-20261122/staged.json").read_text())
-    record = next(r for r in data["selection"] if r["match"] == "match102")
+    record = next(r for r in data["selection"] if r["match"] == args.event)
     assert digest(args.source.read_bytes()) == record["source"]["sha256"]
     assert digest(args.ball.read_bytes()) == record["labels"]["sha256"]
     with args.ball.open() as file:
@@ -35,12 +50,9 @@ def build(args):
     population = sorted(records)
     ticks = [population[i] for i in np.rint(np.linspace(0, len(population) - 1, 12)).astype(int)]
     assert len(set(ticks)) == 12
-    assert (
-        digest(args.features.read_bytes())
-        == "994101c8d3466080777c262d92b9f15953c5636cc4addae06f75ad478d3594ee"
-    )
+    assert digest(args.features.read_bytes()) == feature_sha
     with tarfile.open(args.features) as a:
-        prefix = "publish/test__match102@120/"
+        prefix = f"publish/test__{args.event}@120/"
         ids = json.load(a.extractfile("publish/admission.json"))["ids"]
         aliases = json.load(a.extractfile(prefix + "features.json"))["aliases"]
         raw = a.extractfile(prefix + "sam-masks.rle").read()
@@ -82,7 +94,7 @@ def build(args):
             )
         frames.append(
             dict(
-                id=f"sh102-tick-{tick:03}",
+                id=f"{short}-tick-{tick:03}",
                 frame_index=tick,
                 source="assets/" + source.name,
                 source_sha256=digest(source.read_bytes()),
@@ -92,13 +104,13 @@ def build(args):
     capture.release()
     review = dict(
         version=1,
-        title="Sinner–Shelton, Shanghai 2023 · source player masks",
-        storage_prefix="pointstream-sh102-source-review-",
-        download_name="sh102-source-annotation-decisions.json",
-        review_id="sh102-source-only-20261122",
-        source_group="match102/000",
+        title=title + " · source player masks",
+        storage_prefix=f"pointstream-{short}-source-review-",
+        download_name=f"{short}-source-annotation-decisions.json",
+        review_id=f"{short}-source-only-20261122",
+        source_group=args.event + "/000",
         source_video_sha256=record["source"]["sha256"],
-        source_video_fps=[30000, 1001],
+        source_video_fps=list(map(int, record["video"]["r_frame_rate"].split("/"))),
         window_start_in_clip=0,
         matte_transport_sha256=digest(args.features.read_bytes()),
         matte_member_sha256=digest(raw),
@@ -129,4 +141,5 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     for field in ("source", "ball", "features", "output"):
         parser.add_argument(field, type=Path)
+    parser.add_argument("--event", choices=EVENTS, default="match102")
     build(parser.parse_args())

@@ -1,6 +1,7 @@
 """Bind each selected PNG to the fully verified receiver and its actual joint packet."""
 
 import argparse
+from fractions import Fraction
 import hashlib
 import json
 from pathlib import Path
@@ -12,15 +13,14 @@ from experiments.tennis.player_requalification import array_sha
 HERE = Path(__file__).resolve().parent
 
 
-def bind(directory, out):
+def bind(directory, out, sender_path, source_path):
     path = directory / "manifest.json"
     record = json.loads(path.read_text())
-    sender = json.loads((HERE.parent / "test-crop-joint-20261122/match102-sender.json").read_text())
-    native_source = json.loads(
-        (HERE.parent / "test-crop-joint-20261122/match102-source-review-frames.json").read_text()
-    )
+    sender = json.loads(sender_path.read_text())
+    native_source = json.loads(source_path.read_text())
     assert record["source_sha256"] == sender["source_sha256"] == native_source["source_sha256"]
-    assert record["native_fps"] == sender["native_fps"] == "30000/1001"
+    fps = Fraction(sender["native_fps"])
+    assert Fraction(record["native_fps"]) == fps == Fraction(native_source["native_fps"])
     payment = next(
         r for r in sender["rates"] if r["joint_sha256"] == record["wire"]["joint_sha256"]
     )
@@ -56,7 +56,7 @@ def bind(directory, out):
         frames=rows,
         source_ticks=240,
         source_sha256=sender["source_sha256"],
-        fps=[30000, 1001],
+        fps=[fps.numerator, fps.denominator],
         full_receiver_sha256=record["all_240_output_sha256"],
         finish_job=record["finish_job"],
         native_receipt_sha256=record["receipt_sha256"],
@@ -70,5 +70,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("directory", type=Path)
     parser.add_argument("out", type=Path)
+    parser.add_argument(
+        "--sender", type=Path, default=HERE.parent / "test-crop-joint-20261122/match102-sender.json"
+    )
+    parser.add_argument(
+        "--source-witness",
+        type=Path,
+        default=HERE.parent / "test-crop-joint-20261122/match102-source-review-frames.json",
+    )
     a = parser.parse_args()
-    bind(a.directory, a.out)
+    bind(a.directory, a.out, a.sender, a.source_witness)
