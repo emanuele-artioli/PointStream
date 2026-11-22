@@ -1,0 +1,68 @@
+{
+  "source_sha256": "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934",
+  "packet_sha256": "d4c64ac818c1a340b0ce3384961b63c704c81b3561ef2e708118e415b5ea818e",
+  "ticks": [
+    10,
+    30,
+    50,
+    70,
+    90,
+    110,
+    130,
+    150,
+    170,
+    190,
+    210,
+    230
+  ],
+  "fps": 25,
+  "size": [
+    960,
+    544
+  ],
+  "display_size": [
+    1920,
+    1080
+  ],
+  "kbps": 39.770833333333336,
+  "frames_verified": 240,
+  "frame_sha256": [
+    "b3c0cea957392e6ac0e6f69b30c808f29af09015173ba89802d8574fb678e95b",
+    "e65ebaa613dc9f4d3f9455ec9d2dbbd479bbea945d09d08459ae383454d9066d",
+    "42a4282862a07695f878631e18b713054b0105f9ce4a56a74eed6b9d6a5a033d",
+    "c33aec268ce2bd7307484913b75da32bb064c08cf3715fef8eedb9db4f089bb5",
+    "7a77fd78d8fa15b3063bf198f1501baec1ae37e857b37702a185cbfff69e78a2",
+    "8cee1fa6f082d6e189382a880f40ba76c1bdbe33c97ca79db5fe9eff1f1a5724",
+    "611655c8ac99565fff9b158d02e834d2ffd4f7fa693e6b268ce9c38736acb2c7",
+    "228aa5a890d9d9d803cd4afd04d7c8fbe764e8559e6ae4d22f171b5bd9fcd5e9",
+    "dd69ed27277c00127fe59254bff23c1158566f1f551cf990a0b02e85463137e0",
+    "43d832b8661f8050a60e96240082a712f7f1ec8f0d2929135d9d66a088fca0d5",
+    "4a5911d329a1c7861a79bea825a361a2ee38cfd3f50a21a34ed961e3b92ae26e",
+    "096d4e73dd4e847abb4e214aefc1e341a0e7629d37a344761bf0130dbba0762c"
+  ],
+  "review12_sha256": "8f0b8062f206ed6cf5fa477575e3c1d8cd94e635abff2c99c3b9b6fe12739b0d",
+  "allocator": {
+    "profile": "pointstream-parent2-child6-v1",
+    "device_name": "NVIDIA RTX 6000 Ada Generation",
+    "capability": [
+      8,
+      9
+    ],
+    "role": "dcvc",
+    "pid": 567005,
+    "pgid": 566297,
+    "budget_mib": 6144,
+    "total_bytes": 51010207744,
+    "fraction": 0.12629728889425634,
+    "allocated_before": 0,
+    "host_pid": 567005,
+    "host_pgid": 566297,
+    "start_ticks": 14617048,
+    "campaign_pgid": 566297,
+    "action": "decode",
+    "plan": "decode/plan.json",
+    "gpu_uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0"
+  },
+  "stage": "full",
+  "elapsed_seconds": 9.169587312993826
+}

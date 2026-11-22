@@ -73,7 +73,7 @@
     "experiments.tennis.match284_features",
     "--validate",
     "--manifest",
-    "{staged:manifest}"
+    "/home/itec/emanuele/Datasets/pointstream-data/tennis/match284-source-20261122/feature-manifest.json"
   ],
   "deadline": "2026-11-22T06:00:00Z",
   "verify_staged_inputs": true,
