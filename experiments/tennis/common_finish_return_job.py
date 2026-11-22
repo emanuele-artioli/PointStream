@@ -18,8 +18,16 @@ from experiments.tennis import common_player_finish as finish
 from experiments.tennis import common_receiver_isolation as isolation
 from experiments.tennis import common_receiver_manifest as manifest
 from experiments.tennis import player_requalification as replay
-from experiments.tennis.common_receiver_job import actual_full_cost, bind_allocation, validation_workspace
-UNITS = ("nadal_kyrgios__002_at120__person_000000000000", "nadal_kyrgios__002_at120__person_000000000002")
+from experiments.tennis.common_receiver_job import (
+    actual_full_cost,
+    bind_allocation,
+    validation_workspace,
+)
+
+UNITS = (
+    "nadal_kyrgios__002_at120__person_000000000000",
+    "nadal_kyrgios__002_at120__person_000000000002",
+)
 
 MODULE = "experiments.tennis.common_finish_return_job"
 

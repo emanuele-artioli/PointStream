@@ -17,7 +17,11 @@ import numpy as np
 from experiments.tennis import common_player_packet as packet
 from experiments.tennis import common_receiver_manifest as manifest
 from experiments.tennis import player_requalification as replay
-UNITS = ("nadal_kyrgios__002_at120__person_000000000000", "nadal_kyrgios__002_at120__person_000000000002")
+
+UNITS = (
+    "nadal_kyrgios__002_at120__person_000000000000",
+    "nadal_kyrgios__002_at120__person_000000000002",
+)
 
 MODULE = "experiments.tennis.common_receiver_return_job"
 WEIGHT_PATHS = (
