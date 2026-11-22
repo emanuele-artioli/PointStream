@@ -13,6 +13,7 @@ import zlib
 
 from experiments.tennis.shanghai_ball_rate_crf import TOOLS, sha
 from src.codecs import svtav1
+from experiments.tennis import test102_roi_map as roi
 
 CEILINGS = {"warm": 17794, "cold": 155274}
 GEOMETRY = {320: 192, 480: 272, 640: 384, 960: 544, 1920: 1080}
@@ -62,6 +63,13 @@ def run(a):
     ]
     subprocess.run(cmd, check=True, capture_output=True, timeout=270)
     assert native.stat().st_size == n * w * h * 3 // 2
+    roi_path = None
+    regions = None
+    budgets = CEILINGS
+    if a.roi_features:
+        assert a.ball_payload
+        roi_path, regions = roi.region_map(a.roi_features, a.ball_payload, n, w, h, work)
+        budgets = {"warm": CEILINGS["warm"]}
     rows = {}
     with tarfile.open(a.earlier) as t:
         previous = json.load(t.extractfile("publish/rates.json"))
@@ -70,7 +78,7 @@ def run(a):
             and previous["match"] == "match102"
             and previous["source_sha256"] == meta["source"]["sha256"]
         )
-        for old in previous["rows"] if n == 240 else []:
+        for old in previous["rows"] if n == 240 and not roi_path else []:
             if old["width"] != w:
                 continue
             data = t.extractfile("publish/" + old["native_file"]).read()
@@ -105,6 +113,7 @@ def run(a):
                 crf=q / 4,
                 preset=4,
                 full_range=False,
+                extra=["--roi-map-file", str(roi_path)] if roi_path else None,
             )
             subprocess.run(c, check=True, capture_output=True, timeout=500)
             data = path.read_bytes()
@@ -122,7 +131,7 @@ def run(a):
     # A 24-frame smoke uses representative working limits; selection for the paper uses only full files.
     selected = {}
     floor = encode(280)
-    for label, cap in CEILINGS.items():
+    for label, cap in budgets.items():
         limit = round(Fraction(n, 240) * cap)
         if floor <= limit:
             encode(64)
@@ -145,7 +154,7 @@ def run(a):
             for q in (best["quarter_crf"] - 1, best["quarter_crf"] + 1):
                 if 64 <= q <= 280:
                     encode(q)
-    for label, cap in CEILINGS.items():
+    for label, cap in budgets.items():
         limit = round(Fraction(n, 240) * cap)
         affordable = [r for r in rows.values() if r["bytes"] <= limit]
         if not affordable:
@@ -170,9 +179,15 @@ def run(a):
             while block := src.read(1048576):
                 dst.write(z.compress(block))
             dst.write(z.flush())
+        twin = (
+            roi.compare_same_q(native, dec, best, regions, w, h, n, FPS, tools, work, pub)
+            if roi_path
+            else None
+        )
         selected[label] = dict(
             ceiling=limit,
             affordable=True,
+            identical_qp_control=twin,
             **best,
             decoded_sha256=decoded_sha,
             decoded_file=out.name,
@@ -182,6 +197,10 @@ def run(a):
         match=meta["match"],
         source_sha256=meta["source"]["sha256"],
         earlier_sha256=a.earlier_sha,
+        mode="foreground-roi" if roi_path else "ordinary",
+        roi_map_sha256=sha(roi_path) if roi_path else None,
+        source_masks_sha256=roi.FEATURE_SHA if roi_path else None,
+        ball_sha256=roi.BALL_SHA if roi_path else None,
         frames=n,
         fps=str(FPS),
         width=w,
@@ -216,6 +235,24 @@ def validate():
                 assert x["bytes"] <= x["ceiling"] and x["bytes"] == max(
                     v["bytes"] for v in r["bank"] if v["bytes"] <= x["ceiling"]
                 )
+                if r.get("mode") == "foreground-roi":
+                    t = x["identical_qp_control"]
+                    twin = tar.extractfile("publish/" + t["twin_file"]).read()
+                    assert (
+                        len(twin) == t["twin_bytes"]
+                        and hashlib.sha256(twin).hexdigest() == t["twin_sha256"]
+                        and len(svtav1.ivf_frames(twin)) == n
+                    )
+                    assert t["support_pixels"] + t["outside_pixels"] == r["width"] * r["height"] * n
+                    assert t["non_inert"] == (
+                        t["changed_luma_pixels"] > 0
+                        and t["twin_decoded_sha256"] != x["decoded_sha256"]
+                    )
+                    assert (
+                        r["roi_map_sha256"]
+                        and r["source_masks_sha256"] == roi.FEATURE_SHA
+                        and r["ball_sha256"] == roi.BALL_SHA
+                    )
                 src = tar.extractfile("publish/" + x["decoded_file"])
                 dec = zlib.decompressobj()
                 digest = hashlib.sha256()
@@ -250,7 +287,7 @@ def validate():
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
-    for k in ("source", "metadata", "earlier"):
+    for k in ("source", "metadata", "earlier", "roi-features", "ball-payload"):
         p.add_argument("--" + k, type=Path)
     p.add_argument("--earlier-sha")
     p.add_argument("--frames", type=int)
