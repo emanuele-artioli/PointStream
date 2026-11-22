@@ -41,7 +41,7 @@ def main(a):
         for r in arms:
             work = Path(scope.enter_context(tempfile.TemporaryDirectory(dir=a.scratch)))
             images[r["name"]] = prep(a, r, work)[0]
-        for t in range(NT):
+        for t in range(a.frames):
             ok, bgr = cap.read()
             assert ok
             rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
@@ -105,7 +105,7 @@ def main(a):
         source_mask_rle_sha256=support_hash,
         grid=[960, 544],
         fps=str(FPS),
-        recorded_ticks=240,
+        recorded_ticks=a.frames,
         arms=[{"name": r["name"], "bytes": r["bytes"]} for r in arms],
         tool=f"OpenCV {cv2.__version__}, source-only backward DIS medium",
         summary=summary,
@@ -120,4 +120,5 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
     for k in ("source", "features", "arms", "scratch", "out"):
         p.add_argument("--" + k, type=Path, required=True)
+    p.add_argument("--frames", type=int, choices=(5, NT), default=NT)
     main(p.parse_args())

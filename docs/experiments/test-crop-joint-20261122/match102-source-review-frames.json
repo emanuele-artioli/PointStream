@@ -1,0 +1,97 @@
+{
+  "source_sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+  "frames": 240,
+  "native_fps": "30000/1001",
+  "display": [
+    1920,
+    1080
+  ],
+  "opencv": "4.10.0",
+  "source_decoder": "VideoCapture CAP_FFMPEG BGR to RGB8",
+  "ticks": {
+    "9": {
+      "tick": 9,
+      "file": "source-009.png",
+      "png_sha256": "81bc12989dd3d0917dee584fc8324fcae8cf602b1f8bb192cd5c3b8ea6f75dda",
+      "typed_rgb_sha256": "8887387650e7193c47c99d215a90db739a9e6274fb68cd11e41c4b0a113652b8",
+      "raw_rgb_sha256": "9f3f141253819108961e30662cbbc84515c666a85f0382f4bd36dafc10cdfd8f"
+    },
+    "31": {
+      "tick": 31,
+      "file": "source-031.png",
+      "png_sha256": "8a9fbdd653d179453caf68fcbbab40a8511e36376fa38cd7f9fccae0d4109d43",
+      "typed_rgb_sha256": "a5712fbb73cc6db4661aad816931c153dec35c89b4569d36d64036a9f379e3be",
+      "raw_rgb_sha256": "c661718c3871c11c8770e2cc42a79570e23e78e7ac4cec230b56118b96e4c4f1"
+    },
+    "49": {
+      "tick": 49,
+      "file": "source-049.png",
+      "png_sha256": "5dda09f09e1bf4e5bbf11ec3001563a858a8c5846862e394f585accb2973da23",
+      "typed_rgb_sha256": "019392b9a1813e5ade8c4ab7ef63baee92d4f78d1338e47ecbf7d681a2ed7a8f",
+      "raw_rgb_sha256": "25065df4bf2151d5debe83ede6fc6d9db188a454550ce1a4231d2c5c239d4fc7"
+    },
+    "72": {
+      "tick": 72,
+      "file": "source-072.png",
+      "png_sha256": "be405f91034d0704f06dd24e76b09f7992c5dce3a1843a4d6c83ac47264e4e6a",
+      "typed_rgb_sha256": "ab11f92848e29d7e3b96b2dec1b60758c38c2d4de1b088b3246ff87e20ac1ad1",
+      "raw_rgb_sha256": "55a3d2a9f1db8467ad1724a069d5bbe09de9b39761e3589d055308914eebb9bd"
+    },
+    "95": {
+      "tick": 95,
+      "file": "source-095.png",
+      "png_sha256": "ae0cbc582950eb871b4747a456403bd35207510b82d528a5c8da1d5250d66646",
+      "typed_rgb_sha256": "e537d6cc8b5c05cdd10794fe4aec7bcc3c09cd5955b2c15a518f1289310cc247",
+      "raw_rgb_sha256": "b3bde7ea64e4f3db968ab1c18745ca38b8b3e9facfd8171531e93a91fea1b19d"
+    },
+    "112": {
+      "tick": 112,
+      "file": "source-112.png",
+      "png_sha256": "d5e83c83d22449db3f45e5a166cc4709065d707219468299f71aa54633e1bcae",
+      "typed_rgb_sha256": "f8c5e2abaa61be72fcc79c0a3fc34fd2fc4e73e6ca881660eade445abb9cecc9",
+      "raw_rgb_sha256": "baa3f53996e06ec8d89364cc13aff23df35b53c6e5d2a50054854561cfee4481"
+    },
+    "135": {
+      "tick": 135,
+      "file": "source-135.png",
+      "png_sha256": "96b2027e498b6f78a4c2ab9c1439e9468b7da9c63c3d7c369fffa807e35f1b2c",
+      "typed_rgb_sha256": "b6327f5337cef8a35b317a696d9179859ece5cad5f86a9c2c97d6295020ea75c",
+      "raw_rgb_sha256": "dade22509d42eefdc572494757ffab8b9c25124cfe5b1eccde0f84640f923ffc"
+    },
+    "152": {
+      "tick": 152,
+      "file": "source-152.png",
+      "png_sha256": "aa637fe734b81d95707f8d6eee401fb17c9e1332ad4585d32a88eb8a17bc1292",
+      "typed_rgb_sha256": "1fed61276caaf67f2db2399e28f1680e6ade13530be5ffa6b9951abfbc831390",
+      "raw_rgb_sha256": "4a82a208e8661230a3fcaa4d277f6628fda6215e59c4c46e780c0068b624030e"
+    },
+    "175": {
+      "tick": 175,
+      "file": "source-175.png",
+      "png_sha256": "39ed9777a56968caeb41d6d4bff1a90969c1c0947e2b3cfe6fb74d8681cbb818",
+      "typed_rgb_sha256": "70b32ab5e411e1493234c2546dcec384b55c18744b0e9aef1435c75d86bef3d9",
+      "raw_rgb_sha256": "b6e0e7dad72a19fca040e2fc2e0b0e19618c402a0a2ec64f6fe98f6a28e0f3b4"
+    },
+    "198": {
+      "tick": 198,
+      "file": "source-198.png",
+      "png_sha256": "b6a36d47410b9690429b8de5acca0c7f863f29ad08c9fadfc658bba2ed4a9f66",
+      "typed_rgb_sha256": "3ed30e85b76736da08ef1f2ca18b6d4817413eb7bfc2f4a2554a507e93f6c8b4",
+      "raw_rgb_sha256": "db46120ea6dba30dc0f0f32a7d702b5ba61ebb41c47c74e5d14c35d5c938e932"
+    },
+    "215": {
+      "tick": 215,
+      "file": "source-215.png",
+      "png_sha256": "2630218ce2bee6a6d378976311a7cae0cda7c0e221cde4d12328c5d7a1f7a650",
+      "typed_rgb_sha256": "a3751816fc49d24d8915c36c40b0e01a6392ad6c7648385d071bc8f0dbb4704d",
+      "raw_rgb_sha256": "4ca25b487d098d8ea879e5de9e225132889b5060e2847750045d9250e1850a42"
+    },
+    "238": {
+      "tick": 238,
+      "file": "source-238.png",
+      "png_sha256": "3d6e7ce4a414e0da4a5b11dfe89a46710a2fdd528887a61a496ea04e8ad1fd86",
+      "typed_rgb_sha256": "dc7b2afb506d310473e514c0fa2540f3d633e47de4f702efad38dc4bfade6fa4",
+      "raw_rgb_sha256": "afd808dfdb92ec3452c6681b146da4f031002d4cd11a7afed9a54c4c5381aa9b"
+    }
+  }
+}

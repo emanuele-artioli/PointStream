@@ -196,6 +196,8 @@ def score(a, arm, model, support, support_hash):
     before = time.monotonic()
     cpu0 = time.process_time()
     w, h = arm["width"], arm["height"]
+    count = getattr(a, "frames", NT)
+    source_hashes = getattr(a, "source_hashes", None)
     steps = []
     sse = 0.0
     self_abs = 0.0
@@ -203,10 +205,12 @@ def score(a, arm, model, support, support_hash):
         display, decoded_hash = prep(a, arm, Path(tmp))
         src = cv2.VideoCapture(str(a.source), cv2.CAP_FFMPEG)
         assert abs(src.get(cv2.CAP_PROP_FPS) - float(FPS)) < 0.001
-        for t in range(NT):
+        for t in range(count):
             ok, picture = src.read()
             assert ok
             rgb = cv2.cvtColor(picture, cv2.COLOR_BGR2RGB)
+            if source_hashes is not None and array_sha(rgb) != source_hashes[t]:
+                raise ValueError(f"Decoded original differs at native tick {t}")
             im = (
                 display[t]
                 if arm["kind"] in ("rgb_npy", "rgb_zseq")
@@ -238,10 +242,10 @@ def score(a, arm, model, support, support_hash):
                 )
             if t == 5:
                 forecast = (time.process_time() - cpu0) * 240 / 6 * 1.5
-                if forecast > 1700:
+                if forecast > getattr(a, "full_cap", 1700):
                     raise ValueError(f"CPU stage forecast too high: {forecast}")
         # The registered packet covers the first 240 native ticks of the longer rally file.
-        assert int(src.get(cv2.CAP_PROP_POS_FRAMES)) == NT
+        assert int(src.get(cv2.CAP_PROP_POS_FRAMES)) == count
         src.release()
 
     def group(rows):
@@ -263,7 +267,7 @@ def score(a, arm, model, support, support_hash):
         support_rle_sha256=support_hash,
         support_method="Original frozen SAM31 source supports, per-player DISTS on tight bounds plus 32 pixels; 2x replication of half-resolution binary masks.",
         native_fps=str(FPS),
-        frames=240,
+        frames=count,
         bytes=arm["bytes"],
         kbps=arm["bytes"] * float(FPS) / 30000,
         width=w,
@@ -275,7 +279,7 @@ def score(a, arm, model, support, support_hash):
         near=group([r for r in steps if r["role"] == "near"]),
         far=group([r for r in steps if r["role"] == "far"]),
         optional_review_ticks_on_source_model=group([r for r in steps if r["tick"] in REVIEW]),
-        whole_rgb_psnr=10 * math.log10(255**2 * NT * 1080 * 1920 * 3 / sse),
+        whole_rgb_psnr=10 * math.log10(255**2 * count * 1080 * 1920 * 3 / sse),
         source_self_abs=self_abs,
         cpu_seconds=time.process_time() - cpu0,
         benchmark_forecast=forecast,
