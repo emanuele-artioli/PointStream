@@ -20,6 +20,22 @@ SMOKE = {
 }
 
 
+# Both profiles use the first reviewed tick for the same source-image check.
+SOURCE_SMOKE = "0360ccc4ec8eea097f872285551080d36de520b8ec84ab4f0ccf30b5e9284a7a"
+PROFILES = {
+    "initial": (FRAMES, SMOKE),
+    "joint21": (
+        "f6936efec14c18624bccf16dcb3c0189f386fbb5a769f92d4366fe9f7e57a2d0",
+        {
+            "0360ccc4ec8eea097f872285551080d36de520b8ec84ab4f0ccf30b5e9284a7a",
+            "a0bfc3dd0f139b75e48e01f598fd7a146d4438d929f0fe212b69f3d850b17d8c",
+            "0b98bc0ef17519f354e2f219b99ac971a76607e8f764ef0bc7e146a6edbc4cc9",
+            "88beeebd4a276964760a4cb0fee4f57c5892d04465c57bd21c288b33e2dfa52c",
+        },
+    ),
+}
+
+
 def sha(path):
     digest = hashlib.sha256()
     with path.open("rb") as stream:
@@ -29,6 +45,7 @@ def sha(path):
 
 
 def run(args):
+    frame_hash, smoke_ids = PROFILES[args.profile]
     start = time.monotonic()
     scratch = Path(os.environ["PS_SCRATCH_DIR"])
     os.environ["YOLO_CONFIG_DIR"] = str(scratch / "yolo-config")
@@ -44,7 +61,7 @@ def run(args):
     torch.set_num_threads(1)
     torch.set_num_interop_threads(1)
     cv2.setNumThreads(1)
-    if sha(args.weight) != WEIGHT or sha(args.frames) != FRAMES:
+    if sha(args.weight) != WEIGHT or sha(args.frames) != frame_hash:
         raise ValueError("Staged input changed")
     path = scratch / "yolo26x-seg.pt"
     if path.resolve() != args.weight.resolve():
@@ -56,7 +73,7 @@ def run(args):
         assert len(archive.namelist()) == len(set(archive.namelist())) == 48
         names = sorted(archive.namelist())
         if args.count == 4:
-            names = [name for name in names if Path(name).stem in SMOKE]
+            names = [name for name in names if Path(name).stem in smoke_ids]
         started = time.monotonic()
         for name in names:
             data = archive.read(name)
@@ -102,7 +119,7 @@ def run(args):
     report = dict(
         rows=rows,
         weight=WEIGHT,
-        frames=FRAMES,
+        frames=frame_hash,
         ultralytics=ultralytics.__version__,
         torch=str(torch.__version__),
         setup_seconds=started - start,
@@ -113,7 +130,8 @@ def run(args):
     (publish / "predictions.json").write_text(json.dumps(report))
 
 
-def validate():
+def validate(profile):
+    frame_hash, smoke_ids = PROFILES[profile]
     import cv2
     import numpy as np
 
@@ -122,9 +140,11 @@ def validate():
         r = json.load(archive.extractfile("publish/predictions.json"))
     smoke = os.environ["PS_STAGE"] == "smoke"
     assert (
-        r["weight"] == WEIGHT and r["frames"] == FRAMES and len(r["rows"]) == (4 if smoke else 48)
+        r["weight"] == WEIGHT
+        and r["frames"] == frame_hash
+        and len(r["rows"]) == (4 if smoke else 48)
     )
-    assert SMOKE <= r["rows"].keys()
+    assert smoke_ids <= r["rows"].keys()
     for preds in r["rows"].values():
         for p in preds:
             x, y, w, h = p["rect"]
@@ -132,15 +152,12 @@ def validate():
             assert 0 <= x < x + w <= 1920 and 0 <= y < y + h <= 1080 and 0.25 <= p["score"] <= 1
             assert im.shape == (h, w) and np.count_nonzero(im) == p["pixels"] > 0
             assert np.all((im == 0) | (im == 255))
-    assert r["rows"]["0360ccc4ec8eea097f872285551080d36de520b8ec84ab4f0ccf30b5e9284a7a"]
+    assert r["rows"][SOURCE_SMOKE]
     forecast = r["setup_seconds"] + 18 * r["scoring_seconds"] + 65 if smoke else None
     checks = dict(
-        authenticated_inputs=r["weight"] == WEIGHT and r["frames"] == FRAMES,
+        authenticated_inputs=r["weight"] == WEIGHT and r["frames"] == frame_hash,
         complete_records=len(r["rows"]) == (4 if smoke else 48),
-        source_persons=len(
-            r["rows"]["0360ccc4ec8eea097f872285551080d36de520b8ec84ab4f0ccf30b5e9284a7a"]
-        )
-        > 0,
+        source_persons=len(r["rows"][SOURCE_SMOKE]) > 0,
         geometry_and_masks=True,
         time_budget=forecast is None or forecast < 1150,
     )
@@ -158,5 +175,6 @@ if __name__ == "__main__":
     p.add_argument("--weight", type=Path)
     p.add_argument("--count", type=int, choices=(4, 48))
     p.add_argument("--validate", action="store_true")
+    p.add_argument("--profile", choices=tuple(PROFILES), default="initial")
     args = p.parse_args()
-    validate() if args.validate else run(args)
+    validate(args.profile) if args.validate else run(args)

@@ -1,0 +1,10 @@
+{
+  "frames": "f6936efec14c18624bccf16dcb3c0189f386fbb5a769f92d4366fe9f7e57a2d0",
+  "smoke": {
+    "source": "0360ccc4ec8eea097f872285551080d36de520b8ec84ab4f0ccf30b5e9284a7a",
+    "ordinary": "a0bfc3dd0f139b75e48e01f598fd7a146d4438d929f0fe212b69f3d850b17d8c",
+    "neural": "0b98bc0ef17519f354e2f219b99ac971a76607e8f764ef0bc7e146a6edbc4cc9",
+    "joint": "88beeebd4a276964760a4cb0fee4f57c5892d04465c57bd21c288b33e2dfa52c"
+  },
+  "full_joint_rgb": "45bd0cec2f2c2b1b3169ffe313d73a89d9a9632fee839f641c8089c24a1ff392"
+}
