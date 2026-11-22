@@ -1,0 +1,281 @@
+{
+  "scope": "Three physical Sydney receivers at the cached 12,890-byte ceiling on the twelve fixed source ticks. The smallest measured effective ROI stream exceeds the ceiling.",
+  "source_sha256": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+  "review_sha256": "4da6f50fda72126756868d67c76cb9570e6190d968d81f559cdf4980bc78fb87",
+  "official_ball_sha256": "dd004f20ec88ca03a43f3ce6902cd4ef6565af8c53fed86e5062e248cc57e431",
+  "source_ticks": 240,
+  "sampled_ticks": 1,
+  "source_fps": [
+    60,
+    1
+  ],
+  "lpips_model": {
+    "metric": "LPIPS",
+    "net": "alex",
+    "torchmetrics": "1.9.0",
+    "heads": "/private/tmp/ps-20261119-scorer-addon/torchmetrics/functional/image/lpips_models/alex.pth",
+    "heads_sha256": "df73285e35b22355a2df87cdb6b70b343713b667eddbda73e1977e0c860835c0",
+    "backbone": "/Users/manu/.codex/visualizations/2026/11/01/01a196fe-ab4d-70f0-a4b4-6843ca289667/atlas-metric-models/checkpoints/alexnet-owt-7be5be79.pth",
+    "backbone_sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+    "pooling": "crop spatial map, bilinear to native crop, mean over source mask"
+  },
+  "dists_backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+  "runner_sha256": "488c94475e33fdb1d70f05b3eefe75e353bc46c526f2447000811a8153f2811c",
+  "torch": "2.8.0",
+  "opencv": "4.10.0",
+  "self_control": {
+    "dists": 1.1920928955078125e-07,
+    "lpips": 0.0,
+    "luma_ssim": 1.0,
+    "rgb_psnr": "infinite",
+    "rgb_ms_ssim": 0.9999999999999991,
+    "ms_ssim_implementation_difference": 2.5469239246511677e-06
+  },
+  "forecast_seconds": 112.69099699999998,
+  "cpu_seconds": 17.868887,
+  "arms": {
+    "joint-crf70": {
+      "bytes": 12890,
+      "kbps": 25.78,
+      "bitstream_sha256": "f9ab35e8d3cd6708e726fe57d9d7ba7cc8943285ac4535524491f5cfe0598384",
+      "rescore_manifest_sha256": "f9f45fa41d64e49e09bd6d340f0a359285dc891e28cdcb1c4c2a77959f3c5ce1",
+      "means": {
+        "player": {
+          "dists": 0.2890266180038452,
+          "lpips": 0.25752629339694977,
+          "luma_ssim": 0.3453890792353137,
+          "rgb_psnr": 13.728515170340302
+        },
+        "ball": {
+          "dists": 0.34829092025756836,
+          "lpips": 0.30238842964172363,
+          "luma_ssim": 0.6728258376491236,
+          "rgb_psnr": 17.606727632468573
+        },
+        "foreground": {
+          "dists": 0.3186587691307068,
+          "lpips": 0.2799573615193367,
+          "luma_ssim": 0.5091074584422186,
+          "rgb_psnr": 15.667621401404437
+        },
+        "whole": {
+          "luma_ssim": 0.7903403149498203,
+          "rgb_psnr": 19.829297418349576,
+          "rgb_ms_ssim": 0.745651169436742
+        }
+      },
+      "rows": [
+        {
+          "tick": 9,
+          "source_png_sha256": "8acccc1adbeba40f8fb62376eba43eabcae8dbf53af695791c8a0e3d8dad6eee",
+          "decoded_rgb_sha256": "1614b88697249e3b5cd57bfdd28c67f19af9d007798df4d8aade6204d1693280",
+          "regions": {
+            "person:000000000013": {
+              "dists": 0.32744717597961426,
+              "lpips": 0.25327640771865845,
+              "luma_ssim": 0.19763101481055667,
+              "rgb_psnr": 12.535832201989495
+            },
+            "person:000000000008": {
+              "dists": 0.25060606002807617,
+              "lpips": 0.2617761790752411,
+              "luma_ssim": 0.49314714366007073,
+              "rgb_psnr": 14.92119813869111
+            },
+            "ball": {
+              "dists": 0.34829092025756836,
+              "lpips": 0.30238842964172363,
+              "luma_ssim": 0.6728258376491236,
+              "rgb_psnr": 17.606727632468573
+            }
+          },
+          "foreground": {
+            "dists": 0.3186587691307068,
+            "lpips": 0.2799573615193367,
+            "luma_ssim": 0.5091074584422186,
+            "rgb_psnr": 15.667621401404437
+          },
+          "player": {
+            "dists": 0.2890266180038452,
+            "lpips": 0.25752629339694977,
+            "luma_ssim": 0.3453890792353137,
+            "rgb_psnr": 13.728515170340302
+          },
+          "ball": {
+            "dists": 0.34829092025756836,
+            "lpips": 0.30238842964172363,
+            "luma_ssim": 0.6728258376491236,
+            "rgb_psnr": 17.606727632468573
+          },
+          "whole": {
+            "luma_ssim": 0.7903403149498203,
+            "rgb_psnr": 19.829297418349576,
+            "rgb_ms_ssim": 0.745651169436742
+          }
+        }
+      ]
+    },
+    "ordinary-320-warm": {
+      "bytes": 12862,
+      "kbps": 25.724,
+      "bitstream_sha256": "53a4b5ba06ab41fc3aa339dcda46a1981fd42215c588708d7c58194e7f471592",
+      "rescore_manifest_sha256": "c188eab9f5b0f8b3d7f713caac3f030b36e7fc3ebb2cf6c7cda88d02846e019a",
+      "means": {
+        "player": {
+          "dists": 0.449136346578598,
+          "lpips": 0.6694290339946747,
+          "luma_ssim": 0.3904416432459137,
+          "rgb_psnr": 14.750295647394541
+        },
+        "ball": {
+          "dists": 0.3422471880912781,
+          "lpips": 0.3417819142341614,
+          "luma_ssim": 0.755703037048435,
+          "rgb_psnr": 20.060702894387266
+        },
+        "foreground": {
+          "dists": 0.39569176733493805,
+          "lpips": 0.505605474114418,
+          "luma_ssim": 0.5730723401471743,
+          "rgb_psnr": 17.405499270890903
+        },
+        "whole": {
+          "luma_ssim": 0.8337693440915512,
+          "rgb_psnr": 22.9733369939808,
+          "rgb_ms_ssim": 0.8896089273966342
+        }
+      },
+      "rows": [
+        {
+          "tick": 9,
+          "source_png_sha256": "8acccc1adbeba40f8fb62376eba43eabcae8dbf53af695791c8a0e3d8dad6eee",
+          "decoded_rgb_sha256": "974e7b36484153a8afbae972b858043799d25b81ab98a70205c8d0453b373feb",
+          "regions": {
+            "person:000000000013": {
+              "dists": 0.4917728900909424,
+              "lpips": 0.7371591329574585,
+              "luma_ssim": 0.26889941256790845,
+              "rgb_psnr": 13.871973866193972
+            },
+            "person:000000000008": {
+              "dists": 0.40649980306625366,
+              "lpips": 0.6016989350318909,
+              "luma_ssim": 0.5119838739239189,
+              "rgb_psnr": 15.628617428595108
+            },
+            "ball": {
+              "dists": 0.3422471880912781,
+              "lpips": 0.3417819142341614,
+              "luma_ssim": 0.755703037048435,
+              "rgb_psnr": 20.060702894387266
+            }
+          },
+          "foreground": {
+            "dists": 0.39569176733493805,
+            "lpips": 0.505605474114418,
+            "luma_ssim": 0.5730723401471743,
+            "rgb_psnr": 17.405499270890903
+          },
+          "player": {
+            "dists": 0.449136346578598,
+            "lpips": 0.6694290339946747,
+            "luma_ssim": 0.3904416432459137,
+            "rgb_psnr": 14.750295647394541
+          },
+          "ball": {
+            "dists": 0.3422471880912781,
+            "lpips": 0.3417819142341614,
+            "luma_ssim": 0.755703037048435,
+            "rgb_psnr": 20.060702894387266
+          },
+          "whole": {
+            "luma_ssim": 0.8337693440915512,
+            "rgb_psnr": 22.9733369939808,
+            "rgb_ms_ssim": 0.8896089273966342
+          }
+        }
+      ]
+    },
+    "dcvc-480-q26": {
+      "bytes": 12305,
+      "kbps": 24.61,
+      "bitstream_sha256": "c3d5581a90d2333768191df0f76ea91a992295c4ab0db3f08ef35665e8f382c4",
+      "rescore_manifest_sha256": "9616bea30a00c7bbe1bfa4a49fc611547ca6caaf203751af8d12438850a0c805",
+      "means": {
+        "player": {
+          "dists": 0.36074960231781006,
+          "lpips": 0.45815804600715637,
+          "luma_ssim": 0.5147190108221904,
+          "rgb_psnr": 18.14276175657399
+        },
+        "ball": {
+          "dists": 0.26715290546417236,
+          "lpips": 0.31056272983551025,
+          "luma_ssim": 0.8010020982646424,
+          "rgb_psnr": 21.878092011744947
+        },
+        "foreground": {
+          "dists": 0.3139512538909912,
+          "lpips": 0.3843603879213333,
+          "luma_ssim": 0.6578605545434164,
+          "rgb_psnr": 20.010426884159468
+        },
+        "whole": {
+          "luma_ssim": 0.8811209483567729,
+          "rgb_psnr": 25.403030181816277,
+          "rgb_ms_ssim": 0.9462921722966141
+        }
+      },
+      "rows": [
+        {
+          "tick": 9,
+          "source_png_sha256": "8acccc1adbeba40f8fb62376eba43eabcae8dbf53af695791c8a0e3d8dad6eee",
+          "decoded_rgb_sha256": "78134de3a83e860c233e1b62700708af23d277f8627a6da690d706ec6b22164c",
+          "regions": {
+            "person:000000000013": {
+              "dists": 0.39562278985977173,
+              "lpips": 0.5976255536079407,
+              "luma_ssim": 0.3609734956213964,
+              "rgb_psnr": 16.856514891442423
+            },
+            "person:000000000008": {
+              "dists": 0.3258764147758484,
+              "lpips": 0.31869053840637207,
+              "luma_ssim": 0.6684645260229845,
+              "rgb_psnr": 19.42900862170556
+            },
+            "ball": {
+              "dists": 0.26715290546417236,
+              "lpips": 0.31056272983551025,
+              "luma_ssim": 0.8010020982646424,
+              "rgb_psnr": 21.878092011744947
+            }
+          },
+          "foreground": {
+            "dists": 0.3139512538909912,
+            "lpips": 0.3843603879213333,
+            "luma_ssim": 0.6578605545434164,
+            "rgb_psnr": 20.010426884159468
+          },
+          "player": {
+            "dists": 0.36074960231781006,
+            "lpips": 0.45815804600715637,
+            "luma_ssim": 0.5147190108221904,
+            "rgb_psnr": 18.14276175657399
+          },
+          "ball": {
+            "dists": 0.26715290546417236,
+            "lpips": 0.31056272983551025,
+            "luma_ssim": 0.8010020982646424,
+            "rgb_psnr": 21.878092011744947
+          },
+          "whole": {
+            "luma_ssim": 0.8811209483567729,
+            "rgb_psnr": 25.403030181816277,
+            "rgb_ms_ssim": 0.9462921722966141
+          }
+        }
+      ]
+    }
+  }
+}
