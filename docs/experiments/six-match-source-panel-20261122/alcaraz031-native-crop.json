@@ -1,0 +1,133 @@
+{
+  "event": "alcaraz031",
+  "source_sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+  "prior_feature_archive_sha256": "060c9bf60a90015a3bd65f02f2e9a16027634c56a05642db23f080e4703d4cb5",
+  "frames": 240,
+  "selected_ids": [
+    "person:000000000006",
+    "person:000000000002"
+  ],
+  "median_height_px": {
+    "person:000000000006": 118.0,
+    "person:000000000002": 172.0
+  },
+  "tracks": {
+    "person:000000000006": {
+      "fitted": 240,
+      "mask": 240,
+      "missing": [],
+      "crop_confident_joints_min": 12,
+      "confident_joints_median": 16.0,
+      "whole_fitted": 205,
+      "setting": "crop1",
+      "shape": [
+        240,
+        17,
+        3
+      ],
+      "kp_sha256": "4f2b754d3c8e8837e7025f31fa021418be6e80fd137622311275732f216f626f",
+      "mask_box_sha256": "67a82b10705393e78ebfc440d1644883a8ce42e28e39b348407148d4bdf04287",
+      "npz_sha256": "21109e4cf20d1cd0d4aad222de53dc6282b1ce3570860f3585990eb94efe101a"
+    },
+    "person:000000000002": {
+      "fitted": 240,
+      "mask": 240,
+      "missing": [],
+      "crop_confident_joints_min": 8,
+      "confident_joints_median": 13.0,
+      "whole_fitted": 240,
+      "setting": "whole",
+      "shape": [
+        240,
+        17,
+        3
+      ],
+      "kp_sha256": "c5221bbc82d6251a8e00f1e70594d2ce347784da7c477eca09da85e47ad78de1",
+      "mask_box_sha256": "9cc511018ef381e9f290f89a0826c886e6ed62d2c736c3906839710ae667cab0",
+      "npz_sha256": "20895c27d44f93376c4b600251ae03970ef058d4e12f616b138ae4c31c0d765a"
+    }
+  },
+  "whole_frame_original": {
+    "person:000000000006": {
+      "mask": 240,
+      "paired": 205,
+      "missing": [
+        16,
+        24,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78
+      ]
+    },
+    "person:000000000002": {
+      "mask": 240,
+      "paired": 240,
+      "missing": []
+    }
+  },
+  "native_rgb_source_yuv_sha256": "f12a6e6e956aaaa4892c1cfa248a58155e4fc67cf691015f54ed921184cf9694",
+  "supported_rules": {
+    "crop_below_fraction": 0.15,
+    "pose": 0.25,
+    "joint": 0.5
+  },
+  "fitted_both": true,
+  "trained_weights_sha256": "013c43543b0751b8918486ba96e01ee44a59040683a07f96cc22bcc2cb7785f8",
+  "model": {
+    "ultralytics": "8.4.6",
+    "torch": "2.10.0+cu128",
+    "device": "NVIDIA RTX A6000",
+    "models": {
+      "yolo11x-pose": {
+        "path": "/local/users/emanuele/pointstream/cache/013c43543b0751b8918486ba96e01ee44a59040683a07f96cc22bcc2cb7785f8/yolo11x-pose.pt",
+        "sha256": "013c43543b0751b8918486ba96e01ee44a59040683a07f96cc22bcc2cb7785f8"
+      }
+    },
+    "imgsz": 1280,
+    "conf": 0.25,
+    "on_cuda": {
+      "yolo11x-pose": "cuda:0"
+    }
+  },
+  "gpu": {
+    "cuda": true,
+    "name": "NVIDIA RTX A6000",
+    "cuda_runtime": "12.8"
+  },
+  "crop_count": 240,
+  "yolo_inference_s": 2.430572069948539,
+  "registration_wall_s": 15.511181698995642,
+  "total_s": 30.460202129994286,
+  "estimate_full_s": 110.69030319499143,
+  "output_archive_sha256": "e274b4456306df14ca5a5421d3bf70acf8d458a270b739640984b3659f96f9ee"
+}
