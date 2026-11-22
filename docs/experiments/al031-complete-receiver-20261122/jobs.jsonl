@@ -30,3 +30,4 @@
 {"stage": "ordinary-retained-w480-q4280-qualified-host", "job": "20261122T140124Z-36074d5e", "code": "0d0be5bae9b50b9331ef525167d5c3aaf654ca26"}
 {"stage": "ordinary-retained-w480-q4265-qualified-host", "job": "20261122T141140Z-333f49e8", "code": "23d5b3a1873df8dab2b14c352bc701ac21a9aaa4"}
 {"stage": "two-window-continuous", "job": "20261122T141325Z-60c3e90d", "code": "6ac1b8d3e2d647f38a17b89f92478163e626248c"}
+{"stage": "fresh-primary-motion", "job": "20261122T142941Z-55d20fb3", "code": "5ce37c49f7f3d57cb58f8817ef0532adc3ec12a6"}
