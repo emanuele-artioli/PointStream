@@ -4,6 +4,8 @@ import argparse
 import json
 from pathlib import Path
 
+from src.pointstream.evaluation import anchor_sensitivity
+
 HERE = Path(__file__).resolve().parent
 
 
@@ -103,7 +105,41 @@ def main(a):
                     break_even_seconds=8 * qty["init_bytes"] / (1000 * diff) if diff > 0 else None,
                 )
             )
+    distance_ladders = {}
+    per_rung = {}
+    joint_rows = [r for r in bank if r["codec"] == "PointStream"]
+    if len(joint_rows) == 3:
+        for label, surcharge in ceilings.items():
+            offset = surcharge - qty["joint_bytes"]
+            curve = [(r["bytes"] + offset, -r["dists"]) for r in joint_rows]
+            distance_ladders[label] = {}
+            for codec in ("SVT-AV1", "SVT-AV1 ROI", "DCVC-UF"):
+                anchors = [r for r in bank if r["codec"] == codec]
+                if not anchors:
+                    continue
+                distance_ladders[label][codec] = anchor_sensitivity(
+                    curve, [(r["bytes"], -r["dists"]) for r in anchors]
+                )
+        for r in joint_rows:
+            per_rung[r["name"]] = {}
+            for label, surcharge in ceilings.items():
+                limit = r["bytes"] + surcharge - qty["joint_bytes"]
+                comps = {}
+                for codec in ("SVT-AV1", "SVT-AV1 ROI", "DCVC-UF"):
+                    eligible = [b for b in bank if b["codec"] == codec and b["bytes"] <= limit]
+                    if not eligible:
+                        continue
+                    best = min(eligible, key=lambda b: (b["dists"], b["bytes"]))
+                    comps[codec] = dict(
+                        name=best["name"],
+                        bytes=best["bytes"],
+                        dists=best["dists"],
+                        relative_percent_lower=100 * (1 - r["dists"] / best["dists"]),
+                    )
+                per_rung[r["name"]][label] = dict(ceiling_bytes=limit, controls=comps)
     result = dict(
+        body_dists_bd_rate=distance_ladders,
+        strict_at_each_rung=per_rung,
         source=paid["source_sha256"],
         native_frames=240,
         native_fps=paid["native_fps"],

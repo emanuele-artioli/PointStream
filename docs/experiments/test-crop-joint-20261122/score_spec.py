@@ -124,7 +124,7 @@ def make(a):
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--kind", choices=("calibration", "full", "rung"), required=True)
+    p.add_argument("--kind", choices=("calibration", "cold-neural", "full", "rung"), required=True)
     p.add_argument("--crf", type=int, default=50)
     p.add_argument("--producer", required=True)
     p.add_argument("--sha", required=True)

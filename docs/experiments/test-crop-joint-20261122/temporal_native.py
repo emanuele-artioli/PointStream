@@ -10,6 +10,7 @@ import time
 import cv2
 import numpy as np
 
+from experiments.tennis.player_requalification import array_sha
 from experiments.visor.h3 import dis_flow, warp
 from experiments.visor.h3b import luma
 from src.pointstream.tracked_patch import yuv_to_rgb
@@ -29,7 +30,7 @@ def main(a):
     assert len(arms) == len({x["name"] for x in arms})
     supports, support_hash = get_support(a.features)
     yy, xx = np.indices((544, 960), dtype=np.float32)
-    cap = cv2.VideoCapture(str(a.source), cv2.CAP_FFMPEG)
+    cap = cv2.VideoCapture(str(getattr(a, "source_pixels", a.source)), cv2.CAP_FFMPEG)
     assert abs(cap.get(cv2.CAP_PROP_FPS) - float(FPS)) < 0.001
     rows = {r["name"]: [] for r in arms}
     prev = {}
@@ -43,10 +44,14 @@ def main(a):
             images[r["name"]] = prep(a, r, work)[0]
             if isinstance(images[r["name"]], StreamingYUV):
                 scope.callback(images[r["name"]].close)
+        setup_seconds = time.process_time() - cpu0
+        scoring_start = time.process_time()
         for t in range(a.frames):
             ok, bgr = cap.read()
             assert ok
             rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
+            if getattr(a, "source_hashes", None) is not None:
+                assert array_sha(rgb) == a.source_hashes[t]
             image = cv2.resize(rgb, (960, 544), interpolation=cv2.INTER_AREA)
             g = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
             values = {"source": luma(image)}
@@ -86,7 +91,9 @@ def main(a):
                             )
                         )
                 if t == 4:
-                    forecast = 1.5 * (time.process_time() - cpu0) * NT / 5
+                    forecast = 1.5 * (
+                        setup_seconds + (time.process_time() - scoring_start) * NT / 5
+                    )
                     if forecast > 600:
                         raise ValueError(
                             f"temporal CPU stage forecast {forecast:.1f} s exceeds cap"

@@ -44,15 +44,24 @@ def record(args):
     start = time.monotonic()
     pub = work / "publish"
     pub.mkdir()
-    if args.kind == "calibration":
+    if args.kind in ("calibration", "cold-neural"):
         with tarfile.open(args.data) as z:
             original = json.load(z.extractfile("publish/result.json"))
+            reports = json.load(z.extractfile("publish/reports.json"))
         native = original["native"]
-        assert native["qp"] == 34 and native["accepted"] and native["size"] == [480, 272]
+        expected_q, size = (34, [480, 272]) if args.kind == "calibration" else (42, [960, 544])
+        assert native["qp"] == expected_q and native["accepted"] and native["size"] == size
+        assert original["source_sha256"] == grid["source_sha256"] and original["frames"] == 240
+        passes = [p for group in reports["decode"].values() for p in group["passes"]]
+        assert len(passes) == 4 and all(
+            p["yuv420_sha256"] == original["yuv_frames"]
+            and p["frame_sha256"] == original["yuv_frames"]
+            for p in passes
+        )
         arm = dict(
-            name="dcvc-480-q34",
-            width=480,
-            height=272,
+            name=f"dcvc-{size[0]}-q{expected_q}",
+            width=size[0],
+            height=size[1],
             bytes=native["bytes"],
             kind="yuv_tar",
             archive=str(args.data),
@@ -151,7 +160,7 @@ def validate(args):
         assert all(math.isfinite(r["body_dists"]) and r["area"] > 0 for r in result["rows"])
         scores = np.mean([r["body_dists"] for r in result["rows"]])
         assert abs(scores - result["pooled"]["dists"]) < 1e-8
-        if args.kind != "calibration":
+        if args.kind in ("full", "rung"):
             packet = json.load(z.extractfile("publish/review/manifest.json"))
             assert len(files) == 14 and set(map(int, packet["ticks"])) == set(harvest.TICKS)
             assert (
@@ -160,7 +169,9 @@ def validate(args):
             )
         else:
             assert len(files) == 1 and (
-                args.frames < 240 or abs(scores - result["cross_machine_calibration"]) < 0.0002
+                args.kind == "cold-neural"
+                or args.frames < 240
+                or abs(scores - result["cross_machine_calibration"]) < 0.0002
             )
     estimate = (
         1.5 * (timing["total_s"] - timing["score_s"] + timing["score_s"] * 240 / args.frames) + 60
@@ -179,7 +190,7 @@ def validate(args):
                     producer=args.producer_job,
                     scored_person_ticks=args.frames * 2,
                     source_self=True,
-                    review_samples=0 if args.kind == "calibration" else 12,
+                    review_samples=12 if args.kind in ("full", "rung") else 0,
                     forecast_s=estimate,
                 ),
             )
@@ -194,7 +205,7 @@ if __name__ == "__main__":
     for name in ("source", "weights", "features", "data", "source-pixels"):
         p.add_argument("--" + name, type=Path, required=True)
     p.add_argument("--receipt", type=Path)
-    p.add_argument("--kind", choices=("calibration", "full", "rung"), required=True)
+    p.add_argument("--kind", choices=("calibration", "cold-neural", "full", "rung"), required=True)
     p.add_argument("--frames", type=int, choices=(24, 240), required=True)
     p.add_argument("--crf", type=int, choices=(50, 60, 70), default=50)
     p.add_argument("--producer-job", required=True)
