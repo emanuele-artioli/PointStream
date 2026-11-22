@@ -42,10 +42,10 @@ def tensor(arr):
     return torch.from_numpy(np.ascontiguousarray(arr)).permute(2, 0, 1)[None].float() / 255
 
 
-def get_support(features):
-    crop = json.loads((HERE / "match102-result.json").read_text())
+def get_support(features, *, receipt=None, tracks=None):
+    crop = json.loads((receipt or (HERE / "match102-result.json")).read_text())
     assert sha(features) == crop["prior_feature_archive_sha256"]
-    prefix = "publish/test__match102@120/"
+    prefix = f"publish/test__{crop['event']}@120/"
     with tarfile.open(features) as archive:
         info = json.load(archive.extractfile(prefix + "features.json"))
         rle = archive.extractfile(prefix + "sam-masks.rle").read()
@@ -53,7 +53,8 @@ def get_support(features):
         path = Path(tmp) / "sam.rle"
         path.write_bytes(rle)
         clip = ClipMasks.load(path)
-    tracks = crop["selected_ids"]
+    tracks = crop["selected_ids"] if tracks is None else tracks
+    assert len(tracks) == 2 and set(tracks) == set(crop["selected_ids"])
     timeline = []
     for tick in range(NT):
         people = player_masks(clip.frames[tick], info["aliases"], tracks)
@@ -173,10 +174,12 @@ class StreamingYUV:
 
 def prep(a, arm, work):
     w, h = arm["width"], arm["height"]
+    fps = getattr(a, "fps", FPS)
+    cadence = (fps.numerator, fps.denominator)
     if arm["kind"] == "ivf_stream":
         path = Path(arm["path"])
         assert path.stat().st_size == arm["bytes"] and sha(path) == arm["sha256"]
-        packet._ivf(path.read_bytes(), w, h, (30000, 1001))
+        packet._ivf(path.read_bytes(), w, h, cadence)
         return StreamingYUV(path, arm), arm["decoded_sha256"]
     if arm["kind"] == "rgb_zseq":
         path = Path(arm["path"])
@@ -212,7 +215,7 @@ def prep(a, arm, work):
     path = work / "decoded.yuv"
     if arm["kind"] in ("ivf", "ivf_tar"):
         assert len(data) == arm["bytes"] and hashlib.sha256(data).hexdigest() == arm["sha256"]
-        packet._ivf(data, w, h, (30000, 1001))
+        packet._ivf(data, w, h, cadence)
         ivf = work / "source.ivf"
         ivf.write_bytes(data)
         subprocess.run(
@@ -240,6 +243,8 @@ def score(a, arm, model, support, support_hash):
     cpu0 = time.process_time()
     w, h = arm["width"], arm["height"]
     count = getattr(a, "frames", NT)
+    fps = getattr(a, "fps", FPS)
+    native_rgb_hashes = []
     source_hashes = getattr(a, "source_hashes", None)
     steps = []
     sse = 0.0
@@ -247,12 +252,13 @@ def score(a, arm, model, support, support_hash):
     with tempfile.TemporaryDirectory(dir=a.scratch) as tmp:
         display, decoded_hash = prep(a, arm, Path(tmp))
         src = cv2.VideoCapture(str(getattr(a, "source_pixels", a.source)), cv2.CAP_FFMPEG)
-        assert abs(src.get(cv2.CAP_PROP_FPS) - float(FPS)) < 0.001
+        assert abs(src.get(cv2.CAP_PROP_FPS) - float(fps)) < 0.001
         for t in range(count):
             ok, picture = src.read()
             assert ok
             rgb = cv2.cvtColor(picture, cv2.COLOR_BGR2RGB)
-            if source_hashes is not None and array_sha(rgb) != source_hashes[t]:
+            native_rgb_hashes.append(array_sha(rgb))
+            if source_hashes is not None and native_rgb_hashes[-1] != source_hashes[t]:
                 raise ValueError(f"Decoded original differs at native tick {t}")
             im = (
                 display[t]
@@ -312,10 +318,11 @@ def score(a, arm, model, support, support_hash):
         source_sha256=sha(a.source),
         support_rle_sha256=support_hash,
         support_method="Original frozen SAM31 source supports, per-player DISTS on tight bounds plus 32 pixels; 2x replication of half-resolution binary masks.",
-        native_fps=str(FPS),
+        native_fps=str(fps),
+        source_grid_sha256=hashlib.sha256("".join(native_rgb_hashes).encode("ascii")).hexdigest(),
         frames=count,
         bytes=arm["bytes"],
-        kbps=arm["bytes"] * float(FPS) / 30000,
+        kbps=arm["bytes"] * float(fps) / 30000,
         width=w,
         height=h,
         kind=arm["kind"],
@@ -324,7 +331,9 @@ def score(a, arm, model, support, support_hash):
         pooled=group(steps),
         near=group([r for r in steps if r["role"] == "near"]),
         far=group([r for r in steps if r["role"] == "far"]),
-        optional_review_ticks_on_source_model=group([r for r in steps if r["tick"] in REVIEW]),
+        optional_review_ticks_on_source_model=group(
+            [r for r in steps if r["tick"] in getattr(a, "review_ticks", REVIEW)]
+        ),
         whole_rgb_psnr=10 * math.log10(255**2 * count * 1080 * 1920 * 3 / sse),
         source_self_abs=self_abs,
         cpu_seconds=time.process_time() - cpu0,
