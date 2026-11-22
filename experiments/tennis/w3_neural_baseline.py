@@ -214,7 +214,7 @@ def probe_rate_kbps(a: argparse.Namespace, source: Path, work: Path, fps: int, p
     return kbps
 
 
-def code_point(a: argparse.Namespace, source: Path, work: Path, fps: int, n: int, point: dict[str, Any]) -> dict[str, Any]:
+def code_point(a: argparse.Namespace, source: Path, work: Path, fps: float, n: int, point: dict[str, Any]) -> dict[str, Any]:
     """Encode one point, decode its file in two separate processes; acceptance (a) and (b) of the deviation."""
     from experiments.tennis.k6 import downscaled_source
 
