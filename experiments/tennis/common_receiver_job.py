@@ -32,7 +32,7 @@ WEIGHT_PATHS = (
 
 
 def generation_forecast(
-    timing: dict, render_seconds: float, available: float, full_cap: int, margin: float = 1.25
+    timing: dict, render_seconds: float, available: float, full_cap: int, margin: float = 1.25, target_frames: int = 240
 ) -> dict:
     """Scale the actual 44-tick render, keeping measured initialization and isolation fixed."""
     wall = timing["worker_wall_seconds"]
@@ -41,16 +41,16 @@ def generation_forecast(
         or render_seconds > wall
     ):
         raise ValueError("invalid generation smoke clock")
-    if not math.isfinite(margin) or margin < 1.25:
+    if not math.isfinite(margin) or margin < 1.25 or target_frames not in (120, 240):
         raise ValueError("invalid forecast margin")
-    estimate = margin * (wall - render_seconds + render_seconds * 240 / 44) + 90
+    estimate = margin * (wall - render_seconds + render_seconds * target_frames / 44) + 90
     if estimate > min(full_cap, available - 60):
         raise ValueError(f"forecast {estimate:.1f}s exceeds full cap or remaining lifecycle")
     return {
         "forecast_seconds": estimate,
         "remaining_seconds": available,
         "full_cap_seconds": full_cap,
-        "basis": f"{margin}*(44-tick wall minus render-and-save + 240/44 times render-and-save) + 90; reserve 60s teardown",
+        "basis": f"{margin}*(44-tick wall minus render-and-save + {target_frames}/44 times render-and-save) + 90; reserve 60s teardown",
     }
 
 
@@ -115,7 +115,7 @@ def check_generated(args: argparse.Namespace, output: Path) -> tuple[dict, list[
         if (
             set(data.files) != {"t", "box", "crops"}
             or row["seed"] != unit["seed"]
-            or not np.array_equal(data["t"], np.arange(args.frames))
+            or not np.array_equal(data["t"], unit["t"][: args.frames])
             or not np.array_equal(data["box"], np.asarray(unit["boxes"][: args.frames]))
             or not replay.complete_crops(crops, args.frames)
             or len({replay.array_sha(frame) for frame in crops}) != row["distinct_frames"]
@@ -126,7 +126,7 @@ def check_generated(args: argparse.Namespace, output: Path) -> tuple[dict, list[
 
 def validate_args(args: argparse.Namespace) -> None:
     if (
-        args.frames != {"smoke": 44, "full": 240}.get(os.environ["PS_STAGE"])
+        args.frames != {"smoke": 44, "full": args.run_length}.get(os.environ["PS_STAGE"])
         or len(args.weight) != 8
         or len(args.deny) < 4
         or len(set(args.deny)) != len(args.deny)
@@ -137,8 +137,9 @@ def validate_args(args: argparse.Namespace) -> None:
         raise ValueError("carrier identity")
     profile = packet._embedded_profile(args.carrier.read_bytes())
     packet._profile(profile)
-    if args.unit not in profile["order"]:
-        raise ValueError("requested unit is absent from the paid carrier")
+    runs = [r for r in profile["runs"] if r["unit"] == args.unit]
+    if len(runs) != 1 or runs[0]["end"] - runs[0]["start"] != args.run_length:
+        raise ValueError("requested generation length differs from the paid player run")
 
 
 def bind_allocation(stage: Path) -> None:
@@ -249,8 +250,8 @@ def validate(parser: argparse.ArgumentParser) -> None:
     if args.frames == 44:
         available = dispatch["campaign_clock"]["budget_end"] - time.monotonic()
         profile = packet._embedded_profile(args.carrier.read_bytes())
-        margin = 1.5 if profile["recipe"]["fps"] == [25, 1] else 1.25
-        cost = generation_forecast(timing, row["render_and_save_seconds"], available, args.full_cap, margin)
+        margin = 1.5 if args.run_length == 120 or profile["recipe"]["fps"] == [25, 1] else 1.25
+        cost = generation_forecast(timing, row["render_and_save_seconds"], available, args.full_cap, margin, args.run_length)
     else:
         cost = actual_full_cost(timing, args.full_cap)
     report = {
@@ -276,7 +277,8 @@ def main() -> None:
     run.add_argument("--deny", type=Path, required=True, action="append")
     run.add_argument("--carrier-sha256", required=True)
     run.add_argument("--unit", required=True)
-    run.add_argument("--frames", type=int, choices=(44, 240), required=True)
+    run.add_argument("--frames", type=int, choices=(44, 120, 240), required=True)
+    run.add_argument("--run-length", type=int, choices=(120, 240), default=240)
     run.add_argument("--full-cap", required=True, type=int)
     sub.add_parser("validate-stage")
     args = parser.parse_args()

@@ -28,7 +28,10 @@ def launch(
     seconds: int,
     kind: str,
 ) -> dict:
-    if kind not in ("conditioning", "generation", "finish", "native") or not 1 <= seconds <= 2700:
+    if (
+        kind not in ("conditioning", "generation", "finish", "native", "mixed")
+        or not 1 <= seconds <= 2700
+    ):
         raise ValueError("unsupported worker or budget")
     expected = {"carrier", "manifest", "expected_sha256", "frames", "units"}
     required = [Path(worker_config["carrier"]), Path(worker_config["manifest"])]
@@ -38,10 +41,10 @@ def launch(
             Path(worker_config["fit"]),
             *(Path(v) for v in worker_config["weights"].values()),
         ]
-    if kind in ("finish", "native"):
+    if kind in ("finish", "native", "mixed"):
         expected = {"carrier", "carrier_sha256", "manifest", "ffmpeg"}
         required += [Path(worker_config["ffmpeg"])]
-    if kind == "finish":
+    if kind in ("finish", "mixed"):
         expected |= {"sam", "generated", "generation_receipts", "ticks"}
         required += [
             Path(worker_config["sam"]),
@@ -51,6 +54,9 @@ def launch(
                 for r in worker_config[k].values()
             ),
         ]
+    if kind == "mixed":
+        expected |= {"joint", "cache"}
+        required += [Path(worker_config["joint"]), Path(worker_config["cache"])]
     if (
         set(worker_config) != expected
         or set(inputs) != set(required)
@@ -83,7 +89,7 @@ def launch(
         namespaces={name: os.readlink("/proc/self/ns/" + name) for name in ("net", "user")},
     )
     encoded = json.dumps(config, sort_keys=True).encode()
-    env_sha = manifest.SAM_ENV if kind in ("finish", "native") else manifest.GEN_ENV
+    env_sha = manifest.SAM_ENV if kind in ("finish", "native", "mixed") else manifest.GEN_ENV
     interpreter = Path("/local/users/emanuele/pointstream/cache") / env_sha / "tree/bin/python"
     env = {
         k: v
@@ -138,7 +144,9 @@ def launch(
             f"{kind} worker exit {result.returncode}: {result.stderr[-2400:].decode(errors='replace')}"
         )
     publish = work / "result"
-    receipt = json.loads((publish / f"{kind}.json").read_text())
+    receipt = json.loads(
+        (publish / ("finish.json" if kind == "mixed" else f"{kind}.json")).read_text()
+    )
     if receipt["isolation"]["code_manifest_sha256"] != source_manifest[
         "manifest_sha256"
     ] or receipt["carrier_sha256"] != worker_config.get(
@@ -154,7 +162,7 @@ def worker(expected_hash: str) -> None:
     if hashlib.sha256(raw).hexdigest() != expected_hash:
         raise ValueError("configuration identity mismatch")
     config = json.loads(raw)
-    main_runtime = config["kind"] in ("native", "finish")
+    main_runtime = config["kind"] in ("native", "finish", "mixed")
     env_sha = manifest.SAM_ENV if main_runtime else manifest.GEN_ENV
     runtime = (Path("/local/users/emanuele/pointstream/cache") / env_sha / "tree").resolve(
         strict=True
@@ -175,7 +183,7 @@ def worker(expected_hash: str) -> None:
     output = Path(config["output"])
     if list(output.iterdir()):
         raise ValueError("worker needs empty scratch")
-    is_gpu = config["kind"] in ("generation", "finish")
+    is_gpu = config["kind"] in ("generation", "finish", "mixed")
     denied = [Path(p) for p in config["denied"]]
     limits = (config["seconds"],) * 2
     resource.setrlimit(resource.RLIMIT_CPU, limits)
@@ -268,7 +276,7 @@ def worker(expected_hash: str) -> None:
         from experiments.tennis import common_player_al028_finish as finish
 
         options["output"] = str(output / "result")
-        if config["kind"] == "finish":
+        if config["kind"] in ("finish", "mixed"):
             finish.run(options, isolation)
         else:
             from experiments.tennis import w8_receiver_finish as w8

@@ -17,6 +17,7 @@ import numpy as np
 from experiments.tennis import common_player_al028_finish as finish
 from experiments.tennis import common_al028_finish_isolation as isolation
 from experiments.tennis import common_receiver_manifest as manifest
+from experiments.tennis import med_mixed_channel as mixed
 from experiments.tennis import player_requalification as replay
 from experiments.tennis.common_receiver_job import (
     actual_full_cost,
@@ -44,10 +45,21 @@ def configure(args: argparse.Namespace) -> tuple[dict, list[Path]]:
         raise ValueError("incomplete receiver finish request")
     ffmpeg = Path(sys.prefix) / "bin/ffmpeg"
     files = [args.carrier, args.manifest, ffmpeg, args.sam]
+    mixed_config = {}
+    expected_units, expected_length = UNITS, 240
+    smoke_ticks = finish.SMOKE
+    if any((args.joint, args.cache, args.expected_yuv)):
+        if not all((args.joint, args.cache, args.expected_yuv)):
+            raise ValueError("joint packet, cache and independent native digest are required")
+        channel = mixed.decode(args.joint, args.cache, args.carrier, args.carrier_sha256)
+        expected_units, expected_length = tuple(channel["profile"]["order"]), 120
+        smoke_ticks = mixed.smoke_ticks(channel["start"])
+        mixed_config = {"joint": str(args.joint), "cache": str(args.cache)}
+        files.extend([args.joint, args.cache])
     configs: dict[str, dict] = {}
     receipts: dict[str, dict] = {}
     for unit, directory, seal_hash in args.generation:
-        if unit not in UNITS or unit in receipts:
+        if unit not in expected_units or unit in receipts:
             raise ValueError("unknown or duplicate generated player")
         prefix = Path(directory) / "publish"
         seal = prefix / "generation.json"
@@ -57,11 +69,11 @@ def configure(args: argparse.Namespace) -> tuple[dict, list[Path]]:
         (row,) = meta["outputs"]
         if (
             row["unit"] != unit
-            or meta["frames"] != 240
+            or meta["frames"] != expected_length
             or meta["carrier_sha256"] != args.carrier_sha256
             or row["crops_file"] != unit + ".npz"
         ):
-            raise ValueError("prior generation did not cover same 240 ticks and packet")
+            raise ValueError("prior generation did not cover required ticks and packet")
         crop = prefix / row["crops_file"]
         configs[unit] = {"path": str(crop), "sha256": row["crops_file_sha256"]}
         receipts[unit] = {"path": str(seal), "sha256": seal_hash}
@@ -74,7 +86,8 @@ def configure(args: argparse.Namespace) -> tuple[dict, list[Path]]:
         "sam": str(args.sam),
         "generated": configs,
         "generation_receipts": receipts,
-        "ticks": finish.SMOKE if count == 4 else finish.FULL,
+        "ticks": smoke_ticks if count == 4 else finish.FULL,
+        **mixed_config,
     }, files
 
 
@@ -83,6 +96,22 @@ def verify(output: Path, config: dict, denied: list[Path]) -> tuple[dict, list[P
     report = json.loads(receipt_path.read_text())
     ticks = config["ticks"]
     binding = manifest.verify(Path(config["manifest"]), config["carrier_sha256"])
+    channel = None
+    if "joint" in config:
+        channel = mixed.decode(
+            Path(config["joint"]),
+            Path(config["cache"]),
+            Path(config["carrier"]),
+            config["carrier_sha256"],
+        )
+        profile, geometry = channel["profile"], channel["geometry"]
+        if report["wire"] != channel["wire"]:
+            raise ValueError("paid packet dissection differs")
+    else:
+        profile, _, geometry = finish.geometry(
+            Path(config["carrier"]).read_bytes(), config["carrier_sha256"]
+        )
+    units = profile["order"]
     land = report["isolation"]
     if (
         report["ticks"] != ticks
@@ -96,7 +125,7 @@ def verify(output: Path, config: dict, denied: list[Path]) -> tuple[dict, list[P
         or report["total_receiver_bytes"]
         != Path(config["carrier"]).stat().st_size + binding["manifest_bytes"]
         or report["manifest_sha256"] != binding["manifest_sha256"]
-        or set(report["order"]) != set(UNITS)
+        or set(report["order"]) != set(units)
         or land["landlock_abi"] < 3
         or land["interfaces"] != ["lo"]
         or not land["mutation_denied"]
@@ -114,7 +143,7 @@ def verify(output: Path, config: dict, denied: list[Path]) -> tuple[dict, list[P
     if frames.dtype != np.uint8 or frames.shape != (len(ticks), 1080, 1920, 3):
         raise ValueError("composite RGB timeline")
     masks = {}
-    for unit in UNITS:
+    for unit in units:
         path = output / (unit + "-masks.npz")
         files.append(path)
         if replay.sha256(path) != report["mask_files"][unit]:
@@ -130,28 +159,33 @@ def verify(output: Path, config: dict, denied: list[Path]) -> tuple[dict, list[P
                 raise ValueError("receiver matte shape or ticks")
     cv2.setNumThreads(1)
     native = np.memmap(files[2], np.uint8, mode="r", shape=(240, 144, 160))
-    profile, _, geometry = finish.geometry(
-        Path(config["carrier"]).read_bytes(), config["carrier_sha256"]
-    )
-    if report["order"] != profile["order"] or report["yuv_sha256"] != finish.YUV_SHA:
+    if report["order"] != profile["order"] or (
+        channel is None and report["yuv_sha256"] != finish.YUV_SHA
+    ):
         raise ValueError("paid compositing order or native YUV identity")
     generated = {}
-    for name in UNITS:
+    for name in units:
         with np.load(config["generated"][name]["path"], allow_pickle=False) as stored:
             generated[name] = stored["crops"]
     for i, (tick, row) in enumerate(zip(ticks, report["rows"], strict=True)):
-        if row["frame_sha256"] != replay.array_sha(frames[i]) or set(row["status"]) != set(UNITS):
+        if row["frame_sha256"] != replay.array_sha(frames[i]) or set(row["status"]) != set(units):
             raise ValueError(f"composite digest or object disposition at {tick}")
-        expected = cv2.resize(
-            finish.yuv_to_rgb(native[tick], 160, 96, False),
-            (1920, 1080),
-            interpolation=cv2.INTER_CUBIC,
-        )
+        expected = mixed.canvas(native[tick], tick, channel)
+        local = tick if channel is None else tick - channel["start"]
+        in_run = channel is None or channel["start"] <= tick < channel["stop"]
         if row["base_sha256"] != replay.array_sha(expected):
             raise ValueError("native base differs at this tick")
         union = np.zeros(expected.shape[:2], bool)
         for name in profile["order"]:
-            x, y, w, h = finish.k6b.int_box(geometry[name][2][tick])
+            if not in_run:
+                if (
+                    masks[name][i].any()
+                    or row["projected_pixels"][name]
+                    or row["status"][name] != "missing_pose"
+                ):
+                    raise ValueError("a player was emitted on a conventional-fallback tick")
+                continue
+            x, y, w, h = finish.k6b.int_box(geometry[name][2][local])
             x0, y0, x1, y1 = max(0, x), max(0, y), min(1920, x + w), min(1080, y + h)
             count = 0
             if x1 > x0 and y1 > y0:
@@ -160,7 +194,7 @@ def verify(output: Path, config: dict, denied: list[Path]) -> tuple[dict, list[P
                     masks[name][i].astype(np.uint8), (w, h), interpolation=cv2.INTER_NEAREST
                 )[crop_roi].astype(bool)
                 count = int(mask.sum())
-                fg = cv2.resize(generated[name][tick], (w, h), interpolation=cv2.INTER_LANCZOS4)[
+                fg = cv2.resize(generated[name][local], (w, h), interpolation=cv2.INTER_LANCZOS4)[
                     crop_roi
                 ]
                 expected[y0:y1, x0:x1][mask] = fg[mask]
@@ -169,7 +203,7 @@ def verify(output: Path, config: dict, denied: list[Path]) -> tuple[dict, list[P
                 raise ValueError("published player coverage differs from projected mask")
         if int(union.sum()) != row["coverage_pixels"] or not np.array_equal(expected, frames[i]):
             raise ValueError(f"independent raster differs for tick {tick}")
-        for unit in UNITS:
+        for unit in units:
             status = row["status"][unit]
             area = row["projected_pixels"][unit]
             if (
@@ -187,7 +221,7 @@ def verify(output: Path, config: dict, denied: list[Path]) -> tuple[dict, list[P
                 raise ValueError(f"mask evidence/state differs at tick {tick}")
         if not row["coverage_pixels"] and row["base_sha256"] != row["frame_sha256"]:
             raise ValueError("unexplained change on fallback frame")
-    if not all(any(row["status"][name] == "composed" for row in report["rows"]) for name in UNITS):
+    if not all(any(row["status"][name] == "composed" for row in report["rows"]) for name in units):
         raise ValueError("missing learned reconstruction for a player")
     return report, files
 
@@ -205,10 +239,12 @@ def execute(args: argparse.Namespace) -> None:
         inputs=inputs,
         denied=args.deny,
         seconds=550 if args.ticks == 4 else args.full_cap,
-        kind="finish",
+        kind="mixed" if args.joint else "finish",
     )
     verify_start = time.monotonic()
-    _, files = verify(out, config, args.deny)
+    report, files = verify(out, config, args.deny)
+    if args.expected_yuv and report["yuv_sha256"] != args.expected_yuv:
+        raise ValueError("native YUV differs from independent sender dav1d decode")
     verify_seconds = time.monotonic() - verify_start
     tmp = stage / ".finish.tar"
     dest = stage / "published.tar"
@@ -244,13 +280,20 @@ def validate(parser: argparse.ArgumentParser) -> None:
         raise ValueError("finisher archive identity")
     with validation_workspace() as tmp:
         with tarfile.open(archive) as tar:
-            names = ["finish.json", "frames.npy", "base.yuv", *(u + "-masks.npz" for u in UNITS)]
-            if [m.name for m in tar.getmembers()] != ["publish/" + n for n in names] or not all(
-                m.isfile() and 0 < m.size < 2_000_000_000 for m in tar.getmembers()
-            ):
+            names = [
+                "finish.json",
+                "frames.npy",
+                "base.yuv",
+                *(u + "-masks.npz" for u in config["generated"]),
+            ]
+            if sorted(m.name for m in tar.getmembers()) != sorted(
+                "publish/" + n for n in names
+            ) or not all(m.isfile() and 0 < m.size < 2_000_000_000 for m in tar.getmembers()):
                 raise ValueError("finisher archive contents")
             tar.extractall(tmp, filter="data")
         report, _ = verify(Path(tmp) / "publish", config, request.deny)
+    if request.expected_yuv and report["yuv_sha256"] != request.expected_yuv:
+        raise ValueError("independent sender-native digest differs")
     if request.ticks == 240:
         cost = actual_full_cost(timing, request.full_cap)
     else:
@@ -300,6 +343,9 @@ def main() -> None:
     r = subs.add_parser("run")
     for name in ("carrier", "manifest", "sam"):
         r.add_argument("--" + name, type=Path, required=True)
+    r.add_argument("--joint", type=Path)
+    r.add_argument("--cache", type=Path)
+    r.add_argument("--expected-yuv")
     r.add_argument("--carrier-sha256", required=True)
     r.add_argument("--full-cap", type=int, required=True)
     r.add_argument("--ticks", type=int, choices=(4, 240), required=True)

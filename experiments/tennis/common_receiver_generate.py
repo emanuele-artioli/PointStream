@@ -36,7 +36,7 @@ def producer_sources() -> dict[str, str]:
 
 def conditioning(carrier: Path, expected_sha256: str, frames: int, units: list[str]):
     """Yield one production Renderer input at a time, including its packet-defined seed."""
-    if carrier.stat().st_size > 4 * 1024 * 1024 or frames not in (24, 44, 240):
+    if carrier.stat().st_size > 4 * 1024 * 1024 or frames not in (24, 44, 120, 240):
         raise ValueError('unsupported development window or oversized carrier')
     blob = carrier.read_bytes()
     if packet.wire.sha(blob) != expected_sha256:
@@ -48,8 +48,12 @@ def conditioning(carrier: Path, expected_sha256: str, frames: int, units: list[s
         raise ValueError('invalid selected player units')
     for name in units:
         runs = decoded[name]
-        if len(runs) != 1 or not np.array_equal(runs[0]['t'], np.arange(240)):
-            raise ValueError('requires continuous full-rally player')
+        if len(runs) != 1:
+            raise ValueError('expected one paid continuous player interval')
+        times = runs[0]['t']
+        if (len(times) not in (120, 240) or frames > len(times)
+                or not np.array_equal(times, np.arange(times[0], times[0] + len(times)))):
+            raise ValueError('expected a complete paid run of 120 or 240 native ticks')
         run = runs[0]
         poses = np.empty((frames, 784, 512, 3), np.uint8)
         for tick in range(frames):
