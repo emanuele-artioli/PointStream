@@ -1,0 +1,169 @@
+{
+  "deadline_utc": "2026-11-22T21:01:00+00:00",
+  "gate_observed_utc": "2026-11-22T20:32:16Z to 20:32:21Z",
+  "terminal_verified_utc": "2026-11-22T20:34:34.554323+00:00",
+  "jobs": [
+    {
+      "registration": {
+        "stage": "prefix-pair-0-legacy-decoder",
+        "job": "20261122T132555Z-d4bc6076",
+        "code": "39c936e73eb1ac897c1a647a13fc952dbef7e2b4"
+      },
+      "last_check": {
+        "job_id": "20261122T132555Z-d4bc6076",
+        "created": 1795353982.7501876,
+        "status": "pending",
+        "updated": 1795353982.750544,
+        "directory": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T132555Z-d4bc6076",
+        "gate": null,
+        "campaign_error": null
+      },
+      "cancel": {
+        "job_id": "20261122T132555Z-d4bc6076",
+        "created": 1795353982.7501876,
+        "status": "pending",
+        "updated": 1795353982.750544,
+        "cancellation_requested": true,
+        "directory": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T132555Z-d4bc6076",
+        "gate": null,
+        "campaign_error": null
+      },
+      "terminal": {
+        "job_id": "20261122T132555Z-d4bc6076",
+        "status": "cancelled",
+        "host": null,
+        "stage": null,
+        "minutes_since_start": null,
+        "minutes_since_progress": null,
+        "attention": true,
+        "unacknowledged_event_ids": [
+          "968becb145a256219ab19cf6eb9d8d1c"
+        ],
+        "events": [
+          {
+            "id": "968becb145a256219ab19cf6eb9d8d1c",
+            "kind": "terminal:cancelled"
+          }
+        ]
+      },
+      "allocated_gpu_seconds": 0,
+      "quality": null
+    },
+    {
+      "registration": {
+        "stage": "prefix-pair-1-legacy-decoder",
+        "job": "20261122T132646Z-28a8986d",
+        "code": "bdb98f5e7da626d1e781061912ceed4ced1a8609"
+      },
+      "last_check": {
+        "job_id": "20261122T132646Z-28a8986d",
+        "created": 1795354028.2338614,
+        "status": "pending",
+        "updated": 1795354028.2341404,
+        "directory": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T132646Z-28a8986d",
+        "gate": null,
+        "campaign_error": null
+      },
+      "cancel": {
+        "job_id": "20261122T132646Z-28a8986d",
+        "created": 1795354028.2338614,
+        "status": "pending",
+        "updated": 1795354028.2341404,
+        "cancellation_requested": true,
+        "directory": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T132646Z-28a8986d",
+        "gate": null,
+        "campaign_error": null
+      },
+      "terminal": {
+        "job_id": "20261122T132646Z-28a8986d",
+        "status": "cancelled",
+        "host": null,
+        "stage": null,
+        "minutes_since_start": null,
+        "minutes_since_progress": null,
+        "attention": true,
+        "unacknowledged_event_ids": [
+          "55f81c6ec20a50b58d0725153cb3b186"
+        ],
+        "events": [
+          {
+            "id": "55f81c6ec20a50b58d0725153cb3b186",
+            "kind": "terminal:cancelled"
+          }
+        ]
+      },
+      "allocated_gpu_seconds": 0,
+      "quality": null
+    }
+  ],
+  "remaining_time_decision": {
+    "historical_matched_24_frame_two_arm_gpu_reservations": [
+      {
+        "job": "20261122T091924Z-a6caa821",
+        "track": 4,
+        "state": "complete",
+        "seconds": 404.0904631614685
+      },
+      {
+        "job": "20261122T092121Z-2178c4b9",
+        "track": 6,
+        "state": "complete",
+        "seconds": 644.682959318161
+      }
+    ],
+    "previous_paired_score_cpu_seconds": 45.600992,
+    "source_q90_results_sha256": "31d3a571d99cf54e62a0313c6023fe1efde678ce5f72614b3f174e4b3f2d0fef",
+    "forecast_multiplier": 1.5,
+    "validator_lifecycle_margin_seconds": 75,
+    "serial_paired_forecast_seconds": 1716.5616217194442,
+    "latest_feasible_start_utc": "2026-11-22T20:32:23.438378+00:00",
+    "exclusive_placement": "gpu3, single qualified RTX A6000",
+    "decision": "Both corrected enrollments were still in queue at admission cutoff; closed before any GPU allocation.",
+    "fresh_240_reference_for_scale": [
+      {
+        "job": "20261122T115204Z-c485c799",
+        "role": "slowest complete fresh track, GPU reservation",
+        "seconds": 1782.7031230926514
+      },
+      {
+        "job": "20261122T125912Z-9361b447",
+        "role": "downstream composition, archive and verification, before scorer",
+        "seconds": 107.35306448800839
+      },
+      {
+        "job": "20261122T130937Z-98b93895",
+        "role": "240-frame complete display quality scorer",
+        "seconds": 477.9531012469961
+      }
+    ],
+    "additional_after_pilot_for_full_if_perfectly_parallel_tracks_seconds": 2368.009288827656
+  },
+  "measured": {
+    "prior_packet_sha256": "25a0496ee61a56b78627d4c4dc8162b3dfa4a8f6aab13b2115fcb5849e3785b5",
+    "prior_cache_bytes": 157517,
+    "native_decode_proof_job": "20261122T132235Z-4891ef51",
+    "native_decode_proof_passed": true,
+    "seconds_between_reference_frames": 25.16,
+    "delivered_video_seconds": 19.2,
+    "two_shot_reuse_kbps": 84.09,
+    "two_shot_refresh_kbps": 156.59,
+    "best_affordable_two_window_av1": {
+      "coding": "one_stream",
+      "kbps": 83.64791666666666,
+      "dists": 0.29329495628674823
+    },
+    "first_shot_dists": 0.3027506445844968,
+    "return_dists_needed_to_match": 0.28383926798899967,
+    "prior_return_generated_dists": null,
+    "physical_two_window_reuse_dists": null
+  },
+  "evidence_sha256": {
+    "jobs.jsonl": "a35a2bf7e247b754f0385c6ee7bbb8a89b0b69fd6b616943bdfd5f4bc025c63d",
+    "gpu-accounting-after-fresh.json": "3802e0c45ccc3d940e8f6a69d5b2db18829a164a310983d07477d8fb5a8faeec",
+    "fresh-full-finish-compact.json": "57c7cdd0b1fe22b6c7cc681e33044c1d69a6f6ce3e9fe419ae6d8b7ef8476576",
+    "fresh-joint-q50-scores.json": "1a910e1bece6c2a8b9667d9f3ea5f08b73cc37d990f78f34cf76efe703e21b5d",
+    "two-shot-price.json": "a4900efe56d5255a6541436f9b7eba1bda9f36389eae0a32555834067e1429da",
+    "fresh-two-shot-including-continuous.json": "4e707024aad6c0560594f7e77acfb107aed8a109b6a2776506460c45083ab68a",
+    "legacy-reference-native-proof.json": "ef4aa3c08a6efcc48afdc204fddf73b5a85d49aef417be242febb75583f52098"
+  }
+}
