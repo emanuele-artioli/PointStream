@@ -1,6 +1,6 @@
 {
   "source_files": 6,
-  "decoded_source_ticks": 1200,
+  "decoded_source_ticks": 1440,
   "input_event_count": 2,
   "rows": [
     {
@@ -80,7 +80,18 @@
       "rank": 2,
       "native_fps": "60/1",
       "source_sha256": "24023f10d3017d583fbd0dfb5a4dac2f04fb4492485eb0917cdc6acab7413c9c",
-      "status": "source screen pending"
+      "status": "court eligible",
+      "court_fits": 223,
+      "frames": 240,
+      "source_size": [
+        3840,
+        2160
+      ],
+      "output_size": [
+        1920,
+        1080
+      ],
+      "cpu_host_wall_sec": 457.3876972089929
     },
     {
       "tag": "djokovic_zverev-010",
