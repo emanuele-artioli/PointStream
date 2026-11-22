@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "device": "cpu",
+  "hosts": [
+    "gpu1",
+    "gpu2",
+    "gpu3",
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [],
+  "gpu_memory_mib": 0,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "local_storage_gib": 30,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.player_33_native_anchor"
+  ],
+  "arguments": [
+    "--source",
+    "{staged:source}",
+    "--frames",
+    "{frames}",
+    "--window",
+    "med024",
+    "--source-sha",
+    "4d602291ebea0fcb9698d86d3f93ce4c3076a13005e33079a82975b8b64605f2",
+    "--original-yuv",
+    "6d369add978de6caf939e8dd1b611df8d3f14943d500a9bfeb498a9cd04683cc",
+    "--control-stream",
+    "0393c129f62aa077f317f15c6d86f1a50ceb1d218d7967a3c6ea8f93c12474b5",
+    "--control-yuv",
+    "d774ce8b1f63221889466564a315013f96bdb116e07c5171b4c60f69057131a8",
+    "--crf",
+    "65"
+  ],
+  "staged_inputs": [
+    {
+      "name": "source",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/sources/medvedev_struff__024.mp4",
+      "sha256": "4d602291ebea0fcb9698d86d3f93ce4c3076a13005e33079a82975b8b64605f2",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/sources/medvedev_struff__024.mp4",
+      "sha256": "4d602291ebea0fcb9698d86d3f93ce4c3076a13005e33079a82975b8b64605f2"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "verify_staged_inputs": true,
+  "required_commands": [],
+  "scale": {
+    "frames": {
+      "smoke": 24,
+      "full": 240
+    }
+  },
+  "smoke": {
+    "seconds": 180,
+    "representative_basis": "24 native 50 fps source frames, original W7 conversion, actual historical and proposed ordinary AV1 encodes with full native independent decode and verified IVF frame counts."
+  },
+  "full": {
+    "seconds": 600
+  },
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.player_33_native_anchor",
+    "--validate",
+    "--window",
+    "med024",
+    "--source-sha",
+    "4d602291ebea0fcb9698d86d3f93ce4c3076a13005e33079a82975b8b64605f2",
+    "--original-yuv",
+    "6d369add978de6caf939e8dd1b611df8d3f14943d500a9bfeb498a9cd04683cc",
+    "--control-stream",
+    "0393c129f62aa077f317f15c6d86f1a50ceb1d218d7967a3c6ea8f93c12474b5",
+    "--control-yuv",
+    "d774ce8b1f63221889466564a315013f96bdb116e07c5171b4c60f69057131a8",
+    "--crf",
+    "65"
+  ],
+  "validator_seconds": 60,
+  "budget_seconds": 900,
+  "stall_seconds": 630,
+  "deadline": "2026-11-22T05:30:00Z",
+  "contention": {
+    "policy": "stop",
+    "resume_attempts": 0
+  }
+}

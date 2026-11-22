@@ -1,0 +1,69 @@
+{
+  "rows": [
+    {
+      "arm": "ordinary",
+      "pair": 0,
+      "seconds": 1.5908177499950398,
+      "parse_and_native_seconds": 0.038263458001893014,
+      "full_rgb_sha256": "f17085fc6c4fd9a17cbf0c0b00f63d93876d10a351ef994379b5191654e454fb",
+      "input_bytes": 12038
+    },
+    {
+      "arm": "trajectory",
+      "pair": 0,
+      "seconds": 3.1025871250021737,
+      "parse_and_native_seconds": 0.048770416993647814,
+      "full_rgb_sha256": "aef097238499c8ec0c2260dbfe638bf87362072803a301ade8a73da10c02ef37",
+      "input_bytes": 11979
+    },
+    {
+      "arm": "trajectory",
+      "pair": 1,
+      "seconds": 2.906156540993834,
+      "parse_and_native_seconds": 0.05259158299304545,
+      "full_rgb_sha256": "aef097238499c8ec0c2260dbfe638bf87362072803a301ade8a73da10c02ef37",
+      "input_bytes": 11979
+    },
+    {
+      "arm": "ordinary",
+      "pair": 1,
+      "seconds": 1.5599714160052827,
+      "parse_and_native_seconds": 0.03770549999899231,
+      "full_rgb_sha256": "f17085fc6c4fd9a17cbf0c0b00f63d93876d10a351ef994379b5191654e454fb",
+      "input_bytes": 12038
+    },
+    {
+      "arm": "ordinary",
+      "pair": 2,
+      "seconds": 1.5704928330087569,
+      "parse_and_native_seconds": 0.03494658300769515,
+      "full_rgb_sha256": "f17085fc6c4fd9a17cbf0c0b00f63d93876d10a351ef994379b5191654e454fb",
+      "input_bytes": 12038
+    },
+    {
+      "arm": "trajectory",
+      "pair": 2,
+      "seconds": 2.885060208995128,
+      "parse_and_native_seconds": 0.05376520899881143,
+      "full_rgb_sha256": "aef097238499c8ec0c2260dbfe638bf87362072803a301ade8a73da10c02ef37",
+      "input_bytes": 11979
+    }
+  ],
+  "mean_last_two_seconds": {
+    "ordinary": 1.5652321245070198,
+    "trajectory": 2.895608374994481
+  },
+  "opencv": "4.10.0",
+  "system": "macOS-26.6.2-arm64-arm-64bit",
+  "device": "Apple M1 Pro",
+  "decoder": {
+    "path": "/opt/homebrew/bin/dav1d",
+    "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+    "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+    "version": "1.5.4"
+  },
+  "input_receipt_sha256": "944782772f3f9b7b12cea448cb078d09215da906617dfc11c840cb77c2e1972e",
+  "script_sha256": "d8dd675143d1fefb73451e9bc38c3f3c0362f173bcd79a335c7cf198f8b22e46",
+  "duration": 4.8,
+  "frames": 240
+}
