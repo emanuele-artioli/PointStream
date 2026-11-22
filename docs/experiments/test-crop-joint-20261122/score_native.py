@@ -155,7 +155,10 @@ def prep(a, arm, work):
         assert [hashlib.sha256(frame.tobytes()).hexdigest() for frame in native] == arm[
             "frame_sha256"
         ]
-    return native, sha(path)
+    decoded_hash = sha(path)
+    if "decoded_sha256" in arm:
+        assert decoded_hash == arm["decoded_sha256"]
+    return native, decoded_hash
 
 
 def score(a, arm, model, support, support_hash):
