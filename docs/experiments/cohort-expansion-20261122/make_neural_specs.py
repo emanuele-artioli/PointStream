@@ -51,6 +51,6 @@ def create(directory, qp=24):
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("directory", type=Path)
-    p.add_argument("--qp", type=int, choices=(24, 36, 48), default=24)
+    p.add_argument("--qp", type=int, choices=(12, 24, 36, 48), default=24)
     args = p.parse_args()
     create(args.directory, args.qp)

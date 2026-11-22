@@ -115,7 +115,7 @@ if __name__ == "__main__":
     for key in ("neural-sha", "labels-sha"):
         p.add_argument("--" + key)
     p.add_argument("--frames", type=int)
-    p.add_argument("--qp", type=int, choices=(24, 36, 48), default=24)
+    p.add_argument("--qp", type=int, choices=(12, 24, 36, 48), default=24)
     p.add_argument("--validate", action="store_true")
     args = p.parse_args()
     validate() if args.validate else run(args)
