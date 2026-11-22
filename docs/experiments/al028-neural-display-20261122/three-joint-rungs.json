@@ -1,0 +1,621 @@
+{
+  "reconstruction_sha256": "2eb230df276f52780fd34a11331743c2895c3fe94bde05c6645dc0165ee33559",
+  "source_review_sha256": "fb41c943575b35e6ecec36916b8cfab41b8023744614a98681b7cce884681eee",
+  "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+  "forecast_cpu_seconds": 130.846336,
+  "cpu_seconds": 50.731738,
+  "rows": [
+    {
+      "tick": 10,
+      "arm": "joint-11",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 8480,
+          "dists": 0.3114035725593567
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 2788,
+          "dists": 0.2383730411529541
+        }
+      ],
+      "rgb_sse": 3478689537
+    },
+    {
+      "tick": 10,
+      "arm": "joint-20",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 8480,
+          "dists": 0.3070003390312195
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 2788,
+          "dists": 0.2320190668106079
+        }
+      ],
+      "rgb_sse": 1593800833
+    },
+    {
+      "tick": 10,
+      "arm": "joint-21",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 8480,
+          "dists": 0.30628782510757446
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 2788,
+          "dists": 0.2335180640220642
+        }
+      ],
+      "rgb_sse": 1589043520
+    },
+    {
+      "tick": 30,
+      "arm": "joint-11",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 7548,
+          "dists": 0.3068159222602844
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3300,
+          "dists": 0.31303870677948
+        }
+      ],
+      "rgb_sse": 3457963487
+    },
+    {
+      "tick": 30,
+      "arm": "joint-20",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 7548,
+          "dists": 0.29802924394607544
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3300,
+          "dists": 0.3065827488899231
+        }
+      ],
+      "rgb_sse": 1560232166
+    },
+    {
+      "tick": 30,
+      "arm": "joint-21",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 7548,
+          "dists": 0.29954373836517334
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3300,
+          "dists": 0.3074910044670105
+        }
+      ],
+      "rgb_sse": 1556636769
+    },
+    {
+      "tick": 50,
+      "arm": "joint-11",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 7300,
+          "dists": 0.3432895541191101
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3252,
+          "dists": 0.28575998544692993
+        }
+      ],
+      "rgb_sse": 3467598604
+    },
+    {
+      "tick": 50,
+      "arm": "joint-20",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 7300,
+          "dists": 0.33788466453552246
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3252,
+          "dists": 0.2749330997467041
+        }
+      ],
+      "rgb_sse": 1557899929
+    },
+    {
+      "tick": 50,
+      "arm": "joint-21",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 7300,
+          "dists": 0.33817005157470703
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3252,
+          "dists": 0.2742919921875
+        }
+      ],
+      "rgb_sse": 1553210595
+    },
+    {
+      "tick": 70,
+      "arm": "joint-11",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9956,
+          "dists": 0.31084877252578735
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3084,
+          "dists": 0.27571195363998413
+        }
+      ],
+      "rgb_sse": 3516028189
+    },
+    {
+      "tick": 70,
+      "arm": "joint-20",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9956,
+          "dists": 0.30196934938430786
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3084,
+          "dists": 0.2717251181602478
+        }
+      ],
+      "rgb_sse": 1605018822
+    },
+    {
+      "tick": 70,
+      "arm": "joint-21",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9956,
+          "dists": 0.3021818995475769
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3084,
+          "dists": 0.2698019742965698
+        }
+      ],
+      "rgb_sse": 1599109293
+    },
+    {
+      "tick": 90,
+      "arm": "joint-11",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9228,
+          "dists": 0.3017781376838684
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3120,
+          "dists": 0.32241272926330566
+        }
+      ],
+      "rgb_sse": 3515618953
+    },
+    {
+      "tick": 90,
+      "arm": "joint-20",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9228,
+          "dists": 0.30123090744018555
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3120,
+          "dists": 0.2989189028739929
+        }
+      ],
+      "rgb_sse": 1598138239
+    },
+    {
+      "tick": 90,
+      "arm": "joint-21",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9228,
+          "dists": 0.30217188596725464
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3120,
+          "dists": 0.3008112907409668
+        }
+      ],
+      "rgb_sse": 1592751617
+    },
+    {
+      "tick": 110,
+      "arm": "joint-11",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9540,
+          "dists": 0.28539133071899414
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3512,
+          "dists": 0.31694144010543823
+        }
+      ],
+      "rgb_sse": 3525979520
+    },
+    {
+      "tick": 110,
+      "arm": "joint-20",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9540,
+          "dists": 0.2773640751838684
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3512,
+          "dists": 0.3070670962333679
+        }
+      ],
+      "rgb_sse": 1608311745
+    },
+    {
+      "tick": 110,
+      "arm": "joint-21",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9540,
+          "dists": 0.2774229049682617
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3512,
+          "dists": 0.3056584596633911
+        }
+      ],
+      "rgb_sse": 1604110454
+    },
+    {
+      "tick": 130,
+      "arm": "joint-11",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 10400,
+          "dists": 0.2936136722564697
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3212,
+          "dists": 0.301597535610199
+        }
+      ],
+      "rgb_sse": 3566678001
+    },
+    {
+      "tick": 130,
+      "arm": "joint-20",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 10400,
+          "dists": 0.2940824031829834
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3212,
+          "dists": 0.29805612564086914
+        }
+      ],
+      "rgb_sse": 1650608014
+    },
+    {
+      "tick": 130,
+      "arm": "joint-21",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 10400,
+          "dists": 0.2932305932044983
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3212,
+          "dists": 0.29772311449050903
+        }
+      ],
+      "rgb_sse": 1644502311
+    },
+    {
+      "tick": 150,
+      "arm": "joint-11",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 8040,
+          "dists": 0.3175523281097412
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3352,
+          "dists": 0.2939119338989258
+        }
+      ],
+      "rgb_sse": 3549893018
+    },
+    {
+      "tick": 150,
+      "arm": "joint-20",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 8040,
+          "dists": 0.2961241602897644
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3352,
+          "dists": 0.28506922721862793
+        }
+      ],
+      "rgb_sse": 1637344543
+    },
+    {
+      "tick": 150,
+      "arm": "joint-21",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 8040,
+          "dists": 0.29613780975341797
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3352,
+          "dists": 0.2834647297859192
+        }
+      ],
+      "rgb_sse": 1632677482
+    },
+    {
+      "tick": 170,
+      "arm": "joint-11",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 8868,
+          "dists": 0.3011821508407593
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3136,
+          "dists": 0.33411139249801636
+        }
+      ],
+      "rgb_sse": 3534170407
+    },
+    {
+      "tick": 170,
+      "arm": "joint-20",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 8868,
+          "dists": 0.29643064737319946
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3136,
+          "dists": 0.3143587112426758
+        }
+      ],
+      "rgb_sse": 1617028573
+    },
+    {
+      "tick": 170,
+      "arm": "joint-21",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 8868,
+          "dists": 0.294575572013855
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3136,
+          "dists": 0.31545567512512207
+        }
+      ],
+      "rgb_sse": 1612592751
+    },
+    {
+      "tick": 190,
+      "arm": "joint-11",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9872,
+          "dists": 0.30169183015823364
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 4200,
+          "dists": 0.36719197034835815
+        }
+      ],
+      "rgb_sse": 3568242273
+    },
+    {
+      "tick": 190,
+      "arm": "joint-20",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9872,
+          "dists": 0.3016141653060913
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 4200,
+          "dists": 0.3480647802352905
+        }
+      ],
+      "rgb_sse": 1644210419
+    },
+    {
+      "tick": 190,
+      "arm": "joint-21",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9872,
+          "dists": 0.3026055097579956
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 4200,
+          "dists": 0.3469259738922119
+        }
+      ],
+      "rgb_sse": 1639821547
+    },
+    {
+      "tick": 210,
+      "arm": "joint-11",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9148,
+          "dists": 0.36229026317596436
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 4112,
+          "dists": 0.3034060001373291
+        }
+      ],
+      "rgb_sse": 3539438178
+    },
+    {
+      "tick": 210,
+      "arm": "joint-20",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9148,
+          "dists": 0.3500833511352539
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 4112,
+          "dists": 0.29815059900283813
+        }
+      ],
+      "rgb_sse": 1626772297
+    },
+    {
+      "tick": 210,
+      "arm": "joint-21",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9148,
+          "dists": 0.35112160444259644
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 4112,
+          "dists": 0.2975284457206726
+        }
+      ],
+      "rgb_sse": 1623796862
+    },
+    {
+      "tick": 230,
+      "arm": "joint-11",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9968,
+          "dists": 0.32746422290802
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3600,
+          "dists": 0.3536306619644165
+        }
+      ],
+      "rgb_sse": 3526398544
+    },
+    {
+      "tick": 230,
+      "arm": "joint-20",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9968,
+          "dists": 0.3266114592552185
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3600,
+          "dists": 0.34264522790908813
+        }
+      ],
+      "rgb_sse": 1625488848
+    },
+    {
+      "tick": 230,
+      "arm": "joint-21",
+      "body": [
+        {
+          "person": "archived-track-0",
+          "pixels": 9968,
+          "dists": 0.3257495164871216
+        },
+        {
+          "person": "archived-track-1",
+          "pixels": 3600,
+          "dists": 0.34174323081970215
+        }
+      ],
+      "rgb_sse": 1622613068
+    }
+  ]
+}

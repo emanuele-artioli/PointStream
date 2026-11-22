@@ -39,6 +39,11 @@ PANELS = [
         "Each panel holds the rendered players fixed and changes the transmitted background. Eight windows have a paired historical neural control. Rates use the corrected two-hour appearance and adaptation model. The nine windows span three physical matches.",
     ),
     (
+        "joint-players/joint-players-two-matches.pdf",
+        "What the complete receiver preserves across two rallies",
+        "Two people and the ball travel together. With cached appearance, player DISTS is lower than both baselines on each development rally. The second rally uses source-model masks and the strongest observed affordable ordinary AV1 resolution.",
+    ),
+    (
         "starved-choice/players-rate-quality.pdf",
         "Player fidelity at the available bandwidth",
         "One rally with common scoring. The low-rate joint points use a cleaned base, generated bodies and fitted ball. Solid red charges startup. Open red assumes valid player state. Both people have equal weight. At 20.450 kbps DCVC-UF scored 0.3924, versus 0.2617 at 21.545 kbps for joint cached delivery.",
@@ -345,6 +350,7 @@ def build(
             "architecture.pdf",
             "algorithms.pdf",
             "pooled-curve.pdf",
+            "joint-players-two-matches.pdf",
             "players-rate-quality.pdf",
             "ball-rate-quality.pdf",
             "ball-starved-640-controls.pdf",

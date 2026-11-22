@@ -1,0 +1,152 @@
+{
+  "source_sha256": "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934",
+  "source_review_sha256": "fb41c943575b35e6ecec36916b8cfab41b8023744614a98681b7cce884681eee",
+  "receiver_sha256": "2eb230df276f52780fd34a11331743c2895c3fe94bde05c6645dc0165ee33559",
+  "source_decoder": "4.10.0",
+  "rows": [
+    {
+      "tick": 10,
+      "review_png_sha256": "2dc4956942547f38bcf0c1e52b254167f712659645a6d0906173537c8fe8baf4",
+      "linux_png_sha256": "6181e982ab53416c974ba7ce85e45d15551b2700aeac1ce0e05eea762bbf4837",
+      "max_abs_channel_difference": 3,
+      "mean_absolute_channel_difference": 0.793172421553498,
+      "ordered_neighbour_errors": [
+        25.339664459228516,
+        0.5257070064544678,
+        29.731185913085938
+      ]
+    },
+    {
+      "tick": 30,
+      "review_png_sha256": "a99b5fd2ca280b297e52afdcea4fe740e8dd4da6a3f91ed788abee831dfbf867",
+      "linux_png_sha256": "b0c9bb4628ee4d00a4b304b9d56e9f260909fe50a5df7f02dde57b4d3c8137be",
+      "max_abs_channel_difference": 3,
+      "mean_absolute_channel_difference": 0.7877517361111112,
+      "ordered_neighbour_errors": [
+        32.958763122558594,
+        0.5277470350265503,
+        33.76640701293945
+      ]
+    },
+    {
+      "tick": 50,
+      "review_png_sha256": "00c883581ddfb58fcc0a1c7fda8eabe17cd56d1282f1fa463f9759bdb8f55df1",
+      "linux_png_sha256": "6d1eec69d068d76cad3566f1b979d0d09cad088fdd26a9545e23d295e4903b36",
+      "max_abs_channel_difference": 3,
+      "mean_absolute_channel_difference": 0.7888419495884774,
+      "ordered_neighbour_errors": [
+        37.74519729614258,
+        0.509508490562439,
+        37.13782501220703
+      ]
+    },
+    {
+      "tick": 70,
+      "review_png_sha256": "0c8e3476dadf552d9d95167c308ef8873178c8557ab22b9f1934946a143416db",
+      "linux_png_sha256": "34a6b2ab4ab812316ddf200ae4cda6ef7423cb154bcca5bd6b61cb625bad8e2a",
+      "max_abs_channel_difference": 3,
+      "mean_absolute_channel_difference": 0.7854767875514403,
+      "ordered_neighbour_errors": [
+        30.144556045532227,
+        0.5042689442634583,
+        28.086349487304688
+      ]
+    },
+    {
+      "tick": 90,
+      "review_png_sha256": "087e706695007964f98ff35f68f3476b5cfa50003c8d2e686d7fe57ddef35bb4",
+      "linux_png_sha256": "9138b9b448a725b421f6f27abcc7ae8742f5f88c913b7d3be774ae10862dd1f4",
+      "max_abs_channel_difference": 3,
+      "mean_absolute_channel_difference": 0.7949704218106995,
+      "ordered_neighbour_errors": [
+        31.806041717529297,
+        0.5171417593955994,
+        31.596912384033203
+      ]
+    },
+    {
+      "tick": 110,
+      "review_png_sha256": "74824569a50b5e6082d22112fd0d820ddbfdc78c3994fbea78fea6d7e356a875",
+      "linux_png_sha256": "046d22c8ce8bd2c861c15b9ab820ce2c27e2b7339f805ca5c27bfaee67a64d9f",
+      "max_abs_channel_difference": 3,
+      "mean_absolute_channel_difference": 0.8014580118312757,
+      "ordered_neighbour_errors": [
+        30.981151580810547,
+        0.5217335820198059,
+        34.54706954956055
+      ]
+    },
+    {
+      "tick": 130,
+      "review_png_sha256": "b4deedb74723d50ec49f4dd70afebd21887c1ddb9ae5a07690db5b33011b3814",
+      "linux_png_sha256": "d3eac5fa4cb1c17f254fd13a38f46f9138474d3bc991fdc78a9036560d8525ac",
+      "max_abs_channel_difference": 3,
+      "mean_absolute_channel_difference": 0.8012184927983539,
+      "ordered_neighbour_errors": [
+        39.541873931884766,
+        0.5151336789131165,
+        38.11546325683594
+      ]
+    },
+    {
+      "tick": 150,
+      "review_png_sha256": "fa54c303636d2e7f9ad9e79d2555d7f970e0b27ee4f60bf546856068d1b7dacb",
+      "linux_png_sha256": "fbb4b03993886b6cb0e43bcb62851f9234013035aad4f263b601eb5c77530860",
+      "max_abs_channel_difference": 3,
+      "mean_absolute_channel_difference": 0.800644129372428,
+      "ordered_neighbour_errors": [
+        28.70891761779785,
+        0.5308403372764587,
+        28.53256607055664
+      ]
+    },
+    {
+      "tick": 170,
+      "review_png_sha256": "775de78dafbd5a3ed0521c47676117d786585762ba9c3b6fb7032506a6e50c73",
+      "linux_png_sha256": "3f5403a6c67f4d9f143f088b190b4fda5c66f01212bd666df46f445c26c6b630",
+      "max_abs_channel_difference": 3,
+      "mean_absolute_channel_difference": 0.8023726851851852,
+      "ordered_neighbour_errors": [
+        42.54429244995117,
+        0.5229368209838867,
+        42.650421142578125
+      ]
+    },
+    {
+      "tick": 190,
+      "review_png_sha256": "889b8d2b470c8e51af08f653f693c0cfcb8b8dc8acd57b2d8caf2cecac3ee876",
+      "linux_png_sha256": "5be4a2e325bad29eb4e49853d0197f72a400f473f826830e90bc4535c9235887",
+      "max_abs_channel_difference": 3,
+      "mean_absolute_channel_difference": 0.8014128407921811,
+      "ordered_neighbour_errors": [
+        42.91922378540039,
+        0.5137625336647034,
+        44.30950164794922
+      ]
+    },
+    {
+      "tick": 210,
+      "review_png_sha256": "fc7e85e1c48685373641e0e3961dff03babbc9b55c75908633d453fa501041ac",
+      "linux_png_sha256": "df763a288167257fe26061cd719f88b75bc141c4276da5facdb68b63a22b9baa",
+      "max_abs_channel_difference": 3,
+      "mean_absolute_channel_difference": 0.8010323431069959,
+      "ordered_neighbour_errors": [
+        37.361061096191406,
+        0.5148064494132996,
+        36.6546745300293
+      ]
+    },
+    {
+      "tick": 230,
+      "review_png_sha256": "df8c253b591cb737e68491925d90c771f96946f5ef2f6e66e1951dff7018644a",
+      "linux_png_sha256": "a012f2622cf63a67260fe982f822975831cefc9b4f2b110531ac6fddf77e8dbf",
+      "max_abs_channel_difference": 3,
+      "mean_absolute_channel_difference": 0.8004592656893004,
+      "ordered_neighbour_errors": [
+        36.76176834106445,
+        0.5043976306915283,
+        38.577903747558594
+      ]
+    }
+  ]
+}

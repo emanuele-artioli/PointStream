@@ -12,7 +12,16 @@ import cv2
 import numpy as np
 import torch
 
-from score_bodies import EXPECTED, REVIEW, WEIGHTS, load_rgb, quality, sha, tensor
+from score_bodies import (
+    EXPECTED,
+    REVIEW,
+    WEIGHTS,
+    check_source_pair,
+    load_rgb,
+    quality,
+    sha,
+    tensor,
+)
 
 ARMS = {"ordinary": "av1_320_q52_75", "neural": "dcvc_q24", "joint": "joint-20"}
 
@@ -121,7 +130,10 @@ def run(a):
             path = a.receivers / "private-review" / (key + ".png")
             assert hashes[key] == sha(path)
             rgb[arm] = load_rgb(path)
-        assert np.array_equal(ref, rgb["self"])
+        check_source_pair(
+            t, REVIEW / src["source"], a.receivers / "private-review" / f"{t:03d}/source.png"
+        )
+        rgb["self"] = ref
         decisions.append(
             dict(
                 tick=t,

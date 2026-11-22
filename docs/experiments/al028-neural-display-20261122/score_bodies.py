@@ -31,6 +31,16 @@ def load_rgb(path):
     return cv2.cvtColor(cv2.imread(str(path), cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
 
 
+def check_source_pair(tick, review_path, receiver_path):
+    audit = json.loads((HERE / "source-rgb-audit.json").read_text())
+    row = next(r for r in audit["rows"] if r["tick"] == tick)
+    assert sha(review_path) == row["review_png_sha256"]
+    assert sha(receiver_path) == row["linux_png_sha256"]
+    assert (
+        row["max_abs_channel_difference"] <= 4 and np.argmin(row["ordered_neighbour_errors"]) == 1
+    )
+
+
 def tensor(rgb):
     return torch.from_numpy(np.ascontiguousarray(rgb)).permute(2, 0, 1)[None].float() / 255
 
@@ -87,7 +97,9 @@ def run(args):
                 assert sha(path) == reconstruction["private_review_png_sha256"][key]
                 pix = load_rgb(path)
                 if arm == "source":
-                    assert np.array_equal(pix, ref)
+                    check_source_pair(t, REVIEW / row["source"], path)
+                    if args.source_space == "receiver":
+                        ref = pix
                 else:
                     displays[
                         {"joint-20": "joint", "av1_320_q52_75": "ordinary", "dcvc_q24": "neural"}[
@@ -146,6 +158,7 @@ def run(args):
         weights_sha256=EXPECTED,
         metric=quality.dists_record(WEIGHTS),
         reconstruction_sha256=args.reconstruction_sha,
+        source_space=args.source_space,
     )
     with args.output.open("x") as f:
         json.dump(result, f, indent=2)
@@ -161,4 +174,5 @@ if __name__ == "__main__":
     )
     parser.add_argument("--joint-directory", type=Path)
     parser.add_argument("--reconstruction-sha")
+    parser.add_argument("--source-space", choices=("review", "receiver"), default="review")
     run(parser.parse_args())
