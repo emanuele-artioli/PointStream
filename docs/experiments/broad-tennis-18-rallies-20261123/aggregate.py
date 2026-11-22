@@ -10,6 +10,8 @@ import random
 from statistics import mean
 
 BASELINES = ("av1", "dcvc_uf")
+OPTIONAL_BASELINES = ("av1_roi",)
+ROUTES = ("joint", "ball", "conventional")
 METRIC_DIRECTIONS = {
     "dists": "lower",
     "lpips": "lower",
@@ -42,11 +44,20 @@ def summarize(by_match, draws):
 
 
 def validate_row(row, resolution):
-    if row["route"] not in ("joint", "ball", "conventional"):
-        raise ValueError("unknown delivery route")
-    if set(row["streams"]) != {"pointstream", *BASELINES}:
+    required = {"pointstream", *BASELINES}
+    streams = set(row["streams"])
+    if not required <= streams <= required.union(OPTIONAL_BASELINES):
         raise ValueError("expected one complete registered physical stream per codec family")
-    if row["ticks"] != list(range(*resolution)):
+    intervals = row["routes"]
+    start, stop = resolution
+    durations = Counter()
+    for interval in intervals:
+        mode = interval["mode"]
+        if mode not in ROUTES or interval["start"] != start or not start < interval["stop"] <= stop:
+            raise ValueError("delivery routes must partition the authentic native timeline")
+        durations[mode] += interval["stop"] - start
+        start = interval["stop"]
+    if start != stop or row["ticks"] != list(range(*resolution)):
         raise ValueError("delivery must cover every registered native frame")
     for arm in row["streams"].values():
         if not 0 < arm["bytes"] <= row["byte_ceiling"]:
@@ -60,13 +71,14 @@ def validate_row(row, resolution):
             ):
                 raise ValueError("unregistered metric or invalid score")
     ps = row["streams"]["pointstream"]
-    if row["route"] == "conventional" and not ps.get("fallback_codec"):
+    if durations["conventional"] and not ps.get("fallback_codec"):
         raise ValueError("conventional fallback needs a named delivered codec")
     for area in row["supports"]:
         if len(row["supports"][area]["sha256"]) != 64:
             raise ValueError("paired support lacks an identity")
         if any(area not in arm["scores"] for arm in row["streams"].values()):
             raise ValueError("all codec scores need the same support declarations")
+    return durations
 
 
 def aggregate(manifest, records, draws=10000):
@@ -86,6 +98,7 @@ def aggregate(manifest, records, draws=10000):
         raise ValueError("rally IDs must be distinct")
     seen = {}
     routes = Counter()
+    route_ticks = Counter()
     for row in records:
         name = row["rally_id"]
         if name not in enrolled or name in seen:
@@ -93,23 +106,27 @@ def aggregate(manifest, records, draws=10000):
         match, _, resolution = enrolled[name]
         if resolution is None or row["event_id"] != match:
             raise ValueError(f"record does not identify a frozen source rally {name}")
-        validate_row(row, resolution)
+        durations = validate_row(row, resolution)
         seen[name] = row
-        routes[row["route"]] += 1
+        route_ticks.update(durations)
+        routes[next(iter(durations)) if len(durations) == 1 else "mixed"] += 1
     out = {
         "enrolled": 18,
         "complete_deliveries": len(seen),
         "unresolved_rallies": sorted(set(enrolled) - seen.keys()),
         "routes": dict(routes),
+        "native_ticks_by_route": dict(route_ticks),
         "results": {},
     }
     if len(seen) != 18:
         return out
 
     targets = set.intersection(*(set(r["supports"]) for r in seen.values()))
+    available = set.intersection(*(set(r["streams"]) for r in seen.values()))
+    baselines = [b for b in (*BASELINES, *OPTIONAL_BASELINES) if b in available]
     for target in sorted(targets):
         for metric, direction in METRIC_DIRECTIONS.items():
-            for baseline in BASELINES:
+            for baseline in baselines:
                 by_match = {}
                 for name, row in seen.items():
                     streams = row["streams"]
