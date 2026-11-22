@@ -36,12 +36,12 @@ PANELS = [
     (
         "starved-choice/players-rate-quality.pdf",
         "Player fidelity at the available bandwidth",
-        "One rally with common scoring. The low-rate joint points use a cleaned base, generated bodies and fitted ball. Solid red charges startup. Open red assumes valid player state. Both people have equal weight.",
+        "One rally with common scoring. The low-rate joint points use a cleaned base, generated bodies and fitted ball. Solid red charges startup. Open red assumes valid player state. Both people have equal weight. At 20.450 kbps DCVC-UF scored 0.3924, versus 0.2617 at 21.545 kbps for joint cached delivery.",
     ),
     (
         "starved-choice/ball-rate-quality.pdf",
         "Ball fidelity at the available bandwidth",
-        "Source-fitted trajectory, native video, tracked-pixel and joint modes share the same 12 source-reviewed instants. The lower-left star represents a complete 19.965 kbps stream.",
+        "Source-fitted trajectory, native video, tracked-pixel and joint modes share the same 12 source-reviewed instants. The complete 19.965 kbps stream needs no player references. At 20.450 kbps DCVC-UF slightly leads the 21.545 kbps cached joint receiver on ball DISTS (0.3439 versus 0.3450).",
     ),
     (
         "selection/65kbps-regional-dists.pdf",
@@ -285,6 +285,7 @@ def build(
     if main_only:
         selected = {
             "architecture.pdf",
+            "algorithms.pdf",
             "player-rd-nine.pdf",
             "players-rate-quality.pdf",
             "ball-rate-quality.pdf",

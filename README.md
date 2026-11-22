@@ -1,9 +1,6 @@
 # PointStream
 
-PointStream researches object-centric semantic video coding for racket sports
-and egocentric hand-object video. It provides segmentation, codec and compositing
-components, scoped serialized-ball experiments, and a prospective complete-codec
-programme. Competitive end-to-end gains in both domains remain research goals.
+PointStream studies when to send object motion as points, when to send appearance, and when to keep conventional video. Its scene-selective architecture routes shots at the server. The receiver displays video and can expose decoded locations to an application. Tennis supplies the principal evaluation. The repository also contains experiments on egocentric hand–object video.
 
 Start with the [paper figure plan](PLAN.md) for measured figures, gaps and the next experiments. The [research brief](RESEARCH.md) summarizes the claims. The [codec endpoints](docs/codec-endpoint.md) describe encoding, decoding and inspection.
 

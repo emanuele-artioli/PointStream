@@ -59,14 +59,67 @@ for ax, name in zip(axes.flat, ORDER):
         for i, r in enumerate(window["rates"])
     ]
     assert abs(player[1][0] - windows[name]["rate_kbps"]) < 1e-9
+    recompose = None
+    if name == "al034":
+        extra = (DATA / "al034-recompose-result.json").read_bytes()
+        assert (
+            hashlib.sha256(extra).hexdigest()
+            == "ff2dac7379f9c3855d65c38a27b2ba1a99a15f1a96475bd7e5375da2c38eba74"
+        )
+        recompose = json.loads(extra)
+        assert len(recompose["records"]) == 80
+        player.append(
+            (
+                recompose["candidate"]["modeled_player_kbps"],
+                np.mean([x["player_dists"] for x in recompose["records"]]),
+            )
+        )
     ax.plot(*zip(*player), color="#16735c", marker="o", ms=4, lw=1.5)
     av1 = {}
     for policy, style in (("s2_o0", "--"), ("s4_o0", ":")):
         rows = score["analysis"]["by_policy"][policy]
         points = sorted((v["rate_kbps"], v["foreground_dists"]) for v in rows)
+        if recompose is not None and policy == "s2_o0":
+            points.append(
+                (
+                    recompose["candidate"]["base_kbps"],
+                    np.mean([x["plain_dists"] for x in recompose["records"]]),
+                )
+            )
+            points.sort()
         av1[policy] = points
         ax.plot(*zip(*points), color="#326a99", marker="x", ms=3.5, lw=1, ls=style)
     dcvc = sorted((v[1], v[5]) for v in windows[name]["dcvc_points"])
+    if name == "al034":
+        extra_raw = (DATA / "al034-dcvc33-result.json").read_bytes()
+        assert (
+            hashlib.sha256(extra_raw).hexdigest()
+            == "bfd4d5c052198ead5351d674dd829ee296ac6714c4af28d8d59cf482b259d759"
+        )
+        extra = json.loads(extra_raw)["windows"][0]["dcvc"][0]
+        assert extra["accepted"] and extra["frames"] == 240 and extra["identical_frame_hashes"]
+        dcvc.append((extra["kbps"], extra["mean"]["foreground_dists"]))
+        dcvc.sort()
+    if name == "med019":
+        extra_raw = (DATA / "med019-dcvc33-result.json").read_bytes()
+        assert (
+            hashlib.sha256(extra_raw).hexdigest()
+            == "b1ec2aafb0c5d84d7161f6d14e2b3cdcf75ccb5add4264d131ec011693ff937d"
+        )
+        extra = json.loads(extra_raw)["windows"][0]["dcvc"][0]
+        assert extra["accepted"] and extra["frames"] == 240 and extra["identical_frame_hashes"]
+        dcvc.append((extra["kbps"], extra["mean"]["foreground_dists"]))
+        dcvc.sort()
+    if name == "nad000":
+        extra_raw = (DATA / "nad000-dcvc33-result.json").read_bytes()
+        assert (
+            hashlib.sha256(extra_raw).hexdigest()
+            == "47be107f690bbe44ce5e566a1972c3225f57a45ae0d122c36490a9cdf61bd942"
+        )
+        extra = json.loads(extra_raw)["windows"][0]["dcvc"][0]
+        assert extra["accepted"] and extra["frames"] == 240 and extra["identical_frame_hashes"]
+        dcvc.append((extra["kbps"], extra["mean"]["foreground_dists"]))
+        dcvc.sort()
     if dcvc:
         ax.plot(*zip(*dcvc), color="#bd542e", marker="s", ms=3.5, lw=1.1)
         av = av1["s2_o0"] + av1["s4_o0"]
@@ -80,7 +133,8 @@ for ax, name in zip(axes.flat, ORDER):
         ax.text(
             0.98, 0.96, "DCVC unavailable", transform=ax.transAxes, ha="right", va="top", fontsize=8
         )
-    ax.set_title(name + ("  ·  unpaired" if not dcvc else ""), fontsize=10)
+    match = {"al": "Alcaraz–Hurkacz", "med": "Medvedev–Struff", "nad": "Nadal–Kyrgios"}[name[:-3]]
+    ax.set_title(f"{match} · rally {int(name[-3:])}", fontsize=10)
     ax.grid(alpha=0.18)
     ax.tick_params(labelsize=8)
     out.append(

@@ -16,7 +16,7 @@ def read(study, name):
 
 
 def main():
-    joint = read("cumulative-joint", "cumulative-package-receipt.json")
+    joint = read("cumulative-joint", "cumulative-package-v2-receipt.json")
     native = read("cumulative-joint", "same-gap-control-package-receipt.json")
     reference = read("passage-same-gap", "control.json")
     continuous = read("passage-native", "result-20.json")
