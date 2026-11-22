@@ -108,7 +108,11 @@ def summarize(data):
                 neural_psnr=ns["whole_rgb_psnr"],
                 neural_affordable=ns["bytes"] <= max(s["candidate_bytes"], s["ordinary_bytes"]),
             )
-        judge = data / f"{match}-judge.json"
+        judge = data / f"{match}-judge-ada-fixed.json"
+        if not judge.exists():
+            judge = data / f"{match}-judge-ada.json"
+        if not judge.exists():
+            judge = data / f"{match}-judge.json"
         if judge.exists():
             j = json.loads(judge.read_text())
             assert j["rgb_sha256"]["source"] == s["source_rgb_sha256"]

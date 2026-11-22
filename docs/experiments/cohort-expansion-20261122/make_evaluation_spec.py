@@ -86,7 +86,8 @@ def create(a):
         gpu = json.loads(
             (HERE.parent / "ball-matched-low-20261122/refit-judge-spec.json").read_text()
         )
-        r.pop("single_cpu_campaign", None)
+        assert gpu["single_cpu_campaign"]
+        r["single_cpu_campaign"] = True
         r.update(
             device="gpu",
             hosts=gpu["hosts"],
