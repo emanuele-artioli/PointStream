@@ -29,7 +29,7 @@ def launch(
     kind: str,
 ) -> dict:
     if (
-        kind not in ("conditioning", "generation", "finish", "native", "mixed")
+        kind not in ("conditioning", "generation", "finish", "native", "mixed", "rung")
         or not 1 <= seconds <= 2700
     ):
         raise ValueError("unsupported worker or budget")
@@ -41,7 +41,7 @@ def launch(
             Path(worker_config["fit"]),
             *(Path(v) for v in worker_config["weights"].values()),
         ]
-    if kind in ("finish", "native", "mixed"):
+    if kind in ("finish", "native", "mixed", "rung"):
         expected = {"carrier", "carrier_sha256", "manifest", "ffmpeg"}
         required += [Path(worker_config["ffmpeg"])]
     if kind in ("finish", "mixed"):
@@ -57,6 +57,13 @@ def launch(
     if kind == "mixed":
         expected |= {"joint", "cache"}
         required += [Path(worker_config["joint"]), Path(worker_config["cache"])]
+    if kind == "rung":
+        names = ("joint", "cache", "original_joint", "witness_frames", "witness_receipt")
+        expected |= {*names, "masks", "ticks"}
+        required += [
+            *(Path(worker_config[k]) for k in names),
+            *(Path(p) for p in worker_config["masks"].values()),
+        ]
     if (
         set(worker_config) != expected
         or set(inputs) != set(required)
@@ -89,14 +96,16 @@ def launch(
         namespaces={name: os.readlink("/proc/self/ns/" + name) for name in ("net", "user")},
     )
     encoded = json.dumps(config, sort_keys=True).encode()
-    env_sha = manifest.SAM_ENV if kind in ("finish", "native", "mixed") else manifest.GEN_ENV
+    env_sha = (
+        manifest.SAM_ENV if kind in ("finish", "native", "mixed", "rung") else manifest.GEN_ENV
+    )
     interpreter = Path("/local/users/emanuele/pointstream/cache") / env_sha / "tree/bin/python"
     env = {
         k: v
         for k, v in os.environ.items()
         if k in ("CUDA_VISIBLE_DEVICES", "PS_GPU_MEMORY_LIMIT_MIB", "LD_LIBRARY_PATH")
     }
-    if kind in ("conditioning", "native"):
+    if kind in ("conditioning", "native", "rung"):
         env["CUDA_VISIBLE_DEVICES"] = ""
     elif not env.get("CUDA_VISIBLE_DEVICES"):
         raise ValueError("missing allocated GPU")
@@ -162,7 +171,7 @@ def worker(expected_hash: str) -> None:
     if hashlib.sha256(raw).hexdigest() != expected_hash:
         raise ValueError("configuration identity mismatch")
     config = json.loads(raw)
-    main_runtime = config["kind"] in ("native", "finish", "mixed")
+    main_runtime = config["kind"] in ("native", "finish", "mixed", "rung")
     env_sha = manifest.SAM_ENV if main_runtime else manifest.GEN_ENV
     runtime = (Path("/local/users/emanuele/pointstream/cache") / env_sha / "tree").resolve(
         strict=True
@@ -278,6 +287,10 @@ def worker(expected_hash: str) -> None:
         options["output"] = str(output / "result")
         if config["kind"] in ("finish", "mixed"):
             finish.run(options, isolation)
+        elif config["kind"] == "rung":
+            from experiments.tennis import med_mixed_rung
+
+            med_mixed_rung.run(options, isolation)
         else:
             from experiments.tennis import w8_receiver_finish as w8
 

@@ -4,6 +4,8 @@ import argparse
 from hashlib import file_digest
 import json
 import math
+import struct
+import zlib
 from pathlib import Path
 import time
 
@@ -11,6 +13,7 @@ import cv2
 import numpy as np
 import torch
 
+from experiments.tennis.player_requalification import array_sha
 from src.codecs import quality
 from src.pointstream.tracked_patch import yuv_to_rgb
 
@@ -60,10 +63,19 @@ def main(a):
         path = Path(arm["path"])
         assert sha(path) == arm["sha256"]
         h, w = arm["height"], arm["width"]
+        seq = None
         rgb = arm["kind"] == "rgb_npy"
         if rgb:
             vid = np.load(path, mmap_mode="r", allow_pickle=False)
             assert vid.dtype == np.uint8 and vid.shape == (240, 1080, 1920, 3)
+        elif arm["kind"] == "rgb_zseq":
+            seq = path.open("rb")
+            receipt_path = Path(arm["receipt"])
+            assert sha(receipt_path) == arm["receipt_sha256"]
+            receipt = json.loads(receipt_path.read_text())
+            assert receipt["frames_sha256"] == arm["sha256"] and receipt["ticks"] == list(
+                range(240)
+            )
         else:
             assert arm["kind"] == "native_yuv420p" and path.stat().st_size == h * w * 240 * 3 // 2
             vid = np.memmap(path, np.uint8, "r", shape=(240, h * 3 // 2, w))
@@ -78,13 +90,19 @@ def main(a):
             assert ok
             src = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
             assert src.shape == (1080, 1920, 3)
-            image = (
-                vid[t]
-                if rgb
-                else cv2.resize(
+            if seq is not None:
+                size = struct.unpack(">I", seq.read(4))[0]
+                assert size + 4 == receipt["rows"][t]["wire_bytes"]
+                image = np.frombuffer(zlib.decompress(seq.read(size)), np.uint8).reshape(
+                    1080, 1920, 3
+                )
+                assert array_sha(image) == receipt["rows"][t]["frame_sha256"]
+            elif rgb:
+                image = vid[t]
+            else:
+                image = cv2.resize(
                     yuv_to_rgb(vid[t], w, h, False), (1920, 1080), interpolation=cv2.INTER_CUBIC
                 )
-            )
             bucket = int(not start <= t < start + 120)
             accumulated[bucket] += cv2.norm(src, image, cv2.NORM_L2SQR)
             for who in (0, 1):
@@ -109,6 +127,9 @@ def main(a):
                         f"per-arm CPU pilot projects {forecast:.1f} seconds above 1,500"
                     )
         cap.release()
+        if seq is not None:
+            assert not seq.read(1)
+            seq.close()
         assert len(scores) == schema["nonempty"]
 
         def mean(rows):

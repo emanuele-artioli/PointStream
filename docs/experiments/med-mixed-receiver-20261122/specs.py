@@ -21,7 +21,11 @@ def update_inputs(spec, rows):
 def main(a):
     result = json.loads((a.folder / "result.json").read_text())
     assert result["source_sha256"] == SOURCES[a.clip] and result["native_fps"] == 50
-    (chosen,) = [x for x in result["rates"] if x["crf"] == result["selected_crf"]]
+    (chosen,) = [
+        x
+        for x in result["rates"]
+        if x["crf"] == (a.crf if a.crf is not None else result["selected_crf"])
+    ]
     local = a.folder / f"crf{chosen['crf']}"
     prefix = DATA / "tennis" / f"med{a.clip}-mixed-20261122-{chosen['joint_sha256'][:12]}"
     files = [
@@ -42,7 +46,9 @@ def main(a):
         str(DATA / "tennis/k5b-2026-10-20/inputs/balltrack_best.state_dict.pt"),
     ]
     a.out.mkdir(parents=True, exist_ok=True)
-    if a.generation is None:
+    if a.stage_only:
+        pass
+    elif a.generation is None:
         for i, n in enumerate(names):
             sp = json.loads((OLD / "al028-receiver-4-a6000-2680-spec.json").read_text())
             args = sp["arguments"]
@@ -137,4 +143,6 @@ if __name__ == "__main__":
     p.add_argument("--folder", type=Path, required=True)
     p.add_argument("--out", type=Path, required=True)
     p.add_argument("--generation", type=Path)
+    p.add_argument("--crf", type=int)
+    p.add_argument("--stage-only", action="store_true")
     main(p.parse_args())
