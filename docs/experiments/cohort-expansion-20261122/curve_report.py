@@ -35,10 +35,18 @@ def analysis(grid, data):
         bd["dominance"] = rate_dominance(*family)
         per_event[m["match"]] = dict(visible=m["visible"], bd_rate=bd, points={})
     fixed_budget = []
+    starved_cohort = []
+    fixed_ids = set.intersection(*(set(r["matches"]) for r in grid["fixed_budget_support"]))
+    fixed_ids = [m for m in per_event if m in fixed_ids]
+    fixed_prices = sorted(
+        set(grid["grid_kbps"]) | {r["budget_kbps"] for r in grid["fixed_budget_support"]}
+    )
     scopes = [(price, list(per_event), plots) for price in grid["grid_kbps"]]
     scopes.extend(
         (r["budget_kbps"], r["matches"], fixed_budget) for r in grid["fixed_budget_support"]
     )
+    if fixed_ids:
+        scopes.extend((price, fixed_ids, starved_cohort) for price in fixed_prices)
     for budget, matches, output in scopes:
         n = len(matches)
         if n == 0:
@@ -89,7 +97,13 @@ def analysis(grid, data):
                 actual_candidate_range=[ranges[:, 1].min(), ranges[:, 1].max()],
             )
         )
-    return dict(grid=grid, pooled=plots, fixed_budget=fixed_budget, per_event=per_event)
+    return dict(
+        grid=grid,
+        pooled=plots,
+        fixed_budget=fixed_budget,
+        starved_cohort=starved_cohort,
+        per_event=per_event,
+    )
 
 
 def write_table(result, destination):
@@ -102,7 +116,11 @@ def write_table(result, destination):
         "| Scope | Budget, kbps | Coverage | AV1 DISTS | PS DISTS | PS − AV1 (95% interval) | PS wins | Oracle gain vs best fixed family |",
         "|---|---:|---:|---:|---:|---:|---:|---:|",
     ]
-    for key, label in (("pooled", "Common support"), ("fixed_budget", "Low-rate eligible")):
+    for key, label in (
+        ("pooled", "Common support"),
+        ("fixed_budget", "Low-rate eligible"),
+        ("starved_cohort", "Same low-rate cohort"),
+    ):
         for r in result[key]:
             count = r["count"]
             if not count:
@@ -154,11 +172,11 @@ def write_table(result, destination):
     destination.write_text("\n".join(rows))
 
 
-def plot(result, destination):
+def plot(result, destination, series="pooled"):
     plt.rcParams.update(
         {"font.size": 8, "pdf.fonttype": 42, "axes.spines.top": False, "axes.spines.right": False}
     )
-    p = result["pooled"]
+    p = result[series]
     x = [r["budget_kbps"] for r in p]
     fig, ax = plt.subplots(figsize=(4.6, 2.65), layout="constrained")
     for name, label, marker, color, ls in [
@@ -203,5 +221,7 @@ if __name__ == "__main__":
     result = analysis(json.loads(a.grid.read_text()), a.data)
     a.out.write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
     plot(result, a.figure)
+    if result["starved_cohort"]:
+        plot(result, a.figure.with_name(a.figure.name + "-starved"), "starved_cohort")
     if a.table:
         write_table(result, a.table)
