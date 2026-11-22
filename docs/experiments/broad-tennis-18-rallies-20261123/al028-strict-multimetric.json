@@ -1,0 +1,704 @@
+{
+  "means": {
+    "joint": {
+      "players": {
+        "dists": 0.3036761771548878,
+        "lpips": 0.30926183543422003,
+        "luma_ssim": 0.2422430375767562,
+        "rgb_psnr": 13.595069816305095
+      },
+      "ball": {
+        "dists": 0.24033908410505814,
+        "lpips": 0.27278701859441673,
+        "luma_ssim": 0.7236193374759056,
+        "rgb_psnr": 27.54662814037263
+      },
+      "equal_class": {
+        "dists": 0.27200763062997296,
+        "lpips": 0.2910244270143184,
+        "luma_ssim": 0.4829311875263309,
+        "rgb_psnr": 20.570848978338862
+      }
+    },
+    "av1": {
+      "players": {
+        "dists": 0.4579589068889618,
+        "lpips": 0.6098218953067606,
+        "luma_ssim": 0.35084406710499566,
+        "rgb_psnr": 16.12637468626435
+      },
+      "ball": {
+        "dists": 0.3308974721214988,
+        "lpips": 0.5327918854626742,
+        "luma_ssim": 0.7148027490715633,
+        "rgb_psnr": 25.551497145913547
+      },
+      "equal_class": {
+        "dists": 0.3944281895052303,
+        "lpips": 0.5713068903847174,
+        "luma_ssim": 0.5328234080882794,
+        "rgb_psnr": 20.83893591608895
+      }
+    }
+  },
+  "rows": [
+    {
+      "arm": "joint",
+      "tick": 10,
+      "region": "archived-track-0",
+      "dists": 0.30815374851226807,
+      "lpips": 0.3337770998477936,
+      "luma_ssim": 0.19347024425188492,
+      "rgb_psnr": 13.19808753400081
+    },
+    {
+      "arm": "joint",
+      "tick": 10,
+      "region": "archived-track-1",
+      "dists": 0.23050963878631592,
+      "lpips": 0.13195310533046722,
+      "luma_ssim": 0.28936860295806444,
+      "rgb_psnr": 14.70621145787364
+    },
+    {
+      "arm": "joint",
+      "tick": 10,
+      "region": "ball",
+      "dists": 0.33826059103012085,
+      "lpips": 0.5093321800231934,
+      "luma_ssim": 0.2752112586030233,
+      "rgb_psnr": 22.592075028527667
+    },
+    {
+      "arm": "av1",
+      "tick": 10,
+      "region": "archived-track-0",
+      "dists": 0.4132540225982666,
+      "lpips": 0.6428552269935608,
+      "luma_ssim": 0.38289715821796483,
+      "rgb_psnr": 16.3361614810179
+    },
+    {
+      "arm": "av1",
+      "tick": 10,
+      "region": "archived-track-1",
+      "dists": 0.41183191537857056,
+      "lpips": 0.48616090416908264,
+      "luma_ssim": 0.4111181022015413,
+      "rgb_psnr": 17.666514015073545
+    },
+    {
+      "arm": "av1",
+      "tick": 10,
+      "region": "ball",
+      "dists": 0.4217427968978882,
+      "lpips": 0.7502397894859314,
+      "luma_ssim": 0.2736585936115494,
+      "rgb_psnr": 21.804060396094282
+    },
+    {
+      "arm": "joint",
+      "tick": 30,
+      "region": "archived-track-0",
+      "dists": 0.29968178272247314,
+      "lpips": 0.35137930512428284,
+      "luma_ssim": 0.17587859079731308,
+      "rgb_psnr": 12.105270962693407
+    },
+    {
+      "arm": "joint",
+      "tick": 30,
+      "region": "archived-track-1",
+      "dists": 0.304778516292572,
+      "lpips": 0.2588849663734436,
+      "luma_ssim": 0.30564816634711545,
+      "rgb_psnr": 14.587412288768515
+    },
+    {
+      "arm": "joint",
+      "tick": 30,
+      "region": "ball",
+      "dists": 0.16187459230422974,
+      "lpips": 0.07755966484546661,
+      "luma_ssim": 0.8915787142032285,
+      "rgb_psnr": 28.06805874517494
+    },
+    {
+      "arm": "av1",
+      "tick": 30,
+      "region": "archived-track-0",
+      "dists": 0.4363534450531006,
+      "lpips": 0.6499139070510864,
+      "luma_ssim": 0.36679896966174885,
+      "rgb_psnr": 15.960193560023159
+    },
+    {
+      "arm": "av1",
+      "tick": 30,
+      "region": "archived-track-1",
+      "dists": 0.4989197850227356,
+      "lpips": 0.672976016998291,
+      "luma_ssim": 0.2400096365317813,
+      "rgb_psnr": 13.468151246440804
+    },
+    {
+      "arm": "av1",
+      "tick": 30,
+      "region": "ball",
+      "dists": 0.2735719084739685,
+      "lpips": 0.45662617683410645,
+      "luma_ssim": 0.865833846648731,
+      "rgb_psnr": 27.171715659047404
+    },
+    {
+      "arm": "joint",
+      "tick": 50,
+      "region": "archived-track-0",
+      "dists": 0.33921146392822266,
+      "lpips": 0.32317155599594116,
+      "luma_ssim": 0.20929505484752528,
+      "rgb_psnr": 12.32865820047124
+    },
+    {
+      "arm": "joint",
+      "tick": 50,
+      "region": "archived-track-1",
+      "dists": 0.2727341651916504,
+      "lpips": 0.24029693007469177,
+      "luma_ssim": 0.20452608989260562,
+      "rgb_psnr": 13.649726261177138
+    },
+    {
+      "arm": "joint",
+      "tick": 50,
+      "region": "ball",
+      "dists": 0.30851054191589355,
+      "lpips": 0.39543282985687256,
+      "luma_ssim": 0.6739072205544159,
+      "rgb_psnr": 24.670302953581228
+    },
+    {
+      "arm": "av1",
+      "tick": 50,
+      "region": "archived-track-0",
+      "dists": 0.4577596187591553,
+      "lpips": 0.7432926297187805,
+      "luma_ssim": 0.3794211753923303,
+      "rgb_psnr": 15.951422044743689
+    },
+    {
+      "arm": "av1",
+      "tick": 50,
+      "region": "archived-track-1",
+      "dists": 0.4922245144844055,
+      "lpips": 0.6457228064537048,
+      "luma_ssim": 0.1821669456622015,
+      "rgb_psnr": 15.301588170141606
+    },
+    {
+      "arm": "av1",
+      "tick": 50,
+      "region": "ball",
+      "dists": 0.34860891103744507,
+      "lpips": 0.5686356425285339,
+      "luma_ssim": 0.7046477457163898,
+      "rgb_psnr": 24.090664283225816
+    },
+    {
+      "arm": "joint",
+      "tick": 70,
+      "region": "archived-track-0",
+      "dists": 0.3009384274482727,
+      "lpips": 0.3895520865917206,
+      "luma_ssim": 0.20061652501558444,
+      "rgb_psnr": 13.146376982374617
+    },
+    {
+      "arm": "joint",
+      "tick": 70,
+      "region": "archived-track-1",
+      "dists": 0.26900458335876465,
+      "lpips": 0.17363037168979645,
+      "luma_ssim": 0.3020732673204714,
+      "rgb_psnr": 14.575350524823866
+    },
+    {
+      "arm": "joint",
+      "tick": 70,
+      "region": "ball",
+      "dists": 0.1265200972557068,
+      "lpips": 0.07247649133205414,
+      "luma_ssim": 0.9665100676911609,
+      "rgb_psnr": 32.129455208852036
+    },
+    {
+      "arm": "av1",
+      "tick": 70,
+      "region": "archived-track-0",
+      "dists": 0.43186360597610474,
+      "lpips": 0.6628714203834534,
+      "luma_ssim": 0.33756220505569634,
+      "rgb_psnr": 16.6029003618266
+    },
+    {
+      "arm": "av1",
+      "tick": 70,
+      "region": "archived-track-1",
+      "dists": 0.493472158908844,
+      "lpips": 0.6231215000152588,
+      "luma_ssim": 0.21679802488765348,
+      "rgb_psnr": 15.23201186830477
+    },
+    {
+      "arm": "av1",
+      "tick": 70,
+      "region": "ball",
+      "dists": 0.2893480658531189,
+      "lpips": 0.504559338092804,
+      "luma_ssim": 0.8894656208975643,
+      "rgb_psnr": 25.205690295763873
+    },
+    {
+      "arm": "joint",
+      "tick": 90,
+      "region": "archived-track-0",
+      "dists": 0.3014742136001587,
+      "lpips": 0.3200182616710663,
+      "luma_ssim": 0.27014378187067156,
+      "rgb_psnr": 13.34959547691631
+    },
+    {
+      "arm": "joint",
+      "tick": 90,
+      "region": "archived-track-1",
+      "dists": 0.3028201460838318,
+      "lpips": 0.2738857567310333,
+      "luma_ssim": 0.21643154597487002,
+      "rgb_psnr": 13.895917917745102
+    },
+    {
+      "arm": "joint",
+      "tick": 90,
+      "region": "ball",
+      "dists": 0.2813042998313904,
+      "lpips": 0.09531897306442261,
+      "luma_ssim": 0.7741626676051487,
+      "rgb_psnr": 29.139620328042774
+    },
+    {
+      "arm": "av1",
+      "tick": 90,
+      "region": "archived-track-0",
+      "dists": 0.42477738857269287,
+      "lpips": 0.5682474374771118,
+      "luma_ssim": 0.43759573680705854,
+      "rgb_psnr": 17.1289226556045
+    },
+    {
+      "arm": "av1",
+      "tick": 90,
+      "region": "archived-track-1",
+      "dists": 0.5532957315444946,
+      "lpips": 0.6650270223617554,
+      "luma_ssim": 0.19220273041478153,
+      "rgb_psnr": 14.142179740645137
+    },
+    {
+      "arm": "av1",
+      "tick": 90,
+      "region": "ball",
+      "dists": 0.3744767904281616,
+      "lpips": 0.4871797263622284,
+      "luma_ssim": 0.7432332772828563,
+      "rgb_psnr": 24.61412584323407
+    },
+    {
+      "arm": "joint",
+      "tick": 110,
+      "region": "archived-track-0",
+      "dists": 0.27728527784347534,
+      "lpips": 0.2684187591075897,
+      "luma_ssim": 0.26915586202858327,
+      "rgb_psnr": 14.144016664860303
+    },
+    {
+      "arm": "joint",
+      "tick": 110,
+      "region": "archived-track-1",
+      "dists": 0.30922257900238037,
+      "lpips": 0.24978774785995483,
+      "luma_ssim": 0.2367510880171948,
+      "rgb_psnr": 13.48463890061266
+    },
+    {
+      "arm": "joint",
+      "tick": 110,
+      "region": "ball",
+      "dists": 0.15230607986450195,
+      "lpips": 0.10252401232719421,
+      "luma_ssim": 0.954688598918418,
+      "rgb_psnr": 31.233685330950923
+    },
+    {
+      "arm": "av1",
+      "tick": 110,
+      "region": "archived-track-0",
+      "dists": 0.4170079231262207,
+      "lpips": 0.5424279570579529,
+      "luma_ssim": 0.4995353881653174,
+      "rgb_psnr": 17.705858738374456
+    },
+    {
+      "arm": "av1",
+      "tick": 110,
+      "region": "archived-track-1",
+      "dists": 0.5559492707252502,
+      "lpips": 0.668805718421936,
+      "luma_ssim": 0.17948664583783433,
+      "rgb_psnr": 13.830176010705726
+    },
+    {
+      "arm": "av1",
+      "tick": 110,
+      "region": "ball",
+      "dists": 0.30178511142730713,
+      "lpips": 0.4905230402946472,
+      "luma_ssim": 0.9323324239190064,
+      "rgb_psnr": 29.113350447054437
+    },
+    {
+      "arm": "joint",
+      "tick": 130,
+      "region": "archived-track-0",
+      "dists": 0.2930479049682617,
+      "lpips": 0.3811725378036499,
+      "luma_ssim": 0.27513228425272074,
+      "rgb_psnr": 12.81111996205822
+    },
+    {
+      "arm": "joint",
+      "tick": 130,
+      "region": "archived-track-1",
+      "dists": 0.29609984159469604,
+      "lpips": 0.21310129761695862,
+      "luma_ssim": 0.18960151621998683,
+      "rgb_psnr": 13.882436610087698
+    },
+    {
+      "arm": "joint",
+      "tick": 130,
+      "region": "ball",
+      "dists": 0.31965339183807373,
+      "lpips": 0.6351215839385986,
+      "luma_ssim": 0.45860805173646413,
+      "rgb_psnr": 23.551451450783244
+    },
+    {
+      "arm": "av1",
+      "tick": 130,
+      "region": "archived-track-0",
+      "dists": 0.43070435523986816,
+      "lpips": 0.5419565439224243,
+      "luma_ssim": 0.4763391927399203,
+      "rgb_psnr": 17.197629736849038
+    },
+    {
+      "arm": "av1",
+      "tick": 130,
+      "region": "archived-track-1",
+      "dists": 0.488084077835083,
+      "lpips": 0.6583551168441772,
+      "luma_ssim": 0.23532934490142227,
+      "rgb_psnr": 15.909435743052606
+    },
+    {
+      "arm": "av1",
+      "tick": 130,
+      "region": "ball",
+      "dists": 0.3421677350997925,
+      "lpips": 0.6582422852516174,
+      "luma_ssim": 0.47669521540605486,
+      "rgb_psnr": 23.870753152065983
+    },
+    {
+      "arm": "joint",
+      "tick": 150,
+      "region": "archived-track-0",
+      "dists": 0.2978430390357971,
+      "lpips": 0.3431755006313324,
+      "luma_ssim": 0.17816137560670375,
+      "rgb_psnr": 12.14718248794066
+    },
+    {
+      "arm": "joint",
+      "tick": 150,
+      "region": "archived-track-1",
+      "dists": 0.28530216217041016,
+      "lpips": 0.2661037743091583,
+      "luma_ssim": 0.26511649724553316,
+      "rgb_psnr": 14.221139351075546
+    },
+    {
+      "arm": "av1",
+      "tick": 150,
+      "region": "archived-track-0",
+      "dists": 0.42622995376586914,
+      "lpips": 0.6452418565750122,
+      "luma_ssim": 0.40662278301432214,
+      "rgb_psnr": 16.225985453782663
+    },
+    {
+      "arm": "av1",
+      "tick": 150,
+      "region": "archived-track-1",
+      "dists": 0.5588009357452393,
+      "lpips": 0.7725765705108643,
+      "luma_ssim": 0.22614510673529054,
+      "rgb_psnr": 14.545936316777821
+    },
+    {
+      "arm": "joint",
+      "tick": 170,
+      "region": "archived-track-0",
+      "dists": 0.29435890913009644,
+      "lpips": 0.3612412214279175,
+      "luma_ssim": 0.2787986681834066,
+      "rgb_psnr": 13.400018575821216
+    },
+    {
+      "arm": "joint",
+      "tick": 170,
+      "region": "archived-track-1",
+      "dists": 0.3148254156112671,
+      "lpips": 0.2844172418117523,
+      "luma_ssim": 0.19483821273243468,
+      "rgb_psnr": 14.312240348093859
+    },
+    {
+      "arm": "joint",
+      "tick": 170,
+      "region": "ball",
+      "dists": 0.19292408227920532,
+      "lpips": 0.20030926167964935,
+      "luma_ssim": 0.7952034974167725,
+      "rgb_psnr": 22.41433881196716
+    },
+    {
+      "arm": "av1",
+      "tick": 170,
+      "region": "archived-track-0",
+      "dists": 0.3830845355987549,
+      "lpips": 0.5300713181495667,
+      "luma_ssim": 0.5120997822049541,
+      "rgb_psnr": 17.887926060978938
+    },
+    {
+      "arm": "av1",
+      "tick": 170,
+      "region": "archived-track-1",
+      "dists": 0.5033478736877441,
+      "lpips": 0.7409136295318604,
+      "luma_ssim": 0.2789165642777125,
+      "rgb_psnr": 15.380188196260603
+    },
+    {
+      "arm": "av1",
+      "tick": 170,
+      "region": "ball",
+      "dists": 0.2534469962120056,
+      "lpips": 0.3402717113494873,
+      "luma_ssim": 0.842630363058738,
+      "rgb_psnr": 23.34547330842465
+    },
+    {
+      "arm": "joint",
+      "tick": 190,
+      "region": "archived-track-0",
+      "dists": 0.300997257232666,
+      "lpips": 0.36225730180740356,
+      "luma_ssim": 0.32491225765159804,
+      "rgb_psnr": 13.25829611138242
+    },
+    {
+      "arm": "joint",
+      "tick": 190,
+      "region": "archived-track-1",
+      "dists": 0.3458591103553772,
+      "lpips": 0.3712081015110016,
+      "luma_ssim": 0.1550866218728553,
+      "rgb_psnr": 12.657293670876133
+    },
+    {
+      "arm": "joint",
+      "tick": 190,
+      "region": "ball",
+      "dists": 0.11823534965515137,
+      "lpips": 0.037374045699834824,
+      "luma_ssim": 0.9823672278340569,
+      "rgb_psnr": 33.90630098774946
+    },
+    {
+      "arm": "av1",
+      "tick": 190,
+      "region": "archived-track-0",
+      "dists": 0.37539392709732056,
+      "lpips": 0.4887619614601135,
+      "luma_ssim": 0.5714362211762144,
+      "rgb_psnr": 18.037346524355293
+    },
+    {
+      "arm": "av1",
+      "tick": 190,
+      "region": "archived-track-1",
+      "dists": 0.5182747840881348,
+      "lpips": 0.5971125960350037,
+      "luma_ssim": 0.26488434272988043,
+      "rgb_psnr": 14.540330248051843
+    },
+    {
+      "arm": "av1",
+      "tick": 190,
+      "region": "ball",
+      "dists": 0.28330135345458984,
+      "lpips": 0.49151384830474854,
+      "luma_ssim": 0.9565858321437103,
+      "rgb_psnr": 29.57658125762571
+    },
+    {
+      "arm": "joint",
+      "tick": 210,
+      "region": "archived-track-0",
+      "dists": 0.350822389125824,
+      "lpips": 0.3867741525173187,
+      "luma_ssim": 0.23101014029680697,
+      "rgb_psnr": 12.864617581349352
+    },
+    {
+      "arm": "joint",
+      "tick": 210,
+      "region": "archived-track-1",
+      "dists": 0.2980532646179199,
+      "lpips": 0.3208964765071869,
+      "luma_ssim": 0.2927788259102437,
+      "rgb_psnr": 14.607486442026731
+    },
+    {
+      "arm": "joint",
+      "tick": 210,
+      "region": "ball",
+      "dists": 0.38458961248397827,
+      "lpips": 0.7661274671554565,
+      "luma_ssim": 0.23975806778519765,
+      "rgb_psnr": 19.47366966868415
+    },
+    {
+      "arm": "av1",
+      "tick": 210,
+      "region": "archived-track-0",
+      "dists": 0.4103084206581116,
+      "lpips": 0.5651652812957764,
+      "luma_ssim": 0.4293342132862653,
+      "rgb_psnr": 16.56725221943528
+    },
+    {
+      "arm": "av1",
+      "tick": 210,
+      "region": "archived-track-1",
+      "dists": 0.48500412702560425,
+      "lpips": 0.5674611926078796,
+      "luma_ssim": 0.2375108284615679,
+      "rgb_psnr": 14.978888389018497
+    },
+    {
+      "arm": "av1",
+      "tick": 210,
+      "region": "ball",
+      "dists": 0.3352525234222412,
+      "lpips": 0.7079669833183289,
+      "luma_ssim": 0.26889233700646376,
+      "rgb_psnr": 20.877001282582984
+    },
+    {
+      "arm": "joint",
+      "tick": 230,
+      "region": "archived-track-0",
+      "dists": 0.32601869106292725,
+      "lpips": 0.4582631289958954,
+      "luma_ssim": 0.2568144303677496,
+      "rgb_psnr": 13.092172648310648
+    },
+    {
+      "arm": "joint",
+      "tick": 230,
+      "region": "archived-track-1",
+      "dists": 0.34497857093811035,
+      "lpips": 0.34967297315597534,
+      "luma_ssim": 0.25701504987894935,
+      "rgb_psnr": 15.0345908363882
+    },
+    {
+      "arm": "joint",
+      "tick": 230,
+      "region": "ball",
+      "dists": 0.2595512866973877,
+      "lpips": 0.10908069461584091,
+      "luma_ssim": 0.9478173398870752,
+      "rgb_psnr": 35.83395102978534
+    },
+    {
+      "arm": "av1",
+      "tick": 230,
+      "region": "archived-track-0",
+      "dists": 0.42417246103286743,
+      "lpips": 0.6251307129859924,
+      "luma_ssim": 0.5023977238346832,
+      "rgb_psnr": 17.565116804295872
+    },
+    {
+      "arm": "av1",
+      "tick": 230,
+      "region": "archived-track-1",
+      "dists": 0.47001200914382935,
+      "lpips": 0.5297307968139648,
+      "luma_ssim": 0.38472854386137495,
+      "rgb_psnr": 17.39004928261585
+    },
+    {
+      "arm": "av1",
+      "tick": 230,
+      "region": "ball",
+      "dists": 0.41617000102996826,
+      "lpips": 0.40495219826698303,
+      "luma_ssim": 0.9088549840961324,
+      "rgb_psnr": 31.397052679929796
+    }
+  ],
+  "common_ticks": [
+    10,
+    30,
+    50,
+    70,
+    90,
+    110,
+    130,
+    170,
+    190,
+    210,
+    230
+  ],
+  "source_labels_sha256": "098fc0b387cbc895fb64c543670023f87a26da155a68383a0b80d540ce6ab3f9",
+  "cpu_seconds": 24.215372,
+  "forecast_seconds": 49.86923399999999,
+  "av1_bytes": 23916,
+  "av1_wire_sha256": "21d9285d7331b41a4d438366df15ac4e0f842faf48b3db59b2c297a3fd9b9c0e",
+  "joint_wire_sha256": "1093859b4bcf14d0ebe1f1abe08fdf518acd21b763ed2b23327b2826c9f47020",
+  "native_cpu_job": "20261122T222252Z-34de1411",
+  "metric_code_sha256": "51b2c4b3bf3ab608be643687e4697c4329a27b52dc05b73e39799eefa39c553f",
+  "script_sha256": "376bc4f7adae1c758b66128cbf51940abf8dd89caa2c2516a9118bc60cedd90b",
+  "weights": {
+    "vgg": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+    "alex": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02"
+  },
+  "max_previous_dists_delta": 7.992441003468187e-08,
+  "aggregation": "Same two selected physical streams for all metrics. Mean per-region dB for RGB PSNR, mask-weighted spatial AlexNet LPIPS, source-mask-centred luma SSIM, and original masked DISTS. Equal player/ball class averages on 11 common native ticks."
+}

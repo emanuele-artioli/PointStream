@@ -21,3 +21,18 @@ The gpu3 CPU receiver finished in 94.91 seconds including its audit. All 240 ori
 Table scores use the eleven times with a marked visible ball and two accepted player silhouettes. Both player silhouettes at all twelve times have mean body DISTS 0.3027. The best conventional control in each family was selected on the foreground endpoint among affordable streams; the fixed-price display inventory uses the same bytes-only rule across metrics. The archived Q18 producer result has a scored display. A prior independent replay did not reproduce its native packet. The better validated 20.4117 kbps Q24 stream exceeds the strict cap.
 
 At the common 20.4 kbps ceiling the two equally weighted development rallies (Nadal and Alcaraz) have foreground DISTS **0.2950** against **0.4353** for their respective best tested affordable ordinary AV1 streams, a 32.2% reduction in the mean. The two physical joint rates were 20.362 and 20.214 kbps. [Nadal receiver and controls](nad000-width.md)
+
+## Four measures on the same complete displays
+
+The strongest affordable ordinary foreground-DISTS point used 640×384 CRF62.25. Its 23,916-byte physical stream and all 240 decoded portable native frames reproduced the recorded hashes. Both displays were then scored for all four metrics on the same original source supports. DISTS and LPIPS are better when lower, luma SSIM and RGB PSNR when higher. The eleven common instants give the following means.
+
+| Region | Codec | DISTS | LPIPS | Luma SSIM | RGB PSNR, dB |
+|---|---|---:|---:|---:|---:|
+| Players | PointStream | 0.3037 | 0.3093 | 0.2422 | 13.595 |
+| Players | AV1 | 0.4580 | 0.6098 | 0.3508 | 16.126 |
+| Ball | PointStream | 0.2403 | 0.2728 | 0.7236 | 27.547 |
+| Ball | AV1 | 0.3309 | 0.5328 | 0.7148 | 25.551 |
+| Equal-class mean | PointStream | 0.2720 | 0.2910 | 0.4829 | 20.571 |
+| Equal-class mean | AV1 | 0.3944 | 0.5713 | 0.5328 | 20.839 |
+
+Both perceptual metrics favor PointStream for players and ball. Ball reconstructions also improve by 0.0088 luma SSIM and 2.00 dB. Conventional AV1 more closely preserves player intensities as measured by SSIM and PSNR. The PSNR column averages the individual region dB values and differs from whole-frame PSNR. [All paired per-region records and scoring identities](al028-strict-multimetric.json)
