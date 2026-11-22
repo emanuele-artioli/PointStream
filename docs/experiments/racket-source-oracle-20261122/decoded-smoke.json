@@ -1,0 +1,72 @@
+{
+  "mode": "smoke",
+  "device": "cpu",
+  "model_sha256": "7bc158aa95c0ebfdd87f70f01653c1131b93e92522dbe15c228bcd742e773a24",
+  "labels_sha256": "6f4037988ccfb6799943385dfcd9a6d056690f5ef6ed0494a6720462dc60bfac",
+  "elapsed_seconds": 57.271484212978976,
+  "inference_seconds": 8.250632960000075,
+  "rows": [
+    {
+      "source": "match209",
+      "tick": 13,
+      "truth_boxes": [
+        [
+          364,
+          187,
+          487,
+          293
+        ]
+      ],
+      "predicted_boxes": [],
+      "confidence": [],
+      "assigned_prediction_indices": [
+        -1
+      ],
+      "assigned_iou": [
+        0.0
+      ]
+    },
+    {
+      "source": "match235",
+      "tick": 42,
+      "truth_boxes": [
+        [
+          715,
+          325,
+          730,
+          375
+        ]
+      ],
+      "predicted_boxes": [],
+      "confidence": [],
+      "assigned_prediction_indices": [
+        -1
+      ],
+      "assigned_iou": [
+        0.0
+      ]
+    },
+    {
+      "source": "match269",
+      "tick": 23,
+      "truth_boxes": [
+        [
+          677,
+          74,
+          711,
+          88
+        ]
+      ],
+      "predicted_boxes": [],
+      "confidence": [],
+      "assigned_prediction_indices": [
+        -1
+      ],
+      "assigned_iou": [
+        0.0
+      ]
+    }
+  ],
+  "forecast_seconds": 239.15123141297954,
+  "gate": true
+}
