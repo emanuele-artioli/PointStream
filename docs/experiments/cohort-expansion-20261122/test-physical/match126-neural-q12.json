@@ -1,0 +1,773 @@
+{
+  "stage": "full",
+  "frames": 240,
+  "source_sha256": "29fb4ef71a4d2ef68d79166542c51fda4f48108dfd6647bacc8b9869c018ab93",
+  "conversion": [
+    "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+    "-v",
+    "error",
+    "-nostdin",
+    "-i",
+    "/local/users/emanuele/pointstream/cache/29fb4ef71a4d2ef68d79166542c51fda4f48108dfd6647bacc8b9869c018ab93/match126-000-29fb4ef71a4d.mp4",
+    "-frames:v",
+    "240",
+    "-vf",
+    "select=between(n\\,0\\,239),scale=1920:1080:flags=area:out_range=tv,format=yuv420p",
+    "-fps_mode",
+    "passthrough",
+    "-f",
+    "rawvideo",
+    "-pix_fmt",
+    "yuv420p",
+    "-y",
+    "/local/users/emanuele/pointstream/scratch/20261122T130249Z-ffec6a73-full/source.yuv"
+  ],
+  "ffmpeg": {
+    "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+    "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+    "sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+    "version": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers"
+  },
+  "gpu": "NVIDIA RTX 6000 Ada Generation",
+  "resources": [
+    {
+      "profile": "pointstream-parent2-child6-v1",
+      "device_name": "NVIDIA RTX 6000 Ada Generation",
+      "capability": [
+        8,
+        9
+      ],
+      "role": "dcvc",
+      "pid": 1474704,
+      "pgid": 1472913,
+      "budget_mib": 6144,
+      "total_bytes": 51010207744,
+      "fraction": 0.12629728889425634,
+      "allocated_before": 0,
+      "host_pid": 1474704,
+      "host_pgid": 1472913,
+      "start_ticks": 17454654,
+      "campaign_pgid": 1472913,
+      "action": "encode",
+      "plan": "dcvc-s4-q12/encode-plan.json",
+      "gpu_uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0"
+    },
+    {
+      "profile": "pointstream-parent2-child6-v1",
+      "device_name": "NVIDIA RTX 6000 Ada Generation",
+      "capability": [
+        8,
+        9
+      ],
+      "role": "dcvc",
+      "pid": 1475042,
+      "pgid": 1472913,
+      "budget_mib": 6144,
+      "total_bytes": 51010207744,
+      "fraction": 0.12629728889425634,
+      "allocated_before": 0,
+      "host_pid": 1475042,
+      "host_pgid": 1472913,
+      "start_ticks": 17455318,
+      "campaign_pgid": 1472913,
+      "action": "decode",
+      "plan": "dcvc-s4-q12/decode-a-plan.json",
+      "gpu_uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0"
+    },
+    {
+      "profile": "pointstream-parent2-child6-v1",
+      "device_name": "NVIDIA RTX 6000 Ada Generation",
+      "capability": [
+        8,
+        9
+      ],
+      "role": "dcvc",
+      "pid": 1475281,
+      "pgid": 1472913,
+      "budget_mib": 6144,
+      "total_bytes": 51010207744,
+      "fraction": 0.12629728889425634,
+      "allocated_before": 0,
+      "host_pid": 1475281,
+      "host_pgid": 1472913,
+      "start_ticks": 17455911,
+      "campaign_pgid": 1472913,
+      "action": "decode",
+      "plan": "dcvc-s4-q12/decode-b-plan.json",
+      "gpu_uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0"
+    }
+  ],
+  "native": {
+    "codec": "dcvc-uf-htl",
+    "scale": 4,
+    "qp": 12,
+    "size": [
+      480,
+      272
+    ],
+    "frames": 240,
+    "target_kbps": 20.4,
+    "est_kbps": null,
+    "stream": "stream.psdc",
+    "bytes": 7383,
+    "kbps": 6.1525,
+    "container_sha256": "813049f20f6510d6b1b1e6fa3647c5f7f45333d635a3e146d58bdc6ee1dc8483",
+    "encode_report": {
+      "checkpoints": {
+        "determinism": {
+          "after_set_torch_env": {
+            "cublas_workspace_config": ":4096:8",
+            "cudnn_allow_tf32": true,
+            "cudnn_benchmark": false,
+            "cudnn_deterministic": false,
+            "deterministic_algorithms": true,
+            "deterministic_algorithms_warn_only": false,
+            "matmul_allow_tf32": false
+          },
+          "final": {
+            "cublas_workspace_config": ":4096:8",
+            "cudnn_allow_tf32": true,
+            "cudnn_benchmark": false,
+            "cudnn_deterministic": true,
+            "deterministic_algorithms": true,
+            "deterministic_algorithms_warn_only": false,
+            "matmul_allow_tf32": false
+          },
+          "requested": true
+        },
+        "image": {
+          "bytes": 168845375,
+          "keys": 398,
+          "path": "/local/users/emanuele/pointstream/cache/b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302/cvpr2026_image.pth.tar",
+          "sha256": "b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302"
+        },
+        "precision": "float16",
+        "stream_policy": "legacy",
+        "strict_load": true,
+        "video": {
+          "bytes": 482470963,
+          "keys": 962,
+          "path": "/local/users/emanuele/pointstream/cache/934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3/cvpr2026_video_htl.pth.tar",
+          "sha256": "934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3"
+        }
+      },
+      "container_bytes": 7383,
+      "container_sha256": "813049f20f6510d6b1b1e6fa3647c5f7f45333d635a3e146d58bdc6ee1dc8483",
+      "dpb_reachable": false,
+      "encode_seconds": 1.182,
+      "environment": {
+        "capability": [
+          8,
+          9
+        ],
+        "cuda_visible_devices": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+        "cwd": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/opt/DCVC",
+        "device_name": "NVIDIA RTX 6000 Ada Generation",
+        "extension": {
+          "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/opt/dcvc-extensions/sm89/inference_extensions_cuda.cpython-312-x86_64-linux-gnu.so",
+          "sha256": "0bc03d4064794f9e846fdf11fc3f7a197b7608b658718c71c8d6e66444629131",
+          "variant": "sm89"
+        },
+        "python": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+        "torch": "2.10.0+cu128",
+        "torch_cuda": "12.8"
+      },
+      "frame_count": 240,
+      "frame_delay": 8,
+      "i_recon_sha256": "95d827074525c33a90c4c0594300624c078ec21bde68f4ac1e62776812944e21",
+      "i_recon_yuv420_sha256": "95d827074525c33a90c4c0594300624c078ec21bde68f4ac1e62776812944e21",
+      "kernels": null,
+      "load_seconds": 3.496,
+      "model_calls": 32,
+      "model_encode_seconds": 0.4407,
+      "nals": [
+        {
+          "display_frames": 1,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 1459,
+          "sps_bytes": 5,
+          "type": "I"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 2234,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 1836,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 317,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 95,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 85,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 67,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 58,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 66,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 74,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 62,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 58,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 58,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 55,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 60,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 50,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 47,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 53,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 49,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 47,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 52,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 58,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 50,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 53,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 51,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 45,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 44,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 43,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 44,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 8,
+          "encoder_padding_frames": 0,
+          "nal_bytes": 49,
+          "sps_bytes": 0,
+          "type": "P"
+        },
+        {
+          "display_frames": 7,
+          "encoder_padding_frames": 1,
+          "nal_bytes": 50,
+          "sps_bytes": 0,
+          "type": "P"
+        }
+      ],
+      "operation": "encode",
+      "peak_allocated_mib": 427.8,
+      "qp": 12,
+      "src_type": "yuv420",
+      "structure": "htl",
+      "timing": "model_encode_seconds: codec calls only (profiled runs are not timing evidence)",
+      "warnings": []
+    },
+    "decode_reports": {
+      "decode-a": {
+        "deterministic": true,
+        "container_sha256": "813049f20f6510d6b1b1e6fa3647c5f7f45333d635a3e146d58bdc6ee1dc8483",
+        "environment": {
+          "capability": [
+            8,
+            9
+          ],
+          "cuda_visible_devices": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+          "cwd": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/opt/DCVC",
+          "device_name": "NVIDIA RTX 6000 Ada Generation",
+          "extension": {
+            "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/opt/dcvc-extensions/sm89/inference_extensions_cuda.cpython-312-x86_64-linux-gnu.so",
+            "sha256": "0bc03d4064794f9e846fdf11fc3f7a197b7608b658718c71c8d6e66444629131",
+            "variant": "sm89"
+          },
+          "python": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+          "torch": "2.10.0+cu128",
+          "torch_cuda": "12.8"
+        },
+        "warnings": [],
+        "passes": [
+          {
+            "decode_seconds": 0.42,
+            "model_decode_seconds": 0.2789,
+            "frames_sha256_digest": "3fe60474e5b90854f0ac8b35fd1f0f5102564b666214a93db083724aac11a6fd",
+            "first_frame_sha256": "95d827074525c33a90c4c0594300624c078ec21bde68f4ac1e62776812944e21"
+          },
+          {
+            "decode_seconds": 0.236,
+            "model_decode_seconds": 0.1299,
+            "frames_sha256_digest": "3fe60474e5b90854f0ac8b35fd1f0f5102564b666214a93db083724aac11a6fd",
+            "first_frame_sha256": "95d827074525c33a90c4c0594300624c078ec21bde68f4ac1e62776812944e21"
+          }
+        ]
+      },
+      "decode-b": {
+        "deterministic": true,
+        "container_sha256": "813049f20f6510d6b1b1e6fa3647c5f7f45333d635a3e146d58bdc6ee1dc8483",
+        "environment": {
+          "capability": [
+            8,
+            9
+          ],
+          "cuda_visible_devices": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+          "cwd": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/opt/DCVC",
+          "device_name": "NVIDIA RTX 6000 Ada Generation",
+          "extension": {
+            "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/opt/dcvc-extensions/sm89/inference_extensions_cuda.cpython-312-x86_64-linux-gnu.so",
+            "sha256": "0bc03d4064794f9e846fdf11fc3f7a197b7608b658718c71c8d6e66444629131",
+            "variant": "sm89"
+          },
+          "python": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+          "torch": "2.10.0+cu128",
+          "torch_cuda": "12.8"
+        },
+        "warnings": [],
+        "passes": [
+          {
+            "decode_seconds": 0.421,
+            "model_decode_seconds": 0.279,
+            "frames_sha256_digest": "3fe60474e5b90854f0ac8b35fd1f0f5102564b666214a93db083724aac11a6fd",
+            "first_frame_sha256": "95d827074525c33a90c4c0594300624c078ec21bde68f4ac1e62776812944e21"
+          },
+          {
+            "decode_seconds": 0.226,
+            "model_decode_seconds": 0.1255,
+            "frames_sha256_digest": "3fe60474e5b90854f0ac8b35fd1f0f5102564b666214a93db083724aac11a6fd",
+            "first_frame_sha256": "95d827074525c33a90c4c0594300624c078ec21bde68f4ac1e62776812944e21"
+          }
+        ]
+      }
+    },
+    "dpb_reachable": false,
+    "seconds": {
+      "encode_process": 6.639207392989192,
+      "process": 19.378335873014294,
+      "variable": 2.485
+    },
+    "check_a_i_frame": {
+      "frames": 1,
+      "max_abs_diff": 0,
+      "frames_nonzero": 0,
+      "first_frame_differing": null,
+      "first_frame_beyond_tolerance": null,
+      "tolerance_levels": 1,
+      "passed": true
+    },
+    "check_b_two_processes": {
+      "frames": 240,
+      "max_abs_diff": 0,
+      "frames_nonzero": 0,
+      "first_frame_differing": null,
+      "first_frame_beyond_tolerance": null,
+      "tolerance_levels": 0,
+      "passed": true
+    },
+    "identical_frame_hashes": true,
+    "within_process_deterministic": [
+      true,
+      true
+    ],
+    "max_decode_diff": 0,
+    "luma_psnr": {
+      "min": 26.067947301867306,
+      "first_group_mean": 28.21171161469021,
+      "last_group_mean": 28.288916823504316
+    },
+    "accepted": true,
+    "decoded": "/local/users/emanuele/pointstream/scratch/20261122T130249Z-ffec6a73-full/dcvc-s4-q12/decode-a.yuv"
+  },
+  "fps": 25,
+  "native_fps": [
+    25,
+    1
+  ],
+  "qp": 12,
+  "scale": 4,
+  "raw_sha256": "5cead6b168ac5b479a2b3b3ded57e9b079d58c49bcaf512c315c8ff29d9fc22d",
+  "yuv_frames": [
+    "95d827074525c33a90c4c0594300624c078ec21bde68f4ac1e62776812944e21",
+    "a89c2f7d1f7c40ec7e5aa534829de835bb5116cbdb1e486464b7d1164f677c52",
+    "14b2f6b9394a52862a369f1c3589e9e79ca60216387a933a6dff672e29f49fb1",
+    "e175bb2f44aa16f2c32aea5feede7bebb2dd5cd7ddc37a0a503ccadbe6f4bc56",
+    "8df87f991aa541e4806e4f045f071dbb8ec007cdc2d812e4b1a7c60508afae8e",
+    "010c1d39057b06c3ffe59de82b565692d8ca4f610ee3f1a914a2605600e099ca",
+    "7fab2e8fe6ac5e12afdb6eb323a0818f712b58f76a2031577453c1b4729f6475",
+    "4d68679ce1cd00c067f3e11530e3d1d83c5ee4d2f117e070ccdbceb524b52295",
+    "c30db630790981fb72c2e7e24611fcec15ee17f58aa82e015441419c06bbb041",
+    "8d63465bf87dfa1fd02b79361db7974079cccb632b5cc5a096b92e3f1c8e1db3",
+    "946739de5b0b6f99978e51f4ac5a5e666b13a5b53eb2a60a58ddad6f131dc071",
+    "c25a30d179a8f7abdffa847b6a73858b2bb3b1762ea27f795e94848c8fd2d160",
+    "45cc4cd002109ff4567ab469dda743355f7b2238d450d4ea8556ec27c6749950",
+    "9a2215444af9a2a98c226f100d6641e0a2fb4943e2c94e4a95addd54e7d5db1c",
+    "0b83395e16c255700534fb7f6b27c65177bc51dbce81331a1de008429a55edfc",
+    "506deda3e949c58fcd0e8f80d09e8a0609eca3e5cc0e0906bd334a08c8df9cb7",
+    "dad2ab8d687a4013ed61d5d4f5fb74d77dc508bd19886a1a08b1aaf8e25cd734",
+    "ff072cd766a3912c0bc3cc3a5f2c5673db26d1a0dfd3c9d29d4e13dda70c9fb7",
+    "14f937ed8f1fca08c5a83246262f7eba06fe4cbcd08b74d38006cdece6e7ed67",
+    "b37399fea0d1515700a6e4046a79d709fd39860ee79821b72406bae55dd89292",
+    "4e2dd8f48ab16fbb5b0501efb511375062d7ad97a1fbebb0ddc1504b1ac592de",
+    "07c719bc7404982ae70d4b2fc5a65a12ceca92d7f61bc4c84df2b2f1da90e6fb",
+    "d05bf94dfbd6bce8061ca21cfda993d8fe9c5b2f8a2995286998351ae1221308",
+    "24af97bcc42da724c38f732fca659ae39c3c551a2aca964f9b83fdfb03c2efc3",
+    "a9139da7614b72cdccb3bd80682e35bf5a923858a115cb9517eb03b9e05a0cfa",
+    "4d84b67fdfce9c454775579d311d43976e67e35c178e108d584871bf6c1eff60",
+    "2fad46ebae4b4434441d9e592c2416c0878e6689f65142a95aeda862571e25ac",
+    "94cf6bf99f61c7f307b4c581675ca635af95d7b3295db707f7ef491f9ad55409",
+    "8abcb114cdbdc3e1a8093e34bdda7606aff6a0eed663dcdb402119f5da45ee27",
+    "5371e6e8f750179828bd33f2d4acf087841b5b70e23e73d595b28e022b39df9c",
+    "cb6ac3d2d0b890dac28244fb3f5bbd71d531a6b612b04313c54bec111641b0a4",
+    "42c91043f5d399b4350f2799ea7e060a343f346a0a3ae3b7409003db069a5226",
+    "62dd591db6ded6b11feaae81149b1c12a87ffc6ad25d14de63756502826807e8",
+    "e3b6276cb6d5c98a58ff7bf8d2ccdcb649ef956c4ce6a1d79c58772843800d40",
+    "ccf96e2cedec3bd3abffe7aa7b57f92e1da769690c50a369187784afa86d0fa1",
+    "e9abd3cafa4542d8c137044efbb807c342e3f210fb485ec4cf56fae32f6bea5f",
+    "9f8ac959fc9fe0ca4b7a1370266b4a8c66a9b98554423289af0d49f2334c1bcd",
+    "9d37cafcbf8ca93a82b81ed4dde87ac9d5d9fdd96b4e4bae59a522c0e9c11f94",
+    "6ca007a6633c7ae39cc6fad24d5a97d9e83378c3983f9b6dfee5841d47b9c532",
+    "47135de2ba8892f1bfc0d8883d372ef5c6611d7d358c049f95eb7275fd1e91a2",
+    "e71461eb1dd761d3390da203fa29346e75c2b9713d1f8357ecb40678c89c92ab",
+    "d458120608dae3eaac21b7a3520ff365266d8bbf2b72e0684021589b55e11804",
+    "ea9d4dcdce90277ae05326695c673e2d5e9724c340e8ed84296fa94e073b689a",
+    "c660f9c4905e2496d36cb2d997a657463a96bbbd351ff0fba363326c31048b48",
+    "9506acac9b43ee5c4330f551b642ec13a643529cbb3a90d22d2e0f48e7805323",
+    "38437ec69ffaae4f90bb85274a7cd7f1ee8e9ad29996f36ae5f7d55ee579f204",
+    "afca8ee5dc4b8ca5734d2ad8e2a3c373d71247606c4888b24436176ad608fcc2",
+    "e91379ecd35d94a13252229f49b2fc01785a9f15ba3e79f68c9a5077f46e159a",
+    "a88583c9d0f8798f2de42ae9cd25ca6384738988a68bc5069ec3e42109c23580",
+    "9707d0f54f01588c88f13f9ebfd8becb1b9f6d7ada6554804237eb923bc03432",
+    "4480541e30094198bec9b3f150667864f2a511b16ed68b2e6b4afb4780d523ee",
+    "e45bed829e1c4b0d98143a4c2798debedd3d9da4958b3fb6e7a72762f5d62509",
+    "71f9c46785e16daba572a212a23ca051ae2ba772ef87e8b3322f5f7db2a61010",
+    "87308c9c99594503627c4db44760e0d01d12c944be6a6c1954319ce45d415ad3",
+    "2da57462b6e6601babbe70c216af1b616e92768f19ff1bd776893f8e4605c4ae",
+    "a0be38d4487e01c2c65beca2476f0b3d18a0725c1c1534db736a92695d75676b",
+    "66c29c007600c15f09f0686b042587f6a6358b3dd275dd6555581087149984fa",
+    "9ff55771a5a9af0c72904b4b56ef94a811e7881960a03e2959fd46947be76d16",
+    "296b43552f37550b855df03de22790c3fa57c69390ea417885186bf0f4ddb248",
+    "db932d33e482a7290185c0db2bf252f62adb12867f6470ff8eddd8f4051f4a7b",
+    "c2a6e32c800c06ce52d8c38967a82a2a2081aab4f2a136f859a2d16b8502562a",
+    "b3bfcfc966642f60aaad8211cb40669fffad69500211c57b8b6612dbdea9fa69",
+    "10d36e44c05baa3122c4f71d05c2dd986daa7f8d015e7a15be2f2d15b6401afe",
+    "6d0a9a336bf0a3cd757b8b4d6ba4009184d15878882ab039de4b7881d8a46cfb",
+    "4ab77a75a582936636b4711bcbabd4c6d8a43a85ffef28d3a367188a4fb9e9ac",
+    "feb6d2dccf921c66cffdae40769caca2c7d66df6670986551eb77315ca279fa0",
+    "66321756be62e778e03fc05f00f914e118abe892a1209dce064cb51c99b1c54d",
+    "864cd0a1f1e2020a24deb6a0b03b50da6f6dcc1c970f2112b6807c39a044a317",
+    "843814de23231391442339c063468a655a0f901c02c84a805085876910af7abe",
+    "9dd0610efaaa372afcd617a6317d644096a3bde666de701a5f01784a25c6c517",
+    "ccb6d8318fe6e1cf55a8c120c1daf607258dd9b81ce3a70c857d5bd2eacbeeed",
+    "e1305860686013dbc46ec2d864628538378a3e44a1e8593b48b20e8915697aaf",
+    "188663f06e1e978199460241dfac1fc5d7df8bd166cee7df12e860359214944f",
+    "43932a9cb9e83d5f70ff0aec3b9f1bd134e1bdc2b3af382eb3e12b555b344103",
+    "8d60ded6becee571a8317c45e1fe5a49c86d0a4384d441279dbf3642464b121c",
+    "41f495d3f0a51db3b6bc655b19e2635e19e738e88b96af67dbb447d2630ee388",
+    "5b64b273b31bb15338464474f9c630a21e95c0da28f0cfe62e144c40642ff702",
+    "8aaf33b0ffde3a1a8b60267667acf85cadc8bd0416b05298dcfaf3548ca2c182",
+    "fa401bac0b35e1aa2e434295979594f5cd5f30869a245dd07ec17b1884608da8",
+    "46d38fce1a31f33f0bc7d298cd96f480b1b32bf9927c5f57ba11b37235f33411",
+    "1b5302fc152ff069dadcd75c48f3e413f48b7ce0f15fb07493e9c9ed88e2d292",
+    "8ea10ee3628e35f35f197777f7153cada9a75b38fb74a95a75b450d7b40e4439",
+    "33676f4203f3b511ad246f925fde342cc47c3d4221dd2c3146b939b9d44c1b5b",
+    "5933897a12d59a6619d4528d988c785c0d4fd55571e5768ccec43356dad7160f",
+    "b617824add4f933333d2919058b347b4cbadfb3f78fa36356ff51961ad72201d",
+    "ddbbec2cfa0cc5a9587d5d5de1147d36047d20a492b526b444905908f7d1a98d",
+    "2e3b3468651a5f7a2943859471e3001ca94e35b7102bfb4a343b0f6af178bf5d",
+    "57ddbe88bbfda8cdd7c0f6775aa63fef02c8445447cd4dbe41d6b5212d74acb6",
+    "9ce31b790b50050bb9c71452a44190193e701244cd3df55bbcaa9eb82dc96e1a",
+    "6ac8bf2f5c426ae69824469acd7b279a72eaaf91c4a918dc26e71055ba2ec764",
+    "a9ea235bc98179a7cf95d689113b06e88c9417c262c82e14c19115417ffd58ba",
+    "28c8b0ebdc0ce9928772ee05a91ecc17daa83038bf43102dea1dff309cee7fd9",
+    "eec83f35f432de9711ec06bc2f4504a414598a843043df2ca18b6d31ff7b1af9",
+    "132b219cb2d2690d4dee985114def4b91350cebb49c8428c938e694e75960185",
+    "6a6920f85dd9032b7bd7d78eb98434bd220453619d1ca1c1121bf3afd092603d",
+    "5042af647df14a31809c4076f892bd5437656fffd68fab805de8a3e623abfc5d",
+    "27f192bef56cbe89d39f7ce504e64ea3431abedcc20c4ba5a4d52410b0122c22",
+    "e0a85fa1f966e21a5aa7aaebb866c65924e3bbadfc79609b0aa853a259b80f10",
+    "da375c669a9c76afa6698a9ab1ada875ad25dc10688a3be5d1cbd235bc708c69",
+    "d6a9f9b5f5c71313518644505d6c5b5eae7ae3a790e4044991ee27c3aae20f72",
+    "656ac22ef210a83edd7fc4e686e9d0d0a035615111445a5088feb65167be0580",
+    "c94d59499299e6f6049ae76ca903b580e505397d7858508cf982fc41c01d5884",
+    "7a755edb8db20684be3aa2aa131fa0f7e3ff9485a429617a0ab0e46fc1acdd4e",
+    "9a0c83b79a2962215c2ec68d6a713647abd6653c859b90cb18a1fc251a1087dd",
+    "4a086d0f7815f79d9f104ca3f3abf3b6376e0088617bc7880831a93785182653",
+    "8a537bf1cba365c01e965b11c9f30464a903b26229be8e9d440b21401af99a0f",
+    "312d5a0701e12f909b19e3eb1d20d91deec14aeadabe725a3fed80cc0cf68d46",
+    "757a80096685efde986307ae63ebcbdafa531ff38d142bc1723b0f1bb29b5fc2",
+    "0f0d5e9914f82c45a494e595ca8b2ace2061f2c4aa06547a9d5bfb83896e477b",
+    "5de7130da99bedf5ce6f23aec54c11979fab90edf4f81f3527cba6cda61d5f27",
+    "68731d9433261fbbabaebe1215a3dbcf6c453d2d351811de22b27fe601d63e04",
+    "a5c861226baaa5461e9f29cd4f1d3bac053e317e803cf10d52b34b3136ba998b",
+    "f7017d9a96f75d3601a5a55364c85430fcb6ae2e02d12b603aa1408588d5ee92",
+    "c3ad60d8f8dcab78a9aff067bef2eea06ad902c98e2a0c6c897c1533d774a68a",
+    "d262bc90c26638cd160c6a8971b75c9e57e3a2cff557ea2d9ef97a640afbbd05",
+    "5fbd2c3909a490a53ea26c686d5336f6013de865fb62f001de644fc88d5a2d7a",
+    "ea43adb7df9b6ad3c821c2cc8d3d20d28cfe58db496f0e26cbd6864df40bb5b0",
+    "c477a3e31c03be030664e24f313cebd4578fd6d2507278c38331f047f09285a5",
+    "ab1f886dc7132d48072c9b1e99840ccaedea9dd49dc30a042c1b51b422db70e4",
+    "de9c6930b07a8834cb21075b3728715f4daa52d45bbd82de3923ff130bd948d2",
+    "02917ee5965571f7ab7f58fa9f32f91d6c36075f915cfd2b616a31c8ae33a6b8",
+    "ad7070b6d4fada47cbebd8ea2712eebe6d088a8b8a5097b9291d847f5f9fcb73",
+    "7c88423e0bd9dfa5e48d6249b7095666cd856972b536f0d1532b05aa7bc919d1",
+    "6a77102ba6c43ef190dc85e19a2bc23fdc9994335d9fed37877b2d3db54b44d0",
+    "d64434b8f8d97f3e00fc3f5b56f79c81f2999bcd1ff1e31423ef9d6252d6d57f",
+    "2665338e4d4d16f5203d116266d88d12ef5870150b57362b7638de1f20c1cb21",
+    "127a8211797da9aa16cd50b9379c1c54552c5f3ddca896a958908f440306d35a",
+    "6b6ad00c0dec770f9dd588b051cf5412db191cccb1010393865979a47ceaf036",
+    "2c1318a6e091f6c790cd9316e592acbd9b4753e645d91586220bbbf9ffd6d14f",
+    "e6556e3bf3670a8ffea8343ed334e92a6c2aab08f9299c1e4889124d47608040",
+    "5429d55f4f35026793810077f99840690fc7fe7a78b4c0f8f8f6649fca97dc97",
+    "d61f222833ebb7bb95c8329bdaeaf5214a7b0cdae0e469687f3aac0446928c9e",
+    "9378beb0cf91beaecc3541de7a3212d5ba5852a9a7ace5ddcf222b425fa0b51f",
+    "09329311f8f5a2f5dd8e78db067e4f59bee37ffec0abd9afc4165f1e3869adaf",
+    "1459cc5353003626e032a01e9769e5ac34fb8a9581e55ed891c2a1d756c09a77",
+    "f35945bd8fcc0a683b8b17d4f7ed9ac6ff6f3e4ea0000a56d0933eab8d3b0f5b",
+    "e92a27b919c348f72dce2784b2d2d9d036300792aece66900dfaa6b29940ae17",
+    "f9ccc91316feeeb524d99cbde4c495f758c58807ab5d55b32c460a660f448c48",
+    "0cac1154570a817962157f92d223304a2544375d63f2f2d5be9fd8b6e68b09d9",
+    "ac4c44af0849e3ae75cd07d79bc158cc55b44d365606fcd9c7d1e4e5115228f9",
+    "8479299bd975fe7304b4e2cc361c1b6fe2ebcb99258e48f0fcd57345c2d8bda6",
+    "fb2fa5a5addc2a0b987f51a5c0b0e2f8050921d8d864579e4bbc6785bb2f22b8",
+    "dfcdecb19541386ddd6ca759e46001f0e7262e93a30b7572c0a3d2eb28d82b41",
+    "9fd26ba8e6c231d8d8680912aea341facf0cf3faf00fbdf3b568c81793e39fe9",
+    "e2e5df49f31780076819ea579f2b5e1a4f4457b10188227590be1ea13d112975",
+    "9ede76df667d1b1757f2507a0f79e0e25b0f353f25b662c5666b19b1a5ec9693",
+    "f04a5993f7dad34ffe132f065621fb601a97f3cae02f2eb9321391cf8bbe8626",
+    "6f22c95f682a0de02938186a83b613b0c690de3ddbfe1ea036d533c942cfd7c3",
+    "b07131e3dd4c89b8590d178233c9654ec64a6213cf8b6d575fc4096e4238ff70",
+    "e017a913988d3c2434f6a65761e5dbe5ddde5f6067f306b225415a7b2f27850f",
+    "41fec851e1898f07267036f1f6d365ff5ab751717aa8e2e8f7a09c6c828c472e",
+    "5c3085f0196df727148ec9b785b43304646554ec25e3b9c3af3d633cf5221918",
+    "550f92005bb8f553b88882de4fe3d7cb6d1525e5ffc06c0e2c1dc37291730795",
+    "175655e9b191d92635b84177c70426868e46c2866241ead622109a4bb827fdf9",
+    "81f40287b675679ff8593100a75bf720e3aa1e980a8388c8039a4ebcea3510c3",
+    "2670f57d6995825a898bc6e8ab72d7b854d0ea26b32fa82209d3b9e70dbcd1c1",
+    "bf85971ef2737303621bad2a7cfad585524b0fde6ad3ad726762a96b0c5f0351",
+    "d1b12ce0329c7eea3a97c5e75353fe4fa73e045944e3bad93b31dd6d6380e299",
+    "f43285f535d72e3e8fdb1a8796fb37bced41c9e660c587e2ebffe0451ef545e6",
+    "a0cc52e7858ae03c0953dbe2d23989ed83e5250f86cb091b22236272e742bb23",
+    "2bdb89fcba2c8956922adcbdc7ee922999c1896285ffed00616731746fe7ea78",
+    "b4baa006ff15966487caff3146c7717ea5bdc0cc8d4a0540b844b252add2674b",
+    "f07ad90d78473f128c508af17d40e20bb458d9c9b5d948d7edf6709f21ec222c",
+    "9da6d286fb79fce0aba83ef5d768b655be36327611f5440b2a1b1b71cd281faf",
+    "2f74e37b8197830dde7a025e2ff748b4ad20ed3dc33e25900d6a52b585adc956",
+    "d48a6644ce7fb34c428612b30fcdd849a79277abd0072bf3f08f3ec35350f125",
+    "cd2473a5e584652663325e89fe5760ee41373ae663bb123b5b2dc9967bc46c83",
+    "f579dbcf237a890ff3bb7c12edf734bc7d0f4a3afa5460427ee04e39437cba7d",
+    "7fe609a1477d6169951d50bf4e2e9e3ca01d7b7302395be614c4d1d15c9906ac",
+    "c28a8c3fb9546c6ccd620a24ed58d8812e5927a97d48c7b4c943fab0b875eaff",
+    "9ac2148cd89571e8b9cb7ef5d1d37cb9a8076389eec47b99579ce240b5331569",
+    "fb7995c4ebcd633f55e3a7fcf8751e0f595fb058699199c11026506d199c9084",
+    "8d65db818c7ac907112be52d3bf1d184cf2404abeae02b41275ba2a3c700c30d",
+    "0a73dd51a79f219aceea87a6c4cc820e6890fc91357886aa8c155a1a4a1bad66",
+    "8c0cab9b0716d7088324db3baf0074993544c9d66fbee04a501494359e7b3164",
+    "3daed887b300ba1ea6abd0b9a5c170d43e0f81fb59150d8328ed43165836118e",
+    "b6361eda087e66c0f4ab815f9360558f3514f0e45a454e920e72869f4da4b664",
+    "885646e739877a1d8a2f5098bd9bac95ba8e72e8907ddc0bb466b4d9ce45ed5d",
+    "3da58c784b6963b13848248dea9a364948086dbe66656ed570f13bf8390a6ef3",
+    "bfdf5dd8eceba3193621ce1061b6c126a17df8eba381461ff78c392ff5836301",
+    "95efecb2bd8d8cbf76d6e18e595b185ee387e169d2760c41d7b6f64206ed1ddf",
+    "70dc81b6064f47bf0b32cc33650d35dbc771cf7bb3bdd7d4e4ec8404050d732f",
+    "1436b87209eaf22781b6ea5dd2de3067331623a9f7366f54b2afba81a18b6b5a",
+    "0684cc331adb8277e19741939b6f4b11ed633fabfe36d4adde4dcd3069abf6e2",
+    "f12923094fa3617890e2c649bb0f762c27d4f480dc0f8d4350f2bdff0902aa44",
+    "548df185adf532c002ece5fda7ddb627dc21cb7e537906bc210b84e675640926",
+    "0d7065aa02888c26c465dd5c48aacd27cb4be45ee718434c001d1deefdff2096",
+    "ef01dd93c1a309fe4277789fa35b8af43fb4a4317cd519bdc692ef597f40c2e0",
+    "9b0f8ee2f6ebdb7891989e9e5ffcb3e5c6fabe479e5e94aa9e1d50a105e973a4",
+    "98038c02a6dfb8b80be53854abfc4d8ae46eac4a7e9b56c6f71ff36199217dc3",
+    "d9d45d64a023c136deab3d4a9c8ee625866a9dad599814db8b7a7184b12a8533",
+    "d54d60172fadd7a90782561c0984312d8dff77da6b599aae5161b53cda6fafd6",
+    "f2a913a1c1e97919a26c6a0dc734378f4f9e4edf393dcb1560e97e13ba617184",
+    "4fb13365a95cb3a680e6dbb552e47d31b88172ffead4703e93fe3fdee2240f8d",
+    "6b92f31101cab195812597777895bd391964f5d1e75dba833172263e211bbc42",
+    "6d0519b2366e97f60b4ab6d62f1a2c022370ed72a7b70a52c5c3468be0cfef44",
+    "0bf591311e9f0b490fcefc158cae9bccdbafabfa86bcd6d82cc351e022c71ee1",
+    "65d1c6ac1c2294b39007415413fc454eaa50c266292aef6a819ccaf24f8d08c8",
+    "7c898b8e9c96693e469a743c49aa86153e903f47fb983a290ff0112db292cdb4",
+    "0b3daa4c44fda984ac7a9adb393083ac14cd36280fed5003d0bfd9b74ad39990",
+    "6ca277a7e774b35c2973dae24914d44795f351692f14bec756c44ee93cdf05fe",
+    "09e9f9f5a93bdd8a06110b87678861793cf44e2d204367dd8b0e13eb099458d9",
+    "5600e5076730cf3a78b27e73d55e3a17035c66f975db8158c4c6a4c6b791f802",
+    "a959815620b41397416088bc7953f14290621f1c4a2deb066f196dda84136e3b",
+    "ae2698d5af6cfaa37d28adce4edfe1846a8018173b8b18ac133d07c26d632b35",
+    "9fd160b1453bd794ff4bdd9da3dc87d96644fff56f654c71e00983e534b92e66",
+    "d749b2a10d9bdec961bb2e531b3e3942b5fea3afc14a2ce1f835e638b67c6e8c",
+    "ce6ac5d4faed93f105010ac0c38f90259519d32c7939d5aa6e8884ddf436e451",
+    "8ede30c7bc02c2e40f6d57decfe199abe5b2e22ba7f5ece2b8c11e5b7d5acb76",
+    "406fef9e1766a76331a5ecfd333ece5eefdab6595e0ebf5c8d94a90f35f0a8ff",
+    "8f37659082bca8233be948c432c78e4478aa11882a3add6528553e6d6cbfaae7",
+    "3fff8e166a1b6eb3e3d4bbc278b8c197c07dc0ebbf48c56ec78c8363a574ca3d",
+    "d8e3b3e98fffc7a41ff798a5a68156c5935f4acadb5ba864af0092343243c853",
+    "f3019a6d04ecd00dbf86ddfa20997df62185d6ad6e1d8254385f312555fed9de",
+    "9b712abc71cbac3a168a6d396e6eea5223d6941b948db36a7c3ed184155e92f2",
+    "7cc2c7824053d1d1195f7545da87b011a2e5332c8461661486275f30d8bfe289",
+    "45de2b1fb53eafca607074e26be4b9ffc930620e4acbea7e36cfdd2e31b17caf",
+    "da52ade2ef3fe1d05f995f03441d9cad797315ae166d6106448e56918d3b7ac2",
+    "ffc969b0815b9062cea6ed87877236714ec124f963a11a2fb904480974b79aae",
+    "0832a724ad0ee8253346f693b94d640c9ffd91a5fbc354e11fdf37bfed75671a",
+    "bf9c1e06a8b72f123db057ab9b75dc256e79d69eaab8f980fd64c8919676ac35",
+    "0326b7df20977344fa8afe6178493dbf45fca231501b3c25a063a07668f29a2b",
+    "299350357e941682365728ca72ba561425abb8405883cd4caa849b16a8d8144c",
+    "923302e1b4d169681114b8cd461471137944f72c0a0679dfaf0abcf5798584e3",
+    "ab87f2126500759a36adc417fa708e4745247baac29b23f25174efc10ba3fd5c",
+    "4789cf6a2746d550d44ca37db2ff65c55d7f37f295f4ed2f21b0e4c387817a33",
+    "d52ef27d40bce7aad675aab8aef426640c6414d077addefc8b62682744525b9f",
+    "a22700f67aec9810711cfde1b4899458b9817c053491af7a2b586503fee7f745",
+    "5b0f8817a6ed64f8eb8fba139f55e88506e2f3700cde3dfba4a354bc6aa4379a",
+    "3d58783bcbf85847e50db325714c77b5be5fbb07b4b9015bcbd710bd62af5d1d",
+    "39ef4476b0549e828ae4e0f4507e227a83313a118fde7ce0be4df7e36303bf26",
+    "5c9a96095045683a4790c11284801172235eefb3e20df3bad8893bdbcd924caa",
+    "8f6cbb6efd40972784d3fbe75ba5c7311226970c82a12dac80e7484cf503b67e",
+    "40dd426b11759b14602ca982e0012dd0d6ac4052cbfad9df55db11e02a287162",
+    "2b36813112e4f52d3a344b7989413486bc8cdfe671086f8f166e842d0fc0f499",
+    "d2e7591f242ee83ff3755b6e907ac968d1670d52a1a0de4307662c3cec82ff06",
+    "15ca4435165515b514cf4a054501d4e09c6c4d9679386c740169e7a1e309cd1e",
+    "65fe016d1e2112bb6fd8698aec79e39ddb9eaa5b10dda6203b0604fae484d699",
+    "e820d2ad6a3059487c4b074f6b83c76769327abd72cb9a0d487afa237255f136",
+    "f1c0f92b1b88997937abac8876cb58729fc63678524477e8e3d69f261cf4a995"
+  ],
+  "elapsed_seconds": 21.634535666002193
+}

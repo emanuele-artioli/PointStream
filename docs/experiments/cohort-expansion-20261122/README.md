@@ -93,3 +93,17 @@ The original-source detector qualified on seven of the twelve matches. In these 
 Geneva's Q12 original job `20261122T123956Z-61e5616d` passed its source, cadence, native receiver, four-pass identity, resource, payload and price checks. Its 32.43-second 48-frame smoke projected 303.21 seconds against the 300-second full-stage cap. Preserve that result. Increase only this full-stage allowance to 360 seconds, retaining all native checks, the 1.5× forecasting rule, the registered Q index and the original aggregate budget. At the 12.03/16 CPU-hour and 41.70/120 GPU-minute ledger, its measured forecast plus the previously reserved next groups fits.
 
 As a supplemental comparison to the common-budget plots, use the same per-event PCHIP and achievable neural hull as the spatial comparison over each event's strictly overlapping quality interval. Report coverage, every per-match interval, the geometric mean rate ratio and match-resampled interval. The full population uses only neural rungs available to all twelve. The separate low-rate population can also use the Q12 rung requested on its fixed seven. With a sparse neural bank the resulting comparison applies only to those observed quality intervals. At registration Q24 was complete, with one full Q36 fidelity pilot and three or fewer Q12 scores. No secondary multi-rung pooled readout had been inspected.
+
+### Reproduce the figures from the published receipts
+
+With NumPy, SciPy and Matplotlib installed, run these commands at the repository root. They read the immutable `test-physical` receipts and write the figures and numerical tables to a scratch directory. No video footage or GPU is needed at this stage.
+
+```bash
+card=docs/experiments/cohort-expansion-20261122
+out=$(mktemp -d)
+export PYTHONPATH=.
+python "$card/summarize_test.py" --out "$out/cohort-results.json"
+python "$card/results_table.py" "$out/cohort-results.json" "$out/results.md"
+python "$card/plot_test.py" "$out/cohort-results.json" "$out"
+python "$card/curve_report.py" --grid "$card/curve-grid.json" --out "$out/curve-summary.json" --table "$out/curve-table.md" --figure "$out/official-test-ball-rate"
+```

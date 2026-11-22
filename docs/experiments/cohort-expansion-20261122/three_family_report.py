@@ -261,7 +261,14 @@ def figure(series, path):
         fontsize=7,
     )
     for kind in ("pdf", "png"):
-        fig.savefig(path.with_suffix("." + kind), dpi=190, bbox_inches="tight", pad_inches=0.04)
+        metadata = {"CreationDate": None} if kind == "pdf" else None
+        fig.savefig(
+            path.with_suffix("." + kind),
+            dpi=190,
+            bbox_inches="tight",
+            pad_inches=0.04,
+            metadata=metadata,
+        )
     plt.close(fig)
 
 

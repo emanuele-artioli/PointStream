@@ -1,0 +1,227 @@
+{
+  "rows": [
+    {
+      "tick": 9,
+      "dists": 0.3715079426765442
+    },
+    {
+      "tick": 13,
+      "dists": 0.24653255939483643
+    },
+    {
+      "tick": 18,
+      "dists": 0.3020648956298828
+    },
+    {
+      "tick": 23,
+      "dists": 0.3549228310585022
+    },
+    {
+      "tick": 27,
+      "dists": 0.2585095167160034
+    },
+    {
+      "tick": 32,
+      "dists": 0.28054624795913696
+    },
+    {
+      "tick": 37,
+      "dists": 0.3358706831932068
+    },
+    {
+      "tick": 42,
+      "dists": 0.4019167423248291
+    },
+    {
+      "tick": 46,
+      "dists": 0.38394272327423096
+    },
+    {
+      "tick": 51,
+      "dists": 0.3546147346496582
+    },
+    {
+      "tick": 56,
+      "dists": 0.34622102975845337
+    },
+    {
+      "tick": 60,
+      "dists": 0.3236011266708374
+    },
+    {
+      "tick": 65,
+      "dists": 0.29454725980758667
+    },
+    {
+      "tick": 70,
+      "dists": 0.23459798097610474
+    },
+    {
+      "tick": 75,
+      "dists": 0.19577455520629883
+    },
+    {
+      "tick": 79,
+      "dists": 0.30175817012786865
+    },
+    {
+      "tick": 84,
+      "dists": 0.26083987951278687
+    },
+    {
+      "tick": 89,
+      "dists": 0.24772924184799194
+    },
+    {
+      "tick": 98,
+      "dists": 0.23082149028778076
+    },
+    {
+      "tick": 103,
+      "dists": 0.24160385131835938
+    },
+    {
+      "tick": 108,
+      "dists": 0.2653962969779968
+    },
+    {
+      "tick": 112,
+      "dists": 0.29299676418304443
+    },
+    {
+      "tick": 117,
+      "dists": 0.26359254121780396
+    },
+    {
+      "tick": 122,
+      "dists": 0.3290833830833435
+    },
+    {
+      "tick": 126,
+      "dists": 0.33309483528137207
+    },
+    {
+      "tick": 131,
+      "dists": 0.2611180543899536
+    },
+    {
+      "tick": 136,
+      "dists": 0.22652959823608398
+    },
+    {
+      "tick": 141,
+      "dists": 0.22649013996124268
+    },
+    {
+      "tick": 145,
+      "dists": 0.2376231551170349
+    },
+    {
+      "tick": 150,
+      "dists": 0.21840935945510864
+    },
+    {
+      "tick": 155,
+      "dists": 0.24878549575805664
+    },
+    {
+      "tick": 159,
+      "dists": 0.2885620594024658
+    },
+    {
+      "tick": 164,
+      "dists": 0.29529309272766113
+    },
+    {
+      "tick": 169,
+      "dists": 0.27712535858154297
+    },
+    {
+      "tick": 174,
+      "dists": 0.3069738745689392
+    },
+    {
+      "tick": 178,
+      "dists": 0.2845379710197449
+    },
+    {
+      "tick": 183,
+      "dists": 0.2782735824584961
+    },
+    {
+      "tick": 188,
+      "dists": 0.2815812826156616
+    },
+    {
+      "tick": 192,
+      "dists": 0.24753761291503906
+    },
+    {
+      "tick": 197,
+      "dists": 0.283865749835968
+    },
+    {
+      "tick": 202,
+      "dists": 0.35372740030288696
+    },
+    {
+      "tick": 207,
+      "dists": 0.37428200244903564
+    },
+    {
+      "tick": 211,
+      "dists": 0.3703128695487976
+    },
+    {
+      "tick": 216,
+      "dists": 0.2755972146987915
+    },
+    {
+      "tick": 221,
+      "dists": 0.21722549200057983
+    },
+    {
+      "tick": 225,
+      "dists": 0.20912086963653564
+    },
+    {
+      "tick": 230,
+      "dists": 0.2512965798377991
+    },
+    {
+      "tick": 235,
+      "dists": 0.36383795738220215
+    }
+  ],
+  "ball_dists": 0.2881290428340435,
+  "rgb_sha256": "f5e5ce5cae8f782c180f056c7fed4bc6ca8c2cb152c569f51881fb771da56719",
+  "whole_rgb_psnr": 24.66202979256067,
+  "match": "match116",
+  "frames": 240,
+  "qp": 12,
+  "size": [
+    480,
+    272
+  ],
+  "fps": "25",
+  "bytes": 6037,
+  "kbps": 5.030833333333333,
+  "source_sha256": "39e290951809a969aab505fe590443ed193f1ac7edf96b5bcfb7d9de2776d677",
+  "source_rgb_sha256": "793d0f7c29be38e2e7c14677d0f282b6a131724e51b87867cf42ae3fe4184d81",
+  "packet_sha256": "e8f9dcda229652371318a2c1d069de050e63260cc2905e9cdeb7256b8953b2f5",
+  "neural_archive_sha256": "9d35043a3aaa9c5f6c9da666d2fff3a3b0054f6c5d37f682d3af5cbfb1862223",
+  "labels_sha256": "0b54e15759c08ec1eb5aaf3ed8dbfaf4da20f46f4a76d94a6ac2b2d5fa8b7178",
+  "neural_raw_sha256": "dfbab4007bb608ea6b7461a489a989f4ec9ecac8df9ea6746d9b8ca9cf3b5d02",
+  "visible": 48,
+  "dists_model": {
+    "metric": "DISTS",
+    "net": "vgg16",
+    "torchmetrics": "1.9.0",
+    "weights": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/torchmetrics/functional/image/dists_models/weights.pt",
+    "weights_sha256": "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218",
+    "backbone": "/local/users/emanuele/pointstream/cache/397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0/vgg16-397923af.pth",
+    "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+    "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)"
+  },
+  "elapsed": 23.41719417599961
+}

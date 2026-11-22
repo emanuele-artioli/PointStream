@@ -13,7 +13,12 @@ from matplotlib.lines import Line2D
 
 
 def save(fig, path):
-    fig.savefig(path.with_suffix(".pdf"), bbox_inches="tight", pad_inches=0.04)
+    fig.savefig(
+        path.with_suffix(".pdf"),
+        bbox_inches="tight",
+        pad_inches=0.04,
+        metadata={"CreationDate": None},
+    )
     fig.savefig(path.with_suffix(".png"), dpi=190, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
 
@@ -166,7 +171,7 @@ def figures(d, output):
         1.02, 1.01, "Direct hits /\nvisible marks", va="bottom", transform=ax.transAxes, fontsize=7
     )
     keys = [
-        ("o", palette[0], "Paid coordinates"),
+        ("o", palette[0], "Transmitted coordinates"),
         ("s", "#b4511e", "AV1 + detector"),
         ("D", "#41784d", "PointStream + detector"),
         ("^", "#835187", "Best spatial AV1 + detector"),
