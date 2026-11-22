@@ -46,6 +46,11 @@ def build(a):
         spec.pop("gpu_sharing")
     else:
         assert a.action == "judge"
+        spec["gpu_sharing"] = {
+            "mode": "shared",
+            "basis": "The fixed-pixel WASB objective and frozen source labels do not depend on wall-clock timing. This GPU model has passed the native CUDA and CPU-pixel verification.",
+            "margin_mib": 8192,
+        }
         prior = json.loads(a.display_status.read_text())
         assert prior["status"] == "complete" and prior["gate"]["passed"]
         sha = a.display_archive_sha.read_text().strip()
