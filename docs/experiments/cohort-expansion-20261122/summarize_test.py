@@ -65,6 +65,33 @@ def counts(rows):
     return result
 
 
+def paired_localization(rows):
+    matches = [r for r in rows if r.get("source_qualified") and "strongest" in r["rgb"]]
+    if not matches:
+        return None
+    arms = ("source", "ordinary", "strongest", "candidate", "direct")
+    per_match = []
+    for r in matches:
+        by_arm = {**r["rgb"], "direct": r["direct"]}
+        assert all(by_arm[a]["visible"] == r["direct"]["visible"] > 0 for a in arms)
+        per_match.append([100 * by_arm[a]["hit10"] / by_arm[a]["visible"] for a in arms])
+    rates = np.array(per_match)
+    draws = np.random.default_rng(SEED).integers(len(matches), size=(REPLICATES, len(matches)))
+    gains = {}
+    for i in (3, 4):
+        for j in (1, 2):
+            delta = rates[:, i] - rates[:, j]
+            gains[f"{arms[i]}_minus_{arms[j]}"] = dict(
+                percentage_points=float(delta.mean()),
+                interval95=np.quantile(delta[draws].mean(axis=1), [0.025, 0.975]).tolist(),
+            )
+    return dict(
+        matches=[r["match"] for r in matches],
+        macro_percent=dict(zip(arms, rates.mean(axis=0))),
+        gains=gains,
+    )
+
+
 def summarize(data):
     stage = json.loads((HERE / "staged.json").read_text())["selection"]
     events = {}
@@ -221,6 +248,7 @@ def summarize(data):
         direct_on_qualified_sources=counts(qualifying_direct),
         same_sources_as_strongest={a: counts(v) for a, v in comparable_strong.items()},
         rgb_source_qualified={k: counts(v) for k, v in rgb_rows.items()},
+        paired_localization=paired_localization(rows),
     )
 
 

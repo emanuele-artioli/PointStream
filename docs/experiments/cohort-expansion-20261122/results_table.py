@@ -140,6 +140,14 @@ def text(summary):
         lines.append(
             "The strongest spatial row has partial coverage. Its exact matching direct and decoded-video counterparts are recorded in the numerical companion."
         )
+    paired = summary.get("paired_localization")
+    if paired:
+        gain = paired["gains"]["candidate_minus_strongest"]
+        lo, hi = gain["interval95"]
+        lines += [
+            "",
+            f"Across the {len(paired['matches'])} source-qualified matches with both spatial controls, the PointStream display changed localization by {gain['percentage_points']:+.1f} percentage points relative to the best affordable spatial AV1 display (95% match-bootstrap interval {lo:+.1f} to {hi:+.1f}). Each match has equal weight in this estimate. The counts above pool individual labels.",
+        ]
     lines.append("")
     return "\n".join(lines)
 

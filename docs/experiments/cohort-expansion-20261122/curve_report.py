@@ -97,12 +97,30 @@ def analysis(grid, data):
                 actual_candidate_range=[ranges[:, 1].min(), ranges[:, 1].max()],
             )
         )
+    comparable = {
+        m: r["bd_rate"]["bd_rate_percent"]
+        for m, r in per_event.items()
+        if r["bd_rate"]["bd_rate_percent"] is not None
+    }
+    bd_summary = None
+    if comparable:
+        logs = np.log1p(np.array(list(comparable.values())) / 100)
+        draws = np.random.default_rng(20261122).integers(len(logs), size=(10000, len(logs)))
+        bd_summary = dict(
+            matches=list(comparable),
+            fewer_bits=sum(value < 0 for value in comparable.values()),
+            percent=float(100 * np.expm1(logs.mean())),
+            interval95=(
+                100 * np.expm1(np.quantile(logs[draws].mean(axis=1), [0.025, 0.975]))
+            ).tolist(),
+        )
     return dict(
         grid=grid,
         pooled=plots,
         fixed_budget=fixed_budget,
         starved_cohort=starved_cohort,
         per_event=per_event,
+        paired_bd_rate=bd_summary,
     )
 
 
@@ -164,6 +182,14 @@ def write_table(result, destination):
         rows.append(
             f"| {m} | {interval} | {rate} | {bd['dominance']['verdict'] or 'no common rate'} |"
         )
+    summary = result["paired_bd_rate"]
+    if summary:
+        lo, hi = summary["interval95"]
+        count = len(summary["matches"])
+        rows += [
+            "",
+            f"The geometric mean per-match rate change was **{summary['percent']:+.2f}%** (match-bootstrap 95% interval {lo:+.2f}% to {hi:+.2f}%) across {count}/{n_total} matches with overlapping fidelity. PointStream required fewer bits on {summary['fewer_bits']}/{count}.",
+        ]
     rows += [
         "",
         "Per-match BD-rate uses monotone piecewise-cubic interpolation over common attainable quality. The anchor is its achievable concave envelope. A negative rate change means fewer delivered bits at equal quality. Full packet identities, selected rates and every original registered mark are in the numerical companion.",
