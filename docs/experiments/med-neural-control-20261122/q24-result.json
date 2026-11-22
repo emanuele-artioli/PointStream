@@ -1,0 +1,23 @@
+{
+  "job": "20261122T093041Z-95b7972b",
+  "status": "complete",
+  "source_sha256": "3bf7ddaae0db5c48b1072fccb15f9f162e41fa5999886b9a5bde58dc0495c630",
+  "source_archive_sha256": "e1e532345945a14f2d1e124659ce03bd131c4f436b85ad4710dcd36b74b6f7c9",
+  "gpu": "NVIDIA RTX 6000 Ada Generation",
+  "fps": [
+    50,
+    1
+  ],
+  "frames": 240,
+  "qp": 24,
+  "size": [
+    480,
+    272
+  ],
+  "bytes": 12704,
+  "kbps": 21.173333333333332,
+  "decoded_yuv_sha256": "16b71d566969513986aa80c58798bf91034609821497003aaf3b61013b4df312",
+  "stream_sha256": "e48ce88469dd2fb0e7bdfbe0d1a98639a9311e8ec2b87464d90709bd970e73bc",
+  "published_tar_sha256": "9c2e736e86fc2bf01c8756cc87688303154bdf49055a381a7af4571636d2a29e",
+  "validated_independent_native_passes": 4
+}

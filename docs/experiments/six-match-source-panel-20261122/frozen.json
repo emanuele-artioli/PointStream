@@ -1,0 +1,127 @@
+{
+  "source_manifest_sha256": "2bd94e9966fc8b09c5ce5eb9bef79f49ad349e1310a1d445fa6a646e86db8dde",
+  "archive": "/home/itec/emanuele/Datasets/archive/pre-reset-2026-10-05",
+  "prefix": "pointstream-foreground-panel-20261122/",
+  "original_files": [
+    {
+      "event": "alcaraz_hurkacz",
+      "rank": 1,
+      "pool": 21,
+      "path": "tennis_games/alcaraz_hurkacz/004.mp4",
+      "bytes": 1010490,
+      "sha256": "0aefad9eab9145e2887460d3538429e6c30e1d3ee14722600f15700c62a7468f"
+    },
+    {
+      "event": "alcaraz_hurkacz",
+      "rank": 2,
+      "pool": 21,
+      "path": "tennis_games/alcaraz_hurkacz/039.mp4",
+      "bytes": 924748,
+      "sha256": "b56c55617fd60f02323729ff98693b78a5eda2aa588ae3615db98942471f2db3"
+    },
+    {
+      "event": "alcaraz_hurkacz",
+      "rank": 3,
+      "pool": 21,
+      "path": "tennis_games/alcaraz_hurkacz/031.mp4",
+      "bytes": 2294636,
+      "sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76"
+    },
+    {
+      "event": "djokovic_federer",
+      "rank": 1,
+      "pool": 23,
+      "path": "tennis_games/djokovic_federer/videos/026.mp4",
+      "bytes": 26582534,
+      "sha256": "8aeeba8eab61d1b9f2153fe47fcb16f806fb0ebab30b710b832f8abc846c08f2"
+    },
+    {
+      "event": "djokovic_federer",
+      "rank": 2,
+      "pool": 23,
+      "path": "tennis_games/djokovic_federer/videos/021.mp4",
+      "bytes": 8837646,
+      "sha256": "6423a40735568eb8fd6b190cfb4e7d636d1fa99cc84e953f760b9ce0f09f6e0b"
+    },
+    {
+      "event": "djokovic_federer",
+      "rank": 3,
+      "pool": 23,
+      "path": "tennis_games/djokovic_federer/videos/079.mp4",
+      "bytes": 15105777,
+      "sha256": "a0e505fb26cbd8663e762d78b416a70aa50f80779eae92b8e33a07f7e3a96725"
+    },
+    {
+      "event": "djokovic_zverev",
+      "rank": 1,
+      "pool": 8,
+      "path": "tennis_games/djokovic_zverev/008.mp4",
+      "bytes": 487755777,
+      "sha256": "296d9cc12ecec861d9bd71024bdbf005ea775fe849991118d5d3825f374d8610"
+    },
+    {
+      "event": "djokovic_zverev",
+      "rank": 2,
+      "pool": 8,
+      "path": "tennis_games/djokovic_zverev/006.mp4",
+      "bytes": 558624679,
+      "sha256": "24023f10d3017d583fbd0dfb5a4dac2f04fb4492485eb0917cdc6acab7413c9c"
+    },
+    {
+      "event": "djokovic_zverev",
+      "rank": 3,
+      "pool": 8,
+      "path": "tennis_games/djokovic_zverev/010.mp4",
+      "bytes": 499036338,
+      "sha256": "10b3c9c9797e01b540cb1141b8bbfe2ca5eafdd40d80aca889a57d9e74d52e0d"
+    },
+    {
+      "event": "medvedev_struff",
+      "rank": 1,
+      "pool": 41,
+      "path": "tennis_games/medvedev_struff/041.mp4",
+      "bytes": 89711,
+      "sha256": "3c747fac7afbf1b30a54021fda449c1b0344e72ac764dcc93e65845166d4d55b"
+    },
+    {
+      "event": "medvedev_struff",
+      "rank": 2,
+      "pool": 41,
+      "path": "tennis_games/medvedev_struff/013.mp4",
+      "bytes": 539403,
+      "sha256": "c00551228931a462892639802c67b96cf314763fe1f2aa4b157404b11db41cc7"
+    },
+    {
+      "event": "medvedev_struff",
+      "rank": 3,
+      "pool": 41,
+      "path": "tennis_games/medvedev_struff/034.mp4",
+      "bytes": 2309185,
+      "sha256": "bf325ecfb7377ee6081fac458435185da2f59c75509e1b8a71d719913fcb91a5"
+    },
+    {
+      "event": "rublev_auger-aliassime",
+      "rank": 1,
+      "pool": 66,
+      "path": "tennis_games/rublev_auger-aliassime/videos/020.mp4",
+      "bytes": 1674691,
+      "sha256": "127612c884cd7b255a247dfebdcf989b1a49415f2f8500d7126d97ff274f7220"
+    },
+    {
+      "event": "rublev_auger-aliassime",
+      "rank": 2,
+      "pool": 66,
+      "path": "tennis_games/rublev_auger-aliassime/videos/023.mp4",
+      "bytes": 1638243,
+      "sha256": "8c42213af2fd54699cb125f34c705ede1dac048fb44a8dd2fa7faa63f324355c"
+    },
+    {
+      "event": "rublev_auger-aliassime",
+      "rank": 3,
+      "pool": 66,
+      "path": "tennis_games/rublev_auger-aliassime/videos/039.mp4",
+      "bytes": 5298848,
+      "sha256": "2bb0ac4109303a36ab637d5ba986db59a8558240ce88022dd14c17cdfc7330db"
+    }
+  ]
+}
