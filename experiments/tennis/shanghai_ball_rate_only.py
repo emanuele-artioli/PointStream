@@ -31,11 +31,15 @@ def sha(p):
 def run(a):
     start = time.monotonic()
     assert os.environ.get("CUDA_VISIBLE_DEVICES") == "" and len(os.sched_getaffinity(0)) == 1
-    assert sha(a.source) == SOURCE_SHA and sha(a.payload) == a.payload_sha256
+    assert sha(a.source) == SOURCE_SHA
+    if a.arm == "ball":
+        assert sha(a.payload) == a.payload_sha256
     tools = {k: svtav1.tool(k) for k in TOOLS}
     assert all(tools[k]["sha256"] == v for k, v in TOOLS.items())
-    track, apps = ball.decode_frames(a.payload.read_bytes(), 240, 960, 544)
-    payload = ball.encode_frames(track[: a.frames], apps[: a.frames], 960, 544)
+    payload = b""
+    if a.arm == "ball":
+        track, apps = ball.decode_frames(a.payload.read_bytes(), 240, 960, 544)
+        payload = ball.encode_frames(track[: a.frames], apps[: a.frames], 960, 544)
     work = Path(os.environ["PS_SCRATCH_DIR"]) / "shanghai-rate"
     work.mkdir()
     pub = Path(os.environ["PS_SCRATCH_DIR"]) / "publish"
@@ -63,7 +67,7 @@ def run(a):
         ]
         subprocess.run(command, check=True, capture_output=True, timeout=150)
         assert src.stat().st_size == a.frames * width * height * 3 // 2
-        for kind in ("ordinary", "ball"):
+        for kind in (a.arm,):
             lower, upper = 3, 80
             seen = set()
             records = []
@@ -160,30 +164,17 @@ def run(a):
                     "selected": best,
                 }
             )
-    pairs = []
-    for width in (320, 640):
-        b = next(g["selected"] for g in groups if g["width"] == width and g["kind"] == "ball")
-        o = next(g["selected"] for g in groups if g["width"] == width and g["kind"] == "ordinary")
-        pairs.append(
-            {
-                "width": width,
-                "candidate_bytes": b["bytes"],
-                "ordinary_bytes": o["bytes"],
-                "within_half_percent": abs(b["bytes"] - o["bytes"]) / o["bytes"] <= 0.005
-                and abs(b["bytes"] - target) / target <= 0.005,
-            }
-        )
     data = {
         "stage": os.environ["PS_STAGE"],
         "frames": a.frames,
         "fps": 25,
         "source_sha256": sha(a.source),
-        "payload_sha256": sha(a.payload),
+        "arm": a.arm,
+        "payload_sha256": sha(a.payload) if a.arm == "ball" else None,
         "payload_prefix_sha256": hashlib.sha256(payload).hexdigest(),
         "logical_canvas": [960, 544],
         "target_bytes": target,
         "groups": groups,
-        "pairs": pairs,
         "tools": tools,
         "elapsed_seconds": time.monotonic() - start,
     }
@@ -196,7 +187,8 @@ def validate():
     n = 24 if os.environ["PS_STAGE"] == "smoke" else 240
     checks = {
         "frames": data["frames"] == n,
-        "groups": len(data["groups"]) == 4,
+        "groups": len(data["groups"]) == 2
+        and all(g["kind"] == data["arm"] for g in data["groups"]),
         "input": data["source_sha256"] == SOURCE_SHA,
         "native_decode": all(
             len(g["selected"]["decoded_yuv_sha256"]) == 64 for g in data["groups"]
@@ -217,6 +209,7 @@ if __name__ == "__main__":
     p.add_argument("--payload", type=Path)
     p.add_argument("--payload-sha256")
     p.add_argument("--frames", type=int)
+    p.add_argument("--arm", choices=("ordinary", "ball"))
     p.add_argument("--validate", action="store_true")
     a = p.parse_args()
     validate() if a.validate else run(a)
