@@ -1,0 +1,36 @@
+{
+  "source_sha256": "0afb0fb191881def1235285b58fe54814556c83fed7815cd99a00b92d26bc86c",
+  "gpu": "NVIDIA RTX 6000 Ada Generation",
+  "raw_sha256": "73ee728728e7ac9d5f9305fc711e9ab3d97b462536f1ae17ab72e2a8978431e9",
+  "fps": 25,
+  "frames": 240,
+  "elapsed_seconds": 31.966571199998725,
+  "job": "20261122T051035Z-6bea6d8b",
+  "archive_sha256": "06a94bd09aaeedd4f59d9d46d8982f85af76cbd046867eba235e59da004ff3f9",
+  "codec": "DCVC-UF",
+  "point": {
+    "bytes": 69542,
+    "kbps": 57.95166666666666,
+    "qp": 24,
+    "size": [
+      960,
+      544
+    ],
+    "container_sha256": "700c43b3647f33959cd7e6da2ee2fb3abc6b306dda2c3bd86ce73a7e78975999",
+    "accepted": true,
+    "check_a_i_frame": {
+      "frames": 1,
+      "max_abs_diff": 0,
+      "frames_nonzero": 0,
+      "first_frame_differing": null,
+      "first_frame_beyond_tolerance": null,
+      "tolerance_levels": 1,
+      "passed": true
+    },
+    "identical_frame_hashes": true,
+    "within_process_deterministic": [
+      true,
+      true
+    ]
+  }
+}

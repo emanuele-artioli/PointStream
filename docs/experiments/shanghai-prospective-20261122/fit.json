@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.al028_ball_fit"
+  ],
+  "arguments": [
+    "--source",
+    "{staged:source}",
+    "--chunk0",
+    "{staged:chunk0}",
+    "--chunk1",
+    "{staged:chunk1}",
+    "--frames",
+    "{frames}",
+    "--scene",
+    "shanghai"
+  ],
+  "staged_inputs": [
+    {
+      "name": "source",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/match284-source-20261122/match284_000.mp4",
+      "sha256": "0afb0fb191881def1235285b58fe54814556c83fed7815cd99a00b92d26bc86c",
+      "extract": false
+    },
+    {
+      "name": "chunk0",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T044455Z-888af996/full/chunk.json",
+      "sha256": "439525a033ec540df610c85c0192948062cad2b771fb79d6fff6b85cf97ae7c4",
+      "extract": false
+    },
+    {
+      "name": "chunk1",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T045930Z-c411982d/full/chunk.json",
+      "sha256": "97e32474eee4a8df005e726a350d2e83f670f7eee63d2d56c460bfde8cbb6847",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/match284-source-20261122/match284_000.mp4",
+      "sha256": "0afb0fb191881def1235285b58fe54814556c83fed7815cd99a00b92d26bc86c"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T044455Z-888af996/full/chunk.json",
+      "sha256": "439525a033ec540df610c85c0192948062cad2b771fb79d6fff6b85cf97ae7c4"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T045930Z-c411982d/full/chunk.json",
+      "sha256": "97e32474eee4a8df005e726a350d2e83f670f7eee63d2d56c460bfde8cbb6847"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "required_commands": [],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.al028_ball_fit",
+    "--validate",
+    "--scene",
+    "shanghai"
+  ],
+  "deadline": "2026-11-22T09:24:00Z",
+  "verify_staged_inputs": true,
+  "stall_seconds": 1500,
+  "contention": {
+    "policy": "stop",
+    "resume_attempts": 0
+  },
+  "device": "cpu",
+  "hosts": [
+    "gpu1",
+    "gpu2"
+  ],
+  "gpu_models": [],
+  "gpu_memory_mib": 0,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "local_storage_gib": 30,
+  "smoke": {
+    "seconds": 350,
+    "representative_basis": "24 authentic full-context tracker ticks, native SVT62 decode, frozen fit and packet round-trip; 1.5x forecast for 240 ticks"
+  },
+  "full": {
+    "seconds": 1300
+  },
+  "validator_seconds": 60,
+  "budget_seconds": 1800,
+  "scale": {
+    "frames": {
+      "smoke": 24,
+      "full": 240
+    }
+  }
+}
