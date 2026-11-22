@@ -24,3 +24,7 @@ For a descriptive neural control on the same prospective Shanghai source, freeze
 The Shanghai neural-control job is `20261122T050326Z-e090ba12`, revision 353577d5, deadline 09:24 UTC.
 
 The initial Q24 smoke exited before inference because its child-resource directory did not match the path enforced by the qualified allocator. Restore the established shared-resource-receipts directory and retry the same frozen source, operating point and validators.
+
+Qualified receipt-path retry `20261122T050738Z-5e3fb5b0`, revision 9ac7f671.
+
+The corrected allocator admitted the worker, but the default CUDA stream failed inside the native encoder during graph capture before producing a bitstream. Use the W3 historical legacy CUDA stream that generated the accepted 25-fps Al028 packets. Keep the same Q24, four-pass gate, cost forecast and source. Stop if numerical checks fail; no figure point is inferred from a failed encode.

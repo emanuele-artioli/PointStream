@@ -54,7 +54,7 @@ def run(args):
     subprocess.run(command, check=True, capture_output=True, timeout=180)
     if source.stat().st_size != n * 1920 * 1080 * 3 // 2:
         raise ValueError("Incomplete native input")
-    args.stream_policy = "default"
+    args.stream_policy = "legacy"
     point = w3.code_point(
         args, source, root, 25, n, {"qp": 24, "scale": 2, "target_kbps": 20.4, "est_kbps": None}
     )
