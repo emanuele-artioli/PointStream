@@ -528,3 +528,15 @@ def test_fractional_native_profile_rejects_rounded_cadence():
     struct.pack_into('<II', n, 16, 30, 1)
     with pytest.raises(ValueError):
         packet.build(profile, bytes(n), keys, refs)
+
+def test_sixty_fps_packet_demands_a_matching_timebase():
+    profile, base, keys, refs = fixture()
+    profile['recipe'] = copy.deepcopy(packet.RECIPE_60)
+    calibrated = bytearray(base)
+    struct.pack_into('<II', calibrated, 16, 60, 1)
+    stream = packet.build(profile, bytes(calibrated), keys, refs)
+    assert packet.unpack(stream)[0]['base'] == calibrated
+    for opposite in ((25, 1), (50, 1), (60000, 1001)):
+        struct.pack_into('<II', calibrated, 16, *opposite)
+        with pytest.raises(ValueError):
+            packet.build(profile, bytes(calibrated), keys, refs)

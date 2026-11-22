@@ -52,7 +52,7 @@ def decode(joint: Path, cache: Path, carrier: Path, expected: str) -> dict:
         or carrier.read_bytes() != copied
         or runtime != cp["runtime"]
         or profile["coded_size"] != [160, 96]
-        or profile["recipe"] not in (packet.RECIPE, packet.RECIPE_25, packet.RECIPE_2997)
+        or profile["recipe"] not in (packet.RECIPE, packet.RECIPE_25, packet.RECIPE_2997, packet.RECIPE_60)
         or len(profile["order"]) != 2
         or len(profile["runs"]) != 2
     ):

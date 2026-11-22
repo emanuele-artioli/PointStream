@@ -28,6 +28,7 @@ RECIPE = {'profile': PROFILE, 'guidance': 3.5, 'steps': 30, 'context': [24, 4],
 # Separately identified native-cadence profile for 25 fps sources.
 RECIPE_25 = {**RECIPE, 'profile': 'common-tennis-player-25fps-v1', 'fps': [25, 1]}
 RECIPE_2997 = {**RECIPE, 'profile': 'common-tennis-player-30000-1001fps-v1', 'fps': [30000, 1001]}
+RECIPE_60 = {**RECIPE, 'profile': 'common-tennis-player-60fps-v1', 'fps': [60, 1]}
 # JPEG quality is sender metadata, not a proof of the quantization tables.
 JPEG_RECIPES = {q: {**RECIPE, 'profile': 'common-tennis-player-jpeg-v1',
                     'reference_codec': 'jpeg', 'nominal_quality': q,
@@ -53,7 +54,7 @@ def _profile(profile: dict[str, Any]) -> None:
     jpeg = not native and any(wire.canonical(recipe) == wire.canonical(r) for r in JPEG_RECIPES.values())
     lossless = not native and wire.canonical(recipe) == wire.canonical(LOSSLESS_RECIPE)
     bound_reference = jpeg or lossless
-    allowed = (NATIVE_RECIPE,) if native else (RECIPE, RECIPE_25, RECIPE_2997)
+    allowed = (NATIVE_RECIPE,) if native else (RECIPE, RECIPE_25, RECIPE_2997, RECIPE_60)
     if not bound_reference and not any(wire.canonical(recipe) == wire.canonical(r) for r in allowed):
         raise ValueError('unsupported recipe')
     if set(profile) != keys | ({'reference_rgb_sha256'} if bound_reference else set()):
