@@ -48,7 +48,7 @@ def read_neural(data, match, q_indices):
     ]
 
 
-def results(curves, data, low_indices, all_indices, near=False):
+def results(curves, data, low_indices, all_indices, near=False, all_measured=False):
     policies = {}
     low = set(curves["starved_cohort"][0]["matches"])
     near_q = {}
@@ -58,12 +58,23 @@ def results(curves, data, low_indices, all_indices, near=False):
             assert receipt["match"] == name and receipt["available_kbps"] == 20.4
             near_q[name] = receipt["closest_affordable_qp"]
 
+    supplemental = {}
+    if all_measured:
+        for name in curves["per_event"]:
+            prefix = name + "-neuroscore-q"
+            supplemental[name] = sorted(
+                int(f.stem.removeprefix(prefix))
+                for f in data.glob(prefix + "*.json")
+                if f.stem.removeprefix(prefix).isdigit()
+            )
+
     def used_indices(name, section):
         allowed = set(all_indices)
         if section == "starved_cohort" and name in low:
             allowed.update(low_indices)
             if name in near_q:
                 allowed.add(near_q[name])
+        allowed.update(supplemental.get(name, ()))
         return allowed
 
     for name in curves["per_event"]:
@@ -185,14 +196,23 @@ def results(curves, data, low_indices, all_indices, near=False):
         native_neural=policies,
         equal_quality_vs_neural=equal_quality,
         near_budget_indices=near_q,
+        supplemental_scored_indices=supplemental,
     )
 
 
 def table(result, path):
+    design = (
+        "The neural envelope includes every verified native score available on each source. "
+        "The companion records the tested indices per source, including a Q48 pilot on one match."
+        if result.get("supplemental_scored_indices")
+        else "The twelve-match table uses the neural indices measured on all twelve. "
+        "The seven-match table also uses its registered lower-price neural settings."
+    )
     lines = [
         "# Three codec families under the same per-match bitrate ceiling",
         "",
-        "The available bitrate constrains every match. Rate and DISTS are then averaged with equal weight per match. Every selected point is an actual native stream. The twelve-match table uses the neural indices measured on all twelve. The seven-match table can also use its registered lower-price neural anchor.",
+        "The available bitrate constrains every match. Rate and DISTS are then averaged with equal weight per match. Every selected point is an actual native stream. "
+        + design,
         "",
         "| Matches | Available kbps | AV1 delivered / DISTS | PointStream delivered / DISTS | DCVC-UF delivered / DISTS | PS − DCVC DISTS, 95% interval |",
         "|---:|---:|---:|---:|---:|---:|",
@@ -233,6 +253,8 @@ def table(result, path):
         calibration = (
             ", plus the source-specific byte-calibrated index" if rows["calibrated"] else ""
         )
+        if result.get("supplemental_scored_indices"):
+            calibration += ", with the additional measured indices listed for each source"
         lines += [
             f"Against the DCVC-UF envelope at quantizer indices {', '.join(map(str, rows['neural_indices']))}{calibration}, {count}/{n} matches had overlapping quality. The geometric mean per-match PointStream BD-rate was {summary['percent']:+.2f}% (95% paired match interval {lo:+.2f}% to {hi:+.2f}%). PointStream required fewer bits on {summary['fewer_bits']}/{count} comparable matches.",
             "",
@@ -241,6 +263,28 @@ def table(result, path):
         "Per-event common-quality intervals and rate-domain behavior are in the numerical companion. Each reported rate reduction is bounded by the tested neural operating points.",
         "",
     ]
+    if result["near_budget_indices"]:
+        point = next(
+            row for row in result["results"]["starved_cohort"] if row["available_kbps"] == 20.4
+        )
+        lines += [
+            "## The seven matches at 20.4 kbps",
+            "",
+            "Each cell reports achieved kbps and original-label ball-crop DISTS. The calibration index is the closest affordable price found independently of image quality. The DCVC-UF column uses the strongest affordable measured index, which can differ.",
+            "",
+            "| Match | AV1 | PointStream | DCVC-UF | Calibrated index | Selected DCVC-UF index |",
+            "|---|---:|---:|---:|---:|---:|",
+        ]
+        for i, match in enumerate(point["fixed_population"]):
+            cells = []
+            for arm in ("ordinary", "candidate", "neural"):
+                r = point["families"][arm]["selections"][i]
+                assert r["match"] == match
+                cells.append(f"{r['kbps']:.2f} / {r['dists']:.4f}")
+            lines.append(
+                f"| {match} | {' | '.join(cells)} | {result['near_budget_indices'][match]} | {r['qp']} |"
+            )
+        lines.append("")
     path.write_text("\n".join(lines))
 
 
@@ -283,11 +327,11 @@ def figure(series, path):
     ax.grid(axis="y", alpha=0.2)
     ax.legend(frameon=False, fontsize=7)
     ax.text(
-        1,
-        0.0,
+        0.025,
+        0.035,
         f"{len(series[0]['fixed_population'])} matches per plotted point",
         transform=ax.transAxes,
-        ha="right",
+        ha="left",
         va="bottom",
         fontsize=7,
     )
@@ -312,9 +356,12 @@ if __name__ == "__main__":
     p.add_argument("--all-q", nargs="+", type=int, required=True)
     p.add_argument("--low-q", nargs="*", type=int, default=[])
     p.add_argument("--near", action="store_true")
+    p.add_argument("--all-measured", action="store_true")
     p.add_argument("--table", type=Path)
     a = p.parse_args()
-    result = results(json.loads(a.curves.read_text()), a.data, a.low_q, a.all_q, a.near)
+    result = results(
+        json.loads(a.curves.read_text()), a.data, a.low_q, a.all_q, a.near, a.all_measured
+    )
     a.output.write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
     if a.table:
         table(result, a.table)
