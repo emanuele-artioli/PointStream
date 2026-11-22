@@ -104,6 +104,11 @@ PANELS = [
         "The next source-ranked singles match used a rate-selection rule frozen before opening the outcome. Adding 130 bytes preserved all 64 decoded frames. Paid centers localized 5/5 visible balls, versus 0/5 for the detector on the same video. On seven not-visible labels the corresponding presence counts were 1 and 0.",
     ),
     (
+        "ball/shanghai-prospective-ball.pdf",
+        "How much ball fidelity and location survive at 20 kbps?",
+        "On a prospectively selected 240-frame shot, a 90-byte difference bought 13.4% lower ball DISTS than AV1. The same packet supplied 18/26 correct locations and 2/23 emissions on not-visible marks. WASB scored 5/26 on source and missed its qualification threshold. Sender training may include this footage.",
+    ),
+    (
         "ball/joint-localization.pdf",
         "What can a machine read from the 21.5 kbps serve?",
         "On the same twelve visible labels, the frozen detector found zero balls within ten pixels on AV1 and DCVC-UF, and eight on the joint PointStream display. Reading the joint trajectory gave ten. All ordinary detections reproduced the earlier test. This sample has no absent labels.",
@@ -368,6 +373,7 @@ def build(
             "dense-two-judges.pdf",
             "starved-masks.pdf",
             "joint-localization.pdf",
+            "shanghai-prospective-ball.pdf",
             "joint-price.pdf",
             "passage-bill.pdf",
         }
