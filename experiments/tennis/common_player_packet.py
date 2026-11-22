@@ -7,11 +7,14 @@ The declared RGB resize is a receiver policy; this module does not decode video.
 """
 from __future__ import annotations
 
+import ctypes
 import hashlib
 import json
 import struct
 import zlib
 from copy import deepcopy
+from pathlib import Path
+import sys
 from typing import Any
 
 import numpy as np
@@ -125,6 +128,41 @@ MAX_REF = 8 * 1024 * 1024
 MAX_TRANSPORT_META = 64 * 1024
 
 
+def _installed_zstd(coded: bytes, raw_size: int, limit: int) -> bytes:
+    """Use the JCV runtime's pinned libzstd 1.5.7 when its Python binding is absent."""
+    try:
+        lib = ctypes.CDLL(str(Path(sys.prefix) / 'lib/libzstd.so.1'))
+    except OSError as exc:
+        raise ValueError('no installed Zstandard decoder') from exc
+    lib.ZSTD_versionNumber.restype = ctypes.c_uint
+    if lib.ZSTD_versionNumber() != 10507:
+        raise ValueError('unsupported installed Zstandard ABI')
+
+    # Official ZSTD_FrameHeader ABI in the pinned environment's include/zstd.h.
+    class Header(ctypes.Structure):
+        _fields_ = [('content_size', ctypes.c_ulonglong), ('window', ctypes.c_ulonglong),
+                    ('block_size', ctypes.c_uint), ('frame_type', ctypes.c_uint),
+                    ('header_size', ctypes.c_uint), ('dictionary', ctypes.c_uint),
+                    ('checksum', ctypes.c_uint), ('reserved1', ctypes.c_uint),
+                    ('reserved2', ctypes.c_uint)]
+
+    lib.ZSTD_getFrameHeader.argtypes = [ctypes.POINTER(Header), ctypes.c_char_p, ctypes.c_size_t]
+    lib.ZSTD_getFrameHeader.restype = ctypes.c_size_t
+    lib.ZSTD_findFrameCompressedSize.argtypes = [ctypes.c_char_p, ctypes.c_size_t]
+    lib.ZSTD_findFrameCompressedSize.restype = ctypes.c_size_t
+    lib.ZSTD_decompress.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_char_p, ctypes.c_size_t]
+    lib.ZSTD_decompress.restype = ctypes.c_size_t
+    header = Header()
+    if (lib.ZSTD_getFrameHeader(ctypes.byref(header), coded, len(coded)) != 0
+            or header.frame_type != 0 or header.content_size != raw_size or header.window > limit
+            or lib.ZSTD_findFrameCompressedSize(coded, len(coded)) != len(coded)):
+        raise ValueError('invalid installed-decoder Zstandard frame, size, window or boundary')
+    dest = ctypes.create_string_buffer(raw_size)
+    if lib.ZSTD_decompress(dest, raw_size, coded, len(coded)) != raw_size:
+        raise ValueError('invalid installed-decoder Zstandard payload')
+    return dest.raw
+
+
 def _bounded_transport(blob: bytes, magic: bytes, limit: int) -> tuple[dict[str, Any], bytes]:
     if len(blob) < rates.HEADER.size or len(blob) > rates.HEADER.size + limit:
         raise ValueError('invalid transport size')
@@ -134,17 +172,27 @@ def _bounded_transport(blob: bytes, magic: bytes, limit: int) -> tuple[dict[str,
     coded = blob[rates.HEADER.size:]
     try:
         if coded.startswith(b'\x28\xb5\x2f\xfd'):
-            import zstandard as zstd
-            # Existing encoder writes a content size; unknown-size frames are unsupported.
-            if zstd.frame_content_size(coded) != raw_size:
-                raise ValueError('invalid zstd content size')
-            if zstd.get_frame_parameters(coded).window_size > limit:
-                raise ValueError('zstd window exceeds limit')
             try:
-                raw = zstd.ZstdDecompressor(max_window_size=limit // 1024).decompress(
-                    coded, max_output_size=limit, allow_extra_data=False)
-            except zstd.ZstdError as exc:
-                raise ValueError('invalid zstd stream') from exc
+                import zstandard as zstd
+            except ImportError:
+                # One lossless 512x784 RGB8 PNG: one filter byte per raster row,
+                # with bounded room for image-codec framing and REF1 metadata.
+                if magic == b'REF1':
+                    limit = min(limit, 784 * (512 * 3 + 1) + 2 * MAX_TRANSPORT_META + 4)
+                if raw_size > limit:
+                    raise ValueError('reference transport exceeds the bounded RGB raster')
+                raw = _installed_zstd(coded, raw_size, limit)
+            else:
+                # Existing encoder writes a content size; unknown-size frames are unsupported.
+                if zstd.frame_content_size(coded) != raw_size:
+                    raise ValueError('invalid zstd content size')
+                if zstd.get_frame_parameters(coded).window_size > limit:
+                    raise ValueError('zstd window exceeds limit')
+                try:
+                    raw = zstd.ZstdDecompressor(max_window_size=limit // 1024).decompress(
+                        coded, max_output_size=limit, allow_extra_data=False)
+                except zstd.ZstdError as exc:
+                    raise ValueError('invalid zstd stream') from exc
         else:
             dec = zlib.decompressobj()
             raw = dec.decompress(coded, raw_size + 1)

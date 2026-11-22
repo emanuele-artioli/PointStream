@@ -1,0 +1,23 @@
+{
+  "first_cache_sha256": "91bd3a3fd9b18db301348c98e5af1536b859f2e51dde71e7de56c3beee1c1af2",
+  "first_cache_bytes": 157517,
+  "python_zstandard": "0.25.0",
+  "refs": {
+    "ref0": {
+      "ref_sha": "1f194daffff3b5d3653de12aed6e90ca29854c257a414d9b7ebcd21492bd738e",
+      "expanded": 42626,
+      "rgb_sha": "4efc900c9e414bd768d06545bd70d5c5d2a0299eab1d2f7e044df85839ad9e60",
+      "typed_rgb_sha": "d49f6aa1a46c0c5a671618aa4ad5cf2085200da3d5ede43a22090b40b3ce09e6",
+      "width": 512,
+      "height": 784
+    },
+    "ref1": {
+      "ref_sha": "9d37745c644a38717222f67b27c0c1353cefa9019afc5eb6d48fb1f6a9a98dff",
+      "expanded": 115331,
+      "rgb_sha": "34f19a1b0c83306a069ecf1c6384f06f1115c62dac2490d9053f0050b57e4cdc",
+      "typed_rgb_sha": "53c425974b004ff5c78d0ba33de67dbb69d0a126288e74a04caf37aae880f73e",
+      "width": 512,
+      "height": 784
+    }
+  }
+}

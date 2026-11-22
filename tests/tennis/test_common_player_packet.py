@@ -540,3 +540,36 @@ def test_sixty_fps_packet_demands_a_matching_timebase():
         struct.pack_into('<II', calibrated, 16, *opposite)
         with pytest.raises(ValueError):
             packet.build(profile, bytes(calibrated), keys, refs)
+
+
+def test_legacy_reference_shape_limit_precedes_native_decompression(monkeypatch):
+    import sys
+
+    monkeypatch.setitem(sys.modules, 'zstandard', None)
+    monkeypatch.setattr(packet, '_installed_zstd', lambda *args: pytest.fail('oversized reference decoded'))
+    coded = bytes.fromhex('28b52ffd')
+    too_large = 784 * (512 * 3 + 1) + 2 * packet.MAX_TRANSPORT_META + 5
+    blob = rates.HEADER.pack(b'REF1', too_large, len(coded), bytes(32)) + coded
+    with pytest.raises(ValueError, match='bounded RGB raster'):
+        packet._bounded_transport(blob, b'REF1', packet.MAX_REF)
+
+
+def test_legacy_zstd_rejects_mismatched_size_and_trailing_bytes(monkeypatch):
+    import ctypes
+    from ctypes.util import find_library
+    import zstandard
+
+    import os
+    path = os.environ.get('POINTSTREAM_TEST_ZSTD_LIBRARY') or find_library('zstd')
+    if not path:
+        pytest.skip('native zstd not installed')
+    lib = ctypes.CDLL(path)
+    if lib.ZSTD_versionNumber() != 10507:
+        pytest.skip('the generator adapter requires libzstd 1.5.7')
+    monkeypatch.setattr(packet.ctypes, 'CDLL', lambda _: lib)
+    raw = b'known player reference bytes'
+    coded = zstandard.ZstdCompressor().compress(raw)
+    assert packet._installed_zstd(coded, len(raw), packet.MAX_REF) == raw
+    for truncated, advertised in [(coded, len(raw)+1), (coded[:-1],len(raw)), (coded+coded,len(raw))]:
+        with pytest.raises(ValueError, match='Zstandard'):
+            packet._installed_zstd(truncated, advertised, packet.MAX_REF)
