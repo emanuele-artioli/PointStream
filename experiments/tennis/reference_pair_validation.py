@@ -31,7 +31,7 @@ DIGESTS = {
 def select(a: argparse.Namespace) -> None:
     stage = os.environ["PS_STAGE"]
     a.frames = 24
-    if a.comparison == "al031-fresh-prior":
+    if a.comparison in ("al031-fresh-prior", "shanghai-lossless-q90"):
         first, second = a.control.read_bytes(), a.q90.read_bytes()
         if (packet.wire.sha(first), packet.wire.sha(second)) != (
             a.control_sha,
@@ -39,7 +39,8 @@ def select(a: argparse.Namespace) -> None:
         ) or first == second:
             raise ValueError("Source-matched return-shot identities changed")
         profile = packet._embedded_profile(first)
-        if profile != packet._embedded_profile(second) or profile["recipe"] != packet.RECIPE_25:
+        recipe = packet.RECIPE_2997 if a.comparison == "shanghai-lossless-q90" else packet.RECIPE_25
+        if profile != packet._embedded_profile(second) or profile["recipe"] != recipe:
             raise ValueError("Return-shot conditioning has a changed codec profile")
         x, _, _ = packet.unpack(first)
         y, _, _ = packet.unpack(second)
@@ -134,7 +135,8 @@ def validate(parser: argparse.ArgumentParser) -> None:
     wall = timing["worker_wall_seconds"]
     if os.environ["PS_STAGE"] == "smoke":
         forecast = 1.5 * wall + 60
-        if not (0 < wall < 550 and forecast < min(720, remaining - 30)):
+        cap = 505 if a.comparison == "shanghai-lossless-q90" else 720
+        if not (0 < wall < 550 and forecast < min(cap, remaining - 30)):
             raise ValueError(
                 f"Paired render estimate {forecast:.1f} seconds exceeds the stage or remaining budget"
             )
@@ -172,7 +174,7 @@ def main():
         run_command.add_argument("--" + name, required=True, type=Path, action="append")
     run_command.add_argument(
         "--comparison",
-        choices=["lossless-q90", "jpeg40-jpeg70", "al031-fresh-prior"],
+        choices=["lossless-q90", "jpeg40-jpeg70", "al031-fresh-prior", "shanghai-lossless-q90"],
         default="lossless-q90",
     )
     run_command.add_argument("--control-sha")
