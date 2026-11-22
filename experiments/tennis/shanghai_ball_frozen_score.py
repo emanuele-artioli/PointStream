@@ -212,6 +212,7 @@ def run(a):
     result = {
         "stage": os.environ["PS_STAGE"],
         "frames": a.frames,
+        "decision": report["decision"],
         "labels_sha256": LABEL_SHA,
         "display_archive_sha256": a.display_sha256,
         "rgb_sha256": hashes,

@@ -55,15 +55,21 @@ def run(a):
         and ordinary["arm"] == "ordinary"
         and candidate["arm"] == "ball"
     )
-    target = ordinary["target_bytes"]
-    assert target == candidate["target_bytes"] == 24480
+    target = candidate["target_bytes"]
+    assert target == 24480
+    if a.decision == "primary":
+        assert ordinary["target_bytes"] == target
     pairs = []
     for width in (320, 640):
-        o = next(x["selected"] for x in ordinary["groups"] if x["width"] == width)
-        b = next(x["selected"] for x in candidate["groups"] if x["width"] == width)
-        if (
-            abs(o["bytes"] - b["bytes"]) / o["bytes"] <= 0.005
-            and abs(b["bytes"] - target) / target <= 0.005
+        oo = [x["selected"] for x in ordinary["groups"] if x["width"] == width]
+        bb = [x["selected"] for x in candidate["groups"] if x["width"] == width]
+        if not oo or not bb:
+            continue
+        o, b = oo[0], bb[0]
+        if a.decision == "secondary":
+            assert ordinary["target_bytes"] == b["bytes"]
+        if abs(o["bytes"] - b["bytes"]) / o["bytes"] <= 0.005 and (
+            a.decision == "secondary" or abs(b["bytes"] - target) / target <= 0.005
         ):
             pairs.append((abs(b["bytes"] - target), -width, o, b))
     if not pairs:
@@ -71,6 +77,7 @@ def run(a):
             "stage": os.environ["PS_STAGE"],
             "frames": a.frames,
             "matched": False,
+            "decision": a.decision,
             "ordinary_archive_sha256": sha(a.ordinary),
             "candidate_archive_sha256": sha(a.candidate),
             "pairs": [],
@@ -138,6 +145,7 @@ def run(a):
         "stage": os.environ["PS_STAGE"],
         "frames": a.frames,
         "matched": True,
+        "decision": a.decision,
         "width": width,
         "height": height,
         "logical_canvas": [960, 544],
@@ -186,6 +194,7 @@ if __name__ == "__main__":
     p.add_argument("--ordinary-sha256")
     p.add_argument("--candidate-sha256")
     p.add_argument("--frames", type=int)
+    p.add_argument("--decision", choices=("primary", "secondary"))
     p.add_argument("--validate", action="store_true")
     a = p.parse_args()
     validate() if a.validate else run(a)
