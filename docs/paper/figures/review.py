@@ -101,7 +101,7 @@ PANELS = [
     (
         "system/passage-bill.pdf",
         "What two rallies cost with the full intervening broadcast",
-        "Both cut indexes and all delivered components are charged. The 216.5-second fallback is identical. Even perfect rally frames could not overtake continuous conventional video on whole-passage luma at this allocation.",
+        "Both cut indexes and all delivered components are charged. The fitted-ball package used 2.15% fewer bytes than AV1 with the same 216.5-second fallback. Return boxes and ball centers came from the sender. Whole-passage luma was 24.45 versus 24.53 dB. Continuous AV1 achieved 26.13 dB at a lower rate.",
     ),
     (
         "system/passage-routing.pdf",
@@ -122,6 +122,11 @@ PANELS = [
         "references/rendered-reference-quality.pdf",
         "Which appearance references passed the motion review?",
         "One author viewed two 24-frame player tracks. The Q65 and Q78 rungs passed for Player 2. Player 1 accepted the lossless control and judged Q78 almost acceptable. Q90 has also been rendered. The plotted objective metric includes crop background.",
+    ),
+    (
+        "player-tasks/starved-masks.pdf",
+        "What player masks survive compression?",
+        "At the lower rate, receiver masks reached 0.762 mean IoU across 24 bodies, versus 0.312 from ordinary AV1 and 0.638 from DCVC-UF. On the six bodies drawn without proposals the means were 0.643, 0.431 and 0.606. At about 65 kbps ordinary AV1 reached 0.761.",
     ),
     (
         "player-tasks/decoded-masks.pdf",
@@ -232,7 +237,11 @@ def build(
     if stroke:
         low_rate = stroke.stem == "joint-serve"
         caption = (
-            "At 21.545 kbps with valid cached references, the two players and fitted ball share a cleaned base. Ordinary AV1 costs 21.623 kbps. Sending both references for this rally costs 428.777 kbps in total. All three instants were chosen from the source."
+            (
+                "At 21.545 kbps with valid cached references, the two players and fitted ball share a cleaned base. Ordinary AV1 costs 21.623 kbps. "
+                + ("DCVC-UF costs 20.450 kbps. " if "neural" in stroke.parent.name else "")
+                + "Sending both references for this rally costs 428.777 kbps in total. The three instants were chosen from the source."
+            )
             if low_rate
             else "Three source-selected instants with independently decoded conventional and neural controls. The joint decode costs 469.335 kbps cold or 65.473 kbps with valid references. The racket is missing near contact."
         )
@@ -290,8 +299,9 @@ def build(
             "players-rate-quality.pdf",
             "ball-rate-quality.pdf",
             "ball-starved-640-controls.pdf",
-            "basel-holdout-visual-machine.pdf",
+            "ball-three-match-rates.pdf",
             "matched-low-detection.pdf",
+            "starved-masks.pdf",
             "adelaide-prospective-machine.pdf",
             "joint-price.pdf",
             "passage-bill.pdf",

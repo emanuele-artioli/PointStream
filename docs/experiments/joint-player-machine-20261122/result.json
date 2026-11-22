@@ -1,0 +1,1000 @@
+{
+  "predictions_sha256": "480b0161621510775ebc359eda5ff8b86e88219f9655c34c1af32bbd77c0a16a",
+  "key_sha256": "bfe3020fa645d0f0431e54e8a510725e8c4f122c1aa5f2988c44e9a9c65cda8b",
+  "label_sha256": "9918c87fa6a309052bbac8ef0be21429885e6579fd632754ed9aeb343c912d8a",
+  "inference": {
+    "weight": "92b3de0065766a17180d6219858717dc9d03cdce8a3ca9576c97fd75aabb64f3",
+    "frames": "f6936efec14c18624bccf16dcb3c0189f386fbb5a769f92d4366fe9f7e57a2d0",
+    "ultralytics": "8.4.6",
+    "torch": "2.10.0+cu128",
+    "setup_seconds": 3.243956967984559,
+    "scoring_seconds": 547.9526185890136
+  },
+  "means": {
+    "joint": {
+      "all": {
+        "n": 24,
+        "mean": 0.7825126306636229,
+        "recall_iou50": 1.0
+      },
+      "unprompted": {
+        "n": 6,
+        "mean": 0.6732925235948967,
+        "recall_iou50": 1.0
+      },
+      "assisted": {
+        "n": 18,
+        "mean": 0.818919333019865,
+        "recall_iou50": 1.0
+      }
+    },
+    "neural": {
+      "all": {
+        "n": 24,
+        "mean": 0.6377120961204493,
+        "recall_iou50": 0.8333333333333334
+      },
+      "unprompted": {
+        "n": 6,
+        "mean": 0.6063360433390408,
+        "recall_iou50": 0.8333333333333334
+      },
+      "assisted": {
+        "n": 18,
+        "mean": 0.6481707803809188,
+        "recall_iou50": 0.8333333333333334
+      }
+    },
+    "ordinary": {
+      "all": {
+        "n": 24,
+        "mean": 0.31178372591742515,
+        "recall_iou50": 0.375
+      },
+      "unprompted": {
+        "n": 6,
+        "mean": 0.43046946018055815,
+        "recall_iou50": 0.5
+      },
+      "assisted": {
+        "n": 18,
+        "mean": 0.27222181449638083,
+        "recall_iou50": 0.3333333333333333
+      }
+    },
+    "receiver_mask": {
+      "all": {
+        "n": 24,
+        "mean": 0.7617684550529576,
+        "recall_iou50": 1.0
+      },
+      "unprompted": {
+        "n": 6,
+        "mean": 0.6431279605051813,
+        "recall_iou50": 1.0
+      },
+      "assisted": {
+        "n": 18,
+        "mean": 0.8013152865688832,
+        "recall_iou50": 1.0
+      }
+    },
+    "source": {
+      "all": {
+        "n": 24,
+        "mean": 0.8684929288737339,
+        "recall_iou50": 1.0
+      },
+      "unprompted": {
+        "n": 6,
+        "mean": 0.7703840036100119,
+        "recall_iou50": 1.0
+      },
+      "assisted": {
+        "n": 18,
+        "mean": 0.9011959039616413,
+        "recall_iou50": 1.0
+      }
+    }
+  },
+  "extras": {
+    "source": {
+      "10": 21,
+      "30": 22,
+      "50": 22,
+      "70": 22,
+      "90": 22,
+      "110": 22,
+      "130": 21,
+      "150": 24,
+      "170": 22,
+      "190": 22,
+      "210": 24,
+      "230": 25
+    },
+    "ordinary": {
+      "10": 5,
+      "30": 3,
+      "50": 3,
+      "70": 5,
+      "90": 3,
+      "110": 3,
+      "130": 3,
+      "150": 4,
+      "170": 4,
+      "190": 7,
+      "210": 6,
+      "230": 6
+    },
+    "neural": {
+      "10": 19,
+      "30": 21,
+      "50": 20,
+      "70": 20,
+      "90": 21,
+      "110": 20,
+      "130": 20,
+      "150": 17,
+      "170": 19,
+      "190": 17,
+      "210": 15,
+      "230": 14
+    },
+    "joint": {
+      "10": 0,
+      "30": 0,
+      "50": 0,
+      "70": 0,
+      "90": 0,
+      "110": 0,
+      "130": 0,
+      "150": 0,
+      "170": 0,
+      "190": 0,
+      "210": 0,
+      "230": 0
+    }
+  },
+  "rows": [
+    {
+      "arm": "source",
+      "tick": 10,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.7888011774150389
+    },
+    {
+      "arm": "source",
+      "tick": 10,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.7834996436208126
+    },
+    {
+      "arm": "ordinary",
+      "tick": 10,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.7444362924920519
+    },
+    {
+      "arm": "ordinary",
+      "tick": 10,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.755836264790534
+    },
+    {
+      "arm": "neural",
+      "tick": 10,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.794758675182722
+    },
+    {
+      "arm": "neural",
+      "tick": 10,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.7953125
+    },
+    {
+      "arm": "joint",
+      "tick": 10,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.6759926615122527
+    },
+    {
+      "arm": "joint",
+      "tick": 10,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.676563598032326
+    },
+    {
+      "arm": "source",
+      "tick": 30,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.9208594586328185
+    },
+    {
+      "arm": "source",
+      "tick": 30,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8711329645564434
+    },
+    {
+      "arm": "ordinary",
+      "tick": 30,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7287746982264481
+    },
+    {
+      "arm": "ordinary",
+      "tick": 30,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.6701916721744877
+    },
+    {
+      "arm": "neural",
+      "tick": 30,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8785067537479591
+    },
+    {
+      "arm": "neural",
+      "tick": 30,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8375344623867664
+    },
+    {
+      "arm": "joint",
+      "tick": 30,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7734470158343484
+    },
+    {
+      "arm": "joint",
+      "tick": 30,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.851220038868495
+    },
+    {
+      "arm": "source",
+      "tick": 50,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.9308316430020284
+    },
+    {
+      "arm": "source",
+      "tick": 50,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8915470494417863
+    },
+    {
+      "arm": "ordinary",
+      "tick": 50,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.5634416195856874
+    },
+    {
+      "arm": "ordinary",
+      "tick": 50,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.6700309295132671
+    },
+    {
+      "arm": "neural",
+      "tick": 50,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8244437278297323
+    },
+    {
+      "arm": "neural",
+      "tick": 50,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8447298828862864
+    },
+    {
+      "arm": "joint",
+      "tick": 50,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7749284351145038
+    },
+    {
+      "arm": "joint",
+      "tick": 50,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8215867901731776
+    },
+    {
+      "arm": "source",
+      "tick": 70,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8809431474443497
+    },
+    {
+      "arm": "source",
+      "tick": 70,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8700062098944318
+    },
+    {
+      "arm": "ordinary",
+      "tick": 70,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.0
+    },
+    {
+      "arm": "ordinary",
+      "tick": 70,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.4419667590027701
+    },
+    {
+      "arm": "neural",
+      "tick": 70,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7998654809057619
+    },
+    {
+      "arm": "neural",
+      "tick": 70,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8296024700887689
+    },
+    {
+      "arm": "joint",
+      "tick": 70,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.812778603268945
+    },
+    {
+      "arm": "joint",
+      "tick": 70,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8467587672688629
+    },
+    {
+      "arm": "source",
+      "tick": 90,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.5983870967741935
+    },
+    {
+      "arm": "source",
+      "tick": 90,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.7708689569407742
+    },
+    {
+      "arm": "ordinary",
+      "tick": 90,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.46904574132492116
+    },
+    {
+      "arm": "ordinary",
+      "tick": 90,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.6059326398187249
+    },
+    {
+      "arm": "neural",
+      "tick": 90,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.5366645775169506
+    },
+    {
+      "arm": "neural",
+      "tick": 90,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.7977611940298508
+    },
+    {
+      "arm": "joint",
+      "tick": 90,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.5191269794199632
+    },
+    {
+      "arm": "joint",
+      "tick": 90,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.692085675224062
+    },
+    {
+      "arm": "source",
+      "tick": 110,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.9456511692393013
+    },
+    {
+      "arm": "source",
+      "tick": 110,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8643031784841075
+    },
+    {
+      "arm": "ordinary",
+      "tick": 110,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.0
+    },
+    {
+      "arm": "ordinary",
+      "tick": 110,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.4707345382192008
+    },
+    {
+      "arm": "neural",
+      "tick": 110,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7669951983826131
+    },
+    {
+      "arm": "neural",
+      "tick": 110,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7640883977900552
+    },
+    {
+      "arm": "joint",
+      "tick": 110,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8497669100184713
+    },
+    {
+      "arm": "joint",
+      "tick": 110,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7837890625
+    },
+    {
+      "arm": "source",
+      "tick": 130,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.9174516608824987
+    },
+    {
+      "arm": "source",
+      "tick": 130,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.9127552848441419
+    },
+    {
+      "arm": "ordinary",
+      "tick": 130,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.0
+    },
+    {
+      "arm": "ordinary",
+      "tick": 130,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.0
+    },
+    {
+      "arm": "neural",
+      "tick": 130,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7682527598020555
+    },
+    {
+      "arm": "neural",
+      "tick": 130,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7703319175711814
+    },
+    {
+      "arm": "joint",
+      "tick": 130,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8632825719120135
+    },
+    {
+      "arm": "joint",
+      "tick": 130,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8102528814725615
+    },
+    {
+      "arm": "source",
+      "tick": 150,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.9295963418479974
+    },
+    {
+      "arm": "source",
+      "tick": 150,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8946201894015716
+    },
+    {
+      "arm": "ordinary",
+      "tick": 150,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.0
+    },
+    {
+      "arm": "ordinary",
+      "tick": 150,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.5728879520025945
+    },
+    {
+      "arm": "neural",
+      "tick": 150,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.0
+    },
+    {
+      "arm": "neural",
+      "tick": 150,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7219805955168953
+    },
+    {
+      "arm": "joint",
+      "tick": 150,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8314749681957644
+    },
+    {
+      "arm": "joint",
+      "tick": 150,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7461480646373544
+    },
+    {
+      "arm": "source",
+      "tick": 170,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.8800127054712936
+    },
+    {
+      "arm": "source",
+      "tick": 170,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.800734441437959
+    },
+    {
+      "arm": "ordinary",
+      "tick": 170,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.0
+    },
+    {
+      "arm": "ordinary",
+      "tick": 170,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.007565822657116917
+    },
+    {
+      "arm": "neural",
+      "tick": 170,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.0
+    },
+    {
+      "arm": "neural",
+      "tick": 170,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.7135193133047211
+    },
+    {
+      "arm": "joint",
+      "tick": 170,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.7543288324066719
+    },
+    {
+      "arm": "joint",
+      "tick": 170,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.7216573949741032
+    },
+    {
+      "arm": "source",
+      "tick": 190,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.9225411764705882
+    },
+    {
+      "arm": "source",
+      "tick": 190,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8628255074841091
+    },
+    {
+      "arm": "ordinary",
+      "tick": 190,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.0
+    },
+    {
+      "arm": "ordinary",
+      "tick": 190,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.6755485893416928
+    },
+    {
+      "arm": "neural",
+      "tick": 190,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7263574563290595
+    },
+    {
+      "arm": "neural",
+      "tick": 190,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.6405968191506805
+    },
+    {
+      "arm": "joint",
+      "tick": 190,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7873065827432468
+    },
+    {
+      "arm": "joint",
+      "tick": 190,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8584653363505451
+    },
+    {
+      "arm": "source",
+      "tick": 210,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.9286288378074264
+    },
+    {
+      "arm": "source",
+      "tick": 210,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8863343360550064
+    },
+    {
+      "arm": "ordinary",
+      "tick": 210,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.0
+    },
+    {
+      "arm": "ordinary",
+      "tick": 210,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.1064159028687061
+    },
+    {
+      "arm": "neural",
+      "tick": 210,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.6438924903488965
+    },
+    {
+      "arm": "neural",
+      "tick": 210,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.0769429382907307
+    },
+    {
+      "arm": "joint",
+      "tick": 210,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.781064174839756
+    },
+    {
+      "arm": "joint",
+      "tick": 210,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8095529699938763
+    },
+    {
+      "arm": "source",
+      "tick": 230,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.9131169471238471
+    },
+    {
+      "arm": "source",
+      "tick": 230,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8783811686970886
+    },
+    {
+      "arm": "ordinary",
+      "tick": 230,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.0
+    },
+    {
+      "arm": "ordinary",
+      "tick": 230,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.0
+    },
+    {
+      "arm": "neural",
+      "tick": 230,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7729526958290946
+    },
+    {
+      "arm": "neural",
+      "tick": 230,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.0
+    },
+    {
+      "arm": "joint",
+      "tick": 230,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.9055620780745524
+    },
+    {
+      "arm": "joint",
+      "tick": 230,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8331627430910952
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 10,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.6515580736543909
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 10,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.639557695737471
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 30,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7624377155998466
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 30,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8416169648774022
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 50,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7815279793072992
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 50,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8105436573311368
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 70,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8024347549331636
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 70,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8320363164721142
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 90,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.5046717848003333
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 90,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.6706689536878216
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 110,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7971274685816876
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 110,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7748330550918197
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 130,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8168561756791946
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 130,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7761517615176152
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 150,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8208192467961317
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 150,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7429814155792803
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 170,
+      "player": 1,
+      "stratum": "unprompted",
+      "iou": 0.6969180859691808
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 170,
+      "player": 2,
+      "stratum": "unprompted",
+      "iou": 0.6953931691818904
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 190,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.772093023255814
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 190,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8522560335781741
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 210,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.7462408928848241
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 210,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.7934182590233546
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 230,
+      "player": 1,
+      "stratum": "assisted",
+      "iou": 0.8854376163873371
+    },
+    {
+      "arm": "receiver_mask",
+      "tick": 230,
+      "player": 2,
+      "stratum": "assisted",
+      "iou": 0.8148628213437027
+    }
+  ]
+}

@@ -16,18 +16,32 @@ def read(study, name):
 
 
 def main():
-    joint = read("cumulative-joint", "cumulative-package-v2-receipt.json")
+    joint = read("cumulative-joint", "trajectory-detailed-receipt.json")
+    fitted = read("cumulative-joint", "trajectory-package-receipt.json")
     native = read("cumulative-joint", "same-gap-control-package-receipt.json")
     reference = read("passage-same-gap", "control.json")
     continuous = read("passage-native", "result-20.json")
     gap = read("cumulative-joint", "gap-luma-score.json")
     parts = {p["name"]: p["bytes"] for p in joint["entries"]}
-    assert joint["all_sections_reparsed"] and native["all_sections_reparsed"]
-    assert joint["frames"] == native["frames"] == continuous["metrics"]["full"]["frames"]
+    assert joint["parsed_to_eof"] and native["all_sections_reparsed"]
+    frames = sum(s["frames"] for s in joint["segments"])
+    assert joint["packet_sha256"] == fitted["packet_sha256"]
+    assert frames == native["frames"] == continuous["metrics"]["full"]["frames"]
     assert gap["source_sha256"] == continuous["source_sha256"]
     assert parts["fallback_ivf"] == reference["gap"]["bytes"]
     assert gap["sse"] == reference["gap"]["sse"]
-    ceiling = 10 * math.log10(255**2 * joint["frames"] * math.prod(gap["support"]) / gap["sse"])
+    initial = read("cumulative-joint", "initial-playback-score.json")
+    return_scores = read("cumulative-joint", "return-regions-result.json")
+    total_samples = 255**2 * frames * math.prod(gap["support"])
+    fitted_scores = read("cumulative-joint", "return-trajectory-score.json")
+    assert fitted["packet_sha256"] == fitted_scores["packet_sha256"]
+    ps_sse = initial["joint_sse"] + gap["sse"] + fitted_scores["return_luma_sse"]["trajectory"]
+    av1_sse = (
+        initial["control_display_sse"]
+        + gap["sse"]
+        + return_scores["all_frame_luma_sse"]["ordinary"]
+    )
+    ps_psnr, av1_psnr = (10 * math.log10(total_samples / sse) for sse in (ps_sse, av1_sse))
 
     categories = ["Appearance", "Player stream and base", "Ball", "Ordinary AV1", "Framing"]
     colors = ["#762b67", "#007499", "#cda33a", "#737e89", "#20242a"]
@@ -43,16 +57,16 @@ def main():
         [
             parts["cache_return"],
             parts["return_wire"],
-            parts["return_ball"],
+            parts["return_trajectory"],
             0,
             parts["return_manifest"],
         ],
-        [0, 0, 0, 0, joint["index_bytes"]],
+        [0, 0, 0, 0, fitted["index_bytes"]],
     ]
     native_stages = [
         [0, 0, 0, reference[phase]["bytes"], 0] for phase in ("initial", "gap", "return")
     ] + [[0, 0, 0, 0, native["index_bytes"]]]
-    assert sum(map(sum, joint_stages)) == joint["total_bytes"]
+    assert sum(map(sum, joint_stages)) == fitted["total_bytes"]
     assert sum(map(sum, native_stages)) == native["total_bytes"]
 
     fig, ax = plt.subplots(figsize=(9, 5.3))
@@ -89,7 +103,7 @@ def main():
     fig.text(
         0.04,
         0.90,
-        f"PointStream {joint['kbps']:.3f} kbps   •   AV1 with identical cutaway {native['kbps']:.3f} kbps   •   11,305 frames",
+        f"PointStream {fitted['kbps']:.3f} kbps   •   AV1 with identical cutaway {native['kbps']:.3f} kbps   •   11,305 frames",
         fontsize=11,
     )
     fig.legend(
@@ -104,14 +118,14 @@ def main():
     fig.text(
         0.04,
         0.075,
-        f"The shared gap alone caps either complete reconstruction at {ceiling:.2f} dB, even with perfect rallies.",
+        f"On 12 return frames, DISTS in sender-defined regions was bodies {fitted_scores['body_means']['trajectory']['dists']:.3f} vs {fitted_scores['body_means']['ordinary']['dists']:.3f}, ball {fitted_scores['ball_means']['trajectory']['dists']:.3f} vs {fitted_scores['ball_means']['ordinary']['dists']:.3f}.",
         fontsize=10,
     )
     ctrl = continuous["metrics"]["full"]
     fig.text(
         0.04,
         0.031,
-        f"Continuous AV1 achieved {ctrl['luma_psnr']:.2f} dB at {ctrl['kbps']:.2f} kbps. Both quality measures use 480 × 272 luma.",
+        f"Whole passage: {ps_psnr:.2f} vs {av1_psnr:.2f} dB with the same gap. Continuous AV1: {ctrl['luma_psnr']:.2f} dB at {ctrl['kbps']:.2f} kbps (480 × 272 luma).",
         fontsize=10,
     )
     for ext in ("pdf", "png"):
