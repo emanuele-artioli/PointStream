@@ -4,7 +4,7 @@ Each entry gives actual kbps at the ceiling on the left. Each named family uses 
 
 | Shot | Ceiling | PointStream | AV1 | ROI-AV1 | DCVC-UF |
 |---|---:|---:|---:|---:|---:|
-| al028 | 20.4 | 11.133 | 20.386 | 20.393 | 14.572 |
+| al028 | 20.4 | 20.214 | 20.386 | 20.393 | 14.572 |
 | al028 | 33 | 21.298 | 32.568 | 20.408 | 20.412 |
 | al031 | 20.4 | 16.508 | 19.343 | — | 17.528 |
 | al031 | 33 | 16.508 | 19.343 | — | 17.528 |
@@ -19,6 +19,6 @@ Each entry gives actual kbps at the ceiling on the left. Each named family uses 
 
 **What can be scored together today.** Alcaraz 028 and Nadal 000 have source-reviewed body and ball support on 11 and 12 common times. Alcaraz 028 also has body marks at the remaining time. Nadal now has a complete strict-20.4 reconstruction. [New same-support result](nad000-width.md)
 
-**What to recover.** Alcaraz 028 CRF53.5 costs 24,489 B, nine above the 20.4 allowance. CRF54 already costs 24,257 B (20.2142 kbps); its source-free full receiver replay and common-support scores remain outstanding. The specific local temporary producer/rung directories are gone. Use the cached paid generator outputs and masks when recovered rather than training again. The neural Q18 receipt already supplies the strict-budget producer result; its previous independent native rerun did not reproduce the encoded digest. The 24,494-byte neural Q24 also misses the 24,480-byte allowance. [Physical Alcaraz byte grid](../al028-neural-display-20261122/common-budget.json)
+**Alcaraz recovery.** The 24,489 B CRF53.5 packet misses the 20.4 allowance by nine bytes. The 24,257 B CRF54 alternative (20.2142 kbps) now has a complete source-free two-player replay and scores on 11 common visible-ball and player instants. Its equal-class foreground DISTS was 0.2720 against 0.3944 for the best affordable ordinary control. [Receiver and scores](al028-strict.md) The neural Q18 receipt already supplies the strict-budget producer result; its previous independent native rerun did not reproduce the encoded digest. The 24,494-byte neural Q24 also misses the 24,480-byte allowance. [Physical Alcaraz byte grid](../al028-neural-display-20261122/common-budget.json)
 
 **What still needs labels or controls.** Alcaraz 031 and the three Medvedev shots already have complete displays and source-model body measures. Medvedev uses half joint-coded and half conventional fallback ticks. To extend the source-reviewed foreground endpoint, use the same source-only labeling rule for all four, preserve the fallback instants and score every fixed display on those labels. At 20.4 kbps the three documented Medvedev neural controls exceed the available bytes; qualifying lower-price neural streams still require actual production and scoring. The small Alcaraz 031 bank gives the same affordable tested display at both budgets. Nearer-priced conventional/neural anchors would strengthen the 33-kbps comparison. Unavailable ROI points and unscored byte-grid candidates remain explicit.

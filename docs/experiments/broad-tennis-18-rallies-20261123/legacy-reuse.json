@@ -16,15 +16,17 @@
           "ceiling_bytes": 24480,
           "rows": {
             "PointStream": {
-              "setting": "joint-11",
-              "bytes": 13360,
-              "receipt": "reviewed-foreground-20261122/figure-data.json",
+              "setting": "joint-320w-CRF54",
+              "bytes": 24257,
+              "receipt": "broad-tennis-18-rallies-20261123/al028-strict-carrier.json",
+              "quality_receipt": "broad-tennis-18-rallies-20261123/al028-strict-scores.json",
               "identity": {
-                "wire_sha256": "fb69663af77820efc3d84c65ec314a15948805ab1f3bc70571fcab0ee2d1e1bd"
+                "wire_sha256": "1093859b4bcf14d0ebe1f1abe08fdf518acd21b763ed2b23327b2826c9f47020",
+                "display_sha256": "a52ff85dcbbe12f1a0c6ec7bd2ea25c8bcbc0f882611cf7b7fe9e12ac8b40a36"
               },
               "score_scope": "Source-reviewed body and ball DISTS on 11 common instants; both bodies on 12 instants.",
-              "actual_kbps": 11.133333333333335,
-              "affordable_scored_options": 1
+              "actual_kbps": 20.214166666666667,
+              "affordable_scored_options": 2
             },
             "AV1": {
               "setting": "160w-crf31.0",
@@ -75,7 +77,7 @@
               },
               "score_scope": "Source-reviewed body and ball DISTS on 11 common instants; both bodies on 12 instants.",
               "actual_kbps": 21.298333333333332,
-              "affordable_scored_options": 3
+              "affordable_scored_options": 4
             },
             "AV1": {
               "setting": "160w-crf20",

@@ -1,0 +1,159 @@
+{
+  "kbps": 20.214166666666667,
+  "bytes": 24257,
+  "wire_sha256": "1093859b4bcf14d0ebe1f1abe08fdf518acd21b763ed2b23327b2826c9f47020",
+  "full_display_sha256": "a52ff85dcbbe12f1a0c6ec7bd2ea25c8bcbc0f882611cf7b7fe9e12ac8b40a36",
+  "appeared_cached_bytes": 157517,
+  "reviewed_body_all_24": 0.3026675457755725,
+  "paired_player": 0.3036761771548878,
+  "paired_ball": 0.24033908410505814,
+  "foreground": 0.27200763062997296,
+  "rows": [
+    {
+      "tick": 10,
+      "people": {
+        "archived-track-0": 0.30815374851226807,
+        "archived-track-1": 0.23050963878631592
+      },
+      "player": 0.269331693649292,
+      "ball": 0.33826059103012085
+    },
+    {
+      "tick": 30,
+      "people": {
+        "archived-track-0": 0.29968178272247314,
+        "archived-track-1": 0.304778516292572
+      },
+      "player": 0.3022301495075226,
+      "ball": 0.16187459230422974
+    },
+    {
+      "tick": 50,
+      "people": {
+        "archived-track-0": 0.33921146392822266,
+        "archived-track-1": 0.2727341651916504
+      },
+      "player": 0.3059728145599365,
+      "ball": 0.30851054191589355
+    },
+    {
+      "tick": 70,
+      "people": {
+        "archived-track-0": 0.3009384274482727,
+        "archived-track-1": 0.26900458335876465
+      },
+      "player": 0.2849715054035187,
+      "ball": 0.1265200972557068
+    },
+    {
+      "tick": 90,
+      "people": {
+        "archived-track-0": 0.3014742136001587,
+        "archived-track-1": 0.3028201460838318
+      },
+      "player": 0.30214717984199524,
+      "ball": 0.2813042998313904
+    },
+    {
+      "tick": 110,
+      "people": {
+        "archived-track-0": 0.27728527784347534,
+        "archived-track-1": 0.30922257900238037
+      },
+      "player": 0.29325392842292786,
+      "ball": 0.15230607986450195
+    },
+    {
+      "tick": 130,
+      "people": {
+        "archived-track-0": 0.2930479049682617,
+        "archived-track-1": 0.29609984159469604
+      },
+      "player": 0.2945738732814789,
+      "ball": 0.31965339183807373
+    },
+    {
+      "tick": 150,
+      "people": {
+        "archived-track-0": 0.2978430390357971,
+        "archived-track-1": 0.28530216217041016
+      },
+      "player": 0.29157260060310364,
+      "ball": null
+    },
+    {
+      "tick": 170,
+      "people": {
+        "archived-track-0": 0.29435890913009644,
+        "archived-track-1": 0.3148254156112671
+      },
+      "player": 0.30459216237068176,
+      "ball": 0.19292408227920532
+    },
+    {
+      "tick": 190,
+      "people": {
+        "archived-track-0": 0.300997257232666,
+        "archived-track-1": 0.3458591103553772
+      },
+      "player": 0.3234281837940216,
+      "ball": 0.11823534965515137
+    },
+    {
+      "tick": 210,
+      "people": {
+        "archived-track-0": 0.350822389125824,
+        "archived-track-1": 0.2980532646179199
+      },
+      "player": 0.32443782687187195,
+      "ball": 0.38458961248397827
+    },
+    {
+      "tick": 230,
+      "people": {
+        "archived-track-0": 0.32601869106292725,
+        "archived-track-1": 0.34497857093811035
+      },
+      "player": 0.3354986310005188,
+      "ball": 0.2595512866973877
+    }
+  ],
+  "anchors": {
+    "ordinary": {
+      "bytes": 23916,
+      "kbps": 19.93,
+      "wire_sha256": "21d9285d7331b41a4d438366df15ac4e0f842faf48b3db59b2c297a3fd9b9c0e",
+      "candidates": 30,
+      "players": 0.4579588337378068,
+      "ball": 0.3308973854238337,
+      "foreground": 0.39442810958082025,
+      "archived_only": false
+    },
+    "ROI": {
+      "bytes": 24067,
+      "kbps": 20.055833333333332,
+      "wire_sha256": "8a8e677f10727d8987e859656ff293b0c0b7948d83f2f89b320e8049230a8581",
+      "candidates": 8,
+      "players": 0.5009965815327384,
+      "ball": 0.33194534345106647,
+      "foreground": 0.4164709624919024,
+      "archived_only": false
+    },
+    "neural_producer": {
+      "bytes": 17486,
+      "kbps": 14.571666666666667,
+      "wire_sha256": "d3909f4c4bd56d0b3a8b6ef2f5110ed46e8f7ddae1b52cef51fda357367cb7f8",
+      "candidates": 1,
+      "players": 0.39183383638208563,
+      "ball": 0.3243311914530667,
+      "foreground": 0.3580825139175762,
+      "archived_only": true
+    }
+  },
+  "source_labels_sha256": "098fc0b387cbc895fb64c543670023f87a26da155a68383a0b80d540ce6ab3f9",
+  "native_receipt_sha256": "40abe9064aa4b2385996b719d3804215be268a8113f000adb40023ae17bef26a",
+  "weights_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+  "script_sha256": "d57d63836302778fd7d46f78bbc8a05ff330c31dde745594fd1d06a42b87a1c8",
+  "cpu_seconds": 14.306483,
+  "scope": "11 common times for the equal-class mean, 24 accepted silhouettes; single development rally, warm cache, actual complete packet."
+}
