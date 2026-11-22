@@ -180,6 +180,10 @@ def cleaned(a, start, geometry, pos):
         ]
     )
     masks = np.stack([pilot.mask_at(t, active[t], geometry, coords) for t in range(120)])
+    footprint = a.out / "sender-fill-mask.npz"
+    np.savez_compressed(
+        footprint, ticks=np.arange(start, start + 120), packed=np.packbits(masks > 0, axis=2)
+    )
     orb = cv2.ORB_create(nfeatures=8000)
     keys0, d0 = orb.detectAndCompute(
         cv2.cvtColor(active[0], cv2.COLOR_YUV2BGR_I420), cv2.bitwise_not(masks[0])
@@ -265,6 +269,7 @@ def cleaned(a, start, geometry, pos):
     return dict(
         source_yuv_sha256=sha(source),
         mixed_yuv_sha256=sha(path),
+        sender_fill_mask_sha256=sha(footprint),
         donors=rows,
         holes=holes,
         forecast_seconds=forecast,
