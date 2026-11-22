@@ -1,0 +1,24 @@
+{
+  "far": {
+    "job_id": "20261122T212328Z-15c3068e",
+    "status": "pending",
+    "spec_sha256": "6646f3a4734093e9da13f81770ecec3f2ccf40d3196d2f67ed7058a785649eb5",
+    "source_sha256": "a2a95aa43a9e269d55679cfd4351401d584dacb0eb290cb0d9fcd685590087ed",
+    "source_commit": "b44691bba163f9778b93dfce29f2725ba5802b5b",
+    "source_archive_sha256": "32f19b8a4dfe3aaf1c209f8e4f202bd7bf8a35ec12ea7128972cb7fede242517",
+    "native_frames": 240,
+    "smoke_frames": 64,
+    "budget_seconds": 3450
+  },
+  "near": {
+    "job_id": "20261122T212328Z-5e8d13ac",
+    "status": "pending",
+    "spec_sha256": "9561bdf8b8890fbbc45f43f46658f0ecc487915585dd2b0fb2e8e100e18ae69f",
+    "source_sha256": "a2a95aa43a9e269d55679cfd4351401d584dacb0eb290cb0d9fcd685590087ed",
+    "source_commit": "b44691bba163f9778b93dfce29f2725ba5802b5b",
+    "source_archive_sha256": "32f19b8a4dfe3aaf1c209f8e4f202bd7bf8a35ec12ea7128972cb7fede242517",
+    "native_frames": 240,
+    "smoke_frames": 64,
+    "budget_seconds": 3450
+  }
+}
