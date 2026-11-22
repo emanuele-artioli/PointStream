@@ -1,0 +1,3 @@
+# Racket source feasibility
+
+`racket-detection.pdf` summarizes the fixed source and three existing decoder paths from `docs/experiments/racket-source-oracle-20261122/`. Counts are one-to-one official box matches at IoU ≥0.5 on 15 labeled frames, not trajectory, silhouette, grip or full-video recall. One fixed COCO detector and threshold are used throughout; pretraining overlap is unknown. The source-gate pass motivates a separately billed full-cadence racket-tile pilot; the AV1-plus-ball-tile row does not include a racket stream. Rates are actual complete ball-study stream rates; Washington ROI is materially lower than the others.
