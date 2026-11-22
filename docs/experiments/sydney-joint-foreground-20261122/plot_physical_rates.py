@@ -128,6 +128,7 @@ def main(output, rate_ceiling):
             ax.set_xscale("log")
             ax.set_xticks([v for v in (20, 30, 50, 75, 100, 150, 250, 350) if v <= rate_ceiling])
             ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
+            ax.xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
         ax.set_title("Sydney · Shapovalov–Safiullin", loc="left", fontsize=12)
         ax.grid(axis="y", color="#DDE1E5", linewidth=0.7)
         ax.spines[["right", "top"]].set_visible(False)

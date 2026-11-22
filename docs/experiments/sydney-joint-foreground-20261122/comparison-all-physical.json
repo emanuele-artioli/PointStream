@@ -1,0 +1,1016 @@
+{
+  "source": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+  "player_support": "automatic source masks",
+  "annotation_sha256": null,
+  "ticks": [
+    9,
+    32,
+    44,
+    68,
+    92,
+    115,
+    127,
+    151,
+    175,
+    198,
+    210,
+    234
+  ],
+  "controls": {
+    "ordinary": [
+      {
+        "arm": "SVT-AV1 ordinary 160x96",
+        "bytes": 52443,
+        "kbps": 104.886,
+        "sha256": "c8eebed429b51159677d48e20a3d60b83666cfb8fb86f4b93a5a6761d62c75d2",
+        "scores": {
+          "players": 0.4476606622338295,
+          "ball": 0.32555536429087323,
+          "foreground": 0.38660801326235134
+        },
+        "receipt": "automatic-ordinary-160-q64-range.json",
+        "receipt_sha256": "438d345c7f12cde35b63fa82303cf345a404b86217210623ad0fac20862bb7ce"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 160x96",
+        "bytes": 12780,
+        "kbps": 25.56,
+        "sha256": "2ce46974281a8269b1250332a012ed76b3629615876feb10e0517dc9ae208f08",
+        "scores": {
+          "players": 0.49759699900945026,
+          "ball": 0.36005911231040955,
+          "foreground": 0.42882805565992993
+        },
+        "receipt": "automatic-ordinary-160-warm.json",
+        "receipt_sha256": "e8ea099a10d1307fb4b604dd685f812105331227873c481c2021ea3ac9ad760f"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 192x112",
+        "bytes": 22015,
+        "kbps": 44.03,
+        "sha256": "c95cb0251f4c0246867e3277bc0c9459979d2c035d499efc12c5fb413deb05e6",
+        "scores": {
+          "players": 0.44167712330818176,
+          "ball": 0.3372817287842433,
+          "foreground": 0.3894794260462125
+        },
+        "receipt": "automatic-ordinary-192-q172-range.json",
+        "receipt_sha256": "6e339a63ca857c45beb05db796a5e033b94d70797204a79df3cd0d2778f2dc08"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 192x112",
+        "bytes": 68427,
+        "kbps": 136.854,
+        "sha256": "fa8de84a37cea49b3710ca1d6e4419a70c0cbfc473433108fd9f1dd01f57cbf8",
+        "scores": {
+          "players": 0.4152994255224864,
+          "ball": 0.30127060413360596,
+          "foreground": 0.35828501482804614
+        },
+        "receipt": "automatic-ordinary-192-q64-range.json",
+        "receipt_sha256": "49ff19dfe4b1211e06b44d92cfe0c00043c24e47c4dfc10d8b9e2e2d9378f976"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 192x112 warm",
+        "bytes": 12735,
+        "kbps": 25.47,
+        "sha256": "54ca9ace98884b92d52c5f5d35860f9f1653da6f713a16a7f8722b492bfec1bf",
+        "scores": {
+          "players": 0.4925907626748085,
+          "ball": 0.3535252908865611,
+          "foreground": 0.42305802678068477
+        },
+        "receipt": "automatic-ordinary-192-warm.json",
+        "receipt_sha256": "07ff1f3e284b354a52d09dd109b9ee329e1c0520207caf54f0f7bd22b886a94f"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 1920x1080 cold",
+        "bytes": 156539,
+        "kbps": 313.078,
+        "sha256": "94f39f3c1093d4ad7eb8d1b414056efdc06837d7c7bd1f92263792c771a853b8",
+        "scores": {
+          "players": 0.17923612147569656,
+          "ball": 0.14406523605187735,
+          "foreground": 0.16165067876378694
+        },
+        "receipt": "automatic-ordinary-1920-cold.json",
+        "receipt_sha256": "1aa473ec3e0469d78d743bc38383787057f5ff5a6eddf848597883e8789062bd"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 1920x1080",
+        "bytes": 41677,
+        "kbps": 83.354,
+        "sha256": "86078878304e79be696ce28759d05819518271ae7bdd033f2b26df889ac34268",
+        "scores": {
+          "players": 0.30020952224731445,
+          "ball": 0.2615618755420049,
+          "foreground": 0.2808856988946597
+        },
+        "receipt": "automatic-ordinary-1920-q280-range.json",
+        "receipt_sha256": "fe5d280b0b6edcbb20aa6d20d4df5860ea1059ef39616a4c770692535e0b0ea7"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 256x144",
+        "bytes": 30339,
+        "kbps": 60.678,
+        "sha256": "5554976714c6eb8032a7c52a3199824d89cc51fad06b1af71ab1fa630ae43435",
+        "scores": {
+          "players": 0.39321327457825345,
+          "ball": 0.31539739668369293,
+          "foreground": 0.35430533563097316
+        },
+        "receipt": "automatic-ordinary-256-q172-range.json",
+        "receipt_sha256": "870641c0e35f783e66f044d91ae95377ee77e8b0728c0135285873c9c55d9b26"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 256x144 r15462",
+        "bytes": 15196,
+        "kbps": 30.392,
+        "sha256": "8b4d426698da626376d718b50259179e2892340a25a855a83ffd449400751c7c",
+        "scores": {
+          "players": 0.455764206747214,
+          "ball": 0.34441907207171124,
+          "foreground": 0.40009163940946263
+        },
+        "receipt": "automatic-ordinary-256-r15462.json",
+        "receipt_sha256": "f41dce5d6020c12ba2e8209ca370da497e3ca6ed02eccfce2ea48cf43d1a37fc"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 256x144 r17827",
+        "bytes": 17802,
+        "kbps": 35.604,
+        "sha256": "d7a24d62412ed8e413753f7ae6034faef54074069fc1b15c58b9f2b9b9ea72f3",
+        "scores": {
+          "players": 0.43777093787988025,
+          "ball": 0.3405486245950063,
+          "foreground": 0.38915978123744327
+        },
+        "receipt": "automatic-ordinary-256-r17827.json",
+        "receipt_sha256": "98c40db249d33bc7c03163e48bc85edd083c9c975a3f8cb92aa918e6bd114988"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 256x144 warm",
+        "bytes": 12663,
+        "kbps": 25.326,
+        "sha256": "da9c8adfb1701e1c1575cb43e8c541e47df0f02f608da47f98d1a6a35ea0c60a",
+        "scores": {
+          "players": 0.4869203170140584,
+          "ball": 0.34754326939582825,
+          "foreground": 0.41723179320494336
+        },
+        "receipt": "automatic-ordinary-256-warm.json",
+        "receipt_sha256": "f8f655aa914b989ecd6013d807cce045b02bba53be2ebe91c158cb8a566b0420"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 320x192 cold",
+        "bytes": 162029,
+        "kbps": 324.058,
+        "sha256": "11e7e56fb025d2f8ef3ecea3f7f2f75ed783af664c0cbf6ec6960a06acd90eee",
+        "scores": {
+          "players": 0.3116927469770114,
+          "ball": 0.23887202143669128,
+          "foreground": 0.2752823842068513
+        },
+        "receipt": "automatic-ordinary-320-cold.json",
+        "receipt_sha256": "72a10257552cc8eb8208f08d6f174a98fd600015e3f08b3917269675ec7dce3d"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 320x192",
+        "bytes": 49763,
+        "kbps": 99.526,
+        "sha256": "fa43c8e13b24640fbf506b8741fd0827c5b412b6fe36fd43828972da7a1a9bec",
+        "scores": {
+          "players": 0.341955304145813,
+          "ball": 0.2767860144376755,
+          "foreground": 0.30937065929174423
+        },
+        "receipt": "automatic-ordinary-320-q160-range.json",
+        "receipt_sha256": "31b39097ca8d9b404ddafbc5a62cbba00703f7c37f13e6c18eee7ebce40005c9"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 320x192",
+        "bytes": 26348,
+        "kbps": 52.696,
+        "sha256": "70a193dc275e043ec839cbcbe5023b93dfa5acc8e662bbe561c6b891c60ae0bb",
+        "scores": {
+          "players": 0.38022463768720627,
+          "ball": 0.31498994926611584,
+          "foreground": 0.34760729347666103
+        },
+        "receipt": "automatic-ordinary-320-q220-range.json",
+        "receipt_sha256": "224901d6f001761f62b2071df7b73076364bd55655ec031ca21e018200ea6331"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 320x192",
+        "bytes": 21662,
+        "kbps": 43.324,
+        "sha256": "4852ac0e9b69d40e524d253586b297051509162cd7393cf699d9cae081009339",
+        "scores": {
+          "players": 0.4015224849184354,
+          "ball": 0.31863532960414886,
+          "foreground": 0.36007890726129216
+        },
+        "receipt": "automatic-ordinary-320-q235-range.json",
+        "receipt_sha256": "0c24096e599d63d3ea92087e7c9bb40ec621c8d3b393bc03a3863f87ba25d1b9"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 320x192 r15462",
+        "bytes": 14957,
+        "kbps": 29.914,
+        "sha256": "b241f141aa4eee3b4249380e561ee09523e7f86869185957446f4d316f4fc6ce",
+        "scores": {
+          "players": 0.4489462698499362,
+          "ball": 0.32785695791244507,
+          "foreground": 0.3884016138811906
+        },
+        "receipt": "automatic-ordinary-320-r15462.json",
+        "receipt_sha256": "c0afe0976237b498b57a57d17b22001b9297fa6390495005e566126f8ceace0b"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 320x192 r17827",
+        "bytes": 17662,
+        "kbps": 35.324,
+        "sha256": "b191debe47d5c8915c40641c9889271ba84dc0a04167d4a86b9d0c34d8bee793",
+        "scores": {
+          "players": 0.42275602867205936,
+          "ball": 0.3222683022419612,
+          "foreground": 0.37251216545701027
+        },
+        "receipt": "automatic-ordinary-320-r17827.json",
+        "receipt_sha256": "49924c903f9ac63d2b58825f22e7152215c4f8e7dd670064f38e9de49da279d8"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 320x192 warm",
+        "bytes": 12862,
+        "kbps": 25.724,
+        "sha256": "53a4b5ba06ab41fc3aa339dcda46a1981fd42215c588708d7c58194e7f471592",
+        "scores": {
+          "players": 0.48270222793022793,
+          "ball": 0.32915086050828296,
+          "foreground": 0.40592654421925545
+        },
+        "receipt": "automatic-ordinary-320-warm.json",
+        "receipt_sha256": "76368d7518e1400dad72907f855bd39f3354647af914f5bf1bcd01ecd44c2ca7"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 480x272 cold",
+        "bytes": 160804,
+        "kbps": 321.608,
+        "sha256": "110d16ad8ab25051afb0e947f7c658f33286b8dbcce9905ca18e7d9bf3116466",
+        "scores": {
+          "players": 0.25436684489250183,
+          "ball": 0.1963206926981608,
+          "foreground": 0.22534376879533133
+        },
+        "receipt": "automatic-ordinary-480-cold.json",
+        "receipt_sha256": "1307190220ebe7ec23cc6b576f661fa253ac04b68c853b25656609c60d675021"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 480x272",
+        "bytes": 75309,
+        "kbps": 150.618,
+        "sha256": "0f9d1c82e42b3e19d3f41733bfe2a52be93737b40a151230c22769c7e07078be",
+        "scores": {
+          "players": 0.28439697871605557,
+          "ball": 0.2374402234951655,
+          "foreground": 0.26091860110561055
+        },
+        "receipt": "automatic-ordinary-480-q172-range.json",
+        "receipt_sha256": "eba158fcba4c3fd11d737f84c03f312f85d4a793ada43cdeb3bd22431ac61a09"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 480x272",
+        "bytes": 38301,
+        "kbps": 76.602,
+        "sha256": "008220726d1bd8c2e85379b7b0d6746ed3a2cc5ac2fb9eb8e133e08bb2b05438",
+        "scores": {
+          "players": 0.3336062903205554,
+          "ball": 0.30494657655556995,
+          "foreground": 0.31927643343806267
+        },
+        "receipt": "automatic-ordinary-480-q226-range.json",
+        "receipt_sha256": "494a71138d660ec1d7446f8f078c2bf514b0f18dfa27d9e08ac5c2f7095060b9"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 480x272 r15462",
+        "bytes": 15276,
+        "kbps": 30.552,
+        "sha256": "9683e3e907a71175c812d29d005782701be86d219cb60f9f811f9b3d43703b9c",
+        "scores": {
+          "players": 0.47087690979242325,
+          "ball": 0.3380548357963562,
+          "foreground": 0.4044658727943897
+        },
+        "receipt": "automatic-ordinary-480-r15462.json",
+        "receipt_sha256": "5edf76a900a954c50ab1eb5a4668ecba99cb33b47fcd9506f1e7dcf299965e6b"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 480x272 r17827",
+        "bytes": 17590,
+        "kbps": 35.18,
+        "sha256": "398f6056cd39e4ead89ffc34fcded7016992b72ae3a6eef76724aa0f4cad8cc2",
+        "scores": {
+          "players": 0.43116645763317746,
+          "ball": 0.32061507801214856,
+          "foreground": 0.375890767822663
+        },
+        "receipt": "automatic-ordinary-480-r17827.json",
+        "receipt_sha256": "a09e586e575f31f8a2a310854b6d83b64a5bb4fd0a51dc564831a8b9a7a14599"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 640x384 cold",
+        "bytes": 159529,
+        "kbps": 319.058,
+        "sha256": "c2717ac649bdaac8c41e3f05291c96874c01f6ed1feb9f29786583af1be58bf4",
+        "scores": {
+          "players": 0.22198122491439184,
+          "ball": 0.18861312170823416,
+          "foreground": 0.205297173311313
+        },
+        "receipt": "automatic-ordinary-640-cold.json",
+        "receipt_sha256": "be073d43013d50cd1edcda2d06f571c6d9ee993effed1a825957add0a28c116f"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 640x384",
+        "bytes": 67624,
+        "kbps": 135.248,
+        "sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+        "scores": {
+          "players": 0.27135121325651806,
+          "ball": 0.24173304935296377,
+          "foreground": 0.2565421313047409
+        },
+        "receipt": "automatic-ordinary-640-q220-range.json",
+        "receipt_sha256": "1fe4eae35bcb7e4499d8a99219344fd20c3eff5eb7c25d710b1a49c2d1a5e9bc"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 640x384",
+        "bytes": 32244,
+        "kbps": 64.488,
+        "sha256": "181233789afe8d47e2e92b757c94c148bfd9030009dffb5a6903d5337a315356",
+        "scores": {
+          "players": 0.3351309572656949,
+          "ball": 0.2874115804831187,
+          "foreground": 0.3112712688744068
+        },
+        "receipt": "automatic-ordinary-640-q250-range.json",
+        "receipt_sha256": "8c760a09a9fdb1cc8f4d7f1203996d5366a0f77cb19c33702daa85213d1ea67d"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 640x384 r15462",
+        "bytes": 15364,
+        "kbps": 30.728,
+        "sha256": "439ef999fe843ef98b8ed3050e01ad06e912ccb98ad08e576a0e50800646585a",
+        "scores": {
+          "players": 0.46034588913122815,
+          "ball": 0.31524163484573364,
+          "foreground": 0.38779376198848087
+        },
+        "receipt": "automatic-ordinary-640-r15462.json",
+        "receipt_sha256": "73f2cd7f55d08f4ae26e11c9c372f7dff489e9ad39d1bb7c6ca20b3208941f61"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 640x384 r17827",
+        "bytes": 17623,
+        "kbps": 35.246,
+        "sha256": "ce22585fa5da053222672d7f1cbc9f51591f23cb0efc3a58e42a247fa1e5638b",
+        "scores": {
+          "players": 0.43797170867522556,
+          "ball": 0.314000462492307,
+          "foreground": 0.3759860855837663
+        },
+        "receipt": "automatic-ordinary-640-r17827.json",
+        "receipt_sha256": "341056c0331af2494bd8e13682e1a0dc581cc213c6d9fc3a64391ca16e69932f"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 960x544 cold",
+        "bytes": 161650,
+        "kbps": 323.3,
+        "sha256": "0f41a5511b1a80af6f191b838490087be6e99f82b3e72f8e2b3943b5c7a32246",
+        "scores": {
+          "players": 0.19206313540538153,
+          "ball": 0.16219093402226767,
+          "foreground": 0.1771270347138246
+        },
+        "receipt": "automatic-ordinary-960-cold.json",
+        "receipt_sha256": "3ac2b9f416431da8d4783371ace2d7002e6422f268c10f8e52794e3d8eb0df48"
+      },
+      {
+        "arm": "SVT-AV1 ordinary 960x544",
+        "bytes": 20497,
+        "kbps": 40.994,
+        "sha256": "041d6aae744104779c919adb69455f0fe5887aa1684be738565e8e3c2fc9f970",
+        "scores": {
+          "players": 0.40972881267468136,
+          "ball": 0.30141109228134155,
+          "foreground": 0.35556995247801143
+        },
+        "receipt": "automatic-ordinary-960-q280-range.json",
+        "receipt_sha256": "59f3cbe79e60fe6e3beb881bc375956067fe1eff26c81503529b283b51633f28"
+      }
+    ],
+    "roi": [
+      {
+        "arm": "SVT-AV1 ROI 160x96",
+        "bytes": 13023,
+        "kbps": 26.046,
+        "sha256": "ccdb23a11f34723248b70befe24ab50ea1350cfa7920e045c360a1a0996157db",
+        "scores": {
+          "players": 0.6374459813038508,
+          "ball": 0.380324790875117,
+          "foreground": 0.5088853860894839
+        },
+        "receipt": "automatic-roi-160-floor.json",
+        "receipt_sha256": "e616fc1bbcde232321187b6dc458ff7716f3a3aaffb999949a83c8c0b504039f"
+      },
+      {
+        "arm": "SVT-AV1 ROI 192x112",
+        "bytes": 13009,
+        "kbps": 26.018,
+        "sha256": "9babc102a14fe9d27da93fc667d199df2db3540ed53bc4d9d64a4bc717afbaa8",
+        "scores": {
+          "players": 0.6533883040150007,
+          "ball": 0.37498252590497333,
+          "foreground": 0.514185414959987
+        },
+        "receipt": "automatic-roi-192-floor.json",
+        "receipt_sha256": "126c21b3247df44f5f9be3fd121b706a8e8f3dd5b335c27a3d6fed863cc85cc3"
+      },
+      {
+        "arm": "SVT-AV1 ROI 256x144",
+        "bytes": 13675,
+        "kbps": 27.35,
+        "sha256": "089b4ae5164c6d074b9f360e4199f6cd727cbabbede3decf3a18eea99bd56d12",
+        "scores": {
+          "players": 0.5901622946063677,
+          "ball": 0.36271435022354126,
+          "foreground": 0.4764383224149545
+        },
+        "receipt": "automatic-roi-256-floor.json",
+        "receipt_sha256": "ea25129dae93e01ba4bf8f233f9fbc0580e8e6686e6ddfdbb6a1d46ac1b7063b"
+      },
+      {
+        "arm": "SVT-AV1 roi 320x192 cold",
+        "bytes": 129794,
+        "kbps": 259.588,
+        "sha256": "c0506e42262acc053f03a1c0d0a4e62c3818f4b14d0d065b57b4fd282aade478",
+        "scores": {
+          "players": 0.31045343975226086,
+          "ball": 0.23603763182957968,
+          "foreground": 0.27324553579092026
+        },
+        "receipt": "automatic-roi-320-cold.json",
+        "receipt_sha256": "52a860195898c88a27099d88bc8e44fbf3560372c49123a353d8550b4e3b30b9"
+      },
+      {
+        "arm": "SVT-AV1 ROI 320x192",
+        "bytes": 13975,
+        "kbps": 27.95,
+        "sha256": "83b114e77c8b3b9a8e02229fd56519d7caaa6b4331d3a25661de6caab70e46c5",
+        "scores": {
+          "players": 0.5632175082961718,
+          "ball": 0.3483342081308365,
+          "foreground": 0.45577585821350414
+        },
+        "receipt": "automatic-roi-320-floor.json",
+        "receipt_sha256": "5aa4dc6f9a22644397247a6a253e7f921dbdfa378a0f8448c84d17e87f0c9b43"
+      },
+      {
+        "arm": "SVT-AV1 roi 480x272 cold",
+        "bytes": 162022,
+        "kbps": 324.044,
+        "sha256": "f025e0cccd580518db6a7379f54c63a62b8b7c98229b13f3b4af84d84aaeccc5",
+        "scores": {
+          "players": 0.24796592692534128,
+          "ball": 0.1967532883087794,
+          "foreground": 0.22235960761706033
+        },
+        "receipt": "automatic-roi-480-cold.json",
+        "receipt_sha256": "156ba0aefedb6572aa4bc0d3bba2e37f0ab790d5ad0fec81092027ebdfd60cab"
+      },
+      {
+        "arm": "SVT-AV1 ROI 480x272",
+        "bytes": 15905,
+        "kbps": 31.81,
+        "sha256": "c142ebe2f755cd0e2d2de9e3bd68e6ea7958e7472abde09289b5bed43caf8e03",
+        "scores": {
+          "players": 0.5253251741329829,
+          "ball": 0.35812168816725415,
+          "foreground": 0.44172343115011853
+        },
+        "receipt": "automatic-roi-480-floor.json",
+        "receipt_sha256": "076fb656f1bf81fc5b358ab7918bdd6d5a40be62f76a318afdf70c9836d77b56"
+      },
+      {
+        "arm": "SVT-AV1 roi 640x384 cold",
+        "bytes": 160748,
+        "kbps": 321.496,
+        "sha256": "803e1e91d813728408cc6b6a8c2ae655c0f9d69dc42cc6bc46ebd397ffbf84b3",
+        "scores": {
+          "players": 0.21322035789489746,
+          "ball": 0.17942760388056436,
+          "foreground": 0.19632398088773093
+        },
+        "receipt": "automatic-roi-640-cold.json",
+        "receipt_sha256": "9e7753c9db7d648df5abcb252bc3156e4b67a24124cca9fc0d2d54450f47ad82"
+      },
+      {
+        "arm": "SVT-AV1 ROI 640x384",
+        "bytes": 17077,
+        "kbps": 34.154,
+        "sha256": "9a360274fe715cd2afc299211ad03e5bd249b3f4fdca0ee342e4ccfaf390b4e1",
+        "scores": {
+          "players": 0.5007243951161703,
+          "ball": 0.3221250573794047,
+          "foreground": 0.4114247262477875
+        },
+        "receipt": "automatic-roi-640-floor.json",
+        "receipt_sha256": "6af567c3251216847391065956f088ffae3be88d4fd917db4a368b6bcb4c2a7e"
+      },
+      {
+        "arm": "SVT-AV1 ROI 320x192",
+        "bytes": 14593,
+        "kbps": 29.186,
+        "sha256": "cdb12d8a179fc27d0c60809317b910c1e72bbedb5dc87b679c8adc0db4c7c894",
+        "scores": {
+          "players": 0.5583330517013868,
+          "ball": 0.35862815876801807,
+          "foreground": 0.4584806052347024
+        },
+        "receipt": "automatic-roi8-320-floor.json",
+        "receipt_sha256": "0e544d433436a333f157d3b4d20e17dc2c8c148a2c79f6e7eb01a2acffd6ff35"
+      }
+    ],
+    "neural": [
+      {
+        "arm": "DCVC-UF Q24 480x272",
+        "bytes": 11224,
+        "kbps": 22.448,
+        "sha256": "fb46b547842d5368273860c106cfa5a6ca58bd3dc7a51af57f026aeadc7acf8c",
+        "scores": {
+          "players": 0.39724141856034595,
+          "ball": 0.3065286527077357,
+          "foreground": 0.35188503563404083
+        },
+        "receipt": "automatic-dcvc-480-q24.json",
+        "receipt_sha256": "89af26678599baaa436a244670472ab12bfb57f3e32aad4c7ce491747d5bffad"
+      },
+      {
+        "arm": "DCVC-UF Q26 480x272",
+        "bytes": 12305,
+        "kbps": 24.61,
+        "sha256": "c3d5581a90d2333768191df0f76ea91a992295c4ab0db3f08ef35665e8f382c4",
+        "scores": {
+          "players": 0.3905757615963618,
+          "ball": 0.30784588555494946,
+          "foreground": 0.34921082357565564
+        },
+        "receipt": "automatic-dcvc-480-q26.json",
+        "receipt_sha256": "d54840a26796895fdfb693d9a994439eb49bc27368a317ca8cbd276523ceb352"
+      },
+      {
+        "arm": "DCVC-UF Q27 480x272",
+        "bytes": 12913,
+        "kbps": 25.826,
+        "sha256": "64dca0e76681ce38c917df6012c54c0960f720c48ec77a2d2ae33c55e3e38312",
+        "scores": {
+          "players": 0.384930615623792,
+          "ball": 0.3071470359961192,
+          "foreground": 0.3460388258099556
+        },
+        "receipt": "automatic-dcvc-480-q27.json",
+        "receipt_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+      },
+      {
+        "arm": "DCVC-UF Q36 480x272",
+        "bytes": 20251,
+        "kbps": 40.502,
+        "sha256": "b4011f4bca94fcd98b2912e78aca8ea4d2773e3926a9566ff0ee7f7bbbe8c9da",
+        "scores": {
+          "players": 0.3447669396797816,
+          "ball": 0.29852710167566937,
+          "foreground": 0.3216470206777255
+        },
+        "receipt": "automatic-dcvc-480-q36.json",
+        "receipt_sha256": "9ace93de177c4bcf15bc1b1aa9f405f35abf46131e6c055d87eb2526ac5e064d"
+      },
+      {
+        "arm": "DCVC-UF Q63 480x272",
+        "bytes": 75408,
+        "kbps": 150.816,
+        "sha256": "6b6074650f40b11811bf79267b2a9769e9776f4bd58abb75d3a5d811c4781a69",
+        "scores": {
+          "players": 0.2977276345094045,
+          "ball": 0.239642933011055,
+          "foreground": 0.26868528376022977
+        },
+        "receipt": "automatic-dcvc-480-q63.json",
+        "receipt_sha256": "81e0052fbbb6584a0ffe7d258eb7ce1b7a145e76771c85f16b5383b9abdaea88"
+      },
+      {
+        "arm": "DCVC-UF Q48 960x544",
+        "bytes": 95865,
+        "kbps": 191.73,
+        "sha256": "e443d40d8a0281111026231e1114d71098b4968f33781b5d041881000531afef",
+        "scores": {
+          "players": 0.21221294005711874,
+          "ball": 0.16676764686902365,
+          "foreground": 0.1894902934630712
+        },
+        "receipt": "automatic-dcvc-960-q48.json",
+        "receipt_sha256": "dd79e2b6b8d2c911cd1be4d4eafe902a417f721c169a73f066ec85cee5fc12b1"
+      },
+      {
+        "arm": "DCVC-UF Q54 960x544",
+        "bytes": 132738,
+        "kbps": 265.476,
+        "sha256": "6c9644ab8239cafcb01929554a81715bda2c7c4ede222719c4fd48be6eeb9e94",
+        "scores": {
+          "players": 0.19974710047245026,
+          "ball": 0.16191557049751282,
+          "foreground": 0.18083133548498154
+        },
+        "receipt": "automatic-dcvc-960-q54.json",
+        "receipt_sha256": "760d1e24ff42915a154160aa2bc4573fd1c5953f5973532884f88d927300ce18"
+      }
+    ]
+  },
+  "measured_rungs": {
+    "70": {
+      "joint": {
+        "arm": "PointStream two players and ball, base CRF 70",
+        "bytes": 12890,
+        "kbps": 25.78,
+        "sha256": "f9ab35e8d3cd6708e726fe57d9d7ba7cc8943285ac4535524491f5cfe0598384",
+        "scores": {
+          "players": 0.30214354147513706,
+          "ball": 0.2517430434624354,
+          "foreground": 0.27694329246878624
+        },
+        "receipt": "automatic-joint-70.json",
+        "receipt_sha256": "ff8d29ea2e6847be11a6f2bc2366fcc4d794b4872658637f7d367f069aad36b4"
+      },
+      "cases": {
+        "cached": {
+          "bytes": 12890,
+          "kbps": 25.78,
+          "controls": {
+            "ordinary": {
+              "best": {
+                "arm": "SVT-AV1 ordinary 320x192 warm",
+                "bytes": 12862,
+                "kbps": 25.724,
+                "sha256": "53a4b5ba06ab41fc3aa339dcda46a1981fd42215c588708d7c58194e7f471592",
+                "scores": {
+                  "players": 0.48270222793022793,
+                  "ball": 0.32915086050828296,
+                  "foreground": 0.40592654421925545
+                },
+                "receipt": "automatic-ordinary-320-warm.json",
+                "receipt_sha256": "76368d7518e1400dad72907f855bd39f3354647af914f5bf1bcd01ecd44c2ca7"
+              },
+              "affordable": 4,
+              "relative_lower_dists": 0.3177502274421372
+            },
+            "neural": {
+              "best": {
+                "arm": "DCVC-UF Q26 480x272",
+                "bytes": 12305,
+                "kbps": 24.61,
+                "sha256": "c3d5581a90d2333768191df0f76ea91a992295c4ab0db3f08ef35665e8f382c4",
+                "scores": {
+                  "players": 0.3905757615963618,
+                  "ball": 0.30784588555494946,
+                  "foreground": 0.34921082357565564
+                },
+                "receipt": "automatic-dcvc-480-q26.json",
+                "receipt_sha256": "d54840a26796895fdfb693d9a994439eb49bc27368a317ca8cbd276523ceb352"
+              },
+              "affordable": 2,
+              "relative_lower_dists": 0.20694527840490262
+            }
+          }
+        },
+        "cold": {
+          "bytes": 162340,
+          "kbps": 324.68,
+          "controls": {
+            "ordinary": {
+              "best": {
+                "arm": "SVT-AV1 ordinary 1920x1080 cold",
+                "bytes": 156539,
+                "kbps": 313.078,
+                "sha256": "94f39f3c1093d4ad7eb8d1b414056efdc06837d7c7bd1f92263792c771a853b8",
+                "scores": {
+                  "players": 0.17923612147569656,
+                  "ball": 0.14406523605187735,
+                  "foreground": 0.16165067876378694
+                },
+                "receipt": "automatic-ordinary-1920-cold.json",
+                "receipt_sha256": "1aa473ec3e0469d78d743bc38383787057f5ff5a6eddf848597883e8789062bd"
+              },
+              "affordable": 30,
+              "relative_lower_dists": -0.7132207212904522
+            },
+            "roi": {
+              "best": {
+                "arm": "SVT-AV1 roi 640x384 cold",
+                "bytes": 160748,
+                "kbps": 321.496,
+                "sha256": "803e1e91d813728408cc6b6a8c2ae655c0f9d69dc42cc6bc46ebd397ffbf84b3",
+                "scores": {
+                  "players": 0.21322035789489746,
+                  "ball": 0.17942760388056436,
+                  "foreground": 0.19632398088773093
+                },
+                "receipt": "automatic-roi-640-cold.json",
+                "receipt_sha256": "9e7753c9db7d648df5abcb252bc3156e4b67a24124cca9fc0d2d54450f47ad82"
+              },
+              "affordable": 10,
+              "relative_lower_dists": -0.410644238245953
+            },
+            "neural": {
+              "best": {
+                "arm": "DCVC-UF Q54 960x544",
+                "bytes": 132738,
+                "kbps": 265.476,
+                "sha256": "6c9644ab8239cafcb01929554a81715bda2c7c4ede222719c4fd48be6eeb9e94",
+                "scores": {
+                  "players": 0.19974710047245026,
+                  "ball": 0.16191557049751282,
+                  "foreground": 0.18083133548498154
+                },
+                "receipt": "automatic-dcvc-960-q54.json",
+                "receipt_sha256": "760d1e24ff42915a154160aa2bc4573fd1c5953f5973532884f88d927300ce18"
+              },
+              "affordable": 7,
+              "relative_lower_dists": -0.5315005650211937
+            }
+          }
+        }
+      }
+    },
+    "60": {
+      "joint": {
+        "arm": "PointStream two players and ball, base CRF 60",
+        "bytes": 15462,
+        "kbps": 30.924,
+        "sha256": "f557fdc85d5c2877a7f854e20536f13e706dabae434c84e37f762546e7ad9968",
+        "scores": {
+          "players": 0.29955027004082996,
+          "ball": 0.237636665503184,
+          "foreground": 0.268593467772007
+        },
+        "receipt": "automatic-joint-60.json",
+        "receipt_sha256": "bbbbf15865a1a6d8e7e8f7fe7f626fc7199689328a055e1b274ec68bfde45daf"
+      },
+      "cases": {
+        "cached": {
+          "bytes": 15462,
+          "kbps": 30.924,
+          "controls": {
+            "ordinary": {
+              "best": {
+                "arm": "SVT-AV1 ordinary 640x384 r15462",
+                "bytes": 15364,
+                "kbps": 30.728,
+                "sha256": "439ef999fe843ef98b8ed3050e01ad06e912ccb98ad08e576a0e50800646585a",
+                "scores": {
+                  "players": 0.46034588913122815,
+                  "ball": 0.31524163484573364,
+                  "foreground": 0.38779376198848087
+                },
+                "receipt": "automatic-ordinary-640-r15462.json",
+                "receipt_sha256": "73f2cd7f55d08f4ae26e11c9c372f7dff489e9ad39d1bb7c6ca20b3208941f61"
+              },
+              "affordable": 8,
+              "relative_lower_dists": 0.3073806386292893
+            },
+            "roi": {
+              "best": {
+                "arm": "SVT-AV1 ROI 320x192",
+                "bytes": 13975,
+                "kbps": 27.95,
+                "sha256": "83b114e77c8b3b9a8e02229fd56519d7caaa6b4331d3a25661de6caab70e46c5",
+                "scores": {
+                  "players": 0.5632175082961718,
+                  "ball": 0.3483342081308365,
+                  "foreground": 0.45577585821350414
+                },
+                "receipt": "automatic-roi-320-floor.json",
+                "receipt_sha256": "5aa4dc6f9a22644397247a6a253e7f921dbdfa378a0f8448c84d17e87f0c9b43"
+              },
+              "affordable": 5,
+              "relative_lower_dists": 0.4106895682785665
+            },
+            "neural": {
+              "best": {
+                "arm": "DCVC-UF Q27 480x272",
+                "bytes": 12913,
+                "kbps": 25.826,
+                "sha256": "64dca0e76681ce38c917df6012c54c0960f720c48ec77a2d2ae33c55e3e38312",
+                "scores": {
+                  "players": 0.384930615623792,
+                  "ball": 0.3071470359961192,
+                  "foreground": 0.3460388258099556
+                },
+                "receipt": "automatic-dcvc-480-q27.json",
+                "receipt_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+              },
+              "affordable": 3,
+              "relative_lower_dists": 0.22380540061270915
+            }
+          }
+        },
+        "cold": {
+          "bytes": 164912,
+          "kbps": 329.824,
+          "controls": {
+            "ordinary": {
+              "best": {
+                "arm": "SVT-AV1 ordinary 1920x1080 cold",
+                "bytes": 156539,
+                "kbps": 313.078,
+                "sha256": "94f39f3c1093d4ad7eb8d1b414056efdc06837d7c7bd1f92263792c771a853b8",
+                "scores": {
+                  "players": 0.17923612147569656,
+                  "ball": 0.14406523605187735,
+                  "foreground": 0.16165067876378694
+                },
+                "receipt": "automatic-ordinary-1920-cold.json",
+                "receipt_sha256": "1aa473ec3e0469d78d743bc38383787057f5ff5a6eddf848597883e8789062bd"
+              },
+              "affordable": 30,
+              "relative_lower_dists": -0.6615672128694916
+            },
+            "roi": {
+              "best": {
+                "arm": "SVT-AV1 roi 640x384 cold",
+                "bytes": 160748,
+                "kbps": 321.496,
+                "sha256": "803e1e91d813728408cc6b6a8c2ae655c0f9d69dc42cc6bc46ebd397ffbf84b3",
+                "scores": {
+                  "players": 0.21322035789489746,
+                  "ball": 0.17942760388056436,
+                  "foreground": 0.19632398088773093
+                },
+                "receipt": "automatic-roi-640-cold.json",
+                "receipt_sha256": "9e7753c9db7d648df5abcb252bc3156e4b67a24124cca9fc0d2d54450f47ad82"
+              },
+              "affordable": 10,
+              "relative_lower_dists": -0.36811339377640184
+            },
+            "neural": {
+              "best": {
+                "arm": "DCVC-UF Q54 960x544",
+                "bytes": 132738,
+                "kbps": 265.476,
+                "sha256": "6c9644ab8239cafcb01929554a81715bda2c7c4ede222719c4fd48be6eeb9e94",
+                "scores": {
+                  "players": 0.19974710047245026,
+                  "ball": 0.16191557049751282,
+                  "foreground": 0.18083133548498154
+                },
+                "receipt": "automatic-dcvc-960-q54.json",
+                "receipt_sha256": "760d1e24ff42915a154160aa2bc4573fd1c5953f5973532884f88d927300ce18"
+              },
+              "affordable": 7,
+              "relative_lower_dists": -0.48532590909452367
+            }
+          }
+        }
+      }
+    },
+    "50": {
+      "joint": {
+        "arm": "PointStream two players and ball, base CRF 50",
+        "bytes": 17827,
+        "kbps": 35.654,
+        "sha256": "11cf8f79869e69912006f0556bb7cbb6f967e0a46b0368881b67fa48ba71ecf0",
+        "scores": {
+          "players": 0.29972732563813526,
+          "ball": 0.2349073737859726,
+          "foreground": 0.26731734971205395
+        },
+        "receipt": "automatic-joint-50.json",
+        "receipt_sha256": "00bdb0eb59eb23884f187201f73ae7b5dd7e5e114b1b6df9e9bf22aaf44685c7"
+      },
+      "cases": {
+        "cached": {
+          "bytes": 17827,
+          "kbps": 35.654,
+          "controls": {
+            "ordinary": {
+              "best": {
+                "arm": "SVT-AV1 ordinary 320x192 r17827",
+                "bytes": 17662,
+                "kbps": 35.324,
+                "sha256": "b191debe47d5c8915c40641c9889271ba84dc0a04167d4a86b9d0c34d8bee793",
+                "scores": {
+                  "players": 0.42275602867205936,
+                  "ball": 0.3222683022419612,
+                  "foreground": 0.37251216545701027
+                },
+                "receipt": "automatic-ordinary-320-r17827.json",
+                "receipt_sha256": "49924c903f9ac63d2b58825f22e7152215c4f8e7dd670064f38e9de49da279d8"
+              },
+              "affordable": 12,
+              "relative_lower_dists": 0.28239296726296126
+            },
+            "roi": {
+              "best": {
+                "arm": "SVT-AV1 ROI 640x384",
+                "bytes": 17077,
+                "kbps": 34.154,
+                "sha256": "9a360274fe715cd2afc299211ad03e5bd249b3f4fdca0ee342e4ccfaf390b4e1",
+                "scores": {
+                  "players": 0.5007243951161703,
+                  "ball": 0.3221250573794047,
+                  "foreground": 0.4114247262477875
+                },
+                "receipt": "automatic-roi-640-floor.json",
+                "receipt_sha256": "6af567c3251216847391065956f088ffae3be88d4fd917db4a368b6bcb4c2a7e"
+              },
+              "affordable": 7,
+              "relative_lower_dists": 0.3502642581791314
+            },
+            "neural": {
+              "best": {
+                "arm": "DCVC-UF Q27 480x272",
+                "bytes": 12913,
+                "kbps": 25.826,
+                "sha256": "64dca0e76681ce38c917df6012c54c0960f720c48ec77a2d2ae33c55e3e38312",
+                "scores": {
+                  "players": 0.384930615623792,
+                  "ball": 0.3071470359961192,
+                  "foreground": 0.3460388258099556
+                },
+                "receipt": "automatic-dcvc-480-q27.json",
+                "receipt_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+              },
+              "affordable": 3,
+              "relative_lower_dists": 0.22749318927909967
+            }
+          }
+        },
+        "cold": {
+          "bytes": 167277,
+          "kbps": 334.554,
+          "controls": {
+            "ordinary": {
+              "best": {
+                "arm": "SVT-AV1 ordinary 1920x1080 cold",
+                "bytes": 156539,
+                "kbps": 313.078,
+                "sha256": "94f39f3c1093d4ad7eb8d1b414056efdc06837d7c7bd1f92263792c771a853b8",
+                "scores": {
+                  "players": 0.17923612147569656,
+                  "ball": 0.14406523605187735,
+                  "foreground": 0.16165067876378694
+                },
+                "receipt": "automatic-ordinary-1920-cold.json",
+                "receipt_sha256": "1aa473ec3e0469d78d743bc38383787057f5ff5a6eddf848597883e8789062bd"
+              },
+              "affordable": 30,
+              "relative_lower_dists": -0.6536729183962975
+            },
+            "roi": {
+              "best": {
+                "arm": "SVT-AV1 roi 640x384 cold",
+                "bytes": 160748,
+                "kbps": 321.496,
+                "sha256": "803e1e91d813728408cc6b6a8c2ae655c0f9d69dc42cc6bc46ebd397ffbf84b3",
+                "scores": {
+                  "players": 0.21322035789489746,
+                  "ball": 0.17942760388056436,
+                  "foreground": 0.19632398088773093
+                },
+                "receipt": "automatic-roi-640-cold.json",
+                "receipt_sha256": "9e7753c9db7d648df5abcb252bc3156e4b67a24124cca9fc0d2d54450f47ad82"
+              },
+              "affordable": 10,
+              "relative_lower_dists": -0.3616133317147894
+            },
+            "neural": {
+              "best": {
+                "arm": "DCVC-UF Q54 960x544",
+                "bytes": 132738,
+                "kbps": 265.476,
+                "sha256": "6c9644ab8239cafcb01929554a81715bda2c7c4ede222719c4fd48be6eeb9e94",
+                "scores": {
+                  "players": 0.19974710047245026,
+                  "ball": 0.16191557049751282,
+                  "foreground": 0.18083133548498154
+                },
+                "receipt": "automatic-dcvc-960-q54.json",
+                "receipt_sha256": "760d1e24ff42915a154160aa2bc4573fd1c5953f5973532884f88d927300ce18"
+              },
+              "affordable": 7,
+              "relative_lower_dists": -0.4782689570649954
+            }
+          }
+        }
+      }
+    }
+  }
+}
