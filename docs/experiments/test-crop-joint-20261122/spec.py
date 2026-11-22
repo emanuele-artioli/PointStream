@@ -1,7 +1,9 @@
 """Bind each frozen TEST case to its already closed K4 publication before crop inference."""
 
 import argparse
+import hashlib
 import json
+import tarfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -11,7 +13,17 @@ def main(a):
     assert a.event in ("match108", "match102", "match120")
     old = HERE.parent / "test-joint-admission-20261122"
     d = json.loads((old / (a.event + "-features.json")).read_text())
-    receipt = json.loads((old / (a.event + "-outcome.json")).read_text())
+    if a.archive:
+        assert a.job
+        with tarfile.open(a.archive) as archive:
+            output = json.load(archive.extractfile("publish/admission.json"))
+        receipt = dict(
+            archive_sha256=hashlib.sha256(a.archive.read_bytes()).hexdigest(),
+            job=a.job,
+            full=output,
+        )
+    else:
+        receipt = json.loads((old / (a.event + "-outcome.json")).read_text())
     data = {v["name"]: v for v in d["staged_inputs"]}
     digest = data["source"]["sha256"]
     fs = receipt["archive_sha256"]
@@ -69,4 +81,6 @@ def main(a):
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("event")
+    p.add_argument("--archive", type=Path)
+    p.add_argument("--job")
     main(p.parse_args())
