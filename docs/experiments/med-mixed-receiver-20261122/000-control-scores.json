@@ -3077,5 +3077,1387 @@
       "native_frames": 240,
       "scope": "Original W7 source-SAM masks on 12 fixed ticks, native RGB, tight support plus 32-pixel margin, masked DISTS; all-frame native RGB PSNR"
     }
+  ],
+  "ordinary_under_lower_joint_ceiling": [
+    {
+      "arm": {
+        "name": "ordinary-w160-near-11770B",
+        "kind": "native_yuv420p",
+        "width": 160,
+        "height": 96,
+        "sha256": "4c4d603567f7eb5c3f3d8e1fce29c8a23c2aad395b5f46b4731904afdd78df1f",
+        "path": "/private/tmp/ps-med000-av1-matched-joint11770/w160-q4235/decoded.yuv",
+        "bytes": 11728,
+        "kbps": 19.546666666666667,
+        "crf": 58.75,
+        "stream_sha256": "14568c6248cc4d211fe3d5426e8cdf371240e5bd9ab142df6d7ce2931f4cf9b3",
+        "price_cap_bytes": 11770
+      },
+      "mean_dists": 0.552215687930584,
+      "active_dists": 0.5519695580005646,
+      "fallback_dists": 0.5524618178606033,
+      "rgb_psnr": 19.46952711199614,
+      "active_rgb_psnr": 19.49077139076564,
+      "fallback_rgb_psnr": 19.448386247689562,
+      "cpu_seconds": 10.024863,
+      "body_rows": [
+        {
+          "tick": 10,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.5631853342056274
+        },
+        {
+          "tick": 10,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5748546123504639
+        },
+        {
+          "tick": 30,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.5378177165985107
+        },
+        {
+          "tick": 30,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5860782265663147
+        },
+        {
+          "tick": 50,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.48584479093551636
+        },
+        {
+          "tick": 50,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5689418911933899
+        },
+        {
+          "tick": 70,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.5495235323905945
+        },
+        {
+          "tick": 70,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5759085416793823
+        },
+        {
+          "tick": 90,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.5381537079811096
+        },
+        {
+          "tick": 90,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5144411325454712
+        },
+        {
+          "tick": 110,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.5503162741661072
+        },
+        {
+          "tick": 110,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5785689353942871
+        },
+        {
+          "tick": 130,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.5091551542282104
+        },
+        {
+          "tick": 130,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.537710428237915
+        },
+        {
+          "tick": 150,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.55640709400177
+        },
+        {
+          "tick": 150,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5679340362548828
+        },
+        {
+          "tick": 170,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.550575852394104
+        },
+        {
+          "tick": 170,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.6010094881057739
+        },
+        {
+          "tick": 190,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.5367798805236816
+        },
+        {
+          "tick": 190,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5570111274719238
+        },
+        {
+          "tick": 210,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.5355342030525208
+        },
+        {
+          "tick": 210,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.550865113735199
+        },
+        {
+          "tick": 230,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.5732333064079285
+        },
+        {
+          "tick": 230,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5533261299133301
+        }
+      ],
+      "supports_sha256": "ed45e6d1ebe722b9f1619c08cfb30f927e1d341a050feae9bd1556c4522f800c",
+      "weights_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "native_frames": 240,
+      "scope": "Original W7 source-SAM masks on 12 fixed ticks, native RGB, tight support plus 32-pixel margin, masked DISTS; all-frame native RGB PSNR"
+    },
+    {
+      "arm": {
+        "name": "ordinary-w320-near-11770B",
+        "kind": "native_yuv420p",
+        "width": 320,
+        "height": 192,
+        "sha256": "4396ec332cc543b5a562308c3cd2cdd55d6815315e528700330995c90b8a2aa5",
+        "path": "/private/tmp/ps-med000-av1-matched-joint11770/w320-q4266/decoded.yuv",
+        "bytes": 11769,
+        "kbps": 19.615,
+        "crf": 66.5,
+        "stream_sha256": "5439a324965b7c737068bf4054c2cfe3c789918b504eb1e7dd81eb231e26d33c",
+        "price_cap_bytes": 11770
+      },
+      "mean_dists": 0.5595670640468597,
+      "active_dists": 0.549584150314331,
+      "fallback_dists": 0.5695499777793884,
+      "rgb_psnr": 20.228376408093563,
+      "active_rgb_psnr": 20.261545017162796,
+      "fallback_rgb_psnr": 20.195459200619034,
+      "cpu_seconds": 10.775645999999998,
+      "body_rows": [
+        {
+          "tick": 10,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.5437109470367432
+        },
+        {
+          "tick": 10,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5463338494300842
+        },
+        {
+          "tick": 30,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.48396140336990356
+        },
+        {
+          "tick": 30,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5532660484313965
+        },
+        {
+          "tick": 50,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.5310062766075134
+        },
+        {
+          "tick": 50,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5765148401260376
+        },
+        {
+          "tick": 70,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.5451576113700867
+        },
+        {
+          "tick": 70,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5950523614883423
+        },
+        {
+          "tick": 90,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.5584876537322998
+        },
+        {
+          "tick": 90,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.527348518371582
+        },
+        {
+          "tick": 110,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.5465692281723022
+        },
+        {
+          "tick": 110,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5876010656356812
+        },
+        {
+          "tick": 130,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.520072340965271
+        },
+        {
+          "tick": 130,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5982106328010559
+        },
+        {
+          "tick": 150,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.5677714347839355
+        },
+        {
+          "tick": 150,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5770193338394165
+        },
+        {
+          "tick": 170,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.5427324175834656
+        },
+        {
+          "tick": 170,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.6195095181465149
+        },
+        {
+          "tick": 190,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.5559607744216919
+        },
+        {
+          "tick": 190,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5770406723022461
+        },
+        {
+          "tick": 210,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.5498121380805969
+        },
+        {
+          "tick": 210,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5626101493835449
+        },
+        {
+          "tick": 230,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.5829510688781738
+        },
+        {
+          "tick": 230,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.580909252166748
+        }
+      ],
+      "supports_sha256": "ed45e6d1ebe722b9f1619c08cfb30f927e1d341a050feae9bd1556c4522f800c",
+      "weights_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "native_frames": 240,
+      "scope": "Original W7 source-SAM masks on 12 fixed ticks, native RGB, tight support plus 32-pixel margin, masked DISTS; all-frame native RGB PSNR"
+    }
+  ],
+  "ordinary_under_upper_joint_ceiling": [
+    {
+      "arm": {
+        "name": "ordinary-w160-near-16236B",
+        "kind": "native_yuv420p",
+        "width": 160,
+        "height": 96,
+        "sha256": "008b2372a9bc094fbd4d84eef947c03093b0b98dd7329215f872943106c6c01d",
+        "path": "/private/tmp/ps-med000-av1-matched-joint16236/w160-q4173/decoded.yuv",
+        "bytes": 16116,
+        "kbps": 26.86,
+        "crf": 43.25,
+        "stream_sha256": "e3c2d6649b011905e084a09a561e580cc736ebe3eda0779af09a74622b6a14c7",
+        "price_cap_bytes": 16236
+      },
+      "mean_dists": 0.5236922452847163,
+      "active_dists": 0.5256044069925944,
+      "fallback_dists": 0.5217800835768381,
+      "rgb_psnr": 19.57804042376486,
+      "active_rgb_psnr": 19.594021343140344,
+      "fallback_rgb_psnr": 19.562118094529588,
+      "cpu_seconds": 10.289196,
+      "body_rows": [
+        {
+          "tick": 10,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.5224205255508423
+        },
+        {
+          "tick": 10,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5744757652282715
+        },
+        {
+          "tick": 30,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.49784308671951294
+        },
+        {
+          "tick": 30,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5605461001396179
+        },
+        {
+          "tick": 50,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.49529755115509033
+        },
+        {
+          "tick": 50,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5333902835845947
+        },
+        {
+          "tick": 70,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.4920489192008972
+        },
+        {
+          "tick": 70,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5628534555435181
+        },
+        {
+          "tick": 90,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.493558406829834
+        },
+        {
+          "tick": 90,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.49539440870285034
+        },
+        {
+          "tick": 110,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.5188463926315308
+        },
+        {
+          "tick": 110,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5605779886245728
+        },
+        {
+          "tick": 130,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.5137135982513428
+        },
+        {
+          "tick": 130,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5443253517150879
+        },
+        {
+          "tick": 150,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.5031729936599731
+        },
+        {
+          "tick": 150,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5352568626403809
+        },
+        {
+          "tick": 170,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.5097559690475464
+        },
+        {
+          "tick": 170,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5486891269683838
+        },
+        {
+          "tick": 190,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.5043845176696777
+        },
+        {
+          "tick": 190,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5258777141571045
+        },
+        {
+          "tick": 210,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.5010215640068054
+        },
+        {
+          "tick": 210,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5299091339111328
+        },
+        {
+          "tick": 230,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.5262948274612427
+        },
+        {
+          "tick": 230,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5189593434333801
+        }
+      ],
+      "supports_sha256": "ed45e6d1ebe722b9f1619c08cfb30f927e1d341a050feae9bd1556c4522f800c",
+      "weights_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "native_frames": 240,
+      "scope": "Original W7 source-SAM masks on 12 fixed ticks, native RGB, tight support plus 32-pixel margin, masked DISTS; all-frame native RGB PSNR"
+    },
+    {
+      "arm": {
+        "name": "ordinary-w320-near-16236B",
+        "kind": "native_yuv420p",
+        "width": 320,
+        "height": 192,
+        "sha256": "9439c7214a96c23a534068b19c8d24b6404226ca4094476222d15a62711e98fd",
+        "path": "/private/tmp/ps-med000-av1-matched-joint16236/w320-q4248/decoded.yuv",
+        "bytes": 15787,
+        "kbps": 26.311666666666667,
+        "crf": 62.0,
+        "stream_sha256": "2e7c5b91cd0d9544e91f8e8b9e6bf60e4125821e906ab2a06df7ad6963b04324",
+        "price_cap_bytes": 16236
+      },
+      "mean_dists": 0.4931442216038704,
+      "active_dists": 0.489890123407046,
+      "fallback_dists": 0.49639831980069477,
+      "rgb_psnr": 20.768600679187568,
+      "active_rgb_psnr": 20.78823918769958,
+      "fallback_rgb_psnr": 20.749050575099925,
+      "cpu_seconds": 10.519176999999999,
+      "body_rows": [
+        {
+          "tick": 10,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.4856194853782654
+        },
+        {
+          "tick": 10,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5291768908500671
+        },
+        {
+          "tick": 30,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.44444215297698975
+        },
+        {
+          "tick": 30,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.48893582820892334
+        },
+        {
+          "tick": 50,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.45044028759002686
+        },
+        {
+          "tick": 50,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.524699330329895
+        },
+        {
+          "tick": 70,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.43746358156204224
+        },
+        {
+          "tick": 70,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5601123571395874
+        },
+        {
+          "tick": 90,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.446117103099823
+        },
+        {
+          "tick": 90,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.48385268449783325
+        },
+        {
+          "tick": 110,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.5004150867462158
+        },
+        {
+          "tick": 110,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5274066925048828
+        },
+        {
+          "tick": 130,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.4675154685974121
+        },
+        {
+          "tick": 130,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5291640162467957
+        },
+        {
+          "tick": 150,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.4560304284095764
+        },
+        {
+          "tick": 150,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5420283675193787
+        },
+        {
+          "tick": 170,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.4585224390029907
+        },
+        {
+          "tick": 170,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5826786160469055
+        },
+        {
+          "tick": 190,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.45931291580200195
+        },
+        {
+          "tick": 190,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5198111534118652
+        },
+        {
+          "tick": 210,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.4578186869621277
+        },
+        {
+          "tick": 210,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5165098905563354
+        },
+        {
+          "tick": 230,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.4596096873283386
+        },
+        {
+          "tick": 230,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5077781677246094
+        }
+      ],
+      "supports_sha256": "ed45e6d1ebe722b9f1619c08cfb30f927e1d341a050feae9bd1556c4522f800c",
+      "weights_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "native_frames": 240,
+      "scope": "Original W7 source-SAM masks on 12 fixed ticks, native RGB, tight support plus 32-pixel margin, masked DISTS; all-frame native RGB PSNR"
+    },
+    {
+      "arm": {
+        "name": "ordinary-w480-near-16236B",
+        "kind": "native_yuv420p",
+        "width": 480,
+        "height": 272,
+        "sha256": "67608483ff8c4544bf0895db8aa30dfe3d61898cf8186102e2a91047046132f7",
+        "path": "/private/tmp/ps-med000-av1-matched-joint16236/w480-q4266/decoded.yuv",
+        "bytes": 16194,
+        "kbps": 26.99,
+        "crf": 66.5,
+        "stream_sha256": "b290eab881f1e38ea8d68279497b0795355a284bb9d08de1afb2be316270ceb0",
+        "price_cap_bytes": 16236
+      },
+      "mean_dists": 0.49961142738660175,
+      "active_dists": 0.49804097910722095,
+      "fallback_dists": 0.5011818756659826,
+      "rgb_psnr": 21.643970229122722,
+      "active_rgb_psnr": 21.681621239681967,
+      "fallback_rgb_psnr": 21.60664282918134,
+      "cpu_seconds": 10.939817000000001,
+      "body_rows": [
+        {
+          "tick": 10,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.5230017900466919
+        },
+        {
+          "tick": 10,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5318163633346558
+        },
+        {
+          "tick": 30,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.4640015959739685
+        },
+        {
+          "tick": 30,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.4919092655181885
+        },
+        {
+          "tick": 50,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.45816272497177124
+        },
+        {
+          "tick": 50,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5117350816726685
+        },
+        {
+          "tick": 70,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.49690186977386475
+        },
+        {
+          "tick": 70,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5325319170951843
+        },
+        {
+          "tick": 90,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.45168250799179077
+        },
+        {
+          "tick": 90,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.4711519479751587
+        },
+        {
+          "tick": 110,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.47846341133117676
+        },
+        {
+          "tick": 110,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.565133273601532
+        },
+        {
+          "tick": 130,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.45462411642074585
+        },
+        {
+          "tick": 130,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5125751495361328
+        },
+        {
+          "tick": 150,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.5128542184829712
+        },
+        {
+          "tick": 150,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5437954664230347
+        },
+        {
+          "tick": 170,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.5043880939483643
+        },
+        {
+          "tick": 170,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5671800971031189
+        },
+        {
+          "tick": 190,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.4362414479255676
+        },
+        {
+          "tick": 190,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.542597770690918
+        },
+        {
+          "tick": 210,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.4684579372406006
+        },
+        {
+          "tick": 210,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.49682891368865967
+        },
+        {
+          "tick": 230,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.4770112633705139
+        },
+        {
+          "tick": 230,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.49762803316116333
+        }
+      ],
+      "supports_sha256": "ed45e6d1ebe722b9f1619c08cfb30f927e1d341a050feae9bd1556c4522f800c",
+      "weights_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "native_frames": 240,
+      "scope": "Original W7 source-SAM masks on 12 fixed ticks, native RGB, tight support plus 32-pixel margin, masked DISTS; all-frame native RGB PSNR"
+    },
+    {
+      "arm": {
+        "name": "ordinary-w640-near-16236B",
+        "kind": "native_yuv420p",
+        "width": 640,
+        "height": 384,
+        "sha256": "7e2894690e311e2e273cd28e8e8cb25b0408393186c38e4888bfaf0294b1eb03",
+        "path": "/private/tmp/ps-med000-av1-matched-joint16236/w640-q4276/decoded.yuv",
+        "bytes": 16215,
+        "kbps": 27.025,
+        "crf": 69.0,
+        "stream_sha256": "6008e319592593ae3c58f3a6bdaf9156ef906c816d1e44434ef62d81afd5eefd",
+        "price_cap_bytes": 16236
+      },
+      "mean_dists": 0.49960491557916004,
+      "active_dists": 0.48974669973055523,
+      "fallback_dists": 0.5094631314277649,
+      "rgb_psnr": 22.179095784469105,
+      "active_rgb_psnr": 22.213138615608955,
+      "fallback_rgb_psnr": 22.145317729080702,
+      "cpu_seconds": 11.470427,
+      "body_rows": [
+        {
+          "tick": 10,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.5146303772926331
+        },
+        {
+          "tick": 10,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5287500619888306
+        },
+        {
+          "tick": 30,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.4259337782859802
+        },
+        {
+          "tick": 30,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5090312957763672
+        },
+        {
+          "tick": 50,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.44502609968185425
+        },
+        {
+          "tick": 50,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5301836729049683
+        },
+        {
+          "tick": 70,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.4367782473564148
+        },
+        {
+          "tick": 70,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5498587489128113
+        },
+        {
+          "tick": 90,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.4343000650405884
+        },
+        {
+          "tick": 90,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.47711533308029175
+        },
+        {
+          "tick": 110,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.46967613697052
+        },
+        {
+          "tick": 110,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.5556765794754028
+        },
+        {
+          "tick": 130,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.43911778926849365
+        },
+        {
+          "tick": 130,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5498381853103638
+        },
+        {
+          "tick": 150,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.4648323655128479
+        },
+        {
+          "tick": 150,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5437397956848145
+        },
+        {
+          "tick": 170,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.523058295249939
+        },
+        {
+          "tick": 170,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5914102792739868
+        },
+        {
+          "tick": 190,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.4598212242126465
+        },
+        {
+          "tick": 190,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5041712522506714
+        },
+        {
+          "tick": 210,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.4509850740432739
+        },
+        {
+          "tick": 210,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5272315144538879
+        },
+        {
+          "tick": 230,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.5133913159370422
+        },
+        {
+          "tick": 230,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5459604859352112
+        }
+      ],
+      "supports_sha256": "ed45e6d1ebe722b9f1619c08cfb30f927e1d341a050feae9bd1556c4522f800c",
+      "weights_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "native_frames": 240,
+      "scope": "Original W7 source-SAM masks on 12 fixed ticks, native RGB, tight support plus 32-pixel margin, masked DISTS; all-frame native RGB PSNR"
+    }
+  ],
+  "neural_q26": [
+    {
+      "arm": {
+        "name": "dcvc-w480-q26",
+        "kind": "native_yuv420p",
+        "width": 480,
+        "height": 272,
+        "path": "/private/tmp/ps-med000-q26-native50-decoded.yuv",
+        "sha256": "72e26a89a725364f07887d14fc476d79955959b86060cbd35c93866651fd0a03",
+        "kbps": 23.398333333333333,
+        "bytes": 14039,
+        "producer_archive_sha256": "efb82089f331abe2639e44eab3ba8040ca5d9c742200fb0b2374a095455bb4dc"
+      },
+      "mean_dists": 0.4324774344762166,
+      "active_dists": 0.40328734119733173,
+      "fallback_dists": 0.4616675277551015,
+      "rgb_psnr": 22.012928478935315,
+      "active_rgb_psnr": 22.132511265275802,
+      "fallback_rgb_psnr": 21.89655035591384,
+      "cpu_seconds": 11.067552,
+      "body_rows": [
+        {
+          "tick": 10,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.3632913827896118
+        },
+        {
+          "tick": 10,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.45146894454956055
+        },
+        {
+          "tick": 30,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.3692796230316162
+        },
+        {
+          "tick": 30,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.42527449131011963
+        },
+        {
+          "tick": 50,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.3606053590774536
+        },
+        {
+          "tick": 50,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.4853845238685608
+        },
+        {
+          "tick": 70,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.3327100872993469
+        },
+        {
+          "tick": 70,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.457633376121521
+        },
+        {
+          "tick": 90,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.35756051540374756
+        },
+        {
+          "tick": 90,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.41626960039138794
+        },
+        {
+          "tick": 110,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.34004080295562744
+        },
+        {
+          "tick": 110,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.4799293875694275
+        },
+        {
+          "tick": 130,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.37564724683761597
+        },
+        {
+          "tick": 130,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5041547417640686
+        },
+        {
+          "tick": 150,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.43486106395721436
+        },
+        {
+          "tick": 150,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.49634021520614624
+        },
+        {
+          "tick": 170,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.41779959201812744
+        },
+        {
+          "tick": 170,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5624709725379944
+        },
+        {
+          "tick": 190,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.41004496812820435
+        },
+        {
+          "tick": 190,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5187510848045349
+        },
+        {
+          "tick": 210,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.410960853099823
+        },
+        {
+          "tick": 210,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.5062342286109924
+        },
+        {
+          "tick": 230,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.40576207637786865
+        },
+        {
+          "tick": 230,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.49698328971862793
+        }
+      ],
+      "supports_sha256": "ed45e6d1ebe722b9f1619c08cfb30f927e1d341a050feae9bd1556c4522f800c",
+      "weights_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "native_frames": 240,
+      "scope": "Original W7 source-SAM masks on 12 fixed ticks, native RGB, tight support plus 32-pixel margin, masked DISTS; all-frame native RGB PSNR"
+    }
+  ],
+  "ordinary_under_cold_ceiling": [
+    {
+      "arm": {
+        "name": "ordinary-960-cold",
+        "kind": "native_yuv420p",
+        "width": 960,
+        "height": 544,
+        "sha256": "0011f0cc128207472f27e6767a021ce8f2e7bc92bdfcc7a9202baf5165f85259",
+        "path": "/private/tmp/ps-med000-cold-native-price/selected.yuv",
+        "stream_sha256": "03f4a532a4bb86fd0a83bfc2412b6ae0c1a98a84a001d74b04035724e061f8ce",
+        "bytes": 215174,
+        "kbps": 358.62333333333333,
+        "crf": 43.0,
+        "cold_ceiling_bytes": 216888
+      },
+      "mean_dists": 0.2126602828502655,
+      "active_dists": 0.21234354376792908,
+      "fallback_dists": 0.21297702193260193,
+      "rgb_psnr": 27.910595961762866,
+      "active_rgb_psnr": 27.942122859127455,
+      "fallback_rgb_psnr": 27.879296280305507,
+      "cpu_seconds": 12.785484,
+      "body_rows": [
+        {
+          "tick": 10,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.16689389944076538
+        },
+        {
+          "tick": 10,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.23916643857955933
+        },
+        {
+          "tick": 30,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.1988881230354309
+        },
+        {
+          "tick": 30,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.2540254592895508
+        },
+        {
+          "tick": 50,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.19245916604995728
+        },
+        {
+          "tick": 50,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.24872642755508423
+        },
+        {
+          "tick": 70,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.17544978857040405
+        },
+        {
+          "tick": 70,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.24196666479110718
+        },
+        {
+          "tick": 90,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.17458230257034302
+        },
+        {
+          "tick": 90,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.23908841609954834
+        },
+        {
+          "tick": 110,
+          "player_index": 0,
+          "active": true,
+          "dists": 0.15680915117263794
+        },
+        {
+          "tick": 110,
+          "player_index": 1,
+          "active": true,
+          "dists": 0.2600666880607605
+        },
+        {
+          "tick": 130,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.17353248596191406
+        },
+        {
+          "tick": 130,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.22998493909835815
+        },
+        {
+          "tick": 150,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.17037999629974365
+        },
+        {
+          "tick": 150,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.27733874320983887
+        },
+        {
+          "tick": 170,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.1992276906967163
+        },
+        {
+          "tick": 170,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.2677003741264343
+        },
+        {
+          "tick": 190,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.16363728046417236
+        },
+        {
+          "tick": 190,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.23867064714431763
+        },
+        {
+          "tick": 210,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.17308872938156128
+        },
+        {
+          "tick": 210,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.26794731616973877
+        },
+        {
+          "tick": 230,
+          "player_index": 0,
+          "active": false,
+          "dists": 0.16760361194610596
+        },
+        {
+          "tick": 230,
+          "player_index": 1,
+          "active": false,
+          "dists": 0.22661244869232178
+        }
+      ],
+      "supports_sha256": "ed45e6d1ebe722b9f1619c08cfb30f927e1d341a050feae9bd1556c4522f800c",
+      "weights_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "native_frames": 240,
+      "scope": "Original W7 source-SAM masks on 12 fixed ticks, native RGB, tight support plus 32-pixel margin, masked DISTS; all-frame native RGB PSNR"
+    }
   ]
 }

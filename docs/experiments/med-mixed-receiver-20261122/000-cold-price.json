@@ -1,0 +1,109 @@
+{
+  "target": 216888,
+  "grid": [
+    {
+      "q4": 112,
+      "crf": 28.0,
+      "bytes": 548725,
+      "kbps": 914.5416666666666,
+      "stream": "/private/tmp/ps-med000-cold-native-price/n240q4112.ivf",
+      "stream_sha256": "3231f001aeaffa741d70f4d9bdc47f80c7e875720f52fd651db244f48aa29e7d",
+      "decoded_sha256": "c2157660167e5307a306eb477ad90c06a499773ad2b99b907a298196d23dc419"
+    },
+    {
+      "q4": 168,
+      "crf": 42.0,
+      "bytes": 229100,
+      "kbps": 381.8333333333333,
+      "stream": "/private/tmp/ps-med000-cold-native-price/n240q4168.ivf",
+      "stream_sha256": "dae90fe2f55155c313ce68ed71745d6b059c3c8b4ae4ce1a4bbb763b1dc25ef6",
+      "decoded_sha256": "d321d01dda76aa3959e44004d23e14c1887cfb5e704d0812153568ff5c66e176"
+    },
+    {
+      "q4": 224,
+      "crf": 56.0,
+      "bytes": 103789,
+      "kbps": 172.98166666666665,
+      "stream": "/private/tmp/ps-med000-cold-native-price/n240q4224.ivf",
+      "stream_sha256": "240664097c9ea216d6fd114873fcfcc13655ea7a7d0220390a5cfe5385e4a1c3",
+      "decoded_sha256": "0d3b65ed9d1f6dffe3d564b4c8309346cd48463c16e113c8772d0de3c6d003a4"
+    },
+    {
+      "q4": 196,
+      "crf": 49.0,
+      "bytes": 152870,
+      "kbps": 254.78333333333333,
+      "stream": "/private/tmp/ps-med000-cold-native-price/n240q4196.ivf",
+      "stream_sha256": "038ef6d88be27e6c4c04ebb112cb946a01e1119befa0ff2de6bd31503000912f",
+      "decoded_sha256": "f55c20b09b66c670b113c2cb22b5b064364dcc9c44e285610fa792b87b859139"
+    },
+    {
+      "q4": 182,
+      "crf": 45.5,
+      "bytes": 185082,
+      "kbps": 308.47,
+      "stream": "/private/tmp/ps-med000-cold-native-price/n240q4182.ivf",
+      "stream_sha256": "2c0cf1bfc251d5eb6f0870dabd98e8392db47c9d01e285346e6f102cd3a91e2b",
+      "decoded_sha256": "70d8ff92b8d4fb3b46dd3b6aa1f7114d9c61a5251dd7ef5bf16144a1fc9c4aa4"
+    },
+    {
+      "q4": 175,
+      "crf": 43.75,
+      "bytes": 207610,
+      "kbps": 346.01666666666665,
+      "stream": "/private/tmp/ps-med000-cold-native-price/n240q4175.ivf",
+      "stream_sha256": "62b70d2a84f3d93dd0e873497aaf15b7632091fbb853f47471732a51e30cc661",
+      "decoded_sha256": "6df8768bab63a96cb92b82787f1cfec8a089b403020d78895ce119757375cd96"
+    },
+    {
+      "q4": 171,
+      "crf": 42.75,
+      "bytes": 218616,
+      "kbps": 364.36,
+      "stream": "/private/tmp/ps-med000-cold-native-price/n240q4171.ivf",
+      "stream_sha256": "8774def5ef2c04ff7710a80a04fc4574f31f8fda244d4025097deb1183f5d4e6",
+      "decoded_sha256": "f3d8de89d811b285f9b996eb97112099fe51c3f531e25c6ccb16d55bab11b394"
+    },
+    {
+      "q4": 173,
+      "crf": 43.25,
+      "bytes": 213056,
+      "kbps": 355.0933333333333,
+      "stream": "/private/tmp/ps-med000-cold-native-price/n240q4173.ivf",
+      "stream_sha256": "c04f35bce3a08d809819381d5a1e5e9600da7a8ca62a2f65acc6aa2c4c82fbe0",
+      "decoded_sha256": "f46273209d2d16965ba1bcb0bd5ac93b9d51fb19f619039740330665c48a03b9"
+    },
+    {
+      "q4": 172,
+      "crf": 43.0,
+      "bytes": 215174,
+      "kbps": 358.62333333333333,
+      "stream": "/private/tmp/ps-med000-cold-native-price/n240q4172.ivf",
+      "stream_sha256": "03f4a532a4bb86fd0a83bfc2412b6ae0c1a98a84a001d74b04035724e061f8ce",
+      "decoded_sha256": "0011f0cc128207472f27e6767a021ce8f2e7bc92bdfcc7a9202baf5165f85259"
+    }
+  ],
+  "cpu_seconds": 406.818059,
+  "smoke_cpu": 5.474228,
+  "source_sha256": "02d3f68a73917254a04b37310fddd4953b6d42366d25ece0f832b0f8bc34afcf",
+  "tools": {
+    "ffmpeg": {
+      "path": "/opt/homebrew/bin/ffmpeg",
+      "real_path": "/opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg",
+      "sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be",
+      "version": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    "SvtAv1EncApp": {
+      "path": "/opt/homebrew/bin/SvtAv1EncApp",
+      "real_path": "/opt/homebrew/Cellar/svt-av1/4.0.1/bin/SvtAv1EncApp",
+      "sha256": "db044194faf94d553c2509c8e033ecd05a373ba54d919d0fb49a3a13149d1687",
+      "version": "SVT-AV1 v4.0.1 (release)"
+    },
+    "dav1d": {
+      "path": "/opt/homebrew/bin/dav1d",
+      "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+      "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+      "version": "1.5.4"
+    }
+  }
+}

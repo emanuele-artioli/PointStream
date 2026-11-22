@@ -83,6 +83,7 @@ def main(a):
             budget_seconds=1800,
             hosts=["gpu2", "gpu3", "gpu5", "gpu6"],
             gpu_sharing={"mode": "exclusive"},
+            contention={"policy": "stop", "resume_attempts": 0},
             gpu_models=["RTX A6000", "RTX 6000 Ada"],
             full=dict(seconds=1400),
         )

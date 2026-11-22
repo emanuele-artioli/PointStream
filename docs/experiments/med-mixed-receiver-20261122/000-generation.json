@@ -1,0 +1,24 @@
+{
+  "medvedev_struff__000_at120__person_000000000002": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T095113Z-1c3e52fe/full/published.tar",
+    "archive_sha256": "92d94ab60973c9585af2bfe0a8bc7d838460ba6f0427c668e2e427f1ec38f286",
+    "receipt_sha256": "eac1eb7f4d823b3adba4aa3832b07005bf13f98a5ce30d9dfd9c17c8b340b55a",
+    "gpu": "NVIDIA RTX A6000",
+    "carrier_sha256": "11105f6a96b73fb8f89791e2c0235fbdd7718cd400f9faf206eccafc589765f8",
+    "frames": 120,
+    "render_seconds": 599.1313180429861,
+    "worker_wall_seconds": 691.3080358189764,
+    "job_id": "20261122T095113Z-1c3e52fe"
+  },
+  "medvedev_struff__000_at120__person_000000000005": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T095155Z-0e1c2443/full/published.tar",
+    "archive_sha256": "2cf6cd6d949a5fa0ce17577f1aedff8bedf36e68f3bd23158a70615c477e15cc",
+    "receipt_sha256": "3a6e87961c7f4b0b8dd2aa1cf9ca255dd7a5dffdf38945e77baf134c1ef6d6f7",
+    "gpu": "NVIDIA RTX 6000 Ada Generation",
+    "carrier_sha256": "11105f6a96b73fb8f89791e2c0235fbdd7718cd400f9faf206eccafc589765f8",
+    "frames": 120,
+    "render_seconds": 515.8094629919797,
+    "worker_wall_seconds": 610.7415956610057,
+    "job_id": "20261122T095155Z-0e1c2443"
+  }
+}
