@@ -5,6 +5,7 @@ from fractions import Fraction
 import hashlib
 import json
 import os
+import struct
 from pathlib import Path
 import subprocess
 import tarfile
@@ -34,12 +35,36 @@ def operating_points(a):
     return ceilings
 
 
+def checked_ivf(packet, frames, fps):
+    sizes = svtav1.ivf_frames(packet)
+    assert len(sizes) == frames and Fraction(*struct.unpack_from("<II", packet, 16)) == fps
+    offset = 32
+    for tick, size in enumerate(sizes):
+        assert struct.unpack_from("<Q", packet, offset + 4)[0] == tick
+        offset += 12 + size
+    assert offset == len(packet)
+
+
+def held_display(coded, output, frame_size, count, stride):
+    with coded.open("rb") as src, output.open("xb") as dst:
+        for _ in range(count):
+            frame = src.read(frame_size)
+            assert len(frame) == frame_size
+            for _ in range(stride):
+                dst.write(frame)
+        assert src.read(1) == b""
+
+
 def run(a):
     begin = time.monotonic()
     n = a.frames
     w = a.width
     h = GEOMETRY[w]
     fps = a.fps
+    stride = a.cadence_stride
+    assert n % stride == 0
+    coded_n = n // stride
+    coded_fps = fps / stride
     assert n == {"smoke": 24, "full": 240}[os.environ["PS_STAGE"]]
     assert len(os.sched_getaffinity(0)) == 1 and os.environ.get("CUDA_VISIBLE_DEVICES") == ""
     meta = json.loads(a.metadata.read_text())
@@ -67,9 +92,10 @@ def run(a):
         str(a.source),
         "-an",
         "-frames:v",
-        str(n),
+        str(coded_n),
         "-vf",
-        f"scale={w}:{h}:flags=area,format=yuv420p",
+        (f"select=not(mod(n\\,{stride}))," if stride > 1 else "")
+        + f"scale={w}:{h}:flags=area,format=yuv420p",
         "-fps_mode",
         "passthrough",
         "-f",
@@ -77,7 +103,7 @@ def run(a):
         str(native),
     ]
     subprocess.run(cmd, check=True, capture_output=True, timeout=270)
-    assert native.stat().st_size == n * w * h * 3 // 2
+    assert native.stat().st_size == coded_n * w * h * 3 // 2
     roi_path = None
     regions = None
     budgets = operating_points(a)
@@ -86,6 +112,13 @@ def run(a):
         roi_path, regions = roi.region_map(
             a.roi_features, a.ball_payload, n, w, h, work, a.match, a.roi_offset
         )
+        if stride > 1:
+            lines = roi_path.read_text().splitlines()[::stride]
+            assert len(lines) == coded_n
+            roi_path.write_text(
+                "".join(str(i) + " " + line.split(" ", 1)[1] + "\n" for i, line in enumerate(lines))
+            )
+            regions = regions[::stride]
         budgets = {k: budgets[k] for k in (a.roi_ceiling or ["warm"])}
     rows = {}
     with tarfile.open(a.earlier) as t:
@@ -95,7 +128,7 @@ def run(a):
             and previous["match"] == a.match
             and previous["source_sha256"] == meta["source"]["sha256"]
         )
-        for old in previous["rows"] if n == 240 and not roi_path else []:
+        for old in previous["rows"] if n == 240 and not roi_path and stride == 1 else []:
             if old["width"] != w:
                 continue
             data = t.extractfile("publish/" + old["native_file"]).read()
@@ -125,8 +158,8 @@ def run(a):
                 path,
                 width=w,
                 height=h,
-                fps=fps,
-                frames=n,
+                fps=coded_fps,
+                frames=coded_n,
                 crf=q / 4,
                 preset=4,
                 full_range=False,
@@ -134,7 +167,7 @@ def run(a):
             )
             subprocess.run(c, check=True, capture_output=True, timeout=500)
             data = path.read_bytes()
-            assert len(svtav1.ivf_frames(data)) == n
+            checked_ivf(data, coded_n, coded_fps)
             rows[q] = dict(
                 quarter_crf=q,
                 bytes=len(data),
@@ -195,16 +228,22 @@ def run(a):
             capture_output=True,
             timeout=250,
         )
-        assert dec.stat().st_size == n * w * h * 3 // 2
-        decoded_sha = sha(dec)
+        assert dec.stat().st_size == coded_n * w * h * 3 // 2
+        display = dec
+        if stride > 1:
+            display = work / (label + "-held.yuv")
+            held_display(dec, display, w * h * 3 // 2, coded_n, stride)
+        decoded_sha = sha(display)
         out = pub / (label + ".yuv.z")
         z = zlib.compressobj(1)
-        with dec.open("rb") as src, out.open("wb") as dst:
+        with display.open("rb") as src, out.open("wb") as dst:
             while block := src.read(1048576):
                 dst.write(z.compress(block))
             dst.write(z.flush())
         twin = (
-            roi.compare_same_q(native, dec, best, regions, w, h, n, fps, tools, work, pub)
+            roi.compare_same_q(
+                native, dec, best, regions, w, h, coded_n, coded_fps, tools, work, pub
+            )
             if roi_path
             else None
         )
@@ -213,6 +252,7 @@ def run(a):
             affordable=True,
             identical_qp_control=twin,
             **best,
+            coded_decoded_sha256=sha(dec),
             decoded_sha256=decoded_sha,
             decoded_file=out.name,
             shortfall=1 - best["bytes"] / limit,
@@ -228,6 +268,9 @@ def run(a):
         source_masks_sha256=roi.SOURCES[a.match][0] if roi_path else None,
         ball_sha256=roi.SOURCES[a.match][1] if roi_path else None,
         frames=n,
+        coded_frames=coded_n,
+        coded_fps=str(coded_fps),
+        cadence_stride=stride,
         fps=str(fps),
         width=w,
         height=h,
@@ -247,6 +290,10 @@ def validate(a):
     r = json.loads((stage / "anchors.json").read_text())
     n = r["frames"]
     caps = operating_points(a)
+    stride = a.cadence_stride
+    coded_n = n // stride
+    assert r["cadence_stride"] == stride and r["coded_frames"] == coded_n
+    assert Fraction(r["coded_fps"]) == a.fps / stride
     assert r["match"] == a.match and Fraction(r["fps"]) == a.fps
     expected = set(a.roi_ceiling or ["warm"]) if r["mode"] == "foreground-roi" else set(caps)
     assert set(r["selected"]) == expected
@@ -256,11 +303,8 @@ def validate(a):
         assert json.load(tar.extractfile("publish/anchors.json")) == r
         for row in r["bank"]:
             b = tar.extractfile("publish/" + row["file"]).read()
-            assert (
-                len(b) == row["bytes"]
-                and hashlib.sha256(b).hexdigest() == row["sha256"]
-                and len(svtav1.ivf_frames(b)) == n
-            )
+            assert len(b) == row["bytes"] and hashlib.sha256(b).hexdigest() == row["sha256"]
+            checked_ivf(b, coded_n, a.fps / stride)
         for key, x in r["selected"].items():
             assert x["ceiling"] == round(Fraction(n, 240) * caps[key])
             if x["affordable"]:
@@ -273,12 +317,16 @@ def validate(a):
                     assert (
                         len(twin) == t["twin_bytes"]
                         and hashlib.sha256(twin).hexdigest() == t["twin_sha256"]
-                        and len(svtav1.ivf_frames(twin)) == n
                     )
-                    assert t["support_pixels"] + t["outside_pixels"] == r["width"] * r["height"] * n
+                    checked_ivf(twin, coded_n, a.fps / stride)
+                    assert (
+                        t["support_pixels"] + t["outside_pixels"]
+                        == r["width"] * r["height"] * coded_n
+                    )
                     assert t["non_inert"] == (
                         t["changed_luma_pixels"] > 0
-                        and t["twin_decoded_sha256"] != x["decoded_sha256"]
+                        and t["twin_decoded_sha256"] != x["coded_decoded_sha256"]
+                        and t["selected_decoded_sha256"] == x["coded_decoded_sha256"]
                     )
                     assert (
                         r["roi_map_sha256"]
@@ -289,10 +337,22 @@ def validate(a):
                 dec = zlib.decompressobj()
                 digest = hashlib.sha256()
                 length = 0
+                frame_size = r["width"] * r["height"] * 3 // 2
+                hold_bytes = bytearray()
+                coded_hash = hashlib.sha256()
                 while buf := src.read(65536):
                     raw = dec.decompress(buf)
                     digest.update(raw)
                     length += len(raw)
+                    if stride > 1:
+                        hold_bytes.extend(raw)
+                        while len(hold_bytes) >= frame_size * stride:
+                            frame = bytes(hold_bytes[:frame_size])
+                            assert hold_bytes[: frame_size * stride] == frame * stride
+                            coded_hash.update(frame)
+                            del hold_bytes[: frame_size * stride]
+                if stride > 1:
+                    assert not hold_bytes and coded_hash.hexdigest() == x["coded_decoded_sha256"]
                 tail = dec.flush()
                 digest.update(tail)
                 length += len(tail)
@@ -328,6 +388,7 @@ if __name__ == "__main__":
     p.add_argument("--ceiling", action="append", metavar="NAME=BYTES")
     p.add_argument("--roi-ceiling", action="append", metavar="NAME")
     p.add_argument("--roi-offset", type=int, choices=range(1, 41), default=40)
+    p.add_argument("--cadence-stride", type=int, choices=(1, 2), default=1)
     p.add_argument("--width", type=int, choices=GEOMETRY)
     p.add_argument("--validate", action="store_true")
     args = p.parse_args()

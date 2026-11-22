@@ -113,7 +113,7 @@ def figures(d, output):
         borderpad=0,
         labelspacing=0.35,
     )
-    notes = []
+    notes = [f"One primary rate comparison per match across {len(rows)} selected matches."]
     if any(r.get("selection") == "sensitivity" for r in rows):
         notes.append("* Price difference between 0.5% and 2%.")
     if any(r.get("selection") == "unmatched" for r in rows):

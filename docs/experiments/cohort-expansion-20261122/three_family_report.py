@@ -48,16 +48,29 @@ def read_neural(data, match, q_indices):
     ]
 
 
-def results(curves, data, low_indices, all_indices):
+def results(curves, data, low_indices, all_indices, near=False):
     policies = {}
     low = set(curves["starved_cohort"][0]["matches"])
+    near_q = {}
+    if near:
+        for name in low:
+            receipt = json.loads((data / (name + "-near-budget.json")).read_text())
+            assert receipt["match"] == name and receipt["available_kbps"] == 20.4
+            near_q[name] = receipt["closest_affordable_qp"]
+
+    def used_indices(name, section):
+        allowed = set(all_indices)
+        if section == "starved_cohort" and name in low:
+            allowed.update(low_indices)
+            if name in near_q:
+                allowed.add(near_q[name])
+        return allowed
+
     for name in curves["per_event"]:
-        indices = sorted(set(all_indices + (low_indices if name in low else [])))
-        policies[name] = read_neural(data, name, indices)
+        policies[name] = read_neural(data, name, sorted(used_indices(name, "starved_cohort")))
     out = {}
     for section in ("pooled", "starved_cohort"):
         points = []
-        allowed_q = set(all_indices) | (set(low_indices) if section == "starved_cohort" else set())
         expected = curves[section][0]["matches"]
         for point in curves[section]:
             matches = point["matches"]
@@ -72,7 +85,9 @@ def results(curves, data, low_indices, all_indices):
                 for arm in ("ordinary", "candidate"):
                     by_family[arm].append(dict(match=match, **match_points[cap][arm]))
                 affordable = [
-                    r for r in policies[match] if r["kbps"] <= cap + 1e-9 and r["qp"] in allowed_q
+                    r
+                    for r in policies[match]
+                    if r["kbps"] <= cap + 1e-9 and r["qp"] in used_indices(match, section)
                 ]
                 if affordable:
                     chosen = min(affordable, key=lambda r: (r["dists"], r["bytes"], r["sha256"]))
@@ -117,12 +132,15 @@ def results(curves, data, low_indices, all_indices):
         out[section] = points
     equal_quality = {}
     for section, budgets in out.items():
-        allowed_q = set(all_indices) | (set(low_indices) if section == "starved_cohort" else set())
         per_match = {}
         for match in budgets[0]["fixed_population"]:
             bank = json.loads((data / (match + "-curve.json")).read_text())["bank"]
             candidate = [(r["kbps"], -r["dists"]) for r in bank if r["arm"] == "candidate"]
-            anchors = [(r["kbps"], -r["dists"]) for r in policies[match] if r["qp"] in allowed_q]
+            anchors = [
+                (r["kbps"], -r["dists"])
+                for r in policies[match]
+                if r["qp"] in used_indices(match, section)
+            ]
             if len(anchors) < 2:
                 continue
             lowest_rate = min(rate for rate, _ in anchors)
@@ -155,9 +173,19 @@ def results(curves, data, low_indices, all_indices):
                 ).tolist(),
             )
         equal_quality[section] = dict(
-            neural_indices=sorted(allowed_q), per_match=per_match, geomean=summary
+            neural_indices=sorted(
+                set(all_indices) | (set(low_indices) if section == "starved_cohort" else set())
+            ),
+            calibrated=(near and section == "starved_cohort"),
+            per_match=per_match,
+            geomean=summary,
         )
-    return dict(results=out, native_neural=policies, equal_quality_vs_neural=equal_quality)
+    return dict(
+        results=out,
+        native_neural=policies,
+        equal_quality_vs_neural=equal_quality,
+        near_budget_indices=near_q,
+    )
 
 
 def table(result, path):
@@ -202,8 +230,11 @@ def table(result, path):
         n = len(result["results"][group][0]["fixed_population"])
         count = len(summary["matches"])
         lo, hi = summary["interval95"]
+        calibration = (
+            ", plus the source-specific byte-calibrated index" if rows["calibrated"] else ""
+        )
         lines += [
-            f"Against the DCVC-UF envelope at quantizer indices {', '.join(map(str, rows['neural_indices']))}, {count}/{n} matches had overlapping quality. The geometric mean per-match PointStream BD-rate was {summary['percent']:+.2f}% (95% paired match interval {lo:+.2f}% to {hi:+.2f}%). PointStream required fewer bits on {summary['fewer_bits']}/{count} comparable matches.",
+            f"Against the DCVC-UF envelope at quantizer indices {', '.join(map(str, rows['neural_indices']))}{calibration}, {count}/{n} matches had overlapping quality. The geometric mean per-match PointStream BD-rate was {summary['percent']:+.2f}% (95% paired match interval {lo:+.2f}% to {hi:+.2f}%). PointStream required fewer bits on {summary['fewer_bits']}/{count} comparable matches.",
             "",
         ]
     lines += [
@@ -280,9 +311,10 @@ if __name__ == "__main__":
     p.add_argument("figures", type=Path)
     p.add_argument("--all-q", nargs="+", type=int, required=True)
     p.add_argument("--low-q", nargs="*", type=int, default=[])
+    p.add_argument("--near", action="store_true")
     p.add_argument("--table", type=Path)
     a = p.parse_args()
-    result = results(json.loads(a.curves.read_text()), a.data, a.low_q, a.all_q)
+    result = results(json.loads(a.curves.read_text()), a.data, a.low_q, a.all_q, a.near)
     a.output.write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
     if a.table:
         table(result, a.table)

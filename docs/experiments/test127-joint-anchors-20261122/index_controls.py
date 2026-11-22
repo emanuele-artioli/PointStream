@@ -23,6 +23,8 @@ def index(physical, records, caps):
         mode = "roi" if r["mode"] == "foreground-roi" else "ordinary"
         if mode == "roi" and r.get("roi_offset", 40) != 40:
             mode = f"roi{r['roi_offset']}"
+        if r.get("cadence_stride", 1) > 1:
+            mode += f"-{r['coded_fps']}fps-hold"
         selected = {}
         for label, item in r["selected"].items():
             assert item["ceiling"] == caps[label]
