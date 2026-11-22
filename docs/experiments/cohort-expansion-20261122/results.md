@@ -45,9 +45,9 @@ Direct positions from the paid stream hit 348 of 402 independently marked visibl
 | Miami 2024 | 29.38 / 0.2441 | no | 19 / 20 | yes | 0 / 20 / 0 |
 | Acapulco 2024 | 16.53 / 0.2504 | yes | 23 / 38 | no | — |
 | Monte-Carlo 2024 | 23.29 / 0.2766 | no | 15 / 18 | yes | 0 / 12 / 0 |
-| Marseille 2020 | — | pending | — | pending | — |
-| Queen's Club 2024 | — | pending | — | pending | — |
-| Lyon 2024 | 12.89 / 0.2744 | yes | — | pending | — |
+| Marseille 2020 | 22.38 / 0.2644 | yes | 17 / 21 | yes | 0 / 17 / 0 |
+| Queen's Club 2024 | 16.06 / 0.2802 | yes | 35 / 40 | yes | 0 / 36 / 0 |
+| Lyon 2024 | 12.89 / 0.2744 | yes | 30 / 39 | no | — |
 
 Neural prices refer to the complete fixed 480-wide Q24 bitstream at each native cadence. Source qualification requires a hit within 10 pixels for at least 80% of visible marks on that original source. Detector comparisons on receiver video use only qualifying source matches. Every prematched decoded input passed pixel-hash verification across the scoring and detector hosts. The paid-coordinate outcome uses the full twelve.
 
@@ -56,8 +56,10 @@ Neural prices refer to the complete fixed 480-wide Q24 bitstream at each native 
 
 | Receiver readout | Matches | Hits / visible | Emits / explicitly absent | Marked-tick F1 |
 |---|---:|---:|---:|---:|
-| Original video + WASB | 5 | 133 / 147 | 2 / 4 | 0.920 |
-| Matched AV1 + WASB | 5 | 0 / 147 | 0 / 4 | 0.000 |
-| PointStream display + WASB | 5 | 129 / 147 | 1 / 4 | 0.905 |
-| Direct PointStream coordinates | 5 | 133 / 147 | 1 / 4 | 0.933 |
-| Best affordable spatial AV1 + WASB | 5 | 0 / 147 | 0 / 4 | 0.000 |
+| Original video + WASB | 7 | 185 / 208 | 2 / 13 | 0.920 |
+| Matched AV1 + WASB | 7 | 0 / 208 | 0 / 13 | 0.000 |
+| PointStream display + WASB | 7 | 182 / 208 | 1 / 13 | 0.908 |
+| Direct PointStream coordinates | 7 | 184 / 208 | 2 / 13 | 0.911 |
+| Best affordable spatial AV1 + WASB | 7 | 0 / 208 | 0 / 13 | 0.000 |
+
+Across the 7 source-qualified matches with both spatial controls, the PointStream display changed localization by +86.8 percentage points relative to the best affordable spatial AV1 display (95% match-bootstrap interval +78.7 to +93.5). Each match has equal weight in this estimate. The counts above pool individual labels.
