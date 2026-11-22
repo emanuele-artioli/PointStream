@@ -194,7 +194,10 @@ def run(args):
             assert display.shape == original.shape == (1080, 1920, 3)
             assert sha_array(display) == frame["rgb_sha256"]
             values = {}
+            foreground_pixels = np.zeros(original.shape[:2], dtype=bool)
             for name, rect, mask in supports:
+                x0, y0, x1, y1 = rect
+                foreground_pixels[y0:y1, x0:x1] |= mask
                 pair = region_scores(crop(original, rect), crop(display, rect), mask, dists, lpips)
                 assert all(math.isfinite(n) for n in pair.values())
                 assert abs(pair["dists"] - established[tick, name]) < 0.00015
@@ -225,6 +228,7 @@ def run(args):
                     "player": players,
                     "ball": values["ball"],
                     "whole": whole,
+                    "background_psnr": image_psnr(original, display, ~foreground_pixels),
                 }
             )
         consumed = time.process_time() - started

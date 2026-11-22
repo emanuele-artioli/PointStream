@@ -13,3 +13,33 @@ Within the original polygon-format packet, open `index.html`. Each point has a s
 The original private master page is `tenniset-source-marks-20261123/index.html` in the project’s author visualization directory. Six per-point contact sheets sit beside their editors. A synthetic offline browser round trip exercised polygon drawing, native ball marking, absence, uncertainty, export and import. These synthetic decisions were discarded; no reviewer decisions were solicited or imported into the paper.
 
 The ball-first packet now carries **90 real person-mask proposals across all 48 frozen source images**. The same selected source-frame manifest is retained. The 24 available sender-generated ball candidates are explicitly optional. Offline Chromium opened all 48 images and validated the ball-only path, the provenance flags, per-person proposal controls, visible coverage of the mask interior, and export/restore. No author labels were created by the browser tests. [Interface and provenance receipt](source-mark-interface.json)
+
+## Returned London review
+
+The author export contains all 48 frozen frame identities and provenance for
+the displayed proposal set. It accepts 88 person proposals and rejects two.
+There are nine visible ball clicks and 15 absent marks made without the sender
+overlay. Another 24 visible marks used the overlay. Keep the latter separate
+from independent ball quality and localization. Use checked source masks for
+regional player appearance only. Keep player and ball fidelity and PSNR on
+the remaining source pixels separate. [Replay and scoring script](score_london_review.py)
+
+The CPU replay authenticated and scored all 48 source frames at each of the two
+ceilings. The stream emitted no position on any of the nine independently
+clicked visible frames. Five were court views and four conventionally routed.
+It emitted no positions on the 15 independently marked absent frames. The
+saved tracker suggestion was available on the 24 assisted frames; 23 of those
+clicked centers lay within ten native pixels of the delivered positions. This
+last count measures agreement after viewing the suggestion. The independent
+subset is associated with suggestion availability, so 0/9 must not be
+extrapolated as London recall. The five independently marked court misses
+show a sender coverage problem in this sample at either rate.
+
+On the nine independent visible frames, adding the trajectory produced the
+same ball-crop DISTS, LPIPS and PSNR as its own base, consistent with the
+absent payload on those instants. Only one independent visible frame at
+20.4 kbps and two at 33 kbps fall in the two tightly rate-matched controls.
+Keep those comparisons as diagnostics. The ball-only deliveries support
+comparison of ordinary player-region fidelity and background costs.
+They do not exercise the learned player receiver.
+[Per-frame results and hashes](london-reviewed-scores.json)
