@@ -10,3 +10,10 @@ Three-source native court job `20261122T111403Z-85c6dd3e`, complete-stage cap 2,
 The grouped Linux smoke hit its 300-second allowance on gpu2. Recover by separating the three original files and recording each native tick as evaluated. Keep the previous frame's homography for all 240. At 49 misses the 80% criterion is impossible even if every remaining tick fits. The equivalent local source check is capped at 25 minutes per clip (75 extra local CPU-minutes); any interval still unresolved at the cap stays unresolved. This also distinguishes intrinsically expensive source shots from an interrupted batch. All result archives are separate from the first attempt.
 
 The source-only checks finished on all three native intervals. The court fit on 240/240 frames in Sydney, 240/240 in Halle and 232/240 in Geneva. All six evenly spaced source views per case show baseline play, the two players and the same playing surface. Proceed with the three registered source pose screens. [Source results and frame provenance](court-results.json)
+
+Source-feature jobs, each bound to the same authenticated native court archive, on the A6000 pool:
+* Sydney 127 `20261122T113333Z-9f0e3e92`
+* Halle 105 `20261122T113332Z-80cf4344`
+* Geneva 116 `20261122T113331Z-77903811`
+
+Each job has a representative 240-frame smoke, a 25-minute overall ceiling and the existing two-athlete coverage validator. The crop follow-up draws only on the unused balance of the source budget.
