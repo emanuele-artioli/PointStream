@@ -1,0 +1,52 @@
+{
+  "stage": "full",
+  "frames": 240,
+  "matched": true,
+  "decision": "primary",
+  "width": 640,
+  "height": 384,
+  "logical_canvas": [
+    960,
+    544
+  ],
+  "source_sha256": "0afb0fb191881def1235285b58fe54814556c83fed7815cd99a00b92d26bc86c",
+  "ordinary_archive_sha256": "a7c263d85370a3461da46df0a41f81a8ce947bfc82b4e897f26407fe0910de4b",
+  "candidate_archive_sha256": "a31bccb26f9c3ce5141d4d09b73b9c6b2002ac40f2ae11a134eab894bd420d96",
+  "ordinary": {
+    "crf": 69.75,
+    "native_bytes": 24298,
+    "bytes": 24298,
+    "sha256": "1e21b5f617b9da57a076b7b5f28d1c167658ca73b0f126c3a3ea64d112a036bf",
+    "native_sha256": "1e21b5f617b9da57a076b7b5f28d1c167658ca73b0f126c3a3ea64d112a036bf",
+    "seconds": 13.508177337993402,
+    "file": "640-ordinary-8.packet",
+    "decoded_yuv_sha256": "7c05dcee5baf19d009d97af110fc1952b3e93a91db554d2bbeafd228526058f4",
+    "selected_file": "640-ordinary.ivf"
+  },
+  "candidate": {
+    "crf": 70.0,
+    "native_bytes": 23771,
+    "bytes": 24388,
+    "sha256": "5692e2d288c0d6427af97f334f1de99b9f761c64f1d4a8d1049d5e1f8605ab56",
+    "native_sha256": "c26f6d1c3e01ec85c369c7c0afb33887d173faa91cbd08e36777842ebe5ab7fd",
+    "seconds": 10.277035473991418,
+    "file": "640-ball-1.packet",
+    "decoded_yuv_sha256": "b3ab7e65959486657a2d4aad4cabbbb0aeebfc47bce49df11e3df8bcb0b66cc2",
+    "selected_file": "640-ball.psbl"
+  },
+  "payload_sha256": "15efaa4a569cf899f237da280bdeb448dfbb44b15286be5f29c7614389b6416d",
+  "rgb_sha256": {
+    "source": "1887592882905f4465514aa1dc070910cf7cab346c3ce9ae9bfa953c7638f267",
+    "ordinary": "f294a3a33d821ccc6d7a88367ba1c83d1724d263b04990ae964dbab19b50806e",
+    "candidate": "3e6dcc36e0640028bf47bc18a3880a76dd15715b2933b411df561365bf0c9ce8"
+  },
+  "prefix_rgb_sha256": {
+    "source": "312e13d63954705e8a2c6fa2e518efea46a6d30348805ef46f47a65f0abb0a5a",
+    "ordinary": "499a25f5f7af128630e5214204d2926eea31dce2552c7278839e90cf1af4e8f7",
+    "candidate": "0b83470f3ac9472495bea1f818a27f6de2ed8b011851914e4c445bed3c226023"
+  },
+  "positions_present": 93,
+  "decoder_sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+  "opencv_version": "4.10.0",
+  "elapsed_seconds": 28.88376180100022
+}

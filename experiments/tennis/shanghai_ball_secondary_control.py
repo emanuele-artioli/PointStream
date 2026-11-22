@@ -45,6 +45,7 @@ def run(a):
     pub = Path(os.environ["PS_SCRATCH_DIR"]) / "publish"
     pub.mkdir()
     stage = Path(os.environ["PS_STAGE_DIR"])
+    assert a.target_bytes is not None and a.width in (320, 640)
     target = round(a.target_bytes * a.frames / 240)
     groups = []
     for width, height in ((a.width, {320: 192, 640: 384}[a.width]),):
@@ -208,8 +209,8 @@ if __name__ == "__main__":
     p.add_argument("--payload-sha256")
     p.add_argument("--frames", type=int)
     p.add_argument("--arm", choices=("ordinary", "ball"))
-    p.add_argument("--target-bytes", type=int, required=True)
-    p.add_argument("--width", type=int, choices=(320, 640), required=True)
+    p.add_argument("--target-bytes", type=int)
+    p.add_argument("--width", type=int, choices=(320, 640))
     p.add_argument("--validate", action="store_true")
     a = p.parse_args()
     validate() if a.validate else run(a)
