@@ -1,0 +1,99 @@
+{
+  "scope": "Mask coverage and luma replacement are geometric checks against the sender-side archived W7 human-body model. They do not establish true occluded-court fidelity or racket removal.",
+  "source_supports_sha256": "1936f145922c8ff35f121fe43a2593f7859be04065254e9a5474eb9e8968e63c",
+  "source_sha256": "4d602291ebea0fcb9698d86d3f93ce4c3076a13005e33079a82975b8b64605f2",
+  "fill_mask_sha256": "b29c639ba1a9c762a71d15d4400b9ddd2118c1034852235b30b93f4bbb1d7686",
+  "per_object": [
+    {
+      "tick": 70,
+      "object_index": 0,
+      "source_pixels": 2584,
+      "filled_pixels": 2584,
+      "luma_changed_pixels": 2506
+    },
+    {
+      "tick": 70,
+      "object_index": 1,
+      "source_pixels": 8548,
+      "filled_pixels": 8548,
+      "luma_changed_pixels": 8482
+    },
+    {
+      "tick": 90,
+      "object_index": 0,
+      "source_pixels": 2404,
+      "filled_pixels": 2404,
+      "luma_changed_pixels": 2362
+    },
+    {
+      "tick": 90,
+      "object_index": 1,
+      "source_pixels": 10612,
+      "filled_pixels": 10612,
+      "luma_changed_pixels": 10474
+    },
+    {
+      "tick": 110,
+      "object_index": 0,
+      "source_pixels": 2660,
+      "filled_pixels": 2660,
+      "luma_changed_pixels": 2624
+    },
+    {
+      "tick": 110,
+      "object_index": 1,
+      "source_pixels": 8400,
+      "filled_pixels": 8400,
+      "luma_changed_pixels": 8248
+    },
+    {
+      "tick": 130,
+      "object_index": 0,
+      "source_pixels": 2500,
+      "filled_pixels": 2500,
+      "luma_changed_pixels": 2416
+    },
+    {
+      "tick": 130,
+      "object_index": 1,
+      "source_pixels": 8860,
+      "filled_pixels": 8860,
+      "luma_changed_pixels": 8778
+    },
+    {
+      "tick": 150,
+      "object_index": 0,
+      "source_pixels": 2388,
+      "filled_pixels": 2388,
+      "luma_changed_pixels": 2358
+    },
+    {
+      "tick": 150,
+      "object_index": 1,
+      "source_pixels": 8992,
+      "filled_pixels": 8992,
+      "luma_changed_pixels": 8930
+    },
+    {
+      "tick": 170,
+      "object_index": 0,
+      "source_pixels": 2280,
+      "filled_pixels": 2280,
+      "luma_changed_pixels": 2252
+    },
+    {
+      "tick": 170,
+      "object_index": 1,
+      "source_pixels": 8320,
+      "filled_pixels": 8320,
+      "luma_changed_pixels": 8254
+    }
+  ],
+  "total": {
+    "source_pixels": 68548,
+    "filled_pixels": 68548,
+    "luma_changed_pixels": 67684
+  },
+  "filled_fraction": 1.0,
+  "luma_change_fraction": 0.9873956935286223
+}

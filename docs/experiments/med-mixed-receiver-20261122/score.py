@@ -20,6 +20,7 @@ from src.pointstream.tracked_patch import yuv_to_rgb
 
 WEIGHT = "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
 SOURCE = {
+    "al031": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
     "000": "3bf7ddaae0db5c48b1072fccb15f9f162e41fa5999886b9a5bde58dc0495c630",
     "019": "1c13479eb3b6f8d175eb6f5020c629896e6b01f719014ec995a06b4c6c5a3e9c",
     "024": "4d602291ebea0fcb9698d86d3f93ce4c3076a13005e33079a82975b8b64605f2",
@@ -40,9 +41,11 @@ def main(a):
     torch.set_num_interop_threads(1)
     cv2.setNumThreads(1)
     assert sha(a.weights) == WEIGHT and sha(a.source) == SOURCE[a.clip]
-    start = {"000": 0, "019": 92, "024": 69}[a.clip]
+    start = {"000": 0, "019": 92, "024": 69, "al031": 0}[a.clip]
+    native_fps, active_frames = (25, 240) if a.clip == "al031" else (50, 120)
     schema = json.loads(a.supports.read_text())
-    assert schema["ticks"] == list(range(10, 240, 20)) and schema["source_start"] == 0
+    expected_ticks = list(range(240)) if active_frames == 240 else list(range(10, 240, 20))
+    assert schema["ticks"] == expected_ticks and schema["source_start"] == 0
     supports = {}
     for r in schema["rows"]:
         if not r["area"]:
@@ -84,7 +87,7 @@ def main(a):
             assert arm["kind"] == "native_yuv420p" and path.stat().st_size == h * w * 240 * 3 // 2
             vid = np.memmap(path, np.uint8, "r", shape=(240, h * 3 // 2, w))
         cap = cv2.VideoCapture(str(a.source), cv2.CAP_FFMPEG)
-        assert cap.isOpened() and cap.get(cv2.CAP_PROP_FPS) == 50
+        assert cap.isOpened() and cap.get(cv2.CAP_PROP_FPS) == native_fps
         accumulated = [0.0, 0.0]
         scores = []
         cpu0 = time.process_time()
@@ -94,6 +97,8 @@ def main(a):
             assert ok
             src = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
             assert src.shape == (1080, 1920, 3)
+            if "source_rgb_hashes" in schema:
+                assert array_sha(src) == schema["source_rgb_hashes"][t]
             if seq is not None:
                 header = seq.read(4)
                 size = struct.unpack(">I", header)[0]
@@ -110,7 +115,7 @@ def main(a):
                 image = cv2.resize(
                     yuv_to_rgb(vid[t], w, h, False), (1920, 1080), interpolation=cv2.INTER_CUBIC
                 )
-            bucket = int(not start <= t < start + 120)
+            bucket = int(not start <= t < start + active_frames)
             accumulated[bucket] += cv2.norm(src, image, cv2.NORM_L2SQR)
             for who in (0, 1):
                 if (t, who) not in supports:
@@ -150,19 +155,27 @@ def main(a):
             arm=arm,
             source_sha256=SOURCE[a.clip],
             supports_sha256=sha(a.supports),
-            method="Original W7 source-SAM masks on 12 fixed ticks, native RGB, tight support plus 32-pixel margin, masked DISTS; all-frame native RGB PSNR",
-            native_fps=50,
+            method=(
+                schema["method"]
+                if active_frames == 240
+                else "Original W7 source-SAM masks on 12 fixed ticks, native RGB, tight support plus 32-pixel margin, masked DISTS; all-frame native RGB PSNR"
+            ),
+            native_fps=native_fps,
             frames=240,
             active_start=start,
-            active_frames=120,
-            fallback_frames=120,
+            active_frames=active_frames,
+            fallback_frames=240 - active_frames,
             body_rows=scores,
             mean_dists=mean(scores),
             active_dists=mean([r for r in scores if r["active"]]),
-            fallback_dists=mean([r for r in scores if not r["active"]]),
+            fallback_dists=mean([r for r in scores if not r["active"]])
+            if active_frames < 240
+            else None,
             rgb_psnr=psnr(sum(accumulated), 240),
-            active_rgb_psnr=psnr(accumulated[0], 120),
-            fallback_rgb_psnr=psnr(accumulated[1], 120),
+            active_rgb_psnr=psnr(accumulated[0], active_frames),
+            fallback_rgb_psnr=psnr(accumulated[1], 240 - active_frames)
+            if active_frames < 240
+            else None,
             source_self_abs=max_source_self,
             weights_sha256=WEIGHT,
             torch=torch.__version__,

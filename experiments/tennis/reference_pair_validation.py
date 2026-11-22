@@ -9,6 +9,7 @@ from pathlib import Path
 import tarfile
 import time
 
+from experiments.tennis import common_player_packet as packet
 from experiments.tennis import common_receiver_isolation as isolation
 from experiments.tennis import common_receiver_job as receiver
 from experiments.tennis import common_receiver_manifest as manifest
@@ -30,7 +31,27 @@ DIGESTS = {
 def select(a: argparse.Namespace) -> None:
     stage = os.environ["PS_STAGE"]
     a.frames = 24
-    a.carrier_sha256 = QUANTIZERS.get(a.comparison, DIGESTS)[stage]
+    if a.comparison == "al031-fresh-prior":
+        first, second = a.control.read_bytes(), a.q90.read_bytes()
+        if (packet.wire.sha(first), packet.wire.sha(second)) != (
+            a.control_sha,
+            a.prior_sha,
+        ) or first == second:
+            raise ValueError("Source-matched return-shot identities changed")
+        profile = packet._embedded_profile(first)
+        if profile != packet._embedded_profile(second) or profile["recipe"] != packet.RECIPE_25:
+            raise ValueError("Return-shot conditioning has a changed codec profile")
+        x, _, _ = packet.unpack(first)
+        y, _, _ = packet.unpack(second)
+        if (
+            set(x) != set(y)
+            or any(x[k] != y[k] for k in ("keypoints", "base"))
+            or any(x[k] == y[k] for k in ("ref0", "ref1"))
+        ):
+            raise ValueError("The two paid packets must differ only in their reference pair")
+        a.carrier_sha256 = a.control_sha if stage == "smoke" else a.prior_sha
+    else:
+        a.carrier_sha256 = QUANTIZERS.get(a.comparison, DIGESTS)[stage]
     a.carrier, a.manifest = (
         (a.control, a.control_manifest) if stage == "smoke" else (a.q90, a.q90_manifest)
     )
@@ -150,8 +171,12 @@ def main():
     for name in ("weight", "deny"):
         run_command.add_argument("--" + name, required=True, type=Path, action="append")
     run_command.add_argument(
-        "--comparison", choices=["lossless-q90", "jpeg40-jpeg70"], default="lossless-q90"
+        "--comparison",
+        choices=["lossless-q90", "jpeg40-jpeg70", "al031-fresh-prior"],
+        default="lossless-q90",
     )
+    run_command.add_argument("--control-sha")
+    run_command.add_argument("--prior-sha")
     run_command.add_argument("--unit", required=True)
     run_command.add_argument("--pair-stage", type=int, required=True, choices=[1, 2])
     sub.add_parser("validate-stage")

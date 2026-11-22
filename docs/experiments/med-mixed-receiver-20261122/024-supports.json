@@ -1,0 +1,339 @@
+{
+  "ticks": [
+    10,
+    30,
+    50,
+    70,
+    90,
+    110,
+    130,
+    150,
+    170,
+    190,
+    210,
+    230
+  ],
+  "rows": [
+    {
+      "tick": 10,
+      "object_index": 0,
+      "area": 2440,
+      "xyxy": [
+        1098,
+        120,
+        1212,
+        286
+      ],
+      "mask": "010-p0.png",
+      "sha256": "a5b5d05462352bd0ab4f32b32bc00c89ea04635985053bef66a8c785eb9f5bd7"
+    },
+    {
+      "tick": 10,
+      "object_index": 1,
+      "area": 9096,
+      "xyxy": [
+        818,
+        526,
+        966,
+        862
+      ],
+      "mask": "010-p1.png",
+      "sha256": "87130947efd86184dce4ebcbcb4e3895d1dfe1f940c4188213387874037a74a1"
+    },
+    {
+      "tick": 30,
+      "object_index": 0,
+      "area": 2460,
+      "xyxy": [
+        1072,
+        122,
+        1200,
+        290
+      ],
+      "mask": "030-p0.png",
+      "sha256": "c9950108fcbc6ba41e28fa1b4bebb0f3ddd4d229980826c368f39f6203bedb7e"
+    },
+    {
+      "tick": 30,
+      "object_index": 1,
+      "area": 8904,
+      "xyxy": [
+        832,
+        546,
+        976,
+        806
+      ],
+      "mask": "030-p1.png",
+      "sha256": "12cef4a005531867fa9ecdcbbf586f548b8542f113c98592849944b3ab2bea39"
+    },
+    {
+      "tick": 50,
+      "object_index": 0,
+      "area": 3088,
+      "xyxy": [
+        1064,
+        138,
+        1246,
+        292
+      ],
+      "mask": "050-p0.png",
+      "sha256": "f9d6eb9f16fe8dad6d50772659011431b5219f1335091bd862f5c0c5e8be9b79"
+    },
+    {
+      "tick": 50,
+      "object_index": 1,
+      "area": 7864,
+      "xyxy": [
+        834,
+        578,
+        1004,
+        820
+      ],
+      "mask": "050-p1.png",
+      "sha256": "312fc8f666a7245a62a90c74147861420baab01d0a566ef6e7b975e7c7856d5a"
+    },
+    {
+      "tick": 70,
+      "object_index": 0,
+      "area": 2584,
+      "xyxy": [
+        1118,
+        162,
+        1238,
+        298
+      ],
+      "mask": "070-p0.png",
+      "sha256": "8c189d813dd4c130a8cfea9d3fba02586f06f7d85b848eebc308db8e50c4de0c"
+    },
+    {
+      "tick": 70,
+      "object_index": 1,
+      "area": 8548,
+      "xyxy": [
+        778,
+        562,
+        964,
+        810
+      ],
+      "mask": "070-p1.png",
+      "sha256": "afe50cc3edc22cbe657241863155492242ba95d5cdae63cc2c8d57848126145f"
+    },
+    {
+      "tick": 90,
+      "object_index": 0,
+      "area": 2404,
+      "xyxy": [
+        1108,
+        136,
+        1224,
+        298
+      ],
+      "mask": "090-p0.png",
+      "sha256": "e3abbc68015ef0ad13898015acc22339c9acced8ba3e370b07374ce6d55a41a2"
+    },
+    {
+      "tick": 90,
+      "object_index": 1,
+      "area": 10612,
+      "xyxy": [
+        670,
+        552,
+        932,
+        814
+      ],
+      "mask": "090-p1.png",
+      "sha256": "ed4a917df3a1521cbc222348eeba1755a25585a8de7aa76fedf34ce65b3f3438"
+    },
+    {
+      "tick": 110,
+      "object_index": 0,
+      "area": 2660,
+      "xyxy": [
+        1046,
+        130,
+        1186,
+        294
+      ],
+      "mask": "110-p0.png",
+      "sha256": "ac432bb17a1ca59acc311f731c1459b1eaf28762e31d4a4ec004e06251b30411"
+    },
+    {
+      "tick": 110,
+      "object_index": 1,
+      "area": 8400,
+      "xyxy": [
+        656,
+        540,
+        830,
+        810
+      ],
+      "mask": "110-p1.png",
+      "sha256": "9b134ba4e8644840d16e5e31599b41bc888b2737f54ddcd83ff2f681330ad0e0"
+    },
+    {
+      "tick": 130,
+      "object_index": 0,
+      "area": 2500,
+      "xyxy": [
+        1024,
+        122,
+        1136,
+        286
+      ],
+      "mask": "130-p0.png",
+      "sha256": "3acb6c9465305fd9f309366dc9625f0a340ec27e6edfcebf808646549759e040"
+    },
+    {
+      "tick": 130,
+      "object_index": 1,
+      "area": 8860,
+      "xyxy": [
+        574,
+        544,
+        794,
+        792
+      ],
+      "mask": "130-p1.png",
+      "sha256": "c36b1fc5af232e147f36c9d58a2f7689023aa6c4c2a1ec8f43fd023bec52f5fb"
+    },
+    {
+      "tick": 150,
+      "object_index": 0,
+      "area": 2388,
+      "xyxy": [
+        984,
+        144,
+        1114,
+        294
+      ],
+      "mask": "150-p0.png",
+      "sha256": "f6020ee1d753c44fa80b9b16d62d1d70a20f9703ad16bca0fe21d2792b69e54f"
+    },
+    {
+      "tick": 150,
+      "object_index": 1,
+      "area": 8992,
+      "xyxy": [
+        598,
+        500,
+        796,
+        756
+      ],
+      "mask": "150-p1.png",
+      "sha256": "ec3668aae30337cb5f0b1d98f2110e7b8aef561cec8e7b9f0e7031c07690a863"
+    },
+    {
+      "tick": 170,
+      "object_index": 0,
+      "area": 2280,
+      "xyxy": [
+        926,
+        152,
+        1052,
+        302
+      ],
+      "mask": "170-p0.png",
+      "sha256": "98f5d99d19293df5be0d858e029215ce56c4edeedd02686b0eefde59a1bc6b39"
+    },
+    {
+      "tick": 170,
+      "object_index": 1,
+      "area": 8320,
+      "xyxy": [
+        600,
+        516,
+        810,
+        750
+      ],
+      "mask": "170-p1.png",
+      "sha256": "74d7cf788b271b804e56e9260ef32fc2c4ff430f4f76169fb547fe814cae2d4c"
+    },
+    {
+      "tick": 190,
+      "object_index": 0,
+      "area": 3168,
+      "xyxy": [
+        882,
+        172,
+        1064,
+        322
+      ],
+      "mask": "190-p0.png",
+      "sha256": "c10204cb2d5edcdb0f1eec7485fce594a99408adabb2beb2bd9241dce8f74f5a"
+    },
+    {
+      "tick": 190,
+      "object_index": 1,
+      "area": 7288,
+      "xyxy": [
+        722,
+        494,
+        888,
+        744
+      ],
+      "mask": "190-p1.png",
+      "sha256": "526149576fa27942b4603d0afac00936623d11f645713dcf118fd3b9e3b1d9f8"
+    },
+    {
+      "tick": 210,
+      "object_index": 0,
+      "area": 4000,
+      "xyxy": [
+        816,
+        190,
+        1064,
+        352
+      ],
+      "mask": "210-p0.png",
+      "sha256": "9e09e6f6d278bfaf13a0018bb6790e012df1f38b2d39cffb52218268961008f2"
+    },
+    {
+      "tick": 210,
+      "object_index": 1,
+      "area": 8732,
+      "xyxy": [
+        802,
+        504,
+        1018,
+        758
+      ],
+      "mask": "210-p1.png",
+      "sha256": "69ca52a34c9fa2a2e847cba3b95aae72eddf6225c960d619b4a41ac22b205f5c"
+    },
+    {
+      "tick": 230,
+      "object_index": 0,
+      "area": 3276,
+      "xyxy": [
+        752,
+        222,
+        880,
+        400
+      ],
+      "mask": "230-p0.png",
+      "sha256": "1da50b91ef2850d6c2d25ef4226526a5665caddca5539a805b9c33949d90512e"
+    },
+    {
+      "tick": 230,
+      "object_index": 1,
+      "area": 9168,
+      "xyxy": [
+        846,
+        486,
+        1042,
+        758
+      ],
+      "mask": "230-p1.png",
+      "sha256": "2326805e58db4868cedad128c63b4147bef1fc8d6eacab80d08829de1ba5f2d9"
+    }
+  ],
+  "source_start": 0,
+  "native_display": [
+    1920,
+    1080
+  ],
+  "matte_sha256": "6e1ccb368f86c588f96a68876218d397c5142a55645913c5f5aa19d441e45179",
+  "producer_archive_sha256": "70cfa5b37cbb579be788202148cf3fa88fafca0c45252ac02b91fd25f44fa0e2",
+  "method": "exact original W7 source-SAM matte for each person, replicated from 960x540 to native, tight box plus 32 pixels. Model-derived, no independent human inspection.",
+  "nonempty": 24
+}

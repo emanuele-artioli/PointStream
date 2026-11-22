@@ -1,0 +1,12 @@
+{
+  "match": "alcaraz031",
+  "video": {
+    "width": 1920,
+    "height": 1080,
+    "avg_frame_rate": "25/1",
+    "nb_frames": 259
+  },
+  "source": {
+    "sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76"
+  }
+}

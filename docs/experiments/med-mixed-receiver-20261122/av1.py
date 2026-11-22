@@ -10,7 +10,12 @@ import subprocess
 
 from src.codecs import svtav1
 
-from build import SOURCES
+from build import SOURCES as MED_SOURCES
+
+SOURCES = {
+    **MED_SOURCES,
+    "al031": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+}
 
 
 def sha(path):
@@ -27,6 +32,8 @@ def cpu():
 def main(a):
     if sha(a.source) != SOURCES[a.clip]:
         raise ValueError("source clip identity")
+    fps = 25 if a.clip == "al031" else 50
+    rate_divisor = 240 * 1000 / (fps * 8)
     OUT = a.out
     OUT.mkdir(exist_ok=False)
     source = OUT / "source.yuv"
@@ -74,7 +81,7 @@ def main(a):
                 "-s",
                 "960x544",
                 "-r",
-                "50",
+                str(fps),
                 "-i",
                 str(source),
                 "-vf",
@@ -101,7 +108,7 @@ def main(a):
             dest,
             width=width,
             height=height,
-            fps=Fraction(50),
+            fps=Fraction(fps),
             frames=n,
             crf=q,
             preset=4,
@@ -131,7 +138,7 @@ def main(a):
                     "height": inputs[width][0],
                     "crf": q,
                     "bytes": r["file_bytes"],
-                    "kbps": r["file_bytes"] / 600,
+                    "kbps": r["file_bytes"] / rate_divisor,
                     "stream_sha256": sha(Path(r["stream"])),
                     "decoded_sha256": sha(Path(r["decoded"])),
                 }
@@ -139,7 +146,7 @@ def main(a):
     result = {
         "source_yuv_sha256": sha(source),
         "ticks": 240,
-        "fps": 50,
+        "fps": fps,
         "tools": tools,
         "original_source_sha256": SOURCES[a.clip],
         "grid": rows,

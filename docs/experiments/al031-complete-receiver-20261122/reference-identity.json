@@ -1,0 +1,57 @@
+{
+  "source_sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+  "earlier_source_sha256": "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934",
+  "cut_index_sha256": "40cc90152baafa65c0db7b7b1b6f886bde5e957beb534b2e9252923eaf4c3a9d",
+  "all_available_clip_lengths_match": 21,
+  "start_seconds": {
+    "28": 203.12,
+    "31": 228.28
+  },
+  "age_seconds": 25.16,
+  "old_carrier_sha256": "6dfd992a3e8fcfdf507f0918075ac362068d94b53e6a1a83dd06a3e6a224adf2",
+  "old_cache_sha256": "91bd3a3fd9b18db301348c98e5af1536b859f2e51dde71e7de56c3beee1c1af2",
+  "old_cache_bytes": 157517,
+  "old_paid_units": [
+    "alcaraz_hurkacz__028_at120__person_000000000004",
+    "alcaraz_hurkacz__028_at120__person_000000000006"
+  ],
+  "source_track_ids": {
+    "far": "person:000000000006",
+    "near": "person:000000000002"
+  },
+  "matrix": [
+    [
+      0.17043860399131397,
+      0.6792922621142823
+    ],
+    [
+      0.516953151796554,
+      0.5270673594538361
+    ]
+  ],
+  "assignments": [
+    [
+      0.69750596344515,
+      [
+        0,
+        1
+      ]
+    ],
+    [
+      1.1962454139108363,
+      [
+        1,
+        0
+      ]
+    ]
+  ],
+  "margin": 0.49873945046568624,
+  "threshold": 0.1,
+  "ambiguous": false,
+  "source_contact_sheet": "Both source views show far role in red with red shoes, near role in grey/blue with yellow shoes.",
+  "reference_sha256": {
+    "ref0": "1f194daffff3b5d3653de12aed6e90ca29854c257a414d9b7ebcd21492bd738e",
+    "ref1": "9d37745c644a38717222f67b27c0c1353cefa9019afc5eb6d48fb1f6a9a98dff"
+  },
+  "compatible_resources": true
+}

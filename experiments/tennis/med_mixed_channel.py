@@ -52,7 +52,7 @@ def decode(joint: Path, cache: Path, carrier: Path, expected: str) -> dict:
         or carrier.read_bytes() != copied
         or runtime != cp["runtime"]
         or profile["coded_size"] != [160, 96]
-        or profile["recipe"] not in (packet.RECIPE, packet.RECIPE_2997)
+        or profile["recipe"] not in (packet.RECIPE, packet.RECIPE_25, packet.RECIPE_2997)
         or len(profile["order"]) != 2
         or len(profile["runs"]) != 2
     ):
@@ -64,7 +64,7 @@ def decode(joint: Path, cache: Path, carrier: Path, expected: str) -> dict:
     if len(runs) != 1:
         raise ValueError("expected two players on the same active interval")
     start, stop = runs.pop()
-    length = 240 if profile["recipe"] == packet.RECIPE_2997 else 120
+    length = 120 if profile["recipe"] == packet.RECIPE else 240
     if stop - start != length or not 0 <= start < stop <= 240:
         raise ValueError("unsupported active interval")
     geometry = {}

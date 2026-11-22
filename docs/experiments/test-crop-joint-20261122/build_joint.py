@@ -44,8 +44,34 @@ def sha(path):
         return hashlib.file_digest(f, "sha256").hexdigest()
 
 
-def signal(a):
-    receipt = json.loads((HERE / "match102-result.json").read_text())
+def input_config(event):
+    if event == "alcaraz031":
+        folder = HERE.parent / "six-match-source-panel-20261122"
+        return dict(
+            event=event,
+            fps=Fraction(25),
+            recipe=packet.RECIPE_25,
+            receipt=folder / "alcaraz031-native-crop.json",
+            roles={"far": "person:000000000006", "near": "person:000000000002"},
+            units={
+                "far": "alcaraz_hurkacz__028_at120__person_000000000004",
+                "near": "alcaraz_hurkacz__028_at120__person_000000000006",
+            },
+        )
+    if event == "match102":
+        return dict(
+            event=event,
+            fps=FPS,
+            recipe=packet.RECIPE_2997,
+            receipt=HERE / "match102-result.json",
+            roles={"far": "person:000000000001", "near": "person:000000000000"},
+            units={"far": "match102_far", "near": "match102_near"},
+        )
+    raise ValueError("unsupported source case")
+
+
+def signal(a, case):
+    receipt = json.loads(case["receipt"].read_text())
     assert (
         sha(a.source) == receipt["source_sha256"]
         and sha(a.poses) == receipt["output_archive_sha256"]
@@ -53,17 +79,18 @@ def signal(a):
     assert sha(a.features) == receipt["prior_feature_archive_sha256"]
     cap = cv2.VideoCapture(str(a.source), cv2.CAP_FFMPEG)
     ok, first = cap.read()
-    assert ok and abs(cap.get(cv2.CAP_PROP_FPS) - float(FPS)) < 0.001
+    assert ok and abs(cap.get(cv2.CAP_PROP_FPS) - float(case["fps"])) < 0.001
     cap.release()
     rgb = cv2.cvtColor(first, cv2.COLOR_BGR2RGB)
     units = []
     with tarfile.open(a.poses) as packed:
-        for role, track in zip(("far", "near"), reversed(receipt["selected_ids"]), strict=True):
+        assert set(case["roles"].values()) == set(receipt["selected_ids"])
+        for role, track in case["roles"].items():
             data = packed.extractfile("publish/" + track.replace(":", "_") + ".npz").read()
             assert digest(data) == receipt["tracks"][track]["npz_sha256"]
             with np.load(io.BytesIO(data), allow_pickle=False) as z:
                 assert z["fitted"].all() and np.array_equal(z["t"], np.arange(TOTAL))
-                units.append(dict(name=f"match102_{role}", t=z["t"], kp=z["kp"]))
+                units.append(dict(name=case["units"][role], t=z["t"], kp=z["kp"]))
     setting = w2_pose_rate.Setting(q=4, key=4, predictor="previous", interp="linear", vis="all")
     out = w2_pose_rate.encode_window(units, setting).expected
     names = [u["name"] for u in units]
@@ -121,7 +148,7 @@ def raster_source(a):
 
 
 def spatial_masks(a, receipt, pos):
-    pre = "publish/test__match102@120/"
+    pre = f"publish/test__{receipt['event']}@120/"
     with tarfile.open(a.features) as archive:
         root = json.load(archive.extractfile(pre + "features.json"))
         masks = archive.extractfile(pre + "sam-masks.rle").read()
@@ -231,17 +258,22 @@ def donor_base(a, src, masks):
 def main(a):
     a.out.mkdir(exist_ok=False, parents=True)
     cv2.setNumThreads(1)
-    names, coded, refs, receipt = signal(a)
+    case = input_config(getattr(a, "event", "match102"))
+    fps = case["fps"]
+    names, coded, refs, receipt = signal(a, case)
     payload = a.ball.read_bytes()
-    br = json.loads(
-        (
+    ball_receipt = getattr(a, "ball_receipt", None)
+    if ball_receipt is None:
+        if case["event"] != "match102":
+            raise ValueError("new inputs require their independent source ball receipt")
+        ball_receipt = (
             HERE.parent / "cohort-expansion-20261122/test-physical/match102-sender-retry.json"
-        ).read_text()
-    )
+        )
+    br = json.loads(ball_receipt.read_text())
     assert (
         digest(payload) == br["payload_sha256"]
         and br["source_sha256"] == receipt["source_sha256"]
-        and br["fps"] == str(FPS)
+        and br["fps"] == str(fps)
     )
     pos, app = ball.decode_frames(payload, TOTAL, 960, 544)
     assert (
@@ -268,7 +300,7 @@ def main(a):
             "-s",
             "960x544",
             "-r",
-            str(FPS),
+            str(fps),
             "-i",
             str(a.out / "clean.yuv"),
             "-vf",
@@ -291,7 +323,7 @@ def main(a):
         mode="players",
         canvas_size=[1920, 1080],
         coded_size=[160, 96],
-        recipe=packet.RECIPE_2997,
+        recipe=case["recipe"],
         order=names,
         cuts=[],
         runs=[dict(unit=n, start=0, end=240, reference=f"ref{i}") for i, n in enumerate(names)],
@@ -307,7 +339,7 @@ def main(a):
             d,
             width=160,
             height=96,
-            fps=FPS,
+            fps=fps,
             frames=240,
             crf=crf,
             preset=4,
@@ -356,8 +388,8 @@ def main(a):
         rows.append(
             dict(
                 crf=crf,
-                kbps_cached=len(joint) * float(FPS) / 30000,
-                kbps_cold=(len(joint) + len(cache)) * float(FPS) / 30000,
+                kbps_cached=len(joint) * float(fps) / 30000,
+                kbps_cold=(len(joint) + len(cache)) * float(fps) / 30000,
                 base_bytes=len(base),
                 pose_bytes=len(coded),
                 ball_bytes=len(payload),
@@ -376,7 +408,7 @@ def main(a):
     chosen = min(rows, key=lambda r: (abs(r["kbps_cached"] - 20), r["kbps_cached"]))
     report = dict(
         source_sha256=receipt["source_sha256"],
-        native_fps=str(FPS),
+        native_fps=str(fps),
         frames=240,
         foreground=[dict(unit=n) for n in names],
         donor=donor,
@@ -393,4 +425,6 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__)
     for key in ("out", "features", "source", "poses", "ball"):
         ap.add_argument("--" + key, type=Path, required=True)
+    ap.add_argument("--event", choices=("match102", "alcaraz031"), default="match102")
+    ap.add_argument("--ball-receipt", type=Path)
     main(ap.parse_args())

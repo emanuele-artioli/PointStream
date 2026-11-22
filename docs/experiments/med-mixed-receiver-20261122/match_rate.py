@@ -17,10 +17,12 @@ from src.codecs import svtav1
 
 def main(a):
     grid = json.loads((a.original / "result.json").read_text())
-    assert grid["fps"] == 50 and grid["ticks"] == 240 and grid["original_source_sha256"]
+    assert grid["fps"] in (25, 50) and grid["ticks"] == 240 and grid["original_source_sha256"]
     a.out.mkdir(exist_ok=False)
     tools = grid["tools"]
-    cap = int(a.kbps * 600 + 1e-6)
+    fps = grid["fps"]
+    rate_divisor = grid["ticks"] * 1000 / (fps * 8)
+    cap = int(a.kbps * rate_divisor + 1e-6)
     arms = []
     tried = []
     for w, h in [(160, 96), (320, 192), (480, 272), (640, 384)]:
@@ -41,7 +43,7 @@ def main(a):
                     "-s",
                     "960x544",
                     "-r",
-                    "50",
+                    str(fps),
                     "-i",
                     str(a.original / "source.yuv"),
                     "-vf",
@@ -69,7 +71,7 @@ def main(a):
                     old = a.prior / f"w{w}-q4{q4}"
                     stream, decoded = old / "stream.ivf", old / "decoded.yuv"
                     if stream.is_file() and decoded.is_file():
-                        packet._ivf(stream.read_bytes(), w, h, (50, 1))
+                        packet._ivf(stream.read_bytes(), w, h, (fps, 1))
                         assert decoded.stat().st_size == 240 * w * h * 3 // 2
                         b = stream.stat().st_size
                         known[q4] = dict(
@@ -77,7 +79,7 @@ def main(a):
                             height=h,
                             crf=q4 / 4,
                             bytes=b,
-                            kbps=b / 600,
+                            kbps=b / rate_divisor,
                             stream_sha256=sha(stream),
                             decoded_sha256=sha(decoded),
                             path=str(decoded),
@@ -92,7 +94,7 @@ def main(a):
                         Path(scratch),
                         width=w,
                         height=h,
-                        fps=Fraction(50),
+                        fps=Fraction(fps),
                         frames=240,
                         crf=q4 / 4,
                         preset=4,
@@ -108,7 +110,7 @@ def main(a):
                         height=h,
                         crf=q4 / 4,
                         bytes=r["file_bytes"],
-                        kbps=r["file_bytes"] / 600,
+                        kbps=r["file_bytes"] / rate_divisor,
                         stream_sha256=sha(Path(r["stream"])),
                         decoded_sha256=sha(Path(r["decoded"])),
                         path=str(d / "decoded.yuv"),

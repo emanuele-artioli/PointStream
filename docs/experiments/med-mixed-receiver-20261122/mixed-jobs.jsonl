@@ -3,3 +3,11 @@
 {"clip": "024", "stage": "ball-part0", "job": "20261122T105355Z-058ea56c", "code": "7450373a9c717143314e9f11a0b7b657482c993d"}
 {"clip": "024", "stage": "ball-part120", "job": "20261122T105435Z-de6508b0", "code": "cbd72602ca07e46315cc9ef5b079fa91a426a5b9"}
 {"clip": "000", "stage": "native-split", "job": "20261122T105657Z-8e30e494", "code": "323150565d98638aa75aee305cc154014a34f2c6"}
+{"clip": "019", "stage": "source-assembly", "job": "20261122T110734Z-f3d3081b", "code": "54b753687bc6537f4a948d98e215a616aec4fe1c"}
+{"clip": "019", "stage": "neural-near", "job": "20261122T111338Z-cc60fc9c", "code": "854deb9feb75d4ea58f6972fe434672cd56a2af5"}
+{"clip": "019", "stage": "gen0", "job": "20261122T111338Z-ceb8c179", "code": "854deb9feb75d4ea58f6972fe434672cd56a2af5"}
+{"clip": "019", "stage": "gen1", "job": "20261122T111527Z-cf704060", "code": "09cf80cd42dfb9066182a7103096d19133021a3d"}
+{"clip": "024", "stage": "source-assembly", "job": "20261122T112523Z-bb341eaa", "code": "2029beebf90e4c6c3db1dc35cb82e4c435c21b20"}
+{"clip": "024", "stage": "neural-near", "job": "20261122T113407Z-e40cac03", "code": "f895fd93b238ecd23961e875cbac9c6b6aa09954"}
+{"clip": "024", "stage": "gen0", "job": "20261122T113408Z-c5b3bc3d", "code": "f895fd93b238ecd23961e875cbac9c6b6aa09954"}
+{"clip": "024", "stage": "gen1", "job": "20261122T113519Z-b4358ef0", "code": "88f0d7b1dbd90e8f21aee1f7a9da617934a6c445"}
