@@ -32,25 +32,25 @@ WEIGHT_PATHS = (
 
 
 def generation_forecast(
-    timing: dict, render_seconds: float, available: float, full_cap: int, margin: float = 1.25, target_frames: int = 240
+    timing: dict, render_seconds: float, available: float, full_cap: int, margin: float = 1.25, target_frames: int = 240, smoke_frames: int = 44
 ) -> dict:
-    """Scale the actual 44-tick render, keeping measured initialization and isolation fixed."""
+    """Scale the actual measured smoke render, keeping measured initialization and isolation fixed."""
     wall = timing["worker_wall_seconds"]
     if (
         not all(math.isfinite(v) and v > 0 for v in (wall, render_seconds, available, full_cap))
         or render_seconds > wall
     ):
         raise ValueError("invalid generation smoke clock")
-    if not math.isfinite(margin) or margin < 1.25 or target_frames not in (120, 240):
+    if not math.isfinite(margin) or margin < 1.25 or target_frames not in (120, 240) or smoke_frames not in (44, 64):
         raise ValueError("invalid forecast margin")
-    estimate = margin * (wall - render_seconds + render_seconds * target_frames / 44) + 90
+    estimate = margin * (wall - render_seconds + render_seconds * target_frames / smoke_frames) + 90
     if estimate > min(full_cap, available - 60):
         raise ValueError(f"forecast {estimate:.1f}s exceeds full cap or remaining lifecycle")
     return {
         "forecast_seconds": estimate,
         "remaining_seconds": available,
         "full_cap_seconds": full_cap,
-        "basis": f"{margin}*(44-tick wall minus render-and-save + {target_frames}/44 times render-and-save) + 90; reserve 60s teardown",
+        "basis": f"{margin}*({smoke_frames}-tick wall minus render-and-save + {target_frames}/{smoke_frames} times render-and-save) + 90; reserve 60s teardown",
     }
 
 
@@ -100,7 +100,7 @@ def check_generated(args: argparse.Namespace, output: Path) -> tuple[dict, list[
         if (
             "flash" not in kernels.get("attention_family", [])
             or not set(kernels.get("tensor_core_like", [])).intersection({"cutlass", "xmma", "s16816", "hmma"})
-            or (args.frames == 44 and len(row.get("repeat_8_sha256", "")) != 64)
+            or (args.frames in (44, 64) and len(row.get("repeat_8_sha256", "")) != 64)
         ):
             raise ValueError("A6000 qualification or repeatability proof missing")
     _, roles, units = packet.unpack(args.carrier.read_bytes())
@@ -126,7 +126,7 @@ def check_generated(args: argparse.Namespace, output: Path) -> tuple[dict, list[
 
 def validate_args(args: argparse.Namespace) -> None:
     if (
-        args.frames != {"smoke": 44, "full": args.run_length}.get(os.environ["PS_STAGE"])
+        args.frames != {"smoke": args.smoke_frames, "full": args.run_length}.get(os.environ["PS_STAGE"])
         or len(args.weight) != 8
         or len(args.deny) < 4
         or len(set(args.deny)) != len(args.deny)
@@ -198,7 +198,7 @@ def execute(args: argparse.Namespace) -> None:
         worker_config=worker,
         inputs=[args.carrier, args.manifest, *args.weight, fit],
         denied=args.deny,
-        seconds=550 if args.frames == 44 else args.full_cap,
+        seconds=550 if os.environ["PS_STAGE"] == "smoke" else args.full_cap,
         kind="generation",
     )
     _, files = check_generated(args, output)
@@ -247,11 +247,11 @@ def validate(parser: argparse.ArgumentParser) -> None:
             tar.extractall(tmp, filter="data")
         receipt, _ = check_generated(args, Path(tmp) / "publish")
     (row,) = receipt["outputs"]
-    if args.frames == 44:
+    if os.environ["PS_STAGE"] == "smoke":
         available = dispatch["campaign_clock"]["budget_end"] - time.monotonic()
         profile = packet._embedded_profile(args.carrier.read_bytes())
         margin = 1.5 if args.run_length == 120 or profile["recipe"]["fps"] != [50, 1] else 1.25
-        cost = generation_forecast(timing, row["render_and_save_seconds"], available, args.full_cap, margin, args.run_length)
+        cost = generation_forecast(timing, row["render_and_save_seconds"], available, args.full_cap, margin, args.run_length, args.smoke_frames)
     else:
         cost = actual_full_cost(timing, args.full_cap)
     report = {
@@ -277,7 +277,8 @@ def main() -> None:
     run.add_argument("--deny", type=Path, required=True, action="append")
     run.add_argument("--carrier-sha256", required=True)
     run.add_argument("--unit", required=True)
-    run.add_argument("--frames", type=int, choices=(44, 120, 240), required=True)
+    run.add_argument("--frames", type=int, choices=(44, 64, 120, 240), required=True)
+    run.add_argument("--smoke-frames", type=int, choices=(44, 64), default=44)
     run.add_argument("--run-length", type=int, choices=(120, 240), default=240)
     run.add_argument("--full-cap", required=True, type=int)
     sub.add_parser("validate-stage")

@@ -36,7 +36,7 @@ def producer_sources() -> dict[str, str]:
 
 def conditioning(carrier: Path, expected_sha256: str, frames: int, units: list[str]):
     """Yield one production Renderer input at a time, including its packet-defined seed."""
-    if carrier.stat().st_size > 4 * 1024 * 1024 or frames not in (24, 44, 120, 240):
+    if carrier.stat().st_size > 4 * 1024 * 1024 or frames not in (24, 44, 64, 120, 240):
         raise ValueError('unsupported development window or oversized carrier')
     blob = carrier.read_bytes()
     if packet.wire.sha(blob) != expected_sha256:
@@ -124,7 +124,7 @@ def run(carrier: Path, expected_sha256: str, weights: dict[str, Path], fit: Path
     for name, seed, data in conditioning(carrier, expected_sha256, frames, units):
         row = {'unit': name, 'seed': seed, 'array_sha256': {k: replay.array_sha(a) for k,a in data.items()}}
         if renderer is not None:
-            if a6000 and frames == 44:
+            if a6000 and frames in (44, 64):
                 first = renderer.render(data['reference'], data['pose'][:8], 30, seed)
                 second = renderer.render(data['reference'], data['pose'][:8], 30, seed)
                 if not np.array_equal(first, second):

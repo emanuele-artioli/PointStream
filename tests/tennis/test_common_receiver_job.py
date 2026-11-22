@@ -41,7 +41,7 @@ def test_receiver_accepts_only_units_bound_to_the_paid_carrier(tmp_path, monkeyp
     monkeypatch.setenv('PS_STAGE', 'smoke')
     monkeypatch.setattr(job.packet, '_embedded_profile', lambda _: {'order': ['source_player'], 'runs': [{'unit':'source_player', 'start':92, 'end':212}]})
     monkeypatch.setattr(job.packet, '_profile', lambda _: None)
-    args = argparse.Namespace(frames=44, weight=list(range(8)), deny=list(range(4)), full_cap=600,
+    args = argparse.Namespace(frames=44, smoke_frames=44, weight=list(range(8)), deny=list(range(4)), full_cap=600,
                               carrier=carrier, carrier_sha256=hashlib.sha256(b'fixture').hexdigest(),
                               unit='source_player', run_length=120)
     job.validate_args(args)
@@ -60,3 +60,10 @@ def test_25fps_profile_uses_stricter_requested_margin():
 def test_forecast_scales_only_the_measured_active_run():
     r = generation_forecast({"worker_wall_seconds": 250}, 175, 2500, 2400, 1.5, 120)
     assert r["forecast_seconds"] == pytest.approx(1.5 * (75 + 175 * 120 / 44) + 90)
+
+def test_extended_pilot_preserves_margin_and_actual_sample_count():
+
+    r = generation_forecast({"worker_wall_seconds": 480}, 400, 3300, 2680, 1.5, 240, 64)
+    assert r["forecast_seconds"] == 1.5 * (80 + 400 * 240 / 64) + 90
+    with pytest.raises(ValueError):
+        generation_forecast({"worker_wall_seconds": 546}, 490, 3300, 2680, 1.5, 240, 64)
