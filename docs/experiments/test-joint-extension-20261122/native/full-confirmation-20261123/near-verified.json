@@ -1,0 +1,33 @@
+{
+  "role": "match127_near",
+  "job_id": "20261122T221737Z-4e49e5b8",
+  "timing": {
+    "archive_sha256": "e15af7179ae72905800077cda17f20742ba47d09fb2d7be4fb0d2d3c5bf593a1",
+    "worker_wall_seconds": 1030.3142131349887
+  },
+  "archive_bytes": 116408320,
+  "archive_sha256": "e15af7179ae72905800077cda17f20742ba47d09fb2d7be4fb0d2d3c5bf593a1",
+  "gpu_seconds": 1401.1250338554382,
+  "full_frames": 240,
+  "paid_time_sha256": "1aa53cff742acc7b82349c29558ccf50c9af15c48f018c446652dbe208b329f7",
+  "paid_linux_box_sha256": "a7b3e54d1d68cc606712f2410295f21e9941afa19218d9bd61b2eb969abbe4f1",
+  "independent_mac_box_sha256": "8da94f26ba680a8a8bd2b37ed27934fe60debb7e24813aed5828ff4aa4cc71df",
+  "same_integer_pixel_boxes": true,
+  "max_independent_coordinate_delta_pixels": 3.410605131648481e-13,
+  "all_240_image_hashes_sha256": "f27c2f8613b8390dfee8a4b65b5c63e1479c4d74ea4c8f78c081a816d9c263fe",
+  "smoke_validation": {
+    "passed": true,
+    "checks": {
+      "source_denied": true,
+      "paid_packet_geometry": true,
+      "crop_identity_and_coverage": true,
+      "native_cuda": true,
+      "cost": {
+        "forecast_seconds": 1790.6099273993132,
+        "remaining_seconds": 2477.659797258326,
+        "full_cap_seconds": 2100,
+        "basis": "1.5*(64-tick wall minus render-and-save + 240/64 times render-and-save) + 90; reserve 60s teardown"
+      }
+    }
+  }
+}
