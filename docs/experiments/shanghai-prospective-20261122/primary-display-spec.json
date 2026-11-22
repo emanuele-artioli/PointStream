@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.shanghai_ball_display_freeze"
+  ],
+  "arguments": [
+    "--source",
+    "{staged:source}",
+    "--ordinary",
+    "{staged:ordinary}",
+    "--candidate",
+    "{staged:candidate}",
+    "--ordinary-sha256",
+    "a7c263d85370a3461da46df0a41f81a8ce947bfc82b4e897f26407fe0910de4b",
+    "--candidate-sha256",
+    "a31bccb26f9c3ce5141d4d09b73b9c6b2002ac40f2ae11a134eab894bd420d96",
+    "--frames",
+    "{frames}",
+    "--decision",
+    "primary"
+  ],
+  "staged_inputs": [
+    {
+      "name": "source",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/match284-source-20261122/match284_000.mp4",
+      "sha256": "0afb0fb191881def1235285b58fe54814556c83fed7815cd99a00b92d26bc86c",
+      "extract": false
+    },
+    {
+      "name": "ordinary",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T043538Z-e2efda20/full/published.tar",
+      "sha256": "a7c263d85370a3461da46df0a41f81a8ce947bfc82b4e897f26407fe0910de4b",
+      "extract": false
+    },
+    {
+      "name": "candidate",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T051939Z-58ffb82f/full/published.tar",
+      "sha256": "a31bccb26f9c3ce5141d4d09b73b9c6b2002ac40f2ae11a134eab894bd420d96",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/match284-source-20261122/match284_000.mp4",
+      "sha256": "0afb0fb191881def1235285b58fe54814556c83fed7815cd99a00b92d26bc86c"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T043538Z-e2efda20/full/published.tar",
+      "sha256": "a7c263d85370a3461da46df0a41f81a8ce947bfc82b4e897f26407fe0910de4b"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T051939Z-58ffb82f/full/published.tar",
+      "sha256": "a31bccb26f9c3ce5141d4d09b73b9c6b2002ac40f2ae11a134eab894bd420d96"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "required_commands": [],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.shanghai_ball_display_freeze",
+    "--validate"
+  ],
+  "deadline": "2026-11-22T09:24:00Z",
+  "verify_staged_inputs": true,
+  "stall_seconds": 1500,
+  "device": "cpu",
+  "hosts": [
+    "gpu1",
+    "gpu2",
+    "gpu3",
+    "gpu4",
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [],
+  "gpu_memory_mib": 0,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "local_storage_gib": 30,
+  "smoke": {
+    "seconds": 300,
+    "representative_basis": "24 real frames from source and both independently decoded native packets; PSBL render, all source/packet/decode hashes and 1.5x full-cadence forecast."
+  },
+  "full": {
+    "seconds": 1200
+  },
+  "validator_seconds": 60,
+  "budget_seconds": 1600,
+  "scale": {
+    "frames": {
+      "smoke": 24,
+      "full": 240
+    }
+  }
+}

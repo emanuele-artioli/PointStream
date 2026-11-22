@@ -1,0 +1,158 @@
+{
+  "stage": "full",
+  "frames": 240,
+  "fps": 25,
+  "source_sha256": "0afb0fb191881def1235285b58fe54814556c83fed7815cd99a00b92d26bc86c",
+  "arm": "ball",
+  "payload_sha256": "15efaa4a569cf899f237da280bdeb448dfbb44b15286be5f29c7614389b6416d",
+  "payload_prefix_sha256": "15efaa4a569cf899f237da280bdeb448dfbb44b15286be5f29c7614389b6416d",
+  "logical_canvas": [
+    960,
+    544
+  ],
+  "target_bytes": 24480,
+  "groups": [
+    {
+      "width": 320,
+      "height": 192,
+      "kind": "ball",
+      "trials": [
+        {
+          "tbr_kbps": 3,
+          "native_bytes": 17967,
+          "bytes": 18584,
+          "sha256": "b83001a38ad9177eff7f33d7ac0e601fa586484440236ba1fbd839190ff7eaf0",
+          "native_sha256": "ec507da755f2496a48e786b106a9a2a6b24910ab404cb964e02a3e23595f7dc8",
+          "seconds": 3.1607051210012287,
+          "file": "320-ball-0.packet"
+        },
+        {
+          "tbr_kbps": 80,
+          "native_bytes": 110799,
+          "bytes": 111416,
+          "sha256": "6afede7f058d94df2d49ea920f7cac92e5b9e7c5286cca21feb2739a69244c33",
+          "native_sha256": "63eed8a74ce1ab9a6497ac48dd1448c7ef58ba4b984b9397987c4d0846e22ef0",
+          "seconds": 4.991228951985249,
+          "file": "320-ball-1.packet"
+        },
+        {
+          "tbr_kbps": 41,
+          "native_bytes": 59666,
+          "bytes": 60283,
+          "sha256": "7756e991a3583c681d3977cd8c257aa826875ebeaabe759c4e33520d7de3bd7e",
+          "native_sha256": "ce3655d4d36eae932182953adeee166e1e26b7d9f457557e6c256b2d57324da7",
+          "seconds": 4.858918357000221,
+          "file": "320-ball-2.packet"
+        },
+        {
+          "tbr_kbps": 22,
+          "native_bytes": 33965,
+          "bytes": 34582,
+          "sha256": "ff1315b1c3b1ae1839ba95766c9d26601ab8ae9c62850c9efa4c59976089451a",
+          "native_sha256": "e89d5bdeaccbfd4f9ac49b9411c3389e61700a4e0a6d0b1e25614285995f86a5",
+          "seconds": 4.430819223984145,
+          "file": "320-ball-3.packet"
+        },
+        {
+          "tbr_kbps": 12,
+          "native_bytes": 20757,
+          "bytes": 21374,
+          "sha256": "9becf10959ded4dcd2e5f511726ce660a2394e61fee2b81138e8fc2ebd230c95",
+          "native_sha256": "c7e204f639c016927969b5de8f9f0880815095e4cb5bcae61ed84a8eee2ac0dc",
+          "seconds": 3.5330336340120994,
+          "file": "320-ball-4.packet"
+        },
+        {
+          "tbr_kbps": 17,
+          "native_bytes": 26810,
+          "bytes": 27427,
+          "sha256": "d6346fd593481950fa942bf600272670a0c561b6ebb34860c0b46402d04dd73e",
+          "native_sha256": "cfa6eda0e44cf566704e2eef2540c1f182916fc5771327efd18af1df38e2f63b",
+          "seconds": 4.095724975981284,
+          "file": "320-ball-5.packet"
+        },
+        {
+          "tbr_kbps": 14,
+          "native_bytes": 22641,
+          "bytes": 23258,
+          "sha256": "e0266c93ac63fe501312d19652a5e9d3aaee34bf6b11c78cd5b9a7ec464343b2",
+          "native_sha256": "ec39d0612efa09ad615a4533424a04f0e7be8046144ada4d1a376ce121111db4",
+          "seconds": 3.664399252011208,
+          "file": "320-ball-6.packet"
+        },
+        {
+          "tbr_kbps": 15,
+          "native_bytes": 23982,
+          "bytes": 24599,
+          "sha256": "bea58fce0a557b83d5c9c5b0002fc9ece30c9b5fe7963be02fecfad3ea87f15a",
+          "native_sha256": "becbc7c12ffb2bc9066e259674c6c667dd468b2d5289c9e1e6e7cfce1097bc03",
+          "seconds": 4.943287597998278,
+          "file": "320-ball-7.packet",
+          "decoded_yuv_sha256": "bf54c36a84b245bbec67b3ebdbb355572329217f8886d9596aea37c37b4ab8eb",
+          "selected_file": "320-ball.psbl"
+        }
+      ],
+      "selected": {
+        "tbr_kbps": 15,
+        "native_bytes": 23982,
+        "bytes": 24599,
+        "sha256": "bea58fce0a557b83d5c9c5b0002fc9ece30c9b5fe7963be02fecfad3ea87f15a",
+        "native_sha256": "becbc7c12ffb2bc9066e259674c6c667dd468b2d5289c9e1e6e7cfce1097bc03",
+        "seconds": 4.943287597998278,
+        "file": "320-ball-7.packet",
+        "decoded_yuv_sha256": "bf54c36a84b245bbec67b3ebdbb355572329217f8886d9596aea37c37b4ab8eb",
+        "selected_file": "320-ball.psbl"
+      }
+    },
+    {
+      "width": 640,
+      "height": 384,
+      "kind": "ball",
+      "trials": [
+        {
+          "tbr_kbps": 3,
+          "native_bytes": 36649,
+          "bytes": 37266,
+          "sha256": "c8e3270e3ed5b3225974bb23b277de7f61002a248467ff0dce7cb89e81e0f95c",
+          "native_sha256": "f3a722705addb8615b9aa502c273dad4c51e8a24770d0da073b7eab538d6d09e",
+          "seconds": 14.692536388000008,
+          "file": "640-ball-0.packet",
+          "decoded_yuv_sha256": "3aa8333f765c8604ce20df251c0dc2e1e700265acd664be05ff68de4f33ca898",
+          "selected_file": "640-ball.psbl"
+        }
+      ],
+      "selected": {
+        "tbr_kbps": 3,
+        "native_bytes": 36649,
+        "bytes": 37266,
+        "sha256": "c8e3270e3ed5b3225974bb23b277de7f61002a248467ff0dce7cb89e81e0f95c",
+        "native_sha256": "f3a722705addb8615b9aa502c273dad4c51e8a24770d0da073b7eab538d6d09e",
+        "seconds": 14.692536388000008,
+        "file": "640-ball-0.packet",
+        "decoded_yuv_sha256": "3aa8333f765c8604ce20df251c0dc2e1e700265acd664be05ff68de4f33ca898",
+        "selected_file": "640-ball.psbl"
+      }
+    }
+  ],
+  "tools": {
+    "SvtAv1EncApp": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "sha256": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+      "version": "SVT-AV1 v4.2.0 (release)"
+    },
+    "dav1d": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+      "version": "1.5.4"
+    },
+    "ffmpeg": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+      "version": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers"
+    }
+  },
+  "elapsed_seconds": 54.33692744598375
+}

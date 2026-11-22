@@ -1,0 +1,240 @@
+{
+  "stage": "full",
+  "frames": 240,
+  "fps": 25,
+  "source_sha256": "0afb0fb191881def1235285b58fe54814556c83fed7815cd99a00b92d26bc86c",
+  "arm": "ball",
+  "rate_mode": "crf-quarter-bisection",
+  "payload_sha256": "15efaa4a569cf899f237da280bdeb448dfbb44b15286be5f29c7614389b6416d",
+  "payload_prefix_sha256": "15efaa4a569cf899f237da280bdeb448dfbb44b15286be5f29c7614389b6416d",
+  "logical_canvas": [
+    960,
+    544
+  ],
+  "target_bytes": 24480,
+  "groups": [
+    {
+      "width": 320,
+      "height": 192,
+      "kind": "ball",
+      "trials": [
+        {
+          "crf": 40.0,
+          "native_bytes": 111310,
+          "bytes": 111927,
+          "sha256": "554cde86237878772a5b2d33f16aee3138f8846e0ab1f76f7578a4628588747c",
+          "native_sha256": "c09c6c27ef62c0dc564ae32150983ece1c07dac74ef2b97de6b15996a693ab73",
+          "seconds": 3.855903693009168,
+          "file": "320-ball-0.packet"
+        },
+        {
+          "crf": 70.0,
+          "native_bytes": 13642,
+          "bytes": 14259,
+          "sha256": "6ee1e25736fe11be9833194053060a4139e600aaf76f99af38061bd0cabddb06",
+          "native_sha256": "bccb48d8b0a5da4308b533c84e3cc43047e4b05fb1dbefc52b24f2e6f48de4c7",
+          "seconds": 2.026411493017804,
+          "file": "320-ball-1.packet"
+        },
+        {
+          "crf": 55.0,
+          "native_bytes": 52636,
+          "bytes": 53253,
+          "sha256": "8ac1c2d04759fd5278c0a996d6ce7488ab2931be272e3536a71f0dec2eec8307",
+          "native_sha256": "52ab594a93ea1e16a071318a6b2b5fcd682fa6a55ba1c31c0569c49b9625e3e7",
+          "seconds": 4.7463158140017185,
+          "file": "320-ball-2.packet"
+        },
+        {
+          "crf": 62.5,
+          "native_bytes": 26342,
+          "bytes": 26959,
+          "sha256": "a368582bc6b6a20926cfb0e428737cbe3df36ebe996b5e5dff46607541237f92",
+          "native_sha256": "eaf75b43a2349b0bf9489738be00a8b3c7fc97311e25cf0de31b735b3bd45dea",
+          "seconds": 4.00242447401979,
+          "file": "320-ball-3.packet"
+        },
+        {
+          "crf": 66.25,
+          "native_bytes": 16888,
+          "bytes": 17505,
+          "sha256": "917b3e58967bb95d830f851b9552e5b8599ee446eb61a78992104a86b4271ddb",
+          "native_sha256": "36d7e7a4d91d136ed61257c4d3b63ac8a0b0d7f9ea81b921cd751d1f0d6504c5",
+          "seconds": 2.5903622650075704,
+          "file": "320-ball-4.packet"
+        },
+        {
+          "crf": 64.25,
+          "native_bytes": 19719,
+          "bytes": 20336,
+          "sha256": "173009689e8fb74119c5b3bfc3ae261a35860132a7e8596aaea38cd41d66f2e0",
+          "native_sha256": "9b07b5b8820229e60a437a4facd75ecdfbb55c13558b70747afdc307a3df354c",
+          "seconds": 3.067334093997488,
+          "file": "320-ball-5.packet"
+        },
+        {
+          "crf": 63.25,
+          "native_bytes": 22110,
+          "bytes": 22727,
+          "sha256": "40f26110a5c9ad6f81c267761e4ee9d01eb5d0ff96fea03225c843d768d739ed",
+          "native_sha256": "6d35796551c00f5d56b3081046b754b404a7fec98080fee6d3b508a6066f8016",
+          "seconds": 3.5346538570011035,
+          "file": "320-ball-6.packet"
+        },
+        {
+          "crf": 62.75,
+          "native_bytes": 25202,
+          "bytes": 25819,
+          "sha256": "8ad8713d57941c2e7b03711a31c42081a576839d21605e3b3bbc2ca54a21c81f",
+          "native_sha256": "29de63175d6aab20e54ae8384aed894fc05059cd0efaab6a7eeff4fd3c6c5be4",
+          "seconds": 3.9216203190153465,
+          "file": "320-ball-7.packet"
+        },
+        {
+          "crf": 63.0,
+          "native_bytes": 22873,
+          "bytes": 23490,
+          "sha256": "616ecb2564190599e242ea2af08ed2e7213b35c0d6ae44c1d55500e7f510e9be",
+          "native_sha256": "e40ba2dd57152e8c95e995356371a11740db10f568e9babe6865c1ee8703e873",
+          "seconds": 3.6123834699974395,
+          "file": "320-ball-8.packet",
+          "decoded_yuv_sha256": "b728b09c5dbd14a272f77107b63cda27e7f3343ce06f7d981af4c9b18769c815",
+          "selected_file": "320-ball.psbl"
+        }
+      ],
+      "selected": {
+        "crf": 63.0,
+        "native_bytes": 22873,
+        "bytes": 23490,
+        "sha256": "616ecb2564190599e242ea2af08ed2e7213b35c0d6ae44c1d55500e7f510e9be",
+        "native_sha256": "e40ba2dd57152e8c95e995356371a11740db10f568e9babe6865c1ee8703e873",
+        "seconds": 3.6123834699974395,
+        "file": "320-ball-8.packet",
+        "decoded_yuv_sha256": "b728b09c5dbd14a272f77107b63cda27e7f3343ce06f7d981af4c9b18769c815",
+        "selected_file": "320-ball.psbl"
+      }
+    },
+    {
+      "width": 640,
+      "height": 384,
+      "kind": "ball",
+      "trials": [
+        {
+          "crf": 40.0,
+          "native_bytes": 282318,
+          "bytes": 282935,
+          "sha256": "b6facc7864914e4afce0f9eca3553424f942cb5de85d0d8f96360ff2e178ed16",
+          "native_sha256": "ecbd8bae5cc6eaed30a9b205cf869326778c2d5109c1b5ba3fb24f4877c66a23",
+          "seconds": 15.029237027018098,
+          "file": "640-ball-0.packet"
+        },
+        {
+          "crf": 70.0,
+          "native_bytes": 23771,
+          "bytes": 24388,
+          "sha256": "5692e2d288c0d6427af97f334f1de99b9f761c64f1d4a8d1049d5e1f8605ab56",
+          "native_sha256": "c26f6d1c3e01ec85c369c7c0afb33887d173faa91cbd08e36777842ebe5ab7fd",
+          "seconds": 10.277035473991418,
+          "file": "640-ball-1.packet",
+          "decoded_yuv_sha256": "b3ab7e65959486657a2d4aad4cabbbb0aeebfc47bce49df11e3df8bcb0b66cc2",
+          "selected_file": "640-ball.psbl"
+        },
+        {
+          "crf": 55.0,
+          "native_bytes": 129620,
+          "bytes": 130237,
+          "sha256": "29c211dc47bef7090fdf7ae4375cd85d0a1bd63ddcb825b0461a113128796094",
+          "native_sha256": "be29293187dd1e085175bea030abf7458cedd3508af73b2fbbd58ce7f3d8d912",
+          "seconds": 16.978886475000763,
+          "file": "640-ball-2.packet"
+        },
+        {
+          "crf": 62.5,
+          "native_bytes": 58065,
+          "bytes": 58682,
+          "sha256": "2bb6770cc9671c4b4b2fdc5c31bcb116732464794c66f482be94ecdfa57bc57b",
+          "native_sha256": "4b66b424d2ffd0f1642c367c0fa6ff53764a8be121c5037585ab0227d765bc78",
+          "seconds": 16.756708592991345,
+          "file": "640-ball-3.packet"
+        },
+        {
+          "crf": 66.25,
+          "native_bytes": 32410,
+          "bytes": 33027,
+          "sha256": "dae664639050fc0a8204358f0ef691c770065bf7bbce92d1a66d1700bf3062ed",
+          "native_sha256": "aca55ff5d69d96b89cbb40cb0b980a29b3004b7c40ad6c8551e2761a9978ecc3",
+          "seconds": 12.194190997979604,
+          "file": "640-ball-4.packet"
+        },
+        {
+          "crf": 68.0,
+          "native_bytes": 27881,
+          "bytes": 28498,
+          "sha256": "c8eca2b3fde1b085abaf1705366dbcdead7f5d30fadbc43e35b4c9104c6b7c6e",
+          "native_sha256": "f0e0da3bfd83324365e579ac979196ef62335c61fb8e70438ed0aec8dac66e57",
+          "seconds": 11.09244269298506,
+          "file": "640-ball-5.packet"
+        },
+        {
+          "crf": 69.0,
+          "native_bytes": 25653,
+          "bytes": 26270,
+          "sha256": "247c760e54f1c84591703f58a9535637a4229a7222fafea8fcb89f73c429c448",
+          "native_sha256": "c6f34191d415d3f8cf1ca2f057cc6b39c9fd8199a8eb6c9f458ef77748a97743",
+          "seconds": 10.46111533397925,
+          "file": "640-ball-6.packet"
+        },
+        {
+          "crf": 69.5,
+          "native_bytes": 24952,
+          "bytes": 25569,
+          "sha256": "0402ba06ed931bd46ff61f0e2e8367f6498d9a1b35aa256295d53fbf2da0a425",
+          "native_sha256": "b4dfd87b9ac90c3278c1d4d1de98434a403670686f7ef80c5a9fa1d15f6aa058",
+          "seconds": 10.486702086986043,
+          "file": "640-ball-7.packet"
+        },
+        {
+          "crf": 69.75,
+          "native_bytes": 24298,
+          "bytes": 24915,
+          "sha256": "34eb8236ab261d6754a3a08b9a5ab12969f10215a38d6fd1d511f3e22cd4e6e3",
+          "native_sha256": "1e21b5f617b9da57a076b7b5f28d1c167658ca73b0f126c3a3ea64d112a036bf",
+          "seconds": 10.353932495985646,
+          "file": "640-ball-8.packet"
+        }
+      ],
+      "selected": {
+        "crf": 70.0,
+        "native_bytes": 23771,
+        "bytes": 24388,
+        "sha256": "5692e2d288c0d6427af97f334f1de99b9f761c64f1d4a8d1049d5e1f8605ab56",
+        "native_sha256": "c26f6d1c3e01ec85c369c7c0afb33887d173faa91cbd08e36777842ebe5ab7fd",
+        "seconds": 10.277035473991418,
+        "file": "640-ball-1.packet",
+        "decoded_yuv_sha256": "b3ab7e65959486657a2d4aad4cabbbb0aeebfc47bce49df11e3df8bcb0b66cc2",
+        "selected_file": "640-ball.psbl"
+      }
+    }
+  ],
+  "tools": {
+    "SvtAv1EncApp": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "sha256": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+      "version": "SVT-AV1 v4.2.0 (release)"
+    },
+    "dav1d": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+      "version": "1.5.4"
+    },
+    "ffmpeg": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+      "version": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers"
+    }
+  },
+  "elapsed_seconds": 148.87261945698992
+}
