@@ -31,10 +31,10 @@
         "ceiling_bytes": 155274,
         "controls": {
           "SVT-AV1": {
-            "name": "av1-1920-cold",
-            "bytes": 152843,
-            "dists": 0.26107553703089553,
-            "relative_percent_lower": -24.02167543971183
+            "name": "av1-1920-low-cold",
+            "bytes": 146960,
+            "dists": 0.2596379385640224,
+            "relative_percent_lower": -24.708375432237005
           },
           "SVT-AV1 ROI": {
             "name": "roi-640-warm",
@@ -56,10 +56,16 @@
         "ceiling_bytes": 13555,
         "controls": {
           "SVT-AV1": {
-            "name": "av1-320-280",
-            "bytes": 10471,
-            "dists": 0.6461126454174518,
-            "relative_percent_lower": 49.84292342108609
+            "name": "av1-256-low-warm",
+            "bytes": 13273,
+            "dists": 0.5719378200670083,
+            "relative_percent_lower": 43.33803379008761
+          },
+          "SVT-AV1 ROI": {
+            "name": "roi-256-low-warm",
+            "bytes": 13528,
+            "dists": 0.6575073705365261,
+            "relative_percent_lower": 50.71215489438002
           },
           "DCVC-UF": {
             "name": "dcvc-480-q24",
@@ -73,10 +79,10 @@
         "ceiling_bytes": 151035,
         "controls": {
           "SVT-AV1": {
-            "name": "av1-640-160",
-            "bytes": 139111,
-            "dists": 0.2922174674769243,
-            "relative_percent_lower": -10.900699108162959
+            "name": "av1-1920-low-cold",
+            "bytes": 146960,
+            "dists": 0.2596379385640224,
+            "relative_percent_lower": -24.81658733712646
           },
           "SVT-AV1 ROI": {
             "name": "roi-640-warm",
@@ -112,7 +118,7 @@
         "rate_gap": -0.006013262897605953,
         "nearest_affordable": "av1-640-warm",
         "nearest_bytes": 17731,
-        "qualified_count": 6
+        "qualified_count": 9
       },
       "SVT-AV1 ROI": {
         "best_quality": "roi-640-warm",
@@ -121,7 +127,7 @@
         "rate_gap": -0.0032595256828144015,
         "nearest_affordable": "roi-320-warm",
         "nearest_bytes": 17772,
-        "qualified_count": 3
+        "qualified_count": 4
       },
       "DCVC-UF": {
         "best_quality": "dcvc-480-q34",
@@ -135,13 +141,13 @@
     },
     "cold": {
       "SVT-AV1": {
-        "best_quality": "av1-1920-cold",
-        "dists": 0.26107553703089553,
-        "bytes": 152843,
-        "rate_gap": -0.015656194855545702,
+        "best_quality": "av1-1920-low-cold",
+        "dists": 0.2596379385640224,
+        "bytes": 146960,
+        "rate_gap": -0.05354405760140135,
         "nearest_affordable": "av1-960-cold",
         "nearest_bytes": 154312,
-        "qualified_count": 32
+        "qualified_count": 40
       },
       "SVT-AV1 ROI": {
         "best_quality": "roi-640-warm",
@@ -150,7 +156,7 @@
         "rate_gap": -0.885776111905406,
         "nearest_affordable": "roi-320-warm",
         "nearest_bytes": 17772,
-        "qualified_count": 3
+        "qualified_count": 4
       },
       "DCVC-UF": {
         "best_quality": "dcvc-480-q36",
@@ -186,7 +192,7 @@
       "DCVC-UF": 26.068225474613026
     },
     "cold": {
-      "SVT-AV1": -24.02167543971183,
+      "SVT-AV1": -24.708375432237005,
       "SVT-AV1 ROI": 42.91464298493632,
       "DCVC-UF": 24.29586424072173
     }
@@ -214,6 +220,38 @@
       "full_rgb_psnr": 34.73741998733532,
       "body_dists_twelve_on_sam": 0.26309464623530704,
       "decoded_sha256": "6c676fe4ebf40b4c70502008b871b5211049ed5c294a49068f5d73c7f8d16f64",
+      "source_support_sha256": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e"
+    },
+    {
+      "name": "av1-1920-low-cold",
+      "codec": "SVT-AV1",
+      "bytes": 146960,
+      "kbps": 146.81318681318683,
+      "width": 1920,
+      "height": 1080,
+      "dists": 0.2596379385640224,
+      "near": 0.22302702044447262,
+      "far": 0.29624885668357215,
+      "body_psnr": 22.73164724225605,
+      "full_rgb_psnr": 34.646129154143125,
+      "body_dists_twelve_on_sam": 0.2597329566876094,
+      "decoded_sha256": "27f62a82e006e806cf01fed61f431ea8afed1a7f4a7fd742ef38e42bc485b505",
+      "source_support_sha256": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e"
+    },
+    {
+      "name": "av1-256-low-warm",
+      "codec": "SVT-AV1",
+      "bytes": 13273,
+      "kbps": 13.259740259740258,
+      "width": 256,
+      "height": 144,
+      "dists": 0.5719378200670083,
+      "near": 0.555870055158933,
+      "far": 0.5880055849750837,
+      "body_psnr": 14.037438571577209,
+      "full_rgb_psnr": 22.400749901115358,
+      "body_dists_twelve_on_sam": 0.5664065356055895,
+      "decoded_sha256": "d3fcac7f5c87e4d61e548dfaba830ca684549d7473371ce37fc2a7a1f1d5b6de",
       "source_support_sha256": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e"
     },
     {
@@ -441,6 +479,38 @@
       "source_support_sha256": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e"
     },
     {
+      "name": "av1-320-low-cold",
+      "codec": "SVT-AV1",
+      "bytes": 150641,
+      "kbps": 150.49050949050948,
+      "width": 320,
+      "height": 192,
+      "dists": 0.37182742667694885,
+      "near": 0.3289924105008443,
+      "far": 0.4146624428530534,
+      "body_psnr": 20.810174666819236,
+      "full_rgb_psnr": 24.01363658487923,
+      "body_dists_twelve_on_sam": 0.37581709027290344,
+      "decoded_sha256": "02c475f960a088c7a076c16b7e6641bad984ca1a6c1fffaae149d1e02192100b",
+      "source_support_sha256": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e"
+    },
+    {
+      "name": "av1-320-low-warm",
+      "codec": "SVT-AV1",
+      "bytes": 13408,
+      "kbps": 13.394605394605394,
+      "width": 320,
+      "height": 192,
+      "dists": 0.5750089506308238,
+      "near": 0.5591950731972853,
+      "far": 0.5908228280643623,
+      "body_psnr": 13.814850628491202,
+      "full_rgb_psnr": 23.1544269917929,
+      "body_dists_twelve_on_sam": 0.5768444339434305,
+      "decoded_sha256": "4ecbeb2d094f195c452d03098df089bd871f7a1eb3ca64c5e48c554d89fee713",
+      "source_support_sha256": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e"
+    },
+    {
       "name": "av1-320-warm",
       "codec": "SVT-AV1",
       "bytes": 17687,
@@ -470,6 +540,38 @@
       "full_rgb_psnr": 26.28539767834699,
       "body_dists_twelve_on_sam": 0.31721146156390506,
       "decoded_sha256": "c58a1d42e2a3a8a722095f97e4ea388e7406450618010470d39dcc223ac8ce2c",
+      "source_support_sha256": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e"
+    },
+    {
+      "name": "av1-480-low-cold",
+      "codec": "SVT-AV1",
+      "bytes": 150335,
+      "kbps": 150.1848151848152,
+      "width": 480,
+      "height": 272,
+      "dists": 0.3168341026951869,
+      "near": 0.2817683401207129,
+      "far": 0.35189986526966094,
+      "body_psnr": 22.29293361716412,
+      "full_rgb_psnr": 26.28331897537511,
+      "body_dists_twelve_on_sam": 0.3213954170544942,
+      "decoded_sha256": "9020a64aa36a559ac0e4a1c783a430119250e97e60f0861868c0e4bc94d081e8",
+      "source_support_sha256": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e"
+    },
+    {
+      "name": "av1-480-low-warm",
+      "codec": "SVT-AV1",
+      "bytes": 13494,
+      "kbps": 13.48051948051948,
+      "width": 480,
+      "height": 272,
+      "dists": 0.5880211948106686,
+      "near": 0.584661008665959,
+      "far": 0.5913813809553782,
+      "body_psnr": 13.693783857943306,
+      "full_rgb_psnr": 23.635006305960474,
+      "body_dists_twelve_on_sam": 0.5867750446001688,
+      "decoded_sha256": "58c7e6b233f163f0967d35d9d803ea5d1e5f7f72488b7ac38ce626b0b34cac3d",
       "source_support_sha256": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e"
     },
     {
@@ -681,6 +783,22 @@
       "source_support_sha256": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e"
     },
     {
+      "name": "av1-640-low-cold",
+      "codec": "SVT-AV1",
+      "bytes": 150633,
+      "kbps": 150.48251748251747,
+      "width": 640,
+      "height": 384,
+      "dists": 0.28718222454190256,
+      "near": 0.25412629718581836,
+      "far": 0.3202381518979867,
+      "body_psnr": 22.974610319576207,
+      "full_rgb_psnr": 28.70069369650907,
+      "body_dists_twelve_on_sam": 0.28836342444022495,
+      "decoded_sha256": "27745defdc1efcf9a4445a33c5592b0f9b50c505f709f920d4751bf37eac8874",
+      "source_support_sha256": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e"
+    },
+    {
       "name": "av1-640-warm",
       "codec": "SVT-AV1",
       "bytes": 17731,
@@ -710,6 +828,22 @@
       "full_rgb_psnr": 31.391077578411263,
       "body_dists_twelve_on_sam": 0.2673523724079132,
       "decoded_sha256": "1cbbf4c7e435d652b49cd3056af79ebb244065872054daab993108f12152de60",
+      "source_support_sha256": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e"
+    },
+    {
+      "name": "av1-960-low-cold",
+      "codec": "SVT-AV1",
+      "bytes": 149567,
+      "kbps": 149.41758241758242,
+      "width": 960,
+      "height": 544,
+      "dists": 0.26489968138436476,
+      "near": 0.23017488420009613,
+      "far": 0.2996244785686334,
+      "body_psnr": 23.232241262742107,
+      "full_rgb_psnr": 31.37158575265978,
+      "body_dists_twelve_on_sam": 0.26991061121225357,
+      "decoded_sha256": "405ba3315a299b2aa9890cd7d58a8a68d1cc5b26c1684488523ba178ece293a1",
       "source_support_sha256": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e"
     },
     {
@@ -806,6 +940,22 @@
       "full_rgb_psnr": 19.812175673610803,
       "body_dists_twelve_on_sam": 0.3311777090032895,
       "decoded_sha256": "3f05882eb0d300b6755af92b0201831b48db88cf0d3353796fd9256e947b225c",
+      "source_support_sha256": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e"
+    },
+    {
+      "name": "roi-256-low-warm",
+      "codec": "SVT-AV1 ROI",
+      "bytes": 13528,
+      "kbps": 13.514485514485514,
+      "width": 256,
+      "height": 144,
+      "dists": 0.6575073705365261,
+      "near": 0.6777127069731553,
+      "far": 0.6373020340998967,
+      "body_psnr": 12.574910018875888,
+      "full_rgb_psnr": 20.23469984206955,
+      "body_dists_twelve_on_sam": 0.6621989235281944,
+      "decoded_sha256": "37f32c973aa16c8ef6ed4296f8a17532d01d18603a368e9a7efa7f32d7a8c90f",
       "source_support_sha256": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e"
     },
     {

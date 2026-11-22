@@ -49,7 +49,12 @@
       "revision": "fd1668998f62a91307c9afda109d357340494832",
       "source_archive_sha256": "6f8613e55a1c2823da11ab16d1d7459510b0c0031cd952d1ed081770f615ab51",
       "spec_sha256": "dcb2378b557e987acc4c2368619a11e16e37af09688ec16df6248b2918c57085",
-      "state_at_registration": "pending"
+      "state_at_registration": "pending",
+      "occupied_seconds": 1455.2879440784454,
+      "host": "gpu2",
+      "terminal": "complete",
+      "body_dists": 0.5094091555724541,
+      "running_bytes": 12121
     },
     "control_dcvc-480-q24": {
       "id": "20261122T135053Z-981d1f60",
@@ -83,8 +88,22 @@
       "revision": "23d5b3a1873df8dab2b14c352bc701ac21a9aaa4",
       "source_archive_sha256": "53f89db5aba3f7cae3e3f8630b9d522ddc48527753d4e17cebf2b1dcf5ef5b48",
       "spec_sha256": "8756ba9bec83a51153786126d05c6e36e1de3ad57e1029cabc541d61069ebb85",
+      "state_at_registration": "pending",
+      "occupied_seconds": 374.2850568294525,
+      "host": "gpu4",
+      "terminal": "complete",
+      "body_dists": 0.48364537792901197,
+      "running_bytes": 12862,
+      "source_matched_transitions": 478
+    },
+    "control_dcvc-480-q26": {
+      "id": "20261122T141901Z-a490196a",
+      "revision": "20700459b1d7244f3e5676eabe30261173eb574b",
+      "source_archive_sha256": "0dd44595161a6320cb79bf8138abd2fae7e0e9a87a07821f98b1661b36a73b9c",
+      "spec_sha256": "77b8c322682383041ed1ed24be610deb012c2c74c918d25deacfb3390e7d1bb8",
       "state_at_registration": "pending"
     }
   },
-  "closed_cpu_seconds_as_of_1413": 1018.2916212081909
+  "closed_cpu_seconds_as_of_1413": 1018.2916212081909,
+  "closed_cpu_seconds_as_of_1423": 2847.864622116089
 }
