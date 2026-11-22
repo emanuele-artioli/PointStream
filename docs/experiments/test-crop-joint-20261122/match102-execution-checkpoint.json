@@ -1,0 +1,16 @@
+{
+  "deadline": "2026-11-22T21:01:00Z",
+  "scoring_reference": "all native source RGB and masks checked on 240 original timestamps",
+  "jobs": {
+    "full_far_cuda": "20261122T112930Z-b78072a2",
+    "native_metric_parity": "20261122T113854Z-5f825f0d",
+    "cold_neural_fifth_pilot": "20261122T114042Z-709e9dcc"
+  },
+  "states_at_registration": {
+    "full_far_cuda": "one bounded 64-tick Ada qualification then continuous 240 only if existing cost rule passes",
+    "native_metric_parity": "validate all 480 objective athlete instances against previously measured .437958 body DISTS at Q34",
+    "cold_neural_fifth_pilot": "gpu5 exclusive only, four true receiver passes, original source, original cadence"
+  },
+  "local_original_q34_metric_sha256": "7846eef60ee09c6c3a35d321c4ca21b40731f2b163b1503aa0f14d7074dd60d3",
+  "next": "Bind far and near receipt SHA to source-denied whole-240 SAM finish only after both complete; then self-replay and both extra paid rungs; score and export just twelve native PNGs per output."
+}
