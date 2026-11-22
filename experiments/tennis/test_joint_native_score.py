@@ -210,5 +210,10 @@ if __name__ == "__main__":
     p.add_argument("--crf", type=int, choices=(50, 60, 70), default=50)
     p.add_argument("--producer-job", required=True)
     p.add_argument("--full-cap", type=int, default=1600)
-    a = p.parse_args()
-    validate(a) if a.validate else record(a)
+    if sys.argv[1:] == ["--validate"]:
+        stage = Path(os.environ["PS_STAGE_DIR"])
+        argv = json.loads((stage / "dispatch.json").read_text())["command"]
+        assert argv[1:3] == ["-m", "experiments.tennis.test_joint_native_score"]
+        validate(p.parse_args(argv[3:]))
+    else:
+        record(p.parse_args())

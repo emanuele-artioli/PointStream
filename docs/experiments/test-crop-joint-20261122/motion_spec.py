@@ -35,7 +35,7 @@ def make(job, witness_sha):
     args += ["--frames", "{frames}"]
     spec.update(
         entrypoint=["-m", module],
-        validator=["{python}", "-m", module, "--validate", *args],
+        validator=["{python}", "-m", module, "--validate"],
         arguments=args,
         staged_inputs=staged,
         inputs=[{k: r[k] for k in ("path", "sha256")} for r in staged],

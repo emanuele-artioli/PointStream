@@ -150,4 +150,10 @@ if __name__ == "__main__":
         p.add_argument("--" + k, type=Path, required=True)
     p.add_argument("--frames", type=int, choices=(5, 240), required=True)
     p.add_argument("--validate", action="store_true")
-    main(p.parse_args())
+    if sys.argv[1:] == ["--validate"]:
+        stage = Path(os.environ["PS_STAGE_DIR"])
+        argv = json.loads((stage / "dispatch.json").read_text())["command"]
+        assert argv[1:3] == ["-m", "experiments.tennis.test_joint_native_motion"]
+        main(p.parse_args(["--validate", *argv[3:]]))
+    else:
+        main(p.parse_args())

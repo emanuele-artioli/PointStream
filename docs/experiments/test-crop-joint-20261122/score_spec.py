@@ -87,7 +87,7 @@ def make(a):
         schema=1,
         device="cpu",
         entrypoint=["-m", module],
-        validator=["{python}", "-m", module, "--validate", *options],
+        validator=["{python}", "-m", module, "--validate"],
         arguments=options,
         staged_inputs=inputs,
         inputs=[{k: r[k] for k in ("path", "sha256")} for r in inputs],
@@ -111,11 +111,11 @@ def make(a):
         stall_seconds=1660,
         scale=dict(frames=dict(smoke=24, full=240)),
     )
-    # Fleet validators receive expanded runtime arguments via their own declaration.
+    # Validators bind the actual producer program and scale by reading the fleet dispatch receipt.
     p = HERE / (
         "match102-campus-score-"
         + a.kind
-        + ("-" + str(a.crf) if a.kind != "calibration" else "-rgb")
+        + ("-" + str(a.crf) if a.kind != "calibration" else "-dispatch")
         + ".json"
     )
     p.write_text(json.dumps(spec, indent=2) + "\n")
