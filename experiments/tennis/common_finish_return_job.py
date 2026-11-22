@@ -14,8 +14,8 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-from experiments.tennis import common_player_finish as finish
-from experiments.tennis import common_receiver_isolation as isolation
+from experiments.tennis import common_player_return_finish as finish
+from experiments.tennis import common_return_finish_isolation as isolation
 from experiments.tennis import common_receiver_manifest as manifest
 from experiments.tennis import player_requalification as replay
 from experiments.tennis.common_receiver_job import (
@@ -107,7 +107,7 @@ def verify(output: Path, config: dict, denied: list[Path]) -> tuple[dict, list[P
     if (
         report["frames_file_sha256"] != replay.sha256(files[1])
         or report["yuv_sha256"] != replay.sha256(files[2])
-        or files[2].stat().st_size != 240 * 408 * 480
+        or files[2].stat().st_size != 240 * 204 * 240
     ):
         raise ValueError("native or composite digest")
     frames = np.load(files[1], mmap_mode="r", allow_pickle=False)
@@ -129,7 +129,7 @@ def verify(output: Path, config: dict, denied: list[Path]) -> tuple[dict, list[P
             ):
                 raise ValueError("receiver matte shape or ticks")
     cv2.setNumThreads(1)
-    native = np.memmap(files[2], np.uint8, mode="r", shape=(240, 408, 480))
+    native = np.memmap(files[2], np.uint8, mode="r", shape=(240, 204, 240))
     profile, _, geometry = finish.geometry(
         Path(config["carrier"]).read_bytes(), config["carrier_sha256"]
     )
@@ -143,7 +143,7 @@ def verify(output: Path, config: dict, denied: list[Path]) -> tuple[dict, list[P
         if row["frame_sha256"] != replay.array_sha(frames[i]) or set(row["status"]) != set(UNITS):
             raise ValueError(f"composite digest or object disposition at {tick}")
         expected = cv2.resize(
-            finish.yuv_to_rgb(native[tick], 480, 272, False),
+            finish.yuv_to_rgb(native[tick], 240, 136, False),
             (1920, 1080),
             interpolation=cv2.INTER_CUBIC,
         )
