@@ -20,13 +20,18 @@ from src.codecs import svtav1
 from src.pointstream import ball
 
 SOURCE = "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934"
+SOURCE_PROFILES = {
+    "al028": (SOURCE, 492),
+    "shanghai": ("0afb0fb191881def1235285b58fe54814556c83fed7815cd99a00b92d26bc86c", 250),
+}
 LABELS = "6bbf0e3bb81a586aa3981edc40f4ea5eab0a0b36542f626d61fe12614cf14f1d"
 FPS = Fraction(25)
 SIZE = (960, 544)
 
 
-def source_frames(path, n):
-    if prior.sha(path) != SOURCE:
+def source_frames(path, n, scene="al028"):
+    expected, total = SOURCE_PROFILES[scene]
+    if not 0 < n <= total or prior.sha(path) != expected:
         raise ValueError("Wrong original video")
     cap = cv2.VideoCapture(str(path), cv2.CAP_FFMPEG)
     try:
@@ -36,7 +41,7 @@ def source_frames(path, n):
             cv2.CAP_PROP_FPS,
             cv2.CAP_PROP_FRAME_COUNT,
         ]
-        if [cap.get(k) for k in props] != [1920, 1080, 25, 492]:
+        if [cap.get(k) for k in props] != [1920, 1080, 25, total]:
             raise ValueError("Unexpected original stream geometry or cadence")
         frames = np.empty((n, 544, 960, 3), np.uint8)
         for i in range(n):

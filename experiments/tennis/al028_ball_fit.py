@@ -38,7 +38,7 @@ def run(a):
     if any(chunks[0][k] != chunks[1][k] for k in keys):
         raise ValueError("chunk source/context/model mismatch")
     if (
-        chunks[0]["source_sha256"] != sender.SOURCE
+        chunks[0]["source_sha256"] != sender.SOURCE_PROFILES[a.scene][0]
         or chunks[0]["model_code_sha256"] != fresh_ball_sender.MODEL_CODE
         or chunks[0]["model_weight_sha256"] != fresh_ball_sender.MODEL_WEIGHT
         or [c["start"] for c in chunks] != [0, 120]
@@ -50,7 +50,7 @@ def run(a):
     cv2.setNumThreads(1)
     work = Path(os.environ["PS_SCRATCH_DIR"]) / "al028-ball-fit"
     work.mkdir()
-    source = sender.source_frames(a.source, n)
+    source = sender.source_frames(a.source, n, a.scene)
     if n == 240 and hashlib.sha256(source).hexdigest() != chunks[0]["source_rgb_sha256"]:
         raise ValueError("decoded source differs from tracker context")
     tools = {k: svtav1.tool(k) for k in ("ffmpeg", "SvtAv1EncApp", "dav1d")}
@@ -90,7 +90,7 @@ def run(a):
     (stage / "ball.payload").write_bytes(payload)
     result = dict(
         frames=n,
-        source_sha256=sender.SOURCE,
+        source_sha256=sender.SOURCE_PROFILES[a.scene][0],
         source_rgb_sha256=chunks[0]["source_rgb_sha256"],
         chunk_sha256=[sender.prior.sha(p) for p in (a.chunk0, a.chunk1)],
         model_code_sha256=chunks[0]["model_code_sha256"],
@@ -108,14 +108,14 @@ def run(a):
     (stage / "sender.json").write_text(json.dumps(result, indent=2) + "\n")
 
 
-def validate():
+def validate(a):
     stage = Path(os.environ["PS_STAGE_DIR"])
     r = json.loads((stage / "sender.json").read_text())
     n = 24 if os.environ["PS_STAGE"] == "smoke" else 240
     payload = (stage / "ball.payload").read_bytes()
     decoded, apps = ball.decode_frames(payload, n, 960, 544)
     checks = dict(
-        source=r["source_sha256"] == sender.SOURCE,
+        source=r["source_sha256"] == sender.SOURCE_PROFILES[a.scene][0],
         count=r["frames"] == len(decoded) == len(apps) == n,
         payload=hashlib.sha256(payload).hexdigest() == r["payload_sha256"],
         model=r["model_weight_sha256"] == fresh_ball_sender.MODEL_WEIGHT,
@@ -140,9 +140,10 @@ def main():
     for name in ("source", "chunk0", "chunk1"):
         p.add_argument("--" + name, type=Path)
     p.add_argument("--frames", type=int, choices=(24, 240))
+    p.add_argument("--scene", choices=sender.SOURCE_PROFILES, default="al028")
     p.add_argument("--validate", action="store_true")
     a = p.parse_args()
-    validate() if a.validate else run(a)
+    validate(a) if a.validate else run(a)
 
 
 if __name__ == "__main__":

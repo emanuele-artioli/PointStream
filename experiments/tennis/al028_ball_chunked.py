@@ -64,7 +64,7 @@ def run(a):
         if not torch.isfinite(output[0]).all():
             raise ValueError('non-finite model output')
     tracker.net.register_forward_hook(finite)
-    frames=sender.source_frames(a.source,240)
+    frames=sender.source_frames(a.source,240,a.scene)
     source_hash=sha(frames)
     full=prepare_context(frames)
     setup=time.monotonic()-before
@@ -86,7 +86,7 @@ def run(a):
     else:
         predictions=predict(tracker,full,a.start,a.start+120)
         forecast=None
-    result={'source_sha256':sender.SOURCE,'source_rgb_sha256':source_hash,'source_frames':240,'fps':25,
+    result={'source_sha256':sender.SOURCE_PROFILES[a.scene][0],'source_rgb_sha256':source_hash,'source_frames':240,'fps':25,
             'mode':os.environ['PS_STAGE'],'start':a.start,'frames':a.frames,'predictions':predictions,
             'context_median_sha256':sha(full[0]),'context_small_sha256':sha(full[1]),
             'context_picks':full[2].tolist(),'forecast_seconds':forecast,'seconds':time.monotonic()-start,
@@ -95,11 +95,11 @@ def run(a):
     (Path(os.environ['PS_STAGE_DIR'])/'chunk.json').write_text(json.dumps(result,indent=2)+'\n')
 
 
-def validate():
+def validate(a):
     stage=Path(os.environ['PS_STAGE_DIR'])
     r=json.loads((stage/'chunk.json').read_text())
     n=24 if os.environ['PS_STAGE']=='smoke' else 120
-    checks={'source':r['source_sha256']==sender.SOURCE,'count':len(r['predictions'])==n==r['frames'],
+    checks={'source':r['source_sha256']==sender.SOURCE_PROFILES[a.scene][0],'count':len(r['predictions'])==n==r['frames'],
             'median':len(r['context_picks'])==100,'model':r['model_weight_sha256']==fresh_ball_sender.MODEL_WEIGHT,
             'forecast':n!=24 or r['forecast_seconds']<1300}
     value={'passed':all(checks.values()),'checks':checks,'forecast_seconds':r['forecast_seconds']}
@@ -114,9 +114,10 @@ def main():
         p.add_argument('--'+k,type=Path)
     p.add_argument('--start',type=int,choices=(0,120),default=0)
     p.add_argument('--frames',type=int,choices=(24,120))
+    p.add_argument('--scene',choices=sender.SOURCE_PROFILES,default='al028')
     p.add_argument('--validate',action='store_true')
     a=p.parse_args()
-    validate() if a.validate else run(a)
+    validate(a) if a.validate else run(a)
 
 
 if __name__=='__main__':
