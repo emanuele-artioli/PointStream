@@ -253,6 +253,7 @@ def build(
     main_only=False,
     twenty_ball=None,
     neural_stroke=None,
+    second_match=None,
 ):
     panels = [(HERE / name, title, caption) for name, title, caption in PANELS]
 
@@ -285,6 +286,15 @@ def build(
             else "Three source-selected instants with independently decoded conventional and neural controls. The joint decode costs 469.335 kbps cold or 65.473 kbps with valid references. The racket is missing near contact."
         )
         after("players-starved.pdf", (stroke, "A serve at constrained bandwidth", caption))
+    if second_match:
+        after(
+            stroke.name if stroke else "players-starved.pdf",
+            (
+                second_match,
+                "A second rally at the same bandwidth",
+                "Alcaraz–Hurkacz. The three source-selected moments use the same crop across all columns. The three delivered streams span 20.361 to 20.412 kbps with valid cached appearances. Charging both references and initialization to this 9.6-second shot raises the joint stream to 151.67 kbps.",
+            ),
+        )
     if neural_stroke:
         after(
             "65kbps-regional-dists.pdf",
@@ -345,7 +355,9 @@ def build(
             "passage-bill.pdf",
         }
         selected.update(
-            path.name for path in (timeline, stroke, twenty_ball or starved_ball) if path
+            path.name
+            for path in (timeline, stroke, second_match, twenty_ball or starved_ball)
+            if path
         )
         panels = [entry for entry in panels if entry[0].name in selected]
     writer = PdfWriter()
@@ -389,6 +401,7 @@ if __name__ == "__main__":
     cli.add_argument("--starved-ball", type=Path)
     cli.add_argument("--twenty-ball", type=Path)
     cli.add_argument("--neural-stroke", type=Path)
+    cli.add_argument("--second-match", type=Path)
     cli.add_argument(
         "--main-only", action="store_true", help="Select the proposed manuscript figures"
     )
@@ -403,4 +416,5 @@ if __name__ == "__main__":
         args.main_only,
         args.twenty_ball,
         args.neural_stroke,
+        args.second_match,
     )
