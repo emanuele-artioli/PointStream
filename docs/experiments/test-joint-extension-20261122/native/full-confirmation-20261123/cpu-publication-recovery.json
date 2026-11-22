@@ -1,0 +1,19 @@
+{
+  "affected_phases": {
+    "score-joint-crf70": "20261122T224944Z-c8c5de6e",
+    "rung-70": "20261122T224943Z-5a847bab"
+  },
+  "original_transfer_timeout_seconds": 90,
+  "remote_files": {
+    "20261122T224944Z-c8c5de6e": {
+      "partial_source_archive_bytes": 5341184
+    },
+    "20261122T224943Z-5a847bab": {
+      "partial_source_archive_bytes": 2195456
+    }
+  },
+  "outcome": "Both exact IDs had an incomplete source.tar, no ready.json, no spec.json and no run directory; the official status command confirmed unpublished. Neither execution started. Existing partial directories were retained. Replacements used campus gpu6 for publication; the native-rung source was reused from the signed compositor.",
+  "charged_compute_seconds": 0,
+  "new_score": "20261122T225842Z-00543e57",
+  "new_reference_replay": "20261122T225847Z-01ec2a3a"
+}
