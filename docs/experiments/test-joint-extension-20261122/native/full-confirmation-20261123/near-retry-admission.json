@@ -1,0 +1,13 @@
+{
+  "job": "20261122T221324Z-5a42cbc5",
+  "stage": "admission",
+  "failure": "The authentic native worker requires stop on external contention and rejected the attempted pause policy before starting generation.",
+  "model_started": false,
+  "campus_gpu_slot_seconds": 20.31191921234131,
+  "native_policy": {
+    "policy": "stop",
+    "resume_attempts": 0
+  },
+  "remaining_recovery_cap": 2829,
+  "original_recovery_cap": 2850
+}
