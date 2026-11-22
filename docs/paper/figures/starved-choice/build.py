@@ -93,6 +93,14 @@ def points():
                 q[label],
                 name + "/" + prefix + "#" + label,
             )
+    joint_name = "joint-trajectory-20261122"
+    for r in load(EXP / joint_name / "scores.json")["points"]:
+        source = f"{joint_name}#target-{r['cap']}"
+        add(WARM, r["kbps"], r, source)
+        add(COLD, r["cold_kbps"], r, source)
+    for r in load(EXP / joint_name / "control-scores.json")["points"]:
+        source = f"{joint_name}#{r['mode']}-{r['width']}-Q{r['crf']}"
+        add(ROI if r["mode"] == "roi" else NATIVE, r["kbps"], r, source)
     neural = EXP / "starved-dcvc-regions-20261122/result.json"
     if neural.exists():
         for r in load(neural)["points"]:
@@ -160,7 +168,7 @@ def render(rows, metric):
     fig.text(
         0.12,
         0.025,
-        "Lines join improving measured settings. Open red markers discount both player images; their cold prices are solid red.",
+        "Lines join improving measured settings. Open red markers use cached player state. Solid red includes its delivery.",
         fontsize=8,
     )
     for ext in ("png", "pdf"):

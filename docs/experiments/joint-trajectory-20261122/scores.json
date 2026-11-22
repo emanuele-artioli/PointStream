@@ -1,0 +1,556 @@
+{
+  "points": [
+    {
+      "cap": 20,
+      "players": 0.26169424255688983,
+      "p1": 0.2564324637254079,
+      "p2": 0.26695602138837177,
+      "ball": 0.34504732489585876,
+      "crf": 70,
+      "bytes": 12927,
+      "cold_bytes": 257266,
+      "kbps": 21.545,
+      "cold_kbps": 428.77666666666664,
+      "fits": false,
+      "wire_sha256": "26b35756f5b038dbf509115d38eda8606913726109aaba3dcf20b6e79372e6d0",
+      "base_bytes": 8909,
+      "reference_bytes": 244339,
+      "pose_bytes": 1623,
+      "ball_bytes": 794,
+      "framing_bytes": 1601,
+      "decoded_yuv_sha256": "798efbf98a1a23f45200ff620a7b2d1082a200c0655473783432fccfedc045a0",
+      "all_240_rgb_sha256": "45bd0cec2f2c2b1b3169ffe313d73a89d9a9632fee839f641c8089c24a1ff392",
+      "reviewed_full_rgb_psnr": 20.351248325296805
+    },
+    {
+      "cap": 33,
+      "players": 0.26347207029660547,
+      "p1": 0.25332574049631756,
+      "p2": 0.2736184000968933,
+      "ball": 0.3314671218395233,
+      "crf": 50,
+      "bytes": 19509,
+      "cold_bytes": 263848,
+      "kbps": 32.515,
+      "cold_kbps": 439.74666666666667,
+      "fits": true,
+      "wire_sha256": "693147d20cfe093f9fe96b3ef76ea97b965ac3539ca9c0788b4fea2d124c0b15",
+      "base_bytes": 15490,
+      "reference_bytes": 244339,
+      "pose_bytes": 1623,
+      "ball_bytes": 794,
+      "framing_bytes": 1602,
+      "decoded_yuv_sha256": "10551a234f24057244d31d506dc8909753d350faefab8d335fdc002de11838e2",
+      "all_240_rgb_sha256": "ebfbc089233a8556c1d09fd301c520c5bfcb6180d03d5cea4184f49bfb550ec4",
+      "reviewed_full_rgb_psnr": 22.582025657640802
+    }
+  ],
+  "per_tick": [
+    {
+      "t": 10,
+      "region": "p1",
+      "arm": "20",
+      "dists": 0.22131770849227905
+    },
+    {
+      "t": 10,
+      "region": "p1",
+      "arm": "33",
+      "dists": 0.21621334552764893
+    },
+    {
+      "t": 10,
+      "region": "p2",
+      "arm": "20",
+      "dists": 0.2634144425392151
+    },
+    {
+      "t": 10,
+      "region": "p2",
+      "arm": "33",
+      "dists": 0.2734563946723938
+    },
+    {
+      "t": 10,
+      "region": "ball",
+      "arm": "20",
+      "dists": 0.36816245317459106
+    },
+    {
+      "t": 10,
+      "region": "ball",
+      "arm": "33",
+      "dists": 0.3626024127006531
+    },
+    {
+      "t": 30,
+      "region": "p1",
+      "arm": "20",
+      "dists": 0.24956190586090088
+    },
+    {
+      "t": 30,
+      "region": "p1",
+      "arm": "33",
+      "dists": 0.2461848258972168
+    },
+    {
+      "t": 30,
+      "region": "p2",
+      "arm": "20",
+      "dists": 0.24509966373443604
+    },
+    {
+      "t": 30,
+      "region": "p2",
+      "arm": "33",
+      "dists": 0.258747935295105
+    },
+    {
+      "t": 30,
+      "region": "ball",
+      "arm": "20",
+      "dists": 0.47138404846191406
+    },
+    {
+      "t": 30,
+      "region": "ball",
+      "arm": "33",
+      "dists": 0.46149754524230957
+    },
+    {
+      "t": 50,
+      "region": "p1",
+      "arm": "20",
+      "dists": 0.2546534538269043
+    },
+    {
+      "t": 50,
+      "region": "p1",
+      "arm": "33",
+      "dists": 0.24616259336471558
+    },
+    {
+      "t": 50,
+      "region": "p2",
+      "arm": "20",
+      "dists": 0.27302855253219604
+    },
+    {
+      "t": 50,
+      "region": "p2",
+      "arm": "33",
+      "dists": 0.28320223093032837
+    },
+    {
+      "t": 50,
+      "region": "ball",
+      "arm": "20",
+      "dists": 0.2707709074020386
+    },
+    {
+      "t": 50,
+      "region": "ball",
+      "arm": "33",
+      "dists": 0.2586207985877991
+    },
+    {
+      "t": 70,
+      "region": "p1",
+      "arm": "20",
+      "dists": 0.2730737328529358
+    },
+    {
+      "t": 70,
+      "region": "p1",
+      "arm": "33",
+      "dists": 0.2697644829750061
+    },
+    {
+      "t": 70,
+      "region": "p2",
+      "arm": "20",
+      "dists": 0.29844051599502563
+    },
+    {
+      "t": 70,
+      "region": "p2",
+      "arm": "33",
+      "dists": 0.302206814289093
+    },
+    {
+      "t": 70,
+      "region": "ball",
+      "arm": "20",
+      "dists": 0.3857659697532654
+    },
+    {
+      "t": 70,
+      "region": "ball",
+      "arm": "33",
+      "dists": 0.3758748769760132
+    },
+    {
+      "t": 90,
+      "region": "p1",
+      "arm": "20",
+      "dists": 0.2810215950012207
+    },
+    {
+      "t": 90,
+      "region": "p1",
+      "arm": "33",
+      "dists": 0.26900529861450195
+    },
+    {
+      "t": 90,
+      "region": "p2",
+      "arm": "20",
+      "dists": 0.2691686153411865
+    },
+    {
+      "t": 90,
+      "region": "p2",
+      "arm": "33",
+      "dists": 0.2821088433265686
+    },
+    {
+      "t": 90,
+      "region": "ball",
+      "arm": "20",
+      "dists": 0.39947354793548584
+    },
+    {
+      "t": 90,
+      "region": "ball",
+      "arm": "33",
+      "dists": 0.37600791454315186
+    },
+    {
+      "t": 110,
+      "region": "p1",
+      "arm": "20",
+      "dists": 0.26082807779312134
+    },
+    {
+      "t": 110,
+      "region": "p1",
+      "arm": "33",
+      "dists": 0.2582916021347046
+    },
+    {
+      "t": 110,
+      "region": "p2",
+      "arm": "20",
+      "dists": 0.256502628326416
+    },
+    {
+      "t": 110,
+      "region": "p2",
+      "arm": "33",
+      "dists": 0.25016534328460693
+    },
+    {
+      "t": 110,
+      "region": "ball",
+      "arm": "20",
+      "dists": 0.34523266553878784
+    },
+    {
+      "t": 110,
+      "region": "ball",
+      "arm": "33",
+      "dists": 0.3162379264831543
+    },
+    {
+      "t": 130,
+      "region": "p1",
+      "arm": "20",
+      "dists": 0.22772318124771118
+    },
+    {
+      "t": 130,
+      "region": "p1",
+      "arm": "33",
+      "dists": 0.22529679536819458
+    },
+    {
+      "t": 130,
+      "region": "p2",
+      "arm": "20",
+      "dists": 0.2736208438873291
+    },
+    {
+      "t": 130,
+      "region": "p2",
+      "arm": "33",
+      "dists": 0.2794729471206665
+    },
+    {
+      "t": 130,
+      "region": "ball",
+      "arm": "20",
+      "dists": 0.318963885307312
+    },
+    {
+      "t": 130,
+      "region": "ball",
+      "arm": "33",
+      "dists": 0.31631314754486084
+    },
+    {
+      "t": 150,
+      "region": "p1",
+      "arm": "20",
+      "dists": 0.2549930214881897
+    },
+    {
+      "t": 150,
+      "region": "p1",
+      "arm": "33",
+      "dists": 0.24844223260879517
+    },
+    {
+      "t": 150,
+      "region": "p2",
+      "arm": "20",
+      "dists": 0.25786280632019043
+    },
+    {
+      "t": 150,
+      "region": "p2",
+      "arm": "33",
+      "dists": 0.27140796184539795
+    },
+    {
+      "t": 150,
+      "region": "ball",
+      "arm": "20",
+      "dists": 0.4048306941986084
+    },
+    {
+      "t": 150,
+      "region": "ball",
+      "arm": "33",
+      "dists": 0.3859102129936218
+    },
+    {
+      "t": 170,
+      "region": "p1",
+      "arm": "20",
+      "dists": 0.2808319926261902
+    },
+    {
+      "t": 170,
+      "region": "p1",
+      "arm": "33",
+      "dists": 0.2837910056114197
+    },
+    {
+      "t": 170,
+      "region": "p2",
+      "arm": "20",
+      "dists": 0.1990787386894226
+    },
+    {
+      "t": 170,
+      "region": "p2",
+      "arm": "33",
+      "dists": 0.20658665895462036
+    },
+    {
+      "t": 170,
+      "region": "ball",
+      "arm": "20",
+      "dists": 0.29303449392318726
+    },
+    {
+      "t": 170,
+      "region": "ball",
+      "arm": "33",
+      "dists": 0.30118560791015625
+    },
+    {
+      "t": 190,
+      "region": "p1",
+      "arm": "20",
+      "dists": 0.2686110734939575
+    },
+    {
+      "t": 190,
+      "region": "p1",
+      "arm": "33",
+      "dists": 0.2691308259963989
+    },
+    {
+      "t": 190,
+      "region": "p2",
+      "arm": "20",
+      "dists": 0.25478655099868774
+    },
+    {
+      "t": 190,
+      "region": "p2",
+      "arm": "33",
+      "dists": 0.26936882734298706
+    },
+    {
+      "t": 190,
+      "region": "ball",
+      "arm": "20",
+      "dists": 0.2641209363937378
+    },
+    {
+      "t": 190,
+      "region": "ball",
+      "arm": "33",
+      "dists": 0.25107747316360474
+    },
+    {
+      "t": 210,
+      "region": "p1",
+      "arm": "20",
+      "dists": 0.26306092739105225
+    },
+    {
+      "t": 210,
+      "region": "p1",
+      "arm": "33",
+      "dists": 0.26873892545700073
+    },
+    {
+      "t": 210,
+      "region": "p2",
+      "arm": "20",
+      "dists": 0.34170395135879517
+    },
+    {
+      "t": 210,
+      "region": "p2",
+      "arm": "33",
+      "dists": 0.33555811643600464
+    },
+    {
+      "t": 210,
+      "region": "ball",
+      "arm": "20",
+      "dists": 0.3152881860733032
+    },
+    {
+      "t": 210,
+      "region": "ball",
+      "arm": "33",
+      "dists": 0.2885017991065979
+    },
+    {
+      "t": 230,
+      "region": "p1",
+      "arm": "20",
+      "dists": 0.24151289463043213
+    },
+    {
+      "t": 230,
+      "region": "p1",
+      "arm": "33",
+      "dists": 0.23888695240020752
+    },
+    {
+      "t": 230,
+      "region": "p2",
+      "arm": "20",
+      "dists": 0.27076494693756104
+    },
+    {
+      "t": 230,
+      "region": "p2",
+      "arm": "33",
+      "dists": 0.2711387276649475
+    },
+    {
+      "t": 230,
+      "region": "ball",
+      "arm": "20",
+      "dists": 0.30354011058807373
+    },
+    {
+      "t": 230,
+      "region": "ball",
+      "arm": "33",
+      "dists": 0.2837757468223572
+    }
+  ],
+  "metric": {
+    "metric": "DISTS",
+    "net": "vgg16",
+    "torchmetrics": "1.9.0",
+    "weights": "/private/tmp/ps-20261119-scorer-addon/torchmetrics/functional/image/dists_models/weights.pt",
+    "weights_sha256": "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218",
+    "backbone": "/Users/manu/.codex/visualizations/2026/11/01/01a196fe-ab4d-70f0-a4b4-6843ca289667/atlas-metric-models/checkpoints/vgg16-397923af.pth",
+    "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+    "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)"
+  },
+  "torch": "2.8.0",
+  "numpy": "1.26.4",
+  "opencv": "4.10.0",
+  "self_check": [
+    {
+      "t": 10,
+      "region": "p1",
+      "arm": "source",
+      "dists": 1.1920928955078125e-07
+    },
+    {
+      "t": 10,
+      "region": "p1",
+      "arm": "20",
+      "dists": 0.22131770849227905
+    },
+    {
+      "t": 10,
+      "region": "p1",
+      "arm": "33",
+      "dists": 0.21621334552764893
+    },
+    {
+      "t": 10,
+      "region": "p2",
+      "arm": "source",
+      "dists": 1.7881393432617188e-07
+    },
+    {
+      "t": 10,
+      "region": "p2",
+      "arm": "20",
+      "dists": 0.2634144425392151
+    },
+    {
+      "t": 10,
+      "region": "p2",
+      "arm": "33",
+      "dists": 0.2734563946723938
+    },
+    {
+      "t": 10,
+      "region": "ball",
+      "arm": "source",
+      "dists": 1.7881393432617188e-07
+    },
+    {
+      "t": 10,
+      "region": "ball",
+      "arm": "20",
+      "dists": 0.36816245317459106
+    },
+    {
+      "t": 10,
+      "region": "ball",
+      "arm": "33",
+      "dists": 0.3626024127006531
+    }
+  ],
+  "forecast": 100.25923200000001,
+  "cpu_seconds": 19.811793,
+  "receipt_sha256": "2599859d573d0380eb3f75f08701bafb0a22734623edcb7b2ea8248ec4a13f21",
+  "script_sha256": "f03dcbaebc2321daa271b014aa975afdee18f05913478c108042b9679f1dc4fd",
+  "python": "/Users/manu/.codex/visualizations/2026/11/01/01a196fe-ab4d-70f0-a4b4-6843ca289667/atlas-metrics-env/bin/python"
+}

@@ -1,0 +1,651 @@
+{
+  "source_sha256": "5a81a835c16a1b511f4b581748254b809c3a5d96105113974f6a49b7c8e2182b",
+  "frames": 64,
+  "fps": 25,
+  "cap": 60.6,
+  "ladder": {
+    "widths": [
+      1280,
+      640,
+      320
+    ],
+    "crfs": [
+      40,
+      50,
+      60,
+      65,
+      70
+    ]
+  },
+  "trials": [
+    {
+      "width": 1280,
+      "height": 720,
+      "crf": 40,
+      "ordinary_bytes": 151266,
+      "hybrid_bytes": 151400,
+      "native_sha256": "e4e42579773872a1a604a30134b46fb7a70c78bfffe19c8568f91e5907a8263b",
+      "decoded_sha256": "04f7d703249136cb959c21c9431604b9d97a5993c69a30cdbea7bcc4ba96c6c7"
+    },
+    {
+      "width": 1280,
+      "height": 720,
+      "crf": 50,
+      "ordinary_bytes": 95745,
+      "hybrid_bytes": 95885,
+      "native_sha256": "8a26efca55065b29adcf75d83c96f4a311031459328f28c763c3f96eef483b9b",
+      "decoded_sha256": "1aafb5d2ab1c8f4626a8611e12ecfa9f99c6d6b935fbb9c005d250b0d6f38586"
+    },
+    {
+      "width": 1280,
+      "height": 720,
+      "crf": 60,
+      "ordinary_bytes": 50600,
+      "hybrid_bytes": 50740,
+      "native_sha256": "a02f6b905e19f3efb29995d17b65622f9327ace0a6ba2e529d9f92a5059c584e",
+      "decoded_sha256": "6bb4045892f6fe1395b0b8f89cdc7facb34d1c2e19ef88a4e8de28862baa054d"
+    },
+    {
+      "width": 1280,
+      "height": 720,
+      "crf": 65,
+      "ordinary_bytes": 23246,
+      "hybrid_bytes": 23385,
+      "native_sha256": "3f030136594341d17e8e725410a6db6dc280c5971e5b975160d5ef18aa9617b6",
+      "decoded_sha256": "60652e12d85d082b7589d3bd6e032d99fd9fcfda0f162fd21e6c0222a4218388"
+    },
+    {
+      "width": 1280,
+      "height": 720,
+      "crf": 70,
+      "ordinary_bytes": 13058,
+      "hybrid_bytes": 13188,
+      "native_sha256": "1d8d3acf7e189a2d402099014e0efd483d330a8f08b0574aa4c2855e8a9ec469",
+      "decoded_sha256": "4dae5d86e46fcb1e7a9346af67ee28374b1c0870eb334bcc7ae8befea440ee11"
+    }
+  ],
+  "chosen": {
+    "ordinary": {
+      "width": 1280,
+      "height": 720,
+      "crf": 70,
+      "bytes": 13058,
+      "kbps": 40.80625,
+      "packet_sha256": "f09eeefa1908f6960d249ff11a7ca730258cf64fbbe5f2c775d6b75a67587e4b",
+      "native_sha256": "1d8d3acf7e189a2d402099014e0efd483d330a8f08b0574aa4c2855e8a9ec469",
+      "decoded_sha256": "4dae5d86e46fcb1e7a9346af67ee28374b1c0870eb334bcc7ae8befea440ee11",
+      "file": "ordinary.packet",
+      "rgb_sha256": "41fa58c95a2fa055b69cec064bc1e3ec096f3f04702d1f538ccc4db46953d68c",
+      "cropped": [
+        {
+          "tick": 9,
+          "dists": 0.15054643154144287
+        },
+        {
+          "tick": 13,
+          "dists": 0.19277691841125488
+        },
+        {
+          "tick": 18,
+          "dists": 0.2412363886833191
+        },
+        {
+          "tick": 23,
+          "dists": 0.24712622165679932
+        },
+        {
+          "tick": 28,
+          "dists": 0.2551526427268982
+        }
+      ],
+      "dists": 0.21736772060394288,
+      "whole_rgb_psnr": 29.139162426951913
+    },
+    "metadata": {
+      "width": 1280,
+      "height": 720,
+      "crf": 70,
+      "bytes": 13188,
+      "kbps": 41.2125,
+      "packet_sha256": "99163f1f3cd145cb8454b4a1baf76313192a38e1098668a32f1290f98b8bff6d",
+      "native_sha256": "1d8d3acf7e189a2d402099014e0efd483d330a8f08b0574aa4c2855e8a9ec469",
+      "decoded_sha256": "4dae5d86e46fcb1e7a9346af67ee28374b1c0870eb334bcc7ae8befea440ee11",
+      "file": "metadata.packet",
+      "positions": [
+        [
+          496,
+          208
+        ],
+        [
+          498,
+          220
+        ],
+        [
+          548,
+          212
+        ],
+        null,
+        [
+          648,
+          200
+        ],
+        [
+          684,
+          198
+        ],
+        [
+          716,
+          198
+        ],
+        [
+          746,
+          198
+        ],
+        [
+          776,
+          200
+        ],
+        [
+          796,
+          202
+        ],
+        [
+          816,
+          204
+        ],
+        null,
+        null,
+        [
+          868,
+          196
+        ],
+        null,
+        null,
+        null,
+        null,
+        [
+          928,
+          128
+        ],
+        [
+          940,
+          120
+        ],
+        [
+          948,
+          114
+        ],
+        [
+          958,
+          108
+        ],
+        [
+          968,
+          104
+        ],
+        [
+          976,
+          102
+        ],
+        [
+          984,
+          100
+        ],
+        [
+          996,
+          100
+        ],
+        [
+          996,
+          104
+        ],
+        [
+          1008,
+          98
+        ],
+        [
+          1008,
+          80
+        ],
+        [
+          1008,
+          64
+        ],
+        [
+          1008,
+          52
+        ],
+        [
+          1008,
+          36
+        ],
+        [
+          1008,
+          22
+        ],
+        [
+          1008,
+          16
+        ],
+        [
+          1000,
+          128
+        ],
+        [
+          1022,
+          120
+        ],
+        [
+          1024,
+          116
+        ],
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "rgb_sha256": "41fa58c95a2fa055b69cec064bc1e3ec096f3f04702d1f538ccc4db46953d68c",
+      "cropped": [
+        {
+          "tick": 9,
+          "dists": 0.15054643154144287
+        },
+        {
+          "tick": 13,
+          "dists": 0.19277691841125488
+        },
+        {
+          "tick": 18,
+          "dists": 0.2412363886833191
+        },
+        {
+          "tick": 23,
+          "dists": 0.24712622165679932
+        },
+        {
+          "tick": 28,
+          "dists": 0.2551526427268982
+        }
+      ],
+      "dists": 0.21736772060394288,
+      "whole_rgb_psnr": 29.139162426951913
+    }
+  },
+  "tracked_positions": 30,
+  "labels": [
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      1,
+      796,
+      203
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      1,
+      868,
+      195
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      1,
+      930,
+      128
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      1,
+      977,
+      103
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      1,
+      1009,
+      81
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ]
+  ],
+  "seconds": 44.26459851999243,
+  "tools": {
+    "ffmpeg": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+      "version": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    "SvtAv1EncApp": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "sha256": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+      "version": "SVT-AV1 v4.2.0 (release)"
+    },
+    "dav1d": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+      "version": "1.5.4"
+    }
+  },
+  "metric": {
+    "metric": "DISTS",
+    "net": "vgg16",
+    "torchmetrics": "1.9.0",
+    "weights": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/torchmetrics/functional/image/dists_models/weights.pt",
+    "weights_sha256": "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218",
+    "backbone": "/local/users/emanuele/pointstream/cache/397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0/vgg16-397923af.pth",
+    "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+    "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)"
+  }
+}

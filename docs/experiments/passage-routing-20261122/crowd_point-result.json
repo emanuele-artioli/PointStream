@@ -1,0 +1,1865 @@
+{
+  "source": "676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66",
+  "frames": 444,
+  "decisions": {
+    "shot_fit_share": 0.8,
+    "fit_px": 6.0,
+    "precision": 0.95,
+    "duration_recall": 0.9,
+    "median_px": 2.0,
+    "p95_px": 6.0,
+    "scene_threshold": 0.25,
+    "min_state_seconds": 1.0
+  },
+  "ff": {
+    "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+    "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+    "sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+    "version": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers"
+  },
+  "records": {
+    "crowd_point": {
+      "frames": 444,
+      "seconds": 1086.1994232959987,
+      "cuts": [],
+      "parts": [
+        {
+          "start": 81848,
+          "end": 82292,
+          "predicted": "non_court",
+          "fit_share": 0.0022522522522522522
+        }
+      ],
+      "rows": [
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": true,
+          "error": 2.741607666015625
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": 14.503223419189453
+        },
+        {
+          "fits": false,
+          "error": 13.428312301635742
+        },
+        {
+          "fits": false,
+          "error": 16.280900955200195
+        },
+        {
+          "fits": false,
+          "error": 16.070560455322266
+        },
+        {
+          "fits": false,
+          "error": 9.755462646484375
+        },
+        {
+          "fits": false,
+          "error": 13.481465339660645
+        },
+        {
+          "fits": false,
+          "error": 11.530430793762207
+        },
+        {
+          "fits": false,
+          "error": 13.152544021606445
+        },
+        {
+          "fits": false,
+          "error": 11.727230072021484
+        },
+        {
+          "fits": false,
+          "error": 10.698028564453125
+        },
+        {
+          "fits": false,
+          "error": 11.05871868133545
+        },
+        {
+          "fits": false,
+          "error": 8.22787857055664
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": 19.65835952758789
+        },
+        {
+          "fits": false,
+          "error": 13.722516059875488
+        },
+        {
+          "fits": false,
+          "error": 14.518491744995117
+        },
+        {
+          "fits": false,
+          "error": 12.66546630859375
+        },
+        {
+          "fits": false,
+          "error": 14.298653602600098
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        },
+        {
+          "fits": false,
+          "error": null
+        }
+      ],
+      "cmd": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+        "-v",
+        "error",
+        "-nostdin",
+        "-threads",
+        "1",
+        "-ss",
+        "1636.980000",
+        "-t",
+        "8.900000",
+        "-i",
+        "/local/users/emanuele/pointstream/cache/676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66/nadal-kyrgios-broadcast.mp4",
+        "-frames:v",
+        "444",
+        "-filter_threads",
+        "1",
+        "-vf",
+        "scale=1920:1080:flags=area:out_range=tv,format=yuv420p",
+        "-fps_mode",
+        "passthrough",
+        "-f",
+        "rawvideo",
+        "-pix_fmt",
+        "yuv420p",
+        "pipe:1"
+      ],
+      "cut_cmd": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+        "-v",
+        "error",
+        "-nostdin",
+        "-threads",
+        "1",
+        "-ss",
+        "1636.980000",
+        "-t",
+        "8.900000",
+        "-i",
+        "/local/users/emanuele/pointstream/cache/676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66/nadal-kyrgios-broadcast.mp4",
+        "-an",
+        "-filter_threads",
+        "1",
+        "-vf",
+        "trim=end_frame=444,setpts=PTS-STARTPTS,select='gte(scene,0.10)',metadata=print:file=/local/users/emanuele/pointstream/scratch/20261122T000058Z-c02a8ac0-full/crowd_point.log",
+        "-t",
+        "8.88",
+        "-f",
+        "null",
+        "-"
+      ]
+    }
+  },
+  "seconds": 1086.2393446370115
+}

@@ -64,7 +64,8 @@ for ax, (match, digest) in zip(axes, HASHES.items()):
         ax.barh(i, hits / count, color=COLORS[i], height=0.64, hatch="//" if i in (2, 4) else None)
         rate = "" if width is None or i == 6 else f" · {arm['wire_kbps']:.1f}k"
         ax.text(hits / count + 0.035, i, f"{hits}/{count}{rate}", va="center", fontsize=7.5)
-    ax.set_title(f"Match {match} · {count} visible labels", fontsize=10)
+    event = {"209": "Rotterdam", "269": "Washington", "235": "Indian Wells"}[match]
+    ax.set_title(f"{event} · {count} visible labels", fontsize=10)
     ax.set_xlim(0, 1.38)
     ax.set_xticks([0, 0.5, 1], ["0%", "50%", "100%"])
     ax.grid(axis="x", alpha=0.2)

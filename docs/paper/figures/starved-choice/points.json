@@ -399,6 +399,132 @@
     "source": "starved-ball-twenty-20261122/upper-#roi240Q24.5"
   },
   {
+    "mode": "Joint PointStream \u00b7 valid-cache scenario",
+    "kbps": 21.545,
+    "players": 0.26169424255688983,
+    "ball": 0.34504732489585876,
+    "source": "joint-trajectory-20261122#target-20"
+  },
+  {
+    "mode": "Joint PointStream \u00b7 cold start",
+    "kbps": 428.77666666666664,
+    "players": 0.26169424255688983,
+    "ball": 0.34504732489585876,
+    "source": "joint-trajectory-20261122#target-20"
+  },
+  {
+    "mode": "Joint PointStream \u00b7 valid-cache scenario",
+    "kbps": 32.515,
+    "players": 0.26347207029660547,
+    "ball": 0.3314671218395233,
+    "source": "joint-trajectory-20261122#target-33"
+  },
+  {
+    "mode": "Joint PointStream \u00b7 cold start",
+    "kbps": 439.74666666666667,
+    "players": 0.26347207029660547,
+    "ball": 0.3314671218395233,
+    "source": "joint-trajectory-20261122#target-33"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 21.311666666666667,
+    "players": 0.535861184199651,
+    "ball": 0.4281265437602997,
+    "source": "joint-trajectory-20261122#plain-160-Q59.25"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 21.685,
+    "players": 0.5346439555287361,
+    "ball": 0.42308544119199115,
+    "source": "joint-trajectory-20261122#plain-160-Q59.0"
+  },
+  {
+    "mode": "AV1 with ROI",
+    "kbps": 21.808333333333337,
+    "players": 0.6166362538933754,
+    "ball": 0.459799587726593,
+    "source": "joint-trajectory-20261122#roi-160-Q70.0"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 21.623333333333335,
+    "players": 0.5115252509713173,
+    "ball": 0.4133229007323583,
+    "source": "joint-trajectory-20261122#plain-240-Q63.0"
+  },
+  {
+    "mode": "AV1 with ROI",
+    "kbps": 22.988333333333337,
+    "players": 0.5888842393954594,
+    "ball": 0.43567630151907605,
+    "source": "joint-trajectory-20261122#roi-240-Q70.0"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 22.358333333333334,
+    "players": 0.513247234125932,
+    "ball": 0.3907717565695445,
+    "source": "joint-trajectory-20261122#plain-480-Q70.0"
+  },
+  {
+    "mode": "AV1 with ROI",
+    "kbps": 28.221666666666668,
+    "players": 0.5076996733744938,
+    "ball": 0.39878982305526733,
+    "source": "joint-trajectory-20261122#roi-480-Q70.0"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 32.556666666666665,
+    "players": 0.5107284188270569,
+    "ball": 0.41190577546755475,
+    "source": "joint-trajectory-20261122#plain-160-Q45.5"
+  },
+  {
+    "mode": "AV1 with ROI",
+    "kbps": 32.42166666666667,
+    "players": 0.520737998187542,
+    "ball": 0.4169584810733795,
+    "source": "joint-trajectory-20261122#roi-160-Q53.0"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 32.53,
+    "players": 0.4762258604168892,
+    "ball": 0.3917588343222936,
+    "source": "joint-trajectory-20261122#plain-240-Q57.25"
+  },
+  {
+    "mode": "AV1 with ROI",
+    "kbps": 32.413333333333334,
+    "players": 0.49285549173752463,
+    "ball": 0.39591150482495624,
+    "source": "joint-trajectory-20261122#roi-240-Q61.0"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 32.21,
+    "players": 0.4506993070244789,
+    "ball": 0.362650786836942,
+    "source": "joint-trajectory-20261122#plain-480-Q64.25"
+  },
+  {
+    "mode": "Ordinary AV1",
+    "kbps": 33.03,
+    "players": 0.44666904459396994,
+    "ball": 0.3654652386903763,
+    "source": "joint-trajectory-20261122#plain-480-Q64.0"
+  },
+  {
+    "mode": "AV1 with ROI",
+    "kbps": 32.64333333333334,
+    "players": 0.48432938754558563,
+    "ball": 0.3706728368997574,
+    "source": "joint-trajectory-20261122#roi-480-Q66.5"
+  },
+  {
     "mode": "DCVC-UF",
     "kbps": 36.825,
     "players": 0.33479494601488113,

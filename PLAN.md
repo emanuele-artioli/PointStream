@@ -2,6 +2,12 @@
 
 PointStream splits a broadcast at scene cuts. On suitable shots, the sender can describe foreground motion with points and transmit appearance where needed. Other shots use a conventional codec. The research question is which representation makes the best use of a given bandwidth budget for a viewer or a machine. Keep system design general. Tennis provides the principal evaluation.
 
+## Argument for the rewrite
+
+A video application may need both the image of an action and the position of the object involved. PointStream can send them together. Open on the same rally at 20 kbps: the viewer can see the reconstructed ball, and a machine can read the trajectory from those same bytes. Then ask when the sender should draw the object, send its pixels, or keep the ordinary video and send only its position. Tennis makes these choices measurable. Pose-conditioned players raise a second question about paying for appearance when the broadcast returns to the same people.
+
+The last submission emphasized a 7–10× bandwidth reduction with an ultrafast HEVC anchor and advance model delivery. The reviews asked for stronger codecs, an account of what the receiver already knows, and evidence about motion and changing views. Use the present AV1, ROI, DCVC, in-motion and continuous-broadcast comparisons to answer those questions where the measurements are comparable. Introduce Lai et al.’s earlier tennis scene decomposition and coordinate map alongside the first system figure. Distinguish PointStream through the reconstructed broadcast, direct machine access and the measured cost of supplying both outputs. [Original paper and reviews](https://openreview.net/forum?id=bKRwxysElo) · [Tennis Video 2.0](https://www.larry-lai.com/doc/JVCI_Tennis2.pdf)
+
 ## Manuscript sequence and figure priority
 
 Lead evaluation with **two separate rate–quality figures**, one for all players and one for the ball. Put total delivered bitrate on x and the same regional metric on y. Target 20, 50 and 125 kbps, plot actual rates, and preserve higher-rate outcomes to show the boundary of any gain. Use only the common measured support when pooling curves. Average people within a shot, shots within a match, then weight physical matches equally; for historical union-mask scores preserve their original regional definition. Show match observations and training exposure. Use a near/far split as a diagnostic only if a prespecified scale effect persists across matches. Do not pick a different winning rate for each test match.

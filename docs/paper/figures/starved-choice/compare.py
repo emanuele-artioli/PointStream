@@ -28,7 +28,7 @@ def analyze(rows):
                         *curves, minimum_quality_span=0.005
                     )
         winners = {}
-        for budget in (20, 50, 65, 125):
+        for budget in (20, 22, 33, 50, 65, 125):
             winners[budget] = {}
             for kind, group in (
                 ("measured_anchors", anchors),

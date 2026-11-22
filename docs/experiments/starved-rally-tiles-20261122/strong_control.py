@@ -30,20 +30,20 @@ def cpu():
     )
 
 
-def main(experiment, root):
+def main(experiment, root, target_bytes=None, width=480, max_crf=63.0):
     cv2.setNumThreads(1)
     root.mkdir(exist_ok=False)
     start = cpu()
     begin = time.monotonic()
     previous = json.loads((experiment / "render.json").read_text())
     pair = next(p for p in previous["pairs"] if p["target"] == 63 and p["matched"])
-    target = round(pair["tile_kbps"] * 600)
+    target = round(pair["tile_kbps"] * 600) if target_bytes is None else target_bytes
     tools = previous["tools"]
     assert all(sha(Path(t["path"])) == t["sha256"] for t in tools.values())
     source = crops.ROOT / "ps-native-ctl-20261118-full/source.yuv"
     assert sha(source) == "6cae4bd7a46bfa4bd2a7a7ec5c926647ea43d9e7a5366eb96e464eaffe1e603c"
-    w, h = 480, 272
-    raw = root / "480.yuv"
+    w, h = width, {160: 96, 240: 136, 480: 272}[width]
+    raw = root / f"{w}.yuv"
     conversion = [
         tools["ffmpeg"]["path"],
         "-v",
@@ -61,7 +61,7 @@ def main(experiment, root):
         "-filter_threads",
         "1",
         "-vf",
-        "scale=480:272:flags=area,format=yuv420p",
+        f"scale={w}:{h}:flags=area,format=yuv420p",
         "-f",
         "rawvideo",
         str(raw),
@@ -130,10 +130,12 @@ def main(experiment, root):
     assert (smoke["encode_cpu_seconds"] + smoke["decode_cpu_seconds"]) * 10 * 1.5 < 60
     pilot = encode("plain", 36, 240)
     # Use a full, harder encode to forecast the remaining size-only search.
-    assert (pilot["encode_cpu_seconds"] + pilot["decode_cpu_seconds"]) * 20 * 1.5 + cpu() - start < 490
+    assert (
+        pilot["encode_cpu_seconds"] + pilot["decode_cpu_seconds"]
+    ) * 20 * 1.5 + cpu() - start < 490
     selected = {}
     for mode in ["plain", "roi"]:
-        lo, hi = 36.0, 63.0
+        lo, hi = 36.0, max_crf
         low = encode(mode, lo, 240)
         high = encode(mode, hi, 240)
         if low["file_bytes"] >= target >= high["file_bytes"]:
@@ -175,7 +177,7 @@ def main(experiment, root):
             if Path(key).stem in ("source", "mask"):
                 z.writestr(key, original.read(key))
         for arm_name, row in selected.items():
-            native = np.memmap(row["decoded"], "uint8", "r", shape=(240, 408, 480))
+            native = np.memmap(row["decoded"], "uint8", "r", shape=(240, 3 * h // 2, w))
             for t, f in zip(TICKS, frames, strict=True):
                 assert t == f["tick"]
                 canvas = cv2.resize(
@@ -189,6 +191,7 @@ def main(experiment, root):
     result = dict(
         previous_sha256=sha(experiment / "render.json"),
         target_bytes=target,
+        geometry=[w, h],
         source_sha256=sha(source),
         tools=tools,
         roi_map_sha256=sha(roi),
@@ -209,5 +212,8 @@ if __name__ == "__main__":
     cli = argparse.ArgumentParser(description=__doc__)
     cli.add_argument("experiment", type=Path)
     cli.add_argument("output", type=Path)
+    cli.add_argument("--target-bytes", type=int)
+    cli.add_argument("--width", choices=(160, 240, 480), default=480, type=int)
+    cli.add_argument("--max-crf", type=float, default=63.0)
     args = cli.parse_args()
-    main(args.experiment, args.output)
+    main(args.experiment, args.output, args.target_bytes, args.width, args.max_crf)

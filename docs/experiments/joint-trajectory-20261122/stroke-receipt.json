@@ -1,0 +1,63 @@
+{
+  "ticks": [
+    78,
+    86,
+    94
+  ],
+  "crop": [
+    854,
+    390,
+    1324,
+    1032
+  ],
+  "anchor": {
+    "cap": 20,
+    "mode": "plain",
+    "crf": 63.0,
+    "width": 240,
+    "kbps": 21.623333333333335,
+    "bytes": 12974,
+    "decoded_sha256": "bdb4dac5c91c8013ed49cce6e3244fc5b7a93f48446011822133f43247882bd4",
+    "players": 0.5115252509713173,
+    "ball": 0.4133229007323583,
+    "p1": 0.5116553356250128,
+    "p2": 0.5113951663176218
+  },
+  "joint": {
+    "crf": 70,
+    "bytes": 12927,
+    "cold_bytes": 257266,
+    "kbps": 21.545,
+    "cold_kbps": 428.77666666666664,
+    "fits": false,
+    "wire_sha256": "26b35756f5b038dbf509115d38eda8606913726109aaba3dcf20b6e79372e6d0",
+    "base_bytes": 8909,
+    "reference_bytes": 244339,
+    "pose_bytes": 1623,
+    "ball_bytes": 794,
+    "framing_bytes": 1598,
+    "decoded_yuv_sha256": "798efbf98a1a23f45200ff620a7b2d1082a200c0655473783432fccfedc045a0",
+    "all_240_rgb_sha256": "45bd0cec2f2c2b1b3169ffe313d73a89d9a9632fee839f641c8089c24a1ff392",
+    "reviewed_full_rgb_psnr": 20.351248325296805
+  },
+  "display_sha256": "b628a057e04e95a0c2bc47cbffe7209c71b4ad869bbc9e827fcc67fbbf5ae6f9",
+  "replay_sha256": "c29a34d89c2f049a47035b6a5ccb8120c811aead7c12123449c9ce4e95f0c1a1",
+  "script_sha256": "cde2c3f2ed939215f142c22fd609f1929126fbc324963edb57d07ad0d88d60dd",
+  "crop_sha256": {
+    "Source": [
+      "55212ef6702ee68887d727cc496a110ca4c34aec00167d5d8bb43b0143c9927a",
+      "75aee0ca7c173ca591fd26b7c9780c222b57330fbfd2a8f017bd1ce2c64ff264",
+      "8a0d67de3f86421a2d8fa675cda8ceeb1f0c8b067a9e6e22dfc0f4b70fc4b332"
+    ],
+    "AV1": [
+      "84b9e3995404dfc2899ff680ab5fb8306995b072ae6983ed0fde8796547ccd65",
+      "10fad310a1171507506eab4401ba4457ce940efabb216ffa4609506a40ab70da",
+      "bfa44ecf5ffb4214dc7b9b7d2a2cd7c473ff62483f625ccd8939b69f1b8392c4"
+    ],
+    "PointStream": [
+      "2ed366090b4937c04f8f6bdef50052c72b3ff8b6e1bd2ef1596f8b2c4eee2f18",
+      "9c00643c273e19381bafe85d364b4af960a9b33f8edd00eb7a4043a79084626f",
+      "a0e500614642287550c3e52e8fe04329384ea3840947c88ca3e51fa90358693c"
+    ]
+  }
+}

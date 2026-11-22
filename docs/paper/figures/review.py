@@ -36,7 +36,7 @@ PANELS = [
     (
         "starved-choice/players-rate-quality.pdf",
         "Player fidelity at the available bandwidth",
-        "One rally with common scoring. Solid red charges the full startup. Open red prices already valid player references. All people have equal weight.",
+        "One rally with common scoring. The low-rate joint points use a cleaned base, generated bodies and fitted ball. Solid red charges startup. Open red assumes valid player state. Both people have equal weight.",
     ),
     (
         "starved-choice/ball-rate-quality.pdf",
@@ -72,6 +72,11 @@ PANELS = [
         "ball/basel-holdout-visual-machine.pdf",
         "When the ordinary video already preserves the ball",
         "In Basel, full-width AV1 preserved ball appearance better under the frozen 60.6 kbps cap. Direct paid centers located all 12 labeled balls within 10 native pixels. The frozen detector located 9 on tiled video and zero on either AV1 control.",
+    ),
+    (
+        "ball/adelaide-prospective-machine.pdf",
+        "What a machine can read from the same video",
+        "The next source-ranked singles match used a rate-selection rule frozen before opening the outcome. Adding 130 bytes preserved all 64 decoded frames. Paid centers localized 5/5 visible balls, versus 0/5 for the detector on the same video; on seven not-visible labels the corresponding presence counts were 1 and 0.",
     ),
     (
         "ball/matched-low-detection.pdf",
@@ -219,14 +224,13 @@ def build(
             ),
         )
     if stroke:
-        after(
-            "players-starved.pdf",
-            (
-                stroke,
-                "A serve at constrained bandwidth",
-                "Three source-selected instants with independently decoded conventional and neural controls. The joint decode costs 469.335 kbps cold or 65.473 kbps with valid references. The racket is missing near contact.",
-            ),
+        low_rate = stroke.stem == "joint-serve"
+        caption = (
+            "At 21.545 kbps with valid cached references, the two players and fitted ball share a cleaned base. Ordinary AV1 costs 21.623 kbps. Sending both references for this rally costs 428.777 kbps in total. All three instants were chosen from the source."
+            if low_rate
+            else "Three source-selected instants with independently decoded conventional and neural controls. The joint decode costs 469.335 kbps cold or 65.473 kbps with valid references. The racket is missing near contact."
         )
+        after("players-starved.pdf", (stroke, "A serve at constrained bandwidth", caption))
     if twenty_ball:
         after(
             "ball-rate-quality.pdf",
@@ -272,7 +276,7 @@ def build(
             "ball-starved-640-controls.pdf",
             "basel-holdout-visual-machine.pdf",
             "matched-low-detection.pdf",
-            "ball-machine-anchors.pdf",
+            "adelaide-prospective-machine.pdf",
             "starved-budget.pdf",
             "passage-bill.pdf",
         }

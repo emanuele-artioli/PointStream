@@ -39,21 +39,24 @@ Emit the composed frame; an optional paid ball update follows the players.
 
 Keep model installation, appearance transmission, refresh and reuse assumptions visible beside the achieved rate. The renderer does not receive source target RGB or human masks. The fallback above applies to missing support; a corrupt packet, missing scheduled crop or mismatched model is an error. The historical sampled-window comparison has a different adaptation and rate contract. [Conditioning and native generation](../../../../experiments/tennis/common_receiver_generate.py) · [Compositor and fallback](../../../../experiments/tennis/common_player_finish.py) · [Audited 240-frame replay](../../../experiments/receiver-replay-20261118/independent-idle-20261118/README.md)
 
-## 3. Deliver tracked ball pixels at native cadence
+## 3. Send a ball location with optional pixels
 
-Input is the native video and an optional sender track location at each tick. Output is a complete native base stream and, when used, an aligned tile stream with in-frame placements. This is the tracked-pixel mode. The trajectory-rendering experiment uses a different representation.
+The sender has an ordinary base video and a sequence of optional locations. An application can read the transmitted locations in both modes. The optional tile replaces a small region in the display. The rendered-trajectory mode has its own appearance syntax.
 
 ```text
-Encode the full base video at its allocated setting.
-If any frame has a tracked location:
-    For each tick:
-        Start a neutral 64 × 64 tile. If a location exists, align a 32 × 32
-        window to the chroma grid, clip its origin and copy it into the center.
-    Encode the tile sequence, including the neutral ticks, at native cadence.
-Transmit the base, tile payload if present, placements and packet headers.
-For each receiver tick, decode the base and advance any tile stream.
-    If there is a placement, paste its decoded 32 × 32 center on the base.
-    Emit the resulting frame. With a missing placement, emit the base frame.
+Encode the base video at the chosen setting.
+If the mode is video plus coordinates:
+    Pack the base with all coordinates and explicit missing symbols.
+    At the receiver, return that sequence to the application.
+    Emit the unmodified decoded base for playback and finish.
+For each tick in tracked-pixel mode:
+    Align the tracked 32 × 32 region to the chroma grid and image edges.
+    Copy it into a 64 × 64 tile, or use a neutral tile if missing.
+Send the base, coded tiles when any location exists, and placements.
+For each received base frame:
+    Read its placement and advance the tile stream if present.
+    If a placement exists, paste the decoded 32 × 32 center at that origin.
+    Return the placement to the application and emit the resulting frame.
 ```
 
-The receiver can use a placement directly as tile-location metadata. Centering and edge clipping affect its relationship to the original ball coordinate. The 64 × 64 source-centered evaluation crop has a different role from the 32 × 32 pasted area. Read the exact sender positions, payload and decoded baseline to evaluate the fixed-budget gain. [Packet writer and receiver](../../../../src/pointstream/tracked_patch.py) · [Matched-rate evidence](../ball/README.md)
+In the measured video-plus-coordinates variant, the sender packs the ordinary AV1 stream with the sender’s existing position sequence. The application can read coordinates while the viewer sees the decoded AV1 frames unchanged. The tile mode uses its placement as location metadata. [Packet, all-frame equality and per-frame locations](../../../experiments/ball-basel-confirmation-20261122/metadata-control.json) Centering and edge clipping affect its relationship to the original ball coordinate. The 64 × 64 source-centered evaluation crop has a different role from the 32 × 32 pasted area. Read the exact sender positions, payload and decoded baseline to evaluate the fixed-budget gain. [Packet writer and receiver](../../../../src/pointstream/tracked_patch.py) · [Matched-rate evidence](../ball/README.md)

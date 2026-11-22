@@ -1,0 +1,57 @@
+{
+  "fps": 50,
+  "records": [
+    {
+      "interval": "first",
+      "sampled_frames": 240,
+      "start": 76626,
+      "end": 76866,
+      "geometry_court_frames": 240,
+      "motion_point_frames": 240,
+      "both_frames": 240,
+      "human_court_frames": 0,
+      "human_crowd_frames": 0,
+      "human_unreviewed_frames": 240,
+      "partial": false
+    },
+    {
+      "interval": "return",
+      "sampled_frames": 240,
+      "start": 87691,
+      "end": 87931,
+      "geometry_court_frames": 240,
+      "motion_point_frames": 240,
+      "both_frames": 240,
+      "human_court_frames": 0,
+      "human_crowd_frames": 0,
+      "human_unreviewed_frames": 240,
+      "partial": false
+    },
+    {
+      "interval": "crowd_point",
+      "sampled_frames": 444,
+      "start": 81848,
+      "end": 82292,
+      "geometry_court_frames": 0,
+      "motion_point_frames": 444,
+      "both_frames": 0,
+      "human_court_frames": 0,
+      "human_crowd_frames": 444,
+      "human_unreviewed_frames": 0,
+      "partial": false
+    },
+    {
+      "interval": "crowd_interlude",
+      "sampled_frames": 24,
+      "start": 84351,
+      "end": 84375,
+      "geometry_court_frames": 0,
+      "motion_point_frames": 0,
+      "both_frames": 0,
+      "human_court_frames": 0,
+      "human_crowd_frames": 24,
+      "human_unreviewed_frames": 0,
+      "partial": true
+    }
+  ]
+}
