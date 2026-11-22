@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "contains_human_marks": false,
+  "clips": [
+    {
+      "id": "shanghai/match284",
+      "frames": 250,
+      "fps": 25,
+      "width": 1920,
+      "height": 1080,
+      "sha256": "0afb0fb191881def1235285b58fe54814556c83fed7815cd99a00b92d26bc86c",
+      "review_frames": [
+        120
+      ]
+    }
+  ]
+}
