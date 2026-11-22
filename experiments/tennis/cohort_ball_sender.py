@@ -76,10 +76,13 @@ def run(a):
     frames, fps = source(a.source, meta, n)
     context = chunks.prepare_context(frames)
     raw = chunks.predict(tracker, context, 0, n)
+    audit_seconds = 0.0
     if n == 24:
+        audit_started = time.monotonic()
         assert raw == tracker.run(frames) and raw == chunks.predict(
             tracker, context, 0, 12
         ) + chunks.predict(tracker, context, 12, n)
+        audit_seconds = time.monotonic() - audit_started
     predictions = [(v, x * 960 / 1280, y * 544 / 720) for v, x, y in raw]
     tools = {k: svtav1.tool(k) for k in ("ffmpeg", "SvtAv1EncApp", "dav1d")}
     convert = k5d_encoder.convert_rgb(tools["ffmpeg"]["path"], frames, work / "source.yuv", fps)
@@ -129,6 +132,7 @@ def run(a):
         conversion=convert,
         native=rec,
         seconds=time.monotonic() - start,
+        equivalence_audit_seconds=audit_seconds,
     )
     (stage / "sender.json").write_text(json.dumps(result, indent=2) + "\n")
 
@@ -138,7 +142,9 @@ def validate():
     r = json.loads((stage / "sender.json").read_text())
     p = (stage / "ball.payload").read_bytes()
     pos, apps = ball.decode_frames(p, r["frames"], 960, 544)
-    forecast = 1.5 * r["seconds"] * 240 / r["frames"] + 90
+    production_seconds = r["seconds"] - r.get("equivalence_audit_seconds", 0.0)
+    assert 0 < production_seconds <= r["seconds"]
+    forecast = 1.5 * production_seconds * 240 / r["frames"] + 90
     checks = dict(
         native=r["native"]["decoded_frames"] == r["frames"],
         payload=sha(stage / "ball.payload") == r["payload_sha256"]
