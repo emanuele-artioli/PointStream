@@ -1,0 +1,397 @@
+{
+  "v006_p0014": {
+    "frames": 106,
+    "fps": "25/1",
+    "source_sha256": "8ab59163aa86f3cb0f26b1981e6e546f148cca916e40731c0cdee5c6621e4b78",
+    "results_sha256": "2f2a9ba50befeafdc9aa901dc8caf1b11aaeb164b371d4d332c2f12706e13df9",
+    "arms": [
+      {
+        "size": [
+          320,
+          180
+        ],
+        "selected": {
+          "20400": {
+            "ceiling": 10812,
+            "chosen": "320-crf67.ivf",
+            "bytes": 6435
+          },
+          "33000": {
+            "ceiling": 17490,
+            "chosen": "320-crf58.ivf",
+            "bytes": 14612
+          }
+        }
+      },
+      {
+        "size": [
+          640,
+          360
+        ],
+        "selected": {
+          "20400": {
+            "ceiling": 10812,
+            "chosen": "640-crf70.ivf",
+            "bytes": 9467
+          },
+          "33000": {
+            "ceiling": 17490,
+            "chosen": "640-crf67.ivf",
+            "bytes": 12583
+          }
+        }
+      }
+    ]
+  },
+  "v006_p0041": {
+    "frames": 132,
+    "fps": "25/1",
+    "source_sha256": "19dd9edbef46ac8771294802804c52b2e642843430b59e902f269664c6a8c39b",
+    "results_sha256": "6f5bc7f74438f492216130b40728398e31c06c18f00c2af135807f64aa4bdd09",
+    "arms": [
+      {
+        "size": [
+          320,
+          180
+        ],
+        "selected": {
+          "20400": {
+            "ceiling": 13464,
+            "chosen": "320-crf67.ivf",
+            "bytes": 6891
+          },
+          "33000": {
+            "ceiling": 21780,
+            "chosen": "320-crf58.ivf",
+            "bytes": 16437
+          }
+        }
+      },
+      {
+        "size": [
+          640,
+          360
+        ],
+        "selected": {
+          "20400": {
+            "ceiling": 13464,
+            "chosen": "640-crf67.ivf",
+            "bytes": 11153
+          },
+          "33000": {
+            "ceiling": 21780,
+            "chosen": "640-crf67.ivf",
+            "bytes": 11153
+          }
+        }
+      }
+    ]
+  },
+  "v006_p0068": {
+    "frames": 144,
+    "fps": "25/1",
+    "source_sha256": "c7be37685d69c221c6a881b4e9004c1ce5ae484c2e2fbdda27f6cc7fa2a067d0",
+    "results_sha256": "7ef0dd4f9fef87243ca4dc17dfd596e75707bafed91ab22391efca350ab1ac8b",
+    "arms": [
+      {
+        "size": [
+          320,
+          180
+        ],
+        "selected": {
+          "20400": {
+            "ceiling": 14688,
+            "chosen": "320-crf67.ivf",
+            "bytes": 8284
+          },
+          "33000": {
+            "ceiling": 23760,
+            "chosen": "320-crf58.ivf",
+            "bytes": 19584
+          }
+        }
+      },
+      {
+        "size": [
+          640,
+          360
+        ],
+        "selected": {
+          "20400": {
+            "ceiling": 14688,
+            "chosen": "640-crf70.ivf",
+            "bytes": 11673
+          },
+          "33000": {
+            "ceiling": 23760,
+            "chosen": "640-crf67.ivf",
+            "bytes": 15657
+          }
+        }
+      }
+    ]
+  },
+  "v007_p0022": {
+    "frames": 120,
+    "fps": "25/1",
+    "source_sha256": "f9c4cfb91781a53abaa45e29a89aeb5e73c97aed9aebaab0897aab89939aa1b6",
+    "results_sha256": "603247580f33640ca3b45638b4e37e834c2d0b58f53a84df74189cb53c36cffb",
+    "arms": [
+      {
+        "size": [
+          320,
+          180
+        ],
+        "selected": {
+          "20400": {
+            "ceiling": 12240,
+            "chosen": "320-crf67.ivf",
+            "bytes": 9293
+          },
+          "33000": {
+            "ceiling": 19800,
+            "chosen": "320-crf67.ivf",
+            "bytes": 9293
+          }
+        }
+      },
+      {
+        "size": [
+          640,
+          360
+        ],
+        "selected": {
+          "20400": {
+            "ceiling": 12240,
+            "chosen": null
+          },
+          "33000": {
+            "ceiling": 19800,
+            "chosen": "640-crf67.ivf",
+            "bytes": 19576
+          }
+        }
+      }
+    ]
+  },
+  "v007_p0065": {
+    "frames": 138,
+    "fps": "25/1",
+    "source_sha256": "8d15cd9a62d2dfa88ac809bc3ddb07f70eae4c3e4d4f5a6a1325687cb8603143",
+    "results_sha256": "acfe59beab81d947d162a7f1cb3dc66a2c947a5abda5f627cedda70fc7a85733",
+    "arms": [
+      {
+        "size": [
+          320,
+          180
+        ],
+        "selected": {
+          "20400": {
+            "ceiling": 14076,
+            "chosen": "320-crf67.ivf",
+            "bytes": 9040
+          },
+          "33000": {
+            "ceiling": 22770,
+            "chosen": "320-crf58.ivf",
+            "bytes": 22537
+          }
+        }
+      },
+      {
+        "size": [
+          640,
+          360
+        ],
+        "selected": {
+          "20400": {
+            "ceiling": 14076,
+            "chosen": "640-crf70.ivf",
+            "bytes": 13476
+          },
+          "33000": {
+            "ceiling": 22770,
+            "chosen": "640-crf67.ivf",
+            "bytes": 17542
+          }
+        }
+      }
+    ]
+  },
+  "v007_p0108": {
+    "frames": 264,
+    "fps": "25/1",
+    "source_sha256": "961bb2383d3372449383b234440b14793e03af26b115922f686ddf617e06b08a",
+    "results_sha256": "c441bd843cb084395a825da19e952b8a88ec31296379e7852500da7b57a61ad2",
+    "arms": [
+      {
+        "size": [
+          320,
+          180
+        ],
+        "selected": {
+          "20400": {
+            "ceiling": 26928,
+            "chosen": "320-crf67.ivf",
+            "bytes": 14499
+          },
+          "33000": {
+            "ceiling": 43560,
+            "chosen": "320-crf58.ivf",
+            "bytes": 35249
+          }
+        }
+      },
+      {
+        "size": [
+          640,
+          360
+        ],
+        "selected": {
+          "20400": {
+            "ceiling": 26928,
+            "chosen": "640-crf67.ivf",
+            "bytes": 25945
+          },
+          "33000": {
+            "ceiling": 43560,
+            "chosen": "640-crf67.ivf",
+            "bytes": 25945
+          }
+        }
+      }
+    ]
+  },
+  "game9_clip1": {
+    "frames": 83,
+    "fps": "30/1",
+    "source_sha256": "553b593fb5b110eac8ba33663c372243bf71f17269637057f7e9abdd02c2b383",
+    "results_sha256": "ef14e01f309c512e9f479286f7d431499b09f3137e55447ffcb1e0e6de9efffc",
+    "arms": [
+      {
+        "size": [
+          320,
+          180
+        ],
+        "selected": {
+          "20400": {
+            "ceiling": 7055,
+            "chosen": "320-crf67.ivf",
+            "bytes": 5089
+          },
+          "33000": {
+            "ceiling": 11412,
+            "chosen": "320-crf58.ivf",
+            "bytes": 9800
+          }
+        }
+      },
+      {
+        "size": [
+          640,
+          360
+        ],
+        "selected": {
+          "20400": {
+            "ceiling": 7055,
+            "chosen": "640-crf70.ivf",
+            "bytes": 6947
+          },
+          "33000": {
+            "ceiling": 11412,
+            "chosen": "640-crf67.ivf",
+            "bytes": 9074
+          }
+        }
+      }
+    ]
+  },
+  "game9_clip2": {
+    "frames": 258,
+    "fps": "30/1",
+    "source_sha256": "b41ccedddaf124dbccad6c941305df199b8abfbd56f44cb8c723b42fc24e24d7",
+    "results_sha256": "3d1706710d053b079f418d688460a7a82fd402c9e4b3666ef2d3f1f3c2778b94",
+    "arms": [
+      {
+        "size": [
+          320,
+          180
+        ],
+        "selected": {
+          "20400": {
+            "ceiling": 21930,
+            "chosen": "320-crf58.ivf",
+            "bytes": 19935
+          },
+          "33000": {
+            "ceiling": 35475,
+            "chosen": "320-crf45.ivf",
+            "bytes": 33910
+          }
+        }
+      },
+      {
+        "size": [
+          640,
+          360
+        ],
+        "selected": {
+          "20400": {
+            "ceiling": 21930,
+            "chosen": "640-crf67.ivf",
+            "bytes": 17776
+          },
+          "33000": {
+            "ceiling": 35475,
+            "chosen": "640-crf67.ivf",
+            "bytes": 17776
+          }
+        }
+      }
+    ]
+  },
+  "game9_clip5": {
+    "frames": 292,
+    "fps": "30/1",
+    "source_sha256": "5c6587aaa15ff7303680585e701a044c9328d41cd55ba89652e0a53b3465a5e5",
+    "results_sha256": "444340b9292f0bb61ee14ba5767e05d603d54a1c46039e46caa9c9f369c0876d",
+    "arms": [
+      {
+        "size": [
+          320,
+          180
+        ],
+        "selected": {
+          "20400": {
+            "ceiling": 24820,
+            "chosen": "320-crf58.ivf",
+            "bytes": 22977
+          },
+          "33000": {
+            "ceiling": 40150,
+            "chosen": "320-crf45.ivf",
+            "bytes": 39103
+          }
+        }
+      },
+      {
+        "size": [
+          640,
+          360
+        ],
+        "selected": {
+          "20400": {
+            "ceiling": 24820,
+            "chosen": "640-crf67.ivf",
+            "bytes": 19798
+          },
+          "33000": {
+            "ceiling": 40150,
+            "chosen": "640-crf67.ivf",
+            "bytes": 19798
+          }
+        }
+      }
+    ]
+  }
+}

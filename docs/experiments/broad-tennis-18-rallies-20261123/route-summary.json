@@ -1,0 +1,201 @@
+{
+  "prespecified_rallies": 6,
+  "native_frames": 904,
+  "court_frames": 766,
+  "conventional_frames": 138,
+  "cpu_only": true,
+  "rows": [
+    {
+      "rally_id": "v006_p0014",
+      "evaluated_range": [
+        0,
+        106
+      ],
+      "native_fps": [
+        25,
+        1
+      ],
+      "native_dimensions": [
+        1280,
+        720
+      ],
+      "fits": 106,
+      "shots": [
+        {
+          "start": 0,
+          "stop": 106,
+          "predicted": "court",
+          "fit_share": 1.0
+        }
+      ],
+      "source_sha256": "8ab59163aa86f3cb0f26b1981e6e546f148cca916e40731c0cdee5c6621e4b78",
+      "screen_sha256": "373f2f9bf8474d7c3bb9bbf5cc36bae914dd65e189b07d043ce1c73d0e209503",
+      "selector_sha256": "1867047e29e73192fdde752ab984e01963ade0b41458be0dff5041fc1ddc7dd1",
+      "opencv_version": "4.10.0",
+      "wall_seconds": 113.93288412499987
+    },
+    {
+      "rally_id": "v006_p0041",
+      "evaluated_range": [
+        0,
+        132
+      ],
+      "native_fps": [
+        25,
+        1
+      ],
+      "native_dimensions": [
+        1280,
+        720
+      ],
+      "fits": 132,
+      "shots": [
+        {
+          "start": 0,
+          "stop": 132,
+          "predicted": "court",
+          "fit_share": 1.0
+        }
+      ],
+      "source_sha256": "19dd9edbef46ac8771294802804c52b2e642843430b59e902f269664c6a8c39b",
+      "screen_sha256": "373f2f9bf8474d7c3bb9bbf5cc36bae914dd65e189b07d043ce1c73d0e209503",
+      "selector_sha256": "1867047e29e73192fdde752ab984e01963ade0b41458be0dff5041fc1ddc7dd1",
+      "opencv_version": "4.10.0",
+      "wall_seconds": 127.56756312499965
+    },
+    {
+      "rally_id": "v006_p0068",
+      "evaluated_range": [
+        0,
+        144
+      ],
+      "native_fps": [
+        25,
+        1
+      ],
+      "native_dimensions": [
+        1280,
+        720
+      ],
+      "fits": 144,
+      "shots": [
+        {
+          "start": 0,
+          "stop": 144,
+          "predicted": "court",
+          "fit_share": 1.0
+        }
+      ],
+      "source_sha256": "c7be37685d69c221c6a881b4e9004c1ce5ae484c2e2fbdda27f6cc7fa2a067d0",
+      "screen_sha256": "373f2f9bf8474d7c3bb9bbf5cc36bae914dd65e189b07d043ce1c73d0e209503",
+      "selector_sha256": "1867047e29e73192fdde752ab984e01963ade0b41458be0dff5041fc1ddc7dd1",
+      "opencv_version": "4.10.0",
+      "wall_seconds": 168.0630807919997
+    },
+    {
+      "rally_id": "v007_p0022",
+      "evaluated_range": [
+        0,
+        120
+      ],
+      "native_fps": [
+        25,
+        1
+      ],
+      "native_dimensions": [
+        1280,
+        720
+      ],
+      "fits": 83,
+      "shots": [
+        {
+          "start": 0,
+          "stop": 37,
+          "predicted": "non_court",
+          "fit_share": 0.0
+        },
+        {
+          "start": 37,
+          "stop": 120,
+          "predicted": "court",
+          "fit_share": 1.0
+        }
+      ],
+      "source_sha256": "f9c4cfb91781a53abaa45e29a89aeb5e73c97aed9aebaab0897aab89939aa1b6",
+      "screen_sha256": "373f2f9bf8474d7c3bb9bbf5cc36bae914dd65e189b07d043ce1c73d0e209503",
+      "selector_sha256": "1867047e29e73192fdde752ab984e01963ade0b41458be0dff5041fc1ddc7dd1",
+      "opencv_version": "4.10.0",
+      "wall_seconds": 173.37816379200012
+    },
+    {
+      "rally_id": "v007_p0065",
+      "evaluated_range": [
+        0,
+        138
+      ],
+      "native_fps": [
+        25,
+        1
+      ],
+      "native_dimensions": [
+        1280,
+        720
+      ],
+      "fits": 37,
+      "shots": [
+        {
+          "start": 0,
+          "stop": 70,
+          "predicted": "non_court",
+          "fit_share": 0.0
+        },
+        {
+          "start": 70,
+          "stop": 107,
+          "predicted": "court",
+          "fit_share": 1.0
+        },
+        {
+          "start": 107,
+          "stop": 138,
+          "predicted": "non_court",
+          "fit_share": 0.0
+        }
+      ],
+      "source_sha256": "8d15cd9a62d2dfa88ac809bc3ddb07f70eae4c3e4d4f5a6a1325687cb8603143",
+      "screen_sha256": "373f2f9bf8474d7c3bb9bbf5cc36bae914dd65e189b07d043ce1c73d0e209503",
+      "selector_sha256": "1867047e29e73192fdde752ab984e01963ade0b41458be0dff5041fc1ddc7dd1",
+      "opencv_version": "4.10.0",
+      "wall_seconds": 137.86745412500022
+    },
+    {
+      "rally_id": "v007_p0108",
+      "evaluated_range": [
+        0,
+        264
+      ],
+      "native_fps": [
+        25,
+        1
+      ],
+      "native_dimensions": [
+        1280,
+        720
+      ],
+      "fits": 264,
+      "shots": [
+        {
+          "start": 0,
+          "stop": 264,
+          "predicted": "court",
+          "fit_share": 1.0
+        }
+      ],
+      "source_sha256": "961bb2383d3372449383b234440b14793e03af26b115922f686ddf617e06b08a",
+      "screen_sha256": "373f2f9bf8474d7c3bb9bbf5cc36bae914dd65e189b07d043ce1c73d0e209503",
+      "selector_sha256": "1867047e29e73192fdde752ab984e01963ade0b41458be0dff5041fc1ddc7dd1",
+      "opencv_version": "4.10.0",
+      "wall_seconds": 292.9347875000003
+    }
+  ]
+}

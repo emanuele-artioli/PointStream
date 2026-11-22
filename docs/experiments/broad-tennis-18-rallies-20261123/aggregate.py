@@ -73,12 +73,12 @@ def aggregate(manifest, records, draws=10000):
     events = manifest["events"]
     if len(events) != 6 or any(len(event["rallies"]) != 3 for event in events):
         raise ValueError("expected six registered events with three rallies each")
-    if sum(event["exposure"] == "held-out" for event in events) < 2:
+    if sum(event["held_out"] for event in events) < 2:
         raise ValueError("the study needs two registered held-out matches")
     if len({event["event_id"] for event in events}) != 6:
         raise ValueError("match IDs must be distinct")
     enrolled = {
-        rally["rally_id"]: (event["event_id"], event["exposure"], rally["native_range"])
+        rally["rally_id"]: (event["event_id"], event["held_out"], rally["native_range"])
         for event in events
         for rally in event["rallies"]
     }
@@ -126,7 +126,7 @@ def aggregate(manifest, records, draws=10000):
                     held_out = {
                         event["event_id"]: match_means[event["event_id"]]
                         for event in events
-                        if event["exposure"] == "held-out"
+                        if event["held_out"]
                     }
                     pooled["held_out_match_means"] = held_out
                     out["results"][f"{target}/{metric}/{baseline}"] = pooled
