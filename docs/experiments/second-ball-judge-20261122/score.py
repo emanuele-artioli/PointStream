@@ -1,5 +1,6 @@
 """Join fixed full-clip detector outputs with the independent historical labels."""
 
+import argparse
 import csv
 import hashlib
 import io
@@ -8,9 +9,13 @@ import math
 import tarfile
 from pathlib import Path
 
-prior = json.loads(Path("/private/tmp/ps-monotrack-prior-source-clip.json").read_text())
-judge = json.loads(Path("/private/tmp/ps-monotrack-new-predictions-20261122.json").read_text())
-payload = Path("/private/tmp/ps-monotrack-labels-20261122.tar.gz").read_bytes()
+root = Path(__file__).resolve().parent
+parser = argparse.ArgumentParser()
+parser.add_argument("--historical", type=Path, required=True)
+args = parser.parse_args()
+prior = json.loads((root / "prior-source-clip.json").read_text())
+judge = json.loads((root / "predictions.json").read_text())
+payload = args.historical.read_bytes()
 assert (
     hashlib.sha256(payload).hexdigest()
     == "e3ae88ccbab68a19aa0a34a9ad12328352d00a69ae44901edfd7cbe01220aa12"
@@ -82,7 +87,5 @@ result["source_prior_parity"] = {
     "prior_values_round_to_tenth_pixel": True,
 }
 result["rates_kbps"] = {"baseline": 63.0575, "candidate": 63.3641}
-Path("docs/experiments/second-ball-judge-20261122/result.json").write_text(
-    json.dumps(result, indent=2) + "\n"
-)
+(root / "result.json").write_text(json.dumps(result, indent=2) + "\n")
 print(json.dumps(result))
