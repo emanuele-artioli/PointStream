@@ -7,6 +7,9 @@ import json
 import os
 from pathlib import Path
 import shutil
+import subprocess
+import sys
+import time
 import tarfile
 from types import SimpleNamespace
 
@@ -27,6 +30,7 @@ def sha(path):
 def run(a):
     if a.frames != (24 if os.environ["PS_STAGE"] == "smoke" else 240):
         raise ValueError("wrong stage frame count")
+    started = time.monotonic()
     os.environ["AL028_ASSETS"] = str(a.assets)
     path = (
         Path(__file__).resolve().parents[2]
@@ -51,9 +55,88 @@ def run(a):
     )
     score.main(args)
     stage = Path(os.environ["PS_STAGE_DIR"])
-    shutil.copyfile(out / "result.json", stage / "result.json")
+    # A lossless RGB transport avoids copying a 1.5 GB raw array over the slow
+    # shared home. Verify every decoded byte before releasing the artifact.
+    video = out / "frames-20-ffv1.mkv"
+    ffmpeg = Path(sys.prefix) / "bin/ffmpeg"
+    if sha(ffmpeg) != "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2":
+        raise ValueError("wrong lossless export tool")
+    images = np.load(out / "frames-20.npy", mmap_mode="r", allow_pickle=False)
+    enc = subprocess.Popen(
+        [
+            str(ffmpeg),
+            "-v",
+            "error",
+            "-threads",
+            "1",
+            "-f",
+            "rawvideo",
+            "-pix_fmt",
+            "rgb24",
+            "-s",
+            "1920x1080",
+            "-r",
+            "25",
+            "-i",
+            "pipe:0",
+            "-an",
+            "-c:v",
+            "ffv1",
+            "-level",
+            "3",
+            "-pix_fmt",
+            "bgr0",
+            "-y",
+            str(video),
+        ],
+        stdin=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    assert enc.stdin is not None
+    for im in images:
+        enc.stdin.write(np.ascontiguousarray(im).tobytes())
+    enc.stdin.close()
+    stderr = enc.stderr.read() if enc.stderr is not None else b""
+    if enc.wait(timeout=300) != 0:
+        raise RuntimeError(f"lossless export failed: {stderr[-1000:]!r}")
+    dec = subprocess.Popen(
+        [
+            str(ffmpeg),
+            "-v",
+            "error",
+            "-threads",
+            "1",
+            "-i",
+            str(video),
+            "-an",
+            "-f",
+            "rawvideo",
+            "-pix_fmt",
+            "rgb24",
+            "pipe:1",
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    assert dec.stdout is not None
+    h = hashlib.sha256()
+    total = 0
+    while chunk := dec.stdout.read(8 * 1024 * 1024):
+        h.update(chunk)
+        total += len(chunk)
+    error = dec.stderr.read() if dec.stderr is not None else b""
+    if dec.wait(timeout=300) != 0 or total != a.frames * 1080 * 1920 * 3:
+        raise ValueError(f"lossless decoder coverage failed: {error[-1000:]!r}")
+    result = json.loads((out / "result.json").read_text())
+    if h.hexdigest() != result["rgb_stream_sha256"]["20"]:
+        raise ValueError("lossless movie differs from RGB frame stream")
+    result["ffv1_sha256"] = sha(video)
+    result["ffv1_rgb_roundtrip_sha256"] = h.hexdigest()
+    result["ffv1_bytes"] = video.stat().st_size
+    result["worker_elapsed_seconds"] = time.monotonic() - started
+    (stage / "result.json").write_text(json.dumps(result, indent=2) + "\n")
     if a.frames == 240:
-        shutil.copyfile(out / "frames-20.npy", stage / "frames-20.npy")
+        shutil.copyfile(video, stage / video.name)
         with tarfile.open(stage / "private-review.tar", "x") as tar:
             tar.add(out / "private-review", arcname="private-review")
     (stage / "output-hashes.json").write_text(
@@ -61,7 +144,7 @@ def run(a):
             {
                 p.name: sha(p)
                 for p in stage.iterdir()
-                if p.name in ("result.json", "frames-20.npy", "private-review.tar")
+                if p.name in ("result.json", "frames-20-ffv1.mkv", "private-review.tar")
             },
             indent=2,
         )
@@ -80,21 +163,14 @@ def validate():
         "receipts": r["finish_receipt_sha256"] == FINISH,
         "result_hash": hashes["result.json"] == sha(stage / "result.json"),
     }
-    forecast = 1.5 * r["elapsed_seconds"] * 10 + 300
+    forecast = 1.5 * r["worker_elapsed_seconds"] * 10 + 300
     if n == 24:
         checks["forecast"] = forecast < 1800
     else:
-        frame = stage / "frames-20.npy"
-        images = np.load(frame, mmap_mode="r", allow_pickle=False)
-        h = hashlib.sha256()
-        for im in images:
-            h.update(np.ascontiguousarray(im))
-        checks["frames20"] = (
-            images.shape == (240, 1080, 1920, 3)
-            and images.dtype == np.uint8
-            and h.hexdigest() == r["rgb_stream_sha256"]["20"]
-            and hashes["frames-20.npy"] == sha(frame)
-        )
+        video = stage / "frames-20-ffv1.mkv"
+        checks["frames20"] = r["ffv1_rgb_roundtrip_sha256"] == r["rgb_stream_sha256"]["20"] and r[
+            "ffv1_sha256"
+        ] == hashes["frames-20-ffv1.mkv"] == sha(video)
         checks["review"] = len(r["private_review_png_sha256"]) == 12 * 10 and hashes[
             "private-review.tar"
         ] == sha(stage / "private-review.tar")

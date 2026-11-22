@@ -19,8 +19,8 @@
   "staged_inputs": [
     {
       "name": "assets",
-      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al028-donor25-portable-20261122-731cc34e/scoring-assets-c7d7344b.tar",
-      "sha256": "c7d7344b1c8db426773f757bab5273f7a167b0242f0a1378886125b17f8a91bf",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al028-donor25-portable-20261122-731cc34e/scoring-assets-03100e5b.tar.gz",
+      "sha256": "03100e5bbda2e07f8a5d8c8c64bd94c9e43a0dc5d10de5e9351c423861f62dee",
       "extract": true
     },
     {
@@ -44,8 +44,8 @@
   ],
   "inputs": [
     {
-      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al028-donor25-portable-20261122-731cc34e/scoring-assets-c7d7344b.tar",
-      "sha256": "c7d7344b1c8db426773f757bab5273f7a167b0242f0a1378886125b17f8a91bf"
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/al028-donor25-portable-20261122-731cc34e/scoring-assets-03100e5b.tar.gz",
+      "sha256": "03100e5bbda2e07f8a5d8c8c64bd94c9e43a0dc5d10de5e9351c423861f62dee"
     },
     {
       "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T044900Z-f6f04f90/full/published.tar",
