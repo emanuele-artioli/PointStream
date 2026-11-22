@@ -1,0 +1,18 @@
+{
+  "git_head": "f7d47b8f1553dec20886c971c6f3f3da83cc0144",
+  "snapshot_sha256": "9d607cd2aa65ce46c295c5136e7ad536a2a156db91755646d6d7dd6e85ae55a9",
+  "spec_sha256": "54c26ede4a37fac7e87a1491dfd74e7d297b6543921d44ab2f9501854454b30f",
+  "source_sha256": "cec689704a7d4658a8983f29c3bed5afdfb9081c0d4f679e94cf38153be5ab16",
+  "tracked_archive_paths_selected": [
+    "experiments/tennis",
+    "src",
+    "tools",
+    "env",
+    "scripts",
+    "pyproject.toml",
+    "experiments/__init__.py",
+    "experiments/jobs",
+    "src/__init__.py"
+  ],
+  "origin_job": "20261122T134804Z-ff2bc372"
+}
