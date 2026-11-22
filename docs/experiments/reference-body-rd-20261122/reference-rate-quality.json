@@ -1,6 +1,34 @@
 {
   "scope": "Actual measured image bytes and 24-frame body quality on one development pair. Cost-duration scenarios use the 21.545 kbps measured running price, keep 2,022 other initialization bytes fixed, and assume valid reuse for the stated duration. Only the lossless full 240-frame stream is physically decoded here.",
   "levels": {
+    "jpeg40": {
+      "measured_image_bytes": 41119,
+      "comparison_initialization_bytes": 43141,
+      "body_dists": 0.16705963512261707,
+      "body_psnr": 16.064116277676575,
+      "motion_residual_error": 8.201687304869942,
+      "kbps_by_active_seconds": {
+        "4.8": 93.44666666666667,
+        "30": 33.04926666666667,
+        "120": 24.42106666666667,
+        "300": 22.69542666666667
+      },
+      "active_seconds_at_33_kbps": 30.129026625927548
+    },
+    "jpeg70": {
+      "measured_image_bytes": 64498,
+      "comparison_initialization_bytes": 66520,
+      "body_dists": 0.1727708876132965,
+      "body_psnr": 16.128128327066573,
+      "motion_residual_error": 8.27339672005695,
+      "kbps_by_active_seconds": {
+        "4.8": 132.41166666666666,
+        "30": 39.28366666666667,
+        "120": 25.979666666666667,
+        "300": 23.31886666666667
+      },
+      "active_seconds_at_33_kbps": 46.456569183762554
+    },
     "q65": {
       "measured_image_bytes": 44179,
       "comparison_initialization_bytes": 46201,

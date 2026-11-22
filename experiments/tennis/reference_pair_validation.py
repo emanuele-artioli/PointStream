@@ -15,6 +15,12 @@ from experiments.tennis import common_receiver_manifest as manifest
 from experiments.tennis import player_requalification as replay
 
 MODULE = "experiments.tennis.reference_pair_validation"
+QUANTIZERS = {
+    "jpeg40-jpeg70": {
+        "smoke": "d8e7d96cbf3dd3c812e245644ca15aeccc6553189fb3c5289ee78e783b5a0bfb",
+        "full": "c4364a92fd5ebdcbce109f285098f1671268d714afe162d1fa8f47f1f45d940c",
+    }
+}
 DIGESTS = {
     "smoke": "731cc34e1fcb7c0874cd5722ab63241a123d31fbcd699e199cee4163cdcbc0dc",
     "full": "6bfc32191f264e9dc98498808a20b2113e77d916ebda4ef16965934c6b871dba",
@@ -24,7 +30,7 @@ DIGESTS = {
 def select(a: argparse.Namespace) -> None:
     stage = os.environ["PS_STAGE"]
     a.frames = 24
-    a.carrier_sha256 = DIGESTS[stage]
+    a.carrier_sha256 = QUANTIZERS.get(a.comparison, DIGESTS)[stage]
     a.carrier, a.manifest = (
         (a.control, a.control_manifest) if stage == "smoke" else (a.q90, a.q90_manifest)
     )
@@ -143,6 +149,9 @@ def main():
         run_command.add_argument("--" + name, required=True, type=Path)
     for name in ("weight", "deny"):
         run_command.add_argument("--" + name, required=True, type=Path, action="append")
+    run_command.add_argument(
+        "--comparison", choices=["lossless-q90", "jpeg40-jpeg70"], default="lossless-q90"
+    )
     run_command.add_argument("--unit", required=True)
     run_command.add_argument("--pair-stage", type=int, required=True, choices=[1, 2])
     sub.add_parser("validate-stage")

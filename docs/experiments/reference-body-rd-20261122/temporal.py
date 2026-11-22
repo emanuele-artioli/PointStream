@@ -1,7 +1,10 @@
 """Measure source-flow temporal residuals for the paired reference ablation."""
 
 import argparse
+import hashlib
+import io
 import json
+import tarfile
 from pathlib import Path
 import time
 
@@ -18,6 +21,22 @@ def main(a):
     start = time.process_time()
     people, frames, _, masks, boxes, renders, control, raw_sha, _ = score.read_inputs(a)
     assert max(abs(v["observed"] - v["previous"]) for v in control.values()) < 1e-5
+    modes = list(score.MODES)
+    if a.with_jpeg:
+        receipts = json.loads((score.HERE / "jpeg-result.json").read_text())["init"]
+        for mode, expected in receipts.items():
+            archive = a.scratch / (mode + ".tar")
+            assert score.digest(archive) == expected["archive_sha256"]
+            with tarfile.open(archive) as tar:
+                for person in people:
+                    record = expected["units"][person]
+                    blob = tar.extractfile("publish/" + record["unit"] + "@tennis_only.npz").read()
+                    assert hashlib.sha256(blob).hexdigest() == record["output_sha256"]
+                    with np.load(io.BytesIO(blob), allow_pickle=False) as z:
+                        assert np.array_equal(z["box"], boxes[person])
+                        assert np.array_equal(z["t"], np.arange(24))
+                        renders[mode, person] = z["crops"]
+            modes.append(mode)
     rows = []
     yy, xx = np.mgrid[: score.H, : score.W]
     for t in range(1, 24):
@@ -41,7 +60,7 @@ def main(a):
             mapped_previous = warp(masks[t - 1, person].astype(np.float32), flow)[sy, sx]
             eligible &= mapped_previous > 0.999
             assert eligible.any()
-            for mode in score.MODES:
+            for mode in modes:
                 prev = np.zeros((score.H, score.W, 3), np.uint8)
                 prev[py : py + ph, px : px + pw] = cv2.resize(
                     renders[mode, person][t - 1], (pw, ph), interpolation=cv2.INTER_LANCZOS4
@@ -60,9 +79,7 @@ def main(a):
                 )
         if time.process_time() - start > 300:
             raise ValueError("Temporal diagnostic exceeds the reserved five CPU minutes")
-    summary = {
-        m: float(np.mean([r["luma_error"] for r in rows if r["mode"] == m])) for m in score.MODES
-    }
+    summary = {m: float(np.mean([r["luma_error"] for r in rows if r["mode"] == m])) for m in modes}
     with a.output.open("x") as out:
         json.dump(
             dict(
@@ -86,4 +103,5 @@ if __name__ == "__main__":
     for name in ("scratch", "labels", "weights", "output"):
         p.add_argument("--" + name, type=Path, required=True)
     p.add_argument("--yuv", type=Path)
+    p.add_argument("--with-jpeg", action="store_true")
     main(p.parse_args())

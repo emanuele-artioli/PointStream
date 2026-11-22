@@ -9,7 +9,7 @@ from matplotlib.ticker import MaxNLocator
 
 HERE = Path(__file__).resolve().parent
 CARDS = HERE.parents[2] / "experiments"
-MODES = ("q65", "q78", "q90", "lossless")
+MODES = ("jpeg40", "jpeg70", "q65", "q78", "q90", "lossless")
 
 
 def load(path):
@@ -18,8 +18,10 @@ def load(path):
 
 def main():
     bodies = load(CARDS / "reference-body-rd-20261122/body-result.json")["summary"]["source_model"]
-    temporal = load(CARDS / "reference-body-rd-20261122/temporal-result.json")["summary"]
-    values = [
+    jpeg = load(CARDS / "reference-body-rd-20261122/jpeg-result.json")
+    bodies.update(jpeg["summary"]["source_model"])
+    temporal = load(CARDS / "reference-body-rd-20261122/jpeg-temporal-result.json")["summary"]
+    values = [jpeg["init"][m]["total_image_bytes"] for m in ("jpeg40", "jpeg70")] + [
         sum(
             r["avif_bytes"] for r in load(CARDS / "common-reference-20261122/prepared.json")["rows"]
         ),
@@ -62,40 +64,49 @@ def main():
         + "\n"
     )
     plt.rcParams.update({"pdf.fonttype": 42, "font.size": 8})
-    fig, ax = plt.subplots(figsize=(4.75, 2.75))
-    fig.subplots_adjust(left=0.16, bottom=0.24, right=0.97, top=0.93)
-    xs = [v / 1000 for v in values]
-    ys = [bodies[m]["dists"] for m in MODES]
-    ax.plot(xs[:3], ys[:3], color="#00787e", marker="o", markersize=5, linewidth=1.4)
-    ax.scatter(xs[-1], ys[-1], color="#7a4290", marker="D", s=32, zorder=3)
-    for i, (label, offset) in enumerate(
-        zip(
-            ("AVIF Q65", "Q78", "Q90", "Lossless WebP"),
-            ((0, 8), (12, 6), (0, -13), (-2, 8)),
-            strict=True,
+    for metric, field, ylabel in [
+        ("rd", "body_dists", "Player-body DISTS  ↓"),
+        ("motion", "motion_residual_error", "Motion-compensated body luma error  ↓"),
+    ]:
+        fig, ax = plt.subplots(figsize=(4.25, 2.6))
+        fig.subplots_adjust(left=0.175, bottom=0.23, right=0.97, top=0.94)
+        for levels, color, marker, label in [
+            (("jpeg40", "jpeg70"), "#b34d00", "^", "JPEG"),
+            (("q65", "q78", "q90"), "#00787e", "o", "AVIF"),
+            (("lossless",), "#753c77", "D", "Lossless WebP"),
+        ]:
+            ax.plot(
+                [bills[m]["measured_image_bytes"] / 1000 for m in levels],
+                [bills[m][field] for m in levels],
+                color=color,
+                marker=marker,
+                label=label,
+                markersize=5,
+                linewidth=1.15,
+            )
+        offsets = (
+            [(5, -1), (-2, -13), (4, 5), (10, 5), (4, -12)]
+            if metric == "rd"
+            else [(-14, -1), (4, 1), (-11, -12), (4, 3), (3, 5)]
         )
-    ):
-        ax.annotate(
-            label,
-            (xs[i], ys[i]),
-            textcoords="offset points",
-            xytext=offset,
-            ha="right" if i == 3 else "center",
-            fontsize=8,
-        )
-    ax.set(
-        xlabel="Two transmitted reference images (kB)",
-        ylabel="Player-body DISTS  ↓",
-        ylim=(0.1705, 0.1781),
-        xlim=(12, 265),
-    )
-    ax.set_xticks([50, 100, 150, 200, 250])
-    ax.yaxis.set_major_locator(MaxNLocator(5))
-    ax.grid(axis="y", color="#d7dce0", linewidth=0.6)
-    ax.spines[["top", "right"]].set_visible(False)
-    for ext in ("pdf", "png"):
-        fig.savefig(HERE / f"reference-body-rd.{ext}", dpi=210)
-    plt.close(fig)
+        for m, text, offset in zip(MODES[:5], ["40", "70", "65", "78", "90"], offsets, strict=True):
+            ax.annotate(
+                text,
+                (bills[m]["measured_image_bytes"] / 1000, bills[m][field]),
+                xytext=offset,
+                textcoords="offset points",
+                fontsize=7,
+            )
+        ax.set(xlabel="Two transmitted reference images (kB)", ylabel=ylabel, xlim=(10, 264))
+        ax.set_ylim((0.165, 0.181) if metric == "rd" else (7.3, 8.7))
+        ax.set_xticks([50, 100, 150, 200, 250])
+        ax.yaxis.set_major_locator(MaxNLocator(5))
+        ax.legend(loc="upper right", frameon=False, fontsize=7, ncol=1, handlelength=1.5)
+        ax.grid(axis="y", color="#d7dce0", linewidth=0.6)
+        ax.spines[["top", "right"]].set_visible(False)
+        for ext in ("pdf", "png"):
+            fig.savefig(HERE / f"reference-body-{metric}.{ext}", dpi=210)
+        plt.close(fig)
 
 
 if __name__ == "__main__":
