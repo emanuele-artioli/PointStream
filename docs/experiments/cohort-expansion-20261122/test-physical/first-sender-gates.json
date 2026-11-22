@@ -1,0 +1,202 @@
+{
+  "match102": {
+    "id": "20261122T092242Z-4e4d339c",
+    "host": "gpu5",
+    "campaign": {
+      "error": "smoke validator must exit zero and publish passed:true with substantive checks",
+      "updated": 1795339706.2669222
+    },
+    "validation": {
+      "passed": false,
+      "checks": {
+        "native": true,
+        "payload": true,
+        "model": true,
+        "source": true,
+        "timing": false
+      },
+      "forecast": 4540.774935885274
+    },
+    "elapsed": 314.5022826194763
+  },
+  "match120": {
+    "id": "20261122T092316Z-23907547",
+    "host": "gpu6",
+    "campaign": {
+      "error": "smoke validator must exit zero and publish passed:true with substantive checks",
+      "updated": 1795339964.1510236
+    },
+    "validation": {
+      "passed": false,
+      "checks": {
+        "native": true,
+        "payload": true,
+        "model": true,
+        "source": true,
+        "timing": false
+      },
+      "forecast": 7227.686629575037
+    },
+    "elapsed": 515.1624920368195
+  },
+  "match127": {
+    "id": "20261122T092351Z-a74d7559",
+    "host": "gpu6",
+    "campaign": {
+      "error": "smoke validator must exit zero and publish passed:true with substantive checks",
+      "updated": 1795340010.9640818
+    },
+    "validation": {
+      "passed": false,
+      "checks": {
+        "native": true,
+        "payload": true,
+        "model": true,
+        "source": true,
+        "timing": false
+      },
+      "forecast": 7188.069009780156
+    },
+    "elapsed": 501.0179798603058
+  },
+  "match105": {
+    "id": "20261122T092424Z-146cd690",
+    "host": "gpu1",
+    "campaign": {
+      "error": "smoke validator must exit zero and publish passed:true with substantive checks",
+      "updated": 1795339812.217913
+    },
+    "validation": {
+      "passed": false,
+      "checks": {
+        "native": true,
+        "payload": true,
+        "model": true,
+        "source": true,
+        "timing": false
+      },
+      "forecast": 4233.2752102048835
+    },
+    "elapsed": 300.6227385997772
+  },
+  "match116": {
+    "id": "20261122T092506Z-45f8a03e",
+    "host": "gpu5",
+    "campaign": {
+      "error": "command exceeded its 500 s allowance or the budget",
+      "updated": 1795340087.6276562
+    },
+    "validation": null,
+    "elapsed": 511.1301953792572
+  },
+  "match107": {
+    "id": "20261122T092539Z-d17e1d4e",
+    "host": "gpu6",
+    "campaign": {
+      "error": "smoke validator must exit zero and publish passed:true with substantive checks",
+      "updated": 1795340072.2695453
+    },
+    "validation": {
+      "passed": false,
+      "checks": {
+        "native": true,
+        "payload": true,
+        "model": true,
+        "source": true,
+        "timing": false
+      },
+      "forecast": 7146.831361154909
+    },
+    "elapsed": 501.3425405025482
+  },
+  "match131": {
+    "id": "20261122T092612Z-7b49892c",
+    "host": "gpu4",
+    "campaign": {
+      "error": "smoke validator must exit zero and publish passed:true with substantive checks",
+      "updated": 1795339844.8265777
+    },
+    "validation": {
+      "passed": false,
+      "checks": {
+        "native": true,
+        "payload": true,
+        "model": true,
+        "source": true,
+        "timing": false
+      },
+      "forecast": 2951.0345194651745
+    },
+    "elapsed": 210.55867195129395
+  },
+  "match119": {
+    "id": "20261122T092646Z-39c2537e",
+    "host": "gpu3",
+    "campaign": {
+      "error": "smoke validator must exit zero and publish passed:true with substantive checks",
+      "updated": 1795340141.4779742
+    },
+    "validation": {
+      "passed": false,
+      "checks": {
+        "native": true,
+        "payload": true,
+        "model": true,
+        "source": true,
+        "timing": false
+      },
+      "forecast": 2644.7580643196125
+    },
+    "elapsed": 501.2587399482727
+  },
+  "match104": {
+    "id": "20261122T092725Z-1ced9eb7",
+    "host": "gpu5",
+    "campaign": {
+      "error": "command exceeded its 500 s allowance or the budget",
+      "updated": 1795340210.5214913
+    },
+    "validation": null,
+    "elapsed": 511.14545726776123
+  },
+  "match130": {
+    "id": "20261122T092800Z-9a64e365",
+    "host": "gpu6",
+    "campaign": {
+      "error": "smoke validator must exit zero and publish passed:true with substantive checks",
+      "updated": 1795340174.3535218
+    },
+    "validation": {
+      "passed": false,
+      "checks": {
+        "native": true,
+        "payload": true,
+        "model": true,
+        "source": true,
+        "timing": false
+      },
+      "forecast": 3126.545009220281
+    },
+    "elapsed": 420.8744606971741
+  },
+  "match126": {
+    "id": "20261122T092833Z-674cbae1",
+    "host": "gpu5",
+    "campaign": {
+      "error": "smoke validator must exit zero and publish passed:true with substantive checks",
+      "updated": 1795340274.7391613
+    },
+    "validation": {
+      "passed": false,
+      "checks": {
+        "native": true,
+        "payload": true,
+        "model": true,
+        "source": true,
+        "timing": false
+      },
+      "forecast": 3530.734643579781
+    },
+    "elapsed": 521.4904851913452
+  }
+}

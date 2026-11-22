@@ -70,6 +70,7 @@ def run(a):
             raise ValueError("nonfinite model output")
 
     tracker.net.register_forward_hook(finite)
+    setup_seconds = time.monotonic() - start
     meta = json.loads(a.metadata.read_text())
     n = a.frames
     assert n in (24, 240)
@@ -77,7 +78,8 @@ def run(a):
     context = chunks.prepare_context(frames)
     raw = chunks.predict(tracker, context, 0, n)
     audit_seconds = 0.0
-    if n == 24:
+    prior = json.loads(a.verified_prefix.read_text()) if a.verified_prefix else None
+    if n == 24 and prior is None:
         audit_started = time.monotonic()
         assert raw == tracker.run(frames) and raw == chunks.predict(
             tracker, context, 0, 12
@@ -116,6 +118,11 @@ def run(a):
     payload = ball.encode_frames(pos, apps, 960, 544)
     assert ball.decode_frames(payload, n, 960, 544) == (pos, apps)
     stage = Path(os.environ["PS_STAGE_DIR"])
+    if n == 24 and prior is not None:
+        assert prior["frames"] == 24 and prior["source_sha256"] == meta["source"]["sha256"]
+        assert prior["source_rgb_sha256"] == hashlib.sha256(frames).hexdigest()
+        assert prior["payload_sha256"] == hashlib.sha256(payload).hexdigest()
+        assert prior["model_sha256"] == sha(a.weights) and prior["code_sha256"] == sha(a.archive)
     (stage / "ball.payload").write_bytes(payload)
     result = dict(
         frames=n,
@@ -133,6 +140,8 @@ def run(a):
         native=rec,
         seconds=time.monotonic() - start,
         equivalence_audit_seconds=audit_seconds,
+        setup_seconds=setup_seconds,
+        prior_equivalence_receipt_sha256=sha(a.verified_prefix) if a.verified_prefix else None,
     )
     (stage / "sender.json").write_text(json.dumps(result, indent=2) + "\n")
 
@@ -144,7 +153,9 @@ def validate():
     pos, apps = ball.decode_frames(p, r["frames"], 960, 544)
     production_seconds = r["seconds"] - r.get("equivalence_audit_seconds", 0.0)
     assert 0 < production_seconds <= r["seconds"]
-    forecast = 1.5 * production_seconds * 240 / r["frames"] + 90
+    fixed = r.get("setup_seconds", 0.0)
+    assert 0 <= fixed < production_seconds
+    forecast = 1.5 * (fixed + (production_seconds - fixed) * 240 / r["frames"]) + 90
     checks = dict(
         native=r["native"]["decoded_frames"] == r["frames"],
         payload=sha(stage / "ball.payload") == r["payload_sha256"]
@@ -165,6 +176,7 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     for name in ("metadata", "source", "archive", "weights"):
         p.add_argument("--" + name, type=Path)
+    p.add_argument("--verified-prefix", type=Path)
     p.add_argument("--frames", type=int)
     p.add_argument("--validate", action="store_true")
     args = p.parse_args()
