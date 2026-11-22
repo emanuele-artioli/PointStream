@@ -92,6 +92,68 @@ def analysis(grid, data):
     return dict(grid=grid, pooled=plots, fixed_budget=fixed_budget, per_event=per_event)
 
 
+def write_table(result, destination):
+    n_total = len(result["grid"]["members"]) + len(result["grid"]["excluded"])
+    rows = [
+        "# Ball fidelity under a fixed available bitrate",
+        "",
+        "Each family selects its lowest measured crop DISTS among its affordable encoded files at 320 and 640 pixels wide. The same original set of matches contributes every point of the common-support curve. The two lower-budget columns include only matches for which both measured banks span that budget. A paired bootstrap resamples matches. The final column describes the potential gain from choosing the lower-loss family separately on each source with knowledge of the marks.",
+        "",
+        "| Scope | Budget, kbps | Coverage | AV1 DISTS | PS DISTS | PS − AV1 (95% interval) | PS wins | Oracle gain vs best fixed family |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|",
+    ]
+    for key, label in (("pooled", "Common support"), ("fixed_budget", "Low-rate eligible")):
+        for r in result[key]:
+            count = r["count"]
+            if not count:
+                rows.append(f"| {label} | {r['budget_kbps']:g} | 0/{n_total} | — | — | — | — | — |")
+                continue
+            low, high = r["delta95"]
+            rows.append(
+                f"| {label} | {r['budget_kbps']:g} | {count}/{n_total} | {r['ordinary']:.4f} | {r['candidate']:.4f} | {r['delta']:+.4f} ({low:+.4f}, {high:+.4f}) | {r['wins']}/{count} | {r['oracle_decrease_from_best_fixed']:.4f} |"
+            )
+    rows.extend(
+        [
+            "",
+            "## Actual selected deliveries",
+            "",
+            "| Available kbps | Matches | Range of selected AV1 kbps | Range of selected PointStream kbps |",
+            "|---:|---|---:|---:|",
+        ]
+    )
+    for r in result["pooled"] + result["fixed_budget"]:
+        if r["count"]:
+            a0, a1 = r["actual_ordinary_range"]
+            b0, b1 = r["actual_candidate_range"]
+            rows.append(
+                f"| {r['budget_kbps']:g} | {', '.join(r['matches'])} | {a0:.2f}–{a1:.2f} | {b0:.2f}–{b1:.2f} |"
+            )
+    rows.extend(
+        [
+            "",
+            "## Rate change at equal ball-crop DISTS",
+            "",
+            "| Original match | Common quality range, DISTS | PointStream BD-rate vs AV1 | Rate-domain comparison |",
+            "|---|---:|---:|---|",
+        ]
+    )
+    for m, r in result["per_event"].items():
+        bd = r["bd_rate"]
+        val = bd["bd_rate_percent"]
+        lo, hi = bd["quality_overlap_negative_distance"]
+        interval = f"{-hi:.4f}–{-lo:.4f}" if hi > lo else "none"
+        rate = f"{val:+.2f}%" if val is not None else "undefined"
+        rows.append(
+            f"| {m} | {interval} | {rate} | {bd['dominance']['verdict'] or 'no common rate'} |"
+        )
+    rows += [
+        "",
+        "Per-match BD-rate uses monotone piecewise-cubic interpolation over common attainable quality. The anchor is its achievable concave envelope. A negative rate change means fewer delivered bits at equal quality. Full packet identities, selected rates and every original registered mark are in the numerical companion.",
+        "",
+    ]
+    destination.write_text("\n".join(rows))
+
+
 def plot(result, destination):
     plt.rcParams.update(
         {"font.size": 8, "pdf.fonttype": 42, "axes.spines.top": False, "axes.spines.right": False}
@@ -136,7 +198,10 @@ if __name__ == "__main__":
     p.add_argument("--data", type=Path, default=HERE / "test-physical")
     p.add_argument("--out", type=Path, required=True)
     p.add_argument("--figure", type=Path, required=True)
+    p.add_argument("--table", type=Path)
     a = p.parse_args()
     result = analysis(json.loads(a.grid.read_text()), a.data)
     a.out.write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
     plot(result, a.figure)
+    if a.table:
+        write_table(result, a.table)

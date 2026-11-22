@@ -1,0 +1,254 @@
+{
+  "members": [
+    {
+      "match": "match108",
+      "visible": 50,
+      "ranges": {
+        "ordinary": [
+          9.689166666666667,
+          249.08166666666668
+        ],
+        "candidate": [
+          10.611666666666666,
+          250.00416666666666
+        ]
+      },
+      "source_sha256": "23b6a757e8f01d2366282fb32e2282a76a77f39cfc96c8125069826d7f458fb7",
+      "rate_archive_sha256": "8067877e15ce3f5ac3705472fa5decb3fdd08fcb55079929912fd5582d62fd60",
+      "rate_report_sha256": "ea88b459aa05966c4eed14c70bca0447e9664ee80ed4cb1f67c771aaedd16bad"
+    },
+    {
+      "match": "match102",
+      "visible": 40,
+      "ranges": {
+        "ordinary": [
+          10.460539460539461,
+          138.97202797202797
+        ],
+        "candidate": [
+          11.61238761238761,
+          140.12387612387613
+        ]
+      },
+      "source_sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+      "rate_archive_sha256": "37d21fdac95e0c6818be4f335eff1da308f51ab81344ec250ec6a048d56587d5",
+      "rate_report_sha256": "3608304c57e1a053882d2baf0fe3cb7d353c4cdbe6c2ae8ef2cf4a02c0639df6"
+    },
+    {
+      "match": "match120",
+      "visible": 19,
+      "ranges": {
+        "ordinary": [
+          22.574,
+          574.392
+        ],
+        "candidate": [
+          24.494,
+          576.312
+        ]
+      },
+      "source_sha256": "7d119f25b1922f0dbd7f5ffb6ea5ac34226a8ea93b41e7a37e401f07ee0e5976",
+      "rate_archive_sha256": "5d1d06ac0a1677eb1ba82ed149b80d80a68d6618e34e0dcc9070c8dd92d67439",
+      "rate_report_sha256": "e23ab3cc032bc213050ee3042aee2d0597da8aa6adddbe3e0150dd78ba266452"
+    },
+    {
+      "match": "match127",
+      "visible": 20,
+      "ranges": {
+        "ordinary": [
+          21.284,
+          289.792
+        ],
+        "candidate": [
+          23.39,
+          291.898
+        ]
+      },
+      "source_sha256": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+      "rate_archive_sha256": "12df7179c0874b75a23dcb3821259991ee572b735b4bd8e99ec744f772f0ff5e",
+      "rate_report_sha256": "04935c72fa4411a14879cb07a7e9490d7aff9e6ef7b219de3f9e2158b4064460"
+    },
+    {
+      "match": "match105",
+      "visible": 49,
+      "ranges": {
+        "ordinary": [
+          9.039166666666667,
+          123.97666666666667
+        ],
+        "candidate": [
+          9.980833333333333,
+          124.91833333333334
+        ]
+      },
+      "source_sha256": "a518fd0850781642b2233cb1a8e0d910f253952f0d9d3d206326ce8d35ad0d0c",
+      "rate_archive_sha256": "874da9840c0cbe49b4ba1d450fbaa2a58b316130b7cbe08bc0f9fad9b641918e",
+      "rate_report_sha256": "a1bc093ff81fe8ae17709ff4081684ded01e946e47e6d1a1874f8aaec5047d9a"
+    },
+    {
+      "match": "match116",
+      "visible": 48,
+      "ranges": {
+        "ordinary": [
+          9.236666666666666,
+          178.1675
+        ],
+        "candidate": [
+          10.0275,
+          178.95833333333334
+        ]
+      },
+      "source_sha256": "39e290951809a969aab505fe590443ed193f1ac7edf96b5bcfb7d9de2776d677",
+      "rate_archive_sha256": "dcb9f9639a85b97bda1f9263df969ed1dd0fac432d551b460f6486d454690598",
+      "rate_report_sha256": "956a7e7c9135f3de7e68d3502a1f1826e819925cbc66a8b1d1f9d1c3385282bc"
+    },
+    {
+      "match": "match107",
+      "visible": 20,
+      "ranges": {
+        "ordinary": [
+          22.098,
+          393.132
+        ],
+        "candidate": [
+          24.314,
+          395.348
+        ]
+      },
+      "source_sha256": "9b2197018f90a8e8873595101d4c72651efad33c7e60d506e6718e78d073ba2e",
+      "rate_archive_sha256": "8c647ea17bb8e8eac1718a0100bd33fb5dd7110f5a7145fcb6c17246e61cdfb5",
+      "rate_report_sha256": "450bc318d5d5654234e23a9802803559e703dd0b1c48f52b55e4523f118e9bd0"
+    },
+    {
+      "match": "match131",
+      "visible": 38,
+      "ranges": {
+        "ordinary": [
+          10.044166666666667,
+          233.81333333333333
+        ],
+        "candidate": [
+          10.86,
+          234.62916666666666
+        ]
+      },
+      "source_sha256": "ac89229d3608e6247b706251d7d0fc6c8f2018229ce302d7491c49f2b56a7207",
+      "rate_archive_sha256": "6702b0c0b90324311f2ab46ff4ee12d2e2e928a41e75340835f29c68f1bd2ba3",
+      "rate_report_sha256": "32afe84afa9b7762c3d8fe006b443899c9c93994951cf5ce0d609db3303bd860"
+    },
+    {
+      "match": "match119",
+      "visible": 18,
+      "ranges": {
+        "ordinary": [
+          20.476,
+          237.862
+        ],
+        "candidate": [
+          22.444,
+          239.83
+        ]
+      },
+      "source_sha256": "47c34ad732752c6f2bd72cb527095dd845f2ff8c99b45015883be23539850864",
+      "rate_archive_sha256": "d1142ea27477c99dcd013a8c9706941c194fe29e9d8647e40c1c009d7f611d3d",
+      "rate_report_sha256": "d5c6c503f7d3c3872ecb06c59e64d45c2a03d7f18722793a38486fe343968daa"
+    },
+    {
+      "match": "match104",
+      "visible": 21,
+      "ranges": {
+        "ordinary": [
+          21.218,
+          290.862
+        ],
+        "candidate": [
+          23.406,
+          293.05
+        ]
+      },
+      "source_sha256": "aa0eea258179ed5be7b166dbedb3e8001b823c5caac6630f89f480f6bec30a10",
+      "rate_archive_sha256": "c4f3fc75c58f109cc21695a97302682c8315311e8bb7e7a919e74d759520abb6",
+      "rate_report_sha256": "456e611906234a1bc4945f8a20028b2872515ee795ad42bbb6c62c6c91acfd7b"
+    },
+    {
+      "match": "match130",
+      "visible": 40,
+      "ranges": {
+        "ordinary": [
+          10.103333333333333,
+          238.2975
+        ],
+        "candidate": [
+          10.861666666666666,
+          239.05583333333334
+        ]
+      },
+      "source_sha256": "f3702a7e885cb7b6fcad37bafe362391d314d5f08640015a80ab0625c4bbdd16",
+      "rate_archive_sha256": "c200b8c8b07aee7287e18af5e7a69ae8c68e6afa63486127c0b29d27fcf64fe7",
+      "rate_report_sha256": "d90f3e56d14a78a635728424292ee88aa4ae9d3ba27e7496b72d60d14f81135f"
+    },
+    {
+      "match": "match126",
+      "visible": 39,
+      "ranges": {
+        "ordinary": [
+          8.8675,
+          152.8075
+        ],
+        "candidate": [
+          9.735833333333334,
+          153.67583333333334
+        ]
+      },
+      "source_sha256": "29fb4ef71a4d2ef68d79166542c51fda4f48108dfd6647bacc8b9869c018ab93",
+      "rate_archive_sha256": "3756dc5cebf256ee02f7b8b199ee2c3cbafb3d39f7816d14ec07959ad86df034",
+      "rate_report_sha256": "04d3127aa3365ec5dd0c62150f4ff0495b9a087f351cfa9600d471b1d00834fc"
+    }
+  ],
+  "fixed_budget_support": [
+    {
+      "budget_kbps": 15.0,
+      "matches": [
+        "match108",
+        "match102",
+        "match105",
+        "match116",
+        "match131",
+        "match130",
+        "match126"
+      ]
+    },
+    {
+      "budget_kbps": 20.4,
+      "matches": [
+        "match108",
+        "match102",
+        "match105",
+        "match116",
+        "match131",
+        "match130",
+        "match126"
+      ]
+    }
+  ],
+  "excluded": [],
+  "price_interval_kbps": [
+    24.494,
+    123.97666666666667
+  ],
+  "grid_kbps": [
+    35,
+    60,
+    100
+  ],
+  "registered_prices_kbps": [
+    10,
+    15,
+    20.4,
+    35,
+    60,
+    100,
+    150
+  ],
+  "estimand": "Per complete event and available ceiling, select lowest metric loss from physical packets no dearer than the ceiling; equal weight events. Supported on the intersection of both families\u2019 physically observed prices."
+}

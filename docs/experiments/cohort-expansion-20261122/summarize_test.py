@@ -42,7 +42,7 @@ def aggregate(rows, key):
 def counts(rows):
     vis = [r for r in rows if r["visibility"] == 1]
     absent = [r for r in rows if r["visibility"] == 0]
-    return dict(
+    result = dict(
         visible=len(vis),
         hit5=sum(
             r["error_native_pixels"] is not None and r["error_native_pixels"] <= 5 for r in vis
@@ -55,6 +55,14 @@ def counts(rows):
         visible_position=sum(r["present"] for r in vis),
         unknown=sum(r["visibility"] not in (0, 1) for r in rows),
     )
+    emitted = result["visible_position"] + result["emitted_absent"]
+    hits = result["hit10"]
+    result["false_positive10"] = emitted - hits
+    result["false_negative10"] = result["visible"] - hits
+    result["annotated_precision10"] = hits / emitted if emitted else None
+    denom = emitted + result["visible"]
+    result["annotated_f1_10"] = 2 * hits / denom if denom else None
+    return result
 
 
 def summarize(data):
@@ -70,6 +78,8 @@ def summarize(data):
     rgb_rows = {arm: [] for arm in ("source", "ordinary", "candidate")}
     srctotal = []
     strong_rows = []
+    qualifying_direct = []
+    comparable_strong = {a: [] for a in ("ordinary", "candidate", "direct")}
     for m in stage:
         match = m["match"]
         dest = data / f"{match}-score.json"
@@ -133,6 +143,7 @@ def summarize(data):
             row["rgb"] = {k: counts(v["rows"]) for k, v in j["detections"].items()}
             srctotal += j["detections"]["source"]["rows"]
             if j["source_qualified"]:
+                qualifying_direct += s["direct"]
                 for key, vs in j["detections"].items():
                     rgb_rows[key] += vs["rows"]
                 strong_sha = s["best_affordable"]["sha256"]
@@ -154,6 +165,9 @@ def summarize(data):
                     ]
                     row["rgb"]["strongest"] = counts(strong)
                     strong_rows += strong
+                    comparable_strong["direct"] += s["direct"]
+                    for arm in ("ordinary", "candidate"):
+                        comparable_strong[arm] += j["detections"][arm]["rows"]
     groups = {}
     for name, gr in [(name, [r for r in rows if r.get("selection") == name]) for name in GROUPS] + [
         ("matched-actual", [r for r in rows if r.get("selection") in GROUPS[:2]])
@@ -204,6 +218,8 @@ def summarize(data):
         rgb_source_all_scored=counts(srctotal),
         strongest_judge_count=sum("strongest" in r.get("rgb", {}) for r in rows),
         rgb_strongest_qualified_scored=counts(strong_rows),
+        direct_on_qualified_sources=counts(qualifying_direct),
+        same_sources_as_strongest={a: counts(v) for a, v in comparable_strong.items()},
         rgb_source_qualified={k: counts(v) for k, v in rgb_rows.items()},
     )
 

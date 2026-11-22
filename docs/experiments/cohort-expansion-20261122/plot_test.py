@@ -184,6 +184,12 @@ def figures(d, output):
         columnspacing=0.75,
         borderpad=0,
     )
+    fig.text(
+        0.20,
+        -0.035,
+        "Detector markers require at least 80% localization on the original source.",
+        fontsize=7,
+    )
     save(fig, output / "official-test-ball-localization")
 
 

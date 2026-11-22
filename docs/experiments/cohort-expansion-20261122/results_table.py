@@ -63,7 +63,7 @@ def text(summary):
     c = summary["combined_direct"]
     lines += [
         "",
-        f"Direct positions from the paid stream hit {c['hit10']} of {c['visible']} independently marked visible balls within 10 original pixels. Equal-match mean recall was {100 * summary['macro_hit10']:.1f}%. The receiver emitted a location at {c['emitted_absent']} of {c['marked_absent']} explicitly absent marks. The remaining native frames with no annotation make no contribution to either denominator. The 95% intervals resample complete matches together with their paired outcomes using 10,000 draws.",
+        f"Direct positions from the paid stream hit {c['hit10']} of {c['visible']} independently marked visible balls within 10 original pixels. Equal-match mean recall was {100 * summary['macro_hit10']:.1f}%. The receiver emitted a location at {c['emitted_absent']} of {c['marked_absent']} explicitly absent marks. The remaining native frames with no annotation make no contribution to either denominator. On these explicitly annotated ticks, localization precision was {100 * c['annotated_precision10']:.1f}% and F1 was {c['annotated_f1_10']:.3f}. An emitted location outside the 10-pixel gate counts as a false positive and misses the labeled ball. The 95% intervals resample complete matches together with their paired outcomes using 10,000 draws.",
         "",
         "## Neural video control and receiver-side detector",
         "",
@@ -95,6 +95,52 @@ def text(summary):
             "",
         ]
     )
+    lines.extend(
+        [
+            "",
+            "### Localization on identical qualified sources",
+            "",
+            "| Receiver readout | Matches | Hits / visible | Emits / explicitly absent | Marked-tick F1 |",
+            "|---|---:|---:|---:|---:|",
+        ]
+    )
+    comparisons = [
+        (
+            "Original video + WASB",
+            summary["source_qualified"],
+            summary["rgb_source_qualified"]["source"],
+        ),
+        (
+            "Matched AV1 + WASB",
+            summary["source_qualified"],
+            summary["rgb_source_qualified"]["ordinary"],
+        ),
+        (
+            "PointStream display + WASB",
+            summary["source_qualified"],
+            summary["rgb_source_qualified"]["candidate"],
+        ),
+        (
+            "Direct PointStream coordinates",
+            summary["source_qualified"],
+            summary["direct_on_qualified_sources"],
+        ),
+        (
+            "Best affordable spatial AV1 + WASB",
+            summary["strongest_judge_count"],
+            summary["rgb_strongest_qualified_scored"],
+        ),
+    ]
+    for name, n, c in comparisons:
+        f1 = f"{c['annotated_f1_10']:.3f}" if c["annotated_f1_10"] is not None else "—"
+        lines.append(
+            f"| {name} | {n} | {c['hit10']} / {c['visible']} | {c['emitted_absent']} / {c['marked_absent']} | {f1} |"
+        )
+    if summary["strongest_judge_count"] != summary["source_qualified"]:
+        lines.append(
+            "The strongest spatial row has partial coverage. Its exact matching direct and decoded-video counterparts are recorded in the numerical companion."
+        )
+    lines.append("")
     return "\n".join(lines)
 
 
