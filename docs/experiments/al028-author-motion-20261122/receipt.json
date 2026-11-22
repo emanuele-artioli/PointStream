@@ -1,0 +1,38 @@
+{
+  "source_sha256": "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934",
+  "av1_yuv_sha256": "c60215a513435b726bf9c3dd398b651b1c9add176245a354eb1076ee21445bf1",
+  "dcvc_yuv_sha256": "bac9b77792126c748a7640eee2ce80649f54c2509d5973623d06e1ed35b931bb",
+  "joint_result_sha256": "2eb230df276f52780fd34a11331743c2895c3fe94bde05c6645dc0165ee33559",
+  "joint_rgb_sha256": "43164345ecc74ea5c2dbb5644e1c0aa2a75bef32c4ce5c344dbab4997f856421",
+  "source_selected_native_ticks_verified": [
+    40,
+    120,
+    200
+  ],
+  "native_fps": [
+    25,
+    1
+  ],
+  "frames": 240,
+  "duration_seconds": 9.6,
+  "video_sha256": "94fc3c58e2443975d315a7d896b5b090946c7a08bbfa21b4dbd92c286a7c13da",
+  "still_pdf_sha256": "ad129b3903e1850dd07177593cb3b8883ed6e9158a62ff9e4b42eb3fa8d40e35",
+  "still_png_sha256": "2b841e3e058278b4fb5219c41f7bbd07787df7891a3488af003bbd1c95e21ed7",
+  "ffmpeg_path": "/opt/homebrew/bin/ffmpeg",
+  "ffmpeg_sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be",
+  "baseline_kbps": {
+    "av1": 20.360833333333332,
+    "dcvc": 20.411666666666665
+  },
+  "joint_kbps": {
+    "warm": 20.4075,
+    "cold": 151.67166666666665
+  },
+  "fixed_crop_960x540_xyxy": [
+    300,
+    295,
+    560,
+    510
+  ],
+  "scope": "private 25fps review re-encode; source-selected moments; generated joint bytes checked against complete composed-frame receipt; not a formal subjective evaluation"
+}

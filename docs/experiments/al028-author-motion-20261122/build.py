@@ -46,6 +46,7 @@ def text(board, s, xy, scale=0.57):
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--joint-dir", type=Path, required=True)
+    p.add_argument("--result", type=Path, required=True)
     p.add_argument("--result-sha256", required=True)
     p.add_argument("--output", type=Path, required=True)
     a = p.parse_args()
@@ -55,7 +56,7 @@ def main():
     assert ticks == [40, 120, 200]
     for path, digest in EXPECTED.items():
         assert sha(path) == digest
-    resultfile = a.joint_dir / "result.json"
+    resultfile = a.result
     assert sha(resultfile) == a.result_sha256
     result = json.loads(resultfile.read_text())
     assert result["frames"] == 240 and abs(result["joint_warm_kbps"]["20"] - 20.4075) < 1e-8
