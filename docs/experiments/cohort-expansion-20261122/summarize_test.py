@@ -105,6 +105,8 @@ def summarize(data):
         assert row["selection"] in GROUPS
         all_marks += s["direct"]
         neural = data / f"{match}-neuroscore.json"
+        if not neural.exists():
+            neural = data / f"{match}-neuroscore-fixed.json"
         if neural.exists():
             ns = json.loads(neural.read_text())
             assert (

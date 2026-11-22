@@ -57,11 +57,10 @@ def figures(d, output):
                 lw=1.2,
                 zorder=3,
             )
-        txt = (
-            f"{r['candidate_kbps']:.1f} / {r['ordinary_kbps']:.1f} / {r['strongest_kbps']:.1f}"
-            if "candidate_kbps" in r
-            else "unavailable"
-        )
+        txt = "unavailable"
+        if "candidate_kbps" in r:
+            strongest = f"{r['strongest_kbps']:.1f}" if r.get("strongest_kbps") is not None else "—"
+            txt = f"{r['candidate_kbps']:.1f} / {r['ordinary_kbps']:.1f} / {strongest}"
         if r.get("selection") == "sensitivity":
             txt += " *"
         if r.get("selection") == "unmatched":
@@ -109,6 +108,13 @@ def figures(d, output):
         borderpad=0,
         labelspacing=0.35,
     )
+    notes = []
+    if any(r.get("selection") == "sensitivity" for r in rows):
+        notes.append("* Price difference between 0.5% and 2%.")
+    if any(r.get("selection") == "unmatched" for r in rows):
+        notes.append("† Price difference above 2%.")
+    if notes:
+        fig.text(0.19, 0, "  ".join(notes), fontsize=7)
     save(fig, output / "official-test-ball-quality")
 
     fig, ax = plt.subplots(figsize=(6.2, 3.34))

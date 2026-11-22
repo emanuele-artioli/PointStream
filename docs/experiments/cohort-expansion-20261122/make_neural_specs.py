@@ -1,4 +1,4 @@
-"""Build the fixed 480x272, Q24 DCVC-UF control for all twelve official TEST sources."""
+"""Build a registered 480x272 DCVC-UF control for all twelve official TEST sources."""
 
 import argparse
 import json
@@ -7,10 +7,13 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 
 
-def create(directory):
+def create(directory, qp=24):
     template = json.loads(
         (HERE.parent / "shanghai-prospective-20261122/neural-q24-half-spec.json").read_text()
     )
+    for key in ("arguments", "validator"):
+        template[key][template[key].index("--qp") + 1] = str(qp)
+    suffix = "-neural" if qp == 24 else f"-neural-q{qp}"
     for case in json.loads((HERE / "staged.json").read_text())["selection"]:
         source = dict(
             name="source",
@@ -40,7 +43,7 @@ def create(directory):
             stall_seconds=310,
             budget_seconds=540,
         )
-        with (directory / (case["match"] + "-neural.json")).open("x") as f:
+        with (directory / (case["match"] + suffix + ".json")).open("x") as f:
             json.dump(spec, f, indent=2)
             f.write("\n")
 
@@ -48,4 +51,6 @@ def create(directory):
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("directory", type=Path)
-    create(p.parse_args().directory)
+    p.add_argument("--qp", type=int, choices=(24, 36, 48), default=24)
+    args = p.parse_args()
+    create(args.directory, args.qp)

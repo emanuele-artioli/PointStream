@@ -34,7 +34,7 @@ def run(a):
         point["accepted"]
         and point["identical_frame_hashes"]
         and point["size"] == [480, 272]
-        and point["qp"] == 24
+        and point["qp"] == a.qp
     )
     packet = frozen.member(a.neural, "stream.psdc")
     assert len(packet) == point["bytes"] and frozen.digest(packet) == point["container_sha256"]
@@ -60,7 +60,7 @@ def run(a):
     result.update(
         match=meta["match"],
         frames=n,
-        qp=24,
+        qp=a.qp,
         size=point["size"],
         fps=str(fps),
         bytes=len(packet),
@@ -115,6 +115,7 @@ if __name__ == "__main__":
     for key in ("neural-sha", "labels-sha"):
         p.add_argument("--" + key)
     p.add_argument("--frames", type=int)
+    p.add_argument("--qp", type=int, choices=(24, 36, 48), default=24)
     p.add_argument("--validate", action="store_true")
     args = p.parse_args()
     validate() if args.validate else run(args)

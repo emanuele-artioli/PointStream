@@ -57,6 +57,8 @@ def create(a):
         add("neural", INBOX / neural["job_id"] / "full/published.tar", sha)
         inputs.append(next(i for i in base["staged_inputs"] if i["name"] == "backbone"))
         settings = ["--neural-sha", sha]
+        if a.qp != 24:
+            settings.extend(["--qp", str(a.qp)])
         full_seconds = 1500
     names = [
         v
@@ -119,4 +121,5 @@ if __name__ == "__main__":
     for k in ("neural-status", "neural-archive-sha"):
         p.add_argument("--" + k, type=Path)
     p.add_argument("--cuda", action="store_true")
+    p.add_argument("--qp", type=int, choices=(24, 36, 48), default=24)
     create(p.parse_args())

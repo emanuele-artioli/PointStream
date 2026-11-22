@@ -68,6 +68,8 @@ def analysis(grid, data):
         mean = x.mean(axis=0)
         ranges = np.array(actuals)
         bootstrap = x[draws].mean(axis=1)
+        per_shot_oracle = np.min(x, axis=1)
+        oracle_gain = np.min(bootstrap, axis=1) - per_shot_oracle[draws].mean(axis=1)
         output.append(
             dict(
                 budget_kbps=budget,
@@ -76,6 +78,9 @@ def analysis(grid, data):
                 ordinary=mean[0],
                 candidate=mean[1],
                 delta=mean[1] - mean[0],
+                per_shot_oracle=float(per_shot_oracle.mean()),
+                oracle_decrease_from_best_fixed=float(mean.min() - per_shot_oracle.mean()),
+                oracle_decrease95=np.quantile(oracle_gain, [0.025, 0.975]).tolist(),
                 ordinary95=np.quantile(bootstrap[:, 0], [0.025, 0.975]).tolist(),
                 candidate95=np.quantile(bootstrap[:, 1], [0.025, 0.975]).tolist(),
                 delta95=np.quantile(bootstrap[:, 1] - bootstrap[:, 0], [0.025, 0.975]).tolist(),
