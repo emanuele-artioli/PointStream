@@ -44,6 +44,11 @@ PANELS = [
         "Two people and the ball travel together. With cached appearance, player DISTS is lower than both baselines on each development rally. The second rally uses source-model masks and the strongest observed affordable ordinary AV1 resolution.",
     ),
     (
+        "joint-players/second-rally-rate-quality.pdf",
+        "Which codec gives the clearest players at a given rate?",
+        "On the second rally PointStream leads DCVC-UF around 20.4 kbps, while DCVC-UF leads around 39.8 kbps. Fifty-two ordinary AV1 streams establish the conventional curve. All three methods use the same two source-model body masks on twelve instants.",
+    ),
+    (
         "starved-choice/players-rate-quality.pdf",
         "Player fidelity at the available bandwidth",
         "One rally with common scoring. The low-rate joint points use a cleaned base, generated bodies and fitted ball. Solid red charges startup. Open red assumes valid player state. Both people have equal weight. At 20.450 kbps DCVC-UF scored 0.3924, versus 0.2617 at 21.545 kbps for joint cached delivery.",
@@ -351,6 +356,7 @@ def build(
             "algorithms.pdf",
             "pooled-curve.pdf",
             "joint-players-two-matches.pdf",
+            "second-rally-rate-quality.pdf",
             "players-rate-quality.pdf",
             "ball-rate-quality.pdf",
             "ball-starved-640-controls.pdf",
