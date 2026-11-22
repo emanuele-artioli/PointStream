@@ -145,6 +145,11 @@ def run(a):
     ) == (3, 3, 1, 0.5)
     dists = quality.load_dists(a.backbone, "cpu")
     mask = np.ones((64, 64), bool)
+    self_crop = crop64(displays["source"][0], 480, 272)
+    self_started = time.monotonic()
+    self_score = float(dists_crops(dists, [self_crop], self_crop, mask, "cpu")[0])
+    self_seconds = time.monotonic() - self_started
+    assert math.isfinite(self_score) and abs(self_score) < 1e-5
     out = []
     for name in displays:
         prepared = np.lib.format.open_memmap(
@@ -220,6 +225,8 @@ def run(a):
         "config_sha256": CONFIG,
         "dists_backbone_sha256": BACKBONE,
         "device": "cpu",
+        "dists_self_score": self_score,
+        "dists_self_seconds": self_seconds,
         "label_rows": len(labels),
         "results": out,
         "elapsed_seconds": time.monotonic() - start,
@@ -242,7 +249,9 @@ def validate():
         "same_labels": all(len(x["rows"]) == r["label_rows"] for x in r["results"]),
     }
     if n == 24:
-        checks["forecast"] = r["elapsed_seconds"] * 10 * 1.5 + 180 < 2200
+        checks["forecast"] = (
+            1.5 * (r["elapsed_seconds"] * 10 + r["dists_self_seconds"] * 52) + 180 < 2200
+        )
     if n == 240:
         checks["labels"] = r["label_rows"] == 49
     Path(os.environ["PS_VALIDATION_PATH"]).write_text(
