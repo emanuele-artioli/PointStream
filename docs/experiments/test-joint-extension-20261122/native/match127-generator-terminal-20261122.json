@@ -1,0 +1,54 @@
+{
+  "near": {
+    "job": "20261122T134804Z-ff2bc372",
+    "host": "gpu6",
+    "gpu": {
+      "index": 0,
+      "uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mib": 1,
+      "memory_total_mib": 49140,
+      "memory_free_mib": 48645,
+      "utilization_pct": 0,
+      "compute_processes": [],
+      "pointstream_claimed": false,
+      "pointstream_shared_claims": []
+    },
+    "revision": "f7d47b8f1553dec20886c971c6f3f3da83cc0144",
+    "snapshot": "cec689704a7d4658a8983f29c3bed5afdfb9081c0d4f679e94cf38153be5ab16",
+    "spec_sha256": "54c26ede4a37fac7e87a1491dfd74e7d297b6543921d44ab2f9501854454b30f",
+    "terminal": "failed before generation in smoke",
+    "smoke_log_sha256": "556cad55c9ea12ac9e8fdcc5aa9904c3ddeae1077e76450762d5b41e01559583",
+    "first_missing_import": "experiments.visor",
+    "started_unix": 1795374629.491182,
+    "ended_unix": 1795374639.7348459,
+    "occupied_seconds": 10.243663787841797,
+    "complete_native_frames": 0
+  },
+  "far": {
+    "job": "20261122T134803Z-0408c86a",
+    "host": "gpu6",
+    "gpu": {
+      "index": 0,
+      "uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mib": 1,
+      "memory_total_mib": 49140,
+      "memory_free_mib": 48645,
+      "utilization_pct": 0,
+      "compute_processes": [],
+      "pointstream_claimed": false,
+      "pointstream_shared_claims": []
+    },
+    "revision": "f7d47b8f1553dec20886c971c6f3f3da83cc0144",
+    "snapshot": "cec689704a7d4658a8983f29c3bed5afdfb9081c0d4f679e94cf38153be5ab16",
+    "spec_sha256": "5d4397421992a544c75e12f083533b94f5072b804340e48220ed665ff248ddbc",
+    "terminal": "failed before generation in smoke",
+    "smoke_log_sha256": "2f57b2f88f80eee2cf99df8fd77db9d5b002aefa955780639ea84443d850516a",
+    "first_missing_import": "experiments.visor",
+    "started_unix": 1795374508.2669709,
+    "ended_unix": 1795374529.2856393,
+    "occupied_seconds": 21.01866841316223,
+    "complete_native_frames": 0
+  }
+}
