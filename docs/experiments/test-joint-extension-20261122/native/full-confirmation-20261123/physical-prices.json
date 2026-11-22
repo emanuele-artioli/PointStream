@@ -1,0 +1,93 @@
+{
+  "producer": "20261122T134208Z-0e12634b",
+  "sender_sha256": "5dec9f682760b048b7e066147cfd222494663b84d5515aa7632f496153d1012a",
+  "source": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+  "source_seconds": 4,
+  "scope": "Each total comes from complete native sender bytes. Intermediate reference reuse horizons are scenarios for eligible seconds sharing the same initialization and the same measured running bytes per second; successful reuse on a second Sydney shot has not been tested.",
+  "physical_rates": [
+    {
+      "crf": 70,
+      "joint_sha256": "f9ab35e8d3cd6708e726fe57d9d7ba7cc8943285ac4535524491f5cfe0598384",
+      "initialization_sha256": "1f191ca3d078c258c6252003d746b6077c268bb98cff7260c4c960cab5a8d569",
+      "delivered_joint_bytes": 12890,
+      "delivered_initialization_bytes": 149450,
+      "delivered_first_use_total_bytes": 162340,
+      "joint_components": {
+        "clean_base": 8933,
+        "player_poses": 1772,
+        "ball_trajectory": 964,
+        "joint_metadata": 1221
+      },
+      "initialization_components": {
+        "ref0": 28961,
+        "ref1": 118655,
+        "metadata": 1834
+      },
+      "warm_kbps": 25.78,
+      "cold_kbps": 324.68,
+      "modeled_kbps_by_eligible_seconds": {
+        "4": 324.67999999999995,
+        "60": 45.70666666666666,
+        "180": 32.422222222222224,
+        "7200": 25.946055555555557
+      },
+      "eligible_seconds_for_33_kbps": 165.59556786703604
+    },
+    {
+      "crf": 60,
+      "joint_sha256": "f557fdc85d5c2877a7f854e20536f13e706dabae434c84e37f762546e7ad9968",
+      "initialization_sha256": "1f191ca3d078c258c6252003d746b6077c268bb98cff7260c4c960cab5a8d569",
+      "delivered_joint_bytes": 15462,
+      "delivered_initialization_bytes": 149450,
+      "delivered_first_use_total_bytes": 164912,
+      "joint_components": {
+        "clean_base": 11504,
+        "player_poses": 1772,
+        "ball_trajectory": 964,
+        "joint_metadata": 1222
+      },
+      "initialization_components": {
+        "ref0": 28961,
+        "ref1": 118655,
+        "metadata": 1834
+      },
+      "warm_kbps": 30.924,
+      "cold_kbps": 329.824,
+      "modeled_kbps_by_eligible_seconds": {
+        "4": 329.82399999999996,
+        "60": 50.85066666666667,
+        "180": 37.56622222222222,
+        "7200": 31.090055555555555
+      },
+      "eligible_seconds_for_33_kbps": 575.9152215799613
+    },
+    {
+      "crf": 50,
+      "joint_sha256": "11cf8f79869e69912006f0556bb7cbb6f967e0a46b0368881b67fa48ba71ecf0",
+      "initialization_sha256": "1f191ca3d078c258c6252003d746b6077c268bb98cff7260c4c960cab5a8d569",
+      "delivered_joint_bytes": 17827,
+      "delivered_initialization_bytes": 149450,
+      "delivered_first_use_total_bytes": 167277,
+      "joint_components": {
+        "clean_base": 13869,
+        "player_poses": 1772,
+        "ball_trajectory": 964,
+        "joint_metadata": 1222
+      },
+      "initialization_components": {
+        "ref0": 28961,
+        "ref1": 118655,
+        "metadata": 1834
+      },
+      "warm_kbps": 35.654,
+      "cold_kbps": 334.554,
+      "modeled_kbps_by_eligible_seconds": {
+        "4": 334.554,
+        "60": 55.58066666666667,
+        "180": 42.29622222222223,
+        "7200": 35.82005555555556
+      },
+      "eligible_seconds_for_33_kbps": null
+    }
+  ]
+}
