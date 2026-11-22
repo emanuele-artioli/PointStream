@@ -1,0 +1,142 @@
+{
+  "job": "20261122T125955Z-4dfede40",
+  "worker_source": "9236c03b",
+  "producer": "20261122T120219Z-f2c299f2",
+  "source": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+  "frames": 240,
+  "body_ticks": 480,
+  "full_archive_sha256": "d76768914dfb316ec946d277bbfc3e6d43832444d3aa4100fae01844c82fe371",
+  "source_model": "Whole source 960x540 SAM31 proposals nearest-neighbor to 1920x1080; individual tight crops + 32 pixels. No human truth.",
+  "setting": {
+    "name": "joint-crf50",
+    "codec": "PointStream",
+    "bytes": 17794,
+    "kbps": 17.776223776223773,
+    "width": 1920,
+    "height": 1080,
+    "dists": 0.32379025518894194,
+    "near": 0.295580218732357,
+    "far": 0.3520002916455269,
+    "body_psnr": 13.553119977242158,
+    "full_rgb_psnr": 21.355726984303583,
+    "body_dists_twelve_on_sam": 0.32970095177491504,
+    "decoded_sha256": "077139642774318aa5759a50224f81608407d0874de2942fe112feeeb78bdae3",
+    "source_support_sha256": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e"
+  },
+  "strict_affordable": {
+    "warm": {
+      "SVT-AV1": {
+        "best_quality": "av1-320-warm",
+        "dists": 0.5239948199441036,
+        "bytes": 17687,
+        "rate_gap": -0.006013262897605953,
+        "nearest_affordable": "av1-640-warm",
+        "nearest_bytes": 17731,
+        "qualified_count": 6
+      },
+      "SVT-AV1 ROI": {
+        "best_quality": "roi-640-warm",
+        "dists": 0.567203696568807,
+        "bytes": 17736,
+        "rate_gap": -0.0032595256828144015,
+        "nearest_affordable": "roi-320-warm",
+        "nearest_bytes": 17772,
+        "qualified_count": 3
+      },
+      "DCVC-UF": {
+        "best_quality": "dcvc-480-q34",
+        "dists": 0.4379581814010938,
+        "bytes": 17432,
+        "rate_gap": -0.020343936158255582,
+        "nearest_affordable": "dcvc-480-q34",
+        "nearest_bytes": 17432,
+        "qualified_count": 2
+      }
+    },
+    "cold": {
+      "SVT-AV1": {
+        "best_quality": "av1-1920-cold",
+        "dists": 0.26107553703089553,
+        "bytes": 152843,
+        "rate_gap": -0.015656194855545702,
+        "nearest_affordable": "av1-960-cold",
+        "nearest_bytes": 154312,
+        "qualified_count": 32
+      },
+      "SVT-AV1 ROI": {
+        "best_quality": "roi-640-warm",
+        "dists": 0.567203696568807,
+        "bytes": 17736,
+        "rate_gap": -0.885776111905406,
+        "nearest_affordable": "roi-320-warm",
+        "nearest_bytes": 17772,
+        "qualified_count": 3
+      },
+      "DCVC-UF": {
+        "best_quality": "dcvc-480-q36",
+        "dists": 0.42770484325786434,
+        "bytes": 19401,
+        "rate_gap": -0.8750531318829939,
+        "nearest_affordable": "dcvc-480-q36",
+        "nearest_bytes": 19401,
+        "qualified_count": 4
+      }
+    }
+  },
+  "fraction_lower": {
+    "warm": {
+      "SVT-AV1": 38.20735570945495,
+      "SVT-AV1 ROI": 42.91464298493632,
+      "DCVC-UF": 26.068225474613026
+    },
+    "cold": {
+      "SVT-AV1": -24.02167543971183,
+      "SVT-AV1 ROI": 42.91464298493632,
+      "DCVC-UF": 24.29586424072173
+    }
+  },
+  "conditional_cache_crossover": [
+    {
+      "codec": "SVT-AV1",
+      "cheapest_quality_matched": "av1-640-160",
+      "bytes": 139111,
+      "break_even_seconds": 9.074901621372108
+    }
+  ],
+  "paired_counts": {
+    "warm": {
+      "SVT-AV1": {
+        "anchor": "av1-320-warm",
+        "joint_lower_person_ticks": 479,
+        "joint_lower_role_quarters": 8
+      },
+      "SVT-AV1 ROI": {
+        "anchor": "roi-640-warm",
+        "joint_lower_person_ticks": 480,
+        "joint_lower_role_quarters": 8
+      },
+      "DCVC-UF": {
+        "anchor": "dcvc-480-q34",
+        "joint_lower_person_ticks": 476,
+        "joint_lower_role_quarters": 8
+      }
+    },
+    "cold": {
+      "SVT-AV1": {
+        "anchor": "av1-1920-cold",
+        "joint_lower_person_ticks": 15,
+        "joint_lower_role_quarters": 0
+      },
+      "SVT-AV1 ROI": {
+        "anchor": "roi-640-warm",
+        "joint_lower_person_ticks": 480,
+        "joint_lower_role_quarters": 8
+      },
+      "DCVC-UF": {
+        "anchor": "dcvc-480-q36",
+        "joint_lower_person_ticks": 476,
+        "joint_lower_role_quarters": 8
+      }
+    }
+  }
+}

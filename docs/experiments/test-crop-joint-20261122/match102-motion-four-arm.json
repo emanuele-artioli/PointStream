@@ -38,5 +38,12 @@
     "source_correspondence": true,
     "transitions": 478,
     "receipt_sha256": "1ba8ae99cd72929af08f59fef938e578f8bfcd152c2e96bb698930fc1e086817"
+  },
+  "metric_units": "Mean absolute error in source-flow-compensated temporal differences, 8-bit luma, equal weight across 239 transitions \u00d7 two original player supports.",
+  "measurement_region": "960\u00d7544 original, source-derived backward motion plus current/warped source-mask intersection.",
+  "prepared_control_comparison": {
+    "av1-320-warm": 19.7653,
+    "roi-640-warm": 20.1164,
+    "dcvc-480-q34": 18.1927
   }
 }
