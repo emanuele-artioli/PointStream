@@ -15,7 +15,7 @@ A foreign process entered the A6000 during the Marseille global-feature smoke. T
 
 ## Closed at the registered deadline
 
-The twelve prespecified matches include eleven court routes and one conventional route. Six court shots have complete native pose test records: both athletes supplied uninterrupted poses for all 240 frames in Shanghai, Sydney and Halle. Munich, Gstaad and Geneva supplied paired poses on 190, 176 and 223 frames. The six measured shots therefore have 1,309 paired frames among 1,440 (90.9%), with three complete tracks through the entire shot for both players.
+The twelve prespecified matches include eleven court routes and one conventional route. Six court shots have complete native pose test records: both athletes supplied uninterrupted poses for all 240 frames in Shanghai, Sydney and Halle. Munich, Gstaad and Geneva supplied paired poses on 190, 176 and 223 frames. The six measured shots therefore have 1,309 paired frames among 1,440 (90.9%), and both tracks cover the entire shot in three of the six tests.
 
 Five remaining court shots have unmeasured cropped-pose outcomes. On Miami and Acapulco the source extraction completed and the queued crop stage expired. The Marseille global extraction stopped on foreign GPU activity and its idle-only retry expired. The Queen’s Club and Lyon source jobs expired in queue. One other match, Monte-Carlo, routed to ordinary video at the court-selection stage. All twelve remain in the figure; hatching denotes missing pose measurements and amber denotes the observed conventional route. Each output in the completed groups was obtained under the frozen sampling policy.
 
