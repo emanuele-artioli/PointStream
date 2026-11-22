@@ -69,6 +69,22 @@
       "score_job": "20261122T141901Z-a490196a",
       "producer": "20261122T141034Z-490fceb9",
       "typed_decode_sha256": "953300fdd4182032ac66cfa9c2e7d16ae55a028bfcd04a46364954b56f756376"
+    },
+    {
+      "name": "ordinary-1920-cold",
+      "family": "SVT-AV1",
+      "bytes": 156539,
+      "kbps": 313.078,
+      "source_grid": "7d706c8d9ff2f45ac1c5dc810afa7361a5a390681ea4d7067a72d2673c7063d0",
+      "support": "88e0b197dd16d18a7c1989601637f045859de1d18ac3756d3eb1f280c3d2eb64",
+      "dists": 0.18065927426020303,
+      "near": 0.1644722153743108,
+      "far": 0.1968463331460953,
+      "body_psnr": 23.646042567585283,
+      "full_psnr": 35.26624705384401,
+      "score_job": "20261122T142622Z-be704c69",
+      "producer": "20261122T140310Z-95ed891f",
+      "typed_decode_sha256": "3e0d24638bbcac751ccf810ab5f07a1e35cde8afb9c1314815487598f444a2c5"
     }
   ],
   "comparisons": []

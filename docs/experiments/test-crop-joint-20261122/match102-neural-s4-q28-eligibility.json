@@ -1,0 +1,121 @@
+{
+  "cumulative_approved_gpu_s": 1080,
+  "prior_occupied_gpu_s": 272.85028076171875,
+  "remaining_before_q28": 807.1497192382812,
+  "q28_lifecycle_cap_s": 490,
+  "q28_selected_on_actual_bytes_only": true,
+  "prior_runs": {
+    "20261122T142226Z-b84ab86d": {
+      "state": "failed",
+      "host": "gpu5",
+      "started": 1795357422.8261075,
+      "ended": 1795357463.287834,
+      "occupied_seconds": 40.46172642707825,
+      "gpu": {
+        "index": 1,
+        "uuid": "GPU-7754164a-33cd-265c-3696-c20966d228fe",
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "memory_used_mib": 35647,
+        "memory_total_mib": 49140,
+        "memory_free_mib": 12999,
+        "utilization_pct": 100,
+        "compute_processes": [
+          {
+            "pid": 1576025,
+            "memory_mib": 23094
+          },
+          {
+            "pid": 1976938,
+            "memory_mib": 12514
+          }
+        ],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      }
+    },
+    "20261122T142229Z-9c9af31b": {
+      "state": "failed",
+      "host": "gpu5",
+      "started": 1795357544.38348,
+      "ended": 1795357595.0679953,
+      "occupied_seconds": 50.68451523780823,
+      "gpu": {
+        "index": 1,
+        "uuid": "GPU-7754164a-33cd-265c-3696-c20966d228fe",
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "memory_used_mib": 35647,
+        "memory_total_mib": 49140,
+        "memory_free_mib": 12999,
+        "utilization_pct": 100,
+        "compute_processes": [
+          {
+            "pid": 1576025,
+            "memory_mib": 23094
+          },
+          {
+            "pid": 1976938,
+            "memory_mib": 12514
+          }
+        ],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      }
+    },
+    "20261122T142755Z-78b520ea": {
+      "state": "complete",
+      "host": "gpu5",
+      "started": 1795357726.7303123,
+      "ended": 1795357817.645212,
+      "occupied_seconds": 90.91489958763123,
+      "gpu": {
+        "index": 1,
+        "uuid": "GPU-7754164a-33cd-265c-3696-c20966d228fe",
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "memory_used_mib": 34773,
+        "memory_total_mib": 49140,
+        "memory_free_mib": 13873,
+        "utilization_pct": 96,
+        "compute_processes": [
+          {
+            "pid": 1576025,
+            "memory_mib": 22220
+          },
+          {
+            "pid": 1976938,
+            "memory_mib": 12514
+          }
+        ],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      }
+    },
+    "20261122T143042Z-9c4291e9": {
+      "state": "complete",
+      "host": "gpu5",
+      "started": 1795357908.9693086,
+      "ended": 1795357999.7584481,
+      "occupied_seconds": 90.78913950920105,
+      "gpu": {
+        "index": 1,
+        "uuid": "GPU-7754164a-33cd-265c-3696-c20966d228fe",
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "memory_used_mib": 34773,
+        "memory_total_mib": 49140,
+        "memory_free_mib": 13873,
+        "utilization_pct": 94,
+        "compute_processes": [
+          {
+            "pid": 1576025,
+            "memory_mib": 22220
+          },
+          {
+            "pid": 1976938,
+            "memory_mib": 12514
+          }
+        ],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      }
+    }
+  }
+}

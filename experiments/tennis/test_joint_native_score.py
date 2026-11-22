@@ -217,7 +217,7 @@ if __name__ == "__main__":
         choices=("calibration", "warm-neural", "cold-neural", "full", "rung"),
         required=True,
     )
-    p.add_argument("--qp", type=int, choices=(29, 31))
+    p.add_argument("--qp", type=int, choices=(28, 29, 31))
     p.add_argument("--frames", type=int, choices=(24, 240), required=True)
     p.add_argument("--crf", type=int, choices=(50, 60, 70), default=50)
     p.add_argument("--producer-job", required=True)

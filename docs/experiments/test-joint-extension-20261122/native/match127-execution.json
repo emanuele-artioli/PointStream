@@ -112,13 +112,26 @@
       "revision": "7e5c89cd9a4276cb290cb6c56c242282f22d5e8b",
       "source_archive_sha256": "610465e949dece9cfe71efb502cad88905222ec73aa0369aafcfc6b8d160fd4f",
       "spec_sha256": "aeb0b582fbba0f02e755f605e5ad7db487b9884b46d33fc7697577ee372d2f76",
-      "state_at_registration": "pending"
+      "state_at_registration": "pending",
+      "terminal": "complete",
+      "body_dists": 0.18065927426020303,
+      "running_bytes": 156539
     },
     "control_roi-640-cold": {
       "id": "20261122T143106Z-9ad44592",
       "revision": "5ce37c49f7f3d57cb58f8817ef0532adc3ec12a6",
       "source_archive_sha256": "76cf7d76e28e164a8c4099d4a7cff9beb2b7af655823fc77acaf771d3c2d71ff",
       "spec_sha256": "13bd14842de440f0228d6d5b1e24b06496dfa45e95d7f114382b143dcf550df8",
+      "state_at_registration": "pending",
+      "terminal": "24-tick scientific checks passed, stopped on measured prospective full-stage cost 955.2 s over 850 s",
+      "smoke_s": 72.74113792300341,
+      "smoke_native_score_s": 58.228060788998846
+    },
+    "control_roi-640-cold_recovery": {
+      "id": "20261122T143804Z-c1f667b2",
+      "revision": "5c36e6bbf869c6025929c992d1f1b077f63895a3",
+      "source_archive_sha256": "032b652624d9d64e2b68b11c3441bca5d7f0d5ebf5e51e7159e0649f221bd05c",
+      "spec_sha256": "f6f4ca9fbad4aaa1238452fa73f014520da16839d78b17a9aa75b4bcadfb73dd",
       "state_at_registration": "pending"
     }
   },

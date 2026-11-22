@@ -133,7 +133,7 @@ if __name__ == "__main__":
         choices=("calibration", "warm-neural", "cold-neural", "full", "rung"),
         required=True,
     )
-    p.add_argument("--qp", type=int, choices=(29, 31))
+    p.add_argument("--qp", type=int, choices=(28, 29, 31))
     p.add_argument("--crf", type=int, default=50)
     p.add_argument("--producer", required=True)
     p.add_argument("--sha", required=True)
