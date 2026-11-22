@@ -13,7 +13,7 @@ HERE = Path(__file__).resolve().parent
 def main(a):
     f = json.loads(a.finish.read_text())
     timing = json.loads(a.timing.read_text())
-    sender = json.loads((HERE / "match102-sender.json").read_text())
+    sender = json.loads(a.sender.read_text())
     paid = next(r for r in sender["rates"] if r["crf"] == sender["selected_crf"])
     assert (
         timing["archive_sha256"] == a.archive_sha and f["carrier_sha256"] == paid["carrier_sha256"]
@@ -23,14 +23,14 @@ def main(a):
         f["wire"]["joint_sha256"] == paid["joint_sha256"]
         and f["wire"]["cache_sha256"] == paid["init_sha256"]
     )
-    assert f["wire"]["active_ticks"] == [0, 240] and f["wire"]["ball_positions"] == 217
+    assert f["wire"]["active_ticks"] == [0, 240] and f["wire"]["ball_positions"] == a.ball_positions
     assert f["ticks"] == list(range(240)) and [r["tick"] for r in f["rows"]] == f["ticks"]
     assert (
         f["isolation"]["interfaces"] == ["lo"]
         and f["isolation"]["mutation_denied"]
         and f["kernels"]
     )
-    assert set(f["order"]) == {"match102_near", "match102_far"}
+    assert set(f["order"]) == {r["unit"] for r in sender["foreground"]} and len(f["order"]) == 2
     result = dict(
         job=a.job,
         archive_sha256=a.archive_sha,
@@ -69,6 +69,8 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
     for key in ("finish", "timing", "out"):
         p.add_argument("--" + key, type=Path, required=True)
+    p.add_argument("--sender", type=Path, default=HERE / "match102-sender.json")
+    p.add_argument("--ball-positions", type=int, default=217)
     p.add_argument("--archive-sha", required=True)
     p.add_argument("--job", required=True)
     main(p.parse_args())

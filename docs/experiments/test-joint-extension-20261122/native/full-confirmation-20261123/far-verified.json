@@ -1,0 +1,33 @@
+{
+  "role": "match127_far",
+  "job_id": "20261122T212328Z-15c3068e",
+  "timing": {
+    "archive_sha256": "3627a5ce866a8a904da3c81d4cc6a52e520dbc9ec2195caad9d342fcfd886b63",
+    "worker_wall_seconds": 1046.1506208580104
+  },
+  "archive_bytes": 124641280,
+  "archive_sha256": "3627a5ce866a8a904da3c81d4cc6a52e520dbc9ec2195caad9d342fcfd886b63",
+  "gpu_seconds": 1412.0478942394257,
+  "full_frames": 240,
+  "paid_time_sha256": "1aa53cff742acc7b82349c29558ccf50c9af15c48f018c446652dbe208b329f7",
+  "paid_linux_box_sha256": "763c5af8d9167da27b2c6a6e2019c55bb7a41cef30f278cf1cdda886ca533bb4",
+  "independent_mac_box_sha256": "30bb25cc8b874d9dc378c599b79e38a9879b8b086f3810738a13b8fae506b5c6",
+  "same_integer_pixel_boxes": true,
+  "max_independent_coordinate_delta_pixels": 2.2737367544323206e-13,
+  "all_240_image_hashes_sha256": "98968aec2cae9e0fef6a48c7982c1316fd70b38a7418addd90ac759abb71f366",
+  "smoke_validation": {
+    "passed": true,
+    "checks": {
+      "source_denied": true,
+      "paid_packet_geometry": true,
+      "crop_identity_and_coverage": true,
+      "native_cuda": true,
+      "cost": {
+        "forecast_seconds": 1788.0863530818715,
+        "remaining_seconds": 3099.6600884575164,
+        "full_cap_seconds": 2680,
+        "basis": "1.5*(64-tick wall minus render-and-save + 240/64 times render-and-save) + 90; reserve 60s teardown"
+      }
+    }
+  }
+}
