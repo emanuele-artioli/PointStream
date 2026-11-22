@@ -9,6 +9,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+from experiments.tennis.w3_analysis import compare, rate_dominance
 
 
 def read_neural(data, match, q_indices):
@@ -114,7 +115,49 @@ def results(curves, data, low_indices, all_indices):
                 )
             points.append(row)
         out[section] = points
-    return dict(results=out, native_neural=policies)
+    equal_quality = {}
+    for section, budgets in out.items():
+        allowed_q = set(all_indices) | (set(low_indices) if section == "starved_cohort" else set())
+        per_match = {}
+        for match in budgets[0]["fixed_population"]:
+            bank = json.loads((data / (match + "-curve.json")).read_text())["bank"]
+            candidate = [(r["kbps"], -r["dists"]) for r in bank if r["arm"] == "candidate"]
+            anchors = [(r["kbps"], -r["dists"]) for r in policies[match] if r["qp"] in allowed_q]
+            if len(anchors) < 2:
+                continue
+            lowest_rate = min(rate for rate, _ in anchors)
+            cheapest_quality = max(q for rate, q in anchors if rate == lowest_rate)
+            if max(q for _, q in anchors) <= cheapest_quality:
+                per_match[match] = dict(
+                    status="No neural quality span above the lowest-rate packet",
+                    bd_rate_percent=None,
+                    neural_points=anchors,
+                )
+                continue
+            row = compare(candidate, anchors)
+            row["dominance"] = rate_dominance(candidate, anchors)
+            per_match[match] = row
+        supported = {
+            m: r["bd_rate_percent"]
+            for m, r in per_match.items()
+            if r["bd_rate_percent"] is not None
+        }
+        summary = None
+        if supported:
+            rates = np.log1p(np.array(list(supported.values())) / 100)
+            draws = np.random.default_rng(20261122).integers(len(rates), size=(10000, len(rates)))
+            summary = dict(
+                matches=list(supported),
+                fewer_bits=sum(v < 0 for v in supported.values()),
+                percent=float(100 * np.expm1(rates.mean())),
+                interval95=(
+                    100 * np.expm1(np.quantile(rates[draws].mean(axis=1), [0.025, 0.975]))
+                ).tolist(),
+            )
+        equal_quality[section] = dict(
+            neural_indices=sorted(allowed_q), per_match=per_match, geomean=summary
+        )
+    return dict(results=out, native_neural=policies, equal_quality_vs_neural=equal_quality)
 
 
 def table(result, path):
@@ -148,6 +191,23 @@ def table(result, path):
     lines += [
         "",
         "The paired interval resamples whole matches. The table reports a finite tested neural ladder. The companion JSON records the selected quantizer, native byte count, and packet hash for every underlying event and budget.",
+        "",
+        "## Delivered bitrate at equal ball-crop fidelity",
+        "",
+    ]
+    for group, rows in result["equal_quality_vs_neural"].items():
+        summary = rows["geomean"]
+        if not summary:
+            continue
+        n = len(result["results"][group][0]["fixed_population"])
+        count = len(summary["matches"])
+        lo, hi = summary["interval95"]
+        lines += [
+            f"Against the DCVC-UF envelope at quantizer indices {', '.join(map(str, rows['neural_indices']))}, {count}/{n} matches had overlapping quality. The geometric mean per-match PointStream BD-rate was {summary['percent']:+.2f}% (95% paired match interval {lo:+.2f}% to {hi:+.2f}%). PointStream required fewer bits on {summary['fewer_bits']}/{count} comparable matches.",
+            "",
+        ]
+    lines += [
+        "Per-event common-quality intervals and rate-domain behavior are in the numerical companion. Each reported rate reduction is bounded by the tested neural operating points.",
         "",
     ]
     path.write_text("\n".join(lines))

@@ -1,0 +1,22 @@
+{
+  "job": "20261122T123956Z-61e5616d",
+  "host": "gpu5",
+  "stage": "smoke",
+  "original_limit_seconds": 300,
+  "smoke_elapsed_seconds": 32.42740464801318,
+  "forecast_seconds": 303.20553486009885,
+  "checks": {
+    "source": true,
+    "cadence": true,
+    "count": true,
+    "native": true,
+    "allocator": true,
+    "packet": true,
+    "rate": true,
+    "raw": true,
+    "repeat": true
+  },
+  "forecast": false,
+  "smoke_native_sha256": "e012f984b4441c9f1520366a99dc388f50811edfbba206f4d9029ba816367811",
+  "revised_full_limit_seconds": 360
+}
