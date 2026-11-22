@@ -13,7 +13,13 @@ SOURCE = HERE.parent / "test-crop-joint-20261122/match102-source-review-frames.j
 
 
 def collect(label, output):
-    registered = [json.loads(row) for row in (HERE / "validated-jobs.jsonl").read_text().splitlines()]
+    ledgers = [HERE / "validated-jobs.jsonl", HERE / "small-jobs.jsonl"]
+    registered = [
+        json.loads(line)
+        for ledger in ledgers
+        if ledger.exists()
+        for line in ledger.read_text().splitlines()
+    ]
     entries = [row for row in registered if row["label"] == label]
     assert len(entries) == 1
     job = entries[0]["job"]

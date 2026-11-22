@@ -87,6 +87,8 @@ def measure(args):
         assert hashlib.sha256(display.tobytes()).hexdigest() == arm["rgb_sha256"]
         values = {}
         for identifier, rect, mask in supports:
+            if args.body_rectangle and identifier != "ball":
+                mask = np.ones_like(mask, dtype=bool)
             target = tensor(crop(original, rect))
             prediction = tensor(crop(display, rect))
             support = torch.from_numpy(np.ascontiguousarray(mask))[None, None]
@@ -114,7 +116,13 @@ def measure(args):
         source_sha256=bank["source_sha256"],
         review_sha256=review["review_sha256"],
         annotation_sha256=sha(args.annotation) if args.annotation else None,
-        player_support="author reviewed" if args.annotation else "automatic source masks",
+        player_support=(
+            "full source-player rectangle including 32-pixel context"
+            if args.body_rectangle
+            else "author reviewed"
+            if args.annotation
+            else "automatic source masks"
+        ),
         official_ball_sha256=review["official_ball_sha256"],
         backbone_sha256=EXPECTED,
         arm=bank["mode"],
@@ -141,6 +149,7 @@ if __name__ == "__main__":
     choice.add_argument("--annotation", type=Path)
     choice.add_argument("--automatic-official-ball", type=Path)
     p.add_argument("--qa-only", action="store_true")
+    p.add_argument("--body-rectangle", action="store_true")
     args = p.parse_args()
     record = measure(args)
     with args.out.open("x") as file:
