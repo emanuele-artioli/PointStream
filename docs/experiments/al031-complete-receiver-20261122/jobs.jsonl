@@ -2,3 +2,9 @@
 {"stage": "ball-part120", "job": "20261122T112138Z-275d1c83", "code": "466218193dc684ae68ac9841f031e855e3216a42"}
 {"stage": "neural-q24", "job": "20261122T112315Z-b52c37fd", "code": "466218193dc684ae68ac9841f031e855e3216a42"}
 {"stage": "ball-assembly", "job": "20261122T114430Z-534f6704", "code": "63ea0eacb3f7ff4df259531c15982d8720a77e2b"}
+{"stage": "fresh-generate-0", "job": "20261122T115204Z-c485c799", "code": "3cf2971106937358590f2b557e2a2b0d9c5a05d3"}
+{"stage": "prefix-pair-0", "job": "20261122T115226Z-be6dec22", "code": "3cf2971106937358590f2b557e2a2b0d9c5a05d3"}
+{"stage": "fresh-generate-1", "job": "20261122T115242Z-68bcc806", "code": "3cf2971106937358590f2b557e2a2b0d9c5a05d3"}
+{"stage": "prefix-pair-1", "job": "20261122T115306Z-7fb628cb", "code": "3cf2971106937358590f2b557e2a2b0d9c5a05d3"}
+{"stage": "neural-near", "job": "20261122T115317Z-fa0ec927", "code": "3cf2971106937358590f2b557e2a2b0d9c5a05d3"}
+{"stage": "neural-near-validator", "job": "20261122T115802Z-111cede9", "code": "938eeaae17bec713a2be97246a803f3f1eb44932"}

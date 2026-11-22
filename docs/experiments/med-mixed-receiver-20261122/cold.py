@@ -17,8 +17,15 @@ def main(a):
     target = chosen["joint_bytes"] + chosen["init_bytes"]
     ordinary = json.loads((a.ordinary / "result.json").read_text())
     src = a.ordinary / "source.yuv"
-    assert sha(src) == ordinary["source_yuv_sha256"] == receipt["donor"]["source_yuv_sha256"]
-    assert ordinary["ticks"] == 240 and ordinary["fps"] == 50
+    fps = ordinary["fps"]
+    assert ordinary["ticks"] == 240 and fps in (25, 50)
+    if fps == 25:
+        assert receipt["source_sha256"] == ordinary["original_source_sha256"]
+        assert str(fps) == receipt["native_fps"]
+        sender_source = sha(a.joint / "source.yuv")
+    else:
+        sender_source = receipt["donor"]["source_yuv_sha256"]
+    assert sha(src) == ordinary["source_yuv_sha256"] == sender_source
     tools = ordinary["tools"]
     a.out.mkdir(exist_ok=False)
     rows = {}
@@ -32,7 +39,7 @@ def main(a):
                 d,
                 width=960,
                 height=544,
-                fps=Fraction(50),
+                fps=Fraction(fps),
                 frames=n,
                 crf=q4 / 4,
                 preset=4,
@@ -49,7 +56,7 @@ def main(a):
                 q4=q4,
                 crf=q4 / 4,
                 bytes=r["file_bytes"],
-                kbps=r["file_bytes"] * 8 * 50 / (n * 1000),
+                kbps=r["file_bytes"] * 8 * fps / (n * 1000),
                 stream=str(stream),
                 stream_sha256=sha(stream),
                 decoded_sha256=sha(Path(r["decoded"])),

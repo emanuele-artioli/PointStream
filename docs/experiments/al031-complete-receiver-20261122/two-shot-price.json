@@ -1,0 +1,28 @@
+{
+  "first_cache_bytes": 157517,
+  "first_scene_bytes": 24489,
+  "first_joint_sha256": "ab12294fec2bba5bb5b21bf373a3a31c620b80cf9463cd92ab0383647d1a8aa9",
+  "first_cache_sha256": "91bd3a3fd9b18db301348c98e5af1536b859f2e51dde71e7de56c3beee1c1af2",
+  "elapsed_reference_seconds": 25.16,
+  "send_new": {
+    "new_cache_bytes": 174000,
+    "scene_bytes": 19810,
+    "joint_sha256": "066028a0ea56e7c57494adf6d08062d71067db62f98e01bad8347653e2e82cdc",
+    "total_bytes": 375816,
+    "total_video_seconds": 19.2,
+    "two_shot_kbps": 156.59,
+    "return_kbps": 161.50833333333333
+  },
+  "reuse": {
+    "new_cache_bytes": 0,
+    "scene_bytes": 19810,
+    "joint_sha256": "25a0496ee61a56b78627d4c4dc8162b3dfa4a8f6aab13b2115fcb5849e3785b5",
+    "total_bytes": 201816,
+    "total_video_seconds": 19.2,
+    "two_shot_kbps": 84.09,
+    "return_kbps": 16.508333333333333
+  },
+  "saved_bytes": 174000,
+  "two_shot_saved_fraction": 0.4629925282585095,
+  "coverage": "Two 240-frame video intervals at 25 fps; original clock interval between them excluded identically"
+}
