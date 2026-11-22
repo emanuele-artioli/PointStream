@@ -130,6 +130,8 @@ MAX_TRANSPORT_META = 64 * 1024
 
 def _installed_zstd(coded: bytes, raw_size: int, limit: int) -> bytes:
     """Use the JCV runtime's pinned libzstd 1.5.7 when its Python binding is absent."""
+    if not 4 <= raw_size <= limit or not 0 < len(coded) <= limit:
+        raise ValueError('invalid installed-decoder Zstandard size')
     try:
         lib = ctypes.CDLL(str(Path(sys.prefix) / 'lib/libzstd.so.1'))
     except OSError as exc:

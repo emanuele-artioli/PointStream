@@ -22,3 +22,12 @@
 {"stage": "rung-60-on-gpu6", "job": "20261122T130410Z-e09ddd28", "code": "7f7bc9533c3541df08d49e39c50e578b06077c67", "clip": "019"}
 {"stage": "rung-70-on-gpu6", "job": "20261122T130718Z-2ead0705", "code": "a2e40ca5867c9ed847ec31592fac71749838cb2c", "clip": "019"}
 {"stage": "rung-50-on-gpu6", "job": "20261122T130806Z-8c10b0d2", "code": "a2e40ca5867c9ed847ec31592fac71749838cb2c", "clip": "019"}
+{"stage": "campus-rung-joint-q70", "job": "20261122T131136Z-136d8526", "code": "a4bf1f9e233c20d125dd82d6cd531a9c2c28bd66", "clip": "019"}
+{"stage": "campus-rung-joint-q50", "job": "20261122T131226Z-2286228b", "code": "8a2e64208b93af0f639d831e6ef3ab21774ced6c", "clip": "019"}
+{"stage": "finish", "job": "20261122T131301Z-aebb0fec", "code": "8a2e64208b93af0f639d831e6ef3ab21774ced6c", "clip": "024"}
+{"stage": "campus-finish-joint-q60", "job": "20261122T132212Z-054fd80c", "code": "b15479f981877fd28ba745659c0d6fea0ee65e1c", "clip": "024"}
+{"stage": "rung-60", "job": "20261122T132217Z-258e110a", "code": "b15479f981877fd28ba745659c0d6fea0ee65e1c", "clip": "024"}
+{"stage": "rung-70", "job": "20261122T132301Z-fa1bb05b", "code": "b15479f981877fd28ba745659c0d6fea0ee65e1c", "clip": "024"}
+{"stage": "rung-50", "job": "20261122T132345Z-0db86410", "code": "b15479f981877fd28ba745659c0d6fea0ee65e1c", "clip": "024"}
+{"stage": "campus-rung-joint-q70", "job": "20261122T132803Z-a2a30d82", "code": "385ba40b1feedd305716a8ab8ef4697a3ec07000", "clip": "024"}
+{"stage": "campus-rung-joint-q50", "job": "20261122T132851Z-3e2b12c1", "code": "385ba40b1feedd305716a8ab8ef4697a3ec07000", "clip": "024"}

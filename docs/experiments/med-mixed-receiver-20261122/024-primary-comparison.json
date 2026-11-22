@@ -1,0 +1,118 @@
+{
+  "clip": "024",
+  "joint": {
+    "arm": {
+      "name": "joint-q60",
+      "kind": "rgb_npy",
+      "path": "/local/users/emanuele/pointstream/cache/a833d1b6ca5d329ca1c1ff64c533d6c3a1ec2ce1e4643b18a301416af15302dd/tree/publish/frames.npy",
+      "sha256": "10798a019061aab444d33fddce09651860ac6f70d188451b6286b7dd931f7134",
+      "receipt": "/local/users/emanuele/pointstream/cache/a833d1b6ca5d329ca1c1ff64c533d6c3a1ec2ce1e4643b18a301416af15302dd/tree/publish/finish.json",
+      "receipt_sha256": "4e1422521567f39808bc5284914182da982e922643dbd303ce5a867dca9b2331",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 14010,
+      "kbps": 23.35,
+      "cold_kbps": 301.93833333333333,
+      "joint_sha256": "dbd41008a727bc2878187454a30fde166e79a438c41bb87775ff96bb943c7a0f",
+      "receiver_job": "20261122T131301Z-aebb0fec"
+    },
+    "mean_dists": 0.46073534588019055,
+    "active_dists": 0.3165303021669388,
+    "fallback_dists": 0.6049403895934423,
+    "rgb_psnr": 19.5669433278033
+  },
+  "ordinary": {
+    "affordable": {
+      "arm": {
+        "name": "ordinary-w320-near-14010B",
+        "kind": "native_yuv420p",
+        "width": 320,
+        "height": 192,
+        "sha256": "377a63a76fec23a656cd14ee11551578b2c4c445ab49fc5d0312fce4920a3101",
+        "path": "/private/tmp/ps-med024-joint-matched-av1-price-20261122/w320-q4253/decoded.yuv",
+        "bytes": 13952,
+        "kbps": 23.253333333333334,
+        "crf": 63.25,
+        "stream_sha256": "c87016993060a843447c6a339f4812c783eb5cf2c68eb473a3fd88cad89b13e0",
+        "price_cap_bytes": 14010
+      },
+      "mean_dists": 0.5609582588076591,
+      "active_dists": 0.5646046102046967,
+      "fallback_dists": 0.5573119074106216,
+      "rgb_psnr": 20.759407205520198
+    },
+    "nearest": {
+      "arm": {
+        "name": "ordinary-w160-near-14010B",
+        "kind": "native_yuv420p",
+        "width": 160,
+        "height": 96,
+        "sha256": "ee6e830686fc9c646ba58bf467bc21b3da7e52feabc09c7c94513d883854cccf",
+        "path": "/private/tmp/ps-med024-joint-matched-av1-price-20261122/w160-q4199/decoded.yuv",
+        "bytes": 13987,
+        "kbps": 23.311666666666667,
+        "crf": 49.75,
+        "stream_sha256": "9385fde7c998fc5e9cc06526e3e4479b27f6c4a68ef8ca99b2fe74da47312864",
+        "price_cap_bytes": 14010
+      },
+      "mean_dists": 0.5660140365362167,
+      "active_dists": 0.5696686208248138,
+      "fallback_dists": 0.5623594522476196,
+      "rgb_psnr": 19.690203592225263
+    },
+    "percent_lower": 17.866376214960578,
+    "active_change": -0.24807430803775787,
+    "fallback_change": 0.047628482182820675,
+    "rgb_psnr_change": -1.1924638777168965
+  },
+  "neural": {
+    "affordable": {
+      "arm": {
+        "name": "dcvc-w480-q27",
+        "kind": "native_yuv420p",
+        "width": 480,
+        "height": 272,
+        "path": "/private/tmp/ps-med024-q27-native50-decoded.yuv",
+        "sha256": "d5ad0d6713e5af7136e26b2355b659ecd3e57c1e77b7d3f906e89fcf1430d167",
+        "kbps": 23.215,
+        "bytes": 13929,
+        "producer_job": "20261122T113407Z-e40cac03",
+        "producer_archive_sha256": "c2afaac99f5e7a0fa0b8b6830dbdd720e80ff0f6411cb982af4dd00a673b8f5b",
+        "container_sha256": "0d931927a9cce8a48bb57dfa0fc036fc7c2d4541e95f0d9cb8d28d50100e664b",
+        "source_sha256": "4d602291ebea0fcb9698d86d3f93ce4c3076a13005e33079a82975b8b64605f2",
+        "gpu": "NVIDIA RTX 6000 Ada Generation",
+        "validated_native_passes": 4
+      },
+      "mean_dists": 0.44006600230932236,
+      "active_dists": 0.45136110484600067,
+      "fallback_dists": 0.42877089977264404,
+      "rgb_psnr": 22.164808794047715
+    },
+    "nearest": {
+      "arm": {
+        "name": "dcvc-w480-q27",
+        "kind": "native_yuv420p",
+        "width": 480,
+        "height": 272,
+        "path": "/private/tmp/ps-med024-q27-native50-decoded.yuv",
+        "sha256": "d5ad0d6713e5af7136e26b2355b659ecd3e57c1e77b7d3f906e89fcf1430d167",
+        "kbps": 23.215,
+        "bytes": 13929,
+        "producer_job": "20261122T113407Z-e40cac03",
+        "producer_archive_sha256": "c2afaac99f5e7a0fa0b8b6830dbdd720e80ff0f6411cb982af4dd00a673b8f5b",
+        "container_sha256": "0d931927a9cce8a48bb57dfa0fc036fc7c2d4541e95f0d9cb8d28d50100e664b",
+        "source_sha256": "4d602291ebea0fcb9698d86d3f93ce4c3076a13005e33079a82975b8b64605f2",
+        "gpu": "NVIDIA RTX 6000 Ada Generation",
+        "validated_native_passes": 4
+      },
+      "mean_dists": 0.44006600230932236,
+      "active_dists": 0.45136110484600067,
+      "fallback_dists": 0.42877089977264404,
+      "rgb_psnr": 22.164808794047715
+    },
+    "percent_lower": -4.696873528607592,
+    "active_change": -0.1348308026790619,
+    "fallback_change": 0.17616948982079828,
+    "rgb_psnr_change": -2.5978654662444143
+  }
+}
