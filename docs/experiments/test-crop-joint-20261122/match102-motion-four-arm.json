@@ -1,0 +1,42 @@
+{
+  "job": "20261122T131004Z-176c9734",
+  "receipt_sha256": "1ba8ae99cd72929af08f59fef938e578f8bfcd152c2e96bb698930fc1e086817",
+  "original": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+  "source_mask": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e",
+  "native_fps": "30000/1001",
+  "frames": 240,
+  "athlete_transitions": 478,
+  "wall_seconds": 197.67300771400915,
+  "summary": {
+    "av1-320-warm": {
+      "n": 478,
+      "error": 19.76618607772444,
+      "source_delta": 17.519703371255467,
+      "decoded_delta": 6.880710949334141
+    },
+    "roi-640-warm": {
+      "n": 478,
+      "error": 20.116432406413505,
+      "source_delta": 17.519703371255467,
+      "decoded_delta": 6.513172628739888
+    },
+    "dcvc-480-q34": {
+      "n": 478,
+      "error": 18.19304105327718,
+      "source_delta": 17.519703371255467,
+      "decoded_delta": 7.867423244600016
+    },
+    "joint-crf50": {
+      "n": 478,
+      "error": 27.18326012160489,
+      "source_delta": 17.519703371255467,
+      "decoded_delta": 20.22846861863236
+    }
+  },
+  "source_support_validation": {
+    "arms": 4,
+    "source_correspondence": true,
+    "transitions": 478,
+    "receipt_sha256": "1ba8ae99cd72929af08f59fef938e578f8bfcd152c2e96bb698930fc1e086817"
+  }
+}
