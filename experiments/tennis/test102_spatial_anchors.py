@@ -104,7 +104,6 @@ def run(a):
                 frames=n,
                 crf=q / 4,
                 preset=4,
-                threads=1,
                 full_range=False,
             )
             subprocess.run(c, check=True, capture_output=True, timeout=500)
