@@ -1,0 +1,1047 @@
+{
+  "frames": 240,
+  "fps": 25,
+  "ticks": [
+    10,
+    30,
+    50,
+    70,
+    90,
+    110,
+    130,
+    150,
+    170,
+    190,
+    210,
+    230
+  ],
+  "means": {
+    "source": {
+      "whole": {
+        "energy": 0.2687877242763837,
+        "error": 0.0
+      },
+      "archived-track-0": {
+        "energy": 16.59640097618103,
+        "error": 0.0
+      },
+      "archived-track-1": {
+        "energy": 16.65967885653178,
+        "error": 0.0
+      }
+    },
+    "ordinary": {
+      "whole": {
+        "energy": 0.12265833156804244,
+        "error": 0.3082539327442646
+      },
+      "archived-track-0": {
+        "energy": 8.325615684191385,
+        "error": 16.850227276484173
+      },
+      "archived-track-1": {
+        "energy": 3.490499993165334,
+        "error": 17.245964646339417
+      }
+    },
+    "neural": {
+      "whole": {
+        "energy": 0.3990096151828766,
+        "error": 0.48434126128753024
+      },
+      "archived-track-0": {
+        "energy": 9.261784752209982,
+        "error": 14.951222976048788
+      },
+      "archived-track-1": {
+        "energy": 8.58685584863027,
+        "error": 15.46376915772756
+      }
+    }
+  },
+  "rows": [
+    {
+      "tick": 10,
+      "prior_tick": 9,
+      "region": "whole",
+      "arm": "source",
+      "valid_pixels": 520429,
+      "error": 0.0,
+      "energy": 0.2836914360523224
+    },
+    {
+      "tick": 10,
+      "prior_tick": 9,
+      "region": "whole",
+      "arm": "ordinary",
+      "valid_pixels": 520429,
+      "error": 0.29893437027931213,
+      "energy": 0.08831440657377243
+    },
+    {
+      "tick": 10,
+      "prior_tick": 9,
+      "region": "whole",
+      "arm": "neural",
+      "valid_pixels": 520429,
+      "error": 0.5335848331451416,
+      "energy": 0.43750855326652527
+    },
+    {
+      "tick": 10,
+      "prior_tick": 9,
+      "region": "archived-track-0",
+      "arm": "source",
+      "valid_pixels": 2135,
+      "error": 0.0,
+      "energy": 22.18947982788086
+    },
+    {
+      "tick": 10,
+      "prior_tick": 9,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "valid_pixels": 2135,
+      "error": 22.059906005859375,
+      "energy": 9.23585319519043
+    },
+    {
+      "tick": 10,
+      "prior_tick": 9,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "valid_pixels": 2135,
+      "error": 19.626554489135742,
+      "energy": 11.925235748291016
+    },
+    {
+      "tick": 10,
+      "prior_tick": 9,
+      "region": "archived-track-1",
+      "arm": "source",
+      "valid_pixels": 711,
+      "error": 0.0,
+      "energy": 5.836320877075195
+    },
+    {
+      "tick": 10,
+      "prior_tick": 9,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "valid_pixels": 711,
+      "error": 5.8767008781433105,
+      "energy": 0.1939830780029297
+    },
+    {
+      "tick": 10,
+      "prior_tick": 9,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "valid_pixels": 711,
+      "error": 7.351895809173584,
+      "energy": 5.726869583129883
+    },
+    {
+      "tick": 30,
+      "prior_tick": 29,
+      "region": "whole",
+      "arm": "source",
+      "valid_pixels": 520698,
+      "error": 0.0,
+      "energy": 0.5024845600128174
+    },
+    {
+      "tick": 30,
+      "prior_tick": 29,
+      "region": "whole",
+      "arm": "ordinary",
+      "valid_pixels": 520698,
+      "error": 0.562534511089325,
+      "energy": 0.19657786190509796
+    },
+    {
+      "tick": 30,
+      "prior_tick": 29,
+      "region": "whole",
+      "arm": "neural",
+      "valid_pixels": 520698,
+      "error": 0.6293947696685791,
+      "energy": 0.49407100677490234
+    },
+    {
+      "tick": 30,
+      "prior_tick": 29,
+      "region": "archived-track-0",
+      "arm": "source",
+      "valid_pixels": 1897,
+      "error": 0.0,
+      "energy": 20.78817367553711
+    },
+    {
+      "tick": 30,
+      "prior_tick": 29,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "valid_pixels": 1897,
+      "error": 20.290361404418945,
+      "energy": 7.119149684906006
+    },
+    {
+      "tick": 30,
+      "prior_tick": 29,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "valid_pixels": 1897,
+      "error": 18.13240623474121,
+      "energy": 10.162532806396484
+    },
+    {
+      "tick": 30,
+      "prior_tick": 29,
+      "region": "archived-track-1",
+      "arm": "source",
+      "valid_pixels": 841,
+      "error": 0.0,
+      "energy": 26.56028175354004
+    },
+    {
+      "tick": 30,
+      "prior_tick": 29,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "valid_pixels": 841,
+      "error": 25.99407958984375,
+      "energy": 3.394437789916992
+    },
+    {
+      "tick": 30,
+      "prior_tick": 29,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "valid_pixels": 841,
+      "error": 24.578487396240234,
+      "energy": 12.403214454650879
+    },
+    {
+      "tick": 50,
+      "prior_tick": 49,
+      "region": "whole",
+      "arm": "source",
+      "valid_pixels": 520624,
+      "error": 0.0,
+      "energy": 0.4274058938026428
+    },
+    {
+      "tick": 50,
+      "prior_tick": 49,
+      "region": "whole",
+      "arm": "ordinary",
+      "valid_pixels": 520624,
+      "error": 0.5109055042266846,
+      "energy": 0.21398739516735077
+    },
+    {
+      "tick": 50,
+      "prior_tick": 49,
+      "region": "whole",
+      "arm": "neural",
+      "valid_pixels": 520624,
+      "error": 0.5483358502388,
+      "energy": 0.45088163018226624
+    },
+    {
+      "tick": 50,
+      "prior_tick": 49,
+      "region": "archived-track-0",
+      "arm": "source",
+      "valid_pixels": 1838,
+      "error": 0.0,
+      "energy": 17.542266845703125
+    },
+    {
+      "tick": 50,
+      "prior_tick": 49,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "valid_pixels": 1838,
+      "error": 19.829723358154297,
+      "energy": 7.282602787017822
+    },
+    {
+      "tick": 50,
+      "prior_tick": 49,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "valid_pixels": 1838,
+      "error": 15.577415466308594,
+      "energy": 9.256372451782227
+    },
+    {
+      "tick": 50,
+      "prior_tick": 49,
+      "region": "archived-track-1",
+      "arm": "source",
+      "valid_pixels": 830,
+      "error": 0.0,
+      "energy": 19.584545135498047
+    },
+    {
+      "tick": 50,
+      "prior_tick": 49,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "valid_pixels": 830,
+      "error": 19.095327377319336,
+      "energy": 4.156487464904785
+    },
+    {
+      "tick": 50,
+      "prior_tick": 49,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "valid_pixels": 830,
+      "error": 17.111591339111328,
+      "energy": 9.18729019165039
+    },
+    {
+      "tick": 70,
+      "prior_tick": 69,
+      "region": "whole",
+      "arm": "source",
+      "valid_pixels": 520444,
+      "error": 0.0,
+      "energy": 0.23331202566623688
+    },
+    {
+      "tick": 70,
+      "prior_tick": 69,
+      "region": "whole",
+      "arm": "ordinary",
+      "valid_pixels": 520444,
+      "error": 0.25313976407051086,
+      "energy": 0.10891988128423691
+    },
+    {
+      "tick": 70,
+      "prior_tick": 69,
+      "region": "whole",
+      "arm": "neural",
+      "valid_pixels": 520444,
+      "error": 0.45860475301742554,
+      "energy": 0.38481131196022034
+    },
+    {
+      "tick": 70,
+      "prior_tick": 69,
+      "region": "archived-track-0",
+      "arm": "source",
+      "valid_pixels": 2506,
+      "error": 0.0,
+      "energy": 20.6829833984375
+    },
+    {
+      "tick": 70,
+      "prior_tick": 69,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "valid_pixels": 2506,
+      "error": 20.635578155517578,
+      "energy": 10.722397804260254
+    },
+    {
+      "tick": 70,
+      "prior_tick": 69,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "valid_pixels": 2506,
+      "error": 18.20929527282715,
+      "energy": 11.627559661865234
+    },
+    {
+      "tick": 70,
+      "prior_tick": 69,
+      "region": "archived-track-1",
+      "arm": "source",
+      "valid_pixels": 793,
+      "error": 0.0,
+      "energy": 14.55440902709961
+    },
+    {
+      "tick": 70,
+      "prior_tick": 69,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "valid_pixels": 793,
+      "error": 15.195600509643555,
+      "energy": 6.5986328125
+    },
+    {
+      "tick": 70,
+      "prior_tick": 69,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "valid_pixels": 793,
+      "error": 12.883009910583496,
+      "energy": 7.273359775543213
+    },
+    {
+      "tick": 90,
+      "prior_tick": 89,
+      "region": "whole",
+      "arm": "source",
+      "valid_pixels": 520717,
+      "error": 0.0,
+      "energy": 0.2249600738286972
+    },
+    {
+      "tick": 90,
+      "prior_tick": 89,
+      "region": "whole",
+      "arm": "ordinary",
+      "valid_pixels": 520717,
+      "error": 0.2516813576221466,
+      "energy": 0.10944299399852753
+    },
+    {
+      "tick": 90,
+      "prior_tick": 89,
+      "region": "whole",
+      "arm": "neural",
+      "valid_pixels": 520717,
+      "error": 0.4358072280883789,
+      "energy": 0.40209928154945374
+    },
+    {
+      "tick": 90,
+      "prior_tick": 89,
+      "region": "archived-track-0",
+      "arm": "source",
+      "valid_pixels": 2337,
+      "error": 0.0,
+      "energy": 13.013516426086426
+    },
+    {
+      "tick": 90,
+      "prior_tick": 89,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "valid_pixels": 2337,
+      "error": 13.447831153869629,
+      "energy": 8.02426528930664
+    },
+    {
+      "tick": 90,
+      "prior_tick": 89,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "valid_pixels": 2337,
+      "error": 11.552942276000977,
+      "energy": 7.867503643035889
+    },
+    {
+      "tick": 90,
+      "prior_tick": 89,
+      "region": "archived-track-1",
+      "arm": "source",
+      "valid_pixels": 790,
+      "error": 0.0,
+      "energy": 19.77124786376953
+    },
+    {
+      "tick": 90,
+      "prior_tick": 89,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "valid_pixels": 790,
+      "error": 20.405315399169922,
+      "energy": 3.593979835510254
+    },
+    {
+      "tick": 90,
+      "prior_tick": 89,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "valid_pixels": 790,
+      "error": 17.08088493347168,
+      "energy": 12.408230781555176
+    },
+    {
+      "tick": 110,
+      "prior_tick": 109,
+      "region": "whole",
+      "arm": "source",
+      "valid_pixels": 520817,
+      "error": 0.0,
+      "energy": 0.16880467534065247
+    },
+    {
+      "tick": 110,
+      "prior_tick": 109,
+      "region": "whole",
+      "arm": "ordinary",
+      "valid_pixels": 520817,
+      "error": 0.21030011773109436,
+      "energy": 0.10341199487447739
+    },
+    {
+      "tick": 110,
+      "prior_tick": 109,
+      "region": "whole",
+      "arm": "neural",
+      "valid_pixels": 520817,
+      "error": 0.40336453914642334,
+      "energy": 0.33837148547172546
+    },
+    {
+      "tick": 110,
+      "prior_tick": 109,
+      "region": "archived-track-0",
+      "arm": "source",
+      "valid_pixels": 2419,
+      "error": 0.0,
+      "energy": 12.638521194458008
+    },
+    {
+      "tick": 110,
+      "prior_tick": 109,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "valid_pixels": 2419,
+      "error": 12.645760536193848,
+      "energy": 7.706180095672607
+    },
+    {
+      "tick": 110,
+      "prior_tick": 109,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "valid_pixels": 2419,
+      "error": 10.906899452209473,
+      "energy": 6.875802516937256
+    },
+    {
+      "tick": 110,
+      "prior_tick": 109,
+      "region": "archived-track-1",
+      "arm": "source",
+      "valid_pixels": 894,
+      "error": 0.0,
+      "energy": 14.646842956542969
+    },
+    {
+      "tick": 110,
+      "prior_tick": 109,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "valid_pixels": 894,
+      "error": 15.32901382446289,
+      "energy": 3.130671262741089
+    },
+    {
+      "tick": 110,
+      "prior_tick": 109,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "valid_pixels": 894,
+      "error": 13.707776069641113,
+      "energy": 7.25688362121582
+    },
+    {
+      "tick": 130,
+      "prior_tick": 129,
+      "region": "whole",
+      "arm": "source",
+      "valid_pixels": 520495,
+      "error": 0.0,
+      "energy": 0.1852104812860489
+    },
+    {
+      "tick": 130,
+      "prior_tick": 129,
+      "region": "whole",
+      "arm": "ordinary",
+      "valid_pixels": 520495,
+      "error": 0.21563459932804108,
+      "energy": 0.08770782500505447
+    },
+    {
+      "tick": 130,
+      "prior_tick": 129,
+      "region": "whole",
+      "arm": "neural",
+      "valid_pixels": 520495,
+      "error": 0.44330134987831116,
+      "energy": 0.36795130372047424
+    },
+    {
+      "tick": 130,
+      "prior_tick": 129,
+      "region": "archived-track-0",
+      "arm": "source",
+      "valid_pixels": 2630,
+      "error": 0.0,
+      "energy": 13.138535499572754
+    },
+    {
+      "tick": 130,
+      "prior_tick": 129,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "valid_pixels": 2630,
+      "error": 13.210463523864746,
+      "energy": 6.768427848815918
+    },
+    {
+      "tick": 130,
+      "prior_tick": 129,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "valid_pixels": 2630,
+      "error": 12.53398609161377,
+      "energy": 7.4027018547058105
+    },
+    {
+      "tick": 130,
+      "prior_tick": 129,
+      "region": "archived-track-1",
+      "arm": "source",
+      "valid_pixels": 818,
+      "error": 0.0,
+      "energy": 20.466922760009766
+    },
+    {
+      "tick": 130,
+      "prior_tick": 129,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "valid_pixels": 818,
+      "error": 20.71062469482422,
+      "energy": 2.776890754699707
+    },
+    {
+      "tick": 130,
+      "prior_tick": 129,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "valid_pixels": 818,
+      "error": 17.988697052001953,
+      "energy": 11.16964054107666
+    },
+    {
+      "tick": 150,
+      "prior_tick": 149,
+      "region": "whole",
+      "arm": "source",
+      "valid_pixels": 520616,
+      "error": 0.0,
+      "energy": 0.2396940290927887
+    },
+    {
+      "tick": 150,
+      "prior_tick": 149,
+      "region": "whole",
+      "arm": "ordinary",
+      "valid_pixels": 520616,
+      "error": 0.2549022138118744,
+      "energy": 0.09455999732017517
+    },
+    {
+      "tick": 150,
+      "prior_tick": 149,
+      "region": "whole",
+      "arm": "neural",
+      "valid_pixels": 520616,
+      "error": 0.4591297209262848,
+      "energy": 0.36793169379234314
+    },
+    {
+      "tick": 150,
+      "prior_tick": 149,
+      "region": "archived-track-0",
+      "arm": "source",
+      "valid_pixels": 2036,
+      "error": 0.0,
+      "energy": 18.428701400756836
+    },
+    {
+      "tick": 150,
+      "prior_tick": 149,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "valid_pixels": 2036,
+      "error": 17.856191635131836,
+      "energy": 9.623883247375488
+    },
+    {
+      "tick": 150,
+      "prior_tick": 149,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "valid_pixels": 2036,
+      "error": 16.132610321044922,
+      "energy": 9.5982084274292
+    },
+    {
+      "tick": 150,
+      "prior_tick": 149,
+      "region": "archived-track-1",
+      "arm": "source",
+      "valid_pixels": 852,
+      "error": 0.0,
+      "energy": 13.801824569702148
+    },
+    {
+      "tick": 150,
+      "prior_tick": 149,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "valid_pixels": 852,
+      "error": 15.639195442199707,
+      "energy": 4.8505940437316895
+    },
+    {
+      "tick": 150,
+      "prior_tick": 149,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "valid_pixels": 852,
+      "error": 12.893561363220215,
+      "energy": 6.0187249183654785
+    },
+    {
+      "tick": 170,
+      "prior_tick": 169,
+      "region": "whole",
+      "arm": "source",
+      "valid_pixels": 520424,
+      "error": 0.0,
+      "energy": 0.17892426252365112
+    },
+    {
+      "tick": 170,
+      "prior_tick": 169,
+      "region": "whole",
+      "arm": "ordinary",
+      "valid_pixels": 520424,
+      "error": 0.22459721565246582,
+      "energy": 0.10098358243703842
+    },
+    {
+      "tick": 170,
+      "prior_tick": 169,
+      "region": "whole",
+      "arm": "neural",
+      "valid_pixels": 520424,
+      "error": 0.44412732124328613,
+      "energy": 0.3698562681674957
+    },
+    {
+      "tick": 170,
+      "prior_tick": 169,
+      "region": "archived-track-0",
+      "arm": "source",
+      "valid_pixels": 2259,
+      "error": 0.0,
+      "energy": 10.89030647277832
+    },
+    {
+      "tick": 170,
+      "prior_tick": 169,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "valid_pixels": 2259,
+      "error": 11.369672775268555,
+      "energy": 6.28358268737793
+    },
+    {
+      "tick": 170,
+      "prior_tick": 169,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "valid_pixels": 2259,
+      "error": 11.135470390319824,
+      "energy": 7.004645347595215
+    },
+    {
+      "tick": 170,
+      "prior_tick": 169,
+      "region": "archived-track-1",
+      "arm": "source",
+      "valid_pixels": 801,
+      "error": 0.0,
+      "energy": 20.341571807861328
+    },
+    {
+      "tick": 170,
+      "prior_tick": 169,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "valid_pixels": 801,
+      "error": 20.497352600097656,
+      "energy": 1.2061312198638916
+    },
+    {
+      "tick": 170,
+      "prior_tick": 169,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "valid_pixels": 801,
+      "error": 19.392356872558594,
+      "energy": 11.20624828338623
+    },
+    {
+      "tick": 190,
+      "prior_tick": 189,
+      "region": "whole",
+      "arm": "source",
+      "valid_pixels": 520937,
+      "error": 0.0,
+      "energy": 0.2055855542421341
+    },
+    {
+      "tick": 190,
+      "prior_tick": 189,
+      "region": "whole",
+      "arm": "ordinary",
+      "valid_pixels": 520937,
+      "error": 0.2639009952545166,
+      "energy": 0.12646277248859406
+    },
+    {
+      "tick": 190,
+      "prior_tick": 189,
+      "region": "whole",
+      "arm": "neural",
+      "valid_pixels": 520937,
+      "error": 0.44196176528930664,
+      "energy": 0.3863092362880707
+    },
+    {
+      "tick": 190,
+      "prior_tick": 189,
+      "region": "archived-track-0",
+      "arm": "source",
+      "valid_pixels": 2507,
+      "error": 0.0,
+      "energy": 11.941765785217285
+    },
+    {
+      "tick": 190,
+      "prior_tick": 189,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "valid_pixels": 2507,
+      "error": 13.86033821105957,
+      "energy": 8.816410064697266
+    },
+    {
+      "tick": 190,
+      "prior_tick": 189,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "valid_pixels": 2507,
+      "error": 10.864757537841797,
+      "energy": 7.711217880249023
+    },
+    {
+      "tick": 190,
+      "prior_tick": 189,
+      "region": "archived-track-1",
+      "arm": "source",
+      "valid_pixels": 1069,
+      "error": 0.0,
+      "energy": 17.855138778686523
+    },
+    {
+      "tick": 190,
+      "prior_tick": 189,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "valid_pixels": 1069,
+      "error": 20.09144401550293,
+      "energy": 5.0755085945129395
+    },
+    {
+      "tick": 190,
+      "prior_tick": 189,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "valid_pixels": 1069,
+      "error": 17.2589054107666,
+      "energy": 8.753534317016602
+    },
+    {
+      "tick": 210,
+      "prior_tick": 209,
+      "region": "whole",
+      "arm": "source",
+      "valid_pixels": 520981,
+      "error": 0.0,
+      "energy": 0.3171805739402771
+    },
+    {
+      "tick": 210,
+      "prior_tick": 209,
+      "region": "whole",
+      "arm": "ordinary",
+      "valid_pixels": 520981,
+      "error": 0.3504658043384552,
+      "energy": 0.12266496568918228
+    },
+    {
+      "tick": 210,
+      "prior_tick": 209,
+      "region": "whole",
+      "arm": "neural",
+      "valid_pixels": 520981,
+      "error": 0.5242975354194641,
+      "energy": 0.4128970801830292
+    },
+    {
+      "tick": 210,
+      "prior_tick": 209,
+      "region": "archived-track-0",
+      "arm": "source",
+      "valid_pixels": 2316,
+      "error": 0.0,
+      "energy": 19.486289978027344
+    },
+    {
+      "tick": 210,
+      "prior_tick": 209,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "valid_pixels": 2316,
+      "error": 18.58749008178711,
+      "energy": 9.413912773132324
+    },
+    {
+      "tick": 210,
+      "prior_tick": 209,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "valid_pixels": 2316,
+      "error": 16.096717834472656,
+      "energy": 12.051562309265137
+    },
+    {
+      "tick": 210,
+      "prior_tick": 209,
+      "region": "archived-track-1",
+      "arm": "source",
+      "valid_pixels": 1042,
+      "error": 0.0,
+      "energy": 14.412259101867676
+    },
+    {
+      "tick": 210,
+      "prior_tick": 209,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "valid_pixels": 1042,
+      "error": 15.695446968078613,
+      "energy": 4.346685409545898
+    },
+    {
+      "tick": 210,
+      "prior_tick": 209,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "valid_pixels": 1042,
+      "error": 13.588345527648926,
+      "energy": 6.482334613800049
+    },
+    {
+      "tick": 230,
+      "prior_tick": 229,
+      "region": "whole",
+      "arm": "source",
+      "valid_pixels": 520521,
+      "error": 0.0,
+      "energy": 0.25819912552833557
+    },
+    {
+      "tick": 230,
+      "prior_tick": 229,
+      "region": "whole",
+      "arm": "ordinary",
+      "valid_pixels": 520521,
+      "error": 0.30205073952674866,
+      "energy": 0.11886630207300186
+    },
+    {
+      "tick": 230,
+      "prior_tick": 229,
+      "region": "whole",
+      "arm": "neural",
+      "valid_pixels": 520521,
+      "error": 0.4901854693889618,
+      "energy": 0.3754265308380127
+    },
+    {
+      "tick": 230,
+      "prior_tick": 229,
+      "region": "archived-track-0",
+      "arm": "source",
+      "valid_pixels": 2514,
+      "error": 0.0,
+      "energy": 18.416271209716797
+    },
+    {
+      "tick": 230,
+      "prior_tick": 229,
+      "region": "archived-track-0",
+      "arm": "ordinary",
+      "valid_pixels": 2514,
+      "error": 18.40941047668457,
+      "energy": 8.910722732543945
+    },
+    {
+      "tick": 230,
+      "prior_tick": 229,
+      "region": "archived-track-0",
+      "arm": "neural",
+      "valid_pixels": 2514,
+      "error": 18.645620346069336,
+      "energy": 9.658074378967285
+    },
+    {
+      "tick": 230,
+      "prior_tick": 229,
+      "region": "archived-track-1",
+      "arm": "source",
+      "valid_pixels": 921,
+      "error": 0.0,
+      "energy": 12.084781646728516
+    },
+    {
+      "tick": 230,
+      "prior_tick": 229,
+      "region": "archived-track-1",
+      "arm": "ordinary",
+      "valid_pixels": 921,
+      "error": 12.42147445678711,
+      "energy": 2.561997652053833
+    },
+    {
+      "tick": 230,
+      "prior_tick": 229,
+      "region": "archived-track-1",
+      "arm": "neural",
+      "valid_pixels": 921,
+      "error": 11.729718208312988,
+      "energy": 5.155939102172852
+    }
+  ],
+  "rates_kbps": {
+    "ordinary": 20.360833333333332,
+    "neural": 20.411666666666665
+  },
+  "source_sha256": "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934",
+  "ordinary_yuv_sha256": "c60215a513435b726bf9c3dd398b651b1c9add176245a354eb1076ee21445bf1",
+  "neural_yuv_sha256": "bac9b77792126c748a7640eee2ce80649f54c2509d5973623d06e1ed35b931bb",
+  "review_sha256": "508617ef01170813202eec89a154b0b61890756427a143ac2f2b0e429b00f419",
+  "opencv": "5.0.0",
+  "cpu_seconds": 4.283029,
+  "joint_result_sha256": null
+}
