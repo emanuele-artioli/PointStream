@@ -12,3 +12,6 @@
 {"stage": "neural-q36-published", "job": "20261122T120847Z-28acd80b", "code": "37bfe3a63d5f567c89bb93cb670402ac061c4510"}
 {"stage": "neural-q36-complete-snapshot", "job": "20261122T121405Z-d2d356f7", "code": "938eeaae17bec713a2be97246a803f3f1eb44932"}
 {"stage": "fresh-finish", "job": "20261122T125912Z-9361b447", "code": "7df03336cf7e24e1b14ef9a93bc35e618be02dbf"}
+{"stage": "fresh-rung-50", "job": "20261122T130753Z-4bdba0e4", "code": "a2e40ca5867c9ed847ec31592fac71749838cb2c"}
+{"stage": "fresh-rung-70", "job": "20261122T130904Z-58700edb", "code": "a2e40ca5867c9ed847ec31592fac71749838cb2c"}
+{"stage": "campus-finish-fresh-joint-q50-validated", "job": "20261122T130937Z-98b93895", "code": "a2e40ca5867c9ed847ec31592fac71749838cb2c"}

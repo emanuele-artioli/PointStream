@@ -80,8 +80,8 @@ def make(a):
         )
 
     if a.kind == "rung":
-        add("rung-receipt", root / "rung.json", a.receipt_sha)
-        options += ["--receipt", "{staged:rung-receipt}"]
+        add("rung_receipt", root / "rung.json", a.receipt_sha)
+        options += ["--receipt", "{staged:rung_receipt}"]
     if a.kind in ["finish", "rung"]:
         r = load(card / (a.prefix + "-prices.json" if al else f"{a.clip}-packets.json"))
         wire = next(x for x in r["rates"] if x["crf"] == a.crf)
@@ -98,8 +98,8 @@ def make(a):
         src = FLEET / sender / "full"
         br = AL / "source-ball-receipt.json"
         add("ball", src / "ball.payload", load(br)["payload_sha256"])
-        add("ball-receipt", src / "sender.json", sha256(br))
-        options += ["--ball-payload", "{staged:ball}", "--ball-receipt", "{staged:ball-receipt}"]
+        add("ball_receipt", src / "sender.json", sha256(br))
+        options += ["--ball-payload", "{staged:ball}", "--ball-receipt", "{staged:ball_receipt}"]
     if a.expected_dists is not None:
         options += ["--expected-dists", str(a.expected_dists)]
     template.update(

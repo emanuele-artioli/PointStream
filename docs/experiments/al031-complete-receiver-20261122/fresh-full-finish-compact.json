@@ -1,0 +1,12 @@
+{
+  "job_id": "20261122T125912Z-9361b447",
+  "archive_sha256": "b342ab4c92020c5f2de52f6e12dcc48248b5b8dba33bcad0ab3c1f1eaee53c97",
+  "archive_bytes": 1500190720,
+  "timing": {
+    "worker_wall_seconds": 91.91007878800156,
+    "archive_seconds": 7.755944169999566,
+    "verify_seconds": 7.687041530007264,
+    "archive_bytes": 1500190720,
+    "archive_sha256": "b342ab4c92020c5f2de52f6e12dcc48248b5b8dba33bcad0ab3c1f1eaee53c97"
+  }
+}

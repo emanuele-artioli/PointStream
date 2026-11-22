@@ -19,3 +19,6 @@
 {"stage": "campus-finish-joint-q60", "job": "20261122T125720Z-8a9f38af", "code": "4e5645768f7a33fc0205b78d3e7aa6082dab9e47", "clip": "019"}
 {"stage": "rung-70", "job": "20261122T125804Z-36b7530e", "code": "b574a671729a039d4ee1e9583524b79d28849a7b", "clip": "019"}
 {"stage": "rung-50", "job": "20261122T125851Z-e78f67b3", "code": "7df03336cf7e24e1b14ef9a93bc35e618be02dbf", "clip": "019"}
+{"stage": "rung-60-on-gpu6", "job": "20261122T130410Z-e09ddd28", "code": "7f7bc9533c3541df08d49e39c50e578b06077c67", "clip": "019"}
+{"stage": "rung-70-on-gpu6", "job": "20261122T130718Z-2ead0705", "code": "a2e40ca5867c9ed847ec31592fac71749838cb2c", "clip": "019"}
+{"stage": "rung-50-on-gpu6", "job": "20261122T130806Z-8c10b0d2", "code": "a2e40ca5867c9ed847ec31592fac71749838cb2c", "clip": "019"}
