@@ -15,3 +15,11 @@
 {"stage": "fresh-rung-50", "job": "20261122T130753Z-4bdba0e4", "code": "a2e40ca5867c9ed847ec31592fac71749838cb2c"}
 {"stage": "fresh-rung-70", "job": "20261122T130904Z-58700edb", "code": "a2e40ca5867c9ed847ec31592fac71749838cb2c"}
 {"stage": "campus-finish-fresh-joint-q50-validated", "job": "20261122T130937Z-98b93895", "code": "a2e40ca5867c9ed847ec31592fac71749838cb2c"}
+{"stage": "fresh-rung-60", "job": "20261122T131022Z-0b8e784a", "code": "1d64cd64f117af82acdbc9384616e862f3938628"}
+{"stage": "campus-rung-fresh-joint-q70", "job": "20261122T131142Z-061c65f5", "code": "a4bf1f9e233c20d125dd82d6cd531a9c2c28bd66"}
+{"stage": "campus-rung-fresh-joint-q60", "job": "20261122T131300Z-ff06b842", "code": "8a2e64208b93af0f639d831e6ef3ab21774ced6c"}
+{"stage": "legacy-reference-cpu-smoke", "job": "20261122T132235Z-4891ef51", "code": "b15479f981877fd28ba745659c0d6fea0ee65e1c"}
+{"stage": "campus-rung-fresh-joint-q70-2100s", "job": "20261122T132345Z-8e331b9a", "code": "b15479f981877fd28ba745659c0d6fea0ee65e1c"}
+{"stage": "campus-rung-fresh-joint-q60-2100s", "job": "20261122T132434Z-673070eb", "code": "4c27f54bd4b7004f38bb0f42305900250ddc5459"}
+{"stage": "prefix-pair-0-legacy-decoder", "job": "20261122T132555Z-d4bc6076", "code": "39c936e73eb1ac897c1a647a13fc952dbef7e2b4"}
+{"stage": "prefix-pair-1-legacy-decoder", "job": "20261122T132646Z-28a8986d", "code": "bdb98f5e7da626d1e781061912ceed4ced1a8609"}

@@ -1,0 +1,186 @@
+{
+  "schema": 1,
+  "device": "cpu",
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.foreground_campus_score"
+  ],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.foreground_campus_score",
+    "--validate"
+  ],
+  "arguments": [
+    "--clip",
+    "al031",
+    "--label",
+    "fresh-joint-q70",
+    "--kind",
+    "rung",
+    "--source",
+    "{staged:source}",
+    "--source-sha",
+    "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+    "--canonical",
+    "{staged:canonical}",
+    "--canonical-receipt",
+    "{staged:grid}",
+    "--supports",
+    "{staged:supports}",
+    "--weights",
+    "{staged:weights}",
+    "--data",
+    "{staged:data}",
+    "--frames",
+    "{frames}",
+    "--producer",
+    "20261122T130904Z-58700edb",
+    "--fps",
+    "25",
+    "--paid",
+    "13691",
+    "--receipt",
+    "{staged:rung_receipt}",
+    "--expected-joint",
+    "6b80b199375f57c97c62057d5e1d63ddacaffc98e641a79dc0575709b1a8db06",
+    "--cache",
+    "174000",
+    "--ball-payload",
+    "{staged:ball}",
+    "--ball-receipt",
+    "{staged:ball_receipt}",
+    "--full-cap",
+    "2100"
+  ],
+  "staged_inputs": [
+    {
+      "name": "source",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/six-match-source-panel-20261122/alcaraz031-054e4535638d.mp4",
+      "sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+      "extract": false
+    },
+    {
+      "name": "weights",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "extract": false
+    },
+    {
+      "name": "canonical",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-al031-054e4535638d-20261122T1224/source.mkv",
+      "sha256": "ffc013eacc5dde790a9f6dcccda34f1848aa142f402c0a8b2103948e79cb0742",
+      "extract": false
+    },
+    {
+      "name": "grid",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-al031-054e4535638d-20261122T1224/grid.json",
+      "sha256": "fd7bdfbf5b6a0f25a06a10b13a78de323e8bc636f9df4896d191b973388398f9",
+      "extract": false
+    },
+    {
+      "name": "supports",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-al031-054e4535638d-20261122T1224/supports.tar",
+      "sha256": "52715bd5a1f36d553566fafbb49175255fd4a1d36a89587bba0920b44e4724e6",
+      "extract": true
+    },
+    {
+      "name": "data",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T130904Z-58700edb/full/frames.zseq",
+      "sha256": "42c04d938c63279301a46bd3d4321c1680ee8d070c39a75b7acabb68c2889233",
+      "extract": false
+    },
+    {
+      "name": "rung_receipt",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T130904Z-58700edb/full/rung.json",
+      "sha256": "57b4f1f65c0472f9b8f2a87a36621f112c3ca969f86ac2d67985a77fb926f2ee",
+      "extract": false
+    },
+    {
+      "name": "ball",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T114430Z-534f6704/full/ball.payload",
+      "sha256": "aa3119d822edcead9f1e486973e975e31b7b74da2a5b7ee9be372bbb2c4b22c0",
+      "extract": false
+    },
+    {
+      "name": "ball_receipt",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T114430Z-534f6704/full/sender.json",
+      "sha256": "827d4da6961681af9c42ff034c828e19c5c9d91b5a9e82b12b4a7fca7636b2ad",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/six-match-source-panel-20261122/alcaraz031-054e4535638d.mp4",
+      "sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-al031-054e4535638d-20261122T1224/source.mkv",
+      "sha256": "ffc013eacc5dde790a9f6dcccda34f1848aa142f402c0a8b2103948e79cb0742"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-al031-054e4535638d-20261122T1224/grid.json",
+      "sha256": "fd7bdfbf5b6a0f25a06a10b13a78de323e8bc636f9df4896d191b973388398f9"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/native-src-eval-al031-054e4535638d-20261122T1224/supports.tar",
+      "sha256": "52715bd5a1f36d553566fafbb49175255fd4a1d36a89587bba0920b44e4724e6"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T130904Z-58700edb/full/frames.zseq",
+      "sha256": "42c04d938c63279301a46bd3d4321c1680ee8d070c39a75b7acabb68c2889233"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T130904Z-58700edb/full/rung.json",
+      "sha256": "57b4f1f65c0472f9b8f2a87a36621f112c3ca969f86ac2d67985a77fb926f2ee"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T114430Z-534f6704/full/ball.payload",
+      "sha256": "aa3119d822edcead9f1e486973e975e31b7b74da2a5b7ee9be372bbb2c4b22c0"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T114430Z-534f6704/full/sender.json",
+      "sha256": "827d4da6961681af9c42ff034c828e19c5c9d91b5a9e82b12b4a7fca7636b2ad"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "required_commands": [],
+  "deadline": "2026-11-22T21:01:00Z",
+  "verify_staged_inputs": true,
+  "hosts": [
+    "gpu1",
+    "gpu2",
+    "gpu3",
+    "gpu4",
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [],
+  "gpu_memory_mib": 0,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "local_storage_gib": 28,
+  "smoke": {
+    "seconds": 420,
+    "representative_basis": "24 native frames with two actual player support masks per tick, independent source pixel digest, CPU DISTS and optional audited PNG extraction. Whole-job forecast includes fixed validation costs."
+  },
+  "full": {
+    "seconds": 2100
+  },
+  "validator_seconds": 150,
+  "budget_seconds": 2600,
+  "stall_seconds": 2160,
+  "scale": {
+    "frames": {
+      "smoke": 24,
+      "full": 240
+    }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "000": {
+    "joint_kbps": 23.233333333333334,
+    "effects": {
+      "ordinary": {
+        "control": "ordinary-w320-near-13940B",
+        "control_kbps": 23.05666666666667,
+        "by_interval": {
+          "active_dists": -0.20026017725467676,
+          "fallback_dists": 0.025443241000175476,
+          "mean_dists": -0.08740846812725073
+        }
+      },
+      "neural": {
+        "control": "dcvc-w480-q24",
+        "control_kbps": 21.173333333333332,
+        "by_interval": {
+          "active_dists": -0.10802454253037769,
+          "fallback_dists": 0.08648857971032459,
+          "mean_dists": -0.01076798141002655
+        }
+      }
+    }
+  },
+  "019": {
+    "joint_kbps": 23.006666666666668,
+    "effects": {
+      "ordinary": {
+        "control": "ordinary-w320-near-13804B",
+        "control_kbps": 22.981666666666666,
+        "by_interval": {
+          "active_dists": -0.2007784793774287,
+          "fallback_dists": 0.03897068897883105,
+          "mean_dists": -0.08090389519929891
+        }
+      },
+      "neural": {
+        "control": "dcvc-w480-q26",
+        "control_kbps": 23.0,
+        "by_interval": {
+          "active_dists": -0.11380054553349817,
+          "fallback_dists": 0.12986270089944207,
+          "mean_dists": 0.008031077682971954
+        }
+      }
+    }
+  },
+  "024": {
+    "joint_kbps": 23.35,
+    "effects": {
+      "ordinary": {
+        "control": "ordinary-w320-near-14010B",
+        "control_kbps": 23.253333333333334,
+        "by_interval": {
+          "active_dists": -0.24807430803775787,
+          "fallback_dists": 0.047628482182820675,
+          "mean_dists": -0.1002229129274686
+        }
+      },
+      "neural": {
+        "control": "dcvc-w480-q27",
+        "control_kbps": 23.215,
+        "by_interval": {
+          "active_dists": -0.1348308026790619,
+          "fallback_dists": 0.17616948982079828,
+          "mean_dists": 0.020669343570868193
+        }
+      }
+    }
+  }
+}
