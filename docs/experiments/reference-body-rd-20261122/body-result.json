@@ -1,0 +1,1659 @@
+{
+  "summary": {
+    "source_model": {
+      "q65": {
+        "per_player": {
+          "person:000000000000": {
+            "dists": 0.18354109674692154,
+            "rgb_psnr": 14.916794686504018,
+            "ticks": 24
+          },
+          "person:000000000001": {
+            "dists": 0.16915754725535712,
+            "rgb_psnr": 17.152654346504907,
+            "ticks": 24
+          }
+        },
+        "rgb_psnr": 16.03472451650446,
+        "dists": 0.17634932200113934
+      },
+      "q78": {
+        "per_player": {
+          "person:000000000000": {
+            "dists": 0.17424601564804712,
+            "rgb_psnr": 14.863473714438458,
+            "ticks": 24
+          },
+          "person:000000000001": {
+            "dists": 0.17335579295953116,
+            "rgb_psnr": 17.138616533475798,
+            "ticks": 24
+          }
+        },
+        "rgb_psnr": 16.001045123957127,
+        "dists": 0.17380090430378914
+      },
+      "q90": {
+        "per_player": {
+          "person:000000000000": {
+            "dists": 0.1685618832707405,
+            "rgb_psnr": 14.945812200228954,
+            "ticks": 24
+          },
+          "person:000000000001": {
+            "dists": 0.17543514569600424,
+            "rgb_psnr": 17.135723368093,
+            "ticks": 24
+          }
+        },
+        "rgb_psnr": 16.040767784160977,
+        "dists": 0.1719985144833724
+      },
+      "lossless": {
+        "per_player": {
+          "person:000000000000": {
+            "dists": 0.1695322667558988,
+            "rgb_psnr": 14.94136539412004,
+            "ticks": 24
+          },
+          "person:000000000001": {
+            "dists": 0.1784146229426066,
+            "rgb_psnr": 17.168389821154193,
+            "ticks": 24
+          }
+        },
+        "rgb_psnr": 16.054877607637117,
+        "dists": 0.1739734448492527
+      }
+    },
+    "human": {
+      "q65": {
+        "per_player": {
+          "person:000000000000": {
+            "dists": 0.18825525045394897,
+            "rgb_psnr": 14.786774172577118,
+            "ticks": 1
+          },
+          "person:000000000001": {
+            "dists": 0.174970805644989,
+            "rgb_psnr": 18.882989388712048,
+            "ticks": 1
+          }
+        },
+        "rgb_psnr": 16.834881780644583,
+        "dists": 0.181613028049469
+      },
+      "q78": {
+        "per_player": {
+          "person:000000000000": {
+            "dists": 0.178838849067688,
+            "rgb_psnr": 14.816454238389598,
+            "ticks": 1
+          },
+          "person:000000000001": {
+            "dists": 0.17132753133773804,
+            "rgb_psnr": 18.93348783392802,
+            "ticks": 1
+          }
+        },
+        "rgb_psnr": 16.874971036158808,
+        "dists": 0.175083190202713
+      },
+      "q90": {
+        "per_player": {
+          "person:000000000000": {
+            "dists": 0.1716327667236328,
+            "rgb_psnr": 15.090226733543373,
+            "ticks": 1
+          },
+          "person:000000000001": {
+            "dists": 0.18153798580169678,
+            "rgb_psnr": 18.902178371490017,
+            "ticks": 1
+          }
+        },
+        "rgb_psnr": 16.996202552516696,
+        "dists": 0.1765853762626648
+      },
+      "lossless": {
+        "per_player": {
+          "person:000000000000": {
+            "dists": 0.17431461811065674,
+            "rgb_psnr": 15.045754265995404,
+            "ticks": 1
+          },
+          "person:000000000001": {
+            "dists": 0.17817825078964233,
+            "rgb_psnr": 18.91922947366399,
+            "ticks": 1
+          }
+        },
+        "rgb_psnr": 16.982491869829698,
+        "dists": 0.17624643445014954
+      }
+    }
+  },
+  "rows": [
+    {
+      "pixels": 11636,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.16564607620239258,
+          "sum_squared_rgb": 54719718,
+          "samples": 34908
+        },
+        "q78": {
+          "dists": 0.15022677183151245,
+          "sum_squared_rgb": 56605526,
+          "samples": 34908
+        },
+        "q90": {
+          "dists": 0.14304399490356445,
+          "sum_squared_rgb": 55091507,
+          "samples": 34908
+        },
+        "lossless": {
+          "dists": 0.1329248547554016,
+          "sum_squared_rgb": 55622007,
+          "samples": 34908
+        }
+      },
+      "tick": 0,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 3988,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.14732295274734497,
+          "sum_squared_rgb": 14241815,
+          "samples": 11964
+        },
+        "q78": {
+          "dists": 0.15591001510620117,
+          "sum_squared_rgb": 13918910,
+          "samples": 11964
+        },
+        "q90": {
+          "dists": 0.15913820266723633,
+          "sum_squared_rgb": 14579039,
+          "samples": 11964
+        },
+        "lossless": {
+          "dists": 0.17302119731903076,
+          "sum_squared_rgb": 14521693,
+          "samples": 11964
+        }
+      },
+      "tick": 0,
+      "person": "person:000000000001",
+      "support": "source_model"
+    },
+    {
+      "pixels": 11492,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.19109582901000977,
+          "sum_squared_rgb": 62563342,
+          "samples": 34476
+        },
+        "q78": {
+          "dists": 0.16774284839630127,
+          "sum_squared_rgb": 65256814,
+          "samples": 34476
+        },
+        "q90": {
+          "dists": 0.15137112140655518,
+          "sum_squared_rgb": 62667101,
+          "samples": 34476
+        },
+        "lossless": {
+          "dists": 0.14983701705932617,
+          "sum_squared_rgb": 63155943,
+          "samples": 34476
+        }
+      },
+      "tick": 1,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 3884,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.16630423069000244,
+          "sum_squared_rgb": 14381220,
+          "samples": 11652
+        },
+        "q78": {
+          "dists": 0.17677700519561768,
+          "sum_squared_rgb": 14502617,
+          "samples": 11652
+        },
+        "q90": {
+          "dists": 0.1830785870552063,
+          "sum_squared_rgb": 14458090,
+          "samples": 11652
+        },
+        "lossless": {
+          "dists": 0.17889922857284546,
+          "sum_squared_rgb": 14681000,
+          "samples": 11652
+        }
+      },
+      "tick": 1,
+      "person": "person:000000000001",
+      "support": "source_model"
+    },
+    {
+      "pixels": 11512,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.17640042304992676,
+          "sum_squared_rgb": 60659213,
+          "samples": 34536
+        },
+        "q78": {
+          "dists": 0.16457092761993408,
+          "sum_squared_rgb": 63499342,
+          "samples": 34536
+        },
+        "q90": {
+          "dists": 0.16345375776290894,
+          "sum_squared_rgb": 60655868,
+          "samples": 34536
+        },
+        "lossless": {
+          "dists": 0.15966439247131348,
+          "sum_squared_rgb": 61918057,
+          "samples": 34536
+        }
+      },
+      "tick": 2,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 3896,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.15709775686264038,
+          "sum_squared_rgb": 14134314,
+          "samples": 11688
+        },
+        "q78": {
+          "dists": 0.16767096519470215,
+          "sum_squared_rgb": 14159365,
+          "samples": 11688
+        },
+        "q90": {
+          "dists": 0.1664556860923767,
+          "sum_squared_rgb": 14393932,
+          "samples": 11688
+        },
+        "lossless": {
+          "dists": 0.16634505987167358,
+          "sum_squared_rgb": 14303543,
+          "samples": 11688
+        }
+      },
+      "tick": 2,
+      "person": "person:000000000001",
+      "support": "source_model"
+    },
+    {
+      "pixels": 11440,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.18753570318222046,
+          "sum_squared_rgb": 65318455,
+          "samples": 34320
+        },
+        "q78": {
+          "dists": 0.1669253706932068,
+          "sum_squared_rgb": 69636454,
+          "samples": 34320
+        },
+        "q90": {
+          "dists": 0.15727168321609497,
+          "sum_squared_rgb": 67141880,
+          "samples": 34320
+        },
+        "lossless": {
+          "dists": 0.15593558549880981,
+          "sum_squared_rgb": 68010550,
+          "samples": 34320
+        }
+      },
+      "tick": 3,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 3904,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.16340559720993042,
+          "sum_squared_rgb": 13522491,
+          "samples": 11712
+        },
+        "q78": {
+          "dists": 0.16668683290481567,
+          "sum_squared_rgb": 13679725,
+          "samples": 11712
+        },
+        "q90": {
+          "dists": 0.17122149467468262,
+          "sum_squared_rgb": 13743474,
+          "samples": 11712
+        },
+        "lossless": {
+          "dists": 0.175115168094635,
+          "sum_squared_rgb": 14129261,
+          "samples": 11712
+        }
+      },
+      "tick": 3,
+      "person": "person:000000000001",
+      "support": "source_model"
+    },
+    {
+      "pixels": 11468,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.16042554378509521,
+          "sum_squared_rgb": 65263098,
+          "samples": 34404
+        },
+        "q78": {
+          "dists": 0.156682550907135,
+          "sum_squared_rgb": 68350321,
+          "samples": 34404
+        },
+        "q90": {
+          "dists": 0.14013177156448364,
+          "sum_squared_rgb": 66590654,
+          "samples": 34404
+        },
+        "lossless": {
+          "dists": 0.15055805444717407,
+          "sum_squared_rgb": 67055514,
+          "samples": 34404
+        }
+      },
+      "tick": 4,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 4104,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.16327011585235596,
+          "sum_squared_rgb": 13066347,
+          "samples": 12312
+        },
+        "q78": {
+          "dists": 0.16442495584487915,
+          "sum_squared_rgb": 12947680,
+          "samples": 12312
+        },
+        "q90": {
+          "dists": 0.16172552108764648,
+          "sum_squared_rgb": 13105756,
+          "samples": 12312
+        },
+        "lossless": {
+          "dists": 0.16134315729141235,
+          "sum_squared_rgb": 13205996,
+          "samples": 12312
+        }
+      },
+      "tick": 4,
+      "person": "person:000000000001",
+      "support": "source_model"
+    },
+    {
+      "pixels": 11668,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.18108206987380981,
+          "sum_squared_rgb": 69312019,
+          "samples": 35004
+        },
+        "q78": {
+          "dists": 0.1749240756034851,
+          "sum_squared_rgb": 72680303,
+          "samples": 35004
+        },
+        "q90": {
+          "dists": 0.15876692533493042,
+          "sum_squared_rgb": 69717339,
+          "samples": 35004
+        },
+        "lossless": {
+          "dists": 0.1619061827659607,
+          "sum_squared_rgb": 71343663,
+          "samples": 35004
+        }
+      },
+      "tick": 5,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 3968,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.15541768074035645,
+          "sum_squared_rgb": 13149915,
+          "samples": 11904
+        },
+        "q78": {
+          "dists": 0.16960734128952026,
+          "sum_squared_rgb": 13327424,
+          "samples": 11904
+        },
+        "q90": {
+          "dists": 0.16931360960006714,
+          "sum_squared_rgb": 13377696,
+          "samples": 11904
+        },
+        "lossless": {
+          "dists": 0.1739470362663269,
+          "sum_squared_rgb": 12858433,
+          "samples": 11904
+        }
+      },
+      "tick": 5,
+      "person": "person:000000000001",
+      "support": "source_model"
+    },
+    {
+      "pixels": 11668,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.1755237579345703,
+          "sum_squared_rgb": 74664498,
+          "samples": 35004
+        },
+        "q78": {
+          "dists": 0.16714781522750854,
+          "sum_squared_rgb": 77567064,
+          "samples": 35004
+        },
+        "q90": {
+          "dists": 0.16129517555236816,
+          "sum_squared_rgb": 75154358,
+          "samples": 35004
+        },
+        "lossless": {
+          "dists": 0.16157865524291992,
+          "sum_squared_rgb": 75624010,
+          "samples": 35004
+        }
+      },
+      "tick": 6,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 3964,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.1635940670967102,
+          "sum_squared_rgb": 13202436,
+          "samples": 11892
+        },
+        "q78": {
+          "dists": 0.16764026880264282,
+          "sum_squared_rgb": 13480056,
+          "samples": 11892
+        },
+        "q90": {
+          "dists": 0.16685539484024048,
+          "sum_squared_rgb": 13443450,
+          "samples": 11892
+        },
+        "lossless": {
+          "dists": 0.18334227800369263,
+          "sum_squared_rgb": 13051191,
+          "samples": 11892
+        }
+      },
+      "tick": 6,
+      "person": "person:000000000001",
+      "support": "source_model"
+    },
+    {
+      "pixels": 11288,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.1831321120262146,
+          "sum_squared_rgb": 70729948,
+          "samples": 33864
+        },
+        "q78": {
+          "dists": 0.1711651086807251,
+          "sum_squared_rgb": 72894493,
+          "samples": 33864
+        },
+        "q90": {
+          "dists": 0.1591818928718567,
+          "sum_squared_rgb": 70549481,
+          "samples": 33864
+        },
+        "lossless": {
+          "dists": 0.1608518362045288,
+          "sum_squared_rgb": 71575798,
+          "samples": 33864
+        }
+      },
+      "tick": 7,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 4096,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.16729342937469482,
+          "sum_squared_rgb": 14343438,
+          "samples": 12288
+        },
+        "q78": {
+          "dists": 0.17962288856506348,
+          "sum_squared_rgb": 14129689,
+          "samples": 12288
+        },
+        "q90": {
+          "dists": 0.18326222896575928,
+          "sum_squared_rgb": 14070244,
+          "samples": 12288
+        },
+        "lossless": {
+          "dists": 0.18566596508026123,
+          "sum_squared_rgb": 13763770,
+          "samples": 12288
+        }
+      },
+      "tick": 7,
+      "person": "person:000000000001",
+      "support": "source_model"
+    },
+    {
+      "pixels": 11612,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.18809998035430908,
+          "sum_squared_rgb": 78934106,
+          "samples": 34836
+        },
+        "q78": {
+          "dists": 0.16941726207733154,
+          "sum_squared_rgb": 79846349,
+          "samples": 34836
+        },
+        "q90": {
+          "dists": 0.1576545238494873,
+          "sum_squared_rgb": 77936297,
+          "samples": 34836
+        },
+        "lossless": {
+          "dists": 0.16137683391571045,
+          "sum_squared_rgb": 78808108,
+          "samples": 34836
+        }
+      },
+      "tick": 8,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 4136,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.16406428813934326,
+          "sum_squared_rgb": 14761794,
+          "samples": 12408
+        },
+        "q78": {
+          "dists": 0.1755903959274292,
+          "sum_squared_rgb": 14768596,
+          "samples": 12408
+        },
+        "q90": {
+          "dists": 0.16795378923416138,
+          "sum_squared_rgb": 14301816,
+          "samples": 12408
+        },
+        "lossless": {
+          "dists": 0.17938262224197388,
+          "sum_squared_rgb": 13586275,
+          "samples": 12408
+        }
+      },
+      "tick": 8,
+      "person": "person:000000000001",
+      "support": "source_model"
+    },
+    {
+      "pixels": 11636,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.20289140939712524,
+          "sum_squared_rgb": 81977787,
+          "samples": 34908
+        },
+        "q78": {
+          "dists": 0.19834470748901367,
+          "sum_squared_rgb": 82255500,
+          "samples": 34908
+        },
+        "q90": {
+          "dists": 0.17094957828521729,
+          "sum_squared_rgb": 78855780,
+          "samples": 34908
+        },
+        "lossless": {
+          "dists": 0.16836601495742798,
+          "sum_squared_rgb": 80315339,
+          "samples": 34908
+        }
+      },
+      "tick": 9,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 4152,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.16548418998718262,
+          "sum_squared_rgb": 13084072,
+          "samples": 12456
+        },
+        "q78": {
+          "dists": 0.17063891887664795,
+          "sum_squared_rgb": 13337903,
+          "samples": 12456
+        },
+        "q90": {
+          "dists": 0.17732656002044678,
+          "sum_squared_rgb": 13267529,
+          "samples": 12456
+        },
+        "lossless": {
+          "dists": 0.1758819818496704,
+          "sum_squared_rgb": 12813504,
+          "samples": 12456
+        }
+      },
+      "tick": 9,
+      "person": "person:000000000001",
+      "support": "source_model"
+    },
+    {
+      "pixels": 11644,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.19087713956832886,
+          "sum_squared_rgb": 83309265,
+          "samples": 34932
+        },
+        "q78": {
+          "dists": 0.18121743202209473,
+          "sum_squared_rgb": 82821249,
+          "samples": 34932
+        },
+        "q90": {
+          "dists": 0.16960912942886353,
+          "sum_squared_rgb": 77491616,
+          "samples": 34932
+        },
+        "lossless": {
+          "dists": 0.17749905586242676,
+          "sum_squared_rgb": 78773824,
+          "samples": 34932
+        }
+      },
+      "tick": 10,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 14548,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.18825525045394897,
+          "sum_squared_rgb": 94260012,
+          "samples": 43644
+        },
+        "q78": {
+          "dists": 0.178838849067688,
+          "sum_squared_rgb": 93618027,
+          "samples": 43644
+        },
+        "q90": {
+          "dists": 0.1716327667236328,
+          "sum_squared_rgb": 87898656,
+          "samples": 43644
+        },
+        "lossless": {
+          "dists": 0.17431461811065674,
+          "sum_squared_rgb": 88803377,
+          "samples": 43644
+        }
+      },
+      "tick": 10,
+      "person": "person:000000000000",
+      "support": "human"
+    },
+    {
+      "pixels": 4004,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.1831875443458557,
+          "sum_squared_rgb": 12673127,
+          "samples": 12012
+        },
+        "q78": {
+          "dists": 0.18004858493804932,
+          "sum_squared_rgb": 12546449,
+          "samples": 12012
+        },
+        "q90": {
+          "dists": 0.18943345546722412,
+          "sum_squared_rgb": 12557473,
+          "samples": 12012
+        },
+        "lossless": {
+          "dists": 0.18520700931549072,
+          "sum_squared_rgb": 12674459,
+          "samples": 12012
+        }
+      },
+      "tick": 10,
+      "person": "person:000000000001",
+      "support": "source_model"
+    },
+    {
+      "pixels": 5386,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.174970805644989,
+          "sum_squared_rgb": 13588422,
+          "samples": 16158
+        },
+        "q78": {
+          "dists": 0.17132753133773804,
+          "sum_squared_rgb": 13431335,
+          "samples": 16158
+        },
+        "q90": {
+          "dists": 0.18153798580169678,
+          "sum_squared_rgb": 13528515,
+          "samples": 16158
+        },
+        "lossless": {
+          "dists": 0.17817825078964233,
+          "sum_squared_rgb": 13475504,
+          "samples": 16158
+        }
+      },
+      "tick": 10,
+      "person": "person:000000000001",
+      "support": "human"
+    },
+    {
+      "pixels": 11584,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.18989479541778564,
+          "sum_squared_rgb": 82724911,
+          "samples": 34752
+        },
+        "q78": {
+          "dists": 0.18328630924224854,
+          "sum_squared_rgb": 84181941,
+          "samples": 34752
+        },
+        "q90": {
+          "dists": 0.1823762059211731,
+          "sum_squared_rgb": 78309566,
+          "samples": 34752
+        },
+        "lossless": {
+          "dists": 0.176283597946167,
+          "sum_squared_rgb": 77469815,
+          "samples": 34752
+        }
+      },
+      "tick": 11,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 4232,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.1732330322265625,
+          "sum_squared_rgb": 15501051,
+          "samples": 12696
+        },
+        "q78": {
+          "dists": 0.18418407440185547,
+          "sum_squared_rgb": 14834160,
+          "samples": 12696
+        },
+        "q90": {
+          "dists": 0.18930578231811523,
+          "sum_squared_rgb": 15197739,
+          "samples": 12696
+        },
+        "lossless": {
+          "dists": 0.18389558792114258,
+          "sum_squared_rgb": 14816233,
+          "samples": 12696
+        }
+      },
+      "tick": 11,
+      "person": "person:000000000001",
+      "support": "source_model"
+    },
+    {
+      "pixels": 11312,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.18300974369049072,
+          "sum_squared_rgb": 74773779,
+          "samples": 33936
+        },
+        "q78": {
+          "dists": 0.17941850423812866,
+          "sum_squared_rgb": 76741617,
+          "samples": 33936
+        },
+        "q90": {
+          "dists": 0.17555534839630127,
+          "sum_squared_rgb": 73744913,
+          "samples": 33936
+        },
+        "lossless": {
+          "dists": 0.1731024980545044,
+          "sum_squared_rgb": 71315939,
+          "samples": 33936
+        }
+      },
+      "tick": 12,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 4284,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.17566543817520142,
+          "sum_squared_rgb": 15305137,
+          "samples": 12852
+        },
+        "q78": {
+          "dists": 0.18199819326400757,
+          "sum_squared_rgb": 16332910,
+          "samples": 12852
+        },
+        "q90": {
+          "dists": 0.18351686000823975,
+          "sum_squared_rgb": 16778562,
+          "samples": 12852
+        },
+        "lossless": {
+          "dists": 0.18331199884414673,
+          "sum_squared_rgb": 16219871,
+          "samples": 12852
+        }
+      },
+      "tick": 12,
+      "person": "person:000000000001",
+      "support": "source_model"
+    },
+    {
+      "pixels": 11300,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.175320565700531,
+          "sum_squared_rgb": 64600273,
+          "samples": 33900
+        },
+        "q78": {
+          "dists": 0.1768779158592224,
+          "sum_squared_rgb": 64327795,
+          "samples": 33900
+        },
+        "q90": {
+          "dists": 0.16072285175323486,
+          "sum_squared_rgb": 66031834,
+          "samples": 33900
+        },
+        "lossless": {
+          "dists": 0.17256349325180054,
+          "sum_squared_rgb": 64900451,
+          "samples": 33900
+        }
+      },
+      "tick": 13,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 4280,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.1837521195411682,
+          "sum_squared_rgb": 17331061,
+          "samples": 12840
+        },
+        "q78": {
+          "dists": 0.17986589670181274,
+          "sum_squared_rgb": 17692450,
+          "samples": 12840
+        },
+        "q90": {
+          "dists": 0.18099123239517212,
+          "sum_squared_rgb": 16965655,
+          "samples": 12840
+        },
+        "lossless": {
+          "dists": 0.17781919240951538,
+          "sum_squared_rgb": 16936278,
+          "samples": 12840
+        }
+      },
+      "tick": 13,
+      "person": "person:000000000001",
+      "support": "source_model"
+    },
+    {
+      "pixels": 11308,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.18055737018585205,
+          "sum_squared_rgb": 64032780,
+          "samples": 33924
+        },
+        "q78": {
+          "dists": 0.1644192934036255,
+          "sum_squared_rgb": 64009458,
+          "samples": 33924
+        },
+        "q90": {
+          "dists": 0.16758966445922852,
+          "sum_squared_rgb": 66247003,
+          "samples": 33924
+        },
+        "lossless": {
+          "dists": 0.17304587364196777,
+          "sum_squared_rgb": 65695216,
+          "samples": 33924
+        }
+      },
+      "tick": 14,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 4088,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.17353010177612305,
+          "sum_squared_rgb": 15813780,
+          "samples": 12264
+        },
+        "q78": {
+          "dists": 0.1779489517211914,
+          "sum_squared_rgb": 16207496,
+          "samples": 12264
+        },
+        "q90": {
+          "dists": 0.18168389797210693,
+          "sum_squared_rgb": 16169075,
+          "samples": 12264
+        },
+        "lossless": {
+          "dists": 0.17724770307540894,
+          "sum_squared_rgb": 17352853,
+          "samples": 12264
+        }
+      },
+      "tick": 14,
+      "person": "person:000000000001",
+      "support": "source_model"
+    },
+    {
+      "pixels": 11284,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.17745041847229004,
+          "sum_squared_rgb": 69283326,
+          "samples": 33852
+        },
+        "q78": {
+          "dists": 0.1842593550682068,
+          "sum_squared_rgb": 68996961,
+          "samples": 33852
+        },
+        "q90": {
+          "dists": 0.1800721287727356,
+          "sum_squared_rgb": 71375226,
+          "samples": 33852
+        },
+        "lossless": {
+          "dists": 0.17651695013046265,
+          "sum_squared_rgb": 71319108,
+          "samples": 33852
+        }
+      },
+      "tick": 15,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 4100,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.17055314779281616,
+          "sum_squared_rgb": 17354412,
+          "samples": 12300
+        },
+        "q78": {
+          "dists": 0.17302322387695312,
+          "sum_squared_rgb": 17100804,
+          "samples": 12300
+        },
+        "q90": {
+          "dists": 0.18140077590942383,
+          "sum_squared_rgb": 17144224,
+          "samples": 12300
+        },
+        "lossless": {
+          "dists": 0.1753556728363037,
+          "sum_squared_rgb": 17057975,
+          "samples": 12300
+        }
+      },
+      "tick": 15,
+      "person": "person:000000000001",
+      "support": "source_model"
+    },
+    {
+      "pixels": 11292,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.16882836818695068,
+          "sum_squared_rgb": 69102742,
+          "samples": 33876
+        },
+        "q78": {
+          "dists": 0.1593015193939209,
+          "sum_squared_rgb": 67628358,
+          "samples": 33876
+        },
+        "q90": {
+          "dists": 0.17309057712554932,
+          "sum_squared_rgb": 69306533,
+          "samples": 33876
+        },
+        "lossless": {
+          "dists": 0.16490775346755981,
+          "sum_squared_rgb": 69848001,
+          "samples": 33876
+        }
+      },
+      "tick": 16,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 4308,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.16660404205322266,
+          "sum_squared_rgb": 15926559,
+          "samples": 12924
+        },
+        "q78": {
+          "dists": 0.17903286218643188,
+          "sum_squared_rgb": 15771479,
+          "samples": 12924
+        },
+        "q90": {
+          "dists": 0.1676144003868103,
+          "sum_squared_rgb": 15855331,
+          "samples": 12924
+        },
+        "lossless": {
+          "dists": 0.17854052782058716,
+          "sum_squared_rgb": 15839266,
+          "samples": 12924
+        }
+      },
+      "tick": 16,
+      "person": "person:000000000001",
+      "support": "source_model"
+    },
+    {
+      "pixels": 11180,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.17492562532424927,
+          "sum_squared_rgb": 68805119,
+          "samples": 33540
+        },
+        "q78": {
+          "dists": 0.16026973724365234,
+          "sum_squared_rgb": 66558958,
+          "samples": 33540
+        },
+        "q90": {
+          "dists": 0.17298996448516846,
+          "sum_squared_rgb": 68122353,
+          "samples": 33540
+        },
+        "lossless": {
+          "dists": 0.16760295629501343,
+          "sum_squared_rgb": 67658602,
+          "samples": 33540
+        }
+      },
+      "tick": 17,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 4124,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.1751856803894043,
+          "sum_squared_rgb": 14756538,
+          "samples": 12372
+        },
+        "q78": {
+          "dists": 0.18226158618927002,
+          "sum_squared_rgb": 14971031,
+          "samples": 12372
+        },
+        "q90": {
+          "dists": 0.1780208945274353,
+          "sum_squared_rgb": 14806865,
+          "samples": 12372
+        },
+        "lossless": {
+          "dists": 0.18026161193847656,
+          "sum_squared_rgb": 14643480,
+          "samples": 12372
+        }
+      },
+      "tick": 17,
+      "person": "person:000000000001",
+      "support": "source_model"
+    },
+    {
+      "pixels": 11240,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.17051440477371216,
+          "sum_squared_rgb": 71383909,
+          "samples": 33720
+        },
+        "q78": {
+          "dists": 0.16267961263656616,
+          "sum_squared_rgb": 68701443,
+          "samples": 33720
+        },
+        "q90": {
+          "dists": 0.1721552610397339,
+          "sum_squared_rgb": 69607017,
+          "samples": 33720
+        },
+        "lossless": {
+          "dists": 0.17079108953475952,
+          "sum_squared_rgb": 68472837,
+          "samples": 33720
+        }
+      },
+      "tick": 18,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 4144,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.17420244216918945,
+          "sum_squared_rgb": 16196202,
+          "samples": 12432
+        },
+        "q78": {
+          "dists": 0.17549067735671997,
+          "sum_squared_rgb": 16148110,
+          "samples": 12432
+        },
+        "q90": {
+          "dists": 0.17957055568695068,
+          "sum_squared_rgb": 15850499,
+          "samples": 12432
+        },
+        "lossless": {
+          "dists": 0.19063591957092285,
+          "sum_squared_rgb": 15953959,
+          "samples": 12432
+        }
+      },
+      "tick": 18,
+      "person": "person:000000000001",
+      "support": "source_model"
+    },
+    {
+      "pixels": 11280,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.177959144115448,
+          "sum_squared_rgb": 73330829,
+          "samples": 33840
+        },
+        "q78": {
+          "dists": 0.1703929901123047,
+          "sum_squared_rgb": 71139267,
+          "samples": 33840
+        },
+        "q90": {
+          "dists": 0.17522358894348145,
+          "sum_squared_rgb": 72228691,
+          "samples": 33840
+        },
+        "lossless": {
+          "dists": 0.17334723472595215,
+          "sum_squared_rgb": 71481058,
+          "samples": 33840
+        }
+      },
+      "tick": 19,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 4216,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.17106497287750244,
+          "sum_squared_rgb": 16180265,
+          "samples": 12648
+        },
+        "q78": {
+          "dists": 0.1704692840576172,
+          "sum_squared_rgb": 16302690,
+          "samples": 12648
+        },
+        "q90": {
+          "dists": 0.18020200729370117,
+          "sum_squared_rgb": 16326342,
+          "samples": 12648
+        },
+        "lossless": {
+          "dists": 0.1774815320968628,
+          "sum_squared_rgb": 15925419,
+          "samples": 12648
+        }
+      },
+      "tick": 19,
+      "person": "person:000000000001",
+      "support": "source_model"
+    },
+    {
+      "pixels": 11296,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.1783231496810913,
+          "sum_squared_rgb": 74490342,
+          "samples": 33888
+        },
+        "q78": {
+          "dists": 0.16817080974578857,
+          "sum_squared_rgb": 72869258,
+          "samples": 33888
+        },
+        "q90": {
+          "dists": 0.17627257108688354,
+          "sum_squared_rgb": 72976383,
+          "samples": 33888
+        },
+        "lossless": {
+          "dists": 0.17875516414642334,
+          "sum_squared_rgb": 73251445,
+          "samples": 33888
+        }
+      },
+      "tick": 20,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 4204,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.17737984657287598,
+          "sum_squared_rgb": 18447197,
+          "samples": 12612
+        },
+        "q78": {
+          "dists": 0.1763981580734253,
+          "sum_squared_rgb": 19011327,
+          "samples": 12612
+        },
+        "q90": {
+          "dists": 0.1707666516304016,
+          "sum_squared_rgb": 18272490,
+          "samples": 12612
+        },
+        "lossless": {
+          "dists": 0.18225711584091187,
+          "sum_squared_rgb": 18297134,
+          "samples": 12612
+        }
+      },
+      "tick": 20,
+      "person": "person:000000000001",
+      "support": "source_model"
+    },
+    {
+      "pixels": 11308,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.19455790519714355,
+          "sum_squared_rgb": 74886292,
+          "samples": 33924
+        },
+        "q78": {
+          "dists": 0.1824038028717041,
+          "sum_squared_rgb": 74107452,
+          "samples": 33924
+        },
+        "q90": {
+          "dists": 0.1779612898826599,
+          "sum_squared_rgb": 74607062,
+          "samples": 33924
+        },
+        "lossless": {
+          "dists": 0.18793416023254395,
+          "sum_squared_rgb": 74825199,
+          "samples": 33924
+        }
+      },
+      "tick": 21,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 4212,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.18499350547790527,
+          "sum_squared_rgb": 18546893,
+          "samples": 12636
+        },
+        "q78": {
+          "dists": 0.1672413945198059,
+          "sum_squared_rgb": 18631223,
+          "samples": 12636
+        },
+        "q90": {
+          "dists": 0.1754441261291504,
+          "sum_squared_rgb": 18628195,
+          "samples": 12636
+        },
+        "lossless": {
+          "dists": 0.17687439918518066,
+          "sum_squared_rgb": 18040652,
+          "samples": 12636
+        }
+      },
+      "tick": 21,
+      "person": "person:000000000001",
+      "support": "source_model"
+    },
+    {
+      "pixels": 11372,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.21696257591247559,
+          "sum_squared_rgb": 79849619,
+          "samples": 34116
+        },
+        "q78": {
+          "dists": 0.2082744836807251,
+          "sum_squared_rgb": 79829369,
+          "samples": 34116
+        },
+        "q90": {
+          "dists": 0.19602274894714355,
+          "sum_squared_rgb": 79897342,
+          "samples": 34116
+        },
+        "lossless": {
+          "dists": 0.20246469974517822,
+          "sum_squared_rgb": 78586129,
+          "samples": 34116
+        }
+      },
+      "tick": 22,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 4236,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.1607222557067871,
+          "sum_squared_rgb": 20127143,
+          "samples": 12708
+        },
+        "q78": {
+          "dists": 0.16616171598434448,
+          "sum_squared_rgb": 19990465,
+          "samples": 12708
+        },
+        "q90": {
+          "dists": 0.1717897653579712,
+          "sum_squared_rgb": 20527458,
+          "samples": 12708
+        },
+        "lossless": {
+          "dists": 0.1759798526763916,
+          "sum_squared_rgb": 20080404,
+          "samples": 12708
+        }
+      },
+      "tick": 22,
+      "person": "person:000000000001",
+      "support": "source_model"
+    },
+    {
+      "pixels": 11832,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.21397221088409424,
+          "sum_squared_rgb": 92334637,
+          "samples": 35496
+        },
+        "q78": {
+          "dists": 0.21378517150878906,
+          "sum_squared_rgb": 97879459,
+          "samples": 35496
+        },
+        "q90": {
+          "dists": 0.2027234435081482,
+          "sum_squared_rgb": 91243332,
+          "samples": 35496
+        },
+        "lossless": {
+          "dists": 0.21096044778823853,
+          "sum_squared_rgb": 90279999,
+          "samples": 35496
+        }
+      },
+      "tick": 23,
+      "person": "person:000000000000",
+      "support": "source_model"
+    },
+    {
+      "pixels": 4160,
+      "coverage": 1.0,
+      "scores": {
+        "q65": {
+          "dists": 0.17645269632339478,
+          "sum_squared_rgb": 18789679,
+          "samples": 12480
+        },
+        "q78": {
+          "dists": 0.17184484004974365,
+          "sum_squared_rgb": 18244932,
+          "samples": 12480
+        },
+        "q90": {
+          "dists": 0.17437201738357544,
+          "sum_squared_rgb": 18464482,
+          "samples": 12480
+        },
+        "lossless": {
+          "dists": 0.18413913249969482,
+          "sum_squared_rgb": 18743042,
+          "samples": 12480
+        }
+      },
+      "tick": 23,
+      "person": "person:000000000001",
+      "support": "source_model"
+    }
+  ],
+  "full_crop_controls": {
+    "q65/person:000000000000": {
+      "observed": 19.96566946547365,
+      "previous": 19.96566946547365
+    },
+    "q65/person:000000000001": {
+      "observed": 18.767029417823448,
+      "previous": 18.767029417823448
+    },
+    "q78/person:000000000000": {
+      "observed": 19.953171145058455,
+      "previous": 19.953171145058455
+    },
+    "q78/person:000000000001": {
+      "observed": 18.85928875736279,
+      "previous": 18.85928875736279
+    },
+    "q90/person:000000000000": {
+      "observed": 20.054393132334155,
+      "previous": 20.054393132334162
+    },
+    "q90/person:000000000001": {
+      "observed": 18.81095493076375,
+      "previous": 18.81095493076375
+    },
+    "lossless/person:000000000000": {
+      "observed": 20.127048828399886,
+      "previous": 20.127048828399886
+    },
+    "lossless/person:000000000001": {
+      "observed": 18.922015744754564,
+      "previous": 18.922015744754564
+    }
+  },
+  "source_yuv_sha256": "f80c34e6fb264ec8170a52af5e9368ff58d0ed400f8abb422192280d9eb6d434",
+  "source_sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d",
+  "source_command": [
+    "ffmpeg",
+    "-v",
+    "error",
+    "-nostdin",
+    "-threads",
+    "1",
+    "-i",
+    "/private/tmp/ps-reference-body-20261122-0901/source.mp4",
+    "-frames:v",
+    "24",
+    "-vf",
+    "select=between(n\\,0\\,23),scale=1920:1080:flags=area:out_range=tv,format=yuv420p",
+    "-filter_threads",
+    "1",
+    "-fps_mode",
+    "passthrough",
+    "-threads",
+    "1",
+    "-f",
+    "rawvideo",
+    "-pix_fmt",
+    "yuv420p",
+    "pipe:1"
+  ],
+  "labels_sha256": "9918c87fa6a309052bbac8ef0be21429885e6579fd632754ed9aeb343c912d8a",
+  "source_masks_tar_sha256": "965b8879a821b90dd1e6afba415b8eed269a35a768e1f9891e0f4df96a37a51a",
+  "weights_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+  "script_sha256": "f803e3389197dc413e0f3360985f97fb48b9ee3d58f18c345defe855af1b65a0",
+  "cpu_seconds": 97.91901,
+  "cv2": "4.10.0",
+  "numpy": "1.26.4",
+  "torch": "2.8.0",
+  "ffmpeg_sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be",
+  "cost_forecast_basis_cpu_seconds": 1.4352809999999998
+}
