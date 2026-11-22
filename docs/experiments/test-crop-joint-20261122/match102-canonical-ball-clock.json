@@ -65,11 +65,6 @@
   "deadline": "2026-11-22T21:01:00Z",
   "verify_staged_inputs": true,
   "hosts": [
-    "gpu1",
-    "gpu2",
-    "gpu3",
-    "gpu4",
-    "gpu5",
     "gpu6"
   ],
   "gpu_models": [],
