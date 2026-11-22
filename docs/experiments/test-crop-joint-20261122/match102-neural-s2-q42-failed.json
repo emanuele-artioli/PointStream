@@ -1,0 +1,126 @@
+{
+  "job_id": "20261122T105300Z-7f7cd2fa",
+  "created": 1795344964.8562763,
+  "status": "failed",
+  "updated": 1795345094.5413575,
+  "host_alias": "gpu5",
+  "gpu": {
+    "index": 0,
+    "uuid": "GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162",
+    "name": "NVIDIA RTX 6000 Ada Generation",
+    "memory_used_mib": 26951,
+    "memory_total_mib": 49140,
+    "memory_free_mib": 21695,
+    "utilization_pct": 100,
+    "compute_processes": [
+      {
+        "pid": 1576024,
+        "memory_mib": 23096
+      },
+      {
+        "pid": 1835700,
+        "memory_mib": 3816
+      }
+    ],
+    "pointstream_claimed": false,
+    "pointstream_shared_claims": []
+  },
+  "gpu_sharing": {
+    "mode": "shared",
+    "basis": "Identical historical frame hashes, not shared-device timing, decide correctness.",
+    "margin_mib": 8192
+  },
+  "supervisor_pid": 1857091,
+  "remote_status": {
+    "status": "failed",
+    "started": 1795344973.7104328,
+    "last_progress": 1795345044.7949686,
+    "emitted": [
+      "contention:1795344974.2891676",
+      "terminal:failed",
+      "decision:8fdd8d3527395256bbded8f4156a104f"
+    ],
+    "gpu_sharing": {
+      "mode": "shared",
+      "basis": "Identical historical frame hashes, not shared-device timing, decide correctness.",
+      "margin_mib": 8192
+    },
+    "timing_contaminated": true,
+    "pid": 1857105,
+    "proc_start_time": 1795344973.62,
+    "process_group_id": 1857105,
+    "contention": [
+      {
+        "detected": 1795344974.2891676,
+        "action": "continue",
+        "foreign_gpu_pids": [
+          1576024,
+          1835700
+        ],
+        "ended": 1795345044.7949686
+      }
+    ],
+    "foreign_gpu_pids": [
+      1576024,
+      1835700
+    ],
+    "progress": {
+      "stage": "attention",
+      "completed": 0,
+      "updated": 1795345043.6952007,
+      "decision": "full failed with exit code 1"
+    },
+    "exit_code": 1,
+    "ended": 1795345044.7949686,
+    "salvage": {
+      "exit_code": 0,
+      "reason": "failed",
+      "started": 1795345044.8720665,
+      "seconds": 0.16603422164916992
+    }
+  },
+  "directory": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T105300Z-7f7cd2fa",
+  "gate": {
+    "passed": true,
+    "spec_sha256": "b6a050cdc505c1da98902bb0bfea760d7539a825f011f08273f67022267a1cf5",
+    "source_sha256": "c137dd8563dde84a3a36c1068c66c896855af873b4a08778bd3f5f9a44cf4e2e",
+    "inputs": [
+      {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match102-000-fc5d3ee431f8.mp4",
+        "sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a"
+      },
+      {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_image.pth.tar",
+        "sha256": "b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302"
+      },
+      {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_video_htl.pth.tar",
+        "sha256": "934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3"
+      }
+    ],
+    "validation": {
+      "passed": true,
+      "checks": {
+        "source": true,
+        "cadence": true,
+        "count": true,
+        "native": true,
+        "allocator": true,
+        "packet": true,
+        "rate": true,
+        "raw": true,
+        "repeat": true,
+        "forecast": true
+      },
+      "forecast_seconds": 287.0508769798471
+    },
+    "validator_seconds": 0.670952558517456,
+    "smoke_seconds": 38.50015592575073,
+    "remaining_seconds": 500.9760465621948,
+    "attempt": 1
+  },
+  "campaign_error": {
+    "error": "full failed with exit code 1",
+    "updated": 1795345043.6907713
+  }
+}

@@ -8,10 +8,12 @@ import hashlib
 import json
 import math
 from pathlib import Path
+import struct
 import subprocess
 import tarfile
 import tempfile
 import time
+import zlib
 
 import cv2
 import numpy as np
@@ -19,6 +21,7 @@ import torch
 
 from experiments.tennis import common_player_packet as packet
 from experiments.tennis.k4b_pose import player_masks
+from experiments.tennis.player_requalification import array_sha
 from src.codecs import quality, svtav1
 from src.pointstream.tracked_patch import yuv_to_rgb
 from src.segmentation.masks import ClipMasks
@@ -108,8 +111,36 @@ def control_catalog(a):
     return rows
 
 
+class SealedRgbSequence:
+    def __init__(self, path, receipt):
+        self.file = path.open("rb")
+        self.rows = receipt["rows"]
+        assert receipt["ticks"] == list(range(240)) and len(self.rows) == 240
+        self.index = 0
+
+    def __getitem__(self, tick):
+        assert tick == self.index
+        length = struct.unpack(">I", self.file.read(4))[0]
+        assert length + 4 == self.rows[tick]["wire_bytes"]
+        frame = np.frombuffer(zlib.decompress(self.file.read(length)), dtype=np.uint8).reshape(
+            1080, 1920, 3
+        )
+        assert array_sha(frame) == self.rows[tick]["frame_sha256"]
+        self.index += 1
+        if self.index == 240:
+            assert self.file.read(1) == b""
+            self.file.close()
+        return frame
+
+
 def prep(a, arm, work):
     w, h = arm["width"], arm["height"]
+    if arm["kind"] == "rgb_zseq":
+        path = Path(arm["path"])
+        assert sha(path) == arm["sha256"] and sha(Path(arm["receipt"])) == arm["receipt_sha256"]
+        receipt = json.loads(Path(arm["receipt"]).read_text())
+        assert receipt["frames_sha256"] == arm["sha256"]
+        return SealedRgbSequence(path, receipt), arm["sha256"]
     if arm["kind"] == "rgb_npy":
         path = Path(arm["path"])
         assert sha(path) == arm["sha256"]
@@ -178,7 +209,7 @@ def score(a, arm, model, support, support_hash):
             rgb = cv2.cvtColor(picture, cv2.COLOR_BGR2RGB)
             im = (
                 display[t]
-                if arm["kind"] == "rgb_npy"
+                if arm["kind"] in ("rgb_npy", "rgb_zseq")
                 else cv2.resize(
                     yuv_to_rgb(display[t], w, h, False), (1920, 1080), interpolation=cv2.INTER_CUBIC
                 )
