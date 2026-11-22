@@ -68,12 +68,28 @@ def run(args):
     tracker.net.register_forward_hook(finite)
     fps = Fraction(args.fps)
     all_frames = source(args.source, args.total, fps)
-    context = chunks.prepare_context(all_frames)
     n = 24 if args.pilot else args.total
     frames = all_frames[:n]
+    intervals = [{"start": 0, "stop": n, "predicted": "court"}]
+    if args.route is not None:
+        registered = json.loads(args.route.read_text())
+        assert registered["source_sha256"] == args.source_sha256
+        assert registered["native_fps"] == [fps.numerator, fps.denominator]
+        intervals = registered["shots"]
+        assert [i for s in intervals for i in range(s["start"], s["stop"])] == list(range(n))
+    fallback = [
+        i for s in intervals if s["predicted"] == "non_court" for i in range(s["start"], s["stop"])
+    ]
     setup = time.monotonic() - began
     inference_start = time.monotonic()
-    raw = chunks.predict(tracker, context, 0, n)
+    raw = [(False, 0.0, 0.0)] * n
+    for shot in intervals:
+        lo, hi = shot["start"], shot["stop"]
+        if shot["predicted"] == "court":
+            context = chunks.prepare_context(all_frames if args.pilot else frames[lo:hi])
+            raw[lo:hi] = chunks.predict(tracker, context, 0, hi - lo)
+        else:
+            assert shot["predicted"] == "non_court"
     inference = time.monotonic() - inference_start
     if args.pilot:
         assert raw == chunks.predict(tracker, context, 0, 12) + chunks.predict(
@@ -105,6 +121,8 @@ def run(args):
     (fit,) = k5c_independent_ball.fit_streak(
         k5b1b.track_of(positions, (H, W)), frames, [decoded], (H, W)
     )
+    for tick in fallback:
+        fit["track"][tick] = fit["appearances"][tick] = None
     rendered = k5c_independent_ball.render_frames(decoded, fit["track"], fit["appearances"])
     guard = k5d_encoder.pooled_psnr(frames, rendered) < k5d_encoder.pooled_psnr(frames, decoded)
     track, appearance = ([None] * n, [None] * n) if guard else (fit["track"], fit["appearances"])
@@ -151,6 +169,7 @@ def run(args):
         rgb = np.stack([cv2.resize(img, (W, H), interpolation=cv2.INTER_CUBIC) for img in yy])
         composed = k5c_independent_ball.render_frames(rgb, track, appearance)
         assert composed.shape == (n, H, W, 3)
+        assert all(np.array_equal(composed[tick], rgb[tick]) for tick in fallback)
         rates.append(
             dict(
                 ceiling=ceiling,
@@ -179,6 +198,9 @@ def run(args):
         guard=bool(guard),
         ball_positions=track,
         payload_bytes=len(payload),
+        intervals=intervals,
+        fallback_ticks=len(fallback),
+        fallback_rgb_equals_native_base=True,
         packet_arms=rates,
         setup_wall_s=setup,
         inference_wall_s=inference,
@@ -205,7 +227,10 @@ if __name__ == "__main__":
     p.add_argument("--total", type=int, required=True)
     p.add_argument("--fps", default="25/1")
     p.add_argument("--pilot", action="store_true")
+    p.add_argument("--route", type=Path)
     a = p.parse_args()
+    if a.pilot and a.route is not None:
+        p.error("select either the initial prefix smoke or one complete verified route")
     if not a.pilot and a.av1 is None:
         p.error("full pilot needs the existing baseline directory")
     run(a)
