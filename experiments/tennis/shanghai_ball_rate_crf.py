@@ -68,7 +68,7 @@ def run(a):
         subprocess.run(command, check=True, capture_output=True, timeout=150)
         assert src.stat().st_size == a.frames * width * height * 3 // 2
         for kind in (a.arm,):
-            lower, upper = 160, (300 if a.arm == "ball" else 280)
+            lower, upper = 160, 280
             seen = set()
             records = []
             for iteration in range(10 if a.frames == 240 else 2):
