@@ -120,25 +120,27 @@ def main(a):
                 distance_ladders[label][codec] = anchor_sensitivity(
                     curve, [(r["bytes"], -r["dists"]) for r in anchors]
                 )
-        for r in joint_rows:
-            per_rung[r["name"]] = {}
-            for label, surcharge in ceilings.items():
-                limit = r["bytes"] + surcharge - qty["joint_bytes"]
-                comps = {}
-                for codec in ("SVT-AV1", "SVT-AV1 ROI", "DCVC-UF"):
-                    eligible = [b for b in bank if b["codec"] == codec and b["bytes"] <= limit]
-                    if not eligible:
-                        continue
-                    best = min(eligible, key=lambda b: (b["dists"], b["bytes"]))
-                    comps[codec] = dict(
-                        name=best["name"],
-                        bytes=best["bytes"],
-                        dists=best["dists"],
-                        relative_percent_lower=100 * (1 - r["dists"] / best["dists"]),
-                    )
-                per_rung[r["name"]][label] = dict(ceiling_bytes=limit, controls=comps)
+    for r in joint_rows:
+        per_rung[r["name"]] = {}
+        for label, surcharge in ceilings.items():
+            limit = r["bytes"] + surcharge - qty["joint_bytes"]
+            comps = {}
+            for codec in ("SVT-AV1", "SVT-AV1 ROI", "DCVC-UF"):
+                eligible = [b for b in bank if b["codec"] == codec and b["bytes"] <= limit]
+                if not eligible:
+                    continue
+                best = min(eligible, key=lambda b: (b["dists"], b["bytes"]))
+                comps[codec] = dict(
+                    name=best["name"],
+                    bytes=best["bytes"],
+                    dists=best["dists"],
+                    relative_percent_lower=100 * (1 - r["dists"] / best["dists"]),
+                )
+            per_rung[r["name"]][label] = dict(ceiling_bytes=limit, controls=comps)
     result = dict(
         body_dists_bd_rate=distance_ladders,
+        measured_joint_settings=len(joint_rows),
+        bd_rate_scope="At least three verified candidate settings and overlapping quality are required for this figure",
         strict_at_each_rung=per_rung,
         source=paid["source_sha256"],
         native_frames=240,

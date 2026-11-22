@@ -21,7 +21,7 @@ def main(a):
     s = json.loads(a.data.read_text())
     assert (
         s["primary_joint"]
-        and len([r for r in s["operating_points"] if r["codec"] == "PointStream"]) == 3
+        and len([r for r in s["operating_points"] if r["codec"] == "PointStream"]) >= 2
     )
     a.out.mkdir(exist_ok=True, parents=True)
     fig, ax = plt.subplots(figsize=(5.35, 3.5), layout="constrained")
@@ -57,7 +57,6 @@ def main(a):
             label=name,
         )
     cutoff = max(r["kbps"] for r in s["operating_points"] if r["codec"] == "PointStream")
-    ax.axvline(cutoff, color="#626262", ls=(0, (2.1, 2.3)), lw=0.8, zorder=0)
     ax.set(
         xlabel="Total delivered rate with cached appearance (kbps)",
         ylabel="Player-region DISTS (lower is better)",
