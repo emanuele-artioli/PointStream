@@ -1,0 +1,5468 @@
+{
+  "review_sha256": "c84557742507709e219f2be71bd3a7bb534640c31ff9b471ab9ca037c372e962",
+  "scorer_sha256": "cd8103b8762c0c61b177e0d1780041ca5062c2b1e70db4306b8573f97945d45d",
+  "ball_delivery_summary_sha256": "c3594ccb34dc4d9066fd2038f1e5a73b5b324a0f783ed1dd4ef5662c5bac77b8",
+  "matched_controls_sha256": "95fab7d1cf5ad91fcdedc092ab1fb995a7ad1d2562dd310d18f1a38cf7949d94",
+  "counts": {
+    "absent_independent": 15,
+    "visible_independent": 9,
+    "visible_assisted": 24
+  },
+  "accepted_masks": 88,
+  "model_sha256": {
+    "DISTS": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+    "LPIPS": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02"
+  },
+  "rows": [
+    {
+      "rally": "v006_p0014",
+      "tick": 6,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.41286247968673706,
+              "lpips": 0.5416209101676941,
+              "luma_ssim": 0.42795885709833287,
+              "rgb_psnr": 16.852903251641848
+            },
+            {
+              "dists": 0.41142553091049194,
+              "lpips": 0.421273410320282,
+              "luma_ssim": 0.46016670645449775,
+              "rgb_psnr": 17.302221203904793
+            }
+          ],
+          "remainder_psnr": 24.24491598335073
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.41286247968673706,
+              "lpips": 0.5416209101676941,
+              "luma_ssim": 0.42795885709833287,
+              "rgb_psnr": 16.852903251641848
+            },
+            {
+              "dists": 0.41142553091049194,
+              "lpips": 0.421273410320282,
+              "luma_ssim": 0.46016670645449775,
+              "rgb_psnr": 17.302221203904793
+            }
+          ],
+          "remainder_psnr": 24.24491598335073
+        }
+      }
+    },
+    {
+      "rally": "v006_p0014",
+      "tick": 19,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3820419907569885,
+              "lpips": 0.4664047658443451,
+              "luma_ssim": 0.5123842389389385,
+              "rgb_psnr": 17.793141338507453
+            },
+            {
+              "dists": 0.4349939823150635,
+              "lpips": 0.48362603783607483,
+              "luma_ssim": 0.25139077513871316,
+              "rgb_psnr": 15.605035204887447
+            }
+          ],
+          "remainder_psnr": 24.372568818757575
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3820419907569885,
+              "lpips": 0.4664047658443451,
+              "luma_ssim": 0.5123842389389385,
+              "rgb_psnr": 17.793141338507453
+            },
+            {
+              "dists": 0.4349939823150635,
+              "lpips": 0.48362603783607483,
+              "luma_ssim": 0.25139077513871316,
+              "rgb_psnr": 15.605035204887447
+            }
+          ],
+          "remainder_psnr": 24.372568818757575
+        }
+      }
+    },
+    {
+      "rally": "v006_p0014",
+      "tick": 33,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3618890047073364,
+              "lpips": 0.44849395751953125,
+              "luma_ssim": 0.5648976090058091,
+              "rgb_psnr": 18.503285456695668
+            },
+            {
+              "dists": 0.39288783073425293,
+              "lpips": 0.38814038038253784,
+              "luma_ssim": 0.474873652132909,
+              "rgb_psnr": 17.479484536541186
+            }
+          ],
+          "ball": {
+            "dists": 0.33920443058013916,
+            "lpips": 0.3593512773513794,
+            "luma_ssim": 0.6280183534789964,
+            "rgb_psnr": 21.175688291404178
+          },
+          "remainder_psnr": 24.145326364317018
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3618890047073364,
+              "lpips": 0.44849395751953125,
+              "luma_ssim": 0.5648976090058091,
+              "rgb_psnr": 18.503285456695668
+            },
+            {
+              "dists": 0.39288783073425293,
+              "lpips": 0.38814038038253784,
+              "luma_ssim": 0.474873652132909,
+              "rgb_psnr": 17.479484536541186
+            }
+          ],
+          "ball": {
+            "dists": 0.33920443058013916,
+            "lpips": 0.3593512773513794,
+            "luma_ssim": 0.6280183534789964,
+            "rgb_psnr": 21.175688291404178
+          },
+          "remainder_psnr": 24.145326364317018
+        }
+      }
+    },
+    {
+      "rally": "v006_p0014",
+      "tick": 46,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.36451125144958496,
+              "lpips": 0.44628605246543884,
+              "luma_ssim": 0.5406871461154207,
+              "rgb_psnr": 17.88943409213908
+            },
+            {
+              "dists": 0.4061124920845032,
+              "lpips": 0.42712172865867615,
+              "luma_ssim": 0.2873239157819319,
+              "rgb_psnr": 15.320581586578658
+            }
+          ],
+          "ball": {
+            "dists": 0.3633739948272705,
+            "lpips": 0.3361974060535431,
+            "luma_ssim": 0.5535832648445778,
+            "rgb_psnr": 19.508180672159735
+          },
+          "remainder_psnr": 24.164416428329574
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.36451125144958496,
+              "lpips": 0.44628605246543884,
+              "luma_ssim": 0.5406871461154207,
+              "rgb_psnr": 17.88943409213908
+            },
+            {
+              "dists": 0.4061124920845032,
+              "lpips": 0.42712172865867615,
+              "luma_ssim": 0.2873239157819319,
+              "rgb_psnr": 15.320581586578658
+            }
+          ],
+          "ball": {
+            "dists": 0.3633739948272705,
+            "lpips": 0.3361974060535431,
+            "luma_ssim": 0.5535832648445778,
+            "rgb_psnr": 19.508180672159735
+          },
+          "remainder_psnr": 24.164416428329574
+        }
+      }
+    },
+    {
+      "rally": "v006_p0014",
+      "tick": 59,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.5297747484747821,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3919559121131897,
+              "lpips": 0.5123333930969238,
+              "luma_ssim": 0.48678042981049313,
+              "rgb_psnr": 17.115463738131705
+            },
+            {
+              "dists": 0.45563793182373047,
+              "lpips": 0.612634539604187,
+              "luma_ssim": 0.207232847661781,
+              "rgb_psnr": 14.279229705483989
+            }
+          ],
+          "ball": {
+            "dists": 0.34835922718048096,
+            "lpips": 0.3803623914718628,
+            "luma_ssim": 0.7303396920745802,
+            "rgb_psnr": 24.265014274051072
+          },
+          "remainder_psnr": 24.473682855615635
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3919559121131897,
+              "lpips": 0.5123333930969238,
+              "luma_ssim": 0.48678042981049313,
+              "rgb_psnr": 17.115463738131705
+            },
+            {
+              "dists": 0.45563793182373047,
+              "lpips": 0.612634539604187,
+              "luma_ssim": 0.207232847661781,
+              "rgb_psnr": 14.279229705483989
+            }
+          ],
+          "ball": {
+            "dists": 0.3142569661140442,
+            "lpips": 0.12394373118877411,
+            "luma_ssim": 0.7536006557604014,
+            "rgb_psnr": 26.030414083595424
+          },
+          "remainder_psnr": 24.473682855615635
+        }
+      }
+    },
+    {
+      "rally": "v006_p0014",
+      "tick": 72,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.44117647058823195,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.35784804821014404,
+              "lpips": 0.5008277297019958,
+              "luma_ssim": 0.439914541424992,
+              "rgb_psnr": 16.505998116976624
+            },
+            {
+              "dists": 0.4707462787628174,
+              "lpips": 0.6012978553771973,
+              "luma_ssim": 0.14844100167492266,
+              "rgb_psnr": 14.462170404825672
+            }
+          ],
+          "ball": {
+            "dists": 0.3609344959259033,
+            "lpips": 0.3991241455078125,
+            "luma_ssim": 0.6096595156548645,
+            "rgb_psnr": 22.525299584863383
+          },
+          "remainder_psnr": 24.493802454088957
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.35784804821014404,
+              "lpips": 0.5008277297019958,
+              "luma_ssim": 0.439914541424992,
+              "rgb_psnr": 16.505998116976624
+            },
+            {
+              "dists": 0.4707462787628174,
+              "lpips": 0.6012978553771973,
+              "luma_ssim": 0.14844100167492266,
+              "rgb_psnr": 14.462170404825672
+            }
+          ],
+          "ball": {
+            "dists": 0.35217195749282837,
+            "lpips": 0.21847398579120636,
+            "luma_ssim": 0.634350306842774,
+            "rgb_psnr": 23.36236519277701
+          },
+          "remainder_psnr": 24.493802454088957
+        }
+      }
+    },
+    {
+      "rally": "v006_p0014",
+      "tick": 86,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.33848385297315975,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.39741843938827515,
+              "lpips": 0.5558481812477112,
+              "luma_ssim": 0.28243931006357154,
+              "rgb_psnr": 13.559367740009565
+            },
+            {
+              "dists": 0.449798583984375,
+              "lpips": 0.6970860362052917,
+              "luma_ssim": 0.217792760957341,
+              "rgb_psnr": 15.341701903762042
+            }
+          ],
+          "ball": {
+            "dists": 0.3230404853820801,
+            "lpips": 0.3475317060947418,
+            "luma_ssim": 0.7260368453000402,
+            "rgb_psnr": 26.93954153476612
+          },
+          "remainder_psnr": 24.550126888426334
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.39741843938827515,
+              "lpips": 0.5558481812477112,
+              "luma_ssim": 0.28243931006357154,
+              "rgb_psnr": 13.559367740009565
+            },
+            {
+              "dists": 0.449798583984375,
+              "lpips": 0.6970860362052917,
+              "luma_ssim": 0.217792760957341,
+              "rgb_psnr": 15.341701903762042
+            }
+          ],
+          "ball": {
+            "dists": 0.29032331705093384,
+            "lpips": 0.2111257165670395,
+            "luma_ssim": 0.7454841052745893,
+            "rgb_psnr": 27.35504588084911
+          },
+          "remainder_psnr": 24.550126888426334
+        }
+      }
+    },
+    {
+      "rally": "v006_p0014",
+      "tick": 99,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.4015490412712097,
+              "lpips": 0.6370797753334045,
+              "luma_ssim": 0.36213981122469346,
+              "rgb_psnr": 15.410078847761554
+            },
+            {
+              "dists": 0.4606572389602661,
+              "lpips": 0.6390911340713501,
+              "luma_ssim": 0.15738161020379432,
+              "rgb_psnr": 14.541438072840906
+            }
+          ],
+          "remainder_psnr": 24.479538405807915
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.4015490412712097,
+              "lpips": 0.6370797753334045,
+              "luma_ssim": 0.36213981122469346,
+              "rgb_psnr": 15.410078847761554
+            },
+            {
+              "dists": 0.4606572389602661,
+              "lpips": 0.6390911340713501,
+              "luma_ssim": 0.15738161020379432,
+              "rgb_psnr": 14.541438072840906
+            }
+          ],
+          "remainder_psnr": 24.479538405807915
+        }
+      }
+    },
+    {
+      "rally": "v006_p0014",
+      "tick": 6,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3822534680366516,
+              "lpips": 0.4973454177379608,
+              "luma_ssim": 0.44168425549403295,
+              "rgb_psnr": 17.31611968905532
+            },
+            {
+              "dists": 0.350680410861969,
+              "lpips": 0.2789972126483917,
+              "luma_ssim": 0.5735429097620599,
+              "rgb_psnr": 18.586409223015153
+            }
+          ],
+          "remainder_psnr": 25.525337451765473
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3822534680366516,
+              "lpips": 0.4973454177379608,
+              "luma_ssim": 0.44168425549403295,
+              "rgb_psnr": 17.31611968905532
+            },
+            {
+              "dists": 0.350680410861969,
+              "lpips": 0.2789972126483917,
+              "luma_ssim": 0.5735429097620599,
+              "rgb_psnr": 18.586409223015153
+            }
+          ],
+          "remainder_psnr": 25.525337451765473
+        }
+      }
+    },
+    {
+      "rally": "v006_p0014",
+      "tick": 19,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.35174161195755005,
+              "lpips": 0.4382691979408264,
+              "luma_ssim": 0.5495419220801706,
+              "rgb_psnr": 18.441720493162286
+            },
+            {
+              "dists": 0.4069223999977112,
+              "lpips": 0.3309547007083893,
+              "luma_ssim": 0.32065030664330674,
+              "rgb_psnr": 16.06171696137673
+            }
+          ],
+          "remainder_psnr": 25.675565194658123
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.35174161195755005,
+              "lpips": 0.4382691979408264,
+              "luma_ssim": 0.5495419220801706,
+              "rgb_psnr": 18.441720493162286
+            },
+            {
+              "dists": 0.4069223999977112,
+              "lpips": 0.3309547007083893,
+              "luma_ssim": 0.32065030664330674,
+              "rgb_psnr": 16.06171696137673
+            }
+          ],
+          "remainder_psnr": 25.675565194658123
+        }
+      }
+    },
+    {
+      "rally": "v006_p0014",
+      "tick": 33,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.33084636926651,
+              "lpips": 0.38503125309944153,
+              "luma_ssim": 0.650072824600445,
+              "rgb_psnr": 19.7097702091516
+            },
+            {
+              "dists": 0.3529008626937866,
+              "lpips": 0.33045846223831177,
+              "luma_ssim": 0.5363523317566539,
+              "rgb_psnr": 18.63538720962239
+            }
+          ],
+          "ball": {
+            "dists": 0.2928617000579834,
+            "lpips": 0.2549279034137726,
+            "luma_ssim": 0.6842612498981702,
+            "rgb_psnr": 22.30478582770524
+          },
+          "remainder_psnr": 25.336767483434997
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.33084636926651,
+              "lpips": 0.38503125309944153,
+              "luma_ssim": 0.650072824600445,
+              "rgb_psnr": 19.7097702091516
+            },
+            {
+              "dists": 0.3529008626937866,
+              "lpips": 0.33045846223831177,
+              "luma_ssim": 0.5363523317566539,
+              "rgb_psnr": 18.63538720962239
+            }
+          ],
+          "ball": {
+            "dists": 0.2928617000579834,
+            "lpips": 0.2549279034137726,
+            "luma_ssim": 0.6842612498981702,
+            "rgb_psnr": 22.30478582770524
+          },
+          "remainder_psnr": 25.336767483434997
+        }
+      }
+    },
+    {
+      "rally": "v006_p0014",
+      "tick": 46,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3394118547439575,
+              "lpips": 0.40881863236427307,
+              "luma_ssim": 0.6033952806925158,
+              "rgb_psnr": 19.03924630019237
+            },
+            {
+              "dists": 0.36328834295272827,
+              "lpips": 0.378950834274292,
+              "luma_ssim": 0.41230580334554695,
+              "rgb_psnr": 17.105834553036164
+            }
+          ],
+          "ball": {
+            "dists": 0.2839709520339966,
+            "lpips": 0.2792986035346985,
+            "luma_ssim": 0.6445162455786285,
+            "rgb_psnr": 20.883217612145767
+          },
+          "remainder_psnr": 25.295945561046047
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3394118547439575,
+              "lpips": 0.40881863236427307,
+              "luma_ssim": 0.6033952806925158,
+              "rgb_psnr": 19.03924630019237
+            },
+            {
+              "dists": 0.36328834295272827,
+              "lpips": 0.378950834274292,
+              "luma_ssim": 0.41230580334554695,
+              "rgb_psnr": 17.105834553036164
+            }
+          ],
+          "ball": {
+            "dists": 0.2839709520339966,
+            "lpips": 0.2792986035346985,
+            "luma_ssim": 0.6445162455786285,
+            "rgb_psnr": 20.883217612145767
+          },
+          "remainder_psnr": 25.295945561046047
+        }
+      }
+    },
+    {
+      "rally": "v006_p0014",
+      "tick": 59,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.5297747484747821,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3711041212081909,
+              "lpips": 0.5177534222602844,
+              "luma_ssim": 0.5451455053335137,
+              "rgb_psnr": 18.04641678979652
+            },
+            {
+              "dists": 0.4436432123184204,
+              "lpips": 0.5753724575042725,
+              "luma_ssim": 0.15518941703965847,
+              "rgb_psnr": 13.90284153509918
+            }
+          ],
+          "ball": {
+            "dists": 0.3148837685585022,
+            "lpips": 0.33374977111816406,
+            "luma_ssim": 0.7697085299830622,
+            "rgb_psnr": 24.913404804141884
+          },
+          "remainder_psnr": 25.701296162012547
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3711041212081909,
+              "lpips": 0.5177534222602844,
+              "luma_ssim": 0.5451455053335137,
+              "rgb_psnr": 18.04641678979652
+            },
+            {
+              "dists": 0.4436432123184204,
+              "lpips": 0.5753724575042725,
+              "luma_ssim": 0.15518941703965847,
+              "rgb_psnr": 13.90284153509918
+            }
+          ],
+          "ball": {
+            "dists": 0.26678258180618286,
+            "lpips": 0.0994945615530014,
+            "luma_ssim": 0.7930058799043332,
+            "rgb_psnr": 27.213736263603963
+          },
+          "remainder_psnr": 25.701296162012547
+        }
+      }
+    },
+    {
+      "rally": "v006_p0014",
+      "tick": 72,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.44117647058823195,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.34286588430404663,
+              "lpips": 0.4818967282772064,
+              "luma_ssim": 0.45999754519046704,
+              "rgb_psnr": 17.185047660109138
+            },
+            {
+              "dists": 0.4380224347114563,
+              "lpips": 0.5043998956680298,
+              "luma_ssim": 0.18298604113658745,
+              "rgb_psnr": 14.701077177826964
+            }
+          ],
+          "ball": {
+            "dists": 0.28099822998046875,
+            "lpips": 0.2501745820045471,
+            "luma_ssim": 0.695937310711294,
+            "rgb_psnr": 23.419952643124123
+          },
+          "remainder_psnr": 25.65973641939111
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.34286588430404663,
+              "lpips": 0.4818967282772064,
+              "luma_ssim": 0.45999754519046704,
+              "rgb_psnr": 17.185047660109138
+            },
+            {
+              "dists": 0.4380224347114563,
+              "lpips": 0.5043998956680298,
+              "luma_ssim": 0.18298604113658745,
+              "rgb_psnr": 14.701077177826964
+            }
+          ],
+          "ball": {
+            "dists": 0.25097692012786865,
+            "lpips": 0.12317876517772675,
+            "luma_ssim": 0.721581297307988,
+            "rgb_psnr": 24.629341232948867
+          },
+          "remainder_psnr": 25.65973641939111
+        }
+      }
+    },
+    {
+      "rally": "v006_p0014",
+      "tick": 86,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.33848385297315975,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.41569745540618896,
+              "lpips": 0.5259177684783936,
+              "luma_ssim": 0.28222086617279213,
+              "rgb_psnr": 13.634644308861132
+            },
+            {
+              "dists": 0.4446142911911011,
+              "lpips": 0.5637637972831726,
+              "luma_ssim": 0.2406014896725728,
+              "rgb_psnr": 15.685471867485774
+            }
+          ],
+          "ball": {
+            "dists": 0.3047518730163574,
+            "lpips": 0.30560070276260376,
+            "luma_ssim": 0.7520465011933678,
+            "rgb_psnr": 27.954625567502752
+          },
+          "remainder_psnr": 25.75194917438992
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.41569745540618896,
+              "lpips": 0.5259177684783936,
+              "luma_ssim": 0.28222086617279213,
+              "rgb_psnr": 13.634644308861132
+            },
+            {
+              "dists": 0.4446142911911011,
+              "lpips": 0.5637637972831726,
+              "luma_ssim": 0.2406014896725728,
+              "rgb_psnr": 15.685471867485774
+            }
+          ],
+          "ball": {
+            "dists": 0.2710503339767456,
+            "lpips": 0.17632894217967987,
+            "luma_ssim": 0.7731670720274326,
+            "rgb_psnr": 28.674125063118872
+          },
+          "remainder_psnr": 25.75194917438992
+        }
+      }
+    },
+    {
+      "rally": "v006_p0014",
+      "tick": 99,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3933703899383545,
+              "lpips": 0.6310387253761292,
+              "luma_ssim": 0.4073335328653775,
+              "rgb_psnr": 16.003821061876145
+            },
+            {
+              "dists": 0.450425922870636,
+              "lpips": 0.48359429836273193,
+              "luma_ssim": 0.16421695788300777,
+              "rgb_psnr": 14.419569239608109
+            }
+          ],
+          "remainder_psnr": 25.671216459438146
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3933703899383545,
+              "lpips": 0.6310387253761292,
+              "luma_ssim": 0.4073335328653775,
+              "rgb_psnr": 16.003821061876145
+            },
+            {
+              "dists": 0.450425922870636,
+              "lpips": 0.48359429836273193,
+              "luma_ssim": 0.16421695788300777,
+              "rgb_psnr": 14.419569239608109
+            }
+          ],
+          "remainder_psnr": 25.671216459438146
+        }
+      }
+    },
+    {
+      "rally": "v006_p0041",
+      "tick": 8,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3647409677505493,
+              "lpips": 0.38996949791908264,
+              "luma_ssim": 0.572707486024046,
+              "rgb_psnr": 17.817001829951803
+            },
+            {
+              "dists": 0.3603975772857666,
+              "lpips": 0.33455294370651245,
+              "luma_ssim": 0.5357738614573813,
+              "rgb_psnr": 18.122976755010235
+            }
+          ],
+          "ball": {
+            "dists": 0.3168678879737854,
+            "lpips": 0.2498469352722168,
+            "luma_ssim": 0.6553383439479841,
+            "rgb_psnr": 21.096050282831918
+          },
+          "remainder_psnr": 27.553863372467546
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3647409677505493,
+              "lpips": 0.38996949791908264,
+              "luma_ssim": 0.572707486024046,
+              "rgb_psnr": 17.817001829951803
+            },
+            {
+              "dists": 0.3603975772857666,
+              "lpips": 0.33455294370651245,
+              "luma_ssim": 0.5357738614573813,
+              "rgb_psnr": 18.122976755010235
+            }
+          ],
+          "ball": {
+            "dists": 0.3168678879737854,
+            "lpips": 0.2498469352722168,
+            "luma_ssim": 0.6553383439479841,
+            "rgb_psnr": 21.096050282831918
+          },
+          "remainder_psnr": 27.553863372467546
+        }
+      }
+    },
+    {
+      "rally": "v006_p0041",
+      "tick": 24,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3536418080329895,
+              "lpips": 0.40317898988723755,
+              "luma_ssim": 0.5754496932182486,
+              "rgb_psnr": 17.878319498305586
+            },
+            {
+              "dists": 0.37719184160232544,
+              "lpips": 0.29145193099975586,
+              "luma_ssim": 0.5466171188412707,
+              "rgb_psnr": 17.733601466342797
+            }
+          ],
+          "ball": {
+            "dists": 0.332950234413147,
+            "lpips": 0.2578328549861908,
+            "luma_ssim": 0.6971153919442967,
+            "rgb_psnr": 21.447134054155473
+          },
+          "remainder_psnr": 27.470523963420934
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3536418080329895,
+              "lpips": 0.40317898988723755,
+              "luma_ssim": 0.5754496932182486,
+              "rgb_psnr": 17.878319498305586
+            },
+            {
+              "dists": 0.37719184160232544,
+              "lpips": 0.29145193099975586,
+              "luma_ssim": 0.5466171188412707,
+              "rgb_psnr": 17.733601466342797
+            }
+          ],
+          "ball": {
+            "dists": 0.332950234413147,
+            "lpips": 0.2578328549861908,
+            "luma_ssim": 0.6971153919442967,
+            "rgb_psnr": 21.447134054155473
+          },
+          "remainder_psnr": 27.470523963420934
+        }
+      }
+    },
+    {
+      "rally": "v006_p0041",
+      "tick": 41,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.35350412130355835,
+              "lpips": 0.38418668508529663,
+              "luma_ssim": 0.5890839503002676,
+              "rgb_psnr": 18.191523505150855
+            },
+            {
+              "dists": 0.40936601161956787,
+              "lpips": 0.37075141072273254,
+              "luma_ssim": 0.3084896550629616,
+              "rgb_psnr": 15.362675102268401
+            }
+          ],
+          "remainder_psnr": 27.48387781016349
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.35350412130355835,
+              "lpips": 0.38418668508529663,
+              "luma_ssim": 0.5890839503002676,
+              "rgb_psnr": 18.191523505150855
+            },
+            {
+              "dists": 0.40936601161956787,
+              "lpips": 0.37075141072273254,
+              "luma_ssim": 0.3084896550629616,
+              "rgb_psnr": 15.362675102268401
+            }
+          ],
+          "remainder_psnr": 27.48387781016349
+        }
+      }
+    },
+    {
+      "rally": "v006_p0041",
+      "tick": 57,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3479926586151123,
+              "lpips": 0.3763187527656555,
+              "luma_ssim": 0.6212855557966762,
+              "rgb_psnr": 19.009553905551865
+            },
+            {
+              "dists": 0.3797151446342468,
+              "lpips": 0.30246731638908386,
+              "luma_ssim": 0.3573901543180723,
+              "rgb_psnr": 15.925831255621317
+            }
+          ],
+          "remainder_psnr": 27.574120656918133
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3479926586151123,
+              "lpips": 0.3763187527656555,
+              "luma_ssim": 0.6212855557966762,
+              "rgb_psnr": 19.009553905551865
+            },
+            {
+              "dists": 0.3797151446342468,
+              "lpips": 0.30246731638908386,
+              "luma_ssim": 0.3573901543180723,
+              "rgb_psnr": 15.925831255621317
+            }
+          ],
+          "remainder_psnr": 27.574120656918133
+        }
+      }
+    },
+    {
+      "rally": "v006_p0041",
+      "tick": 74,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.5766839674451932,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.35258781909942627,
+              "lpips": 0.40863218903541565,
+              "luma_ssim": 0.6123582492373759,
+              "rgb_psnr": 18.840794249773264
+            },
+            {
+              "dists": 0.44377201795578003,
+              "lpips": 0.5101131796836853,
+              "luma_ssim": 0.23806752547684132,
+              "rgb_psnr": 15.072169217644733
+            }
+          ],
+          "ball": {
+            "dists": 0.32621586322784424,
+            "lpips": 0.35828983783721924,
+            "luma_ssim": 0.8182132499336928,
+            "rgb_psnr": 26.156615944322347
+          },
+          "remainder_psnr": 27.652763433159816
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.35258781909942627,
+              "lpips": 0.40863218903541565,
+              "luma_ssim": 0.6123582492373759,
+              "rgb_psnr": 18.840794249773264
+            },
+            {
+              "dists": 0.44377201795578003,
+              "lpips": 0.5101131796836853,
+              "luma_ssim": 0.23806752547684132,
+              "rgb_psnr": 15.072169217644733
+            }
+          ],
+          "ball": {
+            "dists": 0.2751989960670471,
+            "lpips": 0.10305172204971313,
+            "luma_ssim": 0.8388265303757141,
+            "rgb_psnr": 28.135874750921204
+          },
+          "remainder_psnr": 27.652763433159816
+        }
+      }
+    },
+    {
+      "rally": "v006_p0041",
+      "tick": 90,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.391789043189945,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3801528215408325,
+              "lpips": 0.3936549723148346,
+              "luma_ssim": 0.47129078287499815,
+              "rgb_psnr": 17.111395801046317
+            },
+            {
+              "dists": 0.3933382034301758,
+              "lpips": 0.4283832907676697,
+              "luma_ssim": 0.15732169080446107,
+              "rgb_psnr": 14.385545669426588
+            }
+          ],
+          "ball": {
+            "dists": 0.3499770164489746,
+            "lpips": 0.359142005443573,
+            "luma_ssim": 0.834939518992424,
+            "rgb_psnr": 26.30648896462969
+          },
+          "remainder_psnr": 27.730353397942267
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3801528215408325,
+              "lpips": 0.3936549723148346,
+              "luma_ssim": 0.47129078287499815,
+              "rgb_psnr": 17.111395801046317
+            },
+            {
+              "dists": 0.3933382034301758,
+              "lpips": 0.4283832907676697,
+              "luma_ssim": 0.15732169080446107,
+              "rgb_psnr": 14.385545669426588
+            }
+          ],
+          "ball": {
+            "dists": 0.2850598692893982,
+            "lpips": 0.06122642010450363,
+            "luma_ssim": 0.8579602737582135,
+            "rgb_psnr": 29.045141916278865
+          },
+          "remainder_psnr": 27.730353397942267
+        }
+      }
+    },
+    {
+      "rally": "v006_p0041",
+      "tick": 107,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.29411764705884025,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.4935375452041626,
+              "lpips": 0.7145100831985474,
+              "luma_ssim": 0.266248433906176,
+              "rgb_psnr": 13.662397337393337
+            },
+            {
+              "dists": 0.43280094861984253,
+              "lpips": 0.5463178157806396,
+              "luma_ssim": 0.18317043847586284,
+              "rgb_psnr": 14.89477032494544
+            }
+          ],
+          "ball": {
+            "dists": 0.3028085231781006,
+            "lpips": 0.256654292345047,
+            "luma_ssim": 0.7707859319487609,
+            "rgb_psnr": 28.273577938723427
+          },
+          "remainder_psnr": 27.797137379943155
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.4935375452041626,
+              "lpips": 0.7145100831985474,
+              "luma_ssim": 0.266248433906176,
+              "rgb_psnr": 13.662397337393337
+            },
+            {
+              "dists": 0.43280094861984253,
+              "lpips": 0.5463178157806396,
+              "luma_ssim": 0.18317043847586284,
+              "rgb_psnr": 14.89477032494544
+            }
+          ],
+          "ball": {
+            "dists": 0.25775885581970215,
+            "lpips": 0.1572740375995636,
+            "luma_ssim": 0.7869868490023861,
+            "rgb_psnr": 28.892468774757198
+          },
+          "remainder_psnr": 27.797137379943155
+        }
+      }
+    },
+    {
+      "rally": "v006_p0041",
+      "tick": 123,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.48777663707733154,
+              "lpips": 0.8051474094390869,
+              "luma_ssim": 0.37980953507557824,
+              "rgb_psnr": 15.10539392091301
+            },
+            {
+              "dists": 0.3953227996826172,
+              "lpips": 0.49769386649131775,
+              "luma_ssim": 0.3565524005783433,
+              "rgb_psnr": 15.79652155028098
+            }
+          ],
+          "remainder_psnr": 27.352433819233415
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.48777663707733154,
+              "lpips": 0.8051474094390869,
+              "luma_ssim": 0.37980953507557824,
+              "rgb_psnr": 15.10539392091301
+            },
+            {
+              "dists": 0.3953227996826172,
+              "lpips": 0.49769386649131775,
+              "luma_ssim": 0.3565524005783433,
+              "rgb_psnr": 15.79652155028098
+            }
+          ],
+          "remainder_psnr": 27.352433819233415
+        }
+      }
+    },
+    {
+      "rally": "v006_p0041",
+      "tick": 8,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3647409677505493,
+              "lpips": 0.38996949791908264,
+              "luma_ssim": 0.572707486024046,
+              "rgb_psnr": 17.817001829951803
+            },
+            {
+              "dists": 0.3603975772857666,
+              "lpips": 0.33455294370651245,
+              "luma_ssim": 0.5357738614573813,
+              "rgb_psnr": 18.122976755010235
+            }
+          ],
+          "ball": {
+            "dists": 0.3168678879737854,
+            "lpips": 0.2498469352722168,
+            "luma_ssim": 0.6553383439479841,
+            "rgb_psnr": 21.096050282831918
+          },
+          "remainder_psnr": 27.553863372467546
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3647409677505493,
+              "lpips": 0.38996949791908264,
+              "luma_ssim": 0.572707486024046,
+              "rgb_psnr": 17.817001829951803
+            },
+            {
+              "dists": 0.3603975772857666,
+              "lpips": 0.33455294370651245,
+              "luma_ssim": 0.5357738614573813,
+              "rgb_psnr": 18.122976755010235
+            }
+          ],
+          "ball": {
+            "dists": 0.3168678879737854,
+            "lpips": 0.2498469352722168,
+            "luma_ssim": 0.6553383439479841,
+            "rgb_psnr": 21.096050282831918
+          },
+          "remainder_psnr": 27.553863372467546
+        }
+      }
+    },
+    {
+      "rally": "v006_p0041",
+      "tick": 24,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3536418080329895,
+              "lpips": 0.40317898988723755,
+              "luma_ssim": 0.5754496932182486,
+              "rgb_psnr": 17.878319498305586
+            },
+            {
+              "dists": 0.37719184160232544,
+              "lpips": 0.29145193099975586,
+              "luma_ssim": 0.5466171188412707,
+              "rgb_psnr": 17.733601466342797
+            }
+          ],
+          "ball": {
+            "dists": 0.332950234413147,
+            "lpips": 0.2578328549861908,
+            "luma_ssim": 0.6971153919442967,
+            "rgb_psnr": 21.447134054155473
+          },
+          "remainder_psnr": 27.470523963420934
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3536418080329895,
+              "lpips": 0.40317898988723755,
+              "luma_ssim": 0.5754496932182486,
+              "rgb_psnr": 17.878319498305586
+            },
+            {
+              "dists": 0.37719184160232544,
+              "lpips": 0.29145193099975586,
+              "luma_ssim": 0.5466171188412707,
+              "rgb_psnr": 17.733601466342797
+            }
+          ],
+          "ball": {
+            "dists": 0.332950234413147,
+            "lpips": 0.2578328549861908,
+            "luma_ssim": 0.6971153919442967,
+            "rgb_psnr": 21.447134054155473
+          },
+          "remainder_psnr": 27.470523963420934
+        }
+      }
+    },
+    {
+      "rally": "v006_p0041",
+      "tick": 41,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.35350412130355835,
+              "lpips": 0.38418668508529663,
+              "luma_ssim": 0.5890839503002676,
+              "rgb_psnr": 18.191523505150855
+            },
+            {
+              "dists": 0.40936601161956787,
+              "lpips": 0.37075141072273254,
+              "luma_ssim": 0.3084896550629616,
+              "rgb_psnr": 15.362675102268401
+            }
+          ],
+          "remainder_psnr": 27.48387781016349
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.35350412130355835,
+              "lpips": 0.38418668508529663,
+              "luma_ssim": 0.5890839503002676,
+              "rgb_psnr": 18.191523505150855
+            },
+            {
+              "dists": 0.40936601161956787,
+              "lpips": 0.37075141072273254,
+              "luma_ssim": 0.3084896550629616,
+              "rgb_psnr": 15.362675102268401
+            }
+          ],
+          "remainder_psnr": 27.48387781016349
+        }
+      }
+    },
+    {
+      "rally": "v006_p0041",
+      "tick": 57,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3479926586151123,
+              "lpips": 0.3763187527656555,
+              "luma_ssim": 0.6212855557966762,
+              "rgb_psnr": 19.009553905551865
+            },
+            {
+              "dists": 0.3797151446342468,
+              "lpips": 0.30246731638908386,
+              "luma_ssim": 0.3573901543180723,
+              "rgb_psnr": 15.925831255621317
+            }
+          ],
+          "remainder_psnr": 27.574120656918133
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3479926586151123,
+              "lpips": 0.3763187527656555,
+              "luma_ssim": 0.6212855557966762,
+              "rgb_psnr": 19.009553905551865
+            },
+            {
+              "dists": 0.3797151446342468,
+              "lpips": 0.30246731638908386,
+              "luma_ssim": 0.3573901543180723,
+              "rgb_psnr": 15.925831255621317
+            }
+          ],
+          "remainder_psnr": 27.574120656918133
+        }
+      }
+    },
+    {
+      "rally": "v006_p0041",
+      "tick": 74,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.5766839674451932,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.35258781909942627,
+              "lpips": 0.40863218903541565,
+              "luma_ssim": 0.6123582492373759,
+              "rgb_psnr": 18.840794249773264
+            },
+            {
+              "dists": 0.44377201795578003,
+              "lpips": 0.5101131796836853,
+              "luma_ssim": 0.23806752547684132,
+              "rgb_psnr": 15.072169217644733
+            }
+          ],
+          "ball": {
+            "dists": 0.32621586322784424,
+            "lpips": 0.35828983783721924,
+            "luma_ssim": 0.8182132499336928,
+            "rgb_psnr": 26.156615944322347
+          },
+          "remainder_psnr": 27.652763433159816
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.35258781909942627,
+              "lpips": 0.40863218903541565,
+              "luma_ssim": 0.6123582492373759,
+              "rgb_psnr": 18.840794249773264
+            },
+            {
+              "dists": 0.44377201795578003,
+              "lpips": 0.5101131796836853,
+              "luma_ssim": 0.23806752547684132,
+              "rgb_psnr": 15.072169217644733
+            }
+          ],
+          "ball": {
+            "dists": 0.2751989960670471,
+            "lpips": 0.10305172204971313,
+            "luma_ssim": 0.8388265303757141,
+            "rgb_psnr": 28.135874750921204
+          },
+          "remainder_psnr": 27.652763433159816
+        }
+      }
+    },
+    {
+      "rally": "v006_p0041",
+      "tick": 90,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.391789043189945,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3801528215408325,
+              "lpips": 0.3936549723148346,
+              "luma_ssim": 0.47129078287499815,
+              "rgb_psnr": 17.111395801046317
+            },
+            {
+              "dists": 0.3933382034301758,
+              "lpips": 0.4283832907676697,
+              "luma_ssim": 0.15732169080446107,
+              "rgb_psnr": 14.385545669426588
+            }
+          ],
+          "ball": {
+            "dists": 0.3499770164489746,
+            "lpips": 0.359142005443573,
+            "luma_ssim": 0.834939518992424,
+            "rgb_psnr": 26.30648896462969
+          },
+          "remainder_psnr": 27.730353397942267
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3801528215408325,
+              "lpips": 0.3936549723148346,
+              "luma_ssim": 0.47129078287499815,
+              "rgb_psnr": 17.111395801046317
+            },
+            {
+              "dists": 0.3933382034301758,
+              "lpips": 0.4283832907676697,
+              "luma_ssim": 0.15732169080446107,
+              "rgb_psnr": 14.385545669426588
+            }
+          ],
+          "ball": {
+            "dists": 0.2850598692893982,
+            "lpips": 0.06122642010450363,
+            "luma_ssim": 0.8579602737582135,
+            "rgb_psnr": 29.045141916278865
+          },
+          "remainder_psnr": 27.730353397942267
+        }
+      }
+    },
+    {
+      "rally": "v006_p0041",
+      "tick": 107,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.29411764705884025,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.4935375452041626,
+              "lpips": 0.7145100831985474,
+              "luma_ssim": 0.266248433906176,
+              "rgb_psnr": 13.662397337393337
+            },
+            {
+              "dists": 0.43280094861984253,
+              "lpips": 0.5463178157806396,
+              "luma_ssim": 0.18317043847586284,
+              "rgb_psnr": 14.89477032494544
+            }
+          ],
+          "ball": {
+            "dists": 0.3028085231781006,
+            "lpips": 0.256654292345047,
+            "luma_ssim": 0.7707859319487609,
+            "rgb_psnr": 28.273577938723427
+          },
+          "remainder_psnr": 27.797137379943155
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.4935375452041626,
+              "lpips": 0.7145100831985474,
+              "luma_ssim": 0.266248433906176,
+              "rgb_psnr": 13.662397337393337
+            },
+            {
+              "dists": 0.43280094861984253,
+              "lpips": 0.5463178157806396,
+              "luma_ssim": 0.18317043847586284,
+              "rgb_psnr": 14.89477032494544
+            }
+          ],
+          "ball": {
+            "dists": 0.25775885581970215,
+            "lpips": 0.1572740375995636,
+            "luma_ssim": 0.7869868490023861,
+            "rgb_psnr": 28.892468774757198
+          },
+          "remainder_psnr": 27.797137379943155
+        }
+      }
+    },
+    {
+      "rally": "v006_p0041",
+      "tick": 123,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.48777663707733154,
+              "lpips": 0.8051474094390869,
+              "luma_ssim": 0.37980953507557824,
+              "rgb_psnr": 15.10539392091301
+            },
+            {
+              "dists": 0.3953227996826172,
+              "lpips": 0.49769386649131775,
+              "luma_ssim": 0.3565524005783433,
+              "rgb_psnr": 15.79652155028098
+            }
+          ],
+          "remainder_psnr": 27.352433819233415
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.48777663707733154,
+              "lpips": 0.8051474094390869,
+              "luma_ssim": 0.37980953507557824,
+              "rgb_psnr": 15.10539392091301
+            },
+            {
+              "dists": 0.3953227996826172,
+              "lpips": 0.49769386649131775,
+              "luma_ssim": 0.3565524005783433,
+              "rgb_psnr": 15.79652155028098
+            }
+          ],
+          "remainder_psnr": 27.352433819233415
+        }
+      }
+    },
+    {
+      "rally": "v006_p0068",
+      "tick": 9,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.38388192653656006,
+              "lpips": 0.5314925909042358,
+              "luma_ssim": 0.4164432731596269,
+              "rgb_psnr": 17.08295065994738
+            },
+            {
+              "dists": 0.44667142629623413,
+              "lpips": 0.4528366029262543,
+              "luma_ssim": 0.2616221731407739,
+              "rgb_psnr": 15.953678823721614
+            }
+          ],
+          "remainder_psnr": 24.452536570172295
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.38388192653656006,
+              "lpips": 0.5314925909042358,
+              "luma_ssim": 0.4164432731596269,
+              "rgb_psnr": 17.08295065994738
+            },
+            {
+              "dists": 0.44667142629623413,
+              "lpips": 0.4528366029262543,
+              "luma_ssim": 0.2616221731407739,
+              "rgb_psnr": 15.953678823721614
+            }
+          ],
+          "remainder_psnr": 24.452536570172295
+        }
+      }
+    },
+    {
+      "rally": "v006_p0068",
+      "tick": 27,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3612613081932068,
+              "lpips": 0.46787646412849426,
+              "luma_ssim": 0.510283149639549,
+              "rgb_psnr": 18.33459227045973
+            },
+            {
+              "dists": 0.45526087284088135,
+              "lpips": 0.45342788100242615,
+              "luma_ssim": 0.23340407577905883,
+              "rgb_psnr": 15.46237848235406
+            }
+          ],
+          "remainder_psnr": 24.47798167515807
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3612613081932068,
+              "lpips": 0.46787646412849426,
+              "luma_ssim": 0.510283149639549,
+              "rgb_psnr": 18.33459227045973
+            },
+            {
+              "dists": 0.45526087284088135,
+              "lpips": 0.45342788100242615,
+              "luma_ssim": 0.23340407577905883,
+              "rgb_psnr": 15.46237848235406
+            }
+          ],
+          "remainder_psnr": 24.47798167515807
+        }
+      }
+    },
+    {
+      "rally": "v006_p0068",
+      "tick": 45,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.3333333333333144,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.37031280994415283,
+              "lpips": 0.4838797152042389,
+              "luma_ssim": 0.5324216471669181,
+              "rgb_psnr": 18.453904671772225
+            },
+            {
+              "dists": 0.45764392614364624,
+              "lpips": 0.5080586671829224,
+              "luma_ssim": 0.18188518915993873,
+              "rgb_psnr": 14.598912550182598
+            }
+          ],
+          "ball": {
+            "dists": 0.29682356119155884,
+            "lpips": 0.17525964975357056,
+            "luma_ssim": 0.7338666711466152,
+            "rgb_psnr": 22.872335345404203
+          },
+          "remainder_psnr": 24.483333624291173
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.37031280994415283,
+              "lpips": 0.4838797152042389,
+              "luma_ssim": 0.5324216471669181,
+              "rgb_psnr": 18.453904671772225
+            },
+            {
+              "dists": 0.45764392614364624,
+              "lpips": 0.5080586671829224,
+              "luma_ssim": 0.18188518915993873,
+              "rgb_psnr": 14.598912550182598
+            }
+          ],
+          "ball": {
+            "dists": 0.2688600420951843,
+            "lpips": 0.11372817307710648,
+            "luma_ssim": 0.7564754689750579,
+            "rgb_psnr": 23.422763222472696
+          },
+          "remainder_psnr": 24.483333624291173
+        }
+      }
+    },
+    {
+      "rally": "v006_p0068",
+      "tick": 63,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.48546738835842057,
+      "accepted_masks": 1,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.4002572298049927,
+              "lpips": 0.48205888271331787,
+              "luma_ssim": 0.361566127556497,
+              "rgb_psnr": 16.151982986830063
+            }
+          ],
+          "ball": {
+            "dists": 0.31794029474258423,
+            "lpips": 0.2117624431848526,
+            "luma_ssim": 0.6490377631854494,
+            "rgb_psnr": 21.149711035363538
+          },
+          "remainder_psnr": 24.452249885636984
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.4002572298049927,
+              "lpips": 0.48205888271331787,
+              "luma_ssim": 0.361566127556497,
+              "rgb_psnr": 16.151982986830063
+            }
+          ],
+          "ball": {
+            "dists": 0.2946755290031433,
+            "lpips": 0.2010801136493683,
+            "luma_ssim": 0.657766997837506,
+            "rgb_psnr": 21.361466342141217
+          },
+          "remainder_psnr": 24.452249885636984
+        }
+      }
+    },
+    {
+      "rally": "v006_p0068",
+      "tick": 81,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.4705882352941444,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.5171149969100952,
+              "lpips": 0.6206043362617493,
+              "luma_ssim": 0.2689320063245384,
+              "rgb_psnr": 13.812656443048537
+            },
+            {
+              "dists": 0.47629183530807495,
+              "lpips": 0.6426421403884888,
+              "luma_ssim": 0.23326583320182884,
+              "rgb_psnr": 15.179118059291824
+            }
+          ],
+          "ball": {
+            "dists": 0.4253634214401245,
+            "lpips": 0.427325963973999,
+            "luma_ssim": 0.8048497994759712,
+            "rgb_psnr": 25.343628484525187
+          },
+          "remainder_psnr": 24.65913056424409
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.5172533392906189,
+              "lpips": 0.6192991137504578,
+              "luma_ssim": 0.2689320063245384,
+              "rgb_psnr": 13.812656443048537
+            },
+            {
+              "dists": 0.47629183530807495,
+              "lpips": 0.6426421403884888,
+              "luma_ssim": 0.23326583320182884,
+              "rgb_psnr": 15.179118059291824
+            }
+          ],
+          "ball": {
+            "dists": 0.34957069158554077,
+            "lpips": 0.21473979949951172,
+            "luma_ssim": 0.830700495867256,
+            "rgb_psnr": 26.093331856761054
+          },
+          "remainder_psnr": 24.65913056424409
+        }
+      }
+    },
+    {
+      "rally": "v006_p0068",
+      "tick": 99,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.377164393366143,
+      "accepted_masks": 1,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.4763696789741516,
+              "lpips": 0.6614875793457031,
+              "luma_ssim": 0.3322091760720187,
+              "rgb_psnr": 15.847138726018335
+            }
+          ],
+          "ball": {
+            "dists": 0.34246009588241577,
+            "lpips": 0.2402290254831314,
+            "luma_ssim": 0.7837546666459536,
+            "rgb_psnr": 25.201797587166777
+          },
+          "remainder_psnr": 24.566393059335713
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.4763696789741516,
+              "lpips": 0.6614875793457031,
+              "luma_ssim": 0.3322091760720187,
+              "rgb_psnr": 15.847138726018335
+            }
+          ],
+          "ball": {
+            "dists": 0.291354775428772,
+            "lpips": 0.15734905004501343,
+            "luma_ssim": 0.8035885829159544,
+            "rgb_psnr": 25.528489880037412
+          },
+          "remainder_psnr": 24.566393059335713
+        }
+      }
+    },
+    {
+      "rally": "v006_p0068",
+      "tick": 117,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.529774748474763,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.5096659660339355,
+              "lpips": 0.744502604007721,
+              "luma_ssim": 0.28089770716058177,
+              "rgb_psnr": 12.964761159177522
+            },
+            {
+              "dists": 0.4765391945838928,
+              "lpips": 0.7694252729415894,
+              "luma_ssim": 0.17794281956587946,
+              "rgb_psnr": 14.724839690992845
+            }
+          ],
+          "ball": {
+            "dists": 0.2613701820373535,
+            "lpips": 0.24064753949642181,
+            "luma_ssim": 0.7909669612874184,
+            "rgb_psnr": 25.40613992363038
+          },
+          "remainder_psnr": 24.616969339486474
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.5096659660339355,
+              "lpips": 0.744502604007721,
+              "luma_ssim": 0.28089770716058177,
+              "rgb_psnr": 12.964761159177522
+            },
+            {
+              "dists": 0.4765391945838928,
+              "lpips": 0.7694252729415894,
+              "luma_ssim": 0.17794281956587946,
+              "rgb_psnr": 14.724839690992845
+            }
+          ],
+          "ball": {
+            "dists": 0.23676574230194092,
+            "lpips": 0.14130976796150208,
+            "luma_ssim": 0.7946212279837989,
+            "rgb_psnr": 25.692517534272653
+          },
+          "remainder_psnr": 24.616969339486474
+        }
+      }
+    },
+    {
+      "rally": "v006_p0068",
+      "tick": 135,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 282.01397000361715,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.5966876745223999,
+              "lpips": 1.0001589059829712,
+              "luma_ssim": 0.2514012343221844,
+              "rgb_psnr": 13.51277965945551
+            },
+            {
+              "dists": 0.3666608929634094,
+              "lpips": 0.6573443412780762,
+              "luma_ssim": 0.4232387786503844,
+              "rgb_psnr": 17.666399030941612
+            }
+          ],
+          "ball": {
+            "dists": 0.283862829208374,
+            "lpips": 0.29291465878486633,
+            "luma_ssim": 0.6842744247995818,
+            "rgb_psnr": 22.9297867875921
+          },
+          "remainder_psnr": 25.18206433657489
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.5966876745223999,
+              "lpips": 1.0001589059829712,
+              "luma_ssim": 0.2514012343221844,
+              "rgb_psnr": 13.51277965945551
+            },
+            {
+              "dists": 0.36648476123809814,
+              "lpips": 0.6580690741539001,
+              "luma_ssim": 0.4232387786503844,
+              "rgb_psnr": 17.666399030941612
+            }
+          ],
+          "ball": {
+            "dists": 0.283862829208374,
+            "lpips": 0.29291465878486633,
+            "luma_ssim": 0.6842744247995818,
+            "rgb_psnr": 22.9297867875921
+          },
+          "remainder_psnr": 25.182299437111226
+        }
+      }
+    },
+    {
+      "rally": "v006_p0068",
+      "tick": 9,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3376395106315613,
+              "lpips": 0.4683895707130432,
+              "luma_ssim": 0.495428354398411,
+              "rgb_psnr": 18.030309726121057
+            },
+            {
+              "dists": 0.41938793659210205,
+              "lpips": 0.44782280921936035,
+              "luma_ssim": 0.28445250049188425,
+              "rgb_psnr": 16.259379686249787
+            }
+          ],
+          "remainder_psnr": 25.970411989025482
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3376395106315613,
+              "lpips": 0.4683895707130432,
+              "luma_ssim": 0.495428354398411,
+              "rgb_psnr": 18.030309726121057
+            },
+            {
+              "dists": 0.41938793659210205,
+              "lpips": 0.44782280921936035,
+              "luma_ssim": 0.28445250049188425,
+              "rgb_psnr": 16.259379686249787
+            }
+          ],
+          "remainder_psnr": 25.970411989025482
+        }
+      }
+    },
+    {
+      "rally": "v006_p0068",
+      "tick": 27,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3306537866592407,
+              "lpips": 0.39336079359054565,
+              "luma_ssim": 0.5828188624899798,
+              "rgb_psnr": 19.748756137295985
+            },
+            {
+              "dists": 0.41836732625961304,
+              "lpips": 0.5135892033576965,
+              "luma_ssim": 0.3288298643803635,
+              "rgb_psnr": 16.440523541553816
+            }
+          ],
+          "remainder_psnr": 25.937413437660986
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3306537866592407,
+              "lpips": 0.39336079359054565,
+              "luma_ssim": 0.5828188624899798,
+              "rgb_psnr": 19.748756137295985
+            },
+            {
+              "dists": 0.41836732625961304,
+              "lpips": 0.5135892033576965,
+              "luma_ssim": 0.3288298643803635,
+              "rgb_psnr": 16.440523541553816
+            }
+          ],
+          "remainder_psnr": 25.937413437660986
+        }
+      }
+    },
+    {
+      "rally": "v006_p0068",
+      "tick": 45,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.3333333333333144,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3233799338340759,
+              "lpips": 0.3846476376056671,
+              "luma_ssim": 0.6305164030924881,
+              "rgb_psnr": 19.91089546476682
+            },
+            {
+              "dists": 0.43070268630981445,
+              "lpips": 0.4465508460998535,
+              "luma_ssim": 0.21930698659311199,
+              "rgb_psnr": 14.869085390945067
+            }
+          ],
+          "ball": {
+            "dists": 0.2524482011795044,
+            "lpips": 0.12247880548238754,
+            "luma_ssim": 0.7996207346689151,
+            "rgb_psnr": 23.266866679405595
+          },
+          "remainder_psnr": 25.982302306753144
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3233799338340759,
+              "lpips": 0.3846476376056671,
+              "luma_ssim": 0.6305164030924881,
+              "rgb_psnr": 19.91089546476682
+            },
+            {
+              "dists": 0.43070268630981445,
+              "lpips": 0.4465508460998535,
+              "luma_ssim": 0.21930698659311199,
+              "rgb_psnr": 14.869085390945067
+            }
+          ],
+          "ball": {
+            "dists": 0.23237138986587524,
+            "lpips": 0.08171705901622772,
+            "luma_ssim": 0.8229362343022097,
+            "rgb_psnr": 23.886366131937624
+          },
+          "remainder_psnr": 25.982302306753144
+        }
+      }
+    },
+    {
+      "rally": "v006_p0068",
+      "tick": 63,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.48546738835842057,
+      "accepted_masks": 1,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3894062042236328,
+              "lpips": 0.5006844997406006,
+              "luma_ssim": 0.3631492866716027,
+              "rgb_psnr": 16.39548113070702
+            }
+          ],
+          "ball": {
+            "dists": 0.27502691745758057,
+            "lpips": 0.16862116754055023,
+            "luma_ssim": 0.7424964735363844,
+            "rgb_psnr": 21.810584420735367
+          },
+          "remainder_psnr": 25.914536988623293
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3894062042236328,
+              "lpips": 0.5006844997406006,
+              "luma_ssim": 0.3631492866716027,
+              "rgb_psnr": 16.39548113070702
+            }
+          ],
+          "ball": {
+            "dists": 0.256669282913208,
+            "lpips": 0.1697627305984497,
+            "luma_ssim": 0.7524274717668986,
+            "rgb_psnr": 22.10238491952001
+          },
+          "remainder_psnr": 25.914536988623293
+        }
+      }
+    },
+    {
+      "rally": "v006_p0068",
+      "tick": 81,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.4705882352941444,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.47663235664367676,
+              "lpips": 0.6299556493759155,
+              "luma_ssim": 0.2567821852721545,
+              "rgb_psnr": 14.726640183259367
+            },
+            {
+              "dists": 0.5030497312545776,
+              "lpips": 0.7103016376495361,
+              "luma_ssim": 0.299174965929452,
+              "rgb_psnr": 15.511587974339244
+            }
+          ],
+          "ball": {
+            "dists": 0.4332014322280884,
+            "lpips": 0.41092708706855774,
+            "luma_ssim": 0.8091292938036976,
+            "rgb_psnr": 25.50214430782053
+          },
+          "remainder_psnr": 25.99974257324186
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.47851741313934326,
+              "lpips": 0.6266955137252808,
+              "luma_ssim": 0.2567821852721545,
+              "rgb_psnr": 14.726640183259367
+            },
+            {
+              "dists": 0.5030497312545776,
+              "lpips": 0.7103016376495361,
+              "luma_ssim": 0.299174965929452,
+              "rgb_psnr": 15.511587974339244
+            }
+          ],
+          "ball": {
+            "dists": 0.35968703031539917,
+            "lpips": 0.2102053016424179,
+            "luma_ssim": 0.8350458090455993,
+            "rgb_psnr": 26.33057025118427
+          },
+          "remainder_psnr": 25.99974257324186
+        }
+      }
+    },
+    {
+      "rally": "v006_p0068",
+      "tick": 99,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.377164393366143,
+      "accepted_masks": 1,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.4337286353111267,
+              "lpips": 0.579649031162262,
+              "luma_ssim": 0.3532146628022135,
+              "rgb_psnr": 16.26901734346793
+            }
+          ],
+          "ball": {
+            "dists": 0.30119216442108154,
+            "lpips": 0.23014096915721893,
+            "luma_ssim": 0.7990270999525468,
+            "rgb_psnr": 26.0755269821206
+          },
+          "remainder_psnr": 26.070451321082015
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.4337286353111267,
+              "lpips": 0.579649031162262,
+              "luma_ssim": 0.3532146628022135,
+              "rgb_psnr": 16.26901734346793
+            }
+          ],
+          "ball": {
+            "dists": 0.26797086000442505,
+            "lpips": 0.14196762442588806,
+            "luma_ssim": 0.8189053034560775,
+            "rgb_psnr": 26.4897885183326
+          },
+          "remainder_psnr": 26.070451321082015
+        }
+      }
+    },
+    {
+      "rally": "v006_p0068",
+      "tick": 117,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.529774748474763,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.42844343185424805,
+              "lpips": 0.5891372561454773,
+              "luma_ssim": 0.3994092174874075,
+              "rgb_psnr": 15.533575684108229
+            },
+            {
+              "dists": 0.4837754964828491,
+              "lpips": 0.8331170678138733,
+              "luma_ssim": 0.20325294939340835,
+              "rgb_psnr": 15.077989455804437
+            }
+          ],
+          "ball": {
+            "dists": 0.2312116026878357,
+            "lpips": 0.21576228737831116,
+            "luma_ssim": 0.8248750262592532,
+            "rgb_psnr": 25.864586421464036
+          },
+          "remainder_psnr": 25.957032229519008
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.42844343185424805,
+              "lpips": 0.5891372561454773,
+              "luma_ssim": 0.3994092174874075,
+              "rgb_psnr": 15.533575684108229
+            },
+            {
+              "dists": 0.4837754964828491,
+              "lpips": 0.8331170678138733,
+              "luma_ssim": 0.20325294939340835,
+              "rgb_psnr": 15.077989455804437
+            }
+          ],
+          "ball": {
+            "dists": 0.21160799264907837,
+            "lpips": 0.13182827830314636,
+            "luma_ssim": 0.8280599160676226,
+            "rgb_psnr": 26.177512981348592
+          },
+          "remainder_psnr": 25.957032229519008
+        }
+      }
+    },
+    {
+      "rally": "v006_p0068",
+      "tick": 135,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 282.01397000361715,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.5108523368835449,
+              "lpips": 0.9349383115768433,
+              "luma_ssim": 0.3916470669600392,
+              "rgb_psnr": 15.124958543167255
+            },
+            {
+              "dists": 0.3714894652366638,
+              "lpips": 0.4800208508968353,
+              "luma_ssim": 0.5048597230815195,
+              "rgb_psnr": 18.342750886528016
+            }
+          ],
+          "ball": {
+            "dists": 0.2569851875305176,
+            "lpips": 0.24808759987354279,
+            "luma_ssim": 0.7425416115611359,
+            "rgb_psnr": 25.510955464883978
+          },
+          "remainder_psnr": 26.459451196819288
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.5108523368835449,
+              "lpips": 0.9349383115768433,
+              "luma_ssim": 0.3916470669600392,
+              "rgb_psnr": 15.124958543167255
+            },
+            {
+              "dists": 0.37568098306655884,
+              "lpips": 0.47976070642471313,
+              "luma_ssim": 0.5048597230815195,
+              "rgb_psnr": 18.342750886528016
+            }
+          ],
+          "ball": {
+            "dists": 0.2569851875305176,
+            "lpips": 0.24808759987354279,
+            "luma_ssim": 0.7425416115611359,
+            "rgb_psnr": 25.510955464883978
+          },
+          "remainder_psnr": 26.45974772967588
+        }
+      }
+    },
+    {
+      "rally": "v007_p0022",
+      "tick": 7,
+      "route": "non_court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 1,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.4646618962287903,
+              "lpips": 0.844246506690979,
+              "luma_ssim": 0.550034482535603,
+              "rgb_psnr": 17.862534079082806
+            }
+          ],
+          "ball": {
+            "dists": 0.44375813007354736,
+            "lpips": 0.6377832889556885,
+            "luma_ssim": 0.3583266651337538,
+            "rgb_psnr": 15.270494396418767
+          },
+          "remainder_psnr": 21.38145478389269
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.4646618962287903,
+              "lpips": 0.844246506690979,
+              "luma_ssim": 0.550034482535603,
+              "rgb_psnr": 17.862534079082806
+            }
+          ],
+          "ball": {
+            "dists": 0.44375813007354736,
+            "lpips": 0.6377832889556885,
+            "luma_ssim": 0.3583266651337538,
+            "rgb_psnr": 15.270494396418767
+          },
+          "remainder_psnr": 21.38145478389269
+        }
+      }
+    },
+    {
+      "rally": "v007_p0022",
+      "tick": 22,
+      "route": "non_court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 1,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.491827130317688,
+              "lpips": 0.8651061058044434,
+              "luma_ssim": 0.5234318844304029,
+              "rgb_psnr": 16.753174195410253
+            }
+          ],
+          "ball": {
+            "dists": 0.4347546100616455,
+            "lpips": 0.6796574592590332,
+            "luma_ssim": 0.293526085304746,
+            "rgb_psnr": 15.040315758825436
+          },
+          "remainder_psnr": 21.287861969346412
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.491827130317688,
+              "lpips": 0.8651061058044434,
+              "luma_ssim": 0.5234318844304029,
+              "rgb_psnr": 16.753174195410253
+            }
+          ],
+          "ball": {
+            "dists": 0.4347546100616455,
+            "lpips": 0.6796574592590332,
+            "luma_ssim": 0.293526085304746,
+            "rgb_psnr": 15.040315758825436
+          },
+          "remainder_psnr": 21.287861969346412
+        }
+      }
+    },
+    {
+      "rally": "v007_p0022",
+      "tick": 37,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.47149670124053955,
+              "lpips": 0.860930323600769,
+              "luma_ssim": 0.36945199170882753,
+              "rgb_psnr": 15.151806415138951
+            },
+            {
+              "dists": 0.5231891870498657,
+              "lpips": 0.7454795837402344,
+              "luma_ssim": 0.24631199695867873,
+              "rgb_psnr": 14.370642601254032
+            }
+          ],
+          "remainder_psnr": 24.438119849087066
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.47149670124053955,
+              "lpips": 0.860930323600769,
+              "luma_ssim": 0.36945199170882753,
+              "rgb_psnr": 15.151806415138951
+            },
+            {
+              "dists": 0.5231891870498657,
+              "lpips": 0.7454795837402344,
+              "luma_ssim": 0.24631199695867873,
+              "rgb_psnr": 14.370642601254032
+            }
+          ],
+          "remainder_psnr": 24.438119849087066
+        }
+      }
+    },
+    {
+      "rally": "v007_p0022",
+      "tick": 52,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.34481383127590015,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.47482192516326904,
+              "lpips": 0.9324821829795837,
+              "luma_ssim": 0.35692814713127624,
+              "rgb_psnr": 15.345692068880766
+            },
+            {
+              "dists": 0.4985894560813904,
+              "lpips": 0.7511704564094543,
+              "luma_ssim": 0.2281875936732201,
+              "rgb_psnr": 13.537063363919442
+            }
+          ],
+          "ball": {
+            "dists": 0.3275986313819885,
+            "lpips": 0.4207480549812317,
+            "luma_ssim": 0.6732148382284553,
+            "rgb_psnr": 21.95482332454224
+          },
+          "remainder_psnr": 24.09083557338765
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.47482192516326904,
+              "lpips": 0.9324821829795837,
+              "luma_ssim": 0.35692814713127624,
+              "rgb_psnr": 15.345692068880766
+            },
+            {
+              "dists": 0.4985894560813904,
+              "lpips": 0.7511704564094543,
+              "luma_ssim": 0.2281875936732201,
+              "rgb_psnr": 13.537063363919442
+            }
+          ],
+          "ball": {
+            "dists": 0.3179091811180115,
+            "lpips": 0.2957189977169037,
+            "luma_ssim": 0.6917795636989095,
+            "rgb_psnr": 22.541568567008127
+          },
+          "remainder_psnr": 24.09083557338765
+        }
+      }
+    },
+    {
+      "rally": "v007_p0022",
+      "tick": 67,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.3643314544326272,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.47853994369506836,
+              "lpips": 0.9824000597000122,
+              "luma_ssim": 0.3134487041451177,
+              "rgb_psnr": 14.353519245498527
+            },
+            {
+              "dists": 0.5035874843597412,
+              "lpips": 0.7162235379219055,
+              "luma_ssim": 0.22847389691211778,
+              "rgb_psnr": 14.387860448518081
+            }
+          ],
+          "ball": {
+            "dists": 0.3738611340522766,
+            "lpips": 0.3708224296569824,
+            "luma_ssim": 0.7673555992216071,
+            "rgb_psnr": 24.18506279485885
+          },
+          "remainder_psnr": 24.015046848860262
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.47853994369506836,
+              "lpips": 0.9824000597000122,
+              "luma_ssim": 0.3134487041451177,
+              "rgb_psnr": 14.353519245498527
+            },
+            {
+              "dists": 0.5035874843597412,
+              "lpips": 0.7162235379219055,
+              "luma_ssim": 0.22847389691211778,
+              "rgb_psnr": 14.387860448518081
+            }
+          ],
+          "ball": {
+            "dists": 0.30738770961761475,
+            "lpips": 0.1850479543209076,
+            "luma_ssim": 0.8037280814298915,
+            "rgb_psnr": 25.0081562030708
+          },
+          "remainder_psnr": 24.015046848860262
+        }
+      }
+    },
+    {
+      "rally": "v007_p0022",
+      "tick": 82,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.5297747484747272,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.5464658737182617,
+              "lpips": 0.9483236074447632,
+              "luma_ssim": 0.23438325503027937,
+              "rgb_psnr": 11.737399865115384
+            },
+            {
+              "dists": 0.4646499752998352,
+              "lpips": 0.9451470375061035,
+              "luma_ssim": 0.23682573291102874,
+              "rgb_psnr": 13.16345542499823
+            }
+          ],
+          "ball": {
+            "dists": 0.3968777060508728,
+            "lpips": 0.37002032995224,
+            "luma_ssim": 0.8282338857626836,
+            "rgb_psnr": 26.874331340306938
+          },
+          "remainder_psnr": 23.78465735802731
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.5464658737182617,
+              "lpips": 0.9483236074447632,
+              "luma_ssim": 0.23438325503027937,
+              "rgb_psnr": 11.737399865115384
+            },
+            {
+              "dists": 0.4646499752998352,
+              "lpips": 0.9451470375061035,
+              "luma_ssim": 0.23682573291102874,
+              "rgb_psnr": 13.16345542499823
+            }
+          ],
+          "ball": {
+            "dists": 0.32839274406433105,
+            "lpips": 0.19770243763923645,
+            "luma_ssim": 0.8451319378187327,
+            "rgb_psnr": 27.993073845782956
+          },
+          "remainder_psnr": 23.78465735802731
+        }
+      }
+    },
+    {
+      "rally": "v007_p0022",
+      "tick": 97,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.3534854191631718,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.5292463302612305,
+              "lpips": 0.8436992168426514,
+              "luma_ssim": 0.28466312355701473,
+              "rgb_psnr": 13.522020188247172
+            },
+            {
+              "dists": 0.5261470675468445,
+              "lpips": 0.9152119159698486,
+              "luma_ssim": 0.19051911781780018,
+              "rgb_psnr": 13.397836664049372
+            }
+          ],
+          "ball": {
+            "dists": 0.3763324022293091,
+            "lpips": 0.41356223821640015,
+            "luma_ssim": 0.8746189389808132,
+            "rgb_psnr": 25.518999991315713
+          },
+          "remainder_psnr": 24.254450099776165
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.5292463302612305,
+              "lpips": 0.8436992168426514,
+              "luma_ssim": 0.28466312355701473,
+              "rgb_psnr": 13.522020188247172
+            },
+            {
+              "dists": 0.5261470675468445,
+              "lpips": 0.9152119159698486,
+              "luma_ssim": 0.19051911781780018,
+              "rgb_psnr": 13.397836664049372
+            }
+          ],
+          "ball": {
+            "dists": 0.26735806465148926,
+            "lpips": 0.07811165601015091,
+            "luma_ssim": 0.9094235053740641,
+            "rgb_psnr": 29.424186522446597
+          },
+          "remainder_psnr": 24.254450099776165
+        }
+      }
+    },
+    {
+      "rally": "v007_p0022",
+      "tick": 112,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.5560994744300842,
+              "lpips": 0.9221314787864685,
+              "luma_ssim": 0.26030504354925366,
+              "rgb_psnr": 13.902495394196446
+            },
+            {
+              "dists": 0.45896267890930176,
+              "lpips": 0.8438444137573242,
+              "luma_ssim": 0.33611854495539717,
+              "rgb_psnr": 14.39066469100993
+            }
+          ],
+          "remainder_psnr": 23.340161060170935
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.5560994744300842,
+              "lpips": 0.9221314787864685,
+              "luma_ssim": 0.26030504354925366,
+              "rgb_psnr": 13.902495394196446
+            },
+            {
+              "dists": 0.45896267890930176,
+              "lpips": 0.8438444137573242,
+              "luma_ssim": 0.33611854495539717,
+              "rgb_psnr": 14.39066469100993
+            }
+          ],
+          "remainder_psnr": 23.340161060170935
+        }
+      }
+    },
+    {
+      "rally": "v007_p0022",
+      "tick": 7,
+      "route": "non_court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 1,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3812516927719116,
+              "lpips": 0.6951591968536377,
+              "luma_ssim": 0.5845485258859426,
+              "rgb_psnr": 19.404301903420926
+            }
+          ],
+          "ball": {
+            "dists": 0.4017544984817505,
+            "lpips": 0.6118946671485901,
+            "luma_ssim": 0.4028693238859984,
+            "rgb_psnr": 15.778154223424064
+          },
+          "remainder_psnr": 23.01678723016701
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3812516927719116,
+              "lpips": 0.6951591968536377,
+              "luma_ssim": 0.5845485258859426,
+              "rgb_psnr": 19.404301903420926
+            }
+          ],
+          "ball": {
+            "dists": 0.4017544984817505,
+            "lpips": 0.6118946671485901,
+            "luma_ssim": 0.4028693238859984,
+            "rgb_psnr": 15.778154223424064
+          },
+          "remainder_psnr": 23.01678723016701
+        },
+        "matched_av1": {
+          "players": [
+            {
+              "dists": 0.3660210371017456,
+              "lpips": 0.6757855415344238,
+              "luma_ssim": 0.6100094977356532,
+              "rgb_psnr": 19.668831581728462
+            }
+          ],
+          "ball": {
+            "dists": 0.39851415157318115,
+            "lpips": 0.6041526794433594,
+            "luma_ssim": 0.41529199543558193,
+            "rgb_psnr": 15.98938832409847
+          },
+          "remainder_psnr": 23.108368022580166
+        }
+      }
+    },
+    {
+      "rally": "v007_p0022",
+      "tick": 22,
+      "route": "non_court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 1,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3771529197692871,
+              "lpips": 0.6723319888114929,
+              "luma_ssim": 0.5562831726991099,
+              "rgb_psnr": 18.2242489779007
+            }
+          ],
+          "ball": {
+            "dists": 0.3743864893913269,
+            "lpips": 0.5964676737785339,
+            "luma_ssim": 0.19660908548314124,
+            "rgb_psnr": 15.381885059258341
+          },
+          "remainder_psnr": 22.869668608152764
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3771529197692871,
+              "lpips": 0.6723319888114929,
+              "luma_ssim": 0.5562831726991099,
+              "rgb_psnr": 18.2242489779007
+            }
+          ],
+          "ball": {
+            "dists": 0.3743864893913269,
+            "lpips": 0.5964676737785339,
+            "luma_ssim": 0.19660908548314124,
+            "rgb_psnr": 15.381885059258341
+          },
+          "remainder_psnr": 22.869668608152764
+        },
+        "matched_av1": {
+          "players": [
+            {
+              "dists": 0.3734755516052246,
+              "lpips": 0.6587913632392883,
+              "luma_ssim": 0.5630007483518183,
+              "rgb_psnr": 18.382657522111522
+            }
+          ],
+          "ball": {
+            "dists": 0.3881162405014038,
+            "lpips": 0.5715159177780151,
+            "luma_ssim": 0.24879692873723508,
+            "rgb_psnr": 16.05152108620921
+          },
+          "remainder_psnr": 22.929962691204828
+        }
+      }
+    },
+    {
+      "rally": "v007_p0022",
+      "tick": 37,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.4143869876861572,
+              "lpips": 0.7068042755126953,
+              "luma_ssim": 0.4521993856576563,
+              "rgb_psnr": 16.04275137184065
+            },
+            {
+              "dists": 0.4738271236419678,
+              "lpips": 0.655067503452301,
+              "luma_ssim": 0.3291048485252465,
+              "rgb_psnr": 15.769693217694844
+            }
+          ],
+          "remainder_psnr": 26.5119002963989
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.4143869876861572,
+              "lpips": 0.7068042755126953,
+              "luma_ssim": 0.4521993856576563,
+              "rgb_psnr": 16.04275137184065
+            },
+            {
+              "dists": 0.4738271236419678,
+              "lpips": 0.655067503452301,
+              "luma_ssim": 0.3291048485252465,
+              "rgb_psnr": 15.769693217694844
+            }
+          ],
+          "remainder_psnr": 26.5119002963989
+        },
+        "matched_av1": {
+          "players": [
+            {
+              "dists": 0.38081860542297363,
+              "lpips": 0.5977360010147095,
+              "luma_ssim": 0.46127272748742293,
+              "rgb_psnr": 16.599433722593584
+            },
+            {
+              "dists": 0.4705873131752014,
+              "lpips": 0.581202507019043,
+              "luma_ssim": 0.3443699222016813,
+              "rgb_psnr": 15.812073832553143
+            }
+          ],
+          "remainder_psnr": 26.678664174006382
+        }
+      }
+    },
+    {
+      "rally": "v007_p0022",
+      "tick": 52,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.34481383127590015,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.4183039665222168,
+              "lpips": 0.8199194669723511,
+              "luma_ssim": 0.41191311722765406,
+              "rgb_psnr": 16.01737790407273
+            },
+            {
+              "dists": 0.46588683128356934,
+              "lpips": 0.6407003998756409,
+              "luma_ssim": 0.2563705441750793,
+              "rgb_psnr": 14.608592556497568
+            }
+          ],
+          "ball": {
+            "dists": 0.3034474849700928,
+            "lpips": 0.3263809084892273,
+            "luma_ssim": 0.7053332494347754,
+            "rgb_psnr": 22.919636750948
+          },
+          "remainder_psnr": 26.079439170402093
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.4183039665222168,
+              "lpips": 0.8199194669723511,
+              "luma_ssim": 0.41191311722765406,
+              "rgb_psnr": 16.01737790407273
+            },
+            {
+              "dists": 0.46588683128356934,
+              "lpips": 0.6407003998756409,
+              "luma_ssim": 0.2563705441750793,
+              "rgb_psnr": 14.608592556497568
+            }
+          ],
+          "ball": {
+            "dists": 0.2856593132019043,
+            "lpips": 0.21812620759010315,
+            "luma_ssim": 0.7232379448973439,
+            "rgb_psnr": 23.600295400084022
+          },
+          "remainder_psnr": 26.079439170402093
+        },
+        "matched_av1": {
+          "players": [
+            {
+              "dists": 0.3991581201553345,
+              "lpips": 0.7189576625823975,
+              "luma_ssim": 0.430488793785824,
+              "rgb_psnr": 16.502152204691388
+            },
+            {
+              "dists": 0.46400076150894165,
+              "lpips": 0.5904533863067627,
+              "luma_ssim": 0.24359988179932107,
+              "rgb_psnr": 14.380578660061659
+            }
+          ],
+          "ball": {
+            "dists": 0.29152584075927734,
+            "lpips": 0.32703548669815063,
+            "luma_ssim": 0.7037530627472466,
+            "rgb_psnr": 22.927564605811085
+          },
+          "remainder_psnr": 26.169052713157903
+        }
+      }
+    },
+    {
+      "rally": "v007_p0022",
+      "tick": 67,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.3643314544326272,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.4447129964828491,
+              "lpips": 0.8238088488578796,
+              "luma_ssim": 0.355267760022119,
+              "rgb_psnr": 15.183118857468383
+            },
+            {
+              "dists": 0.4696025252342224,
+              "lpips": 0.5355184078216553,
+              "luma_ssim": 0.2189395585347249,
+              "rgb_psnr": 14.499455452074706
+            }
+          ],
+          "ball": {
+            "dists": 0.3334321975708008,
+            "lpips": 0.3529450297355652,
+            "luma_ssim": 0.7761105307104574,
+            "rgb_psnr": 24.58474121388191
+          },
+          "remainder_psnr": 25.988746258188954
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.4447129964828491,
+              "lpips": 0.8238088488578796,
+              "luma_ssim": 0.355267760022119,
+              "rgb_psnr": 15.183118857468383
+            },
+            {
+              "dists": 0.4696025252342224,
+              "lpips": 0.5355184078216553,
+              "luma_ssim": 0.2189395585347249,
+              "rgb_psnr": 14.499455452074706
+            }
+          ],
+          "ball": {
+            "dists": 0.2696431875228882,
+            "lpips": 0.20358619093894958,
+            "luma_ssim": 0.8121989344907083,
+            "rgb_psnr": 25.652744567690103
+          },
+          "remainder_psnr": 25.988746258188954
+        },
+        "matched_av1": {
+          "players": [
+            {
+              "dists": 0.4111156463623047,
+              "lpips": 0.7333872318267822,
+              "luma_ssim": 0.35410296221452764,
+              "rgb_psnr": 15.300281877185144
+            },
+            {
+              "dists": 0.46723926067352295,
+              "lpips": 0.5718919634819031,
+              "luma_ssim": 0.2255270446751624,
+              "rgb_psnr": 14.665499652220205
+            }
+          ],
+          "ball": {
+            "dists": 0.335080087184906,
+            "lpips": 0.39541804790496826,
+            "luma_ssim": 0.7541276527612957,
+            "rgb_psnr": 24.78864094346686
+          },
+          "remainder_psnr": 26.089196116842075
+        }
+      }
+    },
+    {
+      "rally": "v007_p0022",
+      "tick": 82,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.5297747484747272,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.4977998733520508,
+              "lpips": 0.7353854775428772,
+              "luma_ssim": 0.2127065429296323,
+              "rgb_psnr": 12.53713811336035
+            },
+            {
+              "dists": 0.4701964259147644,
+              "lpips": 0.675284206867218,
+              "luma_ssim": 0.2317889807778873,
+              "rgb_psnr": 13.439977249413484
+            }
+          ],
+          "ball": {
+            "dists": 0.388174831867218,
+            "lpips": 0.3700297474861145,
+            "luma_ssim": 0.8310952430975396,
+            "rgb_psnr": 26.175189621188647
+          },
+          "remainder_psnr": 26.025088219988994
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.4977998733520508,
+              "lpips": 0.7353854775428772,
+              "luma_ssim": 0.2127065429296323,
+              "rgb_psnr": 12.53713811336035
+            },
+            {
+              "dists": 0.4701964259147644,
+              "lpips": 0.675284206867218,
+              "luma_ssim": 0.2317889807778873,
+              "rgb_psnr": 13.439977249413484
+            }
+          ],
+          "ball": {
+            "dists": 0.31332045793533325,
+            "lpips": 0.1870560348033905,
+            "luma_ssim": 0.847890746756137,
+            "rgb_psnr": 27.324959118118073
+          },
+          "remainder_psnr": 26.025088219988994
+        },
+        "matched_av1": {
+          "players": [
+            {
+              "dists": 0.4894335865974426,
+              "lpips": 0.7525017261505127,
+              "luma_ssim": 0.23506031100418934,
+              "rgb_psnr": 12.367259428716102
+            },
+            {
+              "dists": 0.4747806787490845,
+              "lpips": 0.6549595594406128,
+              "luma_ssim": 0.2194549254375881,
+              "rgb_psnr": 13.345197391295763
+            }
+          ],
+          "ball": {
+            "dists": 0.4070454239845276,
+            "lpips": 0.36357471346855164,
+            "luma_ssim": 0.831424640173416,
+            "rgb_psnr": 26.1245902939333
+          },
+          "remainder_psnr": 25.99872775340147
+        }
+      }
+    },
+    {
+      "rally": "v007_p0022",
+      "tick": 97,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.3534854191631718,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.46146976947784424,
+              "lpips": 0.6348190307617188,
+              "luma_ssim": 0.3244215307137031,
+              "rgb_psnr": 14.728574333867961
+            },
+            {
+              "dists": 0.4967304468154907,
+              "lpips": 0.6820834875106812,
+              "luma_ssim": 0.20661760064303097,
+              "rgb_psnr": 13.814729512989842
+            }
+          ],
+          "ball": {
+            "dists": 0.38636618852615356,
+            "lpips": 0.42754578590393066,
+            "luma_ssim": 0.8822662077803255,
+            "rgb_psnr": 26.015396024136006
+          },
+          "remainder_psnr": 26.288787532583843
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.46146976947784424,
+              "lpips": 0.6348190307617188,
+              "luma_ssim": 0.3244215307137031,
+              "rgb_psnr": 14.728574333867961
+            },
+            {
+              "dists": 0.4967304468154907,
+              "lpips": 0.6820834875106812,
+              "luma_ssim": 0.20661760064303097,
+              "rgb_psnr": 13.814729512989842
+            }
+          ],
+          "ball": {
+            "dists": 0.24321353435516357,
+            "lpips": 0.0730070248246193,
+            "luma_ssim": 0.9165290837684028,
+            "rgb_psnr": 30.355681101059965
+          },
+          "remainder_psnr": 26.288787532583843
+        },
+        "matched_av1": {
+          "players": [
+            {
+              "dists": 0.46249520778656006,
+              "lpips": 0.6854095458984375,
+              "luma_ssim": 0.3985853873117877,
+              "rgb_psnr": 15.175714923747034
+            },
+            {
+              "dists": 0.5158247947692871,
+              "lpips": 0.7566399574279785,
+              "luma_ssim": 0.19476320883939588,
+              "rgb_psnr": 13.456010213677471
+            }
+          ],
+          "ball": {
+            "dists": 0.37340307235717773,
+            "lpips": 0.4296143054962158,
+            "luma_ssim": 0.8960773764594396,
+            "rgb_psnr": 26.304429794159965
+          },
+          "remainder_psnr": 26.220444082453884
+        }
+      }
+    },
+    {
+      "rally": "v007_p0022",
+      "tick": 112,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.46513116359710693,
+              "lpips": 0.6585355401039124,
+              "luma_ssim": 0.4083657427455015,
+              "rgb_psnr": 15.4791479364391
+            },
+            {
+              "dists": 0.426202654838562,
+              "lpips": 0.637024462223053,
+              "luma_ssim": 0.3803871027509869,
+              "rgb_psnr": 15.838200429125791
+            }
+          ],
+          "remainder_psnr": 25.393004316428758
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.46513116359710693,
+              "lpips": 0.6585355401039124,
+              "luma_ssim": 0.4083657427455015,
+              "rgb_psnr": 15.4791479364391
+            },
+            {
+              "dists": 0.426202654838562,
+              "lpips": 0.637024462223053,
+              "luma_ssim": 0.3803871027509869,
+              "rgb_psnr": 15.838200429125791
+            }
+          ],
+          "remainder_psnr": 25.393004316428758
+        },
+        "matched_av1": {
+          "players": [
+            {
+              "dists": 0.4757975935935974,
+              "lpips": 0.6176707148551941,
+              "luma_ssim": 0.42692121259419075,
+              "rgb_psnr": 15.396757291455927
+            },
+            {
+              "dists": 0.4276747703552246,
+              "lpips": 0.5818080306053162,
+              "luma_ssim": 0.37530751011494945,
+              "rgb_psnr": 15.912163754005524
+            }
+          ],
+          "remainder_psnr": 25.514824677421736
+        }
+      }
+    },
+    {
+      "rally": "v007_p0065",
+      "tick": 8,
+      "route": "non_court",
+      "ceiling_bps": 20400,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 1,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3015226125717163,
+              "lpips": 0.40936362743377686,
+              "luma_ssim": 0.8380934879815777,
+              "rgb_psnr": 24.17433551059976
+            }
+          ],
+          "remainder_psnr": 27.370188555284074
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3015226125717163,
+              "lpips": 0.40936362743377686,
+              "luma_ssim": 0.8380934879815777,
+              "rgb_psnr": 24.17433551059976
+            }
+          ],
+          "remainder_psnr": 27.370188555284074
+        }
+      }
+    },
+    {
+      "rally": "v007_p0065",
+      "tick": 25,
+      "route": "non_court",
+      "ceiling_bps": 20400,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 1,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3434385061264038,
+              "lpips": 0.43947598338127136,
+              "luma_ssim": 0.8373147235119737,
+              "rgb_psnr": 23.96524838482921
+            }
+          ],
+          "remainder_psnr": 27.123257369733516
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3434385061264038,
+              "lpips": 0.43947598338127136,
+              "luma_ssim": 0.8373147235119737,
+              "rgb_psnr": 23.96524838482921
+            }
+          ],
+          "remainder_psnr": 27.123257369733516
+        }
+      }
+    },
+    {
+      "rally": "v007_p0065",
+      "tick": 43,
+      "route": "non_court",
+      "ceiling_bps": 20400,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 1,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.35009509325027466,
+              "lpips": 0.4321199655532837,
+              "luma_ssim": 0.8201879099057606,
+              "rgb_psnr": 22.813505672841046
+            }
+          ],
+          "remainder_psnr": 27.523899027869362
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.35009509325027466,
+              "lpips": 0.4321199655532837,
+              "luma_ssim": 0.8201879099057606,
+              "rgb_psnr": 22.813505672841046
+            }
+          ],
+          "remainder_psnr": 27.523899027869362
+        }
+      }
+    },
+    {
+      "rally": "v007_p0065",
+      "tick": 60,
+      "route": "non_court",
+      "ceiling_bps": 20400,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 1,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3745849132537842,
+              "lpips": 0.37688449025154114,
+              "luma_ssim": 0.8958467819307319,
+              "rgb_psnr": 23.756672644300846
+            }
+          ],
+          "remainder_psnr": 27.148398278599124
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3745849132537842,
+              "lpips": 0.37688449025154114,
+              "luma_ssim": 0.8958467819307319,
+              "rgb_psnr": 23.756672644300846
+            }
+          ],
+          "remainder_psnr": 27.148398278599124
+        }
+      }
+    },
+    {
+      "rally": "v007_p0065",
+      "tick": 77,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.4080127852291444,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.44200289249420166,
+              "lpips": 0.7577029466629028,
+              "luma_ssim": 0.3518136968702471,
+              "rgb_psnr": 16.066249364712696
+            },
+            {
+              "dists": 0.5445337295532227,
+              "lpips": 0.6600930094718933,
+              "luma_ssim": 0.3234524706400613,
+              "rgb_psnr": 15.042091887243076
+            }
+          ],
+          "ball": {
+            "dists": 0.34197354316711426,
+            "lpips": 0.36635735630989075,
+            "luma_ssim": 0.689120190483231,
+            "rgb_psnr": 24.097113923780604
+          },
+          "remainder_psnr": 24.820805385749264
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.44200289249420166,
+              "lpips": 0.7577029466629028,
+              "luma_ssim": 0.3518136968702471,
+              "rgb_psnr": 16.066249364712696
+            },
+            {
+              "dists": 0.5445337295532227,
+              "lpips": 0.6600930094718933,
+              "luma_ssim": 0.3234524706400613,
+              "rgb_psnr": 15.042091887243076
+            }
+          ],
+          "ball": {
+            "dists": 0.31154853105545044,
+            "lpips": 0.19566775858402252,
+            "luma_ssim": 0.7088586520999212,
+            "rgb_psnr": 25.12270077363608
+          },
+          "remainder_psnr": 24.820805385749264
+        }
+      }
+    },
+    {
+      "rally": "v007_p0065",
+      "tick": 94,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.42565281070771566,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.5040323138237,
+              "lpips": 0.8408008217811584,
+              "luma_ssim": 0.29441263997837347,
+              "rgb_psnr": 13.541210344326391
+            },
+            {
+              "dists": 0.4471331238746643,
+              "lpips": 0.6287136673927307,
+              "luma_ssim": 0.40349170829129216,
+              "rgb_psnr": 17.10065511088607
+            }
+          ],
+          "ball": {
+            "dists": 0.2481367588043213,
+            "lpips": 0.20806023478507996,
+            "luma_ssim": 0.8264678548860669,
+            "rgb_psnr": 26.285317114192846
+          },
+          "remainder_psnr": 24.685922387899993
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.5040323138237,
+              "lpips": 0.8408008217811584,
+              "luma_ssim": 0.29441263997837347,
+              "rgb_psnr": 13.541210344326391
+            },
+            {
+              "dists": 0.4471331238746643,
+              "lpips": 0.6287136673927307,
+              "luma_ssim": 0.40349170829129216,
+              "rgb_psnr": 17.10065511088607
+            }
+          ],
+          "ball": {
+            "dists": 0.23735105991363525,
+            "lpips": 0.15771351754665375,
+            "luma_ssim": 0.8504538659593452,
+            "rgb_psnr": 26.576118692339126
+          },
+          "remainder_psnr": 24.685922387899993
+        }
+      }
+    },
+    {
+      "rally": "v007_p0065",
+      "tick": 112,
+      "route": "non_court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.4805428385734558,
+              "lpips": 0.7937559485435486,
+              "luma_ssim": 0.39819586606462043,
+              "rgb_psnr": 15.485800377624761
+            },
+            {
+              "dists": 0.42269277572631836,
+              "lpips": 0.46668481826782227,
+              "luma_ssim": 0.30478687200503296,
+              "rgb_psnr": 16.878499103917683
+            }
+          ],
+          "ball": {
+            "dists": 0.2691171169281006,
+            "lpips": 0.2727507948875427,
+            "luma_ssim": 0.8001619275045194,
+            "rgb_psnr": 28.509398705429426
+          },
+          "remainder_psnr": 25.518546787064697
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.4805428385734558,
+              "lpips": 0.7937559485435486,
+              "luma_ssim": 0.39819586606462043,
+              "rgb_psnr": 15.485800377624761
+            },
+            {
+              "dists": 0.42269277572631836,
+              "lpips": 0.46668481826782227,
+              "luma_ssim": 0.30478687200503296,
+              "rgb_psnr": 16.878499103917683
+            }
+          ],
+          "ball": {
+            "dists": 0.2691171169281006,
+            "lpips": 0.2727507948875427,
+            "luma_ssim": 0.8001619275045194,
+            "rgb_psnr": 28.509398705429426
+          },
+          "remainder_psnr": 25.518546787064697
+        }
+      }
+    },
+    {
+      "rally": "v007_p0065",
+      "tick": 129,
+      "route": "non_court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.45200246572494507,
+              "lpips": 0.716035008430481,
+              "luma_ssim": 0.34734431386605974,
+              "rgb_psnr": 15.629688916664904
+            },
+            {
+              "dists": 0.43375861644744873,
+              "lpips": 0.44966983795166016,
+              "luma_ssim": 0.36457112399975844,
+              "rgb_psnr": 16.58058631021792
+            }
+          ],
+          "ball": {
+            "dists": 0.23505616188049316,
+            "lpips": 0.3178791403770447,
+            "luma_ssim": 0.79208190007789,
+            "rgb_psnr": 25.942727529900232
+          },
+          "remainder_psnr": 24.21020689206948
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.45200246572494507,
+              "lpips": 0.716035008430481,
+              "luma_ssim": 0.34734431386605974,
+              "rgb_psnr": 15.629688916664904
+            },
+            {
+              "dists": 0.43375861644744873,
+              "lpips": 0.44966983795166016,
+              "luma_ssim": 0.36457112399975844,
+              "rgb_psnr": 16.58058631021792
+            }
+          ],
+          "ball": {
+            "dists": 0.23505616188049316,
+            "lpips": 0.3178791403770447,
+            "luma_ssim": 0.79208190007789,
+            "rgb_psnr": 25.942727529900232
+          },
+          "remainder_psnr": 24.21020689206948
+        }
+      }
+    },
+    {
+      "rally": "v007_p0065",
+      "tick": 8,
+      "route": "non_court",
+      "ceiling_bps": 33000,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 1,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.2634463906288147,
+              "lpips": 0.32211440801620483,
+              "luma_ssim": 0.8534286707431115,
+              "rgb_psnr": 25.57683480001641
+            }
+          ],
+          "remainder_psnr": 27.551328844736403
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.2634463906288147,
+              "lpips": 0.32211440801620483,
+              "luma_ssim": 0.8534286707431115,
+              "rgb_psnr": 25.57683480001641
+            }
+          ],
+          "remainder_psnr": 27.551328844736403
+        }
+      }
+    },
+    {
+      "rally": "v007_p0065",
+      "tick": 25,
+      "route": "non_court",
+      "ceiling_bps": 33000,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 1,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.30581414699554443,
+              "lpips": 0.37225547432899475,
+              "luma_ssim": 0.8508167592717579,
+              "rgb_psnr": 24.824359974927642
+            }
+          ],
+          "remainder_psnr": 27.523198785280208
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.30581414699554443,
+              "lpips": 0.37225547432899475,
+              "luma_ssim": 0.8508167592717579,
+              "rgb_psnr": 24.824359974927642
+            }
+          ],
+          "remainder_psnr": 27.523198785280208
+        }
+      }
+    },
+    {
+      "rally": "v007_p0065",
+      "tick": 43,
+      "route": "non_court",
+      "ceiling_bps": 33000,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 1,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.31324225664138794,
+              "lpips": 0.3720889091491699,
+              "luma_ssim": 0.8355361385327095,
+              "rgb_psnr": 23.83767829553239
+            }
+          ],
+          "remainder_psnr": 27.71199168940751
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.31324225664138794,
+              "lpips": 0.3720889091491699,
+              "luma_ssim": 0.8355361385327095,
+              "rgb_psnr": 23.83767829553239
+            }
+          ],
+          "remainder_psnr": 27.71199168940751
+        }
+      }
+    },
+    {
+      "rally": "v007_p0065",
+      "tick": 60,
+      "route": "non_court",
+      "ceiling_bps": 33000,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 1,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.34548819065093994,
+              "lpips": 0.33885127305984497,
+              "luma_ssim": 0.8991675457890134,
+              "rgb_psnr": 24.16000813504786
+            }
+          ],
+          "remainder_psnr": 27.779280268715784
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.34548819065093994,
+              "lpips": 0.33885127305984497,
+              "luma_ssim": 0.8991675457890134,
+              "rgb_psnr": 24.16000813504786
+            }
+          ],
+          "remainder_psnr": 27.779280268715784
+        }
+      }
+    },
+    {
+      "rally": "v007_p0065",
+      "tick": 77,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.4080127852291444,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3876912593841553,
+              "lpips": 0.6110325455665588,
+              "luma_ssim": 0.38042412503770356,
+              "rgb_psnr": 16.487160100858837
+            },
+            {
+              "dists": 0.46916574239730835,
+              "lpips": 0.5947604179382324,
+              "luma_ssim": 0.38755006068429015,
+              "rgb_psnr": 16.52469592806106
+            }
+          ],
+          "ball": {
+            "dists": 0.2685604691505432,
+            "lpips": 0.2687492370605469,
+            "luma_ssim": 0.7673269329673782,
+            "rgb_psnr": 25.06334485287716
+          },
+          "remainder_psnr": 26.12938443737361
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3876912593841553,
+              "lpips": 0.6110325455665588,
+              "luma_ssim": 0.38042412503770356,
+              "rgb_psnr": 16.487160100858837
+            },
+            {
+              "dists": 0.46916574239730835,
+              "lpips": 0.5947604179382324,
+              "luma_ssim": 0.38755006068429015,
+              "rgb_psnr": 16.52469592806106
+            }
+          ],
+          "ball": {
+            "dists": 0.24942654371261597,
+            "lpips": 0.09150304645299911,
+            "luma_ssim": 0.786504693503784,
+            "rgb_psnr": 26.516229135548947
+          },
+          "remainder_psnr": 26.12938443737361
+        }
+      }
+    },
+    {
+      "rally": "v007_p0065",
+      "tick": 94,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.42565281070771566,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.38318485021591187,
+              "lpips": 0.5785967707633972,
+              "luma_ssim": 0.4110445669404394,
+              "rgb_psnr": 16.034911375941952
+            },
+            {
+              "dists": 0.4091055393218994,
+              "lpips": 0.5520594716072083,
+              "luma_ssim": 0.43108142530849725,
+              "rgb_psnr": 17.266028891912775
+            }
+          ],
+          "ball": {
+            "dists": 0.22329992055892944,
+            "lpips": 0.1427186131477356,
+            "luma_ssim": 0.8831673061415993,
+            "rgb_psnr": 28.465353323925868
+          },
+          "remainder_psnr": 26.064318402115433
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.38318485021591187,
+              "lpips": 0.5785967707633972,
+              "luma_ssim": 0.4110445669404394,
+              "rgb_psnr": 16.034911375941952
+            },
+            {
+              "dists": 0.4091055393218994,
+              "lpips": 0.5520594716072083,
+              "luma_ssim": 0.43108142530849725,
+              "rgb_psnr": 17.266028891912775
+            }
+          ],
+          "ball": {
+            "dists": 0.19637137651443481,
+            "lpips": 0.08903413265943527,
+            "luma_ssim": 0.9091235205222973,
+            "rgb_psnr": 28.986833101312715
+          },
+          "remainder_psnr": 26.064318402115433
+        }
+      }
+    },
+    {
+      "rally": "v007_p0065",
+      "tick": 112,
+      "route": "non_court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.4255414605140686,
+              "lpips": 0.726990818977356,
+              "luma_ssim": 0.4662348953895304,
+              "rgb_psnr": 16.69444681223066
+            },
+            {
+              "dists": 0.4071841239929199,
+              "lpips": 0.4354763627052307,
+              "luma_ssim": 0.31095397442233397,
+              "rgb_psnr": 16.940203879768166
+            }
+          ],
+          "ball": {
+            "dists": 0.23935550451278687,
+            "lpips": 0.22169773280620575,
+            "luma_ssim": 0.8323657044762741,
+            "rgb_psnr": 29.72783088698202
+          },
+          "remainder_psnr": 26.91917290478317
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.4255414605140686,
+              "lpips": 0.726990818977356,
+              "luma_ssim": 0.4662348953895304,
+              "rgb_psnr": 16.69444681223066
+            },
+            {
+              "dists": 0.4071841239929199,
+              "lpips": 0.4354763627052307,
+              "luma_ssim": 0.31095397442233397,
+              "rgb_psnr": 16.940203879768166
+            }
+          ],
+          "ball": {
+            "dists": 0.23935550451278687,
+            "lpips": 0.22169773280620575,
+            "luma_ssim": 0.8323657044762741,
+            "rgb_psnr": 29.72783088698202
+          },
+          "remainder_psnr": 26.91917290478317
+        }
+      }
+    },
+    {
+      "rally": "v007_p0065",
+      "tick": 129,
+      "route": "non_court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.4422624707221985,
+              "lpips": 0.6987009644508362,
+              "luma_ssim": 0.38584091124640074,
+              "rgb_psnr": 16.182818124053043
+            },
+            {
+              "dists": 0.40997177362442017,
+              "lpips": 0.40188488364219666,
+              "luma_ssim": 0.3896045477218328,
+              "rgb_psnr": 16.940809234939245
+            }
+          ],
+          "ball": {
+            "dists": 0.20373612642288208,
+            "lpips": 0.24114659428596497,
+            "luma_ssim": 0.8251332917873615,
+            "rgb_psnr": 26.865918641233982
+          },
+          "remainder_psnr": 25.356854553106576
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.4422624707221985,
+              "lpips": 0.6987009644508362,
+              "luma_ssim": 0.38584091124640074,
+              "rgb_psnr": 16.182818124053043
+            },
+            {
+              "dists": 0.40997177362442017,
+              "lpips": 0.40188488364219666,
+              "luma_ssim": 0.3896045477218328,
+              "rgb_psnr": 16.940809234939245
+            }
+          ],
+          "ball": {
+            "dists": 0.20373612642288208,
+            "lpips": 0.24114659428596497,
+            "luma_ssim": 0.8251332917873615,
+            "rgb_psnr": 26.865918641233982
+          },
+          "remainder_psnr": 25.356854553106576
+        }
+      }
+    },
+    {
+      "rally": "v007_p0108",
+      "tick": 16,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.4413583278656006,
+              "lpips": 0.687138557434082,
+              "luma_ssim": 0.41602030476439145,
+              "rgb_psnr": 16.066262321976904
+            },
+            {
+              "dists": 0.4166179299354553,
+              "lpips": 0.45244622230529785,
+              "luma_ssim": 0.30256272820922747,
+              "rgb_psnr": 16.502584503604158
+            }
+          ],
+          "remainder_psnr": 26.018869697410587
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.4413583278656006,
+              "lpips": 0.687138557434082,
+              "luma_ssim": 0.41602030476439145,
+              "rgb_psnr": 16.066262321976904
+            },
+            {
+              "dists": 0.4166179299354553,
+              "lpips": 0.45244622230529785,
+              "luma_ssim": 0.30256272820922747,
+              "rgb_psnr": 16.502584503604158
+            }
+          ],
+          "remainder_psnr": 26.018869697410587
+        },
+        "matched_av1": {
+          "players": [
+            {
+              "dists": 0.42215049266815186,
+              "lpips": 0.5760990381240845,
+              "luma_ssim": 0.37073552933414133,
+              "rgb_psnr": 15.681104359861735
+            },
+            {
+              "dists": 0.3963749408721924,
+              "lpips": 0.40314993262290955,
+              "luma_ssim": 0.3216959535228063,
+              "rgb_psnr": 16.312948480039175
+            }
+          ],
+          "remainder_psnr": 26.373637625147346
+        }
+      }
+    },
+    {
+      "rally": "v007_p0108",
+      "tick": 49,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.42565281070771566,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.437847375869751,
+              "lpips": 0.6806182861328125,
+              "luma_ssim": 0.3342582218101601,
+              "rgb_psnr": 14.090784810513775
+            },
+            {
+              "dists": 0.43575459718704224,
+              "lpips": 0.4516223967075348,
+              "luma_ssim": 0.3524533337701316,
+              "rgb_psnr": 17.235037577734943
+            }
+          ],
+          "ball": {
+            "dists": 0.2935153841972351,
+            "lpips": 0.3352004289627075,
+            "luma_ssim": 0.753229423821794,
+            "rgb_psnr": 26.011972898208477
+          },
+          "remainder_psnr": 25.760612654658107
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.437847375869751,
+              "lpips": 0.6806182861328125,
+              "luma_ssim": 0.3342582218101601,
+              "rgb_psnr": 14.090784810513775
+            },
+            {
+              "dists": 0.43575459718704224,
+              "lpips": 0.4516223967075348,
+              "luma_ssim": 0.3524533337701316,
+              "rgb_psnr": 17.235037577734943
+            }
+          ],
+          "ball": {
+            "dists": 0.2516298294067383,
+            "lpips": 0.13787096738815308,
+            "luma_ssim": 0.7671857945314429,
+            "rgb_psnr": 26.486754620394223
+          },
+          "remainder_psnr": 25.760612654658107
+        },
+        "matched_av1": {
+          "players": [
+            {
+              "dists": 0.41747331619262695,
+              "lpips": 0.6651827096939087,
+              "luma_ssim": 0.3669531102462589,
+              "rgb_psnr": 14.873511093903794
+            },
+            {
+              "dists": 0.44174957275390625,
+              "lpips": 0.45202499628067017,
+              "luma_ssim": 0.3498308394902113,
+              "rgb_psnr": 17.32403408439331
+            }
+          ],
+          "ball": {
+            "dists": 0.28650975227355957,
+            "lpips": 0.3330115079879761,
+            "luma_ssim": 0.7300341368537383,
+            "rgb_psnr": 25.448460144343766
+          },
+          "remainder_psnr": 26.114935761662164
+        }
+      }
+    },
+    {
+      "rally": "v007_p0108",
+      "tick": 82,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.3917890431899525,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.4644971489906311,
+              "lpips": 0.6935547590255737,
+              "luma_ssim": 0.3625878648016171,
+              "rgb_psnr": 15.5187135361488
+            },
+            {
+              "dists": 0.4701680541038513,
+              "lpips": 0.5058044791221619,
+              "luma_ssim": 0.29425259153038136,
+              "rgb_psnr": 15.725421075788912
+            }
+          ],
+          "ball": {
+            "dists": 0.33038729429244995,
+            "lpips": 0.30007439851760864,
+            "luma_ssim": 0.5380357793492972,
+            "rgb_psnr": 18.970956777466306
+          },
+          "remainder_psnr": 26.061460378495426
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.4644971489906311,
+              "lpips": 0.6935547590255737,
+              "luma_ssim": 0.3625878648016171,
+              "rgb_psnr": 15.5187135361488
+            },
+            {
+              "dists": 0.4702037572860718,
+              "lpips": 0.49316316843032837,
+              "luma_ssim": 0.29425259153038136,
+              "rgb_psnr": 15.725421075788912
+            }
+          ],
+          "ball": {
+            "dists": 0.33783411979675293,
+            "lpips": 0.275621235370636,
+            "luma_ssim": 0.5514355289664241,
+            "rgb_psnr": 19.141678840513038
+          },
+          "remainder_psnr": 26.061460378495426
+        },
+        "matched_av1": {
+          "players": [
+            {
+              "dists": 0.4695609211921692,
+              "lpips": 0.6950070261955261,
+              "luma_ssim": 0.35335478098745915,
+              "rgb_psnr": 15.47843879216083
+            },
+            {
+              "dists": 0.4640038013458252,
+              "lpips": 0.538619875907898,
+              "luma_ssim": 0.30264409553551236,
+              "rgb_psnr": 15.978916223136244
+            }
+          ],
+          "ball": {
+            "dists": 0.3385504484176636,
+            "lpips": 0.2807770073413849,
+            "luma_ssim": 0.5467389866292662,
+            "rgb_psnr": 19.407720687743172
+          },
+          "remainder_psnr": 26.336691148232166
+        }
+      }
+    },
+    {
+      "rally": "v007_p0108",
+      "tick": 115,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.5297747484747546,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.5303881168365479,
+              "lpips": 0.817205011844635,
+              "luma_ssim": 0.38264362356422316,
+              "rgb_psnr": 15.525558757005363
+            },
+            {
+              "dists": 0.5391578674316406,
+              "lpips": 0.6077054142951965,
+              "luma_ssim": 0.21992076971657704,
+              "rgb_psnr": 16.562196305785605
+            }
+          ],
+          "ball": {
+            "dists": 0.30107301473617554,
+            "lpips": 0.32247066497802734,
+            "luma_ssim": 0.8874259658554753,
+            "rgb_psnr": 26.55346397495167
+          },
+          "remainder_psnr": 27.306920507215615
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.5303881168365479,
+              "lpips": 0.817205011844635,
+              "luma_ssim": 0.38264362356422316,
+              "rgb_psnr": 15.525558757005363
+            },
+            {
+              "dists": 0.5391578674316406,
+              "lpips": 0.6077054142951965,
+              "luma_ssim": 0.21992076971657704,
+              "rgb_psnr": 16.562196305785605
+            }
+          ],
+          "ball": {
+            "dists": 0.25286567211151123,
+            "lpips": 0.07080602645874023,
+            "luma_ssim": 0.9102117696291367,
+            "rgb_psnr": 27.399693798004236
+          },
+          "remainder_psnr": 27.306920507215615
+        },
+        "matched_av1": {
+          "players": [
+            {
+              "dists": 0.5146399736404419,
+              "lpips": 0.8007271885871887,
+              "luma_ssim": 0.37532918774414153,
+              "rgb_psnr": 15.50026825285135
+            },
+            {
+              "dists": 0.5434261560440063,
+              "lpips": 0.604887068271637,
+              "luma_ssim": 0.22022159306881958,
+              "rgb_psnr": 16.425843871703016
+            }
+          ],
+          "ball": {
+            "dists": 0.28597086668014526,
+            "lpips": 0.35066866874694824,
+            "luma_ssim": 0.8954335262476172,
+            "rgb_psnr": 27.600679168046
+          },
+          "remainder_psnr": 27.40288668274955
+        }
+      }
+    },
+    {
+      "rally": "v007_p0108",
+      "tick": 148,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.32352941176469585,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.41475909948349,
+              "lpips": 0.6562559604644775,
+              "luma_ssim": 0.4089297633891137,
+              "rgb_psnr": 15.966086594435861
+            },
+            {
+              "dists": 0.5667985677719116,
+              "lpips": 0.6241822838783264,
+              "luma_ssim": 0.3358931141863688,
+              "rgb_psnr": 17.928021137355223
+            }
+          ],
+          "ball": {
+            "dists": 0.32207924127578735,
+            "lpips": 0.2430914342403412,
+            "luma_ssim": 0.8569744273306312,
+            "rgb_psnr": 26.23986517192366
+          },
+          "remainder_psnr": 26.064306073414663
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.41475909948349,
+              "lpips": 0.6562559604644775,
+              "luma_ssim": 0.4089297633891137,
+              "rgb_psnr": 15.966086594435861
+            },
+            {
+              "dists": 0.5653479099273682,
+              "lpips": 0.6220957040786743,
+              "luma_ssim": 0.3358931141863688,
+              "rgb_psnr": 17.928021137355223
+            }
+          ],
+          "ball": {
+            "dists": 0.29465770721435547,
+            "lpips": 0.06337130814790726,
+            "luma_ssim": 0.8696790611264962,
+            "rgb_psnr": 27.359097703970647
+          },
+          "remainder_psnr": 26.064306073414663
+        },
+        "matched_av1": {
+          "players": [
+            {
+              "dists": 0.4166344404220581,
+              "lpips": 0.6482811570167542,
+              "luma_ssim": 0.4406844436526919,
+              "rgb_psnr": 16.932370708024287
+            },
+            {
+              "dists": 0.5512371063232422,
+              "lpips": 0.5985204577445984,
+              "luma_ssim": 0.34877597804347354,
+              "rgb_psnr": 18.98493493205121
+            }
+          ],
+          "ball": {
+            "dists": 0.3107580542564392,
+            "lpips": 0.20572343468666077,
+            "luma_ssim": 0.8295091361937945,
+            "rgb_psnr": 25.533394194518838
+          },
+          "remainder_psnr": 26.352066073400625
+        }
+      }
+    },
+    {
+      "rally": "v007_p0108",
+      "tick": 181,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.4732605814933777,
+              "lpips": 0.8122742176055908,
+              "luma_ssim": 0.3776209652985743,
+              "rgb_psnr": 14.31761398468542
+            },
+            {
+              "dists": 0.5597729682922363,
+              "lpips": 0.6353178024291992,
+              "luma_ssim": 0.2691380473001941,
+              "rgb_psnr": 17.827182407692344
+            }
+          ],
+          "ball": {
+            "dists": 0.2228853702545166,
+            "lpips": 0.11663659662008286,
+            "luma_ssim": 0.9122925360976174,
+            "rgb_psnr": 28.054868972960367
+          },
+          "remainder_psnr": 26.345287946257187
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.4732605814933777,
+              "lpips": 0.8122742176055908,
+              "luma_ssim": 0.3776209652985743,
+              "rgb_psnr": 14.31761398468542
+            },
+            {
+              "dists": 0.5597729682922363,
+              "lpips": 0.6353178024291992,
+              "luma_ssim": 0.2691380473001941,
+              "rgb_psnr": 17.827182407692344
+            }
+          ],
+          "ball": {
+            "dists": 0.2228853702545166,
+            "lpips": 0.11663659662008286,
+            "luma_ssim": 0.9122925360976174,
+            "rgb_psnr": 28.054868972960367
+          },
+          "remainder_psnr": 26.345287946257187
+        },
+        "matched_av1": {
+          "players": [
+            {
+              "dists": 0.4658677577972412,
+              "lpips": 0.8239161372184753,
+              "luma_ssim": 0.39013225326908674,
+              "rgb_psnr": 14.587116512153901
+            },
+            {
+              "dists": 0.535240888595581,
+              "lpips": 0.6443631649017334,
+              "luma_ssim": 0.2867159192797547,
+              "rgb_psnr": 18.083153761737563
+            }
+          ],
+          "ball": {
+            "dists": 0.20964336395263672,
+            "lpips": 0.10314999520778656,
+            "luma_ssim": 0.9171835916763353,
+            "rgb_psnr": 28.5320745741932
+          },
+          "remainder_psnr": 26.50466524413963
+        }
+      }
+    },
+    {
+      "rally": "v007_p0108",
+      "tick": 214,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.14705882352942012,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.4627898931503296,
+              "lpips": 0.7715553641319275,
+              "luma_ssim": 0.31803207474898154,
+              "rgb_psnr": 14.496426026213612
+            },
+            {
+              "dists": 0.4900844097137451,
+              "lpips": 0.599628210067749,
+              "luma_ssim": 0.3321334658250676,
+              "rgb_psnr": 17.41323545474916
+            }
+          ],
+          "ball": {
+            "dists": 0.2965059280395508,
+            "lpips": 0.35914501547813416,
+            "luma_ssim": 0.812180152436162,
+            "rgb_psnr": 24.523176914421562
+          },
+          "remainder_psnr": 25.54193819728279
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.4627898931503296,
+              "lpips": 0.7715553641319275,
+              "luma_ssim": 0.31803207474898154,
+              "rgb_psnr": 14.496426026213612
+            },
+            {
+              "dists": 0.4900844097137451,
+              "lpips": 0.599628210067749,
+              "luma_ssim": 0.3321334658250676,
+              "rgb_psnr": 17.41323545474916
+            }
+          ],
+          "ball": {
+            "dists": 0.2792166471481323,
+            "lpips": 0.23671379685401917,
+            "luma_ssim": 0.8252916412666971,
+            "rgb_psnr": 24.70852752814061
+          },
+          "remainder_psnr": 25.54193819728279
+        },
+        "matched_av1": {
+          "players": [
+            {
+              "dists": 0.4532865881919861,
+              "lpips": 0.7562622427940369,
+              "luma_ssim": 0.34757245255712377,
+              "rgb_psnr": 15.21689740220436
+            },
+            {
+              "dists": 0.514822244644165,
+              "lpips": 0.6697927117347717,
+              "luma_ssim": 0.27421429507196954,
+              "rgb_psnr": 16.980899035060364
+            }
+          ],
+          "ball": {
+            "dists": 0.2670276165008545,
+            "lpips": 0.3073374032974243,
+            "luma_ssim": 0.8099351490709115,
+            "rgb_psnr": 25.56051136993318
+          },
+          "remainder_psnr": 25.709240252643045
+        }
+      }
+    },
+    {
+      "rally": "v007_p0108",
+      "tick": 247,
+      "route": "court",
+      "ceiling_bps": 20400,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.4445405509315937,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.48450660705566406,
+              "lpips": 0.806286633014679,
+              "luma_ssim": 0.2423038545416238,
+              "rgb_psnr": 12.885896696657786
+            },
+            {
+              "dists": 0.4975266456604004,
+              "lpips": 0.6037393808364868,
+              "luma_ssim": 0.26802696168304335,
+              "rgb_psnr": 16.33332340776382
+            }
+          ],
+          "ball": {
+            "dists": 0.38252848386764526,
+            "lpips": 0.6475920677185059,
+            "luma_ssim": 0.5186049324579856,
+            "rgb_psnr": 26.90329999051471
+          },
+          "remainder_psnr": 25.19333236975865
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.48450660705566406,
+              "lpips": 0.806286633014679,
+              "luma_ssim": 0.2423038545416238,
+              "rgb_psnr": 12.885896696657786
+            },
+            {
+              "dists": 0.4975266456604004,
+              "lpips": 0.6037393808364868,
+              "luma_ssim": 0.26802696168304335,
+              "rgb_psnr": 16.33332340776382
+            }
+          ],
+          "ball": {
+            "dists": 0.35902154445648193,
+            "lpips": 0.5022143721580505,
+            "luma_ssim": 0.5344243017419675,
+            "rgb_psnr": 27.613046785476175
+          },
+          "remainder_psnr": 25.19333236975865
+        },
+        "matched_av1": {
+          "players": [
+            {
+              "dists": 0.4846791625022888,
+              "lpips": 0.7064144015312195,
+              "luma_ssim": 0.2668704178415558,
+              "rgb_psnr": 13.221017311464989
+            },
+            {
+              "dists": 0.48810505867004395,
+              "lpips": 0.7451870441436768,
+              "luma_ssim": 0.24820213925507006,
+              "rgb_psnr": 15.629689420839101
+            }
+          ],
+          "ball": {
+            "dists": 0.37810218334198,
+            "lpips": 0.6404540538787842,
+            "luma_ssim": 0.5259050786283757,
+            "rgb_psnr": 26.540652506326854
+          },
+          "remainder_psnr": 25.37442182229855
+        }
+      }
+    },
+    {
+      "rally": "v007_p0108",
+      "tick": 16,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "absent",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3523523807525635,
+              "lpips": 0.4331357777118683,
+              "luma_ssim": 0.5183233677371386,
+              "rgb_psnr": 17.45761622310584
+            },
+            {
+              "dists": 0.36701691150665283,
+              "lpips": 0.3303225338459015,
+              "luma_ssim": 0.4327473822187781,
+              "rgb_psnr": 17.79837730817316
+            }
+          ],
+          "remainder_psnr": 27.426404204752632
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3523523807525635,
+              "lpips": 0.4331357777118683,
+              "luma_ssim": 0.5183233677371386,
+              "rgb_psnr": 17.45761622310584
+            },
+            {
+              "dists": 0.36701691150665283,
+              "lpips": 0.3303225338459015,
+              "luma_ssim": 0.4327473822187781,
+              "rgb_psnr": 17.79837730817316
+            }
+          ],
+          "remainder_psnr": 27.426404204752632
+        }
+      }
+    },
+    {
+      "rally": "v007_p0108",
+      "tick": 49,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.42565281070771566,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.39337092638015747,
+              "lpips": 0.5653049349784851,
+              "luma_ssim": 0.39601156633279916,
+              "rgb_psnr": 15.304619221959348
+            },
+            {
+              "dists": 0.3687427043914795,
+              "lpips": 0.3010236620903015,
+              "luma_ssim": 0.5558505879212631,
+              "rgb_psnr": 19.35459038514772
+            }
+          ],
+          "ball": {
+            "dists": 0.28934246301651,
+            "lpips": 0.3209797739982605,
+            "luma_ssim": 0.7690337013346444,
+            "rgb_psnr": 25.90226137455459
+          },
+          "remainder_psnr": 27.134133141881964
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.39337092638015747,
+              "lpips": 0.5653049349784851,
+              "luma_ssim": 0.39601156633279916,
+              "rgb_psnr": 15.304619221959348
+            },
+            {
+              "dists": 0.3687427043914795,
+              "lpips": 0.3010236620903015,
+              "luma_ssim": 0.5558505879212631,
+              "rgb_psnr": 19.35459038514772
+            }
+          ],
+          "ball": {
+            "dists": 0.2670353055000305,
+            "lpips": 0.1308211088180542,
+            "luma_ssim": 0.7833247600205429,
+            "rgb_psnr": 26.39580862684244
+          },
+          "remainder_psnr": 27.134133141881964
+        }
+      }
+    },
+    {
+      "rally": "v007_p0108",
+      "tick": 82,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.3917890431899525,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.45463383197784424,
+              "lpips": 0.6477246284484863,
+              "luma_ssim": 0.3611626831391265,
+              "rgb_psnr": 15.910023431070686
+            },
+            {
+              "dists": 0.4699009656906128,
+              "lpips": 0.5069689750671387,
+              "luma_ssim": 0.24398624042130052,
+              "rgb_psnr": 15.878621497798315
+            }
+          ],
+          "ball": {
+            "dists": 0.2973935008049011,
+            "lpips": 0.26411885023117065,
+            "luma_ssim": 0.6048468621111803,
+            "rgb_psnr": 19.489780407719213
+          },
+          "remainder_psnr": 27.272496003209937
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.45463383197784424,
+              "lpips": 0.6477246284484863,
+              "luma_ssim": 0.3611626831391265,
+              "rgb_psnr": 15.910023431070686
+            },
+            {
+              "dists": 0.4680127501487732,
+              "lpips": 0.5097377300262451,
+              "luma_ssim": 0.24398624042130052,
+              "rgb_psnr": 15.878621497798315
+            }
+          ],
+          "ball": {
+            "dists": 0.28207826614379883,
+            "lpips": 0.24997437000274658,
+            "luma_ssim": 0.6181920091850246,
+            "rgb_psnr": 19.686611838343197
+          },
+          "remainder_psnr": 27.272496003209937
+        }
+      }
+    },
+    {
+      "rally": "v007_p0108",
+      "tick": 115,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.5297747484747546,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.4785000681877136,
+              "lpips": 0.7649204730987549,
+              "luma_ssim": 0.3692271000612452,
+              "rgb_psnr": 15.436677740637023
+            },
+            {
+              "dists": 0.5227394700050354,
+              "lpips": 0.583514928817749,
+              "luma_ssim": 0.21757117541823615,
+              "rgb_psnr": 16.555408864808964
+            }
+          ],
+          "ball": {
+            "dists": 0.3262103796005249,
+            "lpips": 0.3803237974643707,
+            "luma_ssim": 0.9084923236198201,
+            "rgb_psnr": 27.543912592328553
+          },
+          "remainder_psnr": 28.391686537617037
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.4785000681877136,
+              "lpips": 0.7649204730987549,
+              "luma_ssim": 0.3692271000612452,
+              "rgb_psnr": 15.436677740637023
+            },
+            {
+              "dists": 0.5227394700050354,
+              "lpips": 0.583514928817749,
+              "luma_ssim": 0.21757117541823615,
+              "rgb_psnr": 16.555408864808964
+            }
+          ],
+          "ball": {
+            "dists": 0.2420530915260315,
+            "lpips": 0.06993520259857178,
+            "luma_ssim": 0.9321009572296097,
+            "rgb_psnr": 28.777972650734046
+          },
+          "remainder_psnr": 28.391686537617037
+        }
+      }
+    },
+    {
+      "rally": "v007_p0108",
+      "tick": 148,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.32352941176469585,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.3667728304862976,
+              "lpips": 0.6387253999710083,
+              "luma_ssim": 0.4771860460974448,
+              "rgb_psnr": 17.29987812597461
+            },
+            {
+              "dists": 0.572721004486084,
+              "lpips": 0.6036917567253113,
+              "luma_ssim": 0.3445096415524075,
+              "rgb_psnr": 18.06357656029596
+            }
+          ],
+          "ball": {
+            "dists": 0.30853164196014404,
+            "lpips": 0.2618427872657776,
+            "luma_ssim": 0.8596440954612893,
+            "rgb_psnr": 26.846474860674988
+          },
+          "remainder_psnr": 27.336553436336718
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.3667728304862976,
+              "lpips": 0.6387253999710083,
+              "luma_ssim": 0.4771860460974448,
+              "rgb_psnr": 17.29987812597461
+            },
+            {
+              "dists": 0.5739166140556335,
+              "lpips": 0.5989740490913391,
+              "luma_ssim": 0.3445096415524075,
+              "rgb_psnr": 18.06357656029596
+            }
+          ],
+          "ball": {
+            "dists": 0.29261958599090576,
+            "lpips": 0.06921270489692688,
+            "luma_ssim": 0.872600079882178,
+            "rgb_psnr": 27.949341254726605
+          },
+          "remainder_psnr": 27.336553436336718
+        }
+      }
+    },
+    {
+      "rally": "v007_p0108",
+      "tick": 181,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": false,
+      "emitted": false,
+      "error_px": null,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.4439363479614258,
+              "lpips": 0.6627312302589417,
+              "luma_ssim": 0.3946051023090529,
+              "rgb_psnr": 15.201819361162096
+            },
+            {
+              "dists": 0.5152519941329956,
+              "lpips": 0.652725875377655,
+              "luma_ssim": 0.2976700297662836,
+              "rgb_psnr": 18.407294902550284
+            }
+          ],
+          "ball": {
+            "dists": 0.21024727821350098,
+            "lpips": 0.08197973668575287,
+            "luma_ssim": 0.934142995114848,
+            "rgb_psnr": 29.117877440487987
+          },
+          "remainder_psnr": 27.606971032612165
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.4439363479614258,
+              "lpips": 0.6627312302589417,
+              "luma_ssim": 0.3946051023090529,
+              "rgb_psnr": 15.201819361162096
+            },
+            {
+              "dists": 0.5152519941329956,
+              "lpips": 0.652725875377655,
+              "luma_ssim": 0.2976700297662836,
+              "rgb_psnr": 18.407294902550284
+            }
+          ],
+          "ball": {
+            "dists": 0.21024727821350098,
+            "lpips": 0.08197973668575287,
+            "luma_ssim": 0.934142995114848,
+            "rgb_psnr": 29.117877440487987
+          },
+          "remainder_psnr": 27.606971032612165
+        }
+      }
+    },
+    {
+      "rally": "v007_p0108",
+      "tick": 214,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.14705882352942012,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.4408477544784546,
+              "lpips": 0.7247499227523804,
+              "luma_ssim": 0.33538141954805706,
+              "rgb_psnr": 15.04675333677299
+            },
+            {
+              "dists": 0.4800654649734497,
+              "lpips": 0.6472049355506897,
+              "luma_ssim": 0.2900254720917711,
+              "rgb_psnr": 17.201191929846992
+            }
+          ],
+          "ball": {
+            "dists": 0.2800883650779724,
+            "lpips": 0.27319127321243286,
+            "luma_ssim": 0.8293076599388606,
+            "rgb_psnr": 25.801340641925602
+          },
+          "remainder_psnr": 26.79392352469022
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.4408477544784546,
+              "lpips": 0.7247499227523804,
+              "luma_ssim": 0.33538141954805706,
+              "rgb_psnr": 15.04675333677299
+            },
+            {
+              "dists": 0.4800654649734497,
+              "lpips": 0.6472049355506897,
+              "luma_ssim": 0.2900254720917711,
+              "rgb_psnr": 17.201191929846992
+            }
+          ],
+          "ball": {
+            "dists": 0.2500838041305542,
+            "lpips": 0.16520163416862488,
+            "luma_ssim": 0.8424468220925359,
+            "rgb_psnr": 26.06279950086661
+          },
+          "remainder_psnr": 26.79392352469022
+        }
+      }
+    },
+    {
+      "rally": "v007_p0108",
+      "tick": 247,
+      "route": "court",
+      "ceiling_bps": 33000,
+      "mark": "visible",
+      "assisted": true,
+      "emitted": true,
+      "error_px": 0.4445405509315937,
+      "accepted_masks": 2,
+      "scores": {
+        "same_base": {
+          "players": [
+            {
+              "dists": 0.4807933568954468,
+              "lpips": 0.8137894868850708,
+              "luma_ssim": 0.23995908363845933,
+              "rgb_psnr": 13.641763547745054
+            },
+            {
+              "dists": 0.4542427062988281,
+              "lpips": 0.5550752282142639,
+              "luma_ssim": 0.26499108506253544,
+              "rgb_psnr": 16.326912491827375
+            }
+          ],
+          "ball": {
+            "dists": 0.3814396262168884,
+            "lpips": 0.6360455751419067,
+            "luma_ssim": 0.5190027323445624,
+            "rgb_psnr": 26.96030082486449
+          },
+          "remainder_psnr": 26.278438783789028
+        },
+        "ball_stream": {
+          "players": [
+            {
+              "dists": 0.4807933568954468,
+              "lpips": 0.8137894868850708,
+              "luma_ssim": 0.23995908363845933,
+              "rgb_psnr": 13.641763547745054
+            },
+            {
+              "dists": 0.4542427062988281,
+              "lpips": 0.5550752282142639,
+              "luma_ssim": 0.26499108506253544,
+              "rgb_psnr": 16.326912491827375
+            }
+          ],
+          "ball": {
+            "dists": 0.35438787937164307,
+            "lpips": 0.5022530555725098,
+            "luma_ssim": 0.5341464470418106,
+            "rgb_psnr": 27.58760434008423
+          },
+          "remainder_psnr": 26.278438783789028
+        }
+      }
+    }
+  ]
+}
