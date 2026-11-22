@@ -28,3 +28,8 @@ def test_smoke_spans_both_modes_and_fallback_is_native(start):
         "looks": track,
     }
     assert np.array_equal(channel.canvas(raw, fallback, profile), direct)
+
+
+def test_full_native_smoke_includes_both_endpoints():
+    assert channel.smoke_ticks(0, 240) == [0, 39, 119, 239]
+    assert channel.smoke_ticks(69, 189) == channel.smoke_ticks(69)

@@ -238,7 +238,7 @@ def run(config: dict, isolation: dict) -> dict:
         channel = mixed.decode(Path(config["joint"]), Path(config["cache"]), carrier, expected)
         profile, base, geom = channel["profile"], channel["base"], channel["geometry"]
         run_start, run_stop = channel["start"], channel["stop"]
-        smoke = mixed.smoke_ticks(run_start)
+        smoke = mixed.smoke_ticks(run_start, run_stop)
     else:
         profile, base, geom = geometry(carrier.read_bytes(), expected)
         run_start, run_stop, smoke = 0, 240, SMOKE

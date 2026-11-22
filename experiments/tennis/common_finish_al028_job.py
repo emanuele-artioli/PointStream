@@ -52,8 +52,8 @@ def configure(args: argparse.Namespace) -> tuple[dict, list[Path]]:
         if not all((args.joint, args.cache, args.expected_yuv)):
             raise ValueError("joint packet, cache and independent native digest are required")
         channel = mixed.decode(args.joint, args.cache, args.carrier, args.carrier_sha256)
-        expected_units, expected_length = tuple(channel["profile"]["order"]), 120
-        smoke_ticks = mixed.smoke_ticks(channel["start"])
+        expected_units, expected_length = tuple(channel["profile"]["order"]), channel["stop"] - channel["start"]
+        smoke_ticks = mixed.smoke_ticks(channel["start"], channel["stop"])
         mixed_config = {"joint": str(args.joint), "cache": str(args.cache)}
         files.extend([args.joint, args.cache])
     configs: dict[str, dict] = {}

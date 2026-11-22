@@ -514,3 +514,17 @@ def test_separate_native_25fps_profile_and_mismatched_headers():
         invalid = copy.deepcopy(profile25)
         invalid['recipe']['fps'] = [30, 1]
         packet.build(invalid, bytes(base25), keypoints, refs)
+
+
+def test_fractional_native_profile_rejects_rounded_cadence():
+    profile, base, keys, refs = fixture()
+    profile['recipe'] = copy.deepcopy(packet.RECIPE_2997)
+    n = bytearray(base)
+    struct.pack_into('<II', n, 16, 30000, 1001)
+    blob = packet.build(profile, bytes(n), keys, refs)
+    assert packet.unpack(blob)[0]['base'] == n
+    with pytest.raises(ValueError):
+        packet.build(profile, base, keys, refs)
+    struct.pack_into('<II', n, 16, 30, 1)
+    with pytest.raises(ValueError):
+        packet.build(profile, bytes(n), keys, refs)

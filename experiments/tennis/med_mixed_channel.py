@@ -52,19 +52,20 @@ def decode(joint: Path, cache: Path, carrier: Path, expected: str) -> dict:
         or carrier.read_bytes() != copied
         or runtime != cp["runtime"]
         or profile["coded_size"] != [160, 96]
-        or profile["recipe"] != packet.RECIPE
+        or profile["recipe"] not in (packet.RECIPE, packet.RECIPE_2997)
         or len(profile["order"]) != 2
         or len(profile["runs"]) != 2
     ):
         raise ValueError("mixed packet cannot reproduce exact paid conditioning")
-    packet._ivf(delivered["base"], 160, 96, (50, 1))
+    packet._ivf(delivered["base"], 160, 96, tuple(profile["recipe"]["fps"]))
     # Only the PNG-capable generation worker decodes appearance. Geometry uses KPS2 alone.
     _, units = packet._bounded_keypoints(delivered["poses"], profile["order"])
     runs = {(r["start"], r["end"]) for r in profile["runs"]}
     if len(runs) != 1:
         raise ValueError("expected two players on the same active interval")
     start, stop = runs.pop()
-    if stop - start != 120 or not 0 <= start < stop <= 240:
+    length = 240 if profile["recipe"] == packet.RECIPE_2997 else 120
+    if stop - start != length or not 0 <= start < stop <= 240:
         raise ValueError("unsupported active interval")
     geometry = {}
     for u in units:
@@ -98,7 +99,9 @@ def decode(joint: Path, cache: Path, carrier: Path, expected: str) -> dict:
     )
 
 
-def smoke_ticks(start: int) -> list[int]:
+def smoke_ticks(start: int, stop: int | None = None) -> list[int]:
+    if stop is not None and stop - start == 240:
+        return [0, 39, 119, 239]
     return sorted([start, start + 39, start + 91, 0 if start else 239])
 
 

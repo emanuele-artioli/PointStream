@@ -1,0 +1,144 @@
+{
+  "event": "match108",
+  "job": "20261122T100354Z-ec042234",
+  "archive_sha256": "744bc1196db2bc70a5e77d1cbc812e1b450cf4cfee70f9ba13734d81ee16c8c5",
+  "source_sha256": "23b6a757e8f01d2366282fb32e2282a76a77f39cfc96c8125069826d7f458fb7",
+  "fps": "25",
+  "total_ticks": 240,
+  "available_both": 190,
+  "longest_both": 54,
+  "eligible_240": false,
+  "eligible_120": false,
+  "runs": [
+    {
+      "start": 0,
+      "end": 5,
+      "count": 6
+    },
+    {
+      "start": 12,
+      "end": 65,
+      "count": 54
+    },
+    {
+      "start": 67,
+      "end": 70,
+      "count": 4
+    },
+    {
+      "start": 73,
+      "end": 73,
+      "count": 1
+    },
+    {
+      "start": 75,
+      "end": 106,
+      "count": 32
+    },
+    {
+      "start": 108,
+      "end": 110,
+      "count": 3
+    },
+    {
+      "start": 121,
+      "end": 122,
+      "count": 2
+    },
+    {
+      "start": 124,
+      "end": 124,
+      "count": 1
+    },
+    {
+      "start": 126,
+      "end": 128,
+      "count": 3
+    },
+    {
+      "start": 130,
+      "end": 143,
+      "count": 14
+    },
+    {
+      "start": 145,
+      "end": 145,
+      "count": 1
+    },
+    {
+      "start": 155,
+      "end": 167,
+      "count": 13
+    },
+    {
+      "start": 169,
+      "end": 178,
+      "count": 10
+    },
+    {
+      "start": 181,
+      "end": 181,
+      "count": 1
+    },
+    {
+      "start": 183,
+      "end": 183,
+      "count": 1
+    },
+    {
+      "start": 187,
+      "end": 187,
+      "count": 1
+    },
+    {
+      "start": 192,
+      "end": 202,
+      "count": 11
+    },
+    {
+      "start": 204,
+      "end": 206,
+      "count": 3
+    },
+    {
+      "start": 208,
+      "end": 212,
+      "count": 5
+    },
+    {
+      "start": 214,
+      "end": 215,
+      "count": 2
+    },
+    {
+      "start": 218,
+      "end": 239,
+      "count": 22
+    }
+  ],
+  "tracks": [
+    {
+      "track": "person:000000000008",
+      "measured_role": "near",
+      "pose_ticks": 240,
+      "eligible": true,
+      "signal": {
+        "pose_bytes": 1377,
+        "reference_png_bytes": 94626,
+        "pose_sha256": "23174dd0e80cba6084a520c3be43b175b6323a581f8c5a00124832cf720de8a9",
+        "reference_section_sha256": "f137479f676e84d8a2c5f853b0e442ec0b003757b0250824cd977cbf176e66b4",
+        "decoded_reference_rgb_sha256": "1caf1a12c0fae74b8eb2749007b3bb2cc4c865e1498ebc20735cf03d5dd05745",
+        "pose_only_kbps": 1.1475,
+        "cold_pose_reference_only_kbps": 80.0025,
+        "note": "Two independently decoded field payloads. Excludes base, ball, model, manifest and packet framing."
+      }
+    },
+    {
+      "track": "person:000000000006",
+      "measured_role": "far",
+      "pose_ticks": 190,
+      "eligible": false
+    }
+  ],
+  "cpu_codec": "OpenCV 4.10.0, portable zlib REF1 and KPS2; dimensions 512\u00d7784."
+}

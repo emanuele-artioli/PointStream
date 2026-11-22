@@ -250,7 +250,7 @@ def validate(parser: argparse.ArgumentParser) -> None:
     if args.frames == 44:
         available = dispatch["campaign_clock"]["budget_end"] - time.monotonic()
         profile = packet._embedded_profile(args.carrier.read_bytes())
-        margin = 1.5 if args.run_length == 120 or profile["recipe"]["fps"] == [25, 1] else 1.25
+        margin = 1.5 if args.run_length == 120 or profile["recipe"]["fps"] != [50, 1] else 1.25
         cost = generation_forecast(timing, row["render_and_save_seconds"], available, args.full_cap, margin, args.run_length)
     else:
         cost = actual_full_cost(timing, args.full_cap)
