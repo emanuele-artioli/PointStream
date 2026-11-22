@@ -101,6 +101,24 @@
       "revision": "20700459b1d7244f3e5676eabe30261173eb574b",
       "source_archive_sha256": "0dd44595161a6320cb79bf8138abd2fae7e0e9a87a07821f98b1661b36a73b9c",
       "spec_sha256": "77b8c322682383041ed1ed24be610deb012c2c74c918d25deacfb3390e7d1bb8",
+      "state_at_registration": "pending",
+      "terminal": "complete",
+      "body_dists": 0.38685691530505817,
+      "running_bytes": 12305,
+      "source_matched_transitions": 478
+    },
+    "control_ordinary-1920-cold": {
+      "id": "20261122T142622Z-be704c69",
+      "revision": "7e5c89cd9a4276cb290cb6c56c242282f22d5e8b",
+      "source_archive_sha256": "610465e949dece9cfe71efb502cad88905222ec73aa0369aafcfc6b8d160fd4f",
+      "spec_sha256": "aeb0b582fbba0f02e755f605e5ad7db487b9884b46d33fc7697577ee372d2f76",
+      "state_at_registration": "pending"
+    },
+    "control_roi-640-cold": {
+      "id": "20261122T143106Z-9ad44592",
+      "revision": "5ce37c49f7f3d57cb58f8817ef0532adc3ec12a6",
+      "source_archive_sha256": "76cf7d76e28e164a8c4099d4a7cff9beb2b7af655823fc77acaf771d3c2d71ff",
+      "spec_sha256": "13bd14842de440f0228d6d5b1e24b06496dfa45e95d7f114382b143dcf550df8",
       "state_at_registration": "pending"
     }
   },

@@ -53,6 +53,22 @@
       "score_job": "20261122T141106Z-e1d3e349",
       "producer": "20261122T134858Z-f6a90d00",
       "typed_decode_sha256": "dedffe2439e94960d64630cc9d2fbc78b6f43a582df460f806cde2c296e23881"
+    },
+    {
+      "name": "dcvc-480-q26",
+      "family": "DCVC-UF",
+      "bytes": 12305,
+      "kbps": 24.61,
+      "source_grid": "7d706c8d9ff2f45ac1c5dc810afa7361a5a390681ea4d7067a72d2673c7063d0",
+      "support": "88e0b197dd16d18a7c1989601637f045859de1d18ac3756d3eb1f280c3d2eb64",
+      "dists": 0.38685691530505817,
+      "near": 0.36503367498517036,
+      "far": 0.408680155624946,
+      "body_psnr": 17.60409408825301,
+      "full_psnr": 24.96215024138245,
+      "score_job": "20261122T141901Z-a490196a",
+      "producer": "20261122T141034Z-490fceb9",
+      "typed_decode_sha256": "953300fdd4182032ac66cfa9c2e7d16ae55a028bfcd04a46364954b56f756376"
     }
   ],
   "comparisons": []
