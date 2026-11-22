@@ -4,6 +4,9 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from make_sender_specs import main as generate_sender_specs
 
 HERE = Path(__file__).resolve().parent
 INBOX = Path("/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox")
@@ -13,11 +16,10 @@ def create(kind, match, job, up, out, archive_sha=None):
     base = json.loads(
         (HERE.parent / "shanghai-prospective-20261122/primary-score-gpu3-spec.json").read_text()
     )
-    sender_spec = json.loads(
-        (
-            Path("/private/tmp/ps-cohort-sender-specs-20261122") / f"{match}-sender-spec.json"
-        ).read_text()
-    )
+    with TemporaryDirectory() as directory:
+        local = Path(directory) / "specs"
+        generate_sender_specs(local)
+        sender_spec = json.loads((local / f"{match}-sender-spec.json").read_text())
     inputs = [x for x in sender_spec["staged_inputs"] if x["name"] in ("source", "metadata")]
     selection = next(
         x

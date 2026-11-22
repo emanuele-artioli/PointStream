@@ -26,6 +26,7 @@ def aggregate(rows, key):
         ordinary=float(means[1]),
         difference=float(means[0] - means[1]),
         gain_percent=float(100 * (1 - means[0] / means[1])),
+        mean_within_clip_gain_percent=float(np.mean(100 * (1 - values[:, 0] / values[:, 1]))),
         difference_95=np.quantile(resampled[:, 0] - resampled[:, 1], [0.025, 0.975]).tolist()
         if len(values) > 1
         else None,
@@ -142,7 +143,7 @@ def summarize(data):
         resamples=REPLICATES,
         count=len(rows),
         scored=sum("direct" in r for r in rows),
-        finished_regardless_of_eligibility=True,
+        scored_regardless_of_scene_eligibility=True,
         rows=rows,
         groups=groups,
         combined_direct=counts(all_marks),
