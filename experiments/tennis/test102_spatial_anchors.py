@@ -16,7 +16,7 @@ from src.codecs import svtav1
 from experiments.tennis import test102_roi_map as roi
 
 CEILINGS = {"warm": 17794, "cold": 155274}
-GEOMETRY = {320: 192, 480: 272, 640: 384, 960: 544, 1920: 1080}
+GEOMETRY = {192: 112, 256: 144, 320: 192, 480: 272, 640: 384, 960: 544, 1920: 1080}
 FPS = Fraction(30000, 1001)
 
 

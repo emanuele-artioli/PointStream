@@ -81,7 +81,7 @@ if __name__ == "__main__":
     p = ArgumentParser(description=__doc__)
     p.add_argument("score_spec", type=Path)
     p.add_argument("out", type=Path)
-    p.add_argument("width", type=int, choices=[320, 480, 640, 960, 1920])
+    p.add_argument("width", type=int, choices=[192, 256, 320, 480, 640, 960, 1920])
     p.add_argument("ceilings", nargs="+")
     p.add_argument("--roi-ceiling", action="append")
     create(p.parse_args())

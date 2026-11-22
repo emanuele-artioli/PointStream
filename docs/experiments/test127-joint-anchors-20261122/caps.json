@@ -1,0 +1,10 @@
+{
+  "source_sha256": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+  "native_frames": 240,
+  "fps": [60, 1],
+  "selected_receiver_base_crf": 70,
+  "primary_warm": "warm",
+  "primary_cold": "cold",
+  "ceilings_bytes": {"warm": 12890, "cold": 162340, "r15462": 15462, "r17827": 17827},
+  "selection_basis": "The sender selected the complete running rate nearest 20 kbps before receiver pictures were scored. The other two running prices are physical sender deliveries awaiting display verification."
+}
