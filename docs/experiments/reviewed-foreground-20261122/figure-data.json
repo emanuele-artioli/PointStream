@@ -1,0 +1,1192 @@
+{
+  "registered_aggregation": "Both bodies averaged per instant, then player and ball classes weighted equally on jointly visible ticks; each rally weighted equally.",
+  "per_shot": {
+    "Nadal\u2013Kyrgios": {
+      "PointStream": {
+        "mode": "PointStream",
+        "kbps": 21.545,
+        "paired_player": 0.26169424255688983,
+        "paired_ball": 0.34504732489585876,
+        "foreground": 0.30337078372637427,
+        "source": "joint-trajectory-20261122#target-20"
+      },
+      "AV1": {
+        "mode": "AV1",
+        "kbps": 21.623333333333335,
+        "paired_player": 0.5115252509713173,
+        "paired_ball": 0.4133229007323583,
+        "foreground": 0.46242407585183776,
+        "source": "starved-ball-twenty-20261122/#plain240Q63"
+      },
+      "DCVC-UF": {
+        "mode": "DCVC-UF",
+        "kbps": 20.45,
+        "paired_player": 0.3924354538321495,
+        "paired_ball": 0.3439212540785472,
+        "foreground": 0.36817835395534837,
+        "source": "joint-trajectory-20261122#DCVC-QP6"
+      }
+    },
+    "Alcaraz\u2013Hurkacz": {
+      "PointStream": {
+        "mode": "PointStream",
+        "setting": "joint-20",
+        "bytes": 24489,
+        "kbps": 20.4075,
+        "stream_sha256": "ab12294fec2bba5bb5b21bf373a3a31c620b80cf9463cd92ab0383647d1a8aa9",
+        "body_all_24": 0.3027506445844968,
+        "paired_player": 0.30385554920543323,
+        "paired_ball": 0.2476190599528226,
+        "foreground": 0.27573730457912793
+      },
+      "AV1": {
+        "mode": "AV1",
+        "bytes": 23916,
+        "kbps": 19.93,
+        "width": 640,
+        "height": 384,
+        "crf": 62.25,
+        "stream_sha256": "21d9285d7331b41a4d438366df15ac4e0f842faf48b3db59b2c297a3fd9b9c0e",
+        "body_all_24": 0.46083854387203854,
+        "paired_player": 0.4579588337378068,
+        "paired_ball": 0.3308973854238337,
+        "foreground": 0.39442810958082025
+      },
+      "DCVC-UF": {
+        "mode": "DCVC-UF",
+        "setting": "Q24",
+        "archived_only": false,
+        "bytes": 24494,
+        "kbps": 20.411666666666665,
+        "stream_sha256": "08ca4898595d5e78c5f634559acd1fc13af369e2d07c3d4170c1cc764633d214",
+        "body_all_24": 0.35179554174343747,
+        "paired_player": 0.3507488803430037,
+        "paired_ball": 0.31280250440944324,
+        "foreground": 0.3317756923762235
+      }
+    }
+  },
+  "caps_kbps": {
+    "Nadal\u2013Kyrgios": 21.623333333333335,
+    "Alcaraz\u2013Hurkacz": 20.411666666666665
+  },
+  "source_ticks": {
+    "Nadal\u2013Kyrgios": 12,
+    "Alcaraz\u2013Hurkacz": 12
+  },
+  "visible_joint_ticks": {
+    "Nadal\u2013Kyrgios": 12,
+    "Alcaraz\u2013Hurkacz": 11
+  },
+  "pooled": {
+    "PointStream": {
+      "paired_player": 0.28277489588116156,
+      "paired_ball": 0.2963331924243407,
+      "foreground": 0.2895540441527511
+    },
+    "AV1": {
+      "paired_player": 0.4847420423545621,
+      "paired_ball": 0.372110143078096,
+      "foreground": 0.42842609271632903
+    },
+    "DCVC-UF": {
+      "paired_player": 0.3715921670875766,
+      "paired_ball": 0.3283618792439952,
+      "foreground": 0.34997702316578594
+    }
+  },
+  "pooled_foreground_relative_decrease_percent": {
+    "AV1": 32.414470295936994,
+    "DCVC-UF": 17.264841693453736
+  },
+  "upper_alcaraz": {
+    "PointStream": {
+      "mode": "PointStream",
+      "setting": "joint-39",
+      "bytes": 47702,
+      "kbps": 39.751666666666665,
+      "stream_sha256": "55bdedb1840e343a40acea72c80712a3e5165c15731e5ed039f20d57324e42f9",
+      "body_all_24": 0.3028963655233383,
+      "paired_player": 0.30407023429870605,
+      "paired_ball": 0.2373825420032848,
+      "foreground": 0.2707263881509954
+    },
+    "AV1": {
+      "mode": "AV1",
+      "bytes": 47719,
+      "kbps": 39.76583333333333,
+      "width": 640,
+      "height": 384,
+      "crf": 55.0,
+      "stream_sha256": "c8d5dea39e2e63579c33b691acb6506064916394d5644a2ef6d7acd4cb6b2aab",
+      "body_all_24": 0.3587648669878642,
+      "paired_player": 0.35641915418884973,
+      "paired_ball": 0.3125093254176053,
+      "foreground": 0.3344642398032275
+    },
+    "DCVC-UF": {
+      "mode": "DCVC-UF",
+      "setting": "Q36",
+      "archived_only": false,
+      "bytes": 47725,
+      "kbps": 39.770833333333336,
+      "stream_sha256": "d4c64ac818c1a340b0ce3384961b63c704c81b3561ef2e708118e415b5ea818e",
+      "body_all_24": 0.29259486744801205,
+      "paired_player": 0.2915711619637229,
+      "paired_ball": 0.26443547010421753,
+      "foreground": 0.2780033160339702
+    }
+  },
+  "limited_rate_foreground_bd_vs_envelope": {
+    "cached": {
+      "protocol": "anchor-geometry-sensitivity-v1",
+      "quality_orientation": "higher_is_better",
+      "physically_demonstrated_switching": false,
+      "candidate_pareto": [
+        [
+          11.133333333333333,
+          -0.3024021061983976
+        ],
+        [
+          20.4075,
+          -0.27573730457912793
+        ],
+        [
+          21.298333333333332,
+          -0.2727635976943103
+        ],
+        [
+          39.751666666666665,
+          -0.2707263881509954
+        ]
+      ],
+      "anchor_pareto": [
+        [
+          8.3125,
+          -0.5291590379043059
+        ],
+        [
+          9.055,
+          -0.5179897600954229
+        ],
+        [
+          9.659166666666666,
+          -0.5012077960101041
+        ],
+        [
+          10.275833333333333,
+          -0.50062018903819
+        ],
+        [
+          10.385833333333334,
+          -0.49242182346907526
+        ],
+        [
+          10.58,
+          -0.48722173002633185
+        ],
+        [
+          10.94,
+          -0.4837288111448288
+        ],
+        [
+          11.085,
+          -0.4780940074812282
+        ],
+        [
+          11.54,
+          -0.47759519788351923
+        ],
+        [
+          11.749166666666667,
+          -0.4753797569058158
+        ],
+        [
+          11.835833333333333,
+          -0.4603503007780422
+        ],
+        [
+          13.7125,
+          -0.44613830745220184
+        ],
+        [
+          15.815833333333334,
+          -0.42289821532639593
+        ],
+        [
+          18.841666666666665,
+          -0.4006251828237013
+        ],
+        [
+          19.93,
+          -0.39442810958082025
+        ],
+        [
+          20.411666666666665,
+          -0.3317756923762235
+        ],
+        [
+          39.770833333333336,
+          -0.2780033160339702
+        ],
+        [
+          89.68333333333334,
+          -0.26964440129019995
+        ]
+      ],
+      "anchor_linear_rate_hull": [
+        [
+          8.3125,
+          -0.5291590379043059
+        ],
+        [
+          9.659166666666666,
+          -0.5012077960101041
+        ],
+        [
+          11.835833333333333,
+          -0.4603503007780422
+        ],
+        [
+          20.411666666666665,
+          -0.3317756923762235
+        ],
+        [
+          39.770833333333336,
+          -0.2780033160339702
+        ],
+        [
+          89.68333333333334,
+          -0.26964440129019995
+        ]
+      ],
+      "candidate_rate_support": [
+        11.133333333333333,
+        39.751666666666665
+      ],
+      "anchor_rate_support": [
+        8.3125,
+        89.68333333333334
+      ],
+      "bd_rate": {
+        "hull_pchip": -0.5263100100178653,
+        "pareto_pchip": -0.5209369985517428,
+        "hull_linear_rate": -0.5822219931314414
+      },
+      "status": "supported",
+      "common_quality_interval": [
+        -0.3024021061983976,
+        -0.2707263881509954
+      ]
+    },
+    "cold": {
+      "protocol": "anchor-geometry-sensitivity-v1",
+      "quality_orientation": "higher_is_better",
+      "physically_demonstrated_switching": false,
+      "candidate_pareto": [
+        [
+          142.39749999999998,
+          -0.3024021061983976
+        ],
+        [
+          151.67166666666665,
+          -0.27573730457912793
+        ],
+        [
+          152.5625,
+          -0.2727635976943103
+        ],
+        [
+          171.01583333333332,
+          -0.2707263881509954
+        ]
+      ],
+      "anchor_pareto": [
+        [
+          8.3125,
+          -0.5291590379043059
+        ],
+        [
+          9.055,
+          -0.5179897600954229
+        ],
+        [
+          9.659166666666666,
+          -0.5012077960101041
+        ],
+        [
+          10.275833333333333,
+          -0.50062018903819
+        ],
+        [
+          10.385833333333334,
+          -0.49242182346907526
+        ],
+        [
+          10.58,
+          -0.48722173002633185
+        ],
+        [
+          10.94,
+          -0.4837288111448288
+        ],
+        [
+          11.085,
+          -0.4780940074812282
+        ],
+        [
+          11.54,
+          -0.47759519788351923
+        ],
+        [
+          11.749166666666667,
+          -0.4753797569058158
+        ],
+        [
+          11.835833333333333,
+          -0.4603503007780422
+        ],
+        [
+          13.7125,
+          -0.44613830745220184
+        ],
+        [
+          15.815833333333334,
+          -0.42289821532639593
+        ],
+        [
+          18.841666666666665,
+          -0.4006251828237013
+        ],
+        [
+          19.93,
+          -0.39442810958082025
+        ],
+        [
+          20.411666666666665,
+          -0.3317756923762235
+        ],
+        [
+          39.770833333333336,
+          -0.2780033160339702
+        ],
+        [
+          89.68333333333334,
+          -0.26964440129019995
+        ]
+      ],
+      "anchor_linear_rate_hull": [
+        [
+          8.3125,
+          -0.5291590379043059
+        ],
+        [
+          9.659166666666666,
+          -0.5012077960101041
+        ],
+        [
+          11.835833333333333,
+          -0.4603503007780422
+        ],
+        [
+          20.411666666666665,
+          -0.3317756923762235
+        ],
+        [
+          39.770833333333336,
+          -0.2780033160339702
+        ],
+        [
+          89.68333333333334,
+          -0.26964440129019995
+        ]
+      ],
+      "candidate_rate_support": [
+        142.39749999999998,
+        171.01583333333332
+      ],
+      "anchor_rate_support": [
+        8.3125,
+        89.68333333333334
+      ],
+      "bd_rate": {
+        "hull_pchip": 3.2462338424406343,
+        "pareto_pchip": 3.2943983880417163,
+        "hull_linear_rate": 2.7197841640432587
+      },
+      "status": "supported",
+      "common_quality_interval": [
+        -0.3024021061983976,
+        -0.2707263881509954
+      ]
+    }
+  },
+  "duplicate_320_upscaler": {
+    "max_crop_channel_difference": 1,
+    "max_crop_dists_difference": 0.0013750791549682617
+  },
+  "alcaraz_points": {
+    "PointStream": [
+      {
+        "mode": "PointStream",
+        "setting": "joint-11",
+        "bytes": 13360,
+        "kbps": 11.133333333333333,
+        "stream_sha256": "fb69663af77820efc3d84c65ec314a15948805ab1f3bc70571fcab0ee2d1e1bd",
+        "body_all_24": 0.31122537950674695,
+        "paired_player": 0.3117247657342391,
+        "paired_ball": 0.29307944666255603,
+        "foreground": 0.3024021061983976
+      },
+      {
+        "mode": "PointStream",
+        "setting": "joint-20",
+        "bytes": 24489,
+        "kbps": 20.4075,
+        "stream_sha256": "ab12294fec2bba5bb5b21bf373a3a31c620b80cf9463cd92ab0383647d1a8aa9",
+        "body_all_24": 0.3027506445844968,
+        "paired_player": 0.30385554920543323,
+        "paired_ball": 0.2476190599528226,
+        "foreground": 0.27573730457912793
+      },
+      {
+        "mode": "PointStream",
+        "setting": "joint-21",
+        "bytes": 25558,
+        "kbps": 21.298333333333332,
+        "stream_sha256": "4a53f55b07b8a2371ee54e8d57c4834888e1f46761b8ea53a9871cab3adcec9b",
+        "body_all_24": 0.3026505361000697,
+        "paired_player": 0.30381865122101526,
+        "paired_ball": 0.24170854416760532,
+        "foreground": 0.2727635976943103
+      },
+      {
+        "mode": "PointStream",
+        "setting": "joint-39",
+        "bytes": 47702,
+        "kbps": 39.751666666666665,
+        "stream_sha256": "55bdedb1840e343a40acea72c80712a3e5165c15731e5ed039f20d57324e42f9",
+        "body_all_24": 0.3028963655233383,
+        "paired_player": 0.30407023429870605,
+        "paired_ball": 0.2373825420032848,
+        "foreground": 0.2707263881509954
+      }
+    ],
+    "AV1": [
+      {
+        "mode": "AV1",
+        "bytes": 9975,
+        "kbps": 8.3125,
+        "width": 320,
+        "height": 192,
+        "crf": 70,
+        "stream_sha256": "29dfaf626f24fd411b0c55823d555887cf05f3a5b763a3b43f794caaa303731e",
+        "body_all_24": 0.6825244103868803,
+        "paired_player": 0.683863333680413,
+        "paired_ball": 0.3744547421281988,
+        "foreground": 0.5291590379043059
+      },
+      {
+        "mode": "AV1",
+        "bytes": 10866,
+        "kbps": 9.055,
+        "width": 160,
+        "height": 96,
+        "crf": 60,
+        "stream_sha256": "2cc47c641acae952b84d8012277e654b9b03b59a177cef423f053c8d96f9b309",
+        "body_all_24": 0.6560222432017326,
+        "paired_player": 0.6554807261987166,
+        "paired_ball": 0.3804987939921292,
+        "foreground": 0.5179897600954229
+      },
+      {
+        "mode": "AV1",
+        "bytes": 11591,
+        "kbps": 9.659166666666666,
+        "width": 320,
+        "height": 192,
+        "crf": 65.0,
+        "stream_sha256": "52757bb0060d488f6464142fadb74fda28714979561d881d3a5bc2f42c06e784",
+        "body_all_24": 0.6334827095270157,
+        "paired_player": 0.6340095454996283,
+        "paired_ball": 0.36840604652057996,
+        "foreground": 0.5012077960101041
+      },
+      {
+        "mode": "AV1",
+        "bytes": 12331,
+        "kbps": 10.275833333333333,
+        "width": 160,
+        "height": 96,
+        "crf": 55.0,
+        "stream_sha256": "c2370deaddac62ebdb8fd1d8766013eab57996b675ee5a20f6c22e2bd56465f7",
+        "body_all_24": 0.6222347617149353,
+        "paired_player": 0.6216042908755216,
+        "paired_ball": 0.3796360872008584,
+        "foreground": 0.50062018903819
+      },
+      {
+        "mode": "AV1",
+        "bytes": 12463,
+        "kbps": 10.385833333333334,
+        "width": 320,
+        "height": 192,
+        "crf": 63.75,
+        "stream_sha256": "d4b704f41eb23ac3891a3419eb97ae6b69b87f74b95bc1b02a458b546250a40b",
+        "body_all_24": 0.6190047164758047,
+        "paired_player": 0.6197687631303613,
+        "paired_ball": 0.3650748838077892,
+        "foreground": 0.49242182346907526
+      },
+      {
+        "mode": "AV1",
+        "bytes": 12696,
+        "kbps": 10.58,
+        "width": 640,
+        "height": 384,
+        "crf": 70,
+        "stream_sha256": "0aa9b217e9de353180d4133a02417f6a5e5f7429baf6fe8528370b36a92187ef",
+        "body_all_24": 0.6103869155049324,
+        "paired_player": 0.6129420318386771,
+        "paired_ball": 0.3615014282139865,
+        "foreground": 0.48722173002633185
+      },
+      {
+        "mode": "AV1",
+        "bytes": 12982,
+        "kbps": 10.818333333333333,
+        "width": 160,
+        "height": 96,
+        "crf": 52.5,
+        "stream_sha256": "847a7da290f4b26125d219db460bb44ccdcdfaf1e9cc7d27963f078cac9960b4",
+        "body_all_24": 0.6144037445386251,
+        "paired_player": 0.6131568009203131,
+        "paired_ball": 0.37888488986275415,
+        "foreground": 0.4960208453915336
+      },
+      {
+        "mode": "AV1",
+        "bytes": 13121,
+        "kbps": 10.934166666666666,
+        "width": 160,
+        "height": 96,
+        "crf": 51.75,
+        "stream_sha256": "cde79d754f4ea03c355d96b58f486505c7c5d13c5f5e74fb8d0d8eb258779ec6",
+        "body_all_24": 0.6128991271058718,
+        "paired_player": 0.6114572367884896,
+        "paired_ball": 0.37941822138699616,
+        "foreground": 0.49543772908774286
+      },
+      {
+        "mode": "AV1",
+        "bytes": 13128,
+        "kbps": 10.94,
+        "width": 320,
+        "height": 192,
+        "crf": 63.0,
+        "stream_sha256": "37fc9dfe5138e46efbef25ec745c4dc1af0e091bc1190ac463b046bd115115ef",
+        "body_all_24": 0.6024069016178449,
+        "paired_player": 0.6022277501496401,
+        "paired_ball": 0.3652298721400174,
+        "foreground": 0.4837288111448288
+      },
+      {
+        "mode": "AV1",
+        "bytes": 13197,
+        "kbps": 10.9975,
+        "width": 160,
+        "height": 96,
+        "crf": 51.5,
+        "stream_sha256": "c0af798886daa7e20f9d2e599fc0645c91cfaf957a84a0e5c1571e85dda3c478",
+        "body_all_24": 0.6108372335632642,
+        "paired_player": 0.6092135120521892,
+        "paired_ball": 0.37976969372142444,
+        "foreground": 0.4944916028868068
+      },
+      {
+        "mode": "AV1",
+        "bytes": 13302,
+        "kbps": 11.085,
+        "width": 640,
+        "height": 384,
+        "crf": 68.75,
+        "stream_sha256": "8708414c738fe7cf541ef1f4bf1e26cd330ffdb25327a25e3ad5e21133026906",
+        "body_all_24": 0.6001852502425512,
+        "paired_player": 0.6013439216397025,
+        "paired_ball": 0.3548440933227539,
+        "foreground": 0.4780940074812282
+      },
+      {
+        "mode": "AV1",
+        "bytes": 13394,
+        "kbps": 11.161666666666667,
+        "width": 160,
+        "height": 96,
+        "crf": 51.25,
+        "stream_sha256": "0598fff91b4e0b3ff0726b610533caa1baf64d2b49243710771e933e6bbb88b1",
+        "body_all_24": 0.6055925190448761,
+        "paired_player": 0.6043973565101624,
+        "paired_ball": 0.38109140504490246,
+        "foreground": 0.4927443807775324
+      },
+      {
+        "mode": "AV1",
+        "bytes": 13641,
+        "kbps": 11.3675,
+        "width": 160,
+        "height": 96,
+        "crf": 50,
+        "stream_sha256": "732a78c4a7dfb34d9edd61ae54c16e5cf22882557b5dee15b9c0a5864f05f75e",
+        "body_all_24": 0.6024651502569517,
+        "paired_player": 0.6011538315903057,
+        "paired_ball": 0.3808077031915838,
+        "foreground": 0.49098076739094476
+      },
+      {
+        "mode": "AV1",
+        "bytes": 13848,
+        "kbps": 11.54,
+        "width": 320,
+        "height": 192,
+        "crf": 62.75,
+        "stream_sha256": "e3ef72962ca2fd768b528dfa2fbbe10e95222cf8d8f4e9d88773dcf0671c4baa",
+        "body_all_24": 0.5935850813984871,
+        "paired_player": 0.5931811413981698,
+        "paired_ball": 0.3620092543688687,
+        "foreground": 0.47759519788351923
+      },
+      {
+        "mode": "AV1",
+        "bytes": 14099,
+        "kbps": 11.749166666666667,
+        "width": 320,
+        "height": 192,
+        "crf": 62.5,
+        "stream_sha256": "8a7a59ffeb6478aa774d44f1530a2c12a055d0f89a1c49839c842f80f282b4b5",
+        "body_all_24": 0.5861160382628441,
+        "paired_player": 0.5845634883100336,
+        "paired_ball": 0.366196025501598,
+        "foreground": 0.4753797569058158
+      },
+      {
+        "mode": "AV1",
+        "bytes": 14203,
+        "kbps": 11.835833333333333,
+        "width": 640,
+        "height": 384,
+        "crf": 67.5,
+        "stream_sha256": "2341a65d9815845df2c64c70f5328c67a6eb030f39a3e7bc5421fc1d0aef1f3e",
+        "body_all_24": 0.5735390856862068,
+        "paired_player": 0.5719883089715784,
+        "paired_ball": 0.3487122925845059,
+        "foreground": 0.4603503007780422
+      },
+      {
+        "mode": "AV1",
+        "bytes": 16455,
+        "kbps": 13.7125,
+        "width": 640,
+        "height": 384,
+        "crf": 65,
+        "stream_sha256": "932b8c0b10ab25c51bd81892f4dcb88cb5baffe1d450b92865aac072f51146d0",
+        "body_all_24": 0.5537085483471552,
+        "paired_player": 0.5506718836047433,
+        "paired_ball": 0.3416047312996604,
+        "foreground": 0.44613830745220184
+      },
+      {
+        "mode": "AV1",
+        "bytes": 17101,
+        "kbps": 14.250833333333333,
+        "width": 320,
+        "height": 192,
+        "crf": 60,
+        "stream_sha256": "657bf4426f7683a893274afea9080bb675be60cf55406fd85848d7e24d3d67fd",
+        "body_all_24": 0.5494255547722181,
+        "paired_player": 0.5470509231090546,
+        "paired_ball": 0.353419921614907,
+        "foreground": 0.4502354223619808
+      },
+      {
+        "mode": "AV1",
+        "bytes": 17614,
+        "kbps": 14.678333333333333,
+        "width": 160,
+        "height": 96,
+        "crf": 40,
+        "stream_sha256": "2e023b88f9cca7c6ec48cec085b55bd9aff380df1768085bfc1b0ed1408ae3a8",
+        "body_all_24": 0.572802538673083,
+        "paired_player": 0.5748587521639738,
+        "paired_ball": 0.377279438755729,
+        "foreground": 0.4760690954598514
+      },
+      {
+        "mode": "AV1",
+        "bytes": 18979,
+        "kbps": 15.815833333333334,
+        "width": 640,
+        "height": 384,
+        "crf": 63.5,
+        "stream_sha256": "ef659eb5a6dc42324cf75e86c20f2bcc42523d52984f9c5b60d6852a3025c058",
+        "body_all_24": 0.5140585824847221,
+        "paired_player": 0.5090386136011644,
+        "paired_ball": 0.33675781705162744,
+        "foreground": 0.42289821532639593
+      },
+      {
+        "mode": "AV1",
+        "bytes": 21006,
+        "kbps": 17.505,
+        "width": 160,
+        "height": 96,
+        "crf": 35.0,
+        "stream_sha256": "9fa702ad7b56c33ff0ac1e242590f645002ab5f9af25d80fb47ed0c0585a971d",
+        "body_all_24": 0.5505433827638626,
+        "paired_player": 0.5512454265897925,
+        "paired_ball": 0.3751765868880532,
+        "foreground": 0.46321100673892285
+      },
+      {
+        "mode": "AV1",
+        "bytes": 22610,
+        "kbps": 18.841666666666665,
+        "width": 640,
+        "height": 384,
+        "crf": 62.75,
+        "stream_sha256": "0d206ef8f278e9172e2fc63cab5a3ffe3de451d7e31c5f39c0516f197beacc17",
+        "body_all_24": 0.47455163051684696,
+        "paired_player": 0.4687331535599448,
+        "paired_ball": 0.3325172120874578,
+        "foreground": 0.4006251828237013
+      },
+      {
+        "mode": "AV1",
+        "bytes": 23006,
+        "kbps": 19.171666666666667,
+        "width": 160,
+        "height": 96,
+        "crf": 32.5,
+        "stream_sha256": "03873e43176166ff87a4dcd935d4b1eda28da41f07a74d9ce8e1727350c31909",
+        "body_all_24": 0.5440657412012418,
+        "paired_player": 0.5446020662784576,
+        "paired_ball": 0.377570856701244,
+        "foreground": 0.46108646148985083
+      },
+      {
+        "mode": "AV1",
+        "bytes": 23194,
+        "kbps": 19.328333333333333,
+        "width": 320,
+        "height": 192,
+        "crf": 54,
+        "stream_sha256": "b46dff01b63216aba5b6a0bb7857f02b42c6f14eaf9e7741468674fe4d26b9c6",
+        "body_all_24": 0.5102658768494924,
+        "paired_player": 0.510415722023357,
+        "paired_ball": 0.3470126282085072,
+        "foreground": 0.42871417511593213
+      },
+      {
+        "mode": "AV1",
+        "bytes": 23763,
+        "kbps": 19.8025,
+        "width": 320,
+        "height": 192,
+        "crf": 53.5,
+        "stream_sha256": "21d4169f87775ed45dbf6a050d061cf5d92eab5258e4e4a71a7a279484fe7d77",
+        "body_all_24": 0.5039207686980566,
+        "paired_player": 0.5027012418616902,
+        "paired_ball": 0.3437349958853288,
+        "foreground": 0.42321811887350946
+      },
+      {
+        "mode": "AV1",
+        "bytes": 23916,
+        "kbps": 19.93,
+        "width": 640,
+        "height": 384,
+        "crf": 62.25,
+        "stream_sha256": "21d9285d7331b41a4d438366df15ac4e0f842faf48b3db59b2c297a3fd9b9c0e",
+        "body_all_24": 0.46083854387203854,
+        "paired_player": 0.4579588337378068,
+        "paired_ball": 0.3308973854238337,
+        "foreground": 0.39442810958082025
+      },
+      {
+        "mode": "AV1",
+        "bytes": 24185,
+        "kbps": 20.154166666666665,
+        "width": 160,
+        "height": 96,
+        "crf": 31.25,
+        "stream_sha256": "c6055426540fe796538e52c4e62b7c1fb514bcc8b09fd377ee94fae810bd0d60",
+        "body_all_24": 0.5439758549133936,
+        "paired_player": 0.5443076924844221,
+        "paired_ball": 0.3744571642442183,
+        "foreground": 0.4593824283643202
+      },
+      {
+        "mode": "AV1",
+        "bytes": 24308,
+        "kbps": 20.256666666666668,
+        "width": 320,
+        "height": 192,
+        "crf": 53,
+        "stream_sha256": "db3fe98d1c982180eef228af5497124347109c6ca29d6d7261a179b39253d18b",
+        "body_all_24": 0.5012545784314474,
+        "paired_player": 0.5007613572207364,
+        "paired_ball": 0.3401118571108038,
+        "foreground": 0.42043660716577014
+      },
+      {
+        "mode": "AV1",
+        "bytes": 24433,
+        "kbps": 20.360833333333332,
+        "width": 320,
+        "height": 192,
+        "crf": 52.75,
+        "stream_sha256": "32e9379693742bf3ddd2324c14e31dfafdf8f7c7fd52230ca8b317d197cf76bf",
+        "body_all_24": 0.5023903300364813,
+        "paired_player": 0.5034544955600392,
+        "paired_ball": 0.3443785851651972,
+        "foreground": 0.42391654036261817
+      },
+      {
+        "mode": "AV1",
+        "bytes": 24463,
+        "kbps": 20.385833333333334,
+        "width": 160,
+        "height": 96,
+        "crf": 31.0,
+        "stream_sha256": "ee21630220971f11b42e4885a5e1ba20f8528f2ec0ba81df15c2c5d082ff2121",
+        "body_all_24": 0.5402006631096204,
+        "paired_player": 0.5401584749872034,
+        "paired_ball": 0.37170983986421063,
+        "foreground": 0.455934157425707
+      },
+      {
+        "mode": "AV1",
+        "bytes": 24718,
+        "kbps": 20.598333333333333,
+        "width": 640,
+        "height": 384,
+        "crf": 62,
+        "stream_sha256": "00948ce449ee4774bd7a3317228b390684daa36549c8d9c7b34e1f1f44147b8a",
+        "body_all_24": 0.4512317478656769,
+        "paired_player": 0.4472230076789856,
+        "paired_ball": 0.3280657042156566,
+        "foreground": 0.3876443559473211
+      },
+      {
+        "mode": "AV1",
+        "bytes": 24747,
+        "kbps": 20.6225,
+        "width": 160,
+        "height": 96,
+        "crf": 30.75,
+        "stream_sha256": "2ce538a8edf24eb2aa0ec0ad3c18179d70f0f4d7a830abe50536f5d051ca467b",
+        "body_all_24": 0.5407672474781672,
+        "paired_player": 0.5405302914706144,
+        "paired_ball": 0.3728337287902832,
+        "foreground": 0.4566820101304488
+      },
+      {
+        "mode": "AV1",
+        "bytes": 24873,
+        "kbps": 20.7275,
+        "width": 320,
+        "height": 192,
+        "crf": 52.5,
+        "stream_sha256": "c77933d23755962f9f08b71987988c41474651a1ea630aa1564f2ddbe49f6aea",
+        "body_all_24": 0.49774353951215744,
+        "paired_player": 0.4972254823554646,
+        "paired_ball": 0.3432250077074224,
+        "foreground": 0.42022524503144354
+      },
+      {
+        "mode": "AV1",
+        "bytes": 25065,
+        "kbps": 20.8875,
+        "width": 160,
+        "height": 96,
+        "crf": 30.5,
+        "stream_sha256": "0873b747a1865695b45bf4bc33280f72a9b3b5b4235027bbee92889ed14480fb",
+        "body_all_24": 0.5374800364176432,
+        "paired_player": 0.5375419530001554,
+        "paired_ball": 0.3730705705556003,
+        "foreground": 0.4553062617778778
+      },
+      {
+        "mode": "AV1",
+        "bytes": 25210,
+        "kbps": 21.008333333333333,
+        "width": 320,
+        "height": 192,
+        "crf": 52,
+        "stream_sha256": "dbe2c84721d430e48d885cab2ea65772da55b896d1dbcb726b4fa1fe974c7e6b",
+        "body_all_24": 0.49304218341906864,
+        "paired_player": 0.4925084493376992,
+        "paired_ball": 0.3397102355957031,
+        "foreground": 0.41610934246670117
+      },
+      {
+        "mode": "AV1",
+        "bytes": 25683,
+        "kbps": 21.4025,
+        "width": 160,
+        "height": 96,
+        "crf": 30.0,
+        "stream_sha256": "6e097950eeac91c0567d1f7748249ec5c30a6ac0becbbac8f05a028f823831e7",
+        "body_all_24": 0.5367458189527193,
+        "paired_player": 0.5369974212212996,
+        "paired_ball": 0.37362809072841296,
+        "foreground": 0.45531275597485626
+      },
+      {
+        "mode": "AV1",
+        "bytes": 26263,
+        "kbps": 21.885833333333334,
+        "width": 320,
+        "height": 192,
+        "crf": 51,
+        "stream_sha256": "5a3b9e0822ca48c864fe2c329dfe267ba3a3053e8c33caea2bc1a90fb9487e05",
+        "body_all_24": 0.4865320424238841,
+        "paired_player": 0.48488053950396454,
+        "paired_ball": 0.34433588656512176,
+        "foreground": 0.41460821303454315
+      },
+      {
+        "mode": "AV1",
+        "bytes": 27489,
+        "kbps": 22.9075,
+        "width": 320,
+        "height": 192,
+        "crf": 50,
+        "stream_sha256": "8a2bf2b6131cba4f952f3cb82552780fe07511e21606c90b38ffddf0acce332b",
+        "body_all_24": 0.48061198244492215,
+        "paired_player": 0.47872869263995776,
+        "paired_ball": 0.3381441831588745,
+        "foreground": 0.40843643789941614
+      },
+      {
+        "mode": "AV1",
+        "bytes": 29148,
+        "kbps": 24.29,
+        "width": 640,
+        "height": 384,
+        "crf": 61,
+        "stream_sha256": "f3f464ab5565bf363900f3bcca36762ca1f5b9c15b37c119dcd55ac390dee8cc",
+        "body_all_24": 0.4196682373682658,
+        "paired_player": 0.41655359214002435,
+        "paired_ball": 0.3239968039772727,
+        "foreground": 0.3702751980586485
+      },
+      {
+        "mode": "AV1",
+        "bytes": 32322,
+        "kbps": 26.935,
+        "width": 640,
+        "height": 384,
+        "crf": 60,
+        "stream_sha256": "2234237c62489ca1b24073acdfa074a2da283cfd015d92976f033d92ce8a8d91",
+        "body_all_24": 0.4123893106977145,
+        "paired_player": 0.411291396076029,
+        "paired_ball": 0.320419734174555,
+        "foreground": 0.365855565125292
+      },
+      {
+        "mode": "AV1",
+        "bytes": 33889,
+        "kbps": 28.240833333333335,
+        "width": 320,
+        "height": 192,
+        "crf": 45,
+        "stream_sha256": "0c668a67e751ec425234c856fd30407686ec80549b1606d3c32385c188001bd8",
+        "body_all_24": 0.44316036502520245,
+        "paired_player": 0.44245818799192255,
+        "paired_ball": 0.33484314246611163,
+        "foreground": 0.3886506652290171
+      },
+      {
+        "mode": "AV1",
+        "bytes": 39082,
+        "kbps": 32.568333333333335,
+        "width": 160,
+        "height": 96,
+        "crf": 20,
+        "stream_sha256": "99948bb7a6e78a004f6616e0fe676fe1bf05f56b06335c62c8875207fb021d99",
+        "body_all_24": 0.5088729659716288,
+        "paired_player": 0.5092465362765572,
+        "paired_ball": 0.3680645769292658,
+        "foreground": 0.43865555660291156
+      },
+      {
+        "mode": "AV1",
+        "bytes": 42655,
+        "kbps": 35.545833333333334,
+        "width": 320,
+        "height": 192,
+        "crf": 40.0,
+        "stream_sha256": "93623028709bfb7772184056f653aad648e47de4832c1644528a1ff2e17ee684",
+        "body_all_24": 0.4219888746738434,
+        "paired_player": 0.42124949260191485,
+        "paired_ball": 0.33077053048393945,
+        "foreground": 0.3760100115429271
+      },
+      {
+        "mode": "AV1",
+        "bytes": 45232,
+        "kbps": 37.693333333333335,
+        "width": 320,
+        "height": 192,
+        "crf": 38.75,
+        "stream_sha256": "47426afd90602e3b96a3cb9acdf5e48a75443c8f3bb3bf90e5c88447f189c2e1",
+        "body_all_24": 0.4118296305338542,
+        "paired_player": 0.4103605936874043,
+        "paired_ball": 0.3286357034336437,
+        "foreground": 0.369498148560524
+      },
+      {
+        "mode": "AV1",
+        "bytes": 46837,
+        "kbps": 39.030833333333334,
+        "width": 320,
+        "height": 192,
+        "crf": 38.0,
+        "stream_sha256": "7caeb5f0cdd4d2f0345caf63936b28e9d1ed627e628c72d9b60df78bbd446084",
+        "body_all_24": 0.4051749010880788,
+        "paired_player": 0.40399361469528894,
+        "paired_ball": 0.3278100544756109,
+        "foreground": 0.3659018345854499
+      },
+      {
+        "mode": "AV1",
+        "bytes": 47719,
+        "kbps": 39.76583333333333,
+        "width": 640,
+        "height": 384,
+        "crf": 55.0,
+        "stream_sha256": "c8d5dea39e2e63579c33b691acb6506064916394d5644a2ef6d7acd4cb6b2aab",
+        "body_all_24": 0.3587648669878642,
+        "paired_player": 0.35641915418884973,
+        "paired_ball": 0.3125093254176053,
+        "foreground": 0.3344642398032275
+      },
+      {
+        "mode": "AV1",
+        "bytes": 48297,
+        "kbps": 40.2475,
+        "width": 320,
+        "height": 192,
+        "crf": 37.75,
+        "stream_sha256": "bac24432bcec62bd5a491839c18c4b162dba369f84827ed055e2cbe01716abd4",
+        "body_all_24": 0.40783223261435825,
+        "paired_player": 0.40618685429746454,
+        "paired_ball": 0.3261373910036954,
+        "foreground": 0.36616212265057996
+      },
+      {
+        "mode": "AV1",
+        "bytes": 48496,
+        "kbps": 40.413333333333334,
+        "width": 320,
+        "height": 192,
+        "crf": 37.5,
+        "stream_sha256": "8f18fe9c73233ef576af9a196f28a083fffa1fe25f10cb78e1e6fed3daf3c784",
+        "body_all_24": 0.4049513638019562,
+        "paired_player": 0.40482583912936126,
+        "paired_ball": 0.32613150639967486,
+        "foreground": 0.36547867276451806
+      },
+      {
+        "mode": "AV1",
+        "bytes": 55801,
+        "kbps": 46.50083333333333,
+        "width": 320,
+        "height": 192,
+        "crf": 35,
+        "stream_sha256": "55fd6d9641d324e1aa223bd87d97252ec9995351f58a1054f9cded7f2544a53c",
+        "body_all_24": 0.38824830452601117,
+        "paired_player": 0.3890427161346782,
+        "paired_ball": 0.32942930134859955,
+        "foreground": 0.35923600874163886
+      },
+      {
+        "mode": "AV1",
+        "bytes": 62760,
+        "kbps": 52.3,
+        "width": 640,
+        "height": 384,
+        "crf": 50,
+        "stream_sha256": "82a17c8c816b4d817dc3e180606cb57e1d35ae922003e221e1f9e5712471dc01",
+        "body_all_24": 0.32660507907470065,
+        "paired_player": 0.32348069277676667,
+        "paired_ball": 0.30696440826762805,
+        "foreground": 0.3152225505221974
+      },
+      {
+        "mode": "AV1",
+        "bytes": 95437,
+        "kbps": 79.53083333333333,
+        "width": 320,
+        "height": 192,
+        "crf": 25,
+        "stream_sha256": "ccfc0486df8892e31671b9817058fe1551089cec316f651d102e66aa299f651a",
+        "body_all_24": 0.3534460763136546,
+        "paired_player": 0.3532234647057273,
+        "paired_ball": 0.3073227513920177,
+        "foreground": 0.3302731080488725
+      },
+      {
+        "mode": "AV1",
+        "bytes": 107620,
+        "kbps": 89.68333333333334,
+        "width": 640,
+        "height": 384,
+        "crf": 40,
+        "stream_sha256": "91617b79bbe2c22beb657069e059a417aa7cb9571e98395303078217ce75226e",
+        "body_all_24": 0.27777282396952313,
+        "paired_player": 0.2771828066218983,
+        "paired_ball": 0.26210599595850165,
+        "foreground": 0.26964440129019995
+      }
+    ],
+    "DCVC-UF": [
+      {
+        "mode": "DCVC-UF",
+        "setting": "Q36",
+        "archived_only": false,
+        "bytes": 47725,
+        "kbps": 39.770833333333336,
+        "stream_sha256": "d4c64ac818c1a340b0ce3384961b63c704c81b3561ef2e708118e415b5ea818e",
+        "body_all_24": 0.29259486744801205,
+        "paired_player": 0.2915711619637229,
+        "paired_ball": 0.26443547010421753,
+        "foreground": 0.2780033160339702
+      },
+      {
+        "mode": "DCVC-UF",
+        "setting": "Q18",
+        "archived_only": true,
+        "bytes": 17486,
+        "kbps": 14.571666666666665,
+        "stream_sha256": "d3909f4c4bd56d0b3a8b6ef2f5110ed46e8f7ddae1b52cef51fda357367cb7f8",
+        "body_all_24": 0.3947386269768079,
+        "paired_player": 0.39183383638208563,
+        "paired_ball": 0.3243311914530667,
+        "foreground": 0.3580825139175762
+      },
+      {
+        "mode": "DCVC-UF",
+        "setting": "Q24",
+        "archived_only": false,
+        "bytes": 24494,
+        "kbps": 20.411666666666665,
+        "stream_sha256": "08ca4898595d5e78c5f634559acd1fc13af369e2d07c3d4170c1cc764633d214",
+        "body_all_24": 0.35179554174343747,
+        "paired_player": 0.3507488803430037,
+        "paired_ball": 0.31280250440944324,
+        "foreground": 0.3317756923762235
+      }
+    ]
+  }
+}
