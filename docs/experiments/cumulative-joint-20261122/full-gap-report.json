@@ -1,0 +1,88 @@
+{
+  "source_sha256": "676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66",
+  "source_probe": {
+    "width": 1920,
+    "height": 1080,
+    "avg_frame_rate": "50/1",
+    "nb_frames": "115505"
+  },
+  "source_start": 76866,
+  "frames": 10825,
+  "fps": 50,
+  "geometry": [
+    240,
+    136
+  ],
+  "crf": 70,
+  "preset": 8,
+  "stage": "full",
+  "cpu_affinity": [
+    0
+  ],
+  "tools": {
+    "SvtAv1EncApp": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "sha256": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+      "version": "SVT-AV1 v4.2.0 (release)"
+    },
+    "dav1d": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+      "version": "1.5.4"
+    },
+    "ffmpeg": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+      "version": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    "ffprobe": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffprobe",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffprobe",
+      "sha256": "f4e72e0094397518602881be95f16a1d60ec41b03ecfb0aaa6f8e45ffa14583a",
+      "version": "ffprobe version 8.1.2 Copyright (c) 2007-2026 the FFmpeg developers"
+    }
+  },
+  "conversion": [
+    "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+    "-v",
+    "error",
+    "-nostdin",
+    "-ss",
+    "1537.340000",
+    "-i",
+    "/local/users/emanuele/pointstream/cache/676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66/nadal-kyrgios-broadcast.mp4",
+    "-frames:v",
+    "10825",
+    "-vf",
+    "scale=240:136:flags=area:out_range=tv,format=yuv420p",
+    "-filter_threads",
+    "1",
+    "-fps_mode",
+    "passthrough",
+    "-threads",
+    "1",
+    "-f",
+    "rawvideo",
+    "-pix_fmt",
+    "yuv420p",
+    "/local/users/emanuele/pointstream/scratch/20261121T230405Z-9ee24c23-full/gap/input.yuv"
+  ],
+  "bytes": 540921,
+  "payload_bytes": 410989,
+  "stream_sha256": "0b4960e92ce07db9dabee33daa98a705c215191ba042c6291b1c546a6a87c1d3",
+  "decoded_sha256": "a8f847be912988f9a7c75535d9f23802120f86566530d8a3426c894cb54b19a2",
+  "decoded_frames": 10825,
+  "kbps": 19.987842956120094,
+  "conversion_seconds": 43.697308332994,
+  "encode_seconds": 16.391,
+  "decode_seconds": 0.975,
+  "native_cpu_seconds": 17.336,
+  "elapsed_seconds": 61.4626464949979,
+  "usage_cpu_seconds": 62.55805,
+  "total_budget_bytes_20kbps": 565250,
+  "reference_channel_bytes": 243000,
+  "remaining_after_references_and_gap_bytes": -218671
+}

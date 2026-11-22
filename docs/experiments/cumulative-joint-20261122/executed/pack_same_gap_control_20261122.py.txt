@@ -1,0 +1,16 @@
+"""Package the matched same-gap three-IVF control with the identical PSB1 index."""
+import hashlib,json,struct,tarfile
+from pathlib import Path
+r=Path('/home/itec/emanuele/Datasets/pointstream-data');out=r/'tennis/cumulative-joint-20261122/same-gap-control-transport-v1';out.mkdir(parents=True,exist_ok=False)
+def sha(b):return hashlib.sha256(b).hexdigest()
+def read(job,name):
+ with tarfile.open(r/f'jobs/fleet/inbox/{job}/full/published.tar') as tar:return tar.extractfile('publish/'+name).read()
+parts=[('initial_ivf',read('20261121T233540Z-28906074','960-q41.0.ivf')),('fallback_ivf',read('20261121T230405Z-9ee24c23','fallback.ivf')),('return_ivf',read('20261121T234041Z-ad3f14db','960-q63.5.ivf'))]
+assert [len(v) for _,v in parts]==[274027,540921,44007]
+assert [sha(v) for _,v in parts]==['fb380d283ef8dbe977cf963fa702d6d625f9dd40505e53690b07bd292607ac7f','0b4960e92ce07db9dabee33daa98a705c215191ba042c6291b1c546a6a87c1d3','66d3af87818b76c12435a9b2b4f5e9797a219a3d32faf4aface4568af74b8bf8']
+h={'version':1,'fps':[50,1],'source_ticks':[76626,87931],'segments':[{'mode':'native','start':0,'frames':240},{'mode':'native-fallback','start':240,'frames':10825},{'mode':'native','start':11065,'frames':240}],'entries':[{'name':n,'bytes':len(v),'sha256':sha(v)} for n,v in parts],'preinstalled':'native codec and its pinned runtime'};raw=json.dumps(h,sort_keys=True,separators=(',',':')).encode();packet=b'PSB1'+struct.pack('>I',len(raw))+raw+b''.join(v for _,v in parts);(out/'delivery.psb').write_bytes(packet)
+q=(out/'delivery.psb').read_bytes();n=struct.unpack_from('>I',q,4)[0];idx=json.loads(q[8:8+n]);pos=8+n
+for e in idx['entries']:
+ part=q[pos:pos+e['bytes']];assert len(part)==e['bytes'] and sha(part)==e['sha256'];pos+=e['bytes']
+assert pos==len(q)
+r={'total_bytes':len(q),'component_bytes':sum(len(v) for _,v in parts),'index_bytes':8+len(raw),'packet_sha256':sha(q),'duration_seconds':226.1,'kbps':len(q)*8/226100,'all_sections_reparsed':True,'frames':11305};(out/'receipt.json').write_text(json.dumps(r,indent=2));print(json.dumps(r))
