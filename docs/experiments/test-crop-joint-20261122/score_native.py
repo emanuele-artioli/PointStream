@@ -206,7 +206,8 @@ def score(a, arm, model, support, support_hash):
                 forecast = (time.process_time() - cpu0) * 240 / 6 * 1.5
                 if forecast > 1700:
                     raise ValueError(f"CPU stage forecast too high: {forecast}")
-        assert not src.read()[0]
+        # The registered packet covers the first 240 native ticks of the longer rally file.
+        assert int(src.get(cv2.CAP_PROP_POS_FRAMES)) == NT
         src.release()
 
     def group(rows):
@@ -272,6 +273,8 @@ def main(a):
         rows = [r for r in rows if r["bytes"] <= 17794]
     elif a.limit == "cold":
         rows = [r for r in rows if 17794 < r["bytes"] <= 155274]
+    if a.offset or a.count is not None:
+        rows = rows[a.offset : None if a.count is None else a.offset + a.count]
     a.output.mkdir(exist_ok=True, parents=True)
     assert len({r["name"] for r in rows}) == len(rows)
     for row in rows:
@@ -305,4 +308,6 @@ if __name__ == "__main__":
     for k in ("arms", "av1", "neural"):
         p.add_argument("--" + k, type=Path)
     p.add_argument("--limit", choices=["warm", "cold", "all"], default="all")
+    p.add_argument("--offset", type=int, default=0)
+    p.add_argument("--count", type=int)
     main(p.parse_args())
