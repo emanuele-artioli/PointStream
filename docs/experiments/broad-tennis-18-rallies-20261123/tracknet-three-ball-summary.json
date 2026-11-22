@@ -1,0 +1,122 @@
+{
+  "scope": "Three originally enrolled complete TrackNet game9 points, one development match, 33 kbps ceilings, paired actual 640-wide streams",
+  "rows": [
+    {
+      "clip": "game9_clip1",
+      "receipt_sha256": "6ebc70cca16c675b854065c7a89fa0d67b91af2c62446aaba92230207273783c",
+      "actual_kbps": {
+        "ordinary": 27.74457831,
+        "pointstream": 27.59710843,
+        "ceiling": 32.99855422
+      },
+      "visible": 83,
+      "absent": 0,
+      "within_ten": 75,
+      "false_on_absent": 0,
+      "whole_psnr": {
+        "ordinary": 27.27616496263627,
+        "pointstream": 27.042999994396
+      },
+      "mean_crops": {
+        "ordinary": {
+          "dists": 0.20307127897997937,
+          "lpips": 0.14404805009085012,
+          "luma_ssim": 0.8856513389947845,
+          "rgb_psnr": 27.309563295156092
+        },
+        "pointstream": {
+          "dists": 0.18716902546135775,
+          "lpips": 0.10136208808924778,
+          "luma_ssim": 0.8938150415701127,
+          "rgb_psnr": 27.728748653874433
+        }
+      }
+    },
+    {
+      "clip": "game9_clip2",
+      "receipt_sha256": "06eb7e45595633246a662ecd87709d2f1d8d3d2ae9b5f06d3ef660ab1177bbbd",
+      "actual_kbps": {
+        "ordinary": 17.70232558,
+        "pointstream": 17.72930233,
+        "ceiling": 33.0
+      },
+      "visible": 258,
+      "absent": 0,
+      "within_ten": 234,
+      "false_on_absent": 0,
+      "whole_psnr": {
+        "ordinary": 26.893932823793016,
+        "pointstream": 26.608730447389824
+      },
+      "mean_crops": {
+        "ordinary": {
+          "dists": 0.22808508840642233,
+          "lpips": 0.20289254975469076,
+          "luma_ssim": 0.864758417765415,
+          "rgb_psnr": 26.286345184898682
+        },
+        "pointstream": {
+          "dists": 0.19458318519037823,
+          "lpips": 0.132106729779508,
+          "luma_ssim": 0.8752844209291698,
+          "rgb_psnr": 27.047796969304777
+        }
+      }
+    },
+    {
+      "clip": "game9_clip5",
+      "receipt_sha256": "fffd07ed5785c9d8778577b49d339cefc9e831f53c11572a4edd416061c89fec",
+      "actual_kbps": {
+        "ordinary": 17.18054795,
+        "pointstream": 17.3309589,
+        "ceiling": 33.0
+      },
+      "visible": 261,
+      "absent": 30,
+      "within_ten": 235,
+      "false_on_absent": 2,
+      "whole_psnr": {
+        "ordinary": 26.789661141289585,
+        "pointstream": 26.556972151001112
+      },
+      "mean_crops": {
+        "ordinary": {
+          "dists": 0.2155218300234769,
+          "lpips": 0.16765083078566181,
+          "luma_ssim": 0.8608396488762737,
+          "rgb_psnr": 25.79729135879524
+        },
+        "pointstream": {
+          "dists": 0.18659264031954653,
+          "lpips": 0.11903449304587425,
+          "luma_ssim": 0.8741664996006052,
+          "rgb_psnr": 26.495504350675855
+        }
+      }
+    }
+  ],
+  "equal_point_ball_means": {
+    "pointstream": {
+      "dists": 0.18944828365709418,
+      "lpips": 0.11750110363821001,
+      "luma_ssim": 0.881088654033296,
+      "rgb_psnr": 27.090683324618354
+    },
+    "ordinary": {
+      "dists": 0.2155593991366262,
+      "lpips": 0.17153047687706757,
+      "luma_ssim": 0.870416468545491,
+      "rgb_psnr": 26.464399946283336
+    }
+  },
+  "equal_point_whole_psnr": {
+    "pointstream": 26.736234197595646,
+    "ordinary": 26.986586309239623
+  },
+  "counts": {
+    "visible": 602,
+    "absent": 30,
+    "within_ten": 544,
+    "false_on_absent": 2
+  }
+}
