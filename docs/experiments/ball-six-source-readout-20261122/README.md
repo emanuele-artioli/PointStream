@@ -1,0 +1,3 @@
+# Direct readout on the six previously scored RacketVision sources
+
+For the manuscript coverage table, combine all three previously opened tracked-pixel sources, the Basel and Adelaide follow-ups and the prospective Shanghai source. Compare the original paid positions to their official marks within ten original source pixels. Keep the original packet choice, display resolution, price and mode. Count emitted positions separately on each clip's explicitly not-visible marks. Unlisted frames have no truth. Report individual denominators and the raw total. The six different prices and modes preclude interpreting their sum as a rate-matched codec comparison. This is a descriptive reuse of completed observations. No new inference or parameter selection.

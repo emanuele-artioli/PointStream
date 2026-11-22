@@ -1,0 +1,76 @@
+{
+  "sources": [
+    {
+      "event": "Rotterdam",
+      "receipt": "ball-machine-anchors-20261122/209-result.json",
+      "receipt_sha256": "48773b30a0e8e2c0059b3efeb1d9dd1cce125f5c24d1edfa1b2e2b9051a867b0",
+      "mode": "tracked",
+      "rate_kbps": 54.61875,
+      "visible": 9,
+      "hits": 8,
+      "not_visible": 3,
+      "emissions": 0
+    },
+    {
+      "event": "Washington",
+      "receipt": "ball-machine-anchors-20261122/269-result.json",
+      "receipt_sha256": "deb053733c1c259f2d154746ae61431714eada82ed0a07ea8db37e882881e0aa",
+      "mode": "tracked",
+      "rate_kbps": 53.90625,
+      "visible": 12,
+      "hits": 12,
+      "not_visible": 0,
+      "emissions": 0
+    },
+    {
+      "event": "Indian Wells",
+      "receipt": "ball-machine-anchors-20261122/235-result.json",
+      "receipt_sha256": "7e3b1651ccde187860472183d76a2fd06bc6d9b714747a2864cb693a5095e1b9",
+      "mode": "tracked",
+      "rate_kbps": 44.42805194805195,
+      "visible": 11,
+      "hits": 10,
+      "not_visible": 2,
+      "emissions": 1
+    },
+    {
+      "event": "Basel",
+      "receipt": "ball-basel-confirmation-20261122/machine-result.json",
+      "receipt_sha256": "50884824c58f9b468f03f9d8e4b5988eea7fad0e9c5b62df99617a2e5360a675",
+      "mode": "tile",
+      "rate_kbps": 60.09375,
+      "visible": 12,
+      "hits": 12,
+      "not_visible": 0,
+      "emissions": 0
+    },
+    {
+      "event": "Adelaide",
+      "receipt": "ball-adelaide-prospective-20261122/machine-result.json",
+      "receipt_sha256": "d85f825d5308f389c41a52252c7bf5685dd6c9bfefeb49e7048a2b7394202be7",
+      "mode": "metadata",
+      "rate_kbps": 41.2125,
+      "visible": 5,
+      "hits": 5,
+      "not_visible": 7,
+      "emissions": 1
+    },
+    {
+      "event": "Shanghai",
+      "receipt": "shanghai-prospective-20261122/primary-score-result.json",
+      "receipt_sha256": "5a542ecc3a84a23f85e729565152f488821c8ee823df1eeac313475bb439f2b9",
+      "mode": "candidate",
+      "rate_kbps": 20.323333333333334,
+      "visible": 26,
+      "hits": 18,
+      "not_visible": 23,
+      "emissions": 2
+    }
+  ],
+  "totals": {
+    "hits": 65,
+    "visible": 75,
+    "emissions": 4,
+    "not_visible": 35
+  }
+}

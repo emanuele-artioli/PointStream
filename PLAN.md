@@ -2,6 +2,15 @@
 
 PointStream splits a broadcast at cuts. For a suitable shot it can send points describing an object’s motion, appearance where needed, and a background. Other shots use a conventional codec. The viewer receives one timeline. An application can read the object data from the same delivery. Keep the design general through the system section and evaluate the choices on tennis.
 
+## November 22 manuscript and confirmation
+
+The revised abstract leads with foreground at a common scene budget. With two independently decoded development rallies and 23 source-reviewed instants the equal-rally foreground DISTS is 0.290 for PointStream, 0.428 for affordable ordinary AV1 and 0.350 for DCVC-UF under a valid appearance cache. The three-match historical player study, prospective Shanghai ball comparison and measured component costs belong in the main text. The reference figure uses objective generated-body distortion across shared settings. Author preference is supplementary.
+
+1. **Complete the second foreground comparison.** The author export passed source-identity and geometry checks. All 24 body supports were accepted, eleven balls were marked visible and one missing. [Complete foreground evidence](docs/experiments/reviewed-foreground-20261122/README.md)
+2. **Test transfer while writing.** Keep the two complete joint demonstrations distinct from the seven historical windows on three matches. Freeze additional source intervals and official TEST IDs from the archive before seeing results. Keep fallback shots in the denominator and report selection, coverage and training exposure. [Source inventory and prospective cohort](docs/experiments/cohort-expansion-20261122/README.md)
+3. **Choose references by measured rate and generated-body distortion.** Report initialization, active reuse, reference quality and source-matched alternatives. Show independently timed ball rendering, pose parsing, generation, masking and ordinary decoding. [Reference experiment](docs/experiments/reference-body-rd-20261122/README.md) · [Receiver cost](docs/experiments/joint-trajectory-20261122/README.md)
+4. **Write and verify the manuscript within the same campaign.** Integrate qualified results as they arrive. Treat generalization across matches as an empirical question. For a broader claim, aim for at least five distinct eligible broadcasts, with three preselected shots per broadcast and at least two broadcasts entirely untouched during development. Report per-match differences, their spread and the frequency of fallback. This is a design target, not a venue rule or a guarantee of statistical power.
+
 ## Argument for the rewrite
 
 Open on a rally. The reader should see what the viewer sees, what the server actually sends and what an application can recover from those same bytes. Then ask which mode gives the most useful foreground at a given total bitrate, how the choice changes with receiver state, and how much computation playback requires.
