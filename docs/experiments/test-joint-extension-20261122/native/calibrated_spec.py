@@ -14,6 +14,8 @@ def main(a):
     i["path"] = str(INBOX / a.job / "full/published.tar")
     i["sha256"] = a.archive_sha
     base["inputs"] = [{k: r[k] for k in ("path", "sha256")} for r in base["staged_inputs"]]
+    # These reference CPUs completed the native DISTS workload inside the unchanged stage cap.
+    base["hosts"] = ["gpu4", "gpu6"]
     args = base["arguments"]
     args[args.index("--arm") + 1] = a.arm
     args[args.index("--producer") + 1] = a.job

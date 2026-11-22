@@ -26,7 +26,9 @@
       "spec_sha256": "862ac08e6df50f50b20f20e0aa9e1e73c4098dfeb07ace689533b07dee45bef4",
       "state_at_registration": "pending",
       "outcome": "Complete, 240 native ticks, CRF70 picked by bytes; 12,890 warm/162,340 cold.",
-      "terminal": "complete"
+      "terminal": "complete",
+      "occupied_seconds": 103.27241897583008,
+      "host": "gpu2"
     },
     "generator_far": {
       "id": "20261122T134803Z-0408c86a",
@@ -58,14 +60,31 @@
       "terminal": "complete",
       "source_grid_sha256": "7d706c8d9ff2f45ac1c5dc810afa7361a5a390681ea4d7067a72d2673c7063d0",
       "body_dists": 0.39249588710566363,
-      "running_bytes": 11224
+      "running_bytes": 11224,
+      "occupied_seconds": 704.4155642986298,
+      "host": "gpu4"
     },
     "control_ordinary-320-warm": {
       "id": "20261122T135529Z-6fabe428",
       "revision": "04bfec247e023ac68c122549b73e8721ee9d6d0c",
       "source_archive_sha256": "297b1632f391d966d4bd353df3431fc8ee9e54c99cfd53b1df6681fde84549b2",
       "spec_sha256": "afd4a16bd0cc77d9c8dd8a06a69a8c48b3dca456ffa127e9641a501dcf672a45",
+      "state_at_registration": "pending",
+      "terminal": "smoke timing gate",
+      "scientific_checks": "Actual 12,862 B, 24 source ticks and 48 player scores. Source and decoder passed.",
+      "wall_seconds": 152.33085407799808,
+      "timed_score_s": 125.59046970499912,
+      "forecast_s": 1983.9676221344853,
+      "occupied_seconds": 210.60363793373108,
+      "host": "gpu1"
+    },
+    "control_ordinary-320-warm_gpu4": {
+      "id": "20261122T141106Z-e1d3e349",
+      "revision": "23d5b3a1873df8dab2b14c352bc701ac21a9aaa4",
+      "source_archive_sha256": "53f89db5aba3f7cae3e3f8630b9d522ddc48527753d4e17cebf2b1dcf5ef5b48",
+      "spec_sha256": "8756ba9bec83a51153786126d05c6e36e1de3ad57e1029cabc541d61069ebb85",
       "state_at_registration": "pending"
     }
-  }
+  },
+  "closed_cpu_seconds_as_of_1413": 1018.2916212081909
 }

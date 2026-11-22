@@ -7,6 +7,22 @@
   "source_support_sha256": "88e0b197dd16d18a7c1989601637f045859de1d18ac3756d3eb1f280c3d2eb64",
   "measured": [
     {
+      "name": "av1-320-265",
+      "family": "SVT-AV1",
+      "bytes": 12121,
+      "kbps": 24.242,
+      "source_grid": "7d706c8d9ff2f45ac1c5dc810afa7361a5a390681ea4d7067a72d2673c7063d0",
+      "support": "88e0b197dd16d18a7c1989601637f045859de1d18ac3756d3eb1f280c3d2eb64",
+      "dists": 0.5094091555724541,
+      "near": 0.5030412564675013,
+      "far": 0.515777054677407,
+      "body_psnr": 12.476118845669115,
+      "full_psnr": 22.3857065460788,
+      "score_job": "20261122T135052Z-42003fe3",
+      "producer": "20261122T103717Z-cdcdffa1",
+      "typed_decode_sha256": "ca582bb776e1bf53ec3d59683ad96707e5714e59aad5b6fc2d9e47b664cb289a"
+    },
+    {
       "name": "dcvc-480-q24",
       "family": "DCVC-UF",
       "bytes": 11224,
