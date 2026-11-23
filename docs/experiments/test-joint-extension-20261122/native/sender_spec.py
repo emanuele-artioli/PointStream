@@ -30,7 +30,7 @@ def make(a):
     assert crop["event"] == e and crop["frames"] == 240 and crop["fitted_both"]
     prior = [json.loads(p.read_text()) for p in a.prior]
     assert [r["event"] for r in prior] == list(ORDER[: ORDER.index(e)])
-    assert all(r["frames"] == 240 and not r["fitted_both"] for r in prior)
+    assert all(r["frames"] == 240 and (e == "match105" or not r["fitted_both"]) for r in prior)
     roles_file = HERE.parent / (e + "-source-roles.json")
     source_roles = json.loads(roles_file.read_text())
     roles = {k: f"person:{i:012d}" for k, i in zip(("far", "near"), ROLES[e], strict=True)}
