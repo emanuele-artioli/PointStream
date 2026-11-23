@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "device": "cpu",
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.test_extension_native_score"
+  ],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.test_extension_native_score",
+    "--validate"
+  ],
+  "arguments": [
+    "--event",
+    "match105",
+    "--arm",
+    "av1-640-160",
+    "--producer",
+    "20261122T102101Z-db304a5b",
+    "--frames",
+    "{frames}",
+    "--full-cap",
+    "1600",
+    "--source",
+    "{staged:source}",
+    "--features",
+    "{staged:features}",
+    "--weights",
+    "{staged:weights}",
+    "--data",
+    "{staged:data}"
+  ],
+  "staged_inputs": [
+    {
+      "name": "source",
+      "sha256": "a518fd0850781642b2233cb1a8e0d910f253952f0d9d3d206326ce8d35ad0d0c",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match105-000-a518fd085078.mp4",
+      "extract": false
+    },
+    {
+      "name": "features",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T113332Z-80cf4344/full/published.tar",
+      "extract": false,
+      "sha256": "3de9a20e1f2bb2040e738e8c36abd69114ff18b8fb82ce34fd4319d3d05adde2"
+    },
+    {
+      "name": "weights",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "extract": false
+    },
+    {
+      "name": "data",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T102101Z-db304a5b/full/published.tar",
+      "sha256": "874da9840c0cbe49b4ba1d450fbaa2a58b316130b7cbe08bc0f9fad9b641918e",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match105-000-a518fd085078.mp4",
+      "sha256": "a518fd0850781642b2233cb1a8e0d910f253952f0d9d3d206326ce8d35ad0d0c"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T113332Z-80cf4344/full/published.tar",
+      "sha256": "3de9a20e1f2bb2040e738e8c36abd69114ff18b8fb82ce34fd4319d3d05adde2"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T102101Z-db304a5b/full/published.tar",
+      "sha256": "874da9840c0cbe49b4ba1d450fbaa2a58b316130b7cbe08bc0f9fad9b641918e"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "required_commands": [],
+  "deadline": "2026-11-23T18:51:00Z",
+  "verify_staged_inputs": true,
+  "hosts": [
+    "gpu1",
+    "gpu2",
+    "gpu3",
+    "gpu4",
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [],
+  "gpu_memory_mib": 0,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "local_storage_gib": 28,
+  "smoke": {
+    "seconds": 420,
+    "representative_basis": "First 24 real native source ticks. Verify the full original feature mask digest, two body supports on each tick, genuine codec pixels, and timing with 1.5x scaled margin."
+  },
+  "full": {
+    "seconds": 1600
+  },
+  "validator_seconds": 90,
+  "budget_seconds": 2280,
+  "stall_seconds": 1660,
+  "scale": {
+    "frames": {
+      "smoke": 24,
+      "full": 240
+    }
+  }
+}

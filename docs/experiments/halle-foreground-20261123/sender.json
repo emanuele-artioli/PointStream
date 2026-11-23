@@ -1,0 +1,65 @@
+{
+  "steps": 240,
+  "source_verified": true,
+  "source": "a518fd0850781642b2233cb1a8e0d910f253952f0d9d3d206326ce8d35ad0d0c",
+  "fps": "25",
+  "event": "match105",
+  "fitted": [
+    240,
+    240
+  ],
+  "tools": {
+    "SvtAv1EncApp": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "sha256": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+      "version": "SVT-AV1 v4.2.0 (release)"
+    },
+    "dav1d": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+      "version": "1.5.4"
+    },
+    "ffmpeg": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+      "version": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers"
+    }
+  },
+  "selected_crf": 50,
+  "rungs": [
+    {
+      "crf": 70,
+      "covered_ticks": 240,
+      "published": {
+        "crf70-rally.psj": "66e89a65a1ff8fd0d5c3fea15a069cee09cb6ace6f1a3a731333b78a4d2344db",
+        "crf70-initial.psr": "c70466960e8860f7e476c2e7ac72310adde4eb6816410748e5838af0e2951cb9",
+        "crf70-players.pscp": "5dbf39815bfbd742602f9386908d7f62bc9e8422e181ff58547b2c13026bd587",
+        "crf70-players.manifest": "3490495cda4c1c9d1b7a2d3593d0d48912320d935f8696ab8e2d1ea999401481"
+      }
+    },
+    {
+      "crf": 60,
+      "covered_ticks": 240,
+      "published": {
+        "crf60-rally.psj": "e2484ba6387b96de466139ed62f02f3d2007139c1a5228f3f31bf601be224f82",
+        "crf60-initial.psr": "c70466960e8860f7e476c2e7ac72310adde4eb6816410748e5838af0e2951cb9",
+        "crf60-players.pscp": "9d4b48aac2aa9a23a20aec3d0c6c6ca1dd549f9ccaa77048f9588ee3d437c3f9",
+        "crf60-players.manifest": "66a0b1a0923b6b4c0595d1954aa44d346f1fa2455602bb87fe5e8d20b5678237"
+      }
+    },
+    {
+      "crf": 50,
+      "covered_ticks": 240,
+      "published": {
+        "crf50-rally.psj": "43ac995556899b99baf846ab1550eed1efa231771712a0128c0db1390b61eee9",
+        "crf50-initial.psr": "c70466960e8860f7e476c2e7ac72310adde4eb6816410748e5838af0e2951cb9",
+        "crf50-players.pscp": "5661e7d08c90053ad49738ab3e66beee944cb4d7133d549d2af1de6de8d66de8",
+        "crf50-players.manifest": "9a527a0d334ee1d7d5a04b7a89fec3d7b15d2b6aed62642ca29244219f8edbf5"
+      }
+    }
+  ],
+  "wall_seconds": 17.994949768995866
+}
