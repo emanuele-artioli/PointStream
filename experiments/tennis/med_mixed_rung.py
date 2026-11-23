@@ -25,9 +25,13 @@ from experiments.tennis import med_split_native as split
 from experiments.tennis import w8_receiver_native_bootstrap as native
 from experiments.tennis.player_requalification import array_sha, sha256
 
+SYDNEY_REVIEW_TICKS = (9, 32, 44, 68, 92, 115, 127, 151, 175, 198, 210, 234)
+REVIEW_SHAPE = (1080, 1920, 3)
+REVIEW_FRAME_BYTES = 1080 * 1920 * 3
+
 
 def config_for(a):
-    channel = mixed.decode(a.joint, a.cache, a.carrier, a.carrier_sha256)
+    channel = mixed.decode(a.joint, a.cache, a.carrier, a.carrier_sha256, allow_wider_base=True)
     root = a.witness / "publish"
     options = dict(
         carrier=str(a.carrier),
@@ -60,15 +64,25 @@ def run(c, proof):
     cv2.setNumThreads(1)
     started = time.monotonic()
     channel = mixed.decode(
-        Path(c["joint"]), Path(c["cache"]), Path(c["carrier"]), c["carrier_sha256"]
+        Path(c["joint"]),
+        Path(c["cache"]),
+        Path(c["carrier"]),
+        c["carrier_sha256"],
+        allow_wider_base=True,
     )
     old = Path(c["original_joint"]).read_bytes()
     new = Path(c["joint"]).read_bytes()
     op = packet._embedded_profile(old)
-    if op != packet._embedded_profile(new):
+    revised_profile = packet._embedded_profile(new)
+    comparison = {
+        **revised_profile,
+        "player": {**revised_profile["player"], "coded_size": op["player"]["coded_size"]},
+    }
+    if op != comparison or tuple(op["player"]["coded_size"]) != mixed.BASE_SIZE:
         raise ValueError("paid headers differ beyond the native base")
     orig, _ = packet.wire.unpack(old, op)
-    revised, _ = packet.wire.unpack(new, op)
+    revised, _ = packet.wire.unpack(new, revised_profile)
+    packet._ivf(orig["base"], *mixed.BASE_SIZE, tuple(op["player"]["recipe"]["fps"]))
     if orig["poses"] != revised["poses"] or orig["trajectory"] != revised["trajectory"]:
         raise ValueError("foreground channels differ between rungs")
     report = json.loads(Path(c["witness_receipt"]).read_text())
@@ -82,7 +96,7 @@ def run(c, proof):
     ):
         raise ValueError("missing complete isolated paid GPU witness")
     original_carrier = packet.wire.pack(
-        channel["profile"],
+        {**channel["profile"], "coded_size": op["player"]["coded_size"]},
         [
             ("base", "frame", orig["base"]),
             ("keypoints", "frame", orig["poses"]),
@@ -134,8 +148,11 @@ def run(c, proof):
             stdin=subprocess.DEVNULL,
             timeout=120,
         )
-        assert yuv.stat().st_size == 240 * 144 * 160
-        raw = np.memmap(yuv, np.uint8, "r", shape=(240, 144, 160))
+        width, height = channel["coded_size"]
+        rows_per_frame = height * 3 // 2
+        if yuv.stat().st_size != 240 * rows_per_frame * width:
+            raise ValueError("decoded native base has the wrong size or frame count")
+        raw = np.memmap(yuv, np.uint8, "r", shape=(240, rows_per_frame, width))
         actual_wire = channel["wire"]
         coded_sha, native_sha = sha256(ivf), sha256(yuv)
         ref_rung = new == old
@@ -200,6 +217,10 @@ def run(c, proof):
                     wire_bytes=4 + len(coded),
                 )
             )
+    if channel["coded_size"] != mixed.BASE_SIZE and all(
+        row["frame_sha256"] == report["rows"][row["tick"]]["frame_sha256"] for row in rows
+    ):
+        raise ValueError("wider coded base did not change any displayed pixels")
     loop = time.monotonic() - stage_start
     result = dict(
         ticks=ticks,
@@ -209,6 +230,7 @@ def run(c, proof):
         witness_sha256=sha256(Path(c["witness_receipt"])),
         original_rung=ref_rung,
         all_witness_frames_matched=ref_rung,
+        coded_size=channel["coded_size"],
         codec_input_sha256=coded_sha,
         native_sha256=sha256(ff),
         yuv_sha256=native_sha,
@@ -239,6 +261,95 @@ def cli_run(a):
     shutil.copy(path / "frames.zseq", stage / "frames.zseq")
     shutil.copy(path / "rung.json", stage / "rung.json")
     (stage / "timing.json").write_text(json.dumps(dict(seconds=time.monotonic() - now)))
+    if a.review_samples:
+        export_review_samples(stage, r)
+        result = dict(passed=True, checks=validate_review_samples(stage, r))
+        (stage / "review-sample-validation.json").write_text(json.dumps(result) + "\n")
+
+
+def review_rows(r):
+    if r["ticks"] == list(range(240)):
+        return [r["rows"][tick] for tick in SYDNEY_REVIEW_TICKS]
+    if r["ticks"] == mixed.smoke_ticks(0, 240):
+        return r["rows"][:1]
+    raise ValueError("expected a complete Sydney replay or its registered smoke ticks")
+
+
+def export_review_samples(stage, r):
+    rows = review_rows(r)
+    offset = 0
+    with (
+        (stage / "frames.zseq").open("rb") as src,
+        (stage / "review-samples.zseq").open("xb") as out,
+    ):
+        for row in r["rows"]:
+            if row in rows:
+                src.seek(offset)
+                block = src.read(row["wire_bytes"])
+                if len(block) != row["wire_bytes"]:
+                    raise ValueError("truncated complete replay")
+                out.write(block)
+            offset += row["wire_bytes"]
+    report = {
+        "rung_sha256": sha256(stage / "rung.json"),
+        "frames_sha256": r["frames_sha256"],
+        "sample_sha256": sha256(stage / "review-samples.zseq"),
+        "rows": rows,
+    }
+    (stage / "review-samples.json").write_text(json.dumps(report) + "\n")
+
+
+def read_review_samples(stage, report):
+    """Read authenticated RGB samples with a fixed decompression extent."""
+    with (stage / "review-samples.zseq").open("rb") as samples:
+        for row in report["rows"]:
+            header = samples.read(4)
+            if len(header) != 4:
+                raise ValueError("truncated review sample header")
+            n = struct.unpack(">I", header)[0]
+            if n + 4 != row["wire_bytes"] or not 0 < n <= REVIEW_FRAME_BYTES + 65536:
+                raise ValueError("invalid compressed review sample size")
+            block = samples.read(n)
+            unpack = zlib.decompressobj()
+            raw = unpack.decompress(block, REVIEW_FRAME_BYTES + 1)
+            if (
+                len(block) != n
+                or len(raw) != REVIEW_FRAME_BYTES
+                or not unpack.eof
+                or unpack.unused_data
+                or unpack.unconsumed_tail
+            ):
+                raise ValueError("invalid review sample payload")
+            rgb = np.frombuffer(raw, np.uint8).reshape(REVIEW_SHAPE)
+            if array_sha(rgb) != row["frame_sha256"]:
+                raise ValueError("review sample pixels differ from the sealed replay")
+            yield row["tick"], rgb
+        if samples.read(1):
+            raise ValueError("trailing data in the review samples")
+
+
+def review_receipt(stage, r):
+    path = stage / "review-samples.json"
+    report = json.loads(path.read_text())
+    if (
+        report["rung_sha256"] != sha256(stage / "rung.json")
+        or report["frames_sha256"] != r["frames_sha256"]
+        or report["sample_sha256"] != sha256(stage / "review-samples.zseq")
+        or report["rows"] != review_rows(r)
+    ):
+        raise ValueError("review samples are unbound from the sealed replay")
+    return report
+
+
+def validate_review_samples(stage, r):
+    report = review_receipt(stage, r)
+    for _ in read_review_samples(stage, report):
+        pass
+    return dict(
+        review_manifest_sha256=sha256(stage / "review-samples.json"),
+        review_rung_sha256=report["rung_sha256"],
+        review_sample_sha256=report["sample_sha256"],
+    )
 
 
 def validate():
@@ -263,17 +374,20 @@ def validate():
     n = len(r["ticks"])
     forecast = 1.5 * (timing - r["loop_seconds"] + r["loop_seconds"] * 240 / n) + 80
     assert (n == 240 and timing <= 1320) or (n == 4 and forecast <= 1320)
+    checks = dict(
+        native=True,
+        rgba_integrity=True,
+        source_denial=True,
+        shared_foreground=True,
+        forecast=True,
+    )
+    if (stage / "review-samples.json").exists():
+        checks.update(validate_review_samples(stage, r))
     Path(os.environ["PS_VALIDATION_PATH"]).write_text(
         json.dumps(
             dict(
                 passed=True,
-                checks=dict(
-                    native=True,
-                    rgba_integrity=True,
-                    source_denial=True,
-                    shared_foreground=True,
-                    forecast=True,
-                ),
+                checks=checks,
                 seconds=timing,
                 forecast=forecast,
             )
@@ -291,6 +405,7 @@ if __name__ == "__main__":
     p.add_argument("--native-sha")
     p.add_argument("--frames", type=int)
     p.add_argument("--reference", action="store_true")
+    p.add_argument("--review-samples", action="store_true")
     p.add_argument("--deny", type=Path, action="append", default=[])
     a = p.parse_args()
     validate() if a.validate else cli_run(a)

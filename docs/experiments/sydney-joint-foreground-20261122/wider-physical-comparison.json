@@ -1,0 +1,1805 @@
+{
+  "scope": "One Sydney rally. DISTS on twelve frozen source instants. Available measured packets only.",
+  "metrics_sha256": "8f8cd5cbbbbeeca667dc9e589300d9e706164c8e7efb0a7190bfcabe629de5ce",
+  "original_bank_sha256": "e2e78f860017995cb2e30f41b16cbcb9537c82d6eb3a48ff5d957b269dec5110",
+  "calibration_sha256": {
+    "wider-calibration-result.json": "20cbdabb5f88f94e17fb68a2e02e38d6b16aaa383b52d7b7ef5bc79ef2483479",
+    "wider-640-calibration-result.json": "eea63dc660f5c1d59e1bd4364424f4aa836a8d20015d8bb39de186d6a72e9b13",
+    "wider-640-upper-calibration-result.json": "aaa3c6cedd30db6650edcdf995111ac492b7045d6d47efb5e9e7c98bdb000ade"
+  },
+  "wider": [
+    {
+      "crf": 42,
+      "pointstream": {
+        "arm": "PointStream 320 wide CRF 42",
+        "bytes": 38832,
+        "sha256": "e246200fcffc644d04e4c63738e861272f297404da8ff234cd36a2b07f6f44a7",
+        "scores": {
+          "foreground": 0.24926978970567384,
+          "players": 0.2934762065609296,
+          "ball": 0.2050633728504181
+        }
+      },
+      "cold_bytes": 188282,
+      "cached_anchor": {
+        "arm": "SVT-AV1 ordinary 640x384",
+        "bytes": 32244,
+        "kbps": 64.488,
+        "sha256": "181233789afe8d47e2e92b757c94c148bfd9030009dffb5a6903d5337a315356",
+        "scores": {
+          "players": 0.3351309572656949,
+          "ball": 0.2874115804831187,
+          "foreground": 0.3112712688744068
+        },
+        "receipt": "automatic-ordinary-640-q250-range.json",
+        "receipt_sha256": "8c760a09a9fdb1cc8f4d7f1203996d5366a0f77cb19c33702daa85213d1ea67d"
+      },
+      "cold_anchor": {
+        "arm": "SVT-AV1 ordinary 1920x1080 cold",
+        "bytes": 156539,
+        "kbps": 313.078,
+        "sha256": "94f39f3c1093d4ad7eb8d1b414056efdc06837d7c7bd1f92263792c771a853b8",
+        "scores": {
+          "players": 0.17923612147569656,
+          "ball": 0.14406523605187735,
+          "foreground": 0.16165067876378694
+        },
+        "receipt": "automatic-ordinary-1920-cold.json",
+        "receipt_sha256": "1aa473ec3e0469d78d743bc38383787057f5ff5a6eddf848597883e8789062bd"
+      },
+      "metrics": {
+        "foreground": {
+          "dists": 0.24926978970567384,
+          "lpips": 0.2314821220934391,
+          "luma_ssim": 0.5891906151090368,
+          "rgb_psnr": 20.017615075371864
+        },
+        "player": {
+          "dists": 0.2934762065609296,
+          "lpips": 0.276321388160189,
+          "luma_ssim": 0.3541758204260825,
+          "rgb_psnr": 13.414828409470609
+        },
+        "ball": {
+          "dists": 0.2050633728504181,
+          "lpips": 0.1866428560266892,
+          "luma_ssim": 0.8242054097919912,
+          "rgb_psnr": 26.620401741273117
+        },
+        "background_psnr": 23.76301796012987,
+        "whole_psnr": 23.450665878035963
+      }
+    },
+    {
+      "crf": 29,
+      "pointstream": {
+        "arm": "PointStream 320 wide CRF 29",
+        "bytes": 63515,
+        "sha256": "47f47bcb8785943e30c2bcfc3838dd8ed0955a57fc349c09ebe6c8bb9551fb47",
+        "scores": {
+          "foreground": 0.2432136038939158,
+          "players": 0.29274027049541473,
+          "ball": 0.1936869372924169
+        }
+      },
+      "cold_bytes": 212965,
+      "cached_anchor": {
+        "arm": "SVT-AV1 ordinary 1920x1080",
+        "bytes": 41677,
+        "kbps": 83.354,
+        "sha256": "86078878304e79be696ce28759d05819518271ae7bdd033f2b26df889ac34268",
+        "scores": {
+          "players": 0.30020952224731445,
+          "ball": 0.2615618755420049,
+          "foreground": 0.2808856988946597
+        },
+        "receipt": "automatic-ordinary-1920-q280-range.json",
+        "receipt_sha256": "fe5d280b0b6edcbb20aa6d20d4df5860ea1059ef39616a4c770692535e0b0ea7"
+      },
+      "cold_anchor": {
+        "arm": "SVT-AV1 ordinary 1920x1080 cold",
+        "bytes": 156539,
+        "kbps": 313.078,
+        "sha256": "94f39f3c1093d4ad7eb8d1b414056efdc06837d7c7bd1f92263792c771a853b8",
+        "scores": {
+          "players": 0.17923612147569656,
+          "ball": 0.14406523605187735,
+          "foreground": 0.16165067876378694
+        },
+        "receipt": "automatic-ordinary-1920-cold.json",
+        "receipt_sha256": "1aa473ec3e0469d78d743bc38383787057f5ff5a6eddf848597883e8789062bd"
+      },
+      "metrics": {
+        "foreground": {
+          "dists": 0.2432136038939158,
+          "lpips": 0.230376409056286,
+          "luma_ssim": 0.5908352775426897,
+          "rgb_psnr": 20.079307322197216
+        },
+        "player": {
+          "dists": 0.29274027049541473,
+          "lpips": 0.27630250590542954,
+          "luma_ssim": 0.35414636657525306,
+          "rgb_psnr": 13.412860932325007
+        },
+        "ball": {
+          "dists": 0.1936869372924169,
+          "lpips": 0.1844503122071425,
+          "luma_ssim": 0.8275241885101263,
+          "rgb_psnr": 26.745753712069423
+        },
+        "background_psnr": 23.79886194368207,
+        "whole_psnr": 23.483729565063786
+      }
+    },
+    {
+      "crf": 50,
+      "pointstream": {
+        "arm": "PointStream 640 wide CRF 50",
+        "bytes": 66384,
+        "sha256": "58353a0ec63967c3c65108ac0a80ff2a6ef531f273de19f670f5612d428ea89e",
+        "scores": {
+          "foreground": 0.23466883351405463,
+          "players": 0.28990164895852405,
+          "ball": 0.17943601806958517
+        }
+      },
+      "cold_bytes": 215834,
+      "cached_anchor": {
+        "arm": "SVT-AV1 ordinary 1920x1080",
+        "bytes": 41677,
+        "kbps": 83.354,
+        "sha256": "86078878304e79be696ce28759d05819518271ae7bdd033f2b26df889ac34268",
+        "scores": {
+          "players": 0.30020952224731445,
+          "ball": 0.2615618755420049,
+          "foreground": 0.2808856988946597
+        },
+        "receipt": "automatic-ordinary-1920-q280-range.json",
+        "receipt_sha256": "fe5d280b0b6edcbb20aa6d20d4df5860ea1059ef39616a4c770692535e0b0ea7"
+      },
+      "cold_anchor": {
+        "arm": "SVT-AV1 ordinary 1920x1080 cold",
+        "bytes": 156539,
+        "kbps": 313.078,
+        "sha256": "94f39f3c1093d4ad7eb8d1b414056efdc06837d7c7bd1f92263792c771a853b8",
+        "scores": {
+          "players": 0.17923612147569656,
+          "ball": 0.14406523605187735,
+          "foreground": 0.16165067876378694
+        },
+        "receipt": "automatic-ordinary-1920-cold.json",
+        "receipt_sha256": "1aa473ec3e0469d78d743bc38383787057f5ff5a6eddf848597883e8789062bd"
+      },
+      "metrics": {
+        "foreground": {
+          "dists": 0.23466883351405463,
+          "lpips": 0.20458622657073042,
+          "luma_ssim": 0.6150393744550098,
+          "rgb_psnr": 20.507053213798997
+        },
+        "player": {
+          "dists": 0.28990164895852405,
+          "lpips": 0.26952580735087395,
+          "luma_ssim": 0.3564826553157943,
+          "rgb_psnr": 13.40658520583322
+        },
+        "ball": {
+          "dists": 0.17943601806958517,
+          "lpips": 0.13964664579058686,
+          "luma_ssim": 0.8735960935942254,
+          "rgb_psnr": 27.607521221764774
+        },
+        "background_psnr": 27.452957178139776,
+        "whole_psnr": 26.71156459365997
+      }
+    },
+    {
+      "crf": 23,
+      "pointstream": {
+        "arm": "PointStream 320 wide CRF 23",
+        "bytes": 84406,
+        "sha256": "b02e394669acc89156e25b045cfa77886803cac52afc9a7e125ee0f95ad88867",
+        "scores": {
+          "foreground": 0.24314798166354498,
+          "players": 0.29277291893959045,
+          "ball": 0.19352304438749948
+        }
+      },
+      "cold_bytes": 233856,
+      "cached_anchor": {
+        "arm": "SVT-AV1 ordinary 640x384",
+        "bytes": 67624,
+        "kbps": 135.248,
+        "sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+        "scores": {
+          "players": 0.27135121325651806,
+          "ball": 0.24173304935296377,
+          "foreground": 0.2565421313047409
+        },
+        "receipt": "automatic-ordinary-640-q220-range.json",
+        "receipt_sha256": "1fe4eae35bcb7e4499d8a99219344fd20c3eff5eb7c25d710b1a49c2d1a5e9bc"
+      },
+      "cold_anchor": {
+        "arm": "SVT-AV1 ordinary 1920x1080 cold",
+        "bytes": 156539,
+        "kbps": 313.078,
+        "sha256": "94f39f3c1093d4ad7eb8d1b414056efdc06837d7c7bd1f92263792c771a853b8",
+        "scores": {
+          "players": 0.17923612147569656,
+          "ball": 0.14406523605187735,
+          "foreground": 0.16165067876378694
+        },
+        "receipt": "automatic-ordinary-1920-cold.json",
+        "receipt_sha256": "1aa473ec3e0469d78d743bc38383787057f5ff5a6eddf848597883e8789062bd"
+      },
+      "metrics": {
+        "foreground": {
+          "dists": 0.24314798166354498,
+          "lpips": 0.23111744838145873,
+          "luma_ssim": 0.5905705559874453,
+          "rgb_psnr": 20.083742505735593
+        },
+        "player": {
+          "dists": 0.29277291893959045,
+          "lpips": 0.27619750673572224,
+          "luma_ssim": 0.3539876077914107,
+          "rgb_psnr": 13.41387662668226
+        },
+        "ball": {
+          "dists": 0.19352304438749948,
+          "lpips": 0.18603739002719522,
+          "luma_ssim": 0.82715350418348,
+          "rgb_psnr": 26.75360838478893
+        },
+        "background_psnr": 23.808803785829983,
+        "whole_psnr": 23.493156020072483
+      }
+    },
+    {
+      "crf": 42,
+      "pointstream": {
+        "arm": "PointStream 640 wide CRF 42",
+        "bytes": 94538,
+        "sha256": "bfc2342c578c673d1de340e058c2b34d724e1036c34719c63dd8c67a75609422",
+        "scores": {
+          "foreground": 0.231266217927138,
+          "players": 0.28930965562661487,
+          "ball": 0.17322278022766113
+        }
+      },
+      "cold_bytes": 243988,
+      "cached_anchor": {
+        "arm": "SVT-AV1 ordinary 640x384",
+        "bytes": 67624,
+        "kbps": 135.248,
+        "sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+        "scores": {
+          "players": 0.27135121325651806,
+          "ball": 0.24173304935296377,
+          "foreground": 0.2565421313047409
+        },
+        "receipt": "automatic-ordinary-640-q220-range.json",
+        "receipt_sha256": "1fe4eae35bcb7e4499d8a99219344fd20c3eff5eb7c25d710b1a49c2d1a5e9bc"
+      },
+      "cold_anchor": {
+        "arm": "SVT-AV1 ordinary 1920x1080 cold",
+        "bytes": 156539,
+        "kbps": 313.078,
+        "sha256": "94f39f3c1093d4ad7eb8d1b414056efdc06837d7c7bd1f92263792c771a853b8",
+        "scores": {
+          "players": 0.17923612147569656,
+          "ball": 0.14406523605187735,
+          "foreground": 0.16165067876378694
+        },
+        "receipt": "automatic-ordinary-1920-cold.json",
+        "receipt_sha256": "1aa473ec3e0469d78d743bc38383787057f5ff5a6eddf848597883e8789062bd"
+      },
+      "metrics": {
+        "foreground": {
+          "dists": 0.231266217927138,
+          "lpips": 0.20310714631341398,
+          "luma_ssim": 0.6158030774248922,
+          "rgb_psnr": 20.541908078538064
+        },
+        "player": {
+          "dists": 0.28930965562661487,
+          "lpips": 0.2696874588727951,
+          "luma_ssim": 0.3564671907538925,
+          "rgb_psnr": 13.407055034735778
+        },
+        "ball": {
+          "dists": 0.17322278022766113,
+          "lpips": 0.13652683375403285,
+          "luma_ssim": 0.8751389640958919,
+          "rgb_psnr": 27.67676112234035
+        },
+        "background_psnr": 27.534036886051588,
+        "whole_psnr": 26.77956545642265
+      }
+    }
+  ],
+  "budget_comparisons": {
+    "42500": {
+      "best_pointstream": {
+        "arm": "PointStream 320 wide CRF 42",
+        "bytes": 38832,
+        "sha256": "e246200fcffc644d04e4c63738e861272f297404da8ff234cd36a2b07f6f44a7",
+        "scores": {
+          "foreground": 0.24926978970567384,
+          "players": 0.2934762065609296,
+          "ball": 0.2050633728504181
+        }
+      },
+      "best_anchor": {
+        "arm": "SVT-AV1 ordinary 1920x1080",
+        "bytes": 41677,
+        "kbps": 83.354,
+        "sha256": "86078878304e79be696ce28759d05819518271ae7bdd033f2b26df889ac34268",
+        "scores": {
+          "players": 0.30020952224731445,
+          "ball": 0.2615618755420049,
+          "foreground": 0.2808856988946597
+        },
+        "receipt": "automatic-ordinary-1920-q280-range.json",
+        "receipt_sha256": "fe5d280b0b6edcbb20aa6d20d4df5860ea1059ef39616a4c770692535e0b0ea7"
+      }
+    },
+    "68000": {
+      "best_pointstream": {
+        "arm": "PointStream 640 wide CRF 50",
+        "bytes": 66384,
+        "sha256": "58353a0ec63967c3c65108ac0a80ff2a6ef531f273de19f670f5612d428ea89e",
+        "scores": {
+          "foreground": 0.23466883351405463,
+          "players": 0.28990164895852405,
+          "ball": 0.17943601806958517
+        }
+      },
+      "best_anchor": {
+        "arm": "SVT-AV1 ordinary 640x384",
+        "bytes": 67624,
+        "kbps": 135.248,
+        "sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+        "scores": {
+          "players": 0.27135121325651806,
+          "ball": 0.24173304935296377,
+          "foreground": 0.2565421313047409
+        },
+        "receipt": "automatic-ordinary-640-q220-range.json",
+        "receipt_sha256": "1fe4eae35bcb7e4499d8a99219344fd20c3eff5eb7c25d710b1a49c2d1a5e9bc"
+      }
+    },
+    "96000": {
+      "best_pointstream": {
+        "arm": "PointStream 640 wide CRF 42",
+        "bytes": 94538,
+        "sha256": "bfc2342c578c673d1de340e058c2b34d724e1036c34719c63dd8c67a75609422",
+        "scores": {
+          "foreground": 0.231266217927138,
+          "players": 0.28930965562661487,
+          "ball": 0.17322278022766113
+        }
+      },
+      "best_anchor": {
+        "arm": "DCVC-UF Q48 960x544",
+        "bytes": 95865,
+        "kbps": 191.73,
+        "sha256": "e443d40d8a0281111026231e1114d71098b4968f33781b5d041881000531afef",
+        "scores": {
+          "players": 0.21221294005711874,
+          "ball": 0.16676764686902365,
+          "foreground": 0.1894902934630712
+        },
+        "receipt": "automatic-dcvc-960-q48.json",
+        "receipt_sha256": "dd79e2b6b8d2c911cd1be4d4eafe902a417f721c169a73f066ec85cee5fc12b1"
+      }
+    }
+  },
+  "measured_order": [
+    {
+      "ceiling_bytes": 12890,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 70",
+        "bytes": 12890,
+        "kbps": 25.78,
+        "sha256": "f9ab35e8d3cd6708e726fe57d9d7ba7cc8943285ac4535524491f5cfe0598384",
+        "scores": {
+          "players": 0.30214354147513706,
+          "ball": 0.2517430434624354,
+          "foreground": 0.27694329246878624
+        },
+        "receipt": "automatic-joint-70.json",
+        "receipt_sha256": "ff8d29ea2e6847be11a6f2bc2366fcc4d794b4872658637f7d367f069aad36b4"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q26 480x272",
+        "bytes": 12305,
+        "kbps": 24.61,
+        "sha256": "c3d5581a90d2333768191df0f76ea91a992295c4ab0db3f08ef35665e8f382c4",
+        "scores": {
+          "players": 0.3905757615963618,
+          "ball": 0.30784588555494946,
+          "foreground": 0.34921082357565564
+        },
+        "receipt": "automatic-dcvc-480-q26.json",
+        "receipt_sha256": "d54840a26796895fdfb693d9a994439eb49bc27368a317ca8cbd276523ceb352"
+      }
+    },
+    {
+      "ceiling_bytes": 12913,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 70",
+        "bytes": 12890,
+        "kbps": 25.78,
+        "sha256": "f9ab35e8d3cd6708e726fe57d9d7ba7cc8943285ac4535524491f5cfe0598384",
+        "scores": {
+          "players": 0.30214354147513706,
+          "ball": 0.2517430434624354,
+          "foreground": 0.27694329246878624
+        },
+        "receipt": "automatic-joint-70.json",
+        "receipt_sha256": "ff8d29ea2e6847be11a6f2bc2366fcc4d794b4872658637f7d367f069aad36b4"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q27 480x272",
+        "bytes": 12913,
+        "kbps": 25.826,
+        "sha256": "64dca0e76681ce38c917df6012c54c0960f720c48ec77a2d2ae33c55e3e38312",
+        "scores": {
+          "players": 0.384930615623792,
+          "ball": 0.3071470359961192,
+          "foreground": 0.3460388258099556
+        },
+        "receipt": "automatic-dcvc-480-q27.json",
+        "receipt_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+      }
+    },
+    {
+      "ceiling_bytes": 13009,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 70",
+        "bytes": 12890,
+        "kbps": 25.78,
+        "sha256": "f9ab35e8d3cd6708e726fe57d9d7ba7cc8943285ac4535524491f5cfe0598384",
+        "scores": {
+          "players": 0.30214354147513706,
+          "ball": 0.2517430434624354,
+          "foreground": 0.27694329246878624
+        },
+        "receipt": "automatic-joint-70.json",
+        "receipt_sha256": "ff8d29ea2e6847be11a6f2bc2366fcc4d794b4872658637f7d367f069aad36b4"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q27 480x272",
+        "bytes": 12913,
+        "kbps": 25.826,
+        "sha256": "64dca0e76681ce38c917df6012c54c0960f720c48ec77a2d2ae33c55e3e38312",
+        "scores": {
+          "players": 0.384930615623792,
+          "ball": 0.3071470359961192,
+          "foreground": 0.3460388258099556
+        },
+        "receipt": "automatic-dcvc-480-q27.json",
+        "receipt_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+      }
+    },
+    {
+      "ceiling_bytes": 13023,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 70",
+        "bytes": 12890,
+        "kbps": 25.78,
+        "sha256": "f9ab35e8d3cd6708e726fe57d9d7ba7cc8943285ac4535524491f5cfe0598384",
+        "scores": {
+          "players": 0.30214354147513706,
+          "ball": 0.2517430434624354,
+          "foreground": 0.27694329246878624
+        },
+        "receipt": "automatic-joint-70.json",
+        "receipt_sha256": "ff8d29ea2e6847be11a6f2bc2366fcc4d794b4872658637f7d367f069aad36b4"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q27 480x272",
+        "bytes": 12913,
+        "kbps": 25.826,
+        "sha256": "64dca0e76681ce38c917df6012c54c0960f720c48ec77a2d2ae33c55e3e38312",
+        "scores": {
+          "players": 0.384930615623792,
+          "ball": 0.3071470359961192,
+          "foreground": 0.3460388258099556
+        },
+        "receipt": "automatic-dcvc-480-q27.json",
+        "receipt_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+      }
+    },
+    {
+      "ceiling_bytes": 13675,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 70",
+        "bytes": 12890,
+        "kbps": 25.78,
+        "sha256": "f9ab35e8d3cd6708e726fe57d9d7ba7cc8943285ac4535524491f5cfe0598384",
+        "scores": {
+          "players": 0.30214354147513706,
+          "ball": 0.2517430434624354,
+          "foreground": 0.27694329246878624
+        },
+        "receipt": "automatic-joint-70.json",
+        "receipt_sha256": "ff8d29ea2e6847be11a6f2bc2366fcc4d794b4872658637f7d367f069aad36b4"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q27 480x272",
+        "bytes": 12913,
+        "kbps": 25.826,
+        "sha256": "64dca0e76681ce38c917df6012c54c0960f720c48ec77a2d2ae33c55e3e38312",
+        "scores": {
+          "players": 0.384930615623792,
+          "ball": 0.3071470359961192,
+          "foreground": 0.3460388258099556
+        },
+        "receipt": "automatic-dcvc-480-q27.json",
+        "receipt_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+      }
+    },
+    {
+      "ceiling_bytes": 13975,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 70",
+        "bytes": 12890,
+        "kbps": 25.78,
+        "sha256": "f9ab35e8d3cd6708e726fe57d9d7ba7cc8943285ac4535524491f5cfe0598384",
+        "scores": {
+          "players": 0.30214354147513706,
+          "ball": 0.2517430434624354,
+          "foreground": 0.27694329246878624
+        },
+        "receipt": "automatic-joint-70.json",
+        "receipt_sha256": "ff8d29ea2e6847be11a6f2bc2366fcc4d794b4872658637f7d367f069aad36b4"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q27 480x272",
+        "bytes": 12913,
+        "kbps": 25.826,
+        "sha256": "64dca0e76681ce38c917df6012c54c0960f720c48ec77a2d2ae33c55e3e38312",
+        "scores": {
+          "players": 0.384930615623792,
+          "ball": 0.3071470359961192,
+          "foreground": 0.3460388258099556
+        },
+        "receipt": "automatic-dcvc-480-q27.json",
+        "receipt_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+      }
+    },
+    {
+      "ceiling_bytes": 14593,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 70",
+        "bytes": 12890,
+        "kbps": 25.78,
+        "sha256": "f9ab35e8d3cd6708e726fe57d9d7ba7cc8943285ac4535524491f5cfe0598384",
+        "scores": {
+          "players": 0.30214354147513706,
+          "ball": 0.2517430434624354,
+          "foreground": 0.27694329246878624
+        },
+        "receipt": "automatic-joint-70.json",
+        "receipt_sha256": "ff8d29ea2e6847be11a6f2bc2366fcc4d794b4872658637f7d367f069aad36b4"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q27 480x272",
+        "bytes": 12913,
+        "kbps": 25.826,
+        "sha256": "64dca0e76681ce38c917df6012c54c0960f720c48ec77a2d2ae33c55e3e38312",
+        "scores": {
+          "players": 0.384930615623792,
+          "ball": 0.3071470359961192,
+          "foreground": 0.3460388258099556
+        },
+        "receipt": "automatic-dcvc-480-q27.json",
+        "receipt_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+      }
+    },
+    {
+      "ceiling_bytes": 14957,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 70",
+        "bytes": 12890,
+        "kbps": 25.78,
+        "sha256": "f9ab35e8d3cd6708e726fe57d9d7ba7cc8943285ac4535524491f5cfe0598384",
+        "scores": {
+          "players": 0.30214354147513706,
+          "ball": 0.2517430434624354,
+          "foreground": 0.27694329246878624
+        },
+        "receipt": "automatic-joint-70.json",
+        "receipt_sha256": "ff8d29ea2e6847be11a6f2bc2366fcc4d794b4872658637f7d367f069aad36b4"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q27 480x272",
+        "bytes": 12913,
+        "kbps": 25.826,
+        "sha256": "64dca0e76681ce38c917df6012c54c0960f720c48ec77a2d2ae33c55e3e38312",
+        "scores": {
+          "players": 0.384930615623792,
+          "ball": 0.3071470359961192,
+          "foreground": 0.3460388258099556
+        },
+        "receipt": "automatic-dcvc-480-q27.json",
+        "receipt_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+      }
+    },
+    {
+      "ceiling_bytes": 15196,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 70",
+        "bytes": 12890,
+        "kbps": 25.78,
+        "sha256": "f9ab35e8d3cd6708e726fe57d9d7ba7cc8943285ac4535524491f5cfe0598384",
+        "scores": {
+          "players": 0.30214354147513706,
+          "ball": 0.2517430434624354,
+          "foreground": 0.27694329246878624
+        },
+        "receipt": "automatic-joint-70.json",
+        "receipt_sha256": "ff8d29ea2e6847be11a6f2bc2366fcc4d794b4872658637f7d367f069aad36b4"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q27 480x272",
+        "bytes": 12913,
+        "kbps": 25.826,
+        "sha256": "64dca0e76681ce38c917df6012c54c0960f720c48ec77a2d2ae33c55e3e38312",
+        "scores": {
+          "players": 0.384930615623792,
+          "ball": 0.3071470359961192,
+          "foreground": 0.3460388258099556
+        },
+        "receipt": "automatic-dcvc-480-q27.json",
+        "receipt_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+      }
+    },
+    {
+      "ceiling_bytes": 15276,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 70",
+        "bytes": 12890,
+        "kbps": 25.78,
+        "sha256": "f9ab35e8d3cd6708e726fe57d9d7ba7cc8943285ac4535524491f5cfe0598384",
+        "scores": {
+          "players": 0.30214354147513706,
+          "ball": 0.2517430434624354,
+          "foreground": 0.27694329246878624
+        },
+        "receipt": "automatic-joint-70.json",
+        "receipt_sha256": "ff8d29ea2e6847be11a6f2bc2366fcc4d794b4872658637f7d367f069aad36b4"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q27 480x272",
+        "bytes": 12913,
+        "kbps": 25.826,
+        "sha256": "64dca0e76681ce38c917df6012c54c0960f720c48ec77a2d2ae33c55e3e38312",
+        "scores": {
+          "players": 0.384930615623792,
+          "ball": 0.3071470359961192,
+          "foreground": 0.3460388258099556
+        },
+        "receipt": "automatic-dcvc-480-q27.json",
+        "receipt_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+      }
+    },
+    {
+      "ceiling_bytes": 15364,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 70",
+        "bytes": 12890,
+        "kbps": 25.78,
+        "sha256": "f9ab35e8d3cd6708e726fe57d9d7ba7cc8943285ac4535524491f5cfe0598384",
+        "scores": {
+          "players": 0.30214354147513706,
+          "ball": 0.2517430434624354,
+          "foreground": 0.27694329246878624
+        },
+        "receipt": "automatic-joint-70.json",
+        "receipt_sha256": "ff8d29ea2e6847be11a6f2bc2366fcc4d794b4872658637f7d367f069aad36b4"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q27 480x272",
+        "bytes": 12913,
+        "kbps": 25.826,
+        "sha256": "64dca0e76681ce38c917df6012c54c0960f720c48ec77a2d2ae33c55e3e38312",
+        "scores": {
+          "players": 0.384930615623792,
+          "ball": 0.3071470359961192,
+          "foreground": 0.3460388258099556
+        },
+        "receipt": "automatic-dcvc-480-q27.json",
+        "receipt_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+      }
+    },
+    {
+      "ceiling_bytes": 15462,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 60",
+        "bytes": 15462,
+        "kbps": 30.924,
+        "sha256": "f557fdc85d5c2877a7f854e20536f13e706dabae434c84e37f762546e7ad9968",
+        "scores": {
+          "players": 0.29955027004082996,
+          "ball": 0.237636665503184,
+          "foreground": 0.268593467772007
+        },
+        "receipt": "automatic-joint-60.json",
+        "receipt_sha256": "bbbbf15865a1a6d8e7e8f7fe7f626fc7199689328a055e1b274ec68bfde45daf"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q27 480x272",
+        "bytes": 12913,
+        "kbps": 25.826,
+        "sha256": "64dca0e76681ce38c917df6012c54c0960f720c48ec77a2d2ae33c55e3e38312",
+        "scores": {
+          "players": 0.384930615623792,
+          "ball": 0.3071470359961192,
+          "foreground": 0.3460388258099556
+        },
+        "receipt": "automatic-dcvc-480-q27.json",
+        "receipt_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+      }
+    },
+    {
+      "ceiling_bytes": 15905,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 60",
+        "bytes": 15462,
+        "kbps": 30.924,
+        "sha256": "f557fdc85d5c2877a7f854e20536f13e706dabae434c84e37f762546e7ad9968",
+        "scores": {
+          "players": 0.29955027004082996,
+          "ball": 0.237636665503184,
+          "foreground": 0.268593467772007
+        },
+        "receipt": "automatic-joint-60.json",
+        "receipt_sha256": "bbbbf15865a1a6d8e7e8f7fe7f626fc7199689328a055e1b274ec68bfde45daf"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q27 480x272",
+        "bytes": 12913,
+        "kbps": 25.826,
+        "sha256": "64dca0e76681ce38c917df6012c54c0960f720c48ec77a2d2ae33c55e3e38312",
+        "scores": {
+          "players": 0.384930615623792,
+          "ball": 0.3071470359961192,
+          "foreground": 0.3460388258099556
+        },
+        "receipt": "automatic-dcvc-480-q27.json",
+        "receipt_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+      }
+    },
+    {
+      "ceiling_bytes": 17077,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 60",
+        "bytes": 15462,
+        "kbps": 30.924,
+        "sha256": "f557fdc85d5c2877a7f854e20536f13e706dabae434c84e37f762546e7ad9968",
+        "scores": {
+          "players": 0.29955027004082996,
+          "ball": 0.237636665503184,
+          "foreground": 0.268593467772007
+        },
+        "receipt": "automatic-joint-60.json",
+        "receipt_sha256": "bbbbf15865a1a6d8e7e8f7fe7f626fc7199689328a055e1b274ec68bfde45daf"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q27 480x272",
+        "bytes": 12913,
+        "kbps": 25.826,
+        "sha256": "64dca0e76681ce38c917df6012c54c0960f720c48ec77a2d2ae33c55e3e38312",
+        "scores": {
+          "players": 0.384930615623792,
+          "ball": 0.3071470359961192,
+          "foreground": 0.3460388258099556
+        },
+        "receipt": "automatic-dcvc-480-q27.json",
+        "receipt_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+      }
+    },
+    {
+      "ceiling_bytes": 17590,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 60",
+        "bytes": 15462,
+        "kbps": 30.924,
+        "sha256": "f557fdc85d5c2877a7f854e20536f13e706dabae434c84e37f762546e7ad9968",
+        "scores": {
+          "players": 0.29955027004082996,
+          "ball": 0.237636665503184,
+          "foreground": 0.268593467772007
+        },
+        "receipt": "automatic-joint-60.json",
+        "receipt_sha256": "bbbbf15865a1a6d8e7e8f7fe7f626fc7199689328a055e1b274ec68bfde45daf"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q27 480x272",
+        "bytes": 12913,
+        "kbps": 25.826,
+        "sha256": "64dca0e76681ce38c917df6012c54c0960f720c48ec77a2d2ae33c55e3e38312",
+        "scores": {
+          "players": 0.384930615623792,
+          "ball": 0.3071470359961192,
+          "foreground": 0.3460388258099556
+        },
+        "receipt": "automatic-dcvc-480-q27.json",
+        "receipt_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+      }
+    },
+    {
+      "ceiling_bytes": 17623,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 60",
+        "bytes": 15462,
+        "kbps": 30.924,
+        "sha256": "f557fdc85d5c2877a7f854e20536f13e706dabae434c84e37f762546e7ad9968",
+        "scores": {
+          "players": 0.29955027004082996,
+          "ball": 0.237636665503184,
+          "foreground": 0.268593467772007
+        },
+        "receipt": "automatic-joint-60.json",
+        "receipt_sha256": "bbbbf15865a1a6d8e7e8f7fe7f626fc7199689328a055e1b274ec68bfde45daf"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q27 480x272",
+        "bytes": 12913,
+        "kbps": 25.826,
+        "sha256": "64dca0e76681ce38c917df6012c54c0960f720c48ec77a2d2ae33c55e3e38312",
+        "scores": {
+          "players": 0.384930615623792,
+          "ball": 0.3071470359961192,
+          "foreground": 0.3460388258099556
+        },
+        "receipt": "automatic-dcvc-480-q27.json",
+        "receipt_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+      }
+    },
+    {
+      "ceiling_bytes": 17662,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 60",
+        "bytes": 15462,
+        "kbps": 30.924,
+        "sha256": "f557fdc85d5c2877a7f854e20536f13e706dabae434c84e37f762546e7ad9968",
+        "scores": {
+          "players": 0.29955027004082996,
+          "ball": 0.237636665503184,
+          "foreground": 0.268593467772007
+        },
+        "receipt": "automatic-joint-60.json",
+        "receipt_sha256": "bbbbf15865a1a6d8e7e8f7fe7f626fc7199689328a055e1b274ec68bfde45daf"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q27 480x272",
+        "bytes": 12913,
+        "kbps": 25.826,
+        "sha256": "64dca0e76681ce38c917df6012c54c0960f720c48ec77a2d2ae33c55e3e38312",
+        "scores": {
+          "players": 0.384930615623792,
+          "ball": 0.3071470359961192,
+          "foreground": 0.3460388258099556
+        },
+        "receipt": "automatic-dcvc-480-q27.json",
+        "receipt_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+      }
+    },
+    {
+      "ceiling_bytes": 17802,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 60",
+        "bytes": 15462,
+        "kbps": 30.924,
+        "sha256": "f557fdc85d5c2877a7f854e20536f13e706dabae434c84e37f762546e7ad9968",
+        "scores": {
+          "players": 0.29955027004082996,
+          "ball": 0.237636665503184,
+          "foreground": 0.268593467772007
+        },
+        "receipt": "automatic-joint-60.json",
+        "receipt_sha256": "bbbbf15865a1a6d8e7e8f7fe7f626fc7199689328a055e1b274ec68bfde45daf"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q27 480x272",
+        "bytes": 12913,
+        "kbps": 25.826,
+        "sha256": "64dca0e76681ce38c917df6012c54c0960f720c48ec77a2d2ae33c55e3e38312",
+        "scores": {
+          "players": 0.384930615623792,
+          "ball": 0.3071470359961192,
+          "foreground": 0.3460388258099556
+        },
+        "receipt": "automatic-dcvc-480-q27.json",
+        "receipt_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+      }
+    },
+    {
+      "ceiling_bytes": 17827,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 50",
+        "bytes": 17827,
+        "kbps": 35.654,
+        "sha256": "11cf8f79869e69912006f0556bb7cbb6f967e0a46b0368881b67fa48ba71ecf0",
+        "scores": {
+          "players": 0.29972732563813526,
+          "ball": 0.2349073737859726,
+          "foreground": 0.26731734971205395
+        },
+        "receipt": "automatic-joint-50.json",
+        "receipt_sha256": "00bdb0eb59eb23884f187201f73ae7b5dd7e5e114b1b6df9e9bf22aaf44685c7"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q27 480x272",
+        "bytes": 12913,
+        "kbps": 25.826,
+        "sha256": "64dca0e76681ce38c917df6012c54c0960f720c48ec77a2d2ae33c55e3e38312",
+        "scores": {
+          "players": 0.384930615623792,
+          "ball": 0.3071470359961192,
+          "foreground": 0.3460388258099556
+        },
+        "receipt": "automatic-dcvc-480-q27.json",
+        "receipt_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+      }
+    },
+    {
+      "ceiling_bytes": 20251,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 50",
+        "bytes": 17827,
+        "kbps": 35.654,
+        "sha256": "11cf8f79869e69912006f0556bb7cbb6f967e0a46b0368881b67fa48ba71ecf0",
+        "scores": {
+          "players": 0.29972732563813526,
+          "ball": 0.2349073737859726,
+          "foreground": 0.26731734971205395
+        },
+        "receipt": "automatic-joint-50.json",
+        "receipt_sha256": "00bdb0eb59eb23884f187201f73ae7b5dd7e5e114b1b6df9e9bf22aaf44685c7"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q36 480x272",
+        "bytes": 20251,
+        "kbps": 40.502,
+        "sha256": "b4011f4bca94fcd98b2912e78aca8ea4d2773e3926a9566ff0ee7f7bbbe8c9da",
+        "scores": {
+          "players": 0.3447669396797816,
+          "ball": 0.29852710167566937,
+          "foreground": 0.3216470206777255
+        },
+        "receipt": "automatic-dcvc-480-q36.json",
+        "receipt_sha256": "9ace93de177c4bcf15bc1b1aa9f405f35abf46131e6c055d87eb2526ac5e064d"
+      }
+    },
+    {
+      "ceiling_bytes": 20497,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 50",
+        "bytes": 17827,
+        "kbps": 35.654,
+        "sha256": "11cf8f79869e69912006f0556bb7cbb6f967e0a46b0368881b67fa48ba71ecf0",
+        "scores": {
+          "players": 0.29972732563813526,
+          "ball": 0.2349073737859726,
+          "foreground": 0.26731734971205395
+        },
+        "receipt": "automatic-joint-50.json",
+        "receipt_sha256": "00bdb0eb59eb23884f187201f73ae7b5dd7e5e114b1b6df9e9bf22aaf44685c7"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q36 480x272",
+        "bytes": 20251,
+        "kbps": 40.502,
+        "sha256": "b4011f4bca94fcd98b2912e78aca8ea4d2773e3926a9566ff0ee7f7bbbe8c9da",
+        "scores": {
+          "players": 0.3447669396797816,
+          "ball": 0.29852710167566937,
+          "foreground": 0.3216470206777255
+        },
+        "receipt": "automatic-dcvc-480-q36.json",
+        "receipt_sha256": "9ace93de177c4bcf15bc1b1aa9f405f35abf46131e6c055d87eb2526ac5e064d"
+      }
+    },
+    {
+      "ceiling_bytes": 21662,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 50",
+        "bytes": 17827,
+        "kbps": 35.654,
+        "sha256": "11cf8f79869e69912006f0556bb7cbb6f967e0a46b0368881b67fa48ba71ecf0",
+        "scores": {
+          "players": 0.29972732563813526,
+          "ball": 0.2349073737859726,
+          "foreground": 0.26731734971205395
+        },
+        "receipt": "automatic-joint-50.json",
+        "receipt_sha256": "00bdb0eb59eb23884f187201f73ae7b5dd7e5e114b1b6df9e9bf22aaf44685c7"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q36 480x272",
+        "bytes": 20251,
+        "kbps": 40.502,
+        "sha256": "b4011f4bca94fcd98b2912e78aca8ea4d2773e3926a9566ff0ee7f7bbbe8c9da",
+        "scores": {
+          "players": 0.3447669396797816,
+          "ball": 0.29852710167566937,
+          "foreground": 0.3216470206777255
+        },
+        "receipt": "automatic-dcvc-480-q36.json",
+        "receipt_sha256": "9ace93de177c4bcf15bc1b1aa9f405f35abf46131e6c055d87eb2526ac5e064d"
+      }
+    },
+    {
+      "ceiling_bytes": 22015,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 50",
+        "bytes": 17827,
+        "kbps": 35.654,
+        "sha256": "11cf8f79869e69912006f0556bb7cbb6f967e0a46b0368881b67fa48ba71ecf0",
+        "scores": {
+          "players": 0.29972732563813526,
+          "ball": 0.2349073737859726,
+          "foreground": 0.26731734971205395
+        },
+        "receipt": "automatic-joint-50.json",
+        "receipt_sha256": "00bdb0eb59eb23884f187201f73ae7b5dd7e5e114b1b6df9e9bf22aaf44685c7"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q36 480x272",
+        "bytes": 20251,
+        "kbps": 40.502,
+        "sha256": "b4011f4bca94fcd98b2912e78aca8ea4d2773e3926a9566ff0ee7f7bbbe8c9da",
+        "scores": {
+          "players": 0.3447669396797816,
+          "ball": 0.29852710167566937,
+          "foreground": 0.3216470206777255
+        },
+        "receipt": "automatic-dcvc-480-q36.json",
+        "receipt_sha256": "9ace93de177c4bcf15bc1b1aa9f405f35abf46131e6c055d87eb2526ac5e064d"
+      }
+    },
+    {
+      "ceiling_bytes": 26348,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 50",
+        "bytes": 17827,
+        "kbps": 35.654,
+        "sha256": "11cf8f79869e69912006f0556bb7cbb6f967e0a46b0368881b67fa48ba71ecf0",
+        "scores": {
+          "players": 0.29972732563813526,
+          "ball": 0.2349073737859726,
+          "foreground": 0.26731734971205395
+        },
+        "receipt": "automatic-joint-50.json",
+        "receipt_sha256": "00bdb0eb59eb23884f187201f73ae7b5dd7e5e114b1b6df9e9bf22aaf44685c7"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q36 480x272",
+        "bytes": 20251,
+        "kbps": 40.502,
+        "sha256": "b4011f4bca94fcd98b2912e78aca8ea4d2773e3926a9566ff0ee7f7bbbe8c9da",
+        "scores": {
+          "players": 0.3447669396797816,
+          "ball": 0.29852710167566937,
+          "foreground": 0.3216470206777255
+        },
+        "receipt": "automatic-dcvc-480-q36.json",
+        "receipt_sha256": "9ace93de177c4bcf15bc1b1aa9f405f35abf46131e6c055d87eb2526ac5e064d"
+      }
+    },
+    {
+      "ceiling_bytes": 30339,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 50",
+        "bytes": 17827,
+        "kbps": 35.654,
+        "sha256": "11cf8f79869e69912006f0556bb7cbb6f967e0a46b0368881b67fa48ba71ecf0",
+        "scores": {
+          "players": 0.29972732563813526,
+          "ball": 0.2349073737859726,
+          "foreground": 0.26731734971205395
+        },
+        "receipt": "automatic-joint-50.json",
+        "receipt_sha256": "00bdb0eb59eb23884f187201f73ae7b5dd7e5e114b1b6df9e9bf22aaf44685c7"
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q36 480x272",
+        "bytes": 20251,
+        "kbps": 40.502,
+        "sha256": "b4011f4bca94fcd98b2912e78aca8ea4d2773e3926a9566ff0ee7f7bbbe8c9da",
+        "scores": {
+          "players": 0.3447669396797816,
+          "ball": 0.29852710167566937,
+          "foreground": 0.3216470206777255
+        },
+        "receipt": "automatic-dcvc-480-q36.json",
+        "receipt_sha256": "9ace93de177c4bcf15bc1b1aa9f405f35abf46131e6c055d87eb2526ac5e064d"
+      }
+    },
+    {
+      "ceiling_bytes": 32244,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 50",
+        "bytes": 17827,
+        "kbps": 35.654,
+        "sha256": "11cf8f79869e69912006f0556bb7cbb6f967e0a46b0368881b67fa48ba71ecf0",
+        "scores": {
+          "players": 0.29972732563813526,
+          "ball": 0.2349073737859726,
+          "foreground": 0.26731734971205395
+        },
+        "receipt": "automatic-joint-50.json",
+        "receipt_sha256": "00bdb0eb59eb23884f187201f73ae7b5dd7e5e114b1b6df9e9bf22aaf44685c7"
+      },
+      "anchor": {
+        "arm": "SVT-AV1 ordinary 640x384",
+        "bytes": 32244,
+        "kbps": 64.488,
+        "sha256": "181233789afe8d47e2e92b757c94c148bfd9030009dffb5a6903d5337a315356",
+        "scores": {
+          "players": 0.3351309572656949,
+          "ball": 0.2874115804831187,
+          "foreground": 0.3112712688744068
+        },
+        "receipt": "automatic-ordinary-640-q250-range.json",
+        "receipt_sha256": "8c760a09a9fdb1cc8f4d7f1203996d5366a0f77cb19c33702daa85213d1ea67d"
+      }
+    },
+    {
+      "ceiling_bytes": 38301,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream two players and ball, base CRF 50",
+        "bytes": 17827,
+        "kbps": 35.654,
+        "sha256": "11cf8f79869e69912006f0556bb7cbb6f967e0a46b0368881b67fa48ba71ecf0",
+        "scores": {
+          "players": 0.29972732563813526,
+          "ball": 0.2349073737859726,
+          "foreground": 0.26731734971205395
+        },
+        "receipt": "automatic-joint-50.json",
+        "receipt_sha256": "00bdb0eb59eb23884f187201f73ae7b5dd7e5e114b1b6df9e9bf22aaf44685c7"
+      },
+      "anchor": {
+        "arm": "SVT-AV1 ordinary 640x384",
+        "bytes": 32244,
+        "kbps": 64.488,
+        "sha256": "181233789afe8d47e2e92b757c94c148bfd9030009dffb5a6903d5337a315356",
+        "scores": {
+          "players": 0.3351309572656949,
+          "ball": 0.2874115804831187,
+          "foreground": 0.3112712688744068
+        },
+        "receipt": "automatic-ordinary-640-q250-range.json",
+        "receipt_sha256": "8c760a09a9fdb1cc8f4d7f1203996d5366a0f77cb19c33702daa85213d1ea67d"
+      }
+    },
+    {
+      "ceiling_bytes": 38832,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream 320 wide CRF 42",
+        "bytes": 38832,
+        "sha256": "e246200fcffc644d04e4c63738e861272f297404da8ff234cd36a2b07f6f44a7",
+        "scores": {
+          "foreground": 0.24926978970567384,
+          "players": 0.2934762065609296,
+          "ball": 0.2050633728504181
+        }
+      },
+      "anchor": {
+        "arm": "SVT-AV1 ordinary 640x384",
+        "bytes": 32244,
+        "kbps": 64.488,
+        "sha256": "181233789afe8d47e2e92b757c94c148bfd9030009dffb5a6903d5337a315356",
+        "scores": {
+          "players": 0.3351309572656949,
+          "ball": 0.2874115804831187,
+          "foreground": 0.3112712688744068
+        },
+        "receipt": "automatic-ordinary-640-q250-range.json",
+        "receipt_sha256": "8c760a09a9fdb1cc8f4d7f1203996d5366a0f77cb19c33702daa85213d1ea67d"
+      }
+    },
+    {
+      "ceiling_bytes": 41677,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream 320 wide CRF 42",
+        "bytes": 38832,
+        "sha256": "e246200fcffc644d04e4c63738e861272f297404da8ff234cd36a2b07f6f44a7",
+        "scores": {
+          "foreground": 0.24926978970567384,
+          "players": 0.2934762065609296,
+          "ball": 0.2050633728504181
+        }
+      },
+      "anchor": {
+        "arm": "SVT-AV1 ordinary 1920x1080",
+        "bytes": 41677,
+        "kbps": 83.354,
+        "sha256": "86078878304e79be696ce28759d05819518271ae7bdd033f2b26df889ac34268",
+        "scores": {
+          "players": 0.30020952224731445,
+          "ball": 0.2615618755420049,
+          "foreground": 0.2808856988946597
+        },
+        "receipt": "automatic-ordinary-1920-q280-range.json",
+        "receipt_sha256": "fe5d280b0b6edcbb20aa6d20d4df5860ea1059ef39616a4c770692535e0b0ea7"
+      }
+    },
+    {
+      "ceiling_bytes": 49763,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream 320 wide CRF 42",
+        "bytes": 38832,
+        "sha256": "e246200fcffc644d04e4c63738e861272f297404da8ff234cd36a2b07f6f44a7",
+        "scores": {
+          "foreground": 0.24926978970567384,
+          "players": 0.2934762065609296,
+          "ball": 0.2050633728504181
+        }
+      },
+      "anchor": {
+        "arm": "SVT-AV1 ordinary 1920x1080",
+        "bytes": 41677,
+        "kbps": 83.354,
+        "sha256": "86078878304e79be696ce28759d05819518271ae7bdd033f2b26df889ac34268",
+        "scores": {
+          "players": 0.30020952224731445,
+          "ball": 0.2615618755420049,
+          "foreground": 0.2808856988946597
+        },
+        "receipt": "automatic-ordinary-1920-q280-range.json",
+        "receipt_sha256": "fe5d280b0b6edcbb20aa6d20d4df5860ea1059ef39616a4c770692535e0b0ea7"
+      }
+    },
+    {
+      "ceiling_bytes": 52443,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream 320 wide CRF 42",
+        "bytes": 38832,
+        "sha256": "e246200fcffc644d04e4c63738e861272f297404da8ff234cd36a2b07f6f44a7",
+        "scores": {
+          "foreground": 0.24926978970567384,
+          "players": 0.2934762065609296,
+          "ball": 0.2050633728504181
+        }
+      },
+      "anchor": {
+        "arm": "SVT-AV1 ordinary 1920x1080",
+        "bytes": 41677,
+        "kbps": 83.354,
+        "sha256": "86078878304e79be696ce28759d05819518271ae7bdd033f2b26df889ac34268",
+        "scores": {
+          "players": 0.30020952224731445,
+          "ball": 0.2615618755420049,
+          "foreground": 0.2808856988946597
+        },
+        "receipt": "automatic-ordinary-1920-q280-range.json",
+        "receipt_sha256": "fe5d280b0b6edcbb20aa6d20d4df5860ea1059ef39616a4c770692535e0b0ea7"
+      }
+    },
+    {
+      "ceiling_bytes": 63515,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream 320 wide CRF 29",
+        "bytes": 63515,
+        "sha256": "47f47bcb8785943e30c2bcfc3838dd8ed0955a57fc349c09ebe6c8bb9551fb47",
+        "scores": {
+          "foreground": 0.2432136038939158,
+          "players": 0.29274027049541473,
+          "ball": 0.1936869372924169
+        }
+      },
+      "anchor": {
+        "arm": "SVT-AV1 ordinary 1920x1080",
+        "bytes": 41677,
+        "kbps": 83.354,
+        "sha256": "86078878304e79be696ce28759d05819518271ae7bdd033f2b26df889ac34268",
+        "scores": {
+          "players": 0.30020952224731445,
+          "ball": 0.2615618755420049,
+          "foreground": 0.2808856988946597
+        },
+        "receipt": "automatic-ordinary-1920-q280-range.json",
+        "receipt_sha256": "fe5d280b0b6edcbb20aa6d20d4df5860ea1059ef39616a4c770692535e0b0ea7"
+      }
+    },
+    {
+      "ceiling_bytes": 66384,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream 640 wide CRF 50",
+        "bytes": 66384,
+        "sha256": "58353a0ec63967c3c65108ac0a80ff2a6ef531f273de19f670f5612d428ea89e",
+        "scores": {
+          "foreground": 0.23466883351405463,
+          "players": 0.28990164895852405,
+          "ball": 0.17943601806958517
+        }
+      },
+      "anchor": {
+        "arm": "SVT-AV1 ordinary 1920x1080",
+        "bytes": 41677,
+        "kbps": 83.354,
+        "sha256": "86078878304e79be696ce28759d05819518271ae7bdd033f2b26df889ac34268",
+        "scores": {
+          "players": 0.30020952224731445,
+          "ball": 0.2615618755420049,
+          "foreground": 0.2808856988946597
+        },
+        "receipt": "automatic-ordinary-1920-q280-range.json",
+        "receipt_sha256": "fe5d280b0b6edcbb20aa6d20d4df5860ea1059ef39616a4c770692535e0b0ea7"
+      }
+    },
+    {
+      "ceiling_bytes": 67624,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream 640 wide CRF 50",
+        "bytes": 66384,
+        "sha256": "58353a0ec63967c3c65108ac0a80ff2a6ef531f273de19f670f5612d428ea89e",
+        "scores": {
+          "foreground": 0.23466883351405463,
+          "players": 0.28990164895852405,
+          "ball": 0.17943601806958517
+        }
+      },
+      "anchor": {
+        "arm": "SVT-AV1 ordinary 640x384",
+        "bytes": 67624,
+        "kbps": 135.248,
+        "sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+        "scores": {
+          "players": 0.27135121325651806,
+          "ball": 0.24173304935296377,
+          "foreground": 0.2565421313047409
+        },
+        "receipt": "automatic-ordinary-640-q220-range.json",
+        "receipt_sha256": "1fe4eae35bcb7e4499d8a99219344fd20c3eff5eb7c25d710b1a49c2d1a5e9bc"
+      }
+    },
+    {
+      "ceiling_bytes": 68427,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream 640 wide CRF 50",
+        "bytes": 66384,
+        "sha256": "58353a0ec63967c3c65108ac0a80ff2a6ef531f273de19f670f5612d428ea89e",
+        "scores": {
+          "foreground": 0.23466883351405463,
+          "players": 0.28990164895852405,
+          "ball": 0.17943601806958517
+        }
+      },
+      "anchor": {
+        "arm": "SVT-AV1 ordinary 640x384",
+        "bytes": 67624,
+        "kbps": 135.248,
+        "sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+        "scores": {
+          "players": 0.27135121325651806,
+          "ball": 0.24173304935296377,
+          "foreground": 0.2565421313047409
+        },
+        "receipt": "automatic-ordinary-640-q220-range.json",
+        "receipt_sha256": "1fe4eae35bcb7e4499d8a99219344fd20c3eff5eb7c25d710b1a49c2d1a5e9bc"
+      }
+    },
+    {
+      "ceiling_bytes": 75309,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream 640 wide CRF 50",
+        "bytes": 66384,
+        "sha256": "58353a0ec63967c3c65108ac0a80ff2a6ef531f273de19f670f5612d428ea89e",
+        "scores": {
+          "foreground": 0.23466883351405463,
+          "players": 0.28990164895852405,
+          "ball": 0.17943601806958517
+        }
+      },
+      "anchor": {
+        "arm": "SVT-AV1 ordinary 640x384",
+        "bytes": 67624,
+        "kbps": 135.248,
+        "sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+        "scores": {
+          "players": 0.27135121325651806,
+          "ball": 0.24173304935296377,
+          "foreground": 0.2565421313047409
+        },
+        "receipt": "automatic-ordinary-640-q220-range.json",
+        "receipt_sha256": "1fe4eae35bcb7e4499d8a99219344fd20c3eff5eb7c25d710b1a49c2d1a5e9bc"
+      }
+    },
+    {
+      "ceiling_bytes": 75408,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream 640 wide CRF 50",
+        "bytes": 66384,
+        "sha256": "58353a0ec63967c3c65108ac0a80ff2a6ef531f273de19f670f5612d428ea89e",
+        "scores": {
+          "foreground": 0.23466883351405463,
+          "players": 0.28990164895852405,
+          "ball": 0.17943601806958517
+        }
+      },
+      "anchor": {
+        "arm": "SVT-AV1 ordinary 640x384",
+        "bytes": 67624,
+        "kbps": 135.248,
+        "sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+        "scores": {
+          "players": 0.27135121325651806,
+          "ball": 0.24173304935296377,
+          "foreground": 0.2565421313047409
+        },
+        "receipt": "automatic-ordinary-640-q220-range.json",
+        "receipt_sha256": "1fe4eae35bcb7e4499d8a99219344fd20c3eff5eb7c25d710b1a49c2d1a5e9bc"
+      }
+    },
+    {
+      "ceiling_bytes": 84406,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream 640 wide CRF 50",
+        "bytes": 66384,
+        "sha256": "58353a0ec63967c3c65108ac0a80ff2a6ef531f273de19f670f5612d428ea89e",
+        "scores": {
+          "foreground": 0.23466883351405463,
+          "players": 0.28990164895852405,
+          "ball": 0.17943601806958517
+        }
+      },
+      "anchor": {
+        "arm": "SVT-AV1 ordinary 640x384",
+        "bytes": 67624,
+        "kbps": 135.248,
+        "sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+        "scores": {
+          "players": 0.27135121325651806,
+          "ball": 0.24173304935296377,
+          "foreground": 0.2565421313047409
+        },
+        "receipt": "automatic-ordinary-640-q220-range.json",
+        "receipt_sha256": "1fe4eae35bcb7e4499d8a99219344fd20c3eff5eb7c25d710b1a49c2d1a5e9bc"
+      }
+    },
+    {
+      "ceiling_bytes": 94538,
+      "winner": "PointStream",
+      "pointstream": {
+        "arm": "PointStream 640 wide CRF 42",
+        "bytes": 94538,
+        "sha256": "bfc2342c578c673d1de340e058c2b34d724e1036c34719c63dd8c67a75609422",
+        "scores": {
+          "foreground": 0.231266217927138,
+          "players": 0.28930965562661487,
+          "ball": 0.17322278022766113
+        }
+      },
+      "anchor": {
+        "arm": "SVT-AV1 ordinary 640x384",
+        "bytes": 67624,
+        "kbps": 135.248,
+        "sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+        "scores": {
+          "players": 0.27135121325651806,
+          "ball": 0.24173304935296377,
+          "foreground": 0.2565421313047409
+        },
+        "receipt": "automatic-ordinary-640-q220-range.json",
+        "receipt_sha256": "1fe4eae35bcb7e4499d8a99219344fd20c3eff5eb7c25d710b1a49c2d1a5e9bc"
+      }
+    },
+    {
+      "ceiling_bytes": 95865,
+      "winner": "DCVC-UF Q48 960x544",
+      "pointstream": {
+        "arm": "PointStream 640 wide CRF 42",
+        "bytes": 94538,
+        "sha256": "bfc2342c578c673d1de340e058c2b34d724e1036c34719c63dd8c67a75609422",
+        "scores": {
+          "foreground": 0.231266217927138,
+          "players": 0.28930965562661487,
+          "ball": 0.17322278022766113
+        }
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q48 960x544",
+        "bytes": 95865,
+        "kbps": 191.73,
+        "sha256": "e443d40d8a0281111026231e1114d71098b4968f33781b5d041881000531afef",
+        "scores": {
+          "players": 0.21221294005711874,
+          "ball": 0.16676764686902365,
+          "foreground": 0.1894902934630712
+        },
+        "receipt": "automatic-dcvc-960-q48.json",
+        "receipt_sha256": "dd79e2b6b8d2c911cd1be4d4eafe902a417f721c169a73f066ec85cee5fc12b1"
+      }
+    },
+    {
+      "ceiling_bytes": 129794,
+      "winner": "DCVC-UF Q48 960x544",
+      "pointstream": {
+        "arm": "PointStream 640 wide CRF 42",
+        "bytes": 94538,
+        "sha256": "bfc2342c578c673d1de340e058c2b34d724e1036c34719c63dd8c67a75609422",
+        "scores": {
+          "foreground": 0.231266217927138,
+          "players": 0.28930965562661487,
+          "ball": 0.17322278022766113
+        }
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q48 960x544",
+        "bytes": 95865,
+        "kbps": 191.73,
+        "sha256": "e443d40d8a0281111026231e1114d71098b4968f33781b5d041881000531afef",
+        "scores": {
+          "players": 0.21221294005711874,
+          "ball": 0.16676764686902365,
+          "foreground": 0.1894902934630712
+        },
+        "receipt": "automatic-dcvc-960-q48.json",
+        "receipt_sha256": "dd79e2b6b8d2c911cd1be4d4eafe902a417f721c169a73f066ec85cee5fc12b1"
+      }
+    },
+    {
+      "ceiling_bytes": 132738,
+      "winner": "DCVC-UF Q54 960x544",
+      "pointstream": {
+        "arm": "PointStream 640 wide CRF 42",
+        "bytes": 94538,
+        "sha256": "bfc2342c578c673d1de340e058c2b34d724e1036c34719c63dd8c67a75609422",
+        "scores": {
+          "foreground": 0.231266217927138,
+          "players": 0.28930965562661487,
+          "ball": 0.17322278022766113
+        }
+      },
+      "anchor": {
+        "arm": "DCVC-UF Q54 960x544",
+        "bytes": 132738,
+        "kbps": 265.476,
+        "sha256": "6c9644ab8239cafcb01929554a81715bda2c7c4ede222719c4fd48be6eeb9e94",
+        "scores": {
+          "players": 0.19974710047245026,
+          "ball": 0.16191557049751282,
+          "foreground": 0.18083133548498154
+        },
+        "receipt": "automatic-dcvc-960-q54.json",
+        "receipt_sha256": "760d1e24ff42915a154160aa2bc4573fd1c5953f5973532884f88d927300ce18"
+      }
+    },
+    {
+      "ceiling_bytes": 156539,
+      "winner": "SVT-AV1 ordinary 1920x1080 cold",
+      "pointstream": {
+        "arm": "PointStream 640 wide CRF 42",
+        "bytes": 94538,
+        "sha256": "bfc2342c578c673d1de340e058c2b34d724e1036c34719c63dd8c67a75609422",
+        "scores": {
+          "foreground": 0.231266217927138,
+          "players": 0.28930965562661487,
+          "ball": 0.17322278022766113
+        }
+      },
+      "anchor": {
+        "arm": "SVT-AV1 ordinary 1920x1080 cold",
+        "bytes": 156539,
+        "kbps": 313.078,
+        "sha256": "94f39f3c1093d4ad7eb8d1b414056efdc06837d7c7bd1f92263792c771a853b8",
+        "scores": {
+          "players": 0.17923612147569656,
+          "ball": 0.14406523605187735,
+          "foreground": 0.16165067876378694
+        },
+        "receipt": "automatic-ordinary-1920-cold.json",
+        "receipt_sha256": "1aa473ec3e0469d78d743bc38383787057f5ff5a6eddf848597883e8789062bd"
+      }
+    },
+    {
+      "ceiling_bytes": 159529,
+      "winner": "SVT-AV1 ordinary 1920x1080 cold",
+      "pointstream": {
+        "arm": "PointStream 640 wide CRF 42",
+        "bytes": 94538,
+        "sha256": "bfc2342c578c673d1de340e058c2b34d724e1036c34719c63dd8c67a75609422",
+        "scores": {
+          "foreground": 0.231266217927138,
+          "players": 0.28930965562661487,
+          "ball": 0.17322278022766113
+        }
+      },
+      "anchor": {
+        "arm": "SVT-AV1 ordinary 1920x1080 cold",
+        "bytes": 156539,
+        "kbps": 313.078,
+        "sha256": "94f39f3c1093d4ad7eb8d1b414056efdc06837d7c7bd1f92263792c771a853b8",
+        "scores": {
+          "players": 0.17923612147569656,
+          "ball": 0.14406523605187735,
+          "foreground": 0.16165067876378694
+        },
+        "receipt": "automatic-ordinary-1920-cold.json",
+        "receipt_sha256": "1aa473ec3e0469d78d743bc38383787057f5ff5a6eddf848597883e8789062bd"
+      }
+    },
+    {
+      "ceiling_bytes": 160748,
+      "winner": "SVT-AV1 ordinary 1920x1080 cold",
+      "pointstream": {
+        "arm": "PointStream 640 wide CRF 42",
+        "bytes": 94538,
+        "sha256": "bfc2342c578c673d1de340e058c2b34d724e1036c34719c63dd8c67a75609422",
+        "scores": {
+          "foreground": 0.231266217927138,
+          "players": 0.28930965562661487,
+          "ball": 0.17322278022766113
+        }
+      },
+      "anchor": {
+        "arm": "SVT-AV1 ordinary 1920x1080 cold",
+        "bytes": 156539,
+        "kbps": 313.078,
+        "sha256": "94f39f3c1093d4ad7eb8d1b414056efdc06837d7c7bd1f92263792c771a853b8",
+        "scores": {
+          "players": 0.17923612147569656,
+          "ball": 0.14406523605187735,
+          "foreground": 0.16165067876378694
+        },
+        "receipt": "automatic-ordinary-1920-cold.json",
+        "receipt_sha256": "1aa473ec3e0469d78d743bc38383787057f5ff5a6eddf848597883e8789062bd"
+      }
+    },
+    {
+      "ceiling_bytes": 160804,
+      "winner": "SVT-AV1 ordinary 1920x1080 cold",
+      "pointstream": {
+        "arm": "PointStream 640 wide CRF 42",
+        "bytes": 94538,
+        "sha256": "bfc2342c578c673d1de340e058c2b34d724e1036c34719c63dd8c67a75609422",
+        "scores": {
+          "foreground": 0.231266217927138,
+          "players": 0.28930965562661487,
+          "ball": 0.17322278022766113
+        }
+      },
+      "anchor": {
+        "arm": "SVT-AV1 ordinary 1920x1080 cold",
+        "bytes": 156539,
+        "kbps": 313.078,
+        "sha256": "94f39f3c1093d4ad7eb8d1b414056efdc06837d7c7bd1f92263792c771a853b8",
+        "scores": {
+          "players": 0.17923612147569656,
+          "ball": 0.14406523605187735,
+          "foreground": 0.16165067876378694
+        },
+        "receipt": "automatic-ordinary-1920-cold.json",
+        "receipt_sha256": "1aa473ec3e0469d78d743bc38383787057f5ff5a6eddf848597883e8789062bd"
+      }
+    },
+    {
+      "ceiling_bytes": 161650,
+      "winner": "SVT-AV1 ordinary 1920x1080 cold",
+      "pointstream": {
+        "arm": "PointStream 640 wide CRF 42",
+        "bytes": 94538,
+        "sha256": "bfc2342c578c673d1de340e058c2b34d724e1036c34719c63dd8c67a75609422",
+        "scores": {
+          "foreground": 0.231266217927138,
+          "players": 0.28930965562661487,
+          "ball": 0.17322278022766113
+        }
+      },
+      "anchor": {
+        "arm": "SVT-AV1 ordinary 1920x1080 cold",
+        "bytes": 156539,
+        "kbps": 313.078,
+        "sha256": "94f39f3c1093d4ad7eb8d1b414056efdc06837d7c7bd1f92263792c771a853b8",
+        "scores": {
+          "players": 0.17923612147569656,
+          "ball": 0.14406523605187735,
+          "foreground": 0.16165067876378694
+        },
+        "receipt": "automatic-ordinary-1920-cold.json",
+        "receipt_sha256": "1aa473ec3e0469d78d743bc38383787057f5ff5a6eddf848597883e8789062bd"
+      }
+    },
+    {
+      "ceiling_bytes": 162022,
+      "winner": "SVT-AV1 ordinary 1920x1080 cold",
+      "pointstream": {
+        "arm": "PointStream 640 wide CRF 42",
+        "bytes": 94538,
+        "sha256": "bfc2342c578c673d1de340e058c2b34d724e1036c34719c63dd8c67a75609422",
+        "scores": {
+          "foreground": 0.231266217927138,
+          "players": 0.28930965562661487,
+          "ball": 0.17322278022766113
+        }
+      },
+      "anchor": {
+        "arm": "SVT-AV1 ordinary 1920x1080 cold",
+        "bytes": 156539,
+        "kbps": 313.078,
+        "sha256": "94f39f3c1093d4ad7eb8d1b414056efdc06837d7c7bd1f92263792c771a853b8",
+        "scores": {
+          "players": 0.17923612147569656,
+          "ball": 0.14406523605187735,
+          "foreground": 0.16165067876378694
+        },
+        "receipt": "automatic-ordinary-1920-cold.json",
+        "receipt_sha256": "1aa473ec3e0469d78d743bc38383787057f5ff5a6eddf848597883e8789062bd"
+      }
+    },
+    {
+      "ceiling_bytes": 162029,
+      "winner": "SVT-AV1 ordinary 1920x1080 cold",
+      "pointstream": {
+        "arm": "PointStream 640 wide CRF 42",
+        "bytes": 94538,
+        "sha256": "bfc2342c578c673d1de340e058c2b34d724e1036c34719c63dd8c67a75609422",
+        "scores": {
+          "foreground": 0.231266217927138,
+          "players": 0.28930965562661487,
+          "ball": 0.17322278022766113
+        }
+      },
+      "anchor": {
+        "arm": "SVT-AV1 ordinary 1920x1080 cold",
+        "bytes": 156539,
+        "kbps": 313.078,
+        "sha256": "94f39f3c1093d4ad7eb8d1b414056efdc06837d7c7bd1f92263792c771a853b8",
+        "scores": {
+          "players": 0.17923612147569656,
+          "ball": 0.14406523605187735,
+          "foreground": 0.16165067876378694
+        },
+        "receipt": "automatic-ordinary-1920-cold.json",
+        "receipt_sha256": "1aa473ec3e0469d78d743bc38383787057f5ff5a6eddf848597883e8789062bd"
+      }
+    }
+  ]
+}

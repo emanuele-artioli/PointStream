@@ -52,6 +52,20 @@ CASES = {
         },
         "scope": "Three physical Sydney receivers at the cached 12,890-byte ceiling on the twelve fixed source ticks. The smallest measured effective ROI stream exceeds the ceiling.",
     },
+    "sydney-wider-anchors": {
+        "directory": "sydney-joint-foreground-20261122",
+        "joint": "ordinary-1920-q280-range",
+        "arms": {
+            tag: tag
+            for tag in (
+                "ordinary-1920-q280-range",
+                "ordinary-640-q220-range",
+                "dcvc-960-q48",
+                "roi-640-floor",
+            )
+        },
+        "scope": "Saved four affordable static controls on wider-rate Sydney native sample grid",
+    },
 }
 ALEX_SHA256 = "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02"
 

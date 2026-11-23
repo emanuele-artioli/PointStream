@@ -1,0 +1,42 @@
+{
+  "job_id": "20261123T004941Z-45c04eb1",
+  "status": "pending",
+  "spec_sha256": "8e8a8111af665a5e9e3c44b16e8170207c1359ea00bf40517838f3b036b9a31f",
+  "source_sha256": "f02999b8e49c4beed56901c082d60118932aba9416d78cce8fcdb1477b23f102",
+  "snapshot": {
+    "git_head": "b1f2988bc82a1e7e1388f03c0d2c2ffe45a1954d",
+    "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tracked_changes_included": [],
+    "tracked_changes_excluded": [
+      "docs/experiments/clean-court-002-20261122/README.md",
+      "docs/experiments/sydney-joint-foreground-20261122/higher-rate.md",
+      "docs/experiments/sydney-joint-foreground-20261122/wider_specs.py",
+      "experiments/tennis/clean_court_002.py",
+      "experiments/tennis/med_mixed_rung.py"
+    ],
+    "included_untracked_sha256": {},
+    "untracked_excluded_count": 8,
+    "untracked_excluded_paths_sha256": "93ee72e631bd36e4705d5cf675b552d98403e7de77972a43f58539c08abd1954",
+    "untracked_excluded_sample": [
+      "docs/experiments/clean-court-002-20261122/000-ball-spec.json",
+      "docs/experiments/sydney-joint-foreground-20261122/clean-parity-registration.json",
+      "docs/experiments/sydney-joint-foreground-20261122/clean-parity-result.json",
+      "docs/experiments/sydney-joint-foreground-20261122/clean-parity-spec.json",
+      "docs/experiments/sydney-joint-foreground-20261122/clean-parity.md",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-reference-spec.json",
+      "experiments/tennis/starved_joint_dcvc_q30.py",
+      "experiments/tennis/sydney_clean_parity.py"
+    ],
+    "deleted_paths": [],
+    "snapshot_sha256": "1ed6e80b3578a12939844baeaa645cded17765eedc591e8819a385731c5afbb9",
+    "tracked_archive_paths_selected": [
+      "experiments",
+      "src",
+      "scripts",
+      "tools",
+      "experiments/__init__.py",
+      "experiments/jobs",
+      "src/__init__.py"
+    ]
+  }
+}

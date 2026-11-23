@@ -1,0 +1,44 @@
+{
+  "scope": "local receiver contract; synthetic wider AV1 bytes are not study evidence",
+  "original_packet_sha256": "f9ab35e8d3cd6708e726fe57d9d7ba7cc8943285ac4535524491f5cfe0598384",
+  "original_carrier_sha256": "a70a444b65f905285830a5fc2561e752708ac24ea0a5e02d538d85ac742dd99c",
+  "original_base_frames_equal_previous_implementation": 240,
+  "original_decoded_yuv_sha256": "93597a2849351d890ea8aef2e205a75204addc2146da1379855846de3c7fa734",
+  "wider_bases": {
+    "320x192": {
+      "physical_av1_frames": 240,
+      "different_canvases": 4,
+      "tested_ticks": [
+        0,
+        39,
+        119,
+        239
+      ],
+      "wrong_dimensions_rejected": true,
+      "ivf_header_mismatch_rejected": true,
+      "default_receiver_rejected_wider_size": true
+    },
+    "640x384": {
+      "physical_av1_frames": 240,
+      "different_canvases": 4,
+      "tested_ticks": [
+        0,
+        39,
+        119,
+        239
+      ],
+      "wrong_dimensions_rejected": true,
+      "ivf_header_mismatch_rejected": true,
+      "default_receiver_rejected_wider_size": true
+    }
+  },
+  "comparison_commit": "f377449d",
+  "platform": "Darwin arm64",
+  "opencv": "4.10.0",
+  "ffmpeg": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+  "original_producer_bytes_match_joint_carrier_and_manifest": true,
+  "focused_tests": {
+    "passed": 52,
+    "skipped": 1
+  }
+}

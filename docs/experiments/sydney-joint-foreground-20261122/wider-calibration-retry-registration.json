@@ -1,0 +1,46 @@
+{
+  "job_id": "20261123T005402Z-c4327bf7",
+  "status": "pending",
+  "spec_sha256": "8e8a8111af665a5e9e3c44b16e8170207c1359ea00bf40517838f3b036b9a31f",
+  "source_sha256": "58494e47a2055ca03304f9d534744da14d316dd6f0ccc086b9678ad38855572b",
+  "snapshot": {
+    "git_head": "c8a588f472e5415243dbcf58cbfb844aec6b53e1",
+    "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tracked_changes_included": [],
+    "tracked_changes_excluded": [
+      "docs/experiments/clean-court-002-20261122/README.md",
+      "docs/experiments/sydney-joint-foreground-20261122/higher-rate.md",
+      "docs/experiments/sydney-joint-foreground-20261122/plot_physical_rates.py",
+      "docs/experiments/sydney-joint-foreground-20261122/wider_specs.py",
+      "experiments/tennis/clean_court_002.py"
+    ],
+    "included_untracked_sha256": {},
+    "untracked_excluded_count": 12,
+    "untracked_excluded_paths_sha256": "3f65d020047a24dc9d7f834c08db3273041cd73623536c62b3511fb4bec34eee",
+    "untracked_excluded_sample": [
+      "docs/experiments/clean-court-002-20261122/000-ball-spec.json",
+      "docs/experiments/sydney-joint-foreground-20261122/clean-parity-registration.json",
+      "docs/experiments/sydney-joint-foreground-20261122/clean-parity-result.json",
+      "docs/experiments/sydney-joint-foreground-20261122/clean-parity-spec.json",
+      "docs/experiments/sydney-joint-foreground-20261122/clean-parity.md",
+      "docs/experiments/sydney-joint-foreground-20261122/compare_wider.py",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-calibration-registration.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-calibration-spec.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-reference-result.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-reference-spec.json",
+      "experiments/tennis/starved_joint_dcvc_q30.py",
+      "experiments/tennis/sydney_clean_parity.py"
+    ],
+    "deleted_paths": [],
+    "snapshot_sha256": "cb4ed11624bd31743fecc37f56c2d740e9f3aba3c896a3aac0b6cc0d9d3e70a7",
+    "tracked_archive_paths_selected": [
+      "experiments",
+      "src",
+      "scripts",
+      "tools",
+      "experiments/__init__.py",
+      "experiments/jobs",
+      "src/__init__.py"
+    ]
+  }
+}
