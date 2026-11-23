@@ -3,15 +3,19 @@
 Add `--review-samples` to the registered `med_mixed_rung` command. It copies
 one physical smoke tick and the twelve frozen review ticks for a complete
 240-frame replay into `review-samples.zseq`. The validator checks each selected
-RGB digest against the complete receiver receipt and includes
+RGB digest against the complete receiver receipt and publishes
+`review-sample-validation.json` in the full stage. It includes
 `checks.review_rung_sha256`, `checks.review_manifest_sha256`, and
 `checks.review_sample_sha256` in its result. The original command preserves
 its previous behavior when this option is absent.
 
 For each completed replay, retrieve only `rung.json`, `review-samples.json`
 and `review-samples.zseq` from its authenticated full stage. Use the
-`checks.review_rung_sha256` from the validated fleet result in the command
-below. Run in the existing CPU environment used for the matched metric
+`checks.review_rung_sha256` from the full stage validation in the command
+below. For an earlier run with the sample export before the full validation
+receipt was added, calculate the SHA256 of its completed `full/rung.json`
+on campus. The job's gate file always binds its smoke receipt. Run the scorer
+in the existing CPU environment used for the matched metric
 cross-check. Reuse the original Sydney review directory, official ball CSV,
 and exactly the same frozen metric weights. The standard invocation scores all
 twelve source instants. Run once with `--smoke` and a separate output to check

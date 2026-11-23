@@ -263,6 +263,8 @@ def cli_run(a):
     (stage / "timing.json").write_text(json.dumps(dict(seconds=time.monotonic() - now)))
     if a.review_samples:
         export_review_samples(stage, r)
+        result = dict(passed=True, checks=validate_review_samples(stage, r))
+        (stage / "review-sample-validation.json").write_text(json.dumps(result) + "\n")
 
 
 def review_rows(r):
@@ -339,6 +341,17 @@ def review_receipt(stage, r):
     return report
 
 
+def validate_review_samples(stage, r):
+    report = review_receipt(stage, r)
+    for _ in read_review_samples(stage, report):
+        pass
+    return dict(
+        review_manifest_sha256=sha256(stage / "review-samples.json"),
+        review_rung_sha256=report["rung_sha256"],
+        review_sample_sha256=report["sample_sha256"],
+    )
+
+
 def validate():
     stage = Path(os.environ["PS_STAGE_DIR"])
     r = json.loads((stage / "rung.json").read_text())
@@ -369,14 +382,7 @@ def validate():
         forecast=True,
     )
     if (stage / "review-samples.json").exists():
-        report = review_receipt(stage, r)
-        for _ in read_review_samples(stage, report):
-            pass
-        checks.update(
-            review_manifest_sha256=sha256(stage / "review-samples.json"),
-            review_rung_sha256=report["rung_sha256"],
-            review_sample_sha256=report["sample_sha256"],
-        )
+        checks.update(validate_review_samples(stage, r))
     Path(os.environ["PS_VALIDATION_PATH"]).write_text(
         json.dumps(
             dict(
