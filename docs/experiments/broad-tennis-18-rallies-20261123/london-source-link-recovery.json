@@ -1,0 +1,78 @@
+{
+  "scope": "exploratory seeded candidate association, no inferred boxes or pose",
+  "source_receipt_sha256": "e1074574c1fdc0b62b0de6eae0721650a2b094fe2bf7f86d2b8d67c7155d2b01",
+  "script_sha256": "33d41d4020ded0b6f3f2c4bc368a5aeaec0f6b4d5059491fc2ad7ac30ce34acc",
+  "review_sha256": "0808e948c9245fc6bdffa2c94dbb7de1cc3980efc850013f7866d360fb902dfb",
+  "gap_limit_ticks": 3,
+  "complete_ticks": 104,
+  "missing_ticks": [
+    93,
+    96
+  ],
+  "review_comparisons": [
+    {
+      "tick": 6,
+      "normalized_center_error": [
+        0.0,
+        0.0
+      ],
+      "matched": true
+    },
+    {
+      "tick": 19,
+      "normalized_center_error": [
+        0.00033078367483265636,
+        0.00034571243892771733
+      ],
+      "matched": true
+    },
+    {
+      "tick": 33,
+      "normalized_center_error": [
+        4.2431737116024625e-05,
+        0.0002988295240175371
+      ],
+      "matched": true
+    },
+    {
+      "tick": 46,
+      "normalized_center_error": [
+        0.00022985782527785236,
+        0.0005274971737473498
+      ],
+      "matched": true
+    },
+    {
+      "tick": 59,
+      "normalized_center_error": [
+        0.00022721469690588751,
+        0.0006011163067916608
+      ],
+      "matched": true
+    },
+    {
+      "tick": 72,
+      "normalized_center_error": [
+        0.0002489014779617707,
+        0.002091197137805888
+      ],
+      "matched": true
+    },
+    {
+      "tick": 86,
+      "normalized_center_error": [
+        0.0003663465419273124,
+        0.0005906395133230276
+      ],
+      "matched": true
+    },
+    {
+      "tick": 99,
+      "normalized_center_error": [
+        6.028785427326477e-05,
+        0.00036366887024009953
+      ],
+      "matched": true
+    }
+  ]
+}

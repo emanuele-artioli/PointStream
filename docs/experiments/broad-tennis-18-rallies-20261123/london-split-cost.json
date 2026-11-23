@@ -1,0 +1,104 @@
+{
+  "scope": "ordinary AV1 on both sides, no player or ball, 640x360 crf70",
+  "source_sha256": "8ab59163aa86f3cb0f26b1981e6e546f148cca916e40731c0cdee5c6621e4b78",
+  "input_yuv_sha256": "769f43e346a34452d7d28da22a5edec203ae0efac5c48598e3f0f70ecae91a4e",
+  "script_sha256": "9b18e18ef301e0ac3769ddedac7cc1b47f721cb8bf595cfedcb56ba8fef13699",
+  "tools": {
+    "ffmpeg": {
+      "path": "/opt/homebrew/bin/ffmpeg",
+      "real_path": "/opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg",
+      "sha256": "8d97d0745b0d1d8f6296c026c426c263f509306b8f81c9ffe4e93e95890ca8be",
+      "version": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    "SvtAv1EncApp": {
+      "path": "/opt/homebrew/bin/SvtAv1EncApp",
+      "real_path": "/opt/homebrew/Cellar/svt-av1/4.0.1/bin/SvtAv1EncApp",
+      "sha256": "db044194faf94d553c2509c8e033ecd05a373ba54d919d0fb49a3a13149d1687",
+      "version": "SVT-AV1 v4.0.1 (release)"
+    },
+    "dav1d": {
+      "path": "/opt/homebrew/bin/dav1d",
+      "real_path": "/opt/homebrew/Cellar/dav1d/1.5.4/bin/dav1d",
+      "sha256": "add73331b706cb655203c27f7ee21d091ccbbf65191a98e4e49d2d9391cc38e4",
+      "version": "1.5.4"
+    }
+  },
+  "ceiling_bytes": 10812,
+  "unsplit_av1_bytes": 9467,
+  "packets": [
+    {
+      "start": 0,
+      "stop": 93,
+      "ivf_bytes": 8667,
+      "packet_bytes": 8896,
+      "ivf_sha256": "8fcbcebf8f39ee1a42cc950c04f47ad62132b6a09f2478996dd9aa9096633611",
+      "decoded_sha256": "00b323ecda5c1f14e20c590d964ca5d39aa7a6aa8a6ea84f125ff12e1042e436",
+      "encoder_arguments": [
+        "-w",
+        "640",
+        "-h",
+        "360",
+        "--input-depth",
+        "8",
+        "--fps-num",
+        "25",
+        "--fps-denom",
+        "1",
+        "-n",
+        "93",
+        "--color-range",
+        "0",
+        "--rc",
+        "0",
+        "--crf",
+        "70",
+        "--preset",
+        "4",
+        "--keyint",
+        "-1",
+        "--lp",
+        "6",
+        "--progress",
+        "0"
+      ]
+    },
+    {
+      "start": 93,
+      "stop": 106,
+      "ivf_bytes": 2728,
+      "packet_bytes": 2957,
+      "ivf_sha256": "c4dca474c9cb1ed666a645533daf231f9158dda3e9d77108103c1450ac155e57",
+      "decoded_sha256": "f42371bc5b8a2963b144d2fafc74096a51c2fa3d3b1f289f54538c6350f4e306",
+      "encoder_arguments": [
+        "-w",
+        "640",
+        "-h",
+        "360",
+        "--input-depth",
+        "8",
+        "--fps-num",
+        "25",
+        "--fps-denom",
+        "1",
+        "-n",
+        "13",
+        "--color-range",
+        "0",
+        "--rc",
+        "0",
+        "--crf",
+        "70",
+        "--preset",
+        "4",
+        "--keyint",
+        "-1",
+        "--lp",
+        "6",
+        "--progress",
+        "0"
+      ]
+    }
+  ],
+  "total_packet_bytes": 11853,
+  "elapsed_seconds": 8.36533741599851
+}
