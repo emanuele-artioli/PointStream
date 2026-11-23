@@ -39,3 +39,13 @@ panel does not evaluate temporal fidelity. Use the existing scored Sydney
 control bank on the same twelve source instants for the primary
 foreground-DISTS comparisons. Report each budget whose affordable control
 does not yet have a matched LPIPS or PSNR score.
+
+Four archived controls have the matched spatial scores in
+[`sydney-wider-anchor-metrics.json`](sydney-wider-anchor-metrics.json).
+The two ordinary AV1 points are 83.354 and 135.248 kbps, the neural point is
+191.730 kbps and the effective ROI point is 34.154 kbps. The saved 40.502 kbps
+neural control supplies DISTS alone. Reproduce the four-control receipt with
+`score.py --case sydney-wider-anchors --ticks 12` using the original Sydney
+review and the native per-control `arm.json` directories for `--arms`.
+The per-frame `background_psnr` field averages PSNR on the complement of
+the same two player masks and ball crop as the wider rerenders.
