@@ -9,3 +9,5 @@ Shanghai pilot `20261123T120443Z-9a4a6d8c` was submitted on the original scorer'
 The first Shanghai smoke computed valid matched metrics and a 46.92-second forecast, but its validator emitted checks to stdout instead of the fleet's validation file. No full stage ran. The corrected validator explicitly publishes its checks at the required path. [First terminal receipt](match102-smoke-terminal.json)
 
 The corrected Shanghai attempt is `20261123T121031Z-739155a9`. [Registered job](match102-retry-registration.json)
+
+The corrected Shanghai pair completed. Both complete receiver RGB hashes and all per-tick original DISTS scores match. The lower local DISTS also accompanies lower LPIPS, higher luma SSIM and lower RGB error on the same crops. The full smoke forecast was under one minute and native work used one CPU. Promote the remaining eleven previously enrolled matches using their existing completed CPU score receipts and identical metrics. [Shanghai native result](match102-result.json) · [Terminal receipt](match102-terminal.json)
