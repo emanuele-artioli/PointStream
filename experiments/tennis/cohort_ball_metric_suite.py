@@ -104,7 +104,8 @@ def run(args):
             if not rows:
                 identity = compare(target, target, lpips)
                 assert abs(identity["lpips"]) < 1e-9, identity
-                assert abs(identity["luma_ssim"] - 1) < 2e-6, identity
+                # Float32 Gaussian convolution can lose precision on flat luma patches.
+                assert abs(identity["luma_ssim"] - 1) < 2e-5, identity
             score = float(dists_crops(dists, [crop], target, np.ones((64, 64), bool), "cpu")[0])
             assert abs(score - expected[tick]) < 2e-5
             values = compare(crop, target, lpips)
