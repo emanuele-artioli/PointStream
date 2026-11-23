@@ -13,3 +13,5 @@ Campus smoke `20261123T115556Z-9c8e0565` produced donor correspondence counts di
 The exact-original 320×192 calibration is registered as `20261123T120527Z-6a36a3be`, revision `aa4a9743`. It uses the verified Mac donor raster, Shanghai's 30000/1001 cadence and unchanged foreground packets. Its validator verifies the original decoded base SHA and actual physical packet identities.
 
 320-wide calibration `20261123T120527Z-6a36a3be` completed on gpu6. The physical warm rates from its six CRFs range from 16.56 to 179.39 kbps. The chosen 83.19 and 109.77 kbps rungs have authenticated packets. Two preselected CRFs 29 and 19 target about 65 and 100 kbps. A 640-wide three-CRF pilot tests whether extra spatial resolution can use approximately 140 kbps effectively. Both reuse the same original clean raster and pay unchanged foreground.
+
+The 320-wide CRF29/19 probe is `20261123T121047Z-8d57f676`. Native original-foreground replay of 83.19 kbps is `20261123T121116Z-c9e8aa0a`, and 109.77 kbps is `20261123T121124Z-c7b36e47`. Each replay exports the 12 frozen Shanghai review ticks and validates their binding to full native display.
