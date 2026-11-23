@@ -1,0 +1,65 @@
+{
+  "job_id": "20261123T115627Z-64bfa092",
+  "created": 1795435048.52418,
+  "status": "complete",
+  "updated": 1795436350.6706276,
+  "host_alias": "gpu1",
+  "gpu": null,
+  "gpu_sharing": null,
+  "supervisor_pid": 2402066,
+  "remote_status": {
+    "status": "complete",
+    "started": 1795435061.753794,
+    "last_progress": 1795436317.5487273,
+    "emitted": [
+      "terminal:complete"
+    ],
+    "pid": 2402100,
+    "proc_start_time": 1795435063.94,
+    "process_group_id": 2402100,
+    "progress": {
+      "stage": "full",
+      "completed": 1,
+      "updated": 1795436309.195024,
+      "decision": null
+    },
+    "exit_code": 0,
+    "ended": 1795436317.5487273
+  },
+  "directory": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T115627Z-64bfa092",
+  "gate": {
+    "passed": true,
+    "spec_sha256": "f904e9ff6c39d53b0a8d0de07d29c9a85e75f19f2451ecb8e7444b7e9f74d571",
+    "source_sha256": "d7b27456f4bd229e4577e6af6cc60a9e562fc56eb192b1bfd4ba2149ae8c54b7",
+    "inputs": [
+      {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match102-000-fc5d3ee431f8.mp4",
+        "sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a"
+      },
+      {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match102.json",
+        "sha256": "59c9f2d3e10a05a9aa6d71ae488b1ed5621d8bcdc549f5e5ed86e4210557358f"
+      },
+      {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T095917Z-126b9bac/full/published.tar",
+        "sha256": "37d21fdac95e0c6818be4f335eff1da308f51ab81344ec250ec6a048d56587d5"
+      }
+    ],
+    "validation": {
+      "passed": true,
+      "checks": {
+        "source": true,
+        "native": true,
+        "delivery": true,
+        "lossless": true,
+        "forecast": true
+      },
+      "forecast": 137.3176640548627
+    },
+    "validator_seconds": 0.4012446403503418,
+    "smoke_seconds": 31.97519540786743,
+    "remaining_seconds": 2244.041147708893,
+    "attempt": 1
+  },
+  "campaign_error": null
+}

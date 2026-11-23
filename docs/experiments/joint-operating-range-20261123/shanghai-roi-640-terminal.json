@@ -1,0 +1,73 @@
+{
+  "job_id": "20261123T120820Z-35db68b8",
+  "created": 1795435737.882529,
+  "status": "complete",
+  "updated": 1795436044.1344118,
+  "host_alias": "gpu3",
+  "gpu": null,
+  "gpu_sharing": null,
+  "supervisor_pid": 242800,
+  "remote_status": {
+    "status": "complete",
+    "started": 1795435743.4867036,
+    "last_progress": 1795436024.2572572,
+    "emitted": [
+      "terminal:complete"
+    ],
+    "pid": 242801,
+    "proc_start_time": 1795435744.2,
+    "process_group_id": 242801,
+    "progress": {
+      "stage": "full",
+      "completed": 1,
+      "updated": 1795436014.8746488,
+      "decision": null
+    },
+    "exit_code": 0,
+    "ended": 1795436024.2572572
+  },
+  "directory": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T120820Z-35db68b8",
+  "gate": {
+    "passed": true,
+    "spec_sha256": "5cf2a312b3efd54fdf78fededd656bd4cce59e6f344235cb233fc1e362dd3370",
+    "source_sha256": "2313d7ee4b05b50823e5d211b8b6148cde782d279a050c532587354d0d7f83a6",
+    "inputs": [
+      {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match102-000-fc5d3ee431f8.mp4",
+        "sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a"
+      },
+      {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match102.json",
+        "sha256": "59c9f2d3e10a05a9aa6d71ae488b1ed5621d8bcdc549f5e5ed86e4210557358f"
+      },
+      {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T095917Z-126b9bac/full/published.tar",
+        "sha256": "37d21fdac95e0c6818be4f335eff1da308f51ab81344ec250ec6a048d56587d5"
+      },
+      {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T095722Z-14da4d11/full/published.tar",
+        "sha256": "994101c8d3466080777c262d92b9f15953c5636cc4addae06f75ad478d3594ee"
+      },
+      {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T094101Z-ad793d52/full/ball.payload",
+        "sha256": "3ad726835c0e51c11daa80d9b54630a1e52494227680b434254e583950426918"
+      }
+    ],
+    "validation": {
+      "passed": true,
+      "checks": {
+        "source": true,
+        "native": true,
+        "delivery": true,
+        "lossless": true,
+        "forecast": true
+      },
+      "forecast": 463.9786729050684
+    },
+    "validator_seconds": 2.168260097503662,
+    "smoke_seconds": 49.698405265808105,
+    "remaining_seconds": 1208.4407441616058,
+    "attempt": 1
+  },
+  "campaign_error": null
+}

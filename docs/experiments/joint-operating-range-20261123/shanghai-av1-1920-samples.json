@@ -1,0 +1,75 @@
+{
+  "rows": [
+    {
+      "state": "complete",
+      "job_id": "20261123T115627Z-64bfa092",
+      "archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T115627Z-64bfa092/full/published.tar",
+      "archive_sha256": "06a60f0b45c2337839c49654d99f5fc2db6edfd04a8e1dc3dfe77e930708d818",
+      "width": 1920,
+      "height": 1080,
+      "mode": "ordinary",
+      "selected": {
+        "r90": {
+          "ceiling": 90090,
+          "affordable": true,
+          "identical_qp_control": null,
+          "quarter_crf": 253,
+          "bytes": 89433,
+          "file": "publish/q253.ivf",
+          "sha256": "6e90412f697fbb1fc070604377cf25f4e8a8c73ef12d0b92c58dcc6b8d2a9d39",
+          "origin": "new",
+          "elapsed": 51.49650481599383,
+          "coded_decoded_sha256": "b1c7479679707ecc10e66a5a3a042468f988e7ad3a17aec0d2fc172f13f01c20",
+          "decoded_sha256": "b1c7479679707ecc10e66a5a3a042468f988e7ad3a17aec0d2fc172f13f01c20",
+          "decoded_file": "publish/r90.yuv.z",
+          "shortfall": 0.007292707292707257
+        },
+        "r120": {
+          "ceiling": 120120,
+          "affordable": true,
+          "identical_qp_control": null,
+          "quarter_crf": 249,
+          "bytes": 119023,
+          "file": "publish/q249.ivf",
+          "sha256": "d2ac3d7b73ef58a85078997112221733ccd4dbe278249d34a83cc867c652c3ec",
+          "origin": "new",
+          "elapsed": 65.37475913198432,
+          "coded_decoded_sha256": "9d0888bc6b0f9c2a6b951be0a3bea4bd80b302e5a8312975064794e31d4a3b29",
+          "decoded_sha256": "9d0888bc6b0f9c2a6b951be0a3bea4bd80b302e5a8312975064794e31d4a3b29",
+          "decoded_file": "publish/r120.yuv.z",
+          "shortfall": 0.00913253413253412
+        },
+        "r140": {
+          "ceiling": 140140,
+          "affordable": true,
+          "identical_qp_control": null,
+          "quarter_crf": 246,
+          "bytes": 138908,
+          "file": "publish/q246.ivf",
+          "sha256": "6f28dbcf20974241053a7a3a85a7b0328c0e467e2a4ee25b5902692f2d2a801c",
+          "origin": "new",
+          "elapsed": 63.07972353399964,
+          "coded_decoded_sha256": "8efc53266cf7f5c9db7ecf9efeda267f2e7a4d0d4673fd7906331f9e61011482",
+          "decoded_sha256": "8efc53266cf7f5c9db7ecf9efeda267f2e7a4d0d4673fd7906331f9e61011482",
+          "decoded_file": "publish/r140.yuv.z",
+          "shortfall": 0.00879120879120876
+        }
+      }
+    }
+  ],
+  "ticks": [
+    9,
+    31,
+    49,
+    72,
+    95,
+    112,
+    135,
+    152,
+    175,
+    198,
+    215,
+    238
+  ],
+  "deduplicate": true
+}
