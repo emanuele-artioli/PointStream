@@ -7,3 +7,5 @@
 Shanghai pilot `20261123T120443Z-9a4a6d8c` was submitted on the original scorer's host. [CPU spec](match102-spec.json) · [Registration](match102-registration.json)
 
 The first Shanghai smoke computed valid matched metrics and a 46.92-second forecast, but its validator emitted checks to stdout instead of the fleet's validation file. No full stage ran. The corrected validator explicitly publishes its checks at the required path. [First terminal receipt](match102-smoke-terminal.json)
+
+The corrected Shanghai attempt is `20261123T121031Z-739155a9`. [Registered job](match102-retry-registration.json)

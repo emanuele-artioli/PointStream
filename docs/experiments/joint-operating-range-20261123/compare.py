@@ -249,7 +249,7 @@ def order_changes(families, endpoint):
 def plot(result, output, endpoint):
     figure, axes = plt.subplots(1, 2, sharey=True, figsize=(7.3, 2.88))
     for ax, (match, data) in zip(axes, result.items(), strict=True):
-        ax.set_title(match, fontweight="semibold", fontsize=9.4)
+        ax.set_title(match, fontweight="bold", fontsize=9.4)
         ax.set_xscale("log")
         ax.set_xlim(10, 340)
         ax.set_xticks([10, 20, 40, 80, 160, 320], [10, 20, 40, 80, 160, 320])
@@ -268,8 +268,14 @@ def plot(result, output, endpoint):
     endpoint_label = {"players": "Player", "ball": "Ball", "foreground": "Foreground"}[endpoint]
     axes[0].set_ylabel(endpoint_label + " DISTS ↓", fontsize=9)
     figure.supxlabel("Delivered bitrate (kbps, appearance cached)", fontsize=9, y=0.105)
-    figure.legend(*axes[0].get_legend_handles_labels(), loc="lower center",
-                  ncol=4, frameon=False, fontsize=8, bbox_to_anchor=(0.5, -0.007))
+    figure.legend(
+        *axes[0].get_legend_handles_labels(),
+        loc="lower center",
+        ncol=4,
+        frameon=False,
+        fontsize=8,
+        bbox_to_anchor=(0.5, -0.007),
+    )
     figure.subplots_adjust(bottom=0.26, left=0.09, right=0.99, top=0.87, wspace=0.10)
     figure.savefig(output, metadata={"CreationDate": None})
     plt.close(figure)
