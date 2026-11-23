@@ -20,13 +20,14 @@ def produced(name, job, filename, digest):
 def build(a):
     template = json.loads((PREVIOUS / "match127-rung-70.json").read_text())
     staged = {r["name"]: r for r in template["staged_inputs"]}
+    original = {**staged["joint"], "name": "original"}
     template["hosts"] = a.hosts
     template["deadline"] = a.deadline
     template.pop("cpu_affinity_index", None)
     if a.mode == "calibration":
         retained = [
             produced("clean", a.job, "clean.yuv", CLEAN_SHA),
-            staged["original"],
+            original,
             staged["cache"],
         ]
         module = "experiments.tennis.sydney_wider_base"
@@ -54,8 +55,9 @@ def build(a):
                 "seconds": 150,
                 "representative_basis": "Authenticated 24-frame wider native CPU encode and pinned decode",
             },
-            full={"seconds": 1300},
-            budget_seconds=1650,
+            full={"seconds": 440},
+            budget_seconds=735,
+            validator_seconds=90,
             scale={"frames": {"smoke": 24, "full": 240}},
             local_storage_gib=6,
         )
@@ -77,11 +79,20 @@ def build(a):
                 produced(name, a.job, f"crf{a.crf}-{file}", rate["files"][file])
                 for name, file in names.items()
             ]
-            retained += [staged["original"], staged["witness"]]
+            retained += [original, staged["witness"]]
             args = template["arguments"]
             args[args.index("--carrier-sha256") + 1] = rate["files"]["players.pscp"]
             args[args.index("--native-sha") + 1] = rate["native_sha256"]
+            args[args.index("--original-joint") + 1] = "{staged:original}"
             args.remove("--reference")
+            args.append("--review-samples")
+            template.update(
+                smoke={**template["smoke"], "seconds": 160},
+                full={"seconds": 400},
+                validator_seconds=90,
+                budget_seconds=730,
+                stall_seconds=425,
+            )
     template["staged_inputs"] = retained
     template["inputs"] = [{k: item[k] for k in ("path", "sha256")} for item in retained]
     return template

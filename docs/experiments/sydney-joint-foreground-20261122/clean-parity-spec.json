@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "device": "cpu",
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.sydney_clean_parity"
+  ],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.sydney_clean_parity",
+    "--validate"
+  ],
+  "arguments": [
+    "--frames",
+    "{frames}",
+    "--source",
+    "{staged:source}",
+    "--features",
+    "{staged:features}",
+    "--poses",
+    "{staged:poses}",
+    "--ball",
+    "{staged:ball}"
+  ],
+  "staged_inputs": [
+    {
+      "name": "source",
+      "sha256": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match127-000-8ebca8b69320.mp4",
+      "extract": false
+    },
+    {
+      "name": "features",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T113333Z-9f0e3e92/full/published.tar",
+      "extract": false,
+      "sha256": "7c7b678cf671e22092efe5284a19cd113bca49ee125af558d844c886fc31c19d"
+    },
+    {
+      "name": "poses",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T122745Z-23a40ae1/full/published.tar",
+      "sha256": "f3de248e4e13bf7acfaa0b2edc5e7619faae41217193bd5a998ba19056e0ca78",
+      "extract": false
+    },
+    {
+      "name": "ball",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T102817Z-df6c7026/full/ball.payload",
+      "sha256": "d85b4b68e26d93d9b5e477785ed4b58c003aad044d9654aeaf74e52d49255757",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match127-000-8ebca8b69320.mp4",
+      "sha256": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T113333Z-9f0e3e92/full/published.tar",
+      "sha256": "7c7b678cf671e22092efe5284a19cd113bca49ee125af558d844c886fc31c19d"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T122745Z-23a40ae1/full/published.tar",
+      "sha256": "f3de248e4e13bf7acfaa0b2edc5e7619faae41217193bd5a998ba19056e0ca78"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T102817Z-df6c7026/full/ball.payload",
+      "sha256": "d85b4b68e26d93d9b5e477785ed4b58c003aad044d9654aeaf74e52d49255757"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "required_commands": [],
+  "deadline": "2026-11-23T01:19:20Z",
+  "verify_staged_inputs": true,
+  "hosts": [
+    "gpu1",
+    "gpu2",
+    "gpu3",
+    "gpu4",
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [],
+  "gpu_memory_mib": 0,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "local_storage_gib": 18,
+  "smoke": {
+    "seconds": 275,
+    "representative_basis": "Reproduce the original sender registrations at native ticks 0, 120 and 239, verify pinned tool and native inputs, then promote only if registration counts exactly match all three original observations."
+  },
+  "full": {
+    "seconds": 660
+  },
+  "validator_seconds": 30,
+  "budget_seconds": 1120,
+  "stall_seconds": 690,
+  "scale": {
+    "frames": {
+      "smoke": 3,
+      "full": 240
+    }
+  }
+}

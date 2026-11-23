@@ -1,0 +1,13 @@
+{
+  "job_id": "20261123T004555Z-ca0fa0a9",
+  "status": "pending",
+  "spec_sha256": "4d27d7abfdb0dd9c71f8c3161aa72e5080fde79f3444e3709eda011429af7cbe",
+  "source_sha256": "8c9b1a4939f645fd3927ac50214972be88ea8259d9f0f424136645ce66fee5ce",
+  "git_head": "f377449d9c0bf88ba03a75d7cad139755d78c5bd",
+  "snapshot_sha256": "7b8b90b0f2fc9d5acf3c269a302fe0bbf21a0c2b933df9200ab570142f2c3ace",
+  "worker_sha256": "ff6b7b74e0e6fcaa4b9c4b1374e03fc5f2c414f6273ae46e4fec94b7f0691a00",
+  "deadline": "2026-11-23T01:19:20Z",
+  "budget_seconds": 1120,
+  "gpu_seconds": 0,
+  "published_clean": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T004555Z-ca0fa0a9/full/clean.yuv"
+}
