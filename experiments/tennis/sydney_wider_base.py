@@ -244,7 +244,17 @@ def validate(stage):
     else:
         assert r["frames"] == 24 and len(r["rates"]) == 1
         assert r["elapsed_s"] * 105 < 1250
-    return {"passed": True, "frames": r["frames"], "native": True, "sha_bound_clean": True}
+    return {
+        "passed": True,
+        "checks": {
+            "frames": r["frames"],
+            "wider_native_decode": True,
+            "sha_bound_clean": True,
+            "encoded_points": len(r["rates"]),
+            "forecast_seconds": r["elapsed_s"] * 105 if r["frames"] == 24 else None,
+            "original_native_parity": r["original_native_parity"],
+        },
+    }
 
 
 if __name__ == "__main__":
