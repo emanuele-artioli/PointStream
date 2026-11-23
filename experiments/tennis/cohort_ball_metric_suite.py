@@ -60,7 +60,7 @@ def run(args):
     assert total_labels == primary["visible"] > 0
     if stage == "smoke":
         marks = [marks[i] for i in np.linspace(0, total_labels - 1, min(6, total_labels), dtype=int)]
-    fixed = time.monotonic()
+    metric_time = 0.0
     assert previous.sha(args.backbone) == previous.BACKBONE and previous.sha(args.lpips) == ALEX
     lpips = quality.load_lpips(args.lpips, "cpu")
     dists = quality.load_dists(args.backbone, "cpu")
@@ -98,6 +98,7 @@ def run(args):
             if label is None:
                 continue
             center = label["x"] / 2, label["y"] * 544 / 1080
+            metric_start = time.monotonic()
             target = crop64(source[tick], *center)
             crop = crop64(rgb, *center)
             if not rows:
@@ -108,6 +109,7 @@ def run(args):
             values = compare(crop, target, lpips)
             assert all(math.isfinite(x) for x in values.values())
             rows.append(dict(tick=tick, dists=score, **values))
+            metric_time += time.monotonic() - metric_start
         rgb_sha = dig.hexdigest()
         assert rgb_sha == primary[mode]["rgb_sha256"]
         smoke_hashes[mode] = rgb_sha
@@ -122,7 +124,8 @@ def run(args):
         )
     assert len({r["width"] for r in output.values()}) == 1
     elapsed = time.monotonic() - start
-    forecast = 1.5 * ((fixed - start) + (elapsed - (fixed - start)) * total_labels / len(marks)) + 20
+    extra_label_time = metric_time * (total_labels / len(marks) - 1)
+    forecast = 1.5 * (elapsed + extra_label_time) + 25
     result = dict(
         match=meta["match"], source_sha256=primary["source_sha256"],
         source_rgb_sha256=primary["source_rgb_sha256"], labels_sha256=primary["labels_sha256"],

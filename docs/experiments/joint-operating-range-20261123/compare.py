@@ -99,6 +99,62 @@ def add_controls(bank, inputs):
     return result
 
 
+def priority_interval(pointstream, anchors):
+    """Solve the intersection of pairwise affine distance inequalities."""
+    lower, upper = 0.0, 1.0
+    score = pointstream["scores"]
+    for anchor in anchors:
+        ball_gap = score["ball"] - anchor["scores"]["ball"]
+        body_gap = score["players"] - anchor["scores"]["players"]
+        slope = body_gap - ball_gap
+        if slope > 0:
+            upper = min(upper, -ball_gap / slope)
+        elif slope < 0:
+            lower = max(lower, -ball_gap / slope)
+        elif ball_gap > 0:
+            return None
+    return [lower, upper] if lower <= upper else None
+
+
+def state_and_priorities(pointstream, baselines, fps):
+    anchors = [r for rows in baselines.values() for r in rows]
+    seconds = 240 / float(fps)
+    output = []
+    for point in sorted(pointstream, key=lambda r: r["bytes"]):
+        rate = point["kbps"]
+        initialization_bytes = round((point["cold_kbps"] - rate) * 1000 * seconds / 8)
+        row = dict(
+            rate=rate, bytes=point["bytes"], packet_sha256=point["sha256"],
+            initialization_bytes=initialization_bytes,
+            first_use_rate=point["cold_kbps"], priorities={}, reuse={}
+        )
+        # Show both the strictly matched ceiling and nearby operational ceilings.
+        ceilings = {point["bytes"], *(round(kbps * 1000 * seconds / 8) for kbps in (85, 136, 192))}
+        for cap in sorted(ceilings):
+            if point["bytes"] <= cap:
+                affordable = [r for r in anchors if r["bytes"] <= cap]
+                if affordable:
+                    row["priorities"][str(cap)] = priority_interval(point, affordable)
+        for endpoint in ENDPOINTS:
+            rival = min(
+                (r for r in anchors if r["scores"][endpoint] <= point["scores"][endpoint]),
+                key=lambda r: r["bytes"],
+                default=None,
+            )
+            if rival is None:
+                row["reuse"][endpoint] = {"status": "no_measured_equal_quality_anchor"}
+                continue
+            difference = rival["kbps"] - rate
+            row["reuse"][endpoint] = dict(
+                status="finite" if difference > 0 else "anchor_already_equal_rate_or_cheaper",
+                anchor_rate=rival["kbps"], anchor_sha256=rival["sha256"],
+                active_seconds=initialization_bytes * 8 / (1000 * difference)
+                if difference > 0 else None,
+            )
+        output.append(row)
+    return output
+
+
 def frontier(rows, endpoint):
     selected = []
     for row in sorted(rows, key=lambda r: (r["bytes"], r["scores"][endpoint])):
@@ -139,6 +195,7 @@ def summarize(bank_path, fps, wider=None, controls=()):
         "source_ticks": 240,
         "scored_ticks": bank["ticks"],
         "frontiers": frontiers,
+        "state_and_priorities": state_and_priorities(pointstream, baselines, fps),
         "bd_rate": {
             endpoint: {
                 family: anchor_sensitivity(
@@ -194,14 +251,14 @@ def plot(result, output, endpoint):
     for ax, (match, data) in zip(axes, result.items(), strict=True):
         ax.set_title(match, fontweight="semibold", fontsize=9.4)
         ax.set_xscale("log")
-        ax.set_xlim(10, 235)
-        ax.set_xticks([10, 20, 40, 80, 160], [10, 20, 40, 80, 160])
+        ax.set_xlim(10, 340)
+        ax.set_xticks([10, 20, 40, 80, 160, 320], [10, 20, 40, 80, 160, 320])
         ax.tick_params(axis="both", which="major", labelsize=8)
         ax.grid(axis="y", alpha=0.24)
         ax.spines[["right", "top"]].set_visible(False)
         for family, (label, color, marker, line) in STYLE.items():
             knots = [
-                r for r in data["frontiers"][endpoint][family] if 10 <= r["kbps"] <= 235
+                r for r in data["frontiers"][endpoint][family] if 10 <= r["kbps"] <= 340
             ]
             if not knots:
                 continue
