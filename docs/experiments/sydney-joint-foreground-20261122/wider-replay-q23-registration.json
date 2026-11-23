@@ -1,0 +1,49 @@
+{
+  "job_id": "20261123T005757Z-c5aed325",
+  "status": "pending",
+  "source_sha256": "58494e47a2055ca03304f9d534744da14d316dd6f0ccc086b9678ad38855572b",
+  "spec_sha256": "2a50f787802450e4d312622c88b5122c15c3eb7037bbc71002a10e3e49e1fc30",
+  "snapshot": {
+    "git_head": "cc4d6c24ae9fc797d3c6b354541d33427093931e",
+    "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tracked_changes_included": [],
+    "tracked_changes_excluded": [
+      "PLAN.md",
+      "docs/experiments/clean-court-002-20261122/README.md",
+      "docs/experiments/sydney-joint-foreground-20261122/higher-rate.md",
+      "docs/experiments/sydney-joint-foreground-20261122/plot_physical_rates.py",
+      "docs/experiments/sydney-joint-foreground-20261122/wider_specs.py",
+      "experiments/tennis/clean_court_002.py"
+    ],
+    "included_untracked_sha256": {},
+    "untracked_excluded_count": 14,
+    "untracked_excluded_paths_sha256": "e1bb7b0b07a7ed78cf99a0b645978821450f345ef6c31dc02578f068fd6a5764",
+    "untracked_excluded_sample": [
+      "docs/experiments/clean-court-002-20261122/000-ball-spec.json",
+      "docs/experiments/sydney-joint-foreground-20261122/clean-parity-registration.json",
+      "docs/experiments/sydney-joint-foreground-20261122/clean-parity-result.json",
+      "docs/experiments/sydney-joint-foreground-20261122/clean-parity-spec.json",
+      "docs/experiments/sydney-joint-foreground-20261122/clean-parity.md",
+      "docs/experiments/sydney-joint-foreground-20261122/compare_wider.py",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-calibration-registration.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-calibration-result.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-calibration-retry-registration.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-calibration-spec.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-reference-result.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-reference-spec.json",
+      "experiments/tennis/starved_joint_dcvc_q30.py",
+      "experiments/tennis/sydney_clean_parity.py"
+    ],
+    "deleted_paths": [],
+    "snapshot_sha256": "9c50a15fa372c8e757d597849082227c8d0386f7699ec12dde6a84a1b801832d",
+    "tracked_archive_paths_selected": [
+      "experiments",
+      "src",
+      "scripts",
+      "tools",
+      "experiments/__init__.py",
+      "experiments/jobs",
+      "src/__init__.py"
+    ]
+  }
+}

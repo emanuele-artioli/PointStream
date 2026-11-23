@@ -1,0 +1,49 @@
+{
+  "job_id": "20261123T010308Z-b79f788a",
+  "status": "pending",
+  "source_sha256": "da6b56d41648c21a7521fd428ff87d5ac4cc76b4f952957e7fc6f628bd3a7d34",
+  "spec_sha256": "ff2a60b004d067cd8a7608a07b6308cc5a0ac0c9e4d95b9608201878e6f5df92",
+  "snapshot": {
+    "git_head": "30016f5ac23f3437a8b310ffcb4fe7cb82bb750d",
+    "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tracked_changes_included": [],
+    "tracked_changes_excluded": [
+      "docs/experiments/clean-court-002-20261122/README.md",
+      "experiments/tennis/clean_court_002.py"
+    ],
+    "included_untracked_sha256": {},
+    "untracked_excluded_count": 18,
+    "untracked_excluded_paths_sha256": "8c08a736e9c0d6959ac1039f391f681e68b26e039738d8e7c69877e22e447ec0",
+    "untracked_excluded_sample": [
+      "docs/experiments/clean-court-002-20261122/000-ball-spec.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-640-calibration-registration.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-640-calibration-retry-registration.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-640-calibration-retry.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-640-calibration.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-replay-q23-registration.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-replay-q23-retry.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-replay-q23.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-replay-q29-registration.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-replay-q29-retry.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-replay-q29.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-replay-q42-registration.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-replay-q42-retry.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-replay-q42.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-retry-replay-q23-registration.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-retry-replay-q29-registration.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-retry-replay-q42-registration.json",
+      "experiments/tennis/starved_joint_dcvc_q30.py"
+    ],
+    "deleted_paths": [],
+    "snapshot_sha256": "501fab13d3804a23a44c98f56ebff640afdd74cc94081d1c335e81a14c499249",
+    "tracked_archive_paths_selected": [
+      "experiments",
+      "src",
+      "scripts",
+      "tools",
+      "experiments/__init__.py",
+      "experiments/jobs",
+      "src/__init__.py"
+    ]
+  }
+}

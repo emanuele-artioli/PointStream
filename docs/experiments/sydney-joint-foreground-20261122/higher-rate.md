@@ -34,3 +34,17 @@ The first wider encode/decode smoke completed in 0.98 seconds. Its validator omi
 The corrected calibration reproduced both the archived encoded joint packet and its native decoded YUV. Six physical 320×192 encodes produced the closest affordable packets at 77.664, 127.030 and 168.812 kbps. The last is more than ten percent below 192 kbps, which triggers the 640×384 upper-rate calibration specified above. [Calibration receipt](wider-calibration-result.json)
 
 The three initial wider replay requests (`20261123T005657Z-72d28aa0`, `20261123T005719Z-6d7a10df`, `20261123T005757Z-c5aed325`) and the first 640×384 calibration request (`20261123T005711Z-58dea53a`) expired before host admission. Their reserved stage maxima outlasted the remaining deadline window. The revised specifications use a 400-second full replay and 440-second calibration cap, based on the measured 28.65-second original replay, the 12.89-second wider calibration, and a separate margin for native sampling and staging.
+
+The corrected 320×192 replay jobs are `20261123T010001Z-1172ef78` (77.664 kbps), `20261123T010024Z-bbda902c` (127.030 kbps), and `20261123T010050Z-3975fccb` (168.812 kbps). All reached a completed native receiver stage on gpu3. The 640×384 calibration was `20261123T010000Z-b334615f`. We selected 132.768 kbps near the common 136 kbps ceiling and registered replay `20261123T010308Z-b79f788a`. Two encodes inside its 132.768–265.952 kbps rate gap (`20261123T010310Z-4da513c5`) supplied a 189.076 kbps physical packet for replay `20261123T010601Z-9342c742`. The replay budget is 730 seconds per job with a 12:21 Sydney deadline and source-denied validation on the original frozen sample. No new player generation or GPU runs were used.
+
+## Measured Sydney crossover
+
+Five wider packets were physically replayed for all 240 frames. Each passes the same native-output seal and uses the original foreground bytes and appearance cache. Metrics use the same twelve frozen source instants and automatic body masks plus independently labeled ball centers. All bitrate ceilings below include every changing byte. The winner is the achievable minimum foreground DISTS at or below the ceiling.
+
+| Budget (kbps) | Best cached PointStream rate / DISTS | Best measured control rate / DISTS |
+|---:|---:|---:|
+| 85 | 77.664 / 0.24927 | AV1 83.354 / 0.28089 |
+| 136 | 132.768 / 0.23467 | AV1 135.248 / 0.25654 |
+| 192 | 189.076 / 0.23127 | DCVC-UF 191.730 / 0.18949 |
+
+The last tested Sydney budget where PointStream leads is 189.076 kbps. The lead changes at the 191.730 kbps DCVC-UF point. This observed bracket concerns one rally, cached appearance, foreground DISTS and the measured codec bank. The corresponding upper pair has foreground LPIPS 0.2031 versus 0.1499 and background PSNR 27.53 versus 30.79 dB. The 640-pixel base improved the ball and court more than player texture. Initialization remains 149,450 bytes, bringing the 189.076 kbps packet to 487.976 kbps for first use in this four-second shot. [Full verified scores](wider-native-metrics.json) · [Comparison and measured envelope](wider-physical-comparison.json) · [Aligned control metrics](../joint-metric-crosscheck-20261123/sydney-wider-anchor-metrics.json)

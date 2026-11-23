@@ -1,0 +1,55 @@
+{
+  "job_id": "20261123T010001Z-1172ef78",
+  "status": "pending",
+  "source_sha256": "58494e47a2055ca03304f9d534744da14d316dd6f0ccc086b9678ad38855572b",
+  "spec_sha256": "acbffbd25e1ee8f49e2f7570f98bf2088f7242df4018cc59cf26169ea07b20c0",
+  "snapshot": {
+    "git_head": "cc4d6c24ae9fc797d3c6b354541d33427093931e",
+    "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tracked_changes_included": [],
+    "tracked_changes_excluded": [
+      "PLAN.md",
+      "docs/experiments/clean-court-002-20261122/README.md",
+      "docs/experiments/sydney-joint-foreground-20261122/higher-rate.md",
+      "docs/experiments/sydney-joint-foreground-20261122/plot_physical_rates.py",
+      "docs/experiments/sydney-joint-foreground-20261122/wider_specs.py",
+      "experiments/tennis/clean_court_002.py"
+    ],
+    "included_untracked_sha256": {},
+    "untracked_excluded_count": 22,
+    "untracked_excluded_paths_sha256": "0373cd854206bfa9cfd82b77aeeaf94baaae63b14c1f9cdcbf5e75638521cb52",
+    "untracked_excluded_sample": [
+      "docs/experiments/clean-court-002-20261122/000-ball-spec.json",
+      "docs/experiments/sydney-joint-foreground-20261122/clean-parity-registration.json",
+      "docs/experiments/sydney-joint-foreground-20261122/clean-parity-result.json",
+      "docs/experiments/sydney-joint-foreground-20261122/clean-parity-spec.json",
+      "docs/experiments/sydney-joint-foreground-20261122/clean-parity.md",
+      "docs/experiments/sydney-joint-foreground-20261122/compare_wider.py",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-640-calibration-registration.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-640-calibration.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-calibration-registration.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-calibration-result.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-calibration-retry-registration.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-calibration-spec.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-reference-result.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-reference-spec.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-replay-q23-registration.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-replay-q23.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-replay-q29-registration.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-replay-q29.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-replay-q42-registration.json",
+      "docs/experiments/sydney-joint-foreground-20261122/wider-replay-q42.json"
+    ],
+    "deleted_paths": [],
+    "snapshot_sha256": "9c50a15fa372c8e757d597849082227c8d0386f7699ec12dde6a84a1b801832d",
+    "tracked_archive_paths_selected": [
+      "experiments",
+      "src",
+      "scripts",
+      "tools",
+      "experiments/__init__.py",
+      "experiments/jobs",
+      "src/__init__.py"
+    ]
+  }
+}
