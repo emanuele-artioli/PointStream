@@ -1,0 +1,97 @@
+{
+  "frames": 240,
+  "size": [
+    640,
+    384
+  ],
+  "foreground_bytes_reused": true,
+  "clean_sha256": "81c32749f1cf597e674c036a52966bd2ca941d8cbedd24bc27c9095346bac86a",
+  "original_sha256": "fdc8fcbb39599348e966f07666a0472cf4cbb9211e8baf7ada44ba59161b7780",
+  "original_native_parity": "62da1fdd02d63a092357567eceeb5958a11e9899571e4fd5f4dfa7f6e44fdaf8",
+  "warm_budgets": {
+    "95000": 40,
+    "119000": 35,
+    "147000": 35
+  },
+  "rates": [
+    {
+      "crf": 35,
+      "native_sha256": "db7d061a27597882afc3faaa0630172965f853ee37cc2bee9b89e1b5f0f16b72",
+      "encoded_bytes": 108637,
+      "joint_bytes": 113241,
+      "initial_bytes": 137480,
+      "files": {
+        "rally.psj": "06bf12dd38ace992dbf3a752bc0944573f9ebb3cde14a61d5bec108eb7a5f200",
+        "players.pscp": "a86bc761d3e865bc418feab8e68333e42adfbfacba33971622ca3d8e720a6c06",
+        "initial.psr": "bef67ff7a17cc2dc83fa66f35faa344a91009393e778a7248e0516321038ddfb",
+        "players.manifest": "8ed0e39e3e8e773728891735b1f7a9eb6116bf59f3914a4ba116abd7058b92be"
+      }
+    },
+    {
+      "crf": 50,
+      "native_sha256": "28d7305502140c27aead7e7cecb772065a707fa467f752a64343812c63013e9d",
+      "encoded_bytes": 50015,
+      "joint_bytes": 54618,
+      "initial_bytes": 137480,
+      "files": {
+        "rally.psj": "f71235a9012646a5e0d6c07a61e95081a229b44fa77a54f8b68dbf1c4484bf5b",
+        "players.pscp": "e6051e2bde9d4080dc6e0cb235571aa9e215df23a9d68e140c8838edce8ff636",
+        "initial.psr": "bef67ff7a17cc2dc83fa66f35faa344a91009393e778a7248e0516321038ddfb",
+        "players.manifest": "69b0795da71d999a6e70fffc7f519725c141004f8f890a089db04b3881fa3388"
+      }
+    },
+    {
+      "crf": 65,
+      "native_sha256": "71eb24adcd46de403bdb65d7d8c81bb3bcd686abe071cbf68fcedc46a69b3400",
+      "encoded_bytes": 17149,
+      "joint_bytes": 21752,
+      "initial_bytes": 137480,
+      "files": {
+        "rally.psj": "363774dd6932c8d4d38bbedb7282d6b4b95010bf3fd5b4edd13808ceb2c0409f",
+        "players.pscp": "ffacb44900f2986ea7c3f6695ec04c95ca9c28da35367c8827f77b5fd27f4f92",
+        "initial.psr": "bef67ff7a17cc2dc83fa66f35faa344a91009393e778a7248e0516321038ddfb",
+        "players.manifest": "8fa6cc4e900166127a8a4eae728d5a4b975411147301322b669e003134bda336"
+      }
+    },
+    {
+      "crf": 42,
+      "native_sha256": "f04903703a2ad4762ddef89813c6e0ccb65d1e06b040b733e6073a8924e02bd9",
+      "encoded_bytes": 72068,
+      "joint_bytes": 76671,
+      "initial_bytes": 137480,
+      "files": {
+        "rally.psj": "0f4004f38f4508f657537693de8cd6d55db764287c2d5bab0644717001e1982d",
+        "players.pscp": "61563fadb35121989726bac0425e058c16c51f9473d1b19bb29880deff0a093a",
+        "initial.psr": "bef67ff7a17cc2dc83fa66f35faa344a91009393e778a7248e0516321038ddfb",
+        "players.manifest": "7e9151ebc198dc94a1192af22df4ffec18fb1d28258db2d87966f4734f682e38"
+      }
+    },
+    {
+      "crf": 38,
+      "native_sha256": "66a5f735bc5d74dcc1e0b910f9d66d88211e62ab7b430f170b4ec9fa7259f880",
+      "encoded_bytes": 90888,
+      "joint_bytes": 95491,
+      "initial_bytes": 137480,
+      "files": {
+        "rally.psj": "ab0b9e75cef7501461b5bf7cf23fb93c5994050e2c80e4ab6a125c28baf77c86",
+        "players.pscp": "240693ba460136101b4683a72b2503816ac05b0bfddb656c349e7fdb1d149aba",
+        "initial.psr": "bef67ff7a17cc2dc83fa66f35faa344a91009393e778a7248e0516321038ddfb",
+        "players.manifest": "1c07ad15bdb562599496c44b6952195729b2e06eb1f077135550a738fe690386"
+      }
+    },
+    {
+      "crf": 40,
+      "native_sha256": "364abed83a34847193d41d747c50b38a7729e9d1ca1d8d9d34f250d22d128ab2",
+      "encoded_bytes": 80735,
+      "joint_bytes": 85338,
+      "initial_bytes": 137480,
+      "files": {
+        "rally.psj": "0314689539d84a6922a684ffc142ab85b659f8ed1109b2247e2161749dd1a5b1",
+        "players.pscp": "d945efa8f9e56230a6fc6aa6b747ff585df348fa7ffbd74a9151c756dcee4c63",
+        "initial.psr": "bef67ff7a17cc2dc83fa66f35faa344a91009393e778a7248e0516321038ddfb",
+        "players.manifest": "b40f8907b3e842fbc5a31f4687779a833861bab28125149c23fed8d89d662f75"
+      }
+    }
+  ],
+  "elapsed_s": 32.067590882012155
+}

@@ -1,0 +1,45 @@
+{
+  "frames": 240,
+  "size": [
+    320,
+    192
+  ],
+  "foreground_bytes_reused": true,
+  "clean_sha256": "81c32749f1cf597e674c036a52966bd2ca941d8cbedd24bc27c9095346bac86a",
+  "original_sha256": "fdc8fcbb39599348e966f07666a0472cf4cbb9211e8baf7ada44ba59161b7780",
+  "original_native_parity": "62da1fdd02d63a092357567eceeb5958a11e9899571e4fd5f4dfa7f6e44fdaf8",
+  "warm_budgets": {
+    "95000": 29,
+    "119000": 19,
+    "147000": 19
+  },
+  "rates": [
+    {
+      "crf": 29,
+      "native_sha256": "a9851e84d614bbb6de501d0539143e4a0512a4e8edd6062c788e58be0be96ab0",
+      "encoded_bytes": 55322,
+      "joint_bytes": 59925,
+      "initial_bytes": 137480,
+      "files": {
+        "rally.psj": "5af5a2d3db09757b6c9852633262f82ba7d4f63bde3e7c8311c46192561327d2",
+        "players.pscp": "9e9c653369587cb29c794d345fcc7527bd34e0f1074eeb9cbc139a52e908a020",
+        "initial.psr": "bef67ff7a17cc2dc83fa66f35faa344a91009393e778a7248e0516321038ddfb",
+        "players.manifest": "649c7a9f9f9c865ebcf27b0b01869617c618492941ae41227b1e800f6cc83db5"
+      }
+    },
+    {
+      "crf": 19,
+      "native_sha256": "97ab9894235ad41c006b0da53fc4d9e192c3dbe023e9e00cba9bdb819c18f782",
+      "encoded_bytes": 94705,
+      "joint_bytes": 99308,
+      "initial_bytes": 137480,
+      "files": {
+        "rally.psj": "cdb1ed38928c1a2f4e93ed385cb6a6e65265108c6a4ab92d061818c124421857",
+        "players.pscp": "b48f133c0521b4ff233bf731f14f6199e098358527b84c805bdca7f4dd354559",
+        "initial.psr": "bef67ff7a17cc2dc83fa66f35faa344a91009393e778a7248e0516321038ddfb",
+        "players.manifest": "2437c2227a2f4237d96070d878b2622a19d8e41a78b3e092f6c7dde26686841f"
+      }
+    }
+  ],
+  "elapsed_s": 7.034292280994123
+}
