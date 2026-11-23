@@ -1,0 +1,42 @@
+{
+  "job_id": "20261123T120443Z-9a4a6d8c",
+  "created": 1795435572.5206323,
+  "status": "failed",
+  "updated": 1795435689.0639336,
+  "host_alias": "gpu5",
+  "gpu": null,
+  "gpu_sharing": null,
+  "supervisor_pid": 2200916,
+  "remote_status": {
+    "status": "failed",
+    "started": 1795435629.816056,
+    "last_progress": 1795435673.2428427,
+    "emitted": [
+      "terminal:failed",
+      "decision:e89aad82358f5294be37cf04993305ef"
+    ],
+    "pid": 2200934,
+    "proc_start_time": 1795435632.86,
+    "process_group_id": 2200934,
+    "progress": {
+      "stage": "attention",
+      "completed": 0,
+      "updated": 1795435665.4307098,
+      "decision": "smoke validator must exit zero and publish passed:true with substantive checks"
+    },
+    "exit_code": 1,
+    "ended": 1795435673.2428427,
+    "salvage": {
+      "exit_code": 0,
+      "reason": "failed",
+      "started": 1795435674.823189,
+      "seconds": 3.589855194091797
+    }
+  },
+  "directory": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T120443Z-9a4a6d8c",
+  "gate": null,
+  "campaign_error": {
+    "error": "smoke validator must exit zero and publish passed:true with substantive checks",
+    "updated": 1795435665.194203
+  }
+}

@@ -23,3 +23,5 @@ At fixed physical byte ceilings, find the full interval of body weights for whic
 The exclusive neural control `20261123T115906Z-88158745` stopped before encoding. The production worker has a qualified shared-allocation resource contract and rejected the exclusive resource profile. Keep the resource checks intact. This leaves the 960-wide Shanghai bank without a qualified neural result from this worker. [Terminal receipt](shanghai-neural-960-q42-status.json)
 
 The ROI bank also lacks adequate mid-rate coverage. Reuse the native 640-wide +40-outside map and hold the source-mask, transmitted-ball and time supports fixed. Target 90/120/140 kbps with the same three ceilings as the full-HD ordinary job. Admit only physically sent ROI streams whose same-CRF no-ROI twin confirms that the allocated map changes the decoded luma. One registered job, up to 21 campus CPU-minutes and no GPU.
+
+The 640-wide ROI job is `20261123T120820Z-35db68b8`. [Submission receipt](shanghai-roi-640-registration.json)

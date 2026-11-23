@@ -150,9 +150,10 @@ def validate():
         [row["tick"] for row in arm["rows"]] == result["selected_visible_ticks"]
         and len(arm["rows"]) == n for arm in result["arms"].values()
     ))
-    print(json.dumps({"passed": all(checks.values()), "checks": checks,
-                      "forecast": result["full_forecast_seconds"]}))
-    if not all(checks.values()):
+    passed = all(checks.values())
+    validation = {"passed": passed, "checks": checks, "forecast": result["full_forecast_seconds"]}
+    Path(os.environ["PS_VALIDATION_PATH"]).write_text(json.dumps(validation) + "\n")
+    if not passed:
         raise SystemExit(1)
 
 
