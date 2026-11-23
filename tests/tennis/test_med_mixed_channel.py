@@ -35,6 +35,26 @@ def test_full_native_smoke_includes_both_endpoints():
     assert channel.smoke_ticks(69, 189) == channel.smoke_ticks(69)
 
 
+@pytest.mark.parametrize("width,height", [(320, 192), (640, 384)])
+def test_wider_native_canvas_uses_the_paid_dimensions(width, height):
+    raw = np.random.default_rng(23).integers(16, 230, (height * 3 // 2, width), dtype=np.uint8)
+    track = [None]
+    decoded = dict(
+        coded_size=(width, height),
+        start=0,
+        stop=1,
+        pos=track,
+        velocity=ball.velocities(track),
+        looks=track,
+    )
+    rgb = yuv_to_rgb(raw, width, height, False)
+    scene = cv2.resize(rgb, (960, 544), interpolation=cv2.INTER_CUBIC)
+    expected = cv2.resize(scene, (1920, 1080), interpolation=cv2.INTER_CUBIC)
+    assert np.array_equal(channel.canvas(raw, 0, decoded), expected)
+    with pytest.raises(ValueError, match="paid coded size"):
+        channel.canvas(raw[:, :-2], 0, decoded)
+
+
 def test_split_sections_keep_their_native_size_and_own_local_tick():
     from experiments.tennis import med_split_native as split
 

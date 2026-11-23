@@ -13,8 +13,13 @@ from experiments.tennis import common_receiver_manifest as manifest
 from src.pointstream import ball
 from src.pointstream.tracked_patch import yuv_to_rgb
 
+BASE_SIZE = (160, 96)
+WIDER_BASE_SIZES = ((320, 192), (640, 384))
 
-def decode(joint: Path, cache: Path, carrier: Path, expected: str) -> dict:
+
+def decode(
+    joint: Path, cache: Path, carrier: Path, expected: str, *, allow_wider_base: bool = False
+) -> dict:
     """Regenerate the exact authenticated generator input from the delivered bytes."""
     blob, initial = joint.read_bytes(), cache.read_bytes()
     jp, cp = packet._embedded_profile(blob), packet._embedded_profile(initial)
@@ -37,6 +42,14 @@ def decode(joint: Path, cache: Path, carrier: Path, expected: str) -> dict:
         raise ValueError("unexpected mixed-mode packet roles or cache identity")
     profile = {**jp["player"], "resources": cp["resources"]}
     packet._profile(profile)
+    width, height = profile["coded_size"]
+    coded_size = (width, height)
+    if coded_size != BASE_SIZE and (
+        not allow_wider_base
+        or profile["recipe"] != packet.RECIPE_60
+        or coded_size not in WIDER_BASE_SIZES
+    ):
+        raise ValueError("unsupported mixed-mode coded base size")
     copied = packet.wire.pack(
         profile,
         [
@@ -51,13 +64,14 @@ def decode(joint: Path, cache: Path, carrier: Path, expected: str) -> dict:
         packet.wire.sha(copied) != expected
         or carrier.read_bytes() != copied
         or runtime != cp["runtime"]
-        or profile["coded_size"] != [160, 96]
-        or profile["recipe"] not in (packet.RECIPE, packet.RECIPE_25, packet.RECIPE_2997, packet.RECIPE_60)
+        or profile["recipe"]
+        not in (packet.RECIPE, packet.RECIPE_25, packet.RECIPE_2997, packet.RECIPE_60)
         or len(profile["order"]) != 2
         or len(profile["runs"]) != 2
     ):
         raise ValueError("mixed packet cannot reproduce exact paid conditioning")
-    packet._ivf(delivered["base"], 160, 96, tuple(profile["recipe"]["fps"]))
+    rate, scale = profile["recipe"]["fps"]
+    packet._ivf(delivered["base"], width, height, (rate, scale))
     # Only the PNG-capable generation worker decodes appearance. Geometry uses KPS2 alone.
     _, units = packet._bounded_keypoints(delivered["poses"], profile["order"])
     runs = {(r["start"], r["end"]) for r in profile["runs"]}
@@ -79,6 +93,7 @@ def decode(joint: Path, cache: Path, carrier: Path, expected: str) -> dict:
         raise ValueError("noncanonical trajectory or symbol outside the active run")
     return dict(
         profile=profile,
+        coded_size=coded_size,
         base=delivered["base"],
         geometry=geometry,
         start=start,
@@ -106,7 +121,10 @@ def smoke_ticks(start: int, stop: int | None = None) -> list[int]:
 
 
 def canvas(raw: np.ndarray, tick: int, channel: dict | None = None) -> np.ndarray:
-    rgb = yuv_to_rgb(raw, 160, 96, False)
+    width, height = BASE_SIZE if channel is None else channel.get("coded_size", BASE_SIZE)
+    if raw.shape != (height * 3 // 2, width) or raw.dtype != np.uint8:
+        raise ValueError("raw base frame does not match the paid coded size")
+    rgb = yuv_to_rgb(raw, width, height, False)
     if channel is not None and channel["start"] <= tick < channel["stop"]:
         scene = cv2.resize(rgb, (960, 544), interpolation=cv2.INTER_CUBIC)
         rgb = ball.render(scene, tick, channel["pos"], channel["velocity"], channel["looks"])

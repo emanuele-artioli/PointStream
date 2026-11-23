@@ -27,7 +27,7 @@ from experiments.tennis.player_requalification import array_sha, sha256
 
 
 def config_for(a):
-    channel = mixed.decode(a.joint, a.cache, a.carrier, a.carrier_sha256)
+    channel = mixed.decode(a.joint, a.cache, a.carrier, a.carrier_sha256, allow_wider_base=True)
     root = a.witness / "publish"
     options = dict(
         carrier=str(a.carrier),
@@ -60,15 +60,25 @@ def run(c, proof):
     cv2.setNumThreads(1)
     started = time.monotonic()
     channel = mixed.decode(
-        Path(c["joint"]), Path(c["cache"]), Path(c["carrier"]), c["carrier_sha256"]
+        Path(c["joint"]),
+        Path(c["cache"]),
+        Path(c["carrier"]),
+        c["carrier_sha256"],
+        allow_wider_base=True,
     )
     old = Path(c["original_joint"]).read_bytes()
     new = Path(c["joint"]).read_bytes()
     op = packet._embedded_profile(old)
-    if op != packet._embedded_profile(new):
+    revised_profile = packet._embedded_profile(new)
+    comparison = {
+        **revised_profile,
+        "player": {**revised_profile["player"], "coded_size": op["player"]["coded_size"]},
+    }
+    if op != comparison or tuple(op["player"]["coded_size"]) != mixed.BASE_SIZE:
         raise ValueError("paid headers differ beyond the native base")
     orig, _ = packet.wire.unpack(old, op)
-    revised, _ = packet.wire.unpack(new, op)
+    revised, _ = packet.wire.unpack(new, revised_profile)
+    packet._ivf(orig["base"], *mixed.BASE_SIZE, tuple(op["player"]["recipe"]["fps"]))
     if orig["poses"] != revised["poses"] or orig["trajectory"] != revised["trajectory"]:
         raise ValueError("foreground channels differ between rungs")
     report = json.loads(Path(c["witness_receipt"]).read_text())
@@ -82,7 +92,7 @@ def run(c, proof):
     ):
         raise ValueError("missing complete isolated paid GPU witness")
     original_carrier = packet.wire.pack(
-        channel["profile"],
+        {**channel["profile"], "coded_size": op["player"]["coded_size"]},
         [
             ("base", "frame", orig["base"]),
             ("keypoints", "frame", orig["poses"]),
@@ -134,8 +144,11 @@ def run(c, proof):
             stdin=subprocess.DEVNULL,
             timeout=120,
         )
-        assert yuv.stat().st_size == 240 * 144 * 160
-        raw = np.memmap(yuv, np.uint8, "r", shape=(240, 144, 160))
+        width, height = channel["coded_size"]
+        rows_per_frame = height * 3 // 2
+        if yuv.stat().st_size != 240 * rows_per_frame * width:
+            raise ValueError("decoded native base has the wrong size or frame count")
+        raw = np.memmap(yuv, np.uint8, "r", shape=(240, rows_per_frame, width))
         actual_wire = channel["wire"]
         coded_sha, native_sha = sha256(ivf), sha256(yuv)
         ref_rung = new == old
@@ -200,6 +213,10 @@ def run(c, proof):
                     wire_bytes=4 + len(coded),
                 )
             )
+    if channel["coded_size"] != mixed.BASE_SIZE and all(
+        row["frame_sha256"] == report["rows"][row["tick"]]["frame_sha256"] for row in rows
+    ):
+        raise ValueError("wider coded base did not change any displayed pixels")
     loop = time.monotonic() - stage_start
     result = dict(
         ticks=ticks,
@@ -209,6 +226,7 @@ def run(c, proof):
         witness_sha256=sha256(Path(c["witness_receipt"])),
         original_rung=ref_rung,
         all_witness_frames_matched=ref_rung,
+        coded_size=channel["coded_size"],
         codec_input_sha256=coded_sha,
         native_sha256=sha256(ff),
         yuv_sha256=native_sha,
