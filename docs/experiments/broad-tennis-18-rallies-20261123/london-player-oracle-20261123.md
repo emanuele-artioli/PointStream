@@ -43,3 +43,20 @@ On the original frozen source frames, evaluate DISTS, LPIPS, SSIM and PSNR on th
 The three 20.4 kbps byte-only searches returned ordinary AV1 packets 1.32% below, 0.56% above and 1.43% above the respective ball packets. All six packets fit their individual available budgets. None met the predeclared 0.5% match, so these are diagnostics and should not support a tightly matched headline. The first attempt tested an invalid CRF above the encoder's supported maximum of 70 and was rejected before encoding. The corrected bounded search completed in 242 seconds wall.
 
 On all six independent visible marks in this selected sample, the ball sender emitted no point. Mean ball-crop DISTS was 0.2995 for ordinary AV1 and 0.3094 for the ball stream. On eight assisted visible marks, DISTS was 0.3118 and 0.2905 respectively. The assisted subset is selected by tracker suggestion availability and is not independent. All-frame ball-stream PSNR fell by 0.157, 0.246 and 0.103 dB in these three points, respectively. This is a camera/event transfer diagnostic, with two points from one match and a third from another match in the same event. The exact physical gaps, source hashes, SSIM and full-picture scores are in the [rate receipt](london-three-rate-diagnostic.json). Per-instant DISTS, LPIPS, SSIM and PSNR on the separate ball and body supports, together with source review flags, are in the [regional scores](london-three-score-diagnostic.json). The selected IVF controls currently reside in `/private/tmp/ps-london-three-match-20261123` and their hashes are in the receipt. Preserve them before local cleanup if a future full-resolution visual audit needs those exact decodes.
+
+## Held-out London machine-coverage accounting
+
+Aggregate all six previously frozen London points separately from the twelve-match ball cohort. Count the full source frames, court eligibility, fallback frames and sent positions from the delivery ledger. Count source-reviewed ball marks on the same 48 frozen instants, grouping independent visible, assisted visible, independent absent and unsure. For independent visible marks, separately show whether the court selector permitted an emission. Count an assisted position within ten source pixels as agreement with a suggestion, with its label dependence stated. Show per-point counts. Validate that both nominal rate ceilings expose the same ball decisions before using one row per reviewed instant. These totals are a coverage audit. The nonrandom availability of suggestions means the independent-visible subset cannot estimate recall over all visible balls.
+
+The physical streams cover 904 original frames. Of these, 766 are eligible court views and 138 are conventional fallback. The sender emitted 497 ball positions on the court frames. These emitted positions are not a count of true visible balls.
+
+| Point | Original frames | Court frames | Paid positions | Independent visible marks | Assisted visible marks |
+|---|---:|---:|---:|---:|---:|
+| V006/14 | 106 | 106 | 46 | 0/2 emitted | 3/3 within 10 px |
+| V006/41 | 132 | 132 | 48 | 0/2 emitted | 3/3 within 10 px |
+| V006/68 | 144 | 144 | 99 | 0/0 | 5/6 within 10 px |
+| V007/22 | 120 | 83 | 56 | 0/2 emitted | 4/4 within 10 px |
+| V007/65 | 138 | 37 | 33 | 0/2 emitted | 2/2 within 10 px |
+| V007/108 | 264 | 264 | 215 | 0/1 emitted | 6/6 within 10 px |
+
+Across the 48 reviewed instants, none of the nine independent visible marks had a transmitted position. Five were in court-eligible views and four were routed to conventional video. The sender emitted nothing on 15 independent absent marks. All 24 assisted visible marks had a suggestion and 23 agreed within ten pixels, but the reviewer saw those suggestions. Neither subgroup establishes population-wide recall. The 12-match prospective localization result and this separate London coverage audit belong side by side, with their different sampling and label provenance stated. [Executable audit and per-point receipt](london-coverage-audit.json)
