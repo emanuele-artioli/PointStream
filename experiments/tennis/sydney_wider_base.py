@@ -168,7 +168,11 @@ def run(a):
         if rebuilt != original or old_decoded != a.original_native_sha:
             raise ValueError("failed original Sydney encoded and decoded byte parity")
         native_parity = old_decoded
-    planned = [50] if a.frames != FRAMES else [35, 50, 65]
+    if a.crf is not None and (
+        len(set(a.crf)) != len(a.crf) or len(a.crf) > 2 or any(not 1 <= q <= 70 for q in a.crf)
+    ):
+        raise ValueError("an explicit upper-rate probe takes one or two distinct CRFs")
+    planned = ([a.crf[0]] if a.crf else [50]) if a.frames != FRAMES else a.crf or [35, 50, 65]
     sizes = {}
     while planned and len(rates) < 6:
         q = planned.pop(0)
@@ -199,7 +203,7 @@ def run(a):
                 initial_bytes=len(initial),
                 files={name: packet.wire.sha(data) for name, data in paths.items()},
             )
-            if not planned and (following := next_crf(sizes)) is not None:
+            if not planned and a.crf is None and (following := next_crf(sizes)) is not None:
                 planned.append(following)
         rates[q] = result
     chosen = {}
@@ -263,6 +267,7 @@ if __name__ == "__main__":
     for k in ("clean", "original", "cache"):
         p.add_argument("--" + k, type=Path)
     p.add_argument("--original-native-sha")
+    p.add_argument("--crf", nargs="+", type=int)
     p.add_argument("--width", type=int, choices=(320, 640), default=320)
     p.add_argument("--frames", type=int, choices=(24, FRAMES))
     run(p.parse_args())

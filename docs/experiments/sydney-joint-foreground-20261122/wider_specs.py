@@ -61,6 +61,8 @@ def build(a):
             scale={"frames": {"smoke": 24, "full": 240}},
             local_storage_gib=6,
         )
+        if a.upper_probe:
+            template["arguments"].extend(["--crf", "42", "44"])
     else:
         if a.reference:
             # Re-run the exact archived proof under the revised decoder.
@@ -108,6 +110,7 @@ if __name__ == "__main__":
     parser.add_argument("--calibration", type=Path)
     parser.add_argument("--crf", type=int)
     parser.add_argument("--reference", action="store_true")
+    parser.add_argument("--upper-probe", action="store_true")
     parser.add_argument("--out", type=Path, required=True)
     parsed = parser.parse_args()
     parsed.out.write_text(json.dumps(build(parsed), indent=2) + "\n")
