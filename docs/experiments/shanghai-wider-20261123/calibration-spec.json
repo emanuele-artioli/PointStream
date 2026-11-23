@@ -27,7 +27,7 @@
   "staged_inputs": [
     {
       "name": "clean",
-      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T115556Z-9c8e0565/full/clean.yuv",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/shanghai-exact-clean-20261123-01/clean.yuv",
       "sha256": "81c32749f1cf597e674c036a52966bd2ca941d8cbedd24bc27c9095346bac86a",
       "extract": false
     },
@@ -46,7 +46,7 @@
   ],
   "inputs": [
     {
-      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T115556Z-9c8e0565/full/clean.yuv",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/shanghai-exact-clean-20261123-01/clean.yuv",
       "sha256": "81c32749f1cf597e674c036a52966bd2ca941d8cbedd24bc27c9095346bac86a"
     },
     {
