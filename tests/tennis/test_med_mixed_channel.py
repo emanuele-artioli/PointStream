@@ -1,5 +1,9 @@
 """Receiver regressions for conventional fallback around a paid native interval."""
 
+import json
+import struct
+import zlib
+
 import cv2
 import numpy as np
 import pytest
@@ -81,3 +85,35 @@ def test_split_sections_keep_their_native_size_and_own_local_tick():
         assert np.array_equal(split.canvas(parts, t, paid), expected)
     with pytest.raises(ValueError, match="undelivered"):
         split.canvas(parts, 5, paid)
+
+
+def test_review_export_binds_sample_bytes_to_the_replay(tmp_path):
+    from experiments.tennis import med_mixed_rung as rung
+
+    ticks = channel.smoke_ticks(0, 240)
+    rows = []
+    frames = tmp_path / "frames.zseq"
+    with frames.open("wb") as dest:
+        for tick in ticks:
+            picture = np.full(rung.REVIEW_SHAPE, tick, dtype=np.uint8)
+            body = zlib.compress(picture.tobytes(), 1)
+            dest.write(struct.pack(">I", len(body)) + body)
+            rows.append(
+                dict(tick=tick, wire_bytes=4 + len(body), frame_sha256=rung.array_sha(picture))
+            )
+    receipt = dict(ticks=ticks, rows=rows, frames_sha256=rung.sha256(frames))
+    (tmp_path / "rung.json").write_text(json.dumps(receipt))
+    rung.export_review_samples(tmp_path, receipt)
+    sample = rung.review_receipt(tmp_path, receipt)
+    (row,) = list(rung.read_review_samples(tmp_path, sample))
+    assert row[0] == 0 and np.all(row[1] == 0)
+
+    # Wrong pixels must fail even when a standalone file digest can be computed.
+    samples = tmp_path / "review-samples.zseq"
+    body = zlib.compress(np.full(rung.REVIEW_SHAPE, 1, dtype=np.uint8).tobytes(), 1)
+    samples.write_bytes(struct.pack(">I", len(body)) + body)
+    with pytest.raises(ValueError, match="unbound"):
+        rung.review_receipt(tmp_path, receipt)
+    sample["rows"][0]["wire_bytes"] = len(body) + 4
+    with pytest.raises(ValueError, match="pixels differ"):
+        list(rung.read_review_samples(tmp_path, sample))
