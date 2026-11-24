@@ -1,5 +1,7 @@
 # PointStream submission handoff
 
+> **Active TOMM 2-week plan (2026-11-24):** See [docs/tomm-submission-plan-20261124.md](tomm-submission-plan-20261124.md) for the updated validation-first priorities, pre-flight V1–V4 audit findings, and two-track schedule superseding the legacy London 18-rally queue below.
+
 Checkpoint from November 24, 2026 (Sydney). Start with this file, [PLAN.md](../PLAN.md), and [AGENTS.md](../AGENTS.md). The plan owns the priority list. Experiment cards own run specifications and evidence.
 
 ## Resume from these revisions

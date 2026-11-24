@@ -1,0 +1,130 @@
+# PointStream ACM TOMM Submission Plan (2026-11-24)
+
+**Status:** Active execution plan, durable across harnesses and context compaction.  
+**Target venue:** ACM Transactions on Multimedia Computing, Communications, and Applications (TOMM) — 23 body/reference pages + 5 online appendix pages.  
+**Target timeline:** ~2 weeks from 2026-11-24 (target submission ~2026-12-08, flexible by 2–3 days if a high-impact experiment warrants it).  
+**Pinned starting revisions:**
+- Code & evidence repo: `455e4505` (PR #456, `origin/codex/match-specific-operating-ranges-20261123`, merged into `origin/main` at `34bbbe2a`), branched onto `tomm/validation-and-plan-20261124`.
+- Overleaf manuscript (`67a9ea6275d3d9785ce57026`): `471d0ea` (`471d0eafa62ab81a9abb619e724038a3f5c28d42`), 23+5 author / 22+5 anonymous pages.
+- Note: Leave `/Users/manu/Desktop/PointStream` root checkout (`6a5213c5`) and `paper/` working state untouched unless explicitly updating Overleaf on a dedicated manuscript pass.
+
+---
+
+## 1. Strategic Decisions (Agreed 2026-11-24)
+
+1. **Perception–distortion & temporal framing:** Explicitly frame PointStream via the perception–distortion tradeoff (semantic/perceptual foreground synthesis vs. pixel-exact waveform fidelity) rather than apologizing for PSNR/SSIM. Pair existing source-flow temporal error with **self-flow temporal consistency + tLPIPS** and a cheap **zero-retraining stabilization ablation** (pose smoothing + context overlap).
+2. **Qualitative visual figures & copyright safety:** Remove the `\PointStreamPublicationSafe` blackout so anonymous TOMM reviewers see qualitative video crops directly. Use **MIT-licensed RacketVision** frames (Shanghai `match102`, Sydney `match127`, Halle `match105`, Badminton) and **CC BY-NC-SA 4.0 OpenTTGames** frames; exclude YouTube-sourced development frames (`Nadal–Kyrgios`, `Alcaraz–Hurkacz`) from visual figures. Include a **supplementary side-by-side `.mp4` comparison video** (MIT-licensed clips) so reviewers can judge temporal motion directly.
+3. **Human subjective study:** Skip an underpowered N≈10 colleague survey unless Week 2 finishes early; visual crops + supplementary `.mp4` + perceptual/temporal diagnostics give stronger evidence per day on a 2-week budget.
+4. **Tennis cohort focus:** Do **not** run the 18-rally dev-heavy London matrix or the Shanghai 960-wide DCVC-UF rung. Instead: finish **Halle** (`N=3` external), audit the **5 unmeasured RacketVision TEST matches**, apply **short-gap pose interpolation** where justified by V1, and reconstruct **1–2 more external matches** inside that single unified 12-match cohort (`N=4–5` external joint matches).
+5. **Extra domains:**
+   - **VISOR:** Do **not** include legacy VISOR pixel-split numbers (`w4-ego-receiver-masks.md`) in the manuscript or appendix—they tested an obsolete pixel-split + uncorrected SAM mask codec (`+494%` BD-rate from tracking drift), not PointStream's keypoint + reusable-appearance architecture. Retain only a concise conceptual **"Structural Boundary Conditions"** discussion explaining why moving ego-cameras and open-vocabulary occluded hand-objects violate cached-background/cached-appearance assumptions.
+   - **Badminton & Table Tennis (RacketVision MIT + OpenTTGames CC):** Run a bounded **4–6 clip ball/shuttlecock transfer study** (CPU + light tracker/oracle separation, no player diffusion) to address multi-domain generality cleanly.
+   - **1-scene non-racket pilot (time-boxed ≤ 1 day):** Test base unadapted AnimateAnyone (`original` weights in `k6b_generate.py`) on 1 rights-clean single-actor clip (e.g., figure skating / dance / gymnastics) vs. AV1 & DCVC-UF. Keep as a short Discussion case study only if clean within 1 day; cut cleanly if dataset/tracking setup exceeds 1 day.
+6. **Parallel execution:** Start **Track B (Writing & Figures)** immediately alongside **Track A (Compute & Validation)** rather than waiting for all experiments to finish.
+
+---
+
+## 2. Pre-Flight Validation Results (V1–V4, Executed 2026-11-24)
+
+All local validation scripts and receipts live in [docs/experiments/tomm-validation-20261124/](experiments/tomm-validation-20261124/).
+
+### V1 — Pose-Gap & Coverage Audit (`pose_gap_audit.py` -> `pose-gap-audit.json`)
+Across the 6 already-measured RacketVision TEST matches (`coverage-summary.json`, 240 frames each = 1,440 ticks):
+- **3 matches are already 240/240:** Shanghai (`match102`), Sydney (`match127`), Halle (`match105`).
+- **3 matches have dropouts exclusively on the small far player (`68–76 px` median height), while the near player (`194–247 px`) is `240/240` in every single clip:**
+  - **Geneva (`match116`):** `223/240` paired (`17` missing ticks in `6` interior spans, `max_gap = 8`, no boundary gaps).
+  - **Munich (`match108`):** `190/240` paired (`50` missing ticks in `20` interior spans, `max_gap = 10`, no boundary gaps).
+  - **Gstaad (`match120`):** `176/240` paired (`64` missing ticks in `19` interior spans, `max_gap = 19`, gaps up to 19 and 14 frames).
+- **Implication & Gate:** Simple interior linear keypoint interpolation with `max_gap <= 10` immediately raises full 240/240 coverage from **3/6 to 5/6** (`1,407 / 1,440` ticks), turning tracking dropouts on small far players into a clean system feature (short-gap keypoint interpolation + span fallback for longer gaps). **Must be tested for perceptual/pose artifacts on Geneva & Munich** rather than assumed lossless.
+
+### V2 — Temporal Consistency & Seam Audit (`temporal_audit.py` -> `temporal-audit.json`)
+Inspecting `match102-motion-four-arm.json` (Shanghai), `temporal-matched.json` (Sydney), `temporal-with-neural.json` (Nadal), and `al028-temporal-20261122/joint-result.json` (Alcaraz) reveals **two simultaneous effects** behind PointStream's higher source-flow temporal error:
+1. **Baselines are heavily motion-damped at ~18–26 kbps:**
+   - **Shanghai (`source_delta = 17.52`):** AV1 `decoded_delta = 6.88` (**0.39×** source), AV1-ROI `6.51` (**0.37×**), DCVC-UF `7.87` (**0.45×**), PointStream `20.23` (**1.15×**).
+   - **Sydney (`source_delta = 8.57`):** AV1 `decoded_delta = 3.57` (**0.42×** source), DCVC-UF `4.46` (**0.52×**), PointStream `12.31` (**1.44×**).
+   - Because AV1 and DCVC-UF blur away half of the true high-frequency motion energy, source-flow warping rewards their over-smoothing.
+2. **PointStream also exhibits +15% to +44% *excess* frame-to-frame delta above source** (`1.15×` on Shanghai, `1.44×` on Sydney; Nadal `p1/p2` energy `9.72 / 12.38` vs. source `8.09 / 8.95`), confirming real high-frequency synthesis jitter on top of spatial offset.
+3. **Implication & Gate:** Existing JSON receipts lack per-tick rows on Shanghai/Sydney (`seam_checks` confirmed `nadal_starved` sampled sparse non-adjacent ticks). **Next diagnostics V5 & V6** will measure self-flow flicker + tLPIPS + 24-frame context seams (`t % 20`) on decoded campus archives, and test pose smoothing + `CONTEXT_OVERLAP=8` on a 48-frame Shanghai slice.
+
+### V3 — Read-Only Campus Inventory Probe (`gpu1.itec.aau.at`, 2026-11-24)
+- **RacketVision MIT (`Datasets/RacketVision`, `Datasets/manifests/RacketVision.json`):** Verified on campus:
+  - `badminton.tar` (1.8 GB): 461 clips, 114,753 frames (1080p, mostly 25 fps), 19,822 visible ball marks, **46 official `test` clips**.
+  - `tabletennis.tar` (2.5 GB): 780 clips, 170,027 frames (1080p, 25–60 fps), 16,961 visible ball marks, **86 official `test` clips**.
+  - `tennis.tar` (1.9 GB): 431 clips, 150,399 frames, **43 official `test` clips**.
+- **Independent Non-YOLO11x Pose Models Already on Campus (`Models/` & conda `pointstream`):**
+  - `Models/DWPose`: `dw-ll_ucoco_384.onnx` + `yolox_l.onnx` (`onnxruntime 1.23.2` installed).
+  - `Models/YOLO`: `yolo26x-pose.pt`, `yolo26l-pose.pt` (distinct family/weights from sender's `yolo11x-pose.pt`), plus `mediapipe 0.10.5` and `torchvision 0.17.2+cu121`.
+  - No `mmpose`/`mmcv` in the default env—use **DWPose ONNX** and/or **YOLO26x-Pose** (zero new env/downloads needed).
+- **Diffusion Samplers Available:** `diffusers 0.30.3` installed in `pointstream` conda env (supports `DPMSolverMultistepScheduler`, `UniPCMultistepScheduler`, `EulerDiscreteScheduler` drop-in on `Pose2VideoPipeline` with zero retraining).
+- **Halle Far Archive:** `/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T120635Z-5a1a9720/full/published.tar` (121 MB) verified present on campus.
+- **Fleet Availability Snapshot (2026-11-24 14:32 AEDT):** All 4 Ada GPUs (`gpu5`, `gpu6`) and 3 A6000 GPUs (`gpu2`, `gpu3`) currently occupied by external/other users' workloads; `gpu1` has 126 free CPU cores + idle GV100. Inspect with `scripts/ps-fleet inspect` before dispatching GPU jobs.
+
+### V4 — MIT-Safe Visual Figure Provenance Audit (`paper` rev `471d0ea`)
+In `companion/journal-figure-sources.json`, `\PointStreamPublicationSafe` hides 3 `private_author_figure` items in anonymous mode:
+- `measured-passage-intro.pdf` (development `Nadal–Kyrgios`, YouTube-sourced)
+- `joint-serve.pdf` (development `Nadal–Kyrgios`, YouTube-sourced)
+- `Shanghai-native-crops.pdf` (**MIT-licensed RacketVision** `match102` Sinner–Shelton — was unnecessarily hidden!)
+**Action:** Drop `measured-passage-intro.pdf` and `joint-serve.pdf` from the review/publication PDFs; replace them with MIT-licensed **Shanghai (`match102`)** and **Sydney (`match127`) / Halle (`match105`)** visual plates, and remove the `\PointStreamPublicationSafe` suppression block for anonymous review.
+
+---
+
+## 3. Remaining Validation Pilots & Decision Gates (Run First Post-Flight)
+
+Before committing full GPU budgets, run these three fast validation pilots (~2.5 GPU-hours total) so results steer the main runs:
+
+| ID | Validation Experiment | Resource / Time | Decision Gate |
+|---|---|---|---|
+| **V5** | **Speed–Quality & Stabilization Pilot (48-frame Shanghai slice)**<br>Sweep `k6b_generate.py` on 48 frames (1 player or 2 players):<br>• `steps ∈ {6, 10, 15, 30}` × `{DDIM, DPMSolverMultistep, UniPC}`<br>• `GEN_W×GEN_H ∈ {256×384, 384×576, 512×784}`<br>• `CONTEXT_OVERLAP ∈ {4, 8}` + light pose smoothing (Savitzky–Golay/EMA) | ~0.5–1.0 Ada GPU-h | Identify top 2 fast Pareto configs (target ≥3× speedup with ≤0.015 player DISTS loss) and check whether pose smoothing / `overlap=8` cuts `decoded_delta / source_delta` from `1.15×–1.44×` toward `~1.0×`. Promote top configs to Track A2 full 240-frame test. |
+| **V6** | **Self-Flow Flicker, Context-Seam & tLPIPS Diagnostic (Campus CPU/light GPU)**<br>Run on existing decoded 240-frame archives for Shanghai & Sydney (PointStream, AV1, AV1-ROI, DCVC-UF):<br>• Self-flow warping error + `tLPIPS` (frame-to-frame perceptual stability)<br>• Stratify error at 24-frame context seams (`t % 20`) vs. interior frames | ~10 CPU-min (no diffusion run) | Separates alignment offset from true synthesis flicker and tells us whether seam artifacts exist. |
+| **V7** | **Independent Player Pose Machine-Task Pilot (Shanghai & Sydney)**<br>Run **DWPose (`dw-ll_ucoco_384.onnx`)** and **YOLO26x-Pose** (both distinct from sender's `yolo11x-pose.pt`) on uncompressed source + decoded ~18–26 kbps AV1, DCVC-UF, and PointStream videos; compare PCK@0.2 / OKS / court-plane position error against direct transmitted joints | ~0.3 GPU/CPU-h | Verify whether post-decode pose estimation degrades sharply at starved rates while direct PointStream joints (`38 ms` CPU) stay accurate. If yes, scale to Halle + new matches (Track A3). |
+
+---
+
+## 4. Cohesive 2-Week Two-Track Execution Schedule
+
+### Track A — Compute & Experiments (~8–11 GPU-hours total)
+
+- **A1. Close External Joint Cohort (`N=4–5` external matches inside the 12-match cohort)** *(Week 1, ~3–4 GPU-h)*
+  1. **Finish Halle (`match105`):** Re-verify far archive `20261123T120635Z-5a1a9720/full/published.tar`, submit near-player generation (`match105-generate-near.json` with refreshed deadline on idle Ada/A6000), composite 240 frames, and recover/run 640-wide AV1 + DCVC-UF matched controls.
+  2. **Audit the 5 unmeasured RacketVision TEST matches (`match107`, `match131`, `match104`, `match130`, `match126`):** Run `k4b_features` + `test_crop_pose` to replace all hatched "unmeasured" bars in `native-player-coverage.pdf`.
+  3. **Apply V1 Pose-Gap Interpolation + Reconstruct 1–2 Additional External Matches:** Test `max_gap <= 10` interior linear keypoint interpolation on Geneva (`match116`) / Munich (`match108`) + clean-240 matches from the 5 newly audited clips; pick 1–2 clean external matches (prefer distinct court/camera scales) and run full 240-frame native joint reconstruction + matched AV1/DCVC-UF controls.
+- **A2. Full Speed–Quality & Stabilization Validation** *(Week 1, ~1.5 GPU-h)*
+  - Run top 2 Pareto configs + best stabilization setting from **V5** across full 240 frames of Shanghai (and Sydney if budget allows) to produce a clean **Decode Time vs. Foreground DISTS & tLPIPS** figure.
+- **A3. Symmetric Player Machine-Task Evaluation (Close `HOLE(journal-anatomy)`)** *(Week 1–2, ~0.5 GPU-h)*
+  - Run **V7** across Shanghai, Sydney, Halle, and any newly added external matches; add a quick 24–36 frame manual keypoint sanity check on uncompressed source so the reference pose ground truth is verified. Compute downstream **court-plane position & wrist-kinematics error** (CPU).
+- **A4. Multi-Sport Ball/Shuttlecock Transfer Study (Badminton & Table Tennis)** *(Week 2, ~0.5 GPU-h / CPU)*
+  - Prespecify 4–6 official `test` clips from MIT-licensed **RacketVision Badminton** (and Table Tennis / existing **OpenTTGames** 120 fps), run matched SVT-AV1 and DCVC-UF at starved rates, and report both **oracle-label representation gain** and **real-tracker end-to-end delivery + direct localization** (strictly separated).
+- **A5. Time-Boxed 1-Scene Non-Racket Pilot [Max 1 calendar day]** *(Week 2, ~0.5 GPU-h)*
+  - Identify 1 rights-clean single-actor clip (e.g., open-license figure skating / dance / gymnastics), run base unadapted AnimateAnyone (`original` weights) + AV1 background + matched AV1 & DCVC-UF controls. Include as a brief **"Beyond Racket Sports"** case study only if completed cleanly within 1 day.
+- **A6. Closed-Loop Shot Mode Selector + Multi-Rally Amortization** *(Week 2, CPU / existing receipts)*
+  - Evaluate a source-only mode selector `{Conv, Conv+Ball, Full-Obj}` (using court fit, track continuity, target rate, cache state — zero oracle scores) across the 12 test matches.
+  - Plot empirical multi-rally amortization using `Eq. 2` across real rally counts.
+
+### Track B — Manuscript Overhaul & Supplementary Media (Parallel from Day 1)
+
+- **B1. Visual Plates & Supplementary Video (MIT-Safe)** *(Week 1)*
+  - Remove `\PointStreamPublicationSafe` blackout in `main.tex` and `sections/`.
+  - Replace `joint-serve.pdf` / `measured-passage-intro.pdf` with MIT-licensed **Shanghai (`match102`)** and **Sydney/Halle** qualitative crop figures, explicitly including an honest **artifact/failure inset** (e.g., racket/foot alignment shift).
+  - Build a short **supplementary `.mp4` side-by-side comparison video** (Source | SVT-AV1 | DCVC-UF | PointStream at ~18–26 kbps on MIT clips).
+- **B2. Front-Half Rewrite (`Introduction`, `Related Work`, `System Design`, `Protocol`)** *(Week 1)*
+  - **Introduction:** Sharpen contribution list around *(1) shot-selective dual-use codec, (2) perception–distortion & bitrate-cache operating region, (3) empirical validation across external broadcasts & sports*.
+  - **Related Work (`310 -> ~1,000 words`, `27 -> 55–70 citations`):** Cover MPEG-4 sprites/VOPs, neural codecs (DVC/DCVC), generative/keypoint codecs (FOMM, CFTE, HDAC, MTTF, Sparse2Dense, GenStream, GLC-Video, GVC-RT, Morphe), perception–distortion theory (Blau & Michaeli), ROI coding, and MPEG VCM. Add a **5-axis comparison table** positioning PointStream.
+  - **System Design (`1,115 -> ~2,200 words`):** Add formal shot-level mode-selection objective, concrete **bitstream/wire specification** (bit allocations for 17-joint delta coding, crop-box coding, ball streak parameters, clean-court donor alignment, pose-gap interpolation & span fallback, compositing order, and cache-reuse accounting).
+  - **Evaluation Protocol:** Unify cohort definitions into one clean table; frame PSNR/SSIM vs. DISTS/LPIPS + self-flow/tLPIPS cleanly via perception–distortion.
+- **B3. Back-Half Consolidation (`Results`, `Machine`, `Cost`, `Discussion`)** *(Week 2)*
+  - Reduce total figures from **20 → ~10–12** (merge `official-test-three-codecs-starved` and `official-test-three-codecs` into a two-panel figure; prune redundant appendix/reference plots).
+  - Demote the legacy 7-window LoRA-adapted player study (`Sec. 5.2`) into an explicit **"Effect of Per-Match Adaptation"** subsection so it does not confuse the zero-adaptation system architecture.
+  - Integrate A1–A6 results (`N=4–5` external joint matches, speed–quality Pareto curve, symmetric player pose machine task, badminton/TT transfer, optional 1-scene case study, and structural VISOR boundary-conditions discussion without legacy pixel-split numbers).
+- **B4. Final Audit & Submission Packaging** *(End of Week 2)*
+  - Update `companion/` JSONs, `marker-dispositions.json`, and `tools/check_journal_results.py`.
+  - Verify `bash tools/build_pdf.sh` (anonymous + author) fits **≤ 23 body/ref + ≤ 5 appendix pages** with zero undefined refs/citations.
+  - Push Overleaf `main`, prepare clean GitHub replication release bundle (scripts + metrics + bitstream spec, excluding restricted broadcast media).
+
+---
+
+## 5. Immediate Post-Flight Resume Checklist
+
+When back online with campus GPU availability:
+1. Check fleet availability: `scripts/ps-fleet inspect` and check any prior jobs via `scripts/ps-fleet status JOB_ID`.
+2. Verify worktree `tomm/validation-and-plan-20261124` (contains this plan + V1/V2/V3/V4 receipts).
+3. Launch **V5 (48-frame Shanghai steps/sampler/overlap/smoothing pilot)** + **V6 (self-flow/tLPIPS CPU diagnostic on Shanghai/Sydney)** + **Halle near-player recovery** in parallel if an Ada/A6000 GPU is free, while simultaneously starting **Track B1 & B2** manuscript edits.

@@ -1,0 +1,260 @@
+{
+  "external_delta_receipts": [
+    {
+      "match": "Shanghai (match102)",
+      "receipt": "docs/experiments/test-crop-joint-20261122/match102-motion-four-arm.json",
+      "arms": {
+        "av1-320-warm": {
+          "n": 478,
+          "error": 19.76618607772444,
+          "source_delta": 17.519703371255467,
+          "decoded_delta": 6.880710949334141,
+          "decoded_to_source_delta_ratio": 0.3927412926764106
+        },
+        "roi-640-warm": {
+          "n": 478,
+          "error": 20.116432406413505,
+          "source_delta": 17.519703371255467,
+          "decoded_delta": 6.513172628739888,
+          "decoded_to_source_delta_ratio": 0.3717627228452985
+        },
+        "dcvc-480-q34": {
+          "n": 478,
+          "error": 18.19304105327718,
+          "source_delta": 17.519703371255467,
+          "decoded_delta": 7.867423244600016,
+          "decoded_to_source_delta_ratio": 0.4490614411604752
+        },
+        "joint-crf50": {
+          "n": 478,
+          "error": 27.18326012160489,
+          "source_delta": 17.519703371255467,
+          "decoded_delta": 20.22846861863236,
+          "decoded_to_source_delta_ratio": 1.1546125062722898
+        }
+      }
+    },
+    {
+      "match": "Sydney (match127)",
+      "receipt": "docs/experiments/test-joint-extension-20261122/native/full-confirmation-20261123/temporal-matched.json",
+      "arms": {
+        "ordinary-320-warm": {
+          "n": 478,
+          "error": 10.292875626229653,
+          "source_delta": 8.565914759220005,
+          "decoded_delta": 3.569916979242194,
+          "decoded_to_source_delta_ratio": 0.41675840579661144
+        },
+        "dcvc-480-q26": {
+          "n": 478,
+          "error": 10.036945688175855,
+          "source_delta": 8.565914759220005,
+          "decoded_delta": 4.459379762909901,
+          "decoded_to_source_delta_ratio": 0.5205958602506526
+        },
+        "joint-crf70": {
+          "n": 478,
+          "error": 16.526048317115176,
+          "source_delta": 8.565914759220005,
+          "decoded_delta": 12.31169177099252,
+          "decoded_to_source_delta_ratio": 1.4372886162263885
+        }
+      }
+    }
+  ],
+  "nadal_means": {
+    "source": {
+      "whole": {
+        "energy": 0.5094135961335573,
+        "error": 0.0
+      },
+      "ball": {
+        "energy": 4.5857794632514315,
+        "error": 0.0
+      },
+      "p1": {
+        "energy": 8.086486836274466,
+        "error": 0.0
+      },
+      "p2": {
+        "energy": 8.954675475756327,
+        "error": 0.0
+      }
+    },
+    "plain": {
+      "whole": {
+        "energy": 0.155674366303817,
+        "error": 0.5701037861687369
+      },
+      "ball": {
+        "energy": 0.7272857522281507,
+        "error": 4.721857205033302
+      },
+      "p1": {
+        "energy": 3.0276150852441788,
+        "error": 8.915970305601755
+      },
+      "p2": {
+        "energy": 3.49209962785244,
+        "error": 10.18458741903305
+      }
+    },
+    "joint": {
+      "whole": {
+        "energy": 0.17031743199755456,
+        "error": 0.5988854528346321
+      },
+      "ball": {
+        "energy": 2.1078763008117676,
+        "error": 4.503366842865944
+      },
+      "p1": {
+        "energy": 9.721008062362671,
+        "error": 13.392207940419516
+      },
+      "p2": {
+        "energy": 12.37958006064097,
+        "error": 14.379078348477682
+      }
+    },
+    "neural": {
+      "whole": {
+        "energy": 0.448426968382991,
+        "error": 0.7453452601841802
+      },
+      "ball": {
+        "energy": 1.243119274576505,
+        "error": 4.574019153912862
+      },
+      "p1": {
+        "energy": 3.566522707541784,
+        "error": 7.965768337249756
+      },
+      "p2": {
+        "energy": 4.051259001096089,
+        "error": 8.562981764475504
+      }
+    }
+  },
+  "alcaraz_joint_means": {
+    "source": {
+      "whole": {
+        "energy": 0.2687877242763837,
+        "error": 0.0
+      },
+      "archived-track-0": {
+        "energy": 16.59640097618103,
+        "error": 0.0
+      },
+      "archived-track-1": {
+        "energy": 16.65967885653178,
+        "error": 0.0
+      }
+    },
+    "ordinary": {
+      "whole": {
+        "energy": 0.12265833156804244,
+        "error": 0.3082539327442646
+      },
+      "archived-track-0": {
+        "energy": 8.325615684191385,
+        "error": 16.850227276484173
+      },
+      "archived-track-1": {
+        "energy": 3.490499993165334,
+        "error": 17.245964646339417
+      }
+    },
+    "neural": {
+      "whole": {
+        "energy": 0.3990096151828766,
+        "error": 0.48434126128753024
+      },
+      "archived-track-0": {
+        "energy": 9.261784752209982,
+        "error": 14.951222976048788
+      },
+      "archived-track-1": {
+        "energy": 8.58685584863027,
+        "error": 15.46376915772756
+      }
+    },
+    "joint_cached": {
+      "whole": {
+        "energy": 0.16663311359783015,
+        "error": 0.3412443983058135
+      },
+      "archived-track-0": {
+        "energy": 16.12655742963155,
+        "error": 25.28945819536845
+      },
+      "archived-track-1": {
+        "energy": 20.08759832382202,
+        "error": 25.43647003173828
+      }
+    }
+  },
+  "alcaraz_control_means": {
+    "source": {
+      "whole": {
+        "energy": 0.2687877242763837,
+        "error": 0.0
+      },
+      "archived-track-0": {
+        "energy": 16.59640097618103,
+        "error": 0.0
+      },
+      "archived-track-1": {
+        "energy": 16.65967885653178,
+        "error": 0.0
+      }
+    },
+    "ordinary": {
+      "whole": {
+        "energy": 0.12265833156804244,
+        "error": 0.3082539327442646
+      },
+      "archived-track-0": {
+        "energy": 8.325615684191385,
+        "error": 16.850227276484173
+      },
+      "archived-track-1": {
+        "energy": 3.490499993165334,
+        "error": 17.245964646339417
+      }
+    },
+    "neural": {
+      "whole": {
+        "energy": 0.3990096151828766,
+        "error": 0.48434126128753024
+      },
+      "archived-track-0": {
+        "energy": 9.261784752209982,
+        "error": 14.951222976048788
+      },
+      "archived-track-1": {
+        "energy": 8.58685584863027,
+        "error": 15.46376915772756
+      }
+    }
+  },
+  "seam_checks": {
+    "nadal_starved": {
+      "available": true,
+      "receipt": "docs/experiments/starved-temporal-20261122/result.json",
+      "arm": "pointstream",
+      "n_rows": 24,
+      "seam_count": 0,
+      "interior_count": 24,
+      "seam_mean_error": null,
+      "interior_mean_error": 13.92616585890452,
+      "seam_mean_energy": null,
+      "interior_mean_energy": 11.163991947968801
+    },
+    "alcaraz_joint": {
+      "available": false,
+      "receipt": "docs/experiments/al028-temporal-20261122/joint-result.json"
+    }
+  },
+  "note": "Shanghai and Sydney JSONs store aggregate means without per-tick rows, and current receipts measure source-flow-warped error only (not self-flow flicker or tLPIPS)."
+}
