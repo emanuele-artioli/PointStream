@@ -63,7 +63,9 @@ def load_base_frames(base_yuv: Path, n_frames: int) -> list[np.ndarray]:
         raise ValueError(f"unexpected base.yuv size {len(raw)}")
     frames: list[np.ndarray] = []
     for t in range(n_frames):
-        chunk = np.frombuffer(raw[t * BASE_FRAME_BYTES : (t + 1) * BASE_FRAME_BYTES], dtype=np.uint8)
+        chunk = np.frombuffer(
+            raw[t * BASE_FRAME_BYTES : (t + 1) * BASE_FRAME_BYTES], dtype=np.uint8
+        ).reshape(BASE_H * 3 // 2, BASE_W)
         rgb = yuv_to_rgb(chunk, BASE_W, BASE_H, False)
         frames.append(cv2.resize(rgb, (1920, 1080), interpolation=cv2.INTER_CUBIC))
     return frames
