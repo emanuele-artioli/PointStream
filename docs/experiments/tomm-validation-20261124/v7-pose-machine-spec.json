@@ -100,7 +100,7 @@
     },
     {
       "name": "yolo26",
-      "path": "/home/itec/emanuele/Datasets/pointstream-data/assets/weights/yolo26x-pose.pt",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/yolo26x-pose.pt",
       "sha256": "08ed9e01d22a6f248b04f2f9992016aca9a32250b9ab57057d886a09d026700d",
       "extract": false
     }
@@ -147,7 +147,7 @@
       "sha256": "724f4ff2439ed61afb86fb8a1951ec39c6220682803b4a8bd4f598cd913b1843"
     },
     {
-      "path": "/home/itec/emanuele/Datasets/pointstream-data/assets/weights/yolo26x-pose.pt",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/yolo26x-pose.pt",
       "sha256": "08ed9e01d22a6f248b04f2f9992016aca9a32250b9ab57057d886a09d026700d"
     }
   ],
