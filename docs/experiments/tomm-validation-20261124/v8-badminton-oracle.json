@@ -1,0 +1,376 @@
+{
+  "clips_evaluated": 6,
+  "target_kbps": 20.4,
+  "badminton_tar_sha256": "1442d215c8dc31787e2a60a290470f5c4072c8d5a2b594d4f853c8399da8ca30",
+  "vgg16_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+  "tools": {
+    "ffmpeg": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+      "version": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    "ffprobe": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffprobe",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffprobe",
+      "sha256": "f4e72e0094397518602881be95f16a1d60ec41b03ecfb0aaa6f8e45ffa14583a",
+      "version": "ffprobe version 8.1.2 Copyright (c) 2007-2026 the FFmpeg developers"
+    },
+    "dav1d": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+      "version": "1.5.4"
+    },
+    "SvtAv1EncApp": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "sha256": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+      "version": "SVT-AV1 v4.2.0 (release)"
+    }
+  },
+  "elapsed_s": 1031.0722482649726,
+  "pooled": {
+    "wins_vs_av1_same_res": 5,
+    "wins_vs_av1_best": 5,
+    "pointstream_dists64": 0.24006744038920755,
+    "av1_same_res_dists64": 0.25417872887741333,
+    "av1_best_dists64": 0.2684525226244411,
+    "same_base_dists64": 0.2545087632024241,
+    "pointstream_kbps": 20.191388888888888,
+    "av1_same_res_kbps": 20.08638888888889,
+    "av1_best_kbps": 20.241944444444446
+  },
+  "clips": [
+    {
+      "clip_id": "match114_000",
+      "fps": "25",
+      "n_frames": 240,
+      "visible_marks": 40,
+      "target_bytes": 24480,
+      "payload_bytes": 164,
+      "max_quant_err_src_px": 1.4038534461509586,
+      "selected": {
+        "pointstream": {
+          "width": 640,
+          "crf": 67.5,
+          "bytes": 24477,
+          "kbps": 20.3975
+        },
+        "av1_same_res": {
+          "width": 640,
+          "crf": 67.5,
+          "bytes": 24228,
+          "kbps": 20.19
+        },
+        "av1_best": {
+          "width": 320,
+          "crf": 61.25,
+          "bytes": 24454,
+          "kbps": 20.378333333333334
+        }
+      },
+      "scores": {
+        "pointstream": {
+          "dists64": 0.234556183218956,
+          "psnr64_db": 21.456872443369335,
+          "psnr12_db": 14.896917054927851,
+          "whole_psnr_db": 24.20984866566474
+        },
+        "av1_same_res": {
+          "dists64": 0.25588143020868304,
+          "psnr64_db": 21.22822070839199,
+          "psnr12_db": 14.056062163363576,
+          "whole_psnr_db": 24.2095177005986
+        },
+        "av1_best": {
+          "dists64": 0.28462637960910797,
+          "psnr64_db": 20.134451888244783,
+          "psnr12_db": 13.730995423239353,
+          "whole_psnr_db": 22.869585885060665
+        },
+        "same_base": {
+          "dists64": 0.25588143020868304,
+          "psnr64_db": 21.22822070839199,
+          "psnr12_db": 14.056062163363576,
+          "whole_psnr_db": 24.2095177005986
+        }
+      }
+    },
+    {
+      "clip_id": "match133_000",
+      "fps": "25",
+      "n_frames": 240,
+      "visible_marks": 48,
+      "target_bytes": 24480,
+      "payload_bytes": 194,
+      "max_quant_err_src_px": 1.3732491211680862,
+      "selected": {
+        "pointstream": {
+          "width": 640,
+          "crf": 65.25,
+          "bytes": 24277,
+          "kbps": 20.230833333333333
+        },
+        "av1_same_res": {
+          "width": 640,
+          "crf": 65.25,
+          "bytes": 23998,
+          "kbps": 19.99833333333333
+        },
+        "av1_best": {
+          "width": 320,
+          "crf": 59.25,
+          "bytes": 24346,
+          "kbps": 20.28833333333333
+        }
+      },
+      "scores": {
+        "pointstream": {
+          "dists64": 0.21970348432660103,
+          "psnr64_db": 21.70166414729486,
+          "psnr12_db": 16.255930292916997,
+          "whole_psnr_db": 26.272720070837913
+        },
+        "av1_same_res": {
+          "dists64": 0.22813978294531503,
+          "psnr64_db": 21.64853930804433,
+          "psnr12_db": 15.842370252041288,
+          "whole_psnr_db": 26.272479872514406
+        },
+        "av1_best": {
+          "dists64": 0.28280553718407947,
+          "psnr64_db": 20.45907616577371,
+          "psnr12_db": 15.504769789888043,
+          "whole_psnr_db": 24.293048783780794
+        },
+        "same_base": {
+          "dists64": 0.22813978294531503,
+          "psnr64_db": 21.64853930804433,
+          "psnr12_db": 15.842370252041288,
+          "whole_psnr_db": 26.272479872514406
+        }
+      }
+    },
+    {
+      "clip_id": "match11_000",
+      "fps": "25",
+      "n_frames": 240,
+      "visible_marks": 45,
+      "target_bytes": 24480,
+      "payload_bytes": 184,
+      "max_quant_err_src_px": 1.3632122911949427,
+      "selected": {
+        "pointstream": {
+          "width": 640,
+          "crf": 64.25,
+          "bytes": 24118,
+          "kbps": 20.098333333333333
+        },
+        "av1_same_res": {
+          "width": 640,
+          "crf": 64.25,
+          "bytes": 23849,
+          "kbps": 19.874166666666667
+        },
+        "av1_best": {
+          "width": 640,
+          "crf": 64.0,
+          "bytes": 24395,
+          "kbps": 20.32916666666667
+        }
+      },
+      "scores": {
+        "pointstream": {
+          "dists64": 0.20723575486077203,
+          "psnr64_db": 22.75661231894737,
+          "psnr12_db": 14.534637901078131,
+          "whole_psnr_db": 27.603314010182416
+        },
+        "av1_same_res": {
+          "dists64": 0.24902810520595975,
+          "psnr64_db": 22.830480637787662,
+          "psnr12_db": 14.86028768852811,
+          "whole_psnr_db": 27.603642822237195
+        },
+        "av1_best": {
+          "dists64": 0.25126016404893664,
+          "psnr64_db": 22.768388215631482,
+          "psnr12_db": 14.893241625031363,
+          "whole_psnr_db": 27.689422324439114
+        },
+        "same_base": {
+          "dists64": 0.24902810520595975,
+          "psnr64_db": 22.830480637787662,
+          "psnr12_db": 14.86028768852811,
+          "whole_psnr_db": 27.603642822237195
+        }
+      }
+    },
+    {
+      "clip_id": "match135_000",
+      "fps": "25",
+      "n_frames": 240,
+      "visible_marks": 49,
+      "target_bytes": 24480,
+      "payload_bytes": 198,
+      "max_quant_err_src_px": 1.3833694635434297,
+      "selected": {
+        "pointstream": {
+          "width": 320,
+          "crf": 61.75,
+          "bytes": 24425,
+          "kbps": 20.354166666666668
+        },
+        "av1_same_res": {
+          "width": 320,
+          "crf": 61.75,
+          "bytes": 24142,
+          "kbps": 20.118333333333332
+        },
+        "av1_best": {
+          "width": 320,
+          "crf": 61.75,
+          "bytes": 24142,
+          "kbps": 20.118333333333332
+        }
+      },
+      "scores": {
+        "pointstream": {
+          "dists64": 0.31310242536116617,
+          "psnr64_db": 18.495497533454962,
+          "psnr12_db": 14.900832476677873,
+          "whole_psnr_db": 21.755841766158408
+        },
+        "av1_same_res": {
+          "dists64": 0.320153647539567,
+          "psnr64_db": 18.493608869470663,
+          "psnr12_db": 14.877411311286329,
+          "whole_psnr_db": 21.75583535763623
+        },
+        "av1_best": {
+          "dists64": 0.320153647539567,
+          "psnr64_db": 18.493608869470663,
+          "psnr12_db": 14.877411311286329,
+          "whole_psnr_db": 21.75583535763623
+        },
+        "same_base": {
+          "dists64": 0.320153647539567,
+          "psnr64_db": 18.493608869470663,
+          "psnr12_db": 14.877411311286329,
+          "whole_psnr_db": 21.75583535763623
+        }
+      }
+    },
+    {
+      "clip_id": "match125_000",
+      "fps": "25",
+      "n_frames": 240,
+      "visible_marks": 48,
+      "target_bytes": 24480,
+      "payload_bytes": 194,
+      "max_quant_err_src_px": 1.4038534461509586,
+      "selected": {
+        "pointstream": {
+          "width": 640,
+          "crf": 67.0,
+          "bytes": 24136,
+          "kbps": 20.113333333333333
+        },
+        "av1_same_res": {
+          "width": 640,
+          "crf": 66.75,
+          "bytes": 24377,
+          "kbps": 20.31416666666667
+        },
+        "av1_best": {
+          "width": 640,
+          "crf": 66.75,
+          "bytes": 24377,
+          "kbps": 20.31416666666667
+        }
+      },
+      "scores": {
+        "pointstream": {
+          "dists64": 0.23065605387091637,
+          "psnr64_db": 20.577450362923866,
+          "psnr12_db": 15.367932358457878,
+          "whole_psnr_db": 24.936693443757626
+        },
+        "av1_same_res": {
+          "dists64": 0.2305811122059822,
+          "psnr64_db": 20.755445085661638,
+          "psnr12_db": 15.470813567739762,
+          "whole_psnr_db": 25.08047972434138
+        },
+        "av1_best": {
+          "dists64": 0.2305811122059822,
+          "psnr64_db": 20.755445085661638,
+          "psnr12_db": 15.470813567739762,
+          "whole_psnr_db": 25.08047972434138
+        },
+        "same_base": {
+          "dists64": 0.23664832611878714,
+          "psnr64_db": 20.583614398564094,
+          "psnr12_db": 15.421052094813657,
+          "whole_psnr_db": 24.936719807217962
+        }
+      }
+    },
+    {
+      "clip_id": "match102_000",
+      "fps": "25",
+      "n_frames": 240,
+      "visible_marks": 39,
+      "target_bytes": 24480,
+      "payload_bytes": 161,
+      "max_quant_err_src_px": 151.00331122197287,
+      "selected": {
+        "pointstream": {
+          "width": 640,
+          "crf": 67.5,
+          "bytes": 23945,
+          "kbps": 19.95416666666667
+        },
+        "av1_same_res": {
+          "width": 640,
+          "crf": 67.25,
+          "bytes": 24028,
+          "kbps": 20.023333333333333
+        },
+        "av1_best": {
+          "width": 640,
+          "crf": 67.25,
+          "bytes": 24028,
+          "kbps": 20.023333333333333
+        }
+      },
+      "scores": {
+        "pointstream": {
+          "dists64": 0.23515074069683367,
+          "psnr64_db": 18.802509406609907,
+          "psnr12_db": 16.326603437290824,
+          "whole_psnr_db": 23.537874587227083
+        },
+        "av1_same_res": {
+          "dists64": 0.2412882951589731,
+          "psnr64_db": 20.88471053086336,
+          "psnr12_db": 16.786060275534766,
+          "whole_psnr_db": 23.588386937968725
+        },
+        "av1_best": {
+          "dists64": 0.2412882951589731,
+          "psnr64_db": 20.88471053086336,
+          "psnr12_db": 16.786060275534766,
+          "whole_psnr_db": 23.588386937968725
+        },
+        "same_base": {
+          "dists64": 0.23720128719623274,
+          "psnr64_db": 20.949754510424683,
+          "psnr12_db": 16.877053643494236,
+          "whole_psnr_db": 23.537633128465014
+        }
+      }
+    }
+  ]
+}
