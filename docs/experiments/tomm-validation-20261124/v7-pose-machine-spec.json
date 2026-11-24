@@ -28,12 +28,10 @@
     "{staged:witness}",
     "--carrier",
     "{staged:carrier}",
-    "--dwpose-det",
-    "{staged:dwpose_det}",
-    "--dwpose-pose",
-    "{staged:dwpose_pose}",
-    "--yolo26",
-    "{staged:yolo26}",
+    "--yolo26x",
+    "{staged:yolo26x}",
+    "--yolo26l",
+    "{staged:yolo26l}",
     "--frames",
     "{frames}"
   ],
@@ -87,21 +85,15 @@
       "extract": false
     },
     {
-      "name": "dwpose_det",
-      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/yolox_l.onnx",
-      "sha256": "7860ae79de6c89a3c1eb72ae9a2756c0ccfbe04b7791bb5880afabd97855a411",
-      "extract": false
-    },
-    {
-      "name": "dwpose_pose",
-      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/dw-ll_ucoco_384.onnx",
-      "sha256": "724f4ff2439ed61afb86fb8a1951ec39c6220682803b4a8bd4f598cd913b1843",
-      "extract": false
-    },
-    {
-      "name": "yolo26",
+      "name": "yolo26x",
       "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/yolo26x-pose.pt",
       "sha256": "08ed9e01d22a6f248b04f2f9992016aca9a32250b9ab57057d886a09d026700d",
+      "extract": false
+    },
+    {
+      "name": "yolo26l",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/yolo26l-pose.pt",
+      "sha256": "ad33da8a29ea5772318c4c980844e47b56792d2b63815ad4e8e09c078c7d1abf",
       "extract": false
     }
   ],
@@ -139,16 +131,12 @@
       "sha256": "3ebc2e455509db026919f17c17d2bfce3eba899fd29a0888c47440b576a219af"
     },
     {
-      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/yolox_l.onnx",
-      "sha256": "7860ae79de6c89a3c1eb72ae9a2756c0ccfbe04b7791bb5880afabd97855a411"
-    },
-    {
-      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/dw-ll_ucoco_384.onnx",
-      "sha256": "724f4ff2439ed61afb86fb8a1951ec39c6220682803b4a8bd4f598cd913b1843"
-    },
-    {
       "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/yolo26x-pose.pt",
       "sha256": "08ed9e01d22a6f248b04f2f9992016aca9a32250b9ab57057d886a09d026700d"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/yolo26l-pose.pt",
+      "sha256": "ad33da8a29ea5772318c4c980844e47b56792d2b63815ad4e8e09c078c7d1abf"
     }
   ],
   "environment": {
@@ -156,7 +144,7 @@
     "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
   },
   "required_commands": [],
-  "deadline": "2026-11-24T04:55:00Z",
+  "deadline": "2026-11-24T05:10:00Z",
   "verify_staged_inputs": true,
   "hosts": [
     "gpu1",
@@ -172,14 +160,14 @@
   "single_cpu_campaign": true,
   "local_storage_gib": 28,
   "smoke": {
-    "seconds": 240,
-    "representative_basis": "4 uniformly spaced Shanghai frames verifying DWPose vs YOLO26x source agreement >=0.70 PCK@0.2 plus all 4 decoded arms and direct paid joints."
+    "seconds": 300,
+    "representative_basis": "4 uniformly spaced Shanghai frames verifying YOLO26x vs YOLO26l source agreement >=0.70 PCK@0.2 plus all 4 decoded arms and direct paid joints."
   },
   "full": {
-    "seconds": 1200
+    "seconds": 1400
   },
   "validator_seconds": 30,
-  "budget_seconds": 1500,
+  "budget_seconds": 1800,
   "stall_seconds": 600,
   "scale": {
     "frames": {

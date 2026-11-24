@@ -233,7 +233,19 @@ def validate(args: argparse.Namespace) -> None:
         assert np.isfinite(s["self_flow_error"]) and np.isfinite(s["tlpips_mean"])
         assert s["self_flow_error"] > 0 and s["tlpips_mean"] > 0
     Path(os.environ["PS_VALIDATION_PATH"]).write_text(
-        json.dumps({"passed": True, "recorded_ticks": expected, "summary": data["summary"]}, indent=2) + "\n"
+        json.dumps(
+            {
+                "passed": True,
+                "checks": {
+                    "recorded_ticks": expected,
+                    "arms": len(data["summary"]),
+                    "finite_self_flow_and_tlpips": True,
+                },
+                "summary": data["summary"],
+            },
+            indent=2,
+        )
+        + "\n"
     )
 
 

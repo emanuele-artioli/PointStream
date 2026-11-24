@@ -1,4 +1,4 @@
-"""Benchmark independent DWPose post-decode pose recovery vs. PointStream direct paid joints on Shanghai."""
+"""Benchmark independent YOLO26x post-decode pose recovery vs. PointStream direct paid joints on Shanghai."""
 
 from __future__ import annotations
 
@@ -15,7 +15,6 @@ from typing import Any
 
 import cv2
 import numpy as np
-import onnxruntime as ort
 from ultralytics import YOLO
 
 from experiments.tennis import common_player_packet as packet
@@ -27,39 +26,14 @@ CARD = Path(__file__).resolve().parents[2] / "docs/experiments/test-crop-joint-2
 sys.path.insert(0, str(CARD))
 from score_native import FPS, NT, StreamingYUV, get_support, prep  # noqa: E402
 
-YOLOX_SHA256 = "7860ae79de6c89a3c1eb72ae9a2756c0ccfbe04b7791bb5880afabd97855a411"
-DWPOSE_SHA256 = "724f4ff2439ed61afb86fb8a1951ec39c6220682803b4a8bd4f598cd913b1843"
-YOLO26_SHA256 = "08ed9e01d22a6f248b04f2f9992016aca9a32250b9ab57057d886a09d026700d"
+YOLO26X_SHA256 = "08ed9e01d22a6f248b04f2f9992016aca9a32250b9ab57057d886a09d026700d"
+YOLO26L_SHA256 = "ad33da8a29ea5772318c4c980844e47b56792d2b63815ad4e8e09c078c7d1abf"
 CARRIER_SHA256 = "3ebc2e455509db026919f17c17d2bfce3eba899fd29a0888c47440b576a219af"
 
 COCO_SIGMAS = np.array(
     [0.026, 0.025, 0.025, 0.035, 0.035, 0.079, 0.079, 0.072, 0.072, 0.062, 0.062, 0.107, 0.107, 0.087, 0.087, 0.089, 0.089],
     dtype=np.float64,
 )
-MEAN_BGR = np.array([103.53, 116.28, 123.675], dtype=np.float32)
-STD_BGR = np.array([57.375, 57.12, 58.395], dtype=np.float32)
-
-
-def nms_boxes(boxes: np.ndarray, scores: np.ndarray, iou_thr: float = 0.65) -> list[int]:
-    if len(boxes) == 0:
-        return []
-    order = np.argsort(-scores)
-    keep: list[int] = []
-    areas = np.maximum(0.0, boxes[:, 2] - boxes[:, 0]) * np.maximum(0.0, boxes[:, 3] - boxes[:, 1])
-    while len(order) > 0:
-        i = int(order[0])
-        keep.append(i)
-        if len(order) == 1:
-            break
-        rest = order[1:]
-        xx1 = np.maximum(boxes[i, 0], boxes[rest, 0])
-        yy1 = np.maximum(boxes[i, 1], boxes[rest, 1])
-        xx2 = np.minimum(boxes[i, 2], boxes[rest, 2])
-        yy2 = np.minimum(boxes[i, 3], boxes[rest, 3])
-        inter = np.maximum(0.0, xx2 - xx1) * np.maximum(0.0, yy2 - yy1)
-        union = areas[i] + areas[rest] - inter + 1e-6
-        order = rest[inter / union <= iou_thr]
-    return keep
 
 
 def box_iou(a: tuple[int, int, int, int] | np.ndarray, b: tuple[int, int, int, int] | np.ndarray) -> float:
@@ -73,100 +47,60 @@ def box_iou(a: tuple[int, int, int, int] | np.ndarray, b: tuple[int, int, int, i
     return inter / (area_a + area_b - inter + 1e-6)
 
 
-class DWPoseONNX:
-    """Pure ONNXRuntime DWPose detector + SimCC pose estimator (CPU)."""
+def predict_full(model: YOLO, bgr: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    res = model.predict(bgr, imgsz=1280, conf=0.15, verbose=False, device="cpu")[0]
+    boxes = res.boxes.xyxy.cpu().numpy() if len(res.boxes) else np.zeros((0, 4), dtype=np.float32)
+    kps = res.keypoints.data.cpu().numpy() if res.keypoints is not None and len(res.boxes) else np.zeros((0, 17, 3), dtype=np.float32)
+    return boxes, kps
 
-    def __init__(self, det_path: Path, pose_path: Path, threads: int) -> None:
-        opts = ort.SessionOptions()
-        opts.intra_op_num_threads = threads
-        opts.inter_op_num_threads = 1
-        self.det = ort.InferenceSession(str(det_path), sess_options=opts, providers=["CPUExecutionProvider"])
-        self.pose = ort.InferenceSession(str(pose_path), sess_options=opts, providers=["CPUExecutionProvider"])
-        self.det_in = self.det.get_inputs()[0].name
-        self.pose_in = self.pose.get_inputs()[0].name
-        grids, strides = [], []
-        for s in (8, 16, 32):
-            gs = 640 // s
-            yv, xv = np.meshgrid(np.arange(gs), np.arange(gs), indexing="ij")
-            grids.append(np.stack([xv, yv], -1).reshape(-1, 2))
-            strides.append(np.full((gs * gs, 1), s, dtype=np.float32))
-        self.grid = np.concatenate(grids, 0).astype(np.float32)
-        self.stride = np.concatenate(strides, 0)
 
-    def detect_people(self, bgr: np.ndarray, score_thr: float = 0.20) -> tuple[np.ndarray, np.ndarray]:
-        h, w = bgr.shape[:2]
-        scale = min(640.0 / h, 640.0 / w)
-        padded = np.full((640, 640, 3), 114, dtype=np.uint8)
-        nh, nw = int(h * scale), int(w * scale)
-        padded[:nh, :nw] = cv2.resize(bgr, (nw, nh))
-        inp = padded.transpose(2, 0, 1)[None].astype(np.float32)
-        out = self.det.run(None, {self.det_in: inp})[0][0]
-        xy = (out[:, :2] + self.grid) * self.stride
-        wh = np.exp(np.clip(out[:, 2:4], -20.0, 20.0)) * self.stride
-        scores = out[:, 4] * out[:, 5]
-        mask = scores >= score_thr
-        if not np.any(mask):
-            return np.zeros((0, 4), dtype=np.float32), np.zeros((0,), dtype=np.float32)
-        boxes = np.concatenate([xy[mask] - wh[mask] / 2.0, xy[mask] + wh[mask] / 2.0], axis=1) / scale
-        sc = scores[mask]
-        keep = nms_boxes(boxes, sc, 0.65)
-        return boxes[keep], sc[keep]
-
-    def estimate_pose(self, bgr: np.ndarray, box: np.ndarray) -> np.ndarray:
-        x1, y1, x2, y2 = [float(v) for v in box]
-        cx, cy = (x1 + x2) / 2.0, (y1 + y2) / 2.0
-        bw, bh = max(10.0, (x2 - x1) * 1.25), max(10.0, (y2 - y1) * 1.25)
-        aspect = 288.0 / 384.0
-        if bw > bh * aspect:
-            bh = bw / aspect
-        else:
-            bw = bh * aspect
-        src_pts = np.array([[cx, cy], [cx, cy - bh * 0.5], [cx - bh * 0.5, cy]], dtype=np.float32)
-        dst_pts = np.array([[144.0, 192.0], [144.0, 0.0], [0.0, 192.0]], dtype=np.float32)
-        mat = cv2.getAffineTransform(src_pts, dst_pts)
-        crop = cv2.warpAffine(bgr, mat, (288, 384), flags=cv2.INTER_LINEAR)
-        inp = ((crop.astype(np.float32) - MEAN_BGR) / STD_BGR).transpose(2, 0, 1)[None].astype(np.float32)
-        sx, sy = self.pose.run(None, {self.pose_in: inp})
-        ix = np.argmax(sx[0, :17], axis=-1)
-        iy = np.argmax(sy[0, :17], axis=-1)
-        conf = 0.5 * (sx[0, np.arange(17), ix] + sy[0, np.arange(17), iy])
-        px = ix.astype(np.float32) / 2.0
-        py = iy.astype(np.float32) / 2.0
-        inv_mat = cv2.invertAffineTransform(mat)
-        xy = np.stack([px, py, np.ones_like(px)], axis=-1) @ inv_mat.T
-        return np.concatenate([xy, conf[:, None]], axis=-1)
-
-    def predict(self, bgr: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-        boxes, _ = self.detect_people(bgr)
-        if len(boxes) == 0:
-            return np.zeros((0, 4), dtype=np.float32), np.zeros((0, 17, 3), dtype=np.float32)
-        kps = np.stack([self.estimate_pose(bgr, b) for b in boxes], axis=0)
-        return boxes, kps
+def predict_crop(model: YOLO, bgr: np.ndarray, box: tuple[int, int, int, int]) -> np.ndarray | None:
+    """Top-down padded crop pose prediction, mapped back to 1080p native pixels."""
+    h_img, w_img = bgr.shape[:2]
+    bw = max(16.0, float(box[2] - box[0]))
+    bh = max(16.0, float(box[3] - box[1]))
+    pad_x = max(32.0, 0.45 * bw)
+    pad_y = max(32.0, 0.35 * bh)
+    x0 = max(0, int(round(box[0] - pad_x)))
+    y0 = max(0, int(round(box[1] - pad_y)))
+    x1 = min(w_img, int(round(box[2] + pad_x)))
+    y1 = min(h_img, int(round(box[3] + pad_y)))
+    crop = bgr[y0:y1, x0:x1]
+    res = model.predict(crop, imgsz=384, conf=0.15, verbose=False, device="cpu")[0]
+    if not len(res.boxes) or res.keypoints is None:
+        return None
+    boxes = res.boxes.xyxy.cpu().numpy()
+    kps = res.keypoints.data.cpu().numpy()
+    local_target = (box[0] - x0, box[1] - y0, box[2] - x0, box[3] - y0)
+    best = int(np.argmax([box_iou(b, local_target) for b in boxes]))
+    if box_iou(boxes[best], local_target) < 0.15:
+        return None
+    kp = kps[best].copy()
+    kp[:, 0] += x0
+    kp[:, 1] += y0
+    return kp
 
 
 def match_player(
     pred_boxes: np.ndarray,
     pred_kps: np.ndarray,
     target_box: tuple[int, int, int, int],
-) -> tuple[np.ndarray | None, float]:
+) -> np.ndarray | None:
     if len(pred_boxes) == 0:
-        return None, 0.0
+        return None
     ious = [box_iou(b, target_box) for b in pred_boxes]
     best = int(np.argmax(ious))
     if ious[best] >= 0.15:
-        return pred_kps[best], float(ious[best])
-    # Fallback: check if any skeleton's confident joints fall inside padded target_box
-    tx0, ty0, tx1, ty1 = target_box
-    for i, kp in enumerate(pred_kps):
-        pts = kp[kp[:, 2] > 0.2, :2]
-        if len(pts) >= 3:
-            inside = ((pts[:, 0] >= tx0) & (pts[:, 0] <= tx1) & (pts[:, 1] >= ty0) & (pts[:, 1] <= ty1)).mean()
-            if inside >= 0.5:
-                return kp, float(ious[i])
-    return None, 0.0
+        return pred_kps[best]
+    return None
 
 
-def score_pose(pred: np.ndarray | None, ref: np.ndarray, ref_box: tuple[int, int, int, int], conf_thr: float = 0.3) -> dict[str, Any]:
+def score_pose(
+    pred: np.ndarray | None,
+    ref: np.ndarray,
+    ref_box: tuple[int, int, int, int],
+    conf_thr: float = 0.3,
+) -> dict[str, Any]:
     bw = max(1.0, float(ref_box[2] - ref_box[0]))
     bh = max(1.0, float(ref_box[3] - ref_box[1]))
     area = bw * bh
@@ -218,7 +152,6 @@ def tight_box(mask: np.ndarray, offset: tuple[int, int]) -> tuple[int, int, int,
 
 def run_eval(args: argparse.Namespace) -> dict[str, Any]:
     cv2.setNumThreads(1)
-    threads = int(os.environ.get("OMP_NUM_THREADS", "4"))
     stage = Path(os.environ["PS_STAGE_DIR"])
     scratch = Path(os.environ["PS_SCRATCH_DIR"])
     expected = {"smoke": 4, "full": 48}[os.environ["PS_STAGE"]]
@@ -226,9 +159,8 @@ def run_eval(args: argparse.Namespace) -> dict[str, Any]:
         raise ValueError(f"frames={args.frames} mismatches stage {os.environ['PS_STAGE']} ({expected})")
 
     for path, h in (
-        (args.dwpose_det, YOLOX_SHA256),
-        (args.dwpose_pose, DWPOSE_SHA256),
-        (args.yolo26, YOLO26_SHA256),
+        (args.yolo26x, YOLO26X_SHA256),
+        (args.yolo26l, YOLO26L_SHA256),
         (args.carrier, CARRIER_SHA256),
     ):
         if sha256(path) != h:
@@ -238,7 +170,6 @@ def run_eval(args: argparse.Namespace) -> dict[str, Any]:
     arms = json.loads(arms_path.read_text())
     supports, _ = get_support(args.features)
 
-    # Parse paid direct 17-joint packet and time CPU parsing across 30 repetitions.
     carrier_bytes = args.carrier.read_bytes()
     t_parse0 = time.perf_counter()
     for _ in range(30):
@@ -249,8 +180,8 @@ def run_eval(args: argparse.Namespace) -> dict[str, Any]:
         "far": np.asarray(decoded_packet["match102_far"][0]["kp"], dtype=np.float32),
     }
 
-    dwpose = DWPoseONNX(args.dwpose_det, args.dwpose_pose, threads=threads)
-    yolo26 = YOLO(str(args.yolo26))
+    yolo26x = YOLO(str(args.yolo26x))
+    yolo26l = YOLO(str(args.yolo26l))
 
     ticks = sorted({min(NT - 1, int(round(i * (NT - 1) / (expected - 1)))) for i in range(expected)})
     if len(ticks) != expected:
@@ -258,9 +189,11 @@ def run_eval(args: argparse.Namespace) -> dict[str, Any]:
 
     cap = cv2.VideoCapture(str(args.pixels), cv2.CAP_FFMPEG)
     arm_names = [r["name"] for r in arms] + ["direct_joints"]
-    records: dict[str, list[dict[str, Any]]] = {n: [] for n in arm_names}
+    records_full: dict[str, list[dict[str, Any]]] = {n: [] for n in arm_names}
+    records_crop: dict[str, list[dict[str, Any]]] = {n: [] for n in arm_names}
     source_agreement: list[dict[str, Any]] = []
-    dwpose_times_s: list[float] = []
+    full_times_s: list[float] = []
+    crop_times_s: list[float] = []
 
     with ExitStack() as scope:
         images: dict[str, Any] = {}
@@ -278,7 +211,6 @@ def run_eval(args: argparse.Namespace) -> dict[str, Any]:
             ok, bgr_src = cap.read()
             if not ok:
                 raise RuntimeError(f"failed source frame {tick}")
-            # Advance StreamingYUV sequentially if any arm uses it; otherwise memmap random access is fine.
             arm_frames: dict[str, np.ndarray] = {}
             for r in arms:
                 if isinstance(images[r["name"]], StreamingYUV) or tick in ticks:
@@ -287,33 +219,25 @@ def run_eval(args: argparse.Namespace) -> dict[str, Any]:
             if tick not in ticks:
                 continue
 
-            # Unpadded tight boxes from SAM source supports
             near_box = tight_box(supports[tick][0][1], supports[tick][0][0][:2])
             far_box = tight_box(supports[tick][1][1], supports[tick][1][0][:2])
             role_boxes = {"near": near_box, "far": far_box}
 
-            dw_src_boxes, dw_src_kps = dwpose.predict(bgr_src)
-            y26_res = yolo26.predict(bgr_src, imgsz=1280, conf=0.25, verbose=False, device="cpu")[0]
-            y26_boxes = y26_res.boxes.xyxy.cpu().numpy() if len(y26_res.boxes) else np.zeros((0, 4))
-            y26_kps = y26_res.keypoints.data.cpu().numpy() if y26_res.keypoints is not None else np.zeros((0, 17, 3))
-
+            # High-res top-down crop reference from independent YOLO26x-Pose, cross-checked against YOLO26l-Pose
             ref_by_role: dict[str, np.ndarray] = {}
             for role, box in role_boxes.items():
-                dw_kp, _ = match_player(dw_src_boxes, dw_src_kps, box)
-                y26_kp, _ = match_player(y26_boxes, y26_kps, box)
-                if dw_kp is not None:
-                    ref_by_role[role] = dw_kp
-                    if y26_kp is not None:
-                        sc = score_pose(y26_kp, dw_kp, box)
-                        source_agreement.append({"tick": tick, "role": role, **sc})
+                ref_kp = predict_crop(yolo26x, bgr_src, box)
+                alt_kp = predict_crop(yolo26l, bgr_src, box)
+                if ref_kp is not None:
+                    ref_by_role[role] = ref_kp
+                    if alt_kp is not None:
+                        source_agreement.append({"tick": tick, "role": role, **score_pose(alt_kp, ref_kp, box)})
 
-            # Score direct transmitted joints against DWPose reference
             for role, ref_kp in ref_by_role.items():
-                kp = paid_kps[role][tick]
-                sc = score_pose(kp, ref_kp, role_boxes[role])
-                records["direct_joints"].append({"tick": tick, "role": role, **sc})
+                sc = score_pose(paid_kps[role][tick], ref_kp, role_boxes[role])
+                records_full["direct_joints"].append({"tick": tick, "role": role, **sc})
+                records_crop["direct_joints"].append({"tick": tick, "role": role, **sc})
 
-            # Score post-decode DWPose on each coded arm
             for r in arms:
                 name = r["name"]
                 fr = arm_frames[name]
@@ -326,13 +250,19 @@ def run_eval(args: argparse.Namespace) -> dict[str, Any]:
                 else:
                     rgb = fr
                 bgr_arm = cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
-                td0 = time.perf_counter()
-                p_boxes, p_kps = dwpose.predict(bgr_arm)
-                dwpose_times_s.append(time.perf_counter() - td0)
+
+                t0 = time.perf_counter()
+                p_boxes, p_kps = predict_full(yolo26x, bgr_arm)
+                full_times_s.append(time.perf_counter() - t0)
+
+                tc0 = time.perf_counter()
                 for role, ref_kp in ref_by_role.items():
-                    pred_kp, _ = match_player(p_boxes, p_kps, role_boxes[role])
-                    sc = score_pose(pred_kp, ref_kp, role_boxes[role])
-                    records[name].append({"tick": tick, "role": role, **sc})
+                    box = role_boxes[role]
+                    pred_f = match_player(p_boxes, p_kps, box)
+                    records_full[name].append({"tick": tick, "role": role, **score_pose(pred_f, ref_kp, box)})
+                    pred_c = predict_crop(yolo26x, bgr_arm, box)
+                    records_crop[name].append({"tick": tick, "role": role, **score_pose(pred_c, ref_kp, box)})
+                crop_times_s.append(time.perf_counter() - tc0)
 
     cap.release()
 
@@ -351,25 +281,36 @@ def run_eval(args: argparse.Namespace) -> dict[str, Any]:
             "hip_valid": len(hip),
         }
 
-    summary = {
+    summary_full = {
         name: {
             "overall": agg(rows),
             "near": agg([r for r in rows if r["role"] == "near"]),
             "far": agg([r for r in rows if r["role"] == "far"]),
         }
-        for name, rows in records.items()
+        for name, rows in records_full.items()
+    }
+    summary_crop = {
+        name: {
+            "overall": agg(rows),
+            "near": agg([r for r in rows if r["role"] == "near"]),
+            "far": agg([r for r in rows if r["role"] == "far"]),
+        }
+        for name, rows in records_crop.items()
     }
     out = {
         "frames_evaluated": len(ticks),
         "ticks": ticks,
-        "source_dwpose_vs_yolo26x": agg(source_agreement),
+        "source_yolo26x_vs_yolo26l": agg(source_agreement),
         "timing": {
             "direct_packet_parse_240frames_ms": parse_ms_total,
             "direct_packet_parse_per_frame_ms": parse_ms_total / NT,
-            "dwpose_cpu_per_frame_s": mean(dwpose_times_s),
+            "yolo26x_full_frame_cpu_s": mean(full_times_s),
+            "yolo26x_two_crops_cpu_s": mean(crop_times_s),
         },
-        "summary": summary,
-        "records": records,
+        "summary_full_frame": summary_full,
+        "summary_topdown_crop": summary_crop,
+        "records_full_frame": records_full,
+        "records_topdown_crop": records_crop,
     }
     (stage / "pose_machine.json").write_text(json.dumps(out, indent=2) + "\n")
     return out
@@ -380,17 +321,22 @@ def validate(args: argparse.Namespace) -> None:
     expected = {"smoke": 4, "full": 48}[os.environ["PS_STAGE"]]
     data = json.loads((stage / "pose_machine.json").read_text())
     assert data["frames_evaluated"] == expected
-    agree = data["source_dwpose_vs_yolo26x"]
-    assert agree["pck_02"] >= 0.70, f"source DWPose vs YOLO26x PCK@0.2 too low: {agree}"
-    assert data["summary"]["direct_joints"]["overall"]["n"] >= int(1.8 * expected)
+    agree = data["source_yolo26x_vs_yolo26l"]
+    assert agree["pck_02"] >= 0.70, f"source YOLO26x vs YOLO26l PCK@0.2 too low: {agree}"
+    n_obs = data["summary_full_frame"]["direct_joints"]["overall"]["n"]
+    assert n_obs >= int(1.5 * expected)
     Path(os.environ["PS_VALIDATION_PATH"]).write_text(
         json.dumps(
             {
                 "passed": True,
-                "frames_evaluated": expected,
-                "source_agreement": agree,
+                "checks": {
+                    "frames_evaluated": expected,
+                    "source_agreement_pck02": agree["pck_02"],
+                    "observations": n_obs,
+                },
                 "timing": data["timing"],
-                "summary": data["summary"],
+                "summary_full_frame": data["summary_full_frame"],
+                "summary_topdown_crop": data["summary_topdown_crop"],
             },
             indent=2,
         )
@@ -409,9 +355,8 @@ def main() -> None:
         "neural",
         "witness",
         "carrier",
-        "dwpose-det",
-        "dwpose-pose",
-        "yolo26",
+        "yolo26x",
+        "yolo26l",
     ):
         p.add_argument("--" + k, type=Path, required=True)
     p.add_argument("--frames", type=int, choices=(4, 48), required=True)

@@ -446,7 +446,19 @@ def validate(args: argparse.Namespace) -> None:
         for arm in ("pointstream", "av1_same_res", "av1_best", "same_base"):
             assert math.isfinite(r["scores"][arm]["dists64"])
     Path(os.environ["PS_VALIDATION_PATH"]).write_text(
-        json.dumps({"passed": True, "clips_evaluated": expected, "pooled": data["pooled"]}, indent=2) + "\n"
+        json.dumps(
+            {
+                "passed": True,
+                "checks": {
+                    "clips_evaluated": expected,
+                    "psbl_roundtrip": True,
+                    "finite_dists64": True,
+                },
+                "pooled": data["pooled"],
+            },
+            indent=2,
+        )
+        + "\n"
     )
 
 
