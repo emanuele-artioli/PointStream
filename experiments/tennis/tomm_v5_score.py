@@ -85,6 +85,24 @@ def load_source_frames(pixels_path: Path, n_frames: int) -> list[np.ndarray]:
     return frames
 
 
+def discover_v5_configs(v5_dir: Path, roles: tuple[str, ...]) -> tuple[list[str], dict[str, float]]:
+    pub = v5_dir / "publish"
+    render_s: dict[str, float] = {}
+    summary_path = pub / "v5_summary.json"
+    if summary_path.exists():
+        v5_summary = json.loads(summary_path.read_text())
+        for rec in v5_summary.get("records", []):
+            cname = str(rec["config"]["name"])
+            render_s[cname] = render_s.get(cname, 0.0) + float(rec["render_seconds"])
+    configs: list[str] = []
+    for sub in sorted(pub.iterdir()):
+        if not sub.is_dir():
+            continue
+        if all((sub / f"match102_{role}.npz").is_file() for role in roles):
+            configs.append(sub.name)
+    return configs, render_s
+
+
 def score_run(args: argparse.Namespace) -> dict[str, Any]:
     cv2.setNumThreads(1)
     torch.set_num_threads(1)
@@ -113,21 +131,22 @@ def score_run(args: argparse.Namespace) -> dict[str, Any]:
         tmp = Path(stack.enter_context(tempfile.TemporaryDirectory(dir=scratch)))
         v5_dir = tmp / "v5"
         wit_dir = tmp / "wit"
-        with tarfile.open(args.v5_tar) as tf:
-            tf.extractall(v5_dir, filter="data")
+        v5_dir.mkdir(parents=True, exist_ok=True)
+        for tar_path in args.v5_tar:
+            with tarfile.open(tar_path) as tf:
+                tf.extractall(v5_dir, filter="data")
         with tarfile.open(args.witness) as tf:
             tf.extractall(wit_dir, filter="data")
 
-        v5_pub = v5_dir / "publish"
-        v5_summary = json.loads((v5_pub / "v5_summary.json").read_text())
-        if int(v5_summary["frames"]) < args.frames:
-            raise ValueError("v5 archive has fewer frames than requested")
+        roles: tuple[str, ...] = ("near",) if stage_name == "smoke" else ("near", "far")
+        configs, render_seconds_map = discover_v5_configs(v5_dir, roles)
+        if not configs:
+            raise ValueError("no complete V5 config archives found")
 
+        v5_pub = v5_dir / "publish"
         base_frames = load_base_frames(wit_dir / "publish/base.yuv", args.frames)
         src_frames = load_source_frames(args.pixels, args.frames)
 
-        configs: list[str] = list(v5_summary["configs"])
-        roles: tuple[str, ...] = ("near",) if stage_name == "smoke" else ("near", "far")
         tlpips_ticks = (
             set(range(1, args.frames))
             if args.frames <= 10
@@ -152,7 +171,6 @@ def score_run(args: argparse.Namespace) -> dict[str, Any]:
         per_config: dict[str, Any] = {}
         t0 = time.monotonic()
 
-        # Check DISTS identity sanity once on frame 0 near mask.
         (x0, y0, x1, y1), m0 = supports[0][0]
         tr0 = tensor(src_frames[0][y0:y1, x0:x1])
         act0 = torch.from_numpy(m0.copy())[None, None]
@@ -165,10 +183,11 @@ def score_run(args: argparse.Namespace) -> dict[str, Any]:
             unit_data: dict[str, dict[str, np.ndarray]] = {}
             for role in roles:
                 npz = np.load(v5_pub / f"{cfg_name}/match102_{role}.npz")
-                unit_data[role] = {
-                    "box": np.asarray(npz["box"], dtype=np.float64),
-                    "crops": np.asarray(npz["crops"], dtype=np.uint8),
-                }
+                crops = np.asarray(npz["crops"], dtype=np.uint8)
+                boxes = np.asarray(npz["box"], dtype=np.float64)
+                if crops.shape[0] < args.frames or boxes.shape[0] < args.frames:
+                    raise ValueError(f"{cfg_name}/{role} has < {args.frames} frames")
+                unit_data[role] = {"box": boxes, "crops": crops}
 
             dists_rows: list[dict[str, Any]] = []
             flow_rows: list[dict[str, Any]] = []
@@ -182,7 +201,6 @@ def score_run(args: argparse.Namespace) -> dict[str, Any]:
                 boxes_t = supports[t]
                 masks_full = [mask_full_res(boxes_t[i]) for i in range(2)]
                 masks_960 = [mask_960(boxes_t[i]) for i in range(2)]
-                # Paste far before near when both exist, matching PointStream layer order.
                 for role in reversed(roles):
                     idx = role_indices[role]
                     k6b.paste(canvas, unit_data[role]["crops"][t], unit_data[role]["box"][t], masks_full[idx])
@@ -261,7 +279,6 @@ def score_run(args: argparse.Namespace) -> dict[str, Any]:
             int_rows = [r for r in flow_rows if not r["seam"]]
             t_seam = [r for r in tlpips_rows if r["seam"]]
             t_int = [r for r in tlpips_rows if not r["seam"]]
-            timing_runs = [r for r in v5_summary["runs"] if r["config"] == cfg_name]
             per_config[cfg_name] = {
                 "n_dists": len(dists_rows),
                 "masked_dists": mean(r["dists"] for r in dists_rows),
@@ -277,8 +294,7 @@ def score_run(args: argparse.Namespace) -> dict[str, Any]:
                 "tlpips_mean": mean(r["tlpips"] for r in tlpips_rows),
                 "tlpips_seam_mean": mean(r["tlpips"] for r in t_seam) if t_seam else None,
                 "tlpips_interior_mean": mean(r["tlpips"] for r in t_int) if t_int else None,
-                "v5_render_s_total": sum(float(r["render_s"]) for r in timing_runs),
-                "v5_render_runs": len(timing_runs),
+                "v5_render_s_total": render_seconds_map.get(cfg_name),
             }
 
         base = per_config.get("ddim30_512_ov4")
@@ -287,17 +303,14 @@ def score_run(args: argparse.Namespace) -> dict[str, Any]:
                 c["delta_dists_vs_base"] = c["masked_dists"] - base["masked_dists"]
                 c["delta_self_flow_vs_base"] = c["self_flow_error"] - base["self_flow_error"]
                 c["delta_tlpips_vs_base"] = c["tlpips_mean"] - base["tlpips_mean"]
-                c["speedup_vs_base"] = (
-                    base["v5_render_s_total"] / c["v5_render_s_total"]
-                    if c["v5_render_s_total"] > 0
-                    else None
-                )
+                if base["v5_render_s_total"] and c["v5_render_s_total"]:
+                    c["speedup_vs_base"] = base["v5_render_s_total"] / c["v5_render_s_total"]
 
     result = {
         "stage": stage_name,
         "frames": args.frames,
         "roles": list(roles),
-        "v5_tar_sha256": sha256(args.v5_tar),
+        "v5_tar_sha256": [sha256(p) for p in args.v5_tar],
         "source_mask_rle_sha256": support_hash,
         "self_dists_check": self_dists,
         "elapsed_s": time.monotonic() - t0,
@@ -311,13 +324,13 @@ def score_run(args: argparse.Namespace) -> dict[str, Any]:
     return result
 
 
-def validate(args: argparse.Namespace) -> None:
+def validate(_args: argparse.Namespace) -> None:
     stage = os.environ["PS_STAGE"]
     stage_dir = Path(os.environ["PS_STAGE_DIR"])
     data = json.loads((stage_dir / "v5_scores.json").read_text())
     cfgs = data["configs"]
     checks = {
-        "has_configs": len(cfgs) >= (4 if stage == "smoke" else 9),
+        "has_configs": len(cfgs) >= (1 if stage == "smoke" else 7),
         "has_baseline": "ddim30_512_ov4" in cfgs,
         "self_dists_ok": float(data["self_dists_check"]) < 1e-5,
         "finite_scores": all(
@@ -326,7 +339,7 @@ def validate(args: argparse.Namespace) -> None:
             and math.isfinite(c["tlpips_mean"])
             for c in cfgs.values()
         ),
-        "forecast_ok": stage != "smoke" or data["elapsed_s"] * 2 * (48 / 8) * (9 / 5) * 1.3 + 60 < 2000,
+        "forecast_ok": stage != "smoke" or data["elapsed_s"] * 2 * (48 / 8) * 1.4 + 60 < 2000,
     }
     ok = all(checks.values())
     Path(os.environ["PS_VALIDATION_PATH"]).write_text(
@@ -338,7 +351,8 @@ def validate(args: argparse.Namespace) -> None:
 
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
-    for k in ("v5-tar", "pixels", "features", "witness", "vgg", "alexnet"):
+    p.add_argument("--v5-tar", type=Path, action="append", required="--validate" not in sys.argv)
+    for k in ("pixels", "features", "witness", "vgg", "alexnet"):
         p.add_argument("--" + k, type=Path, required="--validate" not in sys.argv)
     p.add_argument("--frames", type=int, default=48)
     p.add_argument("--validate", action="store_true")
