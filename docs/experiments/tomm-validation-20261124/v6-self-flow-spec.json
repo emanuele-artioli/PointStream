@@ -76,7 +76,7 @@
     },
     {
       "name": "alexnet",
-      "path": "/home/itec/emanuele/Models/LPIPS/alexnet-owt-7be5be79.pth",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b1b-2026-10-21/inputs/alexnet-owt-7be5be79.pth",
       "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
       "extract": false
     }
@@ -111,7 +111,7 @@
       "sha256": "0c1fc468072ad67f2922e7ea7a81abb4aec1725bb916210c15224c407f0ccbda"
     },
     {
-      "path": "/home/itec/emanuele/Models/LPIPS/alexnet-owt-7be5be79.pth",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b1b-2026-10-21/inputs/alexnet-owt-7be5be79.pth",
       "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02"
     }
   ],

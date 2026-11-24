@@ -88,19 +88,19 @@
     },
     {
       "name": "dwpose_det",
-      "path": "/home/itec/emanuele/Models/DWPose/yolox_l.onnx",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/yolox_l.onnx",
       "sha256": "7860ae79de6c89a3c1eb72ae9a2756c0ccfbe04b7791bb5880afabd97855a411",
       "extract": false
     },
     {
       "name": "dwpose_pose",
-      "path": "/home/itec/emanuele/Models/DWPose/dw-ll_ucoco_384.onnx",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/dw-ll_ucoco_384.onnx",
       "sha256": "724f4ff2439ed61afb86fb8a1951ec39c6220682803b4a8bd4f598cd913b1843",
       "extract": false
     },
     {
       "name": "yolo26",
-      "path": "/home/itec/emanuele/Models/YOLO/yolo26x-pose.pt",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/assets/weights/yolo26x-pose.pt",
       "sha256": "08ed9e01d22a6f248b04f2f9992016aca9a32250b9ab57057d886a09d026700d",
       "extract": false
     }
@@ -139,15 +139,15 @@
       "sha256": "3ebc2e455509db026919f17c17d2bfce3eba899fd29a0888c47440b576a219af"
     },
     {
-      "path": "/home/itec/emanuele/Models/DWPose/yolox_l.onnx",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/yolox_l.onnx",
       "sha256": "7860ae79de6c89a3c1eb72ae9a2756c0ccfbe04b7791bb5880afabd97855a411"
     },
     {
-      "path": "/home/itec/emanuele/Models/DWPose/dw-ll_ucoco_384.onnx",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/dw-ll_ucoco_384.onnx",
       "sha256": "724f4ff2439ed61afb86fb8a1951ec39c6220682803b4a8bd4f598cd913b1843"
     },
     {
-      "path": "/home/itec/emanuele/Models/YOLO/yolo26x-pose.pt",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/assets/weights/yolo26x-pose.pt",
       "sha256": "08ed9e01d22a6f248b04f2f9992016aca9a32250b9ab57057d886a09d026700d"
     }
   ],

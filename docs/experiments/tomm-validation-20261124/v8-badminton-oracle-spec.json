@@ -22,24 +22,24 @@
   "staged_inputs": [
     {
       "name": "badminton_tar",
-      "path": "/home/itec/emanuele/Datasets/RacketVision/badminton.tar",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/badminton.tar",
       "sha256": "1442d215c8dc31787e2a60a290470f5c4072c8d5a2b594d4f853c8399da8ca30",
       "extract": false
     },
     {
       "name": "vgg",
-      "path": "/home/itec/emanuele/Models/DISTS/vgg16-397923af.pth",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b1b-2026-10-21/inputs/vgg16-397923af.pth",
       "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
       "extract": false
     }
   ],
   "inputs": [
     {
-      "path": "/home/itec/emanuele/Datasets/RacketVision/badminton.tar",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/tomm-validation-20261124/badminton.tar",
       "sha256": "1442d215c8dc31787e2a60a290470f5c4072c8d5a2b594d4f853c8399da8ca30"
     },
     {
-      "path": "/home/itec/emanuele/Models/DISTS/vgg16-397923af.pth",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b1b-2026-10-21/inputs/vgg16-397923af.pth",
       "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
     }
   ],
