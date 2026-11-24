@@ -1,0 +1,606 @@
+{
+  "counts_by_regime": {
+    "warm_20.4": {
+      "Conv": 5,
+      "Conv+Ball": 3,
+      "Full-Obj": 4
+    },
+    "warm_26.0": {
+      "Conv": 1,
+      "Conv+Ball": 6,
+      "Full-Obj": 5
+    },
+    "cold_26.0": {
+      "Conv": 1,
+      "Conv+Ball": 11,
+      "Full-Obj": 0
+    },
+    "cold_200.0": {
+      "Conv": 1,
+      "Conv+Ball": 7,
+      "Full-Obj": 4
+    }
+  },
+  "source_only_properties": [
+    "Zero access to decoded quality or DISTS oracle metrics",
+    "Pose-gap interpolation (max_gap <= 10, interior-only) recovers Munich match108 and Geneva match116 for Full-Obj eligibility",
+    "Cold start at 26 kbps cleanly falls back to Conv+Ball (on 11/12 court-eligible matches) instead of blowing the rate ceiling"
+  ],
+  "per_match": [
+    {
+      "match": "match108",
+      "event": "Munich 2024",
+      "fps": "25/1",
+      "court_ticks": 240,
+      "pose_status": "measured",
+      "raw_paired_ticks": 190,
+      "max_interior_gap": 10,
+      "visible_ball_marks": 50,
+      "conv_ball_min_kbps": 10.611666666666666,
+      "regimes": {
+        "warm_20.4": {
+          "mode": "Full-Obj",
+          "reason": "court_ok & interp_gap_le_10(max=10) & budget>=18.0kbps",
+          "ball_dists_improvement_over_same_res_av1": 0.008728189468383774
+        },
+        "warm_26.0": {
+          "mode": "Full-Obj",
+          "reason": "court_ok & interp_gap_le_10(max=10) & budget>=18.0kbps",
+          "ball_dists_improvement_over_same_res_av1": 0.008728189468383774
+        },
+        "cold_26.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=50 (budget<190.0kbps(cold))",
+          "ball_dists_improvement_over_same_res_av1": 0.008728189468383774
+        },
+        "cold_200.0": {
+          "mode": "Full-Obj",
+          "reason": "court_ok & interp_gap_le_10(max=10) & budget>=190.0kbps",
+          "ball_dists_improvement_over_same_res_av1": 0.008728189468383774
+        }
+      }
+    },
+    {
+      "match": "match102",
+      "event": "Shanghai 2023",
+      "fps": "30000/1001",
+      "court_ticks": 240,
+      "pose_status": "measured",
+      "raw_paired_ticks": 240,
+      "max_interior_gap": 0,
+      "visible_ball_marks": 40,
+      "conv_ball_min_kbps": 11.61238761238761,
+      "regimes": {
+        "warm_20.4": {
+          "mode": "Full-Obj",
+          "reason": "court_ok & paired_240 & budget>=18.0kbps",
+          "ball_dists_improvement_over_same_res_av1": 0.02072288095951083
+        },
+        "warm_26.0": {
+          "mode": "Full-Obj",
+          "reason": "court_ok & paired_240 & budget>=18.0kbps",
+          "ball_dists_improvement_over_same_res_av1": 0.02072288095951083
+        },
+        "cold_26.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=40 (budget<190.0kbps(cold))",
+          "ball_dists_improvement_over_same_res_av1": 0.02072288095951083
+        },
+        "cold_200.0": {
+          "mode": "Full-Obj",
+          "reason": "court_ok & paired_240 & budget>=190.0kbps",
+          "ball_dists_improvement_over_same_res_av1": 0.02072288095951083
+        }
+      }
+    },
+    {
+      "match": "match120",
+      "event": "Gstaad 2022",
+      "fps": "60/1",
+      "court_ticks": 240,
+      "pose_status": "measured",
+      "raw_paired_ticks": 176,
+      "max_interior_gap": 19,
+      "visible_ball_marks": 19,
+      "conv_ball_min_kbps": 24.494,
+      "regimes": {
+        "warm_20.4": {
+          "mode": "Conv",
+          "reason": "insufficient_ball_or_below_min_ball_rate",
+          "ball_dists_improvement_over_same_res_av1": null
+        },
+        "warm_26.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=19 (pose_gap>10_or_boundary)",
+          "ball_dists_improvement_over_same_res_av1": 0.009565023999465183
+        },
+        "cold_26.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=19 (pose_gap>10_or_boundary)",
+          "ball_dists_improvement_over_same_res_av1": 0.009565023999465183
+        },
+        "cold_200.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=19 (pose_gap>10_or_boundary)",
+          "ball_dists_improvement_over_same_res_av1": 0.009565023999465183
+        }
+      }
+    },
+    {
+      "match": "match127",
+      "event": "Sydney, ATP Cup 2022",
+      "fps": "60/1",
+      "court_ticks": 240,
+      "pose_status": "measured",
+      "raw_paired_ticks": 240,
+      "max_interior_gap": 0,
+      "visible_ball_marks": 20,
+      "conv_ball_min_kbps": 23.39,
+      "regimes": {
+        "warm_20.4": {
+          "mode": "Conv",
+          "reason": "insufficient_ball_or_below_min_ball_rate",
+          "ball_dists_improvement_over_same_res_av1": null
+        },
+        "warm_26.0": {
+          "mode": "Full-Obj",
+          "reason": "court_ok & paired_240 & budget>=26.0kbps",
+          "ball_dists_improvement_over_same_res_av1": 0.033423379063606234
+        },
+        "cold_26.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=20 (budget<325.0kbps(cold))",
+          "ball_dists_improvement_over_same_res_av1": 0.033423379063606234
+        },
+        "cold_200.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=20 (budget<325.0kbps(cold))",
+          "ball_dists_improvement_over_same_res_av1": 0.033423379063606234
+        }
+      }
+    },
+    {
+      "match": "match105",
+      "event": "Halle 2024",
+      "fps": "25/1",
+      "court_ticks": 240,
+      "pose_status": "measured",
+      "raw_paired_ticks": 240,
+      "max_interior_gap": 0,
+      "visible_ball_marks": 49,
+      "conv_ball_min_kbps": 9.980833333333333,
+      "regimes": {
+        "warm_20.4": {
+          "mode": "Full-Obj",
+          "reason": "court_ok & paired_240 & budget>=18.0kbps",
+          "ball_dists_improvement_over_same_res_av1": 0.022737402088788106
+        },
+        "warm_26.0": {
+          "mode": "Full-Obj",
+          "reason": "court_ok & paired_240 & budget>=18.0kbps",
+          "ball_dists_improvement_over_same_res_av1": 0.022737402088788106
+        },
+        "cold_26.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=49 (budget<190.0kbps(cold))",
+          "ball_dists_improvement_over_same_res_av1": 0.022737402088788106
+        },
+        "cold_200.0": {
+          "mode": "Full-Obj",
+          "reason": "court_ok & paired_240 & budget>=190.0kbps",
+          "ball_dists_improvement_over_same_res_av1": 0.022737402088788106
+        }
+      }
+    },
+    {
+      "match": "match116",
+      "event": "Geneva 2023",
+      "fps": "25/1",
+      "court_ticks": 240,
+      "pose_status": "measured",
+      "raw_paired_ticks": 223,
+      "max_interior_gap": 8,
+      "visible_ball_marks": 48,
+      "conv_ball_min_kbps": 10.0275,
+      "regimes": {
+        "warm_20.4": {
+          "mode": "Full-Obj",
+          "reason": "court_ok & interp_gap_le_10(max=8) & budget>=18.0kbps",
+          "ball_dists_improvement_over_same_res_av1": 0.010099388659000397
+        },
+        "warm_26.0": {
+          "mode": "Full-Obj",
+          "reason": "court_ok & interp_gap_le_10(max=8) & budget>=18.0kbps",
+          "ball_dists_improvement_over_same_res_av1": 0.010099388659000397
+        },
+        "cold_26.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=48 (budget<190.0kbps(cold))",
+          "ball_dists_improvement_over_same_res_av1": 0.010099388659000397
+        },
+        "cold_200.0": {
+          "mode": "Full-Obj",
+          "reason": "court_ok & interp_gap_le_10(max=8) & budget>=190.0kbps",
+          "ball_dists_improvement_over_same_res_av1": 0.010099388659000397
+        }
+      }
+    },
+    {
+      "match": "match107",
+      "event": "Miami 2024",
+      "fps": "60/1",
+      "court_ticks": 240,
+      "pose_status": "unmeasured",
+      "raw_paired_ticks": null,
+      "max_interior_gap": null,
+      "visible_ball_marks": 20,
+      "conv_ball_min_kbps": 24.314,
+      "regimes": {
+        "warm_20.4": {
+          "mode": "Conv",
+          "reason": "insufficient_ball_or_below_min_ball_rate",
+          "ball_dists_improvement_over_same_res_av1": null
+        },
+        "warm_26.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=20 (pose_gap>10_or_boundary)",
+          "ball_dists_improvement_over_same_res_av1": 0.0368191212415695
+        },
+        "cold_26.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=20 (pose_gap>10_or_boundary)",
+          "ball_dists_improvement_over_same_res_av1": 0.0368191212415695
+        },
+        "cold_200.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=20 (pose_gap>10_or_boundary)",
+          "ball_dists_improvement_over_same_res_av1": 0.0368191212415695
+        }
+      }
+    },
+    {
+      "match": "match131",
+      "event": "Acapulco 2024",
+      "fps": "25/1",
+      "court_ticks": 240,
+      "pose_status": "unmeasured",
+      "raw_paired_ticks": null,
+      "max_interior_gap": null,
+      "visible_ball_marks": 38,
+      "conv_ball_min_kbps": 10.86,
+      "regimes": {
+        "warm_20.4": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=38 (pose_gap>10_or_boundary)",
+          "ball_dists_improvement_over_same_res_av1": 0.022678119571585414
+        },
+        "warm_26.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=38 (pose_gap>10_or_boundary)",
+          "ball_dists_improvement_over_same_res_av1": 0.022678119571585414
+        },
+        "cold_26.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=38 (pose_gap>10_or_boundary)",
+          "ball_dists_improvement_over_same_res_av1": 0.022678119571585414
+        },
+        "cold_200.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=38 (pose_gap>10_or_boundary)",
+          "ball_dists_improvement_over_same_res_av1": 0.022678119571585414
+        }
+      }
+    },
+    {
+      "match": "match119",
+      "event": "Monte-Carlo 2024",
+      "fps": "60/1",
+      "court_ticks": 0,
+      "pose_status": "ordinary",
+      "raw_paired_ticks": 0,
+      "max_interior_gap": null,
+      "visible_ball_marks": 18,
+      "conv_ball_min_kbps": 22.444,
+      "regimes": {
+        "warm_20.4": {
+          "mode": "Conv",
+          "reason": "court_fit=0.000 < 0.80",
+          "ball_dists_improvement_over_same_res_av1": null
+        },
+        "warm_26.0": {
+          "mode": "Conv",
+          "reason": "court_fit=0.000 < 0.80",
+          "ball_dists_improvement_over_same_res_av1": null
+        },
+        "cold_26.0": {
+          "mode": "Conv",
+          "reason": "court_fit=0.000 < 0.80",
+          "ball_dists_improvement_over_same_res_av1": null
+        },
+        "cold_200.0": {
+          "mode": "Conv",
+          "reason": "court_fit=0.000 < 0.80",
+          "ball_dists_improvement_over_same_res_av1": null
+        }
+      }
+    },
+    {
+      "match": "match104",
+      "event": "Marseille 2020",
+      "fps": "60/1",
+      "court_ticks": 240,
+      "pose_status": "unmeasured",
+      "raw_paired_ticks": null,
+      "max_interior_gap": null,
+      "visible_ball_marks": 21,
+      "conv_ball_min_kbps": 23.406,
+      "regimes": {
+        "warm_20.4": {
+          "mode": "Conv",
+          "reason": "insufficient_ball_or_below_min_ball_rate",
+          "ball_dists_improvement_over_same_res_av1": null
+        },
+        "warm_26.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=21 (pose_gap>10_or_boundary)",
+          "ball_dists_improvement_over_same_res_av1": 0.006868141038077202
+        },
+        "cold_26.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=21 (pose_gap>10_or_boundary)",
+          "ball_dists_improvement_over_same_res_av1": 0.006868141038077202
+        },
+        "cold_200.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=21 (pose_gap>10_or_boundary)",
+          "ball_dists_improvement_over_same_res_av1": 0.006868141038077202
+        }
+      }
+    },
+    {
+      "match": "match130",
+      "event": "Queen's Club 2024",
+      "fps": "25/1",
+      "court_ticks": 240,
+      "pose_status": "unmeasured",
+      "raw_paired_ticks": null,
+      "max_interior_gap": null,
+      "visible_ball_marks": 40,
+      "conv_ball_min_kbps": 10.861666666666666,
+      "regimes": {
+        "warm_20.4": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=40 (pose_gap>10_or_boundary)",
+          "ball_dists_improvement_over_same_res_av1": 0.003592674434185039
+        },
+        "warm_26.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=40 (pose_gap>10_or_boundary)",
+          "ball_dists_improvement_over_same_res_av1": 0.003592674434185039
+        },
+        "cold_26.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=40 (pose_gap>10_or_boundary)",
+          "ball_dists_improvement_over_same_res_av1": 0.003592674434185039
+        },
+        "cold_200.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=40 (pose_gap>10_or_boundary)",
+          "ball_dists_improvement_over_same_res_av1": 0.003592674434185039
+        }
+      }
+    },
+    {
+      "match": "match126",
+      "event": "Lyon 2024",
+      "fps": "25/1",
+      "court_ticks": 240,
+      "pose_status": "unmeasured",
+      "raw_paired_ticks": null,
+      "max_interior_gap": null,
+      "visible_ball_marks": 39,
+      "conv_ball_min_kbps": 9.735833333333334,
+      "regimes": {
+        "warm_20.4": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=39 (pose_gap>10_or_boundary)",
+          "ball_dists_improvement_over_same_res_av1": 0.011032194663316786
+        },
+        "warm_26.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=39 (pose_gap>10_or_boundary)",
+          "ball_dists_improvement_over_same_res_av1": 0.011032194663316786
+        },
+        "cold_26.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=39 (pose_gap>10_or_boundary)",
+          "ball_dists_improvement_over_same_res_av1": 0.011032194663316786
+        },
+        "cold_200.0": {
+          "mode": "Conv+Ball",
+          "reason": "court_ok & ball_vis=39 (pose_gap>10_or_boundary)",
+          "ball_dists_improvement_over_same_res_av1": 0.011032194663316786
+        }
+      }
+    }
+  ],
+  "amortization_eq2": [
+    {
+      "name": "Shanghai match102 (joint-crf50, 30000/1001 fps)",
+      "duration_s": 8.008,
+      "running_bytes": 17794,
+      "init_bytes": 139463,
+      "warm_kbps": 17.77622377622378,
+      "cold_kbps": 157.0999000999001,
+      "points": [
+        {
+          "k_rallies": 1,
+          "active_seconds": 8.008,
+          "effective_bytes_per_rally": 157257.0,
+          "effective_kbps": 157.0999000999001,
+          "init_share": 0.8868476443020025
+        },
+        {
+          "k_rallies": 2,
+          "active_seconds": 16.016,
+          "effective_bytes_per_rally": 87525.5,
+          "effective_kbps": 87.43806193806194,
+          "init_share": 0.7966992476478284
+        },
+        {
+          "k_rallies": 5,
+          "active_seconds": 40.03999999999999,
+          "effective_bytes_per_rally": 45686.6,
+          "effective_kbps": 45.640959040959046,
+          "init_share": 0.6105203713999291
+        },
+        {
+          "k_rallies": 10,
+          "active_seconds": 80.07999999999998,
+          "effective_bytes_per_rally": 31740.3,
+          "effective_kbps": 31.70859140859141,
+          "init_share": 0.4393877814639433
+        },
+        {
+          "k_rallies": 20,
+          "active_seconds": 160.15999999999997,
+          "effective_bytes_per_rally": 24767.15,
+          "effective_kbps": 24.742407592407595,
+          "init_share": 0.28154834125040623
+        },
+        {
+          "k_rallies": 50,
+          "active_seconds": 400.4,
+          "effective_bytes_per_rally": 20583.260000000002,
+          "effective_kbps": 20.56269730269731,
+          "init_share": 0.13551109007999704
+        },
+        {
+          "k_rallies": 100,
+          "active_seconds": 800.8,
+          "effective_bytes_per_rally": 19188.63,
+          "effective_kbps": 19.16946053946054,
+          "init_share": 0.07268001936563476
+        }
+      ]
+    },
+    {
+      "name": "Sydney match127 (joint-crf70, 60 fps)",
+      "duration_s": 4.0,
+      "running_bytes": 12890,
+      "init_bytes": 149450,
+      "warm_kbps": 25.78,
+      "cold_kbps": 324.68,
+      "points": [
+        {
+          "k_rallies": 1,
+          "active_seconds": 4.0,
+          "effective_bytes_per_rally": 162340.0,
+          "effective_kbps": 324.68,
+          "init_share": 0.9205987433780953
+        },
+        {
+          "k_rallies": 2,
+          "active_seconds": 8.0,
+          "effective_bytes_per_rally": 87615.0,
+          "effective_kbps": 175.23,
+          "init_share": 0.8528790732180562
+        },
+        {
+          "k_rallies": 5,
+          "active_seconds": 20.0,
+          "effective_bytes_per_rally": 42780.0,
+          "effective_kbps": 85.56,
+          "init_share": 0.6986909770920992
+        },
+        {
+          "k_rallies": 10,
+          "active_seconds": 40.0,
+          "effective_bytes_per_rally": 27835.0,
+          "effective_kbps": 55.67,
+          "init_share": 0.536913957248069
+        },
+        {
+          "k_rallies": 20,
+          "active_seconds": 80.0,
+          "effective_bytes_per_rally": 20362.5,
+          "effective_kbps": 40.725,
+          "init_share": 0.3669736034376918
+        },
+        {
+          "k_rallies": 50,
+          "active_seconds": 200.0,
+          "effective_bytes_per_rally": 15879.0,
+          "effective_kbps": 31.758,
+          "init_share": 0.1882360350147994
+        },
+        {
+          "k_rallies": 100,
+          "active_seconds": 400.0,
+          "effective_bytes_per_rally": 14384.5,
+          "effective_kbps": 28.769,
+          "init_share": 0.10389655531996246
+        }
+      ]
+    },
+    {
+      "name": "Halle match105 (joint-crf50, 25 fps, sender verified; receiver pending)",
+      "duration_s": 9.6,
+      "running_bytes": 18319,
+      "init_bytes": 174384,
+      "warm_kbps": 15.265833333333333,
+      "cold_kbps": 160.58583333333334,
+      "points": [
+        {
+          "k_rallies": 1,
+          "active_seconds": 9.6,
+          "effective_bytes_per_rally": 192703.0,
+          "effective_kbps": 160.58583333333334,
+          "init_share": 0.9049366122997566
+        },
+        {
+          "k_rallies": 2,
+          "active_seconds": 19.2,
+          "effective_bytes_per_rally": 105511.0,
+          "effective_kbps": 87.92583333333333,
+          "init_share": 0.8263782923107543
+        },
+        {
+          "k_rallies": 5,
+          "active_seconds": 48.0,
+          "effective_bytes_per_rally": 53195.8,
+          "effective_kbps": 44.32983333333334,
+          "init_share": 0.655630707687449
+        },
+        {
+          "k_rallies": 10,
+          "active_seconds": 96.0,
+          "effective_bytes_per_rally": 35757.4,
+          "effective_kbps": 29.797833333333337,
+          "init_share": 0.48768646489957324
+        },
+        {
+          "k_rallies": 20,
+          "active_seconds": 192.0,
+          "effective_bytes_per_rally": 27038.2,
+          "effective_kbps": 22.531833333333335,
+          "init_share": 0.32247708797183244
+        },
+        {
+          "k_rallies": 50,
+          "active_seconds": 480.0,
+          "effective_bytes_per_rally": 21806.68,
+          "effective_kbps": 18.172233333333335,
+          "init_share": 0.1599363130930522
+        },
+        {
+          "k_rallies": 100,
+          "active_seconds": 960.0,
+          "effective_bytes_per_rally": 20062.84,
+          "effective_kbps": 16.719033333333336,
+          "init_share": 0.08691890081364352
+        }
+      ]
+    }
+  ]
+}

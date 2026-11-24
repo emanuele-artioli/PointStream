@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 from contextlib import ExitStack
+from fractions import Fraction
 import json
 import os
 from pathlib import Path
@@ -19,16 +20,19 @@ from ultralytics import YOLO
 
 from experiments.tennis import common_player_packet as packet
 from experiments.tennis.player_requalification import sha256
+from experiments.tennis.test_extension_native_score import select_arm
 from experiments.tennis.test_joint_native_motion import inputs as load_shanghai_arms
 from src.pointstream.tracked_patch import yuv_to_rgb
 
 CARD = Path(__file__).resolve().parents[2] / "docs/experiments/test-crop-joint-20261122"
+NATIVE_CARD = Path(__file__).resolve().parents[2] / "docs/experiments/test-joint-extension-20261122/native"
 sys.path.insert(0, str(CARD))
 from score_native import FPS, NT, StreamingYUV, get_support, prep  # noqa: E402
 
 YOLO26X_SHA256 = "08ed9e01d22a6f248b04f2f9992016aca9a32250b9ab57057d886a09d026700d"
 YOLO26L_SHA256 = "ad33da8a29ea5772318c4c980844e47b56792d2b63815ad4e8e09c078c7d1abf"
 CARRIER_SHA256 = "3ebc2e455509db026919f17c17d2bfce3eba899fd29a0888c47440b576a219af"
+SYDNEY_CARRIER_SHA256 = "a70a444b65f905285830a5fc2561e752708ac24ea0a5e02d538d85ac742dd99c"
 
 COCO_SIGMAS = np.array(
     [0.026, 0.025, 0.025, 0.035, 0.035, 0.079, 0.079, 0.072, 0.072, 0.062, 0.062, 0.107, 0.107, 0.087, 0.087, 0.089, 0.089],
@@ -150,6 +154,71 @@ def tight_box(mask: np.ndarray, offset: tuple[int, int]) -> tuple[int, int, int,
     return (int(xs.min()) + x0, int(ys.min()) + y0, int(xs.max()) + x0 + 1, int(ys.max()) + y0 + 1)
 
 
+def load_event_arms(args: argparse.Namespace) -> tuple[list[dict[str, Any]], list[tuple[Any, Any]], Fraction]:
+    """Load matched arms, player support masks, and FPS for Shanghai or an extension event."""
+    arms: list[dict[str, Any]] = []
+    if args.event == "match102":
+        arms_path = load_shanghai_arms(args)
+        arms = json.loads(arms_path.read_text())
+        supports, _ = get_support(args.features)
+        return arms, supports, FPS
+
+    b = json.loads((NATIVE_CARD / f"{args.event}-binding.json").read_text())
+    receipts = NATIVE_CARD / f"{args.event}-crop-receipt.json"
+    bank = NATIVE_CARD.parents[1] / "cohort-expansion-20261122/test-physical"
+    fps = Fraction(b["fps"])
+    supports, _ = get_support(
+        args.features,
+        receipt=receipts,
+        tracks=[b["roles"]["near"], b["roles"]["far"]],
+    )
+    specs = [
+        (args.ordinary_arm, args.ordinary, args.ordinary_report_sha256, None),
+        (args.neural_arm, args.neural, args.neural_report_sha256, None),
+        (args.joint_arm, args.witness, None, args.sender),
+    ]
+    for arm_name, data_path, rep_sha, sender_path in specs:
+        ns = argparse.Namespace(
+            event=args.event,
+            arm=arm_name,
+            data=data_path,
+            report_sha256=rep_sha,
+            sender=sender_path,
+            receipt=None,
+        )
+        arms.append(select_arm(ns, b, bank))
+
+    if args.roi is not None:
+        if args.roi_arm == "roi-320-floor":
+            sec = json.loads((NATIVE_CARD / "full-confirmation-20261123/secondary-physical-roi.json").read_text())
+            row = next(r for r in sec["rows"] if r["label"] == "roi-320-floor")
+            arms.append(
+                dict(
+                    name="roi-320-floor",
+                    kind="ivf_tar",
+                    width=320,
+                    height=192,
+                    bytes=row["roi_bytes"],
+                    archive=str(args.roi),
+                    member="publish/q280.ivf",
+                    sha256=row["roi_sha256"],
+                    decoded_sha256=row["roi_decoded_sha256"],
+                )
+            )
+        else:
+            ns_roi = argparse.Namespace(
+                event=args.event,
+                arm=args.roi_arm,
+                data=args.roi,
+                report_sha256=args.roi_report_sha256,
+                sender=None,
+                receipt=None,
+            )
+            arms.append(select_arm(ns_roi, b, bank))
+
+    return arms, supports, fps
+
+
 def run_eval(args: argparse.Namespace) -> dict[str, Any]:
     cv2.setNumThreads(1)
     stage = Path(os.environ["PS_STAGE_DIR"])
@@ -158,17 +227,18 @@ def run_eval(args: argparse.Namespace) -> dict[str, Any]:
     if args.frames != expected:
         raise ValueError(f"frames={args.frames} mismatches stage {os.environ['PS_STAGE']} ({expected})")
 
+    expected_carrier_sha = args.carrier_sha256
+    if args.event == "match127" and expected_carrier_sha == CARRIER_SHA256:
+        expected_carrier_sha = SYDNEY_CARRIER_SHA256
     for path, h in (
         (args.yolo26x, YOLO26X_SHA256),
         (args.yolo26l, YOLO26L_SHA256),
-        (args.carrier, CARRIER_SHA256),
+        (args.carrier, expected_carrier_sha),
     ):
         if sha256(path) != h:
             raise ValueError(f"hash mismatch for {path}")
 
-    arms_path = load_shanghai_arms(args)
-    arms = json.loads(arms_path.read_text())
-    supports, _ = get_support(args.features)
+    arms, supports, fps = load_event_arms(args)
 
     carrier_bytes = args.carrier.read_bytes()
     t_parse0 = time.perf_counter()
@@ -176,8 +246,8 @@ def run_eval(args: argparse.Namespace) -> dict[str, Any]:
         _, _, decoded_packet = packet.unpack(carrier_bytes)
     parse_ms_total = (time.perf_counter() - t_parse0) * 1000.0 / 30.0
     paid_kps = {
-        "near": np.asarray(decoded_packet["match102_near"][0]["kp"], dtype=np.float32),
-        "far": np.asarray(decoded_packet["match102_far"][0]["kp"], dtype=np.float32),
+        "near": np.asarray(decoded_packet[f"{args.event}_near"][0]["kp"], dtype=np.float32),
+        "far": np.asarray(decoded_packet[f"{args.event}_far"][0]["kp"], dtype=np.float32),
     }
 
     yolo26x = YOLO(str(args.yolo26x))
@@ -187,7 +257,8 @@ def run_eval(args: argparse.Namespace) -> dict[str, Any]:
     if len(ticks) != expected:
         ticks = list(range(0, NT, max(1, NT // expected)))[:expected]
 
-    cap = cv2.VideoCapture(str(args.pixels), cv2.CAP_FFMPEG)
+    pixels_path = args.pixels if args.pixels is not None else args.source
+    cap = cv2.VideoCapture(str(pixels_path), cv2.CAP_FFMPEG)
     arm_names = [r["name"] for r in arms] + ["direct_joints"]
     records_full: dict[str, list[dict[str, Any]]] = {n: [] for n in arm_names}
     records_crop: dict[str, list[dict[str, Any]]] = {n: [] for n in arm_names}
@@ -200,7 +271,7 @@ def run_eval(args: argparse.Namespace) -> dict[str, Any]:
         for r in arms:
             work = Path(scope.enter_context(tempfile.TemporaryDirectory(dir=scratch)))
             images[r["name"]] = prep(
-                argparse.Namespace(source=args.source, source_pixels=args.pixels, frames=NT, fps=FPS),
+                argparse.Namespace(source=args.source, source_pixels=pixels_path, frames=NT, fps=fps),
                 r,
                 work,
             )[0]
@@ -298,6 +369,7 @@ def run_eval(args: argparse.Namespace) -> dict[str, Any]:
         for name, rows in records_crop.items()
     }
     out = {
+        "event": args.event,
         "frames_evaluated": len(ticks),
         "ticks": ticks,
         "source_yolo26x_vs_yolo26l": agg(source_agreement),
@@ -334,6 +406,7 @@ def validate(args: argparse.Namespace) -> None:
                     "source_agreement_pck02": agree["pck_02"],
                     "observations": n_obs,
                 },
+                "event": data.get("event", "match102"),
                 "timing": data["timing"],
                 "summary_full_frame": data["summary_full_frame"],
                 "summary_topdown_crop": data["summary_topdown_crop"],
@@ -348,10 +421,8 @@ def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     for k in (
         "source",
-        "pixels",
         "features",
         "ordinary",
-        "roi",
         "neural",
         "witness",
         "carrier",
@@ -359,6 +430,18 @@ def main() -> None:
         "yolo26l",
     ):
         p.add_argument("--" + k, type=Path, required=True)
+    p.add_argument("--pixels", type=Path)
+    p.add_argument("--roi", type=Path)
+    p.add_argument("--sender", type=Path)
+    p.add_argument("--event", choices=("match102", "match127", "match105"), default="match102")
+    p.add_argument("--carrier-sha256", default=CARRIER_SHA256)
+    p.add_argument("--ordinary-arm", default="ordinary-320-warm")
+    p.add_argument("--roi-arm", default="roi-320-floor")
+    p.add_argument("--neural-arm", default="dcvc-480-q26")
+    p.add_argument("--joint-arm", default="joint-crf70")
+    p.add_argument("--ordinary-report-sha256")
+    p.add_argument("--roi-report-sha256")
+    p.add_argument("--neural-report-sha256")
     p.add_argument("--frames", type=int, choices=(4, 48), required=True)
     p.add_argument("--validate", action="store_true")
     if sys.argv[1:] == ["--validate"]:
