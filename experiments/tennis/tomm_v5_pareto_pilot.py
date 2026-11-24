@@ -283,7 +283,8 @@ def run_pilot(args: argparse.Namespace) -> None:
     ))
 
     _, _, decoded = packet.unpack(args.carrier.read_bytes())
-    units = ["match102_near"] if stage_name == "smoke" else ["match102_near", "match102_far"]
+    requested_units = [u.strip() for u in args.units.split(",") if u.strip()]
+    units = [requested_units[0]] if stage_name == "smoke" else requested_units
     selected_cfgs = [c for c in CONFIGS if stage_name != "smoke" or c.name in SMOKE_CONFIGS]
     if args.configs:
         wanted = set(args.configs.split(","))
@@ -394,6 +395,7 @@ def main() -> None:
     p.add_argument("--weight", type=Path, action="append", required=True)
     p.add_argument("--frames", type=int, choices=(8, 48), required=True)
     p.add_argument("--configs", default="")
+    p.add_argument("--units", default="match102_near,match102_far")
     p.add_argument("--mode", choices=("pareto", "timing"), default="pareto")
     p.add_argument("--validate", action="store_true")
     if sys.argv[1:] == ["--validate"]:

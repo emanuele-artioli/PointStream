@@ -73,3 +73,38 @@ V3 campus inventory verified on `gpu1.itec.aau.at`.
 
 - **Data-Hygiene Catch (`match102_000`):** 5/6 clips show normal sub-2-px quantization parity (`max_quant_err_src_px <= 1.40 px`), whereas `match102_000` contains an out-of-frame raw CSV label that was clamped during quantization (`151.00 px`), dropping `psnr64_db` from `20.88 dB` to `18.80 dB`. Excluding `match102_000`, `4/5` clean clips still win cleanly (with the 5th clip `match125_000` at `+0.000075` DISTS while saving 241 bytes and beating its own `same_base` CRF 67.0 `0.2366 -> 0.2307`).
 - **Conclusion (Gate Passed `5/6 >= 4/6`):** Greenlights **Track A4** (MIT RacketVision Badminton + Table Tennis transfer study in Week 2), with raw CSV bounds sanitization added upfront so out-of-frame ground-truth labels are filtered/flagged cleanly before encoding or scoring.
+
+---
+
+## Wave 1–3 Overnight Execution & Final Receipts (2026-11-24 / 2026-11-25)
+
+### V5 — Nine-Configuration Speed–Quality Pareto & Stabilization Study (`tomm_v5_pareto_pilot.py`, `tomm_v5_score.py`)
+- **GPU Jobs:**
+  - `20261124T112219Z-fe23784a` (`gpu6` RTX 6000 Ada, shared, `partial.tar` sha256 `0943b0216e06a2b45bc356c723053844dad7ed921255e119986253e0256fe1ca`; ~0.67 GPU-h): completed all 7 Pareto configs across `match102_near` & `match102_far` (48 frames each = 96 observations).
+  - `20261124T121722Z-89fd9610` (`gpu6` RTX 6000 Ada, COMPLETE, `published.tar` sha256 `de6d27b2e21452b31b830f49ce6818df9aa501afef5b459a0017d70c49b1e575`; ~0.25 GPU-h, `timing_contaminated: true`): [v5-stab-summary.json](v5-stab-summary.json) recorded `ddim30_512_ov4` `674.47 s` (`353.47 + 321.00`), `dpm10_512_ov8_smooth` `206.51 s` (`76.04 + 130.47`, **`3.27×` faster**), `dpm10_512_ov8_smooth_corr05` `208.32 s` (`77.50 + 130.82`, `3.24×` faster).
+  - Exclusive timing spec (`v5-timing-exclusive-spec.json`, using new `--units` flag in `experiments/tennis/tomm_v5_pareto_pilot.py`) was prepared and validated (`ruff`), but not submitted because all Ada/A6000 hosts (`gpu2`, `gpu3`, `gpu5`, `gpu6`) remained continuously occupied by foreign GPU compute processes; shared Ada runtimes + exact step NFE ratios are reported transparently.
+- **CPU Scorer Jobs:**
+  - `20261124T122451Z-30419ed5` (COMPLETE on `gpu3`, 7-config interim score).
+  - `20261124T210801Z-0ab311f9` (COMPLETE on `gpu1`, `571.99 s` scoring / `12.3 min` total) -> [v5-pareto-scores.json](v5-pareto-scores.json) (all 9 configs scored uniformly on `n_dists=96`, `n_flow=94`, `tlpips_n=22`):
+
+| Configuration | Masked DISTS | Masked PSNR (dB) | `self_flow_error` | Seam / Interior `self_flow` | `tLPIPS` Mean | `tLPIPS` Seam / Interior | Speedup / Ada Wall Time |
+|---|---:|---:|---:|---:|---:|---:|---|
+| `ddim30_512_ov4` (base) | `0.3032` | `12.87` | `17.45` | `17.46 / 17.45` | `0.0593` | `0.0792 / 0.0549` | `1.00×` (`674.47 s*`) |
+| `dpm15_512_ov4` | `0.3036` | `12.80` | `17.96` | `17.66 / 18.04` | `0.0580` | `0.0767 / 0.0538` | `2.0×` NFE |
+| `dpm10_512_ov4` | `0.3035` | `12.88` | `17.69` | `17.67 / 17.69` | `0.0586` | `0.0757 / 0.0547` | `3.0×` NFE |
+| `unipc10_512_ov4` | `0.3053` | `12.87` | `17.62` | `17.77 / 17.58` | `0.0598` | `0.0776 / 0.0558` | `3.0×` NFE |
+| `dpm6_512_ov4` | `0.3075` | `13.09` | `16.87` | `16.93 / 16.85` | `0.0555` | `0.0706 / 0.0522` | `5.0×` NFE |
+| `dpm10_384_ov4` | `0.3109` | `12.85` | `15.81` | `16.41 / 15.65` | `0.0553` | `0.0767 / 0.0505` | `3.0×` NFE, `0.54×` px |
+| `dpm10_256_ov4` | `0.3329` | `12.04` | `15.53` | `17.58 / 14.97` | `0.0632` | `0.0944 / 0.0563` | `3.0×` NFE, `0.24×` px |
+| `dpm10_512_ov8_smooth` | `0.3041` | `12.92` | `17.51` | `17.20 / 17.59` | `0.0571` | **`0.0596`** / `0.0566` | **`3.27×`** (`206.51 s*`) |
+| `dpm10_512_ov8_smooth_corr05` | `0.5610` | `6.67` | `36.54` | `34.68 / 37.04` | `0.0663` | `0.0744 / 0.0645` | `3.24×` (`208.32 s*`) |
+
+- **Takeaways:** `dpm10_512_ov8_smooth` achieves **`3.27×` speedup** within `+0.0009` DISTS while cutting chunk-boundary `tLPIPS` seams by **`24.8%`** (`0.0792 -> 0.0596`, shrinking the seam-over-interior jump from `+44.3%` to `+5.3%`); `dpm6_512_ov4` reaches `5×` NFE reduction within `+0.0043` DISTS; naive correlated initial noise (`corr05`) degrades fidelity (`0.5610` DISTS).
+
+### Track A1 / Halle / A3 / A4 / A6 Completion Receipts
+- **A1.2 Unmeasured TEST Court Audit (`20261124T112632Z-9732c726`, COMPLETE on `gpu5`):** `published.tar` sha256 `281a9f82dfb3d9fc1ac1c3295398466288a2aa05fa8425986a34e629f25fc66e` -> [a1-unmeasured-courts.json](a1-unmeasured-courts.json): **5/5 `court_eligible: True`** (`match107` 240/240 @ 60 fps, `match131` 228/240 @ 25 fps, `match104` 240/240 @ 60 fps, `match130` 240/240 @ 25 fps, `match126` 197/240 @ 25 fps). Companion `test_joint_features` attempts on `match107`/`match131` (`20261124T120458Z-672328b9`, `20261124T120746Z-9fe8835f`, `20261124T121814Z-3fbcbf68`) OOMed below `>= 26 GiB` (`sam3.1_multiplex.pt` peak `~24.8 GiB`).
+- **Halle `match105` Status:** Sender verified (`20261123T115652Z-1c5a006d`) & far player generated (`20261123T120635Z-5a1a9720`); both near-player exclusive runs (`20261124T112312Z-7c3f01bf` & `20261124T210849Z-924b8f4b` on `gpu3`) hit `terminal:contended` from foreign GPU processes, so near-player generation was deferred and Halle is documented accurately as sender-verified/far-generated.
+- **A3.1 Sydney `match127` Pose Machine Task (`20261124T095725Z-43f16084`, COMPLETE):** [a3-sydney-pose-machine-summary.json](a3-sydney-pose-machine-summary.json): `YOLO26x-pose` gets `0.000` recall (`ordinary-320-warm`, `roi-320-floor`), `0.4896` (`dcvc-480-q26`: `0.9792` near, `0.000` far, `0.4045` OKS), `0.7917` (`joint-crf70`: `1.000` near, `0.5833` far, `0.7315` OKS), vs. direct `PSCP` **`1.000` recall**, **`0.9527` PCK@0.1**, **`0.9164` OKS** in `104.0 ms` CPU (vs. `3.74 s` full-frame `YOLO26x-pose`).
+- **A4.1 Multi-Sport 24-Clip Transfer (`20261124T095801Z-9c00d626`, `20261124T112406Z-8ee77f9e`, COMPLETE):** [a4-badminton-12.json](a4-badminton-12.json) (`11/12` wins vs. both AV1 same-res & best; `0.24175` vs. `0.25080` / `0.26048` DISTS64; `21.684` vs. `21.310` dB) and [a4-tabletennis-12.json](a4-tabletennis-12.json) (`12/12` vs. same-res, `10/12` vs. best; `0.29387` vs. `0.30930` / `0.31278` DISTS64; `20.296` vs. `20.000` dB), zero out-of-bounds failures.
+- **A6 Mode Selector & Amortization:** [a6-mode-selector-amortization.json](a6-mode-selector-amortization.json) (`warm_20.4`: 5 Conv / 3 Conv+Ball / 4 Full-Obj; `warm_26.0`: 1 / 6 / 5; `cold_26.0`: 1 / 11 / 0).
+- **Cumulative GPU Budget Ledger:** ~1.6 GPU-h spent against `6.0 GPU-h` cap (~0.67 V5 partial + ~0.25 V5-stab + ~0.2 Halle contended + ~0.48 prior smokes/tests).
