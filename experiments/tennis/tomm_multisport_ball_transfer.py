@@ -337,7 +337,8 @@ def eval_clip(
         raise ValueError("PSBL roundtrip mismatch")
     velocity = ball.velocities(dec_centers)
 
-    target_bytes = round(Fraction(int(TARGET_KBPS * 1000) * n_frames, 8) / fps)
+    target_kbps = 35.0 if float(fps) >= 45.0 else TARGET_KBPS
+    target_bytes = round(Fraction(int(target_kbps * 1000) * n_frames, 8) / fps)
     searches = {}
     for w, h in ((320, 180), (640, 360)):
         searches[w] = encode_search(w, h, raw_rgb, fps, n_frames, payload, target_bytes, tools, clip_dir)
@@ -345,7 +346,12 @@ def eval_clip(
     all_ord = [pt for res in searches.values() for pt in res["bank"].values() if pt["bytes"] <= target_bytes]
     all_ps = [pt for res in searches.values() for pt in res["bank"].values() if pt["ball_bytes"] <= target_bytes]
     if not all_ord or not all_ps:
-        raise RuntimeError(f"no affordable encode under {target_bytes} bytes for {clip['clip_id']}")
+        # Fallback to 256x144 when 320x180 exceeds starved target (e.g. high-fps complex court cuts)
+        searches[256] = encode_search(256, 144, raw_rgb, fps, n_frames, payload, target_bytes, tools, clip_dir)
+        all_ord = [pt for res in searches.values() for pt in res["bank"].values() if pt["bytes"] <= target_bytes]
+        all_ps = [pt for res in searches.values() for pt in res["bank"].values() if pt["ball_bytes"] <= target_bytes]
+    if not all_ord or not all_ps:
+        raise RuntimeError(f"no affordable encode under {target_bytes} bytes ({target_kbps} kbps) for {clip['clip_id']}")
 
     same_res_pairs = []
     for res in searches.values():
@@ -445,6 +451,7 @@ def eval_clip(
         "visible_marks": len(vis_ticks),
         "sanitized_out_of_bounds_count": len(oob_rows),
         "sanitized_out_of_bounds_samples": oob_rows[:5],
+        "target_kbps": target_kbps,
         "target_bytes": target_bytes,
         "payload_bytes": len(payload),
         "max_quant_err_src_px": max_quant_err_px,

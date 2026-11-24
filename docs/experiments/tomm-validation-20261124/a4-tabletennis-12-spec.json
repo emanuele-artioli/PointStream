@@ -50,7 +50,7 @@
     "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
   },
   "required_commands": [],
-  "deadline": "2026-11-24T15:53:28Z",
+  "deadline": "2026-11-24T20:00:00Z",
   "verify_staged_inputs": true,
   "hosts": [
     "gpu1",

@@ -34,7 +34,7 @@
     "--run-length",
     "240",
     "--smoke-frames",
-    "64",
+    "44",
     "--deny",
     "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match105-000-a518fd085078.mp4",
     "--deny",
@@ -48,11 +48,11 @@
   ],
   "budget_seconds": 3450,
   "contention": {
-    "policy": "continue",
-    "basis": "Halle match105_near renders pixel crops for quality and pose-task evaluation; wall time is not used as speed evidence"
+    "policy": "stop",
+    "resume_attempts": 0
   },
   "cpu_threads": 1,
-  "deadline": "2026-11-24T15:49:01Z",
+  "deadline": "2026-11-24T21:12:12Z",
   "entrypoint": [
     "-m",
     "experiments.tennis.common_receiver_job"
@@ -64,15 +64,13 @@
   "full": {
     "seconds": 2680
   },
-  "gpu_memory_mib": 16000,
+  "gpu_memory_mib": 18000,
   "gpu_models": [
     "RTX 6000 Ada",
     "RTX A6000"
   ],
   "gpu_sharing": {
-    "mode": "shared",
-    "basis": "Halle match105_near renders pixel crops for quality and pose-task evaluation; wall time is not used as speed evidence",
-    "margin_mib": 4096
+    "mode": "exclusive"
   },
   "hosts": [
     "gpu2",
@@ -130,7 +128,7 @@
   "required_commands": [],
   "scale": {
     "ticks": {
-      "smoke": 64,
+      "smoke": 44,
       "full": 240
     }
   },

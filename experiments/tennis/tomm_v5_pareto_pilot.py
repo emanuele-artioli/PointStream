@@ -21,7 +21,7 @@ from experiments.tennis import k6b
 from experiments.tennis import k6b_generate as gen_mod
 
 CARRIER_SHA256 = "3ebc2e455509db026919f17c17d2bfce3eba899fd29a0888c47440b576a219af"
-FIT_SHA256 = "075b001a3ae9dcc9fdda9fb81e4240aaf3a9da228d707ac58733db094d983285"
+FIT_SHA256 = "85e3c65c9777b799f9ed0df3a5c8da567fe8a92e4ac83d115719527acb739eb4"
 
 
 @dataclass(frozen=True)
