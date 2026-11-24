@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/local/users/emanuele/pointstream/sources/20261123T235003Z-c4aac63c/experiments/tennis/cohort_ball_metric_suite.py", line 168, in <module>
+    validate() if args.validate else run(args)
+                                     ^^^^^^^^^
+  File "/local/users/emanuele/pointstream/sources/20261123T235003Z-c4aac63c/experiments/tennis/cohort_ball_metric_suite.py", line 107, in run
+    assert abs(identity["luma_ssim"] - 1) < 2e-6, identity
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'lpips': 0.0, 'luma_ssim': 0.9999953508377075, 'rgb_mse': 0.0}

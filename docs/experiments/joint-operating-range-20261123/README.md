@@ -25,3 +25,7 @@ The exclusive neural control `20261123T115906Z-88158745` stopped before encoding
 The ROI bank also lacks adequate mid-rate coverage. Reuse the native 640-wide +40-outside map and hold the source-mask, transmitted-ball and time supports fixed. Target 90/120/140 kbps with the same three ceilings as the full-HD ordinary job. Admit only physically sent ROI streams whose same-CRF no-ROI twin confirms that the allocated map changes the decoded luma. One registered job, up to 21 campus CPU-minutes and no GPU.
 
 The 640-wide ROI job is `20261123T120820Z-35db68b8`. [Submission receipt](shanghai-roi-640-registration.json)
+
+## Native-control scores and metric cross-check
+
+Both control jobs reached full validation. The six real 29.97-fps controls use the same twelve source instants. The full-HD AV1 control was recovered as paid IVF files and locally decoded by dav1d. All 240 decoded YUV frame bytes agree with the saved campus digest for each file. The ROI scores are extracted from the verified full decoded archive. Both paths retain source hashes, native comparator speed/profile and actual packet bytes. For the nearby rate switches, rescore the ordinary 89.34 and 118.90 kbps controls and the 118.75 kbps ROI on those same decoded frames with the existing LPIPS, luma SSIM, RGB PSNR and complementary background mask. This asks whether the first foreground DISTS reversal also changes spatial metric ranking. One CPU run under the existing five-minute matched-metric cap. This does not measure temporal agreement at the wider rates.

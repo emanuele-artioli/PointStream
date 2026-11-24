@@ -1,0 +1,79 @@
+{
+  "job_id": "20261123T235736Z-85f18cf3",
+  "status": "pending",
+  "config": {
+    "schema": 1,
+    "hosts": [
+      "gpu1",
+      "gpu2",
+      "gpu3",
+      "gpu4",
+      "gpu5",
+      "gpu6"
+    ],
+    "base": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet",
+    "release": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261121T212706Z-c60133f5",
+    "pythons": {
+      "gpu1": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+      "gpu2": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+      "gpu3": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+      "gpu4": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+      "gpu5": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+      "gpu6": "/home/itec/emanuele/.conda/envs/pointstream/bin/python"
+    },
+    "doctor": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/d4fb2738c08643839322edf1bf9d0eb8",
+    "management_host": "gpu2",
+    "management_python": "/usr/bin/python3"
+  },
+  "spec_sha256": "318037f664cb9c749f55313f476215fcb5bc88af595e3e6ed33aa394b1c39ae5",
+  "snapshot": {
+    "git_head": "a8e7172cb42aecb9b8d5063cfe1391f186a93e64",
+    "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tracked_changes_included": [],
+    "tracked_changes_excluded": [
+      "docs/experiments/joint-operating-range-20261123/README.md"
+    ],
+    "included_untracked_sha256": {},
+    "untracked_excluded_count": 1,
+    "untracked_excluded_paths_sha256": "9695fb5ceffd3de51937da39d736433a70df7be6b922ab2c675c84f7cb6c5dd1",
+    "untracked_excluded_sample": [
+      "docs/experiments/joint-operating-range-20261123/rescore_anchors.py"
+    ],
+    "deleted_paths": [],
+    "snapshot_sha256": "69ddf3200d94f04263f0c3c37724250872d7ca8905d7477233cedd7bc6756fff"
+  },
+  "chat_id": "",
+  "source_archive": true,
+  "source_sha256": "d5ee50e0a8a77d510a0ea164676e5096c788556764625647baa7acc4417b811a",
+  "input_check": {
+    "hashed": [
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match104.json",
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match104-000-e31b2cb84681.csv",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T114943Z-d37cf721/full/scores.json",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T114517Z-c2a832c9/full/published.tar",
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match104-000-aa0eea258179.mp4"
+    ],
+    "deferred": [
+      "/home/itec/emanuele/Datasets/pointstream-data/visor/h3-2026-10-10/inputs/lpips/alexnet-owt-7be5be79.pth",
+      "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz"
+    ],
+    "deferred_bytes": 5734654073,
+    "deferred_to": "campaign"
+  },
+  "monitoring": {
+    "chat_id": "",
+    "events_command": "/private/tmp/ps-overnight-figures-20261123/scripts/ps-fleet events 20261123T235736Z-85f18cf3",
+    "wait_command": [
+      "/private/tmp/ps-overnight-figures-20261123/scripts/ps-fleet",
+      "wait",
+      "20261123T235736Z-85f18cf3",
+      "--max-seconds",
+      "2700"
+    ],
+    "mode": "completion_first",
+    "watchdog_seconds": 2700,
+    "heartbeat_required": false,
+    "recurring_polling": false
+  }
+}
