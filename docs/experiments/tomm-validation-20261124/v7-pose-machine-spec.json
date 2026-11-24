@@ -168,19 +168,19 @@
   ],
   "gpu_models": [],
   "gpu_memory_mib": 0,
-  "cpu_threads": 4,
+  "cpu_threads": 1,
   "single_cpu_campaign": true,
   "local_storage_gib": 28,
   "smoke": {
-    "seconds": 180,
+    "seconds": 240,
     "representative_basis": "4 uniformly spaced Shanghai frames verifying DWPose vs YOLO26x source agreement >=0.70 PCK@0.2 plus all 4 decoded arms and direct paid joints."
   },
   "full": {
-    "seconds": 540
+    "seconds": 1200
   },
   "validator_seconds": 30,
-  "budget_seconds": 750,
-  "stall_seconds": 540,
+  "budget_seconds": 1500,
+  "stall_seconds": 600,
   "scale": {
     "frames": {
       "smoke": 4,
