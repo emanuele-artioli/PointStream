@@ -52,7 +52,7 @@
     "resume_attempts": 0
   },
   "cpu_threads": 1,
-  "deadline": "2026-11-24T21:12:12Z",
+  "deadline": "2026-11-25T05:00:00Z",
   "entrypoint": [
     "-m",
     "experiments.tennis.common_receiver_job"

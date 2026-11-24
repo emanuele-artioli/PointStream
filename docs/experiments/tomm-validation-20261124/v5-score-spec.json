@@ -14,6 +14,8 @@
   "arguments": [
     "--v5-tar",
     "{staged:v5_tar}",
+    "--v5-tar",
+    "{staged:v5_stab_tar}",
     "--pixels",
     "{staged:pixels}",
     "--features",
@@ -32,6 +34,12 @@
       "name": "v5_tar",
       "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261124T112219Z-fe23784a/full/partial.tar",
       "sha256": "0943b0216e06a2b45bc356c723053844dad7ed921255e119986253e0256fe1ca",
+      "extract": false
+    },
+    {
+      "name": "v5_stab_tar",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261124T121722Z-89fd9610/full/published.tar",
+      "sha256": "de6d27b2e21452b31b830f49ce6818df9aa501afef5b459a0017d70c49b1e575",
       "extract": false
     },
     {
@@ -71,6 +79,10 @@
       "sha256": "0943b0216e06a2b45bc356c723053844dad7ed921255e119986253e0256fe1ca"
     },
     {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261124T121722Z-89fd9610/full/published.tar",
+      "sha256": "de6d27b2e21452b31b830f49ce6818df9aa501afef5b459a0017d70c49b1e575"
+    },
+    {
       "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/rv102-rgb-2fd7f48841adb6ec/source.mkv",
       "sha256": "2fd7f48841adb6ecc37e31856f2d616f50af79c988a37f63244826e5509d5b8a"
     },
@@ -98,7 +110,7 @@
   "required_commands": [
     "ffmpeg"
   ],
-  "deadline": "2026-11-24T22:00:00Z",
+  "deadline": "2026-11-25T05:00:00Z",
   "verify_staged_inputs": true,
   "hosts": [
     "gpu1",
@@ -117,10 +129,10 @@
     "representative_basis": "First 8 near-player Shanghai frames scoring masked DISTS, DIS self-flow, source-flow, and tLPIPS."
   },
   "full": {
-    "seconds": 1800
+    "seconds": 2200
   },
   "validator_seconds": 30,
-  "budget_seconds": 2200,
+  "budget_seconds": 2600,
   "stall_seconds": 1200,
   "scale": {
     "frames": {

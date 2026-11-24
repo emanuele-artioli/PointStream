@@ -1,0 +1,149 @@
+{
+  "event": "match102",
+  "mode": "pareto",
+  "stage": "full",
+  "frames": 48,
+  "units": [
+    "match102_near",
+    "match102_far"
+  ],
+  "device": "NVIDIA RTX 6000 Ada Generation",
+  "gpu_peak_mib": 11329.30126953125,
+  "timing_contaminated": true,
+  "model_load_seconds": 27.691321002028417,
+  "fit_info": {
+    "rank": 64,
+    "reference_unet": {
+      "lora_layers": 104,
+      "lora_tensors": 208
+    },
+    "denoising_unet": {
+      "lora_layers": 128,
+      "lora_tensors": 256
+    },
+    "pose_guider": "frozen (the profile's)"
+  },
+  "carrier_sha256": "3ebc2e455509db026919f17c17d2bfce3eba899fd29a0888c47440b576a219af",
+  "records": [
+    {
+      "config": {
+        "name": "ddim30_512_ov4",
+        "scheduler": "ddim",
+        "steps": 30,
+        "width": 512,
+        "height": 784,
+        "overlap": 4,
+        "pose_smooth": false,
+        "corr_noise_alpha": 0.0
+      },
+      "unit": "match102_near",
+      "frames": 48,
+      "seed": 160944524496,
+      "render_seconds": 353.46865514398087,
+      "sec_per_frame": 7.363930315499601,
+      "distinct_frames": 48,
+      "npz_relpath": "ddim30_512_ov4/match102_near.npz",
+      "npz_sha256": "a79a60759db3b4ed5719467a207e5726d7991d8ed3d806c13cc341f7df74b89c"
+    },
+    {
+      "config": {
+        "name": "dpm10_512_ov8_smooth",
+        "scheduler": "dpm",
+        "steps": 10,
+        "width": 512,
+        "height": 784,
+        "overlap": 8,
+        "pose_smooth": true,
+        "corr_noise_alpha": 0.0
+      },
+      "unit": "match102_near",
+      "frames": 48,
+      "seed": 160944524496,
+      "render_seconds": 76.04019780003,
+      "sec_per_frame": 1.584170787500625,
+      "distinct_frames": 48,
+      "npz_relpath": "dpm10_512_ov8_smooth/match102_near.npz",
+      "npz_sha256": "55871ae6749d30b4ad1d93169bb0b226c9ba9dad94bc7ca00836785b68135618"
+    },
+    {
+      "config": {
+        "name": "dpm10_512_ov8_smooth_corr05",
+        "scheduler": "dpm",
+        "steps": 10,
+        "width": 512,
+        "height": 784,
+        "overlap": 8,
+        "pose_smooth": true,
+        "corr_noise_alpha": 0.5
+      },
+      "unit": "match102_near",
+      "frames": 48,
+      "seed": 160944524496,
+      "render_seconds": 77.49942576000467,
+      "sec_per_frame": 1.6145713700000972,
+      "distinct_frames": 48,
+      "npz_relpath": "dpm10_512_ov8_smooth_corr05/match102_near.npz",
+      "npz_sha256": "bcce5e7188f86a0a52db81297285ca98033e75bfd517d180b83a4b5546f5d8a8"
+    },
+    {
+      "config": {
+        "name": "ddim30_512_ov4",
+        "scheduler": "ddim",
+        "steps": 30,
+        "width": 512,
+        "height": 784,
+        "overlap": 4,
+        "pose_smooth": false,
+        "corr_noise_alpha": 0.0
+      },
+      "unit": "match102_far",
+      "frames": 48,
+      "seed": 253787240761,
+      "render_seconds": 320.99792657402577,
+      "sec_per_frame": 6.687456803625537,
+      "distinct_frames": 48,
+      "npz_relpath": "ddim30_512_ov4/match102_far.npz",
+      "npz_sha256": "11a288336bad38aa9bcc5c138f4806c3cb0ae3ddfc6e858f1f3b3e3f9a81421f"
+    },
+    {
+      "config": {
+        "name": "dpm10_512_ov8_smooth",
+        "scheduler": "dpm",
+        "steps": 10,
+        "width": 512,
+        "height": 784,
+        "overlap": 8,
+        "pose_smooth": true,
+        "corr_noise_alpha": 0.0
+      },
+      "unit": "match102_far",
+      "frames": 48,
+      "seed": 253787240761,
+      "render_seconds": 130.47166209301213,
+      "sec_per_frame": 2.718159626937753,
+      "distinct_frames": 48,
+      "npz_relpath": "dpm10_512_ov8_smooth/match102_far.npz",
+      "npz_sha256": "e9ce008bb8945ed67440b649dd8b1b2d9e35602c6b489271d3fb24b0e9109d73"
+    },
+    {
+      "config": {
+        "name": "dpm10_512_ov8_smooth_corr05",
+        "scheduler": "dpm",
+        "steps": 10,
+        "width": 512,
+        "height": 784,
+        "overlap": 8,
+        "pose_smooth": true,
+        "corr_noise_alpha": 0.5
+      },
+      "unit": "match102_far",
+      "frames": 48,
+      "seed": 253787240761,
+      "render_seconds": 130.81992742500734,
+      "sec_per_frame": 2.725415154687653,
+      "distinct_frames": 48,
+      "npz_relpath": "dpm10_512_ov8_smooth_corr05/match102_far.npz",
+      "npz_sha256": "2c43a5d2a39d850fa7289ba5739b5804ab41b7b1bfe903a0f5255453dcfc3b2e"
+    }
+  ]
+}
