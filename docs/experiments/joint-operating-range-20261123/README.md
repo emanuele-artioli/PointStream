@@ -29,3 +29,21 @@ The 640-wide ROI job is `20261123T120820Z-35db68b8`. [Submission receipt](shangh
 ## Native-control scores and metric cross-check
 
 Both control jobs reached full validation. The six real 29.97-fps controls use the same twelve source instants. The full-HD AV1 control was recovered as paid IVF files and locally decoded by dav1d. All 240 decoded YUV frame bytes agree with the saved campus digest for each file. The ROI scores are extracted from the verified full decoded archive. Both paths retain source hashes, native comparator speed/profile and actual packet bytes. For the nearby rate switches, rescore the ordinary 89.34 and 118.90 kbps controls and the 118.75 kbps ROI on those same decoded frames with the existing LPIPS, luma SSIM, RGB PSNR and complementary background mask. This asks whether the first foreground DISTS reversal also changes spatial metric ranking. One CPU run under the existing five-minute matched-metric cap. This does not measure temporal agreement at the wider rates.
+
+At the first Shanghai reversal, the complete 83.194 kbps PointStream stream scored 0.25960 foreground DISTS, 0.28478 LPIPS and 20.09 dB foreground RGB PSNR. AV1 at 89.344 kbps scored 0.25840, 0.24345 and 24.85 dB. Background PSNR was 23.98 and 34.11 dB. The 109.770 kbps PointStream packet at the identical coded width was almost unchanged on each foreground metric. These observations show when raising the same base quality buys little. They use actual native streams and a common spending ceiling, with no claim of a dense sequence of exact bitrate matches. [Spatial cross-check](shanghai-midrate-metrics.json)
+
+A 640×384 PointStream packet regained the foreground-DISTS lead at 113.128 kbps (0.24221). Ordinary AV1 took it back at 118.904 kbps (0.23483). At that ceiling the 640-wide PointStream packet retained the lower ball DISTS (0.17149 vs 0.18776), and AV1 had the lower body DISTS (0.28190 vs 0.31294) and LPIPS (0.19052 vs 0.24098 on the combined region). The observed winner can change more than once across a rate ladder. The missing high-rate neural control limits the Shanghai comparison. [640-wide PointStream result](../shanghai-wider-20261123/q640-metrics.json) · [Physical results and BD-rates](results.json)
+
+## Reproduce the figures
+
+From the root with the project's SciPy and Matplotlib environment:
+
+```sh
+card=docs/experiments/joint-operating-range-20261123
+shanghai=docs/experiments/shanghai-wider-20261123
+PYTHONPATH=. python "$card/compare.py" OUTPUT_DIRECTORY \
+  --shanghai-wider "$shanghai/q23-metrics.json" "$shanghai/q17-metrics.json" "$shanghai/q640-metrics.json" \
+  --ordinary "$card"/ordinary-*.json --roi "$card"/foreground-roi-*.json
+```
+
+The relative rates in the JSON use a higher-is-better internal orientation for DISTS. The budget steps show only physical choices. PCHIP BD-rate is a secondary interpolation-based estimate and is left empty for pairs without a shared quality interval. The sparse joint ladder is especially important when interpreting the estimated savings.

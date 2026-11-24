@@ -163,13 +163,14 @@ def frontier(rows, endpoint):
     return selected
 
 
-def summarize(bank_path, fps, wider=None, controls=()):
+def summarize(bank_path, fps, wider=(), controls=()):
     bank = load(bank_path)
     pointstream = [
         dict(rung["joint"], cold_kbps=rung["cases"]["cold"]["kbps"])
         for rung in bank["measured_rungs"].values()
     ]
-    pointstream.extend(add_rungs(bank, wider, fps))
+    for path in wider:
+        pointstream.extend(add_rungs(bank, path, fps))
     baselines = add_controls(bank, controls) if controls else bank["controls"]
     groups = dict(baselines, pointstream=pointstream)
     by_packet = {}
@@ -191,7 +192,7 @@ def summarize(bank_path, fps, wider=None, controls=()):
     return {
         "source_sha256": bank["source"],
         "baseline_receipt_sha256": digest(bank_path),
-        "wider_receipt_sha256": digest(wider) if wider is not None else None,
+        "wider_receipt_sha256": {path.name: digest(path) for path in wider},
         "source_ticks": 240,
         "scored_ticks": bank["ticks"],
         "frontiers": frontiers,
@@ -284,13 +285,13 @@ def plot(result, output, endpoint):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output", type=Path)
-    parser.add_argument("--shanghai-wider", type=Path)
+    parser.add_argument("--shanghai-wider", type=Path, nargs="+", default=[])
     for family in ("ordinary", "neural", "roi"):
         parser.add_argument("--" + family, type=Path, nargs="*", default=[])
     args = parser.parse_args()
     result = {
         "Sydney · Safiullin–Shapovalov": summarize(
-            SYDNEY / "comparison-all-physical.json", Fraction(60), SYDNEY / "wider-native-metrics.json"
+            SYDNEY / "comparison-all-physical.json", Fraction(60), [SYDNEY / "wider-native-metrics.json"]
         ),
         "Shanghai · Sinner–Shelton": summarize(
             SHANGHAI / "comparison-final-neural.json",
