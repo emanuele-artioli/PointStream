@@ -1,0 +1,410 @@
+{
+  "registered": [
+    "match108",
+    "match102",
+    "match120",
+    "match127",
+    "match105",
+    "match116",
+    "match107",
+    "match131",
+    "match119",
+    "match104",
+    "match130",
+    "match126"
+  ],
+  "complete": [
+    "match102",
+    "match104",
+    "match105",
+    "match107",
+    "match108",
+    "match116",
+    "match119",
+    "match120",
+    "match126",
+    "match127",
+    "match130",
+    "match131"
+  ],
+  "matches": 12,
+  "visible": 402,
+  "scores": {
+    "dists": {
+      "candidate": 0.2527238015559013,
+      "ordinary": 0.2684410416917752,
+      "paired_difference": -0.015717240135873896,
+      "improvement_count": 12,
+      "match_bootstrap_95": [
+        -0.022248059003369597,
+        -0.009863382169083763
+      ]
+    },
+    "lpips": {
+      "candidate": 0.19918386951617467,
+      "ordinary": 0.2620611053974982,
+      "paired_difference": -0.06287723588132356,
+      "improvement_count": 12,
+      "match_bootstrap_95": [
+        -0.08742595350230498,
+        -0.043085796467966356
+      ]
+    },
+    "luma_ssim": {
+      "candidate": 0.785582662276682,
+      "ordinary": 0.7801448010672645,
+      "paired_difference": 0.005437861209417518,
+      "improvement_count": 10,
+      "match_bootstrap_95": [
+        0.0010597493266290257,
+        0.009178139668318224
+      ]
+    },
+    "rgb_psnr": {
+      "candidate": 24.42984334437999,
+      "ordinary": 24.46927876621357,
+      "paired_difference": -0.039435421833582396,
+      "improvement_count": 7,
+      "match_bootstrap_95": [
+        -0.18143033451664828,
+        0.07162612927291505
+      ]
+    },
+    "whole_rgb_psnr": {
+      "candidate": 24.39370187758077,
+      "ordinary": 24.657513638921483,
+      "paired_difference": -0.2638117613407139,
+      "improvement_count": 1,
+      "match_bootstrap_95": [
+        -0.4200339427099068,
+        -0.127977601803238
+      ]
+    }
+  },
+  "rows": [
+    {
+      "match": "match108",
+      "event": "Munich 2024",
+      "total_visible": 50,
+      "source_sha256": "23b6a757e8f01d2366282fb32e2282a76a77f39cfc96c8125069826d7f458fb7",
+      "receipt_sha256": "ac3233db9c09584cd486b3fd4c769449cffdd6dc42840efefb85a061154f6e56",
+      "candidate": {
+        "kbps": 20.315,
+        "bytes": 24378,
+        "packet_sha256": "500dec917fd9f266f8f9cbe41426ac9691eaaf3b93f715441a587a511b837148",
+        "dists": 0.2611924946308136,
+        "lpips": 0.23772501423954964,
+        "luma_ssim": 0.7356907904148102,
+        "rgb_psnr": 21.856473645608606,
+        "whole_rgb_psnr": 21.48354805902819
+      },
+      "ordinary": {
+        "kbps": 20.233333333333334,
+        "bytes": 24280,
+        "packet_sha256": "051d9f7efdafa4f7adcd2d612904a81dc5e767b9942f5190aab226ef6b6a67ed",
+        "dists": 0.2699206840991974,
+        "lpips": 0.266565338075161,
+        "luma_ssim": 0.7278765189647675,
+        "rgb_psnr": 21.874785461400204,
+        "whole_rgb_psnr": 21.53381661856433
+      }
+    },
+    {
+      "match": "match102",
+      "event": "Shanghai 2023",
+      "total_visible": 40,
+      "source_sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+      "receipt_sha256": "536e2b5a46339bc452e144565286e088ff82fb58c4115fad710648b3843aed3b",
+      "candidate": {
+        "kbps": 20.51048951048951,
+        "bytes": 20531,
+        "packet_sha256": "eeeab1de0d4ff36f5b27a77ee0863092a1bd625ad11e70c366a091d3c9590088",
+        "dists": 0.24547197073698043,
+        "lpips": 0.2334926325827837,
+        "luma_ssim": 0.7762937366962432,
+        "rgb_psnr": 23.208344002916817,
+        "whole_rgb_psnr": 24.794864252428038
+      },
+      "ordinary": {
+        "kbps": 20.534465534465536,
+        "bytes": 20555,
+        "packet_sha256": "5d9b6a7a1d0d1874cfd042bd44e23deb03f5e47857c0a857ba56702e09dca0f8",
+        "dists": 0.26619485169649126,
+        "lpips": 0.29565032236278055,
+        "luma_ssim": 0.766260638833046,
+        "rgb_psnr": 23.104663957208356,
+        "whole_rgb_psnr": 24.83746729851521
+      }
+    },
+    {
+      "match": "match120",
+      "event": "Gstaad 2022",
+      "total_visible": 19,
+      "source_sha256": "7d119f25b1922f0dbd7f5ffb6ea5ac34226a8ea93b41e7a37e401f07ee0e5976",
+      "receipt_sha256": "dac80c8fde200d18e9ace941dde0a12932fe4c2ad3ed8202a6614b4b8eb87f3c",
+      "candidate": {
+        "kbps": 39.436,
+        "bytes": 19718,
+        "packet_sha256": "fb287d8946ee3e06916c374dfc1ec17a2d4a4938cf87ff09dea4922c96e687ee",
+        "dists": 0.2598896967737298,
+        "lpips": 0.1707017509952972,
+        "luma_ssim": 0.7723974177711889,
+        "rgb_psnr": 24.30668152250249,
+        "whole_rgb_psnr": 24.40734175536344
+      },
+      "ordinary": {
+        "kbps": 39.352,
+        "bytes": 19676,
+        "packet_sha256": "63bcaee1cc5d4bf736981c57ae00515fe3aff5f182e9f95e09d9c1257c1031d8",
+        "dists": 0.269454720773195,
+        "lpips": 0.24642983627946755,
+        "luma_ssim": 0.7579972681246305,
+        "rgb_psnr": 24.250888963792733,
+        "whole_rgb_psnr": 24.627236385655973
+      }
+    },
+    {
+      "match": "match127",
+      "event": "Sydney, ATP Cup 2022",
+      "total_visible": 20,
+      "source_sha256": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+      "receipt_sha256": "089f5a31446b72cd22fb6bd3216976a211506de21802274fea1e59cdf01fda08",
+      "candidate": {
+        "kbps": 33.968,
+        "bytes": 16984,
+        "packet_sha256": "074793fb9d76a8c951c913d40bf271ec67b285b95d9a1e93e8ec62c7b9fecf59",
+        "dists": 0.23514167070388795,
+        "lpips": 0.1397373544983566,
+        "luma_ssim": 0.8618952035903931,
+        "rgb_psnr": 25.186569222272283,
+        "whole_rgb_psnr": 26.055870941651314
+      },
+      "ordinary": {
+        "kbps": 34.056,
+        "bytes": 17028,
+        "packet_sha256": "458fb1afe646363149b66f01b6c959772d1c774df0d8845063c3c98fbcc929f5",
+        "dists": 0.2685650497674942,
+        "lpips": 0.2421281784772873,
+        "luma_ssim": 0.8627357661724091,
+        "rgb_psnr": 25.178276435754235,
+        "whole_rgb_psnr": 26.590737715445428
+      }
+    },
+    {
+      "match": "match105",
+      "event": "Halle 2024",
+      "total_visible": 49,
+      "source_sha256": "a518fd0850781642b2233cb1a8e0d910f253952f0d9d3d206326ce8d35ad0d0c",
+      "receipt_sha256": "8b26e652f4dacd6f070994c26cfe3957fcf933a9dde2921990a15722c6297590",
+      "candidate": {
+        "kbps": 20.618333333333332,
+        "bytes": 24742,
+        "packet_sha256": "623b050540a061eeb0bcf4d5e43f38fb4e133e80b9547a82fa0acc8451b8d3c8",
+        "dists": 0.2534941240232818,
+        "lpips": 0.2109766790301216,
+        "luma_ssim": 0.7706926538019764,
+        "rgb_psnr": 25.28188497606806,
+        "whole_rgb_psnr": 23.5501600660533
+      },
+      "ordinary": {
+        "kbps": 20.524166666666666,
+        "bytes": 24629,
+        "packet_sha256": "7cbc32980cc38a00001f1384384e5fbaabad0bb4169b812853d346f47657211c",
+        "dists": 0.2762315261120699,
+        "lpips": 0.2974954442102082,
+        "luma_ssim": 0.7586291529694382,
+        "rgb_psnr": 25.067415621842667,
+        "whole_rgb_psnr": 23.577170573989466
+      }
+    },
+    {
+      "match": "match116",
+      "event": "Geneva 2023",
+      "total_visible": 48,
+      "source_sha256": "39e290951809a969aab505fe590443ed193f1ac7edf96b5bcfb7d9de2776d677",
+      "receipt_sha256": "4d426cfc487901dadafbf81db50602bda5002c1e7c047c5fbbabb3598ca218ec",
+      "candidate": {
+        "kbps": 178.95833333333334,
+        "bytes": 214750,
+        "packet_sha256": "d8b35c7b3f56cdceedcdac7109d279183e38cf3e7dc504801770de497c2b7812",
+        "dists": 0.13366857171058655,
+        "lpips": 0.05296980399483194,
+        "luma_ssim": 0.9283831417560577,
+        "rgb_psnr": 28.890329984593368,
+        "whole_rgb_psnr": 29.118457712354896
+      },
+      "ordinary": {
+        "kbps": 178.1675,
+        "bytes": 213801,
+        "packet_sha256": "4c52d30b19d4238c23f096edd823fb87644011db0409812f9a1a821a71dfcd1e",
+        "dists": 0.14376796036958694,
+        "lpips": 0.07346601136183988,
+        "luma_ssim": 0.9240850756565729,
+        "rgb_psnr": 28.836279287302034,
+        "whole_rgb_psnr": 29.11807007255003
+      }
+    },
+    {
+      "match": "match107",
+      "event": "Miami 2024",
+      "total_visible": 20,
+      "source_sha256": "9b2197018f90a8e8873595101d4c72651efad33c7e60d506e6718e78d073ba2e",
+      "receipt_sha256": "b7078dc8082c2b630641e3b31807a825b043b2a0f7da149dc1e4b83c2389e10b",
+      "candidate": {
+        "kbps": 24.314,
+        "bytes": 12157,
+        "packet_sha256": "6684d4213d0d0b071f0603e5e32312080f2a1e70a7979a35032f78fa0bcb5110",
+        "dists": 0.2941474556922913,
+        "lpips": 0.2973213292658329,
+        "luma_ssim": 0.7140614151954651,
+        "rgb_psnr": 23.551608135156087,
+        "whole_rgb_psnr": 21.660260932912507
+      },
+      "ordinary": {
+        "kbps": 24.294,
+        "bytes": 12147,
+        "packet_sha256": "df7d81f98ed9e8f55001c1d496160eeeeb067cbc88a2805e30b5a572e7d3b0b5",
+        "dists": 0.3309665769338608,
+        "lpips": 0.4624036818742752,
+        "luma_ssim": 0.7085887730121613,
+        "rgb_psnr": 23.685572498813585,
+        "whole_rgb_psnr": 22.216326094019596
+      }
+    },
+    {
+      "match": "match131",
+      "event": "Acapulco 2024",
+      "total_visible": 38,
+      "source_sha256": "ac89229d3608e6247b706251d7d0fc6c8f2018229ce302d7491c49f2b56a7207",
+      "receipt_sha256": "f2c71fbf1cb4f7a08bd3717476a23ce324c6ba7dfcfbf536e664dba0b5878fbb",
+      "candidate": {
+        "kbps": 20.0625,
+        "bytes": 24075,
+        "packet_sha256": "7cb5dfcf1baa0cf1457e91e70787dae623ba5d38da10521d1df3aeb41b725021",
+        "dists": 0.21559982237062955,
+        "lpips": 0.14779661894824944,
+        "luma_ssim": 0.8149822338631278,
+        "rgb_psnr": 25.34835546088852,
+        "whole_rgb_psnr": 24.54420663130056
+      },
+      "ordinary": {
+        "kbps": 20.036666666666665,
+        "bytes": 24044,
+        "packet_sha256": "9a4755bd94ce8bb7651554d6fa68d95974f7fc87cfc76545f404ab466c52ff77",
+        "dists": 0.23827794194221497,
+        "lpips": 0.19178965217188784,
+        "luma_ssim": 0.8142798652774409,
+        "rgb_psnr": 25.15231895133601,
+        "whole_rgb_psnr": 24.79008380352252
+      }
+    },
+    {
+      "match": "match119",
+      "event": "Monte-Carlo 2024",
+      "total_visible": 18,
+      "source_sha256": "47c34ad732752c6f2bd72cb527095dd845f2ff8c99b45015883be23539850864",
+      "receipt_sha256": "55840ed5862ff1eb0a4357492611738eb0b187e3e967458ef8f5f38e0bc69167",
+      "candidate": {
+        "kbps": 22.444,
+        "bytes": 11222,
+        "packet_sha256": "b6275d870bb3256001d3890c93ac911b54fa826e2a79518c195d3e9cd61a71bb",
+        "dists": 0.3290715946091546,
+        "lpips": 0.304798375401232,
+        "luma_ssim": 0.7044240103827583,
+        "rgb_psnr": 22.120708830412788,
+        "whole_rgb_psnr": 21.956358407288775
+      },
+      "ordinary": {
+        "kbps": 22.546,
+        "bytes": 11273,
+        "packet_sha256": "be3b7d378324b16275ece7276b35e57340c464574a7269196e807146bd88586c",
+        "dists": 0.33141196105215287,
+        "lpips": 0.34572990735371906,
+        "luma_ssim": 0.716329038143158,
+        "rgb_psnr": 22.777401858292595,
+        "whole_rgb_psnr": 22.795531783069304
+      }
+    },
+    {
+      "match": "match104",
+      "event": "Marseille 2020",
+      "total_visible": 21,
+      "source_sha256": "aa0eea258179ed5be7b166dbedb3e8001b823c5caac6630f89f480f6bec30a10",
+      "receipt_sha256": "a90af4dfac9e0e616e08294b35f935888079024e4fe6af61b10ed3bd1c387d5c",
+      "candidate": {
+        "kbps": 33.556,
+        "bytes": 16778,
+        "packet_sha256": "b09d1b3f669f17bdbe02f9ff10d38295ec45f43d8104bde091db7e9ee3f6875a",
+        "dists": 0.27146129664920626,
+        "lpips": 0.18721511179492586,
+        "luma_ssim": 0.7887776352110363,
+        "rgb_psnr": 24.126146835284196,
+        "whole_rgb_psnr": 25.410261956116397
+      },
+      "ordinary": {
+        "kbps": 33.462,
+        "bytes": 16731,
+        "packet_sha256": "5dcf0beb0c2730b3eb345afcbab501e78ad31f8286a49d20330af317d0b358b4",
+        "dists": 0.27832943768728347,
+        "lpips": 0.21039517365750812,
+        "luma_ssim": 0.7886725153241839,
+        "rgb_psnr": 24.406028953806,
+        "whole_rgb_psnr": 25.841529279890484
+      }
+    },
+    {
+      "match": "match130",
+      "event": "Queen's Club 2024",
+      "total_visible": 40,
+      "source_sha256": "f3702a7e885cb7b6fcad37bafe362391d314d5f08640015a80ab0625c4bbdd16",
+      "receipt_sha256": "5d8fc123a1b14d66e1655523158c28e9cdf348f5a8f180c2685eea6d9ae95b85",
+      "candidate": {
+        "kbps": 20.081666666666667,
+        "bytes": 24098,
+        "packet_sha256": "1aeea5b7c37fb6969aba0fabc235588c804251cf9f3a46ddb87bd269dd79717a",
+        "dists": 0.2707430422306061,
+        "lpips": 0.19372119959443806,
+        "luma_ssim": 0.757542784512043,
+        "rgb_psnr": 24.021729938920203,
+        "whole_rgb_psnr": 25.045562876831863
+      },
+      "ordinary": {
+        "kbps": 20.045,
+        "bytes": 24054,
+        "packet_sha256": "ce32e89ecc862a61670b5d910234c99577b6060be9d1502742397a3fc5200e9f",
+        "dists": 0.2743357166647911,
+        "lpips": 0.2343458781018853,
+        "luma_ssim": 0.7459844283759594,
+        "rgb_psnr": 24.08583809454898,
+        "whole_rgb_psnr": 25.2245668343198
+      }
+    },
+    {
+      "match": "match126",
+      "event": "Lyon 2024",
+      "total_visible": 39,
+      "source_sha256": "29fb4ef71a4d2ef68d79166542c51fda4f48108dfd6647bacc8b9869c018ab93",
+      "receipt_sha256": "4ca4132fdf993766644c1a65164a57f73d29b0336684ebefbfe3f114f131414d",
+      "candidate": {
+        "kbps": 20.248333333333335,
+        "bytes": 24298,
+        "packet_sha256": "f7b4d7fcc99a6595378e48ae5ab77ba4bf0c6f8c99b3ee901561ff67af87254d",
+        "dists": 0.2628038785396478,
+        "lpips": 0.21375056384847715,
+        "luma_ssim": 0.8018509241250845,
+        "rgb_psnr": 25.259287577936437,
+        "whole_rgb_psnr": 24.69752893963995
+      },
+      "ordinary": {
+        "kbps": 20.246666666666666,
+        "bytes": 24296,
+        "packet_sha256": "e7b0872074ddf88d343d6192f61ab65cc60bb06a31d60a2019de046bf6da3c66",
+        "dists": 0.2738360732029646,
+        "lpips": 0.27833384084395874,
+        "luma_ssim": 0.7902985719534067,
+        "rgb_psnr": 25.211875110465446,
+        "whole_rgb_psnr": 24.73762720751566
+      }
+    }
+  ]
+}
