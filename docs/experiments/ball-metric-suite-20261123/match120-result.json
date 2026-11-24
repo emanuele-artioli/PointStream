@@ -1,0 +1,373 @@
+{
+  "match": "match120",
+  "source_sha256": "7d119f25b1922f0dbd7f5ffb6ea5ac34226a8ea93b41e7a37e401f07ee0e5976",
+  "source_rgb_sha256": "8e59f70b22a7779641ca3ba567f90e3822d60ea2e0aa2a86ad660e4b21550c9b",
+  "labels_sha256": "3250a9dd74a29e4abf37374776cd89744e2186cbdba97de266442aaf9da6f2e6",
+  "rate_archive_sha256": "5d1d06ac0a1677eb1ba82ed149b80d80a68d6618e34e0dcc9070c8dd92d67439",
+  "primary_sha256": "19032f2bd2b1c5819e1d37f43ecf09c7566ed5a717fc1f8cfafdc425cc417825",
+  "source_ticks": 240,
+  "selected_visible_ticks": [
+    9,
+    20,
+    32,
+    44,
+    56,
+    68,
+    80,
+    92,
+    103,
+    127,
+    139,
+    151,
+    163,
+    175,
+    186,
+    198,
+    210,
+    222,
+    234
+  ],
+  "total_visible": 19,
+  "matched_rate_gap": 0.0021345801992274094,
+  "arms": {
+    "candidate": {
+      "bytes": 19718,
+      "kbps": 39.436,
+      "packet_sha256": "fb287d8946ee3e06916c374dfc1ec17a2d4a4938cf87ff09dea4922c96e687ee",
+      "rgb_sha256": "3de29172333330290645bfbd837d2faa8bd8e5f922d60b26406f9d22e0a33b87",
+      "width": 640,
+      "height": 384,
+      "rows": [
+        {
+          "tick": 9,
+          "dists": 0.27358102798461914,
+          "lpips": 0.2367744743824005,
+          "luma_ssim": 0.7327378988265991,
+          "rgb_mse": 0.0035371773410588503
+        },
+        {
+          "tick": 20,
+          "dists": 0.24391329288482666,
+          "lpips": 0.20044907927513123,
+          "luma_ssim": 0.741342306137085,
+          "rgb_mse": 0.003191929077729583
+        },
+        {
+          "tick": 32,
+          "dists": 0.2524261474609375,
+          "lpips": 0.1407301425933838,
+          "luma_ssim": 0.8343935608863831,
+          "rgb_mse": 0.002323758089914918
+        },
+        {
+          "tick": 44,
+          "dists": 0.24262934923171997,
+          "lpips": 0.16055431962013245,
+          "luma_ssim": 0.7618923187255859,
+          "rgb_mse": 0.006744427606463432
+        },
+        {
+          "tick": 56,
+          "dists": 0.24547630548477173,
+          "lpips": 0.16109946370124817,
+          "luma_ssim": 0.6900193095207214,
+          "rgb_mse": 0.007641965989023447
+        },
+        {
+          "tick": 68,
+          "dists": 0.2217402458190918,
+          "lpips": 0.19118495285511017,
+          "luma_ssim": 0.7038399577140808,
+          "rgb_mse": 0.0072941710241138935
+        },
+        {
+          "tick": 80,
+          "dists": 0.261174738407135,
+          "lpips": 0.1803397536277771,
+          "luma_ssim": 0.7255316972732544,
+          "rgb_mse": 0.006795558612793684
+        },
+        {
+          "tick": 92,
+          "dists": 0.24233734607696533,
+          "lpips": 0.1170213520526886,
+          "luma_ssim": 0.8579286336898804,
+          "rgb_mse": 0.0016857086447998881
+        },
+        {
+          "tick": 103,
+          "dists": 0.24678033590316772,
+          "lpips": 0.3267824053764343,
+          "luma_ssim": 0.7156155109405518,
+          "rgb_mse": 0.003971115220338106
+        },
+        {
+          "tick": 127,
+          "dists": 0.31324851512908936,
+          "lpips": 0.04811292514204979,
+          "luma_ssim": 0.9050211906433105,
+          "rgb_mse": 0.0008648315561003983
+        },
+        {
+          "tick": 139,
+          "dists": 0.2995808720588684,
+          "lpips": 0.1236836314201355,
+          "luma_ssim": 0.8439365029335022,
+          "rgb_mse": 0.00174570397939533
+        },
+        {
+          "tick": 151,
+          "dists": 0.24791359901428223,
+          "lpips": 0.09924817830324173,
+          "luma_ssim": 0.8185821771621704,
+          "rgb_mse": 0.00232321978546679
+        },
+        {
+          "tick": 163,
+          "dists": 0.27317702770233154,
+          "lpips": 0.29846179485321045,
+          "luma_ssim": 0.6708691120147705,
+          "rgb_mse": 0.004591370467096567
+        },
+        {
+          "tick": 175,
+          "dists": 0.24644160270690918,
+          "lpips": 0.1698349267244339,
+          "luma_ssim": 0.7667421698570251,
+          "rgb_mse": 0.0030411016196012497
+        },
+        {
+          "tick": 186,
+          "dists": 0.23286712169647217,
+          "lpips": 0.16034680604934692,
+          "luma_ssim": 0.7962664365768433,
+          "rgb_mse": 0.0028852110262960196
+        },
+        {
+          "tick": 198,
+          "dists": 0.24866777658462524,
+          "lpips": 0.1389266848564148,
+          "luma_ssim": 0.7949668765068054,
+          "rgb_mse": 0.0031379482243210077
+        },
+        {
+          "tick": 210,
+          "dists": 0.24241328239440918,
+          "lpips": 0.12513521313667297,
+          "luma_ssim": 0.7810968160629272,
+          "rgb_mse": 0.0023627392947673798
+        },
+        {
+          "tick": 222,
+          "dists": 0.27038437128067017,
+          "lpips": 0.17158682644367218,
+          "luma_ssim": 0.7688630819320679,
+          "rgb_mse": 0.0025123925879597664
+        },
+        {
+          "tick": 234,
+          "dists": 0.33315128087997437,
+          "lpips": 0.19306033849716187,
+          "luma_ssim": 0.7659053802490234,
+          "rgb_mse": 0.003832843154668808
+        }
+      ],
+      "means": {
+        "dists": 0.2598896967737298,
+        "lpips": 0.1707017509952972,
+        "luma_ssim": 0.7723974177711889,
+        "rgb_mse": 0.00370964070010048
+      },
+      "whole_rgb_psnr": 24.40734175536344
+    },
+    "ordinary": {
+      "bytes": 19676,
+      "kbps": 39.352,
+      "packet_sha256": "63bcaee1cc5d4bf736981c57ae00515fe3aff5f182e9f95e09d9c1257c1031d8",
+      "rgb_sha256": "3272e58fd66b7b5bd9a5e1c401979dba10690484029ea269687f0d292f1e7e7a",
+      "width": 640,
+      "height": 384,
+      "rows": [
+        {
+          "tick": 9,
+          "dists": 0.26782846450805664,
+          "lpips": 0.26038631796836853,
+          "luma_ssim": 0.7325206398963928,
+          "rgb_mse": 0.0036614220589399338
+        },
+        {
+          "tick": 20,
+          "dists": 0.25182586908340454,
+          "lpips": 0.21555554866790771,
+          "luma_ssim": 0.7364804148674011,
+          "rgb_mse": 0.0033183202613145113
+        },
+        {
+          "tick": 32,
+          "dists": 0.2389501929283142,
+          "lpips": 0.2213912010192871,
+          "luma_ssim": 0.8244014382362366,
+          "rgb_mse": 0.0020825497340410948
+        },
+        {
+          "tick": 44,
+          "dists": 0.22591865062713623,
+          "lpips": 0.14561603963375092,
+          "luma_ssim": 0.7767478823661804,
+          "rgb_mse": 0.0064103864133358
+        },
+        {
+          "tick": 56,
+          "dists": 0.2146868109703064,
+          "lpips": 0.149332195520401,
+          "luma_ssim": 0.7043709754943848,
+          "rgb_mse": 0.007502753287553787
+        },
+        {
+          "tick": 68,
+          "dists": 0.22191351652145386,
+          "lpips": 0.17567488551139832,
+          "luma_ssim": 0.7159554958343506,
+          "rgb_mse": 0.007320720236748457
+        },
+        {
+          "tick": 80,
+          "dists": 0.26033926010131836,
+          "lpips": 0.1706777811050415,
+          "luma_ssim": 0.713192343711853,
+          "rgb_mse": 0.006276348605751991
+        },
+        {
+          "tick": 92,
+          "dists": 0.27610552310943604,
+          "lpips": 0.30895885825157166,
+          "luma_ssim": 0.8293150663375854,
+          "rgb_mse": 0.0015888918424025178
+        },
+        {
+          "tick": 103,
+          "dists": 0.2628880739212036,
+          "lpips": 0.35168561339378357,
+          "luma_ssim": 0.694637656211853,
+          "rgb_mse": 0.004379843827337027
+        },
+        {
+          "tick": 127,
+          "dists": 0.3690052628517151,
+          "lpips": 0.4048759937286377,
+          "luma_ssim": 0.886955738067627,
+          "rgb_mse": 0.0010346743511036038
+        },
+        {
+          "tick": 139,
+          "dists": 0.366191565990448,
+          "lpips": 0.42493852972984314,
+          "luma_ssim": 0.8285504579544067,
+          "rgb_mse": 0.001698770560324192
+        },
+        {
+          "tick": 151,
+          "dists": 0.23378819227218628,
+          "lpips": 0.08214123547077179,
+          "luma_ssim": 0.8508111238479614,
+          "rgb_mse": 0.002291155979037285
+        },
+        {
+          "tick": 163,
+          "dists": 0.2916969060897827,
+          "lpips": 0.28733745217323303,
+          "luma_ssim": 0.6455826759338379,
+          "rgb_mse": 0.005075089167803526
+        },
+        {
+          "tick": 175,
+          "dists": 0.24770629405975342,
+          "lpips": 0.2583480179309845,
+          "luma_ssim": 0.7345444560050964,
+          "rgb_mse": 0.0033274597954005003
+        },
+        {
+          "tick": 186,
+          "dists": 0.258833110332489,
+          "lpips": 0.27176499366760254,
+          "luma_ssim": 0.7597852945327759,
+          "rgb_mse": 0.0031281535048037767
+        },
+        {
+          "tick": 198,
+          "dists": 0.26102060079574585,
+          "lpips": 0.23155564069747925,
+          "luma_ssim": 0.7544518113136292,
+          "rgb_mse": 0.003435905324295163
+        },
+        {
+          "tick": 210,
+          "dists": 0.24100583791732788,
+          "lpips": 0.17347261309623718,
+          "luma_ssim": 0.7539570331573486,
+          "rgb_mse": 0.002541347872465849
+        },
+        {
+          "tick": 222,
+          "dists": 0.2831237316131592,
+          "lpips": 0.23984722793102264,
+          "luma_ssim": 0.7330805659294128,
+          "rgb_mse": 0.002631165785714984
+        },
+        {
+          "tick": 234,
+          "dists": 0.34681183099746704,
+          "lpips": 0.30860674381256104,
+          "luma_ssim": 0.7266070246696472,
+          "rgb_mse": 0.0036895328667014837
+        }
+      ],
+      "means": {
+        "dists": 0.269454720773195,
+        "lpips": 0.24642983627946755,
+        "luma_ssim": 0.7579972681246305,
+        "rgb_mse": 0.003757604814477657
+      },
+      "whole_rgb_psnr": 24.627236385655973
+    }
+  },
+  "checks": {
+    "original_native_pixels": true,
+    "common_visible_ticks": true,
+    "dists_parity": true,
+    "identical_crop_control": true,
+    "forecast": true
+  },
+  "tools": {
+    "opencv": "4.10.0",
+    "torch": "2.10.0+cu128",
+    "dav1d": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+      "version": "1.5.4"
+    },
+    "lpips": {
+      "metric": "LPIPS",
+      "net": "alex",
+      "torchmetrics": "1.9.0",
+      "heads": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/torchmetrics/functional/image/lpips_models/alex.pth",
+      "heads_sha256": "df73285e35b22355a2df87cdb6b70b343713b667eddbda73e1977e0c860835c0",
+      "backbone": "/local/users/emanuele/pointstream/cache/7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02/alexnet-owt-7be5be79.pth",
+      "backbone_sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+      "pooling": "spatial map at full resolution (bilinear), mean over the frame or region"
+    },
+    "dists": {
+      "metric": "DISTS",
+      "net": "vgg16",
+      "torchmetrics": "1.9.0",
+      "weights": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/torchmetrics/functional/image/dists_models/weights.pt",
+      "weights_sha256": "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218",
+      "backbone": "/local/users/emanuele/pointstream/cache/397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0/vgg16-397923af.pth",
+      "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)"
+    }
+  },
+  "elapsed": 27.51382913600537,
+  "full_forecast_seconds": 66.27074370400805
+}

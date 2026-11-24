@@ -1,0 +1,4892 @@
+{
+  "Sydney \u00b7 Safiullin\u2013Shapovalov": {
+    "source_sha256": "8ebca8b693202d8bf7afaee515dde4d723a9fb83250115e6eff080038b0bbf50",
+    "baseline_receipt_sha256": "e2e78f860017995cb2e30f41b16cbcb9537c82d6eb3a48ff5d957b269dec5110",
+    "wider_receipt_sha256": {
+      "wider-native-metrics.json": "8f8cd5cbbbbeeca667dc9e589300d9e706164c8e7efb0a7190bfcabe629de5ce"
+    },
+    "source_ticks": 240,
+    "scored_ticks": [
+      9,
+      32,
+      44,
+      68,
+      92,
+      115,
+      127,
+      151,
+      175,
+      198,
+      210,
+      234
+    ],
+    "frontiers": {
+      "foreground": {
+        "ordinary": [
+          {
+            "arm": "SVT-AV1 ordinary 256x144 warm",
+            "bytes": 12663,
+            "kbps": 25.326,
+            "sha256": "da9c8adfb1701e1c1575cb43e8c541e47df0f02f608da47f98d1a6a35ea0c60a",
+            "scores": {
+              "players": 0.4869203170140584,
+              "ball": 0.34754326939582825,
+              "foreground": 0.41723179320494336
+            },
+            "receipt": "automatic-ordinary-256-warm.json",
+            "receipt_sha256": "f8f655aa914b989ecd6013d807cce045b02bba53be2ebe91c158cb8a566b0420"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 320x192 warm",
+            "bytes": 12862,
+            "kbps": 25.724,
+            "sha256": "53a4b5ba06ab41fc3aa339dcda46a1981fd42215c588708d7c58194e7f471592",
+            "scores": {
+              "players": 0.48270222793022793,
+              "ball": 0.32915086050828296,
+              "foreground": 0.40592654421925545
+            },
+            "receipt": "automatic-ordinary-320-warm.json",
+            "receipt_sha256": "76368d7518e1400dad72907f855bd39f3354647af914f5bf1bcd01ecd44c2ca7"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 320x192 r15462",
+            "bytes": 14957,
+            "kbps": 29.914,
+            "sha256": "b241f141aa4eee3b4249380e561ee09523e7f86869185957446f4d316f4fc6ce",
+            "scores": {
+              "players": 0.4489462698499362,
+              "ball": 0.32785695791244507,
+              "foreground": 0.3884016138811906
+            },
+            "receipt": "automatic-ordinary-320-r15462.json",
+            "receipt_sha256": "c0afe0976237b498b57a57d17b22001b9297fa6390495005e566126f8ceace0b"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 640x384 r15462",
+            "bytes": 15364,
+            "kbps": 30.728,
+            "sha256": "439ef999fe843ef98b8ed3050e01ad06e912ccb98ad08e576a0e50800646585a",
+            "scores": {
+              "players": 0.46034588913122815,
+              "ball": 0.31524163484573364,
+              "foreground": 0.38779376198848087
+            },
+            "receipt": "automatic-ordinary-640-r15462.json",
+            "receipt_sha256": "73f2cd7f55d08f4ae26e11c9c372f7dff489e9ad39d1bb7c6ca20b3208941f61"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 480x272 r17827",
+            "bytes": 17590,
+            "kbps": 35.18,
+            "sha256": "398f6056cd39e4ead89ffc34fcded7016992b72ae3a6eef76724aa0f4cad8cc2",
+            "scores": {
+              "players": 0.43116645763317746,
+              "ball": 0.32061507801214856,
+              "foreground": 0.375890767822663
+            },
+            "receipt": "automatic-ordinary-480-r17827.json",
+            "receipt_sha256": "a09e586e575f31f8a2a310854b6d83b64a5bb4fd0a51dc564831a8b9a7a14599"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 320x192 r17827",
+            "bytes": 17662,
+            "kbps": 35.324,
+            "sha256": "b191debe47d5c8915c40641c9889271ba84dc0a04167d4a86b9d0c34d8bee793",
+            "scores": {
+              "players": 0.42275602867205936,
+              "ball": 0.3222683022419612,
+              "foreground": 0.37251216545701027
+            },
+            "receipt": "automatic-ordinary-320-r17827.json",
+            "receipt_sha256": "49924c903f9ac63d2b58825f22e7152215c4f8e7dd670064f38e9de49da279d8"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 960x544",
+            "bytes": 20497,
+            "kbps": 40.994,
+            "sha256": "041d6aae744104779c919adb69455f0fe5887aa1684be738565e8e3c2fc9f970",
+            "scores": {
+              "players": 0.40972881267468136,
+              "ball": 0.30141109228134155,
+              "foreground": 0.35556995247801143
+            },
+            "receipt": "automatic-ordinary-960-q280-range.json",
+            "receipt_sha256": "59f3cbe79e60fe6e3beb881bc375956067fe1eff26c81503529b283b51633f28"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 320x192",
+            "bytes": 26348,
+            "kbps": 52.696,
+            "sha256": "70a193dc275e043ec839cbcbe5023b93dfa5acc8e662bbe561c6b891c60ae0bb",
+            "scores": {
+              "players": 0.38022463768720627,
+              "ball": 0.31498994926611584,
+              "foreground": 0.34760729347666103
+            },
+            "receipt": "automatic-ordinary-320-q220-range.json",
+            "receipt_sha256": "224901d6f001761f62b2071df7b73076364bd55655ec031ca21e018200ea6331"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 640x384",
+            "bytes": 32244,
+            "kbps": 64.488,
+            "sha256": "181233789afe8d47e2e92b757c94c148bfd9030009dffb5a6903d5337a315356",
+            "scores": {
+              "players": 0.3351309572656949,
+              "ball": 0.2874115804831187,
+              "foreground": 0.3112712688744068
+            },
+            "receipt": "automatic-ordinary-640-q250-range.json",
+            "receipt_sha256": "8c760a09a9fdb1cc8f4d7f1203996d5366a0f77cb19c33702daa85213d1ea67d"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 1920x1080",
+            "bytes": 41677,
+            "kbps": 83.354,
+            "sha256": "86078878304e79be696ce28759d05819518271ae7bdd033f2b26df889ac34268",
+            "scores": {
+              "players": 0.30020952224731445,
+              "ball": 0.2615618755420049,
+              "foreground": 0.2808856988946597
+            },
+            "receipt": "automatic-ordinary-1920-q280-range.json",
+            "receipt_sha256": "fe5d280b0b6edcbb20aa6d20d4df5860ea1059ef39616a4c770692535e0b0ea7"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 640x384",
+            "bytes": 67624,
+            "kbps": 135.248,
+            "sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+            "scores": {
+              "players": 0.27135121325651806,
+              "ball": 0.24173304935296377,
+              "foreground": 0.2565421313047409
+            },
+            "receipt": "automatic-ordinary-640-q220-range.json",
+            "receipt_sha256": "1fe4eae35bcb7e4499d8a99219344fd20c3eff5eb7c25d710b1a49c2d1a5e9bc"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 1920x1080 cold",
+            "bytes": 156539,
+            "kbps": 313.078,
+            "sha256": "94f39f3c1093d4ad7eb8d1b414056efdc06837d7c7bd1f92263792c771a853b8",
+            "scores": {
+              "players": 0.17923612147569656,
+              "ball": 0.14406523605187735,
+              "foreground": 0.16165067876378694
+            },
+            "receipt": "automatic-ordinary-1920-cold.json",
+            "receipt_sha256": "1aa473ec3e0469d78d743bc38383787057f5ff5a6eddf848597883e8789062bd"
+          }
+        ],
+        "roi": [
+          {
+            "arm": "SVT-AV1 ROI 192x112",
+            "bytes": 13009,
+            "kbps": 26.018,
+            "sha256": "9babc102a14fe9d27da93fc667d199df2db3540ed53bc4d9d64a4bc717afbaa8",
+            "scores": {
+              "players": 0.6533883040150007,
+              "ball": 0.37498252590497333,
+              "foreground": 0.514185414959987
+            },
+            "receipt": "automatic-roi-192-floor.json",
+            "receipt_sha256": "126c21b3247df44f5f9be3fd121b706a8e8f3dd5b335c27a3d6fed863cc85cc3"
+          },
+          {
+            "arm": "SVT-AV1 ROI 160x96",
+            "bytes": 13023,
+            "kbps": 26.046,
+            "sha256": "ccdb23a11f34723248b70befe24ab50ea1350cfa7920e045c360a1a0996157db",
+            "scores": {
+              "players": 0.6374459813038508,
+              "ball": 0.380324790875117,
+              "foreground": 0.5088853860894839
+            },
+            "receipt": "automatic-roi-160-floor.json",
+            "receipt_sha256": "e616fc1bbcde232321187b6dc458ff7716f3a3aaffb999949a83c8c0b504039f"
+          },
+          {
+            "arm": "SVT-AV1 ROI 256x144",
+            "bytes": 13675,
+            "kbps": 27.35,
+            "sha256": "089b4ae5164c6d074b9f360e4199f6cd727cbabbede3decf3a18eea99bd56d12",
+            "scores": {
+              "players": 0.5901622946063677,
+              "ball": 0.36271435022354126,
+              "foreground": 0.4764383224149545
+            },
+            "receipt": "automatic-roi-256-floor.json",
+            "receipt_sha256": "ea25129dae93e01ba4bf8f233f9fbc0580e8e6686e6ddfdbb6a1d46ac1b7063b"
+          },
+          {
+            "arm": "SVT-AV1 ROI 320x192",
+            "bytes": 13975,
+            "kbps": 27.95,
+            "sha256": "83b114e77c8b3b9a8e02229fd56519d7caaa6b4331d3a25661de6caab70e46c5",
+            "scores": {
+              "players": 0.5632175082961718,
+              "ball": 0.3483342081308365,
+              "foreground": 0.45577585821350414
+            },
+            "receipt": "automatic-roi-320-floor.json",
+            "receipt_sha256": "5aa4dc6f9a22644397247a6a253e7f921dbdfa378a0f8448c84d17e87f0c9b43"
+          },
+          {
+            "arm": "SVT-AV1 ROI 480x272",
+            "bytes": 15905,
+            "kbps": 31.81,
+            "sha256": "c142ebe2f755cd0e2d2de9e3bd68e6ea7958e7472abde09289b5bed43caf8e03",
+            "scores": {
+              "players": 0.5253251741329829,
+              "ball": 0.35812168816725415,
+              "foreground": 0.44172343115011853
+            },
+            "receipt": "automatic-roi-480-floor.json",
+            "receipt_sha256": "076fb656f1bf81fc5b358ab7918bdd6d5a40be62f76a318afdf70c9836d77b56"
+          },
+          {
+            "arm": "SVT-AV1 ROI 640x384",
+            "bytes": 17077,
+            "kbps": 34.154,
+            "sha256": "9a360274fe715cd2afc299211ad03e5bd249b3f4fdca0ee342e4ccfaf390b4e1",
+            "scores": {
+              "players": 0.5007243951161703,
+              "ball": 0.3221250573794047,
+              "foreground": 0.4114247262477875
+            },
+            "receipt": "automatic-roi-640-floor.json",
+            "receipt_sha256": "6af567c3251216847391065956f088ffae3be88d4fd917db4a368b6bcb4c2a7e"
+          },
+          {
+            "arm": "SVT-AV1 roi 320x192 cold",
+            "bytes": 129794,
+            "kbps": 259.588,
+            "sha256": "c0506e42262acc053f03a1c0d0a4e62c3818f4b14d0d065b57b4fd282aade478",
+            "scores": {
+              "players": 0.31045343975226086,
+              "ball": 0.23603763182957968,
+              "foreground": 0.27324553579092026
+            },
+            "receipt": "automatic-roi-320-cold.json",
+            "receipt_sha256": "52a860195898c88a27099d88bc8e44fbf3560372c49123a353d8550b4e3b30b9"
+          },
+          {
+            "arm": "SVT-AV1 roi 640x384 cold",
+            "bytes": 160748,
+            "kbps": 321.496,
+            "sha256": "803e1e91d813728408cc6b6a8c2ae655c0f9d69dc42cc6bc46ebd397ffbf84b3",
+            "scores": {
+              "players": 0.21322035789489746,
+              "ball": 0.17942760388056436,
+              "foreground": 0.19632398088773093
+            },
+            "receipt": "automatic-roi-640-cold.json",
+            "receipt_sha256": "9e7753c9db7d648df5abcb252bc3156e4b67a24124cca9fc0d2d54450f47ad82"
+          }
+        ],
+        "neural": [
+          {
+            "arm": "DCVC-UF Q24 480x272",
+            "bytes": 11224,
+            "kbps": 22.448,
+            "sha256": "fb46b547842d5368273860c106cfa5a6ca58bd3dc7a51af57f026aeadc7acf8c",
+            "scores": {
+              "players": 0.39724141856034595,
+              "ball": 0.3065286527077357,
+              "foreground": 0.35188503563404083
+            },
+            "receipt": "automatic-dcvc-480-q24.json",
+            "receipt_sha256": "89af26678599baaa436a244670472ab12bfb57f3e32aad4c7ce491747d5bffad"
+          },
+          {
+            "arm": "DCVC-UF Q26 480x272",
+            "bytes": 12305,
+            "kbps": 24.61,
+            "sha256": "c3d5581a90d2333768191df0f76ea91a992295c4ab0db3f08ef35665e8f382c4",
+            "scores": {
+              "players": 0.3905757615963618,
+              "ball": 0.30784588555494946,
+              "foreground": 0.34921082357565564
+            },
+            "receipt": "automatic-dcvc-480-q26.json",
+            "receipt_sha256": "d54840a26796895fdfb693d9a994439eb49bc27368a317ca8cbd276523ceb352"
+          },
+          {
+            "arm": "DCVC-UF Q27 480x272",
+            "bytes": 12913,
+            "kbps": 25.826,
+            "sha256": "64dca0e76681ce38c917df6012c54c0960f720c48ec77a2d2ae33c55e3e38312",
+            "scores": {
+              "players": 0.384930615623792,
+              "ball": 0.3071470359961192,
+              "foreground": 0.3460388258099556
+            },
+            "receipt": "automatic-dcvc-480-q27.json",
+            "receipt_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+          },
+          {
+            "arm": "DCVC-UF Q36 480x272",
+            "bytes": 20251,
+            "kbps": 40.502,
+            "sha256": "b4011f4bca94fcd98b2912e78aca8ea4d2773e3926a9566ff0ee7f7bbbe8c9da",
+            "scores": {
+              "players": 0.3447669396797816,
+              "ball": 0.29852710167566937,
+              "foreground": 0.3216470206777255
+            },
+            "receipt": "automatic-dcvc-480-q36.json",
+            "receipt_sha256": "9ace93de177c4bcf15bc1b1aa9f405f35abf46131e6c055d87eb2526ac5e064d"
+          },
+          {
+            "arm": "DCVC-UF Q63 480x272",
+            "bytes": 75408,
+            "kbps": 150.816,
+            "sha256": "6b6074650f40b11811bf79267b2a9769e9776f4bd58abb75d3a5d811c4781a69",
+            "scores": {
+              "players": 0.2977276345094045,
+              "ball": 0.239642933011055,
+              "foreground": 0.26868528376022977
+            },
+            "receipt": "automatic-dcvc-480-q63.json",
+            "receipt_sha256": "81e0052fbbb6584a0ffe7d258eb7ce1b7a145e76771c85f16b5383b9abdaea88"
+          },
+          {
+            "arm": "DCVC-UF Q48 960x544",
+            "bytes": 95865,
+            "kbps": 191.73,
+            "sha256": "e443d40d8a0281111026231e1114d71098b4968f33781b5d041881000531afef",
+            "scores": {
+              "players": 0.21221294005711874,
+              "ball": 0.16676764686902365,
+              "foreground": 0.1894902934630712
+            },
+            "receipt": "automatic-dcvc-960-q48.json",
+            "receipt_sha256": "dd79e2b6b8d2c911cd1be4d4eafe902a417f721c169a73f066ec85cee5fc12b1"
+          },
+          {
+            "arm": "DCVC-UF Q54 960x544",
+            "bytes": 132738,
+            "kbps": 265.476,
+            "sha256": "6c9644ab8239cafcb01929554a81715bda2c7c4ede222719c4fd48be6eeb9e94",
+            "scores": {
+              "players": 0.19974710047245026,
+              "ball": 0.16191557049751282,
+              "foreground": 0.18083133548498154
+            },
+            "receipt": "automatic-dcvc-960-q54.json",
+            "receipt_sha256": "760d1e24ff42915a154160aa2bc4573fd1c5953f5973532884f88d927300ce18"
+          }
+        ],
+        "pointstream": [
+          {
+            "arm": "PointStream two players and ball, base CRF 70",
+            "bytes": 12890,
+            "kbps": 25.78,
+            "sha256": "f9ab35e8d3cd6708e726fe57d9d7ba7cc8943285ac4535524491f5cfe0598384",
+            "scores": {
+              "players": 0.30214354147513706,
+              "ball": 0.2517430434624354,
+              "foreground": 0.27694329246878624
+            },
+            "receipt": "automatic-joint-70.json",
+            "receipt_sha256": "ff8d29ea2e6847be11a6f2bc2366fcc4d794b4872658637f7d367f069aad36b4",
+            "cold_kbps": 324.68
+          },
+          {
+            "arm": "PointStream two players and ball, base CRF 60",
+            "bytes": 15462,
+            "kbps": 30.924,
+            "sha256": "f557fdc85d5c2877a7f854e20536f13e706dabae434c84e37f762546e7ad9968",
+            "scores": {
+              "players": 0.29955027004082996,
+              "ball": 0.237636665503184,
+              "foreground": 0.268593467772007
+            },
+            "receipt": "automatic-joint-60.json",
+            "receipt_sha256": "bbbbf15865a1a6d8e7e8f7fe7f626fc7199689328a055e1b274ec68bfde45daf",
+            "cold_kbps": 329.824
+          },
+          {
+            "arm": "PointStream two players and ball, base CRF 50",
+            "bytes": 17827,
+            "kbps": 35.654,
+            "sha256": "11cf8f79869e69912006f0556bb7cbb6f967e0a46b0368881b67fa48ba71ecf0",
+            "scores": {
+              "players": 0.29972732563813526,
+              "ball": 0.2349073737859726,
+              "foreground": 0.26731734971205395
+            },
+            "receipt": "automatic-joint-50.json",
+            "receipt_sha256": "00bdb0eb59eb23884f187201f73ae7b5dd7e5e114b1b6df9e9bf22aaf44685c7",
+            "cold_kbps": 334.554
+          },
+          {
+            "arm": "PointStream 320x192",
+            "bytes": 38832,
+            "kbps": 77.664,
+            "cold_kbps": 376.564,
+            "sha256": "e246200fcffc644d04e4c63738e861272f297404da8ff234cd36a2b07f6f44a7",
+            "receipt_sha256": "8f8cd5cbbbbeeca667dc9e589300d9e706164c8e7efb0a7190bfcabe629de5ce",
+            "scores": {
+              "foreground": 0.24926978970567384,
+              "players": 0.2934762065609296,
+              "ball": 0.2050633728504181
+            }
+          },
+          {
+            "arm": "PointStream 320x192",
+            "bytes": 63515,
+            "kbps": 127.03,
+            "cold_kbps": 425.93,
+            "sha256": "47f47bcb8785943e30c2bcfc3838dd8ed0955a57fc349c09ebe6c8bb9551fb47",
+            "receipt_sha256": "8f8cd5cbbbbeeca667dc9e589300d9e706164c8e7efb0a7190bfcabe629de5ce",
+            "scores": {
+              "foreground": 0.2432136038939158,
+              "players": 0.29274027049541473,
+              "ball": 0.1936869372924169
+            }
+          },
+          {
+            "arm": "PointStream 640x384",
+            "bytes": 66384,
+            "kbps": 132.768,
+            "cold_kbps": 431.668,
+            "sha256": "58353a0ec63967c3c65108ac0a80ff2a6ef531f273de19f670f5612d428ea89e",
+            "receipt_sha256": "8f8cd5cbbbbeeca667dc9e589300d9e706164c8e7efb0a7190bfcabe629de5ce",
+            "scores": {
+              "foreground": 0.23466883351405463,
+              "players": 0.28990164895852405,
+              "ball": 0.17943601806958517
+            }
+          },
+          {
+            "arm": "PointStream 640x384",
+            "bytes": 94538,
+            "kbps": 189.076,
+            "cold_kbps": 487.976,
+            "sha256": "bfc2342c578c673d1de340e058c2b34d724e1036c34719c63dd8c67a75609422",
+            "receipt_sha256": "8f8cd5cbbbbeeca667dc9e589300d9e706164c8e7efb0a7190bfcabe629de5ce",
+            "scores": {
+              "foreground": 0.231266217927138,
+              "players": 0.28930965562661487,
+              "ball": 0.17322278022766113
+            }
+          }
+        ]
+      },
+      "players": {
+        "ordinary": [
+          {
+            "arm": "SVT-AV1 ordinary 256x144 warm",
+            "bytes": 12663,
+            "kbps": 25.326,
+            "sha256": "da9c8adfb1701e1c1575cb43e8c541e47df0f02f608da47f98d1a6a35ea0c60a",
+            "scores": {
+              "players": 0.4869203170140584,
+              "ball": 0.34754326939582825,
+              "foreground": 0.41723179320494336
+            },
+            "receipt": "automatic-ordinary-256-warm.json",
+            "receipt_sha256": "f8f655aa914b989ecd6013d807cce045b02bba53be2ebe91c158cb8a566b0420"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 320x192 warm",
+            "bytes": 12862,
+            "kbps": 25.724,
+            "sha256": "53a4b5ba06ab41fc3aa339dcda46a1981fd42215c588708d7c58194e7f471592",
+            "scores": {
+              "players": 0.48270222793022793,
+              "ball": 0.32915086050828296,
+              "foreground": 0.40592654421925545
+            },
+            "receipt": "automatic-ordinary-320-warm.json",
+            "receipt_sha256": "76368d7518e1400dad72907f855bd39f3354647af914f5bf1bcd01ecd44c2ca7"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 320x192 r15462",
+            "bytes": 14957,
+            "kbps": 29.914,
+            "sha256": "b241f141aa4eee3b4249380e561ee09523e7f86869185957446f4d316f4fc6ce",
+            "scores": {
+              "players": 0.4489462698499362,
+              "ball": 0.32785695791244507,
+              "foreground": 0.3884016138811906
+            },
+            "receipt": "automatic-ordinary-320-r15462.json",
+            "receipt_sha256": "c0afe0976237b498b57a57d17b22001b9297fa6390495005e566126f8ceace0b"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 480x272 r17827",
+            "bytes": 17590,
+            "kbps": 35.18,
+            "sha256": "398f6056cd39e4ead89ffc34fcded7016992b72ae3a6eef76724aa0f4cad8cc2",
+            "scores": {
+              "players": 0.43116645763317746,
+              "ball": 0.32061507801214856,
+              "foreground": 0.375890767822663
+            },
+            "receipt": "automatic-ordinary-480-r17827.json",
+            "receipt_sha256": "a09e586e575f31f8a2a310854b6d83b64a5bb4fd0a51dc564831a8b9a7a14599"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 320x192 r17827",
+            "bytes": 17662,
+            "kbps": 35.324,
+            "sha256": "b191debe47d5c8915c40641c9889271ba84dc0a04167d4a86b9d0c34d8bee793",
+            "scores": {
+              "players": 0.42275602867205936,
+              "ball": 0.3222683022419612,
+              "foreground": 0.37251216545701027
+            },
+            "receipt": "automatic-ordinary-320-r17827.json",
+            "receipt_sha256": "49924c903f9ac63d2b58825f22e7152215c4f8e7dd670064f38e9de49da279d8"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 960x544",
+            "bytes": 20497,
+            "kbps": 40.994,
+            "sha256": "041d6aae744104779c919adb69455f0fe5887aa1684be738565e8e3c2fc9f970",
+            "scores": {
+              "players": 0.40972881267468136,
+              "ball": 0.30141109228134155,
+              "foreground": 0.35556995247801143
+            },
+            "receipt": "automatic-ordinary-960-q280-range.json",
+            "receipt_sha256": "59f3cbe79e60fe6e3beb881bc375956067fe1eff26c81503529b283b51633f28"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 320x192",
+            "bytes": 21662,
+            "kbps": 43.324,
+            "sha256": "4852ac0e9b69d40e524d253586b297051509162cd7393cf699d9cae081009339",
+            "scores": {
+              "players": 0.4015224849184354,
+              "ball": 0.31863532960414886,
+              "foreground": 0.36007890726129216
+            },
+            "receipt": "automatic-ordinary-320-q235-range.json",
+            "receipt_sha256": "0c24096e599d63d3ea92087e7c9bb40ec621c8d3b393bc03a3863f87ba25d1b9"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 320x192",
+            "bytes": 26348,
+            "kbps": 52.696,
+            "sha256": "70a193dc275e043ec839cbcbe5023b93dfa5acc8e662bbe561c6b891c60ae0bb",
+            "scores": {
+              "players": 0.38022463768720627,
+              "ball": 0.31498994926611584,
+              "foreground": 0.34760729347666103
+            },
+            "receipt": "automatic-ordinary-320-q220-range.json",
+            "receipt_sha256": "224901d6f001761f62b2071df7b73076364bd55655ec031ca21e018200ea6331"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 640x384",
+            "bytes": 32244,
+            "kbps": 64.488,
+            "sha256": "181233789afe8d47e2e92b757c94c148bfd9030009dffb5a6903d5337a315356",
+            "scores": {
+              "players": 0.3351309572656949,
+              "ball": 0.2874115804831187,
+              "foreground": 0.3112712688744068
+            },
+            "receipt": "automatic-ordinary-640-q250-range.json",
+            "receipt_sha256": "8c760a09a9fdb1cc8f4d7f1203996d5366a0f77cb19c33702daa85213d1ea67d"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 480x272",
+            "bytes": 38301,
+            "kbps": 76.602,
+            "sha256": "008220726d1bd8c2e85379b7b0d6746ed3a2cc5ac2fb9eb8e133e08bb2b05438",
+            "scores": {
+              "players": 0.3336062903205554,
+              "ball": 0.30494657655556995,
+              "foreground": 0.31927643343806267
+            },
+            "receipt": "automatic-ordinary-480-q226-range.json",
+            "receipt_sha256": "494a71138d660ec1d7446f8f078c2bf514b0f18dfa27d9e08ac5c2f7095060b9"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 1920x1080",
+            "bytes": 41677,
+            "kbps": 83.354,
+            "sha256": "86078878304e79be696ce28759d05819518271ae7bdd033f2b26df889ac34268",
+            "scores": {
+              "players": 0.30020952224731445,
+              "ball": 0.2615618755420049,
+              "foreground": 0.2808856988946597
+            },
+            "receipt": "automatic-ordinary-1920-q280-range.json",
+            "receipt_sha256": "fe5d280b0b6edcbb20aa6d20d4df5860ea1059ef39616a4c770692535e0b0ea7"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 640x384",
+            "bytes": 67624,
+            "kbps": 135.248,
+            "sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+            "scores": {
+              "players": 0.27135121325651806,
+              "ball": 0.24173304935296377,
+              "foreground": 0.2565421313047409
+            },
+            "receipt": "automatic-ordinary-640-q220-range.json",
+            "receipt_sha256": "1fe4eae35bcb7e4499d8a99219344fd20c3eff5eb7c25d710b1a49c2d1a5e9bc"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 1920x1080 cold",
+            "bytes": 156539,
+            "kbps": 313.078,
+            "sha256": "94f39f3c1093d4ad7eb8d1b414056efdc06837d7c7bd1f92263792c771a853b8",
+            "scores": {
+              "players": 0.17923612147569656,
+              "ball": 0.14406523605187735,
+              "foreground": 0.16165067876378694
+            },
+            "receipt": "automatic-ordinary-1920-cold.json",
+            "receipt_sha256": "1aa473ec3e0469d78d743bc38383787057f5ff5a6eddf848597883e8789062bd"
+          }
+        ],
+        "roi": [
+          {
+            "arm": "SVT-AV1 ROI 192x112",
+            "bytes": 13009,
+            "kbps": 26.018,
+            "sha256": "9babc102a14fe9d27da93fc667d199df2db3540ed53bc4d9d64a4bc717afbaa8",
+            "scores": {
+              "players": 0.6533883040150007,
+              "ball": 0.37498252590497333,
+              "foreground": 0.514185414959987
+            },
+            "receipt": "automatic-roi-192-floor.json",
+            "receipt_sha256": "126c21b3247df44f5f9be3fd121b706a8e8f3dd5b335c27a3d6fed863cc85cc3"
+          },
+          {
+            "arm": "SVT-AV1 ROI 160x96",
+            "bytes": 13023,
+            "kbps": 26.046,
+            "sha256": "ccdb23a11f34723248b70befe24ab50ea1350cfa7920e045c360a1a0996157db",
+            "scores": {
+              "players": 0.6374459813038508,
+              "ball": 0.380324790875117,
+              "foreground": 0.5088853860894839
+            },
+            "receipt": "automatic-roi-160-floor.json",
+            "receipt_sha256": "e616fc1bbcde232321187b6dc458ff7716f3a3aaffb999949a83c8c0b504039f"
+          },
+          {
+            "arm": "SVT-AV1 ROI 256x144",
+            "bytes": 13675,
+            "kbps": 27.35,
+            "sha256": "089b4ae5164c6d074b9f360e4199f6cd727cbabbede3decf3a18eea99bd56d12",
+            "scores": {
+              "players": 0.5901622946063677,
+              "ball": 0.36271435022354126,
+              "foreground": 0.4764383224149545
+            },
+            "receipt": "automatic-roi-256-floor.json",
+            "receipt_sha256": "ea25129dae93e01ba4bf8f233f9fbc0580e8e6686e6ddfdbb6a1d46ac1b7063b"
+          },
+          {
+            "arm": "SVT-AV1 ROI 320x192",
+            "bytes": 13975,
+            "kbps": 27.95,
+            "sha256": "83b114e77c8b3b9a8e02229fd56519d7caaa6b4331d3a25661de6caab70e46c5",
+            "scores": {
+              "players": 0.5632175082961718,
+              "ball": 0.3483342081308365,
+              "foreground": 0.45577585821350414
+            },
+            "receipt": "automatic-roi-320-floor.json",
+            "receipt_sha256": "5aa4dc6f9a22644397247a6a253e7f921dbdfa378a0f8448c84d17e87f0c9b43"
+          },
+          {
+            "arm": "SVT-AV1 ROI 320x192",
+            "bytes": 14593,
+            "kbps": 29.186,
+            "sha256": "cdb12d8a179fc27d0c60809317b910c1e72bbedb5dc87b679c8adc0db4c7c894",
+            "scores": {
+              "players": 0.5583330517013868,
+              "ball": 0.35862815876801807,
+              "foreground": 0.4584806052347024
+            },
+            "receipt": "automatic-roi8-320-floor.json",
+            "receipt_sha256": "0e544d433436a333f157d3b4d20e17dc2c8c148a2c79f6e7eb01a2acffd6ff35"
+          },
+          {
+            "arm": "SVT-AV1 ROI 480x272",
+            "bytes": 15905,
+            "kbps": 31.81,
+            "sha256": "c142ebe2f755cd0e2d2de9e3bd68e6ea7958e7472abde09289b5bed43caf8e03",
+            "scores": {
+              "players": 0.5253251741329829,
+              "ball": 0.35812168816725415,
+              "foreground": 0.44172343115011853
+            },
+            "receipt": "automatic-roi-480-floor.json",
+            "receipt_sha256": "076fb656f1bf81fc5b358ab7918bdd6d5a40be62f76a318afdf70c9836d77b56"
+          },
+          {
+            "arm": "SVT-AV1 ROI 640x384",
+            "bytes": 17077,
+            "kbps": 34.154,
+            "sha256": "9a360274fe715cd2afc299211ad03e5bd249b3f4fdca0ee342e4ccfaf390b4e1",
+            "scores": {
+              "players": 0.5007243951161703,
+              "ball": 0.3221250573794047,
+              "foreground": 0.4114247262477875
+            },
+            "receipt": "automatic-roi-640-floor.json",
+            "receipt_sha256": "6af567c3251216847391065956f088ffae3be88d4fd917db4a368b6bcb4c2a7e"
+          },
+          {
+            "arm": "SVT-AV1 roi 320x192 cold",
+            "bytes": 129794,
+            "kbps": 259.588,
+            "sha256": "c0506e42262acc053f03a1c0d0a4e62c3818f4b14d0d065b57b4fd282aade478",
+            "scores": {
+              "players": 0.31045343975226086,
+              "ball": 0.23603763182957968,
+              "foreground": 0.27324553579092026
+            },
+            "receipt": "automatic-roi-320-cold.json",
+            "receipt_sha256": "52a860195898c88a27099d88bc8e44fbf3560372c49123a353d8550b4e3b30b9"
+          },
+          {
+            "arm": "SVT-AV1 roi 640x384 cold",
+            "bytes": 160748,
+            "kbps": 321.496,
+            "sha256": "803e1e91d813728408cc6b6a8c2ae655c0f9d69dc42cc6bc46ebd397ffbf84b3",
+            "scores": {
+              "players": 0.21322035789489746,
+              "ball": 0.17942760388056436,
+              "foreground": 0.19632398088773093
+            },
+            "receipt": "automatic-roi-640-cold.json",
+            "receipt_sha256": "9e7753c9db7d648df5abcb252bc3156e4b67a24124cca9fc0d2d54450f47ad82"
+          }
+        ],
+        "neural": [
+          {
+            "arm": "DCVC-UF Q24 480x272",
+            "bytes": 11224,
+            "kbps": 22.448,
+            "sha256": "fb46b547842d5368273860c106cfa5a6ca58bd3dc7a51af57f026aeadc7acf8c",
+            "scores": {
+              "players": 0.39724141856034595,
+              "ball": 0.3065286527077357,
+              "foreground": 0.35188503563404083
+            },
+            "receipt": "automatic-dcvc-480-q24.json",
+            "receipt_sha256": "89af26678599baaa436a244670472ab12bfb57f3e32aad4c7ce491747d5bffad"
+          },
+          {
+            "arm": "DCVC-UF Q26 480x272",
+            "bytes": 12305,
+            "kbps": 24.61,
+            "sha256": "c3d5581a90d2333768191df0f76ea91a992295c4ab0db3f08ef35665e8f382c4",
+            "scores": {
+              "players": 0.3905757615963618,
+              "ball": 0.30784588555494946,
+              "foreground": 0.34921082357565564
+            },
+            "receipt": "automatic-dcvc-480-q26.json",
+            "receipt_sha256": "d54840a26796895fdfb693d9a994439eb49bc27368a317ca8cbd276523ceb352"
+          },
+          {
+            "arm": "DCVC-UF Q27 480x272",
+            "bytes": 12913,
+            "kbps": 25.826,
+            "sha256": "64dca0e76681ce38c917df6012c54c0960f720c48ec77a2d2ae33c55e3e38312",
+            "scores": {
+              "players": 0.384930615623792,
+              "ball": 0.3071470359961192,
+              "foreground": 0.3460388258099556
+            },
+            "receipt": "automatic-dcvc-480-q27.json",
+            "receipt_sha256": "2dfd59bcf34ff8c67635a4f8076be0adcda4669517edf022b8249065b3aaed1f"
+          },
+          {
+            "arm": "DCVC-UF Q36 480x272",
+            "bytes": 20251,
+            "kbps": 40.502,
+            "sha256": "b4011f4bca94fcd98b2912e78aca8ea4d2773e3926a9566ff0ee7f7bbbe8c9da",
+            "scores": {
+              "players": 0.3447669396797816,
+              "ball": 0.29852710167566937,
+              "foreground": 0.3216470206777255
+            },
+            "receipt": "automatic-dcvc-480-q36.json",
+            "receipt_sha256": "9ace93de177c4bcf15bc1b1aa9f405f35abf46131e6c055d87eb2526ac5e064d"
+          },
+          {
+            "arm": "DCVC-UF Q63 480x272",
+            "bytes": 75408,
+            "kbps": 150.816,
+            "sha256": "6b6074650f40b11811bf79267b2a9769e9776f4bd58abb75d3a5d811c4781a69",
+            "scores": {
+              "players": 0.2977276345094045,
+              "ball": 0.239642933011055,
+              "foreground": 0.26868528376022977
+            },
+            "receipt": "automatic-dcvc-480-q63.json",
+            "receipt_sha256": "81e0052fbbb6584a0ffe7d258eb7ce1b7a145e76771c85f16b5383b9abdaea88"
+          },
+          {
+            "arm": "DCVC-UF Q48 960x544",
+            "bytes": 95865,
+            "kbps": 191.73,
+            "sha256": "e443d40d8a0281111026231e1114d71098b4968f33781b5d041881000531afef",
+            "scores": {
+              "players": 0.21221294005711874,
+              "ball": 0.16676764686902365,
+              "foreground": 0.1894902934630712
+            },
+            "receipt": "automatic-dcvc-960-q48.json",
+            "receipt_sha256": "dd79e2b6b8d2c911cd1be4d4eafe902a417f721c169a73f066ec85cee5fc12b1"
+          },
+          {
+            "arm": "DCVC-UF Q54 960x544",
+            "bytes": 132738,
+            "kbps": 265.476,
+            "sha256": "6c9644ab8239cafcb01929554a81715bda2c7c4ede222719c4fd48be6eeb9e94",
+            "scores": {
+              "players": 0.19974710047245026,
+              "ball": 0.16191557049751282,
+              "foreground": 0.18083133548498154
+            },
+            "receipt": "automatic-dcvc-960-q54.json",
+            "receipt_sha256": "760d1e24ff42915a154160aa2bc4573fd1c5953f5973532884f88d927300ce18"
+          }
+        ],
+        "pointstream": [
+          {
+            "arm": "PointStream two players and ball, base CRF 70",
+            "bytes": 12890,
+            "kbps": 25.78,
+            "sha256": "f9ab35e8d3cd6708e726fe57d9d7ba7cc8943285ac4535524491f5cfe0598384",
+            "scores": {
+              "players": 0.30214354147513706,
+              "ball": 0.2517430434624354,
+              "foreground": 0.27694329246878624
+            },
+            "receipt": "automatic-joint-70.json",
+            "receipt_sha256": "ff8d29ea2e6847be11a6f2bc2366fcc4d794b4872658637f7d367f069aad36b4",
+            "cold_kbps": 324.68
+          },
+          {
+            "arm": "PointStream two players and ball, base CRF 60",
+            "bytes": 15462,
+            "kbps": 30.924,
+            "sha256": "f557fdc85d5c2877a7f854e20536f13e706dabae434c84e37f762546e7ad9968",
+            "scores": {
+              "players": 0.29955027004082996,
+              "ball": 0.237636665503184,
+              "foreground": 0.268593467772007
+            },
+            "receipt": "automatic-joint-60.json",
+            "receipt_sha256": "bbbbf15865a1a6d8e7e8f7fe7f626fc7199689328a055e1b274ec68bfde45daf",
+            "cold_kbps": 329.824
+          },
+          {
+            "arm": "PointStream 320x192",
+            "bytes": 38832,
+            "kbps": 77.664,
+            "cold_kbps": 376.564,
+            "sha256": "e246200fcffc644d04e4c63738e861272f297404da8ff234cd36a2b07f6f44a7",
+            "receipt_sha256": "8f8cd5cbbbbeeca667dc9e589300d9e706164c8e7efb0a7190bfcabe629de5ce",
+            "scores": {
+              "foreground": 0.24926978970567384,
+              "players": 0.2934762065609296,
+              "ball": 0.2050633728504181
+            }
+          },
+          {
+            "arm": "PointStream 320x192",
+            "bytes": 63515,
+            "kbps": 127.03,
+            "cold_kbps": 425.93,
+            "sha256": "47f47bcb8785943e30c2bcfc3838dd8ed0955a57fc349c09ebe6c8bb9551fb47",
+            "receipt_sha256": "8f8cd5cbbbbeeca667dc9e589300d9e706164c8e7efb0a7190bfcabe629de5ce",
+            "scores": {
+              "foreground": 0.2432136038939158,
+              "players": 0.29274027049541473,
+              "ball": 0.1936869372924169
+            }
+          },
+          {
+            "arm": "PointStream 640x384",
+            "bytes": 66384,
+            "kbps": 132.768,
+            "cold_kbps": 431.668,
+            "sha256": "58353a0ec63967c3c65108ac0a80ff2a6ef531f273de19f670f5612d428ea89e",
+            "receipt_sha256": "8f8cd5cbbbbeeca667dc9e589300d9e706164c8e7efb0a7190bfcabe629de5ce",
+            "scores": {
+              "foreground": 0.23466883351405463,
+              "players": 0.28990164895852405,
+              "ball": 0.17943601806958517
+            }
+          },
+          {
+            "arm": "PointStream 640x384",
+            "bytes": 94538,
+            "kbps": 189.076,
+            "cold_kbps": 487.976,
+            "sha256": "bfc2342c578c673d1de340e058c2b34d724e1036c34719c63dd8c67a75609422",
+            "receipt_sha256": "8f8cd5cbbbbeeca667dc9e589300d9e706164c8e7efb0a7190bfcabe629de5ce",
+            "scores": {
+              "foreground": 0.231266217927138,
+              "players": 0.28930965562661487,
+              "ball": 0.17322278022766113
+            }
+          }
+        ]
+      },
+      "ball": {
+        "ordinary": [
+          {
+            "arm": "SVT-AV1 ordinary 256x144 warm",
+            "bytes": 12663,
+            "kbps": 25.326,
+            "sha256": "da9c8adfb1701e1c1575cb43e8c541e47df0f02f608da47f98d1a6a35ea0c60a",
+            "scores": {
+              "players": 0.4869203170140584,
+              "ball": 0.34754326939582825,
+              "foreground": 0.41723179320494336
+            },
+            "receipt": "automatic-ordinary-256-warm.json",
+            "receipt_sha256": "f8f655aa914b989ecd6013d807cce045b02bba53be2ebe91c158cb8a566b0420"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 320x192 warm",
+            "bytes": 12862,
+            "kbps": 25.724,
+            "sha256": "53a4b5ba06ab41fc3aa339dcda46a1981fd42215c588708d7c58194e7f471592",
+            "scores": {
+              "players": 0.48270222793022793,
+              "ball": 0.32915086050828296,
+              "foreground": 0.40592654421925545
+            },
+            "receipt": "automatic-ordinary-320-warm.json",
+            "receipt_sha256": "76368d7518e1400dad72907f855bd39f3354647af914f5bf1bcd01ecd44c2ca7"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 320x192 r15462",
+            "bytes": 14957,
+            "kbps": 29.914,
+            "sha256": "b241f141aa4eee3b4249380e561ee09523e7f86869185957446f4d316f4fc6ce",
+            "scores": {
+              "players": 0.4489462698499362,
+              "ball": 0.32785695791244507,
+              "foreground": 0.3884016138811906
+            },
+            "receipt": "automatic-ordinary-320-r15462.json",
+            "receipt_sha256": "c0afe0976237b498b57a57d17b22001b9297fa6390495005e566126f8ceace0b"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 640x384 r15462",
+            "bytes": 15364,
+            "kbps": 30.728,
+            "sha256": "439ef999fe843ef98b8ed3050e01ad06e912ccb98ad08e576a0e50800646585a",
+            "scores": {
+              "players": 0.46034588913122815,
+              "ball": 0.31524163484573364,
+              "foreground": 0.38779376198848087
+            },
+            "receipt": "automatic-ordinary-640-r15462.json",
+            "receipt_sha256": "73f2cd7f55d08f4ae26e11c9c372f7dff489e9ad39d1bb7c6ca20b3208941f61"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 640x384 r17827",
+            "bytes": 17623,
+            "kbps": 35.246,
+            "sha256": "ce22585fa5da053222672d7f1cbc9f51591f23cb0efc3a58e42a247fa1e5638b",
+            "scores": {
+              "players": 0.43797170867522556,
+              "ball": 0.314000462492307,
+              "foreground": 0.3759860855837663
+            },
+            "receipt": "automatic-ordinary-640-r17827.json",
+            "receipt_sha256": "341056c0331af2494bd8e13682e1a0dc581cc213c6d9fc3a64391ca16e69932f"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 960x544",
+            "bytes": 20497,
+            "kbps": 40.994,
+            "sha256": "041d6aae744104779c919adb69455f0fe5887aa1684be738565e8e3c2fc9f970",
+            "scores": {
+              "players": 0.40972881267468136,
+              "ball": 0.30141109228134155,
+              "foreground": 0.35556995247801143
+            },
+            "receipt": "automatic-ordinary-960-q280-range.json",
+            "receipt_sha256": "59f3cbe79e60fe6e3beb881bc375956067fe1eff26c81503529b283b51633f28"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 640x384",
+            "bytes": 32244,
+            "kbps": 64.488,
+            "sha256": "181233789afe8d47e2e92b757c94c148bfd9030009dffb5a6903d5337a315356",
+            "scores": {
+              "players": 0.3351309572656949,
+              "ball": 0.2874115804831187,
+              "foreground": 0.3112712688744068
+            },
+            "receipt": "automatic-ordinary-640-q250-range.json",
+            "receipt_sha256": "8c760a09a9fdb1cc8f4d7f1203996d5366a0f77cb19c33702daa85213d1ea67d"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 1920x1080",
+            "bytes": 41677,
+            "kbps": 83.354,
+            "sha256": "86078878304e79be696ce28759d05819518271ae7bdd033f2b26df889ac34268",
+            "scores": {
+              "players": 0.30020952224731445,
+              "ball": 0.2615618755420049,
+              "foreground": 0.2808856988946597
+            },
+            "receipt": "automatic-ordinary-1920-q280-range.json",
+            "receipt_sha256": "fe5d280b0b6edcbb20aa6d20d4df5860ea1059ef39616a4c770692535e0b0ea7"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 640x384",
+            "bytes": 67624,
+            "kbps": 135.248,
+            "sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+            "scores": {
+              "players": 0.27135121325651806,
+              "ball": 0.24173304935296377,
+              "foreground": 0.2565421313047409
+            },
+            "receipt": "automatic-ordinary-640-q220-range.json",
+            "receipt_sha256": "1fe4eae35bcb7e4499d8a99219344fd20c3eff5eb7c25d710b1a49c2d1a5e9bc"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 480x272",
+            "bytes": 75309,
+            "kbps": 150.618,
+            "sha256": "0f9d1c82e42b3e19d3f41733bfe2a52be93737b40a151230c22769c7e07078be",
+            "scores": {
+              "players": 0.28439697871605557,
+              "ball": 0.2374402234951655,
+              "foreground": 0.26091860110561055
+            },
+            "receipt": "automatic-ordinary-480-q172-range.json",
+            "receipt_sha256": "eba158fcba4c3fd11d737f84c03f312f85d4a793ada43cdeb3bd22431ac61a09"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 1920x1080 cold",
+            "bytes": 156539,
+            "kbps": 313.078,
+            "sha256": "94f39f3c1093d4ad7eb8d1b414056efdc06837d7c7bd1f92263792c771a853b8",
+            "scores": {
+              "players": 0.17923612147569656,
+              "ball": 0.14406523605187735,
+              "foreground": 0.16165067876378694
+            },
+            "receipt": "automatic-ordinary-1920-cold.json",
+            "receipt_sha256": "1aa473ec3e0469d78d743bc38383787057f5ff5a6eddf848597883e8789062bd"
+          }
+        ],
+        "roi": [
+          {
+            "arm": "SVT-AV1 ROI 192x112",
+            "bytes": 13009,
+            "kbps": 26.018,
+            "sha256": "9babc102a14fe9d27da93fc667d199df2db3540ed53bc4d9d64a4bc717afbaa8",
+            "scores": {
+              "players": 0.6533883040150007,
+              "ball": 0.37498252590497333,
+              "foreground": 0.514185414959987
+            },
+            "receipt": "automatic-roi-192-floor.json",
+            "receipt_sha256": "126c21b3247df44f5f9be3fd121b706a8e8f3dd5b335c27a3d6fed863cc85cc3"
+          },
+          {
+            "arm": "SVT-AV1 ROI 256x144",
+            "bytes": 13675,
+            "kbps": 27.35,
+            "sha256": "089b4ae5164c6d074b9f360e4199f6cd727cbabbede3decf3a18eea99bd56d12",
+            "scores": {
+              "players": 0.5901622946063677,
+              "ball": 0.36271435022354126,
+              "foreground": 0.4764383224149545
+            },
+            "receipt": "automatic-roi-256-floor.json",
+            "receipt_sha256": "ea25129dae93e01ba4bf8f233f9fbc0580e8e6686e6ddfdbb6a1d46ac1b7063b"
+          },
+          {
+            "arm": "SVT-AV1 ROI 320x192",
+            "bytes": 13975,
+            "kbps": 27.95,
+            "sha256": "83b114e77c8b3b9a8e02229fd56519d7caaa6b4331d3a25661de6caab70e46c5",
+            "scores": {
+              "players": 0.5632175082961718,
+              "ball": 0.3483342081308365,
+              "foreground": 0.45577585821350414
+            },
+            "receipt": "automatic-roi-320-floor.json",
+            "receipt_sha256": "5aa4dc6f9a22644397247a6a253e7f921dbdfa378a0f8448c84d17e87f0c9b43"
+          },
+          {
+            "arm": "SVT-AV1 ROI 640x384",
+            "bytes": 17077,
+            "kbps": 34.154,
+            "sha256": "9a360274fe715cd2afc299211ad03e5bd249b3f4fdca0ee342e4ccfaf390b4e1",
+            "scores": {
+              "players": 0.5007243951161703,
+              "ball": 0.3221250573794047,
+              "foreground": 0.4114247262477875
+            },
+            "receipt": "automatic-roi-640-floor.json",
+            "receipt_sha256": "6af567c3251216847391065956f088ffae3be88d4fd917db4a368b6bcb4c2a7e"
+          },
+          {
+            "arm": "SVT-AV1 roi 320x192 cold",
+            "bytes": 129794,
+            "kbps": 259.588,
+            "sha256": "c0506e42262acc053f03a1c0d0a4e62c3818f4b14d0d065b57b4fd282aade478",
+            "scores": {
+              "players": 0.31045343975226086,
+              "ball": 0.23603763182957968,
+              "foreground": 0.27324553579092026
+            },
+            "receipt": "automatic-roi-320-cold.json",
+            "receipt_sha256": "52a860195898c88a27099d88bc8e44fbf3560372c49123a353d8550b4e3b30b9"
+          },
+          {
+            "arm": "SVT-AV1 roi 640x384 cold",
+            "bytes": 160748,
+            "kbps": 321.496,
+            "sha256": "803e1e91d813728408cc6b6a8c2ae655c0f9d69dc42cc6bc46ebd397ffbf84b3",
+            "scores": {
+              "players": 0.21322035789489746,
+              "ball": 0.17942760388056436,
+              "foreground": 0.19632398088773093
+            },
+            "receipt": "automatic-roi-640-cold.json",
+            "receipt_sha256": "9e7753c9db7d648df5abcb252bc3156e4b67a24124cca9fc0d2d54450f47ad82"
+          }
+        ],
+        "neural": [
+          {
+            "arm": "DCVC-UF Q24 480x272",
+            "bytes": 11224,
+            "kbps": 22.448,
+            "sha256": "fb46b547842d5368273860c106cfa5a6ca58bd3dc7a51af57f026aeadc7acf8c",
+            "scores": {
+              "players": 0.39724141856034595,
+              "ball": 0.3065286527077357,
+              "foreground": 0.35188503563404083
+            },
+            "receipt": "automatic-dcvc-480-q24.json",
+            "receipt_sha256": "89af26678599baaa436a244670472ab12bfb57f3e32aad4c7ce491747d5bffad"
+          },
+          {
+            "arm": "DCVC-UF Q36 480x272",
+            "bytes": 20251,
+            "kbps": 40.502,
+            "sha256": "b4011f4bca94fcd98b2912e78aca8ea4d2773e3926a9566ff0ee7f7bbbe8c9da",
+            "scores": {
+              "players": 0.3447669396797816,
+              "ball": 0.29852710167566937,
+              "foreground": 0.3216470206777255
+            },
+            "receipt": "automatic-dcvc-480-q36.json",
+            "receipt_sha256": "9ace93de177c4bcf15bc1b1aa9f405f35abf46131e6c055d87eb2526ac5e064d"
+          },
+          {
+            "arm": "DCVC-UF Q63 480x272",
+            "bytes": 75408,
+            "kbps": 150.816,
+            "sha256": "6b6074650f40b11811bf79267b2a9769e9776f4bd58abb75d3a5d811c4781a69",
+            "scores": {
+              "players": 0.2977276345094045,
+              "ball": 0.239642933011055,
+              "foreground": 0.26868528376022977
+            },
+            "receipt": "automatic-dcvc-480-q63.json",
+            "receipt_sha256": "81e0052fbbb6584a0ffe7d258eb7ce1b7a145e76771c85f16b5383b9abdaea88"
+          },
+          {
+            "arm": "DCVC-UF Q48 960x544",
+            "bytes": 95865,
+            "kbps": 191.73,
+            "sha256": "e443d40d8a0281111026231e1114d71098b4968f33781b5d041881000531afef",
+            "scores": {
+              "players": 0.21221294005711874,
+              "ball": 0.16676764686902365,
+              "foreground": 0.1894902934630712
+            },
+            "receipt": "automatic-dcvc-960-q48.json",
+            "receipt_sha256": "dd79e2b6b8d2c911cd1be4d4eafe902a417f721c169a73f066ec85cee5fc12b1"
+          },
+          {
+            "arm": "DCVC-UF Q54 960x544",
+            "bytes": 132738,
+            "kbps": 265.476,
+            "sha256": "6c9644ab8239cafcb01929554a81715bda2c7c4ede222719c4fd48be6eeb9e94",
+            "scores": {
+              "players": 0.19974710047245026,
+              "ball": 0.16191557049751282,
+              "foreground": 0.18083133548498154
+            },
+            "receipt": "automatic-dcvc-960-q54.json",
+            "receipt_sha256": "760d1e24ff42915a154160aa2bc4573fd1c5953f5973532884f88d927300ce18"
+          }
+        ],
+        "pointstream": [
+          {
+            "arm": "PointStream two players and ball, base CRF 70",
+            "bytes": 12890,
+            "kbps": 25.78,
+            "sha256": "f9ab35e8d3cd6708e726fe57d9d7ba7cc8943285ac4535524491f5cfe0598384",
+            "scores": {
+              "players": 0.30214354147513706,
+              "ball": 0.2517430434624354,
+              "foreground": 0.27694329246878624
+            },
+            "receipt": "automatic-joint-70.json",
+            "receipt_sha256": "ff8d29ea2e6847be11a6f2bc2366fcc4d794b4872658637f7d367f069aad36b4",
+            "cold_kbps": 324.68
+          },
+          {
+            "arm": "PointStream two players and ball, base CRF 60",
+            "bytes": 15462,
+            "kbps": 30.924,
+            "sha256": "f557fdc85d5c2877a7f854e20536f13e706dabae434c84e37f762546e7ad9968",
+            "scores": {
+              "players": 0.29955027004082996,
+              "ball": 0.237636665503184,
+              "foreground": 0.268593467772007
+            },
+            "receipt": "automatic-joint-60.json",
+            "receipt_sha256": "bbbbf15865a1a6d8e7e8f7fe7f626fc7199689328a055e1b274ec68bfde45daf",
+            "cold_kbps": 329.824
+          },
+          {
+            "arm": "PointStream two players and ball, base CRF 50",
+            "bytes": 17827,
+            "kbps": 35.654,
+            "sha256": "11cf8f79869e69912006f0556bb7cbb6f967e0a46b0368881b67fa48ba71ecf0",
+            "scores": {
+              "players": 0.29972732563813526,
+              "ball": 0.2349073737859726,
+              "foreground": 0.26731734971205395
+            },
+            "receipt": "automatic-joint-50.json",
+            "receipt_sha256": "00bdb0eb59eb23884f187201f73ae7b5dd7e5e114b1b6df9e9bf22aaf44685c7",
+            "cold_kbps": 334.554
+          },
+          {
+            "arm": "PointStream 320x192",
+            "bytes": 38832,
+            "kbps": 77.664,
+            "cold_kbps": 376.564,
+            "sha256": "e246200fcffc644d04e4c63738e861272f297404da8ff234cd36a2b07f6f44a7",
+            "receipt_sha256": "8f8cd5cbbbbeeca667dc9e589300d9e706164c8e7efb0a7190bfcabe629de5ce",
+            "scores": {
+              "foreground": 0.24926978970567384,
+              "players": 0.2934762065609296,
+              "ball": 0.2050633728504181
+            }
+          },
+          {
+            "arm": "PointStream 320x192",
+            "bytes": 63515,
+            "kbps": 127.03,
+            "cold_kbps": 425.93,
+            "sha256": "47f47bcb8785943e30c2bcfc3838dd8ed0955a57fc349c09ebe6c8bb9551fb47",
+            "receipt_sha256": "8f8cd5cbbbbeeca667dc9e589300d9e706164c8e7efb0a7190bfcabe629de5ce",
+            "scores": {
+              "foreground": 0.2432136038939158,
+              "players": 0.29274027049541473,
+              "ball": 0.1936869372924169
+            }
+          },
+          {
+            "arm": "PointStream 640x384",
+            "bytes": 66384,
+            "kbps": 132.768,
+            "cold_kbps": 431.668,
+            "sha256": "58353a0ec63967c3c65108ac0a80ff2a6ef531f273de19f670f5612d428ea89e",
+            "receipt_sha256": "8f8cd5cbbbbeeca667dc9e589300d9e706164c8e7efb0a7190bfcabe629de5ce",
+            "scores": {
+              "foreground": 0.23466883351405463,
+              "players": 0.28990164895852405,
+              "ball": 0.17943601806958517
+            }
+          },
+          {
+            "arm": "PointStream 640x384",
+            "bytes": 94538,
+            "kbps": 189.076,
+            "cold_kbps": 487.976,
+            "sha256": "bfc2342c578c673d1de340e058c2b34d724e1036c34719c63dd8c67a75609422",
+            "receipt_sha256": "8f8cd5cbbbbeeca667dc9e589300d9e706164c8e7efb0a7190bfcabe629de5ce",
+            "scores": {
+              "foreground": 0.231266217927138,
+              "players": 0.28930965562661487,
+              "ball": 0.17322278022766113
+            }
+          }
+        ]
+      }
+    },
+    "state_and_priorities": [
+      {
+        "rate": 25.78,
+        "bytes": 12890,
+        "packet_sha256": "f9ab35e8d3cd6708e726fe57d9d7ba7cc8943285ac4535524491f5cfe0598384",
+        "initialization_bytes": 149450,
+        "first_use_rate": 324.68,
+        "priorities": {
+          "12890": [
+            0.0,
+            1.0
+          ],
+          "42500": [
+            0.0,
+            0.8354425511529969
+          ],
+          "68000": null,
+          "96000": null
+        },
+        "reuse": {
+          "foreground": {
+            "status": "finite",
+            "anchor_rate": 135.248,
+            "anchor_sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+            "active_seconds": 10.921913253188148
+          },
+          "players": {
+            "status": "finite",
+            "anchor_rate": 83.354,
+            "anchor_sha256": "86078878304e79be696ce28759d05819518271ae7bdd033f2b26df889ac34268",
+            "active_seconds": 20.76631812971133
+          },
+          "ball": {
+            "status": "finite",
+            "anchor_rate": 135.248,
+            "anchor_sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+            "active_seconds": 10.921913253188148
+          }
+        }
+      },
+      {
+        "rate": 30.924,
+        "bytes": 15462,
+        "packet_sha256": "f557fdc85d5c2877a7f854e20536f13e706dabae434c84e37f762546e7ad9968",
+        "initialization_bytes": 149450,
+        "first_use_rate": 329.824,
+        "priorities": {
+          "15462": [
+            0.0,
+            1.0
+          ],
+          "42500": [
+            0.0,
+            1.0
+          ],
+          "68000": [
+            0.0,
+            0.12684093387026166
+          ],
+          "96000": null
+        },
+        "reuse": {
+          "foreground": {
+            "status": "finite",
+            "anchor_rate": 135.248,
+            "anchor_sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+            "active_seconds": 11.460450136114414
+          },
+          "players": {
+            "status": "finite",
+            "anchor_rate": 135.248,
+            "anchor_sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+            "active_seconds": 11.460450136114414
+          },
+          "ball": {
+            "status": "finite",
+            "anchor_rate": 150.618,
+            "anchor_sha256": "0f9d1c82e42b3e19d3f41733bfe2a52be93737b40a151230c22769c7e07078be",
+            "active_seconds": 9.988804785536452
+          }
+        }
+      },
+      {
+        "rate": 35.654,
+        "bytes": 17827,
+        "packet_sha256": "11cf8f79869e69912006f0556bb7cbb6f967e0a46b0368881b67fa48ba71ecf0",
+        "initialization_bytes": 149450,
+        "first_use_rate": 334.554,
+        "priorities": {
+          "17827": [
+            0.0,
+            1.0
+          ],
+          "42500": [
+            0.0,
+            1.0
+          ],
+          "68000": [
+            0.0,
+            0.19390138867253243
+          ],
+          "96000": null
+        },
+        "reuse": {
+          "foreground": {
+            "status": "finite",
+            "anchor_rate": 135.248,
+            "anchor_sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+            "active_seconds": 12.004739241319758
+          },
+          "players": {
+            "status": "finite",
+            "anchor_rate": 135.248,
+            "anchor_sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+            "active_seconds": 12.004739241319758
+          },
+          "ball": {
+            "status": "finite",
+            "anchor_rate": 191.73,
+            "anchor_sha256": "e443d40d8a0281111026231e1114d71098b4968f33781b5d041881000531afef",
+            "active_seconds": 7.660370588687562
+          }
+        }
+      },
+      {
+        "rate": 77.664,
+        "bytes": 38832,
+        "packet_sha256": "e246200fcffc644d04e4c63738e861272f297404da8ff234cd36a2b07f6f44a7",
+        "initialization_bytes": 149450,
+        "first_use_rate": 376.564,
+        "priorities": {
+          "38832": [
+            0.0,
+            1.0
+          ],
+          "42500": [
+            0.0,
+            1.0
+          ],
+          "68000": [
+            0.0,
+            0.6236904913820357
+          ],
+          "96000": null
+        },
+        "reuse": {
+          "foreground": {
+            "status": "finite",
+            "anchor_rate": 191.73,
+            "anchor_sha256": "e443d40d8a0281111026231e1114d71098b4968f33781b5d041881000531afef",
+            "active_seconds": 10.481650973997512
+          },
+          "players": {
+            "status": "finite",
+            "anchor_rate": 135.248,
+            "anchor_sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+            "active_seconds": 20.762711864406786
+          },
+          "ball": {
+            "status": "finite",
+            "anchor_rate": 191.73,
+            "anchor_sha256": "e443d40d8a0281111026231e1114d71098b4968f33781b5d041881000531afef",
+            "active_seconds": 10.481650973997512
+          }
+        }
+      },
+      {
+        "rate": 127.03,
+        "bytes": 63515,
+        "packet_sha256": "47f47bcb8785943e30c2bcfc3838dd8ed0955a57fc349c09ebe6c8bb9551fb47",
+        "initialization_bytes": 149450,
+        "first_use_rate": 425.93,
+        "priorities": {
+          "63515": [
+            0.0,
+            1.0
+          ],
+          "68000": [
+            0.0,
+            0.6919564328178561
+          ],
+          "96000": null
+        },
+        "reuse": {
+          "foreground": {
+            "status": "finite",
+            "anchor_rate": 191.73,
+            "anchor_sha256": "e443d40d8a0281111026231e1114d71098b4968f33781b5d041881000531afef",
+            "active_seconds": 18.47913446676971
+          },
+          "players": {
+            "status": "finite",
+            "anchor_rate": 135.248,
+            "anchor_sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+            "active_seconds": 145.48551959114158
+          },
+          "ball": {
+            "status": "finite",
+            "anchor_rate": 191.73,
+            "anchor_sha256": "e443d40d8a0281111026231e1114d71098b4968f33781b5d041881000531afef",
+            "active_seconds": 18.47913446676971
+          }
+        }
+      },
+      {
+        "rate": 132.768,
+        "bytes": 66384,
+        "packet_sha256": "58353a0ec63967c3c65108ac0a80ff2a6ef531f273de19f670f5612d428ea89e",
+        "initialization_bytes": 149450,
+        "first_use_rate": 431.668,
+        "priorities": {
+          "66384": [
+            0.0,
+            1.0
+          ],
+          "68000": [
+            0.0,
+            0.7705501929286234
+          ],
+          "96000": null
+        },
+        "reuse": {
+          "foreground": {
+            "status": "finite",
+            "anchor_rate": 191.73,
+            "anchor_sha256": "e443d40d8a0281111026231e1114d71098b4968f33781b5d041881000531afef",
+            "active_seconds": 20.27746684305146
+          },
+          "players": {
+            "status": "finite",
+            "anchor_rate": 135.248,
+            "anchor_sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+            "active_seconds": 482.09677419355035
+          },
+          "ball": {
+            "status": "finite",
+            "anchor_rate": 191.73,
+            "anchor_sha256": "e443d40d8a0281111026231e1114d71098b4968f33781b5d041881000531afef",
+            "active_seconds": 20.27746684305146
+          }
+        }
+      },
+      {
+        "rate": 168.812,
+        "bytes": 84406,
+        "packet_sha256": "b02e394669acc89156e25b045cfa77886803cac52afc9a7e125ee0f95ad88867",
+        "initialization_bytes": 149450,
+        "first_use_rate": 467.712,
+        "priorities": {
+          "84406": [
+            0.0,
+            0.6923570384304127
+          ],
+          "96000": null
+        },
+        "reuse": {
+          "foreground": {
+            "status": "finite",
+            "anchor_rate": 191.73,
+            "anchor_sha256": "e443d40d8a0281111026231e1114d71098b4968f33781b5d041881000531afef",
+            "active_seconds": 52.16860109957244
+          },
+          "players": {
+            "status": "anchor_already_equal_rate_or_cheaper",
+            "anchor_rate": 135.248,
+            "anchor_sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+            "active_seconds": null
+          },
+          "ball": {
+            "status": "finite",
+            "anchor_rate": 191.73,
+            "anchor_sha256": "e443d40d8a0281111026231e1114d71098b4968f33781b5d041881000531afef",
+            "active_seconds": 52.16860109957244
+          }
+        }
+      },
+      {
+        "rate": 189.076,
+        "bytes": 94538,
+        "packet_sha256": "bfc2342c578c673d1de340e058c2b34d724e1036c34719c63dd8c67a75609422",
+        "initialization_bytes": 149450,
+        "first_use_rate": 487.976,
+        "priorities": {
+          "94538": [
+            0.0,
+            0.7923128255351385
+          ],
+          "96000": null
+        },
+        "reuse": {
+          "foreground": {
+            "status": "finite",
+            "anchor_rate": 191.73,
+            "anchor_sha256": "e443d40d8a0281111026231e1114d71098b4968f33781b5d041881000531afef",
+            "active_seconds": 450.489826676715
+          },
+          "players": {
+            "status": "anchor_already_equal_rate_or_cheaper",
+            "anchor_rate": 135.248,
+            "anchor_sha256": "653893598bde220eb507e925a085210f54b4036ec62d90bbf2303375790eb833",
+            "active_seconds": null
+          },
+          "ball": {
+            "status": "finite",
+            "anchor_rate": 191.73,
+            "anchor_sha256": "e443d40d8a0281111026231e1114d71098b4968f33781b5d041881000531afef",
+            "active_seconds": 450.489826676715
+          }
+        }
+      }
+    ],
+    "bd_rate": {
+      "foreground": {
+        "ordinary": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              25.78,
+              -0.27694329246878624
+            ],
+            [
+              30.924,
+              -0.268593467772007
+            ],
+            [
+              35.654,
+              -0.26731734971205395
+            ],
+            [
+              77.664,
+              -0.24926978970567384
+            ],
+            [
+              127.03,
+              -0.2432136038939158
+            ],
+            [
+              132.768,
+              -0.23466883351405463
+            ],
+            [
+              189.076,
+              -0.231266217927138
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              25.326,
+              -0.41723179320494336
+            ],
+            [
+              25.724,
+              -0.40592654421925545
+            ],
+            [
+              29.914,
+              -0.3884016138811906
+            ],
+            [
+              30.728,
+              -0.38779376198848087
+            ],
+            [
+              35.18,
+              -0.375890767822663
+            ],
+            [
+              35.324,
+              -0.37251216545701027
+            ],
+            [
+              40.994,
+              -0.35556995247801143
+            ],
+            [
+              52.696,
+              -0.34760729347666103
+            ],
+            [
+              64.488,
+              -0.3112712688744068
+            ],
+            [
+              83.354,
+              -0.2808856988946597
+            ],
+            [
+              135.248,
+              -0.2565421313047409
+            ],
+            [
+              313.078,
+              -0.16165067876378694
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              25.326,
+              -0.41723179320494336
+            ],
+            [
+              25.724,
+              -0.40592654421925545
+            ],
+            [
+              29.914,
+              -0.3884016138811906
+            ],
+            [
+              40.994,
+              -0.35556995247801143
+            ],
+            [
+              64.488,
+              -0.3112712688744068
+            ],
+            [
+              83.354,
+              -0.2808856988946597
+            ],
+            [
+              313.078,
+              -0.16165067876378694
+            ]
+          ],
+          "candidate_rate_support": [
+            25.78,
+            189.076
+          ],
+          "anchor_rate_support": [
+            25.326,
+            313.078
+          ],
+          "bd_rate": {
+            "hull_pchip": -0.39992052695009694,
+            "pareto_pchip": -0.5199367147839021,
+            "hull_linear_rate": -0.49893976672138063
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.27694329246878624,
+            -0.231266217927138
+          ]
+        },
+        "roi": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              25.78,
+              -0.27694329246878624
+            ],
+            [
+              30.924,
+              -0.268593467772007
+            ],
+            [
+              35.654,
+              -0.26731734971205395
+            ],
+            [
+              77.664,
+              -0.24926978970567384
+            ],
+            [
+              127.03,
+              -0.2432136038939158
+            ],
+            [
+              132.768,
+              -0.23466883351405463
+            ],
+            [
+              189.076,
+              -0.231266217927138
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              26.018,
+              -0.514185414959987
+            ],
+            [
+              26.046,
+              -0.5088853860894839
+            ],
+            [
+              27.35,
+              -0.4764383224149545
+            ],
+            [
+              27.95,
+              -0.45577585821350414
+            ],
+            [
+              31.81,
+              -0.44172343115011853
+            ],
+            [
+              34.154,
+              -0.4114247262477875
+            ],
+            [
+              259.588,
+              -0.27324553579092026
+            ],
+            [
+              321.496,
+              -0.19632398088773093
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              26.018,
+              -0.514185414959987
+            ],
+            [
+              26.046,
+              -0.5088853860894839
+            ],
+            [
+              27.95,
+              -0.45577585821350414
+            ],
+            [
+              34.154,
+              -0.4114247262477875
+            ],
+            [
+              321.496,
+              -0.19632398088773093
+            ]
+          ],
+          "candidate_rate_support": [
+            25.78,
+            189.076
+          ],
+          "anchor_rate_support": [
+            26.018,
+            321.496
+          ],
+          "bd_rate": {
+            "hull_pchip": -0.5493700728012494,
+            "pareto_pchip": -0.7684007036488408,
+            "hull_linear_rate": -0.7275372339329477
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.27694329246878624,
+            -0.231266217927138
+          ]
+        },
+        "neural": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              25.78,
+              -0.27694329246878624
+            ],
+            [
+              30.924,
+              -0.268593467772007
+            ],
+            [
+              35.654,
+              -0.26731734971205395
+            ],
+            [
+              77.664,
+              -0.24926978970567384
+            ],
+            [
+              127.03,
+              -0.2432136038939158
+            ],
+            [
+              132.768,
+              -0.23466883351405463
+            ],
+            [
+              189.076,
+              -0.231266217927138
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              22.448,
+              -0.35188503563404083
+            ],
+            [
+              24.61,
+              -0.34921082357565564
+            ],
+            [
+              25.826,
+              -0.3460388258099556
+            ],
+            [
+              40.502,
+              -0.3216470206777255
+            ],
+            [
+              150.816,
+              -0.26868528376022977
+            ],
+            [
+              191.73,
+              -0.1894902934630712
+            ],
+            [
+              265.476,
+              -0.18083133548498154
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              22.448,
+              -0.35188503563404083
+            ],
+            [
+              25.826,
+              -0.3460388258099556
+            ],
+            [
+              40.502,
+              -0.3216470206777255
+            ],
+            [
+              191.73,
+              -0.1894902934630712
+            ],
+            [
+              265.476,
+              -0.18083133548498154
+            ]
+          ],
+          "candidate_rate_support": [
+            25.78,
+            189.076
+          ],
+          "anchor_rate_support": [
+            22.448,
+            265.476
+          ],
+          "bd_rate": {
+            "hull_pchip": -0.19950166076291437,
+            "pareto_pchip": -0.5884460017061834,
+            "hull_linear_rate": -0.43164718857057754
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.27694329246878624,
+            -0.231266217927138
+          ]
+        }
+      },
+      "players": {
+        "ordinary": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              25.78,
+              -0.30214354147513706
+            ],
+            [
+              30.924,
+              -0.29955027004082996
+            ],
+            [
+              77.664,
+              -0.2934762065609296
+            ],
+            [
+              127.03,
+              -0.29274027049541473
+            ],
+            [
+              132.768,
+              -0.28990164895852405
+            ],
+            [
+              189.076,
+              -0.28930965562661487
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              25.326,
+              -0.4869203170140584
+            ],
+            [
+              25.724,
+              -0.48270222793022793
+            ],
+            [
+              29.914,
+              -0.4489462698499362
+            ],
+            [
+              35.18,
+              -0.43116645763317746
+            ],
+            [
+              35.324,
+              -0.42275602867205936
+            ],
+            [
+              40.994,
+              -0.40972881267468136
+            ],
+            [
+              43.324,
+              -0.4015224849184354
+            ],
+            [
+              52.696,
+              -0.38022463768720627
+            ],
+            [
+              64.488,
+              -0.3351309572656949
+            ],
+            [
+              76.602,
+              -0.3336062903205554
+            ],
+            [
+              83.354,
+              -0.30020952224731445
+            ],
+            [
+              135.248,
+              -0.27135121325651806
+            ],
+            [
+              313.078,
+              -0.17923612147569656
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              25.326,
+              -0.4869203170140584
+            ],
+            [
+              25.724,
+              -0.48270222793022793
+            ],
+            [
+              29.914,
+              -0.4489462698499362
+            ],
+            [
+              35.324,
+              -0.42275602867205936
+            ],
+            [
+              64.488,
+              -0.3351309572656949
+            ],
+            [
+              83.354,
+              -0.30020952224731445
+            ],
+            [
+              135.248,
+              -0.27135121325651806
+            ],
+            [
+              313.078,
+              -0.17923612147569656
+            ]
+          ],
+          "candidate_rate_support": [
+            25.78,
+            189.076
+          ],
+          "anchor_rate_support": [
+            25.326,
+            313.078
+          ],
+          "bd_rate": {
+            "hull_pchip": -0.3603640525916937,
+            "pareto_pchip": -0.35098388888023685,
+            "hull_linear_rate": -0.3222962847629436
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.30214354147513706,
+            -0.28930965562661487
+          ]
+        },
+        "roi": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              25.78,
+              -0.30214354147513706
+            ],
+            [
+              30.924,
+              -0.29955027004082996
+            ],
+            [
+              77.664,
+              -0.2934762065609296
+            ],
+            [
+              127.03,
+              -0.29274027049541473
+            ],
+            [
+              132.768,
+              -0.28990164895852405
+            ],
+            [
+              189.076,
+              -0.28930965562661487
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              26.018,
+              -0.6533883040150007
+            ],
+            [
+              26.046,
+              -0.6374459813038508
+            ],
+            [
+              27.35,
+              -0.5901622946063677
+            ],
+            [
+              27.95,
+              -0.5632175082961718
+            ],
+            [
+              29.186,
+              -0.5583330517013868
+            ],
+            [
+              31.81,
+              -0.5253251741329829
+            ],
+            [
+              34.154,
+              -0.5007243951161703
+            ],
+            [
+              259.588,
+              -0.31045343975226086
+            ],
+            [
+              321.496,
+              -0.21322035789489746
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              26.018,
+              -0.6533883040150007
+            ],
+            [
+              26.046,
+              -0.6374459813038508
+            ],
+            [
+              27.95,
+              -0.5632175082961718
+            ],
+            [
+              34.154,
+              -0.5007243951161703
+            ],
+            [
+              321.496,
+              -0.21322035789489746
+            ]
+          ],
+          "candidate_rate_support": [
+            25.78,
+            189.076
+          ],
+          "anchor_rate_support": [
+            26.018,
+            321.496
+          ],
+          "bd_rate": {
+            "hull_pchip": -0.5815599883560832,
+            "pareto_pchip": -0.791792807071113,
+            "hull_linear_rate": -0.7409036672366155
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.30214354147513706,
+            -0.28930965562661487
+          ]
+        },
+        "neural": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              25.78,
+              -0.30214354147513706
+            ],
+            [
+              30.924,
+              -0.29955027004082996
+            ],
+            [
+              77.664,
+              -0.2934762065609296
+            ],
+            [
+              127.03,
+              -0.29274027049541473
+            ],
+            [
+              132.768,
+              -0.28990164895852405
+            ],
+            [
+              189.076,
+              -0.28930965562661487
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              22.448,
+              -0.39724141856034595
+            ],
+            [
+              24.61,
+              -0.3905757615963618
+            ],
+            [
+              25.826,
+              -0.384930615623792
+            ],
+            [
+              40.502,
+              -0.3447669396797816
+            ],
+            [
+              150.816,
+              -0.2977276345094045
+            ],
+            [
+              191.73,
+              -0.21221294005711874
+            ],
+            [
+              265.476,
+              -0.19974710047245026
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              22.448,
+              -0.39724141856034595
+            ],
+            [
+              25.826,
+              -0.384930615623792
+            ],
+            [
+              40.502,
+              -0.3447669396797816
+            ],
+            [
+              191.73,
+              -0.21221294005711874
+            ],
+            [
+              265.476,
+              -0.19974710047245026
+            ]
+          ],
+          "candidate_rate_support": [
+            25.78,
+            189.076
+          ],
+          "anchor_rate_support": [
+            22.448,
+            265.476
+          ],
+          "bd_rate": {
+            "hull_pchip": -0.1467980893644837,
+            "pareto_pchip": -0.6261440135713011,
+            "hull_linear_rate": -0.3573364988582538
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.30214354147513706,
+            -0.28930965562661487
+          ]
+        }
+      },
+      "ball": {
+        "ordinary": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              25.78,
+              -0.2517430434624354
+            ],
+            [
+              30.924,
+              -0.237636665503184
+            ],
+            [
+              35.654,
+              -0.2349073737859726
+            ],
+            [
+              77.664,
+              -0.2050633728504181
+            ],
+            [
+              127.03,
+              -0.1936869372924169
+            ],
+            [
+              132.768,
+              -0.17943601806958517
+            ],
+            [
+              189.076,
+              -0.17322278022766113
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              25.326,
+              -0.34754326939582825
+            ],
+            [
+              25.724,
+              -0.32915086050828296
+            ],
+            [
+              29.914,
+              -0.32785695791244507
+            ],
+            [
+              30.728,
+              -0.31524163484573364
+            ],
+            [
+              35.246,
+              -0.314000462492307
+            ],
+            [
+              40.994,
+              -0.30141109228134155
+            ],
+            [
+              64.488,
+              -0.2874115804831187
+            ],
+            [
+              83.354,
+              -0.2615618755420049
+            ],
+            [
+              135.248,
+              -0.24173304935296377
+            ],
+            [
+              150.618,
+              -0.2374402234951655
+            ],
+            [
+              313.078,
+              -0.14406523605187735
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              25.326,
+              -0.34754326939582825
+            ],
+            [
+              25.724,
+              -0.32915086050828296
+            ],
+            [
+              30.728,
+              -0.31524163484573364
+            ],
+            [
+              40.994,
+              -0.30141109228134155
+            ],
+            [
+              83.354,
+              -0.2615618755420049
+            ],
+            [
+              313.078,
+              -0.14406523605187735
+            ]
+          ],
+          "candidate_rate_support": [
+            25.78,
+            189.076
+          ],
+          "anchor_rate_support": [
+            25.326,
+            313.078
+          ],
+          "bd_rate": {
+            "hull_pchip": -0.5898672633880558,
+            "pareto_pchip": -0.6696430331592914,
+            "hull_linear_rate": -0.6151542036445534
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.2517430434624354,
+            -0.17322278022766113
+          ]
+        },
+        "roi": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              25.78,
+              -0.2517430434624354
+            ],
+            [
+              30.924,
+              -0.237636665503184
+            ],
+            [
+              35.654,
+              -0.2349073737859726
+            ],
+            [
+              77.664,
+              -0.2050633728504181
+            ],
+            [
+              127.03,
+              -0.1936869372924169
+            ],
+            [
+              132.768,
+              -0.17943601806958517
+            ],
+            [
+              189.076,
+              -0.17322278022766113
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              26.018,
+              -0.37498252590497333
+            ],
+            [
+              27.35,
+              -0.36271435022354126
+            ],
+            [
+              27.95,
+              -0.3483342081308365
+            ],
+            [
+              34.154,
+              -0.3221250573794047
+            ],
+            [
+              259.588,
+              -0.23603763182957968
+            ],
+            [
+              321.496,
+              -0.17942760388056436
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              26.018,
+              -0.37498252590497333
+            ],
+            [
+              27.95,
+              -0.3483342081308365
+            ],
+            [
+              34.154,
+              -0.3221250573794047
+            ],
+            [
+              321.496,
+              -0.17942760388056436
+            ]
+          ],
+          "candidate_rate_support": [
+            25.78,
+            189.076
+          ],
+          "anchor_rate_support": [
+            26.018,
+            321.496
+          ],
+          "bd_rate": {
+            "hull_pchip": -0.6098195050922424,
+            "pareto_pchip": -0.7857707254185925,
+            "hull_linear_rate": -0.7470875808633238
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.2517430434624354,
+            -0.17942760388056436
+          ]
+        },
+        "neural": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              25.78,
+              -0.2517430434624354
+            ],
+            [
+              30.924,
+              -0.237636665503184
+            ],
+            [
+              35.654,
+              -0.2349073737859726
+            ],
+            [
+              77.664,
+              -0.2050633728504181
+            ],
+            [
+              127.03,
+              -0.1936869372924169
+            ],
+            [
+              132.768,
+              -0.17943601806958517
+            ],
+            [
+              189.076,
+              -0.17322278022766113
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              22.448,
+              -0.3065286527077357
+            ],
+            [
+              40.502,
+              -0.29852710167566937
+            ],
+            [
+              150.816,
+              -0.239642933011055
+            ],
+            [
+              191.73,
+              -0.16676764686902365
+            ],
+            [
+              265.476,
+              -0.16191557049751282
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              22.448,
+              -0.3065286527077357
+            ],
+            [
+              191.73,
+              -0.16676764686902365
+            ],
+            [
+              265.476,
+              -0.16191557049751282
+            ]
+          ],
+          "candidate_rate_support": [
+            25.78,
+            189.076
+          ],
+          "anchor_rate_support": [
+            22.448,
+            265.476
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.046571260427752136,
+            "pareto_pchip": -0.5970113380512276,
+            "hull_linear_rate": -0.4996311542239322
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.2517430434624354,
+            -0.17322278022766113
+          ]
+        }
+      }
+    },
+    "measured_changes": {
+      "foreground": [
+        {
+          "from": null,
+          "to": {
+            "ceiling_bytes": 12890,
+            "winner": "pointstream",
+            "winning_rate": 25.78,
+            "winning_dists": 0.27694329246878624
+          }
+        },
+        {
+          "from": {
+            "ceiling_bytes": 94538,
+            "winner": "pointstream",
+            "winning_rate": 189.076,
+            "winning_dists": 0.231266217927138
+          },
+          "to": {
+            "ceiling_bytes": 95865,
+            "winner": "neural",
+            "winning_rate": 191.73,
+            "winning_dists": 0.1894902934630712
+          }
+        },
+        {
+          "from": {
+            "ceiling_bytes": 132738,
+            "winner": "neural",
+            "winning_rate": 265.476,
+            "winning_dists": 0.18083133548498154
+          },
+          "to": {
+            "ceiling_bytes": 156539,
+            "winner": "ordinary",
+            "winning_rate": 313.078,
+            "winning_dists": 0.16165067876378694
+          }
+        }
+      ],
+      "players": [
+        {
+          "from": null,
+          "to": {
+            "ceiling_bytes": 12890,
+            "winner": "pointstream",
+            "winning_rate": 25.78,
+            "winning_dists": 0.30214354147513706
+          }
+        },
+        {
+          "from": {
+            "ceiling_bytes": 66384,
+            "winner": "pointstream",
+            "winning_rate": 132.768,
+            "winning_dists": 0.28990164895852405
+          },
+          "to": {
+            "ceiling_bytes": 67624,
+            "winner": "ordinary",
+            "winning_rate": 135.248,
+            "winning_dists": 0.27135121325651806
+          }
+        },
+        {
+          "from": {
+            "ceiling_bytes": 94538,
+            "winner": "ordinary",
+            "winning_rate": 135.248,
+            "winning_dists": 0.27135121325651806
+          },
+          "to": {
+            "ceiling_bytes": 95865,
+            "winner": "neural",
+            "winning_rate": 191.73,
+            "winning_dists": 0.21221294005711874
+          }
+        },
+        {
+          "from": {
+            "ceiling_bytes": 132738,
+            "winner": "neural",
+            "winning_rate": 265.476,
+            "winning_dists": 0.19974710047245026
+          },
+          "to": {
+            "ceiling_bytes": 156539,
+            "winner": "ordinary",
+            "winning_rate": 313.078,
+            "winning_dists": 0.17923612147569656
+          }
+        }
+      ],
+      "ball": [
+        {
+          "from": null,
+          "to": {
+            "ceiling_bytes": 12890,
+            "winner": "pointstream",
+            "winning_rate": 25.78,
+            "winning_dists": 0.2517430434624354
+          }
+        },
+        {
+          "from": {
+            "ceiling_bytes": 94538,
+            "winner": "pointstream",
+            "winning_rate": 189.076,
+            "winning_dists": 0.17322278022766113
+          },
+          "to": {
+            "ceiling_bytes": 95865,
+            "winner": "neural",
+            "winning_rate": 191.73,
+            "winning_dists": 0.16676764686902365
+          }
+        },
+        {
+          "from": {
+            "ceiling_bytes": 132738,
+            "winner": "neural",
+            "winning_rate": 265.476,
+            "winning_dists": 0.16191557049751282
+          },
+          "to": {
+            "ceiling_bytes": 156539,
+            "winner": "ordinary",
+            "winning_rate": 313.078,
+            "winning_dists": 0.14406523605187735
+          }
+        }
+      ]
+    }
+  },
+  "Shanghai \u00b7 Sinner\u2013Shelton": {
+    "source_sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+    "baseline_receipt_sha256": "7f624fb6d63314564e3e6ac0c0745e983dbd09f2496a188990e52f11df3240cb",
+    "wider_receipt_sha256": {
+      "q23-metrics.json": "12f8ea0375485819b8a931ae6701df42779c31bbbd72c16c9efec33c0e49e727",
+      "q17-metrics.json": "2ec1a15c4cb2da5187a5400783ac392269a395024193b25f7a7b3940abb6e541",
+      "q640-metrics.json": "75ba9a87c36db121e0124e2071e97fba222be1a80857013a46bc04fa02aee667"
+    },
+    "source_ticks": 240,
+    "scored_ticks": [
+      9,
+      31,
+      49,
+      72,
+      95,
+      112,
+      135,
+      152,
+      175,
+      198,
+      215,
+      238
+    ],
+    "frontiers": {
+      "foreground": {
+        "ordinary": [
+          {
+            "arm": "SVT-AV1 ordinary 256x144 warm",
+            "bytes": 13273,
+            "kbps": 13.25974025974026,
+            "sha256": "f48f5d647ee2de4ce2eb79edccc107a7e01fc4a64d96311194564bb99d2ac6ee",
+            "scores": {
+              "players": 0.5664065356055895,
+              "ball": 0.318858082095782,
+              "foreground": 0.4426323088506858
+            },
+            "receipt": "score-ordinary-256-warm.json",
+            "receipt_sha256": "6cff3687c8edf4d5346b0cad8cd4a28a05804cfedd7cd9ec3aa824b4a16b36f0"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 320x192 warm",
+            "bytes": 13408,
+            "kbps": 13.394605394605394,
+            "sha256": "8e26c7677715534e49ef6451bc4b823a68b5dae4cca5a8eb5e3e188befaa79b0",
+            "scores": {
+              "players": 0.5768444339434305,
+              "ball": 0.2981932759284973,
+              "foreground": 0.43751885493596393
+            },
+            "receipt": "score-ordinary-320-warm.json",
+            "receipt_sha256": "6f4be63231e1fa132ab229abd1707edb9162d0d92c7a28a56eb029e08e9d953c"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 480x272 warm",
+            "bytes": 17529,
+            "kbps": 17.511488511488515,
+            "sha256": "56cbbe618ef8e36373280a8b5dbf63079409f505593c41cab6629fcbe29f9d72",
+            "scores": {
+              "players": 0.532114232579867,
+              "ball": 0.28634602824846905,
+              "foreground": 0.40923013041416806
+            },
+            "receipt": "automatic-ordinary-480-warm.json",
+            "receipt_sha256": "ea902ca02cb7329c772625365a172516ecb81a022c744b43391ff4a0415a29a5"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 320x192 warm",
+            "bytes": 17687,
+            "kbps": 17.66933066933067,
+            "sha256": "3487fc8fb528ff096a3a5efa63d92e83eb75f8b6847afbdefc482d7317b15621",
+            "scores": {
+              "players": 0.5245776176452637,
+              "ball": 0.29037120441595715,
+              "foreground": 0.4074744110306104
+            },
+            "receipt": "automatic-ordinary-320-warm.json",
+            "receipt_sha256": "538bb36bd846ec1dd373672509901e84e0bcd30d70dc403d6fe4d440a78683d9"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 640x384 warm",
+            "bytes": 17731,
+            "kbps": 17.713286713286713,
+            "sha256": "841dc70c6276193b8a3cca8d554576af7b30143228cc0a4e1215e3b84c901360",
+            "scores": {
+              "players": 0.5319821412364641,
+              "ball": 0.26600279410680133,
+              "foreground": 0.39899246767163277
+            },
+            "receipt": "automatic-ordinary-640-warm.json",
+            "receipt_sha256": "c63740190b0e0dce8b685c47bc1bb981e29879ab205543fe46b45a35f631a9df"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 1920x1080 r90",
+            "bytes": 89433,
+            "kbps": 89.34365634365635,
+            "sha256": "6e90412f697fbb1fc070604377cf25f4e8a8c73ef12d0b92c58dcc6b8d2a9d39",
+            "receipt_sha256": "79741644b45ab03aad4f003daf324a18ede7a7ba24738551e4aa2c59f45bfa1b",
+            "scores": {
+              "players": 0.3184340223670006,
+              "ball": 0.1983616997798284,
+              "foreground": 0.2583978610734145
+            }
+          },
+          {
+            "arm": "SVT-AV1 ordinary 1920x1080 r120",
+            "bytes": 119023,
+            "kbps": 118.9040959040959,
+            "sha256": "d2ac3d7b73ef58a85078997112221733ccd4dbe278249d34a83cc867c652c3ec",
+            "receipt_sha256": "a11148df724cfd2526e674de18b4901a47faf382874e61cdfd8b7be0bb428738",
+            "scores": {
+              "players": 0.281901016831398,
+              "ball": 0.18775523702303568,
+              "foreground": 0.23482812692721686
+            }
+          },
+          {
+            "arm": "SVT-AV1 ordinary 1920x1080 r140",
+            "bytes": 138908,
+            "kbps": 138.76923076923077,
+            "sha256": "6f28dbcf20974241053a7a3a85a7b0328c0e467e2a4ee25b5902692f2d2a801c",
+            "receipt_sha256": "f2b26449bfb31c46042c766a429040e28b65b0a496a8eec8bee118e0d68f54a8",
+            "scores": {
+              "players": 0.26888712743918103,
+              "ball": 0.17000549534956613,
+              "foreground": 0.21944631139437357
+            }
+          },
+          {
+            "arm": "SVT-AV1 ordinary 1920x1080 cold",
+            "bytes": 146960,
+            "kbps": 146.81318681318683,
+            "sha256": "0f5f4a43846508145a97acbf46aae9ced05f952ac63ab0e7fe2481e7b59f3cdb",
+            "scores": {
+              "players": 0.2597329566876094,
+              "ball": 0.17712855339050293,
+              "foreground": 0.21843075503905615
+            },
+            "receipt": "score-ordinary-1920-cold.json",
+            "receipt_sha256": "b654e21ac3053e98231248f377bdf4b7a1b633570c0c06b6f48b25429b74295a"
+          }
+        ],
+        "roi": [
+          {
+            "arm": "SVT-AV1 roi 256x144 warm",
+            "bytes": 13528,
+            "kbps": 13.514485514485514,
+            "sha256": "a6b60458261af3ed22f71701b7430a7fcbe8d24447fef67fb76811a64fd5b056",
+            "scores": {
+              "players": 0.6621989235281944,
+              "ball": 0.3673599511384964,
+              "foreground": 0.5147794373333454
+            },
+            "receipt": "score-roi-256-warm.json",
+            "receipt_sha256": "a5c693abc2a01d16e442365d55107eb5352e2af816b87a478f5c69ec97eca8e2"
+          },
+          {
+            "arm": "SVT-AV1 roi 640x384 warm",
+            "bytes": 17736,
+            "kbps": 17.71828171828172,
+            "sha256": "9d62dae129c3f7222337257c4673be25e48e66b56ba535d60f6b34192a3339d2",
+            "scores": {
+              "players": 0.5681189919511477,
+              "ball": 0.2766084869702657,
+              "foreground": 0.4223637394607067
+            },
+            "receipt": "automatic-roi-640-warm.json",
+            "receipt_sha256": "eb4e081763058b01509ab1b0281e831084f708758eef80e464f5e0803caae12e"
+          },
+          {
+            "arm": "SVT-AV1 foreground-roi 640x384 r90",
+            "bytes": 90056,
+            "kbps": 89.96603396603396,
+            "sha256": "16d06311af55f2672b4cce2749346720881d4c7b0298f98fad3e4a2c5f80b51c",
+            "receipt_sha256": "e1121a738a90a191787c2f8f10a9820396ba7104abe3a0e2b146a5239c7b5e11",
+            "scores": {
+              "players": 0.3235676437616348,
+              "ball": 0.2211993783712387,
+              "foreground": 0.27238351106643677
+            }
+          },
+          {
+            "arm": "SVT-AV1 foreground-roi 640x384 r120",
+            "bytes": 118866,
+            "kbps": 118.74725274725274,
+            "sha256": "681190a09e1578c2beaac604dd4ad15315eddd4fbbedd38d60dc53eda95af01e",
+            "receipt_sha256": "576e454e1bc79578c2d63168f3cce4a5a9f2931a22149484e395a2ae8d883ed9",
+            "scores": {
+              "players": 0.300181046128273,
+              "ball": 0.20566324392954508,
+              "foreground": 0.25292214502890903
+            }
+          },
+          {
+            "arm": "SVT-AV1 foreground-roi 640x384 r140",
+            "bytes": 139532,
+            "kbps": 139.3926073926074,
+            "sha256": "f4840458cf321898316a3c41ad993a25a74110af468008c7031be2645325f85d",
+            "receipt_sha256": "a1aeeb373b6a5468b681be820e55b1e803356ff4a525350b306e482c495fb71f",
+            "scores": {
+              "players": 0.2879679004351298,
+              "ball": 0.19824042916297913,
+              "foreground": 0.24310416479905447
+            }
+          }
+        ],
+        "neural": [
+          {
+            "arm": "DCVC-UF Q24 480x272",
+            "bytes": 10548,
+            "kbps": 10.537462537462538,
+            "sha256": "4723b91727abacf6a2f292939cb6edb23f2971b983c5be4cf1cb639309ea63e5",
+            "scores": {
+              "players": 0.48005277415116626,
+              "ball": 0.27973505357901257,
+              "foreground": 0.3798939138650894
+            },
+            "receipt": "automatic-q24.json",
+            "receipt_sha256": "42cd77e9e73dc51d8255a2ab9e8c821d22d54d763c2ad06374b3fe7157cd7321"
+          },
+          {
+            "arm": "DCVC-UF Q28 480x272",
+            "bytes": 12901,
+            "kbps": 12.888111888111887,
+            "sha256": "69c7a751f86c2cd132796bd1d1b0bcf77a376764aabe5af6b96371cced4ea345",
+            "scores": {
+              "players": 0.4633705293138822,
+              "ball": 0.2750616470972697,
+              "foreground": 0.36921608820557594
+            },
+            "receipt": "score-dcvc-480-q28.json",
+            "receipt_sha256": "905a365dc1a538e40db6aa620bf8e422bad580deb72264faf102cc7ee7b67d7f"
+          },
+          {
+            "arm": "DCVC-UF Q29 480x272",
+            "bytes": 13602,
+            "kbps": 13.588411588411587,
+            "sha256": "e979a62ea50b95eea9fd103a1278fa0e6e2e8bf13e88be7cd147d79e7133f9a1",
+            "scores": {
+              "players": 0.45619160681962967,
+              "ball": 0.27266070743401843,
+              "foreground": 0.3644261571268241
+            },
+            "receipt": "score-dcvc-480-q29.json",
+            "receipt_sha256": "7d5df6b2a62f0a8b1380021da53578ab0bd293338bbfb5558461a7624c09dd6a"
+          },
+          {
+            "arm": "DCVC-UF Q31 480x272",
+            "bytes": 15028,
+            "kbps": 15.012987012987015,
+            "sha256": "5d69533cf9d1b3352be421b2ebebc6a2435b545d892cc70cd6a2521c96eb25e0",
+            "scores": {
+              "players": 0.44659988830486935,
+              "ball": 0.271824171145757,
+              "foreground": 0.3592120297253132
+            },
+            "receipt": "score-dcvc-480-q31.json",
+            "receipt_sha256": "c7573ecfe2bb466ca55b440c8867393b2fc4d6f7b1f741e477361ffea7bdb5f0"
+          },
+          {
+            "arm": "DCVC-UF Q34 480x272",
+            "bytes": 17432,
+            "kbps": 17.414585414585414,
+            "sha256": "e6c1ab762b0f585d04beaa02d2e3e647ab2ee0084322cbaebe7ea9952a57bf6b",
+            "scores": {
+              "players": 0.43134696781635284,
+              "ball": 0.27327940861384076,
+              "foreground": 0.3523131882150968
+            },
+            "receipt": "automatic-dcvc-q34.json",
+            "receipt_sha256": "6a605b513c71615e13518be3f9ef0f3f93a6215edea98dacb3632781d61ac89b"
+          }
+        ],
+        "pointstream": [
+          {
+            "arm": "PointStream two players and ball, base CRF 70",
+            "bytes": 13555,
+            "kbps": 13.54145854145854,
+            "sha256": "c969c69ef59a1d027439d1a2478b7fcd745b40c7991463f3eb2d57ff345f0d9a",
+            "scores": {
+              "players": 0.3311777909596761,
+              "ball": 0.2844676474730174,
+              "foreground": 0.30782271921634674
+            },
+            "receipt": "automatic-joint-70.json",
+            "receipt_sha256": "3e70e67666f6e2aa379040bef57c49d3725c6b19570d7030695e8f75396bdaff",
+            "cold_kbps": 150.8841158841159
+          },
+          {
+            "arm": "PointStream two players and ball, base CRF 50",
+            "bytes": 17794,
+            "kbps": 17.776223776223773,
+            "sha256": "fdc8fcbb39599348e966f07666a0472cf4cbb9211e8baf7ada44ba59161b7780",
+            "scores": {
+              "players": 0.3297010386983554,
+              "ball": 0.2593456010023753,
+              "foreground": 0.29452331985036534
+            },
+            "receipt": "automatic-joint-50.json",
+            "receipt_sha256": "ad4df3e1c880dc8b6632059cc3e5bcb66daa266ec408d419c79cd4d5c1d17b52",
+            "cold_kbps": 155.11888111888112
+          },
+          {
+            "arm": "PointStream 320x192",
+            "bytes": 83277,
+            "kbps": 83.1938061938062,
+            "cold_kbps": 220.53646353646354,
+            "sha256": "794336050f76b0992909b5ff7a92205d2306ca170689c5ad5f527a25af3721d4",
+            "receipt_sha256": "12f8ea0375485819b8a931ae6701df42779c31bbbd72c16c9efec33c0e49e727",
+            "scores": {
+              "foreground": 0.25959958011905354,
+              "players": 0.3216152961055438,
+              "ball": 0.19758386413256326
+            }
+          },
+          {
+            "arm": "PointStream 320x192",
+            "bytes": 109880,
+            "kbps": 109.77022977022978,
+            "cold_kbps": 247.1128871128871,
+            "sha256": "04abcae0d7df0dd51163bbe332d9d29338d100bc4ed1d923bd2df2fe8d9ef07e",
+            "receipt_sha256": "2ec1a15c4cb2da5187a5400783ac392269a395024193b25f7a7b3940abb6e541",
+            "scores": {
+              "foreground": 0.25957132255037624,
+              "players": 0.321535420914491,
+              "ball": 0.1976072241862615
+            }
+          },
+          {
+            "arm": "PointStream 640x384",
+            "bytes": 113241,
+            "kbps": 113.12787212787212,
+            "cold_kbps": 250.47052947052947,
+            "sha256": "06bf12dd38ace992dbf3a752bc0944573f9ebb3cde14a61d5bec108eb7a5f200",
+            "receipt_sha256": "75ba9a87c36db121e0124e2071e97fba222be1a80857013a46bc04fa02aee667",
+            "scores": {
+              "foreground": 0.2422130766014258,
+              "players": 0.31294086823860806,
+              "ball": 0.17148528496424356
+            }
+          }
+        ]
+      },
+      "players": {
+        "ordinary": [
+          {
+            "arm": "SVT-AV1 ordinary 256x144 warm",
+            "bytes": 13273,
+            "kbps": 13.25974025974026,
+            "sha256": "f48f5d647ee2de4ce2eb79edccc107a7e01fc4a64d96311194564bb99d2ac6ee",
+            "scores": {
+              "players": 0.5664065356055895,
+              "ball": 0.318858082095782,
+              "foreground": 0.4426323088506858
+            },
+            "receipt": "score-ordinary-256-warm.json",
+            "receipt_sha256": "6cff3687c8edf4d5346b0cad8cd4a28a05804cfedd7cd9ec3aa824b4a16b36f0"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 480x272 warm",
+            "bytes": 17529,
+            "kbps": 17.511488511488515,
+            "sha256": "56cbbe618ef8e36373280a8b5dbf63079409f505593c41cab6629fcbe29f9d72",
+            "scores": {
+              "players": 0.532114232579867,
+              "ball": 0.28634602824846905,
+              "foreground": 0.40923013041416806
+            },
+            "receipt": "automatic-ordinary-480-warm.json",
+            "receipt_sha256": "ea902ca02cb7329c772625365a172516ecb81a022c744b43391ff4a0415a29a5"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 320x192 warm",
+            "bytes": 17687,
+            "kbps": 17.66933066933067,
+            "sha256": "3487fc8fb528ff096a3a5efa63d92e83eb75f8b6847afbdefc482d7317b15621",
+            "scores": {
+              "players": 0.5245776176452637,
+              "ball": 0.29037120441595715,
+              "foreground": 0.4074744110306104
+            },
+            "receipt": "automatic-ordinary-320-warm.json",
+            "receipt_sha256": "538bb36bd846ec1dd373672509901e84e0bcd30d70dc403d6fe4d440a78683d9"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 1920x1080 r90",
+            "bytes": 89433,
+            "kbps": 89.34365634365635,
+            "sha256": "6e90412f697fbb1fc070604377cf25f4e8a8c73ef12d0b92c58dcc6b8d2a9d39",
+            "receipt_sha256": "79741644b45ab03aad4f003daf324a18ede7a7ba24738551e4aa2c59f45bfa1b",
+            "scores": {
+              "players": 0.3184340223670006,
+              "ball": 0.1983616997798284,
+              "foreground": 0.2583978610734145
+            }
+          },
+          {
+            "arm": "SVT-AV1 ordinary 1920x1080 r120",
+            "bytes": 119023,
+            "kbps": 118.9040959040959,
+            "sha256": "d2ac3d7b73ef58a85078997112221733ccd4dbe278249d34a83cc867c652c3ec",
+            "receipt_sha256": "a11148df724cfd2526e674de18b4901a47faf382874e61cdfd8b7be0bb428738",
+            "scores": {
+              "players": 0.281901016831398,
+              "ball": 0.18775523702303568,
+              "foreground": 0.23482812692721686
+            }
+          },
+          {
+            "arm": "SVT-AV1 ordinary 1920x1080 r140",
+            "bytes": 138908,
+            "kbps": 138.76923076923077,
+            "sha256": "6f28dbcf20974241053a7a3a85a7b0328c0e467e2a4ee25b5902692f2d2a801c",
+            "receipt_sha256": "f2b26449bfb31c46042c766a429040e28b65b0a496a8eec8bee118e0d68f54a8",
+            "scores": {
+              "players": 0.26888712743918103,
+              "ball": 0.17000549534956613,
+              "foreground": 0.21944631139437357
+            }
+          },
+          {
+            "arm": "SVT-AV1 ordinary 1920x1080 cold",
+            "bytes": 146960,
+            "kbps": 146.81318681318683,
+            "sha256": "0f5f4a43846508145a97acbf46aae9ced05f952ac63ab0e7fe2481e7b59f3cdb",
+            "scores": {
+              "players": 0.2597329566876094,
+              "ball": 0.17712855339050293,
+              "foreground": 0.21843075503905615
+            },
+            "receipt": "score-ordinary-1920-cold.json",
+            "receipt_sha256": "b654e21ac3053e98231248f377bdf4b7a1b633570c0c06b6f48b25429b74295a"
+          }
+        ],
+        "roi": [
+          {
+            "arm": "SVT-AV1 roi 256x144 warm",
+            "bytes": 13528,
+            "kbps": 13.514485514485514,
+            "sha256": "a6b60458261af3ed22f71701b7430a7fcbe8d24447fef67fb76811a64fd5b056",
+            "scores": {
+              "players": 0.6621989235281944,
+              "ball": 0.3673599511384964,
+              "foreground": 0.5147794373333454
+            },
+            "receipt": "score-roi-256-warm.json",
+            "receipt_sha256": "a5c693abc2a01d16e442365d55107eb5352e2af816b87a478f5c69ec97eca8e2"
+          },
+          {
+            "arm": "SVT-AV1 roi 640x384 warm",
+            "bytes": 17736,
+            "kbps": 17.71828171828172,
+            "sha256": "9d62dae129c3f7222337257c4673be25e48e66b56ba535d60f6b34192a3339d2",
+            "scores": {
+              "players": 0.5681189919511477,
+              "ball": 0.2766084869702657,
+              "foreground": 0.4223637394607067
+            },
+            "receipt": "automatic-roi-640-warm.json",
+            "receipt_sha256": "eb4e081763058b01509ab1b0281e831084f708758eef80e464f5e0803caae12e"
+          },
+          {
+            "arm": "SVT-AV1 roi 480x272 warm",
+            "bytes": 17755,
+            "kbps": 17.73726273726274,
+            "sha256": "03b30ebb0fc2c898a11dc7d50e8f6ad1fc765eeeee8757c35f3ad8debe99b10d",
+            "scores": {
+              "players": 0.5629750912388166,
+              "ball": 0.292971874276797,
+              "foreground": 0.4279734827578068
+            },
+            "receipt": "automatic-roi-480-warm.json",
+            "receipt_sha256": "efa9c2f32487012679e4b978929e4c372477ba21ad7a63192bd78a1de0b6d7a4"
+          },
+          {
+            "arm": "SVT-AV1 foreground-roi 640x384 r90",
+            "bytes": 90056,
+            "kbps": 89.96603396603396,
+            "sha256": "16d06311af55f2672b4cce2749346720881d4c7b0298f98fad3e4a2c5f80b51c",
+            "receipt_sha256": "e1121a738a90a191787c2f8f10a9820396ba7104abe3a0e2b146a5239c7b5e11",
+            "scores": {
+              "players": 0.3235676437616348,
+              "ball": 0.2211993783712387,
+              "foreground": 0.27238351106643677
+            }
+          },
+          {
+            "arm": "SVT-AV1 foreground-roi 640x384 r120",
+            "bytes": 118866,
+            "kbps": 118.74725274725274,
+            "sha256": "681190a09e1578c2beaac604dd4ad15315eddd4fbbedd38d60dc53eda95af01e",
+            "receipt_sha256": "576e454e1bc79578c2d63168f3cce4a5a9f2931a22149484e395a2ae8d883ed9",
+            "scores": {
+              "players": 0.300181046128273,
+              "ball": 0.20566324392954508,
+              "foreground": 0.25292214502890903
+            }
+          },
+          {
+            "arm": "SVT-AV1 foreground-roi 640x384 r140",
+            "bytes": 139532,
+            "kbps": 139.3926073926074,
+            "sha256": "f4840458cf321898316a3c41ad993a25a74110af468008c7031be2645325f85d",
+            "receipt_sha256": "a1aeeb373b6a5468b681be820e55b1e803356ff4a525350b306e482c495fb71f",
+            "scores": {
+              "players": 0.2879679004351298,
+              "ball": 0.19824042916297913,
+              "foreground": 0.24310416479905447
+            }
+          }
+        ],
+        "neural": [
+          {
+            "arm": "DCVC-UF Q24 480x272",
+            "bytes": 10548,
+            "kbps": 10.537462537462538,
+            "sha256": "4723b91727abacf6a2f292939cb6edb23f2971b983c5be4cf1cb639309ea63e5",
+            "scores": {
+              "players": 0.48005277415116626,
+              "ball": 0.27973505357901257,
+              "foreground": 0.3798939138650894
+            },
+            "receipt": "automatic-q24.json",
+            "receipt_sha256": "42cd77e9e73dc51d8255a2ab9e8c821d22d54d763c2ad06374b3fe7157cd7321"
+          },
+          {
+            "arm": "DCVC-UF Q28 480x272",
+            "bytes": 12901,
+            "kbps": 12.888111888111887,
+            "sha256": "69c7a751f86c2cd132796bd1d1b0bcf77a376764aabe5af6b96371cced4ea345",
+            "scores": {
+              "players": 0.4633705293138822,
+              "ball": 0.2750616470972697,
+              "foreground": 0.36921608820557594
+            },
+            "receipt": "score-dcvc-480-q28.json",
+            "receipt_sha256": "905a365dc1a538e40db6aa620bf8e422bad580deb72264faf102cc7ee7b67d7f"
+          },
+          {
+            "arm": "DCVC-UF Q29 480x272",
+            "bytes": 13602,
+            "kbps": 13.588411588411587,
+            "sha256": "e979a62ea50b95eea9fd103a1278fa0e6e2e8bf13e88be7cd147d79e7133f9a1",
+            "scores": {
+              "players": 0.45619160681962967,
+              "ball": 0.27266070743401843,
+              "foreground": 0.3644261571268241
+            },
+            "receipt": "score-dcvc-480-q29.json",
+            "receipt_sha256": "7d5df6b2a62f0a8b1380021da53578ab0bd293338bbfb5558461a7624c09dd6a"
+          },
+          {
+            "arm": "DCVC-UF Q31 480x272",
+            "bytes": 15028,
+            "kbps": 15.012987012987015,
+            "sha256": "5d69533cf9d1b3352be421b2ebebc6a2435b545d892cc70cd6a2521c96eb25e0",
+            "scores": {
+              "players": 0.44659988830486935,
+              "ball": 0.271824171145757,
+              "foreground": 0.3592120297253132
+            },
+            "receipt": "score-dcvc-480-q31.json",
+            "receipt_sha256": "c7573ecfe2bb466ca55b440c8867393b2fc4d6f7b1f741e477361ffea7bdb5f0"
+          },
+          {
+            "arm": "DCVC-UF Q34 480x272",
+            "bytes": 17432,
+            "kbps": 17.414585414585414,
+            "sha256": "e6c1ab762b0f585d04beaa02d2e3e647ab2ee0084322cbaebe7ea9952a57bf6b",
+            "scores": {
+              "players": 0.43134696781635284,
+              "ball": 0.27327940861384076,
+              "foreground": 0.3523131882150968
+            },
+            "receipt": "automatic-dcvc-q34.json",
+            "receipt_sha256": "6a605b513c71615e13518be3f9ef0f3f93a6215edea98dacb3632781d61ac89b"
+          }
+        ],
+        "pointstream": [
+          {
+            "arm": "PointStream two players and ball, base CRF 70",
+            "bytes": 13555,
+            "kbps": 13.54145854145854,
+            "sha256": "c969c69ef59a1d027439d1a2478b7fcd745b40c7991463f3eb2d57ff345f0d9a",
+            "scores": {
+              "players": 0.3311777909596761,
+              "ball": 0.2844676474730174,
+              "foreground": 0.30782271921634674
+            },
+            "receipt": "automatic-joint-70.json",
+            "receipt_sha256": "3e70e67666f6e2aa379040bef57c49d3725c6b19570d7030695e8f75396bdaff",
+            "cold_kbps": 150.8841158841159
+          },
+          {
+            "arm": "PointStream two players and ball, base CRF 50",
+            "bytes": 17794,
+            "kbps": 17.776223776223773,
+            "sha256": "fdc8fcbb39599348e966f07666a0472cf4cbb9211e8baf7ada44ba59161b7780",
+            "scores": {
+              "players": 0.3297010386983554,
+              "ball": 0.2593456010023753,
+              "foreground": 0.29452331985036534
+            },
+            "receipt": "automatic-joint-50.json",
+            "receipt_sha256": "ad4df3e1c880dc8b6632059cc3e5bcb66daa266ec408d419c79cd4d5c1d17b52",
+            "cold_kbps": 155.11888111888112
+          },
+          {
+            "arm": "PointStream 320x192",
+            "bytes": 83277,
+            "kbps": 83.1938061938062,
+            "cold_kbps": 220.53646353646354,
+            "sha256": "794336050f76b0992909b5ff7a92205d2306ca170689c5ad5f527a25af3721d4",
+            "receipt_sha256": "12f8ea0375485819b8a931ae6701df42779c31bbbd72c16c9efec33c0e49e727",
+            "scores": {
+              "foreground": 0.25959958011905354,
+              "players": 0.3216152961055438,
+              "ball": 0.19758386413256326
+            }
+          },
+          {
+            "arm": "PointStream 320x192",
+            "bytes": 109880,
+            "kbps": 109.77022977022978,
+            "cold_kbps": 247.1128871128871,
+            "sha256": "04abcae0d7df0dd51163bbe332d9d29338d100bc4ed1d923bd2df2fe8d9ef07e",
+            "receipt_sha256": "2ec1a15c4cb2da5187a5400783ac392269a395024193b25f7a7b3940abb6e541",
+            "scores": {
+              "foreground": 0.25957132255037624,
+              "players": 0.321535420914491,
+              "ball": 0.1976072241862615
+            }
+          },
+          {
+            "arm": "PointStream 640x384",
+            "bytes": 113241,
+            "kbps": 113.12787212787212,
+            "cold_kbps": 250.47052947052947,
+            "sha256": "06bf12dd38ace992dbf3a752bc0944573f9ebb3cde14a61d5bec108eb7a5f200",
+            "receipt_sha256": "75ba9a87c36db121e0124e2071e97fba222be1a80857013a46bc04fa02aee667",
+            "scores": {
+              "foreground": 0.2422130766014258,
+              "players": 0.31294086823860806,
+              "ball": 0.17148528496424356
+            }
+          }
+        ]
+      },
+      "ball": {
+        "ordinary": [
+          {
+            "arm": "SVT-AV1 ordinary 256x144 warm",
+            "bytes": 13273,
+            "kbps": 13.25974025974026,
+            "sha256": "f48f5d647ee2de4ce2eb79edccc107a7e01fc4a64d96311194564bb99d2ac6ee",
+            "scores": {
+              "players": 0.5664065356055895,
+              "ball": 0.318858082095782,
+              "foreground": 0.4426323088506858
+            },
+            "receipt": "score-ordinary-256-warm.json",
+            "receipt_sha256": "6cff3687c8edf4d5346b0cad8cd4a28a05804cfedd7cd9ec3aa824b4a16b36f0"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 320x192 warm",
+            "bytes": 13408,
+            "kbps": 13.394605394605394,
+            "sha256": "8e26c7677715534e49ef6451bc4b823a68b5dae4cca5a8eb5e3e188befaa79b0",
+            "scores": {
+              "players": 0.5768444339434305,
+              "ball": 0.2981932759284973,
+              "foreground": 0.43751885493596393
+            },
+            "receipt": "score-ordinary-320-warm.json",
+            "receipt_sha256": "6f4be63231e1fa132ab229abd1707edb9162d0d92c7a28a56eb029e08e9d953c"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 480x272 warm",
+            "bytes": 17529,
+            "kbps": 17.511488511488515,
+            "sha256": "56cbbe618ef8e36373280a8b5dbf63079409f505593c41cab6629fcbe29f9d72",
+            "scores": {
+              "players": 0.532114232579867,
+              "ball": 0.28634602824846905,
+              "foreground": 0.40923013041416806
+            },
+            "receipt": "automatic-ordinary-480-warm.json",
+            "receipt_sha256": "ea902ca02cb7329c772625365a172516ecb81a022c744b43391ff4a0415a29a5"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 640x384 warm",
+            "bytes": 17731,
+            "kbps": 17.713286713286713,
+            "sha256": "841dc70c6276193b8a3cca8d554576af7b30143228cc0a4e1215e3b84c901360",
+            "scores": {
+              "players": 0.5319821412364641,
+              "ball": 0.26600279410680133,
+              "foreground": 0.39899246767163277
+            },
+            "receipt": "automatic-ordinary-640-warm.json",
+            "receipt_sha256": "c63740190b0e0dce8b685c47bc1bb981e29879ab205543fe46b45a35f631a9df"
+          },
+          {
+            "arm": "SVT-AV1 ordinary 1920x1080 r90",
+            "bytes": 89433,
+            "kbps": 89.34365634365635,
+            "sha256": "6e90412f697fbb1fc070604377cf25f4e8a8c73ef12d0b92c58dcc6b8d2a9d39",
+            "receipt_sha256": "79741644b45ab03aad4f003daf324a18ede7a7ba24738551e4aa2c59f45bfa1b",
+            "scores": {
+              "players": 0.3184340223670006,
+              "ball": 0.1983616997798284,
+              "foreground": 0.2583978610734145
+            }
+          },
+          {
+            "arm": "SVT-AV1 ordinary 1920x1080 r120",
+            "bytes": 119023,
+            "kbps": 118.9040959040959,
+            "sha256": "d2ac3d7b73ef58a85078997112221733ccd4dbe278249d34a83cc867c652c3ec",
+            "receipt_sha256": "a11148df724cfd2526e674de18b4901a47faf382874e61cdfd8b7be0bb428738",
+            "scores": {
+              "players": 0.281901016831398,
+              "ball": 0.18775523702303568,
+              "foreground": 0.23482812692721686
+            }
+          },
+          {
+            "arm": "SVT-AV1 ordinary 1920x1080 r140",
+            "bytes": 138908,
+            "kbps": 138.76923076923077,
+            "sha256": "6f28dbcf20974241053a7a3a85a7b0328c0e467e2a4ee25b5902692f2d2a801c",
+            "receipt_sha256": "f2b26449bfb31c46042c766a429040e28b65b0a496a8eec8bee118e0d68f54a8",
+            "scores": {
+              "players": 0.26888712743918103,
+              "ball": 0.17000549534956613,
+              "foreground": 0.21944631139437357
+            }
+          }
+        ],
+        "roi": [
+          {
+            "arm": "SVT-AV1 roi 256x144 warm",
+            "bytes": 13528,
+            "kbps": 13.514485514485514,
+            "sha256": "a6b60458261af3ed22f71701b7430a7fcbe8d24447fef67fb76811a64fd5b056",
+            "scores": {
+              "players": 0.6621989235281944,
+              "ball": 0.3673599511384964,
+              "foreground": 0.5147794373333454
+            },
+            "receipt": "score-roi-256-warm.json",
+            "receipt_sha256": "a5c693abc2a01d16e442365d55107eb5352e2af816b87a478f5c69ec97eca8e2"
+          },
+          {
+            "arm": "SVT-AV1 roi 640x384 warm",
+            "bytes": 17736,
+            "kbps": 17.71828171828172,
+            "sha256": "9d62dae129c3f7222337257c4673be25e48e66b56ba535d60f6b34192a3339d2",
+            "scores": {
+              "players": 0.5681189919511477,
+              "ball": 0.2766084869702657,
+              "foreground": 0.4223637394607067
+            },
+            "receipt": "automatic-roi-640-warm.json",
+            "receipt_sha256": "eb4e081763058b01509ab1b0281e831084f708758eef80e464f5e0803caae12e"
+          },
+          {
+            "arm": "SVT-AV1 foreground-roi 640x384 r90",
+            "bytes": 90056,
+            "kbps": 89.96603396603396,
+            "sha256": "16d06311af55f2672b4cce2749346720881d4c7b0298f98fad3e4a2c5f80b51c",
+            "receipt_sha256": "e1121a738a90a191787c2f8f10a9820396ba7104abe3a0e2b146a5239c7b5e11",
+            "scores": {
+              "players": 0.3235676437616348,
+              "ball": 0.2211993783712387,
+              "foreground": 0.27238351106643677
+            }
+          },
+          {
+            "arm": "SVT-AV1 foreground-roi 640x384 r120",
+            "bytes": 118866,
+            "kbps": 118.74725274725274,
+            "sha256": "681190a09e1578c2beaac604dd4ad15315eddd4fbbedd38d60dc53eda95af01e",
+            "receipt_sha256": "576e454e1bc79578c2d63168f3cce4a5a9f2931a22149484e395a2ae8d883ed9",
+            "scores": {
+              "players": 0.300181046128273,
+              "ball": 0.20566324392954508,
+              "foreground": 0.25292214502890903
+            }
+          },
+          {
+            "arm": "SVT-AV1 foreground-roi 640x384 r140",
+            "bytes": 139532,
+            "kbps": 139.3926073926074,
+            "sha256": "f4840458cf321898316a3c41ad993a25a74110af468008c7031be2645325f85d",
+            "receipt_sha256": "a1aeeb373b6a5468b681be820e55b1e803356ff4a525350b306e482c495fb71f",
+            "scores": {
+              "players": 0.2879679004351298,
+              "ball": 0.19824042916297913,
+              "foreground": 0.24310416479905447
+            }
+          }
+        ],
+        "neural": [
+          {
+            "arm": "DCVC-UF Q24 480x272",
+            "bytes": 10548,
+            "kbps": 10.537462537462538,
+            "sha256": "4723b91727abacf6a2f292939cb6edb23f2971b983c5be4cf1cb639309ea63e5",
+            "scores": {
+              "players": 0.48005277415116626,
+              "ball": 0.27973505357901257,
+              "foreground": 0.3798939138650894
+            },
+            "receipt": "automatic-q24.json",
+            "receipt_sha256": "42cd77e9e73dc51d8255a2ab9e8c821d22d54d763c2ad06374b3fe7157cd7321"
+          },
+          {
+            "arm": "DCVC-UF Q28 480x272",
+            "bytes": 12901,
+            "kbps": 12.888111888111887,
+            "sha256": "69c7a751f86c2cd132796bd1d1b0bcf77a376764aabe5af6b96371cced4ea345",
+            "scores": {
+              "players": 0.4633705293138822,
+              "ball": 0.2750616470972697,
+              "foreground": 0.36921608820557594
+            },
+            "receipt": "score-dcvc-480-q28.json",
+            "receipt_sha256": "905a365dc1a538e40db6aa620bf8e422bad580deb72264faf102cc7ee7b67d7f"
+          },
+          {
+            "arm": "DCVC-UF Q29 480x272",
+            "bytes": 13602,
+            "kbps": 13.588411588411587,
+            "sha256": "e979a62ea50b95eea9fd103a1278fa0e6e2e8bf13e88be7cd147d79e7133f9a1",
+            "scores": {
+              "players": 0.45619160681962967,
+              "ball": 0.27266070743401843,
+              "foreground": 0.3644261571268241
+            },
+            "receipt": "score-dcvc-480-q29.json",
+            "receipt_sha256": "7d5df6b2a62f0a8b1380021da53578ab0bd293338bbfb5558461a7624c09dd6a"
+          },
+          {
+            "arm": "DCVC-UF Q31 480x272",
+            "bytes": 15028,
+            "kbps": 15.012987012987015,
+            "sha256": "5d69533cf9d1b3352be421b2ebebc6a2435b545d892cc70cd6a2521c96eb25e0",
+            "scores": {
+              "players": 0.44659988830486935,
+              "ball": 0.271824171145757,
+              "foreground": 0.3592120297253132
+            },
+            "receipt": "score-dcvc-480-q31.json",
+            "receipt_sha256": "c7573ecfe2bb466ca55b440c8867393b2fc4d6f7b1f741e477361ffea7bdb5f0"
+          }
+        ],
+        "pointstream": [
+          {
+            "arm": "PointStream two players and ball, base CRF 70",
+            "bytes": 13555,
+            "kbps": 13.54145854145854,
+            "sha256": "c969c69ef59a1d027439d1a2478b7fcd745b40c7991463f3eb2d57ff345f0d9a",
+            "scores": {
+              "players": 0.3311777909596761,
+              "ball": 0.2844676474730174,
+              "foreground": 0.30782271921634674
+            },
+            "receipt": "automatic-joint-70.json",
+            "receipt_sha256": "3e70e67666f6e2aa379040bef57c49d3725c6b19570d7030695e8f75396bdaff",
+            "cold_kbps": 150.8841158841159
+          },
+          {
+            "arm": "PointStream two players and ball, base CRF 50",
+            "bytes": 17794,
+            "kbps": 17.776223776223773,
+            "sha256": "fdc8fcbb39599348e966f07666a0472cf4cbb9211e8baf7ada44ba59161b7780",
+            "scores": {
+              "players": 0.3297010386983554,
+              "ball": 0.2593456010023753,
+              "foreground": 0.29452331985036534
+            },
+            "receipt": "automatic-joint-50.json",
+            "receipt_sha256": "ad4df3e1c880dc8b6632059cc3e5bcb66daa266ec408d419c79cd4d5c1d17b52",
+            "cold_kbps": 155.11888111888112
+          },
+          {
+            "arm": "PointStream 320x192",
+            "bytes": 83277,
+            "kbps": 83.1938061938062,
+            "cold_kbps": 220.53646353646354,
+            "sha256": "794336050f76b0992909b5ff7a92205d2306ca170689c5ad5f527a25af3721d4",
+            "receipt_sha256": "12f8ea0375485819b8a931ae6701df42779c31bbbd72c16c9efec33c0e49e727",
+            "scores": {
+              "foreground": 0.25959958011905354,
+              "players": 0.3216152961055438,
+              "ball": 0.19758386413256326
+            }
+          },
+          {
+            "arm": "PointStream 640x384",
+            "bytes": 113241,
+            "kbps": 113.12787212787212,
+            "cold_kbps": 250.47052947052947,
+            "sha256": "06bf12dd38ace992dbf3a752bc0944573f9ebb3cde14a61d5bec108eb7a5f200",
+            "receipt_sha256": "75ba9a87c36db121e0124e2071e97fba222be1a80857013a46bc04fa02aee667",
+            "scores": {
+              "foreground": 0.2422130766014258,
+              "players": 0.31294086823860806,
+              "ball": 0.17148528496424356
+            }
+          }
+        ]
+      }
+    },
+    "state_and_priorities": [
+      {
+        "rate": 13.54145854145854,
+        "bytes": 13555,
+        "packet_sha256": "c969c69ef59a1d027439d1a2478b7fcd745b40c7991463f3eb2d57ff345f0d9a",
+        "initialization_bytes": 137480,
+        "first_use_rate": 150.8841158841159,
+        "priorities": {
+          "13555": [
+            0.0664271480107325,
+            1.0
+          ],
+          "85085": [
+            0.10047143054868705,
+            1.0
+          ],
+          "136136": null,
+          "192192": null
+        },
+        "reuse": {
+          "foreground": {
+            "status": "finite",
+            "anchor_rate": 89.34365634365635,
+            "anchor_sha256": "6e90412f697fbb1fc070604377cf25f4e8a8c73ef12d0b92c58dcc6b8d2a9d39",
+            "active_seconds": 14.509341838213972
+          },
+          "players": {
+            "status": "finite",
+            "anchor_rate": 89.34365634365635,
+            "anchor_sha256": "6e90412f697fbb1fc070604377cf25f4e8a8c73ef12d0b92c58dcc6b8d2a9d39",
+            "active_seconds": 14.509341838213972
+          },
+          "ball": {
+            "status": "anchor_already_equal_rate_or_cheaper",
+            "anchor_rate": 10.537462537462538,
+            "anchor_sha256": "4723b91727abacf6a2f292939cb6edb23f2971b983c5be4cf1cb639309ea63e5",
+            "active_seconds": null
+          }
+        }
+      },
+      {
+        "rate": 17.776223776223773,
+        "bytes": 17794,
+        "packet_sha256": "fdc8fcbb39599348e966f07666a0472cf4cbb9211e8baf7ada44ba59161b7780",
+        "initialization_bytes": 137480,
+        "first_use_rate": 155.11888111888112,
+        "priorities": {
+          "17794": [
+            0.0,
+            1.0
+          ],
+          "85085": [
+            0.0,
+            1.0
+          ],
+          "136136": null,
+          "192192": null
+        },
+        "reuse": {
+          "foreground": {
+            "status": "finite",
+            "anchor_rate": 89.34365634365635,
+            "anchor_sha256": "6e90412f697fbb1fc070604377cf25f4e8a8c73ef12d0b92c58dcc6b8d2a9d39",
+            "active_seconds": 15.367883973813143
+          },
+          "players": {
+            "status": "finite",
+            "anchor_rate": 89.34365634365635,
+            "anchor_sha256": "6e90412f697fbb1fc070604377cf25f4e8a8c73ef12d0b92c58dcc6b8d2a9d39",
+            "active_seconds": 15.367883973813143
+          },
+          "ball": {
+            "status": "finite",
+            "anchor_rate": 89.34365634365635,
+            "anchor_sha256": "6e90412f697fbb1fc070604377cf25f4e8a8c73ef12d0b92c58dcc6b8d2a9d39",
+            "active_seconds": 15.367883973813143
+          }
+        }
+      },
+      {
+        "rate": 83.1938061938062,
+        "bytes": 83277,
+        "packet_sha256": "794336050f76b0992909b5ff7a92205d2306ca170689c5ad5f527a25af3721d4",
+        "initialization_bytes": 137480,
+        "first_use_rate": 220.53646353646354,
+        "priorities": {
+          "83277": [
+            0.0,
+            1.0
+          ],
+          "85085": [
+            0.0,
+            1.0
+          ],
+          "136136": null,
+          "192192": null
+        },
+        "reuse": {
+          "foreground": {
+            "status": "finite",
+            "anchor_rate": 89.34365634365635,
+            "anchor_sha256": "6e90412f697fbb1fc070604377cf25f4e8a8c73ef12d0b92c58dcc6b8d2a9d39",
+            "active_seconds": 178.84012995451585
+          },
+          "players": {
+            "status": "finite",
+            "anchor_rate": 89.34365634365635,
+            "anchor_sha256": "6e90412f697fbb1fc070604377cf25f4e8a8c73ef12d0b92c58dcc6b8d2a9d39",
+            "active_seconds": 178.84012995451585
+          },
+          "ball": {
+            "status": "finite",
+            "anchor_rate": 118.9040959040959,
+            "anchor_sha256": "d2ac3d7b73ef58a85078997112221733ccd4dbe278249d34a83cc867c652c3ec",
+            "active_seconds": 30.798966038158127
+          }
+        }
+      },
+      {
+        "rate": 109.77022977022978,
+        "bytes": 109880,
+        "packet_sha256": "04abcae0d7df0dd51163bbe332d9d29338d100bc4ed1d923bd2df2fe8d9ef07e",
+        "initialization_bytes": 137480,
+        "first_use_rate": 247.1128871128871,
+        "priorities": {
+          "109880": [
+            0.0,
+            0.1956691442630985
+          ],
+          "136136": null,
+          "192192": null
+        },
+        "reuse": {
+          "foreground": {
+            "status": "anchor_already_equal_rate_or_cheaper",
+            "anchor_rate": 89.34365634365635,
+            "anchor_sha256": "6e90412f697fbb1fc070604377cf25f4e8a8c73ef12d0b92c58dcc6b8d2a9d39",
+            "active_seconds": null
+          },
+          "players": {
+            "status": "anchor_already_equal_rate_or_cheaper",
+            "anchor_rate": 89.34365634365635,
+            "anchor_sha256": "6e90412f697fbb1fc070604377cf25f4e8a8c73ef12d0b92c58dcc6b8d2a9d39",
+            "active_seconds": null
+          },
+          "ball": {
+            "status": "finite",
+            "anchor_rate": 118.9040959040959,
+            "anchor_sha256": "d2ac3d7b73ef58a85078997112221733ccd4dbe278249d34a83cc867c652c3ec",
+            "active_seconds": 120.41341354041361
+          }
+        }
+      },
+      {
+        "rate": 113.12787212787212,
+        "bytes": 113241,
+        "packet_sha256": "06bf12dd38ace992dbf3a752bc0944573f9ebb3cde14a61d5bec108eb7a5f200",
+        "initialization_bytes": 137480,
+        "first_use_rate": 250.47052947052947,
+        "priorities": {
+          "113241": [
+            0.0,
+            1.0
+          ],
+          "136136": [
+            0.0,
+            0.34390233877179494
+          ],
+          "192192": null
+        },
+        "reuse": {
+          "foreground": {
+            "status": "finite",
+            "anchor_rate": 118.9040959040959,
+            "anchor_sha256": "d2ac3d7b73ef58a85078997112221733ccd4dbe278249d34a83cc867c652c3ec",
+            "active_seconds": 190.40813559322046
+          },
+          "players": {
+            "status": "finite",
+            "anchor_rate": 118.74725274725274,
+            "anchor_sha256": "681190a09e1578c2beaac604dd4ad15315eddd4fbbedd38d60dc53eda95af01e",
+            "active_seconds": 195.72263822222214
+          },
+          "ball": {
+            "status": "finite",
+            "anchor_rate": 138.76923076923077,
+            "anchor_sha256": "6f28dbcf20974241053a7a3a85a7b0328c0e467e2a4ee25b5902692f2d2a801c",
+            "active_seconds": 42.89320294541628
+          }
+        }
+      }
+    ],
+    "bd_rate": {
+      "foreground": {
+        "ordinary": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              13.54145854145854,
+              -0.30782271921634674
+            ],
+            [
+              17.776223776223773,
+              -0.29452331985036534
+            ],
+            [
+              83.1938061938062,
+              -0.25959958011905354
+            ],
+            [
+              109.77022977022978,
+              -0.25957132255037624
+            ],
+            [
+              113.12787212787212,
+              -0.2422130766014258
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              13.25974025974026,
+              -0.4426323088506858
+            ],
+            [
+              13.394605394605394,
+              -0.43751885493596393
+            ],
+            [
+              17.511488511488515,
+              -0.40923013041416806
+            ],
+            [
+              17.66933066933067,
+              -0.4074744110306104
+            ],
+            [
+              17.713286713286713,
+              -0.39899246767163277
+            ],
+            [
+              89.34365634365635,
+              -0.2583978610734145
+            ],
+            [
+              118.9040959040959,
+              -0.23482812692721686
+            ],
+            [
+              138.76923076923077,
+              -0.21944631139437357
+            ],
+            [
+              146.81318681318683,
+              -0.21843075503905615
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              13.25974025974026,
+              -0.4426323088506858
+            ],
+            [
+              13.394605394605394,
+              -0.43751885493596393
+            ],
+            [
+              17.713286713286713,
+              -0.39899246767163277
+            ],
+            [
+              89.34365634365635,
+              -0.2583978610734145
+            ],
+            [
+              118.9040959040959,
+              -0.23482812692721686
+            ],
+            [
+              138.76923076923077,
+              -0.21944631139437357
+            ],
+            [
+              146.81318681318683,
+              -0.21843075503905615
+            ]
+          ],
+          "candidate_rate_support": [
+            13.54145854145854,
+            113.12787212787212
+          ],
+          "anchor_rate_support": [
+            13.25974025974026,
+            146.81318681318683
+          ],
+          "bd_rate": {
+            "hull_pchip": -0.5058235374530161,
+            "pareto_pchip": -0.49281896123665453,
+            "hull_linear_rate": -0.42329241768989506
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.30782271921634674,
+            -0.2422130766014258
+          ]
+        },
+        "roi": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              13.54145854145854,
+              -0.30782271921634674
+            ],
+            [
+              17.776223776223773,
+              -0.29452331985036534
+            ],
+            [
+              83.1938061938062,
+              -0.25959958011905354
+            ],
+            [
+              109.77022977022978,
+              -0.25957132255037624
+            ],
+            [
+              113.12787212787212,
+              -0.2422130766014258
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              13.514485514485514,
+              -0.5147794373333454
+            ],
+            [
+              17.71828171828172,
+              -0.4223637394607067
+            ],
+            [
+              89.96603396603396,
+              -0.27238351106643677
+            ],
+            [
+              118.74725274725274,
+              -0.25292214502890903
+            ],
+            [
+              139.3926073926074,
+              -0.24310416479905447
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              13.514485514485514,
+              -0.5147794373333454
+            ],
+            [
+              17.71828171828172,
+              -0.4223637394607067
+            ],
+            [
+              89.96603396603396,
+              -0.27238351106643677
+            ],
+            [
+              118.74725274725274,
+              -0.25292214502890903
+            ],
+            [
+              139.3926073926074,
+              -0.24310416479905447
+            ]
+          ],
+          "candidate_rate_support": [
+            13.54145854145854,
+            113.12787212787212
+          ],
+          "anchor_rate_support": [
+            13.514485514485514,
+            139.3926073926074
+          ],
+          "bd_rate": {
+            "hull_pchip": -0.5929987562343682,
+            "pareto_pchip": -0.5929987562343682,
+            "hull_linear_rate": -0.5053083861493735
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.30782271921634674,
+            -0.24310416479905447
+          ]
+        },
+        "neural": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              13.54145854145854,
+              -0.30782271921634674
+            ],
+            [
+              17.776223776223773,
+              -0.29452331985036534
+            ],
+            [
+              83.1938061938062,
+              -0.25959958011905354
+            ],
+            [
+              109.77022977022978,
+              -0.25957132255037624
+            ],
+            [
+              113.12787212787212,
+              -0.2422130766014258
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              10.537462537462538,
+              -0.3798939138650894
+            ],
+            [
+              12.888111888111887,
+              -0.36921608820557594
+            ],
+            [
+              13.588411588411587,
+              -0.3644261571268241
+            ],
+            [
+              15.012987012987015,
+              -0.3592120297253132
+            ],
+            [
+              17.414585414585414,
+              -0.3523131882150968
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              10.537462537462538,
+              -0.3798939138650894
+            ],
+            [
+              13.588411588411587,
+              -0.3644261571268241
+            ],
+            [
+              15.012987012987015,
+              -0.3592120297253132
+            ],
+            [
+              17.414585414585414,
+              -0.3523131882150968
+            ]
+          ],
+          "candidate_rate_support": [
+            13.54145854145854,
+            113.12787212787212
+          ],
+          "anchor_rate_support": [
+            10.537462537462538,
+            17.414585414585414
+          ],
+          "bd_rate": {
+            "hull_pchip": null,
+            "pareto_pchip": null,
+            "hull_linear_rate": null
+          },
+          "status": "unsupported_range",
+          "common_quality_interval": null
+        }
+      },
+      "players": {
+        "ordinary": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              13.54145854145854,
+              -0.3311777909596761
+            ],
+            [
+              17.776223776223773,
+              -0.3297010386983554
+            ],
+            [
+              83.1938061938062,
+              -0.3216152961055438
+            ],
+            [
+              109.77022977022978,
+              -0.321535420914491
+            ],
+            [
+              113.12787212787212,
+              -0.31294086823860806
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              13.25974025974026,
+              -0.5664065356055895
+            ],
+            [
+              17.511488511488515,
+              -0.532114232579867
+            ],
+            [
+              17.66933066933067,
+              -0.5245776176452637
+            ],
+            [
+              89.34365634365635,
+              -0.3184340223670006
+            ],
+            [
+              118.9040959040959,
+              -0.281901016831398
+            ],
+            [
+              138.76923076923077,
+              -0.26888712743918103
+            ],
+            [
+              146.81318681318683,
+              -0.2597329566876094
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              13.25974025974026,
+              -0.5664065356055895
+            ],
+            [
+              17.66933066933067,
+              -0.5245776176452637
+            ],
+            [
+              89.34365634365635,
+              -0.3184340223670006
+            ],
+            [
+              118.9040959040959,
+              -0.281901016831398
+            ],
+            [
+              146.81318681318683,
+              -0.2597329566876094
+            ]
+          ],
+          "candidate_rate_support": [
+            13.54145854145854,
+            113.12787212787212
+          ],
+          "anchor_rate_support": [
+            13.25974025974026,
+            146.81318681318683
+          ],
+          "bd_rate": {
+            "hull_pchip": -0.3787645068039256,
+            "pareto_pchip": -0.37811215865136893,
+            "hull_linear_rate": -0.27063134252345916
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.3311777909596761,
+            -0.31294086823860806
+          ]
+        },
+        "roi": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              13.54145854145854,
+              -0.3311777909596761
+            ],
+            [
+              17.776223776223773,
+              -0.3297010386983554
+            ],
+            [
+              83.1938061938062,
+              -0.3216152961055438
+            ],
+            [
+              109.77022977022978,
+              -0.321535420914491
+            ],
+            [
+              113.12787212787212,
+              -0.31294086823860806
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              13.514485514485514,
+              -0.6621989235281944
+            ],
+            [
+              17.71828171828172,
+              -0.5681189919511477
+            ],
+            [
+              17.73726273726274,
+              -0.5629750912388166
+            ],
+            [
+              89.96603396603396,
+              -0.3235676437616348
+            ],
+            [
+              118.74725274725274,
+              -0.300181046128273
+            ],
+            [
+              139.3926073926074,
+              -0.2879679004351298
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              13.514485514485514,
+              -0.6621989235281944
+            ],
+            [
+              17.73726273726274,
+              -0.5629750912388166
+            ],
+            [
+              89.96603396603396,
+              -0.3235676437616348
+            ],
+            [
+              118.74725274725274,
+              -0.300181046128273
+            ],
+            [
+              139.3926073926074,
+              -0.2879679004351298
+            ]
+          ],
+          "candidate_rate_support": [
+            13.54145854145854,
+            113.12787212787212
+          ],
+          "anchor_rate_support": [
+            13.514485514485514,
+            139.3926073926074
+          ],
+          "bd_rate": {
+            "hull_pchip": -0.4109642980715576,
+            "pareto_pchip": -0.41089895902197204,
+            "hull_linear_rate": -0.3077691927643987
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.3311777909596761,
+            -0.31294086823860806
+          ]
+        },
+        "neural": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              13.54145854145854,
+              -0.3311777909596761
+            ],
+            [
+              17.776223776223773,
+              -0.3297010386983554
+            ],
+            [
+              83.1938061938062,
+              -0.3216152961055438
+            ],
+            [
+              109.77022977022978,
+              -0.321535420914491
+            ],
+            [
+              113.12787212787212,
+              -0.31294086823860806
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              10.537462537462538,
+              -0.48005277415116626
+            ],
+            [
+              12.888111888111887,
+              -0.4633705293138822
+            ],
+            [
+              13.588411588411587,
+              -0.45619160681962967
+            ],
+            [
+              15.012987012987015,
+              -0.44659988830486935
+            ],
+            [
+              17.414585414585414,
+              -0.43134696781635284
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              10.537462537462538,
+              -0.48005277415116626
+            ],
+            [
+              13.588411588411587,
+              -0.45619160681962967
+            ],
+            [
+              15.012987012987015,
+              -0.44659988830486935
+            ],
+            [
+              17.414585414585414,
+              -0.43134696781635284
+            ]
+          ],
+          "candidate_rate_support": [
+            13.54145854145854,
+            113.12787212787212
+          ],
+          "anchor_rate_support": [
+            10.537462537462538,
+            17.414585414585414
+          ],
+          "bd_rate": {
+            "hull_pchip": null,
+            "pareto_pchip": null,
+            "hull_linear_rate": null
+          },
+          "status": "unsupported_range",
+          "common_quality_interval": null
+        }
+      },
+      "ball": {
+        "ordinary": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              13.54145854145854,
+              -0.2844676474730174
+            ],
+            [
+              17.776223776223773,
+              -0.2593456010023753
+            ],
+            [
+              83.1938061938062,
+              -0.19758386413256326
+            ],
+            [
+              113.12787212787212,
+              -0.17148528496424356
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              13.25974025974026,
+              -0.318858082095782
+            ],
+            [
+              13.394605394605394,
+              -0.2981932759284973
+            ],
+            [
+              17.511488511488515,
+              -0.28634602824846905
+            ],
+            [
+              17.713286713286713,
+              -0.26600279410680133
+            ],
+            [
+              89.34365634365635,
+              -0.1983616997798284
+            ],
+            [
+              118.9040959040959,
+              -0.18775523702303568
+            ],
+            [
+              138.76923076923077,
+              -0.17000549534956613
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              13.25974025974026,
+              -0.318858082095782
+            ],
+            [
+              13.394605394605394,
+              -0.2981932759284973
+            ],
+            [
+              17.713286713286713,
+              -0.26600279410680133
+            ],
+            [
+              89.34365634365635,
+              -0.1983616997798284
+            ],
+            [
+              138.76923076923077,
+              -0.17000549534956613
+            ]
+          ],
+          "candidate_rate_support": [
+            13.54145854145854,
+            113.12787212787212
+          ],
+          "anchor_rate_support": [
+            13.25974025974026,
+            138.76923076923077
+          ],
+          "bd_rate": {
+            "hull_pchip": -0.09396490761601711,
+            "pareto_pchip": -0.06683127849457415,
+            "hull_linear_rate": -0.13196045210118745
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.2844676474730174,
+            -0.17148528496424356
+          ]
+        },
+        "roi": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              13.54145854145854,
+              -0.2844676474730174
+            ],
+            [
+              17.776223776223773,
+              -0.2593456010023753
+            ],
+            [
+              83.1938061938062,
+              -0.19758386413256326
+            ],
+            [
+              113.12787212787212,
+              -0.17148528496424356
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              13.514485514485514,
+              -0.3673599511384964
+            ],
+            [
+              17.71828171828172,
+              -0.2766084869702657
+            ],
+            [
+              89.96603396603396,
+              -0.2211993783712387
+            ],
+            [
+              118.74725274725274,
+              -0.20566324392954508
+            ],
+            [
+              139.3926073926074,
+              -0.19824042916297913
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              13.514485514485514,
+              -0.3673599511384964
+            ],
+            [
+              17.71828171828172,
+              -0.2766084869702657
+            ],
+            [
+              89.96603396603396,
+              -0.2211993783712387
+            ],
+            [
+              118.74725274725274,
+              -0.20566324392954508
+            ],
+            [
+              139.3926073926074,
+              -0.19824042916297913
+            ]
+          ],
+          "candidate_rate_support": [
+            13.54145854145854,
+            113.12787212787212
+          ],
+          "anchor_rate_support": [
+            13.514485514485514,
+            139.3926073926074
+          ],
+          "bd_rate": {
+            "hull_pchip": -0.3726988544921107,
+            "pareto_pchip": -0.3726988544921107,
+            "hull_linear_rate": -0.3953843917925318
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.2844676474730174,
+            -0.19824042916297913
+          ]
+        },
+        "neural": {
+          "protocol": "anchor-geometry-sensitivity-v1",
+          "quality_orientation": "higher_is_better",
+          "physically_demonstrated_switching": false,
+          "candidate_pareto": [
+            [
+              13.54145854145854,
+              -0.2844676474730174
+            ],
+            [
+              17.776223776223773,
+              -0.2593456010023753
+            ],
+            [
+              83.1938061938062,
+              -0.19758386413256326
+            ],
+            [
+              113.12787212787212,
+              -0.17148528496424356
+            ]
+          ],
+          "anchor_pareto": [
+            [
+              10.537462537462538,
+              -0.27973505357901257
+            ],
+            [
+              12.888111888111887,
+              -0.2750616470972697
+            ],
+            [
+              13.588411588411587,
+              -0.27266070743401843
+            ],
+            [
+              15.012987012987015,
+              -0.271824171145757
+            ]
+          ],
+          "anchor_linear_rate_hull": [
+            [
+              10.537462537462538,
+              -0.27973505357901257
+            ],
+            [
+              13.588411588411587,
+              -0.27266070743401843
+            ],
+            [
+              15.012987012987015,
+              -0.271824171145757
+            ]
+          ],
+          "candidate_rate_support": [
+            13.54145854145854,
+            113.12787212787212
+          ],
+          "anchor_rate_support": [
+            10.537462537462538,
+            15.012987012987015
+          ],
+          "bd_rate": {
+            "hull_pchip": 0.23640641262103562,
+            "pareto_pchip": 0.17101328583754274,
+            "hull_linear_rate": 0.22436941325458057
+          },
+          "status": "supported",
+          "common_quality_interval": [
+            -0.27973505357901257,
+            -0.271824171145757
+          ]
+        }
+      }
+    },
+    "measured_changes": {
+      "foreground": [
+        {
+          "from": null,
+          "to": {
+            "ceiling_bytes": 13555,
+            "winner": "pointstream",
+            "winning_rate": 13.54145854145854,
+            "winning_dists": 0.30782271921634674
+          }
+        },
+        {
+          "from": {
+            "ceiling_bytes": 83277,
+            "winner": "pointstream",
+            "winning_rate": 83.1938061938062,
+            "winning_dists": 0.25959958011905354
+          },
+          "to": {
+            "ceiling_bytes": 89433,
+            "winner": "ordinary",
+            "winning_rate": 89.34365634365635,
+            "winning_dists": 0.2583978610734145
+          }
+        },
+        {
+          "from": {
+            "ceiling_bytes": 109880,
+            "winner": "ordinary",
+            "winning_rate": 89.34365634365635,
+            "winning_dists": 0.2583978610734145
+          },
+          "to": {
+            "ceiling_bytes": 113241,
+            "winner": "pointstream",
+            "winning_rate": 113.12787212787212,
+            "winning_dists": 0.2422130766014258
+          }
+        },
+        {
+          "from": {
+            "ceiling_bytes": 118866,
+            "winner": "pointstream",
+            "winning_rate": 113.12787212787212,
+            "winning_dists": 0.2422130766014258
+          },
+          "to": {
+            "ceiling_bytes": 119023,
+            "winner": "ordinary",
+            "winning_rate": 118.9040959040959,
+            "winning_dists": 0.23482812692721686
+          }
+        }
+      ],
+      "players": [
+        {
+          "from": null,
+          "to": {
+            "ceiling_bytes": 13555,
+            "winner": "pointstream",
+            "winning_rate": 13.54145854145854,
+            "winning_dists": 0.3311777909596761
+          }
+        },
+        {
+          "from": {
+            "ceiling_bytes": 83277,
+            "winner": "pointstream",
+            "winning_rate": 83.1938061938062,
+            "winning_dists": 0.3216152961055438
+          },
+          "to": {
+            "ceiling_bytes": 89433,
+            "winner": "ordinary",
+            "winning_rate": 89.34365634365635,
+            "winning_dists": 0.3184340223670006
+          }
+        },
+        {
+          "from": {
+            "ceiling_bytes": 109880,
+            "winner": "ordinary",
+            "winning_rate": 89.34365634365635,
+            "winning_dists": 0.3184340223670006
+          },
+          "to": {
+            "ceiling_bytes": 113241,
+            "winner": "pointstream",
+            "winning_rate": 113.12787212787212,
+            "winning_dists": 0.31294086823860806
+          }
+        },
+        {
+          "from": {
+            "ceiling_bytes": 113241,
+            "winner": "pointstream",
+            "winning_rate": 113.12787212787212,
+            "winning_dists": 0.31294086823860806
+          },
+          "to": {
+            "ceiling_bytes": 118866,
+            "winner": "roi",
+            "winning_rate": 118.74725274725274,
+            "winning_dists": 0.300181046128273
+          }
+        },
+        {
+          "from": {
+            "ceiling_bytes": 118866,
+            "winner": "roi",
+            "winning_rate": 118.74725274725274,
+            "winning_dists": 0.300181046128273
+          },
+          "to": {
+            "ceiling_bytes": 119023,
+            "winner": "ordinary",
+            "winning_rate": 118.9040959040959,
+            "winning_dists": 0.281901016831398
+          }
+        }
+      ],
+      "ball": [
+        {
+          "from": null,
+          "to": {
+            "ceiling_bytes": 13555,
+            "winner": "neural",
+            "winning_rate": 12.888111888111887,
+            "winning_dists": 0.2750616470972697
+          }
+        },
+        {
+          "from": {
+            "ceiling_bytes": 17529,
+            "winner": "neural",
+            "winning_rate": 15.012987012987015,
+            "winning_dists": 0.271824171145757
+          },
+          "to": {
+            "ceiling_bytes": 17731,
+            "winner": "ordinary",
+            "winning_rate": 17.713286713286713,
+            "winning_dists": 0.26600279410680133
+          }
+        },
+        {
+          "from": {
+            "ceiling_bytes": 17736,
+            "winner": "ordinary",
+            "winning_rate": 17.713286713286713,
+            "winning_dists": 0.26600279410680133
+          },
+          "to": {
+            "ceiling_bytes": 17794,
+            "winner": "pointstream",
+            "winning_rate": 17.776223776223773,
+            "winning_dists": 0.2593456010023753
+          }
+        },
+        {
+          "from": {
+            "ceiling_bytes": 119023,
+            "winner": "pointstream",
+            "winning_rate": 113.12787212787212,
+            "winning_dists": 0.17148528496424356
+          },
+          "to": {
+            "ceiling_bytes": 138908,
+            "winner": "ordinary",
+            "winning_rate": 138.76923076923077,
+            "winning_dists": 0.17000549534956613
+          }
+        }
+      ]
+    }
+  }
+}

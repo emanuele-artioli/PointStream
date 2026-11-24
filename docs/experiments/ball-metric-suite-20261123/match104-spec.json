@@ -1,0 +1,137 @@
+{
+  "schema": 1,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.cohort_ball_metric_suite"
+  ],
+  "arguments": [
+    "--source",
+    "{staged:source}",
+    "--metadata",
+    "{staged:metadata}",
+    "--rate",
+    "{staged:rate}",
+    "--labels",
+    "{staged:labels}",
+    "--backbone",
+    "{staged:backbone}",
+    "--score",
+    "{staged:score}",
+    "--lpips",
+    "{staged:lpips}",
+    "--frames",
+    "{frames}"
+  ],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.cohort_ball_metric_suite",
+    "--validate"
+  ],
+  "hosts": [
+    "gpu5"
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "staged_inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match104-000-aa0eea258179.mp4",
+      "sha256": "aa0eea258179ed5be7b166dbedb3e8001b823c5caac6630f89f480f6bec30a10",
+      "name": "source",
+      "extract": false
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match104.json",
+      "sha256": "44a197bce3090d734a042f14281659fe8026d0fff3db1283c884a16d9d7d4f51",
+      "name": "metadata",
+      "extract": false
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T114517Z-c2a832c9/full/published.tar",
+      "sha256": "c4f3fc75c58f109cc21695a97302682c8315311e8bb7e7a919e74d759520abb6",
+      "name": "rate",
+      "extract": false
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match104-000-e31b2cb84681.csv",
+      "sha256": "e31b2cb846818b5060f287dc5064ceadf4aedab8a7e4bdf0d3682fa94d786e18",
+      "name": "labels",
+      "extract": false
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "name": "backbone",
+      "extract": false
+    },
+    {
+      "name": "score",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T114943Z-d37cf721/full/scores.json",
+      "sha256": "eede86605b5c49032f5194cf0a72c05226f6e6a12d7f91f7d86f4092abc4d394",
+      "extract": false
+    },
+    {
+      "name": "lpips",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3-2026-10-10/inputs/lpips/alexnet-owt-7be5be79.pth",
+      "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match104-000-aa0eea258179.mp4",
+      "sha256": "aa0eea258179ed5be7b166dbedb3e8001b823c5caac6630f89f480f6bec30a10"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match104.json",
+      "sha256": "44a197bce3090d734a042f14281659fe8026d0fff3db1283c884a16d9d7d4f51"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T114517Z-c2a832c9/full/published.tar",
+      "sha256": "c4f3fc75c58f109cc21695a97302682c8315311e8bb7e7a919e74d759520abb6"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match104-000-e31b2cb84681.csv",
+      "sha256": "e31b2cb846818b5060f287dc5064ceadf4aedab8a7e4bdf0d3682fa94d786e18"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T114943Z-d37cf721/full/scores.json",
+      "sha256": "eede86605b5c49032f5194cf0a72c05226f6e6a12d7f91f7d86f4092abc4d394"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3-2026-10-10/inputs/lpips/alexnet-owt-7be5be79.pth",
+      "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02"
+    }
+  ],
+  "verify_staged_inputs": true,
+  "device": "cpu",
+  "gpu_models": [],
+  "gpu_memory_mib": 0,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "local_storage_gib": 12,
+  "required_commands": [],
+  "smoke": {
+    "seconds": 90,
+    "representative_basis": "Six stratified real ball crops per arm. Full native decoded-pixel witness, model identities and prior DISTS parity."
+  },
+  "full": {
+    "seconds": 315
+  },
+  "validator_seconds": 15,
+  "budget_seconds": 420,
+  "stall_seconds": 315,
+  "deadline": "2026-11-23T17:45:00Z",
+  "scale": {
+    "frames": {
+      "smoke": 24,
+      "full": 240
+    }
+  }
+}

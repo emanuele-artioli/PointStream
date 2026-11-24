@@ -1,0 +1,403 @@
+{
+  "match": "match104",
+  "source_sha256": "aa0eea258179ed5be7b166dbedb3e8001b823c5caac6630f89f480f6bec30a10",
+  "source_rgb_sha256": "c3aabfc987fab8d1fe26809dcb30a66108bbf9b4a6117439ad1ce01f2ebeeebb",
+  "labels_sha256": "e31b2cb846818b5060f287dc5064ceadf4aedab8a7e4bdf0d3682fa94d786e18",
+  "rate_archive_sha256": "c4f3fc75c58f109cc21695a97302682c8315311e8bb7e7a919e74d759520abb6",
+  "primary_sha256": "eede86605b5c49032f5194cf0a72c05226f6e6a12d7f91f7d86f4092abc4d394",
+  "source_ticks": 240,
+  "selected_visible_ticks": [
+    9,
+    20,
+    31,
+    43,
+    54,
+    65,
+    77,
+    88,
+    99,
+    111,
+    122,
+    134,
+    145,
+    156,
+    168,
+    179,
+    190,
+    202,
+    213,
+    224,
+    236
+  ],
+  "total_visible": 21,
+  "matched_rate_gap": 0.002809156655310563,
+  "arms": {
+    "candidate": {
+      "bytes": 16778,
+      "kbps": 33.556,
+      "packet_sha256": "b09d1b3f669f17bdbe02f9ff10d38295ec45f43d8104bde091db7e9ee3f6875a",
+      "rgb_sha256": "4663d56611ba647609d865d31e9875fa06a6b2d6b8c5b17d58f48131233f715a",
+      "width": 640,
+      "height": 384,
+      "rows": [
+        {
+          "tick": 9,
+          "dists": 0.24433088302612305,
+          "lpips": 0.14743636548519135,
+          "luma_ssim": 0.8455365300178528,
+          "rgb_mse": 0.0027643542271107435
+        },
+        {
+          "tick": 20,
+          "dists": 0.39838534593582153,
+          "lpips": 0.3700020909309387,
+          "luma_ssim": 0.6775553822517395,
+          "rgb_mse": 0.007235834840685129
+        },
+        {
+          "tick": 31,
+          "dists": 0.2572488784790039,
+          "lpips": 0.1393524408340454,
+          "luma_ssim": 0.7760298252105713,
+          "rgb_mse": 0.0037388678174465895
+        },
+        {
+          "tick": 43,
+          "dists": 0.2714621424674988,
+          "lpips": 0.20063698291778564,
+          "luma_ssim": 0.6338313221931458,
+          "rgb_mse": 0.004161288030445576
+        },
+        {
+          "tick": 54,
+          "dists": 0.23544597625732422,
+          "lpips": 0.16707050800323486,
+          "luma_ssim": 0.8465224504470825,
+          "rgb_mse": 0.002235359512269497
+        },
+        {
+          "tick": 65,
+          "dists": 0.25255918502807617,
+          "lpips": 0.22941707074642181,
+          "luma_ssim": 0.8765523433685303,
+          "rgb_mse": 0.0018909908831119537
+        },
+        {
+          "tick": 77,
+          "dists": 0.3003469705581665,
+          "lpips": 0.1764577031135559,
+          "luma_ssim": 0.7948780655860901,
+          "rgb_mse": 0.0037177996709942818
+        },
+        {
+          "tick": 88,
+          "dists": 0.339932382106781,
+          "lpips": 0.33469322323799133,
+          "luma_ssim": 0.6466206312179565,
+          "rgb_mse": 0.008830985054373741
+        },
+        {
+          "tick": 99,
+          "dists": 0.35045164823532104,
+          "lpips": 0.26319587230682373,
+          "luma_ssim": 0.6544130444526672,
+          "rgb_mse": 0.009554890915751457
+        },
+        {
+          "tick": 111,
+          "dists": 0.25279873609542847,
+          "lpips": 0.149052232503891,
+          "luma_ssim": 0.7760997414588928,
+          "rgb_mse": 0.006098735611885786
+        },
+        {
+          "tick": 122,
+          "dists": 0.1891019344329834,
+          "lpips": 0.09512723237276077,
+          "luma_ssim": 0.8803603649139404,
+          "rgb_mse": 0.0018458046251907945
+        },
+        {
+          "tick": 134,
+          "dists": 0.32255780696868896,
+          "lpips": 0.1287575364112854,
+          "luma_ssim": 0.6057949066162109,
+          "rgb_mse": 0.0037224553525447845
+        },
+        {
+          "tick": 145,
+          "dists": 0.16075462102890015,
+          "lpips": 0.10203003883361816,
+          "luma_ssim": 0.9200605154037476,
+          "rgb_mse": 0.0012067462084814906
+        },
+        {
+          "tick": 156,
+          "dists": 0.1886027455329895,
+          "lpips": 0.10633714497089386,
+          "luma_ssim": 0.9127437472343445,
+          "rgb_mse": 0.0013376581482589245
+        },
+        {
+          "tick": 168,
+          "dists": 0.16860449314117432,
+          "lpips": 0.028628990054130554,
+          "luma_ssim": 0.9748772978782654,
+          "rgb_mse": 0.0003472798562142998
+        },
+        {
+          "tick": 179,
+          "dists": 0.16983240842819214,
+          "lpips": 0.0643875002861023,
+          "luma_ssim": 0.9584782123565674,
+          "rgb_mse": 0.0007650465704500675
+        },
+        {
+          "tick": 190,
+          "dists": 0.23096328973770142,
+          "lpips": 0.03809265047311783,
+          "luma_ssim": 0.9443508386611938,
+          "rgb_mse": 0.0006142232450656593
+        },
+        {
+          "tick": 202,
+          "dists": 0.2276318073272705,
+          "lpips": 0.14737576246261597,
+          "luma_ssim": 0.7612351179122925,
+          "rgb_mse": 0.00327152363024652
+        },
+        {
+          "tick": 213,
+          "dists": 0.3801690340042114,
+          "lpips": 0.37255075573921204,
+          "luma_ssim": 0.6589571237564087,
+          "rgb_mse": 0.006581492722034454
+        },
+        {
+          "tick": 224,
+          "dists": 0.36587953567504883,
+          "lpips": 0.3873768150806427,
+          "luma_ssim": 0.6276043653488159,
+          "rgb_mse": 0.006659291218966246
+        },
+        {
+          "tick": 236,
+          "dists": 0.393627405166626,
+          "lpips": 0.28353843092918396,
+          "luma_ssim": 0.7918285131454468,
+          "rgb_mse": 0.0046284557320177555
+        }
+      ],
+      "means": {
+        "dists": 0.27146129664920626,
+        "lpips": 0.18721511179492586,
+        "luma_ssim": 0.7887776352110363,
+        "rgb_mse": 0.003867099232073607
+      },
+      "whole_rgb_psnr": 25.410261956116397
+    },
+    "ordinary": {
+      "bytes": 16731,
+      "kbps": 33.462,
+      "packet_sha256": "5dcf0beb0c2730b3eb345afcbab501e78ad31f8286a49d20330af317d0b358b4",
+      "rgb_sha256": "1c6e7356052adc07da9703670b1149ec4830057f6ae7ac9df64ef0f71bbf95c3",
+      "width": 640,
+      "height": 384,
+      "rows": [
+        {
+          "tick": 9,
+          "dists": 0.18897616863250732,
+          "lpips": 0.08733807504177094,
+          "luma_ssim": 0.8617581129074097,
+          "rgb_mse": 0.0023729868698865175
+        },
+        {
+          "tick": 20,
+          "dists": 0.37513184547424316,
+          "lpips": 0.3486645817756653,
+          "luma_ssim": 0.6111011505126953,
+          "rgb_mse": 0.0069725532084703445
+        },
+        {
+          "tick": 31,
+          "dists": 0.24043571949005127,
+          "lpips": 0.15213492512702942,
+          "luma_ssim": 0.7440056204795837,
+          "rgb_mse": 0.003465712070465088
+        },
+        {
+          "tick": 43,
+          "dists": 0.2309170365333557,
+          "lpips": 0.10986116528511047,
+          "luma_ssim": 0.6793216466903687,
+          "rgb_mse": 0.0033245671074837446
+        },
+        {
+          "tick": 54,
+          "dists": 0.25350743532180786,
+          "lpips": 0.18297716975212097,
+          "luma_ssim": 0.81828373670578,
+          "rgb_mse": 0.0025196389760822058
+        },
+        {
+          "tick": 65,
+          "dists": 0.2717132568359375,
+          "lpips": 0.1843414157629013,
+          "luma_ssim": 0.8645216226577759,
+          "rgb_mse": 0.0018380527617409825
+        },
+        {
+          "tick": 77,
+          "dists": 0.29687929153442383,
+          "lpips": 0.15774770081043243,
+          "luma_ssim": 0.7804281711578369,
+          "rgb_mse": 0.0034735628869384527
+        },
+        {
+          "tick": 88,
+          "dists": 0.32916492223739624,
+          "lpips": 0.35419684648513794,
+          "luma_ssim": 0.6625531911849976,
+          "rgb_mse": 0.008517000824213028
+        },
+        {
+          "tick": 99,
+          "dists": 0.3327134847640991,
+          "lpips": 0.30582815408706665,
+          "luma_ssim": 0.6778068542480469,
+          "rgb_mse": 0.008713255636394024
+        },
+        {
+          "tick": 111,
+          "dists": 0.23449242115020752,
+          "lpips": 0.15117934346199036,
+          "luma_ssim": 0.8063334822654724,
+          "rgb_mse": 0.004888248164206743
+        },
+        {
+          "tick": 122,
+          "dists": 0.17214864492416382,
+          "lpips": 0.1228867918252945,
+          "luma_ssim": 0.8708781003952026,
+          "rgb_mse": 0.0018398897955194116
+        },
+        {
+          "tick": 134,
+          "dists": 0.29596489667892456,
+          "lpips": 0.19021156430244446,
+          "luma_ssim": 0.6279455423355103,
+          "rgb_mse": 0.0031863246113061905
+        },
+        {
+          "tick": 145,
+          "dists": 0.21132534742355347,
+          "lpips": 0.09545600414276123,
+          "luma_ssim": 0.9183201193809509,
+          "rgb_mse": 0.0011518319370225072
+        },
+        {
+          "tick": 156,
+          "dists": 0.23514217138290405,
+          "lpips": 0.18900346755981445,
+          "luma_ssim": 0.9102020263671875,
+          "rgb_mse": 0.0014149355702102184
+        },
+        {
+          "tick": 168,
+          "dists": 0.25169837474823,
+          "lpips": 0.29217925667762756,
+          "luma_ssim": 0.961617112159729,
+          "rgb_mse": 0.000631082511972636
+        },
+        {
+          "tick": 179,
+          "dists": 0.21518850326538086,
+          "lpips": 0.09289775788784027,
+          "luma_ssim": 0.952089250087738,
+          "rgb_mse": 0.000930744397919625
+        },
+        {
+          "tick": 190,
+          "dists": 0.304565966129303,
+          "lpips": 0.18425999581813812,
+          "luma_ssim": 0.9476014971733093,
+          "rgb_mse": 0.0004476056492421776
+        },
+        {
+          "tick": 202,
+          "dists": 0.24522137641906738,
+          "lpips": 0.14531256258487701,
+          "luma_ssim": 0.7631658315658569,
+          "rgb_mse": 0.0029195721726864576
+        },
+        {
+          "tick": 213,
+          "dists": 0.373263955116272,
+          "lpips": 0.3159164488315582,
+          "luma_ssim": 0.6627510786056519,
+          "rgb_mse": 0.006464074831455946
+        },
+        {
+          "tick": 224,
+          "dists": 0.3703712224960327,
+          "lpips": 0.3805408477783203,
+          "luma_ssim": 0.6481210589408875,
+          "rgb_mse": 0.00663194851949811
+        },
+        {
+          "tick": 236,
+          "dists": 0.41609615087509155,
+          "lpips": 0.3753645718097687,
+          "luma_ssim": 0.7933176159858704,
+          "rgb_mse": 0.004437029827386141
+        }
+      ],
+      "means": {
+        "dists": 0.27832943768728347,
+        "lpips": 0.21039517365750812,
+        "luma_ssim": 0.7886725153241839,
+        "rgb_mse": 0.0036257437300047882
+      },
+      "whole_rgb_psnr": 25.841529279890484
+    }
+  },
+  "checks": {
+    "original_native_pixels": true,
+    "common_visible_ticks": true,
+    "dists_parity": true,
+    "identical_crop_control": true,
+    "forecast": true
+  },
+  "tools": {
+    "opencv": "4.10.0",
+    "torch": "2.10.0+cu128",
+    "dav1d": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+      "version": "1.5.4"
+    },
+    "lpips": {
+      "metric": "LPIPS",
+      "net": "alex",
+      "torchmetrics": "1.9.0",
+      "heads": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/torchmetrics/functional/image/lpips_models/alex.pth",
+      "heads_sha256": "df73285e35b22355a2df87cdb6b70b343713b667eddbda73e1977e0c860835c0",
+      "backbone": "/local/users/emanuele/pointstream/cache/7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02/alexnet-owt-7be5be79.pth",
+      "backbone_sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+      "pooling": "spatial map at full resolution (bilinear), mean over the frame or region"
+    },
+    "dists": {
+      "metric": "DISTS",
+      "net": "vgg16",
+      "torchmetrics": "1.9.0",
+      "weights": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/torchmetrics/functional/image/dists_models/weights.pt",
+      "weights_sha256": "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218",
+      "backbone": "/local/users/emanuele/pointstream/cache/397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0/vgg16-397923af.pth",
+      "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)"
+    }
+  },
+  "elapsed": 12.48833475401625,
+  "full_forecast_seconds": 43.732502131024376
+}

@@ -1,0 +1,138 @@
+{
+  "scope": "Six London points; two matches at one event; source-reviewed mark availability depends on tracker suggestions",
+  "inputs": {
+    "tenniset-ball-summary.json": "c3594ccb34dc4d9066fd2038f1e5a73b5b324a0f783ed1dd4ef5662c5bac77b8",
+    "london-reviewed-scores.json": "d9d1c6eca1e0c4dda520c2bcbf151d5a7d309c27ebaaeeee02268236eabd579e",
+    "route-summary.json": "55c0c2ff837656812dc860e6ecc016703e825361ce1e60307353530b251fabf5"
+  },
+  "script_sha256": "fc62be28e95cae154d301953fd41ddcd9b276b94e61a4b80543432cd98aba521",
+  "totals": {
+    "absent_independent": 15,
+    "absent_independent_emitted": 0,
+    "visible_independent": 9,
+    "visible_independent_emitted": 0,
+    "visible_independent_court": 5,
+    "visible_independent_within_10px": 0,
+    "visible_assisted": 24,
+    "visible_assisted_emitted": 24,
+    "visible_assisted_court": 24,
+    "visible_assisted_within_10px": 23,
+    "native_frames": 904,
+    "court_frames": 766,
+    "fallback_frames": 138,
+    "delivered_positions": 497,
+    "visible_independent_non_court": 4
+  },
+  "rallies": [
+    {
+      "rally": "v006_p0014",
+      "native_frames": 106,
+      "court_frames": 106,
+      "fallback_frames": 0,
+      "delivered_positions": 46,
+      "reviewed": {
+        "absent_independent": 3,
+        "absent_independent_emitted": 0,
+        "visible_independent": 2,
+        "visible_independent_emitted": 0,
+        "visible_independent_court": 2,
+        "visible_independent_within_10px": 0,
+        "visible_assisted": 3,
+        "visible_assisted_emitted": 3,
+        "visible_assisted_court": 3,
+        "visible_assisted_within_10px": 3
+      }
+    },
+    {
+      "rally": "v006_p0041",
+      "native_frames": 132,
+      "court_frames": 132,
+      "fallback_frames": 0,
+      "delivered_positions": 48,
+      "reviewed": {
+        "visible_independent": 2,
+        "visible_independent_emitted": 0,
+        "visible_independent_court": 2,
+        "visible_independent_within_10px": 0,
+        "absent_independent": 3,
+        "absent_independent_emitted": 0,
+        "visible_assisted": 3,
+        "visible_assisted_emitted": 3,
+        "visible_assisted_court": 3,
+        "visible_assisted_within_10px": 3
+      }
+    },
+    {
+      "rally": "v006_p0068",
+      "native_frames": 144,
+      "court_frames": 144,
+      "fallback_frames": 0,
+      "delivered_positions": 99,
+      "reviewed": {
+        "absent_independent": 2,
+        "absent_independent_emitted": 0,
+        "visible_assisted": 6,
+        "visible_assisted_emitted": 6,
+        "visible_assisted_court": 6,
+        "visible_assisted_within_10px": 5
+      }
+    },
+    {
+      "rally": "v007_p0022",
+      "native_frames": 120,
+      "court_frames": 83,
+      "fallback_frames": 37,
+      "delivered_positions": 56,
+      "reviewed": {
+        "visible_independent": 2,
+        "visible_independent_emitted": 0,
+        "visible_independent_non_court": 2,
+        "visible_independent_within_10px": 0,
+        "absent_independent": 2,
+        "absent_independent_emitted": 0,
+        "visible_assisted": 4,
+        "visible_assisted_emitted": 4,
+        "visible_assisted_court": 4,
+        "visible_assisted_within_10px": 4
+      }
+    },
+    {
+      "rally": "v007_p0065",
+      "native_frames": 138,
+      "court_frames": 37,
+      "fallback_frames": 101,
+      "delivered_positions": 33,
+      "reviewed": {
+        "absent_independent": 4,
+        "absent_independent_emitted": 0,
+        "visible_assisted": 2,
+        "visible_assisted_emitted": 2,
+        "visible_assisted_court": 2,
+        "visible_assisted_within_10px": 2,
+        "visible_independent": 2,
+        "visible_independent_emitted": 0,
+        "visible_independent_non_court": 2,
+        "visible_independent_within_10px": 0
+      }
+    },
+    {
+      "rally": "v007_p0108",
+      "native_frames": 264,
+      "court_frames": 264,
+      "fallback_frames": 0,
+      "delivered_positions": 215,
+      "reviewed": {
+        "absent_independent": 1,
+        "absent_independent_emitted": 0,
+        "visible_assisted": 6,
+        "visible_assisted_emitted": 6,
+        "visible_assisted_court": 6,
+        "visible_assisted_within_10px": 6,
+        "visible_independent": 1,
+        "visible_independent_emitted": 0,
+        "visible_independent_court": 1,
+        "visible_independent_within_10px": 0
+      }
+    }
+  ]
+}

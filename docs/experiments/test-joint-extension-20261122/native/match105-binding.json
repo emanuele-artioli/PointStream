@@ -1,0 +1,25 @@
+{
+  "event": "match105",
+  "fps": "25",
+  "native_width": 1920,
+  "native_height": 1080,
+  "source_sha256": "a518fd0850781642b2233cb1a8e0d910f253952f0d9d3d206326ce8d35ad0d0c",
+  "source_features_sha256": "3de9a20e1f2bb2040e738e8c36abd69114ff18b8fb82ce34fd4319d3d05adde2",
+  "pose_archive_sha256": "b3f803c4e2aa11f105bed8511f48104e82b70f66aad3119edbc469ffca815be5",
+  "crop_receipt_sha256": "3ed1d7fe0677fd0bf634719810942596ec75a80dee4646a23b6b441822608134",
+  "source_role_receipt_sha256": "9b47943b8ef6e42b389db040785cbf9c1fb7aca7f7a069b211871acfd54cb6eb",
+  "roles": {
+    "far": "person:000000000007",
+    "near": "person:000000000000"
+  },
+  "paired_source_coverage": {
+    "far": 240,
+    "near": 240
+  },
+  "prior_ranks_failed": [
+    "match127"
+  ],
+  "ball_sha256": "ebab488891d8c6a57aa25168c07c7479de58dda6da466df45d47e02747272a00",
+  "sender_job_id": "20261122T100048Z-6db80a14",
+  "crop_job_id": "20261122T121815Z-a370d6c3"
+}

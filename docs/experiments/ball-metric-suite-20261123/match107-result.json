@@ -1,0 +1,388 @@
+{
+  "match": "match107",
+  "source_sha256": "9b2197018f90a8e8873595101d4c72651efad33c7e60d506e6718e78d073ba2e",
+  "source_rgb_sha256": "ee6cb3c06285ba4bb3a880fa642c3b85e1807abcd608bc21afa657c3e99d0605",
+  "labels_sha256": "c92dca6049acfca7a52ce892775423ade4e422c602fdf09a13eec8b9e5a58e2f",
+  "rate_archive_sha256": "8c647ea17bb8e8eac1718a0100bd33fb5dd7110f5a7145fcb6c17246e61cdfb5",
+  "primary_sha256": "2a765a8983f384c72681b8790b6a6412656c390faf5f3a2cfefd9d6aaca4e00a",
+  "source_ticks": 240,
+  "selected_visible_ticks": [
+    9,
+    20,
+    32,
+    44,
+    56,
+    68,
+    80,
+    92,
+    103,
+    115,
+    127,
+    139,
+    151,
+    163,
+    175,
+    186,
+    198,
+    210,
+    222,
+    234
+  ],
+  "total_visible": 20,
+  "matched_rate_gap": 0.000823248538733834,
+  "arms": {
+    "candidate": {
+      "bytes": 12157,
+      "kbps": 24.314,
+      "packet_sha256": "6684d4213d0d0b071f0603e5e32312080f2a1e70a7979a35032f78fa0bcb5110",
+      "rgb_sha256": "2f4266adad3947f1ca7cc1e3efaa0a2b3566b161d9a5d6ff3cd4935af73f9bf6",
+      "width": 320,
+      "height": 192,
+      "rows": [
+        {
+          "tick": 9,
+          "dists": 0.22346991300582886,
+          "lpips": 0.09171320497989655,
+          "luma_ssim": 0.8814982771873474,
+          "rgb_mse": 0.0024808342568576336
+        },
+        {
+          "tick": 20,
+          "dists": 0.2475096583366394,
+          "lpips": 0.3090325593948364,
+          "luma_ssim": 0.6928502321243286,
+          "rgb_mse": 0.0027385663706809282
+        },
+        {
+          "tick": 32,
+          "dists": 0.3232266902923584,
+          "lpips": 0.4017379879951477,
+          "luma_ssim": 0.5765307545661926,
+          "rgb_mse": 0.004194069188088179
+        },
+        {
+          "tick": 44,
+          "dists": 0.3590920567512512,
+          "lpips": 0.4827716648578644,
+          "luma_ssim": 0.6328603625297546,
+          "rgb_mse": 0.010486149229109287
+        },
+        {
+          "tick": 56,
+          "dists": 0.31093132495880127,
+          "lpips": 0.46312907338142395,
+          "luma_ssim": 0.743267834186554,
+          "rgb_mse": 0.004911315161734819
+        },
+        {
+          "tick": 68,
+          "dists": 0.29506850242614746,
+          "lpips": 0.346619188785553,
+          "luma_ssim": 0.7780793309211731,
+          "rgb_mse": 0.004401430021971464
+        },
+        {
+          "tick": 80,
+          "dists": 0.20947670936584473,
+          "lpips": 0.11687921732664108,
+          "luma_ssim": 0.8814484477043152,
+          "rgb_mse": 0.0016159838996827602
+        },
+        {
+          "tick": 92,
+          "dists": 0.3157501816749573,
+          "lpips": 0.37390226125717163,
+          "luma_ssim": 0.5083553791046143,
+          "rgb_mse": 0.004414728377014399
+        },
+        {
+          "tick": 103,
+          "dists": 0.20793747901916504,
+          "lpips": 0.11457695066928864,
+          "luma_ssim": 0.8756968379020691,
+          "rgb_mse": 0.0013735215179622173
+        },
+        {
+          "tick": 115,
+          "dists": 0.2705702781677246,
+          "lpips": 0.08949357271194458,
+          "luma_ssim": 0.8511574268341064,
+          "rgb_mse": 0.0013272325741127133
+        },
+        {
+          "tick": 127,
+          "dists": 0.21616047620773315,
+          "lpips": 0.09475260227918625,
+          "luma_ssim": 0.8702577948570251,
+          "rgb_mse": 0.0013248746981844306
+        },
+        {
+          "tick": 139,
+          "dists": 0.301336407661438,
+          "lpips": 0.16761405766010284,
+          "luma_ssim": 0.7590638995170593,
+          "rgb_mse": 0.0035007756669074297
+        },
+        {
+          "tick": 151,
+          "dists": 0.30010032653808594,
+          "lpips": 0.35735246539115906,
+          "luma_ssim": 0.5401456356048584,
+          "rgb_mse": 0.0054520792327821255
+        },
+        {
+          "tick": 163,
+          "dists": 0.2873905897140503,
+          "lpips": 0.25627726316452026,
+          "luma_ssim": 0.6224116683006287,
+          "rgb_mse": 0.004009522031992674
+        },
+        {
+          "tick": 175,
+          "dists": 0.2766321897506714,
+          "lpips": 0.3926888704299927,
+          "luma_ssim": 0.5808566212654114,
+          "rgb_mse": 0.002894183387979865
+        },
+        {
+          "tick": 186,
+          "dists": 0.26087647676467896,
+          "lpips": 0.23193950951099396,
+          "luma_ssim": 0.8526157140731812,
+          "rgb_mse": 0.002019154140725732
+        },
+        {
+          "tick": 198,
+          "dists": 0.3366122841835022,
+          "lpips": 0.379585325717926,
+          "luma_ssim": 0.6670868992805481,
+          "rgb_mse": 0.007297491189092398
+        },
+        {
+          "tick": 210,
+          "dists": 0.37220078706741333,
+          "lpips": 0.4439660906791687,
+          "luma_ssim": 0.6555367112159729,
+          "rgb_mse": 0.011775108985602856
+        },
+        {
+          "tick": 222,
+          "dists": 0.37321311235427856,
+          "lpips": 0.404094934463501,
+          "luma_ssim": 0.6876236796379089,
+          "rgb_mse": 0.006090183276683092
+        },
+        {
+          "tick": 234,
+          "dists": 0.3953936696052551,
+          "lpips": 0.42829978466033936,
+          "luma_ssim": 0.6238847970962524,
+          "rgb_mse": 0.005974190775305033
+        }
+      ],
+      "means": {
+        "dists": 0.2941474556922913,
+        "lpips": 0.2973213292658329,
+        "luma_ssim": 0.7140614151954651,
+        "rgb_mse": 0.004414069699123502
+      },
+      "whole_rgb_psnr": 21.660260932912507
+    },
+    "ordinary": {
+      "bytes": 12147,
+      "kbps": 24.294,
+      "packet_sha256": "df7d81f98ed9e8f55001c1d496160eeeeb067cbc88a2805e30b5a572e7d3b0b5",
+      "rgb_sha256": "62e3c6b64fb354ccb3c2c2a848b88569b14507165c63f67c5cdf0f3b79716577",
+      "width": 320,
+      "height": 192,
+      "rows": [
+        {
+          "tick": 9,
+          "dists": 0.3129822015762329,
+          "lpips": 0.46919548511505127,
+          "luma_ssim": 0.8292801380157471,
+          "rgb_mse": 0.003423368325456977
+        },
+        {
+          "tick": 20,
+          "dists": 0.3045361638069153,
+          "lpips": 0.3854857385158539,
+          "luma_ssim": 0.651159942150116,
+          "rgb_mse": 0.002973620779812336
+        },
+        {
+          "tick": 32,
+          "dists": 0.3225811719894409,
+          "lpips": 0.4722561240196228,
+          "luma_ssim": 0.5612855553627014,
+          "rgb_mse": 0.0036956164985895157
+        },
+        {
+          "tick": 44,
+          "dists": 0.3580787181854248,
+          "lpips": 0.5409476161003113,
+          "luma_ssim": 0.6292863488197327,
+          "rgb_mse": 0.01061119232326746
+        },
+        {
+          "tick": 56,
+          "dists": 0.3105301856994629,
+          "lpips": 0.5996371507644653,
+          "luma_ssim": 0.7575718760490417,
+          "rgb_mse": 0.0044947522692382336
+        },
+        {
+          "tick": 68,
+          "dists": 0.33396458625793457,
+          "lpips": 0.5245980024337769,
+          "luma_ssim": 0.7666402459144592,
+          "rgb_mse": 0.004163240548223257
+        },
+        {
+          "tick": 80,
+          "dists": 0.2641867995262146,
+          "lpips": 0.24996519088745117,
+          "luma_ssim": 0.845463216304779,
+          "rgb_mse": 0.001423683832399547
+        },
+        {
+          "tick": 92,
+          "dists": 0.32655417919158936,
+          "lpips": 0.5227962732315063,
+          "luma_ssim": 0.48773711919784546,
+          "rgb_mse": 0.004792351741343737
+        },
+        {
+          "tick": 103,
+          "dists": 0.3163355588912964,
+          "lpips": 0.38941964507102966,
+          "luma_ssim": 0.8418143391609192,
+          "rgb_mse": 0.0016704486915841699
+        },
+        {
+          "tick": 115,
+          "dists": 0.30471134185791016,
+          "lpips": 0.440642774105072,
+          "luma_ssim": 0.8569332361221313,
+          "rgb_mse": 0.0017004190012812614
+        },
+        {
+          "tick": 127,
+          "dists": 0.3034757375717163,
+          "lpips": 0.42315006256103516,
+          "luma_ssim": 0.8861927390098572,
+          "rgb_mse": 0.0017488315934315324
+        },
+        {
+          "tick": 139,
+          "dists": 0.384394109249115,
+          "lpips": 0.5106219053268433,
+          "luma_ssim": 0.7507172226905823,
+          "rgb_mse": 0.003919749986380339
+        },
+        {
+          "tick": 151,
+          "dists": 0.3316582441329956,
+          "lpips": 0.46704816818237305,
+          "luma_ssim": 0.5818942785263062,
+          "rgb_mse": 0.004766138270497322
+        },
+        {
+          "tick": 163,
+          "dists": 0.3026086091995239,
+          "lpips": 0.28372496366500854,
+          "luma_ssim": 0.6449428200721741,
+          "rgb_mse": 0.0034195093903690577
+        },
+        {
+          "tick": 175,
+          "dists": 0.2875891327857971,
+          "lpips": 0.4396955370903015,
+          "luma_ssim": 0.5816471576690674,
+          "rgb_mse": 0.0026878537610173225
+        },
+        {
+          "tick": 186,
+          "dists": 0.2804275155067444,
+          "lpips": 0.3249708116054535,
+          "luma_ssim": 0.868366003036499,
+          "rgb_mse": 0.0017201857408508658
+        },
+        {
+          "tick": 198,
+          "dists": 0.3422958254814148,
+          "lpips": 0.47342976927757263,
+          "luma_ssim": 0.6663973331451416,
+          "rgb_mse": 0.006785888224840164
+        },
+        {
+          "tick": 210,
+          "dists": 0.40063756704330444,
+          "lpips": 0.5702891945838928,
+          "luma_ssim": 0.6660081148147583,
+          "rgb_mse": 0.010338387452065945
+        },
+        {
+          "tick": 222,
+          "dists": 0.3969627618789673,
+          "lpips": 0.5527425408363342,
+          "luma_ssim": 0.6859484314918518,
+          "rgb_mse": 0.005465434864163399
+        },
+        {
+          "tick": 234,
+          "dists": 0.43482112884521484,
+          "lpips": 0.6074566841125488,
+          "luma_ssim": 0.6124893426895142,
+          "rgb_mse": 0.0057991258800029755
+        }
+      ],
+      "means": {
+        "dists": 0.3309665769338608,
+        "lpips": 0.4624036818742752,
+        "luma_ssim": 0.7085887730121613,
+        "rgb_mse": 0.0042799899587407705
+      },
+      "whole_rgb_psnr": 22.216326094019596
+    }
+  },
+  "checks": {
+    "original_native_pixels": true,
+    "common_visible_ticks": true,
+    "dists_parity": true,
+    "identical_crop_control": true,
+    "forecast": true
+  },
+  "tools": {
+    "opencv": "4.10.0",
+    "torch": "2.10.0+cu128",
+    "dav1d": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+      "version": "1.5.4"
+    },
+    "lpips": {
+      "metric": "LPIPS",
+      "net": "alex",
+      "torchmetrics": "1.9.0",
+      "heads": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/torchmetrics/functional/image/lpips_models/alex.pth",
+      "heads_sha256": "df73285e35b22355a2df87cdb6b70b343713b667eddbda73e1977e0c860835c0",
+      "backbone": "/local/users/emanuele/pointstream/cache/7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02/alexnet-owt-7be5be79.pth",
+      "backbone_sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+      "pooling": "spatial map at full resolution (bilinear), mean over the frame or region"
+    },
+    "dists": {
+      "metric": "DISTS",
+      "net": "vgg16",
+      "torchmetrics": "1.9.0",
+      "weights": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/torchmetrics/functional/image/dists_models/weights.pt",
+      "weights_sha256": "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218",
+      "backbone": "/local/users/emanuele/pointstream/cache/397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0/vgg16-397923af.pth",
+      "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)"
+    }
+  },
+  "elapsed": 10.170670496008825,
+  "full_forecast_seconds": 40.25600574401324
+}

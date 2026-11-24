@@ -46,7 +46,7 @@ def decode(
     coded_size = (width, height)
     if coded_size != BASE_SIZE and (
         not allow_wider_base
-        or profile["recipe"] != packet.RECIPE_60
+        or profile["recipe"] not in (packet.RECIPE_60, packet.RECIPE_2997)
         or coded_size not in WIDER_BASE_SIZES
     ):
         raise ValueError("unsupported mixed-mode coded base size")

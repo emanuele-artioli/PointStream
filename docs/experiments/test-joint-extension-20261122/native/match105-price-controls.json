@@ -1,0 +1,136 @@
+{
+  "source": "a518fd0850781642b2233cb1a8e0d910f253952f0d9d3d206326ce8d35ad0d0c",
+  "prices": [
+    {
+      "crf": 70,
+      "state": "warm",
+      "ceiling": 13350,
+      "width": 320,
+      "arm": "av1-320-280",
+      "bytes": 10847
+    },
+    {
+      "crf": 70,
+      "state": "warm",
+      "ceiling": 13350,
+      "width": 640,
+      "arm": null
+    },
+    {
+      "crf": 70,
+      "state": "cold",
+      "ceiling": 187734,
+      "width": 320,
+      "arm": "av1-320-160",
+      "bytes": 50222
+    },
+    {
+      "crf": 70,
+      "state": "cold",
+      "ceiling": 187734,
+      "width": 640,
+      "arm": "av1-640-160",
+      "bytes": 148772
+    },
+    {
+      "crf": 60,
+      "state": "warm",
+      "ceiling": 15853,
+      "width": 320,
+      "arm": "av1-320-280",
+      "bytes": 10847
+    },
+    {
+      "crf": 60,
+      "state": "warm",
+      "ceiling": 15853,
+      "width": 640,
+      "arm": null
+    },
+    {
+      "crf": 60,
+      "state": "cold",
+      "ceiling": 190237,
+      "width": 320,
+      "arm": "av1-320-160",
+      "bytes": 50222
+    },
+    {
+      "crf": 60,
+      "state": "cold",
+      "ceiling": 190237,
+      "width": 640,
+      "arm": "av1-640-160",
+      "bytes": 148772
+    },
+    {
+      "crf": 50,
+      "state": "warm",
+      "ceiling": 18319,
+      "width": 320,
+      "arm": "av1-320-250",
+      "bytes": 16782
+    },
+    {
+      "crf": 50,
+      "state": "warm",
+      "ceiling": 18319,
+      "width": 640,
+      "arm": "av1-640-280",
+      "bytes": 16439
+    },
+    {
+      "crf": 50,
+      "state": "cold",
+      "ceiling": 192703,
+      "width": 320,
+      "arm": "av1-320-160",
+      "bytes": 50222
+    },
+    {
+      "crf": 50,
+      "state": "cold",
+      "ceiling": 192703,
+      "width": 640,
+      "arm": "av1-640-160",
+      "bytes": 148772
+    }
+  ],
+  "selected": {
+    "av1-320-280": {
+      "producer": "20261122T102101Z-db304a5b",
+      "sha256": "874da9840c0cbe49b4ba1d450fbaa2a58b316130b7cbe08bc0f9fad9b641918e",
+      "file": "published.tar"
+    },
+    "av1-320-160": {
+      "producer": "20261122T102101Z-db304a5b",
+      "sha256": "874da9840c0cbe49b4ba1d450fbaa2a58b316130b7cbe08bc0f9fad9b641918e",
+      "file": "published.tar"
+    },
+    "av1-640-160": {
+      "producer": "20261122T102101Z-db304a5b",
+      "sha256": "874da9840c0cbe49b4ba1d450fbaa2a58b316130b7cbe08bc0f9fad9b641918e",
+      "file": "published.tar"
+    },
+    "av1-320-250": {
+      "producer": "20261122T102101Z-db304a5b",
+      "sha256": "874da9840c0cbe49b4ba1d450fbaa2a58b316130b7cbe08bc0f9fad9b641918e",
+      "file": "published.tar"
+    },
+    "av1-640-280": {
+      "producer": "20261122T102101Z-db304a5b",
+      "sha256": "874da9840c0cbe49b4ba1d450fbaa2a58b316130b7cbe08bc0f9fad9b641918e",
+      "file": "published.tar"
+    },
+    "dcvc-480-q24": {
+      "producer": "20261122T093615Z-3288fdad",
+      "sha256": "13e1f236b801034c31ab665ee4a2a28ff368d3bec0efe3311b21079f97f57517",
+      "file": "published.tar"
+    },
+    "dcvc-480-q36": {
+      "producer": "20261122T131510Z-0059b771",
+      "sha256": "5e4524ac0b8b2c75c905fcc6b28211a1569617cc3cdfdde13fa699864d314d5f",
+      "file": "published.tar"
+    }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "job_id": "20261123T115627Z-64bfa092",
+  "status": "pending",
+  "config": {
+    "schema": 1,
+    "hosts": [
+      "gpu1",
+      "gpu2",
+      "gpu3",
+      "gpu4",
+      "gpu5",
+      "gpu6"
+    ],
+    "base": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet",
+    "release": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261121T212706Z-c60133f5",
+    "pythons": {
+      "gpu1": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+      "gpu2": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+      "gpu3": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+      "gpu4": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+      "gpu5": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+      "gpu6": "/home/itec/emanuele/.conda/envs/pointstream/bin/python"
+    },
+    "doctor": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/d4fb2738c08643839322edf1bf9d0eb8",
+    "management_host": "gpu2",
+    "management_python": "/usr/bin/python3"
+  },
+  "spec_sha256": "f904e9ff6c39d53b0a8d0de07d29c9a85e75f19f2451ecb8e7444b7e9f74d571",
+  "snapshot": {
+    "git_head": "a4cf14ecafc4a38649672063f9bed5968fd94f0a",
+    "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tracked_changes_included": [],
+    "tracked_changes_excluded": [],
+    "included_untracked_sha256": {},
+    "untracked_excluded_count": 0,
+    "untracked_excluded_paths_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "untracked_excluded_sample": [],
+    "deleted_paths": [],
+    "snapshot_sha256": "46ddc3346e1bde27b475b232bc8592b90b5f90256efcd37ff2353d720af3e1f3"
+  },
+  "chat_id": "",
+  "source_archive": true,
+  "source_sha256": "d7b27456f4bd229e4577e6af6cc60a9e562fc56eb192b1bfd4ba2149ae8c54b7",
+  "input_check": {
+    "hashed": [
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match102.json",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T095917Z-126b9bac/full/published.tar",
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match102-000-fc5d3ee431f8.mp4"
+    ],
+    "deferred": [
+      "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz"
+    ],
+    "deferred_bytes": 4936811281,
+    "deferred_to": "campaign"
+  },
+  "monitoring": {
+    "chat_id": "",
+    "events_command": "/private/tmp/ps-overnight-figures-20261123/scripts/ps-fleet events 20261123T115627Z-64bfa092",
+    "wait_command": [
+      "/private/tmp/ps-overnight-figures-20261123/scripts/ps-fleet",
+      "wait",
+      "20261123T115627Z-64bfa092",
+      "--max-seconds",
+      "2700"
+    ],
+    "mode": "completion_first",
+    "watchdog_seconds": 2700,
+    "heartbeat_required": false,
+    "recurring_polling": false
+  }
+}

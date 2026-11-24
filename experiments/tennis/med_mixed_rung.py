@@ -25,6 +25,8 @@ from experiments.tennis import med_split_native as split
 from experiments.tennis import w8_receiver_native_bootstrap as native
 from experiments.tennis.player_requalification import array_sha, sha256
 
+SHANGHAI_CACHE_SHA = "bef67ff7a17cc2dc83fa66f35faa344a91009393e778a7248e0516321038ddfb"
+SHANGHAI_REVIEW_TICKS = (9, 31, 49, 72, 95, 112, 135, 152, 175, 198, 215, 238)
 SYDNEY_REVIEW_TICKS = (9, 32, 44, 68, 92, 115, 127, 151, 175, 198, 210, 234)
 REVIEW_SHAPE = (1080, 1920, 3)
 REVIEW_FRAME_BYTES = 1080 * 1920 * 3
@@ -269,7 +271,12 @@ def cli_run(a):
 
 def review_rows(r):
     if r["ticks"] == list(range(240)):
-        return [r["rows"][tick] for tick in SYDNEY_REVIEW_TICKS]
+        ticks = (
+            SHANGHAI_REVIEW_TICKS
+            if r.get("wire", {}).get("cache_sha256") == SHANGHAI_CACHE_SHA
+            else SYDNEY_REVIEW_TICKS
+        )
+        return [r["rows"][tick] for tick in ticks]
     if r["ticks"] == mixed.smoke_ticks(0, 240):
         return r["rows"][:1]
     raise ValueError("expected a complete Sydney replay or its registered smoke ticks")

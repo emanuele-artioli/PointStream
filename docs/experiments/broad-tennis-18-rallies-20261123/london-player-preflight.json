@@ -1,0 +1,210 @@
+{
+  "scope": "Six saved ball-plus-base physical streams, regional scores on accepted automatic source proposals; no player-generation result",
+  "input_sha256": {
+    "tenniset-ball-summary.json": "c3594ccb34dc4d9066fd2038f1e5a73b5b324a0f783ed1dd4ef5662c5bac77b8",
+    "london-reviewed-scores.json": "d9d1c6eca1e0c4dda520c2bcbf151d5a7d309c27ebaaeeee02268236eabd579e",
+    "route-summary.json": "55c0c2ff837656812dc860e6ecc016703e825361ce1e60307353530b251fabf5"
+  },
+  "script_sha256": "94fe894fbaacc557e6306c010e20b64a183a07602a2c5b4689ce8b34391832f5",
+  "python": "3.14.3",
+  "results": [
+    {
+      "rally": "v006_p0014",
+      "frames": 106,
+      "fallback_ticks": 0,
+      "ceilings": {
+        "20400": {
+          "bytes": 9778,
+          "ceiling_bytes": 10812,
+          "residual_bytes": 1034,
+          "body_reviewed_frames": 8,
+          "body_instances": 16,
+          "metrics_frame_then_player_mean": {
+            "dists": 0.4095210023224354,
+            "lpips": 0.5236978679895401,
+            "luma_ssim": 0.3638628258555089,
+            "rgb_psnr": 16.122595950043014
+          }
+        },
+        "33000": {
+          "bytes": 12894,
+          "ceiling_bytes": 17490,
+          "residual_bytes": 4596,
+          "body_reviewed_frames": 8,
+          "body_instances": 16,
+          "metrics_frame_then_player_mean": {
+            "dists": 0.3861118145287037,
+            "lpips": 0.4582851752638817,
+            "luma_ssim": 0.4078273118542943,
+            "rgb_psnr": 16.779693392454686
+          }
+        }
+      }
+    },
+    {
+      "rally": "v006_p0041",
+      "frames": 132,
+      "fallback_ticks": 0,
+      "ceilings": {
+        "20400": {
+          "bytes": 11497,
+          "ceiling_bytes": 13464,
+          "residual_bytes": 1967,
+          "body_reviewed_frames": 8,
+          "body_instances": 16,
+          "metrics_frame_then_player_mean": {
+            "dists": 0.3953649327158928,
+            "lpips": 0.4473331458866596,
+            "luma_ssim": 0.4232260332155351,
+            "rgb_psnr": 16.55690446185166
+          }
+        },
+        "33000": {
+          "bytes": 11497,
+          "ceiling_bytes": 21780,
+          "residual_bytes": 10283,
+          "body_reviewed_frames": 8,
+          "body_instances": 16,
+          "metrics_frame_then_player_mean": {
+            "dists": 0.3953649327158928,
+            "lpips": 0.4473331458866596,
+            "luma_ssim": 0.4232260332155351,
+            "rgb_psnr": 16.55690446185166
+          }
+        }
+      }
+    },
+    {
+      "rally": "v006_p0068",
+      "frames": 144,
+      "fallback_ticks": 0,
+      "ceilings": {
+        "20400": {
+          "bytes": 12253,
+          "ceiling_bytes": 14688,
+          "residual_bytes": 2435,
+          "body_reviewed_frames": 8,
+          "body_instances": 14,
+          "metrics_frame_then_player_mean": {
+            "dists": 0.4482005536556244,
+            "lpips": 0.6011726222932339,
+            "luma_ssim": 0.3224555309080184,
+            "rgb_psnr": 15.73407593294014
+          }
+        },
+        "33000": {
+          "bytes": 16237,
+          "ceiling_bytes": 23760,
+          "residual_bytes": 7523,
+          "body_reviewed_frames": 8,
+          "body_instances": 14,
+          "metrics_frame_then_player_mean": {
+            "dists": 0.4179200157523155,
+            "lpips": 0.561811150982976,
+            "luma_ssim": 0.37682543615736575,
+            "rgb_psnr": 16.55659060140556
+          }
+        }
+      }
+    },
+    {
+      "rally": "v007_p0022",
+      "frames": 120,
+      "fallback_ticks": 37,
+      "ceilings": {
+        "20400": {
+          "bytes": 9696,
+          "ceiling_bytes": 12240,
+          "residual_bytes": 2544,
+          "body_reviewed_frames": 8,
+          "body_instances": 14,
+          "metrics_frame_then_player_mean": {
+            "dists": 0.4965483844280243,
+            "lpips": 0.8641093149781227,
+            "luma_ssim": 0.3395343676426265,
+            "rgb_psnr": 14.780742057488277
+          }
+        },
+        "33000": {
+          "bytes": 14460,
+          "ceiling_bytes": 19800,
+          "residual_bytes": 5340,
+          "body_reviewed_frames": 8,
+          "body_instances": 14,
+          "metrics_frame_then_player_mean": {
+            "dists": 0.43881624937057495,
+            "lpips": 0.6837458424270153,
+            "luma_ssim": 0.37935913199208293,
+            "rgb_psnr": 15.825991168593042
+          }
+        }
+      }
+    },
+    {
+      "rally": "v007_p0065",
+      "frames": 138,
+      "fallback_ticks": 101,
+      "ceilings": {
+        "20400": {
+          "bytes": 13735,
+          "ceiling_bytes": 14076,
+          "residual_bytes": 341,
+          "body_reviewed_frames": 8,
+          "body_instances": 12,
+          "metrics_frame_then_player_mean": {
+            "dists": 0.40412381291389465,
+            "lpips": 0.5393215119838715,
+            "luma_ssim": 0.5981846561484708,
+            "rgb_psnr": 19.734019115045953
+          }
+        },
+        "33000": {
+          "bytes": 17801,
+          "ceiling_bytes": 22770,
+          "residual_bytes": 4969,
+          "body_reviewed_frames": 8,
+          "body_instances": 12,
+          "metrics_frame_then_player_mean": {
+            "dists": 0.361880574375391,
+            "lpips": 0.4631326477974653,
+            "luma_ssim": 0.6275395459640133,
+            "rgb_psnr": 20.616802297425895
+          }
+        }
+      }
+    },
+    {
+      "rally": "v007_p0108",
+      "frames": 264,
+      "fallback_ticks": 0,
+      "ceilings": {
+        "20400": {
+          "bytes": 21762,
+          "ceiling_bytes": 26928,
+          "residual_bytes": 5166,
+          "body_reviewed_frames": 8,
+          "body_instances": 16,
+          "metrics_frame_then_player_mean": {
+            "dists": 0.4802420772612095,
+            "lpips": 0.6494129430502653,
+            "luma_ssim": 0.3260486053212298,
+            "rgb_psnr": 15.89964653738198
+          }
+        },
+        "33000": {
+          "bytes": 27106,
+          "ceiling_bytes": 43560,
+          "residual_bytes": 16454,
+          "body_reviewed_frames": 8,
+          "body_instances": 16,
+          "metrics_frame_then_player_mean": {
+            "dists": 0.44757475703954697,
+            "lpips": 0.5893537998199463,
+            "luma_ssim": 0.35870049895724365,
+            "rgb_psnr": 16.555320308054775
+          }
+        }
+      }
+    }
+  ]
+}

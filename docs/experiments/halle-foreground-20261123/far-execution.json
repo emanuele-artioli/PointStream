@@ -1,0 +1,28 @@
+{
+  "exit_code": 0,
+  "seconds": 1087.5411751270294,
+  "children_resource_usage": [
+    1230.869925,
+    79.121908,
+    36827204,
+    0,
+    0,
+    0,
+    56181212,
+    0,
+    0,
+    309008,
+    6779192,
+    0,
+    0,
+    0,
+    65945,
+    148462
+  ],
+  "timing_contaminated": false,
+  "contention": [],
+  "paused_seconds": 0.0,
+  "gpu_sharing": {
+    "mode": "exclusive"
+  }
+}
