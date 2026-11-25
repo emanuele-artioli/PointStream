@@ -1,5 +1,7 @@
 # PointStream submission handoff
 
+> **Active TOMM 2-week plan (2026-11-24):** See [docs/tomm-submission-plan-20261124.md](tomm-submission-plan-20261124.md) for the updated validation-first priorities, pre-flight V1–V4 audit findings, and two-track schedule superseding the legacy London 18-rally queue below.
+
 Checkpoint from November 24, 2026 (Sydney). Start with this file, [PLAN.md](../PLAN.md), and [AGENTS.md](../AGENTS.md). The plan owns the priority list. Experiment cards own run specifications and evidence.
 
 ## Resume from these revisions
@@ -10,17 +12,37 @@ Checkpoint from November 24, 2026 (Sydney). Start with this file, [PLAN.md](../P
 | Manuscript | Overleaf project `67a9ea6275d3d9785ce57026`, revision `471d0eafa62ab81a9abb619e724038a3f5c28d42`. Read its own instructions. The shared draft contains both joint rate ladders, the twelve-match metric suite and the London coverage check. Evidence checks passed. The author PDF uses 23 body/reference pages plus five appendix pages, and the anonymous PDF uses 22 plus five. The paper is still a draft. |
 | Data and results | Follow the paths and hashes in the experiment cards. The full clean rasters, native receiver witnesses, model environments and source footage are campus assets. The Markdown, checked-in receipts and manuscript are available with repository access alone. |
 
-[GitHub PR and checks](https://github.com/emanuele-artioli/PointStream/pull/454) · [Overleaf manuscript](https://www.overleaf.com/project/67a9ea6275d3d9785ce57026)
+[GitHub PR and checks](https://github.com/emanuele-artioli/PointStream/pull/456) · [Overleaf manuscript](https://www.overleaf.com/project/67a9ea6275d3d9785ce57026)
 
 Use the platform's existing GitHub, Overleaf and campus access. On a registered machine, reuse an existing execution record if there is one. Otherwise start from the revisions above and carry only the new scoped changes. The originating Mac checkout has unrelated uncommitted clean-court and DCVC work. Keep that checkout intact and leave those edits out of the handoff.
 
+## What has been evaluated
+
+| Evidence | Coverage | Use in the paper |
+|---|---|---|
+| Complete joint player-and-ball reconstructions with foreground scores | Four rally excerpts from four matches. Nadal–Kyrgios and Alcaraz–Hurkacz informed development. Shanghai (Sinner–Shelton) and Sydney (Safiullin–Shapovalov) are external cases, one excerpt each. | Two development shots support the matched low-rate comparison. Shanghai and Sydney support the two external rate ladders and their separate operating ranges. Extra rates reuse the same footage and player generations. |
+| Ball-only matched control | Twelve matches and 402 independently marked visible instants | Broad ball enhancement evidence. Report the perceptual, pixel and whole-picture endpoints separately. |
+| Expansion | Halle has a paid sender and one generated role. London has six ball/routing points and a short player feasibility candidate. | Partial results. The 18-rally joint cohort remains open. |
+
+More matches are worth the cost for breadth. First use the cheapest completed or nearly completed shots with compatible inputs, actual receiver bytes and matched controls. Prioritize distinct events, then different prespecified points within each event. A qualified generated-player bank can serve several rate settings. Preserve conventional fallbacks in the denominator. See [development evidence](experiments/reviewed-foreground-20261122/README.md) and the [cohort design](experiments/broad-tennis-18-rallies-20261123/README.md).
+
 ## Next execution session
 
-1. **Fill the higher-rate Shanghai neural control if it changes the submission claim.** The original native display and exact Mac-authored clean plate have passed. The 320-wide receiver produced verified 83.19 and 109.77 kbps streams using the original foreground. The 640-wide replay regained the DISTS lead at 113.13 kbps, and AV1 regained it at 118.90 kbps. The measured ordinary and ROI rungs are scored. Reuse them. A 960-wide DCVC job stopped before encoding because the production worker requires a qualified shared allocation. Consult the [wider Shanghai card](experiments/shanghai-wider-20261123/README.md) and [control analysis](experiments/joint-operating-range-20261123/README.md) before another dispatch. Use the original source supports. Report any bracket separately by rally and metric.
-2. **Complete Halle's second role.** The source-side paid sender and far generation are preserved. The near job was never registered. Verify the far archive and refresh the recorded near spec's deadline only for a new authorized session. Once both roles and the source-matched controls are available, composite and score the native stream at the frozen budget. [Halle recovery](experiments/halle-foreground-20261123/README.md)
-3. **Qualify the variable-length London player path.** The earlier 106-frame ball transport replay is reusable. The current production feature and crop-pose wrappers still assume 240 ticks. Begin with the explicit interfaces and checks in the [London card](experiments/broad-tennis-18-rallies-20261123/london-player-oracle-20261123.md). Use a real short source, price fallback and score every delivered tick required by the protocol. Verify another independent held-out event before using the broad claim.
+Use [PLAN.md](../PLAN.md) as the queue. **Halle is the first compute priority** because the sender and far-player archive exist and a complete third external example would add new footage to the central result. Inspect the far receipt and frozen near-role spec before dispatch. Recover the source-matched 640-wide AV1 and neural controls from saved evidence where possible. Then qualify the short native London player path and expand the prespecified cohort. A higher-rate Shanghai neural control is conditional on extending the stated comparator claim. Finish with the manuscript and replication audit. The previous overnight compute authorization has ended.
 
-Before sending anything new, check the recorded job IDs in the relevant cards and inspect any uncertain fleet request. The overnight compute authorization ended. See [PLAN.md](../PLAN.md) for the live queue and [fleet rules](fleet.md) for budgets, preflights and receipts.
+Check recorded fleet IDs with `scripts/ps-fleet status JOB_ID` before acting. For an existing registered agent task, capture `agentctl handoff TASK` using its recorded ID. Start the receiving harness from the pinned repository and manuscript revisions, with the same input hashes and a new scoped checkout. Follow [fleet rules](fleet.md) for new authorization, preflights and bounded wait periods.
+
+## Redraw and prepare the replication release
+
+| Figure or table | Versioned source for redrawing |
+|---|---|
+| External combined, players, and ball rate ladders | [Figure code, input receipts, command, and physical results](experiments/joint-operating-range-20261123/README.md#reproduce-the-figures). Run the command from the repository root with SciPy and Matplotlib, using a fresh directory. |
+| Matched ball metric suite | [Twelve per-match score files, aggregator, and summary](experiments/ball-metric-suite-20261123/README.md#completed-twelve-match-comparison). The last paragraph gives the aggregation command. |
+| Development foreground | [Figure inputs, replay receipts, and plotting command](experiments/reviewed-foreground-20261122/README.md). Use the committed aggregate for redrawing. |
+
+Redrawing from committed measurements requires neither campus access nor GPU execution. Recomputing the measurements requires the archived sources, models, environments and native streams identified by their checksums and run receipts. For a replication release, export the plot-ready data, scripts, metric definitions, source and split identifiers, actual per-component byte counts, cache assumptions, environment versions and hashes of the native inputs and outputs. Audit sample images, labels, packet media, dataset terms and machine-local paths before making a public export. Describe any restricted inputs and how eligible researchers can obtain them. The internal repository is the current evidence archive. A public release has not been prepared.
+
+The revision and stage in each receipt determine what the result can support. Use the figure's input list as the active evidence list. Keep legacy outputs with their original code, data fingerprints and job receipts. Mark evidence superseded for a specific figure when its replacement is verified. Preserve old paths and files, including failed or incomplete comparisons that explain a gap. A new run gets a new output path.
 
 ## Results to carry forward
 

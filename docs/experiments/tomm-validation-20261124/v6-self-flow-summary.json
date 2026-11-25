@@ -1,0 +1,62 @@
+{
+  "job_id": "20261124T041924Z-97b539b0",
+  "revision": "d119c241",
+  "source_sha256": "fc5d3ee431f84417d2de3412402f4e8efb0546418ce96f1f0a1e2f1887a88b1a",
+  "source_mask_rle_sha256": "cfd651ca9db4898a28bed6a450e4774fff2c8acefe034d91a6eda28e46828b7e",
+  "recorded_ticks": 240,
+  "elapsed_s": 67.21078923600726,
+  "summary": {
+    "av1-320-warm": {
+      "n": 478,
+      "source_flow_error": 19.766184614293245,
+      "self_flow_error": 4.757891297884233,
+      "source_delta": 17.519703323372237,
+      "decoded_delta": 6.8807118960254865,
+      "seam_self_flow_error": 4.907402485609055,
+      "interior_self_flow_error": 4.713200453727357,
+      "tlpips_n": 94,
+      "tlpips_mean": 0.03630007164394285,
+      "tlpips_seam_mean": 0.042872168123722076,
+      "tlpips_interior_mean": 0.0342919310528992
+    },
+    "roi-640-warm": {
+      "n": 478,
+      "source_flow_error": 20.116437388264483,
+      "self_flow_error": 4.338072919555663,
+      "source_delta": 17.519703323372237,
+      "decoded_delta": 6.513169067861146,
+      "seam_self_flow_error": 5.024721587246114,
+      "interior_self_flow_error": 4.132824676496017,
+      "tlpips_n": 94,
+      "tlpips_mean": 0.025480834650807083,
+      "tlpips_seam_mean": 0.024610895356586712,
+      "tlpips_interior_mean": 0.025746649435152195
+    },
+    "dcvc-480-q34": {
+      "n": 478,
+      "source_flow_error": 18.19304106026015,
+      "self_flow_error": 6.42754064494097,
+      "source_delta": 17.519703323372237,
+      "decoded_delta": 7.86742321616935,
+      "seam_self_flow_error": 6.523630226742138,
+      "interior_self_flow_error": 6.398818215598231,
+      "tlpips_n": 94,
+      "tlpips_mean": 0.04860085598688493,
+      "tlpips_seam_mean": 0.043412955054505306,
+      "tlpips_interior_mean": 0.050186047938445374
+    },
+    "joint-crf50": {
+      "n": 478,
+      "source_flow_error": 27.183260221361614,
+      "self_flow_error": 16.876314556249515,
+      "source_delta": 17.519703323372237,
+      "decoded_delta": 20.2284686844718,
+      "seam_self_flow_error": 17.972233707254585,
+      "interior_self_flow_error": 16.54873002741648,
+      "tlpips_n": 94,
+      "tlpips_mean": 0.0883346598872796,
+      "tlpips_seam_mean": 0.0948162309148095,
+      "tlpips_interior_mean": 0.08635417985108991
+    }
+  }
+}
