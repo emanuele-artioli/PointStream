@@ -13,7 +13,6 @@ import numpy as np
 from PIL import Image
 
 from experiments.tennis import common_player_packet as packet, k6b, w8_payload as wire
-from score_native import get_support
 
 
 def sha(b):
@@ -70,6 +69,8 @@ def psnr(error, pixels):
 
 
 def main(a):
+    from score_native import get_support
+
     start = time.process_time()
     cv2.setNumThreads(1)
     tools = {

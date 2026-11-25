@@ -1,0 +1,44 @@
+{
+  "match": "match127",
+  "sender_job": "20261122T134208Z-0e12634b",
+  "revision": "282268c9ce6141ab9129bc3a1d9f9b31b28bd287",
+  "script_sha256": "f27d95003ae6a9b6809ba70397649f18defd74dc299b9fd0367417771e057d0c",
+  "device": "CPU",
+  "image_metrics_only": true,
+  "tools": {
+    "avifenc": {
+      "path": "/opt/homebrew/Cellar/libavif/1.4.2/bin/avifenc",
+      "sha256": "f9cd38ec2804b56174344fd178ea919f9bff41ec7fc4a471f0ff9065b1b5d076",
+      "version": "Version: 1.4.2 (dav1d [dec]:1.5.4, aom [enc/dec]:3.14.1)\nlibyuv : unavailable"
+    },
+    "avifdec": {
+      "path": "/opt/homebrew/Cellar/libavif/1.4.2/bin/avifdec",
+      "sha256": "635e3acc8cc93212ca5cf1cc867b9bb6f3b738574e92107ed24be48a4a75e6bd",
+      "version": "Version: 1.4.2 (dav1d [dec]:1.5.4, aom [enc/dec]:3.14.1)\nlibyuv : unavailable"
+    }
+  },
+  "seconds": 4.0,
+  "original_cache_bytes": 149450,
+  "original_cache_sha256": "1f191ca3d078c258c6252003d746b6077c268bb98cff7260c4c960cab5a8d569",
+  "warm_bytes": 12890,
+  "warm_sha256": "f9ab35e8d3cd6708e726fe57d9d7ba7cc8943285ac4535524491f5cfe0598384",
+  "q90_cache_bytes": 59776,
+  "q90_cache_sha256": "5a1a7c2d16ea8ed3967e4010543800dbe238947bcd0075760f9d260b59d70ba8",
+  "q90_rebound_warm_sha256": "e5a034030d2ed7e82714acafa24ad4806483c4377c7d5db178c30e3b60a50f20",
+  "q90_cache_saving_percent": 60.00267648042823,
+  "references": {
+    "ref0": {
+      "role": "match127_far",
+      "bytes": 25176,
+      "sha256": "543ac4afacefec55bf0099b24210d235f0980cc7ad298ce0fcf89cc0fcc56694",
+      "crop_psnr_db": 48.44912534355881
+    },
+    "ref1": {
+      "role": "match127_near",
+      "bytes": 32117,
+      "sha256": "204e4ff46eaecb19ca818e8a4d0500712964ba71b479412dd3c8f6a7cbf3152e",
+      "crop_psnr_db": 47.05223609757503
+    }
+  },
+  "elapsed_seconds": 0.3627938329882454
+}
