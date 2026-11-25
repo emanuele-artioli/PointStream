@@ -4,6 +4,30 @@
 
 Checkpoint from November 24, 2026 (Sydney). Start with this file, [PLAN.md](../PLAN.md), and [AGENTS.md](../AGENTS.md). The plan owns the priority list. Experiment cards own run specifications and evidence.
 
+## November 25 validation
+
+The strict-template manuscript is at local commit 55e5460. Both manuscript
+checks pass. The anonymous copy uses 22 body/reference pages plus five online
+appendix pages. The author copy uses 23 plus five. Overleaf Git was unreachable.
+
+- **Halle.** The [newer validation ledger](experiments/tomm-validation-20261124/README.md)
+  records stopped near attempts and completed control scoring. All six hosts
+  failed name resolution in the current preflight. Reconcile the recorded
+  stop rule and prior GPU spend before another near attempt. Inspect the
+  existing jobs and far archive. The prior exclusive spec requests 44
+  smoke frames despite describing the required 64.
+- **Timing.** The expired exclusive spec covers one role and 48 frames.
+  A paired timing comparison needs the same source, full output scope, and
+  isolated load. Prioritize both Shanghai roles over 240 frames with
+  DDIM-30 and DPM-10 plus smoothing. Revisit six steps and smaller far crops
+  after the full-rally gate.
+- **Gap and reference results.** Five-frame Sydney gaps met the coordinate
+  gate for both roles. Ten did for the far role only. Rendered interpolation
+  quality remains open. The Shanghai and Sydney AVIF calculations price
+  validated reference images. Halle's replacement bytes remain unmeasured.
+- **Submission.** Sync the validated manuscript, review the stacked PRs and
+  confirm third-party media rights for the actual submission package.
+
 ## Resume from these revisions
 
 | Repository | Verified revision and access |

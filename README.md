@@ -36,6 +36,15 @@ measurements require restricted footage, source labels, models, native streams,
 and the recorded environments; a public replication package is not yet prepared.
 Each receipt identifies the inputs and run. Check rights before distributing media.
 
+| Manuscript figures and tables | Evidence and reproduction inputs |
+|---|---|
+| Figs. 1–2, broadcast visits and system | [Visit timeline](docs/paper/figures/passage-intro-20261122/) and [architecture](docs/paper/figures/system/) |
+| Figs. 3–5, foreground comparisons, external crops and rate ladders | [Reviewed foreground](docs/paper/figures/reviewed-foreground/), [media recipe](docs/experiments/tomm-validation-20261124/README.md), and [joint ladders](docs/experiments/joint-operating-range-20261123/) |
+| Figs. 6–7 and 10, TEST ball fidelity and machine localization | [Twelve-match receipts](docs/experiments/cohort-expansion-20261122/) and [ball figure assets](docs/paper/figures/ball/) |
+| Figs. 8–9, diffusion pilot and cross-sport transfer | [Sampler and multisport receipts](docs/experiments/tomm-validation-20261124/) |
+| Figs. 11–12, rates and pose coverage | [Byte ledger](docs/paper/figures/complete-wire-cost/) and [coverage and routing audit](docs/experiments/tomm-validation-20261124/) |
+| TEST matrix, startup costs and artificial pose gaps | [Match identities](docs/experiments/cohort-expansion-20261122/test-events.md), [Shanghai startup](docs/experiments/test-crop-joint-20261122/match102-reference-cost.json), [Sydney startup](docs/experiments/tomm-reference-price-20261125/), and [Sydney gap diagnostic](docs/experiments/tomm-pose-bridge-20261125/) |
+
 ## Research priorities
 
 The [active submission plan](docs/tomm-submission-plan-20261124.md) takes
