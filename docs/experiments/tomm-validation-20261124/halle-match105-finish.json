@@ -1,0 +1,171 @@
+{
+  "arguments": [
+    "run",
+    "--carrier",
+    "{staged:carrier}",
+    "--manifest",
+    "{staged:manifest}",
+    "--carrier-sha256",
+    "5661e7d08c90053ad49738ab3e66beee944cb4d7133d549d2af1de6de8d66de8",
+    "--sam",
+    "{staged:sam}",
+    "--full-cap",
+    "1400",
+    "--ticks",
+    "{ticks}",
+    "--joint",
+    "{staged:joint}",
+    "--cache",
+    "{staged:cache}",
+    "--expected-yuv",
+    "72a4521b05e3ef09d77882738e8cd539deeb3af41adc891f73c250743ecc3d54",
+    "--generation",
+    "match105_far",
+    "{staged:g0}",
+    "804db4a24fc2cd5e8fc3cef36b5db036edfae3492f4f76eabb1c33f46221760f",
+    "--generation",
+    "match105_near",
+    "{staged:g1}",
+    "c8123ea42ca6fb731b992a9cca8eaf4a774d0ca26511919a3918084460a87a94",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/tennis/cohort-expansion-20261122/match105-000-a518fd085078.mp4",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T113332Z-80cf4344/full/published.tar",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T121815Z-a370d6c3/full/published.tar",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261122T100048Z-6db80a14/full/ball.payload",
+    "--deny",
+    "/home/itec/emanuele/Datasets/pointstream-data/tennis/k4-2026-10-13/inputs/yolo/yolo11x-pose.pt"
+  ],
+  "budget_seconds": 1800,
+  "contention": {
+    "policy": "continue",
+    "basis": "Deterministic SAM31 compositing and masking for Halle match105 full replay (not timing)."
+  },
+  "cpu_threads": 1,
+  "deadline": "2026-11-26T12:00:00Z",
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.common_finish_al028_job"
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "full": {
+    "seconds": 1400
+  },
+  "gpu_memory_mib": 18000,
+  "gpu_models": [
+    "RTX A6000",
+    "RTX 6000 Ada"
+  ],
+  "gpu_sharing": {
+    "mode": "shared",
+    "margin_mib": 4096,
+    "basis": "Deterministic SAM31 compositing and masking for Halle match105 full replay (not timing)."
+  },
+  "hosts": [
+    "gpu2",
+    "gpu3",
+    "gpu5",
+    "gpu6"
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/background/g1-2026-10-08/inputs/sam3.1_multiplex.pt",
+      "sha256": "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T115652Z-1c5a006d/full/crf50-players.pscp",
+      "sha256": "5661e7d08c90053ad49738ab3e66beee944cb4d7133d549d2af1de6de8d66de8"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T115652Z-1c5a006d/full/crf50-players.manifest",
+      "sha256": "9a527a0d334ee1d7d5a04b7a89fec3d7b15d2b6aed62642ca29244219f8edbf5"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T115652Z-1c5a006d/full/crf50-rally.psj",
+      "sha256": "43ac995556899b99baf846ab1550eed1efa231771712a0128c0db1390b61eee9"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T115652Z-1c5a006d/full/crf50-initial.psr",
+      "sha256": "c70466960e8860f7e476c2e7ac72310adde4eb6816410748e5838af0e2951cb9"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T120635Z-5a1a9720/full/published.tar",
+      "sha256": "453f64c0367f10708eaea9b9ff812731fc2d46275c30e67274574589740caeb6"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261125T131927Z-2d59f826/full/published.tar",
+      "sha256": "cd2e4e07453abd204161ffff12e13b871b632744d982daa2881ef1092e8e931b"
+    }
+  ],
+  "local_storage_gib": 64,
+  "required_commands": [],
+  "scale": {
+    "ticks": {
+      "smoke": 4,
+      "full": 240
+    }
+  },
+  "schema": 1,
+  "single_cpu_campaign": true,
+  "smoke": {
+    "seconds": 330,
+    "representative_basis": "Four paid active ticks from first through last, two 240-tick generated banks, native decoded YUV verification, two-player SAM and independent full-output pixel checks."
+  },
+  "staged_inputs": [
+    {
+      "name": "sam",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/background/g1-2026-10-08/inputs/sam3.1_multiplex.pt",
+      "sha256": "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6",
+      "extract": false
+    },
+    {
+      "name": "carrier",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T115652Z-1c5a006d/full/crf50-players.pscp",
+      "sha256": "5661e7d08c90053ad49738ab3e66beee944cb4d7133d549d2af1de6de8d66de8",
+      "extract": false
+    },
+    {
+      "name": "manifest",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T115652Z-1c5a006d/full/crf50-players.manifest",
+      "sha256": "9a527a0d334ee1d7d5a04b7a89fec3d7b15d2b6aed62642ca29244219f8edbf5",
+      "extract": false
+    },
+    {
+      "name": "joint",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T115652Z-1c5a006d/full/crf50-rally.psj",
+      "sha256": "43ac995556899b99baf846ab1550eed1efa231771712a0128c0db1390b61eee9",
+      "extract": false
+    },
+    {
+      "name": "cache",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T115652Z-1c5a006d/full/crf50-initial.psr",
+      "sha256": "c70466960e8860f7e476c2e7ac72310adde4eb6816410748e5838af0e2951cb9",
+      "extract": false
+    },
+    {
+      "name": "g0",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T120635Z-5a1a9720/full/published.tar",
+      "sha256": "453f64c0367f10708eaea9b9ff812731fc2d46275c30e67274574589740caeb6",
+      "extract": true
+    },
+    {
+      "name": "g1",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261125T131927Z-2d59f826/full/published.tar",
+      "sha256": "cd2e4e07453abd204161ffff12e13b871b632744d982daa2881ef1092e8e931b",
+      "extract": true
+    }
+  ],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.common_finish_al028_job",
+    "validate-stage"
+  ],
+  "validator_seconds": 90,
+  "verify_staged_inputs": true
+}
