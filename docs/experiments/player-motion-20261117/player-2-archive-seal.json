@@ -1,8 +1,0 @@
-{
-  "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261117T083755Z-de05930d/smoke/published.tar",
-  "sha256": "f3e0e6dea0085ac3787e8b52a0a11bcb2c8763971818b0426d8adec1a646a1d4",
-  "bytes": 32706560,
-  "mode_before": "0o644",
-  "mode_after": "0o444",
-  "scope": "Removed write permission only; retained original bytes and read permissions"
-}

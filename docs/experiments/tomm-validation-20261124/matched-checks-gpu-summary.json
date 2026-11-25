@@ -1,0 +1,315 @@
+{
+  "stage": "full",
+  "shanghai_frames": 48,
+  "sydney_frames": 24,
+  "sydney_gap_range": [
+    9,
+    14
+  ],
+  "device": "NVIDIA RTX 6000 Ada Generation",
+  "gpu_peak_mib": 11327.14501953125,
+  "timing_contaminated": true,
+  "model_load_seconds": 27.2283693109639,
+  "fit_info": {
+    "rank": 64,
+    "reference_unet": {
+      "lora_layers": 104,
+      "lora_tensors": 208
+    },
+    "denoising_unet": {
+      "lora_layers": 128,
+      "lora_tensors": 256
+    },
+    "pose_guider": "frozen (the profile's)"
+  },
+  "records": [
+    {
+      "suite": "shanghai_timing",
+      "config": {
+        "name": "ddim30_512_ov4",
+        "scheduler": "ddim",
+        "steps": 30,
+        "width": 512,
+        "height": 784,
+        "overlap": 4,
+        "pose_smooth": false
+      },
+      "unit": "match102_near",
+      "frames": 48,
+      "seed": 160944524496,
+      "render_seconds": 282.6382697770023,
+      "sec_per_frame": 5.8882972870208805,
+      "distinct_frames": 48,
+      "npz_relpath": "shanghai/ddim30_512_ov4/match102_near.npz",
+      "npz_sha256": "651be155390adfa241d17665a8d6cbfbfc05ca1d8ee84b5c471bfa12ab522972"
+    },
+    {
+      "suite": "shanghai_timing",
+      "config": {
+        "name": "dpm10_512_ov8_smooth",
+        "scheduler": "dpm",
+        "steps": 10,
+        "width": 512,
+        "height": 784,
+        "overlap": 8,
+        "pose_smooth": true
+      },
+      "unit": "match102_near",
+      "frames": 48,
+      "seed": 160944524496,
+      "render_seconds": 98.19540237798356,
+      "sec_per_frame": 2.045737549541324,
+      "distinct_frames": 48,
+      "npz_relpath": "shanghai/dpm10_512_ov8_smooth/match102_near.npz",
+      "npz_sha256": "7b06f9d6ae8caa0b1e10fba271c8c628c845bb7757c8d2a9ce4a274abc33e002"
+    },
+    {
+      "suite": "shanghai_timing",
+      "config": {
+        "name": "dpm6_512_ov8_smooth",
+        "scheduler": "dpm",
+        "steps": 6,
+        "width": 512,
+        "height": 784,
+        "overlap": 8,
+        "pose_smooth": true
+      },
+      "unit": "match102_near",
+      "frames": 48,
+      "seed": 160944524496,
+      "render_seconds": 61.30702770402422,
+      "sec_per_frame": 1.277229743833838,
+      "distinct_frames": 48,
+      "npz_relpath": "shanghai/dpm6_512_ov8_smooth/match102_near.npz",
+      "npz_sha256": "f8c00a777ce189b2cdcd6fb9c2ce47eb7da68903e9f6b266c3b5c4bed1a89913"
+    },
+    {
+      "suite": "shanghai_timing",
+      "config": {
+        "name": "dpm10_384_ov8_smooth",
+        "scheduler": "dpm",
+        "steps": 10,
+        "width": 384,
+        "height": 576,
+        "overlap": 8,
+        "pose_smooth": true
+      },
+      "unit": "match102_near",
+      "frames": 48,
+      "seed": 160944524496,
+      "render_seconds": 48.97887155698845,
+      "sec_per_frame": 1.0203931574372593,
+      "distinct_frames": 48,
+      "npz_relpath": "shanghai/dpm10_384_ov8_smooth/match102_near.npz",
+      "npz_sha256": "b9e9a7d695f591144548a8c923490faaf464efeb494b8c16c1c982bb3e5f20ac"
+    },
+    {
+      "suite": "shanghai_timing",
+      "config": {
+        "name": "ddim30_512_ov4",
+        "scheduler": "ddim",
+        "steps": 30,
+        "width": 512,
+        "height": 784,
+        "overlap": 4,
+        "pose_smooth": false
+      },
+      "unit": "match102_far",
+      "frames": 48,
+      "seed": 253787240761,
+      "render_seconds": 281.87665659503546,
+      "sec_per_frame": 5.872430345729906,
+      "distinct_frames": 48,
+      "npz_relpath": "shanghai/ddim30_512_ov4/match102_far.npz",
+      "npz_sha256": "53bf5589a35ad98fc72861ae74d42551df1fce08a0587e7588003be465093cec"
+    },
+    {
+      "suite": "shanghai_timing",
+      "config": {
+        "name": "dpm10_512_ov8_smooth",
+        "scheduler": "dpm",
+        "steps": 10,
+        "width": 512,
+        "height": 784,
+        "overlap": 8,
+        "pose_smooth": true
+      },
+      "unit": "match102_far",
+      "frames": 48,
+      "seed": 253787240761,
+      "render_seconds": 97.99202778801555,
+      "sec_per_frame": 2.0415005789169904,
+      "distinct_frames": 48,
+      "npz_relpath": "shanghai/dpm10_512_ov8_smooth/match102_far.npz",
+      "npz_sha256": "63ca5070263d62f201dafc02dd01ddf0cb523daa5204257d6a14b9594a17fe68"
+    },
+    {
+      "suite": "shanghai_timing",
+      "config": {
+        "name": "dpm6_512_ov8_smooth",
+        "scheduler": "dpm",
+        "steps": 6,
+        "width": 512,
+        "height": 784,
+        "overlap": 8,
+        "pose_smooth": true
+      },
+      "unit": "match102_far",
+      "frames": 48,
+      "seed": 253787240761,
+      "render_seconds": 61.26481901301304,
+      "sec_per_frame": 1.2763503961044382,
+      "distinct_frames": 48,
+      "npz_relpath": "shanghai/dpm6_512_ov8_smooth/match102_far.npz",
+      "npz_sha256": "23921ebd993303a770a9e5decfb603424f4af2c8ec50b072698c23e02a25df02"
+    },
+    {
+      "suite": "shanghai_timing",
+      "config": {
+        "name": "dpm10_384_ov8_smooth",
+        "scheduler": "dpm",
+        "steps": 10,
+        "width": 384,
+        "height": 576,
+        "overlap": 8,
+        "pose_smooth": true
+      },
+      "unit": "match102_far",
+      "frames": 48,
+      "seed": 253787240761,
+      "render_seconds": 48.78150647494476,
+      "sec_per_frame": 1.0162813848946826,
+      "distinct_frames": 48,
+      "npz_relpath": "shanghai/dpm10_384_ov8_smooth/match102_far.npz",
+      "npz_sha256": "06a6ac87bcfd02a3ed9c7e6869e641f6140f9a0b77ced58253315cdd7cd3e69f"
+    },
+    {
+      "suite": "sydney_ablation",
+      "arm": "ref_lossless_uninterrupted",
+      "unit": "match127_near",
+      "frames": 24,
+      "gap_range": [
+        9,
+        14
+      ],
+      "seed": 185970436688,
+      "render_seconds": 33.704066710022744,
+      "sec_per_frame": 1.4043361129176144,
+      "distinct_frames": 24,
+      "npz_relpath": "sydney/ref_lossless_uninterrupted/match127_near.npz",
+      "npz_sha256": "c10d07dcc1fa431f735cc4aa0f683d4bb1d4474383cc4b023e82f56fb758c7ec"
+    },
+    {
+      "suite": "sydney_ablation",
+      "arm": "ref_q90_uninterrupted",
+      "unit": "match127_near",
+      "frames": 24,
+      "gap_range": [
+        9,
+        14
+      ],
+      "seed": 185970436688,
+      "render_seconds": 33.73789016105002,
+      "sec_per_frame": 1.405745423377084,
+      "distinct_frames": 24,
+      "npz_relpath": "sydney/ref_q90_uninterrupted/match127_near.npz",
+      "npz_sha256": "bada95d3b539a289a7d7d99d36ba3a5c2516e7d0432679c3fab41a3d87c3fcca"
+    },
+    {
+      "suite": "sydney_ablation",
+      "arm": "ref_lossless_gap5_bridge",
+      "unit": "match127_near",
+      "frames": 24,
+      "gap_range": [
+        9,
+        14
+      ],
+      "seed": 185970436688,
+      "render_seconds": 33.57248461502604,
+      "sec_per_frame": 1.398853525626085,
+      "distinct_frames": 24,
+      "npz_relpath": "sydney/ref_lossless_gap5_bridge/match127_near.npz",
+      "npz_sha256": "bd75e273135544dfe561a4c2fe987d43d5acfb51229cbc55725fbd3c502691d1"
+    },
+    {
+      "suite": "sydney_ablation",
+      "arm": "ref_lossless_gap5_hold",
+      "unit": "match127_near",
+      "frames": 24,
+      "gap_range": [
+        9,
+        14
+      ],
+      "seed": 185970436688,
+      "render_seconds": 33.654920544009656,
+      "sec_per_frame": 1.4022883560004022,
+      "distinct_frames": 24,
+      "npz_relpath": "sydney/ref_lossless_gap5_hold/match127_near.npz",
+      "npz_sha256": "4d834f90397db6366055e010d6411493887a056ff61a4d5ecf135959ca34814d"
+    },
+    {
+      "suite": "sydney_ablation",
+      "arm": "ref_lossless_uninterrupted",
+      "unit": "match127_far",
+      "frames": 24,
+      "gap_range": [
+        9,
+        14
+      ],
+      "seed": 51360440880,
+      "render_seconds": 33.66971785196802,
+      "sec_per_frame": 1.4029049104986673,
+      "distinct_frames": 24,
+      "npz_relpath": "sydney/ref_lossless_uninterrupted/match127_far.npz",
+      "npz_sha256": "a17390e8eb6204a015baeeca9ec5675c45b0e50568589e104b4e616a9e9fce2b"
+    },
+    {
+      "suite": "sydney_ablation",
+      "arm": "ref_q90_uninterrupted",
+      "unit": "match127_far",
+      "frames": 24,
+      "gap_range": [
+        9,
+        14
+      ],
+      "seed": 51360440880,
+      "render_seconds": 33.67088656203123,
+      "sec_per_frame": 1.402953606751301,
+      "distinct_frames": 24,
+      "npz_relpath": "sydney/ref_q90_uninterrupted/match127_far.npz",
+      "npz_sha256": "e5012c46cf7198a6def624e31df94c6b2daefe6fbdff608fc704bcea824e96dc"
+    },
+    {
+      "suite": "sydney_ablation",
+      "arm": "ref_lossless_gap5_bridge",
+      "unit": "match127_far",
+      "frames": 24,
+      "gap_range": [
+        9,
+        14
+      ],
+      "seed": 51360440880,
+      "render_seconds": 33.59705289301928,
+      "sec_per_frame": 1.3998772038758034,
+      "distinct_frames": 24,
+      "npz_relpath": "sydney/ref_lossless_gap5_bridge/match127_far.npz",
+      "npz_sha256": "35e445762073d89348b5fe7bcdfbf8df7a641cffd8ed0c52f120db1a74104d46"
+    },
+    {
+      "suite": "sydney_ablation",
+      "arm": "ref_lossless_gap5_hold",
+      "unit": "match127_far",
+      "frames": 24,
+      "gap_range": [
+        9,
+        14
+      ],
+      "seed": 51360440880,
+      "render_seconds": 33.627284859947395,
+      "sec_per_frame": 1.4011368691644748,
+      "distinct_frames": 24,
+      "npz_relpath": "sydney/ref_lossless_gap5_hold/match127_far.npz",
+      "npz_sha256": "a889079f6cdca6134dd09db3dac3a1eb14ebe563c661da1d68decf3a65f03635"
+    }
+  ]
+}

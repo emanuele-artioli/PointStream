@@ -1,8 +1,0 @@
-{
-  "review": "common-q65-review",
-  "review_frames": 24,
-  "reviewer": "author",
-  "player_2": {"A": false, "B": true, "C": true},
-  "player_1": {"A": true, "B": true, "C": false},
-  "verbatim": "Player 2 A is bad, B and C acceptable. Player 1 C is bad, others acceptable, though all 3 lose grip on the racket at the end of the clip."
-}

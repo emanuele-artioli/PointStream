@@ -1,15 +1,28 @@
 # PointStream
 
-PointStream studies when to send object motion as points, when to send appearance, and when to keep conventional video. Its scene-selective architecture routes shots at the server. The receiver displays video and can expose decoded locations to an application. Tennis supplies the principal evaluation. The repository also contains experiments on egocentric hand–object video.
+**PointStream** is an object-centric semantic video codec targeting ultra-low-bitrate broadcast sports and structured human-object scenes (ACM TOMM submission). Across cut-segmented shots, a source-only router selects per interval between:
+- **`Conv`** — conventional SVT-AV1 video for off-court views and cutaways;
+- **`Conv+Ball`** — a cleaned background base stream plus a lightweight parametric ball trajectory payload for direct machine coordinate readout (`~300 fps` on CPU) and rendered visual restoration; and
+- **`Full-Obj`** — a cached reference appearance initialization (`.psr`), cleaned background base, 17-joint COCO player pose tracks (`.pscp`), and ball stream reconstructed at the receiver.
 
-Start with the [paper figure plan](PLAN.md) for measured figures, gaps and the next experiments. When resuming on another platform, start with the [submission handoff](docs/submission-handoff.md). The [research brief](RESEARCH.md) summarizes the claims. The [codec endpoints](docs/codec-endpoint.md) describe encoding, decoding and inspection.
+Historical development logs, retired scratch cards, and early exploration notes prior to the submission clean are preserved on `origin` at annotated tag [`archive/pre-tomm-clean-2026-11-25`](https://github.com/emanuele-artioli/PointStream/releases/tag/archive/pre-tomm-clean-2026-11-25).
 
-## Reviewer guide and reproduction
+---
 
-The manuscript's external Shanghai and Sydney rate ladders can be redrawn from
-committed numerical receipts without video, model weights, or a GPU. Install
-SciPy and Matplotlib, then run from the repository root, with a **new** output
-directory:
+## Core Submission Contributions
+
+1. **Unified multi-mode codec and source-only router:** Cut-aware packetization (`Conv`, `Conv+Ball`, `Full-Obj`) charging every header, background, pose, ball, and initialization byte on one unified bitstream timeline, with source-only mode routing across all twelve held-out RacketVision TEST tennis matches (0 unmeasured matches; 11/12 court-eligible, 10/11 player-continuous under `<=10`-frame interior bridging).
+2. **External joint foreground reconstruction & operating-range characterization:** Unadapted external 240-frame full-HD receivers on Shanghai (`match102`, 29.97 fps, `17.78 kbps` warm -> `0.295` vs. `0.399` SVT-AV1 / `0.352` DCVC-UF foreground DISTS) and Sydney (`match127`, 60 fps, `25.78 kbps` warm -> `0.277` vs. `0.406` / `0.349` DISTS), alongside complete bitrate ladders mapping exact crossover boundaries where pixel codecs overtake generative reconstruction (`~118.9 kbps` Shanghai, `~191.7 kbps` Sydney), full temporal coherence analysis (`self_flow` / `tLPIPS`), and 24-frame rendered startup compression (AVIF Q90 cuts Sydney startup `60.0%` from `149,450 B` to `59,776 B` within `0.0004` DISTS) and 5-frame pose bridging (`0.2993` vs. `0.2991` uninterrupted DISTS).
+3. **Twelve-match ball coding & zero-shot multi-sport transfer:** Across twelve salted-hash RacketVision TEST tennis matches (402 visible labels, zero target tuning), `Conv+Ball` achieves **`-21.7%` mean BD-rate** vs. adaptive-width SVT-AV1 (wins in 12/12 same-resolution pairs) and generalizes zero-shot to 24 held-out RacketVision TEST clips in badminton and table tennis (winning 23/24 against same-resolution SVT-AV1 and 21/24 against multi-resolution AV1).
+4. **Dual human-and-machine consumption & speed–quality Pareto optimization:** Direct `PSCP`/ball payload readout recovers `1.000` pose availability (`0.925`–`0.953` PCK@0.1 in `0.43`–`1.79 ms/frame` CPU) vs. `0.000`–`0.010` matched-rate SVT-AV1 full-frame `YOLO26x-pose` recall (`1/96` on `17.71 kbps` Shanghai `640-warm`), while matched RTX 6000 Ada benchmarks show 10-step DPM-Solver + overlap-8 + pose smoothing runs **`2.88x` faster** (`196.2 s` vs. `564.5 s` DDIM-30) within `+0.0009` DISTS and `-24.8%` seam `tLPIPS`, and 6-step / `384px` reach **`4.61x` / `5.77x`** speedups (`+0.0038` / `+0.0052` DISTS).
+
+---
+
+## Reproducing Paper Numbers (Offline, No GPU Needed)
+
+All numerical tables and plots in the ACM TOMM paper can be reproduced offline from checked-in receipts.
+
+### 1. External joint operating-range ladders (Shanghai & Sydney)
 
 ```sh
 card=docs/experiments/joint-operating-range-20261123
@@ -19,79 +32,32 @@ PYTHONPATH=. python "$card/compare.py" OUTPUT_DIRECTORY \
   --ordinary "$card"/ordinary-*.json --roi "$card"/foreground-roi-*.json
 ```
 
-This produces `foreground.pdf`, `players.pdf`, `ball.pdf` and `results.json`.
-The numerical output reproduced the committed `results.json` byte for byte
-on the local workstation. For the twelve-match ball metric table, run:
+### 2. Twelve-match ball metric suite
 
 ```sh
 python docs/experiments/ball-metric-suite-20261123/summarize.py OUTPUT.json \
   docs/experiments/ball-metric-suite-20261123/match*-result.json
 ```
 
-The resulting JSON also matched the committed `summary.json` byte for byte.
-Use fresh output paths; these checks redraw and aggregate existing measurements,
-not independently recompute the experiments. The [replication handoff](docs/submission-handoff.md#redraw-and-prepare-the-replication-release)
-links the underlying receipts and the development foreground figure. Original
-measurements require restricted footage, source labels, models, native streams,
-and the recorded environments; a public replication package is not yet prepared.
-Each receipt identifies the inputs and run. Check rights before distributing media.
+### 3. Validation campaign receipts (Pareto, pose machine, multi-sport, matched checks)
 
-| Manuscript figures and tables | Evidence and reproduction inputs |
-|---|---|
-| Figs. 1–2, broadcast visits and system | [Visit timeline](docs/paper/figures/passage-intro-20261122/) and [architecture](docs/paper/figures/system/) |
-| Figs. 3–4, foreground comparisons and rate ladders | [Reviewed foreground](docs/paper/figures/reviewed-foreground/) and [joint ladders](docs/experiments/joint-operating-range-20261123/) |
-| Figs. 5–6 and 8, TEST ball fidelity and machine localization | [Twelve-match receipts](docs/experiments/cohort-expansion-20261122/) and [ball figure assets](docs/paper/figures/ball/) |
-| Fig. 7 and cross-sport table, diffusion pilot and transfer | [Sampler and multisport receipts](docs/experiments/tomm-validation-20261124/) |
-| Figs. 9–10, rates and pose coverage | [Byte ledger](docs/paper/figures/complete-wire-cost/) and [coverage and routing audit](docs/experiments/tomm-validation-20261124/) |
-| TEST matrix, startup costs and artificial pose gaps | [Match identities](docs/experiments/cohort-expansion-20261122/test-events.md), [Shanghai startup](docs/experiments/test-crop-joint-20261122/match102-reference-cost.json), [Sydney startup](docs/experiments/tomm-reference-price-20261125/), and [Sydney gap diagnostic](docs/experiments/tomm-pose-bridge-20261125/) |
+Inspect [docs/experiments/tomm-validation-20261124/README.md](docs/experiments/tomm-validation-20261124/README.md) for job IDs, SHA-256 receipts, and scoring commands covering:
+- `v7-shanghai-ordinary640-summary.json` (matched `17.713 kbps` SVT-AV1 pose recall `0.010`),
+- `matched-checks-gpu-summary.json` & `matched-checks-scores.json` (48-frame matched timing, rendered Sydney Q90, rendered 5-frame gap bridge),
+- `a4-badminton-12.json` & `a4-tabletennis-12.json` (24-clip zero-shot multi-sport transfer),
+- `coverage-summary-12.json`, `pose-gap-audit.json`, & `a6-mode-selector-amortization.json` (12/12 TEST coverage & routing).
 
-## Research priorities
+---
 
-The [active submission plan](docs/tomm-submission-plan-20261124.md) takes
-precedence over older experiment queues. Prioritize completing the external
-racket-sport validation and checking pose-gap interpolation for artifacts.
-After the submission-critical work, the following remain opportunities rather
-than established results:
+## Repository Layout & Local Checks
 
-1. **VISOR:** run a dedicated hand-object pilot with the current keypoint and reusable-appearance architecture.
-2. **Subjective assessment:** design a sufficiently powered viewer study using licensed comparison material.
-3. **Distilled receiver:** measure fidelity and complete playback cost of fewer-step or TensorRT rendering.
-4. **Racket and equipment keypoints:** evaluate a small equipment channel against independent racket and grip labels.
+- `src/` — Core codec modules, segmentation (`python -m src.segmentation --help`), quality/metrics, container serialization.
+- `experiments/` — Reproducible fleet workers, scoring pipelines, and evaluation harnesses.
+- `docs/experiments/` — Frozen experiment cards, specs, and verified JSON receipts backing every paper claim (`% CLAIM(...)`).
+- `scripts/ps-fleet`, `docs/fleet.md`, `docs/experiments.md`, `docs/resources.md`, `docs/components.md` — Fleet execution tooling and protocol specs.
+- `tests/` — Unit, documentation, and contract test suites.
 
-The [archive dependency inventory](docs/submission-archive-inventory.md)
-identifies what must be traced before preparing a smaller public export.
-
-## Layout
-
-| Path | Contents |
-|---|---|
-| `src/segmentation/` | Foreground/background segmentation: SAM 3.1 and YOLOE backends, lossless masks, evaluation, CLI |
-| `src/codecs/` | Codec workers (DCVC-UF) |
-| `env/`, `environment.yaml` | The environment recipe, patches and locks |
-| `experiments/audit/` | Environment-audit smokes |
-| `tools/` | Dataset acquisition and samples (`datasets/`), weight placement and MANO conversion (`models/`) |
-| `experiments/jobs/` | Fleet dispatcher, workers, resource claims, host-local staging, packed environments |
-| `scripts/ps-fleet` | The fleet's one entry point |
-| `scripts/link-storage` | Creates the `Models` and `Datasets` links |
-| `tests/` | `segmentation/` and `fleet/` |
-| `docs/` | [components](docs/components.md), [resources](docs/resources.md), [experiments](docs/experiments.md), [fleet](docs/fleet.md) |
-
-Rules for working in this repository are in [AGENTS.md](AGENTS.md); the order
-of work is in [PLAN.md](PLAN.md).
-
-## Setup
-
-```bash
-scripts/link-storage
-pip install -e ".[dev]"
-```
-
-That is enough for the checks. The full environment (SAM 3.1, YOLOE, HaMeR,
-WiLoR, HOT3D tooling, DCVC-UF, SVT-AV1) is one prefix built on host-local disk
-by `env/build.sh` from `environment.yaml`, with locks in `env/locks/`; fleet
-jobs run its packed copy ([resources](docs/resources.md#environments)).
-
-## Checks
+### Local development checks (CI gates)
 
 ```bash
 ruff check
@@ -99,13 +65,20 @@ mypy --config-file pyproject.toml
 python -m pytest
 ```
 
-## Segmentation
+Quick segmentation check:
 
 ```bash
 python -m src.segmentation run --backend yoloe-26n --domain tennis --source CLIP --out OUT
 python -m src.segmentation --help
 ```
 
-## Archive
+*(Note: `Models` and `Datasets` are external cluster symlinks excluded from git, ruff, mypy, and pytest.)*
 
-Everything before this layout is at the tag `archive/pre-reset-2026-10-05`.
+---
+
+## Prioritized Future Work
+
+1. **Egocentric hand-object (VISOR) pilot:** Evaluate PointStream's object-centric decomposition, hand pose continuity, and cached appearance reuse on dense egocentric hand-object interaction in a dedicated follow-up session.
+2. **Controlled human subjective preference study:** Run blinded ITU-T P.910 / pairwise preference trials comparing PointStream `Full-Obj` and `Conv+Ball` against SVT-AV1 and DCVC-UF at matched ultra-low bitrates.
+3. **Real-time diffusion receiver (distilled / TensorRT):** Replace 10–30 step UNet inference with consistency/step-distilled models, FP8/TensorRT engines, and temporally recurrent KV caching to close the gap toward real-time 30–60 fps decoding.
+4. **Dedicated racket/equipment keypoints & extended external cohort:** Add explicit racket/equipment landmarks beyond COCO body joints and complete full multi-match `Full-Obj` evaluation across Halle (`match105`), London Olympic clips, and additional grass/clay broadcasts.

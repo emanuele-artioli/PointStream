@@ -52,7 +52,7 @@
     "basis": "Visual reconstruction; shared GPU contention does not alter deterministic diffusion output."
   },
   "cpu_threads": 1,
-  "deadline": "2026-11-25T10:00:00Z",
+  "deadline": "2026-11-25T11:30:00Z",
   "entrypoint": [
     "-m",
     "experiments.tennis.common_receiver_job"
@@ -66,7 +66,7 @@
   },
   "gpu_memory_mib": 18000,
   "gpu_models": [
-    "RTX A6000"
+    "RTX 6000 Ada"
   ],
   "gpu_sharing": {
     "mode": "shared",
@@ -74,7 +74,8 @@
     "basis": "Halle match105 near-player visual reconstruction (not timing); exclusive runs contended under foreign GPU processes."
   },
   "hosts": [
-    "gpu3"
+    "gpu5",
+    "gpu6"
   ],
   "inputs": [
     {
