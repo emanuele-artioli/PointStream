@@ -1,27 +1,35 @@
 {
   "enrolled_total": 12,
-  "measured_count": 6,
-  "unmeasured_count": 5,
+  "measured_count": 11,
+  "unmeasured_count": 0,
   "ordinary_routed_count": 1,
-  "raw_full_240_count": 3,
+  "raw_full_240_count": 7,
   "threshold_totals": {
     "3": {
       "full_240_matches": [
         "match102",
         "match127",
-        "match105"
+        "match105",
+        "match107",
+        "match104",
+        "match130",
+        "match126"
       ],
-      "count_full_240": 3,
-      "total_paired_ticks": 1362
+      "count_full_240": 7,
+      "total_paired_ticks": 2547
     },
     "5": {
       "full_240_matches": [
         "match102",
         "match127",
-        "match105"
+        "match105",
+        "match107",
+        "match104",
+        "match130",
+        "match126"
       ],
-      "count_full_240": 3,
-      "total_paired_ticks": 1374
+      "count_full_240": 7,
+      "total_paired_ticks": 2559
     },
     "10": {
       "full_240_matches": [
@@ -29,10 +37,15 @@
         "match102",
         "match127",
         "match105",
-        "match116"
+        "match116",
+        "match107",
+        "match131",
+        "match104",
+        "match130",
+        "match126"
       ],
-      "count_full_240": 5,
-      "total_paired_ticks": 1407
+      "count_full_240": 10,
+      "total_paired_ticks": 2607
     },
     "15": {
       "full_240_matches": [
@@ -40,10 +53,15 @@
         "match102",
         "match127",
         "match105",
-        "match116"
+        "match116",
+        "match107",
+        "match131",
+        "match104",
+        "match130",
+        "match126"
       ],
-      "count_full_240": 5,
-      "total_paired_ticks": 1421
+      "count_full_240": 10,
+      "total_paired_ticks": 2621
     },
     "20": {
       "full_240_matches": [
@@ -52,10 +70,15 @@
         "match120",
         "match127",
         "match105",
-        "match116"
+        "match116",
+        "match107",
+        "match131",
+        "match104",
+        "match130",
+        "match126"
       ],
-      "count_full_240": 6,
-      "total_paired_ticks": 1440
+      "count_full_240": 11,
+      "total_paired_ticks": 2640
     }
   },
   "matches": {
@@ -1063,17 +1086,219 @@
     },
     "match107": {
       "event": "Miami 2024",
-      "status": "unmeasured",
+      "status": "measured",
       "court_ticks": 240,
-      "paired_ticks": null,
-      "full": null
+      "paired_ticks": 240,
+      "full": true,
+      "players": {
+        "person:000000000001": {
+          "median_height_px": 334.0,
+          "fitted": 240,
+          "mask": 240,
+          "setting": "whole",
+          "missing_count": 0,
+          "gap_spans": [],
+          "gap_lengths": [],
+          "max_gap": 0,
+          "touches_boundary": false,
+          "max_interior_gap": 0,
+          "gaps_le_3": 0,
+          "gaps_le_5": 0,
+          "gaps_le_10": 0,
+          "gaps_gt_10": 0
+        },
+        "person:000000000003": {
+          "median_height_px": 104.0,
+          "fitted": 240,
+          "mask": 240,
+          "setting": "crop1",
+          "missing_count": 0,
+          "gap_spans": [],
+          "gap_lengths": [],
+          "max_gap": 0,
+          "touches_boundary": false,
+          "max_interior_gap": 0,
+          "gaps_le_3": 0,
+          "gaps_le_5": 0,
+          "gaps_le_10": 0,
+          "gaps_gt_10": 0
+        }
+      },
+      "paired_missing": {
+        "missing_count": 0,
+        "gap_spans": [],
+        "gap_lengths": [],
+        "max_gap": 0,
+        "touches_boundary": false,
+        "max_interior_gap": 0,
+        "gaps_le_3": 0,
+        "gaps_le_5": 0,
+        "gaps_le_10": 0,
+        "gaps_gt_10": 0
+      },
+      "interpolation_thresholds": {
+        "3": {
+          "covered_ticks": 240,
+          "reaches_full_240": true
+        },
+        "5": {
+          "covered_ticks": 240,
+          "reaches_full_240": true
+        },
+        "10": {
+          "covered_ticks": 240,
+          "reaches_full_240": true
+        },
+        "15": {
+          "covered_ticks": 240,
+          "reaches_full_240": true
+        },
+        "20": {
+          "covered_ticks": 240,
+          "reaches_full_240": true
+        }
+      }
     },
     "match131": {
       "event": "Acapulco 2024",
-      "status": "unmeasured",
+      "status": "measured",
       "court_ticks": 240,
-      "paired_ticks": null,
-      "full": null
+      "paired_ticks": 221,
+      "full": false,
+      "players": {
+        "person:000000000001": {
+          "median_height_px": 94.0,
+          "fitted": 237,
+          "mask": 240,
+          "setting": "crop1",
+          "missing_count": 3,
+          "gap_spans": [
+            [
+              89,
+              89,
+              1
+            ],
+            [
+              109,
+              110,
+              2
+            ]
+          ],
+          "gap_lengths": [
+            1,
+            2
+          ],
+          "max_gap": 2,
+          "touches_boundary": false,
+          "max_interior_gap": 2,
+          "gaps_le_3": 2,
+          "gaps_le_5": 2,
+          "gaps_le_10": 2,
+          "gaps_gt_10": 0
+        },
+        "person:000000000000": {
+          "median_height_px": 162.0,
+          "fitted": 224,
+          "mask": 240,
+          "setting": "whole",
+          "missing_count": 16,
+          "gap_spans": [
+            [
+              194,
+              201,
+              8
+            ],
+            [
+              213,
+              213,
+              1
+            ],
+            [
+              215,
+              221,
+              7
+            ]
+          ],
+          "gap_lengths": [
+            8,
+            1,
+            7
+          ],
+          "max_gap": 8,
+          "touches_boundary": false,
+          "max_interior_gap": 8,
+          "gaps_le_3": 1,
+          "gaps_le_5": 1,
+          "gaps_le_10": 3,
+          "gaps_gt_10": 0
+        }
+      },
+      "paired_missing": {
+        "missing_count": 19,
+        "gap_spans": [
+          [
+            89,
+            89,
+            1
+          ],
+          [
+            109,
+            110,
+            2
+          ],
+          [
+            194,
+            201,
+            8
+          ],
+          [
+            213,
+            213,
+            1
+          ],
+          [
+            215,
+            221,
+            7
+          ]
+        ],
+        "gap_lengths": [
+          1,
+          2,
+          8,
+          1,
+          7
+        ],
+        "max_gap": 8,
+        "touches_boundary": false,
+        "max_interior_gap": 8,
+        "gaps_le_3": 3,
+        "gaps_le_5": 3,
+        "gaps_le_10": 5,
+        "gaps_gt_10": 0
+      },
+      "interpolation_thresholds": {
+        "3": {
+          "covered_ticks": 225,
+          "reaches_full_240": false
+        },
+        "5": {
+          "covered_ticks": 225,
+          "reaches_full_240": false
+        },
+        "10": {
+          "covered_ticks": 240,
+          "reaches_full_240": true
+        },
+        "15": {
+          "covered_ticks": 240,
+          "reaches_full_240": true
+        },
+        "20": {
+          "covered_ticks": 240,
+          "reaches_full_240": true
+        }
+      }
     },
     "match119": {
       "event": "Monte-Carlo 2024",
@@ -1084,24 +1309,228 @@
     },
     "match104": {
       "event": "Marseille 2020",
-      "status": "unmeasured",
+      "status": "measured",
       "court_ticks": 240,
-      "paired_ticks": null,
-      "full": null
+      "paired_ticks": 240,
+      "full": true,
+      "players": {
+        "person:000000000002": {
+          "median_height_px": 238.0,
+          "fitted": 240,
+          "mask": 240,
+          "setting": "whole",
+          "missing_count": 0,
+          "gap_spans": [],
+          "gap_lengths": [],
+          "max_gap": 0,
+          "touches_boundary": false,
+          "max_interior_gap": 0,
+          "gaps_le_3": 0,
+          "gaps_le_5": 0,
+          "gaps_le_10": 0,
+          "gaps_gt_10": 0
+        },
+        "person:000000000000": {
+          "median_height_px": 104.0,
+          "fitted": 240,
+          "mask": 240,
+          "setting": "crop1",
+          "missing_count": 0,
+          "gap_spans": [],
+          "gap_lengths": [],
+          "max_gap": 0,
+          "touches_boundary": false,
+          "max_interior_gap": 0,
+          "gaps_le_3": 0,
+          "gaps_le_5": 0,
+          "gaps_le_10": 0,
+          "gaps_gt_10": 0
+        }
+      },
+      "paired_missing": {
+        "missing_count": 0,
+        "gap_spans": [],
+        "gap_lengths": [],
+        "max_gap": 0,
+        "touches_boundary": false,
+        "max_interior_gap": 0,
+        "gaps_le_3": 0,
+        "gaps_le_5": 0,
+        "gaps_le_10": 0,
+        "gaps_gt_10": 0
+      },
+      "interpolation_thresholds": {
+        "3": {
+          "covered_ticks": 240,
+          "reaches_full_240": true
+        },
+        "5": {
+          "covered_ticks": 240,
+          "reaches_full_240": true
+        },
+        "10": {
+          "covered_ticks": 240,
+          "reaches_full_240": true
+        },
+        "15": {
+          "covered_ticks": 240,
+          "reaches_full_240": true
+        },
+        "20": {
+          "covered_ticks": 240,
+          "reaches_full_240": true
+        }
+      }
     },
     "match130": {
       "event": "Queen's Club 2024",
-      "status": "unmeasured",
+      "status": "measured",
       "court_ticks": 240,
-      "paired_ticks": null,
-      "full": null
+      "paired_ticks": 240,
+      "full": true,
+      "players": {
+        "person:000000000008": {
+          "median_height_px": 237.0,
+          "fitted": 240,
+          "mask": 240,
+          "setting": "whole",
+          "missing_count": 0,
+          "gap_spans": [],
+          "gap_lengths": [],
+          "max_gap": 0,
+          "touches_boundary": false,
+          "max_interior_gap": 0,
+          "gaps_le_3": 0,
+          "gaps_le_5": 0,
+          "gaps_le_10": 0,
+          "gaps_gt_10": 0
+        },
+        "person:000000000000": {
+          "median_height_px": 72.0,
+          "fitted": 240,
+          "mask": 240,
+          "setting": "crop1",
+          "missing_count": 0,
+          "gap_spans": [],
+          "gap_lengths": [],
+          "max_gap": 0,
+          "touches_boundary": false,
+          "max_interior_gap": 0,
+          "gaps_le_3": 0,
+          "gaps_le_5": 0,
+          "gaps_le_10": 0,
+          "gaps_gt_10": 0
+        }
+      },
+      "paired_missing": {
+        "missing_count": 0,
+        "gap_spans": [],
+        "gap_lengths": [],
+        "max_gap": 0,
+        "touches_boundary": false,
+        "max_interior_gap": 0,
+        "gaps_le_3": 0,
+        "gaps_le_5": 0,
+        "gaps_le_10": 0,
+        "gaps_gt_10": 0
+      },
+      "interpolation_thresholds": {
+        "3": {
+          "covered_ticks": 240,
+          "reaches_full_240": true
+        },
+        "5": {
+          "covered_ticks": 240,
+          "reaches_full_240": true
+        },
+        "10": {
+          "covered_ticks": 240,
+          "reaches_full_240": true
+        },
+        "15": {
+          "covered_ticks": 240,
+          "reaches_full_240": true
+        },
+        "20": {
+          "covered_ticks": 240,
+          "reaches_full_240": true
+        }
+      }
     },
     "match126": {
       "event": "Lyon 2024",
-      "status": "unmeasured",
+      "status": "measured",
       "court_ticks": 240,
-      "paired_ticks": null,
-      "full": null
+      "paired_ticks": 240,
+      "full": true,
+      "players": {
+        "person:000000000006": {
+          "median_height_px": 98.0,
+          "fitted": 240,
+          "mask": 240,
+          "setting": "crop1",
+          "missing_count": 0,
+          "gap_spans": [],
+          "gap_lengths": [],
+          "max_gap": 0,
+          "touches_boundary": false,
+          "max_interior_gap": 0,
+          "gaps_le_3": 0,
+          "gaps_le_5": 0,
+          "gaps_le_10": 0,
+          "gaps_gt_10": 0
+        },
+        "person:000000000005": {
+          "median_height_px": 238.0,
+          "fitted": 240,
+          "mask": 240,
+          "setting": "whole",
+          "missing_count": 0,
+          "gap_spans": [],
+          "gap_lengths": [],
+          "max_gap": 0,
+          "touches_boundary": false,
+          "max_interior_gap": 0,
+          "gaps_le_3": 0,
+          "gaps_le_5": 0,
+          "gaps_le_10": 0,
+          "gaps_gt_10": 0
+        }
+      },
+      "paired_missing": {
+        "missing_count": 0,
+        "gap_spans": [],
+        "gap_lengths": [],
+        "max_gap": 0,
+        "touches_boundary": false,
+        "max_interior_gap": 0,
+        "gaps_le_3": 0,
+        "gaps_le_5": 0,
+        "gaps_le_10": 0,
+        "gaps_gt_10": 0
+      },
+      "interpolation_thresholds": {
+        "3": {
+          "covered_ticks": 240,
+          "reaches_full_240": true
+        },
+        "5": {
+          "covered_ticks": 240,
+          "reaches_full_240": true
+        },
+        "10": {
+          "covered_ticks": 240,
+          "reaches_full_240": true
+        },
+        "15": {
+          "covered_ticks": 240,
+          "reaches_full_240": true
+        },
+        "20": {
+          "covered_ticks": 240,
+          "reaches_full_240": true
+        }
+      }
     }
   }
 }

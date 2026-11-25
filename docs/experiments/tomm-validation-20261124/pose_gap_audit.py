@@ -15,6 +15,11 @@ CROP_RECEIPTS = {
     "match127": ROOT / "docs/experiments/test-joint-extension-20261122/match127-crop-result.json",
     "match105": ROOT / "docs/experiments/test-joint-extension-20261122/match105-crop-result.json",
     "match116": ROOT / "docs/experiments/test-joint-extension-20261122/match116-crop-result.json",
+    "match107": ROOT / "docs/experiments/tomm-validation-20261124/match107-crop-result.json",
+    "match131": ROOT / "docs/experiments/tomm-validation-20261124/match131-crop-result.json",
+    "match104": ROOT / "docs/experiments/tomm-validation-20261124/match104-crop-result.json",
+    "match130": ROOT / "docs/experiments/tomm-validation-20261124/match130-crop-result.json",
+    "match126": ROOT / "docs/experiments/tomm-validation-20261124/match126-crop-result.json",
 }
 
 
@@ -58,7 +63,10 @@ def summarize_missing(missing: list[int], total_frames: int) -> dict[str, Any]:
 
 
 def main() -> None:
-    coverage_path = ROOT / "docs/experiments/official-test-player-coverage-20261122/coverage-summary.json"
+    cov_12 = Path(__file__).resolve().parent / "coverage-summary-12.json"
+    coverage_path = cov_12 if cov_12.exists() else (
+        ROOT / "docs/experiments/official-test-player-coverage-20261122/coverage-summary.json"
+    )
     coverage = json.loads(coverage_path.read_text())
     thresholds = [3, 5, 10, 15, 20]
 

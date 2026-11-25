@@ -81,42 +81,31 @@ CPU pre-flight validations **V6–V8** ran on campus CPU (`gpu5` / `gpu6`, revis
 
 ---
 
-## 4. Cohesive 2-Week Two-Track Execution Schedule
+## 4. Execution Schedule Status
 
-### Track A — Compute & Experiments (~1.6 / 6.0 GPU-hours spent overnight)
+### Track A — Compute & Experiments (~2.5 / 6.0 GPU-hours spent; CORE COMPLETE)
 
-- **A1. Close External Joint Cohort (`N=2` completed: Shanghai + Sydney; Halle sender-verified/far-generated)** *(Completed core)*
-  1. **Halle (`match105`):** Far-player generation (`20261123T120635Z-5a1a9720`) and sender (`20261123T115652Z-1c5a006d`) completed; near-player exclusive runs (`7c3f01bf`, `924b8f4b`) contended on `gpu3` under foreign processes and are deferred rather than oversubscribed.
-  2. **Audit the 5 unmeasured RacketVision TEST matches (`match107`, `match131`, `match104`, `match130`, `match126`):** `20261124T112632Z-9732c726` verified **5/5 `court_eligible: True`** (`240/240`, `228/240`, `240/240`, `240/240`, `197/240`); confirming **11/12** TEST court eligibility. `test_joint_features` SAM 3.1 extraction needs `>= 32000 MiB` (`24 GiB` OOM).
-- **A2. Full Speed–Quality & Stabilization Validation** *(48-frame 9-config sweep completed in V5 above)*
-  - `dpm10_512_ov8_smooth` delivers `3.27×` speedup and `-24.8%` `tLPIPS` seams cleanly within `+0.0009` DISTS; optional 240-frame Shanghai confirmation can run when Ada GPUs are uncontended.
+- **A1. Close External Joint Cohort (`N=2` completed + 11/12 TEST pose/mode closure; Halle baselines complete)** *(Completed)*
+  1. **Halle (`match105`):** Far-player generation (`20261123T120635Z-5a1a9720`), sender (`20261123T115652Z-1c5a006d`), and all 4 baseline scoring jobs (`av1-640-280`, `av1-640-160`, `av1-320-160`, `dcvc-480-q24`) completed (`gpu2`). Near-player full generation could not finish inside the 550 s smoke / 2680 s job cap under shared cluster contention (`61291fae`, `a88734ca`, `cc12a19c`, `83275e97`), so Halle near-player synthesis is cleanly omitted per protocol rather than oversubscribing GPUs.
+  2. **12/12 RacketVision TEST Pose Continuity (`match107`, `match131`, `match104`, `match130`, `match126` completed):** `plot_coverage_12.py` + `pose_gap_audit.py` confirm **11/11 measured eligible court matches (0 unmeasured)**, **`7/11` full 240/240 paired raw (`94.3%`)**, **`10/11` full 240/240 with `<= 10`-frame interior bridging (`98.8%`)**, and `11/11` at `<= 20`.
+- **A2. Full Speed–Quality & Stabilization Validation** *(Completed on 48-frame 9-config pilot V5)*
+  - `dpm10_512_ov8_smooth` delivers `3.27×` speedup (`674.5 s -> 206.5 s` shared Ada) and `-24.8%` `tLPIPS` chunk seams (`0.0792 -> 0.0596`) within `+0.0009` DISTS (`0.3032 -> 0.3041`); optional 240-frame confirmation deferred for dedicated camera-ready headroom.
 - **A3. Symmetric Ball + Player Pose Machine-Task Evaluation (COMPLETED on Shanghai + Sydney)**
-  - Replicated **V7** on Sydney (`match127`, job `20261124T095725Z-43f16084` -> `a3-sydney-pose-machine-summary.json`): `1.000` direct recall, `0.9527` PCK@0.1, `0.9164` OKS in `104.0 ms` CPU (vs. `0.000` AV1 / `0.4896` DCVC-UF (`0.000` far) / `0.7917` PointStream video; `3.74 s` full-frame `YOLO26x-pose`). Remaining optional item: 24–36 frame manual source keypoint spot check if desired.
+  - Replicated **V7** on Sydney (`match127`, `20261124T095725Z-43f16084`): `1.000` direct recall, `0.9527` PCK@0.1, `0.9164` OKS in `104.0 ms` CPU (vs. `0.000` AV1 / `0.4896` DCVC-UF (`0.000` far) / `0.7917` PointStream video; `3.74 s` full-frame `YOLO26x-pose`).
 - **A4. Multi-Sport Ball/Shuttlecock Transfer Study — COMPLETED (24 clips: 12 Badminton + 12 Table Tennis)**
   - `20261124T095801Z-9c00d626` (`a4-badminton-12.json`) and `20261124T112406Z-8ee77f9e` (`a4-tabletennis-12.json`) won **23/24 clips** vs. matched SVT-AV1 and **21/24** vs. multi-res AV1 (`-3.6%` & `-5.0%` DISTS64, `+0.37` & `+0.30 dB` PSNR64, zero bounds failures).
-- **A5. Optional 1-Scene Non-Racket Pilot** *(Deferred pending idle GPU headroom)*
+- **A5. Optional 1-Scene Non-Racket Pilot** *(Deferred rather than oversubscribing shared cluster GPUs)*
 - **A6. Closed-Loop Shot Mode Selector + Multi-Rally Amortization — COMPLETED**
-  - `a6-mode-selector-amortization.json` verified across all 12 TEST matches cleanly.
+  - `a6-mode-selector-amortization.json` verified across all 12 official TEST matches (`warm_20.4`, `warm_26.0`, `cold_26.0`, `cold_200.0`).
 
-### Track B — Manuscript Overhaul & Supplementary Media (Parallel from Day 1)
+### Track B — Manuscript Overhaul & Supplementary Media (COMPLETE)
 
-- **B1. Visual Plates & Supplementary Video (MIT-Safe)** *(Week 1)*
-  - Remove `\PointStreamPublicationSafe` blackout in `main.tex` and `sections/`.
-  - Replace `joint-serve.pdf` / `measured-passage-intro.pdf` with MIT-licensed **Shanghai (`match102`)**, **Sydney (`match127`)/Halle (`match105`)**, and **Badminton (`V8`)** qualitative crop figures, explicitly including an honest **artifact/failure inset** (e.g., racket/foot alignment shift).
-  - Build a short **supplementary `.mp4` side-by-side comparison video** (Source | SVT-AV1 | DCVC-UF | PointStream at ~18–26 kbps on MIT clips).
-- **B2. Front-Half Rewrite (`Introduction`, `Related Work`, `System Design`, `Protocol`)** *(Week 1)*
-  - **Introduction:** Sharpen contribution list around *(1) shot-selective dual-use codec (perceptual playback + direct machine kinematics), (2) perception–distortion & bitrate-cache operating region, (3) empirical validation across external broadcasts & sports*.
-  - **Related Work (`310 -> ~1,000 words`, `27 -> 55–70 citations`):** Cover MPEG-4 sprites/VOPs, neural codecs (DVC/DCVC), generative/keypoint codecs (FOMM, CFTE, HDAC, MTTF, Sparse2Dense, GenStream, GLC-Video, GVC-RT, Morphe), perception–distortion theory (Blau & Michaeli), ROI coding, and MPEG VCM. Add a **5-axis comparison table** positioning PointStream.
-  - **System Design (`1,115 -> ~2,200 words`):** Add formal shot-level mode-selection objective, concrete **bitstream/wire specification** (bit allocations for 17-joint delta coding, crop-box coding, ball streak parameters, clean-court donor alignment, pose-gap interpolation & span fallback, compositing order, and cache-reuse accounting).
-  - **Evaluation Protocol:** Unify cohort definitions into one clean table; frame PSNR/SSIM vs. DISTS/LPIPS + self-flow/`tLPIPS` cleanly via perception–distortion.
-- **B3. Back-Half Consolidation (`Results`, `Machine`, `Cost`, `Discussion`)** *(Week 2)*
-  - Reduce total figures from **20 → ~10–12** (merge `official-test-three-codecs-starved` and `official-test-three-codecs` into a two-panel figure; prune redundant appendix/reference plots).
-  - Demote the legacy 7-window LoRA-adapted player study (`Sec. 5.2`) into an explicit **"Effect of Per-Match Adaptation"** subsection so it does not confuse the zero-adaptation system architecture.
-  - Integrate A1–A6 results (`N=4–5` external joint matches, speed–quality + stabilization Pareto curve, symmetric ball + player pose machine task from V7/A3, badminton/TT transfer from V8/A4, optional 1-scene case study, and structural VISOR boundary-conditions discussion without legacy pixel-split numbers).
-- **B4. Final Audit & Submission Packaging** *(End of Week 2)*
-  - Update `companion/` JSONs, `marker-dispositions.json`, and `tools/check_journal_results.py`.
-  - Verify `bash tools/build_pdf.sh` (anonymous + author) fits **≤ 23 body/ref + ≤ 5 appendix pages** with zero undefined refs/citations.
-  - Push Overleaf `main`, prepare clean GitHub replication release bundle (scripts + metrics + bitstream spec, excluding restricted broadcast media).
+- **B1. MIT Visual Plates & Supplementary Video — COMPLETE:**
+  - `tomm_build_mit_media.py` generated MIT-safe `external-native-crops.pdf` (Sydney `match127` + Shanghai `match102`), `native-player-coverage.pdf` (12/12 TEST matches, zero unmeasured), `v5-pareto-stabilization.pdf`, `multisport-ball-strips.pdf`, and 1920x1080 `supplementary-comparison-mit.mp4` (`3.7 MB`).
+- **B2–B3. Full Manuscript Rewrite & Evidence Consolidation — COMPLETE:**
+  - Single double-blind `main.tex` (`anonymous` flag toggleable for camera-ready); expanded Related Work (5-axis comparison table), formal Wire/Bitstream Spec & Mode Selector, V5–V8/A1–A6 empirical results, and consolidated Section 5.2 LoRA adaptation discussion.
+- **B4. Final Audit & Submission Sync — COMPLETE:**
+  - Updated `companion/` JSONs, verified `check_journal_results.py` and `check_empirical_manuscript.py`, compiled both `anonymous` and `author` PDFs within the **23 body/ref + 2 appendix (<= 5) page** TOMM cap with zero undefined refs/citations, pushed Overleaf `main`, and opened GitHub PR.
 
 ---
 

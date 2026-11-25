@@ -2,13 +2,13 @@
   "counts_by_regime": {
     "warm_20.4": {
       "Conv": 5,
-      "Conv+Ball": 3,
-      "Full-Obj": 4
+      "Conv+Ball": 0,
+      "Full-Obj": 7
     },
     "warm_26.0": {
       "Conv": 1,
-      "Conv+Ball": 6,
-      "Full-Obj": 5
+      "Conv+Ball": 1,
+      "Full-Obj": 10
     },
     "cold_26.0": {
       "Conv": 1,
@@ -17,8 +17,8 @@
     },
     "cold_200.0": {
       "Conv": 1,
-      "Conv+Ball": 7,
-      "Full-Obj": 4
+      "Conv+Ball": 4,
+      "Full-Obj": 7
     }
   },
   "source_only_properties": [
@@ -230,9 +230,9 @@
       "event": "Miami 2024",
       "fps": "60/1",
       "court_ticks": 240,
-      "pose_status": "unmeasured",
-      "raw_paired_ticks": null,
-      "max_interior_gap": null,
+      "pose_status": "measured",
+      "raw_paired_ticks": 240,
+      "max_interior_gap": 0,
       "visible_ball_marks": 20,
       "conv_ball_min_kbps": 24.314,
       "regimes": {
@@ -242,18 +242,18 @@
           "ball_dists_improvement_over_same_res_av1": null
         },
         "warm_26.0": {
-          "mode": "Conv+Ball",
-          "reason": "court_ok & ball_vis=20 (pose_gap>10_or_boundary)",
+          "mode": "Full-Obj",
+          "reason": "court_ok & paired_240 & budget>=26.0kbps",
           "ball_dists_improvement_over_same_res_av1": 0.0368191212415695
         },
         "cold_26.0": {
           "mode": "Conv+Ball",
-          "reason": "court_ok & ball_vis=20 (pose_gap>10_or_boundary)",
+          "reason": "court_ok & ball_vis=20 (budget<325.0kbps(cold))",
           "ball_dists_improvement_over_same_res_av1": 0.0368191212415695
         },
         "cold_200.0": {
           "mode": "Conv+Ball",
-          "reason": "court_ok & ball_vis=20 (pose_gap>10_or_boundary)",
+          "reason": "court_ok & ball_vis=20 (budget<325.0kbps(cold))",
           "ball_dists_improvement_over_same_res_av1": 0.0368191212415695
         }
       }
@@ -263,30 +263,30 @@
       "event": "Acapulco 2024",
       "fps": "25/1",
       "court_ticks": 240,
-      "pose_status": "unmeasured",
-      "raw_paired_ticks": null,
-      "max_interior_gap": null,
+      "pose_status": "measured",
+      "raw_paired_ticks": 221,
+      "max_interior_gap": 8,
       "visible_ball_marks": 38,
       "conv_ball_min_kbps": 10.86,
       "regimes": {
         "warm_20.4": {
-          "mode": "Conv+Ball",
-          "reason": "court_ok & ball_vis=38 (pose_gap>10_or_boundary)",
+          "mode": "Full-Obj",
+          "reason": "court_ok & interp_gap_le_10(max=8) & budget>=18.0kbps",
           "ball_dists_improvement_over_same_res_av1": 0.022678119571585414
         },
         "warm_26.0": {
-          "mode": "Conv+Ball",
-          "reason": "court_ok & ball_vis=38 (pose_gap>10_or_boundary)",
+          "mode": "Full-Obj",
+          "reason": "court_ok & interp_gap_le_10(max=8) & budget>=18.0kbps",
           "ball_dists_improvement_over_same_res_av1": 0.022678119571585414
         },
         "cold_26.0": {
           "mode": "Conv+Ball",
-          "reason": "court_ok & ball_vis=38 (pose_gap>10_or_boundary)",
+          "reason": "court_ok & ball_vis=38 (budget<190.0kbps(cold))",
           "ball_dists_improvement_over_same_res_av1": 0.022678119571585414
         },
         "cold_200.0": {
-          "mode": "Conv+Ball",
-          "reason": "court_ok & ball_vis=38 (pose_gap>10_or_boundary)",
+          "mode": "Full-Obj",
+          "reason": "court_ok & interp_gap_le_10(max=8) & budget>=190.0kbps",
           "ball_dists_improvement_over_same_res_av1": 0.022678119571585414
         }
       }
@@ -329,9 +329,9 @@
       "event": "Marseille 2020",
       "fps": "60/1",
       "court_ticks": 240,
-      "pose_status": "unmeasured",
-      "raw_paired_ticks": null,
-      "max_interior_gap": null,
+      "pose_status": "measured",
+      "raw_paired_ticks": 240,
+      "max_interior_gap": 0,
       "visible_ball_marks": 21,
       "conv_ball_min_kbps": 23.406,
       "regimes": {
@@ -341,18 +341,18 @@
           "ball_dists_improvement_over_same_res_av1": null
         },
         "warm_26.0": {
-          "mode": "Conv+Ball",
-          "reason": "court_ok & ball_vis=21 (pose_gap>10_or_boundary)",
+          "mode": "Full-Obj",
+          "reason": "court_ok & paired_240 & budget>=26.0kbps",
           "ball_dists_improvement_over_same_res_av1": 0.006868141038077202
         },
         "cold_26.0": {
           "mode": "Conv+Ball",
-          "reason": "court_ok & ball_vis=21 (pose_gap>10_or_boundary)",
+          "reason": "court_ok & ball_vis=21 (budget<325.0kbps(cold))",
           "ball_dists_improvement_over_same_res_av1": 0.006868141038077202
         },
         "cold_200.0": {
           "mode": "Conv+Ball",
-          "reason": "court_ok & ball_vis=21 (pose_gap>10_or_boundary)",
+          "reason": "court_ok & ball_vis=21 (budget<325.0kbps(cold))",
           "ball_dists_improvement_over_same_res_av1": 0.006868141038077202
         }
       }
@@ -362,30 +362,30 @@
       "event": "Queen's Club 2024",
       "fps": "25/1",
       "court_ticks": 240,
-      "pose_status": "unmeasured",
-      "raw_paired_ticks": null,
-      "max_interior_gap": null,
+      "pose_status": "measured",
+      "raw_paired_ticks": 240,
+      "max_interior_gap": 0,
       "visible_ball_marks": 40,
       "conv_ball_min_kbps": 10.861666666666666,
       "regimes": {
         "warm_20.4": {
-          "mode": "Conv+Ball",
-          "reason": "court_ok & ball_vis=40 (pose_gap>10_or_boundary)",
+          "mode": "Full-Obj",
+          "reason": "court_ok & paired_240 & budget>=18.0kbps",
           "ball_dists_improvement_over_same_res_av1": 0.003592674434185039
         },
         "warm_26.0": {
-          "mode": "Conv+Ball",
-          "reason": "court_ok & ball_vis=40 (pose_gap>10_or_boundary)",
+          "mode": "Full-Obj",
+          "reason": "court_ok & paired_240 & budget>=18.0kbps",
           "ball_dists_improvement_over_same_res_av1": 0.003592674434185039
         },
         "cold_26.0": {
           "mode": "Conv+Ball",
-          "reason": "court_ok & ball_vis=40 (pose_gap>10_or_boundary)",
+          "reason": "court_ok & ball_vis=40 (budget<190.0kbps(cold))",
           "ball_dists_improvement_over_same_res_av1": 0.003592674434185039
         },
         "cold_200.0": {
-          "mode": "Conv+Ball",
-          "reason": "court_ok & ball_vis=40 (pose_gap>10_or_boundary)",
+          "mode": "Full-Obj",
+          "reason": "court_ok & paired_240 & budget>=190.0kbps",
           "ball_dists_improvement_over_same_res_av1": 0.003592674434185039
         }
       }
@@ -395,30 +395,30 @@
       "event": "Lyon 2024",
       "fps": "25/1",
       "court_ticks": 240,
-      "pose_status": "unmeasured",
-      "raw_paired_ticks": null,
-      "max_interior_gap": null,
+      "pose_status": "measured",
+      "raw_paired_ticks": 240,
+      "max_interior_gap": 0,
       "visible_ball_marks": 39,
       "conv_ball_min_kbps": 9.735833333333334,
       "regimes": {
         "warm_20.4": {
-          "mode": "Conv+Ball",
-          "reason": "court_ok & ball_vis=39 (pose_gap>10_or_boundary)",
+          "mode": "Full-Obj",
+          "reason": "court_ok & paired_240 & budget>=18.0kbps",
           "ball_dists_improvement_over_same_res_av1": 0.011032194663316786
         },
         "warm_26.0": {
-          "mode": "Conv+Ball",
-          "reason": "court_ok & ball_vis=39 (pose_gap>10_or_boundary)",
+          "mode": "Full-Obj",
+          "reason": "court_ok & paired_240 & budget>=18.0kbps",
           "ball_dists_improvement_over_same_res_av1": 0.011032194663316786
         },
         "cold_26.0": {
           "mode": "Conv+Ball",
-          "reason": "court_ok & ball_vis=39 (pose_gap>10_or_boundary)",
+          "reason": "court_ok & ball_vis=39 (budget<190.0kbps(cold))",
           "ball_dists_improvement_over_same_res_av1": 0.011032194663316786
         },
         "cold_200.0": {
-          "mode": "Conv+Ball",
-          "reason": "court_ok & ball_vis=39 (pose_gap>10_or_boundary)",
+          "mode": "Full-Obj",
+          "reason": "court_ok & paired_240 & budget>=190.0kbps",
           "ball_dists_improvement_over_same_res_av1": 0.011032194663316786
         }
       }
