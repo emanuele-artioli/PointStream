@@ -1,0 +1,76 @@
+{
+  "match": "match127",
+  "revision": "bcb9dd5bbe63f4dfdebc77bac7f4133167ea039f",
+  "carrier_sha256": "a70a444b65f905285830a5fc2561e752708ac24ea0a5e02d538d85ac742dd99c",
+  "scorer_sha256": "13acc6499aea74b2440273bda0dd1d2147323a08df01e6754a7dc03a835b7af6",
+  "device": "CPU Darwin arm64",
+  "python": "3.12.7",
+  "numpy": "1.26.4",
+  "elapsed_seconds": 0.2188465830113273,
+  "results": {
+    "match127_far": {
+      "5": {
+        "starts": 234,
+        "paid_joint_observations": 19702,
+        "bridge": {
+          "mean_pck_01": 0.9894849306096312,
+          "p10_gap_pck_01": 0.9523809523809523,
+          "mean_oks": 0.9765612294109495
+        },
+        "last_pose_hold": {
+          "mean_pck_01": 0.965774640121233,
+          "p10_gap_pck_01": 0.8941176470588236,
+          "mean_oks": 0.8949331772144167
+        },
+        "passes_render_gate": true
+      },
+      "10": {
+        "starts": 229,
+        "paid_joint_observations": 38609,
+        "bridge": {
+          "mean_pck_01": 0.9835110819995553,
+          "p10_gap_pck_01": 0.9411764705882353,
+          "mean_oks": 0.9502466267772535
+        },
+        "last_pose_hold": {
+          "mean_pck_01": 0.8699654425627323,
+          "p10_gap_pck_01": 0.7254743271616722,
+          "mean_oks": 0.7959582504072565
+        },
+        "passes_render_gate": true
+      }
+    },
+    "match127_near": {
+      "5": {
+        "starts": 234,
+        "paid_joint_observations": 15609,
+        "bridge": {
+          "mean_pck_01": 0.9504490859506571,
+          "p10_gap_pck_01": 0.8823529411764706,
+          "mean_oks": 0.9454224323777081
+        },
+        "last_pose_hold": {
+          "mean_pck_01": 0.9068299134868179,
+          "p10_gap_pck_01": 0.7735825655563431,
+          "mean_oks": 0.8750695248944161
+        },
+        "passes_render_gate": true
+      },
+      "10": {
+        "starts": 229,
+        "paid_joint_observations": 30587,
+        "bridge": {
+          "mean_pck_01": 0.9297838879954362,
+          "p10_gap_pck_01": 0.8430812324929972,
+          "mean_oks": 0.9130764175739855
+        },
+        "last_pose_hold": {
+          "mean_pck_01": 0.7054956439206893,
+          "p10_gap_pck_01": 0.4769800631877111,
+          "mean_oks": 0.7511908349004566
+        },
+        "passes_render_gate": false
+      }
+    }
+  }
+}
