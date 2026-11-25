@@ -39,10 +39,10 @@ Each receipt identifies the inputs and run. Check rights before distributing med
 | Manuscript figures and tables | Evidence and reproduction inputs |
 |---|---|
 | Figs. 1–2, broadcast visits and system | [Visit timeline](docs/paper/figures/passage-intro-20261122/) and [architecture](docs/paper/figures/system/) |
-| Figs. 3–5, foreground comparisons, external crops and rate ladders | [Reviewed foreground](docs/paper/figures/reviewed-foreground/), [media recipe](docs/experiments/tomm-validation-20261124/README.md), and [joint ladders](docs/experiments/joint-operating-range-20261123/) |
-| Figs. 6–7 and 10, TEST ball fidelity and machine localization | [Twelve-match receipts](docs/experiments/cohort-expansion-20261122/) and [ball figure assets](docs/paper/figures/ball/) |
-| Figs. 8–9, diffusion pilot and cross-sport transfer | [Sampler and multisport receipts](docs/experiments/tomm-validation-20261124/) |
-| Figs. 11–12, rates and pose coverage | [Byte ledger](docs/paper/figures/complete-wire-cost/) and [coverage and routing audit](docs/experiments/tomm-validation-20261124/) |
+| Figs. 3–4, foreground comparisons and rate ladders | [Reviewed foreground](docs/paper/figures/reviewed-foreground/) and [joint ladders](docs/experiments/joint-operating-range-20261123/) |
+| Figs. 5–6 and 8, TEST ball fidelity and machine localization | [Twelve-match receipts](docs/experiments/cohort-expansion-20261122/) and [ball figure assets](docs/paper/figures/ball/) |
+| Fig. 7 and cross-sport table, diffusion pilot and transfer | [Sampler and multisport receipts](docs/experiments/tomm-validation-20261124/) |
+| Figs. 9–10, rates and pose coverage | [Byte ledger](docs/paper/figures/complete-wire-cost/) and [coverage and routing audit](docs/experiments/tomm-validation-20261124/) |
 | TEST matrix, startup costs and artificial pose gaps | [Match identities](docs/experiments/cohort-expansion-20261122/test-events.md), [Shanghai startup](docs/experiments/test-crop-joint-20261122/match102-reference-cost.json), [Sydney startup](docs/experiments/tomm-reference-price-20261125/), and [Sydney gap diagnostic](docs/experiments/tomm-pose-bridge-20261125/) |
 
 ## Research priorities
