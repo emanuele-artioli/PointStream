@@ -43,6 +43,7 @@ python docs/experiments/ball-metric-suite-20261123/summarize.py OUTPUT.json \
 
 Inspect [docs/experiments/tomm-validation-20261124/README.md](docs/experiments/tomm-validation-20261124/README.md) for job IDs, SHA-256 receipts, and scoring commands covering:
 - `v7-shanghai-ordinary640-summary.json` (matched `17.713 kbps` SVT-AV1 pose recall `0.010`),
+- `halle-match105-finish-summary.json`, `halle-joint-scores.json`, `halle-score-joint-crf50.json`, `halle-motion-joint-crf50.json`, & `halle-pose-machine-summary.json` (complete unadapted Halle `match105` 240-frame synthesis, 12-frame joint FG DISTS/LPIPS/PSNR, 480-observation body DISTS, and 48-frame YOLO26x pose machine),
 - `matched-checks-gpu-summary.json` & `matched-checks-scores.json` (48-frame matched timing, rendered Sydney Q90, rendered 5-frame gap bridge),
 - `a4-badminton-12.json` & `a4-tabletennis-12.json` (24-clip zero-shot multi-sport transfer),
 - `coverage-summary-12.json`, `pose-gap-audit.json`, & `a6-mode-selector-amortization.json` (12/12 TEST coverage & routing).
@@ -81,4 +82,4 @@ python -m src.segmentation --help
 1. **Egocentric hand-object (VISOR) pilot:** Evaluate PointStream's object-centric decomposition, hand pose continuity, and cached appearance reuse on dense egocentric hand-object interaction in a dedicated follow-up session.
 2. **Controlled human subjective preference study:** Run blinded ITU-T P.910 / pairwise preference trials comparing PointStream `Full-Obj` and `Conv+Ball` against SVT-AV1 and DCVC-UF at matched ultra-low bitrates.
 3. **Real-time diffusion receiver (distilled / TensorRT):** Replace 10–30 step UNet inference with consistency/step-distilled models, FP8/TensorRT engines, and temporally recurrent KV caching to close the gap toward real-time 30–60 fps decoding.
-4. **Dedicated racket/equipment keypoints & extended external cohort:** Add explicit racket/equipment landmarks beyond COCO body joints and complete full multi-match `Full-Obj` evaluation across Halle (`match105`), London Olympic clips, and additional grass/clay broadcasts.
+4. **Dedicated racket/equipment keypoints & extended external cohort:** Add explicit racket/equipment landmarks beyond COCO body joints and expand full multi-rally `Full-Obj` evaluation beyond Shanghai, Sydney, and Halle to London Olympic clips and additional grass/clay rallies.
