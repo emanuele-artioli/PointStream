@@ -26,6 +26,30 @@ Far-player native reconstruction registered as `20261123T120635Z-5a1a9720`, spec
 
 ## Recovery after the compute window
 
-Far-player job `20261123T120635Z-5a1a9720` completed on an exclusive RTX 6000 Ada and passed the 64-tick source-denial, paid-geometry, coverage, CUDA and 1.5x forecast checks. Its full worker took 1,087.40 seconds and produced `/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T120635Z-5a1a9720/full/published.tar`, SHA256 `453f64c0367f10708eaea9b9ff812731fc2d46275c30e67274574589740caeb6`. The 240-frame generation receipt is inside this archive and has not yet been independently reopened. The near role was never submitted. Reprice and refresh the deadline of `native/match105-generate-near.json`, inspect active fleet jobs and hosts, and use the same complete source snapshot, idle exclusive Ada and 64-tick 1.5x forecast before dispatch. Once both role archives are independently sealed, use `native/seal_generation.py` and `native/receiver_spec.py` to bind a complete 240-tick compositor. All transport and cold cache bytes remain payable. No complete Halle joint reconstruction or quality result exists yet.
+Far-player job `20261123T120635Z-5a1a9720` completed on an exclusive RTX 6000 Ada and passed the 64-tick source-denial, paid-geometry, coverage, CUDA and 1.5x forecast checks. Its full worker took 1,087.40 seconds and produced `/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261123T120635Z-5a1a9720/full/published.tar`, SHA256 `453f64c0367f10708eaea9b9ff812731fc2d46275c30e67274574589740caeb6`. The 240-frame generation receipt is inside this archive and has not yet been independently reopened. At this checkpoint the near role had not been submitted. See the later recovery status below. Reprice and refresh the deadline of `native/match105-generate-near.json`, inspect active fleet jobs and hosts, and use the same complete source snapshot, idle exclusive Ada and 64-tick 1.5x forecast before dispatch. Once both role archives are independently sealed, use `native/seal_generation.py` and `native/receiver_spec.py` to bind a complete 240-tick compositor. All transport and cold cache bytes remain payable. No complete Halle joint reconstruction or quality result exists yet.
 
 320-wide AV1 job `20261123T120312Z-df65f3ac` completed. At 13.985 kbps its source-mask player DISTS is 0.54196 over 480 player-ticks, with near 0.55881 and far 0.52511. [Full score](av1-320-score.json) The 640-wide AV1 and DCVC Q24 jobs `20261123T120312Z-9e113ec9` and `20261123T120312Z-7554c51e` failed at smoke validation on gpu1. Each 24-frame worker returned zero but took 356.9 and 345.8 seconds wall respectively, so the existing extrapolation gate must be diagnosed using the validation receipt and host contention before attempting a revised stage. Their failed smokes provide no full-body score. Preserve the archive and use physical native comparators at affordable prices and identical supports for any eventual Halle joint claim. The existing 49-visible-frame DCVC ball-only score remains valid under its original support.
+
+## November 25 recovery status
+
+The [later validation ledger](../tomm-validation-20261124/README.md#track-a1--halle--a3--a4--a6-completion-receipts)
+supersedes the earlier near-role and control status. It records six near-role
+attempts that stopped in contention, forecast, spec or smoke gates. Prior work
+has verified sender job `20261123T115652Z-1c5a006d`, far job
+`20261123T120635Z-5a1a9720`, and saved source-mask control scores including
+the affordable 640-wide SVT-AV1 and Q24 DCVC-UF rungs. Check the exact source,
+mask support, codec rate and receipt identity before reuse. About 2.5 GPU-hours
+were spent across the validation sprint against six GPU-hours. The stop rule
+remains in force after the failed near attempts.
+
+The follow-up preflight could not resolve any of the six fleet hosts, so
+shared status, host eligibility, GPU occupancy and archive contents remain
+unverified in this session. No new work was dispatched. Reopen and match
+the archived far SHA256 above, reconcile budget and the stop rule, and
+register a revised near spec on a qualified exclusive RTX 6000 Ada with an
+actual 64-tick source-denied smoke and the existing 1.5x forecast gate.
+The expired exclusive spec declared 64 representative ticks but passed 44.
+After both native role receipts are sealed, use
+`../test-joint-extension-20261122/native/seal_generation.py` and
+`../test-joint-extension-20261122/native/receiver_spec.py` to prepare the
+240-tick receiver replay and score it on the matched supports.

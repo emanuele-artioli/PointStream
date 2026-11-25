@@ -6,27 +6,40 @@ Checkpoint from November 24, 2026 (Sydney). Start with this file, [PLAN.md](../P
 
 ## November 25 validation
 
-The strict-template manuscript is at local commit 55e5460. Both manuscript
-checks pass. The anonymous copy uses 22 body/reference pages plus five online
-appendix pages. The author copy uses 23 plus five. Overleaf Git was unreachable.
+The active manuscript is based on local revision `30afdee`. It compiled
+on [Overleaf](https://www.overleaf.com/project/67a9ea6275d3d9785ce57026).
+A download from the live project matched all 20 changed files and confirmed
+the archival files were preserved. Both local PDFs use 21 body/reference
+pages and five appendix pages, and the journal evidence checks passed.
+The reviewer PDF and active-source archive omit the two broadcast crop
+plates and the optional video. The quantitative results remain in the
+manuscript. The RacketVision dataset card declares MIT and its paper
+describes using YouTube broadcasts. The inspected sources supplied no
+broadcaster permission for the specific imagery.
 
-- **Halle.** The [newer validation ledger](experiments/tomm-validation-20261124/README.md)
-  records stopped near attempts and completed control scoring. All six hosts
-  failed name resolution in the current preflight. Reconcile the recorded
-  stop rule and prior GPU spend before another near attempt. Inspect the
-  existing jobs and far archive. The prior exclusive spec requests 44
-  smoke frames despite describing the required 64.
-- **Timing.** The expired exclusive spec covers one role and 48 frames.
-  A paired timing comparison needs the same source, full output scope, and
-  isolated load. Prioritize both Shanghai roles over 240 frames with
-  DDIM-30 and DPM-10 plus smoothing. Revisit six steps and smaller far crops
-  after the full-rally gate.
+[PR #457](https://github.com/emanuele-artioli/PointStream/pull/457) and
+[PR #458](https://github.com/emanuele-artioli/PointStream/pull/458) passed
+Linux CI and merged at `6763d3a` and `a8408a2`.
+
+- **Halle.** The follow-up fleet preflight failed host lookup on all six
+  hosts. The [Halle recovery](experiments/halle-foreground-20261123/README.md)
+  lists confirmed prior work and records the near-role stop rule. Reconcile
+  the remaining GPU budget and reopen the far archive before launching.
+- **Timing.** The previous exclusive spec covered one role and 48 frames
+  and has expired. The [matched timing recovery](experiments/tomm-validation-20261124/v5-matched-240-recovery.md)
+  records prior shared-load measurements, the bounded design and its
+  required implementation. Segmented speed is distinct from uninterrupted
+  native generation or complete receiver latency.
 - **Gap and reference results.** Five-frame Sydney gaps met the coordinate
-  gate for both roles. Ten did for the far role only. Rendered interpolation
-  quality remains open. The Shanghai and Sydney AVIF calculations price
-  validated reference images. Halle's replacement bytes remain unmeasured.
-- **Submission.** Sync the validated manuscript, review the stacked PRs and
-  confirm third-party media rights for the actual submission package.
+  gate for both roles. Ten did for the far role only. Run a paid native
+  rendered comparison for five missing ticks against uninterrupted and
+  held poses. Hold conditioning and crop support fixed. For Shanghai and
+  Sydney AVIF Q90, the measured savings concern reference images. Compare
+  identically conditioned lossless and Q90 24-tick renders before scaling
+  that fidelity claim. Halle's replacement image bytes remain unmeasured.
+- **Submission.** Selecting or initiating the ACM submission is the
+  author's decision. Retain the no-broadcast package until the specific
+  plates and comparison video have documented clearance.
 
 ## Resume from these revisions
 
