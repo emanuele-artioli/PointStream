@@ -6,7 +6,7 @@ Checkpoint from November 24, 2026 (Sydney). Start with this file, [PLAN.md](../P
 
 ## November 26 review package
 
-The active Overleaf revision is `2d564eb5f1f70daade9c1e91e1414c62cfdfe4ec`.
+The active Overleaf revision is `976ec6bb2fcdeb711cf094e57ae896a6e66f74d5`.
 The anonymous and named builds have 21 body/reference pages and five online
 appendix pages. Rebuild with the paper repository's `tools/build_pdf.sh`.
 For a portable anonymous source archive, use
