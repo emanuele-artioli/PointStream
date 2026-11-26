@@ -6,31 +6,17 @@ Start with the [paper figure plan](PLAN.md) for measured figures, gaps and the n
 
 ## Reviewer guide and reproduction
 
-The manuscript's external Shanghai and Sydney rate ladders can be redrawn from
-committed numerical receipts without video, model weights, or a GPU. Install
-SciPy and Matplotlib, then run from the repository root, with a **new** output
-directory:
+Redraw the external Shanghai and Sydney rate ladders and regenerate the
+twelve-match ball metric summary from committed numerical receipts:
 
 ```sh
-card=docs/experiments/joint-operating-range-20261123
-shanghai=docs/experiments/shanghai-wider-20261123
-PYTHONPATH=. python "$card/compare.py" OUTPUT_DIRECTORY \
-  --shanghai-wider "$shanghai/q23-metrics.json" "$shanghai/q17-metrics.json" "$shanghai/q640-metrics.json" \
-  --ordinary "$card"/ordinary-*.json --roi "$card"/foreground-roi-*.json
+python -m pip install -e ".[reproduction]"
+scripts/reproduce-tomm /path/to/new-output-directory
 ```
 
-This produces `foreground.pdf`, `players.pdf`, `ball.pdf` and `results.json`.
-The numerical output reproduced the committed `results.json` byte for byte
-on the local workstation. For the twelve-match ball metric table, run:
-
-```sh
-python docs/experiments/ball-metric-suite-20261123/summarize.py OUTPUT.json \
-  docs/experiments/ball-metric-suite-20261123/match*-result.json
-```
-
-The resulting JSON also matched the committed `summary.json` byte for byte.
-Use fresh output paths; these checks redraw and aggregate existing measurements,
-not independently recompute the experiments. The [replication handoff](docs/submission-handoff.md#redraw-and-prepare-the-replication-release)
+The command writes three ladder PDFs and `joint/results.json`, plus
+`ball-metric-summary.json`. It uses saved measurements and requires no
+source footage, model weights, or GPU. The [replication handoff](docs/submission-handoff.md#redraw-and-prepare-the-replication-release)
 links the underlying receipts and the development foreground figure. Original
 measurements require restricted footage, source labels, models, native streams,
 and the recorded environments; a public replication package is not yet prepared.
@@ -41,17 +27,16 @@ Each receipt identifies the inputs and run. Check rights before distributing med
 | Figs. 1–2, broadcast visits and system | [Visit timeline](docs/paper/figures/passage-intro-20261122/) and [architecture](docs/paper/figures/system/) |
 | Figs. 3–4, foreground comparisons and rate ladders | [Reviewed foreground](docs/paper/figures/reviewed-foreground/) and [joint ladders](docs/experiments/joint-operating-range-20261123/) |
 | Figs. 5–6 and 8, TEST ball fidelity and machine localization | [Twelve-match receipts](docs/experiments/cohort-expansion-20261122/) and [ball figure assets](docs/paper/figures/ball/) |
-| Fig. 7 and cross-sport table, diffusion pilot and transfer | [Sampler and multisport receipts](docs/experiments/tomm-validation-20261124/) |
+| Fig. 7 and cross-sport table, diffusion pilot and annotation-conditioned coding | [Sampler and multisport receipts](docs/experiments/tomm-validation-20261124/) |
 | Figs. 9–10, rates and pose coverage | [Byte ledger](docs/paper/figures/complete-wire-cost/) and [coverage and routing audit](docs/experiments/tomm-validation-20261124/) |
 | TEST matrix, startup costs and artificial pose gaps | [Match identities](docs/experiments/cohort-expansion-20261122/test-events.md), [Shanghai startup](docs/experiments/test-crop-joint-20261122/match102-reference-cost.json), [Sydney startup](docs/experiments/tomm-reference-price-20261125/), and [Sydney gap diagnostic](docs/experiments/tomm-pose-bridge-20261125/) |
 
 ## Research priorities
 
 The [active submission plan](docs/tomm-submission-plan-20261124.md) takes
-precedence over older experiment queues. Prioritize completing the external
-racket-sport validation and checking pose-gap interpolation for artifacts.
-After the submission-critical work, the following remain opportunities rather
-than established results:
+precedence over older experiment queues. The finished external replay and short render pilots are recorded in the
+[submission handoff](docs/submission-handoff.md). The following are research
+opportunities beyond the verified submission evidence:
 
 1. **VISOR:** run a dedicated hand-object pilot with the current keypoint and reusable-appearance architecture.
 2. **Subjective assessment:** design a sufficiently powered viewer study using licensed comparison material.

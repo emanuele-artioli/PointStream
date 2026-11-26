@@ -4,6 +4,30 @@
 
 Checkpoint from November 24, 2026 (Sydney). Start with this file, [PLAN.md](../PLAN.md), and [AGENTS.md](../AGENTS.md). The plan owns the priority list. Experiment cards own run specifications and evidence.
 
+## November 26 review package
+
+The active Overleaf revision is `976ec6bb2fcdeb711cf094e57ae896a6e66f74d5`.
+The anonymous and named builds have 21 body/reference pages and five online
+appendix pages. Rebuild with the paper repository's `tools/build_pdf.sh`.
+For a portable anonymous source archive, use
+`python3 tools/export_review_sources.py build/PointStream-review-source.zip`.
+A clean ZIP rebuild matched the full anonymous PDF's extracted text. The
+export contains only active sources and figures. It omits the two archived
+broadcast plates and comparison video. Coauthors should review the named
+copy before anyone files with ACM.
+
+The [validation ledger](experiments/tomm-validation-20261124/README.md#verified-submission-evidence)
+records complete Halle replay, corrected Shanghai pose inference timing, and
+the controlled synthesis and reference experiments. The new evidence branch
+retains the historical paths from main and carries the saved comparisons and
+workers from the earlier submission branch. The paper scopes the automated
+tennis ball study, annotation-conditioned cross-sport coding, and estimated
+route counts separately. The current evidence package does not require new
+GPU work. A continuous cold-to-warm broadcast evaluation remains a follow-up.
+The [paid-pose control accounting](experiments/pose-sidecar-accounting-20261126/)
+identifies two Shanghai video-plus-pose candidates under the warm byte ceiling.
+An actual packet replay and machine comparison are still required.
+
 ## November 25 validation
 
 The active manuscript is based on local revision `30afdee`. It compiled
@@ -41,7 +65,7 @@ Linux CI and merged at `6763d3a` and `a8408a2`.
   author's decision. Retain the no-broadcast package until the specific
   plates and comparison video have documented clearance.
 
-## Resume from these revisions
+## November 23–25 historical revision notes
 
 | Repository | Verified revision and access |
 |---|---|
@@ -63,7 +87,7 @@ Use the platform's existing GitHub, Overleaf and campus access. On a registered 
 
 More matches are worth the cost for breadth. First use the cheapest completed or nearly completed shots with compatible inputs, actual receiver bytes and matched controls. Prioritize distinct events, then different prespecified points within each event. A qualified generated-player bank can serve several rate settings. Preserve conventional fallbacks in the denominator. See [development evidence](experiments/reviewed-foreground-20261122/README.md) and the [cohort design](experiments/broad-tennis-18-rallies-20261123/README.md).
 
-## Next execution session
+## Historical execution queue
 
 Use [PLAN.md](../PLAN.md) as the queue. **Halle is the first compute priority** because the sender and far-player archive exist and a complete third external example would add new footage to the central result. Inspect the far receipt and frozen near-role spec before dispatch. Recover the source-matched 640-wide AV1 and neural controls from saved evidence where possible. Then qualify the short native London player path and expand the prespecified cohort. A higher-rate Shanghai neural control is conditional on extending the stated comparator claim. Finish with the manuscript and replication audit. The previous overnight compute authorization has ended.
 
