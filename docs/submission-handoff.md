@@ -24,6 +24,9 @@ workers from the earlier submission branch. The paper scopes the automated
 tennis ball study, annotation-conditioned cross-sport coding, and estimated
 route counts separately. The current evidence package does not require new
 GPU work. A continuous cold-to-warm broadcast evaluation remains a follow-up.
+The [paid-pose control accounting](experiments/pose-sidecar-accounting-20261126/)
+identifies two Shanghai video-plus-pose candidates under the warm byte ceiling.
+An actual packet replay and machine comparison are still required.
 
 ## November 25 validation
 
